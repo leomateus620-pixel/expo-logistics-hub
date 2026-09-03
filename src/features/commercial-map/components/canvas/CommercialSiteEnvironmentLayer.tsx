@@ -16,6 +16,7 @@ import {
   type OpenGroundSurfaceProfile,
   type OpenGroundTextureBundle,
 } from './openGroundTextures';
+import { applyParkGroundDetail } from './terrainMaterial';
 
 const NO_RAYCAST = () => undefined;
 
@@ -99,10 +100,19 @@ function createCellBatchGeometry(cells: readonly CommercialSiteEnvironmentCell[]
   return geometry;
 }
 
+// Concrete aprons keep their flat finish; every soil/grass treatment gets the
+// park-scale fBm so the cells stop reading as a single flat tint.
+const PARK_DETAIL_MATERIALS: ReadonlySet<CommercialSiteEnvironmentMaterialId> = new Set([
+  'foundation-contact',
+  'compacted-ground',
+  'grass-dry-mix',
+]);
+
 function createMaterial(
   materialId: CommercialSiteEnvironmentMaterialId,
   opacity: number,
   textures: OpenGroundTextureBundle | null,
+  reducedGraphics: boolean,
 ) {
   const definition = COMMERCIAL_SITE_ENVIRONMENT_MATERIALS[materialId];
   const material = new THREE.MeshStandardMaterial({
@@ -123,6 +133,7 @@ function createMaterial(
     polygonOffsetUnits: -1,
   });
   material.userData.presentationOnly = true;
+  if (PARK_DETAIL_MATERIALS.has(materialId)) applyParkGroundDetail(material, reducedGraphics);
   return material;
 }
 
@@ -163,11 +174,12 @@ export const CommercialSiteEnvironmentLayer = memo(function CommercialSiteEnviro
             materialId,
             Math.max(0, Math.min(1, opacity)),
             textureBundles[materialId],
+            reducedGraphics,
           ),
           cellCount: cells.length,
         } satisfies CommercialSiteEnvironmentBatch];
       })
-  ), [activeCellsByMaterial, opacity, textureBundles]);
+  ), [activeCellsByMaterial, opacity, reducedGraphics, textureBundles]);
 
   useEffect(() => () => {
     batches.forEach((batch) => {

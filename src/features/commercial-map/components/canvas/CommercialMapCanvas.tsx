@@ -153,6 +153,7 @@ import { MiranteInteriorScene } from './MiranteInteriorScene';
 import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
 import { NationsDistrict } from './NationsDistrict';
 import { CommercialMapEnvironment } from './CommercialMapEnvironment';
+import { applyParkGroundDetail } from './terrainMaterial';
 import { CommercialMapAdaptiveQualityController } from './CommercialMapAdaptiveQuality';
 import {
   createInitialCommercialMapQualityState,
@@ -827,6 +828,14 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     () => (openGroundProfile ? openGroundTextureBundleForEntity(openGroundProfile, maxAnisotropy) : null),
     [maxAnisotropy, openGroundProfile],
   );
+  const openGroundMaterialRef = useRef<THREE.MeshStandardMaterial>(null);
+  const openGroundReducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  useLayoutEffect(() => {
+    // Presentation only: the large open fields share the park-scale terrain
+    // fBm so they never read as one flat tile next to the environment ground.
+    if (!openGroundProfile || !openGroundMaterialRef.current) return;
+    applyParkGroundDetail(openGroundMaterialRef.current, openGroundReducedGraphics);
+  }, [openGroundProfile, openGroundReducedGraphics, openGroundTextures]);
 
   const geometry = useMemo(
     () => isQuadra || isGate || isNationsPresentationSurface
@@ -972,6 +981,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
             <meshBasicMaterial visible={false} />
           ) : (
             <meshStandardMaterial
+              ref={openGroundMaterialRef}
               color={displayColor}
               map={openGroundTextures?.map}
               normalMap={openGroundTextures?.normalMap}

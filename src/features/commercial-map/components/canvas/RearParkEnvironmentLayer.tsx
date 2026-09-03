@@ -13,6 +13,7 @@ import {
 } from './openGroundTextures';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { buildRearTerrainPatchGeometry } from '../../utils/rearTerrainGeometry';
+import { applyParkGroundDetail } from './terrainMaterial';
 
 interface RearParkEnvironmentLayerProps {
   reducedGraphics: boolean;
@@ -57,6 +58,19 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
   );
 
   useEffect(() => () => grassTextures?.dispose(), [grassTextures]);
+
+  const terrainMaterial = useMemo(() => applyParkGroundDetail(new THREE.MeshStandardMaterial({
+    name: 'RearParkTerrainMaterial',
+    map: grassTextures?.map ?? null,
+    normalMap: grassTextures?.normalMap ?? null,
+    normalScale: grassTextures ? REAR_TERRAIN_NORMAL_SCALE : undefined,
+    roughnessMap: grassTextures?.roughnessMap ?? null,
+    color: REAR_TERRAIN_SURFACE_PROFILE.baseColor,
+    roughness: REAR_TERRAIN_SURFACE_PROFILE.roughness,
+    metalness: 0,
+  }), reducedGraphics), [grassTextures, reducedGraphics]);
+
+  useEffect(() => () => terrainMaterial.dispose(), [terrainMaterial]);
 
   const trees = useMemo(
     () => (vegetationVisible ? buildRearTreeInstances(reducedGraphics) : []),
@@ -132,18 +146,9 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
           geometry={entry.geometry}
           raycast={NO_RAYCAST}
           receiveShadow={!reducedGraphics}
+          material={terrainMaterial}
           dispose={null}
-        >
-          <meshStandardMaterial
-            map={grassTextures?.map}
-            normalMap={grassTextures?.normalMap}
-            normalScale={grassTextures ? REAR_TERRAIN_NORMAL_SCALE : undefined}
-            roughnessMap={grassTextures?.roughnessMap}
-            color={REAR_TERRAIN_SURFACE_PROFILE.baseColor}
-            roughness={REAR_TERRAIN_SURFACE_PROFILE.roughness}
-            metalness={0}
-          />
-        </mesh>
+        />
       ))}
 
       {trees.length > 0 && (

@@ -3,8 +3,10 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   TERRAIN_MULTISCALE_DEFAULTS,
   TERRAIN_MULTISCALE_PROGRAM_CACHE_KEY,
+  applyParkGroundDetail,
   applyTerrainMultiscaleDetail,
   createMultiscaleTerrainMaterial,
+  hasTerrainMultiscaleDetail,
   resolveTerrainMultiscaleQualityOptions,
   resolveTerrainMultiscaleOptions,
 } from '../features/commercial-map/components/canvas/terrainMaterial';
@@ -64,6 +66,30 @@ describe('material multiescala do terreno comercial', () => {
     expect(balanced!.worldOrigin).toEqual([12, -8]);
   });
 
+  it('usa um perfil de parque com octavas menores para a grama interna sem tocar geometria', () => {
+    const outer = resolveTerrainMultiscaleQualityOptions('full', 400, [0, 0], 'outer');
+    const park = resolveTerrainMultiscaleQualityOptions('full', 400, [0, 0], 'park');
+
+    expect(park).not.toBeNull();
+    expect(resolveTerrainMultiscaleQualityOptions('reduced', 400, [0, 0], 'park')).toBeNull();
+    // The park crop is ~150 units wide: its base octave must be a fraction of it.
+    expect(park!.macroWorldSize).toBeLessThan(80);
+    expect(park!.macroWorldSize).toBeLessThan(outer!.macroWorldSize);
+    expect(park!.microWorldSize).toBeLessThan(outer!.microWorldSize);
+    expect(park!.tilingBreak).toBeGreaterThan(0.5);
+    expect(park!.tintStrength).toBeGreaterThan(0);
+
+    const material = new THREE.MeshStandardMaterial({ color: '#8aa465' });
+    expect(applyParkGroundDetail(material, true)).toBe(material);
+    expect(hasTerrainMultiscaleDetail(material)).toBe(false);
+    expect(applyParkGroundDetail(material, false)).toBe(material);
+    expect(hasTerrainMultiscaleDetail(material)).toBe(true);
+    const shader = standardShader();
+    material.onBeforeCompile(shader, {} as THREE.WebGLRenderer);
+    expect(shader.uniforms.uCommercialTerrainMacroFrequency.value).toBeCloseTo(1 / park!.macroWorldSize);
+    expect(shader.uniforms.uCommercialTerrainTilingBreak.value).toBe(park!.tilingBreak);
+  });
+
   it('preserva MeshStandard/PBR e injeta variação macro/micro em world-space', () => {
     const material = createMultiscaleTerrainMaterial(
       { color: '#8ca375', roughness: 0.96, metalness: 0 },
@@ -91,8 +117,16 @@ describe('material multiescala do terreno comercial', () => {
     );
     expect(shader.vertexShader).toContain('#ifdef USE_INSTANCING');
     expect(shader.vertexShader).toContain('#include <project_vertex>');
-    expect(shader.fragmentShader).toContain('commercialTerrainMacro = commercialTerrainNoise');
+    expect(shader.fragmentShader).toContain('float commercialTerrainFbm(vec2 position)');
+    expect(shader.fragmentShader).toContain('for (int octave = 0; octave < 4; octave += 1)');
+    expect(shader.fragmentShader).toContain('commercialTerrainMacro = commercialTerrainFbm');
     expect(shader.fragmentShader).toContain('commercialTerrainMicro = commercialTerrainNoise');
+    // Tiling break replaces <map_fragment> but keeps r170's decode/multiply path.
+    expect(shader.fragmentShader).not.toContain('#include <map_fragment>');
+    expect(shader.fragmentShader).toContain('vec4 sampledDiffuseColor = texture2D( map, vMapUv );');
+    expect(shader.fragmentShader).toContain('uCommercialTerrainTilingBreak');
+    expect(shader.fragmentShader).toContain('diffuseColor *= sampledDiffuseColor;');
+    expect(shader.fragmentShader).toContain('commercialTerrainTint');
     expect(shader.fragmentShader).toContain(
       'distance(cameraPosition, vCommercialTerrainWorldPosition)',
     );

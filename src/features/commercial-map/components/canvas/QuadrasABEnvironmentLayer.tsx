@@ -12,6 +12,7 @@ import {
 } from '../../utils/quadrasABEnvironment';
 import { commercialSitePolygonBounds } from '../../utils/commercialSiteEnvironment';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
+import { applyParkGroundDetail } from './terrainMaterial';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_LEAF = new THREE.CircleGeometry(0.5, 7);
@@ -230,7 +231,11 @@ function createCellGeometry(
   return geometry;
 }
 
-function createGroundMaterial(quadra: QuadraId, textures: QuadraGroundTextureBundle) {
+function createGroundMaterial(
+  quadra: QuadraId,
+  textures: QuadraGroundTextureBundle,
+  reducedGraphics: boolean,
+) {
   const material = new THREE.MeshStandardMaterial({
     name: `QuadrasAB:organic-blend:${quadra}`,
     color: '#ffffff',
@@ -245,7 +250,7 @@ function createGroundMaterial(quadra: QuadraId, textures: QuadraGroundTextureBun
     polygonOffsetUnits: -1,
   });
   material.userData.presentationOnly = true;
-  return material;
+  return applyParkGroundDetail(material, reducedGraphics);
 }
 
 function DetailInstances({ anchors, reducedGraphics }: {
@@ -317,10 +322,10 @@ export const QuadrasABEnvironmentLayer = memo(function QuadrasABEnvironmentLayer
     return cells.length ? [Object.freeze({
       quadra,
       geometry: createCellGeometry(cells, reference.polygon),
-      material: createGroundMaterial(quadra, textureBundles[quadra]),
+      material: createGroundMaterial(quadra, textureBundles[quadra], reducedGraphics),
       cellCount: cells.length,
     })] : [];
-  })), [plan.cells, textureBundles]);
+  })), [plan.cells, reducedGraphics, textureBundles]);
 
   useEffect(() => () => {
     batches.forEach((batch) => {
