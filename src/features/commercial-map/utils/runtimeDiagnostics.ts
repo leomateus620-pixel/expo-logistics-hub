@@ -2,6 +2,7 @@ import type { ProfilerOnRenderCallback } from 'react';
 import * as THREE from 'three';
 import type { WebGLRenderer } from 'three';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
+import type { CommercialMapQualityTier } from './viewport';
 
 interface RuntimeEvent {
   at: number;
@@ -20,6 +21,7 @@ interface RendererSnapshot {
   width: number;
   height: number;
   heapBytes: number | null;
+  qualityTier: CommercialMapQualityTier | null;
 }
 
 export interface CommercialMapRuntimeDiagnostics {
@@ -37,6 +39,9 @@ export interface CommercialMapRuntimeDiagnostics {
   reactCommits: RuntimeEvent[];
   longTasks: RuntimeEvent[];
   frameTimes: RuntimeEvent[];
+  qualityChanges: RuntimeEvent[];
+  qualityTier: CommercialMapQualityTier | null;
+  qualityDpr: number | null;
   snapshots: RendererSnapshot[];
   capture: () => RendererSnapshot | null;
   resetSamples: () => void;
@@ -63,7 +68,22 @@ function appendBounded<T>(target: T[], entry: T, limit = 240) {
 
 function ensureDiagnostics() {
   if (typeof window === 'undefined') return null;
-  if (window.__commercialMapRuntimeDiagnostics) return window.__commercialMapRuntimeDiagnostics;
+  if (window.__commercialMapRuntimeDiagnostics) {
+    const existing = window.__commercialMapRuntimeDiagnostics;
+    // DEV globals survive hot reloads. Migrate an older diagnostics object so
+    // adding quality telemetry cannot turn HMR into a runtime exception.
+    if (!Array.isArray(existing.qualityChanges)) {
+      existing.qualityChanges = [];
+      existing.qualityTier = null;
+      existing.qualityDpr = null;
+      const previousResetSamples = existing.resetSamples;
+      existing.resetSamples = () => {
+        previousResetSamples();
+        existing.qualityChanges.length = 0;
+      };
+    }
+    return existing;
+  }
   const diagnostics: CommercialMapRuntimeDiagnostics = {
     canvasMounts: 0,
     activeCanvases: 0,
@@ -79,6 +99,9 @@ function ensureDiagnostics() {
     reactCommits: [],
     longTasks: [],
     frameTimes: [],
+    qualityChanges: [],
+    qualityTier: null,
+    qualityDpr: null,
     snapshots: [],
     capture: () => null,
     resetSamples: () => {
@@ -86,6 +109,7 @@ function ensureDiagnostics() {
       diagnostics.reactCommits.length = 0;
       diagnostics.longTasks.length = 0;
       diagnostics.frameTimes.length = 0;
+      diagnostics.qualityChanges.length = 0;
       diagnostics.snapshots.length = 0;
     },
   };
@@ -164,6 +188,7 @@ export function registerCommercialMapRuntimeDiagnostics({
       width: drawingBuffer.x,
       height: drawingBuffer.y,
       heapBytes: performanceMemory.memory?.usedJSHeapSize ?? null,
+      qualityTier: diagnostics.qualityTier,
     };
     appendBounded(diagnostics.snapshots, snapshot, 120);
     gl.domElement.dataset.commercialMapRendererInfo = JSON.stringify(snapshot);
@@ -255,4 +280,33 @@ export function recordCommercialMapFrame(deltaMs: number) {
     at: now(),
     duration: Number(deltaMs.toFixed(3)),
   });
+}
+
+export function recordCommercialMapQualityDecision({
+  tier,
+  hardwareCeiling,
+  dpr,
+  reducedGraphics,
+  reason,
+}: {
+  tier: CommercialMapQualityTier;
+  hardwareCeiling: CommercialMapQualityTier;
+  dpr: number;
+  reducedGraphics: boolean;
+  reason: string;
+}) {
+  if (!import.meta.env.DEV || !Number.isFinite(dpr) || dpr <= 0) return;
+  const diagnostics = ensureDiagnostics();
+  if (!diagnostics) return;
+  diagnostics.qualityTier = tier;
+  diagnostics.qualityDpr = dpr;
+  appendBounded(diagnostics.qualityChanges, {
+    type: 'adaptive-quality-changed',
+    at: now(),
+    tier,
+    hardwareCeiling,
+    dpr: Number(dpr.toFixed(3)),
+    reducedGraphics,
+    reason,
+  }, 120);
 }

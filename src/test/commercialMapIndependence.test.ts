@@ -70,8 +70,9 @@ describe('arquitetura independente do Mapa Comercial', () => {
     const commissionPage = read('src/pages/commissions/CommissionCommercialMapPage.tsx');
 
     expect(canvas.match(/<CommercialTreeLayer/g)).toHaveLength(1);
-    expect(treeLayer.match(/<instancedMesh/g)).toHaveLength(4);
-    expect(treeLayer.match(/raycast=\{NO_RAYCAST\}/g)).toHaveLength(4);
+    expect(treeLayer.match(/<instancedMesh/g)).toHaveLength(5);
+    expect(treeLayer.match(/raycast=\{NO_RAYCAST\}/g)).toHaveLength(5);
+    expect(treeLayer).toContain('name="contato-solo-arvores-comerciais"');
     expect(treeLayer).toContain('computeBoundingSphere()');
     expect(treeLayer).toContain('gl.shadowMap.needsUpdate = true');
     expect(commissionPage).toContain('<CommercialMapWorkspace scope={scope} />');

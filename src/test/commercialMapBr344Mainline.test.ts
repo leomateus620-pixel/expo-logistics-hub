@@ -46,7 +46,7 @@ const FORBIDDEN_TOUCH = [
 const SLICE_FILES = [
   'src/features/commercial-map/highways/br344/br344Mainline.ts',
   'src/features/commercial-map/highways/br344/br344Geometry.ts',
-  'src/features/commercial-map/highways/br344/Br344Mainline.tsx',
+  'src/features/commercial-map/highways/br344/Br344MainlineView.tsx',
   'src/features/commercial-map/highways/br344/index.ts',
 ] as const;
 
@@ -144,10 +144,10 @@ describe('BR-344 mainline — isolated E–W highway slice', () => {
     expect(BR344_PUBLIC_IDENTIFIER).toBe('RODOVIA-BR-344');
   });
 
-  it('uses the Image 2 cartographic language: green carriageway, tan shoulders, yellow edges', () => {
-    expect(BR344_CARTOGRAPHIC_FINISH.carriagewayColor).toMatch(/^#3d/i);
-    expect(BR344_CARTOGRAPHIC_FINISH.shoulderColor).toMatch(/^#c/i);
-    expect(BR344_CARTOGRAPHIC_FINISH.yellowEdgeColor).toMatch(/^#f5/i);
+  it('uses architectural-aerial asphalt, compacted shoulders and restrained yellow edges', () => {
+    expect(BR344_CARTOGRAPHIC_FINISH.carriagewayColor).toBe('#585e62');
+    expect(BR344_CARTOGRAPHIC_FINISH.shoulderColor).toBe('#a99b84');
+    expect(BR344_CARTOGRAPHIC_FINISH.yellowEdgeColor).toBe('#e3c44b');
 
     expect(BR344_OFFSETS.northYellowOuter).toBeLessThan(BR344_OFFSETS.northShoulderOuter);
     expect(BR344_OFFSETS.northShoulderOuter).toBeLessThan(BR344_OFFSETS.northCarriagewayOuter);
@@ -165,7 +165,7 @@ describe('BR-344 mainline — isolated E–W highway slice', () => {
     expect(BR344_CROSS_SECTION.shoulderWidth).toBe(REGIONAL_HIGHWAY_PROFILE.shoulderWidth);
     expect(BR344_CROSS_SECTION.yellowEdgeWidth).toBe(REGIONAL_HIGHWAY_PROFILE.edgeLineWidth);
 
-    const component = read('src/features/commercial-map/highways/br344/Br344Mainline.tsx');
+    const component = read('src/features/commercial-map/highways/br344/Br344MainlineView.tsx');
     expect(component).toContain('BR344_CARTOGRAPHIC_FINISH.carriagewayColor');
     expect(component).toContain('BR344_CARTOGRAPHIC_FINISH.shoulderColor');
     expect(component).toContain('BR344_CARTOGRAPHIC_FINISH.yellowEdgeColor');

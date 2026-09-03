@@ -715,9 +715,11 @@ export const CommercialPavilion = memo(function CommercialPavilion({
     materials.wall.bumpScale = 0.012;
     materials.roof.map = textures.zinc;
     materials.roof.bumpMap = textures.zinc;
-    materials.roof.bumpScale = 0.006;
-    materials.roof.roughness = 0.64;
-    materials.roof.metalness = 0.2;
+    materials.roof.bumpScale = 0.008;
+    // Weathered galvanised sheet: a touch more sheen so ridges catch the 24°
+    // key and roofs stop reading as flat paint. Colours are untouched.
+    materials.roof.roughness = 0.58;
+    materials.roof.metalness = 0.26;
     materials.platform.bumpMap = textures.concrete;
     materials.platform.bumpScale = 0.01;
     materials.wall.needsUpdate = true;

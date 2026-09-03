@@ -15,13 +15,104 @@ import {
   commercialTreeGroundElevation,
   commercialTreeShadowElevationAtPosition,
 } from '../../utils/treeLayer';
+import {
+  buildVegetationLodSelectionPlan,
+  createVegetationLodController,
+  resolveVegetationLodTier,
+  vegetationLodDistanceToAnchor,
+  type VegetationLodTier,
+} from '../../utils/vegetationLod';
+import type { CommercialMapQualityTier } from '../../utils/viewport';
+import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 
 const NO_RAYCAST = () => undefined;
 const SHADOW_OPACITY = 0.105;
-const CONTACT_PATCH_OPACITY = 0.38;
+const CONTACT_PATCH_OPACITY = 0.52;
 const UNIT_Y = new THREE.Vector3(0, 1, 0);
 const SUNRISE_SHADOW_DIRECTION = projectedCommercialMapShadowDirection();
 const SUNRISE_SHADOW_ROTATION = projectedCommercialMapShadowRotation();
+/**
+ * Every LOD tier keeps 100% of the canonical inventory. A tree may lose its
+ * branches with distance, but a tree is never removed: that pop is the one
+ * artefact this presentation forbids. Full graphics keeps the real shadow
+ * caster and the ground-contact patch at every distance so the overview
+ * (Anexo 2 look) still reads volume. Reduced/mobile swaps the caster for
+ * the cheap instanced footprint.
+ */
+const COMMERCIAL_TREE_LOD_DENSITY = Object.freeze({ near: 1, mid: 1, far: 1 });
+const COMMERCIAL_TREE_LOD_TRANSITION_RATE = 7;
+
+interface CommercialTreeLodSceneMetrics {
+  anchor: Readonly<{ x: number; y: number; z: number }>;
+  diagonal: number;
+}
+
+interface CommercialTreeLodInstanceCounts {
+  trees: number;
+  trunks: number;
+  branches: number;
+  crowns: number;
+  shadows: number;
+  contactPatches: number;
+  castsDynamicShadows: boolean;
+}
+
+// Renderer-free tests verify that the canonical near tier is a complete set.
+// eslint-disable-next-line react-refresh/only-export-components
+export function resolveCommercialTreeLodSceneMetrics(
+  trees: readonly Pick<CommercialMapTree, 'position' | 'canopyRadius'>[],
+): CommercialTreeLodSceneMetrics {
+  if (trees.length === 0) return { anchor: { x: 0, y: 0, z: 0 }, diagonal: 1 };
+  let minimumX = Number.POSITIVE_INFINITY;
+  let maximumX = Number.NEGATIVE_INFINITY;
+  let minimumZ = Number.POSITIVE_INFINITY;
+  let maximumZ = Number.NEGATIVE_INFINITY;
+  trees.forEach((tree) => {
+    minimumX = Math.min(minimumX, tree.position[0] - tree.canopyRadius);
+    maximumX = Math.max(maximumX, tree.position[0] + tree.canopyRadius);
+    minimumZ = Math.min(minimumZ, tree.position[1] - tree.canopyRadius);
+    maximumZ = Math.max(maximumZ, tree.position[1] + tree.canopyRadius);
+  });
+  return {
+    anchor: {
+      x: (minimumX + maximumX) / 2,
+      y: 0,
+      z: (minimumZ + maximumZ) / 2,
+    },
+    diagonal: Math.max(1, Math.hypot(maximumX - minimumX, maximumZ - minimumZ)),
+  };
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function resolveCommercialTreeLodInstanceCounts(
+  countByTier: Readonly<Record<VegetationLodTier, number>>,
+  tier: VegetationLodTier,
+  lobeCount: number,
+  reducedGraphics: boolean,
+): CommercialTreeLodInstanceCounts {
+  // The full inventory is the near prefix; lower tiers never shrink it.
+  const trees = Math.max(countByTier.near, countByTier[tier]);
+  // Branches are the first detail to go: reduced sheds them past near, full
+  // graphics keep them until the whole park is a distant object.
+  const branchTrees = reducedGraphics
+    ? tier === 'near' ? trees : 0
+    : tier === 'far' ? 0 : trees;
+  // Real shadow-map casting stays on at every distance in full graphics so
+  // the default overview still shows pavilion/tree PCF contact. Reduced and
+  // mobile keep the single cheap instanced footprint instead.
+  const castsDynamicShadows = !reducedGraphics;
+  const shadowTrees = castsDynamicShadows ? 0 : trees;
+  const contactPatchTrees = reducedGraphics ? 0 : trees;
+  return {
+    trees,
+    trunks: trees,
+    branches: branchTrees * COMMERCIAL_TREE_BRANCHES,
+    crowns: trees * Math.max(1, Math.floor(lobeCount)),
+    shadows: shadowTrees,
+    contactPatches: contactPatchTrees,
+    castsDynamicShadows,
+  };
+}
 
 // Renderer-free QA imports these pure presentation contracts without mounting WebGL.
 // eslint-disable-next-line react-refresh/only-export-components
@@ -112,10 +203,10 @@ export function commercialTreePresentationProfile(
     crownLift: (lobeNoise(noiseSeed, 9.1) - 0.5) * tree.canopyRadius * 0.08,
     contactPatchVisible,
     contactScaleX: contactPatchVisible
-      ? tree.canopyRadius * (0.34 + lobeNoise(noiseSeed, 10.7) * 0.13)
+      ? tree.canopyRadius * (0.42 + lobeNoise(noiseSeed, 10.7) * 0.16)
       : 0,
     contactScaleZ: contactPatchVisible
-      ? tree.canopyRadius * (0.27 + lobeNoise(noiseSeed, 12.3) * 0.11)
+      ? tree.canopyRadius * (0.34 + lobeNoise(noiseSeed, 12.3) * 0.14)
       : 0,
     contactRotation: lobeNoise(noiseSeed, 14.1) * Math.PI * 2,
     contactColor: CONTACT_PATCH_PALETTE[
@@ -230,8 +321,8 @@ function createIrregularContactPatchGeometry() {
   return geometry;
 }
 
-function createTreeMaterials(shadowTexture: THREE.Texture, referenceQuadras = false) {
-  return {
+function createTreeMaterials(shadowTexture: THREE.Texture, referenceQuadras = false, reducedGraphics = false) {
+  const materials = {
     trunk: new THREE.MeshStandardMaterial({
       color: '#ffffff',
       roughness: 0.96,
@@ -280,6 +371,8 @@ function createTreeMaterials(shadowTexture: THREE.Texture, referenceQuadras = fa
       polygonOffsetUnits: -1,
     }),
   };
+  applyParkSurfaceDetail(materials.trunk, 'volume', reducedGraphics);
+  return materials;
 }
 
 /**
@@ -335,8 +428,87 @@ function refreshInstanceBounds(mesh: THREE.InstancedMesh | null) {
   if (!mesh) return;
   mesh.instanceMatrix.needsUpdate = true;
   if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  // Bounds must cover every possible LOD prefix. Three computes instanced
+  // bounds from `count`; using the current far count would cull trees that become
+  // visible later when the camera returns to near.
+  const renderedCount = mesh.count;
+  mesh.count = mesh.instanceMatrix.count;
   mesh.computeBoundingBox();
   mesh.computeBoundingSphere();
+  mesh.count = renderedCount;
+}
+
+function setInstanceCount(mesh: THREE.InstancedMesh | null, count: number) {
+  if (mesh && mesh.count !== count) mesh.count = count;
+}
+
+function applyCommercialTreeLodCounts(
+  counts: CommercialTreeLodInstanceCounts,
+  trunk: THREE.InstancedMesh | null,
+  branch: THREE.InstancedMesh | null,
+  crown: THREE.InstancedMesh | null,
+  shadow: THREE.InstancedMesh | null,
+  contactPatch: THREE.InstancedMesh | null,
+) {
+  setInstanceCount(trunk, counts.trunks);
+  setInstanceCount(branch, counts.branches);
+  setInstanceCount(crown, counts.crowns);
+  setInstanceCount(shadow, counts.shadows);
+  setInstanceCount(contactPatch, counts.contactPatches);
+}
+
+function setCommercialTreeCastShadow(
+  castShadow: boolean,
+  trunk: THREE.InstancedMesh | null,
+  branch: THREE.InstancedMesh | null,
+  crown: THREE.InstancedMesh | null,
+) {
+  let changed = false;
+  if (trunk && trunk.castShadow !== castShadow) {
+    trunk.castShadow = castShadow;
+    changed = true;
+  }
+  if (branch && branch.castShadow !== castShadow) {
+    branch.castShadow = castShadow;
+    changed = true;
+  }
+  if (crown && crown.castShadow !== castShadow) {
+    crown.castShadow = castShadow;
+    changed = true;
+  }
+  return changed;
+}
+
+function approachInstanceCount(current: number, target: number, delta: number) {
+  if (current === target) return current;
+  const frameDelta = Math.min(0.1, Math.max(0, Number.isFinite(delta) ? delta : 0));
+  const remaining = Math.abs(target - current);
+  const step = Math.max(
+    1,
+    Math.ceil(remaining * (1 - Math.exp(-COMMERCIAL_TREE_LOD_TRANSITION_RATE * frameDelta))),
+  );
+  return current < target
+    ? Math.min(target, current + step)
+    : Math.max(target, current - step);
+}
+
+function advanceCommercialTreeLodCounts(
+  current: CommercialTreeLodInstanceCounts,
+  target: CommercialTreeLodInstanceCounts,
+  delta: number,
+) {
+  current.trees = approachInstanceCount(current.trees, target.trees, delta);
+  current.trunks = approachInstanceCount(current.trunks, target.trunks, delta);
+  current.branches = approachInstanceCount(current.branches, target.branches, delta);
+  current.crowns = approachInstanceCount(current.crowns, target.crowns, delta);
+  current.shadows = approachInstanceCount(current.shadows, target.shadows, delta);
+  current.contactPatches = approachInstanceCount(current.contactPatches, target.contactPatches, delta);
+  current.castsDynamicShadows = target.castsDynamicShadows;
+  return current.trunks === target.trunks
+    && current.branches === target.branches
+    && current.crowns === target.crowns
+    && current.shadows === target.shadows
+    && current.contactPatches === target.contactPatches;
 }
 
 function CommercialTreeInstances({
@@ -344,12 +516,16 @@ function CommercialTreeInstances({
   surfaceEntities,
   visible,
   reducedGraphics,
+  qualityTier,
+  lodScene,
   referenceQuadras = false,
 }: {
   trees: readonly CommercialMapTree[];
   surfaceEntities: readonly MapEntity[];
   visible: boolean;
   reducedGraphics: boolean;
+  qualityTier: CommercialMapQualityTier;
+  lodScene: CommercialTreeLodSceneMetrics;
   referenceQuadras?: boolean;
 }) {
   const groupRef = useRef<THREE.Group>(null);
@@ -360,17 +536,64 @@ function CommercialTreeInstances({
   const contactPatchRef = useRef<THREE.InstancedMesh>(null);
   const visibilityProgress = useRef(visible ? 1 : 0);
   const transitionPending = useRef(true);
-  const { gl, invalidate } = useThree();
-  const lobeCount = reducedGraphics ? COMMERCIAL_TREE_REDUCED_CANOPY_LOBES : COMMERCIAL_TREE_CANOPY_LOBES;
+  const { camera, gl, invalidate } = useThree();
+  const effectiveReducedGraphics = reducedGraphics || qualityTier === 'LOW';
+  const lobeCount = effectiveReducedGraphics
+    ? COMMERCIAL_TREE_REDUCED_CANOPY_LOBES
+    : COMMERCIAL_TREE_CANOPY_LOBES;
+  // Quality tiers trade lobes, branches and shadow casters, never trees: the
+  // authored inventory is a geometric fact of the park, not a detail budget.
+  const lodPlan = useMemo(() => buildVegetationLodSelectionPlan(trees, {
+    key: (tree) => tree.id,
+    seed: referenceQuadras ? 'commercial-tree-quadras-ab' : 'commercial-tree-legacy',
+    densityByTier: COMMERCIAL_TREE_LOD_DENSITY,
+    densityScale: 1,
+  }), [referenceQuadras, trees]);
+  const lodControllerRef = useRef<ReturnType<typeof createVegetationLodController> | null>(null);
+  if (!lodControllerRef.current) {
+    const initialDistance = vegetationLodDistanceToAnchor(camera.position, lodScene.anchor);
+    lodControllerRef.current = createVegetationLodController({
+      initialTier: resolveVegetationLodTier(initialDistance, lodScene.diagonal),
+    });
+  }
+  const renderedLodTier = lodControllerRef.current.current() ?? 'near';
+  const renderedLodCounts = resolveCommercialTreeLodInstanceCounts(
+    lodPlan.countByTier,
+    renderedLodTier,
+    lobeCount,
+    effectiveReducedGraphics,
+  );
+  const lodRenderedCountsRef = useRef<CommercialTreeLodInstanceCounts>({ ...renderedLodCounts });
+  const lodTargetCountsRef = useRef<CommercialTreeLodInstanceCounts>({ ...renderedLodCounts });
+  const jsxLodCounts = {
+    trees: Math.min(trees.length, lodRenderedCountsRef.current.trees),
+    trunks: Math.min(trees.length, lodRenderedCountsRef.current.trunks),
+    branches: Math.min(
+      trees.length * COMMERCIAL_TREE_BRANCHES,
+      lodRenderedCountsRef.current.branches,
+    ),
+    crowns: Math.min(trees.length * lobeCount, lodRenderedCountsRef.current.crowns),
+    shadows: Math.min(trees.length, lodRenderedCountsRef.current.shadows),
+    contactPatches: Math.min(trees.length, lodRenderedCountsRef.current.contactPatches),
+  };
   const geometries = useMemo(() => ({
-    trunk: new THREE.CylinderGeometry(0.62, 1, 1, referenceQuadras ? 12 : reducedGraphics ? 6 : 8, 2),
+    trunk: new THREE.CylinderGeometry(
+      0.62,
+      1,
+      1,
+      referenceQuadras ? 12 : effectiveReducedGraphics ? 6 : 8,
+      2,
+    ),
     branch: new THREE.CylinderGeometry(0.42, 0.74, 1, 6, 1),
-    crown: createCrownGeometry(reducedGraphics, referenceQuadras),
+    crown: createCrownGeometry(effectiveReducedGraphics, referenceQuadras),
     shadow: new THREE.PlaneGeometry(2, 2, 1, 1),
     contactPatch: createIrregularContactPatchGeometry(),
-  }), [reducedGraphics, referenceQuadras]);
+  }), [effectiveReducedGraphics, referenceQuadras]);
   const shadowTexture = useMemo(createSoftShadowTexture, []);
-  const materials = useMemo(() => createTreeMaterials(shadowTexture, referenceQuadras), [shadowTexture, referenceQuadras]);
+  const materials = useMemo(
+    () => createTreeMaterials(shadowTexture, referenceQuadras, effectiveReducedGraphics),
+    [effectiveReducedGraphics, referenceQuadras, shadowTexture],
+  );
 
   useLayoutEffect(() => {
     const trunkMesh = trunkRef.current;
@@ -383,7 +606,7 @@ function CommercialTreeInstances({
       || !branchMesh
       || !crownMesh
       || !shadowMesh
-      || (!reducedGraphics && !contactPatchMesh)
+      || (!effectiveReducedGraphics && !contactPatchMesh)
     ) return;
 
     const transform = new THREE.Object3D();
@@ -396,7 +619,9 @@ function CommercialTreeInstances({
     const crownColor = new THREE.Color();
     const contactPatchColor = new THREE.Color();
 
-    trees.forEach((tree, treeIndex) => {
+    // Only the GPU slot changes. Every transform still comes from the same
+    // canonical tree and the same surface-clearance functions as before LOD.
+    lodPlan.rankedItems.forEach((tree, treeIndex) => {
       const [x, z] = tree.position;
       const groundY = commercialTreeGroundElevation(tree, surfaceEntities);
       const trunkPalette = (referenceQuadras ? QUADRAS_AB_TRUNK_PALETTES : TRUNK_PALETTES)[tree.speciesGroup];
@@ -495,17 +720,49 @@ function CommercialTreeInstances({
     });
 
     [trunkMesh, branchMesh, crownMesh, shadowMesh, contactPatchMesh].forEach(refreshInstanceBounds);
+    const activeTier = lodControllerRef.current?.current() ?? 'near';
+    const activeCounts = resolveCommercialTreeLodInstanceCounts(
+      lodPlan.countByTier,
+      activeTier,
+      lobeCount,
+      effectiveReducedGraphics,
+    );
+    lodRenderedCountsRef.current = { ...activeCounts };
+    lodTargetCountsRef.current = { ...activeCounts };
+    applyCommercialTreeLodCounts(
+      activeCounts,
+      trunkMesh,
+      branchMesh,
+      crownMesh,
+      shadowMesh,
+      contactPatchMesh,
+    );
+    if (groupRef.current) {
+      groupRef.current.userData.vegetationLodTier = activeTier;
+      groupRef.current.userData.visibleTreeCount = activeCounts.trees;
+    }
     gl.shadowMap.needsUpdate = true;
     invalidate();
-  }, [gl, invalidate, lobeCount, reducedGraphics, referenceQuadras, surfaceEntities, trees]);
+  }, [
+    effectiveReducedGraphics,
+    gl,
+    invalidate,
+    lobeCount,
+    lodPlan,
+    referenceQuadras,
+    surfaceEntities,
+  ]);
 
   useLayoutEffect(() => {
     const group = groupRef.current;
     if (visible && group) group.visible = true;
     if (group) group.scale.setScalar(1);
-    [trunkRef.current, branchRef.current, crownRef.current].forEach((mesh) => {
-      if (mesh) mesh.castShadow = false;
-    });
+    setCommercialTreeCastShadow(
+      visible && lodTargetCountsRef.current.castsDynamicShadows,
+      trunkRef.current,
+      branchRef.current,
+      crownRef.current,
+    );
     transitionPending.current = true;
     gl.shadowMap.needsUpdate = true;
     invalidate();
@@ -520,9 +777,46 @@ function CommercialTreeInstances({
     shadowTexture.dispose();
   }, [materials, shadowTexture]);
 
-  useFrame((_state, delta) => {
+  useFrame((state, delta) => {
     const group = groupRef.current;
     if (!group) return;
+    const lodController = lodControllerRef.current;
+    const distance = vegetationLodDistanceToAnchor(state.camera.position, lodScene.anchor);
+    const changedTier = lodController?.update(distance, lodScene.diagonal) ?? null;
+    if (changedTier) {
+      lodTargetCountsRef.current = resolveCommercialTreeLodInstanceCounts(
+        lodPlan.countByTier,
+        changedTier,
+        lobeCount,
+        effectiveReducedGraphics,
+      );
+      group.userData.vegetationLodTier = changedTier;
+      transitionPending.current = true;
+      // Only drop the real caster when the target tier replaces it with the
+      // instanced footprint; near<->mid keep casting so shadows never blink.
+      if (!lodTargetCountsRef.current.castsDynamicShadows && setCommercialTreeCastShadow(
+        false,
+        trunkRef.current,
+        branchRef.current,
+        crownRef.current,
+      )) gl.shadowMap.needsUpdate = true;
+    }
+
+    const lodCountsSettled = advanceCommercialTreeLodCounts(
+      lodRenderedCountsRef.current,
+      lodTargetCountsRef.current,
+      delta,
+    );
+    applyCommercialTreeLodCounts(
+      lodRenderedCountsRef.current,
+      trunkRef.current,
+      branchRef.current,
+      crownRef.current,
+      shadowRef.current,
+      contactPatchRef.current,
+    );
+    group.userData.visibleTreeCount = lodRenderedCountsRef.current.trees;
+
     const target = visible ? 1 : 0;
     const previous = visibilityProgress.current;
     const next = THREE.MathUtils.damp(previous, target, visible ? 9 : 12, delta);
@@ -536,20 +830,22 @@ function CommercialTreeInstances({
     materials.contactPatch.opacity = CONTACT_PATCH_OPACITY * progress;
     if (settled) {
       group.visible = visible;
-      if (transitionPending.current) {
-        const castShadow = visible && !reducedGraphics;
-        [trunkRef.current, branchRef.current, crownRef.current].forEach((mesh) => {
-          if (mesh) mesh.castShadow = castShadow;
-        });
+      if (transitionPending.current && lodCountsSettled) {
+        const castShadow = visible && lodTargetCountsRef.current.castsDynamicShadows;
+        setCommercialTreeCastShadow(
+          castShadow,
+          trunkRef.current,
+          branchRef.current,
+          crownRef.current,
+        );
         transitionPending.current = false;
         gl.shadowMap.needsUpdate = true;
       }
+      if (!lodCountsSettled) invalidate();
       return;
     }
     invalidate();
   });
-
-  const castsInitialShadow = visible && !reducedGraphics && visibilityProgress.current >= 0.998;
 
   return (
     <group
@@ -559,24 +855,27 @@ function CommercialTreeInstances({
       userData={{
         presentationVariant: referenceQuadras ? 'quadras-ab-reference' : 'legacy',
         treeCount: trees.length,
-        colorPassDrawCalls: reducedGraphics ? 4 : 5,
+        vegetationLodTier: renderedLodTier,
+        visibleTreeCount: jsxLodCounts.trees,
+        nearTierPreservesCanonicalInventory: lodPlan.countByTier.near === trees.length,
+        colorPassDrawCalls: effectiveReducedGraphics ? 4 : 5,
       }}
     >
       <instancedMesh
         ref={shadowRef}
         name="sombras-arvores-comerciais"
         args={[geometries.shadow, materials.shadow, trees.length]}
-        count={trees.length}
+        count={jsxLodCounts.shadows}
         frustumCulled
         renderOrder={3}
         raycast={NO_RAYCAST}
       />
-      {!reducedGraphics && (
+      {!effectiveReducedGraphics && (
         <instancedMesh
           ref={contactPatchRef}
           name="contato-solo-arvores-comerciais"
           args={[geometries.contactPatch, materials.contactPatch, trees.length]}
-          count={trees.length}
+          count={jsxLodCounts.contactPatches}
           frustumCulled
           renderOrder={2}
           raycast={NO_RAYCAST}
@@ -586,8 +885,9 @@ function CommercialTreeInstances({
         ref={trunkRef}
         name="troncos-arvores-comerciais"
         args={[geometries.trunk, materials.trunk, trees.length]}
-        count={trees.length}
-        castShadow={castsInitialShadow}
+        count={jsxLodCounts.trunks}
+        castShadow={!effectiveReducedGraphics}
+        receiveShadow={!effectiveReducedGraphics}
         frustumCulled
         raycast={NO_RAYCAST}
       />
@@ -595,8 +895,9 @@ function CommercialTreeInstances({
         ref={branchRef}
         name="galhos-arvores-comerciais"
         args={[geometries.branch, materials.trunk, trees.length * COMMERCIAL_TREE_BRANCHES]}
-        count={trees.length * COMMERCIAL_TREE_BRANCHES}
-        castShadow={castsInitialShadow}
+        count={jsxLodCounts.branches}
+        castShadow={!effectiveReducedGraphics}
+        receiveShadow={!effectiveReducedGraphics}
         frustumCulled
         raycast={NO_RAYCAST}
       />
@@ -604,8 +905,9 @@ function CommercialTreeInstances({
         ref={crownRef}
         name="copas-arvores-comerciais"
         args={[geometries.crown, materials.crown, trees.length * lobeCount]}
-        count={trees.length * lobeCount}
-        castShadow={castsInitialShadow}
+        count={jsxLodCounts.crowns}
+        castShadow={!effectiveReducedGraphics}
+        receiveShadow={!effectiveReducedGraphics}
         frustumCulled
         raycast={NO_RAYCAST}
       />
@@ -618,17 +920,33 @@ export const CommercialTreeLayer = memo(function CommercialTreeLayer(props: {
   surfaceEntities: readonly MapEntity[];
   visible: boolean;
   reducedGraphics: boolean;
+  qualityTier?: CommercialMapQualityTier;
 }) {
   const treeGroups = useMemo(() => ({
     referenceQuadras: props.trees.filter((tree) => tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B'),
     legacy: props.trees.filter((tree) => tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B'),
   }), [props.trees]);
+  const lodScene = useMemo(() => resolveCommercialTreeLodSceneMetrics(props.trees), [props.trees]);
+  const qualityTier = props.qualityTier ?? 'HIGH';
   if (props.trees.length === 0) return null;
   return (
     <>
-      {treeGroups.legacy.length > 0 && <CommercialTreeInstances {...props} trees={treeGroups.legacy} />}
+      {treeGroups.legacy.length > 0 && (
+        <CommercialTreeInstances
+          {...props}
+          trees={treeGroups.legacy}
+          qualityTier={qualityTier}
+          lodScene={lodScene}
+        />
+      )}
       {treeGroups.referenceQuadras.length > 0 && (
-        <CommercialTreeInstances {...props} trees={treeGroups.referenceQuadras} referenceQuadras />
+        <CommercialTreeInstances
+          {...props}
+          trees={treeGroups.referenceQuadras}
+          qualityTier={qualityTier}
+          lodScene={lodScene}
+          referenceQuadras
+        />
       )}
     </>
   );

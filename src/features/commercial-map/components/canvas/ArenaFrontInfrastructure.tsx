@@ -16,6 +16,7 @@ import {
 } from '../../data/arenaTerrain';
 import { isArenaTerrainExcluded } from '../../data/arenaSectorZoning';
 import { getOpenGroundTexture, openGroundTextureBundleForEntity, type OpenGroundSurface, type OpenGroundSurfaceProfile } from './openGroundTextures';
+import { applyParkSurfaceDetail, bindParkSurfaceMaterial } from './parkSurfaceMaterial';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { integrateGroundGeometryWithRearRoads } from '../../utils/rearRoadGroundIntegration';
 import { ArenaAccessStructure } from './ArenaAccessStructure';
@@ -29,7 +30,7 @@ const EXPORURAL_SMOOTH_CONCRETE_PROFILE = Object.freeze({
   baseColor: EXPORURAL_SMOOTH_CONCRETE_CORRECTION.baseColor,
   roughness: EXPORURAL_SMOOTH_CONCRETE_CORRECTION.roughness,
 } satisfies OpenGroundSurfaceProfile);
-const EXPORURAL_SMOOTH_CONCRETE_NORMAL_SCALE = new THREE.Vector2(0.16, 0.16);
+const EXPORURAL_SMOOTH_CONCRETE_NORMAL_SCALE = new THREE.Vector2(0.26, 0.26);
 
 function featureUserData(featureId: string) {
   const feature = PARK_ENVIRONMENT_FEATURES.find((candidate) => candidate.id === featureId);
@@ -499,7 +500,7 @@ function ArenaTerrain({ opacity }: { opacity: number }) {
   );
 }
 
-function ExporuralSmoothConcrete({ opacity }: { opacity: number }) {
+function ExporuralSmoothConcrete({ opacity, reducedGraphics = false }: { opacity: number; reducedGraphics?: boolean }) {
   const { gl, invalidate } = useThree();
   const maximumAnisotropy = gl.capabilities.getMaxAnisotropy();
   const outline = useMemo(
@@ -547,12 +548,13 @@ function ExporuralSmoothConcrete({ opacity }: { opacity: number }) {
         transparent={opacity < 0.999}
         opacity={opacity}
         depthWrite={opacity > 0.94}
+        ref={bindParkSurfaceMaterial('concrete', reducedGraphics)}
       />
     </mesh>
   );
 }
 
-function ArenaWalkways({ opacity }: { opacity: number }) {
+function ArenaWalkways({ opacity, reducedGraphics = false }: { opacity: number; reducedGraphics?: boolean }) {
   const { invalidate } = useThree();
   const geometry = useMemo(() => {
     const geometries = ARENA_FRONT_LAYOUT.walkways.map((walkway) => (
@@ -590,6 +592,7 @@ function ArenaWalkways({ opacity }: { opacity: number }) {
             transparent={opacity < 0.999}
             opacity={opacity}
             depthWrite={opacity > 0.94}
+            ref={bindParkSurfaceMaterial('concrete', reducedGraphics)}
           />
         </mesh>
       ))}
@@ -695,15 +698,19 @@ function ArenaVegetation({ reducedGraphics, opacity }: { reducedGraphics: boolea
   );
 }
 
-function CourtSurfaces({ opacity }: { opacity: number }) {
+function CourtSurfaces({ opacity, reducedGraphics = false }: { opacity: number; reducedGraphics?: boolean }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   const { invalidate } = useThree();
   const geometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
-  const material = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#ffffff',
-    roughness: 0.91,
-    metalness: 0,
-  }), []);
+  const material = useMemo(() => {
+    const next = new THREE.MeshStandardMaterial({
+      color: '#ffffff',
+      roughness: 0.93,
+      metalness: 0,
+    });
+    applyParkSurfaceDetail(next, 'concrete', reducedGraphics);
+    return next;
+  }, [reducedGraphics]);
 
   useEffect(() => {
     updateMaterialOpacity(material, opacity);
@@ -769,11 +776,15 @@ function MetalInfrastructure({
   const { gl, invalidate } = useThree();
   const segments = useMemo(() => buildMetalSegments(reducedGraphics, subset), [reducedGraphics, subset]);
   const geometry = useMemo(() => new THREE.CylinderGeometry(1, 1, 1, reducedGraphics ? 6 : 8, 1), [reducedGraphics]);
-  const material = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#5d6664',
-    roughness: 0.48,
-    metalness: 0.58,
-  }), []);
+  const material = useMemo(() => {
+    const next = new THREE.MeshStandardMaterial({
+      color: '#5d6664',
+      roughness: 0.48,
+      metalness: 0.58,
+    });
+    applyParkSurfaceDetail(next, 'metal', reducedGraphics);
+    return next;
+  }, [reducedGraphics]);
 
   useEffect(() => {
     updateMaterialOpacity(material, opacity);
@@ -1066,12 +1077,13 @@ function ArenaStructures({
           transparent={opacity < 0.999}
           opacity={opacity}
           depthWrite={opacity > 0.94}
+          ref={bindParkSurfaceMaterial('concrete', reducedGraphics)}
         />
       </mesh>
       <lineSegments geometry={plazaOutline} raycast={NO_RAYCAST}>
         <lineBasicMaterial color="#797b74" transparent opacity={0.55 * opacity} toneMapped={false} />
       </lineSegments>
-      <ArenaWalkways opacity={opacity} />
+      <ArenaWalkways reducedGraphics={reducedGraphics} opacity={opacity} />
       <StepInstances reducedGraphics={reducedGraphics} opacity={opacity} />
       <MetalInfrastructure
         reducedGraphics={reducedGraphics}
@@ -1104,7 +1116,7 @@ function ArenaCourts({
 
   return (
     <group name="quadras-publicas-arena-exporural" userData={COURTS_USER_DATA}>
-      <CourtSurfaces opacity={opacity} />
+      <CourtSurfaces reducedGraphics={reducedGraphics} opacity={opacity} />
       <lineSegments
         name="marcacoes-quadras-arena"
         geometry={lines}
@@ -1157,7 +1169,12 @@ export const ArenaFrontInfrastructure = memo(function ArenaFrontInfrastructure({
         <ArenaAccessStructure reducedGraphics={reducedGraphics} opacity={arenaAccessOpacity} />
       )}
       {showCourts && <ArenaCourts reducedGraphics={reducedGraphics} opacity={courtsOpacity} />}
-      {showExporuralConcrete && <ExporuralSmoothConcrete opacity={exporuralConcreteOpacity} />}
+      {showExporuralConcrete && (
+        <ExporuralSmoothConcrete
+          reducedGraphics={reducedGraphics}
+          opacity={exporuralConcreteOpacity}
+        />
+      )}
     </group>
   );
 });

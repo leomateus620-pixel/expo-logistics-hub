@@ -130,11 +130,13 @@ import {
   isCommercialMapHydrologicalPortraitViewport,
   resolveCommercialMapHydrologicalPortraitTargetShift,
   resolveCommercialMapPixelRatio,
+  resolveCommercialMapQualityPixelRatio,
   clampCommercialMapCameraPosition,
   resolveCommercialMapCameraDistanceBounds,
   resolveCommercialMapCameraFarPlane,
   resolveCommercialMapCameraNearPlane,
   shouldSuppressCommercialMapResizeRefit,
+  type CommercialMapQualityTier,
 } from '../../utils/viewport';
 import type { CameraPreset, CommercialLot, MapCalibration, MapEntity } from '../../types';
 import { HeadquartersInteriorScene } from './HeadquartersInteriorScene';
@@ -151,6 +153,13 @@ import { MiranteInteriorScene } from './MiranteInteriorScene';
 import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
 import { NationsDistrict } from './NationsDistrict';
 import { CommercialMapEnvironment } from './CommercialMapEnvironment';
+import { applyParkGroundDetail } from './terrainMaterial';
+import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
+import { CommercialMapAdaptiveQualityController } from './CommercialMapAdaptiveQuality';
+import {
+  createInitialCommercialMapQualityState,
+  readCommercialMapDeviceCapabilityHints,
+} from '../../utils/adaptiveQualityRuntime';
 import { createCommercialMapEvents } from './commercialMapEvents';
 import { ParkAccessEnvironmentLayer } from './ParkAccessEnvironmentLayer';
 import { RearParkRoadNetwork } from './RearParkRoadNetwork';
@@ -207,6 +216,11 @@ interface CommercialMapCanvasProps {
   isolatedArea?: CommercialMapSegmentId | null;
   segmentOverride?: CommercialMapSegmentDefinition | null;
   technicalValidationAllowed?: boolean;
+  active?: boolean;
+}
+
+interface CommercialMapSceneProps extends CommercialMapCanvasProps {
+  renderQualityTier?: CommercialMapQualityTier;
 }
 
 class SceneAssetBoundary extends Component<{
@@ -385,6 +399,11 @@ const SHARED_RESTROOM_POLE_MATERIAL = new THREE.MeshStandardMaterial({
   metalness: 0.04,
 });
 const OPEN_GROUND_NORMAL_SCALE = new THREE.Vector2(0.22, 0.22);
+// PCFShadowMap honours shadow.radius (PCFSoftShadowMap silently ignores it), so
+// the sunrise can soften/sharpen the penumbra and the map can pick a per-size
+// texel radius. R3F re-applies this object on every configure(), which is why
+// it is not set imperatively in onCreated.
+const COMMERCIAL_MAP_SHADOW_MAP_CONFIG = Object.freeze({ type: THREE.PCFShadowMap });
 
 function entityLabelHeight(entity: MapEntity) {
   const classification = entity.classification;
@@ -815,6 +834,28 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     () => (openGroundProfile ? openGroundTextureBundleForEntity(openGroundProfile, maxAnisotropy) : null),
     [maxAnisotropy, openGroundProfile],
   );
+  const openGroundMaterialRef = useRef<THREE.MeshStandardMaterial>(null);
+  const openGroundReducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  useLayoutEffect(() => {
+    // Presentation only: the large open fields share the park-scale terrain
+    // fBm so they never read as one flat tile next to the environment ground.
+    if (!openGroundMaterialRef.current) return;
+    if (openGroundProfile) {
+      applyParkGroundDetail(openGroundMaterialRef.current, openGroundReducedGraphics);
+      return;
+    }
+    if (classification === 'PARKING' || classification === 'PEDESTRIAN_PATH') {
+      applyParkSurfaceDetail(
+        openGroundMaterialRef.current,
+        classification === 'PEDESTRIAN_PATH' ? 'concrete' : 'asphalt',
+        openGroundReducedGraphics,
+      );
+      return;
+    }
+    if (!isFlat) {
+      applyParkSurfaceDetail(openGroundMaterialRef.current, 'volume', openGroundReducedGraphics);
+    }
+  }, [classification, isFlat, openGroundProfile, openGroundReducedGraphics, openGroundTextures]);
 
   const geometry = useMemo(
     () => isQuadra || isGate || isNationsPresentationSurface
@@ -960,12 +1001,13 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
             <meshBasicMaterial visible={false} />
           ) : (
             <meshStandardMaterial
+              ref={openGroundMaterialRef}
               color={displayColor}
               map={openGroundTextures?.map}
               normalMap={openGroundTextures?.normalMap}
               normalScale={openGroundTextures ? OPEN_GROUND_NORMAL_SCALE : undefined}
               roughnessMap={openGroundTextures?.roughnessMap}
-              roughness={openGroundProfile ? openGroundProfile.roughness : isPavilion ? 0.82 : isFlat ? 0.9 : 0.72}
+              roughness={openGroundProfile ? openGroundProfile.roughness : isPavilion ? 0.82 : classification === 'PARKING' ? 0.94 : isFlat ? 0.9 : 0.72}
               metalness={0}
               transparent={!solidRendering && visualOpacity < 0.995}
               opacity={solidRendering ? 1 : visualOpacity}
@@ -1328,6 +1370,7 @@ function BatchedLots({
   onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
 }) {
   const invalidate = useThree((state) => state.invalidate);
+  const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const hoveredRef = useRef<string | null>(null);
   const pendingHoverRef = useRef<string | null>(null);
   const hoverFrameRef = useRef<number | null>(null);
@@ -1350,7 +1393,14 @@ function BatchedLots({
       return nonIndexed;
     });
     const vertexCount = sourceGeometries.reduce((sum, geometry) => sum + geometry.getAttribute('position').count, 0);
-    const material = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.86, metalness: 0 });
+    const material = new THREE.MeshStandardMaterial({
+      color: '#ffffff',
+      roughness: 0.94,
+      metalness: 0,
+      polygonOffset: true,
+      polygonOffsetFactor: -3,
+      polygonOffsetUnits: -2,
+    });
     const mesh = new THREE.BatchedMesh(entries.length, vertexCount, 0, material);
     const entityByBatchId = new Map<number, string>();
     const batchIdByEntity = new Map<string, number>();
@@ -1409,6 +1459,11 @@ function BatchedLots({
     mesh.receiveShadow = true;
     return { mesh, material, edgeGeometry, entityByBatchId, batchIdByEntity, raycast: mesh.raycast };
   }, [entries, segmentByEntity]);
+
+  useLayoutEffect(() => {
+    if (!batch) return;
+    applyParkSurfaceDetail(batch.material, 'lot', reducedGraphics);
+  }, [batch, reducedGraphics]);
 
   useEffect(() => () => {
     batch?.edgeGeometry.dispose();
@@ -4029,7 +4084,8 @@ function Scene({
   isolatedArea,
   segmentOverride,
   technicalValidationAllowed = false,
-}: CommercialMapCanvasProps) {
+  renderQualityTier = 'HIGH',
+}: CommercialMapSceneProps) {
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const hoveredEntityId = useCommercialMapStore((state) => state.hoveredEntityId);
@@ -4099,6 +4155,19 @@ function Scene({
       sceneElectricalInfrastructure.nodes,
       sceneHydrologicalInfrastructure.nodes,
     ],
+  );
+  // Shadow-only reach: the official park plus its own parking/access aprons.
+  // Regional highway support points stay out so the 2048² shadow map is spent
+  // on pavilions, trees and canopies instead of kilometres of highway verge.
+  const shadowExtent = useMemo(
+    () => getSceneExtent(
+      entities,
+      [
+        ...(parkAccessVisibleInArea(isolatedArea) ? PARK_ACCESS_SCENE_SUPPORT_POINTS : []),
+        ...(rearParkingVisibleInArea(isolatedArea) ? REAR_PARKING_SCENE_SUPPORT_POINTS : []),
+      ],
+    ),
+    [entities, isolatedArea],
   );
   const sceneCenter = useMemo(() => [extent.centerX, extent.centerZ] as const, [extent.centerX, extent.centerZ]);
   const presentedMatchingEntityIds = useMemo(
@@ -4461,9 +4530,11 @@ function Scene({
     <>
       <CommercialMapEnvironment
         extent={extent}
+        shadowExtent={shadowExtent}
         active={!interiorEntity}
         hydrologicalModeActive={hydrologicalModeActive}
         reducedGraphics={reducedGraphics}
+        adaptiveQualityTier={renderQualityTier}
         nightMode={resolveStrategicLandmarkKind(selectedEntity ?? { publicIdentifier: '' }) === 'amusement-park'}
       />
       <InteriorCameraRequestContext.Provider value={setInteriorCameraRequest}>
@@ -4609,6 +4680,7 @@ function Scene({
         surfaceEntities={treeSurfaceEntities}
         visible={treesVisible && !hydrologicalModeActive}
         reducedGraphics={reducedGraphics}
+        qualityTier={renderQualityTier}
       />
       <CommercialElectricalInfrastructureLayer
         nodes={sceneElectricalInfrastructure.nodes}
@@ -4697,6 +4769,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
     isolatedArea,
     segmentOverride,
     technicalValidationAllowed,
+    active = true,
   } = props;
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
@@ -4706,18 +4779,48 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const canvasCleanup = useRef<(() => void) | null>(null);
+  const capabilityHints = useRef(readCommercialMapDeviceCapabilityHints()).current;
   const initialViewport = useRef({
     width: typeof window === 'undefined' ? 1366 : window.innerWidth,
     height: typeof window === 'undefined' ? 768 : window.innerHeight,
     dpr: typeof window === 'undefined' ? 1 : window.devicePixelRatio,
     reducedGraphics,
   });
-  const pixelRatio = useRef(resolveCommercialMapPixelRatio({
-    devicePixelRatio: initialViewport.current.dpr,
+  const initialQualityState = useRef(createInitialCommercialMapQualityState({
     viewportWidth: initialViewport.current.width,
     viewportHeight: initialViewport.current.height,
-    reducedGraphics: initialViewport.current.reducedGraphics,
+    devicePixelRatio: initialViewport.current.dpr,
+    capabilityHints,
   })).current;
+  const initialPixelRatio = useRef(initialViewport.current.reducedGraphics
+    ? resolveCommercialMapPixelRatio({
+        devicePixelRatio: initialViewport.current.dpr,
+        viewportWidth: initialViewport.current.width,
+        viewportHeight: initialViewport.current.height,
+        reducedGraphics: true,
+      })
+    : resolveCommercialMapQualityPixelRatio({
+        devicePixelRatio: initialViewport.current.dpr,
+        viewportWidth: initialViewport.current.width,
+        viewportHeight: initialViewport.current.height,
+        qualityTier: initialQualityState.tier,
+      })).current;
+  const [renderQuality, setRenderQuality] = useState(() => ({
+    tier: initialQualityState.tier,
+    dpr: initialPixelRatio,
+  }));
+  const handleQualityChange = useCallback((next: {
+    tier: CommercialMapQualityTier;
+    dpr: number;
+    sceneTier?: CommercialMapQualityTier;
+  }) => {
+    const sceneTier = next.sceneTier ?? next.tier;
+    setRenderQuality((current) => (
+      current.tier === sceneTier && Math.abs(current.dpr - next.dpr) <= 0.005
+        ? current
+        : { tier: sceneTier, dpr: next.dpr }
+    ));
+  }, []);
   const extent = useMemo(
     () => getSceneExtent(
       entities,
@@ -4765,7 +4868,10 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
         far: resolveCommercialMapCameraFarPlane(extent, initialCameraBounds.maxDistance),
       },
       renderer: {
-        antialias: !reducedGraphics,
+        // Full/balanced use SMAA in the offscreen composer. Reduced and every
+        // interior render directly, so default-framebuffer MSAA must remain
+        // available or mobile roof/road edges would have no AA at all.
+        antialias: true,
         alpha: false,
         powerPreference: 'high-performance',
         preserveDrawingBuffer: false,
@@ -4784,8 +4890,8 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
       events={createCommercialMapEvents}
       frameloop="demand"
       camera={initialRenderConfig.current.camera}
-      dpr={pixelRatio}
-      shadows={!reducedGraphics}
+      dpr={renderQuality.dpr}
+      shadows={reducedGraphics ? false : COMMERCIAL_MAP_SHADOW_MAP_CONFIG}
       gl={initialRenderConfig.current.renderer}
         onCreated={({ gl, scene, camera }) => {
           canvasCleanup.current?.();
@@ -4798,7 +4904,6 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
           gl.outputColorSpace = THREE.SRGBColorSpace;
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           gl.toneMappingExposure = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.toneMappingExposure;
-          gl.shadowMap.type = THREE.PCFSoftShadowMap;
           gl.domElement.style.cursor = 'grab';
       }}
       onPointerMissed={(event) => {
@@ -4817,6 +4922,13 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
         setSelectedEntityId(null);
       }}
     >
+      <CommercialMapAdaptiveQualityController
+        active={active}
+        reducedGraphics={reducedGraphics}
+        initialState={initialQualityState}
+        capabilityHints={capabilityHints}
+        onQualityChange={handleQualityChange}
+      />
       <Profiler id="CommercialMapScene" onRender={recordCommercialMapProfiler}>
         <Scene
           entities={entities}
@@ -4829,6 +4941,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
           isolatedArea={isolatedArea}
           segmentOverride={segmentOverride}
           technicalValidationAllowed={technicalValidationAllowed}
+          renderQualityTier={renderQuality.tier}
         />
       </Profiler>
     </Canvas>

@@ -12,6 +12,7 @@ import {
   openGroundTextureBundleForEntity,
   type OpenGroundSurfaceProfile,
 } from './openGroundTextures';
+import { bindParkSurfaceMaterial } from './parkSurfaceMaterial';
 
 interface RearParkRoadNetworkProps {
   reducedGraphics: boolean;
@@ -37,7 +38,7 @@ const REAR_ROAD_SURFACE_PROFILES = Object.freeze({
   highway: Object.freeze({
     surface: 'highwayAsphalt',
     tileWorldSize: 1,
-    baseColor: '#5a6064',
+    baseColor: '#585e62',
     roughness: 0.97,
   }),
   park: Object.freeze({
@@ -54,8 +55,8 @@ const REAR_ROAD_SURFACE_PROFILES = Object.freeze({
   }),
 } satisfies Readonly<Record<'highway' | 'park' | 'shoulder', OpenGroundSurfaceProfile>>);
 
-const ASPHALT_NORMAL_SCALE = new THREE.Vector2(0.16, 0.16);
-const SHOULDER_NORMAL_SCALE = new THREE.Vector2(0.22, 0.22);
+const ASPHALT_NORMAL_SCALE = new THREE.Vector2(0.28, 0.28);
+const SHOULDER_NORMAL_SCALE = new THREE.Vector2(0.24, 0.24);
 
 /**
  * BR-472, acesso ao parque e extensões corrigidas de Rua Brasília/Ubiretama.
@@ -171,6 +172,7 @@ export const RearParkRoadNetwork = memo(function RearParkRoadNetwork({
             polygonOffset
             polygonOffsetFactor={-1}
             polygonOffsetUnits={-1}
+            ref={bindParkSurfaceMaterial('asphalt', reducedGraphics)}
           />
         </mesh>
       )}
@@ -199,6 +201,7 @@ export const RearParkRoadNetwork = memo(function RearParkRoadNetwork({
             polygonOffset
             polygonOffsetFactor={-1}
             polygonOffsetUnits={-1}
+            ref={bindParkSurfaceMaterial('asphalt', reducedGraphics)}
           />
         </mesh>
       )}
@@ -216,6 +219,7 @@ export const RearParkRoadNetwork = memo(function RearParkRoadNetwork({
             transparent={transparent}
             opacity={presentedOpacity}
             depthWrite={presentedOpacity > 0.42}
+            ref={bindParkSurfaceMaterial('lot', reducedGraphics)}
           />
         </mesh>
       )}

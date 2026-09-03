@@ -16,6 +16,8 @@ import {
   type OpenGroundSurfaceProfile,
   type OpenGroundTextureBundle,
 } from './openGroundTextures';
+import { applyParkGroundDetail } from './terrainMaterial';
+import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 
 const NO_RAYCAST = () => undefined;
 
@@ -41,6 +43,7 @@ const SITE_MATERIAL_PROFILES: Readonly<Record<CommercialSiteEnvironmentMaterialI
   'grass-dry-mix': Object.freeze({ surface: 'parkingGrassDryMix', tileWorldSize: 7.5, baseColor: '#718458', roughness: 1 }),
 });
 const SITE_NORMAL_SCALE = new THREE.Vector2(0.18, 0.18);
+const SITE_CONCRETE_NORMAL_SCALE = new THREE.Vector2(0.28, 0.28);
 
 function variedColor(materialId: CommercialSiteEnvironmentMaterialId, variation: number) {
   const definition = COMMERCIAL_SITE_ENVIRONMENT_MATERIALS[materialId];
@@ -99,10 +102,19 @@ function createCellBatchGeometry(cells: readonly CommercialSiteEnvironmentCell[]
   return geometry;
 }
 
+// Concrete aprons keep their flat finish; every soil/grass treatment gets the
+// park-scale fBm so the cells stop reading as a single flat tint.
+const PARK_DETAIL_MATERIALS: ReadonlySet<CommercialSiteEnvironmentMaterialId> = new Set([
+  'foundation-contact',
+  'compacted-ground',
+  'grass-dry-mix',
+]);
+
 function createMaterial(
   materialId: CommercialSiteEnvironmentMaterialId,
   opacity: number,
   textures: OpenGroundTextureBundle | null,
+  reducedGraphics: boolean,
 ) {
   const definition = COMMERCIAL_SITE_ENVIRONMENT_MATERIALS[materialId];
   const material = new THREE.MeshStandardMaterial({
@@ -111,7 +123,9 @@ function createMaterial(
     vertexColors: true,
     map: textures?.map ?? null,
     normalMap: textures?.normalMap ?? null,
-    normalScale: textures ? SITE_NORMAL_SCALE : undefined,
+    normalScale: textures
+      ? (materialId === 'concrete-apron' ? SITE_CONCRETE_NORMAL_SCALE : SITE_NORMAL_SCALE)
+      : undefined,
     roughnessMap: textures?.roughnessMap ?? null,
     roughness: definition.roughness,
     metalness: 0,
@@ -123,6 +137,8 @@ function createMaterial(
     polygonOffsetUnits: -1,
   });
   material.userData.presentationOnly = true;
+  if (PARK_DETAIL_MATERIALS.has(materialId)) applyParkGroundDetail(material, reducedGraphics);
+  if (materialId === 'concrete-apron') applyParkSurfaceDetail(material, 'concrete', reducedGraphics);
   return material;
 }
 
@@ -163,11 +179,12 @@ export const CommercialSiteEnvironmentLayer = memo(function CommercialSiteEnviro
             materialId,
             Math.max(0, Math.min(1, opacity)),
             textureBundles[materialId],
+            reducedGraphics,
           ),
           cellCount: cells.length,
         } satisfies CommercialSiteEnvironmentBatch];
       })
-  ), [activeCellsByMaterial, opacity, textureBundles]);
+  ), [activeCellsByMaterial, opacity, reducedGraphics, textureBundles]);
 
   useEffect(() => () => {
     batches.forEach((batch) => {

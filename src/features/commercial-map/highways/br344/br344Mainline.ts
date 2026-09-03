@@ -146,17 +146,17 @@ export const BR344_WORLD_POLYLINE: readonly WorldPoint[] = Object.freeze(
 );
 
 /**
- * Cartographic finish from Image 2 — green carriageway, tan shoulders,
- * yellow edges. Local widths are the shared regional family so BR-344,
+ * Architectural-aerial finish — charcoal asphalt, compacted shoulders and
+ * restrained yellow edges. Local widths are the shared regional family so BR-344,
  * BR-472 and the cloverleaf stubs meet without a neck.
  */
 export const BR344_CARTOGRAPHIC_FINISH = Object.freeze({
-  carriagewayColor: '#3db54a',
-  carriagewayRoughness: 0.92,
-  shoulderColor: '#c9ae86',
-  shoulderRoughness: 0.99,
-  yellowEdgeColor: '#f5c518',
-  yellowEdgeRoughness: 0.62,
+  carriagewayColor: '#585e62',
+  carriagewayRoughness: 0.91,
+  shoulderColor: '#a99b84',
+  shoulderRoughness: 0.98,
+  yellowEdgeColor: '#e3c44b',
+  yellowEdgeRoughness: 0.72,
   laneDashColor: '#f4f0d8',
   laneDashRoughness: 0.78,
   medianColor: '#5f7c45',
@@ -315,7 +315,7 @@ export const BR344_INTEGRATOR_CONTRACT = Object.freeze({
   sceneSupport: 'Spread BR344_SCENE_SUPPORT_POINTS into getSceneExtent(..., supportPoints).',
   sourcePolyline: 'BR344_SOURCE_POLYLINE',
   neCloverleafHandoff: BR344_NE_CLOVERLEAF_HANDOFF.id,
-  visualLanguage: 'BR344_CARTOGRAPHIC_FINISH — green carriageway, tan shoulders, yellow edges.',
+  visualLanguage: 'BR344_CARTOGRAPHIC_FINISH — charcoal asphalt, compacted shoulders, restrained yellow edges.',
   outOfScope: Object.freeze([
     'cloverleaf ramps',
     'BR-472',

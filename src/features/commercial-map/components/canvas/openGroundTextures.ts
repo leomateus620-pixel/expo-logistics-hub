@@ -473,13 +473,13 @@ function surfaceDetailSample(surface: OpenGroundSurface, x: number, y: number) {
   const fine = seededNoise(x * 3.7, y * 3.7, 91.2 - surface.length);
 
   if (surface === 'concrete') {
-    return { height: macro * 0.28 + grain * 0.12, roughness: 0.82 + fine * 0.1, strength: 1.2 };
+    return { height: macro * 0.36 + grain * 0.18, roughness: 0.78 + fine * 0.16, strength: 1.55 };
   }
   if (surface === 'highwayAsphalt') {
-    return { height: macro * 0.2 + grain * 0.22, roughness: 0.82 + fine * 0.12, strength: 1.45 };
+    return { height: macro * 0.24 + grain * 0.28, roughness: 0.8 + fine * 0.14, strength: 1.7 };
   }
   if (surface === 'parkAsphalt') {
-    return { height: macro * 0.24 + grain * 0.25, roughness: 0.84 + fine * 0.12, strength: 1.55 };
+    return { height: macro * 0.32 + grain * 0.38, roughness: 0.8 + fine * 0.18, strength: 2.05 };
   }
   if (surface === 'pitchTurf') {
     return { height: macro * 0.45 + grain * 0.31, roughness: 0.9 + fine * 0.08, strength: 2.25 };
@@ -573,7 +573,23 @@ interface OpenGroundTextureSources {
   readonly roughnessMap: THREE.CanvasTexture;
 }
 
+export interface OpenGroundTextureSamplingOverrides {
+  /** Final UV repeat. Use this for PlaneGeometry, whose UVs are normalized. */
+  repeat?: readonly [number, number];
+  wrapS?: THREE.Wrapping;
+  wrapT?: THREE.Wrapping;
+}
+
 const TEXTURE_CACHE = new Map<OpenGroundSurface, OpenGroundTextureSources | null>();
+
+interface PooledOpenGroundTextureBundle {
+  map: THREE.CanvasTexture;
+  normalMap: THREE.CanvasTexture;
+  roughnessMap: THREE.CanvasTexture;
+  references: number;
+}
+
+const TEXTURE_BUNDLE_POOL = new Map<string, PooledOpenGroundTextureBundle>();
 
 function configureSharedTexture(
   texture: THREE.CanvasTexture,
@@ -664,16 +680,17 @@ function cloneOpenGroundTexture(
   sampling: ReturnType<typeof resolveOpenGroundTextureSampling>,
   colorSpace: THREE.ColorSpace,
   anisotropy: number,
+  overrides: Readonly<OpenGroundTextureSamplingOverrides> = {},
 ) {
   const texture = shared.clone();
-  texture.wrapS = sampling.wrapS;
-  texture.wrapT = sampling.wrapT;
+  texture.wrapS = overrides.wrapS ?? sampling.wrapS;
+  texture.wrapT = overrides.wrapT ?? sampling.wrapT;
   texture.colorSpace = colorSpace;
   texture.generateMipmaps = sampling.generateMipmaps;
   texture.minFilter = sampling.minFilter;
   texture.magFilter = sampling.magFilter;
   texture.anisotropy = anisotropy;
-  texture.repeat.set(...sampling.repeat);
+  texture.repeat.set(...(overrides.repeat ?? sampling.repeat));
   texture.needsUpdate = true;
   return texture;
 }
@@ -694,13 +711,15 @@ export function openGroundTextureForEntity(
 }
 
 /**
- * Complete PBR map set for one rendered entity. Every texture is a lightweight
- * clone with its own UV transform; their canvas pixels remain shared by surface
- * kind. Consumers own the clones and release all three through `dispose()`.
+ * Complete PBR map set for one rendered profile. Identical surface, UV scale
+ * and anisotropy requests share the same GPU textures through reference
+ * counting; different sampling profiles remain isolated. Consumers release
+ * their handle through `dispose()` and the last handle releases all three maps.
  */
 export function openGroundTextureBundleForEntity(
   profile: OpenGroundSurfaceProfile,
   maxAnisotropy: number = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.maxAnisotropy,
+  overrides: Readonly<OpenGroundTextureSamplingOverrides> = {},
 ): OpenGroundTextureBundle | null {
   const shared = getOpenGroundTextureSources(profile.surface);
   if (!shared) return null;
@@ -709,36 +728,64 @@ export function openGroundTextureBundleForEntity(
     sampling.anisotropy,
     OPEN_GROUND_TEXTURE_SAMPLING_POLICY.maxDataAnisotropy,
   );
-  const map = cloneOpenGroundTexture(
-    shared.map,
-    sampling,
-    OPEN_GROUND_TEXTURE_SAMPLING_POLICY.colorSpace,
+  const repeat = overrides.repeat ?? sampling.repeat;
+  const wrapS = overrides.wrapS ?? sampling.wrapS;
+  const wrapT = overrides.wrapT ?? sampling.wrapT;
+  const poolKey = [
+    profile.surface,
+    repeat[0].toFixed(8),
+    repeat[1].toFixed(8),
+    wrapS,
+    wrapT,
     sampling.anisotropy,
-  );
-  const normalMap = cloneOpenGroundTexture(
-    shared.normalMap,
-    sampling,
-    OPEN_GROUND_TEXTURE_SAMPLING_POLICY.dataColorSpace,
     dataAnisotropy,
-  );
-  const roughnessMap = cloneOpenGroundTexture(
-    shared.roughnessMap,
-    sampling,
-    OPEN_GROUND_TEXTURE_SAMPLING_POLICY.dataColorSpace,
-    dataAnisotropy,
-  );
+  ].join(':');
+  let pooled = TEXTURE_BUNDLE_POOL.get(poolKey);
+  if (!pooled) {
+    pooled = {
+      map: cloneOpenGroundTexture(
+        shared.map,
+        sampling,
+        OPEN_GROUND_TEXTURE_SAMPLING_POLICY.colorSpace,
+        sampling.anisotropy,
+        overrides,
+      ),
+      normalMap: cloneOpenGroundTexture(
+        shared.normalMap,
+        sampling,
+        OPEN_GROUND_TEXTURE_SAMPLING_POLICY.dataColorSpace,
+        dataAnisotropy,
+        overrides,
+      ),
+      roughnessMap: cloneOpenGroundTexture(
+        shared.roughnessMap,
+        sampling,
+        OPEN_GROUND_TEXTURE_SAMPLING_POLICY.dataColorSpace,
+        dataAnisotropy,
+        overrides,
+      ),
+      references: 0,
+    };
+    TEXTURE_BUNDLE_POOL.set(poolKey, pooled);
+  }
+  pooled.references += 1;
   let disposed = false;
 
   return Object.freeze({
-    map,
-    normalMap,
-    roughnessMap,
+    map: pooled.map,
+    normalMap: pooled.normalMap,
+    roughnessMap: pooled.roughnessMap,
     dispose: () => {
       if (disposed) return;
       disposed = true;
-      map.dispose();
-      normalMap.dispose();
-      roughnessMap.dispose();
+      const live = TEXTURE_BUNDLE_POOL.get(poolKey);
+      if (!live) return;
+      live.references = Math.max(0, live.references - 1);
+      if (live.references > 0) return;
+      TEXTURE_BUNDLE_POOL.delete(poolKey);
+      live.map.dispose();
+      live.normalMap.dispose();
+      live.roughnessMap.dispose();
     },
   });
 }
@@ -765,7 +812,7 @@ function paintAsphalt(context: CanvasRenderingContext2D, variant: 'highway' | 'p
       const grit = fractalNoise(x / 3.1, y / 3.1, 27.7, 2);
       const grain = seededNoise(x, y, 8.2) - 0.5;
       const blend = THREE.MathUtils.clamp(
-        0.42 + (macro - 0.5) * 0.55 + (grit - 0.5) * 0.5 + grain * 0.22,
+        0.42 + (macro - 0.5) * 0.62 + (grit - 0.5) * 0.58 + grain * 0.32,
         0,
         1,
       );
@@ -789,7 +836,7 @@ function paintAsphalt(context: CanvasRenderingContext2D, variant: 'highway' | 'p
   }
 
   // Remendos amplos, de baixa frequência, para evitar asfalto uniforme.
-  for (let index = 0; index < 8; index += 1) {
+  for (let index = 0; index < 14; index += 1) {
     const x = seededNoise(index, 3.3, 19.4) * TEXTURE_SIZE;
     const y = seededNoise(index, 7.7, 5.1) * TEXTURE_SIZE;
     const radius = TEXTURE_SIZE * (0.05 + seededNoise(index, 2.9, 11.2) * 0.12);

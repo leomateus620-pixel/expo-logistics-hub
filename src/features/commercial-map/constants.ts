@@ -24,7 +24,7 @@ export const ROAD_SURFACE_PROFILE = {
   asphaltTextureBase: 228,
   asphaltGrainAmplitude: 10,
   asphaltRoughness: 0.98,
-  asphaltBumpScale: 0.005,
+  asphaltBumpScale: 0.008,
 } as const;
 
 export const CLASSIFICATION_LABELS: Record<MapClassification, string> = {

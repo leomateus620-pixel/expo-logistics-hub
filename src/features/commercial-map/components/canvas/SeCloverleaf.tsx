@@ -2,6 +2,7 @@ import { memo, useEffect, useMemo } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SE_CLOVERLEAF_REVISION } from '../../data/seCloverleaf';
+import { REGIONAL_HIGHWAY_PALETTE } from '../../data/regional-highways';
 import {
   buildSeCloverleafRenderModel,
   disposeSeCloverleafRenderModel,
@@ -23,25 +24,25 @@ const SURFACE_PROFILES = Object.freeze({
   highway: Object.freeze({
     surface: 'highwayAsphalt',
     tileWorldSize: 1,
-    baseColor: '#2f9e44',
+    baseColor: REGIONAL_HIGHWAY_PALETTE.carriageway,
     roughness: 0.92,
   }),
   ramp: Object.freeze({
     surface: 'highwayAsphalt',
     tileWorldSize: 1,
-    baseColor: '#2a8f3d',
+    baseColor: REGIONAL_HIGHWAY_PALETTE.carriagewayGrain,
     roughness: 0.93,
   }),
   crossing: Object.freeze({
     surface: 'highwayAsphalt',
     tileWorldSize: 1,
-    baseColor: '#2f9e44',
+    baseColor: REGIONAL_HIGHWAY_PALETTE.carriageway,
     roughness: 0.94,
   }),
   shoulder: Object.freeze({
     surface: 'roadShoulder',
     tileWorldSize: 1,
-    baseColor: '#d4b896',
+    baseColor: REGIONAL_HIGHWAY_PALETTE.shoulder,
     roughness: 0.96,
   }),
   grass: Object.freeze({

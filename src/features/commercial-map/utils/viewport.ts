@@ -1,10 +1,73 @@
 export type CommercialMapDetailSheetState = 'collapsed' | 'half' | 'expanded';
 
-interface PixelRatioInput {
+export interface CommercialMapPixelRatioInput {
   devicePixelRatio: number;
   viewportWidth: number;
   viewportHeight: number;
   reducedGraphics: boolean;
+}
+
+export type CommercialMapQualityTier = 'LOW' | 'MEDIUM' | 'HIGH' | 'ULTRA';
+
+export interface CommercialMapQualityPreset {
+  tier: CommercialMapQualityTier;
+  pixelBudget: number;
+  maximumPixelRatio: number;
+  shadowMapSize: 512 | 1024 | 2048 | 4096;
+  vegetationDensity: number;
+  distantVegetationDensity: number;
+  ambientOcclusionResolutionScale: number;
+  maximumAnisotropy: 2 | 4 | 8 | 16;
+  lodDistanceScale: number;
+  downgradeAboveFrameTimeMs: number;
+  upgradeBelowFrameTimeMs: number;
+}
+
+export interface CommercialMapQualityCapabilitiesInput {
+  devicePixelRatio: number;
+  viewportWidth: number;
+  viewportHeight: number;
+  deviceMemoryGb?: number | null;
+  hardwareConcurrency?: number | null;
+  isMobile?: boolean;
+}
+
+export interface CommercialMapQualityPixelRatioInput {
+  devicePixelRatio: number;
+  viewportWidth: number;
+  viewportHeight: number;
+  qualityTier: CommercialMapQualityTier;
+}
+
+export interface CommercialMapAdaptiveQualityState {
+  tier: CommercialMapQualityTier;
+  consecutiveSlowWindows: number;
+  consecutiveFastWindows: number;
+  lastDowngradeAtMs: number;
+  downgradeStreak: number;
+}
+
+export interface CommercialMapAdaptiveQualitySample
+  extends CommercialMapQualityCapabilitiesInput {
+  averageFrameTimeMs: number;
+  sampledFrames?: number;
+  nowMs?: number;
+}
+
+export type CommercialMapEnvironmentQualityTier = 'full' | 'balanced' | 'reduced';
+
+export type CommercialMapAdaptiveQualityReason =
+  | 'hardware-cap'
+  | 'sustained-slow-frames'
+  | 'sustained-fast-frames'
+  | 'insufficient-sample'
+  | 'stable';
+
+export interface CommercialMapAdaptiveQualityDecision
+  extends CommercialMapAdaptiveQualityState {
+  hardwareCeiling: CommercialMapQualityTier;
+  changed: boolean;
+  reason: CommercialMapAdaptiveQualityReason;
 }
 
 export interface CommercialMapCameraFramingBounds {
@@ -29,6 +92,80 @@ interface CommercialMapCameraPositionClampInput {
 
 const STANDARD_PIXEL_BUDGET = 4_800_000;
 const REDUCED_PIXEL_BUDGET = 900_000;
+
+export const COMMERCIAL_MAP_QUALITY_TIER_ORDER = [
+  'LOW',
+  'MEDIUM',
+  'HIGH',
+  'ULTRA',
+] as const satisfies readonly CommercialMapQualityTier[];
+
+/**
+ * Renderer-facing budgets remain deliberately orthogonal to accessibility.
+ * A caller may use the tier to tune visual cost, but reduced-motion must never
+ * select one of these presets or disable a fundamental rendering feature.
+ */
+export const COMMERCIAL_MAP_QUALITY_PRESETS = {
+  LOW: {
+    tier: 'LOW',
+    pixelBudget: REDUCED_PIXEL_BUDGET,
+    maximumPixelRatio: 1,
+    shadowMapSize: 512,
+    vegetationDensity: 0.45,
+    distantVegetationDensity: 0.2,
+    ambientOcclusionResolutionScale: 0,
+    maximumAnisotropy: 2,
+    lodDistanceScale: 0.72,
+    downgradeAboveFrameTimeMs: Number.POSITIVE_INFINITY,
+    upgradeBelowFrameTimeMs: 16.4,
+  },
+  MEDIUM: {
+    tier: 'MEDIUM',
+    pixelBudget: 2_000_000,
+    maximumPixelRatio: 1.35,
+    shadowMapSize: 1024,
+    vegetationDensity: 0.7,
+    distantVegetationDensity: 0.45,
+    ambientOcclusionResolutionScale: 0.5,
+    maximumAnisotropy: 4,
+    lodDistanceScale: 0.86,
+    downgradeAboveFrameTimeMs: 25,
+    upgradeBelowFrameTimeMs: 16.2,
+  },
+  HIGH: {
+    tier: 'HIGH',
+    pixelBudget: STANDARD_PIXEL_BUDGET,
+    maximumPixelRatio: 1.75,
+    shadowMapSize: 2048,
+    vegetationDensity: 1,
+    distantVegetationDensity: 0.75,
+    ambientOcclusionResolutionScale: 0.75,
+    maximumAnisotropy: 8,
+    lodDistanceScale: 1,
+    downgradeAboveFrameTimeMs: 22,
+    upgradeBelowFrameTimeMs: 15.8,
+  },
+  ULTRA: {
+    tier: 'ULTRA',
+    pixelBudget: 7_500_000,
+    maximumPixelRatio: 2.25,
+    shadowMapSize: 4096,
+    vegetationDensity: 1,
+    distantVegetationDensity: 1,
+    ambientOcclusionResolutionScale: 1,
+    maximumAnisotropy: 16,
+    lodDistanceScale: 1.12,
+    downgradeAboveFrameTimeMs: 19.5,
+    upgradeBelowFrameTimeMs: 0,
+  },
+} as const satisfies Record<CommercialMapQualityTier, CommercialMapQualityPreset>;
+
+export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES = 45;
+export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_SLOW_WINDOWS = 2;
+export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_FAST_WINDOWS = 4;
+export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_FAST_WINDOWS_ESCALATION = 2;
+export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FAST_WINDOWS = 10;
+export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_UPGRADE_DWELL_MS = 1_500;
 
 export const COMMERCIAL_MAP_RESIZE_REFIT_DEBOUNCE_MS = 180;
 export const COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS = 650;
@@ -200,28 +337,330 @@ export function shouldSuppressCommercialMapResizeRefit(
   return currentTime < suppressionEndsAt;
 }
 
+function optionalFinitePositive(value: number | null | undefined) {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0
+    ? value
+    : undefined;
+}
+
+function commercialMapQualityTierIndex(tier: CommercialMapQualityTier) {
+  return COMMERCIAL_MAP_QUALITY_TIER_ORDER.indexOf(tier);
+}
+
+function commercialMapQualityTierAt(index: number) {
+  const clampedIndex = Math.min(
+    COMMERCIAL_MAP_QUALITY_TIER_ORDER.length - 1,
+    Math.max(0, Math.round(index)),
+  );
+  return COMMERCIAL_MAP_QUALITY_TIER_ORDER[clampedIndex];
+}
+
+/**
+ * Resolves the highest sensible starting tier from stable device signals.
+ * Unknown browser hints are not treated as weak hardware because Safari does
+ * not expose deviceMemory. Runtime frame-time samples can still move the tier.
+ */
+export function resolveCommercialMapQualityCeiling({
+  devicePixelRatio,
+  viewportWidth,
+  viewportHeight,
+  deviceMemoryGb,
+  hardwareConcurrency,
+  isMobile,
+}: CommercialMapQualityCapabilitiesInput): CommercialMapQualityTier {
+  const width = finitePositive(viewportWidth, 1);
+  const height = finitePositive(viewportHeight, 1);
+  const dpr = Math.max(1, finitePositive(devicePixelRatio, 1));
+  const memory = optionalFinitePositive(deviceMemoryGb);
+  const cores = optionalFinitePositive(hardwareConcurrency);
+  const cssPixelCount = width * height;
+  const nativePixelDemand = cssPixelCount * dpr * dpr;
+  const phoneOrMobile = isMobile ?? Math.min(width, height) <= 600;
+  const explicitlyWeak = (memory !== undefined && memory <= 2)
+    || (cores !== undefined && cores <= 2);
+
+  if (explicitlyWeak) return 'LOW';
+
+  if (phoneOrMobile) {
+    const hasStrongMobileSignal = (memory !== undefined && memory >= 4)
+      || (cores !== undefined && cores >= 6);
+    return hasStrongMobileSignal && nativePixelDemand <= 5_000_000
+      ? 'HIGH'
+      : 'MEDIUM';
+  }
+
+  if (cssPixelCount > 8_500_000 || nativePixelDemand > 20_000_000) return 'MEDIUM';
+  if ((memory !== undefined && memory < 4) || (cores !== undefined && cores < 4)) {
+    return 'MEDIUM';
+  }
+
+  const hasUltraHardware = memory !== undefined
+    && cores !== undefined
+    && memory >= 8
+    && cores >= 8;
+  if (hasUltraHardware && cssPixelCount <= 2_500_000 && nativePixelDemand <= 8_500_000) {
+    return 'ULTRA';
+  }
+
+  return 'HIGH';
+}
+
+export function resolveCommercialMapEnvironmentQualityTier(
+  adaptiveTier: CommercialMapQualityTier,
+): CommercialMapEnvironmentQualityTier {
+  if (adaptiveTier === 'LOW') return 'reduced';
+  if (adaptiveTier === 'MEDIUM') return 'balanced';
+  return 'full';
+}
+
+/**
+ * HIGH and ULTRA share the full environment stack (shadow map, terrain
+ * program, composer, regional instances). HIGH↔MEDIUM and MEDIUM↔LOW do not.
+ */
+export function commercialMapQualitySceneRebuildsOnTierChange(
+  from: CommercialMapQualityTier,
+  to: CommercialMapQualityTier,
+) {
+  return resolveCommercialMapEnvironmentQualityTier(from)
+    !== resolveCommercialMapEnvironmentQualityTier(to);
+}
+
+export function resolveCommercialMapAdaptiveUpgradeWindows(downgradeStreak: number) {
+  const extra = Math.max(0, Math.round(downgradeStreak))
+    * COMMERCIAL_MAP_ADAPTIVE_QUALITY_FAST_WINDOWS_ESCALATION;
+  return Math.min(
+    COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FAST_WINDOWS,
+    COMMERCIAL_MAP_ADAPTIVE_QUALITY_FAST_WINDOWS + extra,
+  );
+}
+
+export function createCommercialMapAdaptiveQualityState(
+  capabilities: CommercialMapQualityCapabilitiesInput,
+): CommercialMapAdaptiveQualityState {
+  return {
+    tier: resolveCommercialMapQualityCeiling(capabilities),
+    consecutiveSlowWindows: 0,
+    consecutiveFastWindows: 0,
+    lastDowngradeAtMs: 0,
+    downgradeStreak: 0,
+  };
+}
+
+function stableCommercialMapQualityDecision(
+  state: CommercialMapAdaptiveQualityState,
+  hardwareCeiling: CommercialMapQualityTier,
+  reason: CommercialMapAdaptiveQualityReason,
+): CommercialMapAdaptiveQualityDecision {
+  return {
+    ...state,
+    hardwareCeiling,
+    changed: false,
+    reason,
+  };
+}
+
+/**
+ * Applies two-way hysteresis to rolling frame-time windows. A quality drop
+ * needs two consecutive slow windows. Recovery waits for a dwell period after
+ * each downgrade, then an escalating number of fast windows, so HIGH↔MEDIUM
+ * cannot flap during a single pan/zoom.
+ */
+export function resolveCommercialMapAdaptiveQuality(
+  state: CommercialMapAdaptiveQualityState,
+  sample: CommercialMapAdaptiveQualitySample,
+): CommercialMapAdaptiveQualityDecision {
+  const hardwareCeiling = resolveCommercialMapQualityCeiling(sample);
+  const ceilingIndex = commercialMapQualityTierIndex(hardwareCeiling);
+  const currentIndex = commercialMapQualityTierIndex(state.tier);
+  const nowMs = optionalFiniteTimestamp(sample.nowMs);
+  const lastDowngradeAtMs = optionalFiniteTimestamp(state.lastDowngradeAtMs) ?? 0;
+  const downgradeStreak = Number.isFinite(state.downgradeStreak)
+    ? Math.max(0, Math.round(state.downgradeStreak))
+    : 0;
+
+  if (currentIndex > ceilingIndex) {
+    return {
+      tier: hardwareCeiling,
+      consecutiveSlowWindows: 0,
+      consecutiveFastWindows: 0,
+      lastDowngradeAtMs: nowMs ?? lastDowngradeAtMs,
+      downgradeStreak: downgradeStreak + 1,
+      hardwareCeiling,
+      changed: true,
+      reason: 'hardware-cap',
+    };
+  }
+
+  const sampledFrames = optionalFinitePositive(sample.sampledFrames)
+    ?? COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES;
+  if (!Number.isFinite(sample.averageFrameTimeMs)
+    || sample.averageFrameTimeMs <= 0
+    || sampledFrames < COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES) {
+    return stableCommercialMapQualityDecision(
+      {
+        tier: state.tier,
+        consecutiveSlowWindows: 0,
+        consecutiveFastWindows: 0,
+        lastDowngradeAtMs,
+        downgradeStreak,
+      },
+      hardwareCeiling,
+      'insufficient-sample',
+    );
+  }
+
+  const preset = COMMERCIAL_MAP_QUALITY_PRESETS[state.tier];
+  const canDowngrade = currentIndex > 0;
+  const canUpgrade = currentIndex < ceilingIndex;
+
+  if (canDowngrade && sample.averageFrameTimeMs >= preset.downgradeAboveFrameTimeMs) {
+    const consecutiveSlowWindows = Math.max(0, state.consecutiveSlowWindows) + 1;
+    if (consecutiveSlowWindows >= COMMERCIAL_MAP_ADAPTIVE_QUALITY_SLOW_WINDOWS) {
+      return {
+        tier: commercialMapQualityTierAt(currentIndex - 1),
+        consecutiveSlowWindows: 0,
+        consecutiveFastWindows: 0,
+        lastDowngradeAtMs: nowMs ?? lastDowngradeAtMs,
+        downgradeStreak: downgradeStreak + 1,
+        hardwareCeiling,
+        changed: true,
+        reason: 'sustained-slow-frames',
+      };
+    }
+    return stableCommercialMapQualityDecision(
+      {
+        tier: state.tier,
+        consecutiveSlowWindows,
+        consecutiveFastWindows: 0,
+        lastDowngradeAtMs,
+        downgradeStreak,
+      },
+      hardwareCeiling,
+      'stable',
+    );
+  }
+
+  const dwellElapsed = lastDowngradeAtMs <= 0
+    || nowMs === undefined
+    || nowMs - lastDowngradeAtMs >= COMMERCIAL_MAP_ADAPTIVE_QUALITY_UPGRADE_DWELL_MS;
+  const requiredFastWindows = resolveCommercialMapAdaptiveUpgradeWindows(downgradeStreak);
+
+  if (canUpgrade && sample.averageFrameTimeMs <= preset.upgradeBelowFrameTimeMs) {
+    if (!dwellElapsed) {
+      return stableCommercialMapQualityDecision(
+        {
+          tier: state.tier,
+          consecutiveSlowWindows: 0,
+          consecutiveFastWindows: 0,
+          lastDowngradeAtMs,
+          downgradeStreak,
+        },
+        hardwareCeiling,
+        'stable',
+      );
+    }
+    const consecutiveFastWindows = Math.max(0, state.consecutiveFastWindows) + 1;
+    if (consecutiveFastWindows >= requiredFastWindows) {
+      return {
+        tier: commercialMapQualityTierAt(currentIndex + 1),
+        consecutiveSlowWindows: 0,
+        consecutiveFastWindows: 0,
+        lastDowngradeAtMs: 0,
+        downgradeStreak: 0,
+        hardwareCeiling,
+        changed: true,
+        reason: 'sustained-fast-frames',
+      };
+    }
+    return stableCommercialMapQualityDecision(
+      {
+        tier: state.tier,
+        consecutiveSlowWindows: 0,
+        consecutiveFastWindows,
+        lastDowngradeAtMs,
+        downgradeStreak,
+      },
+      hardwareCeiling,
+      'stable',
+    );
+  }
+
+  return stableCommercialMapQualityDecision(
+    {
+      tier: state.tier,
+      consecutiveSlowWindows: 0,
+      consecutiveFastWindows: 0,
+      lastDowngradeAtMs,
+      downgradeStreak,
+    },
+    hardwareCeiling,
+    'stable',
+  );
+}
+
+function optionalFiniteTimestamp(value: number | null | undefined) {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0
+    ? value
+    : undefined;
+}
+
+function resolveBudgetedCommercialMapPixelRatio({
+  devicePixelRatio,
+  viewportWidth,
+  viewportHeight,
+  pixelBudget,
+  maximumPixelRatio,
+}: {
+  devicePixelRatio: number;
+  viewportWidth: number;
+  viewportHeight: number;
+  pixelBudget: number;
+  maximumPixelRatio: number;
+}) {
+  const safeDpr = Math.max(1, finitePositive(devicePixelRatio, 1));
+  const safeWidth = finitePositive(viewportWidth, 1);
+  const safeHeight = finitePositive(viewportHeight, 1);
+  const safePixelBudget = finitePositive(pixelBudget, REDUCED_PIXEL_BUDGET);
+  const safeMaximumPixelRatio = finitePositive(maximumPixelRatio, 1);
+  const budgetCap = Math.sqrt(safePixelBudget / (safeWidth * safeHeight));
+  const budgeted = Math.min(safeDpr, safeMaximumPixelRatio, budgetCap);
+  // Round down (never to nearest) so the returned drawing buffer cannot cross
+  // the declared budget because of presentation rounding.
+  const roundedDown = Math.floor(budgeted * 100) / 100;
+  return roundedDown > 0 ? roundedDown : budgeted;
+}
+
+export function resolveCommercialMapQualityPixelRatio({
+  qualityTier,
+  ...viewport
+}: CommercialMapQualityPixelRatioInput) {
+  const preset = COMMERCIAL_MAP_QUALITY_PRESETS[qualityTier];
+  return resolveBudgetedCommercialMapPixelRatio({
+    ...viewport,
+    pixelBudget: preset.pixelBudget,
+    maximumPixelRatio: preset.maximumPixelRatio,
+  });
+}
+
 export function resolveCommercialMapPixelRatio({
   devicePixelRatio,
   viewportWidth,
   viewportHeight,
   reducedGraphics,
-}: PixelRatioInput) {
-  const safeDpr = Number.isFinite(devicePixelRatio) && devicePixelRatio > 0
-    ? Math.max(1, devicePixelRatio)
-    : 1;
-  const safeWidth = Math.max(1, Number.isFinite(viewportWidth) ? viewportWidth : 1);
-  const safeHeight = Math.max(1, Number.isFinite(viewportHeight) ? viewportHeight : 1);
+}: CommercialMapPixelRatioInput) {
+  const safeWidth = finitePositive(viewportWidth, 1);
+  const safeHeight = finitePositive(viewportHeight, 1);
   const isPhoneViewport = Math.min(safeWidth, safeHeight) <= 600;
-  const pixelBudget = reducedGraphics ? REDUCED_PIXEL_BUDGET : STANDARD_PIXEL_BUDGET;
-  const budgetCap = Math.sqrt(pixelBudget / (safeWidth * safeHeight));
-  const qualityCap = reducedGraphics ? 1.35 : isPhoneViewport ? 2.25 : 1.75;
-  const qualityFloor = reducedGraphics ? 1 : 1.5;
-  const budgeted = Math.min(safeDpr, qualityCap, budgetCap);
-  const stablePixelRatio = Math.max(Math.min(safeDpr, qualityFloor), budgeted);
   // Alterar DPR em onStart/onEnd redimensiona o drawing buffer durante o gesto.
   // O orçamento é calculado por viewport e
   // permanece estável durante órbita, pan, pinça e animações da câmera.
-  return Number(stablePixelRatio.toFixed(2));
+  return resolveBudgetedCommercialMapPixelRatio({
+    devicePixelRatio,
+    viewportWidth: safeWidth,
+    viewportHeight: safeHeight,
+    pixelBudget: reducedGraphics ? REDUCED_PIXEL_BUDGET : STANDARD_PIXEL_BUDGET,
+    maximumPixelRatio: reducedGraphics ? 1.35 : isPhoneViewport ? 2.25 : 1.75,
+  });
 }
 
 export function resolveCommercialMapSheetSnap(
