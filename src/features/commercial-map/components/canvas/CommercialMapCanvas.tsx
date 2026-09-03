@@ -1,3 +1,4 @@
+// lovable resync: same snapshot as PR #123
 import {
   Component,
   lazy,
