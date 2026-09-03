@@ -1,6 +1,6 @@
 import { officialLocalPointToPdf, officialPdfPointToLocal } from './officialReference2026';
 import { rearRoadSourceToLocalLength } from './rearParkRoadNetwork';
-import { INTERCHANGE_ENVELOPES } from './regional-highways/contract';
+import { INTERCHANGE_ENVELOPES, REGIONAL_HIGHWAY_PROFILE } from './regional-highways/contract';
 
 /**
  * Trevo sul da BR-472 — camada de apresentação isolada.
@@ -12,7 +12,7 @@ import { INTERCHANGE_ENVELOPES } from './regional-highways/contract';
  *
  * O join publicado pelo slice #117 era o término sul interior `[6146, 4400]`.
  * Não estender `br472SouthRampToSouth` através deste trevo. A malha regional
- * vive no envelope SE (Image 1: sul do parque, BR-472 a 0.5 larguras a leste).
+ * vive no envelope SE (Anexo 2: sul do parque, BR-472 a ~0.26 larguras a leste).
  */
 export const SE_CLOVERLEAF_REVISION = '2026.9-se-cloverleaf.2';
 
@@ -39,8 +39,8 @@ export const SE_CLOVERLEAF_CENTER_SOURCE = Object.freeze(
   officialLocalPointToPdf(SE_CLOVERLEAF_CENTER_LOCAL),
 );
 
-const highwayWidth = rearRoadSourceToLocalLength(70);
-const highwayShoulder = rearRoadSourceToLocalLength(12);
+const highwayWidth = REGIONAL_HIGHWAY_PROFILE.carriagewayWidth;
+const highwayShoulder = REGIONAL_HIGHWAY_PROFILE.shoulderWidth;
 const rampWidth = rearRoadSourceToLocalLength(40);
 const crossingWidth = rearRoadSourceToLocalLength(44);
 

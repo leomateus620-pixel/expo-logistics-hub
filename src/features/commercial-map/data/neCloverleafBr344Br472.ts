@@ -1,6 +1,6 @@
 import { MAP_REFERENCE_HEIGHT, MAP_REFERENCE_WIDTH } from '../constants';
 import { officialLocalPointToPdf } from './officialReference2026';
-import { INTERCHANGE_ENVELOPES } from './regional-highways/contract';
+import { INTERCHANGE_ENVELOPES, REGIONAL_HIGHWAY_PROFILE } from './regional-highways/contract';
 
 /**
  * NE cloverleaf at BR-344 × BR-472 — isolated presentation mesh.
@@ -27,8 +27,8 @@ export type NeCloverleafQuadrantId = 'nw' | 'ne' | 'se' | 'sw';
 
 /**
  * Slice #118 published PDF [5936, -2100] ≈ local (56.42, -110.73), too close
- * to the park east edge. Folded onto the regional NE envelope (Image 1
- * distance: BR-472 at 0.5 hub widths east; Image 2 latitude: BR-344 2.25× north).
+ * to the park east edge. Folded onto the regional NE envelope (Anexo 2
+ * distance: BR-472 at ~0.26 hub widths east; BR-344 2.25× hub height north).
  */
 export const NE_CLOVERLEAF_PUBLISHED_CENTER_SOURCE = [5936, -2100] as const satisfies SourcePoint;
 
@@ -57,9 +57,9 @@ export const NE_CLOVERLEAF_LAYOUT = Object.freeze({
   centerSource: NE_CLOVERLEAF_CENTER_SOURCE,
   centerLocal: NE_CLOVERLEAF_CENTER_LOCAL,
   /** Dual-carriageway half-spacing from interchange centre to lane centre. */
-  medianWidth: 0.52,
-  carriagewayWidth: 1.18,
-  shoulderWidth: 0.28,
+  medianWidth: REGIONAL_HIGHWAY_PROFILE.medianWidth,
+  carriagewayWidth: REGIONAL_HIGHWAY_PROFILE.dualCarriagewayWidth,
+  shoulderWidth: REGIONAL_HIGHWAY_PROFILE.shoulderWidth,
   /** Short stubs only — not the long federal mainlines. */
   stubLength: 11,
   roundaboutOuterRadius: 1.92,
