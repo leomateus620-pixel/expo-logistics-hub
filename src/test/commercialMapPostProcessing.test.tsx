@@ -104,6 +104,23 @@ describe('Commercial Map persistent post-processing with installed postprocessin
     previousTarget.dispose();
   });
 
+  it('adds one post-SMAA sharpen pass on full only, sized from the drawing buffer', () => {
+    const { gl } = createRuntime();
+    const addPass = vi.spyOn(EffectComposer.prototype, 'addPass');
+    const setSize = vi.spyOn(EffectComposer.prototype, 'setSize');
+    const view = render(<SunrisePostProcessing qualityTier="full" enabled />);
+    const composer = addPass.mock.instances[0] as unknown as EffectComposer;
+    const sharpenPass = composer.passes[3] as unknown as { effects: { name: string }[] };
+
+    expect(composer.passes).toHaveLength(4);
+    expect(composer.passes[3]).toBeInstanceOf(EffectPass);
+    expect(sharpenPass.effects.map((effect) => effect.name)).toEqual(['CommercialMapSharpenEffect']);
+    // The composer follows the renderer's drawing buffer (DPR-aware), not `size`.
+    expect(setSize).toHaveBeenCalledWith(1366, 768);
+    expect(gl.toneMapping).toBe(THREE.NoToneMapping);
+    view.unmount();
+  });
+
   it('retains the existing HDR, anti-aliasing and combined Bloom -> ACES stack', () => {
     const { gl } = createRuntime();
     const addPass = vi.spyOn(EffectComposer.prototype, 'addPass');
@@ -159,7 +176,8 @@ describe('Commercial Map persistent post-processing with installed postprocessin
       expect(runtime.priority).toBe(0);
       view.rerender(<SunrisePostProcessing qualityTier="full" enabled />);
     }
-    expect(addPass).toHaveBeenCalledTimes(3);
+    // scene, Bloom/ACES, SMAA, sharpen: built once and never rebuilt by toggles.
+    expect(addPass).toHaveBeenCalledTimes(4);
     expect(dispose).not.toHaveBeenCalled();
     expect(composer.passes).toEqual(passes);
     expect(composer.inputBuffer).toBe(input);
@@ -201,9 +219,10 @@ describe('Commercial Map persistent post-processing with installed postprocessin
     const addPass = vi.spyOn(EffectComposer.prototype, 'addPass');
     const dispose = vi.spyOn(EffectComposer.prototype, 'dispose');
     const view = render(<StrictMode><SunrisePostProcessing qualityTier="full" enabled /></StrictMode>);
-    expect(addPass).toHaveBeenCalledTimes(6);
+    // StrictMode replays the layout effect once: two composers of four passes.
+    expect(addPass).toHaveBeenCalledTimes(8);
     expect(dispose).toHaveBeenCalledTimes(1);
-    const composer = addPass.mock.instances[3] as unknown as EffectComposer;
+    const composer = addPass.mock.instances[4] as unknown as EffectComposer;
     vi.spyOn(composer, 'render').mockImplementation(() => { throw new Error('render interrupted'); });
     gl.autoClear = false;
     expect(() => act(() => runtime.frame?.(runtime.state, 1 / 60))).not.toThrow();

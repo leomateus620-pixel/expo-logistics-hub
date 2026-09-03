@@ -253,7 +253,8 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
       cloudInstances: 0,
       cloudsIntegratedInSky: true,
       animatedLayers: 4,
-      postProcessingPasses: 3,
+      // scene, Bloom/ACES, SMAA and the minimal post-SMAA sharpen.
+      postProcessingPasses: 4,
       shadowMapSize: 2048,
     });
     expect(commercialMapEnvironmentBudget('balanced')).toMatchObject({

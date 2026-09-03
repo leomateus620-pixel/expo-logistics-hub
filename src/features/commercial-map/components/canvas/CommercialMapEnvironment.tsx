@@ -4,6 +4,8 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import {
   BlendFunction,
   BloomEffect,
+  Effect,
+  EffectAttribute,
   EffectComposer,
   EffectPass,
   RenderPass,
@@ -403,6 +405,35 @@ function updateSkyFrame(sky: SunriseSky, frame: CommercialMapSunriseFrame) {
   material.uniforms.sunriseProgress.value = frame.easedProgress;
 }
 
+/**
+ * Five-tap unsharp mask that runs after SMAA in its own pass (two convolution
+ * effects cannot share an EffectPass). Strength is deliberately tiny: it only
+ * returns the edge contrast SMAA ULTRA blends away, never a haloed "sharpen".
+ */
+class CommercialMapSharpenEffect extends Effect {
+  constructor(strength: number) {
+    super(
+      'CommercialMapSharpenEffect',
+      `uniform float uSharpenStrength;
+      void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
+        vec3 north = texture2D(inputBuffer, uv + vec2(0.0, texelSize.y)).rgb;
+        vec3 south = texture2D(inputBuffer, uv - vec2(0.0, texelSize.y)).rgb;
+        vec3 east = texture2D(inputBuffer, uv + vec2(texelSize.x, 0.0)).rgb;
+        vec3 west = texture2D(inputBuffer, uv - vec2(texelSize.x, 0.0)).rgb;
+        vec3 blurred = (north + south + east + west) * 0.25;
+        vec3 sharpened = inputColor.rgb + (inputColor.rgb - blurred) * uSharpenStrength;
+        outputColor = vec4(clamp(sharpened, 0.0, 1.0), inputColor.a);
+      }`,
+      {
+        attributes: EffectAttribute.CONVOLUTION,
+        uniforms: new Map<string, THREE.Uniform>([
+          ['uSharpenStrength', new THREE.Uniform(THREE.MathUtils.clamp(strength, 0, 0.6))],
+        ]),
+      },
+    );
+  }
+}
+
 /** The installed React wrapper removes, but does not dispose, EffectPasses when
  * its JSX children change. Own this fixed stack so active-scene changes never
  * recreate passes, attach duplicate effect listeners, or retire render targets.
@@ -413,6 +444,7 @@ function createCommercialMapPostProcessing(
   camera: THREE.Camera,
   bloomLevels: number,
   smaaPreset: 'high' | 'ultra',
+  sharpenStrength = 0,
 ) {
   const previousAutoClear = gl.autoClear;
   const composer = new EffectComposer(gl, {
@@ -446,6 +478,10 @@ function createCommercialMapPostProcessing(
   composer.addPass(renderPass);
   composer.addPass(effectPass);
   composer.addPass(smaaPass);
+  if (sharpenStrength > 0) {
+    // Sharpen after the edge resolve so it never amplifies aliasing.
+    composer.addPass(new EffectPass(camera, new CommercialMapSharpenEffect(sharpenStrength)));
+  }
   let disposed = false;
   let selectionShadersPrepared = false;
   return {
@@ -500,6 +536,9 @@ export function SunrisePostProcessing({
   const scene = useThree((state) => state.scene);
   const camera = useThree((state) => state.camera);
   const size = useThree((state) => state.size);
+  // Adaptive quality changes the pixel ratio without changing `size`; the
+  // composer sizes its HDR targets from the drawing buffer, so it must follow.
+  const pixelRatio = useThree((state) => state.viewport?.dpr ?? 1);
   const invalidate = useThree((state) => state.invalidate);
   const quality = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality[qualityTier];
   const pipeline = useRef<ReturnType<typeof createCommercialMapPostProcessing> | null>(null);
@@ -524,6 +563,7 @@ export function SunrisePostProcessing({
         camera,
         quality.bloomLevels,
         quality.smaaPreset === 'ultra' ? 'ultra' : 'high',
+        quality.sharpenStrength,
       );
     } catch (error) {
       // Some mobile drivers reject half-float render targets. The map remains
@@ -550,13 +590,15 @@ export function SunrisePostProcessing({
     invalidate,
     quality.bloomEnabled,
     quality.bloomLevels,
+    quality.sharpenStrength,
     quality.smaaPreset,
     scene,
   ]);
 
   useLayoutEffect(() => {
     pipeline.current?.composer.setSize(size.width, size.height);
-  }, [quality.bloomEnabled, quality.bloomLevels, size.height, size.width]);
+    invalidate();
+  }, [invalidate, pixelRatio, quality.bloomEnabled, quality.bloomLevels, size.height, size.width]);
 
   useLayoutEffect(() => {
     // A disabled composer no longer owns output encoding. Restore the same

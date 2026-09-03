@@ -75,6 +75,9 @@ export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
         bloomLevels: 7,
         bloomEnabled: true,
         smaaPreset: 'ultra',
+        // Minimal post-SMAA unsharp so ULTRA edge blending does not soften
+        // roof lines and parking stripes. 0 disables the extra pass.
+        sharpenStrength: 0.16,
       },
       balanced: {
         shadowMapSize: 1536,
@@ -82,6 +85,7 @@ export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
         bloomLevels: 5,
         bloomEnabled: true,
         smaaPreset: 'high',
+        sharpenStrength: 0,
       },
       reduced: {
         shadowMapSize: 512,
@@ -89,6 +93,7 @@ export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
         bloomLevels: 0,
         bloomEnabled: false,
         smaaPreset: 'renderer-msaa',
+        sharpenStrength: 0,
       },
     },
   },
@@ -490,10 +495,11 @@ export function commercialMapEnvironmentBudget(
     cloudInstances: 0,
     cloudsIntegratedInSky: true,
     animatedLayers: 4,
-    // Top-level composer passes: scene, combined Bloom/ACES and final SMAA.
-    // SMAA's two internal lookup passes and Bloom mip levels remain bounded by
-    // the presets above rather than being misreported as scene draw calls.
-    postProcessingPasses: quality.bloomEnabled ? 3 : 0,
+    // Top-level composer passes: scene, combined Bloom/ACES, final SMAA and,
+    // on full only, the minimal sharpen. SMAA's two internal lookup passes and
+    // Bloom mip levels remain bounded by the presets above rather than being
+    // misreported as scene draw calls.
+    postProcessingPasses: quality.bloomEnabled ? 3 + (quality.sharpenStrength > 0 ? 1 : 0) : 0,
     shadowMapSize: quality.shadowMapSize,
   } as const;
 }
