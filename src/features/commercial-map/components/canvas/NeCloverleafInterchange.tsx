@@ -238,6 +238,22 @@ export const NeCloverleafInterchange = memo(function NeCloverleafInterchange({
           />
         </mesh>
       )}
+      {network.edges && (
+        <mesh geometry={network.edges} raycast={NO_RAYCAST} dispose={null}>
+          <meshStandardMaterial
+            color={NE_CLOVERLEAF_COLORS.edgeLine}
+            roughness={0.72}
+            metalness={0}
+            side={THREE.FrontSide}
+            transparent
+            opacity={presentedOpacity * 0.94}
+            depthWrite={false}
+            polygonOffset
+            polygonOffsetFactor={-3}
+            polygonOffsetUnits={-3}
+          />
+        </mesh>
+      )}
       {network.markings && (
         <mesh geometry={network.markings} raycast={NO_RAYCAST} dispose={null}>
           <meshStandardMaterial
@@ -249,8 +265,8 @@ export const NeCloverleafInterchange = memo(function NeCloverleafInterchange({
             opacity={presentedOpacity * 0.86}
             depthWrite={false}
             polygonOffset
-            polygonOffsetFactor={-3}
-            polygonOffsetUnits={-3}
+            polygonOffsetFactor={-4}
+            polygonOffsetUnits={-4}
           />
         </mesh>
       )}

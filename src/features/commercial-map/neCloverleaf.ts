@@ -31,4 +31,6 @@ export {
   disposeNeCloverleafGeometries,
   neCloverleafBr344Elevation,
   neCloverleafBr472Elevation,
+  sampleNeCloverleafInnerRamp,
+  sampleNeCloverleafOuterRamp,
 } from './utils/neCloverleafGeometry';

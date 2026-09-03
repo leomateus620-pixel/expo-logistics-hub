@@ -8,9 +8,29 @@ import {
   SE_CLOVERLEAF_QUADRANTS,
   SE_CLOVERLEAF_RENDER_BUDGET,
   SE_CLOVERLEAF_ROUNDABOUTS,
+  seCloverleafEwMergeOffset,
   seCloverleafLoopCenter,
+  seCloverleafNsMergeOffset,
 } from '../data/seCloverleaf';
 import { rearRoadTerrainElevationAt } from './rearRoadNetwork';
+import {
+  accumulatorToGeometry,
+  createRibbonAccumulator,
+  elevatePoints,
+  maxHeadingJump,
+  pushBox,
+  pushDashedRibbon,
+  pushRibbon,
+  sampleArc2,
+  sampleCloverleafLoopXY,
+  sampleCloverleafOuterSlipXY,
+  sampleLine2,
+  smootherstep,
+  triangleCount,
+  type ElevatedSample,
+  type Point2,
+  type RibbonAccumulator,
+} from './cloverleafRibbon';
 
 export interface SeCloverleafBuildOptions {
   reducedGraphics?: boolean;
@@ -41,179 +61,25 @@ export interface SeCloverleafRenderModel {
   };
 }
 
-type Point2 = readonly [number, number];
-
-interface Sample {
-  x: number;
-  z: number;
-  y: number;
-}
-
-interface Accumulator {
-  positions: number[];
-  normals: number[];
-  uvs: number[];
-  indices: number[];
-}
-
 const CX = SE_CLOVERLEAF_CENTER_LOCAL[0];
 const CZ = SE_CLOVERLEAF_CENTER_LOCAL[1];
 const EPSILON = 1e-8;
-
-function createAccumulator(): Accumulator {
-  return { positions: [], normals: [], uvs: [], indices: [] };
-}
-
-function smootherstep(value: number) {
-  const x = THREE.MathUtils.clamp(value, 0, 1);
-  return x * x * x * (x * (x * 6 - 15) + 10);
-}
-
-function longestDelta(from: number, to: number) {
-  const shortest = ((to - from + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
-  if (Math.abs(shortest) < Math.PI - 1e-6) {
-    return shortest > 0 ? shortest - Math.PI * 2 : shortest + Math.PI * 2;
-  }
-  return shortest;
-}
 
 function terrainY(x: number, z: number, extra = 0) {
   return L.gradeElevation + extra + rearRoadTerrainElevationAt(x, z);
 }
 
-/**
- * Perfil da BR-472 no trevo: pista ao nível até a rampa, tabuleiro sobre a
- * transversal, descida e curva larga para oeste. Nunca compartilha a cota
- * da via inferior.
- */
 export function seCloverleafMainlineElevation(z: number) {
   const riseStart = CZ - L.overpassHalfSpan - L.riseLength;
   const crestStart = CZ - L.overpassHalfSpan;
   const crestEnd = CZ + L.overpassHalfSpan;
-  const riseEnd = CZ + L.overpassHalfSpan + L.riseLength;
   let amount = 0;
   if (z >= crestStart && z <= crestEnd) amount = 1;
   else if (z > riseStart && z < crestStart) amount = smootherstep((z - riseStart) / L.riseLength);
-  else if (z > crestEnd && z < riseEnd) amount = smootherstep(1 - (z - crestEnd) / L.riseLength);
+  else if (z > crestEnd && z < crestEnd + L.riseLength) {
+    amount = smootherstep(1 - (z - crestEnd) / L.riseLength);
+  }
   return L.gradeElevation + (L.overpassHeight - L.gradeElevation) * amount;
-}
-
-function sampleArc(
-  center: Point2,
-  radius: number,
-  fromAngle: number,
-  delta: number,
-  steps: number,
-  elevation: (x: number, z: number) => number,
-): Sample[] {
-  const count = Math.max(3, steps);
-  return Array.from({ length: count + 1 }, (_, index) => {
-    const t = index / count;
-    const angle = fromAngle + delta * t;
-    const x = center[0] + Math.cos(angle) * radius;
-    const z = center[1] + Math.sin(angle) * radius;
-    return { x, z, y: elevation(x, z) };
-  });
-}
-
-function densify(points: Sample[], spacing: number): Sample[] {
-  if (points.length < 2) return [...points];
-  const result: Sample[] = [{ ...points[0] }];
-  for (let index = 1; index < points.length; index += 1) {
-    const previous = points[index - 1];
-    const current = points[index];
-    const span = Math.hypot(current.x - previous.x, current.z - previous.z);
-    const divisions = Math.max(1, Math.ceil(span / Math.max(spacing, 0.08)));
-    for (let step = 1; step <= divisions; step += 1) {
-      const t = step / divisions;
-      result.push({
-        x: previous.x + (current.x - previous.x) * t,
-        z: previous.z + (current.z - previous.z) * t,
-        y: previous.y + (current.y - previous.y) * t,
-      });
-    }
-  }
-  return result;
-}
-
-function pushRibbon(
-  target: Accumulator,
-  samples: readonly Sample[],
-  offsetFrom: number,
-  offsetTo: number,
-  uvRepeat: number,
-  yBias = 0,
-) {
-  if (samples.length < 2) return;
-  const baseIndex = target.positions.length / 3;
-  let distance = 0;
-  for (let index = 0; index < samples.length; index += 1) {
-    const current = samples[index];
-    const previous = samples[Math.max(0, index - 1)];
-    const next = samples[Math.min(samples.length - 1, index + 1)];
-    const dirX = next.x - previous.x;
-    const dirZ = next.z - previous.z;
-    const length = Math.hypot(dirX, dirZ) || 1;
-    const normalX = -dirZ / length;
-    const normalZ = dirX / length;
-    if (index > 0) distance += Math.hypot(current.x - previous.x, current.z - previous.z);
-    const v = distance / Math.max(uvRepeat, 0.001);
-    const y = current.y + yBias;
-    target.positions.push(
-      current.x + normalX * offsetFrom, y, current.z + normalZ * offsetFrom,
-      current.x + normalX * offsetTo, y, current.z + normalZ * offsetTo,
-    );
-    target.normals.push(0, 1, 0, 0, 1, 0);
-    target.uvs.push(0, v, 1, v);
-  }
-  for (let index = 0; index < samples.length - 1; index += 1) {
-    const a = baseIndex + index * 2;
-    const b = a + 1;
-    const c = a + 2;
-    const d = a + 3;
-    target.indices.push(a, b, c, b, d, c);
-  }
-}
-
-function pushDashed(
-  target: Accumulator,
-  samples: readonly Sample[],
-  offset: number,
-  halfThickness: number,
-  dash: number,
-  gap: number,
-  yBias: number,
-) {
-  let cursor = 0;
-  let run: Sample[] = [];
-  const flush = () => {
-    if (run.length >= 2) pushRibbon(target, run, -halfThickness + offset, halfThickness + offset, 1, yBias);
-    run = [];
-  };
-  for (let index = 0; index < samples.length; index += 1) {
-    if (index > 0) {
-      cursor += Math.hypot(
-        samples[index].x - samples[index - 1].x,
-        samples[index].z - samples[index - 1].z,
-      );
-    }
-    const phase = cursor % (dash + gap);
-    if (phase <= dash) run.push(samples[index]);
-    else flush();
-  }
-  flush();
-}
-
-function toGeometry(accumulator: Accumulator) {
-  if (accumulator.indices.length === 0) return null;
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(accumulator.positions, 3));
-  geometry.setAttribute('normal', new THREE.Float32BufferAttribute(accumulator.normals, 3));
-  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(accumulator.uvs, 2));
-  geometry.setIndex(accumulator.indices);
-  geometry.computeBoundingBox();
-  geometry.computeBoundingSphere();
-  return geometry;
 }
 
 function mergeAndDispose(geometries: Array<THREE.BufferGeometry | null>) {
@@ -233,11 +99,6 @@ function mergeAndDispose(geometries: Array<THREE.BufferGeometry | null>) {
   merged.computeBoundingBox();
   merged.computeBoundingSphere();
   return merged;
-}
-
-function triangleCount(geometry: THREE.BufferGeometry | null) {
-  if (!geometry) return 0;
-  return (geometry.getIndex()?.count ?? geometry.getAttribute('position').count) / 3;
 }
 
 function ringGeometry(
@@ -301,147 +162,80 @@ function boxAt(
   return geometry;
 }
 
-function mainlinePath(spacing: number): Sample[] {
-  const riseEnd = CZ + L.overpassHalfSpan + L.riseLength;
-  const turnStartZ = Math.max(riseEnd + 0.35, CZ + L.westTurnStartOffset);
-  const southZ = Math.max(turnStartZ, CZ + L.slipRadius * 0.42);
-  const straight: Sample[] = [];
+function mainlinePath(spacing: number): ElevatedSample[] {
+  const turnStartZ = CZ + L.westTurnStartOffset;
   const startZ = SE_CLOVERLEAF_JOIN_LOCAL[1];
-  const northCount = Math.max(8, Math.ceil((southZ - startZ) / spacing));
-  for (let index = 0; index <= northCount; index += 1) {
-    const z = startZ + (southZ - startZ) * (index / northCount);
-    straight.push({ x: CX, z, y: seCloverleafMainlineElevation(z) });
-  }
-  const turn = sampleArc(
-    [CX - L.westTurnRadius, southZ],
+  const north = sampleLine2([CX, startZ], [CX, turnStartZ], spacing);
+  const turn = sampleArc2(
+    [CX - L.westTurnRadius, turnStartZ],
     L.westTurnRadius,
     0,
     Math.PI / 2,
-    Math.max(10, Math.ceil((L.westTurnRadius * Math.PI) / 2 / spacing)),
-    (x, z) => terrainY(x, z),
+    spacing,
   );
-  const westZ = southZ + L.westTurnRadius;
+  const westZ = turnStartZ + L.westTurnRadius;
   const westEndX = CX - L.westTurnRadius - L.westExtension;
-  const west: Sample[] = [];
-  const westCount = Math.max(6, Math.ceil(L.westExtension / spacing));
-  for (let index = 1; index <= westCount; index += 1) {
-    const x = CX - L.westTurnRadius - L.westExtension * (index / westCount);
-    west.push({ x, z: westZ, y: terrainY(x, westZ) });
-  }
-  return densify([...straight, ...turn.slice(1), ...west], spacing);
+  const west = sampleLine2(
+    [CX - L.westTurnRadius, westZ],
+    [westEndX, westZ],
+    spacing,
+  );
+  const points = [...north, ...turn.slice(1), ...west.slice(1)];
+  return elevatePoints(points, (x, z) => {
+    if (Math.abs(x - CX) < L.highwayWidth) return seCloverleafMainlineElevation(z);
+    return terrainY(x, z);
+  });
 }
 
-function crossingSegments(spacing: number): Sample[][] {
+function crossingSegments(spacing: number): ElevatedSample[][] {
   const west = SE_CLOVERLEAF_ROUNDABOUTS.west;
   const east = SE_CLOVERLEAF_ROUNDABOUTS.east;
   const outer = L.roundaboutOuterRadius;
-  const westEnd = west[0] - outer - 7.4;
-  const eastEnd = east[0] + outer + 7.4;
-  const build = (x0: number, x1: number) => {
-    const count = Math.max(4, Math.ceil(Math.abs(x1 - x0) / spacing));
-    return Array.from({ length: count + 1 }, (_, index) => {
-      const x = x0 + (x1 - x0) * (index / count);
-      return { x, z: CZ, y: terrainY(x, CZ) };
-    });
-  };
+  const westEnd = west[0] - outer - 8.2;
+  const eastEnd = east[0] + outer + 8.2;
+  const build = (x0: number, x1: number) => elevatePoints(
+    sampleLine2([x0, CZ], [x1, CZ], spacing),
+    (x, z) => terrainY(x, z),
+  );
   return [
-    build(westEnd, west[0] - outer + 0.04),
-    build(west[0] + outer - 0.04, east[0] - outer + 0.04),
-    build(east[0] + outer - 0.04, eastEnd),
+    build(westEnd, west[0] - outer + 0.03),
+    build(west[0] + outer - 0.03, east[0] - outer + 0.03),
+    build(east[0] + outer - 0.03, eastEnd),
   ];
 }
 
-function loopPath(sx: number, sz: number, steps: number): Sample[] {
-  const loopCenter = seCloverleafLoopCenter(sx, sz);
-  const rab = sx > 0 ? SE_CLOVERLEAF_ROUNDABOUTS.east : SE_CLOVERLEAF_ROUNDABOUTS.west;
-  const from = Math.atan2(0, CX - loopCenter[0]);
-  const to = Math.atan2(rab[1] - loopCenter[1], rab[0] - loopCenter[0]);
-  const delta = longestDelta(from, to);
-  const samples = sampleArc(
-    loopCenter,
+export function sampleSeCloverleafLoop(sx: number, sz: number, spacing = 0.16) {
+  return sampleCloverleafLoopXY(
+    [CX, CZ],
+    sx,
+    sz,
+    seCloverleafNsMergeOffset(),
+    seCloverleafEwMergeOffset(),
     L.loopRadius,
-    from,
-    delta,
-    steps,
-    (x, z) => terrainY(x, z),
+    spacing,
+    L.goreLength,
   );
-  const rabKeep = L.roundaboutOuterRadius - 0.02;
-  const highwayKeep = L.highwayWidth / 2 + 0.12;
-  const petal = samples.filter((sample) => (
-    Math.hypot(sample.x - rab[0], sample.z - rab[1]) > rabKeep
-    && Math.abs(sample.x - CX) > highwayKeep
-  ));
-  const mergeZ = CZ + sz * (L.overpassHalfSpan + L.riseLength * 0.42);
-  const mergeX = CX + sx * (L.highwayWidth / 2 + L.rampWidth * 0.52);
-  const merge: Sample = { x: mergeX, z: mergeZ, y: seCloverleafMainlineElevation(mergeZ) };
-  const tip = petal[petal.length - 1] ?? merge;
-  const towardX = tip.x - rab[0];
-  const towardZ = tip.z - rab[1];
-  const toward = Math.hypot(towardX, towardZ) || 1;
-  const rabJoin: Sample = {
-    x: rab[0] + (towardX / toward) * (L.roundaboutOuterRadius - 0.04),
-    z: rab[1] + (towardZ / toward) * (L.roundaboutOuterRadius - 0.04),
-    y: terrainY(
-      rab[0] + (towardX / toward) * (L.roundaboutOuterRadius - 0.04),
-      rab[1] + (towardZ / toward) * (L.roundaboutOuterRadius - 0.04),
-    ),
-  };
-  return densify([merge, ...petal, rabJoin], 0.38);
 }
 
-function quadraticBezier(start: Sample, control: Sample, end: Sample, steps: number): Sample[] {
-  return Array.from({ length: Math.max(4, steps) + 1 }, (_, index) => {
-    const t = index / Math.max(4, steps);
-    const u = 1 - t;
-    const x = u * u * start.x + 2 * u * t * control.x + t * t * end.x;
-    const z = u * u * start.z + 2 * u * t * control.z + t * t * end.z;
-    return { x, z, y: start.y * u * u + control.y * 2 * u * t + end.y * t * t };
-  });
-}
-
-function slipPath(sx: number, sz: number, steps: number): Sample[] {
-  const start: Sample = {
-    x: CX + sx * (L.highwayWidth / 2 + L.rampWidth * 0.52),
-    z: CZ + sz * (L.loopOffset + L.loopRadius + 1.85),
-    y: 0,
-  };
-  start.y = seCloverleafMainlineElevation(start.z);
-  const control: Sample = {
-    x: CX + sx * (L.loopOffset + L.loopRadius + 2.85),
-    z: CZ + sz * (L.loopOffset + L.loopRadius + 2.85),
-    y: 0,
-  };
-  control.y = terrainY(control.x, control.z);
-  const end: Sample = {
-    x: CX + sx * (L.roundaboutOffset + L.roundaboutOuterRadius + 1.15),
-    z: CZ + sz * (L.crossingWidth / 2 + L.rampWidth * 0.55),
-    y: 0,
-  };
-  end.y = terrainY(end.x, end.z);
-  const rab = sx > 0 ? SE_CLOVERLEAF_ROUNDABOUTS.east : SE_CLOVERLEAF_ROUNDABOUTS.west;
-  return quadraticBezier(start, control, end, steps).filter((sample) => (
-    Math.hypot(sample.x - rab[0], sample.z - rab[1]) > L.roundaboutOuterRadius - 0.05
-  ));
-}
-
-function circleSamples(center: Point2, radius: number, segments: number, y: number): Sample[] {
-  return Array.from({ length: segments + 1 }, (_, index) => {
-    const angle = (index / segments) * Math.PI * 2;
-    return {
-      x: center[0] + Math.cos(angle) * radius,
-      z: center[1] + Math.sin(angle) * radius,
-      y,
-    };
-  });
+export function sampleSeCloverleafSlip(sx: number, sz: number, spacing = 0.16) {
+  return sampleCloverleafOuterSlipXY(
+    [CX, CZ],
+    sx,
+    sz,
+    seCloverleafNsMergeOffset(),
+    seCloverleafEwMergeOffset(),
+    L.loopRadius,
+    spacing,
+  );
 }
 
 function pavement(
-  target: Accumulator,
-  samples: readonly Sample[],
+  target: RibbonAccumulator,
+  samples: readonly ElevatedSample[],
   width: number,
-  shoulderTarget: Accumulator | null,
+  shoulderTarget: RibbonAccumulator | null,
   shoulderWidth: number,
-  markingTarget: Accumulator | null,
+  markingTarget: RibbonAccumulator | null,
   style: 'highway' | 'ramp' | 'none',
   reduced: boolean,
 ) {
@@ -454,13 +248,10 @@ function pavement(
   }
   if (markingTarget && style !== 'none' && !reduced) {
     const lift = L.markingLift;
+    pushRibbon(markingTarget, samples, -half + 0.04, -half + 0.04 + 0.055, 1, lift);
+    pushRibbon(markingTarget, samples, half - 0.04 - 0.055, half - 0.04, 1, lift);
     if (style === 'highway') {
-      pushDashed(markingTarget, samples, 0, 0.032, 1.55, 2.35, lift);
-      pushRibbon(markingTarget, samples, -half + 0.07, -half + 0.135, 1, lift);
-      pushRibbon(markingTarget, samples, half - 0.135, half - 0.07, 1, lift);
-    } else {
-      pushRibbon(markingTarget, samples, -half + 0.05, -half + 0.1, 1, lift);
-      pushRibbon(markingTarget, samples, half - 0.1, half - 0.05, 1, lift);
+      pushDashedRibbon(markingTarget, samples, 0, 0.03, 1.55, 2.35, lift);
     }
   }
 }
@@ -516,10 +307,10 @@ function buildOverpassStructure(reduced: boolean) {
   const pierHeight = soffit - 0.02 - L.gradeElevation;
   const pierSegments = reduced ? 6 : 10;
   const pierOffsets: Array<readonly [number, number]> = [
-    [-0.42, -2.35],
-    [0.42, -2.35],
-    [-0.42, 2.35],
-    [0.42, 2.35],
+    [-0.38, -2.05],
+    [0.38, -2.05],
+    [-0.38, 2.05],
+    [0.38, 2.05],
   ];
   const piers = pierOffsets.map(([dx, dz]) => {
     const geometry = new THREE.CylinderGeometry(pierRadius, pierRadius * 1.12, pierHeight, pierSegments);
@@ -527,9 +318,9 @@ function buildOverpassStructure(reduced: boolean) {
     return geometry;
   });
   const cap = pierOffsets.map(([dx, dz]) => boxAt(
-    0.42,
+    0.4,
     0.07,
-    0.42,
+    0.4,
     CX + dx,
     soffit - 0.04,
     CZ + dz,
@@ -543,22 +334,20 @@ function buildOverpassStructure(reduced: boolean) {
 export function buildSeCloverleafRenderModel(
   { reducedGraphics = false }: SeCloverleafBuildOptions = {},
 ): SeCloverleafRenderModel {
-  const spacing = reducedGraphics ? 0.72 : 0.34;
-  const arcSteps = reducedGraphics ? 18 : 36;
-  const circleSegments = reducedGraphics ? 20 : 40;
-  const highway = createAccumulator();
-  const ramps = createAccumulator();
-  const crossing = createAccumulator();
-  const shoulders = createAccumulator();
-  const markings = createAccumulator();
+  const spacing = reducedGraphics ? 0.58 : 0.14;
+  const circleSegments = reducedGraphics ? 22 : 48;
+  const highway = createRibbonAccumulator();
+  const ramps = createRibbonAccumulator();
+  const crossing = createRibbonAccumulator();
+  const shoulders = createRibbonAccumulator();
+  const markings = createRibbonAccumulator();
   const grassParts: Array<THREE.BufferGeometry | null> = [];
   const roundaboutParts: Array<THREE.BufferGeometry | null> = [];
   const concreteParts: Array<THREE.BufferGeometry | null> = [];
 
-  const mainline = mainlinePath(spacing);
   pavement(
     highway,
-    mainline,
+    mainlinePath(spacing),
     L.highwayWidth,
     shoulders,
     L.highwayShoulder,
@@ -568,13 +357,19 @@ export function buildSeCloverleafRenderModel(
   );
 
   SE_CLOVERLEAF_QUADRANTS.forEach((quadrant) => {
-    const loop = loopPath(quadrant.sx, quadrant.sz, arcSteps);
+    const loop = elevatePoints(
+      sampleSeCloverleafLoop(quadrant.sx, quadrant.sz, spacing),
+      (x, z) => terrainY(x, z),
+    );
+    const slip = elevatePoints(
+      sampleSeCloverleafSlip(quadrant.sx, quadrant.sz, spacing),
+      (x, z) => terrainY(x, z),
+    );
     pavement(ramps, loop, L.rampWidth, shoulders, L.highwayShoulder * 0.55, markings, 'ramp', reducedGraphics);
-    const slip = slipPath(quadrant.sx, quadrant.sz, Math.max(10, Math.ceil(arcSteps * 0.7)));
     pavement(ramps, slip, L.rampWidth, shoulders, L.highwayShoulder * 0.45, markings, 'ramp', reducedGraphics);
     const loopCenter = seCloverleafLoopCenter(quadrant.sx, quadrant.sz);
     grassParts.push(circleGeometry(
-      Math.max(0.45, L.loopRadius - L.rampWidth * 0.52),
+      Math.max(0.5, L.loopRadius - L.rampWidth * 0.52),
       circleSegments,
       loopCenter,
       SE_CLOVERLEAF_ELEVATION_BANDS.grass + 0.004,
@@ -618,21 +413,8 @@ export function buildSeCloverleafRenderModel(
       center,
       rabYellowY,
     ));
-    if (!reducedGraphics) {
-      const divider = L.roundaboutIslandRadius + L.roundaboutCurbWidth
-        + (L.roundaboutOuterRadius - L.roundaboutIslandRadius - L.roundaboutCurbWidth) * 0.52;
-      pushRibbon(
-        markings,
-        circleSamples(center, divider, circleSegments, rabYellowY + 0.004),
-        -0.028,
-        0.028,
-        1,
-      );
-    }
   });
 
-  const padRadius = L.slipRadius - 0.38;
-  grassParts.push(circleGeometry(padRadius, reducedGraphics ? 24 : 48, [CX, CZ], SE_CLOVERLEAF_ELEVATION_BANDS.grass));
   const westZ = CZ + L.westTurnStartOffset + L.westTurnRadius;
   const westLength = L.westTurnRadius + L.westExtension;
   grassParts.push(boxAt(
@@ -648,12 +430,12 @@ export function buildSeCloverleafRenderModel(
   concreteParts.push(...overpass.geometries);
 
   const geometries: SeCloverleafGeometries = {
-    highway: toGeometry(highway),
-    ramps: toGeometry(ramps),
-    crossing: toGeometry(crossing),
+    highway: accumulatorToGeometry(highway),
+    ramps: accumulatorToGeometry(ramps),
+    crossing: accumulatorToGeometry(crossing),
     roundabout: mergeAndDispose(roundaboutParts),
-    shoulders: toGeometry(shoulders),
-    markings: toGeometry(markings),
+    shoulders: accumulatorToGeometry(shoulders),
+    markings: accumulatorToGeometry(markings),
     grass: mergeAndDispose(grassParts),
     concrete: mergeAndDispose(concreteParts),
   };
@@ -694,9 +476,16 @@ export function seCloverleafWestTerminus(): Point2 {
   ];
 }
 
+export function seCloverleafRampSmoothness(sx: number, sz: number) {
+  return Math.max(
+    maxHeadingJump(sampleSeCloverleafLoop(sx, sz, 0.14)),
+    maxHeadingJump(sampleSeCloverleafSlip(sx, sz, 0.14)),
+  );
+}
+
 export function pointIsOnSeCloverleafHighway(point: Point2, tolerance = L.highwayWidth) {
   const [x, z] = point;
-  if (Math.abs(x - CX) <= tolerance && z >= SE_CLOVERLEAF_JOIN_LOCAL[1] - 0.2 && z <= CZ + L.slipRadius + 1) {
+  if (Math.abs(x - CX) <= tolerance && z >= SE_CLOVERLEAF_JOIN_LOCAL[1] - 0.2 && z <= CZ + L.westTurnStartOffset + 0.4) {
     return true;
   }
   const westZ = CZ + L.westTurnStartOffset + L.westTurnRadius;
