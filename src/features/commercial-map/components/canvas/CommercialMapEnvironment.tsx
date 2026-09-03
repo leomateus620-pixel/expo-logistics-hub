@@ -16,10 +16,12 @@ import * as THREE from 'three';
 import {
   COMMERCIAL_MAP_ENVIRONMENT_CONFIG,
   resolveCommercialMapEnvironmentLayout,
+  resolveCommercialMapShadowFrustum,
   resolveCommercialMapSunriseFrame,
   resolveCommercialMapSunriseProgress,
   resolveCommercialMapSunriseQualityTier,
   type CommercialMapEnvironmentExtent,
+  type CommercialMapShadowFrustum,
   type CommercialMapEnvironmentMode,
   type CommercialMapSunriseFrame,
   type CommercialMapSunriseQualityTier,
@@ -42,6 +44,11 @@ import { RegionalLandscapeLayer } from './RegionalLandscapeLayer';
 interface CommercialMapEnvironmentProps {
   active?: boolean;
   extent: CommercialMapEnvironmentExtent;
+  /**
+   * Park-only box (no regional highways) that the shadow camera is fitted to.
+   * Defaults to `extent` for callers that have no wider scene reach.
+   */
+  shadowExtent?: CommercialMapEnvironmentExtent;
   hydrologicalModeActive: boolean;
   reducedGraphics: boolean;
   adaptiveQualityTier?: CommercialMapQualityTier;
@@ -359,8 +366,7 @@ function updateCelestialSun(
 
 function configureSunLight(
   target: THREE.Object3D,
-  shadowSpan: number,
-  sunDistance: number,
+  frustum: CommercialMapShadowFrustum,
   qualityTier: CommercialMapSunriseQualityTier,
 ) {
   const quality = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality[qualityTier];
@@ -369,16 +375,26 @@ function configureSunLight(
   light.target = target;
   light.castShadow = qualityTier !== 'reduced';
   light.shadow.mapSize.set(quality.shadowMapSize, quality.shadowMapSize);
-  light.shadow.camera.left = -shadowSpan;
-  light.shadow.camera.right = shadowSpan;
-  light.shadow.camera.top = shadowSpan;
-  light.shadow.camera.bottom = -shadowSpan;
-  light.shadow.camera.near = 0.5;
-  light.shadow.camera.far = Math.max(220, sunDistance * 2.8);
-  light.shadow.bias = -0.000055;
-  light.shadow.normalBias = 0.04;
-  light.shadow.radius = 4.1;
+  // Orthographic box fitted to the park only; see resolveCommercialMapShadowFrustum.
+  light.shadow.camera.left = -frustum.halfWidth;
+  light.shadow.camera.right = frustum.halfWidth;
+  light.shadow.camera.top = frustum.halfHeight;
+  light.shadow.camera.bottom = -frustum.halfHeight;
+  light.shadow.camera.near = frustum.near;
+  light.shadow.camera.far = frustum.far;
+  light.shadow.camera.updateProjectionMatrix();
+  // Tight near/far keeps depth precision high, so the constant bias can stay
+  // tiny (no peter-panning) while the normal bias removes acne on the large
+  // flat receivers (ground, roofs, parking) lit at a 24° grazing angle.
+  light.shadow.bias = -0.00004;
+  light.shadow.normalBias = 0.05;
+  light.shadow.radius = resolveShadowRadiusTexels(3, quality.shadowMapSize);
   return light;
+}
+
+/** shadow.radius is in texels for PCFShadowMap; keep world softness constant. */
+function resolveShadowRadiusTexels(radiusAt2048: number, shadowMapSize: number) {
+  return Math.max(1, radiusAt2048 * (shadowMapSize / 2048));
 }
 
 function updateSkyFrame(sky: SunriseSky, frame: CommercialMapSunriseFrame) {
@@ -658,6 +674,7 @@ export function CommercialMapSceneEnvironment({
 export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   active = true,
   extent,
+  shadowExtent = extent,
   hydrologicalModeActive,
   reducedGraphics,
   adaptiveQualityTier = 'HIGH',
@@ -742,12 +759,20 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     ),
     [layout.visualSunDistance, sceneAnchor],
   );
+  const shadowFrustum = useMemo(
+    () => resolveCommercialMapShadowFrustum(shadowExtent),
+    [shadowExtent],
+  );
+  const shadowAnchor = useMemo(
+    () => new THREE.Vector3(shadowFrustum.anchor[0], 0, shadowFrustum.anchor[1]),
+    [shadowFrustum.anchor],
+  );
   const sunTarget = useMemo(() => {
     const target = new THREE.Object3D();
     target.name = 'CommercialMapSolarTarget';
-    target.position.copy(sceneAnchor);
+    target.position.copy(shadowAnchor);
     return target;
-  }, [sceneAnchor]);
+  }, [shadowAnchor]);
   const sky = useMemo(
     () => createSky(
       layout.skyScale,
@@ -765,8 +790,8 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     [initialFrame, layout.visualSunDistance, sceneAnchor],
   );
   const sunLight = useMemo(
-    () => configureSunLight(sunTarget, layout.shadowSpan, layout.sunDistance, qualityTier),
-    [layout.shadowSpan, layout.sunDistance, qualityTier, sunTarget],
+    () => configureSunLight(sunTarget, shadowFrustum, qualityTier),
+    [qualityTier, shadowFrustum, sunTarget],
   );
   const activeGroundTextures = useMemo(() => {
     if (hydrologicalModeActive) return null;
@@ -975,9 +1000,11 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
         sunFacingDirection,
         frame,
       );
-      sunLight.position.copy(sceneAnchor).addScaledVector(frameDirection, layout.sunDistance);
+      // The shadow camera orbits the park anchor at the fitted distance; the
+      // visual sun disc and sky keep the wider scene anchor.
+      sunLight.position.copy(shadowAnchor).addScaledVector(frameDirection, shadowFrustum.distance);
       sunLight.intensity = nightMode ? 0 : frame.sunlightIntensity;
-      sunLight.shadow.radius = frame.shadowRadius;
+      sunLight.shadow.radius = resolveShadowRadiusTexels(frame.shadowRadius, quality.shadowMapSize);
       sunTarget.updateMatrixWorld();
       sunLight.updateMatrixWorld();
       if (ambientRef.current) {

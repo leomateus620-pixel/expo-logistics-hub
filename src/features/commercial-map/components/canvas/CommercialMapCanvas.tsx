@@ -398,6 +398,11 @@ const SHARED_RESTROOM_POLE_MATERIAL = new THREE.MeshStandardMaterial({
   metalness: 0.04,
 });
 const OPEN_GROUND_NORMAL_SCALE = new THREE.Vector2(0.22, 0.22);
+// PCFShadowMap honours shadow.radius (PCFSoftShadowMap silently ignores it), so
+// the sunrise can soften/sharpen the penumbra and the map can pick a per-size
+// texel radius. R3F re-applies this object on every configure(), which is why
+// it is not set imperatively in onCreated.
+const COMMERCIAL_MAP_SHADOW_MAP_CONFIG = Object.freeze({ type: THREE.PCFShadowMap });
 
 function entityLabelHeight(entity: MapEntity) {
   const classification = entity.classification;
@@ -4123,6 +4128,19 @@ function Scene({
       sceneHydrologicalInfrastructure.nodes,
     ],
   );
+  // Shadow-only reach: the official park plus its own parking/access aprons.
+  // The BR-472/BR-344 support points stay out so the 2048² shadow map is spent
+  // on pavilions, trees and canopies instead of kilometres of highway verge.
+  const shadowExtent = useMemo(
+    () => getSceneExtent(
+      entities,
+      [
+        ...(parkAccessVisibleInArea(isolatedArea) ? PARK_ACCESS_SCENE_SUPPORT_POINTS : []),
+        ...(rearParkingVisibleInArea(isolatedArea) ? REAR_PARKING_SCENE_SUPPORT_POINTS : []),
+      ],
+    ),
+    [entities, isolatedArea],
+  );
   const sceneCenter = useMemo(() => [extent.centerX, extent.centerZ] as const, [extent.centerX, extent.centerZ]);
   const presentedMatchingEntityIds = useMemo(
     () => hydrologicalModeActive ? new Set<string>() : matchingEntityIds,
@@ -4484,6 +4502,7 @@ function Scene({
     <>
       <CommercialMapEnvironment
         extent={extent}
+        shadowExtent={shadowExtent}
         active={!interiorEntity}
         hydrologicalModeActive={hydrologicalModeActive}
         reducedGraphics={reducedGraphics}
@@ -4842,7 +4861,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
       frameloop="demand"
       camera={initialRenderConfig.current.camera}
       dpr={renderQuality.dpr}
-      shadows={!reducedGraphics}
+      shadows={reducedGraphics ? false : COMMERCIAL_MAP_SHADOW_MAP_CONFIG}
       gl={initialRenderConfig.current.renderer}
         onCreated={({ gl, scene, camera }) => {
           canvasCleanup.current?.();
@@ -4855,7 +4874,6 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
           gl.outputColorSpace = THREE.SRGBColorSpace;
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           gl.toneMappingExposure = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.toneMappingExposure;
-          gl.shadowMap.type = THREE.PCFSoftShadowMap;
           gl.domElement.style.cursor = 'grab';
       }}
       onPointerMissed={(event) => {

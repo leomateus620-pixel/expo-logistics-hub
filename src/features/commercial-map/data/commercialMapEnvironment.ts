@@ -128,10 +128,12 @@ export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
     hydrologicalIntensity: 0.18,
   },
   ambient: {
-    intensity: 0.39,
-    hydrologicalIntensity: 0.54,
-    hemisphereIntensity: 1.04,
-    hydrologicalHemisphereIntensity: 0.9,
+    // Less flat ambient, more sky/ground hemisphere: north-facing facades keep
+    // reading as volume under the 24° key instead of a uniform grey fill.
+    intensity: 0.33,
+    hydrologicalIntensity: 0.5,
+    hemisphereIntensity: 1.14,
+    hydrologicalHemisphereIntensity: 0.94,
   },
   sky: {
     minimumScale: 50_000,
@@ -162,8 +164,8 @@ export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
   reflections: {
     fullTextureWidth: 128,
     reducedTextureWidth: 64,
-    intensity: 0.42,
-    hydrologicalIntensity: 0.2,
+    intensity: 0.5,
+    hydrologicalIntensity: 0.22,
   },
   toneMappingExposure: 0.93,
   palettes: {
@@ -276,7 +278,9 @@ export function resolveCommercialMapSunriseFrame(
     cloudWarmth: colorTransition,
     hazeStrength: 0.54 + colorTransition * 0.46,
     rayStrength: rayReveal * (1 - raySettle * 0.34),
-    shadowRadius: 4.1 - daylight * 1.55,
+    // Texel radius for a 2048² PCF map (the renderer scales it per map size).
+    // The low sun starts soft and settles to a crisp architectural edge.
+    shadowRadius: 3 - daylight * 1.25,
   };
 }
 
@@ -315,6 +319,107 @@ export function projectedCommercialMapShadowDirection() {
 export function projectedCommercialMapShadowRotation() {
   const [x, z] = projectedCommercialMapShadowDirection();
   return Math.atan2(z, x);
+}
+
+export interface CommercialMapShadowFrustum {
+  /** World-space XZ the directional light targets: the park centre, not the BRs. */
+  anchor: readonly [number, number];
+  /** Orthographic half-extents along the light camera's right/up axes. */
+  halfWidth: number;
+  halfHeight: number;
+  /** Distance from the anchor at which the light (shadow camera) sits. */
+  distance: number;
+  near: number;
+  far: number;
+}
+
+function shadowFrustumForDirection(
+  halfWidth: number,
+  halfDepth: number,
+  maxHeight: number,
+  direction: readonly [number, number, number],
+) {
+  // Camera basis of a DirectionalLight shadow camera: it looks along
+  // -direction with world +Y as the up hint (Object3D.lookAt semantics).
+  const [dx, dy, dz] = direction;
+  const length = Math.hypot(dx, dy, dz) || 1;
+  const forward = [-dx / length, -dy / length, -dz / length] as const;
+  let right = [forward[2], 0, -forward[0]] as [number, number, number];
+  const rightLength = Math.hypot(right[0], right[1], right[2]);
+  right = rightLength < 1e-6 ? [1, 0, 0] : [right[0] / rightLength, 0, right[2] / rightLength];
+  const up = [
+    right[1] * forward[2] - right[2] * forward[1],
+    right[2] * forward[0] - right[0] * forward[2],
+    right[0] * forward[1] - right[1] * forward[0],
+  ] as const;
+  let spanRight = 0;
+  let spanUp = 0;
+  let spanDepth = 0;
+  for (const x of [-halfWidth, halfWidth]) {
+    for (const y of [0, maxHeight]) {
+      for (const z of [-halfDepth, halfDepth]) {
+        spanRight = Math.max(spanRight, Math.abs(x * right[0] + y * right[1] + z * right[2]));
+        spanUp = Math.max(spanUp, Math.abs(x * up[0] + y * up[1] + z * up[2]));
+        spanDepth = Math.max(spanDepth, Math.abs(x * forward[0] + y * forward[1] + z * forward[2]));
+      }
+    }
+  }
+  return { spanRight, spanUp, spanDepth };
+}
+
+/**
+ * Fits the directional shadow camera to the PARK box only. The regional
+ * highways add hundreds of world units to the camera/fog extent, and letting
+ * them into the shadow frustum spreads a 2048² map so thin that pavilions and
+ * trees lose their shadows. The box is evaluated for the low sunrise start and
+ * the ~24° daylight end so the animated light never clips the park.
+ */
+export function resolveCommercialMapShadowFrustum(
+  parkExtent: Pick<CommercialMapEnvironmentExtent, 'centerX' | 'centerZ' | 'width' | 'depth' | 'maxHeight'>,
+  margin = 1.08,
+): CommercialMapShadowFrustum {
+  const halfWidth = Math.max(1, Number.isFinite(parkExtent.width) ? parkExtent.width : 1) / 2;
+  const halfDepth = Math.max(1, Number.isFinite(parkExtent.depth) ? parkExtent.depth : 1) / 2;
+  // Real casters (pavilion roofs, water tanks, canopies) top out well below
+  // this; the floor protects against a scene whose extent reports no height.
+  const maxHeight = Math.max(6, Number.isFinite(parkExtent.maxHeight) ? parkExtent.maxHeight ?? 0 : 0);
+  const safeMargin = Math.min(1.5, Math.max(1, Number.isFinite(margin) ? margin : 1.08));
+  const sunrise = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise;
+  const elevations = [
+    Math.max(0.5, sunrise.startElevationDegrees),
+    sunrise.endElevationDegrees,
+  ];
+  let spanRight = 0;
+  let spanUp = 0;
+  let spanDepth = 0;
+  for (const elevation of elevations) {
+    const fit = shadowFrustumForDirection(
+      halfWidth,
+      halfDepth,
+      maxHeight,
+      commercialMapSunriseDirection(elevation),
+    );
+    spanRight = Math.max(spanRight, fit.spanRight);
+    spanUp = Math.max(spanUp, fit.spanUp);
+    spanDepth = Math.max(spanDepth, fit.spanDepth);
+  }
+  const diagonal = Math.hypot(halfWidth * 2, halfDepth * 2);
+  const distance = Math.max(
+    COMMERCIAL_MAP_ENVIRONMENT_CONFIG.solar.minimumDistance,
+    diagonal * COMMERCIAL_MAP_ENVIRONMENT_CONFIG.solar.distanceRatio,
+  );
+  const depthPadding = Math.max(6, spanDepth * 0.15);
+  return {
+    anchor: [
+      Number.isFinite(parkExtent.centerX) ? parkExtent.centerX : 0,
+      Number.isFinite(parkExtent.centerZ) ? parkExtent.centerZ : 0,
+    ],
+    halfWidth: spanRight * safeMargin,
+    halfHeight: spanUp * safeMargin,
+    distance,
+    near: Math.max(0.5, distance - spanDepth - depthPadding),
+    far: distance + spanDepth + depthPadding,
+  };
 }
 
 export function resolveCommercialMapEnvironmentLayout(

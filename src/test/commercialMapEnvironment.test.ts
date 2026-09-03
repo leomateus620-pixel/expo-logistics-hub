@@ -10,6 +10,7 @@ import {
   projectedCommercialMapShadowDirection,
   projectedCommercialMapShadowRotation,
   resolveCommercialMapEnvironmentLayout,
+  resolveCommercialMapShadowFrustum,
   resolveCommercialMapSunriseFrame,
   resolveCommercialMapSunriseProgress,
   resolveCommercialMapSunriseQualityTier,
@@ -392,9 +393,14 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).toContain('vec3 lowerHorizon = mix(');
     expect(environment).toContain('float belowHorizon = 1.0 - smoothstep(-0.075, 0.008, altitude)');
     expect(environment).not.toContain('cloudMaterial.uniforms');
+    // The shadow camera orbits the park anchor at the park-fitted distance,
+    // never the wider scene extent that includes the regional highways.
     expect(environment).toContain(
-      'sunLight.position.copy(sceneAnchor).addScaledVector(frameDirection, layout.sunDistance)',
+      'sunLight.position.copy(shadowAnchor).addScaledVector(frameDirection, shadowFrustum.distance)',
     );
+    expect(environment).toContain('resolveCommercialMapShadowFrustum(shadowExtent)');
+    expect(environment).toContain('light.shadow.camera.updateProjectionMatrix()');
+    expect(environment).not.toContain('layout.shadowSpan');
     expect(environment).toMatch(
       /projectedSunPosition\s*\.copy\(cameraWorldPosition\)\s*\.addScaledVector\(frameDirection, layout\.visualSunDistance\)/,
     );
@@ -413,6 +419,36 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(authoredSunriseSources).not.toContain('prefers-reduced-motion');
     expect(authoredSunriseSources).not.toContain('matchMedia(');
     expect(authoredSunriseSources).not.toContain('reducedMotion');
+  });
+
+  it('ajusta o frustum de sombra ao parque, não às BRs, e cobre o amanhecer inteiro', () => {
+    const park = { centerX: 4, centerZ: -2, width: 130, depth: 100, maxHeight: 14 };
+    const frustum = resolveCommercialMapShadowFrustum(park);
+    const inflated = resolveCommercialMapShadowFrustum({ ...park, width: 900, depth: 700 });
+    const legacySquareHalfSpan = Math.max(park.width, park.depth)
+      * COMMERCIAL_MAP_ENVIRONMENT_CONFIG.solar.shadowCoverageRatio;
+
+    expect(frustum.anchor).toEqual([4, -2]);
+    // Horizontal fit is the park width plus margin; vertical fit follows the
+    // projected depth at 24° plus roof height, far tighter than the old square.
+    expect(frustum.halfWidth).toBeGreaterThan(park.width / 2);
+    expect(frustum.halfWidth).toBeLessThan(park.width / 2 * 1.15);
+    expect(frustum.halfHeight).toBeGreaterThan(park.maxHeight);
+    expect(frustum.halfHeight).toBeLessThan(legacySquareHalfSpan / 2);
+    expect(frustum.halfWidth * frustum.halfHeight).toBeLessThan(legacySquareHalfSpan ** 2 / 2.5);
+    // Depth range brackets the light distance tightly for bias precision.
+    expect(frustum.near).toBeGreaterThan(frustum.distance * 0.6);
+    expect(frustum.far).toBeLessThan(frustum.distance * 1.4);
+    expect(frustum.near).toBeLessThan(frustum.far);
+    // A scene extent inflated by highways would have spread the map 7× thinner.
+    expect(inflated.halfWidth).toBeGreaterThan(frustum.halfWidth * 6);
+    // Degenerate input never produces NaN or an inverted box.
+    const degenerate = resolveCommercialMapShadowFrustum({
+      centerX: 0, centerZ: 0, width: Number.NaN, depth: 0, maxHeight: Number.NaN,
+    });
+    expect(Number.isFinite(degenerate.halfWidth)).toBe(true);
+    expect(degenerate.halfHeight).toBeGreaterThan(0);
+    expect(degenerate.near).toBeLessThan(degenerate.far);
   });
 
   it('permanece apresentação exterior sem domínio comercial paralelo', () => {
