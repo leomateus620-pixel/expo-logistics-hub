@@ -1,24 +1,28 @@
 import { officialLocalPointToPdf, officialPdfPointToLocal } from './officialReference2026';
-import { rearRoadSourceToLocalLength } from './rearParkRoadNetwork';
-import { INTERCHANGE_ENVELOPES, REGIONAL_HIGHWAY_PROFILE } from './regional-highways/contract';
+import {
+  INTERCHANGE_ENVELOPES,
+  REGIONAL_HIGHWAY_PALETTE,
+  REGIONAL_HIGHWAY_PROFILE,
+  br472MainlineXAt,
+} from './regional-highways/contract';
 
 /**
- * Trevo sul da BR-472 — camada de apresentação isolada.
+ * Trevo sul da BR-472 — Anexo 2.
  *
- * O trevo em Y do Portão 5 / A5 permanece intocado. Esta malha começa no
- * término sul já gerado da BR-472 e modela o cloverleaf simétrico com duas
- * rotatórias amarelas a leste e a oeste da rodovia, no canto sudeste do
- * parque, onde a BR-472 vira de N–S para E–O ao longo da face sul.
+ * Four looping ramps that actually join the N–S carriageway and the E–W
+ * collector, plus two modest yellow roundabouts on that collector (east and
+ * west of the highway). N–S overpass, then the wide 90° westbound sweep.
+ * Not a pair of isolated yellow eyes with a ring of slips.
  *
- * O join publicado pelo slice #117 era o término sul interior `[6146, 4400]`.
- * Não estender `br472SouthRampToSouth` através deste trevo. A malha regional
- * vive no envelope SE (Anexo 2: sul do parque, BR-472 a ~0.26 larguras a leste).
+ * Parametric on `INTERCHANGE_ENVELOPES.seCloverleaf` so a closer BR-472 still
+ * carries this trevo. The Portão 5 / A5 Y-trevo is untouched. The regional
+ * mesh lives in the SE envelope (Anexo 2: south of the park, BR-472 at ~0.26
+ * hub widths east).
  */
-export const SE_CLOVERLEAF_REVISION = '2026.9-se-cloverleaf.2';
+export const SE_CLOVERLEAF_REVISION = '2026.10-se-cloverleaf-anexo2.1';
 
 export type SeCloverleafPoint = readonly [number, number];
 
-/** Interior A5 south terminus — documentation only; not the regional junction. */
 export const SE_CLOVERLEAF_PUBLISHED_JOIN_SOURCE = Object.freeze([6146, 4400] as const);
 export const SE_CLOVERLEAF_PUBLISHED_CENTER_SOURCE = Object.freeze([6146, 4987] as const);
 
@@ -39,36 +43,55 @@ export const SE_CLOVERLEAF_CENTER_SOURCE = Object.freeze(
   officialLocalPointToPdf(SE_CLOVERLEAF_CENTER_LOCAL),
 );
 
+const envelope = INTERCHANGE_ENVELOPES.seCloverleaf as {
+  center: readonly [number, number];
+  headingRadians?: number;
+};
+
+export function seCloverleafHeadingRadians() {
+  if (typeof envelope.headingRadians === 'number') return envelope.headingRadians;
+  const [cx, cz] = SE_CLOVERLEAF_CENTER_LOCAL;
+  return Math.atan2(br472MainlineXAt(cz + 1) - cx, 1);
+}
+
 const highwayWidth = REGIONAL_HIGHWAY_PROFILE.carriagewayWidth;
 const highwayShoulder = REGIONAL_HIGHWAY_PROFILE.shoulderWidth;
-const rampWidth = rearRoadSourceToLocalLength(40);
-const crossingWidth = rearRoadSourceToLocalLength(44);
 
 const centerX = SE_CLOVERLEAF_CENTER_LOCAL[0];
 const centerZ = SE_CLOVERLEAF_CENTER_LOCAL[1];
 const joinZ = SE_CLOVERLEAF_JOIN_LOCAL[1];
 const slipRadius = centerZ - joinZ;
 
+export const SE_CLOVERLEAF_COLORS = Object.freeze({
+  highway: REGIONAL_HIGHWAY_PALETTE.carriageway,
+  ramp: REGIONAL_HIGHWAY_PALETTE.carriagewayGrain,
+  shoulder: REGIONAL_HIGHWAY_PALETTE.shoulder,
+  edgeLine: REGIONAL_HIGHWAY_PALETTE.edgeLine,
+  roundabout: '#f5d031',
+  grass: '#6f8a4e',
+  concrete: '#b7b3a8',
+});
+
 export const SE_CLOVERLEAF_LAYOUT = Object.freeze({
   join: SE_CLOVERLEAF_JOIN_LOCAL,
   center: SE_CLOVERLEAF_CENTER_LOCAL,
+  headingRadians: seCloverleafHeadingRadians(),
   highwayWidth,
   highwayShoulder,
-  rampWidth,
-  crossingWidth,
-  /** Raio das pétalas internas (~45 m). */
-  loopRadius: 4.62,
-  /** Deslocamento do centro de cada pétala em relação ao cruzamento. */
-  loopOffset: 5.42,
-  /** Distância do eixo da BR-472 ao centro de cada rotatória. */
-  roundaboutOffset: 10.15,
-  roundaboutOuterRadius: 3.92,
-  roundaboutIslandRadius: 1.88,
-  roundaboutCurbWidth: 0.16,
-  /** Arco externo de conversão à direita; casa com o handoff norte. */
+  rampWidth: highwayWidth * 0.58,
+  crossingWidth: highwayWidth * 0.86,
+  loopRadius: 5.12,
+  goreGap: 0.05,
+  goreLength: 1.15,
+  /** Collector RAB sits between the north and south leaves on each side. */
+  roundaboutOffset: 6.45,
+  roundaboutOuterRadius: 1.12,
+  roundaboutIslandRadius: 0.46,
+  roundaboutCurbWidth: 0.08,
+  /** North handoff distance — keep the published join length for Agent 1. */
   slipRadius,
-  overpassHalfSpan: 4.15,
-  riseLength: 6.15,
+  overpassHalfSpan: 3.55,
+  riseLength: 5.4,
   overpassHeight: 0.86,
   deckThickness: 0.1,
   gradeElevation: 0.034,
@@ -77,9 +100,9 @@ export const SE_CLOVERLEAF_LAYOUT = Object.freeze({
   roundaboutLift: 0.008,
   islandLift: 0.014,
   grassElevation: 0.0024,
-  westTurnRadius: 11.4,
+  westTurnRadius: 13.2,
   westExtension: 24,
-  westTurnStartOffset: 8.35,
+  westTurnStartOffset: 13.4,
 } as const);
 
 export const SE_CLOVERLEAF_QUADRANTS = Object.freeze([
@@ -91,10 +114,22 @@ export const SE_CLOVERLEAF_QUADRANTS = Object.freeze([
 
 export type SeCloverleafQuadrantId = (typeof SE_CLOVERLEAF_QUADRANTS)[number]['id'];
 
+export function seCloverleafNsMergeOffset() {
+  return SE_CLOVERLEAF_LAYOUT.highwayWidth / 2
+    + SE_CLOVERLEAF_LAYOUT.goreGap
+    + SE_CLOVERLEAF_LAYOUT.rampWidth / 2;
+}
+
+export function seCloverleafEwMergeOffset() {
+  return SE_CLOVERLEAF_LAYOUT.crossingWidth / 2
+    + SE_CLOVERLEAF_LAYOUT.goreGap
+    + SE_CLOVERLEAF_LAYOUT.rampWidth / 2;
+}
+
 export function seCloverleafLoopCenter(sx: number, sz: number): SeCloverleafPoint {
   return [
-    centerX + sx * SE_CLOVERLEAF_LAYOUT.loopOffset,
-    centerZ + sz * SE_CLOVERLEAF_LAYOUT.loopOffset,
+    centerX + sx * (seCloverleafNsMergeOffset() + SE_CLOVERLEAF_LAYOUT.loopRadius),
+    centerZ + sz * (seCloverleafEwMergeOffset() + SE_CLOVERLEAF_LAYOUT.loopRadius),
   ];
 }
 
@@ -136,7 +171,6 @@ export function seCloverleafWestTerminusPoint(): SeCloverleafPoint {
   return [westTerminusX(), westBoundZ()];
 }
 
-/** Envelope da malha, para câmera/terreno (Agent 1 — bounds). */
 export const SE_CLOVERLEAF_FOCUS_BOUNDS = Object.freeze({
   minX: westTerminusX() - highwayWidth,
   maxX: centerX + slipRadius + highwayWidth,

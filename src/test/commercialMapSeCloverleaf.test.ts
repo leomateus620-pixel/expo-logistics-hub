@@ -15,8 +15,10 @@ import {
   SE_CLOVERLEAF_REVISION,
   SE_CLOVERLEAF_ROUNDABOUTS,
   SE_CLOVERLEAF_SCENE_SUPPORT_POINTS,
+  seCloverleafEwMergeOffset,
   seCloverleafIsEastOfParkCore,
   seCloverleafIsSouthOfA5Trevo,
+  seCloverleafNsMergeOffset,
 } from '@/features/commercial-map/data/seCloverleaf';
 import {
   REAR_CALIBRATED_AXES,
@@ -28,8 +30,11 @@ import {
   buildSeCloverleafRenderModel,
   disposeSeCloverleafRenderModel,
   pointIsOnSeCloverleafHighway,
+  sampleSeCloverleafLoop,
+  sampleSeCloverleafSlip,
   seCloverleafLoopCenters,
   seCloverleafMainlineElevation,
+  seCloverleafRampSmoothness,
   seCloverleafWestTerminus,
 } from '@/features/commercial-map/utils/seCloverleaf';
 import { REAR_PARK_ROAD_NETWORK } from '@/features/commercial-map/data/rearParkRoadNetwork';
@@ -104,12 +109,15 @@ describe('trevo sul BR-472 — implantação', () => {
     const [west, east] = [SE_CLOVERLEAF_ROUNDABOUTS.west, SE_CLOVERLEAF_ROUNDABOUTS.east];
     expect(west[1]).toBeCloseTo(SE_CLOVERLEAF_CENTER_LOCAL[1], 6);
     expect(east[1]).toBeCloseTo(SE_CLOVERLEAF_CENTER_LOCAL[1], 6);
-    expect(west[0]).toBeLessThan(SE_CLOVERLEAF_CENTER_LOCAL[0] - 8);
-    expect(east[0]).toBeGreaterThan(SE_CLOVERLEAF_CENTER_LOCAL[0] + 8);
+    expect(west[0]).toBeLessThan(SE_CLOVERLEAF_CENTER_LOCAL[0] - 4);
+    expect(east[0]).toBeGreaterThan(SE_CLOVERLEAF_CENTER_LOCAL[0] + 4);
+    expect(SE_CLOVERLEAF_CENTER_LOCAL[0] - west[0]).toBeLessThan(8);
+    expect(east[0] - SE_CLOVERLEAF_CENTER_LOCAL[0]).toBeLessThan(8);
     expect(east[0] - SE_CLOVERLEAF_CENTER_LOCAL[0]).toBeCloseTo(
       SE_CLOVERLEAF_CENTER_LOCAL[0] - west[0],
       6,
     );
+    expect(SE_CLOVERLEAF_LAYOUT.roundaboutOuterRadius).toBeLessThan(2.2);
     const loops = seCloverleafLoopCenters();
     expect(loops).toHaveLength(4);
     const eastOf = loops.filter(([x]) => x > SE_CLOVERLEAF_CENTER_LOCAL[0]);
@@ -191,6 +199,27 @@ describe('trevo sul BR-472 — malha', () => {
       disposeSeCloverleafRenderModel(model);
       disposeSeCloverleafRenderModel(reduced);
     }
+  });
+
+  it('liga as pétalas e os slips à pista, sem anel em volta das rotatórias', () => {
+    const ns = seCloverleafNsMergeOffset();
+    const ew = seCloverleafEwMergeOffset();
+    SE_CLOVERLEAF_QUADRANTS.forEach((quadrant) => {
+      const loop = sampleSeCloverleafLoop(quadrant.sx, quadrant.sz, 0.16);
+      expect(loop.length).toBeGreaterThan(20);
+      expect(Math.min(...loop.map((point) => Math.abs(point[0] - (SE_CLOVERLEAF_CENTER_LOCAL[0] + quadrant.sx * ns)))))
+        .toBeLessThan(0.25);
+      expect(Math.min(...loop.map((point) => Math.abs(point[1] - (SE_CLOVERLEAF_CENTER_LOCAL[1] + quadrant.sz * ew)))))
+        .toBeLessThan(0.25);
+      const slip = sampleSeCloverleafSlip(quadrant.sx, quadrant.sz, 0.16);
+      expect(slip.length).toBeGreaterThan(10);
+      const rab = quadrant.sx > 0 ? SE_CLOVERLEAF_ROUNDABOUTS.east : SE_CLOVERLEAF_ROUNDABOUTS.west;
+      const minDist = Math.min(
+        ...slip.map((point) => Math.hypot(point[0] - rab[0], point[1] - rab[1])),
+      );
+      expect(minDist).toBeGreaterThan(SE_CLOVERLEAF_LAYOUT.roundaboutOuterRadius + 0.35);
+      expect(seCloverleafRampSmoothness(quadrant.sx, quadrant.sz)).toBeLessThan(0.35);
+    });
   });
 
   it('expõe pontos de suporte e revisão para o enquadramento da rodovia', () => {

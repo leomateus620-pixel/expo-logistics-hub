@@ -1,25 +1,26 @@
 import { MAP_REFERENCE_HEIGHT, MAP_REFERENCE_WIDTH } from '../constants';
 import { officialLocalPointToPdf } from './officialReference2026';
-import { INTERCHANGE_ENVELOPES, REGIONAL_HIGHWAY_PROFILE } from './regional-highways/contract';
+import {
+  BR472_DIAGONAL_DX_PER_DZ,
+  INTERCHANGE_ENVELOPES,
+  REGIONAL_HIGHWAY_PALETTE,
+  REGIONAL_HIGHWAY_PROFILE,
+  br472MainlineXAt,
+} from './regional-highways/contract';
 
 /**
  * NE cloverleaf at BR-344 × BR-472 — isolated presentation mesh.
  *
- * Agent #3 of 4. Does not own the long BR-472 (Agent #1) or BR-344 (Agent #2)
- * mainlines. Short dual-carriageway stubs exist only so the ramps have
- * somewhere to land. Park interior, rear roads, Brasília, Ubiretama, Portão 5
- * and CommercialMapCanvas stay untouched.
+ * Anexo 2 typology: classic cloverleaf. Four inner 270° looping ramps
+ * (one per quadrant) plus four outer right-turn slips. Four small yellow
+ * roundabouts at the inner corners. BR-344 overpass over at-grade BR-472.
  *
- * Placement: far north of the official park crop, on the extrapolated BR-472
- * bearing, where that N–S highway meets the E–W BR-344. Local +X is east,
- * local +Z is south.
- *
- * Mount (Agent #1 bounds, one-liners — this module does not edit the canvas):
- *   support points: ...NE_CLOVERLEAF_SCENE_SUPPORT_POINTS
- *   scene: <NeCloverleafInterchange reducedGraphics={reducedGraphics} />
+ * Placement is parametric on `INTERCHANGE_ENVELOPES.neCloverleaf` so a closer
+ * BR-472 still carries this trevo. Dual-carriageway stubs use the shared
+ * regional family (green / tan / yellow) without owning the long mainlines.
  */
 
-export const NE_CLOVERLEAF_REVISION = '2026.9-ne-cloverleaf-br344-br472.1';
+export const NE_CLOVERLEAF_REVISION = '2026.10-ne-cloverleaf-anexo2.1';
 
 export type LocalPoint = readonly [number, number];
 export type SourcePoint = readonly [number, number];
@@ -38,48 +39,65 @@ export const NE_CLOVERLEAF_CENTER_SOURCE = officialLocalPointToPdf(
   NE_CLOVERLEAF_CENTER_LOCAL,
 ) as SourcePoint;
 
+const envelope = INTERCHANGE_ENVELOPES.neCloverleaf as {
+  center: readonly [number, number];
+  headingRadians?: number;
+};
+
+/** BR-472 bearing at the envelope (0 = +Z south). Falls back to the diagonal contract. */
+export function neCloverleafHeadingRadians() {
+  if (typeof envelope.headingRadians === 'number') return envelope.headingRadians;
+  return Math.atan2(BR472_DIAGONAL_DX_PER_DZ, 1);
+}
+
 export const NE_CLOVERLEAF_COLORS = Object.freeze({
-  /** Dual-carriageway pavement — model stills use a vivid highway green. */
-  highway: '#3db54a',
-  highwayAccent: '#2f9a3c',
-  shoulder: '#c4ae7e',
+  highway: REGIONAL_HIGHWAY_PALETTE.carriageway,
+  highwayAccent: REGIONAL_HIGHWAY_PALETTE.carriagewayGrain,
+  shoulder: REGIONAL_HIGHWAY_PALETTE.shoulder,
   markings: '#f4f1e4',
-  /** Four small circular junctions from the model. */
+  edgeLine: REGIONAL_HIGHWAY_PALETTE.edgeLine,
   roundabout: '#f2d021',
   roundaboutInnerLine: '#f8e56a',
   island: '#3e4f2c',
   islandRim: '#d9d4c6',
-  soffit: '#5e635a',
+  soffit: '#6a6e66',
+  barrier: '#8b8d84',
 });
 
+/**
+ * Dual-carriageway family matches the thinned regional profile so the
+ * overpass stubs land flush with BR-344 / BR-472.
+ */
 export const NE_CLOVERLEAF_LAYOUT = Object.freeze({
   revision: NE_CLOVERLEAF_REVISION,
   centerSource: NE_CLOVERLEAF_CENTER_SOURCE,
   centerLocal: NE_CLOVERLEAF_CENTER_LOCAL,
-  /** Dual-carriageway half-spacing from interchange centre to lane centre. */
+  headingRadians: neCloverleafHeadingRadians(),
   medianWidth: REGIONAL_HIGHWAY_PROFILE.medianWidth,
   carriagewayWidth: REGIONAL_HIGHWAY_PROFILE.dualCarriagewayWidth,
   shoulderWidth: REGIONAL_HIGHWAY_PROFILE.shoulderWidth,
-  /** Short stubs only — not the long federal mainlines. */
-  stubLength: 11,
-  roundaboutOuterRadius: 1.92,
-  roundaboutIslandRadius: 0.74,
-  roundaboutCurbWidth: 0.075,
-  /** Axis offset of each yellow roundabout from the crossing. */
-  quadrantOffset: 7.1,
-  innerRampWidth: 0.94,
-  innerRampShoulder: 0.2,
-  outerRampWidth: 1.02,
-  outerRampShoulder: 0.22,
-  outerLoopRadius: 8.45,
+  edgeLineWidth: REGIONAL_HIGHWAY_PROFILE.edgeLineWidth,
+  stubLength: 12,
+  roundaboutOuterRadius: 1.18,
+  roundaboutIslandRadius: 0.46,
+  roundaboutCurbWidth: 0.07,
+  /** Inner-corner RABs, nestled between the two mainlines inside each leaf. */
+  quadrantOffset: 3.05,
+  innerRampWidth: REGIONAL_HIGHWAY_PROFILE.dualCarriagewayWidth,
+  innerRampShoulder: REGIONAL_HIGHWAY_PROFILE.shoulderWidth * 0.72,
+  outerRampWidth: REGIONAL_HIGHWAY_PROFILE.dualCarriagewayWidth * 0.96,
+  outerRampShoulder: REGIONAL_HIGHWAY_PROFILE.shoulderWidth * 0.68,
+  loopRadius: 5.05,
+  goreGap: 0.055,
+  goreLength: 1.18,
   atGradeElevation: 0.034,
-  roundaboutElevation: 0.049,
+  roundaboutElevation: 0.046,
   overpassElevation: 0.54,
-  overpassDeckHalfSpan: 3.35,
+  overpassDeckHalfSpan: 3.15,
   markingLift: 0.0042,
   shoulderDrop: 0.006,
-  junctionLift: 0.0018,
-  soffitThickness: 0.085,
+  junctionLift: 0.0016,
+  soffitThickness: 0.08,
   identities: Object.freeze({
     br344: 'BR-344',
     br472: 'BR-472',
@@ -101,6 +119,13 @@ const stub = NE_CLOVERLEAF_LAYOUT.stubLength;
 
 export const NE_CLOVERLEAF_HALF_SEPARATION = halfSep;
 
+export function neCloverleafMergeOffset() {
+  return halfSep
+    + NE_CLOVERLEAF_LAYOUT.carriagewayWidth / 2
+    + NE_CLOVERLEAF_LAYOUT.goreGap
+    + NE_CLOVERLEAF_LAYOUT.innerRampWidth / 2;
+}
+
 export const NE_CLOVERLEAF_QUADRANTS = Object.freeze([
   Object.freeze({ id: 'nw' as const, signX: -1 as const, signZ: -1 as const }),
   Object.freeze({ id: 'ne' as const, signX: 1 as const, signZ: -1 as const }),
@@ -116,6 +141,15 @@ export function neCloverleafRoundaboutCenter(id: NeCloverleafQuadrantId): LocalP
   ];
 }
 
+export function neCloverleafLoopCenter(id: NeCloverleafQuadrantId): LocalPoint {
+  const quadrant = NE_CLOVERLEAF_QUADRANTS.find((entry) => entry.id === id)!;
+  const merge = neCloverleafMergeOffset();
+  return [
+    cx + quadrant.signX * (merge + NE_CLOVERLEAF_LAYOUT.loopRadius),
+    cz + quadrant.signZ * (merge + NE_CLOVERLEAF_LAYOUT.loopRadius),
+  ];
+}
+
 export const NE_CLOVERLEAF_ROUNDABOUT_CENTERS = Object.freeze(
   Object.fromEntries(
     NE_CLOVERLEAF_QUADRANTS.map((quadrant) => [
@@ -125,22 +159,26 @@ export const NE_CLOVERLEAF_ROUNDABOUT_CENTERS = Object.freeze(
   ) as Record<NeCloverleafQuadrantId, LocalPoint>,
 );
 
+function br472PointAt(z: number): LocalPoint {
+  return [br472MainlineXAt(z), z];
+}
+
 /**
- * Landing points for Agents #1 (BR-472) and #2 (BR-344). Each stub is a dual
- * carriageway: two lane centres plus the median. Coordinates are local XZ.
+ * Landing points for the BR-472 / BR-344 mainlines. BR-472 stubs sit on the
+ * live bearing (`br472MainlineXAt`) so a closer diagonal still meets flush.
  */
 export const NE_CLOVERLEAF_STUBS = Object.freeze({
   br472North: Object.freeze({
-    axis: [cx, cz - stub] as LocalPoint,
-    westCarriageway: [cx - halfSep, cz - stub] as LocalPoint,
-    eastCarriageway: [cx + halfSep, cz - stub] as LocalPoint,
+    axis: br472PointAt(cz - stub) as LocalPoint,
+    westCarriageway: [br472PointAt(cz - stub)[0] - halfSep, cz - stub] as LocalPoint,
+    eastCarriageway: [br472PointAt(cz - stub)[0] + halfSep, cz - stub] as LocalPoint,
     heading: [0, -1] as LocalPoint,
     owner: 'BR-472' as const,
   }),
   br472South: Object.freeze({
-    axis: [cx, cz + stub] as LocalPoint,
-    westCarriageway: [cx - halfSep, cz + stub] as LocalPoint,
-    eastCarriageway: [cx + halfSep, cz + stub] as LocalPoint,
+    axis: br472PointAt(cz + stub) as LocalPoint,
+    westCarriageway: [br472PointAt(cz + stub)[0] - halfSep, cz + stub] as LocalPoint,
+    eastCarriageway: [br472PointAt(cz + stub)[0] + halfSep, cz + stub] as LocalPoint,
     heading: [0, 1] as LocalPoint,
     owner: 'BR-472' as const,
   }),

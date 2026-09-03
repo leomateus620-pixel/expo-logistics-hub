@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
@@ -22,6 +22,7 @@ import {
   NE_CLOVERLEAF_SCENE_SUPPORT_POINTS,
   NE_CLOVERLEAF_STUBS,
   neCloverleafClearanceFromPark,
+  neCloverleafMergeOffset,
   neCloverleafParkBounds,
 } from '@/features/commercial-map/data/neCloverleafBr344Br472';
 import {
@@ -29,9 +30,19 @@ import {
   disposeNeCloverleafGeometries,
   neCloverleafBr344Elevation,
   neCloverleafBr472Elevation,
+  neCloverleafRampSmoothness,
   sampleNeCloverleafInnerRamp,
   sampleNeCloverleafOuterRamp,
 } from '@/features/commercial-map/utils/neCloverleafGeometry';
+import { maxHeadingJump } from '@/features/commercial-map/utils/cloverleafRibbon';
+import { renderCloverleafPlanView } from '@/features/commercial-map/utils/cloverleafPlanView';
+import {
+  buildSeCloverleafRenderModel,
+  disposeSeCloverleafRenderModel,
+} from '@/features/commercial-map/utils/seCloverleaf';
+import {
+  SE_CLOVERLEAF_CENTER_LOCAL,
+} from '@/features/commercial-map/data/seCloverleaf';
 
 function collectPositions(geometries: Array<{ getAttribute: (name: string) => { count: number; getX: (i: number) => number; getY: (i: number) => number; getZ: (i: number) => number } | undefined } | null>) {
   const points: Array<{ x: number; y: number; z: number }> = [];
@@ -84,13 +95,19 @@ describe('NE cloverleaf BR-344 × BR-472', () => {
     expect(NE_CLOVERLEAF_LAYOUT.stubLength).toBeLessThanOrEqual(NE_CLOVERLEAF_BUDGET.maximumStubLength);
     expect(NE_CLOVERLEAF_STUBS.br472North.owner).toBe('BR-472');
     expect(NE_CLOVERLEAF_STUBS.br344West.owner).toBe('BR-344');
-    expect(Math.hypot(
-      NE_CLOVERLEAF_STUBS.br472North.axis[0] - NE_CLOVERLEAF_CENTER_LOCAL[0],
+    expect(Math.abs(
+      NE_CLOVERLEAF_STUBS.br344West.axis[0] - NE_CLOVERLEAF_CENTER_LOCAL[0],
+    )).toBeCloseTo(NE_CLOVERLEAF_LAYOUT.stubLength, 6);
+    expect(Math.abs(
       NE_CLOVERLEAF_STUBS.br472North.axis[1] - NE_CLOVERLEAF_CENTER_LOCAL[1],
     )).toBeCloseTo(NE_CLOVERLEAF_LAYOUT.stubLength, 6);
+    expect(NE_CLOVERLEAF_STUBS.br472North.axis[0]).toBeCloseTo(
+      br472MainlineXAt(NE_CLOVERLEAF_STUBS.br472North.axis[1]),
+      4,
+    );
   });
 
-  it('places four small yellow roundabouts in the four quadrants', () => {
+  it('places four small yellow roundabouts in the four inner corners', () => {
     expect(NE_CLOVERLEAF_QUADRANTS).toHaveLength(4);
     const yellow = hexChannels(NE_CLOVERLEAF_COLORS.roundabout);
     expect(yellow.r).toBeGreaterThan(200);
@@ -114,23 +131,19 @@ describe('NE cloverleaf BR-344 × BR-472', () => {
       .toBeLessThan(NE_CLOVERLEAF_LAYOUT.roundaboutOuterRadius);
   });
 
-  it('feeds each roundabout with inner connectors and one sweeping outer loop', () => {
-    NE_CLOVERLEAF_QUADRANTS.forEach(({ id }) => {
-      const rab = NE_CLOVERLEAF_ROUNDABOUT_CENTERS[id];
-      const [from344, from472] = sampleNeCloverleafInnerRamp(id, 0.16);
-      expect(from344.length).toBeGreaterThan(6);
-      expect(from472.length).toBeGreaterThan(6);
-      [from344, from472].forEach((path) => {
-        const end = path[path.length - 1];
-        expect(Math.hypot(end[0] - rab[0], end[1] - rab[1]))
-          .toBeLessThanOrEqual(NE_CLOVERLEAF_LAYOUT.roundaboutOuterRadius + 0.08);
-        path.forEach((point) => {
-          expect(Number.isFinite(point[0])).toBe(true);
-          expect(Number.isFinite(point[1])).toBe(true);
-        });
-      });
-      const loop = sampleNeCloverleafOuterRamp(id, 0.22);
+  it('uses Anexo 2 typology: one 270° leaf and one outer slip per quadrant', () => {
+    const merge = neCloverleafMergeOffset();
+    NE_CLOVERLEAF_QUADRANTS.forEach(({ id, signX, signZ }) => {
+      const loop = sampleNeCloverleafInnerRamp(id, 0.16);
       expect(loop.length).toBeGreaterThan(24);
+      loop.forEach((point) => {
+        expect(Number.isFinite(point[0])).toBe(true);
+        expect(Number.isFinite(point[1])).toBe(true);
+      });
+      expect(Math.min(...loop.map((point) => Math.abs(point[0] - (NE_CLOVERLEAF_CENTER_LOCAL[0] + signX * merge)))))
+        .toBeLessThan(0.22);
+      expect(Math.min(...loop.map((point) => Math.abs(point[1] - (NE_CLOVERLEAF_CENTER_LOCAL[1] + signZ * merge)))))
+        .toBeLessThan(0.22);
       const reach = Math.max(
         ...loop.map((point) => Math.hypot(
           point[0] - NE_CLOVERLEAF_CENTER_LOCAL[0],
@@ -138,6 +151,16 @@ describe('NE cloverleaf BR-344 × BR-472', () => {
         )),
       );
       expect(reach).toBeGreaterThan(NE_CLOVERLEAF_LAYOUT.quadrantOffset + 2);
+      expect(maxHeadingJump(loop)).toBeLessThan(0.32);
+
+      const slip = sampleNeCloverleafOuterRamp(id, 0.16);
+      expect(slip.length).toBeGreaterThan(12);
+      expect(Math.min(...slip.map((point) => Math.abs(point[0] - (NE_CLOVERLEAF_CENTER_LOCAL[0] + signX * merge)))))
+        .toBeLessThan(0.22);
+      expect(Math.min(...slip.map((point) => Math.abs(point[1] - (NE_CLOVERLEAF_CENTER_LOCAL[1] + signZ * merge)))))
+        .toBeLessThan(0.22);
+      expect(maxHeadingJump(slip)).toBeLessThan(0.32);
+      expect(neCloverleafRampSmoothness(id)).toBeLessThan(0.32);
     });
   });
 
@@ -148,10 +171,13 @@ describe('NE cloverleaf BR-344 × BR-472', () => {
       expect(detailed.highway).not.toBeNull();
       expect(detailed.roundabouts).not.toBeNull();
       expect(detailed.shoulders).not.toBeNull();
+      expect(detailed.edges).not.toBeNull();
       expect(detailed.markings).not.toBeNull();
       expect(detailed.islands).not.toBeNull();
       expect(detailed.diagnostics.roundaboutCount).toBe(4);
-      expect(detailed.diagnostics.rampCount).toBe(12);
+      expect(detailed.diagnostics.loopCount).toBe(4);
+      expect(detailed.diagnostics.slipCount).toBe(4);
+      expect(detailed.diagnostics.rampCount).toBe(8);
       expect(detailed.diagnostics.stubCarriagewayCount).toBe(4);
       expect(detailed.diagnostics.revision).toBe(NE_CLOVERLEAF_REVISION);
       expect(detailed.diagnostics.withinBudget).toBe(true);
@@ -168,6 +194,7 @@ describe('NE cloverleaf BR-344 × BR-472', () => {
         detailed.islands,
         detailed.curbs,
         detailed.markings,
+        detailed.edges,
         detailed.bridge,
       ]);
       expect(vertices.length).toBeGreaterThan(800);
@@ -217,7 +244,7 @@ describe('NE cloverleaf BR-344 × BR-472', () => {
   it('orients pavement faces to +Y and keeps scene-support points at the stubs', () => {
     const network = buildNeCloverleafGeometries();
     try {
-      [network.highway, network.shoulders, network.roundabouts, network.markings].forEach((geometry) => {
+      [network.highway, network.shoulders, network.roundabouts, network.edges].forEach((geometry) => {
         expect(geometry).not.toBeNull();
         const positions = geometry!.getAttribute('position');
         const normals = geometry!.getAttribute('normal');
@@ -281,6 +308,54 @@ describe('NE cloverleaf BR-344 × BR-472', () => {
     expect(geometry).not.toContain('RUA-BRASILIA');
     expect(geometry).not.toContain('RUA-UBIRETAMA');
     expect(geometry).not.toContain('a5-trevo');
+  });
+
+  it('writes a top-down plan of the real NE and SE meshes', () => {
+    const ne = buildNeCloverleafGeometries();
+    const se = buildSeCloverleafRenderModel();
+    try {
+      const png = renderCloverleafPlanView([
+        {
+          label: 'NE CLOVERLEAF',
+          centerX: NE_CLOVERLEAF_CENTER_LOCAL[0],
+          centerZ: NE_CLOVERLEAF_CENTER_LOCAL[1],
+          radius: 15.5,
+          layers: [
+            { geometry: ne.islands, color: [62, 90, 44] },
+            { geometry: ne.shoulders, color: [212, 184, 150] },
+            { geometry: ne.highway, color: [47, 158, 68] },
+            { geometry: ne.edges, color: [245, 208, 49] },
+            { geometry: ne.roundabouts, color: [242, 208, 33] },
+          ],
+        },
+        {
+          label: 'SE CLOVERLEAF',
+          centerX: SE_CLOVERLEAF_CENTER_LOCAL[0],
+          centerZ: SE_CLOVERLEAF_CENTER_LOCAL[1],
+          radius: 24,
+          layers: [
+            { geometry: se.geometries.grass, color: [62, 90, 44] },
+            { geometry: se.geometries.shoulders, color: [212, 184, 150] },
+            { geometry: se.geometries.highway, color: [47, 158, 68] },
+            { geometry: se.geometries.ramps, color: [42, 143, 61] },
+            { geometry: se.geometries.crossing, color: [47, 158, 68] },
+            { geometry: se.geometries.markings, color: [245, 208, 49] },
+            { geometry: se.geometries.roundabout, color: [242, 208, 33] },
+          ],
+        },
+      ], 720);
+      expect(png.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))).toBe(true);
+      const dest = resolve('/opt/cursor/artifacts/ne_se_cloverleaf_plan.png');
+      mkdirSync(resolve('/opt/cursor/artifacts'), { recursive: true });
+      writeFileSync(dest, png);
+      mkdirSync(resolve(process.cwd(), 'artifacts'), { recursive: true });
+      writeFileSync(resolve(process.cwd(), 'artifacts/ne_se_cloverleaf_plan.png'), png);
+      mkdirSync(resolve('/cursor/stores/self/artifacts'), { recursive: true });
+      writeFileSync(resolve('/cursor/stores/self/artifacts/ne_se_cloverleaf_plan.png'), png);
+    } finally {
+      disposeNeCloverleafGeometries(ne);
+      disposeSeCloverleafRenderModel(se);
+    }
   });
 });
 
