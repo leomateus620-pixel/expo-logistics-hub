@@ -28,10 +28,16 @@ export interface RegionalLandscapeInstance {
   variant: number;
 }
 
+/**
+ * Instance counts, not draw calls: every tier renders the same three
+ * instanced batches, so a denser woodland costs GPU vertices only. Full and
+ * balanced share one budget so an adaptive HIGH<->MEDIUM change never
+ * removes or adds trees at the horizon.
+ */
 export const REGIONAL_LANDSCAPE_INSTANCE_BUDGET = Object.freeze({
-  full: 320,
-  balanced: 220,
-  reduced: 84,
+  full: 840,
+  balanced: 840,
+  reduced: 220,
 } satisfies Record<RegionalLandscapeQualityTier, number>);
 
 export const REGIONAL_LANDSCAPE_DRAW_CALL_BUDGET = Object.freeze({
@@ -45,13 +51,20 @@ export const REGIONAL_LANDSCAPE_DRAW_CALL_BUDGET = Object.freeze({
  * They deliberately describe no road, lot, building or surveyed land use.
  */
 const CLUSTER_CENTERS = Object.freeze([
+  // Inner woodland ring (original 17 anchors).
   [-106, -144], [-62, -151], [-8, -146], [45, -150],
   [-101, -91], [-52, -96], [5, -101], [58, -108],
   [-105, -31], [-99, 34], [-91, 86], [-42, 94],
   [15, 101], [67, 105], [112, 66], [115, 4], [108, -62],
+  // Hedgerows hugging the park perimeter (road/park clearance still applies).
+  [-82, -66], [82, -74], [-84, 8], [88, 34], [-70, 72], [60, 76], [-20, 70],
+  // Outer ring: cheap depth for the pull-back overview and the highway horizon.
+  [-160, -200], [-40, -212], [92, -206], [166, -152], [178, -60], [182, 44],
+  [170, 122], [110, 164], [30, 168], [-62, 172], [-142, 152], [-178, 62],
+  [-172, -42], [-150, -112],
 ] as const);
 
-const MAX_CANDIDATES = 920;
+const MAX_CANDIDATES = 3_200;
 const PARK_CLEARANCE = 5.5;
 const ROAD_CLEARANCE = 2.6;
 
@@ -96,9 +109,11 @@ function candidateAt(index: number): RegionalLandscapeInstance | null {
   const angle = hashUnit(index, 11) * Math.PI * 2 + ring * 0.37;
   // sqrt produces an even area distribution; a second noise stretches every
   // cluster differently so they do not read as identical circular stamps.
-  const radial = Math.sqrt(hashUnit(index, 29));
-  const radiusX = 12 + hashUnit(clusterId, 41) * 18;
-  const radiusZ = 9 + hashUnit(clusterId, 53) * 17;
+  // Bias towards the cluster core so woodlands read as dense copses with a
+  // ragged fringe instead of an even scatter.
+  const radial = Math.pow(hashUnit(index, 29), 0.62);
+  const radiusX = 13 + hashUnit(clusterId, 41) * 22;
+  const radiusZ = 10 + hashUnit(clusterId, 53) * 20;
   const position = Object.freeze([
     center[0] + Math.cos(angle) * radial * radiusX,
     center[1] + Math.sin(angle) * radial * radiusZ,

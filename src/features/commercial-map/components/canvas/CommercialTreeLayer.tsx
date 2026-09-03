@@ -22,10 +22,7 @@ import {
   vegetationLodDistanceToAnchor,
   type VegetationLodTier,
 } from '../../utils/vegetationLod';
-import {
-  COMMERCIAL_MAP_QUALITY_PRESETS,
-  type CommercialMapQualityTier,
-} from '../../utils/viewport';
+import type { CommercialMapQualityTier } from '../../utils/viewport';
 
 const NO_RAYCAST = () => undefined;
 const SHADOW_OPACITY = 0.105;
@@ -33,7 +30,12 @@ const CONTACT_PATCH_OPACITY = 0.38;
 const UNIT_Y = new THREE.Vector3(0, 1, 0);
 const SUNRISE_SHADOW_DIRECTION = projectedCommercialMapShadowDirection();
 const SUNRISE_SHADOW_ROTATION = projectedCommercialMapShadowRotation();
-const COMMERCIAL_TREE_LOD_DENSITY = Object.freeze({ near: 1, mid: 0.82, far: 0.62 });
+/**
+ * Every LOD tier keeps 100% of the canonical inventory. A tree may lose its
+ * branches, contact patch or real shadow caster with distance, but a tree is
+ * never removed: that pop is the one artefact this presentation forbids.
+ */
+const COMMERCIAL_TREE_LOD_DENSITY = Object.freeze({ near: 1, mid: 1, far: 1 });
 const COMMERCIAL_TREE_LOD_TRANSITION_RATE = 7;
 
 interface CommercialTreeLodSceneMetrics {
@@ -84,19 +86,19 @@ export function resolveCommercialTreeLodInstanceCounts(
   lobeCount: number,
   reducedGraphics: boolean,
 ): CommercialTreeLodInstanceCounts {
-  const trees = countByTier[tier];
-  const midDetailTrees = Math.min(trees, countByTier.mid);
-  const farDetailTrees = Math.min(trees, countByTier.far);
+  // The full inventory is the near prefix; lower tiers never shrink it.
+  const trees = Math.max(countByTier.near, countByTier[tier]);
+  // Branches are the first detail to go: reduced sheds them past near, full
+  // graphics keep them until the whole park is a distant object.
   const branchTrees = reducedGraphics
-    ? tier === 'near' ? midDetailTrees : tier === 'mid' ? farDetailTrees : 0
-    : tier === 'near' ? trees : tier === 'mid' ? farDetailTrees : 0;
-  // Never stack the authored footprint over the real shadow-map pass. At
-  // mid/far (and on reduced/mobile) the single cheap instanced footprint keeps
-  // trees grounded after dynamic shadow casters are disabled.
-  const shadowTrees = reducedGraphics || tier !== 'near' ? trees : 0;
-  const contactPatchTrees = reducedGraphics
-    ? 0
-    : tier === 'near' ? trees : tier === 'mid' ? farDetailTrees : 0;
+    ? tier === 'near' ? trees : 0
+    : tier === 'far' ? 0 : trees;
+  // Real shadow-map casting stays on near and mid; only the far overview
+  // (and reduced/mobile) swaps it for the single cheap instanced footprint,
+  // which is never stacked on top of a live shadow pass.
+  const castsDynamicShadows = !reducedGraphics && tier !== 'far';
+  const shadowTrees = castsDynamicShadows ? 0 : trees;
+  const contactPatchTrees = reducedGraphics || tier === 'far' ? 0 : trees;
   return {
     trees,
     trunks: trees,
@@ -104,7 +106,7 @@ export function resolveCommercialTreeLodInstanceCounts(
     crowns: trees * Math.max(1, Math.floor(lobeCount)),
     shadows: shadowTrees,
     contactPatches: contactPatchTrees,
-    castsDynamicShadows: !reducedGraphics && tier === 'near',
+    castsDynamicShadows,
   };
 }
 
@@ -533,16 +535,14 @@ function CommercialTreeInstances({
   const lobeCount = effectiveReducedGraphics
     ? COMMERCIAL_TREE_REDUCED_CANOPY_LOBES
     : COMMERCIAL_TREE_CANOPY_LOBES;
-  const densityScale = Math.min(
-    reducedGraphics ? 0.7 : 1,
-    COMMERCIAL_MAP_QUALITY_PRESETS[qualityTier].vegetationDensity,
-  );
+  // Quality tiers trade lobes, branches and shadow casters, never trees: the
+  // authored inventory is a geometric fact of the park, not a detail budget.
   const lodPlan = useMemo(() => buildVegetationLodSelectionPlan(trees, {
     key: (tree) => tree.id,
     seed: referenceQuadras ? 'commercial-tree-quadras-ab' : 'commercial-tree-legacy',
     densityByTier: COMMERCIAL_TREE_LOD_DENSITY,
-    densityScale,
-  }), [densityScale, referenceQuadras, trees]);
+    densityScale: 1,
+  }), [referenceQuadras, trees]);
   const lodControllerRef = useRef<ReturnType<typeof createVegetationLodController> | null>(null);
   if (!lodControllerRef.current) {
     const initialDistance = vegetationLodDistanceToAnchor(camera.position, lodScene.anchor);
@@ -778,9 +778,9 @@ function CommercialTreeInstances({
       );
       group.userData.vegetationLodTier = changedTier;
       transitionPending.current = true;
-      // Dynamic shadow-map work is the first detail removed while the prefix
-      // count converges; it is enabled again only after a stable near tier.
-      if (setCommercialTreeCastShadow(
+      // Only drop the real caster when the target tier replaces it with the
+      // instanced footprint; near<->mid keep casting so shadows never blink.
+      if (!lodTargetCountsRef.current.castsDynamicShadows && setCommercialTreeCastShadow(
         false,
         trunkRef.current,
         branchRef.current,
