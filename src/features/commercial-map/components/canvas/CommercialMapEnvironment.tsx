@@ -1,4 +1,4 @@
-import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import {
@@ -30,6 +30,7 @@ import {
 } from '../../data/commercialMapEnvironment';
 import {
   resolveCommercialMapCameraDistanceBounds,
+  resolveCommercialMapEnvironmentQualityTier,
   type CommercialMapQualityTier,
 } from '../../utils/viewport';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
@@ -375,7 +376,7 @@ function configureSunLight(
   const light = new THREE.DirectionalLight(COMMERCIAL_MAP_ENVIRONMENT_CONFIG.solar.color, 0);
   light.name = 'CommercialMapAuthoritativeSunLight';
   light.target = target;
-  light.castShadow = qualityTier !== 'reduced';
+  light.castShadow = true;
   light.shadow.mapSize.set(quality.shadowMapSize, quality.shadowMapSize);
   // Orthographic box fitted to the park only; see resolveCommercialMapShadowFrustum.
   light.shadow.camera.left = -frustum.halfWidth;
@@ -543,6 +544,7 @@ export function SunrisePostProcessing({
   const quality = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality[qualityTier];
   const pipeline = useRef<ReturnType<typeof createCommercialMapPostProcessing> | null>(null);
   const rendererState = useRef({ autoClear: gl.autoClear, toneMapping: gl.toneMapping });
+  const [contextEpoch, setContextEpoch] = useState(0);
 
   useLayoutEffect(() => {
     const previous = { autoClear: gl.autoClear, toneMapping: gl.toneMapping };
@@ -552,6 +554,32 @@ export function SunrisePostProcessing({
       gl.toneMapping = previous.toneMapping;
     };
   }, [gl]);
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const handleLost = () => {
+      const failed = pipeline.current;
+      pipeline.current = null;
+      try {
+        failed?.dispose();
+      } catch {
+        // Direct rendering remains authoritative if a lost context also
+        // rejects render-target disposal.
+      }
+      gl.toneMapping = rendererState.current.toneMapping;
+      gl.autoClear = rendererState.current.autoClear;
+    };
+    const handleRestored = () => {
+      setContextEpoch((epoch) => epoch + 1);
+      invalidate();
+    };
+    canvas.addEventListener('webglcontextlost', handleLost);
+    canvas.addEventListener('webglcontextrestored', handleRestored);
+    return () => {
+      canvas.removeEventListener('webglcontextlost', handleLost);
+      canvas.removeEventListener('webglcontextrestored', handleRestored);
+    };
+  }, [gl, invalidate]);
 
   useLayoutEffect(() => {
     if (!quality.bloomEnabled) return;
@@ -593,6 +621,7 @@ export function SunrisePostProcessing({
     quality.sharpenStrength,
     quality.smaaPreset,
     scene,
+    contextEpoch,
   ]);
 
   useLayoutEffect(() => {
@@ -747,11 +776,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       hardwareConcurrency: device?.hardwareConcurrency,
     });
   }
-  const adaptiveEnvironmentTier: CommercialMapSunriseQualityTier = adaptiveQualityTier === 'LOW'
-    ? 'reduced'
-    : adaptiveQualityTier === 'MEDIUM'
-      ? 'balanced'
-      : 'full';
+  const adaptiveEnvironmentTier = resolveCommercialMapEnvironmentQualityTier(adaptiveQualityTier);
   const initialEnvironmentTier = initialQualityTier.current ?? 'balanced';
   const qualityOrder: readonly CommercialMapSunriseQualityTier[] = [
     'reduced',
@@ -887,6 +912,24 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     extent.centerZ,
     gl,
     palette.activeGround,
+  ]);
+  useLayoutEffect(() => {
+    const terrainDetail = resolveTerrainMultiscaleQualityOptions(
+      qualityTier,
+      cameraDistanceBounds.maxDistance,
+      [extent.centerX, extent.centerZ],
+    );
+    if (!terrainDetail) return;
+    try {
+      applyTerrainMultiscaleDetail(activeGroundMaterial, terrainDetail);
+    } catch {
+      // The installed program stays; compile already kept a PBR fallback.
+    }
+  }, [
+    activeGroundMaterial,
+    cameraDistanceBounds.maxDistance,
+    extent.centerX,
+    extent.centerZ,
     qualityTier,
   ]);
   const reflectionTextureWidth = qualityTier === 'reduced'
@@ -914,6 +957,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   const projectedSunPosition = useMemo(() => new THREE.Vector3(), []);
   const cameraWorldPosition = useMemo(() => new THREE.Vector3(), []);
   const cameraForward = useMemo(() => new THREE.Vector3(), []);
+  const sunWorldScratch = useMemo(() => new THREE.Vector3(), []);
   const fogColor = useMemo(() => new THREE.Color(), []);
   const preSunriseFog = useMemo(
     () => new THREE.Color(COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.colors.preSunriseHorizon),
@@ -1079,7 +1123,8 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
         progress: Number(progress.toFixed(4)),
         direction: frame.direction.map((value) => Number(value.toFixed(5))),
         horizonTarget: horizonTarget.toArray().map((value) => Number(value.toFixed(2))),
-        sunWorld: sceneAnchor.clone()
+        sunWorld: sunWorldScratch
+          .copy(sceneAnchor)
           .addScaledVector(frameDirection, layout.visualSunDistance)
           .toArray()
           .map((value) => Number(value.toFixed(2))),

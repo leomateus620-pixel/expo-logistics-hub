@@ -48,22 +48,29 @@ describe('material multiescala do terreno comercial', () => {
     expect(Object.isFrozen(resolved.worldOrigin)).toBe(true);
   });
 
-  it('mantém macro/micro em full e balanced, mas remove o custo procedural no reduced', () => {
+  it('mantém macro/micro em todos os tiers, com reduced mais barato e ainda com campo de parcelas', () => {
     const full = resolveTerrainMultiscaleQualityOptions('full', 400, [12, -8]);
     const balanced = resolveTerrainMultiscaleQualityOptions('balanced', 400, [12, -8]);
+    const reduced = resolveTerrainMultiscaleQualityOptions('reduced', 400, [12, -8]);
 
     expect(full).not.toBeNull();
     expect(balanced).not.toBeNull();
-    expect(resolveTerrainMultiscaleQualityOptions('reduced', 400, [12, -8])).toBeNull();
+    expect(reduced).not.toBeNull();
     expect(full!.macroStrength).toBeGreaterThan(0);
     expect(full!.microStrength).toBeGreaterThan(0);
     expect(balanced!.macroStrength).toBeGreaterThan(0);
     expect(balanced!.microStrength).toBeGreaterThan(0);
+    expect(reduced!.macroStrength).toBeGreaterThan(0);
+    expect(reduced!.microStrength).toBeGreaterThan(0);
+    expect(reduced!.parcelStrength).toBeGreaterThan(0.4);
     expect(full!.microWorldSize).toBeLessThan(balanced!.microWorldSize);
+    expect(balanced!.microWorldSize).toBeLessThan(reduced!.microWorldSize);
     expect(full!.microStrength).toBeGreaterThan(balanced!.microStrength);
+    expect(balanced!.microStrength).toBeGreaterThan(reduced!.microStrength);
     expect(full!.detailFadeEnd).toBeGreaterThan(balanced!.detailFadeEnd);
     expect(full!.worldOrigin).toEqual([12, -8]);
     expect(balanced!.worldOrigin).toEqual([12, -8]);
+    expect(reduced!.worldOrigin).toEqual([12, -8]);
   });
 
   it('usa um perfil de parque com octavas menores para a grama interna sem tocar geometria', () => {
@@ -71,7 +78,8 @@ describe('material multiescala do terreno comercial', () => {
     const park = resolveTerrainMultiscaleQualityOptions('full', 400, [0, 0], 'park');
 
     expect(park).not.toBeNull();
-    expect(resolveTerrainMultiscaleQualityOptions('reduced', 400, [0, 0], 'park')).toBeNull();
+    expect(resolveTerrainMultiscaleQualityOptions('reduced', 400, [0, 0], 'park')).not.toBeNull();
+    const parkReduced = resolveTerrainMultiscaleQualityOptions('reduced', 400, [0, 0], 'park');
     // The park crop is ~150 units wide: its base octave must be a fraction of it.
     expect(park!.macroWorldSize).toBeLessThan(80);
     expect(park!.macroWorldSize).toBeLessThan(outer!.macroWorldSize);
@@ -81,12 +89,14 @@ describe('material multiescala do terreno comercial', () => {
     // The regional parcel field is an outer-ground effect only; it must never
     // draw hedgerows through lots inside the park.
     expect(park!.parcelStrength).toBe(0);
+    expect(parkReduced!.parcelStrength).toBe(0);
+    expect(parkReduced!.microWorldSize).toBeGreaterThan(park!.microWorldSize);
     expect(outer!.parcelStrength).toBeGreaterThan(0.5);
     expect(outer!.parcelInnerRadius).toBeGreaterThan(90);
 
     const material = new THREE.MeshStandardMaterial({ color: '#8aa465' });
     expect(applyParkGroundDetail(material, true)).toBe(material);
-    expect(hasTerrainMultiscaleDetail(material)).toBe(false);
+    expect(hasTerrainMultiscaleDetail(material)).toBe(true);
     expect(applyParkGroundDetail(material, false)).toBe(material);
     expect(hasTerrainMultiscaleDetail(material)).toBe(true);
     const shader = standardShader();

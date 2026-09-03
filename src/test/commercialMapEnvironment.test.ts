@@ -84,7 +84,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).toContain(
       '[activeGroundMaterial, camera, gl, invalidate, requestSunrise, scene]',
     );
-    expect(environment.match(/applyTerrainMultiscaleDetail\(/g)).toHaveLength(1);
+    expect(environment.match(/applyTerrainMultiscaleDetail\(/g)).toHaveLength(2);
   });
 
   it('ancora o sol no horizonte -Z definido pelas referências, sem reutilizar o sol diurno', () => {
@@ -293,7 +293,18 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
       bloomLevels: 0,
       bloomEnabled: false,
       smaaPreset: 'renderer-msaa',
+      sharpenStrength: 0,
+      shadowMapSize: 512,
     });
+    expect(COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality.balanced.sharpenStrength).toBe(0);
+    expect(COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality.full.sharpenStrength).toBeGreaterThan(0);
+    const environment = source(
+      'src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx',
+    );
+    expect(environment).toContain('light.castShadow = true');
+    expect(environment).toContain('webglcontextlost');
+    expect(environment).toContain('webglcontextrestored');
+    expect(environment).not.toContain('prefers-reduced-motion');
   });
 
   it('mantém shaders, recursos e pós-processamento persistentes no Canvas compartilhado', () => {
@@ -406,7 +417,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
       /projectedSunPosition\s*\.copy\(cameraWorldPosition\)\s*\.addScaledVector\(frameDirection, layout\.visualSunDistance\)/,
     );
     expect(environment).toMatch(
-      /sunWorld: sceneAnchor\.clone\(\)\s*\.addScaledVector\(frameDirection, layout\.visualSunDistance\)/,
+      /sunWorld: sunWorldScratch\s*\.copy\(sceneAnchor\)\s*\.addScaledVector\(frameDirection, layout\.visualSunDistance\)/,
     );
     expect(environment).toContain('horizonTarget: horizonTarget.toArray()');
     expect(environment).not.toContain('horizonOrigin');

@@ -1,10 +1,13 @@
 import {
   COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES,
+  commercialMapQualitySceneRebuildsOnTierChange,
   createCommercialMapAdaptiveQualityState,
   type CommercialMapAdaptiveQualityState,
+  type CommercialMapQualityTier,
 } from './viewport';
 
 export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS = 250;
+export const COMMERCIAL_MAP_QUALITY_SCENE_COMMIT_IDLE_MS = 180;
 
 export interface CommercialMapDeviceCapabilityHints {
   deviceMemoryGb?: number;
@@ -14,6 +17,7 @@ export interface CommercialMapDeviceCapabilityHints {
 export interface CommercialMapFrameTimeWindow {
   elapsedMs: number;
   sampledFrames: number;
+  completed: CommercialMapCompletedFrameTimeWindow;
 }
 
 export interface CommercialMapCompletedFrameTimeWindow {
@@ -31,7 +35,11 @@ export function readCommercialMapDeviceCapabilityHints(): CommercialMapDeviceCap
 }
 
 export function createCommercialMapFrameTimeWindow(): CommercialMapFrameTimeWindow {
-  return { elapsedMs: 0, sampledFrames: 0 };
+  return {
+    elapsedMs: 0,
+    sampledFrames: 0,
+    completed: { averageFrameTimeMs: 0, sampledFrames: 0 },
+  };
 }
 
 export function resetCommercialMapFrameTimeWindow(window: CommercialMapFrameTimeWindow) {
@@ -40,8 +48,8 @@ export function resetCommercialMapFrameTimeWindow(window: CommercialMapFrameTime
 }
 
 /**
- * Mutates one reusable accumulator and allocates only when a complete sample
- * is emitted. Long gaps belong to demand-idle time, not GPU frame cost.
+ * Mutates one reusable accumulator and returns its completed slot. Long gaps
+ * belong to demand-idle time, not GPU frame cost.
  */
 export function recordCommercialMapAdaptiveFrame(
   window: CommercialMapFrameTimeWindow,
@@ -58,12 +66,46 @@ export function recordCommercialMapAdaptiveFrame(
   window.sampledFrames += 1;
   if (window.sampledFrames < COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES) return null;
 
-  const completed = {
-    averageFrameTimeMs: window.elapsedMs / window.sampledFrames,
-    sampledFrames: window.sampledFrames,
-  };
+  window.completed.averageFrameTimeMs = window.elapsedMs / window.sampledFrames;
+  window.completed.sampledFrames = window.sampledFrames;
   resetCommercialMapFrameTimeWindow(window);
-  return completed;
+  return window.completed;
+}
+
+export function isCommercialMapHeavyQualityGestureActive(state: {
+  cameraNavigating: boolean;
+  lunarLaunchPhase: string;
+  lunarLaunchReturning: boolean;
+}) {
+  return state.cameraNavigating
+    || state.lunarLaunchPhase !== 'idle'
+    || state.lunarLaunchReturning;
+}
+
+export function shouldApplyCommercialMapPixelRatioNow({
+  currentDpr,
+  nextDpr,
+  gestureActive,
+}: {
+  currentDpr: number;
+  nextDpr: number;
+  gestureActive: boolean;
+}) {
+  if (!gestureActive) return true;
+  return nextDpr <= currentDpr + 0.005;
+}
+
+export function shouldDeferCommercialMapSceneQuality({
+  fromTier,
+  toTier,
+  gestureActive,
+}: {
+  fromTier: CommercialMapQualityTier;
+  toTier: CommercialMapQualityTier;
+  gestureActive: boolean;
+}) {
+  if (!gestureActive || fromTier === toTier) return false;
+  return commercialMapQualitySceneRebuildsOnTierChange(fromTier, toTier);
 }
 
 export function isCommercialMapAdaptiveQualitySamplingActive({

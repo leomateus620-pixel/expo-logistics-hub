@@ -102,13 +102,13 @@ const MAX_WORLD_SIZE = 100_000;
 const MAX_FADE_DISTANCE = 1_000_000;
 
 /**
- * Full and balanced share one program and differ only by uniforms. Reduced
- * deliberately selects the unmodified MeshStandardMaterial in the caller, so
- * constrained devices pay no procedural fragment cost at all.
+ * Full, balanced and reduced share one program and differ only by uniforms.
+ * Reduced keeps the parcel field and grass variation at cheaper frequencies so
+ * LOW never collapses the map to a flat green plane.
  */
 export const TERRAIN_MULTISCALE_QUALITY_PROFILES: Readonly<Record<
   TerrainMultiscaleVariant,
-  Readonly<Record<TerrainMultiscaleQualityTier, Readonly<TerrainMultiscaleQualityProfile> | null>>
+  Readonly<Record<TerrainMultiscaleQualityTier, Readonly<TerrainMultiscaleQualityProfile>>>
 >> = Object.freeze({
   outer: Object.freeze({
     full: Object.freeze({
@@ -139,7 +139,20 @@ export const TERRAIN_MULTISCALE_QUALITY_PROFILES: Readonly<Record<
       detailFadeEndRatio: 0.7,
       minimumDetailFadeStart: 72,
     }),
-    reduced: null,
+    reduced: Object.freeze({
+      macroWorldSize: 280,
+      microWorldSize: 22,
+      macroStrength: 0.15,
+      microStrength: 0.028,
+      roughnessVariation: 0.02,
+      tintStrength: 0.04,
+      tilingBreak: 0.55,
+      parcelStrength: 0.55,
+      parcelInnerRadius: 110,
+      detailFadeStartRatio: 0.16,
+      detailFadeEndRatio: 0.52,
+      minimumDetailFadeStart: 56,
+    }),
   }),
   park: Object.freeze({
     full: Object.freeze({
@@ -172,7 +185,20 @@ export const TERRAIN_MULTISCALE_QUALITY_PROFILES: Readonly<Record<
       detailFadeEndRatio: 0.8,
       minimumDetailFadeStart: 90,
     }),
-    reduced: null,
+    reduced: Object.freeze({
+      macroWorldSize: 72,
+      microWorldSize: 9,
+      macroStrength: 0.12,
+      microStrength: 0.03,
+      roughnessVariation: 0.028,
+      tintStrength: 0.035,
+      tilingBreak: 0.55,
+      parcelStrength: 0,
+      parcelInnerRadius: 110,
+      detailFadeStartRatio: 0.18,
+      detailFadeEndRatio: 0.58,
+      minimumDetailFadeStart: 72,
+    }),
   }),
 });
 
@@ -635,9 +661,8 @@ export const PARK_GROUND_DETAIL_CAMERA_RANGE = 370;
 
 /**
  * Applies the park-scale fBm/tiling-break profile to an interior grass, soil or
- * gravel material. Reduced graphics keeps the plain MeshStandardMaterial, so
- * this is a no-op there and never throws (a driver failure keeps the original
- * program, exactly like the outer ground).
+ * gravel material. Reduced graphics uses the cheaper uniform profile of the
+ * same program so LOW keeps terrain instead of a flat green plane.
  */
 export function applyParkGroundDetail(
   material: THREE.MeshStandardMaterial,

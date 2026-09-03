@@ -236,4 +236,24 @@ describe('Commercial Map persistent post-processing with installed postprocessin
     expect(gl.autoClear).toBe(true);
     expect(gl.toneMapping).toBe(THREE.ACESFilmicToneMapping);
   });
+
+  it('falls back to the direct renderer after a lost WebGL context', () => {
+    const { gl, scene, camera } = createRuntime();
+    const addPass = vi.spyOn(EffectComposer.prototype, 'addPass');
+    const view = render(<SunrisePostProcessing qualityTier="balanced" enabled />);
+    const composer = addPass.mock.instances[0] as unknown as EffectComposer;
+    const dispose = vi.spyOn(composer, 'dispose');
+
+    act(() => {
+      gl.domElement.dispatchEvent(new Event('webglcontextlost'));
+    });
+    expect(dispose).toHaveBeenCalledTimes(1);
+    expect(gl.toneMapping).toBe(THREE.ACESFilmicToneMapping);
+
+    act(() => runtime.frame?.(runtime.state, 1 / 60));
+    expect(gl.render).toHaveBeenCalledWith(scene, camera);
+
+    view.unmount();
+    expect(dispose).toHaveBeenCalledTimes(1);
+  });
 });

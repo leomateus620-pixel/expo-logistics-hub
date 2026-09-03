@@ -110,17 +110,18 @@ export const RegionalLandscapeLayer = memo(function RegionalLandscapeLayer({
   const canopyRef = useRef<THREE.InstancedMesh>(null);
   const shadowRef = useRef<THREE.InstancedMesh>(null);
   const fakeShadows = qualityTier !== 'reduced';
-  const plan = useMemo(() => buildRegionalLandscapePlan(qualityTier), [qualityTier]);
+  const landscapeDetail: RegionalLandscapeQualityTier = fakeShadows ? 'full' : 'reduced';
+  const plan = useMemo(() => buildRegionalLandscapePlan(landscapeDetail), [landscapeDetail]);
   const diagnostics = useMemo(() => regionalLandscapeDiagnostics(qualityTier), [qualityTier]);
 
   const geometries = useMemo(() => {
-    const trunkSegments = qualityTier === 'full' ? 7 : qualityTier === 'balanced' ? 6 : 5;
+    const trunkSegments = landscapeDetail === 'full' ? 7 : 5;
     const trunk = new THREE.CylinderGeometry(0.66, 1, 1, trunkSegments, 1, false);
-    const canopy = new THREE.IcosahedronGeometry(1, qualityTier === 'full' ? 1 : 0);
+    const canopy = new THREE.IcosahedronGeometry(1, landscapeDetail === 'full' ? 1 : 0);
     const shadow = fakeShadows ? new THREE.PlaneGeometry(2, 2, 1, 1) : null;
     trunk.deleteAttribute('uv');
     return { trunk, canopy, shadow };
-  }, [fakeShadows, qualityTier]);
+  }, [fakeShadows, landscapeDetail]);
 
   const materials = useMemo(() => ({
     trunk: new THREE.MeshStandardMaterial({

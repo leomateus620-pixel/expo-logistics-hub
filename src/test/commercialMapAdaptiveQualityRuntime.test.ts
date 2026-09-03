@@ -3,9 +3,13 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS,
+  COMMERCIAL_MAP_QUALITY_SCENE_COMMIT_IDLE_MS,
   createCommercialMapFrameTimeWindow,
   isCommercialMapAdaptiveQualitySamplingActive,
+  isCommercialMapHeavyQualityGestureActive,
   recordCommercialMapAdaptiveFrame,
+  shouldApplyCommercialMapPixelRatioNow,
+  shouldDeferCommercialMapSceneQuality,
 } from '@/features/commercial-map/utils/adaptiveQualityRuntime';
 import { COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES } from '@/features/commercial-map/utils/viewport';
 
@@ -24,7 +28,8 @@ describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
       ) / COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES,
       sampledFrames: COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES,
     });
-    expect(window).toEqual({ elapsedMs: 0, sampledFrames: 0 });
+    expect(window.elapsedMs).toBe(0);
+    expect(window.sampledFrames).toBe(0);
   });
 
   it('descarta pausas do frameloop demand em vez de tratá-las como custo da GPU', () => {
@@ -36,7 +41,8 @@ describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
       window,
       COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS + 1,
     )).toBeNull();
-    expect(window).toEqual({ elapsedMs: 0, sampledFrames: 0 });
+    expect(window.elapsedMs).toBe(0);
+    expect(window.sampledFrames).toBe(0);
     expect(recordCommercialMapAdaptiveFrame(window, Number.NaN)).toBeNull();
     expect(recordCommercialMapAdaptiveFrame(window, 0)).toBeNull();
   });
@@ -72,6 +78,55 @@ describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
     expect(controller).toContain('const setDpr = useThree((state) => state.setDpr)');
     expect(controller).toContain('setDpr(nextDpr)');
     expect(controller).toContain('useFrame((_frameState, deltaSeconds) =>');
+    expect(controller).toContain('sceneTier');
+    expect(controller).toContain('idle-scene-commit');
+    expect(controller).toContain(`setTimeout(() => {`);
     expect(controller).not.toMatch(/setInterval|requestAnimationFrame|prefers-reduced-motion|reducedMotion/);
+  });
+
+  it('aplica DPR mais barato no gesto e adia rebuilds pesados do stack ambiental', () => {
+    expect(COMMERCIAL_MAP_QUALITY_SCENE_COMMIT_IDLE_MS).toBe(180);
+    expect(isCommercialMapHeavyQualityGestureActive({
+      cameraNavigating: true,
+      lunarLaunchPhase: 'idle',
+      lunarLaunchReturning: false,
+    })).toBe(true);
+    expect(isCommercialMapHeavyQualityGestureActive({
+      cameraNavigating: false,
+      lunarLaunchPhase: 'idle',
+      lunarLaunchReturning: false,
+    })).toBe(false);
+
+    expect(shouldApplyCommercialMapPixelRatioNow({
+      currentDpr: 1.75,
+      nextDpr: 1.35,
+      gestureActive: true,
+    })).toBe(true);
+    expect(shouldApplyCommercialMapPixelRatioNow({
+      currentDpr: 1.35,
+      nextDpr: 1.75,
+      gestureActive: true,
+    })).toBe(false);
+    expect(shouldApplyCommercialMapPixelRatioNow({
+      currentDpr: 1.35,
+      nextDpr: 1.75,
+      gestureActive: false,
+    })).toBe(true);
+
+    expect(shouldDeferCommercialMapSceneQuality({
+      fromTier: 'HIGH',
+      toTier: 'MEDIUM',
+      gestureActive: true,
+    })).toBe(true);
+    expect(shouldDeferCommercialMapSceneQuality({
+      fromTier: 'HIGH',
+      toTier: 'ULTRA',
+      gestureActive: true,
+    })).toBe(false);
+    expect(shouldDeferCommercialMapSceneQuality({
+      fromTier: 'HIGH',
+      toTier: 'MEDIUM',
+      gestureActive: false,
+    })).toBe(false);
   });
 });

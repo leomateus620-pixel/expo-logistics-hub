@@ -4784,11 +4784,13 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
   const handleQualityChange = useCallback((next: {
     tier: CommercialMapQualityTier;
     dpr: number;
+    sceneTier?: CommercialMapQualityTier;
   }) => {
+    const sceneTier = next.sceneTier ?? next.tier;
     setRenderQuality((current) => (
-      current.tier === next.tier && Math.abs(current.dpr - next.dpr) <= 0.005
+      current.tier === sceneTier && Math.abs(current.dpr - next.dpr) <= 0.005
         ? current
-        : next
+        : { tier: sceneTier, dpr: next.dpr }
     ));
   }, []);
   const extent = useMemo(

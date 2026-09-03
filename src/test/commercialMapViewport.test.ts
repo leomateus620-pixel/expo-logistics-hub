@@ -5,6 +5,7 @@ import {
   COMMERCIAL_MAP_ADAPTIVE_QUALITY_FAST_WINDOWS,
   COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES,
   COMMERCIAL_MAP_ADAPTIVE_QUALITY_SLOW_WINDOWS,
+  COMMERCIAL_MAP_ADAPTIVE_QUALITY_UPGRADE_DWELL_MS,
   COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_DIRECTION,
   COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_TARGET_SHIFT_RATIO,
   COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS,
@@ -13,10 +14,13 @@ import {
   COMMERCIAL_MAP_QUALITY_PRESETS,
   COMMERCIAL_MAP_QUALITY_TIER_ORDER,
   COMMERCIAL_MAP_TOP_DIRECTION,
+  commercialMapQualitySceneRebuildsOnTierChange,
+  resolveCommercialMapEnvironmentQualityTier,
   clampCommercialMapCameraPosition,
   createCommercialMapAdaptiveQualityState,
   isCommercialMapHydrologicalPortraitViewport,
   resolveCommercialMapAdaptiveQuality,
+  resolveCommercialMapAdaptiveUpgradeWindows,
   resolveCommercialMapBoundingSphereRadius,
   resolveCommercialMapCameraDistanceBounds,
   resolveCommercialMapCameraFarPlane,
@@ -359,6 +363,8 @@ describe('viewport mobile do Mapa Comercial', () => {
       tier: expected,
       consecutiveSlowWindows: 0,
       consecutiveFastWindows: 0,
+      lastDowngradeAtMs: 0,
+      downgradeStreak: 0,
     });
   });
 
@@ -376,6 +382,8 @@ describe('viewport mobile do Mapa Comercial', () => {
       tier: 'ULTRA',
       consecutiveSlowWindows: 0,
       consecutiveFastWindows: 0,
+      lastDowngradeAtMs: 0,
+      downgradeStreak: 0,
     };
 
     for (let index = 1; index < COMMERCIAL_MAP_ADAPTIVE_QUALITY_SLOW_WINDOWS; index += 1) {
@@ -406,6 +414,8 @@ describe('viewport mobile do Mapa Comercial', () => {
       tier: 'HIGH',
       consecutiveSlowWindows: 0,
       consecutiveFastWindows: 0,
+      lastDowngradeAtMs: 0,
+      downgradeStreak: 0,
     };
 
     const slowStart = resolveCommercialMapAdaptiveQuality(state, {
@@ -449,6 +459,8 @@ describe('viewport mobile do Mapa Comercial', () => {
       tier: 'ULTRA',
       consecutiveSlowWindows: 1,
       consecutiveFastWindows: 0,
+      lastDowngradeAtMs: 0,
+      downgradeStreak: 0,
     };
     const hardwareCap = resolveCommercialMapAdaptiveQuality(initial, {
       viewportWidth: 390,
@@ -465,6 +477,8 @@ describe('viewport mobile do Mapa Comercial', () => {
       tier: 'HIGH',
       consecutiveSlowWindows: 1,
       consecutiveFastWindows: 0,
+      lastDowngradeAtMs: 0,
+      downgradeStreak: 0,
     }, {
       viewportWidth: 1440,
       viewportHeight: 900,
@@ -478,6 +492,89 @@ describe('viewport mobile do Mapa Comercial', () => {
       reason: 'insufficient-sample',
       changed: false,
     });
+  });
+
+  it('bloqueia HIGH↔MEDIUM com dwell e janelas rápidas crescentes após o rebaixamento', () => {
+    const capabilities = {
+      viewportWidth: 1440,
+      viewportHeight: 900,
+      devicePixelRatio: 2,
+      deviceMemoryGb: 8,
+      hardwareConcurrency: 8,
+      sampledFrames: COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES,
+    } as const;
+    let state: CommercialMapAdaptiveQualityState = {
+      tier: 'HIGH',
+      consecutiveSlowWindows: 0,
+      consecutiveFastWindows: 0,
+      lastDowngradeAtMs: 0,
+      downgradeStreak: 0,
+    };
+
+    const firstSlow = resolveCommercialMapAdaptiveQuality(state, {
+      ...capabilities,
+      averageFrameTimeMs: 23,
+      nowMs: 1_000,
+    });
+    const downgrade = resolveCommercialMapAdaptiveQuality(firstSlow, {
+      ...capabilities,
+      averageFrameTimeMs: 23,
+      nowMs: 2_000,
+    });
+    expect(downgrade).toMatchObject({
+      tier: 'MEDIUM',
+      changed: true,
+      reason: 'sustained-slow-frames',
+      downgradeStreak: 1,
+      lastDowngradeAtMs: 2_000,
+    });
+
+    const duringDwell = resolveCommercialMapAdaptiveQuality(downgrade, {
+      ...capabilities,
+      averageFrameTimeMs: 15,
+      nowMs: 2_000 + COMMERCIAL_MAP_ADAPTIVE_QUALITY_UPGRADE_DWELL_MS - 1,
+    });
+    expect(duringDwell).toMatchObject({
+      tier: 'MEDIUM',
+      changed: false,
+      consecutiveFastWindows: 0,
+    });
+
+    const requiredFastWindows = resolveCommercialMapAdaptiveUpgradeWindows(1);
+    expect(requiredFastWindows).toBe(COMMERCIAL_MAP_ADAPTIVE_QUALITY_FAST_WINDOWS + 2);
+    state = duringDwell;
+    for (let index = 1; index < requiredFastWindows; index += 1) {
+      const decision = resolveCommercialMapAdaptiveQuality(state, {
+        ...capabilities,
+        averageFrameTimeMs: 15,
+        nowMs: 2_000 + COMMERCIAL_MAP_ADAPTIVE_QUALITY_UPGRADE_DWELL_MS + index,
+      });
+      expect(decision.tier).toBe('MEDIUM');
+      expect(decision.changed).toBe(false);
+      state = decision;
+    }
+    const upgrade = resolveCommercialMapAdaptiveQuality(state, {
+      ...capabilities,
+      averageFrameTimeMs: 15,
+      nowMs: 2_000 + COMMERCIAL_MAP_ADAPTIVE_QUALITY_UPGRADE_DWELL_MS + requiredFastWindows,
+    });
+    expect(upgrade).toMatchObject({
+      tier: 'HIGH',
+      changed: true,
+      reason: 'sustained-fast-frames',
+      downgradeStreak: 0,
+      lastDowngradeAtMs: 0,
+    });
+  });
+
+  it('mantém HIGH e ULTRA no mesmo stack ambiental e só reconstrói em MEDIUM/LOW', () => {
+    expect(resolveCommercialMapEnvironmentQualityTier('ULTRA')).toBe('full');
+    expect(resolveCommercialMapEnvironmentQualityTier('HIGH')).toBe('full');
+    expect(resolveCommercialMapEnvironmentQualityTier('MEDIUM')).toBe('balanced');
+    expect(resolveCommercialMapEnvironmentQualityTier('LOW')).toBe('reduced');
+    expect(commercialMapQualitySceneRebuildsOnTierChange('HIGH', 'ULTRA')).toBe(false);
+    expect(commercialMapQualitySceneRebuildsOnTierChange('HIGH', 'MEDIUM')).toBe(true);
+    expect(commercialMapQualitySceneRebuildsOnTierChange('MEDIUM', 'LOW')).toBe(true);
   });
 
   it('não usa preferências de movimento como entrada do pipeline gráfico', () => {

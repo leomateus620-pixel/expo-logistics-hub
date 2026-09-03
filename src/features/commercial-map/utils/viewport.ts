@@ -43,13 +43,18 @@ export interface CommercialMapAdaptiveQualityState {
   tier: CommercialMapQualityTier;
   consecutiveSlowWindows: number;
   consecutiveFastWindows: number;
+  lastDowngradeAtMs: number;
+  downgradeStreak: number;
 }
 
 export interface CommercialMapAdaptiveQualitySample
   extends CommercialMapQualityCapabilitiesInput {
   averageFrameTimeMs: number;
   sampledFrames?: number;
+  nowMs?: number;
 }
+
+export type CommercialMapEnvironmentQualityTier = 'full' | 'balanced' | 'reduced';
 
 export type CommercialMapAdaptiveQualityReason =
   | 'hardware-cap'
@@ -158,6 +163,9 @@ export const COMMERCIAL_MAP_QUALITY_PRESETS = {
 export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES = 45;
 export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_SLOW_WINDOWS = 2;
 export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_FAST_WINDOWS = 4;
+export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_FAST_WINDOWS_ESCALATION = 2;
+export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FAST_WINDOWS = 10;
+export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_UPGRADE_DWELL_MS = 1_500;
 
 export const COMMERCIAL_MAP_RESIZE_REFIT_DEBOUNCE_MS = 180;
 export const COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS = 650;
@@ -397,6 +405,35 @@ export function resolveCommercialMapQualityCeiling({
   return 'HIGH';
 }
 
+export function resolveCommercialMapEnvironmentQualityTier(
+  adaptiveTier: CommercialMapQualityTier,
+): CommercialMapEnvironmentQualityTier {
+  if (adaptiveTier === 'LOW') return 'reduced';
+  if (adaptiveTier === 'MEDIUM') return 'balanced';
+  return 'full';
+}
+
+/**
+ * HIGH and ULTRA share the full environment stack (shadow map, terrain
+ * program, composer, regional instances). HIGH↔MEDIUM and MEDIUM↔LOW do not.
+ */
+export function commercialMapQualitySceneRebuildsOnTierChange(
+  from: CommercialMapQualityTier,
+  to: CommercialMapQualityTier,
+) {
+  return resolveCommercialMapEnvironmentQualityTier(from)
+    !== resolveCommercialMapEnvironmentQualityTier(to);
+}
+
+export function resolveCommercialMapAdaptiveUpgradeWindows(downgradeStreak: number) {
+  const extra = Math.max(0, Math.round(downgradeStreak))
+    * COMMERCIAL_MAP_ADAPTIVE_QUALITY_FAST_WINDOWS_ESCALATION;
+  return Math.min(
+    COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FAST_WINDOWS,
+    COMMERCIAL_MAP_ADAPTIVE_QUALITY_FAST_WINDOWS + extra,
+  );
+}
+
 export function createCommercialMapAdaptiveQualityState(
   capabilities: CommercialMapQualityCapabilitiesInput,
 ): CommercialMapAdaptiveQualityState {
@@ -404,6 +441,8 @@ export function createCommercialMapAdaptiveQualityState(
     tier: resolveCommercialMapQualityCeiling(capabilities),
     consecutiveSlowWindows: 0,
     consecutiveFastWindows: 0,
+    lastDowngradeAtMs: 0,
+    downgradeStreak: 0,
   };
 }
 
@@ -422,8 +461,9 @@ function stableCommercialMapQualityDecision(
 
 /**
  * Applies two-way hysteresis to rolling frame-time windows. A quality drop
- * needs two consecutive slow windows; recovery needs four fast windows. This
- * prevents DPR, shadows, AO and LOD budgets from oscillating around one frame.
+ * needs two consecutive slow windows. Recovery waits for a dwell period after
+ * each downgrade, then an escalating number of fast windows, so HIGH↔MEDIUM
+ * cannot flap during a single pan/zoom.
  */
 export function resolveCommercialMapAdaptiveQuality(
   state: CommercialMapAdaptiveQualityState,
@@ -432,12 +472,19 @@ export function resolveCommercialMapAdaptiveQuality(
   const hardwareCeiling = resolveCommercialMapQualityCeiling(sample);
   const ceilingIndex = commercialMapQualityTierIndex(hardwareCeiling);
   const currentIndex = commercialMapQualityTierIndex(state.tier);
+  const nowMs = optionalFiniteTimestamp(sample.nowMs);
+  const lastDowngradeAtMs = optionalFiniteTimestamp(state.lastDowngradeAtMs) ?? 0;
+  const downgradeStreak = Number.isFinite(state.downgradeStreak)
+    ? Math.max(0, Math.round(state.downgradeStreak))
+    : 0;
 
   if (currentIndex > ceilingIndex) {
     return {
       tier: hardwareCeiling,
       consecutiveSlowWindows: 0,
       consecutiveFastWindows: 0,
+      lastDowngradeAtMs: nowMs ?? lastDowngradeAtMs,
+      downgradeStreak: downgradeStreak + 1,
       hardwareCeiling,
       changed: true,
       reason: 'hardware-cap',
@@ -454,6 +501,8 @@ export function resolveCommercialMapAdaptiveQuality(
         tier: state.tier,
         consecutiveSlowWindows: 0,
         consecutiveFastWindows: 0,
+        lastDowngradeAtMs,
+        downgradeStreak,
       },
       hardwareCeiling,
       'insufficient-sample',
@@ -471,42 +520,88 @@ export function resolveCommercialMapAdaptiveQuality(
         tier: commercialMapQualityTierAt(currentIndex - 1),
         consecutiveSlowWindows: 0,
         consecutiveFastWindows: 0,
+        lastDowngradeAtMs: nowMs ?? lastDowngradeAtMs,
+        downgradeStreak: downgradeStreak + 1,
         hardwareCeiling,
         changed: true,
         reason: 'sustained-slow-frames',
       };
     }
     return stableCommercialMapQualityDecision(
-      { tier: state.tier, consecutiveSlowWindows, consecutiveFastWindows: 0 },
+      {
+        tier: state.tier,
+        consecutiveSlowWindows,
+        consecutiveFastWindows: 0,
+        lastDowngradeAtMs,
+        downgradeStreak,
+      },
       hardwareCeiling,
       'stable',
     );
   }
 
+  const dwellElapsed = lastDowngradeAtMs <= 0
+    || nowMs === undefined
+    || nowMs - lastDowngradeAtMs >= COMMERCIAL_MAP_ADAPTIVE_QUALITY_UPGRADE_DWELL_MS;
+  const requiredFastWindows = resolveCommercialMapAdaptiveUpgradeWindows(downgradeStreak);
+
   if (canUpgrade && sample.averageFrameTimeMs <= preset.upgradeBelowFrameTimeMs) {
+    if (!dwellElapsed) {
+      return stableCommercialMapQualityDecision(
+        {
+          tier: state.tier,
+          consecutiveSlowWindows: 0,
+          consecutiveFastWindows: 0,
+          lastDowngradeAtMs,
+          downgradeStreak,
+        },
+        hardwareCeiling,
+        'stable',
+      );
+    }
     const consecutiveFastWindows = Math.max(0, state.consecutiveFastWindows) + 1;
-    if (consecutiveFastWindows >= COMMERCIAL_MAP_ADAPTIVE_QUALITY_FAST_WINDOWS) {
+    if (consecutiveFastWindows >= requiredFastWindows) {
       return {
         tier: commercialMapQualityTierAt(currentIndex + 1),
         consecutiveSlowWindows: 0,
         consecutiveFastWindows: 0,
+        lastDowngradeAtMs: 0,
+        downgradeStreak: 0,
         hardwareCeiling,
         changed: true,
         reason: 'sustained-fast-frames',
       };
     }
     return stableCommercialMapQualityDecision(
-      { tier: state.tier, consecutiveSlowWindows: 0, consecutiveFastWindows },
+      {
+        tier: state.tier,
+        consecutiveSlowWindows: 0,
+        consecutiveFastWindows,
+        lastDowngradeAtMs,
+        downgradeStreak,
+      },
       hardwareCeiling,
       'stable',
     );
   }
 
   return stableCommercialMapQualityDecision(
-    { tier: state.tier, consecutiveSlowWindows: 0, consecutiveFastWindows: 0 },
+    {
+      tier: state.tier,
+      consecutiveSlowWindows: 0,
+      consecutiveFastWindows: 0,
+      lastDowngradeAtMs,
+      downgradeStreak,
+    },
     hardwareCeiling,
     'stable',
   );
+}
+
+function optionalFiniteTimestamp(value: number | null | undefined) {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0
+    ? value
+    : undefined;
 }
 
 function resolveBudgetedCommercialMapPixelRatio({
