@@ -78,6 +78,11 @@ describe('material multiescala do terreno comercial', () => {
     expect(park!.microWorldSize).toBeLessThan(outer!.microWorldSize);
     expect(park!.tilingBreak).toBeGreaterThan(0.5);
     expect(park!.tintStrength).toBeGreaterThan(0);
+    // The regional parcel field is an outer-ground effect only; it must never
+    // draw hedgerows through lots inside the park.
+    expect(park!.parcelStrength).toBe(0);
+    expect(outer!.parcelStrength).toBeGreaterThan(0.5);
+    expect(outer!.parcelInnerRadius).toBeGreaterThan(90);
 
     const material = new THREE.MeshStandardMaterial({ color: '#8aa465' });
     expect(applyParkGroundDetail(material, true)).toBe(material);

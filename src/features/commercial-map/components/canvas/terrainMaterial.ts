@@ -5,7 +5,7 @@ import * as THREE from 'three';
  * used below. Keep this key stable while the generated GLSL remains identical.
  */
 export const TERRAIN_MULTISCALE_PROGRAM_CACHE_KEY =
-  'commercial-map-terrain-multiscale-r170-v2-fbm-tiling';
+  'commercial-map-terrain-multiscale-r170-v3-fbm-tiling-parcels';
 
 export interface TerrainMultiscaleOptions {
   /** Width, in world units, of the largest fBm tonal feature. */
@@ -25,6 +25,14 @@ export interface TerrainMultiscaleOptions {
    * sample of the same map by a low-frequency mask, hiding the repeated tile.
    */
   tilingBreak?: number;
+  /**
+   * 0 disables the regional parcel field. Otherwise blends a rotated grid of
+   * pasture/stubble parcels with hedgerow borders into the ground beyond
+   * `parcelInnerRadius`; the park interior is never touched.
+   */
+  parcelStrength?: number;
+  /** World distance from `worldOrigin` where the parcel field starts fading in. */
+  parcelInnerRadius?: number;
   /** Camera distance at which close-range detail starts fading. */
   detailFadeStart?: number;
   /** Camera distance at which close-range detail is fully removed. */
@@ -41,6 +49,8 @@ export interface ResolvedTerrainMultiscaleOptions {
   roughnessVariation: number;
   tintStrength: number;
   tilingBreak: number;
+  parcelStrength: number;
+  parcelInnerRadius: number;
   detailFadeStart: number;
   detailFadeEnd: number;
   worldOrigin: readonly [number, number];
@@ -63,6 +73,8 @@ interface TerrainMultiscaleQualityProfile {
   roughnessVariation: number;
   tintStrength: number;
   tilingBreak: number;
+  parcelStrength: number;
+  parcelInnerRadius: number;
   detailFadeStartRatio: number;
   detailFadeEndRatio: number;
   minimumDetailFadeStart: number;
@@ -79,6 +91,8 @@ export const TERRAIN_MULTISCALE_DEFAULTS: Readonly<ResolvedTerrainMultiscaleOpti
     roughnessVariation: 0.045,
     tintStrength: 0.06,
     tilingBreak: 0.85,
+    parcelStrength: 0,
+    parcelInnerRadius: 110,
     detailFadeStart: 180,
     detailFadeEnd: 1_000,
     worldOrigin: Object.freeze([0, 0] as const),
@@ -105,6 +119,8 @@ export const TERRAIN_MULTISCALE_QUALITY_PROFILES: Readonly<Record<
       roughnessVariation: 0.05,
       tintStrength: 0.07,
       tilingBreak: 0.9,
+      parcelStrength: 0.85,
+      parcelInnerRadius: 110,
       detailFadeStartRatio: 0.28,
       detailFadeEndRatio: 0.92,
       minimumDetailFadeStart: 90,
@@ -117,6 +133,8 @@ export const TERRAIN_MULTISCALE_QUALITY_PROFILES: Readonly<Record<
       roughnessVariation: 0.035,
       tintStrength: 0.055,
       tilingBreak: 0.75,
+      parcelStrength: 0.7,
+      parcelInnerRadius: 110,
       detailFadeStartRatio: 0.22,
       detailFadeEndRatio: 0.7,
       minimumDetailFadeStart: 72,
@@ -134,6 +152,8 @@ export const TERRAIN_MULTISCALE_QUALITY_PROFILES: Readonly<Record<
       roughnessVariation: 0.06,
       tintStrength: 0.065,
       tilingBreak: 0.9,
+      parcelStrength: 0,
+      parcelInnerRadius: 110,
       detailFadeStartRatio: 0.3,
       detailFadeEndRatio: 1,
       minimumDetailFadeStart: 110,
@@ -146,6 +166,8 @@ export const TERRAIN_MULTISCALE_QUALITY_PROFILES: Readonly<Record<
       roughnessVariation: 0.045,
       tintStrength: 0.05,
       tilingBreak: 0.75,
+      parcelStrength: 0,
+      parcelInnerRadius: 110,
       detailFadeStartRatio: 0.24,
       detailFadeEndRatio: 0.8,
       minimumDetailFadeStart: 90,
@@ -227,6 +249,18 @@ export function resolveTerrainMultiscaleOptions(
       0,
       1,
     ),
+    parcelStrength: finiteClamped(
+      options.parcelStrength,
+      TERRAIN_MULTISCALE_DEFAULTS.parcelStrength,
+      0,
+      1,
+    ),
+    parcelInnerRadius: finiteClamped(
+      options.parcelInnerRadius,
+      TERRAIN_MULTISCALE_DEFAULTS.parcelInnerRadius,
+      0,
+      MAX_WORLD_SIZE,
+    ),
     detailFadeStart,
     // A non-empty interval keeps smoothstep defined even under bad input.
     detailFadeEnd: Math.max(detailFadeStart + 1, requestedFadeEnd),
@@ -269,6 +303,8 @@ export function resolveTerrainMultiscaleQualityOptions(
     roughnessVariation: profile.roughnessVariation,
     tintStrength: profile.tintStrength,
     tilingBreak: profile.tilingBreak,
+    parcelStrength: profile.parcelStrength,
+    parcelInnerRadius: profile.parcelInnerRadius,
     detailFadeStart,
     detailFadeEnd,
     worldOrigin,
@@ -283,6 +319,8 @@ type TerrainShaderUniforms = {
   uCommercialTerrainRoughnessVariation: THREE.IUniform<number>;
   uCommercialTerrainTintStrength: THREE.IUniform<number>;
   uCommercialTerrainTilingBreak: THREE.IUniform<number>;
+  uCommercialTerrainParcelStrength: THREE.IUniform<number>;
+  uCommercialTerrainParcelInnerRadius: THREE.IUniform<number>;
   uCommercialTerrainDetailFadeStart: THREE.IUniform<number>;
   uCommercialTerrainDetailFadeEnd: THREE.IUniform<number>;
   uCommercialTerrainWorldOrigin: THREE.IUniform<THREE.Vector2>;
@@ -317,6 +355,8 @@ uniform float uCommercialTerrainMicroStrength;
 uniform float uCommercialTerrainRoughnessVariation;
 uniform float uCommercialTerrainTintStrength;
 uniform float uCommercialTerrainTilingBreak;
+uniform float uCommercialTerrainParcelStrength;
+uniform float uCommercialTerrainParcelInnerRadius;
 uniform float uCommercialTerrainDetailFadeStart;
 uniform float uCommercialTerrainDetailFadeEnd;
 uniform vec2 uCommercialTerrainWorldOrigin;
@@ -425,7 +465,44 @@ vec3 commercialTerrainTint = mix(
   vec3(1.0 + uCommercialTerrainTintStrength, 1.0 + uCommercialTerrainTintStrength * 0.45, 1.0 - uCommercialTerrainTintStrength * 0.9),
   commercialTerrainMacroCentered + 0.5
 );
-diffuseColor.rgb *= clamp(1.0 + commercialTerrainTone, 0.7, 1.26) * commercialTerrainTint;`;
+diffuseColor.rgb *= clamp(1.0 + commercialTerrainTone, 0.7, 1.26) * commercialTerrainTint;
+// Regional parcel field: a rotated, row-offset grid of pasture/stubble cells
+// with hedgerow borders, faded in beyond the park and faded out with camera
+// distance before the border lines could turn into sub-pixel shimmer.
+if (uCommercialTerrainParcelStrength > 0.0) {
+  float commercialTerrainParcelMask = smoothstep(
+    uCommercialTerrainParcelInnerRadius,
+    uCommercialTerrainParcelInnerRadius * 1.6 + 40.0,
+    length(commercialTerrainPosition)
+  );
+  if (commercialTerrainParcelMask > 0.0) {
+    const vec2 commercialTerrainParcelSize = vec2(96.0, 148.0);
+    vec2 commercialTerrainParcelUv = (mat2(0.9659, -0.2588, 0.2588, 0.9659) * commercialTerrainPosition)
+      / commercialTerrainParcelSize;
+    commercialTerrainParcelUv.x += floor(commercialTerrainParcelUv.y) * 0.37;
+    vec2 commercialTerrainParcelCell = floor(commercialTerrainParcelUv);
+    vec2 commercialTerrainParcelLocal = fract(commercialTerrainParcelUv);
+    float commercialTerrainParcelTone = commercialTerrainHash(commercialTerrainParcelCell + vec2(3.7, 8.1)) - 0.5;
+    float commercialTerrainParcelWarm = commercialTerrainHash(commercialTerrainParcelCell + vec2(-5.3, 2.9));
+    vec3 commercialTerrainParcelTint = mix(
+      vec3(0.93, 1.0, 0.9),
+      vec3(1.1, 1.03, 0.84),
+      smoothstep(0.35, 0.8, commercialTerrainParcelWarm)
+    );
+    vec2 commercialTerrainParcelEdge = min(commercialTerrainParcelLocal, 1.0 - commercialTerrainParcelLocal)
+      * commercialTerrainParcelSize;
+    float commercialTerrainHedgerow = (1.0 - smoothstep(0.8, 3.2, min(commercialTerrainParcelEdge.x, commercialTerrainParcelEdge.y)))
+      * (1.0 - smoothstep(700.0, 1600.0, commercialTerrainDistance));
+    vec3 commercialTerrainParcelColor = commercialTerrainParcelTint
+      * (1.0 + commercialTerrainParcelTone * 0.14)
+      * (1.0 - commercialTerrainHedgerow * 0.24);
+    diffuseColor.rgb *= mix(
+      vec3(1.0),
+      commercialTerrainParcelColor,
+      commercialTerrainParcelMask * uCommercialTerrainParcelStrength
+    );
+  }
+}`;
 
 const FRAGMENT_ROUGHNESS_VARIATION = `#include <roughnessmap_fragment>
 float commercialTerrainRoughness =
@@ -446,6 +523,8 @@ function createUniforms(options: Readonly<ResolvedTerrainMultiscaleOptions>): Te
     uCommercialTerrainRoughnessVariation: { value: options.roughnessVariation },
     uCommercialTerrainTintStrength: { value: options.tintStrength },
     uCommercialTerrainTilingBreak: { value: options.tilingBreak },
+    uCommercialTerrainParcelStrength: { value: options.parcelStrength },
+    uCommercialTerrainParcelInnerRadius: { value: options.parcelInnerRadius },
     uCommercialTerrainDetailFadeStart: { value: options.detailFadeStart },
     uCommercialTerrainDetailFadeEnd: { value: options.detailFadeEnd },
     uCommercialTerrainWorldOrigin: {
@@ -465,6 +544,8 @@ function updateUniforms(
   uniforms.uCommercialTerrainRoughnessVariation.value = options.roughnessVariation;
   uniforms.uCommercialTerrainTintStrength.value = options.tintStrength;
   uniforms.uCommercialTerrainTilingBreak.value = options.tilingBreak;
+  uniforms.uCommercialTerrainParcelStrength.value = options.parcelStrength;
+  uniforms.uCommercialTerrainParcelInnerRadius.value = options.parcelInnerRadius;
   uniforms.uCommercialTerrainDetailFadeStart.value = options.detailFadeStart;
   uniforms.uCommercialTerrainDetailFadeEnd.value = options.detailFadeEnd;
   uniforms.uCommercialTerrainWorldOrigin.value.set(options.worldOrigin[0], options.worldOrigin[1]);
