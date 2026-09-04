@@ -7,6 +7,7 @@ import {
   List,
   Map,
   Maximize2,
+  Moon,
   MoreHorizontal,
   ParkingCircle,
   Search,
@@ -81,9 +82,12 @@ export function MapToolbar({
   const toggleHydrologicalMode = useCommercialMapStore((state) => state.toggleHydrologicalMode);
   const sunrisePhase = useCommercialMapStore((state) => state.sunrisePhase);
   const requestSunrise = useCommercialMapStore((state) => state.requestSunrise);
+  const nightModeActive = useCommercialMapStore((state) => state.nightModeActive);
+  const toggleNightMode = useCommercialMapStore((state) => state.toggleNightMode);
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
   const canUseTechnicalValidation = canUseTechnicalValidationOverlay(areaScope, permissions);
+  const nightControlLabel = nightModeActive ? 'Sair do Modo Noturno' : 'Ativar Modo Noturno';
   const presets: CameraPreset[] = areaScope === 'exporural'
     ? ['exporural', 'top', 'isometric', 'quadra-r', 'quadra-s', 'semear']
     : ['overview', 'top', 'isometric'];
@@ -198,6 +202,20 @@ export function MapToolbar({
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
+            <button
+              type="button"
+              className={`commercial-map-night-toggle ${nightModeActive ? 'is-active' : ''}`}
+              onClick={toggleNightMode}
+              aria-label={nightControlLabel}
+              aria-pressed={nightModeActive}
+            >
+              <Moon className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>{nightModeActive ? 'Sair do Modo Noturno' : 'Modo Noturno'}</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <button type="button" className={activePanel === 'layers' ? 'is-active' : ''} onClick={() => setActivePanel(activePanel === 'layers' ? null : 'layers')} aria-label="Camadas do mapa">
               <Layers3 className="h-4 w-4" />
             </button>
@@ -273,6 +291,15 @@ export function MapToolbar({
           aria-pressed={hydrologicalModeActive}
         >
           <Droplets aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          className={`commercial-map-night-toggle ${nightModeActive ? 'is-active' : ''}`}
+          onClick={toggleNightMode}
+          aria-label={nightControlLabel}
+          aria-pressed={nightModeActive}
+        >
+          <Moon aria-hidden="true" />
         </button>
         <button
           type="button"

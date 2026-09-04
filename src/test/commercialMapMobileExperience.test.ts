@@ -177,7 +177,10 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
 
     expect(toolbar).toContain('commercial-map-toolbar-focus-selection');
     expect(toolbar).toContain('commercial-map-toolbar-menu-focus-selection');
-    expect(styles).toMatch(/@media \(max-width: 350px\)[\s\S]*?\.commercial-map-toolbar-mobile > \.commercial-map-toolbar-focus-selection \{ display: none; \}/);
+    // The rail carries six actions (map, top, water, night, focus, more): on
+    // the narrowest phones the focus action moves into the overflow menu.
+    expect(toolbar).toContain('commercial-map-night-toggle');
+    expect(styles).toMatch(/@media \(max-width: 364px\)[\s\S]*?\.commercial-map-toolbar-mobile > \.commercial-map-toolbar-focus-selection \{ display: none; \}/);
     expect(styles).toContain('.commercial-map-toolbar-menu .commercial-map-toolbar-menu-focus-selection { display: flex; }');
   });
 });

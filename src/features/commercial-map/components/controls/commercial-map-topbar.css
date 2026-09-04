@@ -37,6 +37,19 @@
   color: #fff;
   box-shadow: 0 8px 20px -10px rgba(13, 104, 155, .9), inset 0 1px rgba(255, 255, 255, .28);
 }
+.commercial-map-topbar__trigger.is-night { color: #4a5578; }
+.commercial-map-topbar__trigger.is-night:hover {
+  background: rgba(64, 76, 140, .1);
+  color: #2c3566;
+}
+.commercial-map-topbar__trigger.is-night.is-open {
+  background: linear-gradient(150deg, #1c2450, #3b4a9c 62%, #5d6fc9);
+  color: #f6f1e4;
+  box-shadow: 0 8px 20px -10px rgba(28, 36, 80, .95), inset 0 1px rgba(255, 255, 255, .22);
+}
+.commercial-map-topbar__trigger.is-night.is-open svg {
+  filter: drop-shadow(0 0 6px rgba(255, 233, 189, .55));
+}
 .commercial-map-topbar__trigger svg { width: 18px; height: 18px; }
 .commercial-map-topbar__trigger i {
   position: absolute;

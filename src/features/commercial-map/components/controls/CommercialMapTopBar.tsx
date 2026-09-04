@@ -5,6 +5,7 @@ import {
   Grid2x2,
   Layers3,
   Maximize2,
+  Moon,
   ScanSearch,
   Signpost,
   Sunrise,
@@ -54,6 +55,8 @@ export function CommercialMapTopBar({
   const toggleHydrologicalMode = useCommercialMapStore((state) => state.toggleHydrologicalMode);
   const sunrisePhase = useCommercialMapStore((state) => state.sunrisePhase);
   const requestSunrise = useCommercialMapStore((state) => state.requestSunrise);
+  const nightModeActive = useCommercialMapStore((state) => state.nightModeActive);
+  const toggleNightMode = useCommercialMapStore((state) => state.toggleNightMode);
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
 
@@ -69,17 +72,18 @@ export function CommercialMapTopBar({
     Icon: LucideIcon,
     label: string,
     onClick: () => void,
-    options: { active?: boolean; disabled?: boolean; hydrological?: boolean } = {},
+    options: { active?: boolean; disabled?: boolean; hydrological?: boolean; night?: boolean } = {},
   ) => (
     <Tooltip key={key}>
       <TooltipTrigger asChild>
         <button
           type="button"
-          className={`commercial-map-topbar__trigger ${options.active ? 'is-open' : ''} ${options.hydrological ? 'is-hydrological' : ''}`}
+          className={`commercial-map-topbar__trigger ${options.active ? 'is-open' : ''} ${options.hydrological ? 'is-hydrological' : ''} ${options.night ? 'is-night' : ''}`}
           onClick={onClick}
           disabled={options.disabled}
           aria-label={label}
           aria-pressed={options.active}
+          data-commercial-map-control={key}
         >
           <Icon aria-hidden="true" />
         </button>
@@ -120,6 +124,14 @@ export function CommercialMapTopBar({
             : 'Amanhecer',
         requestSunrise,
         { active: sunrisePhase === 'running' },
+      )}
+
+      {renderAction(
+        'night-mode',
+        Moon,
+        nightModeActive ? 'Sair do Modo Noturno' : 'Ativar Modo Noturno',
+        toggleNightMode,
+        { active: nightModeActive, night: true },
       )}
 
       {renderAction(

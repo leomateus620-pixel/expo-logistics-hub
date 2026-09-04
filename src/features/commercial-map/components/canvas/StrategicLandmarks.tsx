@@ -4061,6 +4061,30 @@ export interface StrategicLandmarkMeshProps {
   moduleStateById?: ReadonlyMap<string, CommercialPavilionModuleVisualState>;
 }
 
+/**
+ * The amusement park comes alive either when it is the selected focus or when
+ * the whole park is in Night Mode. Only this landmark subscribes to the night
+ * flag, so toggling the night never re-renders the other structures.
+ */
+function NightAwareAmusementPark({
+  bounds,
+  selected,
+  reducedGraphics,
+}: {
+  bounds: StrategicLandmarkBounds;
+  selected: boolean;
+  reducedGraphics: boolean;
+}) {
+  const nightModeActive = useCommercialMapStore((state) => state.nightModeActive);
+  return (
+    <AmusementPark
+      bounds={bounds}
+      parkActive={selected || nightModeActive}
+      reducedGraphics={reducedGraphics}
+    />
+  );
+}
+
 export function StrategicLandmarkMesh({
   entity,
   segment,
@@ -4297,9 +4321,9 @@ export function StrategicLandmarkMesh({
         {kind === 'fenasoja-restaurant' && <FenasojaRestaurant {...modelProps} />}
         {kind === 'sicredi-arena' && <SicrediArena {...modelProps} />}
         {kind === 'amusement-park' && (
-          <AmusementPark
+          <NightAwareAmusementPark
             bounds={modelProps.bounds}
-            parkActive={selected}
+            selected={selected}
             reducedGraphics={reducedGraphics}
           />
         )}

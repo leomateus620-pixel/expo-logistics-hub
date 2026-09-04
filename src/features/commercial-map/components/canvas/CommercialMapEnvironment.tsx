@@ -17,6 +17,7 @@ import {
 import * as THREE from 'three';
 import {
   COMMERCIAL_MAP_ENVIRONMENT_CONFIG,
+  COMMERCIAL_MAP_NIGHT_ATMOSPHERE,
   resolveCommercialMapEnvironmentLayout,
   resolveCommercialMapShadowFrustum,
   resolveCommercialMapSunriseFrame,
@@ -69,8 +70,15 @@ interface CommercialMapEnvironmentProps {
   hydrologicalModeActive: boolean;
   reducedGraphics: boolean;
   adaptiveQualityTier?: CommercialMapQualityTier;
+  /**
+   * Target of the night blend. Global Night Mode and the amusement-park focus
+   * both drive it; the environment eases towards the target instead of
+   * switching, so sky, fog and lights darken together over ~1.5 s.
+   */
   nightMode?: boolean;
 }
+
+const DAY_AMBIENT_COLOR = '#dbeaf2';
 
 type EnvironmentPalette = typeof COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.normal
   | typeof COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.hydrological;
@@ -185,6 +193,14 @@ function createSky(
   material.uniforms.authoredGroundFar = {
     value: new THREE.Color(mode === 'hydrological' ? palette.activeGround : palette.outerGroundFar),
   };
+  const night = COMMERCIAL_MAP_NIGHT_ATMOSPHERE.sky;
+  material.uniforms.nightBlend = { value: 0 };
+  material.uniforms.nightZenith = { value: new THREE.Color(night.zenith) };
+  material.uniforms.nightUpper = { value: new THREE.Color(night.upper) };
+  material.uniforms.nightHorizon = { value: new THREE.Color(night.horizon) };
+  material.uniforms.nightHorizonGlow = { value: new THREE.Color(night.horizonGlow) };
+  material.uniforms.nightGroundFar = { value: new THREE.Color(night.groundFar) };
+  material.uniforms.nightStarIntensity = { value: night.starIntensity };
   material.fragmentShader = material.fragmentShader
     .replace(
       'uniform vec3 up;',
@@ -201,7 +217,28 @@ function createSky(
       uniform vec3 authoredCloudShade;
       uniform vec3 authoredCloudWarm;
       uniform float authoredCloudOpacity;
-      uniform vec3 authoredGroundFar;`,
+      uniform vec3 authoredGroundFar;
+      uniform float nightBlend;
+      uniform vec3 nightZenith;
+      uniform vec3 nightUpper;
+      uniform vec3 nightHorizon;
+      uniform vec3 nightHorizonGlow;
+      uniform vec3 nightGroundFar;
+      uniform float nightStarIntensity;
+
+      float nightStarField(vec3 dir) {
+        // World-locked, hash-placed points: stable under camera motion and
+        // wide enough (smoothstep) to avoid single-pixel shimmer while orbiting.
+        vec3 cell = floor(dir * 190.0);
+        float h = fract(sin(dot(cell, vec3(12.9898, 78.233, 37.719))) * 43758.5453);
+        vec3 jitter = vec3(h, fract(h * 7.13), fract(h * 3.71)) - 0.5;
+        vec3 center = normalize((cell + 0.5 + jitter * 0.72) / 190.0);
+        float d = length(dir - center);
+        float present = step(0.9935, h);
+        float size = mix(0.0016, 0.0032, fract(h * 11.7));
+        float brightness = 0.45 + 0.55 * fract(h * 5.3);
+        return present * brightness * smoothstep(size, size * 0.15, d);
+      }`,
     )
     .replace(
       'gl_FragColor = vec4( retColor, 1.0 );',
@@ -263,11 +300,24 @@ function createSky(
       );
       float belowHorizon = 1.0 - smoothstep(-0.075, 0.008, altitude);
       composedSky = mix(composedSky, lowerHorizon, belowHorizon);
+      if (nightBlend > 0.0005) {
+        vec3 nightSky = mix(nightHorizon, nightUpper, smoothstep(0.0, 0.34, skyHeight));
+        nightSky = mix(nightSky, nightZenith, smoothstep(0.3, 0.95, skyHeight));
+        // Faint warm glow just above the horizon: the park's own lighting
+        // scattered in the air, so the night never reads as a black void.
+        nightSky = mix(nightSky, nightHorizonGlow, exp(-max(altitude, 0.0) * 22.0) * 0.55);
+        float starVisibility = smoothstep(0.03, 0.22, altitude);
+        nightSky += vec3(0.86, 0.9, 1.0) * nightStarField(normalize(direction))
+          * starVisibility * nightStarIntensity;
+        vec3 nightLower = mix(nightGroundFar, nightSky, smoothstep(-0.14, 0.012, altitude));
+        nightSky = mix(nightSky, nightLower, belowHorizon);
+        composedSky = mix(composedSky, nightSky, nightBlend);
+      }
       float dither = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5;
       gl_FragColor = vec4(max(composedSky + dither / 720.0, vec3(0.0)), 1.0);`,
     );
   // Mode changes uniforms only; both palettes intentionally share one program.
-  material.customProgramCacheKey = () => 'commercial-map-camera-safe-sunrise-sky-v5';
+  material.customProgramCacheKey = () => 'commercial-map-camera-safe-sunrise-sky-v6-night';
   material.needsUpdate = true;
   return sky;
 }
@@ -290,6 +340,7 @@ function createCelestialSun(
     uniforms: {
       uSunriseProgress: { value: initialFrame.easedProgress },
       uRayStrength: { value: initialFrame.rayStrength },
+      uNightBlend: { value: 0 },
       uDiscRadiusRatio: { value: discRadiusRatio },
       uSunCore: { value: new THREE.Color(sunrise.colors.sunCore) },
       uSunEdge: { value: new THREE.Color(sunrise.colors.sunEdge) },
@@ -307,6 +358,7 @@ function createCelestialSun(
     fragmentShader: `
       uniform float uSunriseProgress;
       uniform float uRayStrength;
+      uniform float uNightBlend;
       uniform float uDiscRadiusRatio;
       uniform vec3 uSunCore;
       uniform vec3 uSunEdge;
@@ -317,7 +369,7 @@ function createCelestialSun(
       void main() {
         float radius = length(vSunUv);
         if (radius > 1.0) discard;
-        float reveal = smoothstep(0.025, 0.16, uSunriseProgress);
+        float reveal = smoothstep(0.025, 0.16, uSunriseProgress) * (1.0 - uNightBlend);
         float disc = 1.0 - smoothstep(
           uDiscRadiusRatio * 0.84,
           uDiscRadiusRatio,
@@ -1259,6 +1311,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     lastShadowUpdateAt: Number.NEGATIVE_INFINITY,
     lastDiagnosticBucket: -1,
     lastCameraSignature: '',
+    nightBlend: nightMode ? 1 : 0,
   });
   const frameDirection = useMemo(() => new THREE.Vector3(), []);
   const sunFacingDirection = useMemo(() => new THREE.Vector3(), []);
@@ -1277,12 +1330,24 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       : COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.colors.finalHorizonCool),
     [mode, palette.horizon],
   );
-  const background = useMemo(
-    () => new THREE.Color(nightMode ? '#050916' : palette.fallback),
-    [nightMode, palette.fallback],
-  );
+  // One background object per palette; the night blend mutates its channels
+  // in the frame loop so the scene never swaps the owner during a transition.
+  const dayBackground = useMemo(() => new THREE.Color(palette.fallback), [palette.fallback]);
+  const background = useMemo(() => new THREE.Color(palette.fallback), [palette.fallback]);
   const fog = useMemo(() => new THREE.Fog(preSunriseFog, 0, 1), [preSunriseFog]);
-  const nightFog = useMemo(() => new THREE.Color('#0b1421'), []);
+  const nightColors = useMemo(() => ({
+    background: new THREE.Color(COMMERCIAL_MAP_NIGHT_ATMOSPHERE.background),
+    fog: new THREE.Color(COMMERCIAL_MAP_NIGHT_ATMOSPHERE.fog),
+    ambient: new THREE.Color(COMMERCIAL_MAP_NIGHT_ATMOSPHERE.ambientColor),
+    hemisphereSky: new THREE.Color(COMMERCIAL_MAP_NIGHT_ATMOSPHERE.hemisphereSky),
+    hemisphereGround: new THREE.Color(COMMERCIAL_MAP_NIGHT_ATMOSPHERE.hemisphereGround),
+  }), []);
+  const dayColors = useMemo(() => ({
+    ambient: new THREE.Color(DAY_AMBIENT_COLOR),
+    hemisphereSky: new THREE.Color(palette.horizon),
+    hemisphereGround: new THREE.Color(palette.hemisphereGround),
+  }), [palette.hemisphereGround, palette.horizon]);
+  const dayFogColor = useMemo(() => new THREE.Color(), []);
 
   useLayoutEffect(() => {
     fog.near = layout.fogNear;
@@ -1365,7 +1430,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     activeGroundTextures?.dispose();
   }, [activeGroundTextures]);
 
-  useFrame(() => {
+  useFrame((_state, delta) => {
     if (!active) return;
     const liveState = useCommercialMapStore.getState();
     const now = typeof performance === 'undefined' ? Date.now() : performance.now();
@@ -1375,8 +1440,22 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       : isRunning && liveState.sunriseStartedAt !== null
         ? resolveCommercialMapSunriseProgress(liveState.sunriseStartedAt, now)
         : 0;
+    const nightTarget = nightMode ? 1 : 0;
+    const dampedNight = THREE.MathUtils.damp(
+      timeline.current.nightBlend,
+      nightTarget,
+      nightMode
+        ? COMMERCIAL_MAP_NIGHT_ATMOSPHERE.blendInLambda
+        : COMMERCIAL_MAP_NIGHT_ATMOSPHERE.blendOutLambda,
+      delta,
+    );
+    const nightSettled = Math.abs(dampedNight - nightTarget) < 0.0015;
+    const nightBlend = nightSettled ? nightTarget : dampedNight;
+    const nightChanged = nightBlend !== timeline.current.nightBlend;
+    timeline.current.nightBlend = nightBlend;
     const frameChanged = progress !== timeline.current.lastAppliedProgress
-      || liveState.sunriseSequence !== timeline.current.sequence;
+      || liveState.sunriseSequence !== timeline.current.sequence
+      || nightChanged;
     const cameraSignature = import.meta.env.DEV
       ? [
           ...camera.matrixWorld.elements,
@@ -1407,20 +1486,51 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       // The shadow camera orbits the park anchor at the fitted distance; the
       // visual sun disc and sky keep the wider scene anchor.
       sunLight.position.copy(shadowAnchor).addScaledVector(frameDirection, shadowFrustum.distance);
-      sunLight.intensity = nightMode ? 0 : frame.sunlightIntensity;
+      const daylight = 1 - nightBlend;
+      const night = COMMERCIAL_MAP_NIGHT_ATMOSPHERE;
+      sunLight.intensity = frame.sunlightIntensity * daylight;
+      // A fully dark sun still costs a shadow pass; hide it once the blend
+      // settles and bring it back before the first lit frame.
+      sunLight.visible = nightBlend < 0.999;
+      celestialSun.material.uniforms.uNightBlend.value = nightBlend;
+      sky.material.uniforms.nightBlend.value = nightBlend;
       sunLight.shadow.radius = resolveShadowRadiusTexels(frame.shadowRadius, quality.shadowMapSize);
       sunTarget.updateMatrixWorld();
       sunLight.updateMatrixWorld();
       if (ambientRef.current) {
-        ambientRef.current.intensity = nightMode ? 0.24 : frame.ambientIntensity;
+        ambientRef.current.intensity = THREE.MathUtils.lerp(
+          frame.ambientIntensity,
+          night.ambientIntensity,
+          nightBlend,
+        );
+        ambientRef.current.color.lerpColors(dayColors.ambient, nightColors.ambient, nightBlend);
       }
       if (hemisphereRef.current) {
-        hemisphereRef.current.intensity = nightMode ? 0.3 : frame.hemisphereIntensity;
+        hemisphereRef.current.intensity = THREE.MathUtils.lerp(
+          frame.hemisphereIntensity,
+          night.hemisphereIntensity,
+          nightBlend,
+        );
+        hemisphereRef.current.color.lerpColors(
+          dayColors.hemisphereSky,
+          nightColors.hemisphereSky,
+          nightBlend,
+        );
+        hemisphereRef.current.groundColor.lerpColors(
+          dayColors.hemisphereGround,
+          nightColors.hemisphereGround,
+          nightBlend,
+        );
       }
-      if (nightMode) fogColor.copy(nightFog);
-      else fogColor.lerpColors(preSunriseFog, finalSunriseFog, frame.cloudWarmth);
+      dayFogColor.lerpColors(preSunriseFog, finalSunriseFog, frame.cloudWarmth);
+      fogColor.lerpColors(dayFogColor, nightColors.fog, nightBlend);
       fog.color.copy(fogColor);
-      scene.environmentIntensity = nightMode ? 0.16 : frame.environmentIntensity;
+      background.lerpColors(dayBackground, nightColors.background, nightBlend);
+      scene.environmentIntensity = THREE.MathUtils.lerp(
+        frame.environmentIntensity,
+        night.environmentIntensity,
+        nightBlend,
+      );
     }
 
     const diagnosticBucket = progress >= 1 ? 2 : progress >= 0.45 ? 1 : 0;
@@ -1480,8 +1590,8 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       timeline.current.lastShadowUpdateAt = now;
     }
 
-    if (isRunning && progress < 1) invalidate();
-    else if (isRunning) liveState.completeSunrise(liveState.sunriseSequence);
+    if ((isRunning && progress < 1) || !nightSettled) invalidate();
+    if (isRunning && progress >= 1) liveState.completeSunrise(liveState.sunriseSequence);
   });
 
   return (
@@ -1494,21 +1604,23 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
         environmentIntensity={initialFrame.environmentIntensity}
       />
       <group visible={active}>
-      <primitive object={sky} visible={!nightMode} dispose={null} />
-      <primitive object={celestialSun} visible={!nightMode} dispose={null} />
+      {/* Sky and sun blend towards the night palette inside their shaders;
+          the frame loop owns light colours/intensities from the first frame. */}
+      <primitive object={sky} dispose={null} />
+      <primitive object={celestialSun} dispose={null} />
       <primitive object={sunTarget} dispose={null} />
-      <primitive object={sunLight} visible={!nightMode} dispose={null} />
+      <primitive object={sunLight} dispose={null} />
       <ambientLight
         ref={ambientRef}
-        color={nightMode ? '#6d84b5' : '#dbeaf2'}
-        intensity={nightMode ? 0.24 : initialFrame.ambientIntensity}
+        color={DAY_AMBIENT_COLOR}
+        intensity={initialFrame.ambientIntensity}
       />
       <hemisphereLight
         ref={hemisphereRef}
         args={[
-          nightMode ? '#263a67' : palette.horizon,
-          nightMode ? '#101713' : palette.hemisphereGround,
-          nightMode ? 0.3 : initialFrame.hemisphereIntensity,
+          palette.horizon,
+          palette.hemisphereGround,
+          initialFrame.hemisphereIntensity,
         ]}
       />
       <mesh

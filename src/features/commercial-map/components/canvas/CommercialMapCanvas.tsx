@@ -149,6 +149,7 @@ import { CommercialMapInteriorShaderWarmup } from './CommercialMapInteriorShader
 import { TechnicalValidationOverlay } from './TechnicalValidationOverlay';
 import { CommercialTreeLayer } from './CommercialTreeLayer';
 import { CommercialElectricalInfrastructureLayer } from './CommercialElectricalInfrastructureLayer';
+import { NightLightingLayer } from './NightLightingLayer';
 import { CommercialHydrologicalInfrastructureLayer } from './CommercialHydrologicalInfrastructureLayer';
 import { CommercialPavilionInteriorScene } from './CommercialPavilionInteriorScene';
 import { MiranteInteriorScene } from './MiranteInteriorScene';
@@ -4133,6 +4134,7 @@ function Scene({
   const labelsVisible = useCommercialMapStore((state) => state.labelsVisible);
   const treesVisible = useCommercialMapStore((state) => state.treesVisible);
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
+  const nightModeActive = useCommercialMapStore((state) => state.nightModeActive);
   const setSelectedHydrologicalElementId = useCommercialMapStore(
     (state) => state.setSelectedHydrologicalElementId,
   );
@@ -4565,6 +4567,14 @@ function Scene({
     return () => { raycaster.layers.set(0); };
   }, [interiorEntityId, raycaster, sceneObject]);
 
+  const amusementParkSelected = resolveStrategicLandmarkKind(
+    selectedEntity ?? { publicIdentifier: '' },
+  ) === 'amusement-park';
+  // Global Night Mode extends the amusement-park night to the whole park; the
+  // park focus alone still darkens the scene exactly as before.
+  const nightAtmosphereActive = nightModeActive || amusementParkSelected;
+  const electricalNetworkVisible = treesVisible && !hydrologicalModeActive;
+
   const interiorKind = interiorEntity ? resolveStrategicLandmarkKind(interiorEntity) : null;
   const interiorContent = interiorEntity && (
     interiorKind === 'commercial-pavilion'
@@ -4587,7 +4597,7 @@ function Scene({
         hydrologicalModeActive={hydrologicalModeActive}
         reducedGraphics={reducedGraphics}
         adaptiveQualityTier={renderQualityTier}
-        nightMode={resolveStrategicLandmarkKind(selectedEntity ?? { publicIdentifier: '' }) === 'amusement-park'}
+        nightMode={nightAtmosphereActive}
       />
       <InteriorCameraRequestContext.Provider value={setInteriorCameraRequest}>
         {interiorContent}
@@ -4753,7 +4763,15 @@ function Scene({
         connections={sceneElectricalInfrastructure.connections}
         surfaceEntities={entities}
         rearRoadsActive={!isolatedArea}
-        visible={treesVisible && !hydrologicalModeActive}
+        visible={electricalNetworkVisible}
+        reducedGraphics={reducedGraphics}
+      />
+      <NightLightingLayer
+        nodes={sceneElectricalInfrastructure.nodes}
+        connections={sceneElectricalInfrastructure.connections}
+        surfaceEntities={entities}
+        rearRoadsActive={!isolatedArea}
+        polesVisible={electricalNetworkVisible}
         reducedGraphics={reducedGraphics}
       />
       <Suspense fallback={null}>
