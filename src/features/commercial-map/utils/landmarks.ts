@@ -36,6 +36,10 @@ import {
   pavilionFourSoyKitchenVisualHeight,
 } from './pavilionFourSoyKitchen';
 import {
+  FENASOJA_RESTAURANT_LAYOUT,
+  fenasojaRestaurantVisualHeight,
+} from './fenasojaRestaurant';
+import {
   VIA_EXPRESSA_LAYOUT,
   viaExpressaVisualHeight,
 } from './viaExpressa';
@@ -436,10 +440,18 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
   },
   C2: {
     kind: 'fenasoja-restaurant',
-    aliases: ['Restaurante Fenasoja', 'Restaurante da Fenasoja', 'Pavilhão Restaurante Fenasoja'],
-    facingRadians: Math.PI,
-    focusDirection: [-0.42, 0.4, -0.92],
-    visualHeight: ({ width, depth }) => Math.min(2.7, Math.max(width, depth) * 0.62),
+    aliases: [
+      'Restaurante',
+      'Restaurante Central',
+      'Pizzaria',
+      'Restaurante Fenasoja',
+      'Restaurante da Fenasoja',
+      'Pavilhão Restaurante Fenasoja',
+    ],
+    // One unified building (C2 + C3) whose front faces the Calçada do Arvoredo.
+    facingRadians: FENASOJA_RESTAURANT_LAYOUT.facingRadians,
+    focusDirection: FENASOJA_RESTAURANT_LAYOUT.focusDirection,
+    visualHeight: fenasojaRestaurantVisualHeight,
   },
   F: {
     kind: 'sicredi-arena',
@@ -565,6 +577,12 @@ export function strategicLandmarkVisualHeight(entity: MapEntity): number | null 
   if (definition.kind === 'livestock-tent') {
     return Math.min(
       LIVESTOCK_TENT_LAYOUT.maximumVisualHeight,
+      Math.max(entity.geometry.extrusionHeight, visualHeight),
+    );
+  }
+  if (definition.kind === 'fenasoja-restaurant') {
+    return Math.min(
+      FENASOJA_RESTAURANT_LAYOUT.maximumVisualHeight,
       Math.max(entity.geometry.extrusionHeight, visualHeight),
     );
   }
