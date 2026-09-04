@@ -98,7 +98,7 @@ export const QUADRAS_AB_SPATIAL_REFERENCE = Object.freeze({
     'AV-IMIGRANTES',
   ]),
   protectedStructureIdentifiers: Object.freeze([
-    'B12', 'B13', 'B18', 'B30', 'B42-02',
+    'B12', 'B13',
   ]),
   // Keep the already validated headquarters ground-contact treatment as the
   // sole visible surface wherever its rendered cells meet the new landscape.

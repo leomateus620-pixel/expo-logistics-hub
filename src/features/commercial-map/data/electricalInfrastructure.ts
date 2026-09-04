@@ -180,7 +180,6 @@ export const ELECTRICAL_INFRASTRUCTURE_REFERENCE = {
       { sourceMarkerId: 'pole-ref-222', surfaceEntityIdentifier: 'D3', mountMode: 'FACADE_POLE' },
       { sourceMarkerId: 'pole-ref-234', surfaceEntityIdentifier: 'D3', mountMode: 'FACADE_POLE' },
       { sourceMarkerId: 'pole-ref-357', surfaceEntityIdentifier: 'B12', mountMode: 'FACADE_POLE' },
-      { sourceMarkerId: 'pole-ref-390', surfaceEntityIdentifier: 'B30', mountMode: 'FACADE_POLE' },
       { sourceMarkerId: 'transformer-ref-001', surfaceEntityIdentifier: 'B42-01', mountMode: 'FACADE_RECEPTION' },
       { sourceMarkerId: 'transformer-ref-007', surfaceEntityIdentifier: 'B7', mountMode: 'FACADE_RECEPTION' },
       { sourceMarkerId: 'transformer-ref-011', surfaceEntityIdentifier: 'C1', mountMode: 'FACADE_RECEPTION' },
