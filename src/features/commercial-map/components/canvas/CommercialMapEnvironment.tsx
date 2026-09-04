@@ -1,4 +1,4 @@
-import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import {
@@ -33,7 +33,20 @@ import {
   resolveCommercialMapEnvironmentQualityTier,
   type CommercialMapQualityTier,
 } from '../../utils/viewport';
-import { resolveCommercialMapInteractionPixelRatio } from '../../utils/adaptiveQualityRuntime';
+import {
+  bindCommercialMapScreen,
+  collectCommercialMapRenderTargets,
+  validateCommercialMapRenderTargets,
+} from '../../utils/renderingPresentation';
+import {
+  COMMERCIAL_MAP_RENDER_RETRY_EVENT,
+  publishCommercialMapRenderHealth,
+} from '../../utils/renderingHealth';
+import {
+  beginCommercialMapRenderTiming,
+  endCommercialMapRenderTiming,
+  disposeCommercialMapRenderTiming,
+} from '../../utils/renderingTiming';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import {
   openGroundTextureBundleForEntity,
@@ -408,6 +421,104 @@ function updateSkyFrame(sky: SunriseSky, frame: CommercialMapSunriseFrame) {
   material.uniforms.sunriseProgress.value = frame.easedProgress;
 }
 
+/** Mode is presentation state, not the lifetime of skies or PMREM inputs. */
+// eslint-disable-next-line react-refresh/only-export-components -- Isolated hook export makes the actual resource lifetime regression-testable.
+export function useCommercialMapAtmosphereResources({
+  initialFrame,
+  mode,
+  palette,
+  cloudOpacity,
+  skyScale,
+  centerX,
+  centerZ,
+  visualSunDistance,
+  reflectionTextureWidth,
+}: {
+  initialFrame: CommercialMapSunriseFrame;
+  mode: CommercialMapEnvironmentMode;
+  palette: EnvironmentPalette;
+  cloudOpacity: number;
+  skyScale: number;
+  centerX: number;
+  centerZ: number;
+  visualSunDistance: number;
+  reflectionTextureWidth: number;
+}) {
+  const initial = useRef({ initialFrame, mode, palette, cloudOpacity }).current;
+  const sky = useMemo(() => createSky(
+    1, 0, 0, initial.initialFrame, initial.mode, initial.palette, initial.cloudOpacity,
+  ), [initial]);
+  // Unit-size geometry scales with the current scene envelope; mode/resize
+  // never replaces the material and drops its cached shader program.
+  const celestialSun = useMemo(
+    () => createCelestialSun(new THREE.Vector3(), 1, initial.initialFrame),
+    [initial],
+  );
+  // Keep both authored palettes and both quality inputs alive. Updating or
+  // disposing them on a mode/tier switch invalidates Three's cached PMREM
+  // targets and used to rebuild its LOD geometries on every quality cycle.
+  const reflectionTextures = useMemo(() => ({
+    normal: {
+      full: createReflectionTexture(
+        COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.fullTextureWidth,
+        COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.normal,
+        new THREE.Vector3(...resolveCommercialMapSunriseFrame(1, 'normal').direction),
+      ),
+      reduced: createReflectionTexture(
+        COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.reducedTextureWidth,
+        COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.normal,
+        new THREE.Vector3(...resolveCommercialMapSunriseFrame(1, 'normal').direction),
+      ),
+    },
+    hydrological: {
+      full: createReflectionTexture(
+        COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.fullTextureWidth,
+        COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.hydrological,
+        new THREE.Vector3(...resolveCommercialMapSunriseFrame(1, 'hydrological').direction),
+      ),
+      reduced: createReflectionTexture(
+        COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.reducedTextureWidth,
+        COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.hydrological,
+        new THREE.Vector3(...resolveCommercialMapSunriseFrame(1, 'hydrological').direction),
+      ),
+    },
+  }), []);
+  const reflectionTier = reflectionTextureWidth
+    <= COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.reducedTextureWidth ? 'reduced' : 'full';
+
+  useLayoutEffect(() => {
+    sky.scale.setScalar(skyScale);
+    sky.position.set(centerX, 0, centerZ);
+    const uniforms = sky.material.uniforms;
+    uniforms.turbidity.value = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sky.turbidity
+      + (mode === 'hydrological' ? 0.35 : 0);
+    uniforms.rayleigh.value = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sky.rayleigh
+      - (mode === 'hydrological' ? 0.3 : 0);
+    (uniforms.authoredCloudCool.value as THREE.Color).set(palette.cloud);
+    (uniforms.authoredCloudShade.value as THREE.Color).set(palette.cloudShade);
+    uniforms.authoredCloudOpacity.value = cloudOpacity;
+    (uniforms.authoredGroundFar.value as THREE.Color).set(
+      mode === 'hydrological' ? palette.activeGround : palette.outerGroundFar,
+    );
+    celestialSun.scale.setScalar(visualSunDistance);
+  }, [celestialSun, centerX, centerZ, cloudOpacity, mode, palette, sky, skyScale, visualSunDistance]);
+
+  useEffect(() => () => {
+    Object.values(reflectionTextures).forEach((textures) => {
+      textures.full.dispose();
+      textures.reduced.dispose();
+    });
+  }, [reflectionTextures]);
+  useEffect(() => () => {
+    sky.geometry.dispose();
+    sky.material.dispose();
+    celestialSun.geometry.dispose();
+    celestialSun.material.dispose();
+  }, [celestialSun, sky]);
+
+  return { sky, celestialSun, reflectionTexture: reflectionTextures[mode][reflectionTier] };
+}
+
 /**
  * Five-tap unsharp mask that runs after SMAA in its own pass (two convolution
  * effects cannot share an EffectPass). Strength is deliberately tiny: it only
@@ -492,6 +603,11 @@ function createCommercialMapPostProcessing(
   // Keep the pass allocated across tiers. Toggling `enabled` changes neither
   // the composer's targets nor effect listeners.
   composer.addPass(sharpenPass);
+  // autoRenderToScreen selects the last *added* pass, including disabled
+  // passes. A dormant sharpen used to leave balanced/mobile with no output.
+  composer.autoRenderToScreen = false;
+  smaaPass.renderToScreen = true;
+  sharpenPass.renderToScreen = false;
   let disposed = false;
   let selectionShadersPrepared = false;
   return {
@@ -502,7 +618,13 @@ function createCommercialMapPostProcessing(
     setSharpenStrength: (strength: number) => {
       sharpen.setStrength(strength);
       sharpenPass.enabled = strength > 0;
+      smaaPass.renderToScreen = !sharpenPass.enabled;
+      sharpenPass.renderToScreen = sharpenPass.enabled;
     },
+    hasScreenOutput: () => composer.passes.filter((pass) => pass.enabled && pass.renderToScreen).length === 1,
+    validateTargets: () => validateCommercialMapRenderTargets(gl, collectCommercialMapRenderTargets([
+      composer.inputBuffer, composer.outputBuffer, composer.passes,
+    ])),
     prepareSelectionShaders: () => {
       if (selectionShadersPrepared) return;
       const highlights = scene.getObjectByName('commercial-map-selection-shader-warmup');
@@ -556,13 +678,37 @@ export function SunrisePostProcessing({
   // composer sizes its HDR targets from the drawing buffer, so it must follow.
   const pixelRatio = useThree((state) => state.viewport?.dpr ?? 1);
   const invalidate = useThree((state) => state.invalidate);
-  const setDpr = useThree((state) => state.setDpr);
   const quality = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality[qualityTier];
   const pipeline = useRef<ReturnType<typeof createCommercialMapPostProcessing> | null>(null);
   const rendererState = useRef({ autoClear: gl.autoClear, toneMapping: gl.toneMapping });
-  const restingPixelRatio = useRef(pixelRatio);
-  const interactionScaled = useRef(false);
+  const lost = useRef(false);
+  const postFailed = useRef(false);
+  const rendererFailed = useRef(false);
+  const automaticRecoveryUsed = useRef(false);
+  const directRetryUsed = useRef(false);
+  const directShaderFailed = useRef(false);
+  const renderingFrame = useRef(false);
+  const cachedShaderFailed = useRef(false);
+  const manualContextResetPending = useRef(false);
+  const lastErrorCode = useRef<string | null>(null);
+  const presentedFrames = useRef(0);
+  const contextLosses = useRef(0);
+  const sizedBuffer = useRef('');
+  const drawingBuffer = useRef(new THREE.Vector2());
   const [contextEpoch, setContextEpoch] = useState(0);
+
+  const observeContextLoss = useCallback(() => {
+    // isContextLost() can turn true during a draw before the browser delivers
+    // its DOM event. Both paths observe the same loss, never two failures.
+    if (lost.current) return;
+    lost.current = true;
+    contextLosses.current += 1;
+    lastErrorCode.current = 'context-lost';
+    publishCommercialMapRenderHealth(gl.domElement, {
+      status: 'context-lost', path: 'suspended', presentedFrames: presentedFrames.current,
+      contextLosses: contextLosses.current, lastErrorCode: lastErrorCode.current,
+    });
+  }, [gl]);
 
   useLayoutEffect(() => {
     const previous = { autoClear: gl.autoClear, toneMapping: gl.toneMapping };
@@ -570,37 +716,129 @@ export function SunrisePostProcessing({
     return () => {
       gl.autoClear = previous.autoClear;
       gl.toneMapping = previous.toneMapping;
+      if (import.meta.env.DEV) disposeCommercialMapRenderTiming(gl);
     };
   }, [gl]);
 
-  useEffect(() => {
-    const canvas = gl.domElement;
-    const handleLost = () => {
-      const failed = pipeline.current;
-      pipeline.current = null;
-      try {
-        failed?.dispose();
-      } catch {
-        // Direct rendering remains authoritative if a lost context also
-        // rejects render-target disposal.
+  useLayoutEffect(() => {
+    const previousShaderError = gl.debug.onShaderError;
+    const observeShaderError: NonNullable<typeof gl.debug.onShaderError> = (...args) => {
+      if (!renderingFrame.current) {
+        // Preload is a later scene sibling and renders a cube in its layout
+        // effect. Three reports a failed program only on first use, so retain
+        // failures from that warmup before a later frame reuses the cache.
+        cachedShaderFailed.current = true;
+        invalidate();
       }
-      gl.toneMapping = rendererState.current.toneMapping;
-      gl.autoClear = rendererState.current.autoClear;
+      previousShaderError?.(...args);
     };
-    const handleRestored = () => {
-      setContextEpoch((epoch) => epoch + 1);
-      invalidate();
-    };
-    canvas.addEventListener('webglcontextlost', handleLost);
-    canvas.addEventListener('webglcontextrestored', handleRestored);
+    gl.debug.onShaderError = observeShaderError;
     return () => {
-      canvas.removeEventListener('webglcontextlost', handleLost);
-      canvas.removeEventListener('webglcontextrestored', handleRestored);
+      if (gl.debug.onShaderError === observeShaderError) gl.debug.onShaderError = previousShaderError;
     };
   }, [gl, invalidate]);
 
+  useEffect(() => {
+    const canvas = gl.domElement;
+    // Query while healthy: getExtension may return null after genuine context
+    // loss, so a late forceContextRestore() alone can silently do nothing.
+    let contextRestorer = gl.getContext().isContextLost()
+      ? null : gl.getContext().getExtension('WEBGL_lose_context');
+    const requestContextRestoration = () => {
+      if (contextRestorer) contextRestorer.restoreContext();
+      else gl.forceContextRestore();
+    };
+    let recoveryTimer: ReturnType<typeof setTimeout> | undefined;
+    let manualRestoreTimer: ReturnType<typeof setTimeout> | undefined;
+    const report = (status: 'context-lost' | 'recovering' | 'failed') => publishCommercialMapRenderHealth(canvas, {
+      status, path: 'suspended', presentedFrames: presentedFrames.current,
+      contextLosses: contextLosses.current, lastErrorCode: lastErrorCode.current,
+    });
+    const awaitRestoration = () => {
+      clearTimeout(recoveryTimer);
+      recoveryTimer = setTimeout(() => {
+        if (!lost.current && !manualContextResetPending.current) return;
+        manualContextResetPending.current = false;
+        lastErrorCode.current = 'context-restore-timeout';
+        report('failed');
+      }, 5000);
+    };
+    const handleLost = () => {
+      // No draw/dispose/allocation calls while the browser owns restoration.
+      observeContextLoss();
+      awaitRestoration();
+      if (manualContextResetPending.current) {
+        manualContextResetPending.current = false;
+        // Only an explicit retry of a cached broken shader requests this
+        // context cycle. Restoration must follow delivery of the loss event.
+        manualRestoreTimer = setTimeout(requestContextRestoration, 0);
+      }
+    };
+    const handleRestored = () => {
+      clearTimeout(recoveryTimer);
+      lost.current = false;
+      contextRestorer = gl.getContext().getExtension('WEBGL_lose_context');
+      // Demand-rendered shadows are frozen between scene changes. Their
+      // targets lose GPU contents with the context even though light/target
+      // objects survive; redraw them before the first recovered screen frame.
+      gl.shadowMap.needsUpdate = true;
+      scene.traverse((object) => {
+        const shadow = (object as THREE.Light & { shadow?: THREE.LightShadow }).shadow;
+        if (shadow) shadow.needsUpdate = true;
+      });
+      rendererFailed.current = false;
+      directRetryUsed.current = false;
+      directShaderFailed.current = false;
+      cachedShaderFailed.current = false;
+      manualContextResetPending.current = false;
+      // Repeated driver loss must not create an endless HDR rebuild loop.
+      postFailed.current = automaticRecoveryUsed.current;
+      automaticRecoveryUsed.current = true;
+      lastErrorCode.current = postFailed.current ? 'repeated-context-loss' : null;
+      setContextEpoch((epoch) => epoch + 1);
+      invalidate();
+    };
+    const handleRetry = () => {
+      report('recovering');
+      if (directShaderFailed.current && !lost.current && !gl.getContext().isContextLost()) {
+        // resetState leaves non-runnable programs cached. A user-requested
+        // context restoration clears those programs without replacing scene,
+        // camera, controls or selection. No automatic retry loop is allowed.
+        manualContextResetPending.current = true;
+        automaticRecoveryUsed.current = false;
+        gl.forceContextLoss();
+        awaitRestoration();
+        return;
+      }
+      automaticRecoveryUsed.current = false;
+      directRetryUsed.current = false;
+      rendererFailed.current = false;
+      postFailed.current = false;
+      lastErrorCode.current = null;
+      if (lost.current || gl.getContext().isContextLost()) {
+        observeContextLoss();
+        requestContextRestoration();
+        awaitRestoration();
+      } else {
+        gl.resetState();
+        setContextEpoch((epoch) => epoch + 1);
+        invalidate();
+      }
+    };
+    canvas.addEventListener('webglcontextlost', handleLost);
+    canvas.addEventListener('webglcontextrestored', handleRestored);
+    canvas.addEventListener(COMMERCIAL_MAP_RENDER_RETRY_EVENT, handleRetry);
+    return () => {
+      clearTimeout(recoveryTimer);
+      clearTimeout(manualRestoreTimer);
+      canvas.removeEventListener('webglcontextlost', handleLost);
+      canvas.removeEventListener('webglcontextrestored', handleRestored);
+      canvas.removeEventListener(COMMERCIAL_MAP_RENDER_RETRY_EVENT, handleRetry);
+    };
+  }, [gl, invalidate, observeContextLoss, scene]);
+
   useLayoutEffect(() => {
-    if (!quality.bloomEnabled || pipeline.current) return;
+    if (!quality.bloomEnabled || pipeline.current || lost.current || postFailed.current) return;
     let next: ReturnType<typeof createCommercialMapPostProcessing> | null = null;
     try {
       next = createCommercialMapPostProcessing(
@@ -617,11 +855,14 @@ export function SunrisePostProcessing({
           : String(error);
       }
       pipeline.current = null;
+      postFailed.current = true;
+      lastErrorCode.current = 'post-initialization-failed';
       gl.toneMapping = rendererState.current.toneMapping;
       invalidate();
       return;
     }
     pipeline.current = next;
+    sizedBuffer.current = '';
     invalidate();
   }, [
     camera,
@@ -635,101 +876,138 @@ export function SunrisePostProcessing({
   useLayoutEffect(() => () => {
     const current = pipeline.current;
     pipeline.current = null;
-    current?.dispose();
+    if (!lost.current) current?.dispose();
   }, [camera, gl, scene, contextEpoch]);
 
   useLayoutEffect(() => {
     pipeline.current?.setSharpenStrength(quality.sharpenStrength);
     invalidate();
-  }, [invalidate, quality.sharpenStrength]);
+  }, [contextEpoch, invalidate, quality.sharpenStrength]);
 
   useLayoutEffect(() => {
-    if (interactionActive) {
-      if (interactionScaled.current) return;
-      const currentDpr = gl.getPixelRatio();
-      restingPixelRatio.current = currentDpr;
-      interactionScaled.current = true;
-      const interactionDpr = resolveCommercialMapInteractionPixelRatio(currentDpr);
-      if (Math.abs(currentDpr - interactionDpr) > 0.005) setDpr(interactionDpr);
-      invalidate();
-      return;
-    }
-    if (!interactionScaled.current) return;
-    interactionScaled.current = false;
-    const restoredDpr = restingPixelRatio.current;
-    if (Math.abs(gl.getPixelRatio() - restoredDpr) > 0.005) setDpr(restoredDpr);
+    // Actual target resize/validation happens at frame start, after R3F has
+    // applied the sole DPR controller's drawing-buffer update.
     invalidate();
-  }, [gl, interactionActive, invalidate, setDpr]);
-
-  useLayoutEffect(() => {
-    if (!enabled || !quality.bloomEnabled) return;
-    pipeline.current?.composer.setSize(size.width, size.height);
-    invalidate();
-  }, [enabled, invalidate, pixelRatio, quality.bloomEnabled, size.height, size.width]);
-
-  useLayoutEffect(() => {
-    // A disabled composer no longer owns output encoding. Restore the same
-    // renderer ACES pipeline the interiors used before exterior caching.
-    gl.toneMapping = enabled && quality.bloomEnabled && pipeline.current
-      ? THREE.NoToneMapping
-      : rendererState.current.toneMapping;
-    gl.autoClear = rendererState.current.autoClear;
-    if (enabled) pipeline.current?.prepareSelectionShaders();
-    invalidate();
-  }, [
-    enabled,
-    gl,
-    invalidate,
-    quality.bloomEnabled,
-  ]);
+  }, [enabled, interactionActive, invalidate, pixelRatio, quality.bloomEnabled, size.height, size.width]);
 
   useFrame((_state, delta) => {
-    // At reduced quality R3F's normal render remains the sole renderer. Direct
-    // rendering here is reserved for a failed composer whose positive frame
-    // priority has intentionally taken ownership of the frame.
-    if (!enabled || !quality.bloomEnabled) return;
+    // One stable frame owner across modes. Changing a useFrame priority at a
+    // gesture boundary used to hand the default renderer a retained HDR target.
+    const contextIsLost = () => {
+      if (!lost.current && !gl.getContext().isContextLost()) return false;
+      observeContextLoss();
+      return true;
+    };
+    if (contextIsLost() || rendererFailed.current) return;
+    if (cachedShaderFailed.current) {
+      // The warmup's render path is unknown and its broken program may be
+      // shared with direct rendering. Only a context reset can safely clear
+      // that cache; never count an apparently successful reuse as an image.
+      directShaderFailed.current = true;
+      rendererFailed.current = true;
+      lastErrorCode.current = 'cached-shader-failed';
+      publishCommercialMapRenderHealth(gl.domElement, {
+        status: 'failed', path: 'suspended', presentedFrames: presentedFrames.current,
+        contextLosses: contextLosses.current, lastErrorCode: lastErrorCode.current,
+      });
+      return;
+    }
+    const renderTiming = import.meta.env.DEV ? beginCommercialMapRenderTiming(gl) : null;
+    renderingFrame.current = true;
     const previousAutoClear = gl.autoClear;
+    const previousShaderError = gl.debug.onShaderError;
+    let shaderFailed = false;
+    gl.debug.onShaderError = (...args) => {
+      shaderFailed = true;
+      previousShaderError?.(...args);
+    };
     gl.autoClear = true;
+    let path: 'post' | 'direct' = 'direct';
+    const direct = () => {
+      if (contextIsLost()) throw new Error('context-lost');
+      if (directShaderFailed.current) throw new Error('direct-shader-failed');
+      bindCommercialMapScreen(gl, size.width, size.height);
+      gl.toneMapping = THREE.ACESFilmicToneMapping;
+      shaderFailed = false;
+      gl.render(scene, camera);
+      if (contextIsLost()) throw new Error('context-lost');
+      if (shaderFailed) {
+        directShaderFailed.current = true;
+        throw new Error('direct-shader-failed');
+      }
+    };
     try {
-      if (pipeline.current) {
-        pipeline.current.composer.render(delta);
-      } else {
-        const previousToneMapping = gl.toneMapping;
-        gl.toneMapping = rendererState.current.toneMapping;
+      const current = pipeline.current;
+      if (enabled && !interactionActive && quality.bloomEnabled && current && !postFailed.current) {
         try {
-          gl.render(scene, camera);
-        } finally {
-          gl.toneMapping = previousToneMapping;
+          bindCommercialMapScreen(gl, size.width, size.height);
+          gl.toneMapping = THREE.NoToneMapping;
+          const buffer = gl.getDrawingBufferSize(drawingBuffer.current);
+          const signature = `${size.width}:${size.height}:${buffer.x}:${buffer.y}`;
+          if (signature !== sizedBuffer.current) {
+            current.composer.setSize(size.width, size.height);
+            current.validateTargets();
+            if (contextIsLost()) return;
+            sizedBuffer.current = signature;
+            bindCommercialMapScreen(gl, size.width, size.height);
+          }
+          if (!current.hasScreenOutput()) throw new Error('missing-screen-output');
+          current.prepareSelectionShaders();
+          if (contextIsLost()) return;
+          current.composer.render(delta);
+          if (contextIsLost()) return;
+          if (shaderFailed) throw new Error('post-shader-failed');
+          if (gl.getRenderTarget() !== null) throw new Error('retained-render-target');
+          path = 'post';
+        } catch (error) {
+          if (contextIsLost()) return;
+          postFailed.current = true;
+          lastErrorCode.current = error instanceof Error ? error.message : 'post-render-failed';
+          // Unbind before retirement; never render a fallback into that target.
+          bindCommercialMapScreen(gl, size.width, size.height);
+          if (contextIsLost()) return;
+          pipeline.current = null;
+          try { current.dispose(); } catch { /* Keep the direct path available. */ }
+          direct();
         }
+      } else {
+        direct();
       }
+      if (contextIsLost()) return;
+      presentedFrames.current += 1;
     } catch (error) {
-      const failedPipeline = pipeline.current;
-      pipeline.current = null;
+      if (contextIsLost()) return;
+      lastErrorCode.current = error instanceof Error ? error.message : 'renderer-failed';
+      // At most one direct retry; never loop, reload the app, or reset its camera.
       try {
-        failedPipeline?.dispose();
+        // resetState cannot repair a cached, non-runnable shader program.
+        if (directRetryUsed.current || lastErrorCode.current === 'direct-shader-failed') throw error;
+        directRetryUsed.current = true;
+        gl.resetState();
+        direct();
+        if (contextIsLost()) return;
+        presentedFrames.current += 1;
       } catch {
-        // The direct renderer below remains authoritative even if a broken
-        // driver also rejects render-target disposal.
-      }
-      // A late framebuffer/shader failure must not crash or strand the canvas.
-      // Temporarily restore the direct renderer's tone mapper for this frame.
-      const previousToneMapping = gl.toneMapping;
-      gl.toneMapping = rendererState.current.toneMapping;
-      try {
-        gl.render(scene, camera);
-      } finally {
-        gl.toneMapping = previousToneMapping;
-      }
-      gl.toneMapping = rendererState.current.toneMapping;
-      if (import.meta.env.DEV) {
-        gl.domElement.dataset.commercialMapPostProcessingError = error instanceof Error
-          ? error.message
-          : String(error);
+        if (contextIsLost()) return;
+        rendererFailed.current = true;
       }
     } finally {
+      renderingFrame.current = false;
+      const suspended = contextIsLost();
+      if (!suspended) bindCommercialMapScreen(gl, size.width, size.height);
+      gl.debug.onShaderError = previousShaderError;
       gl.autoClear = previousAutoClear;
+      gl.toneMapping = rendererState.current.toneMapping;
+      if (import.meta.env.DEV) endCommercialMapRenderTiming(renderTiming, path, !suspended && !rendererFailed.current);
+      if (!suspended) publishCommercialMapRenderHealth(gl.domElement, {
+        status: rendererFailed.current ? 'failed' : postFailed.current ? 'degraded' : 'ready',
+        path: rendererFailed.current ? 'suspended' : path,
+        presentedFrames: presentedFrames.current,
+        contextLosses: contextLosses.current,
+        lastErrorCode: lastErrorCode.current,
+      });
     }
-  }, enabled && quality.bloomEnabled ? 1 : 0);
+  }, 1);
 
   return null;
 }
@@ -877,22 +1155,6 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     target.position.copy(shadowAnchor);
     return target;
   }, [shadowAnchor]);
-  const sky = useMemo(
-    () => createSky(
-      layout.skyScale,
-      extent.centerX,
-      extent.centerZ,
-      initialFrame,
-      mode,
-      palette,
-      cloudOpacity,
-    ),
-    [cloudOpacity, extent.centerX, extent.centerZ, initialFrame, layout.skyScale, mode, palette],
-  );
-  const celestialSun = useMemo(
-    () => createCelestialSun(sceneAnchor, layout.visualSunDistance, initialFrame),
-    [initialFrame, layout.visualSunDistance, sceneAnchor],
-  );
   const sunLight = useMemo(
     () => configureSunLight(sunTarget, shadowFrustum, qualityTier),
     [qualityTier, shadowFrustum, sunTarget],
@@ -980,14 +1242,14 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   const reflectionTextureWidth = qualityTier === 'reduced'
     ? COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.reducedTextureWidth
     : COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.fullTextureWidth;
-  const finalSunDirection = useMemo(
-    () => new THREE.Vector3(...resolveCommercialMapSunriseFrame(1, mode).direction),
-    [mode],
-  );
-  const reflectionTexture = useMemo(
-    () => createReflectionTexture(reflectionTextureWidth, palette, finalSunDirection),
-    [finalSunDirection, palette, reflectionTextureWidth],
-  );
+  const { sky, celestialSun, reflectionTexture } = useCommercialMapAtmosphereResources({
+    initialFrame, mode, palette, cloudOpacity,
+    skyScale: layout.skyScale,
+    centerX: extent.centerX,
+    centerZ: extent.centerZ,
+    visualSunDistance: layout.visualSunDistance,
+    reflectionTextureWidth,
+  });
   const ambientRef = useRef<THREE.AmbientLight>(null);
   const hemisphereRef = useRef<THREE.HemisphereLight>(null);
   const outerGroundRef = useRef<THREE.Mesh>(null);
@@ -1026,8 +1288,6 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     fog.near = layout.fogNear;
     fog.far = layout.fogFar;
   }, [fog, layout.fogFar, layout.fogNear]);
-
-  useEffect(() => () => reflectionTexture.dispose(), [reflectionTexture]);
 
   useEffect(() => () => normalGroundMaterial.dispose(), [normalGroundMaterial]);
 
@@ -1096,16 +1356,6 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     requestSunrise,
     scene,
   ]);
-
-  useEffect(() => () => {
-    sky.geometry.dispose();
-    sky.material.dispose();
-  }, [sky]);
-
-  useEffect(() => () => {
-    celestialSun.geometry.dispose();
-    celestialSun.material.dispose();
-  }, [celestialSun]);
 
   useEffect(() => () => {
     sunLight.shadow.map?.dispose();

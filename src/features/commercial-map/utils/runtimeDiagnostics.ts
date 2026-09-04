@@ -3,7 +3,6 @@ import * as THREE from 'three';
 import type { WebGLRenderer } from 'three';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import type { CommercialMapQualityTier } from './viewport';
-import { COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS } from './adaptiveQualityRuntime';
 
 interface RuntimeEvent {
   at: number;
@@ -101,9 +100,7 @@ export function summarizeCommercialMapRuntimeDiagnostics(
 ): CommercialMapRuntimeSummary {
   const durations = (diagnostics?.frameTimes ?? [])
     .map((entry) => Number(entry.duration))
-    .filter((duration) => Number.isFinite(duration)
-      && duration > 0
-      && duration <= COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS)
+    .filter((duration) => Number.isFinite(duration) && duration > 0)
     .sort((a, b) => a - b);
   const average = durations.length > 0
     ? durations.reduce((total, duration) => total + duration, 0) / durations.length
@@ -346,10 +343,11 @@ export function registerCommercialMapControlsDiagnostics(controls: object) {
 }
 
 export function recordCommercialMapFrame(deltaMs: number) {
-  // A demand-render pause is idle wall time, not CPU/GPU frame cost.
+  // The caller excludes actual idle/hidden intervals. A long visible active
+  // frame is a real stall: never discard it to make P95/P99 look smoother.
   if (!import.meta.env.DEV
-    || deltaMs <= 0
-    || deltaMs > COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS) return;
+    || !Number.isFinite(deltaMs)
+    || deltaMs <= 0) return;
   const diagnostics = ensureDiagnostics();
   if (!diagnostics) return;
   appendBounded(diagnostics.frameTimes, {

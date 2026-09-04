@@ -28,6 +28,7 @@ import {
 } from './hooks/useCommercialMap';
 import { useCommercialMapStore } from './state/useCommercialMapStore';
 import { CommercialMapCanvas } from './components/canvas/CommercialMapCanvas';
+import { CommercialMapRendererStatus } from './components/CommercialMapRendererStatus';
 import { MapToolbar } from './components/controls/MapToolbar';
 import { CommercialMapTopBar } from './components/controls/CommercialMapTopBar';
 import { CommercialMapDock } from './components/dock/CommercialMapDock';
@@ -568,6 +569,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                   technicalValidationAllowed={technicalValidationAllowed}
                 />
               </Profiler>
+              <CommercialMapRendererStatus />
               <div
                 className="commercial-map-lunar-launch-hud"
                 data-phase={lunarLaunchPhase}

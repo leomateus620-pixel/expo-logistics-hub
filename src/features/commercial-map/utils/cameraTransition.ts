@@ -73,3 +73,88 @@ export function prepareOrbitControlsForTransitionHandoff(
   Object.assign(controls, angles, limits);
   return { angles, limits };
 }
+
+/** Clear residual pan/orbit damping without applying it to the visible pose. */
+export function stopCommercialMapOrbitMotion(camera: Camera, controls: OrbitControls) {
+  const position = camera.position.clone();
+  const quaternion = camera.quaternion.clone();
+  const target = controls.target.clone();
+  const enableDamping = controls.enableDamping;
+  const autoRotate = controls.autoRotate;
+  try {
+    controls.enableDamping = false;
+    controls.autoRotate = false;
+    controls.update();
+  } finally {
+    camera.position.copy(position);
+    camera.quaternion.copy(quaternion);
+    controls.target.copy(target);
+    controls.enableDamping = enableDamping;
+    controls.autoRotate = autoRotate;
+  }
+}
+
+export type CommercialMapNavigationCancellation = 'pointercancel' | 'blur' | 'hidden' | 'context-lost';
+
+/**
+ * A lost pointerup must not leave OrbitControls' private touch list or the map's
+ * gesture gate active. Send the normal pointercancel path before releasing the
+ * application lock; do not recreate controls or reset their camera/target.
+ */
+export function registerCommercialMapNavigationCancellation({
+  canvas,
+  controlsElement,
+  onCancel,
+}: {
+  canvas: HTMLCanvasElement;
+  controlsElement: HTMLElement;
+  onCancel: (reason: CommercialMapNavigationCancellation) => void;
+}) {
+  const owner = canvas.ownerDocument;
+  const view = owner.defaultView;
+  const activePointers = new Map<number, string>();
+  let cancelling = false;
+  let disposed = false;
+
+  const cancel = (reason: CommercialMapNavigationCancellation) => {
+    if (cancelling || disposed) return;
+    cancelling = true;
+    const pointers = [...activePointers];
+    activePointers.clear();
+    try {
+      for (const [pointerId, pointerType] of pointers) {
+        canvas.dispatchEvent(new PointerEvent('pointercancel', { pointerId, pointerType, bubbles: true }));
+      }
+      onCancel(reason);
+    } finally {
+      cancelling = false;
+    }
+  };
+  const trackPointer = (event: PointerEvent) => activePointers.set(event.pointerId, event.pointerType);
+  const finishPointer = (event: PointerEvent) => activePointers.delete(event.pointerId);
+  const cancelPointer = (event: PointerEvent) => {
+    activePointers.delete(event.pointerId);
+    cancel('pointercancel');
+  };
+  const cancelBlur = () => cancel('blur');
+  const cancelHidden = () => { if (owner.hidden) cancel('hidden'); };
+  const cancelContext = () => cancel('context-lost');
+
+  controlsElement.addEventListener('pointerdown', trackPointer, true);
+  controlsElement.addEventListener('pointercancel', cancelPointer);
+  owner.addEventListener('pointerup', finishPointer, true);
+  owner.addEventListener('visibilitychange', cancelHidden);
+  view?.addEventListener('blur', cancelBlur);
+  canvas.addEventListener('webglcontextlost', cancelContext);
+  return () => {
+    if (disposed) return;
+    disposed = true;
+    activePointers.clear();
+    controlsElement.removeEventListener('pointerdown', trackPointer, true);
+    controlsElement.removeEventListener('pointercancel', cancelPointer);
+    owner.removeEventListener('pointerup', finishPointer, true);
+    owner.removeEventListener('visibilitychange', cancelHidden);
+    view?.removeEventListener('blur', cancelBlur);
+    canvas.removeEventListener('webglcontextlost', cancelContext);
+  };
+}

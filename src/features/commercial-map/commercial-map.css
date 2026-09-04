@@ -587,7 +587,8 @@
 .commercial-map-toolbar button:disabled { opacity: .35; }
 .commercial-map-toolbar-separator { width: 1px; height: 20px; margin: 0 3px; background: rgba(25, 61, 36, .12); }
 
-.commercial-map-actions { position: absolute; z-index: 12; top: 14px; right: 16px; display: flex; gap: 7px; }
+/* Filters live in the dock unless the compact controls replace it. */
+.commercial-map-actions { position: absolute; z-index: 12; top: 14px; right: 16px; display: none; gap: 7px; }
 .commercial-map-actions .button, .commercial-map-actions button { box-shadow: 0 10px 30px rgba(25, 54, 33, .08); }
 .commercial-map-edit-button { background: oklch(var(--action)); color: oklch(var(--action-foreground)); }
 
@@ -1669,12 +1670,6 @@
   background: rgba(255, 253, 244, .97);
   color: #1d3828;
   box-shadow: 0 6px 18px rgba(29, 56, 40, .2);
-}
-
-/* Filters live in the left dock on desktop and tablet; the floating trigger
-   only survives on compact viewports where the dock is hidden. */
-@media (min-width: 721px) {
-  .commercial-map-actions { display: none; }
 }
 
 /* Detalhe do módulo selecionado dentro do pavilhão */

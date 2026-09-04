@@ -59,7 +59,11 @@
   background: rgba(25, 61, 36, .14);
 }
 
-/* Match the compact MapToolbar breakpoint, including phone landscape. */
-@media (max-width: 950px) {
+/* Keep these conditions aligned with the compact MapToolbar. */
+@container commercial-map (max-width: 720px) {
+  .commercial-map-topbar { display: none; }
+}
+
+@media (max-width: 950px) and (max-height: 520px) {
   .commercial-map-topbar { display: none; }
 }

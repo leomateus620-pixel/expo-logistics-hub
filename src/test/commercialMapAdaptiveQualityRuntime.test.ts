@@ -5,12 +5,14 @@ import {
   COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS,
   COMMERCIAL_MAP_QUALITY_SCENE_COMMIT_IDLE_MS,
   createCommercialMapFrameTimeWindow,
+  createCommercialMapPixelRatioState,
   isCommercialMapAdaptiveQualitySamplingActive,
   isCommercialMapHeavyQualityGestureActive,
   recordCommercialMapAdaptiveFrame,
   resolveCommercialMapInteractionPixelRatio,
   shouldApplyCommercialMapPixelRatioNow,
   shouldDeferCommercialMapSceneQuality,
+  updateCommercialMapPixelRatioState,
 } from '@/features/commercial-map/utils/adaptiveQualityRuntime';
 import { COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES } from '@/features/commercial-map/utils/viewport';
 
@@ -140,5 +142,37 @@ describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
       toTier: 'MEDIUM',
       gestureActive: false,
     })).toBe(false);
+  });
+
+  it('reduz o DPR uma vez por gesto e restaura a base mais recente, não um snapshot antigo', () => {
+    const state = createCommercialMapPixelRatioState(1.5);
+    expect(updateCommercialMapPixelRatioState(state, true)).toBe(1);
+    expect(updateCommercialMapPixelRatioState(state, true)).toBeNull();
+    expect(updateCommercialMapPixelRatioState(state, true, 1.2)).toBeNull();
+    expect(state.baseDpr).toBe(1.2);
+    expect(state.effectiveDpr).toBe(1);
+    expect(updateCommercialMapPixelRatioState(state, false)).toBe(1.2);
+    expect(updateCommercialMapPixelRatioState(state, false)).toBeNull();
+  });
+
+  it('retém mudanças de viewport e reduced graphics até o fim do gesto sem acumular escalas', () => {
+    const state = createCommercialMapPixelRatioState(1.25);
+    for (let cycle = 0; cycle < 20; cycle += 1) {
+      expect(updateCommercialMapPixelRatioState(state, true)).toBe(0.9);
+      expect(updateCommercialMapPixelRatioState(state, true, 0.8)).toBeNull();
+      expect(updateCommercialMapPixelRatioState(state, true, 1.25)).toBeNull();
+      expect(updateCommercialMapPixelRatioState(state, false)).toBe(1.25);
+    }
+    expect(state).toEqual({ baseDpr: 1.25, effectiveDpr: 1.25, gestureActive: false });
+  });
+
+  it('aplica a base diretamente em repouso, ignora valores inválidos e não faz writes redundantes', () => {
+    const state = createCommercialMapPixelRatioState(1.5);
+    expect(updateCommercialMapPixelRatioState(state, false, 0.8)).toBe(0.8);
+    expect(updateCommercialMapPixelRatioState(state, false, Number.NaN)).toBeNull();
+    expect(updateCommercialMapPixelRatioState(state, false, 0)).toBeNull();
+    expect(updateCommercialMapPixelRatioState(state, false, 0.802)).toBeNull();
+    expect(state.effectiveDpr).toBe(0.8);
+    expect(state.baseDpr).toBe(0.802);
   });
 });
