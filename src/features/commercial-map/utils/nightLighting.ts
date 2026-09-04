@@ -10,8 +10,8 @@ import type {
  * Every utility pole receives two LED luminaires (one per crossarm side) and
  * junction poles — those that carry more than one primary alignment chain —
  * receive a third head along the secondary chain so intersections stay lit.
- * Light reaches the ground as instanced multiplicative pools rather than as
- * hundreds of dynamic point lights, so 400+ poles cost four draw calls.
+ * Light reaches the ground as instanced blended pools rather than as hundreds
+ * of dynamic point lights, so 400+ poles cost five draw calls.
  */
 export const NIGHT_LIGHTING_CONFIG = {
   revision: '2028.1-global-night',
@@ -31,8 +31,16 @@ export const NIGHT_LIGHTING_CONFIG = {
   poolRadius: 2.45,
   /** Pool centre is thrown forward of the head, like a real cobra-head optic. */
   poolForwardOffset: 0.42,
-  /** Multiplicative gain applied to the surface under the pool centre. */
-  poolGain: 2.15,
+  /**
+   * Irradiance term: the surface under the pool centre is scaled by up to
+   * (1 + poolMultiplyGain), so lots and grass regain their own colour.
+   */
+  poolMultiplyGain: 0.75,
+  /**
+   * Fill term screened onto the surface (linear, pre tone-mapping) so dark
+   * asphalt still shows the pool; bounded, it can never clip a bright lot.
+   */
+  poolScreenGain: 0.11,
   /** Ground pools sit above every flat lot top (0.16–0.18) so they read on lots. */
   poolClearance: 0.205,
   /** Additive halo around each head (HDR, below the bloom threshold). */
@@ -41,12 +49,12 @@ export const NIGHT_LIGHTING_CONFIG = {
   /** Reveal lambda used by the layer damping (seconds⁻¹). */
   revealLambdaIn: 1.9,
   revealLambdaOut: 3.4,
-  /** Instanced draw calls issued by the layer (arm, head, glow, pool). */
-  drawCalls: 4,
+  /** Instanced draw calls issued by the layer (arm, head, glow, 2 pool passes). */
+  drawCalls: 5,
   colors: {
     led: '#ffe7c2',
-    poolCool: '#d5deff',
-    poolWarm: '#ffc98a',
+    poolCool: '#e3e6ea',
+    poolWarm: '#ffd3a1',
     glow: '#ffd9a6',
     arm: '#3b4044',
   },

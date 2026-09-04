@@ -131,7 +131,7 @@ describe('Modo Noturno global do Mapa Comercial', () => {
     expect(buildNightLampFixtures(placements, layouts)).toEqual(fixtures);
   });
 
-  it('renderiza toda a rede em quatro draw calls instanciados, sem luzes dinâmicas', () => {
+  it('renderiza toda a rede em cinco draw calls instanciados, sem luzes dinâmicas', () => {
     const layer = read('src/features/commercial-map/components/canvas/NightLightingLayer.tsx');
     const canvas = read('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
     const landmarks = read('src/features/commercial-map/components/canvas/StrategicLandmarks.tsx');
@@ -140,10 +140,14 @@ describe('Modo Noturno global do Mapa Comercial', () => {
     expect(layer).not.toMatch(/<pointLight/i);
     expect(layer).not.toMatch(/<spotLight/i);
     expect(layer).not.toContain('new THREE.PointLight');
-    // Ground pools scale the surface beneath them instead of painting over it.
+    // Ground pools blend with the surface beneath them (an irradiance multiply
+    // plus a bounded screen fill) instead of painting opaque discs over it.
     expect(layer).toContain('blending: THREE.CustomBlending');
     expect(layer).toContain('blendSrc: THREE.DstColorFactor');
+    expect(layer).toContain('blendSrc: THREE.OneMinusDstColorFactor');
     expect(layer).toContain('blendDst: THREE.OneFactor');
+    expect(NIGHT_LIGHTING_CONFIG.poolMultiplyGain).toBeLessThan(1);
+    expect(NIGHT_LIGHTING_CONFIG.poolScreenGain).toBeLessThan(0.5);
     expect(layer).toContain('depthWrite: false');
     // The reveal is damped in the frame loop and only invalidates while moving.
     expect(layer).toContain('THREE.MathUtils.damp(');

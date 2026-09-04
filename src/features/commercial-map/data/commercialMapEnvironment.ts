@@ -218,12 +218,12 @@ export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
 export const COMMERCIAL_MAP_NIGHT_ATMOSPHERE = {
   background: '#050916',
   fog: '#0b1421',
-  ambientColor: '#6d84b5',
-  ambientIntensity: 0.27,
+  ambientColor: '#7185ad',
+  ambientIntensity: 0.19,
   hemisphereSky: '#263a67',
   hemisphereGround: '#101713',
-  hemisphereIntensity: 0.34,
-  environmentIntensity: 0.16,
+  hemisphereIntensity: 0.25,
+  environmentIntensity: 0.11,
   sky: {
     zenith: '#04070f',
     upper: '#0a1226',

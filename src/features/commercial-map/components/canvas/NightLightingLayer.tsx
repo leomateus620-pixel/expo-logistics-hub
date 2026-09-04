@@ -15,9 +15,11 @@ import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 
 const NO_RAYCAST = () => undefined;
 const REVEAL_EPSILON = 0.002;
-/** Multiplicative pools read stronger on the tone-mapped direct path used while
- * the camera moves; this keeps both render paths visually matched. */
-const DIRECT_PATH_POOL_GAIN = 0.66;
+/** The direct path used while the camera moves blends against already
+ * tone-mapped pixels, where the same pool reads stronger; these keep both
+ * render paths visually matched. */
+const DIRECT_PATH_MULTIPLY_GAIN = 0.7;
+const DIRECT_PATH_SCREEN_GAIN = 0.85;
 const DIRECT_PATH_GLOW_GAIN = 0.8;
 
 const LAMP_ATTRIBUTE = 'aLamp';
@@ -45,8 +47,8 @@ const POOL_FRAGMENT_SHADER = /* glsl */ `
     vec2 p = vec2(vLocal.x * 0.86, vLocal.y);
     float d2 = dot(p, p);
     if (d2 >= 1.0) discard;
-    float pool = pow(1.0 - d2, 1.55);
-    float hotspot = exp(-d2 * 7.0) * 0.42;
+    float pool = pow(1.0 - d2, 2.1);
+    float hotspot = exp(-d2 * 7.0) * 0.3;
     float angle = atan(vLocal.y, vLocal.x);
     float streak = 1.0 + 0.055 * sin(angle * 6.0 + vLamp.z * 6.2831) * smoothstep(0.15, 0.7, sqrt(d2));
     float reveal = smoothstep(vLamp.z * 0.5, vLamp.z * 0.5 + 0.5, uReveal);
@@ -101,6 +103,36 @@ function createLampAttribute(values: Float32Array) {
   return attribute;
 }
 
+function createPoolMaterial(
+  name: string,
+  gain: number,
+  blend: { blendSrc: THREE.BlendingSrcFactor; blendDst: THREE.BlendingDstFactor },
+) {
+  const config = NIGHT_LIGHTING_CONFIG;
+  return new THREE.ShaderMaterial({
+    name,
+    uniforms: {
+      uReveal: { value: 0 },
+      uGain: { value: gain },
+      uCool: { value: new THREE.Color(config.colors.poolCool) },
+      uWarm: { value: new THREE.Color(config.colors.poolWarm) },
+    },
+    vertexShader: POOL_VERTEX_SHADER,
+    fragmentShader: POOL_FRAGMENT_SHADER,
+    transparent: true,
+    depthWrite: false,
+    depthTest: true,
+    blending: THREE.CustomBlending,
+    blendEquation: THREE.AddEquation,
+    blendSrc: blend.blendSrc,
+    blendDst: blend.blendDst,
+    blendSrcAlpha: THREE.ZeroFactor,
+    blendDstAlpha: THREE.OneFactor,
+    fog: false,
+    toneMapped: false,
+  });
+}
+
 function NightLightingInstances({
   nodes,
   connections,
@@ -120,7 +152,8 @@ function NightLightingInstances({
   const armRef = useRef<THREE.InstancedMesh>(null);
   const headRef = useRef<THREE.InstancedMesh>(null);
   const glowRef = useRef<THREE.InstancedMesh>(null);
-  const poolRef = useRef<THREE.InstancedMesh>(null);
+  const poolMultiplyRef = useRef<THREE.InstancedMesh>(null);
+  const poolScreenRef = useRef<THREE.InstancedMesh>(null);
   const invalidate = useThree((state) => state.invalidate);
   const nightModeActive = useCommercialMapStore((state) => state.nightModeActive);
   const runtime = useRef({
@@ -198,29 +231,20 @@ function NightLightingInstances({
       fog: false,
       toneMapped: false,
     }),
-    pool: new THREE.ShaderMaterial({
-      name: 'CommercialMapNightLightPool',
-      uniforms: {
-        uReveal: { value: 0 },
-        uGain: { value: config.poolGain },
-        uCool: { value: new THREE.Color(config.colors.poolCool) },
-        uWarm: { value: new THREE.Color(config.colors.poolWarm) },
-      },
-      vertexShader: POOL_VERTEX_SHADER,
-      fragmentShader: POOL_FRAGMENT_SHADER,
-      transparent: true,
-      depthWrite: false,
-      depthTest: true,
-      // out = dst * (1 + light): the pool scales whatever surface lies under
-      // it, so asphalt, lots and grass keep their own texture while lit.
-      blending: THREE.CustomBlending,
-      blendEquation: THREE.AddEquation,
+    // Ground light is two blended passes over the same instanced disc:
+    //  - multiply, out = dst * (1 + light): lots, grass and roofs regain their
+    //    own colour and texture under the lamp, exactly like real irradiance;
+    //  - screen, out = dst + light * (1 - dst): a low, bounded lift so dark
+    //    asphalt and walkways still show the pool instead of staying black.
+    // Neither term can run away: the multiply gain stays under x1.75 and the
+    // screen term converges to the lamp colour, so overlaps never clip white.
+    poolMultiply: createPoolMaterial('CommercialMapNightLightPoolMultiply', config.poolMultiplyGain, {
       blendSrc: THREE.DstColorFactor,
       blendDst: THREE.OneFactor,
-      blendSrcAlpha: THREE.ZeroFactor,
-      blendDstAlpha: THREE.OneFactor,
-      fog: false,
-      toneMapped: false,
+    }),
+    poolScreen: createPoolMaterial('CommercialMapNightLightPoolScreen', config.poolScreenGain, {
+      blendSrc: THREE.OneMinusDstColorFactor,
+      blendDst: THREE.OneFactor,
     }),
   }), [config]);
 
@@ -228,8 +252,9 @@ function NightLightingInstances({
     const armMesh = armRef.current;
     const headMesh = headRef.current;
     const glowMesh = glowRef.current;
-    const poolMesh = poolRef.current;
-    if (!armMesh || !headMesh || !poolMesh) return;
+    const poolMultiplyMesh = poolMultiplyRef.current;
+    const poolScreenMesh = poolScreenRef.current;
+    if (!armMesh || !headMesh || !poolMultiplyMesh || !poolScreenMesh) return;
     const transform = new THREE.Object3D();
     const armThickness = 0.028;
     fixtures.forEach((fixture, index) => {
@@ -257,9 +282,10 @@ function NightLightingInstances({
       transform.rotation.set(0, fixture.yawRadians, 0);
       transform.scale.set(fixture.poolRadius, 1, fixture.poolRadius);
       transform.updateMatrix();
-      poolMesh.setMatrixAt(index, transform.matrix);
+      poolMultiplyMesh.setMatrixAt(index, transform.matrix);
+      poolScreenMesh.setMatrixAt(index, transform.matrix);
     });
-    [armMesh, headMesh, glowMesh, poolMesh].forEach((mesh) => {
+    [armMesh, headMesh, glowMesh, poolMultiplyMesh, poolScreenMesh].forEach((mesh) => {
       if (!mesh) return;
       mesh.instanceMatrix.needsUpdate = true;
       mesh.computeBoundingBox();
@@ -316,9 +342,12 @@ function NightLightingInstances({
       materials.arm.opacity = Math.min(1, eased * 1.6);
       materials.head.opacity = Math.min(1, eased * 1.6);
       materials.head.emissiveIntensity = config.headEmissivePeak * eased;
-      materials.pool.uniforms.uReveal.value = reveal;
-      materials.pool.uniforms.uGain.value = config.poolGain
-        * (navigating ? DIRECT_PATH_POOL_GAIN : 1);
+      materials.poolMultiply.uniforms.uReveal.value = reveal;
+      materials.poolMultiply.uniforms.uGain.value = config.poolMultiplyGain
+        * (navigating ? DIRECT_PATH_MULTIPLY_GAIN : 1);
+      materials.poolScreen.uniforms.uReveal.value = reveal;
+      materials.poolScreen.uniforms.uGain.value = config.poolScreenGain
+        * (navigating ? DIRECT_PATH_SCREEN_GAIN : 1);
       materials.glow.uniforms.uReveal.value = reveal;
       materials.glow.uniforms.uGain.value = config.glowGain
         * (navigating ? DIRECT_PATH_GLOW_GAIN : 1);
@@ -361,9 +390,18 @@ function NightLightingInstances({
         />
       )}
       <instancedMesh
-        ref={poolRef}
-        name="pocas-de-luz-noturnas"
-        args={[geometries.pool, materials.pool, fixtures.length]}
+        ref={poolMultiplyRef}
+        name="pocas-de-luz-noturnas-irradiancia"
+        args={[geometries.pool, materials.poolMultiply, fixtures.length]}
+        count={fixtures.length}
+        frustumCulled
+        renderOrder={5}
+        raycast={NO_RAYCAST}
+      />
+      <instancedMesh
+        ref={poolScreenRef}
+        name="pocas-de-luz-noturnas-preenchimento"
+        args={[geometries.pool, materials.poolScreen, fixtures.length]}
         count={fixtures.length}
         frustumCulled
         renderOrder={6}
@@ -375,9 +413,10 @@ function NightLightingInstances({
 
 /**
  * Park-wide LED lighting for Night Mode. Two heads per pole (three on chain
- * junctions) share four instanced draw calls; ground light is approximated by
- * multiplicative pools instead of hundreds of dynamic lights, so the whole
- * network fades in and out without recompiling a single scene material.
+ * junctions) share five instanced draw calls; ground light is approximated by
+ * blended pools (irradiance multiply + bounded fill) instead of hundreds of
+ * dynamic lights, so the whole network fades in and out without recompiling a
+ * single scene material.
  */
 export const NightLightingLayer = memo(function NightLightingLayer(props: {
   nodes: readonly CommercialElectricalNode[];
