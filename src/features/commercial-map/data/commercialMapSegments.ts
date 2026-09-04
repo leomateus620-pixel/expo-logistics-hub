@@ -151,7 +151,7 @@ export const COMMERCIAL_MAP_SEGMENTS: readonly CommercialMapSegmentDefinition[] 
       perimeter: [
         'Norte — Rua Bolívia, da Alameda Mercosul ao acesso de D3',
         'Leste — contorno externo de D3, B17 e B16 até a Rua Argentina',
-        'Sudeste — recuo entre B19 e B11, excluindo o Centro Administrativo',
+        'Sudeste — recuo entre B19 e B11, excluindo Centro Administrativo, B15 e B42-02',
         'Sul — fachadas externas de B1 a B6 junto à Avenida Benvenuto de Conti',
         'Oeste — limite externo de B1, B2 e Calçada do Arvoredo',
         'Noroeste — Rua Brasil e Alameda Mercosul envolvendo C2, C3 e as quadras centrais',

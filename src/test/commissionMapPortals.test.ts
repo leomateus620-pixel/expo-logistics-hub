@@ -73,7 +73,7 @@ describe('portais comerciais por comissão', () => {
       'industria-comercio-servicos',
     );
 
-    expect(rural.entities).toHaveLength(108);
+    expect(rural.entities).toHaveLength(111);
     expect(rural.lots).toHaveLength(95);
     expect(industry.entities).toHaveLength(1203);
     expect(industry.lots).toHaveLength(1166);
