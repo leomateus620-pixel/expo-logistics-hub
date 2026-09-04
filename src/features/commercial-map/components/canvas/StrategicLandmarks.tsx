@@ -10,6 +10,11 @@ import { LIVESTOCK_PAVILION_RENDER_BUDGET } from '../../utils/livestockPavilion'
 import { MIRANTE_RENDER_BUDGET } from '../../utils/mirante';
 import { THIRD_AGE_PAVILION_LAYOUT } from '../../utils/thirdAgePavilion';
 import { EXPORURAL_STEAKHOUSE_LAYOUT } from '../../utils/exporuralSteakhouse';
+import {
+  FENASOJA_RESTAURANT_LAYOUT,
+  FENASOJA_RESTAURANT_RENDER_BUDGET,
+  createFenasojaRestaurantLayout,
+} from '../../utils/fenasojaRestaurant';
 import { PAVILION_FOUR_SOY_KITCHEN_LAYOUT } from '../../utils/pavilionFourSoyKitchen';
 import { commercialPavilionModelBounds } from '../../utils/commercialPavilions';
 import {
@@ -460,18 +465,7 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     metal: '#8a908e',
   },
   'exporural-restaurant': EXPORURAL_STEAKHOUSE_LAYOUT.palette,
-  'fenasoja-restaurant': {
-    wall: '#ded2bc',
-    accent: '#aa916e',
-    roof: '#51473e',
-    trim: '#58493f',
-    dark: '#242a29',
-    glass: '#43565b',
-    green: '#16834d',
-    white: '#f3efe4',
-    platform: '#9f9585',
-    metal: '#5c615d',
-  },
+  'fenasoja-restaurant': FENASOJA_RESTAURANT_LAYOUT.palette,
   'sicredi-arena': {
     wall: '#d8ddd8',
     accent: '#aeb9b2',
@@ -681,6 +675,22 @@ function useLandmarkMaterials(
       result.metal.roughness = 0.42;
       result.metal.metalness = 0.48;
     }
+    if (kind === 'fenasoja-restaurant') {
+      // Painted masonry walls, ribbed grey sheet roof and a smooth concrete plinth.
+      result.wall.roughness = 0.9;
+      result.roof.roughness = 0.58;
+      result.roof.metalness = 0.22;
+      result.trim.roughness = 0.7;
+      result.trim.metalness = 0.06;
+      result.dark.roughness = 0.62;
+      result.dark.metalness = 0.18;
+      result.glass.roughness = 0.26;
+      result.glass.metalness = 0.08;
+      result.white.roughness = 0.82;
+      result.platform.roughness = 0.9;
+      result.metal.roughness = 0.46;
+      result.metal.metalness = 0.36;
+    }
     if (kind === 'fenasoja-event-center') {
       result.wall.roughness = 0.9;
       result.roof.roughness = 0.64;
@@ -734,7 +744,21 @@ function useLandmarkMaterials(
               platform: 0.08,
               metal: 0.06,
             } satisfies Record<keyof LandmarkMaterialSet, number>)[key]
-          : tintWeight[key];
+          : kind === 'fenasoja-restaurant'
+            // The satellite roof is neutral grey; segment identity stays on the accent band only.
+            ? ({
+                wall: 0.06,
+                accent: 0.46,
+                roof: 0.03,
+                trim: 0.04,
+                dark: 0.03,
+                glass: 0.1,
+                green: 0.1,
+                white: 0.03,
+                platform: 0.05,
+                metal: 0.04,
+              } satisfies Record<keyof LandmarkMaterialSet, number>)[key]
+            : tintWeight[key];
         baseColor.lerp(new THREE.Color(segment.palette.surface), appliedWeight);
       }
       item.color.copy(baseColor).lerp(MAP_BACKGROUND_COLOR, THREE.MathUtils.clamp(toneDown, 0, 0.9) * 0.82);
@@ -1048,6 +1072,31 @@ function createGableRoofGeometry(
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
   if (ridgeAxis === 'z') geometry.rotateY(Math.PI / 2);
+  geometry.computeVertexNormals();
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
+/**
+ * Closed triangular prism with the ridge along local X. Unlike the open gable
+ * sheet it has an underside, so eave overhangs read as a real roof edge from
+ * oblique map angles.
+ */
+function createRidgeRoofPrismGeometry(width: number, depth: number, rise: number) {
+  const shape = new THREE.Shape();
+  shape.moveTo(-depth / 2, 0);
+  shape.lineTo(depth / 2, 0);
+  shape.lineTo(0, rise);
+  shape.closePath();
+  const geometry = new THREE.ExtrudeGeometry(shape, {
+    depth: width,
+    bevelEnabled: false,
+    curveSegments: 1,
+    steps: 1,
+  });
+  geometry.rotateY(Math.PI / 2);
+  geometry.translate(-width / 2, 0, 0);
   geometry.computeVertexNormals();
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
@@ -1767,7 +1816,7 @@ function useArchitecturalDetail(
       : kind === 'pavilion-four-soy-kitchen'
         ? Math.max(20, Math.max(bounds.width, bounds.depth) * 5.2)
       : kind === 'fenasoja-restaurant'
-        ? Math.max(20, bounds.width * 5)
+        ? Math.max(22, Math.max(bounds.width, bounds.depth) * FENASOJA_RESTAURANT_RENDER_BUDGET.detailDistanceMultiplier)
       : kind === 'exporural-restaurant'
         ? Math.max(22, Math.max(bounds.width, bounds.depth) * 7.4)
       : kind === 'fenasoja-event-center'
@@ -3244,86 +3293,212 @@ function FenasojaRestaurant({
   showDetail,
   showFocusDetail,
 }: LandmarkModelProps) {
-  const width = bounds.width;
-  const depth = bounds.depth;
-  const wallHeight = height * 0.34;
-  const bodyDepth = depth * 0.7;
-  const frontZ = bodyDepth / 2;
-  const mainRoof = useMemo(
-    () => createHipRoofGeometry(width * 0.98, depth * 0.88, height * 0.28),
-    [depth, height, width],
+  const layout = useMemo(
+    () => createFenasojaRestaurantLayout(bounds, height),
+    [bounds, height],
   );
-  const upperRoof = useMemo(
-    () => createHipRoofGeometry(width * 0.44, depth * 0.36, height * 0.14),
-    [depth, height, width],
+  const {
+    width,
+    depth,
+    groundElevation,
+    slabWidth,
+    slabDepth,
+    slabHeight,
+    bodyWidth,
+    bodyDepth,
+    bodyCenterZ,
+    bodyFrontZ,
+    bodyBackZ,
+    wallHeight,
+    plinthHeight,
+    roofWidth,
+    roofDepth,
+    roofRise,
+    eaveHeight,
+    ridgeHeight,
+    canopyWidth,
+    canopyDepth,
+    canopyRearHeight,
+    canopyFrontHeight,
+    canopyFrontZ,
+    canopySlopeRadians,
+    pillarSize,
+    pillarHeight,
+    pillarZ,
+    pillarXs,
+    doorWidth,
+    doorHeight,
+    terraceFrontZ,
+    stepDepth,
+    frontWindowXs,
+    porchWindowXs,
+    rearWindowXs,
+    windowWidth,
+    windowHeight,
+    serviceWidth,
+    serviceDepth,
+    serviceHeight,
+    serviceCenterX,
+    serviceCenterZ,
+  } = layout;
+  const roof = useMemo(
+    () => createRidgeRoofPrismGeometry(roofWidth, roofDepth, roofRise),
+    [roofDepth, roofRise, roofWidth],
   );
-  const entranceBody = useMemo(
-    () => createGableBodyGeometry(width * 0.27, depth * 0.18, wallHeight * 0.82, height * 0.14),
-    [depth, height, wallHeight, width],
+  // Gable-end wall reaches the ridge; it stays inside the wider roof prism
+  // section, so only the eave overhangs remain grey at the ends.
+  const gableEnd = useMemo(
+    () => createGableFacadeGeometry(bodyDepth, roofRise),
+    [bodyDepth, roofRise],
   );
-  const windowTransforms = [-0.4, -0.27, 0.27, 0.4].map((x) => ({
-    position: [x * width, wallHeight * 0.5, frontZ + 0.035] as Vector3Tuple,
-    scale: [width * 0.105, wallHeight * 0.5, 0.04] as Vector3Tuple,
-  }));
-  const facadePosts = [-0.48, -0.34, -0.2, 0.2, 0.34, 0.48].map((x) => ({
-    position: [x * width, wallHeight * 0.53, frontZ + 0.058] as Vector3Tuple,
-    scale: [0.036, wallHeight * 0.98, 0.043] as Vector3Tuple,
-  }));
-  const doorTransforms: InstanceTransform[] = [
-    { position: [-width * 0.055, wallHeight * 0.42, frontZ + depth * 0.105], scale: [width * 0.09, wallHeight * 0.62, 0.035] },
-    { position: [width * 0.055, wallHeight * 0.42, frontZ + depth * 0.105], scale: [width * 0.09, wallHeight * 0.62, 0.035] },
+  const canopyLength = Math.hypot(canopyDepth, canopyRearHeight - canopyFrontHeight);
+  const canopyCenterZ = bodyFrontZ + canopyDepth / 2;
+  const canopyCenterY = (canopyRearHeight + canopyFrontHeight) / 2;
+  const windowY = slabHeight + wallHeight * 0.56;
+  const paneThickness = 0.024;
+  const frameMargin = 0.028;
+  const windowOpenings = [
+    ...frontWindowXs.map((x) => ({ x, z: bodyFrontZ, normal: [0, 1] as const, span: windowWidth, height: windowHeight })),
+    ...porchWindowXs.map((x) => ({ x, z: bodyFrontZ, normal: [0, 1] as const, span: windowWidth * 1.25, height: windowHeight * 1.18 })),
+    ...rearWindowXs.map((x) => ({ x, z: bodyBackZ, normal: [0, -1] as const, span: windowWidth, height: windowHeight })),
+    { x: bodyWidth / 2, z: bodyCenterZ + bodyDepth * 0.12, normal: [1, 0] as const, span: depth * 0.09, height: windowHeight },
+    { x: -bodyWidth / 2, z: bodyCenterZ + bodyDepth * 0.12, normal: [-1, 0] as const, span: depth * 0.09, height: windowHeight },
   ];
-  const umbrellaPositions = [-0.28, 0.28].map((x) => x * width);
+  const windowTransform = (
+    opening: (typeof windowOpenings)[number],
+    offset: number,
+    extra: number,
+  ): InstanceTransform => {
+    const alongX = opening.normal[0] === 0;
+    return {
+      position: [
+        opening.x + opening.normal[0] * offset,
+        windowY,
+        opening.z + opening.normal[1] * offset,
+      ],
+      scale: alongX
+        ? [opening.span + extra, opening.height + extra, paneThickness]
+        : [paneThickness, opening.height + extra, opening.span + extra],
+    };
+  };
+  const windowItems = windowOpenings.map((opening) => windowTransform(opening, 0.012, 0));
+  const windowFrameItems = windowOpenings.map((opening) => windowTransform(opening, 0.007, frameMargin));
+  const pillarItems: InstanceTransform[] = pillarXs.map((x) => ({
+    position: [x, slabHeight + pillarHeight / 2, pillarZ],
+    scale: [pillarSize, pillarHeight, pillarSize],
+  }));
+  const pillarBaseItems: InstanceTransform[] = pillarXs.map((x) => ({
+    position: [x, slabHeight + 0.02, pillarZ],
+    scale: [pillarSize * 1.5, 0.04, pillarSize * 1.5],
+  }));
+  const fasciaItems: InstanceTransform[] = [
+    { position: [0, eaveHeight + 0.012, bodyCenterZ + roofDepth / 2], scale: [roofWidth + 0.01, 0.034, 0.022] },
+    { position: [0, eaveHeight + 0.012, bodyCenterZ - roofDepth / 2], scale: [roofWidth + 0.01, 0.034, 0.022] },
+  ];
+  const stepItems: InstanceTransform[] = [
+    { position: [0, slabHeight * 0.66 / 2, terraceFrontZ + stepDepth / 2], scale: [width * 0.24, slabHeight * 0.66, stepDepth] },
+    { position: [0, slabHeight * 0.33 / 2, terraceFrontZ + stepDepth * 1.5], scale: [width * 0.26, slabHeight * 0.33, stepDepth] },
+  ];
+  const planterItems: InstanceTransform[] = [
+    { position: [-width * 0.21, slabHeight + 0.035, terraceFrontZ - depth * 0.03], scale: [width * 0.09, 0.07, depth * 0.045] },
+    { position: [width * 0.21, slabHeight + 0.035, terraceFrontZ - depth * 0.03], scale: [width * 0.09, 0.07, depth * 0.045] },
+  ];
+  const hedgeItems: InstanceTransform[] = [
+    { position: [-width * 0.21, slabHeight + 0.1, terraceFrontZ - depth * 0.03], scale: [width * 0.08, 0.075, depth * 0.036] },
+    { position: [width * 0.21, slabHeight + 0.1, terraceFrontZ - depth * 0.03], scale: [width * 0.08, 0.075, depth * 0.036] },
+  ];
+  const ridgeVentItems: InstanceTransform[] = [-0.27, 0.27].map((ratio) => ({
+    position: [ratio * width, ridgeHeight + 0.035, bodyCenterZ] as Vector3Tuple,
+    scale: [width * 0.055, 0.05, 0.075] as Vector3Tuple,
+  }));
+  const umbrellaXs = [-width * 0.39, width * 0.39];
 
   useEffect(() => () => {
-    mainRoof.dispose();
-    upperRoof.dispose();
-    entranceBody.dispose();
-  }, [entranceBody, mainRoof, upperRoof]);
+    roof.dispose();
+    gableEnd.dispose();
+  }, [gableEnd, roof]);
 
   return (
-    <group dispose={null}>
-      <mesh geometry={UNIT_BOX} material={materials.platform} position={[0, 0.045, 0]} scale={[width * 0.98, 0.09, depth * 0.98]} receiveShadow raycast={NO_RAYCAST} dispose={null} />
-      <mesh geometry={UNIT_BOX} material={materials.wall} position={[0, wallHeight / 2 + 0.08, -depth * 0.04]} scale={[width * 0.92, wallHeight, bodyDepth]} castShadow receiveShadow raycast={NO_RAYCAST} dispose={null} />
-      <mesh geometry={UNIT_BOX} material={materials.trim} position={[0, wallHeight + 0.055, -depth * 0.04]} scale={[width * 0.96, 0.07, depth * 0.84]} castShadow raycast={NO_RAYCAST} dispose={null} />
-      <mesh geometry={mainRoof} material={materials.roof} position={[0, wallHeight + 0.08, -depth * 0.04]} castShadow receiveShadow raycast={NO_RAYCAST} />
-      <mesh geometry={UNIT_BOX} material={materials.accent} position={[0, wallHeight + height * 0.265, -depth * 0.08]} scale={[width * 0.36, height * 0.11, depth * 0.23]} castShadow raycast={NO_RAYCAST} dispose={null} />
-      <mesh geometry={upperRoof} material={materials.roof} position={[0, wallHeight + height * 0.325, -depth * 0.08]} castShadow raycast={NO_RAYCAST} />
-      <mesh geometry={entranceBody} material={materials.white} position={[0, 0.08, frontZ + depth * 0.04]} castShadow receiveShadow raycast={NO_RAYCAST} />
-      <ScaledInstances material={materials.glass} items={windowTransforms} />
-      <ScaledInstances material={materials.glass} items={doorTransforms} />
-      <ScaledInstances material={materials.trim} items={facadePosts} />
-      <mesh geometry={UNIT_BOX} material={materials.roof} position={[0, wallHeight * 0.8, frontZ + depth * 0.13]} rotation={[0.05, 0, 0]} scale={[width * 0.34, 0.055, depth * 0.16]} castShadow raycast={NO_RAYCAST} dispose={null} />
-      <ScaledInstances material={materials.green} items={[
-        { position: [-width * 0.31, 0.16, frontZ + depth * 0.12], scale: [width * 0.23, 0.14, depth * 0.07] },
-        { position: [width * 0.31, 0.16, frontZ + depth * 0.12], scale: [width * 0.23, 0.14, depth * 0.07] },
+    <group position={[0, groundElevation, 0]} dispose={null}>
+      {/* Ground contact: concrete plinth plus a thin apron that meets the lawn. */}
+      <mesh geometry={UNIT_BOX} material={materials.platform} position={[0, slabHeight / 2, 0]} scale={[slabWidth, slabHeight, slabDepth]} receiveShadow raycast={NO_RAYCAST} dispose={null} />
+      <mesh geometry={UNIT_BOX} material={materials.platform} position={[0, 0.008, 0]} scale={[slabWidth + 0.09, 0.016, slabDepth + 0.09]} receiveShadow raycast={NO_RAYCAST} dispose={null} />
+
+      {/* Single elongated dining hall. */}
+      <mesh geometry={UNIT_BOX} material={materials.wall} position={[0, slabHeight + wallHeight / 2, bodyCenterZ]} scale={[bodyWidth, wallHeight, bodyDepth]} castShadow receiveShadow raycast={NO_RAYCAST} dispose={null} />
+      <mesh geometry={UNIT_BOX} material={materials.dark} position={[0, slabHeight + plinthHeight / 2, bodyCenterZ]} scale={[bodyWidth + 0.016, plinthHeight, bodyDepth + 0.016]} raycast={NO_RAYCAST} dispose={null} />
+      <mesh geometry={UNIT_BOX} material={materials.trim} position={[0, eaveHeight - 0.018, bodyCenterZ]} scale={[bodyWidth + 0.012, 0.036, bodyDepth + 0.012]} raycast={NO_RAYCAST} dispose={null} />
+
+      {/* Grey ridge roof with overhanging eaves, closed gable ends and a ridge cap. */}
+      <mesh geometry={roof} material={materials.roof} position={[0, eaveHeight, bodyCenterZ]} castShadow receiveShadow raycast={NO_RAYCAST} />
+      <ScaledInstances geometry={gableEnd} material={materials.wall} items={[
+        { position: [bodyWidth / 2 + 0.004, eaveHeight, bodyCenterZ], scale: [1, 1, 1], rotation: [0, Math.PI / 2, 0] },
+        { position: [-bodyWidth / 2 - 0.004, eaveHeight, bodyCenterZ], scale: [1, 1, 1], rotation: [0, -Math.PI / 2, 0] },
       ]} />
+      <mesh geometry={UNIT_BOX} material={materials.metal} position={[0, ridgeHeight + 0.008, bodyCenterZ]} scale={[roofWidth + 0.02, 0.028, 0.06]} castShadow raycast={NO_RAYCAST} dispose={null} />
+      <ScaledInstances material={materials.trim} items={fasciaItems} />
+      <ScaledInstances material={materials.dark} items={ridgeVentItems} castShadow />
+
+      {/* Covered frontage toward the Calçada do Arvoredo: lean-to canopy on four pillars. */}
+      <mesh
+        geometry={UNIT_BOX}
+        material={materials.roof}
+        position={[0, canopyCenterY, canopyCenterZ]}
+        rotation={[canopySlopeRadians, 0, 0]}
+        scale={[canopyWidth, 0.03, canopyLength]}
+        castShadow
+        receiveShadow
+        raycast={NO_RAYCAST}
+        dispose={null}
+      />
+      <mesh geometry={UNIT_BOX} material={materials.trim} position={[0, canopyFrontHeight - 0.012, canopyFrontZ + 0.006]} scale={[canopyWidth + 0.01, 0.058, 0.026]} castShadow raycast={NO_RAYCAST} dispose={null} />
+      <ScaledInstances material={materials.white} items={pillarItems} castShadow />
+      <ScaledInstances material={materials.dark} items={pillarBaseItems} />
+
+      {/* Main entrance: framed glazed double door with two shallow steps. */}
+      <mesh geometry={UNIT_BOX} material={materials.dark} position={[0, slabHeight + doorHeight * 0.53, bodyFrontZ + 0.006]} scale={[doorWidth * 1.22, doorHeight * 1.08, 0.02]} raycast={NO_RAYCAST} dispose={null} />
+      <mesh geometry={UNIT_BOX} material={materials.glass} position={[0, slabHeight + doorHeight / 2, bodyFrontZ + 0.014]} scale={[doorWidth, doorHeight, 0.02]} raycast={NO_RAYCAST} dispose={null} />
+      <mesh geometry={UNIT_BOX} material={materials.metal} position={[0, slabHeight + doorHeight / 2, bodyFrontZ + 0.026]} scale={[0.012, doorHeight, 0.012]} raycast={NO_RAYCAST} dispose={null} />
+      <ScaledInstances material={materials.platform} items={stepItems} receiveShadow />
+      <ScaledInstances material={materials.trim} items={windowFrameItems} />
+      <ScaledInstances material={materials.glass} items={windowItems} />
+
+      {/* Rear service annex toward the Pavilhão 1/14 side. */}
+      <mesh geometry={UNIT_BOX} material={materials.wall} position={[serviceCenterX, slabHeight + serviceHeight / 2, serviceCenterZ]} scale={[serviceWidth, serviceHeight, serviceDepth]} castShadow receiveShadow raycast={NO_RAYCAST} dispose={null} />
+      <mesh geometry={UNIT_BOX} material={materials.roof} position={[serviceCenterX, slabHeight + serviceHeight + 0.012, serviceCenterZ]} scale={[serviceWidth + 0.03, 0.024, serviceDepth + 0.03]} castShadow raycast={NO_RAYCAST} dispose={null} />
+
+      {/* Terrace planters flanking the entrance approach. */}
+      <ScaledInstances material={materials.accent} items={planterItems} />
+      <ScaledInstances geometry={UNIT_SHRUB} material={materials.green} items={hedgeItems} castShadow />
+
       {showDetail && (
         <>
-          <SignagePanel title="FENASOJA" subtitle="RESTAURANTE" position={[0, wallHeight * 0.72, frontZ + depth * 0.222]} size={[width * 0.23, height * 0.085]} background="#176f43" />
-          <ScaledInstances material={materials.trim} items={[
-            { position: [-width * 0.4, wallHeight * 0.5, frontZ + 0.062], scale: [0.023, wallHeight * 0.5, 0.023] },
-            { position: [-width * 0.27, wallHeight * 0.5, frontZ + 0.062], scale: [0.023, wallHeight * 0.5, 0.023] },
-            { position: [width * 0.27, wallHeight * 0.5, frontZ + 0.062], scale: [0.023, wallHeight * 0.5, 0.023] },
-            { position: [width * 0.4, wallHeight * 0.5, frontZ + 0.062], scale: [0.023, wallHeight * 0.5, 0.023] },
-            { position: [0, wallHeight * 0.42, frontZ + depth * 0.126], scale: [0.025, wallHeight * 0.62, 0.025] },
+          <SignagePanel title="RESTAURANTE" position={[0, canopyFrontHeight + 0.028, canopyFrontZ + 0.02]} size={[canopyWidth * 0.42, wallHeight * 0.16]} background="#2f3f3b" />
+          <ScaledInstances material={materials.metal} items={[
+            { position: [0, slabHeight + wallHeight * 0.34, canopyFrontZ + stepDepth * 0.5], scale: [0.014, wallHeight * 0.68, 0.014] },
+            { position: [-doorWidth * 0.95, slabHeight + wallHeight * 0.34, canopyFrontZ + stepDepth * 0.5], scale: [0.014, wallHeight * 0.68, 0.014] },
+            { position: [doorWidth * 0.95, slabHeight + wallHeight * 0.34, canopyFrontZ + stepDepth * 0.5], scale: [0.014, wallHeight * 0.68, 0.014] },
+          ]} />
+          <ScaledInstances material={materials.dark} items={[
+            { position: [-width * 0.21, slabHeight + wallHeight * 0.42, bodyFrontZ + 0.03], scale: [0.02, 0.02, 0.03] },
+            { position: [width * 0.21, slabHeight + wallHeight * 0.42, bodyFrontZ + 0.03], scale: [0.02, 0.02, 0.03] },
           ]} />
         </>
       )}
       {showFocusDetail && (
         <>
-          <ScaledInstances geometry={UNIT_CYLINDER} material={materials.metal} items={umbrellaPositions.map((x) => ({
-            position: [x, height * 0.2, depth * 0.43] as Vector3Tuple,
-            scale: [0.025, height * 0.38, 0.025] as Vector3Tuple,
+          <ScaledInstances geometry={UNIT_CYLINDER} material={materials.metal} items={umbrellaXs.map((x) => ({
+            position: [x, slabHeight + wallHeight * 0.32, bodyFrontZ + depth * 0.13] as Vector3Tuple,
+            scale: [0.022, wallHeight * 0.64, 0.022] as Vector3Tuple,
           }))} />
-          <ScaledInstances geometry={UNIT_CONE} material={materials.green} items={umbrellaPositions.map((x) => ({
-            position: [x, height * 0.37, depth * 0.43] as Vector3Tuple,
-            scale: [width * 0.068, height * 0.075, width * 0.068] as Vector3Tuple,
+          <ScaledInstances geometry={UNIT_CONE} material={materials.white} items={umbrellaXs.map((x) => ({
+            position: [x, slabHeight + wallHeight * 0.68, bodyFrontZ + depth * 0.13] as Vector3Tuple,
+            scale: [depth * 0.16, wallHeight * 0.16, depth * 0.16] as Vector3Tuple,
           }))} />
-          <ScaledInstances material={materials.trim} items={[
-            { position: [-width * 0.31, 0.12, depth * 0.47], scale: [width * 0.15, 0.065, 0.065] },
-            { position: [width * 0.31, 0.12, depth * 0.47], scale: [width * 0.15, 0.065, 0.065] },
-          ]} />
+          <ScaledInstances geometry={UNIT_CYLINDER} material={materials.trim} items={umbrellaXs.map((x) => ({
+            position: [x, slabHeight + 0.09, bodyFrontZ + depth * 0.13] as Vector3Tuple,
+            scale: [depth * 0.08, 0.018, depth * 0.08] as Vector3Tuple,
+          }))} />
         </>
       )}
     </group>

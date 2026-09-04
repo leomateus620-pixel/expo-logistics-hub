@@ -170,6 +170,7 @@ import { RegionalHighwayNetwork } from './RegionalHighwayNetwork';
 import { RearParkEnvironmentLayer } from './RearParkEnvironmentLayer';
 import { CommercialSiteEnvironmentLayer } from './CommercialSiteEnvironmentLayer';
 import { QuadrasABEnvironmentLayer } from './QuadrasABEnvironmentLayer';
+import { RestaurantFrontageLayer } from './RestaurantFrontageLayer';
 import { rearRoadLayerPresentation } from '../../utils/commercialLayerPresentation';
 import {
   REAR_ROAD_SCENE_SUPPORT_POINTS,
@@ -4610,6 +4611,12 @@ function Scene({
             entities={siteEnvironmentEntities}
             activeOwnerIdentifiers={activeSiteEnvironmentOwnerIdentifiers}
             reducedGraphics={reducedGraphics}
+          />
+          <RestaurantFrontageLayer
+            entities={nonLotEntities}
+            trees={presentedSceneTrees}
+            reducedGraphics={reducedGraphics}
+            vegetationVisible={treesVisible}
           />
         </group>
       )}

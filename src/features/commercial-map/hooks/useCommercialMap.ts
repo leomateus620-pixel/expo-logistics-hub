@@ -29,6 +29,7 @@ import {
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import type {
   CommercialLot,
+  CommercialMapData,
   CommercialMapQueryScope,
   MapEntity,
   MapPermissions,
@@ -43,6 +44,7 @@ import {
 } from '../utils/entityExplorer';
 import { resolveMapPermissions } from '../utils/permissions';
 import { getCommercialMapSegment, withCommercialMapSegments } from '../data/commercialMapSegments';
+import { withUnifiedFenasojaRestaurant } from '../utils/fenasojaRestaurant';
 
 const MAP_ERROR_MESSAGES: Record<string, string> = {
   MAP_PERMISSION_DENIED: 'Você não possui permissão para concluir esta operação.',
@@ -108,6 +110,15 @@ export function commercialMapQueryKey(
     : ['commercial-map', 'full', userId, orgId] as const;
 }
 
+/**
+ * Client presentation pipeline shared by the official fallback and persisted
+ * rows. The restaurant unification runs before segment tagging so the single
+ * "Restaurante" inherits C2's segment membership; cadastral rows are not edited.
+ */
+export function presentCommercialMapData<T extends CommercialMapData>(data: T): T {
+  return withCommercialMapSegments(withUnifiedFenasojaRestaurant(data));
+}
+
 export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIAL_MAP_SCOPE) {
   const { orgId } = useCurrentOrg();
   const { user } = useAuth();
@@ -121,7 +132,7 @@ export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIA
   const query = useQuery({
     queryKey: commercialMapQueryKey(user?.id, orgId, scope),
     queryFn: () => fetchCommercialMap(orgId!, scope),
-    select: withCommercialMapSegments,
+    select: presentCommercialMapData,
     enabled: Boolean(orgId && user),
     staleTime: 30_000,
     retry: 1,

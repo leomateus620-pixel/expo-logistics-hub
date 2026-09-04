@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CommercialMapCanvas } from '../components/canvas/CommercialMapCanvas';
 import { CommercialMapRendererStatus } from '../components/CommercialMapRendererStatus';
 import { OFFICIAL_REFERENCE_DATA } from '../data/officialReference2026';
+import { presentCommercialMapData } from '../hooks/useCommercialMap';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import {
   summarizeCommercialMapRuntimeDiagnostics,
@@ -23,6 +24,9 @@ import '../commercial-map-mobile.css';
 import './commercial-map-rendering-diagnostics.css';
 
 const EMPTY_MATCHING_ENTITY_IDS = new Set<string>();
+// Same client presentation pipeline as the authenticated map, so diagnostics
+// render the unified Restaurante and segment tags instead of raw cadastral rows.
+const DIAGNOSTICS_MAP_DATA = presentCommercialMapData(OFFICIAL_REFERENCE_DATA);
 const MAXIMUM_ZOOM_WHEEL_STEPS = 80;
 const STRESS_CYCLES = 20;
 const STRESS_IDLE_MS = 650;
@@ -184,7 +188,7 @@ export default function CommercialMapRenderingDiagnosticsPage() {
   useEffect(() => {
     mounted.current = true;
     const store = useCommercialMapStore.getState();
-    store.initializeLayers(OFFICIAL_REFERENCE_DATA.layers);
+    store.initializeLayers(DIAGNOSTICS_MAP_DATA.layers);
     store.setHydrologicalModeActive(false);
     store.setReducedGraphics(false);
     store.setLabelsVisible(true);
@@ -462,11 +466,11 @@ export default function CommercialMapRenderingDiagnosticsPage() {
         <div className="commercial-map-stage">
           <CommercialMapCanvas
             active
-            entities={OFFICIAL_REFERENCE_DATA.entities}
-            parkingOwnerEntities={OFFICIAL_REFERENCE_DATA.entities}
-            siteEnvironmentEntities={OFFICIAL_REFERENCE_DATA.entities}
-            lots={OFFICIAL_REFERENCE_DATA.lots}
-            calibration={OFFICIAL_REFERENCE_DATA.calibration}
+            entities={DIAGNOSTICS_MAP_DATA.entities}
+            parkingOwnerEntities={DIAGNOSTICS_MAP_DATA.entities}
+            siteEnvironmentEntities={DIAGNOSTICS_MAP_DATA.entities}
+            lots={DIAGNOSTICS_MAP_DATA.lots}
+            calibration={DIAGNOSTICS_MAP_DATA.calibration}
             matchingEntityIds={EMPTY_MATCHING_ENTITY_IDS}
             filtersActive={false}
           />
