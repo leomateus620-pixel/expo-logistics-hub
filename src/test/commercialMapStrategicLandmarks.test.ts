@@ -106,7 +106,8 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(strategicLandmarkFacingRadians(persistedItalian)).toBeCloseTo(-Math.PI / 2);
     expect(strategicLandmarkFacingRadians(persistedPortico)).toBe(0);
     expect(strategicLandmarkFacingRadians(persistedEtnia)).toBeCloseTo(Math.PI / 2);
-    expect(strategicLandmarkFacingRadians(persistedRestaurant)).toBe(Math.PI);
+    // Unified Restaurante (C2 + C3) fronts the Calçada do Arvoredo on +x.
+    expect(strategicLandmarkFacingRadians(persistedRestaurant)).toBeCloseTo(Math.PI / 2);
     expect(strategicLandmarkFacingRadians(persistedArena)).toBeCloseTo(-Math.PI / 2);
     expect(strategicLandmarkFacingRadians(persistedAmusementPark)).toBe(0);
     expect(strategicLandmarkFacingRadians(persistedGateFour)).toBe(0);
@@ -121,7 +122,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(strategicLandmarkFocusDirection(persistedItalian)?.[0]).toBeLessThan(0);
     expect(strategicLandmarkFocusDirection(persistedPortico)?.[2]).toBeLessThan(0);
     expect(strategicLandmarkFocusDirection(persistedEtnia)?.[0]).toBeGreaterThan(0);
-    expect(strategicLandmarkFocusDirection(persistedRestaurant)?.[2]).toBeLessThan(0);
+    expect(strategicLandmarkFocusDirection(persistedRestaurant)?.[0]).toBeGreaterThan(0);
     expect(strategicLandmarkFocusDirection(persistedArena)?.[0]).toBeLessThan(0);
     expect(strategicLandmarkFocusDirection(persistedAmusementPark)?.[2]).toBeGreaterThan(0);
     expect(strategicLandmarkFocusDirection(persistedGateFour)?.[2]).toBeLessThan(0);

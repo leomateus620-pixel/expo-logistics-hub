@@ -3300,6 +3300,7 @@ function FenasojaRestaurant({
   const {
     width,
     depth,
+    groundElevation,
     slabWidth,
     slabDepth,
     slabHeight,
@@ -3418,7 +3419,7 @@ function FenasojaRestaurant({
   }, [gableEnd, roof]);
 
   return (
-    <group dispose={null}>
+    <group position={[0, groundElevation, 0]} dispose={null}>
       {/* Ground contact: concrete plinth plus a thin apron that meets the lawn. */}
       <mesh geometry={UNIT_BOX} material={materials.platform} position={[0, slabHeight / 2, 0]} scale={[slabWidth, slabHeight, slabDepth]} receiveShadow raycast={NO_RAYCAST} dispose={null} />
       <mesh geometry={UNIT_BOX} material={materials.platform} position={[0, 0.008, 0]} scale={[slabWidth + 0.09, 0.016, slabDepth + 0.09]} receiveShadow raycast={NO_RAYCAST} dispose={null} />

@@ -1,4 +1,5 @@
 import type { Coordinate, MapEntity } from '../types';
+import { OPEN_GROUND_PRESENTATION_HEIGHT } from '../constants';
 import { withoutClosingPoint } from './geometry';
 
 /**
@@ -44,8 +45,11 @@ export const FENASOJA_RESTAURANT_LAYOUT = Object.freeze({
   facingRadians: Math.PI / 2,
   /** Camera approaches from the walkway so the covered entrance reads first. */
   focusDirection: [0.9, 0.46, 0.24] as const,
-  minimumVisualHeight: 1,
+  /** Above the 1.05 cadastral extrusion even for the raw C2 half; ridge ≈ 7.5–8.8 m. */
+  minimumVisualHeight: 1.1,
   maximumVisualHeight: 1.3,
+  /** Plinth and steps start on the visible ground plane instead of inside it. */
+  groundElevation: OPEN_GROUND_PRESENTATION_HEIGHT + 0.002,
   footprintFill: Object.freeze({ width: 0.985, depth: 0.985 }),
   frontPillarCount: 4,
   palette: Object.freeze({
@@ -92,6 +96,7 @@ export interface FenasojaRestaurantLayout {
   width: number;
   depth: number;
   height: number;
+  groundElevation: number;
   slabWidth: number;
   slabDepth: number;
   slabHeight: number;
@@ -149,7 +154,9 @@ export function createFenasojaRestaurantLayout(
   const slabDepth = depth * FENASOJA_RESTAURANT_LAYOUT.footprintFill.depth;
   const bodyWidth = width * 0.94;
   const bodyDepth = depth * 0.6;
-  const bodyCenterZ = -depth * 0.13;
+  // Hall pushed back so the covered frontage and terrace fit on the plinth;
+  // the rear service annex still ends inside the slab.
+  const bodyCenterZ = -depth * 0.11;
   const bodyFrontZ = bodyCenterZ + bodyDepth / 2;
   const bodyBackZ = bodyCenterZ - bodyDepth / 2;
   const wallHeight = height * 0.44;
@@ -172,6 +179,7 @@ export function createFenasojaRestaurantLayout(
     width,
     depth,
     height,
+    groundElevation: FENASOJA_RESTAURANT_LAYOUT.groundElevation,
     slabWidth,
     slabDepth,
     slabHeight,
@@ -207,10 +215,10 @@ export function createFenasojaRestaurantLayout(
     windowWidth: width * 0.055,
     windowHeight: wallHeight * 0.42,
     serviceWidth: width * 0.2,
-    serviceDepth: depth * 0.11,
+    serviceDepth: depth * 0.08,
     serviceHeight: wallHeight * 0.72,
     serviceCenterX: -width * 0.3,
-    serviceCenterZ: bodyBackZ - depth * 0.055,
+    serviceCenterZ: bodyBackZ - depth * 0.04,
   };
 }
 
@@ -242,10 +250,18 @@ function isRectangularRing(entity: Pick<MapEntity, 'geometry'>, bounds: Footprin
   ));
 }
 
-function rectanglesTouch(first: FootprintBounds, second: FootprintBounds) {
+/**
+ * Only two rectangles that share a full edge (same span on one axis, touching
+ * on the other) unify, so the presented footprint is exactly their union and
+ * never an inflated bounding box.
+ */
+function rectanglesFormRectangle(first: FootprintBounds, second: FootprintBounds) {
+  const tolerance = UNIFICATION_GAP_TOLERANCE;
+  const sameSpanX = Math.abs(first.minX - second.minX) <= tolerance && Math.abs(first.maxX - second.maxX) <= tolerance;
+  const sameSpanZ = Math.abs(first.minZ - second.minZ) <= tolerance && Math.abs(first.maxZ - second.maxZ) <= tolerance;
   const gapX = Math.max(first.minX, second.minX) - Math.min(first.maxX, second.maxX);
   const gapZ = Math.max(first.minZ, second.minZ) - Math.min(first.maxZ, second.maxZ);
-  return gapX <= UNIFICATION_GAP_TOLERANCE && gapZ <= UNIFICATION_GAP_TOLERANCE;
+  return (sameSpanX && Math.abs(gapZ) <= tolerance) || (sameSpanZ && Math.abs(gapX) <= tolerance);
 }
 
 function normalizedIdentifier(entity: Pick<MapEntity, 'publicIdentifier'>) {
@@ -286,7 +302,7 @@ export function unifyFenasojaRestaurantEntities(entities: readonly MapEntity[]):
     absorbed && primaryBounds && absorbedBounds
     && isRectangularRing(primary, primaryBounds)
     && isRectangularRing(absorbed, absorbedBounds)
-    && rectanglesTouch(primaryBounds, absorbedBounds),
+    && rectanglesFormRectangle(primaryBounds, absorbedBounds),
   );
   const mergedBounds: FootprintBounds | null = canMergeFootprints && primaryBounds && absorbedBounds
     ? {
