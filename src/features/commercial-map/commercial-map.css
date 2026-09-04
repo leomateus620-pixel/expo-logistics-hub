@@ -690,6 +690,15 @@
   box-shadow: 0 7px 16px -9px rgba(10, 92, 143, .9), inset 0 1px rgba(255, 255, 255, .3);
 }
 
+.commercial-map-night-toggle { color: #4a5578 !important; }
+.commercial-map-night-toggle:hover:not(:disabled) { background: #e9ebf7 !important; color: #2c3566 !important; }
+.commercial-map-night-toggle.is-active {
+  background: linear-gradient(150deg, #1c2450, #3b4a9c 62%, #5d6fc9) !important;
+  color: #f6f1e4 !important;
+  box-shadow: 0 7px 16px -9px rgba(28, 36, 80, .95), inset 0 1px rgba(255, 255, 255, .22);
+}
+.commercial-map-night-toggle.is-active svg { filter: drop-shadow(0 0 5px rgba(255, 233, 189, .55)); }
+
 .hydrological-network-legend {
   position: absolute;
   z-index: 14;

@@ -336,8 +336,11 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).toContain('float cloudBand = smoothstep');
     expect(environment).toContain('float cloudDensity = smoothstep');
     expect(environment).toContain('composedSky = mix(composedSky, cloudColor, cloudDensity)');
-    expect(environment).toContain("'commercial-map-camera-safe-sunrise-sky-v5'");
+    expect(environment).toContain("'commercial-map-camera-safe-sunrise-sky-v6-night'");
     expect(environment).not.toContain('commercial-map-camera-safe-sunrise-sky-${mode}');
+    // The night is a uniform blend inside the same program, never a second sky.
+    expect(environment).toContain('material.uniforms.nightBlend = { value: 0 }');
+    expect(environment).toContain('composedSky = mix(composedSky, nightSky, nightBlend)');
     expect(environment).toContain('new THREE.ShaderMaterial');
     expect(environment).toContain('new EffectComposer(gl');
     expect(environment).toContain('multisampling: 0');
@@ -360,7 +363,8 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).toContain('scene.environment = reflectionTexture');
     expect(environment).toContain('scene.environment = previousEnvironment');
     expect(environment).toContain('gl.shadowMap.needsUpdate = true');
-    expect(environment).toContain('if (isRunning && progress < 1) invalidate();');
+    // Demand frames are requested only while the sunrise or the night blend moves.
+    expect(environment).toContain('if ((isRunning && progress < 1) || !nightSettled) invalidate();');
     expect(environment).not.toContain('requestAnimationFrame');
     expect(environment).not.toContain('setInterval(');
     expect(environment).not.toContain('new THREE.PMREMGenerator');

@@ -141,7 +141,9 @@
 .commercial-map-toolbar-menu [role="menuitem"] > i { width: 0.4rem; height: 0.4rem; border-radius: 999px; background: #236fa3; }
 .commercial-map-toolbar-menu-focus-selection { display: none; }
 
-@media (max-width: 350px) {
+/* Six rail buttons (map, top, water, night, focus, more) plus the filter
+   action need ~360px; below that the focus action moves into the menu. */
+@media (max-width: 364px) {
   .commercial-map-toolbar-mobile > .commercial-map-toolbar-focus-selection { display: none; }
   .commercial-map-toolbar-menu .commercial-map-toolbar-menu-focus-selection { display: flex; }
 }

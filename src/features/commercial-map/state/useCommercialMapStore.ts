@@ -107,6 +107,8 @@ interface CommercialMapState {
   sunrisePhase: 'idle' | 'running' | 'complete';
   sunriseSequence: number;
   sunriseStartedAt: number | null;
+  /** Park-wide Night Mode: darkened atmosphere plus the pole LED network. */
+  nightModeActive: boolean;
   lunarLaunchPhase: LunarLaunchPhase;
   lunarLaunchSequence: number;
   lunarLaunchStartedAt: number | null;
@@ -166,6 +168,8 @@ interface CommercialMapState {
   requestSunrise: () => void;
   completeSunrise: (sequence: number) => void;
   resetSunrise: () => void;
+  setNightModeActive: (active: boolean) => void;
+  toggleNightMode: () => void;
   requestLunarLaunch: () => void;
   setLunarLaunchPhase: (phase: LunarLaunchPhase, sequence: number) => void;
   requestLunarLaunchSkip: () => void;
@@ -219,6 +223,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   sunrisePhase: 'idle',
   sunriseSequence: 0,
   sunriseStartedAt: null,
+  nightModeActive: false,
   lunarLaunchPhase: 'idle',
   lunarLaunchSequence: 0,
   lunarLaunchStartedAt: null,
@@ -267,6 +272,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
       cameraNavigating: false,
       sunrisePhase: 'idle',
       sunriseStartedAt: null,
+      nightModeActive: false,
       lunarLaunchPhase: 'idle',
       lunarLaunchStartedAt: null,
       lunarLaunchSkipRequested: false,
@@ -529,10 +535,13 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   setTechnicalValidationVisible: (technicalValidationVisible) => set({ technicalValidationVisible }),
   setReducedGraphics: (reducedGraphics) => set({ reducedGraphics }),
   setCameraNavigating: (cameraNavigating) => set({ cameraNavigating }),
+  // The sunrise is the natural way out of the night: replaying it always
+  // restores daylight instead of animating a sun nobody can see.
   requestSunrise: () => set((state) => ({
     sunrisePhase: 'running',
     sunriseSequence: state.sunriseSequence + 1,
     sunriseStartedAt: monotonicNow(),
+    nightModeActive: false,
   })),
   completeSunrise: (sequence) => set((state) => (
     state.sunrisePhase === 'running' && state.sunriseSequence === sequence
@@ -544,6 +553,10 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     sunriseSequence: state.sunriseSequence + 1,
     sunriseStartedAt: null,
   })),
+  setNightModeActive: (nightModeActive) => set((state) => (
+    state.nightModeActive === nightModeActive ? state : { nightModeActive }
+  )),
+  toggleNightMode: () => get().setNightModeActive(!get().nightModeActive),
   requestLunarLaunch: () => set((state) => {
     if (state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning) return state;
     return {

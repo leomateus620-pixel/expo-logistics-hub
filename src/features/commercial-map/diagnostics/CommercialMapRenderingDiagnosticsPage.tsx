@@ -28,6 +28,10 @@ const EMPTY_MATCHING_ENTITY_IDS = new Set<string>();
 // render the unified Restaurante and segment tags instead of raw cadastral rows.
 const DIAGNOSTICS_MAP_DATA = presentCommercialMapData(OFFICIAL_REFERENCE_DATA);
 const MAXIMUM_ZOOM_WHEEL_STEPS = 80;
+const QA_CAMERA_PRESETS: readonly CameraPreset[] = [
+  'overview', 'top', 'isometric', 'commercial', 'pavilions', 'parking', 'gates',
+  'exporural', 'quadra-r', 'quadra-s', 'semear',
+];
 const STRESS_CYCLES = 20;
 const STRESS_IDLE_MS = 650;
 const STRESS_TRANSITION_TIMEOUT_MS = 15_000;
@@ -170,6 +174,7 @@ function formatMetric(value: number | null, suffix = '') {
 export default function CommercialMapRenderingDiagnosticsPage() {
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  const nightModeActive = useCommercialMapStore((state) => state.nightModeActive);
   const [summary, setSummary] = useState<CommercialMapRuntimeSummary>(initialSummary);
   const [stressReport, setStressReport] = useState<StressReport>(initialStressReport);
   const [runtimeFacts, setRuntimeFacts] = useState<RuntimeFacts>(currentRuntimeFacts);
@@ -193,7 +198,27 @@ export default function CommercialMapRenderingDiagnosticsPage() {
     store.setReducedGraphics(false);
     store.setLabelsVisible(true);
     store.setTreesVisible(true);
-    store.requestCameraPreset('overview');
+    // `?night=1&preset=isometric` opens the harness already in Night Mode on a
+    // given camera preset, so screenshot QA needs no clicks.
+    const query = new URLSearchParams(window.location.search);
+    store.setNightModeActive(false);
+    let releaseNightRequest: (() => void) | undefined;
+    if (query.get('night') === '1') {
+      // The environment replays the sunrise on mount and the sunrise always
+      // restores daylight, so the night is armed once that replay has begun.
+      releaseNightRequest = useCommercialMapStore.subscribe((state) => {
+        if (state.sunrisePhase === 'idle') return;
+        state.setNightModeActive(true);
+        releaseNightRequest?.();
+        releaseNightRequest = undefined;
+      });
+    }
+    const requestedPreset = query.get('preset');
+    store.requestCameraPreset(
+      requestedPreset && QA_CAMERA_PRESETS.includes(requestedPreset as CameraPreset)
+        ? (requestedPreset as CameraPreset)
+        : 'overview',
+    );
     window.__commercialMapRuntimeDiagnostics?.resetSamples();
 
     const refresh = () => {
@@ -223,6 +248,7 @@ export default function CommercialMapRenderingDiagnosticsPage() {
     const timer = window.setInterval(refresh, 500);
     return () => {
       mounted.current = false;
+      releaseNightRequest?.();
       stressAbort.current?.abort();
       setCommercialMapRenderTimingEnabled(false);
       window.clearInterval(timer);
@@ -234,6 +260,7 @@ export default function CommercialMapRenderingDiagnosticsPage() {
       const latest = useCommercialMapStore.getState();
       latest.setHydrologicalModeActive(false);
       latest.setReducedGraphics(false);
+      latest.setNightModeActive(false);
       latest.setCameraNavigating(false);
     };
   }, []);
@@ -396,6 +423,14 @@ export default function CommercialMapRenderingDiagnosticsPage() {
             onClick={() => useCommercialMapStore.getState().toggleHydrologicalMode()}
           >
             Hidrológica
+          </button>
+          <button
+            type="button"
+            aria-pressed={nightModeActive}
+            data-commercial-map-control="night-mode"
+            onClick={() => useCommercialMapStore.getState().toggleNightMode()}
+          >
+            Noturno
           </button>
           <button
             type="button"

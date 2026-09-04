@@ -208,6 +208,35 @@ export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
   },
 } as const;
 
+/**
+ * Night atmosphere shared by global Night Mode and the amusement-park focus.
+ * The environment eases towards these values with the damping lambdas below,
+ * so sky, fog, ambient light and the sun darken together instead of flipping.
+ * Ambient/hemisphere stay above the old park-only night so the darker zones
+ * of the map remain readable while the pole network lights the rest.
+ */
+export const COMMERCIAL_MAP_NIGHT_ATMOSPHERE = {
+  background: '#050916',
+  fog: '#0b1421',
+  ambientColor: '#7185ad',
+  ambientIntensity: 0.19,
+  hemisphereSky: '#263a67',
+  hemisphereGround: '#101713',
+  hemisphereIntensity: 0.25,
+  environmentIntensity: 0.11,
+  sky: {
+    zenith: '#04070f',
+    upper: '#0a1226',
+    horizon: '#1d2a49',
+    horizonGlow: '#3a3a4d',
+    groundFar: '#070a10',
+    starIntensity: 0.62,
+  },
+  /** Damping lambdas (s⁻¹) for entering and leaving the night. */
+  blendInLambda: 2.2,
+  blendOutLambda: 2.9,
+} as const;
+
 function clampUnit(value: number) {
   if (!Number.isFinite(value)) return 0;
   return Math.min(1, Math.max(0, value));

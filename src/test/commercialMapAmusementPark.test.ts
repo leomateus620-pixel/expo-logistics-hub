@@ -11,6 +11,7 @@ import {
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8');
 const parkSource = read('src/features/commercial-map/components/canvas/AmusementPark.tsx');
 const environmentSource = read('src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx');
+const environmentConfigSource = read('src/features/commercial-map/data/commercialMapEnvironment.ts');
 const canvasSource = read('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
 const officialSource = read('src/features/commercial-map/data/officialReference2026.ts');
 const packageJson = JSON.parse(read('package.json')) as {
@@ -51,7 +52,12 @@ describe('Parque de Diversões J', () => {
     expect(parkSource).not.toMatch(/<pointLight/i);
     expect(parkSource).not.toMatch(/<spotLight/i);
     expect(canvasSource).toContain("=== 'amusement-park'");
-    expect(environmentSource).toContain("nightMode ? '#050916'");
+    // The park focus still requests the night atmosphere; global Night Mode
+    // shares the same eased blend instead of a second lighting path.
+    expect(canvasSource).toContain('const nightAtmosphereActive = nightModeActive || amusementParkSelected;');
+    expect(canvasSource).toContain('nightMode={nightAtmosphereActive}');
+    expect(environmentConfigSource).toContain("background: '#050916'");
+    expect(environmentSource).toContain('const nightTarget = nightMode ? 1 : 0;');
     expect(environmentSource).toContain('<SunrisePostProcessing');
     expect(environmentSource).toContain('enabled={active && !cameraNavigating}');
     expect(environmentSource).toContain('interactionActive={active && cameraNavigating}');
