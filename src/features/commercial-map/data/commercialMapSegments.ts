@@ -85,8 +85,8 @@ const INDUSTRY_EXCLUDED_ENTITIES = [
   'Q-G-03', 'Q-G-04',
   'QUADRA-N', 'B7', 'B28', 'D4',
   'QUADRA-C', 'QUADRA-B', 'QUADRA-A', 'C1',
-  'B11', 'B12', 'B13', 'B14', 'B21',
-  'B25', 'B26', 'B27', 'B31', 'B32',
+  'B11', 'B12', 'B13', 'B14', 'B15', 'B18', 'B21',
+  'B25', 'B26', 'B27', 'B30', 'B31', 'B32', 'B42-02',
   'G', 'B8', 'B9', 'B10', 'B39',
 ] as const;
 
