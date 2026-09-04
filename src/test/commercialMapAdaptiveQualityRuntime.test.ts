@@ -8,6 +8,7 @@ import {
   isCommercialMapAdaptiveQualitySamplingActive,
   isCommercialMapHeavyQualityGestureActive,
   recordCommercialMapAdaptiveFrame,
+  resolveCommercialMapInteractionPixelRatio,
   shouldApplyCommercialMapPixelRatioNow,
   shouldDeferCommercialMapSceneQuality,
 } from '@/features/commercial-map/utils/adaptiveQualityRuntime';
@@ -84,8 +85,8 @@ describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
     expect(controller).not.toMatch(/setInterval|requestAnimationFrame|prefers-reduced-motion|reducedMotion/);
   });
 
-  it('aplica DPR mais barato no gesto e adia rebuilds pesados do stack ambiental', () => {
-    expect(COMMERCIAL_MAP_QUALITY_SCENE_COMMIT_IDLE_MS).toBe(180);
+  it('separa o render scale transitório do DPR/tier adaptativo e adia rebuild para idle real', () => {
+    expect(COMMERCIAL_MAP_QUALITY_SCENE_COMMIT_IDLE_MS).toBe(650);
     expect(isCommercialMapHeavyQualityGestureActive({
       cameraNavigating: true,
       lunarLaunchPhase: 'idle',
@@ -101,7 +102,13 @@ describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
       currentDpr: 1.75,
       nextDpr: 1.35,
       gestureActive: true,
-    })).toBe(true);
+    })).toBe(false);
+
+    expect(resolveCommercialMapInteractionPixelRatio(2)).toBe(1);
+    expect(resolveCommercialMapInteractionPixelRatio(1)).toBe(0.72);
+    expect(resolveCommercialMapInteractionPixelRatio(0.8)).toBe(0.72);
+    expect(resolveCommercialMapInteractionPixelRatio(0.65)).toBe(0.65);
+    expect(resolveCommercialMapInteractionPixelRatio(Number.NaN)).toBe(0.72);
     expect(shouldApplyCommercialMapPixelRatioNow({
       currentDpr: 1.35,
       nextDpr: 1.75,
@@ -111,6 +118,11 @@ describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
       currentDpr: 1.35,
       nextDpr: 1.75,
       gestureActive: false,
+    })).toBe(true);
+    expect(shouldApplyCommercialMapPixelRatioNow({
+      currentDpr: 1.35,
+      nextDpr: 1.352,
+      gestureActive: true,
     })).toBe(true);
 
     expect(shouldDeferCommercialMapSceneQuality({

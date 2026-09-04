@@ -194,15 +194,21 @@ describe('Rede Hidrológica cartográfica do Mapa Comercial', () => {
     });
   });
 
-  it('integra a camada uma única vez, somente no modo hídrico, e preserva preferências visuais', () => {
+  it('integra a camada uma única vez, preserva recursos após a primeira ativação e mantém preferências visuais', () => {
     const canvasSource = readFileSync(resolve(
       process.cwd(),
       'src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx',
     ), 'utf8');
+    const layerSource = readFileSync(resolve(
+      process.cwd(),
+      'src/features/commercial-map/components/canvas/CommercialHydrologicalInfrastructureLayer.tsx',
+    ), 'utf8');
     expect(canvasSource.match(/<CommercialHydrologicalInfrastructureLayer/g)).toHaveLength(1);
     expect(canvasSource).toContain('treesVisible && !hydrologicalModeActive');
-    expect(canvasSource).toContain('labelsVisible: labelsVisible && !hydrologicalModeActive');
+    expect(canvasSource).toContain('enabled: labelsVisible && !interiorEntity && !hydrologicalModeActive');
     expect(canvasSource).toContain('setSelectedHydrologicalElementId(element.id)');
-    expect(canvasSource).toContain('hydrologicalModeActive ?');
+    expect(canvasSource).toContain('active={hydrologicalModeActive}');
+    expect(layerSource).toContain('const activated = useRef(props.active);');
+    expect(layerSource).toContain('onSelect={props.active ? props.onSelect : undefined}');
   });
 });

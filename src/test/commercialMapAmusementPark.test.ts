@@ -52,7 +52,9 @@ describe('Parque de Diversões J', () => {
     expect(parkSource).not.toMatch(/<spotLight/i);
     expect(canvasSource).toContain("=== 'amusement-park'");
     expect(environmentSource).toContain("nightMode ? '#050916'");
-    expect(environmentSource).toContain('<SunrisePostProcessing qualityTier={qualityTier} enabled={active} />');
+    expect(environmentSource).toContain('<SunrisePostProcessing');
+    expect(environmentSource).toContain('enabled={active && !cameraNavigating}');
+    expect(environmentSource).toContain('interactionActive={active && cameraNavigating}');
   });
 
   it('só inicializa o mundo Rapier na primeira ativação, com carrinhos estáticos antes', () => {

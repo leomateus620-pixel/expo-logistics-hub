@@ -776,7 +776,6 @@ interface EntityMeshProps {
   layerOpacity: number;
   sceneCenter: readonly [number, number];
   sceneDiagonal: number;
-  cameraNavigating: boolean;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   onFocus: () => void;
@@ -797,7 +796,6 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   isMatch,
   layerOpacity,
   sceneCenter,
-  cameraNavigating,
   onSelect,
   onHover,
   onFocus,
@@ -971,12 +969,12 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     ...(PRECISE_HOVER_CAPABLE ? {
       onPointerOver: (event: ThreeEvent<PointerEvent>) => {
         event.stopPropagation();
-        if (cameraNavigating) return;
+        if (useCommercialMapStore.getState().cameraNavigating) return;
         onCursor('pointer');
         onHover(entity.id);
       },
       onPointerOut: () => {
-        onCursor(cameraNavigating ? 'grabbing' : 'grab');
+        onCursor(useCommercialMapStore.getState().cameraNavigating ? 'grabbing' : 'grab');
         onHover(null);
       },
     } : {}),
@@ -1182,7 +1180,6 @@ const EntityMesh = memo(function EntityMesh(props: EntityMeshProps) {
         filtersActive={props.filtersActive}
         isMatch={props.isMatch}
         layerOpacity={props.layerOpacity}
-        cameraNavigating={props.cameraNavigating}
         sceneDiagonal={props.sceneDiagonal}
         hoverEnabled={PRECISE_HOVER_CAPABLE}
         onSelect={props.onSelect}
@@ -1353,7 +1350,6 @@ function BatchedLots({
   onSelect,
   onHover,
   onFocus,
-  cameraNavigating,
   onCursor,
 }: {
   entries: LotEntry[];
@@ -1367,7 +1363,6 @@ function BatchedLots({
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   onFocus: () => void;
-  cameraNavigating: boolean;
   onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
 }) {
   const invalidate = useThree((state) => state.invalidate);
@@ -1530,16 +1525,6 @@ function BatchedLots({
     invalidate();
   }, [batch, entries, invalidate, layerOpacity]);
 
-  useEffect(() => {
-    if (!cameraNavigating) return;
-    if (hoverFrameRef.current !== null) cancelAnimationFrame(hoverFrameRef.current);
-    hoverFrameRef.current = null;
-    pendingHoverRef.current = null;
-    hoveredRef.current = null;
-    onHover(null);
-    onCursor('grabbing');
-  }, [cameraNavigating, onCursor, onHover]);
-
   useEffect(() => () => {
     if (hoverFrameRef.current !== null) cancelAnimationFrame(hoverFrameRef.current);
   }, []);
@@ -1595,12 +1580,12 @@ function BatchedLots({
         {...(PRECISE_HOVER_CAPABLE ? {
           onPointerMove: (event: ThreeEvent<PointerEvent>) => {
             event.stopPropagation();
-            if (cameraNavigating) return;
+            if (useCommercialMapStore.getState().cameraNavigating) return;
             const entityId = resolveEntityId(event);
             queueHover(entityId);
           },
           onPointerOut: () => {
-            if (cameraNavigating) return;
+            if (useCommercialMapStore.getState().cameraNavigating) return;
             queueHover(null);
           },
         } : {})}
@@ -4028,7 +4013,7 @@ function CameraRig({
       makeDefault
       enabled={!lunarCameraLocked && !transitionControlsLocked}
       enableDamping={!lunarCameraLocked && !transitionControlsLocked}
-      dampingFactor={interiorFrame?.dampingFactor ?? (interiorEntity ? 0.075 : 0.072)}
+      dampingFactor={interiorFrame?.dampingFactor ?? (interiorEntity ? 0.11 : 0.14)}
       enablePan={!lunarCameraLocked && !transitionControlsLocked && (interiorFrame?.enablePan ?? true)}
       enableRotate={!lunarCameraLocked && !transitionControlsLocked}
       enableZoom={!lunarCameraLocked && !transitionControlsLocked}
@@ -4037,6 +4022,8 @@ function CameraRig({
       minPolarAngle={appliedAngles.minPolarAngle}
       maxPolarAngle={appliedAngles.maxPolarAngle}
       screenSpacePanning={Boolean(interiorEntity)}
+      panSpeed={1.05}
+      zoomSpeed={1.12}
       zoomToCursor={(interiorFrame?.zoomToCursor ?? !miranteSelected) && !lunarCameraLocked && !transitionControlsLocked}
       touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE }}
       minAzimuthAngle={appliedAngles.minAzimuthAngle}
@@ -4074,6 +4061,25 @@ function RuntimeFrameDiagnostics() {
   return null;
 }
 
+/** Camera motion is intentionally isolated from Scene. Subscribing the scene
+ * root made every gesture reconcile all entity meshes merely to suppress hover.
+ */
+function NavigationInteractionCoordinator({
+  onHover,
+  onCursor,
+}: {
+  onHover: (entityId: string | null) => void;
+  onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
+}) {
+  const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
+  useEffect(() => {
+    if (!cameraNavigating) return;
+    onHover(null);
+    onCursor('grabbing');
+  }, [cameraNavigating, onCursor, onHover]);
+  return null;
+}
+
 function Scene({
   entities,
   parkingOwnerEntities = entities,
@@ -4108,9 +4114,9 @@ function Scene({
     () => rearParkingLayerPresentation(parkingOwnerEntities, layerVisibility, layerOpacity),
     [layerOpacity, layerVisibility, parkingOwnerEntities],
   );
-  const rearParkingEnabled = rearParkingVisibleInArea(isolatedArea) && !hydrologicalModeActive && parkingPresentation.visible;
+  const rearParkingAvailable = rearParkingVisibleInArea(isolatedArea) && parkingPresentation.visible;
+  const rearParkingEnabled = rearParkingAvailable && !hydrologicalModeActive;
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
-  const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
   const lunarLaunchPhase = useCommercialMapStore((state) => state.lunarLaunchPhase);
   const lunarLaunchReturning = useCommercialMapStore((state) => state.lunarLaunchReturning);
   const lunarCinematicActive = lunarLaunchPhase !== 'idle' || lunarLaunchReturning;
@@ -4152,6 +4158,27 @@ function Scene({
     [
       entities,
       hydrologicalModeActive,
+      isolatedArea,
+      sceneElectricalInfrastructure.nodes,
+      sceneHydrologicalInfrastructure.nodes,
+    ],
+  );
+  // Camera presets may frame a mode-specific subset, but the environment owns
+  // one stable world envelope. This keeps its ground textures, geometry and
+  // shader inputs alive instead of rebuilding them on every mode toggle.
+  const environmentExtent = useMemo(
+    () => getSceneExtent(
+      entities,
+      [
+        ...(parkAccessVisibleInArea(isolatedArea) ? PARK_ACCESS_SCENE_SUPPORT_POINTS : []),
+        ...(rearParkingVisibleInArea(isolatedArea) ? REAR_PARKING_SCENE_SUPPORT_POINTS : []),
+        ...(!isolatedArea ? REAR_ROAD_SCENE_SUPPORT_POINTS : []),
+        ...sceneElectricalInfrastructure.nodes,
+        ...sceneHydrologicalInfrastructure.nodes,
+      ],
+    ),
+    [
+      entities,
       isolatedArea,
       sceneElectricalInfrastructure.nodes,
       sceneHydrologicalInfrastructure.nodes,
@@ -4467,7 +4494,6 @@ function Scene({
   const contextualLabel = useContextualMapLabel({
     selectedEntityId,
     hoveredEntityId,
-    cameraNavigating,
     enabled: labelsVisible && !interiorEntity && !hydrologicalModeActive && !lunarCinematicActive,
   });
   const contextualLabelEntities = useMemo(() => {
@@ -4497,11 +4523,6 @@ function Scene({
     treesVisible,
   ]);
 
-  useEffect(() => {
-    if (!cameraNavigating) return;
-    setHoveredEntityId(null);
-  }, [cameraNavigating, setHoveredEntityId]);
-
   useLayoutEffect(() => {
     // The exterior remains cached, but only the active inspection scene can
     // participate in picking. Layer 0 remains enabled for normal rendering.
@@ -4530,7 +4551,7 @@ function Scene({
   return (
     <>
       <CommercialMapEnvironment
-        extent={extent}
+        extent={environmentExtent}
         shadowExtent={shadowExtent}
         active={!interiorEntity}
         hydrologicalModeActive={hydrologicalModeActive}
@@ -4541,7 +4562,11 @@ function Scene({
       <InteriorCameraRequestContext.Provider value={setInteriorCameraRequest}>
         {interiorContent}
         <group ref={exteriorGroup} visible={!interiorEntity}>
-      {!isolatedArea && !hydrologicalModeActive && <ReferenceUnderlay calibration={calibration} />}
+      {!isolatedArea && (
+        <group visible={!hydrologicalModeActive}>
+          <ReferenceUnderlay calibration={calibration} />
+        </group>
+      )}
       <RoadInfrastructure
         entities={circulationEntities}
         selectedEntityId={selectedEntityId}
@@ -4550,32 +4575,34 @@ function Scene({
         layerOpacity={layerOpacity}
         reducedGraphics={reducedGraphics}
       />
-      {(!isolatedArea || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry)
-        && !hydrologicalModeActive && (
-        <CommercialSiteEnvironmentLayer
-          entities={siteEnvironmentEntities}
-          activeOwnerIdentifiers={activeSiteEnvironmentOwnerIdentifiers}
-          reducedGraphics={reducedGraphics}
-        />
+      {(!isolatedArea || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry) && (
+        <group visible={!hydrologicalModeActive}>
+          <CommercialSiteEnvironmentLayer
+            entities={siteEnvironmentEntities}
+            activeOwnerIdentifiers={activeSiteEnvironmentOwnerIdentifiers}
+            reducedGraphics={reducedGraphics}
+          />
+        </group>
       )}
-      {!isolatedArea && !hydrologicalModeActive && (
-        <QuadrasABEnvironmentLayer
-          entities={siteEnvironmentEntities}
-          reducedGraphics={reducedGraphics}
-        />
+      {!isolatedArea && (
+        <group visible={!hydrologicalModeActive}>
+          <QuadrasABEnvironmentLayer
+            entities={siteEnvironmentEntities}
+            reducedGraphics={reducedGraphics}
+          />
+        </group>
       )}
-      {!isolatedArea && !hydrologicalModeActive && (
-        <>
+      {!isolatedArea && (
+        <group visible={!hydrologicalModeActive}>
           <RearParkEnvironmentLayer
             reducedGraphics={reducedGraphics}
             vegetationVisible={treesVisible}
           />
           <RearParkRoadNetwork
             reducedGraphics={reducedGraphics}
-            visible={rearRoadPresentation.visible}
+            visible={!hydrologicalModeActive && rearRoadPresentation.visible}
             opacity={rearRoadPresentation.opacity}
             ownerEntityIdByIdentifier={rearRoadOwnerEntityIds}
-            cameraNavigating={cameraNavigating}
             hoverEnabled={PRECISE_HOVER_CAPABLE}
             onSelect={handleEntitySelect}
             onHover={handleEntityHover}
@@ -4584,23 +4611,27 @@ function Scene({
           />
           <RegionalHighwayNetwork
             reducedGraphics={reducedGraphics}
-            visible={rearRoadPresentation.visible}
+            visible={!hydrologicalModeActive && rearRoadPresentation.visible}
             opacity={rearRoadPresentation.opacity}
             ownerEntityIdByIdentifier={rearRoadOwnerEntityIds}
-            cameraNavigating={cameraNavigating}
             hoverEnabled={PRECISE_HOVER_CAPABLE}
             onSelect={handleEntitySelect}
             onHover={handleEntityHover}
             onFocus={handleEntityFocus}
             onCursor={setCanvasCursor}
           />
-        </>
+        </group>
       )}
-      {rearParkingEnabled && (
-        <RearParkingLayer reducedGraphics={reducedGraphics} labelsVisible={labelsVisible} opacity={parkingPresentation.opacity} />
+      {rearParkingAvailable && (
+        <RearParkingLayer
+          active={rearParkingEnabled}
+          reducedGraphics={reducedGraphics}
+          labelsVisible={labelsVisible}
+          opacity={parkingPresentation.opacity}
+        />
       )}
-      {parkAccessScope && !hydrologicalModeActive && (
-        <>
+      {parkAccessScope && (
+        <group visible={!hydrologicalModeActive}>
           {parkAccessScope === 'all' && (
             <ParkAccessEnvironmentLayer
               reducedGraphics={reducedGraphics}
@@ -4617,7 +4648,7 @@ function Scene({
               && parkAccessPresentation.architecture.visible}
             architectureOpacity={parkAccessPresentation.architecture.opacity}
           />
-        </>
+        </group>
       )}
       <BatchedLots
         entries={lotEntries}
@@ -4631,7 +4662,6 @@ function Scene({
         onSelect={handleEntitySelect}
         onHover={handleEntityHover}
         onFocus={handleEntityFocus}
-        cameraNavigating={cameraNavigating}
         onCursor={setCanvasCursor}
       />
       {structuralEntities.map((entity) => (
@@ -4649,7 +4679,6 @@ function Scene({
           layerOpacity={layerOpacity[entity.layerId] ?? 1}
           sceneCenter={sceneCenter}
           sceneDiagonal={extent.diagonal}
-          cameraNavigating={cameraNavigating}
           onSelect={handleEntitySelect}
           onHover={handleEntityHover}
           onFocus={handleEntityFocus}
@@ -4691,18 +4720,16 @@ function Scene({
         visible={treesVisible && !hydrologicalModeActive}
         reducedGraphics={reducedGraphics}
       />
-      {hydrologicalModeActive ? (
-        <Suspense fallback={null}>
-          <CommercialHydrologicalInfrastructureLayer
-            nodes={sceneHydrologicalInfrastructure.nodes}
-            segments={sceneHydrologicalInfrastructure.segments}
-            surfaceEntities={exteriorRenderedEntities}
-            active
-            reducedGraphics={reducedGraphics}
-            onSelect={handleHydrologicalSelect}
-          />
-        </Suspense>
-      ) : null}
+      <Suspense fallback={null}>
+        <CommercialHydrologicalInfrastructureLayer
+          nodes={sceneHydrologicalInfrastructure.nodes}
+          segments={sceneHydrologicalInfrastructure.segments}
+          surfaceEntities={exteriorRenderedEntities}
+          active={hydrologicalModeActive}
+          reducedGraphics={reducedGraphics}
+          onSelect={handleHydrologicalSelect}
+        />
+      </Suspense>
       {contextualLabelEntities.filter((entity) => (
         (!parkingInspectionOpen || ['PAVILHAO-09', 'D5', 'PISTA-CAMPEIRA', 'J'].includes(entity.publicIdentifier))
       )).map((entity) => (
@@ -4751,6 +4778,10 @@ function Scene({
         hydrologicalModeActive={hydrologicalModeActive}
       />
       <RuntimeFrameDiagnostics />
+      <NavigationInteractionCoordinator
+        onHover={setHoveredEntityId}
+        onCursor={setCanvasCursor}
+      />
       <StrategicLandmarkSelectionShaderWarmup />
       <CommercialMapInteriorShaderWarmup reducedGraphics={reducedGraphics} />
       <Preload all />
@@ -4758,26 +4789,56 @@ function Scene({
   );
 }
 
+function AdaptiveCommercialMapScene({
+  sceneProps,
+  active,
+  reducedGraphics,
+  initialQualityState,
+  capabilityHints,
+}: {
+  sceneProps: CommercialMapCanvasProps;
+  active: boolean;
+  reducedGraphics: boolean;
+  initialQualityState: ReturnType<typeof createInitialCommercialMapQualityState>;
+  capabilityHints: ReturnType<typeof readCommercialMapDeviceCapabilityHints>;
+}) {
+  const [renderQualityTier, setRenderQualityTier] = useState(initialQualityState.tier);
+  const handleQualityChange = useCallback((next: {
+    sceneTier: CommercialMapQualityTier;
+  }) => {
+    setRenderQualityTier((current) => current === next.sceneTier ? current : next.sceneTier);
+  }, []);
+
+  return (
+    <>
+      <CommercialMapAdaptiveQualityController
+        active={active}
+        reducedGraphics={reducedGraphics}
+        initialState={initialQualityState}
+        capabilityHints={capabilityHints}
+        onQualityChange={handleQualityChange}
+      />
+      <Profiler id="CommercialMapScene" onRender={recordCommercialMapProfiler}>
+        <Scene
+          {...sceneProps}
+          active={active}
+          renderQualityTier={renderQualityTier}
+        />
+      </Profiler>
+    </>
+  );
+}
+
 export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: CommercialMapCanvasProps) {
   const {
     entities,
-    parkingOwnerEntities,
-    siteEnvironmentEntities,
-    lots,
-    calibration,
-    matchingEntityIds,
-    filtersActive,
     isolatedArea,
-    segmentOverride,
-    technicalValidationAllowed,
     active = true,
   } = props;
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
-  const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
   const setSelectedHydrologicalElementId = useCommercialMapStore(
     (state) => state.setSelectedHydrologicalElementId,
   );
-  const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const canvasCleanup = useRef<(() => void) | null>(null);
   const capabilityHints = useRef(readCommercialMapDeviceCapabilityHints()).current;
@@ -4806,32 +4867,16 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
         viewportHeight: initialViewport.current.height,
         qualityTier: initialQualityState.tier,
       })).current;
-  const [renderQuality, setRenderQuality] = useState(() => ({
-    tier: initialQualityState.tier,
-    dpr: initialPixelRatio,
-  }));
-  const handleQualityChange = useCallback((next: {
-    tier: CommercialMapQualityTier;
-    dpr: number;
-    sceneTier?: CommercialMapQualityTier;
-  }) => {
-    const sceneTier = next.sceneTier ?? next.tier;
-    setRenderQuality((current) => (
-      current.tier === sceneTier && Math.abs(current.dpr - next.dpr) <= 0.005
-        ? current
-        : { tier: sceneTier, dpr: next.dpr }
-    ));
-  }, []);
   const extent = useMemo(
     () => getSceneExtent(
       entities,
       [
         ...(parkAccessVisibleInArea(isolatedArea) ? PARK_ACCESS_SCENE_SUPPORT_POINTS : []),
         ...(rearParkingVisibleInArea(isolatedArea) ? REAR_PARKING_SCENE_SUPPORT_POINTS : []),
-        ...(!isolatedArea && !hydrologicalModeActive ? REAR_ROAD_SCENE_SUPPORT_POINTS : []),
+        ...(!isolatedArea ? REAR_ROAD_SCENE_SUPPORT_POINTS : []),
       ],
     ),
-    [entities, hydrologicalModeActive, isolatedArea],
+    [entities, isolatedArea],
   );
   const initialRenderConfig = useRef<{
     camera: { position: [number, number, number]; fov: number; near: number; far: number };
@@ -4891,7 +4936,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
       events={createCommercialMapEvents}
       frameloop="demand"
       camera={initialRenderConfig.current.camera}
-      dpr={renderQuality.dpr}
+      dpr={initialPixelRatio}
       shadows={reducedGraphics ? false : COMMERCIAL_MAP_SHADOW_MAP_CONFIG}
       gl={initialRenderConfig.current.renderer}
         onCreated={({ gl, scene, camera }) => {
@@ -4912,39 +4957,27 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
         // Empty-ground orbit/pan must not close parking or reset a close-up camera.
         const interactionState = useCommercialMapStore.getState();
         if (interactionState.parkingInspectionOpen || interactionState.cameraNavigating) return;
-        if (hydrologicalModeActive) {
+        if (interactionState.hydrologicalModeActive) {
           setSelectedHydrologicalElementId(null);
           return;
         }
-        if (interiorEntityId) {
+        if (interactionState.interiorEntityId) {
           useCommercialMapStore.getState().setSelectedModuleId(null);
           return;
         }
         setSelectedEntityId(null);
       }}
     >
-      <CommercialMapAdaptiveQualityController
+      {/* Adaptive DPR stays imperative inside the R3F root. Only this child
+          owns scene-tier state, so a DPR decision cannot reconfigure Canvas
+          and resize the drawing buffer a second time through React props. */}
+      <AdaptiveCommercialMapScene
+        sceneProps={props}
         active={active}
         reducedGraphics={reducedGraphics}
-        initialState={initialQualityState}
+        initialQualityState={initialQualityState}
         capabilityHints={capabilityHints}
-        onQualityChange={handleQualityChange}
       />
-      <Profiler id="CommercialMapScene" onRender={recordCommercialMapProfiler}>
-        <Scene
-          entities={entities}
-          parkingOwnerEntities={parkingOwnerEntities}
-          siteEnvironmentEntities={siteEnvironmentEntities}
-          lots={lots}
-          calibration={calibration}
-          matchingEntityIds={matchingEntityIds}
-          filtersActive={filtersActive}
-          isolatedArea={isolatedArea}
-          segmentOverride={segmentOverride}
-          technicalValidationAllowed={technicalValidationAllowed}
-          renderQualityTier={renderQuality.tier}
-        />
-      </Profiler>
     </Canvas>
   );
 });

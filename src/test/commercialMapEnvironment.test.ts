@@ -39,7 +39,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
       'src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx',
     );
     const ground = environment.slice(
-      environment.indexOf('<mesh\n        rotation={[-Math.PI / 2, 0, 0]}'),
+      environment.indexOf('<mesh\n        ref={outerGroundRef}'),
       environment.indexOf('<SunrisePostProcessing'),
     );
 
@@ -47,8 +47,9 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(ground).toContain('position={[extent.centerX, -0.08, extent.centerZ]}');
     expect(ground).toContain('receiveShadow');
     expect(ground).toContain(
-      '<primitive object={activeGroundMaterial} attach="material" dispose={null} />',
+      '<primitive object={activeGroundMaterial} attach="material" />',
     );
+    expect(ground).not.toContain('attach="material" dispose={null}');
     expect(ground).not.toContain('polygonOffset');
     expect(ground).not.toContain('transparent');
     expect(ground).not.toContain('depthWrite={false}');
@@ -65,7 +66,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
       'src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx',
     );
     const materialSetup = environment.slice(
-      environment.indexOf('const activeGroundMaterial = useMemo(() => {'),
+      environment.indexOf('const normalGroundMaterial = useMemo(() => {'),
       environment.indexOf('const reflectionTextureWidth'),
     );
 
@@ -79,11 +80,13 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(materialSetup).toContain('catch (error)');
     expect(materialSetup).toContain('return createBaseMaterial();');
     expect(environment).toContain(
-      'useEffect(() => () => activeGroundMaterial.dispose(), [activeGroundMaterial]);',
+      'useEffect(() => () => normalGroundMaterial.dispose(), [normalGroundMaterial]);',
     );
-    expect(environment).toContain(
-      '[activeGroundMaterial, camera, gl, invalidate, requestSunrise, scene]',
-    );
+    expect(environment).toContain('CommercialMapHydrologicalOuterGroundMaterial');
+    expect(environment).toContain('hydrologicalGroundMaterial.dispose()');
+    expect(environment).toContain('const groundMaterials = [normalGroundMaterial, hydrologicalGroundMaterial]');
+    expect(environment).toContain('gl.compile(outerGround, camera, scene)');
+    expect(environment).not.toContain('normalScale: activeGroundTextures ?');
     expect(environment.match(/applyTerrainMultiscaleDetail\(/g)).toHaveLength(2);
   });
 
@@ -333,14 +336,15 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).toContain('float cloudBand = smoothstep');
     expect(environment).toContain('float cloudDensity = smoothstep');
     expect(environment).toContain('composedSky = mix(composedSky, cloudColor, cloudDensity)');
-    expect(environment).toContain('commercial-map-camera-safe-sunrise-sky-${mode}-v4');
+    expect(environment).toContain("'commercial-map-camera-safe-sunrise-sky-v5'");
+    expect(environment).not.toContain('commercial-map-camera-safe-sunrise-sky-${mode}');
     expect(environment).toContain('new THREE.ShaderMaterial');
     expect(environment).toContain('new EffectComposer(gl');
     expect(environment).toContain('multisampling: 0');
     expect(environment).toContain('frameBufferType: THREE.HalfFloatType');
     expect(environment).toContain('new BloomEffect(');
     expect(environment).toContain('luminanceThreshold: 3.2');
-    expect(environment).toContain('levels: bloomLevels');
+    expect(environment).toContain('quality.full.bloomLevels');
     expect(environment).not.toContain('SelectiveBloom');
     expect(environment).not.toContain('selection=');
     expect(environment).toContain('createCelestialSun');
@@ -352,7 +356,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).toContain('new ToneMappingEffect({ mode: ToneMappingMode.ACES_FILMIC })');
     expect(environment).toContain('new SMAAEffect({');
     expect(environment).toContain('SMAAPreset.ULTRA');
-    expect(environment).toContain('gl.compile(scene, camera)');
+    expect(environment).toContain('gl.compile(outerGround, camera, scene)');
     expect(environment).toContain('scene.environment = reflectionTexture');
     expect(environment).toContain('scene.environment = previousEnvironment');
     expect(environment).toContain('gl.shadowMap.needsUpdate = true');
@@ -426,7 +430,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).not.toContain('projectedSunPosition.copy(sun.position)');
     expect(environment).toContain('...camera.matrixWorld.elements');
     expect(environment).toContain('cameraPosition: camera.matrixWorld.elements');
-    expect(environment).not.toContain('cameraNavigating');
+    expect(environment).toContain('enabled={active && !cameraNavigating}');
     expect(environmentData).not.toContain('cameraNavigating');
     expect(authoredSunriseSources).not.toContain('prefers-reduced-motion');
     expect(authoredSunriseSources).not.toContain('matchMedia(');

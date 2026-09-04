@@ -13,13 +13,13 @@ import {
   type OpenGroundSurfaceProfile,
 } from './openGroundTextures';
 import { bindParkSurfaceMaterial } from './parkSurfaceMaterial';
+import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 
 interface RearParkRoadNetworkProps {
   reducedGraphics: boolean;
   visible?: boolean;
   opacity?: number;
   ownerEntityIdByIdentifier: ReadonlyMap<string, string>;
-  cameraNavigating: boolean;
   hoverEnabled: boolean;
   onSelect: (entityId: string) => void;
   onHover: (entityId: string | null) => void;
@@ -68,7 +68,6 @@ export const RearParkRoadNetwork = memo(function RearParkRoadNetwork({
   visible = true,
   opacity = 1,
   ownerEntityIdByIdentifier,
-  cameraNavigating,
   hoverEnabled,
   onSelect,
   onHover,
@@ -115,31 +114,32 @@ export const RearParkRoadNetwork = memo(function RearParkRoadNetwork({
 
   const handleClick = useCallback((surface: RearRoadHitSurface) => (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
-    if (cameraNavigating || !isMapSelectionClick(event.delta, event.nativeEvent)) return;
+    if (useCommercialMapStore.getState().cameraNavigating
+      || !isMapSelectionClick(event.delta, event.nativeEvent)) return;
     const entityId = resolveEntityId(event, surface);
     if (!entityId) return;
     onSelect(entityId);
     onFocus();
-  }, [cameraNavigating, onFocus, onSelect, resolveEntityId]);
+  }, [onFocus, onSelect, resolveEntityId]);
 
   const handlePointerMove = useCallback((surface: RearRoadHitSurface) => (
     event: ThreeEvent<PointerEvent>,
   ) => {
     event.stopPropagation();
-    if (!hoverEnabled || cameraNavigating) return;
+    if (!hoverEnabled || useCommercialMapStore.getState().cameraNavigating) return;
     const entityId = resolveEntityId(event, surface);
     if (entityId === hoveredEntityId.current) return;
     hoveredEntityId.current = entityId;
     onHover(entityId);
     onCursor(entityId ? 'pointer' : 'grab');
-  }, [cameraNavigating, hoverEnabled, onCursor, onHover, resolveEntityId]);
+  }, [hoverEnabled, onCursor, onHover, resolveEntityId]);
 
   const handlePointerOut = useCallback(() => {
     if (!hoverEnabled) return;
     hoveredEntityId.current = null;
     onHover(null);
-    onCursor(cameraNavigating ? 'grabbing' : 'grab');
-  }, [cameraNavigating, hoverEnabled, onCursor, onHover]);
+    onCursor(useCommercialMapStore.getState().cameraNavigating ? 'grabbing' : 'grab');
+  }, [hoverEnabled, onCursor, onHover]);
 
   return (
     <group

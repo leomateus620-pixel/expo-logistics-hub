@@ -32,6 +32,7 @@ import { SunrisePostProcessing } from '@/features/commercial-map/components/canv
 
 function createRenderer() {
   const size = new THREE.Vector2(1366, 768);
+  let pixelRatio = 1;
   return {
     autoClear: true,
     toneMapping: THREE.ACESFilmicToneMapping,
@@ -42,6 +43,8 @@ function createRenderer() {
     getContext: () => ({ getContextAttributes: () => ({ alpha: false }) }),
     getSize: (target: THREE.Vector2) => target.copy(size),
     getDrawingBufferSize: (target: THREE.Vector2) => target.copy(size),
+    getPixelRatio: () => pixelRatio,
+    setPixelRatio: (value: number) => { pixelRatio = value; },
     setSize: (width: number, height: number) => { size.set(width, height); },
     render: vi.fn(),
   } as unknown as THREE.WebGLRenderer;
@@ -53,8 +56,14 @@ function createRuntime() {
     scene: new THREE.Scene(),
     camera: new THREE.PerspectiveCamera(38, 1366 / 768, 0.05, 1200),
     size: { width: 1366, height: 768 },
+    viewport: { dpr: 1 },
     invalidate: vi.fn(),
+    setDpr: vi.fn(),
   };
+  state.setDpr.mockImplementation((dpr: number) => {
+    state.viewport.dpr = dpr;
+    state.gl.setPixelRatio(dpr);
+  });
   runtime.state = state;
   return state;
 }
@@ -121,7 +130,7 @@ describe('Commercial Map persistent post-processing with installed postprocessin
     view.unmount();
   });
 
-  it('retains the existing HDR, anti-aliasing and combined Bloom -> ACES stack', () => {
+  it('retains the HDR, anti-aliasing and combined Bloom -> ACES stack with dormant sharpen', () => {
     const { gl } = createRuntime();
     const addPass = vi.spyOn(EffectComposer.prototype, 'addPass');
     const view = render(<SunrisePostProcessing qualityTier="balanced" enabled />);
@@ -133,10 +142,12 @@ describe('Commercial Map persistent post-processing with installed postprocessin
     const [smaa] = (composer.passes[2] as unknown as {
       effects: [SMAAEffect];
     }).effects;
-    expect(composer.passes).toHaveLength(3);
+    expect(composer.passes).toHaveLength(4);
     expect(composer.passes[0]).toBeInstanceOf(RenderPass);
     expect(composer.passes[1]).toBeInstanceOf(EffectPass);
     expect(composer.passes[2]).toBeInstanceOf(EffectPass);
+    expect(composer.passes[3]).toBeInstanceOf(EffectPass);
+    expect(composer.passes[3].enabled).toBe(false);
     expect(composer.inputBuffer.texture.type).toBe(THREE.HalfFloatType);
     expect(composer.multisampling).toBe(0);
     expect(bloom.getAttributes()).toBe(0);
@@ -146,14 +157,63 @@ describe('Commercial Map persistent post-processing with installed postprocessin
     expect(bloom.luminanceMaterial.threshold).toBe(3.2);
     expect(bloom.luminanceMaterial.smoothing).toBe(0.16);
     expect(bloom.mipmapBlurPass.enabled).toBe(true);
-    expect(bloom.mipmapBlurPass.levels).toBe(5);
+    expect(bloom.mipmapBlurPass.levels).toBe(7);
     expect(toneMapping.mode).toBe(ToneMappingMode.ACES_FILMIC);
     expect(smaa).toBeInstanceOf(SMAAEffect);
-    expect(smaa.edgeDetectionMaterial.edgeDetectionThreshold).toBeCloseTo(0.1);
+    expect(smaa.edgeDetectionMaterial.edgeDetectionThreshold).toBeCloseTo(0.05);
     expect(gl.autoClear).toBe(true);
     const dispose = vi.spyOn(composer, 'dispose');
     view.unmount();
     expect(dispose).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the same composer, targets and listeners across quality tiers', () => {
+    createRuntime();
+    const addPass = vi.spyOn(EffectComposer.prototype, 'addPass');
+    const dispose = vi.spyOn(EffectComposer.prototype, 'dispose');
+    const view = render(<SunrisePostProcessing qualityTier="full" enabled />);
+    const composer = addPass.mock.instances[0] as unknown as EffectComposer;
+    const input = composer.inputBuffer;
+    const output = composer.outputBuffer;
+
+    expect(composer.passes[3].enabled).toBe(true);
+    view.rerender(<SunrisePostProcessing qualityTier="balanced" enabled />);
+    expect(composer.passes[3].enabled).toBe(false);
+    view.rerender(<SunrisePostProcessing qualityTier="reduced" enabled />);
+    view.rerender(<SunrisePostProcessing qualityTier="full" enabled />);
+
+    expect(addPass).toHaveBeenCalledTimes(4);
+    expect(dispose).not.toHaveBeenCalled();
+    expect(composer.inputBuffer).toBe(input);
+    expect(composer.outputBuffer).toBe(output);
+    expect(composer.passes[3].enabled).toBe(true);
+    view.unmount();
+    expect(dispose).toHaveBeenCalledTimes(1);
+  });
+
+  it('scales only the default framebuffer during interaction and restores it before post resumes', () => {
+    const state = createRuntime();
+    const addPass = vi.spyOn(EffectComposer.prototype, 'addPass');
+    const setSize = vi.spyOn(EffectComposer.prototype, 'setSize');
+    const view = render(
+      <SunrisePostProcessing qualityTier="full" enabled interactionActive={false} />,
+    );
+    const composer = addPass.mock.instances[0] as unknown as EffectComposer;
+    const sizeCallsAtRest = setSize.mock.calls.length;
+
+    view.rerender(
+      <SunrisePostProcessing qualityTier="full" enabled={false} interactionActive />,
+    );
+    expect(state.setDpr).toHaveBeenLastCalledWith(0.72);
+    expect(setSize).toHaveBeenCalledTimes(sizeCallsAtRest);
+
+    view.rerender(
+      <SunrisePostProcessing qualityTier="full" enabled interactionActive={false} />,
+    );
+    expect(state.setDpr).toHaveBeenLastCalledWith(1);
+    expect(setSize).toHaveBeenCalledTimes(sizeCallsAtRest + 1);
+    expect(addPass).toHaveBeenCalledTimes(4);
+    expect(composer.passes).toHaveLength(4);
   });
 
   it('keeps one composer, its effect listeners and render targets over 20 interior cycles', () => {

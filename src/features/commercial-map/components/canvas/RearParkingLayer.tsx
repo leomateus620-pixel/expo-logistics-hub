@@ -179,8 +179,8 @@ function ParkingOperations({ labelsVisible }: { labelsVisible: boolean }) {
 
 /** All stalls are data, with three spatially culled instanced line batches. */
 export const RearParkingLayer = memo(function RearParkingLayer({
-  reducedGraphics, labelsVisible, opacity = 1,
-}: { reducedGraphics: boolean; labelsVisible: boolean; opacity?: number }) {
+  reducedGraphics, labelsVisible, opacity = 1, active = true,
+}: { reducedGraphics: boolean; labelsVisible: boolean; opacity?: number; active?: boolean }) {
   const { gl, size, invalidate } = useThree();
   const [hovered, setHovered] = useState(false);
   const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
@@ -233,6 +233,7 @@ export const RearParkingLayer = memo(function RearParkingLayer({
   }, [resources]);
   const vector = useMemo(() => new THREE.Vector3(), []);
   useFrame(({ camera }) => {
+    if (!active) return;
     if (!(camera instanceof THREE.PerspectiveCamera)) return;
     resources.markings.forEach(({ center, stalls, rows }) => {
       const distance = Math.max(0.1, camera.position.distanceTo(vector.set(center[0], 0, center[1])));
@@ -257,34 +258,37 @@ export const RearParkingLayer = memo(function RearParkingLayer({
     }
   };
   useEffect(() => {
-    if (hovered && !useCommercialMapStore.getState().cameraNavigating) gl.domElement.style.cursor = 'pointer';
+    if (active && hovered && !useCommercialMapStore.getState().cameraNavigating) gl.domElement.style.cursor = 'pointer';
     return () => { if (hovered) gl.domElement.style.cursor = 'grab'; };
-  }, [gl, hovered]);
+  }, [active, gl, hovered]);
   return (
-    <group name="rear-parking-reference-layer" dispose={null}>
+    <group name="rear-parking-reference-layer" visible={active} dispose={null}>
       {resources.surfaces.map(({ id, kind, geometry, feather }) => (
         <group key={id}>
-          <mesh geometry={geometry} material={materials.solid[kind]} receiveShadow onClick={select}
-            onPointerOver={() => setHovered(true)}
-            onPointerMove={(event: ThreeEvent<PointerEvent>) => {
+          <mesh geometry={geometry} material={materials.solid[kind]} receiveShadow
+            raycast={active ? undefined : NO_RAYCAST}
+            onClick={active ? select : undefined}
+            onPointerOver={active ? () => setHovered(true) : undefined}
+            onPointerMove={active ? (event: ThreeEvent<PointerEvent>) => {
               if (useCommercialMapStore.getState().cameraNavigating) { setHoveredBlockId(null); return; }
               const block = pickRearParkingBlock([event.point.x, event.point.z]);
               setHoveredBlockId((current) => (block?.id ?? null) === current ? current : block?.id ?? null);
-            }}
-            onPointerOut={() => { setHovered(false); setHoveredBlockId(null); }} />
+            } : undefined}
+            onPointerOut={active ? () => { setHovered(false); setHoveredBlockId(null); } : undefined} />
           <mesh geometry={feather} material={materials.feather[kind]} receiveShadow raycast={NO_RAYCAST} />
         </group>
       ))}
       {resources.rowBeds.map(({ code, geometry }) => (
-        <mesh key={code} geometry={geometry} material={materials.solid.soil} receiveShadow onClick={select} />
+        <mesh key={code} geometry={geometry} material={materials.solid.soil} receiveShadow
+          raycast={active ? undefined : NO_RAYCAST} onClick={active ? select : undefined} />
       ))}
       {resources.markings.map(({ code, stalls, rows }) => (
         <group key={code}><primitive object={stalls.object} /><primitive object={rows.object} /></group>
       ))}
       <primitive object={resources.elderly.object} />
       <ParkingSelection />
-      <ParkingOperations labelsVisible={labelsVisible} />
-      <ParkingLabels visible={labelsVisible} hoveredBlockId={hoveredBlockId} />
+      <ParkingOperations labelsVisible={active && labelsVisible} />
+      <ParkingLabels visible={active && labelsVisible} hoveredBlockId={hoveredBlockId} />
     </group>
   );
 });

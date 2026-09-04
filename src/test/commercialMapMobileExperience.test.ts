@@ -54,7 +54,8 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     const styles = read('src/features/commercial-map/commercial-map-mobile.css');
 
     expect(canvas).toContain('resolveCommercialMapPixelRatio');
-    expect(canvas).toContain('dpr={pixelRatio}');
+    expect(canvas).toContain('dpr={initialPixelRatio}');
+    expect(canvas).toContain('Adaptive DPR stays imperative inside the R3F root');
     expect(canvas).not.toContain('AdaptiveDpr');
     expect(canvas).not.toMatch(/<OrbitControls[\s\S]*?\bregress\b/);
     expect(canvas).toContain('touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE }}');
@@ -69,7 +70,7 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     expect(canvas).toContain('pendingResizeRefit.current = false;');
     expect(canvas).toContain('if (preserveManualView.current) return;');
     expect(canvas).toMatch(/selectionChanged && !selectedEntity[\s\S]*?preserveManualView.current = true;[\s\S]*?cancelScheduledResizeRefit\(\);/);
-    expect(canvas).toContain('antialias: !reducedGraphics');
+    expect(canvas).toContain('antialias: true');
     expect(canvas).toContain('gl={initialRenderConfig.current.renderer}');
     expect(styles).toContain('touch-action: none !important;');
     expect(styles).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.commercial-map-stage \{ transition-duration: 340ms !important; \}/);
