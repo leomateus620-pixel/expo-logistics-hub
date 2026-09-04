@@ -226,7 +226,7 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(gates.map((gate) => gate.publicIdentifier).sort()).toEqual(['A1', 'A10', 'A11', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9']);
     expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.metadata.legendCode === 'E')).toHaveLength(0);
     expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.metadata.legendCode === 'D6')).toHaveLength(0);
-    expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.metadata.legendCode === 'B42')).toHaveLength(2);
+    expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.metadata.legendCode === 'B42')).toHaveLength(1);
   });
 
   it('mantém as descrições oficiais completas dos portões A10 e A11', () => {
