@@ -499,6 +499,7 @@
   .commercial-map-toolbar-mobile button:disabled { opacity: 0.34; }
   .commercial-map-toolbar-mobile svg { width: 1rem; height: 1rem; }
 
+  .commercial-map-shell .commercial-map-actions { display: flex; }
   .commercial-map-actions { top: 0.65rem; right: 0.65rem; }
   .commercial-map-actions button { width: 2.75rem; height: 2.75rem; min-height: 2.75rem; padding: 0; border-radius: 0.78rem; font-size: 0; }
   .commercial-map-actions button svg { width: 1.05rem; height: 1.05rem; margin: 0; }
@@ -602,6 +603,7 @@
   .commercial-map-toolbar-mobile > button,
   .commercial-map-toolbar-mobile [data-radix-collection-item] { display: grid; width: 2.5rem; height: 2.5rem; place-items: center; border-radius: 0.65rem; color: #526b7b; }
   .commercial-map-toolbar-mobile svg { width: 1rem; height: 1rem; }
+  .commercial-map-shell .commercial-map-actions { display: flex; }
   .commercial-map-actions { top: 0.5rem; right: max(0.5rem, env(safe-area-inset-right)); }
   .commercial-map-actions button { width: 2.75rem; height: 2.75rem; padding: 0; font-size: 0; }
   .commercial-map-summary { right: max(0.5rem, env(safe-area-inset-right)); bottom: max(0.5rem, env(safe-area-inset-bottom)); left: max(0.5rem, env(safe-area-inset-left)); height: 2.75rem; max-width: none; padding: 0.15rem; }

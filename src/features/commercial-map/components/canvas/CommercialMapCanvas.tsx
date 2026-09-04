@@ -105,10 +105,11 @@ import { InteriorCameraRequestContext, type InteriorCameraRequest } from '../../
 import {
   expandCommercialMapControlAngles,
   prepareOrbitControlsForTransitionHandoff,
+  registerCommercialMapNavigationCancellation,
   stabilizeCameraTransitionUp,
+  stopCommercialMapOrbitMotion,
 } from '../../utils/cameraTransition';
 import {
-  recordCommercialMapFrame,
   recordCommercialMapProfiler,
   registerCommercialMapControlsDiagnostics,
   registerCommercialMapRuntimeDiagnostics,
@@ -157,6 +158,7 @@ import { CommercialMapEnvironment } from './CommercialMapEnvironment';
 import { applyParkGroundDetail } from './terrainMaterial';
 import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 import { CommercialMapAdaptiveQualityController } from './CommercialMapAdaptiveQuality';
+import { RuntimeFrameDiagnostics } from './CommercialMapRuntimeFrameDiagnostics';
 import {
   createInitialCommercialMapQualityState,
   readCommercialMapDeviceCapabilityHints,
@@ -2467,12 +2469,13 @@ function CameraRig({
 
   useEffect(() => {
     const interruptTransition = () => cancelCameraTransition(true);
-    const canvas = gl.domElement;
-    canvas.addEventListener('pointerdown', interruptTransition, true);
-    canvas.addEventListener('wheel', interruptTransition, { capture: true, passive: true });
+    // drei may connect controls to the outer R3F event div, not the canvas.
+    const element = controlsRef.current?.domElement ?? gl.domElement;
+    element.addEventListener('pointerdown', interruptTransition, true);
+    element.addEventListener('wheel', interruptTransition, { capture: true, passive: true });
     return () => {
-      canvas.removeEventListener('pointerdown', interruptTransition, true);
-      canvas.removeEventListener('wheel', interruptTransition, true);
+      element.removeEventListener('pointerdown', interruptTransition, true);
+      element.removeEventListener('wheel', interruptTransition, true);
     };
   }, [cancelCameraTransition, gl]);
 
@@ -2911,6 +2914,57 @@ function CameraRig({
     window.clearTimeout(resizeRefitTimer.current);
     resizeRefitTimer.current = null;
   }, []);
+
+  const cancelTransientNavigation = useCallback(() => {
+    // Cinematic locks own their timeline and must not be released by an OS
+    // gesture cancellation or tab switch. Their visibility pause stays intact.
+    if (lunarCameraLockedRef.current) return;
+    cancelCameraTransition(true);
+    cancelScheduledResizeRefit();
+    pendingResizeRefit.current = false;
+    navigation.current.active = false;
+    navigation.current.navigating = false;
+    navigation.current.settling = false;
+    navigation.current.stableFrames = 0;
+    animating.current = false;
+    const controls = controlsRef.current;
+    if (controls) {
+      stopCommercialMapOrbitMotion(camera, controls);
+      controls.enabled = true;
+      controls.enableDamping = true;
+      controls.enablePan = interiorFrame?.enablePan ?? true;
+      controls.enableRotate = true;
+      controls.enableZoom = true;
+      controls.zoomToCursor = interiorFrame?.zoomToCursor ?? !miranteSelected;
+    }
+    targetPosition.current.copy(camera.position);
+    targetLookAt.current.copy(controls?.target ?? targetLookAt.current);
+    preserveManualView.current = true;
+    resizeRefitSuppressedUntil.current = Date.now()
+      + COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS;
+    setTransitionControlsLocked(false);
+    setCameraNavigating(false);
+    gl.domElement.style.cursor = 'grab';
+    invalidate();
+  }, [
+    camera,
+    cancelCameraTransition,
+    cancelScheduledResizeRefit,
+    gl,
+    interiorFrame,
+    invalidate,
+    miranteSelected,
+    setCameraNavigating,
+  ]);
+
+  const cancelTransientNavigationRef = useRef(cancelTransientNavigation);
+  cancelTransientNavigationRef.current = cancelTransientNavigation;
+  useEffect(() => registerCommercialMapNavigationCancellation({
+    canvas: gl.domElement,
+    controlsElement: controlsRef.current?.domElement ?? gl.domElement,
+    // Keep the pointer registry through DPR/viewport and camera-limit updates.
+    onCancel: () => cancelTransientNavigationRef.current(),
+  }), [gl]);
 
   const captureLunarCamera = useCallback((): LunarCameraSnapshot | null => {
     const controls = controlsRef.current;
@@ -4035,32 +4089,6 @@ function CameraRig({
   );
 }
 
-function RuntimeFrameDiagnostics() {
-  const active = useRef(false);
-  const frameCount = useRef(0);
-  useFrame(({ gl }, delta) => {
-    if (!import.meta.env.DEV) return;
-    if (frameCount.current % 30 === 0) window.__commercialMapRuntimeDiagnostics?.capture();
-    gl.info.reset();
-    const state = useCommercialMapStore.getState();
-    const measuring = state.cameraNavigating
-      || state.lunarLaunchPhase !== 'idle'
-      || state.lunarLaunchReturning;
-    if (!measuring) {
-      active.current = false;
-      frameCount.current = 0;
-      return;
-    }
-    if (!active.current) {
-      active.current = true;
-      return;
-    }
-    recordCommercialMapFrame(delta * 1000);
-    frameCount.current += 1;
-  }, -100);
-  return null;
-}
-
 /** Camera motion is intentionally isolated from Scene. Subscribing the scene
  * root made every gesture reconcile all entity meshes merely to suppress hover.
  */
@@ -4356,14 +4384,15 @@ function Scene({
       || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry)
       ? selectParkAccessCompatibleTreesForPresentation(sceneTrees)
       : sceneTrees;
-    const parkAccessCompatibleTrees = rearParkingEnabled
+    // Hydrology hides vegetation; it does not change its physical placement.
+    const parkAccessCompatibleTrees = rearParkingAvailable
       ? [...baseTrees, ...reconcileRearParkingTrees(baseTrees, entities)]
       : baseTrees;
-    const rearRoadCompatibleTrees = !isolatedArea && !hydrologicalModeActive
+    const rearRoadCompatibleTrees = !isolatedArea
       ? selectRearRoadCompatibleTreesForPresentation(parkAccessCompatibleTrees)
       : parkAccessCompatibleTrees;
     return rearRoadCompatibleTrees;
-  }, [entities, hydrologicalModeActive, isolatedArea, rearParkingEnabled, sceneTrees]);
+  }, [entities, isolatedArea, rearParkingAvailable, sceneTrees]);
   const selectedLunarTreeEntity = selectedEntity
     && resolveStrategicLandmarkKind(selectedEntity) === 'lunar-tree'
     ? selectedEntity
@@ -4379,9 +4408,9 @@ function Scene({
       treeRemainsVisibleWithSelectedApollo(tree, memorialCenter)
     ));
   }, [rearRoadCompatibleSceneTrees, selectedLunarTreeEntity]);
-  const treeSurfaceEntities = useMemo(() => rearParkingEnabled
+  const treeSurfaceEntities = useMemo(() => rearParkingAvailable
     ? [...exteriorRenderedEntities, ...REAR_PARKING_GROUND_SUPPORTS]
-    : exteriorRenderedEntities, [exteriorRenderedEntities, rearParkingEnabled]);
+    : exteriorRenderedEntities, [exteriorRenderedEntities, rearParkingAvailable]);
   const parkAccessScope = parkAccessInfrastructureScopeForArea(isolatedArea);
   const parkAccessPresentation = useMemo(() => {
     const resolveOwners = (identifiers: readonly string[]) => {
@@ -4716,7 +4745,7 @@ function Scene({
         nodes={sceneElectricalInfrastructure.nodes}
         connections={sceneElectricalInfrastructure.connections}
         surfaceEntities={entities}
-        rearRoadsActive={!isolatedArea && !hydrologicalModeActive}
+        rearRoadsActive={!isolatedArea}
         visible={treesVisible && !hydrologicalModeActive}
         reducedGraphics={reducedGraphics}
       />

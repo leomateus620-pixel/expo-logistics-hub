@@ -43,6 +43,18 @@
   color: #145879;
 }
 
+.commercial-map-rendering-diagnostics__manual-controls { min-width: 0; margin: 0; padding: 0; border: 0; }
+.commercial-map-rendering-diagnostics__stress { position: relative; z-index: 30; padding: 5px 12px; background: #f4f8f5; border-bottom: 1px solid #d4dfd8; color: #304a3e; font-size: 10px; }
+.commercial-map-rendering-diagnostics__stress-controls { display: flex; flex-wrap: wrap; gap: 5px; }
+.commercial-map-rendering-diagnostics__stress button { padding: 4px 7px; border: 1px solid #bccfc1; border-radius: 6px; background: white; font-weight: 600; }
+.commercial-map-rendering-diagnostics button:disabled { opacity: .45; cursor: not-allowed; }
+.commercial-map-rendering-diagnostics__stress output { display: block; margin-top: 3px; overflow-wrap: anywhere; }
+.commercial-map-rendering-diagnostics__stress details { margin-top: 3px; }
+.commercial-map-rendering-diagnostics__stress summary { cursor: pointer; }
+.commercial-map-rendering-diagnostics__stress pre { max-height: 150px; overflow: auto; font-size: 9px; }
+.commercial-map-rendering-diagnostics__stress[data-stress-status="failed"] { color: #9c2828; }
+.commercial-map-rendering-diagnostics__stress[data-stress-status="passed"] { color: #126338; }
+
 .commercial-map-rendering-diagnostics__viewport { min-height: 0; }
 .commercial-map-rendering-diagnostics__metrics {
   position: absolute;

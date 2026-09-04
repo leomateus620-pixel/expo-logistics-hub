@@ -121,6 +121,39 @@ export function resolveCommercialMapInteractionPixelRatio(restingDpr: number) {
   ).toFixed(3));
 }
 
+export interface CommercialMapPixelRatioState {
+  /** Latest adaptive/viewport choice, never a snapshot of the gesture scale. */
+  baseDpr: number;
+  effectiveDpr: number;
+  gestureActive: boolean;
+}
+
+export function createCommercialMapPixelRatioState(baseDpr: number): CommercialMapPixelRatioState {
+  return { baseDpr, effectiveDpr: baseDpr, gestureActive: false };
+}
+
+/**
+ * The sole DPR owner's state transition. Keep allocations out of an ongoing
+ * gesture, but remember every new base choice so ending it cannot restore a
+ * stale DPR captured by a different render-path effect.
+ */
+export function updateCommercialMapPixelRatioState(
+  state: CommercialMapPixelRatioState,
+  gestureActive: boolean,
+  baseDpr = state.baseDpr,
+): number | null {
+  if (Number.isFinite(baseDpr) && baseDpr > 0) state.baseDpr = baseDpr;
+  const nextDpr = gestureActive
+    ? state.gestureActive
+      ? state.effectiveDpr
+      : resolveCommercialMapInteractionPixelRatio(state.baseDpr)
+    : state.baseDpr;
+  state.gestureActive = gestureActive;
+  if (Math.abs(state.effectiveDpr - nextDpr) <= 0.005) return null;
+  state.effectiveDpr = nextDpr;
+  return nextDpr;
+}
+
 export function shouldDeferCommercialMapSceneQuality({
   fromTier,
   toTier,

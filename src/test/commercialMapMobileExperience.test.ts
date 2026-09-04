@@ -1,13 +1,84 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { parse } from 'postcss';
 import { describe, expect, it } from 'vitest';
 
 const read = (path: string) => readFileSync(resolve(path), 'utf8');
 
+function declarations(styles: string, selector: string, property: string) {
+  const matches: { value: string; conditions: string[] }[] = [];
+  parse(styles).walkRules((rule) => {
+    if (!rule.selectors.includes(selector)) return;
+    rule.walkDecls(property, (declaration) => {
+      const conditions: string[] = [];
+      let ancestor = rule.parent;
+      while (ancestor && ancestor.type !== 'root') {
+        if (ancestor.type === 'atrule') conditions.unshift(`@${ancestor.name} ${ancestor.params}`);
+        ancestor = ancestor.parent;
+      }
+      matches.push({ value: declaration.value, conditions });
+    });
+  });
+  return matches;
+}
+
+const compactControlConditions = [
+  ['@container commercial-map (max-width: 720px)'],
+  ['@media (max-width: 950px) and (max-height: 520px)'],
+];
+
 describe('arquitetura mobile-first do Mapa Comercial', () => {
-  it('usa apenas a barra compacta até 950px, incluindo o telefone em paisagem', () => {
+  it('oculta a barra superior somente quando a barra compacta está visível', () => {
     const topbar = read('src/features/commercial-map/components/controls/commercial-map-topbar.css');
-    expect(topbar).toMatch(/@media \(max-width: 950px\)\s*\{\s*\.commercial-map-topbar \{ display: none; \}/);
+    const mobile = read('src/features/commercial-map/commercial-map-mobile.css');
+
+    expect(declarations(topbar, '.commercial-map-topbar', 'display')).toEqual([
+      { value: 'flex', conditions: [] },
+      ...compactControlConditions.map((conditions) => ({ value: 'none', conditions })),
+    ]);
+    expect(declarations(mobile, '.commercial-map-toolbar-mobile', 'display')).toEqual([
+      { value: 'none', conditions: [] },
+      ...compactControlConditions.map((conditions) => ({ value: 'flex', conditions })),
+    ]);
+  });
+
+  it('libera o espaço do dock para os controles compactos, inclusive em paisagem', () => {
+    const dock = read('src/features/commercial-map/components/dock/commercial-map-dock.css');
+    const layout = read('src/features/commercial-map/commercial-map.css');
+
+    expect(declarations(dock, '.commercial-map-dock', 'display')).toEqual([
+      { value: 'flex', conditions: [] },
+      ...compactControlConditions.map((conditions) => ({ value: 'none', conditions })),
+    ]);
+    expect(declarations(layout, '.commercial-map-body', 'display')).toContainEqual({ value: 'flex', conditions: [] });
+    expect(declarations(layout, '.commercial-map-viewport', 'flex')).toContainEqual({ value: '1', conditions: [] });
+  });
+
+  it('mostra Filtros flutuante exatamente quando o dock é substituído pelos controles compactos', () => {
+    const layout = read('src/features/commercial-map/commercial-map.css');
+    const mobile = read('src/features/commercial-map/commercial-map-mobile.css');
+
+    expect(declarations(layout, '.commercial-map-actions', 'display')).toEqual([
+      { value: 'none', conditions: [] },
+    ]);
+    expect(declarations(mobile, '.commercial-map-shell .commercial-map-actions', 'display')).toEqual(
+      compactControlConditions.map((conditions) => ({ value: 'flex', conditions })),
+    );
+  });
+
+  it('mantém o total do resumo dentro do rail sem herdar a rolagem horizontal flutuante', () => {
+    const dock = read('src/features/commercial-map/components/dock/commercial-map-dock.css');
+    const summary = '.commercial-map-dock .commercial-map-summary.is-dock';
+    const compact = '.commercial-map-dock.is-compact .commercial-map-summary.is-compact';
+    const scroll = '.commercial-map-dock.is-compact .commercial-map-dock__scroll';
+    const primary = '.commercial-map-dock .commercial-map-summary.is-compact .commercial-map-summary-primary';
+
+    expect(declarations(dock, summary, 'overflow')).toEqual([{ value: 'visible', conditions: [] }]);
+    expect(declarations(dock, summary, 'height')).toEqual([{ value: 'auto', conditions: [] }]);
+    expect(declarations(dock, scroll, 'scrollbar-gutter')).toEqual([{ value: 'auto', conditions: [] }]);
+    expect(declarations(dock, compact, 'width')).toEqual([{ value: '100%', conditions: [] }]);
+    expect(declarations(dock, compact, 'max-width')).toEqual([{ value: '46px', conditions: [] }]);
+    expect(declarations(dock, primary, 'padding-inline')).toEqual([{ value: '0', conditions: [] }]);
   });
 
   it('integra a busca no cabeçalho e mantém o mesmo estado comercial', () => {
