@@ -7,7 +7,13 @@ import {
 } from './viewport';
 
 export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS = 250;
-export const COMMERCIAL_MAP_QUALITY_SCENE_COMMIT_IDLE_MS = 180;
+export const COMMERCIAL_MAP_INTERACTION_MIN_PIXEL_RATIO = 0.72;
+export const COMMERCIAL_MAP_INTERACTION_MAX_PIXEL_RATIO = 1;
+export const COMMERCIAL_MAP_INTERACTION_PIXEL_RATIO_SCALE = 0.72;
+// DPR changes resize the drawing buffer and every post-processing target.
+// Wait for OrbitControls damping to finish, then require a meaningful idle
+// window so those allocations never land in the tail of the same gesture.
+export const COMMERCIAL_MAP_QUALITY_SCENE_COMMIT_IDLE_MS = 650;
 
 export interface CommercialMapDeviceCapabilityHints {
   deviceMemoryGb?: number;
@@ -91,8 +97,28 @@ export function shouldApplyCommercialMapPixelRatioNow({
   nextDpr: number;
   gestureActive: boolean;
 }) {
-  if (!gestureActive) return true;
-  return nextDpr <= currentDpr + 0.005;
+  if (Math.abs(nextDpr - currentDpr) <= 0.005) return true;
+  return !gestureActive;
+}
+
+/**
+ * A deterministic, bounded render scale for camera motion. It changes only at
+ * gesture boundaries and never mutates the logical adaptive-quality tier.
+ * The full-resolution post stack therefore stays allocated while the default
+ * framebuffer alone becomes cheaper to orbit, pan and zoom.
+ */
+export function resolveCommercialMapInteractionPixelRatio(restingDpr: number) {
+  if (!Number.isFinite(restingDpr) || restingDpr <= 0) {
+    return COMMERCIAL_MAP_INTERACTION_MIN_PIXEL_RATIO;
+  }
+  return Number(Math.min(
+    restingDpr,
+    COMMERCIAL_MAP_INTERACTION_MAX_PIXEL_RATIO,
+    Math.max(
+      COMMERCIAL_MAP_INTERACTION_MIN_PIXEL_RATIO,
+      restingDpr * COMMERCIAL_MAP_INTERACTION_PIXEL_RATIO_SCALE,
+    ),
+  ).toFixed(3));
 }
 
 export function shouldDeferCommercialMapSceneQuality({

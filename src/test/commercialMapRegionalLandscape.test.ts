@@ -120,9 +120,9 @@ describe('entorno regional cenográfico do Mapa Comercial', () => {
     );
 
     expect(environment).toContain("import { RegionalLandscapeLayer } from './RegionalLandscapeLayer';");
-    expect(activeGroup).toContain(
-      "{mode === 'normal' && <RegionalLandscapeLayer qualityTier={qualityTier} />}",
-    );
+    expect(activeGroup).toContain("<group visible={mode === 'normal'}>");
+    expect(activeGroup).toContain('<RegionalLandscapeLayer qualityTier={qualityTier} />');
+    expect(activeGroup).not.toContain("mode === 'normal' && <RegionalLandscapeLayer");
     expect(canvas).not.toContain("from './RegionalLandscapeLayer'");
   });
 });

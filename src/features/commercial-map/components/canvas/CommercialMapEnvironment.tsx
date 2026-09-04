@@ -33,6 +33,7 @@ import {
   resolveCommercialMapEnvironmentQualityTier,
   type CommercialMapQualityTier,
 } from '../../utils/viewport';
+import { resolveCommercialMapInteractionPixelRatio } from '../../utils/adaptiveQualityRuntime';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import {
   openGroundTextureBundleForEntity,
@@ -252,7 +253,8 @@ function createSky(
       float dither = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5;
       gl_FragColor = vec4(max(composedSky + dither / 720.0, vec3(0.0)), 1.0);`,
     );
-  material.customProgramCacheKey = () => `commercial-map-camera-safe-sunrise-sky-${mode}-v4`;
+  // Mode changes uniforms only; both palettes intentionally share one program.
+  material.customProgramCacheKey = () => 'commercial-map-camera-safe-sunrise-sky-v5';
   material.needsUpdate = true;
   return sky;
 }
@@ -433,6 +435,11 @@ class CommercialMapSharpenEffect extends Effect {
       },
     );
   }
+
+  setStrength(strength: number) {
+    const uniform = this.uniforms.get('uSharpenStrength');
+    if (uniform) uniform.value = THREE.MathUtils.clamp(strength, 0, 0.6);
+  }
 }
 
 /** The installed React wrapper removes, but does not dispose, EffectPasses when
@@ -443,9 +450,6 @@ function createCommercialMapPostProcessing(
   gl: THREE.WebGLRenderer,
   scene: THREE.Scene,
   camera: THREE.Camera,
-  bloomLevels: number,
-  smaaPreset: 'high' | 'ultra',
-  sharpenStrength = 0,
 ) {
   const previousAutoClear = gl.autoClear;
   const composer = new EffectComposer(gl, {
@@ -461,28 +465,33 @@ function createCommercialMapPostProcessing(
     luminanceThreshold: 3.2,
     luminanceSmoothing: 0.16,
     mipmapBlur: true,
-    levels: bloomLevels,
+    // Keep the authored full-quality glow at rest. Interaction frames bypass
+    // this persistent stack, so these levels never tax orbit/pan/zoom.
+    levels: COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality.full.bloomLevels,
   });
   const toneMapping = new ToneMappingEffect({ mode: ToneMappingMode.ACES_FILMIC });
   // Renderer MSAA only affects the default framebuffer. The exterior renders
   // through an HDR target, so it needs its own edge resolve. SMAA keeps roof,
   // road and parking lines stable without TAA ghosting during pan/selection.
   const smaa = new SMAAEffect({
-    preset: smaaPreset === 'ultra' ? SMAAPreset.ULTRA : SMAAPreset.HIGH,
+    // A single program variant prevents HIGH <-> ULTRA shader recompiles.
+    preset: SMAAPreset.ULTRA,
   });
+  const sharpen = new CommercialMapSharpenEffect(0);
   const renderPass = new RenderPass(scene, camera);
   // SMAA must see the final tone-mapped image. Keeping it in the same
   // EffectPass would let postprocessing sort the convolution effect ahead of
   // Bloom/ACES, which weakens edge detection on HDR values.
   const effectPass = new EffectPass(camera, bloom, toneMapping);
   const smaaPass = new EffectPass(camera, smaa);
+  const sharpenPass = new EffectPass(camera, sharpen);
+  sharpenPass.enabled = false;
   composer.addPass(renderPass);
   composer.addPass(effectPass);
   composer.addPass(smaaPass);
-  if (sharpenStrength > 0) {
-    // Sharpen after the edge resolve so it never amplifies aliasing.
-    composer.addPass(new EffectPass(camera, new CommercialMapSharpenEffect(sharpenStrength)));
-  }
+  // Keep the pass allocated across tiers. Toggling `enabled` changes neither
+  // the composer's targets nor effect listeners.
+  composer.addPass(sharpenPass);
   let disposed = false;
   let selectionShadersPrepared = false;
   return {
@@ -490,6 +499,10 @@ function createCommercialMapPostProcessing(
     bloom,
     toneMapping,
     smaa,
+    setSharpenStrength: (strength: number) => {
+      sharpen.setStrength(strength);
+      sharpenPass.enabled = strength > 0;
+    },
     prepareSelectionShaders: () => {
       if (selectionShadersPrepared) return;
       const highlights = scene.getObjectByName('commercial-map-selection-shader-warmup');
@@ -529,9 +542,11 @@ function createCommercialMapPostProcessing(
 export function SunrisePostProcessing({
   qualityTier,
   enabled,
+  interactionActive = false,
 }: {
   qualityTier: CommercialMapSunriseQualityTier;
   enabled: boolean;
+  interactionActive?: boolean;
 }) {
   const gl = useThree((state) => state.gl);
   const scene = useThree((state) => state.scene);
@@ -541,9 +556,12 @@ export function SunrisePostProcessing({
   // composer sizes its HDR targets from the drawing buffer, so it must follow.
   const pixelRatio = useThree((state) => state.viewport?.dpr ?? 1);
   const invalidate = useThree((state) => state.invalidate);
+  const setDpr = useThree((state) => state.setDpr);
   const quality = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality[qualityTier];
   const pipeline = useRef<ReturnType<typeof createCommercialMapPostProcessing> | null>(null);
   const rendererState = useRef({ autoClear: gl.autoClear, toneMapping: gl.toneMapping });
+  const restingPixelRatio = useRef(pixelRatio);
+  const interactionScaled = useRef(false);
   const [contextEpoch, setContextEpoch] = useState(0);
 
   useLayoutEffect(() => {
@@ -582,16 +600,13 @@ export function SunrisePostProcessing({
   }, [gl, invalidate]);
 
   useLayoutEffect(() => {
-    if (!quality.bloomEnabled) return;
+    if (!quality.bloomEnabled || pipeline.current) return;
     let next: ReturnType<typeof createCommercialMapPostProcessing> | null = null;
     try {
       next = createCommercialMapPostProcessing(
         gl,
         scene,
         camera,
-        quality.bloomLevels,
-        quality.smaaPreset === 'ultra' ? 'ultra' : 'high',
-        quality.sharpenStrength,
       );
     } catch (error) {
       // Some mobile drivers reject half-float render targets. The map remains
@@ -608,26 +623,49 @@ export function SunrisePostProcessing({
     }
     pipeline.current = next;
     invalidate();
-    return () => {
-      if (pipeline.current === next) pipeline.current = null;
-      next.dispose();
-    };
   }, [
     camera,
     gl,
     invalidate,
     quality.bloomEnabled,
-    quality.bloomLevels,
-    quality.sharpenStrength,
-    quality.smaaPreset,
     scene,
     contextEpoch,
   ]);
 
+  useLayoutEffect(() => () => {
+    const current = pipeline.current;
+    pipeline.current = null;
+    current?.dispose();
+  }, [camera, gl, scene, contextEpoch]);
+
   useLayoutEffect(() => {
+    pipeline.current?.setSharpenStrength(quality.sharpenStrength);
+    invalidate();
+  }, [invalidate, quality.sharpenStrength]);
+
+  useLayoutEffect(() => {
+    if (interactionActive) {
+      if (interactionScaled.current) return;
+      const currentDpr = gl.getPixelRatio();
+      restingPixelRatio.current = currentDpr;
+      interactionScaled.current = true;
+      const interactionDpr = resolveCommercialMapInteractionPixelRatio(currentDpr);
+      if (Math.abs(currentDpr - interactionDpr) > 0.005) setDpr(interactionDpr);
+      invalidate();
+      return;
+    }
+    if (!interactionScaled.current) return;
+    interactionScaled.current = false;
+    const restoredDpr = restingPixelRatio.current;
+    if (Math.abs(gl.getPixelRatio() - restoredDpr) > 0.005) setDpr(restoredDpr);
+    invalidate();
+  }, [gl, interactionActive, invalidate, setDpr]);
+
+  useLayoutEffect(() => {
+    if (!enabled || !quality.bloomEnabled) return;
     pipeline.current?.composer.setSize(size.width, size.height);
     invalidate();
-  }, [invalidate, pixelRatio, quality.bloomEnabled, quality.bloomLevels, size.height, size.width]);
+  }, [enabled, invalidate, pixelRatio, quality.bloomEnabled, size.height, size.width]);
 
   useLayoutEffect(() => {
     // A disabled composer no longer owns output encoding. Restore the same
@@ -643,8 +681,6 @@ export function SunrisePostProcessing({
     gl,
     invalidate,
     quality.bloomEnabled,
-    quality.bloomLevels,
-    quality.smaaPreset,
   ]);
 
   useFrame((_state, delta) => {
@@ -761,6 +797,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   const sunriseSequence = useCommercialMapStore((state) => state.sunriseSequence);
   const sunriseStartedAt = useCommercialMapStore((state) => state.sunriseStartedAt);
   const requestSunrise = useCommercialMapStore((state) => state.requestSunrise);
+  const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
   const mode: CommercialMapEnvironmentMode = hydrologicalModeActive ? 'hydrological' : 'normal';
   const palette = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes[mode];
   const initialQualityTier = useRef<CommercialMapSunriseQualityTier | undefined>(undefined);
@@ -861,7 +898,6 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     [qualityTier, shadowFrustum, sunTarget],
   );
   const activeGroundTextures = useMemo(() => {
-    if (hydrologicalModeActive) return null;
     const repeatX = layout.outerGroundSize / ACTIVE_GROUND_PROFILE.tileWorldSize;
     const repeatY = layout.outerGroundSize / ACTIVE_GROUND_PROFILE.tileWorldSize;
     // PlaneGeometry has normalized UVs. Include its final transform in the
@@ -871,22 +907,22 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       wrapT: THREE.MirroredRepeatWrapping,
       repeat: [repeatX, repeatY],
     });
-  }, [hydrologicalModeActive, layout.outerGroundSize, maximumAnisotropy]);
-  const activeGroundMaterial = useMemo(() => {
+  }, [layout.outerGroundSize, maximumAnisotropy]);
+  const normalGroundMaterial = useMemo(() => {
     const createBaseMaterial = () => new THREE.MeshStandardMaterial({
       name: 'CommercialMapOuterGroundMaterial',
-      color: palette.activeGround,
-      map: activeGroundTextures?.map ?? null,
-      normalMap: activeGroundTextures?.normalMap ?? null,
-      normalScale: activeGroundTextures ? ACTIVE_GROUND_NORMAL_SCALE : undefined,
-      roughnessMap: activeGroundTextures?.roughnessMap ?? null,
+      color: COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.normal.activeGround,
+      map: activeGroundTextures.map,
+      normalMap: activeGroundTextures.normalMap,
+      normalScale: ACTIVE_GROUND_NORMAL_SCALE,
+      roughnessMap: activeGroundTextures.roughnessMap,
       roughness: 0.98,
       metalness: 0,
       envMapIntensity: 0.12,
     });
     const material = createBaseMaterial();
     const terrainDetail = resolveTerrainMultiscaleQualityOptions(
-      qualityTier,
+      initialQualityTier.current as CommercialMapSunriseQualityTier,
       cameraDistanceBounds.maxDistance,
       [extent.centerX, extent.centerZ],
     );
@@ -911,8 +947,17 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     extent.centerX,
     extent.centerZ,
     gl,
-    palette.activeGround,
   ]);
+  const hydrologicalGroundMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    name: 'CommercialMapHydrologicalOuterGroundMaterial',
+    color: COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.hydrological.activeGround,
+    roughness: 0.98,
+    metalness: 0,
+    envMapIntensity: 0.08,
+  }), []);
+  const activeGroundMaterial = hydrologicalModeActive
+    ? hydrologicalGroundMaterial
+    : normalGroundMaterial;
   useLayoutEffect(() => {
     const terrainDetail = resolveTerrainMultiscaleQualityOptions(
       qualityTier,
@@ -921,15 +966,15 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     );
     if (!terrainDetail) return;
     try {
-      applyTerrainMultiscaleDetail(activeGroundMaterial, terrainDetail);
+      applyTerrainMultiscaleDetail(normalGroundMaterial, terrainDetail);
     } catch {
       // The installed program stays; compile already kept a PBR fallback.
     }
   }, [
-    activeGroundMaterial,
     cameraDistanceBounds.maxDistance,
     extent.centerX,
     extent.centerZ,
+    normalGroundMaterial,
     qualityTier,
   ]);
   const reflectionTextureWidth = qualityTier === 'reduced'
@@ -945,6 +990,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   );
   const ambientRef = useRef<THREE.AmbientLight>(null);
   const hemisphereRef = useRef<THREE.HemisphereLight>(null);
+  const outerGroundRef = useRef<THREE.Mesh>(null);
   const timeline = useRef({
     sequence: -1,
     lastAppliedProgress: -1,
@@ -983,7 +1029,9 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
 
   useEffect(() => () => reflectionTexture.dispose(), [reflectionTexture]);
 
-  useEffect(() => () => activeGroundMaterial.dispose(), [activeGroundMaterial]);
+  useEffect(() => () => normalGroundMaterial.dispose(), [normalGroundMaterial]);
+
+  useEffect(() => () => hydrologicalGroundMaterial.dispose(), [hydrologicalGroundMaterial]);
 
   useEffect(() => {
     timeline.current.sequence = sunriseSequence;
@@ -1009,11 +1057,23 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   ]);
 
   useEffect(() => {
-    // The first demand-render compiles the persistent post stack. Compile the
-    // scene once more before starting so a replay never allocates or flashes.
+    // Preload owns the full scene. Warm only the two outer-ground variants
+    // here, using the live scene as the lighting environment, so startup does
+    // not traverse and compile hundreds of unrelated meshes twice.
     const compileStartedAt = typeof performance === 'undefined' ? Date.now() : performance.now();
     const programsBefore = gl.info.programs?.length ?? 0;
-    gl.compile(scene, camera);
+    const outerGround = outerGroundRef.current;
+    const attachedMaterial = outerGround?.material;
+    // Both mode-specific materials stay alive for the Environment lifetime.
+    // Compile each variant during startup so switching Hydrological mode never
+    // allocates textures or compiles a new terrain program inside the gesture.
+    const groundMaterials = [normalGroundMaterial, hydrologicalGroundMaterial];
+    for (const groundMaterial of groundMaterials) {
+      if (outerGround) outerGround.material = groundMaterial;
+      if (outerGround) gl.compile(outerGround, camera, scene);
+    }
+    if (!outerGround) gl.compile(scene, camera);
+    if (outerGround && attachedMaterial) outerGround.material = attachedMaterial;
     if (import.meta.env.DEV) {
       const compileCompletedAt = typeof performance === 'undefined' ? Date.now() : performance.now();
       gl.domElement.dataset.commercialMapShaderCompilation = JSON.stringify({
@@ -1027,7 +1087,15 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     }
     if (useCommercialMapStore.getState().sunrisePhase === 'idle') requestSunrise();
     else invalidate();
-  }, [activeGroundMaterial, camera, gl, invalidate, requestSunrise, scene]);
+  }, [
+    camera,
+    gl,
+    hydrologicalGroundMaterial,
+    invalidate,
+    normalGroundMaterial,
+    requestSunrise,
+    scene,
+  ]);
 
   useEffect(() => () => {
     sky.geometry.dispose();
@@ -1194,17 +1262,29 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
         ]}
       />
       <mesh
+        ref={outerGroundRef}
         rotation={[-Math.PI / 2, 0, 0]}
         position={[extent.centerX, -0.08, extent.centerZ]}
         receiveShadow
         raycast={NO_RAYCAST}
       >
         <planeGeometry args={[layout.outerGroundSize, layout.outerGroundSize]} />
-        <primitive object={activeGroundMaterial} attach="material" dispose={null} />
+        {/* R3F never auto-disposes primitive objects. Passing dispose={null}
+            here would overwrite MeshStandardMaterial.dispose at runtime. */}
+        <primitive object={activeGroundMaterial} attach="material" />
       </mesh>
-      {mode === 'normal' && <RegionalLandscapeLayer qualityTier={qualityTier} />}
+      <group visible={mode === 'normal'}>
+        <RegionalLandscapeLayer qualityTier={qualityTier} />
       </group>
-      <SunrisePostProcessing qualityTier={qualityTier} enabled={active} />
+      </group>
+      {/* The persistent composer remains allocated, but native MSAA renders
+          interaction frames directly. The refined post stack resumes after
+          damping settles, without target churn or a shader rebuild. */}
+      <SunrisePostProcessing
+        qualityTier={qualityTier}
+        enabled={active && !cameraNavigating}
+        interactionActive={active && cameraNavigating}
+      />
     </>
   );
 });

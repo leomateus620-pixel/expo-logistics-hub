@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import type { WebGLRenderer } from 'three';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import type { CommercialMapQualityTier } from './viewport';
+import { COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS } from './adaptiveQualityRuntime';
 
 interface RuntimeEvent {
   at: number;
@@ -10,7 +11,7 @@ interface RuntimeEvent {
   [key: string]: unknown;
 }
 
-interface RendererSnapshot {
+export interface RendererSnapshot {
   at: number;
   calls: number;
   triangles: number;
@@ -22,6 +23,24 @@ interface RendererSnapshot {
   height: number;
   heapBytes: number | null;
   qualityTier: CommercialMapQualityTier | null;
+  gpuVendor: string;
+  gpuRenderer: string;
+}
+
+export interface CommercialMapRuntimeSummary {
+  sampledFrames: number;
+  averageFrameTimeMs: number | null;
+  p95FrameTimeMs: number | null;
+  p99FrameTimeMs: number | null;
+  averageFps: number | null;
+  onePercentLowFps: number | null;
+  jankFrames: number;
+  longTasks: number;
+  reactCommits: number;
+  qualityChanges: number;
+  contextLost: number;
+  contextRestored: number;
+  renderer: RendererSnapshot | null;
 }
 
 export interface CommercialMapRuntimeDiagnostics {
@@ -64,6 +83,48 @@ function now() {
 function appendBounded<T>(target: T[], entry: T, limit = 240) {
   target.push(entry);
   if (target.length > limit) target.splice(0, target.length - limit);
+}
+
+function percentile(sorted: readonly number[], ratio: number) {
+  if (sorted.length === 0) return null;
+  return sorted[Math.min(sorted.length - 1, Math.ceil(sorted.length * ratio) - 1)];
+}
+
+function fixedOrNull(value: number | null, digits = 2) {
+  return value === null ? null : Number(value.toFixed(digits));
+}
+
+export function summarizeCommercialMapRuntimeDiagnostics(
+  diagnostics: CommercialMapRuntimeDiagnostics | undefined = typeof window === 'undefined'
+    ? undefined
+    : window.__commercialMapRuntimeDiagnostics,
+): CommercialMapRuntimeSummary {
+  const durations = (diagnostics?.frameTimes ?? [])
+    .map((entry) => Number(entry.duration))
+    .filter((duration) => Number.isFinite(duration)
+      && duration > 0
+      && duration <= COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS)
+    .sort((a, b) => a - b);
+  const average = durations.length > 0
+    ? durations.reduce((total, duration) => total + duration, 0) / durations.length
+    : null;
+  const p95 = percentile(durations, 0.95);
+  const p99 = percentile(durations, 0.99);
+  return {
+    sampledFrames: durations.length,
+    averageFrameTimeMs: fixedOrNull(average),
+    p95FrameTimeMs: fixedOrNull(p95),
+    p99FrameTimeMs: fixedOrNull(p99),
+    averageFps: fixedOrNull(average && average > 0 ? 1000 / average : null, 1),
+    onePercentLowFps: fixedOrNull(p99 && p99 > 0 ? 1000 / p99 : null, 1),
+    jankFrames: durations.filter((duration) => duration > 20).length,
+    longTasks: diagnostics?.longTasks.length ?? 0,
+    reactCommits: diagnostics?.reactCommits.length ?? 0,
+    qualityChanges: diagnostics?.qualityChanges.length ?? 0,
+    contextLost: diagnostics?.contextLost ?? 0,
+    contextRestored: diagnostics?.contextRestored ?? 0,
+    renderer: diagnostics?.snapshots.at(-1) ?? null,
+  };
 }
 
 function ensureDiagnostics() {
@@ -174,6 +235,17 @@ export function registerCommercialMapRuntimeDiagnostics({
 
   const capture = () => {
     const drawingBuffer = gl.getDrawingBufferSize(new THREE.Vector2());
+    const context = gl.getContext();
+    const debugRendererInfo = context.getExtension('WEBGL_debug_renderer_info') as {
+      UNMASKED_VENDOR_WEBGL: number;
+      UNMASKED_RENDERER_WEBGL: number;
+    } | null;
+    const gpuVendor = String(context.getParameter(
+      debugRendererInfo?.UNMASKED_VENDOR_WEBGL ?? context.VENDOR,
+    ) ?? 'unavailable');
+    const gpuRenderer = String(context.getParameter(
+      debugRendererInfo?.UNMASKED_RENDERER_WEBGL ?? context.RENDERER,
+    ) ?? 'unavailable');
     const performanceMemory = performance as Performance & {
       memory?: { usedJSHeapSize?: number };
     };
@@ -189,6 +261,8 @@ export function registerCommercialMapRuntimeDiagnostics({
       height: drawingBuffer.y,
       heapBytes: performanceMemory.memory?.usedJSHeapSize ?? null,
       qualityTier: diagnostics.qualityTier,
+      gpuVendor,
+      gpuRenderer,
     };
     appendBounded(diagnostics.snapshots, snapshot, 120);
     gl.domElement.dataset.commercialMapRendererInfo = JSON.stringify(snapshot);
@@ -272,7 +346,10 @@ export function registerCommercialMapControlsDiagnostics(controls: object) {
 }
 
 export function recordCommercialMapFrame(deltaMs: number) {
-  if (!import.meta.env.DEV || deltaMs <= 0) return;
+  // A demand-render pause is idle wall time, not CPU/GPU frame cost.
+  if (!import.meta.env.DEV
+    || deltaMs <= 0
+    || deltaMs > COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS) return;
   const diagnostics = ensureDiagnostics();
   if (!diagnostics) return;
   appendBounded(diagnostics.frameTimes, {

@@ -23,18 +23,16 @@ const HOVER_SETTLE_MS = 55;
 export function useContextualMapLabel({
   selectedEntityId,
   hoveredEntityId,
-  cameraNavigating,
   enabled,
 }: {
   selectedEntityId: string | null;
   hoveredEntityId: string | null;
-  cameraNavigating: boolean;
   enabled: boolean;
 }): ContextualMapLabelTargets {
   const [settledHoverId, setSettledHoverId] = useState<string | null>(null);
   const timer = useRef<number | null>(null);
 
-  const candidateHoverId = enabled && !cameraNavigating && hoveredEntityId !== selectedEntityId
+  const candidateHoverId = enabled && hoveredEntityId !== selectedEntityId
     ? hoveredEntityId
     : null;
 

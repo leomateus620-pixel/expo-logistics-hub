@@ -3876,7 +3876,6 @@ export interface StrategicLandmarkMeshProps {
   filtersActive: boolean;
   isMatch: boolean;
   layerOpacity: number;
-  cameraNavigating: boolean;
   sceneDiagonal: number;
   hoverEnabled: boolean;
   onSelect: (id: string) => void;
@@ -3895,7 +3894,6 @@ export function StrategicLandmarkMesh({
   filtersActive,
   isMatch,
   layerOpacity,
-  cameraNavigating,
   sceneDiagonal,
   hoverEnabled,
   onSelect,
@@ -4063,12 +4061,12 @@ export function StrategicLandmarkMesh({
           onPointerOver: (event: ThreeEvent<PointerEvent>) => {
             if (eventIntersectsLunarRocket(event)) return;
             event.stopPropagation();
-            if (cameraNavigating) return;
+            if (useCommercialMapStore.getState().cameraNavigating) return;
             onCursor('pointer');
             onHover(entity.id);
           },
           onPointerOut: () => {
-            onCursor(cameraNavigating ? 'grabbing' : 'grab');
+            onCursor(useCommercialMapStore.getState().cameraNavigating ? 'grabbing' : 'grab');
             onHover(null);
           },
         } : {})}

@@ -19,13 +19,13 @@ import {
   openGroundTextureBundleForEntity,
   type OpenGroundSurfaceProfile,
 } from './openGroundTextures';
+import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 
 interface RegionalHighwayNetworkProps {
   reducedGraphics: boolean;
   visible?: boolean;
   opacity?: number;
   ownerEntityIdByIdentifier: ReadonlyMap<string, string>;
-  cameraNavigating: boolean;
   hoverEnabled: boolean;
   onSelect: (entityId: string) => void;
   onHover: (entityId: string | null) => void;
@@ -115,7 +115,6 @@ export const RegionalHighwayNetwork = memo(function RegionalHighwayNetwork({
   visible = true,
   opacity = 1,
   ownerEntityIdByIdentifier,
-  cameraNavigating,
   hoverEnabled,
   onSelect,
   onHover,
@@ -154,7 +153,8 @@ export const RegionalHighwayNetwork = memo(function RegionalHighwayNetwork({
 
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
-    if (cameraNavigating || !isMapSelectionClick(event.delta, event.nativeEvent)) return;
+    if (useCommercialMapStore.getState().cameraNavigating
+      || !isMapSelectionClick(event.delta, event.nativeEvent)) return;
     const entityId = resolveEntityId(event);
     if (!entityId) return;
     onSelect(entityId);
@@ -163,7 +163,7 @@ export const RegionalHighwayNetwork = memo(function RegionalHighwayNetwork({
 
   const handlePointerMove = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
-    if (!hoverEnabled || cameraNavigating) return;
+    if (!hoverEnabled || useCommercialMapStore.getState().cameraNavigating) return;
     const entityId = resolveEntityId(event);
     onHover(entityId);
     onCursor(entityId ? 'pointer' : 'grab');
@@ -172,7 +172,7 @@ export const RegionalHighwayNetwork = memo(function RegionalHighwayNetwork({
   const handlePointerOut = () => {
     if (!hoverEnabled) return;
     onHover(null);
-    onCursor(cameraNavigating ? 'grabbing' : 'grab');
+    onCursor(useCommercialMapStore.getState().cameraNavigating ? 'grabbing' : 'grab');
   };
 
   return (

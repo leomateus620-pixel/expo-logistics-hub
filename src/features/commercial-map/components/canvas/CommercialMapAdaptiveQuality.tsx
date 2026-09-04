@@ -104,9 +104,9 @@ export function CommercialMapAdaptiveQualityController({
     }
 
     committedSceneTier.current = sceneTier;
-    // Keep the Canvas `dpr` prop controlled by the same value. R3F calls
-    // root.configure() after parent rerenders and would otherwise reapply the
-    // original prop over this imperative setDpr update.
+    // Publish only to the scene-tier child. Canvas itself deliberately keeps
+    // its initial DPR prop stable; mirroring DPR into parent React state would
+    // call root.configure() and resize the drawing buffer a second time.
     onQualityChange?.({
       tier: logicalTier,
       dpr: applyDpr ? nextDpr : gl.getPixelRatio(),

@@ -264,12 +264,14 @@ function refreshInstanceBounds(mesh: THREE.InstancedMesh | null) {
 }
 
 function CommercialHydrologicalInfrastructureInstances({
+  active,
   nodes,
   segments,
   surfaceEntities,
   reducedGraphics,
   onSelect,
 }: {
+  active: boolean;
   nodes: readonly CommercialHydrologicalNode[];
   segments: readonly CommercialHydrologicalPipeSegment[];
   surfaceEntities: readonly MapEntity[];
@@ -533,7 +535,7 @@ function CommercialHydrologicalInfrastructureInstances({
   }, [handlePipeSelection, hydrantSpans]);
 
   return (
-    <group name="camada-infraestrutura-hidrologica-comercial">
+    <group name="camada-infraestrutura-hidrologica-comercial" visible={active}>
       {distributionSpans.length > 0 ? (
         <instancedMesh
           ref={distributionPipeRef}
@@ -627,7 +629,7 @@ function CommercialHydrologicalInfrastructureInstances({
           onClick={handleSelection}
         />
       ) : null}
-      {supplyEntryVisuals.map((visual) => {
+      {active && supplyEntryVisuals.map((visual) => {
         const [x, z] = visual.placement.renderPosition;
         return (
           <Html
@@ -666,17 +668,21 @@ export const CommercialHydrologicalInfrastructureLayer = memo(
   function CommercialHydrologicalInfrastructureLayer(
     props: CommercialHydrologicalInfrastructureLayerProps,
   ) {
-    // Water mode is lazy by construction: no geometry, material, frame handler
-    // or raycast surface exists while the mode is inactive.
-    if (!props.active || (props.nodes.length === 0 && props.segments.length === 0)) return null;
+    const activated = useRef(props.active);
+    if (props.active) activated.current = true;
+    // Defer the one-time allocation until water mode is first requested, then
+    // retain the prepared instanced scene. Later toggles only change visibility
+    // and interaction, so no geometry/material lifecycle lands in the gesture.
+    if (!activated.current || (props.nodes.length === 0 && props.segments.length === 0)) return null;
     return (
       <CommercialHydrologicalInfrastructureInstances
         key={props.reducedGraphics ? 'hydrological-reduced' : 'hydrological-full'}
+        active={props.active}
         nodes={props.nodes}
         segments={props.segments}
         surfaceEntities={props.surfaceEntities}
         reducedGraphics={props.reducedGraphics}
-        onSelect={props.onSelect}
+        onSelect={props.active ? props.onSelect : undefined}
       />
     );
   },

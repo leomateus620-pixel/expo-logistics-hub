@@ -207,7 +207,8 @@ describe('commercial site environment presentation layer', () => {
       'src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx',
     ), 'utf8');
     expect(pageSource).toContain('siteEnvironmentEntities={data.entities}');
-    expect(canvasSource).toContain('siteEnvironmentEntities={siteEnvironmentEntities}');
+    expect(canvasSource).toContain('sceneProps={props}');
+    expect(canvasSource).toContain('entities={siteEnvironmentEntities}');
     expect(canvasSource).toContain('activeOwnerIdentifiers={activeSiteEnvironmentOwnerIdentifiers}');
     expect(canvasSource).toMatch(
       /\(!isolatedArea \|\| isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS\.industry\)[\s\S]*?<CommercialSiteEnvironmentLayer/,

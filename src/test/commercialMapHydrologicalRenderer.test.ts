@@ -228,7 +228,7 @@ describe('renderer e utilitários da infraestrutura hidrológica', () => {
     });
   });
 
-  it('mantém renderer estático, montagem lazy, descarte e seleção batched de tubos/nós', () => {
+  it('mantém renderer estático, lazy na primeira ativação, descarte e seleção batched de tubos/nós', () => {
     const renderer = readFileSync(resolve(
       'src/features/commercial-map/components/canvas/CommercialHydrologicalInfrastructureLayer.tsx',
     ), 'utf8');
@@ -236,7 +236,10 @@ describe('renderer e utilitários da infraestrutura hidrológica', () => {
       'src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx',
     ), 'utf8');
 
-    expect(renderer).toContain('if (!props.active');
+    expect(renderer).toContain('const activated = useRef(props.active);');
+    expect(renderer).toContain('if (!activated.current');
+    expect(renderer).toContain('visible={active}');
+    expect(renderer).toContain('onSelect={props.active ? props.onSelect : undefined}');
     expect(renderer).not.toContain('useFrame');
     expect(renderer).not.toContain('revealElapsed');
     expect(renderer).not.toContain('revealSettled');
