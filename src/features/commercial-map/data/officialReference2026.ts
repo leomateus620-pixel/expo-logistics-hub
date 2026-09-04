@@ -1014,8 +1014,8 @@ const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((re
  * permaneça base verde e nunca receba pavimentação nova por engano.
  */
 export const NON_PERMANENT_REMOVED_IDENTIFIERS_2026: readonly string[] = [
-  'B14', 'B16', 'B17', 'B21', 'B23', 'B24', 'B25', 'B26', 'B27',
-  'B31', 'B32', 'B33', 'B34', 'B39', 'B40',
+  'B14', 'B15', 'B16', 'B17', 'B18', 'B21', 'B23', 'B24', 'B25', 'B26', 'B27',
+  'B30', 'B31', 'B32', 'B33', 'B34', 'B39', 'B40', 'B42-02',
   ...OFFICIAL_RESTROOM_CENTERS_2026.map((_, index) => `E-${String(index + 1).padStart(2, '0')}`),
 ];
 

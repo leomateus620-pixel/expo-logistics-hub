@@ -85,8 +85,8 @@ const INDUSTRY_EXCLUDED_ENTITIES = [
   'Q-G-03', 'Q-G-04',
   'QUADRA-N', 'B7', 'B28', 'D4',
   'QUADRA-C', 'QUADRA-B', 'QUADRA-A', 'C1',
-  'B11', 'B12', 'B13', 'B14', 'B15', 'B18', 'B21',
-  'B25', 'B26', 'B27', 'B30', 'B31', 'B32', 'B42-02',
+  'B11', 'B12', 'B13', 'B14', 'B21',
+  'B25', 'B26', 'B27', 'B31', 'B32',
   'G', 'B8', 'B9', 'B10', 'B39',
 ] as const;
 
@@ -151,7 +151,7 @@ export const COMMERCIAL_MAP_SEGMENTS: readonly CommercialMapSegmentDefinition[] 
       perimeter: [
         'Norte — Rua Bolívia, da Alameda Mercosul ao acesso de D3',
         'Leste — contorno externo de D3, B17 e B16 até a Rua Argentina',
-        'Sudeste — recuo entre B19 e B11, excluindo Centro Administrativo, B15 e B42-02',
+        'Sudeste — recuo entre B19 e B11, excluindo o Centro Administrativo',
         'Sul — fachadas externas de B1 a B6 junto à Avenida Benvenuto de Conti',
         'Oeste — limite externo de B1, B2 e Calçada do Arvoredo',
         'Noroeste — Rua Brasil e Alameda Mercosul envolvendo C2, C3 e as quadras centrais',
