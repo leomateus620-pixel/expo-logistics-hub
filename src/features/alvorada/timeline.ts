@@ -77,11 +77,11 @@ export function bellCurve(elapsed: number, start: number, peak: number, end: num
   return 1 - smoothRange(elapsed, peak, end);
 }
 
-const EARTH_FADE_START = 5.05;
-const EARTH_FADE_END = 5.68;
+const EARTH_FADE_START = 4.55;
+const EARTH_FADE_END = 5.08;
 const EARTH_RESIDENCY_END = 5.95;
-const SKY_REVEAL_START = ALVORADA_PHASES.dawn.start;
-const SKY_REVEAL_END = ALVORADA_PHASES.dawn.end;
+const SKY_REVEAL_START = 4.75;
+const SKY_REVEAL_END = 5.6;
 const TRANSITION_START = ALVORADA_PHASES['santa-rosa'].start;
 const TRANSITION_PEAK = 5.2;
 const TRANSITION_END = 6.35;

@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+artifacts/alvorada-qa-dist/
+artifacts/alvorada/
 *.local
 
 # Editor directories and files

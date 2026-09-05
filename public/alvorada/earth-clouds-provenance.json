@@ -1,0 +1,12 @@
+{
+  "credit": "NASA Goddard Space Flight Center / Reto Stöckli, Blue Marble 2002 historical cloud composite",
+  "sourcePage": "https://science.nasa.gov/earth/earth-observatory/the-blue-marble-true-color-global-imagery-at-1km-resolution/",
+  "source": "https://assets.science.nasa.gov/content/dam/science/esd/eo/content-feature/bluemarble/images/cloud_combined_2048.jpg",
+  "sourceSha256": "daddaad84d7a33bbbc86cdda3f591099f57cee8607b7bcf3b67eb7e4f7a1c793",
+  "sourceBytes": 829367,
+  "width": 2048,
+  "height": 1024,
+  "output": "earth-clouds-2048.webp",
+  "outputBytes": 660422,
+  "conversion": "Native dimensions; WebP quality 90; luminance sampled as cloud density, no invented detail or upscaling"
+}

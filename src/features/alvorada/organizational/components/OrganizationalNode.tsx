@@ -11,12 +11,14 @@ import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import type { OrgPerson } from '../types';
 import type { PositionedOrgNode } from '../layout/organizationalLayout';
 import type { OrgNodeVisualState } from '../hooks/useOrgGraphInteraction';
+import { optimizedPortraitUrl } from '../optimizedPortrait';
 
 interface OrganizationalNodeProps {
   active: boolean;
   buttonRef?: Ref<HTMLButtonElement>;
   keyboardActive: boolean;
   people: Record<string, OrgPerson>;
+  selectedPersonId?: string | null;
   position: PositionedOrgNode;
   state: OrgNodeVisualState;
   onBlur: (nodeId: string) => void;
@@ -37,10 +39,10 @@ function presentationText(value: string): string {
 }
 
 function arrivalDelay(authorityLevel: number, levelOrder: number): number {
-  if (authorityLevel === 1) return 140;
-  if (authorityLevel === 2) return Math.min(680, 480 + levelOrder * 160);
-  if (authorityLevel === 3) return 920;
-  return Math.min(1880, 1120 + levelOrder * 22);
+  if (authorityLevel === 1) return 0;
+  if (authorityLevel === 2) return 100 + levelOrder * 60;
+  if (authorityLevel === 3) return 220;
+  return Math.min(680, 300 + levelOrder * 12);
 }
 
 function normalizedIdentity(value: string): string {
@@ -76,16 +78,19 @@ function Avatar({
 }) {
   const [failed, setFailed] = useState(false);
   const canRenderImage = Boolean(person?.avatarUrl) && !failed;
+  const portraitUrl = optimizedPortraitUrl(person?.avatarUrl);
 
   return (
     <span className="org-node__avatar" aria-hidden="true">
       {canRenderImage ? (
         <img
-          src={person?.avatarUrl ?? undefined}
+          src={portraitUrl}
           alt=""
           decoding="async"
+          width={96}
+          height={96}
           draggable={false}
-          loading={eager ? 'eager' : 'lazy'}
+          loading={eager || portraitUrl?.startsWith('/alvorada/portraits/') ? 'eager' : 'lazy'}
           onError={() => setFailed(true)}
         />
       ) : (
@@ -102,6 +107,7 @@ function OrganizationalNodeComponent({
   buttonRef,
   keyboardActive,
   people,
+  selectedPersonId,
   position,
   state,
   onBlur,
@@ -111,6 +117,9 @@ function OrganizationalNodeComponent({
   onSelect,
 }: OrganizationalNodeProps) {
   const { node, levelOrder, x, y } = position;
+  const focusedPerson = selectedPersonId && node.personIds.includes(selectedPersonId)
+    ? people[selectedPersonId]
+    : null;
   const peopleForNode = node.personIds
     .map((personId) => people[personId])
     .filter((person): person is OrgPerson => Boolean(person));
@@ -121,7 +130,7 @@ function OrganizationalNodeComponent({
     ...peopleForNode.map((person) => person.fullName),
     ...responsibilityNames,
   ]).map(presentationText);
-  const primaryName = names[0] ?? node.title;
+  const primaryName = focusedPerson?.fullName ?? names[0] ?? node.title;
   const isRoot = node.type === 'ccp';
   const isCentral = node.type === 'central-commission';
   const additionalCount = isRoot
@@ -129,9 +138,9 @@ function OrganizationalNodeComponent({
     : isCentral
       ? 0
       : Math.max(0, names.length - 1);
-  const isCluster = node.type === 'central-commission' || peopleForNode.length > 1;
+  const isCluster = !focusedPerson && (node.type === 'central-commission' || peopleForNode.length > 1);
   const primaryLabel = presentationText(
-    isRoot || isCentral ? node.title : primaryName,
+    (isRoot || isCentral) && !focusedPerson ? node.title : primaryName,
   );
   const organizationLabel = isRoot
     ? (node.subtitle ?? 'CCPF')
@@ -143,6 +152,9 @@ function OrganizationalNodeComponent({
           ? node.title
           : (node.subtitle ?? node.title);
   const presentedOrganizationLabel = presentationText(organizationLabel);
+  const visibleOrganizationLabel = isRoot && !focusedPerson
+    ? 'CONSELHO CONSULTIVO PERMANENTE'
+    : presentedOrganizationLabel;
   const ariaDescription = [
     primaryLabel,
     presentedOrganizationLabel !== primaryLabel ? presentedOrganizationLabel : null,
@@ -153,7 +165,7 @@ function OrganizationalNodeComponent({
     '--org-node-x': `${x}px`,
     '--org-node-y': `${y}px`,
   };
-  const visiblePeople = peopleForNode.slice(0, isCluster ? 3 : 1);
+  const visiblePeople = focusedPerson ? [focusedPerson] : peopleForNode.slice(0, isCluster ? 3 : 1);
 
   return (
     <article
@@ -176,6 +188,7 @@ function OrganizationalNodeComponent({
         className="org-node__button"
         data-org-node=""
         aria-label={ariaDescription}
+        title={ariaDescription}
         aria-pressed={!state.filtered && state.selected}
         disabled={!active || state.filtered}
         tabIndex={active && !state.filtered && keyboardActive ? 0 : -1}
@@ -199,12 +212,13 @@ function OrganizationalNodeComponent({
         <span className="org-node__ring" aria-hidden="true">
           <span className="org-node__ring-segments" />
           <span className="org-node__portrait">
-            {isRoot ? (
+            {isRoot && !focusedPerson ? (
               <FenasojaBrand
                 className="org-node__brand-mark"
                 markOnly
                 showEdition={false}
                 tone="dark"
+                markSrc="/alvorada/fenasoja-symbol-official.png"
               />
             ) : visiblePeople.length > 0 ? (
               <span className="org-node__avatar-stack" data-count={visiblePeople.length}>
@@ -230,7 +244,7 @@ function OrganizationalNodeComponent({
               {isRoot ? `${additionalCount} INTEGRANTES` : `+${additionalCount} RESPONSÁVEIS`}
             </span>
           )}
-          <span className="org-node__organization">{presentedOrganizationLabel}</span>
+          <span className="org-node__organization">{visibleOrganizationLabel}</span>
         </span>
       </button>
     </article>
@@ -244,6 +258,7 @@ export const OrganizationalNode = memo(
     && previous.buttonRef === next.buttonRef
     && previous.keyboardActive === next.keyboardActive
     && previous.people === next.people
+    && previous.selectedPersonId === next.selectedPersonId
     && previous.position === next.position
     && previous.state.filtered === next.state.filtered
     && previous.state.hovered === next.state.hovered

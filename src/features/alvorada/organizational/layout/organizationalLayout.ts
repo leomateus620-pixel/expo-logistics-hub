@@ -43,13 +43,13 @@ const LEVEL_RADII: Record<1 | 2 | 3 | 4, number> = {
   4: 42,
 };
 
-const TOP_PADDING = 100;
-const LEVEL_2_Y = 310;
-const LEVEL_3_Y = 490;
-const LEVEL_4_Y = 700;
-const LEVEL_4_ROW_GAP = 170;
-const LEVEL_4_COLUMN_GAP = 172;
-const SIDE_PADDING = 150;
+const TOP_PADDING = 88;
+const LEVEL_2_Y = 176;
+const LEVEL_3_Y = 314;
+const LEVEL_4_Y = 480;
+const LEVEL_4_ROW_GAP = 184;
+const LEVEL_4_COLUMN_GAP = 184;
+const SIDE_PADDING = 102;
 
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value));
@@ -101,18 +101,26 @@ function averageParentX(
 }
 
 function createConnectionPath(source: PositionedOrgNode, target: PositionedOrgNode): string {
-  const direction = target.y >= source.y ? 1 : -1;
-  const sourceY = source.y + source.radius * direction;
-  const targetY = target.y - target.radius * direction;
-  const verticalDistance = Math.abs(targetY - sourceY);
-  const bend = clamp(verticalDistance * 0.48, 72, 180) * direction;
-
-  if (verticalDistance < 80) {
-    const horizontalBend = Math.max(80, Math.abs(target.x - source.x) * 0.36);
-    return `M ${source.x} ${source.y} C ${source.x + horizontalBend} ${source.y}, ${target.x - horizontalBend} ${target.y}, ${target.x} ${target.y}`;
+  const side = target.x >= source.x ? 1 : -1;
+  // Fan out along the rim, leaving the caption below each portrait unobstructed.
+  const sourceX = source.x + side * source.radius * 0.9;
+  const sourceY = source.y + source.radius * 0.38;
+  const targetY = target.y - target.radius - 5;
+  if (target.node.authorityLevel === 4) {
+    // Later rows travel through column gutters, never through the portraits or
+    // captions in earlier rows. The final short curve approaches from above.
+    const gutterX = target.x - side * (LEVEL_4_COLUMN_GAP / 2);
+    const laneY = targetY - 30;
+    const fanY = Math.min(sourceY + 58, laneY - 32);
+    return `M ${sourceX} ${sourceY} C ${sourceX + side * 32} ${fanY}, ${gutterX} ${fanY}, ${gutterX} ${fanY + 26} L ${gutterX} ${laneY - 18} Q ${gutterX} ${laneY} ${gutterX + side * 18} ${laneY} L ${target.x - side * 16} ${laneY} Q ${target.x} ${laneY} ${target.x} ${targetY}`;
   }
+  const bend = Math.max(24, Math.abs(targetY - sourceY) * 0.5);
+  return `M ${sourceX} ${sourceY} C ${sourceX + side * 22} ${sourceY + bend}, ${target.x} ${targetY - bend}, ${target.x} ${targetY}`;
+}
 
-  return `M ${source.x} ${sourceY} C ${source.x} ${sourceY + bend}, ${target.x} ${targetY - bend}, ${target.x} ${targetY}`;
+export interface OrganizationalLayoutOptions {
+  viewportWidth?: number;
+  viewportHeight?: number;
 }
 
 /**
@@ -122,6 +130,7 @@ function createConnectionPath(source: PositionedOrgNode, target: PositionedOrgNo
 export function calculateOrganizationalLayout(
   nodes: OrgNode[],
   edges: OrgEdge[],
+  options: OrganizationalLayoutOptions = {},
 ): OrganizationalLayout {
   const renderable = sortNodes(nodes.filter((node) => (
     node.isRenderable && node.authorityLevel >= 1 && node.authorityLevel <= 4
@@ -135,18 +144,20 @@ export function calculateOrganizationalLayout(
 
   const level4 = byLevel.get(4) ?? [];
   const level3 = byLevel.get(3) ?? [];
-  const level4Columns = level4.length === 0
-    ? 1
+  const compact = (options.viewportWidth ?? 1280) <= 720
+    || ((options.viewportWidth ?? 1280) <= 960 && (options.viewportHeight ?? 800) <= 520);
+  const level4Columns = level4.length === 0 ? 1 : compact
+    ? Math.min(level4.length, (options.viewportWidth ?? 390) <= 440 ? 2 : 3)
     : clamp(Math.ceil(level4.length / 3), 1, 12);
   const level4Rows = Math.max(1, Math.ceil(level4.length / level4Columns));
   const worldWidth = Math.max(
-    1640,
+    compact ? 466 : 660,
     (level4Columns - 1) * LEVEL_4_COLUMN_GAP + SIDE_PADDING * 2,
     (Math.min(10, Math.max(1, level3.length)) - 1) * 188 + SIDE_PADDING * 2,
   );
-  const worldHeight = level4.length > 0
-    ? LEVEL_4_Y + (level4Rows - 1) * LEVEL_4_ROW_GAP + 170
-    : LEVEL_3_Y + 240;
+  const worldHeight = (compact ? 234 : 0) + (level4.length > 0
+    ? LEVEL_4_Y + (level4Rows - 1) * LEVEL_4_ROW_GAP + 132
+    : LEVEL_3_Y + 180);
   const centerX = worldWidth / 2;
   const maximumTopSpan = worldWidth - SIDE_PADDING * 2;
 
@@ -166,10 +177,10 @@ export function calculateOrganizationalLayout(
 
   const level2Positions = distributeAcrossSpan(
     byLevel.get(2) ?? [],
-    LEVEL_2_Y,
+    compact ? 320 : LEVEL_2_Y,
     centerX,
-    390,
-    maximumTopSpan * 0.62,
+    compact ? 280 : 480,
+    maximumTopSpan,
     order,
   );
   positioned.push(...level2Positions);
@@ -177,7 +188,7 @@ export function calculateOrganizationalLayout(
 
   const level3Base = distributeAcrossSpan(
     level3,
-    LEVEL_3_Y,
+    compact ? 522 : LEVEL_3_Y,
     centerX,
     220,
     maximumTopSpan,
@@ -206,14 +217,11 @@ export function calculateOrganizationalLayout(
   const availableSlots = Array.from({ length: level4Rows * level4Columns }, (_, slotIndex) => {
     const row = Math.floor(slotIndex / level4Columns);
     const column = slotIndex % level4Columns;
-    const organicOffset = row % 2 === 1 && level4Columns > 1
-      ? Math.sin((column / (level4Columns - 1)) * Math.PI) * columnGap * 0.16
-      : 0;
     return {
       row,
       column,
-      x: gridStartX + columnGap * column + organicOffset,
-      y: LEVEL_4_Y + row * LEVEL_4_ROW_GAP + (column % 2 === 0 ? 0 : 4),
+      x: gridStartX + columnGap * column,
+      y: (compact ? 714 : LEVEL_4_Y) + row * LEVEL_4_ROW_GAP,
     };
   });
 
@@ -290,7 +298,7 @@ export function findDirectionalNode(
     // Prefer the next visual band while still penalizing strong diagonal jumps.
     // A lighter cross-axis weight keeps a centered Level 3 node from skipping
     // over the intentionally split President/Vice band.
-    const score = primaryDelta + secondaryDelta * 0.72;
+    const score = primaryDelta + secondaryDelta * 0.38;
     if (score < bestScore) {
       best = candidate;
       bestScore = score;

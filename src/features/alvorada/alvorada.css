@@ -32,7 +32,6 @@
 
 .alvorada-overlay[data-stage="org-ready"] .alvorada-overlay__canvas {
   opacity: 0;
-  filter: blur(8px);
 }
 
 .alvorada-overlay__canvas canvas {
@@ -87,7 +86,7 @@
   border-radius: 50%;
   background: rgb(2 14 31 / 46%);
   color: rgb(246 250 255 / 82%);
-  opacity: 0.58;
+  opacity: 0.92;
   cursor: pointer;
   backdrop-filter: blur(10px);
   transition: opacity 180ms ease, border-color 180ms ease, background-color 180ms ease;
@@ -108,228 +107,6 @@
   outline: 3px solid #ffd078;
   outline-offset: 3px;
   opacity: 1;
-}
-
-.alvorada-brand-hero {
-  position: absolute;
-  z-index: 5;
-  inset: 0;
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  padding:
-    calc(env(safe-area-inset-top, 0px) + clamp(4.5rem, 9vh, 7.5rem))
-    max(1.25rem, env(safe-area-inset-right, 0px))
-    calc(env(safe-area-inset-bottom, 0px) + clamp(3rem, 8vh, 6rem))
-    max(1.25rem, env(safe-area-inset-left, 0px));
-  pointer-events: none;
-  text-align: center;
-}
-
-.alvorada-brand-hero::before {
-  content: "";
-  position: absolute;
-  inset: 18% 9% 13%;
-  border: 1px solid rgb(197 224 247 / 8%);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, rgb(255 181 77 / 8%) 0 1px, transparent 1.5px) 50% / 18px 18px,
-    radial-gradient(ellipse at center, rgb(2 12 28 / 13%), transparent 67%);
-  opacity: 0;
-  transform: scale(0.82);
-  transition: opacity 900ms ease, transform 1200ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.alvorada-brand-hero--visible::before {
-  opacity: 0.7;
-  transform: scale(1);
-}
-
-.alvorada-brand-hero__territory {
-  position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + clamp(4.5rem, 10vh, 7rem));
-  left: 50%;
-  display: flex;
-  width: min(76vw, 760px);
-  align-items: center;
-  gap: clamp(0.75rem, 2vw, 1.5rem);
-  color: rgb(235 244 252 / 72%);
-  opacity: 0;
-  transform: translate(-50%, 12px);
-  transition: opacity 700ms ease, transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.alvorada-brand-hero[data-stage="territory"] .alvorada-brand-hero__territory,
-.alvorada-brand-hero[data-stage="santa-rosa"] .alvorada-brand-hero__territory,
-.alvorada-brand-hero--visible .alvorada-brand-hero__territory {
-  opacity: 1;
-  transform: translate(-50%, 0);
-}
-
-.alvorada-brand-hero__territory > span {
-  height: 1px;
-  flex: 1;
-  background: linear-gradient(90deg, transparent, rgb(255 192 109 / 48%));
-}
-
-.alvorada-brand-hero__territory > span:last-child {
-  background: linear-gradient(90deg, rgb(255 192 109 / 48%), transparent);
-}
-
-.alvorada-brand-hero__territory p {
-  margin: 0;
-  font-size: clamp(0.62rem, 1vw, 0.76rem);
-  font-weight: 800;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.alvorada-brand-hero__brand {
-  position: relative;
-  display: inline-flex;
-  opacity: 0;
-  transform: translateY(28px) scale(0.92);
-  filter: blur(10px) drop-shadow(0 22px 38px rgb(0 6 18 / 48%));
-  transition:
-    opacity 800ms ease,
-    transform 1150ms cubic-bezier(0.16, 1, 0.3, 1),
-    filter 900ms ease;
-}
-
-.alvorada-brand-hero--visible .alvorada-brand-hero__brand {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  filter: blur(0) drop-shadow(0 22px 38px rgb(0 6 18 / 48%));
-}
-
-.alvorada-brand-hero__brand .fenasoja-brand__mark {
-  width: clamp(4.4rem, 9vw, 7.5rem) !important;
-  height: clamp(4.4rem, 9vw, 7.5rem) !important;
-  border-radius: clamp(1rem, 1.8vw, 1.5rem) !important;
-}
-
-.alvorada-brand-hero__brand .fenasoja-brand__copy > span:first-child {
-  gap: clamp(0.8rem, 2vw, 1.8rem) !important;
-}
-
-.alvorada-brand-hero__brand .fenasoja-brand__wordmark {
-  overflow: visible;
-  background: linear-gradient(180deg, #fff 0%, #f1f6fb 37%, #b8c9da 77%, #fff 100%);
-  background-clip: text;
-  color: transparent;
-  font-size: clamp(3.4rem, 8.6vw, 8rem) !important;
-  line-height: 0.82 !important;
-  letter-spacing: -0.065em;
-  text-shadow: 0 1px 0 rgb(255 255 255 / 35%);
-  -webkit-text-stroke: 1px rgb(255 255 255 / 14%);
-}
-
-.alvorada-brand-hero__brand .fenasoja-brand__edition {
-  min-width: clamp(5rem, 9vw, 8.5rem) !important;
-  padding: clamp(0.55rem, 1.2vw, 0.9rem) clamp(0.7rem, 1.8vw, 1.4rem) !important;
-  border-color: rgb(255 205 135 / 72%) !important;
-  border-radius: clamp(0.75rem, 1.3vw, 1.1rem) !important;
-  background: linear-gradient(150deg, rgb(255 183 91 / 96%), rgb(239 112 28 / 96%)) !important;
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 62%),
-    0 15px 42px rgb(231 101 23 / 32%) !important;
-  color: #07172c !important;
-  font-size: clamp(1.05rem, 2.2vw, 2rem) !important;
-}
-
-.alvorada-brand-hero__brand .fenasoja-brand__edition > span:first-child {
-  color: rgb(7 23 44 / 64%) !important;
-  font-size: clamp(0.45rem, 0.7vw, 0.62rem) !important;
-}
-
-.alvorada-brand-hero__brand .fenasoja-brand__subtitle {
-  margin-top: clamp(0.65rem, 1.3vh, 1rem) !important;
-  color: rgb(234 243 251 / 66%) !important;
-  font-size: clamp(0.58rem, 0.9vw, 0.78rem) !important;
-  letter-spacing: 0.22em !important;
-}
-
-.alvorada-brand-hero__statement {
-  max-width: min(80vw, 780px);
-  margin: clamp(1.6rem, 4vh, 2.8rem) 0 0;
-  color: rgb(241 247 252 / 82%);
-  font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif;
-  font-size: clamp(1rem, 2vw, 1.45rem);
-  font-weight: 500;
-  letter-spacing: 0.025em;
-  line-height: 1.35;
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 700ms 300ms ease, transform 900ms 300ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.alvorada-brand-hero--visible .alvorada-brand-hero__statement {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.alvorada-brand-hero__origin {
-  display: grid;
-  width: min(38vw, 380px);
-  justify-items: center;
-  margin-top: clamp(1.5rem, 4vh, 2.7rem);
-  opacity: 0;
-  transition: opacity 700ms 500ms ease;
-}
-
-.alvorada-brand-hero--visible .alvorada-brand-hero__origin {
-  opacity: 1;
-}
-
-.alvorada-brand-hero__origin > span {
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgb(255 188 97 / 52%), transparent);
-}
-
-.alvorada-brand-hero__origin > i {
-  width: 5px;
-  height: 5px;
-  margin-top: -3px;
-  border-radius: 50%;
-  background: #ffc169;
-  box-shadow: 0 0 18px 5px rgb(255 166 68 / 34%);
-}
-
-.alvorada-brand-hero__sync {
-  position: absolute;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(1.25rem, 4vh, 2.5rem));
-  margin: 0;
-  color: rgb(219 233 245 / 64%);
-  font-size: 0.64rem;
-  font-weight: 760;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.alvorada-brand-hero__sync::before {
-  content: "";
-  display: inline-block;
-  width: 0.48rem;
-  height: 0.48rem;
-  margin-right: 0.65rem;
-  border: 1px solid #ffb255;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: alvorada-loader-orbit 900ms linear infinite;
-}
-
-.alvorada-brand-hero--handoff .alvorada-brand-hero__brand {
-  opacity: 0.28;
-  transform: translateY(-17vh) scale(0.56);
-  filter: blur(2px) drop-shadow(0 18px 32px rgb(0 6 18 / 32%));
-}
-
-.alvorada-brand-hero--handoff .alvorada-brand-hero__statement,
-.alvorada-brand-hero--handoff .alvorada-brand-hero__origin {
-  opacity: 0;
-  transform: translateY(-12px);
 }
 
 .alvorada-fallback {
@@ -392,178 +169,6 @@
   clip-path: polygon(0 55%, 8% 49%, 16% 58%, 23% 42%, 34% 59%, 43% 44%, 52% 56%, 63% 39%, 73% 53%, 83% 41%, 92% 55%, 100% 47%, 100% 100%, 0 100%);
 }
 
-.alvorada-fallback__title {
-  position: absolute;
-  top: 46%;
-  left: 50%;
-  display: flex;
-  width: min(90vw, 1080px);
-  align-items: center;
-  justify-content: center;
-  gap: clamp(12px, 2vw, 26px);
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0 12px 24px rgb(0 7 19 / 38%));
-}
-
-.alvorada-fallback__title > img {
-  width: clamp(2.4rem, 7vw, 6.6rem);
-  height: auto;
-  flex: 0 0 auto;
-  object-fit: contain;
-}
-
-.alvorada-fallback__title > span {
-  background: linear-gradient(180deg, #fff 0%, #d8e2ef 38%, #8291a5 70%, #f7fbff 100%);
-  background-clip: text;
-  color: transparent;
-  font-size: clamp(2.2rem, 8vw, 7.5rem);
-  font-weight: 950;
-  letter-spacing: -0.055em;
-  line-height: 0.9;
-  -webkit-text-stroke: 1px rgb(255 255 255 / 28%);
-}
-
-.alvorada-fallback__title > strong {
-  padding: 0.28em 0.7em;
-  border: 1px solid rgb(255 221 167 / 72%);
-  border-radius: 999px;
-  background: linear-gradient(180deg, #ffad5e, #f47b25);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 58%), 0 8px 28px rgb(238 100 23 / 34%);
-  color: #07172c;
-  font-size: clamp(1.2rem, 4.2vw, 4rem);
-  font-weight: 950;
-  letter-spacing: 0.04em;
-  line-height: 1;
-}
-
-@media (max-width: 640px) {
-  .alvorada-overlay__close {
-    top: calc(env(safe-area-inset-top, 0px) + 10px);
-    right: calc(env(safe-area-inset-right, 0px) + 10px);
-  }
-
-  .alvorada-brand-hero {
-    padding-right: max(0.9rem, env(safe-area-inset-right, 0px));
-    padding-left: max(0.9rem, env(safe-area-inset-left, 0px));
-  }
-
-  .alvorada-brand-hero__territory {
-    top: calc(env(safe-area-inset-top, 0px) + 4.6rem);
-    width: calc(100vw - 5.5rem);
-    gap: 0.6rem;
-  }
-
-  .alvorada-brand-hero__territory p {
-    overflow: hidden;
-    max-width: 68vw;
-    font-size: 0.55rem;
-    letter-spacing: 0.18em;
-    text-overflow: ellipsis;
-  }
-
-  .alvorada-brand-hero__brand {
-    gap: 0.55rem !important;
-  }
-
-  .alvorada-brand-hero__brand .fenasoja-brand__mark {
-    width: clamp(2.7rem, 13vw, 3.65rem) !important;
-    height: clamp(2.7rem, 13vw, 3.65rem) !important;
-    border-radius: 0.75rem !important;
-  }
-
-  .alvorada-brand-hero__brand .fenasoja-brand__copy > span:first-child {
-    gap: 0.45rem !important;
-  }
-
-  .alvorada-brand-hero__brand .fenasoja-brand__wordmark {
-    font-size: clamp(1.8rem, 10.8vw, 3rem) !important;
-    letter-spacing: -0.07em;
-  }
-
-  .alvorada-brand-hero__brand .fenasoja-brand__edition {
-    min-width: 3.45rem !important;
-    padding: 0.42rem 0.46rem !important;
-    border-radius: 0.58rem !important;
-    font-size: clamp(0.76rem, 4.2vw, 1.05rem) !important;
-  }
-
-  .alvorada-brand-hero__brand .fenasoja-brand__edition > span:first-child {
-    display: none;
-  }
-
-  .alvorada-brand-hero__brand .fenasoja-brand__subtitle {
-    max-width: 64vw;
-    margin-top: 0.45rem !important;
-    font-size: 0.47rem !important;
-    letter-spacing: 0.13em !important;
-  }
-
-  .alvorada-brand-hero__statement {
-    max-width: 86vw;
-    margin-top: 1.45rem;
-    font-size: clamp(0.86rem, 3.8vw, 1rem);
-  }
-
-  .alvorada-brand-hero__origin {
-    width: 58vw;
-    margin-top: 1.5rem;
-  }
-
-  .alvorada-brand-hero__sync {
-    width: calc(100vw - 4rem);
-    font-size: 0.52rem;
-    letter-spacing: 0.1em;
-  }
-
-  .alvorada-brand-hero--handoff .alvorada-brand-hero__brand {
-    transform: translateY(-24vh) scale(0.6);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /*
-   * This opt-in cinematic is intentionally isolated from the portal's global
-   * reduced-motion rule. Opening it is an explicit request to play the full
-   * real-time identity journey; the rest of the application remains unchanged.
-   */
-  .alvorada-overlay {
-    animation-duration: 280ms !important;
-    animation-iteration-count: 1 !important;
-  }
-
-  .alvorada-overlay--leaving {
-    animation-duration: 400ms !important;
-    animation-iteration-count: 1 !important;
-  }
-
-  .alvorada-overlay__loader-orbit {
-    animation-duration: 900ms !important;
-    animation-iteration-count: infinite !important;
-  }
-
-  .alvorada-overlay__loader {
-    transition-duration: 340ms !important;
-  }
-
-  .alvorada-overlay__close {
-    transition-duration: 180ms !important;
-  }
-
-  .alvorada-brand-hero,
-  .alvorada-brand-hero::before,
-  .alvorada-brand-hero__brand,
-  .alvorada-brand-hero__territory,
-  .alvorada-brand-hero__statement,
-  .alvorada-brand-hero__origin {
-    transition-duration: 900ms !important;
-  }
-
-  .alvorada-brand-hero__sync::before {
-    animation-duration: 900ms !important;
-    animation-iteration-count: infinite !important;
-  }
-}
-
 @media (forced-colors: active) {
   .alvorada-overlay__close {
     border: 2px solid ButtonText;
@@ -583,4 +188,86 @@
 
 @keyframes alvorada-loader-orbit {
   to { transform: rotate(1turn); }
+}
+
+.alvorada-harvest {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1000ms cubic-bezier(.22, 1, .36, 1);
+}
+.alvorada-harvest picture, .alvorada-harvest img { display: block; width: 100%; height: 100%; }
+.alvorada-harvest img { object-fit: cover; object-position: 60% 62%; transform: scale(1.025); }
+.alvorada-harvest::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgb(2 11 25 / 10%), transparent 65%, rgb(2 11 25 / 24%));
+}
+.alvorada-harvest[data-decoded][data-stage="santa-rosa"] { opacity: 1; transition-delay: 600ms; }
+.alvorada-harvest[data-decoded][data-stage="brand-reveal"],
+.alvorada-harvest[data-decoded][data-stage="brand-hold"] { opacity: 1; }
+.alvorada-harvest[data-stage="brand-reveal"] img,
+.alvorada-harvest[data-stage="brand-hold"] img { transform: scale(1); transition: transform 5s cubic-bezier(.22, 1, .36, 1); }
+.alvorada-harvest[data-stage="org-transition"] { opacity: 0; transition-duration: 1200ms; }
+
+.alvorada-brand-hero {
+  position: absolute; z-index: 5; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 0 24px 22vh;
+  pointer-events: none; text-align: center;
+}
+.alvorada-brand-hero__brand {
+  gap: clamp(20px, 2.5vw, 38px);
+  opacity: 0; transform: translateY(18px) scale(.97);
+  transition: opacity 650ms ease, transform 1000ms cubic-bezier(.16,1,.3,1);
+}
+.alvorada-brand-hero--visible .alvorada-brand-hero__brand { opacity: 1; transform: translateY(0) scale(1); }
+.alvorada-brand-hero__brand .fenasoja-brand__mark {
+  width: clamp(76px, 10vw, 148px); height: clamp(76px, 10vw, 148px);
+  border-radius: 0; overflow: visible;
+}
+.alvorada-brand-hero__brand .fenasoja-brand__mark img { filter: drop-shadow(0 3px 7px rgb(0 0 0 / 16%)); }
+.alvorada-brand-hero__brand .fenasoja-brand__copy > span:first-child { gap: clamp(14px, 2vw, 30px); }
+.alvorada-brand-hero__brand .fenasoja-brand__wordmark {
+  color: #f7f6f1; font-size: clamp(46px, 7.5vw, 108px); line-height: 1;
+  letter-spacing: -.055em; font-weight: 850; overflow: visible;
+  text-shadow: 0 2px 8px rgb(0 0 0 / 14%);
+}
+.alvorada-brand-hero__brand .fenasoja-brand__edition {
+  display: block; min-width: 0; padding: 8px 0 8px clamp(14px, 2vw, 30px);
+  border: 0; border-left: 1px solid rgb(234 189 108 / 60%); border-radius: 0;
+  background: transparent; box-shadow: none; color: #f1ca86;
+  font-size: clamp(28px, 3.6vw, 52px); letter-spacing: -.035em; font-weight: 600;
+}
+.alvorada-brand-hero__statement {
+  max-width: 560px; margin: 24px 0 0; color: #dedfe1;
+  font-size: clamp(14px, 1.4vw, 19px); font-weight: 400; line-height: 1.6; letter-spacing: .015em;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 550ms 180ms ease, transform 700ms 180ms cubic-bezier(.22,1,.36,1);
+}
+.alvorada-brand-hero--visible .alvorada-brand-hero__statement { opacity: 1; transform: translateY(0); }
+.alvorada-brand-hero--handoff .alvorada-brand-hero__brand { opacity: 0; transform: translateY(-18vh) scale(.66); transition-duration: 500ms, 950ms; }
+.alvorada-brand-hero--handoff .alvorada-brand-hero__statement { opacity: 0; transform: translateY(-10px); transition-delay: 0ms; }
+.alvorada-brand-hero__sync {
+  position: absolute; bottom: max(28px, env(safe-area-inset-bottom));
+  margin: 0 32px; color: #e5d3b6; font-size: 12px; letter-spacing: .03em;
+}
+@media (max-width: 640px) {
+  .alvorada-brand-hero { padding: 0 18px 24vh; }
+  .alvorada-brand-hero__brand { flex-direction: column; gap: 24px; }
+  .alvorada-brand-hero__brand .fenasoja-brand__mark { width: 88px; height: 88px; }
+  .alvorada-brand-hero__brand .fenasoja-brand__wordmark { font-size: clamp(32px, 9.8vw, 52px); }
+  .alvorada-brand-hero__brand .fenasoja-brand__copy > span:first-child { gap: 14px; }
+  .alvorada-brand-hero__brand .fenasoja-brand__edition { padding-left: 14px; font-size: 27px; }
+  .alvorada-brand-hero__statement { max-width: 310px; margin-top: 20px; font-size: 14px; }
+  .alvorada-harvest img { object-position: center; }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  .alvorada-brand-hero { padding-bottom: 16vh; }
+  .alvorada-brand-hero__brand { flex-direction: row; gap: 20px; }
+  .alvorada-brand-hero__brand .fenasoja-brand__mark { width: 64px; height: 64px; }
+  .alvorada-brand-hero__brand .fenasoja-brand__wordmark { font-size: 48px; }
+  .alvorada-brand-hero__statement { margin-top: 12px; font-size: 14px; }
 }

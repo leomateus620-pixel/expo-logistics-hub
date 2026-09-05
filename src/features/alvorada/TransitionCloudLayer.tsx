@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { useAlvoradaTimeline } from './TimelineContext';
 import { deriveAlvoradaVisualState, smoothRange } from './timeline';
 import { createCloudTexture, seededRandom } from './visualTextures';
+import type { AlvoradaQualityProfile } from './capabilities';
 
 interface CorridorCloudPlacement {
   depth: number;
@@ -78,6 +79,7 @@ const HAZE_VERTEX_SHADER = `
 
 const HAZE_FRAGMENT_SHADER = `
   uniform float opacity;
+  uniform float coverage;
   uniform float time;
   uniform float warmth;
   varying vec3 vDirection;
@@ -116,12 +118,12 @@ const HAZE_FRAGMENT_SHADER = `
   void main() {
     vec3 samplePosition = vDirection * 3.4 + vec3(time * 0.025, -time * 0.011, 0.0);
     float structure = fbm(samplePosition);
-    vec3 cool = vec3(0.12, 0.29, 0.51);
-    vec3 warm = vec3(0.94, 0.49, 0.2);
+    vec3 cool = vec3(0.016, 0.049, 0.11);
+    vec3 warm = vec3(0.22, 0.13, 0.075);
     vec3 color = mix(cool, warm, warmth * (0.74 + structure * 0.26));
     color += vec3(structure - 0.5) * 0.11;
     float structureMask = smoothstep(0.2, 0.78, structure);
-    float alpha = opacity * (0.68 + structureMask * 0.32);
+    float alpha = mix(opacity * (0.68 + structureMask * 0.32), 1.0, coverage);
 
     gl_FragColor = vec4(color, alpha);
     #include <tonemapping_fragment>
@@ -129,10 +131,10 @@ const HAZE_FRAGMENT_SHADER = `
   }
 `;
 
-function createCorridorPlacements() {
+function createCorridorPlacements(count: number) {
   const random = seededRandom(20280430);
 
-  return Array.from({ length: 12 }, (_, index): CorridorCloudPlacement => {
+  return Array.from({ length: count }, (_, index): CorridorCloudPlacement => {
     const stratum = index % 3;
     const depth = 0.34 + Math.pow(random(), 1.42) * 5.3;
     const horizontalReach = 0.32 + depth * 0.68;
@@ -192,6 +194,7 @@ function createHazeMaterial() {
     side: THREE.BackSide,
     transparent: true,
     uniforms: {
+      coverage: { value: 0 },
       opacity: { value: 0 },
       time: { value: 0 },
       warmth: { value: 0 },
@@ -200,13 +203,13 @@ function createHazeMaterial() {
   });
 }
 
-export function TransitionCloudLayer() {
+export function TransitionCloudLayer({ quality }: { quality: AlvoradaQualityProfile }) {
   const timeline = useAlvoradaTimeline();
   const { camera } = useThree();
   const root = useRef<THREE.Group>(null);
   const cloudMeshes = useRef<THREE.Mesh[]>([]);
   const texture = useMemo(() => createCloudTexture(384), []);
-  const placements = useMemo(createCorridorPlacements, []);
+  const placements = useMemo(() => createCorridorPlacements(quality.mobile ? 5 : 8), [quality.mobile]);
   const cardMaterials = useMemo(
     () => [0, 1, 2].map((stratum) => createCorridorMaterial(texture, stratum)),
     [texture],
@@ -225,6 +228,8 @@ export function TransitionCloudLayer() {
     const ambientElapsed = timelineState.ambientElapsed ?? elapsed;
     const visualState = deriveAlvoradaVisualState(elapsed);
     const visibility = visualState.transitionOpacity;
+    if (root.current) root.current.visible = visibility > 0.001;
+    if (visibility <= 0.001) return;
     const warmth = smoothRange(elapsed, 4.35, 5.95);
     const passage = smoothRange(elapsed, 4.2, 6.25);
 
@@ -247,6 +252,10 @@ export function TransitionCloudLayer() {
       0.34,
       visibility * 0.45,
     );
+    // Fully cover the change of coordinate frame, with a short plateau to absorb
+    // a missed frame on a slower GPU; the surrounding globe remains crisp.
+    hazeMaterial.uniforms.coverage.value = smoothRange(elapsed, 4.65, 5.03)
+      * (1 - smoothRange(elapsed, 5.3, 5.72));
     hazeMaterial.uniforms.time.value = ambientElapsed;
     hazeMaterial.uniforms.warmth.value = warmth;
 

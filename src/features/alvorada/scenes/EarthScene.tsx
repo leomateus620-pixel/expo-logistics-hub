@@ -1,25 +1,18 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Stars, useTexture } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { AlvoradaQualityProfile } from '../capabilities';
-import { EARTH_RADIUS } from '../geo';
+import { getEarthTextureUrls } from '../earthAssets';
+import { EARTH_RADIUS, latitudeLongitudeToVector3 } from '../geo';
 import { useAlvoradaTimeline } from '../TimelineContext';
-import { deriveAlvoradaVisualState, smoothRange } from '../timeline';
+import { deriveAlvoradaVisualState } from '../timeline';
 import { BrazilLayer, RioGrandeDoSulLayer, SantaRosaMarker } from './GeographicLayers';
-
-const EARTH_TEXTURE_URLS = [
-  '/alvorada/earth-day-2048.jpg',
-  '/alvorada/earth-night-lights-2048.png',
-  '/alvorada/earth-normal-2048.jpg',
-  '/alvorada/earth-clouds-1024.png',
-];
 
 const earthVertexShader = `
   varying vec2 vUv;
   varying vec3 vWorldNormal;
   varying vec3 vWorldPosition;
-
   void main() {
     vUv = uv;
     vWorldNormal = normalize(mat3(modelMatrix) * normal);
@@ -30,216 +23,159 @@ const earthVertexShader = `
 `;
 
 const earthFragmentShader = `
-  #include <common>
   uniform sampler2D dayMap;
   uniform sampler2D nightMap;
   uniform sampler2D normalMap;
+  uniform sampler2D cloudMap;
+  uniform vec3 sunDirection;
+  uniform float opacity;
+  uniform float cloudOffset;
+  varying vec2 vUv;
+  varying vec3 vWorldNormal;
+  varying vec3 vWorldPosition;
+  void main() {
+    vec3 albedo = texture2D(dayMap, vUv).rgb;
+    vec3 cities = texture2D(nightMap, vUv).rgb;
+    vec3 normal = normalize(vWorldNormal);
+    // Transform the tangent-space normal into the globe frame; R alone is not height.
+    vec3 tangent = normalize(vec3(-normal.z, 0.0001, normal.x));
+    vec3 bitangent = normalize(cross(normal, tangent));
+    vec3 detail = texture2D(normalMap, vUv).xyz * 2.0 - 1.0;
+    vec3 surfaceNormal = normalize(normal + (tangent * detail.x + bitangent * detail.y) * 0.16);
+    float solarAngle = dot(normal, sunDirection);
+    float day = smoothstep(-0.14, 0.22, solarAngle);
+    float night = 1.0 - smoothstep(-0.2, 0.08, solarAngle);
+    float diffuse = max(dot(surfaceNormal, sunDirection), 0.0);
+    // Source blue chroma identifies open water without another mask texture.
+    float water = smoothstep(0.003, 0.045, albedo.b - max(albedo.r, albedo.g));
+    vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
+    vec3 halfVector = normalize(sunDirection + viewDirection);
+    float reflection = pow(max(dot(surfaceNormal, halfVector), 0.0), 100.0) * water * day;
+    vec2 cloudUv = vec2(fract(vUv.x + cloudOffset + 0.0015), vUv.y);
+    float cloudShadow = texture2D(cloudMap, cloudUv).r * day;
+    vec3 surface = albedo * (0.07 + day * 0.17 + diffuse * 1.12);
+    surface *= 1.0 - cloudShadow * 0.15;
+    // One geographically registered emission term, suppressed across the terminator.
+    surface += cities * vec3(1.0, 0.68, 0.32) * night * 1.55;
+    surface += vec3(1.0, 0.86, 0.64) * reflection * 0.38;
+    gl_FragColor = vec4(surface, opacity);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
+  }
+`;
+
+const cloudFragmentShader = `
+  uniform sampler2D cloudMap;
   uniform vec3 sunDirection;
   uniform float opacity;
   varying vec2 vUv;
   varying vec3 vWorldNormal;
-
-  void main() {
-    vec3 dayColor = texture2D(dayMap, vUv).rgb;
-    vec3 cityLights = texture2D(nightMap, vUv).rgb;
-    float surfaceDetail = texture2D(normalMap, vUv).r;
-    vec3 normal = normalize(vWorldNormal);
-    float lightAmount = dot(normal, normalize(sunDirection));
-    float dayAmount = smoothstep(-0.12, 0.44, lightAmount);
-    float nightAmount = 1.0 - smoothstep(-0.2, 0.2, lightAmount);
-    float horizon = pow(1.0 - abs(clamp(lightAmount, -1.0, 1.0)), 7.0);
-
-    vec3 nightSurface = dayColor * 0.055 + cityLights * vec3(1.62, 1.07, 0.55) * 1.65;
-    vec3 litSurface = dayColor * (0.34 + max(lightAmount, 0.0) * 0.92);
-    vec3 color = mix(nightSurface, litSurface, dayAmount);
-    color += cityLights * nightAmount * 0.62;
-    color += vec3(1.0, 0.37, 0.08) * horizon * 0.13;
-    color *= mix(0.965, 1.035, surfaceDetail);
-
-    gl_FragColor = vec4(color, opacity);
-    #include <tonemapping_fragment>
-    #include <colorspace_fragment>
-  }
-`;
-
-const atmosphereVertexShader = `
-  varying vec3 vNormal;
   varying vec3 vWorldPosition;
   void main() {
-    vNormal = normalize(mat3(modelMatrix) * normal);
-    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-    vWorldPosition = worldPosition.xyz;
-    gl_Position = projectionMatrix * viewMatrix * worldPosition;
+    // Native satellite luminance retains thin cloud filaments as transparency.
+    float density = texture2D(cloudMap, vUv).r;
+    if (density < 0.02) discard;
+    float sunlight = smoothstep(-0.18, 0.5, dot(normalize(vWorldNormal), sunDirection));
+    float body = smoothstep(0.04, 0.8, density);
+    vec3 color = mix(vec3(0.018, 0.034, 0.066), vec3(0.91, 0.94, 0.97), sunlight);
+    color *= mix(0.78, 1.0, body);
+    gl_FragColor = vec4(color, density * opacity);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
   }
 `;
 
 const atmosphereFragmentShader = `
-  #include <common>
   uniform vec3 sunDirection;
   uniform float opacity;
-  varying vec3 vNormal;
+  varying vec3 vWorldNormal;
   varying vec3 vWorldPosition;
   void main() {
+    vec3 normal = normalize(vWorldNormal);
     vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
-    float fresnel = pow(1.0 - max(dot(viewDirection, vNormal), 0.0), 3.2);
-    float sunEdge = pow(max(dot(vNormal, normalize(sunDirection)), 0.0), 7.0);
-    vec3 cool = vec3(0.08, 0.32, 0.76);
-    vec3 warm = vec3(1.0, 0.36, 0.08);
-    vec3 color = mix(cool, warm, sunEdge * 0.82);
-    gl_FragColor = vec4(color, fresnel * opacity);
+    // abs prevents the back-face shell from painting a solid blue limb.
+    float rim = pow(1.0 - abs(dot(viewDirection, normal)), 5.0);
+    float daylight = smoothstep(-0.3, 0.55, dot(normal, sunDirection));
+    vec3 color = mix(vec3(0.025, 0.12, 0.32), vec3(0.22, 0.48, 0.8), daylight);
+    gl_FragColor = vec4(color, rim * opacity * (0.35 + daylight * 0.65));
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
   }
 `;
 
-function createOrbitalGlowTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
-  const context = canvas.getContext('2d');
-  if (!context) return new THREE.CanvasTexture(canvas);
-
-  const gradient = context.createRadialGradient(128, 128, 2, 128, 128, 128);
-  gradient.addColorStop(0, 'rgba(255,255,238,1)');
-  gradient.addColorStop(0.08, 'rgba(255,219,117,.98)');
-  gradient.addColorStop(0.28, 'rgba(255,132,35,.48)');
-  gradient.addColorStop(1, 'rgba(255,83,12,0)');
-  context.fillStyle = gradient;
-  context.fillRect(0, 0, 256, 256);
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  return texture;
-}
-
 export function EarthScene({ quality }: { quality: AlvoradaQualityProfile }) {
   const timeline = useAlvoradaTimeline();
-  const spaceRoot = useRef<THREE.Group>(null);
-  const earthRoot = useRef<THREE.Group>(null);
+  const { gl } = useThree();
+  const root = useRef<THREE.Group>(null);
   const cloudMesh = useRef<THREE.Mesh>(null);
-  const earthMaterial = useRef<THREE.ShaderMaterial>(null);
-  const atmosphereMaterial = useRef<THREE.ShaderMaterial>(null);
-  const sunMaterial = useRef<THREE.SpriteMaterial>(null);
   const stars = useRef<THREE.Points>(null);
-  const [dayMap, nightMap, normalMap, cloudMap] = useTexture(EARTH_TEXTURE_URLS);
-  const glowTexture = useMemo(createOrbitalGlowTexture, []);
-  const sunDirection = useMemo(() => new THREE.Vector3(0.42, 0.63, -0.24).normalize(), []);
-  const earthSegments = quality.mobile ? [96, 64] : [128, 96];
-  const atmosphereSegments = quality.mobile ? [64, 48] : [96, 64];
-
-  useEffect(() => {
-    dayMap.colorSpace = THREE.SRGBColorSpace;
-    nightMap.colorSpace = THREE.SRGBColorSpace;
-    cloudMap.colorSpace = THREE.SRGBColorSpace;
-    [dayMap, nightMap, normalMap, cloudMap].forEach((texture) => {
-      texture.anisotropy = quality.mobile ? 2 : 4;
+  // A quality decline must not restart loading during the journey.
+  const [textureUrls] = useState(() => getEarthTextureUrls(quality.mobile));
+  const configureTextures = useCallback((loaded: THREE.Texture[]) => {
+    loaded.forEach((texture, index) => {
+      texture.colorSpace = index < 2 ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+      texture.anisotropy = Math.min(quality.mobile ? 2 : 4, gl.capabilities.getMaxAnisotropy());
+      texture.wrapS = THREE.RepeatWrapping;
       texture.needsUpdate = true;
     });
-  }, [cloudMap, dayMap, nightMap, normalMap, quality.mobile]);
-
+  }, [gl, quality.mobile]);
+  // Configure in layout before drei uploads, avoiding a second color-space upload.
+  const [dayMap, nightMap, normalMap, cloudMap] = useTexture(textureUrls, configureTextures);
+  const sunDirection = useMemo(() => latitudeLongitudeToVector3(8, 6, 1).normalize(), []);
   const earthUniforms = useMemo(() => ({
-    dayMap: { value: dayMap },
-    nightMap: { value: nightMap },
-    normalMap: { value: normalMap },
-    opacity: { value: 1 },
+    dayMap: { value: dayMap }, nightMap: { value: nightMap }, normalMap: { value: normalMap },
+    cloudMap: { value: cloudMap }, cloudOffset: { value: 0 }, opacity: { value: 1 },
     sunDirection: { value: sunDirection },
-  }), [dayMap, nightMap, normalMap, sunDirection]);
-
+  }), [cloudMap, dayMap, nightMap, normalMap, sunDirection]);
+  const cloudUniforms = useMemo(() => ({
+    cloudMap: { value: cloudMap }, opacity: { value: 0.57 }, sunDirection: { value: sunDirection },
+  }), [cloudMap, sunDirection]);
   const atmosphereUniforms = useMemo(() => ({
-    opacity: { value: 0.38 },
-    sunDirection: { value: sunDirection },
+    opacity: { value: 0.28 }, sunDirection: { value: sunDirection },
   }), [sunDirection]);
 
   useEffect(() => () => {
-    glowTexture.dispose();
     [dayMap, nightMap, normalMap, cloudMap].forEach((texture) => texture.dispose());
-    EARTH_TEXTURE_URLS.forEach((url) => useTexture.clear(url));
-  }, [cloudMap, dayMap, glowTexture, nightMap, normalMap]);
+    useTexture.clear(textureUrls);
+  }, [cloudMap, dayMap, nightMap, normalMap, textureUrls]);
 
   useFrame(() => {
-    const elapsed = timeline.current.elapsed;
-    const fade = deriveAlvoradaVisualState(elapsed).earthOpacity;
-    if (spaceRoot.current) spaceRoot.current.visible = fade > 0.001;
-    if (earthRoot.current) {
-      earthRoot.current.visible = fade > 0.001;
-      earthRoot.current.scale.setScalar(1 + smoothRange(elapsed, 3.7, 4.5) * 0.025);
-    }
-    if (cloudMesh.current) cloudMesh.current.rotation.y = timeline.current.ambientElapsed * 0.0045;
-    if (earthMaterial.current) earthMaterial.current.uniforms.opacity.value = fade;
-    if (atmosphereMaterial.current) atmosphereMaterial.current.uniforms.opacity.value = fade * 0.38;
-    if (sunMaterial.current) sunMaterial.current.opacity = fade * (0.66 + smoothRange(elapsed, 0, 2) * 0.22);
-    if (stars.current) {
-      (stars.current.material as THREE.PointsMaterial).opacity = fade;
-    }
+    const fade = deriveAlvoradaVisualState(timeline.current.elapsed).earthOpacity;
+    if (root.current) root.current.visible = fade > 0.001;
+    if (fade <= 0.001) return;
+    const cloudRotation = timeline.current.ambientElapsed * 0.002;
+    if (cloudMesh.current) cloudMesh.current.rotation.y = cloudRotation;
+    earthUniforms.cloudOffset.value = cloudRotation / (Math.PI * 2);
+    earthUniforms.opacity.value = fade;
+    cloudUniforms.opacity.value = fade * 0.57;
+    atmosphereUniforms.opacity.value = fade * 0.28;
+    if (stars.current) (stars.current.material as THREE.PointsMaterial).opacity = fade * 0.45;
   });
 
+  const segments = quality.mobile ? 80 : 112;
   return (
-    <group ref={spaceRoot}>
-      <group ref={earthRoot}>
-        <mesh>
-          <sphereGeometry args={[EARTH_RADIUS, earthSegments[0], earthSegments[1]]} />
-          <shaderMaterial
-            ref={earthMaterial}
-            fragmentShader={earthFragmentShader}
-            transparent
-            uniforms={earthUniforms}
-            vertexShader={earthVertexShader}
-          />
-        </mesh>
-
-        <mesh ref={cloudMesh} scale={1.006}>
-          <sphereGeometry args={[EARTH_RADIUS, atmosphereSegments[0], atmosphereSegments[1]]} />
-          <meshBasicMaterial
-            map={cloudMap}
-            color="#d8e9f8"
-            blending={THREE.NormalBlending}
-            opacity={0.27}
-            transparent
-            depthWrite={false}
-          />
-        </mesh>
-
-        <mesh scale={1.019}>
-          <sphereGeometry args={[EARTH_RADIUS, atmosphereSegments[0], atmosphereSegments[1]]} />
-          <shaderMaterial
-            ref={atmosphereMaterial}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            fragmentShader={atmosphereFragmentShader}
-            side={THREE.BackSide}
-            transparent
-            uniforms={atmosphereUniforms}
-            vertexShader={atmosphereVertexShader}
-          />
-        </mesh>
-
-        <BrazilLayer />
-        <RioGrandeDoSulLayer />
-        <SantaRosaMarker />
-      </group>
-
-      <sprite position={sunDirection.clone().multiplyScalar(17)} scale={[4.8, 4.8, 1]}>
-        <spriteMaterial
-          ref={sunMaterial}
-          map={glowTexture}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          opacity={0.7}
-          transparent
-          toneMapped={false}
-        />
-      </sprite>
-
-      <Stars
-        ref={stars}
-        radius={68}
-        depth={32}
-        count={quality.mobile ? 720 : 1250}
-        factor={2.1}
-        saturation={0.14}
-        fade
-        speed={0}
-      />
+    <group ref={root} name="AlvoradaEarth">
+      <mesh>
+        <sphereGeometry args={[EARTH_RADIUS, segments, Math.round(segments * 0.66)]} />
+        <shaderMaterial fragmentShader={earthFragmentShader} vertexShader={earthVertexShader}
+          uniforms={earthUniforms} transparent />
+      </mesh>
+      <mesh ref={cloudMesh} scale={1.003}>
+        <sphereGeometry args={[EARTH_RADIUS, 80, 48]} />
+        <shaderMaterial fragmentShader={cloudFragmentShader} vertexShader={earthVertexShader}
+          uniforms={cloudUniforms} transparent depthWrite={false} />
+      </mesh>
+      <mesh scale={1.006}>
+        <sphereGeometry args={[EARTH_RADIUS, 80, 48]} />
+        <shaderMaterial fragmentShader={atmosphereFragmentShader} vertexShader={earthVertexShader}
+          uniforms={atmosphereUniforms} blending={THREE.AdditiveBlending}
+          side={THREE.BackSide} transparent depthWrite={false} />
+      </mesh>
+      <BrazilLayer />
+      <RioGrandeDoSulLayer />
+      <SantaRosaMarker />
+      <Stars ref={stars} radius={68} depth={32} count={quality.mobile ? 300 : 560}
+        factor={1.15} saturation={0} fade speed={0} />
     </group>
   );
 }

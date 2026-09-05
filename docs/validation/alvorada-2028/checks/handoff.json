@@ -1,0 +1,15 @@
+{
+  "phaseAtInput": "org-transition",
+  "reducedMotion": true,
+  "checks": [
+    "same complete journey with reduced-motion preference",
+    "atmospheric approach and harvest decoded",
+    "WebGL released while harvest holds",
+    "one 2028",
+    "search responds during graph reveal",
+    "only selected direct edge during reveal",
+    "close panel",
+    "close/reopen/close intro without stale resources"
+  ],
+  "errors": []
+}

@@ -11,6 +11,7 @@ import {
   Plus,
   RotateCcw,
   Search,
+  X,
 } from 'lucide-react';
 import { CCPF_FULL_LABEL } from '../resolver';
 import type { OrgGraphFilter, OrgSearchResult } from '../hooks/useOrgGraphInteraction';
@@ -30,6 +31,7 @@ interface OrgFilterBarProps {
 interface OrgViewportControlsProps {
   scale: number;
   selected: boolean;
+  onClearSelection?: () => void;
   onFit: () => void;
   onFocusSelected: () => void;
   onZoomIn: () => void;
@@ -112,10 +114,11 @@ export function OrgSearch({
 
   return (
     <div className="org-search" data-org-interactive>
-      <label className="org-search__field">
-        <span className="sr-only">BUSCAR PESSOA, COMISSÃO OU ASSESSORIA</span>
+      <div className="org-search__field">
+        <label className="sr-only" htmlFor={`${listId}-input`}>BUSCAR PESSOA, COMISSÃO OU ASSESSORIA</label>
         <Search aria-hidden="true" data-org-search-icon />
         <input
+          id={`${listId}-input`}
           type="search"
           value={query}
           placeholder="BUSCAR PESSOA OU ÁREA"
@@ -129,7 +132,12 @@ export function OrgSearch({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
         />
-      </label>
+        {query && (
+          <button type="button" className="org-search__clear" onClick={() => onQueryChange('')} aria-label="Limpar busca" title="Limpar busca">
+            <X aria-hidden="true" />
+          </button>
+        )}
+      </div>
 
       {expanded && (
         <div id={listId} className="org-search__results" role="listbox">
@@ -156,6 +164,11 @@ export function OrgSearch({
           })}
         </div>
       )}
+      {query.trim().length >= 2 && results.length === 0 && (
+        <div className="org-search__results org-search__empty" role="status">
+          Nenhuma pessoa ou área encontrada.
+        </div>
+      )}
     </div>
   );
 }
@@ -171,7 +184,7 @@ export function OrgFilterBar({ filter, onFilterChange }: OrgFilterBarProps) {
             type="button"
             aria-label={item.accessibleLabel ?? item.label}
             aria-pressed={filter === item.id}
-            title={item.accessibleLabel}
+            title={item.accessibleLabel ?? item.label}
             onClick={() => onFilterChange(item.id)}
           >
             <FilterIcon aria-hidden="true" data-org-filter-icon />
@@ -187,6 +200,7 @@ export function OrgFilterBar({ filter, onFilterChange }: OrgFilterBarProps) {
 export function OrgViewportControls({
   scale,
   selected,
+  onClearSelection,
   onFit,
   onFocusSelected,
   onZoomIn,
@@ -194,23 +208,30 @@ export function OrgViewportControls({
 }: OrgViewportControlsProps) {
   return (
     <div className="org-viewport-controls" data-org-interactive aria-label="Controles do mapa organizacional">
-      <button type="button" onClick={onZoomOut} aria-label="Reduzir zoom">
+      {selected && onClearSelection && (
+        <button type="button" className="org-viewport-controls__clear" onClick={onClearSelection} aria-label="Limpar seleção e restaurar visão geral" title="Limpar seleção e restaurar visão geral">
+          <X aria-hidden="true" />
+          <span>Limpar seleção</span>
+        </button>
+      )}
+      <button type="button" onClick={onZoomOut} aria-label="Reduzir zoom" title="Reduzir zoom">
         <Minus aria-hidden="true" />
       </button>
       <output aria-label={`Zoom em ${Math.round(scale * 100)} por cento`}>
         {Math.round(scale * 100)}%
       </output>
-      <button type="button" onClick={onZoomIn} aria-label="Aumentar zoom">
+      <button type="button" onClick={onZoomIn} aria-label="Aumentar zoom" title="Aumentar zoom">
         <Plus aria-hidden="true" />
       </button>
       <span className="org-viewport-controls__divider" aria-hidden="true" />
-      <button type="button" onClick={onFit} aria-label="Enquadrar todo o ecossistema">
+      <button type="button" onClick={onFit} aria-label="Enquadrar todo o ecossistema" title="Enquadrar todo o ecossistema">
         <RotateCcw aria-hidden="true" />
       </button>
       <button
         type="button"
         onClick={onFocusSelected}
         aria-label="Centralizar nó selecionado"
+        title="Centralizar nó selecionado"
         disabled={!selected}
       >
         <LocateFixed aria-hidden="true" />
