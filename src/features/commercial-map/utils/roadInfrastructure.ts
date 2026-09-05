@@ -54,6 +54,8 @@ export interface RoadNetworkGeometrySet {
 
 interface NetworkBuildOptions {
   reducedGraphics?: boolean;
+  /** Detailed presentation replaces only base meshes, never source entities. */
+  suppressedSurfaceIdentifiers?: readonly string[];
 }
 
 interface Bounds {
@@ -74,6 +76,14 @@ const EPSILON = 1e-6;
 
 export function isRoadInfrastructureEntity(entity: MapEntity) {
   return entity.classification === 'ROAD' || entity.classification === 'PEDESTRIAN_PATH';
+}
+
+export function selectRoadSurfaceEntities(
+  entities: readonly MapEntity[],
+  suppressedSurfaceIdentifiers: readonly string[] = [],
+) {
+  return entities.filter((entity) => isRoadInfrastructureEntity(entity)
+    && !suppressedSurfaceIdentifiers.includes(entity.publicIdentifier));
 }
 
 export function roadSurfaceHeight(entity: MapEntity) {
@@ -438,7 +448,7 @@ export function buildRoadNetworkGeometries(
   entities: MapEntity[],
   options: NetworkBuildOptions = {},
 ): RoadNetworkGeometrySet {
-  const circulation = entities.filter(isRoadInfrastructureEntity);
+  const circulation = selectRoadSurfaceEntities(entities, options.suppressedSurfaceIdentifiers);
   const roads = circulation.filter((entity) => entity.classification === 'ROAD');
   const pedestrianPaths = circulation.filter((entity) => entity.classification === 'PEDESTRIAN_PATH');
   const connections = findRoadConnections(roads);

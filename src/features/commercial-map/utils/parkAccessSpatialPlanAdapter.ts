@@ -12,6 +12,7 @@ import type {
 } from './parkAccessInfrastructure';
 import { roadSurfaceHeight } from './roadInfrastructure';
 import { entitySurfaceElevation } from './spatialSurface';
+import { splitLateralResidentialSidewalk } from './lateralResidentialStreetIntegration';
 
 type SpatialPlan = typeof PARK_ACCESS_SPATIAL_PLAN;
 
@@ -89,7 +90,7 @@ export function adaptParkAccessSpatialPlan(
       supportAware: surface.supportAware === true,
     })),
     supportSurfaces: PARK_ACCESS_OFFICIAL_FLAT_SUPPORT_SURFACES,
-    sidewalkSurfaces: plan.sidewalkSurfaces.map((surface) => ({
+    sidewalkSurfaces: plan.sidewalkSurfaces.flatMap((surface) => splitLateralResidentialSidewalk({
       id: surface.id,
       polygon: surface.polygon,
       elevation: surface.elevation,

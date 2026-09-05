@@ -157,6 +157,7 @@ import { MiranteInteriorScene } from './MiranteInteriorScene';
 import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
 import { NationsDistrict } from './NationsDistrict';
 import { CommercialMapEnvironment } from './CommercialMapEnvironment';
+import { LateralResidentialDistrict } from './LateralResidentialDistrict';
 import { applyParkGroundDetail } from './terrainMaterial';
 import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 import { CommercialMapAdaptiveQualityController } from './CommercialMapAdaptiveQuality';
@@ -204,6 +205,9 @@ import {
 } from '../../utils/pavilionModuleCommercial';
 
 // Never import the exclusion audit or debug textures in the production bundle.
+const LateralDistrictQaScene = import.meta.env.DEV
+  ? lazy(async () => ({ default: (await import('../../diagnostics/LateralDistrictQa')).LateralDistrictQaScene }))
+  : null;
 const RearRoadValidationOverlay = import.meta.env.DEV
   ? lazy(async () => ({ default: (await import('./RearRoadValidationOverlay')).RearRoadValidationOverlay }))
   : null;
@@ -325,6 +329,7 @@ const EXPORURAL_PARK_ACCESS_SURFACE_OWNER_IDENTIFIERS = [
   'RUA-GUSTAVO-BESSEL',
 ] as const;
 const PARK_ACCESS_ARCHITECTURE_OWNER_IDENTIFIERS = ['A1', 'A2', 'A3'] as const;
+const PARK_ACCESS_DETAILED_ROAD_SURFACE_IDENTIFIERS = ['AV-BENVENUTO-CONTI'] as const;
 const PARK_ACCESS_SCENE_SUPPORT_POINTS = [
   ...PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.flatMap((surface) => (
     surface.polygon.map((position) => ({ position }))
@@ -4689,6 +4694,9 @@ const Scene = memo(function Scene({
       )}
       <RoadInfrastructure
         entities={circulationEntities}
+        suppressedSurfaceIdentifiers={parkAccessScope === 'all'
+          && parkAccessPresentation.surfaces.visible && !hydrologicalModeActive
+          ? PARK_ACCESS_DETAILED_ROAD_SURFACE_IDENTIFIERS : undefined}
         selectedEntityId={selectedEntityId}
         matchingEntityIds={matchingEntityIds}
         filtersActive={filtersActive}
@@ -4723,6 +4731,11 @@ const Scene = memo(function Scene({
           <RearParkEnvironmentLayer
             reducedGraphics={reducedGraphics}
             vegetationVisible={treesVisible}
+          />
+          <LateralResidentialDistrict
+            reducedGraphics={reducedGraphics}
+            vegetationVisible={treesVisible}
+            nightMode={nightAtmosphereActive}
           />
           <RearParkRoadNetwork
             reducedGraphics={reducedGraphics}
@@ -4913,6 +4926,8 @@ const Scene = memo(function Scene({
         hydrologicalModeActive={hydrologicalModeActive}
       />
       <RuntimeFrameDiagnostics />
+      {LateralDistrictQaScene && window.location.pathname === '/__dev/commercial-map-rendering'
+        && <Suspense fallback={null}><LateralDistrictQaScene /></Suspense>}
       <NavigationInteractionCoordinator
         onHover={setHoveredEntityId}
         onCursor={setCanvasCursor}

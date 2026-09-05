@@ -452,6 +452,24 @@ function createHorizontalStripGeometry(
   return geometry;
 }
 
+/** Curbs rest on opaque surfaces; their downward faces can never be seen. */
+function omitCurbUndersides(geometry: THREE.BufferGeometry) {
+  const normal = geometry.getAttribute('normal');
+  const sourceIndex = geometry.index;
+  const count = sourceIndex?.count ?? normal.count;
+  const kept: number[] = [];
+  for (let offset = 0; offset < count; offset += 3) {
+    const a = sourceIndex ? sourceIndex.getX(offset) : offset;
+    const b = sourceIndex ? sourceIndex.getX(offset + 1) : offset + 1;
+    const c = sourceIndex ? sourceIndex.getX(offset + 2) : offset + 2;
+    if (normal.getY(a) < -0.99 && normal.getY(b) < -0.99 && normal.getY(c) < -0.99) continue;
+    kept.push(a, b, c);
+  }
+  geometry.setIndex(kept);
+  geometry.clearGroups();
+  return geometry;
+}
+
 function createCurbSegmentGeometry(
   from: ParkAccessPoint,
   to: ParkAccessPoint,
@@ -474,7 +492,7 @@ function createCurbSegmentGeometry(
   );
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
-  return geometry;
+  return omitCurbUndersides(geometry);
 }
 
 function mergeAndDispose(geometries: Array<THREE.BufferGeometry | null>) {
@@ -637,7 +655,7 @@ function raisedRingGeometry(
   geometry.computeVertexNormals();
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
-  return geometry;
+  return omitCurbUndersides(geometry);
 }
 
 function triangleCount(geometry: THREE.BufferGeometry | null) {

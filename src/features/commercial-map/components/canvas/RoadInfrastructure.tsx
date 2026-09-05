@@ -23,6 +23,8 @@ import { bindParkSurfaceMaterial } from './parkSurfaceMaterial';
 
 interface RoadInfrastructureProps {
   entities: MapEntity[];
+  /** Detailed presentation owns these base surfaces; entity highlights remain. */
+  suppressedSurfaceIdentifiers?: readonly string[];
   selectedEntityId: string | null;
   matchingEntityIds: ReadonlySet<string>;
   filtersActive: boolean;
@@ -62,6 +64,7 @@ const PEDESTRIAN_NORMAL_SCALE = new THREE.Vector2(0.22, 0.22);
 
 const RoadLayerNetwork = memo(function RoadLayerNetwork({
   entities,
+  suppressedSurfaceIdentifiers,
   selectedEntityId,
   matchingEntityIds,
   filtersActive,
@@ -71,8 +74,8 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
 }: RoadLayerNetworkProps) {
   const { invalidate } = useThree();
   const network = useMemo(
-    () => buildRoadNetworkGeometries(entities, { reducedGraphics }),
-    [entities, reducedGraphics],
+    () => buildRoadNetworkGeometries(entities, { reducedGraphics, suppressedSurfaceIdentifiers }),
+    [entities, reducedGraphics, suppressedSurfaceIdentifiers],
   );
   const selectedEntity = useMemo(
     () => entities.find((entity) => entity.id === selectedEntityId) ?? null,
@@ -248,6 +251,7 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
 
 export const RoadInfrastructure = memo(function RoadInfrastructure({
   entities,
+  suppressedSurfaceIdentifiers,
   selectedEntityId,
   matchingEntityIds,
   filtersActive,
@@ -289,6 +293,7 @@ export const RoadInfrastructure = memo(function RoadInfrastructure({
         <RoadLayerNetwork
           key={layerId}
           entities={layerEntities}
+          suppressedSurfaceIdentifiers={suppressedSurfaceIdentifiers}
           selectedEntityId={selectedEntityId}
           matchingEntityIds={matchingEntityIds}
           filtersActive={filtersActive}
