@@ -12,7 +12,7 @@ import {
   EXPORURAL_PARK_ACCESS_INFRASTRUCTURE_INPUT,
   PARK_ACCESS_INFRASTRUCTURE_INPUT,
 } from '../../utils/parkAccessSpatialPlanAdapter';
-import { applyParkSurfaceDetail, bindParkSurfaceMaterial } from './parkSurfaceMaterial';
+import { applyParkSurfaceDetail, bindParkSurfaceMaterial, PARK_SURFACE_PROFILES } from './parkSurfaceMaterial';
 
 export type ParkAccessInfrastructureScope = 'all' | 'exporural';
 
@@ -334,8 +334,6 @@ function SurfaceMaterial({
       color={ROAD_MATERIAL_COLORS.asphalt}
       map={reducedGraphics ? undefined : ASPHALT_TEXTURE}
       roughnessMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS}
-      bumpMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS}
-      bumpScale={ROAD_SURFACE_PROFILE.asphaltBumpScale}
       roughness={ROAD_SURFACE_PROFILE.asphaltRoughness}
       metalness={0}
       transparent={transparent}
@@ -345,7 +343,10 @@ function SurfaceMaterial({
       polygonOffset
       polygonOffsetFactor={-1}
       polygonOffsetUnits={-1}
-      ref={bindParkSurfaceMaterial('asphalt', reducedGraphics)}
+      // Two superimposed normal perturbations produced bright crawling grain
+      // along the avenue at oblique views. Keep albedo/roughness detail while
+      // its broad, almost-flat asphalt uses the geometric surface normal.
+      ref={(material) => { if (material) applyParkSurfaceDetail(material, { ...PARK_SURFACE_PROFILES.asphalt, normalStrength: 0 }, reducedGraphics); }}
     />
   );
   if (kind === 'cobblestone') return (
