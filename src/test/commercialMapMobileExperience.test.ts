@@ -46,10 +46,8 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     const dock = read('src/features/commercial-map/components/dock/commercial-map-dock.css');
     const layout = read('src/features/commercial-map/commercial-map.css');
 
-    expect(declarations(dock, '.commercial-map-dock', 'display')).toEqual([
-      { value: 'flex', conditions: [] },
-      ...compactControlConditions.map((conditions) => ({ value: 'none', conditions })),
-    ]);
+    expect(declarations(dock, '.commercial-map-dock.is-mobile', 'position')).toContainEqual({ value: 'absolute', conditions: [] });
+    expect(declarations(dock, '.commercial-map-dock.is-mobile', 'width')).toContainEqual({ value: '100%', conditions: [] });
     expect(declarations(layout, '.commercial-map-body', 'display')).toContainEqual({ value: 'flex', conditions: [] });
     expect(declarations(layout, '.commercial-map-viewport', 'flex')).toContainEqual({ value: '1', conditions: [] });
   });
@@ -66,19 +64,21 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     );
   });
 
-  it('mantém o total do resumo dentro do rail sem herdar a rolagem horizontal flutuante', () => {
+  it('mantém segmentos legíveis e a legenda sem rolagem horizontal', () => {
     const dock = read('src/features/commercial-map/components/dock/commercial-map-dock.css');
-    const summary = '.commercial-map-dock .commercial-map-summary.is-dock';
-    const compact = '.commercial-map-dock.is-compact .commercial-map-summary.is-compact';
-    const scroll = '.commercial-map-dock.is-compact .commercial-map-dock__scroll';
-    const primary = '.commercial-map-dock .commercial-map-summary.is-compact .commercial-map-summary-primary';
+    const legend = read('src/features/commercial-map/components/panels/contextual-map-legend.css');
+    expect(declarations(dock, '.commercial-map-dock__scroll', 'overflow-x')).toContainEqual({ value: 'hidden', conditions: [] });
+    expect(declarations(dock, '.commercial-map-dock__segments strong', 'white-space')).toContainEqual({ value: 'normal', conditions: [] });
+    expect(declarations(legend, '.commercial-context-statuses button', 'min-height')).toContainEqual({ value: '44px', conditions: [] });
+  });
 
-    expect(declarations(dock, summary, 'overflow')).toEqual([{ value: 'visible', conditions: [] }]);
-    expect(declarations(dock, summary, 'height')).toEqual([{ value: 'auto', conditions: [] }]);
-    expect(declarations(dock, scroll, 'scrollbar-gutter')).toEqual([{ value: 'auto', conditions: [] }]);
-    expect(declarations(dock, compact, 'width')).toEqual([{ value: '100%', conditions: [] }]);
-    expect(declarations(dock, compact, 'max-width')).toEqual([{ value: '46px', conditions: [] }]);
-    expect(declarations(dock, primary, 'padding-inline')).toEqual([{ value: '0', conditions: [] }]);
+  it('permite rolar filtros e resultados em paisagem mantendo o fechamento fixo', () => {
+    const styles = read('src/features/commercial-map/components/panels/entity-explorer-panel.css');
+    const conditions = ['@media (max-width: 950px) and (max-height: 520px)'];
+    expect(declarations(styles, '.commercial-map-shell .commercial-map-results-panel', 'overflow-y')).toContainEqual({ value: 'auto', conditions });
+    expect(declarations(styles, '.commercial-map-results-panel .commercial-map-explorer-panel-header', 'position')).toContainEqual({ value: 'sticky', conditions });
+    expect(declarations(styles, '.commercial-map-results-panel .commercial-map-explorer-panel-header > button', 'min-height')).toContainEqual({ value: '44px', conditions });
+    expect(declarations(styles, '.commercial-map-results-panel .commercial-map-panel-scroll > [data-radix-scroll-area-viewport]', 'overflow')).toContainEqual({ value: 'visible', conditions });
   });
 
   it('integra a busca no cabeçalho e mantém o mesmo estado comercial', () => {
@@ -106,16 +106,13 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     expect(styles).toMatch(/@container commercial-map \(max-width: 720px\)[\s\S]*?\.commercial-map-segment-legend \{ display: none; \}/);
   });
 
-  it('usa split real em meia tela e só expande por ação explícita', () => {
+  it('abre um resumo de um quarto da tela e mantém o canvas persistente', () => {
     const page = read('src/features/commercial-map/CommercialMapPage.tsx');
-    const panel = read('src/features/commercial-map/components/panels/MapPanels.tsx');
-    const styles = read('src/features/commercial-map/commercial-map-mobile.css');
-
+    const styles = read('src/features/commercial-map/components/panels/compact-detail-sheet.css');
     expect(page).toContain('data-canvas-lifecycle="persistent"');
-    expect(panel).toContain("useState<CommercialMapDetailSheetState>('half')");
-    expect(panel).toContain('data-sheet-state={sheetState}');
+    expect(styles).toContain('height: auto !important');
+    expect(styles).toContain('bottom: 0');
     expect(styles).toContain('data-sheet-state="half"');
-    expect(styles).toContain('bottom: 50%');
     expect(styles).toContain('data-sheet-state="collapsed"');
     expect(styles).toContain('data-sheet-state="expanded"');
   });
@@ -139,7 +136,7 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     expect(canvas).toContain('if (navigation.current.active) return;');
     expect(canvas).toContain('if (pendingResizeRefit.current && !wasNavigating) scheduleResizeRefit();');
     expect(canvas).toContain('pendingResizeRefit.current = false;');
-    expect(canvas).toContain('if (preserveManualView.current) return;');
+    expect(canvas).toMatch(/if \(preserveManualView.current\) \{[\s\S]*?targetPosition.current.copy\(camera.position\)[\s\S]*?'panel-layout'[\s\S]*?return;/);
     expect(canvas).toMatch(/selectionChanged && !selectedEntity[\s\S]*?preserveManualView.current = true;[\s\S]*?cancelScheduledResizeRefit\(\);/);
     expect(canvas).toContain('antialias: true');
     expect(canvas).toContain('gl={initialRenderConfig.current.renderer}');

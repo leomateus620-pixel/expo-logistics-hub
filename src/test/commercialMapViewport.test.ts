@@ -619,6 +619,7 @@ describe('viewport mobile do Mapa Comercial', () => {
 
   it('resolve os três snaps do painel sem iniciar expandido', () => {
     expect(resolveCommercialMapSheetSnap(110, 760)).toBe('collapsed');
+    expect(resolveCommercialMapSheetSnap(190, 760, 72)).toBe('half');
     expect(resolveCommercialMapSheetSnap(380, 760)).toBe('half');
     expect(resolveCommercialMapSheetSnap(600, 760)).toBe('expanded');
     expect(resolveCommercialMapSheetSnap(104, 338)).toBe('collapsed');

@@ -33,6 +33,8 @@ interface CommercialPavilionModuleLayerProps {
   mode: ModuleLayerMode;
   reducedGraphics?: boolean;
   moduleStateById?: ReadonlyMap<string, CommercialPavilionModuleVisualState>;
+  matchingEntityIds?: ReadonlySet<string>;
+  filtersActive?: boolean;
   /** Keeps plan labels upright for the pavilion's canonical interior viewpoint. */
   labelRotationRadians?: number;
 }
@@ -64,6 +66,7 @@ function zoneColor(colorCue: string, index: number, total: number) {
 
 const HOVER_COLOR = new THREE.Color('#f3e6b2');
 const SELECTED_COLOR = new THREE.Color('#f2c94c');
+const FILTERED_MODULE_COLOR = new THREE.Color('#a8ada5');
 const MODULE_STATUS_COLORS: Readonly<Record<CommercialStatus, THREE.Color>> = {
   AVAILABLE: new THREE.Color(STATUS_CONFIG.AVAILABLE.color),
   RESERVED: new THREE.Color(STATUS_CONFIG.RESERVED.color),
@@ -395,6 +398,8 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   mode,
   reducedGraphics = false,
   moduleStateById = EMPTY_MODULE_STATE,
+  matchingEntityIds,
+  filtersActive = false,
   labelRotationRadians = 0,
 }: CommercialPavilionModuleLayerProps) {
   const interactive = mode === 'interior';
@@ -553,6 +558,9 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       );
       color.copy(persistedStatus ? MODULE_STATUS_COLORS[persistedStatus] : zoneBaseColor);
       if (persistedStatus) color.lerp(zoneBaseColor, 0.12);
+      if (filtersActive && !matchingEntityIds?.has(moduleStateById.get(cell.id)?.entityId ?? '')) {
+        color.lerp(FILTERED_MODULE_COLOR, 0.82);
+      }
       if (isSelected) color.lerp(SELECTED_COLOR, 0.82);
       else if (isHovered) color.lerp(HOVER_COLOR, 0.55);
       moduleMesh.current?.setColorAt(index, color);
@@ -576,7 +584,9 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     activeHoveredId,
     activeSelectedId,
     floorY,
+    filtersActive,
     invalidate,
+    matchingEntityIds,
     moduleHeight,
     moduleBaseHeight,
     moduleBaseMaterial,
@@ -769,6 +779,9 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
         const color = persistedStatus
           ? MODULE_STATUS_COLORS[persistedStatus].clone().lerp(zoneBaseColor, 0.12)
           : zoneBaseColor;
+        if (filtersActive && !matchingEntityIds?.has(moduleStateById.get(module.cell.id)?.entityId ?? '')) {
+          color.lerp(FILTERED_MODULE_COLOR, 0.82);
+        }
         if (isSelected) color.lerp(SELECTED_COLOR, 0.82);
         else if (isHovered) color.lerp(HOVER_COLOR, 0.55);
         const borderColor = color.clone().multiplyScalar(

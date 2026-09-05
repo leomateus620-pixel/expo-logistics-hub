@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from 'react';
+import { memo, useLayoutEffect, useMemo, useState } from 'react';
 import {
   CalendarClock,
   FileLock2,
@@ -22,6 +22,8 @@ import type {
 } from '../../types';
 import type { CommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
 import { buildPavilionModuleCommercialIndex } from '../../utils/pavilionModuleCommercial';
+import { CompactDetailSheetControls } from './CompactDetailSheet';
+import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { LotAvailabilityDialog } from '../commercial/LotAvailabilityDialog';
 import { LotEditDialog } from '../commercial/LotEditDialog';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
@@ -42,6 +44,7 @@ interface Props {
   source: MapSource;
   onSynchronize?: () => void;
   synchronizing?: boolean;
+  embedded?: boolean;
 }
 
 /** Operational detail card for the neutral module selected inside a pavilion. */
@@ -54,9 +57,11 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
   source,
   onSynchronize,
   synchronizing = false,
+  embedded = false,
 }: Props) {
   const selectedModuleId = useCommercialMapStore((state) => state.selectedModuleId);
   const setSelectedModuleId = useCommercialMapStore((state) => state.setSelectedModuleId);
+  const sheet = useCompactDetailSheet(selectedModuleId);
   const [workflow, setWorkflow] = useState<LotWorkflow>(null);
   const [editingLot, setEditingLot] = useState(false);
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
@@ -84,6 +89,12 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
     persisted && permissions.canManageContracts,
   );
 
+  useLayoutEffect(() => {
+    setWorkflow(null);
+    setEditingLot(false);
+    setAvailabilityOpen(false);
+  }, [selectedModuleId]);
+
   if (!cell) return null;
 
   const individualArea = lot?.officialAreaSqm ?? cell.areaM2 ?? null;
@@ -94,16 +105,17 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
   return (
     <>
       <aside
-        className="commercial-pavilion-module-card"
+        ref={sheet.panelRef}
+        className={`commercial-pavilion-module-card${embedded ? ' is-embedded' : ''}`}
+        data-sheet-state={sheet.sheetState}
         style={{ '--pavilion-plan-accent': plan.colorCue } as React.CSSProperties}
         aria-label={`Módulo ${cell.label} do Pavilhão ${plan.stats.pavilionNumber}`}
         data-commercial-pavilion-module={cell.id}
       >
         <header>
           <div>
-            <span>Módulo selecionado</span>
             <strong>Módulo {cell.label}</strong>
-            <small>Pavilhão {plan.stats.pavilionNumber} · {plan.stats.category}</small>
+            <small>{pavilion.publicIdentifier} · Pavilhão {plan.stats.pavilionNumber}</small>
           </div>
           <button
             type="button"
@@ -114,16 +126,18 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
           </button>
         </header>
 
-        {status && (
-          <div
-            className="commercial-pavilion-module-status"
-            style={{ color: status.border, background: status.surface, borderColor: status.color }}
-          >
-            <b aria-hidden="true">{status.symbol}</b>
-            <span><strong>{status.label}</strong><small>{status.description}</small></span>
-          </div>
-        )}
-
+        <div className="commercial-pavilion-module-summary">
+          {status ? (
+            <div className="commercial-pavilion-module-status"
+              style={{ color: status.border, background: status.surface, borderColor: status.color }}>
+              <b aria-hidden="true">{status.symbol}</b>
+              <strong>{status.label}</strong>
+            </div>
+          ) : <span>Sem cadastro comercial</span>}
+          <span>{individualArea == null ? 'Área não informada' : `${individualArea.toLocaleString('pt-BR')} m² de área individual`}</span>
+        </div>
+        <CompactDetailSheetControls sheet={sheet} subject="módulo" embedded={embedded} />
+        <div className="commercial-pavilion-module-details" hidden={embedded && sheet.sheetState !== 'expanded'}>
         <dl>
           <div>
             <dt>Localização</dt>
@@ -221,8 +235,9 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
         )}
 
         <footer>
-          {persisted ? 'Operações protegidas por permissão e histórico' : 'Identificação oficial · área individual não atribuída'}
+          {persisted ? 'Operações protegidas por permissão e histórico' : 'Identificação oficial · consulta de referência'}
         </footer>
+        </div>
       </aside>
 
       {lot && (

@@ -1,4 +1,4 @@
-import { Profiler, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Profiler, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -32,41 +32,38 @@ import { CommercialMapRendererStatus } from './components/CommercialMapRendererS
 import { MapToolbar } from './components/controls/MapToolbar';
 import { CommercialMapTopBar } from './components/controls/CommercialMapTopBar';
 import { CommercialMapDock } from './components/dock/CommercialMapDock';
+import { CommercialMapHeaderTools } from './components/shell/CommercialMapHeaderTools';
 import { GeometryEditor } from './components/editor/GeometryEditor';
 import { LotCreationWorkspace } from './components/editor/LotCreationWorkspace';
 import {
   EntityDetailsPanel,
   LayersPanel,
-  StatusLegend,
 } from './components/panels/MapPanels';
 import { MapListView, ResultsPanel } from './components/panels/EntityExplorer';
 import { CalibrationPanel } from './components/panels/CalibrationPanel';
 import { PavilionModuleCard } from './components/panels/PavilionModuleCard';
-import { PavilionPlanLegend } from './components/panels/PavilionPlanLegend';
 import { HydrologicalNetworkLegend } from './components/panels/HydrologicalNetworkLegend';
 import { ParkingInspector } from './components/panels/ParkingInspector';
 import { MapPanelBoundary } from './components/panels/MapPanelBoundary';
-import { SegmentLegend } from './components/segments/SegmentLegend';
 import { resolveStrategicLandmarkKind } from './utils/landmarks';
 import { resolveCommercialPavilionModulePlan } from './utils/commercialPavilionModules';
 import { OFFICIAL_REFERENCE_REVISION } from './data/officialReference2026';
 import { REAR_PARKING_BLOCKS, rearParkingVisibleInArea, rearParkingLayerPresentation } from './data/rearParking';
 import {
   COMMERCIAL_MAP_SEGMENT_IDS,
-  buildCommercialMapSegmentIndex,
   getCommercialMapSegment,
   type CommercialMapSegmentDefinition,
   type CommercialMapSegmentId,
 } from './data/commercialMapSegments';
 import {
   areaScopeFromSearchParams,
-  isSegmentCompatibleWithAreaScope,
   scopeCommercialMapData,
   type CommercialMapAreaScope,
 } from './utils/areaScope';
 import { canUseTechnicalValidationOverlay } from './utils/technicalValidation';
 import { lunarLaunchPhaseLabel } from './utils/lunarLaunch';
 import { recordCommercialMapProfiler } from './utils/runtimeDiagnostics';
+import { canHandleCommercialMapEscape } from './utils/contextualNavigation';
 import type { CommercialMapData, CommercialMapQueryScope, MapPermissions } from './types';
 import './commercial-map.css';
 import './commercial-map-mobile.css';
@@ -112,6 +109,8 @@ function EntityDetailsPanelSkeleton() {
 
 interface CommercialMapPageProps {
   scope?: CommercialMapQueryScope;
+  /** Official fixtures for the DEV-only interface diagnostics route. */
+  previewData?: CommercialMapData;
 }
 
 function withPersistedCamera(
@@ -144,18 +143,20 @@ const COMMISSION_READ_ONLY_PERMISSIONS: MapPermissions = {
   isMapAdmin: false,
 };
 
-export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }: CommercialMapPageProps) {
+export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, previewData }: CommercialMapPageProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const isCommissionScope = scope.mode === 'commission';
   const lockedSegmentId = scope.mode === 'commission'
     ? scope.segmentId as CommercialMapSegmentId
     : null;
-  const areaScope = lockedSegmentId ?? areaScopeFromSearchParams(searchParams);
+  // A segment is a presentation filter. Only commission permissions restrict data scope.
+  const areaScope: CommercialMapAreaScope = lockedSegmentId ?? 'park';
   const isExporural = areaScope === 'exporural';
   const registeredScopedSegment = areaScope === 'park' ? null : getCommercialMapSegment(areaScope);
   const mapQuery = useCommercialMap(scope);
   const resolvedPermissions = useMapPermissions();
-  const permissions = isCommissionScope ? COMMISSION_READ_ONLY_PERMISSIONS : resolvedPermissions;
+  const isPreview = import.meta.env.DEV && Boolean(previewData);
+  const permissions = isCommissionScope || isPreview ? COMMISSION_READ_ONLY_PERMISSIONS : resolvedPermissions;
   const { bootstrap, exporuralSync, publish } = useMapMutations();
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
@@ -164,14 +165,12 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
   const setActivePanel = useCommercialMapStore((state) => state.setActivePanel);
   const workspaceMode = useCommercialMapStore((state) => state.workspaceMode);
   const setWorkspaceMode = useCommercialMapStore((state) => state.setWorkspaceMode);
-  const clearExplorerFilters = useCommercialMapStore((state) => state.clearExplorerFilters);
   const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
   const parkingInspectionOpen = useCommercialMapStore((state) => state.parkingInspectionOpen);
   const closeParkingInspection = useCommercialMapStore((state) => state.closeParkingInspection);
   const layerVisibility = useCommercialMapStore((state) => state.layerVisibility);
   const layerOpacity = useCommercialMapStore((state) => state.layerOpacity);
-  const requestCameraPreset = useCommercialMapStore((state) => state.requestCameraPreset);
   const activeSegmentId = useCommercialMapStore((state) => state.activeSegmentId);
   const requestSegmentFocus = useCommercialMapStore((state) => state.requestSegmentFocus);
   const clearSegmentFocus = useCommercialMapStore((state) => state.clearSegmentFocus);
@@ -183,10 +182,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
   const lunarLaunchPreviousPanel = useCommercialMapStore((state) => state.lunarLaunchPreviousPanel);
   const requestLunarLaunchSkip = useCommercialMapStore((state) => state.requestLunarLaunchSkip);
   const requestLunarLaunchReturn = useCommercialMapStore((state) => state.requestLunarLaunchReturn);
-  const interiorBackButtonRef = useRef<HTMLButtonElement>(null);
   const lastInteriorEntityId = useRef<string | null>(null);
-  const previousAreaScope = useRef<CommercialMapAreaScope>(areaScope);
-  const initializedAreaScope = useRef(false);
   const [webglAvailable] = useState(() => supportsWebGL());
   const [publishReason, setPublishReason] = useState('Publicação após revisão cartográfica e comercial');
   const technicalValidationAllowed = !isCommissionScope
@@ -207,7 +203,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
     }
   }, [activateScope, activeSegmentId, isCommissionScope, lockedSegmentId, mapScopeKey]);
 
-  const data = mapQuery.data;
+  const data = isPreview ? previewData : mapQuery.data;
   const scopedSegment = useMemo(
     () => withPersistedCamera(registeredScopedSegment, data),
     [data, registeredScopedSegment],
@@ -219,22 +215,20 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
     ),
     [areaScope, data?.entities, data?.lots],
   );
-  const scopedSegmentIndex = useMemo(
-    () => buildCommercialMapSegmentIndex(scopedData.entities, scopedData.lots),
-    [scopedData.entities, scopedData.lots],
-  );
   const parkingAvailable = rearParkingVisibleInArea(areaScope) && !hydrologicalModeActive
     && rearParkingLayerPresentation(data?.entities ?? [], layerVisibility, layerOpacity).visible;
   useEffect(() => {
     if (!parkingAvailable && parkingInspectionOpen) closeParkingInspection();
   }, [closeParkingInspection, parkingAvailable, parkingInspectionOpen]);
-  const activeSegment = getCommercialMapSegment(activeSegmentId);
-  const summaryLots = useMemo(() => (
-    activeSegment?.behavior.interaction === 'filter-and-focus' && activeSegmentId
-      ? scopedData.lots.filter((lot) => scopedSegmentIndex.get(lot.entityId)?.id === activeSegmentId)
-      : scopedData.lots
-  ), [activeSegment?.behavior.interaction, activeSegmentId, scopedData.lots, scopedSegmentIndex]);
   const mapFilter = useMapEntityFilter(scopedData.entities, scopedData.lots);
+  // DOM controls commit the current selection first; scene styling can render
+  // concurrently using the existing objects. React discards superseded results.
+  const presentation = useMemo(() => ({
+    activeSegmentId, interiorEntityId,
+    matchingEntityIds: mapFilter.matchingEntityIds,
+    filtersActive: mapFilter.hasActiveCriteria,
+  }), [activeSegmentId, interiorEntityId, mapFilter.matchingEntityIds, mapFilter.hasActiveCriteria]);
+  const scenePresentation = useDeferredValue(presentation);
   const selectedEntity = scopedData.entities.find((entity) => entity.id === selectedEntityId) ?? null;
   const selectedLot = scopedData.lots.find((lot) => lot.entityId === selectedEntityId);
   const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
@@ -244,75 +238,26 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
     ? resolveCommercialPavilionModulePlan(interiorEntity)
     : null;
 
-  const setAreaScope = (nextScope: CommercialMapAreaScope) => {
+  const handleSegmentClear = () => {
     if (isCommissionScope) return;
-    if (nextScope === 'exporural' && activeSegmentId !== COMMERCIAL_MAP_SEGMENT_IDS.exporural) {
-      clearSegmentFocus();
-    }
-    requestCameraPreset(nextScope === 'exporural' ? 'exporural' : 'overview');
-    const next = new URLSearchParams(searchParams);
-    if (nextScope === 'exporural') next.set('area', 'exporural');
-    else next.delete('area');
-    setSearchParams(next, { replace: false });
+    clearSegmentFocus();
   };
 
   const handleSegmentSelect = (segmentId: CommercialMapSegmentId) => {
     if (isCommissionScope) return;
-    if (segmentId === activeSegmentId) {
-      clearSegmentFocus();
-      if (workspaceMode !== 'list') requestCameraPreset(isExporural ? 'exporural' : 'overview');
-      return;
-    }
-
-    requestSegmentFocus(segmentId);
-    if (isExporural && segmentId !== COMMERCIAL_MAP_SEGMENT_IDS.exporural) {
-      const next = new URLSearchParams(searchParams);
-      next.delete('area');
-      setSearchParams(next, { replace: false });
-    }
+    if (segmentId === useCommercialMapStore.getState().activeSegmentId) handleSegmentClear();
+    else requestSegmentFocus(segmentId);
   };
 
-  const handleSegmentClear = () => {
-    if (isCommissionScope) return;
-    clearSegmentFocus();
-    if (workspaceMode !== 'list') requestCameraPreset(isExporural ? 'exporural' : 'overview');
-  };
-
+  // Preserve old links without keeping a second competing navigation state.
   useEffect(() => {
-    if (isCommissionScope) return;
-    if (!initializedAreaScope.current) {
-      initializedAreaScope.current = true;
-      const compatibleSegment = isSegmentCompatibleWithAreaScope(activeSegmentId, areaScope);
-      if (activeSegmentId && compatibleSegment) requestSegmentFocus(activeSegmentId);
-      else if (areaScope !== 'park') {
-        if (activeSegmentId) clearSegmentFocus();
-        requestSegmentFocus(areaScope);
-      }
-      return;
-    }
-    if (previousAreaScope.current === areaScope) return;
-    previousAreaScope.current = areaScope;
-    const focusedSegment = useCommercialMapStore.getState().activeSegmentId;
-    const compatibleSegment = isSegmentCompatibleWithAreaScope(focusedSegment, areaScope);
-    clearExplorerFilters();
-    setSelectedEntityId(null);
-    setActivePanel(null);
-    setWorkspaceMode('3d');
-    if (focusedSegment && compatibleSegment) requestSegmentFocus(focusedSegment);
-    else if (areaScope !== 'park') requestSegmentFocus(areaScope);
-    else requestCameraPreset('overview');
-  }, [
-    activeSegmentId,
-    areaScope,
-    clearSegmentFocus,
-    clearExplorerFilters,
-    isCommissionScope,
-    requestCameraPreset,
-    requestSegmentFocus,
-    setActivePanel,
-    setSelectedEntityId,
-    setWorkspaceMode,
-  ]);
+    if (isCommissionScope || !searchParams.has('area')) return;
+    const legacyScope = areaScopeFromSearchParams(searchParams);
+    if (legacyScope !== 'park') requestSegmentFocus(legacyScope);
+    const next = new URLSearchParams(searchParams);
+    next.delete('area');
+    setSearchParams(next, { replace: true });
+  }, [isCommissionScope, requestSegmentFocus, searchParams, setSearchParams]);
 
   useEffect(() => {
     if (selectedEntityId && !scopedData.entityIds.has(selectedEntityId)) setSelectedEntityId(null);
@@ -338,7 +283,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
           '[data-commercial-map-shell-search-trigger], [data-commercial-map-commission-search-trigger]',
         )?.click();
       }
-      if (event.key === 'Escape' && !event.defaultPrevented) {
+      if (canHandleCommercialMapEscape(event)) {
         if (lunarLaunchActive) {
           event.preventDefault();
           event.stopPropagation();
@@ -366,7 +311,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
   useEffect(() => {
     if (interiorEntityId) {
       lastInteriorEntityId.current = interiorEntityId;
-      const frame = window.requestAnimationFrame(() => interiorBackButtonRef.current?.focus());
+      const frame = window.requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('[data-map-interior-back]')?.focus());
       return () => window.cancelAnimationFrame(frame);
     }
     if (!lastInteriorEntityId.current) return undefined;
@@ -397,12 +342,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
   const hasManagementActions = permissions.isMapAdmin
     || permissions.canManageLots
     || permissions.canEditGeometry;
-  const scopeTitle = scopedSegment?.name ?? (isExporural ? 'Exporural' : 'Parque completo');
-  const scopeDescription = scopedSegment
-    ? scopedSegment.description
-    : `Referência cartográfica: ${data?.project.name ?? 'Fenasoja 2028'}`;
-
-  if (mapQuery.isLoading) return <MapPageSkeleton />;
+  if (!isPreview && mapQuery.isLoading) return <MapPageSkeleton />;
   if (!data) {
     return (
       <section className="commercial-map-shell" aria-label="Falha ao carregar o mapa comercial">
@@ -518,32 +458,32 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
       className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${hydrologicalModeActive ? 'is-hydrological-mode' : ''} ${parkingInspectionOpen ? 'is-parking-inspection' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''} ${lunarCinematicUiActive ? 'is-lunar-launch-active' : ''} ${lunarLaunchReturnAvailable ? 'has-lunar-launch-return' : ''}`}
       aria-label="Plataforma de gestão do mapa comercial"
     >
-      {!lunarCinematicUiActive && !isCommissionScope && !interiorEntityId && workspaceMode !== 'edit' && workspaceMode !== 'create' && (
-        <SegmentLegend
-          entities={data.entities}
-          lots={data.lots}
-          activeSegmentId={activeSegmentId}
-          onSelect={handleSegmentSelect}
-          onClear={handleSegmentClear}
-          variant="mobile"
-        />
-      )}
+      <CommercialMapHeaderTools managementActions={managementActions} />
 
       <div className="commercial-map-body">
         <CommercialMapDock
-          entities={data.entities}
-          allLots={data.lots}
-          lots={summaryLots}
-          areaScope={areaScope}
-          onAreaScopeChange={setAreaScope}
+          entities={scopedData.entities}
+          lots={scopedData.lots}
           activeSegmentId={activeSegmentId}
           onSegmentSelect={handleSegmentSelect}
           onSegmentClear={handleSegmentClear}
-          segmentName={activeSegment?.name ?? scopedSegment?.name}
+          scopeTitle={scopedSegment?.name}
           isCommissionScope={isCommissionScope}
-          managementActions={managementActions}
+          interiorEntity={interiorEntity}
+          matchingEntityIds={mapFilter.matchingEntityIds}
+          filtersActive={mapFilter.hasActiveCriteria}
+          moduleCard={interiorPavilionPlan && interiorEntity ? <PavilionModuleCard
+            embedded
+            plan={interiorPavilionPlan}
+            pavilion={interiorEntity}
+            entities={data.entities}
+            lots={data.lots}
+            permissions={permissions}
+            source={data.source}
+            onSynchronize={() => bootstrap.mutate()}
+            synchronizing={bootstrap.isPending}
+          /> : null}
         />
-
 
         <div id="commercial-map-viewport" className="commercial-map-viewport">
 
@@ -562,8 +502,10 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                   siteEnvironmentEntities={data.entities}
                   lots={scopedData.lots}
                   calibration={data.calibration}
-                  matchingEntityIds={mapFilter.matchingEntityIds}
-                  filtersActive={mapFilter.hasActiveCriteria}
+                  matchingEntityIds={scenePresentation.matchingEntityIds}
+                  filtersActive={scenePresentation.filtersActive}
+                  sceneSegmentId={scenePresentation.activeSegmentId}
+                  sceneInteriorEntityId={scenePresentation.interiorEntityId}
                   isolatedArea={areaScope === 'park' ? null : areaScope}
                   segmentOverride={isCommissionScope ? scopedSegment : null}
                   technicalValidationAllowed={technicalValidationAllowed}
@@ -614,60 +556,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                   Voltar à vista anterior
                 </button>
               )}
-              {interiorEntity ? (
-                <>
-                  <div
-                    className="commercial-map-interior-navigation"
-                    role="navigation"
-                    aria-label={`Navegação do interior de ${interiorEntity.name}`}
-                  >
-                    <Button
-                      ref={interiorBackButtonRef}
-                      variant="outline"
-                      onClick={exitInterior}
-                      aria-label={`Voltar ao mapa a partir de ${interiorEntity.name}`}
-                      aria-keyshortcuts="Escape"
-                    >
-                      <ArrowLeft />Voltar ao mapa
-                    </Button>
-                    <div>
-                      <span>
-                        {interiorKind === 'commercial-pavilion' ? 'Planta interna oficial' : 'Inspeção interna'} · {' '}
-                        {interiorPavilionPlan
-                          ? `Pavilhão ${interiorPavilionPlan.stats.pavilionNumber}`
-                          : interiorEntity.publicIdentifier}
-                      </span>
-                      <strong>{interiorEntity.name}</strong>
-                      <small>
-                        {interiorKind === 'commercial-pavilion'
-                          ? 'Arraste para percorrer · use pinça ou roda para aproximar e girar'
-                          : interiorKind === 'livestock-pavilion'
-                          ? 'Arraste para percorrer o corredor e as baias · role para aproximar'
-                          : interiorKind === 'mirante-pavilion'
-                            ? 'Arraste para observar o salão e a vista da Arena · role para aproximar'
-                            : 'Arraste para observar os ambientes · role para aproximar'}
-                      </small>
-                    </div>
-                    <kbd>Esc</kbd>
-                  </div>
-                  {interiorPavilionPlan && (
-                    <>
-                      <PavilionPlanLegend plan={interiorPavilionPlan} variant="interior" />
-                      <StatusLegend />
-                      <PavilionModuleCard
-                        plan={interiorPavilionPlan}
-                        pavilion={interiorEntity}
-                        entities={data.entities}
-                        lots={data.lots}
-                        permissions={permissions}
-                        source={data.source}
-                        onSynchronize={() => bootstrap.mutate()}
-                        synchronizing={bootstrap.isPending}
-                      />
-                    </>
-                  )}
-                </>
-              ) : (
+              {!interiorEntity && (
                 <>
                   {!lunarCinematicUiActive && <CommercialMapTopBar
                     areaScope={areaScope}
@@ -685,7 +574,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                   <div className="commercial-map-cinematic-legend">
                     {hydrologicalModeActive
                       ? <HydrologicalNetworkLegend />
-                      : <StatusLegend scope={areaScope} />}
+                      : null}
                   </div>
                   {parkingAvailable && !lunarCinematicUiActive && (
                     <ParkingInspector blocks={REAR_PARKING_BLOCKS} />
@@ -731,7 +620,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
           </>
         )}
 
-        {mapQuery.isError && (
+        {!isPreview && mapQuery.isError && (
           <div className="commercial-map-sync-warning" role="status">
             <AlertTriangle />
             <span><strong>Atualização temporariamente indisponível</strong>O último mapa válido permanece ativo.</span>
@@ -754,7 +643,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
         )}
         {(workspaceMode === 'list' || (!webglAvailable && workspaceMode === '3d')) && (
           <div className="commercial-map-workspace-layer is-list-view">
-            <MapListView explorer={mapFilter} permissions={permissions} />
+            <MapListView explorer={mapFilter} permissions={permissions} contextTitle={interiorEntity?.name ?? getCommercialMapSegment(activeSegmentId)?.name ?? 'Parque Fenasoja'} />
           </div>
         )}
 

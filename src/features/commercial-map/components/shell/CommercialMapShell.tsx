@@ -5,6 +5,7 @@ import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
+import { CommercialMapHeaderHost } from './headerHost';
 import './commercial-map-shell.css';
 
 export function CommercialMapShell({ children }: { children: ReactNode }) {
@@ -12,6 +13,7 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [toolsHost, setToolsHost] = useState<HTMLDivElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchTriggerRef = useRef<HTMLButtonElement>(null);
   const search = useCommercialMapStore((state) => state.search);
@@ -44,7 +46,7 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="commercial-map-module">
+    <CommercialMapHeaderHost.Provider value={toolsHost}><div className="commercial-map-module">
       <a className="commercial-map-module__skip-link" href="#commercial-map-main">
         Ir para o mapa comercial
       </a>
@@ -128,6 +130,7 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
 
 
         <div className="commercial-map-module__actions">
+          <div ref={setToolsHost} className="commercial-map-module__tools-host" />
           <span className="commercial-map-module__edition">FENASOJA 2028</span>
           <Button
             type="button"
@@ -149,6 +152,6 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
       <main id="commercial-map-main" className="commercial-map-module__content" tabIndex={-1}>
         {children}
       </main>
-    </div>
+    </div></CommercialMapHeaderHost.Provider>
   );
 }

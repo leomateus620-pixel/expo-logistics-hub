@@ -676,8 +676,9 @@ export function resolveCommercialMapSheetSnap(
     Math.max(0, Number.isFinite(collapsedHeight) ? collapsedHeight : 104),
     viewportHeight * 0.4,
   );
-  const halfHeight = viewportHeight * 0.5;
-  const expandedHeight = Math.max(halfHeight, viewportHeight - Math.max(136, viewportHeight * 0.28));
+  // The middle stop is a compact summary; full details need explicit expansion.
+  const halfHeight = Math.max(152, viewportHeight * 0.25);
+  const expandedHeight = Math.max(halfHeight, viewportHeight - Math.max(88, viewportHeight * 0.18));
   const collapsedThreshold = (resolvedCollapsedHeight + halfHeight) / 2;
   const expandedThreshold = (halfHeight + expandedHeight) / 2;
 

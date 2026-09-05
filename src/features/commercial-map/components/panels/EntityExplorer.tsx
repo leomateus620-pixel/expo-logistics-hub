@@ -49,6 +49,7 @@ import type {
 import type { EntityExplorerItem, EntityLocationGroup, EntityLocationOption } from '../../utils/entityExplorer';
 import { resolveCommercialPavilionModuleNavigationTarget } from '../../utils/pavilionModuleCommercial';
 import { LotEditDialog } from '../commercial/LotEditDialog';
+import './entity-explorer-panel.css';
 
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
 
@@ -613,13 +614,26 @@ const EntityTable = memo(function EntityTable({ items, selectedEntityId, density
   );
 });
 
-export const MapListView = memo(function MapListView({ explorer, permissions }: { explorer: MapEntityFilterResult; permissions: MapPermissions }) {
+export const MapListView = memo(function MapListView({ explorer, permissions, contextTitle = 'parque' }: { explorer: MapEntityFilterResult; permissions: MapPermissions; contextTitle?: string }) {
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
   const openExplorerEntity = useOpenExplorerEntity();
   const setWorkspaceMode = useCommercialMapStore((state) => state.setWorkspaceMode);
   const tableDensity = useCommercialMapStore((state) => state.tableDensity);
   const [editingLot, setEditingLot] = useState<CommercialLot | null>(null);
   const tableWrapRef = useRef<HTMLDivElement | null>(null);
+  // Bound DOM/layout work on mobile; filtering still searches the full index.
+  const pageSize = 50;
+  const [pagination, setPagination] = useState(() => ({
+    items: explorer.items,
+    page: Math.floor(Math.max(0, explorer.items.findIndex((item) => item.entity.id === selectedEntityId)) / pageSize),
+  }));
+  const page = pagination.items === explorer.items ? pagination.page : 0;
+  const pageCount = Math.max(1, Math.ceil(explorer.items.length / pageSize));
+  const pageItems = useMemo(() => explorer.items.slice(page * pageSize, (page + 1) * pageSize), [explorer.items, page]);
+  const changePage = (next: number) => {
+    setPagination({ items: explorer.items, page: Math.min(pageCount - 1, Math.max(0, next)) });
+    tableWrapRef.current?.scrollTo?.({ top: 0 });
+  };
 
   useEffect(() => {
     if (!selectedEntityId) return;
@@ -635,17 +649,17 @@ export const MapListView = memo(function MapListView({ explorer, permissions }: 
       <div className="commercial-map-list-heading">
         <div>
           <span>Alternativa acessível ao mapa 3D</span>
-          <h2>Entidades do parque</h2>
+          <h2>Entidades · {contextTitle}</h2>
           <p>Pesquise, compare e abra qualquer registro preservando o contexto da cena.</p>
         </div>
-        <Button variant="outline" onClick={() => setWorkspaceMode('3d')}><Layers3 className="h-4 w-4" />Voltar ao mapa</Button>
+        <Button variant="outline" onClick={() => setWorkspaceMode('3d')}><Layers3 className="h-4 w-4" />Exibir mapa 3D</Button>
       </div>
 
       <ExplorerControls explorer={explorer} variant="table" onEscape={() => setWorkspaceMode('3d')} />
 
       <div className="commercial-map-table-wrap" ref={tableWrapRef}>
         <EntityTable
-          items={explorer.items}
+          items={pageItems}
           selectedEntityId={selectedEntityId}
           density={tableDensity}
           permissions={permissions}
@@ -653,6 +667,12 @@ export const MapListView = memo(function MapListView({ explorer, permissions }: 
           onEdit={handleEdit}
         />
       </div>
+
+      {pageCount > 1 && <nav className="commercial-map-table-pagination" aria-label="Páginas de entidades">
+        <button type="button" disabled={page === 0} onClick={() => changePage(page - 1)}>Anterior</button>
+        <span role="status">{page * pageSize + 1}–{Math.min((page + 1) * pageSize, explorer.items.length)} de {explorer.items.length}</span>
+        <button type="button" disabled={page === pageCount - 1} onClick={() => changePage(page + 1)}>Próxima</button>
+      </nav>}
 
       {editingLot && <LotEditDialog lot={editingLot} open onClose={() => setEditingLot(null)} />}
     </div>
