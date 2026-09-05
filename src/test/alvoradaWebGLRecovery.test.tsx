@@ -331,7 +331,7 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     expect(experience).toHaveAttribute('data-stage', 'brand-reveal');
     advance(1600);
     expect(experience).toHaveAttribute('data-stage', 'brand-hold');
-    expect(screen.getByRole('img', { name: /Fenasoja 2028, Edição 2028/ })).toBeVisible();
+    expect(screen.getByRole('img', { name: /^Fenasoja 2028$/ })).toBeVisible();
     advance(2000);
     expect(experience).toHaveAttribute('data-stage', 'org-transition');
     advance(2000);
@@ -365,7 +365,7 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     expect(runtime.canvasMounts).toHaveLength(1);
     expect(runtime.canvasUnmounts).toEqual([canvas.id]);
     expect(screen.getByText('Sincronizando a estrutura organizacional registrada')).toBeVisible();
-    expect(screen.getByRole('img', { name: /Fenasoja 2028, Edição 2028/ })).toBeVisible();
+    expect(screen.getByRole('img', { name: /^Fenasoja 2028$/ })).toBeVisible();
 
     runtime.orgLoading = false;
     view.rerender(<FenasojaAlvoradaExperience onComplete={onComplete} />);
@@ -383,6 +383,38 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     expect(runtime.canvasMounts).toHaveLength(1);
     expect(runtime.canvasUnmounts).toEqual([canvas.id]);
     expect(screen.getByRole('status')).toHaveTextContent('Estrutura em preparação');
+  });
+
+  it('aguarda o fade da colheita tardia para liberar WebGL e mantém duração e pausa', async () => {
+    render(<FenasojaAlvoradaExperience onComplete={vi.fn()} />);
+    const canvas = currentCanvas();
+    act(() => canvas.props.onReady());
+    const harvest = document.querySelector<HTMLImageElement>('.alvorada-harvest img')!;
+    Object.defineProperty(harvest, 'decode', { configurable: true, value: vi.fn().mockResolvedValue(undefined) });
+    act(() => canvas.props.onProgress(ALVORADA_PHASES['brand-hold'].start));
+    const experience = screen.getByTestId('alvorada-experience');
+    expect(screen.getByTestId('mock-alvorada-canvas')).toBeInTheDocument();
+    await act(async () => fireEvent.load(harvest));
+    expect(screen.getByTestId('mock-alvorada-canvas')).toBeInTheDocument();
+    const backdrop = harvest.closest<HTMLElement>('.alvorada-harvest')!;
+    backdrop.style.opacity = '1';
+    const fadeEnd = new Event('transitionend', { bubbles: true });
+    Object.defineProperty(fadeEnd, 'propertyName', { value: 'opacity' });
+    fireEvent(backdrop, fadeEnd);
+    expect(screen.queryByTestId('mock-alvorada-canvas')).not.toBeInTheDocument();
+    expect(runtime.canvasUnmounts).toEqual([canvas.id]);
+    expect(experience).toHaveAttribute('data-stage', 'brand-hold');
+    advance(1999);
+    setDocumentHidden(true);
+    advance(20_000);
+    expect(experience).toHaveAttribute('data-stage', 'brand-hold');
+    setDocumentHidden(false);
+    advance(1);
+    expect(experience).toHaveAttribute('data-stage', 'org-transition');
+    advance(2000);
+    expect(experience).toHaveAttribute('data-stage', 'org-ready');
+    expect(document.querySelector('.alvorada-harvest')).toBeNull();
+    expect(runtime.canvasMounts).toHaveLength(1);
   });
 
   it('remove o loader no render-error e não fecha o fallback automaticamente', () => {

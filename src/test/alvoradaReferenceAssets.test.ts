@@ -146,13 +146,12 @@ describe('assets oficiais e panoramas da Alvorada', () => {
     warmAlvoradaAssets();
 
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
-      '/alvorada/earth-day-2048.jpg',
+      '/alvorada/earth-surface-4096.webp',
       '/alvorada/earth-night-lights-2048.png',
       '/alvorada/earth-normal-2048.jpg',
-      '/alvorada/earth-clouds-1024.png',
+      '/alvorada/earth-clouds-2048.webp',
       '/alvorada/brazil-min.geojson',
       '/alvorada/rio-grande-do-sul-min.geojson',
-      '/alvorada/santa-rosa-min.geojson',
     ]);
     expect(fetchMock.mock.calls.every(([, options]) => (
       (options as RequestInit).cache === 'force-cache'
@@ -160,17 +159,16 @@ describe('assets oficiais e panoramas da Alvorada', () => {
 
     streamAlvoradaSecondaryAssets();
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
-      '/alvorada/earth-day-2048.jpg',
+      '/alvorada/earth-surface-4096.webp',
       '/alvorada/earth-night-lights-2048.png',
       '/alvorada/earth-normal-2048.jpg',
-      '/alvorada/earth-clouds-1024.png',
+      '/alvorada/earth-clouds-2048.webp',
       '/alvorada/brazil-min.geojson',
       '/alvorada/rio-grande-do-sul-min.geojson',
-      '/alvorada/santa-rosa-min.geojson',
     ]);
 
     warmAlvoradaAssets();
     streamAlvoradaSecondaryAssets();
-    expect(fetchMock).toHaveBeenCalledTimes(7);
+    expect(fetchMock).toHaveBeenCalledTimes(6);
   });
 });

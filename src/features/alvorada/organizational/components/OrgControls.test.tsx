@@ -3,7 +3,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { OrgNode } from '../types';
 import type { OrgSearchResult } from '../hooks/useOrgGraphInteraction';
-import { OrgFilterBar, OrgSearch } from './OrgControls';
+import { OrgFilterBar, OrgSearch, OrgViewportControls } from './OrgControls';
 
 function result(id: string, label: string, title: string): OrgSearchResult {
   const node: OrgNode = {
@@ -85,6 +85,19 @@ describe('OrgSearch combobox', () => {
     expect(search?.querySelectorAll('[data-org-search-icon]')).toHaveLength(1);
     expect(search?.querySelector('kbd')).toBeNull();
   });
+
+  it('provides a visible clear action usable without keyboard shortcuts', () => {
+    render(<SearchHarness onSelect={vi.fn()} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Limpar busca' }));
+    expect(screen.getByRole('combobox')).toHaveValue('');
+    expect(screen.queryByRole('option')).not.toBeInTheDocument();
+  });
+
+  it('announces an empty result without losing the query', () => {
+    render(<OrgSearch query="Nobody" results={[]} onQueryChange={vi.fn()} onResultSelect={vi.fn()} />);
+    expect(screen.getByRole('status')).toHaveTextContent('Nenhuma pessoa ou área encontrada.');
+    expect(screen.getByRole('combobox')).toHaveValue('Nobody');
+  });
 });
 
 describe('OrgFilterBar', () => {
@@ -106,6 +119,7 @@ describe('OrgFilterBar', () => {
     ]);
     buttons.forEach((button) => {
       expect(button.querySelectorAll('[data-org-filter-icon]')).toHaveLength(1);
+      expect(button).toHaveAttribute('title', button.getAttribute('aria-label'));
     });
     expect(new Set(buttons.map((button) => (
       button.querySelector('[data-org-filter-icon]')?.getAttribute('class')
@@ -120,5 +134,26 @@ describe('OrgFilterBar', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'ASSESSORIAS' }));
     expect(onFilterChange).toHaveBeenCalledWith('advisory');
+  });
+});
+
+describe('OrgViewportControls', () => {
+  it('keeps each essential action independent and exposes a clear selection action', () => {
+    const onClearSelection = vi.fn();
+    const onFit = vi.fn();
+    const onZoomIn = vi.fn();
+    const onZoomOut = vi.fn();
+    const onFocusSelected = vi.fn();
+    render(<OrgViewportControls scale={0.8} selected onClearSelection={onClearSelection} onFit={onFit} onZoomIn={onZoomIn} onZoomOut={onZoomOut} onFocusSelected={onFocusSelected} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Limpar seleção e restaurar visão geral' }));
+    expect(onClearSelection).toHaveBeenCalledOnce();
+    expect(onFit).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Enquadrar todo o ecossistema' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Aumentar zoom' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reduzir zoom' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Centralizar nó selecionado' }));
+    [onFit, onZoomIn, onZoomOut, onFocusSelected].forEach((callback) => expect(callback).toHaveBeenCalledOnce());
+    expect(screen.getByRole('status')).toHaveTextContent('80%');
+    screen.getAllByRole('button').forEach((button) => expect(button).toHaveAttribute('title'));
   });
 });

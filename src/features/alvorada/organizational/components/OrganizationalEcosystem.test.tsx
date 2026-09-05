@@ -299,7 +299,7 @@ describe('OrganizationalEcosystem', () => {
     });
     fireEvent.click(screen.getByRole('option', { name: /Bruno Souza/i }));
 
-    expect(screen.getByLabelText(/Detalhes de Comissão de Logística/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Detalhes de Bruno Souza/i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Voluntário futuro/i })).not.toBeInTheDocument();
     expect(screen.queryByText('Voluntário futuro')).not.toBeInTheDocument();
   });
@@ -313,6 +313,19 @@ describe('OrganizationalEcosystem', () => {
 
     expect(screen.getByRole('option', { name: /Carla Ribeiro/i })).toBeInTheDocument();
     expect(screen.queryByRole('option', { name: /Bruno Souza/i })).not.toBeInTheDocument();
+  });
+
+  it('searches a collective title without selecting the first member whose role repeats that title', () => {
+    const graph = createGraph();
+    graph.nodes.find((node) => node.id === 'central')!.personIds = ['person-carla'];
+    graph.people['person-carla'].roles = ['Comissão Central'];
+    const { container } = render(<OrganizationalEcosystem graph={graph} active />);
+    fireEvent.change(screen.getByRole('combobox', { name: /Buscar pessoa/i }), { target: { value: 'Comissão Central' } });
+    fireEvent.click(screen.getByRole('option', { name: /^Comissão Central/i }));
+    expect(container.querySelector('[data-selection-person]')).toBeNull();
+    expect(screen.getByRole('heading', { name: 'COMISSÃO CENTRAL' })).toBeInTheDocument();
+    const edgeIds = Array.from(container.querySelectorAll('[data-edge-id]'), (edge) => edge.getAttribute('data-edge-id')).sort();
+    expect(edgeIds).toEqual(['central-logistics', 'central-press', 'president-central']);
   });
 
   it('uses the executive subtitle as search context when the node title is the person name', () => {
@@ -391,63 +404,38 @@ describe('OrganizationalEcosystem', () => {
       (element) => Number.parseInt(element.style.getPropertyValue('--org-edge-delay'), 10),
     );
 
-    expect(nodeDelays(1)).toEqual([140]);
-    expect(nodeDelays(2)).toEqual([480]);
-    expect(nodeDelays(3)).toEqual([920]);
-    expect(nodeDelays(4).sort((left, right) => left - right)).toEqual([1120, 1142]);
-    expect(edgeDelays(2)).toEqual([360]);
-    expect(edgeDelays(3)).toEqual([760]);
-    expect(edgeDelays(4).sort((left, right) => left - right)).toEqual([980, 1002]);
-    expect(container.querySelectorAll('.org-relationship__reveal-glow')).toHaveLength(4);
+    expect(nodeDelays(1)).toEqual([0]);
+    expect(nodeDelays(2)).toEqual([100]);
+    expect(nodeDelays(3)).toEqual([220]);
+    expect(nodeDelays(4).sort((left, right) => left - right)).toEqual([300, 312]);
+    expect(edgeDelays(2)).toEqual([80]);
+    expect(edgeDelays(3)).toEqual([180]);
+    expect(edgeDelays(4).sort((left, right) => left - right)).toEqual([260, 272]);
+    expect(container.querySelectorAll('.org-relationship__reveal-glow')).toHaveLength(0);
+    expect(container.querySelectorAll('.org-relationship__terminal')).toHaveLength(0);
+    container.querySelectorAll('.org-relationship path').forEach((path) => {
+      expect(path).toHaveAttribute('vector-effect', 'non-scaling-stroke');
+    });
   });
 
-  it('performs the final fit after the complete cascade and keeps a dense graph above 45% at 1366x768', () => {
+  it('fits once above 53% and preserves the initial composition after the arrival cascade', () => {
     vi.useFakeTimers();
-    const view = render(
-      <OrganizationalEcosystem graph={createDenseGraph()} active />,
-    );
-
-    try {
-      act(() => {
-        resizeObserverCallback([{
-          contentRect: { width: 1366, height: 768 },
-        } as ResizeObserverEntry], {} as ResizeObserver);
-        vi.advanceTimersByTime(16);
-      });
-      const ready = view.container.querySelector('.org-ecosystem__ready');
-      if (!(ready instanceof HTMLElement)) throw new Error('Ready graph missing');
-      const narrativeScale = Number(ready.dataset.viewportScale);
-
-      expect(ready).toHaveAttribute('data-layout-width', '2192');
-      expect(ready).toHaveAttribute('data-layout-height', '1210');
-      expect(narrativeScale).toBeCloseTo(0.56, 3);
-      const denseEdgeDelays = Array.from(
-        view.container.querySelectorAll<SVGGElement>(
-          '.org-relationship[data-target-authority="4"]',
-        ),
-        (element) => Number.parseInt(element.style.getPropertyValue('--org-edge-delay'), 10),
-      );
-      expect(denseEdgeDelays).toHaveLength(35);
-      expect(Math.max(...denseEdgeDelays) + 760).toBeLessThan(2600);
-
-      act(() => vi.advanceTimersByTime(2583));
-      expect(Number(ready.dataset.viewportScale)).toBe(narrativeScale);
-
-      act(() => vi.advanceTimersByTime(1));
-      const finalScale = Number(ready.dataset.viewportScale);
-      expect(finalScale).toBeGreaterThan(0.45);
-      expect(finalScale).toBeLessThan(narrativeScale);
-      expect(ready).toHaveAttribute('data-camera-animating', 'true');
-    } finally {
-      act(() => {
-        view.unmount();
-        vi.clearAllTimers();
-      });
-      vi.useRealTimers();
-    }
+    const view = render(<OrganizationalEcosystem graph={createDenseGraph()} active />);
+    act(() => {
+      resizeObserverCallback([{ contentRect: { width: 1366, height: 768 } } as ResizeObserverEntry], {} as ResizeObserver);
+      vi.advanceTimersByTime(32);
+    });
+    const ready = view.container.querySelector('.org-ecosystem__ready') as HTMLElement;
+    const initialScale = Number(ready.dataset.viewportScale);
+    expect(initialScale).toBeGreaterThan(0.53);
+    expect(Number(ready.dataset.layoutHeight)).toBeLessThan(990);
+    act(() => vi.advanceTimersByTime(4000));
+    expect(Number(ready.dataset.viewportScale)).toBe(initialScale);
+    expect(ready).not.toHaveAttribute('data-camera-animating');
+    view.unmount();
   });
 
-  it('cancels the pending final fit when focus enters the graph before 2600ms', () => {
+  it('preserves the fitted composition while search receives focus during the entrance', () => {
     vi.useFakeTimers();
     const view = render(
       <OrganizationalEcosystem graph={createDenseGraph()} active />,
@@ -493,6 +481,7 @@ describe('OrganizationalEcosystem', () => {
       if (!(ready instanceof HTMLElement) || !(world instanceof HTMLElement)) {
         throw new Error('Viewport fixture missing');
       }
+      fireEvent.click(screen.getByRole('button', { name: /Ana Silva/i }));
       const originalGetComputedStyle = window.getComputedStyle;
       const styleSpy = vi.spyOn(window, 'getComputedStyle').mockImplementation((element) => {
         const style = originalGetComputedStyle(element);
@@ -516,7 +505,7 @@ describe('OrganizationalEcosystem', () => {
     }
   });
 
-  it('cancels the pending final fit when the user changes zoom before 2600ms', () => {
+  it('preserves manual zoom after all entrance animations finish', () => {
     vi.useFakeTimers();
     const view = render(
       <OrganizationalEcosystem graph={createDenseGraph()} active />,
@@ -692,6 +681,89 @@ describe('OrganizationalEcosystem', () => {
       target: { value: 'Pessoa Oculta' },
     });
     expect(screen.queryByRole('option', { name: /Pessoa Oculta/i })).not.toBeInTheDocument();
+  });
+
+  it('unmounts every unrelated edge and decoration through successive selections and clear', () => {
+    const { container } = render(<OrganizationalEcosystem graph={createGraph()} active />);
+    const edges = () => Array.from(container.querySelectorAll('[data-edge-id]'), (item) => item.getAttribute('data-edge-id')).sort();
+    expect(edges()).toEqual(['central-logistics', 'central-press', 'president-central', 'root-president']);
+
+    fireEvent.click(screen.getByRole('button', { name: /Bruno Souza/i }));
+    expect(edges()).toEqual(['central-logistics']);
+    expect(container.querySelector('[data-edge-id="root-president"]')).toBeNull();
+    expect(container.querySelector('.org-relationship__reveal-glow')).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: /^Ana Silva/i }));
+    expect(edges()).toEqual(['president-central', 'root-president']);
+    fireEvent.mouseEnter(screen.getByRole('button', { name: /^Daniela Souza/i }));
+    expect(edges()).toEqual(['president-central', 'root-president']);
+
+    fireEvent.click(within(screen.getByRole('group', { name: /Mapa interativo/i })).getByRole('button', { name: /^Comissão Central/i }));
+    expect(edges()).toEqual(['central-logistics', 'central-press', 'president-central']);
+    expect(container.querySelector('[data-edge-id="root-president"]')).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: /Limpar seleção e restaurar/i }));
+    expect(edges()).toHaveLength(4);
+    expect(container.querySelector('[data-org-detail-panel]')).toBeNull();
+  });
+
+  it('selects the actual second person through search and panel without inheriting collective outgoing edges', () => {
+    const graph = createGraph();
+    const central = graph.nodes.find((node) => node.id === 'central')!;
+    central.personIds = ['person-carla'];
+    const { container } = render(<OrganizationalEcosystem graph={graph} active />);
+    const edges = () => Array.from(container.querySelectorAll('[data-edge-id]'), (item) => item.getAttribute('data-edge-id')).sort();
+
+    fireEvent.change(screen.getByRole('combobox', { name: /Buscar pessoa/i }), { target: { value: 'Carla' } });
+    fireEvent.click(screen.getAllByRole('option', { name: /Carla Ribeiro/i })[0]);
+    expect(screen.getByLabelText(/Detalhes de Carla Ribeiro/i)).toBeInTheDocument();
+    expect(edges()).toEqual(['central-logistics', 'president-central']);
+    expect(container.querySelector('[data-edge-id="central-press"]')).toBeNull();
+    expect(container.querySelector('[data-selection-person="person-carla"]')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /Limpar seleção/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^Bruno Souza/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^Selecionar Carla Ribeiro/i }));
+    expect(screen.getByLabelText(/Detalhes de Carla Ribeiro/i)).toBeInTheDocument();
+    expect(edges()).toEqual(['central-logistics', 'president-central']);
+    const logistics = container.querySelector('.org-node[data-node-type="commission"][data-selected="true"]');
+    expect(logistics?.querySelector('.org-node__name')).toHaveTextContent('CARLA RIBEIRO');
+  });
+
+  it('keeps exact manual pan and zoom when graph records refresh', () => {
+    vi.useFakeTimers();
+    const view = render(<OrganizationalEcosystem graph={createDenseGraph()} active />);
+    act(() => vi.advanceTimersByTime(32));
+    fireEvent.click(screen.getByRole('button', { name: /Aumentar zoom/i }));
+    const viewport = screen.getByRole('group', { name: /Mapa interativo/i });
+    fireEvent.pointerDown(viewport, { button: 0, clientX: 100, clientY: 250, pointerId: 1 });
+    fireEvent.pointerMove(viewport, { clientX: 180, clientY: 300, pointerId: 1 });
+    fireEvent.pointerUp(viewport, { clientX: 180, clientY: 300, pointerId: 1 });
+    const transform = (view.container.querySelector('.org-viewport__world') as HTMLElement).style.transform;
+    const nextGraph = createDenseGraph();
+    nextGraph.nodes[1].title = 'Presidência atualizada';
+    view.rerender(<OrganizationalEcosystem graph={nextGraph} active />);
+    act(() => vi.advanceTimersByTime(4000));
+    expect((view.container.querySelector('.org-viewport__world') as HTMLElement).style.transform).toBe(transform);
+    view.unmount();
+  });
+
+  it('moves selection into the available desktop area without changing the manual scale', () => {
+    vi.useFakeTimers();
+    const view = render(<OrganizationalEcosystem graph={createDenseGraph()} active />);
+    act(() => vi.advanceTimersByTime(32));
+    fireEvent.click(screen.getByRole('button', { name: /Aumentar zoom/i }));
+    const ready = view.container.querySelector('.org-ecosystem__ready') as HTMLElement;
+    const scale = ready.dataset.viewportScale;
+    fireEvent.click(screen.getByRole('button', { name: /^Ana Silva/i }));
+    expect(ready.dataset.viewportScale).toBe(scale);
+    const world = view.container.querySelector('.org-viewport__world') as HTMLElement;
+    const transform = world.style.transform.match(/translate3d\(([-\d.]+)px, ([-\d.]+)px, 0\) scale\(([-\d.]+)\)/)!;
+    const selected = view.container.querySelector('.org-node[data-selected="true"]') as HTMLElement;
+    const centerX = Number(transform[1]) + Number.parseFloat(selected.style.getPropertyValue('--org-node-x')) * Number(transform[3]);
+    expect(centerX).toBeGreaterThan(24 + 100);
+    expect(centerX).toBeLessThan(1200 - 388 - 100);
+    view.unmount();
   });
 
   it('shows the intentional empty state for a structural root without real links', () => {

@@ -5,10 +5,13 @@ import {
   type OrgUnitResponsibleRole,
 } from '@/lib/org-units';
 import type { OrganizationalGraph, OrgNode, OrgPerson } from '../types';
+import { optimizedPortraitUrl } from '../optimizedPortrait';
 
 interface PersonDetailPanelProps {
   graph: OrganizationalGraph;
   node: OrgNode;
+  selectedPersonId?: string | null;
+  onPersonSelect?: (personId: string) => void;
   onClose: () => void;
 }
 
@@ -49,10 +52,12 @@ function DetailAvatar({ person }: { person: OrgPerson }) {
     <span className="org-detail__person-avatar">
       {person.avatarUrl && !failed ? (
         <img
-          src={person.avatarUrl}
+          src={optimizedPortraitUrl(person.avatarUrl)}
           alt={`RETRATO DE ${presentationText(person.fullName)}`}
           loading="lazy"
           decoding="async"
+          width={72}
+          height={72}
           onError={() => setFailed(true)}
         />
       ) : (
@@ -62,7 +67,7 @@ function DetailAvatar({ person }: { person: OrgPerson }) {
   );
 }
 
-export function PersonDetailPanel({ graph, node, onClose }: PersonDetailPanelProps) {
+export function PersonDetailPanel({ graph, node, selectedPersonId, onPersonSelect, onClose }: PersonDetailPanelProps) {
   const people = node.personIds
     .map((personId) => graph.people[personId])
     .filter((person): person is OrgPerson => Boolean(person));
@@ -71,7 +76,15 @@ export function PersonDetailPanel({ graph, node, onClose }: PersonDetailPanelPro
     || !node.personIds.includes(responsibility.personId)
     || !graph.people[responsibility.personId]
   ));
-  const heading = presentationText(node.type === 'executive' && people[0]
+  const selectedPerson = selectedPersonId ? graph.people[selectedPersonId] : null;
+  const allowedNodeIds = new Set(graph.renderableNodeIds);
+  const memberships = selectedPerson
+    ? graph.nodes.filter((item) => item.isRenderable
+      && allowedNodeIds.has(item.id)
+      && (item.personIds.includes(selectedPerson.id)
+        || item.responsibilities.some((responsibility) => responsibility.personId === selectedPerson.id)))
+    : [];
+  const heading = presentationText(selectedPerson ? selectedPerson.fullName : node.type === 'executive' && people[0]
     ? people[0].fullName
     : node.title);
 
@@ -88,12 +101,32 @@ export function PersonDetailPanel({ graph, node, onClose }: PersonDetailPanelPro
       <header className="org-detail__header">
         <div>
           <h2>{heading}</h2>
-          <p>{presentationText(node.type === 'executive' ? (node.subtitle ?? 'PRESIDÊNCIA') : (node.subtitle ?? node.title))}</p>
+          <p>{presentationText(selectedPerson ? node.title : node.type === 'executive' ? (node.subtitle ?? 'PRESIDÊNCIA') : (node.subtitle ?? node.title))}</p>
         </div>
-        <button type="button" onClick={onClose} aria-label="Fechar detalhes">
+        <button type="button" onClick={onClose} aria-label="Fechar detalhes" title="Fechar detalhes">
           <X aria-hidden="true" />
         </button>
       </header>
+
+      {selectedPerson && (
+        <section className="org-detail__selected-person" aria-label="Pessoa selecionada">
+          <DetailAvatar key={selectedPerson.id} person={selectedPerson} />
+          <div>
+            <span className="org-detail__eyebrow">VÍNCULOS DIRETOS</span>
+            <ul>
+              {memberships.map((membership) => {
+                const responsibility = membership.responsibilities.find((item) => item.personId === selectedPerson.id);
+                return (
+                  <li key={membership.id}>
+                    <strong>{membership.title}</strong>
+                    <span>{personRoleSummary(responsibility?.relationshipRole, selectedPerson.roles)}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </section>
+      )}
 
       {people.length > 0 && (
         <section className="org-detail__section" aria-labelledby="org-detail-people">
@@ -108,13 +141,21 @@ export function PersonDetailPanel({ graph, node, onClose }: PersonDetailPanelPro
                 ? presentationText(node.subtitle ?? 'PRESIDÊNCIA')
                 : personRoleSummary(relationship?.relationshipRole, person.roles);
               return (
-                <article key={person.id}>
+                <button
+                  key={person.id}
+                  className="org-detail__person"
+                  type="button"
+                  aria-label={`Selecionar ${person.fullName}`}
+                  aria-pressed={person.id === selectedPersonId}
+                  onClick={() => onPersonSelect?.(person.id)}
+                  disabled={!onPersonSelect}
+                >
                   <DetailAvatar person={person} />
                   <span>
                     <strong>{presentationText(person.fullName)}</strong>
                     <small>{roleSummary}</small>
                   </span>
-                </article>
+                </button>
               );
             })}
           </div>

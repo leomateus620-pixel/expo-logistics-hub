@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import * as THREE from 'three';
@@ -124,9 +124,9 @@ function createPhysicalSky() {
       );
       vec3 alvoradaGold = vec3(1.28, 0.58, 0.09);
       vec3 alvoradaOrange = vec3(0.98, 0.22, 0.035);
-      vec3 alvoradaLavender = vec3(0.34, 0.39, 0.61);
-      vec3 alvoradaBlue = vec3(0.025, 0.13, 0.5);
-      vec3 alvoradaDeepBlue = vec3(0.003, 0.025, 0.18);
+      vec3 alvoradaLavender = vec3(0.12, 0.14, 0.26);
+      vec3 alvoradaBlue = vec3(0.012, 0.055, 0.19);
+      vec3 alvoradaDeepBlue = vec3(0.002, 0.012, 0.045);
       float alvoradaLowBlend = smoothstep(-0.01, 0.12, alvoradaAltitude);
       float alvoradaBlueBlend = smoothstep(0.12, 0.48, alvoradaAltitude);
       float alvoradaDeepBlend = smoothstep(0.38, 0.88, alvoradaAltitude);
@@ -137,7 +137,7 @@ function createPhysicalSky() {
       vec3 alvoradaBalancedSky = mix(
         alvoradaPhysicalSky,
         alvoradaSpectralSky,
-        0.58 + skyDawn * 0.2
+        0.83 + skyDawn * 0.09
       );
       alvoradaBalancedSky += vec3(1.0, 0.54, 0.16)
         * alvoradaHorizon
@@ -266,7 +266,7 @@ export function DawnEnvironment({ quality }: DawnEnvironmentProps) {
     () => horizontalSunDirection.clone(),
     [horizontalSunDirection],
   );
-  const cloudTextureSize = quality.level === 'low' ? 192 : quality.mobile ? 256 : 384;
+  const [cloudTextureSize] = useState(() => quality.level === 'low' ? 192 : quality.mobile ? 256 : 384);
   const cloudTextures = useMemo(
     () => [2028, 4317, 2029].map((seed) => createCloudTexture(cloudTextureSize, seed)),
     [cloudTextureSize],
@@ -291,9 +291,12 @@ export function DawnEnvironment({ quality }: DawnEnvironmentProps) {
     sky.geometry.dispose();
     sky.material.dispose();
     sunMaterial.dispose();
+  }, [sky, sunMaterial]);
+
+  useEffect(() => () => {
     cloudMaterials.forEach((material) => material.dispose());
     cloudTextures.forEach((texture) => texture.dispose());
-  }, [cloudMaterials, cloudTextures, sky, sunMaterial]);
+  }, [cloudMaterials, cloudTextures]);
 
   useFrame(() => {
     const timelineState = timeline.current as AmbientTimelineState;
@@ -301,6 +304,12 @@ export function DawnEnvironment({ quality }: DawnEnvironmentProps) {
     const ambientElapsed = timelineState.ambientElapsed ?? elapsed;
     const visualState = deriveAlvoradaVisualState(elapsed);
     const reveal = visualState.skyOpacity;
+    if (root.current) root.current.visible = reveal > 0.001;
+    if (reveal <= 0.001) {
+      if (solarLight.current) solarLight.current.intensity = 0;
+      if (ambientLight.current) ambientLight.current.intensity = 0;
+      return;
+    }
     const dawn = smoothRange(elapsed, 5.35, 11.55);
     const elevation = THREE.MathUtils.degToRad(0.42 + dawn * 1.62);
 

@@ -7,6 +7,8 @@ interface FenasojaBrandProps {
   className?: string;
   compact?: boolean;
   markOnly?: boolean;
+  markSrc?: string;
+  editionLabel?: boolean;
   scale?: 'standard' | 'display';
   showEdition?: boolean;
   soybeanWordmark?: boolean;
@@ -18,6 +20,8 @@ export function FenasojaBrand({
   className,
   compact = false,
   markOnly = false,
+  markSrc = fenasojaLogoOficial.url,
+  editionLabel = true,
   scale = 'standard',
   showEdition = true,
   soybeanWordmark = false,
@@ -79,7 +83,7 @@ export function FenasojaBrand({
           </svg>
         ) : (
           <img
-            src={fenasojaLogoOficial.url}
+            src={markSrc}
             alt=""
             className={cn(
               'h-full w-full object-contain',
@@ -128,7 +132,7 @@ export function FenasojaBrand({
                   compact && !isDisplay && 'text-[8px]',
                 )}
               >
-                {isDisplay && (
+                {isDisplay && editionLabel && (
                   <span className="mb-1 text-[0.5rem] font-bold uppercase tracking-[0.2em] text-[oklch(var(--brand-cream)/0.78)]">
                     Edição
                   </span>

@@ -81,7 +81,7 @@ describe('calculateOrganizationalLayout', () => {
     expect(first.edges).toHaveLength(edges.length);
   });
 
-  it('fits 35 operational cards in a collision-free 2200x1400 world at more than 35% on 1366x768', () => {
+  it('fits 35 operational cards in a collision-free compact world at more than 53% on 1366x768', () => {
     const operationalNodes = Array.from({ length: 35 }, (_, index) => node(
       `unit-${index + 1}`,
       index % 5 === 0 ? 'advisory' : 'commission',
@@ -103,8 +103,8 @@ describe('calculateOrganizationalLayout', () => {
     expect(positionedOperational.map(({ levelOrder }) => levelOrder)).toEqual(
       Array.from({ length: 35 }, (_, index) => index),
     );
-    expect(layout.bounds.width).toBeLessThanOrEqual(2200);
-    expect(layout.bounds.height).toBeLessThanOrEqual(1400);
+    expect(layout.bounds.width).toBeLessThanOrEqual(2240);
+    expect(layout.bounds.height).toBeLessThanOrEqual(990);
     layout.nodes.forEach(({ x, y }) => {
       expect(x).toBeGreaterThanOrEqual(0);
       expect(x).toBeLessThanOrEqual(layout.bounds.width);
@@ -114,7 +114,7 @@ describe('calculateOrganizationalLayout', () => {
 
     positionedOperational.forEach((current, currentIndex) => {
       positionedOperational.slice(currentIndex + 1).forEach((candidate) => {
-        const cardsOverlap = Math.abs(current.x - candidate.x) < 160
+        const cardsOverlap = Math.abs(current.x - candidate.x) < 180
           && Math.abs(current.y - candidate.y) < 166;
         expect(
           cardsOverlap,
@@ -124,10 +124,10 @@ describe('calculateOrganizationalLayout', () => {
     });
 
     const desktopFitScale = Math.min(
-      (1366 - 64 * 2) / layout.bounds.width,
-      (768 - 142 - 50) / layout.bounds.height,
+      (1366 - 24 * 2) / layout.bounds.width,
+      (768 - 168 - 72) / layout.bounds.height,
     );
-    expect(desktopFitScale).toBeGreaterThan(0.35);
+    expect(desktopFitScale).toBeGreaterThan(0.53);
   });
 
   it.each([1, 2, 3, 4, 5, 6])(
@@ -150,9 +150,22 @@ describe('calculateOrganizationalLayout', () => {
       const right = Math.max(...positioned.map((item) => item.x));
 
       expect((left + right) / 2).toBeCloseTo(centerX, 5);
-      expect(right - left).toBeLessThanOrEqual(172);
+      expect(right - left).toBeLessThanOrEqual(184);
     },
   );
+
+  it('reflows dense mobile organizations into readable two and three column maps', () => {
+    const nodes = [node('root', 'ccp', 1), node('central', 'central-commission', 3),
+      ...Array.from({ length: 35 }, (_, index) => node(`unit-${index}`, 'commission', 4, ['central']))];
+    const phone = calculateOrganizationalLayout(nodes, [], { viewportWidth: 390, viewportHeight: 844 });
+    const tablet = calculateOrganizationalLayout(nodes, [], { viewportWidth: 700, viewportHeight: 900 });
+    const columns = (layout: typeof phone) => new Set(layout.nodes.filter((item) => item.node.authorityLevel === 4).map((item) => item.x));
+    expect(columns(phone).size).toBe(2);
+    expect(columns(tablet).size).toBe(3);
+    expect(phone.bounds.width).toBeLessThanOrEqual(600);
+    expect(phone.nodes.map((item) => item.node.id).sort()).toEqual(nodes.map((item) => item.id).sort());
+    expect(phone.bounds.height).toBeGreaterThan(tablet.bounds.height);
+  });
 
   it('supports spatial keyboard navigation without relying on DOM order', () => {
     const layout = calculateOrganizationalLayout([

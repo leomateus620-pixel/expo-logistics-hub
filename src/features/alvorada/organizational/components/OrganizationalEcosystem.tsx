@@ -3,6 +3,8 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
+  type CSSProperties,
   type KeyboardEvent,
   type RefCallback,
 } from 'react';
@@ -26,6 +28,7 @@ import { OrganizationalNode } from './OrganizationalNode';
 import { OrgFilterBar, OrgSearch, OrgViewportControls } from './OrgControls';
 import { PersonDetailPanel } from './PersonDetailPanel';
 import { RelationshipLayer } from './RelationshipLayer';
+import { SoybeanAtmosphere } from './SoybeanAtmosphere';
 import '../organizational-ecosystem.css';
 
 export interface OrganizationalEcosystemProps {
@@ -50,8 +53,6 @@ const ARROW_DIRECTIONS: Partial<Record<string, OrgNavigationDirection>> = {
   ArrowDown: 'down',
   ArrowLeft: 'left',
 };
-
-const FINAL_FIT_DELAY_MS = 2600;
 
 function hasRenderableOrganization(graph: OrganizationalGraph | null): graph is OrganizationalGraph {
   if (!graph) return false;
@@ -79,9 +80,12 @@ function GraphReady({
   const renderableNodes = useMemo(() => graph.nodes.filter((node) => (
     node.isRenderable && renderableNodeIds.has(node.id)
   )), [graph.nodes, renderableNodeIds]);
+  const [viewportSize, setViewportSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   const layout = useMemo(
-    () => calculateOrganizationalLayout(renderableNodes, graph.edges),
-    [graph.edges, renderableNodes],
+    () => calculateOrganizationalLayout(renderableNodes, graph.edges, {
+      viewportWidth: viewportSize.width, viewportHeight: viewportSize.height,
+    }),
+    [graph.edges, renderableNodes, viewportSize.width, viewportSize.height],
   );
   const interaction = useOrgGraphInteraction({
     graph,
@@ -100,34 +104,17 @@ function GraphReady({
   } = interaction;
   const nodeElements = useRef(new Map<string, HTMLButtonElement>());
   const nodeRefCallbacks = useRef(new Map<string, RefCallback<HTMLButtonElement>>());
-  const fitGraph = useRef<() => void>(() => undefined);
-  const finalFitTimer = useRef<number | null>(null);
-  const cancelFinalFit = useCallback(() => {
-    if (finalFitTimer.current === null) return;
-    window.clearTimeout(finalFitTimer.current);
-    finalFitTimer.current = null;
-  }, []);
   const handleBackgroundPress = useCallback(() => {
     clearSelection();
-    fitGraph.current();
   }, [clearSelection]);
   const viewport = useOrgViewport({
     bounds: layout.bounds,
-    initialFocusPoint: layout.nodeById.get(graph.rootNodeId),
+    detailOpen: Boolean(interaction.selectedNode),
+    resizeFocusPoint: selectedNodeId ? layout.nodeById.get(selectedNodeId) : null,
     onBackgroundPress: handleBackgroundPress,
+    onViewportSizeChange: setViewportSize,
   });
   const { camera, fit: fitViewport, focusPoint } = viewport;
-  fitGraph.current = fitViewport;
-
-  useEffect(() => {
-    cancelFinalFit();
-    if (!active || layout.nodes.length === 0) return undefined;
-    finalFitTimer.current = window.setTimeout(() => {
-      finalFitTimer.current = null;
-      fitViewport();
-    }, FINAL_FIT_DELAY_MS);
-    return cancelFinalFit;
-  }, [active, cancelFinalFit, fitViewport, layout.nodes.length]);
 
   const getNodeRef = useCallback((nodeId: string): RefCallback<HTMLButtonElement> => {
     const known = nodeRefCallbacks.current.get(nodeId);
@@ -140,16 +127,15 @@ function GraphReady({
     return callback;
   }, []);
 
-  const focusNode = useCallback((nodeId: string, preferredScale?: number) => {
+  const focusNode = useCallback((nodeId: string, preferredScale?: number, withPanel?: boolean) => {
     const position = layout.nodeById.get(nodeId);
-    if (position) focusPoint(position, preferredScale);
+    if (position) focusPoint(position, preferredScale, withPanel);
   }, [focusPoint, layout.nodeById]);
 
   const selectNode = useCallback((nodeId: string) => {
-    cancelFinalFit();
     commitSelection(nodeId);
-    focusNode(nodeId);
-  }, [cancelFinalFit, commitSelection, focusNode]);
+    focusNode(nodeId, undefined, true);
+  }, [commitSelection, focusNode]);
 
   const closeDetails = useCallback(() => {
     const nodeId = selectedNodeId;
@@ -161,10 +147,9 @@ function GraphReady({
   }, [clearSelection, selectedNodeId]);
 
   const handleNodeFocus = useCallback((nodeId: string) => {
-    cancelFinalFit();
     setKeyboardNodeId(nodeId);
     setHoveredNodeId(nodeId);
-  }, [cancelFinalFit, setHoveredNodeId, setKeyboardNodeId]);
+  }, [setHoveredNodeId, setKeyboardNodeId]);
 
   const handleNodeBlur = useCallback((nodeId: string) => {
     setHoveredNodeId((current) => current === nodeId ? null : current);
@@ -176,7 +161,6 @@ function GraphReady({
   ) => {
     const direction = ARROW_DIRECTIONS[event.key];
     if (direction) {
-      cancelFinalFit();
       event.preventDefault();
       let candidate = findDirectionalNode(layout, currentNodeId, direction);
       const visited = new Set<string>();
@@ -196,7 +180,6 @@ function GraphReady({
     }
 
     if (event.key === 'Home') {
-      cancelFinalFit();
       event.preventDefault();
       const rootId = graph.rootNodeId || layout.nodes[0]?.node.id;
       if (!rootId) return;
@@ -213,7 +196,6 @@ function GraphReady({
     }
   }, [
     closeDetails,
-    cancelFinalFit,
     focusNode,
     graph.rootNodeId,
     layout,
@@ -224,23 +206,20 @@ function GraphReady({
   ]);
 
   const handleSearchResult = useCallback((result: OrgSearchResult) => {
-    cancelFinalFit();
     setQuery('');
-    commitSelection(result.id);
+    commitSelection(result.id, result.personId ?? null);
     setKeyboardNodeId(result.id);
-    focusNode(result.id, 0.94);
+    focusNode(result.id, undefined, true);
     window.requestAnimationFrame(() => nodeElements.current.get(result.id)?.focus({ preventScroll: true }));
-  }, [cancelFinalFit, commitSelection, focusNode, setKeyboardNodeId, setQuery]);
+  }, [commitSelection, focusNode, setKeyboardNodeId, setQuery]);
 
   const handleQueryChange = useCallback((value: string) => {
-    cancelFinalFit();
     setQuery(value);
-  }, [cancelFinalFit, setQuery]);
+  }, [setQuery]);
 
   const handleFilterChange = useCallback((filter: OrgGraphFilter) => {
-    cancelFinalFit();
     setFilter(filter);
-  }, [cancelFinalFit, setFilter]);
+  }, [setFilter]);
 
   useEffect(() => {
     if (!active || layout.nodes.length === 0) return undefined;
@@ -265,12 +244,11 @@ function GraphReady({
       data-layout-height={layout.bounds.height}
       data-layout-width={layout.bounds.width}
       data-viewport-scale={camera.scale.toFixed(3)}
+      data-selection-person={interaction.selectedPersonId ?? undefined}
+      style={{ '--org-viewport-scale': camera.scale } as CSSProperties}
       data-org-detail-open={interaction.selectedNode ? 'true' : undefined}
       aria-hidden={!active}
-      onFocusCapture={cancelFinalFit}
-      onPointerDownCapture={cancelFinalFit}
       onKeyDownCapture={(event) => {
-        cancelFinalFit();
         if (event.key !== 'Escape' || !interaction.selectedNode) return;
         event.preventDefault();
         event.stopPropagation();
@@ -283,6 +261,7 @@ function GraphReady({
             className="org-ecosystem__brand"
             compact
             tone="dark"
+            markSrc="/alvorada/fenasoja-symbol-official.png"
           />
           <h1>ECOSSISTEMA ORGANIZACIONAL</h1>
         </div>
@@ -304,14 +283,12 @@ function GraphReady({
         aria-describedby="org-viewport-instructions"
         onPointerCancel={viewport.onPointerCancel}
         onPointerDown={(event) => {
-          cancelFinalFit();
-          viewport.onPointerDown(event);
+              viewport.onPointerDown(event);
         }}
         onPointerMove={viewport.onPointerMove}
         onPointerUp={viewport.onPointerUp}
         onWheel={(event) => {
-          cancelFinalFit();
-          viewport.onWheel(event);
+              viewport.onWheel(event);
         }}
       >
         <div
@@ -325,6 +302,7 @@ function GraphReady({
           <RelationshipLayer
             active={active}
             activeEdgeIds={interaction.activeEdgeIds}
+            selectionActive={Boolean(interaction.selectedNode)}
             layout={layout}
             visualStateById={visualStateById}
           />
@@ -336,6 +314,7 @@ function GraphReady({
                 buttonRef={getNodeRef(position.node.id)}
                 keyboardActive={active && interaction.keyboardNodeId === position.node.id}
                 people={graph.people}
+                selectedPersonId={interaction.selectedPersonId}
                 position={position}
                 state={visualStateById.get(position.node.id) ?? {
                   filtered: false,
@@ -361,6 +340,8 @@ function GraphReady({
         use as setas para percorrer as estruturas, Enter para selecionar e Home para retornar ao CCPF.
       </p>
 
+      <p className="org-viewport-hint" aria-hidden="true">Arraste para explorar</p>
+
       <div className="org-level-legend" aria-label="LEGENDA DOS NÍVEIS ORGANIZACIONAIS" data-org-interactive>
         <span aria-label={`01 ${CCPF_FULL_LABEL}`} title={CCPF_FULL_LABEL}>
           <i data-level="1" />01 CCPF
@@ -373,21 +354,21 @@ function GraphReady({
       <OrgViewportControls
         scale={viewport.camera.scale}
         selected={Boolean(interaction.selectedNode)}
-        onFit={() => {
-          cancelFinalFit();
+        onClearSelection={() => {
+          clearSelection();
           fitViewport();
         }}
+        onFit={() => {
+              fitViewport();
+        }}
         onFocusSelected={() => {
-          cancelFinalFit();
-          if (selectedNodeId) focusNode(selectedNodeId);
+                if (selectedNodeId) focusNode(selectedNodeId);
         }}
         onZoomIn={() => {
-          cancelFinalFit();
-          viewport.zoomBy(1.2);
+              viewport.zoomBy(1.2);
         }}
         onZoomOut={() => {
-          cancelFinalFit();
-          viewport.zoomBy(1 / 1.2);
+              viewport.zoomBy(1 / 1.2);
         }}
       />
 
@@ -395,6 +376,10 @@ function GraphReady({
         <PersonDetailPanel
           graph={graph}
           node={interaction.selectedNode}
+          selectedPersonId={interaction.selectedPersonId}
+          onPersonSelect={(personId) => {
+            if (selectedNodeId) commitSelection(selectedNodeId, personId);
+          }}
           onClose={closeDetails}
         />
       )}
@@ -463,7 +448,7 @@ export function OrganizationalEcosystem({
       aria-hidden={!active}
       aria-label="Ecossistema organizacional FENASOJA 2028"
     >
-      <div className="org-ecosystem__atmosphere" aria-hidden="true" />
+      <SoybeanAtmosphere active={active} />
       {loading ? (
         <LoadingState />
       ) : error ? (

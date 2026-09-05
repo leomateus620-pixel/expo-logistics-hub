@@ -39,7 +39,32 @@ and the runtime filenames produced by `scripts/build_alvorada_reference_assets.p
 | ImageGen Santa Rosa environmental panorama | `89c25b44bc3afaf9b49e688b3214c13f9da613de4371e3145915e822b4808ecd` | `santa-rosa-horizon.webp`, `santa-rosa-horizon-portrait.webp` |
 | Requester-approved official FENASOJA symbol | `cafa3155fc8f7e7d060dafc2ab5ff619e4c953565bc57821133b39a011b23811` | `fenasoja-symbol-official.png` |
 
-## Three.js r170
+## NASA Blue Marble cloud-free surface
+
+`earth-surface-2048.webp` and `earth-surface-4096.webp` are optimized, geographically
+unchanged versions of the September 2004 [NASA Earth Observatory Blue Marble Next
+Generation map with topography](https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-topography/).
+The [5400 x 2700 source JPEG](https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography/september/world.topo.200409.3x5400x2700.jpg)
+is credited to NASA Earth Observatory. Source SHA-256, dimensions and packaging
+parameters are recorded in `earth-surface-provenance.json`. Packaging uses Lanczos
+resampling and WebP quality 88; it does not invent terrain or change coordinates.
+Only the land/ocean albedo uses a larger desktop variant. The existing registered
+night and normal layers retain their original resolutions and provenance.
+These historical satellite composites are visual geographic context, not live
+weather, current city-light observations or a simulation of a specific event date.
+
+## NASA Blue Marble cloud density
+
+`earth-clouds-2048.webp` uses the native 2048 x 1024 NASA Goddard / Reto Stöckli
+[Blue Marble 2002 cloud composite](https://science.nasa.gov/earth/earth-observatory/the-blue-marble-true-color-global-imagery-at-1km-resolution/).
+The [source luminance map](https://assets.science.nasa.gov/content/dam/science/esd/eo/content-feature/bluemarble/images/cloud_combined_2048.jpg)
+replaces the coarse 1024px alpha layer in this experience. Its luminance is
+sampled as density for transparency and shadow; it is not current weather.
+`earth-clouds-provenance.json` records the source hash and dimensions, and
+`scripts/prepare-alvorada-clouds.mjs` reproduces the format conversion without
+upscaling, geographic changes or generated detail.
+
+## Three.js r170 texture and font sources
 
 The following assets were downloaded from the official [`mrdoob/three.js`](https://github.com/mrdoob/three.js) repository at the immutable `r170` tag. Three.js is distributed under the [MIT License](./THREE-LICENSE.txt).
 
@@ -82,6 +107,22 @@ The 129 x 129 signed heightfield embedded in `santa-rosa-city-v2.json` was sampl
 `scripts/build_alvorada_geodata.py` reproduces the compact city asset from the immutable source partition and elevation tiles. Runtime clients never call Microsoft, Mapzen or Overpass services; all network extraction, validation, clipping and packing happens offline.
 
 ## User-supplied references
+
+### 2028 organizational refinement
+
+`soy-harvest-dawn.webp` and `soy-harvest-dawn-mobile.webp` are original
+ImageGen illustrations created on 2026-09-05. The prompt, variant sizes and
+conversion workflow are recorded in
+`docs/image-prompts/alvorada-soy-harvest-2028.md`. They depict a soybean harvest
+in southern Brazilian countryside; they are not documentary photographs of
+Santa Rosa. Official brand artwork is overlaid separately without redesign.
+
+`portraits/*.webp` are 256px presentation derivatives of the 38 existing
+registered institutional photographs, with source URLs and byte counts in
+`portraits/manifest.json`. `scripts/prepare-alvorada-portraits.mjs` preserves
+framing and identity; the graph retains its original photo URLs and unknown
+uploads retain their own sources. These derivatives are used only by the
+organizational map and detail panel.
 
 The geographic and photographic references attached by the requester were not
 copied into this directory or redistributed. They were used only as visual

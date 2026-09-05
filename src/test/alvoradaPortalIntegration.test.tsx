@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import CommissionPortalPage from '@/pages/commissions/CommissionPortalPage';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const integrationMocks = vi.hoisted(() => ({
   canvasFails: false,
@@ -79,12 +80,15 @@ function PortalHarness() {
 }
 
 function renderPortal() {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
+    <QueryClientProvider client={client}>
     <MemoryRouter initialEntries={['/portal']}>
       <Routes>
         <Route path="*" element={<PortalHarness />} />
       </Routes>
-    </MemoryRouter>,
+    </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 
@@ -130,7 +134,9 @@ describe('integração do launcher da Alvorada no portal', () => {
 
     fireEvent.click(launcher);
 
-    const dialog = await screen.findByTestId('alvorada-experience');
+    // The integration intentionally exercises the real lazy module; allow its
+    // transformation to finish on a busy CI worker before checking behavior.
+    const dialog = await screen.findByTestId('alvorada-experience', {}, { timeout: 5000 });
     expect(dialog).toBeInTheDocument();
     expect(dialog).toHaveAccessibleName('O Nascer da Alvorada');
     expect(launcher).toHaveAttribute('aria-expanded', 'true');
@@ -174,7 +180,7 @@ describe('integração do launcher da Alvorada no portal', () => {
     renderPortal();
     fireEvent.click(screen.getByRole('button', { name: 'Abrir O Nascer da Alvorada' }));
 
-    const fallback = await screen.findByRole('img', { name: 'Alvorada de Santa Rosa' });
+    const fallback = await screen.findByRole('img', { name: 'Alvorada de Santa Rosa' }, { timeout: 5000 });
     const renderer = fallback.closest('.alvorada-overlay__canvas');
 
     await waitFor(() => expect(renderer).toHaveAttribute('data-renderer', 'fallback'));

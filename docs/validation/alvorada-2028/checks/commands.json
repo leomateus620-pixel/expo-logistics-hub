@@ -1,0 +1,32 @@
+{
+  "diffCheck": {
+    "exitCode": 0,
+    "command": "git diff --cached --check"
+  },
+  "browser": {
+    "handoffChecks": 8,
+    "interactionChecks": 33,
+    "physicalDevices": false,
+    "pageErrors": 0
+  },
+  "build": {
+    "command": "npm run build",
+    "exitCode": 0,
+    "durationSeconds": 45.52
+  },
+  "tests": {
+    "failed": 0,
+    "command": "npx vitest run src/features/alvorada src/test/alvorada src/test/organizationalResolver.test.ts",
+    "passed": 130,
+    "files": 17
+  },
+  "typescript": {
+    "exitCode": 0,
+    "command": "npx tsc --noEmit -p tsconfig.app.json"
+  },
+  "date": "2026-09-05T20:09:08.6620226-03:00",
+  "eslint": {
+    "exitCode": 0,
+    "command": "npx eslint src/features/alvorada src/components/brand/FenasojaBrand.tsx src/test/alvorada*.test.* scripts/alvorada-qa.tsx scripts/alvorada-qa.config.ts"
+  }
+}
