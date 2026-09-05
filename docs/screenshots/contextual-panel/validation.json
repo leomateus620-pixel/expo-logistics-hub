@@ -1,0 +1,20 @@
+{
+  "base": "ad561b56",
+  "command": "npm test -- commercialMap --maxWorkers=2",
+  "tests": 976,
+  "passed": 971,
+  "failed": 5,
+  "files": 123,
+  "baselineReproducedAt": "5543034845dfe967cf79e440e68c2d726bfa9233",
+  "baselineFailures": [
+    "infraestrutura elétrica cartográfica do Mapa Comercial mantém todas as fases acima da folga técnica mínima em estruturas existentes",
+    "Churrascaria Exporural C4 e catavento moderno usa as duas referências locais e mantém budgets estáticos em ambos os níveis",
+    "modelo de apresentação do mapa comercial mantém histerese entre níveis de rótulo durante pequenos movimentos de zoom",
+    "modelo de apresentação do mapa comercial mantém os limites exatos e normaliza entradas inválidas da histerese",
+    "reconstrução das Quadras A/B e Palco Cultural Lactalis mantém overlays somente em DEV e integra o palco pelo hitbox oficial existente"
+  ],
+  "typeScript": "passed: tsc -p tsconfig.app.json --noEmit",
+  "eslint": "passed: changed TypeScript files, max-warnings 0",
+  "build": "passed: vite build",
+  "deviceScope": "Desktop browser with CSS viewports; no physical device, Safari or FPS certification"
+}

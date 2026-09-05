@@ -27,6 +27,7 @@ import {
   STATUS_CONFIG,
 } from '../../constants';
 import { geometryCentroid, withoutClosingPoint } from '../../utils/geometry';
+import { applyContextualCameraViewOffset, contextualCameraViewOffset, fitCameraAboveContextualPanel, readContextualCameraViewOffset, readContextualViewportInsets, type ContextualCameraViewOffset } from '../../utils/contextualViewport';
 import {
   isCameraNavigationMovement,
   isMapSelectionClick,
@@ -222,6 +223,9 @@ interface CommercialMapCanvasProps {
   calibration: MapCalibration | null;
   matchingEntityIds: ReadonlySet<string>;
   filtersActive: boolean;
+  /** Deferred presentation snapshot. CameraRig subscribes to live navigation. */
+  sceneSegmentId?: CommercialMapSegmentId | null;
+  sceneInteriorEntityId?: string | null;
   isolatedArea?: CommercialMapSegmentId | null;
   segmentOverride?: CommercialMapSegmentDefinition | null;
   technicalValidationAllowed?: boolean;
@@ -1714,6 +1718,7 @@ interface CameraLensState {
   near: number;
   far: number;
   zoom: number;
+  viewOffset?: ContextualCameraViewOffset;
 }
 
 interface DeterministicCameraTransition {
@@ -1740,6 +1745,7 @@ interface LunarCameraSnapshot {
   near: number;
   far: number;
   zoom: number;
+  viewOffset: ContextualCameraViewOffset;
   exposure: number;
   controls: LunarCameraControlSnapshot;
 }
@@ -1834,8 +1840,9 @@ function CameraRig({
   extent,
   lunarTreeEntity,
   isolatedArea,
-  activeSegment,
-  activeSegmentEntities,
+  exteriorRenderedEntities,
+  resolvedSegmentByEntity,
+  segmentOverride,
   hydrologicalModeActive,
 }: {
   selectedEntity: MapEntity | null;
@@ -1844,8 +1851,9 @@ function CameraRig({
   extent: SceneExtent;
   lunarTreeEntity: MapEntity | null;
   isolatedArea?: CommercialMapSegmentId | null;
-  activeSegment: CommercialMapSegmentDefinition | null;
-  activeSegmentEntities: MapEntity[];
+  exteriorRenderedEntities: MapEntity[];
+  resolvedSegmentByEntity: ReadonlyMap<string, CommercialMapSegmentDefinition>;
+  segmentOverride?: CommercialMapSegmentDefinition | null;
   hydrologicalModeActive: boolean;
 }) {
   const controlsRef = useRef<OrbitControlsImpl>(null);
@@ -1867,6 +1875,13 @@ function CameraRig({
   const [appliedAngles, setAppliedAngles] = useState(desiredAngles);
   const preset = useCommercialMapStore((state) => state.cameraPreset);
   const cameraSequence = useCommercialMapStore((state) => state.cameraSequence);
+  const activeSegmentId = useCommercialMapStore((state) => state.activeSegmentId);
+  const requestedSegment = segmentOverride?.id === activeSegmentId ? segmentOverride : getCommercialMapSegment(activeSegmentId);
+  const activeSegment = requestedSegment?.behavior.interaction === 'filter-and-focus' ? requestedSegment : null;
+  const activeSegmentEntities = useMemo(
+    () => activeSegment ? exteriorRenderedEntities.filter((entity) => resolvedSegmentByEntity.get(entity.id)?.id === activeSegment.id) : [],
+    [activeSegment, exteriorRenderedEntities, resolvedSegmentByEntity],
+  );
   const parkingInspectionOpen = useCommercialMapStore((state) => state.parkingInspectionOpen);
   const parkingCameraSequence = useCommercialMapStore((state) => state.parkingCameraSequence);
   const parkingCameraView = useCommercialMapStore((state) => state.parkingCameraView);
@@ -2296,6 +2311,8 @@ function CameraRig({
       controlsEnabled: controlsRef.current?.enabled,
       interiorEntityId: interiorEntity?.id ?? null,
       fov: camera.fov,
+      zoom: camera.zoom,
+      viewOffset: readContextualCameraViewOffset(camera),
       near: Number(camera.near.toFixed(5)),
       far: Number(camera.far.toFixed(3)),
       distance: Number(camera.position.distanceTo(target).toFixed(4)),
@@ -2332,7 +2349,7 @@ function CameraRig({
     nextLens: Partial<CameraLensState> = {},
     source = 'navigation',
   ) => {
-    clampQueuedCameraPose(minDistance, maxDistance, clampTarget);
+    if (source !== 'panel-layout') clampQueuedCameraPose(minDistance, maxDistance, clampTarget);
     const controls = controlsRef.current;
     const currentTarget = controls?.target ?? targetLookAt.current;
     const currentDistance = camera.position.distanceTo(currentTarget);
@@ -2370,6 +2387,7 @@ function CameraRig({
         near: camera.near,
         far: camera.far,
         zoom: camera.zoom,
+        viewOffset: readContextualCameraViewOffset(camera),
       };
       transition.toPosition.copy(targetPosition.current);
       transition.toTarget.copy(targetLookAt.current);
@@ -2387,10 +2405,14 @@ function CameraRig({
         ),
         far: nextLens.far ?? cameraFarPlane,
         zoom: nextLens.zoom ?? camera.zoom,
+        viewOffset: nextLens.viewOffset ?? readContextualCameraViewOffset(camera),
       };
       const travel = transition.fromPosition.distanceTo(transition.toPosition)
         + transition.fromTarget.distanceTo(transition.toTarget) * 0.65;
-      transition.durationMs = resolveCameraTransitionDuration(travel);
+      transition.durationMs = resolveCameraTransitionDuration(
+        travel,
+        typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches),
+      );
       gl.domElement.dataset.commercialMapCameraTransition = JSON.stringify({
         status: 'running',
         source,
@@ -2688,11 +2710,15 @@ function CameraRig({
     }
     targetLookAt.current.copy(lookAt);
     targetPosition.current.copy(lookAt).add(direction.multiplyScalar(distance));
+    const contextualLens = fitCameraAboveContextualPanel(
+      targetPosition.current, targetLookAt.current, size.width, size.height,
+      readContextualViewportInsets(gl.domElement), cameraDistanceBounds.maxDistance,
+    );
     startCameraMove(
       cameraDistanceBounds.minDistance,
       cameraDistanceBounds.maxDistance,
       true,
-      { fov: 38, near: Math.max(0.05, distance / 1600), far: cameraFarPlane, zoom: 1 },
+      { fov: 38, near: Math.max(0.05, distance / 1600), far: cameraFarPlane, ...contextualLens },
       `preset:${nextPreset}`,
     );
   }, [
@@ -2701,6 +2727,7 @@ function CameraRig({
     cameraDistanceBounds.minDistance,
     cameraFarPlane,
     extent,
+    gl,
     hydrologicalModeActive,
     size.height,
     size.width,
@@ -2773,11 +2800,18 @@ function CameraRig({
     }
     targetLookAt.current.copy(lookAt);
     targetPosition.current.copy(lookAt).add(direction.multiplyScalar(distance));
+    const contextualInsets = readContextualViewportInsets(gl.domElement);
+    // The desktop fit already reserves the details column. Mobile sheets
+    // overlay the persistent drawing buffer and need a vertical correction.
+    const contextualLens = fitCameraAboveContextualPanel(
+      targetPosition.current, targetLookAt.current, size.width, size.height,
+      { ...contextualInsets, left: 0, right: 0 }, controlsMaximumDistance,
+    );
     startCameraMove(
       controlsMinimumDistance,
       controlsMaximumDistance,
       true,
-      { fov: 38, near: Math.max(0.035, distance / 1600), far: cameraFarPlane, zoom: 1 },
+      { fov: 38, near: Math.max(0.035, distance / 1600), far: cameraFarPlane, ...contextualLens },
       `selection:${entity.id}`,
     );
   }, [
@@ -2787,6 +2821,7 @@ function CameraRig({
     controlsMaximumDistance,
     controlsMinimumDistance,
     extent,
+    gl,
     size.height,
     size.width,
     startCameraMove,
@@ -2826,11 +2861,15 @@ function CameraRig({
     );
     targetLookAt.current.copy(lookAt);
     targetPosition.current.copy(lookAt).add(direction.multiplyScalar(distance));
+    const contextualLens = fitCameraAboveContextualPanel(
+      targetPosition.current, targetLookAt.current, size.width, size.height,
+      readContextualViewportInsets(gl.domElement), controlsMaximumDistance,
+    );
     startCameraMove(
       controlsMinimumDistance,
       controlsMaximumDistance,
       true,
-      { fov: 38, near: Math.max(0.04, distance / 1600), far: cameraFarPlane, zoom: 1 },
+      { fov: 38, near: Math.max(0.04, distance / 1600), far: cameraFarPlane, ...contextualLens },
       `segment:${segment.id}`,
     );
   }, [
@@ -2838,6 +2877,7 @@ function CameraRig({
     cameraFarPlane,
     controlsMaximumDistance,
     controlsMinimumDistance,
+    gl,
     preset,
     queuePreset,
     size.height,
@@ -2883,7 +2923,7 @@ function CameraRig({
       limits.minDistance,
       limits.maxDistance,
       false,
-      { fov: frame.fov, near: frame.near, far: Math.max(frame.far, cameraFarPlane), zoom: 1 },
+      { fov: frame.fov, near: frame.near, far: Math.max(frame.far, cameraFarPlane), zoom: 1, viewOffset: { x: 0, y: 0 } },
       `parking:${parkingCameraView}`,
     );
   }, [
@@ -2902,13 +2942,27 @@ function CameraRig({
     setParkingControlLimits(null);
     targetPosition.current.copy(interiorFrame.position);
     targetLookAt.current.copy(interiorFrame.target);
-    startCameraMove(interiorFrame.minDistance, interiorFrame.maxDistance, true, { ...interiorFrame, zoom: 1 }, `interior:${interiorFrame.entityId}`);
-  }, [interiorFrame, startCameraMove]);
+    const contextualLens = fitCameraAboveContextualPanel(
+      targetPosition.current, targetLookAt.current, size.width, size.height,
+      readContextualViewportInsets(gl.domElement), interiorFrame.maxDistance,
+    );
+    startCameraMove(interiorFrame.minDistance, interiorFrame.maxDistance, true, { ...interiorFrame, ...contextualLens }, `interior:${interiorFrame.entityId}`);
+  }, [gl, interiorFrame, size.height, size.width, startCameraMove]);
 
   resizeRefitView.current = () => {
-    // Panel/viewport resizing must not undo a manual orbit, zoom or a close-up
-    // just deselected. R3F updates the aspect; only an explicit focus resets it.
-    if (preserveManualView.current) return;
+    // A panel can change the free screen center without changing the user's
+    // manually chosen world position, pivot, distance or zoom.
+    if (preserveManualView.current) {
+      if (!(camera instanceof THREE.PerspectiveCamera)) return;
+      const viewOffset = contextualCameraViewOffset(size.width, size.height, readContextualViewportInsets(gl.domElement));
+      const current = readContextualCameraViewOffset(camera);
+      if (Math.abs(viewOffset.x - current.x) + Math.abs(viewOffset.y - current.y) < 0.001) return;
+      targetPosition.current.copy(camera.position);
+      targetLookAt.current.copy(controlsRef.current?.target ?? targetLookAt.current);
+      startCameraMove(effectiveControlsMinimumDistance, effectiveControlsMaximumDistance, false, { viewOffset }, 'panel-layout');
+      preserveManualView.current = true;
+      return;
+    }
     if (interiorEntity) queueInterior();
     else if (parkingActive) queueParking();
     else if (selectedEntity) queueSelection(selectedEntity);
@@ -2984,6 +3038,7 @@ function CameraRig({
       near: camera.near,
       far: camera.far,
       zoom: camera.zoom,
+      viewOffset: readContextualCameraViewOffset(camera),
       exposure: gl.toneMappingExposure,
       controls: {
         enabled: controls.enabled,
@@ -3010,7 +3065,8 @@ function CameraRig({
     navigation.current.active = false;
     navigation.current.navigating = false;
     gl.domElement.style.cursor = 'default';
-  }, [gl]);
+    if (camera instanceof THREE.PerspectiveCamera) camera.clearViewOffset();
+  }, [camera, gl]);
 
   const restoreLunarControlState = useCallback((snapshot: LunarCameraSnapshot) => {
     const controls = controlsRef.current;
@@ -3037,7 +3093,7 @@ function CameraRig({
     camera.near = safeSnapshot.near;
     camera.far = cameraFarPlane;
     camera.zoom = safeSnapshot.zoom;
-    camera.updateProjectionMatrix();
+    applyContextualCameraViewOffset(camera, size.width, size.height, safeSnapshot.viewOffset);
     if (controls) {
       controls.target.copy(safeSnapshot.target);
       restoreLunarControlState(safeSnapshot);
@@ -3062,6 +3118,8 @@ function CameraRig({
     gl,
     invalidate,
     restoreLunarControlState,
+    size.width,
+    size.height,
   ]);
   const restoreLunarCameraRef = useRef(restoreLunarCamera);
   useEffect(() => {
@@ -3238,6 +3296,13 @@ function CameraRig({
     }
     if (suppressDetailsRefit) suppressNextDetailsRefit.current = false;
 
+    // A pending panel/resize fit must never restart or overwrite a newer click.
+    // All explicit requests replace the single flight from its visible pose.
+    if (interiorChanged || selectionChanged || segmentChanged || presetChanged || sequenceChanged) {
+      cancelScheduledResizeRefit();
+      pendingResizeRefit.current = false;
+    }
+
     if (interiorEntity) {
       if (previousInterior.current === null) {
         cancelCameraTransition(true);
@@ -3247,7 +3312,7 @@ function CameraRig({
             position: camera.position.toArray() as [number, number, number],
             target: controls.target.toArray() as [number, number, number],
           });
-          interiorReturnLens.current = { fov: camera.fov, near: camera.near, far: camera.far, zoom: camera.zoom };
+          interiorReturnLens.current = { fov: camera.fov, near: camera.near, far: camera.far, zoom: camera.zoom, viewOffset: readContextualCameraViewOffset(camera) };
         }
       }
       if (interiorFrame && (interiorChanged || interiorFrame !== previousInteriorFrame.current)) queueInterior();
@@ -3415,6 +3480,24 @@ function CameraRig({
     size.width,
     lunarCameraLocked,
   ]);
+
+  useEffect(() => {
+    // Sheet observers publish once per layout change; the existing debouncer
+    // coalesces drag frames and retains manual pan/zoom ownership.
+    const onPanelResize = () => {
+      if (!initialized.current || navigation.current.active) return;
+      if (preserveManualView.current) resizeRefitSuppressedUntil.current = 0;
+      scheduleResizeRefit();
+    };
+    window.addEventListener('commercial-map-panel-resize', onPanelResize);
+    return () => window.removeEventListener('commercial-map-panel-resize', onPanelResize);
+  }, [scheduleResizeRefit]);
+
+  useLayoutEffect(() => {
+    if (camera instanceof THREE.PerspectiveCamera && camera.view?.enabled) {
+      applyContextualCameraViewOffset(camera, size.width, size.height, readContextualCameraViewOffset(camera));
+    }
+  }, [camera, size.width, size.height]);
 
   const clampTarget = useCallback(() => {
     const controls = controlsRef.current;
@@ -3988,7 +4071,10 @@ function CameraRig({
           transition.toLens.zoom,
           progress,
         );
-        perspective.updateProjectionMatrix();
+        applyContextualCameraViewOffset(perspective, size.width, size.height, {
+          x: THREE.MathUtils.lerp(transition.fromLens.viewOffset?.x ?? 0, transition.toLens.viewOffset?.x ?? 0, progress),
+          y: THREE.MathUtils.lerp(transition.fromLens.viewOffset?.y ?? 0, transition.toLens.viewOffset?.y ?? 0, progress),
+        });
 
         if (progress >= 0.99999) {
           transition.active = false;
@@ -3999,7 +4085,7 @@ function CameraRig({
           perspective.near = transition.toLens.near;
           perspective.far = transition.toLens.far;
           perspective.zoom = transition.toLens.zoom;
-          perspective.updateProjectionMatrix();
+          applyContextualCameraViewOffset(perspective, size.width, size.height, transition.toLens.viewOffset);
           controls?.target.copy(transition.toTarget);
           perspective.quaternion.copy(transition.toQuaternion);
           if (controls) {
@@ -4115,14 +4201,16 @@ function NavigationInteractionCoordinator({
   return null;
 }
 
-function Scene({
+const Scene = memo(function Scene({
   entities,
   parkingOwnerEntities = entities,
   siteEnvironmentEntities = entities,
   lots,
   calibration,
   matchingEntityIds,
-  filtersActive,
+  filtersActive: snapshotFiltersActive,
+  sceneSegmentId,
+  sceneInteriorEntityId,
   isolatedArea,
   segmentOverride,
   technicalValidationAllowed = false,
@@ -4157,7 +4245,11 @@ function Scene({
   const lunarLaunchReturning = useCommercialMapStore((state) => state.lunarLaunchReturning);
   const lunarCinematicActive = lunarLaunchPhase !== 'idle' || lunarLaunchReturning;
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
-  const activeSegmentId = useCommercialMapStore((state) => state.activeSegmentId);
+  const fallbackSegmentId = useCommercialMapStore((state) => sceneSegmentId === undefined ? state.activeSegmentId : null);
+  const activeSegmentId = sceneSegmentId === undefined ? fallbackSegmentId : sceneSegmentId;
+  // Never apply an exterior/previous interior filter to newly opened modules.
+  const filtersActive = snapshotFiltersActive
+    && (sceneInteriorEntityId === undefined || sceneInteriorEntityId === interiorEntityId);
   const [interiorCameraRequest, setInteriorCameraRequest] = useState<InteriorCameraRequest | null>(null);
   const exteriorGroup = useRef<THREE.Group>(null);
   const sceneObject = useThree((state) => state.scene);
@@ -4289,12 +4381,6 @@ function Scene({
     () => buildCommercialMapSegmentIndex(entities, lots),
     [entities, lots],
   );
-  const requestedSegment = segmentOverride?.id === activeSegmentId
-    ? segmentOverride
-    : getCommercialMapSegment(activeSegmentId);
-  const activeSegment = requestedSegment?.behavior.interaction === 'filter-and-focus'
-    ? requestedSegment
-    : null;
   const segmentByEntity = useMemo(() => {
     if ([...resolvedSegmentByEntity.values()].every((segment) => segment.behavior.visibleByDefault)) {
       return resolvedSegmentByEntity;
@@ -4522,12 +4608,6 @@ function Scene({
     nationsDistrictPresentationAvailable,
     presentedMatchingEntityIds,
   ]);
-  const activeSegmentEntities = useMemo(
-    () => activeSegment
-      ? exteriorRenderedEntities.filter((entity) => segmentByEntity.get(entity.id)?.id === activeSegment.id)
-      : [],
-    [activeSegment, exteriorRenderedEntities, segmentByEntity],
-  );
   const contextualLabel = useContextualMapLabel({
     selectedEntityId,
     hoveredEntityId,
@@ -4583,7 +4663,7 @@ function Scene({
   const interiorKind = interiorEntity ? resolveStrategicLandmarkKind(interiorEntity) : null;
   const interiorContent = interiorEntity && (
     interiorKind === 'commercial-pavilion'
-      ? <CommercialPavilionInteriorScene entity={interiorEntity} entities={entities} lots={lots} reducedGraphics={reducedGraphics} onNavigate={handlePavilionInteriorNavigate} />
+      ? <CommercialPavilionInteriorScene entity={interiorEntity} entities={entities} lots={lots} reducedGraphics={reducedGraphics} onNavigate={handlePavilionInteriorNavigate} matchingEntityIds={matchingEntityIds} filtersActive={filtersActive} />
       : interiorKind === 'livestock-pavilion'
         ? <LivestockPavilionInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />
         : interiorKind === 'mirante-pavilion'
@@ -4840,8 +4920,9 @@ function Scene({
         extent={extent}
         lunarTreeEntity={lunarTreeEntity}
         isolatedArea={isolatedArea}
-        activeSegment={activeSegment}
-        activeSegmentEntities={activeSegmentEntities}
+        exteriorRenderedEntities={exteriorRenderedEntities}
+        resolvedSegmentByEntity={resolvedSegmentByEntity}
+        segmentOverride={segmentOverride}
         hydrologicalModeActive={hydrologicalModeActive}
       />
       <RuntimeFrameDiagnostics />
@@ -4856,7 +4937,7 @@ function Scene({
       <Preload all />
     </>
   );
-}
+});
 
 function AdaptiveCommercialMapScene({
   sceneProps,

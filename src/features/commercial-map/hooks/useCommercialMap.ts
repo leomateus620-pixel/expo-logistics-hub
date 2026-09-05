@@ -43,6 +43,7 @@ import {
   type EntityExplorerItem,
 } from '../utils/entityExplorer';
 import { resolveMapPermissions } from '../utils/permissions';
+import { resolveContextualMapScope } from '../utils/contextualMapSummary';
 import { getCommercialMapSegment, withCommercialMapSegments } from '../data/commercialMapSegments';
 import { withUnifiedFenasojaRestaurant } from '../utils/fenasojaRestaurant';
 
@@ -190,6 +191,7 @@ export function useMapEntityFilter(entities: MapEntity[], lots: CommercialLot[])
   const sortOrder = useCommercialMapStore((state) => state.sortOrder);
   const layerVisibility = useCommercialMapStore((state) => state.layerVisibility);
   const activeSegmentId = useCommercialMapStore((state) => state.activeSegmentId);
+  const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const activeSegment = getCommercialMapSegment(activeSegmentId);
   const debouncedSearch = useDebouncedValue(search, 140);
   const indexedItems = useMemo(() => buildEntityExplorerIndex(entities, lots), [entities, lots]);
@@ -197,11 +199,17 @@ export function useMapEntityFilter(entities: MapEntity[], lots: CommercialLot[])
     () => indexedItems.filter((item) => layerVisibility[item.entity.layerId] !== false),
     [indexedItems, layerVisibility],
   );
+  const interiorScope = useMemo(() => {
+    const interiorEntity = entities.find((entity) => entity.id === interiorEntityId);
+    return interiorEntity ? resolveContextualMapScope({ entities, lots, interiorEntity }) : null;
+  }, [entities, lots, interiorEntityId]);
   const segmentItems = useMemo(
-    () => activeSegment?.behavior.interaction === 'filter-and-focus'
-      ? visibleItems.filter((item) => item.segment?.id === activeSegmentId)
-      : visibleItems,
-    [activeSegment?.behavior.interaction, activeSegmentId, visibleItems],
+    () => interiorScope
+      ? visibleItems.filter((item) => interiorScope.entityIds.has(item.entity.id))
+      : activeSegment?.behavior.interaction === 'filter-and-focus'
+        ? visibleItems.filter((item) => item.segment?.id === activeSegmentId)
+        : visibleItems,
+    [activeSegment?.behavior.interaction, activeSegmentId, interiorScope, visibleItems],
   );
   const facets = useMemo(() => buildEntityExplorerFacets(segmentItems), [segmentItems]);
 
@@ -226,13 +234,13 @@ export function useMapEntityFilter(entities: MapEntity[], lots: CommercialLot[])
         || classificationFilters.length
         || locationFilter
         || verificationFilters.length
-        || activeSegmentId
+        || (!interiorScope && activeSegmentId)
       ),
-      totalCount: visibleItems.length,
+      totalCount: interiorScope ? segmentItems.length : visibleItems.length,
       filteredCount: filteredItems.length,
       facets,
     };
-  }, [activeSegmentId, classificationFilters, debouncedSearch, facets, locationFilter, segmentItems, sortOrder, statusFilters, verificationFilters, visibleItems.length]);
+  }, [activeSegmentId, classificationFilters, debouncedSearch, facets, interiorScope, locationFilter, segmentItems, sortOrder, statusFilters, verificationFilters, visibleItems.length]);
 
   return stableResult;
 }

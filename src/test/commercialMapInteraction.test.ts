@@ -223,7 +223,7 @@ describe('pipeline de seleção do mapa comercial', () => {
     });
     useCommercialMapStore.getState().exitInterior();
     expect(useCommercialMapStore.getState()).toMatchObject({
-      selectedEntityId: 'reference:2026:b3',
+      selectedEntityId: 'reference:2026:b12',
       interiorEntityId: null,
       activePanel: 'details',
       workspaceMode: '3d',
