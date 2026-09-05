@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { lateralDistrictContainsWorldPoint } from '../data/lateralResidentialDistrict';
 import {
   PARK_LOCAL_BOUNDS,
   REGIONAL_HIGHWAY_PROFILE,
@@ -86,6 +87,8 @@ function insideExpandedPark(x: number, z: number) {
 export function regionalLandscapePointIsClear(position: readonly [number, number]) {
   const [x, z] = position;
   if (!Number.isFinite(x) || !Number.isFinite(z) || insideExpandedPark(x, z)) return false;
+  // Maximum regional canopy is 1.9 map units: leave a 13 m crown clearance.
+  if (lateralDistrictContainsWorldPoint(position, 13)) return false;
   if (pointInInterchangeEnvelope(position, 'neCloverleaf')) return false;
   if (pointInInterchangeEnvelope(position, 'seCloverleaf')) return false;
 
