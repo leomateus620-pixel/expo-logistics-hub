@@ -1,0 +1,65 @@
+{
+  "viewport": {
+    "width": 1366,
+    "height": 768
+  },
+  "base": "ad561b56",
+  "sequence": "24 segment selections after warmup",
+  "before": {
+    "renderer": {
+      "at": 376625.6999999881,
+      "calls": 592,
+      "triangles": 585361,
+      "geometries": 559,
+      "textures": 149,
+      "programs": 187,
+      "dpr": 1,
+      "width": 1069,
+      "height": 682,
+      "heapBytes": 237742994,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 495,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  "after": {
+    "renderer": {
+      "at": 399729,
+      "calls": 605,
+      "triangles": 613106,
+      "geometries": 559,
+      "textures": 149,
+      "programs": 187,
+      "dpr": 1,
+      "width": 1069,
+      "height": 682,
+      "heapBytes": 265753004,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 724,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "transition": {
+      "status": "completed",
+      "source": "segment:espaco-automovel",
+      "sequence": 33,
+      "startedAt": 399692.5,
+      "durationMs": 120,
+      "completedAt": 399821.5,
+      "elapsedMs": 129
+    }
+  }
+}

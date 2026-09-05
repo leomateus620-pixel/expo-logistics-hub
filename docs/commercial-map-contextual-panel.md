@@ -1,6 +1,6 @@
 # Painel contextual do Mapa Comercial
 
-Implementação na branch `codex/contextual-commercial-map-panel`, a partir de `5543034845dfe967cf79e440e68c2d726bfa9233`.
+Implementação na branch `codex/contextual-commercial-map-panel`, a partir de `5543034845dfe967cf79e440e68c2d726bfa9233`, integrada à `main` atual `ad561b56` (bairro lateral, PR #129), sem conflitos.
 
 ## Comportamento entregue
 
@@ -33,11 +33,17 @@ Não foram alterados cadastros, geometrias oficiais, modelos 3D, contratos, regr
 
 TypeScript (`tsc -p tsconfig.app.json --noEmit`), ESLint dos arquivos alterados e build de produção passaram. O build mantém avisos existentes sobre chunks grandes e a base Browserslist desatualizada.
 
+Suíte ampla após integrar a `main`: **976 testes em 123 arquivos; 971 aprovados e 5 falhas preexistentes**, sem falhas novas. Comando: `npm test -- commercialMap --maxWorkers=2`. Os relatórios brutos locais ficam em `artifacts/contextual-panel`; o resumo revisável está em [validation.json](screenshots/contextual-panel/validation.json).
+
 Testes de integração cobrem seleção imediata, limpeza independente, permissões/ordem do cabeçalho, prioridade contextual, retorno, lista, formulários ao trocar módulo e paginação. Testes de projeção cobrem exteriores/interiores em 360/390/430 px, com painéis de 25% e 78%, após os limites reais de OrbitControls.
 
 Cinco falhas foram reproduzidas em checkout isolado do commit original (46 testes: 41 passaram, 5 falharam): folga de infraestrutura elétrica, referências locais ausentes da Churrascaria Exporural, duas expectativas de histerese em Presentation e comparação textual LF/CRLF em QuadrasABLactalis. Elas não foram corrigidas alterando dados espaciais nesta tarefa.
 
 As capturas “antes” são os anexos fornecidos pelo usuário. As capturas “depois” usam a mesma interface real na rota exclusivamente DEV `/__dev/commercial-map-interface`, com referência oficial e permissões de leitura. Gestão não aparece nessas capturas por essas permissões; sua apresentação com autorização é validada nos testes de integração.
+
+Verificação visual: desktop 1366×768, mobile 360×800, 390×844 e 430×932, e paisagem 844×390, sem overflow horizontal nos estados inspecionados. O resumo do interior mediu 200, 211 e 233 px respectivamente (25% da altura do viewport). A seleção inicial de estrutura mediu 144 px em 390×844, preservando mais espaço conforme o conteúdo. Voltar ao mapa, lista e controles do painel mediram ao menos 44 px de altura; o botão compacto Lista e tabela mediu 44×44 px. Foram exercitados segmento → situação → limpar segmento, seleção do Pavilhão 14, módulo 73, expansão/recolhimento, lista/mapa e retorno por Esc. Os filtros em paisagem têm rolagem própria, fechamento fixo e ocultam o Dock durante o uso.
+
+Após aquecimento e integração da `main`, **24 trocas de segmento** terminaram com seleção, legenda e câmera em Espaço do Automóvel. Recursos antes/depois: **559 geometrias, 149 texturas, 187 programas**, sem crescimento. Saúde final `ready/post`, 724 quadros apresentados, zero perdas de contexto e nenhum código de erro. Esses números não constituem medição de FPS; detalhes em [stress-segments.json](screenshots/contextual-panel/stress-segments.json). Uma rodada anterior em 430×932 também manteve estáveis 543/149/183 recursos durante 24 trocas, antes da integração do bairro lateral.
 
 ### Capturas
 
@@ -48,5 +54,6 @@ As capturas “antes” são os anexos fornecidos pelo usuário. As capturas “
 | Segmentos desktop | — | [Depois](screenshots/contextual-panel/after-desktop-segments.png) |
 | Interior mobile | — | [360 px](screenshots/contextual-panel/after-mobile-interior-360.png), [390 px](screenshots/contextual-panel/after-mobile-interior-390.png), [430 px](screenshots/contextual-panel/after-mobile-interior-430.png) |
 | Detalhes voluntários | — | [Módulo expandido](screenshots/contextual-panel/after-mobile-module-expanded-390.png) |
+| Filtros em paisagem | — | [844×390](screenshots/contextual-panel/after-landscape-filters.png) |
 
 Validação em navegador desktop com viewports CSS, sem certificação de iPhone/Safari, hardware mobile, multitouch físico ou FPS. Fluxos comerciais de gravação não foram executados contra produção.
