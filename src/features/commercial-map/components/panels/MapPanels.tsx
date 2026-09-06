@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   BadgeCheck,
+  BookOpen,
   Building2,
   CalendarClock,
   CheckCircle2,
@@ -58,6 +59,8 @@ import { LotStructureDialog, type LotStructureOperation } from '../commercial/Lo
 import { LotEditDialog } from '../commercial/LotEditDialog';
 import { EntityVerificationDialog } from '../commercial/EntityVerificationDialog';
 import { PavilionPlanLegend } from './PavilionPlanLegend';
+import { getHistoryIdForEntity } from '../../history/bindings';
+import { HistoryExperience } from '../../history/HistoryExperience';
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
@@ -322,6 +325,14 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
   const [editingLot, setEditingLot] = useState(false);
   const [verificationOpen, setVerificationOpen] = useState(false);
   const [sheetState, setSheetState] = useState<CommercialMapDetailSheetState>('half');
+  const [historyEntityId, setHistoryEntityId] = useState<string | null>(null);
+  const historyTriggerRef = useRef<HTMLButtonElement>(null);
+  const historyId = getHistoryIdForEntity(entity);
+  const historyOpen = historyEntityId === entity.id && historyId !== null;
+  const closeHistory = () => {
+    setHistoryEntityId(null);
+    requestAnimationFrame(() => historyTriggerRef.current?.focus({ preventScroll: true }));
+  };
   const panelRef = useRef<HTMLElement>(null);
   const dragRef = useRef({ pointerId: -1, startY: 0, startHeight: 0, viewportHeight: 0, minimumHeight: 72, maximumHeight: 0, moved: false });
   const suppressHandleClickRef = useRef(false);
@@ -350,6 +361,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
     setStructureOperation(null);
     setEditingLot(false);
     setVerificationOpen(false);
+    setHistoryEntityId(null);
     setSheetState('half');
     dragRef.current.pointerId = -1;
     suppressHandleClickRef.current = false;
@@ -394,6 +406,13 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
         className="commercial-map-panel commercial-map-details-panel"
         data-sheet-state={sheetState}
         aria-label={`Detalhes de ${metadata.officialDisplayName}`}
+        onPointerDown={(event) => event.stopPropagation()}
+        onPointerMove={(event) => event.stopPropagation()}
+        onPointerUp={(event) => event.stopPropagation()}
+        onWheel={(event) => event.stopPropagation()}
+        onTouchStart={(event) => event.stopPropagation()}
+        onTouchMove={(event) => event.stopPropagation()}
+        onTouchEnd={(event) => event.stopPropagation()}
       >
         <div className="commercial-map-sheet-controls">
           <button
@@ -470,7 +489,10 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
             {sheetState === 'expanded' ? <Minimize2 aria-hidden="true" /> : <Maximize2 aria-hidden="true" />}
           </button>
         </div>
+        {historyOpen && <HistoryExperience key={entity.id} historyId={historyId} onClose={closeHistory} />}
+        <div className="commercial-map-commercial-view" hidden={historyOpen}>
         <PanelHeader eyebrow={CLASSIFICATION_LABELS[entity.classification]} title={metadata.officialDisplayName} onClose={() => setSelectedEntityId(null)} />
+        {historyId && <Button ref={historyTriggerRef} variant="outline" className="commercial-map-history-trigger" onClick={() => setHistoryEntityId(entity.id)}><BookOpen aria-hidden="true" />Conhecer a história</Button>}
         {usesInspectionCopy && (
           <Button
             className="commercial-map-short-interior-action"
@@ -618,6 +640,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
             </TabsContent>
           </Tabs>
         </ScrollArea>
+        </div>
       </aside>
       {lot && <LotWorkflowDialog key={`workflow:${lot.id}`} lot={lot} workflow={workflow} onClose={() => setWorkflow(null)} />}
       {lot && <LotStructureDialog key={`structure:${lot.id}`} operation={structureOperation} lot={lot} entity={entity} entities={entities} lots={lots} onClose={() => setStructureOperation(null)} />}
