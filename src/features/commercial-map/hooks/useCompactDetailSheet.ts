@@ -2,7 +2,24 @@ import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 
 import { resolveCommercialMapSheetSnap, type CommercialMapDetailSheetState } from '../utils/viewport';
 
 /** Shared presentation state; changing selection never remounts the map or panel. */
-export function useCompactDetailSheet(selectionKey: string | null) {
+export function useCompactDetailSheet(selectionKey: string | null, freezeCameraFraming = false) {
+  const freezeCameraFramingRef = useRef(freezeCameraFraming);
+  const framingSelectionRef = useRef(selectionKey);
+  useLayoutEffect(() => {
+    const selectionChanged = framingSelectionRef.current !== selectionKey;
+    framingSelectionRef.current = selectionKey;
+    if (freezeCameraFraming || selectionChanged) {
+      freezeCameraFramingRef.current = freezeCameraFraming;
+      return;
+    }
+    // Closing also changes the sheet height. Keep its ResizeObserver delivery
+    // suppressed through that layout, then restore normal commercial resizing.
+    if (!freezeCameraFramingRef.current) return;
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => { freezeCameraFramingRef.current = false; });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [freezeCameraFraming, selectionKey]);
   const [sheetState, setSheetState] = useState<CommercialMapDetailSheetState>('half');
   const panelRef = useRef<HTMLElement>(null);
   const dragRef = useRef({ pointerId: -1, startY: 0, startHeight: 0, viewportHeight: 0, minimumHeight: 72, maximumHeight: 0, moved: false });
@@ -24,7 +41,11 @@ export function useCompactDetailSheet(selectionKey: string | null) {
   useEffect(() => {
     const panel = panelRef.current;
     const viewport = panel?.closest('.commercial-map-viewport') as HTMLElement | null;
-    const notifyPanelResize = () => window.dispatchEvent(new Event('commercial-map-panel-resize'));
+    const notifyPanelResize = () => {
+      // Editorial navigation overlays the existing selection; changing its content
+      // or sheet height must not request a new camera frame.
+      if (!freezeCameraFramingRef.current) window.dispatchEvent(new Event('commercial-map-panel-resize'));
+    };
     const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(notifyPanelResize);
     if (panel) observer?.observe(panel);
     notifyPanelResize();

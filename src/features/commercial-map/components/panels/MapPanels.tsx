@@ -1,6 +1,7 @@
-import { useLayoutEffect, useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   BadgeCheck,
+  BookOpen,
   Building2,
   CalendarClock,
   CheckCircle2,
@@ -54,6 +55,8 @@ import { EntityVerificationDialog } from '../commercial/EntityVerificationDialog
 import { PavilionPlanLegend } from './PavilionPlanLegend';
 import { CompactDetailSheetControls } from './CompactDetailSheet';
 import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
+import { getHistoryIdForEntity } from '../../history/bindings';
+import { HistoryExperience } from '../../history/HistoryExperience';
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
@@ -317,7 +320,15 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
   const [structureOperation, setStructureOperation] = useState<LotStructureOperation>(null);
   const [editingLot, setEditingLot] = useState(false);
   const [verificationOpen, setVerificationOpen] = useState(false);
-  const sheet = useCompactDetailSheet(entity.id);
+  const [historyEntityId, setHistoryEntityId] = useState<string | null>(null);
+  const historyTriggerRef = useRef<HTMLButtonElement>(null);
+  const historyId = getHistoryIdForEntity(entity);
+  const historyOpen = historyEntityId === entity.id && historyId !== null;
+  const sheet = useCompactDetailSheet(entity.id, historyOpen);
+  const closeHistory = () => {
+    setHistoryEntityId(null);
+    requestAnimationFrame(() => historyTriggerRef.current?.focus({ preventScroll: true }));
+  };
   const activity = useLotActivity(lot?.id ?? null);
   const contracts = useLotContractVersions(lot?.id ?? null, permissions.canManageContracts);
   const areaMapUnits = polygonAreaMapUnits(entity.geometry);
@@ -343,6 +354,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
     setStructureOperation(null);
     setEditingLot(false);
     setVerificationOpen(false);
+    setHistoryEntityId(null);
   }, [entity.id]);
 
   return (
@@ -351,11 +363,23 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
         ref={sheet.panelRef}
         className="commercial-map-panel commercial-map-details-panel"
         data-sheet-state={sheet.sheetState}
+        data-history-open={historyOpen}
         aria-label={`Detalhes de ${metadata.officialDisplayName}`}
         onPointerDown={(event) => event.stopPropagation()}
+        onPointerMove={(event) => event.stopPropagation()}
+        onPointerUp={(event) => event.stopPropagation()}
+        onTouchStart={(event) => event.stopPropagation()}
+        onTouchMove={(event) => event.stopPropagation()}
+        onTouchEnd={(event) => event.stopPropagation()}
         onWheel={(event) => event.stopPropagation()}
       >
+        {historyOpen && <>
+          <div className="fenasoja-history-sheet-controls"><CompactDetailSheetControls sheet={sheet} /></div>
+          <HistoryExperience key={entity.id} historyId={historyId} onClose={closeHistory} />
+        </>}
+        <div className="commercial-map-commercial-view" hidden={historyOpen}>
         <PanelHeader eyebrow={`${entity.publicIdentifier} · ${CLASSIFICATION_LABELS[entity.classification]}`} title={metadata.officialDisplayName} onClose={() => setSelectedEntityId(null)} />
+        {historyId && <Button ref={historyTriggerRef} variant="outline" className="commercial-map-history-trigger" onClick={() => setHistoryEntityId(entity.id)}><BookOpen aria-hidden="true" />Conhecer a história</Button>}
         <div className="commercial-map-selection-summary" aria-label="Resumo da seleção">
           {status ? (
             <span className="commercial-map-status-pill" style={{ color: status.border, background: status.surface, borderColor: status.color }}>
@@ -499,6 +523,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
             </TabsContent>
           </Tabs>
         </ScrollArea>
+        </div>
       </aside>
       {lot && <LotWorkflowDialog key={`workflow:${lot.id}`} lot={lot} workflow={workflow} onClose={() => setWorkflow(null)} />}
       {lot && <LotStructureDialog key={`structure:${lot.id}`} operation={structureOperation} lot={lot} entity={entity} entities={entities} lots={lots} onClose={() => setStructureOperation(null)} />}

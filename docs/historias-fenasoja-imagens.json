@@ -1,0 +1,827 @@
+{
+  "version": 2,
+  "reviewedAt": "2026-09-06",
+  "scope": "Auditoria individual de 21 referências; 9 imagens aprovadas para as histórias com vínculo real verificado.",
+  "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado",
+  "policy": "A autorização declarada pelo usuário não é licença pública, atribuição de titularidade ou autorização emitida pelo editor da fonte. Direitos de terceiros, autoria e datas não comprovadas continuam documentados.",
+  "images": [
+    {
+      "id": "I01",
+      "sourceId": "S01",
+      "sourcePageUrl": "https://fenasoja.com.br/portal-oficial/geral/historia-memoria-e-reconhecimento-marcam-o-quarto-dia-da-fenasoja-2026/",
+      "originalImageUrl": "https://fenasoja.com.br/wp-content/uploads/2026/05/IMG_4916.JPG-scaled.jpeg",
+      "caption": "Retrato coletivo no auditório, publicado na cobertura das homenagens dos 60 anos.",
+      "alt": "Retrato coletivo no auditório, publicado na cobertura das homenagens dos 60 anos.",
+      "type": "contexto_documental",
+      "publishedDate": "2026-05-05",
+      "capturedDate": "2026-05-04",
+      "credit": null,
+      "width": 2560,
+      "height": 1920,
+      "reviewNote": "Auditório com plateia e painel Fenasoja 2026; não mostra Casa Fenasoja nem Galeria. EXIF DateTimeOriginal 2026:05:04 20:41:40 é coerente com o evento descrito. ID do auditório ainda não resolvido.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "draft",
+      "historyIds": [
+        "H24"
+      ],
+      "originalSha256": "9592986e8aead165744fa651029870dcf92576519551745ba788cbaf1ded7bec",
+      "originalBytes": 947464,
+      "entityIds": [],
+      "bindingStatus": "pending",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [
+        "Correspondência com estrutura publicável pendente."
+      ],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Fenasoja"
+    },
+    {
+      "id": "I02",
+      "sourceId": "S02",
+      "sourcePageUrl": "https://fenasoja.com.br/portal-oficial/geral/novos-espacos-foram-inaugurados-na-fenasoja/",
+      "originalImageUrl": "https://fenasoja.com.br/wp-content/uploads/2022/05/ea03f4e787faa3e9ef1e24ecf7e8f954.jpeg",
+      "caption": "Vista aérea de circulação e edificações do parque na matéria sobre as obras de 2022.",
+      "alt": "Vista aérea de circulação e edificações do parque na matéria sobre as obras de 2022.",
+      "type": "contexto_documental",
+      "publishedDate": "2022-05-02",
+      "capturedDate": null,
+      "credit": null,
+      "width": 650,
+      "height": 440,
+      "reviewNote": "Panorama aéreo de circulação, público e múltiplas edificações. A matéria relaciona cinco obras, mas a imagem não identifica individualmente cada uma. Apenas contexto do conjunto do parque.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "draft",
+      "historyIds": [
+        "H37"
+      ],
+      "originalSha256": "1ad68febd500ce015e59cde879161bad8a5854a4a782dfdd138c28426b35cd5f",
+      "originalBytes": 98588,
+      "entityIds": [],
+      "bindingStatus": "pending",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [
+        "Correspondência com estrutura publicável pendente."
+      ],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Fenasoja"
+    },
+    {
+      "id": "I03",
+      "sourceId": "S03",
+      "sourcePageUrl": "https://fenasoja.com.br/portal-oficial/geral/novas-estruturas-do-parque-foram-inauguradas-na-tarde-desta-quarta-feira/",
+      "originalImageUrl": "https://fenasoja.com.br/wp-content/uploads/2024/12/6f5ec59662ac3076323a2fc964fa579d.jpeg",
+      "caption": "Grupo diante da placa de inauguração do Ambulatório Médico.",
+      "alt": "Grupo diante da placa de inauguração do Ambulatório Médico.",
+      "type": "registro_de_evento",
+      "publishedDate": "2024-12-05",
+      "capturedDate": null,
+      "credit": null,
+      "width": 650,
+      "height": 440,
+      "reviewNote": "Placa AMBULATÓRIO visível ao fundo confirma o assunto. Grupo no corredor não mostra o edifício inteiro e não é o Restaurante Fenasoja.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "draft",
+      "historyIds": [
+        "H31"
+      ],
+      "originalSha256": "6ad383b49b36abc8e5ec9927d385e3134308d443fbe232b0d15169c24ecbcb98",
+      "originalBytes": 55961,
+      "entityIds": [],
+      "bindingStatus": "pending",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [
+        "Correspondência com estrutura publicável pendente."
+      ],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Fenasoja"
+    },
+    {
+      "id": "I04",
+      "sourceId": "S04",
+      "sourcePageUrl": "https://fenasoja.com.br/portal-oficial/agricultura-familiar/fenasoja-2026-tradicao-e-renovacao-marcam-abertura-do-pavilhao-da-agroindustria-familiar/",
+      "originalImageUrl": "https://fenasoja.com.br/wp-content/uploads/2026/05/IMG_4144-scaled.jpg",
+      "caption": "Cerimônia junto ao prédio do Pavilhão da Agroindústria Familiar.",
+      "alt": "Cerimônia junto ao prédio do Pavilhão da Agroindústria Familiar.",
+      "type": "registro_recente",
+      "publishedDate": "2026-05-01",
+      "capturedDate": null,
+      "credit": null,
+      "width": 2560,
+      "height": 1707,
+      "reviewNote": "Cerimônia diante de fachada do Pavilhão da Agroindústria Familiar, identificada pela fonte da fotografia. EXIF DateTimeOriginal 2026:02:04 04:22:49 contradiz o contexto de maio; relógio da câmera não validado. Data de captura permanece desconhecida.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "published",
+      "historyIds": [
+        "P07"
+      ],
+      "originalSha256": "3e821cbd1e3839a99ae0575a42b916a030e75619bcaf5c3556a574f8439eb7ca",
+      "originalBytes": 356434,
+      "entityIds": [
+        "reference:2026:b10"
+      ],
+      "bindingStatus": "verified",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Fenasoja"
+    },
+    {
+      "id": "I05",
+      "sourceId": "S05",
+      "sourcePageUrl": "https://prefeitura.santarosa.rs.gov.br/?p=16700",
+      "originalImageUrl": "https://prefeitura.santarosa.rs.gov.br/wp-content/uploads/2026/05/WhatsApp-Image-2026-05-03-at-09.24.42-1024x682.jpeg",
+      "caption": "Fachada noturna da Casa da Etnia Alemã na cobertura da inauguração da reforma.",
+      "alt": "Fachada noturna da Casa da Etnia Alemã na cobertura da inauguração da reforma.",
+      "type": "registro_recente",
+      "publishedDate": "2026-05-03",
+      "capturedDate": null,
+      "credit": null,
+      "width": 1024,
+      "height": 682,
+      "reviewNote": "Fachada noturna tem ETNIA ALEMÃ e placa Centro Cultural 25 de Julho legíveis. A notícia municipal descreve reforma, não construção em 1995. Publicação corrigida de 2026-05 para 2026-05-03 após leitura da página.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "published",
+      "historyIds": [
+        "H08"
+      ],
+      "originalSha256": "b565136340844d577aed10ac48a00f3c05e86ccb4cab0438b8517415ad759f6f",
+      "originalBytes": 94829,
+      "entityIds": [
+        "reference:2026:c8"
+      ],
+      "bindingStatus": "verified",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Prefeitura Municipal de Santa Rosa/RS"
+    },
+    {
+      "id": "I06",
+      "sourceId": "S06",
+      "sourcePageUrl": "https://fenasoja.com.br/portal-oficial/cultura/cultura-e-gastronomia-reunidas-na-praca-das-nacoes/",
+      "originalImageUrl": "https://fenasoja.com.br/wp-content/uploads/2018/05/72ee97ba9ac7bdc9025bb37798034124.jpeg",
+      "caption": "Serviço de alimentação na cobertura da gastronomia da Praça das Nações.",
+      "alt": "Serviço de alimentação na cobertura da gastronomia da Praça das Nações.",
+      "type": "contexto_documental",
+      "publishedDate": "2018-05-03",
+      "capturedDate": null,
+      "credit": null,
+      "width": 650,
+      "height": 440,
+      "reviewNote": "Prato sendo servido em buffet. Não há fachada ou placa identificadora de uma casa étnica. Contexto gastronômico da Praça das Nações; a recuperação posterior do texto de S06 não resolve o vínculo da fotografia com uma estrutura individual.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "draft",
+      "historyIds": [
+        "H06"
+      ],
+      "originalSha256": "8ce3776439144b006825b9e36b895fc3ce5204c01741b5a73963e68ae5af33ee",
+      "originalBytes": 55140,
+      "entityIds": [],
+      "bindingStatus": "pending",
+      "sourceReview": "Erro inicial do extrator web; texto de S06 recuperado posteriormente do HTML público e conferido em 2026-09-06, conforme o catálogo de correspondências. A fotografia I06 permanece contextual e sem vínculo individual comprovado.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [
+        "Correspondência com estrutura publicável pendente."
+      ],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Fenasoja"
+    },
+    {
+      "id": "I07",
+      "sourceId": "S07",
+      "sourcePageUrl": "https://fenasoja.com.br/portal-oficial/geral/documentario-da-arvore-lunar-foi-apresentado-a-comunidade/",
+      "originalImageUrl": "https://fenasoja.com.br/wp-content/uploads/2019/03/ee05198e3fea439aab4aba9edc8423d6.jpg",
+      "caption": "Imagem projetada durante a apresentação do documentário sobre a Árvore Lunar.",
+      "alt": "Imagem projetada durante a apresentação do documentário sobre a Árvore Lunar.",
+      "type": "contexto_documental",
+      "publishedDate": "2019-03-27",
+      "capturedDate": null,
+      "credit": "Clóvis Pacheco",
+      "width": 650,
+      "height": 440,
+      "reviewNote": "Tela de cinema com trecho do documentário e homem segurando muda. Não é fotografia do plantio de 1981. Crédito Fotos: Clóvis Pacheco explícito no corpo da fonte; direitos sobre o filme projetado também precisam ser esclarecidos.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "draft",
+      "historyIds": [
+        "H04"
+      ],
+      "originalSha256": "8e313e15327a2c4ff22611bb5c614a7554175c13f9f7cc91b7c80d2a5ed937c0",
+      "originalBytes": 42637,
+      "entityIds": [],
+      "bindingStatus": "pending",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [
+        "Correspondência com estrutura publicável pendente."
+      ],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": "Clóvis Pacheco",
+      "institutionalCredit": "Fenasoja"
+    },
+    {
+      "id": "I08",
+      "sourceId": "S08",
+      "sourcePageUrl": "https://fenasoja.com.br/portal-oficial/geral/arena-e-complexo-poliesportivo-e-cultural-foram-inaugurados-com-grande-festa-no-parque-de-exposicoes/",
+      "originalImageUrl": "https://fenasoja.com.br/wp-content/uploads/2024/06/9fbf435fe757139eab7bf4f636b7171c.jpeg",
+      "caption": "Público sob a cobertura da Arena na notícia de inauguração do complexo em 2024.",
+      "alt": "Público sob a cobertura da Arena na notícia de inauguração do complexo em 2024.",
+      "type": "registro_de_evento",
+      "publishedDate": "2024-06-24",
+      "capturedDate": null,
+      "credit": null,
+      "width": 650,
+      "height": 440,
+      "reviewNote": "Público sob cobertura com identificação Arena mrJack.bet visível. Fonte descreve inauguração de etapas em 2024; preservar patrocinador registrado sem transportar imagem para 2026.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "published",
+      "historyIds": [
+        "H22"
+      ],
+      "originalSha256": "fb9b1c6bb6e15d9bed5028951a6a1f9782fa3bd9cc9c2c543c6313ab47d89331",
+      "originalBytes": 69779,
+      "entityIds": [
+        "reference:2026:f"
+      ],
+      "bindingStatus": "verified",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Fenasoja"
+    },
+    {
+      "id": "I09",
+      "sourceId": "S09",
+      "sourcePageUrl": "https://fenasoja.com.br/portal-oficial/geral/fenasoja-sicredi-e-legaus-kids-instalaram-parquinho-infantil-no-parque-de-exposicoes/",
+      "originalImageUrl": "https://fenasoja.com.br/wp-content/uploads/2024/10/049ccbe29d617a96796d300485ada919.jpg",
+      "caption": "Parquinho do Sojinha e sua placa no parque.",
+      "alt": "Parquinho do Sojinha e sua placa no parque.",
+      "type": "registro_de_evento",
+      "publishedDate": "2024-10-19",
+      "capturedDate": null,
+      "credit": null,
+      "width": 650,
+      "height": 440,
+      "reviewNote": "Placa PARQUINHO DO SOJINHA e brinquedos visíveis. Confirmado o parquinho permanente junto ao Portão 3, não parque de diversões itinerante.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "draft",
+      "historyIds": [
+        "H32"
+      ],
+      "originalSha256": "529de0e5ba5e663c35248133b2137c0fc1b1aa4d32f3c64a526b418a81cb0f1c",
+      "originalBytes": 99786,
+      "entityIds": [],
+      "bindingStatus": "pending",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [
+        "Correspondência com estrutura publicável pendente."
+      ],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Fenasoja"
+    },
+    {
+      "id": "I10",
+      "sourceId": "S10",
+      "sourcePageUrl": "https://fenasoja.com.br/portal-oficial/geral/fenasoja-2026-cozinha-da-soja-destaca-valor-nutricional-e-versatilidade-do-grao-em-oficinas-diarias/",
+      "originalImageUrl": "https://fenasoja.com.br/wp-content/uploads/2026/05/Cozinha-da-Soja-Foto-Mateus-de-Oliveira-RD.jpg",
+      "caption": "Oficina culinária na Cozinha da Soja, com participantes acompanhando a demonstração.",
+      "alt": "Oficina culinária na Cozinha da Soja, com participantes acompanhando a demonstração.",
+      "type": "registro_recente",
+      "publishedDate": "2026-05-02",
+      "capturedDate": null,
+      "credit": null,
+      "width": 600,
+      "height": 400,
+      "reviewNote": "Oficina em cozinha com participantes acompanhando a demonstração. Fonte identifica Cozinha da Soja; não é foto da fachada. Nome de arquivo menciona Mateus de Oliveira, mas não confirma autoria pessoal sozinho.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "published",
+      "historyIds": [
+        "H14"
+      ],
+      "originalSha256": "9691f02cb6388bd745f465508b4751d7eb3c73c504a65d432f814f2a972214f2",
+      "originalBytes": 51708,
+      "entityIds": [
+        "reference:2026:b7"
+      ],
+      "bindingStatus": "verified",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Fenasoja"
+    },
+    {
+      "id": "I11",
+      "sourceId": "S11",
+      "sourcePageUrl": "https://fenasoja.com.br/portal-oficial/uncategorized/pedra-fundamental-da-casa-da-etnia-portuguesa-na-praca-das-nacoes-e-lancada/",
+      "originalImageUrl": "https://fenasoja.com.br/wp-content/uploads/2026/05/WhatsApp-Image-2026-05-07-at-12.43.24.jpeg",
+      "caption": "Descerramento da pedra fundamental da Casa da Etnia Portuguesa.",
+      "alt": "Descerramento da pedra fundamental da Casa da Etnia Portuguesa.",
+      "type": "registro_de_evento",
+      "publishedDate": "2026-05-07",
+      "capturedDate": null,
+      "credit": null,
+      "width": 2560,
+      "height": 1706,
+      "reviewNote": "Placa PEDRA FUNDAMENTAL / CASA CULTURAL DA ETNIA PORTUGUESA identifica a cerimônia. A data inscrita se refere ao marco, não prova captura; imagem não comprova casa concluída.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "draft",
+      "historyIds": [
+        "H12"
+      ],
+      "originalSha256": "877be60fd8786bb1538c14866fdb9389a92c101dc1a7a338ac8351e25ddac67e",
+      "originalBytes": 612346,
+      "entityIds": [],
+      "bindingStatus": "pending",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [
+        "Correspondência com estrutura publicável pendente."
+      ],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Fenasoja"
+    },
+    {
+      "id": "I12",
+      "sourceId": "S14",
+      "sourcePageUrl": "https://www.santarosatur.com.br/parque-de-exposicoes-alfredo-leandro-carlson/",
+      "originalImageUrl": "https://www.santarosatur.com.br/wp-content/uploads/2025/04/parque_exposicoes_01_mar_25.jpg",
+      "caption": "Vista do parque com área arborizada e edificações de convivência.",
+      "alt": "Vista do parque com área arborizada e edificações de convivência.",
+      "type": "registro_sem_data",
+      "publishedDate": null,
+      "capturedDate": null,
+      "credit": "Santa Rosa Tur",
+      "width": 1548,
+      "height": 1031,
+      "reviewNote": "Vista arborizada com estabelecimentos, circulação e marca dágua Santa Rosa Tur. Contexto do parque; não vincular os imóveis a histórias individuais por aparência. Nome do arquivo não comprova data.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "draft",
+      "historyIds": [
+        "H37"
+      ],
+      "originalSha256": "edd6a91114d10811ce49f05cae879dbd91af3dcbf32f72e8b430575e97d4bc9e",
+      "originalBytes": 1601202,
+      "entityIds": [],
+      "bindingStatus": "pending",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [
+        "Correspondência com estrutura publicável pendente."
+      ],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Santa Rosa Tur"
+    },
+    {
+      "id": "I13",
+      "sourceId": "S14",
+      "sourcePageUrl": "https://www.santarosatur.com.br/parque-de-exposicoes-alfredo-leandro-carlson/",
+      "originalImageUrl": "https://www.santarosatur.com.br/wp-content/uploads/2025/04/parque_exposicoes_02_mar_25-300x200.jpg",
+      "caption": "Edificação de dois pavimentos com mural e entorno arborizado.",
+      "alt": "Edificação de dois pavimentos com mural e entorno arborizado.",
+      "type": "candidata",
+      "publishedDate": null,
+      "capturedDate": null,
+      "credit": "Santa Rosa Tur",
+      "width": 300,
+      "height": 200,
+      "reviewNote": "Prédio de dois pavimentos com mural, só 300 x 200 px. Ausência de identificação individual legível; não associar a Centro Administrativo por semelhança e não ampliar para capa.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "draft",
+      "historyIds": [],
+      "originalSha256": "86385389f11f04f292d3a7a316a62d0818a9f487bf5030d862d56a94eece724a",
+      "originalBytes": 24140,
+      "entityIds": [],
+      "bindingStatus": "pending",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [
+        "Identidade individual não comprovada."
+      ],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Santa Rosa Tur"
+    },
+    {
+      "id": "I14",
+      "sourceId": "S14",
+      "sourcePageUrl": "https://www.santarosatur.com.br/parque-de-exposicoes-alfredo-leandro-carlson/",
+      "originalImageUrl": "https://www.santarosatur.com.br/wp-content/uploads/2025/04/parque_exposicoes_03_mar_25-300x200.jpg",
+      "caption": "Edificação junto à área arborizada do parque.",
+      "alt": "Edificação junto à área arborizada do parque.",
+      "type": "candidata",
+      "publishedDate": null,
+      "capturedDate": null,
+      "credit": "Santa Rosa Tur",
+      "width": 300,
+      "height": 200,
+      "reviewNote": "Edificação térrea em área arborizada, só 300 x 200 px. Identidade individual não comprovada; não associar à sede ou churrascaria por aparência.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "draft",
+      "historyIds": [],
+      "originalSha256": "5edfd8cef29317f7e4f662f89ea730773c55e8084083199cd050bafda6599ea7",
+      "originalBytes": 26400,
+      "entityIds": [],
+      "bindingStatus": "pending",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [
+        "Identidade individual não comprovada."
+      ],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Santa Rosa Tur"
+    },
+    {
+      "id": "I15",
+      "sourceId": "S16",
+      "sourcePageUrl": "https://fenasoja.com.br/portal-oficial/geral/lancamento-da-fiesta-del-inmigrante-aproxima-brasil-e-argentina/",
+      "originalImageUrl": "https://fenasoja.com.br/wp-content/uploads/2026/08/lancamento26.jpeg",
+      "caption": "Encontro de lançamento da Fiesta del Inmigrante na sede da Etnia Italiana.",
+      "alt": "Encontro de lançamento da Fiesta del Inmigrante na sede da Etnia Italiana.",
+      "type": "registro_recente",
+      "publishedDate": "2026-08-25",
+      "capturedDate": null,
+      "credit": null,
+      "width": 1280,
+      "height": 960,
+      "reviewNote": "Encontro em interior com representantes e bandeiras. Fonte identifica explicitamente sede da Etnia Italiana. Não prova data de construção; captura não confirmada pelo arquivo.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "published",
+      "historyIds": [
+        "H09"
+      ],
+      "originalSha256": "7673c9fa2cb5d29286c9390cfd03815a2675ddc771003278ad72387b68efb825",
+      "originalBytes": 161310,
+      "entityIds": [
+        "reference:2026:c6"
+      ],
+      "bindingStatus": "verified",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Fenasoja"
+    },
+    {
+      "id": "I16",
+      "sourceId": "S17",
+      "sourcePageUrl": "https://fenasoja.com.br/portal-oficial/uncategorized/cooperativismo-escolar-reune-centenas-de-estudantes-na-fenasoja-2026/",
+      "originalImageUrl": "https://fenasoja.com.br/wp-content/uploads/2026/05/Cooperativismo-1-1-scaled.jpg",
+      "caption": "Atividade de cooperativismo escolar no Centro de Eventos Fenasoja.",
+      "alt": "Atividade de cooperativismo escolar no Centro de Eventos Fenasoja.",
+      "type": "registro_recente",
+      "publishedDate": "2026-05-09",
+      "capturedDate": "2026-05-08",
+      "credit": null,
+      "width": 2560,
+      "height": 1708,
+      "reviewNote": "Abertura de atividade em salão com painel Cooperluz. Fonte identifica Centro de Eventos; EXIF DateTimeOriginal 2026:05:08 10:08:02 é corroborado por descrição do evento na manhã de 8 de maio. Não resolve alias Restaurante.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "published",
+      "historyIds": [
+        "H26"
+      ],
+      "originalSha256": "be955e9f53bdc10785f1685d625a158dc2f5bf44551e2731f554c00c5b126fb9",
+      "originalBytes": 719313,
+      "entityIds": [
+        "reference:2026:c1"
+      ],
+      "bindingStatus": "verified",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Fenasoja"
+    },
+    {
+      "id": "I17",
+      "sourceId": "S18",
+      "sourcePageUrl": "https://fenasoja.com.br/portal-oficial/uncategorized/obras-avancam-e-parque-de-exposicoes-passa-por-melhorias-estruturais/",
+      "originalImageUrl": "https://fenasoja.com.br/wp-content/uploads/2026/03/100c8166-ca26-406f-a033-34862e2e2d4c.jpg",
+      "caption": "Fachada com pergolado na matéria sobre reforma do Pavilhão 7.",
+      "alt": "Fachada com pergolado na matéria sobre reforma do Pavilhão 7.",
+      "type": "candidata",
+      "publishedDate": "2026-03-11",
+      "capturedDate": null,
+      "credit": null,
+      "width": 1280,
+      "height": 960,
+      "reviewNote": "Fachada em obras com pergolado e rampa, sem placa de identificação legível. Fonte trata de várias melhorias; manter candidata para P07/H21 até comprovação individual da imagem.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "draft",
+      "historyIds": [
+        "H21",
+        "P07"
+      ],
+      "originalSha256": "d84e91c99518b3d7c6672d36c641135fdf68142de4b192f52efcb3edc07f8f7e",
+      "originalBytes": 193604,
+      "entityIds": [],
+      "bindingStatus": "pending",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [
+        "Identidade individual não comprovada."
+      ],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Fenasoja"
+    },
+    {
+      "id": "I18",
+      "sourceId": "S21",
+      "sourcePageUrl": "https://jornalnoroeste.com.br/noticia/comportamento/santa-rosa-marca-45-anos-do-plantio-da-arvore-lunar",
+      "originalImageUrl": "https://jornalnoroeste.com.br/files/images/news_20260813_082933_0d93476c80368d52.webp",
+      "caption": "Monumento da Apollo 14 e entorno da Árvore Lunar.",
+      "alt": "Monumento da Apollo 14 e entorno da Árvore Lunar.",
+      "type": "registro_sem_data",
+      "publishedDate": "2026-08-13",
+      "capturedDate": null,
+      "credit": "Reprodução / Santa Rosa Tur",
+      "width": 1190,
+      "height": 669,
+      "reviewNote": "Monumento branco, placa Apollo XIV, bandeiras e Árvore Lunar no entorno do parque local. Fonte credita Reprodução/Santa Rosa Tur; captura desconhecida e notícia contém data imprecisa da instalação do monumento. Não publicar como registro de 2026.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "published",
+      "historyIds": [
+        "H04",
+        "H05"
+      ],
+      "originalSha256": "860dc28d9e1830a5ac1abbbadceede7c4f2ce26f74dcb56c1b0b95d912bf0df3",
+      "originalBytes": 1227752,
+      "entityIds": [
+        "reference:2026:g"
+      ],
+      "bindingStatus": "verified",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Santa Rosa Tur"
+    },
+    {
+      "id": "I19",
+      "sourceId": "S22",
+      "sourcePageUrl": "https://www.correiodopovo.com.br/not%C3%ADcias/cidades/santa-rosa-inaugura-r%C3%A9plica-da-apollo-14-durante-a-fenasoja-1.260563",
+      "originalImageUrl": "https://www.correiodopovo.com.br/image/contentid/policy:1.1260972:1678584266/image/image.JPG?f=4x3&q=0.9&w=900&$p$f$q$w=a05503f",
+      "caption": "Monumento da Apollo 14 junto à Árvore Lunar na cobertura de inauguração de 2018.",
+      "alt": "Monumento da Apollo 14 junto à Árvore Lunar na cobertura de inauguração de 2018.",
+      "type": "registro_de_epoca",
+      "publishedDate": "2018-05-04",
+      "capturedDate": null,
+      "credit": "Felipe Dorneles / Especial / Correio do Povo",
+      "width": 900,
+      "height": 675,
+      "reviewNote": "Monumento Apollo XIV e visitantes junto à Árvore Lunar. A legenda da fonte contemporânea identifica inauguração em 2018 e crédito Felipe Dorneles / Especial / CP. Captura exata não confirmada; não repetir germinação no solo lunar.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "published",
+      "historyIds": [
+        "H04",
+        "H05"
+      ],
+      "originalSha256": "a2bcef4f896b0daf7d20e167fee83f9ef3394521551b34f90a0f935db1bf45ea",
+      "originalBytes": 227158,
+      "entityIds": [
+        "reference:2026:g"
+      ],
+      "bindingStatus": "verified",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": "Felipe Dorneles / Especial / Correio do Povo",
+      "institutionalCredit": "Correio do Povo"
+    },
+    {
+      "id": "I20",
+      "sourceId": "S24",
+      "sourcePageUrl": "https://www.osul.com.br/fenasoja-homenageia-voluntarios-celebra-historia-e-inaugura-monumento-a-soja/",
+      "originalImageUrl": "https://www.osul.com.br/wp-content/uploads/2026/05/aplaca-e1778030496916.jpeg",
+      "caption": "Descerramento da placa de denominação da Casa Fenasoja, em homenagem a Herberto Werner.",
+      "alt": "Descerramento da placa de denominação da Casa Fenasoja, em homenagem a Herberto Werner.",
+      "type": "registro_de_evento",
+      "publishedDate": "2026-05-05",
+      "capturedDate": null,
+      "credit": "Gisele Flores / O Sul",
+      "width": 1600,
+      "height": 962,
+      "reviewNote": "Cerimônia com placa Casa Fenasoja HERBERTO WERNER visível. Fonte identifica a homenagem e fornece Foto: Gisele Flores/O Sul. Foto parcial da fachada; vínculo real da Casa permanece pendente.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "draft",
+      "historyIds": [
+        "H01"
+      ],
+      "originalSha256": "a1e82af237562bc23d130f95dd284622a74dd4477e0396affe02daa008ebd33a",
+      "originalBytes": 188791,
+      "entityIds": [],
+      "bindingStatus": "pending",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [
+        "Correspondência com estrutura publicável pendente."
+      ],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": "Gisele Flores / O Sul",
+      "institutionalCredit": "O Sul"
+    },
+    {
+      "id": "I21",
+      "sourceId": "S23",
+      "sourcePageUrl": "https://fenasoja.com.br/portal-oficial/uncategorized/cultura-arte-e-musica-marcam-o-domingo-no-palco-cultural/",
+      "originalImageUrl": "https://fenasoja.com.br/wp-content/uploads/2026/05/Palco-Cultural-1.jpeg",
+      "caption": "Apresentação teatral no Palco Cultural Lactalis, sob sua estrutura de cobertura.",
+      "alt": "Apresentação teatral no Palco Cultural Lactalis, sob sua estrutura de cobertura.",
+      "type": "registro_recente",
+      "publishedDate": "2026-05-03",
+      "capturedDate": null,
+      "credit": null,
+      "width": 1280,
+      "height": 960,
+      "reviewNote": "Apresentação com atores sob cobertura; faixa Lactalis e Fenasoja visível. Fonte identifica Palco Cultural Lactalis em 2026; não comprova continuidade arquitetônica desde 2022.",
+      "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
+      "rightsStatus": "authorized_by_user_for_project",
+      "publicationStatus": "published",
+      "historyIds": [
+        "H23"
+      ],
+      "originalSha256": "ef434ff1a0bc775fcfe58e14f3d79d2ce8b7a0cfa400de9f33b09a428b97ad21",
+      "originalBytes": 240295,
+      "entityIds": [
+        "reference:2026:b13"
+      ],
+      "bindingStatus": "verified",
+      "sourceReview": "Página de origem examinada em 2026-09-06.",
+      "permission": {
+        "status": "authorized",
+        "label": "Reprodução autorizada para este projeto.",
+        "sourceUrl": null,
+        "authorizationOrigin": "Autorização declarada pelo usuário nesta tarefa, 2026-09-06: Sim pode colocar as fotos; uso no expo-logistics-hub; titular não informado"
+      },
+      "rightsHolder": null,
+      "blockingIssues": [],
+      "reviewedAt": "2026-09-06",
+      "authorCredit": null,
+      "institutionalCredit": "Fenasoja"
+    }
+  ]
+}

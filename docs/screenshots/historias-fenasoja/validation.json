@@ -1,0 +1,1456 @@
+{
+  "date": "2026-09-06",
+  "baseRevision": "33929757be5ad065dd1343c83ba8adc2c169b309",
+  "environment": "Windows, Chrome headless accelerated Intel UHD, DPR1; synthetic local auth/admin organization and official reference fallback. All Supabase requests intercepted. Service workers blocked for deterministic network failures. No live database validation or physical mobile certification.",
+  "tests": {
+    "passed": 99,
+    "total": 99,
+    "files": 7,
+    "seconds": 23.12,
+    "typescript": "tsconfig.app.json --noEmit: exit 0",
+    "eslint": "changed TypeScript and history directory: exit 0",
+    "build": "npm run build: exit 0, 58.55s"
+  },
+  "productionWaterfall": {
+    "scope": "Local preview, same main build configuration and browser fixture, assets script/stylesheet response body bytes; excludes external fonts and local antivirus injection. Single run, not a performance benchmark.",
+    "before": {
+      "requestCount": 38,
+      "responseBodyBytes": 2024215,
+      "assets": [
+        {
+          "url": "/assets/maps-leaflet-BLgUKdXV.js",
+          "type": "script",
+          "bytes": 43460
+        },
+        {
+          "url": "/assets/ui-radix-mu8qjpo_.js",
+          "type": "script",
+          "bytes": 41252
+        },
+        {
+          "url": "/assets/react-vendor-Ca1HmRrB.js",
+          "type": "script",
+          "bytes": 63837
+        },
+        {
+          "url": "/assets/data-vendor-wS43G2YD.js",
+          "type": "script",
+          "bytes": 59750
+        },
+        {
+          "url": "/assets/maps-leaflet-Dgihpmma.css",
+          "type": "stylesheet",
+          "bytes": 6394
+        },
+        {
+          "url": "/assets/maps-three-eyBdhobD.js",
+          "type": "script",
+          "bytes": 1109374
+        },
+        {
+          "url": "/assets/index-NL8J__iL.css",
+          "type": "stylesheet",
+          "bytes": 66735
+        },
+        {
+          "url": "/assets/index-BagV7Ijl.js",
+          "type": "script",
+          "bytes": 136927
+        },
+        {
+          "url": "/assets/fenasoja-brand-CYSopaj9.js",
+          "type": "script",
+          "bytes": 495
+        },
+        {
+          "url": "/assets/textarea-CwTMZrbK.js",
+          "type": "script",
+          "bytes": 522
+        },
+        {
+          "url": "/assets/log-in-DDi0qJCn.js",
+          "type": "script",
+          "bytes": 428
+        },
+        {
+          "url": "/assets/dropdown-menu-CiB_oaEf.js",
+          "type": "script",
+          "bytes": 1479
+        },
+        {
+          "url": "/assets/CommercialMapPage-Dtz-KRSp.css",
+          "type": "stylesheet",
+          "bytes": 2509
+        },
+        {
+          "url": "/assets/maximize-2-CXEM8K3J.js",
+          "type": "script",
+          "bytes": 467
+        },
+        {
+          "url": "/assets/CommercialMapPage-BAOWe6T1.js",
+          "type": "script",
+          "bytes": 1870
+        },
+        {
+          "url": "/assets/scroll-area-wxyZ0dA2.js",
+          "type": "script",
+          "bytes": 1046
+        },
+        {
+          "url": "/assets/moon-Cyu3SYho.js",
+          "type": "script",
+          "bytes": 311
+        },
+        {
+          "url": "/assets/sliders-horizontal-Crfq0Jaw.js",
+          "type": "script",
+          "bytes": 585
+        },
+        {
+          "url": "/assets/CommercialMapPage-CCFGDhgB.css",
+          "type": "stylesheet",
+          "bytes": 27356
+        },
+        {
+          "url": "/assets/chevron-up-B-QQD2Kk.js",
+          "type": "script",
+          "bytes": 296
+        },
+        {
+          "url": "/assets/warehouse-U0kqYuQE.js",
+          "type": "script",
+          "bytes": 901
+        },
+        {
+          "url": "/assets/rotate-ccw-LArQ_ZMe.js",
+          "type": "script",
+          "bytes": 368
+        },
+        {
+          "url": "/assets/label-DZtwvsBu.js",
+          "type": "script",
+          "bytes": 370
+        },
+        {
+          "url": "/assets/switch-Bf_JUcOs.js",
+          "type": "script",
+          "bytes": 852
+        },
+        {
+          "url": "/assets/undo-2-sVK7KJqa.js",
+          "type": "script",
+          "bytes": 376
+        },
+        {
+          "url": "/assets/circle-dot-BkZZq7X_.js",
+          "type": "script",
+          "bytes": 345
+        },
+        {
+          "url": "/assets/plus-Dj5HTmeC.js",
+          "type": "script",
+          "bytes": 322
+        },
+        {
+          "url": "/assets/CommercialMapPage-Bie3UXjT.js",
+          "type": "script",
+          "bytes": 450347
+        },
+        {
+          "url": "/assets/trash-2-DDTxDfRY.js",
+          "type": "script",
+          "bytes": 526
+        },
+        {
+          "url": "/assets/badge-JukDAhbq.js",
+          "type": "script",
+          "bytes": 779
+        },
+        {
+          "url": "/assets/tabs-CY45BcfE.js",
+          "type": "script",
+          "bytes": 501
+        },
+        {
+          "url": "/assets/clock-3-CNvRmhjx.js",
+          "type": "script",
+          "bytes": 350
+        },
+        {
+          "url": "/assets/history-CBkCnvIP.js",
+          "type": "script",
+          "bytes": 406
+        },
+        {
+          "url": "/assets/dialog-wkzC2Mad.js",
+          "type": "script",
+          "bytes": 1004
+        },
+        {
+          "url": "/assets/circle-check-DIj_jFEE.js",
+          "type": "script",
+          "bytes": 341
+        },
+        {
+          "url": "/assets/database-zap-BUaq2N4a.js",
+          "type": "script",
+          "bytes": 507
+        },
+        {
+          "url": "/assets/info-CaI0wFD1.js",
+          "type": "script",
+          "bytes": 368
+        },
+        {
+          "url": "/assets/send-D7v8p5Jw.js",
+          "type": "script",
+          "bytes": 459
+        }
+      ],
+      "initialEditorialRequests": [],
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 167,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "errors": [],
+      "initialHistoryPhotos": []
+    },
+    "after": {
+      "requestCount": 38,
+      "responseBodyBytes": 2026459,
+      "assets": [
+        {
+          "url": "/assets/maps-leaflet-Dgihpmma.css",
+          "type": "stylesheet",
+          "bytes": 6394
+        },
+        {
+          "url": "/assets/index-NL8J__iL.css",
+          "type": "stylesheet",
+          "bytes": 66735
+        },
+        {
+          "url": "/assets/maps-leaflet-BLgUKdXV.js",
+          "type": "script",
+          "bytes": 43460
+        },
+        {
+          "url": "/assets/data-vendor-wS43G2YD.js",
+          "type": "script",
+          "bytes": 59750
+        },
+        {
+          "url": "/assets/react-vendor-Ca1HmRrB.js",
+          "type": "script",
+          "bytes": 63837
+        },
+        {
+          "url": "/assets/ui-radix-mu8qjpo_.js",
+          "type": "script",
+          "bytes": 41252
+        },
+        {
+          "url": "/assets/maps-three-eyBdhobD.js",
+          "type": "script",
+          "bytes": 1109374
+        },
+        {
+          "url": "/assets/index-vanUdbCY.js",
+          "type": "script",
+          "bytes": 136923
+        },
+        {
+          "url": "/assets/fenasoja-brand-CYSopaj9.js",
+          "type": "script",
+          "bytes": 495
+        },
+        {
+          "url": "/assets/log-in-BAKy2O3D.js",
+          "type": "script",
+          "bytes": 428
+        },
+        {
+          "url": "/assets/textarea-DzU9jqQ8.js",
+          "type": "script",
+          "bytes": 522
+        },
+        {
+          "url": "/assets/maximize-2-CCHZwQze.js",
+          "type": "script",
+          "bytes": 467
+        },
+        {
+          "url": "/assets/CommercialMapPage-Dtz-KRSp.css",
+          "type": "stylesheet",
+          "bytes": 2509
+        },
+        {
+          "url": "/assets/CommercialMapPage-DN9WsOGX.js",
+          "type": "script",
+          "bytes": 1870
+        },
+        {
+          "url": "/assets/dropdown-menu-Br7_jPqy.js",
+          "type": "script",
+          "bytes": 1480
+        },
+        {
+          "url": "/assets/moon-DnctWIjR.js",
+          "type": "script",
+          "bytes": 311
+        },
+        {
+          "url": "/assets/warehouse-DXgvEsaO.js",
+          "type": "script",
+          "bytes": 901
+        },
+        {
+          "url": "/assets/CommercialMapPage-BzvE0LnL.css",
+          "type": "stylesheet",
+          "bytes": 28484
+        },
+        {
+          "url": "/assets/sliders-horizontal-D0rY5M19.js",
+          "type": "script",
+          "bytes": 586
+        },
+        {
+          "url": "/assets/scroll-area-CV98BsaD.js",
+          "type": "script",
+          "bytes": 1047
+        },
+        {
+          "url": "/assets/chevron-up-DpxVbKtT.js",
+          "type": "script",
+          "bytes": 296
+        },
+        {
+          "url": "/assets/rotate-ccw-CJ12IpzE.js",
+          "type": "script",
+          "bytes": 368
+        },
+        {
+          "url": "/assets/circle-dot-c8h0T9O5.js",
+          "type": "script",
+          "bytes": 345
+        },
+        {
+          "url": "/assets/plus-DOOELM0A.js",
+          "type": "script",
+          "bytes": 322
+        },
+        {
+          "url": "/assets/undo-2-CEa-FNAf.js",
+          "type": "script",
+          "bytes": 376
+        },
+        {
+          "url": "/assets/switch-8L3oUXBr.js",
+          "type": "script",
+          "bytes": 852
+        },
+        {
+          "url": "/assets/CommercialMapPage-CzjgOURd.js",
+          "type": "script",
+          "bytes": 451464
+        },
+        {
+          "url": "/assets/label-uW7WytC3.js",
+          "type": "script",
+          "bytes": 370
+        },
+        {
+          "url": "/assets/trash-2-wtxH6XC3.js",
+          "type": "script",
+          "bytes": 526
+        },
+        {
+          "url": "/assets/badge-D6z5z840.js",
+          "type": "script",
+          "bytes": 779
+        },
+        {
+          "url": "/assets/tabs-BWOdi3z8.js",
+          "type": "script",
+          "bytes": 501
+        },
+        {
+          "url": "/assets/clock-3-Ble8ezCZ.js",
+          "type": "script",
+          "bytes": 350
+        },
+        {
+          "url": "/assets/history-BJMB6Lrn.js",
+          "type": "script",
+          "bytes": 406
+        },
+        {
+          "url": "/assets/dialog-RTE-gJHm.js",
+          "type": "script",
+          "bytes": 1004
+        },
+        {
+          "url": "/assets/circle-check-CiuT8oa8.js",
+          "type": "script",
+          "bytes": 341
+        },
+        {
+          "url": "/assets/database-zap-CPnf8Wrx.js",
+          "type": "script",
+          "bytes": 507
+        },
+        {
+          "url": "/assets/info-6ftdliPH.js",
+          "type": "script",
+          "bytes": 368
+        },
+        {
+          "url": "/assets/send-DYGMYnJW.js",
+          "type": "script",
+          "bytes": 459
+        }
+      ],
+      "initialEditorialRequests": [],
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 170,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "errors": [],
+      "initialHistoryPhotos": []
+    },
+    "deltaBytes": 2244,
+    "chunks": [
+      {
+        "file": "HistoryImageViewer-DHRI8pJ2.js",
+        "bytes": 1136,
+        "gzipBytes": 652
+      },
+      {
+        "file": "HistoryView-5FLZVuwZ.js",
+        "bytes": 38591,
+        "gzipBytes": 9585
+      },
+      {
+        "file": "maps-three-eyBdhobD.js",
+        "bytes": 3208276,
+        "gzipBytes": 1108512
+      }
+    ]
+  },
+  "productionDesktop": {
+    "viewport": {
+      "width": 1366,
+      "height": 768,
+      "devicePixelRatio": 1
+    },
+    "initialHealth": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 170,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "errors": [],
+    "blockedMutations": [],
+    "flow": {
+      "cameraPreserved": null,
+      "searchPreserved": true,
+      "focusTrapped": true,
+      "selectedCamera": null,
+      "afterCamera": null,
+      "selectedHealth": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 228,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "afterHealth": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 228,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "loadedHistory": [
+        {
+          "url": "/assets/HistoryView-5FLZVuwZ.js",
+          "type": "script",
+          "bytes": 9603
+        },
+        {
+          "url": "/history/i04-400.webp",
+          "type": "image",
+          "bytes": 15440
+        }
+      ],
+      "viewerResources": [
+        {
+          "url": "/history/i04-400.webp",
+          "type": "image",
+          "bytes": 15440
+        },
+        {
+          "url": "/assets/HistoryImageViewer-DHRI8pJ2.js",
+          "type": "script",
+          "bytes": 669
+        },
+        {
+          "url": "/history/i04-full.webp",
+          "type": "image",
+          "bytes": 121884
+        }
+      ]
+    }
+  },
+  "productionMobileExpanded": {
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "devicePixelRatio": 1
+    },
+    "initialHealth": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 241,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "errors": [],
+    "blockedMutations": [],
+    "flow": {
+      "cameraPreserved": null,
+      "searchPreserved": true,
+      "focusTrapped": true,
+      "collapsed": {
+        "height": 72.09375,
+        "headerY": 772.90625,
+        "controlsY": 777.453125,
+        "triggerHidden": true,
+        "width": 390,
+        "scrollWidth": 390
+      },
+      "restored": true,
+      "selectedCamera": null,
+      "afterCamera": null,
+      "selectedHealth": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 317,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "afterHealth": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 317,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "loadedHistory": [
+        {
+          "url": "/assets/HistoryView-5FLZVuwZ.js",
+          "type": "script",
+          "bytes": 9603
+        },
+        {
+          "url": "/history/i04-400.webp",
+          "type": "image",
+          "bytes": 15440
+        }
+      ],
+      "viewerResources": [
+        {
+          "url": "/history/i04-400.webp",
+          "type": "image",
+          "bytes": 15440
+        },
+        {
+          "url": "/assets/HistoryImageViewer-DHRI8pJ2.js",
+          "type": "script",
+          "bytes": 669
+        },
+        {
+          "url": "/history/i04-full.webp",
+          "type": "image",
+          "bytes": 121884
+        }
+      ]
+    }
+  },
+  "mobileHalfClose": {
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "devicePixelRatio": 1
+    },
+    "initialHealth": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 240,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "errors": [],
+    "blockedMutations": [],
+    "flow": {
+      "cameraPreserved": true,
+      "searchPreserved": true,
+      "focusTrapped": true,
+      "collapsed": {
+        "height": 72.09375,
+        "headerY": 772.90625,
+        "controlsY": 777.453125,
+        "triggerHidden": true,
+        "width": 390,
+        "scrollWidth": 390
+      },
+      "restored": true,
+      "selectedCamera": {
+        "position": [
+          -24.0032,
+          25.3656,
+          15.3258
+        ],
+        "target": [
+          -26.3782,
+          0.6216,
+          -14.3891
+        ],
+        "quaternion": [
+          -0.339248,
+          0.037499,
+          0.013536,
+          0.939852
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0.11040609137055837
+        },
+        "near": 0.035,
+        "far": 5407.744,
+        "distance": 38.7412,
+        "minDistance": 8.7889,
+        "maxDistance": 1559.9338,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 1559.9338,
+        "calculatedMaxDistance": 1559.9338,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 390,
+          "height": 788,
+          "aspect": 0.49492,
+          "dpr": 1
+        }
+      },
+      "afterCamera": {
+        "position": [
+          -24.0032,
+          25.3656,
+          15.3258
+        ],
+        "target": [
+          -26.3782,
+          0.6216,
+          -14.3891
+        ],
+        "quaternion": [
+          -0.339248,
+          0.037499,
+          0.013536,
+          0.939852
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0.11040609137055837
+        },
+        "near": 0.035,
+        "far": 5407.744,
+        "distance": 38.7412,
+        "minDistance": 8.7889,
+        "maxDistance": 1559.9338,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 1559.9338,
+        "calculatedMaxDistance": 1559.9338,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 390,
+          "height": 788,
+          "aspect": 0.49492,
+          "dpr": 1
+        }
+      },
+      "selectedHealth": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 268,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "afterHealth": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 268,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "loadedHistory": [
+        {
+          "url": "/src/features/commercial-map/history/HistoryExperience.tsx",
+          "type": "script",
+          "bytes": 15108
+        },
+        {
+          "url": "/src/features/commercial-map/history/bindings.ts",
+          "type": "script",
+          "bytes": 3787
+        },
+        {
+          "url": "/src/features/commercial-map/history/history.css",
+          "type": "script",
+          "bytes": 7618
+        },
+        {
+          "url": "/src/features/commercial-map/history/HistoryView.tsx",
+          "type": "script",
+          "bytes": 58608
+        },
+        {
+          "url": "/src/features/commercial-map/history/mediaTypes.ts",
+          "type": "script",
+          "bytes": 4147
+        },
+        {
+          "url": "/src/features/commercial-map/history/catalog.ts",
+          "type": "script",
+          "bytes": 90518
+        },
+        {
+          "url": "/src/features/commercial-map/history/media.ts",
+          "type": "script",
+          "bytes": 42317
+        },
+        {
+          "url": "/history/i04-400.webp",
+          "type": "image",
+          "bytes": 15440
+        }
+      ],
+      "viewerResources": [
+        {
+          "url": "/src/features/commercial-map/history/HistoryExperience.tsx",
+          "type": "script",
+          "bytes": 15108
+        },
+        {
+          "url": "/src/features/commercial-map/history/bindings.ts",
+          "type": "script",
+          "bytes": 3787
+        },
+        {
+          "url": "/src/features/commercial-map/history/history.css",
+          "type": "script",
+          "bytes": 7618
+        },
+        {
+          "url": "/src/features/commercial-map/history/HistoryView.tsx",
+          "type": "script",
+          "bytes": 58608
+        },
+        {
+          "url": "/src/features/commercial-map/history/mediaTypes.ts",
+          "type": "script",
+          "bytes": 4147
+        },
+        {
+          "url": "/src/features/commercial-map/history/catalog.ts",
+          "type": "script",
+          "bytes": 90518
+        },
+        {
+          "url": "/src/features/commercial-map/history/media.ts",
+          "type": "script",
+          "bytes": 42317
+        },
+        {
+          "url": "/history/i04-400.webp",
+          "type": "image",
+          "bytes": 15440
+        },
+        {
+          "url": "/src/features/commercial-map/history/HistoryImageViewer.tsx",
+          "type": "script",
+          "bytes": 9739
+        },
+        {
+          "url": "/history/i04-full.webp",
+          "type": "image",
+          "bytes": 121884
+        }
+      ]
+    }
+  },
+  "mobileExpandedClose": {
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "devicePixelRatio": 1
+    },
+    "initialHealth": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 239,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "errors": [],
+    "blockedMutations": [],
+    "flow": {
+      "cameraPreserved": true,
+      "searchPreserved": true,
+      "focusTrapped": true,
+      "collapsed": {
+        "height": 72.09375,
+        "headerY": 772.90625,
+        "controlsY": 777.453125,
+        "triggerHidden": true,
+        "width": 390,
+        "scrollWidth": 390
+      },
+      "restored": true,
+      "selectedCamera": {
+        "position": [
+          -24.0032,
+          25.3656,
+          15.3258
+        ],
+        "target": [
+          -26.3782,
+          0.6216,
+          -14.3891
+        ],
+        "quaternion": [
+          -0.339248,
+          0.037499,
+          0.013536,
+          0.939852
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0.11040609137055837
+        },
+        "near": 0.035,
+        "far": 5407.744,
+        "distance": 38.7412,
+        "minDistance": 8.7889,
+        "maxDistance": 1559.9338,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 1559.9338,
+        "calculatedMaxDistance": 1559.9338,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 390,
+          "height": 788,
+          "aspect": 0.49492,
+          "dpr": 1
+        }
+      },
+      "afterCamera": {
+        "position": [
+          -24.0032,
+          25.3656,
+          15.3258
+        ],
+        "target": [
+          -26.3782,
+          0.6216,
+          -14.3891
+        ],
+        "quaternion": [
+          -0.339248,
+          0.037499,
+          0.013536,
+          0.939852
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0.11040609137055837
+        },
+        "near": 0.035,
+        "far": 5407.744,
+        "distance": 38.7412,
+        "minDistance": 8.7889,
+        "maxDistance": 1559.9338,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 1559.9338,
+        "calculatedMaxDistance": 1559.9338,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 390,
+          "height": 788,
+          "aspect": 0.49492,
+          "dpr": 1
+        }
+      },
+      "selectedHealth": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 319,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "afterHealth": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 319,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "loadedHistory": [
+        {
+          "url": "/src/features/commercial-map/history/bindings.ts",
+          "type": "script",
+          "bytes": 3787
+        },
+        {
+          "url": "/src/features/commercial-map/history/HistoryExperience.tsx",
+          "type": "script",
+          "bytes": 15108
+        },
+        {
+          "url": "/src/features/commercial-map/history/history.css",
+          "type": "script",
+          "bytes": 7618
+        },
+        {
+          "url": "/src/features/commercial-map/history/HistoryView.tsx",
+          "type": "script",
+          "bytes": 58608
+        },
+        {
+          "url": "/src/features/commercial-map/history/mediaTypes.ts",
+          "type": "script",
+          "bytes": 4147
+        },
+        {
+          "url": "/src/features/commercial-map/history/media.ts",
+          "type": "script",
+          "bytes": 42317
+        },
+        {
+          "url": "/src/features/commercial-map/history/catalog.ts",
+          "type": "script",
+          "bytes": 90518
+        },
+        {
+          "url": "/history/i04-400.webp",
+          "type": "image",
+          "bytes": 15440
+        }
+      ],
+      "viewerResources": [
+        {
+          "url": "/src/features/commercial-map/history/bindings.ts",
+          "type": "script",
+          "bytes": 3787
+        },
+        {
+          "url": "/src/features/commercial-map/history/HistoryExperience.tsx",
+          "type": "script",
+          "bytes": 15108
+        },
+        {
+          "url": "/src/features/commercial-map/history/history.css",
+          "type": "script",
+          "bytes": 7618
+        },
+        {
+          "url": "/src/features/commercial-map/history/HistoryView.tsx",
+          "type": "script",
+          "bytes": 58608
+        },
+        {
+          "url": "/src/features/commercial-map/history/mediaTypes.ts",
+          "type": "script",
+          "bytes": 4147
+        },
+        {
+          "url": "/src/features/commercial-map/history/media.ts",
+          "type": "script",
+          "bytes": 42317
+        },
+        {
+          "url": "/src/features/commercial-map/history/catalog.ts",
+          "type": "script",
+          "bytes": 90518
+        },
+        {
+          "url": "/history/i04-400.webp",
+          "type": "image",
+          "bytes": 15440
+        },
+        {
+          "url": "/src/features/commercial-map/history/HistoryImageViewer.tsx",
+          "type": "script",
+          "bytes": 9739
+        },
+        {
+          "url": "/history/i04-full.webp",
+          "type": "image",
+          "bytes": 121884
+        }
+      ]
+    }
+  },
+  "fullFlowDesktop": {
+    "viewport": {
+      "width": 1366,
+      "height": 768,
+      "devicePixelRatio": 1
+    },
+    "initialHealth": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 133,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "errors": [],
+    "blockedMutations": [],
+    "flow": {
+      "openingMs": 212,
+      "cameraPreserved": true,
+      "statePreserved": true,
+      "dialogFocusRestored": true,
+      "triggerFocusRestored": true,
+      "galleryCameraPreserved": true,
+      "withoutPhoto": true,
+      "unpublishedHasNoAction": true,
+      "httpFailureKeepsText": true,
+      "latestSelectionWins": "Casa da Etnia Alemã",
+      "latestImage": "/history/i05-800.jpg",
+      "selectedCamera": {
+        "position": [
+          -23.7889,
+          8.939,
+          -4.5439
+        ],
+        "target": [
+          -24.5872,
+          0.6216,
+          -14.5322
+        ],
+        "quaternion": [
+          -0.339248,
+          0.037499,
+          0.013536,
+          0.939852
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.035,
+        "far": 3142.733,
+        "distance": 13.0224,
+        "minDistance": 8.7889,
+        "maxDistance": 804.9298,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 804.9298,
+        "calculatedMaxDistance": 804.9298,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1285.21875,
+          "height": 682.8125,
+          "aspect": 1.88224,
+          "dpr": 1
+        }
+      },
+      "afterCamera": {
+        "position": [
+          -23.7889,
+          8.939,
+          -4.5439
+        ],
+        "target": [
+          -24.5872,
+          0.6216,
+          -14.5322
+        ],
+        "quaternion": [
+          -0.339248,
+          0.037499,
+          0.013536,
+          0.939852
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.035,
+        "far": 3142.733,
+        "distance": 13.0224,
+        "minDistance": 8.7889,
+        "maxDistance": 804.9298,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 804.9298,
+        "calculatedMaxDistance": 804.9298,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1285.21875,
+          "height": 682.8125,
+          "aspect": 1.88224,
+          "dpr": 1
+        }
+      },
+      "selectedHealth": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 171,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "afterHealth": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 171,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "stress": {
+        "cycles": 12,
+        "before": {
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 345,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "runtime": {
+            "canvasMounts": 1,
+            "activeCanvases": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeControls": 1,
+            "rendererIds": [
+              1
+            ],
+            "cameraIds": [
+              "e76a90e2-50af-4e61-8d4e-f3cabde1a710"
+            ],
+            "contextLost": 0,
+            "renderer": {
+              "at": 49417.89999997616,
+              "calls": 414,
+              "triangles": 566405,
+              "geometries": 585,
+              "textures": 153,
+              "programs": 171,
+              "dpr": 1,
+              "width": 1285,
+              "height": 682,
+              "heapBytes": 141707986,
+              "qualityTier": "HIGH",
+              "gpuVendor": "Google Inc. (Intel)",
+              "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+            }
+          }
+        },
+        "after": {
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 345,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "runtime": {
+            "canvasMounts": 1,
+            "activeCanvases": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeControls": 1,
+            "rendererIds": [
+              1
+            ],
+            "cameraIds": [
+              "e76a90e2-50af-4e61-8d4e-f3cabde1a710"
+            ],
+            "contextLost": 0,
+            "renderer": {
+              "at": 50630,
+              "calls": 414,
+              "triangles": 566405,
+              "geometries": 585,
+              "textures": 153,
+              "programs": 171,
+              "dpr": 1,
+              "width": 1285,
+              "height": 682,
+              "heapBytes": 130514653,
+              "qualityTier": "HIGH",
+              "gpuVendor": "Google Inc. (Intel)",
+              "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+            }
+          }
+        }
+      }
+    }
+  },
+  "fullFlowMobile": {
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "devicePixelRatio": 1
+    },
+    "initialHealth": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 161,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "errors": [],
+    "blockedMutations": [],
+    "flow": {
+      "openingMs": 107,
+      "cameraPreserved": true,
+      "statePreserved": true,
+      "dialogFocusRestored": true,
+      "triggerFocusRestored": true,
+      "galleryCameraPreserved": true,
+      "withoutPhoto": true,
+      "unpublishedHasNoAction": true,
+      "httpFailureKeepsText": true,
+      "latestSelectionWins": "Casa da Etnia Alemã",
+      "latestImage": "/history/i05-800.jpg",
+      "widths": [
+        {
+          "width": 360,
+          "scrollWidth": 360,
+          "sheetHeight": 394,
+          "canvasHeight": 788
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "sheetHeight": 394,
+          "canvasHeight": 788
+        },
+        {
+          "width": 430,
+          "scrollWidth": 430,
+          "sheetHeight": 394,
+          "canvasHeight": 788
+        }
+      ],
+      "selectedCamera": {
+        "position": [
+          -24.0032,
+          25.3656,
+          15.3258
+        ],
+        "target": [
+          -26.3782,
+          0.6216,
+          -14.3891
+        ],
+        "quaternion": [
+          -0.339248,
+          0.037499,
+          0.013536,
+          0.939852
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0.11040609137055837
+        },
+        "near": 0.035,
+        "far": 5407.744,
+        "distance": 38.7412,
+        "minDistance": 8.7889,
+        "maxDistance": 1559.9338,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 1559.9338,
+        "calculatedMaxDistance": 1559.9338,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 390,
+          "height": 788,
+          "aspect": 0.49492,
+          "dpr": 1
+        }
+      },
+      "afterCamera": {
+        "position": [
+          -24.0032,
+          25.3656,
+          15.3258
+        ],
+        "target": [
+          -26.3782,
+          0.6216,
+          -14.3891
+        ],
+        "quaternion": [
+          -0.339248,
+          0.037499,
+          0.013536,
+          0.939852
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0.11040609137055837
+        },
+        "near": 0.035,
+        "far": 5407.744,
+        "distance": 38.7412,
+        "minDistance": 8.7889,
+        "maxDistance": 1559.9338,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 1559.9338,
+        "calculatedMaxDistance": 1559.9338,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 390,
+          "height": 788,
+          "aspect": 0.49492,
+          "dpr": 1
+        }
+      },
+      "selectedHealth": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 212,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "afterHealth": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 212,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "stress": {
+        "cycles": 12,
+        "before": {
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 460,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "runtime": {
+            "canvasMounts": 1,
+            "activeCanvases": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeControls": 1,
+            "rendererIds": [
+              1
+            ],
+            "cameraIds": [
+              "07c106f4-51f6-4567-854c-f0f74973d958"
+            ],
+            "contextLost": 0,
+            "renderer": {
+              "at": 42495.200000047684,
+              "calls": 244,
+              "triangles": 451698,
+              "geometries": 573,
+              "textures": 152,
+              "programs": 169,
+              "dpr": 1,
+              "width": 390,
+              "height": 788,
+              "heapBytes": 139985880,
+              "qualityTier": "HIGH",
+              "gpuVendor": "Google Inc. (Intel)",
+              "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+            }
+          }
+        },
+        "after": {
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 460,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "runtime": {
+            "canvasMounts": 1,
+            "activeCanvases": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeControls": 1,
+            "rendererIds": [
+              1
+            ],
+            "cameraIds": [
+              "07c106f4-51f6-4567-854c-f0f74973d958"
+            ],
+            "contextLost": 0,
+            "renderer": {
+              "at": 44044.5,
+              "calls": 244,
+              "triangles": 451698,
+              "geometries": 573,
+              "textures": 152,
+              "programs": 169,
+              "dpr": 1,
+              "width": 390,
+              "height": 788,
+              "heapBytes": 128215951,
+              "qualityTier": "HIGH",
+              "gpuVendor": "Google Inc. (Intel)",
+              "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+            }
+          }
+        }
+      }
+    }
+  }
+}
