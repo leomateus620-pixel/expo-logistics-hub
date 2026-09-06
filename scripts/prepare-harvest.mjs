@@ -1,0 +1,10 @@
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const sharp = require(process.env.SHARP_PATH || 'sharp');
+const input = process.argv[2];
+if (!input) throw new Error('Pass the original generated harvest PNG path.');
+const output = new URL('../public/alvorada/', import.meta.url);
+const { width, height } = await sharp(input).metadata();
+await sharp(input).resize({ width: 1920, withoutEnlargement: true }).webp({ quality: 86 }).toFile(new URL('soy-harvest-dawn.webp', output).pathname.replace(/^\/(\w:)/, '$1'));
+const cropWidth = Math.floor(height * 9 / 16);
+await sharp(input).extract({ left: Math.min(width - cropWidth, Math.floor(width * .625)), top: 0, width: cropWidth, height }).webp({ quality: 85 }).toFile(new URL('soy-harvest-dawn-mobile.webp', output).pathname.replace(/^\/(\w:)/, '$1'));

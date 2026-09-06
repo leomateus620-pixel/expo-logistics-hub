@@ -1,0 +1,146 @@
+.commercial-map-selection-summary {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 9px;
+  padding: 8px 15px 0;
+  color: #435b51;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.commercial-map-selection-summary .commercial-map-status-pill { min-height: 24px; padding: 3px 7px; font-size: 11px; }
+.commercial-map-compact-sheet-controls {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 12px;
+}
+.commercial-map-compact-sheet-controls button {
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #cad8d1;
+  border-radius: 10px;
+  padding: 5px 10px;
+  color: #254837;
+  background: #f2f7f2;
+  font-size: 12px;
+  font-weight: 700;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.commercial-map-compact-sheet-controls button:hover { background: #e4efe5; }
+.commercial-map-compact-sheet-controls button:active { transform: scale(.98); }
+.commercial-map-compact-sheet-controls button:focus-visible,
+.commercial-map-selection-plan > summary:focus-visible { outline: 2px solid #196944; outline-offset: 3px; }
+.commercial-map-compact-sheet-controls button > svg { width: 16px; height: 16px; flex-shrink: 0; }
+.commercial-map-compact-sheet-controls .commercial-map-selection-interior-action {
+  flex: 1;
+  color: white;
+  background: #185638;
+  border-color: #185638;
+}
+.commercial-map-compact-sheet-controls .commercial-map-selection-interior-action:hover { background: #123f2a; }
+.commercial-map-compact-sheet-controls .commercial-map-compact-sheet-handle,
+.commercial-map-details-panel .commercial-map-compact-sheet-expand { display: none; }
+.commercial-map-selection-plan { margin: 8px 12px; border: 1px solid #d5dfd6; border-radius: 10px; }
+.commercial-map-selection-plan > summary { min-height: 44px; padding: 12px; color: #365847; cursor: pointer; font-size: 12px; font-weight: 700; }
+.commercial-map-selection-plan .commercial-pavilion-plan-legend > header { display: none; }
+.commercial-map-selection-plan .commercial-pavilion-plan-legend { margin: 0; border: 0; box-shadow: none; }
+.commercial-map-dock .commercial-pavilion-module-card.is-embedded {
+  position: static;
+  width: 100%;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  background: transparent;
+}
+.commercial-pavilion-module-card .commercial-pavilion-module-summary { padding: 8px 12px 0; color: #43614f; font-size: 12px; }
+.commercial-pavilion-module-card .commercial-pavilion-module-summary .commercial-pavilion-module-status { margin: 0 0 6px; }
+.commercial-pavilion-module-card.is-embedded[data-sheet-state="half"] .commercial-pavilion-module-details,
+.commercial-pavilion-module-card[data-sheet-state="collapsed"] .commercial-pavilion-module-details { display: none; }
+.commercial-pavilion-module-card header button,
+.commercial-pavilion-module-card .commercial-pavilion-module-actions button { min-width: 44px; min-height: 44px; }
+.commercial-pavilion-module-card.is-embedded .commercial-map-compact-sheet-controls { padding: 8px 12px; }
+.commercial-pavilion-module-card.is-embedded .commercial-map-compact-sheet-expand { width: 100%; }
+
+@media (max-width: 950px) {
+  .commercial-map-viewport .commercial-map-panel.commercial-map-details-panel[data-sheet-state] {
+    display: flex;
+    height: auto !important;
+    max-height: calc(100% - 88px);
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+    background: #f9fcf9;
+    backdrop-filter: none;
+    animation: commercial-sheet-in 180ms ease-out;
+    transition: none;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+  }
+  .commercial-map-viewport .commercial-map-details-panel[data-sheet-state] .commercial-map-panel-header {
+    display: flex;
+    min-height: 56px;
+    padding: 8px 10px 3px 14px;
+    border-bottom: 0;
+  }
+  .commercial-map-viewport .commercial-map-details-panel[data-sheet-state] .commercial-map-panel-header h2 {
+    max-width: none;
+    overflow: visible;
+    white-space: normal;
+    text-overflow: clip;
+    font-size: 15px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+  .commercial-map-viewport .commercial-map-details-panel .commercial-map-panel-header span { font-size: 10px; letter-spacing: .05em; }
+  .commercial-map-viewport .commercial-map-details-panel .commercial-map-panel-header > button { width: 44px; height: 44px; }
+  .commercial-map-details-panel .commercial-map-selection-summary { padding: 3px 14px 0; font-size: 11px; }
+  .commercial-map-details-panel .commercial-map-compact-sheet-controls { gap: 6px; padding: 6px 10px; }
+  .commercial-map-details-panel .commercial-map-compact-sheet-controls .commercial-map-compact-sheet-handle,
+  .commercial-map-details-panel .commercial-map-compact-sheet-expand { display: inline-flex; }
+  .commercial-map-details-panel .commercial-map-compact-sheet-handle { touch-action: none; cursor: ns-resize; }
+  .commercial-map-details-panel .commercial-map-compact-sheet-handle > span { display: none; }
+  .commercial-map-details-panel[data-sheet-state="collapsed"] .commercial-map-compact-sheet-handle > svg { transform: rotate(180deg); }
+  .commercial-map-viewport .commercial-map-details-panel[data-sheet-state="half"] .commercial-map-panel-scroll,
+  .commercial-map-viewport .commercial-map-details-panel[data-sheet-state="collapsed"] .commercial-map-panel-scroll,
+  .commercial-map-viewport .commercial-map-details-panel[data-sheet-state="collapsed"] .commercial-map-selection-summary,
+  .commercial-map-viewport .commercial-map-details-panel[data-sheet-state="collapsed"] .commercial-map-selection-interior-action { display: none; }
+  .commercial-map-viewport .commercial-map-details-panel[data-sheet-state="collapsed"] { flex-direction: row; align-items: center; }
+  .commercial-map-viewport .commercial-map-details-panel[data-sheet-state="collapsed"] .commercial-map-panel-header { flex: 1; min-width: 0; }
+  .commercial-map-details-panel[data-sheet-state="collapsed"] .commercial-map-compact-sheet-expand > span { display: none; }
+  .commercial-map-viewport .commercial-map-details-panel[data-sheet-state="expanded"] { height: calc(100% - max(88px, 18%)) !important; }
+  .commercial-map-viewport.is-detail-sheet-dragging .commercial-map-panel.commercial-map-details-panel[data-sheet-state] { height: var(--commercial-map-detail-sheet-height) !important; }
+  .commercial-map-details-panel .commercial-map-panel-scroll { min-height: 0; overflow: hidden; touch-action: pan-y; overscroll-behavior: contain; }
+  .commercial-map-details-panel .commercial-map-panel-scroll button { min-height: 44px; }
+  /* Canvas keeps its dimensions while the framing controller measures the panel.
+     Resizing the WebGL drawing buffer for every sheet drag caused extra work. */
+  .commercial-map-shell .commercial-map-viewport:has(.commercial-map-details-panel[data-sheet-state]) > .commercial-map-stage,
+  .commercial-map-shell .commercial-map-viewport.is-detail-sheet-dragging:has(.commercial-map-details-panel[data-sheet-state]) > .commercial-map-stage { bottom: 0; transition: none; }
+  .commercial-map-viewport .commercial-pavilion-module-card:not(.is-embedded) {
+    top: auto; right: 0; bottom: 0; left: 0; width: 100%;
+    max-height: calc(100% - 88px);
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+    background: #f9fcf9;
+    backdrop-filter: none;
+  }
+  .commercial-pavilion-module-card[data-sheet-state="half"] .commercial-pavilion-module-details { display: none; }
+  .commercial-pavilion-module-card > header { padding: 8px 12px 4px; }
+  .commercial-pavilion-module-card header strong { font-size: 16px; }
+  .commercial-pavilion-module-card header small { white-space: normal; font-size: 11px; }
+  .commercial-pavilion-module-card .commercial-pavilion-module-summary { padding-top: 3px; }
+  .commercial-pavilion-module-card.is-embedded .commercial-pavilion-module-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 11px; }
+  .commercial-pavilion-module-card.is-embedded .commercial-pavilion-module-summary .commercial-pavilion-module-status { margin: 0; padding: 3px 6px; }
+  .commercial-pavilion-module-card.is-embedded .commercial-map-compact-sheet-controls { padding-block: 4px; }
+  .commercial-pavilion-module-card .commercial-map-compact-sheet-expand { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .commercial-map-viewport .commercial-map-panel.commercial-map-details-panel[data-sheet-state],
+  .commercial-map-compact-sheet-controls button { animation: none; transition: none; }
+}

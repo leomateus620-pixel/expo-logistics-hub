@@ -14,39 +14,8 @@ interface AlvoradaBrandHeroProps {
   stage: BrandStage;
 }
 
-const STAGE_COPY: Record<BrandStage, { eyebrow: string; title: string }> = {
-  dawn: {
-    eyebrow: 'O Nascer da Alvorada',
-    title: 'Um novo ciclo desperta',
-  },
-  territory: {
-    eyebrow: 'Rio Grande do Sul',
-    title: 'Do território nasce a nossa força',
-  },
-  'santa-rosa': {
-    eyebrow: 'Santa Rosa · RS',
-    title: 'Aqui convergem pessoas, trabalho e futuro',
-  },
-  'brand-reveal': {
-    eyebrow: 'Santa Rosa · Rio Grande do Sul',
-    title: 'A organização por trás da maior feira multissetorial do Brasil',
-  },
-  'brand-hold': {
-    eyebrow: 'Santa Rosa · Rio Grande do Sul',
-    title: 'A organização por trás da maior feira multissetorial do Brasil',
-  },
-  'org-transition': {
-    eyebrow: 'Ecossistema organizacional',
-    title: 'A marca se transforma em estrutura, relações e responsabilidade',
-  },
-  'org-ready': {
-    eyebrow: 'Ecossistema organizacional',
-    title: 'FENASOJA 2028',
-  },
-};
 
 export function AlvoradaBrandHero({ dataPending, stage }: AlvoradaBrandHeroProps) {
-  const copy = STAGE_COPY[stage];
   const brandVisible = stage === 'brand-reveal'
     || stage === 'brand-hold'
     || stage === 'org-transition'
@@ -58,25 +27,15 @@ export function AlvoradaBrandHero({ dataPending, stage }: AlvoradaBrandHeroProps
       data-stage={stage}
       aria-hidden={!brandVisible}
     >
-      <div className="alvorada-brand-hero__territory">
-        <span aria-hidden="true" />
-        <p>{copy.eyebrow}</p>
-        <span aria-hidden="true" />
-      </div>
-
       <FenasojaBrand
         className="alvorada-brand-hero__brand"
         scale="display"
-        subtitle="Edição 2028 · Santa Rosa"
+        markSrc="/alvorada/fenasoja-symbol-official.png"
+        editionLabel={false}
         tone="dark"
       />
 
-      <p className="alvorada-brand-hero__statement">{copy.title}</p>
-
-      <div className="alvorada-brand-hero__origin" aria-hidden="true">
-        <span />
-        <i />
-      </div>
+      <p className="alvorada-brand-hero__statement">A organização por trás da maior feira multissetorial do Brasil</p>
 
       {dataPending && (stage === 'brand-hold' || stage === 'org-ready') && (
         <p className="alvorada-brand-hero__sync" role="status">

@@ -51,17 +51,32 @@ describe('arquitetura independente do Mapa Comercial', () => {
     expect(canvas).toContain('queuePreset(preset)');
   });
 
-  it('mantém ações administrativas separadas dos controles normais de visualização', () => {
+  it('leva a Gestão ao cabeçalho preservando gates de permissão e modos ativos', () => {
     const page = read('src/features/commercial-map/CommercialMapPage.tsx');
     const toolbar = read('src/features/commercial-map/components/controls/MapToolbar.tsx');
+    const header = read('src/features/commercial-map/components/shell/CommercialMapHeaderTools.tsx');
+    const shell = read('src/features/commercial-map/components/shell/CommercialMapShell.tsx');
+    const dock = read('src/features/commercial-map/components/dock/CommercialMapDock.tsx');
 
-    expect(page).toContain('className="commercial-map-management"');
-    expect(page).toContain('Ferramentas administrativas do mapa');
+    expect(page).toContain('<CommercialMapHeaderTools managementActions={managementActions} />');
+    expect(page).toContain('const managementActions = hasManagementActions ? (');
+    expect(page).toMatch(/const hasManagementActions = permissions\.isMapAdmin\s*\|\| permissions\.canManageLots\s*\|\| permissions\.canEditGeometry/);
+    expect(page).toMatch(/permissions\.canEditGeometry && \([\s\S]*?Editar geometria/);
+    expect(page).toMatch(/permissions\.isMapAdmin && \([\s\S]*?Calibrar/);
+    expect(page).toMatch(/data\.source === 'database' && permissions\.canManageLots && \([\s\S]*?Cadastrar lote/);
+    expect(page).toMatch(/data\.source === 'official-reference' && permissions\.isMapAdmin && \([\s\S]*?Implantar base 2026/);
+    expect(header).toContain('{managementActions && <Popover');
+    expect(header).toContain('aria-pressed={managing}');
+    expect(header).toContain("aria-pressed={mode === 'list'}");
+    expect(header.indexOf('aria-label="Gestão"')).toBeLessThan(header.indexOf('aria-label="Lista e tabela"'));
+    expect(shell.indexOf('ref={setToolsHost}')).toBeLessThan(shell.indexOf('FENASOJA 2028'));
     expect(page).toContain('Editar geometria');
     expect(page).toContain('Calibrar');
     expect(page).toContain('Implantar base 2026');
     expect(toolbar).toContain('Filtros');
     expect(toolbar).not.toContain('Editar geometria');
+    expect(dock).toContain('<ContextualMapLegend');
+    expect(dock).not.toContain('managementActions');
   });
 
   it('monta uma única camada de árvores instanciada nos dois contextos compartilhados', () => {

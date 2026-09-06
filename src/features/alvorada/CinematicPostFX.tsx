@@ -9,13 +9,13 @@ export function CinematicPostFX({ quality }: { quality: AlvoradaQualityProfile }
       <SMAA />
       {quality.bloom && (
         <Bloom
-          intensity={0.16}
-          luminanceThreshold={1.05}
+          intensity={0.06}
+          luminanceThreshold={1.5}
           luminanceSmoothing={0.16}
           mipmapBlur
         />
       )}
-      <Vignette eskil={false} offset={0.24} darkness={0.17} />
+      <Vignette eskil={false} offset={0.2} darkness={0.12} />
     </EffectComposer>
   );
 }

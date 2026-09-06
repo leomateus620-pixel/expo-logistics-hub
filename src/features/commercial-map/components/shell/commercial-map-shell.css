@@ -394,3 +394,33 @@
   .commercial-map-module__icon,
   .commercial-map-module__edition { border: 1px solid CanvasText; }
 }
+
+/* Workspace tools stay beside the edition, with the same permission-gated actions. */
+.commercial-map-module__tools-host { display: flex; }
+.commercial-map-header-tools { display: flex; align-items: center; gap: 6px; }
+.commercial-map-header-tools > button,
+.commercial-map-header-tools > button[data-state] { display: inline-flex; min-height: 44px; min-width: 44px; align-items: center; justify-content: center; gap: 7px; padding: 6px 10px; border: 1px solid #c2d5c8; border-radius: 10px; background: #fff; color: #284c37; font-size: 12px; font-weight: 750; transition: opacity 180ms ease, transform 180ms ease; }
+.commercial-map-header-tools svg { width: 17px; height: 17px; flex-shrink: 0; }
+.commercial-map-header-tools > button.is-active { background: #dfeee3; border-color: #417855; box-shadow: inset 0 -3px #417855; }
+.commercial-map-header-tools > button:focus-visible { outline: 3px solid #287c55; outline-offset: 2px; }
+.commercial-map-header-tools > button:active { transform: scale(.97); }
+.commercial-map-header-management { display: grid; gap: 7px; max-width: calc(100vw - 20px); max-height: calc(100dvh - 88px); overflow: auto; z-index: 45; }
+.commercial-map-header-management > strong { color: #244c35; font-size: 13px; padding: 4px; }
+.commercial-map-header-management button { justify-content: flex-start; min-height: 44px; white-space: normal; text-align: left; }
+.commercial-map-header-tools-fallback { position: absolute; top: 8px; right: 8px; z-index: 35; }
+@media (max-width: 1040px) { .commercial-map-header-tools > button > span { display: none; } }
+@media (max-width: 720px) {
+  .commercial-map-module__bar { min-height: 56px; gap: 4px; padding: max(4px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) 4px max(6px, env(safe-area-inset-left)); }
+  .commercial-map-module__leading { flex: 1; gap: 4px; }
+  .commercial-map-module__identity { flex: 1; gap: 0; }
+  .commercial-map-module__icon, .commercial-map-module__brand, .commercial-map-module__eyebrow, .commercial-map-module__edition { display: none; }
+  .commercial-map-module__title-group > strong { font-size: 14px; white-space: normal; line-height: 1.1; }
+  .commercial-map-module__actions, .commercial-map-header-tools { gap: 3px; }
+  .commercial-map-header-tools > button { padding: 0; }
+  .commercial-map-module__search-trigger { margin-left: 0; }
+  .commercial-map-module__bar.is-search-open .commercial-map-module__identity { display: none; }
+  .commercial-map-module__search { width: 100%; }
+  .commercial-map-module__search input { font-size: 16px; }
+  .commercial-map-module__search button { min-width: 44px; min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) { .commercial-map-header-tools > button { transition: none; } }

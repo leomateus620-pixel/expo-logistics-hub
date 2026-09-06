@@ -245,12 +245,16 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
   lots,
   reducedGraphics,
   onNavigate,
+  matchingEntityIds,
+  filtersActive = false,
 }: {
   entity: MapEntity;
   entities: MapEntity[];
   lots: CommercialLot[];
   reducedGraphics: boolean;
   onNavigate: (targetEntityId: string) => void;
+  matchingEntityIds?: ReadonlySet<string>;
+  filtersActive?: boolean;
 }) {
   const definition = resolveCommercialPavilionDefinition(entity);
   const modulePlan = resolveCommercialPavilionModulePlan(entity);
@@ -428,6 +432,8 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
           mode="interior"
           reducedGraphics={reducedGraphics}
           moduleStateById={moduleStateById}
+          matchingEntityIds={matchingEntityIds}
+          filtersActive={filtersActive}
           labelRotationRadians={interiorViewRotation}
         />
         <CommercialPavilionWayfindingLayer

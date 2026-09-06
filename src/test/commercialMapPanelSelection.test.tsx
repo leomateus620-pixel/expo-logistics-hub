@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EntityDetailsPanel } from '@/features/commercial-map/components/panels/MapPanels';
 import type { CommercialLot, MapEntity, MapPermissions } from '@/features/commercial-map/types';
+import { OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS } from '@/features/commercial-map/data/officialReference2026';
 
 const mocks = vi.hoisted(() => ({
   activity: vi.fn(() => ({ data: [], isLoading: false, isError: false })),
@@ -120,6 +121,33 @@ afterEach(() => {
 });
 
 describe('seleção no painel persistente do mapa comercial', () => {
+  it('oferece uma única entrada para o interior no resumo com identificação e módulos do pavilhão', () => {
+    const pavilion = OFFICIAL_REFERENCE_ENTITIES.find((candidate) => candidate.publicIdentifier === 'B1')!;
+    render(<EntityDetailsPanel entity={pavilion} entities={OFFICIAL_REFERENCE_ENTITIES}
+      lots={OFFICIAL_REFERENCE_LOTS} permissions={permissions} />);
+    const aside = screen.getByRole('complementary');
+    const summary = within(aside).getByLabelText('Resumo da seleção');
+    expect(summary).toHaveTextContent('189 módulos');
+    expect(summary).toHaveTextContent('Não comercial');
+    expect(aside).toHaveAttribute('data-sheet-state', 'half');
+    const interiorAction = within(aside).getByRole('button', { name: /Ver interior de Pavilhão 1/i });
+    fireEvent.click(interiorAction);
+    expect(mocks.store.enterInterior).toHaveBeenCalledWith(pavilion.id);
+    expect(aside.querySelectorAll('[data-commercial-map-interior-trigger]')).toHaveLength(1);
+    expect(within(aside).getByText('Planta e áreas oficiais').closest('details')).not.toHaveAttribute('open');
+  });
+
+  it('recolhe e restaura o resumo sem apagar a seleção nem entrar no interior', () => {
+    render(panel());
+    const aside = screen.getByRole('complementary');
+    fireEvent.click(within(aside).getByRole('button', { name: 'Recolher detalhes do lote' }));
+    expect(aside).toHaveAttribute('data-sheet-state', 'collapsed');
+    fireEvent.click(within(aside).getByRole('button', { name: 'Restaurar detalhes do lote' }));
+    expect(aside).toHaveAttribute('data-sheet-state', 'half');
+    expect(mocks.store.setSelectedEntityId).not.toHaveBeenCalled();
+    expect(mocks.store.enterInterior).not.toHaveBeenCalled();
+  });
+
   it('preserva o aside A→B, fecha a edição aberta e inicia o draft real de LotEditDialog com os dados de B', () => {
     const view = render(panel());
     const aside = screen.getByRole('complementary');

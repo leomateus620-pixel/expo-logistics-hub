@@ -19,6 +19,7 @@ import {
   type CommercialMapStressResourceAnalysis,
 } from './renderingStressResources';
 import type { CameraPreset } from '../types';
+import { LateralDistrictQaPanel } from './LateralDistrictQa';
 import '../commercial-map.css';
 import '../commercial-map-mobile.css';
 import './commercial-map-rendering-diagnostics.css';
@@ -487,6 +488,7 @@ export default function CommercialMapRenderingDiagnosticsPage() {
           <pre data-testid="commercial-map-stress-json">{JSON.stringify(stressReport, null, 2)}</pre>
         </details>
         <small>Contadores confirmam draws enviados ao framebuffer da tela; screenshots validam os pixels exibidos.</small>
+        <LateralDistrictQaPanel />
         <details>
           <summary>CPU/GPU JSON · {timing.enabled ? timingEnvironmentValid ? 'amostra em primeiro plano' : 'amostra inválida: foco/visibilidade' : 'desabilitado'}</summary>
           <pre data-testid="commercial-map-timing-json">{JSON.stringify({ environmentValid: timingEnvironmentValid, environment: runtimeFacts, timing }, null, 2)}</pre>

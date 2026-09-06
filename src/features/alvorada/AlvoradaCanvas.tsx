@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useEffect, useRef } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { AdaptiveDpr, PerformanceMonitor } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -58,9 +58,11 @@ function RendererTelemetry({ quality }: { quality: AlvoradaQualityProfile }) {
 }
 
 function CanvasRuntimeGuard({
+  ready,
   onContextLost,
   onQualityDecline,
 }: {
+  ready: boolean;
   onContextLost: () => void;
   onQualityDecline: () => void;
 }) {
@@ -75,7 +77,7 @@ function CanvasRuntimeGuard({
     return () => gl.domElement.removeEventListener('webglcontextlost', handleContextLost);
   }, [gl, onContextLost]);
 
-  return (
+  return ready ? (
     <PerformanceMonitor
       bounds={(refreshRate) => [Math.min(34, refreshRate * 0.54), refreshRate * 0.82]}
       flipflops={3}
@@ -84,7 +86,7 @@ function CanvasRuntimeGuard({
         onQualityDecline();
       }}
     />
-  );
+  ) : null;
 }
 
 export function AlvoradaCanvas({
@@ -96,6 +98,11 @@ export function AlvoradaCanvas({
   quality,
   rendererTier,
 }: AlvoradaCanvasProps) {
+  const [ready, setReady] = useState(false);
+  const handleReady = useCallback(() => {
+    setReady(true);
+    onReady();
+  }, [onReady]);
   const elapsed = useRef(initialElapsed);
   const handleProgress = useCallback((nextElapsed: number) => {
     elapsed.current = nextElapsed;
@@ -117,22 +124,23 @@ export function AlvoradaCanvas({
       frameloop="always"
       gl={{
         alpha: false,
-        antialias: quality.antialias,
+        antialias: quality.antialias && !quality.postprocessing,
         failIfMajorPerformanceCaveat: rendererTier === 'hardware',
         powerPreference: rendererTier === 'hardware' ? 'high-performance' : 'default',
         stencil: false,
       }}
       performance={{ min: 0.55, debounce: 180 }}
-      shadows={quality.shadows ? 'soft' : false}
+      shadows={false}
       onCreated={({ gl }) => {
         gl.outputColorSpace = THREE.SRGBColorSpace;
         gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = 0.7;
-        gl.localClippingEnabled = true;
+        gl.toneMappingExposure = 0.94;
+        gl.domElement.dataset.createdAt = String(performance.now());
         gl.setClearColor('#010713', 1);
       }}
     >
       <CanvasRuntimeGuard
+        ready={ready}
         onContextLost={handleContextLost}
         onQualityDecline={onQualityDecline}
       />
@@ -141,7 +149,7 @@ export function AlvoradaCanvas({
         <SceneController
           initialElapsed={initialElapsed}
           onProgress={handleProgress}
-          onReady={onReady}
+          onReady={handleReady}
           quality={quality}
         />
         <CinematicPostFX quality={quality} />

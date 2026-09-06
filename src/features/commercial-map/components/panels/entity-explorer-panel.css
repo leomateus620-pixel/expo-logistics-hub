@@ -1,0 +1,36 @@
+/* A short landscape viewport needs one scroll owner for both filters and results.
+   The header remains reachable while the map and its toolbar stay above it. */
+@media (max-width: 950px) and (max-height: 520px) {
+  .commercial-map-shell .commercial-map-results-panel {
+    display: block;
+    height: min(72%, 360px);
+    max-height: calc(100% - 64px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: #f8faf8;
+    scroll-padding-top: 56px;
+  }
+  .commercial-map-results-panel .commercial-map-explorer-panel-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    min-height: 56px;
+    padding: 5px 12px;
+    background: #f8faf8;
+  }
+  .commercial-map-results-panel .commercial-map-explorer-panel-header > button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .commercial-map-results-panel .commercial-map-panel-scroll {
+    height: auto;
+    overflow: visible;
+  }
+  .commercial-map-results-panel .commercial-map-panel-scroll > [data-radix-scroll-area-viewport] {
+    height: auto;
+    overflow: visible !important;
+  }
+}

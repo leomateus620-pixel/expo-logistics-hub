@@ -757,3 +757,22 @@
   .commercial-map-lunar-launch-status small { display: none; }
   .commercial-map-lunar-launch-skip { min-height: 2.75rem; }
 }
+
+.commercial-map-table-pagination { display: flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 12px; padding: 6px; background: #f8fbf7; border-top: 1px solid #d6e0d7; font-size: 12px; }
+.commercial-map-table-pagination button { min-width: 66px; min-height: 44px; padding: 5px 10px; border: 1px solid #b9cebe; border-radius: 8px; color: #285739; }
+.commercial-map-table-pagination button:disabled { opacity: .4; }
+.commercial-map-table-pagination button:focus-visible { outline: 3px solid #27825a; }
+@media (max-width: 720px), (max-width: 950px) and (max-height: 520px) {
+  .commercial-map-shell:has(.commercial-map-dock.is-mobile) .commercial-map-list-view { padding-bottom: 54px; }
+}
+
+@media (max-width: 720px), (max-width: 950px) and (max-height: 520px) {
+  .commercial-map-shell:not(.is-commission-scope) .commercial-map-toolbar-mobile { left: max(8px, env(safe-area-inset-left)); height: 48px; }
+  .commercial-map-toolbar-mobile > button,
+  .commercial-map-toolbar-mobile [data-radix-collection-item] { width: 44px; height: 44px; min-width: 44px; min-height: 44px; }
+  .commercial-map-status-filters > button,
+  .commercial-map-explorer-filter-row > button,
+  .commercial-map-explorer-select,
+  .commercial-map-active-filters > button { min-height: 44px; }
+  .commercial-map-explorer-search input { font-size: 16px; }
+}

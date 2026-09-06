@@ -64,6 +64,9 @@ const CommercialMapPage = lazyWithRetry(() => import('./pages/CommercialMapPage'
 const CommercialMapRenderingDiagnosticsPage = import.meta.env.DEV
   ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/CommercialMapRenderingDiagnosticsPage'))
   : null;
+const CommercialMapInterfaceDiagnosticsPage = import.meta.env.DEV
+  ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/CommercialMapInterfaceDiagnosticsPage'))
+  : null;
 const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
 const UnsubscribePage = lazyWithRetry(() => import('./pages/UnsubscribePage'));
 const CommissionPortalPage = lazyWithRetry(() => import('./pages/commissions/CommissionPortalPage'));
@@ -436,6 +439,9 @@ const App = () => (
               <Route path="/eventos-restaurante-arena/:venueSlug" element={<VenueEventsModuleRoute />} />
               <Route path="/eventos-restaurante-arena/:venueSlug/:viewSlug" element={<VenueEventsModuleRoute />} />
               <Route path="/mapa-comercial" element={<CommercialMapRoute />} />
+              {CommercialMapInterfaceDiagnosticsPage && (
+                <Route path="/__dev/commercial-map-interface" element={<Suspended><CommercialMapInterfaceDiagnosticsPage /></Suspended>} />
+              )}
               {CommercialMapRenderingDiagnosticsPage && (
                 <Route
                   path="/__dev/commercial-map-rendering"

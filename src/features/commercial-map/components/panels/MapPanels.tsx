@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   BadgeCheck,
   BookOpen,
@@ -18,8 +18,6 @@ import {
   Layers3,
   LockKeyhole,
   MapPinned,
-  Maximize2,
-  Minimize2,
   PencilLine,
   Ruler,
   Scissors,
@@ -48,10 +46,6 @@ import {
 } from '../../utils/landmarks';
 import { normalizeMapEntityMetadata } from '../../utils/mapMetadata';
 import { resolveCommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
-import {
-  resolveCommercialMapSheetSnap,
-  type CommercialMapDetailSheetState,
-} from '../../utils/viewport';
 import type { CommercialMapAreaScope } from '../../utils/areaScope';
 import type { CommercialLot, MapEntity, MapLayer, MapPermissions } from '../../types';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
@@ -59,6 +53,8 @@ import { LotStructureDialog, type LotStructureOperation } from '../commercial/Lo
 import { LotEditDialog } from '../commercial/LotEditDialog';
 import { EntityVerificationDialog } from '../commercial/EntityVerificationDialog';
 import { PavilionPlanLegend } from './PavilionPlanLegend';
+import { CompactDetailSheetControls } from './CompactDetailSheet';
+import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { getHistoryIdForEntity } from '../../history/bindings';
 import { HistoryExperience } from '../../history/HistoryExperience';
 
@@ -324,18 +320,15 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
   const [structureOperation, setStructureOperation] = useState<LotStructureOperation>(null);
   const [editingLot, setEditingLot] = useState(false);
   const [verificationOpen, setVerificationOpen] = useState(false);
-  const [sheetState, setSheetState] = useState<CommercialMapDetailSheetState>('half');
   const [historyEntityId, setHistoryEntityId] = useState<string | null>(null);
   const historyTriggerRef = useRef<HTMLButtonElement>(null);
   const historyId = getHistoryIdForEntity(entity);
   const historyOpen = historyEntityId === entity.id && historyId !== null;
+  const sheet = useCompactDetailSheet(entity.id, historyOpen);
   const closeHistory = () => {
     setHistoryEntityId(null);
     requestAnimationFrame(() => historyTriggerRef.current?.focus({ preventScroll: true }));
   };
-  const panelRef = useRef<HTMLElement>(null);
-  const dragRef = useRef({ pointerId: -1, startY: 0, startHeight: 0, viewportHeight: 0, minimumHeight: 72, maximumHeight: 0, moved: false });
-  const suppressHandleClickRef = useRef(false);
   const activity = useLotActivity(lot?.id ?? null);
   const contracts = useLotContractVersions(lot?.id ?? null, permissions.canManageContracts);
   const areaMapUnits = polygonAreaMapUnits(entity.geometry);
@@ -362,167 +355,68 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
     setEditingLot(false);
     setVerificationOpen(false);
     setHistoryEntityId(null);
-    setSheetState('half');
-    dragRef.current.pointerId = -1;
-    suppressHandleClickRef.current = false;
-    const viewport = panelRef.current?.closest('.commercial-map-viewport') as HTMLElement | null;
-    viewport?.classList.remove('is-detail-sheet-dragging');
-    viewport?.style.removeProperty('--commercial-map-detail-sheet-height');
   }, [entity.id]);
-
-  useEffect(() => {
-    const viewport = panelRef.current?.closest('.commercial-map-viewport') as HTMLElement | null;
-    return () => {
-      viewport?.classList.remove('is-detail-sheet-dragging');
-      viewport?.style.removeProperty('--commercial-map-detail-sheet-height');
-    };
-  }, []);
-
-  const cleanupSheetDrag = () => {
-    const viewport = panelRef.current?.closest('.commercial-map-viewport') as HTMLElement | null;
-    viewport?.classList.remove('is-detail-sheet-dragging');
-    viewport?.style.removeProperty('--commercial-map-detail-sheet-height');
-  };
-
-  const finishSheetDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
-    const drag = dragRef.current;
-    if (drag.pointerId !== event.pointerId) return;
-    const viewport = panelRef.current?.closest('.commercial-map-viewport') as HTMLElement | null;
-    const rawHeight = viewport?.style.getPropertyValue('--commercial-map-detail-sheet-height') ?? '';
-    const sheetHeight = Number.parseFloat(rawHeight) || panelRef.current?.getBoundingClientRect().height || drag.startHeight;
-    suppressHandleClickRef.current = drag.moved;
-    setSheetState(resolveCommercialMapSheetSnap(sheetHeight, drag.viewportHeight, drag.minimumHeight));
-    cleanupSheetDrag();
-    dragRef.current.pointerId = -1;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-  };
 
   return (
     <>
       <aside
-        ref={panelRef}
+        ref={sheet.panelRef}
         className="commercial-map-panel commercial-map-details-panel"
-        data-sheet-state={sheetState}
+        data-sheet-state={sheet.sheetState}
+        data-history-open={historyOpen}
         aria-label={`Detalhes de ${metadata.officialDisplayName}`}
         onPointerDown={(event) => event.stopPropagation()}
         onPointerMove={(event) => event.stopPropagation()}
         onPointerUp={(event) => event.stopPropagation()}
-        onWheel={(event) => event.stopPropagation()}
         onTouchStart={(event) => event.stopPropagation()}
         onTouchMove={(event) => event.stopPropagation()}
         onTouchEnd={(event) => event.stopPropagation()}
+        onWheel={(event) => event.stopPropagation()}
       >
-        <div className="commercial-map-sheet-controls">
-          <button
-            type="button"
-            className="commercial-map-sheet-handle"
-            aria-label={sheetState === 'collapsed' ? 'Restaurar detalhes do lote' : 'Recolher detalhes do lote'}
-            aria-expanded={sheetState !== 'collapsed'}
-            onPointerDown={(event) => {
-              if (event.pointerType === 'mouse' && event.button !== 0) return;
-              const panel = panelRef.current;
-              const viewport = panel?.closest('.commercial-map-viewport') as HTMLElement | null;
-              if (!panel || !viewport) return;
-              event.preventDefault();
-              event.stopPropagation();
-              event.currentTarget.setPointerCapture(event.pointerId);
-              const startHeight = panel.getBoundingClientRect().height;
-              const viewportHeight = viewport.getBoundingClientRect().height;
-              const safeAreaBottom = Number.parseFloat(window.getComputedStyle(panel).paddingBottom) || 0;
-              const minimumHeight = 72 + safeAreaBottom;
-              const maximumHeight = Math.max(minimumHeight, viewportHeight - Math.max(136, viewportHeight * 0.28));
-              dragRef.current = {
-                pointerId: event.pointerId,
-                startY: event.clientY,
-                startHeight,
-                viewportHeight,
-                minimumHeight,
-                maximumHeight,
-                moved: false,
-              };
-              viewport.classList.add('is-detail-sheet-dragging');
-              viewport.style.setProperty('--commercial-map-detail-sheet-height', `${startHeight}px`);
-            }}
-            onPointerMove={(event) => {
-              const drag = dragRef.current;
-              if (drag.pointerId !== event.pointerId) return;
-              event.preventDefault();
-              event.stopPropagation();
-              const viewport = panelRef.current?.closest('.commercial-map-viewport') as HTMLElement | null;
-              if (!viewport) return;
-              const delta = drag.startY - event.clientY;
-              if (Math.abs(delta) > 4) drag.moved = true;
-              const nextHeight = Math.min(
-                Math.max(drag.minimumHeight, drag.startHeight + delta),
-                drag.maximumHeight,
-              );
-              viewport.style.setProperty('--commercial-map-detail-sheet-height', `${nextHeight}px`);
-            }}
-            onPointerUp={finishSheetDrag}
-            onPointerCancel={(event) => {
-              finishSheetDrag(event);
-              cleanupSheetDrag();
-            }}
-            onLostPointerCapture={(event) => {
-              if (dragRef.current.pointerId === event.pointerId) finishSheetDrag(event);
-            }}
-            onClick={() => {
-              if (suppressHandleClickRef.current) {
-                suppressHandleClickRef.current = false;
-                return;
-              }
-              setSheetState((current) => current === 'collapsed' ? 'half' : 'collapsed');
-            }}
-          >
-            <span aria-hidden="true" />
-            <ChevronDown aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            className="commercial-map-sheet-expand"
-            onClick={() => setSheetState((current) => current === 'expanded' ? 'half' : 'expanded')}
-            aria-label={sheetState === 'expanded' ? 'Voltar aos detalhes em meia tela' : 'Expandir detalhes do lote'}
-            aria-pressed={sheetState === 'expanded'}
-          >
-            {sheetState === 'expanded' ? <Minimize2 aria-hidden="true" /> : <Maximize2 aria-hidden="true" />}
-          </button>
-        </div>
-        {historyOpen && <HistoryExperience key={entity.id} historyId={historyId} onClose={closeHistory} />}
+        {historyOpen && <>
+          <div className="fenasoja-history-sheet-controls"><CompactDetailSheetControls sheet={sheet} /></div>
+          <HistoryExperience key={entity.id} historyId={historyId} onClose={closeHistory} />
+        </>}
         <div className="commercial-map-commercial-view" hidden={historyOpen}>
-        <PanelHeader eyebrow={CLASSIFICATION_LABELS[entity.classification]} title={metadata.officialDisplayName} onClose={() => setSelectedEntityId(null)} />
+        <PanelHeader eyebrow={`${entity.publicIdentifier} · ${CLASSIFICATION_LABELS[entity.classification]}`} title={metadata.officialDisplayName} onClose={() => setSelectedEntityId(null)} />
         {historyId && <Button ref={historyTriggerRef} variant="outline" className="commercial-map-history-trigger" onClick={() => setHistoryEntityId(entity.id)}><BookOpen aria-hidden="true" />Conhecer a história</Button>}
-        {usesInspectionCopy && (
-          <Button
-            className="commercial-map-short-interior-action"
-            onClick={() => enterInterior(entity.id)}
-            data-commercial-map-interior-trigger={entity.id}
-            aria-label={`Ver interior de ${metadata.officialDisplayName}`}
-          >
-            <DoorOpen className="h-4 w-4" />
-            Ver interior
-          </Button>
-        )}
+        <div className="commercial-map-selection-summary" aria-label="Resumo da seleção">
+          {status ? (
+            <span className="commercial-map-status-pill" style={{ color: status.border, background: status.surface, borderColor: status.color }}>
+              <b aria-hidden="true">{status.symbol}</b>{status.label}
+            </span>
+          ) : <Badge variant="outline">Não comercial</Badge>}
+          <span>{pavilionPlan
+            ? `${pavilionPlan.stats.moduleCount} módulos · ${number.format(pavilionPlan.stats.totalAreaSquareMeters)} m² de área total`
+            : lot?.officialAreaSqm != null ? `${areaNumber.format(lot.officialAreaSqm)} m² de área oficial` : 'Área não informada'}</span>
+        </div>
+        <CompactDetailSheetControls sheet={sheet}>
+          {strategicLandmarkSupportsInterior(entity) && (
+            <Button className="commercial-map-selection-interior-action"
+              onClick={() => enterInterior(entity.id)}
+              data-commercial-map-interior-trigger={entity.id}
+              aria-label={`${usesInspectionCopy ? 'Ver' : 'Visitar'} interior de ${metadata.officialDisplayName}`}>
+              <DoorOpen className="h-4 w-4" />
+              {usesInspectionCopy ? 'Ver interior' : 'Visitar interior'}
+            </Button>
+          )}
+        </CompactDetailSheetControls>
         <ScrollArea className="commercial-map-panel-scroll">
           <div className="commercial-map-detail-hero">
-            <div className="commercial-map-detail-code">{entity.publicIdentifier}</div>
-            {status ? (
-              <span className="commercial-map-status-pill" style={{ color: status.border, background: status.surface, borderColor: status.color }}>
-                <b aria-hidden="true">{status.symbol}</b>{status.label}
-              </span>
-            ) : (
-              <Badge variant="outline">Não comercial</Badge>
-            )}
             <p>{entity.description || 'Estrutura identificada na planta oficial da Fenasoja.'}</p>
           </div>
 
-          {pavilionPlan && <PavilionPlanLegend plan={pavilionPlan} />}
+          {pavilionPlan && (
+            <details className="commercial-map-selection-plan">
+              <summary>Planta e áreas oficiais</summary>
+              <PavilionPlanLegend plan={pavilionPlan} />
+            </details>
+          )}
 
           <div className="commercial-map-detail-primary" aria-label="Informações principais do lote selecionado">
             {lot && <div><span>Quadra / lote</span><strong>{[lot.block, lot.lotNumber].filter(Boolean).join(' · ') || 'Não informado'}</strong></div>}
             {lot && <div><span>Empresa</span><strong>{lot.currentBuyer || 'Sem vínculo ativo'}</strong></div>}
-            {lot && <div><span>Área oficial</span><strong>{lot.officialAreaSqm ? `${areaNumber.format(lot.officialAreaSqm)} m²` : 'Não validada'}</strong></div>}
+            {lot && <div><span>Área oficial</span><strong>{lot.officialAreaSqm != null ? `${areaNumber.format(lot.officialAreaSqm)} m²` : 'Área não informada'}</strong></div>}
             {lot && <div><span>Área calculada</span><strong>{lot.calculatedAreaSqm != null ? `${areaNumber.format(lot.calculatedAreaSqm)} m²` : 'Sem calibração'}</strong></div>}
           </div>
 
@@ -533,7 +427,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
             </TabsList>
             <TabsContent value="overview">
               <div className="commercial-map-detail-grid">
-                <DetailMetric icon={Ruler} label="Área oficial" value={lot?.officialAreaSqm ? `${areaNumber.format(lot.officialAreaSqm)} m²` : 'Não validada'} warning={!lot?.officialAreaSqm} />
+                <DetailMetric icon={Ruler} label="Área oficial" value={lot?.officialAreaSqm != null ? `${areaNumber.format(lot.officialAreaSqm)} m²` : 'Área não informada'} warning={!lot?.officialAreaSqm} />
                 {lot ? (
                   <DetailMetric
                     icon={MapPinned}
@@ -593,17 +487,6 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
 
               <div className="commercial-map-detail-actions">
                 <Button variant="outline" onClick={focusSelection}><Focus className="h-4 w-4" />Centralizar</Button>
-                {strategicLandmarkSupportsInterior(entity) && (
-                  <Button
-                    className="commercial-map-standard-interior-action"
-                    onClick={() => enterInterior(entity.id)}
-                    data-commercial-map-interior-trigger={entity.id}
-                    aria-label={`${usesInspectionCopy ? 'Ver' : 'Visitar'} interior de ${metadata.officialDisplayName}`}
-                  >
-                    <DoorOpen className="h-4 w-4" />
-                    {usesInspectionCopy ? 'Ver interior' : 'Visitar interior'}
-                  </Button>
-                )}
                 {permissions.isMapAdmin && <Button variant="outline" onClick={() => setVerificationOpen(true)}><BadgeCheck className="h-4 w-4" />{entity.verificationStatus === 'VERIFIED' ? 'Reabrir revisão' : 'Verificar entidade'}</Button>}
                 {lot && permissions.canManageLots && <Button variant="outline" onClick={() => setEditingLot(true)}><PencilLine className="h-4 w-4" />Editar lote</Button>}
                 {permissions.canEditGeometry && <Button variant="outline" onClick={() => setWorkspaceMode('edit')}><Ruler className="h-4 w-4" />Editar geometria</Button>}

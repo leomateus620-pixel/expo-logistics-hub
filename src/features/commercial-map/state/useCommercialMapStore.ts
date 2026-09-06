@@ -46,6 +46,16 @@ export interface CommercialMapCameraView {
   target: [number, number, number];
 }
 
+interface InteriorReturnContext {
+  activeSegmentId: CommercialMapSegmentId | null;
+  selectedEntityId: string;
+  search: string;
+  statusFilters: CommercialStatus[];
+  classificationFilters: MapClassification[];
+  locationFilter: string | null;
+  verificationFilters: VerificationStatus[];
+}
+
 // Parking is a cartographic inspection, never a persisted commercial entity.
 const CLEARED_PARKING_INSPECTION = {
   selectedParkingBlockId: null,
@@ -61,6 +71,7 @@ const PARKING_INSPECTION_MODE = {
   selectedModuleId: null,
   interiorEntityId: null,
   interiorReturnView: null,
+  interiorReturnContext: null,
   selectedHydrologicalElementId: null,
   hydrologicalModeActive: false,
   activePanel: null,
@@ -73,6 +84,7 @@ interface CommercialMapState {
   selectedEntityId: string | null;
   interiorEntityId: string | null;
   interiorReturnView: CommercialMapCameraView | null;
+  interiorReturnContext: InteriorReturnContext | null;
   hoveredEntityId: string | null;
   hoveredModuleId: string | null;
   selectedModuleId: string | null;
@@ -188,6 +200,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   selectedEntityId: null,
   interiorEntityId: null,
   interiorReturnView: null,
+  interiorReturnContext: null,
   hoveredEntityId: null,
   hoveredModuleId: null,
   selectedModuleId: null,
@@ -251,6 +264,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
       selectedEntityId: null,
       interiorEntityId: null,
       interiorReturnView: null,
+      interiorReturnContext: null,
       hoveredEntityId: null,
       hoveredModuleId: null,
       selectedModuleId: null,
@@ -289,6 +303,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
           selectedEntityId,
           interiorEntityId: state.interiorEntityId === selectedEntityId ? state.interiorEntityId : null,
           interiorReturnView: state.interiorEntityId === selectedEntityId ? state.interiorReturnView : null,
+          interiorReturnContext: state.interiorEntityId === selectedEntityId ? state.interiorReturnContext : null,
           activePanel: selectedEntityId ? 'details' : null,
           // A new tap cancels the running flight before its click is handled.
           // Repeating an exterior selection must explicitly request that focus
@@ -310,7 +325,16 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
           hoveredModuleId: null,
           selectedModuleId: null,
           interiorEntityId: selectedEntityId,
-          interiorReturnView: null,
+          interiorReturnView: state.interiorEntityId ? state.interiorReturnView : null,
+          interiorReturnContext: state.interiorReturnContext ?? {
+            activeSegmentId: state.activeSegmentId,
+            selectedEntityId,
+            search: state.search,
+            statusFilters: state.statusFilters,
+            classificationFilters: state.classificationFilters,
+            locationFilter: state.locationFilter,
+            verificationFilters: state.verificationFilters,
+          },
           activePanel: null,
           workspaceMode: '3d',
           cameraNavigating: false,
@@ -334,7 +358,9 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   })),
   exitInterior: () => set((state) => ({
     ...CLEARED_PARKING_INSPECTION,
+    ...state.interiorReturnContext,
     interiorEntityId: null,
+    interiorReturnContext: null,
     hoveredModuleId: null,
     selectedModuleId: null,
     activePanel: state.selectedEntityId ? 'details' : null,
@@ -386,6 +412,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     selectedModuleId: null,
     interiorEntityId: null,
     interiorReturnView: null,
+    interiorReturnContext: null,
     activePanel: 'details',
     workspaceMode: '3d',
     cameraSequence: state.cameraSequence + 1,
@@ -412,8 +439,11 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   setWorkspaceMode: (workspaceMode) => set((state) => ({
     ...(workspaceMode === '3d' ? {} : CLEARED_PARKING_INSPECTION),
     workspaceMode,
-    interiorEntityId: workspaceMode === '3d' ? state.interiorEntityId : null,
-    interiorReturnView: workspaceMode === '3d' ? state.interiorReturnView : null,
+    // Map and table are views of the same navigation context. The persistent
+    // canvas resumes this exact interior and camera after visiting the table.
+    interiorEntityId: workspaceMode === '3d' || workspaceMode === 'list' ? state.interiorEntityId : null,
+    interiorReturnView: workspaceMode === '3d' || workspaceMode === 'list' ? state.interiorReturnView : null,
+    interiorReturnContext: workspaceMode === '3d' || workspaceMode === 'list' ? state.interiorReturnContext : null,
   })),
   requestCameraPreset: (cameraPreset) => set((state) => ({
     ...CLEARED_PARKING_INSPECTION,
@@ -424,6 +454,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     workspaceMode: '3d',
     interiorEntityId: null,
     interiorReturnView: null,
+    interiorReturnContext: null,
   })),
   requestSegmentFocus: (activeSegmentId) => set((state) => ({
     ...CLEARED_PARKING_INSPECTION,
@@ -436,12 +467,23 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     workspaceMode: state.workspaceMode === 'list' ? 'list' : '3d',
     interiorEntityId: null,
     interiorReturnView: null,
+    interiorReturnContext: null,
     cameraNavigating: false,
     cameraSequence: state.workspaceMode === 'list' ? state.cameraSequence : state.cameraSequence + 1,
   })),
   clearSegmentFocus: () => set((state) => ({
     ...CLEARED_PARKING_INSPECTION,
     activeSegmentId: null,
+    selectedEntityId: null,
+    hoveredEntityId: null,
+    hoveredModuleId: null,
+    selectedModuleId: null,
+    interiorEntityId: null,
+    interiorReturnView: null,
+    interiorReturnContext: null,
+    activePanel: null,
+    cameraPreset: 'overview',
+    cameraNavigating: false,
     cameraSequence: state.workspaceMode === 'list' ? state.cameraSequence : state.cameraSequence + 1,
   })),
   focusSelection: () => set((state) => ({
@@ -472,6 +514,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
       selectedEntityId: null,
       interiorEntityId: null,
       interiorReturnView: null,
+      interiorReturnContext: null,
       hoveredEntityId: null,
       hoveredModuleId: null,
       selectedModuleId: null,

@@ -58,16 +58,20 @@ describe('renderer operacional do interior comercial', () => {
     expect(layer).not.toMatch(/setSelectedModuleId\(supportSpace/);
   });
 
-  it('expõe a legenda de situações comerciais também no interior', () => {
+  it('concentra legenda contextual e seleção de módulo na Dock do interior', () => {
     const page = read('src/features/commercial-map/CommercialMapPage.tsx');
-    const interiorBranch = page.slice(
-      page.indexOf('{interiorPavilionPlan && ('),
-      page.indexOf(') : (', page.indexOf('{interiorPavilionPlan && (')),
-    );
+    const dock = read('src/features/commercial-map/components/dock/CommercialMapDock.tsx');
+    const legend = read('src/features/commercial-map/components/panels/ContextualMapLegend.tsx');
 
-    expect(interiorBranch).toContain('<PavilionPlanLegend');
-    expect(interiorBranch).toContain('<StatusLegend />');
-    expect(interiorBranch).toContain('<PavilionModuleCard');
+    expect(page).toMatch(/<CommercialMapDock[\s\S]*?interiorEntity=\{interiorEntity\}[\s\S]*?moduleCard=\{interiorPavilionPlan && interiorEntity \? <PavilionModuleCard/);
+    expect(page).toMatch(/<PavilionModuleCard\s+embedded[\s\S]*?permissions=\{permissions\}/);
+    expect(dock).toContain('<ContextualMapLegend');
+    expect(dock).toContain('interiorEntity={interiorEntity}');
+    expect(legend).toContain('state.statusFilters');
+    expect(legend).toContain('state.toggleStatus');
+    expect(legend).toContain('state.clearStatuses');
+    expect(page).not.toContain('<PavilionPlanLegend');
+    expect(page).not.toContain('<StatusLegend');
   });
 
   it('não desenha os filhos INTERNAL_STAND na cena externa compartilhada', () => {

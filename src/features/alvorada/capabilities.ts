@@ -1,4 +1,5 @@
 import type { AlvoradaWebGLTier } from './types';
+import { getEarthTextureUrls } from './earthAssets';
 
 export interface AlvoradaQualityProfile {
   antialias: boolean;
@@ -20,13 +21,8 @@ interface NavigatorPerformanceHints extends Navigator {
 }
 
 const ALVORADA_CRITICAL_ASSETS = [
-  '/alvorada/earth-day-2048.jpg',
-  '/alvorada/earth-night-lights-2048.png',
-  '/alvorada/earth-normal-2048.jpg',
-  '/alvorada/earth-clouds-1024.png',
   '/alvorada/brazil-min.geojson',
   '/alvorada/rio-grande-do-sul-min.geojson',
-  '/alvorada/santa-rosa-min.geojson',
 ] as const;
 
 let assetsWarmed = false;
@@ -43,7 +39,10 @@ export function warmAlvoradaAssets() {
   if (assetsWarmed || typeof window === 'undefined') return;
   assetsWarmed = true;
 
-  streamAssets(ALVORADA_CRITICAL_ASSETS);
+  streamAssets([
+    ...getEarthTextureUrls(getAlvoradaQualityProfile().mobile),
+    ...ALVORADA_CRITICAL_ASSETS,
+  ]);
 }
 
 /**

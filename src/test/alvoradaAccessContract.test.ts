@@ -90,29 +90,11 @@ describe('contrato de acesso exclusivo à Alvorada', () => {
   });
 
   it('não encurta nem oculta a experiência WebGL no CSS de movimento reduzido', () => {
-    const reducedMotionStart = alvoradaCss.indexOf('@media (prefers-reduced-motion: reduce)');
-    const reducedMotionEnd = alvoradaCss.indexOf('@media (forced-colors: active)', reducedMotionStart);
-    const reducedMotionCss = alvoradaCss.slice(reducedMotionStart, reducedMotionEnd);
-    const localAnimationDurations = [...alvoradaCss.matchAll(
-      /animation-duration\s*:\s*([\d.]+)ms/gi,
-    )].map((match) => Number(match[1]));
-
-    expect(reducedMotionStart).toBeGreaterThanOrEqual(0);
-    expect(reducedMotionEnd).toBeGreaterThan(reducedMotionStart);
-    expect(localAnimationDurations.length).toBeGreaterThan(0);
-    expect(localAnimationDurations.every((duration) => duration >= 200)).toBe(true);
-    expect(reducedMotionCss).toMatch(
-      /\.alvorada-overlay\s*\{[\s\S]*?animation-duration:\s*280ms\s*!important/,
-    );
-    expect(reducedMotionCss).toMatch(
-      /\.alvorada-overlay--leaving\s*\{[\s\S]*?animation-duration:\s*400ms\s*!important/,
-    );
-    expect(reducedMotionCss).toMatch(
-      /\.alvorada-overlay__loader-orbit\s*\{[\s\S]*?animation-duration:\s*900ms\s*!important[\s\S]*?animation-iteration-count:\s*infinite\s*!important/,
-    );
-    expect(reducedMotionCss).not.toMatch(
-      /animation-duration\s*:\s*(?:0\.01|1)ms|transition-duration\s*:\s*0\.01ms|display\s*:\s*none|visibility\s*:\s*hidden/i,
-    );
+    const globalCss = readFileSync(resolve('src/index.css'), 'utf8');
+    expect(globalCss).toContain('*:not(.alvorada-overlay, .alvorada-overlay *)');
+    expect(alvoradaCss).not.toContain('prefers-reduced-motion');
+    expect(alvoradaCss).toContain('alvorada-overlay-enter 280ms');
+    expect(alvoradaCss).toContain('alvorada-overlay-exit 400ms');
     expect(alvoradaImplementation).not.toMatch(
       /useReducedMotion|matchMedia\([^)]*prefers-reduced-motion/,
     );

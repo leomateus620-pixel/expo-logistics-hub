@@ -41,6 +41,8 @@ describe('renderização compartilhada dos módulos internos', () => {
     const page = read('src/features/commercial-map/CommercialMapPage.tsx');
     const panels = read('src/features/commercial-map/components/panels/MapPanels.tsx');
     const canvas = read('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
+    const dock = read('src/features/commercial-map/components/dock/CommercialMapDock.tsx');
+    const legend = read('src/features/commercial-map/components/panels/ContextualMapLegend.tsx');
 
     expect(exterior).toContain('<CommercialPavilionModuleLayer');
     expect(exterior).toContain('mode="cutaway"');
@@ -56,7 +58,10 @@ describe('renderização compartilhada dos módulos internos', () => {
     expect(exterior).not.toContain('labelRotationRadians=');
     expect(layer).toContain('context.rotate(labelRotationRadians)');
     expect(interior).toContain('minDistance: maximumDimension * 0.2');
-    expect(page).toContain('<PavilionPlanLegend plan={interiorPavilionPlan} variant="interior" />');
+    expect(page).toContain('interiorEntity={interiorEntity}');
+    expect(dock).toContain('<ContextualMapLegend');
+    expect(legend).toContain('<PavilionPlanThumbnail plan={scope.plan} />');
+    expect(page).not.toContain('<PavilionPlanLegend');
     expect(panels).toContain('<PavilionPlanLegend plan={pavilionPlan} />');
   });
 });

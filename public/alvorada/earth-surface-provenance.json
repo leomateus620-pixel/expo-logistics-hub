@@ -1,0 +1,12 @@
+{
+  "source": "NASA Earth Observatory / Blue Marble Next Generation, September 2004, topography",
+  "sourcePage": "https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-topography/",
+  "sourceUrl": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography/september/world.topo.200409.3x5400x2700.jpg",
+  "sourceSha256": "5f5d16b1c12c7e2e5efc236ed02ce2212c7f9c90d2cbdaafd9d470dd875b6d09",
+  "sourceDimensions": [5400, 2700],
+  "processing": "Pillow Lanczos resize, WebP quality 88 method 6; no recoloring, generated geography or baked clouds",
+  "assets": [
+    { "file": "earth-surface-2048.webp", "dimensions": [2048, 1024], "bytes": 186084 },
+    { "file": "earth-surface-4096.webp", "dimensions": [4096, 2048], "bytes": 630196 }
+  ]
+}

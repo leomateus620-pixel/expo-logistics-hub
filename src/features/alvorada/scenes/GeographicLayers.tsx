@@ -50,6 +50,8 @@ function GeographicBoundary({ color, end, opacity, radius, start, url }: Geograp
     const fade = 1 - smoothRange(timeline.current.elapsed, end + 0.7, end + 1.5);
 
     lines.forEach((line) => {
+      line.visible = reveal > 0.001 && fade > 0.001;
+      if (!line.visible) return;
       const count = line.geometry.getAttribute('position').count;
       line.geometry.setDrawRange(0, Math.max(0, Math.floor(count * reveal)));
       (line.material as THREE.LineBasicMaterial).opacity = opacity * fade;
@@ -192,7 +194,7 @@ export function BrazilLayer() {
     <GeographicBoundary
       color="#b9d9ff"
       end={ALVORADA_PHASES.dawn.end - 0.25}
-      opacity={0.48}
+      opacity={0.3}
       radius={EARTH_RADIUS + 0.022}
       start={ALVORADA_PHASES.dawn.start + 0.3}
       url="/alvorada/brazil-min.geojson"
@@ -205,7 +207,7 @@ export function RioGrandeDoSulLayer() {
     <GeographicBoundary
       color="#ffd08a"
       end={ALVORADA_PHASES.territory.start + 1.35}
-      opacity={0.96}
+      opacity={0.58}
       radius={EARTH_RADIUS + 0.045}
       start={ALVORADA_PHASES.territory.start + 0.35}
       url="/alvorada/rio-grande-do-sul-min.geojson"

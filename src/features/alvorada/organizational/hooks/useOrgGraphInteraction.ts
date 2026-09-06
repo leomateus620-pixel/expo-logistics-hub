@@ -27,6 +27,7 @@ export interface OrgSearchResult {
   label: string;
   meta: string;
   node: OrgNode;
+  personId?: string;
 }
 
 interface UseOrgGraphInteractionOptions {
@@ -87,12 +88,16 @@ function createSearchResult(
   ));
   const nodeSubtitleMatches = includesSearch(node.subtitle, normalizedQuery);
 
-  const matchedPerson = personByName ?? (
+  const namedPerson = personByName ?? (
     responsibilityByName?.personId ? graph.people[responsibilityByName.personId] : null
-  ) ?? personByRole ?? (
-    responsibilityByRole?.personId ? graph.people[responsibilityByRole.personId] : null
   );
-  const matchedResponsibility = responsibilityByName ?? responsibilityByRole;
+  // A collective title also appears in its members' roles. Searching that
+  // title must open the collective, not silently choose the first member.
+  const collectiveMatch = !namedPerson && (nodeTitleMatches || nodeSubtitleMatches);
+  const matchedPerson = namedPerson ?? (collectiveMatch ? null : personByRole ?? (
+    responsibilityByRole?.personId ? graph.people[responsibilityByRole.personId] : null
+  ));
+  const matchedResponsibility = responsibilityByName ?? (collectiveMatch ? null : responsibilityByRole);
   const matches = Boolean(
     matchedPerson
     || matchedResponsibility
@@ -132,52 +137,40 @@ function createSearchResult(
       label,
       meta,
       node,
+      personId: matchedPerson?.id,
     },
   };
 }
 
-function collectRelationshipContext(
+/** Only explicit incident relationships: a collective membership never grants
+ * the selected person every outgoing relationship of that collective. */
+export function collectRelationshipContext(
   graph: OrganizationalGraph,
   focusNodeId: string | null,
-  includeAncestors: boolean,
-): { edgeIds: Set<string>; nodeIds: Set<string> } {
-  const nodeIds = new Set<string>();
+  personId: string | null = null,
+): { edgeIds: Set<string>; nodeIds: Set<string>; membershipIds: Set<string> } {
+  const allowed = new Set(graph.renderableNodeIds);
+  const nodes = graph.nodes.filter((node) => node.isRenderable && allowed.has(node.id));
+  const nodeById = new Map(nodes.map((node) => [node.id, node]));
+  const membershipIds = new Set(personId
+    ? nodes.filter((node) => node.personIds.includes(personId)
+      || node.responsibilities.some((item) => item.personId === personId)).map((node) => node.id)
+    : focusNodeId && nodeById.has(focusNodeId) ? [focusNodeId] : []);
+  const nodeIds = new Set(membershipIds);
   const edgeIds = new Set<string>();
-  if (!focusNodeId) return { edgeIds, nodeIds };
-  nodeIds.add(focusNodeId);
-
-  const incomingByTarget = new Map<string, typeof graph.edges>();
-  const outgoingBySource = new Map<string, typeof graph.edges>();
   graph.edges.forEach((edge) => {
-    incomingByTarget.set(edge.targetId, [...(incomingByTarget.get(edge.targetId) ?? []), edge]);
-    outgoingBySource.set(edge.sourceId, [...(outgoingBySource.get(edge.sourceId) ?? []), edge]);
-  });
-
-  const directIncoming = incomingByTarget.get(focusNodeId) ?? [];
-  const directOutgoing = outgoingBySource.get(focusNodeId) ?? [];
-  [...directIncoming, ...directOutgoing].forEach((edge) => {
+    if (!nodeById.has(edge.sourceId) || !nodeById.has(edge.targetId)) return;
+    const source = nodeById.get(edge.sourceId);
+    const incoming = membershipIds.has(edge.targetId);
+    const outgoing = membershipIds.has(edge.sourceId) && (!personId
+      || source?.type === 'executive'
+      || (membershipIds.has(edge.targetId)));
+    if (!incoming && !outgoing) return;
     edgeIds.add(edge.id);
     nodeIds.add(edge.sourceId);
     nodeIds.add(edge.targetId);
   });
-
-  if (includeAncestors) {
-    const pending = directIncoming.map((edge) => edge.sourceId);
-    const visited = new Set<string>();
-    while (pending.length > 0) {
-      const nodeId = pending.shift();
-      if (!nodeId || visited.has(nodeId)) continue;
-      visited.add(nodeId);
-      nodeIds.add(nodeId);
-      (incomingByTarget.get(nodeId) ?? []).forEach((edge) => {
-        edgeIds.add(edge.id);
-        nodeIds.add(edge.sourceId);
-        pending.push(edge.sourceId);
-      });
-    }
-  }
-
-  return { edgeIds, nodeIds };
+  return { edgeIds, nodeIds, membershipIds };
 }
 
 export function useOrgGraphInteraction({
@@ -203,9 +196,10 @@ export function useOrgGraphInteraction({
   const validInitialSelectedNodeId = initialSelectedNodeId && nodeById.has(initialSelectedNodeId)
     ? initialSelectedNodeId
     : null;
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(
-    validInitialSelectedNodeId,
-  );
+  const [selection, setSelection] = useState<{ nodeId: string | null; personId: string | null }>({
+    nodeId: validInitialSelectedNodeId, personId: null,
+  });
+  const selectedNodeId = selection.nodeId;
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [keyboardNodeId, setKeyboardNodeId] = useState<string | null>(
     validInitialSelectedNodeId ?? fallbackNodeId,
@@ -221,6 +215,10 @@ export function useOrgGraphInteraction({
     ? selectedNodeCandidate
     : null;
   const activeSelectedNodeId = selectedNode?.id ?? null;
+  const activeSelectedPersonId = selection.personId && graph.people[selection.personId] && selectedNode
+    && (selectedNode.personIds.includes(selection.personId)
+      || selectedNode.responsibilities.some((item) => item.personId === selection.personId))
+    ? selection.personId : null;
   const hoveredNodeCandidate = hoveredNodeId ? nodeById.get(hoveredNodeId) ?? null : null;
   const activeHoveredNodeId = hoveredNodeCandidate && matchesFilter(hoveredNodeCandidate, filter)
     ? hoveredNodeCandidate.id
@@ -229,8 +227,8 @@ export function useOrgGraphInteraction({
   const relationshipContext = useMemo(() => collectRelationshipContext(
     graph,
     activeSelectedNodeId ?? activeHoveredNodeId,
-    activeSelectedNodeId !== null,
-  ), [activeHoveredNodeId, activeSelectedNodeId, graph]);
+    activeSelectedPersonId,
+  ), [activeHoveredNodeId, activeSelectedNodeId, activeSelectedPersonId, graph]);
 
   const searchResults = useMemo<OrgSearchResult[]>(() => {
     if (normalizedQuery.length < 2) return [];
@@ -265,7 +263,7 @@ export function useOrgGraphInteraction({
         matched,
         muted: filtered || (hasSearch && !matched) || (hasRelationshipFocus && !related),
         related,
-        selected: activeSelectedNodeId === node.id,
+        selected: Boolean(activeSelectedNodeId && relationshipContext.membershipIds.has(node.id)),
       }];
     }));
   }, [
@@ -275,16 +273,24 @@ export function useOrgGraphInteraction({
     matchIds,
     normalizedQuery.length,
     relationshipContext.nodeIds,
+    relationshipContext.membershipIds,
     renderableNodes,
   ]);
 
-  const selectNode = useCallback((nodeId: string | null) => {
+  const selectNode = useCallback((nodeId: string | null, personId?: string | null) => {
     const candidate = nodeId ? nodeById.get(nodeId) ?? null : null;
     const node = candidate && matchesFilter(candidate, filter) ? candidate : null;
-    setSelectedNodeId(node?.id ?? null);
+    const individualNode = node && node.personIds.length === 1
+      && node.type !== 'ccp' && node.type !== 'central-commission';
+    const requestedPerson = personId === undefined && individualNode ? node.personIds[0] : personId;
+    const validPerson = requestedPerson && node && graph.people[requestedPerson]
+      && (node.personIds.includes(requestedPerson)
+        || node.responsibilities.some((item) => item.personId === requestedPerson))
+      ? requestedPerson : null;
+    setSelection({ nodeId: node?.id ?? null, personId: validPerson });
     if (node) setKeyboardNodeId(node.id);
     onSelectedNodeChange?.(node);
-  }, [filter, nodeById, onSelectedNodeChange]);
+  }, [filter, graph.people, nodeById, onSelectedNodeChange]);
 
   const clearSelection = useCallback(() => {
     setHoveredNodeId(null);
@@ -294,7 +300,7 @@ export function useOrgGraphInteraction({
   useEffect(() => {
     const selectedCandidate = selectedNodeId ? nodeById.get(selectedNodeId) ?? null : null;
     if (selectedNodeId && (!selectedCandidate || !matchesFilter(selectedCandidate, filter))) {
-      setSelectedNodeId(null);
+      setSelection({ nodeId: null, personId: null });
       onSelectedNodeChange?.(null);
     }
     const hoveredCandidate = hoveredNodeId ? nodeById.get(hoveredNodeId) ?? null : null;
@@ -326,6 +332,7 @@ export function useOrgGraphInteraction({
     selectNode,
     selectedNode,
     selectedNodeId: activeSelectedNodeId,
+    selectedPersonId: activeSelectedPersonId,
     setFilter,
     setHoveredNodeId,
     setKeyboardNodeId,

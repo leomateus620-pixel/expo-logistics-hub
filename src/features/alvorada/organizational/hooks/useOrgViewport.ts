@@ -17,7 +17,7 @@ export interface OrgViewportCamera {
   scale: number;
 }
 
-interface ViewportSize {
+export interface ViewportSize {
   width: number;
   height: number;
 }
@@ -39,15 +39,17 @@ interface GestureSnapshot {
 
 export interface UseOrgViewportOptions {
   bounds: OrgLayoutBounds;
-  initialFocusPoint?: OrgLayoutPoint | null;
+  resizeFocusPoint?: OrgLayoutPoint | null;
   onBackgroundPress?: () => void;
+  onViewportSizeChange?: (size: ViewportSize) => void;
+  detailOpen?: boolean;
 }
 
 export interface OrgViewportController {
   camera: OrgViewportCamera;
   cameraStyle: CSSProperties;
   fit: () => void;
-  focusPoint: (point: OrgLayoutPoint, preferredScale?: number) => void;
+  focusPoint: (point: OrgLayoutPoint, preferredScale?: number, withPanel?: boolean) => void;
   isAnimating: boolean;
   isInteracting: boolean;
   onPointerCancel: (event: ReactPointerEvent<HTMLDivElement>) => void;
@@ -82,44 +84,32 @@ function pointerCenter(a: PointerSnapshot, b: PointerSnapshot): PointerSnapshot 
   };
 }
 
-function cameraForBounds(bounds: OrgLayoutBounds, size: ViewportSize): OrgViewportCamera {
-  const isCompact = size.width <= 720;
-  const horizontalPadding = isCompact ? 20 : 64;
-  const topPadding = isCompact ? 166 : 142;
-  const bottomPadding = isCompact ? 62 : 50;
-  const usableWidth = Math.max(1, size.width - horizontalPadding * 2);
-  const usableHeight = Math.max(1, size.height - topPadding - bottomPadding);
-  const scale = clamp(
-    Math.min(usableWidth / Math.max(1, bounds.width), usableHeight / Math.max(1, bounds.height)),
-    MIN_SCALE,
-    MAX_SCALE,
-  );
-
+export function viewportInsets(size: ViewportSize, detailOpen = false) {
+  const compact = size.width <= 720;
+  const landscape = size.width > 720 && size.width <= 960 && size.height <= 520;
   return {
-    x: (size.width - bounds.width * scale) / 2 - bounds.x * scale,
-    y: topPadding + (usableHeight - bounds.height * scale) / 2 - bounds.y * scale,
-    scale,
+    left: compact ? 12 : 24,
+    right: compact ? 12 : detailOpen ? landscape ? 316 : 388 : 24,
+    top: compact ? 202 : landscape ? 112 : 168,
+    bottom: compact ? (detailOpen ? Math.min(size.height * 0.4, 360) + 74 : 76) : landscape ? 60 : 72,
   };
 }
 
-function cameraForInitialFocus(
-  bounds: OrgLayoutBounds,
-  size: ViewportSize,
-  focusPoint: OrgLayoutPoint | null | undefined,
-): OrgViewportCamera {
-  const fitted = cameraForBounds(bounds, size);
-  if (!focusPoint) return fitted;
-
+export function cameraForBounds(bounds: OrgLayoutBounds, size: ViewportSize): OrgViewportCamera {
+  const insets = viewportInsets(size);
   const compact = size.width <= 720;
-  const minimumNarrativeScale = compact ? 0.54 : size.width <= 1600 ? 0.56 : 0.6;
-  const scale = clamp(Math.max(fitted.scale, minimumNarrativeScale), MIN_SCALE, 0.78);
-  const focusY = compact
-    ? clamp(size.height * 0.29, 235, 285)
-    : clamp(size.height * 0.26, 230, 280);
-
+  const usableWidth = Math.max(1, size.width - insets.left - insets.right);
+  const usableHeight = Math.max(1, size.height - insets.top - insets.bottom);
+  // A mobile organization is a readable vertical map. Fitting every row into
+  // one screen would make its people and touch targets unusably small.
+  const scale = clamp(
+    Math.min(usableWidth / Math.max(1, bounds.width), usableHeight / Math.max(1, bounds.height)),
+    compact ? 0.78 : size.width <= 960 && size.height <= 520 ? 0.68 : MIN_SCALE,
+    MAX_SCALE,
+  );
   return {
-    x: size.width / 2 - focusPoint.x * scale,
-    y: focusY - focusPoint.y * scale,
+    x: insets.left + (usableWidth - bounds.width * scale) / 2 - bounds.x * scale,
+    y: insets.top + Math.max(0, (usableHeight - bounds.height * scale) / 2) - bounds.y * scale,
     scale,
   };
 }
@@ -188,8 +178,10 @@ function cameraFromRenderedTransform(
 
 export function useOrgViewport({
   bounds,
-  initialFocusPoint,
   onBackgroundPress,
+  onViewportSizeChange,
+  detailOpen = false,
+  resizeFocusPoint,
 }: UseOrgViewportOptions): OrgViewportController {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [camera, setCamera] = useState<OrgViewportCamera>({ x: 0, y: 0, scale: 1 });
@@ -204,6 +196,17 @@ export function useOrgViewport({
   const cameraFrame = useRef<number | null>(null);
   const clickSuppressionFrame = useRef<number | null>(null);
   const pendingCamera = useRef<OrgViewportCamera | null>(null);
+  const boundsRef = useRef(bounds);
+  boundsRef.current = bounds;
+  const sizeChangeRef = useRef(onViewportSizeChange);
+  sizeChangeRef.current = onViewportSizeChange;
+  const initialized = useRef(false);
+  const committedSize = useRef<ViewportSize>({ width: 0, height: 0 });
+  const lastCameraPublish = useRef(0);
+  const resizeFocusRef = useRef(resizeFocusPoint);
+  resizeFocusRef.current = resizeFocusPoint;
+  const detailOpenRef = useRef(detailOpen);
+  detailOpenRef.current = detailOpen;
 
   const commitCamera = useCallback((next: OrgViewportCamera) => {
     cameraRef.current = next;
@@ -217,9 +220,19 @@ export function useOrgViewport({
       cameraFrame.current = null;
       const queued = pendingCamera.current;
       pendingCamera.current = null;
-      if (queued) commitCamera(queued);
+      if (queued) {
+        cameraRef.current = queued;
+        const world = viewportRef.current?.querySelector<HTMLElement>('.org-viewport__world');
+        if (world) world.style.transform = `translate3d(${queued.x}px, ${queued.y}px, 0) scale(${queued.scale})`;
+        // Gesture frames only update the compositor transform. React publishes
+        // zoom labels at 10 Hz, then receives the exact final camera on release.
+        if (performance.now() - lastCameraPublish.current >= 100) {
+          lastCameraPublish.current = performance.now();
+          setCamera(queued);
+        }
+      }
     });
-  }, [commitCamera]);
+  }, []);
 
   const stopAnimation = useCallback(() => {
     if (animationActive.current) {
@@ -255,22 +268,19 @@ export function useOrgViewport({
     animateCamera(cameraForBounds(bounds, size));
   }, [animateCamera, bounds]);
 
-  const focusPoint = useCallback((point: OrgLayoutPoint, preferredScale?: number) => {
+  const focusPoint = useCallback((point: OrgLayoutPoint, preferredScale?: number, withPanel = detailOpen) => {
     const size = sizeRef.current;
     if (size.width <= 0 || size.height <= 0) return;
-    const compact = size.width <= 720;
-    const targetScale = clamp(
-      preferredScale ?? Math.max(cameraRef.current.scale, compact ? 0.78 : 0.88),
-      MIN_SCALE,
-      MAX_SCALE,
-    );
-    const verticalOffset = compact ? Math.min(90, size.height * 0.1) : 0;
+    const targetScale = clamp(preferredScale ?? cameraRef.current.scale, MIN_SCALE, MAX_SCALE);
+    const insets = viewportInsets(size, withPanel);
+    const usableWidth = Math.max(1, size.width - insets.left - insets.right);
+    const usableHeight = Math.max(1, size.height - insets.top - insets.bottom);
     animateCamera({
-      x: size.width / 2 - point.x * targetScale,
-      y: size.height / 2 - point.y * targetScale - verticalOffset,
+      x: insets.left + usableWidth / 2 - point.x * targetScale,
+      y: insets.top + usableHeight / 2 - point.y * targetScale - 20 * targetScale,
       scale: targetScale,
     });
-  }, [animateCamera]);
+  }, [animateCamera, detailOpen]);
 
   const zoomAt = useCallback((factor: number, clientX: number, clientY: number) => {
     const element = viewportRef.current;
@@ -399,14 +409,15 @@ export function useOrgViewport({
         MIN_SCALE,
         MAX_SCALE,
       );
-      const worldX = (initialCenter.x - initialCamera.x) / initialCamera.scale;
-      const worldY = (initialCenter.y - initialCamera.y) / initialCamera.scale;
+      const rect = event.currentTarget.getBoundingClientRect();
+      const worldX = (initialCenter.x - rect.left - initialCamera.x) / initialCamera.scale;
+      const worldY = (initialCenter.y - rect.top - initialCamera.y) / initialCamera.scale;
       pointers.current.forEach((_, pointerId) => capturePointer(event.currentTarget, pointerId));
       markGestureMoved();
       event.preventDefault();
       queueCamera({
-        x: currentCenter.x - worldX * nextScale,
-        y: currentCenter.y - worldY * nextScale,
+        x: currentCenter.x - rect.left - worldX * nextScale,
+        y: currentCenter.y - rect.top - worldY * nextScale,
         scale: nextScale,
       });
     }
@@ -426,12 +437,18 @@ export function useOrgViewport({
     }
 
     gesture.current = null;
+    if (cameraFrame.current !== null) {
+      window.cancelAnimationFrame(cameraFrame.current);
+      cameraFrame.current = null;
+    }
+    commitCamera(pendingCamera.current ?? cameraRef.current);
+    pendingCamera.current = null;
     setIsInteracting(false);
     if (wasMoved) scheduleClickSuppressionClear();
     if (!cancelled && wasSinglePointer && !wasMoved && !startedOnInteractive) {
       onBackgroundPress?.();
     }
-  }, [beginGesture, onBackgroundPress, scheduleClickSuppressionClear]);
+  }, [beginGesture, commitCamera, onBackgroundPress, scheduleClickSuppressionClear]);
 
   const onPointerUp = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
     finishPointer(event, false);
@@ -445,25 +462,35 @@ export function useOrgViewport({
     const element = viewportRef.current;
     if (!element) return undefined;
     let resizeFrame: number | null = null;
-    let initialized = false;
-    let committedSize: ViewportSize = { width: 0, height: 0 };
     const observer = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect;
       if (width <= 0 || height <= 0) return;
       const nextSize = { width, height };
       sizeRef.current = nextSize;
+      sizeChangeRef.current?.(nextSize);
       if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
       resizeFrame = window.requestAnimationFrame(() => {
         resizeFrame = null;
-        const previousSize = committedSize;
-        if (!initialized || previousSize.width <= 0 || previousSize.height <= 0) {
-          initialized = true;
-          commitCamera(cameraForInitialFocus(bounds, nextSize, initialFocusPoint));
-          committedSize = nextSize;
+        const previousSize = committedSize.current;
+        if (!initialized.current || previousSize.width <= 0 || previousSize.height <= 0) {
+          initialized.current = true;
+          commitCamera(cameraForBounds(boundsRef.current, nextSize));
+          committedSize.current = nextSize;
           return;
         }
 
         const current = cameraRef.current;
+        const resizeFocus = resizeFocusRef.current;
+        if (detailOpenRef.current && resizeFocus) {
+          const insets = viewportInsets(nextSize, true);
+          commitCamera({
+            x: insets.left + Math.max(1, nextSize.width - insets.left - insets.right) / 2 - resizeFocus.x * current.scale,
+            y: insets.top + Math.max(1, nextSize.height - insets.top - insets.bottom) / 2 - (resizeFocus.y + 20) * current.scale,
+            scale: current.scale,
+          });
+          committedSize.current = nextSize;
+          return;
+        }
         const worldCenterX = (previousSize.width / 2 - current.x) / current.scale;
         const worldCenterY = (previousSize.height / 2 - current.y) / current.scale;
         commitCamera({
@@ -471,7 +498,7 @@ export function useOrgViewport({
           y: nextSize.height / 2 - worldCenterY * current.scale,
           scale: current.scale,
         });
-        committedSize = nextSize;
+        committedSize.current = nextSize;
       });
     });
     observer.observe(element);
@@ -479,7 +506,7 @@ export function useOrgViewport({
       observer.disconnect();
       if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
     };
-  }, [bounds, commitCamera, initialFocusPoint]);
+  }, [commitCamera]);
 
   useEffect(() => () => {
     if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);

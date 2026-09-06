@@ -3425,9 +3425,10 @@ input::placeholder, textarea::placeholder {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  /* The explicitly launched Alvorada retains its authored journey. */
+  *:not(.alvorada-overlay, .alvorada-overlay *),
+  *:not(.alvorada-overlay, .alvorada-overlay *)::before,
+  *:not(.alvorada-overlay, .alvorada-overlay *)::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

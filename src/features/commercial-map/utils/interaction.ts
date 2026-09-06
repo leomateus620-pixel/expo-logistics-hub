@@ -136,7 +136,8 @@ export function isCameraNavigationMovement(cameraDelta: number, targetDelta: num
   return Math.max(cameraDelta, targetDelta) >= CAMERA_NAVIGATION_MIN_DELTA;
 }
 
-export function resolveCameraTransitionDuration(travelDistance: number) {
+export function resolveCameraTransitionDuration(travelDistance: number, reducedMotion = false) {
+  if (reducedMotion) return 120;
   const safeTravel = Number.isFinite(travelDistance) ? Math.max(0, travelDistance) : 0;
   return Math.min(
     CAMERA_TRANSITION_MAX_DURATION_MS,

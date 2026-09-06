@@ -1,5 +1,4 @@
 import {
-  Suspense,
   useEffect,
   useMemo,
   useRef,
@@ -42,11 +41,34 @@ function MasterTimeline({
   'initialElapsed' | 'onProgress' | 'onReady'
 >) {
   const timeline = useAlvoradaTimeline();
-  const { gl } = useThree();
+  const { gl, scene, camera } = useThree();
   const startedAt = useRef<number | null>(null);
   const hiddenAt = useRef<number | null>(null);
   const hiddenDuration = useRef(0);
   const ready = useRef(false);
+  const shadersReady = useRef(false);
+  const presentedFrames = useRef(0);
+
+  useEffect(() => {
+    let active = true;
+    const compileStarted = performance.now();
+    gl.domElement.dataset.preparation = 'shaders';
+    // All scene materials, including the next phase, are compiled before the clock starts.
+    // KHR_parallel_shader_compile allows the browser to keep the launcher responsive.
+    void gl.compileAsync(scene, camera).then(() => {
+      if (!active) return;
+      gl.domElement.dataset.shaderPreparationMs = (performance.now() - compileStarted).toFixed(1);
+      gl.domElement.dataset.preparation = 'ready';
+      shadersReady.current = true;
+    }).catch(() => {
+      // Direct rendering remains the recovery path on drivers without async compilation.
+      if (active) {
+        gl.domElement.dataset.preparation = 'direct-render';
+        shadersReady.current = true;
+      }
+    });
+    return () => { active = false; };
+  }, [camera, gl, scene]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -65,6 +87,9 @@ function MasterTimeline({
   }, []);
 
   useFrame(() => {
+    if (!shadersReady.current || document.hidden) return;
+    presentedFrames.current += 1;
+    if (presentedFrames.current < 2) return;
     const now = performance.now();
     if (startedAt.current === null) startedAt.current = now;
     const activeRuntime = Math.max(
@@ -80,6 +105,8 @@ function MasterTimeline({
 
     if (!ready.current) {
       ready.current = true;
+      const createdAt = Number(gl.domElement.dataset.createdAt ?? now);
+      gl.domElement.dataset.firstFrameMs = (now - createdAt).toFixed(1);
       onReady();
     }
 
@@ -105,16 +132,23 @@ function MasterTimeline({
 
 function EarthResidency({
   setEarthResident,
+  setTransitionResident,
 }: {
   setEarthResident: Dispatch<SetStateAction<boolean>>;
+  setTransitionResident: Dispatch<SetStateAction<boolean>>;
 }) {
   const timeline = useAlvoradaTimeline();
   const resident = useRef(deriveAlvoradaVisualState(timeline.current.elapsed).earthResident);
+  const transitionResident = useRef(timeline.current.elapsed < 6.35);
 
   useFrame(() => {
     const earthResident = deriveAlvoradaVisualState(timeline.current.elapsed).earthResident;
     if (earthResident !== resident.current) setEarthResident(earthResident);
     resident.current = earthResident;
+    if (transitionResident.current && timeline.current.elapsed >= 6.35) {
+      transitionResident.current = false;
+      setTransitionResident(false);
+    }
   });
 
   return null;
@@ -141,26 +175,17 @@ function SceneAtmosphere() {
   useFrame(() => {
     const elapsed = timeline.current.elapsed;
     const visualState = deriveAlvoradaVisualState(elapsed);
-    const atmosphericWarmth = smoothRange(
-      elapsed,
-      ALVORADA_PHASES.territory.start,
-      ALVORADA_PHASES['brand-reveal'].end,
-    );
-    fog.color.setRGB(
-      THREE.MathUtils.lerp(0.38, 0.52, atmosphericWarmth),
-      THREE.MathUtils.lerp(0.48, 0.63, atmosphericWarmth),
-      THREE.MathUtils.lerp(0.62, 0.76, atmosphericWarmth),
-    );
-    fog.density = visualState.transitionOpacity * 0.0048;
+    fog.color.set('#193651');
+    fog.density = visualState.transitionOpacity * 0.001;
 
     const orbitalExposure = THREE.MathUtils.lerp(
-      0.68,
-      0.77,
+      0.94,
+      0.94,
       smoothRange(elapsed, 0.5, ALVORADA_PHASES.territory.end - 0.5),
     );
     const dawnExposure = THREE.MathUtils.lerp(
-      0.78,
-      0.96,
+      0.9,
+      0.88,
       smoothRange(
         elapsed,
         ALVORADA_PHASES['santa-rosa'].start,
@@ -193,6 +218,7 @@ export function SceneController({
   const [earthResident, setEarthResident] = useState(
     deriveAlvoradaVisualState(initialElapsed).earthResident,
   );
+  const [transitionResident, setTransitionResident] = useState(initialElapsed < 6.35);
 
   return (
     <AlvoradaTimelineContext.Provider value={timeline}>
@@ -201,16 +227,12 @@ export function SceneController({
         onProgress={onProgress}
         onReady={onReady}
       />
-      <EarthResidency setEarthResident={setEarthResident} />
+      <EarthResidency setEarthResident={setEarthResident} setTransitionResident={setTransitionResident} />
       <SceneAtmosphere />
       <CinematicCamera quality={quality} />
-      {earthResident && (
-        <Suspense fallback={null}>
-          <EarthScene quality={quality} />
-        </Suspense>
-      )}
+      {earthResident && <EarthScene quality={quality} />}
       <DawnEnvironment quality={quality} />
-      <TransitionCloudLayer />
+      {transitionResident && <TransitionCloudLayer quality={quality} />}
     </AlvoradaTimelineContext.Provider>
   );
 }

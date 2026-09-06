@@ -126,7 +126,7 @@ describe('controles do modo Rede Hidrológica', () => {
     expect(useCommercialMapStore.getState().selectedHydrologicalElementId).toBeNull();
   });
 
-  it('marca o shell dedicado e substitui a legenda comercial somente durante o modo hídrico', () => {
+  it('mantém a legenda contextual na Dock e mostra a legenda técnica somente no modo hídrico', () => {
     const page = readFileSync(
       resolve('src/features/commercial-map/CommercialMapPage.tsx'),
       'utf8',
@@ -134,7 +134,14 @@ describe('controles do modo Rede Hidrológica', () => {
 
     expect(page).toContain("hydrologicalModeActive ? 'is-hydrological-mode' : ''");
     expect(page).toMatch(
-      /\{hydrologicalModeActive\s*\? <HydrologicalNetworkLegend \/>\s*: <StatusLegend scope=\{areaScope\} \/>\}/,
+      /\{hydrologicalModeActive\s*\? <HydrologicalNetworkLegend \/>\s*: null\}/,
     );
+    expect(page).toContain('<CommercialMapDock');
+    expect(page).toContain('interiorEntity={interiorEntity}');
+    expect(page).not.toContain('<StatusLegend');
+    const dock = readFileSync(resolve('src/features/commercial-map/components/dock/CommercialMapDock.tsx'), 'utf8');
+    expect(dock).toContain('<ContextualMapLegend');
+    expect(dock).toContain('matchingEntityIds={matchingEntityIds}');
+    expect(dock).toContain('filtersActive={filtersActive}');
   });
 });

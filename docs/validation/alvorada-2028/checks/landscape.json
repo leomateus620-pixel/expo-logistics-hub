@@ -1,0 +1,21 @@
+{
+  "viewport": {
+    "width": 844,
+    "height": 390
+  },
+  "mobileEmulation": true,
+  "checks": [
+    "person has exclusively one incident edge",
+    "selected person stays visible outside panel",
+    "successive search never restores other edges",
+    "clear restores complete graph",
+    "collective has only its immediate links",
+    "member does not inherit collective outgoing links",
+    "zoom controls respond",
+    "filter excludes nodes from interaction and focus",
+    "native Chromium emulated touch pan and pinch",
+    "essential controls have 44px touch targets",
+    "authored movement survives reduced-motion preference"
+  ],
+  "errors": []
+}

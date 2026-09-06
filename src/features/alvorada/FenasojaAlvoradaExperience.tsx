@@ -11,6 +11,7 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { AlvoradaCanvas } from './AlvoradaCanvas';
 import { AlvoradaBrandHero } from './AlvoradaBrandHero';
+import { HarvestBackdrop } from './HarvestBackdrop';
 import {
   degradeAlvoradaQualityProfile,
   getAlvoradaQualityProfile,
@@ -29,6 +30,7 @@ import type {
   AlvoradaFallbackReason,
   AlvoradaRendererState,
 } from './types';
+import type { OrganizationalEcosystemDataResult } from './organizational/types';
 import './alvorada.css';
 
 interface FenasojaAlvoradaExperienceProps {
@@ -192,7 +194,7 @@ const PHASE_ANNOUNCEMENTS: Record<AlvoradaPhase, string> = {
   territory: 'A jornada percorre o território do Rio Grande do Sul.',
   'santa-rosa': 'Santa Rosa é localizada como origem da FENASOJA 2028.',
   'brand-reveal': 'A marca oficial FENASOJA 2028 é revelada.',
-  'brand-hold': 'FENASOJA 2028, edição de Santa Rosa.',
+  'brand-hold': 'FENASOJA 2028. Pessoas, trabalho e futuro.',
   'org-transition': 'A marca se transforma no ecossistema organizacional.',
   'org-ready': 'Ecossistema organizacional interativo disponível.',
 };
@@ -206,8 +208,7 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
-export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvoradaExperienceProps) {
-  const organizationalData = useOrganizationalEcosystemData();
+export function FenasojaAlvoradaExperienceView({ onComplete, organizationalData }: FenasojaAlvoradaExperienceProps & { organizationalData: OrganizationalEcosystemDataResult }) {
   const [rendererTier] = useState(getAlvoradaWebGLTier);
   const [quality, setQuality] = useState(() => getAlvoradaQualityProfile(rendererTier));
   const [rendererState, setRendererState] = useState<AlvoradaRendererState>(
@@ -219,6 +220,12 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
   const [canvasAttempt, setCanvasAttempt] = useState(0);
   const [initialElapsed, setInitialElapsed] = useState(0);
   const [phase, setPhase] = useState<AlvoradaPhase>('dawn');
+  const [harvestCovered, setHarvestCovered] = useState(false);
+  const handleHarvestCovered = useCallback(() => setHarvestCovered(true), []);
+  // Once the harvest fade actually covers WebGL, continue
+  // the same visible-time phase clock without rendering an obscured canvas.
+  const webglReleased = phase === 'org-ready' || (harvestCovered
+    && (phase === 'brand-hold' || phase === 'org-transition'));
   const [lateOrgTransitionActive, setLateOrgTransitionActive] = useState(false);
   const [ready, setReady] = useState(rendererTier === 'unavailable');
   const [leaving, setLeaving] = useState(false);
@@ -375,7 +382,7 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
   ]);
 
   useEffect(() => {
-    if (rendererState !== 'fallback' || phase === 'org-ready' || exitStarted.current) {
+    if ((rendererState !== 'fallback' && !webglReleased) || phase === 'org-ready' || exitStarted.current) {
       clearTimer('fallback-progress');
       return;
     }
@@ -390,7 +397,7 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
     );
 
     return () => clearTimer('fallback-progress');
-  }, [armTimer, clearTimer, commitElapsed, phase, rendererState]);
+  }, [armTimer, clearTimer, commitElapsed, phase, rendererState, webglReleased]);
 
   useEffect(() => {
     const focusFrame = window.requestAnimationFrame(() => closeButton.current?.focus({
@@ -464,7 +471,6 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
     : graphPhase && organizationalData.isLoading
       ? 'brand-hold'
       : phase;
-  const webglReleased = phase === 'org-ready';
   const fallback = <AlvoradaFallback />;
   const recoveryFallback = <AlvoradaFallback recovering />;
   const shouldRenderWebGL = rendererTier !== 'unavailable'
@@ -477,8 +483,12 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
       : rendererState;
 
   useEffect(() => {
-    if (webglReleased) clearRuntimeTimers();
-  }, [clearRuntimeTimers, webglReleased]);
+    if (!webglReleased) return;
+    clearTimer('recovery-delay');
+    clearTimer('recovery-timeout');
+    if (recoveryFrame.current !== null) window.cancelAnimationFrame(recoveryFrame.current);
+    recoveryFrame.current = null;
+  }, [clearTimer, webglReleased]);
 
   useEffect(() => {
     if (phase !== 'org-ready' || exitStarted.current) return;
@@ -537,6 +547,8 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
         ) : rendererState === 'recovering' ? recoveryFallback : fallback}
       </div>
 
+      {ready && displayPhase !== 'org-ready' && <HarvestBackdrop stage={displayPhase} onCovered={handleHarvestCovered} />}
+
       <AlvoradaBrandHero
         dataPending={organizationalData.isLoading}
         stage={displayPhase}
@@ -575,4 +587,9 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
     </section>,
     document.body,
   );
+}
+
+export default function FenasojaAlvoradaExperience(props: FenasojaAlvoradaExperienceProps) {
+  const organizationalData = useOrganizationalEcosystemData();
+  return <FenasojaAlvoradaExperienceView {...props} organizationalData={organizationalData} />;
 }

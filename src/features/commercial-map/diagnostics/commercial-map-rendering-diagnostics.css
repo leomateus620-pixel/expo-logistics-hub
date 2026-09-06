@@ -56,6 +56,11 @@
 .commercial-map-rendering-diagnostics__stress[data-stress-status="passed"] { color: #126338; }
 
 .commercial-map-rendering-diagnostics__viewport { min-height: 0; }
+.commercial-map-rendering-diagnostics.is-district-qa > .commercial-map-rendering-diagnostics__toolbar,
+.commercial-map-rendering-diagnostics.is-district-qa .commercial-map-rendering-diagnostics__stress > :not(.commercial-map-district-qa),
+.commercial-map-rendering-diagnostics.is-district-qa .commercial-map-rendering-diagnostics__metrics { display: none; }
+.commercial-map-district-qa output { display: block; height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.commercial-map-district-qa button[aria-pressed="true"] { background: #dcefe7; }
 .commercial-map-rendering-diagnostics__metrics {
   position: absolute;
   z-index: 25;

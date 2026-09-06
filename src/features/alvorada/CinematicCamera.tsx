@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { AlvoradaQualityProfile } from './capabilities';
-import { latitudeLongitudeToVector3, SANTA_ROSA_COORDINATES, tangentAt } from './geo';
 import { useAlvoradaTimeline } from './TimelineContext';
 import { ALVORADA_PHASES, smoothRange } from './timeline';
+import { sampleOrbitalCamera, SANTA_ROSA_ATMOSPHERIC_HANDOFF } from './orbitalCamera';
 
 interface CinematicCameraProps {
   quality: AlvoradaQualityProfile;
@@ -14,66 +14,19 @@ function cinematicCurve(points: THREE.Vector3[]) {
   return new THREE.CatmullRomCurve3(points, false, 'catmullrom', 0.52);
 }
 
-const SANTA_ROSA_ATMOSPHERIC_CUT = 5.15;
+const SANTA_ROSA_ATMOSPHERIC_CUT = SANTA_ROSA_ATMOSPHERIC_HANDOFF;
 
 /**
  * The authored camera preserves the Brazil -> Rio Grande do Sul -> Santa Rosa
- * travel and then cuts, behind the cloud corridor, directly to the dawn brand
- * frame. There is intentionally no local city-flight path.
+ * travel and changes coordinate frames inside the opaque atmospheric corridor.
+ * It then approaches the dawn brand
+ * frame without stretching the global map into fictitious local detail.
  */
 export function CinematicCamera({ quality }: CinematicCameraProps) {
   const timeline = useAlvoradaTimeline();
   const { camera } = useThree();
   const paths = useMemo(() => {
-    const brazil = latitudeLongitudeToVector3(-13.8, -51.8, 1).normalize();
-    const rioGrandeDoSul = latitudeLongitudeToVector3(-30.05, -53.1, 1).normalize();
-    const santaRosa = latitudeLongitudeToVector3(
-      SANTA_ROSA_COORDINATES.latitude,
-      SANTA_ROSA_COORDINATES.longitude,
-      1,
-    ).normalize();
-    const brazilTangent = tangentAt(brazil);
-    const stateTangent = tangentAt(rioGrandeDoSul);
-
-    const brazilEnd = rioGrandeDoSul.clone().multiplyScalar(7.78)
-      .addScaledVector(stateTangent, 0.46)
-      .add(new THREE.Vector3(0, 0.24, 0));
-    const stateEnd = santaRosa.clone().multiplyScalar(4.34)
-      .addScaledVector(stateTangent, 0.035);
-
     return {
-      dawnPosition: cinematicCurve([
-        brazil.clone().multiplyScalar(11.8).addScaledVector(brazilTangent, 2.25).add(new THREE.Vector3(0, 1.12, 0)),
-        brazil.clone().multiplyScalar(9.75).addScaledVector(brazilTangent, 1.18).add(new THREE.Vector3(0, 0.62, 0)),
-        brazil.clone().multiplyScalar(8.55).addScaledVector(brazilTangent, 0.52),
-        brazilEnd,
-      ]),
-      dawnLook: cinematicCurve([
-        brazil.clone().multiplyScalar(0.72),
-        brazil.clone().multiplyScalar(1.52),
-        rioGrandeDoSul.clone().multiplyScalar(2.42),
-      ]),
-      territoryPosition: cinematicCurve([
-        brazilEnd,
-        rioGrandeDoSul.clone().multiplyScalar(6.68).addScaledVector(stateTangent, 0.24),
-        santaRosa.clone().multiplyScalar(5.46).addScaledVector(stateTangent, 0.11),
-        stateEnd,
-      ]),
-      territoryLook: cinematicCurve([
-        rioGrandeDoSul.clone().multiplyScalar(2.42),
-        rioGrandeDoSul.clone().multiplyScalar(3.22),
-        santaRosa.clone().multiplyScalar(3.98),
-      ]),
-      santaRosaPosition: cinematicCurve([
-        stateEnd,
-        santaRosa.clone().multiplyScalar(4.30).addScaledVector(stateTangent, 0.022),
-        santaRosa.clone().multiplyScalar(4.26).addScaledVector(stateTangent, 0.01),
-      ]),
-      santaRosaLook: cinematicCurve([
-        santaRosa.clone().multiplyScalar(3.98),
-        santaRosa.clone().multiplyScalar(4.005),
-        santaRosa.clone().multiplyScalar(4.02),
-      ]),
       brandApproachPosition: cinematicCurve([
         new THREE.Vector3(7.5, 34, 52),
         new THREE.Vector3(5.2, 25, 40),
@@ -115,36 +68,9 @@ export function CinematicCamera({ quality }: CinematicCameraProps) {
     let bank = 0;
     let fov = quality.mobile ? 48 : 44;
 
-    if (elapsed < ALVORADA_PHASES.dawn.end) {
-      const progress = smoothRange(
-        elapsed,
-        ALVORADA_PHASES.dawn.start,
-        ALVORADA_PHASES.dawn.end,
-      );
-      paths.dawnPosition.getPointAt(progress, position);
-      paths.dawnLook.getPointAt(progress, lookAt);
-      fov = THREE.MathUtils.lerp(quality.mobile ? 52 : 46, quality.mobile ? 46 : 39, progress);
-      bank = Math.sin(progress * Math.PI) * -0.022;
-    } else if (elapsed < ALVORADA_PHASES.territory.end) {
-      const progress = smoothRange(
-        elapsed,
-        ALVORADA_PHASES.territory.start,
-        ALVORADA_PHASES.territory.end,
-      );
-      paths.territoryPosition.getPointAt(progress, position);
-      paths.territoryLook.getPointAt(progress, lookAt);
-      fov = THREE.MathUtils.lerp(quality.mobile ? 46 : 39, quality.mobile ? 50 : 46, progress);
-      bank = Math.sin(progress * Math.PI) * 0.014;
-    } else if (elapsed < SANTA_ROSA_ATMOSPHERIC_CUT) {
-      const progress = smoothRange(
-        elapsed,
-        ALVORADA_PHASES['santa-rosa'].start,
-        SANTA_ROSA_ATMOSPHERIC_CUT,
-      );
-      paths.santaRosaPosition.getPointAt(progress, position);
-      paths.santaRosaLook.getPointAt(progress, lookAt);
-      fov = quality.mobile ? 50 : 46;
-      bank = Math.sin(progress * Math.PI) * 0.004;
+    if (elapsed < SANTA_ROSA_ATMOSPHERIC_CUT) {
+      fov = sampleOrbitalCamera(elapsed, quality.mobile, position, lookAt);
+      bank = Math.sin(smoothRange(elapsed, 0, SANTA_ROSA_ATMOSPHERIC_CUT) * Math.PI) * -0.008;
     } else if (elapsed < ALVORADA_PHASES['brand-reveal'].end) {
       const progress = smoothRange(
         elapsed,

@@ -1,5 +1,5 @@
-import { render, screen, within } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PavilionModuleCard } from '@/features/commercial-map/components/panels/PavilionModuleCard';
 import { OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS } from '@/features/commercial-map/data/officialReference2026';
 import { useCommercialMapStore } from '@/features/commercial-map/state/useCommercialMapStore';
@@ -52,6 +52,7 @@ const referenceLot = OFFICIAL_REFERENCE_LOTS.find((lot) => lot.entityId === refe
 
 describe('cartão operacional do módulo interno', () => {
   beforeEach(() => {
+    vi.stubGlobal('ResizeObserver', class { observe() {} unobserve() {} disconnect() {} });
     useCommercialMapStore.getState().setSelectedModuleId('B6:module:048');
     contractsQuery.isLoading = false;
     contractsQuery.isError = false;
@@ -209,5 +210,34 @@ describe('cartão operacional do módulo interno', () => {
     const actions = screen.getByLabelText('Operações comerciais do módulo');
     expect(within(actions).getByRole('button', { name: /Situação/i })).toBeInTheDocument();
     expect(within(actions).queryByRole('button', { name: /Reservar|Negociar|Vender/i })).not.toBeInTheDocument();
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('abre no dock com resumo, expande voluntariamente e descarta formulário ao selecionar outro módulo', () => {
+    const persistedEntity = { ...referenceEntity, id: '00000000-0000-0000-0000-000000000348' };
+    const persistedLot = {
+      ...referenceLot, id: '10000000-0000-0000-0000-000000000348',
+      entityId: persistedEntity.id, status: 'AVAILABLE' as const,
+    };
+    render(
+      <PavilionModuleCard embedded plan={COMMERCIAL_PAVILION_MODULE_PLANS.B6} pavilion={pavilion}
+        entities={[pavilion, persistedEntity]} lots={[persistedLot]} permissions={permissions} source="database" />,
+    );
+    const card = screen.getByRole('complementary');
+    expect(card).toHaveAttribute('data-sheet-state', 'half');
+    expect(within(card).getByText('Área não informada')).toBeVisible();
+    expect(within(card).queryByRole('button', { name: 'Editar' })).not.toBeInTheDocument();
+    expect(within(card).queryByRole('button', { name: 'Recolher detalhes do módulo' })).not.toBeInTheDocument();
+
+    fireEvent.click(within(card).getByRole('button', { name: 'Expandir detalhes do módulo' }));
+    fireEvent.click(within(card).getByRole('button', { name: 'Editar' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    act(() => useCommercialMapStore.getState().setSelectedModuleId('B6:module:049'));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('complementary')).toBe(card);
+    expect(card).toHaveAttribute('data-sheet-state', 'half');
+    expect(card).toHaveTextContent('Módulo 49');
+    expect(within(card).queryByRole('button', { name: 'Editar' })).not.toBeInTheDocument();
   });
 });
