@@ -54,6 +54,8 @@
 .fenasoja-history-viewer > button { width: 44px; height: 44px; }
 .fenasoja-history-viewer > h2 { padding-right: 40px; }
 @media (max-width: 950px) {
+  .commercial-map-details-panel[data-sheet-state="collapsed"] .commercial-map-commercial-view { min-width: 0; flex-direction: row; align-items: center; }
+  .commercial-map-details-panel[data-sheet-state="collapsed"] .commercial-map-history-trigger { display: none; }
   .fenasoja-history-sheet-controls { display: block; flex: 0 0 auto; }
   .fenasoja-history-sheet-controls .commercial-map-compact-sheet-controls { justify-content: flex-end; }
   .commercial-map-viewport .commercial-map-panel.commercial-map-details-panel[data-history-open="true"][data-sheet-state="half"] { height: 50% !important; }

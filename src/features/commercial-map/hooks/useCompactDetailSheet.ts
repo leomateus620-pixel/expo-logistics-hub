@@ -4,7 +4,22 @@ import { resolveCommercialMapSheetSnap, type CommercialMapDetailSheetState } fro
 /** Shared presentation state; changing selection never remounts the map or panel. */
 export function useCompactDetailSheet(selectionKey: string | null, freezeCameraFraming = false) {
   const freezeCameraFramingRef = useRef(freezeCameraFraming);
-  useLayoutEffect(() => { freezeCameraFramingRef.current = freezeCameraFraming; }, [freezeCameraFraming]);
+  const framingSelectionRef = useRef(selectionKey);
+  useLayoutEffect(() => {
+    const selectionChanged = framingSelectionRef.current !== selectionKey;
+    framingSelectionRef.current = selectionKey;
+    if (freezeCameraFraming || selectionChanged) {
+      freezeCameraFramingRef.current = freezeCameraFraming;
+      return;
+    }
+    // Closing also changes the sheet height. Keep its ResizeObserver delivery
+    // suppressed through that layout, then restore normal commercial resizing.
+    if (!freezeCameraFramingRef.current) return;
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => { freezeCameraFramingRef.current = false; });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [freezeCameraFraming, selectionKey]);
   const [sheetState, setSheetState] = useState<CommercialMapDetailSheetState>('half');
   const panelRef = useRef<HTMLElement>(null);
   const dragRef = useRef({ pointerId: -1, startY: 0, startHeight: 0, viewportHeight: 0, minimumHeight: 72, maximumHeight: 0, moved: false });

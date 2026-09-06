@@ -213,7 +213,7 @@
       "credit": null,
       "width": 650,
       "height": 440,
-      "reviewNote": "Prato sendo servido em buffet. Não há fachada ou placa identificadora de uma casa étnica. Contexto gastronômico da Praça das Nações; página indisponível nesta auditoria, metadados conservados da pesquisa fornecida.",
+      "reviewNote": "Prato sendo servido em buffet. Não há fachada ou placa identificadora de uma casa étnica. Contexto gastronômico da Praça das Nações; a recuperação posterior do texto de S06 não resolve o vínculo da fotografia com uma estrutura individual.",
       "visualReview": "Conferida individualmente a imagem local integral com view_image, em 2026-09-06; sem edição documental.",
       "rightsStatus": "authorized_by_user_for_project",
       "publicationStatus": "draft",
@@ -224,7 +224,7 @@
       "originalBytes": 55140,
       "entityIds": [],
       "bindingStatus": "pending",
-      "sourceReview": "Página retornou erro; conteúdo do pacote não revalidado online.",
+      "sourceReview": "Erro inicial do extrator web; texto de S06 recuperado posteriormente do HTML público e conferido em 2026-09-06, conforme o catálogo de correspondências. A fotografia I06 permanece contextual e sem vínculo individual comprovado.",
       "permission": {
         "status": "authorized",
         "label": "Reprodução autorizada para este projeto.",

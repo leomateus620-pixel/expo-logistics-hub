@@ -35,7 +35,7 @@ Os identificadores de referência são canônicos do mapa; o catálogo de corres
 | I01 | Grupo no auditório; painel Fenasoja 2026, palco, cadeiras e corredor central. EXIF 04/05/2026 coerente com a matéria. | ID do auditório não resolvido; não é Casa Fenasoja/Galeria. |
 | I02 | Panorama aéreo com várias edificações e circulação. | História do conjunto; não identifica individualmente Mirante, Churrascaria, Pavilhão 14 ou Palco. |
 | I03 | Grupo diante da placa “Ambulatório”. | Correspondência do ambulatório com objeto publicável pendente; não usar para Restaurante. |
-| I06 | Serviço de buffet sem placa ou fachada identificadora. | Somente contexto gastronômico da Praça das Nações. Página de origem indisponível nesta auditoria. |
+| I06 | Serviço de buffet sem placa ou fachada identificadora. | Somente contexto gastronômico da Praça das Nações; não identifica uma estrutura individual. O texto da fonte S06 foi conferido após recuperação do HTML público. |
 | I07 | Tela de cinema com trecho do documentário. Corpo da notícia credita Clóvis Pacheco. | Não é plantio de 1981; além da fotografia, procedência e direitos do filme projetado precisam ser esclarecidos. |
 | I09 | Placa “Parquinho do Sojinha” e brinquedos. | Correspondência com entidade permanente publicável pendente; não usar para parque itinerante. |
 | I11 | Descerramento de placa de pedra fundamental da Casa Portuguesa. | Não comprova prédio concluído nem autoriza criar uma casa no mapa. |
@@ -47,7 +47,7 @@ Os identificadores de referência são canônicos do mapa; o catálogo de corres
 
 ## Procedência e condições das fontes
 
-Cada URL de página e de arquivo original consta no JSON. Foram abertas as páginas correspondentes às 21 imagens; S06/I06 retornou erro e fica explicitamente sem revalidação online. A situação de uso foi consultada nos próprios sites:
+Cada URL de página e de arquivo original consta no JSON. Foram consultadas as páginas correspondentes às 21 imagens. S06 retornou erro inicialmente no extrator web; posteriormente, seu texto foi recuperado diretamente do HTML público e conferido, como registrado no catálogo de correspondências. Isso sustenta os textos associados à Praça das Nações, mas não resolve a identidade de uma estrutura individual na fotografia contextual I06, que permanece em pesquisa. A situação de uso foi consultada nos próprios sites:
 
 - O [banco de fotos Fenasoja](https://fenasoja.com.br/banco-de-fotos-e-videos/) existe e disponibiliza registros, mas não apresenta nessa página uma licença geral de reutilização. O rodapé reserva os direitos. Isso não foi tratado como autorização institucional.
 - Os [termos Santa Rosa Tur](https://www.santarosatur.com.br/termos-e-condicoes/) requerem autorização expressa para reprodução e uso comercial. A atribuição institucional de I12–I14 e I18 não revela autoria pessoal.

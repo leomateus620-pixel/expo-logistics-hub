@@ -78,6 +78,9 @@ function panel(selection = fixture(), customPermissions = permissions, mapGestur
 
 async function openHistory() {
   fireEvent.click(screen.getByRole('button', { name: 'Conhecer a história' }));
+  // Wait for the real lazy import, whose first transform can exceed RTL's 1 s
+  // lookup timeout when the build and other test workers share this machine.
+  await act(async () => { await vi.dynamicImportSettled(); });
   return screen.findByRole('heading', { name: 'Pavilhão 7 — história de teste' });
 }
 
@@ -281,5 +284,64 @@ describe('história integrada ao painel comercial persistente', () => {
     expect(aside).toHaveAttribute('data-sheet-state', 'expanded');
     expect(screen.queryByRole('button', { name: 'Editar lote' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Reservar' })).not.toBeInTheDocument();
+  });
+
+  it('preserva câmera até o layout de fechamento e retoma resize comercial ou nova seleção', async () => {
+    let frameId = 0;
+    const frames = new Map<number, FrameRequestCallback>();
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => { frames.set(++frameId, callback); return frameId; });
+    vi.stubGlobal('cancelAnimationFrame', (id: number) => frames.delete(id));
+    const nextFrame = () => act(() => {
+      const pending = [...frames.values()]; frames.clear();
+      pending.forEach((callback) => callback(performance.now()));
+    });
+    const observers = new Map<Element, () => void>();
+    vi.stubGlobal('ResizeObserver', class {
+      constructor(private callback: () => void) {}
+      observe(element: Element) { observers.set(element, this.callback); }
+      unobserve(element: Element) { observers.delete(element); }
+      disconnect() {}
+    });
+    const resize = vi.fn();
+    window.addEventListener('commercial-map-panel-resize', resize);
+    try {
+      configureImages([image('um'), image('dois')]);
+      const view = render(panel());
+      const aside = screen.getByRole('complementary');
+      const notifyResize = observers.get(aside);
+      expect(notifyResize).toBeDefined();
+      act(() => notifyResize!());
+      expect(resize).toHaveBeenCalled();
+      resize.mockClear();
+
+      await openHistory();
+      act(() => notifyResize!());
+      fireEvent.load(screen.getByAltText('Registro um'));
+      act(() => notifyResize!());
+      fireEvent.click(screen.getByRole('button', { name: 'Próxima fotografia' }));
+      act(() => notifyResize!());
+      fireEvent.click(screen.getByRole('button', { name: 'Expandir detalhes do lote' }));
+      expect(aside).toHaveAttribute('data-sheet-state', 'expanded');
+      act(() => notifyResize!());
+      expect(resize).not.toHaveBeenCalled();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Voltar às informações' }));
+      act(() => notifyResize!());
+      nextFrame();
+      act(() => notifyResize!());
+      expect(resize).not.toHaveBeenCalled();
+      nextFrame();
+      fireEvent.click(screen.getByRole('button', { name: 'Voltar ao resumo' }));
+      act(() => notifyResize!());
+      expect(resize).toHaveBeenCalledOnce();
+      resize.mockClear();
+      await openHistory();
+      view.rerender(panel(fixture('uuid-outra-estrutura', 'SEM-HISTORIA')));
+      expect(screen.getByRole('complementary')).toBe(aside);
+      expect(aside).toHaveAttribute('data-history-open', 'false');
+      expect(aside).toHaveAttribute('data-sheet-state', 'half');
+      act(() => notifyResize!());
+      expect(resize).toHaveBeenCalledOnce();
+    } finally { window.removeEventListener('commercial-map-panel-resize', resize); }
   });
 });
