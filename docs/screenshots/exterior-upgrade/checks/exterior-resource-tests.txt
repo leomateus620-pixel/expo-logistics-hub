@@ -1,0 +1,9 @@
+
+ RUN  v3.2.4 C:/Users/Leonardo/Desktop/expo-logistics-hub-exterior-upgrade
+
+ ✓ src/test/commercialMapExteriorResources.test.ts (2 tests) 427ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  19:25:50
+   Duration  2.61s (transform 287ms, setup 96ms, collect 973ms, tests 427ms, environment 493ms, prepare 106ms)

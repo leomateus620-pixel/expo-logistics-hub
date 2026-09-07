@@ -1,0 +1,587 @@
+{
+  "errors": [],
+  "poses": {
+    "fisher-1": {
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 168,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "exterior": {
+        "buildings": 614,
+        "trees": 1509,
+        "used": [
+          "G04",
+          "G07",
+          "H01",
+          "H02",
+          "H03",
+          "H04",
+          "H05",
+          "H06",
+          "H07",
+          "H08",
+          "H09",
+          "H10",
+          "H11",
+          "H12",
+          "H13",
+          "H14",
+          "H15",
+          "H16",
+          "H17",
+          "H18",
+          "H19",
+          "H20",
+          "R01",
+          "R02",
+          "R03",
+          "R04",
+          "R05",
+          "R06"
+        ],
+        "groundTriangles": 12579,
+        "architectures": 68148,
+        "vegetation": 131856,
+        "draws": 176,
+        "lods": {
+          "far": 158,
+          "map": 18
+        }
+      },
+      "camera": {
+        "position": [
+          -44.5923,
+          3.4963,
+          117.9461
+        ],
+        "target": [
+          -38.4207,
+          0.1,
+          123.2017
+        ],
+        "quaternion": [
+          0.082639,
+          0.890035,
+          0.178917,
+          -0.411093
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.63078,
+        "far": 3142.733,
+        "distance": 8.7889,
+        "minDistance": 8.7889,
+        "maxDistance": 804.9298,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 804.9298,
+        "calculatedMaxDistance": 804.9298,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1351,
+          "height": 695,
+          "aspect": 1.94388,
+          "dpr": 1
+        }
+      }
+    },
+    "fisher-2": {
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 202,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "exterior": {
+        "buildings": 614,
+        "trees": 1509,
+        "used": [
+          "G04",
+          "G07",
+          "H01",
+          "H02",
+          "H03",
+          "H04",
+          "H05",
+          "H06",
+          "H07",
+          "H08",
+          "H09",
+          "H10",
+          "H11",
+          "H12",
+          "H13",
+          "H14",
+          "H15",
+          "H16",
+          "H17",
+          "H18",
+          "H19",
+          "H20",
+          "R01",
+          "R02",
+          "R03",
+          "R04",
+          "R05",
+          "R06"
+        ],
+        "groundTriangles": 12579,
+        "architectures": 81420,
+        "vegetation": 310576,
+        "draws": 176,
+        "lods": {
+          "far": 135,
+          "map": 33,
+          "near": 8
+        }
+      },
+      "camera": {
+        "position": [
+          -43.8323,
+          3.4963,
+          116.0461
+        ],
+        "target": [
+          -37.6607,
+          0.1,
+          121.3017
+        ],
+        "quaternion": [
+          0.082639,
+          0.890035,
+          0.178917,
+          -0.411093
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.03662,
+        "far": 3142.733,
+        "distance": 8.7889,
+        "minDistance": 8.7889,
+        "maxDistance": 804.9298,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 804.9298,
+        "calculatedMaxDistance": 804.9298,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1351,
+          "height": 695,
+          "aspect": 1.94388,
+          "dpr": 1
+        }
+      }
+    },
+    "fisher-3": {
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 203,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "exterior": {
+        "buildings": 614,
+        "trees": 1509,
+        "used": [
+          "G04",
+          "G07",
+          "H01",
+          "H02",
+          "H03",
+          "H04",
+          "H05",
+          "H06",
+          "H07",
+          "H08",
+          "H09",
+          "H10",
+          "H11",
+          "H12",
+          "H13",
+          "H14",
+          "H15",
+          "H16",
+          "H17",
+          "H18",
+          "H19",
+          "H20",
+          "R01",
+          "R02",
+          "R03",
+          "R04",
+          "R05",
+          "R06"
+        ],
+        "groundTriangles": 12579,
+        "architectures": 82100,
+        "vegetation": 310576,
+        "draws": 176,
+        "lods": {
+          "far": 134,
+          "map": 34,
+          "near": 8
+        }
+      },
+      "camera": {
+        "position": [
+          -15.2542,
+          3.4963,
+          110.2063
+        ],
+        "target": [
+          -11.6519,
+          0.1,
+          117.4681
+        ],
+        "quaternion": [
+          0.044977,
+          0.954515,
+          0.191879,
+          -0.223742
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.03662,
+        "far": 3142.733,
+        "distance": 8.7889,
+        "minDistance": 8.7889,
+        "maxDistance": 804.9298,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 804.9298,
+        "calculatedMaxDistance": 804.9298,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1351,
+          "height": 695,
+          "aspect": 1.94388,
+          "dpr": 1
+        }
+      }
+    },
+    "fisher-4": {
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 204,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "exterior": {
+        "buildings": 614,
+        "trees": 1509,
+        "used": [
+          "G04",
+          "G07",
+          "H01",
+          "H02",
+          "H03",
+          "H04",
+          "H05",
+          "H06",
+          "H07",
+          "H08",
+          "H09",
+          "H10",
+          "H11",
+          "H12",
+          "H13",
+          "H14",
+          "H15",
+          "H16",
+          "H17",
+          "H18",
+          "H19",
+          "H20",
+          "R01",
+          "R02",
+          "R03",
+          "R04",
+          "R05",
+          "R06"
+        ],
+        "groundTriangles": 12579,
+        "architectures": 82100,
+        "vegetation": 323312,
+        "draws": 176,
+        "lods": {
+          "far": 132,
+          "map": 35,
+          "near": 9
+        }
+      },
+      "camera": {
+        "position": [
+          -8.6553,
+          3.4963,
+          133.6978
+        ],
+        "target": [
+          -7.6245,
+          0.1,
+          125.6575
+        ],
+        "quaternion": [
+          -0.196679,
+          -0.062462,
+          -0.012556,
+          0.978396
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.03662,
+        "far": 3142.733,
+        "distance": 8.7889,
+        "minDistance": 8.7889,
+        "maxDistance": 804.9298,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 804.9298,
+        "calculatedMaxDistance": 804.9298,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1351,
+          "height": 695,
+          "aspect": 1.94388,
+          "dpr": 1
+        }
+      }
+    },
+    "fisher-5": {
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 205,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "exterior": {
+        "buildings": 614,
+        "trees": 1509,
+        "used": [
+          "G04",
+          "G07",
+          "H01",
+          "H02",
+          "H03",
+          "H04",
+          "H05",
+          "H06",
+          "H07",
+          "H08",
+          "H09",
+          "H10",
+          "H11",
+          "H12",
+          "H13",
+          "H14",
+          "H15",
+          "H16",
+          "H17",
+          "H18",
+          "H19",
+          "H20",
+          "R01",
+          "R02",
+          "R03",
+          "R04",
+          "R05",
+          "R06"
+        ],
+        "groundTriangles": 12579,
+        "architectures": 73764,
+        "vegetation": 326300,
+        "draws": 176,
+        "lods": {
+          "far": 140,
+          "map": 25,
+          "near": 11
+        }
+      },
+      "camera": {
+        "position": [
+          -8.1129,
+          3.4963,
+          102.7305
+        ],
+        "target": [
+          -1.0875,
+          0.1,
+          106.7745
+        ],
+        "quaternion": [
+          0.09865,
+          0.848722,
+          0.170612,
+          -0.490745
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.03662,
+        "far": 3142.733,
+        "distance": 8.7889,
+        "minDistance": 8.7889,
+        "maxDistance": 804.9298,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 804.9298,
+        "calculatedMaxDistance": 804.9298,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1351,
+          "height": 695,
+          "aspect": 1.94388,
+          "dpr": 1
+        }
+      }
+    }
+  },
+  "measurements": {
+    "overview": {
+      "frames": 289,
+      "meanMs": 20.733217993100208,
+      "p95Ms": 32.099999994039536,
+      "renderer": {
+        "at": 46109.79999999702,
+        "calls": 835,
+        "triangles": 694985,
+        "geometries": 608,
+        "textures": 145,
+        "programs": 175,
+        "dpr": 0.72,
+        "width": 972,
+        "height": 500,
+        "heapBytes": 175641286,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 511,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "neighbourhood": {
+      "frames": 360,
+      "meanMs": 16.664444444452723,
+      "p95Ms": 17.700000002980232,
+      "renderer": {
+        "at": 53081.79999999702,
+        "calls": 123,
+        "triangles": 597968,
+        "geometries": 610,
+        "textures": 145,
+        "programs": 175,
+        "dpr": 0.72,
+        "width": 972,
+        "height": 500,
+        "heapBytes": 145860809,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 910,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "water": {
+      "frames": 354,
+      "meanMs": 18.031638418087514,
+      "p95Ms": 17,
+      "renderer": {
+        "at": 59946.89999999106,
+        "calls": 183,
+        "triangles": 667977,
+        "geometries": 611,
+        "textures": 145,
+        "programs": 175,
+        "dpr": 0.72,
+        "width": 972,
+        "height": 500,
+        "heapBytes": 166177266,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1292,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    }
+  },
+  "performance": {
+    "frames": 289,
+    "meanMs": 20.733217993100208,
+    "p95Ms": 32.099999994039536,
+    "renderer": {
+      "at": 46109.79999999702,
+      "calls": 835,
+      "triangles": 694985,
+      "geometries": 608,
+      "textures": 145,
+      "programs": 175,
+      "dpr": 0.72,
+      "width": 972,
+      "height": 500,
+      "heapBytes": 175641286,
+      "qualityTier": "MEDIUM",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 511,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "visible": "visible",
+    "focused": true
+  }
+}

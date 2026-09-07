@@ -1,0 +1,17 @@
+
+> vite_react_shadcn_ts@0.0.0 test
+> vitest run src/test/commercialMapTerritorialReconstruction.test.ts src/test/commercialMapAdaptiveQualityRuntime.test.ts src/test/commercialMapRuntimeStability.test.ts src/test/commercialMapVegetationLod.test.ts
+
+
+ RUN  v3.2.4 C:/Users/Leonardo/Desktop/expo-logistics-hub-exterior-upgrade
+
+ ✓ src/test/commercialMapRuntimeStability.test.ts (6 tests) 24ms
+ ✓ src/test/commercialMapAdaptiveQualityRuntime.test.ts (8 tests) 14ms
+ ✓ src/test/commercialMapVegetationLod.test.ts (8 tests) 14ms
+ ✓ src/test/commercialMapTerritorialReconstruction.test.ts (5 tests) 2664ms
+   ✓ territorial reconstruction from September references > triangulates the union without duplicate coverage, inverted faces or lost islands  2469ms
+
+ Test Files  4 passed (4)
+      Tests  27 passed (27)
+   Start at  18:57:52
+   Duration  18.95s (transform 950ms, setup 4.73s, collect 2.74s, tests 2.72s, environment 35.02s, prepare 2.56s)

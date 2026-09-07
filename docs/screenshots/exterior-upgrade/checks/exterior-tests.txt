@@ -1,0 +1,40 @@
+
+ RUN  v3.2.4 C:/Users/Leonardo/Desktop/expo-logistics-hub-exterior-upgrade
+
+ ✓ src/test/commercialMapViewport.test.ts (36 tests) 17ms
+ ✓ src/test/commercialMapCameraTransition.test.ts (11 tests) 32ms
+ ✓ src/test/commercialMapPostProcessing.test.tsx (21 tests) 322ms
+Browserslist: browsers data (caniuse-lite) is 15 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/test/commercialMapSegments.test.ts (10 tests) 178ms
+ ✓ src/test/commercialMapContextualNavigation.test.tsx (27 tests) 168ms
+ ✓ src/test/commercialMapContextualLegend.test.tsx (16 tests) 312ms
+ ✓ src/test/commercialMapPanelSelection.test.tsx (7 tests) 2019ms
+   ✓ seleção no painel persistente do mapa comercial > preserva o aside A→B, fecha a edição aberta e inicia o draft real de LotEditDialog com os dados de B  700ms
+ ✓ src/test/commercialMapAdaptiveQualityRuntime.test.ts (8 tests) 10ms
+ ✓ src/test/commercialMapExteriorPreservation.test.ts (1 test) 1187ms
+   ✓ preserves every approved building, tree anchor, water/land boundary, road and lateral district  1185ms
+ ✓ src/test/commercialMapHistory.test.tsx (13 tests) 7573ms
+   ✓ história integrada ao painel comercial persistente > carrega o conteúdo apenas ao abrir e restaura informações, ações, seleção e foco ao fechar  1849ms
+   ✓ história integrada ao painel comercial persistente > mostra uma foto sem controles de galeria e separa publicação de data fotográfica não confirmada  369ms
+   ✓ história integrada ao painel comercial persistente > navega por botões, teclado e swipe sem propagar gestos ao mapa, carregando só a foto ativa e miniaturas próximas  454ms
+   ✓ história integrada ao painel comercial persistente > respeita economia de dados, mantém só a miniatura ativa e permite escolher outra imagem  371ms
+   ✓ história integrada ao painel comercial persistente > abre a foto completa sob demanda e Escape fecha primeiro a ampliação, depois a história com foco recuperado  691ms
+   ✓ história integrada ao painel comercial persistente > recupera falha fotográfica sem perder texto, fontes ou navegação para outra foto  723ms
+   ✓ história integrada ao painel comercial persistente > mantém a foto e seu acervo na ampliação mesmo se a miniatura falhar  406ms
+   ✓ história integrada ao painel comercial persistente > preserva o atalho global de busca dentro da história  340ms
+   ✓ história integrada ao painel comercial persistente > preserva câmera até o layout de fechamento e retoma resize comercial ou nova seleção  1364ms
+ ✓ src/test/commercialMapAdaptiveQualityController.test.tsx (4 tests) 37ms
+ ✓ src/test/commercialMapRuntimeStability.test.ts (6 tests) 13ms
+ ✓ src/test/commercialMapExteriorArchitecture.test.ts (3 tests) 775ms
+   ✓ exterior architectural contract > provides 50 distinct solid models in the requested categories, in both LODs  438ms
+   ✓ exterior architectural contract > assigns independently of order, tier, navigation and neighboring filters without changing use  332ms
+ ✓ src/test/commercialMapTerritorialReconstruction.test.ts (5 tests) 1715ms
+   ✓ territorial reconstruction from September references > triangulates the union without duplicate coverage, inverted faces or lost islands  1593ms
+ ✓ src/test/commercialMapTreeControls.test.tsx (4 tests) 319ms
+
+ Test Files  15 passed (15)
+      Tests  172 passed (172)
+   Start at  19:24:59
+   Duration  15.41s (transform 1.89s, setup 1.78s, collect 11.56s, tests 14.68s, environment 10.23s, prepare 1.94s)
