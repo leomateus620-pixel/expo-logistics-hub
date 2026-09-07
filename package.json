@@ -68,6 +68,7 @@
     "lucide-react": "^0.462.0",
     "maplibre-gl": "^5.22.0",
     "next-themes": "^0.3.0",
+    "polygon-clipping": "^0.15.7",
     "postprocessing": "^6.37.8",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",

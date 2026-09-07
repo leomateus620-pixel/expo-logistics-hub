@@ -64,6 +64,7 @@ const NON_OBSTACLE_CLASSIFICATIONS = new Set([
 ]);
 const ROAD_COMPATIBLE_OFFICIAL_IDENTIFIERS = new Set([
   'A5',
+  'A11', // registered gate crossed by the restored Ubiretama street
   'EST-EXP-VIS',
   'EST-VIS',
 ]);

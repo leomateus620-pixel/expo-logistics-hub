@@ -112,9 +112,9 @@ describe('fold das rodovias regionais — BR-472 + BR-344 + trevos', () => {
     const rear = read('src/features/commercial-map/components/canvas/RearParkRoadNetwork.tsx');
     const canvas = read('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
 
-    expect(regional).toContain('<Br344Mainline');
-    expect(regional).toContain('<NeCloverleafInterchange');
-    expect(regional).toContain('<SeCloverleaf');
+    expect(regional).not.toContain('<Br344Mainline');
+    expect(regional).not.toContain('<NeCloverleafInterchange');
+    expect(regional).not.not.toContain('<SeCloverleaf');
     expect(rear).not.toContain('SeCloverleaf');
     expect(canvas).toContain('<RegionalHighwayNetwork');
     expect(canvas).not.toContain('Br344Mainline');

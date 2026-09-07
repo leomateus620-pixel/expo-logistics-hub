@@ -6,6 +6,7 @@ import {
 } from './rearParkRoadNetwork';
 import { buildRearRoadCorridorFootprints, distanceToPath } from '../utils/rearRoadNetwork';
 import { REAR_SATELLITE_TOPOLOGY } from '../utils/rearSpatialCalibration';
+import { territoryRoadClearance } from '../utils/territorialRoadGeometry';
 
 /**
  * Ambientação georreferenciada entre a borda leste do parque e a BR-472
@@ -221,6 +222,7 @@ export function buildRearTreeInstances(reducedGraphics = false): RearTreeInstanc
       const sourceZ = cluster.sourceBounds[1]
         + random() * (cluster.sourceBounds[3] - cluster.sourceBounds[1]);
       const local = officialPdfPointToLocal([sourceX, sourceZ]) as [number, number];
+      if (territoryRoadClearance(local) < 1.45) continue;
       if (!terrainPolygons.some((polygon) => pointInPolygon(local, polygon))) continue;
 
       const feather = Math.min(
@@ -293,6 +295,7 @@ export function buildRearPoleInstances(reducedGraphics = false): RearPoleInstanc
             az + (bz - az) * t + dirX * (corridor.halfWidth + clearance) * side,
           ] as const)).find((candidate) => (
             !protectedOfficialPolygons.some((polygon) => distanceToPolygon(candidate, polygon) <= 0.18)
+            && territoryRoadClearance(candidate) > 0.18
             && !footprints.some((footprint) => (
               distanceToPath(candidate, footprint.centerline) <= footprint.halfWidth + 0.08
             ))

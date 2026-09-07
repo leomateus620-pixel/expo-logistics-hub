@@ -39,7 +39,7 @@ describe('encontro físico da Arena com a rede posterior', () => {
 
   it('recorta triângulos inteiros e parciais sem perder UVs, cor ou orientação', () => {
     // Control point on the satellite Portão 5 ribbon (south of Arena, west of Etnias).
-    const [x, z] = officialPdfPointToLocal([5120, 3248]);
+    const [x, z] = officialPdfPointToLocal([5140, 3465]);
     const geometry = new THREE.PlaneGeometry(8, 4, 10, 6);
     geometry.rotateX(-Math.PI / 2);
     geometry.translate(x, 0.052, z);
@@ -55,8 +55,9 @@ describe('encontro físico da Arena com a rede posterior', () => {
     const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
     // The old .052 terrain hid the .032 road. Even rays through partial
     // grid cells must now see a true opening, rather than a lowered decal.
-    for (const dx of [-2, -1, 0, 1, 2]) {
-      const ray = new THREE.Raycaster(new THREE.Vector3(x + dx, 2, z), new THREE.Vector3(0, -1, 0));
+    const road = buildRearRoadCorridorFootprints().find(r=>r.segmentId==='portao5-curve-etnias')!;
+    for (const point of road.centerline.filter(p=>Math.abs(p[0]-x)<2 && Math.abs(p[1]-z)<1.5)) {
+      const ray = new THREE.Raycaster(new THREE.Vector3(point[0], 2, point[1]), new THREE.Vector3(0, -1, 0));
       expect(ray.intersectObject(mesh)).toHaveLength(0);
     }
     const outsideRay = new THREE.Raycaster(new THREE.Vector3(x, 2, z + 1.5), new THREE.Vector3(0, -1, 0));

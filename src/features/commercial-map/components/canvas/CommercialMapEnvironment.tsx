@@ -57,7 +57,7 @@ import {
   applyTerrainMultiscaleDetail,
   resolveTerrainMultiscaleQualityOptions,
 } from './terrainMaterial';
-import { RegionalLandscapeLayer } from './RegionalLandscapeLayer';
+import { TerritorialEnvironment } from './TerritorialEnvironment';
 
 interface CommercialMapEnvironmentProps {
   active?: boolean;
@@ -1636,7 +1636,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
         <primitive object={activeGroundMaterial} attach="material" />
       </mesh>
       <group visible={mode === 'normal'}>
-        <RegionalLandscapeLayer qualityTier={qualityTier} />
+        <TerritorialEnvironment reducedGraphics={qualityTier !== 'full'} />
       </group>
       </group>
       {/* The persistent composer remains allocated, but native MSAA renders

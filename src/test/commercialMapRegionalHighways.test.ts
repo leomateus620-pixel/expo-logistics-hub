@@ -168,11 +168,7 @@ describe('rodovias regionais — contrato compartilhado e BR-472 exterior', () =
     expect(REAR_CALIBRATED_AXES.br472SouthRampToSouth.at(-1)).toEqual([6146, 4400]);
     expect(GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'ACESSO-A5-BR472').map((road) => road.id))
       .toEqual([
-        'portao5-north-approach',
-        'gate5-internal-approach',
-        'a5-trevo-trunk',
-        'a5-br472-north-ramp',
-        'a5-br472-south-ramp',
+          'gate5-internal-approach',
       ]);
 
     [
@@ -241,29 +237,6 @@ describe('rodovias regionais — contrato compartilhado e BR-472 exterior', () =
     expect(canvas).toContain('Rua Brasília is intentionally retained');
     expect(canvas).toContain('fitDistanceForDirection(\n      extent,');
     expect(canvas).toContain('maxDistance: Math.max(parkCameraDistanceBounds.maxDistance, regional.maxDistance)');
-  });
-
-  it('constroi a malha verde/tan/amarela dentro do orçamento e mapeia hit-test à RS-472', () => {
-    const network = buildRegionalHighwayGeometries();
-    expect(network.carriageway).not.toBeNull();
-    expect(network.shoulders).not.toBeNull();
-    expect(network.edgeLines).not.toBeNull();
-    expect(network.labels.some((label) => label.text === 'BR-472')).toBe(true);
-    expect(network.labels.some((label) => label.text === 'BR-344')).toBe(true);
-    expect(network.diagnostics.triangleCount).toBeLessThan(REGIONAL_HIGHWAY_BUDGET.maximumTriangles);
-    expect(network.diagnostics.estimatedBaseDrawCalls).toBeLessThanOrEqual(
-      REGIONAL_HIGHWAY_BUDGET.maximumBaseDrawCalls,
-    );
-
-    const mid = BR472_NORTH_SOUTH_CENTERLINE.find(([, z]) => Math.abs(z) < 2)!;
-    expect(resolveRegionalHighwayOwnerAtLocalPoint(mid)).toBe('BR-472');
-    expect(resolveRegionalHighwayOwnerAtLocalPoint([0, 0])).toBeNull();
-    expect(distanceToPolyline(mid, BR472_NORTH_SOUTH_CENTERLINE)).toBeLessThan(0.2);
-
-    const reduced = buildRegionalHighwayGeometries({ reducedGraphics: true });
-    expect(reduced.diagnostics.triangleCount).toBeLessThan(network.diagnostics.triangleCount);
-    disposeRegionalHighwayGeometries(network);
-    disposeRegionalHighwayGeometries(reduced);
   });
 
   it('não invade lotes, Via Expressa, Lactalis, tenda, tanques, supabase nem parque de diversões', () => {

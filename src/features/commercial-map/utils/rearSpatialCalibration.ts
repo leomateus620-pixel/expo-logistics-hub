@@ -152,7 +152,7 @@ export const REAR_OFFICIAL_ANCHORS = Object.freeze({
   /** Cadastro preservado; busca, seleção e persistência continuam na entidade A5. */
   gate5Entity: [5974, 3678] as Point2,
   /** T da Ubiretama com o Portão 5 a leste da Arena, na latitude sul; não é [4528, 3248], [5548, 3248] nem um Y no portão. */
-  gate5ParkEdge: rearAttachment5ReferencePointById(4).officialSource,
+  gate5ParkEdge: [5860, 3633] as Point2,
   /** Passagem veicular visual; a entidade cadastral A5 permanece imutável. */
   gate5VehicleAccess: gate5PresentationSource,
   /** Trevo em Y do anexo 3: tronco único, bifurcação e duas rampas na BR-472. */
@@ -231,7 +231,6 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
     [5288, 3660],
     [5248, 3600],
     [5246, 3554],
-    [5252, 3400],
     ETNIAS_PARKING_CONNECTION_CORRECTION.parkingJunction,
   ] as readonly Point2[]),
   brasiliaOfficialAxis: RUA_BRASILIA_OFFICIAL_RESTORATION.sourceAxis,
@@ -248,6 +247,8 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
    */
   portao5StreetToCurve: PORTAO5_PARKING_ACCESS_CORRECTION.streetToCurve,
   portao5CurveToEtniasJunction: PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction,
+  // The last reach bends toward the access. The former perfectly horizontal
+  // T was a screenshot-derived simplification. Keep the arena and paved apron clear.
   portao5EtniasToUbiretamaJunction: PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction,
   /**
    * Descida do Portão 5. Arranque = fita cadastral leste. Sem o conector
@@ -301,4 +302,3 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
     [6146, 4400],
   ] as readonly Point2[]),
 });
-

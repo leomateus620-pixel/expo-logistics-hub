@@ -1,0 +1,184 @@
+{
+  "errors": [],
+  "poses": {
+    "general": {
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 266,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          12,
+          245,
+          -29.9
+        ],
+        "target": [
+          12,
+          0,
+          -30
+        ],
+        "quaternion": [
+          -0.706962,
+          0,
+          0,
+          0.707251
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 1.79758,
+        "far": 4948.16,
+        "distance": 245,
+        "minDistance": 8.7889,
+        "maxDistance": 1406.7391,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 1406.7391,
+        "calculatedMaxDistance": 1406.7391,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 375,
+          "height": 681,
+          "aspect": 0.55066,
+          "dpr": 1
+        }
+      }
+    },
+    "gate5": {
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 268,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          -1.4373,
+          100,
+          -44.1478
+        ],
+        "target": [
+          -1.4373,
+          0,
+          -44.2478
+        ],
+        "quaternion": [
+          -0.706753,
+          0,
+          0,
+          0.70746
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 1.02083,
+        "far": 4948.16,
+        "distance": 100,
+        "minDistance": 8.7889,
+        "maxDistance": 1406.7391,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 1406.7391,
+        "calculatedMaxDistance": 1406.7391,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 375,
+          "height": 681,
+          "aspect": 0.55066,
+          "dpr": 1
+        }
+      }
+    },
+    "oblique": {
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 303,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          105,
+          130,
+          160
+        ],
+        "target": [
+          15,
+          0,
+          -20
+        ],
+        "quaternion": [
+          -0.275289,
+          0.22037,
+          0.064987,
+          0.933504
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.41667,
+        "far": 4948.16,
+        "distance": 239.583,
+        "minDistance": 8.7889,
+        "maxDistance": 1406.7391,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 1406.7391,
+        "calculatedMaxDistance": 1406.7391,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 375,
+          "height": 681,
+          "aspect": 0.55066,
+          "dpr": 1
+        }
+      }
+    }
+  },
+  "performance": {
+    "frames": 361,
+    "meanMs": 16.665927977835207,
+    "p95Ms": 16.899999998509884,
+    "renderer": {
+      "at": 40389.89999999851,
+      "calls": 601,
+      "triangles": 496854,
+      "geometries": 535,
+      "textures": 145,
+      "programs": 165,
+      "dpr": 0.72,
+      "width": 270,
+      "height": 490,
+      "heapBytes": 144077853,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 701,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "visible": "visible",
+    "focused": true
+  }
+}

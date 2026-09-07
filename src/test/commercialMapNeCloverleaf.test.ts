@@ -298,7 +298,7 @@ describe('NE cloverleaf BR-344 × BR-472', () => {
 
     expect(canvas).not.toContain('NeCloverleafInterchange');
     expect(canvas).not.toContain('neCloverleafBr344Br472');
-    expect(network).toContain('NeCloverleafInterchange');
+    expect(network).not.toContain('NeCloverleafInterchange');
     expect(rearRoads).not.toContain('NE_CLOVERLEAF');
     expect(component).toContain('NE_CLOVERLEAF_COLORS.roundabout');
     expect(component).toContain('YELLOW_ROUNDABOUT_TEXTURE');
