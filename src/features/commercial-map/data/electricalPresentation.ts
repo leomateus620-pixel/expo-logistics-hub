@@ -95,6 +95,8 @@ export const REAR_ROAD_ELECTRICAL_CLEARANCE_PRESENTATION = Object.freeze({
   revision: '2026.9-anexo3-satellite.1',
   verificationStatus: 'FIELD_REVIEW_REQUIRED',
   offsets: Object.freeze({
+    'pole-ref-056': [0.8, 0], // restored cadastral Ubiretama verge
+    'pole-ref-084': [1.2, 0],
     'pole-ref-222': [0.2, 0], // Brasília: margem leste na altura do pátio.
     'pole-ref-225': [-1, 0], // BR-472: park-side verge, beyond shoulder.
     'pole-ref-234': [0.32, 0], // Brasília: margem leste ao sul de D3.
@@ -107,7 +109,7 @@ export const REAR_ROAD_ELECTRICAL_CLEARANCE_PRESENTATION = Object.freeze({
     'pole-ref-323': [0, -0.22],
     'pole-ref-324': [0, -0.2],
     'pole-ref-330': [0, 0.26], // Ubiretama: margem sul no estacionamento.
-    'pole-ref-336': [0, -0.32], // Ubiretama: margem norte na aproximação A5.
+    'pole-ref-336': [0, -1.5], // Ubiretama: margem norte na aproximação A5.
     'pole-ref-341': [0, 0.4], // Ubiretama: margem sul junto ao cadastro A5.
   } satisfies Readonly<Record<string, readonly [number, number]>>),
 });

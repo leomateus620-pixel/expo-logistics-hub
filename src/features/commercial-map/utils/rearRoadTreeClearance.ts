@@ -1,4 +1,5 @@
 import { GENERATED_REAR_ROAD_SEGMENTS } from '../data/rearParkRoadNetwork';
+import { territoryRoadClearance } from './territorialRoadGeometry';
 import {
   buildRearRoadCorridorFootprints,
   distanceToPath,
@@ -25,7 +26,7 @@ export function treeIntersectsGeneratedRearRoadCorridor(
   tree: RearRoadClearanceTree,
   footprints: readonly RearRoadCorridorFootprint[] = GENERATED_REAR_CORRIDOR_FOOTPRINTS,
 ) {
-  return footprints.some((footprint) => (
+  return territoryRoadClearance(tree.position) <= tree.canopyRadius || footprints.some((footprint) => (
     distanceToPath(tree.position, footprint.centerline)
       <= footprint.halfWidth + tree.canopyRadius
   ));

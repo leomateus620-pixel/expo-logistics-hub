@@ -1,3 +1,4 @@
+import { TERRITORY_ROADS } from '../territorialRoads';
 import type { RegionalHighwayLayer, RegionalHighwayLayerModule } from './contract';
 
 /**
@@ -16,9 +17,9 @@ export function collectRegionalHighwayLayers(): readonly RegionalHighwayLayer[] 
 }
 
 export function regionalHighwaySegments() {
-  return collectRegionalHighwayLayers().flatMap((layer) => layer.segments);
+  return TERRITORY_ROADS.map(r => ({ id: r.id, highwayId: (r.ref?.includes('344') && !r.ref?.includes('472') ? 'BR-344' : 'BR-472') as 'BR-344' | 'BR-472', kind: (r.kind === 'highway' ? 'mainline' : 'connector') as 'mainline' | 'connector', centerline: r.points, carriagewayWidth: r.width, shoulderWidth: r.shoulder }));
 }
 
 export function regionalHighwayLabels() {
-  return collectRegionalHighwayLayers().flatMap((layer) => layer.labels ?? []);
+  return [{ id: 'br472', text: 'BR-472', position: [72.3, -15] as const, headingRadians: 0 }];
 }

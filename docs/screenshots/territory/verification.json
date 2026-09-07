@@ -1,0 +1,171 @@
+{
+  "baseline": {
+    "numTotalTests": 1715,
+    "numPassedTests": 1680,
+    "numFailedTests": 35
+  },
+  "final": {
+    "numTotalTests": 1719,
+    "numPassedTests": 1684,
+    "numFailedTests": 35
+  },
+  "newFailures": [],
+  "baselineFailures": [
+    [
+      "agendaMeetingWorkspace.test.tsx",
+      "AgendaMeetingWorkspace bloqueia seed/offline sem fabricar um UUID ou montar captura"
+    ],
+    [
+      "agendaMeetingWorkspace.test.tsx",
+      "AgendaMeetingWorkspace exige consentimento informado antes de iniciar a sessão canônica"
+    ],
+    [
+      "agendaMeetingWorkspace.test.tsx",
+      "AgendaMeetingWorkspace expõe estado inequívoco, telemetria real e proteção de captura ativa"
+    ],
+    [
+      "agendaMeetingWorkspace.test.tsx",
+      "AgendaMeetingWorkspace renderiza conhecimento tipado, lacunas e ações sem superfície de áudio histórico"
+    ],
+    [
+      "commercialMapElectricalInfrastructure.test.ts",
+      "infraestrutura elétrica cartográfica do Mapa Comercial mantém todas as fases acima da folga técnica mínima em estruturas existentes"
+    ],
+    [
+      "commercialMapExporuralSteakhouse.test.ts",
+      "Churrascaria Exporural C4 e catavento moderno usa as duas referências locais e mantém budgets estáticos em ambos os níveis"
+    ],
+    [
+      "commercialMapPresentation.test.ts",
+      "modelo de apresentação do mapa comercial mantém histerese entre níveis de rótulo durante pequenos movimentos de zoom"
+    ],
+    [
+      "commercialMapPresentation.test.ts",
+      "modelo de apresentação do mapa comercial mantém os limites exatos e normaliza entradas inválidas da histerese"
+    ],
+    [
+      "commercialMapQuadrasABLactalis.test.ts",
+      "reconstrução das Quadras A/B e Palco Cultural Lactalis mantém overlays somente em DEV e integra o palco pelo hitbox oficial existente"
+    ],
+    [
+      "commissionMapPortals.test.ts",
+      "portais comerciais por comissão isola inventário, busca e métricas entre Exporural e Indústria"
+    ],
+    [
+      "cronogramaDashboardIntegration.test.tsx",
+      "Dashboard executivo do cronograma renderiza indicadores reais e mantém o recorte exato no drill-down"
+    ],
+    [
+      "cronogramaDataIntegrity.test.ts",
+      "integridade do cronograma oficial preserva os totais oficiais por ano e os registros sem data"
+    ],
+    [
+      "cronogramaDataIntegrity.test.ts",
+      "integridade do cronograma oficial mescla banco e seed sem apagar oficiais ou eventos manuais"
+    ],
+    [
+      "cronogramaMobilePresentation.test.tsx",
+      "cadastro móvel e histórico remove a entrada duplicada do histórico ao desmontar um overlay ainda aberto"
+    ],
+    [
+      "cronogramaMobilePresentation.test.tsx",
+      "cadastro móvel e histórico mantém o defaultYear informado ao criar um evento sem data"
+    ],
+    [
+      "cronogramaMobilePresentation.test.tsx",
+      "cadastro móvel e histórico fecha pelo voltar quando limpo e mantém o cadastro quando voltar encontra alterações"
+    ],
+    [
+      "cronogramaRegistrationInteractions.test.tsx",
+      "interações do cadastro do cronograma abre o popover desktop, agrupa unidades e busca sem acento pelo contexto institucional"
+    ],
+    [
+      "cronogramaRegistrationInteractions.test.tsx",
+      "interações do cadastro do cronograma mantém seleção semântica, opera por teclado e gerencia múltiplos responsáveis sem duplicar nome externo"
+    ],
+    [
+      "cronogramaTimeline.test.tsx",
+      "navegador do ciclo na linha do tempo renderiza ano atual, etapas, totais e mantém botões semanticamente focáveis"
+    ],
+    [
+      "cronogramaTimeline.test.tsx",
+      "navegador do ciclo na linha do tempo seleciona 2027 e 2028 rapidamente, abre o mês correto e não limpa filtros"
+    ],
+    [
+      "cronogramaTimeline.test.tsx",
+      "navegador do ciclo na linha do tempo mostra contagem filtrada e recuperação explícita sem trocar o ano"
+    ],
+    [
+      "cronogramaTimeline.test.tsx",
+      "navegador do ciclo na linha do tempo mantém anos sem eventos visíveis, identificados e indisponíveis"
+    ],
+    [
+      "cronogramaTimeline.test.tsx",
+      "navegador do ciclo na linha do tempo reconcilia uma URL persistida para um ano que ficou indisponível"
+    ],
+    [
+      "cronogramaTimeline.test.tsx",
+      "navegador do ciclo na linha do tempo Ir para hoje restaura julho de 2026 e atualiza o ano"
+    ],
+    [
+      "cronogramaTimeline.test.tsx",
+      "navegador do ciclo na linha do tempo restaura ano e mês ao navegar pelo histórico externo"
+    ],
+    [
+      "cronogramaTimeline.test.tsx",
+      "navegador do ciclo na linha do tempo acompanha rolagem manual e bloqueia realimentação durante navegação programática"
+    ],
+    [
+      "cronogramaTimeline.test.tsx",
+      "navegador do ciclo na linha do tempo sincroniza filtros temporais com o ano do período principal"
+    ],
+    [
+      "cronogramaTimeline.test.tsx",
+      "navegador do ciclo na linha do tempo mantém o ano após refetch e abertura de detalhes"
+    ],
+    [
+      "cronogramaTimeline.test.tsx",
+      "navegador do ciclo na linha do tempo usa movimento reduzido e mantém um único seletor horizontal no mobile"
+    ],
+    [
+      "cronogramaTimeline.test.tsx",
+      "componentes críticos preservados separa leitura e edição e protege alterações não salvas"
+    ],
+    [
+      "eventHarvestCompletion.test.tsx",
+      "gatilho explícito no detalhe desktop bloqueia cliques repetidos, conclui uma vez e fecha somente após sucesso"
+    ],
+    [
+      "eventHarvestCompletion.test.tsx",
+      "gatilho explícito no detalhe desktop mantém o detalhe e exibe a falha quando o backend rejeita a conclusão"
+    ],
+    [
+      "venueEventsPresentation.test.ts",
+      "contrato de apresentação de Eventos Restaurante e Arena organiza a navegação em planejamento, gestão e controle"
+    ],
+    [
+      "venueEventsPresentation.test.ts",
+      "contrato de apresentação de Eventos Restaurante e Arena exibe o seletor de workspaces em duas metades sem ações do hero"
+    ],
+    [
+      "venueEventsPresentation.test.ts",
+      "contrato de apresentação de Eventos Restaurante e Arena expõe etapas, obrigatoriedade e foco de contexto para tecnologias assistivas"
+    ]
+  ],
+  "typeScript": {
+    "status": "passed",
+    "command": "npx tsc --noEmit -p tsconfig.app.json"
+  },
+  "eslint": {
+    "status": "passed",
+    "errors": 0,
+    "warnings": 0
+  },
+  "build": {
+    "status": "passed",
+    "warnings": [
+      "Chunks larger than 500 kB",
+      "Outdated caniuse-lite database"
+    ]
+  }
+}

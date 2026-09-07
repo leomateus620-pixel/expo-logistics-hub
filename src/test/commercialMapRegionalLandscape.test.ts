@@ -119,9 +119,9 @@ describe('entorno regional cenográfico do Mapa Comercial', () => {
       environment.indexOf('<SunrisePostProcessing'),
     );
 
-    expect(environment).toContain("import { RegionalLandscapeLayer } from './RegionalLandscapeLayer';");
+    expect(environment).toContain("import { TerritorialEnvironment } from './TerritorialEnvironment';");
     expect(activeGroup).toContain("<group visible={mode === 'normal'}>");
-    expect(activeGroup).toContain('<RegionalLandscapeLayer qualityTier={qualityTier} />');
+    expect(activeGroup).toContain('<TerritorialEnvironment');
     expect(activeGroup).not.toContain("mode === 'normal' && <RegionalLandscapeLayer");
     expect(canvas).not.toContain("from './RegionalLandscapeLayer'");
   });

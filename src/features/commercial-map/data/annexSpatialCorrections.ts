@@ -46,57 +46,24 @@ export const CHURRASCARIA_ACCESS_CORRECTION = Object.freeze({
   }),
 });
 
-/**
- * Anexo 3 / satélite — Rua Ubiretama E–W a sul do campo oeste e da Arena, e o
- * Portão 5 contínuo a leste de F.
- *
- * A origem [4528, 3150] é a continuação da Rua Brasil (cruzamento de quatro
- * pontas com a Brasília oficial). Uma curva breve SE contorna o canto SW do
- * campo gramado e segue E–W em y=3248, imediatamente a sul do campo / face
- * sul de F. Não desce colinear em x=4528, não sobe para o norte, não entra em
- * rampa e não varre o estacionamento em y≈3660. Entra no Portão 5 em T
- * perpendicular na latitude sul da Arena, [5860, 3248].
- *
- * O arranque N–S do Portão 5 permanece o cadastro leste (~[5987, 2000]).
- * Depois da curva leve a leste do apron de concreto, a fita continua a sul
- * até o lock [5940, 3678]. O conector fantasma de meio de quadra
- * ([5860, 3140] → [5780, 3236] → [5680, 3248] → [5548, 3248] e o retorno
- * SE [5548, 3248] → [5648, 3348] → [5756, 3480] → [5860, 3608]) não existe
- * no satélite e não é restabelecido. O trevo da BR-472 começa no lock e não
- * é reconstruído aqui.
+/** Arena-side continuation: annexes 6–7 and aligned OSM ways 571136681/682.
+ * This continuation belongs to Rua Brasil. Ubiretama follows the lateral
+ * cadastral strip and meets it near A5. The northern gate in annex 9 is a different access.
+ * Source coordinates are visual alignment estimates, not surveyed positions.
  */
 export const PORTAO5_PARKING_ACCESS_CORRECTION = Object.freeze({
   widthSource: 36,
   streetToCurve: Object.freeze([
-    [4528, 3150],
-    [4560, 3170],
-    [4596, 3208],
-    [4632, 3236],
-    [4668, 3248],
-    [4776, 3248],
-    [4856, 3248],
+    [4528,3150], [4560,3170], [4596,3208], [4632,3236], [4730,3250], [4860,3280], [5066,3441],
   ] as const satisfies readonly AnnexSourcePoint[]),
   curveToEtniasJunction: Object.freeze([
-    [4856, 3248],
-    [4988, 3248],
-    [5120, 3248],
-    [5260, 3248],
+    [5066,3441], [5140,3465], [5260,3503],
   ] as const satisfies readonly AnnexSourcePoint[]),
   etniasToUbiretamaJunction: Object.freeze([
-    [5260, 3248],
-    [5368, 3248],
-    [5456, 3248],
-    [5548, 3248],
-    [5680, 3248],
-    [5780, 3248],
-    [5860, 3248],
+    [5260,3503], [5450,3562], [5600,3593], [5780,3620], [5860,3633],
   ] as const satisfies readonly AnnexSourcePoint[]),
   gate5Approach: Object.freeze([
-    [5860, 3248],
-    [5868, 3380],
-    [5892, 3500],
-    [5918, 3600],
-    [5940, 3678],
+    [5860,3633], [5900,3650], [5940,3678],
   ] as const satisfies readonly AnnexSourcePoint[]),
 });
 
@@ -135,7 +102,7 @@ export const ETNIAS_PARKING_CONNECTION_CORRECTION = Object.freeze({
   officialOwnerIdentifier: 'AV-IMIGRANTES' as const,
   widthSource: 36,
   avenueEntry: [5260, 4200] as const satisfies AnnexSourcePoint,
-  parkingJunction: [5260, 3248] as const satisfies AnnexSourcePoint,
+  parkingJunction: [5260, 3503] as const satisfies AnnexSourcePoint,
   /**
    * Extremidades no T satélite da Ubiretama ao sul da Arena. A Catmull-Rom
    * executável em `REAR_CALIBRATED_AXES.etniasParkingConnection` mantém o
@@ -146,8 +113,8 @@ export const ETNIAS_PARKING_CONNECTION_CORRECTION = Object.freeze({
     [5260, 4140],
     [5260, 3950],
     [5262, 3750],
-    [5262, 3480],
-    [5260, 3248],
+    [5262, 3570],
+    [5260, 3503],
   ] as const satisfies readonly AnnexSourcePoint[]),
 });
 

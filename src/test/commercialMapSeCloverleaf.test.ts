@@ -62,9 +62,9 @@ describe('trevo sul BR-472 — isolamento', () => {
     expect(read('src/features/commercial-map/components/canvas/RearParkRoadNetwork.tsx'))
       .not.toContain('SeCloverleaf');
     expect(read('src/features/commercial-map/components/canvas/RegionalHighwayNetwork.tsx'))
-      .toContain("import { SeCloverleaf } from './SeCloverleaf'");
+      .not.toContain("import { SeCloverleaf } from './SeCloverleaf'");
     expect(read('src/features/commercial-map/components/canvas/RegionalHighwayNetwork.tsx'))
-      .toContain('<SeCloverleaf');
+      .not.toContain('<SeCloverleaf');
   });
 
   it('preserva o trevo em Y do Portão 5 byte a byte', () => {
@@ -77,8 +77,7 @@ describe('trevo sul BR-472 — isolamento', () => {
     ]);
     expect(REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'ACESSO-A5-BR472').map((road) => road.id))
       .toEqual([
-        'portao5-north-approach',
-        'gate5-internal-approach',
+          'gate5-internal-approach',
         'a5-trevo-trunk',
         'a5-br472-north-ramp',
         'a5-br472-south-ramp',

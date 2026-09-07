@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { GENERATED_REAR_ROAD_SEGMENTS } from '../data/rearParkRoadNetwork';
 import { buildRearRoadCorridorFootprints, rearRoadTerrainElevationAt } from './rearRoadNetwork';
 import { clipPlanarSurfaceGeometry, type PlanarSurfaceCut } from './planarSurfaceGeometry';
+import { integrateGroundWithTerritory } from './territorialRoadGeometry';
 
 interface RoadGroundCut extends PlanarSurfaceCut { shoulderElevation: number }
 
@@ -28,7 +29,7 @@ const ROAD_GROUND_CUTS: readonly RoadGroundCut[] = buildRearRoadCorridorFootprin
 
 /** Cut existing terrain/walkways and grade only the narrow shoulder seam. */
 export function integrateGroundGeometryWithRearRoads(geometry: THREE.BufferGeometry) {
-  return clipPlanarSurfaceGeometry(geometry, ROAD_GROUND_CUTS, (cut, x, z) => (
+  return integrateGroundWithTerritory(clipPlanarSurfaceGeometry(geometry, ROAD_GROUND_CUTS, (cut, x, z) => (
     (cut as RoadGroundCut).shoulderElevation + rearRoadTerrainElevationAt(x, z) - 0.0005
-  ));
+  )));
 }

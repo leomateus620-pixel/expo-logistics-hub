@@ -168,7 +168,7 @@ import {
 } from '../../utils/adaptiveQualityRuntime';
 import { createCommercialMapEvents } from './commercialMapEvents';
 import { ParkAccessEnvironmentLayer } from './ParkAccessEnvironmentLayer';
-import { RearParkRoadNetwork } from './RearParkRoadNetwork';
+
 import { RegionalHighwayNetwork } from './RegionalHighwayNetwork';
 import { RearParkEnvironmentLayer } from './RearParkEnvironmentLayer';
 import { CommercialSiteEnvironmentLayer } from './CommercialSiteEnvironmentLayer';
@@ -205,6 +205,7 @@ import {
 } from '../../utils/pavilionModuleCommercial';
 
 // Never import the exclusion audit or debug textures in the production bundle.
+const TerritoryQa = import.meta.env.DEV ? lazy(async () => ({ default: (await import('../../diagnostics/TerritoryQa')).TerritoryQa })) : null;
 const LateralDistrictQaScene = import.meta.env.DEV
   ? lazy(async () => ({ default: (await import('../../diagnostics/LateralDistrictQa')).LateralDistrictQaScene }))
   : null;
@@ -4737,17 +4738,7 @@ const Scene = memo(function Scene({
             vegetationVisible={treesVisible}
             nightMode={nightAtmosphereActive}
           />
-          <RearParkRoadNetwork
-            reducedGraphics={reducedGraphics}
-            visible={!hydrologicalModeActive && rearRoadPresentation.visible}
-            opacity={rearRoadPresentation.opacity}
-            ownerEntityIdByIdentifier={rearRoadOwnerEntityIds}
-            hoverEnabled={PRECISE_HOVER_CAPABLE}
-            onSelect={handleEntitySelect}
-            onHover={handleEntityHover}
-            onFocus={handleEntityFocus}
-            onCursor={setCanvasCursor}
-          />
+          {/* Rear approaches and external roads share one polygon union. */}
           <RegionalHighwayNetwork
             reducedGraphics={reducedGraphics}
             visible={!hydrologicalModeActive && rearRoadPresentation.visible}
@@ -4927,7 +4918,7 @@ const Scene = memo(function Scene({
       />
       <RuntimeFrameDiagnostics />
       {LateralDistrictQaScene && window.location.pathname === '/__dev/commercial-map-rendering'
-        && <Suspense fallback={null}><LateralDistrictQaScene /></Suspense>}
+        && <Suspense fallback={null}><LateralDistrictQaScene />{TerritoryQa && <TerritoryQa />}</Suspense>}
       <NavigationInteractionCoordinator
         onHover={setHoveredEntityId}
         onCursor={setCanvasCursor}

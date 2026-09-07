@@ -141,9 +141,9 @@ describe('área posterior — hierarquia dos anexos e seis âncoras', () => {
 
   it('mantém os marcos rastreáveis e usa os pontos canônicos do traçado corrigido', () => {
     expect(projectRearAttachment5PointToOfficialSource(1)).toEqual([5510, 4200]);
-    expect(projectRearAttachment5PointToOfficialSource(2)).toEqual([4856, 3248]);
+    expect(projectRearAttachment5PointToOfficialSource(2)).toEqual([5066, 3441]);
     expect(projectRearAttachment5PointToOfficialSource(3)).toEqual([4528, 3150]);
-    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5860, 3248]);
+    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5860, 3633]);
     expect(projectRearAttachment5PointToOfficialSource(5)[0]).toBeCloseTo(5987, 10);
     expect(projectRearAttachment5PointToOfficialSource(5)[1]).toBeCloseTo(2000, 10);
     expect(projectRearAttachment5PointToOfficialSource(6)).toEqual([5940, 3678]);
@@ -155,7 +155,7 @@ describe('área posterior — hierarquia dos anexos e seis âncoras', () => {
     expect(projectRearAttachment5InteriorPercentToOfficialSource([80, 30])[0]).toBeCloseTo(5510, 10);
     expect(projectRearAttachment5InteriorPercentToOfficialSource([80, 30])[1]).toBeCloseTo(4200, 10);
 
-    const approach = projectRearAttachment5PointToOfficialSource(4);
+    const approach = REAR_OFFICIAL_ANCHORS.gate5ParkEdge;
     const gate = projectRearAttachment5PointToOfficialSource(6);
     expect(REAR_CALIBRATED_AXES.ubiretamaNorthToJunction.at(-1)).toEqual(approach);
     expect(REAR_CALIBRATED_AXES.portao5EtniasToUbiretamaJunction.at(-1)).toEqual(approach);
@@ -289,10 +289,10 @@ describe('área posterior — identidades, seleção e busca sem duplicação', 
     expect(GENERATED_REAR_ROAD_SEGMENTS.some((road) => road.roadId === 'ACESSO-PORTAO5-ESTACIONAMENTO')).toBe(false);
     expect(GENERATED_REAR_ROAD_SEGMENTS.some((road) => road.id === 'gate5-internal-approach')).toBe(true);
     expect(GENERATED_REAR_ROAD_SEGMENTS.some((road) => road.id === 'portao5-north-approach')).toBe(true);
-    expect(ubiretama.officialOwnerIdentifier).toBe('RUA-UBIRETAMA');
-    expect(resolveRearRoadOwnerAtLocalPoint(ubiretamaPoint, 'park')).toBe('RUA-UBIRETAMA');
-    expect(resolveRearRoadOwnerAtLocalPoint(portao5Point, 'park')).toBe('A5');
-    expect(resolveRearRoadOwnerAtLocalPoint(highwayPoint, 'highway')).toBe('RODOVIA-RS-472');
+    expect(ubiretama.officialOwnerIdentifier).toBe('RUA-BRASIL');
+    expect(resolveRearRoadOwnerAtLocalPoint(ubiretamaPoint, 'park')).toBe('RUA-BRASIL');
+    expect(resolveRearRoadOwnerAtLocalPoint(portao5Point, 'park')).toBe('RUA-UBIRETAMA');
+    expect(resolveRearRoadOwnerAtLocalPoint(highwayPoint, 'highway')).toBeNull(); // retired short BR
   });
 
 
@@ -308,7 +308,7 @@ describe('área posterior — identidades, seleção e busca sem duplicação', 
 });
 
 describe('área posterior — topologia de satélite e rodovia independente', () => {
-  it('materializa a Rua Brasília oficial e o acesso ao Portão 5 com a Ubiretama apenas transversal', () => {
+  it('materializa a Rua Brasília oficial e o acesso ao Portão 5 com Brasil transversal e Ubiretama lateral', () => {
     const path = roadGraphPath('brasilia', 'A5');
     expect(path).toEqual([
       'brasilia-north',
@@ -320,7 +320,7 @@ describe('área posterior — topologia de satélite e rodovia independente', ()
       'gate-5',
     ]);
     const junction = REAR_ROAD_NODES['ubiretama-portao5-junction'].sourcePoint;
-    expect(junction).toEqual([5860, 3248]);
+    expect(junction).toEqual([5860, 3633]);
     expect(junction[0]).toBeGreaterThan(5385);
     expect(REAR_ROAD_NODES['portao5-street'].sourcePoint).toEqual([4528, 3150]);
     expect(roadGraphHasPath('ubiretama', 'brasilia')).toBe(true);
@@ -329,7 +329,7 @@ describe('área posterior — topologia de satélite e rodovia independente', ()
     expect(REAR_PARK_ROAD_NETWORK.filter((road) => (
       road.roadId === 'RUA-BRASILIA' && road.presentation === 'official-surface'
     ))).toHaveLength(1);
-    expect(GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'RUA-UBIRETAMA')).toHaveLength(3);
+    expect(GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'RUA-UBIRETAMA')).toHaveLength(2);
     expect(REAR_PARK_ROAD_NETWORK.some((road) => road.id === 'brasilia-north-junction')).toBe(false);
     expect(REAR_PARK_ROAD_NETWORK.some((road) => road.id === 'brasilia-junction-south')).toBe(false);
     expect(REAR_PARK_ROAD_NETWORK.some((road) => road.id === 'ubiretama-north-junction')).toBe(false);
@@ -372,11 +372,11 @@ describe('área posterior — topologia de satélite e rodovia independente', ()
     expect(GENERATED_REAR_ROAD_SEGMENTS.some((road) => road.id === 'etnias-parking-connection')).toBe(true);
   });
 
-  it('mantém a BR-472 independente e entrega A5 em um trevo em Y', () => {
+  it('retém o grafo histórico do Y somente como referência, fora da apresentação', () => {
     const highway = REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'RODOVIA-RS-472');
     const access = REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'ACESSO-A5-BR472');
     expect(highway).toHaveLength(3);
-    expect(access).toHaveLength(5);
+    expect(access).toHaveLength(4);
     expect(access.find((road) => road.id === 'gate5-internal-approach'))
       .toMatchObject({ from: 'ubiretama-portao5-junction', to: 'gate-5' });
     expect(access.filter((road) => road.from === 'a5-trevo-fork').map((road) => road.to)).toEqual([
@@ -449,7 +449,7 @@ describe('área posterior — exclusões espaciais, profundidade e ambiente', ()
         .filter((boundary) => rearRoadFootprintIntersectsPolygon(footprint, boundary.polygon))
         .map((boundary) => `${footprint.segmentId}:${boundary.id}`)
     ));
-    expect(collisions).toEqual([]);
+    expect(collisions, JSON.stringify(collisions)).toEqual([]);
   });
 
   it('descola os patches reais do cruzamento e do trevo para eliminar z-fighting', () => {
@@ -457,7 +457,7 @@ describe('área posterior — exclusões espaciais, profundidade e ambiente', ()
     try {
       expect(REAR_ROAD_JUNCTION_ELEVATION_LIFT).toBeGreaterThan(0);
       expect(REAR_ROAD_JUNCTION_ELEVATION_LIFT).toBeLessThan(0.004);
-      expect(detailed.diagnostics.junctionCount).toBeGreaterThanOrEqual(4);
+      expect(detailed.diagnostics.junctionCount).toBeGreaterThanOrEqual(2); // retired three-arm Y
 
       const crossing = REAR_ROAD_NODES['ubiretama-portao5-junction'].position;
       const positions = detailed.parkAsphalt!.getAttribute('position');
@@ -478,7 +478,7 @@ describe('área posterior — exclusões espaciais, profundidade e ambiente', ()
   it('orienta todas as faces para +Y, de acordo com as normais do piso', () => {
     const network = buildRearRoadNetworkGeometries();
     try {
-      [network.highway, network.parkAsphalt, network.shoulders, network.markings].forEach((geometry) => {
+      [network.parkAsphalt, network.shoulders].forEach((geometry) => {
         expect(geometry).not.toBeNull();
         const positions = geometry!.getAttribute('position');
         const normals = geometry!.getAttribute('normal');
@@ -514,10 +514,10 @@ describe('área posterior — exclusões espaciais, profundidade e ambiente', ()
       expect(detailed.diagnostics.estimatedBaseDrawCalls).toBeLessThanOrEqual(REAR_ROAD_BUDGET.maximumBaseDrawCalls);
       expect(detailed.diagnostics.triangleCount).toBeLessThan(REAR_ROAD_BUDGET.maximumTriangles);
       expect(reduced.diagnostics.triangleCount).toBeLessThan(detailed.diagnostics.triangleCount);
-      expect(detailed.highway).not.toBeNull();
+      expect(detailed.highway).toBeNull();
       expect(detailed.parkAsphalt).not.toBeNull();
       expect(detailed.shoulders).not.toBeNull();
-      expect(detailed.markings).not.toBeNull();
+      expect(detailed.markings).toBeNull();
     } finally {
       disposeRearRoadNetworkGeometries(detailed);
       disposeRearRoadNetworkGeometries(reduced);
@@ -535,9 +535,9 @@ describe('área posterior — exclusões espaciais, profundidade e ambiente', ()
     expect(first.length).toBeLessThanOrEqual(REAR_ENVIRONMENT_BUDGET.maximumTreeInstances);
     expect(reduced.length).toBeLessThan(first.length);
     first.forEach((tree) => {
-      expect(pointIsInsideAnyRearRoadCorridor([tree.x, tree.z], REAR_PARK_ROAD_NETWORK)).toBe(false);
+      expect(pointIsInsideAnyRearRoadCorridor([tree.x, tree.z], GENERATED_REAR_ROAD_SEGMENTS)).toBe(false);
     });
-    expect(buildRearPoleInstances().length).toBeGreaterThan(0);
+    expect(buildRearPoleInstances()).toEqual([]); // exclusive poles of the retired Y
     expect(buildRearPoleInstances(true)).toEqual([]);
   });
 });

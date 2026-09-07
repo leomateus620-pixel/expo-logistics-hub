@@ -1,0 +1,84 @@
+{
+  "errors": [],
+  "poses": {
+    "ubiretama": {
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 168,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          50,
+          65,
+          10.1
+        ],
+        "target": [
+          50,
+          0,
+          10
+        ],
+        "quaternion": [
+          -0.706563,
+          0,
+          0,
+          0.70765
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.63078,
+        "far": 3142.733,
+        "distance": 65.0001,
+        "minDistance": 8.7889,
+        "maxDistance": 804.9298,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 804.9298,
+        "calculatedMaxDistance": 804.9298,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1351,
+          "height": 695,
+          "aspect": 1.94388,
+          "dpr": 1
+        }
+      }
+    }
+  },
+  "performance": {
+    "frames": 357,
+    "meanMs": 16.805882352949524,
+    "p95Ms": 18.100000001490116,
+    "renderer": {
+      "at": 37080.5,
+      "calls": 729,
+      "triangles": 608373,
+      "geometries": 558,
+      "textures": 149,
+      "programs": 167,
+      "dpr": 0.72,
+      "width": 972,
+      "height": 500,
+      "heapBytes": 120701215,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 560,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "visible": "visible",
+    "focused": true
+  }
+}
