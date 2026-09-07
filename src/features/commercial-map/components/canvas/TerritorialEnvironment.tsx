@@ -1,5 +1,5 @@
 import { memo, useEffect, useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import {
@@ -14,30 +14,22 @@ import {
   UNIFIED_TERRITORY_ROADS,
   territoryPolygonGeometry,
   territorySurfaceSkirt,
+  territoryRoadClearance,
 } from "../../utils/territorialRoadGeometry";
 import { disposeInstancedMesh } from "../../utils/instancedMeshDisposal";
 import { useCommercialMapStore } from "../../state/useCommercialMapStore";
 
-// World-space variation avoids repeated texture tiles and remains filtered at distance.
-function finishGround(shader: THREE.WebGLProgramParametersWithUniforms) {
-  shader.vertexShader =
-    "varying vec2 vTerritoryGround;\n" + shader.vertexShader;
-  shader.vertexShader = shader.vertexShader.replace(
-    "#include <begin_vertex>",
-    "#include <begin_vertex>\nvTerritoryGround = position.xz;",
-  );
-  shader.fragmentShader =
-    "varying vec2 vTerritoryGround;\n" + shader.fragmentShader;
-  shader.fragmentShader = shader.fragmentShader.replace(
-    "#include <color_fragment>",
-    `#include <color_fragment>
-    float broad = sin(vTerritoryGround.x * .13 + sin(vTerritoryGround.y * .09)) * sin(vTerritoryGround.y * .19);
-    float fine = sin(vTerritoryGround.x * 1.7) * sin(vTerritoryGround.y * 1.3);
-    float filtering = 1.0 - smoothstep(.2, 1.0, length(fwidth(vTerritoryGround)));
-    diffuseColor.rgb *= .97 + broad * .08 + fine * .035 * filtering;
-  `,
-  );
-}
+import {
+  buildExteriorArchitectureScene,
+  updateExteriorLod,
+} from "../../utils/exteriorArchitectureScene";
+import {
+  createExteriorGroundMaterial,
+  createExteriorWaterMaterial,
+  finishExteriorPatch,
+} from "../../utils/exteriorSurfaceMaterials";
+import { buildExteriorFishingScene } from "../../utils/exteriorFishing";
+
 const NO_RAYCAST = () => undefined;
 interface Instance {
   position: [number, number, number];
@@ -49,27 +41,13 @@ function buildTerritorialScene() {
   const group = new THREE.Group();
   group.name = "territorial-environment";
   const box = new THREE.BoxGeometry(1, 1, 1);
-  const roofShape = new THREE.Shape([
-    new THREE.Vector2(-0.5, 0),
-    new THREE.Vector2(0.5, 0),
-    new THREE.Vector2(0, 0.35),
-  ]);
-  const gable = new THREE.ExtrudeGeometry(roofShape, {
-    depth: 1,
-    bevelEnabled: false,
-  });
-  gable.translate(0, 0, -0.5);
-  const hip = new THREE.ConeGeometry(Math.SQRT1_2, 0.35, 4);
-  hip.rotateY(Math.PI / 4);
-  hip.translate(0, 0.175, 0);
-  const canopy = new THREE.IcosahedronGeometry(1, 1),
-    trunk = new THREE.CylinderGeometry(0.08, 0.12, 1, 5);
   const material = new THREE.MeshStandardMaterial({
     roughness: 0.93,
     metalness: 0,
   });
-  const leaf = new THREE.MeshStandardMaterial({ roughness: 1, metalness: 0 });
-  const geometries = { box, gable, hip, canopy, trunk };
+  const yardMaterial = createExteriorGroundMaterial(true);
+  const shrub = new THREE.IcosahedronGeometry(1, 1);
+  const geometries = { box, shrub };
   const batches = new Map<
     string,
     {
@@ -113,52 +91,38 @@ function buildTerritorialScene() {
       y,
       z - ox * Math.sin(b.rotation) + oz * Math.cos(b.rotation),
     ];
-    emit("walls", box, {
-      position: [x, b.height / 2 - 0.023, z],
-      scale: [w, b.height + 0.114, d],
-      rotation: b.rotation,
-      color: b.wall,
-    });
-    emit(b.roof, b.roof === "gable" ? gable : b.roof === "hip" ? hip : box, {
-      position: [x, 0.034 + b.height + (b.roof === "flat" ? 0.07 : 0), z],
-      scale: [
-        w * 1.08,
-        b.roof === "flat" ? 0.14 : Math.min(w, d) * 0.7,
-        d * 1.08,
-      ],
-      rotation: b.rotation,
-      color: b.color,
-    });
-    const face = d / 2 + 0.012;
-    // Doors and two window strips remain a single instanced batch per spatial cell.
-    emit(
-      "details",
-      box,
-      {
-        position: [
-          x - Math.sin(b.rotation) * face,
-          0.034 + b.height * 0.57,
-          z - Math.cos(b.rotation) * face,
-        ],
-        scale: [w * 0.57, b.height * 0.23, 0.028],
-        rotation: b.rotation,
-        color: "#444d49",
-      },
-      true,
-    );
-    if (b.kind === "house" && i % 4 === 0)
-      emit(
-        "porch",
-        box,
-        {
-          position: offset(0, -d / 2 - 0.32, 0),
-          scale: [w * 0.56, 0.16, 0.6],
-          rotation: b.rotation,
-          color: "#aea28b",
-        },
-        true,
-      );
     if (b.kind === "house") {
+      const planted = offset(-w * 0.53, d * 0.66, 0.1);
+      if (
+        territoryRoadClearance([planted[0], planted[2]]) > 0.3 &&
+        !TERRITORY_TREES.some(
+          (t) =>
+            Math.hypot(t.center[0] - planted[0], t.center[1] - planted[2]) <
+            t.radius * 0.6,
+        ) &&
+        !TERRITORY_BUILDINGS.some(
+          (other) =>
+            other !== b &&
+            Math.hypot(
+              other.center[0] - planted[0],
+              other.center[1] - planted[2],
+            ) <
+              Math.hypot(...other.size) / 2 + 0.2,
+        )
+      ) {
+        emit(
+          "garden-shrubs",
+          shrub,
+          {
+            position: planted,
+            scale: [0.15, 0.1, 0.2],
+            rotation: b.rotation,
+            color: i % 3 ? "#65754b" : "#7a8053",
+          },
+          true,
+          true,
+        );
+      }
       emit("garden", box, {
         position: offset(0, 0.25, -0.035),
         scale: [w * 1.4, 0.09, d * 1.6],
@@ -201,40 +165,14 @@ function buildTerritorialScene() {
       });
     }
   });
-  TERRITORY_TREES.forEach((t) => {
-    emit(
-      "canopy",
-      canopy,
-      {
-        position: [t.center[0], t.height * 0.7, t.center[1]],
-        scale: [t.radius, t.height * 0.43, t.radius * 0.87],
-        rotation: 0,
-        color: t.color,
-      },
-      false,
-      true,
-    );
-    emit(
-      "trunk",
-      trunk,
-      {
-        position: [t.center[0], t.height * 0.25 - 0.04, t.center[1]],
-        scale: [1, t.height * 0.5 + 0.08, 1],
-        rotation: 0,
-        color: "#675844",
-      },
-      true,
-      true,
-    );
-  });
   const meshes: THREE.InstancedMesh[] = [];
   const matrix = new THREE.Matrix4(),
     quaternion = new THREE.Quaternion(),
     axis = new THREE.Vector3(0, 1, 0);
-  batches.forEach(({ geometry, instances, cell, detail, trees }) => {
+  batches.forEach(({ geometry, instances, cell, detail, trees }, key) => {
     const mesh = new THREE.InstancedMesh(
       geometry,
-      trees ? leaf : material,
+      key.endsWith(":garden") ? yardMaterial : material,
       instances.length,
     );
     mesh.raycast = NO_RAYCAST;
@@ -314,11 +252,7 @@ function buildTerritorialScene() {
       geometry.dispose();
       geometry = joined;
     }
-    const color = new THREE.Color(p.color),
-      colors = [];
-    for (let i = 0; i < geometry.getAttribute("position").count; i++)
-      colors.push(color.r, color.g, color.b);
-    geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+    if (p.kind !== "water") geometry = finishExteriorPatch(geometry, p);
     (p.kind === "water" ? water : grounds).push(geometry);
   });
   const ground = mergeGeometries(grounds),
@@ -334,7 +268,7 @@ function buildTerritorialScene() {
       meshes.forEach(disposeInstancedMesh);
       Object.values(geometries).forEach((g) => g.dispose());
       material.dispose();
-      leaf.dispose();
+      yardMaterial.dispose();
       ground.dispose();
       ponds.dispose();
     },
@@ -349,12 +283,75 @@ export const TerritorialEnvironment = memo(function TerritorialEnvironment({
   vegetationVisible?: boolean;
 }) {
   const treesVisible = useCommercialMapStore((s) => s.treesVisible);
-  const plan = useMemo(buildTerritorialScene, []),
-    last = useRef(0);
+  const lastDiagnostic = useRef(-1);
+  const renderer = useThree((state) => state.gl);
+  const viewportHeight = useThree((state) => state.size.height);
+  const architecture = useMemo(buildExteriorArchitectureScene, []);
+  const fishing = useMemo(buildExteriorFishingScene, []);
+  const groundMaterial = useMemo(() => createExteriorGroundMaterial(), []);
+  const water = useMemo(
+    () =>
+      createExteriorWaterMaterial(
+        TERRITORY_PATCHES.filter((p) => p.kind === "water"),
+      ),
+    [],
+  );
+  const plan = useMemo(buildTerritorialScene, []);
   useEffect(() => () => plan.dispose(), [plan]);
+  useEffect(
+    () => () => {
+      architecture.dispose();
+      fishing.dispose();
+      groundMaterial.dispose();
+      water.material.dispose();
+    },
+    [architecture, fishing, groundMaterial, water],
+  );
   useFrame(({ camera, clock }) => {
-    if (clock.elapsedTime - last.current < 0.3) return;
-    last.current = clock.elapsedTime;
+    if (
+      import.meta.env.DEV &&
+      Math.floor(clock.elapsedTime) !== lastDiagnostic.current
+    ) {
+      lastDiagnostic.current = Math.floor(clock.elapsedTime);
+      renderer.domElement.dataset.exteriorReport = JSON.stringify({
+        buildings: TERRITORY_BUILDINGS.length,
+        trees: TERRITORY_TREES.length,
+        used: architecture.group.userData.modelsUsed,
+        groundTriangles: plan.ground.getAttribute("position").count / 3,
+        architectures: architecture.meshes
+          .filter((m) => !m.userData.exteriorTrees)
+          .reduce(
+            (s, m) =>
+              s + (m.geometry.getAttribute("position").count / 3) * m.count,
+            0,
+          ),
+        vegetation: architecture.meshes
+          .filter((m) => m.userData.exteriorTrees)
+          .reduce(
+            (s, m) =>
+              s + (m.geometry.getAttribute("position").count / 3) * m.count,
+            0,
+          ),
+        draws: architecture.meshes.length,
+        lods: architecture.meshes.reduce(
+          (s, m) => {
+            s[m.userData.lod] = (s[m.userData.lod] ?? 0) + 1;
+            return s;
+          },
+          {} as Record<string, number>,
+        ),
+      });
+    }
+    // Demand-rendered ripples share the existing frame; no perpetual invalidation.
+    water.time.value = clock.elapsedTime;
+    updateExteriorLod(
+      architecture.meshes,
+      camera,
+      viewportHeight,
+      reducedGraphics,
+      vegetationVisible && treesVisible,
+      architecture.farCells,
+    );
     plan.meshes.forEach((mesh) => {
       const sphere = mesh.boundingSphere;
       if (!sphere) return;
@@ -377,21 +374,18 @@ export const TerritorialEnvironment = memo(function TerritorialEnvironment({
   return (
     <group name="territorial-environment-layer">
       <primitive object={plan.group} />
+      <primitive object={architecture.group} />
+      <primitive object={fishing.group} />
       <mesh
         geometry={plan.ground}
         raycast={NO_RAYCAST}
         receiveShadow
         dispose={null}
       >
-        <meshStandardMaterial
-          vertexColors
-
-          roughness={1}
-          metalness={0}
-        />
+        <primitive object={groundMaterial} attach="material" />
       </mesh>
       <mesh geometry={plan.ponds} raycast={NO_RAYCAST} dispose={null}>
-        <meshStandardMaterial vertexColors roughness={0.52} metalness={0} />
+        <primitive object={water.material} attach="material" />
       </mesh>
     </group>
   );

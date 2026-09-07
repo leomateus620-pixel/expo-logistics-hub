@@ -64,6 +64,9 @@ const CommercialMapPage = lazyWithRetry(() => import('./pages/CommercialMapPage'
 const CommercialMapRenderingDiagnosticsPage = import.meta.env.DEV
   ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/CommercialMapRenderingDiagnosticsPage'))
   : null;
+const ExteriorCatalogQa = import.meta.env.DEV
+  ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/ExteriorCatalogQa'))
+  : null;
 const CommercialMapInterfaceDiagnosticsPage = import.meta.env.DEV
   ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/CommercialMapInterfaceDiagnosticsPage'))
   : null;
@@ -439,6 +442,7 @@ const App = () => (
               <Route path="/eventos-restaurante-arena/:venueSlug" element={<VenueEventsModuleRoute />} />
               <Route path="/eventos-restaurante-arena/:venueSlug/:viewSlug" element={<VenueEventsModuleRoute />} />
               <Route path="/mapa-comercial" element={<CommercialMapRoute />} />
+              {ExteriorCatalogQa && <Route path="/__dev/exterior-catalog" element={<Suspended><ExteriorCatalogQa /></Suspended>} />}
               {CommercialMapInterfaceDiagnosticsPage && (
                 <Route path="/__dev/commercial-map-interface" element={<Suspended><CommercialMapInterfaceDiagnosticsPage /></Suspended>} />
               )}

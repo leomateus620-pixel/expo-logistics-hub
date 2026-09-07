@@ -1,0 +1,52 @@
+[
+  {
+    "id": "fisher-1",
+    "pondId": "bathing-pond-long",
+    "position": [
+      -38.513549638903605,
+      123.16458014443856
+    ],
+    "rotation": 1.1902899496825432,
+    "groundY": 0.015
+  },
+  {
+    "id": "fisher-2",
+    "pondId": "bathing-pond-long",
+    "position": [
+      -37.75354963890361,
+      121.26458014443855
+    ],
+    "rotation": 1.1902899496825432,
+    "groundY": 0.015
+  },
+  {
+    "id": "fisher-3",
+    "pondId": "bathing-pond-round",
+    "position": [
+      -11.722634559672906,
+      117.39736544032709
+    ],
+    "rotation": 0.7853981633974374,
+    "groundY": 0.015
+  },
+  {
+    "id": "fisher-4",
+    "pondId": "bathing-pond-round",
+    "position": [
+      -7.604893288918218,
+      125.75553355540892
+    ],
+    "rotation": -2.9441970937399153,
+    "groundY": 0.015
+  },
+  {
+    "id": "fisher-5",
+    "pondId": "bathing-pond-square",
+    "position": [
+      -1.1855335554089117,
+      106.75489328891821
+    ],
+    "rotation": 1.3734007669450004,
+    "groundY": 0.015
+  }
+]
