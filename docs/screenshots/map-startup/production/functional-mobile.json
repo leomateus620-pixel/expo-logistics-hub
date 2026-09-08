@@ -1,0 +1,326 @@
+{
+  "errors": [],
+  "mutations": [],
+  "before": {
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "devicePixelRatio": 1
+    },
+    "page": {
+      "width": 390,
+      "height": 844
+    },
+    "canvasCount": 1,
+    "canvas": {
+      "x": 0,
+      "y": 56,
+      "width": 390,
+      "height": 788,
+      "bufferWidth": 390,
+      "bufferHeight": 788
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "camera": null,
+    "transition": {
+      "status": "completed",
+      "source": "preset:overview",
+      "sequence": 1,
+      "startedAt": 4776.7,
+      "durationMs": 539.78,
+      "completedAt": 9061.4,
+      "elapsedMs": 4284.7
+    },
+    "images": []
+  },
+  "checks": {
+    "navigation": null,
+    "filtersOpened": true,
+    "filterToggled": true,
+    "selection": true,
+    "interior": true,
+    "interiorExit": true,
+    "infrastructureSelections": [
+      {
+        "id": "E-07",
+        "selected": "reference:2026:e-07",
+        "correct": true
+      },
+      {
+        "id": "RES-A9",
+        "selected": "reference:2026:res-a9",
+        "correct": true
+      },
+      {
+        "id": "B13",
+        "selected": "reference:2026:b13",
+        "correct": true
+      },
+      {
+        "id": "E-07",
+        "selected": "reference:2026:e-07",
+        "correct": true
+      },
+      {
+        "id": "RES-A9",
+        "selected": "reference:2026:res-a9",
+        "correct": true
+      },
+      {
+        "id": "B13",
+        "selected": "reference:2026:b13",
+        "correct": true
+      }
+    ],
+    "pan": null,
+    "emulatedPinch": null,
+    "newStructuresSelectable": true,
+    "singleCanvas": true,
+    "renderHealth": true,
+    "noOverflow": true,
+    "noBackendWrites": true,
+    "noPageErrors": true
+  },
+  "url": "http://127.0.0.1:4191/mapa-comercial",
+  "unavailableChecks": [
+    "navigation",
+    "pan",
+    "emulatedPinch"
+  ],
+  "selected": {
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "devicePixelRatio": 1
+    },
+    "page": {
+      "width": 390,
+      "height": 844
+    },
+    "canvasCount": 1,
+    "canvas": {
+      "x": 0,
+      "y": 56,
+      "width": 390,
+      "height": 788,
+      "bufferWidth": 390,
+      "bufferHeight": 788
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 137,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "camera": null,
+    "transition": {
+      "status": "completed",
+      "source": "selection:reference:2026:b10",
+      "sequence": 3,
+      "startedAt": 25935.1,
+      "durationMs": 900,
+      "completedAt": 28107.8,
+      "elapsedMs": 2172.7
+    },
+    "images": []
+  },
+  "interior": {
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "devicePixelRatio": 1
+    },
+    "page": {
+      "width": 390,
+      "height": 844
+    },
+    "canvasCount": 1,
+    "canvas": {
+      "x": 0,
+      "y": 56,
+      "width": 390,
+      "height": 788,
+      "bufferWidth": 390,
+      "bufferHeight": 788
+    },
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 170,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "camera": null,
+    "transition": {
+      "status": "completed",
+      "source": "interior:reference:2026:b10",
+      "sequence": 5,
+      "startedAt": 30983.6,
+      "durationMs": 576.66,
+      "completedAt": 31566.8,
+      "elapsedMs": 583.2
+    },
+    "images": []
+  },
+  "landscape": {
+    "viewport": {
+      "width": 844,
+      "height": 390,
+      "devicePixelRatio": 1
+    },
+    "page": {
+      "width": 844,
+      "height": 390
+    },
+    "canvasCount": 1,
+    "canvas": {
+      "x": 11.390625,
+      "y": 62.796875,
+      "width": 821.21875,
+      "height": 315.8125,
+      "bufferWidth": 821,
+      "bufferHeight": 315
+    },
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 221,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "camera": null,
+    "transition": {
+      "status": "completed",
+      "source": "interior:reference:2026:b10",
+      "sequence": 7,
+      "startedAt": 34569.1,
+      "durationMs": 484.55,
+      "completedAt": 35066.5,
+      "elapsedMs": 497.4
+    },
+    "images": []
+  },
+  "extremeZoom": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "devicePixelRatio": 1
+      },
+      "page": {
+        "width": 390,
+        "height": 844
+      },
+      "canvasCount": 1,
+      "canvas": {
+        "x": 0,
+        "y": 56,
+        "width": 390,
+        "height": 788,
+        "bufferWidth": 390,
+        "bufferHeight": 788
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 857,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": null,
+      "transition": {
+        "status": "completed",
+        "source": "panel-layout",
+        "sequence": 28,
+        "startedAt": 53278.8,
+        "durationMs": 460,
+        "completedAt": 53749.2,
+        "elapsedMs": 470.4
+      },
+      "images": []
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "devicePixelRatio": 1
+      },
+      "page": {
+        "width": 390,
+        "height": 844
+      },
+      "canvasCount": 1,
+      "canvas": {
+        "x": 0,
+        "y": 56,
+        "width": 390,
+        "height": 788,
+        "bufferWidth": 390,
+        "bufferHeight": 788
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 955,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": null,
+      "transition": {
+        "status": "completed",
+        "source": "panel-layout",
+        "sequence": 28,
+        "startedAt": 53278.8,
+        "durationMs": 460,
+        "completedAt": 53749.2,
+        "elapsedMs": 470.4
+      },
+      "images": []
+    }
+  ],
+  "after": {
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "devicePixelRatio": 1
+    },
+    "page": {
+      "width": 390,
+      "height": 844
+    },
+    "canvasCount": 1,
+    "canvas": {
+      "x": 0,
+      "y": 56,
+      "width": 390,
+      "height": 788,
+      "bufferWidth": 390,
+      "bufferHeight": 788
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1004,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "camera": null,
+    "transition": {
+      "status": "completed",
+      "source": "panel-layout",
+      "sequence": 28,
+      "startedAt": 53278.8,
+      "durationMs": 460,
+      "completedAt": 53749.2,
+      "elapsedMs": 470.4
+    },
+    "images": []
+  }
+}

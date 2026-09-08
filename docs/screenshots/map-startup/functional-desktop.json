@@ -1,0 +1,695 @@
+{
+  "errors": [],
+  "mutations": [],
+  "before": {
+    "viewport": {
+      "width": 1366,
+      "height": 768,
+      "devicePixelRatio": 1
+    },
+    "page": {
+      "width": 1366,
+      "height": 768
+    },
+    "canvasCount": 1,
+    "canvas": {
+      "x": 69.390625,
+      "y": 73.796875,
+      "width": 1285.21875,
+      "height": 682.8125,
+      "bufferWidth": 1285,
+      "bufferHeight": 682
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 160,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "camera": {
+      "position": [
+        3.8459,
+        110.553,
+        104.8504
+      ],
+      "target": [
+        -2.2546,
+        0.744,
+        -0.3832
+      ],
+      "quaternion": [
+        -0.391939,
+        0.026631,
+        0.011351,
+        0.919536
+      ],
+      "controlsEnabled": true,
+      "interiorEntityId": null,
+      "fov": 38,
+      "zoom": 1,
+      "viewOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "near": 0.63423,
+      "far": 3142.733,
+      "distance": 152.2148,
+      "minDistance": 8.7889,
+      "maxDistance": 804.9298,
+      "desiredMinDistance": 8.7889,
+      "desiredMaxDistance": 804.9298,
+      "calculatedMaxDistance": 804.9298,
+      "boundingSphereRadius": 79.8989,
+      "viewport": {
+        "width": 1285.21875,
+        "height": 682.8125,
+        "aspect": 1.88224,
+        "dpr": 1
+      }
+    },
+    "transition": {
+      "status": "completed",
+      "source": "preset:overview",
+      "sequence": 1,
+      "startedAt": 7219.5,
+      "durationMs": 508.23,
+      "completedAt": 7772.3,
+      "elapsedMs": 552.8
+    },
+    "runtime": {
+      "canvasMounts": 1,
+      "activeCanvases": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeControls": 1,
+      "rendererIds": [
+        1
+      ],
+      "cameraIds": [
+        "8f704374-b9a4-4db7-9f67-888b800f8371"
+      ],
+      "contextLost": 0,
+      "renderer": {
+        "at": 22175.40000000596,
+        "calls": 866,
+        "triangles": 710301,
+        "geometries": 561,
+        "textures": 146,
+        "programs": 173,
+        "dpr": 1,
+        "width": 1285,
+        "height": 682,
+        "heapBytes": 172809990,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    "images": []
+  },
+  "checks": {
+    "navigation": true,
+    "filtersOpened": true,
+    "filterToggled": true,
+    "selection": true,
+    "interior": true,
+    "interiorExit": true,
+    "infrastructureSelections": [
+      {
+        "id": "E-07",
+        "selected": "reference:2026:e-07",
+        "correct": true
+      },
+      {
+        "id": "RES-A9",
+        "selected": "reference:2026:res-a9",
+        "correct": true
+      },
+      {
+        "id": "B13",
+        "selected": "reference:2026:b13",
+        "correct": true
+      },
+      {
+        "id": "E-07",
+        "selected": "reference:2026:e-07",
+        "correct": true
+      },
+      {
+        "id": "RES-A9",
+        "selected": "reference:2026:res-a9",
+        "correct": true
+      },
+      {
+        "id": "B13",
+        "selected": "reference:2026:b13",
+        "correct": true
+      }
+    ],
+    "pan": true,
+    "newStructuresSelectable": true,
+    "singleCanvas": true,
+    "renderHealth": true,
+    "noOverflow": true,
+    "noBackendWrites": true,
+    "noPageErrors": true
+  },
+  "selected": {
+    "viewport": {
+      "width": 1366,
+      "height": 768,
+      "devicePixelRatio": 1
+    },
+    "page": {
+      "width": 1366,
+      "height": 768
+    },
+    "canvasCount": 1,
+    "canvas": {
+      "x": 69.390625,
+      "y": 73.796875,
+      "width": 1285.21875,
+      "height": 682.8125,
+      "bufferWidth": 1285,
+      "bufferHeight": 682
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 416,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "camera": {
+      "position": [
+        -24.1934,
+        9.1361,
+        -4.566
+      ],
+      "target": [
+        -24.5779,
+        0.6216,
+        -14.4591
+      ],
+      "quaternion": [
+        -0.347654,
+        0.01821,
+        0.006753,
+        0.937422
+      ],
+      "controlsEnabled": true,
+      "interiorEntityId": null,
+      "fov": 38,
+      "zoom": 1,
+      "viewOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "near": 0.05441,
+      "far": 3142.733,
+      "distance": 13.0582,
+      "minDistance": 8.7889,
+      "maxDistance": 804.9298,
+      "desiredMinDistance": 8.7889,
+      "desiredMaxDistance": 804.9298,
+      "calculatedMaxDistance": 804.9298,
+      "boundingSphereRadius": 79.8989,
+      "viewport": {
+        "width": 1285.21875,
+        "height": 682.8125,
+        "aspect": 1.88224,
+        "dpr": 1
+      }
+    },
+    "transition": {
+      "status": "completed",
+      "source": "selection:reference:2026:b10",
+      "sequence": 2,
+      "startedAt": 32256.2,
+      "durationMs": 848.28,
+      "completedAt": 35158.8,
+      "elapsedMs": 2902.6
+    },
+    "runtime": {
+      "canvasMounts": 1,
+      "activeCanvases": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeControls": 1,
+      "rendererIds": [
+        1
+      ],
+      "cameraIds": [
+        "8f704374-b9a4-4db7-9f67-888b800f8371"
+      ],
+      "contextLost": 0,
+      "renderer": {
+        "at": 37731.10000000894,
+        "calls": 506,
+        "triangles": 796270,
+        "geometries": 589,
+        "textures": 148,
+        "programs": 200,
+        "dpr": 1,
+        "width": 1285,
+        "height": 682,
+        "heapBytes": 298069710,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    "images": []
+  },
+  "interior": {
+    "viewport": {
+      "width": 1366,
+      "height": 768,
+      "devicePixelRatio": 1
+    },
+    "page": {
+      "width": 1366,
+      "height": 768
+    },
+    "canvasCount": 1,
+    "canvas": {
+      "x": 285.390625,
+      "y": 73.796875,
+      "width": 1069.21875,
+      "height": 682.8125,
+      "bufferWidth": 1069,
+      "bufferHeight": 682
+    },
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 432,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "camera": {
+      "position": [
+        -26.3782,
+        10.9964,
+        -12.6297
+      ],
+      "target": [
+        -26.3782,
+        0.0932,
+        -14.3891
+      ],
+      "quaternion": [
+        -0.648341,
+        0,
+        0,
+        0.76135
+      ],
+      "controlsEnabled": true,
+      "interiorEntityId": "reference:2026:b10",
+      "fov": 40,
+      "zoom": 1,
+      "viewOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "near": 0.035,
+      "far": 120,
+      "distance": 11.0442,
+      "minDistance": 1.4662,
+      "maxDistance": 804.9298,
+      "desiredMinDistance": 1.4662,
+      "desiredMaxDistance": 24.192,
+      "calculatedMaxDistance": 804.9298,
+      "boundingSphereRadius": 79.8989,
+      "viewport": {
+        "width": 1069.21875,
+        "height": 682.8125,
+        "aspect": 1.5659,
+        "dpr": 1
+      }
+    },
+    "transition": {
+      "status": "completed",
+      "source": "interior:reference:2026:b10",
+      "sequence": 5,
+      "startedAt": 38388.8,
+      "durationMs": 511.26,
+      "completedAt": 38901.8,
+      "elapsedMs": 513
+    },
+    "runtime": {
+      "canvasMounts": 1,
+      "activeCanvases": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeControls": 1,
+      "rendererIds": [
+        1
+      ],
+      "cameraIds": [
+        "8f704374-b9a4-4db7-9f67-888b800f8371"
+      ],
+      "contextLost": 0,
+      "renderer": {
+        "at": 41728.80000001192,
+        "calls": 9,
+        "triangles": 4454,
+        "geometries": 580,
+        "textures": 130,
+        "programs": 203,
+        "dpr": 1,
+        "width": 1069,
+        "height": 682,
+        "heapBytes": 176682484,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    "images": []
+  },
+  "extremeZoom": [
+    {
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "page": {
+        "width": 1366,
+        "height": 768
+      },
+      "canvasCount": 1,
+      "canvas": {
+        "x": 69.390625,
+        "y": 73.796875,
+        "width": 1285.21875,
+        "height": 682.8125,
+        "bufferWidth": 1285,
+        "bufferHeight": 682
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 1077,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          8.4501,
+          2.9635,
+          15.1542
+        ],
+        "target": [
+          16.714,
+          0.5096,
+          13.4424
+        ],
+        "quaternion": [
+          -0.109356,
+          -0.625024,
+          -0.089025,
+          0.767764
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38.00000000000001,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.03662,
+        "far": 3142.733,
+        "distance": 8.7889,
+        "minDistance": 8.6998,
+        "maxDistance": 804.9298,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 804.9298,
+        "calculatedMaxDistance": 804.9298,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1285.21875,
+          "height": 682.8125,
+          "aspect": 1.88224,
+          "dpr": 1
+        }
+      },
+      "transition": {
+        "status": "completed",
+        "source": "safety-limits",
+        "sequence": 45,
+        "startedAt": 64640.5,
+        "durationMs": 460,
+        "completedAt": 65100.9,
+        "elapsedMs": 460.4
+      },
+      "runtime": {
+        "canvasMounts": 1,
+        "activeCanvases": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeControls": 1,
+        "rendererIds": [
+          1
+        ],
+        "cameraIds": [
+          "8f704374-b9a4-4db7-9f67-888b800f8371"
+        ],
+        "contextLost": 0,
+        "renderer": {
+          "at": 65422.80000001192,
+          "calls": 219,
+          "triangles": 575693,
+          "geometries": 627,
+          "textures": 156,
+          "programs": 212,
+          "dpr": 1,
+          "width": 1285,
+          "height": 682,
+          "heapBytes": 170853706,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      },
+      "images": []
+    },
+    {
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "page": {
+        "width": 1366,
+        "height": 768
+      },
+      "canvasCount": 1,
+      "canvas": {
+        "x": 69.390625,
+        "y": 73.796875,
+        "width": 1285.21875,
+        "height": 682.8125,
+        "bufferWidth": 1285,
+        "bufferHeight": 682
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 1168,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          -9.7346,
+          4.8868,
+          19.7492
+        ],
+        "target": [
+          16.714,
+          0.5096,
+          13.4424
+        ],
+        "quaternion": [
+          -0.06257,
+          -0.617724,
+          -0.049404,
+          0.782344
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38.00000000000001,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.11475,
+        "far": 3142.733,
+        "distance": 27.5402,
+        "minDistance": 8.7889,
+        "maxDistance": 804.9298,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 804.9298,
+        "calculatedMaxDistance": 804.9298,
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1285.21875,
+          "height": 682.8125,
+          "aspect": 1.88224,
+          "dpr": 1
+        }
+      },
+      "transition": {
+        "status": "completed",
+        "source": "safety-limits",
+        "sequence": 45,
+        "startedAt": 64640.5,
+        "durationMs": 460,
+        "completedAt": 65100.9,
+        "elapsedMs": 460.4
+      },
+      "runtime": {
+        "canvasMounts": 1,
+        "activeCanvases": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeControls": 1,
+        "rendererIds": [
+          1
+        ],
+        "cameraIds": [
+          "8f704374-b9a4-4db7-9f67-888b800f8371"
+        ],
+        "contextLost": 0,
+        "renderer": {
+          "at": 68497.70000000298,
+          "calls": 396,
+          "triangles": 617027,
+          "geometries": 625,
+          "textures": 151,
+          "programs": 212,
+          "dpr": 1,
+          "width": 1285,
+          "height": 682,
+          "heapBytes": 178771035,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      },
+      "images": []
+    }
+  ],
+  "after": {
+    "viewport": {
+      "width": 1366,
+      "height": 768,
+      "devicePixelRatio": 1
+    },
+    "page": {
+      "width": 1366,
+      "height": 768
+    },
+    "canvasCount": 1,
+    "canvas": {
+      "x": 69.390625,
+      "y": 73.796875,
+      "width": 1285.21875,
+      "height": 682.8125,
+      "bufferWidth": 1285,
+      "bufferHeight": 682
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1168,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "camera": {
+      "position": [
+        -9.7346,
+        4.8868,
+        19.7492
+      ],
+      "target": [
+        16.714,
+        0.5096,
+        13.4424
+      ],
+      "quaternion": [
+        -0.06257,
+        -0.617724,
+        -0.049404,
+        0.782344
+      ],
+      "controlsEnabled": true,
+      "interiorEntityId": null,
+      "fov": 38.00000000000001,
+      "zoom": 1,
+      "viewOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "near": 0.11475,
+      "far": 3142.733,
+      "distance": 27.5402,
+      "minDistance": 8.7889,
+      "maxDistance": 804.9298,
+      "desiredMinDistance": 8.7889,
+      "desiredMaxDistance": 804.9298,
+      "calculatedMaxDistance": 804.9298,
+      "boundingSphereRadius": 79.8989,
+      "viewport": {
+        "width": 1285.21875,
+        "height": 682.8125,
+        "aspect": 1.88224,
+        "dpr": 1
+      }
+    },
+    "transition": {
+      "status": "completed",
+      "source": "safety-limits",
+      "sequence": 45,
+      "startedAt": 64640.5,
+      "durationMs": 460,
+      "completedAt": 65100.9,
+      "elapsedMs": 460.4
+    },
+    "runtime": {
+      "canvasMounts": 1,
+      "activeCanvases": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeControls": 1,
+      "rendererIds": [
+        1
+      ],
+      "cameraIds": [
+        "8f704374-b9a4-4db7-9f67-888b800f8371"
+      ],
+      "contextLost": 0,
+      "renderer": {
+        "at": 68503.60000000894,
+        "calls": 396,
+        "triangles": 617027,
+        "geometries": 625,
+        "textures": 151,
+        "programs": 212,
+        "dpr": 1,
+        "width": 1285,
+        "height": 682,
+        "heapBytes": 178771035,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    "images": []
+  }
+}

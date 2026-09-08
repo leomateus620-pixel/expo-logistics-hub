@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CommercialMapCanvas } from '../components/canvas/CommercialMapCanvas';
 import { CommercialMapRendererStatus } from '../components/CommercialMapRendererStatus';
 import { OFFICIAL_REFERENCE_DATA } from '../data/officialReference2026';
+import persistedStageLayout from '../../../test/fixtures/soyGatePersistedLayout.json';
 import { presentCommercialMapData } from '../hooks/useCommercialMap';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import {
@@ -18,7 +19,7 @@ import {
   analyzeCommercialMapStressResources,
   type CommercialMapStressResourceAnalysis,
 } from './renderingStressResources';
-import type { CameraPreset } from '../types';
+import type { CameraPreset, Coordinate } from '../types';
 import { LateralDistrictQaPanel } from './LateralDistrictQa';
 import '../commercial-map.css';
 import '../commercial-map-mobile.css';
@@ -27,7 +28,13 @@ import './commercial-map-rendering-diagnostics.css';
 const EMPTY_MATCHING_ENTITY_IDS = new Set<string>();
 // Same client presentation pipeline as the authenticated map, so diagnostics
 // render the unified Restaurante and segment tags instead of raw cadastral rows.
-const DIAGNOSTICS_MAP_DATA = presentCommercialMapData(OFFICIAL_REFERENCE_DATA);
+const DIAGNOSTICS_MAP_DATA = presentCommercialMapData(new URLSearchParams(window.location.search).has('persistedStage') ? {
+  ...OFFICIAL_REFERENCE_DATA,
+  entities: OFFICIAL_REFERENCE_DATA.entities.map((entity) => {
+    const row = persistedStageLayout[entity.publicIdentifier as keyof typeof persistedStageLayout];
+    return row ? { ...entity, geometry: { ...entity.geometry, coordinates: row.geometry.coordinates as Coordinate[][] } } : entity;
+  }),
+} : OFFICIAL_REFERENCE_DATA);
 const MAXIMUM_ZOOM_WHEEL_STEPS = 80;
 const QA_CAMERA_PRESETS: readonly CameraPreset[] = [
   'overview', 'top', 'isometric', 'commercial', 'pavilions', 'parking', 'gates',
@@ -223,6 +230,10 @@ export default function CommercialMapRenderingDiagnosticsPage() {
     window.__commercialMapRuntimeDiagnostics?.resetSamples();
 
     const refresh = () => {
+      // Startup capture can be deferred while shaders compile. Seed the first
+      // snapshot afterward so stress controls become available without a click.
+      const diagnostics = window.__commercialMapRuntimeDiagnostics;
+      if (diagnostics && diagnostics.snapshots.length === 0) diagnostics.capture();
       setSummary(summarizeCommercialMapRuntimeDiagnostics());
       const facts = currentRuntimeFacts();
       const latestTiming = readCommercialMapRenderTiming();

@@ -1,3 +1,4 @@
+import { isCommercialSceneCompiling } from './sceneShaderWarmup';
 import type { ProfilerOnRenderCallback } from 'react';
 import * as THREE from 'three';
 import type { WebGLRenderer } from 'three';
@@ -230,19 +231,26 @@ export function registerCommercialMapRuntimeDiagnostics({
     cameraId: camera.uuid,
   });
 
+  let gpuIdentity: { gpuVendor: string; gpuRenderer: string } | null = null;
   const capture = () => {
+    // Even getParameter can flush outstanding driver compilation. Diagnostics
+    // must not turn asynchronous warmup into a multi-second synchronous stall.
+    if (isCommercialSceneCompiling(gl)) return diagnostics.snapshots.at(-1) ?? null;
     const drawingBuffer = gl.getDrawingBufferSize(new THREE.Vector2());
-    const context = gl.getContext();
-    const debugRendererInfo = context.getExtension('WEBGL_debug_renderer_info') as {
-      UNMASKED_VENDOR_WEBGL: number;
-      UNMASKED_RENDERER_WEBGL: number;
-    } | null;
-    const gpuVendor = String(context.getParameter(
-      debugRendererInfo?.UNMASKED_VENDOR_WEBGL ?? context.VENDOR,
-    ) ?? 'unavailable');
-    const gpuRenderer = String(context.getParameter(
-      debugRendererInfo?.UNMASKED_RENDERER_WEBGL ?? context.RENDERER,
-    ) ?? 'unavailable');
+    if (!gpuIdentity) {
+      const context = gl.getContext();
+      const debugRendererInfo = context.getExtension('WEBGL_debug_renderer_info') as {
+        UNMASKED_VENDOR_WEBGL: number;
+        UNMASKED_RENDERER_WEBGL: number;
+      } | null;
+      const gpuVendor = String(context.getParameter(
+        debugRendererInfo?.UNMASKED_VENDOR_WEBGL ?? context.VENDOR,
+      ) ?? 'unavailable');
+      const gpuRenderer = String(context.getParameter(
+        debugRendererInfo?.UNMASKED_RENDERER_WEBGL ?? context.RENDERER,
+      ) ?? 'unavailable');
+      gpuIdentity = { gpuVendor, gpuRenderer };
+    }
     const performanceMemory = performance as Performance & {
       memory?: { usedJSHeapSize?: number };
     };
@@ -258,8 +266,7 @@ export function registerCommercialMapRuntimeDiagnostics({
       height: drawingBuffer.y,
       heapBytes: performanceMemory.memory?.usedJSHeapSize ?? null,
       qualityTier: diagnostics.qualityTier,
-      gpuVendor,
-      gpuRenderer,
+      ...gpuIdentity,
     };
     appendBounded(diagnostics.snapshots, snapshot, 120);
     gl.domElement.dataset.commercialMapRendererInfo = JSON.stringify(snapshot);

@@ -39,7 +39,7 @@ let activeBrowser;
     await page.getByTestId("commercial-map-stress-json").textContent(),
   );
   fs.writeFileSync(
-    "docs/screenshots/soy-gate9/stress.json",
+    `${process.env.QA_OUTPUT || "docs/screenshots/soy-gate9"}/stress.json`,
     JSON.stringify({ errors, ...report }, null, 2),
   );
   console.log(

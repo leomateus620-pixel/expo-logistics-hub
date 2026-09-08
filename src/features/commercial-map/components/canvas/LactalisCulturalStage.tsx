@@ -222,8 +222,8 @@ export function LactalisCulturalStage({
   showFocusDetail: boolean;
 }) {
   const model = useMemo(
-    () => lactalisStageModelDimensions(bounds.width, bounds.depth),
-    [bounds.depth, bounds.width],
+    () => lactalisStageModelDimensions(bounds.width, bounds.depth, [bounds.centerX, bounds.centerZ]),
+    [bounds.centerX, bounds.centerZ, bounds.depth, bounds.width],
   );
   const width = model.width;
   const depth = model.depth;

@@ -15,7 +15,8 @@ import {
   useState,
 } from 'react';
 import { Canvas, type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
-import { Html, OrbitControls, Preload, useTexture } from '@react-three/drei';
+import { Html, OrbitControls, useTexture } from '@react-three/drei';
+import { CommercialMapSceneShaderWarmup } from './CommercialMapSceneShaderWarmup';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import {
@@ -85,7 +86,7 @@ import {
   apolloXivReplicaHeight,
   treeRemainsVisibleWithSelectedApollo,
 } from '../../utils/lunarMemorial';
-import { LACTALIS_STAGE_LAYOUT } from '../../utils/lactalisStage';
+import { LACTALIS_STAGE_LAYOUT, lactalisStagePresentationFootprint } from '../../utils/lactalisStage';
 import {
   LUNAR_LAUNCH_TIMELINE,
   lunarLaunchAltitudeAt,
@@ -515,7 +516,11 @@ function getEntityExtent(entity: MapEntity): SceneExtent {
   const correctedRoadBounds = entity.classification === 'ROAD' || entity.publicIdentifier === 'A5'
     ? rearRoadFocusBoundsForOfficialOwner(entity.publicIdentifier)
     : null;
-  const coordinates = entity.geometry.coordinates.flat();
+  const stageBounds = resolveStrategicLandmarkKind(entity) === 'lactalis-cultural-stage'
+    ? strategicLandmarkBounds(entity) : null;
+  const coordinates = stageBounds
+    ? lactalisStagePresentationFootprint(stageBounds.width, stageBounds.depth, [stageBounds.centerX, stageBounds.centerZ])
+    : entity.geometry.coordinates.flat();
   const xs = correctedRoadBounds
     ? [correctedRoadBounds.minX, correctedRoadBounds.maxX]
     : coordinates.map(([x]) => x).filter(Number.isFinite);
@@ -4932,7 +4937,7 @@ const Scene = memo(function Scene({
       />
       <StrategicLandmarkSelectionShaderWarmup />
       <CommercialMapInteriorShaderWarmup reducedGraphics={reducedGraphics} />
-      <Preload all />
+      <CommercialMapSceneShaderWarmup />
     </>
   );
 });

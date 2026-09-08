@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CommercialMapRendererStatus } from '@/features/commercial-map/components/CommercialMapRendererStatus';
 import {
   COMMERCIAL_MAP_RENDER_HEALTH_EVENT,
+  COMMERCIAL_MAP_PREPARING_EVENT,
   COMMERCIAL_MAP_RENDER_RETRY_EVENT,
   publishCommercialMapRenderHealth,
   readCommercialMapRenderHealth,
@@ -30,6 +31,20 @@ afterEach(() => {
 });
 
 describe('Commercial Map lightweight rendering health', () => {
+  it('shows preparation until the first completed frame, without blocking input', () => {
+    const canvas = createCanvas();
+    canvas.dataset.commercialMapPreparing = 'true';
+    render(<CommercialMapRendererStatus />);
+    expect(screen.getByRole('status').textContent).toBe('Preparando mapa 3D…');
+    delete canvas.dataset.commercialMapPreparing;
+    act(() => publishCommercialMapRenderHealth(canvas, health()));
+    expect(screen.queryByRole('status')).toBeNull();
+    act(() => {
+      canvas.dataset.commercialMapPreparing = 'true';
+      canvas.dispatchEvent(new CustomEvent(COMMERCIAL_MAP_PREPARING_EVENT, { bubbles: true }));
+    });
+    expect(screen.getByRole('status').textContent).toBe('Preparando mapa 3D…');
+  });
   it('publishes a JSON snapshot and bubbles transitions from the originating canvas', () => {
     const canvas = createCanvas();
     const listener = vi.fn();
