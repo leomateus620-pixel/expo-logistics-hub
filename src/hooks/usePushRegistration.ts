@@ -14,12 +14,30 @@ export type PushStatus =
   | 'denied'
   | 'error';
 
-const appId = import.meta.env.VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_APP_ID as string | undefined;
-const vapidKey = import.meta.env.VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_VAPID_KEY as string | undefined;
+// Chaves públicas do app web (não são segredos; o segredo é a conta de serviço,
+// que fica só no backend através do conector).
+const FALLBACK = {
+  apiKey: 'AIzaSyD8BShDWYKIieTHXdV69QSPBIwATbHC_qU',
+  projectId: 'fenasoja-gestao-ee7a7',
+  appId: '1:625830962993:web:5c755c0bb534a3fefbf210',
+  vapidKey:
+    'BCp58T0hsGhrodXi64MIAweeqo14RBxdUgUIWrV3bZCncDdbvBQ-cPOSZ_DE7pw77HQf4kaRQNknVOl3XvD7XWI',
+};
+
+const appId =
+  (import.meta.env.VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_APP_ID as string | undefined) ||
+  FALLBACK.appId;
+const vapidKey =
+  (import.meta.env.VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_VAPID_KEY as string | undefined) ||
+  FALLBACK.vapidKey;
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_WEB_API_KEY as string | undefined,
-  projectId: import.meta.env.VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_PROJECT_ID as string | undefined,
+  apiKey:
+    (import.meta.env.VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_WEB_API_KEY as string | undefined) ||
+    FALLBACK.apiKey,
+  projectId:
+    (import.meta.env.VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_PROJECT_ID as string | undefined) ||
+    FALLBACK.projectId,
   appId,
   messagingSenderId: appId?.split(':')[1] ?? '',
 };
