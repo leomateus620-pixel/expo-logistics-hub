@@ -66,6 +66,7 @@ interface ReminderDeliveryRow {
   offset_minutes: number;
   scheduled_for: string;
   updated_at: string;
+  channel: string | null;
 }
 
 interface SubeventRow {
@@ -142,6 +143,16 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
     list.push({ user_id: cap.user_id, org_id: cap.org_id });
     globalByOrg.set(cap.org_id, list);
   }
+
+  // Canal push: espelha exatamente os mesmos destinatários do e-mail, restrito a
+  // quem registrou ao menos um aparelho ativo. Não altera nenhuma regra de acesso.
+  const { data: pushDevices } = await supa
+    .from("push_devices")
+    .select("user_id")
+    .is("revoked_at", null);
+  const pushEnabledUsers = new Set(
+    ((pushDevices ?? []) as Array<{ user_id: string }>).map((device) => device.user_id),
+  );
 
   for (const event of (events ?? []) as ScheduledEventRow[]) {
     const normalized = normalizeEventDateTime({
