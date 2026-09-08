@@ -8,6 +8,7 @@ import { Settings, Users, Shield, ShieldCheck, Loader2, ChevronDown, ChevronUp }
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import NotificationRecipientsSection from '@/components/settings/NotificationRecipientsSection';
+import PushNotificationsSection from '@/components/settings/PushNotificationsSection';
 
 import { presentFenasojaProductName } from '@/lib/fenasoja-brand';
 
