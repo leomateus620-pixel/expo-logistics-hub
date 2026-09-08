@@ -28,6 +28,8 @@ project_id = "btfaumhroqtqzxomqorx"
     verify_jwt = true
   [functions.send-transactional-email]
     verify_jwt = true
+  [functions.send-push-notification]
+    verify_jwt = true
 
   [functions.mcp]
     verify_jwt = false

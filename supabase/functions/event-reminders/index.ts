@@ -66,6 +66,7 @@ interface ReminderDeliveryRow {
   offset_minutes: number;
   scheduled_for: string;
   updated_at: string;
+  channel: string | null;
 }
 
 interface SubeventRow {
@@ -142,6 +143,16 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
     list.push({ user_id: cap.user_id, org_id: cap.org_id });
     globalByOrg.set(cap.org_id, list);
   }
+
+  // Canal push: espelha exatamente os mesmos destinatários do e-mail, restrito a
+  // quem registrou ao menos um aparelho ativo. Não altera nenhuma regra de acesso.
+  const { data: pushDevices } = await supa
+    .from("push_devices")
+    .select("user_id")
+    .is("revoked_at", null);
+  const pushEnabledUsers = new Set(
+    ((pushDevices ?? []) as Array<{ user_id: string }>).map((device) => device.user_id),
+  );
 
   for (const event of (events ?? []) as ScheduledEventRow[]) {
     const normalized = normalizeEventDateTime({
@@ -239,19 +250,27 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
       if (scheduledFor <= now) continue;
       for (const recipient of recipients.values()) {
         const eventVersion = event.lock_version ?? 0;
-        const idempotencyKey = `${recipient.user_id}|${event.id}|${eventVersion}|${offsetMinutes}`;
-        const { error } = await supa.from("event_reminder_deliveries").upsert({
-          user_id: recipient.user_id,
-          org_id: recipient.org_id,
-          event_id: event.id,
-          event_version: eventVersion,
-          offset_minutes: offsetMinutes,
-          scheduled_for: scheduledFor.toISOString(),
-          idempotency_key: idempotencyKey,
-          status: "pending",
-          last_error: null,
-        }, { onConflict: "idempotency_key", ignoreDuplicates: true });
-        if (error) console.error("event_reminder_schedule_failed", { eventId: event.id, offsetMinutes });
+        const channels = pushEnabledUsers.has(recipient.user_id)
+          ? ["email", "push"]
+          : ["email"];
+        for (const channel of channels) {
+          const idempotencyKey = channel === "email"
+            ? `${recipient.user_id}|${event.id}|${eventVersion}|${offsetMinutes}`
+            : `${recipient.user_id}|${event.id}|${eventVersion}|${offsetMinutes}|push`;
+          const { error } = await supa.from("event_reminder_deliveries").upsert({
+            user_id: recipient.user_id,
+            org_id: recipient.org_id,
+            event_id: event.id,
+            event_version: eventVersion,
+            offset_minutes: offsetMinutes,
+            scheduled_for: scheduledFor.toISOString(),
+            idempotency_key: idempotencyKey,
+            channel,
+            status: "pending",
+            last_error: null,
+          }, { onConflict: "idempotency_key", ignoreDuplicates: true });
+          if (error) console.error("event_reminder_schedule_failed", { eventId: event.id, offsetMinutes, channel });
+        }
       }
     }
   }
@@ -372,6 +391,60 @@ async function sendPending(supa: ReturnType<typeof db>) {
         status: "failed",
         last_error: `invalid_event_datetime:${normalized.error}`,
       }).eq("id", delivery.id);
+      continue;
+    }
+
+    if (delivery.channel === "push") {
+      // Mesmo destinatário e mesmo horário do e-mail; só muda o canal de entrega.
+      const horizonLabel = delivery.offset_minutes >= 1440
+        ? "amanhã"
+        : delivery.offset_minutes >= 120
+        ? "em 2 horas"
+        : "em 1 hora";
+      try {
+        const pushRes = await fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${service}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: delivery.user_id,
+            eventId: delivery.event_id,
+            title: `Evento ${horizonLabel}: ${event.title}`,
+            body: `${normalized.value.dateLong} · ${normalized.value.timeLabel}${event.location ? ` · ${event.location}` : ""}`,
+            path: `/cronograma?event=${delivery.event_id}`,
+          }),
+        });
+        const pushRaw = await pushRes.text();
+        let pushData: any = null;
+        try { pushData = JSON.parse(pushRaw); } catch { /* keep raw */ }
+        if (!pushRes.ok) {
+          console.error("event_reminder_push_http_failed", {
+            deliveryId: delivery.id,
+            status: pushRes.status,
+            body: pushRaw.slice(0, 200),
+          });
+          throw new Error(`push_http_${pushRes.status}`);
+        }
+        if (pushData?.success === false) {
+          await supa.from("event_reminder_deliveries").update({
+            status: "skipped", last_error: String(pushData.reason ?? "push_not_sent"),
+          }).eq("id", delivery.id);
+          continue;
+        }
+        await supa.from("event_reminder_deliveries").update({
+          status: "sent", sent_at: new Date().toISOString(), last_error: null,
+        }).eq("id", delivery.id);
+      } catch (error) {
+        console.error("event_reminder_push_failed", {
+          deliveryId: delivery.id,
+          reason: String((error as Error).message ?? "push_failed").slice(0, 120),
+        });
+        await supa.from("event_reminder_deliveries").update({
+          status: "failed", last_error: "push_delivery_failed",
+        }).eq("id", delivery.id);
+      }
       continue;
     }
 

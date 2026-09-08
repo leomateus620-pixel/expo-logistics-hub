@@ -1,7 +1,7 @@
 // Service Worker — Fenasoja Logística
 // Strategy: never precache the HTML shell. Hashed assets are immutable (cache-first).
 // Navigations are network-first with a short timeout; cache is only used if truly offline.
-const CACHE_VERSION = '3';
+const CACHE_VERSION = '4';
 const CACHE_NAME = `fenasoja-v${CACHE_VERSION}`;
 const STATIC_ASSETS = [
   '/favicon.ico',
@@ -92,4 +92,36 @@ self.addEventListener('fetch', (event) => {
         .catch(() => caches.match(req))
     );
   }
+});
+
+// ---- Notificações no celular (FCM) ----
+self.addEventListener('push', (event) => {
+  let payload = {};
+  try { payload = event.data ? event.data.json() : {}; } catch { payload = {}; }
+  const notification = payload.notification || {};
+  const data = payload.data || {};
+  const title = notification.title || 'Fenasoja';
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: notification.body || '',
+      icon: notification.icon || '/favicon.ico',
+      badge: '/favicon.ico',
+      tag: data.eventId || undefined,
+      data: { path: data.path || '/' },
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const path = (event.notification.data && event.notification.data.path) || '/';
+  const target = new URL(path, self.location.origin).href;
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      for (const client of clients) {
+        if (client.url === target && 'focus' in client) return client.focus();
+      }
+      return self.clients.openWindow ? self.clients.openWindow(target) : undefined;
+    })
+  );
 });
