@@ -11,7 +11,7 @@ project_id = "btfaumhroqtqzxomqorx"
   [functions.agenda-meeting-worker]
     verify_jwt = false
   [functions.event-reminders]
-    verify_jwt = true
+    verify_jwt = false
   [functions.google-calendar-oauth]
     verify_jwt = false
   [functions.google-calendar-oauth-callback]
