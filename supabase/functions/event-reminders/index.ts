@@ -394,6 +394,60 @@ async function sendPending(supa: ReturnType<typeof db>) {
       continue;
     }
 
+    if (delivery.channel === "push") {
+      // Mesmo destinatário e mesmo horário do e-mail; só muda o canal de entrega.
+      const horizonLabel = delivery.offset_minutes >= 1440
+        ? "amanhã"
+        : delivery.offset_minutes >= 120
+        ? "em 2 horas"
+        : "em 1 hora";
+      try {
+        const pushRes = await fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${service}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: delivery.user_id,
+            eventId: delivery.event_id,
+            title: `Evento ${horizonLabel}: ${event.title}`,
+            body: `${normalized.value.dateLong} · ${normalized.value.timeLabel}${event.location ? ` · ${event.location}` : ""}`,
+            path: `/cronograma?event=${delivery.event_id}`,
+          }),
+        });
+        const pushRaw = await pushRes.text();
+        let pushData: any = null;
+        try { pushData = JSON.parse(pushRaw); } catch { /* keep raw */ }
+        if (!pushRes.ok) {
+          console.error("event_reminder_push_http_failed", {
+            deliveryId: delivery.id,
+            status: pushRes.status,
+            body: pushRaw.slice(0, 200),
+          });
+          throw new Error(`push_http_${pushRes.status}`);
+        }
+        if (pushData?.success === false) {
+          await supa.from("event_reminder_deliveries").update({
+            status: "skipped", last_error: String(pushData.reason ?? "push_not_sent"),
+          }).eq("id", delivery.id);
+          continue;
+        }
+        await supa.from("event_reminder_deliveries").update({
+          status: "sent", sent_at: new Date().toISOString(), last_error: null,
+        }).eq("id", delivery.id);
+      } catch (error) {
+        console.error("event_reminder_push_failed", {
+          deliveryId: delivery.id,
+          reason: String((error as Error).message ?? "push_failed").slice(0, 120),
+        });
+        await supa.from("event_reminder_deliveries").update({
+          status: "failed", last_error: "push_delivery_failed",
+        }).eq("id", delivery.id);
+      }
+      continue;
+    }
+
     const { data: authUser } = await supa.auth.admin.getUserById(delivery.user_id);
     const email = authUser?.user?.email;
     if (!email) {
