@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { CronogramaGoogleStatusButton } from '@/components/cronograma-eventos/CronogramaGoogleStatusButton';
 import { CronogramaHeaderSearch } from '@/components/cronograma-eventos/CronogramaHeaderSearch';
 import { CronogramaPreparationPill } from '@/components/cronograma-eventos/CronogramaPreparationPill';
+import { CronogramaPushStatusButton } from '@/components/cronograma-eventos/CronogramaPushStatusButton';
 import { CronogramaSearchProvider } from '@/components/cronograma-eventos/CronogramaSearchContext';
 import { CronogramaTemporalControls } from '@/components/cronograma-eventos/CronogramaTemporalControls';
 import { CronogramaShellProvider } from '@/components/cronograma-eventos/CronogramaShellContext';
@@ -51,6 +52,8 @@ function CronogramaCommandBar() {
           <div className="cronograma-command-layer__google">
             <CronogramaGoogleStatusButton />
           </div>
+
+          <CronogramaPushStatusButton />
 
           <CronogramaTemporalControls className="hidden sm:inline-flex" />
 
