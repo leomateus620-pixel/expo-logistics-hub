@@ -2379,6 +2379,60 @@ export type Database = {
         }
         Relationships: []
       }
+      event_assignment_notifications: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          event_id: string
+          id: string
+          org_id: string
+          sent_at: string | null
+          source: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          event_id: string
+          id?: string
+          org_id: string
+          sent_at?: string | null
+          source: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          event_id?: string
+          id?: string
+          org_id?: string
+          sent_at?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_assignment_notifications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_assignment_notifications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_reminder_deliveries: {
         Row: {
           channel: string
@@ -8689,6 +8743,15 @@ export type Database = {
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      enqueue_event_assignment_notifications: {
+        Args: {
+          _event_id: string
+          _org_id: string
+          _source: string
+          _user_ids: string[]
+        }
+        Returns: undefined
       }
       enqueue_google_sync: {
         Args: { _event_id: string; _operation: string }

@@ -39,6 +39,7 @@ Deno.serve(async (req) => {
   let body: string
   let eventId: string | null = null
   let path: string | null = null
+  let templateName = 'event-reminder'
   try {
     const payload = await req.json()
     userId = String(payload.userId ?? '')
@@ -46,6 +47,7 @@ Deno.serve(async (req) => {
     body = String(payload.body ?? '').slice(0, 300)
     eventId = payload.eventId ? String(payload.eventId) : null
     path = payload.path ? String(payload.path) : null
+    if (payload.templateName) templateName = String(payload.templateName).slice(0, 60)
   } catch {
     return json({ error: 'Invalid JSON in request body' }, 400)
   }
@@ -120,7 +122,7 @@ Deno.serve(async (req) => {
         device_id: device.id,
         title,
         status: 'sent',
-        template_name: 'event-reminder',
+        template_name: templateName,
         metadata: { path: path ?? '/', platform: 'web' },
       })
       continue
@@ -144,7 +146,7 @@ Deno.serve(async (req) => {
       title,
       status: stale ? 'stale_token' : 'failed',
       error_message: `[${res.status}] ${errorBody.slice(0, 200)}`,
-      template_name: 'event-reminder',
+      template_name: templateName,
       metadata: { path: path ?? '/', http_status: res.status },
     })
     if (!stale) failures.push(String(res.status))
