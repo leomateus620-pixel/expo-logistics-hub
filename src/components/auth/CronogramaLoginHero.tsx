@@ -9,6 +9,7 @@ export function CronogramaLoginHero() {
       <FenasojaBrand
         className="auth-hero__brand"
         markOnly
+        markSrc="/alvorada/fenasoja-symbol-official.png"
         showEdition={false}
         tone="dark"
       />
