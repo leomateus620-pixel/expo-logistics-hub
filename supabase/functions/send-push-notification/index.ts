@@ -129,7 +129,10 @@ Deno.serve(async (req) => {
     }
 
     const errorBody = await res.text()
-    console.error(`FCM send failed [${res.status}]: ${errorBody.slice(0, 300)}`)
+    console.error(`FCM send failed [${res.status}]: ${errorBody.slice(0, 2000)}`)
+
+    // Tenta extrair o projeto que o gateway resolveu (aparece no corpo do erro do Google).
+    const resolvedProject = errorBody.match(/projects\/([a-z0-9-]+)/i)?.[1] ?? null
 
     // Token inválido/expirado: revoga em vez de tentar de novo.
     const stale = res.status === 404 || (res.status === 400 && errorBody.includes('INVALID_ARGUMENT'))
@@ -145,10 +148,15 @@ Deno.serve(async (req) => {
       device_id: device.id,
       title,
       status: stale ? 'stale_token' : 'failed',
-      error_message: `[${res.status}] ${errorBody.slice(0, 200)}`,
+      error_message: `[${res.status}] ${errorBody.slice(0, 2000)}`,
       template_name: templateName,
-      metadata: { path: path ?? '/', http_status: res.status },
+      metadata: {
+        path: path ?? '/',
+        http_status: res.status,
+        resolved_project_id: resolvedProject,
+      },
     })
+
     if (!stale) failures.push(String(res.status))
   }
 
