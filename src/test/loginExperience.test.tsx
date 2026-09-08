@@ -55,6 +55,10 @@ describe("experiência de autenticação Fenasoja 2028", () => {
     });
 
     expect(heroBrand).toBeInTheDocument();
+    expect(heroBrand.querySelector("img")).toHaveAttribute(
+      "src",
+      "/alvorada/fenasoja-symbol-official.png",
+    );
     expect(screen.getByRole("heading", { name: "Agenda FENASOJA" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Entrar" })).toBeInTheDocument();
     expect(screen.queryByText("Módulo selecionado")).not.toBeInTheDocument();
