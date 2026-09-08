@@ -415,9 +415,9 @@ async function sendPending(supa: ReturnType<typeof db>) {
           body: JSON.stringify({
             userId: delivery.user_id,
             eventId: delivery.event_id,
-            title: `Evento ${horizonLabel}: ${event.title}`,
-            body: `${normalized.value.dateLong} · ${normalized.value.timeLabel}${event.location ? ` · ${event.location}` : ""}`,
-            path: `/cronograma?event=${delivery.event_id}`,
+            title: pushMessage.title,
+            body: pushMessage.body,
+            path: pushMessage.path,
           }),
         });
         const pushRaw = await pushRes.text();
