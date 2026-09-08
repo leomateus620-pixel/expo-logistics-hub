@@ -7,6 +7,8 @@ import { responsibleRoleLabel } from '@/lib/org-units';
 
 export interface CommissionUnitPeople {
   responsible?: CommissionPerson;
+  /** Todos os responsáveis com papel principal (frentes compartilhadas têm mais de um). */
+  leads: CommissionPerson[];
   members: CommissionPerson[];
 }
 
@@ -28,10 +30,17 @@ export function useCommissionPeople() {
         userId: item.userId,
         role: responsibleRoleLabel(item.relationshipRole),
       }));
-      const responsible = people.find((_, index) => unit.responsibles[index].isPrimary) ?? people[0];
+      const leads = people.filter(
+        (_, index) => unit.responsibles[index].relationshipRole === 'principal',
+      );
+      const responsible = leads[0]
+        ?? people.find((_, index) => unit.responsibles[index].isPrimary)
+        ?? people[0];
+      const leadIds = new Set((leads.length > 0 ? leads : responsible ? [responsible] : []).map((p) => p.id));
       map.set(key, {
         responsible,
-        members: people.filter((person) => person.id !== responsible?.id),
+        leads: leads.length > 0 ? leads : responsible ? [responsible] : [],
+        members: people.filter((person) => !leadIds.has(person.id)),
       });
     }
     return map;

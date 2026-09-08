@@ -18,6 +18,8 @@ interface CommissionCardProps {
   onSelect: (moduleSlug: string) => void;
   /** Responsável oficial da frente (fonte: Agenda Fenasoja). */
   responsible?: CommissionPerson;
+  /** Todos os responsáveis principais (assessorias compartilhadas têm mais de um). */
+  leads?: CommissionPerson[];
   /** Demais integrantes vinculados à frente. */
   members?: CommissionPerson[];
 }
@@ -49,7 +51,9 @@ function getCommissionVisualActionLabel(access: PortalAccessPresentation) {
   return access.label;
 }
 
-function CommissionCard({ access, module, onSelect, responsible, members = [] }: CommissionCardProps) {
+function CommissionCard({ access, module, onSelect, responsible, leads, members = [] }: CommissionCardProps) {
+  const leadList = leads && leads.length > 0 ? leads : responsible ? [responsible] : [];
+  const isShared = leadList.length > 1;
   const Icon = module.icon;
   const status = module.status as CommissionStatus;
   const actionLabel = getCommissionActionLabel(access);
@@ -75,12 +79,18 @@ function CommissionCard({ access, module, onSelect, responsible, members = [] }:
             </span>
           )}
         </span>
-        {responsible && (
-          <span className="commission-access-card__people">
-            <CommissionPersonAvatar person={responsible} variant="lead" />
-            <span className="commission-access-card__lead">
-              <span className="commission-access-card__lead-name">{responsible.name}</span>
-              <span className="commission-access-card__lead-role">{responsible.role ?? 'Responsável'}</span>
+        {leadList.length > 0 && (
+          <span className="commission-access-card__people" data-shared={isShared ? 'true' : undefined}>
+            <span className="commission-access-card__leads">
+              {leadList.map((person) => (
+                <span className="commission-access-card__lead-row" key={person.id}>
+                  <CommissionPersonAvatar person={person} variant="lead" />
+                  <span className="commission-access-card__lead">
+                    <span className="commission-access-card__lead-name">{person.name}</span>
+                    <span className="commission-access-card__lead-role">{person.role ?? 'Responsável'}</span>
+                  </span>
+                </span>
+              ))}
             </span>
             <CommissionPeopleStack people={members} />
           </span>
@@ -143,6 +153,7 @@ export default memo(
     previous.module === next.module
     && previous.onSelect === next.onSelect
     && previous.responsible === next.responsible
+    && previous.leads === next.leads
     && previous.members === next.members
     && previous.access.state === next.access.state
     && previous.access.label === next.access.label
