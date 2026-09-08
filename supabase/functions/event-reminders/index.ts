@@ -255,7 +255,7 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
       if (scheduledFor <= now) continue;
       for (const recipient of recipients.values()) {
         const eventVersion = event.lock_version ?? 0;
-        const channels = pushEnabledUsers.has(recipient.user_id)
+        const channels = offsetMinutes === 60 && pushEnabledUsers.has(recipient.user_id)
           ? ["email", "push"]
           : ["email"];
         for (const channel of channels) {
