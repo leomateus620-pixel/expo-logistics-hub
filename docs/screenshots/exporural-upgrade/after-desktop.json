@@ -1,0 +1,420 @@
+{
+  "phase": "after",
+  "mobile": false,
+  "errors": [],
+  "inventory": {
+    "entity": {
+      "id": "reference:2026:c4",
+      "projectId": "reference:fenasoja-2026",
+      "layerId": "reference:food",
+      "parentEntityId": "reference:2026:quadra-r",
+      "publicIdentifier": "C4",
+      "name": "Churrascaria Exporural",
+      "description": null,
+      "classification": "RESTAURANT",
+      "verificationStatus": "NEEDS_REVIEW",
+      "isSellable": false,
+      "isArchived": false,
+      "geometry": {
+        "id": null,
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              35.56363636363636,
+              -13.200000066265062
+            ],
+            [
+              38.18181818181819,
+              -13.200000066265062
+            ],
+            [
+              38.18181818181819,
+              -10.800000054216866
+            ],
+            [
+              35.56363636363636,
+              -10.800000054216866
+            ],
+            [
+              35.56363636363636,
+              -13.200000066265062
+            ]
+          ]
+        ],
+        "elevation": 0,
+        "extrusionHeight": 0.95,
+        "rotation": 0,
+        "geometryVersion": 5,
+        "calibrationVersion": 5
+      },
+      "metadata": {
+        "seedManaged": true,
+        "sourceRevision": "2026.4",
+        "source": "Mapa oficial Fenasoja 2026 — PDF Mapa do Parque 300x200",
+        "cartographicConfidence": "official_visual_reference",
+        "officialMeasurements": false,
+        "sourcePdfPolygon": [
+          [
+            4980,
+            2370
+          ],
+          [
+            5100,
+            2370
+          ],
+          [
+            5100,
+            2480
+          ],
+          [
+            4980,
+            2480
+          ]
+        ],
+        "parentPublicIdentifier": "QUADRA-R",
+        "buyerDataImported": false,
+        "areaCode": "EXPORURAL",
+        "geometryRevision": "2026.4-exporural.1",
+        "segmentId": "exporural",
+        "segmentCode": "EXPORURAL",
+        "segmentName": "Exporural"
+      },
+      "segmentId": "exporural",
+      "segmentSource": "derived"
+    },
+    "restroom": {
+      "id": "reference:2026:e-06",
+      "projectId": "reference:fenasoja-2026",
+      "layerId": "reference:restrooms",
+      "parentEntityId": null,
+      "publicIdentifier": "E-06",
+      "name": "Sanitários",
+      "description": null,
+      "classification": "RESTROOM",
+      "verificationStatus": "NEEDS_REVIEW",
+      "isSellable": false,
+      "isArchived": false,
+      "geometry": {
+        "id": null,
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              34.036363636363646,
+              -12.327272789156623
+            ],
+            [
+              34.95272727272727,
+              -12.327272789156623
+            ],
+            [
+              34.95272727272727,
+              -11.585454603614458
+            ],
+            [
+              34.036363636363646,
+              -11.585454603614458
+            ],
+            [
+              34.036363636363646,
+              -12.327272789156623
+            ]
+          ]
+        ],
+        "elevation": 0,
+        "extrusionHeight": 0.42,
+        "rotation": 0,
+        "geometryVersion": 5,
+        "calibrationVersion": 5
+      },
+      "metadata": {
+        "seedManaged": true,
+        "sourceRevision": "2026.4",
+        "source": "Mapa oficial Fenasoja 2026 — PDF Mapa do Parque 300x200",
+        "cartographicConfidence": "official_visual_reference",
+        "officialMeasurements": false,
+        "sourcePdfPolygon": [
+          [
+            4910,
+            2410
+          ],
+          [
+            4952,
+            2410
+          ],
+          [
+            4952,
+            2444
+          ],
+          [
+            4910,
+            2444
+          ]
+        ],
+        "parentPublicIdentifier": null,
+        "buyerDataImported": false,
+        "areaCode": "EXPORURAL",
+        "geometryRevision": "2026.4-exporural.1",
+        "legendCode": "E",
+        "instance": 6,
+        "segmentId": "exporural",
+        "segmentCode": "EXPORURAL",
+        "segmentName": "Exporural"
+      },
+      "segmentId": "exporural",
+      "segmentSource": "derived"
+    },
+    "bounds": {
+      "minX": 35.56363636363636,
+      "maxX": 38.18181818181819,
+      "minZ": -13.200000066265062,
+      "maxZ": -10.800000054216866,
+      "width": 2.6181818181818244,
+      "depth": 2.4000000120481957,
+      "centerX": 36.872727272727275,
+      "centerZ": -12.000000060240964
+    },
+    "height": 4.466909090909102,
+    "orientation": 0,
+    "layout": {
+      "officialEntityIdentifier": "C4",
+      "officialRestroomEntityIdentifier": "E-06",
+      "sourcePdfFootprint": [
+        4980,
+        2370,
+        5100,
+        2480
+      ],
+      "sourcePdfRestroomAnchor": [
+        4931,
+        2427
+      ],
+      "facingRadians": 0,
+      "focusDirection": [
+        -0.86,
+        0.54,
+        -0.62
+      ],
+      "mainBuilding": {
+        "widthRatio": 0.84,
+        "depthRatio": 0.9,
+        "offsetXRatio": 0.05,
+        "wallHeightToSpan": 0.36,
+        "roofRiseToSpan": 0.115,
+        "northRoofShare": 0.52,
+        "foundationHeight": 0.055
+      },
+      "restroomAnnex": {
+        "widthRatio": 0.4,
+        "depthRatio": 0.39,
+        "centerOffsetToFootprint": [
+          -0.9083333333333333,
+          0.01818181818181818
+        ],
+        "wallHeightToSpan": 0.245,
+        "roofRiseToSpan": 0.075
+      },
+      "windTurbine": {
+        "offsetToFootprint": [
+          -1.34,
+          -0.18
+        ],
+        "foundationHeight": 0.16,
+        "foundationDiameterToSpan": 0.24,
+        "towerHeightToSpan": 1.36,
+        "minimumTowerHeight": 3.3,
+        "rotorRadiusToSpan": 0.285,
+        "hubRadiusToSpan": 0.075,
+        "bottomRadiusToSpan": 0.047,
+        "topRadiusToSpan": 0.024,
+        "nacelleSizeToSpan": [
+          0.16,
+          0.14,
+          0.38
+        ],
+        "yawRadians": 1.4527042983758027,
+        "bladeTipStartRatio": 0.8,
+        "bladeAngles": [
+          0,
+          2.0943951023931953,
+          4.1887902047863905
+        ]
+      },
+      "palette": {
+        "wall": "#343a3c",
+        "accent": "#b73532",
+        "roof": "#4d5558",
+        "trim": "#c8b99b",
+        "dark": "#202628",
+        "glass": "#66818a",
+        "green": "#466544",
+        "white": "#f3f1e9",
+        "platform": "#8b8982",
+        "metal": "#7b8589"
+      },
+      "references": [
+        "docs/refs-churrascaria-satelite.jpeg",
+        "docs/refs-catavento-fundos.jpg"
+      ]
+    },
+    "dimensions": {
+      "mainWidth": 2.1992727272727324,
+      "mainDepth": 2.160000010843376,
+      "mainOffsetX": 0.13090909090909122,
+      "mainWallHeight": 0.9425454545454568,
+      "mainRoofRise": 0.3010909090909098,
+      "annexWidth": 1.0472727272727298,
+      "annexDepth": 0.9360000046987963,
+      "annexCenterX": -2.3781818181818237,
+      "annexCenterZ": 0.04363636385542174,
+      "annexWallHeight": 0.6414545454545469,
+      "annexRoofRise": 0.19636363636363682,
+      "turbineCenterX": -3.508363636363645,
+      "turbineCenterZ": -0.43200000216867523,
+      "turbineFoundationHeight": 0.16,
+      "turbineFoundationDiameter": 0.6283636363636378,
+      "turbineTowerHeight": 3.5607272727272816,
+      "turbineRotorRadius": 0.7461818181818198,
+      "turbineHubRadius": 0.19636363636363682,
+      "visualHeight": 4.466909090909102
+    },
+    "officialEntitiesSha256": "5abf0ed204b10d98e17d1a6f171add3a6c3b6b37e51f36311c9fed3b57548444",
+    "officialEntityCount": 1733
+  },
+  "poses": {
+    "context": {
+      "target": [
+        35.872727272727275,
+        1,
+        -12.000000060240964
+      ],
+      "position": [
+        22.872727272727275,
+        10,
+        -27.000000060240964
+      ]
+    },
+    "restaurant": {
+      "target": [
+        36.872727272727275,
+        0.6,
+        -12.000000060240964
+      ],
+      "position": [
+        33.472727272727276,
+        2.4,
+        -16.500000060240964
+      ]
+    },
+    "restroom": {
+      "target": [
+        34.49454545454545,
+        0.4,
+        -11.956363696385543
+      ],
+      "position": [
+        32.49454545454545,
+        1.9,
+        -9.156363696385544
+      ]
+    },
+    "turbine": {
+      "target": [
+        33.36436363636363,
+        3,
+        -12.432000062409639
+      ],
+      "position": [
+        29.364363636363628,
+        3.6,
+        -16.43200006240964
+      ]
+    },
+    "top": {
+      "target": [
+        35.872727272727275,
+        0,
+        -12.000000060240964
+      ],
+      "position": [
+        35.872727272727275,
+        13,
+        -12.010000060240964
+      ]
+    },
+    "overview": {
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "position": [
+        100,
+        140,
+        160
+      ]
+    }
+  },
+  "measurements": {
+    "context": {
+      "frames": 361,
+      "meanMs": 16.66592797781457,
+      "p95Ms": 17,
+      "renderer": {
+        "at": 53461.90000000596,
+        "calls": 217,
+        "triangles": 523447,
+        "geometries": 614,
+        "textures": 147,
+        "programs": 180,
+        "dpr": 0.72,
+        "width": 972,
+        "height": 500,
+        "heapBytes": 272474552,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1392,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "overview": {
+      "frames": 295,
+      "meanMs": 20.343728813579528,
+      "p95Ms": 22.100000008940697,
+      "renderer": {
+        "at": 60340.79999999702,
+        "calls": 863,
+        "triangles": 696667,
+        "geometries": 614,
+        "textures": 146,
+        "programs": 179,
+        "dpr": 0.72,
+        "width": 972,
+        "height": 500,
+        "heapBytes": 271002824,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1737,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    }
+  },
+  "browser": "152.0.7977.82"
+}

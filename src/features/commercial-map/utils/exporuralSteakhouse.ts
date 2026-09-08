@@ -1,4 +1,15 @@
-export const EXPORURAL_STEAKHOUSE_REVISION = '2026.9-c4-reference.1';
+export const EXPORURAL_STEAKHOUSE_REVISION = '2026.9-c4-architecture.2';
+// Pixel measurements in the recovered, north-up aerial reference (1448 x 1086).
+// Nacelle tail -> hub gives rotor-facing (-59, -7) in map X/Z. This is an
+// approximately 83.2 degree local yaw, not a surveyed or prevailing wind azimuth.
+export const EXPORURAL_TURBINE_AXIS_REFERENCE = {
+  image: 'docs/refs-churrascaria-satelite.jpeg',
+  hubPixel: [449, 663], tailPixel: [508, 670], approximate: true,
+} as const;
+export const EXPORURAL_TURBINE_YAW = Math.atan2(
+  EXPORURAL_TURBINE_AXIS_REFERENCE.tailPixel[0] - EXPORURAL_TURBINE_AXIS_REFERENCE.hubPixel[0],
+  EXPORURAL_TURBINE_AXIS_REFERENCE.tailPixel[1] - EXPORURAL_TURBINE_AXIS_REFERENCE.hubPixel[1],
+);
 export const EXPORURAL_STEAKHOUSE_VISIBILITY_THRESHOLD = 0.015;
 
 export const EXPORURAL_STEAKHOUSE_LAYOUT = {
@@ -38,9 +49,7 @@ export const EXPORURAL_STEAKHOUSE_LAYOUT = {
     bottomRadiusToSpan: 0.047,
     topRadiusToSpan: 0.024,
     nacelleSizeToSpan: [0.16, 0.14, 0.38] as const,
-    // Local presentation yaw, not a surveyed wind bearing: it exposes the
-    // three-blade plane from the same north-west review view used for C4.
-    yawRadians: -Math.PI * 0.7,
+    yawRadians: EXPORURAL_TURBINE_YAW,
     bladeTipStartRatio: 0.8,
     bladeAngles: [0, (Math.PI * 2) / 3, (Math.PI * 4) / 3] as const,
   },
@@ -64,12 +73,12 @@ export const EXPORURAL_STEAKHOUSE_LAYOUT = {
 
 export const EXPORURAL_STEAKHOUSE_RENDER_BUDGET = {
   reduced: {
-    maximumPrimaryDrawCalls: 15,
-    maximumRenderedTriangles: 1_200,
+    maximumPrimaryDrawCalls: 24,
+    maximumRenderedTriangles: 10_000,
   },
   detailed: {
-    maximumPrimaryDrawCalls: 18,
-    maximumRenderedTriangles: 1_800,
+    maximumPrimaryDrawCalls: 24,
+    maximumRenderedTriangles: 12_000,
   },
   maximumShadowDrawCalls: 12,
 } as const;
@@ -270,10 +279,9 @@ export function exporuralSteakhouseVisualHeight(
 
 export function exporuralSteakhouseRenderDiagnostics(
   detailed: boolean,
+  measured: Pick<ExporuralSteakhouseRenderDiagnostics, 'primaryDrawCalls' | 'renderedTriangles' | 'shadowDrawCalls'>,
 ): ExporuralSteakhouseRenderDiagnostics {
-  const primaryDrawCalls = detailed ? 17 : 15;
-  const renderedTriangles = detailed ? 1_344 : 888;
-  const shadowDrawCalls = 11;
+  const { primaryDrawCalls, renderedTriangles, shadowDrawCalls } = measured;
   const budget = detailed
     ? EXPORURAL_STEAKHOUSE_RENDER_BUDGET.detailed
     : EXPORURAL_STEAKHOUSE_RENDER_BUDGET.reduced;

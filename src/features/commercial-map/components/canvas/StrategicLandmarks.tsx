@@ -663,6 +663,9 @@ function useLandmarkMaterials(
       result.metal.metalness = 0.28;
     }
     if (kind === 'exporural-restaurant') {
+      result.glass.transparent = true;
+      result.glass.opacity = 0.3;
+      result.glass.depthWrite = false;
       result.wall.roughness = 0.86;
       result.roof.roughness = 0.56;
       result.roof.metalness = 0.24;
@@ -744,7 +747,7 @@ function useLandmarkMaterials(
               platform: 0.08,
               metal: 0.06,
             } satisfies Record<keyof LandmarkMaterialSet, number>)[key]
-          : kind === 'fenasoja-restaurant'
+          : kind === 'fenasoja-restaurant' || kind === 'exporural-restaurant'
             // The satellite roof is neutral grey; segment identity stays on the accent band only.
             ? ({
                 wall: 0.06,
@@ -4059,6 +4062,7 @@ export interface StrategicLandmarkMeshProps {
   onEnterInterior: (id: string) => void;
   onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
   moduleStateById?: ReadonlyMap<string, CommercialPavilionModuleVisualState>;
+  exporuralRestroomEntityId?: string;
 }
 
 /**
@@ -4101,6 +4105,7 @@ export function StrategicLandmarkMesh({
   onEnterInterior,
   onCursor,
   moduleStateById,
+  exporuralRestroomEntityId,
 }: StrategicLandmarkMeshProps) {
   const kind = resolveStrategicLandmarkKind(entity);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
@@ -4313,6 +4318,15 @@ export function StrategicLandmarkMesh({
         {kind === 'fenasoja-event-center' && <FenasojaEventCenter {...modelProps} />}
         {kind === 'exporural-restaurant' && (
           <ExporuralSteakhouse
+            selected={selected}
+            restroomOnClick={(event) => {
+              event.stopPropagation();
+              if (!isMapSelectionClick(event.delta, event.nativeEvent)) return;
+              // E-06 remains absent from the official active inventory. Do not
+              // revive a removed registration or trigger C4's cooking by proxy.
+              if (exporuralRestroomEntityId) onSelect(exporuralRestroomEntityId);
+              else useCommercialMapStore.getState().setSelectedEntityId(null);
+            }}
             compoundOnClick={handleClick}
             compoundOnDoubleClick={handleDoubleClick}
             {...modelProps}
