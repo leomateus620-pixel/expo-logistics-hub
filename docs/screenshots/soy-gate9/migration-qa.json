@@ -1,0 +1,14 @@
+{
+  "engine": "PGlite PostgreSQL WASM; isolated schema fixture; no Supabase RLS/PostGIS execution",
+  "checks": {
+    "exactlyTwoNewEntities": true,
+    "historyRetained": true,
+    "restroomReactivated": true,
+    "commercialRecordsPreserved": true,
+    "neighborsPreserved": true,
+    "idempotent": true,
+    "salesConflictRefused": true,
+    "atomicRollback": true,
+    "foreignCoordinateFrameUntouched": true
+  }
+}

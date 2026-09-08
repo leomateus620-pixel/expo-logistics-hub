@@ -1,0 +1,238 @@
+[
+  {
+    "identifier": "E-07",
+    "name": "Sanitários — Cozinha da Soja",
+    "description": "Sanitários permanentes diante da Cozinha da Soja, do outro lado da Rua Montevidéu. Masculino à esquerda e Feminino à direita na aproximação pela cozinha. Implantação estimada por referências; fachadas interpretadas.",
+    "classification": "RESTROOM",
+    "layer": "restrooms",
+    "height": 0.64,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -1.0909090909090935,
+            -10.407272779518074
+          ],
+          [
+            1.0036363636363603,
+            -10.407272779518074
+          ],
+          [
+            1.0036363636363603,
+            -8.923636408433737
+          ],
+          [
+            -1.0909090909090935,
+            -8.923636408433737
+          ],
+          [
+            -1.0909090909090935,
+            -10.407272779518074
+          ]
+        ]
+      ]
+    },
+    "oldGeometry": [
+      [
+        [
+          -0.5018181818181802,
+          -9.992727322891561
+        ],
+        [
+          0.4145454545454612,
+          -9.992727322891561
+        ],
+        [
+          0.4145454545454612,
+          -9.250909137349403
+        ],
+        [
+          -0.5018181818181802,
+          -9.250909137349403
+        ],
+        [
+          -0.5018181818181802,
+          -9.992727322891561
+        ]
+      ]
+    ],
+    "metadata": {
+      "seedManaged": true,
+      "sourceRevision": "2026.9-soy-gate9.1",
+      "source": "5d336574-d021-43c5-8ee6-77284f34d95a.jpeg; f1f1df47-9230-48f9-88fc-6c91a4e1dbc4.jpeg",
+      "cartographicConfidence": "satellite_registered_estimate",
+      "officialMeasurements": false,
+      "sourcePdfPolygon": [
+        [
+          3300,
+          2498
+        ],
+        [
+          3396,
+          2498
+        ],
+        [
+          3396,
+          2566
+        ],
+        [
+          3300,
+          2566
+        ]
+      ],
+      "parentPublicIdentifier": null,
+      "buyerDataImported": false,
+      "legendCode": "E",
+      "instance": 7,
+      "infrastructure": true,
+      "facadeAssumptions": {
+        "wallHeight": 0.46,
+        "roofRise": 0.13,
+        "wallThickness": 0.035,
+        "eave": 0.045
+      }
+    }
+  },
+  {
+    "identifier": "RUA-MONTEVIDEU-COZINHA",
+    "name": "Rua Montevidéu — conexão Cozinha da Soja",
+    "description": null,
+    "classification": "ROAD",
+    "layer": "circulation",
+    "height": 0.032,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            1.9854545454545445,
+            -11.083636419277113
+          ],
+          [
+            2.8800000000000026,
+            -11.083636419277113
+          ],
+          [
+            2.8800000000000026,
+            -8.640000043373497
+          ],
+          [
+            1.9854545454545445,
+            -8.640000043373497
+          ],
+          [
+            1.9854545454545445,
+            -11.083636419277113
+          ]
+        ]
+      ]
+    },
+    "oldGeometry": null,
+    "metadata": {
+      "seedManaged": true,
+      "sourceRevision": "2026.9-soy-gate9.1",
+      "source": "5d336574-d021-43c5-8ee6-77284f34d95a.jpeg; f1f1df47-9230-48f9-88fc-6c91a4e1dbc4.jpeg",
+      "cartographicConfidence": "satellite_registered_estimate",
+      "officialMeasurements": false,
+      "sourcePdfPolygon": [
+        [
+          3441,
+          2467
+        ],
+        [
+          3482,
+          2467
+        ],
+        [
+          3482,
+          2579
+        ],
+        [
+          3441,
+          2579
+        ]
+      ],
+      "parentPublicIdentifier": null,
+      "buyerDataImported": false,
+      "labelPriority": "road",
+      "isSeparator": true,
+      "relatedStreets": [
+        "RUA-PARAGUAI",
+        "RUA-BOLIVIA",
+        "RUA-MONTEVIDEU-SUL"
+      ]
+    }
+  },
+  {
+    "identifier": "RES-A9",
+    "name": "Reservatórios — Portão 9",
+    "description": "Três caixas de água junto ao Portão 9. Instalação de infraestrutura, sem finalidade comercial. Posições vinculadas à planta hidráulica; acabamento e alturas dos corpos interpretados conservadoramente.",
+    "classification": "SERVICE",
+    "layer": "structures",
+    "height": 1.47,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            9.709090909090918,
+            -38.8363638313253
+          ],
+          [
+            11.323636363636354,
+            -38.8363638313253
+          ],
+          [
+            11.323636363636354,
+            -38.138182009638555
+          ],
+          [
+            9.709090909090918,
+            -38.138182009638555
+          ],
+          [
+            9.709090909090918,
+            -38.8363638313253
+          ]
+        ]
+      ]
+    },
+    "oldGeometry": null,
+    "metadata": {
+      "seedManaged": true,
+      "sourceRevision": "2026.9-soy-gate9.1",
+      "source": "efa48d13-4f5a-44be-86c0-2fb40461f351.jpeg",
+      "cartographicConfidence": "hydraulic_plan_registered",
+      "officialMeasurements": false,
+      "sourcePdfPolygon": [
+        [
+          3795,
+          1195
+        ],
+        [
+          3869,
+          1195
+        ],
+        [
+          3869,
+          1227
+        ],
+        [
+          3795,
+          1227
+        ]
+      ],
+      "parentPublicIdentifier": null,
+      "buyerDataImported": false,
+      "infrastructure": true,
+      "relatedGateIdentifier": "A9",
+      "hydroIdentifiers": [
+        "reservoir-elevated-01",
+        "reservoir-elevated-02",
+        "reservoir-elevated-03"
+      ],
+      "tankCount": 3
+    }
+  }
+]

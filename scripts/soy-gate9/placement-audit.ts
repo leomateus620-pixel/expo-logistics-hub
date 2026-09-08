@@ -1,0 +1,12 @@
+import { writeFileSync } from 'node:fs';
+import { OFFICIAL_RENDERED_ENTITIES as entities, officialLocalPointToPdf } from '../../src/features/commercial-map/data/officialReference2026';
+import { COMMERCIAL_ELECTRICAL_NODES } from '../../src/features/commercial-map/data/electricalInfrastructure';
+import { resolveElectricalNodePlacements } from '../../src/features/commercial-map/utils/electricalInfrastructure';
+import { HYDROLOGICAL_NODES } from '../../src/features/commercial-map/data/hydrologicalInfrastructure';
+import { COMMERCIAL_MAP_TREES } from '../../src/features/commercial-map/data/commercialTrees';
+import { lactalisStagePresentationFootprint, LACTALIS_STAGE_LAYOUT } from '../../src/features/commercial-map/utils/lactalisStage';
+import { commercialSitePolygonInteriorsOverlap } from '../../src/features/commercial-map/utils/commercialSiteEnvironment';
+const stage=lactalisStagePresentationFootprint();
+const electrical=resolveElectricalNodePlacements(COMMERCIAL_ELECTRICAL_NODES,entities,true).filter(n=>{const [x,z]=n.renderPosition;return x>-3&&x<3.5&&z>-12&&z<-7});
+const out={stage: {degrees:LACTALIS_STAGE_LAYOUT.facingDegrees,footprint:stage,collisions:entities.filter(e=>['ROAD','BUILDING','ADMINISTRATION','PAVILION'].includes(e.classification)&&commercialSitePolygonInteriorsOverlap(stage,e.geometry.coordinates[0])).map(e=>e.publicIdentifier)}, electrical:electrical.map(n=>({id:n.node.sourceMarkerId,mount:n.node.mountMode,position:n.renderPosition,source:officialLocalPointToPdf(n.renderPosition),radius:n.node.radius})), reservoirs:HYDROLOGICAL_NODES.filter(n=>n.id.startsWith('reservoir-elevated')), trees:COMMERCIAL_MAP_TREES.filter(n=>n.position[0]>8&&n.position[0]<13&&n.position[1]<-35)};
+writeFileSync('docs/screenshots/soy-gate9/placement-audit.json',JSON.stringify(out,null,2));console.log(JSON.stringify(out));

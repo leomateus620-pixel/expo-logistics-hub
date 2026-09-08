@@ -551,6 +551,9 @@ function getEntityExtent(entity: MapEntity): SceneExtent {
 function focusProfileForEntity(entity: MapEntity) {
   const profile = selectionFocusProfile(entity.classification);
   const landmark = resolveStrategicLandmarkKind(entity);
+  if (landmark === 'soy-restroom' || landmark === 'gate-nine-tanks') {
+    return { ...profile, contextRatio: 0.012, fitPadding: 1.18, minDistanceRatio: 0.009, maxDistanceRatio: 0.2, minimumDirectionY: 0.36 };
+  }
   if (landmark === 'administrative-center') {
     return { ...profile, contextRatio: 0.055, fitPadding: 1.08, minDistanceRatio: 0.052, maxDistanceRatio: 0.32, minimumDirectionY: 0.32 };
   }
@@ -1693,7 +1696,7 @@ const EntityLabel = memo(function EntityLabel({
         <div
           data-map-entity-id={entity.id}
           data-map-label-mode={mode}
-          className={`commercial-map-label is-structure ${isGate ? 'is-access' : ''} ${isRestroom ? 'is-restroom' : ''} ${isArchitecturalLandmark ? 'is-architectural-landmark' : ''} ${variant}`}
+          className={`commercial-map-label is-structure ${isGate ? 'is-access' : ''} ${isRestroom ? 'is-restroom' : ''} ${isArchitecturalLandmark && !isRestroom ? 'is-architectural-landmark' : ''} ${variant}`}
         >
           {metadata.structureCode && <strong className="commercial-map-label-code">{isRestroom ? 'E' : metadata.structureCode}</strong>}
           <span>{contextualDisplayName}</span>

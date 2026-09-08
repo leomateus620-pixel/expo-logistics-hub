@@ -8,7 +8,8 @@ import {
   type CommercialSiteEnvironmentTreatmentDefinition,
   type CommercialSiteEnvironmentTreatmentId,
 } from '../data/commercialSiteEnvironment';
-import { OFFICIAL_REFERENCE_ENTITIES } from '../data/officialReference2026';
+import { SOY_RESTROOM } from '../data/soyGateInfrastructure';
+import { OFFICIAL_REFERENCE_ENTITIES, officialPdfPointToLocal } from '../data/officialReference2026';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../data/parkAccessSpatialPlan';
 import { REAR_PARKING_ROWS, REAR_PARKING_SURFACES } from '../data/rearParking';
 import { buildRearRoadCorridorFootprints } from './rearRoadNetwork';
@@ -335,6 +336,14 @@ export function buildCommercialSiteHardSurfaceMasks(
     if (mask) masks.push(mask);
   });
 
+  if (entities.some(e => e.publicIdentifier === SOY_RESTROOM.identifier)) {
+    const [cx, cz] = officialPdfPointToLocal(SOY_RESTROOM.sourceCenter);
+    [-1, 1].forEach(side => {
+      const z = cz - side * 0.34;
+      const path = makeMask(`soy-restroom:approach:${side}`, 'E-07', 'EXISTING_SITE_APRON', [[cx + 1.04, z - 0.14], [cx + 2.029, z - 0.14], [cx + 2.029, z + 0.14], [cx + 1.04, z + 0.14]]);
+      if (path) masks.push(path);
+    });
+  }
   const existingApronMask = makeMask(
     COMMERCIAL_SITE_EXISTING_PAVILION_09_SERVICE_APRON.id,
     COMMERCIAL_SITE_EXISTING_PAVILION_09_SERVICE_APRON.officialOwnerIdentifier,

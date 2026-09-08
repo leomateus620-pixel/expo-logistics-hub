@@ -29,8 +29,13 @@ const bounds = { width: 2.6181818181818244, depth: 2.4000000120481957 };
 
 describe('C4 / E-06 architecture and selection activity', () => {
   it('preserves the complete approved official inventory and compound placement', () => {
+    const prior = JSON.parse(readFileSync('docs/screenshots/soy-gate9/before-inventory.json', 'utf8')).entities;
+    const originalE07 = { ...prior.find((e: { publicIdentifier: string }) => e.publicIdentifier === 'E-07') };
+    delete originalE07.source;
+    // Only the explicitly authorized September additions/restroom are excluded.
+    const preserved = OFFICIAL_REFERENCE_ENTITIES.filter(e => !['RUA-MONTEVIDEU-COZINHA', 'RES-A9'].includes(e.publicIdentifier)).map(e => e.publicIdentifier === 'E-07' ? originalE07 : e);
     const hash = createHash('sha256')
-      .update(JSON.stringify(OFFICIAL_REFERENCE_ENTITIES))
+      .update(JSON.stringify(preserved))
       .digest('hex');
     expect(hash).toBe(baseline.officialEntitiesSha256);
     expect(EXPORURAL_STEAKHOUSE_LAYOUT.mainBuilding).toEqual(

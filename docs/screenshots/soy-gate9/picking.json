@@ -1,0 +1,30 @@
+[
+  {
+    "mobile": false,
+    "id": "E-07",
+    "selected": "reference:2026:e-07",
+    "correct": true,
+    "errors": []
+  },
+  {
+    "mobile": false,
+    "id": "RES-A9",
+    "selected": "reference:2026:res-a9",
+    "correct": true,
+    "errors": []
+  },
+  {
+    "mobile": true,
+    "id": "E-07",
+    "selected": "reference:2026:e-07",
+    "correct": true,
+    "errors": []
+  },
+  {
+    "mobile": true,
+    "id": "RES-A9",
+    "selected": "reference:2026:res-a9",
+    "correct": true,
+    "errors": []
+  }
+]

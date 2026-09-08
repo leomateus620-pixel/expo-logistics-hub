@@ -1,0 +1,276 @@
+{
+  "stage": {
+    "degrees": 0,
+    "footprint": [
+      [
+        15.01947632279392,
+        11.822745059964944
+      ],
+      [
+        17.925978222660646,
+        11.822745059964944
+      ],
+      [
+        17.925978222660646,
+        13.79180052316758
+      ],
+      [
+        17.559600000000007,
+        13.79180052316758
+      ],
+      [
+        17.559600000000007,
+        13.829527341349397
+      ],
+      [
+        15.385854545454558,
+        13.829527341349397
+      ],
+      [
+        15.385854545454558,
+        13.79180052316758
+      ],
+      [
+        15.01947632279392,
+        13.79180052316758
+      ]
+    ],
+    "collisions": []
+  },
+  "electrical": [
+    {
+      "id": "pole-ref-184",
+      "mount": "GROUND_POLE",
+      "position": [
+        1.907846,
+        -11.951364
+      ],
+      "source": [
+        3437.4429416666667,
+        2427.2291527498537
+      ],
+      "radius": 0.035
+    },
+    {
+      "id": "pole-ref-193",
+      "mount": "GROUND_POLE",
+      "position": [
+        1.365821,
+        -10.946054
+      ],
+      "source": [
+        3412.6001291666666,
+        2473.305860851878
+      ],
+      "radius": 0.035
+    },
+    {
+      "id": "pole-ref-194",
+      "mount": "GROUND_POLE",
+      "position": [
+        -1.935561,
+        -10.943187
+      ],
+      "source": [
+        3261.2867874999997,
+        2473.4372650178852
+      ],
+      "radius": 0.035
+    },
+    {
+      "id": "pole-ref-202",
+      "mount": "GROUND_POLE",
+      "position": [
+        1.942402,
+        -9.739687
+      ],
+      "source": [
+        3439.026758333334,
+        2528.597681407642
+      ],
+      "radius": 0.035
+    },
+    {
+      "id": "pole-ref-208",
+      "mount": "GROUND_POLE",
+      "position": [
+        0.628647,
+        -8.81451
+      ],
+      "source": [
+        3378.8129875,
+        2571.0016270281044
+      ],
+      "radius": 0.035
+    },
+    {
+      "id": "pole-ref-213",
+      "mount": "GROUND_POLE",
+      "position": [
+        -1.721693,
+        -8.803553
+      ],
+      "source": [
+        3271.089070833333,
+        2571.5038228589165
+      ],
+      "radius": 0.035
+    },
+    {
+      "id": "pole-ref-229",
+      "mount": "GROUND_POLE",
+      "position": [
+        1.898897,
+        -7.068163
+      ],
+      "source": [
+        3437.032779166667,
+        2651.042530792959
+      ],
+      "radius": 0.035
+    },
+    {
+      "id": "transformer-ref-006",
+      "mount": "GROUND_TRANSFORMER",
+      "position": [
+        1.476835,
+        -10.63619
+      ],
+      "source": [
+        3417.6882708333337,
+        2487.507960780583
+      ],
+      "radius": 0.22
+    },
+    {
+      "id": "transformer-ref-007",
+      "mount": "FACADE_RECEPTION",
+      "position": [
+        3.163636363636364,
+        -10.358991
+      ],
+      "source": [
+        3495,
+        2500.2129148834692
+      ],
+      "radius": 0.22
+    },
+    {
+      "id": "transformer-ref-008",
+      "mount": "GROUND_TRANSFORMER",
+      "position": [
+        -2.487252,
+        -10.263296
+      ],
+      "source": [
+        3236.00095,
+        2504.598935694785
+      ],
+      "radius": 0.22
+    },
+    {
+      "id": "transformer-ref-009",
+      "mount": "GROUND_TRANSFORMER",
+      "position": [
+        -2.487378,
+        -9.72938
+      ],
+      "source": [
+        3235.995175,
+        2529.0700855719374
+      ],
+      "radius": 0.22
+    },
+    {
+      "id": "transformer-ref-010",
+      "mount": "GROUND_TRANSFORMER",
+      "position": [
+        -2.495294,
+        -9.218849
+      ],
+      "source": [
+        3235.6323583333333,
+        2552.469422954471
+      ],
+      "radius": 0.22
+    }
+  ],
+  "reservoirs": [
+    {
+      "id": "reservoir-elevated-01",
+      "type": "reservoir",
+      "position": [
+        9.996289422954405,
+        -38.51386659699169
+      ],
+      "sourcePagePosition": [
+        1012.45,
+        126.43
+      ],
+      "label": "Caixa d’água elevada 01",
+      "linkedSegmentIds": [
+        "hydro-distribution-001",
+        "hydro-distribution-007",
+        "hydro-distribution-002",
+        "hydro-distribution-005"
+      ],
+      "selectable": true,
+      "metadata": {
+        "source": "OFFICIAL_PLAN_VECTOR_SYMBOL",
+        "verificationStatus": "OFFICIAL_PLAN_AFFINE_CALIBRATED",
+        "engineeringNote": "20.000 L; base 6,00 m; cotas 337,55/341,15"
+      }
+    },
+    {
+      "id": "reservoir-elevated-02",
+      "type": "reservoir",
+      "position": [
+        10.506894913568459,
+        -38.50371789860677
+      ],
+      "sourcePagePosition": [
+        1019,
+        126.56
+      ],
+      "label": "Caixa d’água elevada 02",
+      "linkedSegmentIds": [
+        "hydro-distribution-005",
+        "hydro-distribution-002",
+        "hydro-distribution-006",
+        "hydro-distribution-004"
+      ],
+      "selectable": true,
+      "metadata": {
+        "source": "OFFICIAL_PLAN_VECTOR_SYMBOL",
+        "verificationStatus": "OFFICIAL_PLAN_AFFINE_CALIBRATED",
+        "engineeringNote": "20.000 L; base 6,00 m; cotas 337,92/341,20"
+      }
+    },
+    {
+      "id": "reservoir-elevated-03",
+      "type": "reservoir",
+      "position": [
+        11.02139823894845,
+        -38.50370179832805
+      ],
+      "sourcePagePosition": [
+        1025.6,
+        126.56
+      ],
+      "label": "Caixa d’água elevada 03",
+      "linkedSegmentIds": [
+        "hydro-distribution-004",
+        "hydro-distribution-006",
+        "hydro-distribution-002",
+        "hydro-distribution-005"
+      ],
+      "selectable": true,
+      "metadata": {
+        "source": "OFFICIAL_PLAN_VECTOR_SYMBOL",
+        "verificationStatus": "OFFICIAL_PLAN_AFFINE_CALIBRATED",
+        "engineeringNote": "20.000 L; base 6,00 m; cotas 338,02/341,27"
+      }
+    }
+  ],
+  "trees": []
+}
