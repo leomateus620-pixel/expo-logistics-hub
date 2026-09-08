@@ -786,6 +786,7 @@ interface EntityMeshProps {
   infrastructureMode: boolean;
   nationsDistrictPresentationAvailable: boolean;
   exporuralSteakhousePresentationAvailable: boolean;
+  exporuralRestroomEntityId?: string;
   isMatch: boolean;
   layerOpacity: number;
   sceneCenter: readonly [number, number];
@@ -1202,6 +1203,7 @@ const EntityMesh = memo(function EntityMesh(props: EntityMeshProps) {
         onEnterInterior={props.onEnterInterior}
         onCursor={props.onCursor}
         moduleStateById={props.moduleStateById}
+        exporuralRestroomEntityId={props.exporuralRestroomEntityId}
       />
     );
   }
@@ -4460,6 +4462,7 @@ const Scene = memo(function Scene({
   const structuralEntities = useMemo(() => nonLotEntities.filter((entity) => (
     entity.classification !== 'ROAD' && entity.classification !== 'PEDESTRIAN_PATH'
   )).map((entity) => rearParkingEnabled ? rearParkingEntityForPresentation(entity) : entity), [nonLotEntities, rearParkingEnabled]);
+  const exporuralRestroomEntityId = useMemo(() => entities.find(isExporuralSteakhouseRestroomAnnex)?.id, [entities]);
   const exporuralSteakhousePresentationAvailable = useMemo(() => {
     const steakhouse = structuralEntities.find((entity) => (
       resolveStrategicLandmarkKind(entity) === 'exporural-restaurant'
@@ -4805,6 +4808,7 @@ const Scene = memo(function Scene({
           infrastructureMode={hydrologicalModeActive}
           nationsDistrictPresentationAvailable={nationsDistrictPresentationAvailable}
           exporuralSteakhousePresentationAvailable={exporuralSteakhousePresentationAvailable}
+          exporuralRestroomEntityId={exporuralRestroomEntityId}
           isMatch={presentedMatchingEntityIds.has(entity.id)}
           layerOpacity={layerOpacity[entity.layerId] ?? 1}
           sceneCenter={sceneCenter}

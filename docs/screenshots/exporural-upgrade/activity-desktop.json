@@ -1,0 +1,1496 @@
+{
+  "browser": "152.0.7977.82",
+  "mobile": false,
+  "errors": [],
+  "inactive": {
+    "restroomHandlerAvailable": true,
+    "calls": 21,
+    "triangles": 3168,
+    "shadowCalls": 8,
+    "entries": [
+      {
+        "name": "arquitetura-c4-e06-wall",
+        "uuid": "c5517a9b-207a-40b6-95c2-5a3fb03d9d79",
+        "triangles": 360,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-platform",
+        "uuid": "348800e0-9051-47ce-9885-a0b752e756b2",
+        "triangles": 120,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-white",
+        "uuid": "44ea372e-484f-4186-9d3f-f03a92ed48a0",
+        "triangles": 576,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-glass",
+        "uuid": "27e91990-ff4e-4885-9f73-6d6946da0364",
+        "triangles": 60,
+        "shadow": false
+      },
+      {
+        "name": "empenas-fechadas-churrascaria-e-banheiro",
+        "uuid": "65028d64-d0c4-446f-b253-153a6de13562",
+        "triangles": 8,
+        "shadow": true
+      },
+      {
+        "name": "cobertura-norte-metal-cinza-escuro",
+        "uuid": "4e179a0a-be72-4eca-b2ac-bef6547e72cc",
+        "triangles": 96,
+        "shadow": false
+      },
+      {
+        "name": "",
+        "uuid": "3350404f-e4ca-4f11-b797-14c5c84bd428",
+        "triangles": 2,
+        "shadow": false
+      },
+      {
+        "name": "",
+        "uuid": "579c5efe-2cbb-44e2-b744-f8f819e09e90",
+        "triangles": 2,
+        "shadow": false
+      },
+      {
+        "name": "plinto-circular-catavento-sobre-lote-q-r-27",
+        "uuid": "77138116-d97f-4c4d-a494-42f3f4206ee2",
+        "triangles": 48,
+        "shadow": false
+      },
+      {
+        "name": "torre-cilindrica-catavento",
+        "uuid": "e2353fd8-f8cf-407e-b832-9898aec7a61e",
+        "triangles": 64,
+        "shadow": true
+      },
+      {
+        "name": "flanges-secoes-torre",
+        "uuid": "c42eb86a-e6c9-4d21-9a42-e799ea6ca28b",
+        "triangles": 144,
+        "shadow": false
+      },
+      {
+        "name": "plataforma-servico-nacele",
+        "uuid": "f31c539b-4a89-46a1-97bf-e38f47d9b048",
+        "triangles": 196,
+        "shadow": false
+      },
+      {
+        "name": "nacelle-branca-catavento",
+        "uuid": "4970a3f3-5995-4054-9d33-7f412a8aa5cb",
+        "triangles": 28,
+        "shadow": true
+      },
+      {
+        "name": "eixo-rotor-catavento",
+        "uuid": "66acf08e-8c4e-4a67-9405-fd13f7493366",
+        "triangles": 48,
+        "shadow": true
+      },
+      {
+        "name": "tres-pas-brancas-catavento",
+        "uuid": "cea97dcb-0217-4861-9082-d26d5dc62287",
+        "triangles": 84,
+        "shadow": false
+      },
+      {
+        "name": "tres-pontas-vermelhas-catavento",
+        "uuid": "501ec90a-d221-4074-bd03-8182ae7c8525",
+        "triangles": 84,
+        "shadow": false
+      },
+      {
+        "name": "cubo-branco-catavento",
+        "uuid": "128e6512-2726-408e-bfd2-5391727c9a0e",
+        "triangles": 252,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-dark",
+        "uuid": "e078a3eb-ee0b-46e7-add8-cd4adb591b6b",
+        "triangles": 312,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-metal",
+        "uuid": "6a809107-513f-49ae-b137-2a3a98ab3f76",
+        "triangles": 168,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-roof",
+        "uuid": "3f5e4577-f460-480c-b7ba-60b5b060ecc2",
+        "triangles": 96,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-trim",
+        "uuid": "bcc58849-7912-4e27-a136-e6bc39cda4da",
+        "triangles": 420,
+        "shadow": true
+      }
+    ],
+    "activity": {
+      "selected": false,
+      "amount": 0,
+      "updates": 0,
+      "crew": 0,
+      "particles": 0
+    },
+    "rotor": {
+      "phase": 3.093147365715425,
+      "yaw": 1.4527042983758027,
+      "axis": [
+        0.993035236117013,
+        3.469446951953614e-18,
+        0.11781773987828922
+      ]
+    },
+    "roofVisible": true,
+    "roofOpacity": 1,
+    "screenC4": [
+      661.9632541315498,
+      417.5483499695134
+    ],
+    "screenE06": [
+      1095.3261308446108,
+      561.5839850174295
+    ],
+    "memory": {
+      "geometries": 610,
+      "textures": 147,
+      "programs": 180
+    }
+  },
+  "active": {
+    "restroomHandlerAvailable": true,
+    "calls": 22,
+    "triangles": 7168,
+    "shadowCalls": 8,
+    "entries": [
+      {
+        "name": "arquitetura-c4-e06-wall",
+        "uuid": "c5517a9b-207a-40b6-95c2-5a3fb03d9d79",
+        "triangles": 360,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-platform",
+        "uuid": "348800e0-9051-47ce-9885-a0b752e756b2",
+        "triangles": 120,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-white",
+        "uuid": "44ea372e-484f-4186-9d3f-f03a92ed48a0",
+        "triangles": 576,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-glass",
+        "uuid": "27e91990-ff4e-4885-9f73-6d6946da0364",
+        "triangles": 60,
+        "shadow": false
+      },
+      {
+        "name": "empenas-fechadas-churrascaria-e-banheiro",
+        "uuid": "65028d64-d0c4-446f-b253-153a6de13562",
+        "triangles": 8,
+        "shadow": true
+      },
+      {
+        "name": "",
+        "uuid": "3350404f-e4ca-4f11-b797-14c5c84bd428",
+        "triangles": 2,
+        "shadow": false
+      },
+      {
+        "name": "",
+        "uuid": "579c5efe-2cbb-44e2-b744-f8f819e09e90",
+        "triangles": 2,
+        "shadow": false
+      },
+      {
+        "name": "tres-churrasqueiros",
+        "uuid": "aaeaffdd-9e70-409c-96c3-77f04f618205",
+        "triangles": 4080,
+        "shadow": false
+      },
+      {
+        "name": "fumaca-leve-saida-coifa",
+        "uuid": "e41a9500-5951-4854-ad92-e0c1f38c624c",
+        "triangles": 16,
+        "shadow": false
+      },
+      {
+        "name": "plinto-circular-catavento-sobre-lote-q-r-27",
+        "uuid": "77138116-d97f-4c4d-a494-42f3f4206ee2",
+        "triangles": 48,
+        "shadow": false
+      },
+      {
+        "name": "torre-cilindrica-catavento",
+        "uuid": "e2353fd8-f8cf-407e-b832-9898aec7a61e",
+        "triangles": 64,
+        "shadow": true
+      },
+      {
+        "name": "flanges-secoes-torre",
+        "uuid": "c42eb86a-e6c9-4d21-9a42-e799ea6ca28b",
+        "triangles": 144,
+        "shadow": false
+      },
+      {
+        "name": "plataforma-servico-nacele",
+        "uuid": "f31c539b-4a89-46a1-97bf-e38f47d9b048",
+        "triangles": 196,
+        "shadow": false
+      },
+      {
+        "name": "nacelle-branca-catavento",
+        "uuid": "4970a3f3-5995-4054-9d33-7f412a8aa5cb",
+        "triangles": 28,
+        "shadow": true
+      },
+      {
+        "name": "eixo-rotor-catavento",
+        "uuid": "66acf08e-8c4e-4a67-9405-fd13f7493366",
+        "triangles": 48,
+        "shadow": true
+      },
+      {
+        "name": "tres-pas-brancas-catavento",
+        "uuid": "cea97dcb-0217-4861-9082-d26d5dc62287",
+        "triangles": 84,
+        "shadow": false
+      },
+      {
+        "name": "tres-pontas-vermelhas-catavento",
+        "uuid": "501ec90a-d221-4074-bd03-8182ae7c8525",
+        "triangles": 84,
+        "shadow": false
+      },
+      {
+        "name": "cubo-branco-catavento",
+        "uuid": "128e6512-2726-408e-bfd2-5391727c9a0e",
+        "triangles": 252,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-dark",
+        "uuid": "e078a3eb-ee0b-46e7-add8-cd4adb591b6b",
+        "triangles": 312,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-metal",
+        "uuid": "6a809107-513f-49ae-b137-2a3a98ab3f76",
+        "triangles": 168,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-roof",
+        "uuid": "3f5e4577-f460-480c-b7ba-60b5b060ecc2",
+        "triangles": 96,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-trim",
+        "uuid": "bcc58849-7912-4e27-a136-e6bc39cda4da",
+        "triangles": 420,
+        "shadow": true
+      }
+    ],
+    "activity": {
+      "selected": true,
+      "amount": 1,
+      "updates": 42,
+      "crew": 3,
+      "particles": 8
+    },
+    "rotor": {
+      "phase": 3.292893363520886,
+      "yaw": 1.4527042983758027,
+      "axis": [
+        0.993035236117013,
+        1.3877787807814457e-17,
+        0.11781773987828913
+      ]
+    },
+    "roofVisible": false,
+    "roofOpacity": 0,
+    "screenC4": [
+      661.9632541315498,
+      417.5483499695134
+    ],
+    "screenE06": [
+      1095.3261308446108,
+      561.5839850174295
+    ],
+    "memory": {
+      "geometries": 611,
+      "textures": 147,
+      "programs": 181
+    }
+  },
+  "moving": {
+    "restroomHandlerAvailable": true,
+    "calls": 22,
+    "triangles": 7168,
+    "shadowCalls": 8,
+    "entries": [
+      {
+        "name": "arquitetura-c4-e06-wall",
+        "uuid": "c5517a9b-207a-40b6-95c2-5a3fb03d9d79",
+        "triangles": 360,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-platform",
+        "uuid": "348800e0-9051-47ce-9885-a0b752e756b2",
+        "triangles": 120,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-white",
+        "uuid": "44ea372e-484f-4186-9d3f-f03a92ed48a0",
+        "triangles": 576,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-glass",
+        "uuid": "27e91990-ff4e-4885-9f73-6d6946da0364",
+        "triangles": 60,
+        "shadow": false
+      },
+      {
+        "name": "empenas-fechadas-churrascaria-e-banheiro",
+        "uuid": "65028d64-d0c4-446f-b253-153a6de13562",
+        "triangles": 8,
+        "shadow": true
+      },
+      {
+        "name": "",
+        "uuid": "3350404f-e4ca-4f11-b797-14c5c84bd428",
+        "triangles": 2,
+        "shadow": false
+      },
+      {
+        "name": "",
+        "uuid": "579c5efe-2cbb-44e2-b744-f8f819e09e90",
+        "triangles": 2,
+        "shadow": false
+      },
+      {
+        "name": "tres-churrasqueiros",
+        "uuid": "aaeaffdd-9e70-409c-96c3-77f04f618205",
+        "triangles": 4080,
+        "shadow": false
+      },
+      {
+        "name": "fumaca-leve-saida-coifa",
+        "uuid": "e41a9500-5951-4854-ad92-e0c1f38c624c",
+        "triangles": 16,
+        "shadow": false
+      },
+      {
+        "name": "plinto-circular-catavento-sobre-lote-q-r-27",
+        "uuid": "77138116-d97f-4c4d-a494-42f3f4206ee2",
+        "triangles": 48,
+        "shadow": false
+      },
+      {
+        "name": "torre-cilindrica-catavento",
+        "uuid": "e2353fd8-f8cf-407e-b832-9898aec7a61e",
+        "triangles": 64,
+        "shadow": true
+      },
+      {
+        "name": "flanges-secoes-torre",
+        "uuid": "c42eb86a-e6c9-4d21-9a42-e799ea6ca28b",
+        "triangles": 144,
+        "shadow": false
+      },
+      {
+        "name": "plataforma-servico-nacele",
+        "uuid": "f31c539b-4a89-46a1-97bf-e38f47d9b048",
+        "triangles": 196,
+        "shadow": false
+      },
+      {
+        "name": "nacelle-branca-catavento",
+        "uuid": "4970a3f3-5995-4054-9d33-7f412a8aa5cb",
+        "triangles": 28,
+        "shadow": true
+      },
+      {
+        "name": "eixo-rotor-catavento",
+        "uuid": "66acf08e-8c4e-4a67-9405-fd13f7493366",
+        "triangles": 48,
+        "shadow": true
+      },
+      {
+        "name": "tres-pas-brancas-catavento",
+        "uuid": "cea97dcb-0217-4861-9082-d26d5dc62287",
+        "triangles": 84,
+        "shadow": false
+      },
+      {
+        "name": "tres-pontas-vermelhas-catavento",
+        "uuid": "501ec90a-d221-4074-bd03-8182ae7c8525",
+        "triangles": 84,
+        "shadow": false
+      },
+      {
+        "name": "cubo-branco-catavento",
+        "uuid": "128e6512-2726-408e-bfd2-5391727c9a0e",
+        "triangles": 252,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-dark",
+        "uuid": "e078a3eb-ee0b-46e7-add8-cd4adb591b6b",
+        "triangles": 312,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-metal",
+        "uuid": "6a809107-513f-49ae-b137-2a3a98ab3f76",
+        "triangles": 168,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-roof",
+        "uuid": "3f5e4577-f460-480c-b7ba-60b5b060ecc2",
+        "triangles": 96,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-trim",
+        "uuid": "bcc58849-7912-4e27-a136-e6bc39cda4da",
+        "triangles": 420,
+        "shadow": true
+      }
+    ],
+    "activity": {
+      "selected": true,
+      "amount": 1,
+      "updates": 181,
+      "crew": 3,
+      "particles": 8
+    },
+    "rotor": {
+      "phase": 4.968095242138178,
+      "yaw": 1.4527042983758027,
+      "axis": [
+        0.9930352361170129,
+        1.1102230246251565e-16,
+        0.11781773987828936
+      ]
+    },
+    "roofVisible": false,
+    "roofOpacity": 0,
+    "screenC4": [
+      771.2856084266493,
+      229.44876749615014
+    ],
+    "screenE06": [
+      1957.4193384143935,
+      1578.1279392269669
+    ],
+    "memory": {
+      "geometries": 611,
+      "textures": 147,
+      "programs": 181
+    }
+  },
+  "cleared": {
+    "restroomHandlerAvailable": true,
+    "calls": 21,
+    "triangles": 3168,
+    "shadowCalls": 8,
+    "entries": [
+      {
+        "name": "arquitetura-c4-e06-wall",
+        "uuid": "c5517a9b-207a-40b6-95c2-5a3fb03d9d79",
+        "triangles": 360,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-platform",
+        "uuid": "348800e0-9051-47ce-9885-a0b752e756b2",
+        "triangles": 120,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-white",
+        "uuid": "44ea372e-484f-4186-9d3f-f03a92ed48a0",
+        "triangles": 576,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-glass",
+        "uuid": "27e91990-ff4e-4885-9f73-6d6946da0364",
+        "triangles": 60,
+        "shadow": false
+      },
+      {
+        "name": "empenas-fechadas-churrascaria-e-banheiro",
+        "uuid": "65028d64-d0c4-446f-b253-153a6de13562",
+        "triangles": 8,
+        "shadow": true
+      },
+      {
+        "name": "cobertura-norte-metal-cinza-escuro",
+        "uuid": "4e179a0a-be72-4eca-b2ac-bef6547e72cc",
+        "triangles": 96,
+        "shadow": false
+      },
+      {
+        "name": "",
+        "uuid": "3350404f-e4ca-4f11-b797-14c5c84bd428",
+        "triangles": 2,
+        "shadow": false
+      },
+      {
+        "name": "",
+        "uuid": "579c5efe-2cbb-44e2-b744-f8f819e09e90",
+        "triangles": 2,
+        "shadow": false
+      },
+      {
+        "name": "plinto-circular-catavento-sobre-lote-q-r-27",
+        "uuid": "77138116-d97f-4c4d-a494-42f3f4206ee2",
+        "triangles": 48,
+        "shadow": false
+      },
+      {
+        "name": "torre-cilindrica-catavento",
+        "uuid": "e2353fd8-f8cf-407e-b832-9898aec7a61e",
+        "triangles": 64,
+        "shadow": true
+      },
+      {
+        "name": "flanges-secoes-torre",
+        "uuid": "c42eb86a-e6c9-4d21-9a42-e799ea6ca28b",
+        "triangles": 144,
+        "shadow": false
+      },
+      {
+        "name": "plataforma-servico-nacele",
+        "uuid": "f31c539b-4a89-46a1-97bf-e38f47d9b048",
+        "triangles": 196,
+        "shadow": false
+      },
+      {
+        "name": "nacelle-branca-catavento",
+        "uuid": "4970a3f3-5995-4054-9d33-7f412a8aa5cb",
+        "triangles": 28,
+        "shadow": true
+      },
+      {
+        "name": "eixo-rotor-catavento",
+        "uuid": "66acf08e-8c4e-4a67-9405-fd13f7493366",
+        "triangles": 48,
+        "shadow": true
+      },
+      {
+        "name": "tres-pas-brancas-catavento",
+        "uuid": "cea97dcb-0217-4861-9082-d26d5dc62287",
+        "triangles": 84,
+        "shadow": false
+      },
+      {
+        "name": "tres-pontas-vermelhas-catavento",
+        "uuid": "501ec90a-d221-4074-bd03-8182ae7c8525",
+        "triangles": 84,
+        "shadow": false
+      },
+      {
+        "name": "cubo-branco-catavento",
+        "uuid": "128e6512-2726-408e-bfd2-5391727c9a0e",
+        "triangles": 252,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-dark",
+        "uuid": "e078a3eb-ee0b-46e7-add8-cd4adb591b6b",
+        "triangles": 312,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-metal",
+        "uuid": "6a809107-513f-49ae-b137-2a3a98ab3f76",
+        "triangles": 168,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-roof",
+        "uuid": "3f5e4577-f460-480c-b7ba-60b5b060ecc2",
+        "triangles": 96,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-trim",
+        "uuid": "bcc58849-7912-4e27-a136-e6bc39cda4da",
+        "triangles": 420,
+        "shadow": true
+      }
+    ],
+    "activity": {
+      "selected": false,
+      "amount": 0,
+      "updates": 380,
+      "crew": 0,
+      "particles": 0
+    },
+    "rotor": {
+      "phase": 0.5154493686107192,
+      "yaw": 1.4527042983758027,
+      "axis": [
+        0.9930352361170132,
+        5.551115123125783e-17,
+        0.11781773987828903
+      ]
+    },
+    "roofVisible": true,
+    "roofOpacity": 1,
+    "screenC4": [
+      771.2856084266493,
+      229.44876749615014
+    ],
+    "screenE06": [
+      1957.4193384143935,
+      1578.1279392269669
+    ],
+    "memory": {
+      "geometries": 611,
+      "textures": 147,
+      "programs": 181
+    }
+  },
+  "warm": {
+    "restroomHandlerAvailable": true,
+    "calls": 22,
+    "triangles": 7168,
+    "shadowCalls": 8,
+    "entries": [
+      {
+        "name": "arquitetura-c4-e06-wall",
+        "uuid": "c5517a9b-207a-40b6-95c2-5a3fb03d9d79",
+        "triangles": 360,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-platform",
+        "uuid": "348800e0-9051-47ce-9885-a0b752e756b2",
+        "triangles": 120,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-white",
+        "uuid": "44ea372e-484f-4186-9d3f-f03a92ed48a0",
+        "triangles": 576,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-glass",
+        "uuid": "27e91990-ff4e-4885-9f73-6d6946da0364",
+        "triangles": 60,
+        "shadow": false
+      },
+      {
+        "name": "empenas-fechadas-churrascaria-e-banheiro",
+        "uuid": "65028d64-d0c4-446f-b253-153a6de13562",
+        "triangles": 8,
+        "shadow": true
+      },
+      {
+        "name": "",
+        "uuid": "3350404f-e4ca-4f11-b797-14c5c84bd428",
+        "triangles": 2,
+        "shadow": false
+      },
+      {
+        "name": "",
+        "uuid": "579c5efe-2cbb-44e2-b744-f8f819e09e90",
+        "triangles": 2,
+        "shadow": false
+      },
+      {
+        "name": "tres-churrasqueiros",
+        "uuid": "aaeaffdd-9e70-409c-96c3-77f04f618205",
+        "triangles": 4080,
+        "shadow": false
+      },
+      {
+        "name": "fumaca-leve-saida-coifa",
+        "uuid": "e41a9500-5951-4854-ad92-e0c1f38c624c",
+        "triangles": 16,
+        "shadow": false
+      },
+      {
+        "name": "plinto-circular-catavento-sobre-lote-q-r-27",
+        "uuid": "77138116-d97f-4c4d-a494-42f3f4206ee2",
+        "triangles": 48,
+        "shadow": false
+      },
+      {
+        "name": "torre-cilindrica-catavento",
+        "uuid": "e2353fd8-f8cf-407e-b832-9898aec7a61e",
+        "triangles": 64,
+        "shadow": true
+      },
+      {
+        "name": "flanges-secoes-torre",
+        "uuid": "c42eb86a-e6c9-4d21-9a42-e799ea6ca28b",
+        "triangles": 144,
+        "shadow": false
+      },
+      {
+        "name": "plataforma-servico-nacele",
+        "uuid": "f31c539b-4a89-46a1-97bf-e38f47d9b048",
+        "triangles": 196,
+        "shadow": false
+      },
+      {
+        "name": "nacelle-branca-catavento",
+        "uuid": "4970a3f3-5995-4054-9d33-7f412a8aa5cb",
+        "triangles": 28,
+        "shadow": true
+      },
+      {
+        "name": "eixo-rotor-catavento",
+        "uuid": "66acf08e-8c4e-4a67-9405-fd13f7493366",
+        "triangles": 48,
+        "shadow": true
+      },
+      {
+        "name": "tres-pas-brancas-catavento",
+        "uuid": "cea97dcb-0217-4861-9082-d26d5dc62287",
+        "triangles": 84,
+        "shadow": false
+      },
+      {
+        "name": "tres-pontas-vermelhas-catavento",
+        "uuid": "501ec90a-d221-4074-bd03-8182ae7c8525",
+        "triangles": 84,
+        "shadow": false
+      },
+      {
+        "name": "cubo-branco-catavento",
+        "uuid": "128e6512-2726-408e-bfd2-5391727c9a0e",
+        "triangles": 252,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-dark",
+        "uuid": "e078a3eb-ee0b-46e7-add8-cd4adb591b6b",
+        "triangles": 312,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-metal",
+        "uuid": "6a809107-513f-49ae-b137-2a3a98ab3f76",
+        "triangles": 168,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-roof",
+        "uuid": "3f5e4577-f460-480c-b7ba-60b5b060ecc2",
+        "triangles": 96,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-trim",
+        "uuid": "bcc58849-7912-4e27-a136-e6bc39cda4da",
+        "triangles": 420,
+        "shadow": true
+      }
+    ],
+    "activity": {
+      "selected": true,
+      "amount": 1,
+      "updates": 595,
+      "crew": 3,
+      "particles": 8
+    },
+    "rotor": {
+      "phase": 2.235697134072116,
+      "yaw": 1.4527042983758027,
+      "axis": [
+        0.9930352361170129,
+        -5.551115123125783e-17,
+        0.11781773987828928
+      ]
+    },
+    "roofVisible": false,
+    "roofOpacity": 0,
+    "screenC4": [
+      771.2856084266493,
+      229.44876749615014
+    ],
+    "screenE06": [
+      1957.4193384143935,
+      1578.1279392269669
+    ],
+    "memory": {
+      "geometries": 613,
+      "textures": 147,
+      "programs": 181
+    }
+  },
+  "final": {
+    "restroomHandlerAvailable": true,
+    "calls": 22,
+    "triangles": 7168,
+    "shadowCalls": 8,
+    "entries": [
+      {
+        "name": "arquitetura-c4-e06-wall",
+        "uuid": "c5517a9b-207a-40b6-95c2-5a3fb03d9d79",
+        "triangles": 360,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-platform",
+        "uuid": "348800e0-9051-47ce-9885-a0b752e756b2",
+        "triangles": 120,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-white",
+        "uuid": "44ea372e-484f-4186-9d3f-f03a92ed48a0",
+        "triangles": 576,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-glass",
+        "uuid": "27e91990-ff4e-4885-9f73-6d6946da0364",
+        "triangles": 60,
+        "shadow": false
+      },
+      {
+        "name": "empenas-fechadas-churrascaria-e-banheiro",
+        "uuid": "65028d64-d0c4-446f-b253-153a6de13562",
+        "triangles": 8,
+        "shadow": true
+      },
+      {
+        "name": "",
+        "uuid": "3350404f-e4ca-4f11-b797-14c5c84bd428",
+        "triangles": 2,
+        "shadow": false
+      },
+      {
+        "name": "",
+        "uuid": "579c5efe-2cbb-44e2-b744-f8f819e09e90",
+        "triangles": 2,
+        "shadow": false
+      },
+      {
+        "name": "tres-churrasqueiros",
+        "uuid": "aaeaffdd-9e70-409c-96c3-77f04f618205",
+        "triangles": 4080,
+        "shadow": false
+      },
+      {
+        "name": "fumaca-leve-saida-coifa",
+        "uuid": "e41a9500-5951-4854-ad92-e0c1f38c624c",
+        "triangles": 16,
+        "shadow": false
+      },
+      {
+        "name": "plinto-circular-catavento-sobre-lote-q-r-27",
+        "uuid": "77138116-d97f-4c4d-a494-42f3f4206ee2",
+        "triangles": 48,
+        "shadow": false
+      },
+      {
+        "name": "torre-cilindrica-catavento",
+        "uuid": "e2353fd8-f8cf-407e-b832-9898aec7a61e",
+        "triangles": 64,
+        "shadow": true
+      },
+      {
+        "name": "flanges-secoes-torre",
+        "uuid": "c42eb86a-e6c9-4d21-9a42-e799ea6ca28b",
+        "triangles": 144,
+        "shadow": false
+      },
+      {
+        "name": "plataforma-servico-nacele",
+        "uuid": "f31c539b-4a89-46a1-97bf-e38f47d9b048",
+        "triangles": 196,
+        "shadow": false
+      },
+      {
+        "name": "nacelle-branca-catavento",
+        "uuid": "4970a3f3-5995-4054-9d33-7f412a8aa5cb",
+        "triangles": 28,
+        "shadow": true
+      },
+      {
+        "name": "eixo-rotor-catavento",
+        "uuid": "66acf08e-8c4e-4a67-9405-fd13f7493366",
+        "triangles": 48,
+        "shadow": true
+      },
+      {
+        "name": "tres-pas-brancas-catavento",
+        "uuid": "cea97dcb-0217-4861-9082-d26d5dc62287",
+        "triangles": 84,
+        "shadow": false
+      },
+      {
+        "name": "tres-pontas-vermelhas-catavento",
+        "uuid": "501ec90a-d221-4074-bd03-8182ae7c8525",
+        "triangles": 84,
+        "shadow": false
+      },
+      {
+        "name": "cubo-branco-catavento",
+        "uuid": "128e6512-2726-408e-bfd2-5391727c9a0e",
+        "triangles": 252,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-dark",
+        "uuid": "e078a3eb-ee0b-46e7-add8-cd4adb591b6b",
+        "triangles": 312,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-metal",
+        "uuid": "6a809107-513f-49ae-b137-2a3a98ab3f76",
+        "triangles": 168,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-roof",
+        "uuid": "3f5e4577-f460-480c-b7ba-60b5b060ecc2",
+        "triangles": 96,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-trim",
+        "uuid": "bcc58849-7912-4e27-a136-e6bc39cda4da",
+        "triangles": 420,
+        "shadow": true
+      }
+    ],
+    "activity": {
+      "selected": true,
+      "amount": 1,
+      "updates": 1880,
+      "crew": 3,
+      "particles": 8
+    },
+    "rotor": {
+      "phase": 4.118846379315035,
+      "yaw": 1.4527042983758027,
+      "axis": [
+        0.9930352361170129,
+        -5.551115123125783e-17,
+        0.11781773987828922
+      ]
+    },
+    "roofVisible": false,
+    "roofOpacity": 0,
+    "screenC4": [
+      771.2856084266493,
+      229.44876749615014
+    ],
+    "screenE06": [
+      1957.4193384143935,
+      1578.1279392269669
+    ],
+    "memory": {
+      "geometries": 613,
+      "textures": 147,
+      "programs": 181
+    }
+  },
+  "reduced": {
+    "restroomHandlerAvailable": true,
+    "calls": 21,
+    "triangles": 7152,
+    "shadowCalls": 8,
+    "entries": [
+      {
+        "name": "arquitetura-c4-e06-wall",
+        "uuid": "c5517a9b-207a-40b6-95c2-5a3fb03d9d79",
+        "triangles": 360,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-platform",
+        "uuid": "348800e0-9051-47ce-9885-a0b752e756b2",
+        "triangles": 120,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-white",
+        "uuid": "44ea372e-484f-4186-9d3f-f03a92ed48a0",
+        "triangles": 576,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-glass",
+        "uuid": "27e91990-ff4e-4885-9f73-6d6946da0364",
+        "triangles": 60,
+        "shadow": false
+      },
+      {
+        "name": "empenas-fechadas-churrascaria-e-banheiro",
+        "uuid": "65028d64-d0c4-446f-b253-153a6de13562",
+        "triangles": 8,
+        "shadow": true
+      },
+      {
+        "name": "",
+        "uuid": "3350404f-e4ca-4f11-b797-14c5c84bd428",
+        "triangles": 2,
+        "shadow": false
+      },
+      {
+        "name": "",
+        "uuid": "579c5efe-2cbb-44e2-b744-f8f819e09e90",
+        "triangles": 2,
+        "shadow": false
+      },
+      {
+        "name": "tres-churrasqueiros",
+        "uuid": "aaeaffdd-9e70-409c-96c3-77f04f618205",
+        "triangles": 4080,
+        "shadow": false
+      },
+      {
+        "name": "plinto-circular-catavento-sobre-lote-q-r-27",
+        "uuid": "77138116-d97f-4c4d-a494-42f3f4206ee2",
+        "triangles": 48,
+        "shadow": false
+      },
+      {
+        "name": "torre-cilindrica-catavento",
+        "uuid": "e2353fd8-f8cf-407e-b832-9898aec7a61e",
+        "triangles": 64,
+        "shadow": true
+      },
+      {
+        "name": "flanges-secoes-torre",
+        "uuid": "c42eb86a-e6c9-4d21-9a42-e799ea6ca28b",
+        "triangles": 144,
+        "shadow": false
+      },
+      {
+        "name": "plataforma-servico-nacele",
+        "uuid": "f31c539b-4a89-46a1-97bf-e38f47d9b048",
+        "triangles": 196,
+        "shadow": false
+      },
+      {
+        "name": "nacelle-branca-catavento",
+        "uuid": "4970a3f3-5995-4054-9d33-7f412a8aa5cb",
+        "triangles": 28,
+        "shadow": true
+      },
+      {
+        "name": "eixo-rotor-catavento",
+        "uuid": "66acf08e-8c4e-4a67-9405-fd13f7493366",
+        "triangles": 48,
+        "shadow": true
+      },
+      {
+        "name": "tres-pas-brancas-catavento",
+        "uuid": "cea97dcb-0217-4861-9082-d26d5dc62287",
+        "triangles": 84,
+        "shadow": false
+      },
+      {
+        "name": "tres-pontas-vermelhas-catavento",
+        "uuid": "501ec90a-d221-4074-bd03-8182ae7c8525",
+        "triangles": 84,
+        "shadow": false
+      },
+      {
+        "name": "cubo-branco-catavento",
+        "uuid": "128e6512-2726-408e-bfd2-5391727c9a0e",
+        "triangles": 252,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-dark",
+        "uuid": "e078a3eb-ee0b-46e7-add8-cd4adb591b6b",
+        "triangles": 312,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-metal",
+        "uuid": "6a809107-513f-49ae-b137-2a3a98ab3f76",
+        "triangles": 168,
+        "shadow": false
+      },
+      {
+        "name": "arquitetura-c4-e06-roof",
+        "uuid": "3f5e4577-f460-480c-b7ba-60b5b060ecc2",
+        "triangles": 96,
+        "shadow": true
+      },
+      {
+        "name": "arquitetura-c4-e06-trim",
+        "uuid": "bcc58849-7912-4e27-a136-e6bc39cda4da",
+        "triangles": 420,
+        "shadow": true
+      }
+    ],
+    "activity": {
+      "selected": true,
+      "amount": 1,
+      "updates": 1929,
+      "crew": 3,
+      "particles": 0
+    },
+    "rotor": {
+      "phase": 4.530630398941218,
+      "yaw": 1.4527042983758027,
+      "axis": [
+        0.9930352361170132,
+        2.7755575615628914e-16,
+        0.11781773987828914
+      ]
+    },
+    "roofVisible": false,
+    "roofOpacity": 0,
+    "screenC4": [
+      427.10754565867677,
+      703.2337881043986
+    ],
+    "screenE06": [
+      612.5864540049602,
+      817.7708052421061
+    ],
+    "memory": {
+      "geometries": 613,
+      "textures": 147,
+      "programs": 181
+    }
+  },
+  "snapshots": [
+    {
+      "cycle": 1,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 659,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 2,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 720,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 3,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 783,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 4,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 849,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 5,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 913,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 6,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 977,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 7,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 1041,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 8,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 1107,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 9,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 1172,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 10,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 1237,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 11,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 1303,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 12,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 1366,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 13,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 1429,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 14,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 1494,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 15,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 1558,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 16,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 1620,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 17,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 1684,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 18,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 1748,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 19,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 1813,
+        "crew": 3,
+        "particles": 8
+      }
+    },
+    {
+      "cycle": 20,
+      "memory": {
+        "geometries": 613,
+        "textures": 147,
+        "programs": 181
+      },
+      "activity": {
+        "selected": true,
+        "amount": 1,
+        "updates": 1880,
+        "crew": 3,
+        "particles": 8
+      }
+    }
+  ],
+  "health": {
+    "status": "ready",
+    "path": "post",
+    "presentedFrames": 2449,
+    "contextLosses": 0,
+    "lastErrorCode": null
+  },
+  "videoPath": "C:\\Users\\Leonardo\\Desktop\\expo-logistics-hub-exporural-upgrade\\docs\\screenshots\\exporural-upgrade\\video\\page@9eb2a49d6e9ed081b26faf3275d878f3.webm",
+  "animationStartSeconds": 36.908,
+  "animationEndSeconds": 48.679
+}
