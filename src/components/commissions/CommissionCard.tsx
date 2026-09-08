@@ -79,12 +79,18 @@ function CommissionCard({ access, module, onSelect, responsible, leads, members 
             </span>
           )}
         </span>
-        {responsible && (
-          <span className="commission-access-card__people">
-            <CommissionPersonAvatar person={responsible} variant="lead" />
-            <span className="commission-access-card__lead">
-              <span className="commission-access-card__lead-name">{responsible.name}</span>
-              <span className="commission-access-card__lead-role">{responsible.role ?? 'Responsável'}</span>
+        {leadList.length > 0 && (
+          <span className="commission-access-card__people" data-shared={isShared ? 'true' : undefined}>
+            <span className="commission-access-card__leads">
+              {leadList.map((person) => (
+                <span className="commission-access-card__lead-row" key={person.id}>
+                  <CommissionPersonAvatar person={person} variant="lead" />
+                  <span className="commission-access-card__lead">
+                    <span className="commission-access-card__lead-name">{person.name}</span>
+                    <span className="commission-access-card__lead-role">{person.role ?? 'Responsável'}</span>
+                  </span>
+                </span>
+              ))}
             </span>
             <CommissionPeopleStack people={members} />
           </span>
