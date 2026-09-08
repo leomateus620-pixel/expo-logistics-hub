@@ -134,6 +134,7 @@ Deno.serve(async (req) => {
           title: message.title,
           body: message.body,
           path: message.path,
+          templateName: 'event-assignment',
         }),
       });
       const raw = await res.text();
