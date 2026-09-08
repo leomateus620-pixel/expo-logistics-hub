@@ -94,7 +94,7 @@
 .commission-access-card__lead-row {
   display: flex;
   min-width: 0;
-  align-items: center;
+  align-items: flex-start;
   gap: 9px;
 }
 
@@ -109,13 +109,16 @@
 }
 
 .commission-access-card__lead-name {
+  display: -webkit-box;
   overflow: hidden;
   color: #eaf2fa;
   font-size: 0.8rem;
   font-weight: 700;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .commission-access-card__lead-role {
