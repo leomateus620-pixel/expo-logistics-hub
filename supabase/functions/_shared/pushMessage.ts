@@ -35,3 +35,31 @@ export function buildEventPushMessage(input: EventPushInput): EventPushMessage {
     path: `/cronograma?event=${input.eventId}`,
   };
 }
+
+export interface AssignmentPushInput {
+  eventTitle: string;
+  dateLabel?: string | null;
+  timeLabel?: string | null;
+  location?: string | null;
+  eventId: string;
+  /** 'responsible' quando a pessoa foi vinculada diretamente; 'commission' via comissão. */
+  source?: 'responsible' | 'commission';
+}
+
+export function buildAssignmentPushMessage(input: AssignmentPushInput): EventPushMessage {
+  const parts: string[] = [input.eventTitle.trim()];
+  const date = (input.dateLabel ?? '').trim();
+  const time = (input.timeLabel ?? '').trim();
+  const location = (input.location ?? '').trim();
+  if (date) parts.push(date);
+  if (time) parts.push(time);
+  if (location && location.toLowerCase() !== 'não informado') parts.push(location);
+
+  return {
+    title: input.source === 'commission'
+      ? 'Sua comissão foi vinculada a um evento'
+      : 'Você foi vinculado a um evento',
+    body: parts.filter(Boolean).join(' · '),
+    path: `/cronograma?event=${input.eventId}`,
+  };
+}
