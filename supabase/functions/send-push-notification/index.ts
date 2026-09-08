@@ -103,7 +103,10 @@ Deno.serve(async (req) => {
           },
           webpush: {
             fcm_options: { link: path ?? '/' },
-            notification: { icon: '/favicon.ico' },
+            notification: {
+              icon: PUSH_ICON_PATH,
+              badge: PUSH_ICON_PATH,
+            },
           },
         },
       }),
