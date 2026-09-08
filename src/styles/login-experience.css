@@ -3286,6 +3286,7 @@
   border-color: oklch(var(--brand-navy-900));
   border-radius: 0.75rem;
   background: oklch(var(--brand-navy-900));
+  color: oklch(var(--brand-soft-white));
   box-shadow: 0 14px 26px -18px oklch(var(--brand-navy-900) / 0.82);
   font-family: 'Agenda Hind', sans-serif;
   font-weight: 700;
@@ -3299,6 +3300,7 @@
 .auth-screen[data-module='cronograma-eventos'] .auth-submit:hover:not(:disabled) {
   border-color: oklch(var(--brand-indigo-600));
   background: oklch(var(--brand-indigo-600));
+  color: oklch(var(--brand-soft-white));
   box-shadow: 0 16px 28px -18px oklch(var(--brand-indigo-500) / 0.7);
   transform: translateY(-1px);
 }
