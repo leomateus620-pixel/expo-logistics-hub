@@ -4984,7 +4984,9 @@ export type Database = {
           error_message: string | null
           event_id: string | null
           id: string
+          metadata: Json
           status: string
+          template_name: string
           title: string
           user_id: string
         }
@@ -4994,7 +4996,9 @@ export type Database = {
           error_message?: string | null
           event_id?: string | null
           id?: string
+          metadata?: Json
           status?: string
+          template_name?: string
           title: string
           user_id: string
         }
@@ -5004,7 +5008,9 @@ export type Database = {
           error_message?: string | null
           event_id?: string | null
           id?: string
+          metadata?: Json
           status?: string
+          template_name?: string
           title?: string
           user_id?: string
         }
