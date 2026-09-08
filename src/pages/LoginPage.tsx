@@ -409,7 +409,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           aria-labelledby="login-title"
           aria-busy={phase === 'submitting'}
         >
-          {!isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && !isFinancialLogin && (
+          {!isCronogramaLogin && !isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && !isFinancialLogin && (
             <div className="auth-panel__brand-row">
               <FenasojaBrand
                 compact
@@ -438,7 +438,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           )}
 
           <div className="auth-panel__heading">
-            {!isVenueEventsLogin && (
+            {!isCronogramaLogin && !isVenueEventsLogin && (
               <p className="auth-panel__eyebrow">
                 <ShieldCheck aria-hidden="true" />
                 {isCommercialMapLogin
@@ -451,7 +451,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
               </p>
             )}
             <h2 id="login-title">Entrar</h2>
-            <p>
+            {!isCronogramaLogin && <p>
               {isVenueEventsLogin
                 ? 'Informe suas credenciais para continuar.'
                 : isFinancialLogin
@@ -459,7 +459,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
                   : isCommercialMapLogin || isCommissionMapLogin
                   ? 'Use seu e-mail e senha institucionais para continuar.'
                   : <>Use suas credenciais institucionais para continuar em <strong>{contextName}</strong>.</>}
-            </p>
+            </p>}
           </div>
 
 
@@ -624,7 +624,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           </form>
 
           <div className="auth-panel__footer">
-            {!isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && !isFinancialLogin && (
+            {!isCronogramaLogin && !isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && !isFinancialLogin && (
               <div className="auth-restricted-note">
                 <span className="auth-restricted-note__icon" aria-hidden="true">
                   <ShieldCheck />

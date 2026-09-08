@@ -47,30 +47,20 @@ describe("experiência de autenticação Fenasoja 2028", () => {
     localStorage.clear();
   });
 
-  it("apresenta o hero simplificado, o título correto e o ciclo estratégico", () => {
+  it("apresenta a identidade clean da Agenda FENASOJA", () => {
     renderLogin();
 
     const heroBrand = screen.getByRole("img", {
-      name: "Fenasoja 2028, Planejamento institucional",
+      name: "Fenasoja 2028",
     });
 
     expect(heroBrand).toBeInTheDocument();
-    expect(
-      heroBrand.querySelector(".fenasoja-brand__edition"),
-    ).not.toBeInTheDocument();
-    expect(
-      screen
-        .getByRole("img", { name: "Fenasoja 2028, Acesso ao sistema" })
-        .querySelector(".fenasoja-brand__edition"),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "Planejamento da Fenasoja 2028" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("img", {
-        name: "Ciclo estratégico de 2026 a 2028, com foco atual em 2028",
-      }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Agenda FENASOJA" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Entrar" })).toBeInTheDocument();
+    expect(screen.queryByText("Módulo selecionado")).not.toBeInTheDocument();
+    expect(screen.queryByText("Identificação segura")).not.toBeInTheDocument();
+    expect(screen.queryByText("Acesso restrito")).not.toBeInTheDocument();
+    expect(screen.queryByText("Ciclo estratégico")).not.toBeInTheDocument();
 
     expect(screen.queryByText("Acesso protegido")).not.toBeInTheDocument();
     expect(
