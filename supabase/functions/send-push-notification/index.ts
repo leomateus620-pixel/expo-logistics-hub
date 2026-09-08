@@ -120,6 +120,8 @@ Deno.serve(async (req) => {
         device_id: device.id,
         title,
         status: 'sent',
+        template_name: 'event-reminder',
+        metadata: { path: path ?? '/', platform: 'web' },
       })
       continue
     }
@@ -142,6 +144,8 @@ Deno.serve(async (req) => {
       title,
       status: stale ? 'stale_token' : 'failed',
       error_message: `[${res.status}] ${errorBody.slice(0, 200)}`,
+      template_name: 'event-reminder',
+      metadata: { path: path ?? '/', http_status: res.status },
     })
     if (!stale) failures.push(String(res.status))
   }
