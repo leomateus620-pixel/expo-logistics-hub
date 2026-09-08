@@ -1,0 +1,933 @@
+{
+  "phase": "after",
+  "mobile": true,
+  "errors": [],
+  "inventory": {
+    "entities": [
+      {
+        "id": "reference:2026:rua-montevideu-cozinha",
+        "projectId": "reference:fenasoja-2026",
+        "layerId": "reference:circulation",
+        "parentEntityId": null,
+        "publicIdentifier": "RUA-MONTEVIDEU-COZINHA",
+        "name": "Rua Montevidéu — conexão Cozinha da Soja",
+        "description": null,
+        "classification": "ROAD",
+        "verificationStatus": "NEEDS_REVIEW",
+        "isSellable": false,
+        "isArchived": false,
+        "geometry": {
+          "id": null,
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                1.9854545454545445,
+                -11.083636419277113
+              ],
+              [
+                2.8800000000000026,
+                -11.083636419277113
+              ],
+              [
+                2.8800000000000026,
+                -8.640000043373497
+              ],
+              [
+                1.9854545454545445,
+                -8.640000043373497
+              ],
+              [
+                1.9854545454545445,
+                -11.083636419277113
+              ]
+            ]
+          ],
+          "elevation": 0,
+          "extrusionHeight": 0.032,
+          "rotation": 0,
+          "geometryVersion": 1,
+          "calibrationVersion": null
+        },
+        "metadata": {
+          "seedManaged": true,
+          "sourceRevision": "2026.9-soy-gate9.1",
+          "source": "5d336574-d021-43c5-8ee6-77284f34d95a.jpeg; f1f1df47-9230-48f9-88fc-6c91a4e1dbc4.jpeg",
+          "cartographicConfidence": "satellite_registered_estimate",
+          "officialMeasurements": false,
+          "sourcePdfPolygon": [
+            [
+              3441,
+              2467
+            ],
+            [
+              3482,
+              2467
+            ],
+            [
+              3482,
+              2579
+            ],
+            [
+              3441,
+              2579
+            ]
+          ],
+          "parentPublicIdentifier": null,
+          "buyerDataImported": false,
+          "labelPriority": "road",
+          "isSeparator": true,
+          "relatedStreets": [
+            "RUA-PARAGUAI",
+            "RUA-BOLIVIA",
+            "RUA-MONTEVIDEU-SUL"
+          ]
+        }
+      },
+      {
+        "id": "reference:2026:a9",
+        "projectId": "reference:fenasoja-2026",
+        "layerId": "reference:gates",
+        "parentEntityId": null,
+        "publicIdentifier": "A9",
+        "name": "Portão 9 — saída de visitantes e expositores",
+        "description": null,
+        "classification": "GATE",
+        "verificationStatus": "NEEDS_REVIEW",
+        "isSellable": false,
+        "isArchived": false,
+        "geometry": {
+          "id": null,
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                13.396363636363631,
+                -36.981818367469884
+              ],
+              [
+                13.876363636363635,
+                -36.501818365060245
+              ],
+              [
+                13.396363636363631,
+                -36.021818362650606
+              ],
+              [
+                12.916363636363641,
+                -36.501818365060245
+              ],
+              [
+                13.396363636363631,
+                -36.981818367469884
+              ]
+            ]
+          ],
+          "elevation": 0,
+          "extrusionHeight": 0.72,
+          "rotation": 0,
+          "geometryVersion": 1,
+          "calibrationVersion": null
+        },
+        "metadata": {
+          "seedManaged": true,
+          "sourceRevision": "2026.3",
+          "source": "Mapa oficial Fenasoja 2026 — PDF Mapa do Parque 300x200",
+          "cartographicConfidence": "official_visual_reference",
+          "officialMeasurements": false,
+          "sourcePdfPolygon": [
+            [
+              3964,
+              1280
+            ],
+            [
+              3986,
+              1302
+            ],
+            [
+              3964,
+              1324
+            ],
+            [
+              3942,
+              1302
+            ]
+          ],
+          "parentPublicIdentifier": null,
+          "buyerDataImported": false,
+          "legendCode": "A9",
+          "labelPriority": "gate"
+        }
+      },
+      {
+        "id": "reference:2026:b7",
+        "projectId": "reference:fenasoja-2026",
+        "layerId": "reference:pavilions",
+        "parentEntityId": "reference:2026:quadra-n",
+        "publicIdentifier": "B7",
+        "name": "Pavilhão 4 — Cozinha da Soja",
+        "description": null,
+        "classification": "PAVILION",
+        "verificationStatus": "NEEDS_REVIEW",
+        "isSellable": false,
+        "isArchived": false,
+        "geometry": {
+          "id": null,
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                3.163636363636364,
+                -10.429090961445787
+              ],
+              [
+                6.894545454545451,
+                -10.429090961445787
+              ],
+              [
+                6.894545454545451,
+                -8.880000044578317
+              ],
+              [
+                3.163636363636364,
+                -8.880000044578317
+              ],
+              [
+                3.163636363636364,
+                -10.429090961445787
+              ]
+            ]
+          ],
+          "elevation": 0,
+          "extrusionHeight": 1.35,
+          "rotation": 0,
+          "geometryVersion": 1,
+          "calibrationVersion": null
+        },
+        "metadata": {
+          "seedManaged": true,
+          "sourceRevision": "2026.3",
+          "source": "Mapa oficial Fenasoja 2026 — PDF Mapa do Parque 300x200",
+          "cartographicConfidence": "official_visual_reference",
+          "officialMeasurements": false,
+          "sourcePdfPolygon": [
+            [
+              3495,
+              2497
+            ],
+            [
+              3666,
+              2497
+            ],
+            [
+              3666,
+              2568
+            ],
+            [
+              3495,
+              2568
+            ]
+          ],
+          "parentPublicIdentifier": "QUADRA-N",
+          "buyerDataImported": false
+        }
+      },
+      {
+        "id": "reference:2026:b13",
+        "projectId": "reference:fenasoja-2026",
+        "layerId": "reference:structures",
+        "parentEntityId": "reference:2026:quadra-b",
+        "publicIdentifier": "B13",
+        "name": "Palco Cultural Lactalis",
+        "description": null,
+        "classification": "EVENT_VENUE",
+        "verificationStatus": "NEEDS_REVIEW",
+        "isSellable": false,
+        "isArchived": false,
+        "geometry": {
+          "id": null,
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                15,
+                11.672727331325298
+              ],
+              [
+                17.945454545454538,
+                11.672727331325298
+              ],
+              [
+                17.945454545454538,
+                13.941818251807227
+              ],
+              [
+                15,
+                13.941818251807227
+              ],
+              [
+                15,
+                11.672727331325298
+              ]
+            ]
+          ],
+          "elevation": 0,
+          "extrusionHeight": 1.05,
+          "rotation": 0,
+          "geometryVersion": 1,
+          "calibrationVersion": null
+        },
+        "metadata": {
+          "seedManaged": true,
+          "sourceRevision": "2026.3",
+          "source": "Mapa oficial Fenasoja 2026 — PDF Mapa do Parque 300x200",
+          "cartographicConfidence": "official_visual_reference",
+          "officialMeasurements": false,
+          "sourcePdfPolygon": [
+            [
+              4037.5,
+              3510
+            ],
+            [
+              4172.5,
+              3510
+            ],
+            [
+              4172.5,
+              3614
+            ],
+            [
+              4037.5,
+              3614
+            ]
+          ],
+          "parentPublicIdentifier": "QUADRA-B",
+          "buyerDataImported": false
+        }
+      },
+      {
+        "id": "reference:2026:e-07",
+        "projectId": "reference:fenasoja-2026",
+        "layerId": "reference:restrooms",
+        "parentEntityId": null,
+        "publicIdentifier": "E-07",
+        "name": "Sanitários — Cozinha da Soja",
+        "description": "Sanitários permanentes diante da Cozinha da Soja, do outro lado da Rua Montevidéu. Masculino à esquerda e Feminino à direita na aproximação pela cozinha. Implantação estimada por referências; fachadas interpretadas.",
+        "classification": "RESTROOM",
+        "verificationStatus": "NEEDS_REVIEW",
+        "isSellable": false,
+        "isArchived": false,
+        "geometry": {
+          "id": null,
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -1.0909090909090935,
+                -10.407272779518074
+              ],
+              [
+                1.0036363636363603,
+                -10.407272779518074
+              ],
+              [
+                1.0036363636363603,
+                -8.923636408433737
+              ],
+              [
+                -1.0909090909090935,
+                -8.923636408433737
+              ],
+              [
+                -1.0909090909090935,
+                -10.407272779518074
+              ]
+            ]
+          ],
+          "elevation": 0,
+          "extrusionHeight": 0.64,
+          "rotation": 0,
+          "geometryVersion": 1,
+          "calibrationVersion": null
+        },
+        "metadata": {
+          "seedManaged": true,
+          "sourceRevision": "2026.9-soy-gate9.1",
+          "source": "5d336574-d021-43c5-8ee6-77284f34d95a.jpeg; f1f1df47-9230-48f9-88fc-6c91a4e1dbc4.jpeg",
+          "cartographicConfidence": "satellite_registered_estimate",
+          "officialMeasurements": false,
+          "sourcePdfPolygon": [
+            [
+              3300,
+              2498
+            ],
+            [
+              3396,
+              2498
+            ],
+            [
+              3396,
+              2566
+            ],
+            [
+              3300,
+              2566
+            ]
+          ],
+          "parentPublicIdentifier": null,
+          "buyerDataImported": false,
+          "legendCode": "E",
+          "instance": 7,
+          "infrastructure": true,
+          "facadeAssumptions": {
+            "wallHeight": 0.46,
+            "roofRise": 0.13,
+            "wallThickness": 0.035,
+            "eave": 0.045
+          }
+        }
+      },
+      {
+        "id": "reference:2026:res-a9",
+        "projectId": "reference:fenasoja-2026",
+        "layerId": "reference:structures",
+        "parentEntityId": null,
+        "publicIdentifier": "RES-A9",
+        "name": "Reservatórios — Portão 9",
+        "description": "Três caixas de água junto ao Portão 9. Instalação de infraestrutura, sem finalidade comercial. Posições vinculadas à planta hidráulica; acabamento e alturas dos corpos interpretados conservadoramente.",
+        "classification": "SERVICE",
+        "verificationStatus": "NEEDS_REVIEW",
+        "isSellable": false,
+        "isArchived": false,
+        "geometry": {
+          "id": null,
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                9.709090909090918,
+                -38.8363638313253
+              ],
+              [
+                11.323636363636354,
+                -38.8363638313253
+              ],
+              [
+                11.323636363636354,
+                -38.138182009638555
+              ],
+              [
+                9.709090909090918,
+                -38.138182009638555
+              ],
+              [
+                9.709090909090918,
+                -38.8363638313253
+              ]
+            ]
+          ],
+          "elevation": 0,
+          "extrusionHeight": 1.47,
+          "rotation": 0,
+          "geometryVersion": 1,
+          "calibrationVersion": null
+        },
+        "metadata": {
+          "seedManaged": true,
+          "sourceRevision": "2026.9-soy-gate9.1",
+          "source": "efa48d13-4f5a-44be-86c0-2fb40461f351.jpeg",
+          "cartographicConfidence": "hydraulic_plan_registered",
+          "officialMeasurements": false,
+          "sourcePdfPolygon": [
+            [
+              3795,
+              1195
+            ],
+            [
+              3869,
+              1195
+            ],
+            [
+              3869,
+              1227
+            ],
+            [
+              3795,
+              1227
+            ]
+          ],
+          "parentPublicIdentifier": null,
+          "buyerDataImported": false,
+          "infrastructure": true,
+          "relatedGateIdentifier": "A9",
+          "hydroIdentifiers": [
+            "reservoir-elevated-01",
+            "reservoir-elevated-02",
+            "reservoir-elevated-03"
+          ],
+          "tankCount": 3
+        }
+      }
+    ],
+    "stage": {
+      "revision": "2026.9-lactalis-stage.3",
+      "publicIdentifier": "B13",
+      "runtimeEntityId": "reference:2026:b13",
+      "displayName": "Palco Cultural Lactalis",
+      "sourceReferences": {
+        "currentRear": "4d5553bc-e7bb-4b7b-bea7-82b430272a8b.jpeg",
+        "currentFront": "19f56352-460e-4796-b9cb-a8430e2a168b.jpeg",
+        "satellite": "WhatsApp Image 2026-08-30 at 23.40.19.jpeg",
+        "architecture": "4618B88E-96C4-4F78-98A2-6E21E6C254F2.jpeg"
+      },
+      "sourceCenter": [
+        4105,
+        3562
+      ],
+      "sourceFootprint": [
+        135,
+        104
+      ],
+      "sourceFootprintPolygon": [
+        [
+          4037.5,
+          3510
+        ],
+        [
+          4172.5,
+          3510
+        ],
+        [
+          4172.5,
+          3614
+        ],
+        [
+          4037.5,
+          3614
+        ]
+      ],
+      "worldCenter": [
+        16.472727272727283,
+        12.807272791566263
+      ],
+      "targetIdentifier": "Q-D-12",
+      "targetIdentifiers": [
+        "Q-D-11",
+        "Q-D-12"
+      ],
+      "targetSourceCenter": [
+        3897.4166666666665,
+        3605
+      ],
+      "targetWorldCenter": [
+        11.943636363636358,
+        13.745454614457834
+      ],
+      "headquartersIdentifier": "B12",
+      "headquartersSourceFootprint": [
+        135,
+        104
+      ],
+      "headquartersWorldCenter": [
+        16.472727272727283,
+        15.403636440963858
+      ],
+      "localFrontAxis": [
+        0,
+        1
+      ],
+      "frontVector": [
+        -0.9792119822362227,
+        0.20283957662400848
+      ],
+      "facingRadians": -1.366539413442817,
+      "facingDegrees": -78.2969409285565,
+      "architecture": {
+        "widthRatio": 0.9,
+        "depthRatio": 0.76,
+        "eaveHeight": 1.18,
+        "ridgeHeight": 1.82,
+        "columnThicknessRatio": 0.024,
+        "minimumColumnThickness": 0.042,
+        "roofThickness": 0.042,
+        "roofOverhangRatio": 0.045,
+        "platformHeight": 0.12,
+        "platformWidthRatio": 0.82,
+        "platformDepthRatio": 0.32,
+        "audienceApronDepth": 0.16,
+        "audienceApronWidthRatio": 0.82,
+        "footprintSafetyInset": 0.015,
+        "headquartersClearance": 0.045,
+        "floorThickness": 0.05,
+        "sideEnclosureDepthRatio": 0.44,
+        "fasciaDepth": 0.16,
+        "claddingThickness": 0.036
+      },
+      "signage": {
+        "aspectRatio": 2.4,
+        "widthRatio": 0.26,
+        "centerAboveEave": 0.03
+      },
+      "camera": {
+        "minimumDistance": 3.4,
+        "focusedDistance": 6.2,
+        "focusMinimumDirectionY": 0.28,
+        "focusPortraitMinimumDirectionY": 0.48
+      },
+      "palette": {
+        "cladding": "#c8ccca",
+        "claddingLight": "#dadddb",
+        "roof": "#b8bfbe",
+        "roofEdge": "#434b4e",
+        "frame": "#20282b",
+        "interior": "#31383a",
+        "platform": "#24292a",
+        "concrete": "#a9a79e",
+        "sign": "#16466e",
+        "lactalisBlue": "#0a4381",
+        "light": "#8bd483"
+      },
+      "renderBudget": {
+        "baseDrawCalls": 11,
+        "detailDrawCalls": 17,
+        "focusedDrawCalls": 22,
+        "independentCables": 0,
+        "textureAssets": 0
+      }
+    }
+  },
+  "poses": {
+    "restroomTop": {
+      "target": [
+        0,
+        0,
+        -9.6
+      ],
+      "position": [
+        0,
+        15,
+        -9.61
+      ]
+    },
+    "restroomFront": {
+      "target": [
+        0,
+        0.4,
+        -9.6
+      ],
+      "position": [
+        7,
+        4,
+        -9.6
+      ]
+    },
+    "restroomRear": {
+      "target": [
+        0,
+        0.4,
+        -9.6
+      ],
+      "position": [
+        -6,
+        4,
+        -12
+      ]
+    },
+    "kitchenContext": {
+      "target": [
+        2,
+        0,
+        -9.6
+      ],
+      "position": [
+        11,
+        10,
+        -3
+      ]
+    },
+    "gate9Top": {
+      "target": [
+        11,
+        0,
+        -38
+      ],
+      "position": [
+        11,
+        22,
+        -38.01
+      ]
+    },
+    "gate9": {
+      "target": [
+        10.6,
+        0.5,
+        -38.5
+      ],
+      "position": [
+        17,
+        5,
+        -33
+      ]
+    },
+    "stageTop": {
+      "target": [
+        16.47,
+        0,
+        12.8
+      ],
+      "position": [
+        16.47,
+        14,
+        12.79
+      ]
+    },
+    "stageLot11": {
+      "target": [
+        16.47,
+        0.75,
+        12.8
+      ],
+      "position": [
+        11.94,
+        2.4,
+        14.94
+      ]
+    },
+    "stageLot12": {
+      "target": [
+        16.47,
+        0.75,
+        12.8
+      ],
+      "position": [
+        11.94,
+        2.4,
+        12.55
+      ]
+    },
+    "stageRear": {
+      "target": [
+        16.47,
+        0.75,
+        12.8
+      ],
+      "position": [
+        22,
+        4,
+        12.8
+      ]
+    },
+    "overview": {
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "position": [
+        100,
+        140,
+        160
+      ]
+    }
+  },
+  "stageReport": {
+    "status": "APPLIED_USER_APPROVED_PLAN_REDUCTION",
+    "localFrontAxis": [
+      0,
+      0,
+      1
+    ],
+    "upAxis": "Y",
+    "parentTransform": "translation-only",
+    "center": [
+      16.47272727272727,
+      12.807272791566263
+    ],
+    "lots": [
+      {
+        "id": "reference:2026:q-d-11",
+        "publicIdentifier": "Q-D-11",
+        "center": [
+          11.943636363636372,
+          14.945454620481929
+        ]
+      },
+      {
+        "id": "reference:2026:q-d-12",
+        "publicIdentifier": "Q-D-12",
+        "center": [
+          11.943636363636372,
+          12.545454608433737
+        ]
+      }
+    ],
+    "midpoint": [
+      11.943636363636372,
+      13.745454614457833
+    ],
+    "yaw": -1.3665394134428164,
+    "expectedYaw": -1.3665394134428162,
+    "degrees": -78.29694092855645,
+    "frontVector": [
+      -0.9792119822362227,
+      0.20283957662400917
+    ],
+    "planScale": 0.8718357892503263,
+    "reductionPercent": 12.816421074967366,
+    "footprint": [
+      [
+        17.055808077126663,
+        11.390454602419899
+      ],
+      [
+        17.57065284709229,
+        13.875877694563746
+      ],
+      [
+        15.889646468327875,
+        14.224090980712626
+      ],
+      [
+        15.824429702263316,
+        13.909255780225648
+      ],
+      [
+        15.772141873983827,
+        13.920086980357185
+      ],
+      [
+        15.387730636147317,
+        12.064334289187295
+      ],
+      [
+        15.440018464426807,
+        12.053503089055758
+      ],
+      [
+        15.374801698362248,
+        11.738667888568779
+      ]
+    ],
+    "heightPreserved": true,
+    "collisions": []
+  },
+  "measurements": {
+    "kitchenContext": {
+      "frames": 259,
+      "meanMs": 25.97606177605027,
+      "p95Ms": 18.69999998807907,
+      "renderer": {
+        "at": 53498.59999999404,
+        "calls": 259,
+        "triangles": 547874,
+        "geometries": 605,
+        "textures": 148,
+        "programs": 182,
+        "dpr": 0.72,
+        "width": 280,
+        "height": 490,
+        "heapBytes": 148667818,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 378,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "gate9": {
+      "frames": 228,
+      "meanMs": 26.388157894736842,
+      "p95Ms": 33.79999999701977,
+      "renderer": {
+        "at": 60410.40000000596,
+        "calls": 120,
+        "triangles": 545161,
+        "geometries": 600,
+        "textures": 146,
+        "programs": 180,
+        "dpr": 0.72,
+        "width": 280,
+        "height": 490,
+        "heapBytes": 152602476,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 655,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "stageLot11": {
+      "frames": 181,
+      "meanMs": 33.333149171254256,
+      "p95Ms": 33.70000000298023,
+      "renderer": {
+        "at": 67245.09999999404,
+        "calls": 131,
+        "triangles": 578896,
+        "geometries": 608,
+        "textures": 150,
+        "programs": 181,
+        "dpr": 0.72,
+        "width": 280,
+        "height": 490,
+        "heapBytes": 154563947,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 861,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "overview": {
+      "frames": 181,
+      "meanMs": 33.23425414367934,
+      "p95Ms": 34.20000000298023,
+      "renderer": {
+        "at": 74160.90000000596,
+        "calls": 759,
+        "triangles": 623054,
+        "geometries": 601,
+        "textures": 147,
+        "programs": 181,
+        "dpr": 0.72,
+        "width": 280,
+        "height": 490,
+        "heapBytes": 162944762,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1068,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    }
+  },
+  "browser": "152.0.7977.82"
+}

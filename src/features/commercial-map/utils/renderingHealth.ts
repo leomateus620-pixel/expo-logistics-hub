@@ -1,6 +1,7 @@
 /** Lightweight production diagnostics. No frame histories or renderer references are retained. */
 export const COMMERCIAL_MAP_RENDER_HEALTH_EVENT = 'commercial-map-render-health';
 export const COMMERCIAL_MAP_RENDER_RETRY_EVENT = 'commercial-map-render-retry';
+export const COMMERCIAL_MAP_PREPARING_EVENT = 'commercial-map-preparing';
 
 export type RenderPath = 'post' | 'direct' | 'suspended';
 export type RenderHealthStatus = 'ready' | 'degraded' | 'context-lost' | 'recovering' | 'failed';

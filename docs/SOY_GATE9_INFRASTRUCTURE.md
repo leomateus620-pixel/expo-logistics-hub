@@ -1,5 +1,7 @@
 # Cozinha da Soja, Portão 9 e estudo de orientação Lactalis
 
+> Registro histórico da PR #136. A migração foi aplicada ao Cloud em 08/09/2026 e a redução/orientação foi autorizada posteriormente. Consulte [a correção de persistência, palco e abertura](MAP_PERSISTENCE_STAGE_STARTUP.md) para o estado atual e novas evidências.
+
 Base de comparação: `672b8a4ebd35a355d17ac0a37503f44878f2da3e` (PR #135 integrada). A implementação acrescenta o banheiro E-07, a conexão de asfalto e três reservatórios RES-A9. **O giro de B13 permanece pendente de uma decisão sobre suas dimensões. A PR é um rascunho; não representa conclusão integral do pedido.**
 
 ## Referências e implantação

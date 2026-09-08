@@ -1,0 +1,1246 @@
+{
+  "browser": "152.0.7977.82",
+  "viewport": {
+    "width": 1366,
+    "height": 768
+  },
+  "errors": [],
+  "hot": [
+    {
+      "ms": 14722.002,
+      "functionName": "onFirstUse",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 12617,
+      "columnNumber": 21
+    },
+    {
+      "ms": 2489.179,
+      "functionName": "(idle)",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 1510.404,
+      "functionName": "onFirstUse",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 12617,
+      "columnNumber": 21
+    },
+    {
+      "ms": 1446.442,
+      "functionName": "onFirstUse",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 12617,
+      "columnNumber": 21
+    },
+    {
+      "ms": 682.071,
+      "functionName": "WebGLRenderer.renderBufferDirect",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 17875,
+      "columnNumber": 38
+    },
+    {
+      "ms": 537.392,
+      "functionName": "(program)",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 460.019,
+      "functionName": "getParameters",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 12793,
+      "columnNumber": 24
+    },
+    {
+      "ms": 453.259,
+      "functionName": "setProgram",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 18411,
+      "columnNumber": 23
+    },
+    {
+      "ms": 322.103,
+      "functionName": "getProgram",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 18322,
+      "columnNumber": 23
+    },
+    {
+      "ms": 294.465,
+      "functionName": "upload",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 12048,
+      "columnNumber": 15
+    },
+    {
+      "ms": 201.909,
+      "functionName": "refreshUniformsCommon",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 17045,
+      "columnNumber": 32
+    },
+    {
+      "ms": 195.938,
+      "functionName": "(garbage collector)",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 177.022,
+      "functionName": "setupVertexAttributes",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 9832,
+      "columnNumber": 32
+    },
+    {
+      "ms": 171.808,
+      "functionName": "arraysEqual",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 11487,
+      "columnNumber": 20
+    },
+    {
+      "ms": 171.451,
+      "functionName": "onFirstUse",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 12617,
+      "columnNumber": 21
+    },
+    {
+      "ms": 169.291,
+      "functionName": "setValueM4",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 11596,
+      "columnNumber": 19
+    },
+    {
+      "ms": 166.872,
+      "functionName": "flatten",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 11469,
+      "columnNumber": 16
+    },
+    {
+      "ms": 166.24,
+      "functionName": "bindVertexArrayObject",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 9695,
+      "columnNumber": 32
+    },
+    {
+      "ms": 165.741,
+      "functionName": "capture",
+      "scriptId": "178",
+      "url": "http://127.0.0.1:4190/src/features/commercial-map/utils/runtimeDiagnostics.ts",
+      "lineNumber": 127,
+      "columnNumber": 20
+    },
+    {
+      "ms": 156.159,
+      "functionName": "renderObject",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 18304,
+      "columnNumber": 25
+    },
+    {
+      "ms": 149.951,
+      "functionName": "setValueV3f",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 11530,
+      "columnNumber": 20
+    },
+    {
+      "ms": 148.485,
+      "functionName": "setup",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 9672,
+      "columnNumber": 16
+    },
+    {
+      "ms": 144.79,
+      "functionName": "renderObjects",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 18291,
+      "columnNumber": 26
+    },
+    {
+      "ms": 135.115,
+      "functionName": "WebGLShader",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 12065,
+      "columnNumber": 20
+    },
+    {
+      "ms": 133.95,
+      "functionName": "getContext",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 130.269,
+      "functionName": "setValueV1f",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 11510,
+      "columnNumber": 20
+    },
+    {
+      "ms": 128.011,
+      "functionName": "getProgramCacheKey",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 13008,
+      "columnNumber": 29
+    },
+    {
+      "ms": 122.101,
+      "functionName": "copyArray",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 11494,
+      "columnNumber": 18
+    },
+    {
+      "ms": 105.661,
+      "functionName": "setValueM4Array",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 11836,
+      "columnNumber": 24
+    },
+    {
+      "ms": 102.736,
+      "functionName": "setValue",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 11995,
+      "columnNumber": 10
+    },
+    {
+      "ms": 101.131,
+      "functionName": "setValue",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 11995,
+      "columnNumber": 10
+    },
+    {
+      "ms": 99.134,
+      "functionName": "projectObject",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 18154,
+      "columnNumber": 26
+    },
+    {
+      "ms": 98.404,
+      "functionName": "refreshMaterialUniforms",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 17002,
+      "columnNumber": 34
+    },
+    {
+      "ms": 94.549,
+      "functionName": "setValue",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 12040,
+      "columnNumber": 10
+    },
+    {
+      "ms": 92.562,
+      "functionName": "vertexAttribPointer",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 9825,
+      "columnNumber": 30
+    },
+    {
+      "ms": 89.463,
+      "functionName": "onFirstUse",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 12617,
+      "columnNumber": 21
+    },
+    {
+      "ms": 88.908,
+      "functionName": "getUniforms",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 13174,
+      "columnNumber": 22
+    },
+    {
+      "ms": 86.214,
+      "functionName": "needsUpdate",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 9742,
+      "columnNumber": 22
+    },
+    {
+      "ms": 84.307,
+      "functionName": "getBindingState",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 9701,
+      "columnNumber": 26
+    },
+    {
+      "ms": 84.279,
+      "functionName": "sort",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 13340,
+      "columnNumber": 15
+    },
+    {
+      "ms": 72.217,
+      "functionName": "setValueV1i",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 11610,
+      "columnNumber": 20
+    },
+    {
+      "ms": 71.271,
+      "functionName": "setValueV3f",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 11530,
+      "columnNumber": 20
+    },
+    {
+      "ms": 69.858,
+      "functionName": "distanceToSegment",
+      "scriptId": "292",
+      "url": "http://127.0.0.1:4190/src/features/commercial-map/utils/spatialSurface.ts",
+      "lineNumber": 13,
+      "columnNumber": 33
+    },
+    {
+      "ms": 67.953,
+      "functionName": "territoryRoadClearance",
+      "scriptId": "290",
+      "url": "http://127.0.0.1:4190/src/features/commercial-map/utils/territorialRoadGeometry.ts",
+      "lineNumber": 220,
+      "columnNumber": 38
+    },
+    {
+      "ms": 66.866,
+      "functionName": "bindTexture",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 14623,
+      "columnNumber": 22
+    },
+    {
+      "ms": 64.036,
+      "functionName": "setMaterial",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 14544,
+      "columnNumber": 22
+    },
+    {
+      "ms": 63.997,
+      "functionName": "projectObject",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 18154,
+      "columnNumber": 26
+    },
+    {
+      "ms": 61.334,
+      "functionName": "territoryRoadClearance",
+      "scriptId": "290",
+      "url": "http://127.0.0.1:4190/src/features/commercial-map/utils/territorialRoadGeometry.ts",
+      "lineNumber": 220,
+      "columnNumber": 38
+    },
+    {
+      "ms": 61.277,
+      "functionName": "",
+      "scriptId": "390",
+      "url": "http://127.0.0.1:4190/src/features/commercial-map/data/territorialEnvironment.ts",
+      "lineNumber": 685,
+      "columnNumber": 27
+    },
+    {
+      "ms": 59.212,
+      "functionName": "multiplyMatrices",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 4189,
+      "columnNumber": 18
+    },
+    {
+      "ms": 57.838,
+      "functionName": "markUniformsLightsNeedsUpdate",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 18607,
+      "columnNumber": 42
+    },
+    {
+      "ms": 57.601,
+      "functionName": "onFirstUse",
+      "scriptId": "281",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-TY7W7KHZ.js?v=ae8bc347",
+      "lineNumber": 12617,
+      "columnNumber": 21
+    },
+    {
+      "ms": 56.433,
+      "functionName": "",
+      "scriptId": "390",
+      "url": "http://127.0.0.1:4190/src/features/commercial-map/data/territorialEnvironment.ts",
+      "lineNumber": 675,
+      "columnNumber": 14
+    },
+    {
+      "ms": 55.909,
+      "functionName": "",
+      "scriptId": "352",
+      "url": "http://127.0.0.1:4190/src/features/commercial-map/components/canvas/TerritorialEnvironment.tsx",
+      "lineNumber": 70,
+      "columnNumber": 32
+    },
+    {
+      "ms": 55.349,
+      "functionName": "findScrollContainers",
+      "scriptId": "289",
+      "url": "http://127.0.0.1:4190/node_modules/.vite/deps/chunk-5FRVR2RK.js?v=ae8bc347",
+      "lineNumber": 18376,
+      "columnNumber": 29
+    }
+  ],
+  "tasks": [
+    {
+      "start": 1551.1000000089407,
+      "duration": 539
+    },
+    {
+      "start": 2115.7000000029802,
+      "duration": 59
+    },
+    {
+      "start": 2191,
+      "duration": 158
+    },
+    {
+      "start": 2352.7000000029802,
+      "duration": 19092
+    },
+    {
+      "start": 21445.90000000596,
+      "duration": 1861
+    },
+    {
+      "start": 23344.29999999702,
+      "duration": 1801
+    },
+    {
+      "start": 25157.79999999702,
+      "duration": 66
+    },
+    {
+      "start": 25274.79999999702,
+      "duration": 64
+    },
+    {
+      "start": 25392.29999999702,
+      "duration": 71
+    },
+    {
+      "start": 25587,
+      "duration": 53
+    },
+    {
+      "start": 25745.90000000596,
+      "duration": 50
+    },
+    {
+      "start": 25889.70000000298,
+      "duration": 59
+    }
+  ],
+  "ready": 23294.1,
+  "frames": [
+    37.39999999701976,
+    16.700000000000017,
+    16.69999999999999,
+    16.69999999999999,
+    16.600000000000023,
+    16.599999999999966,
+    16.700000000000045,
+    16.69999999999999,
+    16.599999999999966,
+    16.700000000000045,
+    16.69999999999999,
+    16.69999999999999,
+    16.600000000000023,
+    16.69999999999999,
+    16.599999999999966,
+    16.700000000000045,
+    16.599999999999966,
+    16.69999999999999,
+    16.700000000000045,
+    16.699999999999932,
+    16.700000000000045,
+    16.600000000000023,
+    16.699999999999932,
+    16.600000000000023,
+    16.700000000000045,
+    16.699999999999932,
+    16.600000000000023,
+    16.700000000000045,
+    16.699999999999932,
+    16.700000000000045,
+    16.600000000000023,
+    16.600000000000023,
+    33.5,
+    16.59999999999991,
+    16.700000000000045,
+    16.600000000000023,
+    16.699999999999932,
+    16.600000000000023,
+    16.600000000000023,
+    16.700000000000045,
+    16.699999999999932,
+    16.700000000000045,
+    16.600000000000023,
+    16.699999999999932,
+    16.700000000000045,
+    16.600000000000023,
+    16.799999999999955,
+    16.5,
+    16.700000000000045,
+    16.700000000000045,
+    16.699999999999818,
+    16.700000000000045,
+    16.600000000000136,
+    16.699999999999818,
+    16.600000000000136,
+    16.700000000000045,
+    16.699999999999818,
+    16.600000000000136,
+    16.700000000000045,
+    16.59999999999991,
+    16.700000000000045,
+    16.700000000000045,
+    16.699999999999818,
+    16.600000000000136,
+    16.700000000000045,
+    16.699999999999818,
+    16.600000000000136,
+    16.899999999999864,
+    16.700000000000045,
+    16.40000000000009,
+    16.700000000000045,
+    16.699999999999818,
+    16.600000000000136,
+    16.700000000000045,
+    16.699999999999818,
+    16.700000000000045,
+    16.600000000000136,
+    16.699999999999818,
+    16.700000000000045,
+    16.600000000000136,
+    16.699999999999818,
+    516.5999999999999,
+    16.700000000000273,
+    16.59999999999991,
+    50,
+    33.40000000000009,
+    150.19999999999982,
+    20949,
+    1849.9000000000015,
+    66.90000000000146,
+    49.79999999999927,
+    66.79999999999927,
+    50.099999999998545,
+    83.30000000000291,
+    33.099999999998545,
+    50,
+    33.400000000001455,
+    50.19999999999709,
+    49.70000000000073,
+    33.79999999999927,
+    66.5,
+    50,
+    49.900000000001455,
+    66.5,
+    33.29999999999927,
+    33.29999999999927,
+    33.400000000001455,
+    33.29999999999927,
+    33.29999999999927,
+    33.400000000001455,
+    33.29999999999927,
+    33.60000000000218,
+    49.69999999999709,
+    33.60000000000218,
+    33.099999999998545,
+    33.400000000001455,
+    33.29999999999927,
+    33.400000000001455,
+    33.29999999999927,
+    16.700000000000728,
+    33.19999999999709,
+    33.400000000001455,
+    33.400000000001455,
+    16.599999999998545,
+    33.5,
+    33.20000000000073,
+    33.5,
+    33.099999999998545,
+    33.400000000001455,
+    33.29999999999927,
+    16.700000000000728,
+    50,
+    16.700000000000728,
+    33.19999999999709,
+    33.400000000001455,
+    16.700000000000728,
+    33.29999999999927,
+    16.599999999998545,
+    33.30000000000291,
+    16.69999999999709,
+    33.30000000000291,
+    17,
+    16.5,
+    33.19999999999709,
+    33.400000000001455,
+    33.29999999999927,
+    33.29999999999927,
+    33.400000000001455,
+    16.799999999999272,
+    33.20000000000073,
+    16.599999999998545,
+    33.30000000000291,
+    16.799999999999272,
+    33.29999999999927,
+    33.29999999999927,
+    16.600000000002183,
+    33.29999999999927,
+    16.799999999999272,
+    33.29999999999927,
+    16.600000000002183,
+    33.5,
+    16.599999999998545,
+    33.20000000000073,
+    33.5,
+    16.599999999998545,
+    33.5,
+    33.10000000000218,
+    33.29999999999927,
+    16.700000000000728,
+    33.39999999999782,
+    16.700000000000728,
+    33.29999999999927,
+    16.700000000000728,
+    16.599999999998545,
+    33.30000000000291,
+    33.39999999999782,
+    33.29999999999927,
+    16.80000000000291,
+    33.099999999998545,
+    16.799999999999272,
+    33.29999999999927,
+    33.30000000000291,
+    16.69999999999709,
+    33.400000000001455,
+    33.29999999999927,
+    16.600000000002183,
+    33.5,
+    33.19999999999709,
+    16.600000000002183,
+    33.39999999999782,
+    33.60000000000218,
+    16.399999999997817,
+    50,
+    16.700000000000728,
+    33.29999999999927,
+    33.30000000000291,
+    33.5,
+    16.5,
+    33.29999999999927,
+    33.39999999999782,
+    16.700000000000728,
+    33.29999999999927,
+    33.30000000000291,
+    16.69999999999709,
+    33.400000000001455,
+    33.5,
+    16.400000000001455,
+    33.29999999999927,
+    33.39999999999782,
+    33.20000000000073,
+    16.799999999999272,
+    33.30000000000291,
+    16.69999999999709,
+    33.30000000000291,
+    33.29999999999927,
+    33.5,
+    16.5,
+    33.39999999999782,
+    33.30000000000291,
+    16.599999999998545,
+    33.400000000001455,
+    16.599999999998545,
+    33.29999999999927,
+    33.5,
+    16.600000000002183,
+    50,
+    16.69999999999709,
+    33.30000000000291,
+    33.29999999999927,
+    16.700000000000728,
+    33.5,
+    33.19999999999709,
+    16.700000000000728,
+    33.29999999999927,
+    16.600000000002183,
+    33.39999999999782,
+    33.5,
+    33.10000000000218,
+    33.39999999999782,
+    16.5,
+    33.5,
+    33.30000000000291,
+    16.69999999999709,
+    33.20000000000073,
+    33.400000000001455,
+    16.599999999998545,
+    33.400000000001455,
+    33.5,
+    16.5,
+    33.29999999999927,
+    16.700000000000728,
+    50,
+    33.39999999999782,
+    16.600000000002183,
+    33.5,
+    33.29999999999927,
+    16.5,
+    33.5,
+    33.29999999999927,
+    16.600000000002183,
+    33.29999999999927,
+    16.599999999998545,
+    33.60000000000218,
+    33.19999999999709,
+    33.400000000001455,
+    16.400000000001455,
+    33.5,
+    16.799999999999272,
+    33.099999999998545,
+    33.400000000001455,
+    16.599999999998545,
+    50,
+    16.600000000002183,
+    33.39999999999782,
+    33.400000000001455,
+    16.700000000000728,
+    33.29999999999927,
+    33.39999999999782,
+    16.600000000002183,
+    33.29999999999927,
+    16.599999999998545,
+    50.10000000000218,
+    33.29999999999927,
+    33.5,
+    16.5,
+    33.400000000001455,
+    50.39999999999782,
+    16.200000000000728,
+    33.29999999999927,
+    33.400000000001455,
+    33.39999999999782,
+    16.700000000000728,
+    33.10000000000218,
+    33.599999999998545,
+    33.29999999999927,
+    16.5,
+    33.60000000000218,
+    33.19999999999709,
+    33.5,
+    33.10000000000218,
+    16.599999999998545,
+    33.60000000000218,
+    33.099999999998545,
+    16.799999999999272,
+    33.20000000000073,
+    33.400000000001455,
+    33.29999999999927,
+    16.799999999999272,
+    49.79999999999927,
+    34.20000000000073,
+    15.799999999999272,
+    33.29999999999927,
+    33.80000000000291,
+    32.89999999999782,
+    33.400000000001455,
+    17.200000000000728,
+    32.69999999999709,
+    34.10000000000218,
+    32.70000000000073,
+    33.29999999999927,
+    34,
+    49.29999999999927,
+    33.29999999999927,
+    17.200000000000728,
+    32.79999999999927,
+    33.29999999999927,
+    33.80000000000291,
+    34.19999999999709,
+    32.20000000000073,
+    34,
+    33.900000000001455,
+    32,
+    33.39999999999782,
+    16.600000000002183,
+    49.89999999999782,
+    33.400000000001455,
+    16.599999999998545,
+    33.30000000000291,
+    33.400000000001455,
+    33.39999999999418,
+    16.5,
+    33.400000000001455,
+    33.30000000000291,
+    16.799999999995634,
+    33.200000000004366,
+    33.5,
+    33.19999999999709,
+    16.599999999998545,
+    33.30000000000291,
+    33.400000000001455,
+    33.400000000001455,
+    16.799999999995634,
+    33.30000000000291,
+    33.299999999995634,
+    16.5,
+    33.30000000000291,
+    33.5,
+    16.5,
+    33.5,
+    33.30000000000291,
+    16.5,
+    33.5,
+    33.299999999995634,
+    16.599999999998545,
+    33.400000000001455,
+    33.30000000000291,
+    16.69999999999709,
+    50.599999999998545,
+    16.10000000000582,
+    33.19999999999709,
+    33.5,
+    16.5,
+    33.400000000001455,
+    33.400000000001455,
+    16.599999999998545,
+    33.5,
+    33.19999999999709,
+    16.5,
+    33.599999999998545,
+    33.30000000000291,
+    16.5,
+    33.30000000000291,
+    16.69999999999709,
+    33.5,
+    33.19999999999709,
+    33.5,
+    33.200000000004366,
+    16.599999999998545,
+    33.400000000001455,
+    33.299999999995634,
+    16.700000000004366,
+    33.299999999995634,
+    33.60000000000582,
+    16.39999999999418,
+    33.30000000000291,
+    33.400000000001455,
+    16.599999999998545,
+    33.400000000001455,
+    16.599999999998545,
+    33.400000000001455,
+    33.299999999995634,
+    33.400000000001455,
+    33.30000000000291,
+    16.69999999999709,
+    33.400000000001455,
+    33.19999999999709,
+    16.60000000000582,
+    33.39999999999418,
+    33.60000000000582,
+    16.299999999995634,
+    33.400000000001455,
+    33.400000000001455,
+    16.599999999998545,
+    33.30000000000291,
+    16.69999999999709,
+    50.099999999998545,
+    16.599999999998545,
+    33.5,
+    33.30000000000291,
+    16.5,
+    33.5,
+    33.19999999999709,
+    16.700000000004366,
+    33.400000000001455,
+    33.299999999995634,
+    16.599999999998545,
+    33.30000000000291,
+    33.30000000000291,
+    33.39999999999418,
+    16.60000000000582,
+    66.69999999999709,
+    83.59999999999854,
+    49.700000000004366
+  ],
+  "renderer": {
+    "at": 35415.40000000596,
+    "calls": 871,
+    "triangles": 732425,
+    "geometries": 622,
+    "textures": 147,
+    "programs": 179,
+    "dpr": 1,
+    "width": 1351,
+    "height": 695,
+    "heapBytes": 204604954,
+    "qualityTier": "HIGH",
+    "gpuVendor": "Google Inc. (Intel)",
+    "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+  },
+  "health": {
+    "status": "ready",
+    "path": "post",
+    "presentedFrames": 341,
+    "contextLosses": 0,
+    "lastErrorCode": null
+  },
+  "warmup": "{\"durationMs\":1916,\"programsBefore\":145,\"programsAfter\":167,\"error\":null}",
+  "resources": [
+    {
+      "name": "main.js?attr=we0Y-r71Yc5-j2YCMdDAwOp-95ZU5T4csi3m1OJIX6pcIVSAn0IKUYw7vh6dnARzfHVmiPcL5lk56LXQ3bNS395eG_BnO3eiuxWKL6y-ZW8",
+      "duration": 3.9000000059604645,
+      "bytes": 0
+    },
+    {
+      "name": "env.mjs",
+      "duration": 8.300000011920929,
+      "bytes": 300
+    },
+    {
+      "name": "react_jsx-dev-runtime.js?v=43a3fb53",
+      "duration": 24,
+      "bytes": 0
+    },
+    {
+      "name": "react-dom_client.js?v=1fa305bc",
+      "duration": 25.19999998807907,
+      "bytes": 0
+    },
+    {
+      "name": "react.js?v=ac3be6d9",
+      "duration": 34.400000005960464,
+      "bytes": 0
+    },
+    {
+      "name": "@tanstack_react-query.js?v=06d1f808",
+      "duration": 37,
+      "bytes": 0
+    },
+    {
+      "name": "@tanstack_react-query-persist-client.js?v=02799596",
+      "duration": 42.3999999910593,
+      "bytes": 0
+    },
+    {
+      "name": "@tanstack_query-sync-storage-persister.js?v=6fa57e81",
+      "duration": 44.69999998807907,
+      "bytes": 0
+    },
+    {
+      "name": "react-router-dom.js?v=df397925",
+      "duration": 126,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-R6S6G3XE.js?v=ae8bc347",
+      "duration": 79.20000000298023,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-WOOG5QLI.js?v=ae8bc347",
+      "duration": 79.29999999701977,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-KXK6RNBB.js?v=ae8bc347",
+      "duration": 80.8999999910593,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-M32WF6PW.js?v=ae8bc347",
+      "duration": 250.19999998807907,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-A4CKEICI.js?v=ae8bc347",
+      "duration": 85.3999999910593,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-ZBEZPD4S.js?v=ae8bc347",
+      "duration": 193.8999999910593,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-SBKJLODQ.js?v=ae8bc347",
+      "duration": 105.29999999701977,
+      "bytes": 0
+    },
+    {
+      "name": "@radix-ui_react-tooltip.js?v=22085e22",
+      "duration": 101.29999999701977,
+      "bytes": 0
+    },
+    {
+      "name": "next-themes.js?v=89190cd7",
+      "duration": 100.70000000298023,
+      "bytes": 0
+    },
+    {
+      "name": "sonner.js?v=c9dc4e3b",
+      "duration": 100.59999999403954,
+      "bytes": 0
+    },
+    {
+      "name": "lucide-react.js?v=1863b6c8",
+      "duration": 392.29999999701977,
+      "bytes": 0
+    },
+    {
+      "name": "class-variance-authority.js?v=ccff722c",
+      "duration": 139.59999999403954,
+      "bytes": 0
+    },
+    {
+      "name": "@radix-ui_react-toast.js?v=5340d278",
+      "duration": 139.09999999403954,
+      "bytes": 0
+    },
+    {
+      "name": "clsx.js?v=5977b17f",
+      "duration": 83.70000000298023,
+      "bytes": 0
+    },
+    {
+      "name": "tailwind-merge.js?v=9a3f1c4a",
+      "duration": 163.70000000298023,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-GEJ6CX6W.js?v=ae8bc347",
+      "duration": 143.59999999403954,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-F535CY4T.js?v=ae8bc347",
+      "duration": 147.79999999701977,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-LJ4WXB5Q.js?v=ae8bc347",
+      "duration": 147.79999999701977,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-O2DXTAXG.js?v=ae8bc347",
+      "duration": 148.20000000298023,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-ZLV3XD2W.js?v=ae8bc347",
+      "duration": 148.59999999403954,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-WJRFPKRT.js?v=ae8bc347",
+      "duration": 149.59999999403954,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-GJWPYU5K.js?v=ae8bc347",
+      "duration": 150.20000000298023,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-4QXN2O3T.js?v=ae8bc347",
+      "duration": 150.09999999403954,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-US4YBZPP.js?v=ae8bc347",
+      "duration": 152,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-R3FROAUU.js?v=ae8bc347",
+      "duration": 154,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-ZF2VZNX5.js?v=ae8bc347",
+      "duration": 154.6000000089407,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-NNUGXCSY.js?v=ae8bc347",
+      "duration": 154.79999999701977,
+      "bytes": 0
+    },
+    {
+      "name": "@supabase_supabase-js.js?v=9a62d6ec",
+      "duration": 224.5,
+      "bytes": 0
+    },
+    {
+      "name": "@radix-ui_react-slot.js?v=26cd7655",
+      "duration": 155,
+      "bytes": 0
+    },
+    {
+      "name": "date-fns.js?v=0c007d86",
+      "duration": 155.09999999403954,
+      "bytes": 0
+    },
+    {
+      "name": "date-fns_locale.js?v=1bb7cbda",
+      "duration": 152.79999999701977,
+      "bytes": 0
+    },
+    {
+      "name": "fenasoja-golden-soybean.png?import",
+      "duration": 164.5,
+      "bytes": 0
+    },
+    {
+      "name": "fenasoja-logo-oficial.png.asset.json?import",
+      "duration": 116.5,
+      "bytes": 300
+    },
+    {
+      "name": "chunk-E2YSM4CT.js?v=ae8bc347",
+      "duration": 132.3999999910593,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-GESY5VTG.js?v=ae8bc347",
+      "duration": 132.1000000089407,
+      "bytes": 0
+    },
+    {
+      "name": "@radix-ui_react-popover.js?v=cc90f138",
+      "duration": 101.5,
+      "bytes": 0
+    },
+    {
+      "name": "@radix-ui_react-alert-dialog.js?v=f1fc1cd4",
+      "duration": 106.6000000089407,
+      "bytes": 0
+    },
+    {
+      "name": "vaul.js?v=12b80957",
+      "duration": 101.20000000298023,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-N6GGWYHP.js?v=ae8bc347",
+      "duration": 80.69999998807907,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-6E7G3E5P.js?v=ae8bc347",
+      "duration": 67.20000000298023,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-BRNX55QA.js?v=ae8bc347",
+      "duration": 101.90000000596046,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-ESOIFARW.js?v=ae8bc347",
+      "duration": 45.599999994039536,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-5FDKI6ZW.js?v=ae8bc347",
+      "duration": 46.5,
+      "bytes": 0
+    },
+    {
+      "name": "chunk-PDD54ISM.js?v=ae8bc347",
+      "duration": 29.299999997019768,
+      "bytes": 0
+    },
+    {
+      "name": "@react-three_fiber.js?v=aeae94f0",
+      "duration": 11.799999997019768,
+      "bytes": 0
+    },
+    {
+      "name": "@react-three_drei.js?v=1f9e34f8",
+      "duration": 130.09999999403954,
+      "bytes": 0
+    },
+    {
+      "name": "three.js?v=2826e558",
+      "duration": 62,
+      "bytes": 0
+    },
+    {
+      "name": "zustand.js?v=d88b2ee4",
+      "duration": 128.5,
+      "bytes": 0
+    }
+  ]
+}

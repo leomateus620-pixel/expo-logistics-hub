@@ -33,7 +33,7 @@ const poses=[
   const healthy=rounds.flat().every(s=>s.health.status==='ready'&&s.health.contextLosses===0&&!s.health.lastErrorCode);
   const retainedStable=retainedHeap[2].usedSize<=retainedHeap[1].usedSize+2_000_000;
   const report={errors,stable,healthy,rounds,retainedHeap,retainedStable};
-  fs.writeFileSync('docs/screenshots/soy-gate9/navigation-stress.json',JSON.stringify(report,null,2));
+  fs.writeFileSync(`${process.env.QA_OUTPUT || 'docs/screenshots/soy-gate9'}/navigation-stress.json`,JSON.stringify(report,null,2));
   console.log(JSON.stringify({stable,healthy,warm:rounds[1].at(-1).renderer,after:rounds[2].at(-1).renderer}));
   if(!stable||!healthy||!retainedStable||errors.length)process.exitCode=1;
  }finally{await browser.close();}

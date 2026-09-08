@@ -1,3 +1,4 @@
+import { isCommercialSceneCompiling } from '../../utils/sceneShaderWarmup';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
@@ -686,7 +687,7 @@ function createCommercialMapPostProcessing(
       const previousFace = gl.getActiveCubeFace();
       const previousLevel = gl.getActiveMipmapLevel();
       try {
-        // Preload's default-framebuffer compile uses sRGB output, whereas the
+        // The default-framebuffer shader variant uses sRGB output, whereas the
         // exterior RenderPass writes linear HDR into this actual shared target.
         // Compile only the four highlight probes with the live scene's lights
         // and fog, without rendering a frame or changing shared materials.
@@ -950,7 +951,7 @@ export function SunrisePostProcessing({
       observeContextLoss();
       return true;
     };
-    if (contextIsLost() || rendererFailed.current) return;
+    if (contextIsLost() || rendererFailed.current || isCommercialSceneCompiling(gl)) return;
     if (cachedShaderFailed.current) {
       // The warmup's render path is unknown and its broken program may be
       // shared with direct rendering. Only a context reset can safely clear
@@ -1382,7 +1383,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   ]);
 
   useEffect(() => {
-    // Preload owns the full scene. Warm only the two outer-ground variants
+    // CommercialMapSceneShaderWarmup owns the full scene. Warm only the two outer-ground variants
     // here, using the live scene as the lighting environment, so startup does
     // not traverse and compile hundreds of unrelated meshes twice.
     const compileStartedAt = typeof performance === 'undefined' ? Date.now() : performance.now();

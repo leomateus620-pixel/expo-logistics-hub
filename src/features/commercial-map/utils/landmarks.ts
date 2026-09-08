@@ -19,6 +19,8 @@ import {
 } from './thirdAgePavilion';
 import {
   LACTALIS_STAGE_LAYOUT,
+  lactalisStageFacingRadians,
+  lactalisStageFrontVector,
   lactalisStageVisualHeight,
 } from './lactalisStage';
 import {
@@ -330,8 +332,7 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
       'Palco Cultural Lactalis',
       'Lactalis Cultural Stage',
     ],
-    // Empena alinhada à Quadra B e à Casa Fenasoja (yaw 0, não o diagonal
-    // antigo para Q-D-12). A câmera lê a fachada sul, do mesmo quadrante da B12.
+    // Local +Z points to the midpoint of the exact Quadra D lots 11 and 12.
     facingRadians: LACTALIS_STAGE_LAYOUT.facingRadians,
     focusDirection: [
       LACTALIS_STAGE_LAYOUT.frontVector[0] * 0.45 - 0.28,
@@ -530,14 +531,23 @@ export function strategicLandmarkSearchAliases(
 }
 
 export function strategicLandmarkFacingRadians(
-  entity: Pick<MapEntity, 'publicIdentifier'>,
+  entity: Pick<MapEntity, 'publicIdentifier'> & Partial<Pick<MapEntity, 'geometry'>>,
 ): number {
+  if (normalizedIdentifier(entity) === 'B13' && entity.geometry) {
+    const bounds = strategicLandmarkBounds({ geometry: entity.geometry });
+    return lactalisStageFacingRadians([bounds.centerX, bounds.centerZ]);
+  }
   return STRATEGIC_LANDMARKS[normalizedIdentifier(entity)]?.facingRadians ?? 0;
 }
 
 export function strategicLandmarkFocusDirection(
-  entity: Pick<MapEntity, 'publicIdentifier'>,
+  entity: Pick<MapEntity, 'publicIdentifier'> & Partial<Pick<MapEntity, 'geometry'>>,
 ): readonly [number, number, number] | null {
+  if (normalizedIdentifier(entity) === 'B13' && entity.geometry) {
+    const bounds = strategicLandmarkBounds({ geometry: entity.geometry });
+    const front = lactalisStageFrontVector([bounds.centerX, bounds.centerZ]);
+    return [front[0], LACTALIS_STAGE_LAYOUT.camera.focusMinimumDirectionY, front[1]];
+  }
   return STRATEGIC_LANDMARKS[normalizedIdentifier(entity)]?.focusDirection ?? null;
 }
 

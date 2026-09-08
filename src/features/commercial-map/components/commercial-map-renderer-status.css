@@ -48,3 +48,21 @@
     min-height: 44px;
   }
 }
+.commercial-map-preparing {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #eef2ea, #dbe5d7);
+  color: #244435;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.commercial-map-preparing span {
+  padding: 16px 24px;
+  border: 1px solid #c6d5c1;
+  border-radius: 14px;
+  background: #f8faf5;
+}

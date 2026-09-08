@@ -26,32 +26,34 @@ const toLocal = (point: ReadonlyCoordinate): ReadonlyCoordinate => {
 };
 
 /**
- * Same size-class rectangle as Casa Fenasoja / B12 (135×104), aligned on the
- * shared east-west axis. The centre sits further north so the south-facing
- * apron and roof stay clear of B12 after the buildings share a heading.
+ * Preserve the reference cadastral rectangle. Older persisted anchors remain
+ * authoritative: the model and selection envelope use the supplied centre.
+ * Only the architectural plan is reduced to clear the road and headquarters.
  */
 const sourceCenter = [4105, 3562] as const;
 const sourceFootprint = [135, 104] as const;
 
 /**
- * Q-D-12 remains the neighbouring Quadra D lot west of the stage. It is not
- * the facing target: the previous D-12 heading left B13 crooked beside B12.
+ * Midpoint of Q-D-11 and Q-D-12 (Quadra D). These exact identifiers and their
+ * centroids were verified against both the reference and persisted project.
  */
-const targetSourceCenter = [3897.4166666666665, 3550] as const;
+const targetSourceCenter = [3897.4166666666665, 3605] as const;
 const headquartersSourceCenter = FENASOJA_HEADQUARTERS_LAYOUT.sourceCenter;
 const headquartersSourceFootprint = FENASOJA_HEADQUARTERS_LAYOUT.sourceFootprint;
 const worldCenter = toLocal(sourceCenter);
 const targetWorldCenter = toLocal(targetSourceCenter);
 const headquartersWorldCenter = toLocal(headquartersSourceCenter);
-/** Axis-aligned with Quadra B / Casa Fenasoja, not the old diagonal D-12 yaw. */
-const facingRadians = 0;
+export function lactalisStageFacingRadians(center: ReadonlyCoordinate = worldCenter) {
+  return Math.atan2(targetWorldCenter[0] - center[0], targetWorldCenter[1] - center[1]);
+}
+const facingRadians = lactalisStageFacingRadians();
 const frontVector = normalize2([
   Math.sin(facingRadians),
   Math.cos(facingRadians),
 ]);
 
 export const LACTALIS_STAGE_LAYOUT = Object.freeze({
-  revision: '2026.9-lactalis-stage.2',
+  revision: '2026.9-lactalis-stage.3',
   publicIdentifier: 'B13',
   runtimeEntityId: 'reference:2026:b13',
   displayName: 'Palco Cultural Lactalis',
@@ -66,6 +68,7 @@ export const LACTALIS_STAGE_LAYOUT = Object.freeze({
   sourceFootprintPolygon: sourceRectangle(sourceCenter, sourceFootprint[0], sourceFootprint[1]),
   worldCenter,
   targetIdentifier: 'Q-D-12',
+  targetIdentifiers: Object.freeze(['Q-D-11', 'Q-D-12'] as const),
   targetSourceCenter,
   targetWorldCenter,
   headquartersIdentifier: 'B12',
@@ -75,7 +78,7 @@ export const LACTALIS_STAGE_LAYOUT = Object.freeze({
   frontVector,
   facingRadians,
   facingDegrees: facingRadians * 180 / Math.PI,
-  /** Architecture stays inside the official selectable footprint after rotation. */
+  /** User-authorized plan reduction; the anchor and architectural height stay fixed. */
   architecture: Object.freeze({
     widthRatio: FENASOJA_HEADQUARTERS_LAYOUT.envelope.widthRatio,
     depthRatio: FENASOJA_HEADQUARTERS_LAYOUT.envelope.depthRatio,
@@ -136,8 +139,9 @@ export function lactalisStageVisualHeight() {
   return LACTALIS_STAGE_LAYOUT.architecture.ridgeHeight;
 }
 
-export function lactalisStageFrontVector(): ReadonlyCoordinate {
-  return LACTALIS_STAGE_LAYOUT.frontVector;
+export function lactalisStageFrontVector(center: ReadonlyCoordinate = worldCenter): ReadonlyCoordinate {
+  const yaw = lactalisStageFacingRadians(center);
+  return [Math.sin(yaw), Math.cos(yaw)];
 }
 
 export function lactalisStageHeadingToHeadquartersErrorRadians() {
@@ -147,29 +151,34 @@ export function lactalisStageHeadingToHeadquartersErrorRadians() {
 }
 
 export function lactalisStageHeadingToTargetErrorRadians() {
-  return lactalisStageHeadingToHeadquartersErrorRadians();
+  const towardTarget = normalize2([targetWorldCenter[0] - worldCenter[0], targetWorldCenter[1] - worldCenter[1]]);
+  return Math.acos(Math.min(1, towardTarget[0] * frontVector[0] + towardTarget[1] * frontVector[1]));
 }
 
 export function lactalisStageModelDimensions(
   footprintWidth: number,
   footprintDepth: number,
+  center: ReadonlyCoordinate = worldCenter,
 ) {
   const requestedWidth = footprintWidth * LACTALIS_STAGE_LAYOUT.architecture.widthRatio;
   const requestedDepth = footprintDepth * LACTALIS_STAGE_LAYOUT.architecture.depthRatio;
   const inset = LACTALIS_STAGE_LAYOUT.architecture.footprintSafetyInset;
-  const cosine = Math.cos(facingRadians);
-  const sine = Math.sin(facingRadians);
+  const yaw = lactalisStageFacingRadians(center);
+  const cosine = Math.cos(yaw);
+  const sine = Math.sin(yaw);
   // Keep all new architecture north of B12. Do not edit the B12 cadastral polygon.
   const headquartersNorthEdge = toLocal([
     headquartersSourceCenter[0],
     headquartersSourceCenter[1] - headquartersSourceFootprint[1] / 2,
-  ])[1] - worldCenter[1] - LACTALIS_STAGE_LAYOUT.architecture.headquartersClearance;
+  ])[1] - center[1] - LACTALIS_STAGE_LAYOUT.architecture.headquartersClearance;
+  // Rua Uruguai's validated southern edge (PDF y=3494), also checked in Cloud.
+  const roadSouthEdge = toLocal([sourceCenter[0], 3494])[1] - center[1] + inset;
   const fits = (scale: number) => localPresentationFootprint(
     requestedWidth * scale,
     requestedDepth * scale,
   ).every(([x, z]) => (
     Math.abs(x * cosine + z * sine) <= footprintWidth / 2 - inset
-    && Math.abs(-x * sine + z * cosine) <= footprintDepth / 2 - inset
+    && -x * sine + z * cosine >= roadSouthEdge
     && -x * sine + z * cosine <= headquartersNorthEdge
   ));
   // Test the full rotated envelope, including roof thickness and gutters. The
@@ -233,8 +242,9 @@ export function lactalisStageLocalToWorld(
   [x, z]: ReadonlyCoordinate,
   center: ReadonlyCoordinate = worldCenter,
 ): Coordinate {
-  const cosine = Math.cos(facingRadians);
-  const sine = Math.sin(facingRadians);
+  const yaw = lactalisStageFacingRadians(center);
+  const cosine = Math.cos(yaw);
+  const sine = Math.sin(yaw);
   return [center[0] + x * cosine + z * sine, center[1] - x * sine + z * cosine];
 }
 
@@ -244,7 +254,7 @@ export function lactalisStagePresentationFootprint(
   footprintDepth = officialFootprintDimensions()[1],
   center: ReadonlyCoordinate = worldCenter,
 ): readonly Coordinate[] {
-  const model = lactalisStageModelDimensions(footprintWidth, footprintDepth);
+  const model = lactalisStageModelDimensions(footprintWidth, footprintDepth, center);
   return Object.freeze(localPresentationFootprint(model.width, model.depth)
     .map((point) => lactalisStageLocalToWorld(point, center)));
 }
