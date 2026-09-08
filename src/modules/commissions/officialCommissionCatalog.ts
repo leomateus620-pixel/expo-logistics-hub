@@ -71,6 +71,8 @@ export interface OfficialUnitEntry {
   tone: CommissionTone;
   /** Responsável oficial (exibido inclusive para visitantes não autenticados). */
   responsible: string;
+  /** Frentes compartilhadas: um nome por responsável principal. */
+  responsibles?: string[];
   responsibleRole?: string;
   description: string;
 }
@@ -401,6 +403,7 @@ export const OFFICIAL_COMMISSION_UNITS: readonly OfficialUnitEntry[] = [
     icon: Newspaper,
     tone: 'sky',
     responsible: 'Deise Anelise Froelich e Francine Maria Boijink',
+    responsibles: ['Deise Anelise Froelich', 'Francine Maria Boijink'],
     description: 'Relacionamento com a imprensa, pauta oficial e cobertura da feira.',
   },
   {
@@ -412,6 +415,7 @@ export const OFFICIAL_COMMISSION_UNITS: readonly OfficialUnitEntry[] = [
     icon: Scale,
     tone: 'gold',
     responsible: 'José Mauro Barbieri e Sandra Lameira',
+    responsibles: ['José Mauro Barbieri', 'Sandra Lameira'],
     description: 'Contratos, pareceres, conformidade legal e apoio jurídico às comissões.',
   },
   {
@@ -424,6 +428,7 @@ export const OFFICIAL_COMMISSION_UNITS: readonly OfficialUnitEntry[] = [
     icon: Globe2,
     tone: 'cyan',
     responsible: 'Júlio Bravo, Roberto Adriano Racho e Sara Kirchhof Varela',
+    responsibles: ['Júlio Bravo', 'Roberto Adriano Racho', 'Sara Kirchhof Varela'],
     description: 'Delegações estrangeiras, missões e agenda internacional da Fenasoja.',
   },
   {
