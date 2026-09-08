@@ -1,6 +1,7 @@
 import { Suspense, type ReactNode } from 'react';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
 import { Toaster } from '@/components/ui/toaster';
+import PushPermissionPrompt from '@/components/notifications/PushPermissionPrompt';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, defaultShouldDehydrateQuery } from '@tanstack/react-query';
@@ -456,6 +457,7 @@ const App = () => (
               <Route path="/comissoes/:moduleSlug/*" element={<CommissionModuleRoutes />} />
               <Route path="/*" element={<LegacyLogisticsRoutes />} />
             </Routes>
+            <PushPermissionPrompt />
           </BrowserRouter>
         </TooltipProvider>
       </CapabilitiesProvider>
