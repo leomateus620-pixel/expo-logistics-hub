@@ -18,6 +18,8 @@ interface CommissionCardProps {
   onSelect: (moduleSlug: string) => void;
   /** Responsável oficial da frente (fonte: Agenda Fenasoja). */
   responsible?: CommissionPerson;
+  /** Todos os responsáveis principais (assessorias compartilhadas têm mais de um). */
+  leads?: CommissionPerson[];
   /** Demais integrantes vinculados à frente. */
   members?: CommissionPerson[];
 }
