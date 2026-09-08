@@ -51,7 +51,9 @@ function getCommissionVisualActionLabel(access: PortalAccessPresentation) {
   return access.label;
 }
 
-function CommissionCard({ access, module, onSelect, responsible, members = [] }: CommissionCardProps) {
+function CommissionCard({ access, module, onSelect, responsible, leads, members = [] }: CommissionCardProps) {
+  const leadList = leads && leads.length > 0 ? leads : responsible ? [responsible] : [];
+  const isShared = leadList.length > 1;
   const Icon = module.icon;
   const status = module.status as CommissionStatus;
   const actionLabel = getCommissionActionLabel(access);
