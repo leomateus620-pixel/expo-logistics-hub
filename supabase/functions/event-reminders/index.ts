@@ -94,9 +94,13 @@ function json(data: Record<string, unknown>, status = 200) {
   });
 }
 
+const workerToken = Deno.env.get("EVENT_REMINDERS_WORKER_TOKEN") ?? "";
+
 function requireServiceRole(req: Request) {
   const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
-  return Boolean(service && token && token === service);
+  if (service && token && token === service) return true;
+  const wt = req.headers.get("X-Worker-Token") ?? "";
+  return Boolean(workerToken && wt && wt === workerToken);
 }
 
 function saoPauloDateString(date: Date) {
