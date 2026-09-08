@@ -30,6 +30,8 @@ project_id = "btfaumhroqtqzxomqorx"
     verify_jwt = true
   [functions.send-push-notification]
     verify_jwt = true
+  [functions.event-assignment-push]
+    verify_jwt = false
 
   [functions.mcp]
     verify_jwt = false
