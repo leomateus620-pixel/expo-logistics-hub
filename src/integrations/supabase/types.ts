@@ -8746,6 +8746,7 @@ export type Database = {
         Returns: boolean
       }
       invoke_agenda_meeting_worker: { Args: never; Returns: number }
+      invoke_event_reminders: { Args: { p_mode: string }; Returns: number }
       invoke_google_sync_worker: { Args: never; Returns: number }
       is_org_member: {
         Args: { _org_id: string; _user_id: string }
