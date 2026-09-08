@@ -31,7 +31,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
   const roads = circulation.filter((entity) => entity.classification === 'ROAD');
 
   it('preserva o inventário cartográfico oficial sem criar vias artificiais', () => {
-    expect(roads).toHaveLength(29);
+    expect(roads).toHaveLength(30);
     expect(circulation.filter((entity) => entity.classification === 'PEDESTRIAN_PATH')).toHaveLength(1);
     expect(circulation.every((entity) => entity.geometry.elevation === 0)).toBe(true);
     expect(roads.every((entity) => entity.geometry.extrusionHeight === ROAD_INFRASTRUCTURE.asphaltHeight)).toBe(true);
@@ -250,7 +250,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
       expect(detailed.gutters).not.toBeNull();
       expect(detailed.curbs).not.toBeNull();
       expect(detailed.diagnostics).toMatchObject({
-        roadCount: 29,
+        roadCount: 30,
         pedestrianPathCount: 1,
         microGapCount: 1,
       });

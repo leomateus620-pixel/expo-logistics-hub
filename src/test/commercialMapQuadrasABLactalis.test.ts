@@ -356,7 +356,7 @@ describe('reconstrução das Quadras A/B e Palco Cultural Lactalis', () => {
       'src/features/commercial-map/components/canvas/LactalisCulturalStage.tsx',
     ), 'utf8');
 
-    expect(canvasSource).toContain("import.meta.env.DEV\n  ? lazy(async () => ({ default: (await import('./QuadrasABValidationOverlay'))");
+    expect(canvasSource.replace(/\r\n/g, '\n')).toContain("import.meta.env.DEV\n  ? lazy(async () => ({ default: (await import('./QuadrasABValidationOverlay'))");
     expect(canvasSource).toContain("new URLSearchParams(window.location.search).has('quadrasABDebug')");
     expect(canvasSource).toContain('<QuadrasABEnvironmentLayer');
     expect(landmarkSource).toContain("kind === 'lactalis-cultural-stage'");

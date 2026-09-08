@@ -1,0 +1,8 @@
+/debug.png
+/functional-error*
+/candidate-desktop.json
+/placement-audit-log.txt
+/candidate-*.png
+!candidate-stageTop.png
+!candidate-stageLot11.png
+!candidate-stageLot12.png

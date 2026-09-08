@@ -1,3 +1,4 @@
+import { SOY_RESTROOM, SOY_ROAD_CONNECTION, GATE_NINE_TANKS } from './soyGateInfrastructure';
 import {
   DEFAULT_REFERENCE_LAYERS,
   MAP_REFERENCE_HEIGHT,
@@ -433,6 +434,7 @@ const roadInputs: Array<[string, string, PdfPolygon, MapClassification?]> = [
   // sobre as vias vizinhas para que as interseções sejam geradas sem costura.
   ['RUA-URUGUAI-LESTE', 'Rua Uruguai (trecho leste)', rectPdf([3960, 3438, 4510, 3494])],
   ['RUA-ARGENTINA-LESTE', 'Rua Argentina (trecho leste)', rectPdf([3960, 3716, 4510, 3780])],
+  [SOY_ROAD_CONNECTION.identifier, 'Rua Montevidéu — conexão Cozinha da Soja', rectPdf([...SOY_ROAD_CONNECTION.sourceBounds])],
   ['RUA-MONTEVIDEU-SUL', 'Rua Montevidéu (trecho sul)', rectPdf([3441, 2600, 3482, 3130])],
   ['RUA-INTERNA-OESTE', 'Rua Interna Oeste', rectPdf([2222, 2450, 2241, 3125])],
   // Conexões cartográficas 2026.4: faixas livres entre quadras que permaneciam
@@ -471,6 +473,7 @@ roadInputs.forEach(([publicIdentifier, name, polygon, classification = 'ROAD']) 
     metadata: {
       labelPriority: 'road',
       isSeparator: true,
+      ...(publicIdentifier === SOY_ROAD_CONNECTION.identifier ? { sourceRevision: '2026.9-soy-gate9.1', source: SOY_RESTROOM.evidence.join('; '), cartographicConfidence: 'satellite_registered_estimate', relatedStreets: ['RUA-PARAGUAI', 'RUA-BOLIVIA', 'RUA-MONTEVIDEU-SUL'] } : {}),
       ...(isExporuralRoad ? {
         areaCode: EXPORURAL_AREA_CODE,
         entityType: 'EXPORURAL_ROAD',
@@ -487,6 +490,7 @@ function addStructure(
   layer: string,
   boundsOrCenter: PdfBounds | PdfPoint,
   options: {
+    description?: string;
     height?: number;
     parent?: string;
     width?: number;
@@ -504,6 +508,7 @@ function addStructure(
     classification,
     layer,
     polygon,
+    description: options.description,
     height: options.height ?? (classification === 'PAVILION' || classification === 'EVENT_VENUE' ? 1.35 : 0.62),
     parentPublicIdentifier: options.parent ? `QUADRA-${options.parent}` : undefined,
     verificationStatus: options.verificationStatus,
@@ -628,12 +633,14 @@ export const OFFICIAL_RESTROOM_CENTERS_2026: readonly PdfPoint[] = [
 ];
 OFFICIAL_RESTROOM_CENTERS_2026.forEach((center, index) => addStructure(
   `E-${String(index + 1).padStart(2, '0')}`,
-  'Sanitários',
+  index === 6 ? 'Sanitários — Cozinha da Soja' : 'Sanitários',
   'RESTROOM',
   'restrooms',
-  center,
-  { width: 42, depth: 34, height: 0.42, metadata: { legendCode: 'E', instance: index + 1 } },
+  index === 6 ? [...SOY_RESTROOM.sourceBounds] : center,
+  index === 6 ? { height: 0.64, metadata: { legendCode: 'E', instance: 7, infrastructure: true, sourceRevision: '2026.9-soy-gate9.1', source: SOY_RESTROOM.evidence.join('; '), cartographicConfidence: 'satellite_registered_estimate', officialMeasurements: false, facadeAssumptions: SOY_RESTROOM.assumed }, description: 'Sanitários permanentes diante da Cozinha da Soja, do outro lado da Rua Montevidéu. Masculino à esquerda e Feminino à direita na aproximação pela cozinha. Implantação estimada por referências; fachadas interpretadas.' } : { width: 42, depth: 34, height: 0.42, metadata: { legendCode: 'E', instance: index + 1 } },
 ));
+
+addStructure(GATE_NINE_TANKS.identifier, 'Reservatórios — Portão 9', 'SERVICE', 'structures', [...GATE_NINE_TANKS.sourceBounds], { height: 1.47, description: 'Três caixas de água junto ao Portão 9. Instalação de infraestrutura, sem finalidade comercial. Posições vinculadas à planta hidráulica; acabamento e alturas dos corpos interpretados conservadoramente.', metadata: { infrastructure: true, sourceRevision: '2026.9-soy-gate9.1', relatedGateIdentifier: 'A9', hydroIdentifiers: GATE_NINE_TANKS.hydroIdentifiers, tankCount: 3, source: GATE_NINE_TANKS.evidence, cartographicConfidence: 'hydraulic_plan_registered', officialMeasurements: false } });
 
 // Large official areas and permanent footprints.
 addStructure('PISTA-CAMPEIRA', 'Pista Campeira', 'LIVESTOCK_AREA', 'exporural', [1990, 1740, 3240, 2175], { height: 0.18 });
@@ -1004,7 +1011,8 @@ const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((re
 /**
  * Blocos não permanentes retirados da infraestrutura oficial 2026.4.
  * São estruturas temporárias de edição (apoios institucionais, comissões,
- * segurança/emergência montada e toda a série sanitária E) que não compõem a
+ * segurança/emergência montada e a série sanitária E, exceto E-07 confirmado
+ * permanente nas referências de setembro) que não compõem a
  * infraestrutura permanente do parque.
  *
  * Só o payload renderizado (`OFFICIAL_REFERENCE_DATA.entities`) perde esses
@@ -1016,7 +1024,8 @@ const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((re
 export const NON_PERMANENT_REMOVED_IDENTIFIERS_2026: readonly string[] = [
   'B14', 'B15', 'B16', 'B17', 'B18', 'B21', 'B23', 'B24', 'B25', 'B26', 'B27',
   'B30', 'B31', 'B32', 'B33', 'B34', 'B39', 'B40', 'B42-02',
-  ...OFFICIAL_RESTROOM_CENTERS_2026.map((_, index) => `E-${String(index + 1).padStart(2, '0')}`),
+  // E-07 is confirmed permanent by the September satellite references.
+  ...OFFICIAL_RESTROOM_CENTERS_2026.flatMap((_, index) => index === 6 ? [] : [`E-${String(index + 1).padStart(2, '0')}`]),
 ];
 
 const nonPermanentRemovedIdentifiers = new Set(NON_PERMANENT_REMOVED_IDENTIFIERS_2026);

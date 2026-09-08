@@ -14,11 +14,11 @@ const PERMANENT_SAMPLE = [
 ];
 
 describe('limpeza estrutural dos blocos não permanentes', () => {
-  it('remove exatamente 45 identificadores (26 sanitários + 19 estruturas)', () => {
+  it('remove exatamente 44 identificadores (25 sanitários + 19 estruturas)', () => {
     const restrooms = NON_PERMANENT_REMOVED_IDENTIFIERS_2026.filter((id) => id.startsWith('E-'));
-    expect(restrooms).toHaveLength(26);
-    expect(NON_PERMANENT_REMOVED_IDENTIFIERS_2026).toHaveLength(45);
-    expect(new Set(NON_PERMANENT_REMOVED_IDENTIFIERS_2026).size).toBe(45);
+    expect(restrooms).toHaveLength(25);
+    expect(NON_PERMANENT_REMOVED_IDENTIFIERS_2026).toHaveLength(44);
+    expect(new Set(NON_PERMANENT_REMOVED_IDENTIFIERS_2026).size).toBe(44);
   });
 
   it('cobre cada bloco citado no pedido por identificador oficial', () => {
@@ -34,11 +34,11 @@ describe('limpeza estrutural dos blocos não permanentes', () => {
     expect(remaining).toEqual([]);
   });
 
-  it('não sobra nenhum sanitário no inventário oficial', () => {
+  it('resta apenas E-07, confirmado permanente nas novas referências', () => {
     const restrooms = OFFICIAL_RENDERED_ENTITIES.filter((entity) => (
       entity.classification === 'RESTROOM' || entity.classification === 'CHEMICAL_RESTROOM'
     ));
-    expect(restrooms).toEqual([]);
+    expect(restrooms.map(e => e.publicIdentifier)).toEqual(['E-07']);
   });
 
   it('preserva integralmente a infraestrutura permanente', () => {
@@ -50,7 +50,7 @@ describe('limpeza estrutural dos blocos não permanentes', () => {
     const count = (predicate: (classification: string) => boolean) => (
       OFFICIAL_RENDERED_ENTITIES.filter((entity) => predicate(entity.classification)).length
     );
-    expect(count((c) => c === 'ROAD')).toBe(29);
+    expect(count((c) => c === 'ROAD')).toBe(30);
     expect(count((c) => c === 'PEDESTRIAN_PATH')).toBe(1);
     expect(count((c) => c === 'QUADRA')).toBe(21);
     expect(count((c) => c === 'SELLABLE_LOT')).toBe(262);

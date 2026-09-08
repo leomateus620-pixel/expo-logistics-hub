@@ -1,0 +1,680 @@
+{
+  "phase": "before",
+  "mobile": false,
+  "errors": [],
+  "inventory": {
+    "entities": [
+      {
+        "id": "reference:2026:a9",
+        "projectId": "reference:fenasoja-2026",
+        "layerId": "reference:gates",
+        "parentEntityId": null,
+        "publicIdentifier": "A9",
+        "name": "Portão 9 — saída de visitantes e expositores",
+        "description": null,
+        "classification": "GATE",
+        "verificationStatus": "NEEDS_REVIEW",
+        "isSellable": false,
+        "isArchived": false,
+        "geometry": {
+          "id": null,
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                13.396363636363631,
+                -36.981818367469884
+              ],
+              [
+                13.876363636363635,
+                -36.501818365060245
+              ],
+              [
+                13.396363636363631,
+                -36.021818362650606
+              ],
+              [
+                12.916363636363641,
+                -36.501818365060245
+              ],
+              [
+                13.396363636363631,
+                -36.981818367469884
+              ]
+            ]
+          ],
+          "elevation": 0,
+          "extrusionHeight": 0.72,
+          "rotation": 0,
+          "geometryVersion": 1,
+          "calibrationVersion": null
+        },
+        "metadata": {
+          "seedManaged": true,
+          "sourceRevision": "2026.3",
+          "source": "Mapa oficial Fenasoja 2026 — PDF Mapa do Parque 300x200",
+          "cartographicConfidence": "official_visual_reference",
+          "officialMeasurements": false,
+          "sourcePdfPolygon": [
+            [
+              3964,
+              1280
+            ],
+            [
+              3986,
+              1302
+            ],
+            [
+              3964,
+              1324
+            ],
+            [
+              3942,
+              1302
+            ]
+          ],
+          "parentPublicIdentifier": null,
+          "buyerDataImported": false,
+          "legendCode": "A9",
+          "labelPriority": "gate"
+        }
+      },
+      {
+        "id": "reference:2026:b7",
+        "projectId": "reference:fenasoja-2026",
+        "layerId": "reference:pavilions",
+        "parentEntityId": "reference:2026:quadra-n",
+        "publicIdentifier": "B7",
+        "name": "Pavilhão 4 — Cozinha da Soja",
+        "description": null,
+        "classification": "PAVILION",
+        "verificationStatus": "NEEDS_REVIEW",
+        "isSellable": false,
+        "isArchived": false,
+        "geometry": {
+          "id": null,
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                3.163636363636364,
+                -10.429090961445787
+              ],
+              [
+                6.894545454545451,
+                -10.429090961445787
+              ],
+              [
+                6.894545454545451,
+                -8.880000044578317
+              ],
+              [
+                3.163636363636364,
+                -8.880000044578317
+              ],
+              [
+                3.163636363636364,
+                -10.429090961445787
+              ]
+            ]
+          ],
+          "elevation": 0,
+          "extrusionHeight": 1.35,
+          "rotation": 0,
+          "geometryVersion": 1,
+          "calibrationVersion": null
+        },
+        "metadata": {
+          "seedManaged": true,
+          "sourceRevision": "2026.3",
+          "source": "Mapa oficial Fenasoja 2026 — PDF Mapa do Parque 300x200",
+          "cartographicConfidence": "official_visual_reference",
+          "officialMeasurements": false,
+          "sourcePdfPolygon": [
+            [
+              3495,
+              2497
+            ],
+            [
+              3666,
+              2497
+            ],
+            [
+              3666,
+              2568
+            ],
+            [
+              3495,
+              2568
+            ]
+          ],
+          "parentPublicIdentifier": "QUADRA-N",
+          "buyerDataImported": false
+        }
+      },
+      {
+        "id": "reference:2026:b13",
+        "projectId": "reference:fenasoja-2026",
+        "layerId": "reference:structures",
+        "parentEntityId": "reference:2026:quadra-b",
+        "publicIdentifier": "B13",
+        "name": "Palco Cultural Lactalis",
+        "description": null,
+        "classification": "EVENT_VENUE",
+        "verificationStatus": "NEEDS_REVIEW",
+        "isSellable": false,
+        "isArchived": false,
+        "geometry": {
+          "id": null,
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                15,
+                11.672727331325298
+              ],
+              [
+                17.945454545454538,
+                11.672727331325298
+              ],
+              [
+                17.945454545454538,
+                13.941818251807227
+              ],
+              [
+                15,
+                13.941818251807227
+              ],
+              [
+                15,
+                11.672727331325298
+              ]
+            ]
+          ],
+          "elevation": 0,
+          "extrusionHeight": 1.05,
+          "rotation": 0,
+          "geometryVersion": 1,
+          "calibrationVersion": null
+        },
+        "metadata": {
+          "seedManaged": true,
+          "sourceRevision": "2026.3",
+          "source": "Mapa oficial Fenasoja 2026 — PDF Mapa do Parque 300x200",
+          "cartographicConfidence": "official_visual_reference",
+          "officialMeasurements": false,
+          "sourcePdfPolygon": [
+            [
+              4037.5,
+              3510
+            ],
+            [
+              4172.5,
+              3510
+            ],
+            [
+              4172.5,
+              3614
+            ],
+            [
+              4037.5,
+              3614
+            ]
+          ],
+          "parentPublicIdentifier": "QUADRA-B",
+          "buyerDataImported": false
+        }
+      },
+      {
+        "id": "reference:2026:e-07",
+        "projectId": "reference:fenasoja-2026",
+        "layerId": "reference:restrooms",
+        "parentEntityId": null,
+        "publicIdentifier": "E-07",
+        "name": "Sanitários",
+        "description": null,
+        "classification": "RESTROOM",
+        "verificationStatus": "NEEDS_REVIEW",
+        "isSellable": false,
+        "isArchived": false,
+        "geometry": {
+          "id": null,
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -0.5018181818181802,
+                -9.992727322891561
+              ],
+              [
+                0.4145454545454612,
+                -9.992727322891561
+              ],
+              [
+                0.4145454545454612,
+                -9.250909137349403
+              ],
+              [
+                -0.5018181818181802,
+                -9.250909137349403
+              ],
+              [
+                -0.5018181818181802,
+                -9.992727322891561
+              ]
+            ]
+          ],
+          "elevation": 0,
+          "extrusionHeight": 0.42,
+          "rotation": 0,
+          "geometryVersion": 1,
+          "calibrationVersion": null
+        },
+        "metadata": {
+          "seedManaged": true,
+          "sourceRevision": "2026.3",
+          "source": "Mapa oficial Fenasoja 2026 — PDF Mapa do Parque 300x200",
+          "cartographicConfidence": "official_visual_reference",
+          "officialMeasurements": false,
+          "sourcePdfPolygon": [
+            [
+              3327,
+              2517
+            ],
+            [
+              3369,
+              2517
+            ],
+            [
+              3369,
+              2551
+            ],
+            [
+              3327,
+              2551
+            ]
+          ],
+          "parentPublicIdentifier": null,
+          "buyerDataImported": false,
+          "legendCode": "E",
+          "instance": 7
+        }
+      }
+    ],
+    "stage": {
+      "revision": "2026.9-lactalis-stage.2",
+      "publicIdentifier": "B13",
+      "runtimeEntityId": "reference:2026:b13",
+      "displayName": "Palco Cultural Lactalis",
+      "sourceReferences": {
+        "currentRear": "4d5553bc-e7bb-4b7b-bea7-82b430272a8b.jpeg",
+        "currentFront": "19f56352-460e-4796-b9cb-a8430e2a168b.jpeg",
+        "satellite": "WhatsApp Image 2026-08-30 at 23.40.19.jpeg",
+        "architecture": "4618B88E-96C4-4F78-98A2-6E21E6C254F2.jpeg"
+      },
+      "sourceCenter": [
+        4105,
+        3562
+      ],
+      "sourceFootprint": [
+        135,
+        104
+      ],
+      "sourceFootprintPolygon": [
+        [
+          4037.5,
+          3510
+        ],
+        [
+          4172.5,
+          3510
+        ],
+        [
+          4172.5,
+          3614
+        ],
+        [
+          4037.5,
+          3614
+        ]
+      ],
+      "worldCenter": [
+        16.472727272727283,
+        12.807272791566263
+      ],
+      "targetIdentifier": "Q-D-12",
+      "targetSourceCenter": [
+        3897.4166666666665,
+        3550
+      ],
+      "targetWorldCenter": [
+        11.943636363636358,
+        12.54545460843373
+      ],
+      "headquartersIdentifier": "B12",
+      "headquartersSourceFootprint": [
+        135,
+        104
+      ],
+      "headquartersWorldCenter": [
+        16.472727272727283,
+        15.403636440963858
+      ],
+      "localFrontAxis": [
+        0,
+        1
+      ],
+      "frontVector": [
+        0,
+        1
+      ],
+      "facingRadians": 0,
+      "facingDegrees": 0,
+      "architecture": {
+        "widthRatio": 0.9,
+        "depthRatio": 0.76,
+        "eaveHeight": 1.18,
+        "ridgeHeight": 1.82,
+        "columnThicknessRatio": 0.024,
+        "minimumColumnThickness": 0.042,
+        "roofThickness": 0.042,
+        "roofOverhangRatio": 0.045,
+        "platformHeight": 0.12,
+        "platformWidthRatio": 0.82,
+        "platformDepthRatio": 0.32,
+        "audienceApronDepth": 0.16,
+        "audienceApronWidthRatio": 0.82,
+        "footprintSafetyInset": 0.015,
+        "headquartersClearance": 0.045,
+        "floorThickness": 0.05,
+        "sideEnclosureDepthRatio": 0.44,
+        "fasciaDepth": 0.16,
+        "claddingThickness": 0.036
+      },
+      "signage": {
+        "aspectRatio": 2.4,
+        "widthRatio": 0.26,
+        "centerAboveEave": 0.03
+      },
+      "camera": {
+        "minimumDistance": 3.4,
+        "focusedDistance": 6.2,
+        "focusMinimumDirectionY": 0.28,
+        "focusPortraitMinimumDirectionY": 0.48
+      },
+      "palette": {
+        "cladding": "#c8ccca",
+        "claddingLight": "#dadddb",
+        "roof": "#b8bfbe",
+        "roofEdge": "#434b4e",
+        "frame": "#20282b",
+        "interior": "#31383a",
+        "platform": "#24292a",
+        "concrete": "#a9a79e",
+        "sign": "#16466e",
+        "lactalisBlue": "#0a4381",
+        "light": "#8bd483"
+      },
+      "renderBudget": {
+        "baseDrawCalls": 11,
+        "detailDrawCalls": 17,
+        "focusedDrawCalls": 22,
+        "independentCables": 0,
+        "textureAssets": 0
+      }
+    }
+  },
+  "poses": {
+    "restroomTop": {
+      "target": [
+        0,
+        0,
+        -9.6
+      ],
+      "position": [
+        0,
+        15,
+        -9.61
+      ]
+    },
+    "restroomFront": {
+      "target": [
+        0,
+        0.4,
+        -9.6
+      ],
+      "position": [
+        7,
+        4,
+        -9.6
+      ]
+    },
+    "restroomRear": {
+      "target": [
+        0,
+        0.4,
+        -9.6
+      ],
+      "position": [
+        -6,
+        4,
+        -12
+      ]
+    },
+    "kitchenContext": {
+      "target": [
+        2,
+        0,
+        -9.6
+      ],
+      "position": [
+        11,
+        10,
+        -3
+      ]
+    },
+    "gate9Top": {
+      "target": [
+        11,
+        0,
+        -38
+      ],
+      "position": [
+        11,
+        22,
+        -38.01
+      ]
+    },
+    "gate9": {
+      "target": [
+        10.6,
+        0.5,
+        -38.5
+      ],
+      "position": [
+        17,
+        5,
+        -33
+      ]
+    },
+    "stageTop": {
+      "target": [
+        16.47,
+        0,
+        12.8
+      ],
+      "position": [
+        16.47,
+        14,
+        12.79
+      ]
+    },
+    "stageLot11": {
+      "target": [
+        16.47,
+        0.75,
+        12.8
+      ],
+      "position": [
+        11.94,
+        2.4,
+        14.94
+      ]
+    },
+    "stageLot12": {
+      "target": [
+        16.47,
+        0.75,
+        12.8
+      ],
+      "position": [
+        11.94,
+        2.4,
+        12.55
+      ]
+    },
+    "stageRear": {
+      "target": [
+        16.47,
+        0.75,
+        12.8
+      ],
+      "position": [
+        22,
+        4,
+        12.8
+      ]
+    },
+    "overview": {
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "position": [
+        100,
+        140,
+        160
+      ]
+    }
+  },
+  "measurements": {
+    "kitchenContext": {
+      "frames": 360,
+      "meanMs": 16.666111111102833,
+      "p95Ms": 17.700000002980232,
+      "renderer": {
+        "at": 69739.40000000596,
+        "calls": 304,
+        "triangles": 645115,
+        "geometries": 634,
+        "textures": 148,
+        "programs": 183,
+        "dpr": 0.72,
+        "width": 972,
+        "height": 500,
+        "heapBytes": 150161934,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 877,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "gate9": {
+      "frames": 361,
+      "meanMs": 16.66980609417457,
+      "p95Ms": 16.900000005960464,
+      "renderer": {
+        "at": 76658.90000000596,
+        "calls": 166,
+        "triangles": 569823,
+        "geometries": 629,
+        "textures": 146,
+        "programs": 181,
+        "dpr": 0.72,
+        "width": 972,
+        "height": 500,
+        "heapBytes": 151691130,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1266,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "stageLot11": {
+      "frames": 361,
+      "meanMs": 16.666481994443323,
+      "p95Ms": 18,
+      "renderer": {
+        "at": 83547.59999999404,
+        "calls": 495,
+        "triangles": 859979,
+        "geometries": 640,
+        "textures": 155,
+        "programs": 182,
+        "dpr": 0.72,
+        "width": 972,
+        "height": 500,
+        "heapBytes": 145850514,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1671,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "overview": {
+      "frames": 265,
+      "meanMs": 22.637735849056604,
+      "p95Ms": 34.79999999701977,
+      "renderer": {
+        "at": 90459,
+        "calls": 863,
+        "triangles": 696667,
+        "geometries": 629,
+        "textures": 146,
+        "programs": 181,
+        "dpr": 0.72,
+        "width": 972,
+        "height": 500,
+        "heapBytes": 158932729,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1985,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    }
+  },
+  "browser": "152.0.7977.82"
+}

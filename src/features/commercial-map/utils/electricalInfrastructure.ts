@@ -266,7 +266,14 @@ export function resolveElectricalNodePlacements(
     const rearRoadClearance = rearRoadsActive && !facade
       ? resolveRearRoadElectricalClearancePosition(node)
       : null;
-    const renderPosition = facade?.renderPosition
+    // The new Montevideo link exposes one verified cabinet/road conflict.
+    // Keep its source node and wiring; move only the B7 reception cabinet
+    // 0.232 map units onto the existing forecourt, clear of the asphalt.
+    const soyReception = node.sourceMarkerId === 'transformer-ref-007'
+      && entityByIdentifier.has('RUA-MONTEVIDEU-COZINHA') && facade
+      ? [facade.renderPosition[0] + 0.232, facade.renderPosition[1]] as Coordinate
+      : null;
+    const renderPosition = soyReception ?? facade?.renderPosition
       ?? rearRoadClearance
       ?? parkAccessClearance
       ?? architectureClearance
