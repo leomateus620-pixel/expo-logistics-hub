@@ -126,21 +126,18 @@ export default function CommissionPortalPage() {
   const accessLoading = authLoading || capabilitiesLoading || orgLoading;
   const moduleAccessContext = { capSet, hasFullAccess, myRole, memberUnitSlugs };
 
-  const fallbackPeople = (entry: OfficialUnitEntry) => ({
-    responsible: {
-      id: `${entry.id}-fallback`,
-      name: entry.responsible,
-      role: entry.responsibleRole ?? 'Responsável',
-    },
-    leads: [
-      {
-        id: `${entry.id}-fallback`,
-        name: entry.responsible,
-        role: entry.responsibleRole ?? 'Responsável',
-      },
-    ],
-    members: [],
-  });
+  const fallbackPeople = (entry: OfficialUnitEntry) => {
+    const role = entry.responsibleRole ?? 'Responsável';
+    const names = entry.responsibles && entry.responsibles.length > 0
+      ? entry.responsibles
+      : [entry.responsible];
+    const leads = names.map((name, index) => ({
+      id: `${entry.id}-fallback-${index}`,
+      name,
+      role,
+    }));
+    return { responsible: leads[0], leads, members: [] };
+  };
 
   const resolveCapabilityAccess = (destination: PortalDestination): PortalAccessPresentation => {
     if (authLoading) return loadingAccess();

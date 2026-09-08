@@ -71,6 +71,8 @@ export interface OfficialUnitEntry {
   tone: CommissionTone;
   /** Responsável oficial (exibido inclusive para visitantes não autenticados). */
   responsible: string;
+  /** Frentes compartilhadas: um nome por responsável principal. */
+  responsibles?: string[];
   responsibleRole?: string;
   description: string;
 }
