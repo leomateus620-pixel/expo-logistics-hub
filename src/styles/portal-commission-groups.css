@@ -84,6 +84,24 @@
   gap: 9px;
 }
 
+.commission-access-card__leads {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 auto;
+  gap: 6px;
+}
+
+.commission-access-card__lead-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 9px;
+}
+
+.commission-access-card__people[data-shared='true'] {
+  align-items: flex-start;
+}
+
 .commission-access-card__lead {
   display: grid;
   min-width: 0;

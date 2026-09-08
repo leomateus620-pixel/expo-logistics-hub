@@ -132,6 +132,13 @@ export default function CommissionPortalPage() {
       name: entry.responsible,
       role: entry.responsibleRole ?? 'Responsável',
     },
+    leads: [
+      {
+        id: `${entry.id}-fallback`,
+        name: entry.responsible,
+        role: entry.responsibleRole ?? 'Responsável',
+      },
+    ],
     members: [],
   });
 
@@ -478,6 +485,7 @@ export default function CommissionPortalPage() {
                                   access={resolveCommissionAccess(module)}
                                   onSelect={saveSelectedModule}
                                   responsible={people.responsible ?? fallbackPeople(unit).responsible}
+                                  leads={people.leads}
                                   members={people.members}
                                 />
                               );
