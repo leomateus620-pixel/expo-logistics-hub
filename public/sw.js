@@ -104,8 +104,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(title, {
       body: notification.body || '',
-      icon: notification.icon || '/favicon.ico',
-      badge: '/favicon.ico',
+      icon: notification.icon || '/push-icon.png',
+      badge: '/push-icon.png',
       tag: data.eventId || undefined,
       data: { path: data.path || '/' },
     })

@@ -9,6 +9,7 @@ import {
   buildCronogramaEventUrl,
   buildGoogleCalendarEventUrl,
 } from "../_shared/eventReminderModel.ts";
+import { buildEventPushMessage } from "../_shared/pushMessage.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -396,11 +397,14 @@ async function sendPending(supa: ReturnType<typeof db>) {
 
     if (delivery.channel === "push") {
       // Mesmo destinatário e mesmo horário do e-mail; só muda o canal de entrega.
-      const horizonLabel = delivery.offset_minutes >= 1440
-        ? "amanhã"
-        : delivery.offset_minutes >= 120
-        ? "em 2 horas"
-        : "em 1 hora";
+      const pushMessage = buildEventPushMessage({
+        offsetMinutes: delivery.offset_minutes,
+        eventTitle: event.title,
+        dateLabel: normalized.value.dateLong,
+        timeLabel: normalized.value.timeLabel,
+        location: event.location,
+        eventId: delivery.event_id,
+      });
       try {
         const pushRes = await fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
           method: "POST",
@@ -411,9 +415,9 @@ async function sendPending(supa: ReturnType<typeof db>) {
           body: JSON.stringify({
             userId: delivery.user_id,
             eventId: delivery.event_id,
-            title: `Evento ${horizonLabel}: ${event.title}`,
-            body: `${normalized.value.dateLong} · ${normalized.value.timeLabel}${event.location ? ` · ${event.location}` : ""}`,
-            path: `/cronograma?event=${delivery.event_id}`,
+            title: pushMessage.title,
+            body: pushMessage.body,
+            path: pushMessage.path,
           }),
         });
         const pushRaw = await pushRes.text();

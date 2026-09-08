@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
+import { PUSH_ICON_PATH } from '../_shared/pushMessage.ts'
 
 // Espelho do send-transactional-email para o canal push.
 // Só aceita chamadas com service-role (workers internos).
@@ -102,7 +103,10 @@ Deno.serve(async (req) => {
           },
           webpush: {
             fcm_options: { link: path ?? '/' },
-            notification: { icon: '/favicon.ico' },
+            notification: {
+              icon: PUSH_ICON_PATH,
+              badge: PUSH_ICON_PATH,
+            },
           },
         },
       }),
