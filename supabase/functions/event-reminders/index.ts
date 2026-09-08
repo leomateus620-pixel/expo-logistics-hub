@@ -250,19 +250,27 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
       if (scheduledFor <= now) continue;
       for (const recipient of recipients.values()) {
         const eventVersion = event.lock_version ?? 0;
-        const idempotencyKey = `${recipient.user_id}|${event.id}|${eventVersion}|${offsetMinutes}`;
-        const { error } = await supa.from("event_reminder_deliveries").upsert({
-          user_id: recipient.user_id,
-          org_id: recipient.org_id,
-          event_id: event.id,
-          event_version: eventVersion,
-          offset_minutes: offsetMinutes,
-          scheduled_for: scheduledFor.toISOString(),
-          idempotency_key: idempotencyKey,
-          status: "pending",
-          last_error: null,
-        }, { onConflict: "idempotency_key", ignoreDuplicates: true });
-        if (error) console.error("event_reminder_schedule_failed", { eventId: event.id, offsetMinutes });
+        const channels = pushEnabledUsers.has(recipient.user_id)
+          ? ["email", "push"]
+          : ["email"];
+        for (const channel of channels) {
+          const idempotencyKey = channel === "email"
+            ? `${recipient.user_id}|${event.id}|${eventVersion}|${offsetMinutes}`
+            : `${recipient.user_id}|${event.id}|${eventVersion}|${offsetMinutes}|push`;
+          const { error } = await supa.from("event_reminder_deliveries").upsert({
+            user_id: recipient.user_id,
+            org_id: recipient.org_id,
+            event_id: event.id,
+            event_version: eventVersion,
+            offset_minutes: offsetMinutes,
+            scheduled_for: scheduledFor.toISOString(),
+            idempotency_key: idempotencyKey,
+            channel,
+            status: "pending",
+            last_error: null,
+          }, { onConflict: "idempotency_key", ignoreDuplicates: true });
+          if (error) console.error("event_reminder_schedule_failed", { eventId: event.id, offsetMinutes, channel });
+        }
       }
     }
   }
