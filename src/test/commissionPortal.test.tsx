@@ -291,7 +291,7 @@ describe('CommissionPortalPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /Comissões/ }));
 
     const commissionCards = container.querySelectorAll('[data-module]');
-    expect(commissionCards).toHaveLength(32);
+    expect(commissionCards).toHaveLength(33);
     const slugs = Array.from(commissionCards, (card) => card.getAttribute('data-module'));
     expect(slugs).toContain('pecuaria');
     expect(slugs).toContain('assessoria-juridica');
