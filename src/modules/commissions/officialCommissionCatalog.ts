@@ -31,6 +31,7 @@ import {
   Leaf,
   Lightbulb,
   Megaphone,
+  MonitorCog,
   Music4,
   Newspaper,
   Palette,
@@ -462,12 +463,23 @@ export const OFFICIAL_COMMISSION_UNITS: readonly OfficialUnitEntry[] = [
     responsibleRole: 'Diretora de Marketing e Comunicação',
     description: 'Marca, campanhas, conteúdo, fotografia e comunicação institucional da Fenasoja.',
   },
+  {
+    id: 'assessoria-de-sistemas',
+    name: 'Assessoria de Sistemas',
+    shortName: 'Sistemas',
+    type: 'assessoria',
+    order: 7,
+    aliases: ['sistemas', 'assessoria de sistemas', 'ti', 'tecnologia da informacao'],
+    icon: MonitorCog,
+    tone: 'cyan',
+    responsible: 'Jeferson Araújo',
+    description: 'Sistemas, infraestrutura de TI, acessos e suporte tecnológico da Fenasoja.',
+  },
 ];
 
 /** Frentes registradas no banco que NÃO são exibidas como card no portal. */
 export const NON_PORTAL_UNIT_SLUGS: readonly string[] = [
   'central',
-  'assessoria-de-sistemas',
   'assessoria-projetos-e-captacoes-institucionais',
   'fotografia',
 ];
