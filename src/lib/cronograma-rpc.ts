@@ -78,6 +78,7 @@ export interface CronogramaSaveEventPayload {
   commission_name?: string | null;
   responsible_name?: string | null;
   has_exact_date?: boolean;
+  notify_all_commission_members?: boolean;
   is_official_seed?: boolean;
   pending_reason?: string | null;
   decision_needed?: string | null;

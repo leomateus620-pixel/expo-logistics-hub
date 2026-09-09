@@ -1769,6 +1769,7 @@ export type Database = {
           location: string | null
           lock_version: number
           month_label: string | null
+          notify_all_commission_members: boolean
           org_id: string
           pending_reason: string | null
           planning_restricted: boolean
@@ -1809,6 +1810,7 @@ export type Database = {
           location?: string | null
           lock_version?: number
           month_label?: string | null
+          notify_all_commission_members?: boolean
           org_id: string
           pending_reason?: string | null
           planning_restricted?: boolean
@@ -1849,6 +1851,7 @@ export type Database = {
           location?: string | null
           lock_version?: number
           month_label?: string | null
+          notify_all_commission_members?: boolean
           org_id?: string
           pending_reason?: string | null
           planning_restricted?: boolean
@@ -8651,6 +8654,12 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      commission_leadership_user_ids: {
+        Args: { _commission_id: string }
+        Returns: {
+          user_id: string
+        }[]
       }
       complete_google_sync_task: {
         Args: {

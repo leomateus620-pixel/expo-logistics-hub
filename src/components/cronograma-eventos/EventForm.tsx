@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+
 import {
   Select,
   SelectContent,
@@ -525,9 +527,29 @@ export function EventForm({
               presentation={presentation}
               variant="person"
             />
+
+            <div className="flex items-start justify-between gap-3 rounded-2xl border border-white/60 bg-white/72 p-3">
+              <div className="space-y-0.5">
+                <Label htmlFor={fieldId('notify-all')} className="cursor-pointer">
+                  Avisar todos os membros das comissões
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Desligado: avisamos apenas as lideranças das comissões e quem está
+                  relacionado ao evento.
+                </p>
+              </div>
+              <Switch
+                id={fieldId('notify-all')}
+                aria-label="Avisar todos os membros das comissões"
+                checked={form.notifyAllCommissionMembers === true}
+                onCheckedChange={(checked) => update('notifyAllCommissionMembers', checked)}
+                disabled={isSaving}
+              />
+            </div>
           </div>
         </div>
       )}
+
 
 
 
