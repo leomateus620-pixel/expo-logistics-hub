@@ -31,7 +31,9 @@ interface ScheduledEventRow extends EventDateFields {
   title: string;
   lock_version: number | null;
   has_exact_date: boolean;
+  notify_all_commission_members?: boolean | null;
 }
+
 
 interface EmailEventRow extends EventDateFields {
   id: string;
@@ -130,7 +132,7 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
   const horizon = addUtcDays(today, 30);
 
   const { data: events, error: eventsError } = await supa.from("cronograma_eventos")
-    .select("id, org_id, title, start_date, end_date, start_time, end_time, lock_version, has_exact_date, event_type")
+    .select("id, org_id, title, start_date, end_date, start_time, end_time, lock_version, has_exact_date, event_type, notify_all_commission_members")
     .eq("has_exact_date", true)
     .neq("event_type", "feriado")
     .gte("start_date", today)
@@ -197,19 +199,48 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
     )];
 
     if (commissionIds.length) {
-      const { data: members, error: membersError } = await supa
-        .from("org_members")
-        .select("user_id, org_id, commission_id, is_active")
-        .eq("org_id", event.org_id)
-        .eq("is_active", true)
-        .in("commission_id", commissionIds);
-      if (membersError) {
-        console.error("event_reminder_members_query_failed", { eventId: event.id });
-      }
-      for (const member of (members ?? []) as OrgMemberRow[]) {
-        if (member.user_id && member.org_id) {
-          recipients.set(member.user_id, { user_id: member.user_id, org_id: member.org_id });
+      // Padrão: comissão relacionada avisa apenas suas lideranças (presidente,
+      // copresidente, corresponsável). O evento pode optar por avisar todos os
+      // membros da comissão marcando notify_all_commission_members.
+      let allowedUserIds: string[] | null = null;
+      if (!event.notify_all_commission_members) {
+        const { data: leaders, error: leadersError } = await supa
+          .from("commission_responsibles")
+          .select("user_id, commission_id, relationship_role, active")
+          .eq("org_id", event.org_id)
+          .eq("active", true)
+          .in("commission_id", commissionIds)
+          .in("relationship_role", ["principal", "copresidente", "corresponsavel"])
+          .not("user_id", "is", null);
+        if (leadersError) {
+          console.error("event_reminder_leadership_query_failed", { eventId: event.id });
         }
+        allowedUserIds = [...new Set(
+          ((leaders ?? []) as Array<{ user_id: string | null }>)
+            .map((row) => row.user_id)
+            .filter((id): id is string => Boolean(id)),
+        )];
+      }
+
+      if (allowedUserIds === null || allowedUserIds.length) {
+        let membersQuery = supa
+          .from("org_members")
+          .select("user_id, org_id, commission_id, is_active")
+          .eq("org_id", event.org_id)
+          .eq("is_active", true);
+        membersQuery = allowedUserIds === null
+          ? membersQuery.in("commission_id", commissionIds)
+          : membersQuery.in("user_id", allowedUserIds);
+        const { data: members, error: membersError } = await membersQuery;
+        if (membersError) {
+          console.error("event_reminder_members_query_failed", { eventId: event.id });
+        }
+        for (const member of (members ?? []) as OrgMemberRow[]) {
+          if (member.user_id && member.org_id) {
+            recipients.set(member.user_id, { user_id: member.user_id, org_id: member.org_id });
+          }
+        }
+      }
     }
 
     // Vínculo individual: responsáveis/participantes ligados diretamente ao evento
@@ -242,11 +273,11 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
         }
       }
     }
-    }
 
     for (const globalRecipient of globalByOrg.get(event.org_id) ?? []) {
       recipients.set(globalRecipient.user_id, globalRecipient);
     }
+
 
     if (!recipients.size) continue;
 

@@ -54,6 +54,8 @@ export interface CronogramaEvent {
   isMain?: boolean;
   isOfficial?: boolean;
   isCentralMeeting?: boolean;
+  /** Avisar todos os membros das comissões relacionadas (padrão: só lideranças). */
+  notifyAllCommissionMembers?: boolean;
   pendingReason?: string;
   decisionNeeded?: string;
   createdAt?: string | null;

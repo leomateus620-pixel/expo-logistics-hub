@@ -127,6 +127,8 @@ export interface CronogramaEventSeed {
   sourceNote?: string | null;
   isOfficialSeed: boolean;
   hasExactDate: boolean;
+  /** Quando true, comissões relacionadas avisam todos os membros, não só lideranças. */
+  notifyAllCommissionMembers?: boolean;
   linkedCommissions?: CronogramaCommissionLink[];
   subevents?: CronogramaSubeventSeed[];
   lockVersion?: number | null;
