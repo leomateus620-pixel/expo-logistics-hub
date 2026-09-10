@@ -418,7 +418,7 @@
 .cronograma-attachments__item {
   display: grid;
   min-width: 0;
-  grid-template-columns: 3.15rem minmax(0, 1fr) 2.5rem;
+  grid-template-columns: 3.15rem minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.62rem;
   border: 1px solid oklch(var(--border) / 0.82);
