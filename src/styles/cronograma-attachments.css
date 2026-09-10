@@ -655,7 +655,7 @@
   }
 
   .cronograma-attachments__item {
-    grid-template-columns: 2.85rem minmax(0, 1fr) 2.75rem;
+    grid-template-columns: 2.85rem minmax(0, 1fr) auto;
     gap: 0.52rem;
     padding: 0.46rem;
   }
@@ -666,10 +666,16 @@
     height: 2.85rem;
   }
 
+  .cronograma-attachments__row-actions {
+    gap: 0;
+  }
+
+  .cronograma-attachments__row-action,
   .cronograma-attachments__menu-trigger {
-    width: 2.75rem;
+    width: 2.6rem;
     height: 2.75rem;
   }
+
 }
 
 @media (max-width: 380px) {
