@@ -414,6 +414,8 @@ export function EventoAnexosSection({ eventId, className }: Props) {
 
     if (fileRef.current) fileRef.current.value = "";
     if (cameraRef.current) cameraRef.current.value = "";
+    if (galleryRef.current) galleryRef.current.value = "";
+
   };
 
   const isPdf = (anexo: EventoAnexo) =>
