@@ -261,11 +261,16 @@ export function EventoAnexosSection({ eventId, className }: Props) {
     remove,
     removing,
     getSignedUrl,
+    urlFor: urlForFromHook,
+    downloadUrlFor: downloadUrlForFromHook,
   } = useEventoAnexos(eventId);
+  const urlFor = urlForFromHook ?? (() => null);
+  const downloadUrlFor = downloadUrlForFromHook ?? (() => null);
   const { user } = useAuth();
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
+  const galleryRef = useRef<HTMLInputElement>(null);
   const previewTriggerRef = useRef<HTMLElement | null>(null);
   const menuTriggerRefs = useRef(new Map<string, HTMLButtonElement>());
   const soybeanTimerRef = useRef<number | null>(null);
@@ -278,9 +283,19 @@ export function EventoAnexosSection({ eventId, className }: Props) {
     url: string;
     name: string;
   } | null>(null);
+  const [docPreview, setDocPreview] = useState<{
+    url: string;
+    name: string;
+  } | null>(null);
+  const [fallbackLink, setFallbackLink] = useState<{
+    url: string;
+    name: string;
+  } | null>(null);
+  const [dragActive, setDragActive] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState<EventoAnexo | null>(null);
   const [soybeanActive, setSoybeanActive] = useState(false);
   const [feedback, setFeedback] = useState<UploadFeedback>(INITIAL_FEEDBACK);
+
 
   const canUpload = Boolean(user);
   const effectivePhase: UploadPhase = uploading ? "uploading" : feedback.phase;
