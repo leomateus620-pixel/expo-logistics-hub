@@ -843,6 +843,8 @@ export function EventoAnexosSection({ eventId, className }: Props) {
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
+                      </div>
+
                     </li>
                   );
                 })}
