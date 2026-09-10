@@ -502,12 +502,66 @@
   font-weight: 750;
 }
 
+.cronograma-attachments__row-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.12rem;
+}
+
+.cronograma-attachments__row-action {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.62rem;
+  color: oklch(var(--foreground) / 0.72);
+}
+
+.cronograma-attachments__row-action svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.cronograma-attachments__doc-frame {
+  width: 100%;
+  height: min(78dvh, 48rem);
+  border: 0;
+  border-radius: 0.5rem;
+  background: rgb(255 255 255 / 0.96);
+}
+
+.cronograma-attachments__doc-fallback {
+  position: absolute;
+  bottom: max(0.65rem, env(safe-area-inset-bottom));
+  left: 50%;
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  padding: 0 1rem;
+  background: rgb(3 12 25 / 0.86);
+  color: rgb(255 255 255 / 0.92);
+  font-size: 0.72rem;
+  font-weight: 700;
+  transform: translateX(-50%);
+}
+
+.cronograma-attachments__doc-fallback svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.cronograma-attachments__surface[data-drag-active="true"] {
+  border-color: oklch(var(--action) / 0.6);
+  box-shadow: 0 0 0 3px oklch(var(--action) / 0.16);
+}
+
 .cronograma-attachments__menu-trigger {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.62rem;
   color: oklch(var(--foreground) / 0.7);
 }
+
 
 .cronograma-attachments__lightbox-content {
   width: min(calc(100vw - 2rem), 76rem);
