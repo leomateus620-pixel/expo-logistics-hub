@@ -14,6 +14,11 @@ import { buildEventPushMessage } from "../_shared/pushMessage.ts";
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+// Lembretes de evento por e-mail desativados: os avisos saem apenas por push
+// (1h antes) e pelo Google Agenda. Basta voltar para `true` para reativar.
+const EMAIL_REMINDERS_ENABLED = false;
+
+
 function db() {
   return createClient(supabaseUrl, service, { auth: { persistSession: false } });
 }
@@ -286,9 +291,13 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
       if (scheduledFor <= now) continue;
       for (const recipient of recipients.values()) {
         const eventVersion = event.lock_version ?? 0;
-        const channels = offsetMinutes === 60 && pushEnabledUsers.has(recipient.user_id)
-          ? ["email", "push"]
-          : ["email"];
+        const pushEligible = offsetMinutes === 60 && pushEnabledUsers.has(recipient.user_id);
+        const channels = [
+          ...(EMAIL_REMINDERS_ENABLED ? ["email"] : []),
+          ...(pushEligible ? ["push"] : []),
+        ];
+        if (!channels.length) continue;
+
         for (const channel of channels) {
           const idempotencyKey = channel === "email"
             ? `${recipient.user_id}|${event.id}|${eventVersion}|${offsetMinutes}`
@@ -396,6 +405,15 @@ async function sendPending(supa: ReturnType<typeof db>) {
       continue;
     }
     if (!deliveryClaim) continue;
+
+    if (!EMAIL_REMINDERS_ENABLED && delivery.channel !== "push") {
+      await supa.from("event_reminder_deliveries").update({
+        status: "cancelled", last_error: "email_channel_disabled",
+      }).eq("id", delivery.id);
+      continue;
+    }
+
+
 
     const event = eventById.get(delivery.event_id);
     if (!event) {
