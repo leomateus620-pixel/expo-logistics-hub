@@ -82,6 +82,11 @@ beforeEach(() => {
   upload.mockResolvedValue(attachment());
   remove.mockResolvedValue("attachment-1");
   getSignedUrl.mockResolvedValue("https://example.test/signed-file");
+  urlFor.mockReturnValue("https://example.test/signed-file?token=abc");
+  downloadUrlFor.mockReturnValue(
+    "https://example.test/signed-file?token=abc&download=arquivo.pdf",
+  );
+
   mocks.authHook.mockReturnValue({ user: { id: "user-1" } });
   mocks.attachmentHook.mockReturnValue(attachmentHookValue());
 });
