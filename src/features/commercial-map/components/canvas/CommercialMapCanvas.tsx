@@ -150,6 +150,8 @@ import { StrategicLandmarkMesh, StrategicLandmarkSelectionShaderWarmup } from '.
 import { CommercialMapInteriorShaderWarmup } from './CommercialMapInteriorShaderWarmup';
 import { TechnicalValidationOverlay } from './TechnicalValidationOverlay';
 import { CommercialTreeLayer } from './CommercialTreeLayer';
+import { applyPilotGroundMaterial } from './vegetationPilotMaterial';
+import { isVegetationPilotEnabled } from '../../utils/vegetationPilot';
 import { CommercialElectricalInfrastructureLayer } from './CommercialElectricalInfrastructureLayer';
 import { NightLightingLayer } from './NightLightingLayer';
 import { CommercialHydrologicalInfrastructureLayer } from './CommercialHydrologicalInfrastructureLayer';
@@ -863,6 +865,10 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     // fBm so they never read as one flat tile next to the environment ground.
     if (!openGroundMaterialRef.current) return;
     if (openGroundProfile) {
+      if (entity.publicIdentifier === 'EST-EXP-VIS' && isVegetationPilotEnabled('ground')) {
+        applyPilotGroundMaterial(openGroundMaterialRef.current);
+        return;
+      }
       applyParkGroundDetail(openGroundMaterialRef.current, openGroundReducedGraphics);
       return;
     }
@@ -877,7 +883,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     if (!isFlat) {
       applyParkSurfaceDetail(openGroundMaterialRef.current, 'volume', openGroundReducedGraphics);
     }
-  }, [classification, isFlat, openGroundProfile, openGroundReducedGraphics, openGroundTextures]);
+  }, [classification, entity.publicIdentifier, isFlat, openGroundProfile, openGroundReducedGraphics, openGroundTextures]);
 
   const geometry = useMemo(
     () => isQuadra || isGate || isNationsPresentationSurface

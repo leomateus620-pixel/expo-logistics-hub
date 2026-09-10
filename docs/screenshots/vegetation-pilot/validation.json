@@ -1,0 +1,40 @@
+{
+  "baseCommit": "b0600c1f",
+  "date": "2026-09-10",
+  "focused": {
+    "files": 14,
+    "passed": 149,
+    "failed": 0,
+    "log": "focused-tests.txt"
+  },
+  "typecheck": {
+    "command": "npx tsc -p tsconfig.app.json --noEmit",
+    "exitCode": 0
+  },
+  "lint": {
+    "command": "npx eslint [changed canvas, pilot utilities, TerritoryQa, pilot and tree presentation tests]",
+    "exitCode": 0
+  },
+  "build": {
+    "command": "npm run build",
+    "exitCode": 0,
+    "seconds": 58.08,
+    "log": "build.txt"
+  },
+  "broadSuite": {
+    "initialFailed": 51,
+    "reproducedOnCleanBase": 50,
+    "newSourceExpectationUpdatedAndFocusedPassed": 1,
+    "evidence": "baseline-failures.json"
+  },
+  "viewportControlHashes": {
+    "portrait": {
+      "before": "3a5fc2c7945aadc486b9e375eb0e903fa4e266af076be98088adc6d2849665d1",
+      "after": "3a5fc2c7945aadc486b9e375eb0e903fa4e266af076be98088adc6d2849665d1"
+    },
+    "landscape": {
+      "before": "ddb544a6340ce8b832224277b6928877b7da00a8aefdf208ec35ad35d1b34b9e",
+      "after": "ddb544a6340ce8b832224277b6928877b7da00a8aefdf208ec35ad35d1b34b9e"
+    }
+  }
+}

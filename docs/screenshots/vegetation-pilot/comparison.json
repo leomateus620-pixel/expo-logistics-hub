@@ -1,0 +1,302 @@
+[
+  {
+    "device": "desktop",
+    "view": "a-close",
+    "beforeMs": 30.67828054297968,
+    "afterMs": 33.54207920792079,
+    "beforeP95": 30.59999999962747,
+    "afterP95": 35,
+    "beforeTriangles": 853183,
+    "afterTriangles": 978795,
+    "beforeTier": "MEDIUM",
+    "afterTier": "MEDIUM",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 361,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "device": "desktop",
+    "view": "b-close",
+    "beforeMs": 19.66895424836358,
+    "afterMs": 24.486530612257063,
+    "beforeP95": 21.799999998882413,
+    "afterP95": 26.099999997764826,
+    "beforeTriangles": 684082,
+    "afterTriangles": 828054,
+    "beforeTier": "MEDIUM",
+    "afterTier": "MEDIUM",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 638,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "device": "desktop",
+    "view": "parking-close",
+    "beforeMs": 21.004181184666393,
+    "afterMs": 24.85165289256814,
+    "beforeP95": 27.40000000037253,
+    "afterP95": 32.600000001490116,
+    "beforeTriangles": 801258,
+    "afterTriangles": 946064,
+    "beforeTier": "MEDIUM",
+    "afterTier": "LOW",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 928,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "device": "desktop",
+    "view": "pilot-high",
+    "beforeMs": 18.091265060237596,
+    "afterMs": 22.014634146338867,
+    "beforeP95": 19,
+    "afterP95": 22.800000000745058,
+    "beforeTriangles": 660518,
+    "afterTriangles": 599602,
+    "beforeTier": "MEDIUM",
+    "afterTier": "LOW",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 1512,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "device": "desktop",
+    "view": "overview",
+    "beforeMs": 25.07782426778866,
+    "afterMs": 29.079611650478203,
+    "beforeP95": 26.90000000037253,
+    "afterP95": 35.69999999925494,
+    "beforeTriangles": 869672,
+    "afterTriangles": 785380,
+    "beforeTier": "LOW",
+    "afterTier": "LOW",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 1853,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "device": "portrait",
+    "view": "a-close",
+    "beforeMs": 20.79355828221773,
+    "afterMs": 19.486781609201824,
+    "beforeP95": 18.300000000745058,
+    "afterP95": 16.800000000745058,
+    "beforeTriangles": 716575,
+    "afterTriangles": 798119,
+    "beforeTier": "HIGH",
+    "afterTier": "HIGH",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 368,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "device": "portrait",
+    "view": "b-close",
+    "beforeMs": 17.71882352940738,
+    "afterMs": 16.666759002768018,
+    "beforeP95": 18.199999999254942,
+    "afterP95": 17,
+    "beforeTriangles": 578010,
+    "afterTriangles": 722234,
+    "beforeTier": "HIGH",
+    "afterTier": "HIGH",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 789,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "device": "portrait",
+    "view": "parking-close",
+    "beforeMs": 17.504081632659577,
+    "afterMs": 16.66565096952083,
+    "beforeP95": 18.100000001490116,
+    "afterP95": 16.899999998509884,
+    "beforeTriangles": 623192,
+    "afterTriangles": 731416,
+    "beforeTier": "HIGH",
+    "afterTier": "HIGH",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 1204,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "device": "portrait",
+    "view": "pilot-high",
+    "beforeMs": 17.669117647058822,
+    "afterMs": 16.666204986149584,
+    "beforeP95": 18.199999999254942,
+    "afterP95": 16.900000002235174,
+    "beforeTriangles": 563721,
+    "afterTriangles": 636056,
+    "beforeTier": "HIGH",
+    "afterTier": "HIGH",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 1627,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "device": "portrait",
+    "view": "overview",
+    "beforeMs": 17.819584569730726,
+    "afterMs": 17.595014662752227,
+    "beforeP95": 20.600000001490116,
+    "afterP95": 20.899999998509884,
+    "beforeTriangles": 695904,
+    "afterTriangles": 729032,
+    "beforeTier": "HIGH",
+    "afterTier": "HIGH",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 2024,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "device": "landscape",
+    "view": "a-close",
+    "beforeMs": 22.25934426229997,
+    "afterMs": 21.571656050955415,
+    "beforeP95": 19.700000002980232,
+    "afterP95": 20.600000001490116,
+    "beforeTriangles": 935256,
+    "afterTriangles": 1052480,
+    "beforeTier": "HIGH",
+    "afterTier": "HIGH",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 482,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "device": "landscape",
+    "view": "b-close",
+    "beforeMs": 17.48052325581612,
+    "afterMs": 16.758379888268156,
+    "beforeP95": 18.100000001490116,
+    "afterP95": 16.899999998509884,
+    "beforeTriangles": 640306,
+    "afterTriangles": 784458,
+    "beforeTier": "HIGH",
+    "afterTier": "HIGH",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 879,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "device": "landscape",
+    "view": "parking-close",
+    "beforeMs": 17.69176470588016,
+    "afterMs": 17.938622754491018,
+    "beforeP95": 19.199999999254942,
+    "afterP95": 23.599999997764826,
+    "beforeTriangles": 846314,
+    "afterTriangles": 990538,
+    "beforeTier": "HIGH",
+    "afterTier": "HIGH",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 1267,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "device": "landscape",
+    "view": "pilot-high",
+    "beforeMs": 17.689705882352943,
+    "afterMs": 16.900280898876403,
+    "beforeP95": 18.299999997019768,
+    "afterP95": 19.5,
+    "beforeTriangles": 599632,
+    "afterTriangles": 671856,
+    "beforeTier": "HIGH",
+    "afterTier": "HIGH",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 1913,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "device": "landscape",
+    "view": "overview",
+    "beforeMs": 19.51525974025732,
+    "afterMs": 28.54619047618693,
+    "beforeP95": 25.100000001490116,
+    "afterP95": 34.600000001490116,
+    "beforeTriangles": 771108,
+    "afterTriangles": 804236,
+    "beforeTier": "HIGH",
+    "afterTier": "MEDIUM",
+    "dpr": 0.72,
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 2189,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  }
+]

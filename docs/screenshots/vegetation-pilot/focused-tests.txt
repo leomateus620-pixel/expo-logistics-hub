@@ -1,0 +1,45 @@
+
+> vite_react_shadcn_ts@0.0.0 test
+> vitest run src/test/commercialMapVegetationPilot.test.ts src/test/commercialMapTrees.test.ts src/test/commercialMapTreePresentation.test.ts src/test/commercialMapTreeControls.test.tsx src/test/commercialMapVegetationLod.test.ts src/test/commercialMapQuadrasABLactalis.test.ts src/test/commercialMapRuntimeStability.test.ts src/test/commercialMapTerrainMaterial.test.ts src/test/commercialMapOpenGroundTextures.test.ts src/test/commercialMapPostProcessing.test.tsx src/test/commercialMapAdaptiveQualityRuntime.test.ts src/test/commercialMapParkingRendering.test.ts src/test/commercialMapParkingControls.test.tsx src/test/commercialMapContextualControls.test.tsx
+
+
+ RUN  v3.2.4 C:/Users/Leonardo/Desktop/expo-logistics-hub
+
+Browserslist: browsers data (caniuse-lite) is 15 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/test/commercialMapQuadrasABLactalis.test.ts (13 tests) 1514ms
+   ✓ reconstrução das Quadras A/B e Palco Cultural Lactalis > gera solo A/B determinístico, PBR, não selecionável e sem sobrepor hard surfaces  433ms
+   ✓ reconstrução das Quadras A/B e Palco Cultural Lactalis > não duplica o tratamento validado da sede e distribui detalhes nas duas quadras (reduced=false)  554ms
+   ✓ reconstrução das Quadras A/B e Palco Cultural Lactalis > não duplica o tratamento validado da sede e distribui detalhes nas duas quadras (reduced=true)  338ms
+stderr | src/test/commercialMapContextualControls.test.tsx > integração dos controles contextuais > publica ferramentas no cabeçalho antes da edição e preserva interior ao alternar lista/mapa
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/test/commercialMapContextualControls.test.tsx (8 tests) 2341ms
+   ✓ integração dos controles contextuais > mostra nomes completos ao abrir, filtra pela legenda e limpa somente o segmento  1142ms
+   ✓ integração dos controles contextuais > mantém legenda interior acessível durante a seleção, expandindo somente por ação voluntária  401ms
+ ✓ src/test/commercialMapParkingControls.test.tsx (20 tests) 529ms
+   ✓ inspeção cartográfica do estacionamento > oferece entrada compacta, select agrupado e vistas com estado acessível  392ms
+ ✓ src/test/commercialMapTrees.test.ts (13 tests) 1054ms
+   ✓ camada cartográfica de árvores do mapa comercial > preserva troncos ambientais fora de vias, prédios, marcos e lotes comerciais  558ms
+ ✓ src/test/commercialMapPostProcessing.test.tsx (21 tests) 460ms
+ ✓ src/test/commercialMapTreeControls.test.tsx (4 tests) 625ms
+   ✓ controle de visibilidade do ambiente e da rede elétrica > oferece um toggle PT-BR com estado acessível no mapa completo  324ms
+ ✓ src/test/commercialMapOpenGroundTextures.test.ts (12 tests) 425ms
+ ✓ src/test/commercialMapParkingRendering.test.ts (17 tests) 674ms
+stderr | src/test/commercialMapTreePresentation.test.ts
+WARNING: Multiple instances of Three.js being imported.
+
+ ✓ src/test/commercialMapTreePresentation.test.ts (6 tests) 84ms
+ ✓ src/test/commercialMapTerrainMaterial.test.ts (8 tests) 16ms
+ ✓ src/test/commercialMapRuntimeStability.test.ts (6 tests) 19ms
+ ✓ src/test/commercialMapAdaptiveQualityRuntime.test.ts (8 tests) 15ms
+ ✓ src/test/commercialMapVegetationLod.test.ts (8 tests) 13ms
+ ✓ src/test/commercialMapVegetationPilot.test.ts (5 tests) 21418ms
+   ✓ controlled three-zone vegetation pilot > keeps every complete grass tuft within authorized free cells and parking collars  21250ms
+
+ Test Files  14 passed (14)
+      Tests  149 passed (149)
+   Start at  12:25:22
+   Duration  29.27s (transform 3.00s, setup 3.26s, collect 20.39s, tests 29.19s, environment 17.03s, prepare 2.68s)

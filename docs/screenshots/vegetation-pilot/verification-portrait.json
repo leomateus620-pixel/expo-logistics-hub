@@ -1,0 +1,2616 @@
+{
+  "device": "portrait",
+  "errors": [],
+  "samples": [
+    {
+      "i": 0,
+      "variation": 36.6533237277282,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 30,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 19566.699999999255,
+        "calls": 662,
+        "triangles": 1176462,
+        "geometries": 587,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 259453175,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 1,
+      "variation": 38.86359661199102,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 33,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 20585.89999999851,
+        "calls": 340,
+        "triangles": 800824,
+        "geometries": 585,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 283207251,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 2,
+      "variation": 46.552756956200334,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 36,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 21700.39999999851,
+        "calls": 700,
+        "triangles": 1191659,
+        "geometries": 584,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 263290289,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 3,
+      "variation": 51.41271472991277,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 38,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 22942.199999999255,
+        "calls": 709,
+        "triangles": 1166865,
+        "geometries": 585,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 289593695,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 4,
+      "variation": 56.181540225323644,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 41,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 24027.39999999851,
+        "calls": 746,
+        "triangles": 1126290,
+        "geometries": 587,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 269781722,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 5,
+      "variation": 56.37458262702465,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 43,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 25153.699999999255,
+        "calls": 470,
+        "triangles": 755302,
+        "geometries": 587,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 294082506,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 6,
+      "variation": 55.77330517046721,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 45,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 26145.5,
+        "calls": 827,
+        "triangles": 1113709,
+        "geometries": 587,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 275966217,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 7,
+      "variation": 53.93200565836595,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 45,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 27115.699999999255,
+        "calls": 519,
+        "triangles": 757117,
+        "geometries": 588,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 299304797,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 8,
+      "variation": 51.171652667433136,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 49,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 28097.10000000149,
+        "calls": 536,
+        "triangles": 764437,
+        "geometries": 588,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 279672262,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 9,
+      "variation": 48.53769181119394,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 52,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 29081.699999999255,
+        "calls": 552,
+        "triangles": 765129,
+        "geometries": 588,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 302748994,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 10,
+      "variation": 46.69326023039979,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 54,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 30111.39999999851,
+        "calls": 583,
+        "triangles": 781605,
+        "geometries": 588,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 283322504,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 11,
+      "variation": 45.229676985104746,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 55,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 31201.39999999851,
+        "calls": 621,
+        "triangles": 768282,
+        "geometries": 589,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 306456207,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 12,
+      "variation": 43.899315791746126,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 57,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 32423.199999999255,
+        "calls": 640,
+        "triangles": 773954,
+        "geometries": 589,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 287120323,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 13,
+      "variation": 42.684228808953634,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 59,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 33601.300000000745,
+        "calls": 668,
+        "triangles": 715650,
+        "geometries": 589,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 324474863,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 14,
+      "variation": 41.69377565107741,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 86,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 34821.699999999255,
+        "calls": 724,
+        "triangles": 725302,
+        "geometries": 590,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 296060701,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 15,
+      "variation": 40.800079452197544,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 181,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 36882.60000000149,
+        "calls": 748,
+        "triangles": 739558,
+        "geometries": 592,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 310494844,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 16,
+      "variation": 39.5652729413938,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 272,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 38910.5,
+        "calls": 754,
+        "triangles": 712372,
+        "geometries": 592,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 322735164,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 17,
+      "variation": 38.50557727187244,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 365,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 40893.89999999851,
+        "calls": 765,
+        "triangles": 711434,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 329653963,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 18,
+      "variation": 38.50599815053137,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 460,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 42888.60000000149,
+        "calls": 765,
+        "triangles": 711434,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 300524415,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 19,
+      "variation": 39.5601412063509,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 547,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 45403.699999999255,
+        "calls": 754,
+        "triangles": 707204,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 321929183,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 20,
+      "variation": 40.79808334125773,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 668,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 48185.199999999255,
+        "calls": 748,
+        "triangles": 734390,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 311834445,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 21,
+      "variation": 41.694404009448284,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 800,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 50773.800000000745,
+        "calls": 724,
+        "triangles": 725302,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 331236464,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 22,
+      "variation": 42.684228808953634,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 889,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 52997.5,
+        "calls": 667,
+        "triangles": 715458,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 299071945,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 23,
+      "variation": 43.9006314916331,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 893,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 53970,
+        "calls": 639,
+        "triangles": 711610,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 320957664,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 24,
+      "variation": 45.18548126956173,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 893,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 54908.5,
+        "calls": 620,
+        "triangles": 758394,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 301517405,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 25,
+      "variation": 46.69326023039979,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 897,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 55919.300000000745,
+        "calls": 583,
+        "triangles": 756013,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 335049560,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 26,
+      "variation": 48.53769181119394,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 928,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 56908.800000000745,
+        "calls": 552,
+        "triangles": 765129,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 305294383,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 27,
+      "variation": 51.171652667433136,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 928,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 57874.5,
+        "calls": 536,
+        "triangles": 764437,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 216116866,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 28,
+      "variation": 53.93200565836595,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 932,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 58831.300000000745,
+        "calls": 519,
+        "triangles": 752017,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 168334676,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 29,
+      "variation": 55.774715616066246,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 934,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 59877.10000000149,
+        "calls": 499,
+        "triangles": 750783,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 184666813,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 30,
+      "variation": 56.375686469332464,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 936,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 60928.39999999851,
+        "calls": 456,
+        "triangles": 741658,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 171706605,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 31,
+      "variation": 56.18267187868056,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 936,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 61876.800000000745,
+        "calls": 729,
+        "triangles": 1111228,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 189221463,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 32,
+      "variation": 51.41271472991277,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 940,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 62830.699999999255,
+        "calls": 692,
+        "triangles": 1152111,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 176301298,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 33,
+      "variation": 46.57113174844783,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 940,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 63787.199999999255,
+        "calls": 692,
+        "triangles": 1179529,
+        "geometries": 593,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 194186133,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 34,
+      "variation": 38.86359661199102,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 945,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 64825.5,
+        "calls": 669,
+        "triangles": 1160534,
+        "geometries": 594,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 180188182,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "i": 35,
+      "variation": 36.6533237277282,
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 948,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "resources": {
+        "at": 65849.69999999925,
+        "calls": 322,
+        "triangles": 803360,
+        "geometries": 596,
+        "textures": 145,
+        "programs": 199,
+        "dpr": 1,
+        "width": 390,
+        "height": 681,
+        "heapBytes": 196741563,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    }
+  ],
+  "checks": {
+    "pilotInventory": true,
+    "zoomInventoryAndTransforms": true,
+    "treeToggle": true,
+    "navigation": true
+  },
+  "inventory": {
+    "expected": [
+      "tree-parking-west-01",
+      "tree-parking-west-02",
+      "tree-parking-west-05",
+      "tree-parking-west-06",
+      "tree-parking-west-07",
+      "tree-parking-west-08",
+      "tree-parking-west-09",
+      "tree-parking-west-10",
+      "tree-parking-west-11",
+      "tree-parking-west-12",
+      "tree-parking-west-13",
+      "tree-parking-west-14",
+      "tree-parking-west-15",
+      "tree-parking-west-24",
+      "tree-parking-west-25",
+      "tree-parking-west-26",
+      "tree-parking-west-27",
+      "tree-parking-west-28",
+      "tree-parking-west-30",
+      "tree-parking-west-31",
+      "tree-parking-west-32",
+      "tree-parking-west-33",
+      "tree-parking-west-34",
+      "tree-parking-west-35",
+      "tree-parking-west-36",
+      "tree-parking-west-37",
+      "tree-parking-west-38",
+      "tree-parking-west-39",
+      "tree-parking-west-40",
+      "tree-quadra-a-01",
+      "tree-quadra-a-02",
+      "tree-quadra-a-03",
+      "tree-quadra-a-04",
+      "tree-quadra-a-05",
+      "tree-quadra-a-06",
+      "tree-quadra-a-07",
+      "tree-quadra-a-08",
+      "tree-quadra-a-09",
+      "tree-quadra-a-10",
+      "tree-quadra-a-11",
+      "tree-quadra-a-12",
+      "tree-quadra-a-13",
+      "tree-quadra-a-14",
+      "tree-quadra-a-15",
+      "tree-quadra-a-16",
+      "tree-quadra-a-17",
+      "tree-quadra-a-18",
+      "tree-quadra-a-19",
+      "tree-quadra-a-20",
+      "tree-quadra-a-21",
+      "tree-quadra-a-22",
+      "tree-quadra-b-01",
+      "tree-quadra-b-02",
+      "tree-quadra-b-03",
+      "tree-quadra-b-04",
+      "tree-quadra-b-05",
+      "tree-quadra-b-06",
+      "tree-quadra-b-07",
+      "tree-quadra-b-08",
+      "tree-quadra-b-09",
+      "tree-quadra-b-10",
+      "tree-quadra-b-11",
+      "tree-quadra-b-12"
+    ],
+    "rendered": 63
+  },
+  "night": {
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1038,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "objects": [
+      {
+        "name": "vegetation-pilot-trees",
+        "visible": true,
+        "data": {
+          "areas": [
+            "QUADRA_A",
+            "QUADRA_B",
+            "PARKING_EXHIBITORS_VISITORS"
+          ]
+        },
+        "triangles": null
+      },
+      {
+        "name": "vegetation-pilot-trees-0",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 19,
+          "treeIds": [
+            "tree-quadra-a-01",
+            "tree-quadra-a-03",
+            "tree-quadra-a-05",
+            "tree-quadra-a-09",
+            "tree-quadra-a-10",
+            "tree-quadra-a-14",
+            "tree-quadra-a-16",
+            "tree-quadra-a-18",
+            "tree-quadra-a-21",
+            "tree-quadra-b-08",
+            "tree-parking-west-01",
+            "tree-parking-west-05",
+            "tree-parking-west-09",
+            "tree-parking-west-10",
+            "tree-parking-west-14",
+            "tree-parking-west-30",
+            "tree-parking-west-34",
+            "tree-parking-west-36",
+            "tree-parking-west-38"
+          ],
+          "family": 0,
+          "alphaTestedLeaves": true,
+          "detailVisible": true
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-0",
+        "visible": true,
+        "data": {},
+        "count": 19,
+        "triangles": 874,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "pilot-canopies-0",
+        "visible": true,
+        "data": {},
+        "count": 19,
+        "triangles": 800,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-0",
+        "visible": true,
+        "data": {},
+        "count": 19,
+        "triangles": 192,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "vegetation-pilot-trees-1",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 24,
+          "treeIds": [
+            "tree-quadra-a-02",
+            "tree-quadra-a-07",
+            "tree-quadra-a-12",
+            "tree-quadra-a-15",
+            "tree-quadra-a-17",
+            "tree-quadra-a-20",
+            "tree-quadra-a-22",
+            "tree-quadra-b-01",
+            "tree-quadra-b-02",
+            "tree-quadra-b-03",
+            "tree-quadra-b-04",
+            "tree-quadra-b-06",
+            "tree-quadra-b-07",
+            "tree-quadra-b-09",
+            "tree-quadra-b-11",
+            "tree-quadra-b-12",
+            "tree-parking-west-02",
+            "tree-parking-west-07",
+            "tree-parking-west-12",
+            "tree-parking-west-24",
+            "tree-parking-west-25",
+            "tree-parking-west-27",
+            "tree-parking-west-32",
+            "tree-parking-west-37"
+          ],
+          "family": 1,
+          "alphaTestedLeaves": true,
+          "detailVisible": true
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-1",
+        "visible": true,
+        "data": {},
+        "count": 24,
+        "triangles": 874,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "pilot-canopies-1",
+        "visible": true,
+        "data": {},
+        "count": 24,
+        "triangles": 560,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-1",
+        "visible": true,
+        "data": {},
+        "count": 24,
+        "triangles": 192,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "vegetation-pilot-trees-2",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 20,
+          "treeIds": [
+            "tree-quadra-a-04",
+            "tree-quadra-a-06",
+            "tree-quadra-a-08",
+            "tree-quadra-a-11",
+            "tree-quadra-a-13",
+            "tree-quadra-a-19",
+            "tree-quadra-b-05",
+            "tree-quadra-b-10",
+            "tree-parking-west-06",
+            "tree-parking-west-08",
+            "tree-parking-west-11",
+            "tree-parking-west-13",
+            "tree-parking-west-15",
+            "tree-parking-west-26",
+            "tree-parking-west-28",
+            "tree-parking-west-31",
+            "tree-parking-west-33",
+            "tree-parking-west-35",
+            "tree-parking-west-39",
+            "tree-parking-west-40"
+          ],
+          "family": 2,
+          "alphaTestedLeaves": true,
+          "detailVisible": true
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-2",
+        "visible": true,
+        "data": {},
+        "count": 20,
+        "triangles": 874,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "pilot-canopies-2",
+        "visible": true,
+        "data": {},
+        "count": 20,
+        "triangles": 800,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-2",
+        "visible": true,
+        "data": {},
+        "count": 20,
+        "triangles": 192,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "vegetation-pilot-ground-cover",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "anchorCount": 13741
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-grass-QUADRA_A",
+        "visible": true,
+        "data": {
+          "area": "QUADRA_A",
+          "fullCount": 2400,
+          "groundCover": true
+        },
+        "count": 2400,
+        "triangles": 15,
+        "transforms": {
+          "elements": 38400,
+          "sha256": "dd4922f124aabe6b30087ff8a4899727d5e6d28efb08e298b8ee7daa1b506684"
+        }
+      },
+      {
+        "name": "pilot-grass-QUADRA_B",
+        "visible": true,
+        "data": {
+          "area": "QUADRA_B",
+          "fullCount": 2400,
+          "groundCover": true
+        },
+        "count": 2400,
+        "triangles": 15,
+        "transforms": {
+          "elements": 38400,
+          "sha256": "a07ab90ab7c7959c6c3f6cd6603ff89d6a01e571532d3e657f0f828a04dcde75"
+        }
+      },
+      {
+        "name": "pilot-grass-PARKING_EXHIBITORS_VISITORS",
+        "visible": true,
+        "data": {
+          "area": "PARKING_EXHIBITORS_VISITORS",
+          "fullCount": 1800,
+          "groundCover": true
+        },
+        "count": 1800,
+        "triangles": 15,
+        "transforms": {
+          "elements": 28800,
+          "sha256": "ee41a548ebcd2582d47a9e35a0bd65b5662444eda047cba228d3baf43c931006"
+        }
+      },
+      {
+        "name": "pilot-tree-ground-contact",
+        "visible": true,
+        "data": {},
+        "count": 63,
+        "triangles": 2,
+        "transforms": {
+          "elements": 1008,
+          "sha256": "992146ee3d4f288eddefa1cf5bffc90160258485964f6bc6c0212ba54e1b725d"
+        }
+      },
+      {
+        "name": "camada-arvores-comerciais",
+        "visible": true,
+        "data": {
+          "presentationVariant": "legacy",
+          "treeCount": 206,
+          "vegetationLodTier": "near",
+          "visibleTreeCount": 206,
+          "nearTierPreservesCanonicalInventory": true,
+          "colorPassDrawCalls": 5
+        },
+        "triangles": null
+      }
+    ],
+    "resources": {
+      "at": 70033.10000000149,
+      "calls": 201,
+      "triangles": 748157,
+      "geometries": 588,
+      "textures": 145,
+      "programs": 199,
+      "dpr": 1,
+      "width": 390,
+      "height": 681,
+      "heapBytes": 230354665,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  },
+  "reduced": {
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 1130,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "objects": [
+      {
+        "name": "vegetation-pilot-trees",
+        "visible": true,
+        "data": {
+          "areas": [
+            "QUADRA_A",
+            "QUADRA_B",
+            "PARKING_EXHIBITORS_VISITORS"
+          ]
+        },
+        "triangles": null
+      },
+      {
+        "name": "vegetation-pilot-trees-0",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 19,
+          "treeIds": [
+            "tree-quadra-a-01",
+            "tree-quadra-a-03",
+            "tree-quadra-a-05",
+            "tree-quadra-a-09",
+            "tree-quadra-a-10",
+            "tree-quadra-a-14",
+            "tree-quadra-a-16",
+            "tree-quadra-a-18",
+            "tree-quadra-a-21",
+            "tree-quadra-b-08",
+            "tree-parking-west-01",
+            "tree-parking-west-05",
+            "tree-parking-west-09",
+            "tree-parking-west-10",
+            "tree-parking-west-14",
+            "tree-parking-west-30",
+            "tree-parking-west-34",
+            "tree-parking-west-36",
+            "tree-parking-west-38"
+          ],
+          "family": 0,
+          "alphaTestedLeaves": true,
+          "detailVisible": false
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-0",
+        "visible": true,
+        "data": {},
+        "count": 19,
+        "triangles": 874,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "pilot-canopies-0",
+        "visible": true,
+        "data": {},
+        "count": 19,
+        "triangles": 800,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-0",
+        "visible": false,
+        "data": {},
+        "count": 19,
+        "triangles": 192,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "vegetation-pilot-trees-1",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 24,
+          "treeIds": [
+            "tree-quadra-a-02",
+            "tree-quadra-a-07",
+            "tree-quadra-a-12",
+            "tree-quadra-a-15",
+            "tree-quadra-a-17",
+            "tree-quadra-a-20",
+            "tree-quadra-a-22",
+            "tree-quadra-b-01",
+            "tree-quadra-b-02",
+            "tree-quadra-b-03",
+            "tree-quadra-b-04",
+            "tree-quadra-b-06",
+            "tree-quadra-b-07",
+            "tree-quadra-b-09",
+            "tree-quadra-b-11",
+            "tree-quadra-b-12",
+            "tree-parking-west-02",
+            "tree-parking-west-07",
+            "tree-parking-west-12",
+            "tree-parking-west-24",
+            "tree-parking-west-25",
+            "tree-parking-west-27",
+            "tree-parking-west-32",
+            "tree-parking-west-37"
+          ],
+          "family": 1,
+          "alphaTestedLeaves": true,
+          "detailVisible": false
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-1",
+        "visible": true,
+        "data": {},
+        "count": 24,
+        "triangles": 874,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "pilot-canopies-1",
+        "visible": true,
+        "data": {},
+        "count": 24,
+        "triangles": 560,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-1",
+        "visible": false,
+        "data": {},
+        "count": 24,
+        "triangles": 192,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "vegetation-pilot-trees-2",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 20,
+          "treeIds": [
+            "tree-quadra-a-04",
+            "tree-quadra-a-06",
+            "tree-quadra-a-08",
+            "tree-quadra-a-11",
+            "tree-quadra-a-13",
+            "tree-quadra-a-19",
+            "tree-quadra-b-05",
+            "tree-quadra-b-10",
+            "tree-parking-west-06",
+            "tree-parking-west-08",
+            "tree-parking-west-11",
+            "tree-parking-west-13",
+            "tree-parking-west-15",
+            "tree-parking-west-26",
+            "tree-parking-west-28",
+            "tree-parking-west-31",
+            "tree-parking-west-33",
+            "tree-parking-west-35",
+            "tree-parking-west-39",
+            "tree-parking-west-40"
+          ],
+          "family": 2,
+          "alphaTestedLeaves": true,
+          "detailVisible": false
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-2",
+        "visible": true,
+        "data": {},
+        "count": 20,
+        "triangles": 874,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "pilot-canopies-2",
+        "visible": true,
+        "data": {},
+        "count": 20,
+        "triangles": 800,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-2",
+        "visible": false,
+        "data": {},
+        "count": 20,
+        "triangles": 192,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "vegetation-pilot-ground-cover",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "anchorCount": 13741
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-grass-QUADRA_A",
+        "visible": true,
+        "data": {
+          "area": "QUADRA_A",
+          "fullCount": 2400,
+          "groundCover": true
+        },
+        "count": 1200,
+        "triangles": 15,
+        "transforms": {
+          "elements": 38400,
+          "sha256": "dd4922f124aabe6b30087ff8a4899727d5e6d28efb08e298b8ee7daa1b506684"
+        }
+      },
+      {
+        "name": "pilot-grass-QUADRA_B",
+        "visible": true,
+        "data": {
+          "area": "QUADRA_B",
+          "fullCount": 2400,
+          "groundCover": true
+        },
+        "count": 1200,
+        "triangles": 15,
+        "transforms": {
+          "elements": 38400,
+          "sha256": "a07ab90ab7c7959c6c3f6cd6603ff89d6a01e571532d3e657f0f828a04dcde75"
+        }
+      },
+      {
+        "name": "pilot-grass-PARKING_EXHIBITORS_VISITORS",
+        "visible": true,
+        "data": {
+          "area": "PARKING_EXHIBITORS_VISITORS",
+          "fullCount": 1800,
+          "groundCover": true
+        },
+        "count": 900,
+        "triangles": 15,
+        "transforms": {
+          "elements": 28800,
+          "sha256": "ee41a548ebcd2582d47a9e35a0bd65b5662444eda047cba228d3baf43c931006"
+        }
+      },
+      {
+        "name": "pilot-tree-ground-contact",
+        "visible": true,
+        "data": {},
+        "count": 63,
+        "triangles": 2,
+        "transforms": {
+          "elements": 1008,
+          "sha256": "e666fb41670c74f0d2c9573381e12e221cb2e923312f7ed9ebad65a9d1c5c3cc"
+        }
+      },
+      {
+        "name": "camada-arvores-comerciais",
+        "visible": true,
+        "data": {
+          "presentationVariant": "legacy",
+          "treeCount": 206,
+          "vegetationLodTier": "near",
+          "visibleTreeCount": 206,
+          "nearTierPreservesCanonicalInventory": true,
+          "colorPassDrawCalls": 4
+        },
+        "triangles": null
+      }
+    ],
+    "resources": {
+      "at": 76236.30000000075,
+      "calls": 174,
+      "triangles": 577869,
+      "geometries": 541,
+      "textures": 112,
+      "programs": 190,
+      "dpr": 1,
+      "width": 390,
+      "height": 681,
+      "heapBytes": 230742657,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  },
+  "full": {
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1178,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "objects": [
+      {
+        "name": "vegetation-pilot-trees",
+        "visible": true,
+        "data": {
+          "areas": [
+            "QUADRA_A",
+            "QUADRA_B",
+            "PARKING_EXHIBITORS_VISITORS"
+          ]
+        },
+        "triangles": null
+      },
+      {
+        "name": "vegetation-pilot-trees-0",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 19,
+          "treeIds": [
+            "tree-quadra-a-01",
+            "tree-quadra-a-03",
+            "tree-quadra-a-05",
+            "tree-quadra-a-09",
+            "tree-quadra-a-10",
+            "tree-quadra-a-14",
+            "tree-quadra-a-16",
+            "tree-quadra-a-18",
+            "tree-quadra-a-21",
+            "tree-quadra-b-08",
+            "tree-parking-west-01",
+            "tree-parking-west-05",
+            "tree-parking-west-09",
+            "tree-parking-west-10",
+            "tree-parking-west-14",
+            "tree-parking-west-30",
+            "tree-parking-west-34",
+            "tree-parking-west-36",
+            "tree-parking-west-38"
+          ],
+          "family": 0,
+          "alphaTestedLeaves": true,
+          "detailVisible": true
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-0",
+        "visible": true,
+        "data": {},
+        "count": 19,
+        "triangles": 874,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "pilot-canopies-0",
+        "visible": true,
+        "data": {},
+        "count": 19,
+        "triangles": 800,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-0",
+        "visible": true,
+        "data": {},
+        "count": 19,
+        "triangles": 192,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "vegetation-pilot-trees-1",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 24,
+          "treeIds": [
+            "tree-quadra-a-02",
+            "tree-quadra-a-07",
+            "tree-quadra-a-12",
+            "tree-quadra-a-15",
+            "tree-quadra-a-17",
+            "tree-quadra-a-20",
+            "tree-quadra-a-22",
+            "tree-quadra-b-01",
+            "tree-quadra-b-02",
+            "tree-quadra-b-03",
+            "tree-quadra-b-04",
+            "tree-quadra-b-06",
+            "tree-quadra-b-07",
+            "tree-quadra-b-09",
+            "tree-quadra-b-11",
+            "tree-quadra-b-12",
+            "tree-parking-west-02",
+            "tree-parking-west-07",
+            "tree-parking-west-12",
+            "tree-parking-west-24",
+            "tree-parking-west-25",
+            "tree-parking-west-27",
+            "tree-parking-west-32",
+            "tree-parking-west-37"
+          ],
+          "family": 1,
+          "alphaTestedLeaves": true,
+          "detailVisible": true
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-1",
+        "visible": true,
+        "data": {},
+        "count": 24,
+        "triangles": 874,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "pilot-canopies-1",
+        "visible": true,
+        "data": {},
+        "count": 24,
+        "triangles": 560,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-1",
+        "visible": true,
+        "data": {},
+        "count": 24,
+        "triangles": 192,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "vegetation-pilot-trees-2",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 20,
+          "treeIds": [
+            "tree-quadra-a-04",
+            "tree-quadra-a-06",
+            "tree-quadra-a-08",
+            "tree-quadra-a-11",
+            "tree-quadra-a-13",
+            "tree-quadra-a-19",
+            "tree-quadra-b-05",
+            "tree-quadra-b-10",
+            "tree-parking-west-06",
+            "tree-parking-west-08",
+            "tree-parking-west-11",
+            "tree-parking-west-13",
+            "tree-parking-west-15",
+            "tree-parking-west-26",
+            "tree-parking-west-28",
+            "tree-parking-west-31",
+            "tree-parking-west-33",
+            "tree-parking-west-35",
+            "tree-parking-west-39",
+            "tree-parking-west-40"
+          ],
+          "family": 2,
+          "alphaTestedLeaves": true,
+          "detailVisible": true
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-2",
+        "visible": true,
+        "data": {},
+        "count": 20,
+        "triangles": 874,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "pilot-canopies-2",
+        "visible": true,
+        "data": {},
+        "count": 20,
+        "triangles": 800,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-2",
+        "visible": true,
+        "data": {},
+        "count": 20,
+        "triangles": 192,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "vegetation-pilot-ground-cover",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "anchorCount": 13741
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-grass-QUADRA_A",
+        "visible": true,
+        "data": {
+          "area": "QUADRA_A",
+          "fullCount": 2400,
+          "groundCover": true
+        },
+        "count": 2400,
+        "triangles": 15,
+        "transforms": {
+          "elements": 38400,
+          "sha256": "dd4922f124aabe6b30087ff8a4899727d5e6d28efb08e298b8ee7daa1b506684"
+        }
+      },
+      {
+        "name": "pilot-grass-QUADRA_B",
+        "visible": true,
+        "data": {
+          "area": "QUADRA_B",
+          "fullCount": 2400,
+          "groundCover": true
+        },
+        "count": 2400,
+        "triangles": 15,
+        "transforms": {
+          "elements": 38400,
+          "sha256": "a07ab90ab7c7959c6c3f6cd6603ff89d6a01e571532d3e657f0f828a04dcde75"
+        }
+      },
+      {
+        "name": "pilot-grass-PARKING_EXHIBITORS_VISITORS",
+        "visible": true,
+        "data": {
+          "area": "PARKING_EXHIBITORS_VISITORS",
+          "fullCount": 1800,
+          "groundCover": true
+        },
+        "count": 1800,
+        "triangles": 15,
+        "transforms": {
+          "elements": 28800,
+          "sha256": "ee41a548ebcd2582d47a9e35a0bd65b5662444eda047cba228d3baf43c931006"
+        }
+      },
+      {
+        "name": "pilot-tree-ground-contact",
+        "visible": true,
+        "data": {},
+        "count": 63,
+        "triangles": 2,
+        "transforms": {
+          "elements": 1008,
+          "sha256": "992146ee3d4f288eddefa1cf5bffc90160258485964f6bc6c0212ba54e1b725d"
+        }
+      },
+      {
+        "name": "camada-arvores-comerciais",
+        "visible": true,
+        "data": {
+          "presentationVariant": "legacy",
+          "treeCount": 206,
+          "vegetationLodTier": "near",
+          "visibleTreeCount": 206,
+          "nearTierPreservesCanonicalInventory": true,
+          "colorPassDrawCalls": 5
+        },
+        "triangles": null
+      }
+    ],
+    "resources": {
+      "at": 83108,
+      "calls": 198,
+      "triangles": 747857,
+      "geometries": 543,
+      "textures": 123,
+      "programs": 222,
+      "dpr": 1,
+      "width": 390,
+      "height": 681,
+      "heapBytes": 235399388,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  },
+  "day": {
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1289,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "objects": [
+      {
+        "name": "vegetation-pilot-trees",
+        "visible": true,
+        "data": {
+          "areas": [
+            "QUADRA_A",
+            "QUADRA_B",
+            "PARKING_EXHIBITORS_VISITORS"
+          ]
+        },
+        "triangles": null
+      },
+      {
+        "name": "vegetation-pilot-trees-0",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 19,
+          "treeIds": [
+            "tree-quadra-a-01",
+            "tree-quadra-a-03",
+            "tree-quadra-a-05",
+            "tree-quadra-a-09",
+            "tree-quadra-a-10",
+            "tree-quadra-a-14",
+            "tree-quadra-a-16",
+            "tree-quadra-a-18",
+            "tree-quadra-a-21",
+            "tree-quadra-b-08",
+            "tree-parking-west-01",
+            "tree-parking-west-05",
+            "tree-parking-west-09",
+            "tree-parking-west-10",
+            "tree-parking-west-14",
+            "tree-parking-west-30",
+            "tree-parking-west-34",
+            "tree-parking-west-36",
+            "tree-parking-west-38"
+          ],
+          "family": 0,
+          "alphaTestedLeaves": true,
+          "detailVisible": true
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-0",
+        "visible": true,
+        "data": {},
+        "count": 19,
+        "triangles": 874,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "pilot-canopies-0",
+        "visible": true,
+        "data": {},
+        "count": 19,
+        "triangles": 800,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-0",
+        "visible": true,
+        "data": {},
+        "count": 19,
+        "triangles": 192,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "vegetation-pilot-trees-1",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 24,
+          "treeIds": [
+            "tree-quadra-a-02",
+            "tree-quadra-a-07",
+            "tree-quadra-a-12",
+            "tree-quadra-a-15",
+            "tree-quadra-a-17",
+            "tree-quadra-a-20",
+            "tree-quadra-a-22",
+            "tree-quadra-b-01",
+            "tree-quadra-b-02",
+            "tree-quadra-b-03",
+            "tree-quadra-b-04",
+            "tree-quadra-b-06",
+            "tree-quadra-b-07",
+            "tree-quadra-b-09",
+            "tree-quadra-b-11",
+            "tree-quadra-b-12",
+            "tree-parking-west-02",
+            "tree-parking-west-07",
+            "tree-parking-west-12",
+            "tree-parking-west-24",
+            "tree-parking-west-25",
+            "tree-parking-west-27",
+            "tree-parking-west-32",
+            "tree-parking-west-37"
+          ],
+          "family": 1,
+          "alphaTestedLeaves": true,
+          "detailVisible": true
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-1",
+        "visible": true,
+        "data": {},
+        "count": 24,
+        "triangles": 874,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "pilot-canopies-1",
+        "visible": true,
+        "data": {},
+        "count": 24,
+        "triangles": 560,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-1",
+        "visible": true,
+        "data": {},
+        "count": 24,
+        "triangles": 192,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "vegetation-pilot-trees-2",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 20,
+          "treeIds": [
+            "tree-quadra-a-04",
+            "tree-quadra-a-06",
+            "tree-quadra-a-08",
+            "tree-quadra-a-11",
+            "tree-quadra-a-13",
+            "tree-quadra-a-19",
+            "tree-quadra-b-05",
+            "tree-quadra-b-10",
+            "tree-parking-west-06",
+            "tree-parking-west-08",
+            "tree-parking-west-11",
+            "tree-parking-west-13",
+            "tree-parking-west-15",
+            "tree-parking-west-26",
+            "tree-parking-west-28",
+            "tree-parking-west-31",
+            "tree-parking-west-33",
+            "tree-parking-west-35",
+            "tree-parking-west-39",
+            "tree-parking-west-40"
+          ],
+          "family": 2,
+          "alphaTestedLeaves": true,
+          "detailVisible": true
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-2",
+        "visible": true,
+        "data": {},
+        "count": 20,
+        "triangles": 874,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "pilot-canopies-2",
+        "visible": true,
+        "data": {},
+        "count": 20,
+        "triangles": 800,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-2",
+        "visible": true,
+        "data": {},
+        "count": 20,
+        "triangles": 192,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "vegetation-pilot-ground-cover",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "anchorCount": 13741
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-grass-QUADRA_A",
+        "visible": true,
+        "data": {
+          "area": "QUADRA_A",
+          "fullCount": 2400,
+          "groundCover": true
+        },
+        "count": 2400,
+        "triangles": 15,
+        "transforms": {
+          "elements": 38400,
+          "sha256": "dd4922f124aabe6b30087ff8a4899727d5e6d28efb08e298b8ee7daa1b506684"
+        }
+      },
+      {
+        "name": "pilot-grass-QUADRA_B",
+        "visible": true,
+        "data": {
+          "area": "QUADRA_B",
+          "fullCount": 2400,
+          "groundCover": true
+        },
+        "count": 2400,
+        "triangles": 15,
+        "transforms": {
+          "elements": 38400,
+          "sha256": "a07ab90ab7c7959c6c3f6cd6603ff89d6a01e571532d3e657f0f828a04dcde75"
+        }
+      },
+      {
+        "name": "pilot-grass-PARKING_EXHIBITORS_VISITORS",
+        "visible": true,
+        "data": {
+          "area": "PARKING_EXHIBITORS_VISITORS",
+          "fullCount": 1800,
+          "groundCover": true
+        },
+        "count": 1800,
+        "triangles": 15,
+        "transforms": {
+          "elements": 28800,
+          "sha256": "ee41a548ebcd2582d47a9e35a0bd65b5662444eda047cba228d3baf43c931006"
+        }
+      },
+      {
+        "name": "pilot-tree-ground-contact",
+        "visible": true,
+        "data": {},
+        "count": 63,
+        "triangles": 2,
+        "transforms": {
+          "elements": 1008,
+          "sha256": "992146ee3d4f288eddefa1cf5bffc90160258485964f6bc6c0212ba54e1b725d"
+        }
+      },
+      {
+        "name": "camada-arvores-comerciais",
+        "visible": true,
+        "data": {
+          "presentationVariant": "legacy",
+          "treeCount": 206,
+          "vegetationLodTier": "near",
+          "visibleTreeCount": 206,
+          "nearTierPreservesCanonicalInventory": true,
+          "colorPassDrawCalls": 5
+        },
+        "triangles": null
+      }
+    ],
+    "resources": {
+      "at": 85556.19999999925,
+      "calls": 193,
+      "triangles": 721667,
+      "geometries": 559,
+      "textures": 130,
+      "programs": 239,
+      "dpr": 1,
+      "width": 390,
+      "height": 681,
+      "heapBytes": 249812231,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  },
+  "final": {
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1408,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "objects": [
+      {
+        "name": "vegetation-pilot-trees",
+        "visible": true,
+        "data": {
+          "areas": [
+            "QUADRA_A",
+            "QUADRA_B",
+            "PARKING_EXHIBITORS_VISITORS"
+          ]
+        },
+        "triangles": null
+      },
+      {
+        "name": "vegetation-pilot-trees-0",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 19,
+          "treeIds": [
+            "tree-quadra-a-01",
+            "tree-quadra-a-03",
+            "tree-quadra-a-05",
+            "tree-quadra-a-09",
+            "tree-quadra-a-10",
+            "tree-quadra-a-14",
+            "tree-quadra-a-16",
+            "tree-quadra-a-18",
+            "tree-quadra-a-21",
+            "tree-quadra-b-08",
+            "tree-parking-west-01",
+            "tree-parking-west-05",
+            "tree-parking-west-09",
+            "tree-parking-west-10",
+            "tree-parking-west-14",
+            "tree-parking-west-30",
+            "tree-parking-west-34",
+            "tree-parking-west-36",
+            "tree-parking-west-38"
+          ],
+          "family": 0,
+          "alphaTestedLeaves": true,
+          "detailVisible": true
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-0",
+        "visible": true,
+        "data": {},
+        "count": 19,
+        "triangles": 874,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "pilot-canopies-0",
+        "visible": true,
+        "data": {},
+        "count": 19,
+        "triangles": 800,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-0",
+        "visible": true,
+        "data": {},
+        "count": 19,
+        "triangles": 192,
+        "transforms": {
+          "elements": 304,
+          "sha256": "b02a4197feee34774b1a8008f2b533e2f1c114ab9ca24e9af30103da5377cd53"
+        }
+      },
+      {
+        "name": "vegetation-pilot-trees-1",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 24,
+          "treeIds": [
+            "tree-quadra-a-02",
+            "tree-quadra-a-07",
+            "tree-quadra-a-12",
+            "tree-quadra-a-15",
+            "tree-quadra-a-17",
+            "tree-quadra-a-20",
+            "tree-quadra-a-22",
+            "tree-quadra-b-01",
+            "tree-quadra-b-02",
+            "tree-quadra-b-03",
+            "tree-quadra-b-04",
+            "tree-quadra-b-06",
+            "tree-quadra-b-07",
+            "tree-quadra-b-09",
+            "tree-quadra-b-11",
+            "tree-quadra-b-12",
+            "tree-parking-west-02",
+            "tree-parking-west-07",
+            "tree-parking-west-12",
+            "tree-parking-west-24",
+            "tree-parking-west-25",
+            "tree-parking-west-27",
+            "tree-parking-west-32",
+            "tree-parking-west-37"
+          ],
+          "family": 1,
+          "alphaTestedLeaves": true,
+          "detailVisible": true
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-1",
+        "visible": true,
+        "data": {},
+        "count": 24,
+        "triangles": 874,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "pilot-canopies-1",
+        "visible": true,
+        "data": {},
+        "count": 24,
+        "triangles": 560,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-1",
+        "visible": true,
+        "data": {},
+        "count": 24,
+        "triangles": 192,
+        "transforms": {
+          "elements": 384,
+          "sha256": "009bc719e4651d6305055616fcca5483d3b5d27b97987cc2501e6235aba9aa6b"
+        }
+      },
+      {
+        "name": "vegetation-pilot-trees-2",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "treeCount": 20,
+          "treeIds": [
+            "tree-quadra-a-04",
+            "tree-quadra-a-06",
+            "tree-quadra-a-08",
+            "tree-quadra-a-11",
+            "tree-quadra-a-13",
+            "tree-quadra-a-19",
+            "tree-quadra-b-05",
+            "tree-quadra-b-10",
+            "tree-parking-west-06",
+            "tree-parking-west-08",
+            "tree-parking-west-11",
+            "tree-parking-west-13",
+            "tree-parking-west-15",
+            "tree-parking-west-26",
+            "tree-parking-west-28",
+            "tree-parking-west-31",
+            "tree-parking-west-33",
+            "tree-parking-west-35",
+            "tree-parking-west-39",
+            "tree-parking-west-40"
+          ],
+          "family": 2,
+          "alphaTestedLeaves": true,
+          "detailVisible": true
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-trunks-2",
+        "visible": true,
+        "data": {},
+        "count": 20,
+        "triangles": 874,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "pilot-canopies-2",
+        "visible": true,
+        "data": {},
+        "count": 20,
+        "triangles": 800,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "pilot-leaf-detail-2",
+        "visible": true,
+        "data": {},
+        "count": 20,
+        "triangles": 192,
+        "transforms": {
+          "elements": 320,
+          "sha256": "e331d960f1b3e3eb3b819b0d95fc56e41e720ee64691d366ad7a383b98e26c41"
+        }
+      },
+      {
+        "name": "vegetation-pilot-ground-cover",
+        "visible": true,
+        "data": {
+          "presentationOnly": true,
+          "anchorCount": 13741
+        },
+        "triangles": null
+      },
+      {
+        "name": "pilot-grass-QUADRA_A",
+        "visible": true,
+        "data": {
+          "area": "QUADRA_A",
+          "fullCount": 2400,
+          "groundCover": true
+        },
+        "count": 2400,
+        "triangles": 15,
+        "transforms": {
+          "elements": 38400,
+          "sha256": "dd4922f124aabe6b30087ff8a4899727d5e6d28efb08e298b8ee7daa1b506684"
+        }
+      },
+      {
+        "name": "pilot-grass-QUADRA_B",
+        "visible": true,
+        "data": {
+          "area": "QUADRA_B",
+          "fullCount": 2400,
+          "groundCover": true
+        },
+        "count": 2400,
+        "triangles": 15,
+        "transforms": {
+          "elements": 38400,
+          "sha256": "a07ab90ab7c7959c6c3f6cd6603ff89d6a01e571532d3e657f0f828a04dcde75"
+        }
+      },
+      {
+        "name": "pilot-grass-PARKING_EXHIBITORS_VISITORS",
+        "visible": true,
+        "data": {
+          "area": "PARKING_EXHIBITORS_VISITORS",
+          "fullCount": 1800,
+          "groundCover": true
+        },
+        "count": 1800,
+        "triangles": 15,
+        "transforms": {
+          "elements": 28800,
+          "sha256": "ee41a548ebcd2582d47a9e35a0bd65b5662444eda047cba228d3baf43c931006"
+        }
+      },
+      {
+        "name": "pilot-tree-ground-contact",
+        "visible": true,
+        "data": {},
+        "count": 63,
+        "triangles": 2,
+        "transforms": {
+          "elements": 1008,
+          "sha256": "992146ee3d4f288eddefa1cf5bffc90160258485964f6bc6c0212ba54e1b725d"
+        }
+      },
+      {
+        "name": "camada-arvores-comerciais",
+        "visible": true,
+        "data": {
+          "presentationVariant": "legacy",
+          "treeCount": 206,
+          "vegetationLodTier": "near",
+          "visibleTreeCount": 206,
+          "nearTierPreservesCanonicalInventory": true,
+          "colorPassDrawCalls": 5
+        },
+        "triangles": null
+      }
+    ],
+    "resources": {
+      "at": 90780.10000000149,
+      "calls": 133,
+      "triangles": 624296,
+      "geometries": 560,
+      "textures": 131,
+      "programs": 254,
+      "dpr": 1,
+      "width": 390,
+      "height": 681,
+      "heapBytes": 225270758,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  }
+}

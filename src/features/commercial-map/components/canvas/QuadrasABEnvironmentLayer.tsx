@@ -13,6 +13,8 @@ import {
 import { commercialSitePolygonBounds } from '../../utils/commercialSiteEnvironment';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { applyParkGroundDetail } from './terrainMaterial';
+import { applyPilotGroundMaterial } from './vegetationPilotMaterial';
+import { isVegetationPilotEnabled } from '../../utils/vegetationPilot';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_LEAF = new THREE.CircleGeometry(0.5, 7);
@@ -250,7 +252,7 @@ function createGroundMaterial(
     polygonOffsetUnits: -1,
   });
   material.userData.presentationOnly = true;
-  return applyParkGroundDetail(material, reducedGraphics);
+  return isVegetationPilotEnabled('ground') ? applyPilotGroundMaterial(material) : applyParkGroundDetail(material, reducedGraphics);
 }
 
 function DetailInstances({ anchors, reducedGraphics }: {
