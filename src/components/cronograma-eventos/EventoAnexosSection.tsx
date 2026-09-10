@@ -261,11 +261,16 @@ export function EventoAnexosSection({ eventId, className }: Props) {
     remove,
     removing,
     getSignedUrl,
+    urlFor: urlForFromHook,
+    downloadUrlFor: downloadUrlForFromHook,
   } = useEventoAnexos(eventId);
+  const urlFor = urlForFromHook ?? (() => null);
+  const downloadUrlFor = downloadUrlForFromHook ?? (() => null);
   const { user } = useAuth();
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
+  const galleryRef = useRef<HTMLInputElement>(null);
   const previewTriggerRef = useRef<HTMLElement | null>(null);
   const menuTriggerRefs = useRef(new Map<string, HTMLButtonElement>());
   const soybeanTimerRef = useRef<number | null>(null);
@@ -278,9 +283,19 @@ export function EventoAnexosSection({ eventId, className }: Props) {
     url: string;
     name: string;
   } | null>(null);
+  const [docPreview, setDocPreview] = useState<{
+    url: string;
+    name: string;
+  } | null>(null);
+  const [fallbackLink, setFallbackLink] = useState<{
+    url: string;
+    name: string;
+  } | null>(null);
+  const [dragActive, setDragActive] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState<EventoAnexo | null>(null);
   const [soybeanActive, setSoybeanActive] = useState(false);
   const [feedback, setFeedback] = useState<UploadFeedback>(INITIAL_FEEDBACK);
+
 
   const canUpload = Boolean(user);
   const effectivePhase: UploadPhase = uploading ? "uploading" : feedback.phase;
@@ -399,13 +414,21 @@ export function EventoAnexosSection({ eventId, className }: Props) {
 
     if (fileRef.current) fileRef.current.value = "";
     if (cameraRef.current) cameraRef.current.value = "";
+    if (galleryRef.current) galleryRef.current.value = "";
+
   };
 
+  const isPdf = (anexo: EventoAnexo) =>
+    anexo.mime_type.toLowerCase().includes("pdf") ||
+    anexo.file_name.toLowerCase().endsWith(".pdf");
+
+  // Abre sem depender de janela nova: imagem e PDF usam visualizador interno.
+  // Demais formatos usam link real (âncora), preservando o gesto do toque.
   const handleOpen = async (
     anexo: EventoAnexo,
     trigger?: HTMLElement | null,
   ) => {
-    const url = await getSignedUrl(anexo.file_path);
+    const url = urlFor(anexo.file_path) ?? (await getSignedUrl(anexo.file_path));
     if (!url) {
       toast({
         title: "Arquivo indisponível",
@@ -414,26 +437,42 @@ export function EventoAnexosSection({ eventId, className }: Props) {
       });
       return;
     }
+    previewTriggerRef.current = trigger ?? null;
     if (anexo.kind === "foto") {
-      previewTriggerRef.current = trigger ?? null;
       setLightbox({ url, name: anexo.file_name });
       return;
     }
-    window.open(url, "_blank", "noopener,noreferrer");
+    if (isPdf(anexo)) {
+      setDocPreview({ url, name: anexo.file_name });
+      return;
+    }
+    const opened = window.open(url, "_blank", "noopener,noreferrer");
+    if (!opened) {
+      setFallbackLink({ url, name: anexo.file_name });
+    }
   };
 
   const handleDownload = async (anexo: EventoAnexo) => {
-    const url = await getSignedUrl(anexo.file_path);
-    if (url) {
-      window.open(url, "_blank", "noopener,noreferrer");
+    const url =
+      downloadUrlFor(anexo.file_path, anexo.file_name) ??
+      (await getSignedUrl(anexo.file_path));
+    if (!url) {
+      toast({
+        title: "Download indisponível",
+        description: "Não foi possível preparar este arquivo para download.",
+        variant: "destructive",
+      });
       return;
     }
-    toast({
-      title: "Download indisponível",
-      description: "Não foi possível preparar este arquivo para download.",
-      variant: "destructive",
-    });
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.rel = "noopener noreferrer";
+    anchor.download = anexo.file_name;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
   };
+
 
   const handleConfirmRemove = async () => {
     if (!confirmRemove) return;
@@ -472,7 +511,26 @@ export function EventoAnexosSection({ eventId, className }: Props) {
       aria-labelledby={titleId}
       aria-busy={uploadBusy}
     >
-      <div className="cronograma-attachments__surface">
+      <div
+        className="cronograma-attachments__surface"
+        data-drag-active={dragActive ? "true" : "false"}
+        onDragOver={(event) => {
+          if (!canUpload || uploadBusy) return;
+          event.preventDefault();
+          setDragActive(true);
+        }}
+        onDragLeave={(event) => {
+          if (event.currentTarget.contains(event.relatedTarget as Node)) return;
+          setDragActive(false);
+        }}
+        onDrop={(event) => {
+          if (!canUpload || uploadBusy) return;
+          event.preventDefault();
+          setDragActive(false);
+          void handleFiles(event.dataTransfer?.files ?? null);
+        }}
+      >
+
         <header className="cronograma-attachments__header">
           <span
             className="cronograma-attachments__heading-icon"
@@ -541,6 +599,31 @@ export function EventoAnexosSection({ eventId, className }: Props) {
             <Camera aria-hidden="true" />
             Tirar foto
           </Button>
+
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => galleryRef.current?.click()}
+            disabled={!canUpload || uploadBusy}
+            className="cronograma-attachments__camera-button sm:hidden"
+            aria-describedby={showStatus ? `${guidanceId} ${statusId}` : guidanceId}
+          >
+            <FileImage aria-hidden="true" />
+            Escolher da galeria
+          </Button>
+
+          <input
+            ref={galleryRef}
+            type="file"
+            multiple
+            accept="image/*"
+            className="hidden"
+            tabIndex={-1}
+            aria-label="Escolher fotos da galeria"
+            onChange={(event) => void handleFiles(event.target.files)}
+          />
+
 
           <input
             ref={fileRef}
@@ -661,7 +744,32 @@ export function EventoAnexosSection({ eventId, className }: Props) {
                         </p>
                       </div>
 
+                      <div className="cronograma-attachments__row-actions">
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          className="cronograma-attachments__row-action"
+                          aria-label={`Abrir ${anexo.file_name}`}
+                          onClick={(event) =>
+                            void handleOpen(anexo, event.currentTarget)
+                          }
+                        >
+                          <Eye aria-hidden="true" />
+                        </Button>
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          className="cronograma-attachments__row-action"
+                          aria-label={`Baixar ${anexo.file_name}`}
+                          onClick={() => void handleDownload(anexo)}
+                        >
+                          <Download aria-hidden="true" />
+                        </Button>
+
                       <DropdownMenu>
+
                         <DropdownMenuTrigger asChild>
                           <Button
                             ref={(node) => {
@@ -735,6 +843,8 @@ export function EventoAnexosSection({ eventId, className }: Props) {
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
+                      </div>
+
                     </li>
                   );
                 })}
@@ -777,6 +887,76 @@ export function EventoAnexosSection({ eventId, className }: Props) {
           </DialogContent>
         )}
       </Dialog>
+
+      <Dialog
+        open={Boolean(docPreview)}
+        onOpenChange={(open) => !open && setDocPreview(null)}
+      >
+        {docPreview && (
+          <DialogContent
+            className="cronograma-attachments__lightbox-content [&>button:last-child]:hidden"
+            aria-describedby={undefined}
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              previewTriggerRef.current?.focus();
+            }}
+          >
+            <DialogTitle className="sr-only">
+              Visualização de {docPreview.name}
+            </DialogTitle>
+            <DialogClose asChild>
+              <button
+                type="button"
+                className="cronograma-attachments__lightbox-close focus-ring"
+                aria-label="Fechar visualização"
+              >
+                <X />
+              </button>
+            </DialogClose>
+            <iframe
+              src={docPreview.url}
+              title={`Documento ${docPreview.name}`}
+              className="cronograma-attachments__doc-frame"
+            />
+            <a
+              href={docPreview.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cronograma-attachments__doc-fallback focus-ring"
+            >
+              <Download aria-hidden="true" />
+              Abrir em nova aba
+            </a>
+          </DialogContent>
+        )}
+      </Dialog>
+
+      <Dialog
+        open={Boolean(fallbackLink)}
+        onOpenChange={(open) => !open && setFallbackLink(null)}
+      >
+        {fallbackLink && (
+          <DialogContent aria-describedby={undefined} className="max-w-sm">
+            <DialogTitle>Abrir anexo</DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              O navegador bloqueou a abertura automática. Toque no link abaixo
+              para abrir {fallbackLink.name}.
+            </p>
+            <a
+              href={fallbackLink.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setFallbackLink(null)}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground focus-ring"
+            >
+              <Eye aria-hidden="true" />
+              Abrir arquivo
+            </a>
+          </DialogContent>
+        )}
+      </Dialog>
+
+
 
       {confirmRemove && (
         <AlertDialog

@@ -1,9 +1,12 @@
+import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useCurrentOrg } from './useCurrentOrg';
 
 const BUCKET = 'cronograma-event-attachments';
+const SIGNED_URL_TTL_SECONDS = 60 * 60;
+
 
 export interface EventoAnexo {
   id: string;
@@ -40,6 +43,34 @@ export function useEventoAnexos(eventId: string | null | undefined) {
       return data ?? [];
     },
   });
+
+  const anexos = useMemo(() => listQuery.data ?? [], [listQuery.data]);
+  const pathKey = anexos.map((a) => a.file_path).join('|');
+
+  // Pré-assina as URLs junto da listagem. Assim o toque em "abrir"/"baixar"
+  // no celular usa um link já pronto e não é bloqueado por falta de gesto.
+  const urlsQuery = useQuery({
+    queryKey: ['cronograma-anexos-urls', eventId, pathKey],
+    enabled: enabled && anexos.length > 0,
+    staleTime: (SIGNED_URL_TTL_SECONDS - 300) * 1000,
+    gcTime: SIGNED_URL_TTL_SECONDS * 1000,
+    queryFn: async (): Promise<Record<string, string>> => {
+      const paths = pathKey ? pathKey.split('|') : [];
+      if (paths.length === 0) return {};
+      const { data, error } = await supabase.storage
+        .from(BUCKET)
+        .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS);
+      if (error) throw error;
+      const map: Record<string, string> = {};
+      for (const entry of data ?? []) {
+        const entryPath = (entry as { path?: string | null }).path;
+        if (entryPath && entry.signedUrl) map[entryPath] = entry.signedUrl;
+      }
+      return map;
+    },
+  });
+
+
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
@@ -103,19 +134,36 @@ export function useEventoAnexos(eventId: string | null | undefined) {
     },
   });
 
-  const getSignedUrl = async (path: string, expiresIn = 3600): Promise<string | null> => {
+  const getSignedUrl = async (path: string, expiresIn = SIGNED_URL_TTL_SECONDS): Promise<string | null> => {
+    const cached = urlsQuery.data?.[path];
+    if (cached) return cached;
     const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, expiresIn);
     if (error) return null;
     return data?.signedUrl ?? null;
   };
 
+  /** URL já assinada disponível de forma síncrona (sem espera no toque). */
+  const urlFor = (path: string): string | null => urlsQuery.data?.[path] ?? null;
+
+  /** URL que força o download com o nome original do arquivo. */
+  const downloadUrlFor = (path: string, fileName: string): string | null => {
+    const base = urlFor(path);
+    if (!base) return null;
+    const separator = base.includes('?') ? '&' : '?';
+    return `${base}${separator}download=${encodeURIComponent(fileName)}`;
+  };
+
   return {
-    anexos: listQuery.data ?? [],
+    anexos,
     isLoading: listQuery.isLoading,
     upload: uploadMutation.mutateAsync,
     uploading: uploadMutation.isPending,
     remove: removeMutation.mutateAsync,
     removing: removeMutation.isPending,
     getSignedUrl,
+    urlFor,
+    downloadUrlFor,
+    urlsReady: !urlsQuery.isLoading,
+
   };
 }
