@@ -401,11 +401,17 @@ export function EventoAnexosSection({ eventId, className }: Props) {
     if (cameraRef.current) cameraRef.current.value = "";
   };
 
+  const isPdf = (anexo: EventoAnexo) =>
+    anexo.mime_type.toLowerCase().includes("pdf") ||
+    anexo.file_name.toLowerCase().endsWith(".pdf");
+
+  // Abre sem depender de janela nova: imagem e PDF usam visualizador interno.
+  // Demais formatos usam link real (âncora), preservando o gesto do toque.
   const handleOpen = async (
     anexo: EventoAnexo,
     trigger?: HTMLElement | null,
   ) => {
-    const url = await getSignedUrl(anexo.file_path);
+    const url = urlFor(anexo.file_path) ?? (await getSignedUrl(anexo.file_path));
     if (!url) {
       toast({
         title: "Arquivo indisponível",
@@ -414,26 +420,42 @@ export function EventoAnexosSection({ eventId, className }: Props) {
       });
       return;
     }
+    previewTriggerRef.current = trigger ?? null;
     if (anexo.kind === "foto") {
-      previewTriggerRef.current = trigger ?? null;
       setLightbox({ url, name: anexo.file_name });
       return;
     }
-    window.open(url, "_blank", "noopener,noreferrer");
+    if (isPdf(anexo)) {
+      setDocPreview({ url, name: anexo.file_name });
+      return;
+    }
+    const opened = window.open(url, "_blank", "noopener,noreferrer");
+    if (!opened) {
+      setFallbackLink({ url, name: anexo.file_name });
+    }
   };
 
   const handleDownload = async (anexo: EventoAnexo) => {
-    const url = await getSignedUrl(anexo.file_path);
-    if (url) {
-      window.open(url, "_blank", "noopener,noreferrer");
+    const url =
+      downloadUrlFor(anexo.file_path, anexo.file_name) ??
+      (await getSignedUrl(anexo.file_path));
+    if (!url) {
+      toast({
+        title: "Download indisponível",
+        description: "Não foi possível preparar este arquivo para download.",
+        variant: "destructive",
+      });
       return;
     }
-    toast({
-      title: "Download indisponível",
-      description: "Não foi possível preparar este arquivo para download.",
-      variant: "destructive",
-    });
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.rel = "noopener noreferrer";
+    anchor.download = anexo.file_name;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
   };
+
 
   const handleConfirmRemove = async () => {
     if (!confirmRemove) return;
