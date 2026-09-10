@@ -888,6 +888,76 @@ export function EventoAnexosSection({ eventId, className }: Props) {
         )}
       </Dialog>
 
+      <Dialog
+        open={Boolean(docPreview)}
+        onOpenChange={(open) => !open && setDocPreview(null)}
+      >
+        {docPreview && (
+          <DialogContent
+            className="cronograma-attachments__lightbox-content [&>button:last-child]:hidden"
+            aria-describedby={undefined}
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              previewTriggerRef.current?.focus();
+            }}
+          >
+            <DialogTitle className="sr-only">
+              Visualização de {docPreview.name}
+            </DialogTitle>
+            <DialogClose asChild>
+              <button
+                type="button"
+                className="cronograma-attachments__lightbox-close focus-ring"
+                aria-label="Fechar visualização"
+              >
+                <X />
+              </button>
+            </DialogClose>
+            <iframe
+              src={docPreview.url}
+              title={`Documento ${docPreview.name}`}
+              className="cronograma-attachments__doc-frame"
+            />
+            <a
+              href={docPreview.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cronograma-attachments__doc-fallback focus-ring"
+            >
+              <Download aria-hidden="true" />
+              Abrir em nova aba
+            </a>
+          </DialogContent>
+        )}
+      </Dialog>
+
+      <Dialog
+        open={Boolean(fallbackLink)}
+        onOpenChange={(open) => !open && setFallbackLink(null)}
+      >
+        {fallbackLink && (
+          <DialogContent aria-describedby={undefined} className="max-w-sm">
+            <DialogTitle>Abrir anexo</DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              O navegador bloqueou a abertura automática. Toque no link abaixo
+              para abrir {fallbackLink.name}.
+            </p>
+            <a
+              href={fallbackLink.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setFallbackLink(null)}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground focus-ring"
+            >
+              <Eye aria-hidden="true" />
+              Abrir arquivo
+            </a>
+          </DialogContent>
+        )}
+      </Dialog>
+
+
+
       {confirmRemove && (
         <AlertDialog
           open
