@@ -509,7 +509,26 @@ export function EventoAnexosSection({ eventId, className }: Props) {
       aria-labelledby={titleId}
       aria-busy={uploadBusy}
     >
-      <div className="cronograma-attachments__surface">
+      <div
+        className="cronograma-attachments__surface"
+        data-drag-active={dragActive ? "true" : "false"}
+        onDragOver={(event) => {
+          if (!canUpload || uploadBusy) return;
+          event.preventDefault();
+          setDragActive(true);
+        }}
+        onDragLeave={(event) => {
+          if (event.currentTarget.contains(event.relatedTarget as Node)) return;
+          setDragActive(false);
+        }}
+        onDrop={(event) => {
+          if (!canUpload || uploadBusy) return;
+          event.preventDefault();
+          setDragActive(false);
+          void handleFiles(event.dataTransfer?.files ?? null);
+        }}
+      >
+
         <header className="cronograma-attachments__header">
           <span
             className="cronograma-attachments__heading-icon"
