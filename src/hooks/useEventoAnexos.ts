@@ -134,19 +134,36 @@ export function useEventoAnexos(eventId: string | null | undefined) {
     },
   });
 
-  const getSignedUrl = async (path: string, expiresIn = 3600): Promise<string | null> => {
+  const getSignedUrl = async (path: string, expiresIn = SIGNED_URL_TTL_SECONDS): Promise<string | null> => {
+    const cached = urlsQuery.data?.[path];
+    if (cached) return cached;
     const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, expiresIn);
     if (error) return null;
     return data?.signedUrl ?? null;
   };
 
+  /** URL já assinada disponível de forma síncrona (sem espera no toque). */
+  const urlFor = (path: string): string | null => urlsQuery.data?.[path] ?? null;
+
+  /** URL que força o download com o nome original do arquivo. */
+  const downloadUrlFor = (path: string, fileName: string): string | null => {
+    const base = urlFor(path);
+    if (!base) return null;
+    const separator = base.includes('?') ? '&' : '?';
+    return `${base}${separator}download=${encodeURIComponent(fileName)}`;
+  };
+
   return {
-    anexos: listQuery.data ?? [],
+    anexos,
     isLoading: listQuery.isLoading,
     upload: uploadMutation.mutateAsync,
     uploading: uploadMutation.isPending,
     remove: removeMutation.mutateAsync,
     removing: removeMutation.isPending,
     getSignedUrl,
+    urlFor,
+    downloadUrlFor,
+    urlsReady: !urlsQuery.isLoading,
+
   };
 }
