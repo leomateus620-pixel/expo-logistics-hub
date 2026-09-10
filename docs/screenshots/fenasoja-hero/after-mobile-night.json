@@ -1,0 +1,2073 @@
+{
+  "phase": "after",
+  "mobile": true,
+  "browser": "152.0.7977.82",
+  "errors": [],
+  "poses": {
+    "attachment1": {
+      "target": [
+        15.8,
+        0,
+        14
+      ],
+      "position": [
+        15.79,
+        12,
+        14
+      ],
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    "attachment2": {
+      "target": [
+        15.8,
+        0,
+        14
+      ],
+      "position": [
+        15.8,
+        12,
+        14.01
+      ]
+    },
+    "frontage": {
+      "target": [
+        15.8,
+        0.8,
+        15.7
+      ],
+      "position": [
+        11.1,
+        1.65,
+        15.7
+      ]
+    },
+    "beforeView4": {
+      "target": [
+        16,
+        0,
+        14
+      ],
+      "position": [
+        19.5,
+        12,
+        14
+      ]
+    },
+    "beforeView5": {
+      "target": [
+        16,
+        0,
+        14
+      ],
+      "position": [
+        12,
+        12,
+        14
+      ]
+    },
+    "beforeView6": {
+      "target": [
+        15.8,
+        0.6,
+        15.7
+      ],
+      "position": [
+        11.3,
+        2.9,
+        12.7
+      ]
+    },
+    "rear": {
+      "target": [
+        15.8,
+        0.6,
+        15.5
+      ],
+      "position": [
+        20,
+        3.5,
+        16.5
+      ]
+    },
+    "rightRoom": {
+      "target": [
+        15.8,
+        0.6,
+        15.7
+      ],
+      "position": [
+        14.5,
+        2.8,
+        19.5
+      ]
+    },
+    "roof": {
+      "target": [
+        15.8,
+        0.6,
+        15.7
+      ],
+      "position": [
+        18,
+        5.5,
+        18.5
+      ]
+    },
+    "stageFront": {
+      "target": [
+        15.6,
+        0.6,
+        12.9
+      ],
+      "position": [
+        10,
+        2.1,
+        12.9
+      ]
+    },
+    "maximum": {
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "position": [
+        100,
+        140,
+        160
+      ]
+    },
+    "referenceFront": {
+      "target": [
+        15.3,
+        0.67,
+        15.1
+      ],
+      "position": [
+        11.5,
+        1,
+        15.1
+      ]
+    },
+    "monument": {
+      "target": [
+        14.43,
+        0.31,
+        15.65
+      ],
+      "position": [
+        12.9,
+        0.7,
+        15.85
+      ]
+    }
+  },
+  "nightOnly": true,
+  "measurements": {
+    "frontage": {
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 607.1000000238419,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 5,
+        "lod": 2,
+        "rendersDuringMeasure": 1
+      },
+      "frames": 360,
+      "meanMs": 16.66583333330022,
+      "p95Ms": 16.80000001192093,
+      "renderer": {
+        "at": 67388.19999998808,
+        "calls": 117,
+        "triangles": 668853,
+        "geometries": 602,
+        "textures": 147,
+        "programs": 345,
+        "dpr": 0.72,
+        "width": 280,
+        "height": 490,
+        "heapBytes": 185702181,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1496,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "stageFront": {
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 607.1000000238419,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 5,
+        "lod": 2,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 361,
+      "meanMs": 16.666204986149584,
+      "p95Ms": 16.80000001192093,
+      "renderer": {
+        "at": 74221.89999997616,
+        "calls": 115,
+        "triangles": 585675,
+        "geometries": 602,
+        "textures": 147,
+        "programs": 345,
+        "dpr": 0.72,
+        "width": 280,
+        "height": 490,
+        "heapBytes": 191250817,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1905,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "beforeView6": {
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 607.1000000238419,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 5,
+        "lod": 2,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 361,
+      "meanMs": 16.666204986149584,
+      "p95Ms": 16.80000001192093,
+      "renderer": {
+        "at": 81054.89999997616,
+        "calls": 116,
+        "triangles": 639162,
+        "geometries": 602,
+        "textures": 147,
+        "programs": 345,
+        "dpr": 0.72,
+        "width": 280,
+        "height": 490,
+        "heapBytes": 175508617,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2313,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "maximum": {
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 607.1000000238419,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 6,
+        "lod": 0,
+        "rendersDuringMeasure": 1
+      },
+      "frames": 360,
+      "meanMs": 16.7125,
+      "p95Ms": 17,
+      "renderer": {
+        "at": 87895.89999997616,
+        "calls": 786,
+        "triangles": 712737,
+        "geometries": 602,
+        "textures": 147,
+        "programs": 345,
+        "dpr": 0.72,
+        "width": 280,
+        "height": 490,
+        "heapBytes": 179866713,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2726,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    }
+  },
+  "registration": {
+    "spec": {
+      "revision": "2026.9-reference-complex.1",
+      "registration": {
+        "pointsPerPixel": 0.3373860182370821,
+        "pixelsPerMeter": 20.2,
+        "unitsPerMeter": 0.14869521967394309,
+        "metersAreEstimates": true,
+        "planToleranceMeters": 1,
+        "heightToleranceMeters": 0.7,
+        "landmarks": [
+          {
+            "identifier": "RUA-BRASILIA",
+            "image": [
+              170,
+              790
+            ],
+            "source": [
+              3988,
+              3494
+            ]
+          },
+          {
+            "identifier": "RUA-URUGUAI-LESTE",
+            "image": [
+              170,
+              790
+            ],
+            "source": [
+              3988,
+              3494
+            ]
+          },
+          {
+            "identifier": "RUA-ARGENTINA-LESTE",
+            "image": [
+              828,
+              790
+            ],
+            "source": [
+              3988,
+              3716
+            ]
+          }
+        ]
+      },
+      "headquarters": {
+        "identifier": "B12",
+        "origin": [
+          15.296534954407292,
+          15.107267276723915
+        ],
+        "sourceOrigin": [
+          4051.091185410334,
+          3667.41641337386
+        ],
+        "yaw": -1.5707963267948966,
+        "front": [
+          -1,
+          0
+        ],
+        "footprint": [
+          [
+            -4.5,
+            -4.85
+          ],
+          [
+            0.7,
+            -4.85
+          ],
+          [
+            0.7,
+            -2.35
+          ],
+          [
+            1.025,
+            -2.35
+          ],
+          [
+            1.025,
+            -6.525
+          ],
+          [
+            4.475,
+            -6.525
+          ],
+          [
+            4.475,
+            -3.2
+          ],
+          [
+            6.275,
+            -3.2
+          ],
+          [
+            6.275,
+            -0.3
+          ],
+          [
+            3.25,
+            -0.3
+          ],
+          [
+            3.25,
+            4.55
+          ],
+          [
+            -2.53,
+            4.55
+          ],
+          [
+            -2.53,
+            6.775
+          ],
+          [
+            -4.24,
+            6.775
+          ],
+          [
+            -4.24,
+            7.6
+          ],
+          [
+            -4.42,
+            7.6
+          ],
+          [
+            -4.42,
+            6.775
+          ],
+          [
+            -4.43,
+            6.775
+          ],
+          [
+            -4.43,
+            4.325
+          ],
+          [
+            -3.25,
+            4.325
+          ],
+          [
+            -3.25,
+            -1.55
+          ],
+          [
+            -4.5,
+            -1.55
+          ]
+        ],
+        "roofProjection": [
+          [
+            -4.554455445544555,
+            -4.801980198019802
+          ],
+          [
+            0.7425742574257426,
+            -4.801980198019802
+          ],
+          [
+            0.7425742574257426,
+            -6.584158415841585
+          ],
+          [
+            4.504950495049505,
+            -6.584158415841585
+          ],
+          [
+            4.504950495049505,
+            -3.613861386138614
+          ],
+          [
+            6.683168316831684,
+            -1.9306930693069309
+          ],
+          [
+            6.683168316831684,
+            0.24752475247524752
+          ],
+          [
+            3.6633663366336635,
+            0.24752475247524752
+          ],
+          [
+            3.6633663366336635,
+            5
+          ],
+          [
+            -0.6930693069306931,
+            5
+          ],
+          [
+            -0.6930693069306931,
+            8.514851485148515
+          ],
+          [
+            -4.554455445544555,
+            8.514851485148515
+          ],
+          [
+            -4.554455445544555,
+            5.594059405940595
+          ],
+          [
+            -3.613861386138614,
+            5.594059405940595
+          ],
+          [
+            -3.613861386138614,
+            2.0792079207920793
+          ],
+          [
+            -4.554455445544555,
+            2.0792079207920793
+          ]
+        ],
+        "site": [
+          [
+            -4.653465346534654,
+            -4.801980198019802
+          ],
+          [
+            0.7425742574257426,
+            -4.801980198019802
+          ],
+          [
+            0.7425742574257426,
+            -6.584158415841585
+          ],
+          [
+            4.504950495049505,
+            -6.584158415841585
+          ],
+          [
+            4.504950495049505,
+            -3.613861386138614
+          ],
+          [
+            6.881188118811881,
+            -1.9306930693069309
+          ],
+          [
+            6.881188118811881,
+            7.871287128712871
+          ],
+          [
+            6.237623762376238,
+            8.96039603960396
+          ],
+          [
+            -5.643564356435644,
+            8.96039603960396
+          ],
+          [
+            -5.643564356435644,
+            7.772277227722773
+          ],
+          [
+            -4.653465346534654,
+            7.772277227722773
+          ],
+          [
+            -4.653465346534654,
+            5.594059405940595
+          ],
+          [
+            -3.613861386138614,
+            5.594059405940595
+          ],
+          [
+            -3.613861386138614,
+            2.0792079207920793
+          ],
+          [
+            -4.653465346534654,
+            2.0792079207920793
+          ]
+        ],
+        "volumes": {
+          "main": {
+            "center": [
+              0,
+              1.1
+            ],
+            "width": 6.5,
+            "depth": 6.9,
+            "eave": 4.6,
+            "ridge": 8.2,
+            "overhang": 0.36,
+            "roofThickness": 0.1,
+            "pitch": 0.7840112017347867
+          },
+          "rearLeft": {
+            "center": [
+              -1.9,
+              -3.2
+            ],
+            "width": 5.2,
+            "depth": 3.3,
+            "eave": 2.85,
+            "ridge": 4.05
+          },
+          "rearRight": {
+            "center": [
+              2.75,
+              -4.2
+            ],
+            "width": 3.45,
+            "depth": 4.65,
+            "eave": 2.85,
+            "ridge": 4.4
+          },
+          "volunteers": {
+            "center": [
+              4.75,
+              -1.75
+            ],
+            "width": 3.05,
+            "depth": 2.9,
+            "eave": 2.7,
+            "ridge": 3.3,
+            "footprint": [
+              [
+                3.225,
+                -3.2
+              ],
+              [
+                6.275,
+                -3.2
+              ],
+              [
+                6.275,
+                -0.3
+              ],
+              [
+                3.225,
+                -0.3
+              ]
+            ]
+          },
+          "frontLeft": {
+            "center": [
+              -3.48,
+              5.95
+            ],
+            "width": 2.04,
+            "depth": 3.25,
+            "eave": 2.5,
+            "ridge": 3.15
+          }
+        },
+        "sidewalk": [
+          [
+            -4.55,
+            4.55
+          ],
+          [
+            6.7,
+            4.55
+          ],
+          [
+            6.7,
+            8.9
+          ],
+          [
+            -5.6,
+            8.9
+          ],
+          [
+            -5.6,
+            7.8
+          ],
+          [
+            -4.55,
+            7.8
+          ]
+        ],
+        "planting": [
+          [
+            [
+              -5.25,
+              7.8
+            ],
+            [
+              -2.7,
+              7.8
+            ],
+            [
+              -2.7,
+              8.55
+            ],
+            [
+              -5.25,
+              8.55
+            ]
+          ],
+          [
+            [
+              4.5,
+              2.5
+            ],
+            [
+              6.5,
+              2.5
+            ],
+            [
+              6.5,
+              8.6
+            ],
+            [
+              4.5,
+              8.6
+            ]
+          ]
+        ],
+        "entrance": [
+          0,
+          4.56
+        ],
+        "entryPoint": [
+          0,
+          5.3
+        ],
+        "monument": {
+          "position": [
+            3.8,
+            5.6
+          ],
+          "yaw": -0.12,
+          "height": 2.86,
+          "planterRadius": 1.18,
+          "pedestalHeight": 0.57
+        },
+        "sign": {
+          "width": 5.95,
+          "height": 1.5,
+          "bottom": 2.6,
+          "depth": 0.28,
+          "bulge": 0.18,
+          "symbolAsset": "/alvorada/fenasoja-symbol-official.png"
+        },
+        "glazing": {
+          "triangleBase": 5.38,
+          "triangleWidth": 4.05,
+          "triangleRise": 2.35,
+          "lowerBottom": 4.12,
+          "lowerHeight": 0.88,
+          "lowerWidth": 4.05
+        }
+      },
+      "stage": {
+        "identifier": "B13",
+        "origin": [
+          15.590980933959662,
+          13.06822885808767
+        ],
+        "sourceOrigin": [
+          4064.586626139818,
+          3573.9604863221884
+        ],
+        "yaw": -1.5707963267948966,
+        "front": [
+          -1,
+          0
+        ],
+        "audienceIdentifiers": [
+          "Q-D-11",
+          "Q-D-12"
+        ],
+        "roofWidth": 17.821782178217823,
+        "roofDepth": 19.10891089108911,
+        "footprint": [
+          [
+            -8.55,
+            -9.2
+          ],
+          [
+            8.55,
+            -9.2
+          ],
+          [
+            8.55,
+            9.2
+          ],
+          [
+            -8.55,
+            9.2
+          ]
+        ],
+        "roofProjection": [
+          [
+            -8.910891089108912,
+            -9.554455445544555
+          ],
+          [
+            8.910891089108912,
+            -9.554455445544555
+          ],
+          [
+            8.910891089108912,
+            9.554455445544555
+          ],
+          [
+            -8.910891089108912,
+            9.554455445544555
+          ]
+        ],
+        "eave": 4.8,
+        "ridge": 6.65,
+        "platformHeight": 0.45,
+        "platformDepth": 6.1,
+        "overhang": 0.36,
+        "roofPitch": 0.20470310977031053
+      },
+      "stageToHeadquartersRoofGapMeters": 0.24752475247524752,
+      "assumptions": [
+        "The roof edges nearly touch at the rear-left connection; walls remain separate under their overhangs.",
+        "Unseen rear openings are restrained; no invented door signage or plaque inscription.",
+        "Front-left low roof and rear hipped volumes follow plan evidence; their unseen drainage junctions are inferred.",
+        "Monument ground point follows the yellow marker with about 0.5 m allowance for roof parallax."
+      ]
+    },
+    "orientation": {
+      "status": "APPLIED_REFERENCE_REGISTRATION",
+      "localFrontAxis": [
+        0,
+        0,
+        1
+      ],
+      "upAxis": "Y",
+      "parentTransform": "translation-only",
+      "center": [
+        15.590980933959662,
+        13.06822885808767
+      ],
+      "lots": [
+        {
+          "id": "reference:2026:q-d-11",
+          "publicIdentifier": "Q-D-11",
+          "center": [
+            11.943636363636372,
+            14.945454620481929
+          ]
+        },
+        {
+          "id": "reference:2026:q-d-12",
+          "publicIdentifier": "Q-D-12",
+          "center": [
+            11.943636363636372,
+            12.545454608433737
+          ]
+        }
+      ],
+      "midpoint": [
+        11.943636363636372,
+        13.745454614457833
+      ],
+      "yaw": -1.5707963267948966,
+      "expectedYaw": -1.5707963267948966,
+      "angleToAudienceMidpoint": -1.387210637531397,
+      "degrees": -90,
+      "referenceRevision": "2026.9-reference-complex.1",
+      "frontVector": [
+        -1,
+        6.123233995736766e-17
+      ],
+      "planScale": 1,
+      "reductionPercent": 0,
+      "footprint": [
+        [
+          17.023682785299812,
+          11.737221950102038
+        ],
+        [
+          17.023682785299812,
+          14.399235766073302
+        ],
+        [
+          14.158279082619512,
+          14.399235766073302
+        ],
+        [
+          14.158279082619512,
+          11.737221950102038
+        ]
+      ],
+      "heightPreserved": false,
+      "collisions": []
+    },
+    "meshes": [
+      {
+        "name": "sede-fenasoja-reference-reconstruction",
+        "worldBounds": {
+          "isBox3": true,
+          "min": {
+            "x": 13.961251949802552,
+            "y": -0.010408665421490645,
+            "z": 14.267139271385455
+          },
+          "max": {
+            "x": 16.300971180321596,
+            "y": 1.243835478538899,
+            "z": 16.104714837523634
+          }
+        },
+        "worldMatrix": [
+          3.3016971306741435e-17,
+          0,
+          0.14869521967394309,
+          0,
+          0,
+          0.14869521967394309,
+          0,
+          0,
+          -0.14869521967394309,
+          0,
+          3.3016971306741435e-17,
+          0,
+          15.296534954407292,
+          0,
+          15.107267276723915,
+          1
+        ],
+        "userData": {
+          "entityBounds": [
+            2.3114009394860453,
+            1.8623708206686942
+          ],
+          "contactBake": {
+            "durationMs": 607.1000000238419,
+            "samples": 16167,
+            "rays": 8,
+            "maxDistanceMeters": 0.85
+          },
+          "resources": {
+            "materialCount": 24,
+            "geometryBatches": 33,
+            "instancedBatches": 3,
+            "instanceCapacity": 2652,
+            "geometryBufferBytes": 4189038,
+            "textureCount": 15,
+            "estimatedTextureBytes": 17476266.666666664,
+            "transparentBatches": 1
+          },
+          "renderCount": 1,
+          "lod": 0
+        },
+        "surfaces": [
+          {
+            "name": "B12:wall",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.619971676529488,
+                "y": -0.0005947809069463481,
+                "z": 14.438138788191171
+              },
+              "max": {
+                "x": 16.26677127696045,
+                "y": 1.2201419709736092,
+                "z": 16.040329794358588
+              }
+            },
+            "triangles": 425
+          },
+          {
+            "name": "B12:warmInterior",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.642275973661262,
+                "y": 7.090340704425551e-9,
+                "z": 14.806902935818686
+              },
+              "max": {
+                "x": 15.066800846392356,
+                "y": 0.38660755697157084,
+                "z": 15.407631617629145
+              }
+            },
+            "triangles": 36
+          },
+          {
+            "name": "B12:concrete",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 13.971957938686261,
+                "y": -0.0011895618138926963,
+                "z": 14.273384514288258
+              },
+              "max": {
+                "x": 15.601360147648535,
+                "y": 0.0223042816216526,
+                "z": 16.104714837523634
+              }
+            },
+            "triangles": 1842
+          },
+          {
+            "name": "B12:soffit",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.569415350054664,
+                "y": 0.0014869550716509704,
+                "z": 14.55538795734083
+              },
+              "max": {
+                "x": 15.696525103838608,
+                "y": 1.210610000686245,
+                "z": 15.659146596107
+              }
+            },
+            "triangles": 2902
+          },
+          {
+            "name": "B12:wood",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.179387767295276,
+                "y": 0.013382569194564703,
+                "z": 14.522502886740323
+              },
+              "max": {
+                "x": 15.051187845490457,
+                "y": 0.37950051862068945,
+                "z": 15.98867864839191
+              }
+            },
+            "triangles": 4812
+          },
+          {
+            "name": "B12:trim",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 13.961251949802552,
+                "y": -0.010408665421490645,
+                "z": 14.267139271385455
+              },
+              "max": {
+                "x": 16.300971180321596,
+                "y": 1.2236369416615553,
+                "z": 16.088655712391258
+              }
+            },
+            "triangles": 3536
+          },
+          {
+            "name": "B12:wood",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 15.040184399092778,
+                "y": 0.18809945076043583,
+                "z": 14.888685299549014
+              },
+              "max": {
+                "x": 15.042860914039556,
+                "y": 0.31449039102845777,
+                "z": 15.168232316258456
+              }
+            },
+            "triangles": 648
+          },
+          {
+            "name": "B12:soffit",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.562724053824791,
+                "y": 0.19330377848578542,
+                "z": 14.573369663778266
+              },
+              "max": {
+                "x": 15.039812652535185,
+                "y": 1.1941496331793855,
+                "z": 15.641164889669565
+              }
+            },
+            "triangles": 2016
+          },
+          {
+            "name": "B12:interior",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 15.038400061703543,
+                "y": 0.19925159932632217,
+                "z": 14.90504177584025
+              },
+              "max": {
+                "x": 15.03899483492467,
+                "y": 0.29590348856921483,
+                "z": 15.151875844398683
+              }
+            },
+            "triangles": 72
+          },
+          {
+            "name": "B12:metal",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.655010579893684,
+                "y": 0.1394981527618362,
+                "z": 14.968683334753033
+              },
+              "max": {
+                "x": 14.773425188327565,
+                "y": 0.36318809107042344,
+                "z": 15.245851218694797
+              }
+            },
+            "triangles": 912
+          },
+          {
+            "name": "B12:warmInterior",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.751715664416919,
+                "y": 0.3605859006189714,
+                "z": 14.971359849699812
+              },
+              "max": {
+                "x": 14.770748655654934,
+                "y": 0.3605859006189714,
+                "z": 15.243174703748018
+              }
+            },
+            "triangles": 32
+          },
+          {
+            "name": "B12:glass",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.628893452104922,
+                "y": 0.008921707441692163,
+                "z": 14.8061594427035
+              },
+              "max": {
+                "x": 15.772359664454251,
+                "y": 1.1494140509157162,
+                "z": 15.98828648165339
+              }
+            },
+            "triangles": 63
+          },
+          {
+            "name": "B12:interior",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.65974770735113,
+                "y": 0.6051895695981745,
+                "z": 14.8061594427035
+              },
+              "max": {
+                "x": 14.738927880630005,
+                "y": 1.1494140509157162,
+                "z": 15.40837511074433
+              }
+            },
+            "triangles": 15
+          },
+          {
+            "name": "B12:frame",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.597221326070647,
+                "y": -0.0007434725504297517,
+                "z": 14.796494280367988
+              },
+              "max": {
+                "x": 14.642127289218905,
+                "y": 1.1537358262208852,
+                "z": 15.418040273079843
+              }
+            },
+            "triangles": 2340
+          },
+          {
+            "name": "B12:contact",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.667554172350377,
+                "y": 0.8579714146825154,
+                "z": 14.978645910287886
+              },
+              "max": {
+                "x": 14.676475877022405,
+                "y": 0.9620580400929132,
+                "z": 15.235888643159944
+              }
+            },
+            "triangles": 12
+          },
+          {
+            "name": "B12:graphics",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.63082642075896,
+                "y": 0.6159699361547643,
+                "z": 14.81247901010163
+              },
+              "max": {
+                "x": 14.63082642075896,
+                "y": 0.7401304502547792,
+                "z": 15.4020555433462
+              }
+            },
+            "triangles": 8
+          },
+          {
+            "name": "B12:roof",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.121079500540409,
+                "y": 0.35998573873898837,
+                "z": 14.405736569785441
+              },
+              "max": {
+                "x": 16.30022768720641,
+                "y": 1.243835478538899,
+                "z": 16.073670348439162
+              }
+            },
+            "triangles": 666
+          },
+          {
+            "name": "B12:roof",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.546346856013155,
+                "y": 0.6885900554082512,
+                "z": 14.561343240764847
+              },
+              "max": {
+                "x": 15.69949900539595,
+                "y": 1.22894292714524,
+                "z": 15.65874896980622
+              }
+            },
+            "triangles": 19112
+          },
+          {
+            "name": "B12:sideWall",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.166451299066006,
+                "y": -2.8361361761159123e-9,
+                "z": 14.448547479093573
+              },
+              "max": {
+                "x": 14.653428157678851,
+                "y": 0.36579024607017246,
+                "z": 14.731068375203044
+              }
+            },
+            "triangles": 24
+          },
+          {
+            "name": "B12:entry",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.63617948610422,
+                "y": 0.02973903994647203,
+                "z": 14.8529984454092
+              },
+              "max": {
+                "x": 14.63617948610422,
+                "y": 0.3568685413981446,
+                "z": 15.36153610803863
+              }
+            },
+            "triangles": 4
+          },
+          {
+            "name": "B12:frame",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.670899820465312,
+                "y": 0.0052043277253495885,
+                "z": 15.007269739366086
+              },
+              "max": {
+                "x": 14.682051933579496,
+                "y": 0.36653373918535964,
+                "z": 15.207264814081745
+              }
+            },
+            "triangles": 216
+          },
+          {
+            "name": "B12:metal",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.08675069478718,
+                "y": -7.090340704425551e-9,
+                "z": 14.351003394567286
+              },
+              "max": {
+                "x": 14.71364968194089,
+                "y": 0.9211669114053036,
+                "z": 15.46302057844928
+              }
+            },
+            "triangles": 1948
+          },
+          {
+            "name": "B12:sign",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.537594539578032,
+                "y": 0.38749973452911424,
+                "z": 14.665791154480456
+              },
+              "max": {
+                "x": 14.564251809513609,
+                "y": 0.608758208924942,
+                "z": 15.548743398967375
+              }
+            },
+            "triangles": 96
+          },
+          {
+            "name": "B12:joint",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 13.985043162261293,
+                "y": 0.01339743896823919,
+                "z": 14.362750316354301
+              },
+              "max": {
+                "x": 14.830029220816112,
+                "y": 0.013516394941903638,
+                "z": 16.033867587033463
+              }
+            },
+            "triangles": 636
+          },
+          {
+            "name": "B12:concrete",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.14959926114447,
+                "y": 0.013382570302430423,
+                "z": 15.358124874273155
+              },
+              "max": {
+                "x": 14.778083081228818,
+                "y": 0.015166912123128571,
+                "z": 15.980836164462419
+              }
+            },
+            "triangles": 4968
+          },
+          {
+            "name": "B12:soil",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.017756008488657,
+                "y": 0.010408665421490645,
+                "z": 14.326617373435713
+              },
+              "max": {
+                "x": 14.924796905222435,
+                "y": 0.11211619683951099,
+                "z": 16.073786204604545
+              }
+            },
+            "triangles": 696
+          },
+          {
+            "name": "B12:foliage",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 13.976507526634869,
+                "y": 0.031225995156606217,
+                "z": 14.277726071643698
+              },
+              "max": {
+                "x": 14.96431261418899,
+                "y": 0.48490892532551017,
+                "z": 16.07913813549531
+              }
+            },
+            "triangles": 25536
+          },
+          {
+            "name": "B12:foliage",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.399761083570754,
+                "y": 0.30274694350833686,
+                "z": 15.715075025491592
+              },
+              "max": {
+                "x": 14.928997896575504,
+                "y": 0.48499815726194573,
+                "z": 16.068688816941275
+              }
+            },
+            "triangles": 15456
+          },
+          {
+            "name": "B12:wood",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.542502189726878,
+                "y": 0.02955796151050516,
+                "z": 15.874505588059323
+              },
+              "max": {
+                "x": 14.557211526719465,
+                "y": 0.42407472473233077,
+                "z": 15.95039088006195
+              }
+            },
+            "triangles": 1176
+          },
+          {
+            "name": "B12:pot",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.146228725934032,
+                "y": 0.014869522188967452,
+                "z": 14.489289923338827
+              },
+              "max": {
+                "x": 14.595585655397917,
+                "y": 0.10706056241944338,
+                "z": 15.47246274957296
+              }
+            },
+            "triangles": 2016
+          },
+          {
+            "name": "B12:pedestal",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.285407432263117,
+                "y": 0.014869522188967452,
+                "z": 15.493874833695486
+              },
+              "max": {
+                "x": 14.642275973661262,
+                "y": 0.15092564584195006,
+                "z": 15.85074337509363
+              }
+            },
+            "triangles": 1740
+          },
+          {
+            "name": "B12:bronze",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.401048902133708,
+                "y": 0.09628015154822488,
+                "z": 15.521207529476502
+              },
+              "max": {
+                "x": 14.501958345921796,
+                "y": 0.42738222681484556,
+                "z": 15.824497983043438
+              }
+            },
+            "triangles": 10700
+          },
+          {
+            "name": "B12:bronze",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.399804263745,
+                "y": 0.09962579966316108,
+                "z": 15.643378777618125
+              },
+              "max": {
+                "x": 14.405645002716644,
+                "y": 0.12936484182536453,
+                "z": 15.686500527458108
+              }
+            },
+            "triangles": 1760
+          },
+          {
+            "name": "",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.02035851523577,
+                "y": 0.01933037895644426,
+                "z": 14.352607135492049
+              },
+              "max": {
+                "x": 14.907324614415352,
+                "y": 0.29650619033943404,
+                "z": 16.04839571072448
+              }
+            },
+            "triangles": 24
+          },
+          {
+            "name": "",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.08651789791413,
+                "y": 0.05769672460966498,
+                "z": 14.358806240975772
+              },
+              "max": {
+                "x": 14.609498613177962,
+                "y": 0.09907544278552548,
+                "z": 16.00904636012918
+              }
+            },
+            "triangles": 24
+          },
+          {
+            "name": "",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.021092347266215,
+                "y": 0.05769672460966498,
+                "z": 14.358722433149895
+              },
+              "max": {
+                "x": 14.633657021421751,
+                "y": 0.09911513470781179,
+                "z": 16.01674909344547
+              }
+            },
+            "triangles": 24
+          }
+        ]
+      },
+      {
+        "name": "palco-cultural-lactalis-architecture",
+        "worldBounds": {
+          "isBox3": true,
+          "min": {
+            "x": 14.164331221933542,
+            "y": 0,
+            "z": 11.741710584291715
+          },
+          "max": {
+            "x": 17.01302103882569,
+            "y": 0.988823218909414,
+            "z": 14.394747131883625
+          }
+        },
+        "worldMatrix": [
+          2.220446049250313e-16,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          -1,
+          0,
+          2.220446049250313e-16,
+          0,
+          15.590980933959662,
+          0,
+          13.06822885808767,
+          1
+        ],
+        "userData": {},
+        "surfaces": [
+          {
+            "name": "",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.164331221933542,
+                "y": 0,
+                "z": 11.781494515512597
+              },
+              "max": {
+                "x": 16.958152459914864,
+                "y": 0.017843427136540413,
+                "z": 14.354963200662743
+              }
+            },
+            "triangles": 12
+          },
+          {
+            "name": "",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.181820294101788,
+                "y": 0.014274746179580688,
+                "z": 11.79675223169149
+              },
+              "max": {
+                "x": 16.958152489717186,
+                "y": 0.9708232134580612,
+                "z": 14.339705484483849
+              }
+            },
+            "triangles": 12
+          },
+          {
+            "name": "",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.170279072578131,
+                "y": 0.6991779622621834,
+                "z": 11.741710584291715
+              },
+              "max": {
+                "x": 17.011682795341194,
+                "y": 0.9888231935910881,
+                "z": 14.394747131883625
+              }
+            },
+            "triangles": 12
+          },
+          {
+            "name": "",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.168940829093634,
+                "y": 0,
+                "z": 11.765425158229183
+              },
+              "max": {
+                "x": 17.01302103882569,
+                "y": 0.9842459000647068,
+                "z": 14.371032557946156
+              }
+            },
+            "triangles": 12
+          },
+          {
+            "name": "",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 15.700354652459799,
+                "y": 0.017843425273895264,
+                "z": 12.025617974374901
+              },
+              "max": {
+                "x": 16.575344460065544,
+                "y": 0.0847562775015831,
+                "z": 14.110839741800438
+              }
+            },
+            "triangles": 12
+          },
+          {
+            "name": "",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.185820341918703,
+                "y": 0.7137370544349267,
+                "z": 11.79675223169149
+              },
+              "max": {
+                "x": 14.197715959388848,
+                "y": 0.988823218909414,
+                "z": 14.339705484483849
+              }
+            },
+            "triangles": 8
+          },
+          {
+            "name": "",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 16.95220469748212,
+                "y": 0.7137370544349267,
+                "z": 11.79675223169149
+              },
+              "max": {
+                "x": 16.964100314952265,
+                "y": 0.988823218909414,
+                "z": 14.339705484483849
+              }
+            },
+            "triangles": 8
+          },
+          {
+            "name": "",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 16.926263872364302,
+                "y": 0.1356100403426361,
+                "z": 12.0256180223872
+              },
+              "max": {
+                "x": 16.939995819956458,
+                "y": 0.5495775319148936,
+                "z": 14.11083969378814
+              }
+            },
+            "triangles": 12
+          },
+          {
+            "name": "palco-cultural-lactalis-signage",
+            "worldBounds": {
+              "isBox3": true,
+              "min": {
+                "x": 14.170861552915174,
+                "y": 0.5804546095606521,
+                "z": 12.737644934572886
+              },
+              "max": {
+                "x": 14.170861552915174,
+                "y": 0.8559412124896381,
+                "z": 13.398812781602453
+              }
+            },
+            "triangles": 2
+          }
+        ]
+      }
+    ]
+  },
+  "warmup": {
+    "frontage": {
+      "elapsedMs": 16540,
+      "sample": {
+        "headquarters": {
+          "entityBounds": [
+            2.3114009394860453,
+            1.8623708206686942
+          ],
+          "contactBake": {
+            "durationMs": 607.1000000238419,
+            "samples": 16167,
+            "rays": 8,
+            "maxDistanceMeters": 0.85
+          },
+          "resources": {
+            "materialCount": 24,
+            "geometryBatches": 33,
+            "instancedBatches": 3,
+            "instanceCapacity": 2652,
+            "geometryBufferBytes": 4189038,
+            "textureCount": 15,
+            "estimatedTextureBytes": 17476266.666666664,
+            "transparentBatches": 1
+          },
+          "renderCount": 3,
+          "lod": 2,
+          "rendersDuringMeasure": 1
+        },
+        "frames": 19,
+        "meanMs": 355.23157894925066,
+        "p95Ms": 6456.800000011921,
+        "renderer": {
+          "at": 39573.89999997616,
+          "calls": 116,
+          "triangles": 668670,
+          "geometries": 590,
+          "textures": 146,
+          "programs": 302,
+          "dpr": 0.72,
+          "width": 280,
+          "height": 490,
+          "heapBytes": 203064859,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 61,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "visible": "visible",
+        "focused": true
+      }
+    },
+    "stageFront": {
+      "elapsedMs": 6824,
+      "sample": {
+        "headquarters": {
+          "entityBounds": [
+            2.3114009394860453,
+            1.8623708206686942
+          ],
+          "contactBake": {
+            "durationMs": 607.1000000238419,
+            "samples": 16167,
+            "rays": 8,
+            "maxDistanceMeters": 0.85
+          },
+          "resources": {
+            "materialCount": 24,
+            "geometryBatches": 33,
+            "instancedBatches": 3,
+            "instanceCapacity": 2652,
+            "geometryBufferBytes": 4189038,
+            "textureCount": 15,
+            "estimatedTextureBytes": 17476266.666666664,
+            "transparentBatches": 1
+          },
+          "renderCount": 3,
+          "lod": 2,
+          "rendersDuringMeasure": 0
+        },
+        "frames": 349,
+        "meanMs": 17.238968481307044,
+        "p95Ms": 16.80000001192093,
+        "renderer": {
+          "at": 46723,
+          "calls": 115,
+          "triangles": 585675,
+          "geometries": 592,
+          "textures": 147,
+          "programs": 317,
+          "dpr": 0.72,
+          "width": 280,
+          "height": 490,
+          "heapBytes": 192869317,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 444,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "visible": "visible",
+        "focused": true
+      }
+    },
+    "beforeView6": {
+      "elapsedMs": 6817,
+      "sample": {
+        "headquarters": {
+          "entityBounds": [
+            2.3114009394860453,
+            1.8623708206686942
+          ],
+          "contactBake": {
+            "durationMs": 607.1000000238419,
+            "samples": 16167,
+            "rays": 8,
+            "maxDistanceMeters": 0.85
+          },
+          "resources": {
+            "materialCount": 24,
+            "geometryBatches": 33,
+            "instancedBatches": 3,
+            "instanceCapacity": 2652,
+            "geometryBufferBytes": 4189038,
+            "textureCount": 15,
+            "estimatedTextureBytes": 17476266.666666664,
+            "transparentBatches": 1
+          },
+          "renderCount": 3,
+          "lod": 2,
+          "rendersDuringMeasure": 0
+        },
+        "frames": 361,
+        "meanMs": 16.666204986149584,
+        "p95Ms": 16.80000001192093,
+        "renderer": {
+          "at": 53572.59999996424,
+          "calls": 115,
+          "triangles": 639150,
+          "geometries": 594,
+          "textures": 147,
+          "programs": 319,
+          "dpr": 0.72,
+          "width": 280,
+          "height": 490,
+          "heapBytes": 164061674,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 820,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "visible": "visible",
+        "focused": true
+      }
+    },
+    "maximum": {
+      "elapsedMs": 6822,
+      "sample": {
+        "headquarters": {
+          "entityBounds": [
+            2.3114009394860453,
+            1.8623708206686942
+          ],
+          "contactBake": {
+            "durationMs": 607.1000000238419,
+            "samples": 16167,
+            "rays": 8,
+            "maxDistanceMeters": 0.85
+          },
+          "resources": {
+            "materialCount": 24,
+            "geometryBatches": 33,
+            "instancedBatches": 3,
+            "instanceCapacity": 2652,
+            "geometryBufferBytes": 4189038,
+            "textureCount": 15,
+            "estimatedTextureBytes": 17476266.666666664,
+            "transparentBatches": 1
+          },
+          "renderCount": 4,
+          "lod": 0,
+          "rendersDuringMeasure": 1
+        },
+        "frames": 256,
+        "meanMs": 26.133593749953434,
+        "p95Ms": 17.100000023841858,
+        "renderer": {
+          "at": 60413.19999998808,
+          "calls": 786,
+          "triangles": 712737,
+          "geometries": 602,
+          "textures": 147,
+          "programs": 341,
+          "dpr": 0.72,
+          "width": 280,
+          "height": 490,
+          "heapBytes": 173073845,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1110,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "visible": "visible",
+        "focused": true
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sede Fenasoja — comparação no aplicativo</title>
+<style>
+  *{box-sizing:border-box}body{margin:0;background:#14231e;color:#f3f2e8;font:16px/1.55 system-ui,sans-serif}
+  main{max-width:1440px;margin:auto;padding:28px}h1{font-size:clamp(25px,4vw,42px);line-height:1.15;margin:0 0 12px}
+  p{max-width:900px;color:#c4d0c5;margin:0 0 20px}a{color:#e8d99b}label{display:block;margin:12px 0 6px}
+  select{font:inherit;color:inherit;background:#263a30;border:1px solid #637366;border-radius:6px;padding:9px 14px;width:min(100%,480px)}
+  .comparison{position:relative;isolation:isolate;margin-top:22px;background:#101714;aspect-ratio:1440/1000;overflow:hidden;border:1px solid #637366}
+  .comparison img{display:block;position:absolute;width:100%;height:100%;object-fit:contain}.new{clip-path:inset(0 0 0 var(--split))}
+  .divider{position:absolute;left:var(--split);inset-block:0;width:2px;background:#fff;box-shadow:0 0 5px #000}
+  .caption{position:absolute;bottom:14px;padding:5px 10px;background:#102219e6;border-radius:4px;font-weight:600}.oldLabel{left:14px}.newLabel{right:14px}
+  input[type=range]{width:100%;accent-color:#e0c978;cursor:ew-resize}small{display:block;color:#bdcbbf}footer{margin-top:24px;border-top:1px solid #455c4a;padding-top:16px}
+  @media(max-width:600px){main{padding:16px}.caption{font-size:11px;padding:3px 6px;bottom:7px}.oldLabel{left:7px}.newLabel{right:7px}}
+</style>
+<main>
+  <h1>Sede Fenasoja</h1>
+  <p>Primeiro passe e refinamento arquitetônico, capturados no Commercial Map pela mesma câmera. O comparador usa somente imagens do aplicativo WebGL em execução.</p>
+  <label for="view">Câmera de inspeção</label>
+  <select id="view">
+    <option value="referenceFront">C — Fachada frontal</option>
+    <option value="monument">H — Monumento e entrada</option>
+    <option value="beforeView6">D/E — Três quartos à esquerda</option>
+    <option value="rightRoom">F — Sala e lateral direita</option>
+    <option value="roof">G — Cobertura e junções</option>
+    <option value="attachment1">A — Registro aéreo 1</option>
+    <option value="attachment2">B — Registro aéreo 2</option>
+    <option value="frontage">I — Distância de navegação</option>
+    <option value="rear">Traseira</option>
+  </select>
+  <div class="comparison" style="--split:50%">
+    <img id="before" src="screenshots/fenasoja-hero/before-referenceFront.png" alt="Sede antes do refinamento">
+    <img id="after" class="new" src="screenshots/fenasoja-hero/after-referenceFront.png" alt="Sede após o refinamento">
+    <div class="divider"></div>
+    <span class="caption oldLabel">Primeiro passe · 0a2c6a78</span>
+    <span class="caption newLabel">Refinamento final</span>
+  </div>
+  <label for="split">Divisão entre antes e depois</label>
+  <input id="split" type="range" min="0" max="100" value="50" aria-label="Posição da divisão antes e depois">
+  <small>Arraste o controle ou use as setas do teclado. À esquerda, primeiro passe; à direita, versão final.</small>
+  <footer><p>Medidas derivadas das fotografias, sem levantamento cadastral. Materiais, geometria, LOD, testes e limitações estão no <a href="fenasoja-headquarters-hero.md">relatório técnico</a>. A imagem conceitual gerada não faz parte destas capturas.</p></footer>
+</main>
+<script>
+  const view=document.getElementById('view'),split=document.getElementById('split'),comparison=document.querySelector('.comparison');
+  split.addEventListener('input',()=>comparison.style.setProperty('--split',split.value+'%'));
+  view.addEventListener('change',()=>{
+    for(const phase of ['before','after'])document.getElementById(phase).src='screenshots/fenasoja-hero/'+phase+'-'+view.value+'.png';
+  });
+</script>
+</html>

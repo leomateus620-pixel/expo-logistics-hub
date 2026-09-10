@@ -1,9 +1,10 @@
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
 const fs = require("node:fs");
 const path = require("node:path");
-const out = "docs/screenshots/fenasoja-complex";
+const out = process.env.QA_OUTPUT || "docs/screenshots/fenasoja-complex";
 const phase = process.argv[2] || "after";
 const mobile = process.argv.includes("--mobile");
+const nightOnly = process.argv.includes("--night-only");
 const poses = {
   attachment1: {
     target: [15.8, 0, 14],
@@ -70,14 +71,17 @@ let browser;
     browser: browser.version(),
     errors,
     poses,
+    nightOnly,
     measurements: {},
   };
   if (phase !== "before") {
     report.registration = await page.evaluate(async () => {
-      const s =
-        await import("/src/features/commercial-map/data/fenasojaComplexReconstruction.ts");
-      const l =
-        await import("/src/features/commercial-map/utils/lactalisOrientationProposal.ts");
+      const s = await import(
+        "/src/features/commercial-map/data/fenasojaComplexReconstruction.ts"
+      );
+      const l = await import(
+        "/src/features/commercial-map/utils/lactalisOrientationProposal.ts"
+      );
       window.dispatchEvent(
         new CustomEvent("territory-qa", { detail: { inspectComplex: true } }),
       );
@@ -91,7 +95,19 @@ let browser;
       };
     });
   }
-  for (const [name, pose] of Object.entries(poses)) {
+  if (nightOnly) {
+    await page.evaluate(async () =>
+      (
+        await import(
+          "/src/features/commercial-map/state/useCommercialMapStore.ts"
+        )
+      ).useCommercialMapStore
+        .getState()
+        .setNightModeActive(true),
+    );
+    await page.waitForTimeout(2200);
+  }
+  for (const [name, pose] of nightOnly ? [] : Object.entries(poses)) {
     await page.evaluate(
       (p) =>
         window.dispatchEvent(new CustomEvent("territory-qa", { detail: p })),
@@ -101,6 +117,24 @@ let browser;
     await page.screenshot({
       path: path.join(out, `${phase}-${mobile ? "mobile-" : ""}${name}.png`),
     });
+  }
+  // Night-only runs have not visited the daytime camera sequence. Warm every
+  // direct-path shader/LOD variant before timing; otherwise first compilation
+  // can consume the whole six-second sample. Keep warmup evidence separately.
+  if (nightOnly && !process.argv.includes("--quick")) {
+    report.warmup = {};
+    for (const name of ["frontage", "stageFront", "beforeView6", "maximum"]) {
+      const started = Date.now();
+      await page.evaluate((p) => {
+        delete document.querySelector("canvas").dataset.territoryReport;
+        window.dispatchEvent(new CustomEvent("territory-qa", { detail: { ...p, measure: true } }));
+      }, poses[name]);
+      await page.waitForFunction(() => document.querySelector("canvas")?.dataset.territoryReport, null, { timeout: 60000 });
+      report.warmup[name] = {
+        elapsedMs: Date.now() - started,
+        sample: await page.locator("canvas").evaluate((c) => JSON.parse(c.dataset.territoryReport)),
+      };
+    }
   }
   for (const name of process.argv.includes("--quick")
     ? []
@@ -120,15 +154,52 @@ let browser;
       .locator("canvas")
       .evaluate((c) => JSON.parse(c.dataset.territoryReport));
   }
-  if (phase === "after") {
+  if (!nightOnly && (phase === "after" || phase.startsWith("preview"))) {
+    report.rested = {};
+    for (const name of ["referenceFront", "monument", "beforeView6"]) {
+      await page.evaluate(async (p) => {
+        window.dispatchEvent(new CustomEvent("territory-qa", { detail: p }));
+        const s = (
+          await import(
+            "/src/features/commercial-map/state/useCommercialMapStore.ts"
+          )
+        ).useCommercialMapStore;
+        s.getState().setCameraNavigating(false);
+      }, poses[name]);
+      await page.waitForTimeout(2200);
+      await page.evaluate(() =>
+        window.dispatchEvent(
+          new CustomEvent("territory-qa", { detail: { inspectComplex: true } }),
+        ),
+      );
+      report.rested[name] = await page.locator("canvas").evaluate((c) => ({
+        health: JSON.parse(c.dataset.commercialMapRenderHealth || "{}"),
+        meshes: JSON.parse(c.dataset.fenasojaComplexInspection || "[]"),
+      }));
+      await page.screenshot({
+        path: path.join(
+          out,
+          `${phase}-${mobile ? "mobile-" : ""}rested-${name}.png`,
+        ),
+      });
+    }
+  }
+  if (phase === "after" || nightOnly) {
     await page.evaluate(async () =>
       (
-        await import("/src/features/commercial-map/state/useCommercialMapStore.ts")
+        await import(
+          "/src/features/commercial-map/state/useCommercialMapStore.ts"
+        )
       ).useCommercialMapStore
         .getState()
         .setNightModeActive(true),
     );
-    for (const name of ["frontage", "stageFront"]) {
+    for (const name of [
+      "frontage",
+      "stageFront",
+      "referenceFront",
+      "monument",
+    ]) {
       await page.evaluate(
         (p) =>
           window.dispatchEvent(new CustomEvent("territory-qa", { detail: p })),
@@ -149,7 +220,10 @@ let browser;
     }
   }
   fs.writeFileSync(
-    path.join(out, `${phase}-${mobile ? "mobile" : "desktop"}.json`),
+    path.join(
+      out,
+      `${phase}-${mobile ? "mobile" : "desktop"}${nightOnly ? "-night" : ""}.json`,
+    ),
     JSON.stringify(report, null, 2),
   );
   console.log(
@@ -171,6 +245,17 @@ let browser;
     }),
   );
   await browser.close();
+  if (
+    errors.length ||
+    Object.values(report.measurements).some(
+      (v) =>
+        v.frames < 60 || !Number.isFinite(v.meanMs) || !Number.isFinite(v.p95Ms) ||
+        v.health.status !== "ready" ||
+        v.health.contextLosses !== 0 ||
+        v.health.lastErrorCode !== null,
+    )
+  )
+    process.exitCode = 1;
 })().catch(async (e) => {
   console.error(e);
   await browser?.close();

@@ -13,7 +13,8 @@ const fs = require("node:fs");
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto(
     (process.env.QA_URL || "http://127.0.0.1:4194") +
-      "/__dev/commercial-map-rendering",{waitUntil:"domcontentloaded",timeout:120000},
+      "/__dev/commercial-map-rendering",
+    { waitUntil: "domcontentloaded", timeout: 120000 },
   );
   await page.waitForFunction(
     () => document.querySelector("canvas")?.dataset.territoryQa === "ready",
@@ -37,7 +38,7 @@ const fs = require("node:fs");
     await page.getByTestId("commercial-map-stress-json").textContent(),
   );
   fs.writeFileSync(
-    "docs/screenshots/fenasoja-complex/stress.json",
+    `${process.env.QA_OUTPUT || "docs/screenshots/fenasoja-complex"}/stress.json`,
     JSON.stringify({ errors, ...report }, null, 2),
   );
   console.log(

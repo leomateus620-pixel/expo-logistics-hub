@@ -12,6 +12,13 @@ import {
 } from '../../utils/electricalInfrastructure';
 import { buildNightLampFixtures, NIGHT_LIGHTING_CONFIG } from '../../utils/nightLighting';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
+import {
+  headquartersNightReceiver,
+  headquartersReceiverFixtures,
+  HEADQUARTERS_NIGHT_MASK_POINTS,
+  HEADQUARTERS_NIGHT_WALLS,
+  HEADQUARTERS_POOL_MASK_SHADER,
+} from './headquarters/nightReceiver';
 
 const NO_RAYCAST = () => undefined;
 const REVEAL_EPSILON = 0.002;
@@ -28,14 +35,20 @@ const POOL_VERTEX_SHADER = /* glsl */ `
   attribute vec4 aLamp;
   varying vec2 vLocal;
   varying vec4 vLamp;
+  varying vec2 vPoolWorld;
+  varying vec3 vPoolPosition;
   void main() {
     vLocal = position.xz;
     vLamp = aLamp;
-    gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position, 1.0);
+    vec4 worldPosition=modelMatrix * instanceMatrix * vec4(position, 1.0);
+    vPoolWorld=worldPosition.xz;
+    vPoolPosition=worldPosition.xyz;
+    gl_Position = projectionMatrix * viewMatrix * worldPosition;
   }
 `;
 
 const POOL_FRAGMENT_SHADER = /* glsl */ `
+  ${HEADQUARTERS_POOL_MASK_SHADER}
   uniform float uReveal;
   uniform float uGain;
   uniform vec3 uCool;
@@ -43,6 +56,13 @@ const POOL_FRAGMENT_SHADER = /* glsl */ `
   varying vec2 vLocal;
   varying vec4 vLamp;
   void main() {
+    // Project the mask to the receiver plane, not the elevated park pool.
+    // This avoids a camera-dependent cut line across the frontage.
+    vec3 viewRay=vPoolPosition-cameraPosition;
+    float groundT=(uHqGround-cameraPosition.y)/min(-0.00001,viewRay.y);
+    vec2 receiverPoint=(cameraPosition+viewRay*groundT).xz;
+    bool inHq=inHeadquarters(receiverPoint);
+    if(uHqOnly>0.5 ? !inHq : (inHq || crossesHeadquartersWall(vPoolWorld,receiverPoint)))discard;
     // Local +X points away from the pole: stretch the pool along the throw.
     vec2 p = vec2(vLocal.x * 0.86, vLocal.y);
     float d2 = dot(p, p);
@@ -106,7 +126,10 @@ function createLampAttribute(values: Float32Array) {
 function createPoolMaterial(
   name: string,
   gain: number,
-  blend: { blendSrc: THREE.BlendingSrcFactor; blendDst: THREE.BlendingDstFactor },
+  blend: {
+    blendSrc: THREE.BlendingSrcFactor;
+    blendDst: THREE.BlendingDstFactor;
+  },
 ) {
   const config = NIGHT_LIGHTING_CONFIG;
   return new THREE.ShaderMaterial({
@@ -116,6 +139,16 @@ function createPoolMaterial(
       uGain: { value: gain },
       uCool: { value: new THREE.Color(config.colors.poolCool) },
       uWarm: { value: new THREE.Color(config.colors.poolWarm) },
+      uHqActive: { value: 0 },
+      uHqOnly: { value: 0 },
+      uHqGround: { value: 0 },
+      uHqBounds: { value: new THREE.Vector4() },
+      uHqPolygon: {
+        value: Array.from({ length: HEADQUARTERS_NIGHT_MASK_POINTS }, () => new THREE.Vector2()),
+      },
+      uHqWalls: {
+        value: Array.from({ length: HEADQUARTERS_NIGHT_WALLS }, () => new THREE.Vector4()),
+      },
     },
     vertexShader: POOL_VERTEX_SHADER,
     fragmentShader: POOL_FRAGMENT_SHADER,
@@ -154,6 +187,8 @@ function NightLightingInstances({
   const glowRef = useRef<THREE.InstancedMesh>(null);
   const poolMultiplyRef = useRef<THREE.InstancedMesh>(null);
   const poolScreenRef = useRef<THREE.InstancedMesh>(null);
+  const hqMultiplyRef = useRef<THREE.InstancedMesh>(null);
+  const hqScreenRef = useRef<THREE.InstancedMesh>(null);
   const invalidate = useThree((state) => state.invalidate);
   const nightModeActive = useCommercialMapStore((state) => state.nightModeActive);
   const runtime = useRef({
@@ -180,6 +215,15 @@ function NightLightingInstances({
     });
     return values;
   }, [fixtures]);
+  const hqReceiver = useMemo(() => headquartersNightReceiver(surfaceEntities), [surfaceEntities]);
+  const hqFixtures = useMemo(
+    () => headquartersReceiverFixtures(fixtures, hqReceiver),
+    [fixtures, hqReceiver],
+  );
+  const hqLampValues = useMemo(
+    () => new Float32Array(hqFixtures.flatMap((f) => [f.intensity, f.warmth, f.seed, 0])),
+    [hqFixtures],
+  );
 
   const geometries = useMemo(() => {
     const arm = new THREE.BoxGeometry(1, 1, 1);
@@ -190,63 +234,111 @@ function NightLightingInstances({
     const pool = new THREE.PlaneGeometry(2, 2, 1, 1);
     pool.rotateX(-Math.PI / 2);
     pool.setAttribute(LAMP_ATTRIBUTE, createLampAttribute(lampValues));
-    return { arm, head, glow, pool };
-  }, [config.headSize, lampValues]);
+    const hqPool = new THREE.PlaneGeometry(2, 2, 1, 1);
+    hqPool.rotateX(-Math.PI / 2);
+    hqPool.setAttribute(LAMP_ATTRIBUTE, createLampAttribute(hqLampValues));
+    return { arm, head, glow, pool, hqPool };
+  }, [config.headSize, lampValues, hqLampValues]);
 
-  const materials = useMemo(() => ({
-    arm: new THREE.MeshStandardMaterial({
-      name: 'CommercialMapNightLampArm',
-      color: config.colors.arm,
-      roughness: 0.62,
-      metalness: 0.48,
-      transparent: true,
-      opacity: 0,
+  const materials = useMemo(
+    () => ({
+      arm: new THREE.MeshStandardMaterial({
+        name: 'CommercialMapNightLampArm',
+        color: config.colors.arm,
+        roughness: 0.62,
+        metalness: 0.48,
+        transparent: true,
+        opacity: 0,
+      }),
+      head: new THREE.MeshStandardMaterial({
+        name: 'CommercialMapNightLampHead',
+        color: '#dfe4de',
+        emissive: config.colors.led,
+        emissiveIntensity: 0,
+        roughness: 0.34,
+        metalness: 0.12,
+        transparent: true,
+        opacity: 0,
+        toneMapped: false,
+      }),
+      glow: new THREE.ShaderMaterial({
+        name: 'CommercialMapNightLampGlow',
+        uniforms: {
+          uReveal: { value: 0 },
+          uGain: { value: config.glowGain },
+          uSize: { value: config.glowSize },
+          uMinAngular: { value: 0.0034 },
+          uColor: { value: new THREE.Color(config.colors.glow) },
+        },
+        vertexShader: GLOW_VERTEX_SHADER,
+        fragmentShader: GLOW_FRAGMENT_SHADER,
+        transparent: true,
+        depthWrite: false,
+        depthTest: true,
+        blending: THREE.AdditiveBlending,
+        fog: false,
+        toneMapped: false,
+      }),
+      // Ground light is two blended passes over the same instanced disc:
+      //  - multiply, out = dst * (1 + light): lots, grass and roofs regain their
+      //    own colour and texture under the lamp, exactly like real irradiance;
+      //  - screen, out = dst + light * (1 - dst): a low, bounded lift so dark
+      //    asphalt and walkways still show the pool instead of staying black.
+      // Neither term can run away: the multiply gain stays under x1.75 and the
+      // screen term converges to the lamp colour, so overlaps never clip white.
+      poolMultiply: createPoolMaterial(
+        'CommercialMapNightLightPoolMultiply',
+        config.poolMultiplyGain,
+        {
+          blendSrc: THREE.DstColorFactor,
+          blendDst: THREE.OneFactor,
+        },
+      ),
+      poolScreen: createPoolMaterial('CommercialMapNightLightPoolScreen', config.poolScreenGain, {
+        blendSrc: THREE.OneMinusDstColorFactor,
+        blendDst: THREE.OneFactor,
+      }),
     }),
-    head: new THREE.MeshStandardMaterial({
-      name: 'CommercialMapNightLampHead',
-      color: '#dfe4de',
-      emissive: config.colors.led,
-      emissiveIntensity: 0,
-      roughness: 0.34,
-      metalness: 0.12,
-      transparent: true,
-      opacity: 0,
-      toneMapped: false,
-    }),
-    glow: new THREE.ShaderMaterial({
-      name: 'CommercialMapNightLampGlow',
-      uniforms: {
-        uReveal: { value: 0 },
-        uGain: { value: config.glowGain },
-        uSize: { value: config.glowSize },
-        uMinAngular: { value: 0.0034 },
-        uColor: { value: new THREE.Color(config.colors.glow) },
-      },
-      vertexShader: GLOW_VERTEX_SHADER,
-      fragmentShader: GLOW_FRAGMENT_SHADER,
-      transparent: true,
-      depthWrite: false,
-      depthTest: true,
-      blending: THREE.AdditiveBlending,
-      fog: false,
-      toneMapped: false,
-    }),
-    // Ground light is two blended passes over the same instanced disc:
-    //  - multiply, out = dst * (1 + light): lots, grass and roofs regain their
-    //    own colour and texture under the lamp, exactly like real irradiance;
-    //  - screen, out = dst + light * (1 - dst): a low, bounded lift so dark
-    //    asphalt and walkways still show the pool instead of staying black.
-    // Neither term can run away: the multiply gain stays under x1.75 and the
-    // screen term converges to the lamp colour, so overlaps never clip white.
-    poolMultiply: createPoolMaterial('CommercialMapNightLightPoolMultiply', config.poolMultiplyGain, {
-      blendSrc: THREE.DstColorFactor,
-      blendDst: THREE.OneFactor,
-    }),
-    poolScreen: createPoolMaterial('CommercialMapNightLightPoolScreen', config.poolScreenGain, {
-      blendSrc: THREE.OneMinusDstColorFactor,
-      blendDst: THREE.OneFactor,
-    }),
-  }), [config]);
+    [config],
+  );
+  const hqMaterials = useMemo(() => {
+    const copy = (source: THREE.ShaderMaterial) => {
+      const material = source.clone();
+      // Share fade/path uniforms with the park; only the receiver selector differs.
+      material.uniforms = { ...source.uniforms, uHqOnly: { value: 1 } };
+      return material;
+    };
+    return {
+      multiply: copy(materials.poolMultiply),
+      screen: copy(materials.poolScreen),
+    };
+  }, [materials]);
+  useLayoutEffect(() => {
+    for (const material of [materials.poolMultiply, materials.poolScreen]) {
+      material.uniforms.uHqActive.value = hqReceiver.active ? 1 : 0;
+      material.uniforms.uHqBounds.value = hqReceiver.bounds;
+      material.uniforms.uHqPolygon.value = hqReceiver.points;
+      material.uniforms.uHqWalls.value = hqReceiver.walls;
+      material.uniforms.uHqGround.value = hqReceiver.groundY;
+    }
+    const transform = new THREE.Object3D();
+    hqFixtures.forEach((fixture, index) => {
+      transform.position.set(fixture.poolCenter[0], hqReceiver.groundY, fixture.poolCenter[2]);
+      transform.rotation.set(0, fixture.yawRadians, 0);
+      transform.scale.set(fixture.poolRadius, 1, fixture.poolRadius);
+      transform.updateMatrix();
+      hqMultiplyRef.current?.setMatrixAt(index, transform.matrix);
+      hqScreenRef.current?.setMatrixAt(index, transform.matrix);
+    });
+    for (const mesh of [hqMultiplyRef.current, hqScreenRef.current])
+      if (mesh) {
+        mesh.instanceMatrix.needsUpdate = true;
+        mesh.computeBoundingBox();
+        mesh.computeBoundingSphere();
+      }
+    invalidate();
+  }, [hqReceiver, hqFixtures, geometries, materials, invalidate]);
+  useEffect(() => () => Object.values(hqMaterials).forEach((m) => m.dispose()), [hqMaterials]);
 
   useLayoutEffect(() => {
     const armMesh = armRef.current;
@@ -304,13 +396,19 @@ function NightLightingInstances({
     invalidate();
   }, [invalidate, nightModeActive, polesVisible]);
 
-  useEffect(() => () => {
-    Object.values(geometries).forEach((geometry) => geometry.dispose());
-  }, [geometries]);
+  useEffect(
+    () => () => {
+      Object.values(geometries).forEach((geometry) => geometry.dispose());
+    },
+    [geometries],
+  );
 
-  useEffect(() => () => {
-    Object.values(materials).forEach((material) => material.dispose());
-  }, [materials]);
+  useEffect(
+    () => () => {
+      Object.values(materials).forEach((material) => material.dispose());
+    },
+    [materials],
+  );
 
   useFrame((_state, delta) => {
     const group = groupRef.current;
@@ -343,14 +441,14 @@ function NightLightingInstances({
       materials.head.opacity = Math.min(1, eased * 1.6);
       materials.head.emissiveIntensity = config.headEmissivePeak * eased;
       materials.poolMultiply.uniforms.uReveal.value = reveal;
-      materials.poolMultiply.uniforms.uGain.value = config.poolMultiplyGain
-        * (navigating ? DIRECT_PATH_MULTIPLY_GAIN : 1);
+      materials.poolMultiply.uniforms.uGain.value =
+        config.poolMultiplyGain * (navigating ? DIRECT_PATH_MULTIPLY_GAIN : 1);
       materials.poolScreen.uniforms.uReveal.value = reveal;
-      materials.poolScreen.uniforms.uGain.value = config.poolScreenGain
-        * (navigating ? DIRECT_PATH_SCREEN_GAIN : 1);
+      materials.poolScreen.uniforms.uGain.value =
+        config.poolScreenGain * (navigating ? DIRECT_PATH_SCREEN_GAIN : 1);
       materials.glow.uniforms.uReveal.value = reveal;
-      materials.glow.uniforms.uGain.value = config.glowGain
-        * (navigating ? DIRECT_PATH_GLOW_GAIN : 1);
+      materials.glow.uniforms.uGain.value =
+        config.glowGain * (navigating ? DIRECT_PATH_GLOW_GAIN : 1);
     }
     if (!revealSettled || !presenceSettled) invalidate();
   });
@@ -407,6 +505,24 @@ function NightLightingInstances({
         renderOrder={6}
         raycast={NO_RAYCAST}
       />
+      {hqFixtures.length > 0 && (
+        <>
+          <instancedMesh
+            ref={hqMultiplyRef}
+            name="B12:night-pool-irradiance"
+            args={[geometries.hqPool, hqMaterials.multiply, hqFixtures.length]}
+            renderOrder={5}
+            raycast={NO_RAYCAST}
+          />
+          <instancedMesh
+            ref={hqScreenRef}
+            name="B12:night-pool-fill"
+            args={[geometries.hqPool, hqMaterials.screen, hqFixtures.length]}
+            renderOrder={6}
+            raycast={NO_RAYCAST}
+          />
+        </>
+      )}
     </group>
   );
 }

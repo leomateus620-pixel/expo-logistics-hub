@@ -100,7 +100,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(resolveStrategicLandmarkKind({ publicIdentifier: 'B1' })).toBe('commercial-pavilion');
 
     expect(strategicLandmarkFacingRadians(persistedAdministrativeCenter)).toBeCloseTo(Math.PI / 2);
-    expect(strategicLandmarkFacingRadians(persistedHeadquarters)).toBeCloseTo(-Math.PI / 18);
+    expect(strategicLandmarkFacingRadians(persistedHeadquarters)).toBeCloseTo(-Math.PI / 2);
     expect(strategicLandmarkFacingRadians(persistedLivestockPavilion)).toBe(0);
     expect(strategicLandmarkFacingRadians(persistedPolish)).toBeCloseTo(Math.PI / 2);
     expect(strategicLandmarkFacingRadians(persistedItalian)).toBeCloseTo(-Math.PI / 2);
@@ -149,8 +149,9 @@ describe('marcos arquitetônicos estratégicos', () => {
 
     expect(administrativeBounds.width).toBeCloseTo(2.7273, 4);
     expect(administrativeBounds.depth).toBeCloseTo(6.5455, 4);
-    expect(headquartersBounds.width).toBeCloseTo(2.9455, 4);
-    expect(headquartersBounds.depth).toBeCloseTo(2.2691, 4);
+    // Registered September roof/site envelope, replacing the old rotated placeholder.
+    expect(headquartersBounds.width).toBeCloseTo(2.3114, 4);
+    expect(headquartersBounds.depth).toBeCloseTo(1.8624, 4);
     expect(livestockBounds.width).toBeCloseTo(18.7636, 4);
     expect(livestockBounds.depth).toBeCloseTo(2.9018, 4);
     expect(meetingRoomBounds.width).toBeCloseTo(1.6145, 4);
@@ -197,7 +198,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(administrativeBounds.maxX).toBeLessThan(brasiliaBounds.minX);
     expect(headquartersBounds.minX).toBeGreaterThan(brasiliaBounds.maxX);
     expect(headquartersBounds.centerZ).toBeLessThan(argentinaBounds.centerZ);
-    expect(headquartersBounds.maxZ).toBeGreaterThan(argentinaBounds.minZ);
+    expect(headquartersBounds.maxZ).toBeLessThan(argentinaBounds.minZ);
     expect(meetingRoomBounds.maxX).toBeLessThan(administrativeBounds.minX);
 
     expect(targets.B11.id).toBe('reference:2026:b11');

@@ -17,6 +17,10 @@ import {
   NIGHT_LIGHTING_CONFIG,
   summarizeNightLighting,
 } from '@/features/commercial-map/utils/nightLighting';
+import {
+  headquartersNightReceiver,
+  headquartersReceiverFixtures,
+} from '@/features/commercial-map/components/canvas/headquarters/nightReceiver';
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8');
 
@@ -87,7 +91,10 @@ describe('Modo Noturno global do Mapa Comercial', () => {
   });
 
   it('posiciona cada luminária no braço do poste e a poça acima de qualquer lote plano', () => {
-    const placements = resolveElectricalNodePlacements(COMMERCIAL_ELECTRICAL_NODES, OFFICIAL_REFERENCE_ENTITIES);
+    const placements = resolveElectricalNodePlacements(
+      COMMERCIAL_ELECTRICAL_NODES,
+      OFFICIAL_REFERENCE_ENTITIES,
+    );
     const layouts = buildElectricalPoleCrossarmLayouts(
       COMMERCIAL_ELECTRICAL_NODES,
       COMMERCIAL_ELECTRICAL_CONNECTIONS,
@@ -117,7 +124,7 @@ describe('Modo Noturno global do Mapa Comercial', () => {
     });
 
     // Two-lamp poles face opposite sides of the same crossarm.
-    const byPole = new Map<string, typeof fixtures[number][]>();
+    const byPole = new Map<string, (typeof fixtures)[number][]>();
     fixtures.forEach((fixture) => {
       byPole.set(fixture.poleId, [...(byPole.get(fixture.poleId) ?? []), fixture]);
     });
@@ -131,12 +138,12 @@ describe('Modo Noturno global do Mapa Comercial', () => {
     expect(buildNightLampFixtures(placements, layouts)).toEqual(fixtures);
   });
 
-  it('renderiza toda a rede em cinco draw calls instanciados, sem luzes dinâmicas', () => {
+  it('mantém cinco lotes da rede e dois receptores locais da Sede, sem novas luzes', () => {
     const layer = read('src/features/commercial-map/components/canvas/NightLightingLayer.tsx');
     const canvas = read('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
     const landmarks = read('src/features/commercial-map/components/canvas/StrategicLandmarks.tsx');
 
-    expect(layer.match(/<instancedMesh/g)).toHaveLength(NIGHT_LIGHTING_CONFIG.drawCalls);
+    expect(layer.match(/<instancedMesh/g)).toHaveLength(NIGHT_LIGHTING_CONFIG.drawCalls + 2);
     expect(layer).not.toMatch(/<pointLight/i);
     expect(layer).not.toMatch(/<spotLight/i);
     expect(layer).not.toContain('new THREE.PointLight');
@@ -160,10 +167,68 @@ describe('Modo Noturno global do Mapa Comercial', () => {
     expect(landmarks).toContain('parkActive={selected || nightModeActive}');
   });
 
+  it('recebe luz no passeio real de B12 sem alterar luminárias e acompanha a edição de posição', () => {
+    const hq = OFFICIAL_REFERENCE_ENTITIES.find((e) => e.publicIdentifier === 'B12')!;
+    const receiver = headquartersNightReceiver([hq]);
+    expect(receiver.active).toBe(true);
+    expect(receiver.groundY).toBeGreaterThan(0.013);
+    expect(receiver.groundY).toBeLessThan(0.02);
+    expect(headquartersNightReceiver([]).active).toBe(false);
+    const moved = {
+      ...hq,
+      geometry: {
+        ...hq.geometry,
+        coordinates: hq.geometry.coordinates.map((r) =>
+          r.map(([x, z]) => [x + 1, z - 2] as [number, number]),
+        ),
+      },
+    };
+    const translated = headquartersNightReceiver([moved]);
+    receiver.points.forEach((p, i) => {
+      expect(translated.points[i].x - p.x).toBeCloseTo(1, 8);
+      expect(translated.points[i].y - p.y).toBeCloseTo(-2, 8);
+    });
+    receiver.walls.forEach((b, i) => {
+      expect(translated.walls[i].x - b.x).toBeCloseTo(1, 8);
+      expect(translated.walls[i].y - b.y).toBeCloseTo(-2, 8);
+      expect(translated.walls[i].z - b.z).toBeCloseTo(1, 8);
+      expect(translated.walls[i].w - b.w).toBeCloseTo(-2, 8);
+      expect(b.z).toBeGreaterThan(b.x);
+      expect(b.w).toBeGreaterThan(b.y);
+    });
+    expect(
+      headquartersNightReceiver([{ ...hq, geometry: { ...hq.geometry, elevation: 0.5 } }]).groundY -
+        receiver.groundY,
+    ).toBeCloseTo(0.5, 8);
+    const placements = resolveElectricalNodePlacements(
+      COMMERCIAL_ELECTRICAL_NODES,
+      OFFICIAL_REFERENCE_ENTITIES,
+      true,
+    );
+    const fixtures = buildNightLampFixtures(
+      placements,
+      buildElectricalPoleCrossarmLayouts(
+        COMMERCIAL_ELECTRICAL_NODES,
+        COMMERCIAL_ELECTRICAL_CONNECTIONS,
+        placements,
+      ),
+    );
+    const snapshot = JSON.stringify(fixtures),
+      local = headquartersReceiverFixtures(fixtures, receiver);
+    expect(local.length).toBeGreaterThan(0);
+    expect(local.length).toBeLessThan(24);
+    expect(local.every((f) => fixtures.includes(f))).toBe(true);
+    expect(local.every((f) => f.poolCenter[1] >= NIGHT_LIGHTING_CONFIG.poolClearance)).toBe(true);
+    expect(JSON.stringify(fixtures)).toBe(snapshot);
+    expect(headquartersReceiverFixtures(fixtures, headquartersNightReceiver([]))).toHaveLength(0);
+  });
+
   it('expõe o ícone de lua junto aos modos no desktop e no celular', () => {
     const topBar = read('src/features/commercial-map/components/controls/CommercialMapTopBar.tsx');
     const toolbar = read('src/features/commercial-map/components/controls/MapToolbar.tsx');
-    const topBarStyles = read('src/features/commercial-map/components/controls/commercial-map-topbar.css');
+    const topBarStyles = read(
+      'src/features/commercial-map/components/controls/commercial-map-topbar.css',
+    );
     const styles = read('src/features/commercial-map/commercial-map.css');
 
     expect(topBar).toContain('Moon,');
