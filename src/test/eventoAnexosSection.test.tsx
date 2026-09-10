@@ -331,4 +331,55 @@ describe("Anexos e fotos", () => {
     expect(css).toContain("opacity: 0.68");
     expect(css).not.toContain("cronograma-attachment-reduced-confirm");
   });
+
+  it("abre PDF em visualizador interno, sem depender de janela nova bloqueada no celular", async () => {
+    const pdf = attachment({ id: "pdf-1", file_name: "ata.pdf" });
+    mocks.attachmentHook.mockReturnValue(
+      attachmentHookValue({ anexos: [pdf] }),
+    );
+    const openSpy = vi
+      .spyOn(window, "open")
+      .mockImplementation(() => null);
+
+    render(<EventoAnexosSection eventId="event-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Abrir ata.pdf" }));
+
+    await screen.findByRole("dialog", { name: "Visualização de ata.pdf" });
+    expect(openSpy).not.toHaveBeenCalled();
+    openSpy.mockRestore();
+  });
+
+  it("baixa usando link real com o nome do arquivo, sem abrir janela nova", async () => {
+    const pdf = attachment({ id: "pdf-2", file_name: "ata.pdf" });
+    mocks.attachmentHook.mockReturnValue(
+      attachmentHookValue({ anexos: [pdf] }),
+    );
+    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+    const anchorClick = vi
+      .spyOn(HTMLAnchorElement.prototype, "click")
+      .mockImplementation(function (this: HTMLAnchorElement) {
+        expect(this.download).toBe("ata.pdf");
+        expect(this.href).toContain("download=arquivo.pdf");
+      });
+
+    render(<EventoAnexosSection eventId="event-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Baixar ata.pdf" }));
+
+    await waitFor(() => expect(anchorClick).toHaveBeenCalledTimes(1));
+    expect(openSpy).not.toHaveBeenCalled();
+    expect(downloadUrlFor).toHaveBeenCalledWith(pdf.file_path, "ata.pdf");
+    anchorClick.mockRestore();
+    openSpy.mockRestore();
+  });
+
+  it("oferece a galeria como origem explícita além da câmera", () => {
+    render(<EventoAnexosSection eventId="event-1" />);
+
+    expect(
+      screen.getByRole("button", { name: "Escolher da galeria" }),
+    ).toBeEnabled();
+    expect(screen.getByLabelText("Escolher fotos da galeria")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Tirar foto" })).toBeEnabled();
+  });
 });
+
