@@ -3,10 +3,11 @@ import { useFrame, useThree } from "@react-three/fiber";
 import type { OrbitControls } from "three-stdlib";
 import { useCommercialMapStore } from "../state/useCommercialMapStore";
 import { stopCommercialMapOrbitMotion } from "../utils/cameraTransition";
+import { Box3, Group, Mesh } from 'three';
 
 /** DEV-only reproducible camera poses and demand-render navigation timing. */
 export function TerritoryQa() {
-  const { camera, gl, invalidate } = useThree();
+  const { camera, gl, invalidate, scene } = useThree();
   const controls = useThree((s) => s.controls) as OrbitControls | null;
   const run = useRef<{
     start: number;
@@ -22,6 +23,20 @@ export function TerritoryQa() {
     gl.domElement.dataset.territoryQa = "ready";
     const receive = (event: Event) => {
       if (!controls) return;
+      const request=(event as CustomEvent).detail;
+      if(request.release){pose.current=null;return;}
+      if(request.inspectComplex){
+        const report:unknown[]=[];
+        scene.updateMatrixWorld(true);
+        scene.traverse(object=>{
+          if(object.name==='sede-fenasoja-reference-reconstruction'||object.name==='palco-cultural-lactalis-architecture'){
+            const group=object as Group;
+            report.push({name:group.name,worldBounds:new Box3().setFromObject(group),worldMatrix:group.matrixWorld.elements,
+              surfaces:group.children.filter(child=>child instanceof Mesh).map(child=>({name:child.name,worldBounds:new Box3().setFromObject(child),triangles:((child as Mesh).geometry.index?.count??(child as Mesh).geometry.getAttribute('position').count)/3}))});
+          }
+        });
+        gl.domElement.dataset.fenasojaComplexInspection=JSON.stringify(report);return;
+      }
       const { target, position, measure } = (
         event as CustomEvent<{
           target: [number, number, number];
@@ -50,7 +65,7 @@ export function TerritoryQa() {
       if (run.current)
         useCommercialMapStore.getState().setCameraNavigating(false);
     };
-  }, [camera, controls, invalidate, gl]);
+  }, [camera, controls, invalidate, gl, scene]);
   useFrame((_, delta) => {
     if (pose.current && controls) {
       camera.position.set(...pose.current.position);

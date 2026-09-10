@@ -563,7 +563,7 @@ function focusProfileForEntity(entity: MapEntity) {
     return { ...profile, contextRatio: 0.055, fitPadding: 1.08, minDistanceRatio: 0.052, maxDistanceRatio: 0.32, minimumDirectionY: 0.32 };
   }
   if (landmark === 'fenasoja-headquarters') {
-    return { ...profile, contextRatio: 0.055, fitPadding: 1.16, minDistanceRatio: 0.05, maxDistanceRatio: 0.3, minimumDirectionY: 0.32 };
+    return { ...profile, contextRatio: 0.012, fitPadding: 1.16, minDistanceRatio: 0.009, maxDistanceRatio: 0.3, minimumDirectionY: 0.30 };
   }
   if (landmark === 'lactalis-cultural-stage') {
     return { ...profile, contextRatio: 0.03, fitPadding: 1.22, minDistanceRatio: 0.02, maxDistanceRatio: 0.34, minimumDirectionY: LACTALIS_STAGE_LAYOUT.camera.focusMinimumDirectionY };
@@ -1994,11 +1994,11 @@ function CameraRig({
     }),
     [extent, miranteExtent, segmentExtent, size.height, size.width],
   );
-  // B13 is an open gabled stage in the same size class as Casa Fenasoja.
-  // Its own close-view range keeps the camera on the south facade without
-  // changing the exterior limits or the camera behavior of any neighbor.
+  // Registered close ranges for the Brasília frontage; global limits remain shared.
   const requestedMinimumDistance = lactalisSelected
     ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance
+    : selectedKind === 'fenasoja-headquarters' && !interiorEntity
+      ? 1.5
     : miranteExtent
     ? Math.max(7.5, miranteExtent.diagonal * 0.8)
     : segmentExtent && activeSegment
@@ -2778,6 +2778,7 @@ function CameraRig({
       else direction.lerp(deterministicDirection, 0.92).normalize();
     }
     const compactStage = landmarkKind === 'lactalis-cultural-stage';
+    const compactHeadquarters = landmarkKind === 'fenasoja-headquarters';
     const minimumDirectionY = compactStage && aspect < 0.72
       ? LACTALIS_STAGE_LAYOUT.camera.focusPortraitMinimumDirectionY
       : focusProfile.minimumDirectionY;
@@ -2789,11 +2790,11 @@ function CameraRig({
       aspect,
       direction,
       focusProfile.fitPadding,
-      compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance : undefined,
+      compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance : compactHeadquarters ? 1.5 : undefined,
     );
     const fittedSelectionDistance = THREE.MathUtils.clamp(
       Math.max(fittedDistance, compactStage ? LACTALIS_STAGE_LAYOUT.camera.focusedDistance : extent.diagonal * focusProfile.contextRatio),
-      compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance : Math.max(10, extent.diagonal * focusProfile.minDistanceRatio),
+      compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance : compactHeadquarters ? 1.5 : Math.max(10, extent.diagonal * focusProfile.minDistanceRatio),
       controlsMaximumDistance,
     );
     const distance = compactSidePanelMirante

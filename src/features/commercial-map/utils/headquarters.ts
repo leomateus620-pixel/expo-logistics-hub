@@ -1,63 +1,55 @@
-import { FENASOJA_2028_COLORS } from '@/lib/fenasoja-brand';
-
-export const FENASOJA_HEADQUARTERS_REVISION = '2026.8-headquarters-realism.2';
-
+import {
+  FENASOJA_COMPLEX,
+  FENASOJA_COMPLEX_REVISION,
+} from "../data/fenasojaComplexReconstruction";
+const hq = FENASOJA_COMPLEX.headquarters;
+const unit = FENASOJA_COMPLEX.registration.unitsPerMeter;
+export const FENASOJA_HEADQUARTERS_REVISION = FENASOJA_COMPLEX_REVISION;
 export const FENASOJA_HEADQUARTERS_LAYOUT = {
-  sourceCenter: [4105, 3681] as const,
-  sourceFootprint: [135, 104] as const,
-  facingRadians: -Math.PI / 18,
-  envelope: {
-    widthRatio: 0.9,
-    depthRatio: 0.76,
-  },
+  sourceCenter: hq.sourceOrigin,
+  sourceFootprint: [106, 84] as const,
+  facingRadians: hq.yaw,
+  envelope: { widthRatio: 1, depthRatio: 1 },
   identity: {
-    symbolAsset: '/alvorada/fenasoja-symbol-official.png',
-    wordmark: 'FENASOJA',
-    department: 'Comissão Central',
+    symbolAsset: hq.sign.symbolAsset,
+    wordmark: "FENASOJA",
+    department: "Comissão Central",
   },
   palette: {
-    navy: FENASOJA_2028_COLORS.navy,
-    navyDark: FENASOJA_2028_COLORS.nearBlackNavy,
-    roof: FENASOJA_2028_COLORS.softWhite,
-    glass: '#153a51',
-    amber: FENASOJA_2028_COLORS.orange,
-    warmLight: FENASOJA_2028_COLORS.gold,
+    navy: "#454b4c",
+    navyDark: "#252521",
+    roof: "#eceee5",
+    glass: "#4d6875",
+    amber: "#a5a297",
+    warmLight: "#ead4a9",
   },
 } as const;
-
 export const FENASOJA_HEADQUARTERS_RENDER_BUDGET = {
-  basePrimaryDrawCalls: 14,
-  detailPrimaryDrawCalls: 28,
-  focusPrimaryDrawCalls: 36,
-  measuredModelBasePrimaryDrawCalls: 9,
-  measuredModelDetailPrimaryDrawCalls: 25,
-  measuredModelFocusPrimaryDrawCalls: 30,
-  measuredBaseWithOverlayDrawCalls: 10,
-  measuredDetailWithOverlayDrawCalls: 26,
-  measuredFocusWithOverlayDrawCalls: 32,
+  basePrimaryDrawCalls: 20,
+  detailPrimaryDrawCalls: 24,
+  focusPrimaryDrawCalls: 24,
 } as const;
-
 export interface HeadquartersFootprint {
   width: number;
   depth: number;
 }
-
 export interface HeadquartersOrientedEnvelope extends HeadquartersFootprint {
   localWidth: number;
   localDepth: number;
 }
-
 export function headquartersOrientedEnvelope(
-  footprint: HeadquartersFootprint,
-  facingRadians = FENASOJA_HEADQUARTERS_LAYOUT.facingRadians,
+  _footprint: HeadquartersFootprint,
+  facingRadians: number = hq.yaw,
 ): HeadquartersOrientedEnvelope {
-  const localWidth = footprint.width * FENASOJA_HEADQUARTERS_LAYOUT.envelope.widthRatio;
-  const localDepth = footprint.depth * FENASOJA_HEADQUARTERS_LAYOUT.envelope.depthRatio;
-  const cosine = Math.abs(Math.cos(facingRadians));
-  const sine = Math.abs(Math.sin(facingRadians));
+  const xs = hq.roofProjection.map((p) => p[0]),
+    zs = hq.roofProjection.map((p) => p[1]);
+  const localWidth = (Math.max(...xs) - Math.min(...xs)) * unit,
+    localDepth = (Math.max(...zs) - Math.min(...zs)) * unit;
+  const c = Math.abs(Math.cos(facingRadians)),
+    s = Math.abs(Math.sin(facingRadians));
   return {
-    width: localWidth * cosine + localDepth * sine,
-    depth: localWidth * sine + localDepth * cosine,
+    width: localWidth * c + localDepth * s,
+    depth: localWidth * s + localDepth * c,
     localWidth,
     localDepth,
   };
