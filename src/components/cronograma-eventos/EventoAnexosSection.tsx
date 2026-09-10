@@ -744,7 +744,32 @@ export function EventoAnexosSection({ eventId, className }: Props) {
                         </p>
                       </div>
 
+                      <div className="cronograma-attachments__row-actions">
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          className="cronograma-attachments__row-action"
+                          aria-label={`Abrir ${anexo.file_name}`}
+                          onClick={(event) =>
+                            void handleOpen(anexo, event.currentTarget)
+                          }
+                        >
+                          <Eye aria-hidden="true" />
+                        </Button>
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          className="cronograma-attachments__row-action"
+                          aria-label={`Baixar ${anexo.file_name}`}
+                          onClick={() => void handleDownload(anexo)}
+                        >
+                          <Download aria-hidden="true" />
+                        </Button>
+
                       <DropdownMenu>
+
                         <DropdownMenuTrigger asChild>
                           <Button
                             ref={(node) => {
