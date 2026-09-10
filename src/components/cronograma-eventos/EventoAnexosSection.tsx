@@ -579,6 +579,31 @@ export function EventoAnexosSection({ eventId, className }: Props) {
             Tirar foto
           </Button>
 
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => galleryRef.current?.click()}
+            disabled={!canUpload || uploadBusy}
+            className="cronograma-attachments__camera-button sm:hidden"
+            aria-describedby={showStatus ? `${guidanceId} ${statusId}` : guidanceId}
+          >
+            <FileImage aria-hidden="true" />
+            Escolher da galeria
+          </Button>
+
+          <input
+            ref={galleryRef}
+            type="file"
+            multiple
+            accept="image/*"
+            className="hidden"
+            tabIndex={-1}
+            aria-label="Escolher fotos da galeria"
+            onChange={(event) => void handleFiles(event.target.files)}
+          />
+
+
           <input
             ref={fileRef}
             type="file"
