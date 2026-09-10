@@ -1,4 +1,5 @@
 import { SOY_RESTROOM, SOY_ROAD_CONNECTION, GATE_NINE_TANKS } from './soyGateInfrastructure';
+import { reconstructFenasojaEntity } from './fenasojaComplexReconstruction';
 import {
   DEFAULT_REFERENCE_LAYERS,
   MAP_REFERENCE_HEIGHT,
@@ -1037,7 +1038,7 @@ export function isNonPermanentRemovedIdentifier(publicIdentifier: string) {
 export const OFFICIAL_REFERENCE_ENTITIES = [
   ...officialBaseEntities,
   ...pavilionModuleEntities,
-].map(withCommercialMapSegmentMetadata);
+].map(reconstructFenasojaEntity).map(withCommercialMapSegmentMetadata);
 
 export const OFFICIAL_RENDERED_ENTITIES = OFFICIAL_REFERENCE_ENTITIES.filter((entity) => (
   !nonPermanentRemovedIdentifiers.has(entity.publicIdentifier)

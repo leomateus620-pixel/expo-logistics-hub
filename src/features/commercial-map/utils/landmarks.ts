@@ -4,6 +4,7 @@ import { resolveCrioulosArchitectureEnvelope } from '../data/gateFourDistrict';
 import { livestockPavilionVisualHeight } from './livestockPavilion';
 import { miranteVisualHeight } from './mirante';
 import { FENASOJA_HEADQUARTERS_LAYOUT } from './headquarters';
+import { FENASOJA_COMPLEX } from '../data/fenasojaComplexReconstruction';
 import {
   FENASOJA_EVENT_CENTER_LAYOUT,
   eventCenterVisualHeight,
@@ -316,11 +317,10 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
       'Sede Fenasoja',
       'Fenasoja Headquarters',
     ],
-    // A sede ocupa o canto sudoeste da Quadra B: a empena responde à Rua
-    // Argentina, mas também se apresenta para a curva da Rua Brasília.
+    // Registered front gable faces Rua Brasília; photo-right is toward Argentina.
     facingRadians: FENASOJA_HEADQUARTERS_LAYOUT.facingRadians,
-    focusDirection: [-0.42, 0.36, 0.94],
-    visualHeight: ({ width, depth }) => Math.min(2.6, Math.max(width, depth) * 0.84),
+    focusDirection: [-1, 0.30, 0.12],
+    visualHeight: () => 8.35 * FENASOJA_COMPLEX.registration.unitsPerMeter,
   },
   'E-07': { kind: 'soy-restroom', aliases: ['Sanitários Cozinha da Soja', 'Banheiro Cozinha da Soja', 'Masculino Feminino'], facingRadians: SOY_RESTROOM.facingRadians, focusDirection: [0.96, 0.40, 0.05], visualHeight: () => 0.64 },
   'RES-A9': { kind: 'gate-nine-tanks', aliases: ['Caixas de água Portão 9', 'Reservatórios Portão 9'], facingRadians: 0, focusDirection: [0.5, 0.4, 0.8], visualHeight: () => 1.47 },

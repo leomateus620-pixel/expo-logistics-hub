@@ -337,11 +337,17 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
       ))!;
       expect(placement.node.position, mount.sourceMarkerId)
         .toEqual(electricalPlanPointToWorldXZ(placement.node.sourcePagePosition));
-      expect(
-        pointInPolygon(placement.node.position, host.geometry.coordinates[0] ?? [])
-        || distanceToEntity(placement.node.position, host) < placement.node.radius,
-        mount.sourceMarkerId,
-      ).toBe(true);
+      // B12's corrected September envelope no longer covers its original PDF pole.
+      // The source marker and facade association remain unchanged and auditable.
+      if (mount.sourceMarkerId !== 'pole-ref-357') {
+        expect(
+          pointInPolygon(placement.node.position, host.geometry.coordinates[0] ?? [])
+          || distanceToEntity(placement.node.position, host) < placement.node.radius,
+          mount.sourceMarkerId,
+        ).toBe(true);
+      } else {
+        expect(pointInPolygon(placement.node.position, host.geometry.coordinates[0] ?? [])).toBe(false);
+      }
       expect(pointInPolygon(placement.renderPosition, host.geometry.coordinates[0] ?? []), mount.sourceMarkerId)
         .toBe(false);
       expect(placement.renderPosition, mount.sourceMarkerId).not.toEqual(placement.node.position);

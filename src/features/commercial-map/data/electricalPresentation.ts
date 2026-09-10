@@ -1,5 +1,6 @@
 import type { Coordinate, MapEntity } from '../types';
 import type { CommercialElectricalNode } from './electricalInfrastructure';
+import { complexWorldPolygon, FENASOJA_COMPLEX_REVISION } from './fenasojaComplexReconstruction';
 
 /**
  * Small presentation-only offsets for the reconstructed gate-four volumes.
@@ -38,6 +39,13 @@ export function resolveElectricalArchitectureClearancePosition(
   entityByIdentifier: ReadonlyMap<string, MapEntity>,
 ): Coordinate | null {
   if (node.mountMode !== 'GROUND_POLE') return null;
+  // The larger registered B13 roof intersects this PDF pole. Keep its source and
+  // wiring IDs; place the rendered shaft just beyond the roof on the same apron.
+  if (node.sourceMarkerId === 'pole-ref-337'
+    && entityByIdentifier.get('B13')?.metadata?.reconstructionRevision === FENASOJA_COMPLEX_REVISION) {
+    const frontEdge = Math.min(...complexWorldPolygon('stage', 'roofProjection').map(p => p[0]));
+    return [frontEdge - node.radius - 0.04, node.position[1]];
+  }
   const group = ELECTRICAL_ARCHITECTURE_CLEARANCE_PRESENTATION.groups.find((candidate) => (
     candidate.sourceMarkerIds.some((identifier) => identifier === node.sourceMarkerId)
     && entityByIdentifier.get(candidate.ownerIdentifier)?.classification === candidate.ownerClassification

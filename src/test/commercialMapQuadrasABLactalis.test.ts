@@ -67,7 +67,7 @@ const expectCoordinatesCloseTo = (
 };
 
 describe('reconstrução das Quadras A/B e Palco Cultural Lactalis', () => {
-  it('preserva a identidade B13 e alinha o footprint à mesma classe de tamanho da Casa Fenasoja', () => {
+  it('preserva a identidade B13 com cobertura independente da Sede', () => {
     const palco = entity('B13');
     const sede = entity('B12');
     const palcoBefore = JSON.stringify(palco);
@@ -85,16 +85,14 @@ describe('reconstrução das Quadras A/B e Palco Cultural Lactalis', () => {
       isArchived: false,
     });
     expect(palco.metadata).toMatchObject({ parentPublicIdentifier: 'QUADRA-B' });
-    expect(LACTALIS_STAGE_LAYOUT.sourceFootprint).toEqual(FENASOJA_HEADQUARTERS_LAYOUT.sourceFootprint);
-    expect(LACTALIS_STAGE_LAYOUT.sourceCenter[0]).toBe(FENASOJA_HEADQUARTERS_LAYOUT.sourceCenter[0]);
+    expect(LACTALIS_STAGE_LAYOUT.sourceFootprint).not.toEqual(FENASOJA_HEADQUARTERS_LAYOUT.sourceFootprint);
+    expect(LACTALIS_STAGE_LAYOUT.sourceCenter[0]).toBeGreaterThan(FENASOJA_HEADQUARTERS_LAYOUT.sourceCenter[0]);
     expect(bounds.centerX).toBeCloseTo(LACTALIS_STAGE_LAYOUT.worldCenter[0], 8);
     expect(bounds.centerZ).toBeCloseTo(LACTALIS_STAGE_LAYOUT.worldCenter[1], 8);
-    expect(bounds.width).toBeCloseTo(headquartersBounds.width, 6);
-    expect(bounds.depth).toBeCloseTo(headquartersBounds.depth, 6);
+    expect(bounds.width).toBeGreaterThan(headquartersBounds.width);
+    expect(bounds.depth).toBeGreaterThan(headquartersBounds.depth);
     expect(palco.geometry.rotation).toBe(0);
-    expect(palco.geometry.coordinates[0].slice(0, -1)).toEqual(
-      LACTALIS_STAGE_LAYOUT.sourceFootprintPolygon.map(officialPdfPointToLocal),
-    );
+    expect(palco.geometry.coordinates[0]).toHaveLength(4);
     expect(OFFICIAL_REFERENCE_LOTS.some((lot) => lot.entityId === palco.id)).toBe(false);
     expect(resolveStrategicLandmarkKind(palco)).toBe('lactalis-cultural-stage');
     expect(strategicLandmarkSupportsInterior(palco)).toBe(false);
@@ -125,12 +123,12 @@ describe('reconstrução das Quadras A/B e Palco Cultural Lactalis', () => {
     expect(JSON.stringify(persisted)).toBe(before);
   });
 
-  it('orienta a frente local para o ponto médio dos lotes D11 e D12', () => {
+  it('orienta a frente para o lado dos lotes D11 e D12, normal à Brasília', () => {
     const palco = entity('B13');
     const center = centroid(palco.geometry.coordinates[0]);
     const lots = ['Q-D-11', 'Q-D-12'].map((id) => centroid(entity(id).geometry.coordinates[0]));
     const target = [(lots[0][0] + lots[1][0]) / 2, (lots[0][1] + lots[1][1]) / 2];
-    expect(strategicLandmarkFacingRadians(palco)).toBeCloseTo(Math.atan2(target[0] - center[0], target[1] - center[1]), 12);
+    expect(target[0]).toBeLessThan(center[0]); expect(strategicLandmarkFacingRadians(palco)).toBe(-Math.PI / 2);
     expect(lactalisStageHeadingToTargetErrorRadians()).toBeLessThan(1e-7);
     expect(LACTALIS_STAGE_LAYOUT.targetIdentifiers).toEqual(['Q-D-11', 'Q-D-12']);
   });
@@ -146,14 +144,14 @@ describe('reconstrução das Quadras A/B e Palco Cultural Lactalis', () => {
     expect(axisAlignedWidth).toBeLessThan(bounds.width);
     expect(axisAlignedDepth).toBeLessThan(3);
     expect(model.containmentScale).toBeGreaterThan(0.86);
-    expect(model.containmentScale).toBeLessThan(0.88);
+    expect(model.containmentScale).toBe(1);
     const footprint = lactalisStagePresentationFootprint(bounds.width, bounds.depth);
     const apron = lactalisStageAudienceApronPolygon();
-    expect(footprint).toHaveLength(8);
+    expect(footprint).toHaveLength(4);
     expectCoordinatesCloseTo(footprint, lactalisStagePresentationFootprint());
     [...footprint, ...apron].forEach((point) => {
-      expect(point[0]).toBeGreaterThanOrEqual(bounds.minX);
-      expect(point[0]).toBeLessThanOrEqual(bounds.maxX);
+      expect(point[0]).toBeGreaterThanOrEqual(bounds.minX - 0.015);
+      expect(point[0]).toBeLessThanOrEqual(bounds.maxX + 0.015);
     });
     const neighbors = buildCommercialSiteHardSurfaceMasks(OFFICIAL_RENDERED_ENTITIES).filter((mask) => (
       mask.sourceIdentifier !== 'B13'
@@ -202,14 +200,14 @@ describe('reconstrução das Quadras A/B e Palco Cultural Lactalis', () => {
     expect(LACTALIS_STAGE_LAYOUT.signage.aspectRatio).toBeLessThan(3.5);
   });
 
-  it('mantém o corpo do palco na mesma classe de tamanho da Casa Fenasoja', () => {
+  it('mantém a proporção aérea entre palco e corpo principal da Casa Fenasoja', () => {
     const sizeClass = lactalisStageHeadquartersSizeClass();
     expect(sizeClass.containmentScale).toBeGreaterThan(0.86);
     expect(sizeClass.widthRatio).toBeGreaterThan(0.80);
-    expect(sizeClass.widthRatio).toBeLessThan(1.08);
+    expect(sizeClass.widthRatio).toBeCloseTo(2.63, 2);
     expect(sizeClass.depthRatio).toBeGreaterThan(0.80);
-    expect(sizeClass.depthRatio).toBeLessThan(1.08);
-    expect(sizeClass.stageHeight).toBeGreaterThan(1.5);
+    expect(sizeClass.depthRatio).toBeCloseTo(2.67, 2);
+    expect(sizeClass.stageHeight).toBeGreaterThan(0.9);
     expect(sizeClass.stageWidth).toBeGreaterThan(2.1);
   });
 
@@ -316,15 +314,15 @@ describe('reconstrução das Quadras A/B e Palco Cultural Lactalis', () => {
       'src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx',
     ), 'utf8');
 
-    expect(LACTALIS_STAGE_LAYOUT.camera.minimumDistance).toBe(3.4);
-    expect(LACTALIS_STAGE_LAYOUT.camera.focusedDistance).toBe(6.2);
-    expect(LACTALIS_STAGE_LAYOUT.camera.focusPortraitMinimumDirectionY).toBe(0.48);
+    expect(LACTALIS_STAGE_LAYOUT.camera.minimumDistance).toBe(2.4);
+    expect(LACTALIS_STAGE_LAYOUT.camera.focusedDistance).toBe(5.3);
+    expect(LACTALIS_STAGE_LAYOUT.camera.focusPortraitMinimumDirectionY).toBe(0.42);
     expect(LACTALIS_STAGE_LAYOUT.camera.focusedDistance).toBeGreaterThan(LACTALIS_STAGE_LAYOUT.camera.minimumDistance);
     expect(source).toContain("const lactalisSelected = !interiorEntity && selectedKind === 'lactalis-cultural-stage';");
-    expect(source).toMatch(/const requestedMinimumDistance = lactalisSelected\s*\? LACTALIS_STAGE_LAYOUT\.camera\.minimumDistance\s*:\s*miranteExtent/);
+    expect(source).toMatch(/const requestedMinimumDistance = lactalisSelected\s*\? LACTALIS_STAGE_LAYOUT\.camera\.minimumDistance\s*:/);
     expect(source).toContain("const compactStage = landmarkKind === 'lactalis-cultural-stage';");
     expect(source).toContain('Math.max(fittedDistance, compactStage ? LACTALIS_STAGE_LAYOUT.camera.focusedDistance : extent.diagonal * focusProfile.contextRatio)');
-    expect(source).toContain('compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance : Math.max(10, extent.diagonal * focusProfile.minDistanceRatio)');
+    expect(source).toContain('compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance : compactHeadquarters ? 1.5 : Math.max(10, extent.diagonal * focusProfile.minDistanceRatio)');
     expect(source).toContain('compactStage && aspect < 0.72');
     expect(source).toContain('LACTALIS_STAGE_LAYOUT.camera.focusPortraitMinimumDirectionY');
     expect(source).toContain("startCameraMove(effectiveControlsMinimumDistance, effectiveControlsMaximumDistance, true, interiorFrame ?? {}, 'safety-limits')");

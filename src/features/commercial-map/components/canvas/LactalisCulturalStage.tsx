@@ -289,15 +289,15 @@ export function LactalisCulturalStage({
       position: [side * (width / 2 - column * 0.42), eaveHeight * 0.49, rearZ + depth * LACTALIS_STAGE_LAYOUT.architecture.sideEnclosureDepthRatio / 2],
       scale: [column * 0.78, eaveHeight * 0.86, depth * LACTALIS_STAGE_LAYOUT.architecture.sideEnclosureDepthRatio],
     })),
-    { position: [0, eaveHeight - fasciaDepth / 2, frontZ], scale: [width, fasciaDepth, LACTALIS_STAGE_LAYOUT.architecture.claddingThickness] },
+    { position: [0, eaveHeight - fasciaDepth / 2, frontZ + column * 1.05], scale: [width, fasciaDepth, LACTALIS_STAGE_LAYOUT.architecture.claddingThickness] },
     // Thin front-sheet ribs have the exact gable profile and remain present at
     // every LOD; normals supply the finer folds between these structural ribs.
     ...Array.from({ length: 31 }, (_, index): InstanceTransform => {
       const ratio = (index + 1) / 32 - 0.5;
       const ribHeight = fasciaDepth + rise * (1 - Math.abs(ratio) * 2) - 0.018;
       return {
-        position: [ratio * width, eaveHeight - fasciaDepth + ribHeight / 2, frontZ + LACTALIS_STAGE_LAYOUT.architecture.claddingThickness / 2 + 0.007],
-        scale: [width * 0.0042, ribHeight, 0.012],
+        position: [ratio * width, eaveHeight - fasciaDepth + ribHeight / 2, frontZ + column * 1.05 + LACTALIS_STAGE_LAYOUT.architecture.claddingThickness / 2 + 0.002],
+        scale: [width * 0.002, ribHeight, 0.004],
       };
     }),
   ], [column, depth, eaveHeight, fasciaDepth, frontZ, rearZ, rise, width]);
@@ -374,7 +374,7 @@ export function LactalisCulturalStage({
       <mesh
         geometry={gableGeometry}
         material={materials.wall}
-        position={[0, eaveHeight, frontZ + column * 0.02]}
+        position={[0, eaveHeight, frontZ + column * 1.05]}
         raycast={NO_RAYCAST}
         castShadow
         receiveShadow
