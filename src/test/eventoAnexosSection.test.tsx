@@ -39,6 +39,8 @@ vi.mock("@/hooks/use-toast", () => ({
 const upload = vi.fn();
 const remove = vi.fn();
 const getSignedUrl = vi.fn();
+const urlFor = vi.fn();
+const downloadUrlFor = vi.fn();
 
 function attachmentHookValue(overrides: Record<string, unknown> = {}) {
   return {
@@ -49,9 +51,12 @@ function attachmentHookValue(overrides: Record<string, unknown> = {}) {
     remove,
     removing: false,
     getSignedUrl,
+    urlFor,
+    downloadUrlFor,
     ...overrides,
   };
 }
+
 
 function attachment(overrides: Partial<EventoAnexo> = {}): EventoAnexo {
   return {
