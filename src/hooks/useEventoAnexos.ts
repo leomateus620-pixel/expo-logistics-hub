@@ -44,6 +44,34 @@ export function useEventoAnexos(eventId: string | null | undefined) {
     },
   });
 
+  const anexos = useMemo(() => listQuery.data ?? [], [listQuery.data]);
+  const pathKey = anexos.map((a) => a.file_path).join('|');
+
+  // Pré-assina as URLs junto da listagem. Assim o toque em "abrir"/"baixar"
+  // no celular usa um link já pronto e não é bloqueado por falta de gesto.
+  const urlsQuery = useQuery({
+    queryKey: ['cronograma-anexos-urls', eventId, pathKey],
+    enabled: enabled && anexos.length > 0,
+    staleTime: (SIGNED_URL_TTL_SECONDS - 300) * 1000,
+    gcTime: SIGNED_URL_TTL_SECONDS * 1000,
+    queryFn: async (): Promise<Record<string, string>> => {
+      const paths = pathKey ? pathKey.split('|') : [];
+      if (paths.length === 0) return {};
+      const { data, error } = await supabase.storage
+        .from(BUCKET)
+        .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS);
+      if (error) throw error;
+      const map: Record<string, string> = {};
+      for (const entry of data ?? []) {
+        const entryPath = (entry as { path?: string | null }).path;
+        if (entryPath && entry.signedUrl) map[entryPath] = entry.signedUrl;
+      }
+      return map;
+    },
+  });
+
+
+
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
       if (!eventId || !orgId || !user) throw new Error('Sessão inválida');
