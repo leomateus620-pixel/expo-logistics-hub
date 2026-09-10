@@ -1,9 +1,12 @@
+import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useCurrentOrg } from './useCurrentOrg';
 
 const BUCKET = 'cronograma-event-attachments';
+const SIGNED_URL_TTL_SECONDS = 60 * 60;
+
 
 export interface EventoAnexo {
   id: string;
