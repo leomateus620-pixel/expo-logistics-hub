@@ -1,0 +1,1016 @@
+{
+  "phase": "before",
+  "device": "landscape",
+  "browser": "152.0.7977.83",
+  "viewport": {
+    "width": 844,
+    "height": 390
+  },
+  "poses": {
+    "a-close": {
+      "target": [
+        16.36363636363636,
+        1.1,
+        20.400000102409635
+      ],
+      "position": [
+        20.36363636363636,
+        3.6,
+        25.400000102409635
+      ]
+    },
+    "a-medium": {
+      "target": [
+        19.854545454545445,
+        0.5,
+        21.272727379518074
+      ],
+      "position": [
+        28.854545454545445,
+        10.5,
+        34.272727379518074
+      ]
+    },
+    "b-close": {
+      "target": [
+        23.127272727272725,
+        1.1,
+        13.527272795180721
+      ],
+      "position": [
+        19.127272727272725,
+        3.4,
+        18.52727279518072
+      ]
+    },
+    "b-medium": {
+      "target": [
+        20.072727272727263,
+        0.5,
+        13.85454552409638
+      ],
+      "position": [
+        28.072727272727263,
+        9.5,
+        25.85454552409638
+      ]
+    },
+    "parking-close": {
+      "target": [
+        31.63636363636364,
+        1.1,
+        14.901818256626512
+      ],
+      "position": [
+        35.63636363636364,
+        3.7,
+        19.901818256626512
+      ]
+    },
+    "parking-medium": {
+      "target": [
+        33.60000000000001,
+        0.5,
+        16.03636371686747
+      ],
+      "position": [
+        43.60000000000001,
+        14.5,
+        34.03636371686747
+      ]
+    },
+    "pilot-high": {
+      "target": [
+        28.799999999999997,
+        0.5,
+        16.9090909939759
+      ],
+      "position": [
+        28.9,
+        40.5,
+        19.9090909939759
+      ]
+    },
+    "control-outside": {
+      "target": [
+        -8.07272727272727,
+        0.5,
+        1.8545454638554162
+      ],
+      "position": [
+        -5.0727272727272705,
+        9.5,
+        13.854545463855416
+      ]
+    },
+    "overview": {
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "position": [
+        65,
+        85,
+        105
+      ]
+    }
+  },
+  "errors": [],
+  "measurements": {
+    "a-close": {
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 588.5,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 6,
+        "lod": 1,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 305,
+      "meanMs": 22.25934426229997,
+      "p95Ms": 19.700000002980232,
+      "renderer": {
+        "at": 38285.199999999255,
+        "calls": 728,
+        "triangles": 935256,
+        "geometries": 600,
+        "textures": 150,
+        "programs": 198,
+        "dpr": 0.72,
+        "width": 607,
+        "height": 206,
+        "heapBytes": 163159337,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 336,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "b-close": {
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 588.5,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 8,
+        "lod": 1,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 344,
+      "meanMs": 17.48052325581612,
+      "p95Ms": 18.100000001490116,
+      "renderer": {
+        "at": 48892,
+        "calls": 265,
+        "triangles": 640306,
+        "geometries": 608,
+        "textures": 147,
+        "programs": 198,
+        "dpr": 0.72,
+        "width": 607,
+        "height": 206,
+        "heapBytes": 165965257,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 715,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "parking-close": {
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 588.5,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 11,
+        "lod": 0,
+        "rendersDuringMeasure": 2
+      },
+      "frames": 340,
+      "meanMs": 17.69176470588016,
+      "p95Ms": 19.199999999254942,
+      "renderer": {
+        "at": 59599.900000002235,
+        "calls": 721,
+        "triangles": 846314,
+        "geometries": 603,
+        "textures": 146,
+        "programs": 198,
+        "dpr": 0.72,
+        "width": 607,
+        "height": 206,
+        "heapBytes": 173494050,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1107,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "pilot-high": {
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 588.5,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 11,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 340,
+      "meanMs": 17.689705882352943,
+      "p95Ms": 18.299999997019768,
+      "renderer": {
+        "at": 70156.60000000149,
+        "calls": 264,
+        "triangles": 599632,
+        "geometries": 603,
+        "textures": 144,
+        "programs": 196,
+        "dpr": 0.72,
+        "width": 607,
+        "height": 206,
+        "heapBytes": 168768855,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1499,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    "overview": {
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 588.5,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 11,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 308,
+      "meanMs": 19.51525974025732,
+      "p95Ms": 25.100000001490116,
+      "renderer": {
+        "at": 80683.5,
+        "calls": 863,
+        "triangles": 771108,
+        "geometries": 603,
+        "textures": 144,
+        "programs": 196,
+        "dpr": 0.72,
+        "width": 607,
+        "height": 206,
+        "heapBytes": 169097292,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1854,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    }
+  },
+  "inventory": {
+    "QUADRA_A": [
+      {
+        "id": "tree-quadra-a-01",
+        "position": [
+          15.84,
+          18.7855
+        ],
+        "canopyRadius": 0.807
+      },
+      {
+        "id": "tree-quadra-a-02",
+        "position": [
+          17.6727,
+          18.7418
+        ],
+        "canopyRadius": 0.73
+      },
+      {
+        "id": "tree-quadra-a-03",
+        "position": [
+          19.68,
+          18.8291
+        ],
+        "canopyRadius": 0.886
+      },
+      {
+        "id": "tree-quadra-a-04",
+        "position": [
+          21.8182,
+          18.7855
+        ],
+        "canopyRadius": 0.925
+      },
+      {
+        "id": "tree-quadra-a-05",
+        "position": [
+          24.1745,
+          18.8291
+        ],
+        "canopyRadius": 0.965
+      },
+      {
+        "id": "tree-quadra-a-06",
+        "position": [
+          15.7964,
+          20.1818
+        ],
+        "canopyRadius": 0.882
+      },
+      {
+        "id": "tree-quadra-a-07",
+        "position": [
+          16.0145,
+          21.7091
+        ],
+        "canopyRadius": 0.798
+      },
+      {
+        "id": "tree-quadra-a-08",
+        "position": [
+          15.7527,
+          23.2364
+        ],
+        "canopyRadius": 0.968
+      },
+      {
+        "id": "tree-quadra-a-09",
+        "position": [
+          24.2182,
+          20.0073
+        ],
+        "canopyRadius": 0.863
+      },
+      {
+        "id": "tree-quadra-a-10",
+        "position": [
+          24,
+          21.7527
+        ],
+        "canopyRadius": 0.906
+      },
+      {
+        "id": "tree-quadra-a-11",
+        "position": [
+          24.2618,
+          23.4545
+        ],
+        "canopyRadius": 0.948
+      },
+      {
+        "id": "tree-quadra-a-12",
+        "position": [
+          24.0436,
+          24.6327
+        ],
+        "canopyRadius": 0.854
+      },
+      {
+        "id": "tree-quadra-a-13",
+        "position": [
+          20.9018,
+          24.6764
+        ],
+        "canopyRadius": 0.788
+      },
+      {
+        "id": "tree-quadra-a-14",
+        "position": [
+          22.5164,
+          24.5891
+        ],
+        "canopyRadius": 0.827
+      },
+      {
+        "id": "tree-quadra-a-15",
+        "position": [
+          17.0618,
+          20.3564
+        ],
+        "canopyRadius": 0.774
+      },
+      {
+        "id": "tree-quadra-a-16",
+        "position": [
+          18.5455,
+          19.5709
+        ],
+        "canopyRadius": 0.816
+      },
+      {
+        "id": "tree-quadra-a-17",
+        "position": [
+          20.3345,
+          20.0945
+        ],
+        "canopyRadius": 0.792
+      },
+      {
+        "id": "tree-quadra-a-18",
+        "position": [
+          22.6036,
+          20.6182
+        ],
+        "canopyRadius": 0.877
+      },
+      {
+        "id": "tree-quadra-a-19",
+        "position": [
+          17.4545,
+          21.9709
+        ],
+        "canopyRadius": 0.979
+      },
+      {
+        "id": "tree-quadra-a-20",
+        "position": [
+          18.3273,
+          23.6291
+        ],
+        "canopyRadius": 0.722
+      },
+      {
+        "id": "tree-quadra-a-21",
+        "position": [
+          19.8545,
+          23.4545
+        ],
+        "canopyRadius": 0.796
+      },
+      {
+        "id": "tree-quadra-a-22",
+        "position": [
+          21.3818,
+          23.0618
+        ],
+        "canopyRadius": 0.774
+      }
+    ],
+    "QUADRA_B": [
+      {
+        "id": "tree-quadra-b-01",
+        "position": [
+          19.1564,
+          12.3273
+        ],
+        "canopyRadius": 0.583
+      },
+      {
+        "id": "tree-quadra-b-02",
+        "position": [
+          20.9455,
+          12.2836
+        ],
+        "canopyRadius": 0.611
+      },
+      {
+        "id": "tree-quadra-b-03",
+        "position": [
+          22.7782,
+          12.3709
+        ],
+        "canopyRadius": 0.64
+      },
+      {
+        "id": "tree-quadra-b-04",
+        "position": [
+          24.4364,
+          12.3273
+        ],
+        "canopyRadius": 0.668
+      },
+      {
+        "id": "tree-quadra-b-05",
+        "position": [
+          19.3091,
+          13.8545
+        ],
+        "canopyRadius": 0.796
+      },
+      {
+        "id": "tree-quadra-b-06",
+        "position": [
+          21.8182,
+          13.0691
+        ],
+        "canopyRadius": 0.669
+      },
+      {
+        "id": "tree-quadra-b-07",
+        "position": [
+          22.6909,
+          13.9855
+        ],
+        "canopyRadius": 0.827
+      },
+      {
+        "id": "tree-quadra-b-08",
+        "position": [
+          24.4364,
+          13.8982
+        ],
+        "canopyRadius": 0.775
+      },
+      {
+        "id": "tree-quadra-b-09",
+        "position": [
+          19.5273,
+          15.3818
+        ],
+        "canopyRadius": 0.651
+      },
+      {
+        "id": "tree-quadra-b-10",
+        "position": [
+          21.3818,
+          15.0764
+        ],
+        "canopyRadius": 0.877
+      },
+      {
+        "id": "tree-quadra-b-11",
+        "position": [
+          23.1273,
+          15.12
+        ],
+        "canopyRadius": 0.704
+      },
+      {
+        "id": "tree-quadra-b-12",
+        "position": [
+          24.48,
+          15.2727
+        ],
+        "canopyRadius": 0.616
+      }
+    ],
+    "PARKING_EXHIBITORS_VISITORS": [
+      {
+        "id": "tree-parking-west-01",
+        "position": [
+          26.8364,
+          7.3091
+        ],
+        "canopyRadius": 1.013
+      },
+      {
+        "id": "tree-parking-west-02",
+        "position": [
+          29.6727,
+          7.4836
+        ],
+        "canopyRadius": 0.917
+      },
+      {
+        "id": "tree-parking-west-03",
+        "position": [
+          32.5091,
+          7.6145
+        ],
+        "canopyRadius": 1.113
+      },
+      {
+        "id": "tree-parking-west-04",
+        "position": [
+          35.3455,
+          7.7455
+        ],
+        "canopyRadius": 1.162
+      },
+      {
+        "id": "tree-parking-west-05",
+        "position": [
+          38.1818,
+          7.8764
+        ],
+        "canopyRadius": 1.212
+      },
+      {
+        "id": "tree-parking-west-06",
+        "position": [
+          40.9091,
+          7.9636
+        ],
+        "canopyRadius": 1.013
+      },
+      {
+        "id": "tree-parking-west-07",
+        "position": [
+          26.6182,
+          10.1455
+        ],
+        "canopyRadius": 0.917
+      },
+      {
+        "id": "tree-parking-west-08",
+        "position": [
+          26.5091,
+          13.2
+        ],
+        "canopyRadius": 1.113
+      },
+      {
+        "id": "tree-parking-west-09",
+        "position": [
+          26.4,
+          16.2545
+        ],
+        "canopyRadius": 1.162
+      },
+      {
+        "id": "tree-parking-west-10",
+        "position": [
+          26.2909,
+          19.3091
+        ],
+        "canopyRadius": 1.212
+      },
+      {
+        "id": "tree-parking-west-11",
+        "position": [
+          26.1818,
+          22.3636
+        ],
+        "canopyRadius": 1.013
+      },
+      {
+        "id": "tree-parking-west-12",
+        "position": [
+          29.2364,
+          23.4545
+        ],
+        "canopyRadius": 0.917
+      },
+      {
+        "id": "tree-parking-west-13",
+        "position": [
+          32.2909,
+          23.5636
+        ],
+        "canopyRadius": 1.113
+      },
+      {
+        "id": "tree-parking-west-14",
+        "position": [
+          35.3455,
+          23.6727
+        ],
+        "canopyRadius": 1.162
+      },
+      {
+        "id": "tree-parking-west-15",
+        "position": [
+          38.4,
+          23.7818
+        ],
+        "canopyRadius": 1.212
+      },
+      {
+        "id": "tree-parking-west-16",
+        "position": [
+          40.6909,
+          23.4545
+        ],
+        "canopyRadius": 1.013
+      },
+      {
+        "id": "tree-parking-west-17",
+        "position": [
+          41.4545,
+          10.8
+        ],
+        "canopyRadius": 0.917
+      },
+      {
+        "id": "tree-parking-west-18",
+        "position": [
+          41.2364,
+          13.8545
+        ],
+        "canopyRadius": 1.113
+      },
+      {
+        "id": "tree-parking-west-19",
+        "position": [
+          41.1273,
+          16.9091
+        ],
+        "canopyRadius": 1.162
+      },
+      {
+        "id": "tree-parking-west-20",
+        "position": [
+          40.9091,
+          19.9636
+        ],
+        "canopyRadius": 1.212
+      },
+      {
+        "id": "tree-parking-west-21",
+        "position": [
+          27.0545,
+          5.6727
+        ],
+        "canopyRadius": 0.777
+      },
+      {
+        "id": "tree-parking-west-22",
+        "position": [
+          30.3273,
+          5.7818
+        ],
+        "canopyRadius": 0.815
+      },
+      {
+        "id": "tree-parking-west-23",
+        "position": [
+          33.6,
+          5.9345
+        ],
+        "canopyRadius": 0.853
+      },
+      {
+        "id": "tree-parking-west-24",
+        "position": [
+          36.8727,
+          6.0436
+        ],
+        "canopyRadius": 0.891
+      },
+      {
+        "id": "tree-parking-west-25",
+        "position": [
+          40.0364,
+          6.1527
+        ],
+        "canopyRadius": 0.929
+      },
+      {
+        "id": "tree-parking-west-26",
+        "position": [
+          28.5818,
+          11.0182
+        ],
+        "canopyRadius": 1.051
+      },
+      {
+        "id": "tree-parking-west-27",
+        "position": [
+          31.6364,
+          11.1927
+        ],
+        "canopyRadius": 0.951
+      },
+      {
+        "id": "tree-parking-west-28",
+        "position": [
+          34.6909,
+          11.3236
+        ],
+        "canopyRadius": 1.154
+      },
+      {
+        "id": "tree-parking-west-29",
+        "position": [
+          37.7455,
+          11.4545
+        ],
+        "canopyRadius": 1.205
+      },
+      {
+        "id": "tree-parking-west-30",
+        "position": [
+          29.0182,
+          14.7273
+        ],
+        "canopyRadius": 1.257
+      },
+      {
+        "id": "tree-parking-west-31",
+        "position": [
+          32.0727,
+          14.9018
+        ],
+        "canopyRadius": 1.051
+      },
+      {
+        "id": "tree-parking-west-32",
+        "position": [
+          35.1273,
+          15.0327
+        ],
+        "canopyRadius": 0.951
+      },
+      {
+        "id": "tree-parking-west-33",
+        "position": [
+          38.1818,
+          15.1636
+        ],
+        "canopyRadius": 1.154
+      },
+      {
+        "id": "tree-parking-west-34",
+        "position": [
+          28.5818,
+          18.4364
+        ],
+        "canopyRadius": 1.205
+      },
+      {
+        "id": "tree-parking-west-35",
+        "position": [
+          31.6364,
+          18.6109
+        ],
+        "canopyRadius": 1.257
+      },
+      {
+        "id": "tree-parking-west-36",
+        "position": [
+          34.6909,
+          18.7418
+        ],
+        "canopyRadius": 1.051
+      },
+      {
+        "id": "tree-parking-west-37",
+        "position": [
+          37.7455,
+          18.8727
+        ],
+        "canopyRadius": 0.951
+      },
+      {
+        "id": "tree-parking-west-38",
+        "position": [
+          29.8909,
+          21.9273
+        ],
+        "canopyRadius": 1.154
+      },
+      {
+        "id": "tree-parking-west-39",
+        "position": [
+          33.6,
+          22.1018
+        ],
+        "canopyRadius": 1.205
+      },
+      {
+        "id": "tree-parking-west-40",
+        "position": [
+          37.3091,
+          22.2545
+        ],
+        "canopyRadius": 1.257
+      }
+    ]
+  },
+  "final": {
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1895,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "snapshot": {
+      "at": 80777.80000000075,
+      "calls": 881,
+      "triangles": 771126,
+      "geometries": 603,
+      "textures": 144,
+      "programs": 196,
+      "dpr": 1,
+      "width": 844,
+      "height": 287,
+      "heapBytes": 174997705,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  }
+}

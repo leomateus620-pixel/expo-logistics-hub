@@ -60,6 +60,18 @@ export function TerritoryQa() {
           JSON.stringify(report);
         return;
       }
+      if (request.inspectVegetation) {
+        const objects: unknown[] = [];
+        scene.traverse(object => {
+          if (!/^(vegetation-pilot|pilot-|camada-arvores)/.test(object.name)) return;
+          const mesh = object as Mesh & { count?: number; instanceMatrix?: { array: ArrayLike<number> } };
+          objects.push({name: object.name, visible: object.visible, data: object.userData, count:mesh.count,
+            triangles: mesh.geometry ? (mesh.geometry.index?.count ?? mesh.geometry.attributes.position.count)/3 : null,
+            transforms:mesh.instanceMatrix?Array.from(mesh.instanceMatrix.array):undefined});
+        });
+        gl.domElement.dataset.vegetationInspection=JSON.stringify(objects);
+        return;
+      }
       const { target, position, measure } = (
         event as CustomEvent<{
           target: [number, number, number];

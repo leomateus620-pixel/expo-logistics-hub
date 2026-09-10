@@ -24,6 +24,9 @@ import {
 } from '../../utils/vegetationLod';
 import type { CommercialMapQualityTier } from '../../utils/viewport';
 import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
+import { isVegetationPilotEnabled, isVegetationPilotTree } from '../../utils/vegetationPilot';
+import { VegetationPilotTreeLayer } from './VegetationPilotTreeLayer';
+import { VegetationPilotGroundLayer } from './VegetationPilotGroundLayer';
 
 const NO_RAYCAST = () => undefined;
 const SHADOW_OPACITY = 0.105;
@@ -922,15 +925,21 @@ export const CommercialTreeLayer = memo(function CommercialTreeLayer(props: {
   reducedGraphics: boolean;
   qualityTier?: CommercialMapQualityTier;
 }) {
+  const pilotEnabled = isVegetationPilotEnabled();
   const treeGroups = useMemo(() => ({
-    referenceQuadras: props.trees.filter((tree) => tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B'),
-    legacy: props.trees.filter((tree) => tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B'),
-  }), [props.trees]);
+    pilot: pilotEnabled ? props.trees.filter(isVegetationPilotTree) : [],
+    referenceQuadras: pilotEnabled ? [] : props.trees.filter((tree) => tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B'),
+    legacy: props.trees.filter((tree) => pilotEnabled ? !isVegetationPilotTree(tree) : tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B'),
+  }), [props.trees, pilotEnabled]);
   const lodScene = useMemo(() => resolveCommercialTreeLodSceneMetrics(props.trees), [props.trees]);
   const qualityTier = props.qualityTier ?? 'HIGH';
   if (props.trees.length === 0) return null;
   return (
     <>
+      {treeGroups.pilot.length > 0 && <>
+        <VegetationPilotTreeLayer {...props} trees={treeGroups.pilot} reducedGraphics={props.reducedGraphics || qualityTier === 'LOW'} />
+        <VegetationPilotGroundLayer entities={props.surfaceEntities} trees={treeGroups.pilot} visible={props.visible} reducedGraphics={props.reducedGraphics || qualityTier === 'LOW'} />
+      </>}
       {treeGroups.legacy.length > 0 && (
         <CommercialTreeInstances
           {...props}

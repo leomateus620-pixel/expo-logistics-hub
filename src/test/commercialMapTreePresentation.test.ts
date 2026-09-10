@@ -200,9 +200,10 @@ describe('apresentação profissional e instanciada das árvores comerciais', ()
     expect(rendererSource).not.toContain('useState');
   });
 
-  it('aplica a copa e os materiais refinados somente ao grupo A/B sem duplicar o inventário legado', () => {
-    expect(rendererSource).toContain("referenceQuadras: props.trees.filter((tree) => tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B')");
-    expect(rendererSource).toContain("legacy: props.trees.filter((tree) => tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B')");
+  it('preserva a referência A/B para comparação e isola o piloto do inventário legado', () => {
+    expect(rendererSource).toContain('pilotEnabled ? props.trees.filter(isVegetationPilotTree) : []');
+    expect(rendererSource).toContain("referenceQuadras: pilotEnabled ? [] : props.trees.filter((tree) => tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B')");
+    expect(rendererSource).toContain("pilotEnabled ? !isVegetationPilotTree(tree) : tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B'");
     expect(rendererSource).toContain('trees={treeGroups.legacy}');
     expect(rendererSource).toContain('trees={treeGroups.referenceQuadras}');
     expect(rendererSource.match(/lodScene=\{lodScene\}/g)).toHaveLength(2);
