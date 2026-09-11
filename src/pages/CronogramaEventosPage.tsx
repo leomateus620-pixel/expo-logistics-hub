@@ -68,6 +68,7 @@ import {
   isCronogramaCycleYear,
   type CronogramaCycleYear,
 } from '@/lib/cronograma-cycle';
+import { isVisibleInCentralTimeline } from '@/lib/cronograma-eventos';
 import type { CronogramaEvent as SourceCronogramaEvent } from '@/lib/cronograma-eventos';
 import type { DashboardDrilldown } from '@/lib/cronograma-dashboard-selectors';
 import {
