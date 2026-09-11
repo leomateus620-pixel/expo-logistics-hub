@@ -69,8 +69,17 @@ import { useAuth } from "@/hooks/useAuth";
 import {
   createVenueDocumentUrl,
   useVenueEventDetail,
+  useVenueEventNoteMutations,
+  useVenueEventNotes,
   type VenuePermissionMap,
 } from "@/hooks/useVenueOperations";
+import {
+  VENUE_HISTORY_FILTERS,
+  buildVenueEventHistory,
+  filterVenueHistory,
+  type VenueHistoryFilter,
+} from "@/lib/venue-history";
+import { toDisplayUpper } from "@/lib/textNormalize";
 import {
   COUNTERPART_UNIT_LABELS,
   EVENT_STATUS_LABELS,
