@@ -344,12 +344,20 @@
   overflow: hidden;
   background: #010713;
   opacity: 1;
-  transition: opacity 520ms cubic-bezier(0.4, 0, 0.6, 1);
+  /* Keep in step with ALVORADA_INTRO_EXIT_TEXT_MS / ALVORADA_INTRO_EXIT_DURATION_MS. */
+  transition: opacity 460ms cubic-bezier(0.4, 0, 0.6, 1) 220ms;
 }
 
 .fenasoja-portal__intro[data-presentation="leaving"] {
   opacity: 0;
   pointer-events: none;
+}
+
+/* The brand text leaves before the landscape starts dissolving. */
+.fenasoja-portal__intro[data-presentation="leaving"] .alvorada-brand-hero__brand,
+.fenasoja-portal__intro[data-presentation="leaving"] .alvorada-brand-hero__statement {
+  opacity: 0;
+  transition: opacity 200ms ease;
 }
 
 .fenasoja-portal__intro-stage {
@@ -419,10 +427,11 @@
   outline-offset: 3px;
 }
 
-.portal-official-countdown {
-  transition: opacity 520ms ease;
-}
-
+/*
+ * The countdown is revealed at full opacity underneath the intro layer, which
+ * is the only surface that fades: a single dissolve, no mid-fade dip where
+ * both layers would be half transparent over the card background.
+ */
 .portal-official-countdown[data-concealed] {
   visibility: hidden;
   opacity: 0;

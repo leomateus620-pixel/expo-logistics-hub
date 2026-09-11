@@ -34,8 +34,13 @@ export const ALVORADA_INTRO_BRAND_FRAME_START = ALVORADA_PHASES['brand-reveal'].
 export const ALVORADA_INTRO_PREPARE_TIMEOUT_MS = 9000;
 /** Absolute visible-time ceiling; the countdown is always restored afterwards. */
 export const ALVORADA_INTRO_MAX_DURATION_MS = 24000;
-/** Cross-fade between the intro layer and the restored countdown. */
-export const ALVORADA_INTRO_EXIT_DURATION_MS = 520;
+/**
+ * Exit of the intro layer: the brand text withdraws first
+ * (`ALVORADA_INTRO_EXIT_TEXT_MS`), then the landscape dissolves into the
+ * restored countdown, so the two texts never blend on screen.
+ */
+export const ALVORADA_INTRO_EXIT_TEXT_MS = 220;
+export const ALVORADA_INTRO_EXIT_DURATION_MS = 720;
 
 export function getAlvoradaIntroStage(
   elapsed: number,

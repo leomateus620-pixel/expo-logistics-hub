@@ -118,6 +118,7 @@ export function AlvoradaIntro({
   const phaseRef = useRef<AlvoradaPhase>(phase);
   const rendererRef = useRef<IntroRenderer>(renderer);
   const finished = useRef(false);
+  const harvestCoveredRef = useRef(false);
   const { armTimer, clearTimer, clearTimers, isArmed } = useAlvoradaVisibleTimeouts(INTRO_TIMER_KEYS);
 
   const commitStage = useCallback((nextStage: AlvoradaIntroStage) => {
@@ -237,6 +238,10 @@ export function AlvoradaIntro({
   }, [commitStage, startBrandHold]);
 
   const handleContextLost = useCallback(() => {
+    // Once the landscape covers the frame the scene contributes nothing more;
+    // losing (or intentionally releasing) its context must not downgrade the
+    // presentation that is already on screen.
+    if (harvestCoveredRef.current) return;
     enterStaticDawn('context-lost');
   }, [enterStaticDawn]);
 
@@ -248,7 +253,10 @@ export function AlvoradaIntro({
     setBaseQuality((current) => degradeAlvoradaQualityProfile(current));
   }, []);
 
-  const handleHarvestCovered = useCallback(() => setHarvestCovered(true), []);
+  const handleHarvestCovered = useCallback(() => {
+    harvestCoveredRef.current = true;
+    setHarvestCovered(true);
+  }, []);
 
   // Once the landscape covers the frame during the dawn, the WebGL scene has
   // nothing visible left to contribute and its renderer is released.
