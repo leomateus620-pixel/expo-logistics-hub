@@ -4,6 +4,9 @@ import type {
   CronogramaStatus,
   CronogramaView,
 } from '@/components/cronograma-eventos/types';
+import { eventCoversMonthNumber, eventOverlapsRange } from '@/lib/cronograma-event-period';
+
+export { eventCoversDay, eventCoversMonthNumber, eventOverlapsRange, getEventPeriod } from '@/lib/cronograma-event-period';
 
 const DAY_MS = 86_400_000;
 export const CRONOGRAMA_TIME_ZONE = 'America/Sao_Paulo';
