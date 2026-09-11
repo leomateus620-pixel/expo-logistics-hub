@@ -50,6 +50,8 @@ import {
 } from './CronogramaBadges';
 import { EventForm } from './EventForm';
 import { formatLongDate, formatLongDateRange } from './dateUtils';
+import { formatEventDurationLabel, formatEventPeriod } from '@/lib/cronograma-event-period';
+import { getEventOperationalLines } from '@/lib/cronograma-event-details';
 import type { CronogramaEvent, CronogramaHistoryEntry } from './types';
 import { EventoAnexosSection } from './EventoAnexosSection';
 import { PersonAvatar } from './PersonAvatar';
