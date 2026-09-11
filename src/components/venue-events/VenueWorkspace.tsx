@@ -677,10 +677,13 @@ export function VenueWorkspace() {
       workspace.allocations,
       workspace.spaces,
     );
-    const sponsor = getStakeholderName(
+    const sponsor = `${getStakeholderName(
       event.sponsor_id,
       workspace.stakeholders,
-    );
+    )} ${getStakeholderName(
+      event.responsible_organization_id,
+      workspace.stakeholders,
+    )}`;
     return (
       eventMatchesSearch(event, search, sponsor, spaces) &&
       (statusFilter === "all" || event.status === statusFilter) &&
@@ -754,10 +757,13 @@ export function VenueWorkspace() {
       workspace.allocations,
       workspace.spaces,
     );
-    const sponsor = getStakeholderName(
+    const sponsor = `${getStakeholderName(
       event.sponsor_id,
       workspace.stakeholders,
-    );
+    )} ${getStakeholderName(
+      event.responsible_organization_id,
+      workspace.stakeholders,
+    )}`;
     return (
       eventMatchesSearch(event, search, sponsor, spaces) &&
       (spaceFilter === "all" ||
