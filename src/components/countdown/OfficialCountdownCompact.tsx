@@ -15,7 +15,18 @@ import {
 
 const PORTAL_COUNTDOWN_CONTROL_ID = 'fenasoja-countdown-expand-portal';
 
-export const OfficialCountdownCompact = memo(function OfficialCountdownCompact() {
+interface OfficialCountdownCompactProps {
+  /**
+   * While the embedded intro plays above the card, the countdown keeps its
+   * layout and its live clock but is hidden from sight and from assistive
+   * technology, so the card never shifts and the digits are current on reveal.
+   */
+  concealed?: boolean;
+}
+
+export const OfficialCountdownCompact = memo(function OfficialCountdownCompact({
+  concealed = false,
+}: OfficialCountdownCompactProps) {
   const navigate = useNavigate();
   const rootRef = useRef<HTMLElement>(null);
   const [nearViewport, setNearViewport] = useState(true);
@@ -52,7 +63,10 @@ export const OfficialCountdownCompact = memo(function OfficialCountdownCompact()
       ref={rootRef}
       className="portal-official-countdown"
       data-phase={snapshot.phase}
+      data-concealed={concealed || undefined}
       aria-labelledby="portal-official-countdown-title"
+      aria-hidden={concealed || undefined}
+      {...(concealed ? ({ inert: '' } as Record<string, string>) : {})}
     >
       <div className="portal-official-countdown__intro">
         <span className="portal-official-countdown__spark" aria-hidden="true">

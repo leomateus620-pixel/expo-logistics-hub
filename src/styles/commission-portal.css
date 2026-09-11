@@ -332,6 +332,102 @@
   border-radius: 0 0 8px;
 }
 
+/*
+ * Embedded Alvorada intro. The layer covers the card interior (rounded clip is
+ * inherited from the hero), never the rest of the portal, and cross-fades back
+ * to the countdown that kept its layout underneath.
+ */
+.fenasoja-portal__intro {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  overflow: hidden;
+  background: #010713;
+  opacity: 1;
+  transition: opacity 520ms cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.fenasoja-portal__intro[data-presentation="leaving"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fenasoja-portal__intro-stage {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.fenasoja-portal__intro-preparing {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 68% 70%, rgb(244 127 34 / 14%), transparent 31%),
+    #010713;
+}
+
+.fenasoja-portal__intro-preparing > span {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgb(155 195 238 / 22%);
+  border-top-color: var(--portal-gold-strong);
+  border-radius: 50%;
+  animation: portal-alvorada-loader 900ms linear infinite;
+}
+
+.fenasoja-portal__intro-skip {
+  position: absolute;
+  z-index: 3;
+  right: 12px;
+  bottom: 12px;
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid rgb(226 238 252 / 34%);
+  border-radius: 999px;
+  background: rgb(2 14 31 / 62%);
+  color: #f6faff;
+  font-size: 0.74rem;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  touch-action: manipulation;
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.fenasoja-portal__intro-skip svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  color: var(--portal-gold);
+}
+
+.fenasoja-portal__intro-skip:hover {
+  border-color: rgb(255 211 92 / 62%);
+  background: rgb(5 24 50 / 82%);
+}
+
+.fenasoja-portal__intro-skip:focus-visible {
+  outline: 3px solid var(--portal-gold);
+  outline-offset: 3px;
+}
+
+.portal-official-countdown {
+  transition: opacity 520ms ease;
+}
+
+.portal-official-countdown[data-concealed] {
+  visibility: hidden;
+  opacity: 0;
+}
+
 /* Access-card styling lives exclusively in portal-access-navigation.css. */
 
 .fenasoja-portal__footer {

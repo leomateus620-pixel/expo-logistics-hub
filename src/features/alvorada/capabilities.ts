@@ -45,15 +45,6 @@ export function warmAlvoradaAssets() {
   ]);
 }
 
-/**
- * Compatibility hook retained for the existing Portal launcher. The city,
- * typeface and 3D-symbol payloads were removed from the runtime; organizational
- * data and portraits now own their loading lifecycle outside this WebGL intro.
- */
-export function streamAlvoradaSecondaryAssets() {
-  return undefined;
-}
-
 function canCreateWebGL2Context(attributes: WebGLContextAttributes) {
   try {
     const canvas = document.createElement('canvas');

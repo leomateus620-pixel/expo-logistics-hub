@@ -20,10 +20,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCapabilities } from '@/hooks/useCapabilities';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { resolveModuleAccess } from '@/hooks/useModuleAccess';
+import { dismissAlvoradaIntro } from '@/features/alvorada/introSession';
 import {
-  streamAlvoradaSecondaryAssets,
-  warmAlvoradaAssets,
-} from '@/features/alvorada/capabilities';
+  ECOSYSTEM_CLOSE_LABEL,
+  ECOSYSTEM_DIALOG_LABEL,
+  ECOSYSTEM_OPEN_LABEL,
+  ECOSYSTEM_PREPARING_LABEL,
+} from '@/features/alvorada/ecosystemLabels';
 import {
   consumeFenasojaCountdownLaunch,
   findFenasojaCountdownReturnFocus,
@@ -51,8 +54,8 @@ import '@/styles/commission-portal.css';
 import '@/styles/portal-access-navigation.css';
 import '@/styles/portal-commission-groups.css';
 
-const loadAlvoradaExperience = () => import('@/features/alvorada/FenasojaAlvoradaExperience');
-const FenasojaAlvoradaExperience = lazy(loadAlvoradaExperience);
+const loadEcosystemExperience = () => import('@/features/alvorada/FenasojaEcosystemExperience');
+const FenasojaEcosystemExperience = lazy(loadEcosystemExperience);
 
 function saveSelectedModule(slug: string) {
   try {
@@ -114,10 +117,10 @@ export default function CommissionPortalPage() {
   } = useCapabilities();
   const { hasOrg, myRole, isLoading: orgLoading } = useCurrentOrg();
   const [expandedEntry, setExpandedEntry] = useState<PortalEntryId | null>(null);
-  const [alvoradaOpen, setAlvoradaOpen] = useState(false);
+  const [ecosystemOpen, setEcosystemOpen] = useState(false);
   const portalRef = useRef<HTMLDivElement>(null);
-  const alvoradaLauncherRef = useRef<HTMLButtonElement>(null);
-  const alvoradaSuspenseCloseRef = useRef<HTMLButtonElement>(null);
+  const ecosystemLauncherRef = useRef<HTMLButtonElement>(null);
+  const ecosystemSuspenseCloseRef = useRef<HTMLButtonElement>(null);
   const entryButtonRefs = useRef<Partial<Record<PortalEntryId, HTMLButtonElement | null>>>({});
   const pendingEntryPosition = useRef<{ entryId: PortalEntryId; top: number } | null>(null);
   const commissionGroups = useMemo(() => getPortalCommissionGroups(), []);
@@ -256,26 +259,27 @@ export default function CommissionPortalPage() {
     setExpandedEntry((current) => (current === entryId ? null : entryId));
   };
 
-  const warmAlvorada = useCallback(() => {
-    warmAlvoradaAssets();
-    void loadAlvoradaExperience();
+  const preloadEcosystem = useCallback(() => {
+    void loadEcosystemExperience();
   }, []);
 
-  const openAlvorada = useCallback(() => {
-    warmAlvorada();
-    streamAlvoradaSecondaryAssets();
-    setAlvoradaOpen(true);
-  }, [warmAlvorada]);
+  const openEcosystem = useCallback(() => {
+    // The ecosystem takes priority over the embedded intro still playing in
+    // the countdown card: the card reveals the countdown and stops rendering.
+    dismissAlvoradaIntro();
+    preloadEcosystem();
+    setEcosystemOpen(true);
+  }, [preloadEcosystem]);
 
-  const closeAlvorada = useCallback(() => {
-    setAlvoradaOpen(false);
+  const closeEcosystem = useCallback(() => {
+    setEcosystemOpen(false);
     window.requestAnimationFrame(() => {
-      alvoradaLauncherRef.current?.focus({ preventScroll: true });
+      ecosystemLauncherRef.current?.focus({ preventScroll: true });
     });
   }, []);
 
   useLayoutEffect(() => {
-    if (!alvoradaOpen) return undefined;
+    if (!ecosystemOpen) return undefined;
 
     const portal = portalRef.current;
     const bodyOverflow = document.body.style.overflow;
@@ -291,19 +295,19 @@ export default function CommissionPortalPage() {
     portal?.setAttribute('inert', '');
 
     const focusFrame = window.requestAnimationFrame(() => {
-      alvoradaSuspenseCloseRef.current?.focus({ preventScroll: true });
+      ecosystemSuspenseCloseRef.current?.focus({ preventScroll: true });
     });
 
     const containSuspenseKeyboard = (event: KeyboardEvent) => {
       if (document.querySelector('.alvorada-overlay')) return;
       if (event.key === 'Tab') {
         event.preventDefault();
-        alvoradaSuspenseCloseRef.current?.focus({ preventScroll: true });
+        ecosystemSuspenseCloseRef.current?.focus({ preventScroll: true });
       }
       if (event.key === 'Escape') {
         event.preventDefault();
         event.stopImmediatePropagation();
-        closeAlvorada();
+        closeEcosystem();
       }
     };
 
@@ -319,7 +323,7 @@ export default function CommissionPortalPage() {
       else portal?.setAttribute('aria-hidden', previousAriaHidden);
       if (!hadInert) portal?.removeAttribute('inert');
     };
-  }, [alvoradaOpen, closeAlvorada]);
+  }, [ecosystemOpen, closeEcosystem]);
 
   const getEntryAccess = (entryId: PortalEntryId): PortalAccessPresentation => {
     if (entryId === 'comissoes') {
@@ -378,16 +382,17 @@ export default function CommissionPortalPage() {
         <header className="fenasoja-portal__header portal-reveal">
           <h1 className="sr-only">FENASOJA 2028</h1>
           <button
-            ref={alvoradaLauncherRef}
+            ref={ecosystemLauncherRef}
             type="button"
             className="fenasoja-portal__alvorada-launcher"
-            aria-label="Abrir O Nascer da Alvorada"
+            data-testid="portal-ecosystem-launcher"
+            aria-label={ECOSYSTEM_OPEN_LABEL}
             aria-haspopup="dialog"
-            aria-expanded={alvoradaOpen}
-            onClick={openAlvorada}
-            onFocus={warmAlvorada}
-            onPointerEnter={warmAlvorada}
-            onTouchStart={warmAlvorada}
+            aria-expanded={ecosystemOpen}
+            onClick={openEcosystem}
+            onFocus={preloadEcosystem}
+            onPointerEnter={preloadEcosystem}
+            onTouchStart={preloadEcosystem}
           >
             <FenasojaBrand
               className="fenasoja-portal__brand-standard"
@@ -499,30 +504,30 @@ export default function CommissionPortalPage() {
         </nav>
       </main>
 
-      {alvoradaOpen && (
+      {ecosystemOpen && (
         <Suspense
           fallback={createPortal((
             <section
               className="fenasoja-portal__alvorada-suspense"
               role="dialog"
               aria-modal="true"
-              aria-label="O Nascer da Alvorada"
+              aria-label={ECOSYSTEM_DIALOG_LABEL}
             >
               <span aria-hidden="true" />
-              <p>Preparando a Alvorada</p>
+              <p>{ECOSYSTEM_PREPARING_LABEL}</p>
               <button
-                ref={alvoradaSuspenseCloseRef}
+                ref={ecosystemSuspenseCloseRef}
                 type="button"
                 className="fenasoja-portal__alvorada-suspense-close"
-                aria-label="Fechar O Nascer da Alvorada"
-                onClick={closeAlvorada}
+                aria-label={ECOSYSTEM_CLOSE_LABEL}
+                onClick={closeEcosystem}
               >
                 <X aria-hidden="true" />
               </button>
             </section>
           ), document.body)}
         >
-          <FenasojaAlvoradaExperience onComplete={closeAlvorada} />
+          <FenasojaEcosystemExperience onComplete={closeEcosystem} />
         </Suspense>
       )}
     </div>

@@ -1,0 +1,179 @@
+/*
+ * Embedded Alvorada intro. Everything is sized from the host container
+ * (container query units), never from the viewport, so the same composition
+ * fits the portal countdown card on phones, tablets and wide desktops.
+ */
+.alvorada-intro {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  container-type: size;
+  background: #010713;
+  color: #f8fafc;
+  pointer-events: none;
+  touch-action: auto;
+  contain: layout paint;
+}
+
+.alvorada-intro__canvas,
+.alvorada-intro__canvas > div,
+.alvorada-intro canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.alvorada-intro__canvas {
+  position: absolute;
+  inset: 0;
+  transition: opacity 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.alvorada-intro canvas {
+  display: block;
+  pointer-events: none !important;
+  touch-action: auto !important;
+}
+
+.alvorada-intro__loader {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 68% 70%, rgb(244 127 34 / 14%), transparent 31%),
+    #010713;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 420ms ease, visibility 420ms ease;
+}
+
+.alvorada-intro[data-stage="preparing"] .alvorada-intro__loader {
+  opacity: 1;
+  visibility: visible;
+}
+
+.alvorada-intro__loader-orbit {
+  width: clamp(26px, 9cqh, 40px);
+  height: clamp(26px, 9cqh, 40px);
+  border: 1px solid rgb(155 195 238 / 22%);
+  border-top-color: #ffb24d;
+  border-radius: 50%;
+  box-shadow: 0 0 22px rgb(255 149 48 / 12%);
+  animation: alvorada-loader-orbit 900ms linear infinite;
+}
+
+/* Dawn landscape framing inside the card. */
+.alvorada-intro .alvorada-harvest img {
+  object-position: 58% 60%;
+}
+
+.alvorada-intro .alvorada-harvest[data-variant="portrait"] img {
+  object-position: 50% 58%;
+}
+
+/* Brand frame: the official symbol, FENASOJA and 2028 scale with the card. */
+.alvorada-intro .alvorada-brand-hero {
+  padding: 0 6cqw 9cqh;
+}
+
+.alvorada-intro .alvorada-brand-hero__brand {
+  flex-direction: row;
+  gap: clamp(10px, 2.4cqw, 28px);
+}
+
+.alvorada-intro .alvorada-brand-hero__brand .fenasoja-brand__mark {
+  width: clamp(36px, 16cqh, 96px);
+  height: clamp(36px, 16cqh, 96px);
+}
+
+.alvorada-intro .alvorada-brand-hero__brand .fenasoja-brand__copy > span:first-child {
+  gap: clamp(8px, 1.8cqw, 24px);
+}
+
+.alvorada-intro .alvorada-brand-hero__brand .fenasoja-brand__wordmark {
+  font-size: clamp(24px, min(7.4cqw, 15cqh), 72px);
+}
+
+.alvorada-intro .alvorada-brand-hero__brand .fenasoja-brand__edition {
+  padding: 4px 0 4px clamp(8px, 1.8cqw, 24px);
+  font-size: clamp(15px, min(3.6cqw, 7.6cqh), 36px);
+}
+
+.alvorada-intro .alvorada-brand-hero__statement {
+  max-width: 78cqw;
+  margin-top: clamp(8px, 2.6cqh, 18px);
+  font-size: clamp(11px, min(1.55cqw, 3.6cqh), 15px);
+  line-height: 1.5;
+}
+
+.alvorada-intro .alvorada-brand-hero__sync {
+  display: none;
+}
+
+/* Portrait or narrow cards (phones): stacked brand, horizon kept whole. */
+@container (max-width: 480px) {
+  .alvorada-intro .alvorada-brand-hero {
+    padding: 0 5cqw 12cqh;
+  }
+
+  .alvorada-intro .alvorada-brand-hero__brand {
+    flex-direction: column;
+    gap: clamp(10px, 3cqh, 18px);
+  }
+
+  .alvorada-intro .alvorada-brand-hero__brand .fenasoja-brand__mark {
+    width: clamp(44px, 14cqh, 72px);
+    height: clamp(44px, 14cqh, 72px);
+  }
+
+  .alvorada-intro .alvorada-brand-hero__brand .fenasoja-brand__wordmark {
+    font-size: clamp(26px, 10.5cqw, 44px);
+  }
+
+  .alvorada-intro .alvorada-brand-hero__brand .fenasoja-brand__edition {
+    padding-left: 10px;
+    font-size: clamp(16px, 5.4cqw, 24px);
+  }
+
+  .alvorada-intro .alvorada-brand-hero__statement {
+    max-width: 86cqw;
+    font-size: 12px;
+  }
+}
+
+/* Short landscape cards (phones rotated, compact desktops). */
+@container (max-height: 230px) {
+  .alvorada-intro .alvorada-brand-hero {
+    padding-bottom: 6cqh;
+  }
+
+  .alvorada-intro .alvorada-brand-hero__brand {
+    flex-direction: row;
+  }
+
+  .alvorada-intro .alvorada-brand-hero__brand .fenasoja-brand__mark {
+    width: clamp(30px, 18cqh, 52px);
+    height: clamp(30px, 18cqh, 52px);
+  }
+
+  .alvorada-intro .alvorada-brand-hero__brand .fenasoja-brand__wordmark {
+    font-size: clamp(22px, 17cqh, 44px);
+  }
+
+  .alvorada-intro .alvorada-brand-hero__brand .fenasoja-brand__edition {
+    font-size: clamp(14px, 9cqh, 24px);
+  }
+
+  .alvorada-intro .alvorada-brand-hero__statement {
+    margin-top: 6px;
+    font-size: 11px;
+  }
+}
+
+@media (forced-colors: active) {
+  .alvorada-intro {
+    border: 1px solid CanvasText;
+  }
+}

@@ -20,6 +20,40 @@ export const ALVORADA_PHASES = {
 
 export type AlvoradaPhase = keyof typeof ALVORADA_PHASES;
 
+/**
+ * Embedded intro (portal countdown card). The authored WebGL journey is reused
+ * up to the dawn brand frame; the organizational hand-off never happens here.
+ */
+export type AlvoradaIntroStage = 'preparing' | 'globe' | 'approach' | 'alvorada' | 'finished';
+
+/** Visible time the "FENASOJA 2028" dawn frame stays before the countdown returns. */
+export const ALVORADA_INTRO_BRAND_HOLD_MS = 3000;
+/** The dawn brand frame starts with the brand reveal; the camera travel is over. */
+export const ALVORADA_INTRO_BRAND_FRAME_START = ALVORADA_PHASES['brand-reveal'].start;
+/** Upper bound for the WebGL preparation before the static dawn takes over. */
+export const ALVORADA_INTRO_PREPARE_TIMEOUT_MS = 9000;
+/** Absolute visible-time ceiling; the countdown is always restored afterwards. */
+export const ALVORADA_INTRO_MAX_DURATION_MS = 24000;
+/** Cross-fade between the intro layer and the restored countdown. */
+export const ALVORADA_INTRO_EXIT_DURATION_MS = 520;
+
+export function getAlvoradaIntroStage(
+  elapsed: number,
+): Exclude<AlvoradaIntroStage, 'preparing' | 'finished'> {
+  const authoredElapsed = Number.isNaN(elapsed) ? 0 : Math.max(0, elapsed);
+  if (authoredElapsed < ALVORADA_PHASES.territory.start) return 'globe';
+  if (authoredElapsed < ALVORADA_INTRO_BRAND_FRAME_START) return 'approach';
+  return 'alvorada';
+}
+
+/**
+ * The embedded intro must never reach the organizational hand-off phases,
+ * otherwise the harvest backdrop fades out and the brand leaves the frame.
+ */
+export function clampAlvoradaIntroPhase(phase: AlvoradaPhase): AlvoradaPhase {
+  return phase === 'org-transition' || phase === 'org-ready' ? 'brand-hold' : phase;
+}
+
 export type AlvoradaDominantScene =
   | 'dawn'
   | 'territory'
