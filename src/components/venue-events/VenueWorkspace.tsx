@@ -1493,6 +1493,12 @@ export function VenueWorkspace() {
               setYearFilter(year);
             }}
           />
+          <VenueMonthFilter
+            value={monthFilter}
+            counts={monthCounts}
+            totalCount={eventsBeforeMonthFilter.length}
+            onChange={setMonthFilter}
+          />
           <VenueEventsFiltersTrigger
             statusFilter={statusFilter}
             onStatusFilterChange={setStatusFilter}
