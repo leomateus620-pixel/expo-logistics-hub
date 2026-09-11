@@ -1136,52 +1136,8 @@ export function VenueEventFormDialog({
                 )}
               </div>
 
-              {effectiveConflicts.length > 0 &&
-                permissions.venue_events_conflict_override && (
-                  <div className="venue-exception-panel">
-                    <div className="venue-preliminary-toggle">
-                      <div>
-                        <strong>Registrar exceção autorizada</strong>
-                        <p>
-                          A justificativa e o usuário autorizador ficarão no
-                          histórico imutável.
-                        </p>
-                      </div>
-                      <Switch
-                        id="venue-event-conflict-override"
-                        aria-label="Registrar exceção autorizada"
-                        checked={draft.conflictOverride}
-                        onCheckedChange={(checked) =>
-                          update("conflictOverride", checked)
-                        }
-                      />
-                    </div>
-                    {draft.conflictOverride && (
-                      <Field
-                        id="venue-event-conflict-reason"
-                        field="conflictOverrideReason"
-                        label="Justificativa da exceção"
-                        error={errors.conflictOverrideReason}
-                        required={draft.conflictOverride}
-                        full
-                      >
-                        <Textarea
-                          id="venue-event-conflict-reason"
-                          value={draft.conflictOverrideReason}
-                          onChange={(event) =>
-                            update("conflictOverrideReason", event.target.value)
-                          }
-                          rows={3}
-                        />
-                      </Field>
-                    )}
-                    {errors.conflictOverride && (
-                      <p className="venue-field__error">
-                        {errors.conflictOverride}
-                      </p>
-                    )}
-                  </div>
-                )}
+
+
             </section>
           </div>
 
