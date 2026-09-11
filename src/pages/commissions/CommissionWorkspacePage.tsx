@@ -40,7 +40,7 @@ interface CommissionWorkspacePageProps {
 }
 
 export default function CommissionWorkspacePage({ module, entry }: CommissionWorkspacePageProps) {
-  const { orgId, role } = useCurrentOrg();
+  const { orgId, myRole } = useCurrentOrg();
   const { user } = useAuth();
   const { byUnit, isLoading: peopleLoading } = useCommissionPeople();
   const location = useLocation();
@@ -99,8 +99,8 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
   }, [user, commissionId, unit.leads, unit.members]);
 
   const accessContext = useMemo(
-    () => ({ userId: user?.id ?? null, orgRole: (role ?? null) as never, memberCommissionIds }),
-    [user?.id, role, memberCommissionIds],
+    () => ({ userId: user?.id ?? null, orgRole: (myRole ?? null) as never, memberCommissionIds }),
+    [user?.id, myRole, memberCommissionIds],
   );
 
   const mayManageDocuments = canManageDocuments(accessContext, commissionId);
