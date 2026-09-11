@@ -983,8 +983,8 @@ export function VenueEventFormDialog({
                   <Field
                     id="venue-event-change-reason"
                     field="changeReason"
-                    label="Motivo da alteração"
-                    hint="Obrigatório quando um evento confirmado muda de data ou espaço."
+                    label="Motivo da alteração (opcional)"
+                    hint="Se preenchido, aparece junto do registro automático no histórico."
                     error={errors.changeReason}
                     full
                   >
@@ -998,6 +998,7 @@ export function VenueEventFormDialog({
                     />
                   </Field>
                 )}
+
               </div>
             </section>
 
