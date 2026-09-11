@@ -87,6 +87,8 @@ interface ReminderDeliveryRow {
   scheduled_for: string;
   updated_at: string;
   channel: string | null;
+  notification_type?: string | null;
+  notification_date?: string | null;
 }
 
 interface SubeventRow {
