@@ -1,3 +1,4 @@
+import { LightingBenchmark } from './LightingBenchmark';
 import { useEffect, useRef, useState } from 'react';
 import { CommercialMapCanvas } from '../components/canvas/CommercialMapCanvas';
 import { CommercialMapRendererStatus } from '../components/CommercialMapRendererStatus';
@@ -533,6 +534,7 @@ export default function CommercialMapRenderingDiagnosticsPage() {
           data-quality-changes={summary.qualityChanges}
           data-sampled-frames={summary.sampledFrames}
         >
+          <LightingBenchmark />
           <strong>Frame consistency</strong>
           <dl>
             <div><dt>FPS médio</dt><dd>{formatMetric(summary.averageFps)}</dd></div>

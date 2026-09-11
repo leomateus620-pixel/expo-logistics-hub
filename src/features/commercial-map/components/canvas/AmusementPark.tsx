@@ -1,25 +1,32 @@
+import { BumperCarBody, bumperCarSpawn } from './BumperCarModel';
+import { preloadBumperPhysics } from '../../utils/preloadBumperPhysics';
 import {
+  Component,
   Suspense,
+  lazy,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  type ReactNode,
 } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import {
-  CuboidCollider,
-  Physics,
-  RigidBody,
-  type RapierRigidBody,
-} from '@react-three/rapier';
 import gsap from 'gsap';
 import * as THREE from 'three';
 import type { StrategicLandmarkBounds } from '../../utils/landmarks';
 
+const PhysicsBumperCars = lazy(preloadBumperPhysics);
+
+// A failed secondary download/physics initialization must not unmount Canvas.
+class BumperPhysicsBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() { return this.state.failed ? this.props.fallback : this.props.children; }
+}
+
 const NO_RAYCAST = () => undefined;
 const CABIN_COLORS = ['#ef3f45', '#1c8cca', '#f5c638', '#7b45b7', '#ef762f', '#2f9d69'];
-const CAR_COLORS = ['#e64045', '#1687be', '#f0b930', '#7149b4', '#e76f31', '#15916c'];
 
 /** Local design frame: the park is authored in a ~7.3 x 6 module and scaled
  * so the official J footprint [930, 2450, 1600, 3000] stays the terrain and
@@ -496,93 +503,6 @@ function Kamikaze({ parkActive }: { parkActive: boolean }) {
   );
 }
 
-function BumperCarBody({ index }: { index: number }) {
-  return (
-    <>
-      <mesh castShadow>
-        <boxGeometry args={[0.5, 0.2, 0.38]} />
-        <meshStandardMaterial
-          color={CAR_COLORS[index % CAR_COLORS.length]}
-          metalness={0.28}
-          roughness={0.38}
-        />
-      </mesh>
-      <mesh position={[0, 0.15, -0.02]}>
-        <boxGeometry args={[0.28, 0.16, 0.23]} />
-        <meshStandardMaterial color="#22292c" metalness={0.18} roughness={0.32} />
-      </mesh>
-      <mesh position={[0, 0, 0.2]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.09, 0.025, 6, 12]} />
-        <meshStandardMaterial color="#f2d34f" roughness={0.42} />
-      </mesh>
-    </>
-  );
-}
-
-function bumperCarSpawn(index: number): [number, number, number] {
-  const column = index % 3;
-  const row = Math.floor(index / 3);
-  return [-0.72 + column * 0.72, 0.34, -0.43 + row * 0.56];
-}
-
-function BumperCar({
-  index,
-  parkActive,
-  position,
-}: {
-  index: number;
-  parkActive: boolean;
-  position: [number, number, number];
-}) {
-  const body = useRef<RapierRigidBody>(null);
-  const nextImpulseAt = useRef(index * 0.17);
-  const invalidate = useThree((state) => state.invalidate);
-
-  useEffect(() => {
-    if (parkActive) {
-      nextImpulseAt.current = 0;
-      body.current?.wakeUp();
-      invalidate();
-    } else {
-      body.current?.setLinvel({ x: 0, y: 0, z: 0 }, false);
-      body.current?.setAngvel({ x: 0, y: 0, z: 0 }, false);
-      body.current?.sleep();
-    }
-  }, [invalidate, parkActive]);
-
-  useFrame(({ clock }) => {
-    if (!parkActive || !body.current) return;
-    const elapsed = clock.elapsedTime;
-    if (elapsed >= nextImpulseAt.current) {
-      const heading = elapsed * (0.72 + index * 0.06) + index * 1.73;
-      body.current.applyImpulse({
-        x: Math.cos(heading) * 0.048,
-        y: 0,
-        z: Math.sin(heading) * 0.048,
-      }, true);
-      body.current.applyTorqueImpulse({ x: 0, y: Math.sin(heading * 0.7) * 0.006, z: 0 }, true);
-      nextImpulseAt.current = elapsed + 0.55 + (index % 3) * 0.12;
-    }
-    invalidate();
-  });
-
-  return (
-    <RigidBody
-      ref={body}
-      position={position}
-      colliders={false}
-      linearDamping={1.45}
-      angularDamping={2.2}
-      enabledRotations={[false, true, false]}
-      canSleep
-      mass={0.72}
-    >
-      <CuboidCollider args={[0.24, 0.1, 0.18]} restitution={0.78} friction={0.22} />
-      <BumperCarBody index={index} />
-    </RigidBody>
-  );
-}
-
 /** Static stand-ins shown before the Rapier world has ever been needed. */
 function ParkedBumperCars({ carCount }: { carCount: number }) {
   return (
@@ -599,40 +519,13 @@ function ParkedBumperCars({ carCount }: { carCount: number }) {
   );
 }
 
-function PhysicsBumperCars({
-  parkActive,
-  carCount,
-}: {
-  parkActive: boolean;
-  carCount: number;
-}) {
-  return (
-    <Physics paused={!parkActive} gravity={[0, -9.81, 0]} timeStep="vary">
-      <RigidBody type="fixed" colliders={false}>
-        <CuboidCollider position={[0, 0.12, 0]} args={[1.26, 0.08, 0.83]} />
-        <CuboidCollider position={[-1.29, 0.33, 0]} args={[0.06, 0.25, 0.9]} />
-        <CuboidCollider position={[1.29, 0.33, 0]} args={[0.06, 0.25, 0.9]} />
-        <CuboidCollider position={[0, 0.33, -0.86]} args={[1.28, 0.25, 0.06]} />
-        <CuboidCollider position={[0, 0.33, 0.86]} args={[1.28, 0.25, 0.06]} />
-      </RigidBody>
-      {Array.from({ length: carCount }, (_, index) => (
-        <BumperCar
-          key={index}
-          index={index}
-          parkActive={parkActive}
-          position={bumperCarSpawn(index)}
-        />
-      ))}
-    </Physics>
-  );
-}
-
 function BumperCars({ parkActive, reducedGraphics }: { parkActive: boolean; reducedGraphics: boolean }) {
   const carCount = reducedGraphics ? 4 : 7;
   // The Rapier world (and its WASM payload) boots lazily on the first
   // activation and stays mounted afterwards; until then the pad shows cheap
   // parked meshes, keeping the dormant park free of physics work.
   const [physicsBooted, setPhysicsBooted] = useState(false);
+  useEffect(() => { void preloadBumperPhysics().catch(() => undefined); }, []);
   useEffect(() => {
     if (parkActive) setPhysicsBooted(true);
   }, [parkActive]);
@@ -704,9 +597,11 @@ function BumperCars({ parkActive, reducedGraphics }: { parkActive: boolean; redu
       </mesh>
       <LedString positions={canopyLeds} color="#ffd784" parkActive={parkActive} peak={5.5} />
       {physicsBooted ? (
-        <Suspense fallback={<ParkedBumperCars carCount={carCount} />}>
-          <PhysicsBumperCars parkActive={parkActive} carCount={carCount} />
-        </Suspense>
+        <BumperPhysicsBoundary fallback={<ParkedBumperCars carCount={carCount} />}>
+          <Suspense fallback={<ParkedBumperCars carCount={carCount} />}>
+            <PhysicsBumperCars parkActive={parkActive} carCount={carCount} />
+          </Suspense>
+        </BumperPhysicsBoundary>
       ) : (
         <ParkedBumperCars carCount={carCount} />
       )}

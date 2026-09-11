@@ -48,9 +48,16 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
+          // Rollup otherwise places shared preload/CJS helpers in the first
+          // manual graphics chunk, making every lazy route load that chunk.
+          if (id.includes('vite/preload-helper') || id.includes('commonjsHelpers')) return 'module-runtime';
+          if (id.includes('suspend-react')) return 'graphics-suspense';
           if (!id.includes("node_modules")) return;
+          if (id.includes('zustand') || id.includes('use-sync-external-store')) return 'state-vendor';
+          if (id.includes('prop-types')) return 'react-vendor';
           if (id.includes("maplibre-gl")) return "maps-maplibre";
           if (id.includes("/leaflet/") || id.includes("\\leaflet\\")) return "maps-leaflet";
+          if (id.includes("@dimforge/rapier") || id.includes("@react-three/rapier")) return "maps-physics";
           if (
             id.includes("/three/") ||
             id.includes("\\three\\") ||

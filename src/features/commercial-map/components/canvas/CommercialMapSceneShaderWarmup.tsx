@@ -1,3 +1,4 @@
+import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
 import { useLayoutEffect } from 'react';
 import { useThree } from '@react-three/fiber';
 import { prepareCommercialScene } from '../../utils/sceneShaderWarmup';
@@ -18,7 +19,7 @@ export function CommercialMapSceneShaderWarmup() {
       gl.domElement.dispatchEvent(new CustomEvent(COMMERCIAL_MAP_PREPARING_EVENT, { bubbles: true }));
       void prepareCommercialScene(gl, scene, camera).then(() => {
         if (!active || current !== generation) return;
-        if (import.meta.env.DEV) gl.domElement.dataset.commercialMapSceneWarmup = JSON.stringify({
+        if (commercialMapDiagnosticsEnabled) gl.domElement.dataset.commercialMapSceneWarmup = JSON.stringify({
           durationMs: performance.now() - startedAt,
           parallel: gl.extensions.has('KHR_parallel_shader_compile'),
         });
