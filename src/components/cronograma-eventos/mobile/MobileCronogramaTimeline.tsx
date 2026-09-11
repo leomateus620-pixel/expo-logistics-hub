@@ -37,6 +37,9 @@ import {
   getTodayKey,
   groupTimelineByMonth,
 } from '@/lib/cronograma-timeline';
+import { formatEventDurationLabel, formatEventPeriodShort, getEventPeriod } from '@/lib/cronograma-event-period';
+import { getEventDetailTeaser } from '@/lib/cronograma-event-details';
+import { toDisplayUpper } from '@/lib/textNormalize';
 import {
   CronogramaCategoryMarker,
   CronogramaPriorityIndicator,
