@@ -619,6 +619,7 @@ async function sendPending(supa: ReturnType<typeof db>) {
             title: pushMessage.title,
             body: pushMessage.body,
             path: pushMessage.path,
+            templateName: delivery.notification_type ?? "event-reminder",
           }),
         });
         const pushRaw = await pushRes.text();
