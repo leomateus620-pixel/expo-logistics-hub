@@ -328,6 +328,21 @@ export function EventDrawer({
                   </div>
                 </section>
 
+                {getEventOperationalLines(event).length > 0 && (
+                  <section className="cronograma-drawer-section" aria-label="Informações operacionais">
+                    <p className="cronograma-section-eyebrow">Informações do evento</p>
+                    <ul className="mt-2 space-y-2">
+                      {getEventOperationalLines(event).map((line) => (
+                        <li key={`${line.source}-${line.text}`} className="rounded-lg border border-border/60 bg-white/50 p-2.5">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/55">{line.source}</p>
+                          <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-foreground/80">{line.text}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+
+
                 {(event.pendingReason || event.decisionNeeded || !event.date) && (
                   <section className="cronograma-pending-panel" aria-label="Definição pendente">
                     <div className="flex items-start gap-3">
