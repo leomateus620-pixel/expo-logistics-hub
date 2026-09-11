@@ -54,12 +54,12 @@ export function CommissionDocumentsPage({ unit, documents, state = 'ready', onOp
   }, [sorted, scope, search]);
 
   const grouped = useMemo(() => {
-    const map = new Map<string, DocumentViewModel[]>();
-    for (const document of visible) {
-      const key = document.eventTitle ?? (document.category ?? `Documentos ${unitLabel}`);
-      map.set(key, [...(map.get(key) ?? []), document]);
-    }
-    return Array.from(map.entries());
+    const unitDocs = visible.filter((document) => !document.eventId);
+    const eventDocs = visible.filter((document) => Boolean(document.eventId));
+    const groups: Array<[string, DocumentViewModel[]]> = [];
+    if (unitDocs.length > 0) groups.push([`Documentos ${unitLabel}`, unitDocs]);
+    if (eventDocs.length > 0) groups.push(['Documentos de eventos', eventDocs]);
+    return groups;
   }, [visible, unitLabel]);
 
   if (state === 'error') {
@@ -128,7 +128,7 @@ export function CommissionDocumentsPage({ unit, documents, state = 'ready', onOp
                   </header>
                   <div className="ua-documents">
                     {items.map((document) => (
-                      <DocumentCard key={document.id} document={document} hideEvent onOpen={onOpenDocument} onDownload={onDownloadDocument} />
+                      <DocumentCard key={document.id} document={document} onOpen={onOpenDocument} onDownload={onDownloadDocument} />
                     ))}
                   </div>
                 </section>

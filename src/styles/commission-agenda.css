@@ -1923,6 +1923,17 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Em trilhas estreitas o local viraria "Ca…"; melhor omitir do que truncar. */
+.ua-compact-event__location {
+  display: none;
+}
+
+@container workspace (min-width: 480px) {
+  .ua-compact-event__location {
+    display: inline;
+  }
+}
+
 .ua-compact-event svg.ua-compact-event__chevron {
   width: 16px;
   height: 16px;
@@ -2741,6 +2752,8 @@
   min-height: 0;
   flex: 1;
   overflow-y: auto;
+  /* Recebe o foco inicial do painel apenas como ponto de partida do teclado. */
+  outline: none;
   padding: var(--space-4);
   padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
 }

@@ -48,7 +48,7 @@ export function WorkspaceSheet({ open, onOpenChange, eyebrow, title, description
           </div>
           {headerAside}
         </div>
-        <div ref={bodyRef} className="ua-sheet__body ws-focus-inset" tabIndex={-1}>{children}</div>
+        <div ref={bodyRef} className="ua-sheet__body" tabIndex={-1}>{children}</div>
         {footer && <div className="ua-sheet__footer">{footer}</div>}
       </SheetContent>
     </Sheet>

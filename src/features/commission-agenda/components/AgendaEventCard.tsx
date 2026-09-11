@@ -131,7 +131,7 @@ export function AgendaEventCompactCard({ event, onOpen, className }: AgendaEvent
         <span className="ua-compact-event__meta ws-caption" style={{ fontWeight: 500 }}>
           <EventStatusBadge status={event.status} size="sm" />
           {event.startTime && <span className="ua-compact-event__time">{event.startTime}{event.endTime ? ` → ${event.endTime}` : ''}</span>}
-          {event.location && <span>{event.location}</span>}
+          {event.location && <span className="ua-compact-event__location">{event.location}</span>}
         </span>
       </span>
       <ChevronRight className="ua-compact-event__chevron" aria-hidden="true" />
