@@ -1065,7 +1065,11 @@ export function VenueEventDetail({
           </div>
 
 
-          <Tabs defaultValue="resumo" className="venue-detail-tabs">
+          <Tabs
+            value={activeTab}
+            onValueChange={changeTab}
+            className="venue-detail-tabs"
+          >
             <TabsList aria-label="Detalhes do evento">
               <TabsTrigger value="resumo">Resumo</TabsTrigger>
               <TabsTrigger value="operacao">Operação</TabsTrigger>
