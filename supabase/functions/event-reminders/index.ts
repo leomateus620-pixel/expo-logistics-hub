@@ -555,14 +555,37 @@ async function sendPending(supa: ReturnType<typeof db>) {
     }
 
     if (delivery.channel === "push") {
+      const range = normalizeEventRange(event.start_date, event.end_date);
+      const endTimeLabel = formatHourLabel(event.end_time);
+      const endDateLabel = range ? shortDateLabel(range.end) : null;
       // Mesmo destinatário e mesmo horário do e-mail; só muda o canal de entrega.
-      const pushMessage = buildEventPushMessage({
-        offsetMinutes: delivery.offset_minutes,
-        eventTitle: event.title,
-        dateLabel: normalized.value.dateLong,
-        timeLabel: normalized.value.timeLabel,
-        location: event.location,
+      const pushMessage = lifecycleDay
+        ? buildEventLifecycleMessage({
+          state: lifecycleDay.state,
+          eventTitle: event.title,
+          eventId: delivery.event_id,
+          dayIndex: lifecycleDay.dayIndex,
+          totalDays: lifecycleDay.totalDays,
+          endDateLabel,
+          endTimeLabel,
+          location: event.location,
+        })
+        : buildEventPushMessage({
+          offsetMinutes: delivery.offset_minutes,
+          eventTitle: event.title,
+          dateLabel: normalized.value.dateLong,
+          timeLabel: normalized.value.timeLabel,
+          location: event.location,
+          eventId: delivery.event_id,
+          multiDayEndLabel: isMultiDayEvent(event.start_date, event.end_date) && endDateLabel
+            ? (endTimeLabel ? `${endDateLabel} · ${endTimeLabel}` : endDateLabel)
+            : null,
+        });
+      console.log("event_lifecycle_delivery_attempt", {
+        deliveryId: delivery.id,
         eventId: delivery.event_id,
+        lifecycleState: lifecycleDay?.state ?? "START",
+        notificationDate: delivery.notification_date ?? null,
       });
       try {
         const pushRes = await fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
