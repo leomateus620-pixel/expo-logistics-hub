@@ -387,6 +387,23 @@ export function MobileEventScreen({
               </div>
             </section>
 
+            {getEventOperationalLines(event).length > 0 && (
+              <section className="cronograma-mobile-event-section" aria-labelledby="cronograma-mobile-operational-title">
+                <h2 id="cronograma-mobile-operational-title" className="text-base font-black tracking-tight text-foreground">
+                  Detalhes e orientações
+                </h2>
+                <ul className="mt-3 space-y-2">
+                  {getEventOperationalLines(event).map((line) => (
+                    <li key={`${line.source}-${line.text}`} className="rounded-xl border border-border/60 bg-white/60 p-3">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/55">{line.source}</p>
+                      <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-foreground/80">{line.text}</p>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+
             {(event.pendingReason || event.decisionNeeded || !event.date) && (
               <section className="cronograma-mobile-event-section" aria-labelledby="cronograma-mobile-pending-title">
                 <div className="flex items-start gap-3">
