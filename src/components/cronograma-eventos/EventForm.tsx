@@ -177,7 +177,11 @@ export function EventForm({
   const initialSignature = useMemo(() => JSON.stringify(initialForm), [initialForm]);
   const [form, setForm] = useState<CronogramaEvent>(initialForm);
   const [baselineSignature, setBaselineSignature] = useState(initialSignature);
-  const [fieldErrors, setFieldErrors] = useState<{ title?: string; time?: string }>({});
+  const [fieldErrors, setFieldErrors] = useState<{ title?: string; time?: string; range?: string }>({});
+  /** Multi-day toggle: a single canonical event covering a date interval. */
+  const [multiDay, setMultiDay] = useState(
+    () => Boolean(initialForm.date && initialForm.endDate && initialForm.endDate > initialForm.date),
+  );
   const formIdentity = event?.sourceKey ?? event?.id ?? '__new-cronograma-event__';
   const formIdentityRef = useRef(formIdentity);
   const dirtyRef = useRef(false);
@@ -190,6 +194,7 @@ export function EventForm({
     setForm(initialForm);
     setBaselineSignature(initialSignature);
     setFieldErrors({});
+    setMultiDay(Boolean(initialForm.date && initialForm.endDate && initialForm.endDate > initialForm.date));
   }, [formIdentity, initialForm, initialSignature]);
 
   useEffect(() => {
