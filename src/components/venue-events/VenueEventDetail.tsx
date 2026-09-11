@@ -73,7 +73,7 @@ import {
 import {
   COUNTERPART_UNIT_LABELS,
   EVENT_STATUS_LABELS,
-  EVENT_TYPE_LABELS,
+  venueEventTypeLabel,
   RESOURCE_TYPE_LABELS,
   eventReadiness,
   formatQuantity,
