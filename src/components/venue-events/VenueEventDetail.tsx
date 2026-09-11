@@ -558,6 +558,69 @@ export function VenueEventDetail({
     event?.id ?? null,
     permissions.venue_events_audit_view,
   );
+  const [localTab, setLocalTab] = useState<VenueDetailTab>("resumo");
+  const activeTab: VenueDetailTab = tab ?? localTab;
+  const changeTab = (value: string) => {
+    if (!isVenueDetailTab(value)) return;
+    setLocalTab(value);
+    onTabChange?.(value);
+  };
+  const canViewHistory = permissions.venue_events_audit_view;
+  const canCreateNote =
+    permissions.venue_events_manage || permissions.venue_operations_manage;
+  const notesQuery = useVenueEventNotes(event?.id ?? null, canViewHistory);
+  const { saveNote, deleteNote } = useVenueEventNoteMutations(
+    event?.id ?? null,
+  );
+  const [noteComposerOpen, setNoteComposerOpen] = useState(false);
+  const [noteDraft, setNoteDraft] = useState("");
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [historyFilter, setHistoryFilter] = useState<VenueHistoryFilter>(
+    "todos",
+  );
+  const historyItems = useMemo(
+    () =>
+      buildVenueEventHistory({
+        audit: detailQuery.auditQuery.data ?? [],
+        approvals: detailQuery.detailQuery.data?.approvals ?? [],
+        notes: notesQuery.data ?? [],
+      }),
+    [
+      detailQuery.auditQuery.data,
+      detailQuery.detailQuery.data?.approvals,
+      notesQuery.data,
+    ],
+  );
+  const visibleHistory = useMemo(
+    () => filterVenueHistory(historyItems, historyFilter),
+    [historyFilter, historyItems],
+  );
+  const submitNote = async () => {
+    const body = toDisplayUpper(noteDraft.trim());
+    if (body.trim().length < 2) {
+      toast.error("Escreva o apontamento antes de salvar.");
+      return;
+    }
+    try {
+      await saveNote.mutateAsync({ body, noteId: editingNoteId });
+      setNoteDraft("");
+      setEditingNoteId(null);
+      setNoteComposerOpen(false);
+      toast.success(
+        editingNoteId ? "Apontamento atualizado." : "Apontamento registrado.",
+      );
+    } catch (error) {
+      toast.error(mapVenueError(error));
+    }
+  };
+  const removeNote = async (noteId: string) => {
+    try {
+      await deleteNote.mutateAsync(noteId);
+      toast.success("Apontamento removido.");
+    } catch (error) {
+      toast.error(mapVenueError(error));
+    }
+  };
   const [action, setAction] = useState<TransitionName | null>(null);
   const [reason, setReason] = useState("");
   const [result, setResult] = useState("");
