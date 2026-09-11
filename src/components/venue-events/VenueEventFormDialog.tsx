@@ -839,15 +839,7 @@ export function VenueEventFormDialog({
               <div className="venue-form-section__intro">
                 <h3>Vínculos</h3>
               </div>
-              <div className="venue-identity-grid" data-venue-field="requesterName">
-                <div className="venue-identity-card">
-                  <span>Solicitante</span>
-                  <strong>
-                    <UserRound aria-hidden="true" />
-                    {draft.requesterName || defaultRequesterName || "—"}
-                  </strong>
-                  <small>Usuário autenticado que está cadastrando</small>
-                </div>
+              <div className="venue-identity-grid">
                 <div className="venue-identity-card">
                   <span>Responsável Fenasoja</span>
                   <strong>
