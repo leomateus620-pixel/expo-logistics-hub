@@ -285,6 +285,37 @@ export function VenueEventCard({
       </span>
 
       <span className="venue-event-card__aside">
+        {(onOpenDocuments || onOpenHistory) && (
+          <span className="venue-event-card__quick">
+            {onOpenDocuments && (
+              <button
+                type="button"
+                className="venue-event-card__quick-action"
+                onClick={quickAction(onOpenDocuments)}
+                onKeyDown={(keyEvent) => keyEvent.stopPropagation()}
+                aria-label="Abrir documentos do evento"
+                title="Documentos"
+              >
+                <FileText aria-hidden="true" />
+                {typeof documentCount === "number" && documentCount > 0 && (
+                  <b>{documentCount}</b>
+                )}
+              </button>
+            )}
+            {onOpenHistory && (
+              <button
+                type="button"
+                className="venue-event-card__quick-action"
+                onClick={quickAction(onOpenHistory)}
+                onKeyDown={(keyEvent) => keyEvent.stopPropagation()}
+                aria-label="Abrir histórico do evento"
+                title="Histórico"
+              >
+                <History aria-hidden="true" />
+              </button>
+            )}
+          </span>
+        )}
         {hasConflict && (
           <AlertTriangle
             className="venue-event-card__conflict"
@@ -295,6 +326,6 @@ export function VenueEventCard({
         <VenueEventStatusBadge status={event.status} />
         <ChevronRight aria-hidden="true" />
       </span>
-    </button>
+    </div>
   );
 }
