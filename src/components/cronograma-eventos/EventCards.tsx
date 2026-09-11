@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getEventOperationalLines } from '@/lib/cronograma-event-details';
+import { toDisplayUpper } from '@/lib/textNormalize';
 import { formatEventDurationLabel, formatEventPeriodShort, getEventPeriod } from '@/lib/cronograma-event-period';
 import {
   CronogramaCategoryMarker,
