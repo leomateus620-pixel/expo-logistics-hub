@@ -1174,3 +1174,49 @@
     border-color: currentColor;
   }
 }
+
+/* Ações rápidas (Documentos / Histórico) ---------------------------- */
+.venue-event-card__quick {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.venue-event-card__quick-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.4rem;
+  border-radius: 0.6rem;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--vec-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+
+.venue-event-card__quick-action svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.venue-event-card__quick-action:hover,
+.venue-event-card__quick-action:focus-visible {
+  background: oklch(var(--muted) / 0.7);
+  border-color: oklch(var(--border));
+  color: var(--vec-accent);
+  outline: none;
+}
+
+@media (max-width: 640px) {
+  .venue-event-card__quick-action {
+    min-width: 1.9rem;
+    height: 1.9rem;
+    padding: 0 0.3rem;
+  }
+}
