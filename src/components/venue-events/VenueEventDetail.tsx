@@ -497,11 +497,14 @@ export function VenueEventDetail({
   onResourceUpdate,
   onDocumentUpload,
   onDelete,
-
+  tab,
+  onTabChange,
 }: {
   event: VenueEvent | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  tab?: VenueDetailTab;
+  onTabChange?: (tab: VenueDetailTab) => void;
   workspace: VenueWorkspaceData;
   permissions: VenuePermissionMap;
   members: VenueMember[];
