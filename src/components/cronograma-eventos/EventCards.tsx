@@ -36,7 +36,12 @@ export function CronogramaEventCard({
   onOpen: (event: CronogramaEvent) => void;
   onEdit?: (event: CronogramaEvent) => void;
 }) {
-  const dateLabel = event.date ? formatShortDate(event.date) : 'Sem data';
+  const period = getEventPeriod(event);
+  const dateLabel = event.date
+    ? (period.isMultiDay ? formatEventPeriodShort(event) : formatShortDate(event.date))
+    : 'Sem data';
+  const durationLabel = formatEventDurationLabel(event);
+  const operationalLines = compact ? [] : getEventOperationalLines(event, 3).slice(1);
   return (
     <article
       className={cn(
@@ -52,8 +57,14 @@ export function CronogramaEventCard({
           {event.date ? event.year : 'Pendente'}
         </span>
         <span className="mt-1 text-sm font-black leading-tight text-foreground">{dateLabel}</span>
+        {durationLabel && (
+          <span className="mt-1 rounded-full bg-gold/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-gold">
+            {durationLabel}
+          </span>
+        )}
         {event.startTime && <span className="mt-1 font-mono text-[10px] font-semibold text-primary">{event.startTime}</span>}
       </div>
+
 
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
