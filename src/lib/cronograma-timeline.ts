@@ -277,7 +277,8 @@ export function filterTimelineEvents(
       if (!haystack.includes(query)) return false;
     }
     if (filters.year !== 'all' && event.year !== filters.year) return false;
-    if (filters.month !== 'all' && (!event.date || Number(event.date.slice(5, 7)) !== filters.month)) return false;
+    /** Multi-day events match any month they cover, never duplicated. */
+    if (filters.month !== 'all' && !eventCoversMonthNumber(event, filters.month)) return false;
     if (filters.category !== 'all' && event.category !== filters.category) return false;
     if (filters.status !== 'all' && event.status !== filters.status) return false;
     if (filters.priority !== 'all' && event.priority !== filters.priority) return false;
@@ -285,15 +286,14 @@ export function filterTimelineEvents(
     if (filters.owner !== 'all' && event.owner !== filters.owner) return false;
     if (filters.officialOnly && !event.isOfficial && !event.isMain) return false;
     if (filters.missingOwner && event.owner) return false;
-    if (filters.fromDate && (!event.date || event.date < filters.fromDate)) return false;
-    if (filters.toDate && (!event.date || event.date > filters.toDate)) return false;
+    if ((filters.fromDate || filters.toDate) && !eventOverlapsRange(event, filters.fromDate || null, filters.toDate || null)) return false;
 
-    if (filters.period === 'today' && event.date !== todayKey) return false;
-    if (filters.period === 'week' && (!event.date || event.date < weekStart || event.date > weekEnd)) return false;
-    if (filters.period === '30days' && (!event.date || event.date < todayKey || event.date > next30)) return false;
+    if (filters.period === 'today' && !eventOverlapsRange(event, todayKey, todayKey)) return false;
+    if (filters.period === 'week' && !eventOverlapsRange(event, weekStart, weekEnd)) return false;
+    if (filters.period === '30days' && !eventOverlapsRange(event, todayKey, next30)) return false;
     if (
       filters.period === 'upcoming'
-      && (!event.date || event.date < todayKey || ['completed', 'cancelled', 'rescheduled'].includes(event.status))
+      && (!eventOverlapsRange(event, todayKey, null) || ['completed', 'cancelled', 'rescheduled'].includes(event.status))
     ) return false;
     if (filters.period === 'overdue') {
       if (!isCronogramaEventOverdue(event, todayKey)) return false;
