@@ -158,6 +158,8 @@ export function adaptCronogramaEvent(
     isOfficial: event.isOfficialSeed,
     isCentralMeeting: centralMeeting,
     notifyAllCommissionMembers: event.notifyAllCommissionMembers === true,
+    originSource: event.originSource === 'unidade' ? 'unidade' : 'agenda_central',
+    originCommissionId: event.originCommissionId ?? null,
     pendingReason: event.hasExactDate ? undefined : event.sourceNote ?? 'Aguardando definição de data oficial.',
     decisionNeeded: event.hasExactDate ? undefined : 'Definir data oficial e confirmar responsáveis vinculados.',
     createdAt: event.createdAt,

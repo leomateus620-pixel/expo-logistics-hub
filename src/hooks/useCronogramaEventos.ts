@@ -411,6 +411,8 @@ function fromDbRow(row: unknown): CronogramaEvent {
     isOfficialSeed: record.is_official_seed === true,
     hasExactDate: record.has_exact_date === false ? false : true,
     notifyAllCommissionMembers: record.notify_all_commission_members === true,
+    originSource: readString(record, 'origin_source') === 'unidade' ? 'unidade' : 'agenda_central',
+    originCommissionId: readString(record, 'origin_commission_id'),
     linkedCommissions: parseJsonArray<CronogramaCommissionLink>(record.linked_commissions),
     subevents: viewSubevents.length > 0 ? viewSubevents : legacySubevents,
     lockVersion: readNumber(record, 'lock_version'),

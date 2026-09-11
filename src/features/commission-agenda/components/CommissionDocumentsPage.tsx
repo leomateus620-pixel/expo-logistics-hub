@@ -16,6 +16,8 @@ export interface CommissionDocumentsPageProps {
   state?: AgendaLoadState;
   onOpenDocument?: (document: DocumentViewModel) => void;
   onDownloadDocument?: (document: DocumentViewModel) => void;
+  /** Só é informado quando o usuário pode gerenciar documentos da frente. */
+  onDeleteDocument?: (document: DocumentViewModel) => void;
   onAddDocument?: () => void;
   onRetry?: () => void;
   className?: string;
@@ -29,7 +31,7 @@ const SCOPE_LABELS: Record<DocumentScope, string> = {
   events: 'De eventos',
 };
 
-export function CommissionDocumentsPage({ unit, documents, state = 'ready', onOpenDocument, onDownloadDocument, onAddDocument, onRetry, className }: CommissionDocumentsPageProps) {
+export function CommissionDocumentsPage({ unit, documents, state = 'ready', onOpenDocument, onDownloadDocument, onDeleteDocument, onAddDocument, onRetry, className }: CommissionDocumentsPageProps) {
   const [search, setSearch] = useState('');
   const [scope, setScope] = useState<DocumentScope>('all');
   const unitLabel = unitArticleLabel(unit.type);
@@ -128,7 +130,7 @@ export function CommissionDocumentsPage({ unit, documents, state = 'ready', onOp
                   </header>
                   <div className="ua-documents">
                     {items.map((document) => (
-                      <DocumentCard key={document.id} document={document} onOpen={onOpenDocument} onDownload={onDownloadDocument} />
+                      <DocumentCard key={document.id} document={document} onOpen={onOpenDocument} onDownload={onDownloadDocument} onDelete={onDeleteDocument} />
                     ))}
                   </div>
                 </section>

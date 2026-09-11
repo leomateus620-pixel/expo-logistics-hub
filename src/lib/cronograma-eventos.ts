@@ -231,6 +231,21 @@ export function isMainFenasojaEvent(event: CronogramaEvent): boolean {
   return event.sourceKey === '2028-realizacao-fenasoja-2028' || event.eventType === 'evento_principal';
 }
 
+/**
+ * Eventos criados dentro da agenda de uma comissão/assessoria só entram na
+ * timeline da Agenda Fenasoja quando a Comissão Central está relacionada.
+ * Eles continuam existindo (mesmo ID) e contando nos indicadores.
+ */
+export function isVisibleInCentralTimeline(event: {
+  originSource?: 'agenda_central' | 'unidade';
+  commissionSlug?: string | null;
+  linkedCommissions?: Array<{ slug?: string | null }> | null;
+}): boolean {
+  if (event.originSource !== 'unidade') return true;
+  const slugs = [event.commissionSlug, ...(event.linkedCommissions ?? []).map((item) => item.slug)];
+  return slugs.some((slug) => slug === 'central' || slug === 'comissao-central');
+}
+
 export function isCentralMeeting(event: CronogramaEvent): boolean {
   return event.eventType === 'reuniao' && event.commissionSlug === 'comissao-central' && event.title.includes('Comissão Central');
 }

@@ -68,6 +68,7 @@ import {
   isCronogramaCycleYear,
   type CronogramaCycleYear,
 } from '@/lib/cronograma-cycle';
+import { isVisibleInCentralTimeline } from '@/lib/cronograma-eventos';
 import type { CronogramaEvent as SourceCronogramaEvent } from '@/lib/cronograma-eventos';
 import type { DashboardDrilldown } from '@/lib/cronograma-dashboard-selectors';
 import {
@@ -201,7 +202,11 @@ export default function CronogramaEventosPage() {
   );
   const eventsForView = useMemo(() => {
     if (filters.scopeEventIds?.length) return events;
-    if (activeView === 'timeline') return eventBuckets.timeline;
+    if (activeView === 'timeline') return eventBuckets.timeline.filter((event) => isVisibleInCentralTimeline({
+      originSource: event.originSource,
+      commissionSlug: event.commission ?? null,
+      linkedCommissions: (event.relatedCommissionIds ?? []).map((slug) => ({ slug })),
+    }));
     if (activeView === 'completed') return eventBuckets.completed;
     // Pendências: a exclusão de concluídos/cancelados é aplicada pelo board,
     // depois dos filtros globais — aqui a visão recebe o universo completo.

@@ -1771,6 +1771,8 @@ export type Database = {
           month_label: string | null
           notify_all_commission_members: boolean
           org_id: string
+          origin_commission_id: string | null
+          origin_source: string
           pending_reason: string | null
           planning_restricted: boolean
           priority: string
@@ -1812,6 +1814,8 @@ export type Database = {
           month_label?: string | null
           notify_all_commission_members?: boolean
           org_id: string
+          origin_commission_id?: string | null
+          origin_source?: string
           pending_reason?: string | null
           planning_restricted?: boolean
           priority?: string
@@ -1853,6 +1857,8 @@ export type Database = {
           month_label?: string | null
           notify_all_commission_members?: boolean
           org_id?: string
+          origin_commission_id?: string | null
+          origin_source?: string
           pending_reason?: string | null
           planning_restricted?: boolean
           priority?: string
@@ -1877,6 +1883,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cronograma_eventos_origin_commission_id_fkey"
+            columns: ["origin_commission_id"]
+            isOneToOne: false
+            referencedRelation: "commissions"
             referencedColumns: ["id"]
           },
         ]
@@ -2227,6 +2240,62 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "cronograma_eventos_full"
             referencedColumns: ["id", "org_id"]
+          },
+        ]
+      }
+      cronograma_unidade_anexos: {
+        Row: {
+          caption: string | null
+          commission_id: string
+          created_at: string
+          file_name: string
+          file_path: string
+          id: string
+          kind: string
+          mime_type: string | null
+          org_id: string
+          size_bytes: number | null
+          updated_at: string
+          uploaded_by: string | null
+          uploader_name: string | null
+        }
+        Insert: {
+          caption?: string | null
+          commission_id: string
+          created_at?: string
+          file_name: string
+          file_path: string
+          id?: string
+          kind?: string
+          mime_type?: string | null
+          org_id: string
+          size_bytes?: number | null
+          updated_at?: string
+          uploaded_by?: string | null
+          uploader_name?: string | null
+        }
+        Update: {
+          caption?: string | null
+          commission_id?: string
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          kind?: string
+          mime_type?: string | null
+          org_id?: string
+          size_bytes?: number | null
+          updated_at?: string
+          uploaded_by?: string | null
+          uploader_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_unidade_anexos_commission_id_fkey"
+            columns: ["commission_id"]
+            isOneToOne: false
+            referencedRelation: "commissions"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -7938,6 +8007,8 @@ export type Database = {
           lock_version: number | null
           month_label: string | null
           org_id: string | null
+          origin_commission_id: string | null
+          origin_source: string | null
           pending_reason: string | null
           priority: string | null
           responsible_name: string | null
@@ -7980,6 +8051,8 @@ export type Database = {
           lock_version?: number | null
           month_label?: string | null
           org_id?: string | null
+          origin_commission_id?: string | null
+          origin_source?: string | null
           pending_reason?: string | null
           priority?: string | null
           responsible_name?: string | null
@@ -8022,6 +8095,8 @@ export type Database = {
           lock_version?: number | null
           month_label?: string | null
           org_id?: string | null
+          origin_commission_id?: string | null
+          origin_source?: string | null
           pending_reason?: string | null
           priority?: string | null
           responsible_name?: string | null
@@ -8047,6 +8122,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cronograma_eventos_origin_commission_id_fkey"
+            columns: ["origin_commission_id"]
+            isOneToOne: false
+            referencedRelation: "commissions"
             referencedColumns: ["id"]
           },
         ]
@@ -8790,6 +8872,46 @@ export type Database = {
       cronograma_scoped_event_visible: {
         Args: { _event_id: string; _user_id: string }
         Returns: boolean
+      }
+      cronograma_set_event_origin: {
+        Args: { _commission_id: string; _event_id: string }
+        Returns: undefined
+      }
+      cronograma_unit_agenda: {
+        Args: { _commission_id: string }
+        Returns: {
+          commission_slug: string
+          description: string
+          document_count: number
+          end_date: string
+          end_time: string
+          event_time: string
+          id: string
+          location: string
+          origin_commission_id: string
+          origin_source: string
+          people: Json
+          responsible_name: string
+          start_date: string
+          start_time: string
+          status: string
+          title: string
+          units: Json
+        }[]
+      }
+      cronograma_unit_can_manage: {
+        Args: { _commission_id: string; _user_id: string }
+        Returns: boolean
+      }
+      cronograma_unit_metrics: {
+        Args: { _commission_id: string }
+        Returns: {
+          completed: number
+          documents: number
+          in_month: number
+          total: number
+          upcoming: number
+        }[]
       }
       delete_email: {
         Args: { message_id: number; queue_name: string }

@@ -1,15 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { CalendarPlus } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useCommissionPeople } from '@/hooks/useCommissionPeople';
+import { useAuth } from '@/hooks/useAuth';
+import { useUnitAgenda } from '@/hooks/useUnitAgenda';
+import { useUnitDocuments } from '@/hooks/useUnitDocuments';
 import { toast } from '@/hooks/use-toast';
+import { cronogramaSaveEvent } from '@/lib/cronograma-rpc';
+import { supabase } from '@/integrations/supabase/client';
 import CommissionLayout from '@/components/commissions/CommissionLayout';
 import PageTransition from '@/components/PageTransition';
 import type { CommissionMenuItem, CommissionModule } from '@/modules/commissions/commissionRegistry';
-import { resolveOfficialUnit, type OfficialUnitEntry } from '@/modules/commissions/officialCommissionCatalog';
+import type { OfficialUnitEntry } from '@/modules/commissions/officialCommissionCatalog';
 import {
   CommissionAgendaPage,
   CommissionDocumentsPage,
@@ -20,115 +23,97 @@ import {
   WORKSPACE_SECTION_PATHS,
   buildWorkspaceNavigation,
   resolveWorkspaceSection,
-  toAgendaEventViewModels,
   toCommissionUnitViewModel,
-  toUnitSummary,
   type AgendaEventViewModel,
   type AgendaLoadState,
   type CommissionAgendaPageHandle,
-  type CronogramaEventRowLike,
   type DocumentViewModel,
+  type PersonSummary,
 } from '@/features/commission-agenda';
+import { draftToSaveEventPayload, validateDraft } from '@/features/commission-agenda/lib/event-draft';
+import { canManageDocuments } from '@/features/commission-agenda/lib/visibility';
+import type { AgendaEventDraft } from '@/features/commission-agenda/components/EventFormShell';
 
 interface CommissionWorkspacePageProps {
   module: CommissionModule;
   entry: OfficialUnitEntry;
 }
 
-const EVENT_COLUMNS =
-  'id, title, start_date, end_date, start_time, end_time, event_time, status, location, description, responsible_name, commission_slug';
-
-/** Documents are not persisted yet — the panel renders its empty state. */
-const NO_DOCUMENTS: DocumentViewModel[] = [];
-
-function notifyNextPhase(feature: string) {
-  toast({
-    title: `${feature} em preparação`,
-    description: 'Esta ação será habilitada na próxima fase da Agenda das comissões.',
-  });
-}
-
 export default function CommissionWorkspacePage({ module, entry }: CommissionWorkspacePageProps) {
-  const { orgId } = useCurrentOrg();
+  const { orgId, myRole } = useCurrentOrg();
+  const { user } = useAuth();
   const { byUnit, isLoading: peopleLoading } = useCommissionPeople();
   const location = useLocation();
   const navigate = useNavigate();
   const agendaRef = useRef<CommissionAgendaPageHandle>(null);
   const [pendingCreate, setPendingCreate] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const section = resolveWorkspaceSection(location.pathname, module.basePath);
 
-  const slugCandidates = useMemo(
-    () => Array.from(new Set([entry.id, entry.moduleSlug].filter(Boolean) as string[])),
-    [entry.id, entry.moduleSlug],
-  );
-
-  const eventsQuery = useQuery({
-    queryKey: ['commission-front-events', orgId, entry.id],
-    enabled: Boolean(orgId),
-    staleTime: 2 * 60 * 1000,
-    queryFn: async (): Promise<CronogramaEventRowLike[]> => {
-      if (!orgId) return [];
-      const { data: links, error: linkError } = await supabase
-        .from('cronograma_evento_comissoes')
-        .select('event_id')
-        .eq('org_id', orgId)
-        .in('commission_slug', slugCandidates)
-        .limit(500);
-      if (linkError) throw linkError;
-
-      const ids = Array.from(new Set((links ?? []).map((row) => row.event_id)));
-
-      const direct = await supabase
-        .from('cronograma_eventos')
-        .select(EVENT_COLUMNS)
-        .eq('org_id', orgId)
-        .in('commission_slug', slugCandidates)
-        .limit(200);
-      if (direct.error) throw direct.error;
-
-      let linked: CronogramaEventRowLike[] = [];
-      if (ids.length > 0) {
-        const { data, error } = await supabase
-          .from('cronograma_eventos')
-          .select(EVENT_COLUMNS)
-          .eq('org_id', orgId)
-          .in('id', ids)
-          .limit(200);
-        if (error) throw error;
-        linked = (data ?? []) as CronogramaEventRowLike[];
-      }
-
-      const merged = new Map<string, CronogramaEventRowLike>();
-      for (const row of [...((direct.data ?? []) as CronogramaEventRowLike[]), ...linked]) merged.set(row.id, row);
-      return Array.from(merged.values());
-    },
-  });
+  const {
+    commissionId,
+    commissionSlug,
+    unitOptions,
+    byCanonicalId,
+    events,
+    metrics,
+    isLoading: agendaLoading,
+    isError,
+    refetch,
+    invalidate,
+  } = useUnitAgenda(entry.id);
 
   const unit = useMemo(
     () => toCommissionUnitViewModel({ module, entry, people: byUnit.get(entry.id) }),
     [module, entry, byUnit],
   );
 
-  const events = useMemo<AgendaEventViewModel[]>(() => {
-    const self = toUnitSummary(entry);
-    return toAgendaEventViewModels(eventsQuery.data ?? [], {
-      self,
-      resolveUnit: (slug) => {
-        const resolved = resolveOfficialUnit(slug);
-        return resolved ? toUnitSummary(resolved.entry) : undefined;
-      },
-    });
-  }, [eventsQuery.data, entry]);
+  const eventTitles = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const event of events) map[event.id] = event.title;
+    return map;
+  }, [events]);
 
-  const state: AgendaLoadState = eventsQuery.isError ? 'error' : eventsQuery.isLoading || peopleLoading ? 'loading' : 'ready';
+  const {
+    documents,
+    isLoading: documentsLoading,
+    upload,
+    remove: removeDocument,
+    openDocument,
+  } = useUnitDocuments(commissionId, { eventTitles });
+
+  const peopleOptions = useMemo<PersonSummary[]>(() => {
+    const map = new Map<string, PersonSummary>();
+    for (const person of [...unit.leads, ...unit.members]) map.set(person.id, person);
+    for (const event of events) {
+      for (const person of event.people ?? []) if (!map.has(person.id)) map.set(person.id, person);
+    }
+    return Array.from(map.values());
+  }, [unit.leads, unit.members, events]);
+
+  const memberCommissionIds = useMemo(() => {
+    if (!user || !commissionId) return [] as string[];
+    const belongs = [...unit.leads, ...unit.members].some((person) => person.userId === user.id);
+    return belongs ? [commissionId] : [];
+  }, [user, commissionId, unit.leads, unit.members]);
+
+  const accessContext = useMemo(
+    () => ({ userId: user?.id ?? null, orgRole: (myRole ?? null) as never, memberCommissionIds }),
+    [user?.id, myRole, memberCommissionIds],
+  );
+
+  const mayManageDocuments = canManageDocuments(accessContext, commissionId);
+
+  const state: AgendaLoadState = isError ? 'error' : agendaLoading || peopleLoading ? 'loading' : 'ready';
 
   const navigation = useMemo(
     () => buildWorkspaceNavigation(module.basePath, {
-      agenda: events.length,
+      agenda: metrics.total || events.length,
       team: unit.leads.length + unit.members.length,
+      documents: documents.length,
     }),
-    [module.basePath, events.length, unit.leads.length, unit.members.length],
+    [module.basePath, metrics.total, events.length, unit.leads.length, unit.members.length, documents.length],
   );
 
   const sidebarItems = useMemo<CommissionMenuItem[]>(
@@ -143,6 +128,7 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
 
   const agendaPath = `${module.basePath}/${WORKSPACE_SECTION_PATHS.agenda}`;
   const overviewPath = `${module.basePath}/${WORKSPACE_SECTION_PATHS.overview}`;
+  const documentsPath = `${module.basePath}/${WORKSPACE_SECTION_PATHS.documents}`;
 
   const requestCreate = useCallback(() => {
     if (section === 'agenda' && agendaRef.current) {
@@ -184,7 +170,112 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
     return () => window.cancelAnimationFrame(frame);
   }, [openEventId, section, state, events, navigate, location.pathname]);
 
-  const retry = () => void eventsQuery.refetch();
+  const retry = () => void refetch();
+
+  const submitEvent = useCallback(
+    async (draft: AgendaEventDraft, editing: AgendaEventViewModel | null) => {
+      if (!orgId || !commissionId || !commissionSlug) {
+        toast({ title: 'Não foi possível salvar', description: 'Frente sem cadastro nesta organização.', variant: 'destructive' });
+        return;
+      }
+      const problem = validateDraft(draft);
+      if (problem) {
+        toast({ title: 'Revise o formulário', description: problem, variant: 'destructive' });
+        return;
+      }
+
+      setSaving(true);
+      try {
+        const payload = draftToSaveEventPayload(draft, {
+          orgId,
+          owner: { commissionId, slug: commissionSlug, name: unit.name },
+          editing,
+          resolveUnit: (canonicalId) => byCanonicalId.get(canonicalId),
+          resolvePerson: (personId) => peopleOptions.find((person) => person.id === personId),
+        });
+
+        const saved = (await cronogramaSaveEvent(payload)) as { id?: string } | null;
+        const savedId = editing?.id ?? saved?.id ?? null;
+        if (savedId && !editing) {
+          await (supabase as any).rpc('cronograma_set_event_origin', {
+            _event_id: savedId,
+            _commission_id: commissionId,
+          });
+        }
+
+        invalidate();
+        toast({
+          title: editing ? 'Evento atualizado' : 'Evento criado',
+          description: 'O evento também aparece na Agenda Fenasoja quando envolve a Comissão Central.',
+        });
+      } catch (error) {
+        toast({
+          title: 'Falha ao salvar o evento',
+          description: error instanceof Error ? error.message : 'Tente novamente.',
+          variant: 'destructive',
+        });
+      } finally {
+        setSaving(false);
+      }
+    },
+    [orgId, commissionId, commissionSlug, unit.name, byCanonicalId, peopleOptions, invalidate],
+  );
+
+  const handleAddDocument = useCallback(() => {
+    if (!mayManageDocuments) {
+      toast({ title: 'Sem permissão', description: 'Somente responsáveis da frente podem publicar documentos.', variant: 'destructive' });
+      return;
+    }
+    const input = window.document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx';
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      try {
+        await upload(file);
+        toast({ title: 'Documento publicado', description: file.name });
+      } catch (error) {
+        toast({
+          title: 'Falha no envio',
+          description: error instanceof Error ? error.message : 'Tente novamente.',
+          variant: 'destructive',
+        });
+      }
+    };
+    input.click();
+  }, [mayManageDocuments, upload]);
+
+  const handleOpenDocument = useCallback(
+    async (documentModel: DocumentViewModel, download = false) => {
+      const url = await openDocument(documentModel.id, { download });
+      if (!url) {
+        toast({ title: 'Não foi possível abrir o arquivo', variant: 'destructive' });
+        return;
+      }
+      window.location.assign(url);
+    },
+    [openDocument],
+  );
+
+  const handleDeleteDocument = useCallback(
+    async (documentModel: DocumentViewModel) => {
+      if (!mayManageDocuments) return;
+      try {
+        await removeDocument(documentModel.id);
+        toast({ title: 'Documento removido', description: documentModel.name });
+      } catch (error) {
+        toast({
+          title: 'Falha ao remover',
+          description: error instanceof Error ? error.message : 'Tente novamente.',
+          variant: 'destructive',
+        });
+      }
+    },
+    [mayManageDocuments, removeDocument],
+  );
+
+  const documentsState: AgendaLoadState = documentsLoading ? 'loading' : 'ready';
 
   return (
     <CommissionLayout module={module} variant="workspace" menuItems={sidebarItems}>
@@ -192,7 +283,7 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
         unit={unit}
         navigation={navigation}
         section={section}
-        action={{ label: 'Criar evento', icon: CalendarPlus, onClick: requestCreate }}
+        action={{ label: saving ? 'Salvando…' : 'Criar evento', icon: CalendarPlus, onClick: requestCreate }}
       >
         <PageTransition>
           <Routes>
@@ -203,11 +294,13 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
                 <CommissionOverviewPage
                   unit={unit}
                   events={events}
-                  documents={NO_DOCUMENTS}
+                  documents={documents}
                   state={state}
                   onOpenEvent={openEventInAgenda}
                   onCreateEvent={requestCreate}
-                  onAddDocument={() => notifyNextPhase('Publicação de documentos')}
+                  onOpenDocument={(doc) => void handleOpenDocument(doc)}
+                  onDownloadDocument={(doc) => void handleOpenDocument(doc, true)}
+                  onAddDocument={handleAddDocument}
                   onRetry={retry}
                 />
               }
@@ -219,12 +312,16 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
                   ref={agendaRef}
                   unit={unit}
                   events={events}
-                  documents={NO_DOCUMENTS}
+                  documents={documents}
                   state={state}
+                  peopleOptions={peopleOptions}
+                  unitOptions={unitOptions}
                   onRetry={retry}
-                  onAddDocument={() => notifyNextPhase('Publicação de documentos')}
-                  onOpenDocuments={() => navigate(`${module.basePath}/${WORKSPACE_SECTION_PATHS.documents}`)}
-                  onSubmitEvent={() => notifyNextPhase('Criação de eventos')}
+                  onAddDocument={handleAddDocument}
+                  onOpenDocument={(doc) => void handleOpenDocument(doc)}
+                  onDownloadDocument={(doc) => void handleOpenDocument(doc, true)}
+                  onOpenDocuments={() => navigate(documentsPath)}
+                  onSubmitEvent={(draft, editing) => void submitEvent(draft, editing)}
                 />
               }
             />
@@ -233,9 +330,12 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
               element={
                 <CommissionDocumentsPage
                   unit={unit}
-                  documents={NO_DOCUMENTS}
-                  state={state === 'error' ? 'ready' : state}
-                  onAddDocument={() => notifyNextPhase('Publicação de documentos')}
+                  documents={documents}
+                  state={documentsState}
+                  onOpenDocument={(doc) => void handleOpenDocument(doc)}
+                  onDownloadDocument={(doc) => void handleOpenDocument(doc, true)}
+                  onDeleteDocument={mayManageDocuments ? (doc) => void handleDeleteDocument(doc) : undefined}
+                  onAddDocument={handleAddDocument}
                 />
               }
             />
