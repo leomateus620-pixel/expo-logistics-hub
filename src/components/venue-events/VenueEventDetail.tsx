@@ -96,6 +96,20 @@ import {
   formatBrl,
 } from "@/lib/venue-agenda";
 
+export const VENUE_DETAIL_TABS = [
+  "resumo",
+  "operacao",
+  "contrapartida",
+  "documentos",
+  "historico",
+] as const;
+
+export type VenueDetailTab = (typeof VENUE_DETAIL_TABS)[number];
+
+export function isVenueDetailTab(value: unknown): value is VenueDetailTab {
+  return VENUE_DETAIL_TABS.includes(value as VenueDetailTab);
+}
+
 type TransitionName =
   | "submit"
   | "start_review"
