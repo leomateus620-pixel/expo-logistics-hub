@@ -325,7 +325,7 @@ function EventRow({
           <StatusBadge status={event.status} />
           <small>
             {APPROVAL_STATUS_LABELS[event.approval_status] ||
-              EVENT_TYPE_LABELS[event.event_type]}
+              venueEventTypeLabel(event.event_type)}
           </small>
         </span>
         <strong title={event.title}>{event.title}</strong>
@@ -2305,9 +2305,9 @@ export function VenueWorkspace() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os tipos</SelectItem>
-                {Object.entries(EVENT_TYPE_LABELS).map(([type, label]) => (
+                {usedEventTypes.map((type) => (
                   <SelectItem key={type} value={type}>
-                    {label}
+                    {venueEventTypeLabel(type)}
                   </SelectItem>
                 ))}
               </SelectContent>
