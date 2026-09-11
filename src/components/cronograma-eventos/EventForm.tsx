@@ -315,6 +315,7 @@ export function EventForm({
       title: form.title.trim(),
       summary: form.summary.trim(),
       date: normalizedDate,
+      endDate: spansDays ? rangeEndDate : normalizedDate,
       year: nextYear,
       startTime: form.startTime?.trim() || undefined,
       endTime: form.endTime?.trim() || undefined,
