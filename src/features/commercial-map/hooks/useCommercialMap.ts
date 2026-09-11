@@ -1,3 +1,4 @@
+import { measureCommercialMapStage } from '../utils/performanceDiagnostics';
 import { withFenasojaComplexReconstruction } from '../data/fenasojaComplexReconstruction';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -10,6 +11,7 @@ import {
   bootstrapOfficialReference,
   createCommercialLot,
   fetchCommercialMap,
+  signedReferenceUrl,
   fetchLotActivity,
   fetchLotContractVersions,
   mergeCommercialLots,
@@ -133,12 +135,13 @@ export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIA
     : 'full-map';
   const query = useQuery({
     queryKey: commercialMapQueryKey(user?.id, orgId, scope),
-    queryFn: () => fetchCommercialMap(orgId!, scope),
+    queryFn: () => measureCommercialMapStage('essential-data', () => fetchCommercialMap(orgId!, scope, { includeReferenceImage: false })),
     select: presentCommercialMapData,
     enabled: Boolean(orgId && user),
     staleTime: 30_000,
     retry: 1,
-    meta: { persist: scope.mode !== 'commission' },
+    // Business status must be revalidated after a fresh document load.
+    meta: { persist: false },
   });
 
   useEffect(() => {
@@ -159,7 +162,19 @@ export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIA
     setReferenceOpacity(calibration.opacity);
   }, [query.data?.calibration, setReferenceOpacity]);
 
-  return query;
+  const referenceNeeded = useCommercialMapStore((state) => state.referenceVisible
+    || state.activePanel === 'calibration' || state.workspaceMode === 'edit' || state.workspaceMode === 'create');
+  const calibration = query.data?.calibration;
+  const reference = useQuery({
+    queryKey: ['commercial-map', 'reference', user?.id, orgId, scopeKey, calibration?.id, calibration?.version, calibration?.referenceImagePath],
+    queryFn: () => measureCommercialMapStage('reference-signing', () => signedReferenceUrl(calibration ?? null)),
+    enabled: scope.mode === 'full' && Boolean(user && orgId && referenceNeeded && calibration?.referenceImagePath && !calibration.referenceImagePath.startsWith('/')),
+    staleTime: 50 * 60_000,
+    meta: { persist: false },
+  });
+  const data = useMemo(() => query.data && reference.data?.referenceImageUrl
+    ? { ...query.data, calibration: reference.data } : query.data, [query.data, reference.data]);
+  return { ...query, data };
 }
 
 export interface MapEntityFilterResult {
