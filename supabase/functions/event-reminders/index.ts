@@ -332,6 +332,63 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
         }
       }
     }
+
+    // ----- Ciclo de vida de eventos de vários dias -----
+    // Um único evento canônico: os dias seguintes são derivados do intervalo.
+    const range = normalizeEventRange(event.start_date, event.end_date);
+    const lifecycleDays = isClosedEventStatus(event.status)
+      ? []
+      : enumerateLifecycleDailyDays(event.start_date, event.end_date);
+    const eventVersion = event.lock_version ?? 0;
+    const validDates: string[] = [];
+
+    for (const day of lifecycleDays) {
+      const scheduledFor = localHourInstant(day.date, LIFECYCLE_DAILY_HOUR);
+      if (!scheduledFor) continue;
+      validDates.push(day.date);
+      if (scheduledFor <= now) continue;
+
+      for (const recipient of recipients.values()) {
+        if (!pushEnabledUsers.has(recipient.user_id)) continue;
+        const notificationType = LIFECYCLE_TYPE_BY_STATE[day.state];
+        const { error } = await supa.from("event_reminder_deliveries").upsert({
+          user_id: recipient.user_id,
+          org_id: recipient.org_id,
+          event_id: event.id,
+          event_version: eventVersion,
+          offset_minutes: 0,
+          scheduled_for: scheduledFor.toISOString(),
+          idempotency_key: `${recipient.user_id}|${event.id}|${notificationType}|${day.date}|push`,
+          channel: "push",
+          notification_type: notificationType,
+          notification_date: day.date,
+          status: "pending",
+          last_error: null,
+        }, { onConflict: "idempotency_key", ignoreDuplicates: true });
+        if (error) {
+          console.error("event_lifecycle_schedule_failed", {
+            eventId: event.id,
+            lifecycleState: day.state,
+            notificationDate: day.date,
+          });
+        }
+      }
+    }
+
+    // Reconciliação de edição: dias que saíram do intervalo (ou evento fechado)
+    // deixam de avisar; o histórico já entregue é preservado.
+    let obsolete = supa.from("event_reminder_deliveries")
+      .update({ status: "cancelled", last_error: "event_range_shrunk" })
+      .eq("event_id", event.id)
+      .eq("status", "pending")
+      .not("notification_date", "is", null);
+    if (validDates.length) {
+      obsolete = obsolete.not("notification_date", "in", `(${validDates.join(",")})`);
+    }
+    const { error: obsoleteError } = await obsolete;
+    if (obsoleteError) {
+      console.error("event_lifecycle_reconcile_failed", { eventId: event.id, range: range?.totalDays ?? 0 });
+    }
   }
 }
 
