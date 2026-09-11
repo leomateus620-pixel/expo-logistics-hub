@@ -501,14 +501,23 @@ export function VenueWorkspace() {
     navigate(buildModulePath(nextVenue, view));
     setMobileMoreOpen(false);
   };
-  const openEvent = (eventId: string) => {
+  const openEvent = (eventId: string, tab?: VenueDetailTab) => {
     const next = new URLSearchParams(searchParams);
     next.set("evento", eventId);
+    if (tab && tab !== "resumo") next.set("aba", tab);
+    else next.delete("aba");
+    setSearchParams(next, { replace: false });
+  };
+  const setDetailTab = (tab: VenueDetailTab) => {
+    const next = new URLSearchParams(searchParams);
+    if (tab === "resumo") next.delete("aba");
+    else next.set("aba", tab);
     setSearchParams(next, { replace: true });
   };
   const closeEvent = () => {
     const next = new URLSearchParams(searchParams);
     next.delete("evento");
+    next.delete("aba");
     setSearchParams(next, { replace: true });
   };
 
