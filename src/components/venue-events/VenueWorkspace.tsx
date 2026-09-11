@@ -488,6 +488,9 @@ export function VenueWorkspace() {
   const historyQuery = useVenueAuditHistory(
     view === "historico" && operations.permissions.venue_events_audit_view,
   );
+  const documentCounts = useVenueEventDocumentCounts(
+    view === "agenda" || view === "eventos",
+  );
 
   const buildModulePath = (
     nextVenue: VenueWorkspaceId,
