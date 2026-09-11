@@ -2,7 +2,13 @@ import { useState, type ReactNode } from "react";
 import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import {
   Select,
   SelectContent,
@@ -76,7 +82,18 @@ export function VenueEventsFiltersTrigger({
   const body: ReactNode = (
     <div className="venue-agenda-filters__panel">
       <header className="venue-agenda-filters__panel-header">
-        <strong>Filtros dos eventos</strong>
+        {isMobile ? (
+          <>
+            <DrawerTitle className="venue-agenda-filters__panel-title">
+              Filtros dos eventos
+            </DrawerTitle>
+            <DrawerDescription className="sr-only">
+              Refine o registro por status, área, revisão e histórico.
+            </DrawerDescription>
+          </>
+        ) : (
+          <strong>Filtros dos eventos</strong>
+        )}
         {activeCount > 0 && (
           <Button
             type="button"

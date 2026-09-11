@@ -17,10 +17,6 @@ import {
   LayoutDashboard,
   ListChecks,
   Loader2,
-  Building2,
-  MapPin,
-  UserRound,
-  Handshake,
   Plus,
   RefreshCw,
   Search,
@@ -80,8 +76,12 @@ import {
   normalizeSearchText,
 } from "@/lib/venue-agenda";
 import { VenueMonthFilter } from "@/components/venue-events/VenueMonthFilter";
-import { toDisplayUpper } from "@/lib/textNormalize";
 import { VenueEventDetail } from "@/components/venue-events/VenueEventDetail";
+import {
+  VenueEventCard,
+  VenueEventSectionHeader,
+  VenueEventStatusBadge,
+} from "@/components/venue-events/VenueEventCard";
 import { VenueEventFormDialog } from "@/components/venue-events/VenueEventFormDialog";
 import {
   VenueAgreementDialog,
@@ -118,6 +118,7 @@ import {
 import "@/styles/venue-events.css";
 import "@/styles/venue-events-production.css";
 import "@/styles/venue-events-navigation.css";
+import "@/styles/venue-event-cards.css";
 
 const VIEW_CONTEXT: Record<
   VenueView,
@@ -275,13 +276,7 @@ function eventMatchesSearch(
   return haystack.includes(term);
 }
 
-function StatusBadge({ status }: { status: VenueEventStatus }) {
-  return (
-    <span className="venue-status" data-status={status}>
-      {EVENT_STATUS_LABELS[status]}
-    </span>
-  );
-}
+const StatusBadge = VenueEventStatusBadge;
 
 function EventRow({
   event,
@@ -1247,30 +1242,6 @@ export function VenueWorkspace() {
     </div>
   );
 
-  const agendaHourFormatter = new Intl.DateTimeFormat("pt-BR", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "America/Sao_Paulo",
-  });
-
-  const formatAgendaHour = (value: string | null | undefined) =>
-    value ? agendaHourFormatter.format(new Date(value)) : null;
-
-  const formatAgendaDuration = (
-    start: string | null | undefined,
-    end: string | null | undefined,
-  ) => {
-    if (!start || !end) return null;
-    const diff = new Date(end).getTime() - new Date(start).getTime();
-    if (!Number.isFinite(diff) || diff <= 0) return null;
-    const totalMinutes = Math.round(diff / 60000);
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    if (hours && minutes) return `${hours}h${String(minutes).padStart(2, "0")}`;
-    if (hours) return `${hours}h`;
-    return `${minutes}min`;
-  };
-
   const renderAgenda = () => (
     <section className="venue-panel venue-agenda-view">
       <header className="venue-panel__header venue-panel__header--responsive">
@@ -1329,96 +1300,27 @@ export function VenueWorkspace() {
         <div className="venue-agenda-timeline venue-agenda-timeline--v2">
           {agendaGroups.map(([date, events]) => (
             <section key={date}>
-              <header>
-                <time dateTime={date}>
-                  <strong>
-                    {new Intl.DateTimeFormat("pt-BR", {
-                      weekday: "long",
-                      timeZone: "America/Sao_Paulo",
-                    }).format(new Date(`${date}T12:00:00-03:00`))}
-                  </strong>
-                  <b>
-                    {new Intl.DateTimeFormat("pt-BR", {
-                      day: "2-digit",
-                      timeZone: "America/Sao_Paulo",
-                    }).format(new Date(`${date}T12:00:00-03:00`))}
-                  </b>
-                  <span>
-                    {new Intl.DateTimeFormat("pt-BR", {
-                      month: "short",
-                      year: "numeric",
-                      timeZone: "America/Sao_Paulo",
-                    }).format(new Date(`${date}T12:00:00-03:00`))}
-                  </span>
-                </time>
-                <i />
-              </header>
+              <VenueEventSectionHeader variant="day" date={date} />
               <div>
-                {events.map((event) => {
-                  const startLabel = formatAgendaHour(event.start_at);
-                  const endLabel = formatAgendaHour(event.end_at);
-                  const durationLabel = formatAgendaDuration(
-                    event.start_at,
-                    event.end_at,
-                  );
-                  const spaceLabel = getSpaceNames(
-                    event.id,
-                    workspace.allocations,
-                    workspace.spaces,
-                  );
-                  const sponsorLabel = getStakeholderName(
-                    event.sponsor_id,
-                    workspace.stakeholders,
-                  );
-
-                  return (
-                    <button
-                      key={event.id}
-                      type="button"
-                      onClick={() => openEvent(event.id)}
-                      data-status={event.status}
-                      className="venue-agenda-card"
-                      aria-label={`${event.title} — ${startLabel ?? "sem horário"}${endLabel ? ` às ${endLabel}` : ""}`}
-                    >
-                      <span className="venue-agenda-card__time">
-                        <time dateTime={event.start_at ?? undefined}>
-                          {startLabel ?? "--:--"}
-                        </time>
-                        {endLabel && <em>{endLabel}</em>}
-                        {durationLabel && <i>{durationLabel}</i>}
-                      </span>
-
-                      <span className="venue-agenda-card__body">
-                        <strong>{toDisplayUpper(event.title)}</strong>
-                        <span className="venue-agenda-card__requester">
-                          <UserRound aria-hidden="true" />
-                          {toDisplayUpper(event.requester_name) ||
-                            "Requerente não informado"}
-                        </span>
-                        <span className="venue-agenda-card__chips">
-                          <span data-kind="space">
-                            <MapPin aria-hidden="true" />
-                            {spaceLabel || "Área não definida"}
-                          </span>
-                          {sponsorLabel && sponsorLabel !== "Sem vínculo" && (
-                            <span data-kind="sponsor">
-                              <Building2 aria-hidden="true" />
-                              {sponsorLabel}
-                            </span>
-                          )}
-                        </span>
-                      </span>
-
-                      <span className="venue-agenda-card__aside">
-                        <StatusBadge status={event.status} />
-                        <ChevronRight aria-hidden="true" />
-                      </span>
-                    </button>
-                  );
-                })}
+                {events.map((event) => (
+                  <VenueEventCard
+                    key={event.id}
+                    variant="agenda"
+                    event={event}
+                    spaceLabel={getSpaceNames(
+                      event.id,
+                      workspace.allocations,
+                      workspace.spaces,
+                    )}
+                    sponsorLabel={getStakeholderName(
+                      event.sponsor_id,
+                      workspace.stakeholders,
+                    )}
+                    onOpen={() => openEvent(event.id)}
+                  />
+                ))}
               </div>
             </section>
-
           ))}
         </div>
       ) : (
@@ -1546,138 +1448,30 @@ export function VenueWorkspace() {
         <div className="venue-event-list">
           {monthlyEventGroups.map((group) => (
             <div key={group.label} className="venue-event-group">
-              <p className="venue-event-group__label">
-                {group.label}
-                <span>{group.events.length}</span>
-              </p>
-              {group.events.map((event) => {
-                const startLabel = formatAgendaHour(event.start_at);
-                const endLabel = formatAgendaHour(event.end_at);
-                const durationLabel = formatAgendaDuration(
-                  event.start_at,
-                  event.end_at,
-                );
-                const spaceLabel = getSpaceNames(
-                  event.id,
-                  workspace.allocations,
-                  workspace.spaces,
-                );
-                const sponsorLabel = getStakeholderName(
-                  event.sponsor_id,
-                  workspace.stakeholders,
-                );
-                const responsibleLabel =
-                  workspace.members.find(
-                    (member) => member.user_id === event.responsible_user_id,
-                  )?.nome_exibicao || "Não definido";
-                const hasCounterpart = Boolean(event.counterpart_agreement_id);
-                const dayLabel = event.start_at
-                  ? new Intl.DateTimeFormat("pt-BR", {
-                      timeZone: "America/Sao_Paulo",
-                      day: "2-digit",
-                    }).format(new Date(event.start_at))
-                  : "—";
-                const monthLabel = event.start_at
-                  ? new Intl.DateTimeFormat("pt-BR", {
-                      timeZone: "America/Sao_Paulo",
-                      month: "short",
-                    })
-                      .format(new Date(event.start_at))
-                      .replace(".", "")
-                  : "s/ data";
-                const yearLabel = event.start_at
-                  ? new Intl.DateTimeFormat("pt-BR", {
-                      timeZone: "America/Sao_Paulo",
-                      year: "numeric",
-                    }).format(new Date(event.start_at))
-                  : "";
-
-                return (
-                  <button
-                    key={event.id}
-                    type="button"
-                    onClick={() => openEvent(event.id)}
-                    data-status={event.status}
-                    className="venue-agenda-card venue-event-card"
-                    aria-label={`${event.title} — ${dayLabel} ${monthLabel} ${yearLabel}${startLabel ? `, ${startLabel}` : ""}`}
-                  >
-                    <span className="venue-event-card__date">
-                      <b>{dayLabel}</b>
-                      <i>{monthLabel}</i>
-                      {yearLabel && <u>{yearLabel}</u>}
-                    </span>
-
-                    <span
-                      className="venue-event-card__hours"
-                      data-empty={!startLabel}
-                    >
-                      {startLabel ? (
-                        <>
-                          <time dateTime={event.start_at ?? undefined}>
-                            {startLabel}
-                          </time>
-                          {endLabel && (
-                            <span className="venue-event-card__hours-end">
-                              <em>{endLabel}</em>
-                              {durationLabel && <i>{durationLabel}</i>}
-                            </span>
-                          )}
-                        </>
-                      ) : (
-                        <span className="venue-event-card__hours-empty">
-                          Horário
-                          <br />a definir
-                        </span>
-                      )}
-                    </span>
-
-
-                    <span className="venue-agenda-card__body">
-                      <strong>{toDisplayUpper(event.title)}</strong>
-                      <span className="venue-agenda-card__requester">
-                        <UserRound aria-hidden="true" />
-                        {toDisplayUpper(event.requester_name) ||
-                          "Requerente não informado"}
-                      </span>
-                      <span className="venue-agenda-card__chips">
-                        <span data-kind="space">
-                          <MapPin aria-hidden="true" />
-                          {spaceLabel || "Área não definida"}
-                        </span>
-                        {event.event_type && (
-                          <span data-kind="type">
-                            {venueEventTypeLabel(event.event_type)}
-                          </span>
-                        )}
-                        {sponsorLabel && sponsorLabel !== "Sem vínculo" && (
-                          <span data-kind="sponsor">
-                            <Building2 aria-hidden="true" />
-                            {sponsorLabel}
-                          </span>
-                        )}
-                        {hasCounterpart && (
-                          <span data-kind="counterpart">
-                            <Handshake aria-hidden="true" />
-                            Contrapartida
-                          </span>
-                        )}
-                      </span>
-                    </span>
-
-                    <span className="venue-agenda-card__aside">
-                      {event.conflict_status === "conflito" && (
-                        <AlertTriangle
-                          className="venue-event-card__conflict"
-                          aria-label="Conflito pendente"
-                        />
-                      )}
-                      <StatusBadge status={event.status} />
-                      <ChevronRight aria-hidden="true" />
-                    </span>
-                  </button>
-                );
-              })}
-
+              <VenueEventSectionHeader
+                variant="month"
+                label={group.label}
+                count={group.events.length}
+              />
+              {group.events.map((event) => (
+                <VenueEventCard
+                  key={event.id}
+                  variant="registry"
+                  event={event}
+                  showType
+                  spaceLabel={getSpaceNames(
+                    event.id,
+                    workspace.allocations,
+                    workspace.spaces,
+                  )}
+                  sponsorLabel={getStakeholderName(
+                    event.sponsor_id,
+                    workspace.stakeholders,
+                  )}
+                  hasCounterpart={Boolean(event.counterpart_agreement_id)}
+                  onOpen={() => openEvent(event.id)}
+                />
+              ))}
             </div>
           ))}
         </div>
