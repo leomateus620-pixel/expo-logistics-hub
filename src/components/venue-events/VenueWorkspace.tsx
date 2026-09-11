@@ -42,6 +42,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import {
   useVenueAuditHistory,
+  useVenueEventDocumentCounts,
   useVenueOperations,
 } from "@/hooks/useVenueOperations";
 import {
@@ -440,6 +441,10 @@ export function VenueWorkspace() {
   }, [routeIsCanonical, params.venueSlug, view, venueId, navigate, searchParams]);
 
   const selectedEventId = searchParams.get("evento");
+  const requestedTab = searchParams.get("aba");
+  const detailTab: VenueDetailTab = isVenueDetailTab(requestedTab)
+    ? requestedTab
+    : "resumo";
   const [formOpen, setFormOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [stakeholderOpen, setStakeholderOpen] = useState(false);
