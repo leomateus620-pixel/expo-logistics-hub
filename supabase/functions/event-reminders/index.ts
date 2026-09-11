@@ -496,6 +496,39 @@ async function sendPending(supa: ReturnType<typeof db>) {
       continue;
     }
 
+    // Revalidação imediatamente antes do envio: um job criado dias antes pode
+    // ter perdido a validade (evento cancelado, concluído antes ou encurtado).
+    if (isClosedEventStatus((event as { status?: string | null }).status)) {
+      console.log("event_lifecycle_skipped", {
+        deliveryId: delivery.id,
+        eventId: delivery.event_id,
+        lifecycleState: delivery.notification_type ?? "event_start",
+        notificationDate: delivery.notification_date ?? null,
+        reason: "event_closed",
+      });
+      await supa.from("event_reminder_deliveries").update({
+        status: "skipped", last_error: "event_closed",
+      }).eq("id", delivery.id);
+      continue;
+    }
+
+    const lifecycleDay = delivery.notification_date
+      ? lifecycleDayFor(event.start_date, event.end_date, delivery.notification_date)
+      : null;
+    if (delivery.notification_date && !lifecycleDay) {
+      console.log("event_lifecycle_skipped", {
+        deliveryId: delivery.id,
+        eventId: delivery.event_id,
+        lifecycleState: delivery.notification_type ?? null,
+        notificationDate: delivery.notification_date,
+        reason: "day_outside_range",
+      });
+      await supa.from("event_reminder_deliveries").update({
+        status: "cancelled", last_error: "event_range_shrunk",
+      }).eq("id", delivery.id);
+      continue;
+    }
+
     const normalized = normalizeEventDateTime({
       date: event.start_date,
       startTime: event.start_time,
