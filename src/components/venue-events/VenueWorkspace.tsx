@@ -1337,7 +1337,10 @@ export function VenueWorkspace() {
                       event.sponsor_id,
                       workspace.stakeholders,
                     )}
+                    documentCount={documentCounts[event.id]}
                     onOpen={() => openEvent(event.id)}
+                    onOpenDocuments={() => openEvent(event.id, "documentos")}
+                    onOpenHistory={() => openEvent(event.id, "historico")}
                   />
                 ))}
               </div>
@@ -1490,7 +1493,10 @@ export function VenueWorkspace() {
                     workspace.stakeholders,
                   )}
                   hasCounterpart={Boolean(event.counterpart_agreement_id)}
+                  documentCount={documentCounts[event.id]}
                   onOpen={() => openEvent(event.id)}
+                  onOpenDocuments={() => openEvent(event.id, "documentos")}
+                  onOpenHistory={() => openEvent(event.id, "historico")}
                 />
               ))}
             </div>
