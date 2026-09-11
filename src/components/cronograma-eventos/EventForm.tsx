@@ -258,20 +258,29 @@ export function EventForm({
     submitEvent.preventDefault();
     if (isSaving) return;
 
-    const nextErrors: { title?: string; time?: string } = {};
+    const normalizedDate = form.date?.trim() ? form.date : null;
+    const rangeEndDate = multiDay && normalizedDate && form.endDate?.trim() ? form.endDate.trim() : null;
+    const spansDays = Boolean(rangeEndDate && normalizedDate && rangeEndDate > normalizedDate);
+
+    const nextErrors: { title?: string; time?: string; range?: string } = {};
     if (!form.title.trim()) nextErrors.title = 'Informe um título para identificar o evento.';
-    if (form.startTime && form.endTime && form.endTime <= form.startTime) {
+    if (multiDay && normalizedDate && rangeEndDate && rangeEndDate < normalizedDate) {
+      nextErrors.range = 'A data final não pode ser anterior à data inicial.';
+    }
+    /** Times only need ordering when start and end fall on the same day. */
+    if (!spansDays && form.startTime && form.endTime && form.endTime <= form.startTime) {
       nextErrors.time = 'O horário final deve ser posterior ao horário inicial.';
     }
     setFieldErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
       window.requestAnimationFrame(() => {
-        document.getElementById(nextErrors.title ? fieldId('title') : fieldId('end'))?.focus();
+        document.getElementById(
+          nextErrors.title ? fieldId('title') : nextErrors.range ? fieldId('end-date') : fieldId('end'),
+        )?.focus();
       });
       return;
     }
 
-    const normalizedDate = form.date?.trim() ? form.date : null;
     const nextYear = normalizedDate ? Number(normalizedDate.slice(0, 4)) : Number(form.year || 2028);
     const normalizedSubevents: CronogramaSubevent[] = (form.subevents ?? [])
       .map((subevent, index) => ({
