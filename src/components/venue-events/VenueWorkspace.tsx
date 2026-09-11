@@ -52,7 +52,7 @@ import {
   VENUE_MODULE_ROUTE,
   COUNTERPART_UNIT_LABELS,
   EVENT_STATUS_LABELS,
-  EVENT_TYPE_LABELS,
+  venueEventTypeLabel,
   buildVenueReport,
   deriveVenuePendencies,
   eventReadiness,
@@ -74,10 +74,13 @@ import {
 import {
   agendaBadges,
   agendaSearchTokens,
+  eventMonth,
   eventYear,
   monthGroupLabel,
   normalizeSearchText,
 } from "@/lib/venue-agenda";
+import { VenueMonthFilter } from "@/components/venue-events/VenueMonthFilter";
+import { toDisplayUpper } from "@/lib/textNormalize";
 import { VenueEventDetail } from "@/components/venue-events/VenueEventDetail";
 import { VenueEventFormDialog } from "@/components/venue-events/VenueEventFormDialog";
 import {
