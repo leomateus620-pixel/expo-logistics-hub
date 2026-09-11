@@ -9,7 +9,17 @@ import {
   buildCronogramaEventUrl,
   buildGoogleCalendarEventUrl,
 } from "../_shared/eventReminderModel.ts";
-import { buildEventPushMessage } from "../_shared/pushMessage.ts";
+import { buildEventLifecycleMessage, buildEventPushMessage } from "../_shared/pushMessage.ts";
+import {
+  enumerateLifecycleDailyDays,
+  isClosedEventStatus,
+  isMultiDayEvent,
+  LIFECYCLE_DAILY_HOUR,
+  LIFECYCLE_TYPE_BY_STATE,
+  lifecycleDayFor,
+  localHourInstant,
+  normalizeEventRange,
+} from "../_shared/eventLifecycle.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -34,6 +44,8 @@ interface ScheduledEventRow extends EventDateFields {
   id: string;
   org_id: string;
   title: string;
+  location?: string | null;
+  status?: string | null;
   lock_version: number | null;
   has_exact_date: boolean;
   notify_all_commission_members?: boolean | null;
