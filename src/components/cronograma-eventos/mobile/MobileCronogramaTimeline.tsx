@@ -508,7 +508,18 @@ function MobileTimelineEventCard({
           </span>
         )}
 
-        <strong className="cronograma-mobile-event-title">{event.title}</strong>
+        <strong className="cronograma-mobile-event-title">{toDisplayUpper(event.title)}</strong>
+
+        {getEventPeriod(event).isMultiDay && (
+          <span className="cronograma-mobile-event-period">
+            {formatEventPeriodShort(event)} · {formatEventDurationLabel(event)}
+          </span>
+        )}
+
+        {getEventDetailTeaser(event) && (
+          <span className="cronograma-mobile-event-teaser">{getEventDetailTeaser(event)}</span>
+        )}
+
 
         <EventPeopleAvatars
           people={[
