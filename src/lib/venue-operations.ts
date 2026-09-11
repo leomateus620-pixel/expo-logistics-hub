@@ -646,17 +646,9 @@ export const venueEventDraftSchema = z
         message: "A desmontagem não pode terminar antes do evento.",
       });
     }
-    if (
-      draft.conflictOverride &&
-      draft.conflictOverrideReason.trim().length < 8
-    ) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["conflictOverrideReason"],
-        message:
-          "Justifique a exceção de conflito com pelo menos 8 caracteres.",
-      });
-    }
+    // A exceção autorizada foi descontinuada: sobreposição de horário é apenas
+    // um alerta informativo e não exige justificativa para salvar.
+
   });
 
 export const venueStakeholderSchema = z.object({
