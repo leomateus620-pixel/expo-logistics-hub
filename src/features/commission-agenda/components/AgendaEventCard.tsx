@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import type { AgendaEventViewModel } from '../types';
-import { formatDayMonth, formatLongDate, getEventDuration } from '../lib/agenda-presentation';
+import { formatLongDate, getEventDuration } from '../lib/agenda-presentation';
 import {
   EventDateBadge,
   EventLocation,
@@ -129,14 +129,12 @@ export function AgendaEventCompactCard({ event, onOpen, className }: AgendaEvent
       <span className="min-w-0">
         <span className="ua-compact-event__title ws-meta" style={{ fontWeight: 600 }}>{event.title}</span>
         <span className="ua-compact-event__meta ws-caption" style={{ fontWeight: 500 }}>
-          <span>{formatDayMonth(event.date)}{event.startTime ? ` · ${event.startTime}` : ''}</span>
-          {event.location && <span>· {event.location}</span>}
+          <EventStatusBadge status={event.status} size="sm" />
+          {event.startTime && <span className="ua-compact-event__time">{event.startTime}{event.endTime ? ` → ${event.endTime}` : ''}</span>}
+          {event.location && <span>{event.location}</span>}
         </span>
       </span>
-      <span className="flex items-center gap-2">
-        <EventStatusBadge status={event.status} className="hidden sm:inline-flex" />
-        <ChevronRight className="ua-compact-event__chevron" aria-hidden="true" />
-      </span>
+      <ChevronRight className="ua-compact-event__chevron" aria-hidden="true" />
     </button>
   );
 }

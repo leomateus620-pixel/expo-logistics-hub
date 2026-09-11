@@ -176,7 +176,7 @@ const STATUS_ICONS: Record<EventStatus, LucideIcon> = {
 
 interface EventStatusBadgeProps {
   status: EventStatus;
-  size?: 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg';
   withIcon?: boolean;
   className?: string;
 }

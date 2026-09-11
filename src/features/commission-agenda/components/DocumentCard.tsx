@@ -61,7 +61,7 @@ export function DocumentCard({ document, hideEvent = false, onOpen, onDownload, 
         )}
       </div>
       <div className="ua-document__actions">
-        <IconButton icon={Download} label={`Baixar ${document.name}`} onClick={() => onDownload?.(document)} className="hidden sm:inline-grid" />
+        <IconButton icon={Download} label={`Baixar ${document.name}`} onClick={() => onDownload?.(document)} className="ua-document__download" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <IconButton icon={MoreHorizontal} label={`Mais ações para ${document.name}`} />

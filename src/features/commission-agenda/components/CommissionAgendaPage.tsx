@@ -253,6 +253,7 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
             <aside className="ua-layout__aside" aria-label="Atalhos da agenda">
               <DocumentsPanel
                 documents={documents}
+                title="Documentos"
                 unitLabel={unitLabel}
                 limit={4}
                 onOpenAll={() => openDocuments()}

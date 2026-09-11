@@ -48,7 +48,7 @@ export function CommissionHeader({ unit, action, children, className }: Commissi
             <span className="cw-unit-status" data-status={unit.status}>{UNIT_STATUS_LABELS[unit.status]}</span>
           </div>
           <h1 className="cw-header__name ws-display">{unit.name}</h1>
-          {unit.description && <p className="cw-header__description ws-meta-secondary hidden md:block" style={{ color: 'var(--text-on-inverse-muted)' }}>{unit.description}</p>}
+          {unit.description && <p className="cw-header__description ws-meta-secondary" style={{ color: 'var(--text-on-inverse-muted)' }}>{unit.description}</p>}
         </div>
         {action && ActionIcon && (
           <div className="cw-header__actions">
