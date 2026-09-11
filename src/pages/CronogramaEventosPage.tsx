@@ -202,7 +202,11 @@ export default function CronogramaEventosPage() {
   );
   const eventsForView = useMemo(() => {
     if (filters.scopeEventIds?.length) return events;
-    if (activeView === 'timeline') return eventBuckets.timeline.filter(isVisibleInCentralTimeline);
+    if (activeView === 'timeline') return eventBuckets.timeline.filter((event) => isVisibleInCentralTimeline({
+      originSource: event.originSource,
+      commissionSlug: event.commission ?? null,
+      linkedCommissions: (event.relatedCommissionIds ?? []).map((slug) => ({ slug })),
+    }));
     if (activeView === 'completed') return eventBuckets.completed;
     // Pendências: a exclusão de concluídos/cancelados é aplicada pelo board,
     // depois dos filtros globais — aqui a visão recebe o universo completo.
