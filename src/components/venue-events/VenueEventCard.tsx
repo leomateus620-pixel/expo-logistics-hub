@@ -3,7 +3,9 @@ import {
   AlertTriangle,
   Building2,
   ChevronRight,
+  FileText,
   Handshake,
+  History,
   MapPin,
   UserRound,
 } from "lucide-react";
@@ -182,7 +184,12 @@ interface VenueEventCardProps {
   sponsorLabel?: string | null;
   hasCounterpart?: boolean;
   showType?: boolean;
+  documentCount?: number;
   onOpen: () => void;
+  /** Atalho: abre o mesmo evento direto na aba Documentos. */
+  onOpenDocuments?: () => void;
+  /** Atalho: abre o mesmo evento direto na aba Histórico. */
+  onOpenHistory?: () => void;
 }
 
 export function VenueEventCard({
@@ -192,7 +199,10 @@ export function VenueEventCard({
   sponsorLabel,
   hasCounterpart = false,
   showType = false,
+  documentCount,
   onOpen,
+  onOpenDocuments,
+  onOpenHistory,
 }: VenueEventCardProps) {
   const title = toDisplayUpper(event.title);
   const startLabel = formatVenueHour(event.start_at);
@@ -213,10 +223,26 @@ export function VenueEventCard({
       ? " — sem horário"
       : "";
 
+  const quickAction = (handler?: () => void) => (
+    eventObject: React.MouseEvent | React.KeyboardEvent,
+  ) => {
+    eventObject.stopPropagation();
+    handler?.();
+  };
+
   return (
-    <button
-      type="button"
+    // Contêiner clicável em <div> (e não <button>) para permitir os atalhos
+    // Documentos/Histórico como botões reais aninhados, sem HTML inválido.
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onOpen}
+      onKeyDown={(keyEvent) => {
+        if (keyEvent.key === "Enter" || keyEvent.key === " ") {
+          keyEvent.preventDefault();
+          onOpen();
+        }
+      }}
       data-status={event.status}
       data-variant={variant}
       className="venue-event-card"
@@ -261,6 +287,37 @@ export function VenueEventCard({
       </span>
 
       <span className="venue-event-card__aside">
+        {(onOpenDocuments || onOpenHistory) && (
+          <span className="venue-event-card__quick">
+            {onOpenDocuments && (
+              <button
+                type="button"
+                className="venue-event-card__quick-action"
+                onClick={quickAction(onOpenDocuments)}
+                onKeyDown={(keyEvent) => keyEvent.stopPropagation()}
+                aria-label="Abrir documentos do evento"
+                title="Documentos"
+              >
+                <FileText aria-hidden="true" />
+                {typeof documentCount === "number" && documentCount > 0 && (
+                  <b>{documentCount}</b>
+                )}
+              </button>
+            )}
+            {onOpenHistory && (
+              <button
+                type="button"
+                className="venue-event-card__quick-action"
+                onClick={quickAction(onOpenHistory)}
+                onKeyDown={(keyEvent) => keyEvent.stopPropagation()}
+                aria-label="Abrir histórico do evento"
+                title="Histórico"
+              >
+                <History aria-hidden="true" />
+              </button>
+            )}
+          </span>
+        )}
         {hasConflict && (
           <AlertTriangle
             className="venue-event-card__conflict"
@@ -271,6 +328,6 @@ export function VenueEventCard({
         <VenueEventStatusBadge status={event.status} />
         <ChevronRight aria-hidden="true" />
       </span>
-    </button>
+    </div>
   );
 }

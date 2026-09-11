@@ -42,6 +42,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import {
   useVenueAuditHistory,
+  useVenueEventDocumentCounts,
   useVenueOperations,
 } from "@/hooks/useVenueOperations";
 import {
@@ -76,7 +77,11 @@ import {
   normalizeSearchText,
 } from "@/lib/venue-agenda";
 import { VenueMonthFilter } from "@/components/venue-events/VenueMonthFilter";
-import { VenueEventDetail } from "@/components/venue-events/VenueEventDetail";
+import {
+  VenueEventDetail,
+  isVenueDetailTab,
+  type VenueDetailTab,
+} from "@/components/venue-events/VenueEventDetail";
 import {
   VenueEventCard,
   VenueEventSectionHeader,
@@ -436,6 +441,10 @@ export function VenueWorkspace() {
   }, [routeIsCanonical, params.venueSlug, view, venueId, navigate, searchParams]);
 
   const selectedEventId = searchParams.get("evento");
+  const requestedTab = searchParams.get("aba");
+  const detailTab: VenueDetailTab = isVenueDetailTab(requestedTab)
+    ? requestedTab
+    : "resumo";
   const [formOpen, setFormOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [stakeholderOpen, setStakeholderOpen] = useState(false);
@@ -479,6 +488,9 @@ export function VenueWorkspace() {
   const historyQuery = useVenueAuditHistory(
     view === "historico" && operations.permissions.venue_events_audit_view,
   );
+  const documentCounts = useVenueEventDocumentCounts(
+    view === "agenda" || view === "eventos",
+  );
 
   const buildModulePath = (
     nextVenue: VenueWorkspaceId,
@@ -501,14 +513,23 @@ export function VenueWorkspace() {
     navigate(buildModulePath(nextVenue, view));
     setMobileMoreOpen(false);
   };
-  const openEvent = (eventId: string) => {
+  const openEvent = (eventId: string, tab?: VenueDetailTab) => {
     const next = new URLSearchParams(searchParams);
     next.set("evento", eventId);
+    if (tab && tab !== "resumo") next.set("aba", tab);
+    else next.delete("aba");
+    setSearchParams(next, { replace: false });
+  };
+  const setDetailTab = (tab: VenueDetailTab) => {
+    const next = new URLSearchParams(searchParams);
+    if (tab === "resumo") next.delete("aba");
+    else next.set("aba", tab);
     setSearchParams(next, { replace: true });
   };
   const closeEvent = () => {
     const next = new URLSearchParams(searchParams);
     next.delete("evento");
+    next.delete("aba");
     setSearchParams(next, { replace: true });
   };
 
@@ -1316,7 +1337,10 @@ export function VenueWorkspace() {
                       event.sponsor_id,
                       workspace.stakeholders,
                     )}
+                    documentCount={documentCounts[event.id]}
                     onOpen={() => openEvent(event.id)}
+                    onOpenDocuments={() => openEvent(event.id, "documentos")}
+                    onOpenHistory={() => openEvent(event.id, "historico")}
                   />
                 ))}
               </div>
@@ -1469,7 +1493,10 @@ export function VenueWorkspace() {
                     workspace.stakeholders,
                   )}
                   hasCounterpart={Boolean(event.counterpart_agreement_id)}
+                  documentCount={documentCounts[event.id]}
                   onOpen={() => openEvent(event.id)}
+                  onOpenDocuments={() => openEvent(event.id, "documentos")}
+                  onOpenHistory={() => openEvent(event.id, "historico")}
                 />
               ))}
             </div>
@@ -2622,6 +2649,8 @@ export function VenueWorkspace() {
       <VenueEventDetail
         event={selectedEvent}
         open={Boolean(selectedEvent)}
+        tab={detailTab}
+        onTabChange={setDetailTab}
         onOpenChange={(next) => !next && closeEvent()}
         workspace={fullWorkspace}
         permissions={permissions}

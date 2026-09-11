@@ -33,10 +33,12 @@ import {
   type VenueStakeholder,
   type VenueWorkspaceData,
 } from "@/lib/venue-operations";
+import type { VenueEventNote } from "@/lib/venue-history";
 
 const VENUE_QUERY_KEY = "venue-operations";
 const VENUE_DOCUMENT_BUCKET = "venue-event-documents";
 const VENUE_AUDIT_PAGE_SIZE = 100;
+const EMPTY_DOCUMENT_COUNTS: Record<string, number> = {};
 
 // Compatibility boundary until the generated Supabase bindings are refreshed
 // after these additive migrations are applied to the linked project.
@@ -1237,6 +1239,98 @@ export function useVenueEventDetail(
     detailQuery,
     auditQuery,
   };
+}
+
+/**
+ * Contagem de documentos por evento em UMA consulta agregada para toda a
+ * listagem visível (sem N+1 por card).
+ */
+export function useVenueEventDocumentCounts(enabled: boolean) {
+  const { orgId } = useCurrentOrg();
+  const query = useQuery({
+    queryKey: [VENUE_QUERY_KEY, orgId, "document-counts"],
+    queryFn: async () => {
+      const currentOrgId = requireOrgId(orgId);
+      const { data, error } = await venueDb
+        .from("venue_event_documents")
+        .select("event_id")
+        .eq("org_id", currentOrgId)
+        .limit(5000);
+      if (error) throw error;
+      const counts: Record<string, number> = {};
+      for (const row of (data ?? []) as Array<{ event_id: string }>) {
+        counts[row.event_id] = (counts[row.event_id] ?? 0) + 1;
+      }
+      return counts;
+    },
+    enabled: Boolean(orgId && enabled),
+    staleTime: 60_000,
+    meta: { persist: false },
+  });
+  return query.data ?? EMPTY_DOCUMENT_COUNTS;
+}
+
+export function useVenueEventNotes(eventId: string | null, enabled: boolean) {
+  const { orgId } = useCurrentOrg();
+  return useQuery({
+    queryKey: [VENUE_QUERY_KEY, orgId, "event-notes", eventId],
+    queryFn: async () => {
+      const currentOrgId = requireOrgId(orgId);
+      if (!eventId) throw new Error("VENUE_EVENT_REQUIRED");
+      const { data, error } = await venueDb
+        .from("venue_event_notes")
+        .select("*")
+        .eq("org_id", currentOrgId)
+        .eq("event_id", eventId)
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as VenueEventNote[];
+    },
+    enabled: Boolean(orgId && eventId && enabled),
+    staleTime: 10_000,
+    meta: { persist: false },
+  });
+}
+
+export function useVenueEventNoteMutations(eventId: string | null) {
+  const { orgId } = useCurrentOrg();
+  const queryClient = useQueryClient();
+  const invalidate = useCallback(() => {
+    void queryClient.invalidateQueries({
+      queryKey: [VENUE_QUERY_KEY, orgId, "event-notes", eventId],
+    });
+    void queryClient.invalidateQueries({
+      queryKey: [VENUE_QUERY_KEY, orgId, "audit-history", eventId],
+    });
+  }, [eventId, orgId, queryClient]);
+
+  const saveNote = useMutation({
+    mutationFn: async (input: { body: string; noteId?: string | null }) => {
+      if (!eventId) throw new Error("VENUE_EVENT_REQUIRED");
+      const { data, error } = await venueDb.rpc("venue_save_event_note", {
+        p_event_id: eventId,
+        p_body: input.body,
+        p_note_id: input.noteId ?? null,
+      });
+      if (error) throw new Error(mapVenueError(error));
+      return data as VenueEventNote;
+    },
+    onSuccess: invalidate,
+  });
+
+  const deleteNote = useMutation({
+    mutationFn: async (noteId: string) => {
+      const { error } = await venueDb.rpc("venue_delete_event_note", {
+        p_note_id: noteId,
+      });
+      if (error) throw new Error(mapVenueError(error));
+      return true;
+    },
+    onSuccess: invalidate,
+  });
+
+  return { saveNote, deleteNote };
 }
 
 export async function createVenueDocumentUrl(document: VenueEventDocument) {

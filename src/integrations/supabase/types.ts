@@ -6822,6 +6822,47 @@ export type Database = {
           },
         ]
       }
+      venue_event_notes: {
+        Row: {
+          author_user_id: string
+          body: string
+          created_at: string
+          deleted_at: string | null
+          event_id: string
+          id: string
+          org_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_user_id: string
+          body: string
+          created_at?: string
+          deleted_at?: string | null
+          event_id: string
+          id?: string
+          org_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_user_id?: string
+          body?: string
+          created_at?: string
+          deleted_at?: string | null
+          event_id?: string
+          id?: string
+          org_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_event_notes_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "venue_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venue_event_resources: {
         Row: {
           completion_status: string
@@ -9190,6 +9231,7 @@ export type Database = {
         }
         Returns: Json
       }
+      venue_delete_event_note: { Args: { p_note_id: string }; Returns: boolean }
       venue_finish_mutation: {
         Args: {
           _idempotency_key: string
@@ -9277,6 +9319,25 @@ export type Database = {
       venue_save_event_agenda: {
         Args: { _event_id: string; _org_id: string; _payload: Json }
         Returns: Json
+      }
+      venue_save_event_note: {
+        Args: { p_body: string; p_event_id: string; p_note_id?: string }
+        Returns: {
+          author_user_id: string
+          body: string
+          created_at: string
+          deleted_at: string | null
+          event_id: string
+          id: string
+          org_id: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "venue_event_notes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       venue_seed_org_defaults: { Args: { _org_id: string }; Returns: undefined }
       venue_sync_event_counterpart: {
