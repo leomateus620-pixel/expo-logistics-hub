@@ -122,6 +122,8 @@ export function useUnitAgenda(entryId: string | null | undefined) {
   return {
     commissionId,
     commissionSlug,
+    unitOptions,
+    byCanonicalId,
     rows,
     events,
     metrics: metricsQuery.data ?? EMPTY_METRICS,
