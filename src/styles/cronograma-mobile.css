@@ -1093,6 +1093,33 @@
   -webkit-line-clamp: 3;
 }
 
+.cronograma-mobile-event-period {
+  display: inline-flex;
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: oklch(var(--gold) / 0.16);
+  color: oklch(var(--gold));
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cronograma-mobile-event-teaser {
+  display: -webkit-box;
+  margin-top: 0.3rem;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.75rem;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+
 .cronograma-mobile-event-badges {
   display: flex;
   min-width: 0;
