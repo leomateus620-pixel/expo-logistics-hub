@@ -52,7 +52,7 @@ import {
   VENUE_MODULE_ROUTE,
   COUNTERPART_UNIT_LABELS,
   EVENT_STATUS_LABELS,
-  EVENT_TYPE_LABELS,
+  venueEventTypeLabel,
   buildVenueReport,
   deriveVenuePendencies,
   eventReadiness,
@@ -74,10 +74,13 @@ import {
 import {
   agendaBadges,
   agendaSearchTokens,
+  eventMonth,
   eventYear,
   monthGroupLabel,
   normalizeSearchText,
 } from "@/lib/venue-agenda";
+import { VenueMonthFilter } from "@/components/venue-events/VenueMonthFilter";
+import { toDisplayUpper } from "@/lib/textNormalize";
 import { VenueEventDetail } from "@/components/venue-events/VenueEventDetail";
 import { VenueEventFormDialog } from "@/components/venue-events/VenueEventFormDialog";
 import {
@@ -322,7 +325,7 @@ function EventRow({
           <StatusBadge status={event.status} />
           <small>
             {APPROVAL_STATUS_LABELS[event.approval_status] ||
-              EVENT_TYPE_LABELS[event.event_type]}
+              venueEventTypeLabel(event.event_type)}
           </small>
         </span>
         <strong title={event.title}>{event.title}</strong>
@@ -460,6 +463,7 @@ export function VenueWorkspace() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [spaceFilter, setSpaceFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("2026");
+  const [monthFilter, setMonthFilter] = useState("all");
   const [includeHistory, setIncludeHistory] = useState(false);
   const [reviewOnly, setReviewOnly] = useState(false);
   const [agendaMode, setAgendaMode] = useState<"dia" | "semana" | "mes">(
@@ -665,16 +669,21 @@ export function VenueWorkspace() {
       ),
   );
 
-  const filteredEvents = workspace.events.filter((event) => {
+  // Filtros combinados (área, busca, status, revisão, espaço, ano) sem o mês —
+  // usados também para calcular os contadores por mês de forma coerente.
+  const eventsBeforeMonthFilter = workspace.events.filter((event) => {
     const spaces = getSpaceNames(
       event.id,
       workspace.allocations,
       workspace.spaces,
     );
-    const sponsor = getStakeholderName(
+    const sponsor = `${getStakeholderName(
       event.sponsor_id,
       workspace.stakeholders,
-    );
+    )} ${getStakeholderName(
+      event.responsible_organization_id,
+      workspace.stakeholders,
+    )}`;
     return (
       eventMatchesSearch(event, search, sponsor, spaces) &&
       (statusFilter === "all" || event.status === statusFilter) &&
@@ -691,6 +700,29 @@ export function VenueWorkspace() {
         ))
     );
   });
+
+  const monthCounts = eventsBeforeMonthFilter.reduce<Record<string, number>>(
+    (acc, event) => {
+      const month = eventMonth(event);
+      if (month) acc[month] = (acc[month] ?? 0) + 1;
+      return acc;
+    },
+    {},
+  );
+
+  const filteredEvents = eventsBeforeMonthFilter.filter(
+    (event) => monthFilter === "all" || eventMonth(event) === monthFilter,
+  );
+
+  const usedEventTypes = Array.from(
+    new Set(
+      workspace.events
+        .map((event) => (event.event_type ?? "").trim())
+        .filter(Boolean),
+    ),
+  ).sort((a, b) =>
+    venueEventTypeLabel(a).localeCompare(venueEventTypeLabel(b), "pt-BR"),
+  );
 
   const CYCLE_YEARS = ["2026", "2027", "2028"];
   const availableYears = CYCLE_YEARS;
@@ -725,10 +757,13 @@ export function VenueWorkspace() {
       workspace.allocations,
       workspace.spaces,
     );
-    const sponsor = getStakeholderName(
+    const sponsor = `${getStakeholderName(
       event.sponsor_id,
       workspace.stakeholders,
-    );
+    )} ${getStakeholderName(
+      event.responsible_organization_id,
+      workspace.stakeholders,
+    )}`;
     return (
       eventMatchesSearch(event, search, sponsor, spaces) &&
       (spaceFilter === "all" ||
@@ -1354,16 +1389,23 @@ export function VenueWorkspace() {
                       </span>
 
                       <span className="venue-agenda-card__body">
-                        <strong>{event.title}</strong>
+                        <strong>{toDisplayUpper(event.title)}</strong>
+                        <span className="venue-agenda-card__requester">
+                          <UserRound aria-hidden="true" />
+                          {toDisplayUpper(event.requester_name) ||
+                            "Requerente não informado"}
+                        </span>
                         <span className="venue-agenda-card__chips">
                           <span data-kind="space">
                             <MapPin aria-hidden="true" />
                             {spaceLabel || "Área não definida"}
                           </span>
-                          <span data-kind="sponsor" data-empty={!sponsorLabel || sponsorLabel === "Sem vínculo"}>
-                            <Building2 aria-hidden="true" />
-                            {sponsorLabel || "Sem vínculo"}
-                          </span>
+                          {sponsorLabel && sponsorLabel !== "Sem vínculo" && (
+                            <span data-kind="sponsor">
+                              <Building2 aria-hidden="true" />
+                              {sponsorLabel}
+                            </span>
+                          )}
                         </span>
                       </span>
 
@@ -1463,6 +1505,12 @@ export function VenueWorkspace() {
               setIncludeHistory(false);
               setYearFilter(year);
             }}
+          />
+          <VenueMonthFilter
+            value={monthFilter}
+            counts={monthCounts}
+            totalCount={eventsBeforeMonthFilter.length}
+            onChange={setMonthFilter}
           />
           <VenueEventsFiltersTrigger
             statusFilter={statusFilter}
@@ -1585,32 +1633,34 @@ export function VenueWorkspace() {
 
 
                     <span className="venue-agenda-card__body">
-                      <strong>{event.title}</strong>
+                      <strong>{toDisplayUpper(event.title)}</strong>
+                      <span className="venue-agenda-card__requester">
+                        <UserRound aria-hidden="true" />
+                        {toDisplayUpper(event.requester_name) ||
+                          "Requerente não informado"}
+                      </span>
                       <span className="venue-agenda-card__chips">
                         <span data-kind="space">
                           <MapPin aria-hidden="true" />
                           {spaceLabel || "Área não definida"}
                         </span>
-                        <span
-                          data-kind="sponsor"
-                          data-empty={!sponsorLabel || sponsorLabel === "Sem vínculo"}
-                        >
-                          <Building2 aria-hidden="true" />
-                          {sponsorLabel || "Sem vínculo"}
-                        </span>
-                        <span data-kind="responsible">
-                          <UserRound aria-hidden="true" />
-                          {responsibleLabel}
-                        </span>
-                        <span
-                          data-kind="counterpart"
-                          data-empty={!hasCounterpart}
-                        >
-                          <Handshake aria-hidden="true" />
-                          {hasCounterpart
-                            ? "Contrapartida vinculada"
-                            : "Sem contrapartida"}
-                        </span>
+                        {event.event_type && (
+                          <span data-kind="type">
+                            {venueEventTypeLabel(event.event_type)}
+                          </span>
+                        )}
+                        {sponsorLabel && sponsorLabel !== "Sem vínculo" && (
+                          <span data-kind="sponsor">
+                            <Building2 aria-hidden="true" />
+                            {sponsorLabel}
+                          </span>
+                        )}
+                        {hasCounterpart && (
+                          <span data-kind="counterpart">
+                            <Handshake aria-hidden="true" />
+                            Contrapartida
+                          </span>
+                        )}
                       </span>
                     </span>
 
@@ -2302,9 +2352,9 @@ export function VenueWorkspace() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os tipos</SelectItem>
-                {Object.entries(EVENT_TYPE_LABELS).map(([type, label]) => (
+                {usedEventTypes.map((type) => (
                   <SelectItem key={type} value={type}>
-                    {label}
+                    {venueEventTypeLabel(type)}
                   </SelectItem>
                 ))}
               </SelectContent>

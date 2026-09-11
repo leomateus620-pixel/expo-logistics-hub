@@ -41,15 +41,16 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import type { VenuePermissionMap } from "@/hooks/useVenueOperations";
+import { toDisplayUpper } from "@/lib/textNormalize";
 import {
   COUNTERPART_UNIT_LABELS,
-  EVENT_TYPE_LABELS,
-  VENUE_EVENT_TYPES,
+  VENUE_EVENT_TYPE_SUGGESTIONS,
   createEmptyVenueEventDraft,
   findLocalAvailabilityConflicts,
   formatVenuePeriod,
   getStakeholderName,
   venueEventDraftSchema,
+  venueEventTypeLabel,
   type AvailabilityConflict,
   type VenueEventDraft,
   type VenueWorkspaceData,
@@ -118,7 +119,7 @@ const FIELD_SECTION: Partial<Record<keyof VenueEventDraft, SectionId>> = {
   setupStartTime: "ocupacao",
   teardownEndDate: "ocupacao",
   teardownEndTime: "ocupacao",
-  requesterName: "vinculos",
+  requesterName: "identificacao",
   responsibleOrganizationId: "vinculos",
   responsibleUserId: "vinculos",
   sponsorId: "vinculos",
@@ -238,6 +239,32 @@ export function VenueEventFormDialog({
   const activeSpaces = useMemo(
     () => workspace.spaces.filter((space) => space.active),
     [workspace.spaces],
+  );
+
+  // Sugestões vindas dos próprios registros, para reduzir grafias divergentes.
+  const requesterSuggestions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          workspace.events
+            .map((event) => toDisplayUpper(event.requester_name ?? "").trim())
+            .filter(Boolean),
+        ),
+      ).sort((a, b) => a.localeCompare(b, "pt-BR")),
+    [workspace.events],
+  );
+
+  const eventTypeSuggestions = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          ...workspace.events
+            .map((event) => venueEventTypeLabel(event.event_type))
+            .filter(Boolean),
+          ...VENUE_EVENT_TYPE_SUGGESTIONS,
+        ]),
+      ).sort((a, b) => a.localeCompare(b, "pt-BR")),
+    [workspace.events],
   );
 
   const defaultResponsibleUserId = useMemo(() => {
@@ -579,37 +606,61 @@ export function VenueEventFormDialog({
                   <Input
                     id="venue-event-title"
                     value={draft.title}
-                    onChange={(event) => update("title", event.target.value)}
+                    onChange={(event) =>
+                      update("title", toDisplayUpper(event.target.value))
+                    }
                     autoFocus
                     aria-invalid={Boolean(errors.title)}
                   />
                 </Field>
                 <Field
+                  id="venue-event-requester"
+                  field="requesterName"
+                  label="Requerente"
+                  hint="Empresa, entidade ou pessoa que solicitou o espaço."
+                  error={errors.requesterName}
+                >
+                  <Input
+                    id="venue-event-requester"
+                    value={draft.requesterName}
+                    list="venue-requester-options"
+                    autoComplete="off"
+                    onChange={(event) =>
+                      update("requesterName", toDisplayUpper(event.target.value))
+                    }
+                    placeholder="EX.: COTRIROSA"
+                    aria-invalid={Boolean(errors.requesterName)}
+                  />
+                  <datalist id="venue-requester-options">
+                    {requesterSuggestions.map((option) => (
+                      <option key={option} value={option} />
+                    ))}
+                  </datalist>
+                </Field>
+                <Field
                   id="venue-event-type"
                   field="eventType"
-                  label="Tipo"
+                  label="Tipo do evento"
+                  hint="Texto livre. Ex.: JANTAR EMPRESARIAL, SEMINÁRIO, FORMATURA."
                   error={errors.eventType}
                 >
-                  <Select
+                  <Input
+                    id="venue-event-type"
                     value={draft.eventType}
-                    onValueChange={(value) =>
-                      update("eventType", value as VenueEventDraft["eventType"])
+                    list="venue-event-type-options"
+                    autoComplete="off"
+                    maxLength={80}
+                    onChange={(event) =>
+                      update("eventType", toDisplayUpper(event.target.value))
                     }
-                  >
-                    <SelectTrigger
-                      id="venue-event-type"
-                      aria-invalid={Boolean(errors.eventType)}
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {VENUE_EVENT_TYPES.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {EVENT_TYPE_LABELS[type]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    placeholder="EX.: JANTAR EMPRESARIAL"
+                    aria-invalid={Boolean(errors.eventType)}
+                  />
+                  <datalist id="venue-event-type-options">
+                    {eventTypeSuggestions.map((option) => (
+                      <option key={option} value={option} />
+                    ))}
+                  </datalist>
                 </Field>
                 <Field
                   id="venue-event-description"
@@ -622,7 +673,10 @@ export function VenueEventFormDialog({
                     id="venue-event-description"
                     value={draft.executiveDescription}
                     onChange={(event) =>
-                      update("executiveDescription", event.target.value)
+                      update(
+                        "executiveDescription",
+                        toDisplayUpper(event.target.value),
+                      )
                     }
                     rows={3}
                   />
@@ -639,7 +693,7 @@ export function VenueEventFormDialog({
                       id="venue-event-requested-area"
                       value={draft.requestedArea}
                       onChange={(event) =>
-                        update("requestedArea", event.target.value)
+                        update("requestedArea", toDisplayUpper(event.target.value))
                       }
                       placeholder="Ex.: arena principal, palco e backstage"
                     />
@@ -785,15 +839,7 @@ export function VenueEventFormDialog({
               <div className="venue-form-section__intro">
                 <h3>Vínculos</h3>
               </div>
-              <div className="venue-identity-grid" data-venue-field="requesterName">
-                <div className="venue-identity-card">
-                  <span>Solicitante</span>
-                  <strong>
-                    <UserRound aria-hidden="true" />
-                    {draft.requesterName || defaultRequesterName || "—"}
-                  </strong>
-                  <small>Usuário autenticado que está cadastrando</small>
-                </div>
+              <div className="venue-identity-grid">
                 <div className="venue-identity-card">
                   <span>Responsável Fenasoja</span>
                   <strong>
@@ -804,9 +850,6 @@ export function VenueEventFormDialog({
                   <small>Responsável padrão desta agenda</small>
                 </div>
               </div>
-              {errors.requesterName && (
-                <p className="venue-field__error">{errors.requesterName}</p>
-              )}
               <div className="venue-form-grid">
                 <Field
                   id="venue-event-organization"
@@ -930,7 +973,7 @@ export function VenueEventFormDialog({
                     id="venue-event-observations"
                     value={draft.observations}
                     onChange={(event) =>
-                      update("observations", event.target.value)
+                      update("observations", toDisplayUpper(event.target.value))
                     }
                     rows={5}
                     placeholder="Ex.: necessário acesso antecipado para montagem, apoio de recepção e preparação do espaço às 17h."
@@ -966,7 +1009,9 @@ export function VenueEventFormDialog({
                 <article>
                   <span>Evento</span>
                   <strong>{draft.title || "Título não informado"}</strong>
-                  <small>{EVENT_TYPE_LABELS[draft.eventType]}</small>
+                  <small>
+                    {venueEventTypeLabel(draft.eventType) || "Tipo não informado"}
+                  </small>
                 </article>
                 <article>
                   <span>Espaço</span>
