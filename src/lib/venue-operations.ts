@@ -1544,7 +1544,7 @@ export function createEmptyVenueEventDraft(): VenueEventDraft {
   return {
     title: "",
     executiveDescription: "",
-    eventType: "",
+    eventType: "EXTERNO",
     venueIds: [],
     requestedArea: "",
     pendingDate: false,
