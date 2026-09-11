@@ -365,8 +365,8 @@ export function MobileEventScreen({
               <div className="cronograma-mobile-info-list">
                 <MobileInfo
                   icon={CalendarClock}
-                  label="Data e horário"
-                  value={`${formatLongDateRange(event.date, event.endDate)}${event.startTime ? ` · ${event.startTime}` : ''}${event.endTime ? ` às ${event.endTime}` : ''}`}
+                  label="Período"
+                  value={`${formatEventPeriod(event)}${formatEventDurationLabel(event) ? ` (${formatEventDurationLabel(event)})` : ''}`}
                 />
                 <MobileInfo icon={MapPin} label="Local" value={event.location || 'Local a definir'} />
                 <MobileInfo
