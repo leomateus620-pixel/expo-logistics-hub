@@ -9,7 +9,9 @@ import {
 } from '@/features/commercial-map/utils/landmarks';
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8');
-const parkSource = read('src/features/commercial-map/components/canvas/AmusementPark.tsx');
+const parkSource = read('src/features/commercial-map/components/canvas/AmusementPark.tsx')
+  + read('src/features/commercial-map/components/canvas/AmusementParkPhysics.tsx')
+  + read('src/features/commercial-map/components/canvas/BumperCarModel.tsx');
 const environmentSource = read('src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx');
 const environmentConfigSource = read('src/features/commercial-map/data/commercialMapEnvironment.ts');
 const canvasSource = read('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
@@ -54,7 +56,7 @@ describe('Parque de Diversões J', () => {
     expect(canvasSource).toContain("=== 'amusement-park'");
     // The park focus still requests the night atmosphere; global Night Mode
     // shares the same eased blend instead of a second lighting path.
-    expect(canvasSource).toContain('const nightAtmosphereActive = nightModeActive || amusementParkSelected;');
+    expect(canvasSource).toContain('nightMode={night || props.nightMode}');
     expect(canvasSource).toContain('nightMode={nightAtmosphereActive}');
     expect(environmentConfigSource).toContain("background: '#050916'");
     expect(environmentSource).toContain('const nightTarget = nightMode ? 1 : 0;');
@@ -67,7 +69,8 @@ describe('Parque de Diversões J', () => {
     expect(parkSource).toContain('const [physicsBooted, setPhysicsBooted] = useState(false);');
     expect(parkSource).toContain('if (parkActive) setPhysicsBooted(true);');
     expect(parkSource).toContain('<ParkedBumperCars carCount={carCount} />');
-    expect(parkSource).toMatch(/physicsBooted \? \(\s*<Suspense fallback=\{<ParkedBumperCars/);
+    expect(parkSource).toMatch(/physicsBooted \? \(\s*<BumperPhysicsBoundary fallback=\{<ParkedBumperCars/);
+    expect(parkSource).toContain('<Suspense fallback={<ParkedBumperCars');
   });
 
   it('anima os dois braços espelhados do Kamikaze em rise-pause-descend', () => {

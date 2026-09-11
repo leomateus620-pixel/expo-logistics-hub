@@ -1,3 +1,4 @@
+import { measureCommercialMapStage, markCommercialMapStage } from '../utils/performanceDiagnostics';
 import { supabase } from '@/integrations/supabase/client';
 import { OFFICIAL_REFERENCE_DATA, OFFICIAL_REFERENCE_REVISION } from '../data/officialReference2026';
 import { reconcileExporuralReference } from '../data/reconcileExporuralReference';
@@ -71,6 +72,14 @@ interface LotRow {
   accessibility_notes: string | null; commercial_notes: string | null; internal_notes: string | null; archived_at: string | null;
   created_by: string | null; updated_by: string | null; created_at: string | null; updated_at: string | null;
 }
+/** Every relation column consumed by mapLot; no history/blob payloads. */
+export const COMMERCIAL_LOT_SELECT = `*,
+  lot_prices(is_active,pricing_mode,base_price,price_per_sqm,asking_price,minimum_price),
+  lot_reservations(status,company_name,expires_at,responsible_name),
+  lot_negotiations(status,company_name),
+  lot_sales(status,buyer_name,sale_date,salesperson_name,contract_number),
+  lot_contracts(is_active,contract_number)`;
+
 interface ActivityRow {
   id: string; entity_id: string | null; lot_id: string | null; action: string; reason: string | null; actor_user_id: string | null;
   before_state: Record<string, unknown> | null; after_state: Record<string, unknown> | null; created_at: string;
@@ -87,13 +96,13 @@ const db = supabase as any;
 const MAP_PAGE_SIZE = 1000;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function fetchAllRows(buildQuery: () => any): Promise<{ data: any[] | null; error: any }> {
+async function fetchAllRows(buildQuery: () => any, stage = 'paged-query'): Promise<{ data: any[] | null; error: any }> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const all: any[] = [];
   for (let from = 0; ; from += MAP_PAGE_SIZE) {
-    const { data, error } = await buildQuery()
+    const { data, error } = await measureCommercialMapStage<Awaited<ReturnType<typeof fetchAllRows>>>(`${stage}:page-${from / MAP_PAGE_SIZE}`, () => buildQuery()
       .order('id')
-      .range(from, from + MAP_PAGE_SIZE - 1);
+      .range(from, from + MAP_PAGE_SIZE - 1));
     if (error) return { data: null, error };
     const rows = data ?? [];
     all.push(...rows);
@@ -313,7 +322,7 @@ function mapLot(row: LotRow): CommercialLot {
   };
 }
 
-async function signedReferenceUrl(calibration: MapCalibration | null): Promise<MapCalibration | null> {
+export async function signedReferenceUrl(calibration: MapCalibration | null): Promise<MapCalibration | null> {
   if (!calibration?.referenceImagePath || calibration.referenceImagePath.startsWith('/')) return calibration;
   const { data, error } = await supabase.storage.from('map-references').createSignedUrl(calibration.referenceImagePath, 3600);
   if (error) return calibration;
@@ -492,19 +501,23 @@ async function fetchCommissionCommercialMap(
 export async function fetchCommercialMap(
   orgId: string,
   scope: CommercialMapQueryScope = { mode: 'full' },
+  options: { includeReferenceImage?: boolean } = {},
 ): Promise<CommercialMapData> {
-  if (scope.mode === 'full') {
-    const maintenance = await db.rpc('expire_commercial_reservations', { p_org_id: orgId });
-    if (maintenance.error && !isMissingReservationMaintenance(maintenance.error)) throw maintenance.error;
-  }
-  const { data: projectRow, error: projectError } = await db
+  // Both promises are observed immediately; business rows still wait for expiry.
+  const [maintenance, { data: projectRow, error: projectError }] = await Promise.all([
+    scope.mode === 'full'
+      ? measureCommercialMapStage<{ error: { code?: string; message?: string } | null }>('reservation-maintenance', () => db.rpc('expire_commercial_reservations', { p_org_id: orgId }))
+      : Promise.resolve({ error: null }),
+    measureCommercialMapStage<{ data: ProjectRow | null; error: { code?: string; message?: string } | null }>('project', () => db
     .from('map_projects')
     .select('*')
     .eq('org_id', orgId)
     .eq('is_archived', false)
     .order('updated_at', { ascending: false })
     .limit(1)
-    .maybeSingle();
+    .maybeSingle()),
+  ]);
+  if (maintenance.error && !isMissingReservationMaintenance(maintenance.error)) throw maintenance.error;
 
   if (projectError) {
     if (isMissingMapInfrastructure(projectError)) {
@@ -531,6 +544,12 @@ export async function fetchCommercialMap(
     return fetchCommissionCommercialMap(project, scope);
   }
 
+  const calibrationPromise = measureCommercialMapStage('calibration', async () => {
+    const result = await db.from('map_calibrations').select('*').eq('project_id', project.id).order('version', { ascending: false }).limit(1).maybeSingle();
+    const mapped = result.data ? mapCalibration(result.data) : null;
+    return { ...result, calibration: result.error || options.includeReferenceImage === false
+      ? mapped : await measureCommercialMapStage('reference-signing', () => signedReferenceUrl(mapped)) };
+  });
   const [
     layersResult,
     entitiesResult,
@@ -541,10 +560,10 @@ export async function fetchCommercialMap(
     segmentsResult,
   ] = await Promise.all([
     db.from('map_layers').select('*').eq('project_id', project.id).order('sort_order'),
-    fetchAllRows(() => db.from('map_entities').select('*').eq('project_id', project.id).eq('is_archived', false)),
-    fetchAllRows(() => db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true)),
-    db.from('map_calibrations').select('*').eq('project_id', project.id).order('version', { ascending: false }).limit(1).maybeSingle(),
-    fetchAllRows(() => db.from('commercial_lots').select('*, lot_prices(*), lot_reservations(*), lot_negotiations(*), lot_sales(*), lot_contracts(*)').eq('project_id', project.id).is('archived_at', null)),
+    fetchAllRows(() => db.from('map_entities').select('*').eq('project_id', project.id).eq('is_archived', false), 'entities'),
+    fetchAllRows(() => db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true), 'geometries'),
+    calibrationPromise,
+    fetchAllRows(() => db.from('commercial_lots').select(COMMERCIAL_LOT_SELECT).eq('project_id', project.id).is('archived_at', null), 'lots'),
     db.from('commercial_lots').select('id').eq('project_id', project.id).limit(1),
     db.from('map_segments').select('id, slug').eq('project_id', project.id).eq('is_active', true),
   ]);
@@ -563,6 +582,8 @@ export async function fetchCommercialMap(
   ]
     .find((result) => result.error)?.error;
   if (firstError || segmentLookupError) throw firstError ?? segmentLookupError;
+  const transformationStartedAt = performance.now();
+  markCommercialMapStage('inventory-transformation:start');
   const segmentSlugById = new Map<string, CommercialMapSegmentId>(
     ((segmentsResult.data ?? []) as SegmentLookupRow[])
       .map((segment) => [segment.id, segment.slug] as const)
@@ -588,15 +609,17 @@ export async function fetchCommercialMap(
     };
   }
 
-  return reconcileExporuralReference({
+  const result = reconcileExporuralReference({
     source: 'database',
     sourceMessage: project.isPublished ? null : 'Projeto cartográfico em rascunho. Alterações ainda não estão publicadas para toda a equipe.',
     project,
-    calibration: await signedReferenceUrl(calibrationResult.data ? mapCalibration(calibrationResult.data) : null),
+    calibration: calibrationResult.calibration,
     layers: (layersResult.data ?? []).map(mapLayer),
     entities,
     lots: lotRows.map(mapLot),
   });
+  markCommercialMapStage('inventory-transformation:end', performance.now() - transformationStartedAt);
+  return result;
 }
 
 export async function bootstrapOfficialReference(orgId: string): Promise<string> {

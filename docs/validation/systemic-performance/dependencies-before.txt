@@ -1,0 +1,159 @@
+npm error code EUSAGE
+npm error
+npm error `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync. Please update your lock file with `npm install` before continuing.
+npm error
+npm error Missing: firebase@12.19.0 from lock file
+npm error Missing: @firebase/ai@2.16.0 from lock file
+npm error Missing: @firebase/app@0.16.2 from lock file
+npm error Missing: @firebase/app-types@0.9.6 from lock file
+npm error Missing: @firebase/analytics@0.10.25 from lock file
+npm error Missing: @firebase/analytics-compat@0.2.31 from lock file
+npm error Missing: @firebase/app-compat@0.5.18 from lock file
+npm error Missing: @firebase/app-check@0.13.1 from lock file
+npm error Missing: @firebase/app-check-compat@0.4.7 from lock file
+npm error Missing: @firebase/auth@1.13.6 from lock file
+npm error Missing: @firebase/auth-compat@0.6.11 from lock file
+npm error Missing: @firebase/data-connect@0.7.4 from lock file
+npm error Missing: @firebase/database@1.1.5 from lock file
+npm error Missing: @firebase/database-compat@2.1.7 from lock file
+npm error Missing: @firebase/firestore@4.17.2 from lock file
+npm error Missing: @firebase/firestore-compat@0.4.14 from lock file
+npm error Missing: @firebase/functions@0.14.0 from lock file
+npm error Missing: @firebase/functions-compat@0.5.0 from lock file
+npm error Missing: @firebase/installations@0.6.24 from lock file
+npm error Missing: @firebase/installations-compat@0.2.24 from lock file
+npm error Missing: @firebase/messaging@0.13.3 from lock file
+npm error Missing: @firebase/messaging-compat@0.2.30 from lock file
+npm error Missing: @firebase/performance@0.7.14 from lock file
+npm error Missing: @firebase/performance-compat@0.2.27 from lock file
+npm error Missing: @firebase/remote-config@0.9.2 from lock file
+npm error Missing: @firebase/remote-config-compat@0.2.29 from lock file
+npm error Missing: @firebase/storage@0.14.5 from lock file
+npm error Missing: @firebase/storage-compat@0.4.5 from lock file
+npm error Missing: @firebase/util@1.15.3 from lock file
+npm error Missing: @firebase/app-check-interop-types@0.3.5 from lock file
+npm error Missing: @firebase/component@0.7.5 from lock file
+npm error Missing: @firebase/logger@0.5.2 from lock file
+npm error Missing: @firebase/analytics-types@0.8.5 from lock file
+npm error Missing: idb@7.1.1 from lock file
+npm error Missing: @firebase/app-check-types@0.5.5 from lock file
+npm error Missing: @firebase/auth@1.13.6 from lock file
+npm error Missing: @firebase/auth-types@0.13.2 from lock file
+npm error Missing: @firebase/auth-interop-types@0.2.6 from lock file
+npm error Missing: faye-websocket@0.11.4 from lock file
+npm error Missing: @firebase/database-types@1.0.22 from lock file
+npm error Missing: @firebase/webchannel-wrapper@1.0.7 from lock file
+npm error Missing: @grpc/grpc-js@1.9.16 from lock file
+npm error Missing: @grpc/proto-loader@0.7.15 from lock file
+npm error Missing: re2js@2.8.6 from lock file
+npm error Missing: @firebase/firestore-types@3.0.5 from lock file
+npm error Missing: @firebase/messaging-interop-types@0.2.6 from lock file
+npm error Missing: @firebase/functions-types@0.6.5 from lock file
+npm error Missing: @firebase/installations-types@0.5.5 from lock file
+npm error Missing: web-vitals@4.2.4 from lock file
+npm error Missing: @firebase/performance-types@0.2.5 from lock file
+npm error Missing: @firebase/remote-config-types@0.5.2 from lock file
+npm error Missing: @firebase/storage-types@0.8.5 from lock file
+npm error Missing: lodash.camelcase@4.3.0 from lock file
+npm error Missing: long@5.3.2 from lock file
+npm error Missing: protobufjs@7.6.6 from lock file
+npm error Missing: yargs@17.7.3 from lock file
+npm error Missing: websocket-driver@0.7.5 from lock file
+npm error Missing: @protobufjs/aspromise@1.1.2 from lock file
+npm error Missing: @protobufjs/base64@1.1.2 from lock file
+npm error Missing: @protobufjs/codegen@2.0.5 from lock file
+npm error Missing: @protobufjs/eventemitter@1.1.1 from lock file
+npm error Missing: @protobufjs/fetch@1.1.1 from lock file
+npm error Missing: @protobufjs/float@1.0.2 from lock file
+npm error Missing: @protobufjs/path@1.1.2 from lock file
+npm error Missing: @protobufjs/pool@1.1.0 from lock file
+npm error Missing: @protobufjs/utf8@1.1.2 from lock file
+npm error Missing: http-parser-js@0.5.10 from lock file
+npm error Missing: safe-buffer@5.2.1 from lock file
+npm error Missing: websocket-extensions@0.1.4 from lock file
+npm error Missing: cliui@8.0.1 from lock file
+npm error Missing: get-caller-file@2.0.5 from lock file
+npm error Missing: require-directory@2.1.1 from lock file
+npm error Missing: string-width@4.2.3 from lock file
+npm error Missing: y18n@5.0.8 from lock file
+npm error Missing: yargs-parser@21.1.1 from lock file
+npm error Missing: string-width@4.2.3 from lock file
+npm error Missing: strip-ansi@6.0.1 from lock file
+npm error Missing: wrap-ansi@7.0.0 from lock file
+npm error Missing: emoji-regex@8.0.0 from lock file
+npm error Missing: ansi-regex@5.0.1 from lock file
+npm error Missing: emoji-regex@8.0.0 from lock file
+npm error Missing: strip-ansi@6.0.1 from lock file
+npm error Missing: ansi-regex@5.0.1 from lock file
+npm error
+npm error Clean install a project
+npm error
+npm error Usage:
+npm error npm ci
+npm error
+npm error Options:
+npm error [--install-strategy <hoisted|nested|shallow|linked>] [--legacy-bundling]
+npm error [--global-style] [--omit <dev|optional|peer> [--omit <dev|optional|peer> ...]]
+npm error [--include <prod|dev|optional|peer> [--include <prod|dev|optional|peer> ...]]
+npm error [--strict-peer-deps] [--foreground-scripts] [--ignore-scripts]
+npm error [--allow-git <all|none|root>] [--no-audit] [--no-bin-links] [--no-fund]
+npm error [--dry-run]
+npm error [-w|--workspace <workspace-name> [-w|--workspace <workspace-name> ...]]
+npm error [--workspaces] [--include-workspace-root] [--install-links]
+npm error
+npm error   --install-strategy
+npm error     Sets the strategy for installing packages in node_modules.
+npm error
+npm error   --legacy-bundling
+npm error     Instead of hoisting package installs in `node_modules`, install packages
+npm error
+npm error   --global-style
+npm error     Only install direct dependencies in the top level `node_modules`,
+npm error
+npm error   --omit
+npm error     Dependency types to omit from the installation tree on disk.
+npm error
+npm error   --include
+npm error     Option that allows for defining which types of dependencies to install.
+npm error
+npm error   --strict-peer-deps
+npm error     If set to `true`, and `--legacy-peer-deps` is not set, then _any_
+npm error
+npm error   --foreground-scripts
+npm error     Run all build scripts (ie, `preinstall`, `install`, and
+npm error
+npm error   --ignore-scripts
+npm error     If true, npm does not run scripts specified in package.json files.
+npm error
+npm error   --allow-git
+npm error     Limits the ability for npm to fetch dependencies from git references.
+npm error
+npm error   --audit
+npm error     When "true" submit audit reports alongside the current npm command to the
+npm error
+npm error   --bin-links
+npm error     Tells npm to create symlinks (or `.cmd` shims on Windows) for package
+npm error
+npm error   --fund
+npm error     When "true" displays the message at the end of each `npm install`
+npm error
+npm error   --dry-run
+npm error     Indicates that you don't want npm to make any changes and that it should
+npm error
+npm error   -w|--workspace
+npm error     Enable running a command in the context of the configured workspaces of the
+npm error
+npm error   --workspaces
+npm error     Set to true to run the command in the context of **all** configured
+npm error
+npm error   --include-workspace-root
+npm error     Include the workspace root when workspaces are enabled for a command.
+npm error
+npm error   --install-links
+npm error     When set file: protocol dependencies will be packed and installed as
+npm error
+npm error
+npm error aliases: clean-install, ic, install-clean, isntall-clean
+npm error
+npm error Run "npm help ci" for more info
+npm error A complete log of this run can be found in: C:\Users\Leonardo\AppData\Local\npm-cache\_logs\2026-09-11T05_28_01_126Z-debug-0.log

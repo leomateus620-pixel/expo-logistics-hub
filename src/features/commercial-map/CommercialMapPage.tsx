@@ -1,4 +1,5 @@
-import { Profiler, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { commercialMapDiagnosticsEnabled } from './utils/performanceDiagnostics';
+import { Profiler, lazy, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -27,20 +28,20 @@ import {
   useMapPermissions,
 } from './hooks/useCommercialMap';
 import { useCommercialMapStore } from './state/useCommercialMapStore';
-import { CommercialMapCanvas } from './components/canvas/CommercialMapCanvas';
+import { preloadCommercialMapCanvas } from './utils/preloadCanvas';
+const CommercialMapCanvas = lazy(preloadCommercialMapCanvas);
 import { CommercialMapRendererStatus } from './components/CommercialMapRendererStatus';
 import { MapToolbar } from './components/controls/MapToolbar';
 import { CommercialMapTopBar } from './components/controls/CommercialMapTopBar';
 import { CommercialMapDock } from './components/dock/CommercialMapDock';
 import { CommercialMapHeaderTools } from './components/shell/CommercialMapHeaderTools';
-import { GeometryEditor } from './components/editor/GeometryEditor';
-import { LotCreationWorkspace } from './components/editor/LotCreationWorkspace';
-import {
-  EntityDetailsPanel,
-  LayersPanel,
-} from './components/panels/MapPanels';
-import { MapListView, ResultsPanel } from './components/panels/EntityExplorer';
-import { CalibrationPanel } from './components/panels/CalibrationPanel';
+const GeometryEditor = lazy(() => import('./components/editor/GeometryEditor').then((m) => ({ default: m.GeometryEditor })));
+const LotCreationWorkspace = lazy(() => import('./components/editor/LotCreationWorkspace').then((m) => ({ default: m.LotCreationWorkspace })));
+const EntityDetailsPanel = lazy(() => import('./components/panels/MapPanels').then((m) => ({ default: m.EntityDetailsPanel })));
+const LayersPanel = lazy(() => import('./components/panels/MapPanels').then((m) => ({ default: m.LayersPanel })));
+const MapListView = lazy(() => import('./components/panels/EntityExplorer').then((m) => ({ default: m.MapListView })));
+const ResultsPanel = lazy(() => import('./components/panels/EntityExplorer').then((m) => ({ default: m.ResultsPanel })));
+const CalibrationPanel = lazy(() => import('./components/panels/CalibrationPanel').then((m) => ({ default: m.CalibrationPanel })));
 import { PavilionModuleCard } from './components/panels/PavilionModuleCard';
 import { HydrologicalNetworkLegend } from './components/panels/HydrologicalNetworkLegend';
 import { ParkingInspector } from './components/panels/ParkingInspector';
@@ -62,7 +63,8 @@ import {
 } from './utils/areaScope';
 import { canUseTechnicalValidationOverlay } from './utils/technicalValidation';
 import { lunarLaunchPhaseLabel } from './utils/lunarLaunch';
-import { recordCommercialMapProfiler } from './utils/runtimeDiagnostics';
+import { recordCommercialMapProfiler } from './utils/profilerDiagnostics';
+import { markCommercialMapStage } from './utils/performanceDiagnostics';
 import { canHandleCommercialMapEscape } from './utils/contextualNavigation';
 import type { CommercialMapData, CommercialMapQueryScope, MapPermissions } from './types';
 import './commercial-map.css';
@@ -75,6 +77,14 @@ function supportsWebGL() {
   } catch {
     return false;
   }
+}
+
+function MapFeatureBoundary({ id, children }: { id: string; children: ReactNode }) {
+  return <MapPanelBoundary resetKey={id} title="Ferramenta indisponível">
+    <Suspense fallback={<aside role="status" className="commercial-map-panel commercial-map-details-skeleton">Carregando ferramenta…</aside>}>
+      {children}
+    </Suspense>
+  </MapPanelBoundary>;
 }
 
 function MapPageSkeleton() {
@@ -154,8 +164,13 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const isExporural = areaScope === 'exporural';
   const registeredScopedSegment = areaScope === 'park' ? null : getCommercialMapSegment(areaScope);
   const mapQuery = useCommercialMap(scope);
+  useEffect(() => {
+    markCommercialMapStage('route-mounted');
+    // Start during the data wait. Catch speculative errors; lazy owns error UI.
+    void preloadCommercialMapCanvas().catch(() => undefined);
+  }, []);
   const resolvedPermissions = useMapPermissions();
-  const isPreview = import.meta.env.DEV && Boolean(previewData);
+  const isPreview = commercialMapDiagnosticsEnabled && Boolean(previewData);
   const permissions = isCommissionScope || isPreview ? COMMISSION_READ_ONLY_PERMISSIONS : resolvedPermissions;
   const { bootstrap, exporuralSync, publish } = useMapMutations();
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
@@ -494,6 +509,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
               aria-hidden={workspaceMode !== '3d'}
               data-canvas-lifecycle="persistent"
             >
+              <Suspense fallback={<div className="commercial-map-page-loader">Preparando visualização 3D…</div>}>
               <Profiler id="CommercialMapCanvas" onRender={recordCommercialMapProfiler}>
                 <CommercialMapCanvas
                   active={workspaceMode === '3d'}
@@ -511,6 +527,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                   technicalValidationAllowed={technicalValidationAllowed}
                 />
               </Profiler>
+              </Suspense>
               <CommercialMapRendererStatus />
               <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer"
                 style={{position:'absolute',right:8,bottom:8,zIndex:5,fontSize:10,padding:'2px 5px',borderRadius:3,background:'#f5f7efdd',color:'#384b42'}}>
@@ -595,16 +612,16 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
             </div>
 
             {workspaceMode === '3d' && !interiorEntityId && activePanel === 'layers' && (
-              <Suspense fallback={null}>
+              <MapFeatureBoundary id="layers">
               <LayersPanel
                 layers={data.layers}
                 entities={scopedData.entities}
                 lots={scopedData.lots}
                 permissions={permissions}
               />
-              </Suspense>
+              </MapFeatureBoundary>
             )}
-            {workspaceMode === '3d' && !interiorEntityId && activePanel === 'results' && <Suspense fallback={null}><ResultsPanel explorer={mapFilter} /></Suspense>}
+            {workspaceMode === '3d' && !interiorEntityId && activePanel === 'results' && <MapFeatureBoundary id="results"><ResultsPanel explorer={mapFilter} /></MapFeatureBoundary>}
             {workspaceMode === '3d' && !interiorEntityId
               && selectedEntity
               && (activePanel === 'details' || lunarLaunchPreviousPanel === 'details')
@@ -620,7 +637,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                   </MapPanelBoundary>
                 </div>
               )}
-            {workspaceMode === '3d' && !interiorEntityId && activePanel === 'calibration' && <CalibrationPanel project={data.project} calibration={data.calibration} />}
+            {workspaceMode === '3d' && !interiorEntityId && activePanel === 'calibration' && <MapFeatureBoundary id="calibration"><CalibrationPanel project={data.project} calibration={data.calibration} /></MapFeatureBoundary>}
           </>
         )}
 
@@ -637,17 +654,17 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
 
         {workspaceMode === 'create' && (
           <div className="commercial-map-workspace-layer">
-            <LotCreationWorkspace project={data.project} calibration={data.calibration} layers={data.layers} entities={scopedData.entities} />
+            <MapFeatureBoundary id="create"><LotCreationWorkspace project={data.project} calibration={data.calibration} layers={data.layers} entities={scopedData.entities} /></MapFeatureBoundary>
           </div>
         )}
         {workspaceMode === 'edit' && selectedEntity && (
           <div className="commercial-map-workspace-layer">
-            <GeometryEditor entity={selectedEntity} calibration={data.calibration} />
+            <MapFeatureBoundary id={selectedEntity.id}><GeometryEditor entity={selectedEntity} calibration={data.calibration} /></MapFeatureBoundary>
           </div>
         )}
         {(workspaceMode === 'list' || (!webglAvailable && workspaceMode === '3d')) && (
           <div className="commercial-map-workspace-layer is-list-view">
-            <MapListView explorer={mapFilter} permissions={permissions} contextTitle={interiorEntity?.name ?? getCommercialMapSegment(activeSegmentId)?.name ?? 'Parque Fenasoja'} />
+            <MapFeatureBoundary id="list"><MapListView explorer={mapFilter} permissions={permissions} contextTitle={interiorEntity?.name ?? getCommercialMapSegment(activeSegmentId)?.name ?? 'Parque Fenasoja'} /></MapFeatureBoundary>
           </div>
         )}
 

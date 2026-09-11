@@ -53,14 +53,11 @@ function DistrictCell({ cell, assets, reducedGraphics, vegetationVisible, nightM
     for (const kind of ['canopy', 'palm'] as const) if (compiled.batches[kind]) compiled.batches[kind]!.visible = vegetationVisible;
     if (compiled.batches.trunk) compiled.batches.trunk.count = vegetationVisible ? cell.batches.trunk.length : compiled.batches.trunk.userData.poleCount;
   }, [cell, compiled, vegetationVisible]);
-  useLayoutEffect(() => {
-    // A restrained ambient contribution keeps the local streets and gardens
-    // readable with the park's night rig, without allocating point lights.
-    compiled.groundMaterial.emissive.set('#596e77');
-    compiled.groundMaterial.emissiveIntensity = nightMode ? .055 : 0;
-  }, [compiled, nightMode]);
+  useLayoutEffect(() => { compiled.groundMaterial.emissive.set('#596e77'); }, [compiled]);
   const center = useMemo(() => new THREE.Vector3(cell.center[0], .5, cell.center[1]), [cell]);
   useFrame(({ camera }) => {
+    const nightBlend = (assets.materials.lightPool as THREE.ShaderMaterial).uniforms.brightness.value / .65;
+    compiled.groundMaterial.emissiveIntensity = .055 * nightBlend;
     const distance = camera.position.distanceTo(center);
     detailVisible.current = resolveResidentialDetailVisibility(distance, detailVisible.current, reducedGraphics ? 20 : 45, reducedGraphics ? 26 : 53);
     // Leaflets become sub-pixel at overview distances; keep the full curved
@@ -68,8 +65,8 @@ function DistrictCell({ cell, assets, reducedGraphics, vegetationVisible, nightM
     fullPalm.current = resolveResidentialDetailVisibility(distance, fullPalm.current, 45, 53);
     nearShadows.current = resolveResidentialDetailVisibility(distance, nearShadows.current, 62, 70);
     for (const [kind, mesh] of compiled.entries) {
-      if (DETAIL.has(kind)) mesh.visible = detailVisible.current || (kind === 'glass' && nightMode);
-      if (kind === 'lightPool') mesh.visible = nightMode;
+      if (DETAIL.has(kind)) mesh.visible = detailVisible.current || (kind === 'glass' && (nightMode || nightBlend > .001));
+      if (kind === 'lightPool') mesh.visible = nightBlend > .001;
       if (VEGETATION.has(kind) && kind !== 'trunk') mesh.visible = vegetationVisible;
       const cast = !reducedGraphics && nearShadows.current && (kind === 'masonry' || kind === 'hipRoof' || kind === 'gableRoof');
       if (mesh.castShadow !== cast) { mesh.castShadow = cast; gl.shadowMap.needsUpdate = true; }
@@ -86,14 +83,22 @@ export const LateralResidentialDistrict = memo(function LateralResidentialDistri
   const cells = useMemo(() => buildLateralResidentialRenderPlan(), []);
   const audit = useMemo(() => auditLateralResidentialRenderPlan(cells), [cells]);
   useEffect(() => () => assets.dispose(), [assets]);
-  useLayoutEffect(() => {
-    (assets.materials.lightPool as THREE.ShaderMaterial).uniforms.brightness.value = nightMode ? .65 : 0;
-    for (const [kind, material] of Object.entries(assets.materials)) {
-      if (!(material instanceof THREE.MeshStandardMaterial)) continue;
-      material.emissive.set(kind === 'glass' || kind === 'lamp' ? '#ffd18a' : kind.startsWith('pool') ? '#249caf' : '#506779');
-      material.emissiveIntensity = nightMode ? kind === 'lamp' ? 1.8 : kind === 'glass' ? .55 : kind.startsWith('pool') ? .22 : .055 : 0;
-    }
-  }, [assets, nightMode]);
+  const invalidate = useThree((state) => state.invalidate);
+  const blend = useRef(nightMode ? 1 : 0);
+  const emissives = useMemo(() => Object.entries(assets.materials).flatMap(([kind, material]) => {
+    if (!(material instanceof THREE.MeshStandardMaterial)) return [];
+    material.emissive.set(kind === 'glass' || kind === 'lamp' ? '#ffd18a' : kind.startsWith('pool') ? '#249caf' : '#506779');
+    return [{ material, peak: kind === 'lamp' ? 1.8 : kind === 'glass' ? .55 : kind.startsWith('pool') ? .22 : .055 }];
+  }), [assets]);
+  useEffect(() => { invalidate(); }, [invalidate, nightMode]);
+  useFrame((_state, delta) => {
+    const target = nightMode ? 1 : 0;
+    const next = THREE.MathUtils.damp(blend.current, target, nightMode ? 2.2 : 2.9, Math.min(delta, .05));
+    blend.current = Math.abs(next - target) < .0015 ? target : next;
+    (assets.materials.lightPool as THREE.ShaderMaterial).uniforms.brightness.value = .65 * blend.current;
+    for (const { material, peak } of emissives) material.emissiveIntensity = peak * blend.current;
+    if (blend.current !== target) invalidate();
+  });
   return <group name="lateral-residential-district" visible={visible} dispose={null} userData={{ presentationOnly: true, ...audit }}>
     {cells.map((cell) => <DistrictCell key={cell.id} cell={cell} assets={assets} reducedGraphics={reducedGraphics} vegetationVisible={vegetationVisible} nightMode={nightMode} />)}
   </group>;

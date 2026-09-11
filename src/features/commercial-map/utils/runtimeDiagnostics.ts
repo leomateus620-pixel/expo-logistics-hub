@@ -1,5 +1,5 @@
+import { commercialMapDiagnosticsEnabled } from './performanceDiagnostics';
 import { isCommercialSceneCompiling } from './sceneShaderWarmup';
-import type { ProfilerOnRenderCallback } from 'react';
 import * as THREE from 'three';
 import type { WebGLRenderer } from 'three';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
@@ -176,27 +176,7 @@ function ensureDiagnostics() {
   return diagnostics;
 }
 
-export const recordCommercialMapProfiler: ProfilerOnRenderCallback = (
-  id,
-  phase,
-  actualDuration,
-  baseDuration,
-  startTime,
-  commitTime,
-) => {
-  if (!import.meta.env.DEV) return;
-  const diagnostics = ensureDiagnostics();
-  if (!diagnostics) return;
-  appendBounded(diagnostics.reactCommits, {
-    type: 'react-commit',
-    at: commitTime,
-    id,
-    phase,
-    actualDuration: Number(actualDuration.toFixed(3)),
-    baseDuration: Number(baseDuration.toFixed(3)),
-    startTime: Number(startTime.toFixed(3)),
-  });
-};
+export { recordCommercialMapProfiler } from './profilerDiagnostics';
 
 export function registerCommercialMapRuntimeDiagnostics({
   gl,
@@ -207,7 +187,7 @@ export function registerCommercialMapRuntimeDiagnostics({
   scene: THREE.Scene;
   camera: THREE.Camera;
 }) {
-  if (!import.meta.env.DEV || typeof window === 'undefined') return () => undefined;
+  if (!commercialMapDiagnosticsEnabled || typeof window === 'undefined') return () => undefined;
   const diagnostics = ensureDiagnostics();
   if (!diagnostics) return () => undefined;
 
@@ -334,7 +314,7 @@ export function registerCommercialMapRuntimeDiagnostics({
 }
 
 export function registerCommercialMapControlsDiagnostics(controls: object) {
-  if (!import.meta.env.DEV) return () => undefined;
+  if (!commercialMapDiagnosticsEnabled) return () => undefined;
   const diagnostics = ensureDiagnostics();
   if (!diagnostics) return () => undefined;
   if (!knownControls.has(controls)) {
@@ -352,7 +332,7 @@ export function registerCommercialMapControlsDiagnostics(controls: object) {
 export function recordCommercialMapFrame(deltaMs: number) {
   // The caller excludes actual idle/hidden intervals. A long visible active
   // frame is a real stall: never discard it to make P95/P99 look smoother.
-  if (!import.meta.env.DEV
+  if (!commercialMapDiagnosticsEnabled
     || !Number.isFinite(deltaMs)
     || deltaMs <= 0) return;
   const diagnostics = ensureDiagnostics();
@@ -377,7 +357,7 @@ export function recordCommercialMapQualityDecision({
   reducedGraphics: boolean;
   reason: string;
 }) {
-  if (!import.meta.env.DEV || !Number.isFinite(dpr) || dpr <= 0) return;
+  if (!commercialMapDiagnosticsEnabled || !Number.isFinite(dpr) || dpr <= 0) return;
   const diagnostics = ensureDiagnostics();
   if (!diagnostics) return;
   diagnostics.qualityTier = tier;

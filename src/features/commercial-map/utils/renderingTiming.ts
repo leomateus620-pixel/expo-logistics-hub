@@ -1,3 +1,4 @@
+import { commercialMapDiagnosticsEnabled } from './performanceDiagnostics';
 import type { WebGLRenderer } from 'three';
 
 export const COMMERCIAL_MAP_RENDER_TIMING_EVENT = 'commercial-map-render-timing';
@@ -79,7 +80,7 @@ export function readCommercialMapRenderTiming(canvas?: HTMLCanvasElement): Comme
   const state = canvas ? canvasStates.get(canvas) : activeStates.values().next().value as TimingState | undefined;
   const samples = state?.samples ?? [];
   return {
-    enabled: import.meta.env.DEV && enabled,
+    enabled: commercialMapDiagnosticsEnabled && enabled,
     gpuStatus: state?.gpuStatus ?? 'not-requested',
     sampleLimit: SAMPLE_LIMIT,
     pendingQueries: state?.pending.length ?? 0,
@@ -153,7 +154,7 @@ function poll(state: TimingState) {
 }
 
 export function setCommercialMapRenderTimingEnabled(next: boolean) {
-  if (!import.meta.env.DEV) return;
+  if (!commercialMapDiagnosticsEnabled) return;
   enabled = next;
   for (const state of activeStates) {
     if (!next) discardPending(state);
@@ -162,7 +163,7 @@ export function setCommercialMapRenderTimingEnabled(next: boolean) {
 }
 
 export function resetCommercialMapRenderTiming() {
-  if (!import.meta.env.DEV) return;
+  if (!commercialMapDiagnosticsEnabled) return;
   for (const state of activeStates) {
     discardPending(state);
     state.samples.length = 0;
@@ -172,9 +173,9 @@ export function resetCommercialMapRenderTiming() {
   }
 }
 
-/** Called only behind import.meta.env.DEV; disabled by default and tree-shaken from production. */
+/** Called only behind commercialMapDiagnosticsEnabled; disabled by default and tree-shaken from production. */
 export function beginCommercialMapRenderTiming(renderer: WebGLRenderer): CommercialMapRenderTimingToken | null {
-  if (!import.meta.env.DEV || !enabled) return null;
+  if (!commercialMapDiagnosticsEnabled || !enabled) return null;
   const context = renderer.getContext() as WebGL2RenderingContext;
   if (context.isContextLost()) return null;
   let state = canvasStates.get(renderer.domElement);
@@ -216,7 +217,7 @@ export function endCommercialMapRenderTiming(
   path: TimingPath,
   presented: boolean,
 ) {
-  if (!import.meta.env.DEV || !token) return;
+  if (!commercialMapDiagnosticsEnabled || !token) return;
   const cpuMs = performance.now() - token.startedAt;
   const { state, query } = token;
   const context = state.context;
@@ -242,7 +243,7 @@ export function endCommercialMapRenderTiming(
 }
 
 export function disposeCommercialMapRenderTiming(renderer: WebGLRenderer) {
-  if (!import.meta.env.DEV) return;
+  if (!commercialMapDiagnosticsEnabled) return;
   const state = canvasStates.get(renderer.domElement);
   if (!state) return;
   discardPending(state);

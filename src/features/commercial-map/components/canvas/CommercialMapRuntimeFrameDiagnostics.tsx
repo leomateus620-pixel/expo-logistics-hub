@@ -1,3 +1,4 @@
+import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
 import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
@@ -11,7 +12,7 @@ export function RuntimeFrameDiagnostics() {
   const frameCount = useRef(0);
 
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
+    if (!commercialMapDiagnosticsEnabled) return;
     const reset = () => {
       active.current = false;
       frameCount.current = 0;
@@ -31,7 +32,7 @@ export function RuntimeFrameDiagnostics() {
   }, [gl]);
 
   useFrame((_state, delta) => {
-    if (!import.meta.env.DEV) return;
+    if (!commercialMapDiagnosticsEnabled) return;
     const measuring = isCommercialMapHeavyQualityGestureActive(useCommercialMapStore.getState())
       && document.visibilityState === 'visible'
       && !gl.getContext().isContextLost();

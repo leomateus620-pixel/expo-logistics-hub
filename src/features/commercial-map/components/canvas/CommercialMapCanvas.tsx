@@ -1,3 +1,6 @@
+import { LightingPerformanceProbe } from '../../diagnostics/LightingPerformanceProbe';
+import { markCommercialMapStage } from '../../utils/performanceDiagnostics';
+import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
 // lovable resync: same snapshot as PR #123
 import {
   Component,
@@ -7,6 +10,7 @@ import {
   Suspense,
   type ErrorInfo,
   type ReactNode,
+  type ComponentProps,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -208,8 +212,8 @@ import {
 } from '../../utils/pavilionModuleCommercial';
 
 // Never import the exclusion audit or debug textures in the production bundle.
-const TerritoryQa = import.meta.env.DEV ? lazy(async () => ({ default: (await import('../../diagnostics/TerritoryQa')).TerritoryQa })) : null;
-const LateralDistrictQaScene = import.meta.env.DEV
+const TerritoryQa = commercialMapDiagnosticsEnabled ? lazy(async () => ({ default: (await import('../../diagnostics/TerritoryQa')).TerritoryQa })) : null;
+const LateralDistrictQaScene = commercialMapDiagnosticsEnabled
   ? lazy(async () => ({ default: (await import('../../diagnostics/LateralDistrictQa')).LateralDistrictQaScene }))
   : null;
 const RearRoadValidationOverlay = import.meta.env.DEV
@@ -251,7 +255,7 @@ class SceneAssetBoundary extends Component<{
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    if (import.meta.env.DEV) {
+    if (commercialMapDiagnosticsEnabled) {
       console.warn('[CommercialMap] optional scene asset failed; keeping the active map', error, info);
     }
   }
@@ -694,6 +698,7 @@ function ReferenceUnderlay({ calibration }: { calibration: MapCalibration | null
   // Keep the text-baked calibration raster out of the loading/rendering path
   // until explicitly requested. Semantic navigation labels own the default view.
   if (!referenceVisible) return null;
+  if (calibration?.referenceImagePath && !calibration.referenceImagePath.startsWith('/') && !calibration.referenceImageUrl) return null;
   const imageUrl = calibration?.referenceImageUrl || calibration?.referenceImagePath || OFFICIAL_REFERENCE_IMAGE;
   return (
     <SceneAssetBoundary resetKey={imageUrl}>
@@ -2316,7 +2321,7 @@ function CameraRig({
     controlsMinimumDistance,
   ]);
   const writeCameraDiagnostics = useCallback((force = false) => {
-    if (!import.meta.env.DEV || !(camera instanceof THREE.PerspectiveCamera)) return;
+    if (!commercialMapDiagnosticsEnabled || !(camera instanceof THREE.PerspectiveCamera)) return;
     const now = typeof performance === 'undefined' ? Date.now() : performance.now();
     if (!force && now - cameraDiagnosticsAt.current < 90) return;
     cameraDiagnosticsAt.current = now;
@@ -4035,7 +4040,7 @@ function CameraRig({
         suppressNextDetailsRefit.current = true;
         restoreLunarCamera(snapshot);
         useCommercialMapStore.getState().completeLunarLaunch(true);
-        if (import.meta.env.DEV) console.error('[CommercialMap] lunar camera cleanup after runtime failure', error);
+        if (commercialMapDiagnosticsEnabled) console.error('[CommercialMap] lunar camera cleanup after runtime failure', error);
       }
       return;
     }
@@ -4219,6 +4224,16 @@ function NavigationInteractionCoordinator({
   return null;
 }
 
+function NightAwareEnvironment(props: ComponentProps<typeof CommercialMapEnvironment>) {
+  const night = useCommercialMapStore((state) => state.nightModeActive);
+  return <CommercialMapEnvironment {...props} nightMode={night || props.nightMode} />;
+}
+
+function NightAwareResidentialDistrict(props: ComponentProps<typeof LateralResidentialDistrict>) {
+  const night = useCommercialMapStore((state) => state.nightModeActive);
+  return <LateralResidentialDistrict {...props} nightMode={night || props.nightMode} />;
+}
+
 const Scene = memo(function Scene({
   entities,
   parkingOwnerEntities = entities,
@@ -4245,7 +4260,6 @@ const Scene = memo(function Scene({
   const labelsVisible = useCommercialMapStore((state) => state.labelsVisible);
   const treesVisible = useCommercialMapStore((state) => state.treesVisible);
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
-  const nightModeActive = useCommercialMapStore((state) => state.nightModeActive);
   const setSelectedHydrologicalElementId = useCommercialMapStore(
     (state) => state.setSelectedHydrologicalElementId,
   );
@@ -4676,7 +4690,7 @@ const Scene = memo(function Scene({
   ) === 'amusement-park';
   // Global Night Mode extends the amusement-park night to the whole park; the
   // park focus alone still darkens the scene exactly as before.
-  const nightAtmosphereActive = nightModeActive || amusementParkSelected;
+  const nightAtmosphereActive = amusementParkSelected;
   const electricalNetworkVisible = treesVisible && !hydrologicalModeActive;
 
   const interiorKind = interiorEntity ? resolveStrategicLandmarkKind(interiorEntity) : null;
@@ -4694,7 +4708,7 @@ const Scene = memo(function Scene({
 
   return (
     <>
-      <CommercialMapEnvironment
+      <NightAwareEnvironment
         extent={environmentExtent}
         shadowExtent={shadowExtent}
         active={!interiorEntity}
@@ -4751,7 +4765,7 @@ const Scene = memo(function Scene({
             reducedGraphics={reducedGraphics}
             vegetationVisible={treesVisible}
           />
-          <LateralResidentialDistrict
+          <NightAwareResidentialDistrict
             reducedGraphics={reducedGraphics}
             vegetationVisible={treesVisible}
             nightMode={nightAtmosphereActive}
@@ -4936,6 +4950,7 @@ const Scene = memo(function Scene({
         hydrologicalModeActive={hydrologicalModeActive}
       />
       <RuntimeFrameDiagnostics />
+      {commercialMapDiagnosticsEnabled && <LightingPerformanceProbe />}
       {LateralDistrictQaScene && window.location.pathname === '/__dev/commercial-map-rendering'
         && <Suspense fallback={null}><LateralDistrictQaScene />{TerritoryQa && <TerritoryQa />}</Suspense>}
       <NavigationInteractionCoordinator
@@ -5100,6 +5115,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
       shadows={reducedGraphics ? false : COMMERCIAL_MAP_SHADOW_MAP_CONFIG}
       gl={initialRenderConfig.current.renderer}
         onCreated={({ gl, scene, camera }) => {
+          markCommercialMapStage('canvas-created');
           canvasCleanup.current?.();
           const disposeGestureGuard = registerMapGestureGuard(gl.domElement);
           const disposeDiagnostics = registerCommercialMapRuntimeDiagnostics({ gl, scene, camera });

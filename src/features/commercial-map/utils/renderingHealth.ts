@@ -1,3 +1,4 @@
+import { markCommercialMapStage } from './performanceDiagnostics';
 /** Lightweight production diagnostics. No frame histories or renderer references are retained. */
 export const COMMERCIAL_MAP_RENDER_HEALTH_EVENT = 'commercial-map-render-health';
 export const COMMERCIAL_MAP_RENDER_RETRY_EVENT = 'commercial-map-render-retry';
@@ -27,6 +28,7 @@ export function publishCommercialMapRenderHealth(
   health: CommercialMapRenderHealth,
 ): void {
   const latest = latestHealth.get(canvas);
+  if (!latest?.presentedFrames && health.presentedFrames > 0) markCommercialMapStage('first-draw');
   if (latest) Object.assign(latest, health);
   else latestHealth.set(canvas, { ...health });
   const previous = publishedHealth.get(canvas);

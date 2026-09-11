@@ -29,7 +29,7 @@ describe('non-rendering commercial scene preparation', () => {
     expect(states).toEqual([{ tone: THREE.ACESFilmicToneMapping, target: null }]);
     expect(gl.getRenderTarget()).toBe(initialTarget);
     expect(gl.toneMapping).toBe(THREE.ReinhardToneMapping);
-    pending[0].resolve(); await Promise.resolve();
+    pending[0].resolve(); for (let i = 0; i < 5; i++) await Promise.resolve();
     expect(states[1].tone).toBe(THREE.NoToneMapping);
     expect(states[1].target?.width).toBe(1);
     const dispose = vi.spyOn(states[1].target!, 'dispose');
@@ -49,6 +49,20 @@ describe('non-rendering commercial scene preparation', () => {
     await expect(promise).rejects.toThrow('context lost');
     expect(isCommercialSceneCompiling(gl)).toBe(false);
     expect(gl.getRenderTarget()).toBe(initialTarget);
+    initialTarget?.dispose();
+  });
+  it('does not let an obsolete context preparation compile again or unlock its successor', async () => {
+    const { gl, pending, initialTarget } = rendererFixture();
+    const scene = new THREE.Scene(); const camera = new THREE.Camera();
+    const old = prepareCommercialScene(gl, scene, camera);
+    const current = prepareCommercialScene(gl, scene, camera);
+    pending[0].resolve(); await old;
+    expect(gl.compileAsync).toHaveBeenCalledTimes(2);
+    expect(isCommercialSceneCompiling(gl)).toBe(true);
+    pending[1].resolve(); for (let i = 0; i < 5; i++) await Promise.resolve();
+    expect(gl.compileAsync).toHaveBeenCalledTimes(3);
+    pending[2].resolve(); await current;
+    expect(isCommercialSceneCompiling(gl)).toBe(false);
     initialTarget?.dispose();
   });
 });

@@ -364,7 +364,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).toContain('scene.environment = previousEnvironment');
     expect(environment).toContain('gl.shadowMap.needsUpdate = true');
     // Demand frames are requested only while the sunrise or the night blend moves.
-    expect(environment).toContain('if ((isRunning && progress < 1) || !nightSettled) invalidate();');
+    expect(environment).toContain('if ((isRunning && !hasSunrisePlaybackFinished(playback.current) && !nightMode) || !nightSettled) invalidate();');
     expect(environment).not.toContain('requestAnimationFrame');
     expect(environment).not.toContain('setInterval(');
     expect(environment).not.toContain('new THREE.PMREMGenerator');

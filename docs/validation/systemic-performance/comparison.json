@@ -1,0 +1,653 @@
+{
+  "warning": "Local reference fixture, n=3 reloads, uncontrolled HTTP/driver cache. Nearest-rank p95 is the maximum and does not estimate production p95. Lighting summaries are medians of per-transition percentiles, excluding cycle 0, not pooled frame percentiles.",
+  "baselineLoad": {
+    "n": 3,
+    "p50": 16813.899999999907,
+    "p95NearestRank": 16901.300000000047,
+    "rows": [
+      {
+        "run": 1,
+        "viewport": [
+          1366,
+          768,
+          1
+        ],
+        "visible": true,
+        "focused": true,
+        "canvas": 3131.5,
+        "draw": 16847.800000000047,
+        "presentationOpportunity": 16901.300000000047,
+        "longTasks": [
+          [
+            1882.1999999999534,
+            84
+          ],
+          [
+            2421.399999999907,
+            660
+          ],
+          [
+            3188.0999999998603,
+            8142
+          ],
+          [
+            11330.199999999953,
+            64
+          ],
+          [
+            15512.199999999953,
+            261
+          ]
+        ]
+      },
+      {
+        "run": 2,
+        "viewport": [
+          1366,
+          768,
+          1
+        ],
+        "visible": true,
+        "focused": true,
+        "canvas": 919.3999999999069,
+        "draw": 16812.399999999907,
+        "presentationOpportunity": 16813.899999999907,
+        "longTasks": [
+          [
+            497,
+            407
+          ],
+          [
+            971.1000000000931,
+            5436
+          ],
+          [
+            10846.399999999907,
+            221
+          ]
+        ]
+      },
+      {
+        "run": 3,
+        "viewport": [
+          1366,
+          768,
+          1
+        ],
+        "visible": true,
+        "focused": true,
+        "canvas": 856.3999999999069,
+        "draw": 7536,
+        "presentationOpportunity": 7573.300000000047,
+        "longTasks": [
+          [
+            403.5,
+            436
+          ],
+          [
+            890.3000000000466,
+            5623
+          ],
+          [
+            6587.600000000093,
+            202
+          ],
+          [
+            6867.100000000093,
+            669
+          ]
+        ]
+      }
+    ]
+  },
+  "afterLoad": {
+    "n": 3,
+    "p50": 9891.200000000186,
+    "p95NearestRank": 10055.899999999907,
+    "rows": [
+      {
+        "run": 1,
+        "viewport": [
+          1366,
+          768,
+          1
+        ],
+        "visible": true,
+        "focused": true,
+        "canvas": 915.8999999999069,
+        "draw": 10025.300000000047,
+        "presentationOpportunity": 10055.899999999907,
+        "longTasks": [
+          [
+            420.89999999990687,
+            474
+          ],
+          [
+            974.5999999998603,
+            5602
+          ],
+          [
+            9148.199999999953,
+            178
+          ],
+          [
+            9428.800000000047,
+            596
+          ]
+        ]
+      },
+      {
+        "run": 2,
+        "viewport": [
+          1366,
+          768,
+          1
+        ],
+        "visible": true,
+        "focused": true,
+        "canvas": 1041.2000000001863,
+        "draw": 9839.899999999907,
+        "presentationOpportunity": 9891.200000000186,
+        "longTasks": [
+          [
+            307.70000000018626,
+            53
+          ],
+          [
+            524.7000000001863,
+            488
+          ],
+          [
+            1103,
+            7072
+          ],
+          [
+            8417.399999999907,
+            320
+          ]
+        ]
+      },
+      {
+        "run": 3,
+        "viewport": [
+          1366,
+          768,
+          1
+        ],
+        "visible": true,
+        "focused": true,
+        "canvas": 877,
+        "draw": 7462.5,
+        "presentationOpportunity": 7494.299999999814,
+        "longTasks": [
+          [
+            416,
+            446
+          ],
+          [
+            933.1999999997206,
+            5530
+          ],
+          [
+            6540.100000000093,
+            201
+          ]
+        ]
+      }
+    ]
+  },
+  "baselineLighting": {
+    "file": "baseline-iab-lighting.json",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "viewport": [
+      1366,
+      768,
+      1
+    ],
+    "lifecycle": {
+      "canvasMounts": 1,
+      "controlsCreates": 1,
+      "rendererCreates": 1
+    },
+    "rows": 40,
+    "foreground": true,
+    "cameraMax": 0,
+    "quaternionMax": 0,
+    "targetMax": 0,
+    "projectionMax": 0,
+    "buffers": [
+      "1351x467@1"
+    ],
+    "programs": [
+      270,
+      278
+    ],
+    "errors": [],
+    "resources": [
+      "590/146"
+    ],
+    "perTransitionMedians": {
+      "night": {
+        "n": 19,
+        "p50": 21.399999999906868,
+        "p95": 30,
+        "p99": 33.800000000046566,
+        "allComplete": true
+      },
+      "sunrise": {
+        "n": 19,
+        "p50": 23.5999999998603,
+        "p95": 32.10000000009313,
+        "p99": 38.0999999998603,
+        "allComplete": true
+      }
+    },
+    "first": {
+      "cycle": 0,
+      "mode": "night",
+      "foreground": true,
+      "frames": 2,
+      "frameMs": {
+        "p50": 8387.90000000014,
+        "p95": 8387.90000000014,
+        "p99": 8387.90000000014
+      },
+      "cameraDelta": 0,
+      "quaternionDelta": 0,
+      "targetDelta": 0,
+      "projectionDelta": 0,
+      "buffers": [
+        "1351x467@1"
+      ],
+      "programs": [
+        270
+      ],
+      "sunVisibility": [
+        false
+      ],
+      "last": {
+        "at": 92918,
+        "deltaMs": 8387.90000000014,
+        "visible": true,
+        "focused": true,
+        "position": [
+          3.812713028754711,
+          109.95625551758472,
+          104.27856305241929
+        ],
+        "quaternion": [
+          -0.3919388644454563,
+          0.026630852900829772,
+          0.011351018127214578,
+          0.9195356864192147
+        ],
+        "target": [
+          -2.2546344999999945,
+          0.744,
+          -0.3831818185993967
+        ],
+        "projection": [
+          1.0038982086414576,
+          0,
+          0,
+          0,
+          0,
+          2.9042108776758226,
+          0,
+          0,
+          0,
+          0,
+          -1.0004015030513438,
+          -1,
+          0,
+          0,
+          -1.2618167280782595,
+          0
+        ],
+        "width": 1351,
+        "height": 467,
+        "dpr": 1,
+        "sunVisible": false,
+        "sunIntensity": 0,
+        "sunPosition": [
+          -3.089995454545452,
+          84.99529937767083,
+          -191.28574982984622
+        ],
+        "shadowVersion": 1,
+        "sunrise": "complete",
+        "night": true,
+        "navigating": false,
+        "programs": 270,
+        "calls": 886,
+        "geometries": 590,
+        "textures": 146
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 215,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "longTasks": []
+    },
+    "last": {
+      "cycle": 19,
+      "mode": "sunrise",
+      "foreground": true,
+      "frames": 311,
+      "frameMs": {
+        "p50": 23.199999999953434,
+        "p95": 29,
+        "p99": 31.89999999990687
+      },
+      "cameraDelta": 0,
+      "quaternionDelta": 0,
+      "targetDelta": 0,
+      "projectionDelta": 0,
+      "buffers": [
+        "1351x467@1"
+      ],
+      "programs": [
+        278
+      ],
+      "sunVisibility": [
+        false,
+        true
+      ],
+      "last": {
+        "at": 329159.3999999999,
+        "deltaMs": 26.800000000046566,
+        "visible": true,
+        "focused": true,
+        "position": [
+          3.812713028754711,
+          109.95625551758472,
+          104.27856305241929
+        ],
+        "quaternion": [
+          -0.3919388644454563,
+          0.026630852900829772,
+          0.011351018127214578,
+          0.9195356864192147
+        ],
+        "target": [
+          -2.2546344999999945,
+          0.744,
+          -0.3831818185993967
+        ],
+        "projection": [
+          1.0038982086414576,
+          0,
+          0,
+          0,
+          0,
+          2.9042108776758226,
+          0,
+          0,
+          0,
+          0,
+          -1.0004015030513438,
+          -1,
+          0,
+          0,
+          -1.2618167280782595,
+          0
+        ],
+        "width": 1351,
+        "height": 467,
+        "dpr": 1,
+        "sunVisible": true,
+        "sunIntensity": 2.46,
+        "sunPosition": [
+          -3.089995454545452,
+          84.99529937767083,
+          -191.28574982984622
+        ],
+        "shadowVersion": 1,
+        "sunrise": "complete",
+        "night": false,
+        "navigating": false,
+        "programs": 278,
+        "calls": 1153,
+        "geometries": 590,
+        "textures": 146
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 9297,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "longTasks": []
+    }
+  },
+  "afterLighting": {
+    "file": "after-final-lighting.json",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "viewport": [
+      1366,
+      768,
+      1
+    ],
+    "lifecycle": {
+      "canvasMounts": 1,
+      "controlsCreates": 1,
+      "rendererCreates": 1
+    },
+    "rows": 40,
+    "foreground": true,
+    "cameraMax": 0,
+    "quaternionMax": 0,
+    "targetMax": 0,
+    "projectionMax": 0,
+    "buffers": [
+      "1351x467@1"
+    ],
+    "programs": [
+      204
+    ],
+    "errors": [],
+    "resources": [
+      "590/146"
+    ],
+    "perTransitionMedians": {
+      "night": {
+        "n": 19,
+        "p50": 24.5,
+        "p95": 27,
+        "p99": 29.399999999906868,
+        "allComplete": true
+      },
+      "sunrise": {
+        "n": 19,
+        "p50": 27.5,
+        "p95": 31.89999999990687,
+        "p99": 36.90000000037253,
+        "allComplete": true
+      }
+    },
+    "first": {
+      "cycle": 0,
+      "mode": "night",
+      "foreground": true,
+      "frames": 156,
+      "frameMs": {
+        "p50": 21.800000000279397,
+        "p95": 28.799999999813735,
+        "p99": 42.3000000002794
+      },
+      "cameraDelta": 0,
+      "quaternionDelta": 0,
+      "targetDelta": 0,
+      "projectionDelta": 0,
+      "buffers": [
+        "1351x467@1"
+      ],
+      "programs": [
+        204
+      ],
+      "sunVisibility": [
+        true
+      ],
+      "last": {
+        "at": 137887.90000000037,
+        "deltaMs": 21.700000000186265,
+        "visible": true,
+        "focused": true,
+        "position": [
+          3.812713028754711,
+          109.95625551758472,
+          104.27856305241929
+        ],
+        "quaternion": [
+          -0.3919388644454563,
+          0.026630852900829772,
+          0.011351018127214578,
+          0.9195356864192147
+        ],
+        "target": [
+          -2.2546344999999945,
+          0.744,
+          -0.3831818185993967
+        ],
+        "projection": [
+          1.0038982086414576,
+          0,
+          0,
+          0,
+          0,
+          2.9042108776758226,
+          0,
+          0,
+          0,
+          0,
+          -1.0004015030513438,
+          -1,
+          0,
+          0,
+          -1.2618167280782595,
+          0
+        ],
+        "width": 1351,
+        "height": 467,
+        "dpr": 1,
+        "sunVisible": true,
+        "sunIntensity": 0,
+        "sunPosition": [
+          -3.089995454545452,
+          84.99529937767083,
+          -191.28574982984622
+        ],
+        "shadowVersion": 1,
+        "sunrise": "complete",
+        "night": true,
+        "navigating": false,
+        "programs": 204,
+        "calls": 886,
+        "geometries": 590,
+        "textures": 146
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 377,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "longTasks": []
+    },
+    "last": {
+      "cycle": 19,
+      "mode": "sunrise",
+      "foreground": true,
+      "frames": 304,
+      "frameMs": {
+        "p50": 27.399999999906868,
+        "p95": 30.600000000093132,
+        "p99": 32.6999999997206
+      },
+      "cameraDelta": 0,
+      "quaternionDelta": 0,
+      "targetDelta": 0,
+      "projectionDelta": 0,
+      "buffers": [
+        "1351x467@1"
+      ],
+      "programs": [
+        204
+      ],
+      "sunVisibility": [
+        true
+      ],
+      "last": {
+        "at": 374899.1000000001,
+        "deltaMs": 27.5,
+        "visible": true,
+        "focused": true,
+        "position": [
+          3.812713028754711,
+          109.95625551758472,
+          104.27856305241929
+        ],
+        "quaternion": [
+          -0.3919388644454563,
+          0.026630852900829772,
+          0.011351018127214578,
+          0.9195356864192147
+        ],
+        "target": [
+          -2.2546344999999945,
+          0.744,
+          -0.3831818185993967
+        ],
+        "projection": [
+          1.0038982086414576,
+          0,
+          0,
+          0,
+          0,
+          2.9042108776758226,
+          0,
+          0,
+          0,
+          0,
+          -1.0004015030513438,
+          -1,
+          0,
+          0,
+          -1.2618167280782595,
+          0
+        ],
+        "width": 1351,
+        "height": 467,
+        "dpr": 1,
+        "sunVisible": true,
+        "sunIntensity": 2.46,
+        "sunPosition": [
+          -3.089995454545452,
+          84.99529937767083,
+          -191.28574982984622
+        ],
+        "shadowVersion": 1,
+        "sunrise": "complete",
+        "night": false,
+        "navigating": false,
+        "programs": 204,
+        "calls": 871,
+        "geometries": 590,
+        "textures": 146
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 9125,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "longTasks": []
+    }
+  }
+}

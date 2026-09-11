@@ -1,3 +1,4 @@
+import { deserializeQueryCache } from './lib/queryPersistence';
 import { Suspense, type ReactNode } from 'react';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
 import { Toaster } from '@/components/ui/toaster';
@@ -62,13 +63,13 @@ const FenasojaCountdownExperiencePage = lazyWithRetry(
   () => import('./pages/FenasojaCountdownExperiencePage'),
 );
 const CommercialMapPage = lazyWithRetry(() => import('./pages/CommercialMapPage'));
-const CommercialMapRenderingDiagnosticsPage = import.meta.env.DEV
+const CommercialMapRenderingDiagnosticsPage = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
   ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/CommercialMapRenderingDiagnosticsPage'))
   : null;
-const ExteriorCatalogQa = import.meta.env.DEV
+const ExteriorCatalogQa = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
   ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/ExteriorCatalogQa'))
   : null;
-const CommercialMapInterfaceDiagnosticsPage = import.meta.env.DEV
+const CommercialMapInterfaceDiagnosticsPage = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
   ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/CommercialMapInterfaceDiagnosticsPage'))
   : null;
 const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
@@ -120,6 +121,7 @@ function safeStorage(): Storage {
 const persister = createSyncStoragePersister({
   storage: safeStorage(),
   key: 'fenasoja-query-cache',
+  deserialize: deserializeQueryCache,
 });
 
 const FullAccessRoute = ({ children }: { children: ReactNode }) => (
@@ -415,7 +417,7 @@ const App = () => (
       buster: lastUserId,
       dehydrateOptions: {
         shouldDehydrateQuery: (query) =>
-          query.meta?.persist !== false && defaultShouldDehydrateQuery(query),
+          query.queryKey[0] !== 'commercial-map' && query.meta?.persist !== false && defaultShouldDehydrateQuery(query),
       },
     }}
   >

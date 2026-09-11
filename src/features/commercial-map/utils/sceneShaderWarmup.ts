@@ -1,3 +1,4 @@
+import { measureCommercialMapStage, markCommercialMapStage } from './performanceDiagnostics';
 import * as THREE from 'three';
 
 const pending = new WeakMap<THREE.WebGLRenderer, object>();
@@ -17,21 +18,23 @@ export function prepareCommercialScene(renderer: THREE.WebGLRenderer, scene: THR
     const level = renderer.getActiveMipmapLevel();
     const toneMapping = renderer.toneMapping;
     const outputColorSpace = renderer.outputColorSpace;
+    const startedAt = performance.now();
     try {
       renderer.setRenderTarget(offscreen ? linearTarget : null);
       renderer.toneMapping = offscreen ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
       renderer.outputColorSpace = THREE.SRGBColorSpace;
-      return renderer.compileAsync(scene, camera);
+      return measureCommercialMapStage(offscreen ? 'compile-post' : 'compile-direct', () => renderer.compileAsync(scene, camera));
     } catch (error) {
       return Promise.reject(error);
     } finally {
+      markCommercialMapStage(offscreen ? 'compile-post-js' : 'compile-direct-js', performance.now() - startedAt);
       renderer.toneMapping = toneMapping;
       renderer.outputColorSpace = outputColorSpace;
       renderer.setRenderTarget(target, face, level);
     }
   };
   // r170 polls material.currentProgram. Finish one variant before changing it.
-  return compile(false).then(() => compile(true)).finally(() => {
+  return compile(false).then(() => pending.get(renderer) === ticket ? compile(true) : undefined).finally(() => {
     linearTarget.dispose();
     if (pending.get(renderer) === ticket) pending.delete(renderer);
   });

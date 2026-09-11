@@ -1,3 +1,5 @@
+import { advanceSunrisePlayback, hasSunrisePlaybackFinished, updateSolarShadow } from '../../utils/lightingTransition';
+import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
 import { isCommercialSceneCompiling } from '../../utils/sceneShaderWarmup';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
@@ -22,7 +24,6 @@ import {
   resolveCommercialMapEnvironmentLayout,
   resolveCommercialMapShadowFrustum,
   resolveCommercialMapSunriseFrame,
-  resolveCommercialMapSunriseProgress,
   resolveCommercialMapSunriseQualityTier,
   type CommercialMapEnvironmentExtent,
   type CommercialMapShadowFrustum,
@@ -695,7 +696,7 @@ function createCommercialMapPostProcessing(
         gl.compile(highlights, camera, scene);
       } catch (error) {
         // Optional precompilation must never take the persistent map down.
-        if (import.meta.env.DEV) {
+        if (commercialMapDiagnosticsEnabled) {
           gl.domElement.dataset.commercialMapSelectionShaderWarmupError = error instanceof Error
             ? error.message
             : String(error);
@@ -769,7 +770,7 @@ export function SunrisePostProcessing({
     return () => {
       gl.autoClear = previous.autoClear;
       gl.toneMapping = previous.toneMapping;
-      if (import.meta.env.DEV) disposeCommercialMapRenderTiming(gl);
+      if (commercialMapDiagnosticsEnabled) disposeCommercialMapRenderTiming(gl);
     };
   }, [gl]);
 
@@ -902,7 +903,7 @@ export function SunrisePostProcessing({
     } catch (error) {
       // Some mobile drivers reject half-float render targets. The map remains
       // functional with the renderer ACES/MSAA path instead of going blank.
-      if (import.meta.env.DEV) {
+      if (commercialMapDiagnosticsEnabled) {
         gl.domElement.dataset.commercialMapPostProcessingError = error instanceof Error
           ? error.message
           : String(error);
@@ -965,7 +966,7 @@ export function SunrisePostProcessing({
       });
       return;
     }
-    const renderTiming = import.meta.env.DEV ? beginCommercialMapRenderTiming(gl) : null;
+    const renderTiming = commercialMapDiagnosticsEnabled ? beginCommercialMapRenderTiming(gl) : null;
     renderingFrame.current = true;
     const previousAutoClear = gl.autoClear;
     const previousShaderError = gl.debug.onShaderError;
@@ -1051,7 +1052,7 @@ export function SunrisePostProcessing({
       gl.debug.onShaderError = previousShaderError;
       gl.autoClear = previousAutoClear;
       gl.toneMapping = rendererState.current.toneMapping;
-      if (import.meta.env.DEV) endCommercialMapRenderTiming(renderTiming, path, !suspended && !rendererFailed.current);
+      if (commercialMapDiagnosticsEnabled) endCommercialMapRenderTiming(renderTiming, path, !suspended && !rendererFailed.current);
       if (!suspended) publishCommercialMapRenderHealth(gl.domElement, {
         status: rendererFailed.current ? 'failed' : postFailed.current ? 'degraded' : 'ready',
         path: rendererFailed.current ? 'suspended' : path,
@@ -1249,7 +1250,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       // Shader customization is presentation-only. A driver/library mismatch
       // must retain the original opaque PBR terrain instead of losing Canvas.
       material.dispose();
-      if (import.meta.env.DEV) {
+      if (commercialMapDiagnosticsEnabled) {
         gl.domElement.dataset.commercialMapTerrainMaterialError = error instanceof Error
           ? error.message
           : String(error);
@@ -1306,6 +1307,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   const ambientRef = useRef<THREE.AmbientLight>(null);
   const hemisphereRef = useRef<THREE.HemisphereLight>(null);
   const outerGroundRef = useRef<THREE.Mesh>(null);
+  const playback = useRef({ sequence: -1, progress: initialSunriseProgress.current, from: 0, elapsed: 0, rewinding: false });
   const timeline = useRef({
     sequence: -1,
     lastAppliedProgress: -1,
@@ -1394,13 +1396,16 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     // Compile each variant during startup so switching Hydrological mode never
     // allocates textures or compiles a new terrain program inside the gesture.
     const groundMaterials = [normalGroundMaterial, hydrologicalGroundMaterial];
-    for (const groundMaterial of groundMaterials) {
-      if (outerGround) outerGround.material = groundMaterial;
-      if (outerGround) gl.compile(outerGround, camera, scene);
+    try {
+      for (const groundMaterial of groundMaterials) {
+        if (outerGround) outerGround.material = groundMaterial;
+        if (outerGround) gl.compile(outerGround, camera, scene);
+      }
+      if (!outerGround) gl.compile(scene, camera);
+    } finally {
+      if (outerGround && attachedMaterial) outerGround.material = attachedMaterial;
     }
-    if (!outerGround) gl.compile(scene, camera);
-    if (outerGround && attachedMaterial) outerGround.material = attachedMaterial;
-    if (import.meta.env.DEV) {
+    if (commercialMapDiagnosticsEnabled) {
       const compileCompletedAt = typeof performance === 'undefined' ? Date.now() : performance.now();
       gl.domElement.dataset.commercialMapShaderCompilation = JSON.stringify({
         startedAt: Number(compileStartedAt.toFixed(2)),
@@ -1436,11 +1441,10 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     const liveState = useCommercialMapStore.getState();
     const now = typeof performance === 'undefined' ? Date.now() : performance.now();
     const isRunning = liveState.sunrisePhase === 'running';
-    const progress = liveState.sunrisePhase === 'complete'
-      ? 1
-      : isRunning && liveState.sunriseStartedAt !== null
-        ? resolveCommercialMapSunriseProgress(liveState.sunriseStartedAt, now)
-        : 0;
+    const compiling = isCommercialSceneCompiling(gl);
+    const progress = advanceSunrisePlayback(playback.current, liveState.sunriseSequence, isRunning,
+      liveState.sunrisePhase === 'complete', delta, compiling || document.hidden || nightMode);
+    if (compiling || document.hidden) return;
     const nightTarget = nightMode ? 1 : 0;
     const dampedNight = THREE.MathUtils.damp(
       timeline.current.nightBlend,
@@ -1448,7 +1452,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       nightMode
         ? COMMERCIAL_MAP_NIGHT_ATMOSPHERE.blendInLambda
         : COMMERCIAL_MAP_NIGHT_ATMOSPHERE.blendOutLambda,
-      delta,
+      Math.min(delta, .05),
     );
     const nightSettled = Math.abs(dampedNight - nightTarget) < 0.0015;
     const nightBlend = nightSettled ? nightTarget : dampedNight;
@@ -1457,20 +1461,19 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     const frameChanged = progress !== timeline.current.lastAppliedProgress
       || liveState.sunriseSequence !== timeline.current.sequence
       || nightChanged;
-    const cameraSignature = import.meta.env.DEV
+    const cameraSignature = commercialMapDiagnosticsEnabled
       ? [
           ...camera.matrixWorld.elements,
           ...camera.projectionMatrix.elements,
         ].map((value) => value.toFixed(4)).join(':')
       : '';
-    const diagnosticsStale = import.meta.env.DEV
+    const diagnosticsStale = commercialMapDiagnosticsEnabled
       && cameraSignature !== timeline.current.lastCameraSignature;
+    if ((isRunning && !hasSunrisePlaybackFinished(playback.current) && !nightMode) || !nightSettled) invalidate();
+    if (isRunning && hasSunrisePlaybackFinished(playback.current)) liveState.completeSunrise(liveState.sunriseSequence);
     if (!frameChanged && !diagnosticsStale) return;
 
     const frame = resolveCommercialMapSunriseFrame(progress, mode);
-    const completedNow = frameChanged
-      && progress >= 1
-      && timeline.current.lastAppliedProgress < 1;
     if (frameChanged) {
       timeline.current.sequence = liveState.sunriseSequence;
       timeline.current.lastAppliedProgress = progress;
@@ -1486,13 +1489,14 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       );
       // The shadow camera orbits the park anchor at the fitted distance; the
       // visual sun disc and sky keep the wider scene anchor.
+      const previousSunX = sunLight.position.x;
+      const previousSunY = sunLight.position.y;
+      const previousSunZ = sunLight.position.z;
       sunLight.position.copy(shadowAnchor).addScaledVector(frameDirection, shadowFrustum.distance);
       const daylight = 1 - nightBlend;
       const night = COMMERCIAL_MAP_NIGHT_ATMOSPHERE;
-      sunLight.intensity = frame.sunlightIntensity * daylight;
-      // A fully dark sun still costs a shadow pass; hide it once the blend
-      // settles and bring it back before the first lit frame.
-      sunLight.visible = nightBlend < 0.999;
+      updateSolarShadow(sunLight, gl, frame.sunlightIntensity * daylight,
+        previousSunX !== sunLight.position.x || previousSunY !== sunLight.position.y || previousSunZ !== sunLight.position.z);
       celestialSun.material.uniforms.uNightBlend.value = nightBlend;
       sky.material.uniforms.nightBlend.value = nightBlend;
       sunLight.shadow.radius = resolveShadowRadiusTexels(frame.shadowRadius, quality.shadowMapSize);
@@ -1536,7 +1540,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
 
     const diagnosticBucket = progress >= 1 ? 2 : progress >= 0.45 ? 1 : 0;
     if (
-      import.meta.env.DEV
+      commercialMapDiagnosticsEnabled
       && (diagnosticBucket !== timeline.current.lastDiagnosticBucket || diagnosticsStale)
     ) {
       timeline.current.lastDiagnosticBucket = diagnosticBucket;
@@ -1579,20 +1583,6 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       });
     }
 
-    if (
-      sunLight.castShadow
-      && frameChanged
-      && (
-        now - timeline.current.lastShadowUpdateAt >= quality.shadowRefreshIntervalMs
-        || completedNow
-      )
-    ) {
-      gl.shadowMap.needsUpdate = true;
-      timeline.current.lastShadowUpdateAt = now;
-    }
-
-    if ((isRunning && progress < 1) || !nightSettled) invalidate();
-    if (isRunning && progress >= 1) liveState.completeSunrise(liveState.sunriseSequence);
   });
 
   return (

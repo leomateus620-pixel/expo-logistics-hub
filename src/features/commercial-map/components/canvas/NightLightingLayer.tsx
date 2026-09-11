@@ -421,7 +421,7 @@ function NightLightingInstances({
       state.reveal,
       revealTarget,
       liveNight ? config.revealLambdaIn : config.revealLambdaOut,
-      delta,
+      Math.min(delta, .05),
     );
     const nextPresence = THREE.MathUtils.damp(state.presence, presenceTarget, 10, delta);
     const revealSettled = Math.abs(nextReveal - revealTarget) < REVEAL_EPSILON;

@@ -1,0 +1,208 @@
+{
+  "entry": "src/pages/CommercialMapPage.tsx",
+  "chunks": [
+    {
+      "key": "src/pages/CommercialMapPage.tsx",
+      "file": "assets/CommercialMapPage-AQmkXWuk.js",
+      "bytes": 4610,
+      "gzipBytes": 1830
+    },
+    {
+      "key": "_react-vendor-Ca1HmRrB.js",
+      "file": "assets/react-vendor-Ca1HmRrB.js",
+      "bytes": 192210,
+      "gzipBytes": 63785
+    },
+    {
+      "key": "_maps-leaflet-BLgUKdXV.js",
+      "file": "assets/maps-leaflet-BLgUKdXV.js",
+      "bytes": 149771,
+      "gzipBytes": 43418
+    },
+    {
+      "key": "_CommercialMapPage-CjaVaTEr.js",
+      "file": "assets/CommercialMapPage-CjaVaTEr.js",
+      "bytes": 1637335,
+      "gzipBytes": 503488
+    },
+    {
+      "key": "index.html",
+      "file": "assets/index-COrJXa2f.js",
+      "bytes": 589766,
+      "gzipBytes": 155921
+    },
+    {
+      "key": "_maps-three-DhfgW_SI.js",
+      "file": "assets/maps-three-DhfgW_SI.js",
+      "bytes": 3249391,
+      "gzipBytes": 1123180
+    },
+    {
+      "key": "_ui-radix-B31QUAQH.js",
+      "file": "assets/ui-radix-B31QUAQH.js",
+      "bytes": 137075,
+      "gzipBytes": 41208
+    },
+    {
+      "key": "_data-vendor-CgJOmbAq.js",
+      "file": "assets/data-vendor-CgJOmbAq.js",
+      "bytes": 221547,
+      "gzipBytes": 59643
+    },
+    {
+      "key": "_textarea-CL6eg2YI.js",
+      "file": "assets/textarea-CL6eg2YI.js",
+      "bytes": 522,
+      "gzipBytes": 341
+    },
+    {
+      "key": "_log-in-BeXiKI4_.js",
+      "file": "assets/log-in-BeXiKI4_.js",
+      "bytes": 428,
+      "gzipBytes": 320
+    },
+    {
+      "key": "_dropdown-menu-BqEUnGNp.js",
+      "file": "assets/dropdown-menu-BqEUnGNp.js",
+      "bytes": 5110,
+      "gzipBytes": 1465
+    },
+    {
+      "key": "_maximize-2-BBLFM_a3.js",
+      "file": "assets/maximize-2-BBLFM_a3.js",
+      "bytes": 467,
+      "gzipBytes": 314
+    },
+    {
+      "key": "_moon-CU9ffyWj.js",
+      "file": "assets/moon-CU9ffyWj.js",
+      "bytes": 311,
+      "gzipBytes": 252
+    },
+    {
+      "key": "_scroll-area-BZr2mrtP.js",
+      "file": "assets/scroll-area-BZr2mrtP.js",
+      "bytes": 2599,
+      "gzipBytes": 1031
+    },
+    {
+      "key": "_sliders-horizontal-CELLRaZa.js",
+      "file": "assets/sliders-horizontal-CELLRaZa.js",
+      "bytes": 1564,
+      "gzipBytes": 568
+    },
+    {
+      "key": "_warehouse-C--DdlkB.js",
+      "file": "assets/warehouse-C--DdlkB.js",
+      "bytes": 901,
+      "gzipBytes": 436
+    },
+    {
+      "key": "_chevron-up-BxTCIC2w.js",
+      "file": "assets/chevron-up-BxTCIC2w.js",
+      "bytes": 296,
+      "gzipBytes": 246
+    },
+    {
+      "key": "_rotate-ccw-D0Vmw5RM.js",
+      "file": "assets/rotate-ccw-D0Vmw5RM.js",
+      "bytes": 368,
+      "gzipBytes": 286
+    },
+    {
+      "key": "_label-07rJJnHA.js",
+      "file": "assets/label-07rJJnHA.js",
+      "bytes": 370,
+      "gzipBytes": 271
+    },
+    {
+      "key": "_switch-CIgfVEG3.js",
+      "file": "assets/switch-CIgfVEG3.js",
+      "bytes": 852,
+      "gzipBytes": 457
+    },
+    {
+      "key": "_undo-2-BJykB0aL.js",
+      "file": "assets/undo-2-BJykB0aL.js",
+      "bytes": 376,
+      "gzipBytes": 280
+    },
+    {
+      "key": "_circle-dot-BdyVVyMl.js",
+      "file": "assets/circle-dot-BdyVVyMl.js",
+      "bytes": 345,
+      "gzipBytes": 252
+    },
+    {
+      "key": "_plus-CrekM7px.js",
+      "file": "assets/plus-CrekM7px.js",
+      "bytes": 322,
+      "gzipBytes": 253
+    },
+    {
+      "key": "_trash-2-CRxm7MOa.js",
+      "file": "assets/trash-2-CRxm7MOa.js",
+      "bytes": 526,
+      "gzipBytes": 349
+    },
+    {
+      "key": "_badge-CvpS2_-E.js",
+      "file": "assets/badge-CvpS2_-E.js",
+      "bytes": 779,
+      "gzipBytes": 426
+    },
+    {
+      "key": "_tabs-TwhS6ImU.js",
+      "file": "assets/tabs-TwhS6ImU.js",
+      "bytes": 1149,
+      "gzipBytes": 487
+    },
+    {
+      "key": "_dialog-ycZqodg3.js",
+      "file": "assets/dialog-ycZqodg3.js",
+      "bytes": 2518,
+      "gzipBytes": 991
+    },
+    {
+      "key": "_clock-3-BRVB3s2k.js",
+      "file": "assets/clock-3-BRVB3s2k.js",
+      "bytes": 350,
+      "gzipBytes": 274
+    },
+    {
+      "key": "_history-mNIF5ei5.js",
+      "file": "assets/history-mNIF5ei5.js",
+      "bytes": 406,
+      "gzipBytes": 298
+    },
+    {
+      "key": "_circle-check-QnQWP7wP.js",
+      "file": "assets/circle-check-QnQWP7wP.js",
+      "bytes": 341,
+      "gzipBytes": 269
+    },
+    {
+      "key": "_info-BauIOnn3.js",
+      "file": "assets/info-BauIOnn3.js",
+      "bytes": 368,
+      "gzipBytes": 279
+    },
+    {
+      "key": "_database-zap-CFbHsTNn.js",
+      "file": "assets/database-zap-CFbHsTNn.js",
+      "bytes": 507,
+      "gzipBytes": 349
+    },
+    {
+      "key": "_send-anxWUuzx.js",
+      "file": "assets/send-anxWUuzx.js",
+      "bytes": 459,
+      "gzipBytes": 331
+    }
+  ],
+  "staticBytes": 6203939,
+  "staticGzipBytes": 2003298,
+  "rendererRequiredBeforeQuery": true,
+  "physicsRequiredBeforeQuery": false,
+  "pdfRequiredBeforeQuery": false
+}

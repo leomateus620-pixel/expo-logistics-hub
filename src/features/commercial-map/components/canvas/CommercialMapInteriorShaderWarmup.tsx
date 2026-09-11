@@ -1,3 +1,4 @@
+import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
 import { useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -95,7 +96,7 @@ export function CommercialMapInteriorShaderWarmup({ reducedGraphics }: { reduced
         probes.dispose();
         return;
       }
-      if (import.meta.env.DEV) {
+      if (commercialMapDiagnosticsEnabled) {
         gl.domElement.dataset.commercialMapInteriorShaderWarmup = JSON.stringify({
           durationMs: Number((performance.now() - startedAt).toFixed(2)),
           programsBefore,
