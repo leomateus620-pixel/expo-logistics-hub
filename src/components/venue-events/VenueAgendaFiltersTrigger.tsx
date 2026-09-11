@@ -3,7 +3,13 @@ import { ChevronLeft, ChevronRight, Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import {
   Select,
   SelectContent,
@@ -79,7 +85,18 @@ export function VenueAgendaFiltersTrigger({
   const body: ReactNode = (
     <div className="venue-agenda-filters__panel">
       <header className="venue-agenda-filters__panel-header">
-        <strong>Filtros da agenda</strong>
+        {isMobile ? (
+          <>
+            <DrawerTitle className="venue-agenda-filters__panel-title">
+              Filtros da agenda
+            </DrawerTitle>
+            <DrawerDescription className="sr-only">
+              Ajuste a janela, a data de referência e a área da agenda.
+            </DrawerDescription>
+          </>
+        ) : (
+          <strong>Filtros da agenda</strong>
+        )}
         {activeCount > 0 && (
           <Button
             type="button"

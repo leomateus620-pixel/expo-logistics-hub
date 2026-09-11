@@ -354,11 +354,99 @@
 
 @media (max-width: 1023px) {
   .venue-workspace-switcher {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     flex: 1 1 auto;
+    min-width: 0;
   }
 
   .venue-workspace-switcher__option {
+    min-width: 0;
     flex: 1 1 0;
+  }
+}
+
+/* Topline mobile: gatilho de navegação + switcher com alvos de 44px. */
+@media (max-width: 640px) {
+  /* A navegação inferior fixa deixou de existir; sem reserva morta no rodapé. */
+  .venue-workspace {
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  }
+
+  .venue-shell-grid {
+    gap: 0.625rem;
+  }
+
+  .venue-shell-main {
+    gap: 0.625rem;
+  }
+
+  .venue-shell-topline {
+    gap: 0.5rem;
+  }
+
+  .venue-nav-trigger {
+    width: 2.75rem;
+    min-height: 2.75rem;
+    flex: 0 0 auto;
+    justify-content: center;
+    padding: 0;
+    border-radius: 0.75rem;
+  }
+
+  .venue-nav-trigger span {
+    display: none;
+  }
+
+  .venue-nav-trigger svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .venue-workspace-switcher {
+    gap: 0.2rem;
+    padding: 0.2rem;
+    border-radius: 0.85rem;
+  }
+
+  .venue-workspace-switcher__option {
+    min-height: 2.35rem;
+    gap: 0.4rem;
+    padding: 0 0.5rem;
+    border-radius: 0.65rem;
+    font-size: 0.82rem;
+  }
+
+  .venue-workspace-switcher__option svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .venue-workspace-switcher__option small {
+    min-width: 1.5rem;
+    padding: 0.12rem 0.4rem;
+    text-align: center;
+    font-size: 0.68rem;
+  }
+}
+
+@media (max-width: 430px) {
+  .venue-workspace-switcher__option {
+    gap: 0.3rem;
+    padding: 0 0.35rem;
+    font-size: 0.78rem;
+    letter-spacing: -0.02em;
+  }
+
+  .venue-workspace-switcher__option small {
+    padding-inline: 0.35rem;
+    font-size: 0.64rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .venue-workspace-switcher__option svg {
+    display: none;
   }
 }
 
@@ -524,9 +612,5 @@
 @media (max-width: 480px) {
   .venue-nav-trigger span {
     display: none;
-  }
-
-  .venue-nav-trigger {
-    padding: 0 0.5rem;
   }
 }

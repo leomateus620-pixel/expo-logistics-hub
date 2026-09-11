@@ -189,3 +189,69 @@ export function monthGroupLabel(startAt: string | null): string {
   }).format(new Date(startAt));
   return label.charAt(0).toLocaleUpperCase("pt-BR") + label.slice(1);
 }
+
+const VENUE_TZ = "America/Sao_Paulo";
+
+const venueHourFormatter = new Intl.DateTimeFormat("pt-BR", {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: VENUE_TZ,
+});
+const venueDayFormatter = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  timeZone: VENUE_TZ,
+});
+const venueMonthShortFormatter = new Intl.DateTimeFormat("pt-BR", {
+  month: "short",
+  timeZone: VENUE_TZ,
+});
+const venueYearFormatter = new Intl.DateTimeFormat("pt-BR", {
+  year: "numeric",
+  timeZone: VENUE_TZ,
+});
+const venueWeekdayFormatter = new Intl.DateTimeFormat("pt-BR", {
+  weekday: "long",
+  timeZone: VENUE_TZ,
+});
+
+/** "19:00" no fuso de Brasília, ou null quando não há instante. */
+export function formatVenueHour(value: string | null | undefined): string | null {
+  return value ? venueHourFormatter.format(new Date(value)) : null;
+}
+
+/** Duração compacta ("4h30", "2h", "45min"), ou null quando inválida. */
+export function formatVenueDuration(
+  start: string | null | undefined,
+  end: string | null | undefined,
+): string | null {
+  if (!start || !end) return null;
+  const diff = new Date(end).getTime() - new Date(start).getTime();
+  if (!Number.isFinite(diff) || diff <= 0) return null;
+  const totalMinutes = Math.round(diff / 60000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours && minutes) return `${hours}h${String(minutes).padStart(2, "0")}`;
+  if (hours) return `${hours}h`;
+  return `${minutes}min`;
+}
+
+export interface VenueDateParts {
+  day: string;
+  /** Mês abreviado sem ponto ("jan", "set"). */
+  month: string;
+  year: string;
+  weekday: string;
+}
+
+/** Partes da data no fuso de Brasília para o selo de data e cabeçalhos. */
+export function venueDateParts(value: string | null | undefined): VenueDateParts | null {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return {
+    day: venueDayFormatter.format(date),
+    month: venueMonthShortFormatter.format(date).replace(".", ""),
+    year: venueYearFormatter.format(date),
+    weekday: venueWeekdayFormatter.format(date),
+  };
+}

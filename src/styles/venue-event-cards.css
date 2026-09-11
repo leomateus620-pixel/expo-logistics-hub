@@ -1,0 +1,1155 @@
+/*
+ * Sistema unificado de cards de evento — Agenda + Registro mestre.
+ *
+ * Um único vocabulário visual (data, horário, título, requerente, local/tipo,
+ * status) com duas composições:
+ *   - desktop: linha horizontal em colunas (data | horário | corpo | status);
+ *   - mobile (≤ 640px): bloco compacto em duas linhas, com o horário e o
+ *     status na primeira linha e o corpo ocupando toda a largura.
+ *
+ * Escala de espaçamento: 4 / 8 / 12 / 16 / 20 / 24 / 32 px.
+ */
+
+.venue-agenda-timeline,
+.venue-event-list {
+  --vec-radius: 0.95rem;
+  --vec-accent: var(--venue-indigo, oklch(var(--brand-indigo-500)));
+  --vec-border: oklch(var(--border));
+  --vec-muted: oklch(var(--muted-foreground));
+  --vec-ink: oklch(var(--foreground));
+  --vec-chip-bg: oklch(var(--neutral-100));
+  min-width: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Agenda — linha do tempo por dia                                     */
+/* ------------------------------------------------------------------ */
+
+.venue-agenda-timeline {
+  display: grid;
+  gap: 1.35rem;
+}
+
+.venue-agenda-timeline > section {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: 1rem;
+  min-width: 0;
+}
+
+.venue-agenda-timeline > section > div {
+  display: grid;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.venue-event-section__header[data-variant="day"] {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.venue-event-section__header[data-variant="day"] time {
+  display: block;
+  padding-top: 0.35rem;
+  text-align: right;
+}
+
+.venue-event-section__header[data-variant="day"] strong {
+  display: block;
+  color: var(--vec-muted);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.venue-event-section__header[data-variant="day"] b {
+  display: block;
+  margin-top: 0.1rem;
+  color: var(--vec-accent);
+  font-size: 1.65rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.venue-event-section__header[data-variant="day"] span {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--vec-muted);
+  font-size: 0.6rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.venue-event-section__header[data-variant="day"] i {
+  position: relative;
+  width: 1px;
+  flex: 0 0 auto;
+  background: oklch(var(--brand-indigo-200));
+}
+
+.venue-event-section__header[data-variant="day"] i::before {
+  content: "";
+  position: absolute;
+  top: 0.85rem;
+  left: 50%;
+  width: 0.62rem;
+  height: 0.62rem;
+  border: 2px solid var(--vec-accent);
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 0 4px oklch(var(--background));
+  transform: translateX(-50%);
+}
+
+/* ------------------------------------------------------------------ */
+/* Registro mestre — grupos por mês                                    */
+/* ------------------------------------------------------------------ */
+
+.venue-event-list {
+  display: grid;
+  gap: 0;
+}
+
+.venue-event-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.venue-event-group + .venue-event-group {
+  margin-top: 1.1rem;
+}
+
+.venue-event-group__label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0 0.15rem 0.3rem;
+  border-bottom: 1px solid oklch(var(--border) / 0.7);
+  color: var(--vec-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.venue-event-group__label-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.venue-event-group__label-count {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: baseline;
+  gap: 0.25rem;
+  color: var(--vec-muted);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.venue-event-group__label-count b {
+  color: var(--vec-ink);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.venue-event-group__label-count small {
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------------ */
+/* Card                                                                */
+/* ------------------------------------------------------------------ */
+
+.venue-event-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 5.2rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.95rem;
+  width: 100%;
+  min-width: 0;
+  min-height: 74px;
+  padding: 0.7rem 0.9rem 0.7rem 1.05rem;
+  border: 1px solid var(--vec-border);
+  border-left: none;
+  border-radius: var(--vec-radius);
+  background: linear-gradient(
+    180deg,
+    oklch(var(--glass-surface-strong, var(--card))),
+    oklch(var(--card))
+  );
+  box-shadow: var(--elevation-1);
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.venue-event-card[data-variant="registry"] {
+  grid-template-columns: 4rem 6.5rem minmax(0, 1fr) auto;
+  gap: 0.9rem;
+  padding: 0.75rem 0.9rem 0.75rem 1.1rem;
+}
+
+.venue-event-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  border-radius: var(--vec-radius) 0 0 var(--vec-radius);
+  background: linear-gradient(
+    180deg,
+    var(--vec-accent),
+    oklch(var(--brand-indigo-200))
+  );
+}
+
+.venue-event-card[data-status="confirmado"]::before,
+.venue-event-card[data-status="aprovado"]::before {
+  background: linear-gradient(
+    180deg,
+    oklch(var(--success)),
+    oklch(var(--success) / 0.5)
+  );
+}
+
+.venue-event-card[data-status="solicitado"]::before,
+.venue-event-card[data-status="em_analise"]::before,
+.venue-event-card[data-status="em_preparacao"]::before {
+  background: linear-gradient(
+    180deg,
+    oklch(var(--warning)),
+    oklch(var(--warning) / 0.5)
+  );
+}
+
+.venue-event-card[data-status="cancelado"]::before,
+.venue-event-card[data-status="recusado"]::before,
+.venue-event-card[data-status="bloqueado"]::before {
+  background: linear-gradient(
+    180deg,
+    oklch(var(--destructive)),
+    oklch(var(--destructive) / 0.5)
+  );
+}
+
+.venue-event-card[data-status="rascunho"]::before {
+  background: linear-gradient(
+    180deg,
+    oklch(var(--neutral-400)),
+    oklch(var(--neutral-300))
+  );
+}
+
+.venue-event-card:focus-visible {
+  outline: 2px solid var(--vec-accent);
+  outline-offset: 2px;
+}
+
+/* Selo de data */
+.venue-event-card__date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.05rem;
+  min-height: 3.4rem;
+  padding: 0.4rem 0.25rem;
+  border: 1px solid oklch(var(--border) / 0.9);
+  border-radius: 0.75rem;
+  background: linear-gradient(
+    180deg,
+    oklch(var(--card)),
+    oklch(var(--neutral-100) / 0.75)
+  );
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.6),
+    0 6px 14px -12px oklch(0 0 0 / 0.55);
+}
+
+.venue-event-card__date b {
+  color: var(--vec-ink);
+  font-size: 1.28rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.venue-event-card__date i {
+  color: var(--vec-accent);
+  font-size: 0.6rem;
+  font-style: normal;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.venue-event-card__date u {
+  color: var(--vec-muted);
+  font-size: 0.56rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+}
+
+/* Horário */
+.venue-event-card__time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.2rem;
+  min-width: 0;
+  min-height: 3.4rem;
+  padding-right: 0.85rem;
+  border-right: 1px dashed var(--vec-border);
+}
+
+.venue-event-card__time time {
+  color: var(--vec-accent);
+  font-size: 1.02rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.venue-event-card__time-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.venue-event-card__time-end em {
+  color: var(--vec-muted);
+  font-size: 0.76rem;
+  font-style: normal;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.venue-event-card__time-end i {
+  padding: 0.06rem 0.36rem;
+  border: 1px solid var(--vec-border);
+  border-radius: 999px;
+  background: var(--vec-chip-bg);
+  color: var(--vec-muted);
+  font-size: 0.56rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.venue-event-card__time-empty {
+  color: var(--vec-muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* Corpo: título, requerente, metadados */
+.venue-event-card__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.venue-event-card__title {
+  display: block;
+  overflow: hidden;
+  color: var(--vec-ink);
+  font-size: 0.92rem;
+  font-weight: 780;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.venue-event-card__requester {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  margin-top: 0.15rem;
+  color: var(--vec-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.venue-event-card__requester > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.venue-event-card__requester svg {
+  width: 0.78rem;
+  height: 0.78rem;
+  flex-shrink: 0;
+  color: var(--vec-accent);
+}
+
+.venue-event-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+  min-width: 0;
+}
+
+.venue-event-card__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  max-width: 16rem;
+  min-width: 0;
+  padding: 0.14rem 0.48rem;
+  border: 1px solid var(--vec-border);
+  border-radius: 999px;
+  background: var(--vec-chip-bg);
+  color: var(--vec-muted);
+  font-size: 0.63rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.venue-event-card__chip > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.venue-event-card__chip svg {
+  width: 0.72rem;
+  height: 0.72rem;
+  flex-shrink: 0;
+  color: var(--vec-accent);
+}
+
+.venue-event-card__chip[data-kind="type"] {
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Status + navegação */
+.venue-event-card__aside {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.venue-event-card__aside > svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: var(--vec-muted);
+  transition: transform 160ms ease;
+}
+
+.venue-event-card__conflict {
+  color: oklch(var(--destructive)) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .venue-event-card:hover {
+    transform: translateY(-2px);
+    border-color: oklch(var(--brand-indigo-200));
+    box-shadow: var(--elevation-3, var(--elevation-2));
+  }
+
+  .venue-event-card:hover .venue-event-card__aside > svg:last-child {
+    transform: translateX(2px);
+    color: var(--vec-accent);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Registro mestre — cabeçalho, anos, meses e filtros                  */
+/* ------------------------------------------------------------------ */
+
+.venue-events-registry__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+}
+
+.venue-events-registry__identity {
+  min-width: 0;
+}
+
+.venue-events-registry__identity h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.venue-events-registry__scope {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.24rem 0.7rem 0.24rem 0.55rem;
+  border: 1px solid oklch(var(--border));
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    oklch(var(--card) / 0.9),
+    oklch(var(--neutral-100) / 0.85)
+  );
+  color: oklch(var(--foreground));
+  font-size: 0.72em;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.55),
+    var(--elevation-1);
+  animation: venue-scope-swap 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.venue-events-registry__scope i {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 0 3px currentColor;
+  opacity: 0.9;
+}
+
+.venue-events-registry__scope[data-venue="restaurante"] {
+  border-color: oklch(var(--warning) / 0.45);
+  background: linear-gradient(
+    180deg,
+    oklch(var(--warning) / 0.18),
+    oklch(var(--warning) / 0.08)
+  );
+  color: oklch(var(--warning-foreground, var(--foreground)));
+}
+
+.venue-events-registry__scope[data-venue="restaurante"] i {
+  color: oklch(var(--warning));
+  box-shadow: 0 0 0 3px oklch(var(--warning) / 0.22);
+}
+
+.venue-events-registry__scope[data-venue="arena"] {
+  border-color: oklch(var(--primary) / 0.4);
+  background: linear-gradient(
+    180deg,
+    oklch(var(--primary) / 0.14),
+    oklch(var(--primary) / 0.06)
+  );
+  color: var(--venue-indigo, oklch(var(--primary)));
+}
+
+.venue-events-registry__scope[data-venue="arena"] i {
+  color: var(--venue-indigo, oklch(var(--primary)));
+  box-shadow: 0 0 0 3px oklch(var(--primary) / 0.2);
+}
+
+@keyframes venue-scope-swap {
+  0% {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(0.55em) scale(0.96);
+  }
+  55% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+.venue-events-registry__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.venue-events-registry__count {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Seletor de anos (segmentado) */
+.venue-year-selector {
+  position: relative;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  min-width: 0;
+  padding: 0.2rem;
+  border: 1px solid oklch(var(--border));
+  border-radius: 999px;
+  background: oklch(var(--muted) / 0.55);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.06);
+}
+
+.venue-year-selector__thumb {
+  position: absolute;
+  top: 0.2rem;
+  bottom: 0.2rem;
+  left: 0.2rem;
+  width: calc((100% - 0.4rem) / var(--venue-year-count, 3));
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    oklch(var(--card)),
+    oklch(var(--card) / 0.85)
+  );
+  box-shadow:
+    0 1px 3px rgb(0 0 0 / 0.14),
+    inset 0 1px 0 rgb(255 255 255 / 0.7);
+  transform: translateX(calc(var(--venue-year-index, 0) * 100%));
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.venue-year-selector__option {
+  position: relative;
+  z-index: 1;
+  min-width: 4.1rem;
+  min-height: 2rem;
+  padding: 0 0.7rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: oklch(var(--muted-foreground));
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 180ms ease;
+}
+
+.venue-year-selector__option sup {
+  margin-left: 0.22rem;
+  font-size: 0.58rem;
+  font-weight: 700;
+  opacity: 0.6;
+}
+
+.venue-year-selector__option[data-active="true"] {
+  color: oklch(var(--foreground));
+}
+
+.venue-year-selector__option:focus-visible {
+  outline: 2px solid var(--venue-indigo, oklch(var(--primary)));
+  outline-offset: 2px;
+}
+
+/* Filtro de meses (barra rolável) */
+.venue-month-filter {
+  display: flex;
+  gap: 0.3rem;
+  min-width: 0;
+  padding-bottom: 0.15rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.venue-month-filter::-webkit-scrollbar {
+  display: none;
+}
+
+.venue-month-filter__option {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.2rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid oklch(var(--border));
+  border-radius: 999px;
+  background: oklch(var(--card));
+  color: oklch(var(--muted-foreground));
+  font-size: 0.65rem;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.venue-month-filter__option sup {
+  font-size: 0.55rem;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+.venue-month-filter__option[data-empty="true"] {
+  opacity: 0.55;
+}
+
+.venue-month-filter__option[data-active="true"] {
+  border-color: oklch(var(--primary));
+  background: oklch(var(--primary));
+  color: oklch(var(--primary-foreground));
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------------ */
+/* Tablet (≤ 48rem / 768px)                                            */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 48rem) {
+  .venue-events-registry__tools {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .venue-agenda-timeline > section {
+    grid-template-columns: 7rem minmax(0, 1fr);
+  }
+
+  /* Agenda: título e gatilho de filtros na mesma linha (sem botão esticado). */
+  .venue-workspace .venue-panel__header--responsive {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .venue-workspace .venue-agenda-controls {
+    flex-direction: row;
+    width: auto;
+    flex: 0 0 auto;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Mobile (≤ 40rem / 640px) — composição compacta                      */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 40rem) {
+  .venue-workspace .venue-panel {
+    --venue-panel-pad: 0.7rem;
+    padding: var(--venue-panel-pad);
+    border-radius: 0.85rem;
+  }
+
+  .venue-workspace .venue-panel__header {
+    min-height: 0;
+    margin-bottom: 0.625rem;
+  }
+
+  .venue-workspace .venue-agenda-period--compact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.75rem;
+    margin-bottom: 0.75rem;
+    padding: 0.45rem 0.7rem;
+    border-radius: 0.7rem;
+  }
+
+  .venue-workspace .venue-agenda-period--compact > svg {
+    display: none;
+  }
+
+  .venue-workspace .venue-agenda-period--compact > span {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .venue-workspace .venue-agenda-period--compact > span:not(:first-of-type) {
+    grid-column: auto;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .venue-workspace .venue-agenda-period--compact small {
+    font-size: 0.6rem;
+  }
+
+  .venue-workspace .venue-agenda-period--compact strong {
+    font-size: 0.72rem;
+    white-space: normal;
+  }
+
+  /* Linha do tempo: seções em bloco, cabeçalho de dia inline. */
+  .venue-agenda-timeline {
+    gap: 1rem;
+  }
+
+  .venue-agenda-timeline > section {
+    display: block;
+  }
+
+  .venue-agenda-timeline > section > div {
+    gap: 0.5rem;
+  }
+
+  .venue-event-section__header[data-variant="day"] {
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.6rem;
+    margin-bottom: 0.45rem;
+    padding-inline: 0.15rem;
+  }
+
+  .venue-event-section__header[data-variant="day"] time {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: baseline;
+    gap: 0.4rem;
+    padding-top: 0;
+    text-align: left;
+  }
+
+  .venue-event-section__header[data-variant="day"] strong {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+  }
+
+  .venue-event-section__header[data-variant="day"] strong::after {
+    content: "·";
+    margin-left: 0.4rem;
+    color: oklch(var(--brand-indigo-300));
+  }
+
+  .venue-event-section__header[data-variant="day"] b {
+    margin-top: 0;
+    font-size: 1rem;
+  }
+
+  .venue-event-section__header[data-variant="day"] span {
+    margin-top: 0;
+    font-size: 0.62rem;
+    font-weight: 700;
+  }
+
+  .venue-event-section__header[data-variant="day"] i {
+    width: auto;
+    height: 1px;
+    flex: 1 1 auto;
+    background: oklch(var(--border) / 0.9);
+  }
+
+  .venue-event-section__header[data-variant="day"] i::before {
+    display: none;
+  }
+
+  /* Grupos mensais: divisores finos. */
+  .venue-event-group {
+    gap: 0.5rem;
+  }
+
+  .venue-event-group + .venue-event-group {
+    margin-top: 0.9rem;
+  }
+
+  .venue-event-group__label {
+    padding: 0.1rem 0.15rem 0.35rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* Card: bloco compacto em duas linhas. */
+  .venue-event-card,
+  .venue-event-card[data-variant="registry"] {
+    --vec-radius: 0.85rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "time aside"
+      "body body";
+    align-items: start;
+    gap: 0.375rem 0.5rem;
+    min-height: 0;
+    padding: 0.625rem 0.75rem 0.7rem 0.875rem;
+    backdrop-filter: none;
+  }
+
+  .venue-event-card[data-variant="registry"] {
+    grid-template-columns: 3.1rem minmax(0, 1fr) auto;
+    grid-template-areas:
+      "date time aside"
+      "date body body";
+    column-gap: 0.625rem;
+  }
+
+  .venue-event-card__date {
+    grid-area: date;
+    align-self: start;
+    min-height: 0;
+    padding: 0.35rem 0.15rem 0.3rem;
+    border-radius: 0.6rem;
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.6);
+  }
+
+  .venue-event-card__date b {
+    font-size: 1.2rem;
+  }
+
+  .venue-event-card__date i {
+    font-size: 0.56rem;
+    letter-spacing: 0.12em;
+  }
+
+  .venue-event-card__date u {
+    font-size: 0.52rem;
+  }
+
+  .venue-event-card__time {
+    grid-area: time;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.15rem 0.45rem;
+    min-height: 1.5rem;
+    padding-right: 0;
+    border-right: 0;
+  }
+
+  .venue-event-card__time time {
+    font-size: 1rem;
+  }
+
+  .venue-event-card__time-end {
+    gap: 0.4rem;
+  }
+
+  .venue-event-card__time-end em {
+    font-size: 0.8rem;
+    font-weight: 650;
+  }
+
+  .venue-event-card__time-end i {
+    padding: 0.08rem 0.4rem;
+    font-size: 0.6rem;
+  }
+
+  .venue-event-card__time[data-empty="true"] {
+    align-items: center;
+  }
+
+  .venue-event-card__body {
+    grid-area: body;
+    gap: 0.2rem;
+  }
+
+  .venue-event-card__title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: 0.9375rem;
+    line-height: 1.25;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .venue-event-card__requester {
+    margin-top: 0;
+    font-size: 0.78rem;
+    font-weight: 650;
+  }
+
+  .venue-event-card__requester svg {
+    width: 0.8rem;
+    height: 0.8rem;
+  }
+
+  .venue-event-card__chips {
+    gap: 0.3rem;
+    margin-top: 0.3rem;
+  }
+
+  .venue-event-card__chip {
+    max-width: 100%;
+    min-height: 1.5rem;
+    padding: 0 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.68rem;
+    line-height: 1.5rem;
+  }
+
+  .venue-event-card__chip svg {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
+  .venue-event-card__aside {
+    grid-area: aside;
+    align-self: start;
+    justify-self: end;
+    gap: 0.25rem;
+    margin-top: 0.05rem;
+  }
+
+  .venue-event-card__aside > svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    margin-right: -0.25rem;
+  }
+
+  .venue-event-card .venue-status {
+    min-height: 1.375rem;
+    padding: 0 0.5rem;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+  }
+
+  /* Registro mestre: ferramentas empilhadas em grade estável. */
+  .venue-events-registry__header {
+    gap: 0.625rem;
+  }
+
+  .venue-events-registry__identity h2 {
+    flex-wrap: wrap;
+    gap: 0.4rem 0.55rem;
+    font-size: 1rem;
+  }
+
+  .venue-events-registry__tools {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .venue-year-selector {
+    display: grid;
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .venue-year-selector__option {
+    min-width: 0;
+    min-height: 2.25rem;
+    padding: 0 0.4rem;
+  }
+
+  .venue-month-filter {
+    grid-column: 1 / -1;
+    margin-inline: calc(var(--venue-panel-pad, 0.7rem) * -1);
+    padding-inline: var(--venue-panel-pad, 0.7rem);
+    padding-bottom: 0.1rem;
+    scroll-padding-inline: var(--venue-panel-pad, 0.7rem);
+    scroll-snap-type: x proximity;
+  }
+
+  .venue-month-filter::after {
+    content: "";
+    flex: 0 0 calc(var(--venue-panel-pad, 0.7rem) / 2);
+  }
+
+  .venue-month-filter__option {
+    min-height: 2.25rem;
+    padding: 0 0.7rem;
+    scroll-snap-align: start;
+  }
+
+  .venue-events-registry__tools > .venue-agenda-filters__trigger {
+    grid-column: 1;
+    min-height: 2.25rem;
+  }
+
+  .venue-events-registry__count {
+    grid-column: 2;
+    justify-self: end;
+    min-height: 1.75rem;
+    padding-inline: 0.7rem;
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 22.5rem) {
+  .venue-event-card,
+  .venue-event-card[data-variant="registry"] {
+    padding: 0.6rem 0.625rem 0.65rem 0.75rem;
+  }
+
+  .venue-event-card[data-variant="registry"] {
+    grid-template-columns: 2.9rem minmax(0, 1fr) auto;
+    column-gap: 0.5rem;
+  }
+
+  .venue-event-card__title {
+    font-size: 0.9rem;
+  }
+
+  .venue-event-card__time time {
+    font-size: 0.95rem;
+  }
+
+  .venue-event-card__time-end em {
+    font-size: 0.76rem;
+  }
+
+  /* O card inteiro é o alvo de toque; a seta é só afordância e cede espaço. */
+  .venue-event-card__aside > svg:last-child {
+    display: none;
+  }
+
+  .venue-event-card .venue-status {
+    padding-inline: 0.42rem;
+    font-size: 0.62rem;
+  }
+
+  .venue-event-section__header[data-variant="day"] strong {
+    font-size: 0.58rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .venue-event-card,
+  .venue-event-card__aside > svg,
+  .venue-year-selector__thumb,
+  .venue-month-filter__option,
+  .venue-events-registry__scope {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .venue-event-card,
+  .venue-event-card__date,
+  .venue-event-card__chip,
+  .venue-month-filter__option,
+  .venue-year-selector {
+    border-color: currentColor;
+  }
+}

@@ -82,6 +82,7 @@
 }
 
 .venue-module-shell__leading {
+  flex: 0 1 auto;
   gap: 0.75rem;
 }
 
@@ -216,6 +217,7 @@
 }
 
 .venue-module-shell__content {
+  --venue-shell-bar-offset: 4.5rem;
   min-height: calc(100dvh - 4.5rem);
   outline: none;
 }
@@ -413,40 +415,7 @@
   }
 }
 
-@media (max-width: 64rem) {
-  }
-
 @media (max-width: 40rem) {
-  .venue-module-shell__bar-inner {
-    gap: 0.5rem;
-    padding-right: max(0.75rem, env(safe-area-inset-right));
-    padding-left: max(0.75rem, env(safe-area-inset-left));
-  }
-
-  .venue-module-shell__leading,
-  .venue-module-shell__identity {
-    gap: 0.5rem;
-  }
-
-  .venue-module-shell__back {
-    padding-inline: 0.625rem;
-  }
-
-  .venue-module-shell__back span,
-  .venue-module-shell__eyebrow,
-  .venue-module-shell__sign-out span {
-    display: none;
-  }
-
-  .venue-module-shell .venue-module-shell__sign-out {
-    width: 2.75rem;
-    padding: 0;
-  }
-
-  .venue-module-shell__title {
-    font-size: clamp(0.78rem, 3.5vw, 0.96rem);
-  }
-
   .venue-route-state__actions {
     width: 100%;
     align-items: stretch;
@@ -455,23 +424,6 @@
 
   .venue-route-state__actions > * {
     width: 100%;
-  }
-}
-
-@media (max-width: 27rem) {
-  .venue-module-shell__brand,
-  .venue-module-shell__divider {
-    display: none;
-  }
-}
-
-@media (max-width: 22.5rem) {
-  .venue-module-shell__module-icon {
-    display: none;
-  }
-
-  .venue-module-shell__title {
-    font-size: 0.75rem;
   }
 }
 
@@ -537,14 +489,16 @@
 /* Busca compacta no cabeçalho do módulo. */
 .venue-module-shell__search {
   display: flex;
+  width: 100%;
   min-width: 0;
   max-width: 20rem;
   flex: 1 1 14rem;
   align-items: center;
   gap: 0.45rem;
   height: 2.25rem;
-  margin-left: 0.85rem;
+  margin-right: auto;
   padding-inline: 0.7rem;
+  box-sizing: border-box;
   border: 1px solid rgb(196 213 255 / 0.24);
   border-radius: 999px;
   background: linear-gradient(180deg, rgb(255 255 255 / 0.12), rgb(4 12 32 / 0.35));
@@ -608,17 +562,164 @@
   background: rgb(255 255 255 / 0.2);
 }
 
+/*
+ * Cabeçalho mobile / tablet estreito (≤ 900px).
+ * Composição em duas linhas deliberadas:
+ *   linha 1 — [voltar] [marca] [contexto do módulo] ……… [sair]
+ *   linha 2 — [busca em toda a largura disponível]
+ * Nenhum filho pode recusar encolher (min-width: 0) e nada extrapola o viewport.
+ */
 @media (max-width: 900px) {
   .venue-module-shell__bar-inner {
-    flex-wrap: wrap;
+    --venue-shell-control: 2.75rem;
+    --venue-shell-search: 2.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "leading actions"
+      "search search";
+    align-items: center;
+    gap: 0.375rem 0.5rem;
+    min-height: 0;
+    padding: max(0.375rem, env(safe-area-inset-top))
+      max(0.75rem, env(safe-area-inset-right)) 0.5rem
+      max(0.75rem, env(safe-area-inset-left));
+  }
+
+  .venue-module-shell__leading {
+    grid-area: leading;
+    min-width: 0;
+    gap: 0.5rem;
+  }
+
+  .venue-module-shell__identity {
+    min-width: 0;
+    flex: 1 1 auto;
+    gap: 0.5rem;
+  }
+
+  .venue-module-shell__actions {
+    grid-area: actions;
   }
 
   .venue-module-shell__search {
-    order: 3;
-    max-width: none;
-    flex: 1 0 100%;
-    height: 2.75rem;
-    margin-left: 0;
-    margin-top: 0.5rem;
+    grid-area: search;
+    width: 100%;
+    max-width: 100%;
+    flex: none;
+    height: var(--venue-shell-search);
+    margin: 0;
+    padding-inline: 0.8rem;
+    border-radius: 0.75rem;
+  }
+
+  .venue-header-search__icon {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
+  .venue-header-search__input {
+    font-size: 0.875rem;
+  }
+
+  .venue-header-search__clear {
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-right: -0.25rem;
+  }
+
+  .venue-header-search__clear svg {
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+
+  .venue-module-shell__back,
+  .venue-module-shell__sign-out,
+  .venue-module-shell .venue-module-shell__sign-out {
+    width: var(--venue-shell-control);
+    min-width: var(--venue-shell-control);
+    height: var(--venue-shell-control);
+    min-height: var(--venue-shell-control);
+    padding: 0;
+  }
+
+  .venue-module-shell__back span,
+  .venue-module-shell__sign-out span,
+  .venue-module-shell__eyebrow {
+    display: none;
+  }
+
+  .venue-module-shell__back svg,
+  .venue-module-shell__sign-out svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .venue-module-shell__divider {
+    display: none;
+  }
+
+  .venue-module-shell__module-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.6rem;
+  }
+
+  /* Lockup empilhado: "AGENDA" como olho + "Restaurante e Arena" em destaque. */
+  .venue-module-shell__title {
+    overflow: visible;
+    line-height: 1.1;
+    white-space: normal;
+  }
+
+  .venue-module-shell__title .agenda-wordmark {
+    --wordmark-size: clamp(0.8rem, 3.6vw, 0.9rem);
+    --wordmark-gap: 0;
+  }
+
+  .venue-module-shell__title .agenda-wordmark__visual {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .venue-module-shell__title .agenda-wordmark__lead {
+    font-size: 0.68em;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .venue-module-shell__title .agenda-wordmark__underline {
+    margin-top: 0.1em;
+  }
+
+  .venue-module-shell__content {
+    --venue-shell-bar-offset: calc(6.5rem + env(safe-area-inset-top));
+    min-height: calc(100dvh - 6.5rem);
+  }
+}
+
+@media (max-width: 26rem) {
+  .venue-module-shell__brand {
+    display: none;
+  }
+}
+
+@media (max-width: 22.5rem) {
+  .venue-module-shell__bar-inner {
+    padding-right: max(0.625rem, env(safe-area-inset-right));
+    padding-left: max(0.625rem, env(safe-area-inset-left));
+  }
+
+  .venue-module-shell__module-icon {
+    display: none;
+  }
+
+  .venue-module-shell__title {
+    font-size: 0.78rem;
   }
 }
