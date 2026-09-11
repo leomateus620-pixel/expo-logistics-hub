@@ -147,9 +147,27 @@ export function agendaBadges(event: VenueEvent): VenueAgendaBadge[] {
 }
 
 export function agendaSearchTokens(event: VenueEvent): string {
-  return [event.contact_name, event.contact_phone, event.shift]
+  return [
+    event.contact_name,
+    event.contact_phone,
+    event.shift,
+    event.event_type,
+    event.requested_area,
+    event.executive_description,
+  ]
     .filter(Boolean)
     .join(" ");
+}
+
+/** Mês (01…12) do evento no fuso de Brasília, ou null quando sem data. */
+export function eventMonth(event: VenueEvent): string | null {
+  const source = event.start_at ?? event.reservation_start_date;
+  if (!source) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(source)) return source.slice(5, 7);
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    month: "2-digit",
+  }).format(new Date(source));
 }
 
 export function eventYear(event: VenueEvent): string | null {
