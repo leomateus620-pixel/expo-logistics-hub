@@ -408,7 +408,7 @@ async function sendPending(supa: ReturnType<typeof db>) {
   const eventIds = [...new Set(deliveries.map((delivery) => delivery.event_id))];
   const userIds = [...new Set(deliveries.map((delivery) => delivery.user_id))];
   const { data: events } = await supa.from("cronograma_eventos")
-    .select("id, org_id, title, start_date, end_date, start_time, end_time, location, pending_reason, decision_needed, commission_name")
+    .select("id, org_id, title, status, start_date, end_date, start_time, end_time, location, pending_reason, decision_needed, commission_name")
     .in("id", eventIds);
   const { data: links } = await supa.from("cronograma_evento_comissoes")
     .select("event_id, commission_id, commission_name_snapshot, relation_role, commissions(nome)")
