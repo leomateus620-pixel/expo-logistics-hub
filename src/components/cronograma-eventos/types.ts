@@ -56,6 +56,9 @@ export interface CronogramaEvent {
   isCentralMeeting?: boolean;
   /** Avisar todos os membros das comissões relacionadas (padrão: só lideranças). */
   notifyAllCommissionMembers?: boolean;
+  /** Onde o evento nasceu: agenda central ou agenda de uma comissão/assessoria. */
+  originSource?: 'agenda_central' | 'unidade';
+  originCommissionId?: string | null;
   pendingReason?: string;
   decisionNeeded?: string;
   createdAt?: string | null;
