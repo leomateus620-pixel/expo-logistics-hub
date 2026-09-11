@@ -139,6 +139,25 @@ function addUtcDays(date: string, days: number) {
   return next.toISOString().slice(0, 10);
 }
 
+/** "2026-09-15" -> "15 SET" (padrão de maiúsculas da Agenda). */
+function shortDateLabel(date: string | null | undefined) {
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  const [year, month, day] = date.split("-").map(Number);
+  const label = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "UTC",
+    day: "2-digit",
+    month: "short",
+  }).format(new Date(Date.UTC(year, month - 1, day, 12)));
+  return label.replace(/\./g, "").toLocaleUpperCase("pt-BR");
+}
+
+/** "18:00:00" -> "18h"; "18:30:00" -> "18h30". */
+function formatHourLabel(time: string | null | undefined) {
+  if (!time || !/^\d{2}:\d{2}/.test(time)) return null;
+  const [hour, minute] = time.split(":");
+  return minute === "00" ? `${Number(hour)}h` : `${Number(hour)}h${minute}`;
+}
+
 function relationName(link: EventRelationRow) {
   const joined = Array.isArray(link.commissions) ? link.commissions[0] : link.commissions;
   return String(joined?.nome ?? link.commission_name_snapshot ?? "").trim() || null;
