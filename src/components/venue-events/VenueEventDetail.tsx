@@ -1707,135 +1707,214 @@ export function VenueEventDetail({
               </TabsContent>
 
               <TabsContent value="historico" className="venue-detail-content">
-                {detailQuery.detailQuery.isLoading &&
-                !detailQuery.auditQuery.data?.length ? (
-                  <div className="venue-loading-inline">
-                    <Loader2 className="animate-spin" /> Carregando trilha…
-                  </div>
-                ) : (
-                  <div className="venue-history-list">
-                    {detailQuery.detailQuery.isError && (
-                      <div className="venue-detail-query-error" role="alert">
-                        <AlertTriangle />
-                        <div>
-                          <strong>
-                            Não foi possível consultar as decisões vinculadas
-                          </strong>
-                          <p>
-                            Os registros disponíveis foram preservados; tente
-                            novamente para completar a trilha.
-                          </p>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => void detailQuery.detailQuery.refetch()}
-                          disabled={detailQuery.detailQuery.isFetching}
-                        >
-                          <RefreshCw />
-                          Tentar novamente
-                        </Button>
-                      </div>
+                <div className="venue-history">
+                  <header className="venue-history__header">
+                    <div>
+                      <p className="venue-eyebrow">Linha do tempo</p>
+                      <h3>Histórico do evento</h3>
+                      <small>
+                        {historyItems.length}{" "}
+                        {historyItems.length === 1 ? "registro" : "registros"}
+                      </small>
+                    </div>
+                    {canCreateNote && !noteComposerOpen && (
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setEditingNoteId(null);
+                          setNoteDraft("");
+                          setNoteComposerOpen(true);
+                        }}
+                      >
+                        <Plus /> Adicionar apontamento
+                      </Button>
                     )}
-                    {detailQuery.detailQuery.data?.approvals.map((approval) => (
-                      <article key={approval.id}>
-                        <span>
-                          <ShieldCheck />
-                        </span>
-                        <div>
-                          <strong>
-                            {approval.decision.replaceAll("_", " ")}
-                          </strong>
-                          <small>
-                            {formatVenueDateTime(approval.created_at)} ·{" "}
-                            {memberName(approval.approver_id, members)}
-                          </small>
-                          {approval.reason && <p>{approval.reason}</p>}
-                        </div>
-                      </article>
-                    ))}
-                    {detailQuery.auditQuery.isLoading && (
-                      <div className="venue-loading-inline">
-                        <Loader2 className="animate-spin" /> Carregando
-                        auditoria…
-                      </div>
-                    )}
-                    {detailQuery.auditQuery.isError && (
-                      <div className="venue-detail-query-error" role="alert">
-                        <AlertTriangle />
-                        <div>
-                          <strong>
-                            Não foi possível completar a auditoria do evento
-                          </strong>
-                          <p>
-                            Nenhum estado vazio foi inferido a partir desta
-                            falha.
-                          </p>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => void detailQuery.auditQuery.refetch()}
-                          disabled={detailQuery.auditQuery.isFetching}
-                        >
-                          {detailQuery.auditQuery.isFetching ? (
-                            <Loader2 className="animate-spin" />
-                          ) : (
-                            <RefreshCw />
-                          )}
-                          Tentar novamente
-                        </Button>
-                      </div>
-                    )}
-                    {detailQuery.auditQuery.data?.map((entry) => {
-                      const diff = buildAuditDiff(
-                        entry.before_data,
-                        entry.after_data,
-                      );
-                      return (
-                        <article key={entry.id}>
-                          <span>
-                            <History />
-                          </span>
-                          <div>
-                            <strong>
-                              {String(
-                                entry.after_data?.venue_action || entry.action,
-                              ).replaceAll("_", " ")}
-                            </strong>
-                            <small>
-                              {formatVenueDateTime(entry.created_at)} ·{" "}
-                              {memberName(entry.actor_user_id, members)}
-                            </small>
-                            {entry.after_data?.reason && (
-                              <p>{String(entry.after_data.reason)}</p>
-                            )}
-                            {diff.length > 0 && (
-                              <ul className="venue-audit-diff">
-                                {diff.map((change) => (
-                                  <li key={change.label}>
-                                    <span>{change.label}</span>
-                                    <em data-tone="from">{change.from}</em>
-                                    <i aria-hidden="true">→</i>
-                                    <em data-tone="to">{change.to}</em>
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        </article>
-                      );
-                    })}
+                  </header>
 
-                    {!detailQuery.detailQuery.data?.approvals.length &&
-                      !detailQuery.auditQuery.data?.length &&
-                      !detailQuery.detailQuery.isError &&
-                      !detailQuery.auditQuery.isLoading && (
-                        <div className="venue-empty-compact">
-                          Nenhum registro disponível para este perfil.
-                        </div>
-                      )}
-                    {detailQuery.auditQuery.hasMore && (
+                  {canCreateNote && noteComposerOpen && (
+                    <div className="venue-history__composer">
+                      <Label htmlFor="venue-note-body">Apontamento</Label>
+                      <Textarea
+                        id="venue-note-body"
+                        value={noteDraft}
+                        autoFocus
+                        rows={3}
+                        maxLength={2000}
+                        placeholder="Ex.: CLIENTE CONFIRMOU 120 PESSOAS."
+                        onChange={(changeEvent) =>
+                          setNoteDraft(changeEvent.target.value)
+                        }
+                      />
+                      <div className="venue-history__composer-actions">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setNoteComposerOpen(false);
+                            setEditingNoteId(null);
+                            setNoteDraft("");
+                          }}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => void submitNote()}
+                          disabled={saveNote.isPending}
+                        >
+                          {saveNote.isPending && (
+                            <Loader2 className="animate-spin" />
+                          )}
+                          {editingNoteId ? "Salvar alteração" : "Registrar"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div
+                    className="venue-history__filters"
+                    role="tablist"
+                    aria-label="Filtrar histórico"
+                  >
+                    {VENUE_HISTORY_FILTERS.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        role="tab"
+                        aria-selected={historyFilter === option.value}
+                        data-active={historyFilter === option.value}
+                        onClick={() => setHistoryFilter(option.value)}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {(detailQuery.detailQuery.isError ||
+                    detailQuery.auditQuery.isError) && (
+                    <div className="venue-detail-query-error" role="alert">
+                      <AlertTriangle />
+                      <div>
+                        <strong>
+                          Não foi possível completar o histórico do evento
+                        </strong>
+                        <p>
+                          Os registros já carregados foram preservados; tente
+                          novamente para completar a trilha.
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          void detailQuery.detailQuery.refetch();
+                          void detailQuery.auditQuery.refetch();
+                        }}
+                        disabled={
+                          detailQuery.detailQuery.isFetching ||
+                          detailQuery.auditQuery.isFetching
+                        }
+                      >
+                        <RefreshCw /> Tentar novamente
+                      </Button>
+                    </div>
+                  )}
+
+                  {(detailQuery.detailQuery.isLoading ||
+                    detailQuery.auditQuery.isLoading ||
+                    notesQuery.isLoading) &&
+                  !historyItems.length ? (
+                    <div className="venue-loading-inline">
+                      <Loader2 className="animate-spin" /> Carregando histórico…
+                    </div>
+                  ) : visibleHistory.length ? (
+                    <ol className="venue-history-list venue-history-list--v2">
+                      {visibleHistory.map((item) => {
+                        const diff =
+                          item.source === "audit" && item.raw
+                            ? buildAuditDiff(
+                                item.raw.before_data,
+                                item.raw.after_data,
+                              )
+                            : [];
+                        const canManageNote =
+                          item.source === "note" &&
+                          (permissions.venue_events_manage ||
+                            item.actorUserId === user?.id);
+                        return (
+                          <li key={item.id} data-kind={item.kind}>
+                            <span className="venue-history-item__icon">
+                              {item.kind === "apontamento" ? (
+                                <MessageSquare />
+                              ) : item.kind === "documento" ? (
+                                <FileText />
+                              ) : (
+                                <History />
+                              )}
+                            </span>
+                            <div className="venue-history-item__body">
+                              <strong>
+                                {item.title}
+                                {item.kind === "apontamento" && (
+                                  <em className="venue-history-item__tag">
+                                    Apontamento
+                                  </em>
+                                )}
+                              </strong>
+                              <small>
+                                {formatVenueDateTime(item.at)} ·{" "}
+                                {memberName(item.actorUserId ?? "", members)}
+                                {item.edited ? " · editado" : ""}
+                              </small>
+                              {item.body && <p>{item.body}</p>}
+                              {item.reason && <p>{item.reason}</p>}
+                              {diff.length > 0 && (
+                                <ul className="venue-audit-diff">
+                                  {diff.map((change) => (
+                                    <li key={change.label}>
+                                      <span>{change.label}</span>
+                                      <em data-tone="from">{change.from}</em>
+                                      <i aria-hidden="true">→</i>
+                                      <em data-tone="to">{change.to}</em>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                              {canManageNote && item.noteId && (
+                                <div className="venue-history-item__actions">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingNoteId(item.noteId!);
+                                      setNoteDraft(item.body ?? "");
+                                      setNoteComposerOpen(true);
+                                    }}
+                                  >
+                                    Editar
+                                  </button>
+                                  <button
+                                    type="button"
+                                    data-tone="danger"
+                                    onClick={() => void removeNote(item.noteId!)}
+                                    disabled={deleteNote.isPending}
+                                  >
+                                    Remover
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  ) : (
+                    <div className="venue-empty-compact">
+                      Ainda não há registros neste evento.
+                    </div>
+                  )}
+
+                  {detailQuery.auditQuery.hasMore &&
+                    historyFilter !== "apontamentos" && (
                       <div className="venue-history-load-more">
                         <Button
                           variant="outline"
@@ -1847,12 +1926,11 @@ export function VenueEventDetail({
                           {detailQuery.auditQuery.isFetchingNextPage && (
                             <Loader2 className="animate-spin" />
                           )}
-                          Carregar mais auditoria
+                          Carregar mais
                         </Button>
                       </div>
                     )}
-                  </div>
-                )}
+                </div>
               </TabsContent>
             </div>
           </Tabs>
