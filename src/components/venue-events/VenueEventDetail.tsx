@@ -950,7 +950,7 @@ export function VenueEventDetail({
             <SheetHeader>
               <div className="venue-detail-badges">
                 <Badge>{EVENT_STATUS_LABELS[event.status]}</Badge>
-                <span>{EVENT_TYPE_LABELS[event.event_type]}</span>
+                <span>{venueEventTypeLabel(event.event_type)}</span>
                 {event.conflict_status === "conflito" && (
                   <span className="is-danger">
                     <AlertTriangle /> Conflito
@@ -1002,8 +1002,13 @@ export function VenueEventDetail({
                   />
                   <DetailFact
                     icon={Users}
-                    label="Solicitante"
+                    label="Requerente"
                     value={event.requester_name}
+                  />
+                  <DetailFact
+                    icon={ListChecks}
+                    label="Tipo do evento"
+                    value={venueEventTypeLabel(event.event_type)}
                   />
                   <DetailFact
                     icon={ShieldCheck}
