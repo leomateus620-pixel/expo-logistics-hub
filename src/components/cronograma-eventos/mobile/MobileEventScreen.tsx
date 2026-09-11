@@ -28,6 +28,8 @@ import {
   CronogramaStatusIndicator,
 } from '../CronogramaBadges';
 import { formatLongDate, formatLongDateRange } from '../dateUtils';
+import { formatEventDurationLabel, formatEventPeriod } from '@/lib/cronograma-event-period';
+import { getEventOperationalLines } from '@/lib/cronograma-event-details';
 import { EventForm } from '../EventForm';
 import { splitEventResponsibles } from '../EventRelationFields';
 import type { CronogramaEvent, CronogramaHistoryEntry } from '../types';
