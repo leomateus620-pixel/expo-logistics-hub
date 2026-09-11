@@ -1,3 +1,5 @@
+> Auditoria complementar de 11/09/2026: [carregamento e iluminação](commercial-map-systemic-performance.md). Os resultados históricos abaixo não certificam a versão atual.
+
 # Auditoria técnica de estabilidade do Mapa Comercial
 
 ## Contexto e escopo

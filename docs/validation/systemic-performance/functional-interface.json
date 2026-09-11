@@ -1,0 +1,28 @@
+[
+  {
+    "test": "search-list-panel-interior",
+    "health": "{\"status\":\"ready\",\"path\":\"direct\",\"presentedFrames\":1445,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "camera": "{\"position\":[-20.9276,11.6836,15.3709],\"target\":[-19.0582,0.107,15.3709],\"quaternion\":[-0.458418,-0.53838,-0.458418,0.53838],\"controlsEnabled\":true,\"interiorEntityId\":\"reference:2026:b1\",\"fov\":40,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.035,\"far\":120,\"distance\":11.7266,\"minDistance\":1.5578,\"maxDistance\":25.704,\"desiredMinDistance\":1.5578,\"desiredMaxDistance\":25.704,\"calculatedMaxDistance\":804.9298,\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1069.21875,\"height\":682.8125,\"aspect\":1.5659,\"dpr\":1}}"
+  },
+  {
+    "test": "rapid-dawn-night-with-selection-panel",
+    "before": "{\"position\":[-12.4032,14.0075,5.2479],\"target\":[-20.7956,0.7132,13.6318],\"quaternion\":[-0.156533,0.84307,0.37763,0.349464],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0.17769983925179014,\"y\":0},\"near\":0.07424,\"far\":3142.733,\"distance\":17.8174,\"minDistance\":8.7889,\"maxDistance\":804.9298,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":804.9298,\"calculatedMaxDistance\":804.9298,\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1069.21875,\"height\":682.8125,\"aspect\":1.5659,\"dpr\":1}}",
+    "after": "{\"position\":[-12.4032,14.0075,5.2479],\"target\":[-20.7956,0.7132,13.6318],\"quaternion\":[-0.156533,0.84307,0.37763,0.349464],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0.17769983925179014,\"y\":0},\"near\":0.07424,\"far\":3142.733,\"distance\":17.8174,\"minDistance\":8.7889,\"maxDistance\":804.9298,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":804.9298,\"calculatedMaxDistance\":804.9298,\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1069.21875,\"height\":682.8125,\"aspect\":1.5659,\"dpr\":1}}",
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":1851,\"contextLosses\":0,\"lastErrorCode\":null}"
+  },
+  {
+    "test": "exporural-fixture",
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":1876,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "camera": "{\"position\":[85.1553,67.4517,20.5466],\"target\":[27.6873,0.7147,-22.0909],\"quaternion\":[-0.327408,0.418245,0.164766,0.8311],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.06116,\"far\":3142.733,\"distance\":97.8487,\"minDistance\":8.1388,\"maxDistance\":804.9298,\"desiredMinDistance\":8.1388,\"desiredMaxDistance\":149.2121,\"calculatedMaxDistance\":804.9298,\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1069.21875,\"height\":682.8125,\"aspect\":1.5659,\"dpr\":1}}"
+  },
+  {
+    "test": "portrait-night-dawn-manual-drag",
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":2525,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "camera": "{\"position\":[-37.3981,446.6542,246.4392],\"target\":[-2.2546,0.744,-0.3832],\"quaternion\":[-0.504695,-0.060946,-0.03575,0.860401],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0.03426395939086294},\"near\":2.12864,\"far\":5407.744,\"distance\":510.874,\"minDistance\":8.7889,\"maxDistance\":1559.9338,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":1559.9338,\"calculatedMaxDistance\":1559.9338,\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":390,\"height\":788,\"aspect\":0.49492,\"dpr\":1}}"
+  },
+  {
+    "test": "landscape-resize",
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":2560,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "camera": "{\"position\":[-37.3982,446.6544,246.4389],\"target\":[-2.2546,0.744,-0.3832],\"quaternion\":[-0.504695,-0.060946,-0.03575,0.860401],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0.0854937660795567},\"near\":2.12864,\"far\":3142.733,\"distance\":510.874,\"minDistance\":8.7889,\"maxDistance\":804.9298,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":804.9298,\"calculatedMaxDistance\":804.9298,\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":821.21875,\"height\":315.8125,\"aspect\":2.60034,\"dpr\":1}}"
+  }
+]

@@ -1,0 +1,148 @@
+{
+  "entry": "src/pages/CommercialMapPage.tsx",
+  "chunks": [
+    {
+      "key": "src/pages/CommercialMapPage.tsx",
+      "file": "assets/CommercialMapPage-DSPu8uT9.js",
+      "bytes": 4316,
+      "gzipBytes": 1696
+    },
+    {
+      "key": "_react-vendor-DTjdp-YJ.js",
+      "file": "assets/react-vendor-DTjdp-YJ.js",
+      "bytes": 192974,
+      "gzipBytes": 64157
+    },
+    {
+      "key": "_module-runtime-CEDABylm.js",
+      "file": "assets/module-runtime-CEDABylm.js",
+      "bytes": 1244,
+      "gzipBytes": 724
+    },
+    {
+      "key": "_CommercialMapPage-BMICvaLx.js",
+      "file": "assets/CommercialMapPage-BMICvaLx.js",
+      "bytes": 540747,
+      "gzipBytes": 155891
+    },
+    {
+      "key": "index.html",
+      "file": "assets/index-SWFlJYA3.js",
+      "bytes": 589773,
+      "gzipBytes": 155979
+    },
+    {
+      "key": "_ui-radix-DJIQZdr7.js",
+      "file": "assets/ui-radix-DJIQZdr7.js",
+      "bytes": 137075,
+      "gzipBytes": 41207
+    },
+    {
+      "key": "_data-vendor-DAC_r2tT.js",
+      "file": "assets/data-vendor-DAC_r2tT.js",
+      "bytes": 221547,
+      "gzipBytes": 59644
+    },
+    {
+      "key": "_textarea-xOTXAPlt.js",
+      "file": "assets/textarea-xOTXAPlt.js",
+      "bytes": 522,
+      "gzipBytes": 342
+    },
+    {
+      "key": "_state-vendor-B3jmfb1d.js",
+      "file": "assets/state-vendor-B3jmfb1d.js",
+      "bytes": 2203,
+      "gzipBytes": 1034
+    },
+    {
+      "key": "_dropdown-menu-DVydnLhA.js",
+      "file": "assets/dropdown-menu-DVydnLhA.js",
+      "bytes": 4628,
+      "gzipBytes": 1355
+    },
+    {
+      "key": "_maximize-2-CLyqXZfL.js",
+      "file": "assets/maximize-2-CLyqXZfL.js",
+      "bytes": 467,
+      "gzipBytes": 315
+    },
+    {
+      "key": "_moon-C9MiV4vw.js",
+      "file": "assets/moon-C9MiV4vw.js",
+      "bytes": 311,
+      "gzipBytes": 252
+    },
+    {
+      "key": "_scroll-area-D2vfFnBj.js",
+      "file": "assets/scroll-area-D2vfFnBj.js",
+      "bytes": 2599,
+      "gzipBytes": 1031
+    },
+    {
+      "key": "_sliders-horizontal-DAEIc4gm.js",
+      "file": "assets/sliders-horizontal-DAEIc4gm.js",
+      "bytes": 1188,
+      "gzipBytes": 488
+    },
+    {
+      "key": "_warehouse-DVr_P2j-.js",
+      "file": "assets/warehouse-DVr_P2j-.js",
+      "bytes": 901,
+      "gzipBytes": 436
+    },
+    {
+      "key": "_chevron-up-B7bim-GJ.js",
+      "file": "assets/chevron-up-B7bim-GJ.js",
+      "bytes": 296,
+      "gzipBytes": 246
+    },
+    {
+      "key": "_rotate-ccw-CmZZRqiL.js",
+      "file": "assets/rotate-ccw-CmZZRqiL.js",
+      "bytes": 368,
+      "gzipBytes": 287
+    },
+    {
+      "key": "_dialog-R257m3y3.js",
+      "file": "assets/dialog-R257m3y3.js",
+      "bytes": 2518,
+      "gzipBytes": 991
+    },
+    {
+      "key": "_label-CQ4QeLpN.js",
+      "file": "assets/label-CQ4QeLpN.js",
+      "bytes": 370,
+      "gzipBytes": 272
+    },
+    {
+      "key": "_switch-BJYic-zx.js",
+      "file": "assets/switch-BJYic-zx.js",
+      "bytes": 852,
+      "gzipBytes": 459
+    },
+    {
+      "key": "_info-CF8SZ8SK.js",
+      "file": "assets/info-CF8SZ8SK.js",
+      "bytes": 368,
+      "gzipBytes": 279
+    },
+    {
+      "key": "_database-zap-BioYUvnw.js",
+      "file": "assets/database-zap-BioYUvnw.js",
+      "bytes": 507,
+      "gzipBytes": 350
+    },
+    {
+      "key": "_send-Bt7WQwpJ.js",
+      "file": "assets/send-Bt7WQwpJ.js",
+      "bytes": 459,
+      "gzipBytes": 332
+    }
+  ],
+  "staticBytes": 1706233,
+  "staticGzipBytes": 487767,
+  "rendererRequiredBeforeQuery": false,
+  "physicsRequiredBeforeQuery": false,
+  "pdfRequiredBeforeQuery": false
+}

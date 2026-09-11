@@ -1,0 +1,17 @@
+[
+  {
+    "test": "forced-context-loss-restore-night",
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":11427,\"contextLosses\":1,\"lastErrorCode\":null}",
+    "camera": "{\"position\":[3.8127,109.9563,104.2786],\"target\":[-2.2546,0.744,-0.3832],\"quaternion\":[-0.391939,0.026631,0.011351,0.919536],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.09462,\"far\":3142.733,\"distance\":151.3876,\"minDistance\":8.7889,\"maxDistance\":804.9298,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":804.9298,\"calculatedMaxDistance\":804.9298,\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1351,\"height\":467,\"aspect\":2.89293,\"dpr\":1}}"
+  },
+  {
+    "test": "hydrology-after-context-recovery",
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":11531,\"contextLosses\":1,\"lastErrorCode\":null}",
+    "camera": "{\"position\":[3.8127,109.9563,104.2786],\"target\":[-2.2546,0.744,-0.3832],\"quaternion\":[-0.391939,0.026631,0.011351,0.919536],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.09462,\"far\":3142.733,\"distance\":151.3876,\"minDistance\":8.7889,\"maxDistance\":804.9298,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":804.9298,\"calculatedMaxDistance\":804.9298,\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1351,\"height\":467,\"aspect\":2.89293,\"dpr\":1}}"
+  },
+  {
+    "test": "maximum-zoom-after-hydrology",
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":11663,\"contextLosses\":1,\"lastErrorCode\":null}",
+    "camera": "{\"position\":[-2.0159,7.0844,5.5535],\"target\":[-2.3681,0.744,-0.5227],\"quaternion\":[-0.391939,0.026631,0.011351,0.919536],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.03662,\"far\":3142.733,\"distance\":8.7889,\"minDistance\":8.7889,\"maxDistance\":804.9298,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":804.9298,\"calculatedMaxDistance\":804.9298,\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1351,\"height\":467,\"aspect\":2.89293,\"dpr\":1}}"
+  }
+]
