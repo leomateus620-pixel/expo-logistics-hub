@@ -76,7 +76,11 @@ import {
   normalizeSearchText,
 } from "@/lib/venue-agenda";
 import { VenueMonthFilter } from "@/components/venue-events/VenueMonthFilter";
-import { VenueEventDetail } from "@/components/venue-events/VenueEventDetail";
+import {
+  VenueEventDetail,
+  isVenueDetailTab,
+  type VenueDetailTab,
+} from "@/components/venue-events/VenueEventDetail";
 import {
   VenueEventCard,
   VenueEventSectionHeader,
