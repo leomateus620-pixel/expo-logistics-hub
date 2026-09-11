@@ -221,10 +221,26 @@ export function VenueEventCard({
       ? " — sem horário"
       : "";
 
+  const quickAction = (handler?: () => void) => (
+    eventObject: React.MouseEvent | React.KeyboardEvent,
+  ) => {
+    eventObject.stopPropagation();
+    handler?.();
+  };
+
   return (
-    <button
-      type="button"
+    // Contêiner clicável em <div> (e não <button>) para permitir os atalhos
+    // Documentos/Histórico como botões reais aninhados, sem HTML inválido.
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onOpen}
+      onKeyDown={(keyEvent) => {
+        if (keyEvent.key === "Enter" || keyEvent.key === " ") {
+          keyEvent.preventDefault();
+          onOpen();
+        }
+      }}
       data-status={event.status}
       data-variant={variant}
       className="venue-event-card"
