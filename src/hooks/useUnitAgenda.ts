@@ -67,7 +67,14 @@ export function useUnitIdentity(entryId: string | null | undefined) {
 export function useUnitAgenda(entryId: string | null | undefined) {
   const { orgId } = useCurrentOrg();
   const queryClient = useQueryClient();
-  const { commissionId, commissionSlug, resolveUnit, isLoading: identityLoading } = useUnitIdentity(entryId);
+  const {
+    commissionId,
+    commissionSlug,
+    resolveUnit,
+    unitOptions,
+    byCanonicalId,
+    isLoading: identityLoading,
+  } = useUnitIdentity(entryId);
 
   const agendaQuery = useQuery({
     queryKey: ['unit-agenda', orgId, commissionId],
