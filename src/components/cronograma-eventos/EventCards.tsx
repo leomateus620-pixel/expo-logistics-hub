@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { getEventOperationalLines } from '@/lib/cronograma-event-details';
+import { formatEventDurationLabel, formatEventPeriodShort, getEventPeriod } from '@/lib/cronograma-event-period';
 import {
   CronogramaCategoryMarker,
   CronogramaPriorityIndicator,
