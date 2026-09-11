@@ -13,6 +13,7 @@ import {
   MapPin,
   Paperclip,
   Link2,
+  ListChecks,
   Play,
   RefreshCw,
   Send,
