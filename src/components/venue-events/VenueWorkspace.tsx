@@ -2649,6 +2649,8 @@ export function VenueWorkspace() {
       <VenueEventDetail
         event={selectedEvent}
         open={Boolean(selectedEvent)}
+        tab={detailTab}
+        onTabChange={setDetailTab}
         onOpenChange={(next) => !next && closeEvent()}
         workspace={fullWorkspace}
         permissions={permissions}
