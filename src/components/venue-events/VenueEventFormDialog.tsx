@@ -850,9 +850,6 @@ export function VenueEventFormDialog({
                   <small>Responsável padrão desta agenda</small>
                 </div>
               </div>
-              {errors.requesterName && (
-                <p className="venue-field__error">{errors.requesterName}</p>
-              )}
               <div className="venue-form-grid">
                 <Field
                   id="venue-event-organization"
