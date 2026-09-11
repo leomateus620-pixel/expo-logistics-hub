@@ -136,12 +136,14 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
   const today = saoPauloDateString(now);
   const horizon = addUtcDays(today, 30);
 
+  // Sobreposição de intervalo: eventos de vários dias continuam elegíveis
+  // depois do primeiro dia (start <= horizonte AND fim >= hoje).
   const { data: events, error: eventsError } = await supa.from("cronograma_eventos")
-    .select("id, org_id, title, start_date, end_date, start_time, end_time, lock_version, has_exact_date, event_type, notify_all_commission_members")
+    .select("id, org_id, title, location, status, start_date, end_date, start_time, end_time, lock_version, has_exact_date, event_type, notify_all_commission_members")
     .eq("has_exact_date", true)
     .neq("event_type", "feriado")
-    .gte("start_date", today)
-    .lte("start_date", horizon);
+    .lte("start_date", horizon)
+    .or(`end_date.gte.${today},and(end_date.is.null,start_date.gte.${today})`);
   if (eventsError) throw new Error("reminder_events_query_failed");
 
   // Global recipients: users with capability 'cronograma_reminder_all' receive reminders for every non-holiday event of their org.
