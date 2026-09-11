@@ -299,8 +299,8 @@ export function EventDrawer({
                   <div className="cronograma-info-grid">
                     <InfoCard
                       icon={CalendarClock}
-                      label="Data e horário"
-                      value={`${formatLongDateRange(event.date, event.endDate)}${event.startTime ? ` · ${event.startTime}` : ''}${event.endTime ? ` às ${event.endTime}` : ''}`}
+                      label="Período"
+                      value={`${formatEventPeriod(event)}${formatEventDurationLabel(event) ? ` (${formatEventDurationLabel(event)})` : ''}`}
                     />
                     <InfoCard icon={MapPin} label="Local" value={event.location || 'Local a definir'} />
                     <RelationCard
