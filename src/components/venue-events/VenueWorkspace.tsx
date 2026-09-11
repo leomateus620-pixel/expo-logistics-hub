@@ -463,6 +463,7 @@ export function VenueWorkspace() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [spaceFilter, setSpaceFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("2026");
+  const [monthFilter, setMonthFilter] = useState("all");
   const [includeHistory, setIncludeHistory] = useState(false);
   const [reviewOnly, setReviewOnly] = useState(false);
   const [agendaMode, setAgendaMode] = useState<"dia" | "semana" | "mes">(
