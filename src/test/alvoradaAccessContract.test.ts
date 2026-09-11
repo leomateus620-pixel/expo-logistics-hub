@@ -12,11 +12,12 @@ function implementationSources(directory: string): string[] {
     if (entry.isDirectory()) {
       return entry.name === 'test' ? [] : implementationSources(absolute);
     }
-    return ['.ts', '.tsx'].includes(extname(entry.name)) ? [absolute] : [];
+    if (!['.ts', '.tsx'].includes(extname(entry.name))) return [];
+    return /\.test\.tsx?$/.test(entry.name) ? [] : [absolute];
   });
 }
 
-describe('contrato de acesso exclusivo à Alvorada', () => {
+describe('contrato de acesso: ecossistema direto e introdução embutida na contagem', () => {
   const app = source('src/App.tsx');
   const portalPage = source('src/pages/commissions/CommissionPortalPage.tsx');
   const portalRegistry = source('src/modules/portal/portalRegistry.ts');
@@ -24,9 +25,14 @@ describe('contrato de acesso exclusivo à Alvorada', () => {
   const logisticsLayout = source('src/components/Layout.tsx');
   const brand = source('src/components/brand/FenasojaBrand.tsx');
   const portalHero = source('src/components/portal/FenasojaPortalHero.tsx');
+  const countdownCompact = source('src/components/countdown/OfficialCountdownCompact.tsx');
   const capabilities = source('src/features/alvorada/capabilities.ts');
   const alvoradaCss = source('src/features/alvorada/alvorada.css');
-  const experience = source('src/features/alvorada/FenasojaAlvoradaExperience.tsx');
+  const introCss = source('src/features/alvorada/alvorada-intro.css');
+  const ecosystem = source('src/features/alvorada/FenasojaEcosystemExperience.tsx');
+  const intro = source('src/features/alvorada/AlvoradaIntro.tsx');
+  const introSession = source('src/features/alvorada/introSession.ts');
+  const labels = source('src/features/alvorada/ecosystemLabels.ts');
   const allImplementation = implementationSources(resolve('src'))
     .map((file) => readFileSync(file, 'utf8'))
     .join('\n');
@@ -34,20 +40,36 @@ describe('contrato de acesso exclusivo à Alvorada', () => {
     .map((file) => readFileSync(file, 'utf8'))
     .join('\n');
 
-  it('expõe um único launcher no bloco de marca FENASOJA 2028 existente', () => {
-    expect(allImplementation.match(/aria-label="Abrir O Nascer da Alvorada"/g)).toHaveLength(1);
+  it('expõe um único launcher no bloco de marca FENASOJA 2028 e abre o ecossistema diretamente', () => {
+    expect(labels).toContain("ECOSYSTEM_OPEN_LABEL = 'Abrir Ecossistema Fenasoja'");
+    expect(allImplementation.match(/aria-label=\{ECOSYSTEM_OPEN_LABEL\}/g)).toHaveLength(1);
+    expect(allImplementation).not.toContain('Abrir O Nascer da Alvorada');
     expect(portalPage.match(/className="fenasoja-portal__alvorada-launcher"/g)).toHaveLength(1);
     expect(portalPage).toMatch(
       /<button[\s\S]*?className="fenasoja-portal__alvorada-launcher"[\s\S]*?<FenasojaBrand[\s\S]*?<FenasojaBrand[\s\S]*?<\/button>/,
     );
     expect(portalPage).toContain('aria-haspopup="dialog"');
-    expect(portalPage).toContain('aria-expanded={alvoradaOpen}');
+    expect(portalPage).toContain('aria-expanded={ecosystemOpen}');
+    expect(portalPage).toContain('onClick={openEcosystem}');
+    // Opening the ecosystem ends any intro still playing in the countdown card.
+    expect(portalPage).toMatch(/const openEcosystem = useCallback\(\(\) => \{[\s\S]*?dismissAlvoradaIntro\(\);/);
+  });
+
+  it('o diálogo do ecossistema não executa mais a sequência de planeta e alvorada', () => {
+    expect(ecosystem).not.toMatch(/AlvoradaCanvas|HarvestBackdrop|AlvoradaBrandHero|@react-three|three/);
+    expect(ecosystem).not.toMatch(/getAlvoradaWebGLTier|getAlvoradaQualityProfile|MasterTimeline/);
+    expect(ecosystem).toContain('<OrganizationalEcosystem');
+    expect(ecosystem).toContain('role="dialog"');
+    expect(ecosystem).toContain('aria-modal="true"');
+    expect(ecosystem).toContain('aria-label={ECOSYSTEM_DIALOG_LABEL}');
+    expect(ecosystem).not.toMatch(/useNavigate|<Link|window\.location|history\./);
+    expect(allImplementation).not.toContain('FenasojaAlvoradaExperience');
   });
 
   it('não cria rota, deep link, menu, atalho ou registry paralelo', () => {
     for (const sourceText of [app, portalRegistry, sidebar, logisticsLayout, brand]) {
       expect(sourceText).not.toMatch(/\/alvorada|o-nascer-da-alvorada/i);
-      expect(sourceText).not.toContain('FenasojaAlvoradaExperience');
+      expect(sourceText).not.toContain('FenasojaEcosystemExperience');
     }
     expect(app).not.toMatch(/path=["'].*alvorada/i);
     expect(portalRegistry).not.toMatch(/alvorada/i);
@@ -55,29 +77,46 @@ describe('contrato de acesso exclusivo à Alvorada', () => {
 
     const featureConsumers = implementationSources(resolve('src'))
       .filter((file) => readFileSync(file, 'utf8').includes(
-        "@/features/alvorada/FenasojaAlvoradaExperience",
+        "@/features/alvorada/FenasojaEcosystemExperience",
       ));
     expect(featureConsumers.map((file) => file.replaceAll('\\', '/'))).toEqual([
       expect.stringMatching(/src\/pages\/commissions\/CommissionPortalPage\.tsx$/),
     ]);
   });
 
-  it('mantém a contagem oficial como experiência separada na rota já existente', () => {
+  it('embute a introdução no card da contagem oficial sem substituir a contagem', () => {
     expect(app).toContain('path="/cronograma-eventos/contagem-oficial"');
     expect(portalPage).toContain('<FenasojaPortalHero />');
-    expect(portalHero).toContain('OfficialCountdownCompact');
-    expect(portalHero).not.toMatch(/Alvorada|alvorada/);
-    expect(experience).not.toMatch(/useNavigate|<Link|window\.location|history\./);
-    expect(experience).toContain('role="dialog"');
-    expect(experience).toContain('aria-modal="true"');
+    expect(portalHero).toContain('<OfficialCountdownCompact concealed={introActive} />');
+    expect(portalHero).toContain("const loadAlvoradaIntro = () => import('@/features/alvorada/AlvoradaIntro')");
+    expect(portalHero).toContain('const AlvoradaIntro = lazy(loadAlvoradaIntro)');
+    expect(portalHero).not.toMatch(/createPortal|role="dialog"|aria-modal/);
+    expect(portalHero).toContain('Pular animação');
+    // The countdown keeps its layout and clock while concealed: it is hidden,
+    // never unmounted, so the card never jumps when the intro leaves.
+    expect(countdownCompact).toContain('data-concealed={concealed || undefined}');
+    expect(countdownCompact).toMatch(/concealed \? \(\{ inert: '' \}/);
+    expect(countdownCompact).toContain('useFenasojaCountdown');
+    expect(countdownCompact).not.toMatch(/new Date\(['"]2028/);
+    expect(intro).not.toMatch(/useNavigate|<Link|window\.location|history\.|createPortal/);
+    expect(intro).not.toMatch(/'org-transition'|'org-ready'/);
+  });
+
+  it('não persiste o autoplay entre acessos e não usa a viewport dentro do card', () => {
+    expect(introSession).not.toMatch(/localStorage|sessionStorage|document\.cookie|indexedDB/);
+    expect(introCss).not.toMatch(/\d(vw|vh|svh|dvh|lvh)\b/);
+    expect(introCss).toContain('container-type: size');
+    expect(introCss).toContain('pointer-events: none');
+    expect(intro).not.toMatch(/window\.innerWidth|window\.innerHeight/);
   });
 
   it('carrega a cena sob demanda e mantém o dataset urbano arquivado fora do runtime', () => {
     expect(portalPage).toContain(
-      "const loadAlvoradaExperience = () => import('@/features/alvorada/FenasojaAlvoradaExperience')",
+      "const loadEcosystemExperience = () => import('@/features/alvorada/FenasojaEcosystemExperience')",
     );
-    expect(portalPage).toContain('const FenasojaAlvoradaExperience = lazy(loadAlvoradaExperience)');
-    expect(portalPage).toContain('<FenasojaAlvoradaExperience onComplete={closeAlvorada} />');
+    expect(portalPage).toContain('const FenasojaEcosystemExperience = lazy(loadEcosystemExperience)');
+    expect(portalPage).toContain('<FenasojaEcosystemExperience onComplete={closeEcosystem} />');
+    expect(portalPage).not.toMatch(/from '@\/features\/alvorada\/AlvoradaIntro'/);
 
     const shippedAssets = readdirSync(resolve('public/alvorada'));
     expect(shippedAssets).toContain('santa-rosa-city-v2.json');
@@ -89,14 +128,18 @@ describe('contrato de acesso exclusivo à Alvorada', () => {
     expect(shippedAssets).not.toContain('0317D251-1A8A-4036-91C2-8DF02808D0DC.png');
   });
 
-  it('não encurta nem oculta a experiência WebGL no CSS de movimento reduzido', () => {
+  it('respeita movimento reduzido no host, sem encurtar a cena WebGL pelo CSS', () => {
     const globalCss = readFileSync(resolve('src/index.css'), 'utf8');
     expect(globalCss).toContain('*:not(.alvorada-overlay, .alvorada-overlay *)');
     expect(alvoradaCss).not.toContain('prefers-reduced-motion');
+    expect(introCss).not.toContain('prefers-reduced-motion');
     expect(alvoradaCss).toContain('alvorada-overlay-enter 280ms');
     expect(alvoradaCss).toContain('alvorada-overlay-exit 400ms');
     expect(alvoradaImplementation).not.toMatch(
       /useReducedMotion|matchMedia\([^)]*prefers-reduced-motion/,
     );
+    // The host decides: reduced motion selects the static dawn presentation.
+    expect(portalHero).toContain("'(prefers-reduced-motion: reduce)'");
+    expect(portalHero).toContain("prefersReducedMotion() ? 'static' : 'cinematic'");
   });
 });

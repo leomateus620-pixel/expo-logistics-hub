@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import CommissionPortalPage from '@/pages/commissions/CommissionPortalPage';
+import { markAlvoradaIntroStarted } from '@/features/alvorada/introSession';
 import { SELECTED_COMMISSION_STORAGE_KEY } from '@/modules/commissions/commissionRegistry';
 
 const portalMocks = vi.hoisted(() => ({
@@ -90,6 +91,9 @@ function setReducedMotionPreference(matches: boolean) {
 
 describe('CommissionPortalPage', () => {
   beforeEach(() => {
+    // These specs cover the portal at rest. The embedded countdown intro that
+    // plays on a new access is exercised by alvoradaPortalIntegration.test.tsx.
+    markAlvoradaIntroStarted();
     setReducedMotionPreference(false);
     localStorage.clear();
     sessionStorage.clear();

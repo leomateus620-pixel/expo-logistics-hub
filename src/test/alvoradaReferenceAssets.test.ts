@@ -139,10 +139,7 @@ describe('assets oficiais e panoramas da Alvorada', () => {
     vi.stubGlobal('fetch', fetchMock);
     vi.resetModules();
 
-    const {
-      streamAlvoradaSecondaryAssets,
-      warmAlvoradaAssets,
-    } = await import('@/features/alvorada/capabilities');
+    const { warmAlvoradaAssets } = await import('@/features/alvorada/capabilities');
     warmAlvoradaAssets();
 
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
@@ -157,18 +154,8 @@ describe('assets oficiais e panoramas da Alvorada', () => {
       (options as RequestInit).cache === 'force-cache'
     ))).toBe(true);
 
-    streamAlvoradaSecondaryAssets();
-    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
-      '/alvorada/earth-surface-4096.webp',
-      '/alvorada/earth-night-lights-2048.png',
-      '/alvorada/earth-normal-2048.jpg',
-      '/alvorada/earth-clouds-2048.webp',
-      '/alvorada/brazil-min.geojson',
-      '/alvorada/rio-grande-do-sul-min.geojson',
-    ]);
-
+    // Warming is idempotent: the embedded intro and its host both call it.
     warmAlvoradaAssets();
-    streamAlvoradaSecondaryAssets();
     expect(fetchMock).toHaveBeenCalledTimes(6);
   });
 });
