@@ -8007,6 +8007,8 @@ export type Database = {
           lock_version: number | null
           month_label: string | null
           org_id: string | null
+          origin_commission_id: string | null
+          origin_source: string | null
           pending_reason: string | null
           priority: string | null
           responsible_name: string | null
@@ -8049,6 +8051,8 @@ export type Database = {
           lock_version?: number | null
           month_label?: string | null
           org_id?: string | null
+          origin_commission_id?: string | null
+          origin_source?: string | null
           pending_reason?: string | null
           priority?: string | null
           responsible_name?: string | null
@@ -8091,6 +8095,8 @@ export type Database = {
           lock_version?: number | null
           month_label?: string | null
           org_id?: string | null
+          origin_commission_id?: string | null
+          origin_source?: string | null
           pending_reason?: string | null
           priority?: string | null
           responsible_name?: string | null
@@ -8116,6 +8122,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cronograma_eventos_origin_commission_id_fkey"
+            columns: ["origin_commission_id"]
+            isOneToOne: false
+            referencedRelation: "commissions"
             referencedColumns: ["id"]
           },
         ]
