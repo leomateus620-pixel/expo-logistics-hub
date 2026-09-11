@@ -76,7 +76,10 @@ const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
 const UnsubscribePage = lazyWithRetry(() => import('./pages/UnsubscribePage'));
 const CommissionPortalPage = lazyWithRetry(() => import('./pages/commissions/CommissionPortalPage'));
 const CommissionDashboardPlaceholder = lazyWithRetry(() => import('./pages/commissions/CommissionDashboardPlaceholder'));
-const CommissionFrontPage = lazyWithRetry(() => import('./pages/commissions/CommissionFrontPage'));
+const CommissionWorkspacePage = lazyWithRetry(() => import('./pages/commissions/CommissionWorkspacePage'));
+const CommissionAgendaPreviewPage = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
+  ? lazyWithRetry(() => import('./features/commission-agenda/dev/CommissionAgendaPreviewPage'))
+  : null;
 const FinancialManagementPage = lazyWithRetry(() => import('./pages/commissions/FinancialManagementPage'));
 const CommissionCommercialMapPage = lazyWithRetry(() => import('./pages/commissions/CommissionCommercialMapPage'));
 const AdminPortalPage = lazyWithRetry(() => import('./pages/admin/AdminPortalPage'));
@@ -287,6 +290,20 @@ function CommissionModuleRoutes() {
     );
   }
 
+  if (isDerivedFront && officialUnit) {
+    return (
+      <AuthGuard>
+        <OrgGuard>
+          <ModuleAccessGuard module={module}>
+            <Suspended>
+              <CommissionWorkspacePage module={module} entry={officialUnit.entry} />
+            </Suspended>
+          </ModuleAccessGuard>
+        </OrgGuard>
+      </AuthGuard>
+    );
+  }
+
   return (
     <AuthGuard>
       <OrgGuard>
@@ -295,8 +312,6 @@ function CommissionModuleRoutes() {
             <Suspended>
               {module.slug === 'financeiro-gerencial' ? (
                 <FinancialManagementPage module={module} />
-              ) : isDerivedFront && officialUnit ? (
-                <CommissionFrontPage module={module} entry={officialUnit.entry} />
               ) : (
                 <CommissionDashboardPlaceholder module={module} />
               )}
@@ -446,6 +461,9 @@ const App = () => (
               <Route path="/eventos-restaurante-arena/:venueSlug/:viewSlug" element={<VenueEventsModuleRoute />} />
               <Route path="/mapa-comercial" element={<CommercialMapRoute />} />
               {ExteriorCatalogQa && <Route path="/__dev/exterior-catalog" element={<Suspended><ExteriorCatalogQa /></Suspended>} />}
+              {CommissionAgendaPreviewPage && (
+                <Route path="/__dev/comissao-agenda" element={<Suspended><CommissionAgendaPreviewPage /></Suspended>} />
+              )}
               {CommercialMapInterfaceDiagnosticsPage && (
                 <Route path="/__dev/commercial-map-interface" element={<Suspended><CommercialMapInterfaceDiagnosticsPage /></Suspended>} />
               )}

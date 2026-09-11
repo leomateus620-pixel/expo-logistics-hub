@@ -7,20 +7,24 @@ import { cn } from '@/lib/utils';
 import {
   getModuleRoute,
   statusLabels,
+  type CommissionMenuItem,
   type CommissionModule,
 } from '@/modules/commissions/commissionRegistry';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 
 interface CommissionSidebarProps {
   module: CommissionModule;
+  /** Optional items replacing `module.menus` (e.g. workspace sections). */
+  menuItems?: CommissionMenuItem[];
   mobileOpen: boolean;
   onMobileOpen: () => void;
   onMobileClose: () => void;
 }
 
-export default function CommissionSidebar({ module, mobileOpen, onMobileOpen, onMobileClose }: CommissionSidebarProps) {
+export default function CommissionSidebar({ module, menuItems, mobileOpen, onMobileOpen, onMobileClose }: CommissionSidebarProps) {
   const { signOut } = useAuth();
   const ModuleIcon = module.icon;
+  const items = menuItems ?? module.menus;
   const openButtonRef = useRef<HTMLButtonElement>(null);
   const mobileDrawerRef = useRef<HTMLDivElement>(null);
 
@@ -118,7 +122,7 @@ export default function CommissionSidebar({ module, mobileOpen, onMobileOpen, on
       </div>
 
       <nav className="premium-sidebar-scrollbar flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label={`Menu ${module.name}`}>
-        {module.menus.map((item) => {
+        {items.map((item) => {
           const Icon = item.icon;
           const target = getModuleRoute(module, item.path);
           return (
@@ -172,6 +176,7 @@ export default function CommissionSidebar({ module, mobileOpen, onMobileOpen, on
         ref={openButtonRef}
         type="button"
         onClick={onMobileOpen}
+        data-commission-menu-open
         className="fixed left-3 top-3 z-30 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-border bg-card p-2.5 text-foreground shadow-[var(--shadow-xs)] focus-ring md:hidden"
         aria-label="Abrir menu"
         aria-expanded={mobileOpen}
