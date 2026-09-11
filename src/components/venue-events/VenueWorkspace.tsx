@@ -1633,32 +1633,34 @@ export function VenueWorkspace() {
 
 
                     <span className="venue-agenda-card__body">
-                      <strong>{event.title}</strong>
+                      <strong>{toDisplayUpper(event.title)}</strong>
+                      <span className="venue-agenda-card__requester">
+                        <UserRound aria-hidden="true" />
+                        {toDisplayUpper(event.requester_name) ||
+                          "Requerente não informado"}
+                      </span>
                       <span className="venue-agenda-card__chips">
                         <span data-kind="space">
                           <MapPin aria-hidden="true" />
                           {spaceLabel || "Área não definida"}
                         </span>
-                        <span
-                          data-kind="sponsor"
-                          data-empty={!sponsorLabel || sponsorLabel === "Sem vínculo"}
-                        >
-                          <Building2 aria-hidden="true" />
-                          {sponsorLabel || "Sem vínculo"}
-                        </span>
-                        <span data-kind="responsible">
-                          <UserRound aria-hidden="true" />
-                          {responsibleLabel}
-                        </span>
-                        <span
-                          data-kind="counterpart"
-                          data-empty={!hasCounterpart}
-                        >
-                          <Handshake aria-hidden="true" />
-                          {hasCounterpart
-                            ? "Contrapartida vinculada"
-                            : "Sem contrapartida"}
-                        </span>
+                        {event.event_type && (
+                          <span data-kind="type">
+                            {venueEventTypeLabel(event.event_type)}
+                          </span>
+                        )}
+                        {sponsorLabel && sponsorLabel !== "Sem vínculo" && (
+                          <span data-kind="sponsor">
+                            <Building2 aria-hidden="true" />
+                            {sponsorLabel}
+                          </span>
+                        )}
+                        {hasCounterpart && (
+                          <span data-kind="counterpart">
+                            <Handshake aria-hidden="true" />
+                            Contrapartida
+                          </span>
+                        )}
                       </span>
                     </span>
 
