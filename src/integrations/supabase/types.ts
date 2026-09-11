@@ -2445,6 +2445,8 @@ export type Database = {
           id: string
           idempotency_key: string
           last_error: string | null
+          notification_date: string | null
+          notification_type: string
           offset_minutes: number
           org_id: string
           scheduled_for: string
@@ -2461,6 +2463,8 @@ export type Database = {
           id?: string
           idempotency_key: string
           last_error?: string | null
+          notification_date?: string | null
+          notification_type?: string
           offset_minutes: number
           org_id: string
           scheduled_for: string
@@ -2477,6 +2481,8 @@ export type Database = {
           id?: string
           idempotency_key?: string
           last_error?: string | null
+          notification_date?: string | null
+          notification_type?: string
           offset_minutes?: number
           org_id?: string
           scheduled_for?: string
