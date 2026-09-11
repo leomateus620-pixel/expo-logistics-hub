@@ -182,7 +182,12 @@ interface VenueEventCardProps {
   sponsorLabel?: string | null;
   hasCounterpart?: boolean;
   showType?: boolean;
+  documentCount?: number;
   onOpen: () => void;
+  /** Atalho: abre o mesmo evento direto na aba Documentos. */
+  onOpenDocuments?: () => void;
+  /** Atalho: abre o mesmo evento direto na aba Histórico. */
+  onOpenHistory?: () => void;
 }
 
 export function VenueEventCard({
@@ -192,7 +197,10 @@ export function VenueEventCard({
   sponsorLabel,
   hasCounterpart = false,
   showType = false,
+  documentCount,
   onOpen,
+  onOpenDocuments,
+  onOpenHistory,
 }: VenueEventCardProps) {
   const title = toDisplayUpper(event.title);
   const startLabel = formatVenueHour(event.start_at);
