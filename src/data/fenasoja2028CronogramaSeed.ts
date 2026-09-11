@@ -129,6 +129,9 @@ export interface CronogramaEventSeed {
   hasExactDate: boolean;
   /** Quando true, comissões relacionadas avisam todos os membros, não só lideranças. */
   notifyAllCommissionMembers?: boolean;
+  /** Onde o evento foi criado: agenda central ou a agenda de uma comissão/assessoria. */
+  originSource?: 'agenda_central' | 'unidade';
+  originCommissionId?: string | null;
   linkedCommissions?: CronogramaCommissionLink[];
   subevents?: CronogramaSubeventSeed[];
   lockVersion?: number | null;
