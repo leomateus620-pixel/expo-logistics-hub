@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
+import { formatEventPeriodShort, getEventPeriod } from '@/lib/cronograma-event-period';
 import { officialMemberLabel, resolveOfficialMembers } from '@/lib/memberIdentity';
 import { ORG_UNIT_SELECT_LABEL } from '@/lib/org-units';
 import {
