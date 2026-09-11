@@ -27,4 +27,3 @@ export function bumperCarSpawn(index: number): [number, number, number] {
   const row = Math.floor(index / 3);
   return [-0.72 + column * 0.72, 0.34, -0.43 + row * 0.56];
 }
-

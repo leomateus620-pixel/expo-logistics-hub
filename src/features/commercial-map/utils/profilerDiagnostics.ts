@@ -22,4 +22,3 @@ export const recordCommercialMapProfiler: ProfilerOnRenderCallback = (
   });
   if (diagnostics.reactCommits.length > 240) diagnostics.reactCommits.splice(0, diagnostics.reactCommits.length - 240);
 };
-
