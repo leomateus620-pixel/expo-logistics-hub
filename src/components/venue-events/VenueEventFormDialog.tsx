@@ -983,8 +983,8 @@ export function VenueEventFormDialog({
                   <Field
                     id="venue-event-change-reason"
                     field="changeReason"
-                    label="Motivo da alteração"
-                    hint="Obrigatório quando um evento confirmado muda de data ou espaço."
+                    label="Motivo da alteração (opcional)"
+                    hint="Se preenchido, aparece junto do registro automático no histórico."
                     error={errors.changeReason}
                     full
                   >
@@ -998,6 +998,7 @@ export function VenueEventFormDialog({
                     />
                   </Field>
                 )}
+
               </div>
             </section>
 
@@ -1092,14 +1093,15 @@ export function VenueEventFormDialog({
                       {checking
                         ? "Validando disponibilidade…"
                         : effectiveConflicts.length
-                          ? `${effectiveConflicts.length} ${effectiveConflicts.length === 1 ? "conflito encontrado" : "conflitos encontrados"}`
-                          : "Disponibilidade confirmada"}
+                          ? `${effectiveConflicts.length} ${effectiveConflicts.length === 1 ? "sobreposição de horário" : "sobreposições de horário"}`
+                          : "Sem sobreposição de horário"}
                     </strong>
                     <p>
                       {effectiveConflicts.length
-                        ? "Ajuste o período ou registre uma exceção autorizada."
-                        : "Nenhuma sobreposição ou bloqueio no período informado."}
+                        ? "O aviso é informativo: você pode salvar mesmo assim e o registro fica no histórico."
+                        : "Nenhum outro evento ou bloqueio no período informado."}
                     </p>
+
                   </div>
                   <Button
                     type="button"
@@ -1136,52 +1138,8 @@ export function VenueEventFormDialog({
                 )}
               </div>
 
-              {effectiveConflicts.length > 0 &&
-                permissions.venue_events_conflict_override && (
-                  <div className="venue-exception-panel">
-                    <div className="venue-preliminary-toggle">
-                      <div>
-                        <strong>Registrar exceção autorizada</strong>
-                        <p>
-                          A justificativa e o usuário autorizador ficarão no
-                          histórico imutável.
-                        </p>
-                      </div>
-                      <Switch
-                        id="venue-event-conflict-override"
-                        aria-label="Registrar exceção autorizada"
-                        checked={draft.conflictOverride}
-                        onCheckedChange={(checked) =>
-                          update("conflictOverride", checked)
-                        }
-                      />
-                    </div>
-                    {draft.conflictOverride && (
-                      <Field
-                        id="venue-event-conflict-reason"
-                        field="conflictOverrideReason"
-                        label="Justificativa da exceção"
-                        error={errors.conflictOverrideReason}
-                        required={draft.conflictOverride}
-                        full
-                      >
-                        <Textarea
-                          id="venue-event-conflict-reason"
-                          value={draft.conflictOverrideReason}
-                          onChange={(event) =>
-                            update("conflictOverrideReason", event.target.value)
-                          }
-                          rows={3}
-                        />
-                      </Field>
-                    )}
-                    {errors.conflictOverride && (
-                      <p className="venue-field__error">
-                        {errors.conflictOverride}
-                      </p>
-                    )}
-                  </div>
-                )}
+
+
             </section>
           </div>
 

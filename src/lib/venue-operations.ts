@@ -646,17 +646,9 @@ export const venueEventDraftSchema = z
         message: "A desmontagem não pode terminar antes do evento.",
       });
     }
-    if (
-      draft.conflictOverride &&
-      draft.conflictOverrideReason.trim().length < 8
-    ) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["conflictOverrideReason"],
-        message:
-          "Justifique a exceção de conflito com pelo menos 8 caracteres.",
-      });
-    }
+    // A exceção autorizada foi descontinuada: sobreposição de horário é apenas
+    // um alerta informativo e não exige justificativa para salvar.
+
   });
 
 export const venueStakeholderSchema = z.object({
@@ -975,110 +967,10 @@ export function findLocalAvailabilityConflicts(
     });
   });
 
-  const audience = Number(
-    draft.confirmedAudience || draft.estimatedAudience || 0,
-  );
-  const selectedCapacitySpaces = data.spaces.filter(
-    (space) =>
-      draft.venueIds.includes(space.id) && typeof space.capacity === "number",
-  );
-  const combinedCapacity = selectedCapacitySpaces.reduce(
-    (sum, space) => sum + (space.capacity ?? 0),
-    0,
-  );
-  if (selectedCapacitySpaces.length > 0 && audience > combinedCapacity) {
-    const primarySpace = selectedCapacitySpaces[0];
-    const spaceNames = selectedCapacitySpaces
-      .map((space) => space.name)
-      .join(" + ");
-    conflicts.push({
-      id: `capacity-${primarySpace.id}`,
-      kind: "capacity",
-      spaceId: primarySpace.id,
-      title:
-        selectedCapacitySpaces.length === 1
-          ? `Capacidade de ${primarySpace.name} excedida`
-          : "Capacidade combinada dos espaços excedida",
-      startsAt: schedule.startAt,
-      endsAt: schedule.endAt,
-      detail: `Público de ${audience} pessoas para capacidade cadastrada de ${combinedCapacity} em ${spaceNames}.`,
-    });
-  }
+  // Regra vigente: somente sobreposição temporal (evento x evento e bloqueios
+  // de espaço) gera alerta. Capacidade, tipo de evento, montagem/desmontagem e
+  // faixa de operação padrão deixaram de ser tratados como conflito.
 
-  data.spaces
-    .filter((space) => draft.venueIds.includes(space.id))
-    .forEach((space) => {
-      // O tipo virou texto livre: a política do espaço só é avaliada quando o
-      // tipo informado pertence ao catálogo legado de usos permitidos.
-      if (
-        space.allowed_event_types.length > 0 &&
-        isLegacyVenueEventType(draft.eventType) &&
-        !space.allowed_event_types.includes(
-          draft.eventType.trim().toLocaleLowerCase("pt-BR"),
-        )
-      ) {
-        conflicts.push({
-          id: `policy-type-${space.id}`,
-          kind: "policy",
-          spaceId: space.id,
-          title: `Tipo de evento não permitido em ${space.name}`,
-          startsAt: schedule.startAt,
-          endsAt: schedule.endAt,
-          detail: `${venueEventTypeLabel(draft.eventType)} não consta entre os usos permitidos do espaço.`,
-        });
-      }
-      const setupMinutes =
-        schedule.startAt && schedule.setupStartAt
-          ? (new Date(schedule.startAt).getTime() -
-              new Date(schedule.setupStartAt).getTime()) /
-            60_000
-          : 0;
-      if (setupMinutes < space.required_setup_minutes) {
-        conflicts.push({
-          id: `policy-setup-${space.id}`,
-          kind: "policy",
-          spaceId: space.id,
-          title: `Montagem insuficiente em ${space.name}`,
-          startsAt: schedule.setupStartAt,
-          endsAt: schedule.startAt,
-          detail: `O espaço exige ao menos ${space.required_setup_minutes} minutos de montagem.`,
-        });
-      }
-      const teardownMinutes =
-        schedule.endAt && schedule.teardownEndAt
-          ? (new Date(schedule.teardownEndAt).getTime() -
-              new Date(schedule.endAt).getTime()) /
-            60_000
-          : 0;
-      if (teardownMinutes < space.required_teardown_minutes) {
-        conflicts.push({
-          id: `policy-teardown-${space.id}`,
-          kind: "policy",
-          spaceId: space.id,
-          title: `Desmontagem insuficiente em ${space.name}`,
-          startsAt: schedule.endAt,
-          endsAt: schedule.teardownEndAt,
-          detail: `O espaço exige ao menos ${space.required_teardown_minutes} minutos de desmontagem.`,
-        });
-      }
-      const dailyStart = String(
-        space.standard_opening_hours.daily_start || "08:00",
-      );
-      const dailyEnd = String(
-        space.standard_opening_hours.daily_end || "22:00",
-      );
-      if (draft.startTime < dailyStart || draft.endTime > dailyEnd) {
-        conflicts.push({
-          id: `policy-hours-${space.id}`,
-          kind: "policy",
-          spaceId: space.id,
-          title: `Horário fora da operação padrão de ${space.name}`,
-          startsAt: schedule.startAt,
-          endsAt: schedule.endAt,
-          detail: `Faixa padrão cadastrada: ${dailyStart}–${dailyEnd}.`,
-        });
-      }
-    });
 
   return conflicts;
 }

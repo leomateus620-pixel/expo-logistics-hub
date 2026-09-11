@@ -432,7 +432,7 @@ describe("conflitos e políticas de ocupação", () => {
     ]);
   });
 
-  it("soma a capacidade dos dois espaços e aplica as políticas de cada um", () => {
+  it("não trata capacidade, tipo de evento, montagem ou horário padrão como conflito", () => {
     const arena = makeSpace(ARENA_ID, "Arena", 5_000, {
       allowed_event_types: ["show", "cultural"],
       required_setup_minutes: 120,
@@ -442,6 +442,8 @@ describe("conflitos e políticas de ocupação", () => {
       venueIds: [RESTAURANT_ID, ARENA_ID],
       eventType: "jantar",
       estimatedAudience: "5601",
+      startTime: "05:00",
+      endTime: "23:59",
     });
 
     const conflicts = findLocalAvailabilityConflicts(draft, {
@@ -451,24 +453,7 @@ describe("conflitos e políticas de ocupação", () => {
       blocks: [],
     });
 
-    expect(conflicts).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          kind: "capacity",
-          title: "Capacidade combinada dos espaços excedida",
-        }),
-        expect.objectContaining({ kind: "policy", spaceId: ARENA_ID }),
-        expect.objectContaining({ id: `policy-setup-${ARENA_ID}` }),
-      ]),
-    );
-
-    const atLimit = findLocalAvailabilityConflicts(
-      { ...draft, eventType: "show", estimatedAudience: "5600" },
-      { events: [], allocations: [], spaces, blocks: [] },
-    );
-    expect(atLimit.some((conflict) => conflict.kind === "capacity")).toBe(
-      false,
-    );
+    expect(conflicts).toEqual([]);
   });
 });
 
