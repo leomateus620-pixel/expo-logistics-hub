@@ -669,7 +669,9 @@ export function VenueWorkspace() {
       ),
   );
 
-  const filteredEvents = workspace.events.filter((event) => {
+  // Filtros combinados (área, busca, status, revisão, espaço, ano) sem o mês —
+  // usados também para calcular os contadores por mês de forma coerente.
+  const eventsBeforeMonthFilter = workspace.events.filter((event) => {
     const spaces = getSpaceNames(
       event.id,
       workspace.allocations,
@@ -695,6 +697,29 @@ export function VenueWorkspace() {
         ))
     );
   });
+
+  const monthCounts = eventsBeforeMonthFilter.reduce<Record<string, number>>(
+    (acc, event) => {
+      const month = eventMonth(event);
+      if (month) acc[month] = (acc[month] ?? 0) + 1;
+      return acc;
+    },
+    {},
+  );
+
+  const filteredEvents = eventsBeforeMonthFilter.filter(
+    (event) => monthFilter === "all" || eventMonth(event) === monthFilter,
+  );
+
+  const usedEventTypes = Array.from(
+    new Set(
+      workspace.events
+        .map((event) => (event.event_type ?? "").trim())
+        .filter(Boolean),
+    ),
+  ).sort((a, b) =>
+    venueEventTypeLabel(a).localeCompare(venueEventTypeLabel(b), "pt-BR"),
+  );
 
   const CYCLE_YEARS = ["2026", "2027", "2028"];
   const availableYears = CYCLE_YEARS;
