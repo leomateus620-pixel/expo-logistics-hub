@@ -76,10 +76,20 @@ export function CronogramaEventCard({
         </div>
         <button type="button" onClick={() => onOpen(event)} className="mt-1.5 block w-full text-left focus-ring">
           <h3 className={cn('text-balance font-bold leading-tight tracking-tight text-foreground group-hover:text-primary', compact ? 'text-sm' : 'text-base')}>
-            {event.title}
+            {toDisplayUpper(event.title)}
           </h3>
         </button>
         {!compact && <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{event.summary}</p>}
+        {operationalLines.length > 0 && (
+          <ul className="mt-2 space-y-1">
+            {operationalLines.map((line) => (
+              <li key={`${line.source}-${line.text}`} className="flex gap-1.5 text-xs leading-relaxed text-muted-foreground">
+                <span className="shrink-0 font-bold uppercase tracking-[0.1em] text-foreground/55">{line.source}</span>
+                <span className="line-clamp-1">{line.text}</span>
+              </li>
+            ))}
+          </ul>
+        )}
         <EventMetaLine event={event} dense className="mt-2" />
         {contextNote && (
           <p className="mt-2 line-clamp-2 border-l-2 border-gold/50 pl-2.5 text-xs font-medium leading-relaxed text-muted-foreground">
