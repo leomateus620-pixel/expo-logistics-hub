@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { forwardRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import {
   Ban,
   CheckCircle2,
@@ -254,16 +254,21 @@ export function EventLocation({ location, className }: { location?: string | nul
 
 /* ─────────────────────────── Botões utilitários ──────────────────────────── */
 
-interface WorkspaceButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface WorkspaceButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'primary' | 'ghost';
   size?: 'md' | 'sm';
   icon?: LucideIcon;
   children?: ReactNode;
 }
 
-export function WorkspaceButton({ variant = 'default', size = 'md', icon: Icon, className, children, type = 'button', ...props }: WorkspaceButtonProps) {
+/* Refs are forwarded so these buttons can anchor Radix poppers (`asChild`). */
+export const WorkspaceButton = forwardRef<HTMLButtonElement, WorkspaceButtonProps>(function WorkspaceButton(
+  { variant = 'default', size = 'md', icon: Icon, className, children, type = 'button', ...props },
+  ref,
+) {
   return (
     <button
+      ref={ref}
       type={type}
       className={cn(
         'ua-button ws-focus',
@@ -278,17 +283,20 @@ export function WorkspaceButton({ variant = 'default', size = 'md', icon: Icon, 
       {children}
     </button>
   );
-}
+});
 
-interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon: LucideIcon;
   label: string;
 }
 
-export function IconButton({ icon: Icon, label, className, type = 'button', ...props }: IconButtonProps) {
+export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton(
+  { icon: Icon, label, className, type = 'button', ...props },
+  ref,
+) {
   return (
-    <button type={type} className={cn('ua-icon-button ws-focus', className)} aria-label={label} title={label} {...props}>
+    <button ref={ref} type={type} className={cn('ua-icon-button ws-focus', className)} aria-label={label} title={label} {...props}>
       <Icon aria-hidden="true" />
     </button>
   );
-}
+});
