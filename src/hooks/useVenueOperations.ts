@@ -33,10 +33,12 @@ import {
   type VenueStakeholder,
   type VenueWorkspaceData,
 } from "@/lib/venue-operations";
+import type { VenueEventNote } from "@/lib/venue-history";
 
 const VENUE_QUERY_KEY = "venue-operations";
 const VENUE_DOCUMENT_BUCKET = "venue-event-documents";
 const VENUE_AUDIT_PAGE_SIZE = 100;
+const EMPTY_DOCUMENT_COUNTS: Record<string, number> = {};
 
 // Compatibility boundary until the generated Supabase bindings are refreshed
 // after these additive migrations are applied to the linked project.
