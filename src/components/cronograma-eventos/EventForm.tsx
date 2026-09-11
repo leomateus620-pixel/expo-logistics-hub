@@ -423,21 +423,51 @@ export function EventForm({
 
       <div className="cronograma-form-section">
         <h3 className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-foreground/72">Data, local e responsáveis</h3>
-        <div className="grid gap-3 sm:grid-cols-3">
+
+        <div className="cronograma-range-toggle">
+          <div className="min-w-0">
+            <Label htmlFor={fieldId('multi-day')} className="cursor-pointer">Evento de vários dias</Label>
+            <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
+              Um único evento cobrindo um período (ex.: 11 a 15 de setembro).
+            </p>
+          </div>
+          <Switch
+            id={fieldId('multi-day')}
+            checked={multiDay}
+            onCheckedChange={(checked) => {
+              setMultiDay(checked);
+              setFieldErrors((current) => ({ ...current, range: undefined }));
+              if (!checked) update('endDate', form.date ?? null);
+              else if (!form.endDate || (form.date && form.endDate < form.date)) update('endDate', form.date ?? null);
+            }}
+          />
+        </div>
+
+        <div className={multiDay ? 'grid gap-3 sm:grid-cols-2' : 'grid gap-3 sm:grid-cols-3'}>
           <div className="space-y-1.5">
             <Label htmlFor={fieldId('date')}>
-              Data <span className="font-normal text-muted-foreground">(opcional)</span>
+              {multiDay ? 'Data inicial' : 'Data'} <span className="font-normal text-muted-foreground">(opcional)</span>
             </Label>
             <Input
               id={fieldId('date')}
               type="date"
               value={form.date || ''}
-              onChange={(event) => update('date', event.target.value || null)}
+              onChange={(event) => {
+                const nextDate = event.target.value || null;
+                setForm((current) => ({
+                  ...current,
+                  date: nextDate,
+                  endDate: multiDay && current.endDate && nextDate && current.endDate >= nextDate
+                    ? current.endDate
+                    : nextDate,
+                }));
+                setFieldErrors((current) => ({ ...current, range: undefined }));
+              }}
               className="bg-white/72"
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor={fieldId('start')}>Início</Label>
+            <Label htmlFor={fieldId('start')}>{multiDay ? 'Horário inicial' : 'Início'}</Label>
             <Input
               id={fieldId('start')}
               type="time"
@@ -449,8 +479,31 @@ export function EventForm({
               className="bg-white/72"
             />
           </div>
+          {multiDay && (
+            <div className="space-y-1.5">
+              <Label htmlFor={fieldId('end-date')}>Data final</Label>
+              <Input
+                id={fieldId('end-date')}
+                type="date"
+                min={form.date || undefined}
+                value={form.endDate || ''}
+                onChange={(event) => {
+                  update('endDate', event.target.value || null);
+                  setFieldErrors((current) => ({ ...current, range: undefined }));
+                }}
+                className="bg-white/72"
+                aria-invalid={Boolean(fieldErrors.range) || undefined}
+                aria-describedby={fieldErrors.range ? fieldId('range-error') : undefined}
+              />
+              {fieldErrors.range && (
+                <p id={fieldId('range-error')} className="cronograma-mobile-field-error" role="alert">
+                  {fieldErrors.range}
+                </p>
+              )}
+            </div>
+          )}
           <div className="space-y-1.5">
-            <Label htmlFor={fieldId('end')}>Fim</Label>
+            <Label htmlFor={fieldId('end')}>{multiDay ? 'Horário final' : 'Fim'}</Label>
             <Input
               id={fieldId('end')}
               type="time"
@@ -470,6 +523,18 @@ export function EventForm({
             )}
           </div>
         </div>
+
+        {form.date && (
+          <p className="cronograma-range-summary" data-multi-day={multiDay || undefined}>
+            <CalendarClock className="h-3.5 w-3.5 shrink-0 text-gold" aria-hidden="true" />
+            <span>{formatEventPeriodShort({ date: form.date, endDate: multiDay ? form.endDate : form.date })}</span>
+            {form.startTime && <span className="font-mono">{form.startTime}{form.endTime ? `–${form.endTime}` : ''}</span>}
+            {multiDay && form.endDate && form.endDate > form.date && (
+              <strong>{getEventPeriod({ date: form.date, endDate: form.endDate }).days} dias</strong>
+            )}
+          </p>
+        )}
+
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
