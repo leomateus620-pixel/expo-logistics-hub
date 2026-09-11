@@ -1092,14 +1092,15 @@ export function VenueEventFormDialog({
                       {checking
                         ? "Validando disponibilidade…"
                         : effectiveConflicts.length
-                          ? `${effectiveConflicts.length} ${effectiveConflicts.length === 1 ? "conflito encontrado" : "conflitos encontrados"}`
-                          : "Disponibilidade confirmada"}
+                          ? `${effectiveConflicts.length} ${effectiveConflicts.length === 1 ? "sobreposição de horário" : "sobreposições de horário"}`
+                          : "Sem sobreposição de horário"}
                     </strong>
                     <p>
                       {effectiveConflicts.length
-                        ? "Ajuste o período ou registre uma exceção autorizada."
-                        : "Nenhuma sobreposição ou bloqueio no período informado."}
+                        ? "O aviso é informativo: você pode salvar mesmo assim e o registro fica no histórico."
+                        : "Nenhum outro evento ou bloqueio no período informado."}
                     </p>
+
                   </div>
                   <Button
                     type="button"
