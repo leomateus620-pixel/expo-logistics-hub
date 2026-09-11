@@ -915,6 +915,12 @@
   align-items: center;
 }
 
+.ua-search input::-webkit-search-cancel-button,
+.ua-search input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .ua-search svg {
   position: absolute;
   left: 12px;
@@ -2149,7 +2155,10 @@
   .ua-document__download {
     display: inline-grid;
   }
+}
 
+/* Na coluna lateral estreita (layout em duas colunas) fica só o menu. */
+@container workspace (min-width: 1000px) {
   .ua-layout__aside .ua-document__download {
     display: none;
   }

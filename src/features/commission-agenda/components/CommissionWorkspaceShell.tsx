@@ -1,5 +1,5 @@
 import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Users, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CommissionUnitViewModel, CommissionWorkspaceNavItem, CommissionWorkspaceSection } from '../types';
@@ -119,7 +119,7 @@ export function CommissionNavigation({ items, active, className }: CommissionNav
           const Icon = item.icon;
           const isActive = item.id === active;
           return (
-            <NavLink
+            <Link
               key={item.id}
               to={item.path}
               className="cw-nav__item ws-focus"
@@ -131,7 +131,7 @@ export function CommissionNavigation({ items, active, className }: CommissionNav
               <span className="cw-nav__label--full">{item.label}</span>
               <span className="cw-nav__label--short">{item.shortLabel}</span>
               {typeof item.count === 'number' && item.count > 0 && <span className="cw-nav__count">{item.count}</span>}
-            </NavLink>
+            </Link>
           );
         })}
       </div>
