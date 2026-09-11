@@ -25,10 +25,11 @@ export interface DocumentCardProps {
   hideEvent?: boolean;
   onOpen?: (document: DocumentViewModel) => void;
   onDownload?: (document: DocumentViewModel) => void;
+  onDelete?: (document: DocumentViewModel) => void;
   className?: string;
 }
 
-export function DocumentCard({ document, hideEvent = false, onOpen, onDownload, className }: DocumentCardProps) {
+export function DocumentCard({ document, hideEvent = false, onOpen, onDownload, onDelete, className }: DocumentCardProps) {
   const meta = KIND_META[document.kind];
   const Icon = meta.icon;
   const { year } = getDateParts(document.date);
@@ -70,7 +71,13 @@ export function DocumentCard({ document, hideEvent = false, onOpen, onDownload, 
             <DropdownMenuItem onSelect={() => onOpen?.(document)}>Abrir</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => onDownload?.(document)}>Baixar</DropdownMenuItem>
             <DropdownMenuItem disabled>Substituir versão</DropdownMenuItem>
-            <DropdownMenuItem disabled className="text-destructive">Remover</DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={!onDelete}
+              className="text-destructive"
+              onSelect={() => onDelete?.(document)}
+            >
+              Remover
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
