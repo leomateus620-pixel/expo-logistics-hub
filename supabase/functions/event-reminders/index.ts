@@ -9,7 +9,17 @@ import {
   buildCronogramaEventUrl,
   buildGoogleCalendarEventUrl,
 } from "../_shared/eventReminderModel.ts";
-import { buildEventPushMessage } from "../_shared/pushMessage.ts";
+import { buildEventLifecycleMessage, buildEventPushMessage } from "../_shared/pushMessage.ts";
+import {
+  enumerateLifecycleDailyDays,
+  isClosedEventStatus,
+  isMultiDayEvent,
+  LIFECYCLE_DAILY_HOUR,
+  LIFECYCLE_TYPE_BY_STATE,
+  lifecycleDayFor,
+  localHourInstant,
+  normalizeEventRange,
+} from "../_shared/eventLifecycle.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -34,6 +44,8 @@ interface ScheduledEventRow extends EventDateFields {
   id: string;
   org_id: string;
   title: string;
+  location?: string | null;
+  status?: string | null;
   lock_version: number | null;
   has_exact_date: boolean;
   notify_all_commission_members?: boolean | null;
@@ -75,6 +87,8 @@ interface ReminderDeliveryRow {
   scheduled_for: string;
   updated_at: string;
   channel: string | null;
+  notification_type?: string | null;
+  notification_date?: string | null;
 }
 
 interface SubeventRow {
@@ -125,6 +139,25 @@ function addUtcDays(date: string, days: number) {
   return next.toISOString().slice(0, 10);
 }
 
+/** "2026-09-15" -> "15 SET" (padrão de maiúsculas da Agenda). */
+function shortDateLabel(date: string | null | undefined) {
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  const [year, month, day] = date.split("-").map(Number);
+  const label = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "UTC",
+    day: "2-digit",
+    month: "short",
+  }).format(new Date(Date.UTC(year, month - 1, day, 12)));
+  return label.replace(/\./g, "").toLocaleUpperCase("pt-BR");
+}
+
+/** "18:00:00" -> "18h"; "18:30:00" -> "18h30". */
+function formatHourLabel(time: string | null | undefined) {
+  if (!time || !/^\d{2}:\d{2}/.test(time)) return null;
+  const [hour, minute] = time.split(":");
+  return minute === "00" ? `${Number(hour)}h` : `${Number(hour)}h${minute}`;
+}
+
 function relationName(link: EventRelationRow) {
   const joined = Array.isArray(link.commissions) ? link.commissions[0] : link.commissions;
   return String(joined?.nome ?? link.commission_name_snapshot ?? "").trim() || null;
@@ -136,12 +169,14 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
   const today = saoPauloDateString(now);
   const horizon = addUtcDays(today, 30);
 
+  // Sobreposição de intervalo: eventos de vários dias continuam elegíveis
+  // depois do primeiro dia (start <= horizonte AND fim >= hoje).
   const { data: events, error: eventsError } = await supa.from("cronograma_eventos")
-    .select("id, org_id, title, start_date, end_date, start_time, end_time, lock_version, has_exact_date, event_type, notify_all_commission_members")
+    .select("id, org_id, title, location, status, start_date, end_date, start_time, end_time, lock_version, has_exact_date, event_type, notify_all_commission_members")
     .eq("has_exact_date", true)
     .neq("event_type", "feriado")
-    .gte("start_date", today)
-    .lte("start_date", horizon);
+    .lte("start_date", horizon)
+    .or(`end_date.gte.${today},and(end_date.is.null,start_date.gte.${today})`);
   if (eventsError) throw new Error("reminder_events_query_failed");
 
   // Global recipients: users with capability 'cronograma_reminder_all' receive reminders for every non-holiday event of their org.
@@ -318,6 +353,63 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
         }
       }
     }
+
+    // ----- Ciclo de vida de eventos de vários dias -----
+    // Um único evento canônico: os dias seguintes são derivados do intervalo.
+    const range = normalizeEventRange(event.start_date, event.end_date);
+    const lifecycleDays = isClosedEventStatus(event.status)
+      ? []
+      : enumerateLifecycleDailyDays(event.start_date, event.end_date);
+    const eventVersion = event.lock_version ?? 0;
+    const validDates: string[] = [];
+
+    for (const day of lifecycleDays) {
+      const scheduledFor = localHourInstant(day.date, LIFECYCLE_DAILY_HOUR);
+      if (!scheduledFor) continue;
+      validDates.push(day.date);
+      if (scheduledFor <= now) continue;
+
+      for (const recipient of recipients.values()) {
+        if (!pushEnabledUsers.has(recipient.user_id)) continue;
+        const notificationType = LIFECYCLE_TYPE_BY_STATE[day.state];
+        const { error } = await supa.from("event_reminder_deliveries").upsert({
+          user_id: recipient.user_id,
+          org_id: recipient.org_id,
+          event_id: event.id,
+          event_version: eventVersion,
+          offset_minutes: 0,
+          scheduled_for: scheduledFor.toISOString(),
+          idempotency_key: `${recipient.user_id}|${event.id}|${notificationType}|${day.date}|push`,
+          channel: "push",
+          notification_type: notificationType,
+          notification_date: day.date,
+          status: "pending",
+          last_error: null,
+        }, { onConflict: "idempotency_key", ignoreDuplicates: true });
+        if (error) {
+          console.error("event_lifecycle_schedule_failed", {
+            eventId: event.id,
+            lifecycleState: day.state,
+            notificationDate: day.date,
+          });
+        }
+      }
+    }
+
+    // Reconciliação de edição: dias que saíram do intervalo (ou evento fechado)
+    // deixam de avisar; o histórico já entregue é preservado.
+    let obsolete = supa.from("event_reminder_deliveries")
+      .update({ status: "cancelled", last_error: "event_range_shrunk" })
+      .eq("event_id", event.id)
+      .eq("status", "pending")
+      .not("notification_date", "is", null);
+    if (validDates.length) {
+      obsolete = obsolete.not("notification_date", "in", `(${validDates.join(",")})`);
+    }
+    const { error: obsoleteError } = await obsolete;
+    if (obsoleteError) {
+      console.error("event_lifecycle_reconcile_failed", { eventId: event.id, range: range?.totalDays ?? 0 });
+    }
   }
 }
 
@@ -335,7 +427,7 @@ async function sendPending(supa: ReturnType<typeof db>) {
   const eventIds = [...new Set(deliveries.map((delivery) => delivery.event_id))];
   const userIds = [...new Set(deliveries.map((delivery) => delivery.user_id))];
   const { data: events } = await supa.from("cronograma_eventos")
-    .select("id, org_id, title, start_date, end_date, start_time, end_time, location, pending_reason, decision_needed, commission_name")
+    .select("id, org_id, title, status, start_date, end_date, start_time, end_time, location, pending_reason, decision_needed, commission_name")
     .in("id", eventIds);
   const { data: links } = await supa.from("cronograma_evento_comissoes")
     .select("event_id, commission_id, commission_name_snapshot, relation_role, commissions(nome)")
@@ -423,6 +515,39 @@ async function sendPending(supa: ReturnType<typeof db>) {
       continue;
     }
 
+    // Revalidação imediatamente antes do envio: um job criado dias antes pode
+    // ter perdido a validade (evento cancelado, concluído antes ou encurtado).
+    if (isClosedEventStatus((event as { status?: string | null }).status)) {
+      console.log("event_lifecycle_skipped", {
+        deliveryId: delivery.id,
+        eventId: delivery.event_id,
+        lifecycleState: delivery.notification_type ?? "event_start",
+        notificationDate: delivery.notification_date ?? null,
+        reason: "event_closed",
+      });
+      await supa.from("event_reminder_deliveries").update({
+        status: "skipped", last_error: "event_closed",
+      }).eq("id", delivery.id);
+      continue;
+    }
+
+    const lifecycleDay = delivery.notification_date
+      ? lifecycleDayFor(event.start_date, event.end_date, delivery.notification_date)
+      : null;
+    if (delivery.notification_date && !lifecycleDay) {
+      console.log("event_lifecycle_skipped", {
+        deliveryId: delivery.id,
+        eventId: delivery.event_id,
+        lifecycleState: delivery.notification_type ?? null,
+        notificationDate: delivery.notification_date,
+        reason: "day_outside_range",
+      });
+      await supa.from("event_reminder_deliveries").update({
+        status: "cancelled", last_error: "event_range_shrunk",
+      }).eq("id", delivery.id);
+      continue;
+    }
+
     const normalized = normalizeEventDateTime({
       date: event.start_date,
       startTime: event.start_time,
@@ -449,14 +574,37 @@ async function sendPending(supa: ReturnType<typeof db>) {
     }
 
     if (delivery.channel === "push") {
+      const range = normalizeEventRange(event.start_date, event.end_date);
+      const endTimeLabel = formatHourLabel(event.end_time);
+      const endDateLabel = range ? shortDateLabel(range.end) : null;
       // Mesmo destinatário e mesmo horário do e-mail; só muda o canal de entrega.
-      const pushMessage = buildEventPushMessage({
-        offsetMinutes: delivery.offset_minutes,
-        eventTitle: event.title,
-        dateLabel: normalized.value.dateLong,
-        timeLabel: normalized.value.timeLabel,
-        location: event.location,
+      const pushMessage = lifecycleDay
+        ? buildEventLifecycleMessage({
+          state: lifecycleDay.state,
+          eventTitle: event.title,
+          eventId: delivery.event_id,
+          dayIndex: lifecycleDay.dayIndex,
+          totalDays: lifecycleDay.totalDays,
+          endDateLabel,
+          endTimeLabel,
+          location: event.location,
+        })
+        : buildEventPushMessage({
+          offsetMinutes: delivery.offset_minutes,
+          eventTitle: event.title,
+          dateLabel: normalized.value.dateLong,
+          timeLabel: normalized.value.timeLabel,
+          location: event.location,
+          eventId: delivery.event_id,
+          multiDayEndLabel: isMultiDayEvent(event.start_date, event.end_date) && endDateLabel
+            ? (endTimeLabel ? `${endDateLabel} · ${endTimeLabel}` : endDateLabel)
+            : null,
+        });
+      console.log("event_lifecycle_delivery_attempt", {
+        deliveryId: delivery.id,
         eventId: delivery.event_id,
+        lifecycleState: lifecycleDay?.state ?? "START",
+        notificationDate: delivery.notification_date ?? null,
       });
       try {
         const pushRes = await fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
@@ -471,6 +619,7 @@ async function sendPending(supa: ReturnType<typeof db>) {
             title: pushMessage.title,
             body: pushMessage.body,
             path: pushMessage.path,
+            templateName: delivery.notification_type ?? "event-reminder",
           }),
         });
         const pushRaw = await pushRes.text();
