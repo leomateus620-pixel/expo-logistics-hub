@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { toDisplayUpper } from "@/lib/textNormalize";
 
 export const VENUE_MODULE_ROUTE = "/eventos-restaurante-arena";
 export const VENUE_TIME_ZONE = "America/Sao_Paulo";
@@ -74,7 +75,29 @@ export const COUNTERPART_UNITS = [
   "outro",
 ] as const;
 
-export type VenueEventType = (typeof VENUE_EVENT_TYPES)[number];
+/**
+ * Tipo do evento é texto livre (o banco valida apenas tamanho).
+ * `VENUE_EVENT_TYPES` continua existindo como catálogo legado usado nos
+ * usos permitidos de espaços e nos registros históricos.
+ */
+export type VenueEventType = string;
+export type VenueLegacyEventType = (typeof VENUE_EVENT_TYPES)[number];
+
+/** Sugestões exibidas no campo livre de tipo do evento. */
+export const VENUE_EVENT_TYPE_SUGGESTIONS = [
+  "JANTAR EMPRESARIAL",
+  "SEMINÁRIO",
+  "CONFRATERNIZAÇÃO",
+  "FORMATURA",
+  "REUNIÃO",
+  "PALESTRA",
+  "CASAMENTO",
+  "SHOW",
+  "FEIRA",
+  "TREINAMENTO",
+  "EXTERNO",
+  "INSTITUCIONAL",
+] as const;
 export type VenueEventStatus = (typeof VENUE_EVENT_STATUSES)[number];
 export type VenueApprovalStatus = (typeof VENUE_APPROVAL_STATUSES)[number];
 export type VenueResourceType = (typeof VENUE_RESOURCE_TYPES)[number];
@@ -489,13 +512,23 @@ export const venueEventDraftSchema = z
       .string()
       .trim()
       .min(3, "Informe um título com pelo menos 3 caracteres.")
-      .max(160),
+      .max(160)
+      .transform((value) => toDisplayUpper(value)),
     executiveDescription: z.string().trim().max(2_000),
-    eventType: z.enum(VENUE_EVENT_TYPES),
+    eventType: z
+      .string()
+      .trim()
+      .min(2, "Informe o tipo do evento.")
+      .max(80, "Use no máximo 80 caracteres no tipo do evento.")
+      .transform((value) => toDisplayUpper(value)),
     venueIds: z
       .array(z.string().uuid())
       .min(1, "Selecione ao menos um espaço."),
-    requestedArea: z.string().trim().max(160),
+    requestedArea: z
+      .string()
+      .trim()
+      .max(160)
+      .transform((value) => toDisplayUpper(value)),
     pendingDate: z.boolean(),
     startDate: optionalDate,
     startTime: optionalTime,
@@ -505,7 +538,12 @@ export const venueEventDraftSchema = z
     setupStartTime: optionalTime,
     teardownEndDate: optionalDate,
     teardownEndTime: optionalTime,
-    requesterName: z.string().trim().min(2, "Informe o solicitante.").max(160),
+    requesterName: z
+      .string()
+      .trim()
+      .min(2, "Informe o requerente do evento.")
+      .max(160)
+      .transform((value) => toDisplayUpper(value)),
     responsibleOrganizationId: z
       .string()
       .uuid("Selecione a organização responsável.")
@@ -719,6 +757,24 @@ export const EVENT_TYPE_LABELS: Record<VenueEventType, string> = {
   interno: "Interno",
   outro: "Outro",
 };
+
+/**
+ * Rótulo exibível para o tipo do evento. Converte os códigos legados
+ * (externo, institucional…) e devolve o texto livre em maiúsculas com acentos.
+ */
+export function venueEventTypeLabel(value: string | null | undefined): string {
+  const raw = (value ?? "").trim();
+  if (!raw) return "";
+  const legacy = EVENT_TYPE_LABELS[raw.toLocaleLowerCase("pt-BR")];
+  return toDisplayUpper(legacy ?? raw);
+}
+
+/** Verifica se o valor pertence ao catálogo legado de tipos. */
+export function isLegacyVenueEventType(value: string | null | undefined) {
+  const raw = (value ?? "").trim().toLocaleLowerCase("pt-BR");
+  return (VENUE_EVENT_TYPES as readonly string[]).includes(raw);
+}
+
 
 export const RESOURCE_TYPE_LABELS: Record<string, string> = {
   mesas: "Mesas",
@@ -952,9 +1008,14 @@ export function findLocalAvailabilityConflicts(
   data.spaces
     .filter((space) => draft.venueIds.includes(space.id))
     .forEach((space) => {
+      // O tipo virou texto livre: a política do espaço só é avaliada quando o
+      // tipo informado pertence ao catálogo legado de usos permitidos.
       if (
         space.allowed_event_types.length > 0 &&
-        !space.allowed_event_types.includes(draft.eventType)
+        isLegacyVenueEventType(draft.eventType) &&
+        !space.allowed_event_types.includes(
+          draft.eventType.trim().toLocaleLowerCase("pt-BR"),
+        )
       ) {
         conflicts.push({
           id: `policy-type-${space.id}`,
@@ -963,7 +1024,7 @@ export function findLocalAvailabilityConflicts(
           title: `Tipo de evento não permitido em ${space.name}`,
           startsAt: schedule.startAt,
           endsAt: schedule.endAt,
-          detail: `${EVENT_TYPE_LABELS[draft.eventType]} não consta entre os usos permitidos do espaço.`,
+          detail: `${venueEventTypeLabel(draft.eventType)} não consta entre os usos permitidos do espaço.`,
         });
       }
       const setupMinutes =
@@ -1483,7 +1544,7 @@ export function createEmptyVenueEventDraft(): VenueEventDraft {
   return {
     title: "",
     executiveDescription: "",
-    eventType: "institucional",
+    eventType: "",
     venueIds: [],
     requestedArea: "",
     pendingDate: false,
@@ -1554,7 +1615,7 @@ export function eventToDraft(
     version: event.version,
     title: event.title,
     executiveDescription: event.executive_description ?? "",
-    eventType: event.event_type,
+    eventType: venueEventTypeLabel(event.event_type),
     venueIds: eventAllocations.map((allocation) => allocation.space_id),
     requestedArea: event.requested_area ?? "",
     pendingDate: event.pending_date,
