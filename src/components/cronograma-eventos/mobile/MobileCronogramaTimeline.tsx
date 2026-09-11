@@ -37,6 +37,9 @@ import {
   getTodayKey,
   groupTimelineByMonth,
 } from '@/lib/cronograma-timeline';
+import { formatEventDurationLabel, formatEventPeriodShort, getEventPeriod } from '@/lib/cronograma-event-period';
+import { getEventDetailTeaser } from '@/lib/cronograma-event-details';
+import { toDisplayUpper } from '@/lib/textNormalize';
 import {
   CronogramaCategoryMarker,
   CronogramaPriorityIndicator,
@@ -508,7 +511,18 @@ function MobileTimelineEventCard({
           </span>
         )}
 
-        <strong className="cronograma-mobile-event-title">{event.title}</strong>
+        <strong className="cronograma-mobile-event-title">{toDisplayUpper(event.title)}</strong>
+
+        {getEventPeriod(event).isMultiDay && (
+          <span className="cronograma-mobile-event-period">
+            {formatEventPeriodShort(event)} · {formatEventDurationLabel(event)}
+          </span>
+        )}
+
+        {getEventDetailTeaser(event) && (
+          <span className="cronograma-mobile-event-teaser">{getEventDetailTeaser(event)}</span>
+        )}
+
 
         <EventPeopleAvatars
           people={[

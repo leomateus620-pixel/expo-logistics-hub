@@ -83,3 +83,19 @@ export function formatCpf(raw: string | null | undefined): string {
   }
   return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
 }
+
+/**
+ * Display-only uppercase for human-readable, user-entered text.
+ * Keeps pt-BR accents (comunicação → COMUNICAÇÃO) and never touches
+ * technical values: e-mails, URLs, tokens, ids and file paths are returned
+ * untouched so we don't corrupt machine-readable content.
+ */
+const TECHNICAL_VALUE = /^(?:[a-z][a-z0-9+.-]*:\/\/|mailto:|www\.)|^[^\s@]+@[^\s@]+\.[^\s@]+$|^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export function toDisplayUpper<T extends string | null | undefined>(raw: T): T {
+  if (raw == null) return raw;
+  const value = String(raw);
+  if (!value.trim()) return raw;
+  if (TECHNICAL_VALUE.test(value.trim())) return raw;
+  return value.toLocaleUpperCase('pt-BR') as T;
+}

@@ -28,6 +28,8 @@ import {
   CronogramaStatusIndicator,
 } from '../CronogramaBadges';
 import { formatLongDate, formatLongDateRange } from '../dateUtils';
+import { formatEventDurationLabel, formatEventPeriod } from '@/lib/cronograma-event-period';
+import { getEventOperationalLines } from '@/lib/cronograma-event-details';
 import { EventForm } from '../EventForm';
 import { splitEventResponsibles } from '../EventRelationFields';
 import type { CronogramaEvent, CronogramaHistoryEntry } from '../types';
@@ -365,8 +367,8 @@ export function MobileEventScreen({
               <div className="cronograma-mobile-info-list">
                 <MobileInfo
                   icon={CalendarClock}
-                  label="Data e horário"
-                  value={`${formatLongDateRange(event.date, event.endDate)}${event.startTime ? ` · ${event.startTime}` : ''}${event.endTime ? ` às ${event.endTime}` : ''}`}
+                  label="Período"
+                  value={`${formatEventPeriod(event)}${formatEventDurationLabel(event) ? ` (${formatEventDurationLabel(event)})` : ''}`}
                 />
                 <MobileInfo icon={MapPin} label="Local" value={event.location || 'Local a definir'} />
                 <MobileInfo
@@ -384,6 +386,23 @@ export function MobileEventScreen({
                 <MobileInfo icon={Layers3} label="Comissão" value={event.commission || 'Comissão a definir'} />
               </div>
             </section>
+
+            {getEventOperationalLines(event).length > 0 && (
+              <section className="cronograma-mobile-event-section" aria-labelledby="cronograma-mobile-operational-title">
+                <h2 id="cronograma-mobile-operational-title" className="text-base font-black tracking-tight text-foreground">
+                  Detalhes e orientações
+                </h2>
+                <ul className="mt-3 space-y-2">
+                  {getEventOperationalLines(event).map((line) => (
+                    <li key={`${line.source}-${line.text}`} className="rounded-xl border border-border/60 bg-white/60 p-3">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/55">{line.source}</p>
+                      <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-foreground/80">{line.text}</p>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
 
             {(event.pendingReason || event.decisionNeeded || !event.date) && (
               <section className="cronograma-mobile-event-section" aria-labelledby="cronograma-mobile-pending-title">

@@ -11,6 +11,9 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { getEventOperationalLines } from '@/lib/cronograma-event-details';
+import { toDisplayUpper } from '@/lib/textNormalize';
+import { formatEventDurationLabel, formatEventPeriodShort, getEventPeriod } from '@/lib/cronograma-event-period';
 import {
   CronogramaCategoryMarker,
   CronogramaPriorityIndicator,
@@ -36,7 +39,12 @@ export function CronogramaEventCard({
   onOpen: (event: CronogramaEvent) => void;
   onEdit?: (event: CronogramaEvent) => void;
 }) {
-  const dateLabel = event.date ? formatShortDate(event.date) : 'Sem data';
+  const period = getEventPeriod(event);
+  const dateLabel = event.date
+    ? (period.isMultiDay ? formatEventPeriodShort(event) : formatShortDate(event.date))
+    : 'Sem data';
+  const durationLabel = formatEventDurationLabel(event);
+  const operationalLines = compact ? [] : getEventOperationalLines(event, 3).slice(1);
   return (
     <article
       className={cn(
@@ -52,8 +60,14 @@ export function CronogramaEventCard({
           {event.date ? event.year : 'Pendente'}
         </span>
         <span className="mt-1 text-sm font-black leading-tight text-foreground">{dateLabel}</span>
+        {durationLabel && (
+          <span className="mt-1 rounded-full bg-gold/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-gold">
+            {durationLabel}
+          </span>
+        )}
         {event.startTime && <span className="mt-1 font-mono text-[10px] font-semibold text-primary">{event.startTime}</span>}
       </div>
+
 
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
@@ -63,10 +77,20 @@ export function CronogramaEventCard({
         </div>
         <button type="button" onClick={() => onOpen(event)} className="mt-1.5 block w-full text-left focus-ring">
           <h3 className={cn('text-balance font-bold leading-tight tracking-tight text-foreground group-hover:text-primary', compact ? 'text-sm' : 'text-base')}>
-            {event.title}
+            {toDisplayUpper(event.title)}
           </h3>
         </button>
         {!compact && <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{event.summary}</p>}
+        {operationalLines.length > 0 && (
+          <ul className="mt-2 space-y-1">
+            {operationalLines.map((line) => (
+              <li key={`${line.source}-${line.text}`} className="flex gap-1.5 text-xs leading-relaxed text-muted-foreground">
+                <span className="shrink-0 font-bold uppercase tracking-[0.1em] text-foreground/55">{line.source}</span>
+                <span className="line-clamp-1">{line.text}</span>
+              </li>
+            ))}
+          </ul>
+        )}
         <EventMetaLine event={event} dense className="mt-2" />
         {contextNote && (
           <p className="mt-2 line-clamp-2 border-l-2 border-gold/50 pl-2.5 text-xs font-medium leading-relaxed text-muted-foreground">

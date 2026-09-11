@@ -910,6 +910,41 @@ body[data-scroll-locked] {
   background: hsl(45 75% 96%);
 }
 
+/* Multi-day event range controls */
+.cronograma-range-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid oklch(var(--border));
+  border-radius: 0.75rem;
+  background: rgb(255 255 255 / 0.6);
+}
+
+.cronograma-range-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.6rem;
+  margin-top: 0.7rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.65rem;
+  border: 1px solid oklch(var(--border));
+  background: rgb(255 255 255 / 0.6);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: hsl(var(--muted-foreground));
+}
+
+.cronograma-range-summary[data-multi-day] {
+  border-color: oklch(var(--gold) / 0.35);
+  background: oklch(var(--gold) / 0.1);
+  color: hsl(var(--foreground));
+}
+
 .cronograma-create-dialog,
 .cronograma-discard-dialog {
   --background: var(--brand-soft-white);
