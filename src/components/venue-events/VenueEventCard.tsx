@@ -3,7 +3,9 @@ import {
   AlertTriangle,
   Building2,
   ChevronRight,
+  FileText,
   Handshake,
+  History,
   MapPin,
   UserRound,
 } from "lucide-react";
