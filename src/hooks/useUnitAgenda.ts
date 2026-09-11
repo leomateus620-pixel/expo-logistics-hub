@@ -29,6 +29,7 @@ export function useUnitIdentity(entryId: string | null | undefined) {
 
   return useMemo(() => {
     const bySlug = new Map<string, UnitSummary>();
+    const byCanonicalId = new Map<string, { commissionId: string; slug: string; name: string }>();
     let commissionId: string | null = null;
     let commissionSlug: string | null = null;
 
@@ -41,6 +42,7 @@ export function useUnitIdentity(entryId: string | null | undefined) {
         shortName: official?.entry.shortName,
         type: unit.type === 'assessoria' ? 'assessoria' : 'comissao',
       });
+      byCanonicalId.set(canonicalId, { commissionId: unit.id, slug: unit.slug, name: unit.name });
       if (entryId && canonicalId === entryId) {
         commissionId = unit.id;
         commissionSlug = unit.slug;
@@ -50,6 +52,8 @@ export function useUnitIdentity(entryId: string | null | undefined) {
     return {
       commissionId,
       commissionSlug,
+      unitOptions: Array.from(bySlug.values()).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
+      byCanonicalId,
       resolveUnit: (slug: string) => bySlug.get(slug),
       isLoading,
     };
