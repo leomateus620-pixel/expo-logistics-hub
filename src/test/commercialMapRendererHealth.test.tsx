@@ -1,9 +1,9 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beginCommercialMapBoot, markCommercialMapStage } from '@/features/commercial-map/utils/performanceDiagnostics';
 import { CommercialMapRendererStatus } from '@/features/commercial-map/components/CommercialMapRendererStatus';
 import {
   COMMERCIAL_MAP_RENDER_HEALTH_EVENT,
-  COMMERCIAL_MAP_PREPARING_EVENT,
   COMMERCIAL_MAP_RENDER_RETRY_EVENT,
   publishCommercialMapRenderHealth,
   readCommercialMapRenderHealth,
@@ -24,6 +24,7 @@ function health(overrides: Partial<CommercialMapRenderHealth> = {}): CommercialM
   };
 }
 
+beforeEach(() => { beginCommercialMapBoot(); markCommercialMapStage('first-interactive'); });
 afterEach(() => {
   cleanup();
   document.querySelectorAll('canvas').forEach((canvas) => canvas.remove());
@@ -31,19 +32,17 @@ afterEach(() => {
 });
 
 describe('Commercial Map lightweight rendering health', () => {
-  it('shows preparation until the first completed frame, without blocking input', () => {
+  it('keeps preparation until frames and responsive controls qualify readiness', async () => {
+    beginCommercialMapBoot();
     const canvas = createCanvas();
     canvas.dataset.commercialMapPreparing = 'true';
     render(<CommercialMapRendererStatus />);
-    expect(screen.getByRole('status').textContent).toBe('Preparando mapa 3D…');
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
     delete canvas.dataset.commercialMapPreparing;
-    act(() => publishCommercialMapRenderHealth(canvas, health()));
-    expect(screen.queryByRole('status')).toBeNull();
-    act(() => {
-      canvas.dataset.commercialMapPreparing = 'true';
-      canvas.dispatchEvent(new CustomEvent(COMMERCIAL_MAP_PREPARING_EVENT, { bubbles: true }));
-    });
-    expect(screen.getByRole('status').textContent).toBe('Preparando mapa 3D…');
+    await act(async () => publishCommercialMapRenderHealth(canvas, health()));
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    await act(async () => markCommercialMapStage('first-interactive'));
+    expect(screen.queryByRole('progressbar')).toBeNull();
   });
   it('publishes a JSON snapshot and bubbles transitions from the originating canvas', () => {
     const canvas = createCanvas();

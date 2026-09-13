@@ -776,3 +776,14 @@
   .commercial-map-active-filters > button { min-height: 44px; }
   .commercial-map-explorer-search input { font-size: 16px; }
 }
+
+/* Keep the rain control directly reachable without shrinking touch targets. */
+.commercial-map-toolbar-menu .commercial-map-toolbar-menu-top { display: none; }
+@media (max-width: 384px) {
+  .commercial-map-toolbar-mobile > .commercial-map-toolbar-focus-selection { display: none; }
+  .commercial-map-toolbar-menu .commercial-map-toolbar-menu-focus-selection { display: flex; }
+}
+@media (max-width: 344px) {
+  .commercial-map-toolbar-mobile > .commercial-map-toolbar-top-view { display: none; }
+  .commercial-map-toolbar-menu .commercial-map-toolbar-menu-top { display: flex; }
+}

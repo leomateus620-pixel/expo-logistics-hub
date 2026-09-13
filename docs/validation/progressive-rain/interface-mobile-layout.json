@@ -1,0 +1,133 @@
+{
+  "boot": {
+    "controlsResponseMs": null,
+    "cpuStagesMs": {
+      "b12-materials": 179,
+      "b12-unpack": 3,
+      "geometry-preparation": 16,
+      "textures": 249
+    },
+    "dataMs": null,
+    "entityGeometryCpuMs": 15.599999964237211,
+    "environmentMaterialMs": 0,
+    "firstDrawMs": 4418,
+    "headquartersWorkerMs": 1678,
+    "hydrationMs": null,
+    "interactiveMs": 8624,
+    "moduleMs": 436,
+    "navigationToModuleMs": 378.199999988079,
+    "physicsMs": null,
+    "postprocessingMs": 6,
+    "proceduralTextureCpuMs": 249.39999997615817,
+    "rendererModuleMs": 764,
+    "rendererMs": 19,
+    "sceneMs": 1850,
+    "shaderDirectMs": 3055,
+    "shaderPostMs": null,
+    "shadowMs": 0,
+    "webglContextMs": 10
+  },
+  "buttons": [
+    {
+      "label": "Visão geral",
+      "pressed": null,
+      "rect": {
+        "bottom": 112.390625,
+        "height": 44,
+        "left": 10.59375,
+        "right": 54.59375,
+        "top": 68.390625,
+        "width": 44,
+        "x": 10.59375,
+        "y": 68.390625
+      }
+    },
+    {
+      "label": "Vista superior",
+      "pressed": null,
+      "rect": {
+        "bottom": 112.390625,
+        "height": 44,
+        "left": 56.1875,
+        "right": 100.1875,
+        "top": 68.390625,
+        "width": 44,
+        "x": 56.1875,
+        "y": 68.390625
+      }
+    },
+    {
+      "label": "Ativar modo Rede Hidrológica",
+      "pressed": "false",
+      "rect": {
+        "bottom": 112.390625,
+        "height": 44,
+        "left": 101.78125,
+        "right": 145.78125,
+        "top": 68.390625,
+        "width": 44,
+        "x": 101.78125,
+        "y": 68.390625
+      }
+    },
+    {
+      "label": "Ativar Modo Noturno",
+      "pressed": "false",
+      "rect": {
+        "bottom": 112.390625,
+        "height": 44,
+        "left": 147.375,
+        "right": 191.375,
+        "top": 68.390625,
+        "width": 44,
+        "x": 147.375,
+        "y": 68.390625
+      }
+    },
+    {
+      "label": "Desativar chuva",
+      "pressed": "true",
+      "rect": {
+        "bottom": 112.390625,
+        "height": 44,
+        "left": 192.96875,
+        "right": 236.96875,
+        "top": 68.390625,
+        "width": 44,
+        "x": 192.96875,
+        "y": 68.390625
+      }
+    },
+    {
+      "label": "Centralizar seleção",
+      "pressed": null,
+      "rect": {
+        "bottom": 112.390625,
+        "height": 44,
+        "left": 238.5625,
+        "right": 282.5625,
+        "top": 68.390625,
+        "width": 44,
+        "x": 238.5625,
+        "y": 68.390625
+      }
+    },
+    {
+      "label": "Mais controles do mapa",
+      "pressed": null,
+      "rect": {
+        "bottom": 112.390625,
+        "height": 44,
+        "left": 284.15625,
+        "right": 328.15625,
+        "top": 68.390625,
+        "width": 44,
+        "x": 284.15625,
+        "y": 68.390625
+      }
+    }
+  ],
+  "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":849,\"contextLosses\":0,\"lastErrorCode\":null}",
+  "scrollWidth": 390,
+  "width": 390
+}

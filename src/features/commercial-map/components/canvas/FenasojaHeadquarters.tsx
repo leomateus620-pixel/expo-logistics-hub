@@ -7,6 +7,7 @@ import {
 } from "../../data/fenasojaComplexReconstruction";
 import type { StrategicLandmarkBounds } from "../../utils/landmarks";
 import { disposeInstancedMesh } from "../../utils/instancedMeshDisposal";
+import { measureCommercialMapSync } from "../../utils/performanceDiagnostics";
 
 const NO_RAYCAST = () => undefined;
 const PETAL_GEOMETRY = new THREE.SphereGeometry(1, 6, 3);
@@ -18,16 +19,13 @@ PETAL_GEOMETRY.setAttribute(
   ),
 );
 import {
-  createHeadquartersGeometry,
   type Surface,
   type V3,
 } from "./headquarters/geometry";
 import { makeHeadquartersMaterials } from "./headquarters/materials";
 import { useCommercialMapStore } from "../../state/useCommercialMapStore";
-import { buildShell } from "./headquarters/architecture";
-import { buildFrontage } from "./headquarters/landscape";
-import { bakeArchitecturalContact } from "./headquarters/contact";
-import { buildSoybeanMonument } from "./headquarters/monument";
+import { readPreparedHeadquartersGeometry } from "./headquarters/headquartersPreparationResource";
+import { unpackHeadquartersGeometry } from "./headquarters/headquartersGeometryPacking";
 const hq = SPEC.headquarters;
 const u = SPEC.registration.unitsPerMeter;
 const sitePolygon = complexWorldPolygon("headquarters", "site");
@@ -45,13 +43,6 @@ const architecturalOffset: V3 = [
   siteCenter[0] - hq.origin[0],
 ];
 
-function buildArchitecture() {
-  const builder = createHeadquartersGeometry();
-  buildShell(builder);
-  buildFrontage(builder);
-  buildSoybeanMonument(builder);
-  return builder.finish();
-}
 function RepeatedPlanting({
   matrices,
   material,
@@ -104,13 +95,14 @@ export function FenasojaHeadquarters({
   const night = useCommercialMapStore((s) => s.nightModeActive);
   const renderCount = useRef(0);
   renderCount.current++;
+  const prepared = readPreparedHeadquartersGeometry();
   const resources = useMemo(() => {
-    const geometry = buildArchitecture();
-    const contact = bakeArchitecturalContact(geometry.geometry);
-    const palette = makeHeadquartersMaterials(
+    const geometry = measureCommercialMapSync("b12-unpack", () => unpackHeadquartersGeometry(prepared));
+    const contact = geometry.contact;
+    const palette = measureCommercialMapSync("b12-materials", () => makeHeadquartersMaterials(
       invalidate,
       gl.capabilities.getMaxAnisotropy(),
-    );
+    ));
     const textures = new Set<THREE.Texture>();
     for (const material of Object.values(palette.materials))
       for (const value of Object.values(material))
@@ -158,7 +150,7 @@ export function FenasojaHeadquarters({
         palette.dispose();
       },
     };
-  }, [gl, invalidate]);
+  }, [gl, invalidate, prepared]);
   const group = useRef<THREE.Group>(null);
   const lod = useRef({
     tier: -1,

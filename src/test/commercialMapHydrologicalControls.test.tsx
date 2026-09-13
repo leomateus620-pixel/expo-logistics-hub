@@ -63,6 +63,20 @@ describe('controles do modo Rede Hidrológica', () => {
     });
   });
 
+  it('exposes an independent rain toggle in the compact toolbar', () => {
+    useCommercialMapStore.setState({ rainModeActive: false, nightModeActive: true });
+    renderMobileToolbar();
+    const before = useCommercialMapStore.getState();
+    fireEvent.click(screen.getByRole('button', { name: 'Ativar chuva' }));
+    const after = useCommercialMapStore.getState();
+    expect(after.rainModeActive).toBe(true);
+    expect(after.nightModeActive).toBe(true);
+    expect(after.selectedEntityId).toBe(before.selectedEntityId);
+    expect(after.cameraSequence).toBe(before.cameraSequence);
+    expect(after.sunriseSequence).toBe(before.sunriseSequence);
+    expect(screen.getByRole('button', { name: 'Desativar chuva' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
   it('inicia desligado e ativa pela barra desktop sem alterar árvores ou rótulos', () => {
     renderTopBar();
 

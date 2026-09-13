@@ -1,6 +1,6 @@
 import { createArenaParkingGeometry, isArenaParking } from '../../utils/arenaParkingGeometry';
 import { LightingPerformanceProbe } from '../../diagnostics/LightingPerformanceProbe';
-import { markCommercialMapStage } from '../../utils/performanceDiagnostics';
+import { beginCommercialMapBoot, getCommercialMapBootSnapshot, markCommercialMapStage, measureCommercialMapSync } from '../../utils/performanceDiagnostics';
 import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
 // lovable resync: same snapshot as PR #123
 import {
@@ -22,6 +22,9 @@ import {
 import { Canvas, type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, useTexture } from '@react-three/drei';
 import { CommercialMapSceneShaderWarmup } from './CommercialMapSceneShaderWarmup';
+import { readPreparedHeadquartersGeometry } from './headquarters/headquartersPreparationResource';
+import { CommercialMapInteractiveBoot, DeferredSceneLayer } from './DeferredSceneLayer';
+import { preloadBumperPhysics } from '../../utils/preloadBumperPhysics';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import {
@@ -159,7 +162,6 @@ import { applyPilotGroundMaterial } from './vegetationPilotMaterial';
 import { isVegetationPilotEnabled } from '../../utils/vegetationPilot';
 import { CommercialElectricalInfrastructureLayer } from './CommercialElectricalInfrastructureLayer';
 import { NightLightingLayer } from './NightLightingLayer';
-import { CommercialHydrologicalInfrastructureLayer } from './CommercialHydrologicalInfrastructureLayer';
 import { CommercialPavilionInteriorScene } from './CommercialPavilionInteriorScene';
 import { MiranteInteriorScene } from './MiranteInteriorScene';
 import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
@@ -223,6 +225,21 @@ const RearRoadValidationOverlay = import.meta.env.DEV
 const QuadrasABValidationOverlay = import.meta.env.DEV
   ? lazy(async () => ({ default: (await import('./QuadrasABValidationOverlay')).QuadrasABValidationOverlay }))
   : null;
+const CommercialHydrologicalInfrastructureLayer = lazy(async () => ({
+  default: (await import('./CommercialHydrologicalInfrastructureLayer')).CommercialHydrologicalInfrastructureLayer,
+}));
+const CommercialMapRainLayer = lazy(() => import('./CommercialMapRainLayer'));
+
+function DeferredPhysicsPreload() {
+  useEffect(() => {
+    markCommercialMapStage('physics-preparation:start');
+    void preloadBumperPhysics().then(
+      () => markCommercialMapStage('physics-preparation:end'),
+      () => markCommercialMapStage('physics-preparation:end', undefined, true),
+    );
+  }, []);
+  return null;
+}
 
 interface CommercialMapCanvasProps {
   entities: MapEntity[];
@@ -729,6 +746,10 @@ function createEntityShape(entity: MapEntity) {
 }
 
 function createEntityGeometry(entity: MapEntity, heightOverride?: number) {
+  return measureCommercialMapSync('geometry-preparation', () => createEntityGeometryResource(entity, heightOverride));
+}
+
+function createEntityGeometryResource(entity: MapEntity, heightOverride?: number) {
   if (isArenaParking(entity)) return createArenaParkingGeometry(entity, heightOverride ?? 0.06);
   const shape = createEntityShape(entity);
   const classification = String(entity.classification);
@@ -1883,7 +1904,10 @@ function CameraRig({
   const controlsRef = useRef<OrbitControlsImpl>(null);
   useEffect(() => {
     const controls = controlsRef.current;
-    if (controls) return registerCommercialMapControlsDiagnostics(controls);
+    if (controls) {
+      markCommercialMapStage('controls-created');
+      return registerCommercialMapControlsDiagnostics(controls);
+    }
   }, []);
   const camera = useThree((state) => state.camera);
   const size = useThree((state) => state.size);
@@ -4251,6 +4275,16 @@ const Scene = memo(function Scene({
   technicalValidationAllowed = false,
   renderQualityTier = 'HIGH',
 }: CommercialMapSceneProps) {
+  // Suspend before constructing siblings. Suspending only inside B12 makes
+  // React replay terrain/road/material preparation while its worker finishes.
+  if (entities.some((entity) => resolveStrategicLandmarkKind(entity) === 'fenasoja-headquarters')) {
+    readPreparedHeadquartersGeometry();
+  }
+  const bootStarted = useRef(false);
+  if (!bootStarted.current) {
+    bootStarted.current = true;
+    markCommercialMapStage('critical-scene:start');
+  }
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const hoveredEntityId = useCommercialMapStore((state) => state.hoveredEntityId);
@@ -4739,6 +4773,7 @@ const Scene = memo(function Scene({
         reducedGraphics={reducedGraphics}
       />
       {(!isolatedArea || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry) && (
+        <DeferredSceneLayer id="site-context" priority={25}>
         <group visible={!hydrologicalModeActive}>
           <CommercialSiteEnvironmentLayer
             entities={siteEnvironmentEntities}
@@ -4752,26 +4787,33 @@ const Scene = memo(function Scene({
             vegetationVisible={treesVisible}
           />
         </group>
+        </DeferredSceneLayer>
       )}
       {!isolatedArea && (
+        <DeferredSceneLayer id="quadras-context" priority={35}>
         <group visible={!hydrologicalModeActive}>
           <QuadrasABEnvironmentLayer
             entities={siteEnvironmentEntities}
             reducedGraphics={reducedGraphics}
           />
         </group>
+        </DeferredSceneLayer>
       )}
       {!isolatedArea && (
         <group visible={!hydrologicalModeActive}>
+          <DeferredSceneLayer id="rear-environment" priority={60}>
           <RearParkEnvironmentLayer
             reducedGraphics={reducedGraphics}
             vegetationVisible={treesVisible}
           />
+          </DeferredSceneLayer>
+          <DeferredSceneLayer id="residential-district" priority={110}>
           <NightAwareResidentialDistrict
             reducedGraphics={reducedGraphics}
             vegetationVisible={treesVisible}
             nightMode={nightAtmosphereActive}
           />
+          </DeferredSceneLayer>
           {/* Rear approaches and external roads share one polygon union. */}
           <RegionalHighwayNetwork
             reducedGraphics={reducedGraphics}
@@ -4787,21 +4829,25 @@ const Scene = memo(function Scene({
         </group>
       )}
       {rearParkingAvailable && (
+        <DeferredSceneLayer id="parking-context" priority={30}>
         <RearParkingLayer
           active={rearParkingEnabled}
           reducedGraphics={reducedGraphics}
           labelsVisible={labelsVisible}
           opacity={parkingPresentation.opacity}
         />
+        </DeferredSceneLayer>
       )}
       {parkAccessScope && (
         <group visible={!hydrologicalModeActive}>
           {parkAccessScope === 'all' && (
+            <DeferredSceneLayer id="access-environment" priority={45}>
             <ParkAccessEnvironmentLayer
               reducedGraphics={reducedGraphics}
               surfacesVisible
               vegetationVisible={treesVisible}
             />
+            </DeferredSceneLayer>
           )}
           <ParkAccessInfrastructure
             reducedGraphics={reducedGraphics}
@@ -4828,7 +4874,8 @@ const Scene = memo(function Scene({
         onFocus={handleEntityFocus}
         onCursor={setCanvasCursor}
       />
-      {structuralEntities.map((entity) => (
+      {structuralEntities.map((entity) => {
+        const mesh = (
         <EntityMesh
           key={entity.id}
           entity={entity}
@@ -4851,15 +4898,27 @@ const Scene = memo(function Scene({
           onCursor={setCanvasCursor}
           moduleStateById={selectedEntityId === entity.id ? selectedPavilionModuleState : undefined}
         />
-      ))}
+        );
+        const kind = resolveStrategicLandmarkKind(entity);
+        // These exact authored landmarks are decorative context; keep their
+        // EntityMesh identity and picking props intact after one-time admission.
+        // Lunar memorial retains its zero-intensity engine light in Stage 1:
+        // late insertion would change every lit shader's global light count.
+        return kind === 'amusement-park'
+          ? <DeferredSceneLayer key={entity.id} id={`landmark:${entity.id}`} priority={95}>{mesh}</DeferredSceneLayer>
+          : mesh;
+      })}
+      <DeferredSceneLayer id="nations-context" priority={40}>
       <NationsDistrict
         visible={nationsDistrictPresentation.visible}
         opacity={nationsDistrictPresentation.opacity}
         reducedGraphics={reducedGraphics}
       />
+      </DeferredSceneLayer>
       {(arenaFrontInfrastructurePresentation.arenaStructures.visible
         || arenaFrontInfrastructurePresentation.arenaAccess.visible
         || arenaFrontInfrastructurePresentation.courts.visible) && (
+        <DeferredSceneLayer id="arena-context" priority={42}>
         <ArenaFrontInfrastructure
           reducedGraphics={reducedGraphics}
           showArenaStructures={arenaFrontInfrastructurePresentation.arenaStructures.visible}
@@ -4869,7 +4928,9 @@ const Scene = memo(function Scene({
           arenaAccessOpacity={arenaFrontInfrastructurePresentation.arenaAccess.opacity}
           courtsOpacity={arenaFrontInfrastructurePresentation.courts.opacity}
         />
+        </DeferredSceneLayer>
       )}
+      <DeferredSceneLayer id="vegetation" priority={90}>
       <CommercialTreeLayer
         trees={presentedSceneTrees}
         surfaceEntities={treeSurfaceEntities}
@@ -4877,6 +4938,8 @@ const Scene = memo(function Scene({
         reducedGraphics={reducedGraphics}
         qualityTier={renderQualityTier}
       />
+      </DeferredSceneLayer>
+      <DeferredSceneLayer id="electrical-detail" priority={50}>
       <CommercialElectricalInfrastructureLayer
         nodes={sceneElectricalInfrastructure.nodes}
         connections={sceneElectricalInfrastructure.connections}
@@ -4885,6 +4948,7 @@ const Scene = memo(function Scene({
         visible={electricalNetworkVisible}
         reducedGraphics={reducedGraphics}
       />
+      </DeferredSceneLayer>
       <NightLightingLayer
         nodes={sceneElectricalInfrastructure.nodes}
         connections={sceneElectricalInfrastructure.connections}
@@ -4893,16 +4957,20 @@ const Scene = memo(function Scene({
         polesVisible={electricalNetworkVisible}
         reducedGraphics={reducedGraphics}
       />
-      <Suspense fallback={null}>
+      <DeferredSceneLayer id="hydrology" priority={10}>
         <CommercialHydrologicalInfrastructureLayer
           nodes={sceneHydrologicalInfrastructure.nodes}
           segments={sceneHydrologicalInfrastructure.segments}
           surfaceEntities={exteriorRenderedEntities}
           active={hydrologicalModeActive}
+          prepare
           reducedGraphics={reducedGraphics}
           onSelect={handleHydrologicalSelect}
         />
-      </Suspense>
+      </DeferredSceneLayer>
+      <DeferredSceneLayer id="rain" priority={5}>
+        <CommercialMapRainLayer entities={entities} qualityTier={renderQualityTier} active={!interiorEntity} />
+      </DeferredSceneLayer>
       {contextualLabelEntities.filter((entity) => (
         (!parkingInspectionOpen || ['PAVILHAO-09', 'D5', 'PISTA-CAMPEIRA', 'J'].includes(entity.publicIdentifier))
       )).map((entity) => (
@@ -4960,8 +5028,14 @@ const Scene = memo(function Scene({
         onCursor={setCanvasCursor}
       />
       <StrategicLandmarkSelectionShaderWarmup />
+      <DeferredSceneLayer id="interior-shaders" priority={140} waitForMilestone="interior-preparation:end">
       <CommercialMapInteriorShaderWarmup reducedGraphics={reducedGraphics} />
+      </DeferredSceneLayer>
+      <DeferredSceneLayer id="physics-module" priority={150} waitForMilestone="physics-preparation:end">
+        <DeferredPhysicsPreload />
+      </DeferredSceneLayer>
       <CommercialMapSceneShaderWarmup />
+      <CommercialMapInteractiveBoot />
     </>
   );
 });
@@ -5007,6 +5081,13 @@ function AdaptiveCommercialMapScene({
 }
 
 export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: CommercialMapCanvasProps) {
+  const bootSessionInitialized = useRef(false);
+  if (!bootSessionInitialized.current) {
+    bootSessionInitialized.current = true;
+    // A lazy page factory runs only once in an SPA. A new Canvas still needs
+    // its own readiness session after leaving and returning to the map.
+    if (getCommercialMapBootSnapshot().interactive) beginCommercialMapBoot();
+  }
   const {
     entities,
     isolatedArea,
@@ -5107,6 +5188,20 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
     canvasCleanup.current = null;
   }, []);
 
+  const createRenderer = useCallback((canvas: HTMLCanvasElement) => {
+    markCommercialMapStage('renderer:create:start');
+    markCommercialMapStage('webgl-context:start');
+    const configuration = { canvas, ...initialRenderConfig.current!.renderer };
+    const context = canvas.getContext('webgl2', {
+      alpha: false, antialias: true, depth: true, stencil: false,
+      premultipliedAlpha: true, preserveDrawingBuffer: false, powerPreference: 'high-performance',
+    }) as WebGL2RenderingContext | null;
+    markCommercialMapStage('webgl-context:end');
+    const renderer = new THREE.WebGLRenderer({ ...configuration, ...(context ? { context } : {}) });
+    markCommercialMapStage('renderer:create:end');
+    return renderer;
+  }, []);
+
   return (
     <Canvas
       className="commercial-map-canvas"
@@ -5115,13 +5210,26 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
       camera={initialRenderConfig.current.camera}
       dpr={initialPixelRatio}
       shadows={reducedGraphics ? false : COMMERCIAL_MAP_SHADOW_MAP_CONFIG}
-      gl={initialRenderConfig.current.renderer}
+      gl={createRenderer}
         onCreated={({ gl, scene, camera }) => {
           markCommercialMapStage('canvas-created');
           canvasCleanup.current?.();
           const disposeGestureGuard = registerMapGestureGuard(gl.domElement);
           const disposeDiagnostics = registerCommercialMapRuntimeDiagnostics({ gl, scene, camera });
+          const renderShadows = gl.shadowMap.render;
+          gl.shadowMap.render = (...args: Parameters<typeof renderShadows>) => {
+            if (!gl.shadowMap.enabled || (!gl.shadowMap.autoUpdate && !gl.shadowMap.needsUpdate) || !args[0].length) {
+              return renderShadows.apply(gl.shadowMap, args);
+            }
+            markCommercialMapStage('shadow-preparation:start');
+            try { return renderShadows.apply(gl.shadowMap, args); }
+            finally {
+              markCommercialMapStage('shadow-preparation:end');
+              gl.shadowMap.render = renderShadows;
+            }
+          };
           canvasCleanup.current = () => {
+            gl.shadowMap.render = renderShadows;
             disposeDiagnostics();
             disposeGestureGuard();
           };

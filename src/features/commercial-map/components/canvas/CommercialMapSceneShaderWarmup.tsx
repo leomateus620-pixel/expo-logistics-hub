@@ -1,7 +1,8 @@
-import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
+import { commercialMapDiagnosticsEnabled, markCommercialMapStage } from '../../utils/performanceDiagnostics';
 import { useLayoutEffect } from 'react';
 import { useThree } from '@react-three/fiber';
-import { prepareCommercialScene } from '../../utils/sceneShaderWarmup';
+import { prepareCommercialMapCriticalPost, prepareCommercialScene } from '../../utils/sceneShaderWarmup';
+import { scheduleCommercialMapSceneTask } from './DeferredSceneLayer';
 import { COMMERCIAL_MAP_PREPARING_EVENT } from '../../utils/renderingHealth';
 
 export function CommercialMapSceneShaderWarmup() {
@@ -12,18 +13,36 @@ export function CommercialMapSceneShaderWarmup() {
   useLayoutEffect(() => {
     let active = true;
     let generation = 0;
+    let cancelPostTask: (() => void) | undefined;
+    let postController: AbortController | undefined;
     const prepare = () => {
+      postController?.abort();
+      cancelPostTask?.();
+      postController = new AbortController();
+      const signal = postController.signal;
       const current = ++generation;
       const startedAt = performance.now();
+      markCommercialMapStage('critical-scene:end');
       gl.domElement.dataset.commercialMapPreparing = 'true';
       gl.domElement.dispatchEvent(new CustomEvent(COMMERCIAL_MAP_PREPARING_EVENT, { bubbles: true }));
-      void prepareCommercialScene(gl, scene, camera).then(() => {
+      void prepareCommercialScene(gl, scene, camera, signal).then(() => {
         if (!active || current !== generation) return;
         if (commercialMapDiagnosticsEnabled) gl.domElement.dataset.commercialMapSceneWarmup = JSON.stringify({
           durationMs: performance.now() - startedAt,
           parallel: gl.extensions.has('KHR_parallel_shader_compile'),
         });
         delete gl.domElement.dataset.commercialMapPreparing;
+        cancelPostTask = scheduleCommercialMapSceneTask(gl.domElement, {
+          id: 'critical-post-shaders', priority: 0,
+          run: (complete) => {
+            void prepareCommercialMapCriticalPost(gl, scene, camera, signal).catch((error) => {
+              if (!signal.aborted) {
+                markCommercialMapStage('critical-post:end', undefined, true);
+                if (commercialMapDiagnosticsEnabled) console.warn('[CommercialMap] post warmup retained direct rendering', error);
+              }
+            }).finally(() => { complete(); invalidate(); });
+          },
+        });
         invalidate();
       }, () => {
         // The frame owner's existing error/recovery path diagnoses failed shaders.
@@ -33,10 +52,19 @@ export function CommercialMapSceneShaderWarmup() {
         }
       });
     };
+    const lost = () => {
+      generation += 1;
+      postController?.abort();
+      cancelPostTask?.();
+    };
     prepare();
+    gl.domElement.addEventListener('webglcontextlost', lost);
     gl.domElement.addEventListener('webglcontextrestored', prepare);
     return () => {
       active = false;
+      postController?.abort();
+      cancelPostTask?.();
+      gl.domElement.removeEventListener('webglcontextlost', lost);
       gl.domElement.removeEventListener('webglcontextrestored', prepare);
     };
   }, [camera, gl, invalidate, scene]);

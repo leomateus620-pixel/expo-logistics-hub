@@ -1,6 +1,7 @@
 import {
   Box,
   Compass,
+  CloudRain,
   Droplets,
   Grid2x2,
   Layers3,
@@ -57,6 +58,8 @@ export function CommercialMapTopBar({
   const requestSunrise = useCommercialMapStore((state) => state.requestSunrise);
   const nightModeActive = useCommercialMapStore((state) => state.nightModeActive);
   const toggleNightMode = useCommercialMapStore((state) => state.toggleNightMode);
+  const rainModeActive = useCommercialMapStore((state) => state.rainModeActive);
+  const toggleRainMode = useCommercialMapStore((state) => state.toggleRainMode);
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
 
@@ -72,13 +75,13 @@ export function CommercialMapTopBar({
     Icon: LucideIcon,
     label: string,
     onClick: () => void,
-    options: { active?: boolean; disabled?: boolean; hydrological?: boolean; night?: boolean } = {},
+    options: { active?: boolean; disabled?: boolean; hydrological?: boolean; night?: boolean; rain?: boolean } = {},
   ) => (
     <Tooltip key={key}>
       <TooltipTrigger asChild>
         <button
           type="button"
-          className={`commercial-map-topbar__trigger ${options.active ? 'is-open' : ''} ${options.hydrological ? 'is-hydrological' : ''} ${options.night ? 'is-night' : ''}`}
+          className={`commercial-map-topbar__trigger ${options.active ? 'is-open' : ''} ${options.hydrological ? 'is-hydrological' : ''} ${options.night ? 'is-night' : ''} ${options.rain ? 'is-rain' : ''}`}
           onClick={onClick}
           disabled={options.disabled}
           aria-label={label}
@@ -132,6 +135,14 @@ export function CommercialMapTopBar({
         nightModeActive ? 'Sair do Modo Noturno' : 'Ativar Modo Noturno',
         toggleNightMode,
         { active: nightModeActive, night: true },
+      )}
+
+      {renderAction(
+        'rain-mode',
+        CloudRain,
+        rainModeActive ? 'Desativar chuva' : 'Ativar chuva',
+        toggleRainMode,
+        { active: rainModeActive, rain: true },
       )}
 
       {renderAction(

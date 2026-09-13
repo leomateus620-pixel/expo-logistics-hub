@@ -1,0 +1,178 @@
+{
+  "entry": "src/pages/CommercialMapPage.tsx",
+  "chunks": [
+    {
+      "key": "src/pages/CommercialMapPage.tsx",
+      "file": "assets/CommercialMapPage-D5fIWR5B.js",
+      "bytes": 4495,
+      "gzipBytes": 1779
+    },
+    {
+      "key": "_react-vendor-Cze6uWs8.js",
+      "file": "assets/react-vendor-Cze6uWs8.js",
+      "bytes": 192974,
+      "gzipBytes": 64161
+    },
+    {
+      "key": "_module-runtime-CEDABylm.js",
+      "file": "assets/module-runtime-CEDABylm.js",
+      "bytes": 1244,
+      "gzipBytes": 724
+    },
+    {
+      "key": "_CommercialMapPage-BxahsdvB.js",
+      "file": "assets/CommercialMapPage-BxahsdvB.js",
+      "bytes": 533005,
+      "gzipBytes": 152677
+    },
+    {
+      "key": "index.html",
+      "file": "assets/index-CWWP57A0.js",
+      "bytes": 596620,
+      "gzipBytes": 158907
+    },
+    {
+      "key": "_ui-radix-oleMKT98.js",
+      "file": "assets/ui-radix-oleMKT98.js",
+      "bytes": 137075,
+      "gzipBytes": 41212
+    },
+    {
+      "key": "_data-vendor-BB8ZE5qF.js",
+      "file": "assets/data-vendor-BB8ZE5qF.js",
+      "bytes": 221547,
+      "gzipBytes": 59643
+    },
+    {
+      "key": "_textarea-B7HUSMGn.js",
+      "file": "assets/textarea-B7HUSMGn.js",
+      "bytes": 522,
+      "gzipBytes": 340
+    },
+    {
+      "key": "_fenasojaComplexReconstruction-zk8l-oYI.js",
+      "file": "assets/fenasojaComplexReconstruction-zk8l-oYI.js",
+      "bytes": 8556,
+      "gzipBytes": 4110
+    },
+    {
+      "key": "_state-vendor-CDfFiNsr.js",
+      "file": "assets/state-vendor-CDfFiNsr.js",
+      "bytes": 2203,
+      "gzipBytes": 1034
+    },
+    {
+      "key": "_dropdown-menu-HkdhDNoG.js",
+      "file": "assets/dropdown-menu-HkdhDNoG.js",
+      "bytes": 3759,
+      "gzipBytes": 1109
+    },
+    {
+      "key": "_maximize-2-MIj8kSQq.js",
+      "file": "assets/maximize-2-MIj8kSQq.js",
+      "bytes": 467,
+      "gzipBytes": 314
+    },
+    {
+      "key": "_moon-DDKA_ROk.js",
+      "file": "assets/moon-DDKA_ROk.js",
+      "bytes": 311,
+      "gzipBytes": 253
+    },
+    {
+      "key": "_scroll-area-CREdazGM.js",
+      "file": "assets/scroll-area-CREdazGM.js",
+      "bytes": 2283,
+      "gzipBytes": 953
+    },
+    {
+      "key": "_ellipsis-CSx8OATu.js",
+      "file": "assets/ellipsis-CSx8OATu.js",
+      "bytes": 390,
+      "gzipBytes": 266
+    },
+    {
+      "key": "_sliders-horizontal-zRCooJQi.js",
+      "file": "assets/sliders-horizontal-zRCooJQi.js",
+      "bytes": 753,
+      "gzipBytes": 370
+    },
+    {
+      "key": "_warehouse-D0cRUyMo.js",
+      "file": "assets/warehouse-D0cRUyMo.js",
+      "bytes": 901,
+      "gzipBytes": 435
+    },
+    {
+      "key": "_chevron-up-Bqr_RxHv.js",
+      "file": "assets/chevron-up-Bqr_RxHv.js",
+      "bytes": 296,
+      "gzipBytes": 246
+    },
+    {
+      "key": "_rotate-ccw-CIaHF0KB.js",
+      "file": "assets/rotate-ccw-CIaHF0KB.js",
+      "bytes": 368,
+      "gzipBytes": 286
+    },
+    {
+      "key": "_save-CjWTqsSl.js",
+      "file": "assets/save-CjWTqsSl.js",
+      "bytes": 918,
+      "gzipBytes": 441
+    },
+    {
+      "key": "_dialog-CkHBl4Tu.js",
+      "file": "assets/dialog-CkHBl4Tu.js",
+      "bytes": 2518,
+      "gzipBytes": 988
+    },
+    {
+      "key": "_label-BbaiyumY.js",
+      "file": "assets/label-BbaiyumY.js",
+      "bytes": 370,
+      "gzipBytes": 269
+    },
+    {
+      "key": "_switch-Ca0ltng8.js",
+      "file": "assets/switch-Ca0ltng8.js",
+      "bytes": 852,
+      "gzipBytes": 457
+    },
+    {
+      "key": "_info-C1LP97ff.js",
+      "file": "assets/info-C1LP97ff.js",
+      "bytes": 368,
+      "gzipBytes": 280
+    },
+    {
+      "key": "_database-zap-CyeBCWul.js",
+      "file": "assets/database-zap-CyeBCWul.js",
+      "bytes": 507,
+      "gzipBytes": 350
+    },
+    {
+      "key": "_send-BOmHB6TB.js",
+      "file": "assets/send-BOmHB6TB.js",
+      "bytes": 459,
+      "gzipBytes": 331
+    },
+    {
+      "key": "_badge-check-mp1JXmo5.js",
+      "file": "assets/badge-check-mp1JXmo5.js",
+      "bytes": 484,
+      "gzipBytes": 314
+    },
+    {
+      "key": "_skip-forward-vRhJWspX.js",
+      "file": "assets/skip-forward-vRhJWspX.js",
+      "bytes": 365,
+      "gzipBytes": 289
+    }
+  ],
+  "staticBytes": 1714610,
+  "staticGzipBytes": 492538,
+  "rendererRequiredBeforeQuery": false,
+  "physicsRequiredBeforeQuery": false,
+  "pdfRequiredBeforeQuery": false
+}

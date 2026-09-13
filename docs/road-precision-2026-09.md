@@ -68,3 +68,9 @@ Tempos locais de primeira apresentação (aproximadamente 20–40 s em Vite) inc
 Reprodução: `npx vite-node scripts/road-precision/audit.ts after`; `node scripts/road-precision/capture.cjs performance`; `node scripts/road-precision/functional.cjs --desktop http://127.0.0.1:4186/mapa-comercial` (ou `--mobile`); `node scripts/road-precision/modes.cjs`; `QA_URL=http://127.0.0.1:4186 node scripts/road-precision/stress.cjs` (ajustar atribuição da variável no PowerShell). Os scripts usam `PLAYWRIGHT_MODULE` quando Playwright vem do runtime instalado do Codex.
 
 As execuções funcionais usam autenticação e dados de teste locais, sem escrita no backend. Não certificam a revisão publicada, dispositivos físicos ou Safari/iOS. O código desta base não contém modo de chuva; `dist-rain/`, que já estava fora do controle de versão, foi preservado. Os anexos atuais são a autoridade visual desta intervenção; referências e notas antigas do repositório não prevalecem sobre eles.
+
+## Integração para publicação da PR
+
+A `main` avançou para `61106b2a` (PR #145, carregamento progressivo e chuva) depois das validações acima. Essa revisão foi incorporada à branch antes da publicação. O único conflito foi resolvido mantendo a medição de preparação de geometria da nova base e aplicando o recorte do estacionamento dentro de `createEntityGeometryResource`.
+
+Os arquivos `integration-static.json`, `integration-build.json` e `integration-tests.json` registram a nova checagem de TypeScript, lint do ponto integrado, build e testes direcionados de preservação, geometria viária, chuva e boot progressivo. As capturas, suíte completa e medições de desempenho anteriores continuam identificadas pela base `524f446a`; não foram apresentadas como medições da composição com a PR #145. A chuva agora existe na base incorporada, mas não recebeu nova validação visual nesta etapa de publicação.

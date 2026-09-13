@@ -42,7 +42,8 @@ describe('contrato de estabilidade do mapa comercial', () => {
   it('pré-carrega módulos críticos e usa uma transição de câmera cancelável', () => {
     const canvas = read('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
 
-    expect(canvas).toContain("import { CommercialHydrologicalInfrastructureLayer } from './CommercialHydrologicalInfrastructureLayer';");
+    expect(canvas).toContain("import('./CommercialHydrologicalInfrastructureLayer')");
+    expect(canvas).toContain('<DeferredSceneLayer id="hydrology"');
     expect(canvas).toContain("import { CommercialPavilionInteriorScene } from './CommercialPavilionInteriorScene';");
     expect(canvas).toContain("import { MiranteInteriorScene } from './MiranteInteriorScene';");
     expect(canvas).toContain('interface DeterministicCameraTransition');

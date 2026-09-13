@@ -1,4 +1,6 @@
 import { LightingBenchmark } from './LightingBenchmark';
+import { EnvironmentBenchmark } from './EnvironmentBenchmark';
+import { useCommercialMapBootVisit } from '../hooks/useCommercialMapBootVisit';
 import { useEffect, useRef, useState } from 'react';
 import { CommercialMapCanvas } from '../components/canvas/CommercialMapCanvas';
 import { CommercialMapRendererStatus } from '../components/CommercialMapRendererStatus';
@@ -22,6 +24,7 @@ import {
 } from './renderingStressResources';
 import type { CameraPreset, Coordinate } from '../types';
 import { LateralDistrictQaPanel } from './LateralDistrictQa';
+import { getCommercialMapBootSnapshot, markCommercialMapStage, summarizeCommercialMapBoot } from '../utils/performanceDiagnostics';
 import '../commercial-map.css';
 import '../commercial-map-mobile.css';
 import './commercial-map-rendering-diagnostics.css';
@@ -36,6 +39,7 @@ const DIAGNOSTICS_MAP_DATA = presentCommercialMapData(new URLSearchParams(window
     return row ? { ...entity, geometry: { ...entity.geometry, coordinates: row.geometry.coordinates as Coordinate[][] } } : entity;
   }),
 } : OFFICIAL_REFERENCE_DATA);
+markCommercialMapStage('fixture-data-ready');
 const MAXIMUM_ZOOM_WHEEL_STEPS = 80;
 const QA_CAMERA_PRESETS: readonly CameraPreset[] = [
   'overview', 'top', 'isometric', 'commercial', 'pavilions', 'parking', 'gates',
@@ -181,9 +185,13 @@ function formatMetric(value: number | null, suffix = '') {
  * App.tsx excludes the route and dynamic import from production builds.
  */
 export default function CommercialMapRenderingDiagnosticsPage() {
+  const newBootVisit = useCommercialMapBootVisit();
+  if (newBootVisit) markCommercialMapStage('fixture-data-ready');
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const nightModeActive = useCommercialMapStore((state) => state.nightModeActive);
+  const rainModeActive = useCommercialMapStore((state) => state.rainModeActive);
+  const [bootReport, setBootReport] = useState(() => ({ fixture: true, summary: summarizeCommercialMapBoot(), snapshot: getCommercialMapBootSnapshot(), events: window.__commercialMapPerformance }));
   const [summary, setSummary] = useState<CommercialMapRuntimeSummary>(initialSummary);
   const [stressReport, setStressReport] = useState<StressReport>(initialStressReport);
   const [runtimeFacts, setRuntimeFacts] = useState<RuntimeFacts>(currentRuntimeFacts);
@@ -211,6 +219,7 @@ export default function CommercialMapRenderingDiagnosticsPage() {
     // given camera preset, so screenshot QA needs no clicks.
     const query = new URLSearchParams(window.location.search);
     store.setNightModeActive(false);
+    store.setRainModeActive(query.get('rain') === '1');
     let releaseNightRequest: (() => void) | undefined;
     if (query.get('night') === '1') {
       // The environment replays the sunrise on mount and the sunrise always
@@ -240,6 +249,7 @@ export default function CommercialMapRenderingDiagnosticsPage() {
       const latestTiming = readCommercialMapRenderTiming();
       setRuntimeFacts(facts);
       setTiming(latestTiming);
+      setBootReport({ fixture: true, summary: summarizeCommercialMapBoot(), snapshot: getCommercialMapBootSnapshot(), events: window.__commercialMapPerformance });
       if (latestTiming.enabled && (facts.visibility !== 'visible' || !facts.focused)) {
         setTimingEnvironmentValid(false);
       }
@@ -274,6 +284,7 @@ export default function CommercialMapRenderingDiagnosticsPage() {
       latest.setHydrologicalModeActive(false);
       latest.setReducedGraphics(false);
       latest.setNightModeActive(false);
+      latest.setRainModeActive(false);
       latest.setCameraNavigating(false);
     };
   }, []);
@@ -445,6 +456,9 @@ export default function CommercialMapRenderingDiagnosticsPage() {
           >
             Noturno
           </button>
+          <button type="button" aria-pressed={rainModeActive} data-commercial-map-control="rain-mode"
+            onClick={() => useCommercialMapStore.getState().toggleRainMode()}>Chuva</button>
+          <button type="button" onClick={() => useCommercialMapStore.getState().requestSunrise()}>Amanhecer</button>
           <button
             type="button"
             aria-pressed={reducedGraphics}
@@ -501,6 +515,17 @@ export default function CommercialMapRenderingDiagnosticsPage() {
         </details>
         <small>Contadores confirmam draws enviados ao framebuffer da tela; screenshots validam os pixels exibidos.</small>
         <LateralDistrictQaPanel />
+        <div className="commercial-map-district-qa" style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          <button type="button" aria-pressed={!nightModeActive} onClick={() => useCommercialMapStore.getState().setNightModeActive(false)}>Dia QA</button>
+          <button type="button" aria-pressed={nightModeActive} onClick={() => useCommercialMapStore.getState().toggleNightMode()}>Noite QA</button>
+          <button type="button" aria-pressed={rainModeActive} onClick={() => useCommercialMapStore.getState().toggleRainMode()}>Chuva QA</button>
+          <button type="button" aria-pressed={hydrologicalModeActive} onClick={() => useCommercialMapStore.getState().toggleHydrologicalMode()}>Hidrologia QA</button>
+        </div>
+        <details>
+          <summary>MAP BOOT · {bootReport.summary.interactiveMs ?? '—'} ms interativo (fixture)</summary>
+          <pre id="commercial-map-boot-result">{JSON.stringify(bootReport)}</pre>
+        </details>
+        <EnvironmentBenchmark disabled={stressRunning || !renderer} />
         <details>
           <summary>CPU/GPU JSON · {timing.enabled ? timingEnvironmentValid ? 'amostra em primeiro plano' : 'amostra inválida: foco/visibilidade' : 'desabilitado'}</summary>
           <pre data-testid="commercial-map-timing-json">{JSON.stringify({ environmentValid: timingEnvironmentValid, environment: runtimeFacts, timing }, null, 2)}</pre>

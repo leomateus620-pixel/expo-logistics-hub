@@ -16,14 +16,13 @@ import type {
 import { HYDROLOGICAL_PRESENTATION_PALETTE } from '../../data/hydrologicalPresentation';
 import type { MapEntity } from '../../types';
 import {
-  buildHydrologicalPipeSpans,
   hydrologicalNodeRenderKind,
-  resolveHydrologicalNodePlacements,
   type HydrologicalNodeRenderKind,
   type HydrologicalPipeSpan,
   type ResolvedHydrologicalNodePlacement,
 } from '../../utils/hydrologicalInfrastructure';
 import { isMapSelectionClick } from '../../utils/interaction';
+import { readPreparedHydrology } from '../../utils/hydrologyPreparationResource';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_Y = new THREE.Vector3(0, 1, 0);
@@ -287,24 +286,18 @@ function CommercialHydrologicalInfrastructureInstances({
   const nodeAccessoryRef = useRef<THREE.InstancedMesh>(null);
   const nodeRingRef = useRef<THREE.InstancedMesh>(null);
   const selectionRef = useRef<THREE.InstancedMesh>(null);
-  const { invalidate } = useThree();
-  const selectionEnabled = Boolean(onSelect);
+  const { invalidate, gl } = useThree();
+  const selectionEnabled = active && Boolean(onSelect);
 
-  const pipeSpans = useMemo(() => buildHydrologicalPipeSpans(
-    segments,
-    surfaceEntities,
-    reducedGraphics,
-  ), [reducedGraphics, segments, surfaceEntities]);
+  const { pipeSpans, placements } = readPreparedHydrology({
+    nodes, segments, surfaces: surfaceEntities, reducedGraphics,
+  }, gl.domElement);
   const distributionSpans = useMemo(() => pipeSpans.filter((span) => (
     span.renderClass === 'DISTRIBUTION'
   )), [pipeSpans]);
   const hydrantSpans = useMemo(() => pipeSpans.filter((span) => (
     span.renderClass === 'HYDRANT_SUPPLY'
   )), [pipeSpans]);
-  const placements = useMemo(
-    () => resolveHydrologicalNodePlacements(nodes, surfaceEntities),
-    [nodes, surfaceEntities],
-  );
   const nodeVisuals = useMemo<readonly HydrologicalNodeVisual[]>(() => placements.flatMap((placement) => {
     const kind = hydrologicalNodeRenderKind(placement.node);
     if (kind === 'JUNCTION') return [];
@@ -616,7 +609,9 @@ function CommercialHydrologicalInfrastructureInstances({
           raycast={NO_RAYCAST}
         />
       ) : null}
-      {selectionEnabled && selectableVisuals.length > 0 ? (
+      {/* Keep picking instances allocated and positioned during inactive
+          preparation. Enabling the mode changes interaction, never matrices. */}
+      {selectableVisuals.length > 0 ? (
         <instancedMesh
           ref={selectionRef}
           name="selecao-pontos-hidrologicos"
@@ -626,7 +621,9 @@ function CommercialHydrologicalInfrastructureInstances({
           receiveShadow={false}
           frustumCulled
           renderOrder={17}
-          onClick={handleSelection}
+          visible={selectionEnabled}
+          raycast={selectionEnabled ? THREE.InstancedMesh.prototype.raycast : NO_RAYCAST}
+          onClick={selectionEnabled ? handleSelection : undefined}
         />
       ) : null}
       {active && supplyEntryVisuals.map((visual) => {
@@ -658,6 +655,8 @@ export interface CommercialHydrologicalInfrastructureLayerProps {
   segments: readonly CommercialHydrologicalPipeSegment[];
   surfaceEntities: readonly MapEntity[];
   active: boolean;
+  /** Prepare during an admitted idle slot without enabling the water overlay. */
+  prepare?: boolean;
   reducedGraphics: boolean;
   onSelect?: (
     element: CommercialHydrologicalNode | CommercialHydrologicalPipeSegment,
@@ -668,15 +667,14 @@ export const CommercialHydrologicalInfrastructureLayer = memo(
   function CommercialHydrologicalInfrastructureLayer(
     props: CommercialHydrologicalInfrastructureLayerProps,
   ) {
-    const activated = useRef(props.active);
-    if (props.active) activated.current = true;
+    const activated = useRef(props.active || props.prepare);
+    if (props.active || props.prepare) activated.current = true;
     // Defer the one-time allocation until water mode is first requested, then
     // retain the prepared instanced scene. Later toggles only change visibility
     // and interaction, so no geometry/material lifecycle lands in the gesture.
     if (!activated.current || (props.nodes.length === 0 && props.segments.length === 0)) return null;
     return (
       <CommercialHydrologicalInfrastructureInstances
-        key={props.reducedGraphics ? 'hydrological-reduced' : 'hydrological-full'}
         active={props.active}
         nodes={props.nodes}
         segments={props.segments}

@@ -1,26 +1,41 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as THREE from 'three';
-import { isCommercialSceneCompiling, prepareCommercialScene } from '@/features/commercial-map/utils/sceneShaderWarmup';
+import { compileCommercialMapPrograms, isCommercialMapPostReady, isCommercialSceneCompiling,
+  prepareCommercialMapCriticalPost, prepareCommercialScene } from '@/features/commercial-map/utils/sceneShaderWarmup';
+afterEach(() => vi.useRealTimers());
 
 function rendererFixture() {
   let target: THREE.WebGLRenderTarget | null = new THREE.WebGLRenderTarget(2, 2);
   const initialTarget = target;
   const pending: { resolve: () => void; reject: (error: Error) => void }[] = [];
   const states: { tone: number; target: THREE.WebGLRenderTarget | null }[] = [];
+  const background: { tone: number; target: THREE.WebGLRenderTarget | null; objects: THREE.Object3D[] }[] = [];
+  const programByMaterial = new Map<THREE.Material, { isReady: () => boolean }>();
   const gl = {
     toneMapping: THREE.ReinhardToneMapping, outputColorSpace: THREE.LinearSRGBColorSpace,
     getRenderTarget: () => target, getActiveCubeFace: () => 0, getActiveMipmapLevel: () => 0,
     setRenderTarget: vi.fn((value) => { target = value; }),
-    compileAsync: vi.fn(() => {
+    compile: vi.fn((objects: THREE.Object3D) => {
+      if (!(objects instanceof THREE.Scene)) {
+        background.push({ tone: gl.toneMapping, target, objects: [...objects.children] });
+        return new Set<THREE.Material>();
+      }
       states.push({ tone: gl.toneMapping, target });
-      return new Promise<void>((resolve, reject) => pending.push({ resolve, reject }));
+      let ready = false;
+      let error: Error | null = null;
+      const material = new THREE.MeshBasicMaterial();
+      const program = { isReady: () => { if (error) throw error; return ready; } };
+      programByMaterial.set(material, program);
+      pending.push({ resolve: () => { ready = true; }, reject: (value) => { error = value; } });
+      return new Set([material]);
     }),
+    properties: { get: (material: THREE.Material) => ({ currentProgram: programByMaterial.get(material) }) },
   };
-  return { gl: gl as unknown as THREE.WebGLRenderer, initialTarget, pending, states };
+  return { gl: gl as unknown as THREE.WebGLRenderer, initialTarget, pending, states, background };
 }
 
 describe('non-rendering commercial scene preparation', () => {
-  it('restores renderer state immediately, waits for each shader variant, never renders or toggles visibility', async () => {
+  it('prepares only DIRECT before interaction and restores state without rendering or toggling visibility', async () => {
     const { gl, initialTarget, pending, states } = rendererFixture();
     const scene = new THREE.Scene();
     const hidden = new THREE.Mesh(); hidden.visible = false; scene.add(hidden);
@@ -29,13 +44,9 @@ describe('non-rendering commercial scene preparation', () => {
     expect(states).toEqual([{ tone: THREE.ACESFilmicToneMapping, target: null }]);
     expect(gl.getRenderTarget()).toBe(initialTarget);
     expect(gl.toneMapping).toBe(THREE.ReinhardToneMapping);
-    pending[0].resolve(); for (let i = 0; i < 5; i++) await Promise.resolve();
-    expect(states[1].tone).toBe(THREE.NoToneMapping);
-    expect(states[1].target?.width).toBe(1);
-    const dispose = vi.spyOn(states[1].target!, 'dispose');
-    expect(isCommercialSceneCompiling(gl)).toBe(true);
-    pending[1].resolve(); await promise;
-    expect(dispose).toHaveBeenCalledOnce();
+    pending[0].resolve(); await promise;
+    expect(states).toHaveLength(1);
+    expect(isCommercialMapPostReady(gl)).toBe(false);
     expect(isCommercialSceneCompiling(gl)).toBe(false);
     expect(hidden.visible).toBe(false);
     expect(gl.getRenderTarget()).toBe(initialTarget);
@@ -57,12 +68,66 @@ describe('non-rendering commercial scene preparation', () => {
     const old = prepareCommercialScene(gl, scene, camera);
     const current = prepareCommercialScene(gl, scene, camera);
     pending[0].resolve(); await old;
-    expect(gl.compileAsync).toHaveBeenCalledTimes(2);
+    expect(gl.compile).toHaveBeenCalledTimes(2);
     expect(isCommercialSceneCompiling(gl)).toBe(true);
-    pending[1].resolve(); for (let i = 0; i < 5; i++) await Promise.resolve();
-    expect(gl.compileAsync).toHaveBeenCalledTimes(3);
-    pending[2].resolve(); await current;
+    pending[1].resolve(); await current;
+    expect(gl.compile).toHaveBeenCalledTimes(2);
     expect(isCommercialSceneCompiling(gl)).toBe(false);
     initialTarget?.dispose();
+  });
+  it('warms only the captured critical snapshot after readiness without reacquiring the draw gate', async () => {
+    vi.useFakeTimers();
+    const { gl, pending, background, initialTarget } = rendererFixture();
+    const scene = new THREE.Scene(), camera = new THREE.Camera();
+    const critical = new THREE.Mesh(); critical.name = 'critical'; scene.add(critical);
+    const direct = prepareCommercialScene(gl, scene, camera);
+    pending[0].resolve(); await vi.advanceTimersByTimeAsync(10); await direct;
+    const optional = new THREE.Mesh(); optional.name = 'optional'; scene.add(optional);
+    const post = prepareCommercialMapCriticalPost(gl, scene, camera);
+    expect(isCommercialSceneCompiling(gl)).toBe(false);
+    expect(isCommercialMapPostReady(gl)).toBe(false);
+    await vi.runAllTimersAsync(); await post;
+    expect(background).toHaveLength(1);
+    expect(background[0].tone).toBe(THREE.NoToneMapping);
+    expect(background[0].objects).toEqual([critical]);
+    expect(isCommercialMapPostReady(gl)).toBe(true);
+    expect(gl.getRenderTarget()).toBe(initialTarget);
+    expect(gl.toneMapping).toBe(THREE.ReinhardToneMapping);
+    for (const mesh of [critical, optional]) { mesh.geometry.dispose(); (mesh.material as THREE.Material).dispose(); }
+    initialTarget?.dispose();
+  });
+  it('polls captured POST programs when an intervening DIRECT frame changes currentProgram', async () => {
+    vi.useFakeTimers();
+    const material = new THREE.MeshBasicMaterial();
+    let ready = false;
+    const capturedProgram = { isReady: () => ready };
+    const properties = { currentProgram: capturedProgram };
+    const gl = { compile: () => new Set([material]), properties: { get: () => properties } } as unknown as THREE.WebGLRenderer;
+    let finished = false;
+    const preparation = compileCommercialMapPrograms(gl, new THREE.Group(), new THREE.Camera(), new THREE.Scene()).then(() => { finished = true; });
+    properties.currentProgram = { isReady: () => true }; // a live direct draw
+    await vi.advanceTimersByTimeAsync(20);
+    expect(finished).toBe(false);
+    ready = true;
+    await vi.advanceTimersByTimeAsync(10); await preparation;
+    expect(finished).toBe(true);
+    material.dispose();
+  });
+  it('cancels pending program polls on Canvas teardown instead of retaining dead GPU programs', async () => {
+    vi.useFakeTimers();
+    const material = new THREE.MeshBasicMaterial();
+    const program = { isReady: vi.fn(() => false) };
+    const gl = { compile: () => new Set([material]), properties: { get: () => ({ currentProgram: program }) } } as unknown as THREE.WebGLRenderer;
+    const controller = new AbortController();
+    const preparation = compileCommercialMapPrograms(gl, new THREE.Group(), new THREE.Camera(), new THREE.Scene(), controller.signal);
+    expect(vi.getTimerCount()).toBe(1);
+    const rejected = expect(preparation).rejects.toMatchObject({ name: 'AbortError' });
+    controller.abort();
+    await rejected;
+    expect(vi.getTimerCount()).toBe(0);
+    const checks = program.isReady.mock.calls.length;
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(program.isReady).toHaveBeenCalledTimes(checks);
+    material.dispose();
   });
 });
