@@ -1,3 +1,4 @@
+import { ARENA_ROAD_CORRECTION } from '../data/arenaRoadCorrection';
 import {
   ETNIAS_PARKING_CONNECTION_CORRECTION,
   PORTAO5_PARKING_ACCESS_CORRECTION,
@@ -22,7 +23,7 @@ import { officialPdfPointToLocal } from '../data/officialReference2026';
  * É um registro cartográfico de apresentação, não um levantamento geodésico:
  * os anexos não fornecem CRS, escala métrica certificada ou pontos de campo.
  */
-export const REAR_SPATIAL_CALIBRATION_REVISION = '2026.9-anexo3-satellite.2';
+export const REAR_SPATIAL_CALIBRATION_REVISION = ARENA_ROAD_CORRECTION.revision;
 
 export type Point2 = readonly [number, number];
 export type RearAttachment5PointId = 1 | 2 | 3 | 4 | 5 | 6;
@@ -114,7 +115,7 @@ function attachment5Point(
 
 export const REAR_ATTACHMENT_5_REFERENCE_POINTS = Object.freeze([
   attachment5Point(1, 'Término da Rua das Etnias', 'etnias-terminus', [80, 30], {
-    canonicalSource: [5510, 4200],
+    canonicalSource: ARENA_ROAD_CORRECTION.frontageTerminus,
   }),
   attachment5Point(2, 'Rua Ubiretama — fim da curva SE, latitude sul do campo', 'ubiretama-axis', [53, 73], {
     canonicalSource: PORTAO5_PARKING_ACCESS_JUNCTIONS.curve,
@@ -151,8 +152,8 @@ const gate5PresentationSource = rearAttachment5ReferencePointById(6).officialSou
 export const REAR_OFFICIAL_ANCHORS = Object.freeze({
   /** Cadastro preservado; busca, seleção e persistência continuam na entidade A5. */
   gate5Entity: [5974, 3678] as Point2,
-  /** T da Ubiretama com o Portão 5 a leste da Arena, na latitude sul; não é [4528, 3248], [5548, 3248] nem um Y no portão. */
-  gate5ParkEdge: [5860, 3633] as Point2,
+  /** Junction of Ubiretama and the Brasil axis, separately calibrated from A5. */
+  gate5ParkEdge: ARENA_ROAD_CORRECTION.ubiretamaJunction,
   /** Passagem veicular visual; a entidade cadastral A5 permanece imutável. */
   gate5VehicleAccess: gate5PresentationSource,
   /** Trevo em Y do anexo 3: tronco único, bifurcação e duas rampas na BR-472. */
@@ -216,35 +217,15 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
     ETNIAS_PARKING_CONNECTION_CORRECTION.avenueEntry,
     rearAttachment5ReferencePointById(1).officialSource,
   ] as readonly Point2[]),
-  /**
-   * Asfalto executável da ligação das Etnias. Extremidades = blueprint
-   * ([5260,4200] e [5260,3248]). Controles internos afastam a Catmull-Rom
-   * dos postes CAD 361 (≈[5258,3739]) e 331 (≈[5287,3554]); o T rejeitado
-   * [5260, 3661] não é restabelecido.
-   */
-  etniasParkingConnection: Object.freeze([
-    ETNIAS_PARKING_CONNECTION_CORRECTION.avenueEntry,
-    [5260, 4140],
-    [5260, 3950],
-    [5294, 3820],
-    [5296, 3739],
-    [5288, 3660],
-    [5248, 3600],
-    [5246, 3554],
-    ETNIAS_PARKING_CONNECTION_CORRECTION.parkingJunction,
-  ] as readonly Point2[]),
+  // One source for the road, parking mask, hit testing and debug overlay.
+  etniasParkingConnection: ETNIAS_PARKING_CONNECTION_CORRECTION.sourceAxis,
   brasiliaOfficialAxis: RUA_BRASILIA_OFFICIAL_RESTORATION.sourceAxis,
   brasiliaOfficialToImigrantes: Object.freeze([
     RUA_BRASILIA_OFFICIAL_RESTORATION.sourceAxis[2],
     [3940, 4200],
   ] as readonly Point2[]),
-  /**
-   * Ubiretama: origem [4528, 3150] na Rua Brasil, curva breve SE a sul do
-   * campo, E–W nivelada em y=3248 até o T [5860, 3248]. O Portão 5 guarda o
-   * arranque norte (~[5987, 2000]), curva leve a leste do apron e segue N–S
-   * até o lock [5940, 3678] — sem o gancho [5780, 3236]→[5548, 3248]. Não
-   * substitui a Rua Brasília, não desce colinear em x=4528 e não entra no trevo.
-   */
+  /** Rua Brasil crosses below the Arena. The September 13 frontage connector
+   * and Exporural approach meet distinct nodes within the same junction zone. */
   portao5StreetToCurve: PORTAO5_PARKING_ACCESS_CORRECTION.streetToCurve,
   portao5CurveToEtniasJunction: PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction,
   // The last reach bends toward the access. The former perfectly horizontal
@@ -254,17 +235,7 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
    * Descida do Portão 5. Arranque = fita cadastral leste. Sem o conector
    * fantasma a meio da quadra ([5780, 3236], [5680, 3248], T em [5548, 3248]).
    */
-  ubiretamaNorthToJunction: Object.freeze([
-    rearAttachment5ReferencePointById(5).officialSource,
-    [5972, 2080],
-    [5946, 2250],
-    [5920, 2450],
-    [5892, 2690],
-    [5884, 2900],
-    [5860, 3140],
-    [5860, 3200],
-    rearAttachment5ReferencePointById(4).officialSource,
-  ] as readonly Point2[]),
+  ubiretamaNorthToJunction: ARENA_ROAD_CORRECTION.ubiretamaApproach,
 
   gate5InternalApproach: PORTAO5_PARKING_ACCESS_CORRECTION.gate5Approach,
   /** Tronco único do trevo, entre o portão e a bifurcação em Y. */

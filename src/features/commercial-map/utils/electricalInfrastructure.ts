@@ -273,11 +273,34 @@ export function resolveElectricalNodePlacements(
       && entityByIdentifier.has('RUA-MONTEVIDEU-COZINHA') && facade
       ? [facade.renderPosition[0] + 0.232, facade.renderPosition[1]] as Coordinate
       : null;
-    const renderPosition = soyReception ?? facade?.renderPosition
+    let renderPosition = soyReception ?? facade?.renderPosition
       ?? rearRoadClearance
       ?? parkAccessClearance
       ?? architectureClearance
       ?? node.position;
+    // Only six audited display conflicts introduced by the September 13 roads.
+    // The survey nodes and wire graph remain unchanged. Move to the nearest
+    // verge of the current road, instead of bending an actual road around a pole.
+    let precisionClearance = false;
+    if (rearRoadsActive && !facade && node.mountMode === 'GROUND_POLE'
+      && ['pole-ref-192', 'pole-ref-264', 'pole-ref-306', 'pole-ref-336', 'pole-ref-361', 'pole-ref-378'].includes(node.sourceMarkerId)) {
+      for (let pass = 0; pass < 3; pass++) for (const footprint of rearRoadFootprints) {
+        const margin = footprint.halfWidth + node.radius + 0.08;
+        let nearest: Coordinate | null = null;
+        let distance = Infinity;
+        footprint.centerline.slice(1).forEach((point, i) => {
+          const candidate = closestPointOnSegment(renderPosition, footprint.centerline[i] as Coordinate, point as Coordinate);
+          const d = Math.hypot(renderPosition[0] - candidate[0], renderPosition[1] - candidate[1]);
+          if (d < distance) { nearest = [candidate[0], candidate[1]]; distance = d; }
+        });
+        if (nearest && distance < margin) {
+          const dx = renderPosition[0] - nearest[0], dz = renderPosition[1] - nearest[1];
+          renderPosition = [nearest[0] + (distance > 1e-6 ? dx / distance : 1) * margin,
+            nearest[1] + (distance > 1e-6 ? dz / distance : 0) * margin];
+          precisionClearance = true;
+        }
+      }
+    }
     return {
       node,
       renderPosition,
@@ -285,7 +308,7 @@ export function resolveElectricalNodePlacements(
       rotationRadians: facade?.rotationRadians ?? node.rotationRadians,
       sourceAnchorPreserved: true,
       placementStatus: facade?.placementStatus
-        ?? (rearRoadClearance || parkAccessClearance || architectureClearance
+        ?? (precisionClearance || rearRoadClearance || parkAccessClearance || architectureClearance
           ? 'PROJECTED_CLEARANCE'
           : 'DIRECT'),
     };

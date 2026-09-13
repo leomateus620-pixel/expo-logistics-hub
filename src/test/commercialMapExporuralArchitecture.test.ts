@@ -32,8 +32,10 @@ describe('C4 / E-06 architecture and selection activity', () => {
     const prior = JSON.parse(readFileSync('docs/screenshots/soy-gate9/before-inventory.json', 'utf8')).entities;
     const originalE07 = { ...prior.find((e: { publicIdentifier: string }) => e.publicIdentifier === 'E-07') };
     delete originalE07.source;
-    // Only the explicitly authorized September additions/restroom are excluded.
-    const preserved = OFFICIAL_REFERENCE_ENTITIES.filter(e => !['RUA-MONTEVIDEU-COZINHA', 'RES-A9'].includes(e.publicIdentifier)).map(e => e.publicIdentifier === 'E-07' ? originalE07 : e);
+    const originalFrontage = { ...prior.find((e: { publicIdentifier: string }) => e.publicIdentifier === 'AV-IMIGRANTES') };
+    delete originalFrontage.source;
+    // Normalize only the separately tested September footprint corrections.
+    const preserved = OFFICIAL_REFERENCE_ENTITIES.filter(e => !['RUA-MONTEVIDEU-COZINHA', 'RES-A9'].includes(e.publicIdentifier)).map(e => e.publicIdentifier === 'E-07' ? originalE07 : e.publicIdentifier === 'AV-IMIGRANTES' ? originalFrontage : e);
     const hash = createHash('sha256')
       .update(JSON.stringify(preserved))
       .digest('hex');

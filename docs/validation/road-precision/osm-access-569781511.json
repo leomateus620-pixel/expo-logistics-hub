@@ -1,0 +1,72 @@
+{
+  "version": "0.6",
+  "generator": "openstreetmap-cgimap 2.1.0 (244691 spike-07.openstreetmap.org)",
+  "copyright": "OpenStreetMap and contributors",
+  "attribution": "http://www.openstreetmap.org/copyright",
+  "license": "http://opendatacommons.org/licenses/odbl/1-0/",
+  "elements": [
+    {
+      "type": "node",
+      "id": 5479124531,
+      "lat": -27.8410233,
+      "lon": -54.4796146,
+      "timestamp": "2021-06-01T05:19:00Z",
+      "version": 3,
+      "changeset": 105654738,
+      "user": "FairmountPark",
+      "uid": 10653115
+    },
+    {
+      "type": "node",
+      "id": 5479124533,
+      "lat": -27.8412053,
+      "lon": -54.479797,
+      "timestamp": "2021-06-01T05:19:00Z",
+      "version": 3,
+      "changeset": 105654738,
+      "user": "FairmountPark",
+      "uid": 10653115
+    },
+    {
+      "type": "node",
+      "id": 5479124534,
+      "lat": -27.8413346,
+      "lon": -54.4798782,
+      "timestamp": "2021-06-01T05:19:00Z",
+      "version": 3,
+      "changeset": 105654738,
+      "user": "FairmountPark",
+      "uid": 10653115
+    },
+    {
+      "type": "node",
+      "id": 5479124535,
+      "lat": -27.8411514,
+      "lon": -54.4797488,
+      "timestamp": "2021-06-01T05:19:00Z",
+      "version": 3,
+      "changeset": 105654738,
+      "user": "FairmountPark",
+      "uid": 10653115
+    },
+    {
+      "type": "way",
+      "id": 569781511,
+      "timestamp": "2021-06-07T11:33:30Z",
+      "version": 3,
+      "changeset": 105968532,
+      "user": "FairmountPark",
+      "uid": 10653115,
+      "nodes": [
+        5479124534,
+        5479124533,
+        5479124535,
+        5479124531
+      ],
+      "tags": {
+        "highway": "primary_link",
+        "oneway": "yes"
+      }
+    }
+  ]
+}

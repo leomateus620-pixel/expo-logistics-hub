@@ -1,0 +1,1247 @@
+{
+  "status": "validated-with-existing-baseline-test-failures",
+  "baseCommit": "524f446a",
+  "branch": "codex/precision-arena-roads",
+  "preservation": {
+    "officialEntities": 1691,
+    "unchangedCompleteEntities": 1690,
+    "changedEntities": [
+      "AV-IMIGRANTES"
+    ],
+    "changedRoads": [
+      {
+        "id": "osm-569781512-0",
+        "before": [
+          [
+            60.9722,
+            16.7811
+          ],
+          [
+            61.7771,
+            16.9278
+          ],
+          [
+            63.4177,
+            17.25
+          ]
+        ],
+        "after": [
+          [
+            59.6248,
+            16.4106
+          ],
+          [
+            60.9722,
+            16.7811
+          ],
+          [
+            61.7771,
+            16.9278
+          ],
+          [
+            63.4177,
+            17.25
+          ]
+        ],
+        "boundsBefore": {
+          "minX": 60.9722,
+          "maxX": 63.4177,
+          "minZ": 16.7811,
+          "maxZ": 17.25
+        },
+        "boundsAfter": {
+          "minX": 59.6248,
+          "maxX": 63.4177,
+          "minZ": 16.4106,
+          "maxZ": 17.25
+        },
+        "width": 0.98
+      },
+      {
+        "id": "osm-951983188-0",
+        "after": [
+          [
+            60.7478,
+            14.4475
+          ],
+          [
+            60.1863,
+            15.42905
+          ],
+          [
+            59.6248,
+            16.4106
+          ]
+        ],
+        "boundsBefore": null,
+        "boundsAfter": {
+          "minX": 59.6248,
+          "maxX": 60.7478,
+          "minZ": 14.4475,
+          "maxZ": 16.4106
+        },
+        "width": 0.98
+      },
+      {
+        "id": "arena-br472-access",
+        "before": [
+          [
+            56.509090909090915,
+            15.338181895180718
+          ],
+          [
+            59.2,
+            15.5
+          ],
+          [
+            61.5,
+            16.2
+          ],
+          [
+            63.6,
+            16.6
+          ]
+        ],
+        "after": [
+          [
+            56.509090909090915,
+            15.338181895180718
+          ],
+          [
+            58.2,
+            15.48
+          ],
+          [
+            60.1863,
+            15.42905
+          ]
+        ],
+        "boundsBefore": {
+          "minX": 56.509090909090915,
+          "maxX": 63.6,
+          "minZ": 15.338181895180718,
+          "maxZ": 16.6
+        },
+        "boundsAfter": {
+          "minX": 56.509090909090915,
+          "maxX": 60.1863,
+          "minZ": 15.338181895180718,
+          "maxZ": 15.48
+        },
+        "width": 1.02
+      },
+      {
+        "id": "etnias-parking-connection",
+        "before": [
+          [
+            41.67272727272727,
+            26.727272861445783
+          ],
+          [
+            41.67272727272727,
+            25.418181945783132
+          ],
+          [
+            41.67272727272727,
+            21.272727379518074
+          ],
+          [
+            42.41454545454546,
+            18.43636372891566
+          ],
+          [
+            42.458181818181814,
+            16.669090992771082
+          ],
+          [
+            42.28363636363636,
+            14.945454620481925
+          ],
+          [
+            41.41090909090909,
+            13.636363704819274
+          ],
+          [
+            41.367272727272734,
+            12.632727336144576
+          ],
+          [
+            41.67272727272727,
+            11.520000057831325
+          ]
+        ],
+        "after": [
+          [
+            38.61818181818181,
+            26.727272861445783
+          ],
+          [
+            39.05454545454545,
+            25.200000126506026
+          ],
+          [
+            40.31999999999999,
+            21.272727379518074
+          ],
+          [
+            41.67272727272727,
+            16.9090909939759
+          ],
+          [
+            43.41818181818182,
+            12.632727336144576
+          ],
+          [
+            44.94545454545454,
+            11.520000057831325
+          ]
+        ],
+        "boundsBefore": {
+          "minX": 41.367272727272734,
+          "maxX": 42.458181818181814,
+          "minZ": 11.520000057831325,
+          "maxZ": 26.727272861445783
+        },
+        "boundsAfter": {
+          "minX": 38.61818181818181,
+          "maxX": 44.94545454545454,
+          "minZ": 11.520000057831325,
+          "maxZ": 26.727272861445783
+        },
+        "width": 0.7854545454545454
+      },
+      {
+        "id": "portao5-street-curve",
+        "before": [
+          [
+            25.701818181818183,
+            3.8181818373493925
+          ],
+          [
+            26.39999999999999,
+            4.254545475903612
+          ],
+          [
+            27.185454545454533,
+            5.083636389156631
+          ],
+          [
+            27.97090909090909,
+            5.694545483132529
+          ],
+          [
+            30.10909090909091,
+            6.000000030120489
+          ],
+          [
+            32.94545454545454,
+            6.654545487951815
+          ],
+          [
+            37.44000000000001,
+            10.167272778313254
+          ]
+        ],
+        "after": [
+          [
+            25.701818181818183,
+            3.8181818373493925
+          ],
+          [
+            26.39999999999999,
+            4.254545475903612
+          ],
+          [
+            27.185454545454533,
+            5.083636389156631
+          ],
+          [
+            27.97090909090909,
+            5.694545483132529
+          ],
+          [
+            30.10909090909091,
+            6.000000030120489
+          ],
+          [
+            32.94545454545454,
+            6.654545487951815
+          ],
+          [
+            34.47272727272727,
+            8.596363679518078
+          ],
+          [
+            36.43636363636364,
+            9.687272775903608
+          ],
+          [
+            37.44000000000001,
+            10.167272778313254
+          ]
+        ],
+        "boundsBefore": {
+          "minX": 25.701818181818183,
+          "maxX": 37.44000000000001,
+          "minZ": 3.8181818373493925,
+          "maxZ": 10.167272778313254
+        },
+        "boundsAfter": {
+          "minX": 25.701818181818183,
+          "maxX": 37.44000000000001,
+          "minZ": 3.8181818373493925,
+          "maxZ": 10.167272778313254
+        },
+        "width": 0.7854545454545454
+      },
+      {
+        "id": "portao5-curve-etnias",
+        "before": [
+          [
+            37.44000000000001,
+            10.167272778313254
+          ],
+          [
+            39.05454545454545,
+            10.690909144578313
+          ],
+          [
+            41.67272727272727,
+            11.520000057831325
+          ]
+        ],
+        "after": [
+          [
+            37.44000000000001,
+            10.167272778313254
+          ],
+          [
+            38.44363636363637,
+            10.647272780722894
+          ],
+          [
+            41.018181818181816,
+            10.909090963855427
+          ],
+          [
+            43.41818181818182,
+            11.0618182373494
+          ],
+          [
+            44.94545454545454,
+            11.520000057831325
+          ]
+        ],
+        "boundsBefore": {
+          "minX": 37.44000000000001,
+          "maxX": 41.67272727272727,
+          "minZ": 10.167272778313254,
+          "maxZ": 11.520000057831325
+        },
+        "boundsAfter": {
+          "minX": 37.44000000000001,
+          "maxX": 44.94545454545454,
+          "minZ": 10.167272778313254,
+          "maxZ": 11.520000057831325
+        },
+        "width": 0.7854545454545454
+      },
+      {
+        "id": "portao5-etnias-ubiretama",
+        "before": [
+          [
+            41.67272727272727,
+            11.520000057831325
+          ],
+          [
+            45.81818181818181,
+            12.807272791566263
+          ],
+          [
+            49.09090909090909,
+            13.483636431325301
+          ],
+          [
+            53.018181818181816,
+            14.072727343373494
+          ],
+          [
+            54.763636363636365,
+            14.356363708433733
+          ]
+        ],
+        "after": [
+          [
+            44.94545454545454,
+            11.520000057831325
+          ],
+          [
+            46.47272727272728,
+            11.97818187831325
+          ]
+        ],
+        "boundsBefore": {
+          "minX": 41.67272727272727,
+          "maxX": 54.763636363636365,
+          "minZ": 11.520000057831325,
+          "maxZ": 14.356363708433733
+        },
+        "boundsAfter": {
+          "minX": 44.94545454545454,
+          "maxX": 46.47272727272728,
+          "minZ": 11.520000057831325,
+          "maxZ": 11.97818187831325
+        },
+        "width": 0.7854545454545454
+      },
+      {
+        "id": "portao5-north-approach",
+        "before": [
+          [
+            57.534545454545466,
+            -21.27272737951808
+          ],
+          [
+            57.20727272727274,
+            -19.527272825301207
+          ],
+          [
+            56.64,
+            -15.818181897590364
+          ],
+          [
+            56.07272727272728,
+            -11.454545512048192
+          ],
+          [
+            55.461818181818174,
+            -6.218181849397588
+          ],
+          [
+            55.287272727272736,
+            -1.63636364457831
+          ],
+          [
+            54.763636363636365,
+            3.6000000180722864
+          ],
+          [
+            54.763636363636365,
+            4.909090933734937
+          ],
+          [
+            54.763636363636365,
+            14.356363708433733
+          ]
+        ],
+        "after": [
+          [
+            57.53454545454545,
+            -21.27272737951807
+          ],
+          [
+            57.20727272727274,
+            -19.527272825301207
+          ],
+          [
+            56.64,
+            -15.818181897590364
+          ],
+          [
+            55.19999999999999,
+            -11.672727331325298
+          ],
+          [
+            53.127272727272725,
+            -7.9636364036144585
+          ],
+          [
+            50.400000000000006,
+            -4.036363656626506
+          ],
+          [
+            49.09090909090909,
+            -1.8545454638554233
+          ],
+          [
+            49.134545454545446,
+            0.10909090963856016
+          ],
+          [
+            49.7890909090909,
+            2.0727272831325365
+          ],
+          [
+            49.52727272727273,
+            4.254545475903612
+          ],
+          [
+            48.21818181818182,
+            8.618181861445791
+          ],
+          [
+            46.47272727272728,
+            11.97818187831325
+          ]
+        ],
+        "boundsBefore": {
+          "minX": 54.763636363636365,
+          "maxX": 57.534545454545466,
+          "minZ": -21.27272737951808,
+          "maxZ": 14.356363708433733
+        },
+        "boundsAfter": {
+          "minX": 46.47272727272728,
+          "maxX": 57.53454545454545,
+          "minZ": -21.27272737951807,
+          "maxZ": 11.97818187831325
+        },
+        "width": 0.6981818181818181
+      },
+      {
+        "id": "gate5-internal-approach",
+        "before": [
+          [
+            54.763636363636365,
+            14.356363708433733
+          ],
+          [
+            55.63636363636364,
+            14.727272801204819
+          ],
+          [
+            56.509090909090915,
+            15.338181895180718
+          ]
+        ],
+        "after": [
+          [
+            46.47272727272728,
+            11.97818187831325
+          ],
+          [
+            49.09090909090909,
+            12.763636427710843
+          ],
+          [
+            53.018181818181816,
+            14.072727343373494
+          ],
+          [
+            54.763636363636365,
+            14.356363708433733
+          ],
+          [
+            55.63636363636364,
+            14.727272801204819
+          ],
+          [
+            56.509090909090915,
+            15.338181895180718
+          ]
+        ],
+        "boundsBefore": {
+          "minX": 54.763636363636365,
+          "maxX": 56.509090909090915,
+          "minZ": 14.356363708433733,
+          "maxZ": 15.338181895180718
+        },
+        "boundsAfter": {
+          "minX": 46.47272727272728,
+          "maxX": 56.509090909090915,
+          "minZ": 11.97818187831325,
+          "maxZ": 15.338181895180718
+        },
+        "width": 0.7854545454545454
+      }
+    ],
+    "removedRoad": "gate-7-johan-muller-link",
+    "gate7PerpendicularPreserved": true,
+    "lotGeometryAndCommercialRecords": "Unchanged; full entity hashes and source diffs checked"
+  },
+  "tests": {
+    "total": 1844,
+    "passed": 1794,
+    "failed": 50,
+    "newFailures": [],
+    "currentFailures": [
+      {
+        "file": "agendaMeetingWorkspace.test.tsx",
+        "test": "AgendaMeetingWorkspace bloqueia seed/offline sem fabricar um UUID ou montar captura",
+        "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/ata vinculada/i`"
+      },
+      {
+        "file": "agendaMeetingWorkspace.test.tsx",
+        "test": "AgendaMeetingWorkspace exige consentimento informado antes de iniciar a sessão canônica",
+        "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/ata vinculada/i`"
+      },
+      {
+        "file": "agendaMeetingWorkspace.test.tsx",
+        "test": "AgendaMeetingWorkspace expõe estado inequívoco, telemetria real e proteção de captura ativa",
+        "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/ata vinculada/i`"
+      },
+      {
+        "file": "agendaMeetingWorkspace.test.tsx",
+        "test": "AgendaMeetingWorkspace renderiza conhecimento tipado, lacunas e ações sem superfície de áudio histórico",
+        "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/ata vinculada/i`"
+      },
+      {
+        "file": "commercialMap2026Reference.test.ts",
+        "test": "referência cartográfica oficial Fenasoja 2026 inclui a rede viária e todas as instâncias repetidas da legenda",
+        "message": "AssertionError: expected [ Array(1) ] to have a length of +0 but got 1"
+      },
+      {
+        "file": "commercialMap2026Reference.test.ts",
+        "test": "referência cartográfica oficial Fenasoja 2026 mantém os 26 centros sanitários vetoriais oficiais e nenhum volume renderizado",
+        "message": "AssertionError: expected [ Array(1) ] to deeply equal []"
+      },
+      {
+        "file": "commercialMapElectricalInfrastructure.test.ts",
+        "test": "infraestrutura elétrica cartográfica do Mapa Comercial preserva as 13 âncoras conflitantes e projeta só sua apresentação à fachada livre",
+        "message": "AssertionError: transformer-ref-007: expected true to be false // Object.is equality"
+      },
+      {
+        "file": "commercialMapElectricalInfrastructure.test.ts",
+        "test": "infraestrutura elétrica cartográfica do Mapa Comercial mantém todas as fases acima da folga técnica mínima em estruturas existentes",
+        "message": "AssertionError: expected [ …(937) ] to deeply equal []"
+      },
+      {
+        "file": "commercialMapExporuralArchitecture.test.ts",
+        "test": "C4 / E-06 architecture and selection activity preserves the complete approved official inventory and compound placement",
+        "message": "AssertionError: expected '33792267ef10f702e895a3cea59b4afb3e701…' to be '5abf0ed204b10d98e17d1a6f171add3a6c3b6…' // Object.is equality"
+      },
+      {
+        "file": "commercialMapPavilionFourSoyKitchen.test.ts",
+        "test": "Pavilhão 4 — Cozinha da Soja B7 reutiliza os postes frontais e a recepção elétrica oficiais sem duplicá-los",
+        "message": "AssertionError: expected 3.163636363636364 to be less than 3.000945454545455"
+      },
+      {
+        "file": "commercialMapPresentation.test.ts",
+        "test": "modelo de apresentação do mapa comercial mantém histerese entre níveis de rótulo durante pequenos movimentos de zoom",
+        "message": "AssertionError: expected 'near' to be 'medium' // Object.is equality"
+      },
+      {
+        "file": "commercialMapPresentation.test.ts",
+        "test": "modelo de apresentação do mapa comercial mantém os limites exatos e normaliza entradas inválidas da histerese",
+        "message": "AssertionError: expected 'detail' to be 'near' // Object.is equality"
+      },
+      {
+        "file": "commercialMapSiteEnvironment.test.ts",
+        "test": "commercial site environment presentation layer composes every reusable no-environment mask family and accepts no intersecting cell",
+        "message": "AssertionError: expected 3 to be 1 // Object.is equality"
+      },
+      {
+        "file": "commercialMapSoyGateInfrastructure.test.ts",
+        "test": "E07 / Montevideo / A9 reference-aligned infrastructure preserves every existing entity except the authorized E07 footprint",
+        "message": "AssertionError: B12: expected { id: 'reference:2026:b12', …(12) } to deeply equal { id: 'reference:2026:b12', …(12) }"
+      },
+      {
+        "file": "commissionMapPortals.test.ts",
+        "test": "portais comerciais por comissão isola inventário, busca e métricas entre Exporural e Indústria",
+        "message": "AssertionError: expected [ { …(15) }, { …(15) }, …(106) ] to have a length of 111 but got 108"
+      },
+      {
+        "file": "cronogramaDashboardIntegration.test.tsx",
+        "test": "Dashboard executivo do cronograma renderiza indicadores reais e mantém o recorte exato no drill-down",
+        "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Eventos atrasados: 1\\./`"
+      },
+      {
+        "file": "cronogramaDataIntegrity.test.ts",
+        "test": "integridade do cronograma oficial preserva os totais oficiais por ano e os registros sem data",
+        "message": "AssertionError: expected [ { …(16) }, { …(22) }, …(113) ] to have a length of 145 but got 115"
+      },
+      {
+        "file": "cronogramaDataIntegrity.test.ts",
+        "test": "integridade do cronograma oficial mescla banco e seed sem apagar oficiais ou eventos manuais",
+        "message": "AssertionError: expected [ { …(19) }, { …(19) }, …(114) ] to have a length of 146 but got 116"
+      },
+      {
+        "file": "cronogramaMobileOverlays.test.tsx",
+        "test": "overlays móveis do cronograma confirma edição suja, preserva o formulário ao cancelar e fecha ao descartar",
+        "message": "ReferenceError: ResizeObserver is not defined"
+      },
+      {
+        "file": "cronogramaMobileOverlays.test.tsx",
+        "test": "overlays móveis do cronograma preserva os campos e mostra alerta quando o salvamento falha",
+        "message": "ReferenceError: ResizeObserver is not defined"
+      },
+      {
+        "file": "cronogramaMobileOverlays.test.tsx",
+        "test": "overlays móveis do cronograma bloqueia fechar e voltar enquanto o salvamento está pendente",
+        "message": "ReferenceError: ResizeObserver is not defined"
+      },
+      {
+        "file": "cronogramaMobileOverlays.test.tsx",
+        "test": "overlays móveis do cronograma fecha pela pilha de histórico quando a fonte desaparece e protege um rascunho sujo",
+        "message": "ReferenceError: ResizeObserver is not defined"
+      },
+      {
+        "file": "cronogramaMobileOverlays.test.tsx",
+        "test": "overlays móveis do cronograma mantém edição e rascunho quando o seed recebe o UUID do Supabase",
+        "message": "ReferenceError: ResizeObserver is not defined"
+      },
+      {
+        "file": "cronogramaMobileOverlays.test.tsx",
+        "test": "formulário e criação móvel incorpora refetch quando limpo e preserva o rascunho quando já está sujo",
+        "message": "ReferenceError: ResizeObserver is not defined"
+      },
+      {
+        "file": "cronogramaMobileOverlays.test.tsx",
+        "test": "formulário e criação móvel valida título obrigatório e ordem dos horários antes de enviar",
+        "message": "ReferenceError: ResizeObserver is not defined"
+      },
+      {
+        "file": "cronogramaMobileOverlays.test.tsx",
+        "test": "formulário e criação móvel confirma descarte do cadastro sujo e preserva os dados ao cancelar",
+        "message": "ReferenceError: ResizeObserver is not defined"
+      },
+      {
+        "file": "cronogramaMobileOverlays.test.tsx",
+        "test": "formulário e criação móvel fecha o cadastro pelo histórico após criar com sucesso",
+        "message": "ReferenceError: ResizeObserver is not defined"
+      },
+      {
+        "file": "cronogramaMobileOverlays.test.tsx",
+        "test": "viewport móvel acompanha visualViewport e remove os listeners ao desmontar o diálogo",
+        "message": "ReferenceError: ResizeObserver is not defined"
+      },
+      {
+        "file": "cronogramaMobilePresentation.test.tsx",
+        "test": "cadastro móvel e histórico remove a entrada duplicada do histórico ao desmontar um overlay ainda aberto",
+        "message": "Error: useAuthContext must be used within AuthProvider"
+      },
+      {
+        "file": "cronogramaMobilePresentation.test.tsx",
+        "test": "cadastro móvel e histórico mantém o defaultYear informado ao criar um evento sem data",
+        "message": "Error: useAuthContext must be used within AuthProvider"
+      },
+      {
+        "file": "cronogramaMobilePresentation.test.tsx",
+        "test": "cadastro móvel e histórico fecha pelo voltar quando limpo e mantém o cadastro quando voltar encontra alterações",
+        "message": "Error: useAuthContext must be used within AuthProvider"
+      },
+      {
+        "file": "cronogramaRegistrationInteractions.test.tsx",
+        "test": "interações do cadastro do cronograma abre o popover desktop, agrupa unidades e busca sem acento pelo contexto institucional",
+        "message": "TestingLibraryElementError: Found multiple elements with the text: Comissões"
+      },
+      {
+        "file": "cronogramaRegistrationInteractions.test.tsx",
+        "test": "interações do cadastro do cronograma mantém seleção semântica, opera por teclado e gerencia múltiplos responsáveis sem duplicar nome externo",
+        "message": "Error: expect(element).toHaveAttribute(\"data-primary\", \"true\") // element.getAttribute(\"data-primary\") === \"true\""
+      },
+      {
+        "file": "cronogramaTimeline.test.tsx",
+        "test": "navegador do ciclo na linha do tempo renderiza ano atual, etapas, totais e mantém botões semanticamente focáveis",
+        "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"list\" and name \"Anos do planejamento institucional\""
+      },
+      {
+        "file": "cronogramaTimeline.test.tsx",
+        "test": "navegador do ciclo na linha do tempo seleciona 2027 e 2028 rapidamente, abre o mês correto e não limpa filtros",
+        "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação/i`"
+      },
+      {
+        "file": "cronogramaTimeline.test.tsx",
+        "test": "navegador do ciclo na linha do tempo mostra contagem filtrada e recuperação explícita sem trocar o ano",
+        "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação, 1 evento, 0 correspondem/i`"
+      },
+      {
+        "file": "cronogramaTimeline.test.tsx",
+        "test": "navegador do ciclo na linha do tempo mantém anos sem eventos visíveis, identificados e indisponíveis",
+        "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação, 0 eventos, ano indisponível/i`"
+      },
+      {
+        "file": "cronogramaTimeline.test.tsx",
+        "test": "navegador do ciclo na linha do tempo reconcilia uma URL persistida para um ano que ficou indisponível",
+        "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/2026 selecionado/i`"
+      },
+      {
+        "file": "cronogramaTimeline.test.tsx",
+        "test": "navegador do ciclo na linha do tempo Ir para hoje restaura julho de 2026 e atualiza o ano",
+        "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name \"Ir para o período de hoje\""
+      },
+      {
+        "file": "cronogramaTimeline.test.tsx",
+        "test": "navegador do ciclo na linha do tempo restaura ano e mês ao navegar pelo histórico externo",
+        "message": "Error: Unable to find role=\"button\" and name `/2028 selecionado/i`"
+      },
+      {
+        "file": "cronogramaTimeline.test.tsx",
+        "test": "navegador do ciclo na linha do tempo acompanha rolagem manual e bloqueia realimentação durante navegação programática",
+        "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/2027 selecionado/i`"
+      },
+      {
+        "file": "cronogramaTimeline.test.tsx",
+        "test": "navegador do ciclo na linha do tempo sincroniza filtros temporais com o ano do período principal",
+        "message": "Error: Unable to find role=\"button\" and name `/2026 selecionado/i`"
+      },
+      {
+        "file": "cronogramaTimeline.test.tsx",
+        "test": "navegador do ciclo na linha do tempo mantém o ano após refetch e abertura de detalhes",
+        "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação/i`"
+      },
+      {
+        "file": "cronogramaTimeline.test.tsx",
+        "test": "navegador do ciclo na linha do tempo usa movimento reduzido e mantém um único seletor horizontal no mobile",
+        "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação/i`"
+      },
+      {
+        "file": "cronogramaTimeline.test.tsx",
+        "test": "componentes críticos preservados separa leitura e edição e protege alterações não salvas",
+        "message": "Error: useAuthContext must be used within AuthProvider"
+      },
+      {
+        "file": "eventHarvestCompletion.test.tsx",
+        "test": "gatilho explícito no detalhe desktop bloqueia cliques repetidos, conclui uma vez e fecha somente após sucesso",
+        "message": "Error: useAuthContext must be used within AuthProvider"
+      },
+      {
+        "file": "eventHarvestCompletion.test.tsx",
+        "test": "gatilho explícito no detalhe desktop mantém o detalhe e exibe a falha quando o backend rejeita a conclusão",
+        "message": "Error: useAuthContext must be used within AuthProvider"
+      },
+      {
+        "file": "venueEventsPresentation.test.ts",
+        "test": "contrato de apresentação de Eventos Restaurante e Arena organiza a navegação em planejamento, gestão e controle",
+        "message": "AssertionError: expected 'import { useEffect, useMemo, useState…' to contain '{ id: \"planejamento\", label: \"Planeja…'"
+      },
+      {
+        "file": "venueEventsPresentation.test.ts",
+        "test": "contrato de apresentação de Eventos Restaurante e Arena exibe o seletor de workspaces em duas metades sem ações do hero",
+        "message": "AssertionError: expected 'import {\\r\\n  VENUE_WORKSPACES,\\r\\n  …' not to contain '<small>'"
+      },
+      {
+        "file": "venueEventsPresentation.test.ts",
+        "test": "contrato de apresentação de Eventos Restaurante e Arena expõe etapas, obrigatoriedade e foco de contexto para tecnologias assistivas",
+        "message": "AssertionError: expected 'import { useCallback, useEffect, useM…' to contain 'aria-current={index === step ? \"step\"…'"
+      }
+    ],
+    "baselineVerification": {
+      "commit": "524f446a",
+      "tests": 254,
+      "failed": 50,
+      "method": "Replayed every failing original suite in a detached clean checkout; maxWorkers=2, testTimeout=30000"
+    },
+    "staticChecks": {
+      "TypecheckExit": 0,
+      "LintExit": 0
+    },
+    "build": {
+      "exitCode": 0
+    }
+  },
+  "browser": {
+    "desktop": {
+      "navigation": true,
+      "filtersOpened": true,
+      "filterToggled": true,
+      "selection": true,
+      "interior": true,
+      "interiorExit": true,
+      "preservedLotSelectable": true,
+      "segmentAndLabels": true,
+      "parkingInspection": true,
+      "noOverflow": true,
+      "persistentCanvas": true,
+      "rendererHealthy": true
+    },
+    "mobileChromeEmulation": {
+      "navigation": true,
+      "filtersOpened": true,
+      "filterToggled": true,
+      "selection": true,
+      "interior": true,
+      "interiorExit": true,
+      "preservedLotSelectable": true,
+      "segmentAndLabels": true,
+      "parkingInspection": true,
+      "noOverflow": true,
+      "persistentCanvas": true,
+      "rendererHealthy": true
+    },
+    "modeTransitions": 24,
+    "modeWarmupCycles": 2,
+    "modeResourceGrowth": {
+      "day": {
+        "geometries": 0,
+        "textures": 0,
+        "programs": 0
+      },
+      "night": {
+        "geometries": 0,
+        "textures": 0,
+        "programs": 0
+      },
+      "hydrology": {
+        "geometries": 0,
+        "textures": 0,
+        "programs": 0
+      },
+      "sunrise": {
+        "geometries": 0,
+        "textures": 0,
+        "programs": 0
+      }
+    },
+    "stress": {
+      "status": "passed",
+      "startedAt": "2026-09-13T04:19:18.317Z",
+      "cycles": 40,
+      "transitions": 80,
+      "resources": {
+        "status": "passed",
+        "warmupSamples": 2,
+        "minimumWarmSamples": 4,
+        "growthThreshold": 3,
+        "requiredBuckets": 4,
+        "coveredBuckets": 4,
+        "groups": [
+          {
+            "phase": "hydrology",
+            "target": true,
+            "configuration": "[\"hydrology\",true,\"HIGH\",1351,467,1]",
+            "samples": 20,
+            "warmSamples": 18,
+            "assessable": true,
+            "trends": [
+              {
+                "metric": "geometries",
+                "fromCycle": 3,
+                "toCycle": 20,
+                "from": 564,
+                "to": 564,
+                "growth": 0,
+                "positiveSteps": 0,
+                "leaking": false
+              },
+              {
+                "metric": "textures",
+                "fromCycle": 3,
+                "toCycle": 20,
+                "from": 148,
+                "to": 148,
+                "growth": 0,
+                "positiveSteps": 0,
+                "leaking": false
+              },
+              {
+                "metric": "programs",
+                "fromCycle": 3,
+                "toCycle": 20,
+                "from": 224,
+                "to": 224,
+                "growth": 0,
+                "positiveSteps": 0,
+                "leaking": false
+              }
+            ]
+          },
+          {
+            "phase": "hydrology",
+            "target": false,
+            "configuration": "[\"hydrology\",false,\"HIGH\",1351,467,1]",
+            "samples": 20,
+            "warmSamples": 18,
+            "assessable": true,
+            "trends": [
+              {
+                "metric": "geometries",
+                "fromCycle": 3,
+                "toCycle": 20,
+                "from": 565,
+                "to": 565,
+                "growth": 0,
+                "positiveSteps": 0,
+                "leaking": false
+              },
+              {
+                "metric": "textures",
+                "fromCycle": 3,
+                "toCycle": 20,
+                "from": 148,
+                "to": 148,
+                "growth": 0,
+                "positiveSteps": 0,
+                "leaking": false
+              },
+              {
+                "metric": "programs",
+                "fromCycle": 3,
+                "toCycle": 20,
+                "from": 224,
+                "to": 224,
+                "growth": 0,
+                "positiveSteps": 0,
+                "leaking": false
+              }
+            ]
+          },
+          {
+            "phase": "quality",
+            "target": true,
+            "configuration": "[\"quality\",true,\"HIGH\",1351,467,1]",
+            "samples": 20,
+            "warmSamples": 18,
+            "assessable": true,
+            "trends": [
+              {
+                "metric": "geometries",
+                "fromCycle": 3,
+                "toCycle": 20,
+                "from": 539,
+                "to": 539,
+                "growth": 0,
+                "positiveSteps": 0,
+                "leaking": false
+              },
+              {
+                "metric": "textures",
+                "fromCycle": 3,
+                "toCycle": 20,
+                "from": 137,
+                "to": 137,
+                "growth": 0,
+                "positiveSteps": 0,
+                "leaking": false
+              },
+              {
+                "metric": "programs",
+                "fromCycle": 3,
+                "toCycle": 20,
+                "from": 238,
+                "to": 242,
+                "growth": 4,
+                "positiveSteps": 1,
+                "leaking": false
+              }
+            ]
+          },
+          {
+            "phase": "quality",
+            "target": false,
+            "configuration": "[\"quality\",false,\"HIGH\",1351,467,1]",
+            "samples": 20,
+            "warmSamples": 18,
+            "assessable": true,
+            "trends": [
+              {
+                "metric": "geometries",
+                "fromCycle": 3,
+                "toCycle": 20,
+                "from": 560,
+                "to": 560,
+                "growth": 0,
+                "positiveSteps": 0,
+                "leaking": false
+              },
+              {
+                "metric": "textures",
+                "fromCycle": 3,
+                "toCycle": 20,
+                "from": 150,
+                "to": 150,
+                "growth": 0,
+                "positiveSteps": 0,
+                "leaking": false
+              },
+              {
+                "metric": "programs",
+                "fromCycle": 3,
+                "toCycle": 20,
+                "from": 240,
+                "to": 244,
+                "growth": 4,
+                "positiveSteps": 1,
+                "leaking": false
+              }
+            ]
+          }
+        ],
+        "issues": []
+      }
+    },
+    "errors": [],
+    "backendMutations": 0
+  },
+  "geometry": [
+    {
+      "id": "pavement",
+      "beforeTriangles": 7294,
+      "afterTriangles": 7344
+    },
+    {
+      "id": "unpaved",
+      "beforeTriangles": 443,
+      "afterTriangles": 443
+    },
+    {
+      "id": "embankment",
+      "beforeTriangles": 5602,
+      "afterTriangles": 5708
+    },
+    {
+      "id": "hitSurface",
+      "beforeTriangles": 2202,
+      "afterTriangles": 2238
+    },
+    {
+      "id": "shoulders",
+      "beforeTriangles": 13830,
+      "afterTriangles": 13946
+    },
+    {
+      "id": "edgeLines",
+      "beforeTriangles": 10557,
+      "afterTriangles": 10560
+    },
+    {
+      "id": "centerLines",
+      "beforeTriangles": 2218,
+      "afterTriangles": 2220
+    }
+  ],
+  "performance": {
+    "before": [
+      {
+        "meanMs": 26.0844961239617,
+        "p95Ms": 32,
+        "renderer": {
+          "at": 56654,
+          "calls": 430,
+          "triangles": 720341,
+          "geometries": 610,
+          "textures": 145,
+          "programs": 204,
+          "dpr": 0.72,
+          "width": 853,
+          "height": 667,
+          "heapBytes": 183906424,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      },
+      {
+        "meanMs": 20.66151202749141,
+        "p95Ms": 31,
+        "renderer": {
+          "at": 64209.59999999404,
+          "calls": 430,
+          "triangles": 720341,
+          "geometries": 610,
+          "textures": 145,
+          "programs": 204,
+          "dpr": 0.72,
+          "width": 853,
+          "height": 667,
+          "heapBytes": 174890525,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      },
+      {
+        "meanMs": 20.589041095890412,
+        "p95Ms": 27.599999994039536,
+        "renderer": {
+          "at": 71820.59999999404,
+          "calls": 430,
+          "triangles": 720341,
+          "geometries": 610,
+          "textures": 145,
+          "programs": 204,
+          "dpr": 0.72,
+          "width": 853,
+          "height": 667,
+          "heapBytes": 195239283,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      }
+    ],
+    "after": [
+      {
+        "meanMs": 23.88309859159127,
+        "p95Ms": 20.5,
+        "renderer": {
+          "at": 47801.90000000596,
+          "calls": 430,
+          "triangles": 720407,
+          "geometries": 610,
+          "textures": 145,
+          "programs": 204,
+          "dpr": 0.72,
+          "width": 853,
+          "height": 667,
+          "heapBytes": 168290922,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      },
+      {
+        "meanMs": 19.80132013195419,
+        "p95Ms": 20.200000017881393,
+        "renderer": {
+          "at": 55329.40000000596,
+          "calls": 430,
+          "triangles": 720407,
+          "geometries": 610,
+          "textures": 145,
+          "programs": 204,
+          "dpr": 0.72,
+          "width": 853,
+          "height": 667,
+          "heapBytes": 191170695,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      },
+      {
+        "meanMs": 19.919205297993507,
+        "p95Ms": 20.5,
+        "renderer": {
+          "at": 62931.30000001192,
+          "calls": 430,
+          "triangles": 720407,
+          "geometries": 610,
+          "textures": 145,
+          "programs": 204,
+          "dpr": 0.72,
+          "width": 853,
+          "height": 667,
+          "heapBytes": 182715941,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      }
+    ],
+    "note": "Local warmed Chrome samples on Intel UHD. Different runs and adaptive-quality states; no cold-cache, input-to-photon, 60 FPS or physical-device certification."
+  },
+  "visual": {
+    "comparison": "comparison.html",
+    "views": [
+      "reference-1",
+      "reference-2-3",
+      "reference-4",
+      "top",
+      "low-opposite",
+      "reference-5",
+      "br472-access",
+      "br472-roundabout",
+      "gate5-top"
+    ],
+    "portao5Before": "baseline-gate5-gate5-top.png",
+    "references": 6,
+    "debugOverlay": "DEV-only; absent from production build"
+  },
+  "limits": [
+    "Satellite attachments have no georeferencing metadata; calibration is relative to preserved map anchors, not a metric survey.",
+    "Current OSM confirms road naming and A5 shared nodes. No usable additional satellite image was returned.",
+    "Synthetic local auth/data; deployed Cloud revision and physical Android/iPhone/Safari were not exercised.",
+    "Rain mode is absent from the tracked base source; pre-existing untracked dist-rain was not changed."
+  ]
+}

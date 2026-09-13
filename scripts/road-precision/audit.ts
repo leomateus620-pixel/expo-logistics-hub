@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+import { createHash } from 'node:crypto';
+import { OFFICIAL_REFERENCE_DATA } from '../../src/features/commercial-map/data/officialReference2026';
+import { REAR_PARK_ROAD_NETWORK } from '../../src/features/commercial-map/data/rearParkRoadNetwork';
+import { UNIFIED_TERRITORY_ROADS, buildTerritoryRoadGeometry } from '../../src/features/commercial-map/utils/territorialRoadGeometry';
+const phase=process.argv[2] || 'before';
+const entities=OFFICIAL_REFERENCE_DATA.entities;
+const network=buildTerritoryRoadGeometry();
+const geometries=Object.entries(network).filter(([,g])=>g && 'getAttribute' in g).map(([id,g])=>{const geometry=g as import('three').BufferGeometry; const result={id,triangles:(geometry.index?.count??geometry.getAttribute('position')?.count??0)/3,sha256:createHash('sha256').update(JSON.stringify(geometry.toJSON().data)).digest('hex')};geometry.dispose();return result;});
+const result={entities:entities.map(e=>({id:e.publicIdentifier,classification:e.classification,hash:createHash('sha256').update(JSON.stringify(e)).digest('hex'),geometry:e.geometry})),roads:REAR_PARK_ROAD_NETWORK,territory:UNIFIED_TERRITORY_ROADS,geometries};
+fs.mkdirSync('docs/validation/road-precision',{recursive:true});
+fs.writeFileSync(`docs/validation/road-precision/${phase}-geometry.json`,JSON.stringify(result,null,2));
+console.log(JSON.stringify({phase,entities:entities.length,geometries}));

@@ -418,11 +418,11 @@ describe('park access spatial plan', () => {
     ]));
   });
 
-  it('links A6 to A7 and both Exporural frontage roads without invading adjacent footprints', () => {
+  it('keeps A6/A7 and the south road intact after the explicit eastern-link removal', () => {
     const roads = new Map(PARK_ACCESS_SPATIAL_PLAN.roadSurfaces
       .map((surface) => [surface.id, surface]));
     const gateAxis = roads.get('gate-6-gate-7-asphalt')!;
-    const johanLink = roads.get('gate-7-johan-muller-link')!;
+    expect(roads.has('gate-7-johan-muller-link')).toBe(false);
     const gustavoLink = roads.get('gate-7-gustavo-bessel-link')!;
 
     expect(gateAxis).toMatchObject({
@@ -445,20 +445,6 @@ describe('park access spatial plan', () => {
     expect(gateAxis.centerline[0]).toEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate6.point);
     expect(gateAxis.centerline.at(-1)).toEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate7.point);
 
-    expect(johanLink).toMatchObject({
-      kind: 'ASPHALT_ACCESS_ROAD',
-      widthMeters: 5.2,
-      widthReviewRangeMeters: [5, 6],
-      supportAware: true,
-    });
-    expect(johanLink.connects).toEqual(expect.arrayContaining([
-      'A7',
-      'gate-7-junction',
-      'RUA-JOHAN-MULLER',
-    ]));
-    expect(johanLink.centerline.at(-1))
-      .toEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate7JohanMullerSeam.point);
-
     expect(gustavoLink).toMatchObject({
       kind: 'ASPHALT_ACCESS_ROAD',
       widthMeters: 6,
@@ -474,25 +460,18 @@ describe('park access spatial plan', () => {
     expect(gustavoLink.centerline[1]).toEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate7Junction.point);
     expect(gustavoLink.centerline.at(-1))
       .toEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate7GustavoBesselSeam.point);
-    expect(johanLink.centerline).toContainEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate7Junction.point);
     expect(distance(gateAxis.centerline.at(-1)!, gustavoLink.centerline[0])).toBe(0);
 
-    expect(polygonsIntersect(gateAxis.polygon, johanLink.polygon)).toBe(true);
     expect(polygonsIntersect(gateAxis.polygon, gustavoLink.polygon)).toBe(true);
-    expect(polygonsIntersect(johanLink.polygon, gustavoLink.polygon)).toBe(true);
 
-    const [johanMuller, gustavoBessel] = officialFootprints([
-      'RUA-JOHAN-MULLER',
-      'RUA-GUSTAVO-BESSEL',
-    ]);
-    expect(polygonsIntersect(johanLink.polygon, johanMuller.polygon)).toBe(true);
+    const [gustavoBessel] = officialFootprints(['RUA-GUSTAVO-BESSEL']);
     expect(polygonsIntersect(gustavoLink.polygon, gustavoBessel.polygon)).toBe(true);
 
     officialFootprints(['PISTA-CAMPEIRA', 'Q-R-15']).forEach(({ identifier, polygon }) => {
       expect(polygonsIntersect(gustavoLink.polygon, polygon), `gate-7-south/${identifier}`)
         .toBe(false);
     });
-    [gateAxis, johanLink, gustavoLink].forEach((surface) => {
+    [gateAxis, gustavoLink].forEach((surface) => {
       expect(surface.sourceIds).toContain('annex-23-satellite-gates-6-7');
       expect(surface.sourcePdfCurbCenterlines).toHaveLength(2);
       expect(surface.curbCenterlines).toHaveLength(2);
@@ -518,7 +497,7 @@ describe('park access spatial plan', () => {
     expect(PARK_ACCESS_ROAD_CURB_WIDTH_METERS).toBe(0.5);
     expect(curbWidth).toBeCloseTo(0.075, 8);
     const protectedFootprints = officialFootprints(['PISTA-CAMPEIRA', 'Q-R-08', 'Q-R-15']);
-    [gateAxis, johanLink, gustavoLink].forEach((surface) => {
+    [gateAxis, gustavoLink].forEach((surface) => {
       surface.curbCenterlines!.forEach((centerline, curbIndex) => {
         centerline.slice(0, -1).forEach((from, segmentIndex) => {
           const footprint = segmentFootprint(from, centerline[segmentIndex + 1], curbWidth);

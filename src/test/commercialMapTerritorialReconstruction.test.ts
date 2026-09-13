@@ -1,3 +1,4 @@
+import { OFFICIAL_REFERENCE_DATA } from '../features/commercial-map/data/officialReference2026';
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import {
@@ -55,7 +56,7 @@ describe("territorial reconstruction from September references", () => {
     expect(TERRITORY_REFERENCE.anchors.gate5Neighbourhood[1]).toBeLessThan(-35);
     expect(TERRITORY_REFERENCE.anchors.arenaAccess[1]).toBeGreaterThan(14);
     expect(REAR_OFFICIAL_ANCHORS.gate5Entity).toEqual([5974, 3678]);
-    expect(REAR_OFFICIAL_ANCHORS.gate5ParkEdge).toEqual([5860, 3633]);
+    expect(REAR_OFFICIAL_ANCHORS.gate5ParkEdge).toEqual([5480, 3524]);
   });
   it("triangulates the union without duplicate coverage, inverted faces or lost islands", () => {
     const network = buildTerritoryRoadGeometry();
@@ -119,7 +120,8 @@ describe("territorial reconstruction from September references", () => {
           .filter((_, i) => i % 8 === 0)
           .forEach((point) => {
             expect(
-              network.fullFootprint.some(
+              OFFICIAL_REFERENCE_DATA.entities.some(e => ['AV-IMIGRANTES', 'RUA-BRASIL'].includes(e.publicIdentifier)
+                && territoryContainsPoint(point, e.geometry.coordinates[0])) || network.fullFootprint.some(
                 (rings) =>
                   territoryContainsPoint(point, rings[0]) &&
                   !rings

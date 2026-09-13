@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import { mergeBufferGeometries } from 'three-stdlib';
 import type { Coordinate, MapEntity } from '../types';
 import { withoutClosingPoint } from './geometry';
+import { buildRearRoadCorridorFootprints, distanceToPath } from './rearRoadNetwork';
+
+const REAR_ENTRY_FOOTPRINTS = buildRearRoadCorridorFootprints();
 
 export const ROAD_INFRASTRUCTURE = {
   asphaltHeight: 0.032,
@@ -326,7 +329,9 @@ export function buildRoadBoundaryRuns(
         const from = lerpCoordinate(start, end, step / steps);
         const to = lerpCoordinate(start, end, (step + 1) / steps);
         const midpoint = lerpCoordinate(from, to, 0.5);
-        const blockedByIntersection = circulation.some((candidate) => {
+        const blockedByRearEntry = ['AV-IMIGRANTES', 'RUA-BRASIL'].includes(entity.publicIdentifier)
+          && REAR_ENTRY_FOOTPRINTS.some(r => distanceToPath(midpoint, r.centerline) <= r.halfWidth + ROAD_INFRASTRUCTURE.curbWidth);
+        const blockedByIntersection = blockedByRearEntry || circulation.some((candidate) => {
           if (candidate.id === entity.id) return false;
           return pointNearRing(midpoint, rings.get(candidate.id)!, ROAD_INFRASTRUCTURE.joinTolerance);
         });

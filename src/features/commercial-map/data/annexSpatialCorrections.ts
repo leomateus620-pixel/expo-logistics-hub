@@ -1,3 +1,5 @@
+import { ARENA_ROAD_CORRECTION } from './arenaRoadCorrection';
+
 /**
  * Blueprint de correção espacial dos anexos 1, 2 e 4 — revisão 2026.9.
  *
@@ -12,7 +14,7 @@ export type AnnexSourcePoint = readonly [number, number];
 export type AnnexSourceBounds = readonly [number, number, number, number];
 export type AnnexSourcePolygon = readonly AnnexSourcePoint[];
 
-export const COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION = '2026.9-anexo3-satellite.2';
+export const COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION = '2026.9-road-precision.1';
 
 /** Escala uniforme do recorte oficial 5.500 × 120, só para larguras físicas. */
 export const ANNEX_SOURCE_POINTS_PER_LOCAL_UNIT = 5500 / 120;
@@ -54,16 +56,16 @@ export const CHURRASCARIA_ACCESS_CORRECTION = Object.freeze({
 export const PORTAO5_PARKING_ACCESS_CORRECTION = Object.freeze({
   widthSource: 36,
   streetToCurve: Object.freeze([
-    [4528,3150], [4560,3170], [4596,3208], [4632,3236], [4730,3250], [4860,3280], [5066,3441],
+    [4528,3150], [4560,3170], [4596,3208], [4632,3236], [4730,3250], [4860,3280], [4930,3369], [5020,3419], [5066,3441],
   ] as const satisfies readonly AnnexSourcePoint[]),
   curveToEtniasJunction: Object.freeze([
-    [5066,3441], [5140,3465], [5260,3503],
+    [5066,3441], [5112,3463], [5230,3475], [5340,3482], ARENA_ROAD_CORRECTION.etniasJunction,
   ] as const satisfies readonly AnnexSourcePoint[]),
   etniasToUbiretamaJunction: Object.freeze([
-    [5260,3503], [5450,3562], [5600,3593], [5780,3620], [5860,3633],
+    ARENA_ROAD_CORRECTION.etniasJunction, ARENA_ROAD_CORRECTION.ubiretamaJunction,
   ] as const satisfies readonly AnnexSourcePoint[]),
   gate5Approach: Object.freeze([
-    [5860,3633], [5900,3650], [5940,3678],
+    ARENA_ROAD_CORRECTION.ubiretamaJunction, [5600,3560], [5780,3620], [5860,3633], [5900,3650], [5940,3678],
   ] as const satisfies readonly AnnexSourcePoint[]),
 });
 
@@ -94,28 +96,13 @@ export function portao5ParkingAccessSourceAxis(): AnnexSourcePoint[] {
   ];
 }
 
-/**
- * Anexo 2 — “Criar essa estrada”: ligação N–S da Av. dos Imigrantes / Rua das
- * Etnias até o T na Ubiretama, ao sul da Arena em [5260, 3248].
- */
+/** Distinct frontage connector; both junction nodes come from one calibration. */
 export const ETNIAS_PARKING_CONNECTION_CORRECTION = Object.freeze({
   officialOwnerIdentifier: 'AV-IMIGRANTES' as const,
   widthSource: 36,
-  avenueEntry: [5260, 4200] as const satisfies AnnexSourcePoint,
-  parkingJunction: [5260, 3503] as const satisfies AnnexSourcePoint,
-  /**
-   * Extremidades no T satélite da Ubiretama ao sul da Arena. A Catmull-Rom
-   * executável em `REAR_CALIBRATED_AXES.etniasParkingConnection` mantém o
-   * desvio dos postes CAD 361 e 331; o T rejeitado [5260, 3661] não volta.
-   */
-  sourceAxis: Object.freeze([
-    [5260, 4200],
-    [5260, 4140],
-    [5260, 3950],
-    [5262, 3750],
-    [5262, 3570],
-    [5260, 3503],
-  ] as const satisfies readonly AnnexSourcePoint[]),
+  avenueEntry: ARENA_ROAD_CORRECTION.frontageEntry,
+  parkingJunction: ARENA_ROAD_CORRECTION.etniasJunction,
+  sourceAxis: ARENA_ROAD_CORRECTION.etniasConnector,
 });
 
 /**

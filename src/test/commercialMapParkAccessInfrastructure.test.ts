@@ -269,8 +269,8 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
 
     expect(input.roadSurfaces).toHaveLength(PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.length);
     expect(input.sidewalkSurfaces).toHaveLength(PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.length + 4);
-    expect(input.curbSegments).toHaveLength(20);
-    expect(new Set(input.curbSegments?.map((segment) => segment.id)).size).toBe(20);
+    expect(input.curbSegments).toHaveLength(16);
+    expect(new Set(input.curbSegments?.map((segment) => segment.id)).size).toBe(16);
     expect(input.curbSegments?.every((segment) => segment.id.includes(':curb-'))).toBe(true);
     expect(input.parkingBays).toHaveLength(43);
     expect(input.markingSegments).toHaveLength(5);
@@ -286,7 +286,6 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     const surfaceContract = [
       ['gate-1-gate-10-rua-brasil-asphalt', 'asphalt'],
       ['gate-6-gate-7-asphalt', 'asphalt'],
-      ['gate-7-johan-muller-link', 'asphalt'],
       ['gate-7-gustavo-bessel-link', 'asphalt'],
       ['costeiros-service-road', 'gravel'],
       ['third-age-pavilion-access', 'cobblestone'],
@@ -332,7 +331,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     expect(selected.roadSurfaces.map((surface) => surface.id)).toEqual(
       EXPORURAL_GATE_ACCESS_ROAD_SURFACE_IDS,
     );
-    expect(selected.curbSegments).toHaveLength(20);
+    expect(selected.curbSegments).toHaveLength(16);
     expect(selected.curbSegments?.every((segment) => (
       EXPORURAL_GATE_ACCESS_ROAD_SURFACE_IDS.some((surfaceId) => (
         segment.id.startsWith(`${surfaceId}:curb-`)
@@ -354,8 +353,8 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       expect(model.geometries.cobblestone).toBeNull();
       expect(model.geometries.gravel).toBeNull();
       expect(model.diagnostics).toMatchObject({
-        roadSurfaceCount: 4,
-        curbSegmentCount: 20,
+        roadSurfaceCount: 3,
+        curbSegmentCount: 16,
         estimatedPrimaryDrawCalls: 2,
         estimatedShadowDrawCalls: 0,
         withinBudget: true,
@@ -376,7 +375,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       expect(detailed.diagnostics).toMatchObject({
         roadSurfaceCount: PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.length,
         sidewalkSurfaceCount: 9,
-        curbSegmentCount: 20,
+        curbSegmentCount: 16,
         parkingBayCount: 43,
         markingSegmentCount: 5,
         roundaboutCount: 2,

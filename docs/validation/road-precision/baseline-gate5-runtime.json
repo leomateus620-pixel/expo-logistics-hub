@@ -1,0 +1,27 @@
+{
+  "errors": [],
+  "readyMs": 49600,
+  "poses": {
+    "gate5-top": {
+      "pose": {
+        "target": [
+          61,
+          0,
+          16
+        ],
+        "position": [
+          61,
+          16,
+          16.01
+        ]
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 171,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  }
+}
