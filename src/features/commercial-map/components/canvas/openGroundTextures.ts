@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { measureCommercialMapSync } from '../../utils/performanceDiagnostics';
 
 /**
  * Procedural ground textures for large open surfaces (motor home field and the
@@ -608,6 +609,11 @@ function configureSharedTexture(
 }
 
 function getOpenGroundTextureSources(surface: OpenGroundSurface): OpenGroundTextureSources | null {
+  if (TEXTURE_CACHE.has(surface)) return TEXTURE_CACHE.get(surface) ?? null;
+  return measureCommercialMapSync('textures', () => buildOpenGroundTextureSources(surface));
+}
+
+function buildOpenGroundTextureSources(surface: OpenGroundSurface): OpenGroundTextureSources | null {
   if (TEXTURE_CACHE.has(surface)) return TEXTURE_CACHE.get(surface) ?? null;
   if (typeof document === 'undefined') {
     TEXTURE_CACHE.set(surface, null);

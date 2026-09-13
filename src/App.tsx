@@ -1,6 +1,9 @@
 import { deserializeQueryCache } from './lib/queryPersistence';
 import { Suspense, type ReactNode } from 'react';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
+import { CommercialMapBootLoader } from '@/features/commercial-map/components/CommercialMapBootLoader';
+import { beginCommercialMapBoot, markCommercialMapStage } from '@/features/commercial-map/utils/performanceDiagnostics';
+import { preloadHeadquartersGeometry } from '@/features/commercial-map/components/canvas/headquarters/headquartersPreparationResource';
 import { Toaster } from '@/components/ui/toaster';
 import PushPermissionPrompt from '@/components/notifications/PushPermissionPrompt';
 import { Toaster as Sonner } from '@/components/ui/sonner';
@@ -62,15 +65,33 @@ const GoogleCalendarCallbackPage = lazyWithRetry(() => import('./pages/GoogleCal
 const FenasojaCountdownExperiencePage = lazyWithRetry(
   () => import('./pages/FenasojaCountdownExperiencePage'),
 );
-const CommercialMapPage = lazyWithRetry(() => import('./pages/CommercialMapPage'));
+const CommercialMapPage = lazyWithRetry(async () => {
+  beginCommercialMapBoot();
+  void preloadHeadquartersGeometry().catch(() => undefined);
+  const module = await import('./pages/CommercialMapPage');
+  markCommercialMapStage('module-ready');
+  return module;
+});
 const CommercialMapRenderingDiagnosticsPage = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
-  ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/CommercialMapRenderingDiagnosticsPage'))
+  ? lazyWithRetry(async () => {
+    beginCommercialMapBoot();
+    void preloadHeadquartersGeometry().catch(() => undefined);
+    const module = await import('./features/commercial-map/diagnostics/CommercialMapRenderingDiagnosticsPage');
+    markCommercialMapStage('module-ready');
+    return module;
+  })
   : null;
 const ExteriorCatalogQa = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
   ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/ExteriorCatalogQa'))
   : null;
 const CommercialMapInterfaceDiagnosticsPage = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
-  ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/CommercialMapInterfaceDiagnosticsPage'))
+  ? lazyWithRetry(async () => {
+    beginCommercialMapBoot();
+    void preloadHeadquartersGeometry().catch(() => undefined);
+    const module = await import('./features/commercial-map/diagnostics/CommercialMapInterfaceDiagnosticsPage');
+    markCommercialMapStage('module-ready');
+    return module;
+  })
   : null;
 const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
 const UnsubscribePage = lazyWithRetry(() => import('./pages/UnsubscribePage'));
@@ -81,7 +102,13 @@ const CommissionAgendaPreviewPage = (import.meta.env.DEV || import.meta.env.VITE
   ? lazyWithRetry(() => import('./features/commission-agenda/dev/CommissionAgendaPreviewPage'))
   : null;
 const FinancialManagementPage = lazyWithRetry(() => import('./pages/commissions/FinancialManagementPage'));
-const CommissionCommercialMapPage = lazyWithRetry(() => import('./pages/commissions/CommissionCommercialMapPage'));
+const CommissionCommercialMapPage = lazyWithRetry(async () => {
+  beginCommercialMapBoot();
+  void preloadHeadquartersGeometry().catch(() => undefined);
+  const module = await import('./pages/commissions/CommissionCommercialMapPage');
+  markCommercialMapStage('module-ready');
+  return module;
+});
 const AdminPortalPage = lazyWithRetry(() => import('./pages/admin/AdminPortalPage'));
 const AdminOverviewPage = lazyWithRetry(() => import('./pages/admin/AdminOverviewPage'));
 const AdminCommissionPage = lazyWithRetry(() => import('./pages/admin/AdminCommissionPage'));
@@ -140,7 +167,7 @@ try {
   lastUserId = 'anon';
 }
 
-const RouteFallback = () => (
+const RouteFallback = () => /mapa-comercial|commercial-map/.test(window.location.pathname) ? <CommercialMapBootLoader force /> : (
   <div className="min-h-[40vh] flex items-center justify-center">
     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
   </div>

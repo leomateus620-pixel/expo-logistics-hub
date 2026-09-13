@@ -525,7 +525,6 @@ function BumperCars({ parkActive, reducedGraphics }: { parkActive: boolean; redu
   // activation and stays mounted afterwards; until then the pad shows cheap
   // parked meshes, keeping the dormant park free of physics work.
   const [physicsBooted, setPhysicsBooted] = useState(false);
-  useEffect(() => { void preloadBumperPhysics().catch(() => undefined); }, []);
   useEffect(() => {
     if (parkActive) setPhysicsBooted(true);
   }, [parkActive]);

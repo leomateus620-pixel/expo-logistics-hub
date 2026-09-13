@@ -1,4 +1,4 @@
-import { measureCommercialMapStage } from '../utils/performanceDiagnostics';
+import { measureCommercialMapStage, markCommercialMapStage } from '../utils/performanceDiagnostics';
 import { withFenasojaComplexReconstruction } from '../data/fenasojaComplexReconstruction';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -143,6 +143,10 @@ export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIA
     // Business status must be revalidated after a fresh document load.
     meta: { persist: false },
   });
+
+  useEffect(() => {
+    if (query.data) markCommercialMapStage('essential-data:cached');
+  }, [query.data]);
 
   useEffect(() => {
     // CommercialMapPage activates (and resets) the store scope after hooks are

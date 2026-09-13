@@ -1,6 +1,8 @@
 import { advanceSunrisePlayback, hasSunrisePlaybackFinished, updateSolarShadow } from '../../utils/lightingTransition';
 import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
-import { isCommercialSceneCompiling } from '../../utils/sceneShaderWarmup';
+import { isCommercialMapPostReady, isCommercialSceneCompiling } from '../../utils/sceneShaderWarmup';
+import { advanceRainBlend, commercialRainRuntime } from '../../utils/rainRuntime';
+import { markCommercialMapStage } from '../../utils/performanceDiagnostics';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
@@ -60,6 +62,7 @@ import {
   resolveTerrainMultiscaleQualityOptions,
 } from './terrainMaterial';
 import { TerritorialEnvironment } from './TerritorialEnvironment';
+import { DeferredSceneLayer } from './DeferredSceneLayer';
 
 interface CommercialMapEnvironmentProps {
   active?: boolean;
@@ -197,6 +200,7 @@ function createSky(
   };
   const night = COMMERCIAL_MAP_NIGHT_ATMOSPHERE.sky;
   material.uniforms.nightBlend = { value: 0 };
+  material.uniforms.rainBlend = { value: 0 };
   material.uniforms.nightZenith = { value: new THREE.Color(night.zenith) };
   material.uniforms.nightUpper = { value: new THREE.Color(night.upper) };
   material.uniforms.nightHorizon = { value: new THREE.Color(night.horizon) };
@@ -221,6 +225,7 @@ function createSky(
       uniform float authoredCloudOpacity;
       uniform vec3 authoredGroundFar;
       uniform float nightBlend;
+      uniform float rainBlend;
       uniform vec3 nightZenith;
       uniform vec3 nightUpper;
       uniform vec3 nightHorizon;
@@ -315,11 +320,20 @@ function createSky(
         nightSky = mix(nightSky, nightLower, belowHorizon);
         composedSky = mix(composedSky, nightSky, nightBlend);
       }
+      // Cloud coverage and horizon haze are part of the existing sky program.
+      // Fixed world-space cloud coordinates keep weather stable during orbit.
+      float rainCloud = sin(cloudAzimuth * 5.0 + altitude * 16.0) * .12
+        + sin(cloudAzimuth * 11.0 - altitude * 23.0) * .055;
+      vec3 rainSky = mix(vec3(.42,.49,.54), vec3(.20,.27,.33), smoothstep(0.0,.8,skyHeight));
+      rainSky += rainCloud * smoothstep(-.05,.2,altitude);
+      rainSky = mix(rainSky, vec3(.035,.050,.074) + rainCloud * .08, nightBlend);
+      rainSky = mix(rainSky, mix(authoredGroundFar * .77, nightGroundFar, nightBlend), belowHorizon);
+      composedSky = mix(composedSky, rainSky, rainBlend * .9);
       float dither = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5;
       gl_FragColor = vec4(max(composedSky + dither / 720.0, vec3(0.0)), 1.0);`,
     );
   // Mode changes uniforms only; both palettes intentionally share one program.
-  material.customProgramCacheKey = () => 'commercial-map-camera-safe-sunrise-sky-v6-night';
+  material.customProgramCacheKey = () => 'commercial-map-camera-safe-sunrise-sky-v7-weather';
   material.needsUpdate = true;
   return sky;
 }
@@ -343,6 +357,7 @@ function createCelestialSun(
       uSunriseProgress: { value: initialFrame.easedProgress },
       uRayStrength: { value: initialFrame.rayStrength },
       uNightBlend: { value: 0 },
+      uRainBlend: { value: 0 },
       uDiscRadiusRatio: { value: discRadiusRatio },
       uSunCore: { value: new THREE.Color(sunrise.colors.sunCore) },
       uSunEdge: { value: new THREE.Color(sunrise.colors.sunEdge) },
@@ -361,6 +376,7 @@ function createCelestialSun(
       uniform float uSunriseProgress;
       uniform float uRayStrength;
       uniform float uNightBlend;
+      uniform float uRainBlend;
       uniform float uDiscRadiusRatio;
       uniform vec3 uSunCore;
       uniform vec3 uSunEdge;
@@ -371,7 +387,7 @@ function createCelestialSun(
       void main() {
         float radius = length(vSunUv);
         if (radius > 1.0) discard;
-        float reveal = smoothstep(0.025, 0.16, uSunriseProgress) * (1.0 - uNightBlend);
+        float reveal = smoothstep(0.025, 0.16, uSunriseProgress) * (1.0 - uNightBlend) * (1.0 - uRainBlend * .96);
         float disc = 1.0 - smoothstep(
           uDiscRadiusRatio * 0.84,
           uDiscRadiusRatio,
@@ -616,6 +632,7 @@ function createCommercialMapPostProcessing(
   scene: THREE.Scene,
   camera: THREE.Camera,
 ) {
+  markCommercialMapStage('postprocessing:start');
   const previousAutoClear = gl.autoClear;
   const composer = new EffectComposer(gl, {
     multisampling: 0,
@@ -664,6 +681,7 @@ function createCommercialMapPostProcessing(
   sharpenPass.renderToScreen = false;
   let disposed = false;
   let selectionShadersPrepared = false;
+  markCommercialMapStage('postprocessing:end');
   return {
     composer,
     bloom,
@@ -992,7 +1010,8 @@ export function SunrisePostProcessing({
     };
     try {
       const current = pipeline.current;
-      if (enabled && !interactionActive && quality.bloomEnabled && current && !postFailed.current) {
+      if (enabled && !interactionActive && isCommercialMapPostReady(gl)
+        && quality.bloomEnabled && current && !postFailed.current) {
         try {
           bindCommercialMapScreen(gl, size.width, size.height);
           gl.toneMapping = THREE.NoToneMapping;
@@ -1129,6 +1148,8 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   const sunriseSequence = useCommercialMapStore((state) => state.sunriseSequence);
   const sunriseStartedAt = useCommercialMapStore((state) => state.sunriseStartedAt);
   const requestSunrise = useCommercialMapStore((state) => state.requestSunrise);
+  const rainModeActive = useCommercialMapStore((state) => state.rainModeActive);
+  const rain = useMemo(() => commercialRainRuntime(scene), [scene]);
   const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
   const mode: CommercialMapEnvironmentMode = hydrologicalModeActive ? 'hydrological' : 'normal';
   const palette = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes[mode];
@@ -1214,17 +1235,21 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     [qualityTier, shadowFrustum, sunTarget],
   );
   const activeGroundTextures = useMemo(() => {
+    markCommercialMapStage('environment:textures:start');
     const repeatX = layout.outerGroundSize / ACTIVE_GROUND_PROFILE.tileWorldSize;
     const repeatY = layout.outerGroundSize / ACTIVE_GROUND_PROFILE.tileWorldSize;
     // PlaneGeometry has normalized UVs. Include its final transform in the
     // pool key so no later mutation can affect another PBR surface handle.
-    return openGroundTextureBundleForEntity(ACTIVE_GROUND_PROFILE, maximumAnisotropy, {
+    const textures = openGroundTextureBundleForEntity(ACTIVE_GROUND_PROFILE, maximumAnisotropy, {
       wrapS: THREE.MirroredRepeatWrapping,
       wrapT: THREE.MirroredRepeatWrapping,
       repeat: [repeatX, repeatY],
     });
+    markCommercialMapStage('environment:textures:end');
+    return textures;
   }, [layout.outerGroundSize, maximumAnisotropy]);
   const normalGroundMaterial = useMemo(() => {
+    markCommercialMapStage('environment:materials:start');
     const createBaseMaterial = () => new THREE.MeshStandardMaterial({
       name: 'CommercialMapOuterGroundMaterial',
       color: COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.normal.activeGround,
@@ -1237,6 +1262,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       envMapIntensity: 0.12,
     });
     const material = createBaseMaterial();
+    markCommercialMapStage('environment:materials:end');
     const terrainDetail = resolveTerrainMultiscaleQualityOptions(
       initialQualityTier.current as CommercialMapSunriseQualityTier,
       cameraDistanceBounds.maxDistance,
@@ -1351,6 +1377,11 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     hemisphereGround: new THREE.Color(palette.hemisphereGround),
   }), [palette.hemisphereGround, palette.horizon]);
   const dayFogColor = useMemo(() => new THREE.Color(), []);
+  const rainColors = useMemo(() => ({
+    day: new THREE.Color('#879ba9'), night: new THREE.Color('#172433'),
+    ambient: new THREE.Color('#b8d0df'), ground: new THREE.Color('#445d56'),
+    mixed: new THREE.Color(),
+  }), []);
 
   useLayoutEffect(() => {
     fog.near = layout.fogNear;
@@ -1376,6 +1407,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     layout.fogNear,
     mode,
     nightMode,
+    rainModeActive,
     qualityTier,
     sky,
     sunLight,
@@ -1458,9 +1490,14 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     const nightBlend = nightSettled ? nightTarget : dampedNight;
     const nightChanged = nightBlend !== timeline.current.nightBlend;
     timeline.current.nightBlend = nightBlend;
+    const rainBlend = advanceRainBlend(rain.blend.value, liveState.rainModeActive, delta);
+    const rainChanged = rainBlend !== rain.blend.value;
+    rain.blend.value = rainBlend;
+    rain.night.value = nightBlend;
+    const rainSettled = rainBlend === (liveState.rainModeActive ? 1 : 0);
     const frameChanged = progress !== timeline.current.lastAppliedProgress
       || liveState.sunriseSequence !== timeline.current.sequence
-      || nightChanged;
+      || nightChanged || rainChanged;
     const cameraSignature = commercialMapDiagnosticsEnabled
       ? [
           ...camera.matrixWorld.elements,
@@ -1469,7 +1506,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       : '';
     const diagnosticsStale = commercialMapDiagnosticsEnabled
       && cameraSignature !== timeline.current.lastCameraSignature;
-    if ((isRunning && !hasSunrisePlaybackFinished(playback.current) && !nightMode) || !nightSettled) invalidate();
+    if ((isRunning && !hasSunrisePlaybackFinished(playback.current) && !nightMode) || !nightSettled || !rainSettled) invalidate();
     if (isRunning && hasSunrisePlaybackFinished(playback.current)) liveState.completeSunrise(liveState.sunriseSequence);
     if (!frameChanged && !diagnosticsStale) return;
 
@@ -1495,11 +1532,13 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       sunLight.position.copy(shadowAnchor).addScaledVector(frameDirection, shadowFrustum.distance);
       const daylight = 1 - nightBlend;
       const night = COMMERCIAL_MAP_NIGHT_ATMOSPHERE;
-      updateSolarShadow(sunLight, gl, frame.sunlightIntensity * daylight,
+      updateSolarShadow(sunLight, gl, frame.sunlightIntensity * daylight * (1 - rainBlend * .7),
         previousSunX !== sunLight.position.x || previousSunY !== sunLight.position.y || previousSunZ !== sunLight.position.z);
       celestialSun.material.uniforms.uNightBlend.value = nightBlend;
+      celestialSun.material.uniforms.uRainBlend.value = rainBlend;
       sky.material.uniforms.nightBlend.value = nightBlend;
-      sunLight.shadow.radius = resolveShadowRadiusTexels(frame.shadowRadius, quality.shadowMapSize);
+      sky.material.uniforms.rainBlend.value = rainBlend;
+      sunLight.shadow.radius = resolveShadowRadiusTexels(frame.shadowRadius + rainBlend * 1.5, quality.shadowMapSize);
       sunTarget.updateMatrixWorld();
       sunLight.updateMatrixWorld();
       if (ambientRef.current) {
@@ -1509,6 +1548,8 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
           nightBlend,
         );
         ambientRef.current.color.lerpColors(dayColors.ambient, nightColors.ambient, nightBlend);
+        ambientRef.current.color.lerp(rainColors.ambient, rainBlend * .2 * daylight);
+        ambientRef.current.intensity *= 1 + rainBlend * .08;
       }
       if (hemisphereRef.current) {
         hemisphereRef.current.intensity = THREE.MathUtils.lerp(
@@ -1526,16 +1567,26 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
           nightColors.hemisphereGround,
           nightBlend,
         );
+        hemisphereRef.current.color.lerp(rainColors.ambient, rainBlend * .25 * daylight);
+        hemisphereRef.current.groundColor.lerp(rainColors.ground, rainBlend * .12 * daylight);
+        hemisphereRef.current.intensity *= 1 - rainBlend * .18;
       }
       dayFogColor.lerpColors(preSunriseFog, finalSunriseFog, frame.cloudWarmth);
       fogColor.lerpColors(dayFogColor, nightColors.fog, nightBlend);
       fog.color.copy(fogColor);
       background.lerpColors(dayBackground, nightColors.background, nightBlend);
+      rainColors.mixed.lerpColors(rainColors.day, rainColors.night, nightBlend);
+      fog.color.lerp(rainColors.mixed, rainBlend * .72);
+      background.lerp(rainColors.mixed, rainBlend * .78);
+      // Keep every legal camera framing clear. Weather reduces distant contrast
+      // beyond the park without obscuring lots at the maximum zoom distance.
+      fog.near = layout.fogNear * (1 - rainBlend * .1);
+      fog.far = layout.fogFar * (1 - rainBlend * .22);
       scene.environmentIntensity = THREE.MathUtils.lerp(
         frame.environmentIntensity,
         night.environmentIntensity,
         nightBlend,
-      );
+      ) * (1 - rainBlend * .2);
     }
 
     const diagnosticBucket = progress >= 1 ? 2 : progress >= 0.45 ? 1 : 0;
@@ -1627,7 +1678,9 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
         <primitive object={activeGroundMaterial} attach="material" />
       </mesh>
       <group visible={mode === 'normal'}>
-        <TerritorialEnvironment reducedGraphics={qualityTier !== 'full'} />
+        <DeferredSceneLayer id="territorial-context" priority={100}>
+          <TerritorialEnvironment reducedGraphics={qualityTier !== 'full'} />
+        </DeferredSceneLayer>
       </group>
       </group>
       {/* The persistent composer remains allocated, but native MSAA renders

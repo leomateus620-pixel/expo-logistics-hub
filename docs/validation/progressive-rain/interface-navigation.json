@@ -1,0 +1,14 @@
+{
+  "fixture": true,
+  "input": "mouse drag and wheel in responsive viewport; not physical multi-touch",
+  "before": {
+    "camera": "{\"position\":[4.9338,21.5632,35.476],\"target\":[3.7436,0.14,14.9455],\"quaternion\":[-0.391939,0.026631,0.011351,0.919536],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0.23114981199287551},\"near\":0.035,\"far\":3142.733,\"distance\":29.6964,\"minDistance\":8.7889,\"maxDistance\":804.9298,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":804.9298,\"calculatedMaxDistance\":804.9298,\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":821.21875,\"height\":315.8125,\"aspect\":2.60034,\"dpr\":1}}",
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":5550,\"contextLosses\":0,\"lastErrorCode\":null}"
+  },
+  "after": {
+    "camera": "{\"position\":[-4.5226,26.1924,21.2483],\"target\":[3.5802,0.14,15.1675],\"quaternion\":[-0.505042,-0.369004,-0.25243,0.738274],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0.23114981199287551},\"near\":0.11647,\"far\":3142.733,\"distance\":27.9528,\"minDistance\":8.7889,\"maxDistance\":804.9298,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":804.9298,\"calculatedMaxDistance\":804.9298,\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":821.21875,\"height\":315.8125,\"aspect\":2.60034,\"dpr\":0.72}}",
+    "health": "{\"status\":\"ready\",\"path\":\"direct\",\"presentedFrames\":6724,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "scrollWidth": 844,
+    "width": 844
+  }
+}

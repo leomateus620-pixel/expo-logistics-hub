@@ -1,0 +1,74 @@
+[
+  {
+    "mode": "day",
+    "medianFrameMs": 29.6,
+    "medianP95Ms": 30.6,
+    "maxFrameMs": 50.5,
+    "medianFirstPresentedMs": 28.85,
+    "calls": 888,
+    "triangles": 832944
+  },
+  {
+    "mode": "day-hydrology",
+    "medianFrameMs": 19.5,
+    "medianP95Ms": 22.85,
+    "maxFrameMs": 36.8,
+    "medianFirstPresentedMs": 19.7,
+    "calls": 628,
+    "triangles": 223659
+  },
+  {
+    "mode": "day-rain",
+    "medianFrameMs": 29.2,
+    "medianP95Ms": 30.55,
+    "maxFrameMs": 178.9,
+    "medianFirstPresentedMs": 29.75,
+    "calls": 892,
+    "triangles": 839584
+  },
+  {
+    "mode": "day-rain-hydrology",
+    "medianFrameMs": 19.3,
+    "medianP95Ms": 23.5,
+    "maxFrameMs": 341.7,
+    "medianFirstPresentedMs": 28.15,
+    "calls": 629,
+    "triangles": 229659
+  },
+  {
+    "mode": "night",
+    "medianFrameMs": 29.3,
+    "medianP95Ms": 31.35,
+    "maxFrameMs": 208.6,
+    "medianFirstPresentedMs": 24.3,
+    "calls": 903,
+    "triangles": 863822
+  },
+  {
+    "mode": "night-hydrology",
+    "medianFrameMs": 19.8,
+    "medianP95Ms": 23.4,
+    "maxFrameMs": 49.5,
+    "medianFirstPresentedMs": 19.85,
+    "calls": 628,
+    "triangles": 223659
+  },
+  {
+    "mode": "night-rain",
+    "medianFrameMs": 29.6,
+    "medianP95Ms": 30.45,
+    "maxFrameMs": 50.9,
+    "medianFirstPresentedMs": 27.95,
+    "calls": 907,
+    "triangles": 870462
+  },
+  {
+    "mode": "night-rain-hydrology",
+    "medianFrameMs": 19.6,
+    "medianP95Ms": 22.85,
+    "maxFrameMs": 72.2,
+    "medianFirstPresentedMs": 19.0,
+    "calls": 629,
+    "triangles": 229659
+  }
+]

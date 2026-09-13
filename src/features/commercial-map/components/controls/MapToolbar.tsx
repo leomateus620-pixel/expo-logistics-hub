@@ -2,6 +2,7 @@ import {
   Box,
   Building2,
   CarFront,
+  CloudRain,
   Droplets,
   Layers3,
   List,
@@ -84,6 +85,8 @@ export function MapToolbar({
   const requestSunrise = useCommercialMapStore((state) => state.requestSunrise);
   const nightModeActive = useCommercialMapStore((state) => state.nightModeActive);
   const toggleNightMode = useCommercialMapStore((state) => state.toggleNightMode);
+  const rainModeActive = useCommercialMapStore((state) => state.rainModeActive);
+  const toggleRainMode = useCommercialMapStore((state) => state.toggleRainMode);
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
   const canUseTechnicalValidation = canUseTechnicalValidationOverlay(areaScope, permissions);
@@ -92,7 +95,7 @@ export function MapToolbar({
     ? ['exporural', 'top', 'isometric', 'quadra-r', 'quadra-s', 'semear']
     : ['overview', 'top', 'isometric'];
   const mobileResetPreset: CameraPreset = areaScope === 'exporural' ? 'exporural' : 'overview';
-  const mobileSecondaryPresets = presets.filter((preset) => ![mobileResetPreset, 'top'].includes(preset));
+  const mobileSecondaryPresets = presets.filter((preset) => preset !== mobileResetPreset);
   const sunriseControlLabel = sunrisePhase === 'running'
     ? 'Reiniciar Amanhecer'
     : sunrisePhase === 'complete'
@@ -277,7 +280,7 @@ export function MapToolbar({
         </button>
         <button
           type="button"
-          className={cameraPreset === 'top' ? 'is-active' : ''}
+          className={`commercial-map-toolbar-top-view ${cameraPreset === 'top' ? 'is-active' : ''}`}
           onClick={() => requestCameraPreset('top')}
           aria-label={CAMERA_PRESETS.top.label}
         >
@@ -303,6 +306,15 @@ export function MapToolbar({
         </button>
         <button
           type="button"
+          className={rainModeActive ? 'is-active' : ''}
+          onClick={toggleRainMode}
+          aria-label={rainModeActive ? 'Desativar chuva' : 'Ativar chuva'}
+          aria-pressed={rainModeActive}
+        >
+          <CloudRain aria-hidden="true" />
+        </button>
+        <button
+          type="button"
           className="commercial-map-toolbar-focus-selection"
           onClick={focusSelection}
           disabled={!hasSelection}
@@ -320,7 +332,7 @@ export function MapToolbar({
             {mobileSecondaryPresets.map((preset) => {
               const Icon = presetIcons[preset];
               return (
-                <DropdownMenuItem key={`mobile:${preset}`} onSelect={() => requestCameraPreset(preset)}>
+                <DropdownMenuItem className={preset === 'top' ? 'commercial-map-toolbar-menu-top' : undefined} key={`mobile:${preset}`} onSelect={() => requestCameraPreset(preset)}>
                   <Icon aria-hidden="true" />
                   <span>{CAMERA_PRESETS[preset].label}</span>
                   {cameraPreset === preset && <i aria-hidden="true" />}
