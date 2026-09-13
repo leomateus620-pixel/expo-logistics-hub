@@ -5,14 +5,16 @@ import * as THREE from 'three';
 import type { AlvoradaQualityProfile } from './capabilities';
 import { CinematicPostFX } from './CinematicPostFX';
 import { SceneController } from './SceneController';
-import type { AlvoradaWebGLTier } from './types';
+import type { AlvoradaPreparationEvent, AlvoradaWebGLTier } from './types';
 
 interface AlvoradaCanvasProps {
   initialElapsed: number;
-  onProgress: (elapsed: number) => void;
-  onReady: () => void;
   onContextLost: (elapsed: number) => void;
+  /** Preparation milestones for the host watchdog and telemetry. */
+  onPreparation?: (event: AlvoradaPreparationEvent) => void;
+  onProgress: (elapsed: number) => void;
   onQualityDecline: () => void;
+  onReady: () => void;
   quality: AlvoradaQualityProfile;
   rendererTier: Exclude<AlvoradaWebGLTier, 'unavailable'>;
 }
@@ -92,6 +94,7 @@ function CanvasRuntimeGuard({
 export function AlvoradaCanvas({
   initialElapsed,
   onContextLost,
+  onPreparation,
   onProgress,
   onQualityDecline,
   onReady,
@@ -111,6 +114,15 @@ export function AlvoradaCanvas({
   const handleContextLost = useCallback(() => {
     onContextLost(elapsed.current);
   }, [onContextLost]);
+  const onPreparationRef = useRef(onPreparation);
+  onPreparationRef.current = onPreparation;
+  const report = useCallback((event: AlvoradaPreparationEvent) => {
+    onPreparationRef.current?.(event);
+  }, []);
+
+  useEffect(() => {
+    report({ kind: 'canvas-created' });
+  }, [report]);
 
   return (
     <Canvas
@@ -137,6 +149,19 @@ export function AlvoradaCanvas({
         gl.toneMappingExposure = 0.94;
         gl.domElement.dataset.createdAt = String(performance.now());
         gl.setClearColor('#010713', 1);
+        const context = gl.getContext();
+        const debugInfo = context.getExtension('WEBGL_debug_renderer_info');
+        report({
+          kind: 'context-created',
+          detail: {
+            webglVersion: gl.capabilities.isWebGL2 ? 'webgl2' : 'webgl1',
+            parallelShaderCompile: Boolean(context.getExtension('KHR_parallel_shader_compile')),
+            renderer: debugInfo
+              ? String(context.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL))
+              : String(context.getParameter(context.RENDERER)),
+            maxTextureSize: gl.capabilities.maxTextureSize,
+          },
+        });
       }}
     >
       <CanvasRuntimeGuard
@@ -145,13 +170,14 @@ export function AlvoradaCanvas({
         onQualityDecline={onQualityDecline}
       />
       <RendererTelemetry quality={quality} />
+      <SceneController
+        initialElapsed={initialElapsed}
+        onPreparation={report}
+        onProgress={handleProgress}
+        onReady={handleReady}
+        quality={quality}
+      />
       <Suspense fallback={null}>
-        <SceneController
-          initialElapsed={initialElapsed}
-          onProgress={handleProgress}
-          onReady={handleReady}
-          quality={quality}
-        />
         <CinematicPostFX quality={quality} />
       </Suspense>
       <AdaptiveDpr pixelated={false} />

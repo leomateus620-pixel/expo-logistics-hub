@@ -10,6 +10,7 @@ import {
 import { SkipForward } from 'lucide-react';
 import { OfficialCountdownCompact } from '@/components/countdown/OfficialCountdownCompact';
 import type { AlvoradaIntroMotion } from '@/features/alvorada/AlvoradaIntro';
+import { AlvoradaPreparingSurface } from '@/features/alvorada/AlvoradaPreparingSurface';
 import { warmAlvoradaAssets } from '@/features/alvorada/capabilities';
 import {
   markAlvoradaIntroStarted,
@@ -37,14 +38,6 @@ function prefersReducedMotion() {
   return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 }
 
-function IntroPreparingSurface() {
-  return (
-    <div className="fenasoja-portal__intro-preparing" aria-hidden="true">
-      <span />
-    </div>
-  );
-}
-
 export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
   const heroRef = useRef<HTMLElement>(null);
   const [presentation, setPresentation] = useState<IntroPresentation>(() => (
@@ -52,7 +45,7 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
   ));
   const [introStage, setIntroStage] = useState<AlvoradaIntroStage>('preparing');
   const [motion] = useState<AlvoradaIntroMotion>(() => (
-    prefersReducedMotion() ? 'static' : 'cinematic'
+    prefersReducedMotion() ? 'reduced' : 'cinematic'
   ));
   const presentationRef = useRef<IntroPresentation>(presentation);
   const leaveTimer = useRef<number | null>(null);
@@ -76,8 +69,9 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
   useEffect(() => {
     if (presentation !== 'waiting') return undefined;
 
-    // Download the WebGL chunk and warm the shared assets while the card waits
-    // for visibility; nothing here blocks the portal's initial interaction.
+    // Download the WebGL chunk and start the shared asset pipeline while the
+    // card waits for visibility; the scene consumes these same downloads, so
+    // nothing is fetched twice and nothing here blocks the portal.
     void loadAlvoradaIntro();
     warmAlvoradaAssets();
 
@@ -137,9 +131,9 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
         >
           <div className="fenasoja-portal__intro-stage" aria-hidden="true">
             {presentation === 'waiting' ? (
-              <IntroPreparingSurface />
+              <AlvoradaPreparingSurface />
             ) : (
-              <Suspense fallback={<IntroPreparingSurface />}>
+              <Suspense fallback={<AlvoradaPreparingSurface />}>
                 <AlvoradaIntro
                   motion={motion}
                   onFinished={finishIntro}

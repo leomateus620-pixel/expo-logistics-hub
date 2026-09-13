@@ -364,25 +364,8 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-}
-
-.fenasoja-portal__intro-preparing {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background:
-    radial-gradient(circle at 68% 70%, rgb(244 127 34 / 14%), transparent 31%),
-    #010713;
-}
-
-.fenasoja-portal__intro-preparing > span {
-  width: 34px;
-  height: 34px;
-  border: 1px solid rgb(155 195 238 / 22%);
-  border-top-color: var(--portal-gold-strong);
-  border-radius: 50%;
-  animation: portal-alvorada-loader 900ms linear infinite;
+  /* The preparing surface and the intro size themselves from this box. */
+  container-type: size;
 }
 
 .fenasoja-portal__intro-skip {
