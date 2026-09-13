@@ -37,6 +37,13 @@
   color: #fff;
   box-shadow: 0 8px 20px -10px rgba(13, 104, 155, .9), inset 0 1px rgba(255, 255, 255, .28);
 }
+.commercial-map-topbar__trigger.is-rain { color: #426c82; }
+.commercial-map-topbar__trigger.is-rain:hover { background: #e8f1f5; }
+.commercial-map-topbar__trigger.is-rain.is-open {
+  color: #d5edf9;
+  border-color: #568299;
+  background: linear-gradient(145deg, #254252, #3e657a);
+}
 .commercial-map-topbar__trigger.is-night { color: #4a5578; }
 .commercial-map-topbar__trigger.is-night:hover {
   background: rgba(64, 76, 140, .1);

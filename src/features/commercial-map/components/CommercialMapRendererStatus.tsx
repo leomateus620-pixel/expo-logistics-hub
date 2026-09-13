@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { CommercialMapBootLoader } from './CommercialMapBootLoader';
 import {
   COMMERCIAL_MAP_RENDER_HEALTH_EVENT,
   COMMERCIAL_MAP_PREPARING_EVENT,
@@ -24,13 +25,11 @@ function currentMapCanvas(): HTMLCanvasElement | null {
 /** A passive notice: never overlays an input-capturing surface over the map. */
 export function CommercialMapRendererStatus() {
   const [status, setStatus] = useState<RenderHealthStatus>('ready');
-  const [preparing, setPreparing] = useState(false);
 
   useEffect(() => {
     const updateStatus = () => {
       const health = readCommercialMapRenderHealth(currentMapCanvas());
       setStatus(health?.status ?? 'ready');
-      setPreparing(currentMapCanvas()?.dataset.commercialMapPreparing === 'true');
     };
     const onHealth = (event: Event) => {
       if (event.target === currentMapCanvas()) updateStatus();
@@ -44,12 +43,7 @@ export function CommercialMapRendererStatus() {
     };
   }, []);
 
-  if (preparing && status === 'ready') return (
-    <div className="commercial-map-preparing" role="status" aria-live="polite">
-      <span>Preparando mapa 3D…</span>
-    </div>
-  );
-  if (status === 'ready') return null;
+  if (status === 'ready') return <CommercialMapBootLoader />;
 
   const retry = () => {
     const canvas = currentMapCanvas();

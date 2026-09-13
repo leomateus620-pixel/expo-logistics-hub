@@ -121,6 +121,8 @@ interface CommercialMapState {
   sunriseStartedAt: number | null;
   /** Park-wide Night Mode: darkened atmosphere plus the pole LED network. */
   nightModeActive: boolean;
+  /** Weather composes with day/night and never owns navigation or selection. */
+  rainModeActive: boolean;
   lunarLaunchPhase: LunarLaunchPhase;
   lunarLaunchSequence: number;
   lunarLaunchStartedAt: number | null;
@@ -182,6 +184,8 @@ interface CommercialMapState {
   resetSunrise: () => void;
   setNightModeActive: (active: boolean) => void;
   toggleNightMode: () => void;
+  setRainModeActive: (active: boolean) => void;
+  toggleRainMode: () => void;
   requestLunarLaunch: () => void;
   setLunarLaunchPhase: (phase: LunarLaunchPhase, sequence: number) => void;
   requestLunarLaunchSkip: () => void;
@@ -237,6 +241,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   sunriseSequence: 0,
   sunriseStartedAt: null,
   nightModeActive: false,
+  rainModeActive: false,
   lunarLaunchPhase: 'idle',
   lunarLaunchSequence: 0,
   lunarLaunchStartedAt: null,
@@ -287,6 +292,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
       sunrisePhase: 'idle',
       sunriseStartedAt: null,
       nightModeActive: false,
+      rainModeActive: false,
       lunarLaunchPhase: 'idle',
       lunarLaunchStartedAt: null,
       lunarLaunchSkipRequested: false,
@@ -600,6 +606,10 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     state.nightModeActive === nightModeActive ? state : { nightModeActive }
   )),
   toggleNightMode: () => get().setNightModeActive(!get().nightModeActive),
+  setRainModeActive: (rainModeActive) => set((state) => (
+    state.rainModeActive === rainModeActive ? state : { rainModeActive }
+  )),
+  toggleRainMode: () => get().setRainModeActive(!get().rainModeActive),
   requestLunarLaunch: () => set((state) => {
     if (state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning) return state;
     return {

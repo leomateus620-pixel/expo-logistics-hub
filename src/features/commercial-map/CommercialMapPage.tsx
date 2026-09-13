@@ -1,4 +1,6 @@
 import { commercialMapDiagnosticsEnabled } from './utils/performanceDiagnostics';
+import { CommercialMapBootLoader } from './components/CommercialMapBootLoader';
+import { useCommercialMapBootVisit } from './hooks/useCommercialMapBootVisit';
 import { Profiler, lazy, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -7,7 +9,6 @@ import {
   BadgeCheck,
   Box,
   DatabaseZap,
-  Loader2,
   MapPinPlus,
   MousePointer2,
   RefreshCw,
@@ -90,7 +91,7 @@ function MapFeatureBoundary({ id, children }: { id: string; children: ReactNode 
 function MapPageSkeleton() {
   return (
     <div className="commercial-map-shell is-loading">
-      <div className="commercial-map-page-loader"><Loader2 /><strong>Carregando mapa comercial</strong><span>Sincronizando projeto, camadas e situação dos lotes…</span></div>
+      <CommercialMapBootLoader force />
     </div>
   );
 }
@@ -154,6 +155,7 @@ const COMMISSION_READ_ONLY_PERMISSIONS: MapPermissions = {
 };
 
 export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, previewData }: CommercialMapPageProps) {
+  useCommercialMapBootVisit();
   const [searchParams, setSearchParams] = useSearchParams();
   const isCommissionScope = scope.mode === 'commission';
   const lockedSegmentId = scope.mode === 'commission'
@@ -171,6 +173,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   }, []);
   const resolvedPermissions = useMapPermissions();
   const isPreview = commercialMapDiagnosticsEnabled && Boolean(previewData);
+  useEffect(() => { if (isPreview) markCommercialMapStage('fixture-data-ready'); }, [isPreview]);
   const permissions = isCommissionScope || isPreview ? COMMISSION_READ_ONLY_PERMISSIONS : resolvedPermissions;
   const { bootstrap, exporuralSync, publish } = useMapMutations();
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
@@ -509,7 +512,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
               aria-hidden={workspaceMode !== '3d'}
               data-canvas-lifecycle="persistent"
             >
-              <Suspense fallback={<div className="commercial-map-page-loader">Preparando visualização 3D…</div>}>
+              <Suspense fallback={<CommercialMapBootLoader force />}>
               <Profiler id="CommercialMapCanvas" onRender={recordCommercialMapProfiler}>
                 <CommercialMapCanvas
                   active={workspaceMode === '3d'}

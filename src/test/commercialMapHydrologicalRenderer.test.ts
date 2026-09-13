@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { Children, isValidElement, type ReactElement } from 'react';
+import { cleanup, renderHook } from '@testing-library/react';
+import * as THREE from 'three';
+import { CommercialHydrologicalInfrastructureLayer } from '@/features/commercial-map/components/canvas/CommercialHydrologicalInfrastructureLayer';
 import type {
   CommercialHydrologicalNode,
   CommercialHydrologicalPipeSegment,
@@ -21,6 +25,25 @@ import {
   resolveHydrologicalNodePlacements,
   selectCommercialHydrologicalInfrastructureForScene,
 } from '@/features/commercial-map/utils/hydrologicalInfrastructure';
+
+vi.mock('@react-three/fiber', () => ({ useThree: () => ({ invalidate: () => undefined, gl: { domElement: {} } }) }));
+vi.mock('@react-three/drei', () => ({ Html: () => null }));
+vi.mock('@/features/commercial-map/utils/hydrologyPreparationResource', async () => {
+  const utilities = await vi.importActual<typeof import('@/features/commercial-map/utils/hydrologicalInfrastructure')>(
+    '@/features/commercial-map/utils/hydrologicalInfrastructure',
+  );
+  const cache = new WeakMap<object, unknown>();
+  return { readPreparedHydrology: (input: { nodes: CommercialHydrologicalNode[]; segments: CommercialHydrologicalPipeSegment[]; surfaces: MapEntity[] }) => {
+    let result = cache.get(input.surfaces);
+    if (!result) {
+      result = { pipeSpans: utilities.buildHydrologicalPipeSpans(input.segments, input.surfaces),
+        placements: utilities.resolveHydrologicalNodePlacements(input.nodes, input.surfaces) };
+      cache.set(input.surfaces, result);
+    }
+    return result;
+  } };
+});
+afterEach(cleanup);
 
 function surface(
   id: string,
@@ -106,6 +129,58 @@ function segment(
 const SQUARE: readonly Coordinate[] = [[0, 0], [6, 0], [6, 6], [0, 6]];
 
 describe('renderer e utilitários da infraestrutura hidrológica', () => {
+  it('prepares picking transforms while inactive and retains them across 20 mode cycles', () => {
+    const props = {
+      nodes: [node('prepared-tap', 'tap', [2, 3])], segments: [],
+      surfaceEntities: [surface('floor', 'ROAD', SQUARE)], prepare: true, reducedGraphics: false,
+      active: false, onSelect: undefined as ((element: unknown) => void) | undefined,
+    };
+    const component = CommercialHydrologicalInfrastructureLayer as unknown as { type: (input: typeof props) => ReactElement };
+    const outer = renderHook((input) => component.type(input), { initialProps: props });
+    const instances = outer.result.current.type as (input: unknown) => ReactElement;
+    const meshByRef = new Map<object, THREE.InstancedMesh>();
+    const elements = (element: ReactElement): ReactElement[] => [element, ...Children.toArray(element.props.children)
+      .filter(isValidElement).flatMap((child) => elements(child))];
+    const inner = renderHook((input) => {
+      const tree = instances(input);
+      for (const element of elements(tree)) {
+        if (element.type !== 'instancedMesh') continue;
+        const ref = (element as unknown as { ref: { current: THREE.InstancedMesh } }).ref;
+        if (!meshByRef.has(ref)) meshByRef.set(ref, new THREE.InstancedMesh(...element.props.args as ConstructorParameters<typeof THREE.InstancedMesh>));
+        ref.current = meshByRef.get(ref)!;
+      }
+      return tree;
+    }, { initialProps: outer.result.current.props });
+    const selection = () => elements(inner.result.current).find((element) => element.props.name === 'selecao-pontos-hidrologicos')!;
+    const initial = selection();
+    expect(initial).toBeDefined();
+    expect(initial.props.visible).toBe(false);
+    expect(initial.props.onClick).toBeUndefined();
+    const mesh = (initial as unknown as { ref: { current: THREE.InstancedMesh } }).ref.current;
+    const matrix = new THREE.Matrix4();
+    mesh.getMatrixAt(0, matrix);
+    expect(matrix.elements[12]).toBe(2);
+    expect(matrix.elements[14]).toBe(3);
+    expect(mesh.boundingSphere).not.toBeNull();
+    const baselineMatrix = matrix.clone();
+    for (let cycle = 0; cycle < 20; cycle += 1) {
+      for (const active of [true, false]) {
+        outer.rerender({ ...props, active, onSelect: active ? () => undefined : undefined });
+        inner.rerender(outer.result.current.props);
+        const current = selection();
+        expect(current.props.args[0]).toBe(initial.props.args[0]);
+        expect(current.props.args[1]).toBe(initial.props.args[1]);
+        expect((current as unknown as { ref: { current: THREE.InstancedMesh } }).ref.current).toBe(mesh);
+        expect(current.props.visible).toBe(active);
+        if (active) expect(current.props.raycast).toBe(THREE.InstancedMesh.prototype.raycast);
+        else expect(current.props.raycast()).toBeUndefined();
+        mesh.getMatrixAt(0, matrix);
+        expect(matrix.equals(baselineMatrix)).toBe(true);
+      }
+    }
+    inner.unmount(); outer.unmount();
+    meshByRef.forEach((instance) => instance.dispose());
+  });
   it('preserva X/Z e usa somente a superfície que contém cada âncora', () => {
     const nodes = [
       node('inside', 'tap', [2, 2]),
@@ -236,7 +311,7 @@ describe('renderer e utilitários da infraestrutura hidrológica', () => {
       'src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx',
     ), 'utf8');
 
-    expect(renderer).toContain('const activated = useRef(props.active);');
+    expect(renderer).toContain('const activated = useRef(props.active || props.prepare);');
     expect(renderer).toContain('if (!activated.current');
     expect(renderer).toContain('visible={active}');
     expect(renderer).toContain('onSelect={props.active ? props.onSelect : undefined}');

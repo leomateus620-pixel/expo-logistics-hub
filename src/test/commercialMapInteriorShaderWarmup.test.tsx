@@ -11,7 +11,8 @@ import { CommercialMapInteriorShaderWarmup } from '@/features/commercial-map/com
 
 function createRuntime({ pending = false, target = null }: { pending?: boolean; target?: THREE.WebGLRenderTarget | null } = {}) {
   let currentTarget = target;
-  let complete: () => void = () => undefined;
+  let ready = !pending;
+  const complete = () => { ready = true; };
   const snapshot: { scene?: THREE.Scene; toneMapping?: THREE.ToneMapping; target?: THREE.WebGLRenderTarget | null; outputColorSpace?: string } = {};
   const gl = {
     toneMapping: THREE.NoToneMapping as THREE.ToneMapping,
@@ -23,9 +24,13 @@ function createRuntime({ pending = false, target = null }: { pending?: boolean; 
     getActiveMipmapLevel: () => 2,
     setRenderTarget: vi.fn((next: THREE.WebGLRenderTarget | null) => { currentTarget = next; }),
     render: vi.fn(),
-    compileAsync: vi.fn((scene: THREE.Scene) => {
+    properties: { get: () => ({ currentProgram: { isReady: () => ready } }) },
+    compile: vi.fn((scene: THREE.Scene) => {
       Object.assign(snapshot, { scene, target: currentTarget, toneMapping: gl.toneMapping, outputColorSpace: gl.outputColorSpace });
-      return pending ? new Promise<THREE.Scene>((resolve) => { complete = () => resolve(scene); }) : Promise.resolve(scene);
+      const materials = new Set<THREE.Material>();
+      scene.traverse((object) => { const material = (object as THREE.Mesh).material;
+        if (material) (Array.isArray(material) ? material : [material]).forEach((m) => materials.add(m)); });
+      return materials;
     }),
   };
   runtime.state = { gl, camera: new THREE.PerspectiveCamera(38, 1.5, 0.05, 1200) };
@@ -73,7 +78,7 @@ describe('Commercial Map exact interior shader warmup', () => {
     expect(gl.render).not.toHaveBeenCalled();
   });
 
-  it('keeps programs retained across rerenders and defers cleanup until asynchronous compilation finishes', async () => {
+  it('keeps programs retained across rerenders and aborts pending polling and releases resources on teardown', async () => {
     const previousTarget = new THREE.WebGLRenderTarget(8, 8);
     const { gl, snapshot, complete } = createRuntime({ pending: true, target: previousTarget });
     const view = render(<CommercialMapInteriorShaderWarmup reducedGraphics />);
@@ -94,19 +99,35 @@ describe('Commercial Map exact interior shader warmup', () => {
     expect(gl.getRenderTarget()).toBe(previousTarget);
     expect(gl.setRenderTarget).toHaveBeenLastCalledWith(previousTarget, 3, 2);
     for (let cycle = 0; cycle < 20; cycle += 1) view.rerender(<CommercialMapInteriorShaderWarmup reducedGraphics />);
-    expect(gl.compileAsync).toHaveBeenCalledTimes(1);
+    expect(gl.compile).toHaveBeenCalledTimes(1);
     disposals.forEach((dispose) => expect(dispose).not.toHaveBeenCalled());
     view.unmount();
-    disposals.forEach((dispose) => expect(dispose).not.toHaveBeenCalled());
+    disposals.forEach((dispose) => expect(dispose).toHaveBeenCalledTimes(1));
     await act(async () => { complete(); });
     disposals.forEach((dispose) => expect(dispose).toHaveBeenCalledTimes(1));
     expect(scene.children).toHaveLength(0);
     previousTarget.dispose();
   });
 
+  it('aborts lost programs and recompiles retained probes on context restoration', async () => {
+    const { gl, snapshot, complete } = createRuntime({ pending: true });
+    const view = render(<CommercialMapInteriorShaderWarmup reducedGraphics />);
+    const scene = snapshot.scene;
+    await act(async () => { gl.domElement.dispatchEvent(new Event('webglcontextlost')); });
+    expect(JSON.parse(gl.domElement.dataset.commercialMapInteriorShaderWarmup!).error).toContain('Shader preparation cancelled');
+    complete();
+    await act(async () => { gl.domElement.dispatchEvent(new Event('webglcontextrestored')); });
+    expect(gl.compile).toHaveBeenCalledTimes(2);
+    expect(snapshot.scene).toBe(scene);
+    expect(JSON.parse(gl.domElement.dataset.commercialMapInteriorShaderWarmup!)).toMatchObject({ error: null });
+    view.unmount();
+    gl.domElement.dispatchEvent(new Event('webglcontextrestored'));
+    expect(gl.compile).toHaveBeenCalledTimes(2);
+  });
+
   it('restores renderer globals and leaves the map intact when optional warmup fails', async () => {
     const { gl } = createRuntime();
-    gl.compileAsync.mockImplementation(() => { throw new Error('driver compile unavailable'); });
+    gl.compile.mockImplementation(() => { throw new Error('driver compile unavailable'); });
     const view = render(<CommercialMapInteriorShaderWarmup reducedGraphics={false} />);
     await act(async () => {});
     expect(gl.toneMapping).toBe(THREE.NoToneMapping);

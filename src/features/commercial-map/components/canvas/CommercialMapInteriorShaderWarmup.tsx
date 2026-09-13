@@ -1,7 +1,8 @@
-import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
+import { commercialMapDiagnosticsEnabled, markCommercialMapStage } from '../../utils/performanceDiagnostics';
 import { useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { compileCommercialMapPrograms } from '../../utils/sceneShaderWarmup';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 
 const NO_RAYCAST = () => undefined;
@@ -61,57 +62,65 @@ export function CommercialMapInteriorShaderWarmup({ reducedGraphics }: { reduced
   const camera = useThree((state) => state.camera);
 
   useEffect(() => {
+    markCommercialMapStage('interior-preparation:start');
     const probes = createInteriorShaderProbes(reducedGraphics);
-    const previousTarget = gl.getRenderTarget();
-    const previousFace = gl.getActiveCubeFace();
-    const previousLevel = gl.getActiveMipmapLevel();
-    const previousToneMapping = gl.toneMapping;
-    const previousOutputColorSpace = gl.outputColorSpace;
-    const startedAt = performance.now();
-    const programsBefore = gl.info.programs?.length ?? 0;
-    let cancelled = false;
-    let finished = false;
-    let compilation: Promise<THREE.Object3D>;
-
-    try {
-      // Interiors render directly with ACES/sRGB. An ordinary offscreen target
-      // would instead compile linear output with no tone mapping (wrong keys).
-      if (previousTarget !== null) gl.setRenderTarget(null);
-      gl.toneMapping = THREE.ACESFilmicToneMapping;
-      gl.outputColorSpace = THREE.SRGBColorSpace;
-      // Three r170 performs compile synchronously, then polls readiness. Restore
-      // renderer globals immediately, before awaiting that readiness promise.
-      compilation = gl.compileAsync(probes.scene, camera);
-    } catch (error) {
-      compilation = Promise.reject(error);
-    } finally {
-      gl.toneMapping = previousToneMapping;
-      gl.outputColorSpace = previousOutputColorSpace;
-      if (previousTarget !== null) gl.setRenderTarget(previousTarget, previousFace, previousLevel);
-    }
-
-    const finish = (error?: unknown) => {
-      finished = true;
-      if (cancelled) {
-        probes.dispose();
-        return;
+    let controller: AbortController | null = null;
+    let disposed = false;
+    const prepare = () => {
+      controller?.abort();
+      const current = new AbortController();
+      controller = current;
+      const previousTarget = gl.getRenderTarget();
+      const previousFace = gl.getActiveCubeFace();
+      const previousLevel = gl.getActiveMipmapLevel();
+      const previousToneMapping = gl.toneMapping;
+      const previousOutputColorSpace = gl.outputColorSpace;
+      const startedAt = performance.now();
+      const programsBefore = gl.info.programs?.length ?? 0;
+      let compilation: Promise<void>;
+      try {
+        // Preserve the exact ACES/sRGB direct-output keys used by interiors.
+        if (previousTarget !== null) gl.setRenderTarget(null);
+        gl.toneMapping = THREE.ACESFilmicToneMapping;
+        gl.outputColorSpace = THREE.SRGBColorSpace;
+        compilation = compileCommercialMapPrograms(gl, probes.scene, camera, probes.scene, current.signal);
+      } catch (error) {
+        compilation = Promise.reject(error);
+      } finally {
+        gl.toneMapping = previousToneMapping;
+        gl.outputColorSpace = previousOutputColorSpace;
+        if (previousTarget !== null) gl.setRenderTarget(previousTarget, previousFace, previousLevel);
       }
-      if (commercialMapDiagnosticsEnabled) {
-        gl.domElement.dataset.commercialMapInteriorShaderWarmup = JSON.stringify({
-          durationMs: Number((performance.now() - startedAt).toFixed(2)),
-          programsBefore,
-          programsAfter: gl.info.programs?.length ?? 0,
-          error: error instanceof Error ? error.message : error ? String(error) : null,
-        });
-      }
+      const finish = (error?: unknown) => {
+        if (disposed || controller !== current) return;
+        markCommercialMapStage('interior-preparation:end', performance.now() - startedAt, Boolean(error));
+        if (commercialMapDiagnosticsEnabled) {
+          gl.domElement.dataset.commercialMapInteriorShaderWarmup = JSON.stringify({
+            durationMs: Number((performance.now() - startedAt).toFixed(2)), programsBefore,
+            programsAfter: gl.info.programs?.length ?? 0,
+            error: error instanceof Error ? error.message : error ? String(error) : null,
+          });
+        }
+      };
+      void compilation.then(() => finish(), finish);
     };
-    void compilation.then(() => finish(), finish);
-
+    const lost = () => {
+      controller?.abort();
+      // Release the optional queue even when the driver's old program can no
+      // longer become ready. The critical renderer owns context recovery.
+      markCommercialMapStage('interior-preparation:end', undefined, true);
+    };
+    gl.domElement.addEventListener('webglcontextlost', lost);
+    gl.domElement.addEventListener('webglcontextrestored', prepare);
+    prepare();
     return () => {
-      cancelled = true;
-      // Keep materials alive for the Canvas lifetime so Three retains the
-      // compiled programs; do not dispose while compileAsync still polls them.
-      if (finished) probes.dispose();
+      disposed = true;
+      controller?.abort();
+      gl.domElement.removeEventListener('webglcontextlost', lost);
+      gl.domElement.removeEventListener('webglcontextrestored', prepare);
+      // Fixed-program polling releases references on abort; GPU resources can
+      // now be disposed immediately, including an abandoned pending warmup.
+      probes.dispose();
     };
   }, [camera, gl, reducedGraphics]);
 

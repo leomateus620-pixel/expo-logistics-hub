@@ -17,7 +17,8 @@ export function LateralDistrictQaPanel() {
   const night = useCommercialMapStore((state) => state.nightModeActive);
   const reduced = useCommercialMapStore((state) => state.reducedGraphics);
   useEffect(() => {
-    document.querySelector('.commercial-map-rendering-diagnostics')?.classList.toggle('is-district-qa', clean);
+    const root = document.querySelector<HTMLElement>('.commercial-map-rendering-diagnostics');
+    if (root) root.dataset.districtQa = String(clean);
   }, [clean]);
   const [report, setReport] = useState<unknown>(null);
   useEffect(() => {

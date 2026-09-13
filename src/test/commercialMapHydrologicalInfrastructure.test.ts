@@ -208,7 +208,7 @@ describe('Rede Hidrológica cartográfica do Mapa Comercial', () => {
     expect(canvasSource).toContain('enabled: labelsVisible && !interiorEntity && !hydrologicalModeActive');
     expect(canvasSource).toContain('setSelectedHydrologicalElementId(element.id)');
     expect(canvasSource).toContain('active={hydrologicalModeActive}');
-    expect(layerSource).toContain('const activated = useRef(props.active);');
+    expect(layerSource).toContain('const activated = useRef(props.active || props.prepare);');
     expect(layerSource).toContain('onSelect={props.active ? props.onSelect : undefined}');
   });
 });

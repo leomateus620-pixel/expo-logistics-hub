@@ -23,6 +23,7 @@ vi.mock('@react-three/fiber', () => ({
 
 import { SunrisePostProcessing } from '@/features/commercial-map/components/canvas/CommercialMapEnvironment';
 import { COMMERCIAL_MAP_RENDER_RETRY_EVENT, readCommercialMapRenderHealth } from '@/features/commercial-map/utils/renderingHealth';
+import { prepareCommercialMapCriticalPost, prepareCommercialScene } from '@/features/commercial-map/utils/sceneShaderWarmup';
 
 function createRenderer() {
   const size = new THREE.Vector2(1366, 768);
@@ -64,7 +65,7 @@ function createRenderer() {
     setScissor: vi.fn((x: number, y: number, width: number, height: number) => scissor.set(x, y, width, height)),
     getScissorTest: () => scissorTest,
     setScissorTest: vi.fn((enabled: boolean) => { scissorTest = enabled; }),
-    render: vi.fn(), compile: vi.fn(), resetState: vi.fn(), forceContextRestore: vi.fn(), forceContextLoss: vi.fn(),
+    render: vi.fn(), compile: vi.fn(() => new Set()), properties: { get: () => ({}) }, compileAsync: vi.fn(async () => new THREE.Scene()), resetState: vi.fn(), forceContextRestore: vi.fn(), forceContextLoss: vi.fn(),
   } as unknown as THREE.WebGLRenderer;
 }
 
@@ -119,6 +120,26 @@ afterEach(() => {
 });
 
 describe('Commercial Map persistent post-processing with installed postprocessing classes', () => {
+  it('keeps the first usable frame and gesture DIRECT until background POST readiness without remounting', async () => {
+    const state = createRuntime();
+    await prepareCommercialScene(state.gl, state.scene, state.camera);
+    const originalCamera = state.camera;
+    const view = render(<SunrisePostProcessing qualityTier="full" enabled />);
+    drawFrame();
+    expect(state.gl.render).toHaveBeenCalledOnce();
+    expect(EffectComposer.prototype.render).not.toHaveBeenCalled();
+    view.rerender(<SunrisePostProcessing qualityTier="full" enabled interactionActive />);
+    drawFrame();
+    expect(state.gl.render).toHaveBeenCalledTimes(2);
+    expect(state.gl.compile).toHaveBeenCalledOnce();
+    expect(EffectComposer.prototype.render).not.toHaveBeenCalled();
+    await prepareCommercialMapCriticalPost(state.gl, state.scene, state.camera);
+    view.rerender(<SunrisePostProcessing qualityTier="full" enabled />);
+    drawFrame();
+    expect(EffectComposer.prototype.render).toHaveBeenCalledOnce();
+    expect(state.camera).toBe(originalCamera);
+    expectScreenBound(state.gl);
+  });
   it('prepares shared selection shaders once on the first frame in the real HDR target', () => {
     const { gl, scene, camera } = createRuntime();
     const targetsDuringCompile: (THREE.WebGLRenderTarget | null)[] = [];

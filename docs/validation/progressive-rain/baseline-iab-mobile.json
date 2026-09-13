@@ -1,0 +1,213 @@
+{
+  "canvas": {
+    "commercialMapCameraDiagnostics": "{\"position\":[15.0359,311.973,297.8779],\"target\":[-2.2546,0.744,-0.3832],\"quaternion\":[-0.391939,0.026631,0.011351,0.919536],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.26964,\"far\":4948.16,\"distance\":431.4188,\"minDistance\":8.7889,\"maxDistance\":1406.7391,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":1406.7391,\"calculatedMaxDistance\":1406.7391,\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":375,\"height\":681,\"aspect\":0.55066,\"dpr\":1}}",
+    "commercialMapCameraTransition": "{\"status\":\"completed\",\"source\":\"preset:overview\",\"sequence\":1,\"startedAt\":19416.5,\"durationMs\":120,\"completedAt\":19699.3,\"elapsedMs\":282.8}",
+    "commercialMapInteriorShaderWarmup": "{\"durationMs\":1353.6,\"programsBefore\":89,\"programsAfter\":96,\"error\":null}",
+    "commercialMapRenderHealth": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":392,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "commercialMapRendererInfo": "{\"at\":25497.5,\"calls\":850,\"triangles\":761494,\"geometries\":561,\"textures\":144,\"programs\":189,\"dpr\":1,\"width\":375,\"height\":681,\"heapBytes\":208817829,\"qualityTier\":\"HIGH\",\"gpuVendor\":\"Google Inc. (Intel)\",\"gpuRenderer\":\"ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)\"}",
+    "commercialMapSceneWarmup": "{\"durationMs\":5453.800000011921,\"parallel\":true}",
+    "commercialMapShaderCompilation": "{\"startedAt\":19635.4,\"durationMs\":1.2,\"programsBefore\":89,\"programsAfter\":89,\"geometries\":8,\"textures\":3}",
+    "commercialMapSunriseDiagnostics": "{\"qualityTier\":\"balanced\",\"progress\":1,\"direction\":[0,0.40674,-0.91355],\"horizonTarget\":[-2.25,0,-50000.38],\"sunWorld\":[-2.25,20336.83,-45677.66],\"sunNdc\":[0.8246,8.0697,1.0005],\"cameraPosition\":[15.04,311.97,297.88],\"cameraForward\":[-0.04008,-0.72141,-0.69135],\"sunViewDot\":0.33816,\"cameraFar\":4948.160391070029,\"safeCameraMaxDistance\":463.21,\"fogNear\":702.581,\"fogFar\":1596.775,\"azimuthMapDegrees\":0,\"elevationDegrees\":24,\"renderer\":{\"calls\":0,\"triangles\":0,\"programs\":198,\"geometries\":561,\"textures\":145}}",
+    "engine": "three.js r170",
+    "territoryQa": "ready"
+  },
+  "preview": {
+    "events": {
+      "canvas": 14023.70000001788,
+      "draw": 25467.10000002384,
+      "presentationOpportunity": 25493.5
+    },
+    "fixture": true,
+    "focused": true,
+    "health": {
+      "contextLosses": 0,
+      "lastErrorCode": null,
+      "path": "post",
+      "presentedFrames": 1,
+      "status": "ready"
+    },
+    "longTasks": [
+      [
+        13551,
+        449
+      ],
+      [
+        14033.40000000596,
+        81
+      ],
+      [
+        14120.600000023842,
+        5551
+      ],
+      [
+        19672.20000001788,
+        52
+      ],
+      [
+        22934.20000001788,
+        202
+      ]
+    ],
+    "navigation": 0,
+    "resources": [
+      {
+        "bytes": 0,
+        "duration": 139.7999999821186,
+        "name": "/assets/index-DrZr-6kY.js",
+        "start": 13200.20000001788
+      },
+      {
+        "bytes": 0,
+        "duration": 75.59999999403954,
+        "name": "/assets/module-runtime-CEDABylm.js",
+        "start": 13200.40000000596
+      },
+      {
+        "bytes": 0,
+        "duration": 125.10000002384186,
+        "name": "/assets/data-vendor-BB8ZE5qF.js",
+        "start": 13200.5
+      },
+      {
+        "bytes": 0,
+        "duration": 126.40000000596046,
+        "name": "/assets/react-vendor-Cze6uWs8.js",
+        "start": 13200.5
+      },
+      {
+        "bytes": 0,
+        "duration": 109.60000002384186,
+        "name": "/assets/ui-radix-P81l1CXk.js",
+        "start": 13200.5
+      },
+      {
+        "bytes": 0,
+        "duration": 58.19999998807907,
+        "name": "/assets/index-DE9Zqhxm.css",
+        "start": 13200.600000023842
+      },
+      {
+        "bytes": 0,
+        "duration": 47.400000005960464,
+        "name": "/assets/CommercialMapRenderingDiagnosticsPage-Bo-Tu1nY.js",
+        "start": 13392
+      },
+      {
+        "bytes": 0,
+        "duration": 130.40000000596046,
+        "name": "/assets/commercial-map-mobile-R-po_ZPe.js",
+        "start": 13392.20000001788
+      },
+      {
+        "bytes": 0,
+        "duration": 111.59999999403954,
+        "name": "/assets/rearParkRoadNetwork-D8at7Jkp.js",
+        "start": 13392.40000000596
+      },
+      {
+        "bytes": 0,
+        "duration": 46.900000005960464,
+        "name": "/assets/state-vendor-CDfFiNsr.js",
+        "start": 13392.5
+      },
+      {
+        "bytes": 0,
+        "duration": 44,
+        "name": "/assets/commercial-map-mobile-COsIeft4.css",
+        "start": 13392.70000001788
+      },
+      {
+        "bytes": 0,
+        "duration": 150.69999998807907,
+        "name": "/assets/CommercialMapCanvas-DeVIi-rh.js",
+        "start": 13393.30000001192
+      },
+      {
+        "bytes": 0,
+        "duration": 144.30000001192093,
+        "name": "/assets/maps-three-CevA-pFR.js",
+        "start": 13393.5
+      },
+      {
+        "bytes": 0,
+        "duration": 71.19999998807907,
+        "name": "/assets/graphics-suspense-BKIKQNXN.js",
+        "start": 13393.70000001788
+      },
+      {
+        "bytes": 0,
+        "duration": 83.59999999403954,
+        "name": "/assets/electricalInfrastructure-CDin-dJm.js",
+        "start": 13393.90000000596
+      },
+      {
+        "bytes": 0,
+        "duration": 70.89999997615814,
+        "name": "/assets/exteriorArchitectureGeometry-DJy0HuZj.js",
+        "start": 13394.100000023842
+      },
+      {
+        "bytes": 0,
+        "duration": 54.900000005960464,
+        "name": "/assets/BumperCarModel-CePQ_Yww.js",
+        "start": 13394.40000000596
+      },
+      {
+        "bytes": 0,
+        "duration": 128.2000000178814,
+        "name": "/assets/log-in-DvGh2KZO.js",
+        "start": 13394.5
+      },
+      {
+        "bytes": 0,
+        "duration": 82.59999999403954,
+        "name": "/assets/CommercialMapCanvas-D1pprHiZ.css",
+        "start": 13394.70000001788
+      },
+      {
+        "bytes": 0,
+        "duration": 127.80000001192091,
+        "name": "/assets/LateralDistrictQa-D2kYXKGk.js",
+        "start": 13394.90000000596
+      },
+      {
+        "bytes": 0,
+        "duration": 90.7999999821186,
+        "name": "/assets/CommercialMapRenderingDiagnosticsPage-D3wxnmex.css",
+        "start": 13395.20000001788
+      },
+      {
+        "bytes": 0,
+        "duration": 9.599999994039536,
+        "name": "/assets/TerritoryQa-DFp2eQmo.js",
+        "start": 19130.80000001192
+      },
+      {
+        "bytes": 0,
+        "duration": 174.40000000596046,
+        "name": "/assets/AmusementParkPhysics-DROTlQeK.js",
+        "start": 19642.5
+      },
+      {
+        "bytes": 0,
+        "duration": 302.5,
+        "name": "/assets/maps-physics-Ct16L0qW.js",
+        "start": 19642.5
+      },
+      {
+        "bytes": 0,
+        "duration": 251.5999999940395,
+        "name": "/alvorada/fenasoja-symbol-official.png",
+        "start": 19669.80000001192
+      }
+    ],
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "visible": true,
+    "resourceScope": "Application assets only; browser-injected/external paths excluded from published evidence."
+  }
+}
