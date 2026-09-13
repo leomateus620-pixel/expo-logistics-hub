@@ -8,7 +8,7 @@ import {
   releaseAlvoradaTexture,
 } from '../alvoradaTextures';
 import type { AlvoradaQualityProfile } from '../capabilities';
-import { getEarthTextureUrls } from '../earthAssets';
+import { getEarthTextureSet } from '../earthAssets';
 import { EARTH_RADIUS, latitudeLongitudeToVector3 } from '../geo';
 import { useAlvoradaReadiness, useAlvoradaTimeline } from '../TimelineContext';
 import { deriveAlvoradaVisualState } from '../timeline';
@@ -32,12 +32,14 @@ const earthVertexShader = `
 
 const earthFragmentShader = `
   uniform sampler2D dayMap;
+  uniform sampler2D dayDetailMap;
   uniform sampler2D nightMap;
   uniform sampler2D normalMap;
   uniform sampler2D cloudMap;
   uniform vec3 sunDirection;
   uniform float opacity;
   uniform float cloudOffset;
+  uniform float detailMix;
   uniform float nightMix;
   uniform float normalMix;
   uniform float cloudMix;
@@ -45,7 +47,8 @@ const earthFragmentShader = `
   varying vec3 vWorldNormal;
   varying vec3 vWorldPosition;
   void main() {
-    vec3 albedo = texture2D(dayMap, vUv).rgb;
+    // The base albedo presents the globe; the detail tier crossfades in later.
+    vec3 albedo = mix(texture2D(dayMap, vUv).rgb, texture2D(dayDetailMap, vUv).rgb, detailMix);
     vec3 cities = texture2D(nightMap, vUv).rgb * nightMix;
     vec3 normal = normalize(vWorldNormal);
     // Transform the tangent-space normal into the globe frame; R alone is not height.
@@ -123,7 +126,7 @@ export function EarthScene({ quality }: { quality: AlvoradaQualityProfile }) {
   const stars = useRef<THREE.Points>(null);
   // The texture tier is fixed by the device profile and matches what the host
   // warmed; a narrow-container framing or a quality decline never reloads it.
-  const [textureUrls] = useState(() => getEarthTextureUrls(quality.textureTier === 'mobile'));
+  const [textures] = useState(() => getEarthTextureSet(quality.textureTier === 'mobile'));
   const [anisotropy] = useState(() => Math.min(quality.mobile ? 2 : 4, gl.capabilities.getMaxAnisotropy()));
   const placeholders = useMemo(() => ({
     day: createPlaceholderTexture([9, 22, 46, 255]),
@@ -132,16 +135,18 @@ export function EarthScene({ quality }: { quality: AlvoradaQualityProfile }) {
     cloud: createPlaceholderTexture([0, 0, 0, 0]),
   }), []);
   // Per-map arrival ramps (0 → 1) advanced by the authored clock.
-  const arrival = useRef({ night: 0, normal: 0, cloud: 0 });
-  const arrived = useRef({ night: false, normal: false, cloud: false });
+  const arrival = useRef({ night: 0, normal: 0, cloud: 0, detail: 0 });
+  const arrived = useRef({ night: false, normal: false, cloud: false, detail: false });
   const sunDirection = useMemo(() => latitudeLongitudeToVector3(8, 6, 1).normalize(), []);
   const earthUniforms = useMemo(() => ({
     dayMap: { value: placeholders.day as THREE.Texture },
+    dayDetailMap: { value: placeholders.day as THREE.Texture },
     nightMap: { value: placeholders.night as THREE.Texture },
     normalMap: { value: placeholders.normal as THREE.Texture },
     cloudMap: { value: placeholders.cloud as THREE.Texture },
     cloudOffset: { value: 0 },
     opacity: { value: 1 },
+    detailMix: { value: 0 },
     nightMix: { value: 0 },
     normalMix: { value: 0 },
     cloudMix: { value: 0 },
@@ -158,7 +163,7 @@ export function EarthScene({ quality }: { quality: AlvoradaQualityProfile }) {
 
   useEffect(() => {
     let active = true;
-    const [dayUrl, nightUrl, normalUrl, cloudUrl] = textureUrls;
+    const dayUrl = textures.surface;
     const configure = (texture: THREE.Texture, color: boolean) => {
       texture.colorSpace = color ? THREE.SRGBColorSpace : THREE.NoColorSpace;
       texture.anisotropy = anisotropy;
@@ -167,8 +172,9 @@ export function EarthScene({ quality }: { quality: AlvoradaQualityProfile }) {
       return texture;
     };
 
-    // The albedo is the only map the globe cannot appear without: it gates the
-    // clock. Night lights, relief and clouds fade in whenever they arrive.
+    // The base albedo is the only map the globe cannot appear without: it
+    // gates the clock. Night lights, relief, clouds and the desktop detail
+    // albedo fade in whenever they arrive.
     loadAlvoradaTexture(dayUrl).then((texture) => {
       if (!active) return;
       earthUniforms.dayMap.value = configure(texture, true);
@@ -182,13 +188,18 @@ export function EarthScene({ quality }: { quality: AlvoradaQualityProfile }) {
     });
 
     const secondary: Array<[string, keyof typeof arrived.current, boolean, (texture: THREE.Texture) => void]> = [
-      [nightUrl, 'night', true, (texture) => { earthUniforms.nightMap.value = texture; }],
-      [normalUrl, 'normal', false, (texture) => { earthUniforms.normalMap.value = texture; }],
-      [cloudUrl, 'cloud', false, (texture) => {
+      [textures.nightLights, 'night', true, (texture) => { earthUniforms.nightMap.value = texture; }],
+      [textures.normal, 'normal', false, (texture) => { earthUniforms.normalMap.value = texture; }],
+      [textures.clouds, 'cloud', false, (texture) => {
         earthUniforms.cloudMap.value = texture;
         cloudUniforms.cloudMap.value = texture;
       }],
     ];
+    if (textures.detail) {
+      secondary.push([textures.detail, 'detail', true, (texture) => {
+        earthUniforms.dayDetailMap.value = texture;
+      }]);
+    }
     secondary.forEach(([url, key, color, bind]) => {
       loadAlvoradaTexture(url).then((texture) => {
         if (!active) return;
@@ -206,10 +217,10 @@ export function EarthScene({ quality }: { quality: AlvoradaQualityProfile }) {
 
     return () => {
       active = false;
-      textureUrls.forEach(releaseAlvoradaTexture);
+      [dayUrl, ...secondary.map(([url]) => url)].forEach(releaseAlvoradaTexture);
       Object.values(placeholders).forEach((texture) => texture.dispose());
     };
-  }, [anisotropy, cloudUniforms, earthUniforms, placeholders, readiness, textureUrls]);
+  }, [anisotropy, cloudUniforms, earthUniforms, placeholders, readiness, textures]);
 
   useFrame(() => {
     const fade = deriveAlvoradaVisualState(timeline.current.elapsed).earthOpacity;
@@ -228,6 +239,7 @@ export function EarthScene({ quality }: { quality: AlvoradaQualityProfile }) {
     if (cloudMesh.current) cloudMesh.current.rotation.y = cloudRotation;
     earthUniforms.cloudOffset.value = cloudRotation / (Math.PI * 2);
     earthUniforms.opacity.value = fade;
+    earthUniforms.detailMix.value = arrival.current.detail;
     earthUniforms.nightMix.value = arrival.current.night;
     earthUniforms.normalMix.value = arrival.current.normal;
     earthUniforms.cloudMix.value = arrival.current.cloud;

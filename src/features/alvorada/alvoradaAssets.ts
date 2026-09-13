@@ -1,4 +1,4 @@
-import { getEarthTextureUrls } from './earthAssets';
+import { getEarthTextureSet, getEarthTextureUrls } from './earthAssets';
 
 /**
  * Shared download pipeline for the Alvorada intro assets.
@@ -46,12 +46,18 @@ export const ALVORADA_CRITICAL_GEODATA = [
   '/alvorada/rio-grande-do-sul-min.geojson',
 ] as const;
 
-/** The globe cannot be presented without its albedo. */
-export function getAlvoradaCriticalTextureUrl(mobile: boolean) {
-  return getEarthTextureUrls(mobile)[0];
+/**
+ * The globe cannot be presented without its albedo. Every tier starts from the
+ * same base resolution so the first frame never waits for the desktop detail.
+ */
+export function getAlvoradaCriticalTextureUrl() {
+  return getEarthTextureSet(false).surface;
 }
 
-/** Night lights, relief and clouds fade in when they arrive; they never gate the first frame. */
+/**
+ * Night lights, relief, clouds and (desktop) the detail albedo fade in when
+ * they arrive; they never gate the first frame.
+ */
 export function getAlvoradaSecondaryTextureUrls(mobile: boolean) {
   return getEarthTextureUrls(mobile).slice(1);
 }
@@ -178,7 +184,7 @@ export function warmAlvoradaIntroAssets(mobile: boolean) {
     // Errors surface where the asset is consumed; warming is best effort.
     loadAlvoradaAsset(url, priority).catch(() => undefined);
   };
-  start(getAlvoradaCriticalTextureUrl(mobile), 'high');
+  start(getAlvoradaCriticalTextureUrl(), 'high');
   ALVORADA_CRITICAL_GEODATA.forEach((url) => start(url, 'high'));
   getAlvoradaSecondaryTextureUrls(mobile).forEach((url) => start(url, 'low'));
 }

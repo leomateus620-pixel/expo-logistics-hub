@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { loadAlvoradaAsset } from './alvoradaAssets';
-import { getEarthTextureUrls } from './earthAssets';
+import { getAlvoradaCriticalTextureUrl, loadAlvoradaAsset } from './alvoradaAssets';
 import type { AlvoradaIntroStage, AlvoradaPhase } from './timeline';
 import './alvorada-narrative.css';
 
@@ -11,13 +10,13 @@ interface AlvoradaNarrativeFallbackProps {
   stage: AlvoradaIntroStage;
 }
 
-/** The compact albedo already flowing through the pipeline dresses the CSS planet. */
+/** The base albedo already flowing through the pipeline dresses the CSS planet. */
 function useAlbedoObjectUrl() {
   const [url, setUrl] = useState<string | null>(null);
   useEffect(() => {
     let active = true;
     let objectUrl: string | null = null;
-    loadAlvoradaAsset(getEarthTextureUrls(true)[0])
+    loadAlvoradaAsset(getAlvoradaCriticalTextureUrl())
       .then((blob) => {
         if (!active) return;
         objectUrl = URL.createObjectURL(blob);

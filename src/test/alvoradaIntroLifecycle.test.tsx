@@ -556,7 +556,7 @@ describe('ciclo de vida da introdução Alvorada embutida', () => {
       expect(intro).toHaveAttribute('data-renderer', 'webgl');
       expect(intro).toHaveAttribute('data-stage', 'preparing');
 
-      report({ kind: 'asset-failed', detail: { critical: true, url: '/alvorada/earth-surface-4096.webp' } });
+      report({ kind: 'asset-failed', detail: { critical: true, url: '/alvorada/earth-surface-2048.webp' } });
       expect(intro).toHaveAttribute('data-renderer', 'fallback');
       expect(intro).toHaveAttribute('data-static-reason', 'asset-failed');
       expect(intro).toHaveAttribute('data-stage', 'globe');
