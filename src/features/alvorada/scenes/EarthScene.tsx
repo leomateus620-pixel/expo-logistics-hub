@@ -1,13 +1,21 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Stars, useTexture } from '@react-three/drei';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Stars } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import {
+  createPlaceholderTexture,
+  loadAlvoradaTexture,
+  releaseAlvoradaTexture,
+} from '../alvoradaTextures';
 import type { AlvoradaQualityProfile } from '../capabilities';
-import { getEarthTextureUrls } from '../earthAssets';
+import { getEarthTextureSet } from '../earthAssets';
 import { EARTH_RADIUS, latitudeLongitudeToVector3 } from '../geo';
-import { useAlvoradaTimeline } from '../TimelineContext';
+import { useAlvoradaReadiness, useAlvoradaTimeline } from '../TimelineContext';
 import { deriveAlvoradaVisualState } from '../timeline';
 import { BrazilLayer, RioGrandeDoSulLayer, SantaRosaMarker } from './GeographicLayers';
+
+/** Secondary maps fade in over this many seconds of authored time once decoded. */
+const SECONDARY_ARRIVAL_SECONDS = 0.9;
 
 const earthVertexShader = `
   varying vec2 vUv;
@@ -24,23 +32,29 @@ const earthVertexShader = `
 
 const earthFragmentShader = `
   uniform sampler2D dayMap;
+  uniform sampler2D dayDetailMap;
   uniform sampler2D nightMap;
   uniform sampler2D normalMap;
   uniform sampler2D cloudMap;
   uniform vec3 sunDirection;
   uniform float opacity;
   uniform float cloudOffset;
+  uniform float detailMix;
+  uniform float nightMix;
+  uniform float normalMix;
+  uniform float cloudMix;
   varying vec2 vUv;
   varying vec3 vWorldNormal;
   varying vec3 vWorldPosition;
   void main() {
-    vec3 albedo = texture2D(dayMap, vUv).rgb;
-    vec3 cities = texture2D(nightMap, vUv).rgb;
+    // The base albedo presents the globe; the detail tier crossfades in later.
+    vec3 albedo = mix(texture2D(dayMap, vUv).rgb, texture2D(dayDetailMap, vUv).rgb, detailMix);
+    vec3 cities = texture2D(nightMap, vUv).rgb * nightMix;
     vec3 normal = normalize(vWorldNormal);
     // Transform the tangent-space normal into the globe frame; R alone is not height.
     vec3 tangent = normalize(vec3(-normal.z, 0.0001, normal.x));
     vec3 bitangent = normalize(cross(normal, tangent));
-    vec3 detail = texture2D(normalMap, vUv).xyz * 2.0 - 1.0;
+    vec3 detail = (texture2D(normalMap, vUv).xyz * 2.0 - 1.0) * normalMix;
     vec3 surfaceNormal = normalize(normal + (tangent * detail.x + bitangent * detail.y) * 0.16);
     float solarAngle = dot(normal, sunDirection);
     float day = smoothstep(-0.14, 0.22, solarAngle);
@@ -52,7 +66,7 @@ const earthFragmentShader = `
     vec3 halfVector = normalize(sunDirection + viewDirection);
     float reflection = pow(max(dot(surfaceNormal, halfVector), 0.0), 100.0) * water * day;
     vec2 cloudUv = vec2(fract(vUv.x + cloudOffset + 0.0015), vUv.y);
-    float cloudShadow = texture2D(cloudMap, cloudUv).r * day;
+    float cloudShadow = texture2D(cloudMap, cloudUv).r * day * cloudMix;
     vec3 surface = albedo * (0.07 + day * 0.17 + diffuse * 1.12);
     surface *= 1.0 - cloudShadow * 0.15;
     // One geographically registered emission term, suppressed across the terminator.
@@ -105,49 +119,131 @@ const atmosphereFragmentShader = `
 
 export function EarthScene({ quality }: { quality: AlvoradaQualityProfile }) {
   const timeline = useAlvoradaTimeline();
+  const readiness = useAlvoradaReadiness();
   const { gl } = useThree();
   const root = useRef<THREE.Group>(null);
   const cloudMesh = useRef<THREE.Mesh>(null);
   const stars = useRef<THREE.Points>(null);
-  // A quality decline must not restart loading during the journey.
-  const [textureUrls] = useState(() => getEarthTextureUrls(quality.mobile));
-  const configureTextures = useCallback((loaded: THREE.Texture[]) => {
-    loaded.forEach((texture, index) => {
-      texture.colorSpace = index < 2 ? THREE.SRGBColorSpace : THREE.NoColorSpace;
-      texture.anisotropy = Math.min(quality.mobile ? 2 : 4, gl.capabilities.getMaxAnisotropy());
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.needsUpdate = true;
-    });
-  }, [gl, quality.mobile]);
-  // Configure in layout before drei uploads, avoiding a second color-space upload.
-  const [dayMap, nightMap, normalMap, cloudMap] = useTexture(textureUrls, configureTextures);
+  // The texture tier is fixed by the device profile and matches what the host
+  // warmed; a narrow-container framing or a quality decline never reloads it.
+  const [textures] = useState(() => getEarthTextureSet(quality.textureTier === 'mobile'));
+  const [anisotropy] = useState(() => Math.min(quality.mobile ? 2 : 4, gl.capabilities.getMaxAnisotropy()));
+  const placeholders = useMemo(() => ({
+    day: createPlaceholderTexture([9, 22, 46, 255]),
+    night: createPlaceholderTexture([0, 0, 0, 255]),
+    normal: createPlaceholderTexture([128, 128, 255, 255]),
+    cloud: createPlaceholderTexture([0, 0, 0, 0]),
+  }), []);
+  // Per-map arrival ramps (0 → 1) advanced by the authored clock.
+  const arrival = useRef({ night: 0, normal: 0, cloud: 0, detail: 0 });
+  const arrived = useRef({ night: false, normal: false, cloud: false, detail: false });
   const sunDirection = useMemo(() => latitudeLongitudeToVector3(8, 6, 1).normalize(), []);
   const earthUniforms = useMemo(() => ({
-    dayMap: { value: dayMap }, nightMap: { value: nightMap }, normalMap: { value: normalMap },
-    cloudMap: { value: cloudMap }, cloudOffset: { value: 0 }, opacity: { value: 1 },
+    dayMap: { value: placeholders.day as THREE.Texture },
+    dayDetailMap: { value: placeholders.day as THREE.Texture },
+    nightMap: { value: placeholders.night as THREE.Texture },
+    normalMap: { value: placeholders.normal as THREE.Texture },
+    cloudMap: { value: placeholders.cloud as THREE.Texture },
+    cloudOffset: { value: 0 },
+    opacity: { value: 1 },
+    detailMix: { value: 0 },
+    nightMix: { value: 0 },
+    normalMix: { value: 0 },
+    cloudMix: { value: 0 },
     sunDirection: { value: sunDirection },
-  }), [cloudMap, dayMap, nightMap, normalMap, sunDirection]);
+  }), [placeholders, sunDirection]);
   const cloudUniforms = useMemo(() => ({
-    cloudMap: { value: cloudMap }, opacity: { value: 0.57 }, sunDirection: { value: sunDirection },
-  }), [cloudMap, sunDirection]);
+    cloudMap: { value: placeholders.cloud as THREE.Texture },
+    opacity: { value: 0 },
+    sunDirection: { value: sunDirection },
+  }), [placeholders, sunDirection]);
   const atmosphereUniforms = useMemo(() => ({
     opacity: { value: 0.28 }, sunDirection: { value: sunDirection },
   }), [sunDirection]);
 
-  useEffect(() => () => {
-    [dayMap, nightMap, normalMap, cloudMap].forEach((texture) => texture.dispose());
-    useTexture.clear(textureUrls);
-  }, [cloudMap, dayMap, nightMap, normalMap, textureUrls]);
+  useEffect(() => {
+    let active = true;
+    const dayUrl = textures.surface;
+    const configure = (texture: THREE.Texture, color: boolean) => {
+      texture.colorSpace = color ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+      texture.anisotropy = anisotropy;
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.needsUpdate = true;
+      return texture;
+    };
+
+    // The base albedo is the only map the globe cannot appear without: it
+    // gates the clock. Night lights, relief, clouds and the desktop detail
+    // albedo fade in whenever they arrive.
+    loadAlvoradaTexture(dayUrl).then((texture) => {
+      if (!active) return;
+      earthUniforms.dayMap.value = configure(texture, true);
+      readiness.current.report({ kind: 'critical-assets-ready', detail: { url: dayUrl } });
+    }).catch((error: unknown) => {
+      if (!active) return;
+      readiness.current.report({
+        kind: 'asset-failed',
+        detail: { critical: true, url: dayUrl, message: error instanceof Error ? error.message : String(error) },
+      });
+    });
+
+    const secondary: Array<[string, keyof typeof arrived.current, boolean, (texture: THREE.Texture) => void]> = [
+      [textures.nightLights, 'night', true, (texture) => { earthUniforms.nightMap.value = texture; }],
+      [textures.normal, 'normal', false, (texture) => { earthUniforms.normalMap.value = texture; }],
+      [textures.clouds, 'cloud', false, (texture) => {
+        earthUniforms.cloudMap.value = texture;
+        cloudUniforms.cloudMap.value = texture;
+      }],
+    ];
+    if (textures.detail) {
+      secondary.push([textures.detail, 'detail', true, (texture) => {
+        earthUniforms.dayDetailMap.value = texture;
+      }]);
+    }
+    secondary.forEach(([url, key, color, bind]) => {
+      loadAlvoradaTexture(url).then((texture) => {
+        if (!active) return;
+        bind(configure(texture, color));
+        arrived.current[key] = true;
+      }).catch((error: unknown) => {
+        if (!active) return;
+        // The globe stays presentable without a secondary map.
+        readiness.current.report({
+          kind: 'asset-failed',
+          detail: { critical: false, url, message: error instanceof Error ? error.message : String(error) },
+        });
+      });
+    });
+
+    return () => {
+      active = false;
+      [dayUrl, ...secondary.map(([url]) => url)].forEach(releaseAlvoradaTexture);
+      Object.values(placeholders).forEach((texture) => texture.dispose());
+    };
+  }, [anisotropy, cloudUniforms, earthUniforms, placeholders, readiness, textures]);
 
   useFrame(() => {
     const fade = deriveAlvoradaVisualState(timeline.current.elapsed).earthOpacity;
     if (root.current) root.current.visible = fade > 0.001;
     if (fade <= 0.001) return;
+    const step = timeline.current.delta / SECONDARY_ARRIVAL_SECONDS;
+    (Object.keys(arrival.current) as Array<keyof typeof arrival.current>).forEach((key) => {
+      if (arrived.current[key] && arrival.current[key] < 1) {
+        // Maps decoded before the first frame appear complete; later ones fade in.
+        arrival.current[key] = timeline.current.elapsed === 0
+          ? 1
+          : Math.min(1, arrival.current[key] + step);
+      }
+    });
     const cloudRotation = timeline.current.ambientElapsed * 0.002;
     if (cloudMesh.current) cloudMesh.current.rotation.y = cloudRotation;
     earthUniforms.cloudOffset.value = cloudRotation / (Math.PI * 2);
     earthUniforms.opacity.value = fade;
-    cloudUniforms.opacity.value = fade * 0.57;
+    earthUniforms.detailMix.value = arrival.current.detail;
+    earthUniforms.nightMix.value = arrival.current.night;
+    earthUniforms.normalMix.value = arrival.current.normal;
+    earthUniforms.cloudMix.value = arrival.current.cloud;
+    cloudUniforms.opacity.value = fade * 0.57 * arrival.current.cloud;
     atmosphereUniforms.opacity.value = fade * 0.28;
     if (stars.current) (stars.current.material as THREE.PointsMaterial).opacity = fade * 0.45;
   });

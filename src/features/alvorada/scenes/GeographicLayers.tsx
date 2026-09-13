@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef } from 'react';
-import { useFrame, useLoader, useThree } from '@react-three/fiber';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { loadAlvoradaText } from '../alvoradaAssets';
 import {
   EARTH_RADIUS,
   geoJsonBoundaryRings,
@@ -20,11 +21,27 @@ interface GeographicBoundaryProps {
   url: string;
 }
 
+/**
+ * Boundaries come from the shared asset pipeline and never suspend the scene:
+ * the globe starts on schedule and a late boundary simply joins the reveal.
+ */
+function useBoundarySource(url: string) {
+  const [source, setSource] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    loadAlvoradaText(url)
+      .then((text) => { if (active) setSource(text); })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, [url]);
+  return source;
+}
+
 function GeographicBoundary({ color, end, opacity, radius, start, url }: GeographicBoundaryProps) {
-  const source = useLoader(THREE.FileLoader, url) as string;
+  const source = useBoundarySource(url);
   const timeline = useAlvoradaTimeline();
   const lines = useMemo(() => (
-    geoJsonBoundaryRings(parseBoundaryGeoJson(source), radius).map((points) => {
+    source === null ? [] : geoJsonBoundaryRings(parseBoundaryGeoJson(source), radius).map((points) => {
       const geometry = new THREE.BufferGeometry().setFromPoints(points);
       geometry.setDrawRange(0, 0);
       const material = new THREE.LineBasicMaterial({

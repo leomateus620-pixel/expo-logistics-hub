@@ -35,35 +35,6 @@
   touch-action: auto !important;
 }
 
-.alvorada-intro__loader {
-  position: absolute;
-  z-index: 4;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background:
-    radial-gradient(circle at 68% 70%, rgb(244 127 34 / 14%), transparent 31%),
-    #010713;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 420ms ease, visibility 420ms ease;
-}
-
-.alvorada-intro[data-stage="preparing"] .alvorada-intro__loader {
-  opacity: 1;
-  visibility: visible;
-}
-
-.alvorada-intro__loader-orbit {
-  width: clamp(26px, 9cqh, 40px);
-  height: clamp(26px, 9cqh, 40px);
-  border: 1px solid rgb(155 195 238 / 22%);
-  border-top-color: #ffb24d;
-  border-radius: 50%;
-  box-shadow: 0 0 22px rgb(255 149 48 / 12%);
-  animation: alvorada-loader-orbit 900ms linear infinite;
-}
-
 /* Dawn landscape framing inside the card. */
 .alvorada-intro .alvorada-harvest img {
   object-position: 58% 60%;

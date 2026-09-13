@@ -36,9 +36,11 @@ describe('viagem contínua até Santa Rosa', () => {
     expect(deriveAlvoradaVisualState(2).skyOpacity).toBe(0);
   });
 
-  it('usa resolução extra apenas na superfície desktop, preservando o orçamento mobile', () => {
-    expect(getEarthTextureUrls(false)[0]).toBe('/alvorada/earth-surface-4096.webp');
+  it('todo tier começa pelo albedo base; a resolução extra é só desktop e chega depois', () => {
+    expect(getEarthTextureUrls(false)[0]).toBe('/alvorada/earth-surface-2048.webp');
     expect(getEarthTextureUrls(true)[0]).toBe('/alvorada/earth-surface-2048.webp');
-    expect(getEarthTextureUrls(false).slice(1)).toEqual(getEarthTextureUrls(true).slice(1));
+    expect(getEarthTextureUrls(false).at(-1)).toBe('/alvorada/earth-surface-4096.webp');
+    expect(getEarthTextureUrls(true)).not.toContain('/alvorada/earth-surface-4096.webp');
+    expect(getEarthTextureUrls(false).slice(0, -1)).toEqual(getEarthTextureUrls(true));
   });
 });

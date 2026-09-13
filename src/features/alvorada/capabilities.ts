@@ -1,5 +1,5 @@
 import type { AlvoradaWebGLTier } from './types';
-import { getEarthTextureUrls } from './earthAssets';
+import { warmAlvoradaIntroAssets } from './alvoradaAssets';
 
 export interface AlvoradaQualityProfile {
   antialias: boolean;
@@ -13,6 +13,12 @@ export interface AlvoradaQualityProfile {
   shadowMapSize: number;
   shadows: boolean;
   terrainSegments: number;
+  /**
+   * Texture resolution tier, fixed by the device profile. Unlike `mobile`
+   * (which embedded hosts may adapt to a narrow container for framing), the
+   * tier never changes after warming so the scene consumes what was warmed.
+   */
+  textureTier: 'desktop' | 'mobile';
   treeCount: number;
 }
 
@@ -20,29 +26,13 @@ interface NavigatorPerformanceHints extends Navigator {
   deviceMemory?: number;
 }
 
-const ALVORADA_CRITICAL_ASSETS = [
-  '/alvorada/brazil-min.geojson',
-  '/alvorada/rio-grande-do-sul-min.geojson',
-] as const;
-
-let assetsWarmed = false;
-
-function streamAssets(sources: readonly string[]) {
-  sources.forEach((source) => {
-    // Fetch warms the HTTP cache without eagerly decoding another Image. The
-    // Three loaders consume the same response when their phase is mounted.
-    void fetch(source, { cache: 'force-cache' }).catch(() => undefined);
-  });
-}
-
+/**
+ * Starts the shared asset pipeline for the texture tier this device will use.
+ * The scene consumes the same downloads later, so nothing is requested twice.
+ */
 export function warmAlvoradaAssets() {
-  if (assetsWarmed || typeof window === 'undefined') return;
-  assetsWarmed = true;
-
-  streamAssets([
-    ...getEarthTextureUrls(getAlvoradaQualityProfile().mobile),
-    ...ALVORADA_CRITICAL_ASSETS,
-  ]);
+  if (typeof window === 'undefined') return;
+  warmAlvoradaIntroAssets(getAlvoradaQualityProfile().mobile);
 }
 
 function canCreateWebGL2Context(attributes: WebGLContextAttributes) {
@@ -117,6 +107,7 @@ export function getAlvoradaQualityProfile(
     shadowMapSize: compatibleRenderer ? 512 : reduced ? 1024 : 2048,
     shadows: !compatibleRenderer && !mobile && !lowMemory,
     terrainSegments: compatibleRenderer ? 56 : mobile ? 72 : reduced ? 96 : 128,
+    textureTier: mobile ? 'mobile' : 'desktop',
     treeCount: compatibleRenderer ? 500 : mobile ? 900 : reduced ? 1400 : 4500,
   };
 }

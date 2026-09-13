@@ -30,10 +30,76 @@ export type AlvoradaIntroStage = 'preparing' | 'globe' | 'approach' | 'alvorada'
 export const ALVORADA_INTRO_BRAND_HOLD_MS = 3000;
 /** The dawn brand frame starts with the brand reveal; the camera travel is over. */
 export const ALVORADA_INTRO_BRAND_FRAME_START = ALVORADA_PHASES['brand-reveal'].start;
-/** Upper bound for the WebGL preparation before the static dawn takes over. */
-export const ALVORADA_INTRO_PREPARE_TIMEOUT_MS = 9000;
-/** Absolute visible-time ceiling; the countdown is always restored afterwards. */
+/**
+ * Preparation watchdog. A slow preparation is not a failure: while the
+ * renderer keeps reporting progress (bytes arriving, context created, shaders
+ * compiling, frames presented) the intro waits. Only a real stall — no
+ * progress at all for `ALVORADA_INTRO_PREPARE_STALL_MS` — or the absolute
+ * ceiling hands the presentation to the narrative fallback.
+ */
+export const ALVORADA_INTRO_PREPARE_STALL_MS = 10000;
+export const ALVORADA_INTRO_PREPARE_CEILING_MS = 30000;
+/**
+ * Visible-time ceiling for the journey itself, armed only once the journey
+ * starts (never during preparation), so a slow download cannot consume the
+ * budget of the animation. The countdown is always restored afterwards.
+ */
 export const ALVORADA_INTRO_MAX_DURATION_MS = 24000;
+/**
+ * Largest step the authored clock may take in one frame. A frozen browser or a
+ * hidden tab therefore advances the journey by at most this much on the next
+ * presented frame, instead of skipping the globe entirely.
+ */
+export const ALVORADA_MAX_FRAME_DELTA = 0.1;
+
+export interface AlvoradaClockStep {
+  /** Whether the raw frame time exceeded the clamp (a long or resumed frame). */
+  clamped: boolean;
+  delta: number;
+  elapsed: number;
+}
+
+/**
+ * One step of the monotonic authored clock: never backwards, never more than
+ * `ALVORADA_MAX_FRAME_DELTA` per presented frame.
+ */
+export function advanceAlvoradaClock(elapsed: number, rawDeltaSeconds: number): AlvoradaClockStep {
+  const safeRaw = Number.isFinite(rawDeltaSeconds) ? Math.max(0, rawDeltaSeconds) : 0;
+  const delta = Math.min(ALVORADA_MAX_FRAME_DELTA, safeRaw);
+  return { clamped: safeRaw > ALVORADA_MAX_FRAME_DELTA, delta, elapsed: elapsed + delta };
+}
+/**
+ * The 2D narrative fallback (no usable WebGL) walks the same stages on visible
+ * timers so a device without a renderer still experiences the journey.
+ */
+export const ALVORADA_FALLBACK_NARRATIVE = {
+  globeMs: 2600,
+  approachMs: 2400,
+  santaRosaMs: 1500,
+} as const;
+
+export const ALVORADA_INTRO_STAGE_ORDER: readonly AlvoradaIntroStage[] = [
+  'preparing',
+  'globe',
+  'approach',
+  'alvorada',
+  'finished',
+];
+
+/**
+ * The stages an observer must see between `from` (exclusive) and `to`
+ * (inclusive). Returns an empty list when `to` does not advance the sequence,
+ * so a late or out-of-order event can never rewind the presentation.
+ */
+export function alvoradaIntroStagesBetween(
+  from: AlvoradaIntroStage,
+  to: AlvoradaIntroStage,
+): AlvoradaIntroStage[] {
+  const fromIndex = ALVORADA_INTRO_STAGE_ORDER.indexOf(from);
+  const toIndex = ALVORADA_INTRO_STAGE_ORDER.indexOf(to);
+  if (toIndex <= fromIndex) return [];
+  return ALVORADA_INTRO_STAGE_ORDER.slice(fromIndex + 1, toIndex + 1);
+}
 /**
  * Exit of the intro layer: the brand text withdraws first
  * (`ALVORADA_INTRO_EXIT_TEXT_MS`), then the landscape dissolves into the

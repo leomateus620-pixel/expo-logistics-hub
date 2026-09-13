@@ -138,8 +138,9 @@ describe('contrato de acesso: ecossistema direto e introdução embutida na cont
     expect(alvoradaImplementation).not.toMatch(
       /useReducedMotion|matchMedia\([^)]*prefers-reduced-motion/,
     );
-    // The host decides: reduced motion selects the static dawn presentation.
+    // The host decides: reduced motion selects the accessible (still narrated,
+    // never WebGL) presentation instead of the 3D journey.
     expect(portalHero).toContain("'(prefers-reduced-motion: reduce)'");
-    expect(portalHero).toContain("prefersReducedMotion() ? 'static' : 'cinematic'");
+    expect(portalHero).toContain("prefersReducedMotion() ? 'reduced' : 'cinematic'");
   });
 });

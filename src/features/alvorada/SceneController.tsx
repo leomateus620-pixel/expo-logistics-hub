@@ -11,8 +11,15 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { AlvoradaQualityProfile } from './capabilities';
 import { CinematicCamera } from './CinematicCamera';
-import { AlvoradaTimelineContext, useAlvoradaTimeline } from './TimelineContext';
 import {
+  AlvoradaReadinessContext,
+  AlvoradaTimelineContext,
+  useAlvoradaReadiness,
+  useAlvoradaTimeline,
+  type AlvoradaSceneReadiness,
+} from './TimelineContext';
+import {
+  advanceAlvoradaClock,
   ALVORADA_PHASES,
   ALVORADA_SEQUENCE_DURATION,
   createInitialTimelineState,
@@ -24,103 +31,112 @@ import {
 import { TransitionCloudLayer } from './TransitionCloudLayer';
 import { DawnEnvironment } from './scenes/DawnEnvironment';
 import { EarthScene } from './scenes/EarthScene';
+import type { AlvoradaPreparationEvent } from './types';
 
 interface SceneControllerProps {
   initialElapsed: number;
+  onPreparation?: (event: AlvoradaPreparationEvent) => void;
   onProgress: (elapsed: number) => void;
   onReady: () => void;
   quality: AlvoradaQualityProfile;
 }
 
+/**
+ * Single authority over the authored clock.
+ *
+ * The clock is monotonic and frame-based: it starts at `initialElapsed` (zero
+ * for a fresh intro) on the second frame presented after the critical assets
+ * are bound and the scene shaders are compiled, and it advances by the real
+ * frame delta clamped to `ALVORADA_MAX_FRAME_DELTA`. Time spent downloading,
+ * compiling, suspended or hidden is therefore never charged to the journey,
+ * and a multi-second frame moves the sequence by a fraction of a second.
+ */
 function MasterTimeline({
   initialElapsed,
   onProgress,
   onReady,
-}: Pick<
-  SceneControllerProps,
-  'initialElapsed' | 'onProgress' | 'onReady'
->) {
+}: Pick<SceneControllerProps, 'initialElapsed' | 'onProgress' | 'onReady'>) {
   const timeline = useAlvoradaTimeline();
+  const readiness = useAlvoradaReadiness();
   const { gl, scene, camera } = useThree();
-  const startedAt = useRef<number | null>(null);
-  const hiddenAt = useRef<number | null>(null);
-  const hiddenDuration = useRef(0);
   const ready = useRef(false);
   const shadersReady = useRef(false);
   const presentedFrames = useRef(0);
+  const lastFrameAt = useRef<number | null>(null);
+  const ambientElapsed = useRef(Math.max(0, Number.isNaN(initialElapsed) ? 0 : initialElapsed));
+  const clampedFrames = useRef(0);
 
   useEffect(() => {
     let active = true;
     const compileStarted = performance.now();
     gl.domElement.dataset.preparation = 'shaders';
-    // All scene materials, including the next phase, are compiled before the clock starts.
-    // KHR_parallel_shader_compile allows the browser to keep the launcher responsive.
-    void gl.compileAsync(scene, camera).then(() => {
+    readiness.current.report({ kind: 'shader-compile-start' });
+    const finish = (mode: 'async' | 'direct-render') => {
       if (!active) return;
-      gl.domElement.dataset.shaderPreparationMs = (performance.now() - compileStarted).toFixed(1);
-      gl.domElement.dataset.preparation = 'ready';
+      const shaderPreparationMs = performance.now() - compileStarted;
+      gl.domElement.dataset.shaderPreparationMs = shaderPreparationMs.toFixed(1);
+      gl.domElement.dataset.preparation = mode === 'async' ? 'ready' : 'direct-render';
       shadersReady.current = true;
-    }).catch(() => {
-      // Direct rendering remains the recovery path on drivers without async compilation.
-      if (active) {
-        gl.domElement.dataset.preparation = 'direct-render';
-        shadersReady.current = true;
-      }
-    });
-    return () => { active = false; };
-  }, [camera, gl, scene]);
-
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        if (startedAt.current !== null) hiddenAt.current ??= performance.now();
-        return;
-      }
-      if (hiddenAt.current !== null) {
-        hiddenDuration.current += (performance.now() - hiddenAt.current) / 1000;
-        hiddenAt.current = null;
-      }
+      readiness.current.report({
+        kind: 'shader-compile-end',
+        detail: { mode, shaderPreparationMs: Math.round(shaderPreparationMs) },
+      });
     };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
+    // Every scene material is compiled before the clock starts; browsers with
+    // KHR_parallel_shader_compile keep the portal responsive meanwhile.
+    void gl.compileAsync(scene, camera)
+      .then(() => finish('async'))
+      // Direct rendering remains the recovery path on drivers without async compilation.
+      .catch(() => finish('direct-render'));
+    return () => { active = false; };
+  }, [camera, gl, readiness, scene]);
 
   useFrame(() => {
-    if (!shadersReady.current || document.hidden) return;
+    if (document.hidden || !shadersReady.current || !readiness.current.criticalAssetsReady) {
+      // Nothing was presented; the next frame must not inherit this gap.
+      lastFrameAt.current = null;
+      return;
+    }
     presentedFrames.current += 1;
     if (presentedFrames.current < 2) return;
+
     const now = performance.now();
-    if (startedAt.current === null) startedAt.current = now;
-    const activeRuntime = Math.max(
-      0,
-      (now - startedAt.current) / 1000 - hiddenDuration.current,
+    const step = advanceAlvoradaClock(
+      ambientElapsed.current,
+      lastFrameAt.current === null ? 0 : (now - lastFrameAt.current) / 1000,
     );
-    const ambientElapsed = Math.max(0, initialElapsed + activeRuntime);
-    const elapsed = Math.min(ALVORADA_SEQUENCE_DURATION, ambientElapsed);
-    const delta = Math.min(
-      0.1,
-      Math.max(0, ambientElapsed - timeline.current.ambientElapsed),
-    );
+    if (step.clamped) {
+      clampedFrames.current += 1;
+      gl.domElement.dataset.clampedFrames = String(clampedFrames.current);
+    }
+    lastFrameAt.current = now;
 
     if (!ready.current) {
       ready.current = true;
       const createdAt = Number(gl.domElement.dataset.createdAt ?? now);
-      gl.domElement.dataset.firstFrameMs = (now - createdAt).toFixed(1);
+      const firstFrameMs = now - createdAt;
+      gl.domElement.dataset.firstFrameMs = firstFrameMs.toFixed(1);
+      readiness.current.report({
+        kind: 'first-frame',
+        detail: { firstFrameMs: Math.round(firstFrameMs) },
+      });
       onReady();
     }
 
-    timeline.current.ambientElapsed = ambientElapsed;
-    timeline.current.delta = delta;
+    ambientElapsed.current = step.elapsed;
+    const elapsed = Math.min(ALVORADA_SEQUENCE_DURATION, ambientElapsed.current);
+
+    timeline.current.ambientElapsed = ambientElapsed.current;
+    timeline.current.delta = step.delta;
     timeline.current.elapsed = elapsed;
     timeline.current.progress = elapsed / ALVORADA_SEQUENCE_DURATION;
-    timeline.current.phase = getAlvoradaPhase(ambientElapsed);
+    timeline.current.phase = getAlvoradaPhase(ambientElapsed.current);
     const visualState = deriveAlvoradaVisualState(elapsed);
 
     // Lightweight diagnostics used by visual QA and field support. Keeping the
     // values on the canvas avoids React updates inside the render loop.
     gl.domElement.dataset.elapsed = elapsed.toFixed(3);
-    gl.domElement.dataset.ambientElapsed = ambientElapsed.toFixed(3);
+    gl.domElement.dataset.ambientElapsed = ambientElapsed.current.toFixed(3);
     gl.domElement.dataset.phase = timeline.current.phase;
     gl.domElement.dataset.scene = visualState.dominantScene;
 
@@ -208,6 +224,7 @@ function SceneAtmosphere() {
 
 export function SceneController({
   initialElapsed,
+  onPreparation,
   onProgress,
   onReady,
   quality,
@@ -215,6 +232,16 @@ export function SceneController({
   const timeline = useRef(
     createInitialTimelineState(initialElapsed),
   ) as MutableRefObject<AlvoradaTimelineState>;
+  const onPreparationRef = useRef(onPreparation);
+  onPreparationRef.current = onPreparation;
+  const readiness = useRef<AlvoradaSceneReadiness>({
+    // A clock restored past the globe has no critical texture left to wait for.
+    criticalAssetsReady: !deriveAlvoradaVisualState(initialElapsed).earthResident,
+    report: (event) => {
+      if (event.kind === 'critical-assets-ready') readiness.current.criticalAssetsReady = true;
+      onPreparationRef.current?.(event);
+    },
+  });
   const [earthResident, setEarthResident] = useState(
     deriveAlvoradaVisualState(initialElapsed).earthResident,
   );
@@ -222,17 +249,19 @@ export function SceneController({
 
   return (
     <AlvoradaTimelineContext.Provider value={timeline}>
-      <MasterTimeline
-        initialElapsed={initialElapsed}
-        onProgress={onProgress}
-        onReady={onReady}
-      />
-      <EarthResidency setEarthResident={setEarthResident} setTransitionResident={setTransitionResident} />
-      <SceneAtmosphere />
-      <CinematicCamera quality={quality} />
-      {earthResident && <EarthScene quality={quality} />}
-      <DawnEnvironment quality={quality} />
-      {transitionResident && <TransitionCloudLayer quality={quality} />}
+      <AlvoradaReadinessContext.Provider value={readiness}>
+        <MasterTimeline
+          initialElapsed={initialElapsed}
+          onProgress={onProgress}
+          onReady={onReady}
+        />
+        <EarthResidency setEarthResident={setEarthResident} setTransitionResident={setTransitionResident} />
+        <SceneAtmosphere />
+        <CinematicCamera quality={quality} />
+        {earthResident && <EarthScene quality={quality} />}
+        <DawnEnvironment quality={quality} />
+        {transitionResident && <TransitionCloudLayer quality={quality} />}
+      </AlvoradaReadinessContext.Provider>
     </AlvoradaTimelineContext.Provider>
   );
 }

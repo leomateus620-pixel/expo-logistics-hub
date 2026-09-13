@@ -1,0 +1,230 @@
+/*
+ * 2D narrative fallback for the embedded Alvorada intro. Sized from the host
+ * container (container query units), never from the viewport. Stage timing is
+ * driven by the intro's visible-time timers (ALVORADA_FALLBACK_NARRATIVE); the
+ * transitions here only smooth the hand-offs between those stages.
+ */
+.alvorada-narrative {
+  --alvorada-planet-size: min(66cqh, 48cqw);
+
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 70% 110%, rgb(24 58 104 / 55%), transparent 55%),
+    linear-gradient(180deg, #010713 0%, #030f24 60%, #061a38 100%);
+}
+
+.alvorada-narrative__stars {
+  position: absolute;
+  inset: -10%;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgb(255 255 255 / 70%), transparent 60%),
+    radial-gradient(1px 1px at 28% 62%, rgb(255 255 255 / 55%), transparent 60%),
+    radial-gradient(1.5px 1.5px at 44% 30%, rgb(214 230 255 / 80%), transparent 60%),
+    radial-gradient(1px 1px at 61% 74%, rgb(255 255 255 / 50%), transparent 60%),
+    radial-gradient(1px 1px at 73% 22%, rgb(255 255 255 / 65%), transparent 60%),
+    radial-gradient(1.5px 1.5px at 86% 48%, rgb(255 236 200 / 75%), transparent 60%),
+    radial-gradient(1px 1px at 92% 86%, rgb(255 255 255 / 45%), transparent 60%),
+    radial-gradient(1px 1px at 8% 88%, rgb(255 255 255 / 55%), transparent 60%),
+    radial-gradient(1px 1px at 52% 8%, rgb(255 255 255 / 60%), transparent 60%),
+    radial-gradient(1px 1px at 36% 92%, rgb(255 255 255 / 40%), transparent 60%);
+  background-size: 50% 50%;
+  opacity: 0.85;
+  transition: opacity 1600ms ease;
+}
+
+.alvorada-narrative__planet {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--alvorada-planet-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translate(-46%, -48%) scale(1);
+  /* Santa Rosa on the equirectangular albedo framed below (≈27.9°S, 54.5°W). */
+  transform-origin: 55% 59%;
+  box-shadow:
+    0 0 clamp(14px, 6cqh, 40px) rgb(80 150 255 / 32%),
+    0 0 clamp(30px, 14cqh, 90px) rgb(40 110 220 / 18%),
+    inset 0 0 clamp(10px, 4cqh, 26px) rgb(120 190 255 / 30%);
+  transition:
+    transform 2600ms cubic-bezier(0.32, 0.08, 0.24, 1),
+    opacity 1200ms ease;
+  animation: alvorada-narrative-drift 9s ease-in-out infinite alternate;
+}
+
+.alvorada-narrative__planet-surface {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 36% 30%, #7cc4ff 0%, #2f7fd6 22%, #163e8a 52%, #0b1f4d 78%, #050f2a 100%);
+}
+
+.alvorada-narrative__planet-surface img {
+  position: absolute;
+  top: -14%;
+  left: -23.3%;
+  width: 220%;
+  height: 110%;
+  max-width: none;
+  object-fit: fill;
+  filter: saturate(1.05) brightness(0.98);
+}
+
+.alvorada-narrative__planet-surface::before,
+.alvorada-narrative__planet-surface::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(0.6px);
+}
+
+/* The stylised land masses only stand in while the real albedo is unavailable. */
+.alvorada-narrative[data-textured] .alvorada-narrative__planet-surface::before,
+.alvorada-narrative[data-textured] .alvorada-narrative__planet-surface::after {
+  display: none;
+}
+
+/* Stylised land masses, warm-lit like the reference dawn palette. */
+.alvorada-narrative__planet-surface::before {
+  top: 30%;
+  left: 40%;
+  width: 34%;
+  height: 46%;
+  background: radial-gradient(ellipse at 40% 35%, #8ea85c 0%, #587a3f 55%, transparent 72%);
+  transform: rotate(-18deg);
+}
+
+.alvorada-narrative__planet-surface::after {
+  top: 14%;
+  left: 12%;
+  width: 26%;
+  height: 30%;
+  background: radial-gradient(ellipse at 50% 50%, #96a961 0%, #5f7d43 60%, transparent 76%);
+  transform: rotate(24deg);
+}
+
+.alvorada-narrative__planet-terminator {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 28%, rgb(255 255 255 / 16%) 0%, transparent 42%),
+    linear-gradient(115deg, transparent 38%, rgb(1 7 19 / 55%) 62%, rgb(1 7 19 / 92%) 100%);
+  box-shadow: inset 0 0 clamp(8px, 3cqh, 20px) rgb(2 10 30 / 70%);
+}
+
+/*
+ * The marker sits at the planet's transform origin, so its screen position is
+ * invariant while the planet scales up during the approach.
+ */
+.alvorada-narrative__marker {
+  position: absolute;
+  top: calc(50% + 0.11 * var(--alvorada-planet-size));
+  left: calc(50% + 0.09 * var(--alvorada-planet-size));
+  width: clamp(6px, 2.6cqh, 12px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ffb24d;
+  box-shadow: 0 0 0 3px rgb(255 178 77 / 24%), 0 0 12px rgb(255 178 77 / 80%);
+  translate: -50% -50%;
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+
+.alvorada-narrative__veil {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(ellipse at 50% 60%, rgb(236 240 246 / 82%) 0%, rgb(210 222 238 / 55%) 40%, transparent 70%);
+  filter: blur(18px);
+  opacity: 0;
+  transition: opacity 1400ms ease;
+}
+
+.alvorada-narrative__horizon {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, #06183a 0%, #164a83 40%, #d8712f 68%, #ffc35c 84%, #2a3f44 100%);
+  opacity: 0;
+  transition: opacity 1500ms ease;
+}
+
+.alvorada-narrative__horizon::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 24%;
+  background: linear-gradient(180deg, transparent, rgb(1 12 25 / 84%));
+}
+
+.alvorada-narrative__sun {
+  position: absolute;
+  top: 60%;
+  left: 68%;
+  width: clamp(6px, 3cqh, 14px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fffbe6;
+  box-shadow: 0 0 clamp(20px, 8cqh, 50px) clamp(8px, 3cqh, 16px) rgb(255 187 67 / 58%), 0 0 clamp(60px, 22cqh, 140px) clamp(20px, 8cqh, 50px) rgb(255 116 31 / 26%);
+}
+
+/* Stage choreography. */
+.alvorada-narrative[data-stage="approach"] .alvorada-narrative__planet {
+  transform: translate(-46%, -48%) scale(3.4);
+  animation: none;
+}
+
+.alvorada-narrative[data-phase="territory"] .alvorada-narrative__marker {
+  opacity: 1;
+}
+
+.alvorada-narrative[data-phase="santa-rosa"] .alvorada-narrative__veil,
+.alvorada-narrative[data-stage="alvorada"] .alvorada-narrative__veil {
+  opacity: 1;
+}
+
+.alvorada-narrative[data-stage="alvorada"] .alvorada-narrative__veil {
+  opacity: 0;
+  transition-delay: 300ms;
+}
+
+.alvorada-narrative[data-phase="santa-rosa"] .alvorada-narrative__stars,
+.alvorada-narrative[data-stage="alvorada"] .alvorada-narrative__stars {
+  opacity: 0;
+}
+
+.alvorada-narrative[data-stage="alvorada"] .alvorada-narrative__planet {
+  opacity: 0;
+}
+
+.alvorada-narrative[data-phase="santa-rosa"] .alvorada-narrative__horizon,
+.alvorada-narrative[data-stage="alvorada"] .alvorada-narrative__horizon {
+  opacity: 1;
+}
+
+/* Reduced motion: the same narrative as crossfades, without travel or zoom. */
+.alvorada-narrative[data-reduced] .alvorada-narrative__planet {
+  transform: translate(-50%, -50%) scale(1);
+  transition: opacity 1200ms ease;
+  animation: none;
+}
+
+.alvorada-narrative[data-reduced][data-stage="approach"] .alvorada-narrative__planet {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+@keyframes alvorada-narrative-drift {
+  from { rotate: -1.5deg; }
+  to { rotate: 1.5deg; }
+}
+
+@media (forced-colors: active) {
+  .alvorada-narrative {
+    border: 1px solid CanvasText;
+  }
+}

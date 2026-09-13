@@ -1,0 +1,80 @@
+/*
+ * "Preparando a Alvorada": the calm night sky shown while the intro chunk,
+ * the assets and the renderer get ready. Container units only.
+ */
+.alvorada-preparing {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: clamp(8px, 2.4cqh, 14px);
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 66% 118%, rgb(244 127 34 / 22%), transparent 42%),
+    radial-gradient(ellipse at 30% -20%, rgb(63 126 255 / 12%), transparent 46%),
+    #010713;
+  color: rgb(226 235 246 / 78%);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 420ms ease, visibility 420ms ease;
+}
+
+.alvorada-preparing[data-active] {
+  opacity: 1;
+  visibility: visible;
+}
+
+.alvorada-preparing__glow {
+  position: absolute;
+  inset: auto -10% -2%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 10%, rgb(255 190 92 / 55%) 50%, transparent 90%);
+  box-shadow: 0 0 clamp(18px, 8cqh, 46px) clamp(6px, 3cqh, 14px) rgb(255 149 48 / 18%);
+  animation: alvorada-preparing-breathe 3200ms ease-in-out infinite;
+}
+
+.alvorada-preparing__orbit {
+  width: clamp(26px, 9cqh, 40px);
+  height: clamp(26px, 9cqh, 40px);
+  border: 1px solid rgb(155 195 238 / 22%);
+  border-top-color: #ffb24d;
+  border-radius: 50%;
+  box-shadow: 0 0 22px rgb(255 149 48 / 12%);
+  animation: alvorada-preparing-orbit 900ms linear infinite;
+}
+
+.alvorada-preparing__label {
+  font-size: clamp(9px, 2.6cqh, 11px);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.alvorada-preparing__meter {
+  width: clamp(72px, 22cqw, 140px);
+  height: 2px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(155 195 238 / 16%);
+}
+
+.alvorada-preparing__meter > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #ffb24d, #ffd35c);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 240ms ease-out;
+}
+
+@keyframes alvorada-preparing-breathe {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+@keyframes alvorada-preparing-orbit {
+  to { transform: rotate(1turn); }
+}
