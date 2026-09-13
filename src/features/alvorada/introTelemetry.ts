@@ -77,7 +77,7 @@ const NOISY_EVENTS: ReadonlySet<AlvoradaIntroTelemetryEvent> = new Set(['asset-p
 
 export function isAlvoradaDebugEnabled() {
   if (typeof window === 'undefined') return false;
-  if (import.meta.env.DEV) return true;
+  if (import.meta.env.DEV && import.meta.env.MODE !== 'test') return true;
   try {
     if (new URLSearchParams(window.location.search).has(DEBUG_QUERY_FLAG)) return true;
     return window.localStorage?.getItem(DEBUG_STORAGE_KEY) === '1';

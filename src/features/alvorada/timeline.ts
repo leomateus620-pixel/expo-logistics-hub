@@ -51,6 +51,23 @@ export const ALVORADA_INTRO_MAX_DURATION_MS = 24000;
  * presented frame, instead of skipping the globe entirely.
  */
 export const ALVORADA_MAX_FRAME_DELTA = 0.1;
+
+export interface AlvoradaClockStep {
+  /** Whether the raw frame time exceeded the clamp (a long or resumed frame). */
+  clamped: boolean;
+  delta: number;
+  elapsed: number;
+}
+
+/**
+ * One step of the monotonic authored clock: never backwards, never more than
+ * `ALVORADA_MAX_FRAME_DELTA` per presented frame.
+ */
+export function advanceAlvoradaClock(elapsed: number, rawDeltaSeconds: number): AlvoradaClockStep {
+  const safeRaw = Number.isFinite(rawDeltaSeconds) ? Math.max(0, rawDeltaSeconds) : 0;
+  const delta = Math.min(ALVORADA_MAX_FRAME_DELTA, safeRaw);
+  return { clamped: safeRaw > ALVORADA_MAX_FRAME_DELTA, delta, elapsed: elapsed + delta };
+}
 /**
  * The 2D narrative fallback (no usable WebGL) walks the same stages on visible
  * timers so a device without a renderer still experiences the journey.

@@ -5,6 +5,7 @@ import CommissionPortalPage from '@/pages/commissions/CommissionPortalPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { resetAlvoradaIntroSessionForTests } from '@/features/alvorada/introSession';
 import {
+  ALVORADA_FALLBACK_NARRATIVE,
   ALVORADA_INTRO_BRAND_HOLD_MS,
   ALVORADA_INTRO_EXIT_DURATION_MS,
 } from '@/features/alvorada/timeline';
@@ -174,7 +175,8 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
     expect(dialog.querySelector('canvas')).toBeNull();
     expect(dialog.querySelector('.alvorada-harvest')).toBeNull();
     expect(dialog.querySelector('.alvorada-brand-hero')).toBeNull();
-    expect(screen.queryByText('Preparando a Alvorada')).not.toBeInTheDocument();
+    expect(dialog.querySelector('.alvorada-preparing')).toBeNull();
+    expect(dialog.querySelector('.alvorada-narrative')).toBeNull();
     expect(launcher).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByTestId('alvorada-location')).toHaveTextContent('/portal');
     expect(container.querySelector('.fenasoja-portal')).toHaveAttribute('inert');
@@ -238,10 +240,28 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
       expect(screen.getByRole('navigation', { name: 'Áreas do sistema Fenasoja 2028' })).toBeInTheDocument();
 
       const intro = await screen.findByTestId('alvorada-intro', {}, { timeout: 5000 });
-      expect(intro).toHaveAttribute('data-renderer', 'static');
-      expect(intro).toHaveAttribute('data-stage', 'alvorada');
+      // Without WebGL the same journey plays as the 2D narrative, with an
+      // explicit reason, and it still begins with the planet — never the brand.
+      expect(intro).toHaveAttribute('data-renderer', 'fallback');
+      expect(intro).toHaveAttribute('data-static-reason', 'unsupported-webgl');
+      expect(intro).toHaveAttribute('data-stage', 'globe');
+      expect(hero).toHaveAttribute('data-intro-stage', 'globe');
       expect(hero.contains(intro)).toBe(true);
+      expect(intro.querySelector('.alvorada-narrative')).toHaveAttribute('data-stage', 'globe');
+      expect(intro.querySelector('.alvorada-brand-hero--visible')).toBeNull();
+
+      act(() => {
+        vi.advanceTimersByTime(ALVORADA_FALLBACK_NARRATIVE.globeMs);
+      });
+      expect(intro).toHaveAttribute('data-stage', 'approach');
+      expect(hero).toHaveAttribute('data-intro', 'playing');
+
+      act(() => {
+        vi.advanceTimersByTime(ALVORADA_FALLBACK_NARRATIVE.approachMs + ALVORADA_FALLBACK_NARRATIVE.santaRosaMs);
+      });
+      expect(intro).toHaveAttribute('data-stage', 'alvorada');
       expect(within(intro).getByRole('img', { name: /^Fenasoja 2028$/, hidden: true })).toBeInTheDocument();
+      expect(hero).toHaveAttribute('data-intro', 'playing');
 
       act(() => {
         vi.advanceTimersByTime(ALVORADA_INTRO_BRAND_HOLD_MS + 700);
@@ -331,7 +351,7 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
     }
   });
 
-  it('usa a alvorada estática quando o usuário prefere movimento reduzido', async () => {
+  it('usa a narrativa acessível, sem WebGL, quando o usuário prefere movimento reduzido', async () => {
     (window.matchMedia as unknown as ReturnType<typeof vi.fn>).mockImplementation((query: string) => ({
       matches: query.includes('prefers-reduced-motion'),
       media: query,
@@ -347,6 +367,10 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
     renderPortal();
     const intro = await screen.findByTestId('alvorada-intro', {}, { timeout: 5000 });
     expect(intro).toHaveAttribute('data-static-reason', 'reduced-motion');
+    expect(intro).toHaveAttribute('data-renderer', 'fallback');
+    expect(intro).toHaveAttribute('data-motion', 'reduced');
+    expect(intro).toHaveAttribute('data-stage', 'globe');
+    expect(intro.querySelector('.alvorada-narrative')).toHaveAttribute('data-reduced', 'true');
     expect(integrationMocks.canvasMounts).toBe(0);
   });
 });

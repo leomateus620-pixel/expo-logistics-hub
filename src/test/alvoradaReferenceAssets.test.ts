@@ -142,17 +142,22 @@ describe('assets oficiais e panoramas da Alvorada', () => {
     const { warmAlvoradaAssets } = await import('@/features/alvorada/capabilities');
     warmAlvoradaAssets();
 
+    // Critical first (the globe cannot appear without its albedo and the
+    // boundaries), then the maps that fade in whenever they arrive.
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
       '/alvorada/earth-surface-4096.webp',
+      '/alvorada/brazil-min.geojson',
+      '/alvorada/rio-grande-do-sul-min.geojson',
       '/alvorada/earth-night-lights-2048.png',
       '/alvorada/earth-normal-2048.jpg',
       '/alvorada/earth-clouds-2048.webp',
-      '/alvorada/brazil-min.geojson',
-      '/alvorada/rio-grande-do-sul-min.geojson',
     ]);
     expect(fetchMock.mock.calls.every(([, options]) => (
       (options as RequestInit).cache === 'force-cache'
     ))).toBe(true);
+    expect(fetchMock.mock.calls.map(([, options]) => (options as { priority?: string }).priority)).toEqual([
+      'high', 'high', 'high', 'low', 'low', 'low',
+    ]);
 
     // Warming is idempotent: the embedded intro and its host both call it.
     warmAlvoradaAssets();

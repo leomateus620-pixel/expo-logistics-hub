@@ -19,7 +19,7 @@ import {
   type AlvoradaSceneReadiness,
 } from './TimelineContext';
 import {
-  ALVORADA_MAX_FRAME_DELTA,
+  advanceAlvoradaClock,
   ALVORADA_PHASES,
   ALVORADA_SEQUENCE_DURATION,
   createInitialTimelineState,
@@ -101,14 +101,13 @@ function MasterTimeline({
     if (presentedFrames.current < 2) return;
 
     const now = performance.now();
-    let delta = 0;
-    if (lastFrameAt.current !== null) {
-      const rawDelta = Math.max(0, (now - lastFrameAt.current) / 1000);
-      delta = Math.min(ALVORADA_MAX_FRAME_DELTA, rawDelta);
-      if (rawDelta > ALVORADA_MAX_FRAME_DELTA) {
-        clampedFrames.current += 1;
-        gl.domElement.dataset.clampedFrames = String(clampedFrames.current);
-      }
+    const step = advanceAlvoradaClock(
+      ambientElapsed.current,
+      lastFrameAt.current === null ? 0 : (now - lastFrameAt.current) / 1000,
+    );
+    if (step.clamped) {
+      clampedFrames.current += 1;
+      gl.domElement.dataset.clampedFrames = String(clampedFrames.current);
     }
     lastFrameAt.current = now;
 
@@ -124,11 +123,11 @@ function MasterTimeline({
       onReady();
     }
 
-    ambientElapsed.current += delta;
+    ambientElapsed.current = step.elapsed;
     const elapsed = Math.min(ALVORADA_SEQUENCE_DURATION, ambientElapsed.current);
 
     timeline.current.ambientElapsed = ambientElapsed.current;
-    timeline.current.delta = delta;
+    timeline.current.delta = step.delta;
     timeline.current.elapsed = elapsed;
     timeline.current.progress = elapsed / ALVORADA_SEQUENCE_DURATION;
     timeline.current.phase = getAlvoradaPhase(ambientElapsed.current);
