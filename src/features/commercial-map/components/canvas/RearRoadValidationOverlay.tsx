@@ -2,7 +2,7 @@ import { memo, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { REAR_ROAD_EXCLUSION_BOUNDARIES } from '../../data/rearRoadExclusions';
 import {
-  REAR_PARK_ROAD_NETWORK,
+  REAR_PARK_ROAD_NETWORK, GENERATED_REAR_ROAD_SEGMENTS,
   rearRoadLocalPath,
 } from '../../data/rearParkRoadNetwork';
 import {
@@ -11,8 +11,9 @@ import {
   projectRearAttachment5PointToLocal,
 } from '../../utils/rearSpatialCalibration';
 import { officialPdfPointToLocal } from '../../data/officialReference2026';
-import { sampleRearRoadCenterline } from '../../utils/rearRoadNetwork';
+import { buildRearRoadCorridorFootprints, sampleRearRoadCenterline } from '../../utils/rearRoadNetwork';
 
+const ACTIVE_ROADS = REAR_PARK_ROAD_NETWORK.filter(r => r.presentation === 'official-surface' || GENERATED_REAR_ROAD_SEGMENTS.includes(r));
 const NO_RAYCAST = () => undefined;
 const OVERLAY_Y = 0.12;
 const ANCHOR_SPRITE_CENTER = new THREE.Vector2(0, 0);
@@ -49,9 +50,11 @@ function pointsGeometry(points: readonly (readonly [number, number])[]) {
 export const RearRoadValidationOverlay = memo(function RearRoadValidationOverlay() {
   // Screen-facing GPU sprites share the canvas projection with the anchors.
   // This also keeps the development overlay independent of DOM zoom/portals.
-  const anchorLabels = useMemo(() => REAR_ATTACHMENT_5_REFERENCE_POINTS.map((point) => {
+  const anchorLabels = useMemo(() => ACTIVE_ROADS.map((road) => {
+    const path = sampleRearRoadCenterline(rearRoadLocalPath(road), 2);
+    const position = path[Math.floor(path.length / 2)];
     const canvas = document.createElement('canvas');
-    canvas.width = 256;
+    canvas.width = 640;
     canvas.height = 40;
     const context = canvas.getContext('2d');
     if (context) {
@@ -61,29 +64,30 @@ export const RearRoadValidationOverlay = memo(function RearRoadValidationOverlay
       context.fillStyle = '#ffffff';
       context.textAlign = 'center';
       context.textBaseline = 'middle';
-      context.fillText(`P${point.id} · ${point.percent[0]}%, ${point.percent[1]}%`, 128, 20);
+      context.fillText(road.id, 320, 20);
     }
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
-    return { id: point.id, position: projectRearAttachment5PointToLocal(point.id), texture };
+    return { id: road.id, position, texture };
   }), []);
 
   const geometries = useMemo(() => {
-    const centerlines = lineSegmentsGeometry(REAR_PARK_ROAD_NETWORK.map((road) => (
+    const centerlines = lineSegmentsGeometry(ACTIVE_ROADS.map((road) => (
       sampleRearRoadCenterline(rearRoadLocalPath(road), 5)
     )));
     const exclusions = lineSegmentsGeometry(REAR_ROAD_EXCLUSION_BOUNDARIES.map((boundary) => {
       const polygon = boundary.polygon;
       return polygon.length > 0 ? [...polygon, polygon[0]] : polygon;
     }));
-    const controlPoints = pointsGeometry(REAR_PARK_ROAD_NETWORK.flatMap(rearRoadLocalPath));
+    const controlPoints = pointsGeometry(ACTIVE_ROADS.flatMap(rearRoadLocalPath));
     const anchors = pointsGeometry(REAR_ATTACHMENT_5_REFERENCE_POINTS.map((point) => (
       projectRearAttachment5PointToLocal(point.id)
     )));
     const satellite = pointsGeometry(REAR_SATELLITE_TOPOLOGY.points.map((point) => (
       officialPdfPointToLocal(point.officialSource)
     )));
-    return { centerlines, exclusions, controlPoints, anchors, satellite };
+    const boundaries = lineSegmentsGeometry(buildRearRoadCorridorFootprints(GENERATED_REAR_ROAD_SEGMENTS).map(r => [...r.polygon, r.polygon[0]]));
+    return { centerlines, boundaries, exclusions, controlPoints, anchors, satellite };
   }, []);
 
   useEffect(() => () => {
@@ -101,6 +105,9 @@ export const RearRoadValidationOverlay = memo(function RearRoadValidationOverlay
       <lineSegments geometry={geometries.centerlines} raycast={NO_RAYCAST} frustumCulled={false}>
         <lineBasicMaterial color="#35e7ff" depthTest={false} />
       </lineSegments>
+      <lineSegments geometry={geometries.boundaries} raycast={NO_RAYCAST}>
+        <lineBasicMaterial color="#f59e0b" depthTest={false} />
+      </lineSegments>
       <points geometry={geometries.controlPoints} raycast={NO_RAYCAST} frustumCulled={false}>
         <pointsMaterial color="#ffd54a" size={0.18} sizeAttenuation depthTest={false} />
       </points>
@@ -111,7 +118,7 @@ export const RearRoadValidationOverlay = memo(function RearRoadValidationOverlay
         <pointsMaterial color="#55ff8a" size={0.3} sizeAttenuation depthTest={false} />
       </points>
       {anchorLabels.map(({ id, position: [x, z], texture }) => (
-        <sprite key={id} position={[x, OVERLAY_Y + 0.05, z]} scale={[8.4, 1.3125, 1]}
+        <sprite key={id} position={[x, OVERLAY_Y + 0.05, z]} scale={[11.2, 0.7, 1]}
           center={ANCHOR_SPRITE_CENTER} raycast={NO_RAYCAST} renderOrder={121}>
           <spriteMaterial map={texture} depthTest={false} depthWrite={false} toneMapped={false} />
         </sprite>

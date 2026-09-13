@@ -1,3 +1,4 @@
+import { ARENA_ROAD_CORRECTION } from './arenaRoadCorrection';
 import { SOY_RESTROOM, SOY_ROAD_CONNECTION, GATE_NINE_TANKS } from './soyGateInfrastructure';
 import { reconstructFenasojaEntity } from './fenasojaComplexReconstruction';
 import {
@@ -452,7 +453,7 @@ const roadInputs: Array<[string, string, PdfPolygon, MapClassification?]> = [
   ['ALAMEDA-MERCOSUL', 'Alameda Mercosul', rectPdf([2786, 2410, 2828, 3780])],
   ['CALCADA-ARVOREDO', 'Calçada do Arvoredo', rectPdf([2630, 3110, 2782, 3565]), 'PEDESTRIAN_PATH'],
   ['AV-BENVENUTO-CONTI', 'Avenida Benvenuto de Conti', rectPdf([1050, 4165, 3940, 4235])],
-  ['AV-IMIGRANTES', 'Avenida dos Imigrantes', rectPdf([3940, 4165, 5510, 4235])],
+  ['AV-IMIGRANTES', 'Avenida dos Imigrantes', rectPdf([3940, 4165, ARENA_ROAD_CORRECTION.frontageTerminus[0], 4235])],
   ['AV-TUPARENDI', 'Avenida Tuparendi', [[600, 3850], [1300, 4190], [1268, 4260], [600, 3930]]],
   // A rodovia foi recuada para leste da faixa da Ubiretama: antes o plano da
   // RS 472 cobria a via urbana ao lado do Q-R-55, que ficava invisível.

@@ -130,9 +130,9 @@ describe('residential street junctions with the existing avenue', () => {
     }
     const artery = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.find(({ id }) => id === 'benvenuto-four-lane-axis')!;
     // Benvenuto has no separate curb runs to cut: its curbs come from the
-    // sidewalk loops. The 20 independent runs belong to the Exporural access.
+    // sidewalk loops. Four exclusive curb runs of the nonexistent A7 road were removed.
     expect(artery.curbCenterlines).toEqual([]);
-    expect(input.curbSegments).toHaveLength(20);
+    expect(input.curbSegments).toHaveLength(16);
     expect(input.curbSegments!.some(({ id }) => id.startsWith(`${artery.id}:`))).toBe(false);
     expect(JSON.stringify(PARK_ACCESS_SPATIAL_PLAN)).toBe(snapshot);
   });

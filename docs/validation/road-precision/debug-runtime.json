@@ -1,0 +1,27 @@
+{
+  "errors": [],
+  "readyMs": 20785,
+  "poses": {
+    "top": {
+      "pose": {
+        "target": [
+          43,
+          0,
+          12
+        ],
+        "position": [
+          43,
+          66,
+          12.01
+        ]
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 229,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  }
+}

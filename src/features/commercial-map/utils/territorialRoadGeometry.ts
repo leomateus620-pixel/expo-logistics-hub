@@ -17,6 +17,7 @@ import {
   GENERATED_REAR_ROAD_SEGMENTS,
   rearRoadLocalPath,
 } from "../data/rearParkRoadNetwork";
+import { OFFICIAL_REFERENCE_DATA, officialPdfPointToLocal } from '../data/officialReference2026';
 
 export const TERRITORY_ROAD_Y = 0.034;
 export const UNIFIED_TERRITORY_ROADS: readonly TerritoryRoad[] = [
@@ -207,6 +208,38 @@ export function territorySurfaceSkirt(
 const union = (polys: MultiPolygon[]) =>
   polys.length ? polygonClipping.union(polys[0], ...polys.slice(1)) : [];
 
+/** Independently capped OSM ways leave a wedge at shared, angled endpoints.
+ * Fill only the intervention's existing nodes, at the existing half-width.
+ * No centreline, island or external road is moved. Sixteen vertices suffice for
+ * these sub-metre joins; the final polygon union removes duplicate coverage.
+ */
+export function precisionSeamPolygons(shoulders = false): MultiPolygon[] {
+  const nodes = new Map<string, { point: TerritoryPoint; widths: number[] }>();
+  for (const road of UNIFIED_TERRITORY_ROADS) {
+    // Junctions can meet an intermediate OSM node, as at the A5 access mouth.
+    for (const p of road.points) {
+      const inArena = p[0] >= 25 && p[0] <= 67 && p[1] >= -22 && p[1] <= 29;
+      const inBrJunction = p[0] >= 88 && p[0] <= 104 && p[1] >= -85 && p[1] <= -64;
+      if (!inArena && !inBrJunction) continue;
+      const key = `${p[0].toFixed(5)},${p[1].toFixed(5)}`;
+      const node = nodes.get(key) ?? { point: p, widths: [] };
+      node.widths.push(road.width + (shoulders ? 2 * road.shoulder : 0));
+      nodes.set(key, node);
+    }
+  }
+  return [...nodes.values()].filter(n => n.widths.length > 1).map(n => {
+    // The wider entry owns the node. The narrow entry's radius leaves a notch
+    // in the outside edge of a mixed-width BR-472 junction.
+    const radius = Math.max(...n.widths) / 2;
+    const ring: Ring = Array.from({ length: 16 }, (_, i) => [
+      n.point[0] + radius * Math.cos(i * Math.PI / 8),
+      n.point[1] + radius * Math.sin(i * Math.PI / 8),
+    ]);
+    ring.push([...ring[0]]);
+    return [[ring]];
+  });
+}
+
 /** Exact polygon union at construction time: no overlapping asphalt planes at a crossing.
  * Holes are retained as islands. Shoulders are the set difference of the two unions.
  * Markings are clipped against every intersecting roadway, rather than running across its mouth.
@@ -218,7 +251,18 @@ export function buildTerritoryRoadGeometry() {
   const surfaces = UNIFIED_TERRITORY_ROADS.map((r, i) =>
     corridorPolygon(samples[i], r.width),
   );
-  const pavement = union(surfaces);
+  // The official frontage and Brasil polygon own their existing top surface.
+  // Trim the generated ribbons to their exact mouths, never stack asphalt.
+  const officialMouths: MultiPolygon[] = OFFICIAL_REFERENCE_DATA.entities
+    .filter(e => ['AV-IMIGRANTES', 'RUA-BRASIL'].includes(e.publicIdentifier))
+    .map(e => [e.geometry.coordinates.map(r => r.map(p => [p[0], p[1]]))]);
+  const brasilMouth = corridorPolygon(
+    [[4510,3150], [4528,3150]].map(p => officialPdfPointToLocal(p as [number, number])),
+    GENERATED_REAR_ROAD_SEGMENTS.find(r => r.id === 'portao5-street-curve')!.width,
+  );
+  const pavement = polygonClipping.difference(
+    union([...surfaces, ...precisionSeamPolygons(), brasilMouth]), ...officialMouths,
+  );
   const unpaved = polygonClipping.difference(
     union(
       surfaces.filter((_, i) =>
@@ -243,12 +287,13 @@ export function buildTerritoryRoadGeometry() {
         UNIFIED_TERRITORY_ROADS[i].evidence === "project-continuation",
     ),
   );
-  const outer = union(
-    UNIFIED_TERRITORY_ROADS.map((r, i) =>
+  const outer = union([
+    ...UNIFIED_TERRITORY_ROADS.map((r, i) =>
       corridorPolygon(samples[i], r.width + r.shoulder * 2),
     ),
-  );
-  const shoulders = polygonClipping.difference(outer, pavement);
+    ...precisionSeamPolygons(true),
+  ]);
+  const shoulders = polygonClipping.difference(outer, pavement, ...officialMouths);
   const edgeBands: MultiPolygon[] = [],
     centerDashes: MultiPolygon[] = [];
   const bounds = surfaces.map((p) => {

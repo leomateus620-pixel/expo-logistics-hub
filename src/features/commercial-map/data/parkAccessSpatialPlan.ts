@@ -394,12 +394,10 @@ const MOTORHOME_SOURCE_BOUNDS = [760, 1780, 1630, 2400] as const;
 const MOTORHOME_FOOTPRINT_SOURCE = sourceRectangle(...MOTORHOME_SOURCE_BOUNDS);
 
 const GATE_7_JUNCTION_SOURCE = [3267, 1720] as const;
-const GATE_7_JOHAN_MULLER_SEAM_SOURCE = [3994, 1744] as const;
 const GATE_7_GUSTAVO_BESSEL_SEAM_SOURCE = [3263.5, 2069] as const;
 
 export const EXPORURAL_GATE_ACCESS_ROAD_SURFACE_IDS = [
   'gate-6-gate-7-asphalt',
-  'gate-7-johan-muller-link',
   'gate-7-gustavo-bessel-link',
   'acesso-churrascaria',
 ] as const;
@@ -415,14 +413,6 @@ const GATE_6_GATE_7_SOURCE = [
   A7_SOURCE,
 ] as const satisfies readonly ParkAccessSourcePoint[];
 
-const GATE_7_JOHAN_MULLER_LINK_SOURCE = [
-  [3244, 1720],
-  GATE_7_JUNCTION_SOURCE,
-  [3410, 1736],
-  [3650, 1742],
-  GATE_7_JOHAN_MULLER_SEAM_SOURCE,
-] as const satisfies readonly ParkAccessSourcePoint[];
-
 const GATE_7_GUSTAVO_BESSEL_LINK_SOURCE = [
   A7_SOURCE,
   GATE_7_JUNCTION_SOURCE,
@@ -435,10 +425,6 @@ const GATE_7_GUSTAVO_BESSEL_LINK_SOURCE = [
 const GATE_6_GATE_7_CURB_SOURCES = Object.values(sourcePathEdges(
   GATE_6_GATE_7_SOURCE.slice(0, -1),
   6 - PARK_ACCESS_ROAD_CURB_WIDTH_METERS,
-));
-const GATE_7_JOHAN_MULLER_CURB_SOURCES = Object.values(sourcePathEdges(
-  GATE_7_JOHAN_MULLER_LINK_SOURCE.slice(2),
-  5.2 - PARK_ACCESS_ROAD_CURB_WIDTH_METERS,
 ));
 const GATE_7_GUSTAVO_BESSEL_CURB_SOURCES = Object.values(sourcePathEdges(
   GATE_7_GUSTAVO_BESSEL_LINK_SOURCE.slice(2, -1),
@@ -609,7 +595,6 @@ function makeRoadSurface(
     'gate-1-apron': 0.056,
     'gate-2-apron': 0.057,
     'gate-3-arrival': 0.058,
-    'gate-7-johan-muller-link': 0.045,
     'gate-7-gustavo-bessel-link': 0.046,
     'acesso-churrascaria': 0.048,
   };
@@ -740,24 +725,6 @@ const ROAD_SURFACES = [
       GATE_6_GATE_7_CURB_SOURCES,
     ),
     widthReviewRangeMeters: [5.5, 6.5] as const,
-    supportAware: true,
-  },
-  {
-    ...makeRoadSurface(
-      'gate-7-johan-muller-link',
-      'ASPHALT_ACCESS_ROAD',
-      GATE_7_JOHAN_MULLER_LINK_SOURCE,
-      5.2,
-      ['A7', 'gate-6-gate-7-asphalt', 'gate-7-junction', 'RUA-JOHAN-MULLER'],
-      {
-        sourceIds: ['official-2026-park-map', 'annex-23-satellite-gates-6-7'],
-        confidence: 'ANNEX_REGISTERED_TRACE',
-        notes: 'Braço leste-oeste forma o T de A7 e termina dentro da faixa oficial da Rua Johan Muller; o pequeno prolongamento oeste conserva a leitura do entroncamento sem ocupar a Pista Campeira.',
-      },
-      undefined,
-      GATE_7_JOHAN_MULLER_CURB_SOURCES,
-    ),
-    widthReviewRangeMeters: [5, 6] as const,
     supportAware: true,
   },
   {
@@ -1392,7 +1359,7 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
       officialEntityIdentifier: 'A7',
       sourceIds: ['official-2026-park-map', 'annex-23-satellite-gates-6-7'],
       confidence: 'OFFICIAL_ANCHOR',
-      notes: 'Centro oficial A7 preservado no encontro entre o eixo A6/A7, o braço leste-oeste e o ramal sul da Exporural.',
+      notes: 'Centro oficial A7 preservado no eixo A6/A7 e ramal sul da Exporural. O braço leste foi retirado pelo anexo 5 de 13/09/2026.',
     },
     gate7Junction: {
       id: 'anchor-gate-7-junction',
@@ -1403,16 +1370,6 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
       sourceIds: ['official-2026-park-map', 'annex-23-satellite-gates-6-7'],
       confidence: 'ANNEX_REGISTERED_TRACE',
       notes: 'Controle de junção imediatamente ao sul de A7, registrado pelo gate oficial e pelas faixas livres do mapa; não é coordenada as-built.',
-    },
-    gate7JohanMullerSeam: {
-      id: 'anchor-gate-7-johan-muller-seam',
-      name: 'Encaixe A7 / Rua Johan Muller',
-      sourcePdfPoint: GATE_7_JOHAN_MULLER_SEAM_SOURCE,
-      point: parkAccessSourcePointToLocal(GATE_7_JOHAN_MULLER_SEAM_SOURCE),
-      officialEntityIdentifier: 'RUA-JOHAN-MULLER',
-      sourceIds: ['official-2026-park-map', 'annex-23-satellite-gates-6-7'],
-      confidence: 'OFFICIAL_ANCHOR',
-      notes: 'Ponto interno à faixa oficial da Rua Johan Muller, usado apenas para eliminar a fresta visual da extensão que parte de A7.',
     },
     gate7GustavoBesselSeam: {
       id: 'anchor-gate-7-gustavo-bessel-seam',

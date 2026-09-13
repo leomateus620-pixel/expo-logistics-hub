@@ -1,0 +1,49 @@
+{
+  "version": "0.6",
+  "generator": "openstreetmap-cgimap 2.1.0 (244686 spike-07.openstreetmap.org)",
+  "copyright": "OpenStreetMap and contributors",
+  "attribution": "http://www.openstreetmap.org/copyright",
+  "license": "http://opendatacommons.org/licenses/odbl/1-0/",
+  "elements": [
+    {
+      "type": "node",
+      "id": 5489891754,
+      "lat": -27.8426856,
+      "lon": -54.4795123,
+      "timestamp": "2020-04-14T15:17:27Z",
+      "version": 2,
+      "changeset": 83542784,
+      "user": "erickdeoliveiraleal",
+      "uid": 463504
+    },
+    {
+      "type": "node",
+      "id": 5489891755,
+      "lat": -27.8432849,
+      "lon": -54.4795974,
+      "timestamp": "2020-04-14T15:17:27Z",
+      "version": 2,
+      "changeset": 83542784,
+      "user": "erickdeoliveiraleal",
+      "uid": 463504
+    },
+    {
+      "type": "way",
+      "id": 571136682,
+      "timestamp": "2026-08-29T20:14:39Z",
+      "version": 2,
+      "changeset": 188216252,
+      "user": "ftrebien",
+      "uid": 401472,
+      "nodes": [
+        5489891754,
+        5489891755
+      ],
+      "tags": {
+        "access": "destination",
+        "highway": "unclassified",
+        "name": "Rua Brasil"
+      }
+    }
+  ]
+}

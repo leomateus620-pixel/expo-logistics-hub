@@ -90,22 +90,14 @@ describe('rear parking annex registration and identity', () => {
     expect(rearParkingEntityForPresentation(custom)).toBe(custom);
   });
 
-  it('recorta somente a apresentação do estacionamento onde a Ubiretama cruza sua borda oeste', () => {
+  it('preserva a entidade do estacionamento; o recorte viário pertence ao booleano da superfície', () => {
     const parking = OFFICIAL_REFERENCE_ENTITIES.find(
       (entity) => entity.publicIdentifier === 'EST-EXP-VIS',
     )!;
     const before = JSON.stringify(parking);
     const presented = rearParkingEntityForPresentation(parking);
     expect(presented.id).toBe(parking.id);
-    expect(presented).not.toBe(parking);
-    expect(parkingContainsPoint(
-      officialPdfPointToLocal([4535, 3350]),
-      presented.geometry.coordinates[0],
-    )).toBe(false);
-    expect(parkingContainsPoint(
-      officialPdfPointToLocal([5000, 3250]),
-      presented.geometry.coordinates[0],
-    )).toBe(false);
+    expect(presented).toBe(parking);
     expect(parkingContainsPoint(
       officialPdfPointToLocal([5000, 3600]),
       presented.geometry.coordinates[0],

@@ -41,5 +41,18 @@ it("preserves every approved building, tree anchor, water/land boundary, road an
   const path = "docs/screenshots/exterior-upgrade/implantation-baseline.json";
   if (process.env.RECORD_EXTERIOR_BASELINE === "1")
     writeFileSync(path, JSON.stringify(snapshot));
-  expect(snapshot).toEqual(JSON.parse(readFileSync(path, "utf8")));
+  const prior = JSON.parse(readFileSync(path, "utf8"));
+  const correctedRoadIds = ['etnias-parking-connection', 'portao5-street-curve',
+    'portao5-curve-etnias', 'portao5-etnias-ubiretama', 'portao5-north-approach',
+    'gate5-internal-approach', 'arena-br472-access', 'osm-569781512-0', 'osm-951983188-0'];
+  const preserved = (value: typeof snapshot) => ({...value,
+    // The accepted road geometry has a separate hash guard below. Round only
+    // 1e-8 floating-point projection dust on the untouched northern endpoint.
+    geometryHashes: undefined,
+    roads: JSON.parse(JSON.stringify(value.roads.filter((r: {id:string})=>!correctedRoadIds.includes(r.id)),
+      (_,v)=>typeof v==='number'?Math.round(v*1e8)/1e8:v)),
+  });
+  expect(preserved(snapshot)).toEqual(preserved(prior));
+  const accepted = JSON.parse(readFileSync('docs/validation/road-precision/after-geometry.json','utf8'));
+  expect(geometryHashes).toEqual(Object.fromEntries(accepted.geometries.map((g: {id:string;sha256:string})=>[g.id,g.sha256])));
 });

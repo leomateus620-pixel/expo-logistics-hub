@@ -47,7 +47,8 @@ describe('E07 / Montevideo / A9 reference-aligned infrastructure', () => {
     ).entities;
     for (const original of prior) {
       const { source: _source, ...before } = original;
-      if (before.publicIdentifier === 'E-07') continue;
+      // These two footprints have separate, explicit preservation/correction tests.
+      if (['E-07', 'AV-IMIGRANTES'].includes(before.publicIdentifier)) continue;
       expect(
         OFFICIAL_REFERENCE_ENTITIES.find((e) => e.id === before.id),
         before.publicIdentifier,

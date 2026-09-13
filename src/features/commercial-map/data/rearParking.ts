@@ -1,3 +1,4 @@
+import { ARENA_ROAD_CORRECTION } from './arenaRoadCorrection';
 import type { MapEntity } from '../types';
 import type { ParkingCameraView } from '../utils/parkingViewport';
 import {
@@ -189,42 +190,19 @@ export function rearParkingLayerPresentation(entities: readonly MapEntity[], vis
   return { visible: layerIds.every((id) => visibility[id] !== false) && strength > 0.015, opacity: strength };
 }
 
-function arenaRoadParkingPresentation(entity: MapEntity): MapEntity | null {
-  if (entity.publicIdentifier !== 'EST-EXP-VIS' || entity.classification !== 'PARKING') return null;
-  const ring = openParkingPolygon(entity.geometry.coordinates[0] ?? []);
-  if (ring.length !== 4 || entity.geometry.coordinates.length !== 1) return null;
-  const sourcePolygon = [
-    [4558, 3242],
-    [4700, 3250],
-    [5000, 3262],
-    [5350, 3274],
-    [5270, 4140],
-    [4510, 4140],
-    [4510, 3488],
-    [4558, 3488],
-    [4558, 3222],
-  ] as const;
-  return {
-    ...entity,
-    geometry: {
-      ...entity.geometry,
-      coordinates: [sourcePolygon.map((point) => officialPdfPointToLocal(point))],
-    },
-    metadata: {
-      ...entity.metadata,
-      parkingPresentationCut: 'RUA_UBIRETAMA_WEST_EDGE_CANONICAL_UNCHANGED',
-    },
-  };
-}
-
-/**
- * Presentation-only cuts keep real circulation visible without changing the
- * cadastral entities. The Arena parking loses only the narrow west-edge channel
- * occupied by Rua Ubiretama; J keeps its Annex 5 inner-boundary correction.
- */
+/** Parking is cut against the canonical road union by arenaParkingGeometry.
+ * No hard-coded presentation outline competes with that surface. */
 export function rearParkingEntityForPresentation(entity: MapEntity): MapEntity {
-  const arenaParking = arenaRoadParkingPresentation(entity);
-  if (arenaParking) return arenaParking;
+  // Apply the same frontage limit to older persisted snapshots; IDs and other
+  // properties are preserved, including official commercial data.
+  if (entity.publicIdentifier === 'AV-IMIGRANTES') {
+    const limit = officialPdfPointToLocal(ARENA_ROAD_CORRECTION.frontageTerminus)[0];
+    if (entity.geometry.coordinates.some(r => r.some(p => p[0] > limit))) return {
+      ...entity, geometry: {...entity.geometry, coordinates: entity.geometry.coordinates.map(
+        r => r.map(([x, z]) => [Math.min(x, limit), z]),
+      )},
+    };
+  }
   if (entity.publicIdentifier !== 'J' || entity.classification !== 'ATTRACTION') return entity;
   const ring = openParkingPolygon(entity.geometry.coordinates[0] ?? []);
   const bounds = parkingBounds(ring);

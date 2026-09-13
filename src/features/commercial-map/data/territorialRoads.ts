@@ -16,6 +16,14 @@ export interface TerritoryRoad {
   ref?: string;
 }
 const local = (p: TerritoryPoint): TerritoryPoint => officialPdfPointToLocal(p);
+// OSM node 5479124532 -> 5479124534 (way 951983188), verified 2026-09-13.
+// The former park-envelope clip dropped this way and the first vertex of
+// way 569781512, disconnecting the two existing BR-472 access branches.
+export const GATE5_ACCESS_NODES = {
+  upper: [60.7478, 14.4475] as TerritoryPoint,
+  lower: [59.6248, 16.4106] as TerritoryPoint,
+  parkMouth: [60.1863, 15.42905] as TerritoryPoint,
+} as const;
 export const TERRITORY_REFERENCE = {
   revision: "2026-09-07",
   unitsPerMetre: 0.15,
@@ -42,16 +50,28 @@ export const TERRITORY_REFERENCE = {
  * Clipping excludes the established park and lateral district. No API runs in the browser.
  */
 export const TERRITORY_ROADS: readonly TerritoryRoad[] = [
-  ...(source.roads as unknown as TerritoryRoad[]),
+  ...(source.roads as unknown as TerritoryRoad[]).map(road => road.id === 'osm-569781512-0'
+    ? { ...road, points: [GATE5_ACCESS_NODES.lower, ...road.points] }
+    : road),
+  {
+    id: 'osm-951983188-0',
+    name: 'Conexão dos ramos do acesso A5',
+    kind: 'access',
+    points: [GATE5_ACCESS_NODES.upper, GATE5_ACCESS_NODES.parkMouth, GATE5_ACCESS_NODES.lower],
+    width: 0.98,
+    shoulder: 0.08,
+    evidence: 'osm-aligned',
+    sourceWay: '951983188',
+    surface: 'unspecified',
+  },
   {
     id: "arena-br472-access",
     name: "Acesso rodoviário da arena (A5 cadastral)",
     kind: "access",
     points: [
       TERRITORY_REFERENCE.anchors.arenaAccess,
-      [59.2, 15.5],
-      [61.5, 16.2],
-      [63.6, 16.6],
+      [58.2, 15.48],
+      GATE5_ACCESS_NODES.parkMouth,
     ],
     width: 1.02,
     shoulder: 0.09,

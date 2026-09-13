@@ -92,7 +92,7 @@ export interface RearRoadIdentity {
 
 export type RearContextualLabelOwner = RearRoadIdentity['officialOwnerIdentifier'] | 'A5';
 
-export const REAR_PARK_ROAD_REVISION = '2026.9-anexo3-satellite.2';
+export const REAR_PARK_ROAD_REVISION = '2026.9-road-precision.1';
 
 /** Escala uniforme do recorte oficial, usada apenas para larguras físicas. */
 export const SOURCE_POINTS_PER_LOCAL_UNIT = ANNEX_SOURCE_POINTS_PER_LOCAL_UNIT;
@@ -305,7 +305,7 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     from: 'etnias-parking-avenue', to: 'etnias-parking-junction', ...generatedParkDefaults,
     sourceControlPoints: REAR_CALIBRATED_AXES.etniasParkingConnection,
     officialOwnerIdentifier: 'AV-IMIGRANTES',
-    notes: 'Ligação da Av. dos Imigrantes à continuação da Rua Brasil em [5260, 3503], ao sul da arena. Mantém os desvios dos postes cadastrados.',
+    notes: 'Conector independente da frente das Etnias em [5120,4200] ao eixo Brasil em [5410,3503], conforme anexos 1–2 de 13/09/2026.',
   }),
   segment({
     id: 'portao5-street-curve', roadId: 'RUA-BRASIL', name: 'Rua Brasil',
@@ -319,14 +319,14 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     from: 'portao5-curve', to: 'etnias-parking-junction', ...generatedParkDefaults,
     sourceControlPoints: REAR_CALIBRATED_AXES.portao5CurveToEtniasJunction,
     officialOwnerIdentifier: 'RUA-BRASIL',
-    notes: 'Continuação curva da Rua Brasil ao sul da arena até a ligação das Etnias em [5260, 3503], alinhada aos anexos 6/7.',
+    notes: 'Continuação da Rua Brasil até o conector das Etnias, com tangente comum entre trechos.',
   }),
   segment({
     id: 'portao5-etnias-ubiretama', roadId: 'RUA-BRASIL', name: 'Rua Brasil',
     from: 'etnias-parking-junction', to: 'ubiretama-portao5-junction', ...generatedParkDefaults,
     sourceControlPoints: REAR_CALIBRATED_AXES.portao5EtniasToUbiretamaJunction,
     officialOwnerIdentifier: 'RUA-BRASIL',
-    notes: 'Aproximação oblíqua da Rua Brasil à Ubiretama em [5860, 3633], antes do A5 cadastral. Mantém distância da arena.',
+    notes: 'Pequeno intervalo entre os dois acessos independentes na zona do cruzamento: Etnias [5410,3503] e Ubiretama [5480,3524].',
   }),
   segment({
     id: 'portao5-north-approach', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
@@ -335,7 +335,7 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     width: rearRoadSourceToLocalLength(32), shoulderWidth: 0,
     elevationOffset: 0.03, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-UBIRETAMA',
-    notes: 'Continuidade da faixa cadastral lateral da Rua Ubiretama até o encontro em [5860, 3633]. Não corresponde à saída norte indicada no anexo 9.',
+    notes: 'Aproximação da Expo Rural junto à Arena, com inflexão suave e encontro antecipado no eixo Brasil em [5480,3524].',
   }),
   segment({
     id: 'gate5-internal-approach', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — rede interna',

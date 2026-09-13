@@ -1,3 +1,4 @@
+import { createArenaParkingGeometry, isArenaParking } from '../../utils/arenaParkingGeometry';
 import { LightingPerformanceProbe } from '../../diagnostics/LightingPerformanceProbe';
 import { markCommercialMapStage } from '../../utils/performanceDiagnostics';
 import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
@@ -728,6 +729,7 @@ function createEntityShape(entity: MapEntity) {
 }
 
 function createEntityGeometry(entity: MapEntity, heightOverride?: number) {
+  if (isArenaParking(entity)) return createArenaParkingGeometry(entity, heightOverride ?? 0.06);
   const shape = createEntityShape(entity);
   const classification = String(entity.classification);
   const surface = ['ROAD', 'PEDESTRIAN_PATH', 'GREEN_AREA', 'PARKING', 'WATER', 'QUADRA'].includes(classification);

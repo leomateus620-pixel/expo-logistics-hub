@@ -1,3 +1,4 @@
+import { treeIntersectsGeneratedRearRoadCorridor } from '../../utils/rearRoadTreeClearance';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -604,7 +605,9 @@ function ArenaVegetation({ reducedGraphics, opacity }: { reducedGraphics: boolea
   const trunksRef = useRef<THREE.InstancedMesh>(null);
   const crownsRef = useRef<THREE.InstancedMesh>(null);
   const { gl, invalidate } = useThree();
-  const clusters = ARENA_FRONT_LAYOUT.treeClusters;
+  const clusters = useMemo(() => ARENA_FRONT_LAYOUT.treeClusters.filter(cluster => !treeIntersectsGeneratedRearRoadCorridor({
+    position: sourcePolygonToLocal([cluster.sourcePosition])[0], canopyRadius: cluster.scale * 0.3,
+  })), []);
   const count = clusters.length;
   const trunkGeometry = useMemo(
     () => new THREE.CylinderGeometry(0.03, 0.045, 1, reducedGraphics ? 5 : 7),
