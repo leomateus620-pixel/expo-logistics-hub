@@ -10,14 +10,16 @@ import { CRONOGRAMA_CYCLE_YEARS } from '@/lib/cronograma-cycle';
 export const CRONOGRAMA_YEARS = CRONOGRAMA_CYCLE_YEARS;
 
 export const categoryLabels: Record<CronogramaCategory, string> = {
-  governanca: 'Governança',
-  programacao: 'Programação',
-  infraestrutura: 'Infraestrutura',
-  logistica: 'Logística',
-  comunicacao: 'Comunicação',
-  comercial: 'Comercial',
-  cerimonial: 'Cerimonial',
-  representacoes: 'Representações',
+  governanca: 'Governança e Gestão',
+  programacao: 'Programação e Eventos',
+  infraestrutura: 'Infraestrutura e Operações',
+  logistica: 'Logística e Mobilidade',
+  comunicacao: 'Comunicação e Marketing',
+  comercial: 'Comercial e Patrocínios',
+  cerimonial: 'Cerimonial e Protocolo',
+  representacoes: 'Relações Institucionais e Representações',
+  financeiro: 'Financeiro e Administrativo',
+  tecnologia: 'Tecnologia e Sistemas',
 };
 
 export const statusLabels: Record<CronogramaStatus, string> = {
@@ -49,6 +51,8 @@ export const categoryTone: Record<CronogramaCategory, string> = {
   comercial: 'bg-amber-700',
   cerimonial: 'bg-rose-700',
   representacoes: 'bg-indigo-700',
+  financeiro: 'bg-teal-700',
+  tecnologia: 'bg-cyan-700',
 };
 
 export const officialCronogramaEvents: CronogramaEvent[] = [

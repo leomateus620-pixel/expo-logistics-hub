@@ -13,7 +13,9 @@ export type CronogramaCategory =
   | 'comunicacao'
   | 'comercial'
   | 'cerimonial'
-  | 'representacoes';
+  | 'representacoes'
+  | 'financeiro'
+  | 'tecnologia';
 
 export type CronogramaStatus =
   | 'confirmed'

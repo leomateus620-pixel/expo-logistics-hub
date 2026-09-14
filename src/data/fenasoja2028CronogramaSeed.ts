@@ -105,6 +105,8 @@ export interface CronogramaEventSeed {
   title: string;
   description?: string | null;
   category: string;
+  /** Canonical taxonomy slug persisted in `cronograma_eventos.category_key`. */
+  categoryKey?: string | null;
   eventType: CronogramaEventType;
   sourceYear: 2026 | 2027 | 2028;
   startDate: string | null;

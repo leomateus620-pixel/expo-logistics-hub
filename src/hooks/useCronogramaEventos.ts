@@ -388,6 +388,7 @@ function fromDbRow(row: unknown): CronogramaEvent {
     title: readString(record, 'title') ?? '',
     description: readString(record, 'description'),
     category: readString(record, 'category') ?? 'Outros / a classificar',
+    categoryKey: readString(record, 'category_key'),
     eventType: (readString(record, 'event_type') ?? 'planejamento') as CronogramaEvent['eventType'],
     sourceYear: (readNumber(record, 'source_year') ?? 2028) as 2026 | 2027 | 2028,
     startDate: readString(record, 'start_date'),
