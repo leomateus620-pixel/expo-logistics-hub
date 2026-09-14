@@ -4,6 +4,13 @@ import userEvent from '@testing-library/user-event';
 import { EventForm } from '@/components/cronograma-eventos/EventForm';
 import type { CronogramaEvent } from '@/components/cronograma-eventos/types';
 
+class ResizeObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = ResizeObserverStub;
+
 vi.mock('@/hooks/useAuth', () => ({ useAuth: () => ({ user: null }) }));
 vi.mock('@/components/cronograma-eventos/useCronogramaRelationOptions', async () => {
   const actual = await vi.importActual<Record<string, unknown>>(
