@@ -10,7 +10,9 @@
  * production never logs by default.
  */
 
-export const ALVORADA_RUNTIME_VERSION = 'portal-lifecycle-v2';
+import { ALVORADA_MOTION_MODE } from './motionPolicy';
+
+export const ALVORADA_RUNTIME_VERSION = 'portal-canonical-motion-v3';
 
 export type AlvoradaIntroTelemetryEvent =
   | 'intro-mounted'
@@ -47,6 +49,7 @@ export type AlvoradaIntroTelemetryEvent =
   | 'finished';
 
 export interface AlvoradaIntroTelemetryEnvironment {
+  motionMode: typeof ALVORADA_MOTION_MODE;
   context?: Record<string, unknown>;
   textureTier?: string;
   runtimeVersion?: string;
@@ -113,6 +116,7 @@ export function createAlvoradaIntroTelemetry(): AlvoradaIntroTelemetry {
   const startedAt = now();
   const record: AlvoradaIntroTelemetryRecord = {
     environment: {
+      motionMode: ALVORADA_MOTION_MODE,
       runtimeVersion: ALVORADA_RUNTIME_VERSION,
       gitCommit: import.meta.env.VITE_GIT_COMMIT ?? 'unknown',
       appVersion: import.meta.env.VITE_APP_VERSION ?? 'unknown',

@@ -373,7 +373,8 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
     await waitFor(() => expect(intro).toHaveAttribute('data-host-state', 'ready'));
     expect(intro).not.toHaveAttribute('data-static-reason');
     expect(intro).toHaveAttribute('data-renderer', 'webgl');
-    expect(intro).toHaveAttribute('data-motion', 'reduced');
+    expect(intro).toHaveAttribute('data-motion', 'canonical');
+    expect(intro).toHaveAttribute('data-visual-engine', 'webgl-canonical');
     expect(intro).toHaveAttribute('data-stage', 'preparing');
     expect(intro.querySelector('.alvorada-narrative')).toBeNull();
     expect(integrationMocks.canvasMounts).toBe(1);

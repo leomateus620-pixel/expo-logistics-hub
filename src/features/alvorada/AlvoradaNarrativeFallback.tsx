@@ -5,8 +5,6 @@ import './alvorada-narrative.css';
 
 interface AlvoradaNarrativeFallbackProps {
   phase: AlvoradaPhase;
-  /** Crossfades only: no travel, no zoom (prefers-reduced-motion). */
-  reduced?: boolean;
   stage: AlvoradaIntroStage;
 }
 
@@ -39,7 +37,7 @@ function useAlbedoObjectUrl() {
  * animation skipped to the end". The harvest landscape and the brand frame are
  * layered above it by the intro, exactly as over the WebGL scene.
  */
-export function AlvoradaNarrativeFallback({ phase, reduced = false, stage }: AlvoradaNarrativeFallbackProps) {
+export function AlvoradaNarrativeFallback({ phase, stage }: AlvoradaNarrativeFallbackProps) {
   const albedo = useAlbedoObjectUrl();
 
   return (
@@ -48,7 +46,6 @@ export function AlvoradaNarrativeFallback({ phase, reduced = false, stage }: Alv
       data-testid="alvorada-narrative-fallback"
       data-stage={stage}
       data-phase={phase}
-      data-reduced={reduced || undefined}
       data-textured={albedo ? 'true' : undefined}
       role="img"
       aria-label="Alvorada de Santa Rosa"

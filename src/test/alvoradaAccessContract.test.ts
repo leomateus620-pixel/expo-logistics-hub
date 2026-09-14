@@ -128,19 +128,22 @@ describe('contrato de acesso: ecossistema direto e introdução embutida na cont
     expect(shippedAssets).not.toContain('0317D251-1A8A-4036-91C2-8DF02808D0DC.png');
   });
 
-  it('respeita movimento reduzido no host, sem encurtar a cena WebGL pelo CSS', () => {
-    const globalCss = readFileSync(resolve('src/index.css'), 'utf8');
-    expect(globalCss).toContain('*:not(.alvorada-overlay, .alvorada-overlay *)');
+  it('keeps a single full cinematic policy without changing global accessibility', () => {
+    const globalCss = source('src/index.css');
+    const portalCss = source('src/styles/commission-portal.css');
+    expect(globalCss).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(portalCss).toContain('@media (prefers-reduced-motion: reduce)');
+    for (const css of [globalCss, portalCss]) {
+      expect(css).toContain('[data-alvorada-motion="canonical"]');
+      expect(css).toContain('animation-duration: 0.01ms !important');
+    }
     expect(alvoradaCss).not.toContain('prefers-reduced-motion');
     expect(introCss).not.toContain('prefers-reduced-motion');
     expect(alvoradaCss).toContain('alvorada-overlay-enter 280ms');
     expect(alvoradaCss).toContain('alvorada-overlay-exit 400ms');
-    expect(intro).not.toMatch(/motion === 'reduced' \? 'unavailable'/);
-    expect(intro).toContain("reducedMotion={motion === 'reduced'}");
-    expect(source('src/features/alvorada/SceneController.tsx')).toContain('sampleReducedAlvorada');
-    // The host detects the accessibility preference; the canonical renderer
-    // samples authored stills instead of treating it as GPU unavailability.
-    expect(portalHero).toContain("'(prefers-reduced-motion: reduce)'");
-    expect(portalHero).toContain("prefersReducedMotion() ? 'reduced' : 'cinematic'");
+    expect(intro).not.toContain('reducedMotion');
+    expect(source('src/features/alvorada/SceneController.tsx')).not.toContain('sampleReducedAlvorada');
+    expect(portalHero).not.toContain('matchMedia');
+    expect(portalHero).toContain('data-alvorada-motion={ALVORADA_MOTION_MODE}');
   });
 });

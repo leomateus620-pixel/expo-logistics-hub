@@ -1,5 +1,6 @@
 import { getAlvoradaAssetDiagnostics } from './alvoradaAssets';
 import { ALVORADA_RUNTIME_VERSION } from './introTelemetry';
+import { ALVORADA_MOTION_MODE } from './motionPolicy';
 
 export function isAlvoradaDiagnosticRequested() {
   return typeof window !== 'undefined'
@@ -59,6 +60,8 @@ export async function collectAlvoradaDiagnostic() {
     ? { available: true, result: 'active-canonical-context', maxTextureSize: actual.maxTextureSize }
     : probe('webgl2');
   const entries = record?.events ?? [];
+  const visualEngine = intro?.dataset.visualEngine
+    ?? entries.filter(e => e.name === 'engine-selected').at(-1)?.detail?.engine ?? 'unknown';
   return {
     schema: 1,
     capturedAt: new Date().toISOString(),
@@ -67,11 +70,14 @@ export async function collectAlvoradaDiagnostic() {
     os: /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && nav.maxTouchPoints > 1) ? 'iOS/iPadOS' : /Android/.test(ua) ? 'Android' : /Windows/.test(ua) ? 'Windows' : /Macintosh/.test(ua) ? 'macOS' : /Linux/.test(ua) ? 'Linux' : 'unknown',
     viewport: { width: innerWidth, height: innerHeight }, dpr: devicePixelRatio,
     hardwareConcurrency: nav.hardwareConcurrency ?? null, deviceMemory: nav.deviceMemory ?? null,
-    prefersReducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+    // Informational only. No renderer or animation module consumes this value.
+    prefersReducedMotion: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
+    motionMode: ALVORADA_MOTION_MODE,
     webgl1: probe('webgl'), webgl2,
     // WebGL1 availability is reported, not misrepresented as supported by r170.
     rendererRequirement: 'Three r170 requires WebGL2',
-    engine: intro?.dataset.visualEngine ?? entries.filter(e => e.name === 'engine-selected').at(-1)?.detail?.engine ?? 'unknown',
+    engine: visualEngine,
+    visualEngine,
     environment: record?.environment ?? null,
     criticalAssetResult: entries.filter(e => e.name === 'critical-assets-ready' || (e.name === 'asset-failed' && e.detail?.critical)).at(-1) ?? null,
     contextLossCount: entries.filter(e => e.name === 'context-lost').length,

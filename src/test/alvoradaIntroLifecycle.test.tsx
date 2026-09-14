@@ -15,7 +15,6 @@ import type { AlvoradaPreparationEvent } from '@/features/alvorada/types';
 
 interface MockCanvasProps {
   initialElapsed: number;
-  reducedMotion?: boolean;
   onContextLost: (elapsed: number) => void;
   onPreparation?: (event: AlvoradaPreparationEvent) => void;
   onProgress: (elapsed: number) => void;
@@ -235,7 +234,7 @@ describe('ciclo de vida da introdução Alvorada embutida', () => {
 
     expect(intro).toHaveAttribute('data-stage', 'preparing');
     expect(intro).toHaveAttribute('data-renderer', 'webgl');
-    expect(intro).toHaveAttribute('data-motion', 'cinematic');
+    expect(intro).toHaveAttribute('data-motion', 'canonical');
     expect(screen.getByTestId('mock-alvorada-canvas')).toHaveAttribute('data-renderer-tier', 'hardware');
     expect(screen.getByTestId('mock-alvorada-canvas')).toHaveAttribute('data-initial-elapsed', '0');
     expect(screen.getByTestId('alvorada-preparing')).toHaveAttribute('data-active', 'true');
@@ -345,16 +344,21 @@ describe('ciclo de vida da introdução Alvorada embutida', () => {
   });
 
   describe('narrativa 2D quando não há renderizador WebGL utilizável', () => {
-    it('movimento reduzido conserva a Terra canônica sem trocar o renderizador por CSS', () => {
+    it.each([false, true])('full cinematic is unchanged when reduced motion = %s', (reduced) => {
+      vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
+        matches: reduced && query.includes('prefers-reduced-motion'), media: query,
+        onchange: null, addListener: vi.fn(), removeListener: vi.fn(),
+        addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: vi.fn(),
+      }));
       const onFinished = vi.fn();
       const stages: AlvoradaIntroStage[] = [];
-      render(<AlvoradaIntro motion="reduced" onFinished={onFinished} onStageChange={(stage) => stages.push(stage)} />);
+      render(<AlvoradaIntro onFinished={onFinished} onStageChange={(stage) => stages.push(stage)} />);
       const intro = screen.getByTestId('alvorada-intro');
-      expect(currentCanvas().props.reducedMotion).toBe(true);
+      expect(currentCanvas().props).not.toHaveProperty('reducedMotion');
       expect(runtime.canvasMounts).toHaveLength(1);
       expect(intro).toHaveAttribute('data-visual-engine', 'webgl-canonical');
       expect(intro).not.toHaveAttribute('data-static-reason');
-      expect(intro).toHaveAttribute('data-motion', 'reduced');
+      expect(intro).toHaveAttribute('data-motion', 'canonical');
       expect(screen.queryByTestId('alvorada-narrative-fallback')).toBeNull();
       act(() => currentCanvas().props.onReady());
       act(() => currentCanvas().props.onProgress(ALVORADA_PHASES.territory.start));

@@ -207,17 +207,6 @@
   opacity: 1;
 }
 
-/* Reduced motion: the same narrative as crossfades, without travel or zoom. */
-.alvorada-narrative[data-reduced] .alvorada-narrative__planet {
-  transform: translate(-50%, -50%) scale(1);
-  transition: opacity 1200ms ease;
-  animation: none;
-}
-
-.alvorada-narrative[data-reduced][data-stage="approach"] .alvorada-narrative__planet {
-  transform: translate(-50%, -50%) scale(1);
-}
-
 @keyframes alvorada-narrative-drift {
   from { rotate: -1.5deg; }
   to { rotate: 1.5deg; }

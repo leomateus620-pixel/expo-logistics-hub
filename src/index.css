@@ -3460,10 +3460,11 @@ input::placeholder, textarea::placeholder {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* The explicitly launched Alvorada retains its authored journey. */
-  *:not(.alvorada-overlay, .alvorada-overlay *),
-  *:not(.alvorada-overlay, .alvorada-overlay *)::before,
-  *:not(.alvorada-overlay, .alvorada-overlay *)::after {
+  /* Alvorada alone retains its authored motion, including the embedded host.
+     The rest of the application continues to honor the OS preference. */
+  *:not(.alvorada-overlay, .alvorada-overlay *, [data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"])),
+  *:not(.alvorada-overlay, .alvorada-overlay *, [data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"]))::before,
+  *:not(.alvorada-overlay, .alvorada-overlay *, [data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"]))::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

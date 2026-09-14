@@ -642,9 +642,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fenasoja-portal *,
-  .fenasoja-portal *::before,
-  .fenasoja-portal *::after {
+  /* Exempt only the Alvorada layer and its active host reveal, not menus/cards. */
+  .fenasoja-portal *:not(:where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"]))),
+  .fenasoja-portal *:not(:where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"])))::before,
+  .fenasoja-portal *:not(:where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"])))::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-delay: 0ms !important;

@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 import { observeAlvoradaHost } from './hostReadiness';
+import { ALVORADA_MOTION_MODE } from './motionPolicy';
 import { ALVORADA_RUNTIME_VERSION } from './introTelemetry';
 import { AlvoradaCanvas } from './AlvoradaCanvas';
 import { AlvoradaBrandHero } from './AlvoradaBrandHero';
@@ -41,13 +42,9 @@ import type { AlvoradaFallbackReason, AlvoradaPreparationEvent, AlvoradaWebGLTie
 import './alvorada.css';
 import './alvorada-intro.css';
 
-/** `reduced` follows prefers-reduced-motion: the narrative plays as crossfades, without travel. */
-export type AlvoradaIntroMotion = 'cinematic' | 'reduced';
-
 export interface AlvoradaIntroProps {
   /** Visible time the dawn brand frame stays before `onFinished`. */
   brandHoldMs?: number;
-  motion?: AlvoradaIntroMotion;
   /** Fired exactly once when the sequence is complete; the host restores the countdown. */
   onFinished: () => void;
   onStageChange?: (stage: AlvoradaIntroStage) => void;
@@ -69,8 +66,7 @@ export type AlvoradaIntroStaticReason =
   | AlvoradaFallbackReason
   | 'asset-failed'
   | 'prepare-ceiling'
-  | 'prepare-stall'
-  | 'reduced-motion';
+  | 'prepare-stall';
 
 const INTRO_TIMER_KEYS: readonly IntroTimerKey[] = [
   'brand-hold',
@@ -132,7 +128,6 @@ function assetProgressRatio(progress: AlvoradaAssetProgress) {
  */
 export function AlvoradaIntro({
   brandHoldMs = ALVORADA_INTRO_BRAND_HOLD_MS,
-  motion = 'cinematic',
   onFinished,
   onStageChange,
 }: AlvoradaIntroProps) {
@@ -300,7 +295,7 @@ export function AlvoradaIntro({
     window.__alvoradaIntroTelemetry = telemetry.record;
     telemetry.setEnvironment({ rendererTier, qualityProfile: budget.level, textureTier: budget.textureTier });
     telemetry.mark('engine-selected', { engine: initialRenderer === 'webgl' ? 'webgl-canonical' : 'emergency-fallback', reason: staticReason, previousEngine: null, recoveryAttempt: 0 });
-    telemetry.mark('intro-mounted', { motion, rendererTier, quality: budget.level });
+    telemetry.mark('intro-mounted', { motionMode: ALVORADA_MOTION_MODE, rendererTier, quality: budget.level });
     if (initialRenderer === 'fallback') {
       const reason: AlvoradaIntroStaticReason = 'unsupported-webgl';
       telemetry.setEnvironment({ staticReason: reason });
@@ -467,7 +462,9 @@ export function AlvoradaIntro({
       data-runtime-version={ALVORADA_RUNTIME_VERSION}
       data-host-state={!hostReady ? 'waiting-size' : hostUsable ? 'ready' : 'suspended-size'}
       data-frame={variant}
-      data-motion={motion}
+      data-motion={ALVORADA_MOTION_MODE}
+      data-motion-mode={ALVORADA_MOTION_MODE}
+      data-alvorada-motion={ALVORADA_MOTION_MODE}
       data-preparation-ms={preparationMs ?? undefined}
       data-first-frame-ms={firstFrameMs ?? undefined}
       aria-hidden="true"
@@ -478,7 +475,6 @@ export function AlvoradaIntro({
             <AlvoradaCanvas
               initialElapsed={0}
               paused={!hostUsable}
-              reducedMotion={motion === 'reduced'}
               onContextLost={handleContextLost}
               onPreparation={handlePreparation}
               onProgress={handleProgress}
@@ -491,7 +487,6 @@ export function AlvoradaIntro({
         ) : renderer === 'fallback' && (
           <AlvoradaNarrativeFallback
             phase={phase}
-            reduced={motion === 'reduced'}
             stage={stage}
           />
         )}
