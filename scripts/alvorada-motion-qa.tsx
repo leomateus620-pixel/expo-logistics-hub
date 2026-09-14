@@ -29,6 +29,15 @@ function Fixture() {
   const [started, start] = useState(new URLSearchParams(location.search).has('cold'));
   Object.assign(window, { __alvoradaMotionQA: {
     start: () => start(true), warm: warmVisualAssets, diagnostic: collectAlvoradaDiagnostic,
+    // With the test clock paused, flush the same frame through the REAL R3F
+    // subscribers/composer, then wait for GPU completion. WebKit screenshots
+    // otherwise race its compositor and may read a stale/blank drawing buffer.
+    // This hook is absent from the application bundle and never changes time.
+    flush: () => {
+      const canvas = document.querySelector('canvas');
+      const state = canvas ? _roots.get(canvas)?.store.getState() : undefined;
+      if (state) { state.advance(performance.now(), true); state.gl.getContext().finish(); }
+    },
     // QA only: read the REAL R3F camera; never replace it or control the timeline.
     sample: () => {
       const canvas = document.querySelector('canvas');

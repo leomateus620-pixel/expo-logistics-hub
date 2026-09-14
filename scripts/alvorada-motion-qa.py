@@ -7,7 +7,6 @@ physical iPhones, Windows drivers or the authenticated Portal workload.
 import argparse
 import asyncio
 import json
-import os
 import time
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -93,6 +92,11 @@ async def lifecycle(browser, mobile, preference, base, output, name, toggle=Fals
     try:
         await page.goto(base + '?cold=1', wait_until='load')
         await page.wait_for_function("document.querySelector('[data-testid=alvorada-intro]')?.dataset.stage==='globe'", timeout=45000)
+        if not technical and not skip:
+            await page.wait_for_function("Number(document.querySelector('canvas')?.dataset.elapsed) >= .45")
+            globe_path = output / f'{name}-native-globe.png'
+            await page.screenshot(path=str(globe_path), clip=await page.locator('.fenasoja-portal__intro').bounding_box())
+            check_globe_pixels(Image.open(globe_path).convert('RGB'), name)
         initial = await page.evaluate('window.__alvoradaMotionQA.sample()')
         styles = await page.evaluate(STYLE_SAMPLE)
         other = await page.locator('[data-testid=outside-motion]').evaluate('(el)=>getComputedStyle(el).transitionDuration')
@@ -171,6 +175,7 @@ async def matched_frames(browser, mobile, preference, base, output, name):
                 break
             await asyncio.sleep(.005)  # real asynchronous shader compilation
         check(ready, 'Canonical first frame never presented')
+        timeline_epoch = await page.evaluate('performance.now()') - float(state['canvas']['elapsed']) * 1000
         # Finish only the surrounding host reveal, outside the authored scene,
         # to isolate the pixel comparison from variable shader-compile latency.
         await page.evaluate("document.querySelector('.fenasoja-portal__hero').getAnimations().forEach(a=>{a.currentTime=10000})")
@@ -178,11 +183,20 @@ async def matched_frames(browser, mobile, preference, base, output, name):
         for label, target in SAMPLES:
             for _ in range(500):
                 state = await page.evaluate('window.__alvoradaMotionQA.sample()')
-                elapsed = float(state['canvas'].get('elapsed', 0)) if state['canvas'] else target
-                if elapsed >= target - .001:
+                # Keep the same visible clock AFTER Canvas release too. Treating
+                # a released canvas as 'target reached' captured different points
+                # in the brand fade even though the product timeline was equal.
+                authored = (await page.evaluate('performance.now()') - timeline_epoch) / 1000
+                if authored >= target - .001:
                     break
                 await page.clock.run_for(16)
                 await page.evaluate(SYNC_CSS)
+            await page.evaluate(SYNC_CSS)
+            await page.evaluate('window.__alvoradaMotionQA.flush()')
+            await asyncio.sleep(.06)  # Native compositor time; JS clock stays paused.
+            await page.evaluate('window.__alvoradaMotionQA.flush()')
+            await asyncio.sleep(.06)
+            state = await page.evaluate('window.__alvoradaMotionQA.sample()')
             dataset = await page.locator('[data-testid=alvorada-intro]').evaluate('(el)=>({...el.dataset})')
             check(dataset['visualEngine'] == 'webgl-canonical', 'Wrong visual engine at capture')
             check(dataset['motionMode'] == 'canonical', 'Wrong motion mode at capture')
@@ -200,6 +214,12 @@ async def matched_frames(browser, mobile, preference, base, output, name):
         await context.close()
 
 
+def check_globe_pixels(image, label):
+    width, height = image.size
+    center = image.crop((int(width*.35), int(height*.25), int(width*.65), int(height*.75)))
+    check(max(ImageStat.Stat(center).stddev) > 8, f'No textured Earth in the center: {label}')
+
+
 def compare_frames(left, right, output):
     results = []
     for a, b in zip(left, right):
@@ -212,6 +232,9 @@ def compare_frames(left, right, output):
         im1 = Image.open(output / a['image']).convert('RGB')
         im2 = Image.open(output / b['image']).convert('RGB')
         check(im1.size == im2.size, 'Card size changed with preference')
+        if a['label'].startswith(('T0', 'T1', 'T2')):
+            check_globe_pixels(im1, a['image'])
+            check_globe_pixels(im2, b['image'])
         check(max(ImageStat.Stat(im1).stddev) > 5, 'Empty image passed visual gate')
         diff = ImageChops.difference(im1, im2)
         mae = sum(ImageStat.Stat(diff).mean)/3
@@ -226,25 +249,32 @@ async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--base-url', default='http://127.0.0.1:4181/scripts/alvorada-motion-qa.html')
     parser.add_argument('--output', default='runtime-motion')
+    parser.add_argument('--project', choices=['chromium-desktop', 'chromium-mobile', 'webkit-desktop', 'webkit-mobile'])
     args = parser.parse_args()
     output = Path(args.output); output.mkdir(parents=True, exist_ok=True)
     results = []
     async def run(name, callback):
         try:
-            value = await callback()
+            value = await asyncio.wait_for(callback(), timeout=180)
             results.append({'case': name, 'status': 'passed'})
             print('PASS', name, flush=True)
             return value
         except Exception as error:
-            results.append({'case': name, 'status': 'failed', 'error': str(error)})
-            print('FAIL', name, str(error), flush=True)
+            results.append({'case': name, 'status': 'failed', 'error': str(error) or type(error).__name__})
+            print('FAIL', name, str(error) or type(error).__name__, flush=True)
+        finally:
+            (output / 'summary.json').write_text(json.dumps(results, indent=2))
     async with async_playwright() as pw:
         for browser_name in ['chromium', 'webkit']:
+            if args.project and not args.project.startswith(browser_name):
+                continue
             browser = await getattr(pw, browser_name).launch(headless=True,
                 args=['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] if browser_name == 'chromium' else [])
             results.append({'browser': browser_name, 'version': browser.version})
             for mobile in [False, True]:
                 device = f'{browser_name}-{"mobile" if mobile else "desktop"}'
+                if args.project and args.project != device:
+                    continue
                 cold = []; pairs = []
                 for pref in PREFS:
                     name = f'{device}-{pref}'
@@ -254,12 +284,15 @@ async def main():
                     async def compare():
                         comparison = compare_frames(*pairs, output)
                         (output / f'{device}-comparison.json').write_text(json.dumps(comparison,indent=2))
+                        check(all(cold), 'A cold lifecycle failed; see its artifact')
                         check(sequence(cold[0]['history']) == sequence(cold[1]['history']), 'Stage sequences differ')
                     await run(device+'-ON-OFF-equality', compare)
-                await run(device+'-toggle-live', lambda: lifecycle(browser,mobile,'no-preference',args.base_url,output,device+'-toggle-live',toggle=True))
-                await run(device+'-skip-reduce', lambda: lifecycle(browser,mobile,'reduce',args.base_url,output,device+'-skip-reduce',skip=True))
-            for pref in PREFS:
-                await run(browser_name+'-technical-'+pref, lambda: lifecycle(browser,False,pref,args.base_url,output,browser_name+'-technical-'+pref,technical=True))
+                for pref in PREFS:
+                    await run(device+'-toggle-from-'+pref, lambda: lifecycle(browser,mobile,pref,args.base_url,output,device+'-toggle-from-'+pref,toggle=True))
+                    await run(device+'-skip-'+pref, lambda: lifecycle(browser,mobile,pref,args.base_url,output,device+'-skip-'+pref,skip=True))
+            if not args.project or args.project.endswith('desktop'):
+                for pref in PREFS:
+                    await run(browser_name+'-technical-'+pref, lambda: lifecycle(browser,False,pref,args.base_url,output,browser_name+'-technical-'+pref,technical=True))
             await browser.close()
     (output / 'summary.json').write_text(json.dumps(results, indent=2))
     if any(x.get('status') == 'failed' for x in results):

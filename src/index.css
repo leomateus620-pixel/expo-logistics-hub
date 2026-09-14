@@ -3462,9 +3462,9 @@ input::placeholder, textarea::placeholder {
 @media (prefers-reduced-motion: reduce) {
   /* Alvorada alone retains its authored motion, including the embedded host.
      The rest of the application continues to honor the OS preference. */
-  *:not(.alvorada-overlay, .alvorada-overlay *, [data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"])),
-  *:not(.alvorada-overlay, .alvorada-overlay *, [data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"]))::before,
-  *:not(.alvorada-overlay, .alvorada-overlay *, [data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"]))::after {
+  *:not(.alvorada-overlay, .alvorada-overlay *, :where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"]))),
+  *:not(.alvorada-overlay, .alvorada-overlay *, :where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"])))::before,
+  *:not(.alvorada-overlay, .alvorada-overlay *, :where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"])))::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

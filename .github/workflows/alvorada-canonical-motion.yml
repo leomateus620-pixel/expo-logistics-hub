@@ -19,7 +19,11 @@ concurrency:
 jobs:
   canonical-motion:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium-desktop, chromium-mobile, webkit-desktop, webkit-mobile]
     env:
       VITE_SUPABASE_URL: https://qa.invalid
       VITE_SUPABASE_PUBLISHABLE_KEY: qa-placeholder
@@ -55,10 +59,10 @@ jobs:
         run: |
           python -m http.server 4181 --bind 127.0.0.1 --directory dist-alvorada-motion > runtime-motion/server.log 2>&1 &
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4181/scripts/alvorada-motion-qa.html > /dev/null && break; sleep 1; done
-          python scripts/alvorada-motion-qa.py
+          python scripts/alvorada-motion-qa.py --project ${{ matrix.project }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: alvorada-canonical-motion-${{ github.sha }}
+          name: alvorada-canonical-motion-${{ matrix.project }}-${{ github.sha }}
           path: runtime-motion/
           retention-days: 14
