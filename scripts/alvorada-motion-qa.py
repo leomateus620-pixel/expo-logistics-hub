@@ -175,6 +175,11 @@ async def matched_frames(browser, mobile, preference, base, output, name):
                 break
             await asyncio.sleep(.005)  # real asynchronous shader compilation
         check(ready, 'Canonical first frame never presented')
+        # Flush at the current virtual instant before deriving the epoch: the
+        # last RAF may have executed several milliseconds before run_for ends.
+        # A stale dataset paired with current performance.now shifts every frame.
+        await page.evaluate('window.__alvoradaMotionQA.flush()')
+        state = await page.evaluate('window.__alvoradaMotionQA.sample()')
         timeline_epoch = await page.evaluate('performance.now()') - float(state['canvas']['elapsed']) * 1000
         # Finish only the surrounding host reveal, outside the authored scene,
         # to isolate the pixel comparison from variable shader-compile latency.
@@ -187,9 +192,11 @@ async def matched_frames(browser, mobile, preference, base, output, name):
                 # a released canvas as 'target reached' captured different points
                 # in the brand fade even though the product timeline was equal.
                 authored = (await page.evaluate('performance.now()') - timeline_epoch) / 1000
-                if authored >= target - .001:
+                remaining_ms = target * 1000 - authored * 1000
+                if remaining_ms < .0001:
                     break
-                await page.clock.run_for(16)
+                # Do not overshoot the checkpoint by a partial RAF interval.
+                await page.clock.run_for(min(16, remaining_ms))
                 await page.evaluate(SYNC_CSS)
             await page.evaluate(SYNC_CSS)
             await page.evaluate('window.__alvoradaMotionQA.flush()')
@@ -201,6 +208,8 @@ async def matched_frames(browser, mobile, preference, base, output, name):
             check(dataset['visualEngine'] == 'webgl-canonical', 'Wrong visual engine at capture')
             check(dataset['motionMode'] == 'canonical', 'Wrong motion mode at capture')
             if state['canvas']:
+                check(abs(float(state['canvas']['elapsed']) - target) < .001,
+                      f'Capture missed authored checkpoint {label}: {state["canvas"]["elapsed"]}')
                 check(abs(float(state['canvas']['elapsed']) - float(state['canvas']['visualElapsed'])) < .001, 'Static sampler used')
             # JS clock is paused; screenshot does not fast-forward animations.
             clip = await page.locator('.fenasoja-portal__intro').bounding_box()
