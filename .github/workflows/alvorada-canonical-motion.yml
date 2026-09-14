@@ -19,7 +19,8 @@ concurrency:
 jobs:
   canonical-motion:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    # Twelve independent scene boots and GPU readbacks, not animation duration.
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
