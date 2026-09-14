@@ -1,0 +1,52 @@
+name: Stage exact visual clock
+on:
+  push:
+    branches: [chore/alvorada-motion-css-stage]
+    paths: ['.github/workflows/alvorada-frame-clock-stage.yml']
+permissions:
+  contents: write
+jobs:
+  stage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Stage exact reviewed QA text without changing refs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p frame-stage
+          python - <<'PY'
+          import base64, hashlib, json, os, pathlib, urllib.request
+          def api(path, data=None):
+              req=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+path, data=None if data is None else json.dumps(data).encode(), headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'})
+              with urllib.request.urlopen(req,timeout=60) as r:return json.load(r)
+          source=base64.b64decode(api('/git/blobs/f6db2b0fac85566d14e7ca28000a9401ed1de6bf')['content']).decode()
+          before="        timeline_epoch = await page.evaluate('performance.now()') - float(state['canvas']['elapsed']) * 1000"
+          after="""        # Flush at the current virtual instant before deriving the epoch: the
+                  # last RAF may have executed several milliseconds before run_for ends.
+                  # A stale dataset paired with current performance.now shifts every frame.
+                  await page.evaluate('window.__alvoradaMotionQA.flush()')
+                  state = await page.evaluate('window.__alvoradaMotionQA.sample()')
+                  timeline_epoch = await page.evaluate('performance.now()') - float(state['canvas']['elapsed']) * 1000"""
+          after='\n'.join(line[8:] if i else line for i,line in enumerate(after.splitlines()))
+          assert source.count(before)==1;source=source.replace(before,after)
+          before="                if authored >= target - .001:\n                    break\n                await page.clock.run_for(16)"
+          after="                remaining_ms = target * 1000 - authored * 1000\n                if remaining_ms < .0001:\n                    break\n                # Do not overshoot the checkpoint by a partial RAF interval.\n                await page.clock.run_for(min(16, remaining_ms))"
+          assert source.count(before)==1;source=source.replace(before,after)
+          before="            if state['canvas']:\n                check(abs"
+          after="            if state['canvas']:\n                check(abs(float(state['canvas']['elapsed']) - target) < .001,\n                      f'Capture missed authored checkpoint {label}: {state[\"canvas\"][\"elapsed\"]}')\n                check(abs"
+          assert source.count(before)==1;source=source.replace(before,after)
+          data=source.encode();expected='8aff8d71e13b16124722f9ec4f9c395f5c48e5c0'
+          actual=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+          assert actual==expected,(actual,expected)
+          compile(source,'alvorada-motion-qa.py','exec')
+          sha=api('/git/blobs',{'content':base64.b64encode(data).decode(),'encoding':'base64'})['sha']
+          pathlib.Path('frame-stage/result.json').write_text(json.dumps({'path':'scripts/alvorada-motion-qa.py','sha':sha,'refsChanged':False},indent=2))
+          print(sha)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: alvorada-frame-clock
+          path: frame-stage/
+          retention-days: 7
