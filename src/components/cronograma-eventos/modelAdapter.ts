@@ -9,6 +9,7 @@ import {
   type CronogramaEvent as SourceCronogramaEvent,
 } from '@/lib/cronograma-eventos';
 import { deriveOperationalStatus, getTodayKey } from '@/lib/cronograma-timeline';
+import { classifyEvent, normalizeLegacyCategory } from '@/lib/cronograma-classification';
 import { categoryLabels } from './cronogramaData';
 import type {
   CronogramaCategory,
@@ -98,6 +99,19 @@ function normalizeYear(year: number): 2026 | 2027 | 2028 {
 }
 
 function getVisualCategory(event: SourceCronogramaEvent): CronogramaCategory {
+  /** Persisted canonical value always wins over any inference. */
+  const persisted = normalizeLegacyCategory(event.categoryKey) ?? normalizeLegacyCategory(event.category);
+  if (persisted) return persisted;
+
+  const classified = classifyEvent({
+    title: event.title,
+    summary: event.description,
+    commissions: [event.commissionSlug, event.commissionName],
+    owner: event.responsibleName,
+    location: event.location,
+  });
+  if (!classified.category.source.includes('fallback')) return classified.category.value;
+
   const haystack = [
     event.category,
     event.eventType,
@@ -275,7 +289,8 @@ export function visualEventToSourceUpdates(
   return {
     title: event.title,
     description: event.summary,
-    category: event.sourceCategory || categoryLabels[event.category],
+    category: categoryLabels[event.category],
+    categoryKey: event.category,
     eventType: visualToSourceKind[event.kind],
     sourceYear: normalizeYear(event.date ? Number(event.date.slice(0, 4)) : event.year),
     startDate: event.date,
@@ -306,7 +321,8 @@ export function visualEventToDraft(event: CronogramaEvent): CronogramaEventDraft
     sourceKey: event.sourceKey,
     title: event.title,
     description: event.summary,
-    category: event.sourceCategory || categoryLabels[event.category],
+    category: categoryLabels[event.category],
+    categoryKey: event.category,
     eventType: visualToSourceKind[event.kind],
     sourceYear: normalizeYear(event.date ? Number(event.date.slice(0, 4)) : event.year),
     startDate: event.date,

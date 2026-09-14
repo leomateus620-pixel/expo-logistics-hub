@@ -27,6 +27,8 @@ import {
   useCronogramaRelationOptions,
 } from './useCronogramaRelationOptions';
 import { categoryLabels, priorityLabels, statusLabels } from './cronogramaData';
+import { CRONOGRAMA_KIND_HINTS, CRONOGRAMA_KIND_LABELS } from '@/lib/cronograma-classification';
+import { useEventClassification } from '@/lib/cronograma-classification/useEventClassification';
 import { CronogramaSubeventForm } from './CronogramaSubeventForm';
 import { RelationalMultiSelect, type RelationalSelection } from './RelationalMultiSelect';
 import type {
@@ -40,13 +42,7 @@ import type {
   CronogramaSubevent,
 } from './types';
 
-const kindLabels: Record<CronogramaKind, string> = {
-  milestone: 'Marco',
-  event: 'Evento',
-  meeting: 'Reunião',
-  deadline: 'Prazo',
-  decision: 'Decisão',
-};
+const kindLabels = CRONOGRAMA_KIND_LABELS;
 
 const editableStatusLabels: Partial<Record<CronogramaStatus, string>> = {
   planned: statusLabels.planned,
@@ -234,6 +230,23 @@ export function EventForm({
     setForm((current) => ({ ...current, [key]: value }));
   };
 
+  /** Signals feeding the automatic classification (Categoria e Tipo). */
+  const classificationInput = useMemo(() => ({
+    title: form.title,
+    summary: form.summary,
+    description: form.pendingReason ?? '',
+    commissions: (form.commissionsRel ?? []).map((link) => link.commissionName || link.commissionSlug || ''),
+    people: (form.responsiblesRel ?? []).map((link) => link.name || ''),
+    owner: form.owner ?? '',
+    location: form.location ?? '',
+  }), [form.commissionsRel, form.location, form.owner, form.pendingReason, form.responsiblesRel, form.summary, form.title]);
+
+  const classification = useEventClassification({
+    input: classificationInput,
+    enabled: !event,
+    onSuggest: (patch) => setForm((current) => ({ ...current, ...patch })),
+  });
+
   const commissionSelections = useMemo(
     () => commissionLinksToSelections(form.commissionsRel),
     [form.commissionsRel],
@@ -395,8 +408,13 @@ export function EventForm({
             label="Categoria"
             mobile={presentation === 'mobile'}
             value={form.category}
-            onChange={(value) => update('category', value as CronogramaCategory)}
+            onChange={(value) => {
+              classification.markCategoryManual();
+              update('category', value as CronogramaCategory);
+            }}
             items={categoryLabels}
+            auto={classification.categoryAuto && Boolean(classification.suggestion)}
+            onResumeAuto={classification.categoryAuto ? undefined : classification.resumeCategoryAuto}
           />
           <SelectField
             label="Status"
@@ -416,10 +434,26 @@ export function EventForm({
             label="Tipo"
             mobile={presentation === 'mobile'}
             value={form.kind}
-            onChange={(value) => update('kind', value as CronogramaKind)}
+            onChange={(value) => {
+              classification.markKindManual();
+              update('kind', value as CronogramaKind);
+            }}
             items={kindLabels}
+            itemHints={CRONOGRAMA_KIND_HINTS}
+            info={`Marco: ${CRONOGRAMA_KIND_HINTS.milestone}`}
+            auto={classification.kindAuto && Boolean(classification.suggestion)}
+            onResumeAuto={classification.kindAuto ? undefined : classification.resumeKindAuto}
           />
         </div>
+        {event && (
+          <button
+            type="button"
+            onClick={classification.applySuggestion}
+            className="mt-3 text-xs font-semibold text-primary underline-offset-4 hover:underline"
+          >
+            ✦ Atualizar classificação automaticamente
+          </button>
+        )}
       </div>
 
       <div className="cronograma-form-section">
@@ -671,34 +705,75 @@ function SelectField<T extends string>({
   onChange,
   items,
   mobile = false,
+  itemHints,
+  info,
+  auto = false,
+  onResumeAuto,
 }: {
   label: string;
   value: T;
   onChange: (value: string) => void;
   items: Record<string, string | undefined>;
   mobile?: boolean;
+  itemHints?: Record<string, string>;
+  info?: string;
+  auto?: boolean;
+  onResumeAuto?: () => void;
 }) {
   return (
     <div className="space-y-1.5">
-      <Label>{label}</Label>
+      <div className="flex min-h-[1.25rem] items-center gap-1.5">
+        <Label>{label}</Label>
+        {info && (
+          <span
+            role="img"
+            aria-label={info}
+            title={info}
+            tabIndex={0}
+            className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-primary/40 text-[10px] font-bold text-primary"
+          >
+            i
+          </span>
+        )}
+      </div>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger aria-label={label} className="rounded-2xl border-white/60 bg-white/72">
           <SelectValue />
         </SelectTrigger>
         <SelectContent
           className={mobile
-            ? 'cronograma-event-select-content z-[95] max-h-[min(22rem,70dvh)] rounded-2xl bg-white/95'
+            ? 'cronograma-event-select-content z-[95] max-h-[min(22rem,60dvh)] rounded-2xl bg-white/95'
             : 'rounded-2xl bg-white/95'}
+          position="popper"
+          sideOffset={6}
+          collisionPadding={12}
         >
           {Object.entries(items)
             .filter(([, itemLabel]) => Boolean(itemLabel))
             .map(([itemValue, itemLabel]) => (
               <SelectItem key={itemValue} value={itemValue} className="rounded-xl">
-                {itemLabel}
+                <span className="block">{itemLabel}</span>
+                {itemHints?.[itemValue] && (
+                  <span className="mt-0.5 block max-w-[15rem] text-[11px] leading-snug text-muted-foreground">
+                    {itemHints[itemValue]}
+                  </span>
+                )}
               </SelectItem>
             ))}
         </SelectContent>
       </Select>
+      {auto && (
+        <p className="text-[11px] font-medium text-primary/80">✦ Sugestão automática</p>
+      )}
+      {onResumeAuto && (
+        <button
+          type="button"
+          onClick={onResumeAuto}
+          className="text-[11px] font-semibold text-primary underline-offset-4 hover:underline"
+        >
+          Usar sugestão automática
+        </button>
+      )}
     </div>
   );
 }
