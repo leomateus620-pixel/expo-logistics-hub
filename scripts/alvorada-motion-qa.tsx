@@ -39,7 +39,37 @@ function Fixture() {
       if (state) { state.advance(performance.now(), true); state.gl.getContext().finish(); }
     },
     // QA only: read the REAL R3F camera; never replace it or control the timeline.
-    sample: () => {
+    // A paused non-preserving WebGL canvas can be empty in WebKit page snapshots.
+  // Capture the REAL composer output synchronously after its normal render loop
+  // and hold only that raster while Playwright composites the DOM screenshot.
+  // Never used in production or in the native/cold/live-toggle lifecycle tests.
+  // https://threejs.org/manual/en/tips.html#taking-a-screenshot-of-the-canvas
+  captureDrawingBuffer: async () => {
+    const canvas = document.querySelector('canvas');
+    const state = canvas ? _roots.get(canvas)?.store.getState() : undefined;
+    if (!canvas || !state) return null;
+    const style = getComputedStyle(canvas);
+    if (style.display === 'none' || style.visibility !== 'visible') {
+      throw new Error('Canonical canvas is hidden during visual capture');
+    }
+    state.advance(performance.now(), true);
+    state.gl.getContext().finish();
+    // Must stay in the same JS task as rendering; no changed renderer settings.
+    const dataUrl = canvas.toDataURL('image/png');
+    const image = new Image();
+    image.dataset.qaDrawingBuffer = 'true';
+    image.alt = '';
+    Object.assign(image.style, {
+      position: 'absolute', inset: '0', width: '100%', height: '100%',
+      pointerEvents: 'none', opacity: style.opacity, transform: style.transform,
+      filter: style.filter,
+    });
+    image.src = dataUrl;
+    await image.decode();
+    canvas.parentElement?.appendChild(image);
+    return dataUrl;
+  },
+  sample: () => {
       const canvas = document.querySelector('canvas');
       const state = canvas ? _roots.get(canvas)?.store.getState() : undefined;
       const camera = state?.camera;

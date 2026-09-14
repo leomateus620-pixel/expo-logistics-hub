@@ -5,6 +5,7 @@ frames with Playwright's clock. Browser contexts emulate media/viewport, NOT
 physical iPhones, Windows drivers or the authenticated Portal workload.
 """
 import argparse
+import base64
 import asyncio
 import json
 import time
@@ -203,6 +204,7 @@ async def matched_frames(browser, mobile, preference, base, output, name):
             await asyncio.sleep(.06)  # Native compositor time; JS clock stays paused.
             await page.evaluate('window.__alvoradaMotionQA.flush()')
             await asyncio.sleep(.06)
+            drawing_buffer = await page.evaluate('window.__alvoradaMotionQA.captureDrawingBuffer()')
             state = await page.evaluate('window.__alvoradaMotionQA.sample()')
             dataset = await page.locator('[data-testid=alvorada-intro]').evaluate('(el)=>({...el.dataset})')
             check(dataset['visualEngine'] == 'webgl-canonical', 'Wrong visual engine at capture')
@@ -214,9 +216,18 @@ async def matched_frames(browser, mobile, preference, base, output, name):
             # JS clock is paused; screenshot does not fast-forward animations.
             clip = await page.locator('.fenasoja-portal__intro').bounding_box()
             filename = f'{name}-{label}.png'
-            await page.screenshot(path=str(output / filename), clip=clip, animations='allow')
+            # Native cold captures above remain untouched. These matched-time
+            # stills hold the actual GPU pixels until the DOM compositor reads
+            # them; otherwise WebKit can capture a cleared drawing buffer.
+            if drawing_buffer:
+                (output / f'{name}-{label}-gpu.png').write_bytes(base64.b64decode(drawing_buffer.split(',', 1)[1]))
+            try:
+                await page.screenshot(path=str(output / filename), clip=clip, animations='allow')
+            finally:
+                await page.locator('[data-qa-drawing-buffer]').evaluate_all('(elements)=>elements.forEach(el=>el.remove())')
             frames.append({'label': label, 'target': target, 'state': state, 'dataset': dataset,
-                           'styles': await page.evaluate(STYLE_SAMPLE), 'image': filename})
+                           'styles': await page.evaluate(STYLE_SAMPLE), 'image': filename,
+                           'capture': 'actual-gpu-buffer-plus-dom' if drawing_buffer else 'native-dom'})
         (output / f'{name}-frames.json').write_text(json.dumps(frames, indent=2))
         return frames
     finally:
