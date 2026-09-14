@@ -10,7 +10,6 @@ import {
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { AlvoradaQualityProfile } from './capabilities';
-import { sampleReducedAlvorada } from './reducedMotion';
 import { CinematicCamera } from './CinematicCamera';
 import {
   AlvoradaReadinessContext,
@@ -37,7 +36,6 @@ import type { AlvoradaPreparationEvent } from './types';
 interface SceneControllerProps {
   initialElapsed: number;
   paused?: boolean;
-  reducedMotion?: boolean;
   onPreparation?: (event: AlvoradaPreparationEvent) => void;
   onProgress: (elapsed: number) => void;
   onReady: () => void;
@@ -57,10 +55,9 @@ interface SceneControllerProps {
 function MasterTimeline({
   initialElapsed,
   paused = false,
-  reducedMotion = false,
   onProgress,
   onReady,
-}: Pick<SceneControllerProps, 'initialElapsed' | 'paused' | 'reducedMotion' | 'onProgress' | 'onReady'>) {
+}: Pick<SceneControllerProps, 'initialElapsed' | 'paused' | 'onProgress' | 'onReady'>) {
   const timeline = useAlvoradaTimeline();
   const readiness = useAlvoradaReadiness();
   const { gl, scene, camera } = useThree();
@@ -165,13 +162,11 @@ function MasterTimeline({
     ambientElapsed.current = step.elapsed;
     const elapsed = Math.min(ALVORADA_SEQUENCE_DURATION, ambientElapsed.current);
 
-    const sample = reducedMotion ? sampleReducedAlvorada(elapsed) : null;
-    gl.domElement.style.opacity = String(sample?.opacity ?? 1);
-    timeline.current.ambientElapsed = sample?.visualElapsed ?? ambientElapsed.current;
+    timeline.current.ambientElapsed = ambientElapsed.current;
     timeline.current.delta = step.delta;
-    timeline.current.elapsed = sample?.visualElapsed ?? elapsed;
+    timeline.current.elapsed = elapsed;
     timeline.current.progress = elapsed / ALVORADA_SEQUENCE_DURATION;
-    timeline.current.phase = getAlvoradaPhase(sample?.visualElapsed ?? ambientElapsed.current);
+    timeline.current.phase = getAlvoradaPhase(ambientElapsed.current);
     gl.domElement.dataset.visualElapsed = timeline.current.elapsed.toFixed(3);
     const visualState = deriveAlvoradaVisualState(elapsed);
 
@@ -267,7 +262,6 @@ function SceneAtmosphere() {
 export function SceneController({
   initialElapsed,
   paused = false,
-  reducedMotion = false,
   onPreparation,
   onProgress,
   onReady,
@@ -298,7 +292,6 @@ export function SceneController({
         <MasterTimeline
           initialElapsed={initialElapsed}
           paused={paused}
-          reducedMotion={reducedMotion}
           onProgress={onProgress}
           onReady={onReady}
         />

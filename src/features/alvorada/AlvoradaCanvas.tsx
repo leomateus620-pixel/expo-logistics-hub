@@ -11,7 +11,6 @@ import type { AlvoradaPreparationEvent, AlvoradaWebGLTier } from './types';
 interface AlvoradaCanvasProps {
   initialElapsed: number;
   paused?: boolean;
-  reducedMotion?: boolean;
   onContextLost: (elapsed: number) => void;
   /** Preparation milestones for the host watchdog and telemetry. */
   onPreparation?: (event: AlvoradaPreparationEvent) => void;
@@ -97,7 +96,6 @@ function CanvasRuntimeGuard({
 export function AlvoradaCanvas({
   initialElapsed,
   paused = false,
-  reducedMotion = false,
   onContextLost,
   onPreparation,
   onProgress,
@@ -176,7 +174,6 @@ export function AlvoradaCanvas({
       <SceneController
         initialElapsed={initialElapsed}
         paused={paused}
-        reducedMotion={reducedMotion}
         onPreparation={report}
         onProgress={handleProgress}
         onReady={handleReady}

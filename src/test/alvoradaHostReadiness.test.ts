@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { observeAlvoradaHost } from '@/features/alvorada/hostReadiness';
-import { sampleReducedAlvorada } from '@/features/alvorada/reducedMotion';
 
 describe('Portal host readiness (no GPU assumptions)', () => {
   let element: HTMLDivElement;
@@ -47,14 +46,5 @@ describe('Portal host readiness (no GPU assumptions)', () => {
     const stop = observeAlvoradaHost(element, frames, ready); stop(); resize();
     vi.advanceTimersByTime(100);
     expect(frames).not.toHaveBeenCalled(); expect(ready).not.toHaveBeenCalled();
-  });
-  it('reduced motion samples canonical orbit/geography/dawn without camera travel', () => {
-    expect(sampleReducedAlvorada(0).visualElapsed).toBe(0);
-    expect(sampleReducedAlvorada(1).visualElapsed).toBe(0);
-    expect(sampleReducedAlvorada(2).visualElapsed).toBe(2.4);
-    expect(sampleReducedAlvorada(4).visualElapsed).toBe(4.2);
-    expect(sampleReducedAlvorada(6).visualElapsed).toBe(7.4);
-    expect(sampleReducedAlvorada(1.6).opacity).toBe(0);
-    expect(sampleReducedAlvorada(1.9).opacity).toBe(1);
   });
 });

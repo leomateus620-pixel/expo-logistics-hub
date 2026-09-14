@@ -12,7 +12,7 @@ import { createAlvoradaIntroTelemetry } from '@/features/alvorada/introTelemetry
 import { AlvoradaDiagnostics } from '@/features/alvorada/AlvoradaDiagnostics';
 import { SkipForward } from 'lucide-react';
 import { OfficialCountdownCompact } from '@/components/countdown/OfficialCountdownCompact';
-import type { AlvoradaIntroMotion } from '@/features/alvorada/AlvoradaIntro';
+import { ALVORADA_MOTION_MODE } from '@/features/alvorada/motionPolicy';
 import { AlvoradaPreparingSurface } from '@/features/alvorada/AlvoradaPreparingSurface';
 import { warmAlvoradaAssets } from '@/features/alvorada/capabilities';
 import {
@@ -37,19 +37,12 @@ type IntroPresentation = 'waiting' | 'playing' | 'leaving' | 'done';
 
 const INTRO_VISIBILITY_THRESHOLD = 0.35;
 
-function prefersReducedMotion() {
-  return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-}
-
 export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
   const heroRef = useRef<HTMLElement>(null);
   const [presentation, setPresentation] = useState<IntroPresentation>(() => (
     shouldAutoplayAlvoradaIntro() ? 'waiting' : 'done'
   ));
   const [introStage, setIntroStage] = useState<AlvoradaIntroStage>('preparing');
-  const [motion] = useState<AlvoradaIntroMotion>(() => (
-    prefersReducedMotion() ? 'reduced' : 'cinematic'
-  ));
   const presentationRef = useRef<IntroPresentation>(presentation);
   const leaveTimer = useRef<number | null>(null);
   const introActive = presentation === 'waiting' || presentation === 'playing';
@@ -141,6 +134,7 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
         <div
           className="fenasoja-portal__intro"
           data-testid="portal-alvorada-intro"
+          data-alvorada-motion={ALVORADA_MOTION_MODE}
           data-presentation={presentation}
           role="group"
           aria-label="Introdução: a Alvorada de Santa Rosa e a marca FENASOJA 2028"
@@ -152,7 +146,6 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
               <AlvoradaErrorBoundary fallback={<AlvoradaPreparingSurface />} onError={handleChunkError}>
               <Suspense fallback={<AlvoradaPreparingSurface />}>
                 <AlvoradaIntro
-                  motion={motion}
                   onFinished={finishIntro}
                   onStageChange={setIntroStage}
                 />
