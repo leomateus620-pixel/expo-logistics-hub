@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render as renderReact, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AlvoradaIntro } from '@/features/alvorada/AlvoradaIntro';
 import {
@@ -15,6 +15,7 @@ import type { AlvoradaPreparationEvent } from '@/features/alvorada/types';
 
 interface MockCanvasProps {
   initialElapsed: number;
+  reducedMotion?: boolean;
   onContextLost: (elapsed: number) => void;
   onPreparation?: (event: AlvoradaPreparationEvent) => void;
   onProgress: (elapsed: number) => void;
@@ -100,6 +101,13 @@ vi.mock('@/features/alvorada/AlvoradaCanvas', async () => {
   };
 });
 
+// jsdom has no layout. Model two real, positive layout frames explicitly.
+function render(ui: Parameters<typeof renderReact>[0]) {
+  const result = renderReact(ui);
+  advance(32);
+  return result;
+}
+
 function currentCanvas() {
   const current = runtime.canvasMounts.at(-1);
   if (!current) throw new Error('Canvas Alvorada não montou no teste.');
@@ -176,6 +184,9 @@ const NARRATIVE_TO_ALVORADA_MS = ALVORADA_FALLBACK_NARRATIVE.globeMs
 describe('ciclo de vida da introdução Alvorada embutida', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
+      width: 1000, height: 420, x: 0, y: 0, top: 0, left: 0, right: 1000, bottom: 420, toJSON: () => ({}),
+    });
     runtime.canvasMounts = [];
     runtime.canvasUnmounts = [];
     runtime.nextCanvasId = 0;
@@ -334,37 +345,24 @@ describe('ciclo de vida da introdução Alvorada embutida', () => {
   });
 
   describe('narrativa 2D quando não há renderizador WebGL utilizável', () => {
-    it('movimento reduzido: percorre planeta → aproximação → alvorada em crossfade, sem WebGL', () => {
+    it('movimento reduzido conserva a Terra canônica sem trocar o renderizador por CSS', () => {
       const onFinished = vi.fn();
       const stages: AlvoradaIntroStage[] = [];
       render(<AlvoradaIntro motion="reduced" onFinished={onFinished} onStageChange={(stage) => stages.push(stage)} />);
       const intro = screen.getByTestId('alvorada-intro');
-
-      expect(screen.queryByTestId('mock-alvorada-canvas')).not.toBeInTheDocument();
-      expect(runtime.canvasMounts).toHaveLength(0);
-      expect(runtime.warmCalls).toBe(0);
-      expect(intro).toHaveAttribute('data-renderer', 'fallback');
-      expect(intro).toHaveAttribute('data-static-reason', 'reduced-motion');
+      expect(currentCanvas().props.reducedMotion).toBe(true);
+      expect(runtime.canvasMounts).toHaveLength(1);
+      expect(intro).toHaveAttribute('data-visual-engine', 'webgl-canonical');
+      expect(intro).not.toHaveAttribute('data-static-reason');
       expect(intro).toHaveAttribute('data-motion', 'reduced');
-      expect(intro).toHaveAttribute('data-stage', 'globe');
-      expect(screen.getByTestId('alvorada-narrative-fallback')).toHaveAttribute('data-reduced', 'true');
-      expect(document.querySelector('.alvorada-brand-hero--visible')).toBeNull();
-
-      advance(ALVORADA_FALLBACK_NARRATIVE.globeMs);
-      expect(intro).toHaveAttribute('data-stage', 'approach');
-      expect(document.querySelector('.alvorada-harvest')).toHaveAttribute('data-stage', 'territory');
-      advance(ALVORADA_FALLBACK_NARRATIVE.approachMs);
-      expect(intro).toHaveAttribute('data-stage', 'approach');
-      expect(document.querySelector('.alvorada-harvest')).toHaveAttribute('data-stage', 'santa-rosa');
-      advance(ALVORADA_FALLBACK_NARRATIVE.santaRosaMs);
-      expect(intro).toHaveAttribute('data-stage', 'alvorada');
-      expect(screen.getByRole('img', { name: /^Fenasoja 2028$/, hidden: true })).toBeVisible();
-
+      expect(screen.queryByTestId('alvorada-narrative-fallback')).toBeNull();
+      act(() => currentCanvas().props.onReady());
+      act(() => currentCanvas().props.onProgress(ALVORADA_PHASES.territory.start));
+      act(() => currentCanvas().props.onProgress(ALVORADA_PHASES['brand-reveal'].start));
       advance(ALVORADA_INTRO_BRAND_HOLD_MS);
-      expect(onFinished).not.toHaveBeenCalled();
-      advance(700);
       expect(onFinished).toHaveBeenCalledTimes(1);
       expect(stages).toEqual(['globe', 'approach', 'alvorada', 'finished']);
+      expect(telemetryEvents()).not.toContain('fallback-triggered');
     });
 
     it('WebGL indisponível: mesma narrativa com motivo explícito', () => {
@@ -424,6 +422,10 @@ describe('ciclo de vida da introdução Alvorada embutida', () => {
       expect(intro).toHaveAttribute('data-stage', 'approach');
 
       act(() => canvas.props.onContextLost(ALVORADA_PHASES.territory.start + 1));
+      expect(intro).toHaveAttribute('data-renderer', 'webgl');
+      expect(runtime.canvasUnmounts).toHaveLength(0);
+      expect(telemetryEvents()).toContain('recovery-start');
+      advance(3000);
 
       expect(intro).toHaveAttribute('data-renderer', 'fallback');
       expect(intro).toHaveAttribute('data-static-reason', 'context-lost');
@@ -653,6 +655,7 @@ describe('ciclo de vida da introdução Alvorada embutida', () => {
         width: 360, height: 420, top: 0, left: 0, right: 360, bottom: 420, x: 0, y: 0, toJSON: () => ({}),
       });
       act(() => runtime.resizeObservers.forEach((callback) => callback([])));
+      advance(32);
 
       expect(intro).toHaveAttribute('data-frame', 'portrait');
       expect(intro).toHaveAttribute('data-stage', 'preparing');
@@ -741,6 +744,40 @@ describe('ciclo de vida da introdução Alvorada embutida', () => {
     expect(onFinished).not.toHaveBeenCalled();
     advance(1);
     expect(onFinished).toHaveBeenCalledTimes(1);
+  });
+
+  it('caixa zero não consome o watchdog nem monta o Canvas antes de duas medidas válidas', () => {
+    const measurement = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect');
+    measurement.mockReturnValue({ width: 0, height: 0 } as DOMRect);
+    render(<AlvoradaIntro onFinished={vi.fn()} />);
+    advance(31_000);
+    expect(runtime.canvasMounts).toHaveLength(0);
+    expect(screen.getByTestId('alvorada-intro')).toHaveAttribute('data-stage', 'preparing');
+    expect(telemetryEvents()).not.toContain('fallback-triggered');
+    measurement.mockReturnValue({ width: 390, height: 420 } as DOMRect);
+    act(() => window.dispatchEvent(new Event('resize')));
+    advance(16);
+    expect(runtime.canvasMounts).toHaveLength(0);
+    advance(16);
+    expect(runtime.canvasMounts).toHaveLength(1);
+    expect(currentCanvas().props.initialElapsed).toBe(0);
+  });
+
+  it('restaura o contexto existente sem reiniciar o relógio ou selecionar CSS', () => {
+    render(<AlvoradaIntro onFinished={vi.fn()} />);
+    const canvas = currentCanvas();
+    act(() => canvas.props.onReady());
+    act(() => canvas.props.onProgress(2.6));
+    act(() => canvas.props.onContextLost(2.6));
+    advance(800);
+    report({ kind: 'context-restored' });
+    advance(3000);
+    act(() => canvas.props.onProgress(2.7));
+    expect(runtime.canvasMounts).toHaveLength(1);
+    expect(runtime.canvasUnmounts).toHaveLength(0);
+    expect(screen.getByTestId('alvorada-intro')).toHaveAttribute('data-stage', 'approach');
+    expect(telemetryEvents()).toContain('recovery-complete');
+    expect(telemetryEvents()).not.toContain('fallback-triggered');
   });
 
   it('não captura gestos: a camada é decorativa e não recebe ponteiro', () => {

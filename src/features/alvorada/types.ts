@@ -20,7 +20,10 @@ export type AlvoradaPreparationEventKind =
   | 'critical-assets-ready'
   | 'shader-compile-start'
   | 'shader-compile-end'
-  | 'first-frame';
+  | 'first-frame'
+  | 'canonical-globe-presented'
+  | 'context-restored'
+  | 'render-error';
 
 export interface AlvoradaPreparationEvent {
   detail?: Record<string, unknown>;

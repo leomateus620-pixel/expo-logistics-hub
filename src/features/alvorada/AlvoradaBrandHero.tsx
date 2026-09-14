@@ -1,3 +1,4 @@
+import { versionAlvoradaAsset } from './assetVersion';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 
 type BrandStage =
@@ -30,7 +31,7 @@ export function AlvoradaBrandHero({ dataPending, stage }: AlvoradaBrandHeroProps
       <FenasojaBrand
         className="alvorada-brand-hero__brand"
         scale="display"
-        markSrc="/alvorada/fenasoja-symbol-official.png"
+        markSrc={versionAlvoradaAsset('/alvorada/fenasoja-symbol-official.png')}
         editionLabel={false}
         tone="dark"
       />

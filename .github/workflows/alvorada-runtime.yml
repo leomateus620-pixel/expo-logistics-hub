@@ -1,0 +1,61 @@
+name: Alvorada runtime
+on:
+  push:
+    branches: [fix/alvorada-canonical-portal-runtime]
+  pull_request:
+    paths: ['src/features/alvorada/**', 'src/components/portal/**', 'src/styles/commission-portal.css', 'src/test/alvorada*', 'scripts/alvorada*', '.github/workflows/alvorada-runtime.yml']
+permissions:
+  contents: read
+concurrency:
+  group: alvorada-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  browser-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.0'
+      - run: bun install --frozen-lockfile
+      - name: Historical evidence
+        run: |
+          mkdir -p runtime-audit
+          git fetch --no-tags --depth=1 origin c45c7c2397ee0af92a75cedeca903245debdfe84 9abda2f2c799c133d5a430a988710b1e3a6ac5d4 831dcc69f24a68ad57ab1cd2a751323fbcf4d792
+          git diff 831dcc69f24a68ad57ab1cd2a751323fbcf4d792 9abda2f2c799c133d5a430a988710b1e3a6ac5d4 -- src/features/alvorada src/components/portal src/styles/commission-portal.css > runtime-audit/after-147.diff
+          git archive c45c7c2397ee0af92a75cedeca903245debdfe84 src/features/alvorada src/components/portal src/styles scripts vite.config.ts package.json > runtime-audit/old-host.tar
+          git rev-parse HEAD > runtime-audit/commit.txt
+      - name: Unit tests
+        run: npx vitest run src/test/alvorada --reporter=json --outputFile=runtime-audit/unit-tests.json
+      - name: Production build
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee runtime-audit/build.log
+      - name: Install browsers
+        run: |
+          python -m pip install playwright==1.57.0
+          python -m playwright install --with-deps chromium webkit
+      - name: Differential browser audit
+        run: |
+          npx vite --host 127.0.0.1 --port 4180 --mode qa > runtime-audit/vite.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4180/scripts/alvorada-host-qa.html > /dev/null && break; sleep 1; done
+          python scripts/alvorada-runtime-qa.py
+      - name: Public delivery headers (no credentials)
+        if: always()
+        run: |
+          for path in / /sw.js /alvorada/earth-surface-2048.webp /alvorada/earth-surface-4096.webp /alvorada/earth-night-lights-2048.png /alvorada/earth-normal-2048.jpg /alvorada/earth-clouds-2048.webp /alvorada/brazil-min.geojson /alvorada/rio-grande-do-sul-min.geojson /alvorada/soy-harvest-dawn.webp /alvorada/soy-harvest-dawn-mobile.webp; do
+            printf '\n%s\n' "$path" >> runtime-audit/delivery.txt
+            curl -sS --max-time 20 -I "https://fenasojagestao.com$path" | grep -iE '^HTTP|^content-type:|^content-length:|^cache-control:|^etag:|^last-modified:|^server:|^age:|^vary:' >> runtime-audit/delivery.txt || true
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: alvorada-runtime-${{ github.sha }}
+          path: runtime-audit/
+          retention-days: 7

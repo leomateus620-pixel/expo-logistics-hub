@@ -1,3 +1,4 @@
+import { retryFailedAlvoradaAsset } from '../alvoradaAssets';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Stars } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
@@ -175,7 +176,12 @@ export function EarthScene({ quality }: { quality: AlvoradaQualityProfile }) {
     // The base albedo is the only map the globe cannot appear without: it
     // gates the clock. Night lights, relief, clouds and the desktop detail
     // albedo fade in whenever they arrive.
-    loadAlvoradaTexture(dayUrl).then((texture) => {
+    loadAlvoradaTexture(dayUrl).catch((error: unknown) => {
+      if (!active) throw error;
+      // Retry the critical base once; optional layer failures remain local.
+      retryFailedAlvoradaAsset(dayUrl);
+      return loadAlvoradaTexture(dayUrl);
+    }).then((texture) => {
       if (!active) return;
       earthUniforms.dayMap.value = configure(texture, true);
       readiness.current.report({ kind: 'critical-assets-ready', detail: { url: dayUrl } });
@@ -251,7 +257,17 @@ export function EarthScene({ quality }: { quality: AlvoradaQualityProfile }) {
   const segments = quality.mobile ? 80 : 112;
   return (
     <group ref={root} name="AlvoradaEarth">
-      <mesh>
+      <mesh name="AlvoradaCanonicalSurface" onAfterRender={() => {
+        if (readiness.current.canonicalGlobeRendered || !readiness.current.criticalAssetsReady
+          || gl.getContext().isContextLost() || gl.info.render.calls === 0
+          || gl.domElement.width < 2 || gl.domElement.height < 2
+          || earthUniforms.dayMap.value === placeholders.day) return;
+        readiness.current.canonicalGlobeRendered = true;
+        readiness.current.report({ kind: 'canonical-globe-presented', detail: {
+          elapsed: timeline.current.elapsed, surface: textures.surface,
+          decoder: earthUniforms.dayMap.value.userData.alvoradaDecoder,
+        } });
+      }}>
         <sphereGeometry args={[EARTH_RADIUS, segments, Math.round(segments * 0.66)]} />
         <shaderMaterial fragmentShader={earthFragmentShader} vertexShader={earthVertexShader}
           uniforms={earthUniforms} transparent />

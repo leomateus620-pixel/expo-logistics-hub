@@ -1,3 +1,4 @@
+import { versionAlvoradaAsset } from './assetVersion';
 import { getEarthTextureSet, getEarthTextureUrls } from './earthAssets';
 
 /**
@@ -32,6 +33,9 @@ interface AssetEntry {
   loadedBytes: number;
   settled: boolean;
   totalBytes: number;
+  status?: number;
+  contentType?: string;
+  error?: string;
 }
 
 const entries = new Map<string, AssetEntry>();
@@ -148,7 +152,12 @@ export function loadAlvoradaAsset(url: string, priority: AlvoradaAssetPriority =
     try {
       // Priority hints let the albedo win bandwidth over the secondary maps on
       // browsers that support them; elsewhere the field is ignored.
-      const response = await fetch(url, { cache: 'force-cache', priority } as RequestInit);
+      const response = await fetch(versionAlvoradaAsset(url), { cache: 'force-cache', priority } as RequestInit);
+      entry.status = response.status;
+      entry.contentType = response.headers.get('content-type') ?? '';
+      if (response.status === 206 || /text\/html/i.test(entry.contentType)) {
+        throw new Error(`Alvorada asset ${url}: incomplete or HTML response`);
+      }
       if (!response.ok) throw new Error(`Alvorada asset ${url}: HTTP ${response.status}`);
       const blob = await streamResponse(entry, url, response);
       entry.settled = true;
@@ -156,6 +165,7 @@ export function loadAlvoradaAsset(url: string, priority: AlvoradaAssetPriority =
       return blob;
     } catch (error) {
       entry.failed = true;
+      entry.error = error instanceof Error ? error.message : 'network-or-body-failed';
       entry.settled = true;
       emit(url, true);
       throw error;
@@ -198,4 +208,18 @@ export function resetAlvoradaAssetsForTests() {
     window.clearTimeout(emitTimer);
   }
   emitTimer = null;
+}
+
+/** Public asset diagnostics only; no headers, cookies or application requests. */
+export function getAlvoradaAssetDiagnostics() {
+  return Array.from(entries, ([url, entry]) => ({
+    asset: url.split('?')[0], status: entry.status ?? null,
+    contentType: entry.contentType ?? null, bytes: entry.loadedBytes,
+    settled: entry.settled, failed: entry.failed, error: entry.error ?? null,
+  }));
+}
+
+/** A consumer may explicitly make one bounded retry of a failed request. */
+export function retryFailedAlvoradaAsset(url: string) {
+  if (entries.get(url)?.failed) entries.delete(url);
 }

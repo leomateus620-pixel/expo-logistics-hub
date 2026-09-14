@@ -10,8 +10,21 @@
  * production never logs by default.
  */
 
+export const ALVORADA_RUNTIME_VERSION = 'portal-lifecycle-v2';
+
 export type AlvoradaIntroTelemetryEvent =
   | 'intro-mounted'
+  | 'host-frame'
+  | 'host-ready'
+  | 'engine-selected'
+  | 'canonical-globe-presented'
+  | 'context-lost'
+  | 'context-restored'
+  | 'recovery-start'
+  | 'recovery-complete'
+  | 'render-error'
+  | 'chunk-failed'
+  | 'postprocessing-failed'
   | 'assets-warm-start'
   | 'assets-warm-end'
   | 'asset-progress'
@@ -34,6 +47,11 @@ export type AlvoradaIntroTelemetryEvent =
   | 'finished';
 
 export interface AlvoradaIntroTelemetryEnvironment {
+  context?: Record<string, unknown>;
+  textureTier?: string;
+  runtimeVersion?: string;
+  gitCommit?: string;
+  appVersion?: string;
   containerHeight: number | null;
   containerWidth: number | null;
   devicePixelRatio: number;
@@ -55,6 +73,7 @@ export interface AlvoradaIntroTelemetryRecord {
   environment: AlvoradaIntroTelemetryEnvironment;
   events: AlvoradaIntroTelemetryEntry[];
   startedAt: number;
+  droppedEvents?: number;
 }
 
 export interface AlvoradaIntroTelemetry {
@@ -79,7 +98,7 @@ export function isAlvoradaDebugEnabled() {
   if (typeof window === 'undefined') return false;
   if (import.meta.env.DEV && import.meta.env.MODE !== 'test') return true;
   try {
-    if (new URLSearchParams(window.location.search).has(DEBUG_QUERY_FLAG)) return true;
+    if (new URLSearchParams(window.location.search).get(DEBUG_QUERY_FLAG) === '1') return true;
     return window.localStorage?.getItem(DEBUG_STORAGE_KEY) === '1';
   } catch {
     return false;
@@ -94,6 +113,9 @@ export function createAlvoradaIntroTelemetry(): AlvoradaIntroTelemetry {
   const startedAt = now();
   const record: AlvoradaIntroTelemetryRecord = {
     environment: {
+      runtimeVersion: ALVORADA_RUNTIME_VERSION,
+      gitCommit: import.meta.env.VITE_GIT_COMMIT ?? 'unknown',
+      appVersion: import.meta.env.VITE_APP_VERSION ?? 'unknown',
       containerHeight: null,
       containerWidth: null,
       devicePixelRatio: typeof window === 'undefined' ? 1 : window.devicePixelRatio ?? 1,
@@ -119,6 +141,11 @@ export function createAlvoradaIntroTelemetry(): AlvoradaIntroTelemetry {
       const entry: AlvoradaIntroTelemetryEntry = { at: elapsed(), name };
       if (detail) entry.detail = detail;
       record.events.push(entry);
+      if (record.events.length > 512) {
+        // Keep startup evidence and the latest failure, without unbounded logs.
+        record.events.splice(128, 1);
+        record.droppedEvents = (record.droppedEvents ?? 0) + 1;
+      }
       if (debug && !NOISY_EVENTS.has(name)) {
         console.debug(`[alvorada] ${String(entry.at).padStart(6)}ms ${name}`, detail ?? '');
       }

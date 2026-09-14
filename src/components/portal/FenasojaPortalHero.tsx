@@ -7,6 +7,9 @@ import {
   useRef,
   useState,
 } from 'react';
+import { AlvoradaErrorBoundary } from '@/features/alvorada/AlvoradaErrorBoundary';
+import { createAlvoradaIntroTelemetry } from '@/features/alvorada/introTelemetry';
+import { AlvoradaDiagnostics } from '@/features/alvorada/AlvoradaDiagnostics';
 import { SkipForward } from 'lucide-react';
 import { OfficialCountdownCompact } from '@/components/countdown/OfficialCountdownCompact';
 import type { AlvoradaIntroMotion } from '@/features/alvorada/AlvoradaIntro';
@@ -62,6 +65,15 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
     }, ALVORADA_INTRO_EXIT_DURATION_MS);
   }, []);
 
+  const handleChunkError = useCallback(() => {
+    const telemetry = createAlvoradaIntroTelemetry();
+    window.__alvoradaIntroTelemetry = telemetry.record;
+    telemetry.setEnvironment({ staticReason: 'chunk-failed' });
+    telemetry.mark('chunk-failed', { stage: 'preparing' });
+    telemetry.mark('engine-selected', { engine: 'unavailable', reason: 'chunk-failed' });
+    finishIntro();
+  }, [finishIntro]);
+
   useEffect(() => () => {
     if (leaveTimer.current !== null) window.clearTimeout(leaveTimer.current);
   }, []);
@@ -72,7 +84,10 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
     // Download the WebGL chunk and start the shared asset pipeline while the
     // card waits for visibility; the scene consumes these same downloads, so
     // nothing is fetched twice and nothing here blocks the portal.
-    void loadAlvoradaIntro();
+    void loadAlvoradaIntro().catch(() => {
+      // The lazy boundary owns the error UI. Do not emit an unhandled rejection
+      // that the application's global cache recovery interprets as a reload.
+    });
     warmAlvoradaAssets();
 
     const node = heroRef.current;
@@ -110,6 +125,7 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
   }, [finishIntro, introActive]);
 
   return (
+    <>
     <section
       ref={heroRef}
       className="fenasoja-portal__hero portal-reveal"
@@ -133,6 +149,7 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
             {presentation === 'waiting' ? (
               <AlvoradaPreparingSurface />
             ) : (
+              <AlvoradaErrorBoundary fallback={<AlvoradaPreparingSurface />} onError={handleChunkError}>
               <Suspense fallback={<AlvoradaPreparingSurface />}>
                 <AlvoradaIntro
                   motion={motion}
@@ -140,6 +157,7 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
                   onStageChange={setIntroStage}
                 />
               </Suspense>
+              </AlvoradaErrorBoundary>
             )}
           </div>
 
@@ -157,5 +175,7 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
         </div>
       )}
     </section>
+    <AlvoradaDiagnostics />
+    </>
   );
 });

@@ -6,6 +6,8 @@ import {
   useRef,
   useState,
 } from 'react';
+import { observeAlvoradaHost } from './hostReadiness';
+import { ALVORADA_RUNTIME_VERSION } from './introTelemetry';
 import { AlvoradaCanvas } from './AlvoradaCanvas';
 import { AlvoradaBrandHero } from './AlvoradaBrandHero';
 import { AlvoradaErrorBoundary } from './AlvoradaErrorBoundary';
@@ -61,7 +63,8 @@ type IntroTimerKey =
   | 'fallback-step'
   | 'max-duration'
   | 'prepare-ceiling'
-  | 'prepare-stall';
+  | 'prepare-stall'
+  | 'context-recovery';
 export type AlvoradaIntroStaticReason =
   | AlvoradaFallbackReason
   | 'asset-failed'
@@ -75,6 +78,7 @@ const INTRO_TIMER_KEYS: readonly IntroTimerKey[] = [
   'max-duration',
   'prepare-ceiling',
   'prepare-stall',
+  'context-recovery',
 ];
 /** The narrative dawn fades the landscape in before its hold starts counting. */
 const NARRATIVE_DAWN_FADE_ALLOWANCE_MS = 700;
@@ -134,21 +138,20 @@ export function AlvoradaIntro({
 }: AlvoradaIntroProps) {
   const [telemetry] = useState(createAlvoradaIntroTelemetry);
   const [rendererTier] = useState<AlvoradaWebGLTier>(() => (
-    motion === 'reduced' ? 'unavailable' : getAlvoradaWebGLTier()
+    getAlvoradaWebGLTier()
   ));
   const initialRenderer: IntroRenderer = rendererTier === 'unavailable' ? 'fallback' : 'webgl';
   const [renderer, setRenderer] = useState<IntroRenderer>(initialRenderer);
   const [staticReason, setStaticReason] = useState<AlvoradaIntroStaticReason | null>(() => (
-    motion === 'reduced'
-      ? 'reduced-motion'
-      : rendererTier === 'unavailable'
-        ? 'unsupported-webgl'
-        : null
+    rendererTier === 'unavailable' ? 'unsupported-webgl' : null
   ));
   const [stage, setStage] = useState<AlvoradaIntroStage>('preparing');
   const [phase, setPhase] = useState<AlvoradaPhase>('dawn');
   const [harvestCovered, setHarvestCovered] = useState(false);
   const [frame, setFrame] = useState<ContainerFrame | null>(null);
+  const [hostReady, setHostReady] = useState(false);
+  const [hostUsable, setHostUsable] = useState(false);
+  const contextLosses = useRef(0);
   const [budget, setBudget] = useState(() => getAlvoradaQualityProfile(rendererTier));
   const [preparationMs, setPreparationMs] = useState<number | null>(null);
   const [firstFrameMs, setFirstFrameMs] = useState<number | null>(null);
@@ -259,6 +262,8 @@ export function AlvoradaIntro({
     if (finished.current || rendererRef.current === 'fallback') return;
     clearTimer('prepare-stall');
     clearTimer('prepare-ceiling');
+    clearTimer('context-recovery');
+    telemetry.mark('engine-selected', { engine: 'emergency-fallback', previousEngine: 'webgl-canonical', reason, stage: stageRef.current, recoveryAttempt: contextLosses.current });
     rendererRef.current = 'fallback';
     setRenderer('fallback');
     setStaticReason(reason);
@@ -276,49 +281,49 @@ export function AlvoradaIntro({
     const element = root.current;
     if (!element) return undefined;
 
-    const measure = () => {
-      const rect = element.getBoundingClientRect();
-      const next = { width: Math.round(rect.width), height: Math.round(rect.height) };
+    return observeAlvoradaHost(element, (next, usable) => {
       telemetry.setEnvironment({ containerWidth: next.width, containerHeight: next.height });
-      setFrame((current) => (
-        current && current.width === next.width && current.height === next.height
-          ? current
-          : next
-      ));
-    };
-    measure();
-
-    if (typeof ResizeObserver === 'undefined') {
-      window.addEventListener('resize', measure, { passive: true });
-      return () => window.removeEventListener('resize', measure);
-    }
-
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    return () => observer.disconnect();
+      setHostUsable(usable);
+      // Preserve the last valid framing while a host is temporarily collapsed.
+      if (usable) setFrame((current) => {
+        if (current?.width === next.width && current?.height === next.height) return current;
+        telemetry.mark('host-frame', { ...next, usable });
+        return next;
+      });
+    }, () => {
+      telemetry.mark('host-ready');
+      setHostReady(true);
+    });
   }, [telemetry]);
 
   useEffect(() => {
-    telemetry.setEnvironment({ rendererTier, qualityProfile: budget.level });
+    window.__alvoradaIntroTelemetry = telemetry.record;
+    telemetry.setEnvironment({ rendererTier, qualityProfile: budget.level, textureTier: budget.textureTier });
+    telemetry.mark('engine-selected', { engine: initialRenderer === 'webgl' ? 'webgl-canonical' : 'emergency-fallback', reason: staticReason, previousEngine: null, recoveryAttempt: 0 });
     telemetry.mark('intro-mounted', { motion, rendererTier, quality: budget.level });
     if (initialRenderer === 'fallback') {
-      const reason: AlvoradaIntroStaticReason = motion === 'reduced' ? 'reduced-motion' : 'unsupported-webgl';
+      const reason: AlvoradaIntroStaticReason = 'unsupported-webgl';
       telemetry.setEnvironment({ staticReason: reason });
       telemetry.mark('fallback-triggered', { reason, stage: 'preparing', phase: 'dawn', preparationMs: 0 });
-      runFallbackStep();
       return undefined;
     }
 
     telemetry.mark('assets-warm-start');
     warmAlvoradaAssets();
-    // Watchdog: the stall budget is re-armed by every progress event; the
-    // ceiling is absolute. Neither runs once the journey has started.
-    armTimer('prepare-stall', ALVORADA_INTRO_PREPARE_STALL_MS, () => enterFallback('prepare-stall'));
-    armTimer('prepare-ceiling', ALVORADA_INTRO_PREPARE_CEILING_MS, () => enterFallback('prepare-ceiling'));
     return undefined;
     // The mount configuration is fixed for the lifetime of one intro instance.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!hostReady || stageRef.current !== 'preparing') return;
+    if (initialRenderer === 'fallback') { runFallbackStep(); return; }
+    // Charge GPU preparation only after the embedded host can present frames.
+    // The budgets themselves are unchanged from PR #147.
+    armTimer('prepare-stall', ALVORADA_INTRO_PREPARE_STALL_MS, () => enterFallback('prepare-stall'));
+    armTimer('prepare-ceiling', ALVORADA_INTRO_PREPARE_CEILING_MS, () => enterFallback('prepare-ceiling'));
+    return () => { clearTimer('prepare-stall'); clearTimer('prepare-ceiling'); };
+  }, [hostReady, initialRenderer, armTimer, clearTimer, enterFallback, runFallbackStep]);
 
   const notePreparationProgress = useCallback((event: AlvoradaPreparationEvent) => {
     if (finished.current || rendererRef.current !== 'webgl' || stageRef.current !== 'preparing') return;
@@ -332,8 +337,16 @@ export function AlvoradaIntro({
     if (finished.current || rendererRef.current !== 'webgl') return;
     switch (event.kind) {
       case 'context-created':
-        telemetry.setEnvironment({ webglVersion: String(event.detail?.webglVersion ?? 'unknown') });
+        telemetry.setEnvironment({ webglVersion: String(event.detail?.webglVersion ?? 'unknown'), context: event.detail ?? {} });
         break;
+      case 'context-restored':
+        clearTimer('context-recovery');
+        telemetry.mark('recovery-complete', { attempt: contextLosses.current, elapsed: lastElapsed.current });
+        break;
+      case 'render-error':
+        telemetry.mark('render-error', event.detail);
+        enterFallback('render-error');
+        return;
       case 'shader-compile-end':
         telemetry.setEnvironment({ shaderPreparationMs: Number(event.detail?.shaderPreparationMs ?? 0) });
         break;
@@ -351,7 +364,7 @@ export function AlvoradaIntro({
     }
     telemetry.mark(event.kind, event.detail);
     notePreparationProgress(event);
-  }, [enterFallback, notePreparationProgress, telemetry]);
+  }, [clearTimer, enterFallback, notePreparationProgress, telemetry]);
 
   useEffect(() => {
     if (initialRenderer === 'fallback') return undefined;
@@ -400,12 +413,14 @@ export function AlvoradaIntro({
   }, [advanceStage, commitPhase, handleReady, telemetry]);
 
   const handleContextLost = useCallback(() => {
-    // Once the landscape covers the frame the scene contributes nothing more;
-    // losing (or intentionally releasing) its context must not downgrade the
-    // presentation that is already on screen.
-    if (harvestCoveredRef.current) return;
-    enterFallback('context-lost');
-  }, [enterFallback]);
+    if (harvestCoveredRef.current || finished.current) return;
+    contextLosses.current += 1;
+    telemetry.mark('context-lost', { count: contextLosses.current, elapsed: lastElapsed.current, stage: stageRef.current });
+    if (contextLosses.current > 1) { enterFallback('context-lost'); return; }
+    // Keep this Canvas and its timeline alive while Three restores the context.
+    telemetry.mark('recovery-start', { attempt: 1, previousEngine: 'webgl-canonical' });
+    armTimer('context-recovery', 3000, () => enterFallback('context-lost'));
+  }, [armTimer, enterFallback, telemetry]);
 
   const handleRenderError = useCallback(() => {
     enterFallback('render-error');
@@ -434,7 +449,7 @@ export function AlvoradaIntro({
     && (stage === 'alvorada' || stage === 'finished');
   const shouldRenderWebGL = renderer === 'webgl'
     && rendererTier !== 'unavailable'
-    && frame !== null
+    && hostReady && frame !== null
     && !webglReleased;
   const dataRenderer = webglReleased ? 'released' : renderer;
   const variant = frameVariant(frame);
@@ -448,6 +463,9 @@ export function AlvoradaIntro({
       data-renderer={dataRenderer}
       data-static-reason={staticReason ?? undefined}
       data-quality={quality.level}
+      data-visual-engine={renderer === 'webgl' ? 'webgl-canonical' : 'emergency-fallback'}
+      data-runtime-version={ALVORADA_RUNTIME_VERSION}
+      data-host-state={!hostReady ? 'waiting-size' : hostUsable ? 'ready' : 'suspended-size'}
       data-frame={variant}
       data-motion={motion}
       data-preparation-ms={preparationMs ?? undefined}
@@ -459,6 +477,8 @@ export function AlvoradaIntro({
           <AlvoradaErrorBoundary fallback={null} onError={handleRenderError}>
             <AlvoradaCanvas
               initialElapsed={0}
+              paused={!hostUsable}
+              reducedMotion={motion === 'reduced'}
               onContextLost={handleContextLost}
               onPreparation={handlePreparation}
               onProgress={handleProgress}
@@ -468,10 +488,10 @@ export function AlvoradaIntro({
               rendererTier={rendererTier}
             />
           </AlvoradaErrorBoundary>
-        ) : (renderer === 'fallback' || webglReleased) && (
+        ) : renderer === 'fallback' && (
           <AlvoradaNarrativeFallback
             phase={phase}
-            reduced={staticReason === 'reduced-motion'}
+            reduced={motion === 'reduced'}
             stage={stage}
           />
         )}

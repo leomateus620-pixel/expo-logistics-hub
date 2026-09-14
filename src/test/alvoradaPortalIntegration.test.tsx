@@ -107,6 +107,9 @@ function countdownSection() {
 
 describe('integração do portal: ecossistema direto e introdução embutida na contagem', () => {
   beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
+      width: 390, height: 420, x: 0, y: 0, top: 0, left: 0, right: 390, bottom: 420, toJSON: () => ({}),
+    });
     resetAlvoradaIntroSessionForTests();
     integrationMocks.canvasMounts = 0;
     integrationMocks.orgLoading = false;
@@ -240,7 +243,8 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
       expect(screen.getByRole('navigation', { name: 'Áreas do sistema Fenasoja 2028' })).toBeInTheDocument();
 
       const intro = await screen.findByTestId('alvorada-intro', {}, { timeout: 5000 });
-      // Without WebGL the same journey plays as the 2D narrative, with an
+      await waitFor(() => expect(intro).toHaveAttribute('data-host-state', 'ready'));
+      // Without WebGL the emergency narrative records an
       // explicit reason, and it still begins with the planet — never the brand.
       expect(intro).toHaveAttribute('data-renderer', 'fallback');
       expect(intro).toHaveAttribute('data-static-reason', 'unsupported-webgl');
@@ -351,7 +355,7 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
     }
   });
 
-  it('usa a narrativa acessível, sem WebGL, quando o usuário prefere movimento reduzido', async () => {
+  it('conserva o renderizador canônico quando o usuário prefere movimento reduzido', async () => {
     (window.matchMedia as unknown as ReturnType<typeof vi.fn>).mockImplementation((query: string) => ({
       matches: query.includes('prefers-reduced-motion'),
       media: query,
@@ -366,11 +370,12 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
 
     renderPortal();
     const intro = await screen.findByTestId('alvorada-intro', {}, { timeout: 5000 });
-    expect(intro).toHaveAttribute('data-static-reason', 'reduced-motion');
-    expect(intro).toHaveAttribute('data-renderer', 'fallback');
+    await waitFor(() => expect(intro).toHaveAttribute('data-host-state', 'ready'));
+    expect(intro).not.toHaveAttribute('data-static-reason');
+    expect(intro).toHaveAttribute('data-renderer', 'webgl');
     expect(intro).toHaveAttribute('data-motion', 'reduced');
-    expect(intro).toHaveAttribute('data-stage', 'globe');
-    expect(intro.querySelector('.alvorada-narrative')).toHaveAttribute('data-reduced', 'true');
-    expect(integrationMocks.canvasMounts).toBe(0);
+    expect(intro).toHaveAttribute('data-stage', 'preparing');
+    expect(intro.querySelector('.alvorada-narrative')).toBeNull();
+    expect(integrationMocks.canvasMounts).toBe(1);
   });
 });

@@ -145,7 +145,7 @@ describe('assets oficiais e panoramas da Alvorada', () => {
     // Critical first (the globe cannot appear without its base albedo and the
     // boundaries), then the maps that fade in whenever they arrive; the desktop
     // detail albedo is the last and never gates the first frame.
-    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+    expect(fetchMock.mock.calls.map(([url]) => String(url).split('?')[0])).toEqual([
       '/alvorada/earth-surface-2048.webp',
       '/alvorada/brazil-min.geojson',
       '/alvorada/rio-grande-do-sul-min.geojson',

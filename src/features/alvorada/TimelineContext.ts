@@ -17,6 +17,7 @@ export function useAlvoradaTimeline() {
  */
 export interface AlvoradaSceneReadiness {
   criticalAssetsReady: boolean;
+  canonicalGlobeRendered: boolean;
   report: (event: AlvoradaPreparationEvent) => void;
 }
 

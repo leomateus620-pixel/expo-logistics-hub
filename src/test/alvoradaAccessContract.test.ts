@@ -135,11 +135,11 @@ describe('contrato de acesso: ecossistema direto e introdução embutida na cont
     expect(introCss).not.toContain('prefers-reduced-motion');
     expect(alvoradaCss).toContain('alvorada-overlay-enter 280ms');
     expect(alvoradaCss).toContain('alvorada-overlay-exit 400ms');
-    expect(alvoradaImplementation).not.toMatch(
-      /useReducedMotion|matchMedia\([^)]*prefers-reduced-motion/,
-    );
-    // The host decides: reduced motion selects the accessible (still narrated,
-    // never WebGL) presentation instead of the 3D journey.
+    expect(intro).not.toMatch(/motion === 'reduced' \? 'unavailable'/);
+    expect(intro).toContain("reducedMotion={motion === 'reduced'}");
+    expect(source('src/features/alvorada/SceneController.tsx')).toContain('sampleReducedAlvorada');
+    // The host detects the accessibility preference; the canonical renderer
+    // samples authored stills instead of treating it as GPU unavailability.
     expect(portalHero).toContain("'(prefers-reduced-motion: reduce)'");
     expect(portalHero).toContain("prefersReducedMotion() ? 'reduced' : 'cinematic'");
   });

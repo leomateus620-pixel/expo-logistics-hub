@@ -1,6 +1,14 @@
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+
+const appVersion = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8")).version;
+const gitCommit = (() => {
+  try { return execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(); }
+  catch { return process.env.GITHUB_SHA ?? "unversioned-local"; }
+})();
 import { componentTagger } from "lovable-tagger";
 import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/supabase/vite";
 
@@ -26,6 +34,10 @@ const suppressTaggerRefWarnings = (): Plugin => ({
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  define: {
+    "import.meta.env.VITE_APP_VERSION": JSON.stringify(appVersion),
+    "import.meta.env.VITE_GIT_COMMIT": JSON.stringify(gitCommit),
+  },
   server: {
     host: "::",
     port: 8080,
