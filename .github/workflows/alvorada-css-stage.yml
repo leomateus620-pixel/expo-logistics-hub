@@ -1,0 +1,42 @@
+name: Stage scoped CSS specificity
+on:
+  push:
+    branches: [chore/alvorada-motion-css-stage]
+permissions:
+  contents: write
+jobs:
+  stage-css:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Create scoped stylesheet blob without updating any ref
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p css-stage
+          python - <<'PY'
+          import pathlib, subprocess, json, os, urllib.request, base64
+          path = pathlib.Path('src/index.css')
+          assert subprocess.check_output(['git', 'hash-object', str(path)], text=True).strip() == 'b37b1c760a21e22a8cb8f4fa19899b16d12317ee'
+          source = path.read_text()
+          before = '*:not(.alvorada-overlay, .alvorada-overlay *, [data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"]))'
+          after = '*:not(.alvorada-overlay, .alvorada-overlay *, :where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"])))'
+          assert source.count(before) == 3
+          path.write_text(source.replace(before, after))
+          data = json.dumps({'content': base64.b64encode(path.read_bytes()).decode(), 'encoding': 'base64'}).encode()
+          req = urllib.request.Request('https://api.github.com/repos/' + os.environ['GITHUB_REPOSITORY'] + '/git/blobs', data=data, headers={'Authorization': 'Bearer ' + os.environ['GH_TOKEN'], 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json'})
+          with urllib.request.urlopen(req, timeout=60) as response:
+              blob = json.load(response)
+          result = {'path': str(path), 'sha': blob['sha'], 'refsChanged': False}
+          pathlib.Path('css-stage/result.json').write_text(json.dumps(result, indent=2))
+          print(json.dumps(result))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: alvorada-css-specificity
+          path: css-stage/
+          retention-days: 3
