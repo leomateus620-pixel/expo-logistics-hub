@@ -43,9 +43,8 @@ STYLE_SAMPLE = """() => Object.fromEntries([
  animationDelay:s.animationDelay,animationIterationCount:s.animationIterationCount,
  transitionDuration:s.transitionDuration,transitionDelay:s.transitionDelay,
  transitionTimingFunction:s.transitionTimingFunction}];}))"""
-# A CSS clock for matched stills only. CSS/WAAPI does not follow the mocked JS
-# clock automatically. Register transitions on first observation, then advance
-# their real effects at the same virtual rate, without editing styles/keyframes.
+# CSS/WAAPI is independent of the mocked JS clock. Advance the real effects
+# at the same virtual rate, without replacing styles or authored keyframes.
 SYNC_CSS = """() => {
  window.__cssClock ??= new Map();
  const now=performance.now();
@@ -155,11 +154,15 @@ async def lifecycle(browser, mobile, preference, base, output, name, toggle=Fals
         await context.close()
 
 
-async def matched_frames(browser, mobile, preference, base, output, name):
+async def matched_checkpoint(browser, mobile, preference, base, output, name, checkpoint):
+    # Boot the unmodified journey for EVERY still. A screenshot/readback in one
+    # checkpoint must not affect a later checkpoint's compositor or GL state.
+    # Continuous cold and live-toggle scenarios above remain uninterrupted.
     context = await options(browser, mobile, preference)
     page = await context.new_page()
     await page.add_init_script(INIT)
     origin = datetime(2026, 9, 14, 9, tzinfo=timezone.utc)
+    label, target = checkpoint
     try:
         await page.clock.install(time=origin)
         await page.clock.pause_at(origin + timedelta(seconds=1))
@@ -174,64 +177,57 @@ async def matched_frames(browser, mobile, preference, base, output, name):
             if state['canvas'] and 'elapsed' in state['canvas']:
                 ready = True
                 break
-            await asyncio.sleep(.005)  # real asynchronous shader compilation
+            await asyncio.sleep(.005)
         check(ready, 'Canonical first frame never presented')
-        # Flush at the current virtual instant before deriving the epoch: the
-        # last RAF may have executed several milliseconds before run_for ends.
-        # A stale dataset paired with current performance.now shifts every frame.
         await page.evaluate('window.__alvoradaMotionQA.flush()')
         state = await page.evaluate('window.__alvoradaMotionQA.sample()')
         timeline_epoch = await page.evaluate('performance.now()') - float(state['canvas']['elapsed']) * 1000
-        # Finish only the surrounding host reveal, outside the authored scene,
-        # to isolate the pixel comparison from variable shader-compile latency.
+        # Only the surrounding host reveal is completed to remove preparation
+        # latency from visual comparison. No Alvorada effect is fast-forwarded.
         await page.evaluate("document.querySelector('.fenasoja-portal__hero').getAnimations().forEach(a=>{a.currentTime=10000})")
-        frames = []
-        for label, target in SAMPLES:
-            for _ in range(500):
-                state = await page.evaluate('window.__alvoradaMotionQA.sample()')
-                # Keep the same visible clock AFTER Canvas release too. Treating
-                # a released canvas as 'target reached' captured different points
-                # in the brand fade even though the product timeline was equal.
-                authored = (await page.evaluate('performance.now()') - timeline_epoch) / 1000
-                remaining_ms = target * 1000 - authored * 1000
-                if remaining_ms < .5:
-                    break
-                # Do not overshoot the checkpoint by a partial RAF interval.
-                await page.clock.run_for(min(16, round(remaining_ms)))
-                await page.evaluate(SYNC_CSS)
+        for _ in range(500):
+            authored = (await page.evaluate('performance.now()') - timeline_epoch) / 1000
+            remaining_ms = target * 1000 - authored * 1000
+            if remaining_ms < .5:
+                break
+            await page.clock.run_for(min(16, round(remaining_ms)))
             await page.evaluate(SYNC_CSS)
-            await page.evaluate('window.__alvoradaMotionQA.flush()')
-            await asyncio.sleep(.06)  # Native compositor time; JS clock stays paused.
-            await page.evaluate('window.__alvoradaMotionQA.flush()')
-            await asyncio.sleep(.06)
-            drawing_buffer = await page.evaluate('window.__alvoradaMotionQA.captureDrawingBuffer()')
-            state = await page.evaluate('window.__alvoradaMotionQA.sample()')
-            dataset = await page.locator('[data-testid=alvorada-intro]').evaluate('(el)=>({...el.dataset})')
-            check(dataset['visualEngine'] == 'webgl-canonical', 'Wrong visual engine at capture')
-            check(dataset['motionMode'] == 'canonical', 'Wrong motion mode at capture')
-            if state['canvas']:
-                check(abs(float(state['canvas']['elapsed']) - target) < .001,
-                      f'Capture missed authored checkpoint {label}: {state["canvas"]["elapsed"]}')
-                check(abs(float(state['canvas']['elapsed']) - float(state['canvas']['visualElapsed'])) < .001, 'Static sampler used')
-            # JS clock is paused; screenshot does not fast-forward animations.
-            clip = await page.locator('.fenasoja-portal__intro').bounding_box()
-            filename = f'{name}-{label}.png'
-            # Native cold captures above remain untouched. These matched-time
-            # stills hold the actual GPU pixels until the DOM compositor reads
-            # them; otherwise WebKit can capture a cleared drawing buffer.
-            if drawing_buffer:
-                (output / f'{name}-{label}-gpu.png').write_bytes(base64.b64decode(drawing_buffer.split(',', 1)[1]))
-            try:
-                await page.screenshot(path=str(output / filename), clip=clip, animations='allow')
-            finally:
-                await page.locator('[data-qa-drawing-buffer]').evaluate_all('(elements)=>elements.forEach(el=>el.remove())')
-            frames.append({'label': label, 'target': target, 'state': state, 'dataset': dataset,
-                           'styles': await page.evaluate(STYLE_SAMPLE), 'image': filename,
-                           'capture': 'actual-gpu-buffer-plus-dom' if drawing_buffer else 'native-dom'})
-        (output / f'{name}-frames.json').write_text(json.dumps(frames, indent=2))
-        return frames
+        await page.evaluate(SYNC_CSS)
+        await page.evaluate('window.__alvoradaMotionQA.flush()')
+        await asyncio.sleep(.06)
+        await page.evaluate('window.__alvoradaMotionQA.flush()')
+        await asyncio.sleep(.06)
+        drawing_buffer = await page.evaluate('window.__alvoradaMotionQA.captureDrawingBuffer()')
+        state = await page.evaluate('window.__alvoradaMotionQA.sample(true)')
+        dataset = await page.locator('[data-testid=alvorada-intro]').evaluate('(el)=>({...el.dataset})')
+        check(dataset['visualEngine'] == 'webgl-canonical', 'Wrong visual engine at capture')
+        check(dataset['motionMode'] == 'canonical', 'Wrong motion mode at capture')
+        if state['canvas']:
+            check(abs(float(state['canvas']['elapsed']) - target) < .001,
+                  f'Capture missed authored checkpoint {label}: {state["canvas"]["elapsed"]}')
+            check(abs(float(state['canvas']['elapsed']) - float(state['canvas']['visualElapsed'])) < .001, 'Static sampler used')
+        clip = await page.locator('.fenasoja-portal__intro').bounding_box()
+        filename = f'{name}-{label}.png'
+        if drawing_buffer:
+            (output / f'{name}-{label}-gpu.png').write_bytes(base64.b64decode(drawing_buffer.split(',', 1)[1]))
+        try:
+            await page.screenshot(path=str(output / filename), clip=clip, animations='allow')
+        finally:
+            await page.locator('[data-qa-drawing-buffer]').evaluate_all('(elements)=>elements.forEach(el=>el.remove())')
+        return {'label': label, 'target': target, 'state': state, 'dataset': dataset,
+                'styles': await page.evaluate(STYLE_SAMPLE), 'image': filename,
+                'isolatedContext': True,
+                'capture': 'actual-gpu-buffer-plus-dom' if drawing_buffer else 'native-dom'}
     finally:
         await context.close()
+
+
+async def matched_frames(browser, mobile, preference, base, output, name):
+    frames = []
+    for checkpoint in SAMPLES:
+        frames.append(await matched_checkpoint(browser, mobile, preference, base, output, name, checkpoint))
+        (output / f'{name}-frames.json').write_text(json.dumps(frames, indent=2))
+    return frames
 
 
 def check_globe_pixels(image, label):
@@ -241,6 +237,7 @@ def check_globe_pixels(image, label):
 
 
 def compare_frames(left, right, output):
+    check(len(left) == len(right) == len(SAMPLES), 'Missing visual checkpoints')
     results = []
     for a, b in zip(left, right):
         check(a['styles'] == b['styles'], f'CSS duration/delay differs at {a["label"]}')
@@ -260,7 +257,7 @@ def compare_frames(left, right, output):
         mae = sum(ImageStat.Stat(diff).mean)/3
         diff.save(output / f'diff-{a["image"]}')
         results.append({'frame': a['label'], 'meanAbsoluteChannelDifference': mae, 'limit': 2.0})
-        # Small raster/compositor noise is permitted, not a different planet.
+        # The original limit is unchanged: no masking or image registration.
         check(mae <= 2.0, f'Visual mismatch at {a["label"]}: MAE {mae:.3f}/255')
     return results
 
