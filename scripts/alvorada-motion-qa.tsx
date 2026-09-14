@@ -30,8 +30,8 @@ function runtime() {
   return canvas ? _roots.get(canvas)?.store.getState() : undefined;
 }
 
-// Read-only diagnostics distinguish authored-frame differences from capture or
-// GPU state differences. Kept in this isolated fixture, never the application.
+// Read-only evidence, collected only at visual checkpoints. GPU queries are
+// deliberately excluded from the normal lifecycle polling/performance path.
 function graphicsSnapshot() {
   const state = runtime();
   if (!state) return null;
@@ -65,13 +65,15 @@ function Fixture() {
   const [started, start] = useState(new URLSearchParams(location.search).has('cold'));
   Object.assign(window, { __alvoradaMotionQA: {
     start: () => start(true), warm: warmVisualAssets, diagnostic: collectAlvoradaDiagnostic,
-    // Flush through the real R3F subscribers/composer at the current instant.
     flush: () => {
       const state = runtime();
       if (state) { state.advance(performance.now(), true); state.gl.getContext().finish(); }
     },
-    // Hold the real GPU raster only while Playwright composites a paused frame.
-    // Native cold / live-toggle lifecycle tests do not use this hook.
+    // QA only: read the actual final framebuffer in the same task as rendering.
+    // readPixels avoids WebGL canvas-to-image conversion/compositor timing.
+    // The 2D canvas only encodes these unchanged RGBA pixels (with row-order
+    // conversion); it never draws a replacement Earth or other authored asset.
+    // Native cold/live-toggle runs do not use this hook or a paused clock.
     captureDrawingBuffer: async () => {
       const state = runtime();
       const canvas = state?.gl.domElement;
@@ -81,8 +83,26 @@ function Fixture() {
         throw new Error('Canonical canvas is hidden during visual capture');
       }
       state.advance(performance.now(), true);
-      state.gl.getContext().finish();
-      const dataUrl = canvas.toDataURL('image/png');
+      const context = state.gl.getContext();
+      context.finish();
+      if (state.gl.getRenderTarget() !== null) throw new Error('Composer has not presented to the screen');
+      const width = context.drawingBufferWidth;
+      const height = context.drawingBufferHeight;
+      const rgba = new Uint8Array(width * height * 4);
+      context.readPixels(0, 0, width, height, context.RGBA, context.UNSIGNED_BYTE, rgba);
+      if (context.getError() !== context.NO_ERROR) throw new Error('Framebuffer readback failed');
+      const topDown = new Uint8ClampedArray(rgba.length);
+      const stride = width * 4;
+      for (let y = 0; y < height; y += 1) {
+        const from = (height - y - 1) * stride;
+        topDown.set(rgba.subarray(from, from + stride), y * stride);
+      }
+      const encoder = document.createElement('canvas');
+      encoder.width = width; encoder.height = height;
+      const encoderContext = encoder.getContext('2d');
+      if (!encoderContext) throw new Error('PNG encoder unavailable');
+      encoderContext.putImageData(new ImageData(topDown, width, height), 0, 0);
+      const dataUrl = encoder.toDataURL('image/png');
       const image = new Image();
       image.dataset.qaDrawingBuffer = 'true';
       image.alt = '';
@@ -95,13 +115,13 @@ function Fixture() {
       canvas.parentElement?.appendChild(image);
       return dataUrl;
     },
-    sample: () => {
+    sample: (includeGraphics = false) => {
       const state = runtime();
       const camera = state?.camera;
       return { canvas: state ? { ...state.gl.domElement.dataset } : null,
         camera: camera ? { position: camera.position.toArray(), quaternion: camera.quaternion.toArray(),
           fov: 'fov' in camera ? camera.fov : null } : null,
-        graphics: graphicsSnapshot(),
+        ...(includeGraphics ? { graphics: graphicsSnapshot() } : {}),
       };
     },
   } });
