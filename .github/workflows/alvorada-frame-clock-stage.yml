@@ -22,13 +22,7 @@ jobs:
               with urllib.request.urlopen(req,timeout=60) as r:return json.load(r)
           source=base64.b64decode(api('/git/blobs/f6db2b0fac85566d14e7ca28000a9401ed1de6bf')['content']).decode()
           before="        timeline_epoch = await page.evaluate('performance.now()') - float(state['canvas']['elapsed']) * 1000"
-          after="""        # Flush at the current virtual instant before deriving the epoch: the
-                  # last RAF may have executed several milliseconds before run_for ends.
-                  # A stale dataset paired with current performance.now shifts every frame.
-                  await page.evaluate('window.__alvoradaMotionQA.flush()')
-                  state = await page.evaluate('window.__alvoradaMotionQA.sample()')
-                  timeline_epoch = await page.evaluate('performance.now()') - float(state['canvas']['elapsed']) * 1000"""
-          after='\n'.join(line[8:] if i else line for i,line in enumerate(after.splitlines()))
+          after="        # Flush at the current virtual instant before deriving the epoch: the\n        # last RAF may have executed several milliseconds before run_for ends.\n        # A stale dataset paired with current performance.now shifts every frame.\n        await page.evaluate('window.__alvoradaMotionQA.flush()')\n        state = await page.evaluate('window.__alvoradaMotionQA.sample()')\n        timeline_epoch = await page.evaluate('performance.now()') - float(state['canvas']['elapsed']) * 1000"
           assert source.count(before)==1;source=source.replace(before,after)
           before="                if authored >= target - .001:\n                    break\n                await page.clock.run_for(16)"
           after="                remaining_ms = target * 1000 - authored * 1000\n                if remaining_ms < .0001:\n                    break\n                # Do not overshoot the checkpoint by a partial RAF interval.\n                await page.clock.run_for(min(16, remaining_ms))"
