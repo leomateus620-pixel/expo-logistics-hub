@@ -193,10 +193,10 @@ async def matched_frames(browser, mobile, preference, base, output, name):
                 # in the brand fade even though the product timeline was equal.
                 authored = (await page.evaluate('performance.now()') - timeline_epoch) / 1000
                 remaining_ms = target * 1000 - authored * 1000
-                if remaining_ms < .0001:
+                if remaining_ms < .5:
                     break
                 # Do not overshoot the checkpoint by a partial RAF interval.
-                await page.clock.run_for(min(16, remaining_ms))
+                await page.clock.run_for(min(16, round(remaining_ms)))
                 await page.evaluate(SYNC_CSS)
             await page.evaluate(SYNC_CSS)
             await page.evaluate('window.__alvoradaMotionQA.flush()')
