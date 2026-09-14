@@ -7,7 +7,6 @@ import "./styles/cronograma-mobile.css";
 import "./styles/cronograma-mobile-overlays.css";
 
 const RECOVERY_KEY = 'fenasoja-recovery-attempted';
-const RELOAD_KEY = 'fenasoja-sw-reloaded';
 
 async function nukeCachesAndReload() {
   const ss = safeSession();
@@ -81,10 +80,10 @@ if ('serviceWorker' in navigator) {
     }).catch(() => {});
 
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      const ss = safeSession();
-      try { if (ss?.getItem(RELOAD_KEY)) return; } catch {}
-      try { ss?.setItem(RELOAD_KEY, '1'); } catch {}
-      window.location.reload();
+      // First installation can claim this tab while the Portal intro is still
+      // preparing. A forced reload here restarts an otherwise healthy renderer.
+      // Existing hashed modules stay valid; update on the next navigation.
+      window.dispatchEvent(new Event('fenasoja:worker-updated'));
     });
   });
 }

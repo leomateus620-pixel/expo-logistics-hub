@@ -10,6 +10,7 @@ import {
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { AlvoradaQualityProfile } from './capabilities';
+import { sampleReducedAlvorada } from './reducedMotion';
 import { CinematicCamera } from './CinematicCamera';
 import {
   AlvoradaReadinessContext,
@@ -35,6 +36,8 @@ import type { AlvoradaPreparationEvent } from './types';
 
 interface SceneControllerProps {
   initialElapsed: number;
+  paused?: boolean;
+  reducedMotion?: boolean;
   onPreparation?: (event: AlvoradaPreparationEvent) => void;
   onProgress: (elapsed: number) => void;
   onReady: () => void;
@@ -53,9 +56,11 @@ interface SceneControllerProps {
  */
 function MasterTimeline({
   initialElapsed,
+  paused = false,
+  reducedMotion = false,
   onProgress,
   onReady,
-}: Pick<SceneControllerProps, 'initialElapsed' | 'onProgress' | 'onReady'>) {
+}: Pick<SceneControllerProps, 'initialElapsed' | 'paused' | 'reducedMotion' | 'onProgress' | 'onReady'>) {
   const timeline = useAlvoradaTimeline();
   const readiness = useAlvoradaReadiness();
   const { gl, scene, camera } = useThree();
@@ -65,14 +70,18 @@ function MasterTimeline({
   const lastFrameAt = useRef<number | null>(null);
   const ambientElapsed = useRef(Math.max(0, Number.isNaN(initialElapsed) ? 0 : initialElapsed));
   const clampedFrames = useRef(0);
+  const recovering = useRef(false);
 
   useEffect(() => {
     let active = true;
+    let generation = 0;
+    const compile = () => {
+    const attempt = ++generation;
     const compileStarted = performance.now();
     gl.domElement.dataset.preparation = 'shaders';
     readiness.current.report({ kind: 'shader-compile-start' });
     const finish = (mode: 'async' | 'direct-render') => {
-      if (!active) return;
+      if (!active || attempt !== generation || gl.getContext().isContextLost()) return;
       const shaderPreparationMs = performance.now() - compileStarted;
       gl.domElement.dataset.shaderPreparationMs = shaderPreparationMs.toFixed(1);
       gl.domElement.dataset.preparation = mode === 'async' ? 'ready' : 'direct-render';
@@ -88,14 +97,44 @@ function MasterTimeline({
       .then(() => finish('async'))
       // Direct rendering remains the recovery path on drivers without async compilation.
       .catch(() => finish('direct-render'));
-    return () => { active = false; };
-  }, [camera, gl, readiness, scene]);
+    };
+    const lost = () => {
+      generation += 1;
+      recovering.current = true;
+      readiness.current.canonicalGlobeRendered = deriveAlvoradaVisualState(timeline.current.elapsed).earthOpacity <= 0.001;
+      shadersReady.current = false;
+      lastFrameAt.current = null;
+      timeline.current.delta = 0;
+    };
+    const restored = () => {
+      lastFrameAt.current = null;
+      compile();
+    };
+    const visibility = () => { lastFrameAt.current = null; timeline.current.delta = 0; };
+    gl.domElement.addEventListener('webglcontextlost', lost);
+    gl.domElement.addEventListener('webglcontextrestored', restored);
+    document.addEventListener('visibilitychange', visibility);
+    compile();
+    return () => {
+      active = false;
+      gl.domElement.removeEventListener('webglcontextlost', lost);
+      gl.domElement.removeEventListener('webglcontextrestored', restored);
+      document.removeEventListener('visibilitychange', visibility);
+    };
+  }, [camera, gl, readiness, scene, timeline]);
 
   useFrame(() => {
-    if (document.hidden || !shadersReady.current || !readiness.current.criticalAssetsReady) {
+    if (paused || document.hidden || gl.getContext().isContextLost()
+      || !shadersReady.current || !readiness.current.criticalAssetsReady
+      || !readiness.current.canonicalGlobeRendered) {
+      timeline.current.delta = 0;
       // Nothing was presented; the next frame must not inherit this gap.
       lastFrameAt.current = null;
       return;
+    }
+    if (recovering.current) {
+      recovering.current = false;
+      readiness.current.report({ kind: 'context-restored' });
     }
     presentedFrames.current += 1;
     if (presentedFrames.current < 2) return;
@@ -118,7 +157,7 @@ function MasterTimeline({
       gl.domElement.dataset.firstFrameMs = firstFrameMs.toFixed(1);
       readiness.current.report({
         kind: 'first-frame',
-        detail: { firstFrameMs: Math.round(firstFrameMs) },
+        detail: { firstFrameMs: Math.round(firstFrameMs), visualEngine: 'webgl-canonical', elapsed: timeline.current.elapsed },
       });
       onReady();
     }
@@ -126,11 +165,14 @@ function MasterTimeline({
     ambientElapsed.current = step.elapsed;
     const elapsed = Math.min(ALVORADA_SEQUENCE_DURATION, ambientElapsed.current);
 
-    timeline.current.ambientElapsed = ambientElapsed.current;
+    const sample = reducedMotion ? sampleReducedAlvorada(elapsed) : null;
+    gl.domElement.style.opacity = String(sample?.opacity ?? 1);
+    timeline.current.ambientElapsed = sample?.visualElapsed ?? ambientElapsed.current;
     timeline.current.delta = step.delta;
-    timeline.current.elapsed = elapsed;
+    timeline.current.elapsed = sample?.visualElapsed ?? elapsed;
     timeline.current.progress = elapsed / ALVORADA_SEQUENCE_DURATION;
-    timeline.current.phase = getAlvoradaPhase(ambientElapsed.current);
+    timeline.current.phase = getAlvoradaPhase(sample?.visualElapsed ?? ambientElapsed.current);
+    gl.domElement.dataset.visualElapsed = timeline.current.elapsed.toFixed(3);
     const visualState = deriveAlvoradaVisualState(elapsed);
 
     // Lightweight diagnostics used by visual QA and field support. Keeping the
@@ -224,6 +266,8 @@ function SceneAtmosphere() {
 
 export function SceneController({
   initialElapsed,
+  paused = false,
+  reducedMotion = false,
   onPreparation,
   onProgress,
   onReady,
@@ -237,6 +281,7 @@ export function SceneController({
   const readiness = useRef<AlvoradaSceneReadiness>({
     // A clock restored past the globe has no critical texture left to wait for.
     criticalAssetsReady: !deriveAlvoradaVisualState(initialElapsed).earthResident,
+    canonicalGlobeRendered: !deriveAlvoradaVisualState(initialElapsed).earthResident,
     report: (event) => {
       if (event.kind === 'critical-assets-ready') readiness.current.criticalAssetsReady = true;
       onPreparationRef.current?.(event);
@@ -252,6 +297,8 @@ export function SceneController({
       <AlvoradaReadinessContext.Provider value={readiness}>
         <MasterTimeline
           initialElapsed={initialElapsed}
+          paused={paused}
+          reducedMotion={reducedMotion}
           onProgress={onProgress}
           onReady={onReady}
         />

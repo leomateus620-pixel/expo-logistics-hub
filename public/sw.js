@@ -1,7 +1,7 @@
 // Service Worker — Fenasoja Logística
 // Strategy: never precache the HTML shell. Hashed assets are immutable (cache-first).
 // Navigations are network-first with a short timeout; cache is only used if truly offline.
-const CACHE_VERSION = '4';
+const CACHE_VERSION = '5';
 const CACHE_NAME = `fenasoja-v${CACHE_VERSION}`;
 const STATIC_ASSETS = [
   '/favicon.ico',
@@ -18,7 +18,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+      Promise.all(keys.filter((k) => k.startsWith('fenasoja-v') && k !== CACHE_NAME).map((k) => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
@@ -62,7 +62,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Hashed Vite assets — immutable, cache-first
-  if (/\/assets\/.*-[a-f0-9]{8,}\.(js|css|png|jpg|jpeg|webp|svg|woff2?)$/.test(url.pathname)) {
+  if (/\/assets\/.*-[A-Za-z0-9_-]{8,}\.(js|css|png|jpg|jpeg|webp|svg|woff2?)$/.test(url.pathname)) {
     event.respondWith(
       caches.match(req).then((cached) => {
         if (cached) return cached;

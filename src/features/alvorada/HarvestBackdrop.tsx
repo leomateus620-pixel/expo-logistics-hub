@@ -1,10 +1,11 @@
+import { versionAlvoradaAsset } from './assetVersion';
 import { useState } from 'react';
 import type { AlvoradaPhase } from './timeline';
 
 export type HarvestBackdropVariant = 'auto' | 'landscape' | 'portrait';
 
-const HARVEST_LANDSCAPE_SRC = '/alvorada/soy-harvest-dawn.webp';
-const HARVEST_PORTRAIT_SRC = '/alvorada/soy-harvest-dawn-mobile.webp';
+const HARVEST_LANDSCAPE_SRC = versionAlvoradaAsset('/alvorada/soy-harvest-dawn.webp');
+const HARVEST_PORTRAIT_SRC = versionAlvoradaAsset('/alvorada/soy-harvest-dawn-mobile.webp');
 
 interface HarvestBackdropProps {
   stage: AlvoradaPhase;

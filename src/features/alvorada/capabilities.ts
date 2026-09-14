@@ -32,7 +32,7 @@ interface NavigatorPerformanceHints extends Navigator {
  */
 export function warmAlvoradaAssets() {
   if (typeof window === 'undefined') return;
-  warmAlvoradaIntroAssets(getAlvoradaQualityProfile().mobile);
+  warmAlvoradaIntroAssets(getAlvoradaQualityProfile('hardware').mobile);
 }
 
 function canCreateWebGL2Context(attributes: WebGLContextAttributes) {

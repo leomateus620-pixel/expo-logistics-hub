@@ -3,12 +3,15 @@ import { AdaptiveDpr, PerformanceMonitor } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { AlvoradaQualityProfile } from './capabilities';
+import { AlvoradaErrorBoundary } from './AlvoradaErrorBoundary';
 import { CinematicPostFX } from './CinematicPostFX';
 import { SceneController } from './SceneController';
 import type { AlvoradaPreparationEvent, AlvoradaWebGLTier } from './types';
 
 interface AlvoradaCanvasProps {
   initialElapsed: number;
+  paused?: boolean;
+  reducedMotion?: boolean;
   onContextLost: (elapsed: number) => void;
   /** Preparation milestones for the host watchdog and telemetry. */
   onPreparation?: (event: AlvoradaPreparationEvent) => void;
@@ -93,6 +96,8 @@ function CanvasRuntimeGuard({
 
 export function AlvoradaCanvas({
   initialElapsed,
+  paused = false,
+  reducedMotion = false,
   onContextLost,
   onPreparation,
   onProgress,
@@ -124,23 +129,18 @@ export function AlvoradaCanvas({
     report({ kind: 'canvas-created' });
   }, [report]);
 
+  const [initialCamera] = useState(() => ({ far: 900, fov: quality.mobile ? 53 : 45, near: 0.08, position: [0, 0, 12] as [number, number, number] }));
+  const [contextAttributes] = useState<THREE.WebGLRendererParameters>(() => ({
+    alpha: false, antialias: quality.antialias && !quality.postprocessing,
+    failIfMajorPerformanceCaveat: false, powerPreference: 'default', stencil: false,
+  }));
+
   return (
     <Canvas
-      camera={{
-        far: 900,
-        fov: quality.mobile ? 53 : 45,
-        near: 0.08,
-        position: [0, 0, 12],
-      }}
+      camera={initialCamera}
       dpr={quality.dpr}
       frameloop="always"
-      gl={{
-        alpha: false,
-        antialias: quality.antialias && !quality.postprocessing,
-        failIfMajorPerformanceCaveat: rendererTier === 'hardware',
-        powerPreference: rendererTier === 'hardware' ? 'high-performance' : 'default',
-        stencil: false,
-      }}
+      gl={contextAttributes}
       performance={{ min: 0.55, debounce: 180 }}
       shadows={false}
       onCreated={({ gl }) => {
@@ -150,15 +150,18 @@ export function AlvoradaCanvas({
         gl.domElement.dataset.createdAt = String(performance.now());
         gl.setClearColor('#010713', 1);
         const context = gl.getContext();
-        const debugInfo = context.getExtension('WEBGL_debug_renderer_info');
+        let gpu = 'privacy-restricted';
+        try {
+          const info = context.getExtension('WEBGL_debug_renderer_info');
+          gpu = String(context.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : context.RENDERER));
+        } catch { /* Optional diagnostic extension, not a readiness requirement. */ }
+        gl.debug.onShaderError = () => report({ kind: 'render-error', detail: { reason: 'shader-link-failed' } });
         report({
           kind: 'context-created',
           detail: {
             webglVersion: gl.capabilities.isWebGL2 ? 'webgl2' : 'webgl1',
             parallelShaderCompile: Boolean(context.getExtension('KHR_parallel_shader_compile')),
-            renderer: debugInfo
-              ? String(context.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL))
-              : String(context.getParameter(context.RENDERER)),
+            renderer: gpu, contextCreationResult: 'created', requestedTier: rendererTier,
             maxTextureSize: gl.capabilities.maxTextureSize,
           },
         });
@@ -172,14 +175,18 @@ export function AlvoradaCanvas({
       <RendererTelemetry quality={quality} />
       <SceneController
         initialElapsed={initialElapsed}
+        paused={paused}
+        reducedMotion={reducedMotion}
         onPreparation={report}
         onProgress={handleProgress}
         onReady={handleReady}
         quality={quality}
       />
-      <Suspense fallback={null}>
-        <CinematicPostFX quality={quality} />
-      </Suspense>
+      <AlvoradaErrorBoundary fallback={null} onError={onQualityDecline}>
+        <Suspense fallback={null}>
+          <CinematicPostFX quality={quality} />
+        </Suspense>
+      </AlvoradaErrorBoundary>
       <AdaptiveDpr pixelated={false} />
     </Canvas>
   );

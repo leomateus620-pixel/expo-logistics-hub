@@ -10,7 +10,8 @@ import { loadAlvoradaAsset } from './alvoradaAssets';
  * URL is decoded once per execution and shared by every consumer.
  */
 
-const textures = new Map<string, Promise<THREE.Texture>>();
+interface TextureEntry { promise: Promise<THREE.Texture>; users: number }
+const textures = new Map<string, TextureEntry>();
 
 function supportsImageBitmap() {
   return typeof createImageBitmap === 'function' && typeof ImageBitmap !== 'undefined';
@@ -25,6 +26,7 @@ async function decodeWithImageBitmap(blob: Blob) {
   const texture = new THREE.Texture(bitmap);
   // ImageBitmap is already flipped; Three must not flip it again on upload.
   texture.flipY = false;
+  texture.userData.alvoradaDecoder = 'image-bitmap';
   return texture;
 }
 
@@ -33,13 +35,16 @@ async function decodeWithImageElement(blob: Blob) {
   try {
     const image = new Image();
     image.decoding = 'async';
-    image.src = url;
     await new Promise<void>((resolve, reject) => {
       image.onload = () => resolve();
       image.onerror = () => reject(new Error('Alvorada texture decode failed.'));
+      image.src = url;
     });
     await image.decode().catch(() => undefined);
-    return new THREE.Texture(image);
+    if (!image.naturalWidth || !image.naturalHeight) throw new Error('Alvorada image has no decoded pixels.');
+    const texture = new THREE.Texture(image);
+    texture.userData.alvoradaDecoder = 'image-element';
+    return texture;
   } finally {
     URL.revokeObjectURL(url);
   }
@@ -47,7 +52,7 @@ async function decodeWithImageElement(blob: Blob) {
 
 export function loadAlvoradaTexture(url: string): Promise<THREE.Texture> {
   const cached = textures.get(url);
-  if (cached) return cached;
+  if (cached) { cached.users += 1; return cached.promise; }
 
   const pending = loadAlvoradaAsset(url)
     .then(async (blob) => {
@@ -62,20 +67,25 @@ export function loadAlvoradaTexture(url: string): Promise<THREE.Texture> {
       textures.delete(url);
       throw error;
     });
-  textures.set(url, pending);
+  textures.set(url, { promise: pending, users: 1 });
   return pending;
 }
 
 /** Releases the decoded texture once the consuming scene has been torn down. */
 export function releaseAlvoradaTexture(url: string) {
-  const pending = textures.get(url);
-  if (!pending) return;
-  textures.delete(url);
-  pending.then((texture) => {
-    const image = texture.image as { close?: () => void } | undefined;
-    texture.dispose();
-    image?.close?.();
-  }).catch(() => undefined);
+  const entry = textures.get(url);
+  if (!entry) return;
+  entry.users = Math.max(0, entry.users - 1);
+  // React's cleanup/setup replay can reacquire in the same turn. Do not close
+  // the shared ImageBitmap while another mounted scene still owns it.
+  queueMicrotask(() => {
+    if (entry.users || textures.get(url) !== entry) return;
+    textures.delete(url);
+    entry.promise.then((texture) => {
+      texture.dispose();
+      (texture.image as { close?: () => void } | undefined)?.close?.();
+    }).catch(() => undefined);
+  });
 }
 
 /** 1×1 stand-ins keep every shader sampler bound while the real maps arrive. */
