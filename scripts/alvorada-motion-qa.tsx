@@ -30,8 +30,9 @@ function runtime() {
   return canvas ? _roots.get(canvas)?.store.getState() : undefined;
 }
 
-// Read-only evidence, collected only at visual checkpoints. GPU queries are
-// deliberately excluded from the normal lifecycle polling/performance path.
+let lastReadback: Record<string, unknown> | null = null;
+
+// Read-only evidence at visual checkpoints, never in the native frame loop.
 function graphicsSnapshot() {
   const state = runtime();
   if (!state) return null;
@@ -58,6 +59,7 @@ function graphicsSnapshot() {
     projection: camera.projectionMatrix.toArray(), cameraParent: camera.parent?.type ?? null,
     earthWorld: earth?.matrixWorld.toArray(), toneMappingExposure: gl.toneMappingExposure,
     originNdc: camera.position.clone().set(0, 0, 0).project(camera).toArray(), programs,
+    readback: lastReadback,
   };
 }
 
@@ -69,11 +71,13 @@ function Fixture() {
       const state = runtime();
       if (state) { state.advance(performance.now(), true); state.gl.getContext().finish(); }
     },
-    // QA only: read the actual final framebuffer in the same task as rendering.
-    // readPixels avoids WebGL canvas-to-image conversion/compositor timing.
-    // The 2D canvas only encodes these unchanged RGBA pixels (with row-order
-    // conversion); it never draws a replacement Earth or other authored asset.
-    // Native cold/live-toggle runs do not use this hook or a paused clock.
+    // QA only: encode the actual screen framebuffer in the rendering task.
+    // WebGL2 read and draw framebuffer bindings are independent. Postprocessing
+    // may leave READ_FRAMEBUFFER on a floating-point target even after drawing
+    // the final composition to screen; read that screen explicitly and restore
+    // all changed read state. No renderer/quality/camera setting is changed.
+    // The 2D canvas only encodes unchanged RGBA pixels with row-order conversion.
+    // Native cold/live-toggle scenarios never use this hook or a paused clock.
     captureDrawingBuffer: async () => {
       const state = runtime();
       const canvas = state?.gl.domElement;
@@ -83,14 +87,35 @@ function Fixture() {
         throw new Error('Canonical canvas is hidden during visual capture');
       }
       state.advance(performance.now(), true);
-      const context = state.gl.getContext();
+      const context = state.gl.getContext() as WebGL2RenderingContext;
       context.finish();
       if (state.gl.getRenderTarget() !== null) throw new Error('Composer has not presented to the screen');
+      const priorErrors: number[] = [];
+      for (let index = 0; index < 16; index += 1) {
+        const error = context.getError();
+        if (error === context.NO_ERROR) break;
+        priorErrors.push(error);
+      }
+      const previousReadFramebuffer = context.getParameter(context.READ_FRAMEBUFFER_BINDING);
+      const previousReadBuffer = context.getParameter(context.READ_BUFFER);
       const width = context.drawingBufferWidth;
       const height = context.drawingBufferHeight;
       const rgba = new Uint8Array(width * height * 4);
-      context.readPixels(0, 0, width, height, context.RGBA, context.UNSIGNED_BYTE, rgba);
-      if (context.getError() !== context.NO_ERROR) throw new Error('Framebuffer readback failed');
+      let readError = context.NO_ERROR as number;
+      try {
+        context.bindFramebuffer(context.READ_FRAMEBUFFER, null);
+        context.readBuffer(context.BACK);
+        context.readPixels(0, 0, width, height, context.RGBA, context.UNSIGNED_BYTE, rgba);
+        readError = context.getError();
+      } finally {
+        context.bindFramebuffer(context.READ_FRAMEBUFFER, previousReadFramebuffer);
+        context.readBuffer(previousReadBuffer);
+      }
+      lastReadback = { priorErrors, readError, previousReadFramebufferDefault: previousReadFramebuffer === null,
+        previousReadBuffer, width, height };
+      if (readError !== context.NO_ERROR) {
+        throw new Error(`Framebuffer readback failed: ${JSON.stringify(lastReadback)}`);
+      }
       const topDown = new Uint8ClampedArray(rgba.length);
       const stride = width * 4;
       for (let y = 0; y < height; y += 1) {

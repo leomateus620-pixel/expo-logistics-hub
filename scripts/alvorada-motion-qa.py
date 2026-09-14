@@ -1,8 +1,7 @@
-"""Executable motion-policy regression gate, not just screenshot collection.
+"""Motion-policy regression gate on the production-built PortalHero/Canvas.
 
-Production-built real PortalHero/Canvas. Cold real-time lifecycle + warm matched
-frames with Playwright's clock. Browser contexts emulate media/viewport, NOT
-physical iPhones, Windows drivers or the authenticated Portal workload.
+Native cold/live-toggle lifecycle and isolated matched visual checkpoints.
+Playwright emulates media/viewport, not physical iPhones or Windows drivers.
 """
 import argparse
 import base64
@@ -43,8 +42,8 @@ STYLE_SAMPLE = """() => Object.fromEntries([
  animationDelay:s.animationDelay,animationIterationCount:s.animationIterationCount,
  transitionDuration:s.transitionDuration,transitionDelay:s.transitionDelay,
  transitionTimingFunction:s.transitionTimingFunction}];}))"""
-# CSS/WAAPI is independent of the mocked JS clock. Advance the real effects
-# at the same virtual rate, without replacing styles or authored keyframes.
+# CSS/WAAPI is independent of the mocked JS clock. Advance real effects at
+# the same virtual rate, without replacing styles or authored keyframes.
 SYNC_CSS = """() => {
  window.__cssClock ??= new Map();
  const now=performance.now();
@@ -155,9 +154,9 @@ async def lifecycle(browser, mobile, preference, base, output, name, toggle=Fals
 
 
 async def matched_checkpoint(browser, mobile, preference, base, output, name, checkpoint):
-    # Boot the unmodified journey for EVERY still. A screenshot/readback in one
-    # checkpoint must not affect a later checkpoint's compositor or GL state.
-    # Continuous cold and live-toggle scenarios above remain uninterrupted.
+    # Independently boot the unmodified journey for each still: one checkpoint's
+    # readback cannot affect the next one's compositor or GL state. Continuous
+    # cold and live-toggle scenarios above remain uninterrupted.
     context = await options(browser, mobile, preference)
     page = await context.new_page()
     await page.add_init_script(INIT)
@@ -167,6 +166,15 @@ async def matched_checkpoint(browser, mobile, preference, base, output, name, ch
         await page.clock.install(time=origin)
         await page.clock.pause_at(origin + timedelta(seconds=1))
         await page.goto(base, wait_until='load')
+        # Document load does not imply React's concurrent root has committed.
+        # RAF-based polling would deadlock under the paused clock; explicitly
+        # allow bootstrap tasks to run BEFORE starting the authored sequence.
+        for _ in range(120):
+            if await page.evaluate('Boolean(window.__alvoradaMotionQA)'):
+                break
+            await page.clock.run_for(16)
+            await asyncio.sleep(.005)
+        check(await page.evaluate('Boolean(window.__alvoradaMotionQA)'), 'QA host bootstrap did not commit')
         await page.evaluate('window.__alvoradaMotionQA.warm()')
         await page.evaluate('window.__alvoradaMotionQA.start()')
         ready = False
@@ -183,7 +191,7 @@ async def matched_checkpoint(browser, mobile, preference, base, output, name, ch
         state = await page.evaluate('window.__alvoradaMotionQA.sample()')
         timeline_epoch = await page.evaluate('performance.now()') - float(state['canvas']['elapsed']) * 1000
         # Only the surrounding host reveal is completed to remove preparation
-        # latency from visual comparison. No Alvorada effect is fast-forwarded.
+        # latency from comparison. No Alvorada effect is fast-forwarded.
         await page.evaluate("document.querySelector('.fenasoja-portal__hero').getAnimations().forEach(a=>{a.currentTime=10000})")
         for _ in range(500):
             authored = (await page.evaluate('performance.now()') - timeline_epoch) / 1000
