@@ -1,0 +1,65 @@
+name: Alvorada runtime
+
+on:
+  push:
+    branches: [fix/alvorada-canonical-portal-runtime]
+  pull_request:
+    paths:
+      - 'src/features/alvorada/**'
+      - 'src/components/portal/**'
+      - 'src/styles/commission-portal.css'
+      - 'src/test/alvorada*'
+      - 'scripts/alvorada*'
+      - '.github/workflows/alvorada-runtime.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: alvorada-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  baseline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.0'
+      - name: Install locked dependencies
+        run: bun install --frozen-lockfile
+      - name: Record historical code and complete PR 147 diff
+        run: |
+          mkdir -p runtime-audit
+          git fetch --no-tags --depth=1 origin c45c7c2397ee0af92a75cedeca903245debdfe84 695619bd12acbb18837a42fe322cbce7effe23e2 f76c2e05e5d26d90d0118f8ad540a9b2b82b0867 831dcc69f24a68ad57ab1cd2a751323fbcf4d792
+          git diff f76c2e05e5d26d90d0118f8ad540a9b2b82b0867 695619bd12acbb18837a42fe322cbce7effe23e2 > runtime-audit/pr-147.diff
+          git diff 831dcc69f24a68ad57ab1cd2a751323fbcf4d792 9abda2f2c799c133d5a430a988710b1e3a6ac5d4 -- src/features/alvorada src/components/portal src/styles/commission-portal.css > runtime-audit/after-147.diff
+          git archive c45c7c2397ee0af92a75cedeca903245debdfe84 src/features/alvorada src/components/portal src/styles scripts vite.config.ts package.json > runtime-audit/old-host.tar
+          git rev-parse HEAD > runtime-audit/commit.txt
+      - name: Alvorada unit baseline
+        continue-on-error: true
+        run: npx vitest run src/test/alvorada --reporter=json --outputFile=runtime-audit/unit-tests.json
+      - name: Production build baseline
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee runtime-audit/build.log
+      - name: Package isolated source and dependencies for offline browser analysis
+        if: always()
+        run: |
+          mkdir -p runtime-audit
+          tar -czf runtime-audit/workspace.tgz src public scripts node_modules package.json package-lock.json bun.lock index.html vite.config.ts vitest.config.ts tsconfig*.json tailwind.config.ts postcss.config.js eslint.config.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: alvorada-baseline-${{ github.sha }}
+          path: runtime-audit/
+          retention-days: 3
+          compression-level: 0
