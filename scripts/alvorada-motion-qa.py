@@ -1,6 +1,6 @@
 """Motion-policy regression gate on the production-built PortalHero/Canvas.
 
-Native cold/live-toggle lifecycle and isolated matched visual checkpoints.
+Native cold/live-toggle lifecycle and matched visual checkpoints.
 Playwright emulates media/viewport, not physical iPhones or Windows drivers.
 """
 import argparse
@@ -153,22 +153,18 @@ async def lifecycle(browser, mobile, preference, base, output, name, toggle=Fals
         await context.close()
 
 
-async def matched_checkpoint(browser, mobile, preference, base, output, name, checkpoint):
-    # Independently boot the unmodified journey for each still: one checkpoint's
-    # readback cannot affect the next one's compositor or GL state. Continuous
-    # cold and live-toggle scenarios above remain uninterrupted.
+async def matched_journey(browser, mobile, preference, base, output, name, checkpoints):
     context = await options(browser, mobile, preference)
     page = await context.new_page()
     await page.add_init_script(INIT)
     origin = datetime(2026, 9, 14, 9, tzinfo=timezone.utc)
-    label, target = checkpoint
+    frames = []
     try:
         await page.clock.install(time=origin)
         await page.clock.pause_at(origin + timedelta(seconds=1))
         await page.goto(base, wait_until='load')
-        # Document load does not imply React's concurrent root has committed.
-        # RAF-based polling would deadlock under the paused clock; explicitly
-        # allow bootstrap tasks to run BEFORE starting the authored sequence.
+        # React's concurrent root may commit after document load. Poll with
+        # explicit clock ticks BEFORE starting the authored sequence.
         for _ in range(120):
             if await page.evaluate('Boolean(window.__alvoradaMotionQA)'):
                 break
@@ -193,47 +189,58 @@ async def matched_checkpoint(browser, mobile, preference, base, output, name, ch
         # Only the surrounding host reveal is completed to remove preparation
         # latency from comparison. No Alvorada effect is fast-forwarded.
         await page.evaluate("document.querySelector('.fenasoja-portal__hero').getAnimations().forEach(a=>{a.currentTime=10000})")
-        for _ in range(500):
-            authored = (await page.evaluate('performance.now()') - timeline_epoch) / 1000
-            remaining_ms = target * 1000 - authored * 1000
-            if remaining_ms < .5:
-                break
-            await page.clock.run_for(min(16, round(remaining_ms)))
+        for label, target in checkpoints:
+            for _ in range(500):
+                authored = (await page.evaluate('performance.now()') - timeline_epoch) / 1000
+                remaining_ms = target * 1000 - authored * 1000
+                if remaining_ms < .5:
+                    break
+                await page.clock.run_for(min(16, round(remaining_ms)))
+                await page.evaluate(SYNC_CSS)
             await page.evaluate(SYNC_CSS)
-        await page.evaluate(SYNC_CSS)
-        await page.evaluate('window.__alvoradaMotionQA.flush()')
-        await asyncio.sleep(.06)
-        await page.evaluate('window.__alvoradaMotionQA.flush()')
-        await asyncio.sleep(.06)
-        drawing_buffer = await page.evaluate('window.__alvoradaMotionQA.captureDrawingBuffer()')
-        state = await page.evaluate('window.__alvoradaMotionQA.sample(true)')
-        dataset = await page.locator('[data-testid=alvorada-intro]').evaluate('(el)=>({...el.dataset})')
-        check(dataset['visualEngine'] == 'webgl-canonical', 'Wrong visual engine at capture')
-        check(dataset['motionMode'] == 'canonical', 'Wrong motion mode at capture')
-        if state['canvas']:
-            check(abs(float(state['canvas']['elapsed']) - target) < .001,
-                  f'Capture missed authored checkpoint {label}: {state["canvas"]["elapsed"]}')
-            check(abs(float(state['canvas']['elapsed']) - float(state['canvas']['visualElapsed'])) < .001, 'Static sampler used')
-        clip = await page.locator('.fenasoja-portal__intro').bounding_box()
-        filename = f'{name}-{label}.png'
-        if drawing_buffer:
-            (output / f'{name}-{label}-gpu.png').write_bytes(base64.b64decode(drawing_buffer.split(',', 1)[1]))
-        try:
-            await page.screenshot(path=str(output / filename), clip=clip, animations='allow')
-        finally:
-            await page.locator('[data-qa-drawing-buffer]').evaluate_all('(elements)=>elements.forEach(el=>el.remove())')
-        return {'label': label, 'target': target, 'state': state, 'dataset': dataset,
-                'styles': await page.evaluate(STYLE_SAMPLE), 'image': filename,
-                'isolatedContext': True,
-                'capture': 'actual-gpu-buffer-plus-dom' if drawing_buffer else 'native-dom'}
+            await page.evaluate('window.__alvoradaMotionQA.flush()')
+            await asyncio.sleep(.06)
+            await page.evaluate('window.__alvoradaMotionQA.flush()')
+            await asyncio.sleep(.06)
+            drawing_buffer = await page.evaluate('window.__alvoradaMotionQA.captureDrawingBuffer()')
+            state = await page.evaluate('window.__alvoradaMotionQA.sample(true)')
+            dataset = await page.locator('[data-testid=alvorada-intro]').evaluate('(el)=>({...el.dataset})')
+            check(dataset['visualEngine'] == 'webgl-canonical', 'Wrong visual engine at capture')
+            check(dataset['motionMode'] == 'canonical', 'Wrong motion mode at capture')
+            if state['canvas']:
+                check(abs(float(state['canvas']['elapsed']) - target) < .001,
+                      f'Capture missed authored checkpoint {label}: {state["canvas"]["elapsed"]}')
+                check(abs(float(state['canvas']['elapsed']) - float(state['canvas']['visualElapsed'])) < .001, 'Static sampler used')
+            clip = await page.locator('.fenasoja-portal__intro').bounding_box()
+            filename = f'{name}-{label}.png'
+            if drawing_buffer:
+                (output / f'{name}-{label}-gpu.png').write_bytes(base64.b64decode(drawing_buffer.split(',', 1)[1]))
+            try:
+                await page.screenshot(path=str(output / filename), clip=clip, animations='allow')
+            finally:
+                await page.locator('[data-qa-drawing-buffer]').evaluate_all('(elements)=>elements.forEach(el=>el.remove())')
+            frames.append({'label': label, 'target': target, 'state': state, 'dataset': dataset,
+                           'styles': await page.evaluate(STYLE_SAMPLE), 'image': filename,
+                           'isolatedContext': len(checkpoints) == 1,
+                           'capture': 'actual-gpu-buffer-plus-dom' if drawing_buffer else 'native-dom'})
+            if len(checkpoints) > 1:
+                (output / f'{name}-frames.json').write_text(json.dumps(frames, indent=2))
+        return frames
     finally:
         await context.close()
 
 
 async def matched_frames(browser, mobile, preference, base, output, name):
+    # Chromium supports sequential paused captures: traverse the journey once,
+    # not six times on SwiftShader. This keeps the original 180s QA budget and
+    # every checkpoint/assertion. WebKit uses fresh checkpoint contexts to
+    # isolate its paused compositor/readback state. Neither changes the product.
+    # Native cold/live-toggle tests run uninterrupted in BOTH browser engines.
+    if browser.browser_type.name == 'chromium':
+        return await matched_journey(browser, mobile, preference, base, output, name, SAMPLES)
     frames = []
     for checkpoint in SAMPLES:
-        frames.append(await matched_checkpoint(browser, mobile, preference, base, output, name, checkpoint))
+        frames.extend(await matched_journey(browser, mobile, preference, base, output, name, [checkpoint]))
         (output / f'{name}-frames.json').write_text(json.dumps(frames, indent=2))
     return frames
 
@@ -265,7 +272,6 @@ def compare_frames(left, right, output):
         mae = sum(ImageStat.Stat(diff).mean)/3
         diff.save(output / f'diff-{a["image"]}')
         results.append({'frame': a['label'], 'meanAbsoluteChannelDifference': mae, 'limit': 2.0})
-        # The original limit is unchanged: no masking or image registration.
         check(mae <= 2.0, f'Visual mismatch at {a["label"]}: MAE {mae:.3f}/255')
     return results
 
