@@ -335,12 +335,12 @@ addEntity({
   code,
   bounds,
   code === 'G' ? {
-    unresolvedPrintedLots: ['03', '04'],
-    sourceNote: 'Os lotes impressos 03 e 04 permanecem fora do cadastro: após o arquivamento de B40 (Espaço Institucional — Emater/Ascar) em 30/08/2026 a coluna central passou a ser ocupada pela Rua Interna da Quadra G. Conflito cartográfico documentado, pendente de decisão.',
-    pendingCartographicConflict: {
+    unresolvedPrintedLots: [],
+    sourceNote: 'Quadra completa com oito lotes conforme a planta oficial A1. Histórico: B40 (Espaço Institucional — Emater/Ascar) ocupou a coluna central até seu arquivamento em 30/08/2026 e, em seguida, a coluna foi tomada pela Rua Interna da Quadra G — via inexistente na planta oficial, removida em 2026.4.',
+    historicalSuppression: {
       identifiers: ['Q-G-03', 'Q-G-04'],
-      reason: 'A coluna central da Quadra G é ocupada pela Rua Interna da Quadra G (RUA-INTERNA-QUADRA-G).',
-      documentedIn: EXTERNAL_LOT_AREA_REVISION,
+      reason: 'Coluna central ocupada por B40 (arquivado) e depois pela Rua Interna da Quadra G (removida).',
+      resolvedIn: EXTERNAL_LOT_AREA_REVISION,
     },
   } : undefined,
   code === 'R' ? EXPORURAL_R_SOURCE_POLYGON : code === 'S' ? EXPORURAL_S_SOURCE_POLYGON : undefined,
