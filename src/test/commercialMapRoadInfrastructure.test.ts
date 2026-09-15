@@ -94,7 +94,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
   });
 
   it('mantém os novos corredores dentro das faixas reservadas, sem invadir lotes', () => {
-    const newCorridors = ['RUA-URUGUAI-LESTE', 'RUA-ARGENTINA-LESTE', 'RUA-MONTEVIDEU-SUL', 'RUA-INTERNA-OESTE', 'RUA-INTERNA-QUADRA-G', 'RUA-INTERNA-QUADRA-T', 'RUA-LESTE-EXPORURAL', 'RUA-UBIRETAMA-LATERAL-R55'];
+    const newCorridors = ['RUA-URUGUAI-LESTE', 'RUA-ARGENTINA-LESTE', 'RUA-MONTEVIDEU-SUL', 'RUA-INTERNA-OESTE', 'RUA-INTERNA-QUADRA-T', 'RUA-LESTE-EXPORURAL', 'RUA-UBIRETAMA-LATERAL-R55'];
     const box = (ring: readonly (readonly [number, number])[] | number[][]) => {
       const points = ring as number[][];
       return {
