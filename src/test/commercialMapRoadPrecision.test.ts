@@ -70,7 +70,7 @@ describe('September 13 precision road correction', () => {
     expect(road.sourcePdfCenterline).toEqual([[3267,1703],[3267,1720],[3265,1805],[3263.5,1935],[3263.5,2040],[3263.5,2069]]);
     const removed = corridorPolygon([[3400,1740],[3880,1740]].map(p => officialPdfPointToLocal(p as [number,number])),0.1);
     for (const surface of PARK_ACCESS_SPATIAL_PLAN.roadSurfaces) {
-      expect(polygonClipping.intersection([[surface.polygon.map(p => [p[0],p[1]])]],removed), surface.id).toEqual([]);
+      expect(polygonClipping.intersection([[surface.polygon.map(p => [p[0], p[1]] as [number, number])]],removed), surface.id).toEqual([]);
     }
   });
 

@@ -335,12 +335,12 @@ addEntity({
   code,
   bounds,
   code === 'G' ? {
-    unresolvedPrintedLots: ['03', '04'],
-    sourceNote: 'Os lotes impressos 03 e 04 permanecem fora do cadastro: após o arquivamento de B40 (Espaço Institucional — Emater/Ascar) em 30/08/2026 a coluna central passou a ser ocupada pela Rua Interna da Quadra G. Conflito cartográfico documentado, pendente de decisão.',
-    pendingCartographicConflict: {
+    unresolvedPrintedLots: [],
+    sourceNote: 'Quadra completa com oito lotes conforme a planta oficial A1. Histórico: B40 (Espaço Institucional — Emater/Ascar) ocupou a coluna central até seu arquivamento em 30/08/2026 e, em seguida, a coluna foi tomada pela Rua Interna da Quadra G — via inexistente na planta oficial, removida em 2026.4.',
+    historicalSuppression: {
       identifiers: ['Q-G-03', 'Q-G-04'],
-      reason: 'A coluna central da Quadra G é ocupada pela Rua Interna da Quadra G (RUA-INTERNA-QUADRA-G).',
-      documentedIn: EXTERNAL_LOT_AREA_REVISION,
+      reason: 'Coluna central ocupada por B40 (arquivado) e depois pela Rua Interna da Quadra G (removida).',
+      resolvedIn: EXTERNAL_LOT_AREA_REVISION,
     },
   } : undefined,
   code === 'R' ? EXPORURAL_R_SOURCE_POLYGON : code === 'S' ? EXPORURAL_S_SOURCE_POLYGON : undefined,
@@ -395,10 +395,11 @@ addTwoRowGrid('I', [2830, 3495, 3440, 3715], [2, 4, 6, 8, 10, 12, 14, 16], [1, 3
 addTwoRowGrid('F', [3484, 2890, 3760, 3105], [2, 4, 6, 8], [1, 3, 5, 7]);
 addTwoRowGrid('D', [3484, 3495, 3935, 3715], [2, 4, 6, 8, 10, 12], [1, 3, 5, 7, 9, 11]);
 
-// A coluna de índice 1 (lotes 03/04) segue fora do cadastro: o espaço é hoje
-// ocupado pela Rua Interna da Quadra G. Conflito documentado, sem criação.
+// Quadra G completa: a coluna de índice 1 (lotes 03/04) voltou ao cadastro em
+// 2026.4 com a remoção da Rua Interna da Quadra G, via ausente da planta oficial.
 const gColumns: Array<{ top: number; bottom: number; index: number }> = [
   { top: 2, bottom: 1, index: 0 },
+  { top: 4, bottom: 3, index: 1 },
   { top: 6, bottom: 5, index: 2 },
   { top: 8, bottom: 7, index: 3 },
 ];
@@ -414,7 +415,7 @@ addLot('E', 12, rectPdf([3835, 3267, 3935, 3352], LOT_INSET));
 addLot('E', 11, rectPdf([3835, 3352, 3935, 3437], LOT_INSET));
 
 const expectedLotCounts: Record<string, number> = {
-  S: 36, R: 59, V: 6, Q: 6, U: 12, P: 14, M: 16, G: 6,
+  S: 36, R: 59, V: 6, Q: 6, U: 12, P: 14, M: 16, G: 8,
   T: 12, O: 14, L: 16, F: 8, J: 16, E: 13, I: 16, D: 12,
 };
 
@@ -469,7 +470,6 @@ const roadInputs: Array<[string, string, PdfPolygon, MapClassification?]> = [
   // A antiga "Praça de Acesso à Exporural" foi retirada: o acesso ao lado do
   // Espaço Mirante é feito pela própria Rua Brasília, que já desce da lateral
   // do Q-E-13 até a Rua Pastor Albert Lehenbauer, ao lado do Q-R-02.
-  ['RUA-INTERNA-QUADRA-G', 'Rua Interna da Quadra G', rectPdf([3552, 2624, 3622, 2836])],
   ['RUA-INTERNA-QUADRA-T', 'Rua Interna das Quadras V, U e T', rectPdf([1749, 2444, 1811, 3108])],
   ['RUA-LESTE-EXPORURAL', 'Rua Leste da Exporural', rectPdf([5942, 1265, 5966, 1762])],
   // Faixa da Rua Ubiretama que passa rente ao lado leste do Q-R-55 e encontra
