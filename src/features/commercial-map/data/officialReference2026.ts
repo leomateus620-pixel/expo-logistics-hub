@@ -395,10 +395,11 @@ addTwoRowGrid('I', [2830, 3495, 3440, 3715], [2, 4, 6, 8, 10, 12, 14, 16], [1, 3
 addTwoRowGrid('F', [3484, 2890, 3760, 3105], [2, 4, 6, 8], [1, 3, 5, 7]);
 addTwoRowGrid('D', [3484, 3495, 3935, 3715], [2, 4, 6, 8, 10, 12], [1, 3, 5, 7, 9, 11]);
 
-// A coluna de índice 1 (lotes 03/04) segue fora do cadastro: o espaço é hoje
-// ocupado pela Rua Interna da Quadra G. Conflito documentado, sem criação.
+// Quadra G completa: a coluna de índice 1 (lotes 03/04) voltou ao cadastro em
+// 2026.4 com a remoção da Rua Interna da Quadra G, via ausente da planta oficial.
 const gColumns: Array<{ top: number; bottom: number; index: number }> = [
   { top: 2, bottom: 1, index: 0 },
+  { top: 4, bottom: 3, index: 1 },
   { top: 6, bottom: 5, index: 2 },
   { top: 8, bottom: 7, index: 3 },
 ];
