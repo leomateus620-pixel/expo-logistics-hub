@@ -17,7 +17,7 @@ const expectedLots: Record<string, number[]> = {
   U: Array.from({ length: 12 }, (_, index) => index + 1),
   P: Array.from({ length: 14 }, (_, index) => index + 1),
   M: Array.from({ length: 16 }, (_, index) => index + 1),
-  G: Array.from({ length: 8 }, (_, index) => index + 1),
+  G: [1, 2, 5, 6, 7, 8],
   T: Array.from({ length: 12 }, (_, index) => index + 1),
   O: Array.from({ length: 14 }, (_, index) => index + 1),
   L: Array.from({ length: 16 }, (_, index) => index + 1),
@@ -55,7 +55,7 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(quadras).toEqual(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'I', 'J', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'X']);
   });
 
-  it('preserva exatamente as 264 numerações visíveis por quadra', () => {
+  it('preserva exatamente as 262 numerações visíveis por quadra', () => {
     const entitiesById = new Map(OFFICIAL_REFERENCE_DATA.entities.map((entity) => [entity.id, entity]));
     const externalLots = OFFICIAL_REFERENCE_DATA.lots.filter(
       (lot) => entitiesById.get(lot.entityId)?.classification === 'SELLABLE_LOT',
@@ -70,12 +70,11 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
       expect(lot.activeContractNumber).toBeNull();
     });
 
-    expect(externalLots).toHaveLength(264);
+    expect(externalLots).toHaveLength(262);
     expect(Object.fromEntries([...lotsByBlock].map(([block, values]) => [block, values.sort((a, b) => a - b)])))
       .toEqual(expectedLots);
-    // G-03 e G-04 voltaram ao cadastro em 2026.4 após o arquivamento de B40.
-    expect(lotsByBlock.get('G')).toContain(3);
-    expect(lotsByBlock.get('G')).toContain(4);
+    expect(lotsByBlock.get('G')).not.toContain(3);
+    expect(lotsByBlock.get('G')).not.toContain(4);
   });
 
   it('incorpora os 1.315 módulos neutros dos oito pavilhões oficiais sem inventar área, comprador ou contrato', () => {
@@ -90,7 +89,7 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
       { publicIdentifier: 'B10', block: 'P7', moduleCount: 171, segmentId: null },
     ] as const;
 
-    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(1579);
+    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(1577);
     pavilionReferences.forEach((reference) => {
       const pavilion = OFFICIAL_REFERENCE_DATA.entities.find(
         (entity) => entity.publicIdentifier === reference.publicIdentifier,
@@ -299,7 +298,7 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
       .map((entity) => entity.publicIdentifier);
     expect(new Set(entityIdentifiers).size).toBe(entityIdentifiers.length);
     expect(new Set(lotIdentifiers).size).toBe(lotIdentifiers.length);
-    expect(externalLotIdentifiers).toHaveLength(264);
+    expect(externalLotIdentifiers).toHaveLength(262);
     expect(externalLotIdentifiers.every((identifier) => /^Q-[A-Z]-\d{2}$/.test(identifier))).toBe(true);
     expect(pavilionModuleIdentifiers).toHaveLength(1315);
     expect(pavilionModuleIdentifiers.every((identifier) => /^B(?:1|2|3|4|5|6|8|10)-M\d{3}$/.test(identifier))).toBe(true);

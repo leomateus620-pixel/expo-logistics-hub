@@ -335,12 +335,12 @@ addEntity({
   code,
   bounds,
   code === 'G' ? {
-    unresolvedPrintedLots: [],
-    sourceNote: 'Quadra completa com oito lotes conforme a planta oficial A1. Histórico: até 2026.4 os lotes 03/04 eram suprimidos porque B40 (Espaço Institucional — Emater/Ascar) ocupava a coluna central; B40 foi arquivado em 30/08/2026 e a supressão deixou de valer.',
-    historicalSuppression: {
+    unresolvedPrintedLots: ['03', '04'],
+    sourceNote: 'Os lotes impressos 03 e 04 permanecem fora do cadastro: após o arquivamento de B40 (Espaço Institucional — Emater/Ascar) em 30/08/2026 a coluna central passou a ser ocupada pela Rua Interna da Quadra G. Conflito cartográfico documentado, pendente de decisão.',
+    pendingCartographicConflict: {
       identifiers: ['Q-G-03', 'Q-G-04'],
-      reason: 'B40 cobria a coluna regular da Quadra G até seu arquivamento em 30/08/2026.',
-      resolvedIn: EXTERNAL_LOT_AREA_REVISION,
+      reason: 'A coluna central da Quadra G é ocupada pela Rua Interna da Quadra G (RUA-INTERNA-QUADRA-G).',
+      documentedIn: EXTERNAL_LOT_AREA_REVISION,
     },
   } : undefined,
   code === 'R' ? EXPORURAL_R_SOURCE_POLYGON : code === 'S' ? EXPORURAL_S_SOURCE_POLYGON : undefined,
@@ -415,7 +415,7 @@ addLot('E', 12, rectPdf([3835, 3267, 3935, 3352], LOT_INSET));
 addLot('E', 11, rectPdf([3835, 3352, 3935, 3437], LOT_INSET));
 
 const expectedLotCounts: Record<string, number> = {
-  S: 36, R: 59, V: 6, Q: 6, U: 12, P: 14, M: 16, G: 8,
+  S: 36, R: 59, V: 6, Q: 6, U: 12, P: 14, M: 16, G: 6,
   T: 12, O: 14, L: 16, F: 8, J: 16, E: 13, I: 16, D: 12,
 };
 
