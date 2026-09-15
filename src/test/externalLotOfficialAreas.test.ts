@@ -53,8 +53,8 @@ describe('metragens oficiais dos lotes externos', () => {
       (lot) => lot.block !== null && (EXTERNAL_LOT_AREA_BLOCKS as readonly string[]).includes(lot.block),
     );
 
-    // 167 cadastrados: Q-G-03 e Q-G-04 seguem fora por conflito com a via interna.
-    expect(externalLots).toHaveLength(167);
+    // 169 cadastrados após a remoção da via interna da Quadra G. (antes: conflito com a via interna.
+    expect(externalLots).toHaveLength(169);
     externalLots.forEach((lot) => {
       const reference = getExternalLotOfficialAreaByIdentifier(lot.publicIdentifier)!;
       expect(lot.officialAreaSqm).toBe(reference.officialAreaSqm);

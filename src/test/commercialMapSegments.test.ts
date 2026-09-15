@@ -111,7 +111,7 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
       'QUADRA-J', 'QUADRA-E', 'QUADRA-I', 'QUADRA-D',
     ]));
     expect(blockIdentifiers).toHaveLength(8);
-    expect(lotIdentifiers).toHaveLength(103);
+    expect(lotIdentifiers).toHaveLength(105);
     expect(pavilionModuleIdentifiers).toHaveLength(1063);
     expect(pavilionModuleIdentifiers).toEqual(expect.arrayContaining([
       'B1-M001', 'B1-M189',
@@ -121,7 +121,7 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
       'B5-M001', 'B5-M103',
       'B6-M001', 'B6-M214',
     ]));
-    expect(identifiers).toHaveLength(1203);
+    expect(identifiers).toHaveLength(1205);
     expect(lotIdentifiers).toEqual(expect.arrayContaining([
       'Q-G-01', 'Q-G-02', 'Q-G-03', 'Q-G-04', 'Q-G-05', 'Q-G-06', 'Q-G-07', 'Q-G-08',
     ]));
@@ -138,7 +138,7 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
 
     const inventory = commercialMapSegmentInventory(OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS);
     expect(inventory.find(({ segment }) => segment.id === COMMERCIAL_MAP_SEGMENT_IDS.industry))
-      .toMatchObject({ entityCount: 1203, lotCount: 1166 });
+      .toMatchObject({ entityCount: 1205, lotCount: 1168 });
   });
 
   it('não aceita sobreposição silenciosa entre segmentos', () => {

@@ -31,7 +31,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
   const roads = circulation.filter((entity) => entity.classification === 'ROAD');
 
   it('preserva o inventário cartográfico oficial sem criar vias artificiais', () => {
-    expect(roads).toHaveLength(30);
+    expect(roads).toHaveLength(29);
     expect(circulation.filter((entity) => entity.classification === 'PEDESTRIAN_PATH')).toHaveLength(1);
     expect(circulation.every((entity) => entity.geometry.elevation === 0)).toBe(true);
     expect(roads.every((entity) => entity.geometry.extrusionHeight === ROAD_INFRASTRUCTURE.asphaltHeight)).toBe(true);
@@ -141,7 +141,6 @@ describe('infraestrutura viária do Mapa Comercial', () => {
       ['eixo Q-E-13 → Q-R-02 ao lado do Mirante', 13.4, -9.6],
       ['eixo Q-E-13 → Q-R-02 na altura da Quadra E', 13.4, 5.4],
       ['corredor oeste das Quadras F e G', 2.4, -2.0],
-      ['corredor interno da Quadra G', 5.1, -5.3],
       ['corredor Q-V-06 → Q-T-12', -34.2, -4.5],
       ['faixa leste Q-R-55 → Q-S-19', 56.8, -30.0],
       ['Rua Ubiretama ao lado do Q-R-55', 57.5, -23.0],
@@ -250,7 +249,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
       expect(detailed.gutters).not.toBeNull();
       expect(detailed.curbs).not.toBeNull();
       expect(detailed.diagnostics).toMatchObject({
-        roadCount: 30,
+        roadCount: 29,
         pedestrianPathCount: 1,
         microGapCount: 1,
       });
