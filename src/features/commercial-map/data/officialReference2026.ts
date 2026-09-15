@@ -415,7 +415,7 @@ addLot('E', 12, rectPdf([3835, 3267, 3935, 3352], LOT_INSET));
 addLot('E', 11, rectPdf([3835, 3352, 3935, 3437], LOT_INSET));
 
 const expectedLotCounts: Record<string, number> = {
-  S: 36, R: 59, V: 6, Q: 6, U: 12, P: 14, M: 16, G: 6,
+  S: 36, R: 59, V: 6, Q: 6, U: 12, P: 14, M: 16, G: 8,
   T: 12, O: 14, L: 16, F: 8, J: 16, E: 13, I: 16, D: 12,
 };
 
@@ -470,7 +470,6 @@ const roadInputs: Array<[string, string, PdfPolygon, MapClassification?]> = [
   // A antiga "Praça de Acesso à Exporural" foi retirada: o acesso ao lado do
   // Espaço Mirante é feito pela própria Rua Brasília, que já desce da lateral
   // do Q-E-13 até a Rua Pastor Albert Lehenbauer, ao lado do Q-R-02.
-  ['RUA-INTERNA-QUADRA-G', 'Rua Interna da Quadra G', rectPdf([3552, 2624, 3622, 2836])],
   ['RUA-INTERNA-QUADRA-T', 'Rua Interna das Quadras V, U e T', rectPdf([1749, 2444, 1811, 3108])],
   ['RUA-LESTE-EXPORURAL', 'Rua Leste da Exporural', rectPdf([5942, 1265, 5966, 1762])],
   // Faixa da Rua Ubiretama que passa rente ao lado leste do Q-R-55 e encontra
