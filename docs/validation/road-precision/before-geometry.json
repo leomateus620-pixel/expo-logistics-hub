@@ -12251,44 +12251,6 @@
       }
     },
     {
-      "id": "RUA-INTERNA-QUADRA-G",
-      "classification": "ROAD",
-      "hash": "7a469f11bc349363931ba02d530bef26dea12800ae568cd0d17dbb4a9b5d5839",
-      "geometry": {
-        "id": null,
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              4.407272727272726,
-              -7.658181856626506
-            ],
-            [
-              5.934545454545457,
-              -7.658181856626506
-            ],
-            [
-              5.934545454545457,
-              -3.0327272879518077
-            ],
-            [
-              4.407272727272726,
-              -3.0327272879518077
-            ],
-            [
-              4.407272727272726,
-              -7.658181856626506
-            ]
-          ]
-        ],
-        "elevation": 0,
-        "extrusionHeight": 0.032,
-        "rotation": 0,
-        "geometryVersion": 1,
-        "calibrationVersion": null
-      }
-    },
-    {
       "id": "RUA-INTERNA-QUADRA-T",
       "classification": "ROAD",
       "hash": "40f60c520f0ed409e8f4095c3e677c0e0b085fba3d6daac94181e239eac0a479",
@@ -64969,6 +64931,14 @@
         "geometryVersion": 1,
         "calibrationVersion": null
       }
+    },
+    {
+      "id": "Q-G-03",
+      "hash": "1ebc322d7cf7f21cb813962f71b4c90bd083cdf1f3262507795ecd8136a61904"
+    },
+    {
+      "id": "Q-G-04",
+      "hash": "8f886510b1b552d35d47ecf48c0fc2c2b19df7c6982f21f2a99c6508dd39e48c"
     }
   ],
   "roads": [
