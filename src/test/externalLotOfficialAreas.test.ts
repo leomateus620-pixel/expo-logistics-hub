@@ -53,7 +53,8 @@ describe('metragens oficiais dos lotes externos', () => {
       (lot) => lot.block !== null && (EXTERNAL_LOT_AREA_BLOCKS as readonly string[]).includes(lot.block),
     );
 
-    expect(externalLots).toHaveLength(169);
+    // 167 cadastrados: Q-G-03 e Q-G-04 seguem fora por conflito com a via interna.
+    expect(externalLots).toHaveLength(167);
     externalLots.forEach((lot) => {
       const reference = getExternalLotOfficialAreaByIdentifier(lot.publicIdentifier)!;
       expect(lot.officialAreaSqm).toBe(reference.officialAreaSqm);
@@ -81,14 +82,12 @@ describe('metragens oficiais dos lotes externos', () => {
       });
   });
 
-  it('reabre os lotes 03 e 04 da Quadra G com 168,00 m² sem ressuscitar B40', () => {
+  it('documenta Q-G-03 e Q-G-04 sem cadastrá-los enquanto a via interna ocupa a coluna', () => {
     ['Q-G-03', 'Q-G-04'].forEach((identifier) => {
-      const lot = OFFICIAL_REFERENCE_DATA.lots.find((item) => item.publicIdentifier === identifier)!;
-      expect(lot.officialAreaSqm).toBe(168.00);
-      expect(lot.currentBuyer).toBeNull();
-      expect(lot.activeContractNumber).toBeNull();
+      expect(getExternalLotOfficialAreaByIdentifier(identifier)?.officialAreaSqm).toBe(168.00);
+      expect(OFFICIAL_REFERENCE_DATA.lots.find((item) => item.publicIdentifier === identifier)).toBeUndefined();
     });
-    const b40 = OFFICIAL_REFERENCE_DATA.entities.find((entity) => entity.publicIdentifier === 'B40');
-    expect(b40).toBeUndefined();
+    expect(OFFICIAL_REFERENCE_DATA.entities.some((entity) => entity.publicIdentifier === 'RUA-INTERNA-QUADRA-G')).toBe(true);
+    expect(OFFICIAL_REFERENCE_DATA.entities.find((entity) => entity.publicIdentifier === 'B40')).toBeUndefined();
   });
 });
