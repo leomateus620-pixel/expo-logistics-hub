@@ -81,8 +81,12 @@ const INDUSTRY_RELATED_ENTITIES = [
   'RUA-URUGUAI', 'RUA-MONTEVIDEU', 'CALCADA-ARVOREDO',
 ] as const;
 
+/**
+ * Q-G-03 e Q-G-04 deixaram de ser excluídos em 2026.4: a supressão existia
+ * porque B40 (Emater/Ascar) ocupava a coluna central da Quadra G. B40 está
+ * arquivado desde 30/08/2026 e os dois lotes constam da planta oficial A1.
+ */
 const INDUSTRY_EXCLUDED_ENTITIES = [
-  'Q-G-03', 'Q-G-04',
   'QUADRA-N', 'B7', 'B28', 'D4',
   'QUADRA-C', 'QUADRA-B', 'QUADRA-A', 'C1',
   'B11', 'B12', 'B13', 'B14', 'B15', 'B18', 'B21',

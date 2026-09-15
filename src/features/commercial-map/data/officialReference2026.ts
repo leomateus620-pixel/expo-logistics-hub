@@ -30,6 +30,11 @@ import {
 } from './exporuralReference2026';
 import { withCommercialMapSegmentMetadata } from './commercialMapSegments';
 import {
+  EXTERNAL_LOT_AREA_REVISION,
+  EXTERNAL_LOT_AREA_SOURCE,
+  getExternalLotOfficialArea,
+} from './externalLotOfficialAreas';
+import {
   createCommercialPavilionReferenceProjectionFrame,
   DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION,
   projectCommercialPavilionReferencePoint,
@@ -213,6 +218,7 @@ function addLot(block: string, value: number | string, polygon: PdfPolygon, meta
   const key = `${block}-${number}`;
   if (lotKeys.has(key)) throw new Error(`Lote oficial duplicado: ${key}`);
   lotKeys.add(key);
+  const externalArea = getExternalLotOfficialArea(block, Number(number));
   addEntity({
     publicIdentifier: `Q-${block}-${number}`,
     name: `Lote ${number}`,
@@ -225,7 +231,16 @@ function addLot(block: string, value: number | string, polygon: PdfPolygon, meta
       block,
       lotNumber: number,
       officialLabelVerified: true,
+      // A geometria segue cartográfica mesmo quando existe área documental:
+      // a área oficial é cadastral, não medida sobre o polígono simplificado.
       cartographicAreaOnly: true,
+      ...(externalArea ? {
+        officialAreaSqm: externalArea.officialAreaSqm,
+        areaSource: EXTERNAL_LOT_AREA_SOURCE,
+        areaSourceRevision: EXTERNAL_LOT_AREA_REVISION,
+        areaValidationScope: 'CADASTRAL_DOCUMENT',
+        officialMeasurements: false,
+      } : {}),
       ...metadata,
     },
   });
@@ -319,7 +334,15 @@ addEntity({
 ] as Array<[string, PdfBounds]>).forEach(([code, bounds]) => addQuadra(
   code,
   bounds,
-  code === 'G' ? { unresolvedPrintedLots: ['03', '04'], sourceNote: 'B40 cobre a coluna regular; os números 03/04 não estão impressos no mapa oficial.' } : undefined,
+  code === 'G' ? {
+    unresolvedPrintedLots: [],
+    sourceNote: 'Quadra completa com oito lotes conforme a planta oficial A1. Histórico: até 2026.4 os lotes 03/04 eram suprimidos porque B40 (Espaço Institucional — Emater/Ascar) ocupava a coluna central; B40 foi arquivado em 30/08/2026 e a supressão deixou de valer.',
+    historicalSuppression: {
+      identifiers: ['Q-G-03', 'Q-G-04'],
+      reason: 'B40 cobria a coluna regular da Quadra G até seu arquivamento em 30/08/2026.',
+      resolvedIn: EXTERNAL_LOT_AREA_REVISION,
+    },
+  } : undefined,
   code === 'R' ? EXPORURAL_R_SOURCE_POLYGON : code === 'S' ? EXPORURAL_S_SOURCE_POLYGON : undefined,
 ));
 
@@ -372,8 +395,11 @@ addTwoRowGrid('I', [2830, 3495, 3440, 3715], [2, 4, 6, 8, 10, 12, 14, 16], [1, 3
 addTwoRowGrid('F', [3484, 2890, 3760, 3105], [2, 4, 6, 8], [1, 3, 5, 7]);
 addTwoRowGrid('D', [3484, 3495, 3935, 3715], [2, 4, 6, 8, 10, 12], [1, 3, 5, 7, 9, 11]);
 
+// A coluna de índice 1 voltou ao cadastro em 2026.4 (lotes 03/04). Ficava
+// omitida enquanto B40 ocupava o espaço; B40 segue arquivado e não é renderizado.
 const gColumns: Array<{ top: number; bottom: number; index: number }> = [
   { top: 2, bottom: 1, index: 0 },
+  { top: 4, bottom: 3, index: 1 },
   { top: 6, bottom: 5, index: 2 },
   { top: 8, bottom: 7, index: 3 },
 ];
@@ -389,7 +415,7 @@ addLot('E', 12, rectPdf([3835, 3267, 3935, 3352], LOT_INSET));
 addLot('E', 11, rectPdf([3835, 3352, 3935, 3437], LOT_INSET));
 
 const expectedLotCounts: Record<string, number> = {
-  S: 36, R: 59, V: 6, Q: 6, U: 12, P: 14, M: 16, G: 6,
+  S: 36, R: 59, V: 6, Q: 6, U: 12, P: 14, M: 16, G: 8,
   T: 12, O: 14, L: 16, F: 8, J: 16, E: 13, I: 16, D: 12,
 };
 
@@ -1058,10 +1084,24 @@ export const OFFICIAL_REFERENCE_LOTS: CommercialLot[] = officialLotEntities.map(
     : String(entity.metadata.block);
   const number = String(entity.metadata.lotNumber);
   const exporuralReference = getExporuralReference(block, number);
-  const officialAreaSqm = exporuralReference?.officialAreaSqm ?? null;
+  // Precedência: Exporural (medida e calibrada) primeiro; depois a tabela
+  // documental externa (ICS externa, Espaço do Automóvel e faixa Q/V).
+  // Pavilhões e demais quadras seguem sem área documental.
+  const externalReference = !isPavilionModule && !exporuralReference
+    ? getExternalLotOfficialArea(block, Number(number))
+    : undefined;
+  const officialAreaSqm = exporuralReference?.officialAreaSqm
+    ?? externalReference?.officialAreaSqm
+    ?? null;
+  // Área calculada só existe onde há geometria calibrada (Exporural).
   const calculatedAreaSqm = exporuralReference
     ? sourcePolygonAreaSqm(exporuralReference.sourcePolygon)
     : null;
+  // Validação CADASTRAL da área documental — não é validação métrica da
+  // geometria simplificada, que permanece cartográfica.
+  const areaValidationStatus = exporuralReference || externalReference
+    ? 'VALIDATED'
+    : 'UNVALIDATED';
   return {
     id: isPavilionModule
       ? `reference:2026:lot:${slug(entity.publicIdentifier)}`
@@ -1078,7 +1118,7 @@ export const OFFICIAL_REFERENCE_LOTS: CommercialLot[] = officialLotEntities.map(
     status: 'BLOCKED',
     officialAreaSqm,
     calculatedAreaSqm,
-    areaValidationStatus: exporuralReference ? 'VALIDATED' : 'UNVALIDATED',
+    areaValidationStatus,
     frontageMeters: null,
     depthMeters: null,
     pricingMode: 'NOT_FOR_SALE',
