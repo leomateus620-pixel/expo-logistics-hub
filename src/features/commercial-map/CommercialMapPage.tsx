@@ -36,6 +36,7 @@ import { MapToolbar } from './components/controls/MapToolbar';
 import { CommercialMapTopBar } from './components/controls/CommercialMapTopBar';
 import { CommercialMapDock } from './components/dock/CommercialMapDock';
 import { CommercialMapHeaderTools } from './components/shell/CommercialMapHeaderTools';
+import { SalesModeLayer } from './sales/components/SalesModeLayer';
 const GeometryEditor = lazy(() => import('./components/editor/GeometryEditor').then((m) => ({ default: m.GeometryEditor })));
 const LotCreationWorkspace = lazy(() => import('./components/editor/LotCreationWorkspace').then((m) => ({ default: m.LotCreationWorkspace })));
 const EntityDetailsPanel = lazy(() => import('./components/panels/MapPanels').then((m) => ({ default: m.EntityDetailsPanel })));
@@ -476,7 +477,10 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
       className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${hydrologicalModeActive ? 'is-hydrological-mode' : ''} ${parkingInspectionOpen ? 'is-parking-inspection' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''} ${lunarCinematicUiActive ? 'is-lunar-launch-active' : ''} ${lunarLaunchReturnAvailable ? 'has-lunar-launch-return' : ''}`}
       aria-label="Plataforma de gestão do mapa comercial"
     >
-      <CommercialMapHeaderTools managementActions={managementActions} />
+      <CommercialMapHeaderTools
+        managementActions={managementActions}
+        salesAvailable={data.source === 'database' && permissions.canManageSales}
+      />
 
       <div className="commercial-map-body">
         <CommercialMapDock
