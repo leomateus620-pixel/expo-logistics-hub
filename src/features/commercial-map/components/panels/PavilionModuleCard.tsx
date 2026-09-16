@@ -22,11 +22,22 @@ import type {
 } from '../../types';
 import type { CommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
 import { buildPavilionModuleCommercialIndex } from '../../utils/pavilionModuleCommercial';
+import {
+  formatAreaSqm,
+  getPavilionAreaSummary,
+} from '../../data/pavilionModuleOfficialAreas';
 import { CompactDetailSheetControls } from './CompactDetailSheet';
 import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { LotAvailabilityDialog } from '../commercial/LotAvailabilityDialog';
 import { LotEditDialog } from '../commercial/LotEditDialog';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
+
+const AREA_VALIDATION_LABELS: Record<string, string> = {
+  VALIDATED: 'Área conferida no croqui oficial',
+  CALCULATED: 'Área derivada da malha modular oficial',
+  UNVALIDATED: 'Área documental pendente de conferência',
+  REJECTED: 'Área rejeitada na conferência',
+};
 
 const SEQUENCE_LABELS = {
   'x-increasing': 'Sequência horizontal',
@@ -97,7 +108,19 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
 
   if (!cell) return null;
 
-  const individualArea = lot?.officialAreaSqm ?? cell.areaM2 ?? null;
+  // Em modo conectado a ficha reflete a área persistida — o valor de referência
+  // não pode mascarar um cadastro ainda sem metragem.
+  const individualArea = persisted
+    ? lot?.officialAreaSqm ?? null
+    : lot?.officialAreaSqm ?? cell.areaM2 ?? null;
+  const areaLabel = individualArea == null ? null : formatAreaSqm(individualArea);
+  const areaOriginLabel = persisted
+    ? AREA_VALIDATION_LABELS[lot?.areaValidationStatus ?? 'UNVALIDATED']
+    : cell.areaM2 == null
+      ? 'Sem metragem documental'
+      : 'Metragem documental (leitura)';
+  const areaCaveat = cell.areaCaveat ?? null;
+  const pavilionAreaSummary = getPavilionAreaSummary(pavilion.publicIdentifier);
   const sequenceLabel = cell.sequenceOrientation
     ? SEQUENCE_LABELS[cell.sequenceOrientation]
     : 'Sequência do setor';
