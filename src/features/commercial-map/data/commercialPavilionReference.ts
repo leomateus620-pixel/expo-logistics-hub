@@ -1,3 +1,8 @@
+import {
+  getPavilionModuleArea,
+  type PavilionModuleAreaEvidence,
+} from './pavilionModuleOfficialAreas';
+
 export type CommercialPavilionReferenceModuleOrientation =
   | 'east-west'
   | 'north-south';
