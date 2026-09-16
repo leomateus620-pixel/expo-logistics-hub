@@ -157,7 +157,7 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
               <strong>{status.label}</strong>
             </div>
           ) : <span>Sem cadastro comercial</span>}
-          <span>{individualArea == null ? 'Área não informada' : `${individualArea.toLocaleString('pt-BR')} m² de área individual`}</span>
+          <span>{areaLabel == null ? 'Área individual não informada' : `${areaLabel} de área individual`}</span>
         </div>
         <CompactDetailSheetControls sheet={sheet} subject="módulo" embedded={embedded} />
         <div className="commercial-pavilion-module-details" hidden={embedded && sheet.sheetState !== 'expanded'}>
@@ -172,7 +172,23 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
           </div>
           <div>
             <dt>Área individual</dt>
-            <dd>{individualArea == null ? 'Não informada' : `${individualArea.toLocaleString('pt-BR')} m²`}</dd>
+            <dd>
+              {areaLabel ?? 'Não informada'}
+              <small className="commercial-pavilion-module-area-origin">{areaOriginLabel}</small>
+              {cell.areaMethod ? (
+                <small className="commercial-pavilion-module-area-origin">{cell.areaMethod}</small>
+              ) : null}
+              {areaCaveat ? (
+                <small className="commercial-pavilion-module-area-caveat">
+                  Atenção: {areaCaveat}
+                </small>
+              ) : null}
+              {pavilionAreaSummary?.documentalCaveat ? (
+                <small className="commercial-pavilion-module-area-origin">
+                  Ressalva do pavilhão: {pavilionAreaSummary.documentalCaveat}
+                </small>
+              ) : null}
+            </dd>
           </div>
           <div>
             <dt>Vínculo comercial</dt>
