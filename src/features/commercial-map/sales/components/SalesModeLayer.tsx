@@ -20,7 +20,6 @@ export function SalesModeLayer({ lots }: { lots: CommercialLot[] }) {
   const active = useSalesStore((state) => state.salesModeActive);
   const addLot = useSalesStore((state) => state.addLot);
   const selectionCount = useSalesStore((state) => state.selection.length);
-  const setCheckoutOpen = useSalesStore((state) => state.setCheckoutOpen);
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
   const setTreesVisible = useCommercialMapStore((state) => state.setTreesVisible);
   const setReducedGraphics = useCommercialMapStore((state) => state.setReducedGraphics);
@@ -99,8 +98,6 @@ export function SalesModeLayer({ lots }: { lots: CommercialLot[] }) {
       </Drawer>
 
       <SalesCheckoutDialog summary={summary} />
-      {/* Botão de finalizar na gaveta usa o mesmo estado do carrinho */}
-      <span hidden aria-hidden="true" onClick={() => setCheckoutOpen(true)} />
     </>
   );
 }
