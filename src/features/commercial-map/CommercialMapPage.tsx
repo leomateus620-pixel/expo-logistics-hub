@@ -509,6 +509,10 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
 
         <div id="commercial-map-viewport" className="commercial-map-viewport">
 
+        {workspaceMode === '3d' && permissions.canManageSales && (
+          <SalesModeLayer lots={scopedData.lots} />
+        )}
+
         {webglAvailable && (
           <>
             <div
