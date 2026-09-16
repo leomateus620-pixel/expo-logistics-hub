@@ -23,10 +23,13 @@ import {
   Scissors,
   ShieldAlert,
   ShoppingBag,
+  ShoppingCart,
   Tag,
   UnlockKeyhole,
   X,
 } from 'lucide-react';
+import { toSalesEntry } from '../../sales/salesEntry';
+import { useSalesStore } from '../../sales/useSalesSelection';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -313,6 +316,9 @@ function DetailMetric({ icon: Icon, label, value, warning }: { icon: typeof Tag;
 }
 
 export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }: { entity: MapEntity; lot?: CommercialLot; entities: MapEntity[]; lots: CommercialLot[]; permissions: MapPermissions }) {
+  const salesModeActive = useSalesStore((state) => state.salesModeActive);
+  const salesSelection = useSalesStore((state) => state.selection);
+  const toggleSalesLot = useSalesStore((state) => state.toggleLot);
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
   const focusSelection = useCommercialMapStore((state) => state.focusSelection);
   const enterInterior = useCommercialMapStore((state) => state.enterInterior);
@@ -506,7 +512,17 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
                   <Button variant="outline" onClick={() => setWorkflow('negotiate')}><Clock3 className="h-4 w-4" />Negociar</Button>
                 )}
                 {lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED', 'IN_NEGOTIATION'].includes(lot.status) && (
-                  <Button onClick={() => setWorkflow('sell')}><ShoppingBag className="h-4 w-4" />Marcar vendido</Button>
+                  salesModeActive ? (
+                    <Button
+                      variant={salesSelection.some((item) => item.lotId === lot.id) ? 'secondary' : 'default'}
+                      onClick={() => toggleSalesLot(toSalesEntry(lot))}
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                      {salesSelection.some((item) => item.lotId === lot.id) ? 'Na venda' : 'Adicionar à venda'}
+                    </Button>
+                  ) : (
+                    <Button onClick={() => setWorkflow('sell')}><ShoppingBag className="h-4 w-4" />Marcar vendido</Button>
+                  )
                 )}
                 {lot && permissions.canManageContracts && <Button variant="outline" onClick={() => setWorkflow('contract')}><FileLock2 className="h-4 w-4" />Anexar contrato</Button>}
               </div>

@@ -8,8 +8,11 @@ import {
   RefreshCw,
   ShieldCheck,
   ShoppingBag,
+  ShoppingCart,
   X,
 } from 'lucide-react';
+import { toSalesEntry } from '../../sales/salesEntry';
+import { useSalesStore } from '../../sales/useSalesSelection';
 import { Button } from '@/components/ui/button';
 import { STATUS_CONFIG } from '../../constants';
 import { useLotContractVersions } from '../../hooks/useCommercialMap';
@@ -72,6 +75,9 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
   embedded = false,
 }: Props) {
   const selectedModuleId = useCommercialMapStore((state) => state.selectedModuleId);
+  const salesModeActive = useSalesStore((state) => state.salesModeActive);
+  const salesSelection = useSalesStore((state) => state.selection);
+  const toggleSalesLot = useSalesStore((state) => state.toggleLot);
   const setSelectedModuleId = useCommercialMapStore((state) => state.setSelectedModuleId);
   const sheet = useCompactDetailSheet(selectedModuleId);
   const [workflow, setWorkflow] = useState<LotWorkflow>(null);
@@ -96,6 +102,7 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
   const canReserve = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'IN_NEGOTIATION'].includes(lot.status));
   const canNegotiate = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED'].includes(lot.status));
   const canSell = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED', 'IN_NEGOTIATION'].includes(lot.status));
+  const inSalesCart = Boolean(lot && salesSelection.some((item) => item.lotId === lot.id));
   const contracts = useLotContractVersions(
     persisted ? lot?.id ?? null : null,
     persisted && permissions.canManageContracts,
@@ -262,7 +269,17 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
             {canNegotiate && (
               <Button size="sm" variant="outline" onClick={() => setWorkflow('negotiate')}><Handshake />Negociar</Button>
             )}
-            {canSell && (
+            {canSell && salesModeActive && (
+              <Button
+                size="sm"
+                variant={inSalesCart ? 'secondary' : 'default'}
+                onClick={() => toggleSalesLot(toSalesEntry(lot, pavilion.publicIdentifier))}
+              >
+                <ShoppingCart />
+                {inSalesCart ? 'Na venda' : 'Adicionar à venda'}
+              </Button>
+            )}
+            {canSell && !salesModeActive && (
               <Button size="sm" onClick={() => setWorkflow('sell')}><ShoppingBag />Vender</Button>
             )}
             {permissions.canManageContracts && (
