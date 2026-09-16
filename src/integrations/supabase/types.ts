@@ -1157,6 +1157,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "commercial_lot_corner_audit_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: true
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
+          },
+          {
             foreignKeyName: "commercial_lot_corner_audit_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
@@ -1297,6 +1304,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "commercial_lots"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commercial_lots_superseded_by_lot_id_fkey"
+            columns: ["superseded_by_lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
           },
         ]
       }
@@ -3685,6 +3699,13 @@ export type Database = {
             referencedRelation: "commercial_lots"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "lot_contracts_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
+          },
         ]
       }
       lot_negotiations: {
@@ -3741,6 +3762,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "commercial_lots"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_negotiations_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
           },
         ]
       }
@@ -3816,6 +3844,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "commercial_lots"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_prices_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
           },
           {
             foreignKeyName: "lot_prices_rule_id_fkey"
@@ -3909,6 +3944,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "commercial_lots"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_reservations_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
           },
         ]
       }
@@ -4019,6 +4061,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "commercial_lots"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_sale_order_items_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
           },
           {
             foreignKeyName: "lot_sale_order_items_order_id_fkey"
@@ -4183,6 +4232,13 @@ export type Database = {
             referencedRelation: "commercial_lots"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "lot_sales_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
+          },
         ]
       }
       lot_status_history: {
@@ -4227,6 +4283,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "commercial_lots"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_status_history_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
           },
         ]
       }
@@ -4291,6 +4354,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "commercial_lots"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_activity_logs_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
           },
           {
             foreignKeyName: "map_activity_logs_org_id_fkey"
@@ -4721,6 +4791,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "map_lot_lineage_source_lot_id_fkey"
+            columns: ["source_lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
+          },
+          {
             foreignKeyName: "map_lot_lineage_target_lot_id_fkey"
             columns: ["target_lot_id"]
             isOneToOne: false
@@ -4733,6 +4810,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "commercial_lots"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_lot_lineage_target_lot_id_fkey"
+            columns: ["target_lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
           },
         ]
       }
@@ -8456,6 +8540,34 @@ export type Database = {
           segunda_rule_label: string | null
           segunda_total: number | null
           status: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commercial_lots_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commercial_sale_eligibility: {
+        Row: {
+          block: string | null
+          has_active_contract: boolean | null
+          has_active_negotiation: boolean | null
+          has_active_reservation: boolean | null
+          has_active_sale: boolean | null
+          ineligible_reason: string | null
+          is_sellable: boolean | null
+          is_unpriced_pavilion: boolean | null
+          lot_id: string | null
+          official_area_sqm: number | null
+          project_id: string | null
+          public_identifier: string | null
+          resolution_status: string | null
+          status: string | null
+          status_origin: string | null
         }
         Relationships: [
           {
