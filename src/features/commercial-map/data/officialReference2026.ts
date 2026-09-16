@@ -997,8 +997,19 @@ const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((re
         moduleNumber: cell.number,
         lotNumber: cell.lotNumber,
         moduleType: cell.type,
-        areaM2: null,
-        areaAssignment: 'unassigned',
+        areaM2: cell.areaM2 ?? null,
+        areaAssignment: cell.areaM2 == null
+          ? 'unassigned'
+          : `documental:${cell.areaEvidence ?? 'nominal'}`,
+        ...(cell.areaM2 == null ? {} : {
+          areaSource: {
+            revision: PAVILION_MODULE_AREA_REVISION,
+            document: cell.source.document,
+            evidence: cell.areaEvidence,
+            method: cell.areaMethod,
+            caveat: cell.areaCaveat,
+          },
+        }),
         normalizedFootprint: {
           centerX: cell.centerX,
           centerZ: cell.centerZ,
