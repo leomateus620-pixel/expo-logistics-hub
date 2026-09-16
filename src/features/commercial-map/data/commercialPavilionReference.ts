@@ -1,3 +1,8 @@
+import {
+  getPavilionModuleArea,
+  type PavilionModuleAreaEvidence,
+} from './pavilionModuleOfficialAreas';
+
 export type CommercialPavilionReferenceModuleOrientation =
   | 'east-west'
   | 'north-south';
@@ -342,7 +347,11 @@ export interface CommercialPavilionReferenceCell<PavilionId extends string = str
   sequenceOrientation: CommercialPavilionReferenceSequenceOrientation;
   labelAnchor: readonly [x: number, z: number];
   type: 'commercial-lot';
-  areaM2: null;
+  /** Área individual oficial em m²; nula quando o croqui não a documenta. */
+  areaM2: number | null;
+  areaEvidence: PavilionModuleAreaEvidence | null;
+  areaMethod: string | null;
+  areaCaveat: string | null;
   sortOrder: number;
   group: string;
   cluster: string;
@@ -479,6 +488,7 @@ function expandRun<PavilionId extends string>(
     const label = formatCommercialPavilionModuleNumber(number);
     const shape = input.shapeForNumber?.(number) ?? null;
     const labelAnchor = shape?.labelAnchor ?? [centerX, centerZ] as const;
+    const area = getPavilionModuleArea(input.pavilionId, number);
 
     return {
       id: `${input.pavilionId}:module:${String(number).padStart(3, '0')}`,
@@ -495,7 +505,10 @@ function expandRun<PavilionId extends string>(
       sequenceOrientation: run.sequenceOrientation,
       labelAnchor,
       type: 'commercial-lot',
-      areaM2: null,
+      areaM2: area?.areaSqm ?? null,
+      areaEvidence: area?.evidence ?? null,
+      areaMethod: area?.method ?? null,
+      areaCaveat: area?.caveat ?? null,
       sortOrder: number,
       group: run.group,
       cluster: clusterForNumber(run, number),

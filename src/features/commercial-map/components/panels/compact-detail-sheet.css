@@ -63,6 +63,16 @@
 }
 .commercial-pavilion-module-card .commercial-pavilion-module-summary { padding: 8px 12px 0; color: #43614f; font-size: 12px; }
 .commercial-pavilion-module-card .commercial-pavilion-module-summary .commercial-pavilion-module-status { margin: 0 0 6px; }
+.commercial-pavilion-module-card .commercial-pavilion-module-area-origin,
+.commercial-pavilion-module-card .commercial-pavilion-module-area-caveat {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+.commercial-pavilion-module-card .commercial-pavilion-module-area-origin { color: #5b7a68; }
+.commercial-pavilion-module-card .commercial-pavilion-module-area-caveat { color: #8a5a12; font-weight: 700; }
 .commercial-pavilion-module-card.is-embedded[data-sheet-state="half"] .commercial-pavilion-module-details,
 .commercial-pavilion-module-card[data-sheet-state="collapsed"] .commercial-pavilion-module-details { display: none; }
 .commercial-pavilion-module-card header button,

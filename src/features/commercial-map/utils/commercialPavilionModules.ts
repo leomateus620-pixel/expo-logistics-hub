@@ -104,6 +104,9 @@ export interface CommercialPavilionModuleCell
   labelAnchor?: readonly [x: number, z: number];
   type?: 'commercial-lot';
   areaM2?: number | null;
+  areaEvidence?: 'written' | 'nominal' | 'disputed' | null;
+  areaMethod?: string | null;
+  areaCaveat?: string | null;
   sortOrder?: number;
   group?: string | null;
   cluster?: string;

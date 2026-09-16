@@ -95,7 +95,7 @@ describe('enquadramento oficial do Pavilhão 5', () => {
     });
 
     expect(cell(28).source.discrepancy).toBe('manual-confirmation-required');
-    expect(cell(28).areaM2).toBeNull();
+    expect(cell(28).areaM2).toBe(3);
     expect(cell(28)).not.toHaveProperty('status');
     expect(PAVILION5_COMMERCIAL_REFERENCE_CELLS
       .filter((candidate) => candidate.source.discrepancy !== null)
