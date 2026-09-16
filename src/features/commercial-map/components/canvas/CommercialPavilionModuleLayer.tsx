@@ -323,9 +323,28 @@ function createModuleNumberTexture(
       context.rotate(visualSequenceOrientation === 'z-decreasing' ? -Math.PI / 2 : Math.PI / 2);
     }
     context.rotate(labelRotationRadians);
-    context.strokeText(cell.label, 0, 0);
+    // Rótulo secundário com a metragem oficial, só quando cabe sem encobrir o número.
+    const areaSqm = orientedCell.areaM2 ?? null;
+    const areaFontSize = Math.floor(fontSize * 0.62);
+    const showArea = areaSqm != null
+      && !reducedGraphics
+      && areaFontSize >= 7
+      && usableHeight > fontSize * 2.6;
+    const numberOffset = showArea ? -areaFontSize * 0.72 : 0;
+    context.strokeText(cell.label, 0, numberOffset);
     context.fillStyle = '#173b2b';
-    context.fillText(cell.label, 0, 0);
+    context.fillText(cell.label, 0, numberOffset);
+    if (showArea && areaSqm != null) {
+      const areaText = `${areaSqm.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })} m²`;
+      context.font = `600 ${areaFontSize}px Inter, Arial, sans-serif`;
+      context.lineWidth = Math.max(1.2, areaFontSize * 0.18);
+      context.strokeText(areaText, 0, fontSize * 0.68);
+      context.fillStyle = '#3d6b52';
+      context.fillText(areaText, 0, fontSize * 0.68);
+    }
     context.restore();
   });
 
