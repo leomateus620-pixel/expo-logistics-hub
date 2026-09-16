@@ -20,6 +20,8 @@ import {
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { isMapSelectionClick } from '../../utils/interaction';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
+import { dispatchSalesModuleClick } from '../../sales/salesInteraction';
+import { useSalesSelectedLotIds } from '../../sales/useSalesSelection';
 import type { CommercialStatus } from '../../types';
 import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
 
@@ -432,6 +434,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   const selectedModuleId = useCommercialMapStore((state) => state.selectedModuleId);
   const setHoveredModuleId = useCommercialMapStore((state) => state.setHoveredModuleId);
   const setSelectedModuleId = useCommercialMapStore((state) => state.setSelectedModuleId);
+  const salesSelectedLotIds = useSalesSelectedLotIds();
   const unitBoxGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const shortSide = Math.min(layout.interior.clearWidth, layout.interior.clearDepth);
   const moduleHeight = THREE.MathUtils.clamp(
