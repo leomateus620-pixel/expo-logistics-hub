@@ -488,6 +488,7 @@ function expandRun<PavilionId extends string>(
     const label = formatCommercialPavilionModuleNumber(number);
     const shape = input.shapeForNumber?.(number) ?? null;
     const labelAnchor = shape?.labelAnchor ?? [centerX, centerZ] as const;
+    const area = getPavilionModuleArea(input.pavilionId, number);
 
     return {
       id: `${input.pavilionId}:module:${String(number).padStart(3, '0')}`,
@@ -504,7 +505,10 @@ function expandRun<PavilionId extends string>(
       sequenceOrientation: run.sequenceOrientation,
       labelAnchor,
       type: 'commercial-lot',
-      areaM2: null,
+      areaM2: area?.areaSqm ?? null,
+      areaEvidence: area?.evidence ?? null,
+      areaMethod: area?.method ?? null,
+      areaCaveat: area?.caveat ?? null,
       sortOrder: number,
       group: run.group,
       cluster: clusterForNumber(run, number),
