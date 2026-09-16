@@ -4830,13 +4830,15 @@ const Scene = memo(function Scene({
             vegetationVisible={treesVisible}
           />
           </DeferredSceneLayer>
-          <DeferredSceneLayer id="residential-district" priority={110}>
-          <NightAwareResidentialDistrict
-            reducedGraphics={reducedGraphics}
-            vegetationVisible={treesVisible}
-            nightMode={nightAtmosphereActive}
-          />
-          </DeferredSceneLayer>
+          {!salesPresentationActive && (
+            <DeferredSceneLayer id="residential-district" priority={110}>
+            <NightAwareResidentialDistrict
+              reducedGraphics={reducedGraphics}
+              vegetationVisible={treesVisible}
+              nightMode={nightAtmosphereActive}
+            />
+            </DeferredSceneLayer>
+          )}
           {/* Rear approaches and external roads share one polygon union. */}
           <RegionalHighwayNetwork
             reducedGraphics={reducedGraphics}
@@ -4934,7 +4936,7 @@ const Scene = memo(function Scene({
       })}
       <DeferredSceneLayer id="nations-context" priority={40}>
       <NationsDistrict
-        visible={nationsDistrictPresentation.visible}
+        visible={nationsDistrictPresentation.visible && !salesPresentationActive}
         opacity={nationsDistrictPresentation.opacity}
         reducedGraphics={reducedGraphics}
       />
@@ -4958,7 +4960,7 @@ const Scene = memo(function Scene({
       <CommercialTreeLayer
         trees={presentedSceneTrees}
         surfaceEntities={treeSurfaceEntities}
-        visible={treesVisible && !hydrologicalModeActive}
+        visible={treesVisible && !hydrologicalModeActive && !salesPresentationActive}
         reducedGraphics={reducedGraphics}
         qualityTier={renderQualityTier}
       />
@@ -4993,7 +4995,7 @@ const Scene = memo(function Scene({
         />
       </DeferredSceneLayer>
       <DeferredSceneLayer id="rain" priority={5}>
-        <CommercialMapRainLayer entities={entities} qualityTier={renderQualityTier} active={!interiorEntity} />
+        <CommercialMapRainLayer entities={entities} qualityTier={renderQualityTier} active={!interiorEntity && !salesPresentationActive} />
       </DeferredSceneLayer>
       {contextualLabelEntities.filter((entity) => (
         (!parkingInspectionOpen || ['PAVILHAO-09', 'D5', 'PISTA-CAMPEIRA', 'J'].includes(entity.publicIdentifier))
