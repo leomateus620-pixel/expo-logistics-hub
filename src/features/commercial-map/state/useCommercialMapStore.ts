@@ -115,6 +115,13 @@ interface CommercialMapState {
   parkingCameraSequence: number;
   technicalValidationVisible: boolean;
   reducedGraphics: boolean;
+  /**
+   * Preset visual do modo Vendas: oculta apenas ambientação decorativa
+   * (vegetação, clima, atividades, distrito residencial). Nunca degrada
+   * geometria, LOD ou arquitetura de pavilhões — isso é papel do
+   * `reducedGraphics`, que o modo Vendas jamais liga.
+   */
+  salesPresentationActive: boolean;
   cameraNavigating: boolean;
   sunrisePhase: 'idle' | 'running' | 'complete';
   sunriseSequence: number;
@@ -178,6 +185,7 @@ interface CommercialMapState {
   setParkingInspectionOpen: (open: boolean) => void;
   setTechnicalValidationVisible: (visible: boolean) => void;
   setReducedGraphics: (reduced: boolean) => void;
+  setSalesPresentationActive: (active: boolean) => void;
   setCameraNavigating: (navigating: boolean) => void;
   requestSunrise: () => void;
   completeSunrise: (sequence: number) => void;
