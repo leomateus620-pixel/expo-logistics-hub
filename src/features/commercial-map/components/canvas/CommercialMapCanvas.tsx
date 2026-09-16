@@ -4325,6 +4325,9 @@ const Scene = memo(function Scene({
   const rearParkingAvailable = rearParkingVisibleInArea(isolatedArea) && parkingPresentation.visible;
   const rearParkingEnabled = rearParkingAvailable && !hydrologicalModeActive;
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  // Preset visual de Vendas: oculta apenas ambientação decorativa.
+  const salesPresentationActive = useCommercialMapStore((state) => state.salesPresentationActive);
+  const salesSelectedLotIds = useSalesSelectedLotIds();
   const lunarLaunchPhase = useCommercialMapStore((state) => state.lunarLaunchPhase);
   const lunarLaunchReturning = useCommercialMapStore((state) => state.lunarLaunchReturning);
   const lunarCinematicActive = lunarLaunchPhase !== 'idle' || lunarLaunchReturning;
@@ -4881,6 +4884,7 @@ const Scene = memo(function Scene({
         </group>
       )}
       <BatchedLots
+        salesSelectedLotIds={salesSelectedLotIds}
         entries={lotEntries}
         selectedEntityId={selectedEntityId}
         hoveredEntityId={hoveredEntityId}
