@@ -1540,7 +1540,8 @@ function BatchedLots({
     const selected = currentSelection === entityId;
     const hovered = currentHover === entityId;
     const scratch = visualScratch.current;
-    batch.mesh.setColorAt(batchId, lotColor(
+    const salesSelected = salesSelectedLotIds.has(entry.lot.id);
+    const color = lotColor(
       entry,
       segmentByEntity.get(entityId) ?? null,
       filtersActive,
@@ -1550,10 +1551,20 @@ function BatchedLots({
       infrastructureMode,
       scratch.color,
       scratch.blend,
-    ));
-    scratch.matrix.makeTranslation(0, entry.entity.geometry.elevation + (selected ? 0.055 : hovered ? 0.035 : 0), 0);
+    );
+    // Realce do carrinho: dourado sólido, mantendo geometria e status originais.
+    if (salesSelected) color.lerp(scratch.blend.set('#f2c94c'), 0.62);
+    batch.mesh.setColorAt(batchId, color);
+    const lift = salesSelected ? 0.09 : selected ? 0.055 : hovered ? 0.035 : 0;
+    scratch.matrix.makeTranslation(0, entry.entity.geometry.elevation + lift, 0);
     batch.mesh.setMatrixAt(batchId, scratch.matrix);
-  }, [batch, entryByEntity, filtersActive, infrastructureMode, matchingEntityIds, segmentByEntity]);
+  }, [batch, entryByEntity, filtersActive, infrastructureMode, matchingEntityIds, salesSelectedLotIds, segmentByEntity]);
+
+  useEffect(() => {
+    if (!batch) return;
+    entries.forEach((entry) => applyVisualState(entry.entity.id));
+    invalidate();
+  }, [applyVisualState, batch, entries, invalidate, salesSelectedLotIds]);
 
   useEffect(() => {
     if (!batch) return;
