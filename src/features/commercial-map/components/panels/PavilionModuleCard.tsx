@@ -262,7 +262,17 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
             {canNegotiate && (
               <Button size="sm" variant="outline" onClick={() => setWorkflow('negotiate')}><Handshake />Negociar</Button>
             )}
-            {canSell && (
+            {canSell && salesModeActive && (
+              <Button
+                size="sm"
+                variant={inSalesCart ? 'secondary' : 'default'}
+                onClick={() => toggleSalesLot(toSalesEntry(lot, pavilion.publicIdentifier))}
+              >
+                <ShoppingCart />
+                {inSalesCart ? 'Na venda' : 'Adicionar à venda'}
+              </Button>
+            )}
+            {canSell && !salesModeActive && (
               <Button size="sm" onClick={() => setWorkflow('sell')}><ShoppingBag />Vender</Button>
             )}
             {permissions.canManageContracts && (
