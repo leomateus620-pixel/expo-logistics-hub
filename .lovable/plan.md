@@ -1,73 +1,77 @@
-# Auditoria do modo Vendas — Mapa Comercial (somente leitura)
+# Modo Vendas 2028 — liberação comercial e acabamento final
 
-Nada foi alterado nesta verificação: sem edição de código, sem migração, sem publicação.
+Escopo: liberar comercialmente os espaços já com área e preço oficiais, finalizar a experiência de venda no mapa e provar tudo com testes. Nada será publicado.
 
-Resultado geral: a maior parte do que você pediu já está no projeto após a última correção. O que sobra são pontos reais e específicos, listados abaixo com o que ainda precisa ser feito.
+Observação sobre as imagens enviadas: elas mostram o painel antigo ("Toque nos espaços do mapa…") e a ficha lateral abrindo ao clicar no lote. No código atual essas duas coisas já foram corrigidas — a tela que você viu é a versão anterior carregada no navegador. A primeira coisa do plano é confirmar isso na tela real antes de mexer em qualquer coisa.
 
-## Item a item
+## Etapa 1 — Conferência antes de tocar em dados
 
-### 1. Pavilhões cortados/simplificados — causa anterior eliminada
-O modo Vendas não liga mais o modo gráfico reduzido: não há nenhuma chamada a `setReducedGraphics` dentro de `sales/`. Hoje só restam dois acionadores, ambos manuais e fora de Vendas: o interruptor no painel de camadas (`components/panels/MapPanels.tsx:211,301`) e as telas de diagnóstico.
+- Reconferir no banco: total de espaços ativos, quantos bloqueados, quantos elegíveis e quantos do Pavilhão 7.
+- Números esperados: 1.579 bloqueados, 1.408 elegíveis, 171 do Pavilhão 7 sem preço.
+- Gerar um relatório de simulação (sem gravar) com identificador, quadra/pavilhão, status atual, área oficial, situação do preço e motivo da elegibilidade.
+- Se os números divergirem, parar e reportar — nenhuma liberação silenciosa.
 
-Ao entrar em Vendas só some ambientação decorativa: bairro residencial, parque de diversões, distrito das nações, árvores e chuva (`components/canvas/CommercialMapCanvas.tsx:4833, 4934, 4942, 4966, 5001`). Terreno, ruas, quadras, pavilhões, módulos e rótulos continuam completos.
+## Etapa 2 — Liberação comercial controlada
 
-Ponto que ainda pode explicar "cortado" e não foi validado visualmente: o mapa tem qualidade adaptativa própria (`utils/adaptiveQualityRuntime.ts`, `renderQualityTier`), que baixa o nível sozinha quando a taxa de quadros cai — independente de Vendas. Falta a validação visual descrita no item 10 para confirmar se o que você viu era isso ou resíduo da versão anterior.
+- Uma única operação transacional que muda para "disponível" apenas os espaços bloqueados que a camada oficial de elegibilidade considera vendáveis.
+- Cada mudança gera um registro de histórico com situação anterior, nova situação e o motivo "Liberação comercial 2028 após validação de área oficial e precificação".
+- O histórico antigo de importação e bloqueio é preservado, nunca apagado.
+- Pavilhão 7 permanece bloqueado e sem preço.
+- Conferência depois: contagem por situação, soma das áreas, quantidade de regras de preço e de esquinas inalteradas, nenhuma venda criada.
 
-### 2. Seleção e cálculo da venda
-Clique em espaço externo e clique em módulo interno agora entram direto no carrinho pelo mesmo despachante (`sales/salesInteraction.ts`), com alternância (clica adiciona, clica de novo remove) e mistura de externos + internos na mesma venda. O painel lista cada item com identificador, contexto, área oficial, preço por m² e total do item, e soma item a item; trocar Renovação ↔ 2ª Etapa recalcula sem perder a seleção (`sales/useSalesCheckout.ts`, `sales/salesPricing.ts`).
+## Etapa 3 — Pavilhão 7 e espaços sem valor
 
-Pendência real: o texto vago que você citou não existe mais, mas isso ainda não foi conferido na tela com o mapa rodando.
+- No mapa e no carrinho aparecem como "Valor ainda não definido / Indisponível para venda".
+- Clique não adiciona, o fechamento da venda fica bloqueado e nenhum preço é criado.
 
-### 3. Ficha lateral padrão
-O clique no canvas é interceptado antes de selecionar a entidade (`components/canvas/CommercialMapCanvas.tsx:4442-4447`): em modo Vendas o clique é consumido pelo carrinho e a ficha lateral não abre. Fora de Vendas nada muda. Os demais pontos que abrem a ficha (criação de lote, diálogo de estrutura) não fazem parte do fluxo de venda.
+## Etapa 4 — Qualidade visual dos pavilhões
 
-### 4. Módulos internos
-O clique do módulo alterna direto no carrinho (`components/canvas/CommercialPavilionModuleLayer.tsx`), sem depender do card do módulo. Como o carrinho vive em um estado separado do mapa, a seleção sobrevive a entrar e sair do interior dos pavilhões. O botão antigo dentro do card continua existindo como caminho alternativo — decidir se fica ou sai.
+- Conferir, comparando lado a lado mapa normal e modo Vendas, que telhado, fachadas, vigas, sombras, módulos, rótulos e proporção são idênticos.
+- Garantir um piso mínimo de qualidade estrutural no modo Vendas: a redução automática por desempenho pode simplificar ambientação, nunca a arquitetura comercial.
+- Modo Vendas continua ocultando só ambientação (árvores, pessoas, chuva, parque, bairro externo, efeitos) e restaurando tudo ao sair.
 
-### 5. Painel Vendas
-Já está sólido (sem transparência), com cabeçalho "VENDAS" e contador, seletor real de etapa com indicador deslizante, lista compacta, área e valor totais em destaque, "Finalizar venda" só com seleção válida, "Limpar seleção" secundário e estado vazio curto. No celular há barra fixa inferior com quantidade, área e valor, abrindo uma gaveta com os mesmos controles.
+## Etapa 5 — Interação e seleção
 
-### 6. Checkout
-Continua em três etapas (expositor, pagamento, revisão) com confirmação, validações de CPF/CNPJ, telefone e parcelas, e agora só é montado quando a seleção é válida. No servidor, a operação segue atômica e idempotente por chave, bloqueando lote sem preço oficial.
+- Clique no espaço externo e no módulo interno alterna direto no carrinho; a ficha lateral não abre no modo Vendas e continua normal fora dele.
+- Dentro do modo Vendas, o botão "adicionar à venda" do card do módulo é ocultado para não existirem dois caminhos.
+- Seleção sobrevive a mover câmera, trocar quadra/segmento, entrar e sair de pavilhões e trocar de etapa.
+- Realce: contorno claro para disponível, brilho leve no hover, contorno forte com leve elevação e pulso único ao selecionar, aparência distinta para vendido, bloqueado e sem preço — sempre por contorno/espessura/opacidade, não só cor.
 
-### 7. Elegibilidade — estado atual do banco (verificado agora)
-- 1.579 lotes ativos, todos ainda com status bloqueado. Nenhuma liberação em massa foi feita.
-- A camada de elegibilidade existe como consulta oficial e classifica: 1.408 vendáveis e 171 não vendáveis, todos do Pavilhão 7 pelo motivo "sem preço".
-- A regra distingue bloqueio técnico (sem histórico comercial, ou apenas o histórico de importação da referência 2026.3) de bloqueio comercial explícito, exige área oficial maior que zero, preço 2028 resolvido e ausência de venda, reserva, negociação ou contrato ativo.
-- O aplicativo não usa mais lista de status: ele apenas espelha essa decisão do servidor, e a operação de venda revalida a mesma regra antes de gravar.
+## Etapa 6 — Painel e carrinho
 
-Pendência real: a consulta de elegibilidade respeita as permissões de quem está logado, mas isso ainda não foi exercido com um usuário real — se as permissões de leitura de lotes não alcançarem o usuário comercial, o carrinho ficará sem itens elegíveis.
+- Entrada no modo com transição curta (cerca de 200 ms), painel deslizando pela direita.
+- Desktop: painel sólido de 340–390 px, cabeçalho "VENDAS" com subtítulo "Mapa Comercial • Fenasoja 2028" e contador de espaços, fechar discreto.
+- Seletor de etapa como controle segmentado real, com indicador animado; trocar recalcula cada item na hora, com transição suave nos valores, sem perder seleção.
+- Cada item: quadra/pavilhão e número, área, valor por m², total do item e remover discreto.
+- Área total e, em maior destaque, valor total. Soma sempre item a item.
+- Estado vazio curto: "Selecione os espaços diretamente no mapa." com a linha de apoio "Clique em um lote para adicionar à venda."
+- Botão de finalizar só ativo com seleção válida; com item sem valor, desabilitado e com o motivo visível.
+- Celular (360/390/430): barra inferior com quantidade, área e valor, abrindo uma gaveta com os mesmos controles.
 
-### 8. Pavilhão 7
-Permanece intocado, sem preço, marcado como indisponível e impedido no carrinho e na confirmação da venda.
+## Etapa 7 — Fechamento da venda
 
-### 9. Realce visual
-Selecionados ganham realce dourado forte e leve elevação, tanto nos espaços externos quanto nos módulos internos, sem alterar geometria. Hover e seleção comum continuam distintos. Falta reforçar a leitura de vendido/bloqueado por contorno, hoje apoiada só em cor.
+- Três etapas: expositor (nome/razão social, CPF ou CNPJ, celular, e-mail e observações opcionais), pagamento (à vista ou parcelado, método, primeiro vencimento, cronograma automático com ajuste de centavos) e revisão completa antes de confirmar.
+- Não abre com carrinho vazio ou inválido; botão bloqueado durante o processamento.
+- No servidor: autenticação, permissão de venda, travamento das linhas, revalidação de elegibilidade e disponibilidade, recálculo do total no próprio servidor, criação de ordem, itens, parcelas e vendas, mudança para vendido, histórico e confirmação — tudo ou nada.
+- Se um espaço deixar de estar disponível durante o fechamento, a venda inteira é cancelada com mensagem nomeando o espaço.
+- Duplo clique não cria duas vendas.
+- Depois do sucesso: carrinho limpo, mapa atualizado, espaços como vendidos e confirmação curta.
 
-## O que ainda precisa ser feito
+## Etapa 8 — Testes
 
-1. Validação visual no mapa rodando: 1366×768, 1920×1080 e 360/390/430, em Exporural, Indústria/Comércio/Serviços, Espaço do Automóvel e no interior de pavilhões — confirmando que nenhum pavilhão aparece cortado, que a ficha lateral não abre e que a multi-seleção soma corretamente.
-2. Confirmar, com um usuário comercial real, que a lista de espaços vendáveis chega ao aplicativo.
-3. Decidir sobre o botão "adicionar à venda" dentro do card do módulo: manter como atalho ou remover para evitar dois caminhos.
-4. Contorno próprio para vendido/bloqueado, sem depender apenas de cor.
-5. Testes de tela (hoje só existem testes de regra): painel não abre a ficha lateral, carrinho vazio não abre o checkout, barra inferior aparece no celular.
-
-## Riscos de regressão
-
-- Ocultar ambientação por engano em outros modos, se o preset de Vendas não for restaurado ao sair.
-- Interceptar clique fora de Vendas e quebrar a navegação normal do mapa.
-- Liberar lote bloqueado por decisão comercial ao afrouxar a regra de elegibilidade.
-
-## Sequência sugerida
-
-1. Validação visual e de permissão (itens 1 e 2).
-2. Ajustes finos de leitura visual e caminho duplicado (itens 3 e 4).
-3. Testes de tela (item 5).
+- Regra: alternar, 1/2/N espaços, remover, limpar, sem duplicar, persistência ao entrar/sair de pavilhão, as duas etapas, troca de etapa, somas com preços diferentes, esquina com comum, pavilhões diferentes, Pavilhão 7, parcelas, CPF, CNPJ, telefone, repetição da mesma venda.
+- Elegibilidade: disponível com preço, bloqueio técnico, bloqueio comercial, vendido, sem preço, Pavilhão 7, arquivado, venda ativa.
+- Tela: fora do modo abre a ficha; no modo Vendas não abre e adiciona; segundo clique remove; carrinho vazio não abre o fechamento; barra inferior aparece no celular.
+- Visual no navegador: 1366×768, 1920×1080 e 360/390/430, em Exporural, Indústria/Comércio/Serviços, Espaço do Automóvel e dentro de dois pavilhões, comparando a arquitetura com o mapa normal.
 
 ## Detalhes técnicos
 
-- Preset visual: `salesPresentationActive` no store do mapa, separado de `reducedGraphics`.
-- Despachante de clique: `sales/salesInteraction.ts`, consumido por `CommercialMapCanvas` e `CommercialPavilionModuleLayer`.
-- Elegibilidade: consulta `commercial_sale_eligibility` (respeita permissões do usuário), espelhada por `sales/salesEligibility.ts` e revalidada em `register_commercial_sale_order`.
-- Cálculo: `sales/salesPricing.ts` soma item a item; nunca área total × preço único.
-- Invariantes preservados: áreas oficiais, preços, regras 2028, esquinas, geometrias, identificadores, numeração e Pavilhão 7.
+- Liberação via migração transacional filtrada por `commercial_sale_eligibility.is_sellable`, com inserção em `lot_status_history`; a camada de elegibilidade continua existindo e sendo revalidada no servidor.
+- Preset visual `salesPresentationActive`; `reducedGraphics` nunca é acionado pelo modo Vendas; piso de qualidade estrutural aplicado sobre `renderQualityTier`/`adaptiveQualityRuntime`.
+- Interação por `sales/salesInteraction.ts` (`toggleLot`), sem depender de `selectedEntityId`; consumo do clique em `CommercialMapCanvas` e `CommercialPavilionModuleLayer`.
+- Cálculo item a item em `sales/salesPricing.ts`; venda por `register_commercial_sale_order` (atômica, idempotente, total recalculado no servidor).
+- Invariantes: áreas oficiais, preços, regras 2028, esquinas, geometrias, identificadores e numeração intocados; Pavilhão 7 sem preço; sem publicação.
+
+## Entrega
+
+Relatório com: quantos estavam bloqueados, quantos foram liberados, quantos seguem bloqueados e por quê, confirmação dos 171 do Pavilhão 7, arquivos alterados, migrações, testes executados, comparação do pavilhão normal × Vendas, testes em celular e pendências reais.
