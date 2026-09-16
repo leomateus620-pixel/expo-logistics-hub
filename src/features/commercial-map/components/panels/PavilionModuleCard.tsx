@@ -8,8 +8,11 @@ import {
   RefreshCw,
   ShieldCheck,
   ShoppingBag,
+  ShoppingCart,
   X,
 } from 'lucide-react';
+import { toSalesEntry } from '../../sales/salesEntry';
+import { useSalesStore } from '../../sales/useSalesSelection';
 import { Button } from '@/components/ui/button';
 import { STATUS_CONFIG } from '../../constants';
 import { useLotContractVersions } from '../../hooks/useCommercialMap';
@@ -72,6 +75,9 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
   embedded = false,
 }: Props) {
   const selectedModuleId = useCommercialMapStore((state) => state.selectedModuleId);
+  const salesModeActive = useSalesStore((state) => state.salesModeActive);
+  const salesSelection = useSalesStore((state) => state.selection);
+  const toggleSalesLot = useSalesStore((state) => state.toggleLot);
   const setSelectedModuleId = useCommercialMapStore((state) => state.setSelectedModuleId);
   const sheet = useCompactDetailSheet(selectedModuleId);
   const [workflow, setWorkflow] = useState<LotWorkflow>(null);
