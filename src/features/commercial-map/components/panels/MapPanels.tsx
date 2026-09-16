@@ -54,6 +54,7 @@ import { LotEditDialog } from '../commercial/LotEditDialog';
 import { EntityVerificationDialog } from '../commercial/EntityVerificationDialog';
 import { PavilionPlanLegend } from './PavilionPlanLegend';
 import { CompactDetailSheetControls } from './CompactDetailSheet';
+import { LotPricing2028Panel } from './LotPricing2028Panel';
 import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { getHistoryIdForEntity } from '../../history/bindings';
 import { HistoryExperience } from '../../history/HistoryExperience';
@@ -419,6 +420,8 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
             {lot && <div><span>Área oficial</span><strong>{lot.officialAreaSqm != null ? `${areaNumber.format(lot.officialAreaSqm)} m²` : 'Área não informada'}</strong></div>}
             {lot && <div><span>Área calculada</span><strong>{lot.calculatedAreaSqm != null ? `${areaNumber.format(lot.calculatedAreaSqm)} m²` : 'Sem calibração'}</strong></div>}
           </div>
+
+          {lot && <LotPricing2028Panel lotId={lot.id} officialAreaSqm={lot.officialAreaSqm} />}
 
           <Tabs defaultValue="overview" className="commercial-map-detail-tabs">
             <TabsList>

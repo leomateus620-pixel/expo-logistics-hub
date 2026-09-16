@@ -31,6 +31,7 @@ import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { LotAvailabilityDialog } from '../commercial/LotAvailabilityDialog';
 import { LotEditDialog } from '../commercial/LotEditDialog';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
+import { LotPricing2028Panel } from './LotPricing2028Panel';
 
 const AREA_VALIDATION_LABELS: Record<string, string> = {
   VALIDATED: 'Área conferida no croqui oficial',
@@ -188,6 +189,13 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
                   Ressalva do pavilhão: {pavilionAreaSummary.documentalCaveat}
                 </small>
               ) : null}
+            </dd>
+          </div>
+          <div>
+            <dt>Valores oficiais 2028</dt>
+            <dd>
+              <LotPricing2028Panel lotId={persisted ? lot?.id ?? null : null} officialAreaSqm={individualArea} compact />
+              {!persisted ? <small className="commercial-pavilion-module-area-origin">Disponível após sincronizar o cadastro.</small> : null}
             </dd>
           </div>
           <div>
