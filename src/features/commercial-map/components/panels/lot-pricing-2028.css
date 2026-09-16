@@ -1,0 +1,93 @@
+.lot-pricing-2028 {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.875rem;
+  background: hsl(var(--card) / 0.65);
+  color: hsl(var(--card-foreground));
+}
+
+.lot-pricing-2028 > header {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+.lot-pricing-2028-state {
+  font-size: 0.8rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.lot-pricing-2028-area,
+.lot-pricing-2028-pending {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.lot-pricing-2028-area span,
+.lot-pricing-2028-pending span {
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.lot-pricing-2028-area strong {
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.lot-pricing-2028-pending strong {
+  font-size: 0.9rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.lot-pricing-2028-stages {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 420px) {
+  .lot-pricing-2028-stages {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.lot-pricing-2028-stage {
+  display: grid;
+  gap: 0.125rem;
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.75rem;
+  background: hsl(var(--muted) / 0.45);
+}
+
+.lot-pricing-2028-stage-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+.lot-pricing-2028-total {
+  font-size: 1.15rem;
+  line-height: 1.2;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--foreground));
+}
+
+.lot-pricing-2028-unit {
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--muted-foreground));
+}
+
+.lot-pricing-2028-rule {
+  font-size: 0.7rem;
+  color: hsl(var(--muted-foreground));
+}
