@@ -4930,9 +4930,12 @@ const Scene = memo(function Scene({
         // EntityMesh identity and picking props intact after one-time admission.
         // Lunar memorial retains its zero-intensity engine light in Stage 1:
         // late insertion would change every lit shader's global light count.
-        return kind === 'amusement-park'
-          ? <DeferredSceneLayer key={entity.id} id={`landmark:${entity.id}`} priority={95}>{mesh}</DeferredSceneLayer>
-          : mesh;
+        if (kind === 'amusement-park') {
+          return salesPresentationActive
+            ? null
+            : <DeferredSceneLayer key={entity.id} id={`landmark:${entity.id}`} priority={95}>{mesh}</DeferredSceneLayer>;
+        }
+        return mesh;
       })}
       <DeferredSceneLayer id="nations-context" priority={40}>
       <NationsDistrict
