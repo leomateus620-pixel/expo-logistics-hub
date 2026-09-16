@@ -202,3 +202,17 @@ export function createInitialCommercialMapQualityState({
     ...capabilityHints,
   });
 }
+
+/**
+ * Piso estrutural do modo Vendas: a qualidade adaptativa continua protegendo o
+ * desempenho reduzindo ambientação, mas nunca pode simplificar a arquitetura
+ * comercial (pavilhões, módulos, lotes e ruas). Por isso o nível fica travado
+ * em pelo menos `HIGH` enquanto a apresentação de Vendas estiver ativa.
+ */
+export function applyCommercialMapSalesQualityFloor(
+  tier: CommercialMapQualityTier,
+  salesPresentationActive: boolean,
+): CommercialMapQualityTier {
+  if (!salesPresentationActive) return tier;
+  return tier === 'LOW' || tier === 'MEDIUM' ? 'HIGH' : tier;
+}
