@@ -1407,6 +1407,7 @@ function BatchedLots({
   infrastructureMode,
   layerOpacity,
   segmentByEntity,
+  salesSelectedLotIds,
   onSelect,
   onHover,
   onFocus,
@@ -1420,6 +1421,8 @@ function BatchedLots({
   infrastructureMode: boolean;
   layerOpacity: Record<string, number>;
   segmentByEntity: ReadonlyMap<string, CommercialMapSegmentDefinition>;
+  /** Espaços no carrinho de Vendas: realce forte, sem alterar geometria. */
+  salesSelectedLotIds: ReadonlySet<string>;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   onFocus: () => void;
