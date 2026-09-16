@@ -531,10 +531,12 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     const color = new THREE.Color();
     const borderColor = new THREE.Color();
     projectedModuleParts.forEach(({ cell, projected, shaped }, index) => {
-      const isSelected = cell.id === activeSelectedId;
+      const moduleState = moduleStateById.get(cell.id) ?? null;
+      const inCart = Boolean(moduleState?.lotId && salesSelectedLotIds.has(moduleState.lotId));
+      const isSelected = inCart || cell.id === activeSelectedId;
       const isHovered = !isSelected && cell.id === activeHoveredId;
-      const persistedStatus = moduleStateById.get(cell.id)?.status ?? null;
-      const heightScale = isSelected ? 1.34 : isHovered ? 1.14 : 1;
+      const persistedStatus = moduleState?.status ?? null;
+      const heightScale = inCart ? 1.42 : isSelected ? 1.34 : isHovered ? 1.14 : 1;
       const cellHeight = moduleHeight * heightScale;
 
       object.position.set(
