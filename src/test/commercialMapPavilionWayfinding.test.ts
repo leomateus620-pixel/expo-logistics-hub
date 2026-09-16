@@ -300,10 +300,11 @@ describe('orientação visual das plantas internas comerciais', () => {
     );
 
     expect(layer).toContain('raycast={NO_RAYCAST}');
-    expect(layer).toContain("style={{ pointerEvents: canNavigate ? 'auto' : 'none' }}");
-    expect(layer).toContain('calculatePosition={canNavigate');
+    expect(layer).toContain("const HTML_HOST_STYLE: CSSProperties = { pointerEvents: 'none' };");
+    expect(layer).toContain('style={HTML_HOST_STYLE}');
+    expect(layer).toContain('calculatePosition={calculateWayfindingMarkerPosition}');
     expect(layer).toContain('THREE.MathUtils.clamp');
-    expect(layer).toContain('onPointerDown={(event) => event.stopPropagation()}');
+    expect(layer).toContain('event.stopPropagation();\n    lastPointerType.current = event.pointerType;');
     expect(layer).toContain('geometry.dispose()');
     expect(layer).toContain('surface.dispose()');
     expect(layer).toContain('accent.dispose()');
@@ -316,5 +317,53 @@ describe('orientação visual das plantas internas comerciais', () => {
     expect(canvas).not.toContain('PAVILION_INTERIOR_TRANSITION_COVER_MS');
     expect(canvas).not.toContain('PavilionInteriorTransitionOverlay');
     expect(styles).not.toContain('.commercial-pavilion-view-transition');
+  });
+
+  it('apresenta os acessos como marcadores compactos fixos com rótulo apenas sob interação', () => {
+    const layer = readFileSync(
+      'src/features/commercial-map/components/canvas/CommercialPavilionWayfindingLayer.tsx',
+      'utf8',
+    );
+    const styles = readFileSync(
+      'src/features/commercial-map/commercial-map.css',
+      'utf8',
+    );
+
+    // Same shared component for every pavilion; no permanent text on the map.
+    expect(layer).toContain('function PavilionAccessMarker(');
+    expect(layer).not.toContain('<strong>{marker.label}</strong>');
+    expect(layer).toContain('aria-label={canNavigate ? `${marker.label}. Abrir vista interna` : marker.label}');
+    expect(layer).toContain('{open ? (\n            <PavilionAccessTooltip');
+    expect(layer).toContain("if (event.pointerType === 'mouse') setHovered(true);");
+    expect(layer).toContain('if (isKeyboardFocus(event.currentTarget)) setHovered(true);');
+    expect(layer).toContain("if (pointerType === 'touch' && !active)");
+    expect(layer).toContain("document.addEventListener('pointerdown', closeOnOutsidePointer, true)");
+    expect(layer).toContain('}, [plan.publicIdentifier]);');
+    // Anchor and inset are untouched: the icon sits exactly where the pill sat.
+    expect(layer).toContain('position={[0, layout.interior.floorY + shortSide * 0.065, 0]}');
+    expect(layer).toContain('const inset = Math.min(layout.interior.clearWidth, layout.interior.clearDepth) * 0.022;');
+    expect(layer).not.toContain('distanceFactor');
+
+    // Legacy pills are gone and the compact marker is fixed (no motion).
+    expect(styles).not.toContain('.commercial-pavilion-wayfinding-label');
+    expect(styles).toContain('.commercial-pavilion-access-marker {');
+    expect(styles).toMatch(/\.commercial-pavilion-access-marker \{[^}]*width: 44px;[^}]*height: 44px;/);
+    expect(styles).toMatch(/\.commercial-pavilion-access-marker-icon \{[^}]*width: 30px;[^}]*height: 30px;/);
+    expect(styles).toContain('.commercial-pavilion-access-marker.is-entrance {');
+    expect(styles).toContain('.commercial-pavilion-access-marker.is-exit {');
+    expect(styles).toContain('.commercial-pavilion-access-marker.is-bidirectional {');
+    expect(styles).toContain('.commercial-pavilion-access-marker.is-connection {');
+    expect(styles).toContain('.commercial-pavilion-access-tooltip.is-top {');
+    expect(styles).toContain('.commercial-pavilion-access-tooltip.is-bottom {');
+    expect(styles).toContain('.commercial-pavilion-access-tooltip.is-left {');
+    expect(styles).toContain('.commercial-pavilion-access-tooltip.is-right {');
+    const markerStyles = styles.slice(
+      styles.indexOf('.commercial-pavilion-access-marker {'),
+      styles.indexOf('@keyframes commercial-pavilion-access-tooltip-enter'),
+    );
+    expect(markerStyles).not.toMatch(/animation:(?!\s*commercial-pavilion-access-tooltip-enter)/);
+    expect(markerStyles).not.toMatch(/rotate\((?!45deg\))/);
+    expect(markerStyles).not.toContain('infinite');
+    expect(markerStyles).not.toContain('translateY(-');
   });
 });
