@@ -102,6 +102,7 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
   const canReserve = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'IN_NEGOTIATION'].includes(lot.status));
   const canNegotiate = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED'].includes(lot.status));
   const canSell = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED', 'IN_NEGOTIATION'].includes(lot.status));
+  const inSalesCart = Boolean(lot && salesSelection.some((item) => item.lotId === lot.id));
   const contracts = useLotContractVersions(
     persisted ? lot?.id ?? null : null,
     persisted && permissions.canManageContracts,
