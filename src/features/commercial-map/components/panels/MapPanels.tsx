@@ -420,6 +420,8 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
             {lot && <div><span>Área calculada</span><strong>{lot.calculatedAreaSqm != null ? `${areaNumber.format(lot.calculatedAreaSqm)} m²` : 'Sem calibração'}</strong></div>}
           </div>
 
+          {lot && <LotPricing2028Panel lotId={lot.id} officialAreaSqm={lot.officialAreaSqm} />}
+
           <Tabs defaultValue="overview" className="commercial-map-detail-tabs">
             <TabsList>
               <TabsTrigger value="overview">Visão geral</TabsTrigger>
