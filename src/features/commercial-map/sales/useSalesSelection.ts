@@ -6,6 +6,8 @@ interface SalesState {
   stage: SalesStage;
   /** Ordem de inclusão preservada; chave = lotId (nunca duplica). */
   selection: SalesSelectionEntry[];
+  /** Conjunto vendável decidido pelo servidor (view commercial_sale_eligibility). */
+  eligibleLotIds: ReadonlySet<string> | null;
   checkoutOpen: boolean;
   openSalesMode: () => void;
   closeSalesMode: () => void;
@@ -15,6 +17,7 @@ interface SalesState {
   addLot: (entry: SalesSelectionEntry) => void;
   removeLot: (lotId: string) => void;
   clearSelection: () => void;
+  setEligibleLotIds: (ids: ReadonlySet<string> | null) => void;
   setCheckoutOpen: (open: boolean) => void;
   isSelected: (lotId: string) => boolean;
 }
@@ -23,6 +26,7 @@ export const useSalesStore = create<SalesState>((set, get) => ({
   salesModeActive: false,
   stage: 'RENOVACAO',
   selection: [],
+  eligibleLotIds: null,
   checkoutOpen: false,
   openSalesMode: () => set({ salesModeActive: true }),
   closeSalesMode: () => set({ salesModeActive: false, selection: [], checkoutOpen: false }),
@@ -41,10 +45,27 @@ export const useSalesStore = create<SalesState>((set, get) => ({
   )),
   removeLot: (lotId) => set((state) => ({ selection: state.selection.filter((item) => item.lotId !== lotId) })),
   clearSelection: () => set({ selection: [] }),
+  setEligibleLotIds: (eligibleLotIds) => set({ eligibleLotIds }),
   setCheckoutOpen: (checkoutOpen) => set({ checkoutOpen }),
   isSelected: (lotId) => get().selection.some((item) => item.lotId === lotId),
 }));
 
 export function useSalesSelectionCount() {
   return useSalesStore((state) => state.selection.length);
+}
+
+/** Ids selecionados para realce no canvas, sem recriar Set a cada render. */
+export function useSalesSelectedLotIds(): ReadonlySet<string> {
+  return useSalesStore((state) => selectedIdsCache(state.selection));
+}
+
+let cacheSource: SalesSelectionEntry[] | null = null;
+let cacheValue: ReadonlySet<string> = new Set();
+
+function selectedIdsCache(selection: SalesSelectionEntry[]): ReadonlySet<string> {
+  if (cacheSource !== selection) {
+    cacheSource = selection;
+    cacheValue = new Set(selection.map((item) => item.lotId));
+  }
+  return cacheValue;
 }

@@ -115,6 +115,13 @@ interface CommercialMapState {
   parkingCameraSequence: number;
   technicalValidationVisible: boolean;
   reducedGraphics: boolean;
+  /**
+   * Preset visual do modo Vendas: oculta apenas ambientação decorativa
+   * (vegetação, clima, atividades, distrito residencial). Nunca degrada
+   * geometria, LOD ou arquitetura de pavilhões — isso é papel do
+   * `reducedGraphics`, que o modo Vendas jamais liga.
+   */
+  salesPresentationActive: boolean;
   cameraNavigating: boolean;
   sunrisePhase: 'idle' | 'running' | 'complete';
   sunriseSequence: number;
@@ -178,6 +185,7 @@ interface CommercialMapState {
   setParkingInspectionOpen: (open: boolean) => void;
   setTechnicalValidationVisible: (visible: boolean) => void;
   setReducedGraphics: (reduced: boolean) => void;
+  setSalesPresentationActive: (active: boolean) => void;
   setCameraNavigating: (navigating: boolean) => void;
   requestSunrise: () => void;
   completeSunrise: (sequence: number) => void;
@@ -236,6 +244,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   parkingCameraSequence: 0,
   technicalValidationVisible: false,
   reducedGraphics: false,
+  salesPresentationActive: false,
   cameraNavigating: false,
   sunrisePhase: 'idle',
   sunriseSequence: 0,
@@ -583,6 +592,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   },
   setTechnicalValidationVisible: (technicalValidationVisible) => set({ technicalValidationVisible }),
   setReducedGraphics: (reducedGraphics) => set({ reducedGraphics }),
+  setSalesPresentationActive: (salesPresentationActive) => set({ salesPresentationActive }),
   setCameraNavigating: (cameraNavigating) => set({ cameraNavigating }),
   // The sunrise is the natural way out of the night: replaying it always
   // restores daylight instead of animating a sun nobody can see.

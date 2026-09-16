@@ -20,6 +20,8 @@ import {
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { isMapSelectionClick } from '../../utils/interaction';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
+import { dispatchSalesModuleClick } from '../../sales/salesInteraction';
+import { useSalesSelectedLotIds } from '../../sales/useSalesSelection';
 import type { CommercialStatus } from '../../types';
 import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
 
@@ -432,6 +434,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   const selectedModuleId = useCommercialMapStore((state) => state.selectedModuleId);
   const setHoveredModuleId = useCommercialMapStore((state) => state.setHoveredModuleId);
   const setSelectedModuleId = useCommercialMapStore((state) => state.setSelectedModuleId);
+  const salesSelectedLotIds = useSalesSelectedLotIds();
   const unitBoxGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const shortSide = Math.min(layout.interior.clearWidth, layout.interior.clearDepth);
   const moduleHeight = THREE.MathUtils.clamp(
@@ -531,10 +534,12 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     const color = new THREE.Color();
     const borderColor = new THREE.Color();
     projectedModuleParts.forEach(({ cell, projected, shaped }, index) => {
-      const isSelected = cell.id === activeSelectedId;
+      const moduleState = moduleStateById.get(cell.id) ?? null;
+      const inCart = Boolean(moduleState?.lotId && salesSelectedLotIds.has(moduleState.lotId));
+      const isSelected = inCart || cell.id === activeSelectedId;
       const isHovered = !isSelected && cell.id === activeHoveredId;
-      const persistedStatus = moduleStateById.get(cell.id)?.status ?? null;
-      const heightScale = isSelected ? 1.34 : isHovered ? 1.14 : 1;
+      const persistedStatus = moduleState?.status ?? null;
+      const heightScale = inCart ? 1.42 : isSelected ? 1.34 : isHovered ? 1.14 : 1;
       const cellHeight = moduleHeight * heightScale;
 
       object.position.set(
@@ -699,14 +704,26 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     gl.domElement.style.cursor = 'pointer';
   }, [gl, interactive, setHoveredModuleId]);
 
+  const salesToggle = useCallback((moduleId: string) => {
+    const state = moduleStateById.get(moduleId) ?? null;
+    return dispatchSalesModuleClick(state && {
+      lotId: state.lotId,
+      publicIdentifier: state.publicIdentifier,
+      displayName: state.displayName,
+      context: state.block,
+    });
+  }, [moduleStateById]);
+
   const handleClick = useCallback((event: ThreeEvent<MouseEvent>) => {
     if (!interactive || !isMapSelectionClick(event.delta, event.nativeEvent)) return;
     event.stopPropagation();
     const part = event.instanceId === undefined ? null : projectedModuleParts[event.instanceId];
     if (!part) return;
+    // Modo Vendas: o clique alterna o módulo no carrinho, sem abrir o card.
+    if (salesToggle(part.cell.id)) return;
     const current = useCommercialMapStore.getState().selectedModuleId;
     setSelectedModuleId(current === part.cell.id ? null : part.cell.id);
-  }, [interactive, projectedModuleParts, setSelectedModuleId]);
+  }, [interactive, projectedModuleParts, salesToggle, setSelectedModuleId]);
 
   const handleIrregularClick = useCallback((
     moduleId: string,
@@ -714,9 +731,10 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   ) => {
     if (!interactive || !isMapSelectionClick(event.delta, event.nativeEvent)) return;
     event.stopPropagation();
+    if (salesToggle(moduleId)) return;
     const current = useCommercialMapStore.getState().selectedModuleId;
     setSelectedModuleId(current === moduleId ? null : moduleId);
-  }, [interactive, setSelectedModuleId]);
+  }, [interactive, salesToggle, setSelectedModuleId]);
 
   useEffect(() => () => {
     moduleMaterial.dispose();

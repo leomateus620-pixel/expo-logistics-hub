@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { MousePointerClick, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatAreaSqmLabel, formatBrl } from '../../utils/lotPricing2028';
 import type { SalesCartSummary } from '../salesPricing';
@@ -11,12 +11,15 @@ const STAGES: SalesStage[] = ['RENOVACAO', 'SEGUNDA_ETAPA'];
 export function SalesStageSwitch() {
   const stage = useSalesStore((state) => state.stage);
   const setStage = useSalesStore((state) => state.setStage);
+  const activeIndex = STAGES.indexOf(stage);
   return (
-    <div className="sales-cart__stage" role="group" aria-label="Etapa de valores">
+    <div className="sales-segmented" role="group" aria-label="Etapa de valores">
+      <span className="sales-segmented__thumb" style={{ transform: `translateX(${activeIndex * 100}%)` }} aria-hidden="true" />
       {STAGES.map((item) => (
         <button
           key={item}
           type="button"
+          aria-pressed={stage === item}
           className={stage === item ? 'is-active' : ''}
           onClick={() => setStage(item)}
         >
@@ -34,10 +37,11 @@ export function SalesCartContents({ summary, loading }: { summary: SalesCartSumm
 
   if (summary.lines.length === 0) {
     return (
-      <p className="sales-cart__empty">
-        Toque nos espaços do mapa — módulos dos pavilhões, Exporural, Indústria/Comércio e Espaço do Automóvel —
-        para montar a venda.
-      </p>
+      <div className="sales-cart__empty">
+        <MousePointerClick aria-hidden="true" />
+        <strong>Selecione os espaços diretamente no mapa.</strong>
+        <span>Toque de novo para remover.</span>
+      </div>
     );
   }
 
@@ -68,14 +72,11 @@ export function SalesCartContents({ summary, loading }: { summary: SalesCartSumm
       )}
 
       <div className="sales-cart__actions">
-        <Button
-          type="button"
-          className="h-11 w-full rounded-xl"
-          disabled={!summary.ready || loading}
-          onClick={() => setCheckoutOpen(true)}
-        >
-          Finalizar venda
-        </Button>
+        {summary.ready && !loading && (
+          <Button type="button" className="h-11 w-full rounded-xl" onClick={() => setCheckoutOpen(true)}>
+            Finalizar venda
+          </Button>
+        )}
         <Button type="button" variant="ghost" className="h-9 w-full rounded-xl" onClick={clearSelection}>
           Limpar seleção
         </Button>
@@ -90,15 +91,17 @@ export function SalesCart({ summary, loading }: { summary: SalesCartSummary; loa
   return (
     <aside className="sales-cart" aria-label="Venda de espaços">
       <header className="sales-cart__header">
-        <strong>VENDAS</strong>
-        <button type="button" className="sales-cart__remove" onClick={closeSalesMode} aria-label="Sair do modo Vendas">
+        <div>
+          <strong>VENDAS</strong>
+          <span className="sales-cart__count">
+            {summary.lines.length} espaço{summary.lines.length === 1 ? '' : 's'} selecionado{summary.lines.length === 1 ? '' : 's'}
+          </span>
+        </div>
+        <button type="button" className="sales-cart__close" onClick={closeSalesMode} aria-label="Sair do modo Vendas">
           <X aria-hidden="true" />
         </button>
       </header>
       <SalesStageSwitch />
-      <span className="sales-cart__count">
-        {summary.lines.length} espaço{summary.lines.length === 1 ? '' : 's'} selecionado{summary.lines.length === 1 ? '' : 's'}
-      </span>
       <SalesCartContents summary={summary} loading={loading} />
     </aside>
   );

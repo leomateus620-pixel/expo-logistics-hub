@@ -126,6 +126,8 @@ import {
 } from '../../utils/runtimeDiagnostics';
 
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
+import { dispatchSalesLotClick } from '../../sales/salesInteraction';
+import { useSalesSelectedLotIds, useSalesStore } from '../../sales/useSalesSelection';
 import {
   getRearParkingFocusBounds, rearParkingVisibleInArea, rearParkingLayerPresentation,
   REAR_PARKING_SCENE_SUPPORT_POINTS, REAR_PARKING_GROUND_SUPPORTS, reconcileRearParkingTrees, rearParkingEntityForPresentation,
@@ -1405,6 +1407,7 @@ function BatchedLots({
   infrastructureMode,
   layerOpacity,
   segmentByEntity,
+  salesSelectedLotIds,
   onSelect,
   onHover,
   onFocus,
@@ -1418,6 +1421,8 @@ function BatchedLots({
   infrastructureMode: boolean;
   layerOpacity: Record<string, number>;
   segmentByEntity: ReadonlyMap<string, CommercialMapSegmentDefinition>;
+  /** Espaços no carrinho de Vendas: realce forte, sem alterar geometria. */
+  salesSelectedLotIds: ReadonlySet<string>;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   onFocus: () => void;
@@ -1535,7 +1540,8 @@ function BatchedLots({
     const selected = currentSelection === entityId;
     const hovered = currentHover === entityId;
     const scratch = visualScratch.current;
-    batch.mesh.setColorAt(batchId, lotColor(
+    const salesSelected = salesSelectedLotIds.has(entry.lot.id);
+    const color = lotColor(
       entry,
       segmentByEntity.get(entityId) ?? null,
       filtersActive,
@@ -1545,10 +1551,20 @@ function BatchedLots({
       infrastructureMode,
       scratch.color,
       scratch.blend,
-    ));
-    scratch.matrix.makeTranslation(0, entry.entity.geometry.elevation + (selected ? 0.055 : hovered ? 0.035 : 0), 0);
+    );
+    // Realce do carrinho: dourado sólido, mantendo geometria e status originais.
+    if (salesSelected) color.lerp(scratch.blend.set('#f2c94c'), 0.62);
+    batch.mesh.setColorAt(batchId, color);
+    const lift = salesSelected ? 0.09 : selected ? 0.055 : hovered ? 0.035 : 0;
+    scratch.matrix.makeTranslation(0, entry.entity.geometry.elevation + lift, 0);
     batch.mesh.setMatrixAt(batchId, scratch.matrix);
-  }, [batch, entryByEntity, filtersActive, infrastructureMode, matchingEntityIds, segmentByEntity]);
+  }, [batch, entryByEntity, filtersActive, infrastructureMode, matchingEntityIds, salesSelectedLotIds, segmentByEntity]);
+
+  useEffect(() => {
+    if (!batch) return;
+    entries.forEach((entry) => applyVisualState(entry.entity.id));
+    invalidate();
+  }, [applyVisualState, batch, entries, invalidate, salesSelectedLotIds]);
 
   useEffect(() => {
     if (!batch) return;
@@ -4309,6 +4325,9 @@ const Scene = memo(function Scene({
   const rearParkingAvailable = rearParkingVisibleInArea(isolatedArea) && parkingPresentation.visible;
   const rearParkingEnabled = rearParkingAvailable && !hydrologicalModeActive;
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  // Preset visual de Vendas: oculta apenas ambientação decorativa.
+  const salesPresentationActive = useCommercialMapStore((state) => state.salesPresentationActive);
+  const salesSelectedLotIds = useSalesSelectedLotIds();
   const lunarLaunchPhase = useCommercialMapStore((state) => state.lunarLaunchPhase);
   const lunarLaunchReturning = useCommercialMapStore((state) => state.lunarLaunchReturning);
   const lunarCinematicActive = lunarLaunchPhase !== 'idle' || lunarLaunchReturning;
@@ -4420,8 +4439,12 @@ const Scene = memo(function Scene({
       : null
   ), [entities, isolatedArea]);
   const handleEntitySelect = useCallback((entityId: string) => {
-    if (!hydrologicalModeActive) setSelectedEntityId(entityId);
-  }, [hydrologicalModeActive, setSelectedEntityId]);
+    if (hydrologicalModeActive) return;
+    // Em modo Vendas o clique pertence ao carrinho: não seleciona a entidade
+    // nem abre o painel de detalhes padrão.
+    if (dispatchSalesLotClick(lots.find((lot) => lot.entityId === entityId))) return;
+    setSelectedEntityId(entityId);
+  }, [hydrologicalModeActive, lots, setSelectedEntityId]);
   const handleEntityHover = useCallback((entityId: string | null) => {
     if (!hydrologicalModeActive) setHoveredEntityId(entityId);
   }, [hydrologicalModeActive, setHoveredEntityId]);
@@ -4807,13 +4830,15 @@ const Scene = memo(function Scene({
             vegetationVisible={treesVisible}
           />
           </DeferredSceneLayer>
-          <DeferredSceneLayer id="residential-district" priority={110}>
-          <NightAwareResidentialDistrict
-            reducedGraphics={reducedGraphics}
-            vegetationVisible={treesVisible}
-            nightMode={nightAtmosphereActive}
-          />
-          </DeferredSceneLayer>
+          {!salesPresentationActive && (
+            <DeferredSceneLayer id="residential-district" priority={110}>
+            <NightAwareResidentialDistrict
+              reducedGraphics={reducedGraphics}
+              vegetationVisible={treesVisible}
+              nightMode={nightAtmosphereActive}
+            />
+            </DeferredSceneLayer>
+          )}
           {/* Rear approaches and external roads share one polygon union. */}
           <RegionalHighwayNetwork
             reducedGraphics={reducedGraphics}
@@ -4861,6 +4886,7 @@ const Scene = memo(function Scene({
         </group>
       )}
       <BatchedLots
+        salesSelectedLotIds={salesSelectedLotIds}
         entries={lotEntries}
         selectedEntityId={selectedEntityId}
         hoveredEntityId={hoveredEntityId}
@@ -4904,13 +4930,16 @@ const Scene = memo(function Scene({
         // EntityMesh identity and picking props intact after one-time admission.
         // Lunar memorial retains its zero-intensity engine light in Stage 1:
         // late insertion would change every lit shader's global light count.
-        return kind === 'amusement-park'
-          ? <DeferredSceneLayer key={entity.id} id={`landmark:${entity.id}`} priority={95}>{mesh}</DeferredSceneLayer>
-          : mesh;
+        if (kind === 'amusement-park') {
+          return salesPresentationActive
+            ? null
+            : <DeferredSceneLayer key={entity.id} id={`landmark:${entity.id}`} priority={95}>{mesh}</DeferredSceneLayer>;
+        }
+        return mesh;
       })}
       <DeferredSceneLayer id="nations-context" priority={40}>
       <NationsDistrict
-        visible={nationsDistrictPresentation.visible}
+        visible={nationsDistrictPresentation.visible && !salesPresentationActive}
         opacity={nationsDistrictPresentation.opacity}
         reducedGraphics={reducedGraphics}
       />
@@ -4934,7 +4963,7 @@ const Scene = memo(function Scene({
       <CommercialTreeLayer
         trees={presentedSceneTrees}
         surfaceEntities={treeSurfaceEntities}
-        visible={treesVisible && !hydrologicalModeActive}
+        visible={treesVisible && !hydrologicalModeActive && !salesPresentationActive}
         reducedGraphics={reducedGraphics}
         qualityTier={renderQualityTier}
       />
@@ -4969,7 +4998,7 @@ const Scene = memo(function Scene({
         />
       </DeferredSceneLayer>
       <DeferredSceneLayer id="rain" priority={5}>
-        <CommercialMapRainLayer entities={entities} qualityTier={renderQualityTier} active={!interiorEntity} />
+        <CommercialMapRainLayer entities={entities} qualityTier={renderQualityTier} active={!interiorEntity && !salesPresentationActive} />
       </DeferredSceneLayer>
       {contextualLabelEntities.filter((entity) => (
         (!parkingInspectionOpen || ['PAVILHAO-09', 'D5', 'PISTA-CAMPEIRA', 'J'].includes(entity.publicIdentifier))

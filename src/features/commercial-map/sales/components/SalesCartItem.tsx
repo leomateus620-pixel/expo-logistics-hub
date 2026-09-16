@@ -23,7 +23,9 @@ export function SalesCartItem({ line, onRemove }: Props) {
       >
         <X aria-hidden="true" />
       </button>
-      <small>{areaLabel}{priceLabel ? ` · ${priceLabel}` : ''}</small>
+      <small>
+        {[line.entry.context, areaLabel, priceLabel].filter(Boolean).join(' · ')}
+      </small>
     </article>
   );
 }
