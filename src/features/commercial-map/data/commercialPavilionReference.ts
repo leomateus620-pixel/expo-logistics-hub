@@ -342,7 +342,11 @@ export interface CommercialPavilionReferenceCell<PavilionId extends string = str
   sequenceOrientation: CommercialPavilionReferenceSequenceOrientation;
   labelAnchor: readonly [x: number, z: number];
   type: 'commercial-lot';
-  areaM2: null;
+  /** Área individual oficial em m²; nula quando o croqui não a documenta. */
+  areaM2: number | null;
+  areaEvidence: PavilionModuleAreaEvidence | null;
+  areaMethod: string | null;
+  areaCaveat: string | null;
   sortOrder: number;
   group: string;
   cluster: string;
