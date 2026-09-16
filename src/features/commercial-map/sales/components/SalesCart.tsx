@@ -40,7 +40,7 @@ export function SalesCartContents({ summary, loading }: { summary: SalesCartSumm
       <div className="sales-cart__empty">
         <MousePointerClick aria-hidden="true" />
         <strong>Selecione os espaços diretamente no mapa.</strong>
-        <span>Toque de novo para remover.</span>
+        <span>Clique em um lote para adicionar à venda.</span>
       </div>
     );
   }
@@ -72,11 +72,14 @@ export function SalesCartContents({ summary, loading }: { summary: SalesCartSumm
       )}
 
       <div className="sales-cart__actions">
-        {summary.ready && !loading && (
-          <Button type="button" className="h-11 w-full rounded-xl" onClick={() => setCheckoutOpen(true)}>
-            Finalizar venda
-          </Button>
-        )}
+        <Button
+          type="button"
+          className="h-11 w-full rounded-xl"
+          disabled={!summary.ready || loading}
+          onClick={() => setCheckoutOpen(true)}
+        >
+          {loading ? 'Calculando valores…' : 'Finalizar venda'}
+        </Button>
         <Button type="button" variant="ghost" className="h-9 w-full rounded-xl" onClick={clearSelection}>
           Limpar seleção
         </Button>
@@ -93,6 +96,7 @@ export function SalesCart({ summary, loading }: { summary: SalesCartSummary; loa
       <header className="sales-cart__header">
         <div>
           <strong>VENDAS</strong>
+          <span className="sales-cart__subtitle">Mapa Comercial • Fenasoja 2028</span>
           <span className="sales-cart__count">
             {summary.lines.length} espaço{summary.lines.length === 1 ? '' : 's'} selecionado{summary.lines.length === 1 ? '' : 's'}
           </span>

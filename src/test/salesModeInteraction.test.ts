@@ -1,3 +1,4 @@
+import { applyCommercialMapSalesQualityFloor } from '@/features/commercial-map/utils/adaptiveQualityRuntime';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { isSellableLot, toSalesEntry } from '@/features/commercial-map/sales/salesEntry';
 import { dispatchSalesLotClick, dispatchSalesModuleClick } from '@/features/commercial-map/sales/salesInteraction';
@@ -143,5 +144,18 @@ describe('preset visual do modo Vendas', () => {
     expect(useCommercialMapStore.getState().salesPresentationActive).toBe(true);
     expect(useCommercialMapStore.getState().reducedGraphics).toBe(false);
     useCommercialMapStore.getState().setSalesPresentationActive(false);
+  });
+});
+
+describe('piso de qualidade estrutural no modo Vendas', () => {
+  it('eleva níveis baixos para HIGH enquanto Vendas está ativo', () => {
+    expect(applyCommercialMapSalesQualityFloor('LOW', true)).toBe('HIGH');
+    expect(applyCommercialMapSalesQualityFloor('MEDIUM', true)).toBe('HIGH');
+  });
+
+  it('não rebaixa ULTRA nem altera nada fora do modo Vendas', () => {
+    expect(applyCommercialMapSalesQualityFloor('ULTRA', true)).toBe('ULTRA');
+    expect(applyCommercialMapSalesQualityFloor('LOW', false)).toBe('LOW');
+    expect(applyCommercialMapSalesQualityFloor('MEDIUM', false)).toBe('MEDIUM');
   });
 });

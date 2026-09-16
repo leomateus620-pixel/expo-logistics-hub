@@ -175,6 +175,7 @@ import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 import { CommercialMapAdaptiveQualityController } from './CommercialMapAdaptiveQuality';
 import { RuntimeFrameDiagnostics } from './CommercialMapRuntimeFrameDiagnostics';
 import {
+  applyCommercialMapSalesQualityFloor,
   createInitialCommercialMapQualityState,
   readCommercialMapDeviceCapabilityHints,
 } from '../../utils/adaptiveQualityRuntime';
@@ -5082,12 +5083,15 @@ function AdaptiveCommercialMapScene({
   initialQualityState: ReturnType<typeof createInitialCommercialMapQualityState>;
   capabilityHints: ReturnType<typeof readCommercialMapDeviceCapabilityHints>;
 }) {
-  const [renderQualityTier, setRenderQualityTier] = useState(initialQualityState.tier);
+  const [adaptiveTier, setAdaptiveTier] = useState(initialQualityState.tier);
+  const salesPresentationActive = useCommercialMapStore((state) => state.salesPresentationActive);
   const handleQualityChange = useCallback((next: {
     sceneTier: CommercialMapQualityTier;
   }) => {
-    setRenderQualityTier((current) => current === next.sceneTier ? current : next.sceneTier);
+    setAdaptiveTier((current) => current === next.sceneTier ? current : next.sceneTier);
   }, []);
+  // Vendas nunca simplifica a arquitetura comercial: piso estrutural aplicado.
+  const renderQualityTier = applyCommercialMapSalesQualityFloor(adaptiveTier, salesPresentationActive);
 
   return (
     <>
