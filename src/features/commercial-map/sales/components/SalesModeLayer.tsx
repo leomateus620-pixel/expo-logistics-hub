@@ -3,9 +3,8 @@ import { ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
-import { formatBrl } from '../../utils/lotPricing2028';
-import type { CommercialLot } from '../../types';
-import { isSellableLot, toSalesEntry } from '../salesEntry';
+import { formatAreaSqmLabel, formatBrl } from '../../utils/lotPricing2028';
+import { useSalesEligibility } from '../salesEligibility';
 import { useSalesCart } from '../useSalesCheckout';
 import { useSalesStore } from '../useSalesSelection';
 import { SalesCart, SalesCartContents, SalesStageSwitch } from './SalesCart';
@@ -13,50 +12,40 @@ import { SalesCheckoutDialog } from './SalesCheckoutDialog';
 import '../sales-mode.css';
 
 /**
- * Camada do modo Vendas: ambientação leve, carrinho desktop, barra/gaveta mobile
- * e checkout. Nenhuma geometria, área ou cadastro é alterado aqui.
+ * Camada do modo Vendas: preset visual leve (só ambientação), carrinho desktop,
+ * barra/gaveta mobile e checkout. Nenhuma geometria, área ou cadastro muda aqui,
+ * e `reducedGraphics` nunca é acionado — pavilhões mantêm a arquitetura normal.
  */
-export function SalesModeLayer({ lots }: { lots: CommercialLot[] }) {
+export function SalesModeLayer({ projectId }: { projectId: string | null }) {
   const active = useSalesStore((state) => state.salesModeActive);
-  const addLot = useSalesStore((state) => state.addLot);
   const selectionCount = useSalesStore((state) => state.selection.length);
-  const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
+  const checkoutOpen = useSalesStore((state) => state.checkoutOpen);
   const setTreesVisible = useCommercialMapStore((state) => state.setTreesVisible);
-  const setReducedGraphics = useCommercialMapStore((state) => state.setReducedGraphics);
   const setNightModeActive = useCommercialMapStore((state) => state.setNightModeActive);
+  const setSalesPresentationActive = useCommercialMapStore((state) => state.setSalesPresentationActive);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const previousVisuals = useRef<{ trees: boolean; reduced: boolean; night: boolean } | null>(null);
+  const previousVisuals = useRef<{ trees: boolean; night: boolean } | null>(null);
 
   const { summary, loading } = useSalesCart();
+  useSalesEligibility(projectId, active);
 
-  // Ambientação pesada some enquanto o modo Vendas está ativo e volta ao sair.
+  // Ambientação decorativa some enquanto o modo Vendas está ativo e volta ao sair.
   useEffect(() => {
     if (!active) return undefined;
     const store = useCommercialMapStore.getState();
-    previousVisuals.current = {
-      trees: store.treesVisible,
-      reduced: store.reducedGraphics,
-      night: store.nightModeActive,
-    };
+    previousVisuals.current = { trees: store.treesVisible, night: store.nightModeActive };
+    setSalesPresentationActive(true);
     setTreesVisible(false);
-    setReducedGraphics(true);
     setNightModeActive(false);
     return () => {
+      setSalesPresentationActive(false);
       const snapshot = previousVisuals.current;
       if (!snapshot) return;
       setTreesVisible(snapshot.trees);
-      setReducedGraphics(snapshot.reduced);
       setNightModeActive(snapshot.night);
       previousVisuals.current = null;
     };
-  }, [active, setNightModeActive, setReducedGraphics, setTreesVisible]);
-
-  // Tocar num espaço externo vendável já o inclui na venda.
-  useEffect(() => {
-    if (!active || !selectedEntityId) return;
-    const lot = lots.find((candidate) => candidate.entityId === selectedEntityId);
-    if (lot && isSellableLot(lot)) addLot(toSalesEntry(lot));
-  }, [active, addLot, lots, selectedEntityId]);
+  }, [active, setNightModeActive, setSalesPresentationActive, setTreesVisible]);
 
   useEffect(() => {
     if (!active) setSheetOpen(false);
@@ -72,13 +61,17 @@ export function SalesModeLayer({ lots }: { lots: CommercialLot[] }) {
         <ShoppingCart aria-hidden="true" />
         <span>
           <strong>{selectionCount} espaço{selectionCount === 1 ? '' : 's'}</strong>
-          <small>{loading ? 'Calculando…' : formatBrl(summary.valueTotal) ?? 'R$ 0,00'}</small>
+          <small>
+            {loading
+              ? 'Calculando…'
+              : `${formatAreaSqmLabel(summary.areaTotal)} · ${formatBrl(summary.valueTotal) ?? 'R$ 0,00'}`}
+          </small>
         </span>
-        <span className="text-xs font-semibold uppercase">Ver venda</span>
+        <span className="sales-mobile-bar__cta">Ver venda</span>
       </button>
 
       <Drawer open={sheetOpen} onOpenChange={setSheetOpen}>
-        <DrawerContent className="max-h-[88dvh]">
+        <DrawerContent className="max-h-[80dvh]">
           <DrawerHeader className="pb-2">
             <DrawerTitle>Venda de espaços</DrawerTitle>
           </DrawerHeader>
@@ -97,7 +90,8 @@ export function SalesModeLayer({ lots }: { lots: CommercialLot[] }) {
         </DrawerContent>
       </Drawer>
 
-      <SalesCheckoutDialog summary={summary} />
+      {/* Checkout só existe quando há seleção válida. */}
+      {checkoutOpen && summary.ready && <SalesCheckoutDialog summary={summary} />}
     </>
   );
 }
