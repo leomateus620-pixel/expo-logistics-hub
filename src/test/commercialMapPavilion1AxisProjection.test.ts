@@ -236,7 +236,8 @@ describe('projeção oficial do Pavilhão 1', () => {
       (sum, cell) => sum + metricCellArea(cell),
       0,
     )).toBeCloseTo(587.85, 10);
-    expect(PAVILION1_COMMERCIAL_REFERENCE.cells.every((cell) => cell.areaM2 === null)).toBe(true);
+    expect(PAVILION1_COMMERCIAL_REFERENCE.cells.reduce((sum, cell) => sum + (cell.areaM2 ?? 0), 0))
+      .toBeCloseTo(587.85, 10);
   });
 
   it('projeta todos os módulos e renderParts dentro do frame sem sobreposição', () => {
@@ -309,7 +310,7 @@ describe('projeção oficial do Pavilhão 1', () => {
     expect(module141.metadata.planCoordinateTransform).toBe('quarter-turn-clockwise');
     expect(module141.metadata.projectionFit).toBe('metric-contain');
     expect(module141.metadata.metricReference).toEqual({ widthM: 52.7, depthM: 22.84 });
-    expect(module141.metadata.areaM2).toBeNull();
+    expect(module141.metadata.areaM2).toBe(19.35);
   });
 
   it('preserva os frames stretch legados e reconhece as projeções oficiais posteriores', () => {

@@ -296,7 +296,10 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
           'zoneId',
         ];
         const officialReferenceKeys = [
+          'areaCaveat',
+          'areaEvidence',
           'areaM2',
+          'areaMethod',
           'centerX',
           'centerZ',
           'cluster',
@@ -333,7 +336,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
           expect(cell.pavilionId).toBe(publicIdentifier);
           expect(cell.lotNumber).toBe(cell.label);
           expect(cell.type).toBe('commercial-lot');
-          expect(cell.areaM2).toBeNull();
+          expect(typeof cell.areaM2).toBe('number');
           expect(cell.sortOrder).toBe(cell.number);
           expect(cell.labelAnchor).toEqual(
             cell.shape?.labelAnchor ?? [cell.centerX, cell.centerZ],
@@ -458,7 +461,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
       southSpecialZone!.bounds.width / (southRegularZone!.bounds.width / 51),
     ).toBeCloseTo(1.5, 12);
     expect(cell(58).depth).toBeCloseTo(cell(57).depth, 12);
-    expect(cell(58).areaM2).toBeNull();
+    expect(cell(58).areaM2).toBe(4.5);
     expectStrictlyDecreasing(Array.from({ length: 6 }, (_, index) => cell(index + 59).centerZ));
     expectStrictlyDecreasing(Array.from({ length: 38 }, (_, index) => cell(index + 65).centerX));
     expectStrictlyIncreasing(Array.from({ length: 38 }, (_, index) => cell(index + 103).centerX));
@@ -499,7 +502,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
       eastSpecialZone!.bounds.depth / (eastRegularZone!.bounds.depth / 42),
     ).toBeCloseTo(1.5, 12);
     expect(cell(1).width).toBeCloseTo(cell(2).width, 12);
-    expect(cell(1).areaM2).toBeNull();
+    expect(cell(1).areaM2).toBe(4.5);
 
     expect(plan.supportSpaces).toHaveLength(4);
     expect(new Set(plan.supportSpaces.map((space) => space.id)).size).toBe(4);
@@ -570,7 +573,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     expect(plan.cells.filter((candidate) => candidate.shape)).toEqual([irregular]);
     expect(irregular.shape?.footprint).toHaveLength(6);
     expect(irregular.shape?.renderParts).toHaveLength(2);
-    expect(irregular.areaM2).toBeNull();
+    expect(irregular.areaM2).toBe(24.5);
     expect(PAVILION8_COMMERCIAL_GEOMETRIC_AREA_M2).toBe(438.5);
     expect(metricAreaForPlan(plan, 21.7, 35.4)).toBeCloseTo(438.5, 9);
     expectNoModuleRenderPartOverlaps(plan);
@@ -642,7 +645,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     [25, 26, 78, 79].forEach((number) => {
       expect(cell(number).shape?.footprint).toHaveLength(4);
       expect(cell(number).shape?.renderParts.length).toBeGreaterThanOrEqual(12);
-      expect(cell(number).areaM2).toBeNull();
+      expect(cell(number).areaM2).toBe(number === 25 || number === 79 ? 12.45 : 14.7);
     });
     expect(metricAreaForPlan(plan, 21, 35.35)).toBeCloseTo(351.3, 9);
     expect(PAVILION13_COMMERCIAL_REFERENCE.source.geometricModuleAreaM2)
@@ -784,7 +787,8 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
   it('mantém área individual vazia, metadados neutros e lacunas documentais explícitas', () => {
     const plan = COMMERCIAL_PAVILION_MODULE_PLANS.B6;
     expect(plan.stats.moduleAreaSquareMeters).toBe(663);
-    expect(plan.cells.every((cell) => cell.areaM2 === null)).toBe(true);
+    expect(plan.cells.reduce((sum, cell) => sum + (cell.areaM2 ?? 0), 0)).toBeCloseTo(663, 10);
+    expect(plan.cells.find((cell) => cell.number === 36)?.areaM2).toBe(24);
 
     const discrepancyNumbers = plan.cells
       .filter((cell) => cell.source?.discrepancy === 'official-range-omission')

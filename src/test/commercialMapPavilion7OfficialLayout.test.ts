@@ -80,7 +80,7 @@ describe('referência oficial do Pavilhão 7', () => {
     PAVILION7_COMMERCIAL_REFERENCE_CELLS.forEach((module) => {
       expect(module.width * 49.9).toBeCloseTo(1, 10);
       expect(module.depth * 18.3).toBeCloseTo(2.5, 10);
-      expect(module.areaM2).toBeNull();
+      expect(module.areaM2).toBe(2.5);
       expect(module.type).toBe('commercial-lot');
       expect(module.source.discrepancy).toBeNull();
     });

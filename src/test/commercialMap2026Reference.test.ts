@@ -113,7 +113,7 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
         && entity.segmentId === reference.segmentId
         && entity.metadata.parentPublicIdentifier === reference.publicIdentifier
         && entity.metadata.pavilionPublicIdentifier === reference.publicIdentifier
-        && entity.metadata.areaM2 === null
+        && typeof entity.metadata.areaM2 === 'number'
         && entity.metadata.buyerDataImported === false
       ))).toBe(true);
       expect(moduleLots.every((lot) => (
@@ -155,21 +155,21 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
       planCoordinateTransform: 'quarter-turn-clockwise',
       projectionFit: 'metric-contain',
       metricReference: { widthM: 35, depthM: 33 },
-      areaM2: null,
+      areaM2: 3,
     });
     expect(moduleFor(pavilion5).metadata).toMatchObject({
       layoutRevision: '2026.4-p5.2',
       planCoordinateTransform: 'identity',
       projectionFit: 'metric-contain',
       metricReference: { widthM: 25.5, depthM: 43.5 },
-      areaM2: null,
+      areaM2: 4.5,
     });
     expect(moduleFor(pavilion7).metadata).toMatchObject({
       layoutRevision: '2026.4-p7.1',
       planCoordinateTransform: 'identity',
       projectionFit: 'metric-contain',
       metricReference: { widthM: 49.9, depthM: 18.3 },
-      areaM2: null,
+      areaM2: 2.5,
     });
   });
 

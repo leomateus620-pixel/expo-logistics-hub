@@ -23,7 +23,11 @@ describe('enquadramento oficial do Pavilhão 14', () => {
     expect(PAVILION14_COMMERCIAL_REFERENCE_CELLS.map(({ number }) => number)).toEqual(
       Array.from({ length: 186 }, (_, index) => index + 1),
     );
-    expect(PAVILION14_COMMERCIAL_REFERENCE_CELLS.every(({ areaM2 }) => areaM2 === null)).toBe(true);
+    expect(PAVILION14_COMMERCIAL_REFERENCE_CELLS.every(({ areaM2, number }) => (
+      areaM2 === (number >= 36 && number <= 151 ? 3.5 : 3)
+    ))).toBe(true);
+    expect(PAVILION14_COMMERCIAL_REFERENCE_CELLS.reduce((sum, { areaM2 }) => sum + (areaM2 ?? 0), 0))
+      .toBeCloseTo(616, 10);
     expect(PAVILION14_COMMERCIAL_REFERENCE_CELLS.every(({ source }) => source.discrepancy === null)).toBe(true);
 
     const nominalArea = PAVILION14_COMMERCIAL_REFERENCE_CELLS.reduce(
