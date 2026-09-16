@@ -54,6 +54,7 @@ import { LotEditDialog } from '../commercial/LotEditDialog';
 import { EntityVerificationDialog } from '../commercial/EntityVerificationDialog';
 import { PavilionPlanLegend } from './PavilionPlanLegend';
 import { CompactDetailSheetControls } from './CompactDetailSheet';
+import { LotPricing2028Panel } from './LotPricing2028Panel';
 import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { getHistoryIdForEntity } from '../../history/bindings';
 import { HistoryExperience } from '../../history/HistoryExperience';
