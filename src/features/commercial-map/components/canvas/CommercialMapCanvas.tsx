@@ -126,6 +126,8 @@ import {
 } from '../../utils/runtimeDiagnostics';
 
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
+import { dispatchSalesLotClick } from '../../sales/salesInteraction';
+import { useSalesSelectedLotIds, useSalesStore } from '../../sales/useSalesSelection';
 import {
   getRearParkingFocusBounds, rearParkingVisibleInArea, rearParkingLayerPresentation,
   REAR_PARKING_SCENE_SUPPORT_POINTS, REAR_PARKING_GROUND_SUPPORTS, reconcileRearParkingTrees, rearParkingEntityForPresentation,
