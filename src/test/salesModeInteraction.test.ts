@@ -17,6 +17,7 @@ function lot(id: string, overrides: Partial<CommercialLot> = {}): CommercialLot 
     block: 'D',
     status: 'BLOCKED',
     archivedAt: null,
+    ...overrides,
   } as unknown as CommercialLot;
 }
 
