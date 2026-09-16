@@ -1,94 +1,63 @@
-# Auditoria do Mapa Comercial — preparação do modo "Vendas"
+# Modo VENDAS no Mapa Comercial — Fenasoja 2028
 
-Auditoria somente leitura. Nada foi editado, nenhuma migração aplicada, nada publicado.
+Novo modo operacional dentro do próprio Mapa Comercial: seleção de vários espaços, soma automática de áreas e valores pela etapa comercial, e fechamento da venda em uma única operação atômica.
 
-## 1. Onde o modo Vendas entra
+## Estado atual confirmado (leitura)
 
-- Raiz do módulo: `src/pages/CommercialMapPage.tsx` → `CommercialMapShell` (cabeçalho) + `src/features/commercial-map/CommercialMapPage.tsx` (workspace, 681 linhas).
-- O botão **Gestão** vive em `components/shell/CommercialMapHeaderTools.tsx` (popover com `managementActions`, ao lado de "Lista e tabela"). O workspace decide as permissões; o shell decide o lugar.
-- A barra flutuante do 3D é `components/controls/CommercialMapTopBar.tsx` (presets de câmera, camadas, árvores, chuva, noite, validação técnica).
-- Encaixe recomendado: **novo botão "Vendas" ao lado de Gestão**, em `CommercialMapHeaderTools`, ativando um novo `workspaceMode: 'sales'` (hoje `'3d' | 'list' | 'edit' | 'create'` em `types.ts`). A topbar ganha o preset visual leve; o carrinho vira painel próprio.
+- O botão **Gestão** vive em `components/shell/CommercialMapHeaderTools.tsx`, ao lado de "Lista e tabela"; as ações vêm de `CommercialMapPage.tsx:360-472`.
+- A seleção é **única**: `selectedEntityId` e `selectedModuleId` (escalares) em `state/useCommercialMapStore.ts`. Não existe multi-seleção.
+- Já existe `reducedGraphics` no store + `CommercialMapAdaptiveQuality` (governador de qualidade), sem botão de usuário.
+- Ambientação pesada: `CommercialTreeLayer`, `VegetationPilot*`, `AmusementPark*`, `ExporuralActivity`, `LivestockCattle`, `NationsDistrict`, `LateralResidentialDistrict`, `RegionalLandscapeLayer`, `TerritorialEnvironment`, `CommercialMapRainLayer`, `NightLightingLayer`, `LunarRocketLaunchEffects`, `StrategicLandmarks`.
+- Entrar/sair de pavilhão: `enterInterior` / `switchInterior` / `exitInterior`; módulos por `pavilionModuleCommercial.ts`.
+- Banco: `lot_sales`, `lot_reservations`, `lot_negotiations`, `lot_contracts`, `lot_prices` (com `source/stage/rule_id/area_used_sqm`), `lot_status_history`; RPCs `reserve_commercial_lot`, `start_commercial_negotiation`, `register_commercial_sale` — todas **um lote por vez**. Não há agrupador de venda nem parcelas.
+- `canManageSales` (`map.manage_sales`) existe em `utils/permissions.ts` e hoje só é lido em `MapPanels.tsx` / `PavilionModuleCard.tsx`.
+- A view `commercial_lot_pricing_2028` já entrega área oficial, preço/m² e total nas duas etapas; Pavilhão 7 (B10) sai como EXCLUÍDO.
 
-## 2. Seleção hoje é estritamente única
+## Etapa 1 — Banco (migração)
 
-Em `state/useCommercialMapStore.ts`:
-- `selectedEntityId: string | null` (lotes externos e entidades) e `selectedModuleId: string | null` (módulos internos dos pavilhões) — dois caminhos separados, ambos單 singulares.
-- `setSelectedEntityId` limpa interior e abre o painel `details`; `enterInterior` / `exitInterior` controlam a entrada nos pavilhões e zeram `selectedModuleId`.
-- Não existe nenhuma estrutura de multi-seleção. Será necessário um conjunto novo (`salesSelection: Map<lotId, snapshot>`) **paralelo**, sem alterar a seleção atual, para não quebrar painéis, câmera e explorer.
+Três tabelas novas no padrão do projeto (RLS + GRANT para `authenticated` e `service_role`):
 
-## 3. Renderer e ambientação
+- `lot_sale_orders`: projeto, comprador, CPF/CNPJ, celular, e-mail, etapa, área total, valor total, tipo de pagamento, nº de parcelas, método, primeiro vencimento, status, observações, vendedor, `idempotency_key` único, timestamps, reversão.
+- `lot_sale_order_items`: ordem, lote, snapshot de área oficial, preço/m², regra aplicada, etapa, total do item, status anterior do lote. Unicidade por `(order_id, lot_id)`.
+- `lot_sale_installments`: ordem, número, vencimento, valor, situação de pagamento, pago em, observações.
 
-- Canvas: `components/canvas/CommercialMapCanvas.tsx` (5.269 linhas) e `CommercialMapEnvironment.tsx` (1.696).
-- Lotes externos e módulos: `CommercialPavilionModuleLayer.tsx`, `CommercialPavilion.tsx`, `CommercialPavilionInteriorScene.tsx`.
-- Ambientação pesada (candidata a desligar no modo Vendas): `CommercialTreeLayer`, `VegetationPilot*`, `AmusementPark*`, `ExporuralActivity`, `LivestockCattle`, `NationsDistrict`, `LateralResidentialDistrict`, `RegionalLandscapeLayer`, `TerritorialEnvironment`, `CommercialMapRainLayer`, `NightLightingLayer`, `LunarRocketLaunchEffects`, `StrategicLandmarks`, `FenasojaComplexOverlay`.
-- Já existe uma flag de qualidade: `reducedGraphics` no store + `CommercialMapAdaptiveQuality.tsx`. O modo Vendas deve **reutilizar** essa flag e somar um `salesModeActive` que oculta camadas de ambientação — sempre por visibilidade de camada, nunca mexendo em geometria ou dados.
-- Manter sempre: ruas (`RoadInfrastructure`), pavilhões, quadras, rótulos e referências de orientação.
+RPC `register_commercial_sale_order(...)` `SECURITY DEFINER`, transacional:
+valida sessão e `map.manage_sales` → trava os lotes com `SELECT ... FOR UPDATE` em ordem de `id` → reconfere existência, não arquivado e status elegível → **recalcula os preços no servidor** pela view (nunca aceita o total do cliente) → compara com o total enviado e aborta em divergência → cria ordem, itens e parcelas → grava um `lot_sales` por lote (histórico individual preservado) → atualiza status para `SOLD` → registra `lot_status_history` e log de atividade. Qualquer falha derruba a operação inteira. Reenvio com a mesma `idempotency_key` devolve a ordem já criada, sem duplicar.
 
-## 4. Filtros, segmentos e entrada nos pavilhões
+Regras dentro da RPC: Pavilhão 7 e qualquer lote sem preço resolvido são rejeitados com motivo; preço de origem `MANUAL` é respeitado e nunca sobrescrito; nenhuma taxa é somada.
 
-- Segmentos: `data/commercialMapSegments.ts`, `components/segments/SegmentLegend.tsx`, `utils/areaScope.ts` (Exporural vs geral).
-- Filtros: `statusFilters`, `classificationFilters`, `verificationFilters`, `locationFilter`, `search` no store; dock com seções `search | area | segments | view | filters | management`.
-- Entrada no pavilhão: `enterInterior(entityId)` + `useInteriorCameraRequest`. O carrinho de vendas precisa **sobreviver** a entrar/sair de pavilhões e trocar de segmento.
+## Etapa 2 — Estado e seleção múltipla
 
-## 5. Banco: o que já existe e o que falta
+Novo módulo `src/features/commercial-map/sales/`:
 
-Existe (confirmado no banco):
-- `lot_sales`: `lot_id, buyer_name, document_number, negotiated_value, sale_date, salesperson_user_id, salesperson_name, contract_number, payment_status, internal_notes, status, reverted_at/by`.
-- `lot_reservations` (com `phone`, `email`, `expires_at`), `lot_negotiations`, `lot_contracts` (+ `lot_contract_versions`), `lot_prices` (agora com `source, stage, rule_id, area_used_sqm`), `lot_status_history`.
-- RPCs: `reserve_commercial_lot`, `start_commercial_negotiation`, `register_commercial_sale`, `update_commercial_lot`, `register_lot_contract_version`, `apply_lot_price_rules_2028`.
-- Serviços: `services/commercialMapService.ts` (linhas ~1018–1090) e `components/commercial/LotWorkflowDialog.tsx`.
+- `salesTypes.ts`, `salesValidation.ts` (CPF/CNPJ, celular BR), `salesPricing.ts` (soma item a item, centavos inteiros; nunca área total × um preço único), `salesInstallments.ts` (cronograma mensal com ajuste do centavo na última parcela para `Σ parcelas = total`).
+- `useSalesSelection.ts` — slice próprio no store: `salesModeActive`, `salesStage` ('RENOVACAO' | 'SEGUNDA_ETAPA'), `salesSelection` (mapa lotId → snapshot). Clicar adiciona, clicar de novo remove; a seleção sobrevive a troca de quadra, segmento e entrada/saída de pavilhão. Só some ao limpar, sair do modo ou concluir.
+- `salesService.ts` + `useSalesCheckout.ts` — leitura em lote da view de preços e chamada única da RPC, com invalidação das queries do mapa ao concluir.
 
-Falta para o modo Vendas (tudo **um lote por vez** hoje):
-- Agrupador de venda: uma tabela `lot_sale_orders` (comprador/expositor, CPF/CNPJ, celular, e-mail, etapa `RENOVACAO|SEGUNDA_ETAPA`, área total, valor total, condição à vista/parcelado, nº de parcelas, método, 1º vencimento, observações, status, autor, timestamps) e `lot_sale_order_items` (lote, snapshot de área oficial, preço/m², regra aplicada, valor do item) — o vínculo com `lot_sales` mantém o histórico por lote intacto.
-- Parcelas: `lot_sale_installments` (nº, vencimento, valor, status de pagamento).
-- Uma RPC transacional `register_commercial_sale_order(...)` que valide e grave tudo num único bloco.
+`types.ts` ganha `'sales'` em `MapWorkspaceMode`. A seleção atual (`selectedEntityId` / `selectedModuleId`) fica intacta.
 
-## 6. Permissões
+## Etapa 3 — Modo visual comercial
 
-`utils/permissions.ts` já entrega `canManageSales` (`map.manage_sales`, ou admin/gestor). Recomendação: **reutilizar `canManageSales`** para abrir o modo Vendas e concluir a venda; nenhuma capability nova é necessária. As RLS das novas tabelas devem espelhar as de `lot_sales`, com `GRANT` explícito para `authenticated` e `service_role`.
+`salesModeActive` liga um perfil leve: força `reducedGraphics`, desliga árvores, vegetação, pessoas, gado, parque de diversões, chuva, noite, amanhecer, lançamento lunar e overlays decorativos; mantém terreno, ruas, quadras, pavilhões, lotes, módulos, rótulos e marcos úteis de orientação. Tudo por visibilidade de camada — nenhuma geometria, posição ou dado é alterado, e sair do modo restaura o estado anterior.
 
-## 7. Riscos de vender vários lotes de uma vez
+Leitura comercial reforçada: contorno mais forte por lote e estados visuais distintos (disponível, hover, selecionado, reservado, em negociação, vendido, bloqueado), diferenciados por cor **e** opacidade, espessura de borda e marcação de status — o mesmo vale para os módulos internos.
 
-- **Atomicidade:** venda multi-lote precisa ser uma única RPC `SECURITY DEFINER`; nada de N chamadas do cliente.
-- **Concorrência:** `SELECT ... FOR UPDATE` nos lotes na ordem do `id` para evitar deadlock; reconferir status dentro da transação.
-- **Estado inválido:** lote `SOLD`, `BLOCKED` ou reservado por terceiro aborta a operação inteira com mensagem por lote (nunca venda parcial silenciosa).
-- **Preço:** a etapa (Renovação / 2ª Etapa) é escolhida uma vez por venda; o valor de cada item é recalculado no servidor pela view `commercial_lot_pricing_2028` — o total do cliente é apenas conferência.
-- **Snapshot:** gravar área, preço/m², regra e etapa no item; mudanças futuras de regra não podem reescrever vendas passadas.
-- **Pavilhão 7 (B10):** permanece sem preço → não pode entrar no carrinho.
-- **Idempotência:** chave de operação enviada pelo cliente, com unicidade no banco, para evitar duplicidade por duplo clique/reenvio.
-- **Rollback:** reversão pelo caminho já existente (`reverted_at/by`), aplicada à ordem inteira.
+## Etapa 4 — Carrinho e checkout
 
-## 8. Performance
+- `SalesMode.tsx`, `SalesCart.tsx`, `SalesCartItem.tsx`, `SalesCheckoutDialog.tsx`, `SalesBuyerForm.tsx`, `SalesPaymentForm.tsx`, `SalesReview.tsx`, `sales-mode.css`.
+- Desktop: painel lateral direito compacto — etapa, contagem, lista (identificação, área, valor), área total, valor total em destaque, "Finalizar venda", remover item e limpar seleção.
+- Mobile (320/360/390/430): barra fixa inferior "3 lotes • 418,20 m² • R$ 20.271,00" que abre gaveta no padrão de `CompactDetailSheet.tsx`.
+- Checkout em três passos: expositor → pagamento (à vista ou parcelado, método, vencimentos, cronograma automático) → revisão e **Confirmar venda**, com botão bloqueado durante o envio.
+- Pavilhão 7 aparece como "Valor ainda não definido" e impede a finalização, explicando o motivo.
 
-Modo Vendas ativa um perfil leve: força `reducedGraphics`, desliga árvores/vegetação, pessoas, gado, parque de diversões, chuva, noite, amanhecer, lançamento lunar e overlays decorativos; reduz sombras e pós-processamento. Mantém ruas, pavilhões, quadras, rótulos e realce de seleção. Tudo por flags de visibilidade — nenhuma geometria, posição ou dado é tocado.
+## Etapa 5 — Integração e permissões
 
-## 9. UI — carrinho sem poluir o mapa
+Botão **Vendas** ao lado de Gestão em `CommercialMapHeaderTools.tsx`, visível com `canManageSales`; ações "Adicionar à venda" em `MapPanels.tsx` e `PavilionModuleCard.tsx`; cliques de seleção múltipla em `CommercialMapCanvas.tsx` e `CommercialPavilionModuleLayer.tsx` quando o modo está ativo. Nenhuma capability nova.
 
-- Desktop: painel lateral fixo à direita (mesma linguagem Liquid Glass de `MapPanels.tsx` / `lot-pricing-2028.css`), com lista de lotes, área total, total por etapa e botão "Finalizar venda".
-- Mobile (320–430px): barra resumo fixa no rodapé ("N lotes · área · total") que abre uma gaveta, no padrão de `CompactDetailSheet.tsx`.
-- Finalização em diálogo de duas etapas: dados do expositor → condições de pagamento → revisão e confirmação.
+## Etapa 6 — Testes e auditoria
 
-## 10. Arquivos que serão tocados
-
-Novos: `features/commercial-map/sales/` (store slice, tipos, serviço, hook), `components/sales/SalesCart.tsx`, `SalesCheckoutDialog.tsx`, `SalesModeOverlay.tsx`, `sales-mode.css`; testes em `src/test/`. Migração com `lot_sale_orders`, `lot_sale_order_items`, `lot_sale_installments`, RLS/GRANT e a RPC transacional.
-
-Alterados: `state/useCommercialMapStore.ts` (modo + seleção múltipla), `types.ts` (`MapWorkspaceMode`), `components/shell/CommercialMapHeaderTools.tsx` (botão Vendas), `controls/CommercialMapTopBar.tsx`, `CommercialMapPage.tsx` (workspace), `CommercialMapCanvas.tsx` / `CommercialMapEnvironment.tsx` (perfil leve + clique de seleção múltipla), `CommercialPavilionModuleLayer.tsx`, `panels/PavilionModuleCard.tsx` e `panels/MapPanels.tsx` (ação "Adicionar à venda"), `services/commercialMapService.ts`.
+Testes de seleção (adicionar, remover, limpar, não duplicar, sobreviver ao pavilhão), de cálculo (somas, etapas, esquina + comum, centavos), de parcelas (à vista, 2, 3, diferença de R$ 0,01, soma exata), de Pavilhão 7 bloqueado e da RPC (lote vendido/reservado durante o checkout, duplo clique, rollback, idempotência) em ambiente isolado. Verificação visual desktop e mobile, comparação de desempenho mapa normal × modo Vendas, e auditoria final confirmando que quantidade de lotes, áreas, geometrias, IDs, numeração, regras de preço e classificação de esquina permanecem idênticas.
 
 ## Invariantes
 
-Nenhuma alteração em áreas oficiais, geometrias, posições, numeração, segmentos ou `area_validation_status`; Pavilhão 7 continua sem preço e fora do carrinho; preço manual nunca sobrescrito; vendas existentes preservadas; sem taxas adicionais (PPCI, limpeza, licença); nada publicado sem pedido explícito.
-
-## Fluxo de venda sugerido
-
-1. Abrir **Vendas** → mapa em modo leve.
-2. Escolher a etapa (Renovação ou 2ª Etapa).
-3. Clicar nos lotes externos e nos módulos internos — cada clique soma ao carrinho.
-4. Conferir área total e valor total no painel.
-5. "Finalizar venda" → dados do expositor (nome/empresa, CPF/CNPJ, celular, e-mail).
-6. Condições: à vista ou parcelado, nº de parcelas, método, primeiro vencimento.
-7. Revisão lote a lote → confirmar.
-8. Servidor valida, trava, grava a ordem, os itens, as parcelas e o histórico por lote; os lotes passam a VENDIDO no mapa.
-
-## Próximo passo
-
-Se aprovar esta direção, o próximo passo é o plano de implementação detalhado (banco primeiro, depois seleção múltipla, depois modo visual e checkout).
+Área oficial, geometria, posição, numeração, segmentos e `area_validation_status` nunca mudam; Pavilhão 7 continua sem valor e nunca vira R$ 0,00; preço manual nunca é sobrescrito; total do cliente nunca é autoridade; sem venda parcial; sem taxas (PPCI, limpeza, administrativa, licença); histórico de preço e de venda preservados. Nada publicado em produção.
