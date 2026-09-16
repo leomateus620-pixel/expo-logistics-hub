@@ -10,6 +10,10 @@ export interface CommercialPavilionModuleVisualState {
   entityId: string;
   lotId: string | null;
   status: CommercialStatus | null;
+  /** Identificação usada pelo carrinho de Vendas ao clicar no módulo. */
+  publicIdentifier: string | null;
+  displayName: string | null;
+  block: string | null;
 }
 
 export interface CommercialPavilionModuleNavigationTarget {
