@@ -29,6 +29,7 @@ import {
   sourcePolygonAreaSqm,
 } from './exporuralReference2026';
 import { withCommercialMapSegmentMetadata } from './commercialMapSegments';
+import { PAVILION_MODULE_AREA_REVISION } from './pavilionModuleOfficialAreas';
 import {
   EXTERNAL_LOT_AREA_REVISION,
   EXTERNAL_LOT_AREA_SOURCE,
