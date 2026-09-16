@@ -3912,6 +3912,210 @@ export type Database = {
           },
         ]
       }
+      lot_sale_installments: {
+        Row: {
+          amount: number
+          created_at: string
+          due_date: string
+          id: string
+          installment_number: number
+          notes: string | null
+          order_id: string
+          paid_at: string | null
+          payment_status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          due_date: string
+          id?: string
+          installment_number: number
+          notes?: string | null
+          order_id: string
+          paid_at?: string | null
+          payment_status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          due_date?: string
+          id?: string
+          installment_number?: number
+          notes?: string | null
+          order_id?: string
+          paid_at?: string | null
+          payment_status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_sale_installments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "lot_sale_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lot_sale_order_items: {
+        Row: {
+          created_at: string
+          id: string
+          item_total: number
+          lot_id: string
+          official_area_snapshot: number
+          order_id: string
+          original_status: string
+          price_per_sqm_snapshot: number
+          pricing_rule_id: string | null
+          pricing_rule_label: string | null
+          pricing_stage: string
+          public_identifier: string
+          sale_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_total: number
+          lot_id: string
+          official_area_snapshot: number
+          order_id: string
+          original_status: string
+          price_per_sqm_snapshot: number
+          pricing_rule_id?: string | null
+          pricing_rule_label?: string | null
+          pricing_stage: string
+          public_identifier: string
+          sale_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_total?: number
+          lot_id?: string
+          official_area_snapshot?: number
+          order_id?: string
+          original_status?: string
+          price_per_sqm_snapshot?: number
+          pricing_rule_id?: string | null
+          pricing_rule_label?: string | null
+          pricing_stage?: string
+          public_identifier?: string
+          sale_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_sale_order_items_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lot_pricing_2028"
+            referencedColumns: ["lot_id"]
+          },
+          {
+            foreignKeyName: "lot_sale_order_items_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_sale_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "lot_sale_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_sale_order_items_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "lot_sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lot_sale_orders: {
+        Row: {
+          buyer_name: string
+          created_at: string
+          document_number: string | null
+          email: string | null
+          first_due_date: string | null
+          id: string
+          idempotency_key: string
+          installment_count: number
+          negotiated_total: number
+          notes: string | null
+          official_area_total: number
+          payment_method: string
+          payment_type: string
+          phone: string | null
+          project_id: string
+          reverted_at: string | null
+          reverted_by: string | null
+          salesperson_user_id: string
+          stage: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_name: string
+          created_at?: string
+          document_number?: string | null
+          email?: string | null
+          first_due_date?: string | null
+          id?: string
+          idempotency_key: string
+          installment_count?: number
+          negotiated_total?: number
+          notes?: string | null
+          official_area_total?: number
+          payment_method: string
+          payment_type: string
+          phone?: string | null
+          project_id: string
+          reverted_at?: string | null
+          reverted_by?: string | null
+          salesperson_user_id: string
+          stage: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_name?: string
+          created_at?: string
+          document_number?: string | null
+          email?: string | null
+          first_due_date?: string | null
+          id?: string
+          idempotency_key?: string
+          installment_count?: number
+          negotiated_total?: number
+          notes?: string | null
+          official_area_total?: number
+          payment_method?: string
+          payment_type?: string
+          phone?: string | null
+          project_id?: string
+          reverted_at?: string | null
+          reverted_by?: string | null
+          salesperson_user_id?: string
+          stage?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_sale_orders_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lot_sales: {
         Row: {
           buyer_name: string
@@ -9419,6 +9623,25 @@ export type Database = {
           p_payment_status: string
           p_sale_date: string
           p_salesperson_name: string
+        }
+        Returns: string
+      }
+      register_commercial_sale_order: {
+        Args: {
+          p_buyer_name: string
+          p_document_number: string
+          p_email: string
+          p_expected_total: number
+          p_first_due_date: string
+          p_idempotency_key: string
+          p_installment_count: number
+          p_installments: Json
+          p_lot_ids: string[]
+          p_notes: string
+          p_payment_method: string
+          p_payment_type: string
+          p_phone: string
+          p_stage: string
         }
         Returns: string
       }
