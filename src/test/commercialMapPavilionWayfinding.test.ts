@@ -300,7 +300,8 @@ describe('orientação visual das plantas internas comerciais', () => {
     );
 
     expect(layer).toContain('raycast={NO_RAYCAST}');
-    expect(layer).toContain("style={{ pointerEvents: 'none' }}");
+    expect(layer).toContain("const HTML_HOST_STYLE: CSSProperties = { pointerEvents: 'none' };");
+    expect(layer).toContain('style={HTML_HOST_STYLE}');
     expect(layer).toContain('calculatePosition={calculateWayfindingMarkerPosition}');
     expect(layer).toContain('THREE.MathUtils.clamp');
     expect(layer).toContain('event.stopPropagation();\n    lastPointerType.current = event.pointerType;');
@@ -334,6 +335,7 @@ describe('orientação visual das plantas internas comerciais', () => {
     expect(layer).toContain('aria-label={canNavigate ? `${marker.label}. Abrir vista interna` : marker.label}');
     expect(layer).toContain('{open ? (\n            <PavilionAccessTooltip');
     expect(layer).toContain("if (event.pointerType === 'mouse') setHovered(true);");
+    expect(layer).toContain('if (isKeyboardFocus(event.currentTarget)) setHovered(true);');
     expect(layer).toContain("if (pointerType === 'touch' && !active)");
     expect(layer).toContain("document.addEventListener('pointerdown', closeOnOutsidePointer, true)");
     expect(layer).toContain('}, [plan.publicIdentifier]);');

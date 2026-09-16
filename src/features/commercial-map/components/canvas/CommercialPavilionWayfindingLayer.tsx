@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type FocusEvent as ReactFocusEvent,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
@@ -40,8 +41,17 @@ const MARKER_SCREEN_MARGIN_PX = 24;
 const MARKER_Z_INDEX_RANGE: [number, number] = [14, 4];
 const ACTIVE_MARKER_Z_INDEX_RANGE: [number, number] = [28, 28];
 const DEFAULT_TOOLTIP_LAYOUT: CommercialPavilionAccessTooltipLayout = { placement: 'top', shift: 0 };
+const HTML_HOST_STYLE: CSSProperties = { pointerEvents: 'none' };
 const CONNECTION_TAP_HINT = 'Toque novamente para abrir a planta';
 const CONNECTION_CLICK_HINT = 'Clique para abrir a planta';
+
+function isKeyboardFocus(element: HTMLElement): boolean {
+  try {
+    return element.matches(':focus-visible');
+  } catch {
+    return true;
+  }
+}
 
 function calculateWayfindingMarkerPosition(
   object: THREE.Object3D,
@@ -193,7 +203,8 @@ function PavilionAccessMarker({
   const markerDepth = Math.max(shortSide * 0.025, 0.12);
   const isConnection = marker.kind === 'connection';
   const canNavigate = isConnection && Boolean(targetEntityId);
-  const tooltipId = `pavilion-access-tooltip-${useId()}`;
+  const reactId = useId();
+  const tooltipId = `pavilion-access-tooltip-${reactId}`;
   const buttonRef = useRef<HTMLButtonElement>(null);
   const htmlRef = useRef<HTMLDivElement>(null);
   const lastPointerType = useRef('');
@@ -218,7 +229,11 @@ function PavilionAccessMarker({
   const handlePointerLeave = useCallback((event: ReactPointerEvent<HTMLButtonElement>) => {
     if (event.pointerType === 'mouse') setHovered(false);
   }, []);
-  const handleFocus = useCallback(() => setHovered(true), []);
+  const handleFocus = useCallback((event: ReactFocusEvent<HTMLButtonElement>) => {
+    // Only keyboard focus reveals the bubble; pointer focus is handled by
+    // hover/tap so a second tap can close it even while the button is focused.
+    if (isKeyboardFocus(event.currentTarget)) setHovered(true);
+  }, []);
   const handleBlur = useCallback(() => setHovered(false), []);
   const handleKeyDown = useCallback((event: ReactKeyboardEvent<HTMLButtonElement>) => {
     if (event.key !== 'Escape') return;
@@ -241,6 +256,7 @@ function PavilionAccessMarker({
       onNavigate(targetEntityId);
       return;
     }
+    if (active) setHovered(false);
     onActivate(active ? null : marker.id);
   }, [active, isConnection, marker.id, onActivate, onNavigate, targetEntityId]);
 
@@ -289,7 +305,7 @@ function PavilionAccessMarker({
         eps={0.001}
         zIndexRange={open ? ACTIVE_MARKER_Z_INDEX_RANGE : MARKER_Z_INDEX_RANGE}
         calculatePosition={calculateWayfindingMarkerPosition}
-        style={{ pointerEvents: 'none' }}
+        style={HTML_HOST_STYLE}
       >
         <button
           ref={buttonRef}
