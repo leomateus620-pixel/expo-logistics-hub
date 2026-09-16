@@ -704,14 +704,26 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     gl.domElement.style.cursor = 'pointer';
   }, [gl, interactive, setHoveredModuleId]);
 
+  const salesToggle = useCallback((moduleId: string) => {
+    const state = moduleStateById.get(moduleId) ?? null;
+    return dispatchSalesModuleClick(state && {
+      lotId: state.lotId,
+      publicIdentifier: state.publicIdentifier,
+      displayName: state.displayName,
+      context: state.block,
+    });
+  }, [moduleStateById]);
+
   const handleClick = useCallback((event: ThreeEvent<MouseEvent>) => {
     if (!interactive || !isMapSelectionClick(event.delta, event.nativeEvent)) return;
     event.stopPropagation();
     const part = event.instanceId === undefined ? null : projectedModuleParts[event.instanceId];
     if (!part) return;
+    // Modo Vendas: o clique alterna o módulo no carrinho, sem abrir o card.
+    if (salesToggle(part.cell.id)) return;
     const current = useCommercialMapStore.getState().selectedModuleId;
     setSelectedModuleId(current === part.cell.id ? null : part.cell.id);
-  }, [interactive, projectedModuleParts, setSelectedModuleId]);
+  }, [interactive, projectedModuleParts, salesToggle, setSelectedModuleId]);
 
   const handleIrregularClick = useCallback((
     moduleId: string,
@@ -719,9 +731,10 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   ) => {
     if (!interactive || !isMapSelectionClick(event.delta, event.nativeEvent)) return;
     event.stopPropagation();
+    if (salesToggle(moduleId)) return;
     const current = useCommercialMapStore.getState().selectedModuleId;
     setSelectedModuleId(current === moduleId ? null : moduleId);
-  }, [interactive, setSelectedModuleId]);
+  }, [interactive, salesToggle, setSelectedModuleId]);
 
   useEffect(() => () => {
     moduleMaterial.dispose();
