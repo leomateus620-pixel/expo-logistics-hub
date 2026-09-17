@@ -1,0 +1,57 @@
+name: Apply audited Arena reconstruction once
+on:
+  push:
+    branches: [fix/arena-canonical-reconstruction]
+    paths: ['.github/arena-transfer/**', '.github/workflows/arena-apply-once.yml']
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: github.repository == 'leomateus620-pixel/expo-logistics-hub' && github.ref == 'refs/heads/fix/arena-canonical-reconstruction' && github.event.head_commit.message == 'chore(arena): stage checksum-verified reconstruction payload'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          ref: ${{ github.sha }}
+      - name: Verify and apply exact reviewed changes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import base64, gzip, hashlib, json, pathlib, subprocess
+          run = lambda *args: subprocess.check_output(args, text=True).strip()
+          encoded = ''.join(p.read_text() for p in sorted(pathlib.Path('.github/arena-transfer').glob('part-*.b64')))
+          compressed = base64.b64decode(encoded, validate=True)
+          assert hashlib.sha256(compressed).hexdigest() == 'aa64596bbddedec23c3eab66a6bdd8fa2a35f0a49b032013436fdc4a5015733d', 'Payload checksum mismatch'
+          payload = json.loads(gzip.decompress(compressed))
+          assert run('git','rev-parse','HEAD^') == payload['base'] == '8885b12ce57635fc440e21e70fa1dfda6a169fef', 'Branch changed: reconcile before writing'
+          allowed = {'scripts/arena-capture.py','scripts/arena-compare-tests.py','.github/workflows/arena-reconstruction.yml'}
+          for item in payload['files']:
+              assert item['path'] in allowed
+              path = pathlib.Path(item['path'])
+              if item['expected'] is None:
+                  assert not path.exists(), 'Unexpected existing file'
+              else:
+                  assert run('git','hash-object',str(path)) == item['expected'], 'Existing file has changed'
+          patch = pathlib.Path('/tmp/arena-reviewed.patch'); patch.write_text(payload['patch'])
+          subprocess.run(['git','apply','--check',str(patch)], check=True)
+          subprocess.run(['git','apply',str(patch)], check=True)
+          for item in payload['files']:
+              pathlib.Path(item['path']).write_text(item['content'])
+          changed = run('git','diff','--name-only').splitlines()
+          assert all(p.startswith(('src/features/commercial-map/','src/test/')) or p == 'package.json' or p in allowed for p in changed), changed
+          PY
+      - name: Commit reconstruction and tests, remove transport, publish branch only
+        shell: bash
+        run: |
+          git config user.name 'leomateus620-pixel'
+          git config user.email 'leomateus620-pixel@users.noreply.github.com'
+          git add src/features/commercial-map package.json
+          git commit -m 'feat(arena): reconstruct canonical open vault and aligned spatial sector'
+          git add src/test scripts/arena-capture.py scripts/arena-compare-tests.py .github/workflows/arena-reconstruction.yml
+          git commit -m 'test(arena): protect Mirante and add comparable real-map validation'
+          git rm -r .github/arena-transfer .github/workflows/arena-apply-once.yml
+          git commit -m 'chore(arena): remove one-time patch transport'
+          test -z "$(git status --porcelain)"
+          git push origin HEAD:refs/heads/fix/arena-canonical-reconstruction
