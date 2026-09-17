@@ -1,0 +1,67 @@
+name: Territorial reconstruction
+on:
+  push:
+    branches: [fix/test-drive-pecuaria-access]
+  pull_request:
+    paths:
+      - 'src/features/commercial-map/**'
+      - 'src/test/commercialMap*'
+      - 'scripts/territorial*'
+      - '.github/workflows/territorial-reconstruction.yml'
+permissions:
+  contents: read
+concurrency:
+  group: territorial-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      VITE_SUPABASE_URL: https://qa.invalid
+      VITE_SUPABASE_PUBLISHABLE_KEY: qa-placeholder
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Baseline source and locked dependencies
+        run: |
+          mkdir -p territorial-validation transfer
+          git rev-parse HEAD > territorial-validation/commit.txt
+          tar -czf transfer/source.tgz src public scripts package.json package-lock.json index.html vite.config.ts vitest.config.ts tsconfig*.json tailwind.config.ts postcss.config.js eslint.config.js .github README.md
+          tar -czf transfer/dependencies.tgz node_modules
+      - name: Map contracts baseline
+        continue-on-error: true
+        run: npx vitest run src/test/commercialMap --reporter=json --outputFile=territorial-validation/tests.json
+      - name: TypeScript
+        run: npx tsc --noEmit -p tsconfig.app.json
+      - name: Production build
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee territorial-validation/build.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: territorial-validation-${{ github.sha }}
+          path: territorial-validation/
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: territorial-source-${{ github.sha }}
+          path: transfer/source.tgz
+          retention-days: 3
+          compression-level: 0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: territorial-dependencies-${{ github.sha }}
+          path: transfer/dependencies.tgz
+          retention-days: 3
+          compression-level: 0
