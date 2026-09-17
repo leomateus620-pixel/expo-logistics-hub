@@ -5,11 +5,24 @@ import type { OrbitControls } from 'three-stdlib';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import { stopCommercialMapOrbitMotion } from '../utils/cameraTransition';
 import { readCommercialMapRenderTiming, resetCommercialMapRenderTiming, setCommercialMapRenderTimingEnabled } from '../utils/renderingTiming';
+import { MIRANTE_COMPLEX, miranteComplexSourceBoundsToLocal } from '../data/miranteComplexReconstruction';
 
 // DEV-only repeatable poses; no new production camera mode or navigation limit.
 const EVENT = 'commercial-map:district-qa';
-type View = 'top' | 'oblique' | 'reverse' | 'close' | 'sweep' | 'visibility' | 'maximum' | 'snapshot';
+type View =
+  | 'top' | 'oblique' | 'reverse' | 'close' | 'sweep' | 'visibility' | 'maximum' | 'snapshot'
+  | 'mirante-top' | 'mirante-oblique' | 'mirante-street' | 'mirante-arena' | 'mirante-stairs';
 const dispatch = (view: View, visible?: boolean) => window.dispatchEvent(new CustomEvent(EVENT, { detail: { view, visible } }));
+
+function miranteComplexCenter() {
+  const mirante = miranteComplexSourceBoundsToLocal(MIRANTE_COMPLEX.mirante.sourceBounds);
+  const lateral = miranteComplexSourceBoundsToLocal(MIRANTE_COMPLEX.lateralStructure.sourceBounds);
+  return new Vector3(
+    (mirante.centerX + lateral.centerX) / 2,
+    MIRANTE_COMPLEX.levels.deck,
+    (mirante.minZ + lateral.maxZ) / 2,
+  );
+}
 
 export function LateralDistrictQaPanel() {
   const [shown, setShown] = useState(true);
@@ -34,6 +47,11 @@ export function LateralDistrictQaPanel() {
       <button onClick={() => dispatch('reverse')}>Bairro reverso</button>
       <button onClick={() => dispatch('close')}>Bairro perto</button>
       <button onClick={() => dispatch('maximum')}>Bairro zoom máximo</button>
+      <button onClick={() => dispatch('mirante-top')}>Mirante superior</button>
+      <button onClick={() => dispatch('mirante-oblique')}>Mirante oblíquo</button>
+      <button onClick={() => dispatch('mirante-street')}>Mirante rua</button>
+      <button onClick={() => dispatch('mirante-arena')}>Mirante arena</button>
+      <button onClick={() => dispatch('mirante-stairs')}>Mirante escada norte</button>
       <button onClick={() => useCommercialMapStore.getState().requestCameraPreset('overview')}>Parque geral</button>
       <button aria-pressed={night} onClick={() => useCommercialMapStore.getState().toggleNightMode()}>Noite bairro</button>
       <button aria-pressed={reduced} onClick={() => useCommercialMapStore.getState().setReducedGraphics(!reduced)}>Qualidade reduzida bairro</button>
@@ -75,10 +93,18 @@ export function LateralDistrictQaScene() {
       if (useCommercialMapStore.getState().cameraNavigating) return;
       sweep.current = null;
       stopCommercialMapOrbitMotion(camera, controls);
+      const miranteViews: Partial<Record<View, { direction: Vector3; distance: number }>> = {
+        'mirante-top': { direction: new Vector3(0.002, 1, 0.01), distance: 22 },
+        'mirante-oblique': { direction: new Vector3(-0.85, 0.55, 0.35), distance: 14 },
+        'mirante-street': { direction: new Vector3(-1, 0.18, 0.08), distance: 6.4 },
+        'mirante-arena': { direction: new Vector3(0.92, 0.42, 0.12), distance: 18 },
+        'mirante-stairs': { direction: new Vector3(-0.15, 0.38, -1), distance: 8.5 },
+      };
+      const mirantePose = miranteViews[view];
       // Registered avenue interval: world x[-47,13], exterior z[28,44].
-      const center = new Vector3(-17, 0.1, 35.5);
+      const center = mirantePose ? miranteComplexCenter() : new Vector3(-17, 0.1, 35.5);
       const portrait = size.height > size.width;
-      const directions: Record<Exclude<View, 'visibility' | 'snapshot'>, Vector3> = {
+      const directions: Record<Exclude<View, 'visibility' | 'snapshot' | keyof typeof miranteViews>, Vector3> = {
         top: portrait ? new Vector3(.008, 1, 0) : new Vector3(0, 1, .008),
         oblique: portrait ? new Vector3(1, .8, .3) : new Vector3(.3, .8, 1),
         reverse: portrait ? new Vector3(-1, .65, -.35) : new Vector3(-.35, .65, -1), close: new Vector3(.3, .6, 1),
@@ -86,10 +112,13 @@ export function LateralDistrictQaScene() {
       };
       const tangent = Math.tan(camera.fov * Math.PI / 360);
       const horizontalFit = (portrait ? 13 : 36) / (tangent * Math.max(.2, size.width / size.height));
-      const distance = view === 'maximum' ? controls.minDistance : view === 'close' ? 15 : Math.max(53, horizontalFit, portrait ? 36 / tangent : 0);
+      const distance = mirantePose
+        ? mirantePose.distance
+        : view === 'maximum' ? controls.minDistance : view === 'close' ? 15 : Math.max(53, horizontalFit, portrait ? 36 / tangent : 0);
+      const offset = mirantePose ? mirantePose.direction : directions[view as keyof typeof directions];
       controls.target.copy(center);
       camera.up.set(0, 1, 0);
-      camera.position.copy(center).addScaledVector(directions[view].normalize(), distance);
+      camera.position.copy(center).addScaledVector(offset.normalize(), distance);
       camera.lookAt(center);
       controls.update();
       camera.updateMatrixWorld();
