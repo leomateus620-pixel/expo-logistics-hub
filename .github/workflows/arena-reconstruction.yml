@@ -4,11 +4,9 @@ on:
     branches: [fix/arena-canonical-reconstruction]
   pull_request:
     paths:
-      - 'src/components/map/**'
-      - 'src/lib/map/**'
-      - 'src/data/**'
-      - 'src/test/*arena*'
-      - 'src/test/*Arena*'
+      - 'src/features/commercial-map/**'
+      - 'src/test/commercialMapArena*'
+      - 'src/test/commercialMapParkEnvironment*'
       - 'scripts/arena*'
       - '.github/workflows/arena-reconstruction.yml'
 permissions:
@@ -36,13 +34,13 @@ jobs:
       - run: bun install --frozen-lockfile
       - name: Canonical source and offline dependencies
         run: |
-          mkdir -p arena-validation
+          mkdir -p arena-validation offline-source offline-dependencies
           git rev-parse HEAD > arena-validation/commit.txt
-          git archive HEAD | gzip > arena-validation/source.tgz
-          tar -czf arena-validation/dependencies.tgz node_modules
+          git archive HEAD src public scripts .github package.json package-lock.json bun.lock index.html vite.config.ts vitest.config.ts tsconfig.json tsconfig.app.json tsconfig.node.json tailwind.config.ts postcss.config.js eslint.config.js | gzip > offline-source/source.tgz
+          git ls-files docs | grep -E '\.(md|ts|tsx|py|json)$' | tar -czf offline-source/documentation.tgz -T -
+          tar -czf offline-dependencies/dependencies.tgz node_modules
       - name: Arena baseline contracts
-        run: |
-          npx vitest run src/test/arena --reporter=json --outputFile=arena-validation/tests.json
+        run: npx vitest run src/test/commercialMapArena src/test/commercialMapParkEnvironment --reporter=json --outputFile=arena-validation/tests.json
       - name: TypeScript
         run: npx tsc --noEmit -p tsconfig.app.json
       - name: Production build
@@ -55,4 +53,17 @@ jobs:
           name: arena-validation-${{ github.sha }}
           path: arena-validation/
           retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: arena-source-${{ github.sha }}
+          path: offline-source/
+          retention-days: 3
+          compression-level: 0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: arena-dependencies-${{ github.sha }}
+          path: offline-dependencies/
+          retention-days: 3
           compression-level: 0
