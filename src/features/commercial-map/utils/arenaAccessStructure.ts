@@ -1,7 +1,7 @@
 import { MIRANTE_COMPLEX } from '../data/miranteComplexReconstruction';
 
 export const ARENA_ACCESS_STRUCTURE_ID = 'arena-front-covered-access' as const;
-export const ARENA_ACCESS_STRUCTURE_REVISION = '2026.9-mirante-complex-satellite.1';
+export const ARENA_ACCESS_STRUCTURE_REVISION = '2026.9-mirante-complex-satellite.2';
 
 export interface ArenaAccessBounds {
   width: number;
@@ -125,8 +125,8 @@ export interface ArenaAccessLayoutOptions {
 /**
  * Estrutura lateral coberta ("PISTA"): laje fina no nível do passeio, fascia
  * clara, apoios pretos em V e parede cega no norte, encostada ao Mirante.
- * A altura da cobertura acompanha o pavilhão D3 — não um bloco de dois
- * pavimentos.
+ * A altura da cobertura acompanha o pavilhão D3 e a Via Expressa — eave
+ * ~0.95–1.00, cumeeira na família 1.16, nunca um toldo baixo.
  */
 export function createArenaAccessLayout(
   bounds: ArenaAccessBounds,
@@ -141,9 +141,9 @@ export function createArenaAccessLayout(
   const sideWallEnd = options.sideWallEnd ?? MIRANTE_COMPLEX.lateralStructure.sideWallEnd;
   const bayCount = Math.max(3, Math.round(options.bayCount ?? MIRANTE_COMPLEX.lateralStructure.bayCount));
 
-  const roofClearance = clamp(width * 0.24, 0.34, 0.4);
+  const roofClearance = clamp(width * 0.48, 0.78, 0.88);
   const roofEaveY = platformTopY + roofClearance;
-  const roofRise = clamp(width * 0.042, 0.055, 0.075);
+  const roofRise = clamp(width * 0.08, 0.12, 0.16);
   const roofHalfSpan = width / 2 + 0.08;
   const roofDepth = depth + 0.12;
   const roofThickness = 0.028;

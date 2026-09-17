@@ -21,13 +21,13 @@ conformidade.
 - Classificação: `ATTRACTION`
 - Camada: `reference:structures`
 - Revisão da fonte: `2026.3`
-- Revisão da reconstrução: `2026.9-mirante-complex-satellite.1`
+- Revisão da reconstrução: `2026.9-mirante-complex-satellite.2`
 - Verificação: `NEEDS_REVIEW`
 - Elevação cartográfica: `0`
 - Rotação persistida: `0`
-- Extrusão visual: `0.57`
+- Extrusão visual: `1.16` (cumeeira no patamar da Via Expressa)
 - Footprint PDF reconstruído: `[4004, 2440]–[4072, 2748]`
-- Escada norte (PDF): `[4004, 2440]–[4072, 2480]`
+- Patamar norte (PDF): `[4004, 2440]–[4072, 2480]`
 - Âncoras fixas: borda leste de Rua Brasília (`3988`), borda norte de Rua
   Brasil (`3106`) e borda sul da Quadra R (`2440`)
 - Confiança registrada: `reference_registered_estimate`
@@ -43,18 +43,18 @@ nova e não altera a malha viária canônica.
 |---|---|---|---|
 | Eixo longo no Z, recuado da via | Verificado | Satélite (anexo 2) e âncoras de Rua Brasília / Quadra R | Substituir o retângulo oficial ~27 % mais longo e ~60 % mais fundo |
 | Deck contínuo com o passeio | Verificado visualmente | Fotos 7, 9 e 10 | `sidewalk`, `apron` e `deck` compartilham a cota `0.178`; o meio-fio é a queda até a via |
-| Escada de descida na ponta norte | Verificado | Anexo 2 (“Calçada de descida”) e anexo 5 | Degraus entre muretas, do deck ao gramado da Exporural |
+| Escada de descida na ponta norte | Verificado | Fotos do patamar (tátil amarelo, muro à direita) | Lance estreito virado em `+X` entre a cerca e o muro, do patamar de chão ao deck |
 | Estrutura lateral coberta ao sul | Verificado | Anexos 2, 7 e 10 | Fascia clara, apoios pretos em V, parede cega no norte, laje fina no terraço |
 | Faixa de grama junto a Rua Brasil | Verificado | Anexos 2 e 8 | Recuar a laje da praça; o terreno natural ocupa `[4092, 2958]–[4660, 3096]` |
 | Bancos voltados à Arena | Verificado visualmente | Foto 8 | Módulos vermelhos no bordo leste; sem mesas genéricas |
-| Altura visual de um pavimento | Inferência conservadora | Deck + vãos + cumeeira rasa | `miranteVisualHeight` ≈ `0.57`, nunca um pódio de dois andares |
+| Altura visual de um pavimento | Verificado contra pares | Via Expressa (cumeeira 1.16) e telhado da Alameda | `miranteVisualHeight` ≈ `1.16`; deck permanece no passeio `0.178` |
 | Rampa leste independente | Rejeitado | O satélite e as fotos não mostram rampa própria em `+X` | Acesso leste = terraço contínuo + escadaria da Arena |
 
 ## Relação cartográfica e acesso
 
 A implantação reconstruída, de norte a sul ao longo de Rua Brasília:
 
-1. escada de descida do Mirante, na fronteira com a Exporural;
+1. patamar de chão e escada norte virada em `+X`, na fronteira com a Exporural;
 2. plataforma coberta do Espaço Mirante;
 3. estrutura lateral coberta (parede norte encostada ao Mirante);
 4. pátio pavimentado (“Calçada”) até Rua Brasil;
@@ -68,20 +68,21 @@ não geram entidade selecionável nova e permanecem fora das métricas comerciai
 
 `createMiranteLayout` deriva, para o footprint reconstruído:
 
-- altura visual ≈ `0.57 un`;
+- altura visual ≈ `1.16 un` (cumeeira; eave ≈ `0.95–1.00`);
 - topo da plataforma = cota do passeio / terraço da Arena;
-- cobertura de duas águas baixas, maior que o footprint;
-- vãos estruturais ao longo da plataforma coberta (a ponta `-Z` é a escada);
+- cobertura de duas águas de pavilhão, maior que o footprint;
+- vãos estruturais ao longo da plataforma coberta (a ponta `-Z` é o patamar);
 - corredor longitudinal oeste contínuo;
 - bancos no bordo leste, voltados à Arena;
-- escada norte com endpoints `[x, y, z]` até `exporuralGround`.
+- escada norte estreita, `rotationY = −π/2`, correndo em `+X` até `exporuralGround`.
 
 Campos de alto nível:
 
-- `platform`: laje da plataforma coberta (não inclui a corrida da escada);
+- `platform`: laje da plataforma coberta (não inclui o patamar de chão);
 - `base`: contenção sob o deck;
 - `roof`, `structure`, `railings`, `aisle`;
-- `access.descentStairs`: descida norte;
+- `access.descentStairs`: lance virado na face norte;
+- `access.landing`: patamar de chão com tátil;
 - `furniture`: bancos;
 - `service`: quiosque sul, junto à parede da estrutura lateral.
 

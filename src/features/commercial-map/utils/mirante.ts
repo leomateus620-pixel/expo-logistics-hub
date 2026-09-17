@@ -80,7 +80,7 @@ export interface MiranteSiteProfile {
   deckTopY: number;
   sidewalkY: number;
   northGroundY: number;
-  /** Profundidade (unidades locais) reservada à escada de descida, na ponta -Z. */
+  /** Profundidade (unidades locais) reservada ao patamar de chão, na ponta -Z. */
   descentDepth: number;
 }
 
@@ -174,22 +174,36 @@ export interface MiranteStairLayout {
   stepCount: number;
   stepRise: number;
   stepDepth: number;
-  /** Topo da escada, na borda norte da plataforma. */
+  /** Topo da escada, no deck, canto leste da face norte. */
   start: MiranteVector3;
-  /** Pé da escada, no gramado da Exporural. */
+  /** Pé da escada, no patamar de chão, a oeste rumo a Rua Brasília. */
   endpoint: MiranteVector3;
   center: MiranteVector3;
+  /** −π/2: o lance corre em +X (descida para −X). */
   rotationY: number;
   landingLength: number;
+  landingWidth: number;
   cheekWallThickness: number;
 }
 
+export interface MiranteLandingLayout {
+  width: number;
+  depth: number;
+  topY: number;
+  thickness: number;
+  centerX: number;
+  centerZ: number;
+  tactileWidth: number;
+  tactileOffsetFromNorth: number;
+}
+
 export interface MiranteAccessLayout {
-  /** Borda norte da plataforma: início da escada de descida. */
+  /** Borda norte da plataforma: muro de contenção e arranque da escada. */
   northEdgeZ: number;
   /** Borda sul da plataforma: continuidade com a estrutura lateral coberta. */
   southEdgeZ: number;
   descentStairs: MiranteStairLayout;
+  landing: MiranteLandingLayout;
   southConnectionY: number;
 }
 
@@ -246,25 +260,25 @@ function clamp(value: number, minimum: number, maximum: number): number {
 }
 
 function roofClearance(width: number): number {
-  return clamp(width * 0.23, 0.32, 0.36);
+  return clamp(width * 0.56, 0.82, 0.86);
 }
 
 function roofRiseFor(width: number): number {
-  return clamp(width * 0.037, 0.05, 0.06);
+  return clamp(width * 0.11, 0.15, 0.18);
 }
 
 /**
- * The official map units are not calibrated metres. The visual height is the
- * ridge of a low canopy over a deck half a metre above the sidewalk (photo 9):
- * deck datum + column clearance + shallow gable rise. It reads like the
- * single-storey pavilions around it, never like a two-storey podium.
+ * Unidades do mapa não são metros. A altura visual é a cumeeira do pavilhão
+ * aberto no mesmo patamar da Via Expressa (1.16) e da cobertura da Alameda
+ * (sem as bandeiras): deck no passeio + vão de pilares + água baixa.
  */
 export function miranteVisualHeight(
   bounds: MiranteBoundsDimensions,
   site: MiranteSiteProfile = MIRANTE_DEFAULT_SITE,
 ): number {
   const width = Math.max(0.6, finiteOr(bounds.width, 1.48));
-  return site.deckTopY + roofClearance(width) + roofRiseFor(width);
+  const ridge = site.deckTopY + roofClearance(width) + roofRiseFor(width);
+  return clamp(ridge, 1.02, MIRANTE_COMPLEX.mirante.extrusionHeight);
 }
 
 /**
@@ -295,7 +309,8 @@ export function miranteArenaFacingRadians(
  * Parametric D3 construction contract. Local X is west/east (+X toward the
  * open Arena side, -X toward Rua Brasília) and local Z follows the registered
  * longitudinal footprint (-Z toward the Exporural, +Z toward the covered
- * lateral structure). The footprint includes the descent stairs at -Z.
+ * lateral structure). The north strip is a ground landing; the stair runs +X
+ * along the podium's north face.
  */
 export function createMiranteLayout(
   bounds: MiranteBoundsDimensions,
@@ -306,7 +321,7 @@ export function createMiranteLayout(
   const depth = Math.max(3.2, finiteOr(bounds.depth, 6.72));
   const deckTopY = Math.max(site.sidewalkY, finiteOr(site.deckTopY, MIRANTE_DEFAULT_SITE.deckTopY));
   const height = Math.max(
-    deckTopY + 0.26,
+    deckTopY + 0.90,
     finiteOr(requestedHeight, miranteVisualHeight({ width, depth }, site)),
   );
 
@@ -332,18 +347,23 @@ export function createMiranteLayout(
   const aisleMinX = -width / 2 + railingInset + 0.02;
   const furnitureClearance = clamp(width * 0.05, 0.06, 0.09);
 
-  // Escada de descida: ocupa toda a largura da ponta norte, entre muretas
-  // laterais, e desce do deck ao topo do lote Q-R-04.
-  const cheekWallThickness = clamp(width * 0.04, 0.05, 0.07);
-  const stairWidth = width - cheekWallThickness * 2;
-  const stairRise = Math.max(0.03, deckTopY - finiteOr(site.northGroundY, 0.13));
-  const stairStepCount = Math.max(4, Math.ceil(stairRise / 0.014));
+  // Escada virada: lance estreito na face norte do pódio, correndo em +X
+  // (sobe rumo à Arena). A faixa norte do footprint é o patamar de chão.
+  const northGroundY = finiteOr(site.northGroundY, MIRANTE_DEFAULT_SITE.northGroundY);
+  const cheekWallThickness = clamp(width * 0.035, 0.04, 0.055);
+  const stairWidth = clamp(width * 0.16, 0.22, 0.30);
+  const stairRise = Math.max(0.03, deckTopY - northGroundY);
+  const stairRun = clamp(width * 0.55, 0.70, 0.95);
+  const stairStepCount = Math.max(7, Math.ceil(stairRise / 0.016));
   const stairStepRise = stairRise / stairStepCount;
-  const stairLandingLength = clamp(descentDepth * 0.2, 0.12, 0.2);
-  const stairRun = Math.max(0.3, descentDepth - stairLandingLength);
   const stairStepDepth = stairRun / stairStepCount;
-  const stairTopZ = platformMinZ;
-  const stairBottomZ = platformMinZ - stairRun;
+  const stairCenterZ = platformMinZ;
+  const stairBottomX = -width / 2 + 0.08;
+  const stairTopX = stairBottomX + stairRun;
+  const landingLength = descentDepth;
+  const landingWidth = width;
+  const landingCenterZ = -depth / 2 + landingLength / 2;
+  const landingThickness = 0.028;
 
   const platform: MirantePlatformLayout = {
     width,
@@ -419,12 +439,27 @@ export function createMiranteLayout(
       stepCount: stairStepCount,
       stepRise: stairStepRise,
       stepDepth: stairStepDepth,
-      start: [0, deckTopY, stairTopZ],
-      endpoint: [0, deckTopY - stairRise, stairBottomZ],
-      center: [0, deckTopY - stairRise / 2, (stairTopZ + stairBottomZ) / 2],
-      rotationY: Math.PI,
-      landingLength: stairLandingLength,
+      start: [stairTopX, deckTopY, stairCenterZ],
+      endpoint: [stairBottomX, northGroundY, stairCenterZ],
+      center: [
+        (stairTopX + stairBottomX) / 2,
+        deckTopY - stairRise / 2,
+        stairCenterZ,
+      ],
+      rotationY: -Math.PI / 2,
+      landingLength,
+      landingWidth,
       cheekWallThickness,
+    },
+    landing: {
+      width: landingWidth,
+      depth: landingLength,
+      topY: northGroundY,
+      thickness: landingThickness,
+      centerX: 0,
+      centerZ: landingCenterZ,
+      tactileWidth: 0.045,
+      tactileOffsetFromNorth: 0.08,
     },
     southConnectionY: deckTopY,
   };
@@ -482,7 +517,7 @@ export function miranteStructuralBayPositions(layout: MiranteLayout): number[] {
 
 /**
  * Bancos encostados ao guarda-corpo leste, voltados para a Arena (fotos 8 e
- * 9). O corredor oeste, a escada norte e o quiosque sul permanecem livres.
+ * 9). O corredor oeste, o patamar norte e o quiosque sul permanecem livres.
  */
 export function createMiranteFurniturePlan(layout: MiranteLayout): MiranteFurniturePlan {
   const { benchSize, benchCount } = layout.furniture;

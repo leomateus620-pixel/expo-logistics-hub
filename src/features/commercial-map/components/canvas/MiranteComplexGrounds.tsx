@@ -130,6 +130,9 @@ export const MiranteComplexGrounds = memo(function MiranteComplexGrounds({
       MIRANTE_COMPLEX.mirante.sourceBounds[2],
       MIRANTE_COMPLEX.mirante.sourceBounds[3],
     ]);
+    const northLanding = miranteComplexSourceBoundsToLocal(
+      MIRANTE_COMPLEX.mirante.descentStairsSourceBounds,
+    );
     const lateralPad = miranteComplexSourceBoundsToLocal([
       MIRANTE_COMPLEX.lateralStructure.sourceBounds[0],
       MIRANTE_COMPLEX.lateralStructure.sourceBounds[1],
@@ -138,9 +141,11 @@ export const MiranteComplexGrounds = memo(function MiranteComplexGrounds({
     ]);
     const topY = MIRANTE_COMPLEX.levels.sidewalk;
     const roadY = MIRANTE_COMPLEX.levels.road;
+    const landingY = MIRANTE_COMPLEX.levels.exporuralGround;
     const slabThickness = 0.03;
     const curbHeight = Math.max(0.04, topY - roadY);
     const tactileX = sidewalk.minX + MIRANTE_COMPLEX.sidewalk.tactileOffsetFromRoad;
+    const landingTactileWidth = MIRANTE_COMPLEX.sidewalk.tactileWidth;
 
     return {
       concrete: [
@@ -191,6 +196,14 @@ export const MiranteComplexGrounds = memo(function MiranteComplexGrounds({
             0.012,
             sidewalk.depth * 0.97,
           ] as const,
+        },
+        {
+          position: [
+            northLanding.centerX,
+            landingY + 0.008,
+            northLanding.minZ + 0.08,
+          ] as const,
+          scale: [northLanding.width * 0.92, 0.012, landingTactileWidth] as const,
         },
       ],
     };

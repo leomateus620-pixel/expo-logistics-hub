@@ -17,7 +17,7 @@ import type { CommercialMapData, Coordinate, MapEntity } from '../types';
  * mapa (unidades não calibradas em metros) e ficam explicitamente marcadas
  * como estimativa registrada em `metadata`.
  */
-export const MIRANTE_COMPLEX_REVISION = '2026.9-mirante-complex-satellite.1';
+export const MIRANTE_COMPLEX_REVISION = '2026.9-mirante-complex-satellite.2';
 
 type SourceBounds = readonly [number, number, number, number];
 type SourcePoint = readonly [number, number];
@@ -102,16 +102,20 @@ export const MIRANTE_COMPLEX = Object.freeze({
   }),
 
   /**
-   * D3 — Espaço Mirante. O footprint inclui a escada de descida do lado norte
+   * D3 — Espaço Mirante. O footprint inclui o patamar de chão do lado norte
    * (fronteira com a Exporural); a plataforma coberta começa em Z=2480.
+   * A escada sobe virada em +X, encostada à face norte do pódio.
    */
   mirante: Object.freeze({
     identifier: 'D3',
     sourceBounds: [4004, 2440, 4072, 2748] as SourceBounds,
     platformSourceMinZ: 2480,
     descentStairsSourceBounds: [4004, 2440, 4072, 2480] as SourceBounds,
-    /** Altura visual total (deck + pilares + cumeeira) em unidades do mapa. */
-    extrusionHeight: 0.57,
+    /**
+     * Cumeeira do pavilhão aberto, no mesmo patamar da Via Expressa (1.16).
+     * Não inclui bandeiras da Alameda.
+     */
+    extrusionHeight: 1.16,
   }),
 
   /**

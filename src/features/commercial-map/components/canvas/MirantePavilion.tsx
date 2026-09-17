@@ -216,48 +216,72 @@ function createArchitecture(
     scale: [0.012, layout.base.curbBandHeight, platform.depth],
   });
 
-  // Escada de descida para a Exporural (ponta norte): degraus entre muretas.
+  // Escada virada na face norte: lance estreito em +X, patamar no chão.
   const stairs = access.descentStairs;
+  const landing = access.landing;
   for (let index = 0; index < stairs.stepCount; index += 1) {
     const treadTopY = platform.topY - stairs.stepRise * (index + 1);
-    const centerZ = platform.minZ - stairs.stepDepth * (index + 0.5);
+    const centerX = stairs.start[0] - stairs.stepDepth * (index + 0.5);
     stairSteps.push({
-      position: [0, treadTopY / 2, centerZ],
-      scale: [stairs.width, treadTopY, stairs.stepDepth + 0.01],
+      position: [centerX, treadTopY / 2, stairs.center[2]],
+      scale: [stairs.stepDepth + 0.01, treadTopY, stairs.width],
     });
   }
-  const landingTopY = stairs.endpoint[1];
   stairSteps.push({
-    position: [0, landingTopY / 2, stairs.endpoint[2] - stairs.landingLength / 2],
-    scale: [stairs.width + stairs.cheekWallThickness * 2, landingTopY, stairs.landingLength],
+    position: [landing.centerX, landing.topY / 2, landing.centerZ],
+    scale: [landing.width, landing.topY, landing.depth],
   });
-  [-1, 1].forEach((side) => {
-    const x = side * (layout.width / 2 - stairs.cheekWallThickness / 2);
-    stairWalls.push({
-      position: [x, platform.topY / 2, platform.minZ - stairs.run / 2],
-      scale: [stairs.cheekWallThickness, platform.topY, stairs.run],
-    });
-    if (!showDetail) return;
-    const railY = railings.height * 0.92;
-    stairRails.push(
-      beamBetween(
-        [x, platform.topY + railY, platform.minZ + 0.02],
-        [x, stairs.endpoint[1] + railY, stairs.endpoint[2]],
-        railings.railSize,
-      ),
+  stairWalls.push({
+    position: [
+      stairs.center[0],
+      platform.topY / 2,
+      platform.minZ + stairs.cheekWallThickness / 2,
+    ],
+    scale: [stairs.run + 0.04, platform.topY, stairs.cheekWallThickness],
+  });
+  const fenceZ = landing.centerZ - landing.depth / 2 + 0.02;
+  const fenceHeight = 0.18;
+  const fencePostCount = 6;
+  for (let index = 0; index <= fencePostCount; index += 1) {
+    const x = THREE.MathUtils.lerp(
+      -landing.width / 2 + 0.04,
+      landing.width / 2 - 0.04,
+      index / fencePostCount,
     );
-    [0, 0.5, 1].forEach((ratio) => {
-      const y = THREE.MathUtils.lerp(platform.topY, stairs.endpoint[1], ratio);
-      stairRails.push({
-        position: [
-          x,
-          y + railY / 2,
-          THREE.MathUtils.lerp(platform.minZ + 0.02, stairs.endpoint[2], ratio),
-        ],
-        scale: [railings.postSize, railY, railings.postSize],
+    stairWalls.push({
+      position: [x, landing.topY + fenceHeight / 2, fenceZ],
+      scale: [0.014, fenceHeight, 0.014],
+    });
+  }
+  if (showDetail) {
+    const railY = railings.height * 0.92;
+    const northRailZ = stairs.center[2] - stairs.width / 2 - 0.012;
+    const southRailZ = platform.minZ + 0.02;
+    [northRailZ, southRailZ].forEach((z) => {
+      stairRails.push(
+        beamBetween(
+          [stairs.start[0], platform.topY + railY, z],
+          [stairs.endpoint[0], stairs.endpoint[1] + railY, z],
+          railings.railSize,
+        ),
+      );
+      [0, 0.5, 1].forEach((ratio) => {
+        const y = THREE.MathUtils.lerp(platform.topY, stairs.endpoint[1], ratio);
+        stairRails.push({
+          position: [
+            THREE.MathUtils.lerp(stairs.start[0], stairs.endpoint[0], ratio),
+            y + railY / 2,
+            z,
+          ],
+          scale: [railings.postSize, railY, railings.postSize],
+        });
       });
     });
-  });
+    stairRails.push({
+      position: [0, landing.topY + fenceHeight, fenceZ],
+      scale: [landing.width - 0.08, 0.01, 0.01],
+    });
+  }
 
   if (showDetail) {
     for (let index = 1; index <= structure.purlinCount; index += 1) {
@@ -282,8 +306,8 @@ function createArchitecture(
       });
     });
 
-    // Guarda-corpo nas duas laterais longas. A ponta norte é a escada e a ponta
-    // sul segue para a plataforma coberta, ambas sem fechamento.
+    // Guarda-corpo nas laterais longas e na face norte, com vão no topo da
+    // escada. A ponta sul segue aberta para a estrutura lateral.
     const railMinZ = platform.minZ + railings.inset;
     const railMaxZ = platform.maxZ - railings.inset;
     const postCount = Math.max(4, Math.ceil((railMaxZ - railMinZ) / railings.postSpacing));
@@ -303,6 +327,33 @@ function createArchitecture(
         railingRails.push({
           position: [x, platform.topY + railings.height * heightRatio, (railMinZ + railMaxZ) / 2],
           scale: [railings.railSize, railings.railSize, railMaxZ - railMinZ],
+        });
+      });
+    });
+    const northRailZ = platform.minZ + railings.inset;
+    const stairGapWest = stairs.endpoint[0] - 0.04;
+    const stairGapEast = stairs.start[0] + 0.06;
+    const northRailSpans: Array<readonly [number, number]> = [
+      [-layout.width / 2 + railings.inset, stairGapWest],
+      [stairGapEast, layout.width / 2 - railings.inset],
+    ];
+    northRailSpans.forEach(([fromX, toX]) => {
+      if (toX - fromX < 0.12) return;
+      const postCountNorth = Math.max(2, Math.ceil((toX - fromX) / railings.postSpacing));
+      for (let index = 0; index <= postCountNorth; index += 1) {
+        railingPosts.push({
+          position: [
+            THREE.MathUtils.lerp(fromX, toX, index / postCountNorth),
+            platform.topY + railings.height / 2,
+            northRailZ,
+          ],
+          scale: [railings.postSize, railings.height, railings.postSize],
+        });
+      }
+      [0.42, 0.98].forEach((heightRatio) => {
+        railingRails.push({
+          position: [(fromX + toX) / 2, platform.topY + railings.height * heightRatio, northRailZ],
+          scale: [toX - fromX, railings.railSize, railings.railSize],
         });
       });
     });

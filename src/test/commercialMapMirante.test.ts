@@ -86,13 +86,14 @@ describe('fonte de verdade arquitetônica do Espaço Mirante', () => {
     );
   });
 
-  it('deriva uma altura de um pavimento alinhada ao terraço, sem tratá-la como medida real', () => {
+  it('deriva uma altura de pavilhão no patamar da Via Expressa, sem tratá-la como medida real', () => {
     const bounds = strategicLandmarkBounds(mirante);
     const height = miranteVisualHeight(bounds);
 
-    expect(height).toBeGreaterThan(MIRANTE_COMPLEX.levels.deck + 0.28);
-    expect(height).toBeLessThan(0.7);
+    expect(height).toBeGreaterThan(1.02);
+    expect(height).toBeLessThanOrEqual(1.16);
     expect(height).toBeCloseTo(mirante.geometry.extrusionHeight, 1);
+    expect(height).toBeCloseTo(MIRANTE_COMPLEX.mirante.extrusionHeight, 2);
   });
 
   it('orienta câmera e hospitalidade positivamente do Mirante para a Arena', () => {
@@ -172,23 +173,33 @@ describe('fonte de verdade arquitetônica do Espaço Mirante', () => {
     });
   });
 
-  it('implanta a escada de descida na ponta norte, em direção à Exporural', () => {
+  it('implanta a escada norte virada em +X, do patamar de chão ao deck', () => {
     const bounds = strategicLandmarkBounds(mirante);
     const layout = createMiranteLayout(bounds, miranteVisualHeight(bounds));
     const plan = createMiranteFurniturePlan(layout);
     const stairs = layout.access.descentStairs;
+    const landing = layout.access.landing;
     const furnitureMinZ = Math.min(
       ...plan.all.map((pose) => pose.position[2] - pose.dimensions[2] / 2),
     );
 
     expect(layout.access.northEdgeZ).toBe(layout.platform.minZ);
     expect(layout.access.southEdgeZ).toBe(layout.platform.maxZ);
-    expect(stairs.start[2]).toBe(layout.platform.minZ);
-    expect(stairs.endpoint[2]).toBeLessThan(stairs.start[2]);
+    expect(stairs.rotationY).toBeCloseTo(-Math.PI / 2, 8);
+    expect(stairs.width).toBeGreaterThanOrEqual(0.22);
+    expect(stairs.width).toBeLessThanOrEqual(0.32);
+    expect(stairs.width).toBeLessThan(layout.width * 0.35);
+    expect(stairs.start[2]).toBeCloseTo(layout.platform.minZ, 8);
+    expect(stairs.endpoint[2]).toBeCloseTo(layout.platform.minZ, 8);
+    expect(stairs.endpoint[0]).toBeLessThan(stairs.start[0]);
+    expect(stairs.start[0] - stairs.endpoint[0]).toBeCloseTo(stairs.run, 8);
     expect(stairs.endpoint[1]).toBeLessThan(stairs.start[1]);
     expect(stairs.endpoint[1]).toBeCloseTo(MIRANTE_COMPLEX.levels.exporuralGround, 8);
-    expect(stairs.stepCount).toBeGreaterThanOrEqual(4);
+    expect(stairs.stepCount).toBeGreaterThanOrEqual(7);
     expect(stairs.stepRise * stairs.stepCount).toBeCloseTo(stairs.rise, 10);
+    expect(landing.topY).toBeCloseTo(MIRANTE_COMPLEX.levels.exporuralGround, 8);
+    expect(landing.centerZ).toBeLessThan(layout.platform.minZ);
+    expect(landing.depth).toBeCloseTo(layout.site.descentDepth, 8);
     expect(furnitureMinZ).toBeGreaterThan(layout.platform.minZ);
     expect(layout.railings.openSouthEnd).toBe(true);
   });

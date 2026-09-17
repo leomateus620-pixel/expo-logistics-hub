@@ -100,7 +100,10 @@ export function LateralDistrictQaScene() {
       const mirante = miranteComplexSourceBoundsToLocal(MIRANTE_COMPLEX.mirante.sourceBounds);
       const lateral = miranteComplexSourceBoundsToLocal(MIRANTE_COMPLEX.lateralStructure.sourceBounds);
       const sidewalk = miranteComplexSourceBoundsToLocal(MIRANTE_COMPLEX.sidewalk.sourceBounds);
-      const miranteViews: Partial<Record<View, { position: Vector3; target: Vector3 }>> = {
+      const miranteViews: Record<
+        'mirante-top' | 'mirante-oblique' | 'mirante-street' | 'mirante-arena' | 'mirante-stairs',
+        { position: Vector3; target: Vector3 }
+      > = {
         'mirante-top': {
           position: new Vector3(terrace.x, 11.5, terrace.z + 0.08),
           target: terrace.clone(),
@@ -118,8 +121,8 @@ export function LateralDistrictQaScene() {
           target: new Vector3(mirante.centerX, terrace.y + 0.12, terrace.z),
         },
         'mirante-stairs': {
-          position: new Vector3(mirante.centerX - 1.1, 1.35, mirante.minZ - 2.2),
-          target: new Vector3(mirante.centerX, terrace.y + 0.08, mirante.minZ + 0.4),
+          position: new Vector3(mirante.minX - 0.45, 1.05, mirante.minZ - 1.15),
+          target: new Vector3(mirante.minX + 0.55, terrace.y + 0.12, mirante.minZ + 0.15),
         },
       };
       const mirantePose = miranteViews[view];
