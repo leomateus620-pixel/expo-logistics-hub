@@ -1,3 +1,5 @@
+import { MIRANTE_COMPLEX } from '../data/miranteComplexReconstruction';
+
 export const MIRANTE_PUBLIC_IDENTIFIER = 'D3';
 export const MIRANTE_OFFICIAL_NAME = 'Espaço Mirante';
 export const MIRANTE_ARENA_PUBLIC_IDENTIFIER = 'F';
@@ -66,12 +68,39 @@ export interface MiranteEntityCenter {
 }
 
 export type MiranteVector3 = [number, number, number];
-export type MiranteFurnitureKind = 'table' | 'chair';
-export type MiranteFurnitureFacing = 'arena' | 'table';
+export type MiranteFurnitureKind = 'bench';
+export type MiranteFurnitureFacing = 'arena';
+
+/**
+ * Cotas do sítio partilhadas com a escadaria da Arena e a estrutura lateral.
+ * O deck é o terraço superior da escadaria; o passeio de Rua Brasília e o
+ * lote Q-R-04 (onde a escada norte aterrissa) são as referências de contato.
+ */
+export interface MiranteSiteProfile {
+  deckTopY: number;
+  sidewalkY: number;
+  northGroundY: number;
+  /** Profundidade (unidades locais) reservada ao patamar de chão, na ponta -Z. */
+  descentDepth: number;
+}
+
+const SOURCE_UNITS_TO_LOCAL = 120 / 5500;
+
+export const MIRANTE_DEFAULT_SITE: MiranteSiteProfile = Object.freeze({
+  deckTopY: MIRANTE_COMPLEX.levels.deck,
+  sidewalkY: MIRANTE_COMPLEX.levels.sidewalk,
+  northGroundY: MIRANTE_COMPLEX.levels.exporuralGround,
+  descentDepth: (
+    MIRANTE_COMPLEX.mirante.platformSourceMinZ - MIRANTE_COMPLEX.mirante.sourceBounds[1]
+  ) * SOURCE_UNITS_TO_LOCAL,
+});
 
 export interface MirantePlatformLayout {
   width: number;
   depth: number;
+  minZ: number;
+  maxZ: number;
+  centerZ: number;
   topY: number;
   thickness: number;
   centerY: number;
@@ -82,12 +111,18 @@ export interface MiranteBaseLayout {
   depth: number;
   height: number;
   centerY: number;
+  centerZ: number;
   retainingThickness: number;
+  /** Faixa pintada de branco no topo do muro de contenção, como no passeio real. */
+  curbBandHeight: number;
+  /** Quanto do muro fica exposto acima do passeio de Rua Brasília. */
+  exposedAboveSidewalk: number;
 }
 
 export interface MiranteRoofLayout {
   width: number;
   depth: number;
+  centerZ: number;
   eaveY: number;
   ridgeY: number;
   rise: number;
@@ -97,16 +132,19 @@ export interface MiranteRoofLayout {
   slopeLength: number;
   angle: number;
   thickness: number;
+  fasciaHeight: number;
 }
 
 export interface MiranteStructureLayout {
   bayCount: number;
   bayInset: number;
   columnSize: number;
+  columnInsetX: number;
   columnHeight: number;
   columnCenterY: number;
   beamSize: number;
   trussMemberSize: number;
+  trussDepth: number;
   purlinCount: number;
 }
 
@@ -116,6 +154,8 @@ export interface MiranteRailingLayout {
   railSize: number;
   postSpacing: number;
   inset: number;
+  /** O lado sul segue contínuo para a plataforma da estrutura lateral. */
+  openSouthEnd: true;
 }
 
 export interface MiranteAisleLayout {
@@ -127,19 +167,6 @@ export interface MiranteAisleLayout {
   furnitureClearance: number;
 }
 
-export interface MiranteRampLayout {
-  width: number;
-  run: number;
-  rise: number;
-  slope: number;
-  start: MiranteVector3;
-  endpoint: MiranteVector3;
-  center: MiranteVector3;
-  rotationY: number;
-  landingLength: number;
-  guardrailHeight: number;
-}
-
 export interface MiranteStairLayout {
   width: number;
   run: number;
@@ -147,31 +174,56 @@ export interface MiranteStairLayout {
   stepCount: number;
   stepRise: number;
   stepDepth: number;
+  /** Topo da escada, no deck, canto leste da face norte. */
   start: MiranteVector3;
+  /** Pé da escada, no patamar de chão, a oeste rumo a Rua Brasília. */
   endpoint: MiranteVector3;
   center: MiranteVector3;
+  /** −π/2: o lance corre em +X (descida para −X). */
   rotationY: number;
   landingLength: number;
+  landingWidth: number;
+  cheekWallThickness: number;
+}
+
+export interface MiranteLandingLayout {
+  width: number;
+  depth: number;
+  topY: number;
+  thickness: number;
+  centerX: number;
+  centerZ: number;
+  tactileWidth: number;
+  tactileOffsetFromNorth: number;
 }
 
 export interface MiranteAccessLayout {
-  eastEdgeX: number;
-  clearMinZ: number;
-  clearMaxZ: number;
-  ramp: MiranteRampLayout;
-  stairs: MiranteStairLayout;
+  /** Borda norte da plataforma: muro de contenção e arranque da escada. */
+  northEdgeZ: number;
+  /** Borda sul da plataforma: continuidade com a estrutura lateral coberta. */
+  southEdgeZ: number;
+  descentStairs: MiranteStairLayout;
+  landing: MiranteLandingLayout;
+  southConnectionY: number;
 }
 
 export interface MiranteFurnitureDimensions {
-  tableSize: MiranteVector3;
-  chairSize: MiranteVector3;
-  rowCount: number;
+  benchSize: MiranteVector3;
+  benchCount: number;
+}
+
+export interface MiranteServiceLayout {
+  width: number;
+  depth: number;
+  height: number;
+  center: MiranteVector3;
 }
 
 export interface MiranteLayout {
   width: number;
   depth: number;
   height: number;
+  site: MiranteSiteProfile;
   platform: MirantePlatformLayout;
   base: MiranteBaseLayout;
   roof: MiranteRoofLayout;
@@ -180,6 +232,7 @@ export interface MiranteLayout {
   aisle: MiranteAisleLayout;
   access: MiranteAccessLayout;
   furniture: MiranteFurnitureDimensions;
+  service: MiranteServiceLayout;
 }
 
 export interface MiranteFurniturePose {
@@ -194,8 +247,7 @@ export interface MiranteFurniturePose {
 }
 
 export interface MiranteFurniturePlan {
-  tables: MiranteFurniturePose[];
-  chairs: MiranteFurniturePose[];
+  benches: MiranteFurniturePose[];
   all: MiranteFurniturePose[];
 }
 
@@ -207,15 +259,26 @@ function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value));
 }
 
+function roofClearance(width: number): number {
+  return clamp(width * 0.56, 0.82, 0.86);
+}
+
+function roofRiseFor(width: number): number {
+  return clamp(width * 0.11, 0.15, 0.18);
+}
+
 /**
- * The official map units are not calibrated metres. This height is therefore
- * a conservative visual ratio derived from the long side of the D3 footprint,
- * not a surveyed or code-compliance dimension.
+ * Unidades do mapa não são metros. A altura visual é a cumeeira do pavilhão
+ * aberto no mesmo patamar da Via Expressa (1.16) e da cobertura da Alameda
+ * (sem as bandeiras): deck no passeio + vão de pilares + água baixa.
  */
-export function miranteVisualHeight(bounds: MiranteBoundsDimensions): number {
-  const width = Math.max(0.2, finiteOr(bounds.width, 2.4));
-  const depth = Math.max(0.2, finiteOr(bounds.depth, 8.5));
-  return clamp(Math.max(width, depth) * 0.27, 2.16, 2.42);
+export function miranteVisualHeight(
+  bounds: MiranteBoundsDimensions,
+  site: MiranteSiteProfile = MIRANTE_DEFAULT_SITE,
+): number {
+  const width = Math.max(0.6, finiteOr(bounds.width, 1.48));
+  const ridge = site.deckTopY + roofClearance(width) + roofRiseFor(width);
+  return clamp(ridge, 1.02, MIRANTE_COMPLEX.mirante.extrusionHeight);
 }
 
 /**
@@ -244,75 +307,89 @@ export function miranteArenaFacingRadians(
 
 /**
  * Parametric D3 construction contract. Local X is west/east (+X toward the
- * open Arena side) and local Z follows the official longitudinal footprint.
- * Access dimensions intentionally remain illustrative while map calibration
- * and the built project's measured dimensions are unknown.
+ * open Arena side, -X toward Rua Brasília) and local Z follows the registered
+ * longitudinal footprint (-Z toward the Exporural, +Z toward the covered
+ * lateral structure). The north strip is a ground landing; the stair runs +X
+ * along the podium's north face.
  */
 export function createMiranteLayout(
   bounds: MiranteBoundsDimensions,
   requestedHeight = miranteVisualHeight(bounds),
+  site: MiranteSiteProfile = MIRANTE_DEFAULT_SITE,
 ): MiranteLayout {
-  const width = Math.max(1.6, finiteOr(bounds.width, 2.4));
-  const depth = Math.max(4.8, finiteOr(bounds.depth, 8.5));
-  const height = Math.max(2.1, finiteOr(requestedHeight, miranteVisualHeight({ width, depth })));
+  const width = Math.max(1.0, finiteOr(bounds.width, 1.48));
+  const depth = Math.max(3.2, finiteOr(bounds.depth, 6.72));
+  const deckTopY = Math.max(site.sidewalkY, finiteOr(site.deckTopY, MIRANTE_DEFAULT_SITE.deckTopY));
+  const height = Math.max(
+    deckTopY + 0.90,
+    finiteOr(requestedHeight, miranteVisualHeight({ width, depth }, site)),
+  );
 
-  const platformTopY = clamp(Math.min(width * 0.18, depth * 0.055), 0.36, 0.46);
-  const platformThickness = clamp(width * 0.055, 0.11, 0.15);
-  const roofRise = clamp(height * 0.135, 0.27, 0.36);
-  const overhangX = clamp(width * 0.065, 0.13, 0.2);
-  const overhangZ = clamp(depth * 0.028, 0.18, 0.28);
-  const halfSpan = width / 2 + overhangX;
+  const descentDepth = clamp(finiteOr(site.descentDepth, 0.87), 0.5, depth * 0.2);
+  const platformMinZ = -depth / 2 + descentDepth;
+  const platformMaxZ = depth / 2;
+  const platformDepth = platformMaxZ - platformMinZ;
+  const platformCenterZ = (platformMinZ + platformMaxZ) / 2;
+  const slabThickness = clamp(width * 0.04, 0.05, 0.065);
+
+  const roofRise = roofRiseFor(width);
   const eaveY = height - roofRise;
-  const bayInset = clamp(depth * 0.018, 0.12, 0.18);
-  const bayCount = Math.round(clamp(depth / 1.05, 6, 10));
-  const columnSize = clamp(width * 0.03, 0.06, 0.085);
-  const railingInset = clamp(width * 0.03, 0.06, 0.085);
-  const railingHeight = clamp(height * 0.2, 0.42, 0.5);
-  const aisleWidth = clamp(width * 0.24, 0.52, 0.64);
-  const longitudinalEndClearance = clamp(depth * 0.047, 0.34, 0.46);
+  const overhangX = clamp(width * 0.1, 0.12, 0.18);
+  const overhangZ = clamp(platformDepth * 0.02, 0.1, 0.14);
+  const halfSpan = width / 2 + overhangX;
+  const bayInset = clamp(platformDepth * 0.03, 0.14, 0.2);
+  const bayCount = Math.round(clamp(platformDepth / 0.72, 6, 10));
+  const columnSize = clamp(width * 0.024, 0.03, 0.04);
+  const columnInsetX = clamp(width * 0.075, 0.09, 0.13);
+  const railingInset = clamp(width * 0.03, 0.035, 0.05);
+  const railingHeight = clamp(height * 0.19, 0.095, 0.115);
+  const aisleWidth = clamp(width * 0.34, 0.42, 0.56);
   const aisleMinX = -width / 2 + railingInset + 0.02;
-  const furnitureClearance = clamp(width * 0.05, 0.1, 0.14);
+  const furnitureClearance = clamp(width * 0.05, 0.06, 0.09);
 
-  // Persisted-neighbour review leaves the +X side as the only clear lateral
-  // access edge. Small end offsets avoid the Q-R-04 and B17 overlap bands.
-  const clearMinZ = -depth / 2 + Math.max(0.12, depth * 0.018);
-  const clearMaxZ = depth / 2 - Math.max(0.95, depth * 0.16);
-  const rampRise = platformTopY;
-  const rampRun = Math.max(rampRise * 12, depth * 0.58);
-  const rampWidth = clamp(width * 0.22, 0.5, 0.58);
-  const rampEndpointZ = Math.min(
-    clearMaxZ - Math.max(1.1, depth * 0.14),
-    Math.max(depth * 0.1, clearMinZ + rampRun),
-  );
-  const rampStartZ = rampEndpointZ - rampRun;
-  const eastEdgeX = width / 2;
-  const rampCenterX = eastEdgeX + rampWidth / 2;
-  const stairStepCount = Math.max(3, Math.ceil(platformTopY / 0.12));
-  const stairStepDepth = clamp(width * 0.075, 0.16, 0.2);
-  const stairRun = stairStepCount * stairStepDepth;
-  const stairWidth = clamp(width * 0.25, 0.54, 0.64);
-  const stairZ = Math.min(
-    clearMaxZ - 0.38,
-    rampEndpointZ + Math.max(1.1, depth * 0.145),
-  );
+  // Escada virada: lance estreito na face norte do pódio, correndo em +X
+  // (sobe rumo à Arena). A faixa norte do footprint é o patamar de chão.
+  const northGroundY = finiteOr(site.northGroundY, MIRANTE_DEFAULT_SITE.northGroundY);
+  const cheekWallThickness = clamp(width * 0.035, 0.04, 0.055);
+  const stairWidth = clamp(width * 0.16, 0.22, 0.30);
+  const stairRise = Math.max(0.03, deckTopY - northGroundY);
+  const stairRun = clamp(width * 0.55, 0.70, 0.95);
+  const stairStepCount = Math.max(7, Math.ceil(stairRise / 0.016));
+  const stairStepRise = stairRise / stairStepCount;
+  const stairStepDepth = stairRun / stairStepCount;
+  const stairCenterZ = platformMinZ;
+  const stairBottomX = -width / 2 + 0.08;
+  const stairTopX = stairBottomX + stairRun;
+  const landingLength = descentDepth;
+  const landingWidth = width;
+  const landingCenterZ = -depth / 2 + landingLength / 2;
+  const landingThickness = 0.028;
 
   const platform: MirantePlatformLayout = {
     width,
-    depth,
-    topY: platformTopY,
-    thickness: platformThickness,
-    centerY: platformTopY - platformThickness / 2,
+    depth: platformDepth,
+    minZ: platformMinZ,
+    maxZ: platformMaxZ,
+    centerZ: platformCenterZ,
+    topY: deckTopY,
+    thickness: slabThickness,
+    centerY: deckTopY - slabThickness / 2,
   };
+  const baseHeight = Math.max(0.05, deckTopY - slabThickness);
   const base: MiranteBaseLayout = {
-    width: width * 0.95,
-    depth: depth * 0.92,
-    height: Math.max(0.18, platformTopY - platformThickness),
-    centerY: Math.max(0.18, platformTopY - platformThickness) / 2,
-    retainingThickness: clamp(width * 0.045, 0.085, 0.12),
+    width: width - 0.02,
+    depth: platformDepth - 0.02,
+    height: baseHeight,
+    centerY: baseHeight / 2,
+    centerZ: platformCenterZ,
+    retainingThickness: clamp(width * 0.05, 0.06, 0.09),
+    curbBandHeight: clamp(deckTopY * 0.16, 0.024, 0.034),
+    exposedAboveSidewalk: Math.max(0, deckTopY - site.sidewalkY),
   };
   const roof: MiranteRoofLayout = {
     width: width + overhangX * 2,
-    depth: depth + overhangZ * 2,
+    depth: platformDepth + overhangZ * 2,
+    centerZ: platformCenterZ,
     eaveY,
     ridgeY: height,
     rise: roofRise,
@@ -321,81 +398,98 @@ export function createMiranteLayout(
     halfSpan,
     slopeLength: Math.hypot(halfSpan, roofRise),
     angle: Math.atan2(roofRise, halfSpan),
-    thickness: clamp(width * 0.018, 0.038, 0.05),
+    thickness: clamp(width * 0.012, 0.014, 0.02),
+    fasciaHeight: clamp(width * 0.035, 0.045, 0.06),
   };
   const structure: MiranteStructureLayout = {
     bayCount,
     bayInset,
     columnSize,
-    columnHeight: eaveY - platformTopY,
-    columnCenterY: platformTopY + (eaveY - platformTopY) / 2,
-    beamSize: clamp(width * 0.028, 0.055, 0.075),
-    trussMemberSize: clamp(width * 0.019, 0.038, 0.052),
-    purlinCount: Math.round(clamp(depth / 0.62, 10, 18)),
+    columnInsetX,
+    columnHeight: eaveY - deckTopY,
+    columnCenterY: deckTopY + (eaveY - deckTopY) / 2,
+    beamSize: clamp(width * 0.022, 0.028, 0.036),
+    trussMemberSize: clamp(width * 0.012, 0.014, 0.02),
+    trussDepth: clamp(width * 0.045, 0.055, 0.075),
+    purlinCount: Math.round(clamp(width / 0.28, 4, 7)),
   };
   const railings: MiranteRailingLayout = {
     height: railingHeight,
-    postSize: clamp(width * 0.014, 0.028, 0.038),
-    railSize: clamp(width * 0.011, 0.022, 0.032),
-    postSpacing: clamp(width * 0.15, 0.32, 0.42),
+    postSize: clamp(width * 0.012, 0.014, 0.02),
+    railSize: clamp(width * 0.009, 0.011, 0.015),
+    postSpacing: clamp(width * 0.2, 0.26, 0.34),
     inset: railingInset,
+    openSouthEnd: true,
   };
   const aisle: MiranteAisleLayout = {
     minX: aisleMinX,
     maxX: aisleMinX + aisleWidth,
-    minZ: -depth / 2 + longitudinalEndClearance,
-    maxZ: depth / 2 - longitudinalEndClearance,
+    minZ: platformMinZ + 0.1,
+    maxZ: platformMaxZ - 0.1,
     width: aisleWidth,
     furnitureClearance,
   };
   const access: MiranteAccessLayout = {
-    eastEdgeX,
-    clearMinZ,
-    clearMaxZ,
-    ramp: {
-      width: rampWidth,
-      run: rampRun,
-      rise: rampRise,
-      slope: rampRise / rampRun,
-      start: [rampCenterX, 0, rampStartZ],
-      endpoint: [rampCenterX, platformTopY, rampEndpointZ],
-      center: [rampCenterX, platformTopY / 2, (rampStartZ + rampEndpointZ) / 2],
-      rotationY: 0,
-      landingLength: clamp(width * 0.3, 0.64, 0.78),
-      guardrailHeight: railingHeight,
-    },
-    stairs: {
+    northEdgeZ: platformMinZ,
+    southEdgeZ: platformMaxZ,
+    descentStairs: {
       width: stairWidth,
       run: stairRun,
-      rise: platformTopY,
+      rise: stairRise,
       stepCount: stairStepCount,
-      stepRise: platformTopY / stairStepCount,
+      stepRise: stairStepRise,
       stepDepth: stairStepDepth,
-      start: [eastEdgeX + stairRun, 0, stairZ],
-      endpoint: [eastEdgeX, platformTopY, stairZ],
-      center: [eastEdgeX + stairRun / 2, platformTopY / 2, stairZ],
+      start: [stairTopX, deckTopY, stairCenterZ],
+      endpoint: [stairBottomX, northGroundY, stairCenterZ],
+      center: [
+        (stairTopX + stairBottomX) / 2,
+        deckTopY - stairRise / 2,
+        stairCenterZ,
+      ],
       rotationY: -Math.PI / 2,
-      landingLength: clamp(width * 0.28, 0.6, 0.74),
+      landingLength,
+      landingWidth,
+      cheekWallThickness,
     },
+    landing: {
+      width: landingWidth,
+      depth: landingLength,
+      topY: northGroundY,
+      thickness: landingThickness,
+      centerX: 0,
+      centerZ: landingCenterZ,
+      tactileWidth: 0.045,
+      tactileOffsetFromNorth: 0.08,
+    },
+    southConnectionY: deckTopY,
   };
   const furniture: MiranteFurnitureDimensions = {
-    tableSize: [
-      clamp(width * 0.2, 0.42, 0.5),
-      clamp(height * 0.165, 0.35, 0.4),
-      clamp(depth * 0.052, 0.38, 0.46),
+    benchSize: [
+      clamp(width * 0.11, 0.13, 0.17),
+      clamp(height * 0.12, 0.06, 0.075),
+      clamp(width * 0.3, 0.38, 0.5),
     ],
-    chairSize: [
-      clamp(width * 0.112, 0.25, 0.29),
-      clamp(height * 0.165, 0.35, 0.4),
-      clamp(width * 0.116, 0.26, 0.3),
+    benchCount: Math.round(clamp(platformDepth / 1.15, 3, 6)),
+  };
+  const serviceWidth = clamp(width * 0.36, 0.42, 0.56);
+  const serviceDepth = clamp(platformDepth * 0.1, 0.5, 0.64);
+  const serviceHeight = Math.min(structure.columnHeight - 0.05, clamp(height * 0.45, 0.22, 0.27));
+  const service: MiranteServiceLayout = {
+    width: serviceWidth,
+    depth: serviceDepth,
+    height: serviceHeight,
+    center: [
+      -width / 2 + railingInset + 0.04 + serviceWidth / 2,
+      deckTopY + serviceHeight / 2,
+      platformMaxZ - bayInset - serviceDepth / 2,
     ],
-    rowCount: 4,
   };
 
   return {
     width,
     depth,
     height,
+    site: { ...site, deckTopY },
     platform,
     base,
     roof,
@@ -404,15 +498,17 @@ export function createMiranteLayout(
     aisle,
     access,
     furniture,
+    service,
   };
 }
 
+/** Planos estruturais (pilares + treliças) ao longo da plataforma coberta. */
 export function miranteStructuralBayPositions(layout: MiranteLayout): number[] {
-  const usableDepth = Math.max(0.2, layout.depth - layout.structure.bayInset * 2);
+  const usableDepth = Math.max(0.2, layout.platform.depth - layout.structure.bayInset * 2);
   return Array.from(
     { length: layout.structure.bayCount + 1 },
     (_, index) => (
-      -layout.depth / 2
+      layout.platform.minZ
       + layout.structure.bayInset
       + usableDepth * (index / layout.structure.bayCount)
     ),
@@ -420,95 +516,30 @@ export function miranteStructuralBayPositions(layout: MiranteLayout): number[] {
 }
 
 /**
- * Four restrained hospitality groups occupy the east half. Each group keeps
- * two primary chairs facing +X toward the Arena and one companion chair
- * oriented to the table. The west longitudinal aisle and both east access
- * endpoints remain free.
+ * Bancos encostados ao guarda-corpo leste, voltados para a Arena (fotos 8 e
+ * 9). O corredor oeste, o patamar norte e o quiosque sul permanecem livres.
  */
 export function createMiranteFurniturePlan(layout: MiranteLayout): MiranteFurniturePlan {
-  const { tableSize, chairSize, rowCount } = layout.furniture;
-  const groupHalfDepth = tableSize[2] / 2 + chairSize[2] + 0.12;
-  const firstRowZ = -layout.depth / 2 + layout.railings.inset + groupHalfDepth;
-  const lastRowZ = Math.min(
-    layout.access.ramp.endpoint[2] - groupHalfDepth - 0.42,
-    layout.access.stairs.endpoint[2] - groupHalfDepth - 0.72,
-  );
-  const rowSpan = Math.max(0, lastRowZ - firstRowZ);
-  const tableCenterX = Math.min(
-    layout.width / 2 - layout.railings.inset - tableSize[0] / 2 - 0.12,
-    Math.max(
-      layout.width * 0.14,
-      layout.aisle.maxX
-        + layout.aisle.furnitureClearance
-        + chairSize[0]
-        + tableSize[0] / 2,
-    ),
-  );
-  const arenaChairX = (
-    tableCenterX
-    - tableSize[0] / 2
-    - chairSize[0] / 2
-    - 0.08
-  );
-  const pairedChairOffsetZ = chairSize[2] * 0.62;
-  const companionChairOffsetZ = tableSize[2] / 2 + chairSize[2] / 2 + 0.09;
-  const tables: MiranteFurniturePose[] = [];
-  const chairs: MiranteFurniturePose[] = [];
+  const { benchSize, benchCount } = layout.furniture;
+  const benchX = layout.width / 2 - layout.railings.inset - 0.03 - benchSize[0] / 2;
+  const firstZ = layout.platform.minZ + layout.structure.bayInset + 0.2 + benchSize[2] / 2;
+  const lastZ = layout.service.center[2] - layout.service.depth / 2 - 0.24 - benchSize[2] / 2;
+  const span = Math.max(0, lastZ - firstZ);
+  const benches: MiranteFurniturePose[] = [];
 
-  for (let groupIndex = 0; groupIndex < rowCount; groupIndex += 1) {
-    const ratio = rowCount === 1 ? 0.5 : groupIndex / (rowCount - 1);
-    const rowZ = firstRowZ + rowSpan * ratio;
-    const tableY = layout.platform.topY + tableSize[1] / 2;
-    const chairY = layout.platform.topY + chairSize[1] / 2;
-
-    tables.push({
-      id: `mirante:table:${groupIndex}`,
-      kind: 'table',
+  for (let groupIndex = 0; groupIndex < benchCount; groupIndex += 1) {
+    const ratio = benchCount === 1 ? 0.5 : groupIndex / (benchCount - 1);
+    benches.push({
+      id: `mirante:bench:${groupIndex}`,
+      kind: 'bench',
       groupIndex,
-      position: [tableCenterX, tableY, rowZ],
-      rotationY: groupIndex % 2 === 0 ? 0.018 : -0.018,
-      dimensions: [...tableSize],
+      position: [benchX, layout.platform.topY + benchSize[1] / 2, firstZ + span * ratio],
+      rotationY: 0,
+      dimensions: [...benchSize],
       facing: 'arena',
       castsShadow: false,
     });
-
-    chairs.push(
-      {
-        id: `mirante:chair:${groupIndex}:arena-north`,
-        kind: 'chair',
-        groupIndex,
-        position: [arenaChairX, chairY, rowZ - pairedChairOffsetZ],
-        rotationY: Math.PI / 2 + (groupIndex % 2 === 0 ? 0.035 : -0.028),
-        dimensions: [...chairSize],
-        facing: 'arena',
-        castsShadow: false,
-      },
-      {
-        id: `mirante:chair:${groupIndex}:arena-south`,
-        kind: 'chair',
-        groupIndex,
-        position: [arenaChairX, chairY, rowZ + pairedChairOffsetZ],
-        rotationY: Math.PI / 2 + (groupIndex % 2 === 0 ? -0.026 : 0.032),
-        dimensions: [...chairSize],
-        facing: 'arena',
-        castsShadow: false,
-      },
-      {
-        id: `mirante:chair:${groupIndex}:companion`,
-        kind: 'chair',
-        groupIndex,
-        position: [tableCenterX, chairY, rowZ + companionChairOffsetZ],
-        rotationY: Math.PI,
-        dimensions: [...chairSize],
-        facing: 'table',
-        castsShadow: false,
-      },
-    );
   }
 
-  return {
-    tables,
-    chairs,
-    all: [...tables, ...chairs],
-  };
+  return { benches, all: [...benches] };
 }

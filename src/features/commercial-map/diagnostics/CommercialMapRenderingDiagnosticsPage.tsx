@@ -237,6 +237,22 @@ export default function CommercialMapRenderingDiagnosticsPage() {
         ? (requestedPreset as CameraPreset)
         : 'overview',
     );
+    const miranteView = query.get('miranteView');
+    if (miranteView) {
+      const applyMiranteView = () => {
+        const canvas = document.querySelector<HTMLCanvasElement>(
+          '.commercial-map-rendering-diagnostics__viewport canvas',
+        );
+        if (canvas?.dataset.commercialMapHydration !== 'complete') {
+          window.setTimeout(applyMiranteView, 400);
+          return;
+        }
+        window.dispatchEvent(new CustomEvent('commercial-map:district-qa', {
+          detail: { view: miranteView },
+        }));
+      };
+      applyMiranteView();
+    }
     window.__commercialMapRuntimeDiagnostics?.resetSamples();
 
     const refresh = () => {

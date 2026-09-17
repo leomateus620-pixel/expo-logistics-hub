@@ -36,8 +36,8 @@ function pointInLocalPolygon(x: number, z: number, polygon: readonly (readonly [
 describe('terreno reconstruído do entorno da Arena', () => {
   it('substitui o bloco flutuante por um desnível compatível com a escadaria', () => {
     expect(ARENA_FRONT_LAYOUT.stairs.riserHeight).toBeLessThan(0.04);
-    expect(ARENA_TERRAIN_RISE).toBeGreaterThan(0.5);
-    expect(ARENA_TERRAIN_RISE).toBeLessThan(0.7);
+    expect(ARENA_TERRAIN_RISE).toBeGreaterThan(0.1);
+    expect(ARENA_TERRAIN_RISE).toBeLessThan(0.2);
     expect(arenaStairTreadElevation(0)).toBeCloseTo(ARENA_TERRAIN_BASE_ELEVATION, 6);
     expect(arenaStairTreadElevation(ARENA_FRONT_LAYOUT.stairs.stepCount))
       .toBeCloseTo(ARENA_TERRAIN_TOP_ELEVATION, 6);
@@ -71,7 +71,7 @@ describe('terreno reconstruído do entorno da Arena', () => {
     const multi = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds);
     const sand = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.sandVolleyballCourt.sourceBounds);
     const arena = sourceBoundsToLocal([4900, 2690, 5385, 3130]);
-    const verge = sourceBoundsToLocal([4020, 2720, 4088, 2800]);
+    const verge = sourceBoundsToLocal([4200, 2980, 4500, 3080]);
 
     expect('footballField' in ARENA_FRONT_LAYOUT).toBe(false);
     expect(field.maxX).toBeLessThan(arena.minX);
@@ -99,6 +99,7 @@ describe('terreno reconstruído do entorno da Arena', () => {
     expect(resolveArenaSurfaceOwner(arena.centerX, arena.centerZ)).toBe('ARENA_STRUCTURE');
     expect(pointInLocalPolygon(verge.centerX, verge.centerZ, plaza)).toBe(false);
     expect(resolveArenaSurfaceOwner(verge.centerX, verge.centerZ)).not.toBe('CONCRETE_ACCESS');
+    expect(resolveArenaSurfaceOwner(verge.centerX, verge.centerZ)).toBe(null);
 
     const oldFieldCenter = sourceBoundsToLocal([5410, 2800, 5900, 3120]);
     expect(arenaTerrainElevation(oldFieldCenter.centerX, oldFieldCenter.centerZ))

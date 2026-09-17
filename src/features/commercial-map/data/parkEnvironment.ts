@@ -1,4 +1,5 @@
 import { officialPdfPointToLocal } from './officialReference2026';
+import { MIRANTE_COMPLEX } from './miranteComplexReconstruction';
 import type { MapEntity } from '../types';
 
 export type ParkEnvironmentClassification =
@@ -42,7 +43,10 @@ export interface LocalBounds {
   centerZ: number;
 }
 
-export const PARK_ENVIRONMENT_REVISION = '2026.9-arena-north-apron-concrete.1';
+export const PARK_ENVIRONMENT_REVISION = '2026.9-mirante-complex-satellite.1';
+
+const ARENA_PLAZA_ELEVATION = 0.052;
+const ARENA_STAIR_STEP_COUNT = 18;
 
 /**
  * Retângulo do campo gramado que o PR #112 recolocou sobre o apron norte da
@@ -111,30 +115,38 @@ export const ARENA_FRONT_LAYOUT = {
   plaza: {
     // Laje única ao norte/oeste da Arena. O retângulo do campo inexistente
     // ([4660, 2860, 4880, 3200]) entra neste polígono — sem segunda malha.
-    // A borda oeste em x=4116 preserva o gramado da via, a leste de Brasília.
+    // A borda oeste em x=4092 encosta no patamar superior da escadaria, logo a
+    // leste da estrutura lateral. A borda sul recua para z=2958 (anexos 2 e 8):
+    // entre a laje e Rua Brasil existe grama, não concreto.
     sourcePolygon: [
-      [4116, 2682],
+      [4092, 2682],
       [4888, 2682],
       [4888, 3200],
       [4660, 3200],
-      [4660, 3098],
-      [4116, 3098],
+      [4660, 2958],
+      [4092, 2958],
     ] as readonly SourcePoint[],
-    elevation: 0.052,
+    elevation: ARENA_PLAZA_ELEVATION,
   },
   stairs: {
-    sourceBounds: [4120, 2720, 4480, 3070] as SourceBounds,
+    /**
+     * Três lances de terraços entre o patamar do conjunto Mirante/estrutura
+     * lateral (oeste) e o apron da Arena (leste). O retângulo ocupa a praça de
+     * norte a sul, de modo que as muretas laterais são as próprias bordas da laje
+     * e o gramado nunca encosta em concreto por uma parede de terra.
+     */
+    sourceBounds: [4092, 2682, 4480, 2940] as SourceBounds,
     runAxis: 'x' as const,
     highEdge: 'west' as const,
     lowEdge: 'east' as const,
-    stepCount: 18,
+    stepCount: ARENA_STAIR_STEP_COUNT,
     bankCount: 3,
     /**
-     * Perfil recalculado em 2026.7: o desnível total (18 × 0,032 ≈ 0,58) passa a
-     * acompanhar a descida natural do terreno lida nos anexos 3 e 4, no lugar do
-     * bloco de 1,53 que flutuava sobre a antiga praça plana.
+     * O desnível total é a diferença entre o deck do Mirante (anexo 9: cerca de
+     * meio metro acima do passeio) e o apron. O antigo perfil de 0,58 elevava o
+     * conjunto a quase uma altura de pavimento acima de Rua Brasília.
      */
-    riserHeight: 0.032,
+    riserHeight: (MIRANTE_COMPLEX.levels.deck - ARENA_PLAZA_ELEVATION) / ARENA_STAIR_STEP_COUNT,
     lowerLandingDepth: 0.62,
     upperLandingDepth: 0.74,
     /** Laje fina de topo: o patamar superior deixa de ser um maciço de concreto. */
@@ -147,33 +159,38 @@ export const ARENA_FRONT_LAYOUT = {
   },
   /**
    * Plataforma coberta fotografada entre Rua Brasília e a escadaria, ao sul
-   * de D3. O retângulo fica integralmente fora do footprint dos degraus e das
-   * vias canônicas. A posição é interpretação cartográfica conservadora a ser
-   * conferida em campo; não cria entidade comercial nem altera D3/F.
+   * de D3 (anexos 7 e 10). O retângulo é registrado no satélite junto com o
+   * Mirante e a calçada sul; fica fora dos degraus e das vias canônicas e não
+   * cria entidade comercial nem altera F.
    */
   accessCanopy: {
-    sourceBounds: [4005, 2840, 4110, 3068] as SourceBounds,
+    sourceBounds: MIRANTE_COMPLEX.lateralStructure.sourceBounds,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED' as const,
     sourceReferences: [
       'IMG_9692.jpeg — vista pelo vão em direção à Arena',
       'IMG_9693.jpeg — fachada viária, parede lateral e apoios em V',
+      'Anexo 2 — satélite: extensão da estrutura entre o Mirante e a calçada sul',
     ] as const,
     longAxis: 'z' as const,
     arenaSide: 'east' as const,
     roadSide: 'west' as const,
-    sideWallEnd: 'south' as const,
-    bayCount: 5,
+    sideWallEnd: MIRANTE_COMPLEX.lateralStructure.sideWallEnd,
+    bayCount: MIRANTE_COMPLEX.lateralStructure.bayCount,
   },
+  /** Passeio de Rua Brasília, pátio sul e escada norte do Mirante. */
+  miranteComplex: MIRANTE_COMPLEX,
   /**
-   * Malha de terreno do setor: alta a oeste (topo da escadaria), descendo até o
-   * apron da Arena e seguindo pelas laterais e pelo fundo (leste/sudeste) até as
-   * bordas dos estacionamentos oficiais. É recortada contra as zonas de concreto,
-   * quadras, vias e estacionamento (ver `arenaSectorZoning.ts`).
+   * Malha de terreno do setor: no nível do deck junto ao Mirante e ao patamar
+   * superior da escadaria, descendo até o apron da Arena e seguindo pelas
+   * laterais e pelo fundo (leste/sudeste) até as bordas dos estacionamentos
+   * oficiais. Desce também para a Exporural (norte) e para a faixa de grama de
+   * Rua Brasil (sul). É recortada contra as zonas de concreto, quadras, vias e
+   * estacionamento (ver `arenaSectorZoning.ts`).
    */
   terrain: {
-    sourceBounds: [4106, 2400, 5980, 3300] as SourceBounds,
-    segmentsX: 108,
-    segmentsZ: 58,
+    sourceBounds: [4072, 2440, 5980, 3300] as SourceBounds,
+    segmentsX: 112,
+    segmentsZ: 60,
     /** Faixa de transição, em unidades locais, entre talude e piso pavimentado. */
     blendDistance: 1.15,
   },
@@ -187,13 +204,14 @@ export const ARENA_FRONT_LAYOUT = {
   ] as const,
   /** Massas arbóreas do setor, lidas nos anexos 3 e 4 (conferência de campo recomendada). */
   treeClusters: [
-    { sourcePosition: [4128, 2660] as SourcePoint, scale: 1.05 },
-    { sourcePosition: [4180, 2620] as SourcePoint, scale: 0.92 },
+    { sourcePosition: [4128, 2640] as SourcePoint, scale: 1.05 },
+    { sourcePosition: [4180, 2612] as SourcePoint, scale: 0.92 },
     { sourcePosition: [4238, 2648] as SourcePoint, scale: 1.12 },
-    { sourcePosition: [4112, 2790] as SourcePoint, scale: 0.98 },
-    { sourcePosition: [4108, 2930] as SourcePoint, scale: 1.08 },
-    { sourcePosition: [4132, 3090] as SourcePoint, scale: 0.94 },
-    { sourcePosition: [4160, 2470] as SourcePoint, scale: 1.0 },
+    // Faixa de grama entre a praça e Rua Brasil (anexo 2: árvores junto à via).
+    { sourcePosition: [4230, 3040] as SourcePoint, scale: 0.98 },
+    { sourcePosition: [4400, 3056] as SourcePoint, scale: 1.08 },
+    { sourcePosition: [4560, 3046] as SourcePoint, scale: 0.94 },
+    { sourcePosition: [4160, 2480] as SourcePoint, scale: 1.0 },
     { sourcePosition: [4520, 2420] as SourcePoint, scale: 1.07 },
     { sourcePosition: [4700, 2645] as SourcePoint, scale: 1.04 },
     { sourcePosition: [4840, 2650] as SourcePoint, scale: 0.98 },
@@ -211,12 +229,14 @@ export const ARENA_FRONT_LAYOUT = {
     { sourcePosition: [5480, 3178] as SourcePoint, scale: 1.1 },
     { sourcePosition: [5230, 3172] as SourcePoint, scale: 0.9 },
   ] as const,
+  /** Ombreira gramada ao norte da laje, entre o Mirante e as quadras. */
   northBerm: {
-    sourceBounds: [4120, 2682, 4480, 2720] as SourceBounds,
+    sourceBounds: [4092, 2600, 4480, 2682] as SourceBounds,
     highEdge: 'west' as const,
   },
+  /** Faixa de grama ao sul da laje, até Rua Brasil (antes concreto). */
   southBerm: {
-    sourceBounds: [4120, 3070, 4480, 3098] as SourceBounds,
+    sourceBounds: MIRANTE_COMPLEX.grassStrip.sourceBounds,
     highEdge: 'west' as const,
   },
 
@@ -250,7 +270,23 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceBounds: ARENA_FRONT_LAYOUT.accessCanopy.sourceBounds,
     sourceReferences: ARENA_FRONT_LAYOUT.accessCanopy.sourceReferences,
     verificationStatus: ARENA_FRONT_LAYOUT.accessCanopy.verificationStatus,
-    notes: 'Plataforma aberta entre Rua Brasília, D3 e a escadaria, com fascia clara, treliças e apoios pretos em V; apresentação associada, nunca entidade selecionável.',
+    notes: 'Plataforma aberta entre Rua Brasília, D3 e a escadaria, com fascia clara, treliças e apoios pretos em V e parede cega no topo norte; apresentação associada, nunca entidade selecionável.',
+  },
+  {
+    id: 'mirante-complex-sidewalk',
+    name: 'Passeio de Rua Brasília e pátio sul do Mirante',
+    classification: 'PEDESTRIAN_PATH',
+    isSellable: false,
+    contributesToCommercialMetrics: false,
+    sourceBounds: [3988, 2440, 4092, 3106],
+    sourceReferences: [
+      'Anexo 2 — satélite: faixa de calçada ao longo de Rua Brasília e "Calçada" até Rua Brasil',
+      'Anexo 7 — passeio com meio-fio pintado e piso tátil diante da estrutura lateral',
+      'Anexo 9 — deck do Mirante contínuo com o passeio e o meio-fio',
+      'Anexo 10 — continuidade do passeio até a parede norte',
+    ],
+    verificationStatus: 'REFERENCE_INTERPRETED',
+    notes: 'Calçada com meio-fio e piso tátil ao longo de Rua Brasília, do lote Q-R-04 até Rua Brasil, no mesmo terraço do deck do Mirante e da estrutura lateral, e pátio pavimentado ao sul até Rua Brasil; nunca lote nem via canônica.',
   },
   {
     id: 'arena-front-public-plaza',
@@ -258,10 +294,25 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     classification: 'PAVED_PUBLIC_AREA',
     isSellable: false,
     contributesToCommercialMetrics: false,
-    sourceBounds: [4116, 2682, 4888, 3200],
+    sourceBounds: [4092, 2682, 4888, 3200],
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'REFERENCE_INTERPRETED',
-    notes: 'Pátio cívico de concreto contínuo ao norte e a oeste da Arena, inclusive no retângulo do campo inexistente, preservando o gramado da via a oeste e o apron livre diante do palco; nunca representa lote.',
+    notes: 'Pátio cívico de concreto contínuo ao norte e a oeste da Arena, inclusive no retângulo do campo inexistente, recuado de Rua Brasil para deixar a faixa de grama real e encostado ao patamar da estrutura lateral; nunca representa lote.',
+  },
+  {
+    id: 'arena-front-grass-strip',
+    name: 'Faixa de grama entre a praça e Rua Brasil',
+    classification: 'LANDSCAPE_FEATURE',
+    isSellable: false,
+    contributesToCommercialMetrics: false,
+    sourceBounds: [...MIRANTE_COMPLEX.grassStrip.sourceBounds],
+    sourceReferences: [
+      'Anexo 2 — satélite: "Grama" entre a laje e Rua Brasil, até o Portão 5',
+      'Anexo 8 — gramado visto do deck, entre a escadaria e a via',
+      ...ARENA_FRONT_SOURCE_REFERENCES,
+    ],
+    verificationStatus: 'REFERENCE_INTERPRETED',
+    notes: 'Gramado natural no nível da via entre a laje da praça, o pátio sul da estrutura lateral e Rua Brasil; substitui o concreto que antes chegava até a rua.',
   },
   {
     id: 'arena-front-concrete-stairs',
@@ -272,7 +323,7 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceBounds: ARENA_FRONT_LAYOUT.stairs.sourceBounds,
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Dezoito níveis em três setores, altos a oeste e descendendo a leste em direção ao apron da Arena.',
+    notes: 'Dezoito níveis em três setores, partindo do patamar do conjunto Mirante/estrutura lateral a oeste e descendendo a leste em direção ao apron da Arena.',
   },
   {
     id: 'arena-front-multi-sport-court',
@@ -302,10 +353,10 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     classification: 'LANDSCAPE_FEATURE',
     isSellable: false,
     contributesToCommercialMetrics: false,
-    sourceBounds: [4120, 2682, 4480, 3098],
+    sourceBounds: [4092, 2600, 4660, 3096],
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Taludes estreitos ao norte e ao sul acompanham o desnível oeste-leste sem ocupar o apron pavimentado.',
+    notes: 'Ombreiras gramadas ao norte da laje e faixa de grama ao sul acompanham o desnível oeste-leste sem ocupar o apron pavimentado.',
   },
   {
     id: 'arena-front-natural-terrain',

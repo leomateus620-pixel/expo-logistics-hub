@@ -119,10 +119,8 @@ export const ArenaAccessStructure = memo(function ArenaAccessStructure({
   const materials = useMemo(() => ({
     concrete: opacityMaterial('#aaa79e', 0.96, 0, normalizedOpacity),
     roof: opacityMaterial('#b8b8b1', 0.84, 0.06, normalizedOpacity),
-    light: opacityMaterial('#ddd9cc', 0.88, 0.02, normalizedOpacity),
+    light: opacityMaterial('#e6e2d6', 0.86, 0.02, normalizedOpacity),
     steel: opacityMaterial('#222929', 0.55, 0.42, normalizedOpacity),
-    bench: opacityMaterial('#315b79', 0.72, 0.18, normalizedOpacity),
-    tactile: opacityMaterial('#d0a82d', 0.9, 0.02, normalizedOpacity),
   }), [normalizedOpacity]);
 
   const transforms = useMemo(() => {
@@ -133,8 +131,7 @@ export const ArenaAccessStructure = memo(function ArenaAccessStructure({
       concrete: forBoxes(['PLATFORM', 'CONNECTOR']),
       roof: forBoxes(['ROOF']),
       light: forBoxes(['FASCIA', 'SIDE_WALL']),
-      bench: forBoxes(['BENCH']),
-      tactile: forBoxes(['TACTILE_STRIP']),
+      columns: forBoxes(['COLUMN']),
       steel: layout.segments.map((item) => ({ matrix: beamMatrix(item) })),
     };
   }, [layout]);
@@ -189,17 +186,11 @@ export const ArenaAccessStructure = memo(function ArenaAccessStructure({
         castShadow={castShadow}
       />
       <InstancedBoxes
-        name="bancos-conexao-arena"
-        items={transforms.bench}
-        material={materials.bench}
+        name="pilares-canto-conexao-arena"
+        items={transforms.columns}
+        material={materials.steel}
         geometry={geometry}
-      />
-      <InstancedBoxes
-        name="faixa-tatil-conexao-arena"
-        items={transforms.tactile}
-        material={materials.tactile}
-        geometry={geometry}
-        receiveShadow
+        castShadow={castShadow}
       />
     </group>
   );

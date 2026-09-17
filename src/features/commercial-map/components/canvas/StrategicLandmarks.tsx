@@ -319,7 +319,7 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
 
   'mirante-pavilion': {
     wall: '#d6d2c7',
-    accent: '#8b765d',
+    accent: '#c43c3c',
     roof: '#c9ced0',
     trim: '#e5e1d8',
     dark: '#273033',

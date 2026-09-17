@@ -1,5 +1,6 @@
 import { measureCommercialMapStage, markCommercialMapStage } from '../utils/performanceDiagnostics';
 import { withFenasojaComplexReconstruction } from '../data/fenasojaComplexReconstruction';
+import { withMiranteComplexReconstruction } from '../data/miranteComplexReconstruction';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCapabilities } from '@/hooks/useCapabilities';
@@ -120,7 +121,9 @@ export function commercialMapQueryKey(
  * "Restaurante" inherits C2's segment membership; cadastral rows are not edited.
  */
 export function presentCommercialMapData<T extends CommercialMapData>(data: T): T {
-  return withCommercialMapSegments(withUnifiedFenasojaRestaurant(withFenasojaComplexReconstruction(data)));
+  return withCommercialMapSegments(withUnifiedFenasojaRestaurant(
+    withMiranteComplexReconstruction(withFenasojaComplexReconstruction(data)),
+  ));
 }
 
 export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIAL_MAP_SCOPE) {

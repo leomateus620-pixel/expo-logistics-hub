@@ -7,6 +7,7 @@ import {
   createMiranteLayout,
   miranteVisualHeight,
 } from '../../utils/mirante';
+import { MIRANTE_SITE_PROFILE } from './MirantePavilion';
 import {
   strategicLandmarkBounds,
   strategicLandmarkFacingRadians,
@@ -23,7 +24,7 @@ function MiranteInteriorCameraRig({ entity }: { entity: MapEntity; reducedGraphi
   const request = useMemo<InteriorCameraRequest>(() => {
     const bounds = strategicLandmarkBounds(entity);
     const height = Math.max(entity.geometry.extrusionHeight, miranteVisualHeight(bounds));
-    const layout = createMiranteLayout(bounds, height);
+    const layout = createMiranteLayout(bounds, height, MIRANTE_SITE_PROFILE);
     const facing = strategicLandmarkFacingRadians(entity);
     const center = new THREE.Vector3(bounds.centerX, entity.geometry.elevation, bounds.centerZ);
     const toWorld = (x: number, y: number, z: number) => (
@@ -81,7 +82,10 @@ export const MiranteInteriorScene = memo(function MiranteInteriorScene({
 }) {
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const height = Math.max(entity.geometry.extrusionHeight, miranteVisualHeight(bounds));
-  const layout = useMemo(() => createMiranteLayout(bounds, height), [bounds, height]);
+  const layout = useMemo(
+    () => createMiranteLayout(bounds, height, MIRANTE_SITE_PROFILE),
+    [bounds, height],
+  );
   const facing = strategicLandmarkFacingRadians(entity);
   const materials = useMemo<MirantePavilionMaterials>(() => {
     const result: MirantePavilionMaterials = {

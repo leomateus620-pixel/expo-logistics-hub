@@ -1,16 +1,24 @@
 import { memo, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import { ARENA_TERRAIN_TOP_ELEVATION } from '../../data/arenaTerrain';
 import {
+  MIRANTE_DEFAULT_SITE,
   createMiranteFurniturePlan,
   createMiranteLayout,
   miranteStructuralBayPositions,
   type MiranteLayout,
+  type MiranteSiteProfile,
 } from '../../utils/mirante';
 import type { StrategicLandmarkBounds } from '../../utils/landmarks';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
-const UNIT_CYLINDER = new THREE.CylinderGeometry(0.5, 0.5, 1, 8);
+const LANDING_TACTILE_MATERIAL = new THREE.MeshStandardMaterial({
+  color: '#d4a82c',
+  roughness: 0.9,
+  metalness: 0,
+});
+const UNIT_CYLINDER = new THREE.CylinderGeometry(0.5, 0.5, 1, 10);
 const UNIT_TRIANGLE = new THREE.BufferGeometry();
 UNIT_TRIANGLE.setAttribute(
   'position',
@@ -22,6 +30,15 @@ UNIT_TRIANGLE.setAttribute(
 );
 UNIT_TRIANGLE.setIndex([0, 1, 2]);
 UNIT_TRIANGLE.computeVertexNormals();
+
+/**
+ * Perfil do sítio compartilhado com a escadaria da Arena: o deck do Mirante é
+ * o terraço superior dos degraus, e não uma cota própria.
+ */
+export const MIRANTE_SITE_PROFILE: MiranteSiteProfile = Object.freeze({
+  ...MIRANTE_DEFAULT_SITE,
+  deckTopY: ARENA_TERRAIN_TOP_ELEVATION,
+});
 
 type Vector3Tuple = [number, number, number];
 type QuaternionTuple = [number, number, number, number];
@@ -117,27 +134,6 @@ function beamBetween(
   };
 }
 
-function slabBetween(
-  start: Vector3Tuple,
-  end: Vector3Tuple,
-  width: number,
-  thickness: number,
-): InstanceTransform {
-  const startVector = new THREE.Vector3(...start);
-  const endVector = new THREE.Vector3(...end);
-  const forward = endVector.clone().sub(startVector);
-  const length = Math.max(0.001, forward.length());
-  forward.normalize();
-  const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), forward);
-  if (right.lengthSq() < 0.001) right.set(1, 0, 0);
-  else right.normalize();
-  const up = new THREE.Vector3().crossVectors(forward, right).normalize();
-  const basis = new THREE.Matrix4().makeBasis(right, up, forward);
-  basis.setPosition(startVector.add(endVector).multiplyScalar(0.5));
-  basis.scale(new THREE.Vector3(width, thickness, length));
-  return { matrix: basis };
-}
-
 function beamAlongXy(
   startX: number,
   startY: number,
@@ -146,23 +142,7 @@ function beamAlongXy(
   z: number,
   thickness: number,
 ): InstanceTransform {
-  return beamBetween(
-    [startX, startY, z],
-    [endX, endY, z],
-    thickness,
-  );
-}
-
-function splitRailSegments(
-  minZ: number,
-  maxZ: number,
-  clearMinZ: number,
-  clearMaxZ: number,
-) {
-  const segments: Array<[number, number]> = [];
-  if (clearMinZ - minZ > 0.08) segments.push([minZ, clearMinZ]);
-  if (maxZ - clearMaxZ > 0.08) segments.push([clearMaxZ, maxZ]);
-  return segments;
+  return beamBetween([startX, startY, z], [endX, endY, z], thickness);
 }
 
 function createArchitecture(
@@ -172,405 +152,249 @@ function createArchitecture(
   reducedGraphics: boolean,
 ) {
   const bayPositions = miranteStructuralBayPositions(layout);
+  const { platform, roof, structure, railings, access } = layout;
   const columns: InstanceTransform[] = [];
   const longitudinalBeams: InstanceTransform[] = [];
   const trussMembers: InstanceTransform[] = [];
   const purlins: InstanceTransform[] = [];
-  const roofRibs: InstanceTransform[] = [];
+  const fascias: InstanceTransform[] = [];
   const railingPosts: InstanceTransform[] = [];
   const railingRails: InstanceTransform[] = [];
-  const lowerOpenings: InstanceTransform[] = [];
   const stairSteps: InstanceTransform[] = [];
-  const accessRails: InstanceTransform[] = [];
-  const furniturePlan = createMiranteFurniturePlan(layout);
-  const tableTops: InstanceTransform[] = [];
-  const tableLegs: InstanceTransform[] = [];
-  const chairSeats: InstanceTransform[] = [];
-  const chairBacks: InstanceTransform[] = [];
-  const chairLegs: InstanceTransform[] = [];
+  const stairWalls: InstanceTransform[] = [];
+  const stairRails: InstanceTransform[] = [];
+  const landingTactile: InstanceTransform[] = [];
+  const curbBands: InstanceTransform[] = [];
+  const benchSeats: InstanceTransform[] = [];
+  const benchFrames: InstanceTransform[] = [];
 
-  const columnX = layout.width / 2 - layout.structure.bayInset;
+  // Pilares tubulares esbeltos, recuados da borda para deixar o guarda-corpo
+  // livre, como nas fotos 7 e 9.
+  const columnX = layout.width / 2 - structure.columnInsetX;
   bayPositions.forEach((z) => {
     [-1, 1].forEach((side) => {
       columns.push({
-        position: [
-          side * columnX,
-          layout.structure.columnCenterY,
-          z,
-        ],
-        scale: [
-          layout.structure.columnSize,
-          layout.structure.columnHeight,
-          layout.structure.columnSize,
-        ],
+        position: [side * columnX, structure.columnCenterY, z],
+        scale: [structure.columnSize, structure.columnHeight, structure.columnSize],
       });
     });
     if (!showDetail) return;
-    const trussY = layout.roof.eaveY - layout.structure.beamSize * 0.2;
+    // Treliça plana de banzo inferior horizontal e banzo superior acompanhando
+    // a água baixa da cobertura; montantes e diagonais em zigue-zague.
+    const lowerY = roof.eaveY - structure.trussDepth;
     trussMembers.push(
-      beamAlongXy(
-        -layout.roof.halfSpan,
-        trussY,
-        layout.roof.halfSpan,
-        trussY,
-        z,
-        layout.structure.trussMemberSize,
-      ),
-      beamAlongXy(
-        -layout.roof.halfSpan,
-        layout.roof.eaveY,
-        0,
-        layout.roof.ridgeY,
-        z,
-        layout.structure.trussMemberSize,
-      ),
-      beamAlongXy(
-        0,
-        layout.roof.ridgeY,
-        layout.roof.halfSpan,
-        layout.roof.eaveY,
-        z,
-        layout.structure.trussMemberSize,
-      ),
+      beamAlongXy(-roof.halfSpan + 0.02, lowerY, roof.halfSpan - 0.02, lowerY, z, structure.trussMemberSize),
+      beamAlongXy(-roof.halfSpan + 0.02, roof.eaveY, 0, roof.ridgeY, z, structure.trussMemberSize),
+      beamAlongXy(0, roof.ridgeY, roof.halfSpan - 0.02, roof.eaveY, z, structure.trussMemberSize),
     );
-    [-0.66, -0.33, 0.33, 0.66].forEach((ratio) => {
-      const topY = layout.roof.ridgeY
-        - layout.roof.rise * Math.abs(ratio);
-      const nextRatio = ratio < 0 ? ratio + 0.33 : ratio - 0.33;
-      trussMembers.push(
-        beamAlongXy(
-          ratio * layout.roof.halfSpan,
-          trussY,
-          nextRatio * layout.roof.halfSpan,
-          topY,
-          z,
-          layout.structure.trussMemberSize * 0.84,
-        ),
-      );
-    });
+    const panels = reducedGraphics ? 4 : 6;
+    for (let index = 0; index <= panels; index += 1) {
+      const ratio = index / panels;
+      const x = -roof.halfSpan + 0.02 + ratio * (roof.halfSpan * 2 - 0.04);
+      const topY = roof.ridgeY - roof.rise * Math.abs(x) / roof.halfSpan;
+      trussMembers.push(beamAlongXy(x, lowerY, x, topY, z, structure.trussMemberSize * 0.8));
+      if (index < panels) {
+        const nextX = -roof.halfSpan + 0.02 + ((index + 1) / panels) * (roof.halfSpan * 2 - 0.04);
+        const nextTopY = roof.ridgeY - roof.rise * Math.abs(nextX) / roof.halfSpan;
+        trussMembers.push(
+          index % 2 === 0
+            ? beamAlongXy(x, lowerY, nextX, nextTopY, z, structure.trussMemberSize * 0.8)
+            : beamAlongXy(x, topY, nextX, lowerY, z, structure.trussMemberSize * 0.8),
+        );
+      }
+    }
   });
 
   [-1, 1].forEach((side) => {
     longitudinalBeams.push({
-      position: [
-        side * columnX,
-        layout.roof.eaveY - layout.structure.beamSize * 0.3,
-        0,
-      ],
-      scale: [
-        layout.structure.beamSize,
-        layout.structure.beamSize,
-        layout.depth - layout.structure.bayInset * 1.25,
-      ],
+      position: [side * columnX, roof.eaveY - structure.trussDepth - structure.beamSize * 0.5, platform.centerZ],
+      scale: [structure.beamSize, structure.beamSize, platform.depth - structure.bayInset * 1.2],
     });
   });
   longitudinalBeams.push({
-    position: [0, layout.roof.ridgeY - layout.structure.beamSize * 0.2, 0],
-    scale: [
-      layout.structure.beamSize,
-      layout.structure.beamSize,
-      layout.depth - layout.structure.bayInset,
-    ],
+    position: [0, roof.ridgeY - structure.beamSize * 0.35, platform.centerZ],
+    scale: [structure.beamSize, structure.beamSize, roof.depth - 0.04],
   });
 
+  // Faixa branca pintada no topo do muro de contenção voltado ao passeio.
+  curbBands.push({
+    position: [-layout.width / 2 - 0.004, platform.topY - layout.base.curbBandHeight / 2 + 0.002, platform.centerZ],
+    scale: [0.012, layout.base.curbBandHeight, platform.depth],
+  });
+
+  // Escada virada na face norte: lance estreito em +X, patamar no chão.
+  const stairs = access.descentStairs;
+  const landing = access.landing;
+  for (let index = 0; index < stairs.stepCount; index += 1) {
+    const treadTopY = platform.topY - stairs.stepRise * (index + 1);
+    const centerX = stairs.start[0] - stairs.stepDepth * (index + 0.5);
+    stairSteps.push({
+      position: [centerX, treadTopY / 2, stairs.center[2]],
+      scale: [stairs.stepDepth + 0.01, treadTopY, stairs.width],
+    });
+  }
+  stairSteps.push({
+    position: [landing.centerX, landing.topY / 2, landing.centerZ],
+    scale: [landing.width, landing.topY, landing.depth],
+  });
+  landingTactile.push({
+    position: [
+      landing.centerX,
+      landing.topY + 0.008,
+      landing.centerZ - landing.depth / 2 + landing.tactileOffsetFromNorth,
+    ],
+    scale: [landing.width * 0.92, 0.012, landing.tactileWidth],
+  });
+  stairWalls.push({
+    position: [
+      stairs.center[0],
+      platform.topY / 2,
+      platform.minZ + stairs.cheekWallThickness / 2,
+    ],
+    scale: [stairs.run + 0.04, platform.topY, stairs.cheekWallThickness],
+  });
+  const fenceZ = landing.centerZ - landing.depth / 2 + 0.02;
+  const fenceHeight = 0.18;
+  const fencePostCount = 6;
+  for (let index = 0; index <= fencePostCount; index += 1) {
+    const x = THREE.MathUtils.lerp(
+      -landing.width / 2 + 0.04,
+      landing.width / 2 - 0.04,
+      index / fencePostCount,
+    );
+    stairWalls.push({
+      position: [x, landing.topY + fenceHeight / 2, fenceZ],
+      scale: [0.014, fenceHeight, 0.014],
+    });
+  }
   if (showDetail) {
-    for (let index = 1; index <= layout.structure.purlinCount; index += 1) {
-      const ratio = index / (layout.structure.purlinCount + 1);
+    const railY = railings.height * 0.92;
+    const northRailZ = stairs.center[2] - stairs.width / 2 - 0.012;
+    const southRailZ = platform.minZ + 0.02;
+    [northRailZ, southRailZ].forEach((z) => {
+      stairRails.push(
+        beamBetween(
+          [stairs.start[0], platform.topY + railY, z],
+          [stairs.endpoint[0], stairs.endpoint[1] + railY, z],
+          railings.railSize,
+        ),
+      );
+      [0, 0.5, 1].forEach((ratio) => {
+        const y = THREE.MathUtils.lerp(platform.topY, stairs.endpoint[1], ratio);
+        stairRails.push({
+          position: [
+            THREE.MathUtils.lerp(stairs.start[0], stairs.endpoint[0], ratio),
+            y + railY / 2,
+            z,
+          ],
+          scale: [railings.postSize, railY, railings.postSize],
+        });
+      });
+    });
+    stairRails.push({
+      position: [0, landing.topY + fenceHeight, fenceZ],
+      scale: [landing.width - 0.08, 0.01, 0.01],
+    });
+  }
+
+  if (showDetail) {
+    for (let index = 1; index <= structure.purlinCount; index += 1) {
+      const ratio = index / (structure.purlinCount + 1);
       [-1, 1].forEach((side) => {
         purlins.push({
           position: [
-            side * layout.roof.halfSpan * ratio,
-            layout.roof.ridgeY - layout.roof.rise * ratio - 0.015,
-            0,
+            side * roof.halfSpan * ratio,
+            roof.ridgeY - roof.rise * ratio - roof.thickness * 0.5 - 0.01,
+            roof.centerZ,
           ],
-          scale: [
-            layout.structure.trussMemberSize * 0.72,
-            layout.structure.trussMemberSize * 0.72,
-            layout.roof.depth - 0.08,
-          ],
+          scale: [structure.trussMemberSize * 0.9, structure.trussMemberSize * 0.9, roof.depth - 0.06],
         });
       });
     }
 
-    const ribCount = showFocusDetail ? 24 : 12;
-    for (let index = 0; index < ribCount; index += 1) {
-      const z = -layout.roof.depth / 2 + ((index + 0.5) / ribCount) * layout.roof.depth;
-      [-1, 1].forEach((side) => {
-        roofRibs.push({
-          position: [
-            side * layout.roof.halfSpan * 0.5,
-            (layout.roof.eaveY + layout.roof.ridgeY) / 2 + 0.018,
-            z,
-          ],
-          scale: [layout.roof.slopeLength, 0.018, 0.018],
-          rotation: [0, 0, side > 0 ? -layout.roof.angle : layout.roof.angle],
-        });
-      });
-    }
-
-    const railMinZ = -layout.depth / 2 + layout.railings.inset;
-    const railMaxZ = layout.depth / 2 - layout.railings.inset;
-    const regularPostCount = Math.max(
-      3,
-      Math.ceil((railMaxZ - railMinZ) / layout.railings.postSpacing),
-    );
+    // Testeiras nas duas águas (fotos 7 e 9: borda clara e contínua).
     [-1, 1].forEach((side) => {
-      for (let index = 0; index <= regularPostCount; index += 1) {
-        const z = THREE.MathUtils.lerp(railMinZ, railMaxZ, index / regularPostCount);
-        if (
-          side > 0
-          && z > layout.access.clearMinZ
-          && z < layout.access.clearMaxZ
-        ) continue;
-        railingPosts.push({
-          position: [
-            side * (layout.width / 2 - layout.railings.inset),
-            layout.platform.topY + layout.railings.height / 2,
-            z,
-          ],
-          scale: [
-            layout.railings.postSize,
-            layout.railings.height,
-            layout.railings.postSize,
-          ],
-        });
-      }
-
-      const segments = side < 0
-        ? [[railMinZ, railMaxZ] as [number, number]]
-        : splitRailSegments(
-          railMinZ,
-          railMaxZ,
-          layout.access.clearMinZ,
-          layout.access.clearMaxZ,
-        );
-      segments.forEach(([startZ, endZ]) => {
-        [0.48, 0.88].forEach((heightRatio) => {
-          railingRails.push({
-            position: [
-              side * (layout.width / 2 - layout.railings.inset),
-              layout.platform.topY + layout.railings.height * heightRatio,
-              (startZ + endZ) / 2,
-            ],
-            scale: [
-              layout.railings.railSize,
-              layout.railings.railSize,
-              endZ - startZ,
-            ],
-          });
-        });
+      fascias.push({
+        position: [side * (roof.halfSpan - 0.008), roof.eaveY - roof.fasciaHeight / 2 + 0.012, roof.centerZ],
+        scale: [0.016, roof.fasciaHeight, roof.depth],
       });
     });
 
-    [-1, 1].forEach((zSide) => {
-      const z = zSide * (layout.depth / 2 - layout.railings.inset);
-      const width = layout.width - layout.railings.inset * 2;
-      const endPostCount = Math.max(2, Math.ceil(width / layout.railings.postSpacing));
-      for (let index = 0; index <= endPostCount; index += 1) {
+    // Guarda-corpo nas laterais longas e na face norte, com vão no topo da
+    // escada. A ponta sul segue aberta para a estrutura lateral.
+    const railMinZ = platform.minZ + railings.inset;
+    const railMaxZ = platform.maxZ - railings.inset;
+    const postCount = Math.max(4, Math.ceil((railMaxZ - railMinZ) / railings.postSpacing));
+    [-1, 1].forEach((side) => {
+      const x = side * (layout.width / 2 - railings.inset);
+      for (let index = 0; index <= postCount; index += 1) {
         railingPosts.push({
           position: [
-            THREE.MathUtils.lerp(-width / 2, width / 2, index / endPostCount),
-            layout.platform.topY + layout.railings.height / 2,
-            z,
+            x,
+            platform.topY + railings.height / 2,
+            THREE.MathUtils.lerp(railMinZ, railMaxZ, index / postCount),
           ],
-          scale: [
-            layout.railings.postSize,
-            layout.railings.height,
-            layout.railings.postSize,
-          ],
+          scale: [railings.postSize, railings.height, railings.postSize],
         });
       }
-      [0.48, 0.88].forEach((heightRatio) => {
+      [0.42, 0.98].forEach((heightRatio) => {
         railingRails.push({
-          position: [
-            0,
-            layout.platform.topY + layout.railings.height * heightRatio,
-            z,
-          ],
-          scale: [
-            width,
-            layout.railings.railSize,
-            layout.railings.railSize,
-          ],
+          position: [x, platform.topY + railings.height * heightRatio, (railMinZ + railMaxZ) / 2],
+          scale: [railings.railSize, railings.railSize, railMaxZ - railMinZ],
         });
       });
     });
-
-    const openingCount = Math.max(4, Math.min(7, Math.round(layout.depth / 1.35)));
-    for (let index = 0; index < openingCount; index += 1) {
-      const z = -layout.depth * 0.36 + (index / Math.max(1, openingCount - 1)) * layout.depth * 0.72;
-      const isDoor = index % 2 === 0;
-      lowerOpenings.push({
-        position: [
-          layout.base.width / 2 + 0.012,
-          isDoor ? layout.base.height * 0.34 : layout.base.height * 0.58,
-          z,
-        ],
-        scale: [
-          0.025,
-          isDoor ? layout.base.height * 0.58 : layout.base.height * 0.22,
-          Math.min(0.5, layout.depth / openingCount * 0.46),
-        ],
+    const northRailZ = platform.minZ + railings.inset;
+    const stairGapWest = stairs.endpoint[0] - 0.04;
+    const stairGapEast = stairs.start[0] + 0.06;
+    const northRailSpans: Array<readonly [number, number]> = [
+      [-layout.width / 2 + railings.inset, stairGapWest],
+      [stairGapEast, layout.width / 2 - railings.inset],
+    ];
+    northRailSpans.forEach(([fromX, toX]) => {
+      if (toX - fromX < 0.12) return;
+      const postCountNorth = Math.max(2, Math.ceil((toX - fromX) / railings.postSpacing));
+      for (let index = 0; index <= postCountNorth; index += 1) {
+        railingPosts.push({
+          position: [
+            THREE.MathUtils.lerp(fromX, toX, index / postCountNorth),
+            platform.topY + railings.height / 2,
+            northRailZ,
+          ],
+          scale: [railings.postSize, railings.height, railings.postSize],
+        });
+      }
+      [0.42, 0.98].forEach((heightRatio) => {
+        railingRails.push({
+          position: [(fromX + toX) / 2, platform.topY + railings.height * heightRatio, northRailZ],
+          scale: [toX - fromX, railings.railSize, railings.railSize],
+        });
       });
-    }
-
-    const stairStart = layout.access.stairs.start as Vector3Tuple;
-    const stairEnd = layout.access.stairs.endpoint as Vector3Tuple;
-    const stairDx = stairEnd[0] - stairStart[0];
-    const stairDz = stairEnd[2] - stairStart[2];
-    const stairRotation = Math.atan2(stairDx, stairDz);
-    for (let index = 0; index < layout.access.stairs.stepCount; index += 1) {
-      const ratio = (index + 0.5) / layout.access.stairs.stepCount;
-      const stepHeight = (index + 1) * layout.access.stairs.stepRise;
-      stairSteps.push({
-        position: [
-          THREE.MathUtils.lerp(stairStart[0], stairEnd[0], ratio),
-          stairStart[1] + stepHeight / 2,
-          THREE.MathUtils.lerp(stairStart[2], stairEnd[2], ratio),
-        ],
-        scale: [
-          layout.access.stairs.width,
-          stepHeight,
-          layout.access.stairs.stepDepth + 0.015,
-        ],
-        rotation: [0, stairRotation, 0],
-      });
-    }
-
-    const addAccessGuardrail = (
-      start: Vector3Tuple,
-      end: Vector3Tuple,
-      width: number,
-      guardrailHeight: number,
-      intervals: number,
-    ) => {
-      const horizontal = new THREE.Vector3(end[0] - start[0], 0, end[2] - start[2]);
-      const perpendicular = new THREE.Vector3(-horizontal.z, 0, horizontal.x).normalize();
-      [-1, 1].forEach((side) => {
-        const lateral = perpendicular.clone().multiplyScalar(side * width * 0.48);
-        const startRail = new THREE.Vector3(...start).add(lateral);
-        const endRail = new THREE.Vector3(...end).add(lateral);
-        startRail.y += guardrailHeight;
-        endRail.y += guardrailHeight;
-        accessRails.push(
-          beamBetween(
-            startRail.toArray() as Vector3Tuple,
-            endRail.toArray() as Vector3Tuple,
-            layout.railings.railSize,
-          ),
-        );
-        for (let index = 0; index <= intervals; index += 1) {
-          const ratio = index / intervals;
-          const floor = new THREE.Vector3(
-            THREE.MathUtils.lerp(start[0], end[0], ratio),
-            THREE.MathUtils.lerp(start[1], end[1], ratio),
-            THREE.MathUtils.lerp(start[2], end[2], ratio),
-          ).add(lateral);
-          accessRails.push({
-            position: [
-              floor.x,
-              floor.y + guardrailHeight / 2,
-              floor.z,
-            ],
-            scale: [
-              layout.railings.postSize,
-              guardrailHeight,
-              layout.railings.postSize,
-            ],
-          });
-        }
-      });
-    };
-
-    addAccessGuardrail(
-      layout.access.ramp.start as Vector3Tuple,
-      layout.access.ramp.endpoint as Vector3Tuple,
-      layout.access.ramp.width,
-      layout.access.ramp.guardrailHeight,
-      5,
-    );
-    addAccessGuardrail(
-      stairStart,
-      stairEnd,
-      layout.access.stairs.width,
-      layout.railings.height,
-      Math.max(2, Math.floor(layout.access.stairs.stepCount / 2)),
-    );
+    });
   }
 
   if (showFocusDetail) {
-    const tableWidth = Math.min(0.48, layout.width * 0.2);
-    const tableDepth = tableWidth * 0.78;
-    const tableHeight = Math.max(0.34, layout.platform.thickness * 1.55);
-    const chairWidth = tableWidth * 0.34;
-    const chairDepth = chairWidth * 0.92;
-    const chairSeatY = layout.platform.topY + tableHeight * 0.52;
-
-    furniturePlan.tables
-      .filter((pose) => !reducedGraphics || pose.groupIndex < 2)
+    createMiranteFurniturePlan(layout).benches
+      .filter((pose) => !reducedGraphics || pose.groupIndex % 2 === 0)
       .forEach((pose) => {
-      const [x, , z] = pose.position as Vector3Tuple;
-      tableTops.push({
-        position: [x, layout.platform.topY + tableHeight, z],
-        scale: [tableWidth, 0.055, tableDepth],
-        rotation: [0, pose.rotationY, 0],
-      });
-      [-1, 1].forEach((xSide) => {
+        const [x, , z] = pose.position as Vector3Tuple;
+        const [benchWidth, benchHeight, benchDepth] = pose.dimensions as Vector3Tuple;
+        const seatY = platform.topY + benchHeight;
+        benchSeats.push({
+          position: [x, seatY, z],
+          scale: [benchWidth, 0.014, benchDepth],
+        });
+        benchSeats.push({
+          position: [x + benchWidth * 0.42, seatY + benchHeight * 0.55, z],
+          scale: [0.014, benchHeight * 0.95, benchDepth],
+          rotation: [0, 0, 0.18],
+        });
         [-1, 1].forEach((zSide) => {
-          const local = new THREE.Vector3(
-            xSide * tableWidth * 0.39,
-            0,
-            zSide * tableDepth * 0.37,
-          ).applyAxisAngle(new THREE.Vector3(0, 1, 0), pose.rotationY);
-          tableLegs.push({
-            position: [
-              x + local.x,
-              layout.platform.topY + tableHeight / 2,
-              z + local.z,
-            ],
-            scale: [0.035, tableHeight, 0.035],
+          benchFrames.push({
+            position: [x, seatY / 2 + platform.topY / 2, z + zSide * benchDepth * 0.42],
+            scale: [benchWidth * 0.9, seatY - platform.topY, 0.012],
           });
         });
-      });
-      });
-
-    furniturePlan.chairs
-      .filter((pose) => !reducedGraphics || pose.groupIndex < 2)
-      .forEach((pose) => {
-      const [x, , z] = pose.position as Vector3Tuple;
-      chairSeats.push({
-        position: [x, chairSeatY, z],
-        scale: [chairWidth, 0.05, chairDepth],
-        rotation: [0, pose.rotationY, 0],
-      });
-      const backward = new THREE.Vector3(0, 0, -chairDepth * 0.42)
-        .applyAxisAngle(new THREE.Vector3(0, 1, 0), pose.rotationY);
-      chairBacks.push({
-        position: [
-          x + backward.x,
-          chairSeatY + chairWidth * 0.48,
-          z + backward.z,
-        ],
-        scale: [chairWidth, chairWidth * 0.84, 0.045],
-        rotation: [0, pose.rotationY, 0],
-      });
-      [-1, 1].forEach((xSide) => {
-        [-1, 1].forEach((zSide) => {
-          const local = new THREE.Vector3(
-            xSide * chairWidth * 0.38,
-            0,
-            zSide * chairDepth * 0.36,
-          ).applyAxisAngle(new THREE.Vector3(0, 1, 0), pose.rotationY);
-          chairLegs.push({
-            position: [
-              x + local.x,
-              layout.platform.topY + (chairSeatY - layout.platform.topY) / 2,
-              z + local.z,
-            ],
-            scale: [0.022, chairSeatY - layout.platform.topY, 0.022],
-          });
-        });
-      });
       });
   }
 
@@ -579,19 +403,16 @@ function createArchitecture(
     longitudinalBeams,
     trussMembers,
     purlins,
-    roofRibs,
+    fascias,
     railingPosts,
     railingRails,
-    lowerOpenings,
     stairSteps,
-    accessRails,
-    furniture: {
-      tableTops,
-      tableLegs,
-      chairSeats,
-      chairBacks,
-      chairLegs,
-    },
+    stairWalls,
+    stairRails,
+    landingTactile,
+    curbBands,
+    benchSeats,
+    benchFrames,
   };
 }
 
@@ -614,39 +435,17 @@ export const MiranteArchitecture = memo(function MiranteArchitecture({
     () => createArchitecture(layout, showDetail, showFocusDetail, reducedGraphics),
     [layout, reducedGraphics, showDetail, showFocusDetail],
   );
-  const roofCenterY = (layout.roof.eaveY + layout.roof.ridgeY) / 2;
-  const serviceWidth = Math.min(layout.width * 0.48, 0.92);
-  const serviceDepth = Math.min(layout.depth * 0.13, 1.05);
-  const serviceHeight = Math.min(
-    layout.roof.eaveY - layout.platform.topY - 0.16,
-    layout.height * 0.34,
-  );
-  const serviceZ = -layout.depth / 2 + serviceDepth * 0.72;
-  const terrainPadWidth = layout.width * 1.12;
-  const terrainPadCenterX = (terrainPadWidth - layout.width) / 2;
-  const rampSurface = slabBetween(
-    layout.access.ramp.start as Vector3Tuple,
-    layout.access.ramp.endpoint as Vector3Tuple,
-    layout.access.ramp.width,
-    0.075,
-  );
-  const furnitureVisible = showFocusDetail;
+  const { platform, base, roof, service } = layout;
+  const roofCenterY = (roof.eaveY + roof.ridgeY) / 2;
 
   return (
     <group raycast={NO_RAYCAST} dispose={null}>
-      <mesh
-        geometry={UNIT_BOX}
-        material={materials.green}
-        position={[terrainPadCenterX, -0.025, 0]}
-        scale={[terrainPadWidth, 0.11, layout.depth * 0.97]}
-        receiveShadow
-        raycast={NO_RAYCAST}
-      />
+      {/* Muro de contenção + laje do deck: um único volume apoiado no passeio. */}
       <mesh
         geometry={UNIT_BOX}
         material={materials.wall}
-        position={[0, layout.base.centerY, 0]}
-        scale={[layout.base.width, layout.base.height, layout.base.depth]}
+        position={[0, base.centerY, base.centerZ]}
+        scale={[base.width, base.height, base.depth]}
         castShadow={!reducedGraphics}
         receiveShadow
         raycast={NO_RAYCAST}
@@ -654,35 +453,21 @@ export const MiranteArchitecture = memo(function MiranteArchitecture({
       <mesh
         geometry={UNIT_BOX}
         material={materials.platform}
-        position={[0, layout.platform.centerY, 0]}
-        scale={[layout.platform.width, layout.platform.thickness, layout.platform.depth]}
+        position={[0, platform.centerY, platform.centerZ]}
+        scale={[platform.width + 0.016, platform.thickness, platform.depth + 0.016]}
         castShadow={!reducedGraphics}
         receiveShadow
         raycast={NO_RAYCAST}
       />
-      <mesh
-        geometry={UNIT_BOX}
-        material={materials.trim}
-        position={[layout.width * 0.48, layout.base.height * 0.28, 0]}
-        scale={[
-          layout.base.retainingThickness,
-          layout.base.height * 0.56,
-          layout.depth * 0.98,
-        ]}
-        receiveShadow
-        raycast={NO_RAYCAST}
-      />
+      <ScaledInstances material={materials.white} items={architecture.curbBands} />
 
+      {/* Cobertura de duas águas com inclinação baixa, chapa clara e cumeeira. */}
       <mesh
         geometry={UNIT_BOX}
         material={materials.roof}
-        position={[
-          layout.roof.halfSpan * 0.5,
-          roofCenterY,
-          0,
-        ]}
-        rotation={[0, 0, -layout.roof.angle]}
-        scale={[layout.roof.slopeLength, layout.roof.thickness, layout.roof.depth]}
+        position={[roof.halfSpan * 0.5, roofCenterY, roof.centerZ]}
+        rotation={[0, 0, -roof.angle]}
+        scale={[roof.slopeLength, roof.thickness, roof.depth]}
         castShadow={!reducedGraphics}
         receiveShadow
         raycast={NO_RAYCAST}
@@ -691,13 +476,9 @@ export const MiranteArchitecture = memo(function MiranteArchitecture({
         <mesh
           geometry={UNIT_BOX}
           material={materials.roof}
-          position={[
-            -layout.roof.halfSpan * 0.5,
-            roofCenterY,
-            0,
-          ]}
-          rotation={[0, 0, layout.roof.angle]}
-          scale={[layout.roof.slopeLength, layout.roof.thickness, layout.roof.depth]}
+          position={[-roof.halfSpan * 0.5, roofCenterY, roof.centerZ]}
+          rotation={[0, 0, roof.angle]}
+          scale={[roof.slopeLength, roof.thickness, roof.depth]}
           castShadow={!reducedGraphics}
           receiveShadow
           raycast={NO_RAYCAST}
@@ -705,92 +486,86 @@ export const MiranteArchitecture = memo(function MiranteArchitecture({
       )}
       <mesh
         geometry={UNIT_BOX}
-        material={materials.metal}
-        position={[0, layout.roof.ridgeY + 0.018, 0]}
-        scale={[
-          layout.structure.beamSize * 1.2,
-          layout.roof.thickness * 0.7,
-          layout.roof.depth,
-        ]}
+        material={materials.trim}
+        position={[0, roof.ridgeY + roof.thickness * 0.4, roof.centerZ]}
+        scale={[layout.structure.beamSize * 1.6, roof.thickness * 0.9, roof.depth]}
         raycast={NO_RAYCAST}
       />
 
       <ScaledInstances
+        geometry={UNIT_CYLINDER}
         material={materials.dark}
         items={architecture.columns}
         castShadow={!reducedGraphics}
       />
       <ScaledInstances material={materials.metal} items={architecture.longitudinalBeams} />
 
+      {/* Escada de descida (fronteira com a Exporural) — sempre presente. */}
+      <ScaledInstances
+        material={materials.platform}
+        items={architecture.stairSteps}
+        castShadow={!reducedGraphics}
+        receiveShadow
+      />
+      <ScaledInstances
+        material={materials.wall}
+        items={architecture.stairWalls}
+        castShadow={!reducedGraphics}
+        receiveShadow
+      />
+      <ScaledInstances
+        material={LANDING_TACTILE_MATERIAL}
+        items={architecture.landingTactile}
+        receiveShadow
+      />
+
       {showDetail && (
         <>
           <ScaledInstances material={materials.metal} items={architecture.trussMembers} />
           <ScaledInstances material={materials.metal} items={architecture.purlins} />
-          <ScaledInstances material={materials.trim} items={architecture.roofRibs} />
+          <ScaledInstances material={materials.trim} items={architecture.fascias} />
           <ScaledInstances material={materials.metal} items={architecture.railingPosts} />
           <ScaledInstances material={materials.metal} items={architecture.railingRails} />
-          <ScaledInstances material={materials.dark} items={architecture.lowerOpenings} />
-          <ScaledInstances
-            material={materials.platform}
-            items={architecture.stairSteps}
-            receiveShadow
-          />
-          <ScaledInstances material={materials.metal} items={architecture.accessRails} />
-          <ScaledInstances
-            material={materials.platform}
-            items={[rampSurface]}
-            receiveShadow
-          />
+          <ScaledInstances material={materials.metal} items={architecture.stairRails} />
           <mesh
             geometry={UNIT_TRIANGLE}
-            material={materials.roof}
-            position={[0, layout.roof.eaveY, -layout.roof.depth / 2 + 0.012]}
-            scale={[layout.roof.halfSpan, layout.roof.rise, 1]}
+            material={materials.trim}
+            position={[0, roof.eaveY, roof.centerZ - roof.depth / 2 + 0.008]}
+            scale={[roof.halfSpan, roof.rise, 1]}
             raycast={NO_RAYCAST}
           />
           <mesh
             geometry={UNIT_TRIANGLE}
-            material={materials.roof}
-            position={[0, layout.roof.eaveY, layout.roof.depth / 2 - 0.012]}
+            material={materials.trim}
+            position={[0, roof.eaveY, roof.centerZ + roof.depth / 2 - 0.008]}
             rotation={[0, Math.PI, 0]}
-            scale={[layout.roof.halfSpan, layout.roof.rise, 1]}
+            scale={[roof.halfSpan, roof.rise, 1]}
             raycast={NO_RAYCAST}
           />
-          <group position={[-layout.width * 0.2, 0, serviceZ]} raycast={NO_RAYCAST}>
+          {/* Quiosque de apoio junto à parede da estrutura lateral. */}
+          <group position={service.center} raycast={NO_RAYCAST}>
             <mesh
               geometry={UNIT_BOX}
               material={materials.white}
-              position={[0, layout.platform.topY + serviceHeight / 2, 0]}
-              scale={[serviceWidth, serviceHeight, serviceDepth]}
+              scale={[service.width, service.height, service.depth]}
               castShadow={!reducedGraphics}
               raycast={NO_RAYCAST}
             />
             <mesh
               geometry={UNIT_BOX}
               material={materials.dark}
-              position={[
-                serviceWidth / 2 + 0.012,
-                layout.platform.topY + serviceHeight * 0.42,
-                serviceDepth * 0.08,
-              ]}
-              scale={[0.025, serviceHeight * 0.58, serviceDepth * 0.36]}
+              position={[service.width / 2 + 0.006, -service.height * 0.08, service.depth * 0.1]}
+              scale={[0.012, service.height * 0.6, service.depth * 0.4]}
               raycast={NO_RAYCAST}
             />
           </group>
         </>
       )}
 
-      {furnitureVisible && (
+      {showFocusDetail && (
         <>
-          <ScaledInstances material={materials.accent} items={architecture.furniture.tableTops} />
-          <ScaledInstances material={materials.dark} items={architecture.furniture.tableLegs} />
-          <ScaledInstances material={materials.accent} items={architecture.furniture.chairSeats} />
-          <ScaledInstances material={materials.accent} items={architecture.furniture.chairBacks} />
-          <ScaledInstances
-            geometry={UNIT_CYLINDER}
-            material={materials.dark}
-            items={architecture.furniture.chairLegs}
-          />
+          <ScaledInstances material={materials.accent} items={architecture.benchSeats} />
+          <ScaledInstances material={materials.dark} items={architecture.benchFrames} />
         </>
       )}
     </group>
@@ -803,15 +578,17 @@ export const MirantePavilion = memo(function MirantePavilion({
   materials,
   showDetail,
   showFocusDetail,
+  reducedGraphics = false,
 }: {
   bounds: StrategicLandmarkBounds;
   height: number;
   materials: MirantePavilionMaterials;
   showDetail: boolean;
   showFocusDetail: boolean;
+  reducedGraphics?: boolean;
 }) {
   const layout = useMemo(
-    () => createMiranteLayout(bounds, height),
+    () => createMiranteLayout(bounds, height, MIRANTE_SITE_PROFILE),
     [bounds, height],
   );
 
@@ -821,6 +598,7 @@ export const MirantePavilion = memo(function MirantePavilion({
       materials={materials}
       showDetail={showDetail}
       showFocusDetail={showFocusDetail}
+      reducedGraphics={reducedGraphics}
     />
   );
 });

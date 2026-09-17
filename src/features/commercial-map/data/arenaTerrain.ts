@@ -1,4 +1,5 @@
 import { ARENA_FRONT_LAYOUT, sourceBoundsToLocal } from './parkEnvironment';
+import { MIRANTE_COMPLEX } from './miranteComplexReconstruction';
 
 /**
  * Modelo de cota do setor da Arena Sicredi - Icatu.
@@ -9,7 +10,7 @@ import { ARENA_FRONT_LAYOUT, sourceBoundsToLocal } from './parkEnvironment';
  * alimenta lote, métrica comercial ou geometria oficial.
  */
 
-export const ARENA_TERRAIN_REVISION = '2026.9-arena-north-apron-concrete.1';
+export const ARENA_TERRAIN_REVISION = '2026.9-mirante-complex-satellite.1';
 
 /** Cota do apron pavimentado diante da Arena (leste). */
 export const ARENA_TERRAIN_BASE_ELEVATION = ARENA_FRONT_LAYOUT.plaza.elevation;
@@ -18,13 +19,34 @@ export const ARENA_TERRAIN_BASE_ELEVATION = ARENA_FRONT_LAYOUT.plaza.elevation;
 export const ARENA_TERRAIN_RISE =
   ARENA_FRONT_LAYOUT.stairs.stepCount * ARENA_FRONT_LAYOUT.stairs.riserHeight;
 
+/**
+ * Terraço superior = deck do Mirante e piso da estrutura lateral coberta. O
+ * espelho dos degraus é derivado dessa cota em `parkEnvironment`, portanto o
+ * valor coincide com `MIRANTE_COMPLEX.levels.deck`.
+ */
 export const ARENA_TERRAIN_TOP_ELEVATION = ARENA_TERRAIN_BASE_ELEVATION + ARENA_TERRAIN_RISE;
 
 const STAIRS = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.stairs.sourceBounds);
+const TERRAIN = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.terrain.sourceBounds);
 
 /** Início (leste) e fim (oeste) da rampa natural, alinhados à corrida da escadaria. */
 const SLOPE_EAST_X = STAIRS.maxX - ARENA_FRONT_LAYOUT.stairs.lowerLandingDepth;
 const SLOPE_WEST_X = STAIRS.minX + ARENA_FRONT_LAYOUT.stairs.upperLandingDepth;
+
+/**
+ * Ao norte o terreno desce para a Exporural, encontrando o topo do lote
+ * Q-R-04 (onde a escada norte do Mirante aterrissa) em vez de formar um
+ * paredão de grama. Ao sul, logo depois da mureta da escadaria, cai para o
+ * nível da faixa de grama que acompanha Rua Brasil.
+ */
+const NORTH_FLOOR_FACTOR = Math.min(
+  1,
+  Math.max(0, (MIRANTE_COMPLEX.levels.exporuralGround - ARENA_TERRAIN_BASE_ELEVATION) / ARENA_TERRAIN_RISE),
+);
+const NORTH_FADE_START_Z = TERRAIN.minZ + 0.15;
+const NORTH_FADE_END_Z = TERRAIN.minZ + 2.4;
+const SOUTH_FADE_START_Z = STAIRS.maxZ - 0.05;
+const SOUTH_FADE_END_Z = STAIRS.maxZ + 0.5;
 
 function smoothstep(edge0: number, edge1: number, value: number) {
   if (edge1 === edge0) return value < edge0 ? 0 : 1;
@@ -37,6 +59,14 @@ export function arenaTerrainSlopeFactor(x: number) {
   return smoothstep(SLOPE_EAST_X, SLOPE_WEST_X, x);
 }
 
+/** Perfil transversal (1 na faixa do conjunto Mirante/escadaria, menor nas pontas). */
+export function arenaTerrainLateralFactor(z: number) {
+  const north = NORTH_FLOOR_FACTOR
+    + (1 - NORTH_FLOOR_FACTOR) * smoothstep(NORTH_FADE_START_Z, NORTH_FADE_END_Z, z);
+  const south = 1 - smoothstep(SOUTH_FADE_START_Z, SOUTH_FADE_END_Z, z);
+  return north * south;
+}
+
 /**
  * Ondulação suave, determinística e de baixa frequência. Desaparece por
  * completo no apron pavimentado para não brigar com o piso plano da Arena.
@@ -46,11 +76,12 @@ function gentleUndulation(x: number, z: number) {
   const wave =
     Math.sin(x * 0.62 + z * 0.31) * 0.6 +
     Math.sin(z * 0.44 - x * 0.19) * 0.4;
-  return wave * 0.018 * apronFade;
+  return wave * 0.012 * apronFade;
 }
 
 export function arenaTerrainElevation(x: number, z: number) {
-  return ARENA_TERRAIN_BASE_ELEVATION + ARENA_TERRAIN_RISE * arenaTerrainSlopeFactor(x)
+  return ARENA_TERRAIN_BASE_ELEVATION
+    + ARENA_TERRAIN_RISE * arenaTerrainSlopeFactor(x) * arenaTerrainLateralFactor(z)
     + gentleUndulation(x, z);
 }
 
@@ -83,4 +114,6 @@ export const ARENA_STAIR_GEOMETRY = Object.freeze({
   bounds: STAIRS,
   slopeEastX: SLOPE_EAST_X,
   slopeWestX: SLOPE_WEST_X,
+  northFadeZ: [NORTH_FADE_START_Z, NORTH_FADE_END_Z] as const,
+  southFadeZ: [SOUTH_FADE_START_Z, SOUTH_FADE_END_Z] as const,
 });
