@@ -1,0 +1,95 @@
+[
+  {
+    "scene": "lot",
+    "bufferBefore": [
+      1285,
+      682
+    ],
+    "bufferAfter": [
+      1285,
+      682
+    ],
+    "positionIdentical": true,
+    "targetIdentical": true,
+    "orientationIdentical": true,
+    "dprBefore": 1,
+    "dprAfter": 1,
+    "qualityAfter": {
+      "logicalTier": "HIGH",
+      "sceneTier": "HIGH",
+      "baseDpr": 1,
+      "effectiveDpr": 1,
+      "hardwareCeiling": "HIGH",
+      "reason": "viewport-sync"
+    },
+    "healthAfter": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 429,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "scene": "pavilion",
+    "bufferBefore": [
+      1285,
+      682
+    ],
+    "bufferAfter": [
+      1285,
+      682
+    ],
+    "positionIdentical": true,
+    "targetIdentical": true,
+    "orientationIdentical": true,
+    "dprBefore": 1,
+    "dprAfter": 1,
+    "qualityAfter": {
+      "logicalTier": "HIGH",
+      "sceneTier": "HIGH",
+      "baseDpr": 1,
+      "effectiveDpr": 1,
+      "hardwareCeiling": "HIGH",
+      "reason": "viewport-sync"
+    },
+    "healthAfter": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 388,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  {
+    "scene": "interior",
+    "bufferBefore": [
+      1069,
+      682
+    ],
+    "bufferAfter": [
+      1069,
+      682
+    ],
+    "positionIdentical": true,
+    "targetIdentical": true,
+    "orientationIdentical": true,
+    "dprBefore": 1,
+    "dprAfter": 1,
+    "qualityAfter": {
+      "logicalTier": "HIGH",
+      "sceneTier": "HIGH",
+      "baseDpr": 1,
+      "effectiveDpr": 1,
+      "hardwareCeiling": "HIGH",
+      "reason": "viewport-sync"
+    },
+    "healthAfter": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 378,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  }
+]

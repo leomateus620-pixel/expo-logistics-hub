@@ -1,0 +1,80 @@
+{
+  "node": "v24.15.0",
+  "npm": "11.12.1",
+  "cleanInstall": {
+    "command": "npm ci --no-audit --no-fund",
+    "passed": true,
+    "packages": 853
+  },
+  "typecheck": {
+    "command": "npm run typecheck",
+    "passed": true
+  },
+  "lint": {
+    "scope": "modified and added TS/TSX files",
+    "passed": true
+  },
+  "builds": {
+    "qa": {
+      "passed": true,
+      "seconds": 44.67,
+      "diagnostics": true
+    },
+    "production": {
+      "passed": true,
+      "seconds": 75,
+      "diagnostics": false
+    },
+    "productionWithManifest": {
+      "passed": true,
+      "seconds": 65,
+      "diagnostics": false
+    }
+  },
+  "bundle": {
+    "command": "node scripts/commercial-map-performance/bundle-report.cjs dist --assert-independent",
+    "passed": true
+  },
+  "modifiedTestFiles": [
+    {
+      "file": "test/commercialMapAdaptiveQualityController.test.tsx",
+      "passed": 6,
+      "failed": 0
+    },
+    {
+      "file": "test/commercialMapAdaptiveQualityRuntime.test.ts",
+      "passed": 8,
+      "failed": 0
+    },
+    {
+      "file": "test/commercialMapCameraTransition.test.ts",
+      "passed": 14,
+      "failed": 0
+    },
+    {
+      "file": "test/commercialMapDevicePerformance.test.tsx",
+      "passed": 8,
+      "failed": 0
+    },
+    {
+      "file": "test/commercialMapEnvironment.test.ts",
+      "passed": 11,
+      "failed": 0
+    },
+    {
+      "file": "test/commercialMapRuntimeDiagnostics.test.tsx",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "file": "test/commercialMapViewport.test.ts",
+      "passed": 36,
+      "failed": 0
+    }
+  ],
+  "deviceFinalRetest": {
+    "passed": 8,
+    "failed": 0
+  },
+  "fullSuiteSee": "test-baseline-comparison.json"
+}

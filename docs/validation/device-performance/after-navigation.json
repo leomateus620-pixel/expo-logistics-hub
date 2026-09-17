@@ -1,0 +1,51 @@
+[
+  {
+    "label": "overview-before-gesture",
+    "camera": "{\"position\":[3.8459,110.553,104.8504],\"target\":[-2.2546,0.744,-0.3832],\"quaternion\":[-0.391939,0.026631,0.011351,0.919536],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.09513,\"far\":1283.245,\"distance\":152.2148,\"minDistance\":8.7889,\"maxDistance\":328.6701,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":328.6701,\"calculatedMaxDistance\":328.6701,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":6.2,\"diagonal\":198.05951217035},\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1285.21875,\"height\":682.8125,\"aspect\":1.88224,\"dpr\":1}}",
+    "canvas": 1,
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":444,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "quality": "{\"logicalTier\":\"HIGH\",\"sceneTier\":\"HIGH\",\"baseDpr\":1,\"effectiveDpr\":1,\"hardwareCeiling\":\"HIGH\",\"reason\":\"viewport-sync\"}"
+  },
+  {
+    "label": "zoom-in-wheel",
+    "camera": "{\"position\":[3.4971,104.2772,99.1312],\"target\":[-2.2547,0.744,-0.0882],\"quaternion\":[-0.391939,0.026631,0.011351,0.919536],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.59798,\"far\":1283.245,\"distance\":143.5155,\"minDistance\":8.7889,\"maxDistance\":328.6701,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":328.6701,\"calculatedMaxDistance\":328.6701,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":6.2,\"diagonal\":198.05951217035},\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1285.21875,\"height\":682.8125,\"aspect\":1.88224,\"dpr\":1}}",
+    "canvas": 1,
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":444,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "quality": "{\"logicalTier\":\"HIGH\",\"sceneTier\":\"HIGH\",\"baseDpr\":1,\"effectiveDpr\":1,\"hardwareCeiling\":\"HIGH\",\"reason\":\"viewport-sync\"}"
+  },
+  {
+    "label": "drag-right-down",
+    "camera": "{\"position\":[-30.4578,140.9806,-11.7053],\"target\":[-2.2547,0.744,-0.0882],\"quaternion\":[0.349123,0.646982,0.521388,-0.433222],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.59798,\"far\":1283.245,\"distance\":143.5155,\"minDistance\":8.7889,\"maxDistance\":328.6701,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":328.6701,\"calculatedMaxDistance\":328.6701,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":6.2,\"diagonal\":198.05951217035},\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1285.21875,\"height\":682.8125,\"aspect\":1.88224,\"dpr\":0.72}}",
+    "canvas": 1,
+    "health": "{\"status\":\"ready\",\"path\":\"direct\",\"presentedFrames\":537,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "quality": "{\"logicalTier\":\"MEDIUM\",\"sceneTier\":\"HIGH\",\"baseDpr\":1,\"effectiveDpr\":0.72,\"hardwareCeiling\":\"HIGH\",\"reason\":\"sustained-slow-frames\"}"
+  },
+  {
+    "label": "zoom-out-wheel",
+    "camera": "{\"position\":[-31.7303,149.352,-12.3604],\"target\":[-2.0613,0.744,0.0111],\"quaternion\":[0.34824,0.647621,0.522513,-0.431621],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.63352,\"far\":1283.245,\"distance\":152.0448,\"minDistance\":8.7889,\"maxDistance\":328.6701,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":328.6701,\"calculatedMaxDistance\":328.6701,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":6.2,\"diagonal\":198.05951217035},\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1285.21875,\"height\":682.8125,\"aspect\":1.88224,\"dpr\":0.72}}",
+    "canvas": 1,
+    "health": "{\"status\":\"ready\",\"path\":\"direct\",\"presentedFrames\":575,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "quality": "{\"logicalTier\":\"MEDIUM\",\"sceneTier\":\"HIGH\",\"baseDpr\":1,\"effectiveDpr\":0.72,\"hardwareCeiling\":\"HIGH\",\"reason\":\"sustained-slow-frames\"}"
+  },
+  {
+    "label": "after-gesture-settled-top",
+    "camera": "{\"position\":[-2.2546,151.2945,3.3814],\"target\":[-2.2546,0.744,-0.3832],\"quaternion\":[-0.698213,0,0,0.71589],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.09412,\"far\":1283.245,\"distance\":150.5976,\"minDistance\":8.7889,\"maxDistance\":328.6701,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":328.6701,\"calculatedMaxDistance\":328.6701,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":6.2,\"diagonal\":198.05951217035},\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1285.21875,\"height\":682.8125,\"aspect\":1.88224,\"dpr\":1}}",
+    "canvas": 1,
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":633,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "quality": "{\"logicalTier\":\"MEDIUM\",\"sceneTier\":\"MEDIUM\",\"baseDpr\":1,\"effectiveDpr\":1,\"hardwareCeiling\":\"HIGH\",\"reason\":\"idle-scene-commit\"}"
+  },
+  {
+    "label": "css-viewport-390x844",
+    "camera": "{\"position\":[-2.2546,454.7271,10.9688],\"target\":[-2.2546,0.744,-0.3832],\"quaternion\":[-0.698213,0,0,0.71589],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0.03426395939086294},\"near\":0.26438,\"far\":2208.098,\"distance\":454.1251,\"minDistance\":8.7889,\"maxDistance\":636.9544,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":636.9544,\"calculatedMaxDistance\":636.9544,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":6.2,\"diagonal\":198.05951217035},\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":390,\"height\":788,\"aspect\":0.49492,\"dpr\":1}}",
+    "canvas": 1,
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":651,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "quality": "{\"logicalTier\":\"MEDIUM\",\"sceneTier\":\"MEDIUM\",\"baseDpr\":1,\"effectiveDpr\":1,\"hardwareCeiling\":\"HIGH\",\"reason\":\"viewport-sync\"}"
+  },
+  {
+    "label": "css-viewport-844x390",
+    "camera": "{\"position\":[-2.2546,329.3114,7.8327],\"target\":[-2.2546,0.744,-0.3832],\"quaternion\":[-0.698213,0,0,0.71589],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0.0854937660795567},\"near\":1.36946,\"far\":1283.245,\"distance\":328.6701,\"minDistance\":8.7889,\"maxDistance\":328.6701,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":328.6701,\"calculatedMaxDistance\":328.6701,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":6.2,\"diagonal\":198.05951217035},\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":821.21875,\"height\":315.8125,\"aspect\":2.60034,\"dpr\":1}}",
+    "canvas": 1,
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":677,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "quality": "{\"logicalTier\":\"MEDIUM\",\"sceneTier\":\"MEDIUM\",\"baseDpr\":1,\"effectiveDpr\":1,\"hardwareCeiling\":\"HIGH\",\"reason\":\"viewport-sync\"}"
+  }
+]

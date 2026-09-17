@@ -1,0 +1,184 @@
+{
+  "entry": "src/pages/CommercialMapPage.tsx",
+  "chunks": [
+    {
+      "key": "src/pages/CommercialMapPage.tsx",
+      "file": "assets/CommercialMapPage-CsWFKcmO.js",
+      "bytes": 4524,
+      "gzipBytes": 1789
+    },
+    {
+      "key": "_react-vendor-Cze6uWs8.js",
+      "file": "assets/react-vendor-Cze6uWs8.js",
+      "bytes": 192974,
+      "gzipBytes": 64161
+    },
+    {
+      "key": "_module-runtime-CEDABylm.js",
+      "file": "assets/module-runtime-CEDABylm.js",
+      "bytes": 1244,
+      "gzipBytes": 724
+    },
+    {
+      "key": "_CommercialMapPage-BivL2YqP.js",
+      "file": "assets/CommercialMapPage-BivL2YqP.js",
+      "bytes": 561339,
+      "gzipBytes": 165771
+    },
+    {
+      "key": "index.html",
+      "file": "assets/index-ChtFYO4y.js",
+      "bytes": 596906,
+      "gzipBytes": 158957
+    },
+    {
+      "key": "_ui-radix-B-9dom6S.js",
+      "file": "assets/ui-radix-B-9dom6S.js",
+      "bytes": 137075,
+      "gzipBytes": 41211
+    },
+    {
+      "key": "_data-vendor-BB8ZE5qF.js",
+      "file": "assets/data-vendor-BB8ZE5qF.js",
+      "bytes": 221547,
+      "gzipBytes": 59643
+    },
+    {
+      "key": "_textarea-DrKC44Sb.js",
+      "file": "assets/textarea-DrKC44Sb.js",
+      "bytes": 522,
+      "gzipBytes": 341
+    },
+    {
+      "key": "_fenasojaComplexReconstruction-zk8l-oYI.js",
+      "file": "assets/fenasojaComplexReconstruction-zk8l-oYI.js",
+      "bytes": 8556,
+      "gzipBytes": 4110
+    },
+    {
+      "key": "_state-vendor-CDfFiNsr.js",
+      "file": "assets/state-vendor-CDfFiNsr.js",
+      "bytes": 2203,
+      "gzipBytes": 1034
+    },
+    {
+      "key": "_dropdown-menu-DWT2KQlg.js",
+      "file": "assets/dropdown-menu-DWT2KQlg.js",
+      "bytes": 3759,
+      "gzipBytes": 1109
+    },
+    {
+      "key": "_maximize-2-DANnBa53.js",
+      "file": "assets/maximize-2-DANnBa53.js",
+      "bytes": 467,
+      "gzipBytes": 314
+    },
+    {
+      "key": "_moon-DMRvOqM3.js",
+      "file": "assets/moon-DMRvOqM3.js",
+      "bytes": 311,
+      "gzipBytes": 251
+    },
+    {
+      "key": "_scroll-area-CWs8ZAYf.js",
+      "file": "assets/scroll-area-CWs8ZAYf.js",
+      "bytes": 2278,
+      "gzipBytes": 954
+    },
+    {
+      "key": "_ellipsis-DWfuSeTF.js",
+      "file": "assets/ellipsis-DWfuSeTF.js",
+      "bytes": 390,
+      "gzipBytes": 264
+    },
+    {
+      "key": "_sliders-horizontal-DRpDpocr.js",
+      "file": "assets/sliders-horizontal-DRpDpocr.js",
+      "bytes": 753,
+      "gzipBytes": 369
+    },
+    {
+      "key": "_warehouse-CZs6vk-B.js",
+      "file": "assets/warehouse-CZs6vk-B.js",
+      "bytes": 901,
+      "gzipBytes": 436
+    },
+    {
+      "key": "_chevron-up-CehVo-MY.js",
+      "file": "assets/chevron-up-CehVo-MY.js",
+      "bytes": 296,
+      "gzipBytes": 246
+    },
+    {
+      "key": "_rotate-ccw-CJLsl_Hf.js",
+      "file": "assets/rotate-ccw-CJLsl_Hf.js",
+      "bytes": 368,
+      "gzipBytes": 285
+    },
+    {
+      "key": "_dialog-BC0ucAtJ.js",
+      "file": "assets/dialog-BC0ucAtJ.js",
+      "bytes": 2518,
+      "gzipBytes": 986
+    },
+    {
+      "key": "_select-X8oWZLtz.js",
+      "file": "assets/select-X8oWZLtz.js",
+      "bytes": 3037,
+      "gzipBytes": 1111
+    },
+    {
+      "key": "_save-CfsVUwIm.js",
+      "file": "assets/save-CfsVUwIm.js",
+      "bytes": 918,
+      "gzipBytes": 441
+    },
+    {
+      "key": "_label-CeLyzlcp.js",
+      "file": "assets/label-CeLyzlcp.js",
+      "bytes": 370,
+      "gzipBytes": 270
+    },
+    {
+      "key": "_switch-pZfVRqrY.js",
+      "file": "assets/switch-pZfVRqrY.js",
+      "bytes": 850,
+      "gzipBytes": 456
+    },
+    {
+      "key": "_info-D2ZVPuzT.js",
+      "file": "assets/info-D2ZVPuzT.js",
+      "bytes": 368,
+      "gzipBytes": 278
+    },
+    {
+      "key": "_database-zap-k1dN5ttT.js",
+      "file": "assets/database-zap-k1dN5ttT.js",
+      "bytes": 507,
+      "gzipBytes": 349
+    },
+    {
+      "key": "_send-kovTo-xy.js",
+      "file": "assets/send-kovTo-xy.js",
+      "bytes": 459,
+      "gzipBytes": 331
+    },
+    {
+      "key": "_badge-check-B4-rtWTK.js",
+      "file": "assets/badge-check-B4-rtWTK.js",
+      "bytes": 484,
+      "gzipBytes": 313
+    },
+    {
+      "key": "_skip-forward-ht0JvtDo.js",
+      "file": "assets/skip-forward-ht0JvtDo.js",
+      "bytes": 365,
+      "gzipBytes": 287
+    }
+  ],
+  "staticBytes": 1746289,
+  "staticGzipBytes": 506791,
+  "rendererRequiredBeforeQuery": false,
+  "physicsRequiredBeforeQuery": false,
+  "pdfRequiredBeforeQuery": false
+}
