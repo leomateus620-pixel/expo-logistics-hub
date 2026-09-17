@@ -335,7 +335,7 @@ describe('viewport mobile do Mapa Comercial', () => {
     {
       label: 'mobile sem hints proprietários',
       input: { viewportWidth: 390, viewportHeight: 844, devicePixelRatio: 3 },
-      expected: 'MEDIUM',
+      expected: 'HIGH',
     },
     {
       label: 'mobile moderno',
@@ -360,7 +360,7 @@ describe('viewport mobile do Mapa Comercial', () => {
   ])('limita a qualidade inicial por viewport, DPR, memória e cores em $label', ({ input, expected }) => {
     expect(resolveCommercialMapQualityCeiling(input)).toBe(expected);
     expect(createCommercialMapAdaptiveQualityState(input)).toEqual({
-      tier: expected,
+      tier: expected === 'ULTRA' ? 'HIGH' : expected,
       consecutiveSlowWindows: 0,
       consecutiveFastWindows: 0,
       lastDowngradeAtMs: 0,
@@ -562,8 +562,8 @@ describe('viewport mobile do Mapa Comercial', () => {
       tier: 'HIGH',
       changed: true,
       reason: 'sustained-fast-frames',
-      downgradeStreak: 0,
-      lastDowngradeAtMs: 0,
+      downgradeStreak: 1,
+      lastDowngradeAtMs: 2_000,
     });
   });
 

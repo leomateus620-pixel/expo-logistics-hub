@@ -72,14 +72,7 @@ import type { CommercialMapData, CommercialMapQueryScope, MapPermissions } from 
 import './commercial-map.css';
 import './commercial-map-mobile.css';
 
-function supportsWebGL() {
-  try {
-    const canvas = document.createElement('canvas');
-    return Boolean(window.WebGL2RenderingContext && canvas.getContext('webgl2'));
-  } catch {
-    return false;
-  }
-}
+import { useWebGLAvailability } from './hooks/useWebGLAvailability';
 
 function MapFeatureBoundary({ id, children }: { id: string; children: ReactNode }) {
   return <MapPanelBoundary resetKey={id} title="Ferramenta indisponível">
@@ -123,6 +116,7 @@ interface CommercialMapPageProps {
   scope?: CommercialMapQueryScope;
   /** Official fixtures for the DEV-only interface diagnostics route. */
   previewData?: CommercialMapData;
+  previewWebGLUnavailable?: boolean;
 }
 
 function withPersistedCamera(
@@ -155,7 +149,7 @@ const COMMISSION_READ_ONLY_PERMISSIONS: MapPermissions = {
   isMapAdmin: false,
 };
 
-export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, previewData }: CommercialMapPageProps) {
+export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, previewData, previewWebGLUnavailable = false }: CommercialMapPageProps) {
   useCommercialMapBootVisit();
   const [searchParams, setSearchParams] = useSearchParams();
   const isCommissionScope = scope.mode === 'commission';
@@ -167,11 +161,12 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const isExporural = areaScope === 'exporural';
   const registeredScopedSegment = areaScope === 'park' ? null : getCommercialMapSegment(areaScope);
   const mapQuery = useCommercialMap(scope);
+  const { available: webglAvailable, retry: retryWebGL, attempts: webglAttempts, canRetry: canRetryWebGL } = useWebGLAvailability(Boolean(previewData && previewWebGLUnavailable));
   useEffect(() => {
     markCommercialMapStage('route-mounted');
     // Start during the data wait. Catch speculative errors; lazy owns error UI.
-    void preloadCommercialMapCanvas().catch(() => undefined);
-  }, []);
+    if (webglAvailable) void preloadCommercialMapCanvas().catch(() => undefined);
+  }, [webglAvailable]);
   const resolvedPermissions = useMapPermissions();
   const isPreview = commercialMapDiagnosticsEnabled && Boolean(previewData);
   useEffect(() => { if (isPreview) markCommercialMapStage('fixture-data-ready'); }, [isPreview]);
@@ -202,7 +197,6 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const requestLunarLaunchSkip = useCommercialMapStore((state) => state.requestLunarLaunchSkip);
   const requestLunarLaunchReturn = useCommercialMapStore((state) => state.requestLunarLaunchReturn);
   const lastInteriorEntityId = useRef<string | null>(null);
-  const [webglAvailable] = useState(() => supportsWebGL());
   const [publishReason, setPublishReason] = useState('Publicação após revisão cartográfica e comercial');
   const technicalValidationAllowed = !isCommissionScope
     && canUseTechnicalValidationOverlay(areaScope, permissions);
@@ -479,7 +473,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     >
       <CommercialMapHeaderTools
         managementActions={managementActions}
-        salesAvailable={data.source === 'database' && permissions.canManageSales}
+        salesAvailable={webglAvailable && data.source === 'database' && permissions.canManageSales}
       />
 
       <div className="commercial-map-body">
@@ -507,9 +501,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
           /> : null}
         />
 
-        <div id="commercial-map-viewport" className="commercial-map-viewport">
+        <div id="commercial-map-viewport" className={`commercial-map-viewport${webglAvailable ? '' : ' is-webgl-fallback'}`}>
 
-        {workspaceMode === '3d' && permissions.canManageSales && (
+        {webglAvailable && workspaceMode === '3d' && permissions.canManageSales && (
           <SalesModeLayer projectId={data.project?.id ?? null} />
         )}
 
@@ -675,12 +669,27 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
         )}
         {(workspaceMode === 'list' || (!webglAvailable && workspaceMode === '3d')) && (
           <div className="commercial-map-workspace-layer is-list-view">
-            <MapFeatureBoundary id="list"><MapListView explorer={mapFilter} permissions={permissions} contextTitle={interiorEntity?.name ?? getCommercialMapSegment(activeSegmentId)?.name ?? 'Parque Fenasoja'} /></MapFeatureBoundary>
+            <MapFeatureBoundary id="list"><MapListView explorer={mapFilter} permissions={permissions}
+              sceneAvailable={webglAvailable} canRetry3D={canRetryWebGL}
+              onRequest3D={() => { if (webglAvailable || retryWebGL()) setWorkspaceMode('3d'); }}
+              contextTitle={interiorEntity?.name ?? getCommercialMapSegment(activeSegmentId)?.name ?? 'Parque Fenasoja'} /></MapFeatureBoundary>
           </div>
         )}
 
+        {!webglAvailable && selectedEntity && activePanel === 'details' && (
+          <MapFeatureBoundary id={selectedEntity.id}>
+            <Suspense fallback={<EntityDetailsPanelSkeleton />}>
+            <EntityDetailsPanel entity={selectedEntity} lot={selectedLot} entities={scopedData.entities}
+              lots={scopedData.lots} permissions={permissions} sceneAvailable={false} />
+            </Suspense>
+          </MapFeatureBoundary>
+        )}
+
         {!webglAvailable && workspaceMode !== 'edit' && (
-          <div className="commercial-map-webgl-note"><Box /><span><strong>Modo 2D acessível ativado</strong>O navegador não disponibilizou WebGL 2. A tabela permanece totalmente operacional.</span></div>
+          <div className="commercial-map-webgl-note" role="status"><Box /><span><strong>Modo 2D acessível ativado</strong>
+            O navegador não disponibilizou WebGL 2. Consulte registros e detalhes pela tabela. A seleção múltipla de Vendas e os interiores exigem o mapa 3D.
+            {webglAttempts > 0 && ` Verificação ${webglAttempts}/3: WebGL 2 continua indisponível.`}
+          </span></div>
         )}
         </div>
       </div>

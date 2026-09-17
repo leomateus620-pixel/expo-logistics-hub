@@ -315,8 +315,8 @@ function DetailMetric({ icon: Icon, label, value, warning }: { icon: typeof Tag;
   );
 }
 
-export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }: { entity: MapEntity; lot?: CommercialLot; entities: MapEntity[]; lots: CommercialLot[]; permissions: MapPermissions }) {
-  const salesModeActive = useSalesStore((state) => state.salesModeActive);
+export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, sceneAvailable = true }: { entity: MapEntity; lot?: CommercialLot; entities: MapEntity[]; lots: CommercialLot[]; permissions: MapPermissions; sceneAvailable?: boolean }) {
+  const salesModeActive = useSalesStore((state) => state.salesModeActive) && sceneAvailable;
   const salesSelection = useSalesStore((state) => state.selection);
   const toggleSalesLot = useSalesStore((state) => state.toggleLot);
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
@@ -398,7 +398,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
             : lot?.officialAreaSqm != null ? `${areaNumber.format(lot.officialAreaSqm)} m² de área oficial` : 'Área não informada'}</span>
         </div>
         <CompactDetailSheetControls sheet={sheet}>
-          {strategicLandmarkSupportsInterior(entity) && (
+          {sceneAvailable && strategicLandmarkSupportsInterior(entity) && (
             <Button className="commercial-map-selection-interior-action"
               onClick={() => enterInterior(entity.id)}
               data-commercial-map-interior-trigger={entity.id}
@@ -495,7 +495,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
               )}
 
               <div className="commercial-map-detail-actions">
-                <Button variant="outline" onClick={focusSelection}><Focus className="h-4 w-4" />Centralizar</Button>
+                {sceneAvailable && <Button variant="outline" onClick={focusSelection}><Focus className="h-4 w-4" />Centralizar</Button>}
                 {permissions.isMapAdmin && <Button variant="outline" onClick={() => setVerificationOpen(true)}><BadgeCheck className="h-4 w-4" />{entity.verificationStatus === 'VERIFIED' ? 'Reabrir revisão' : 'Verificar entidade'}</Button>}
                 {lot && permissions.canManageLots && <Button variant="outline" onClick={() => setEditingLot(true)}><PencilLine className="h-4 w-4" />Editar lote</Button>}
                 {permissions.canEditGeometry && <Button variant="outline" onClick={() => setWorkspaceMode('edit')}><Ruler className="h-4 w-4" />Editar geometria</Button>}

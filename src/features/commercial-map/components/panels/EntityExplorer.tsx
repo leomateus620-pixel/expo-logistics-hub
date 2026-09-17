@@ -514,6 +514,7 @@ export const ResultsPanel = memo(function ResultsPanel({ explorer }: { explorer:
 });
 
 interface EntityTableProps {
+  sceneAvailable?: boolean;
   items: EntityExplorerItem[];
   selectedEntityId: string | null;
   density: 'compact' | 'comfortable';
@@ -522,7 +523,7 @@ interface EntityTableProps {
   onEdit: (lot: CommercialLot) => void;
 }
 
-const EntityTable = memo(function EntityTable({ items, selectedEntityId, density, permissions, onOpen, onEdit }: EntityTableProps) {
+const EntityTable = memo(function EntityTable({ items, selectedEntityId, density, permissions, onOpen, onEdit, sceneAvailable = true }: EntityTableProps) {
   return (
     <table className={`commercial-map-entity-table is-${density}`}>
       <caption className="sr-only">Entidades do parque filtradas e sincronizadas com o mapa comercial 3D</caption>
@@ -592,7 +593,7 @@ const EntityTable = memo(function EntityTable({ items, selectedEntityId, density
               </td>
               <td data-label="Ações">
                 <div className="commercial-map-table-actions">
-                  <Button size="sm" variant="ghost" onClick={() => onOpen(item)}>Ver no mapa<ChevronRight className="h-4 w-4" /></Button>
+                  <Button size="sm" variant="ghost" onClick={() => onOpen(item)}>{sceneAvailable ? 'Ver no mapa' : 'Ver detalhes'}<ChevronRight className="h-4 w-4" /></Button>
                   {item.lot && permissions.canManageLots && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -614,7 +615,10 @@ const EntityTable = memo(function EntityTable({ items, selectedEntityId, density
   );
 });
 
-export const MapListView = memo(function MapListView({ explorer, permissions, contextTitle = 'parque' }: { explorer: MapEntityFilterResult; permissions: MapPermissions; contextTitle?: string }) {
+export const MapListView = memo(function MapListView({ explorer, permissions, contextTitle = 'parque', sceneAvailable = true, canRetry3D = true, onRequest3D }: {
+  explorer: MapEntityFilterResult; permissions: MapPermissions; contextTitle?: string;
+  sceneAvailable?: boolean; canRetry3D?: boolean; onRequest3D?: () => void;
+}) {
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
   const openExplorerEntity = useOpenExplorerEntity();
   const setWorkspaceMode = useCommercialMapStore((state) => state.setWorkspaceMode);
@@ -641,7 +645,13 @@ export const MapListView = memo(function MapListView({ explorer, permissions, co
     selectedRow?.scrollIntoView({ block: 'nearest' });
   }, [explorer.items, selectedEntityId]);
 
-  const handleOpen = useCallback((item: EntityExplorerItem) => openExplorerEntity(item), [openExplorerEntity]);
+  const handleOpen = useCallback((item: EntityExplorerItem) => {
+    if (sceneAvailable) openExplorerEntity(item);
+    else {
+      // Even an internal stand is inspectable without entering a missing scene.
+      useCommercialMapStore.setState({ selectedEntityId: item.entity.id, activePanel: 'details' });
+    }
+  }, [openExplorerEntity, sceneAvailable]);
   const handleEdit = useCallback((lot: CommercialLot) => setEditingLot(lot), []);
 
   return (
@@ -650,15 +660,21 @@ export const MapListView = memo(function MapListView({ explorer, permissions, co
         <div>
           <span>Alternativa acessível ao mapa 3D</span>
           <h2>Entidades · {contextTitle}</h2>
-          <p>Pesquise, compare e abra qualquer registro preservando o contexto da cena.</p>
+          <p>{sceneAvailable
+            ? 'Pesquise, compare e abra qualquer registro preservando o contexto da cena.'
+            : 'WebGL 2 indisponível. Consulte os detalhes pela lista. Vendas múltiplas e interiores exigem o mapa 3D.'}</p>
         </div>
-        <Button variant="outline" onClick={() => setWorkspaceMode('3d')}><Layers3 className="h-4 w-4" />Exibir mapa 3D</Button>
+        <Button variant="outline" disabled={!sceneAvailable && !canRetry3D}
+          onClick={onRequest3D ?? (() => setWorkspaceMode('3d'))}><Layers3 className="h-4 w-4" />
+          {sceneAvailable ? 'Exibir mapa 3D' : canRetry3D ? 'Verificar suporte 3D' : '3D indisponível nesta sessão'}
+        </Button>
       </div>
 
-      <ExplorerControls explorer={explorer} variant="table" onEscape={() => setWorkspaceMode('3d')} />
+      <ExplorerControls explorer={explorer} variant="table" onEscape={() => { if (sceneAvailable) setWorkspaceMode('3d'); }} />
 
       <div className="commercial-map-table-wrap" ref={tableWrapRef}>
         <EntityTable
+          sceneAvailable={sceneAvailable}
           items={pageItems}
           selectedEntityId={selectedEntityId}
           density={tableDensity}

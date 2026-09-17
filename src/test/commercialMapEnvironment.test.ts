@@ -364,7 +364,8 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).toContain('scene.environment = previousEnvironment');
     expect(environment).toContain('gl.shadowMap.needsUpdate = true');
     // Demand frames follow sunrise and both independently interpolated environment blends.
-    expect(environment).toContain('if ((isRunning && !hasSunrisePlaybackFinished(playback.current) && !nightMode) || !nightSettled || !rainSettled) invalidate();');
+    expect(environment).toContain('if ((isRunning && !hasSunrisePlaybackFinished(playback.current) && !nightMode) || !nightSettled || !rainSettled)');
+    expect(environment).toContain('requestCommercialMapAnimationFrame(gl, invalidate, COMMERCIAL_MAP_ANIMATION.environment)');
     expect(environment).not.toContain('requestAnimationFrame');
     expect(environment).not.toContain('setInterval(');
     expect(environment).not.toContain('new THREE.PMREMGenerator');

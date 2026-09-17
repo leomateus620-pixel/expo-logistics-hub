@@ -262,6 +262,8 @@
 }
 .commercial-map-details-panel-presence { display: contents; }
 .commercial-map-details-panel-presence[hidden] { display: none; }
+.is-webgl-fallback .commercial-map-panel { z-index: 42; }
+.is-webgl-fallback .commercial-map-webgl-note { z-index: 41; pointer-events: none; }
 .commercial-map-canvas { display: block; width: 100%; height: 100%; outline: none; cursor: grab; touch-action: none; }
 .commercial-map-canvas > canvas { cursor: grab; }
 

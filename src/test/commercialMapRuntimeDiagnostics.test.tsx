@@ -47,7 +47,7 @@ describe('runtime diagnostics retain real stalls and exclude actual inactive int
     expect(window.__commercialMapRuntimeDiagnostics?.frameTimes.map((event) => event.duration)).toEqual([16, 800, 16]);
     expect(summarizeCommercialMapRuntimeDiagnostics()).toMatchObject({
       sampledFrames: 3, jankFrames: 1, averageFrameTimeMs: 277.33,
-      p95FrameTimeMs: 800, p99FrameTimeMs: 800, onePercentLowFps: 1.3,
+      p95FrameTimeMs: 800, p99FrameTimeMs: 800, inverseP99FpsApproximation: 1.3,
     });
   });
 

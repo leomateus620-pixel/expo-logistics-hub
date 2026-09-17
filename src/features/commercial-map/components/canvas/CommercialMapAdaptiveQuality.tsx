@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import { commercialMapFrameActivity } from '../../utils/frameActivity';
+import { sampleCommercialMapDisplayCadence } from '../../utils/displayCadence';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { recordCommercialMapQualityDecision } from '../../utils/runtimeDiagnostics';
+import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
 import {
   resolveCommercialMapAdaptiveQuality,
   resolveCommercialMapPixelRatio,
@@ -12,6 +15,7 @@ import {
 } from '../../utils/viewport';
 import {
   COMMERCIAL_MAP_QUALITY_SCENE_COMMIT_IDLE_MS,
+  COMMERCIAL_MAP_QUALITY_EVENT,
   createCommercialMapFrameTimeWindow,
   createCommercialMapPixelRatioState,
   isCommercialMapAdaptiveQualitySamplingActive,
@@ -44,6 +48,7 @@ function copyQualityState(
   target.consecutiveFastWindows = source.consecutiveFastWindows;
   target.lastDowngradeAtMs = source.lastDowngradeAtMs;
   target.downgradeStreak = source.downgradeStreak;
+  target.lastUpgradeAtMs = source.lastUpgradeAtMs ?? target.lastUpgradeAtMs;
 }
 
 export function CommercialMapAdaptiveQualityController({
@@ -64,6 +69,16 @@ export function CommercialMapAdaptiveQualityController({
   const idleCommitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const frameWindow = useRef(createCommercialMapFrameTimeWindow());
   const lastDiagnosticSignature = useRef('');
+  const samplingSignature = useRef('');
+  const sampledPresentation = useRef(-1);
+  const displayCadence = useRef<number | null>(null);
+  const cadenceCancel = useRef<(() => void) | null>(null);
+  const activity = useRef(commercialMapFrameActivity(gl));
+  // Opt-in, local QA only: compare identical initial quality before/after.
+  // The query has no effect on the authenticated route or normal builds.
+  const fixedQualityForComparison = useRef(commercialMapDiagnosticsEnabled
+    && window.location.pathname === '/__dev/commercial-map-rendering'
+    && new URLSearchParams(window.location.search).get('quality') === 'fixed');
 
   const resolveCapabilities = useCallback((): CommercialMapQualityCapabilitiesInput => ({
     devicePixelRatio: typeof window === 'undefined' ? 1 : window.devicePixelRatio,
@@ -93,6 +108,8 @@ export function CommercialMapAdaptiveQualityController({
     );
     if (nextDpr !== null && Math.abs(gl.getPixelRatio() - nextDpr) > 0.005) {
       setDpr(nextDpr);
+      const quality = gl.domElement?.dataset.commercialMapQuality;
+      if (quality) gl.domElement.dataset.commercialMapQuality = JSON.stringify({ ...JSON.parse(quality), effectiveDpr: nextDpr });
       // A demand canvas must present the resized drawing buffer even when
       // this is the last transition after OrbitControls has stopped moving.
       invalidate();
@@ -110,6 +127,10 @@ export function CommercialMapAdaptiveQualityController({
     const effectiveDpr = pixelRatioState.current.effectiveDpr;
 
     committedSceneTier.current = sceneTier;
+    if (gl.domElement) {
+      gl.domElement.dataset.commercialMapQuality = JSON.stringify({ logicalTier, sceneTier, baseDpr: pixelRatioState.current.baseDpr, effectiveDpr, hardwareCeiling, reason });
+      gl.domElement.dispatchEvent(new Event(COMMERCIAL_MAP_QUALITY_EVENT, { bubbles: true }));
+    }
     // Publish only to the scene-tier child. Canvas itself deliberately keeps
     // its initial DPR prop stable; mirroring DPR into parent React state would
     // call root.configure() and resize the drawing buffer a second time.
@@ -137,7 +158,7 @@ export function CommercialMapAdaptiveQualityController({
         reason,
       });
     }
-  }, [onQualityChange, reducedGraphics, syncPixelRatio]);
+  }, [gl, onQualityChange, reducedGraphics, syncPixelRatio]);
 
   const flushPendingQuality = useCallback((reason: string) => {
     cancelIdleCommit();
@@ -206,6 +227,10 @@ export function CommercialMapAdaptiveQualityController({
   // Viewport and hardware caps are safety limits, so they do not wait for a
   // performance window. Heavy GPU rebuilds still wait if a gesture is live.
   useLayoutEffect(() => {
+    cadenceCancel.current?.();
+    cadenceCancel.current = null;
+    displayCadence.current = null;
+    samplingSignature.current = '';
     const capabilities = resolveCapabilities();
     const decision = resolveCommercialMapAdaptiveQuality(qualityState.current, {
       ...capabilities,
@@ -222,17 +247,24 @@ export function CommercialMapAdaptiveQualityController({
 
   useEffect(() => {
     if (typeof document === 'undefined') return undefined;
-    const resetWindow = () => resetCommercialMapFrameTimeWindow(frameWindow.current);
+    const resetWindow = () => {
+      resetCommercialMapFrameTimeWindow(frameWindow.current);
+      samplingSignature.current = '';
+      cadenceCancel.current?.();
+      cadenceCancel.current = null;
+      displayCadence.current = null;
+    };
     document.addEventListener('visibilitychange', resetWindow);
     return () => document.removeEventListener('visibilitychange', resetWindow);
   }, []);
 
-  useEffect(() => () => cancelIdleCommit(), [cancelIdleCommit]);
+  useEffect(() => () => { cancelIdleCommit(); cadenceCancel.current?.(); }, [cancelIdleCommit]);
 
   useEffect(() => {
     return useCommercialMapStore.subscribe((state, previous) => {
       const wasBusy = isCommercialMapHeavyQualityGestureActive(previous);
       const isBusy = isCommercialMapHeavyQualityGestureActive(state);
+      if (wasBusy !== isBusy) samplingSignature.current = '';
       if (wasBusy !== isBusy) syncPixelRatio();
       if (isBusy) {
         cancelIdleCommit();
@@ -244,26 +276,46 @@ export function CommercialMapAdaptiveQualityController({
 
   useFrame((_frameState, deltaSeconds) => {
     const store = useCommercialMapStore.getState();
-    const continuousRendering = isCommercialMapHeavyQualityGestureActive(store);
+    const gestureActive = isCommercialMapHeavyQualityGestureActive(store);
+    const frame = activity.current;
+    const requested = frame.requested;
+    frame.requested = 0;
+    const ready = gl.domElement?.dataset.commercialMapHydration === 'complete'
+      && !gl.domElement.dataset.commercialMapPreparing;
+    const continuousRendering = gestureActive || requested !== 0;
+    // Calibrate RAF once in idle; do not request any extra WebGL draws.
+    if (active && ready && !continuousRendering && displayCadence.current === null && !cadenceCancel.current && document.visibilityState === 'visible') {
+      cadenceCancel.current = sampleCommercialMapDisplayCadence((cadence) => {
+        displayCadence.current = cadence;
+        // Retain the completed handle: retry only after a visibility/viewport boundary.
+      });
+    }
+    const signature = `${gestureActive ? 'gesture' : requested}:${frame.path}:${store.interiorEntityId ?? 'outside'}:${gl.getPixelRatio()}:${committedSceneTier.current}`;
     const samplingActive = isCommercialMapAdaptiveQualitySamplingActive({
-      mapActive: active,
+      mapActive: active && ready && !fixedQualityForComparison.current,
       reducedGraphics,
       documentVisibilityState: typeof document === 'undefined'
         ? 'unavailable'
         : document.visibilityState,
       continuousRendering,
     });
-    if (!samplingActive || pendingSceneTier.current !== null) {
+    if (!samplingActive || pendingSceneTier.current !== null || frame.frames === sampledPresentation.current) {
       // Samples still describe the previously committed scene while its new
       // tier is deferred. Do not repeatedly downgrade/upgrade that unchanged
       // workload before the first decision has actually reached the renderer.
       resetCommercialMapFrameTimeWindow(frameWindow.current);
-      if (continuousRendering) cancelIdleCommit();
+      samplingSignature.current = '';
+      if (gestureActive) cancelIdleCommit();
       else scheduleIdleCommit();
       return;
     }
-
-    cancelIdleCommit();
+    sampledPresentation.current = frame.frames;
+    if (signature !== samplingSignature.current) {
+      samplingSignature.current = signature;
+      resetCommercialMapFrameTimeWindow(frameWindow.current);
+      return; // First interval belongs partly to idle, loading or the previous path.
+    }
+    if (gestureActive) cancelIdleCommit();
     const completedWindow = recordCommercialMapAdaptiveFrame(
       frameWindow.current,
       deltaSeconds * 1000,
@@ -274,6 +326,9 @@ export function CommercialMapAdaptiveQualityController({
       ...resolveCapabilities(),
       averageFrameTimeMs: completedWindow.averageFrameTimeMs,
       sampledFrames: completedWindow.sampledFrames,
+      p95FrameTimeMs: completedWindow.p95FrameTimeMs,
+      displayCadenceMs: displayCadence.current,
+      recoveryEligible: !gestureActive,
       nowMs: typeof performance === 'undefined' ? Date.now() : performance.now(),
     });
     copyQualityState(qualityState.current, decision);

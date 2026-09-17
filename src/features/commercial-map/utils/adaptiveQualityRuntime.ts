@@ -6,7 +6,6 @@ import {
   type CommercialMapQualityTier,
 } from './viewport';
 
-export const COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS = 250;
 export const COMMERCIAL_MAP_INTERACTION_MIN_PIXEL_RATIO = 0.72;
 export const COMMERCIAL_MAP_INTERACTION_MAX_PIXEL_RATIO = 1;
 export const COMMERCIAL_MAP_INTERACTION_PIXEL_RATIO_SCALE = 0.72;
@@ -14,6 +13,7 @@ export const COMMERCIAL_MAP_INTERACTION_PIXEL_RATIO_SCALE = 0.72;
 // Wait for OrbitControls damping to finish, then require a meaningful idle
 // window so those allocations never land in the tail of the same gesture.
 export const COMMERCIAL_MAP_QUALITY_SCENE_COMMIT_IDLE_MS = 650;
+export const COMMERCIAL_MAP_QUALITY_EVENT = 'commercial-map-quality';
 
 export interface CommercialMapDeviceCapabilityHints {
   deviceMemoryGb?: number;
@@ -24,11 +24,13 @@ export interface CommercialMapFrameTimeWindow {
   elapsedMs: number;
   sampledFrames: number;
   completed: CommercialMapCompletedFrameTimeWindow;
+  durations: number[];
 }
 
 export interface CommercialMapCompletedFrameTimeWindow {
   averageFrameTimeMs: number;
   sampledFrames: number;
+  p95FrameTimeMs: number;
 }
 
 export function readCommercialMapDeviceCapabilityHints(): CommercialMapDeviceCapabilityHints {
@@ -44,36 +46,40 @@ export function createCommercialMapFrameTimeWindow(): CommercialMapFrameTimeWind
   return {
     elapsedMs: 0,
     sampledFrames: 0,
-    completed: { averageFrameTimeMs: 0, sampledFrames: 0 },
+    completed: { averageFrameTimeMs: 0, sampledFrames: 0, p95FrameTimeMs: 0 },
+    durations: [],
   };
 }
 
 export function resetCommercialMapFrameTimeWindow(window: CommercialMapFrameTimeWindow) {
   window.elapsedMs = 0;
   window.sampledFrames = 0;
+  window.durations.length = 0;
 }
 
 /**
- * Mutates one reusable accumulator and returns its completed slot. Long gaps
- * belong to demand-idle time, not GPU frame cost.
+ * The caller owns activity/visibility boundaries and skips the first delta.
+ * Duration alone cannot distinguish an active stall from demand-idle time.
  */
 export function recordCommercialMapAdaptiveFrame(
   window: CommercialMapFrameTimeWindow,
   deltaMs: number,
 ): CommercialMapCompletedFrameTimeWindow | null {
   if (!Number.isFinite(deltaMs)
-    || deltaMs <= 0
-    || deltaMs > COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS) {
+    || deltaMs <= 0) {
     resetCommercialMapFrameTimeWindow(window);
     return null;
   }
 
   window.elapsedMs += deltaMs;
   window.sampledFrames += 1;
+  window.durations.push(deltaMs);
   if (window.sampledFrames < COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES) return null;
 
   window.completed.averageFrameTimeMs = window.elapsedMs / window.sampledFrames;
   window.completed.sampledFrames = window.sampledFrames;
+  window.durations.sort((a, b) => a - b);
+  window.completed.p95FrameTimeMs = window.durations[Math.ceil(window.durations.length * 0.95) - 1];
   resetCommercialMapFrameTimeWindow(window);
   return window.completed;
 }

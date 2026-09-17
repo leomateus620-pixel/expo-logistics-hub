@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CommercialMapBootLoader } from './CommercialMapBootLoader';
+import { COMMERCIAL_MAP_QUALITY_EVENT } from '../utils/adaptiveQualityRuntime';
 import {
   COMMERCIAL_MAP_RENDER_HEALTH_EVENT,
   COMMERCIAL_MAP_PREPARING_EVENT,
@@ -25,25 +26,36 @@ function currentMapCanvas(): HTMLCanvasElement | null {
 /** A passive notice: never overlays an input-capturing surface over the map. */
 export function CommercialMapRendererStatus() {
   const [status, setStatus] = useState<RenderHealthStatus>('ready');
+  const [compatibility, setCompatibility] = useState(false);
 
   useEffect(() => {
     const updateStatus = () => {
       const health = readCommercialMapRenderHealth(currentMapCanvas());
       setStatus(health?.status ?? 'ready');
+      const quality = currentMapCanvas()?.dataset.commercialMapQuality;
+      const tier = quality ? (JSON.parse(quality) as { sceneTier?: string }).sceneTier : undefined;
+      setCompatibility(tier === 'LOW' || tier === 'MEDIUM');
     };
     const onHealth = (event: Event) => {
       if (event.target === currentMapCanvas()) updateStatus();
     };
     window.addEventListener(COMMERCIAL_MAP_RENDER_HEALTH_EVENT, onHealth);
     window.addEventListener(COMMERCIAL_MAP_PREPARING_EVENT, onHealth);
+    window.addEventListener(COMMERCIAL_MAP_QUALITY_EVENT, onHealth);
     updateStatus();
     return () => {
       window.removeEventListener(COMMERCIAL_MAP_RENDER_HEALTH_EVENT, onHealth);
       window.removeEventListener(COMMERCIAL_MAP_PREPARING_EVENT, onHealth);
+      window.removeEventListener(COMMERCIAL_MAP_QUALITY_EVENT, onHealth);
     };
   }, []);
 
-  if (status === 'ready') return <CommercialMapBootLoader />;
+  if (status === 'ready') return <>
+    <CommercialMapBootLoader />
+    {compatibility && <div className="commercial-map-renderer-status" role="status">
+      Perfil de compatibilidade ativo: resolução e efeitos reduzidos.
+    </div>}
+  </>;
 
   const retry = () => {
     const canvas = currentMapCanvas();

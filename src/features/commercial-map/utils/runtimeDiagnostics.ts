@@ -31,9 +31,12 @@ export interface CommercialMapRuntimeSummary {
   sampledFrames: number;
   averageFrameTimeMs: number | null;
   p95FrameTimeMs: number | null;
+  p50FrameTimeMs: number | null;
   p99FrameTimeMs: number | null;
   averageFps: number | null;
-  onePercentLowFps: number | null;
+  inverseP99FpsApproximation: number | null;
+  stallsOver250Ms: number;
+  stallDurationMs: number;
   jankFrames: number;
   longTasks: number;
   reactCommits: number;
@@ -112,9 +115,12 @@ export function summarizeCommercialMapRuntimeDiagnostics(
     sampledFrames: durations.length,
     averageFrameTimeMs: fixedOrNull(average),
     p95FrameTimeMs: fixedOrNull(p95),
+    p50FrameTimeMs: fixedOrNull(percentile(durations, 0.5)),
     p99FrameTimeMs: fixedOrNull(p99),
     averageFps: fixedOrNull(average && average > 0 ? 1000 / average : null, 1),
-    onePercentLowFps: fixedOrNull(p99 && p99 > 0 ? 1000 / p99 : null, 1),
+    inverseP99FpsApproximation: fixedOrNull(p99 && p99 > 0 ? 1000 / p99 : null, 1),
+    stallsOver250Ms: durations.filter((duration) => duration > 250).length,
+    stallDurationMs: durations.filter((duration) => duration > 250).reduce((sum, duration) => sum + duration, 0),
     jankFrames: durations.filter((duration) => duration > 20).length,
     longTasks: diagnostics?.longTasks.length ?? 0,
     reactCommits: diagnostics?.reactCommits.length ?? 0,
