@@ -33,13 +33,13 @@ describe('conexão coberta entre Mirante e escadaria da Arena', () => {
     const overlapWithStairsOnZ = Math.min(access.maxZ, stairs.maxZ)
       - Math.max(access.minZ, stairs.minZ);
 
-    expect(access.minZ).toBeGreaterThan(mirante.maxZ);
+    expect(access.minZ).toBeGreaterThanOrEqual(mirante.maxZ);
     expect(overlapWithMiranteOnX).toBeGreaterThan(0);
     expect(access.maxX).toBeLessThan(stairs.minX);
     expect(overlapWithStairsOnZ).toBeGreaterThan(0);
     expect(ARENA_FRONT_LAYOUT.accessCanopy.longAxis).toBe('z');
     expect(ARENA_FRONT_LAYOUT.accessCanopy.arenaSide).toBe('east');
-    expect(ARENA_FRONT_LAYOUT.accessCanopy.sideWallEnd).toBe('south');
+    expect(ARENA_FRONT_LAYOUT.accessCanopy.sideWallEnd).toBe('north');
   });
 
   it('forma dez V estruturais repetidos nas duas faces e apoia todos na plataforma', () => {
@@ -73,6 +73,11 @@ describe('conexão coberta entre Mirante e escadaria da Arena', () => {
 
     expect(layout.segments.some((segment) => segment.role === 'ROOF_TRUSS')).toBe(true);
     expect(layout.segments.some((segment) => segment.role === 'LONGITUDINAL_TRUSS')).toBe(true);
+    expect(layout.sideWall.end).toBe('north');
+    expect(layout.platform.thickness).toBeLessThan(0.05);
+    expect(layout.roof.eaveY - layout.platform.topY).toBeLessThan(0.45);
+    expect(layout.boxes.some((box) => box.role === 'SIDE_WALL' && box.position[2] < 0)).toBe(true);
+    expect(layout.segments.some((segment) => segment.role === 'BIKE_RACK')).toBe(true);
   });
 
   it('permanece apresentação não comercial, não selecionável e sem entidade duplicada', () => {

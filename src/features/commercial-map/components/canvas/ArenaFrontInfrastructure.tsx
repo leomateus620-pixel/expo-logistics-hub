@@ -21,6 +21,7 @@ import { applyParkSurfaceDetail, bindParkSurfaceMaterial } from './parkSurfaceMa
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { integrateGroundGeometryWithRearRoads } from '../../utils/rearRoadGroundIntegration';
 import { ArenaAccessStructure } from './ArenaAccessStructure';
+import { MiranteComplexGrounds } from './MiranteComplexGrounds';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_Y = new THREE.Vector3(0, 1, 0);
@@ -1167,6 +1168,14 @@ export const ArenaFrontInfrastructure = memo(function ArenaFrontInfrastructure({
     <group name="infraestrutura-publica-frente-arena" userData={INFRASTRUCTURE_USER_DATA}>
       {showArenaStructures && (
         <ArenaStructures reducedGraphics={reducedGraphics} opacity={arenaStructuresOpacity} />
+      )}
+      {(showArenaStructures || showArenaAccess) && (
+        <MiranteComplexGrounds
+          opacity={Math.max(
+            showArenaStructures ? arenaStructuresOpacity : 0,
+            showArenaAccess ? arenaAccessOpacity : 0,
+          )}
+        />
       )}
       {showArenaAccess && (
         <ArenaAccessStructure reducedGraphics={reducedGraphics} opacity={arenaAccessOpacity} />

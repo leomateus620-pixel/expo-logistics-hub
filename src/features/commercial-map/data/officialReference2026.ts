@@ -1,6 +1,7 @@
 import { ARENA_ROAD_CORRECTION } from './arenaRoadCorrection';
 import { SOY_RESTROOM, SOY_ROAD_CONNECTION, GATE_NINE_TANKS } from './soyGateInfrastructure';
 import { reconstructFenasojaEntity } from './fenasojaComplexReconstruction';
+import { reconstructMiranteComplexEntity } from './miranteComplexReconstruction';
 import {
   DEFAULT_REFERENCE_LAYERS,
   MAP_REFERENCE_HEIGHT,
@@ -1076,7 +1077,7 @@ export function isNonPermanentRemovedIdentifier(publicIdentifier: string) {
 export const OFFICIAL_REFERENCE_ENTITIES = [
   ...officialBaseEntities,
   ...pavilionModuleEntities,
-].map(reconstructFenasojaEntity).map(withCommercialMapSegmentMetadata);
+].map(reconstructFenasojaEntity).map(reconstructMiranteComplexEntity).map(withCommercialMapSegmentMetadata);
 
 export const OFFICIAL_RENDERED_ENTITIES = OFFICIAL_REFERENCE_ENTITIES.filter((entity) => (
   !nonPermanentRemovedIdentifiers.has(entity.publicIdentifier)

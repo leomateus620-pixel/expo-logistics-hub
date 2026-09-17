@@ -119,8 +119,8 @@ function sourceBoundsOverlapPolygon(bounds: SourceBounds, polygon: readonly Sour
 
 describe('infraestrutura ambiental do parque', () => {
   it('mantém inventário ambiental versionado, explícito e fora das métricas comerciais', () => {
-    expect(PARK_ENVIRONMENT_REVISION).toBe('2026.9-arena-north-apron-concrete.1');
-    expect(PARK_ENVIRONMENT_FEATURES).toHaveLength(9);
+    expect(PARK_ENVIRONMENT_REVISION).toBe('2026.9-mirante-complex-satellite.1');
+    expect(PARK_ENVIRONMENT_FEATURES).toHaveLength(11);
     expect(new Set(PARK_ENVIRONMENT_FEATURES.map((feature) => feature.id)).size)
       .toBe(PARK_ENVIRONMENT_FEATURES.length);
     expect(new Set(PARK_ENVIRONMENT_FEATURES.map((feature) => feature.classification))).toEqual(new Set([
@@ -160,7 +160,7 @@ describe('infraestrutura ambiental do parque', () => {
       highEdge: 'west',
       lowEdge: 'east',
     });
-    expect(stairs[0]).toBeGreaterThan(4100); // fora de D3
+    expect(stairs[0]).toBeGreaterThan(4072); // leste do D3 reconstruído
     expect(stairs[2]).toBeLessThan(4900); // fora do footprint F
     expect(stairs[3]).toBeLessThan(3106); // termina antes da Rua Brasil
     expect(multiSport[3]).toBeLessThan(2682); // quadras ficam ao norte da praça
@@ -190,7 +190,7 @@ describe('infraestrutura ambiental do parque', () => {
     ] as const).forEach((point) => {
       expect(pointInPolygon(point, ARENA_FRONT_LAYOUT.plaza.sourcePolygon), point.join(',')).toBe(true);
     });
-    expect(ARENA_FRONT_LAYOUT.plaza.sourcePolygon.every(([x]) => x >= 4116)).toBe(true);
+    expect(ARENA_FRONT_LAYOUT.plaza.sourcePolygon.every(([x]) => x >= 4092)).toBe(true);
     expect(pointInPolygon([4052, 2750], ARENA_FRONT_LAYOUT.plaza.sourcePolygon)).toBe(false);
     expect(ARENA_FRONT_LAYOUT.walkways.some((walkway) => (
       walkway.sourcePath.some(([x, z]) => (
@@ -316,6 +316,9 @@ describe('infraestrutura ambiental do parque', () => {
     expect(renderer).toContain('redes-volei-arena');
     expect(renderer).toContain('tabelas-basquete-arena');
     expect(renderer).toContain('praca-pavimentada-arena');
+    expect(renderer).toContain('<MiranteComplexGrounds');
+    expect(source('src/features/commercial-map/components/canvas/MiranteComplexGrounds.tsx'))
+      .toContain('piso-tatil-conjunto-mirante');
     expect(renderer).toContain('piso-concreto-liso-exporural-c4');
     expect(renderer).toContain('createWorldTiledHorizontalPolygonGeometry');
     expect(renderer).toContain('EXPORURAL_SMOOTH_CONCRETE_CORRECTION');
