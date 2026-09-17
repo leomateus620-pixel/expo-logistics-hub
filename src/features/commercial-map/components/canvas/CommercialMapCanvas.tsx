@@ -25,6 +25,8 @@ import { Html, OrbitControls, useTexture } from '@react-three/drei';
 import { CommercialMapSceneShaderWarmup } from './CommercialMapSceneShaderWarmup';
 import { readPreparedHeadquartersGeometry } from './headquarters/headquartersPreparationResource';
 import { CommercialMapInteractiveBoot, DeferredSceneLayer } from './DeferredSceneLayer';
+import { EssentialSceneLayer } from './EssentialSceneLayer';
+import { commercialMapNavigationExtent } from '../../data/commercialMapSpatialBounds';
 import { preloadBumperPhysics } from '../../utils/preloadBumperPhysics';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
@@ -198,7 +200,6 @@ import {
   rearRoadFocusBoundsForOfficialOwner,
 } from '../../data/rearParkRoadNetwork';
 import { rearRoadTerrainElevationAt } from '../../utils/rearRoadNetwork';
-import { expandFramingBoundsWithRegionalHighways } from '../../data/regional-highways';
 import {
   ParkAccessInfrastructure,
   type ParkAccessInfrastructureScope,
@@ -1998,8 +1999,8 @@ function CameraRig({
   const lunarCameraLocked = lunarLaunchPhase !== 'idle' || lunarLaunchReturning;
   const lunarCameraLockedRef = useRef(lunarCameraLocked);
   lunarCameraLockedRef.current = lunarCameraLocked;
-  const regionalExtent = useMemo(
-    () => expandFramingBoundsWithRegionalHighways(extent),
+  const navigationExtent = useMemo(
+    () => commercialMapNavigationExtent(extent),
     [extent],
   );
   const parkCameraDistanceBounds = useMemo(
@@ -2013,7 +2014,7 @@ function CameraRig({
   const cameraDistanceBounds = useMemo(
     () => {
       const regional = resolveCommercialMapCameraDistanceBounds({
-        bounds: regionalExtent,
+        bounds: navigationExtent,
         verticalFovDegrees: 38,
         aspect: size.width / Math.max(size.height, 1),
       });
@@ -2022,11 +2023,11 @@ function CameraRig({
         maxDistance: Math.max(parkCameraDistanceBounds.maxDistance, regional.maxDistance),
       };
     },
-    [parkCameraDistanceBounds, regionalExtent, size.height, size.width],
+    [parkCameraDistanceBounds, navigationExtent, size.height, size.width],
   );
   const cameraFarPlane = useMemo(
-    () => resolveCommercialMapCameraFarPlane(regionalExtent, cameraDistanceBounds.maxDistance),
-    [cameraDistanceBounds.maxDistance, regionalExtent],
+    () => resolveCommercialMapCameraFarPlane(navigationExtent, cameraDistanceBounds.maxDistance),
+    [cameraDistanceBounds.maxDistance, navigationExtent],
   );
   const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
   const lactalisSelected = !interiorEntity && selectedKind === 'lactalis-cultural-stage';
@@ -2237,7 +2238,7 @@ function CameraRig({
       : miranteExtent ?? segmentExtent ?? extent;
     const panExtent = parkingActive || isolatedArea || miranteExtent || segmentExtent
       ? framingExtent
-      : regionalExtent;
+      : navigationExtent;
     const snapExtent = framingExtent;
     const margin = isolatedArea
       ? Math.max(1.6, framingExtent.diagonal * 0.035)
@@ -2256,22 +2257,22 @@ function CameraRig({
       Math.hypot(snapExtent.width, snapExtent.depth) * 0.018,
     );
     const minimumX = THREE.MathUtils.lerp(
-      panExtent.minX - margin,
+      panExtent.minX - (panExtent === navigationExtent ? 0 : margin),
       snapExtent.centerX - targetSlack,
       boundaryProgress,
     );
     const maximumX = THREE.MathUtils.lerp(
-      panExtent.maxX + margin,
+      panExtent.maxX + (panExtent === navigationExtent ? 0 : margin),
       snapExtent.centerX + targetSlack,
       boundaryProgress,
     );
     const minimumZ = THREE.MathUtils.lerp(
-      panExtent.minZ - margin,
+      panExtent.minZ - (panExtent === navigationExtent ? 0 : margin),
       snapExtent.centerZ - targetSlack,
       boundaryProgress,
     );
     const maximumZ = THREE.MathUtils.lerp(
-      panExtent.maxZ + margin,
+      panExtent.maxZ + (panExtent === navigationExtent ? 0 : margin),
       snapExtent.centerZ + targetSlack,
       boundaryProgress,
     );
@@ -2299,7 +2300,7 @@ function CameraRig({
     miranteSelected,
     parkingActive,
     parkingFramingExtent,
-    regionalExtent,
+    navigationExtent,
     segmentExtent,
   ]);
   const clampQueuedCameraPose = useCallback((
@@ -2387,6 +2388,7 @@ function CameraRig({
       desiredMinDistance: Number(effectiveControlsMinimumDistance.toFixed(4)),
       desiredMaxDistance: Number(effectiveControlsMaximumDistance.toFixed(4)),
       calculatedMaxDistance: Number(cameraDistanceBounds.maxDistance.toFixed(4)),
+      navigationBounds: navigationExtent,
       boundingSphereRadius: Number(cameraDistanceBounds.boundingSphereRadius.toFixed(4)),
       viewport: {
         width: size.width,
@@ -2405,6 +2407,7 @@ function CameraRig({
     effectiveControlsMinimumDistance,
     gl,
     interiorEntity,
+    navigationExtent,
     size.height,
     size.width,
   ]);
@@ -4798,7 +4801,7 @@ const Scene = memo(function Scene({
         reducedGraphics={reducedGraphics}
       />
       {(!isolatedArea || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry) && (
-        <DeferredSceneLayer id="site-context" priority={25}>
+        <EssentialSceneLayer id="site-context">
         <group visible={!hydrologicalModeActive}>
           <CommercialSiteEnvironmentLayer
             entities={siteEnvironmentEntities}
@@ -4812,34 +4815,34 @@ const Scene = memo(function Scene({
             vegetationVisible={treesVisible}
           />
         </group>
-        </DeferredSceneLayer>
+        </EssentialSceneLayer>
       )}
       {!isolatedArea && (
-        <DeferredSceneLayer id="quadras-context" priority={35}>
+        <EssentialSceneLayer id="quadras-context">
         <group visible={!hydrologicalModeActive}>
           <QuadrasABEnvironmentLayer
             entities={siteEnvironmentEntities}
             reducedGraphics={reducedGraphics}
           />
         </group>
-        </DeferredSceneLayer>
+        </EssentialSceneLayer>
       )}
       {!isolatedArea && (
         <group visible={!hydrologicalModeActive}>
-          <DeferredSceneLayer id="rear-environment" priority={60}>
+          <EssentialSceneLayer id="rear-environment">
           <RearParkEnvironmentLayer
             reducedGraphics={reducedGraphics}
             vegetationVisible={treesVisible}
           />
-          </DeferredSceneLayer>
+          </EssentialSceneLayer>
           {!salesPresentationActive && (
-            <DeferredSceneLayer id="residential-district" priority={110}>
+            <EssentialSceneLayer id="residential-district">
             <NightAwareResidentialDistrict
               reducedGraphics={reducedGraphics}
               vegetationVisible={treesVisible}
               nightMode={nightAtmosphereActive}
             />
-            </DeferredSceneLayer>
+            </EssentialSceneLayer>
           )}
           {/* Rear approaches and external roads share one polygon union. */}
           <RegionalHighwayNetwork
@@ -4856,25 +4859,25 @@ const Scene = memo(function Scene({
         </group>
       )}
       {rearParkingAvailable && (
-        <DeferredSceneLayer id="parking-context" priority={30}>
+        <EssentialSceneLayer id="parking-context">
         <RearParkingLayer
           active={rearParkingEnabled}
           reducedGraphics={reducedGraphics}
           labelsVisible={labelsVisible}
           opacity={parkingPresentation.opacity}
         />
-        </DeferredSceneLayer>
+        </EssentialSceneLayer>
       )}
       {parkAccessScope && (
         <group visible={!hydrologicalModeActive}>
           {parkAccessScope === 'all' && (
-            <DeferredSceneLayer id="access-environment" priority={45}>
+            <EssentialSceneLayer id="access-environment">
             <ParkAccessEnvironmentLayer
               reducedGraphics={reducedGraphics}
               surfacesVisible
               vegetationVisible={treesVisible}
             />
-            </DeferredSceneLayer>
+            </EssentialSceneLayer>
           )}
           <ParkAccessInfrastructure
             reducedGraphics={reducedGraphics}
@@ -4928,28 +4931,28 @@ const Scene = memo(function Scene({
         />
         );
         const kind = resolveStrategicLandmarkKind(entity);
-        // These exact authored landmarks are decorative context; keep their
+        // These authored landmarks are essential park content; keep their
         // EntityMesh identity and picking props intact after one-time admission.
         // Lunar memorial retains its zero-intensity engine light in Stage 1:
         // late insertion would change every lit shader's global light count.
         if (kind === 'amusement-park') {
           return salesPresentationActive
             ? null
-            : <DeferredSceneLayer key={entity.id} id={`landmark:${entity.id}`} priority={95}>{mesh}</DeferredSceneLayer>;
+            : <EssentialSceneLayer key={entity.id} id={`landmark:${entity.id}`}>{mesh}</EssentialSceneLayer>;
         }
         return mesh;
       })}
-      <DeferredSceneLayer id="nations-context" priority={40}>
+      <EssentialSceneLayer id="nations-context">
       <NationsDistrict
         visible={nationsDistrictPresentation.visible && !salesPresentationActive}
         opacity={nationsDistrictPresentation.opacity}
         reducedGraphics={reducedGraphics}
       />
-      </DeferredSceneLayer>
+      </EssentialSceneLayer>
       {(arenaFrontInfrastructurePresentation.arenaStructures.visible
         || arenaFrontInfrastructurePresentation.arenaAccess.visible
         || arenaFrontInfrastructurePresentation.courts.visible) && (
-        <DeferredSceneLayer id="arena-context" priority={42}>
+        <EssentialSceneLayer id="arena-context">
         <ArenaFrontInfrastructure
           reducedGraphics={reducedGraphics}
           showArenaStructures={arenaFrontInfrastructurePresentation.arenaStructures.visible}
@@ -4959,9 +4962,9 @@ const Scene = memo(function Scene({
           arenaAccessOpacity={arenaFrontInfrastructurePresentation.arenaAccess.opacity}
           courtsOpacity={arenaFrontInfrastructurePresentation.courts.opacity}
         />
-        </DeferredSceneLayer>
+        </EssentialSceneLayer>
       )}
-      <DeferredSceneLayer id="vegetation" priority={90}>
+      <EssentialSceneLayer id="vegetation">
       <CommercialTreeLayer
         trees={presentedSceneTrees}
         surfaceEntities={treeSurfaceEntities}
@@ -4969,8 +4972,8 @@ const Scene = memo(function Scene({
         reducedGraphics={reducedGraphics}
         qualityTier={renderQualityTier}
       />
-      </DeferredSceneLayer>
-      <DeferredSceneLayer id="electrical-detail" priority={50}>
+      </EssentialSceneLayer>
+      <EssentialSceneLayer id="electrical-detail">
       <CommercialElectricalInfrastructureLayer
         nodes={sceneElectricalInfrastructure.nodes}
         connections={sceneElectricalInfrastructure.connections}
@@ -4979,7 +4982,7 @@ const Scene = memo(function Scene({
         visible={electricalNetworkVisible}
         reducedGraphics={reducedGraphics}
       />
-      </DeferredSceneLayer>
+      </EssentialSceneLayer>
       <NightLightingLayer
         nodes={sceneElectricalInfrastructure.nodes}
         connections={sceneElectricalInfrastructure.connections}

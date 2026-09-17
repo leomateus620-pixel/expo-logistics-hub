@@ -1,0 +1,49 @@
+name: Commercial Map spatial contracts
+on:
+  pull_request:
+    paths:
+      - 'src/features/commercial-map/**'
+      - 'src/test/commercialMap*'
+      - 'scripts/spatial-cleanup/**'
+      - 'docs/validation/spatial-cleanup/**'
+      - '.github/workflows/commercial-map-spatial.yml'
+permissions:
+  contents: read
+jobs:
+  spatial:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      VITE_SUPABASE_URL: https://qa.invalid
+      VITE_SUPABASE_PUBLISHABLE_KEY: qa-placeholder
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: oven-sh/setup-bun@v2
+        with: {bun-version: '1.3.0'}
+      - run: bun install --frozen-lockfile
+      - name: Reproducible offline catalog
+        run: node scripts/spatial-cleanup/generate.cjs --check
+      - name: Spatial, presentation, camera and resource contracts
+        run: >-
+          npx vitest run --maxWorkers=2 --testTimeout=60000
+          src/test/commercialMapSpatialBounds.test.ts
+          src/test/commercialMapTerritorialReconstruction.test.ts
+          src/test/commercialMapExteriorArchitecture.test.ts
+          src/test/commercialMapExteriorPreservation.test.ts
+          src/test/commercialMapExteriorResources.test.ts
+          src/test/commercialMapBootLoader.test.tsx
+          src/test/commercialMapProgressiveBoot.test.ts
+          src/test/commercialMapRendererHealth.test.tsx
+          src/test/commercialMapSceneShaderWarmup.test.ts
+          src/test/commercialMapDeferredResources.test.tsx
+          src/test/commercialMapRearParkResourcePersistence.test.ts
+          src/test/commercialMapRearRoadGround.test.ts
+          src/test/commercialMapRearRoadTreeClearance.test.ts
+          src/test/commercialMapCameraTransition.test.ts
+          src/test/commercialMapViewport.test.ts
+      - run: npm run typecheck
+      - run: npm run build -- --manifest
+      - run: node scripts/commercial-map-performance/bundle-report.cjs dist --assert-independent

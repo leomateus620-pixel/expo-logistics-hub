@@ -62,7 +62,7 @@ import {
   resolveTerrainMultiscaleQualityOptions,
 } from './terrainMaterial';
 import { TerritorialEnvironment } from './TerritorialEnvironment';
-import { DeferredSceneLayer } from './DeferredSceneLayer';
+import { EssentialSceneLayer } from './EssentialSceneLayer';
 
 interface CommercialMapEnvironmentProps {
   active?: boolean;
@@ -1678,9 +1678,9 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
         <primitive object={activeGroundMaterial} attach="material" />
       </mesh>
       <group visible={mode === 'normal'}>
-        <DeferredSceneLayer id="territorial-context" priority={100}>
+        <EssentialSceneLayer id="territorial-context">
           <TerritorialEnvironment reducedGraphics={qualityTier !== 'full'} />
-        </DeferredSceneLayer>
+        </EssentialSceneLayer>
       </group>
       </group>
       {/* The persistent composer remains allocated, but native MSAA renders

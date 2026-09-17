@@ -4,12 +4,23 @@ import { act, cleanup, fireEvent, render, renderHook, screen } from '@testing-li
 import { useCommercialMapBootVisit } from '@/features/commercial-map/hooks/useCommercialMapBootVisit';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CommercialMapBootLoader, commercialMapBootProgress } from '@/features/commercial-map/components/CommercialMapBootLoader';
-import { beginCommercialMapBoot, getCommercialMapBootSnapshot, markCommercialMapStage, measureCommercialMapStage, summarizeCommercialMapBoot } from '@/features/commercial-map/utils/performanceDiagnostics';
+import { beginCommercialMapBoot, getCommercialMapBootSnapshot, markCommercialMapStage, measureCommercialMapStage, summarizeCommercialMapBoot, resetCommercialMapReady } from '@/features/commercial-map/utils/performanceDiagnostics';
 
 beforeEach(() => beginCommercialMapBoot());
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 describe('Commercial Map real readiness loader', () => {
+  it('requires a new ready event after context loss, even when the route already presented once', async () => {
+    render(<CommercialMapBootLoader />);
+    await act(async () => markCommercialMapStage('commercial-map-ready'));
+    expect(screen.queryByRole('progressbar')).toBeNull();
+    await act(async () => resetCommercialMapReady());
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    await act(async () => markCommercialMapStage('essential-scene:failed', undefined, true));
+    expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument();
+    await act(async () => { resetCommercialMapReady(); markCommercialMapStage('commercial-map-ready'); });
+    expect(screen.queryByRole('progressbar')).toBeNull();
+  });
   it('preserves a new factory session but resets a cached page remount before children and data marks', async () => {
     markCommercialMapStage('module-ready');
     const firstModuleAt = getCommercialMapBootSnapshot().marks['module-requested'];
@@ -66,8 +77,12 @@ describe('Commercial Map real readiness loader', () => {
       markCommercialMapStage('critical-scene:end');
       markCommercialMapStage('first-draw');
     });
-    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '85');
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '55');
     await act(async () => markCommercialMapStage('first-interactive'));
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    await act(async () => markCommercialMapStage('essential-scene:prepared'));
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '85');
+    await act(async () => markCommercialMapStage('commercial-map-ready'));
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
@@ -92,6 +107,7 @@ describe('Commercial Map real readiness loader', () => {
     await act(async () => markCommercialMapStage('first-interactive'));
     beginCommercialMapBoot();
     expect(getCommercialMapBootSnapshot().interactive).toBe(false);
+    expect(getCommercialMapBootSnapshot().commercialMapReady).toBe(false);
     expect(getCommercialMapBootSnapshot().marks['first-draw']).toBeUndefined();
   });
 });

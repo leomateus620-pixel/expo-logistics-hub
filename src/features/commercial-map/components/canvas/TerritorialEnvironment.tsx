@@ -255,8 +255,8 @@ function buildTerritorialScene() {
     if (p.kind !== "water") geometry = finishExteriorPatch(geometry, p);
     (p.kind === "water" ? water : grounds).push(geometry);
   });
-  const ground = mergeGeometries(grounds),
-    ponds = mergeGeometries(water);
+  const ground = grounds.length ? mergeGeometries(grounds) : null,
+    ponds = water.length ? mergeGeometries(water) : null;
   grounds.forEach((g) => g.dispose());
   water.forEach((g) => g.dispose());
   return {
@@ -269,8 +269,8 @@ function buildTerritorialScene() {
       Object.values(geometries).forEach((g) => g.dispose());
       material.dispose();
       yardMaterial.dispose();
-      ground.dispose();
-      ponds.dispose();
+      ground?.dispose();
+      ponds?.dispose();
     },
   };
 }
@@ -290,10 +290,10 @@ export const TerritorialEnvironment = memo(function TerritorialEnvironment({
   const fishing = useMemo(buildExteriorFishingScene, []);
   const groundMaterial = useMemo(() => createExteriorGroundMaterial(), []);
   const water = useMemo(
-    () =>
-      createExteriorWaterMaterial(
-        TERRITORY_PATCHES.filter((p) => p.kind === "water"),
-      ),
+    () => {
+      const ponds = TERRITORY_PATCHES.filter((p) => p.kind === "water");
+      return ponds.length ? createExteriorWaterMaterial(ponds) : null;
+    },
     [],
   );
   const plan = useMemo(buildTerritorialScene, []);
@@ -303,7 +303,7 @@ export const TerritorialEnvironment = memo(function TerritorialEnvironment({
       architecture.dispose();
       fishing.dispose();
       groundMaterial.dispose();
-      water.material.dispose();
+      water?.material.dispose();
     },
     [architecture, fishing, groundMaterial, water],
   );
@@ -317,7 +317,7 @@ export const TerritorialEnvironment = memo(function TerritorialEnvironment({
         buildings: TERRITORY_BUILDINGS.length,
         trees: TERRITORY_TREES.length,
         used: architecture.group.userData.modelsUsed,
-        groundTriangles: plan.ground.getAttribute("position").count / 3,
+        groundTriangles: (plan.ground?.getAttribute("position")?.count ?? 0) / 3,
         architectures: architecture.meshes
           .filter((m) => !m.userData.exteriorTrees)
           .reduce(
@@ -343,7 +343,7 @@ export const TerritorialEnvironment = memo(function TerritorialEnvironment({
       });
     }
     // Demand-rendered ripples share the existing frame; no perpetual invalidation.
-    water.time.value = clock.elapsedTime;
+    if (water) water.time.value = clock.elapsedTime;
     updateExteriorLod(
       architecture.meshes,
       camera,
@@ -376,17 +376,17 @@ export const TerritorialEnvironment = memo(function TerritorialEnvironment({
       <primitive object={plan.group} />
       <primitive object={architecture.group} />
       <primitive object={fishing.group} />
-      <mesh
+      {plan.ground && <mesh
         geometry={plan.ground}
         raycast={NO_RAYCAST}
         receiveShadow
         dispose={null}
       >
         <primitive object={groundMaterial} attach="material" />
-      </mesh>
-      <mesh geometry={plan.ponds} raycast={NO_RAYCAST} dispose={null}>
+      </mesh>}
+      {plan.ponds && water && <mesh geometry={plan.ponds} raycast={NO_RAYCAST} dispose={null}>
         <primitive object={water.material} attach="material" />
-      </mesh>
+      </mesh>}
     </group>
   );
 });

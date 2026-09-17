@@ -13,6 +13,7 @@ import { resolveRearRoadOwnerAtLocalPoint } from '../features/commercial-map/uti
 import { buildRoadBoundaryRuns } from '../features/commercial-map/utils/roadInfrastructure';
 import { rearParkingEntityForPresentation } from '../features/commercial-map/data/rearParking';
 import { GATE5_ACCESS_NODES } from '../features/commercial-map/data/territorialRoads';
+import { isProtectedCommercialMapRoad } from '../features/commercial-map/data/commercialMapSpatialBounds';
 
 const baseline = JSON.parse(readFileSync('docs/validation/road-precision/before-geometry.json', 'utf8'));
 const entity = (id: string) => OFFICIAL_REFERENCE_DATA.entities.find(e => e.publicIdentifier === id)!;
@@ -27,10 +28,10 @@ describe('September 13 precision road correction', () => {
     }
   });
 
-  it('keeps all external road definitions and every carriageway width unchanged', () => {
+  it('keeps protected external axes and every retained carriageway width unchanged', () => {
     const repaired = ['osm-569781512-0', 'osm-951983188-0', 'arena-br472-access'];
-    expect(UNIFIED_TERRITORY_ROADS.filter(r => r.evidence !== 'project-continuation' && !repaired.includes(r.id)))
-      .toEqual(baseline.territory.filter((r: {evidence:string;id:string}) => r.evidence !== 'project-continuation' && !repaired.includes(r.id)));
+    expect(UNIFIED_TERRITORY_ROADS.filter(r => isProtectedCommercialMapRoad(r) && r.evidence !== 'project-continuation' && !repaired.includes(r.id)))
+      .toEqual(baseline.territory.filter((r: {evidence:string;id:string}) => isProtectedCommercialMapRoad(r) && r.evidence !== 'project-continuation' && !repaired.includes(r.id)));
     for (const road of UNIFIED_TERRITORY_ROADS) {
       const previous = baseline.territory.find((r: {id:string})=>r.id===road.id);
       if (previous) {expect(road.width,road.id).toBe(previous.width);expect(road.shoulder,road.id).toBe(previous.shoulder);}

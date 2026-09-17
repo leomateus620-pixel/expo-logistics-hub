@@ -8,6 +8,7 @@ import {
 import { buildRearRoadCorridorFootprints, distanceToPath } from '../utils/rearRoadNetwork';
 import { REAR_SATELLITE_TOPOLOGY } from '../utils/rearSpatialCalibration';
 import { territoryRoadClearance } from '../utils/territorialRoadGeometry';
+import { retainCommercialMapContext } from './commercialMapSpatialBounds';
 
 /**
  * Ambientação georreferenciada entre a borda leste do parque e a BR-472
@@ -243,14 +244,17 @@ export function buildRearTreeInstances(reducedGraphics = false): RearTreeInstanc
       if (protectedStructurePolygons.some((polygon) => distanceToPolygon(local, polygon) <= 0.32)) continue;
 
       const baseScale = cluster.species === 'scrub' ? 0.34 : cluster.species === 'grove' ? 0.68 : 0.94;
-      instances.push({
+      const instance = {
         x: local[0],
         z: local[1],
         scale: baseScale * (0.68 + random() * 0.82),
         rotation: random() * Math.PI * 2,
         tint: random(),
         species: cluster.species,
-      });
+      };
+      // Consume the original seed and cluster quota before rejection so the
+      // retained edge vegetation never relocates to refill a removed horizon.
+      if (retainCommercialMapContext(local, instance.scale)) instances.push(instance);
       clusterInstances += 1;
       if (instances.length >= budget || clusterInstances >= target) break;
     }

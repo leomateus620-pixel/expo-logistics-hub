@@ -143,7 +143,8 @@ describe("territorial reconstruction from September references", () => {
     }
   });
   it("keeps all new building envelopes and canopy radii clear of sampled road surfaces", () => {
-    expect(TERRITORY_BUILDINGS.length).toBeGreaterThan(140);
+    expect(TERRITORY_BUILDINGS.length).toBeGreaterThan(5);
+    expect(TERRITORY_BUILDINGS.length).toBeLessThan(100);
     TERRITORY_BUILDINGS.forEach((b) =>
       expect(territoryRoadClearance(b.center), b.id).toBeGreaterThan(
         Math.hypot(...b.size) / 2 + 0.2,
@@ -152,9 +153,9 @@ describe("territorial reconstruction from September references", () => {
     TERRITORY_TREES.forEach((t) =>
       expect(territoryRoadClearance(t.center)).toBeGreaterThan(t.radius + 0.3),
     );
-    expect(TERRITORY_TREES.length).toBeLessThan(1600);
+    expect(TERRITORY_TREES.length).toBeLessThan(300);
     expect(new Set(TERRITORY_BUILDINGS.map((b) => b.roof)).size).toBe(3);
-    expect(TERRITORY_PATCHES.filter((p) => p.kind === "water")).toHaveLength(3);
+    expect(TERRITORY_PATCHES.filter((p) => p.kind === "water")).toHaveLength(0);
   });
   it("does not convert the green area outline into a road or a new cadastral gate", () => {
     expect(TERRITORY_ROADS.some((r) => r.id.includes("boundary"))).toBe(false);

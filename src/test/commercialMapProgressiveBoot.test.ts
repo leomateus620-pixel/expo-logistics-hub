@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createSceneHydrationQueue, qualifiesInteractiveFrame } from '@/features/commercial-map/utils/progressiveSceneBoot';
+import { createSceneHydrationQueue, qualifiesInteractiveFrame, qualifiesCommercialMapReady } from '@/features/commercial-map/utils/progressiveSceneBoot';
 import { prepareHydrologyCoordinates, unpackHydrologyCoordinates } from '@/features/commercial-map/utils/hydrologyPreparation';
 import { HYDROLOGICAL_NODES, HYDROLOGICAL_PIPE_SEGMENTS } from '@/features/commercial-map/data/hydrologicalInfrastructure';
 import { buildHydrologicalPipeSpans, resolveHydrologicalNodePlacements } from '@/features/commercial-map/utils/hydrologicalInfrastructure';
@@ -9,8 +9,11 @@ describe('progressive boot ordering and readiness',()=>{
   it('requires actual draws, controls, unblocked intervals and finished critical preparation',()=>{
     const ready={presentedFrames:3,consecutiveResponsiveFrames:2,preparing:false,controlsInstalled:true,frameIntervalMs:20};
     expect(qualifiesInteractiveFrame(ready)).toBe(true);
+    expect(qualifiesCommercialMapReady({ ...ready, essentialPrepared: false })).toBe(false);
+    expect(qualifiesCommercialMapReady({ ...ready, essentialPrepared: true })).toBe(true);
     for(const override of [{presentedFrames:0},{controlsInstalled:false},{preparing:true},{frameIntervalMs:120},{consecutiveResponsiveFrames:0}]){
       expect(qualifiesInteractiveFrame({...ready,...override})).toBe(false);
+      expect(qualifiesCommercialMapReady({...ready,...override,essentialPrepared:true})).toBe(false);
     }
   });
   it('admits one ordered task, yields to gestures and cancels scheduled work on disposal',()=>{

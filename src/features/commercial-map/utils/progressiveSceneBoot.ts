@@ -78,3 +78,9 @@ export function qualifiesInteractiveFrame(input: {
     && input.presentedFrames >= 3 && input.consecutiveResponsiveFrames >= 2
     && input.frameIntervalMs > 0 && input.frameIntervalMs <= 100;
 }
+
+export function qualifiesCommercialMapReady(input: Parameters<typeof qualifiesInteractiveFrame>[0] & {
+  essentialPrepared: boolean;
+}) {
+  return input.essentialPrepared && qualifiesInteractiveFrame(input);
+}

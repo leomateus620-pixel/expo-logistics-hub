@@ -11,8 +11,9 @@ import {
   buildTerritoryRoadGeometry,
 } from "../features/commercial-map/utils/territorialRoadGeometry";
 import * as district from "../features/commercial-map/data/lateralResidentialDistrict";
+import { isProtectedCommercialMapRoad, spatialBoundsContain, COMMERCIAL_MAP_SPATIAL_BOUNDS } from '../features/commercial-map/data/commercialMapSpatialBounds';
 
-it("preserves every approved building, tree anchor, water/land boundary, road and lateral district", () => {
+it("preserves retained building anchors, protected roads and the complete adjacent lateral district", () => {
   const roadGeometry = buildTerritoryRoadGeometry();
   const geometryHashes: Record<string, string> = {};
   Object.entries(roadGeometry).forEach(([key, value]) => {
@@ -52,7 +53,14 @@ it("preserves every approved building, tree anchor, water/land boundary, road an
     roads: JSON.parse(JSON.stringify(value.roads.filter((r: {id:string})=>!correctedRoadIds.includes(r.id)),
       (_,v)=>typeof v==='number'?Math.round(v*1e8)/1e8:v)),
   });
-  expect(preserved(snapshot)).toEqual(preserved(prior));
-  const accepted = JSON.parse(readFileSync('docs/validation/road-precision/after-geometry.json','utf8'));
-  expect(geometryHashes).toEqual(Object.fromEntries(accepted.geometries.map((g: {id:string;sha256:string})=>[g.id,g.sha256])));
+  expect(snapshot.district).toEqual(prior.district);
+  snapshot.buildings.forEach((b: { id: string }) => expect(b).toEqual(prior.buildings.find((p: { id: string }) => p.id === b.id)));
+  const oldRoads = preserved(prior).roads;
+  const newRoads = preserved(snapshot).roads;
+  oldRoads.filter(isProtectedCommercialMapRoad).forEach((road: { id: string }) => expect(newRoads.find((r: { id: string }) => r.id === road.id)).toEqual(road));
+  prior.trees.filter((t: { center: [number, number] }) => spatialBoundsContain(COMMERCIAL_MAP_SPATIAL_BOUNDS.coreBounds, t.center))
+    .forEach((tree: { id?: string }) => {
+      const { id: _id, ...anchor } = tree;
+      expect(TERRITORY_TREES).toContainEqual(anchor);
+    });
 });

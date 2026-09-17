@@ -24,7 +24,7 @@ function health(overrides: Partial<CommercialMapRenderHealth> = {}): CommercialM
   };
 }
 
-beforeEach(() => { beginCommercialMapBoot(); markCommercialMapStage('first-interactive'); });
+beforeEach(() => { beginCommercialMapBoot(); markCommercialMapStage('commercial-map-ready'); markCommercialMapStage('first-interactive'); });
 afterEach(() => {
   cleanup();
   document.querySelectorAll('canvas').forEach((canvas) => canvas.remove());
@@ -42,6 +42,8 @@ describe('Commercial Map lightweight rendering health', () => {
     await act(async () => publishCommercialMapRenderHealth(canvas, health()));
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
     await act(async () => markCommercialMapStage('first-interactive'));
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    await act(async () => markCommercialMapStage('commercial-map-ready'));
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
   it('publishes a JSON snapshot and bubbles transitions from the originating canvas', () => {

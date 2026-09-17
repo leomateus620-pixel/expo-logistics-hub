@@ -38,19 +38,20 @@ export const EXTERIOR_FISHERS = Object.freeze(
     [1, 0, 0.48],
     [1, 4, 0.53],
     [2, 3, 0.52],
-  ].map(([pondIndex, edge, t], i) => {
+  ].flatMap(([pondIndex, edge, t], i) => {
+    if (!ponds[pondIndex]) return [];
     const pond = ponds[pondIndex],
       position = bankPoint(pond, edge, t, 0.23);
     const a = pond.ring[edge],
       b = pond.ring[(edge + 1) % pond.ring.length];
     const shore = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
-    return {
+    return [{
       id: `fisher-${i + 1}`,
       pondId: pond.id,
       position,
       rotation: Math.atan2(shore[0] - position[0], shore[1] - position[1]),
       groundY: 0.015,
-    };
+    }];
   }),
 );
 
@@ -58,6 +59,8 @@ export const EXTERIOR_FISHERS = Object.freeze(
 export function buildExteriorFishingScene() {
   const group = new THREE.Group();
   group.name = "five-seated-fishers";
+  // No ponds means no fishing geometry, materials, reeds or water resources.
+  if (!ponds.length) return { group, dispose: () => undefined };
   const resources: THREE.BufferGeometry[] = [];
   const material = new THREE.MeshStandardMaterial({
     vertexColors: true,

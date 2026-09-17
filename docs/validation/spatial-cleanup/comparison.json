@@ -1,0 +1,244 @@
+{
+  "before": {
+    "runs": 3,
+    "inventory": {
+      "buildings": 614,
+      "trees": 1509,
+      "patches": 14,
+      "roads": 216
+    },
+    "ponds": 3,
+    "allocation": {
+      "objects": 1548,
+      "meshes": 1158,
+      "instances": 28738,
+      "allocatedTriangles": 1252439,
+      "geometries": 591,
+      "materials": 637,
+      "geometryBufferBytes": 24729460
+    },
+    "renderer": {
+      "textures": 148,
+      "programs": 240,
+      "heapBytes": 207730343
+    },
+    "boot": {
+      "firstInteractiveMs": 17195.40000000596,
+      "essentialPresentedMs": 167348.10000002384,
+      "optionalQueueCompleteMs": 170495.5,
+      "recordedLongTasks": 465,
+      "recordedLongTaskDurationMs": 46532,
+      "longTaskBufferSaturated": true
+    },
+    "views": {
+      "annex-1-core": {
+        "meanMs": 35.650887573964496,
+        "fpsFromMean": 28.04979253112033,
+        "p95Ms": 57.39999997615814,
+        "calls": 849,
+        "triangles": 806260,
+        "quality": [
+          {
+            "tier": "MEDIUM",
+            "dpr": 0.72
+          },
+          {
+            "tier": "MEDIUM",
+            "dpr": 0.72
+          },
+          {
+            "tier": "MEDIUM",
+            "dpr": 0.72
+          }
+        ]
+      },
+      "annex-2-territory": {
+        "meanMs": 30.878865979381445,
+        "fpsFromMean": 32.384608964193305,
+        "p95Ms": 40.79999998211861,
+        "calls": 879,
+        "triangles": 817140,
+        "quality": [
+          {
+            "tier": "LOW",
+            "dpr": 0.72
+          },
+          {
+            "tier": "LOW",
+            "dpr": 0.72
+          },
+          {
+            "tier": "LOW",
+            "dpr": 0.72
+          }
+        ]
+      }
+    },
+    "errors": [],
+    "health": [
+      {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4173,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4391,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4171,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4441,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4080,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4307,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    ]
+  },
+  "after": {
+    "runs": 3,
+    "inventory": {
+      "buildings": 22,
+      "trees": 111,
+      "patches": 2,
+      "roads": 57
+    },
+    "ponds": 0,
+    "allocation": {
+      "objects": 1305,
+      "meshes": 929,
+      "instances": 23215,
+      "allocatedTriangles": 908544,
+      "geometries": 557,
+      "materials": 634,
+      "geometryBufferBytes": 13144154
+    },
+    "renderer": {
+      "textures": 148,
+      "programs": 209,
+      "heapBytes": 216325194
+    },
+    "boot": {
+      "firstInteractiveMs": 16774.100000023842,
+      "essentialPresentedMs": 16774.100000023842,
+      "optionalQueueCompleteMs": 73721.5,
+      "recordedLongTasks": 76,
+      "recordedLongTaskDurationMs": 10168,
+      "longTaskBufferSaturated": false
+    },
+    "views": {
+      "annex-1-core": {
+        "meanMs": 20.420408163245032,
+        "fpsFromMean": 48.970617629470965,
+        "p95Ms": 24.900000005960464,
+        "calls": 781,
+        "triangles": 644375,
+        "quality": [
+          {
+            "tier": "MEDIUM",
+            "dpr": 0.72
+          },
+          {
+            "tier": "HIGH",
+            "dpr": 0.72
+          },
+          {
+            "tier": "MEDIUM",
+            "dpr": 0.72
+          }
+        ]
+      },
+      "annex-2-territory": {
+        "meanMs": 17.858630952380953,
+        "fpsFromMean": 55.99533372218982,
+        "p95Ms": 23.599999994039536,
+        "calls": 779,
+        "triangles": 598489,
+        "quality": [
+          {
+            "tier": "MEDIUM",
+            "dpr": 0.72
+          },
+          {
+            "tier": "HIGH",
+            "dpr": 0.72
+          },
+          {
+            "tier": "MEDIUM",
+            "dpr": 0.72
+          }
+        ]
+      }
+    },
+    "errors": [],
+    "health": [
+      {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2735,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 3067,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2055,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2467,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2976,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 3389,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    ]
+  }
+}
