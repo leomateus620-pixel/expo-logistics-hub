@@ -7,7 +7,7 @@ Correções de navegação interrompida, amostragem adaptativa e fallback WebGL,
 - Base: `3c81b943c4b5871ff5dd6adea42f9ab28efee5c3`, obtida de `origin/main`. A identidade com o deploy de produção não foi demonstrada.
 - Branch: `codex/commercial-map-device-performance`; implementação `71c422ad73158422af6e0ddd2e4658a41e810f1a`. O commit seguinte contém somente este relatório/evidências; `provenance.json` relaciona código e builds locais.
 - Worktree isolado. As alterações preexistentes no checkout principal foram preservadas. O arquivo MCP regenerado pelo build está fora da entrega.
-- npm é o gerenciador canônico, seguindo os scripts/CI existentes. Node 24.15.0, npm 11.12.1 nesta máquina. `npm ci` falhava por ausência de `@testing-library/user-event@14.6.7` no lock. Correção restrita a essa entrada; instalação limpa passou, sem atualização gráfica em massa.
+- npm é o gerenciador canônico escolhido, consistente com o README e os comandos de desenvolvimento existentes. Node 24.15.0, npm 11.12.1 nesta máquina. `npm ci` falhava por ausência de `@testing-library/user-event@14.6.7` no lock. Correção restrita a essa entrada; instalação limpa passou, sem atualização gráfica em massa. Os workflows legados instalam com Bun 1.3.0 e lock próprio; não foram migrados nesta entrega e seus resultados não certificam identidade do grafo com npm. A convergência desses workflows permanece pendente.
 
 ## Máquina e condições realmente observadas
 
