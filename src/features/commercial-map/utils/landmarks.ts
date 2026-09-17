@@ -1,3 +1,4 @@
+import { ARENA_CANONICAL_LAYOUT } from '../data/arenaCanonicalLayout';
 import { SOY_RESTROOM } from '../data/soyGateInfrastructure';
 import type { MapEntity } from '../types';
 import { resolveCrioulosArchitectureEnvelope } from '../data/gateFourDistrict';
@@ -463,9 +464,9 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     kind: 'sicredi-arena',
     aliases: ['Arena Sicredi Icatu', 'Arena Sicredi', 'Palco Sicredi Icatu'],
     // A boca de cena abre para a grande área pública a oeste da Arena.
-    facingRadians: -Math.PI / 2,
+    facingRadians: ARENA_CANONICAL_LAYOUT.arenaRotation,
     focusDirection: [-0.92, 0.56, 0.32],
-    visualHeight: ({ width }) => Math.min(5.5, width * 0.5),
+    visualHeight: ({ depth }) => depth * ARENA_CANONICAL_LAYOUT.architecture.riseToSpan + ARENA_CANONICAL_LAYOUT.architecture.springHeight,
   },
   J: {
     kind: 'amusement-park',

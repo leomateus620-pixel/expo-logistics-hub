@@ -15,7 +15,9 @@ import {
   arenaTerrainElevation,
   arenaTerrainPlateauElevation,
 } from '../../data/arenaTerrain';
-import { isArenaTerrainExcluded } from '../../data/arenaSectorZoning';
+import { ARENA_TERRAIN_CUTS } from '../../data/arenaSectorZoning';
+import { clipPlanarSurfaceGeometry } from '../../utils/planarSurfaceGeometry';
+import { arenaVegetationAllowed, arenaWalkwayRibbon } from '../../data/arenaCanonicalLayout';
 import { getOpenGroundTexture, openGroundTextureBundleForEntity, type OpenGroundSurface, type OpenGroundSurfaceProfile } from './openGroundTextures';
 import { applyParkSurfaceDetail, bindParkSurfaceMaterial } from './parkSurfaceMaterial';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
@@ -113,7 +115,7 @@ function tiledSurfaceTexture(surface: OpenGroundSurface, repeatX: number, repeat
   texture.generateMipmaps = true;
   texture.minFilter = THREE.LinearMipmapLinearFilter;
   texture.magFilter = THREE.LinearFilter;
-  texture.anisotropy = 16;
+  texture.anisotropy = 4;
   texture.repeat.set(Math.max(repeatX, 0.01), Math.max(repeatY, 0.01));
   texture.needsUpdate = true;
   return texture;
@@ -208,21 +210,8 @@ function createTerrainGeometry() {
   position.needsUpdate = true;
   geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-  // Recorte real: triângulos cujo baricentro cai em zona de outra camada saem.
-  const sourceIndex = geometry.getIndex();
-  if (sourceIndex) {
-    const kept: number[] = [];
-    for (let triangle = 0; triangle < sourceIndex.count; triangle += 3) {
-      const a = sourceIndex.getX(triangle);
-      const b = sourceIndex.getX(triangle + 1);
-      const c = sourceIndex.getX(triangle + 2);
-      const centroidX = (position.getX(a) + position.getX(b) + position.getX(c)) / 3;
-      const centroidZ = (position.getZ(a) + position.getZ(b) + position.getZ(c)) / 3;
-      if (isArenaTerrainExcluded(centroidX, centroidZ)) continue;
-      kept.push(a, b, c);
-    }
-    geometry.setIndex(kept);
-  }
+  // Exact subtraction preserves edge vertices/UVs: no grass teeth over steps.
+  clipPlanarSurfaceGeometry(geometry, ARENA_TERRAIN_CUTS);
 
   geometry.computeVertexNormals();
   geometry.computeBoundingBox();
@@ -235,24 +224,11 @@ function createWalkwayGeometry(path: readonly (readonly [number, number])[], wid
   const positions: number[] = [];
   const uvs: number[] = [];
   const indices: number[] = [];
-  const half = width / 2;
+  const ribbon = arenaWalkwayRibbon(path, width);
   let travelled = 0;
-
   path.forEach(([x, z], index) => {
-    const previous = path[index - 1] ?? path[index];
-    const next = path[index + 1] ?? path[index];
-    const dirX = next[0] - previous[0];
-    const dirZ = next[1] - previous[1];
-    const length = Math.hypot(dirX, dirZ) || 1;
-    const normalX = -dirZ / length;
-    const normalZ = dirX / length;
-    if (index > 0) {
-      travelled += Math.hypot(x - path[index - 1][0], z - path[index - 1][1]);
-    }
-    const leftX = x + normalX * half;
-    const leftZ = z + normalZ * half;
-    const rightX = x - normalX * half;
-    const rightZ = z - normalZ * half;
+    if (index > 0) travelled += Math.hypot(x-path[index-1][0], z-path[index-1][1]);
+    const [[leftX,leftZ],[rightX,rightZ]] = ribbon[index];
     positions.push(leftX, arenaTerrainElevation(leftX, leftZ) + 0.014, leftZ);
     positions.push(rightX, arenaTerrainElevation(rightX, rightZ) + 0.014, rightZ);
     uvs.push(0, travelled, 1, travelled);
@@ -606,7 +582,7 @@ function ArenaVegetation({ reducedGraphics, opacity }: { reducedGraphics: boolea
   const trunksRef = useRef<THREE.InstancedMesh>(null);
   const crownsRef = useRef<THREE.InstancedMesh>(null);
   const { gl, invalidate } = useThree();
-  const clusters = useMemo(() => ARENA_FRONT_LAYOUT.treeClusters.filter(cluster => !treeIntersectsGeneratedRearRoadCorridor({
+  const clusters = useMemo(() => ARENA_FRONT_LAYOUT.treeClusters.filter(cluster => arenaVegetationAllowed(sourcePolygonToLocal([cluster.sourcePosition])[0], cluster.scale * 0.3) && !treeIntersectsGeneratedRearRoadCorridor({
     position: sourcePolygonToLocal([cluster.sourcePosition])[0], canopyRadius: cluster.scale * 0.3,
   })), []);
   const count = clusters.length;
@@ -960,7 +936,7 @@ function StepInstances({ reducedGraphics, opacity }: { reducedGraphics: boolean;
     // Patamar inferior, encostando no apron da Arena.
     transform.position.set(
       bounds.maxX - config.lowerLandingDepth / 2,
-      BASE_Y + 0.022,
+      BASE_Y - 0.025,
       bounds.centerZ,
     );
     transform.scale.set(config.lowerLandingDepth, 0.05, bounds.depth);
@@ -1046,10 +1022,10 @@ function ArenaStructures({
   const { gl, invalidate } = useThree();
   const plazaPoints = useMemo(() => sourcePolygonToLocal(ARENA_FRONT_LAYOUT.plaza.sourcePolygon), []);
   const plazaGeometry = useMemo(
-    () => createWorldTiledHorizontalPolygonGeometry(plazaPoints, BASE_Y + 0.006),
+    () => createWorldTiledHorizontalPolygonGeometry(plazaPoints, BASE_Y),
     [plazaPoints],
   );
-  const plazaOutline = useMemo(() => createPolygonOutlineGeometry(plazaPoints, BASE_Y + 0.014), [plazaPoints]);
+  const plazaOutline = useMemo(() => createPolygonOutlineGeometry(plazaPoints, BASE_Y + 0.002), [plazaPoints]);
   const plazaTexture = useMemo(() => tiledSurfaceTexture('concrete', 0.25, 0.25), []);
 
   useEffect(() => {

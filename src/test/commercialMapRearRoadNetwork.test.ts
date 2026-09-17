@@ -436,7 +436,7 @@ describe('área posterior — exclusões espaciais, profundidade e ambiente', ()
     ['official:F', 'official:C1', 'official:D3', 'official:EST-EXP-VIS', 'official:EST-VIS']
       .forEach((id) => expect(REAR_ROAD_EXCLUSION_BOUNDARIES.some((boundary) => boundary.id === id)).toBe(true));
     expect(REAR_ROAD_EXCLUSION_BOUNDARIES.some((boundary) => boundary.id.startsWith('rear-parking-row:'))).toBe(true);
-    expect(REAR_ROAD_EXCLUSION_BOUNDARIES.some((boundary) => boundary.id === 'arena-zone:football-field')).toBe(true);
+    expect(REAR_ROAD_EXCLUSION_BOUNDARIES.some((boundary) => boundary.id === 'arena-zone:arena-plaza-concrete')).toBe(true);
   });
 
   it('não cruza nenhuma exclusão não autorizada com pista ou acostamento', () => {

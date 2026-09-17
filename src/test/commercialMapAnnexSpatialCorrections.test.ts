@@ -1,3 +1,4 @@
+import { ARENA_CANONICAL_LAYOUT as ARENA } from '@/features/commercial-map/data/arenaCanonicalLayout';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -460,8 +461,8 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
 
     const arena = officialEntity('F').geometry.coordinates[0] as ParkAccessPoint[];
     const arenaBounds = ringBounds(arena);
-    expect(arenaBounds.minX).toBeCloseTo(officialPdfPointToLocal([4900, 2690])[0], 8);
-    expect(arenaBounds.maxX).toBeCloseTo(officialPdfPointToLocal([5385, 3130])[0], 8);
+    expect(arenaBounds.minX).toBeCloseTo(officialPdfPointToLocal(ARENA.arenaFootprint.sourcePolygon[0])[0], 8);
+    expect(arenaBounds.maxX).toBeCloseTo(officialPdfPointToLocal(ARENA.arenaFootprint.sourcePolygon[2])[0], 8);
     const footprints = buildRearRoadCorridorFootprints(GENERATED_REAR_ROAD_SEGMENTS, {
       includeShoulders: true,
     });

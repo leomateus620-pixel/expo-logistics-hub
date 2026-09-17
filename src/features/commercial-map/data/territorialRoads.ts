@@ -1,3 +1,4 @@
+import { ARENA_CANONICAL_LAYOUT } from './arenaCanonicalLayout';
 import source from "./territoryRoadSource.json";
 import { officialPdfPointToLocal } from "./officialReference2026";
 
@@ -28,7 +29,7 @@ export const TERRITORY_REFERENCE = {
   revision: "2026-09-07",
   unitsPerMetre: 0.15,
   anchors: {
-    arena: local([5142.5, 2910]),
+    arena: ARENA_CANONICAL_LAYOUT.arenaCenter.local,
     brasilia: local([3964, 2440]),
     gate5Neighbourhood: [-1.4373, -44.2478] as TerritoryPoint,
     arenaAccess: local([5940, 3678]),

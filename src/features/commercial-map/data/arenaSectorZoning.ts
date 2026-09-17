@@ -1,5 +1,6 @@
+import { ARENA_CANONICAL_LAYOUT } from './arenaCanonicalLayout';
 import { officialPdfPointToLocal } from './officialReference2026';
-import { ARENA_ABSORBED_FIELD_BOUNDS, ARENA_FRONT_LAYOUT, EXPORURAL_SMOOTH_CONCRETE_CORRECTION } from './parkEnvironment';
+import { ARENA_FRONT_LAYOUT, EXPORURAL_SMOOTH_CONCRETE_CORRECTION } from './parkEnvironment';
 import { MIRANTE_COMPLEX } from './miranteComplexReconstruction';
 
 /**
@@ -62,12 +63,10 @@ function inflate(bounds: readonly [number, number, number, number]) {
 /** Zonas que o terreno natural nunca pode invadir. */
 export const ARENA_SECTOR_SURFACE_ZONES: readonly ArenaSurfaceZone[] = [
   // Arena Sicredi - Icatu (entidade oficial F) e o apron imediato.
-  zone('arena-footprint', 'ARENA_STRUCTURE', rect(inflate([4900, 2690, 5385, 3130]))),
+  ...ARENA_CANONICAL_LAYOUT.terrainExclusion.map(item => zone(item.id, item.owner, item.sourcePolygon)),
   // Churrascaria Exporural (C4), imediatamente ao norte da Arena.
   zone('churrascaria-exporural', 'ARENA_STRUCTURE', rect(inflate([4980, 2370, 5100, 2480]))),
   // Praça cívica pavimentada + escadaria de concreto: acesso da Arena.
-  zone('arena-plaza-concrete', 'CONCRETE_ACCESS', ARENA_FRONT_LAYOUT.plaza.sourcePolygon),
-  zone('arena-stairs-concrete', 'CONCRETE_ACCESS', rect(inflate(ARENA_FRONT_LAYOUT.stairs.sourceBounds))),
   zone('arena-covered-access', 'CONCRETE_ACCESS', rect(inflate(ARENA_FRONT_LAYOUT.accessCanopy.sourceBounds))),
   // Deck do Mirante (D3 reconstruído), passeio de Rua Brasília e pátio sul.
   zone('mirante-deck', 'ARENA_STRUCTURE', rect(inflate(MIRANTE_COMPLEX.mirante.sourceBounds))),
@@ -81,9 +80,6 @@ export const ARENA_SECTOR_SURFACE_ZONES: readonly ArenaSurfaceZone[] = [
   zone('parking-visitantes', 'PARKING', [[5350, 3400], [5980, 3480], [5900, 4250], [5350, 4140]]),
   // Rua Brasil, chegando pelo oeste.
   zone('rua-brasil', 'ROAD', rect([4106, 3096, 4520, 3191])),
-  // O retângulo do campo inexistente é concreto da laje, não gramado esportivo.
-  // O id `football-field` permanece para o overlay de exclusão das vias.
-  zone('football-field', 'CONCRETE_ACCESS', rect(ARENA_ABSORBED_FIELD_BOUNDS)),
   // Anexo 1: concreto liso a leste de C4. Polígono exato, sem inflar sobre vias.
   zone('exporural-smooth-concrete', 'CONCRETE_ACCESS', EXPORURAL_SMOOTH_CONCRETE_CORRECTION.sourcePolygon),
 ];
@@ -123,4 +119,11 @@ export function isArenaTerrainExcluded(x: number, z: number) {
   return resolveArenaSurfaceOwner(x, z) !== null;
 }
 
-export const ARENA_SECTOR_ZONING_REVISION = '2026.9-mirante-complex-satellite.1';
+export const ARENA_SECTOR_ZONING_REVISION = ARENA_CANONICAL_LAYOUT.revision;
+
+/** Convex masks consumed by the existing attribute-preserving terrain clipper. */
+export const ARENA_TERRAIN_CUTS = [...LOCAL_ZONES, ...ARENA_CANONICAL_LAYOUT.pedestrianMasks.map(item => ({polygon:item.localPolygon}))].map(item => ({
+  polygon: item.polygon,
+  minX: Math.min(...item.polygon.map(p => p[0])), maxX: Math.max(...item.polygon.map(p => p[0])),
+  minZ: Math.min(...item.polygon.map(p => p[1])), maxZ: Math.max(...item.polygon.map(p => p[1])),
+}));
