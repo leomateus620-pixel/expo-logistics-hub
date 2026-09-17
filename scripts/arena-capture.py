@@ -1,6 +1,5 @@
-"""Real-map visual/performance evidence. No backend writes or synthetic scene.
-Run against the existing development diagnostics route with the same options
-before and after the reconstruction. Linux software GPU is not physical mobile.
+"""Real-map visual/performance evidence, with no backend writes.
+Linux/software-GPU viewports do not certify physical mobile devices.
 """
 import argparse
 import asyncio
@@ -39,29 +38,39 @@ async def main():
         try:
             start = time.monotonic()
             await page.goto(args.base + '/__dev/commercial-map-rendering', wait_until='domcontentloaded', timeout=120000)
+            # Hide only QA controls and pin the scene viewport; live counters
+            # must not change its size or make locator.screenshot wait forever.
+            await page.add_style_tag(content='''
+              .commercial-map-rendering-diagnostics__toolbar,
+              .commercial-map-rendering-diagnostics__stress,
+              .commercial-map-rendering-diagnostics__metrics{display:none!important}
+              .commercial-map-rendering-diagnostics__viewport{
+                position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;
+              }
+            ''')
             await page.wait_for_function("document.querySelector('canvas')?.dataset.territoryQa==='ready'", timeout=180000)
             await page.wait_for_function("JSON.parse(document.querySelector('canvas')?.dataset.commercialMapRenderHealth||'{}').status==='ready'", timeout=180000)
             report['readyMs'] = round((time.monotonic() - start) * 1000)
-            await page.wait_for_timeout(5000)
-            await page.add_style_tag(content='.commercial-map-district-qa{display:none!important}')
+            await page.wait_for_function("document.querySelector('canvas')?.dataset.commercialMapHydration==='complete'", timeout=180000)
+            report['hydratedMs'] = round((time.monotonic() - start) * 1000)
             await page.evaluate("async()=>{const {useCommercialMapStore:s}=await import('/src/features/commercial-map/state/useCommercialMapStore.ts');window.__arenaQaStore=s;s.getState().setLabelsVisible(false);}")
+            await page.wait_for_timeout(2500)
             canvas = page.locator('.commercial-map-rendering-diagnostics__viewport canvas')
             for name, pose in POSES.items():
                 await page.evaluate("pose=>window.dispatchEvent(new CustomEvent('territory-qa',{detail:pose}))", pose)
                 await page.wait_for_timeout(2000)
-                await canvas.screenshot(path=str(output / f'{args.phase}-{name}.png'))
+                await page.screenshot(path=str(output / f'{args.phase}-{name}.png'))
                 report['views'][name] = await canvas.evaluate('(c)=>({...c.dataset})')
             for attempt in range(3):
                 await page.evaluate("pose=>window.dispatchEvent(new CustomEvent('territory-qa',{detail:{...pose,measure:true}}))", POSES['oblique'])
-                await page.wait_for_timeout(7600)
+                await page.wait_for_timeout(8000)
                 report['performance'].append(await canvas.evaluate("c=>JSON.parse(c.dataset.territoryReport||'{}')"))
-            # Same renderer must survive repeated quality and environment toggles.
             for reduced in [True, False, True, False]:
                 await page.evaluate("v=>window.__arenaQaStore.getState().setReducedGraphics(v)", reduced)
                 await page.wait_for_timeout(1500)
             await page.evaluate("window.__arenaQaStore.getState().setNightModeActive(true)")
             await page.wait_for_timeout(2000)
-            await canvas.screenshot(path=str(output / f'{args.phase}-night.png'))
+            await page.screenshot(path=str(output / f'{args.phase}-night.png'))
             await page.evaluate("window.__arenaQaStore.getState().setNightModeActive(false)")
             await page.wait_for_timeout(1500)
             report['finalHealth'] = await canvas.evaluate("c=>JSON.parse(c.dataset.commercialMapRenderHealth||'{}')")
@@ -71,6 +80,7 @@ async def main():
             report['status'] = 'passed'
         except Exception as error:
             report.update(status='failed', error=str(error))
+            report['datasets'] = await page.locator('canvas').evaluate_all('(items)=>items.map(c=>({...c.dataset}))')
             await page.screenshot(path=str(output / f'{args.phase}-failure.png'))
             raise
         finally:
