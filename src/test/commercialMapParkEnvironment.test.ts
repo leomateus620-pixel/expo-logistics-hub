@@ -1,8 +1,8 @@
+import { ARENA_CANONICAL_LAYOUT as ARENA } from '@/features/commercial-map/data/arenaCanonicalLayout';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
-  ARENA_ABSORBED_FIELD_BOUNDS,
   ARENA_FRONT_LAYOUT,
   ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET,
   EXPORURAL_SMOOTH_CONCRETE_CORRECTION,
@@ -119,7 +119,7 @@ function sourceBoundsOverlapPolygon(bounds: SourceBounds, polygon: readonly Sour
 
 describe('infraestrutura ambiental do parque', () => {
   it('mantém inventário ambiental versionado, explícito e fora das métricas comerciais', () => {
-    expect(PARK_ENVIRONMENT_REVISION).toBe('2026.9-mirante-complex-satellite.1');
+    expect(PARK_ENVIRONMENT_REVISION).toBe(ARENA.revision);
     expect(PARK_ENVIRONMENT_FEATURES).toHaveLength(11);
     expect(new Set(PARK_ENVIRONMENT_FEATURES.map((feature) => feature.id)).size)
       .toBe(PARK_ENVIRONMENT_FEATURES.length);
@@ -146,7 +146,7 @@ describe('infraestrutura ambiental do parque', () => {
 
   it('orienta a escadaria para a Arena e ancora as quadras junto à borda sul da Exporural', () => {
     const stairs = ARENA_FRONT_LAYOUT.stairs.sourceBounds;
-    const absorbedField = ARENA_ABSORBED_FIELD_BOUNDS;
+    const plazaBounds = ARENA.frontPlaza.sourceBounds;
     const multiSport = ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds;
     const volleyball = ARENA_FRONT_LAYOUT.sandVolleyballCourt.sourceBounds;
     const localStairs = sourceBoundsToLocal(stairs);
@@ -174,28 +174,29 @@ describe('infraestrutura ambiental do parque', () => {
     expect(localVolleyball.centerX).toBeLessThan(localMultiSport.centerX);
     expect(localVolleyball.maxX).toBeLessThan(localMultiSport.minX);
     expect(localMultiSport.maxZ).toBeLessThan(localStairs.minZ);
-    expect(absorbedField).toEqual([4660, 2860, 4880, 3200]);
-    expect(absorbedField[2]).toBeLessThan(4900);
-    expect(absorbedField[0]).toBeGreaterThan(stairs[2]);
+    expect(plazaBounds).toEqual([4480, 2682, 4888, 2940]);
+    expect(plazaBounds[2]).toBeLessThan(4900);
+    expect(plazaBounds[0]).toBe(stairs[2]);
     expect('footballField' in ARENA_FRONT_LAYOUT).toBe(false);
     expect(PARK_ENVIRONMENT_FEATURES.filter((feature) => feature.classification === 'SPORTS_FIELD'))
       .toHaveLength(0);
     expect(PARK_ENVIRONMENT_FEATURES.some((feature) => feature.id === 'arena-front-football-field')).toBe(false);
-    expect(sourceBoundsOverlapPolygon(absorbedField, ARENA_FRONT_LAYOUT.plaza.sourcePolygon)).toBe(true);
+    expect(sourceBoundsOverlapPolygon(plazaBounds, ARENA_FRONT_LAYOUT.plaza.sourcePolygon)).toBe(true);
     ([
-      [4770, 3030],
+      [4770, 2830],
       [4664, 2864],
-      [4876, 3196],
+      [4876, 2936],
       [4770, 2864],
     ] as const).forEach((point) => {
       expect(pointInPolygon(point, ARENA_FRONT_LAYOUT.plaza.sourcePolygon), point.join(',')).toBe(true);
     });
-    expect(ARENA_FRONT_LAYOUT.plaza.sourcePolygon.every(([x]) => x >= 4092)).toBe(true);
+    expect(ARENA_FRONT_LAYOUT.plaza.sourcePolygon.every(([x]) => x >= stairs[2])).toBe(true);
+    expect(pointInPolygon([4770,3030], ARENA_FRONT_LAYOUT.plaza.sourcePolygon)).toBe(false);
     expect(pointInPolygon([4052, 2750], ARENA_FRONT_LAYOUT.plaza.sourcePolygon)).toBe(false);
     expect(ARENA_FRONT_LAYOUT.walkways.some((walkway) => (
       walkway.sourcePath.some(([x, z]) => (
-        x > absorbedField[0] && x < absorbedField[2]
-        && z > absorbedField[1] && z < absorbedField[3]
+        x > plazaBounds[0] && x < plazaBounds[2]
+        && z > plazaBounds[1] && z < plazaBounds[3]
       ))
     ))).toBe(false);
 
@@ -225,12 +226,12 @@ describe('infraestrutura ambiental do parque', () => {
       'F', 'D3', 'D1', 'C1', 'RUA-BRASILIA', 'RUA-BRASIL',
     ].forEach((identifier) => {
       expect(
-        sourceBoundsOverlap(absorbedField, sourceBoundsForEntity(identifier)),
-        `${identifier}: ${absorbedField.join(',')}`,
+        sourceBoundsOverlap(plazaBounds, sourceBoundsForEntity(identifier)),
+        `${identifier}: ${plazaBounds.join(',')}`,
       ).toBe(false);
     });
     [stairs, multiSport, volleyball].forEach((bounds) => {
-      expect(sourceBoundsOverlap(absorbedField, bounds), `apron absorvido: ${bounds.join(',')}`).toBe(false);
+      expect(sourceBoundsOverlap(plazaBounds, bounds), `apron absorvido: ${bounds.join(',')}`).toBe(false);
     });
   });
 
@@ -238,7 +239,7 @@ describe('infraestrutura ambiental do parque', () => {
     const concrete = EXPORURAL_SMOOTH_CONCRETE_CORRECTION.sourcePolygon;
     const concreteBounds = [5100, 2372, 5375, 2500] as const;
     const steakhouse = sourceBoundsForEntity('C4');
-    const absorbedField = ARENA_ABSORBED_FIELD_BOUNDS;
+    const plazaBounds = ARENA.frontPlaza.sourceBounds;
     const feature = PARK_ENVIRONMENT_FEATURES.find((candidate) => (
       candidate.id === 'exporural-smooth-concrete-c4'
     ));
@@ -263,10 +264,10 @@ describe('infraestrutura ambiental do parque', () => {
     expect(feature!.contributesToCommercialMetrics).toBe(false);
     expect(concreteBounds[0]).toBe(steakhouse[2]);
     expect(sourceBoundsOverlap(concreteBounds, steakhouse)).toBe(false);
-    expect(sourceBoundsOverlap(concreteBounds, absorbedField)).toBe(false);
+    expect(sourceBoundsOverlap(concreteBounds, plazaBounds)).toBe(false);
     expect(sourceBoundsOverlap(concreteBounds, sourceBoundsForEntity('C1'))).toBe(false);
     expect(sourceBoundsOverlap(concreteBounds, sourceBoundsForEntity('F'))).toBe(false);
-    expect(sourceBoundsOverlapPolygon(absorbedField, concrete)).toBe(false);
+    expect(sourceBoundsOverlapPolygon(plazaBounds, concrete)).toBe(false);
     expect(pointInPolygon([5230, 2430], concrete)).toBe(true);
     expect(pointInPolygon([5040, 2425], concrete)).toBe(false);
     expect(ARENA_FRONT_LAYOUT.plaza.elevation).toBe(0.052);

@@ -1,0 +1,145 @@
+{
+  "base": "8783fea7caaf8bd1ac395232b8beb85a262030ab",
+  "entityCount": 1692,
+  "entitiesWithoutArenaHash": "488a555a48b6ef75fcdf02f389f0e33c79723fa66db321a121ce8afcb4bd6c7d",
+  "lots": "e054df73103c048dc3963b252d1b730883b7b856eb4b70b6c64dcb78e3664e57",
+  "mirante": {
+    "revision": "2026.9-mirante-complex-satellite.2",
+    "registration": {
+      "satellitePixelsAlongStreet": 418,
+      "sourcePointsAlongStreet": 666,
+      "sourcePointsPerPixel": 1.5933014354066986,
+      "anchors": {
+        "ruaBrasiliaEastEdge": 3988,
+        "ruaBrasilNorthEdge": 3106,
+        "quadraRSouthEdge": 2440
+      },
+      "landmarks": [
+        {
+          "identifier": "RUA-BRASILIA",
+          "role": "west-edge",
+          "source": 3988
+        },
+        {
+          "identifier": "RUA-BRASIL",
+          "role": "south-edge",
+          "source": 3106
+        },
+        {
+          "identifier": "Q-R-04",
+          "role": "north-edge",
+          "source": 2440
+        }
+      ],
+      "metersAreEstimates": true
+    },
+    "levels": {
+      "road": 0.032,
+      "sidewalk": 0.178,
+      "apron": 0.178,
+      "deck": 0.178,
+      "exporuralGround": 0.055
+    },
+    "eastTerraceSourceMaxX": 4092,
+    "sidewalk": {
+      "sourceBounds": [
+        3988,
+        2440,
+        4004,
+        3106
+      ],
+      "tactileOffsetFromRoad": 0.09,
+      "tactileWidth": 0.045,
+      "curbPaintWidth": 0.035
+    },
+    "mirante": {
+      "identifier": "D3",
+      "sourceBounds": [
+        4004,
+        2440,
+        4072,
+        2748
+      ],
+      "platformSourceMinZ": 2480,
+      "descentStairsSourceBounds": [
+        4004,
+        2440,
+        4072,
+        2480
+      ],
+      "extrusionHeight": 1.16
+    },
+    "lateralStructure": {
+      "id": "arena-front-covered-access",
+      "sourceBounds": [
+        4004,
+        2748,
+        4084,
+        2944
+      ],
+      "sideWallEnd": "north",
+      "bayCount": 5
+    },
+    "rooms": {
+      "B17": {
+        "sourceBounds": [
+          4008,
+          2760,
+          4042,
+          2804
+        ],
+        "extrusionHeight": 0.31
+      },
+      "B16": {
+        "sourceBounds": [
+          4008,
+          2812,
+          4042,
+          2856
+        ],
+        "extrusionHeight": 0.31
+      }
+    },
+    "southApron": {
+      "sourceBounds": [
+        3988,
+        2944,
+        4092,
+        3106
+      ]
+    },
+    "grassStrip": {
+      "sourceBounds": [
+        4092,
+        2958,
+        4596,
+        3096
+      ]
+    }
+  },
+  "stairs": {
+    "sourceBounds": [
+      4092,
+      2682,
+      4480,
+      2940
+    ],
+    "runAxis": "x",
+    "highEdge": "west",
+    "lowEdge": "east",
+    "stepCount": 18,
+    "bankCount": 3,
+    "riserHeight": 0.007,
+    "lowerLandingDepth": 0.62,
+    "upperLandingDepth": 0.74,
+    "upperLandingThickness": 0.07,
+    "retainingWallWidth": 0.11,
+    "handrailHeight": 0.34,
+    "bankGap": 0,
+    "intermediateLandingSteps": [
+      6,
+      12
+    ],
+    "intermediateLandingDepth": 0.42
+  }
+}

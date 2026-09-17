@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { ARENA_CANONICAL_LAYOUT } from '@/features/commercial-map/data/arenaCanonicalLayout';
 import { OFFICIAL_REFERENCE_ENTITIES } from '@/features/commercial-map/data/officialReference2026';
 import {
   resolveStrategicLandmarkKind,
@@ -166,8 +167,8 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(etniaBounds.depth).toBeCloseTo(2.5309, 4);
     expect(restaurantBounds.width).toBeCloseTo(3.9273, 4);
     expect(restaurantBounds.depth).toBeCloseTo(3.2727, 4);
-    expect(arenaBounds.width).toBeCloseTo(10.5818, 4);
-    expect(arenaBounds.depth).toBeCloseTo(9.6, 4);
+    expect(arenaBounds.width).toBeCloseTo(ARENA_CANONICAL_LAYOUT.arenaDepth, 6);
+    expect(arenaBounds.depth).toBeCloseTo(ARENA_CANONICAL_LAYOUT.arenaWidth, 6);
     // Source bounds remain exactly [930, 2450, 1600, 3000].
     expect(amusementParkBounds.width).toBeCloseTo(14.6182, 4);
     expect(amusementParkBounds.depth).toBeCloseTo(12, 4);
@@ -181,7 +182,11 @@ describe('marcos arquitetônicos estratégicos', () => {
     [targets.B11, targets.B12, targets.B9, targets.C5, targets.C6, targets.C8, targets.C2, targets.F, targets.J, targets['PORTICO-NACOES'], targets.A4, targets.D5, targets['PAVILHAO-09']]
       .forEach((entity) => {
         const before = JSON.stringify(entity);
-        expect(strategicLandmarkVisualHeight(entity)).toBeGreaterThan(entity.geometry.extrusionHeight);
+        if (entity.publicIdentifier === 'F') {
+          expect(strategicLandmarkVisualHeight(entity)).toBeCloseTo(entity.geometry.extrusionHeight);
+        } else {
+          expect(strategicLandmarkVisualHeight(entity)).toBeGreaterThan(entity.geometry.extrusionHeight);
+        }
         expect(JSON.stringify(entity)).toBe(before);
       });
 

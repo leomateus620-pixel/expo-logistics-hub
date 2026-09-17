@@ -1,5 +1,6 @@
 import { treeIntersectsGeneratedRearRoadCorridor } from '@/features/commercial-map/utils/rearRoadTreeClearance';
 import { describe, expect, it } from 'vitest';
+import { ARENA_VEGETATION, arenaVegetationAllowed } from '@/features/commercial-map/data/arenaCanonicalLayout';
 import * as THREE from 'three';
 import { officialPdfPointToLocal } from '@/features/commercial-map/data/officialReference2026';
 import { REAR_GATE_5_PRESENTATION, rearRoadFocusBoundsForOfficialOwner } from '@/features/commercial-map/data/rearParkRoadNetwork';
@@ -28,9 +29,10 @@ describe('encontro físico da Arena com a rede posterior', () => {
     });
   });
 
-  it('preserva o inventário de 20 árvores e remove somente copas da pista na apresentação', () => {
+  it('usa o inventário canônico e mantém copas fora das superfícies e da pista', () => {
     const roads = buildRearRoadCorridorFootprints();
-    expect(ARENA_FRONT_LAYOUT.treeClusters).toHaveLength(20);
+    expect(ARENA_FRONT_LAYOUT.treeClusters).toBe(ARENA_VEGETATION);
+    ARENA_VEGETATION.forEach(tree => expect(arenaVegetationAllowed(officialPdfPointToLocal(tree.sourcePosition), tree.scale * 0.3)).toBe(true));
     const visible = ARENA_FRONT_LAYOUT.treeClusters.filter(tree => !treeIntersectsGeneratedRearRoadCorridor({
       position: officialPdfPointToLocal(tree.sourcePosition), canopyRadius: tree.scale * 0.3,
     }));

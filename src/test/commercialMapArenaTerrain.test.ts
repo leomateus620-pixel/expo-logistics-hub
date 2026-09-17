@@ -1,6 +1,6 @@
+import { ARENA_CANONICAL_LAYOUT as ARENA, arenaSourceToLocal } from '@/features/commercial-map/data/arenaCanonicalLayout';
 import { describe, expect, it } from 'vitest';
 import {
-  ARENA_ABSORBED_FIELD_BOUNDS,
   ARENA_FRONT_LAYOUT,
   PARK_ENVIRONMENT_FEATURES,
   sourceBoundsToLocal,
@@ -65,17 +65,18 @@ describe('terreno reconstruído do entorno da Arena', () => {
     expect(samples[samples.length - 1]).toBeGreaterThan(samples[0]);
   });
 
-  it('absorve o campo inexistente na laje de concreto e preserva o gramado da via', () => {
-    const field = sourceBoundsToLocal(ARENA_ABSORBED_FIELD_BOUNDS);
+  it('substitui a extensão em L por praça retangular alinhada e devolve a ombreira ao terreno', () => {
+    const field = sourceBoundsToLocal(ARENA.frontPlaza.sourceBounds);
     const plaza = sourcePolygonToLocal(ARENA_FRONT_LAYOUT.plaza.sourcePolygon);
     const multi = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds);
     const sand = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.sandVolleyballCourt.sourceBounds);
-    const arena = sourceBoundsToLocal([4900, 2690, 5385, 3130]);
+    const arena = sourceBoundsToLocal(ARENA.arenaFootprint.sourceBounds);
     const verge = sourceBoundsToLocal([4200, 2980, 4500, 3080]);
 
     expect('footballField' in ARENA_FRONT_LAYOUT).toBe(false);
-    expect(field.maxX).toBeLessThan(arena.minX);
-    expect(field.minX).toBeGreaterThan(STAIRS.maxX);
+    expect(resolveArenaSurfaceOwner(...arenaSourceToLocal([4770,3030]))).toBeNull();
+    expect(field.maxX).toBeCloseTo(arena.minX, 8);
+    expect(field.minX).toBeCloseTo(STAIRS.maxX, 8);
     expect(pointInLocalPolygon(field.centerX, field.centerZ, plaza)).toBe(true);
     [
       [field.minX + 0.2, field.minZ + 0.2],
@@ -116,13 +117,14 @@ describe('terreno reconstruído do entorno da Arena', () => {
         expect(feature!.contributesToCommercialMetrics).toBe(false);
       });
     expect(PARK_ENVIRONMENT_FEATURES.some((feature) => feature.id === 'arena-front-football-field')).toBe(false);
-    expect(ARENA_FRONT_LAYOUT.walkways.length).toBeGreaterThanOrEqual(3);
+    expect(ARENA_FRONT_LAYOUT.walkways).toHaveLength(2);
+    expect(ARENA_FRONT_LAYOUT.walkways.map(p=>p.id)).not.toContain('arena-walkway-stairs-apron');
     expect(ARENA_FRONT_LAYOUT.treeClusters.length).toBeGreaterThanOrEqual(10);
   });
 
   it('impede que o terreno natural invada concreto, quadras, vias ou estacionamento', () => {
-    const plaza = sourceBoundsToLocal([4200, 2750, 4800, 3050]);
-    const arena = sourceBoundsToLocal([4900, 2690, 5385, 3130]);
+    const plaza = sourceBoundsToLocal(ARENA.frontPlaza.sourceBounds);
+    const arena = sourceBoundsToLocal(ARENA.arenaFootprint.sourceBounds);
     const multi = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds);
     const parking = sourceBoundsToLocal([4600, 3300, 5200, 3900]);
     [plaza, arena, multi, parking].forEach((zone) => {
@@ -137,7 +139,7 @@ describe('terreno reconstruído do entorno da Arena', () => {
     const rear = sourceBoundsToLocal([5900, 2500, 5960, 2560]);
     expect(isArenaTerrainExcluded(rear.centerX, rear.centerZ)).toBe(false);
 
-    const field = sourceBoundsToLocal(ARENA_ABSORBED_FIELD_BOUNDS);
+    const field = sourceBoundsToLocal(ARENA.frontPlaza.sourceBounds);
     for (const x of [field.minX + 0.1, field.centerX, field.maxX - 0.1]) {
       for (const z of [field.minZ + 0.1, field.centerZ, field.maxZ - 0.1]) {
         expect(resolveArenaSurfaceOwner(x, z)).toBe('CONCRETE_ACCESS');
