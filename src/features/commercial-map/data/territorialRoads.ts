@@ -1,6 +1,8 @@
 import { ARENA_CANONICAL_LAYOUT } from './arenaCanonicalLayout';
-import source from "./territoryRoadSource.json";
+import context from './territoryContext.generated.json';
+import { clipContextRoad } from './commercialMapSpatialBounds';
 import { officialPdfPointToLocal } from "./officialReference2026";
+const source = context.provenance;
 
 export type TerritoryPoint = readonly [number, number];
 export interface TerritoryRoad {
@@ -50,35 +52,11 @@ export const TERRITORY_REFERENCE = {
  * Full geometry, tags, attribution and transformation are retained in the source.
  * Clipping excludes the established park and lateral district. No API runs in the browser.
  */
-export const TERRITORY_ROADS: readonly TerritoryRoad[] = [
-  ...(source.roads as unknown as TerritoryRoad[]).map(road => road.id === 'osm-569781512-0'
-    ? { ...road, points: [GATE5_ACCESS_NODES.lower, ...road.points] }
-    : road),
-  {
-    id: 'osm-951983188-0',
-    name: 'Conexão dos ramos do acesso A5',
-    kind: 'access',
-    points: [GATE5_ACCESS_NODES.upper, GATE5_ACCESS_NODES.parkMouth, GATE5_ACCESS_NODES.lower],
-    width: 0.98,
-    shoulder: 0.08,
-    evidence: 'osm-aligned',
-    sourceWay: '951983188',
-    surface: 'unspecified',
-  },
-  {
-    id: "arena-br472-access",
-    name: "Acesso rodoviário da arena (A5 cadastral)",
-    kind: "access",
-    points: [
-      TERRITORY_REFERENCE.anchors.arenaAccess,
-      [58.2, 15.48],
-      GATE5_ACCESS_NODES.parkMouth,
-    ],
-    width: 1.02,
-    shoulder: 0.09,
-    evidence: "annex-7",
-  },
-];
+// Full OSM provenance remains in the repository. Only the offline spatial
+// catalog is bundled; protected axes preserve their complete original vertices.
+export const TERRITORY_ROADS: readonly TerritoryRoad[] = Object.freeze(
+  (context.roads as unknown as TerritoryRoad[]).flatMap(clipContextRoad),
+);
 export const TERRITORY_BR472 = TERRITORY_ROADS.filter((r) =>
   r.ref?.includes("472"),
 ).flatMap((r) => r.points);

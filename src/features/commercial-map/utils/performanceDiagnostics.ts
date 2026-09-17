@@ -13,10 +13,11 @@ export interface CommercialMapBootSnapshot {
   startedAt: number;
   marks: Readonly<Record<string, number>>;
   interactive: boolean;
+  commercialMapReady: boolean;
   failed: boolean;
 }
 
-let snapshot: CommercialMapBootSnapshot = { startedAt: 0, marks: {}, interactive: false, failed: false };
+let snapshot: CommercialMapBootSnapshot = { startedAt: 0, marks: {}, interactive: false, commercialMapReady: false, failed: false };
 const listeners = new Set<() => void>();
 let longTaskObserver: PerformanceObserver | undefined;
 let notificationPending = false;
@@ -37,6 +38,11 @@ function notifyBootListeners() {
 }
 
 export const getCommercialMapBootSnapshot = () => snapshot;
+/** Context recovery must pass the same presentation barrier as the first visit. */
+export function resetCommercialMapReady() {
+  snapshot = { ...snapshot, commercialMapReady: false, interactive: false, failed: false };
+  notifyBootListeners();
+}
 export const subscribeCommercialMapBoot = (listener: () => void) => {
   listeners.add(listener);
   return () => { listeners.delete(listener); };
@@ -46,7 +52,7 @@ export const subscribeCommercialMapBoot = (listener: () => void) => {
 export function beginCommercialMapBoot() {
   bootSession += 1;
   const initialNavigation = !snapshot.marks['module-requested'];
-  snapshot = { startedAt: initialNavigation ? 0 : performance.now(), marks: {}, interactive: false, failed: false };
+  snapshot = { startedAt: initialNavigation ? 0 : performance.now(), marks: {}, interactive: false, commercialMapReady: false, failed: false };
   for (const name of Object.keys(syncTotals)) delete syncTotals[name];
   if (commercialMapDiagnosticsEnabled && typeof window !== 'undefined') {
     window.__commercialMapPerformance = { events: [], longTasks: [] };
@@ -123,10 +129,13 @@ export function markCommercialMapStage(name: string, duration?: number, failed?:
   if (typeof window === 'undefined') return;
   const at = performance.now();
   const first = snapshot.marks[name] === undefined;
-  if (first || failed || (name === 'essential-data:end' && snapshot.failed)) {
+  if (first || failed || (name === 'essential-data:end' && snapshot.failed)
+    || (name === 'commercial-map-ready' && !snapshot.commercialMapReady)
+    || (name === 'first-interactive' && !snapshot.interactive)) {
     snapshot = { ...snapshot, marks: first ? { ...snapshot.marks, [name]: at } : snapshot.marks,
       interactive: snapshot.interactive || name === 'first-interactive',
-      failed: name === 'essential-data:end' ? Boolean(failed) : snapshot.failed };
+      commercialMapReady: snapshot.commercialMapReady || name === 'commercial-map-ready',
+      failed: name === 'essential-data:end' || name === 'essential-scene:failed' ? Boolean(failed) : snapshot.failed };
     notifyBootListeners();
   }
   const markName = PREFIX + name;

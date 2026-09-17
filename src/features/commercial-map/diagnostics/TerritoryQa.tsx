@@ -27,6 +27,42 @@ export function TerritoryQa() {
     const receive = (event: Event) => {
       if (!controls) return;
       const request = (event as CustomEvent).detail;
+      if (request.inspectSpatial) {
+        const geometries = new Set<import('three').BufferGeometry>();
+        const materials = new Set<import('three').Material>();
+        const buffers = new Set<ArrayBufferLike>();
+        let objects = 0, meshes = 0, instances = 0, allocatedTriangles = 0;
+        const groups: Record<string, { objects: number; meshes: number; instances: number }> = {};
+        scene.traverse(object => {
+          objects++;
+          const mesh = object as Mesh & { isMesh?: boolean; isInstancedMesh?: boolean; count?: number; instanceMatrix?: import('three').InstancedBufferAttribute };
+          if (!mesh.isMesh) return;
+          meshes++;
+          const count = mesh.isInstancedMesh ? mesh.count ?? 0 : 1;
+          if (mesh.isInstancedMesh) instances += count;
+          geometries.add(mesh.geometry);
+          (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach(m => materials.add(m));
+          allocatedTriangles += (mesh.geometry.index?.count ?? mesh.geometry.attributes.position?.count ?? 0) / 3 * count;
+          if (mesh.instanceMatrix) buffers.add(mesh.instanceMatrix.array.buffer);
+          let parent = object.parent;
+          while (parent && !/territorial-environment-layer|progressive-|essential-/.test(parent.name)) parent = parent.parent;
+          const key = parent?.name ?? 'core';
+          const group = groups[key] ??= { objects: 0, meshes: 0, instances: 0 };
+          group.meshes++;
+          group.instances += mesh.isInstancedMesh ? count : 0;
+        });
+        geometries.forEach(g => {
+          Object.values(g.attributes).forEach(a => { if ('array' in a) buffers.add(a.array.buffer); });
+          if (g.index) buffers.add(g.index.array.buffer);
+        });
+        gl.domElement.dataset.spatialInspection = JSON.stringify({
+          objects, meshes, instances, allocatedTriangles, geometries: geometries.size,
+          materials: materials.size, geometryBufferBytes: [...buffers].reduce((sum, b) => sum + b.byteLength, 0), groups,
+          renderer: window.__commercialMapRuntimeDiagnostics?.capture(), boot: getCommercialMapBootSnapshot(),
+          camera: { position: camera.position.toArray(), target: controls.target.toArray(), minDistance: controls.minDistance, maxDistance: controls.maxDistance },
+        });
+        return;
+      }
       if (request.inspectArena) {
         scene.updateMatrixWorld(true);
         const layers: unknown[] = [];

@@ -4,7 +4,8 @@ import * as THREE from 'three';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { commercialMapDiagnosticsEnabled, getCommercialMapBootSnapshot, markCommercialMapStage } from '../../utils/performanceDiagnostics';
 import { retainHydrologyPreparationOwner } from '../../utils/hydrologyPreparationResource';
-import { createSceneHydrationQueue, qualifiesInteractiveFrame, type SceneHydrationTask } from '../../utils/progressiveSceneBoot';
+import { createSceneHydrationQueue, qualifiesCommercialMapReady, type SceneHydrationTask } from '../../utils/progressiveSceneBoot';
+import { COMMERCIAL_MAP_PREPARING_EVENT } from '../../utils/renderingHealth';
 import { readLatestCommercialMapRenderHealth } from '../../utils/renderingHealth';
 import { isCommercialSceneCompiling, prepareCommercialSceneLayer } from '../../utils/sceneShaderWarmup';
 
@@ -50,7 +51,8 @@ export function scheduleCommercialMapSceneTask(canvas: HTMLCanvasElement, task: 
   return queueFor(canvas).add(task);
 }
 
-/** Mark responsive readiness before admitting any optional scene construction. */
+/** Only engine-only / opt-in layers remain deferred. All default visible
+ * structures and vegetation are committed and compiled before this barrier. */
 export function CommercialMapInteractiveBoot() {
   const gl = useThree((state) => state.gl);
   const invalidate = useThree((state) => state.invalidate);
@@ -59,6 +61,14 @@ export function CommercialMapInteractiveBoot() {
   useEffect(() => {
     const canvas = gl.domElement;
     const releaseHydrologyOwner = retainHydrologyPreparationOwner(canvas);
+    const reset = () => {
+      timing.current = { last: 0, responsive: 0, ready: false };
+      canvas.dataset.commercialMapReady = 'false';
+      canvas.dataset.commercialMapInteractive = 'false';
+      invalidate();
+    };
+    canvas.addEventListener('webglcontextlost', reset);
+    canvas.addEventListener(COMMERCIAL_MAP_PREPARING_EVENT, reset);
     let responseMeasured = false;
     const onInput = () => {
       lastInteraction.set(canvas, performance.now());
@@ -77,6 +87,8 @@ export function CommercialMapInteractiveBoot() {
       canvas.removeEventListener('pointerdown', onInput);
       canvas.removeEventListener('pointermove', onInput);
       canvas.removeEventListener('wheel', onInput);
+      canvas.removeEventListener('webglcontextlost', reset);
+      canvas.removeEventListener(COMMERCIAL_MAP_PREPARING_EVENT, reset);
       queues.get(canvas)?.dispose();
       queues.delete(canvas);
       lastInteraction.delete(canvas);
@@ -91,7 +103,8 @@ export function CommercialMapInteractiveBoot() {
     frame.last = now;
     frame.responsive = interval > 0 && interval <= 100 ? frame.responsive + 1 : 0;
     const health = readLatestCommercialMapRenderHealth(gl.domElement);
-    if (qualifiesInteractiveFrame({
+    if (qualifiesCommercialMapReady({
+      essentialPrepared: gl.domElement.dataset.commercialMapEssentialReady === 'true',
       presentedFrames: health?.presentedFrames ?? 0,
       consecutiveResponsiveFrames: frame.responsive,
       preparing: isCommercialSceneCompiling(gl) || Boolean(gl.domElement.dataset.commercialMapPreparing)
@@ -101,6 +114,8 @@ export function CommercialMapInteractiveBoot() {
     })) {
       frame.ready = true;
       gl.domElement.dataset.commercialMapInteractive = 'true';
+      gl.domElement.dataset.commercialMapReady = 'true';
+      markCommercialMapStage('commercial-map-ready');
       markCommercialMapStage('first-interactive');
       queueFor(gl.domElement).start();
     } else invalidate();

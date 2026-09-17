@@ -5,8 +5,8 @@ import './commercial-map-boot-loader.css';
 const milestones = [
   { label: 'Dados comerciais', weight: 23, keys: ['essential-data:end', 'essential-data:cached', 'fixture-data-ready'] },
   { label: 'Estrutura do parque', weight: 32, keys: ['critical-scene:end'] },
-  { label: 'Preparando visualização', weight: 30, keys: ['first-draw'] },
-  { label: 'Controles e navegação', weight: 15, keys: ['first-interactive'] },
+  { label: 'Preparando visualização', weight: 30, keys: ['essential-scene:prepared'] },
+  { label: 'Controles e navegação', weight: 15, keys: ['commercial-map-ready'] },
 ] as const;
 
 export function commercialMapBootProgress(boot: CommercialMapBootSnapshot) {
@@ -18,7 +18,7 @@ export function commercialMapBootProgress(boot: CommercialMapBootSnapshot) {
 /** CSS/SVG only. Percentages advance exclusively when the renderer/data report completion. */
 export function CommercialMapBootLoader({ force = false, error, onRetry }: { force?: boolean; error?: string; onRetry?: () => void }) {
   const boot = useSyncExternalStore(subscribeCommercialMapBoot, getCommercialMapBootSnapshot, getCommercialMapBootSnapshot);
-  if (boot.interactive && !force && !error) return null;
+  if (boot.commercialMapReady && !force && !error) return null;
   const { done, progress, current } = commercialMapBootProgress(boot);
   const failed = error || (boot.failed ? 'Não foi possível preparar o mapa. Tente novamente.' : null);
   return <section className="commercial-map-boot" aria-label="Carregamento do Mapa Comercial" data-map-boot={failed ? 'failed' : 'loading'}>
@@ -42,7 +42,7 @@ export function CommercialMapBootLoader({ force = false, error, onRetry }: { for
         <span aria-hidden="true">{done[index] ? '✓' : current === index ? '●' : '○'}</span>{stage.label}
       </li>)}</ol>
       {failed && <button type="button" onClick={onRetry ?? (() => window.location.reload())}>Tentar novamente</button>}
-      <small>O ambiente ganha detalhes enquanto você explora.</small>
+      <small>Preparando o parque completo para você explorar.</small>
     </div>
   </section>;
 }

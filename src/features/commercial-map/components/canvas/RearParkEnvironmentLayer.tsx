@@ -15,6 +15,7 @@ import {
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { buildRearTerrainPatchGeometry } from '../../utils/rearTerrainGeometry';
 import { applyParkGroundDetail } from './terrainMaterial';
+import { clipContextPolygon } from '../../data/commercialMapSpatialBounds';
 
 interface RearParkEnvironmentLayerProps {
   reducedGraphics: boolean;
@@ -45,10 +46,11 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
   const trunkRef = useRef<THREE.InstancedMesh>(null);
   const poleRef = useRef<THREE.InstancedMesh>(null);
 
-  const terrain = useMemo(() => REAR_TERRAIN_PATCHES.map((patch) => {
-    const outline = sourcePolygonToLocal(patch.sourcePolygon);
+  const terrain = useMemo(() => REAR_TERRAIN_PATCHES.flatMap((patch) => {
+    const outline = clipContextPolygon(sourcePolygonToLocal(patch.sourcePolygon));
+    if (outline.length < 3) return [];
     const geometry = buildRearTerrainPatchGeometry(outline, patch.baseElevation);
-    return { patch, geometry };
+    return [{ patch, geometry }];
   }), []);
 
   useEffect(() => () => terrain.forEach((entry) => entry.geometry.dispose()), [terrain]);

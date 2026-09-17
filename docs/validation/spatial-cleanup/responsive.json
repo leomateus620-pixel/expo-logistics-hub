@@ -1,0 +1,985 @@
+{
+  "errors": [],
+  "results": [
+    {
+      "width": 1920,
+      "height": 1080,
+      "first": {
+        "camera": {
+          "position": [
+            3.8127,
+            109.9563,
+            104.2786
+          ],
+          "target": [
+            -2.2546,
+            0.744,
+            -0.3832
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 0.09462,
+          "far": 1283.245,
+          "distance": 151.3876,
+          "minDistance": 8.7889,
+          "maxDistance": 328.6701,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 328.6701,
+          "calculatedMaxDistance": 328.6701,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 1905,
+            "height": 982,
+            "aspect": 1.93992,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 61,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      },
+      "maximum": {
+        "camera": {
+          "position": [
+            10.9799,
+            237.8493,
+            226.8391
+          ],
+          "target": [
+            -2.1926,
+            0.744,
+            -0.3868
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 1.36946,
+          "far": 1283.245,
+          "distance": 328.6701,
+          "minDistance": 8.7889,
+          "maxDistance": 328.6701,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 328.6701,
+          "calculatedMaxDistance": 328.6701,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 1905,
+            "height": 982,
+            "aspect": 1.93992,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 233,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      },
+      "pan": {
+        "camera": {
+          "position": [
+            83.0673,
+            109.9563,
+            166.9345
+          ],
+          "target": [
+            77,
+            0.744,
+            62.2727
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 0.63078,
+          "far": 1283.245,
+          "distance": 151.3876,
+          "minDistance": 8.7889,
+          "maxDistance": 328.6701,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 328.6701,
+          "calculatedMaxDistance": 328.6701,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 1905,
+            "height": 982,
+            "aspect": 1.93992,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 709,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      }
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "first": {
+        "camera": {
+          "position": [
+            3.8127,
+            109.9563,
+            104.2786
+          ],
+          "target": [
+            -2.2546,
+            0.744,
+            -0.3832
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 0.09462,
+          "far": 1283.245,
+          "distance": 151.3876,
+          "minDistance": 8.7889,
+          "maxDistance": 328.6701,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 328.6701,
+          "calculatedMaxDistance": 328.6701,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 1351,
+            "height": 640,
+            "aspect": 2.11094,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 802,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      },
+      "maximum": {
+        "camera": {
+          "position": [
+            11.0131,
+            237.8493,
+            226.8372
+          ],
+          "target": [
+            -2.1594,
+            0.744,
+            -0.3887
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 1.36946,
+          "far": 1283.245,
+          "distance": 328.6701,
+          "minDistance": 8.7889,
+          "maxDistance": 328.6701,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 328.6701,
+          "calculatedMaxDistance": 328.6701,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 1351,
+            "height": 640,
+            "aspect": 2.11094,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 895,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      },
+      "pan": {
+        "camera": {
+          "position": [
+            83.0673,
+            109.9563,
+            166.9345
+          ],
+          "target": [
+            77,
+            0.744,
+            62.2727
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 0.63078,
+          "far": 1283.245,
+          "distance": 151.3876,
+          "minDistance": 8.7889,
+          "maxDistance": 328.6701,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 328.6701,
+          "calculatedMaxDistance": 328.6701,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 1351,
+            "height": 640,
+            "aspect": 2.11094,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1309,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      }
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "first": {
+        "camera": {
+          "position": [
+            4.7431,
+            126.7031,
+            120.3276
+          ],
+          "target": [
+            -2.2546,
+            0.744,
+            -0.3832
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 0.10913,
+          "far": 1283.245,
+          "distance": 174.6017,
+          "minDistance": 8.7889,
+          "maxDistance": 328.6701,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 328.6701,
+          "calculatedMaxDistance": 328.6701,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 1009,
+            "height": 640,
+            "aspect": 1.57656,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1430,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      },
+      "maximum": {
+        "camera": {
+          "position": [
+            11.0006,
+            237.8493,
+            226.8379
+          ],
+          "target": [
+            -2.1719,
+            0.744,
+            -0.388
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 1.36946,
+          "far": 1283.245,
+          "distance": 328.6701,
+          "minDistance": 8.7889,
+          "maxDistance": 328.6701,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 328.6701,
+          "calculatedMaxDistance": 328.6701,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 1009,
+            "height": 640,
+            "aspect": 1.57656,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1525,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      },
+      "pan": {
+        "camera": {
+          "position": [
+            83.9977,
+            126.7031,
+            182.9835
+          ],
+          "target": [
+            77,
+            0.744,
+            62.2727
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 0.72751,
+          "far": 1283.245,
+          "distance": 174.6017,
+          "minDistance": 8.7889,
+          "maxDistance": 328.6701,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 328.6701,
+          "calculatedMaxDistance": 328.6701,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 1009,
+            "height": 640,
+            "aspect": 1.57656,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 2005,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      }
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "first": {
+        "camera": {
+          "position": [
+            13.7584,
+            288.9784,
+            275.8414
+          ],
+          "target": [
+            -2.2546,
+            0.744,
+            -0.3832
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 0.24972,
+          "far": 1886.302,
+          "distance": 399.5442,
+          "minDistance": 8.7889,
+          "maxDistance": 529.689,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 529.689,
+          "calculatedMaxDistance": 529.689,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 375,
+            "height": 626,
+            "aspect": 0.59904,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 2057,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      },
+      "maximum": {
+        "camera": {
+          "position": [
+            19.0458,
+            382.8659,
+            365.8129
+          ],
+          "target": [
+            -2.1832,
+            0.744,
+            -0.3873
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 2.20704,
+          "far": 1886.302,
+          "distance": 529.689,
+          "minDistance": 8.7889,
+          "maxDistance": 529.689,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 529.689,
+          "calculatedMaxDistance": 529.689,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 375,
+            "height": 626,
+            "aspect": 0.59904,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 2137,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      },
+      "pan": {
+        "camera": {
+          "position": [
+            89.8554,
+            288.9784,
+            336.0259
+          ],
+          "target": [
+            73.8423,
+            0.744,
+            59.8013
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 1.66477,
+          "far": 1886.302,
+          "distance": 399.5442,
+          "minDistance": 8.7889,
+          "maxDistance": 529.689,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 529.689,
+          "calculatedMaxDistance": 529.689,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 375,
+            "height": 626,
+            "aspect": 0.59904,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 2611,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      }
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "first": {
+        "camera": {
+          "position": [
+            3.8127,
+            109.9563,
+            104.2786
+          ],
+          "target": [
+            -2.2546,
+            0.744,
+            -0.3832
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 0.09462,
+          "far": 1283.245,
+          "distance": 151.3876,
+          "minDistance": 8.7889,
+          "maxDistance": 529.689,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 328.6701,
+          "calculatedMaxDistance": 328.6701,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 829,
+            "height": 232,
+            "aspect": 3.57328,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 2698,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      },
+      "maximum": {
+        "camera": {
+          "position": [
+            11.1806,
+            237.8493,
+            226.8275
+          ],
+          "target": [
+            -1.992,
+            0.744,
+            -0.3984
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 1.36946,
+          "far": 1283.245,
+          "distance": 328.6701,
+          "minDistance": 8.7889,
+          "maxDistance": 328.6701,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 328.6701,
+          "calculatedMaxDistance": 328.6701,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 829,
+            "height": 232,
+            "aspect": 3.57328,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 2786,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      },
+      "pan": {
+        "camera": {
+          "position": [
+            83.0673,
+            109.9563,
+            166.9345
+          ],
+          "target": [
+            77,
+            0.744,
+            62.2727
+          ],
+          "quaternion": [
+            -0.391939,
+            0.026631,
+            0.011351,
+            0.919536
+          ],
+          "controlsEnabled": true,
+          "interiorEntityId": null,
+          "fov": 38,
+          "zoom": 1,
+          "viewOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "near": 0.63078,
+          "far": 1283.245,
+          "distance": 151.3876,
+          "minDistance": 8.7889,
+          "maxDistance": 328.6701,
+          "desiredMinDistance": 8.7889,
+          "desiredMaxDistance": 328.6701,
+          "calculatedMaxDistance": 328.6701,
+          "navigationBounds": {
+            "minX": -77,
+            "maxX": 77,
+            "minZ": -62.2727275,
+            "maxZ": 62.2727275,
+            "width": 154,
+            "depth": 124.545455,
+            "centerX": 0,
+            "centerZ": 0,
+            "maxHeight": 6.2,
+            "diagonal": 198.05951217035
+          },
+          "boundingSphereRadius": 79.8989,
+          "viewport": {
+            "width": 829,
+            "height": 232,
+            "aspect": 3.57328,
+            "dpr": 1
+          }
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 3198,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "overflow": false
+      }
+    }
+  ]
+}

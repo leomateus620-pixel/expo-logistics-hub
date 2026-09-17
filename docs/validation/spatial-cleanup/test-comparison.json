@@ -1,0 +1,250 @@
+{
+  "baselineCommit": "42e89d1b",
+  "broad": {
+    "total": 1145,
+    "passed": 1087,
+    "failed": 58
+  },
+  "reproducedOnUnmodifiedBaseline": [
+    {
+      "file": "commercialMap2026Reference.test.ts",
+      "test": "referência cartográfica oficial Fenasoja 2026 inclui a rede viária e todas as instâncias repetidas da legenda"
+    },
+    {
+      "file": "commercialMap2026Reference.test.ts",
+      "test": "referência cartográfica oficial Fenasoja 2026 mantém os 26 centros sanitários vetoriais oficiais e nenhum volume renderizado"
+    },
+    {
+      "file": "commercialMapAtmospherePersistence.test.tsx",
+      "test": "atmosphere resource lifetime is independent of Hydrological visibility keeps hidden vegetation and electrical geometry on their normal physical inputs"
+    },
+    {
+      "file": "commercialMapContextualLegend.test.tsx",
+      "test": "resumo comercial contextual retorna ao segmento e ao parque sem transportar os totais do interior"
+    },
+    {
+      "file": "commercialMapElectricalInfrastructure.test.ts",
+      "test": "infraestrutura elétrica cartográfica do Mapa Comercial preserva as 13 âncoras conflitantes e projeta só sua apresentação à fachada livre"
+    },
+    {
+      "file": "commercialMapElectricalInfrastructure.test.ts",
+      "test": "infraestrutura elétrica cartográfica do Mapa Comercial mantém todas as fases acima da folga técnica mínima em estruturas existentes"
+    },
+    {
+      "file": "commercialMapElectricalInfrastructure.test.ts",
+      "test": "infraestrutura elétrica cartográfica do Mapa Comercial mantém uma única linha batched, geometrias instanciadas e orçamento fixo de draw calls"
+    },
+    {
+      "file": "commercialMapExplorer.test.ts",
+      "test": "explorador compartilhado de entidades do mapa comercial expõe somente facetas derivadas dos metadados existentes"
+    },
+    {
+      "file": "commercialMapExporuralArchitecture.test.ts",
+      "test": "C4 / E-06 architecture and selection activity preserves the complete approved official inventory and compound placement"
+    },
+    {
+      "file": "commercialMapExporuralCartographicFidelity.test.ts",
+      "test": "fidelidade cartográfica dourada da Exporural 2026.4 preserva os 95 lotes dentro do mesmo perímetro canônico e fora das sete ruas"
+    },
+    {
+      "file": "commercialMapFenasojaReferenceStructures.test.ts",
+      "test": "reconstrução arquitetônica de B28 e D1 mantém D1 reta no eixo oficial e orienta sua fachada para leste, diante da Arena"
+    },
+    {
+      "file": "commercialMapGeometry.test.ts",
+      "test": "regras comerciais e segurança importa somente os lotes e módulos numerados pela planta e os mantém comercialmente bloqueados"
+    },
+    {
+      "file": "commercialMapHistory.test.tsx",
+      "test": "história integrada ao painel comercial persistente carrega o conteúdo apenas ao abrir e restaura informações, ações, seleção e foco ao fechar"
+    },
+    {
+      "file": "commercialMapHistory.test.tsx",
+      "test": "história integrada ao painel comercial persistente mantém conteúdo comprovado sem foto e não inventa imagem ou data de captura"
+    },
+    {
+      "file": "commercialMapHistory.test.tsx",
+      "test": "história integrada ao painel comercial persistente mostra uma foto sem controles de galeria e separa publicação de data fotográfica não confirmada"
+    },
+    {
+      "file": "commercialMapHistory.test.tsx",
+      "test": "história integrada ao painel comercial persistente exclui imagens sem correspondência, verificação ou autorização mesmo quando citadas no catálogo"
+    },
+    {
+      "file": "commercialMapHistory.test.tsx",
+      "test": "história integrada ao painel comercial persistente navega por botões, teclado e swipe sem propagar gestos ao mapa, carregando só a foto ativa e miniaturas próximas"
+    },
+    {
+      "file": "commercialMapHistory.test.tsx",
+      "test": "história integrada ao painel comercial persistente respeita economia de dados, mantém só a miniatura ativa e permite escolher outra imagem"
+    },
+    {
+      "file": "commercialMapHistory.test.tsx",
+      "test": "história integrada ao painel comercial persistente abre a foto completa sob demanda e Escape fecha primeiro a ampliação, depois a história com foco recuperado"
+    },
+    {
+      "file": "commercialMapHistory.test.tsx",
+      "test": "história integrada ao painel comercial persistente recupera falha fotográfica sem perder texto, fontes ou navegação para outra foto"
+    },
+    {
+      "file": "commercialMapHistory.test.tsx",
+      "test": "história integrada ao painel comercial persistente mantém a foto e seu acervo na ampliação mesmo se a miniatura falhar"
+    },
+    {
+      "file": "commercialMapHistory.test.tsx",
+      "test": "história integrada ao painel comercial persistente preserva o atalho global de busca dentro da história"
+    },
+    {
+      "file": "commercialMapHistory.test.tsx",
+      "test": "história integrada ao painel comercial persistente troca A→B durante a abertura lazy sem exibir história antiga ou substituir o painel"
+    },
+    {
+      "file": "commercialMapHistory.test.tsx",
+      "test": "história integrada ao painel comercial persistente preserva permissões de leitura e o estado expansível do painel inferior ao entrar e voltar"
+    },
+    {
+      "file": "commercialMapHistory.test.tsx",
+      "test": "história integrada ao painel comercial persistente preserva câmera até o layout de fechamento e retoma resize comercial ou nova seleção"
+    },
+    {
+      "file": "commercialMapIndependence.test.ts",
+      "test": "arquitetura independente do Mapa Comercial leva a Gestão ao cabeçalho preservando gates de permissão e modos ativos"
+    },
+    {
+      "file": "commercialMapMobileExperience.test.ts",
+      "test": "arquitetura mobile-first do Mapa Comercial mantém antialias, gestos GIS completos e DPR adaptativo no canvas compartilhado"
+    },
+    {
+      "file": "commercialMapNonPermanentCleanup.test.ts",
+      "test": "limpeza estrutural dos blocos não permanentes mantém ruas, quadras, lotes e pavilhões intocados"
+    },
+    {
+      "file": "commercialMapPanelSelection.test.tsx",
+      "test": "seleção no painel persistente do mapa comercial recolhe e restaura o resumo sem apagar a seleção nem entrar no interior"
+    },
+    {
+      "file": "commercialMapPanelSelection.test.tsx",
+      "test": "seleção no painel persistente do mapa comercial preserva o aside A→B, fecha a edição aberta e inicia o draft real de LotEditDialog com os dados de B"
+    },
+    {
+      "file": "commercialMapPanelSelection.test.tsx",
+      "test": "seleção no painel persistente do mapa comercial fecha o modal de Reservar ao trocar a entidade sem substituir o painel"
+    },
+    {
+      "file": "commercialMapPanelSelection.test.tsx",
+      "test": "seleção no painel persistente do mapa comercial fecha o modal de Dividir ao trocar a entidade sem substituir o painel"
+    },
+    {
+      "file": "commercialMapPanelSelection.test.tsx",
+      "test": "seleção no painel persistente do mapa comercial fecha o modal de Verificar entidade ao trocar a entidade sem substituir o painel"
+    },
+    {
+      "file": "commercialMapPanelSelection.test.tsx",
+      "test": "seleção no painel persistente do mapa comercial limpa altura transitória e estado do sheet na seleção e no unmount"
+    },
+    {
+      "file": "commercialMapPavilionCommercial.test.ts",
+      "test": "pavilion module commercial identity derives the same persisted status index for the exterior cutaway and the interior"
+    },
+    {
+      "file": "commercialMapPavilionFourSoyKitchen.test.ts",
+      "test": "Pavilhão 4 — Cozinha da Soja B7 reutiliza os postes frontais e a recepção elétrica oficiais sem duplicá-los"
+    },
+    {
+      "file": "commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno mantém o módulo 'B1' neutro e sem área individual inventada"
+    },
+    {
+      "file": "commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno mantém o módulo 'B2' neutro e sem área individual inventada"
+    },
+    {
+      "file": "commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno mantém o módulo 'B3' neutro e sem área individual inventada"
+    },
+    {
+      "file": "commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno mantém o módulo 'B8' neutro e sem área individual inventada"
+    },
+    {
+      "file": "commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno não converte a área modular total em medida individual"
+    },
+    {
+      "file": "commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno oferece somente operações válidas para um módulo disponível e persistido"
+    },
+    {
+      "file": "commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno expõe versões privadas de contrato no próprio cartão do módulo"
+    },
+    {
+      "file": "commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno não oferece venda direta enquanto o módulo permanece bloqueado"
+    },
+    {
+      "file": "commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno abre no dock com resumo, expande voluntariamente e descarta formulário ao selecionar outro módulo"
+    },
+    {
+      "file": "commercialMapPavilionOperationalRenderer.test.ts",
+      "test": "renderer operacional do interior comercial aplica situação persistida sem introduzir identidade de expositor"
+    },
+    {
+      "file": "commercialMapPavilionWayfinding.test.ts",
+      "test": "orientação visual das plantas internas comerciais não intercepta lotes e descarta recursos GPU ao trocar de interior"
+    },
+    {
+      "file": "commercialMapPavilionWayfinding.test.ts",
+      "test": "orientação visual das plantas internas comerciais apresenta os acessos como marcadores compactos fixos com rótulo apenas sob interação"
+    },
+    {
+      "file": "commercialMapPresentation.test.ts",
+      "test": "modelo de apresentação do mapa comercial mantém histerese entre níveis de rótulo durante pequenos movimentos de zoom"
+    },
+    {
+      "file": "commercialMapPresentation.test.ts",
+      "test": "modelo de apresentação do mapa comercial mantém os limites exatos e normaliza entradas inválidas da histerese"
+    },
+    {
+      "file": "commercialMapRoadPrecision.test.ts",
+      "test": "September 13 precision road correction preserves every complete official record except the explicitly shortened road"
+    },
+    {
+      "file": "commercialMapSegmentLegend.test.tsx",
+      "test": "legenda acessível dos segmentos comerciais apresenta os três segmentos, seus inventários e solicita foco"
+    },
+    {
+      "file": "commercialMapSiteEnvironment.test.ts",
+      "test": "commercial site environment presentation layer composes every reusable no-environment mask family and accepts no intersecting cell"
+    },
+    {
+      "file": "commercialMapSoyGateInfrastructure.test.ts",
+      "test": "E07 / Montevideo / A9 reference-aligned infrastructure preserves every existing entity except the authorized E07 footprint"
+    }
+  ],
+  "resolvedByFinalFocusedRun": [
+    {
+      "file": "commercialMapRendererHealth.test.tsx",
+      "test": "Commercial Map lightweight rendering health keeps preparation until frames and responsive controls qualify readiness"
+    },
+    {
+      "file": "commercialMapRendererHealth.test.tsx",
+      "test": "Commercial Map renderer recovery notice stays hidden when ready and when no renderer has published a state"
+    },
+    {
+      "file": "commercialMapRendererHealth.test.tsx",
+      "test": "Commercial Map renderer recovery notice reads failures published before mount and retries only the current canvas without reload"
+    },
+    {
+      "file": "commercialMapRendererHealth.test.tsx",
+      "test": "Commercial Map renderer recovery notice ignores another WebGL canvas and detaches its listener on unmount"
+    }
+  ],
+  "unresolvedNewFailures": [],
+  "focused": {
+    "total": 111,
+    "passed": 111,
+    "failed": 0
+  }
+}

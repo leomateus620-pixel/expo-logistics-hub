@@ -12,7 +12,7 @@ import {
   territoryContainsPoint,
 } from "../features/commercial-map/data/territorialEnvironment";
 import { createArchitectureGeometry } from "../features/commercial-map/utils/exteriorArchitectureGeometry";
-import { EXTERIOR_FISHERS } from "../features/commercial-map/utils/exteriorFishing";
+import { EXTERIOR_FISHERS, buildExteriorFishingScene } from "../features/commercial-map/utils/exteriorFishing";
 import { territoryRoadClearance } from "../features/commercial-map/utils/territorialRoadGeometry";
 
 describe("exterior architectural contract", () => {
@@ -104,8 +104,11 @@ describe("exterior architectural contract", () => {
       );
     }
   });
-  it("seats exactly five people outside water and roads, with rod floats inside the assigned pond", () => {
-    expect(EXTERIOR_FISHERS).toHaveLength(5);
+  it("does not create people, reeds, water geometry or materials for removed distant ponds", () => {
+    expect(EXTERIOR_FISHERS).toHaveLength(0);
+    const fishing = buildExteriorFishingScene();
+    expect(fishing.group.children).toHaveLength(0);
+    fishing.dispose();
     EXTERIOR_FISHERS.forEach((f) => {
       const pond = TERRITORY_PATCHES.find((p) => p.id === f.pondId)!;
       expect(territoryContainsPoint(f.position, pond.ring), f.id).toBe(false);
