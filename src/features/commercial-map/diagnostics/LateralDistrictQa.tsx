@@ -90,19 +90,41 @@ export function LateralDistrictQaScene() {
         invalidate();
         return;
       }
-      if (useCommercialMapStore.getState().cameraNavigating) return;
+      if (useCommercialMapStore.getState().cameraNavigating) {
+        if (!String(view).startsWith('mirante-')) return;
+        useCommercialMapStore.getState().setCameraNavigating(false);
+      }
       sweep.current = null;
       stopCommercialMapOrbitMotion(camera, controls);
-      const miranteViews: Partial<Record<View, { direction: Vector3; distance: number }>> = {
-        'mirante-top': { direction: new Vector3(0.002, 1, 0.01), distance: 22 },
-        'mirante-oblique': { direction: new Vector3(-0.85, 0.55, 0.35), distance: 14 },
-        'mirante-street': { direction: new Vector3(-1, 0.18, 0.08), distance: 6.4 },
-        'mirante-arena': { direction: new Vector3(0.92, 0.42, 0.12), distance: 18 },
-        'mirante-stairs': { direction: new Vector3(-0.15, 0.38, -1), distance: 8.5 },
+      const terrace = miranteComplexCenter();
+      const mirante = miranteComplexSourceBoundsToLocal(MIRANTE_COMPLEX.mirante.sourceBounds);
+      const lateral = miranteComplexSourceBoundsToLocal(MIRANTE_COMPLEX.lateralStructure.sourceBounds);
+      const sidewalk = miranteComplexSourceBoundsToLocal(MIRANTE_COMPLEX.sidewalk.sourceBounds);
+      const miranteViews: Partial<Record<View, { position: Vector3; target: Vector3 }>> = {
+        'mirante-top': {
+          position: new Vector3(terrace.x, 11.5, terrace.z + 0.08),
+          target: terrace.clone(),
+        },
+        'mirante-oblique': {
+          position: new Vector3(sidewalk.minX - 2.4, 3.6, lateral.maxZ + 1.8),
+          target: new Vector3(lateral.centerX + 0.4, terrace.y, terrace.z),
+        },
+        'mirante-street': {
+          position: new Vector3(sidewalk.minX - 1.55, 1.55, lateral.centerZ + 0.35),
+          target: new Vector3(lateral.centerX + 0.15, terrace.y + 0.22, lateral.centerZ - 0.2),
+        },
+        'mirante-arena': {
+          position: new Vector3(lateral.maxX + 6.8, 3.2, terrace.z + 0.6),
+          target: new Vector3(mirante.centerX, terrace.y + 0.12, terrace.z),
+        },
+        'mirante-stairs': {
+          position: new Vector3(mirante.centerX - 1.1, 1.35, mirante.minZ - 2.2),
+          target: new Vector3(mirante.centerX, terrace.y + 0.08, mirante.minZ + 0.4),
+        },
       };
       const mirantePose = miranteViews[view];
       // Registered avenue interval: world x[-47,13], exterior z[28,44].
-      const center = mirantePose ? miranteComplexCenter() : new Vector3(-17, 0.1, 35.5);
+      const center = mirantePose ? mirantePose.target : new Vector3(-17, 0.1, 35.5);
       const portrait = size.height > size.width;
       const directions: Record<Exclude<View, 'visibility' | 'snapshot' | keyof typeof miranteViews>, Vector3> = {
         top: portrait ? new Vector3(.008, 1, 0) : new Vector3(0, 1, .008),
@@ -112,13 +134,11 @@ export function LateralDistrictQaScene() {
       };
       const tangent = Math.tan(camera.fov * Math.PI / 360);
       const horizontalFit = (portrait ? 13 : 36) / (tangent * Math.max(.2, size.width / size.height));
-      const distance = mirantePose
-        ? mirantePose.distance
-        : view === 'maximum' ? controls.minDistance : view === 'close' ? 15 : Math.max(53, horizontalFit, portrait ? 36 / tangent : 0);
-      const offset = mirantePose ? mirantePose.direction : directions[view as keyof typeof directions];
+      const distance = view === 'maximum' ? controls.minDistance : view === 'close' ? 15 : Math.max(53, horizontalFit, portrait ? 36 / tangent : 0);
       controls.target.copy(center);
       camera.up.set(0, 1, 0);
-      camera.position.copy(center).addScaledVector(offset.normalize(), distance);
+      if (mirantePose) camera.position.copy(mirantePose.position);
+      else camera.position.copy(center).addScaledVector(directions[view as keyof typeof directions].normalize(), distance);
       camera.lookAt(center);
       controls.update();
       camera.updateMatrixWorld();
