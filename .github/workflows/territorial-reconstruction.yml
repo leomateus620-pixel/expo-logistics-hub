@@ -17,6 +17,10 @@ jobs:
   validate:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [standard, wide, mobile]
     env:
       VITE_SUPABASE_URL: https://qa.invalid
       VITE_SUPABASE_PUBLISHABLE_KEY: qa-placeholder
@@ -30,38 +34,29 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
-      - name: Baseline source and locked dependencies
+      - name: Map contracts
         run: |
-          mkdir -p territorial-validation transfer
+          mkdir -p territorial-validation
           git rev-parse HEAD > territorial-validation/commit.txt
-          tar -czf transfer/source.tgz src public scripts package.json package-lock.json index.html vite.config.ts vitest.config.ts tsconfig*.json tailwind.config.ts postcss.config.js eslint.config.js .github README.md
-          tar -czf transfer/dependencies.tgz node_modules
-      - name: Map contracts baseline
-        continue-on-error: true
-        run: npx vitest run src/test/commercialMap --reporter=json --outputFile=territorial-validation/tests.json
+          npx vitest run src/test/commercialMap --reporter=json --outputFile=territorial-validation/tests.json
       - name: TypeScript
-        run: npx tsc --noEmit -p tsconfig.app.json
+        run: npm run typecheck
       - name: Production build
         run: |
           set -o pipefail
           npm run build 2>&1 | tee territorial-validation/build.log
+      - name: Browser
+        run: |
+          python -m pip install playwright==1.57.0 Pillow==11.3.0
+          python -m playwright install --with-deps chromium
+      - name: Real-map views and metrics
+        run: |
+          npm run dev -- --host 127.0.0.1 --port 4188 > territorial-validation/server.log 2>&1 &
+          for i in $(seq 1 45); do curl -fsS http://127.0.0.1:4188 > /dev/null && break; sleep 1; done
+          python scripts/territorial-capture.py --project ${{ matrix.project }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: territorial-validation-${{ github.sha }}
+          name: territorial-validation-${{ matrix.project }}-${{ github.sha }}
           path: territorial-validation/
           retention-days: 14
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: territorial-source-${{ github.sha }}
-          path: transfer/source.tgz
-          retention-days: 3
-          compression-level: 0
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: territorial-dependencies-${{ github.sha }}
-          path: transfer/dependencies.tgz
-          retention-days: 3
-          compression-level: 0
