@@ -1,3 +1,4 @@
+import { ARENA_CANONICAL_LAYOUT } from './arenaCanonicalLayout';
 import { OFFICIAL_REFERENCE_DATA, officialPdfPointToLocal } from './officialReference2026';
 import {
   ETHNIC_QUARTER_SOURCE_BOUNDS,
@@ -78,8 +79,8 @@ export const REAR_TERRAIN_PATCHES: readonly RearTerrainPatch[] = Object.freeze([
 /** Limites de auditoria explícitos, extraídos da planta oficial. */
 export const REAR_STRUCTURE_EXCLUSIONS: readonly SourceBounds[] = Object.freeze([
   ETHNIC_QUARTER_SOURCE_BOUNDS,
-  [4860, 2650, 5430, 3180], // Arena Shows (F)
-  [4660, 2860, 4880, 3200], // apron de concreto a oeste da Arena (antigo campo absorvido)
+  ARENA_CANONICAL_LAYOUT.arenaFootprint.sourceBounds, // Same F envelope, not an independent mask
+  ARENA_CANONICAL_LAYOUT.frontPlaza.sourceBounds, // Rectangular apron; former L is natural ground
   [3980, 3140, 4530, 3480], // Centro de Eventos (C1)
   [3970, 2420, 4120, 2850], // Espaço Mirante (D3)
   [4960, 2350, 5120, 2500], // Churrascaria Exporural (C4)

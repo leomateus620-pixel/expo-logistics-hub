@@ -4,10 +4,12 @@ import type { OrbitControls } from "three-stdlib";
 import { useCommercialMapStore } from "../state/useCommercialMapStore";
 import { stopCommercialMapOrbitMotion } from "../utils/cameraTransition";
 import { Box3, Group, Mesh } from "three";
+import { getCommercialMapBootSnapshot } from "../utils/performanceDiagnostics";
 
 /** DEV-only reproducible camera poses and demand-render navigation timing. */
 export function TerritoryQa() {
   const { camera, gl, invalidate, scene } = useThree();
+  const keepRendering = useRef(false);
   const controls = useThree((s) => s.controls) as OrbitControls | null;
   const run = useRef<{
     start: number;
@@ -25,6 +27,29 @@ export function TerritoryQa() {
     const receive = (event: Event) => {
       if (!controls) return;
       const request = (event as CustomEvent).detail;
+      if (request.inspectArena) {
+        scene.updateMatrixWorld(true);
+        const layers: unknown[] = [];
+        scene.traverse(object => {
+          if (!/progressive-|arena|mirante|sicredi/i.test(object.name)) return;
+          const mesh = object as Mesh & { count?: number };
+          layers.push({ name: object.name, visible: object.visible,
+            ancestorsVisible: (() => { let parent = object.parent; while(parent) { if(!parent.visible) return false; parent=parent.parent; } return true; })(),
+            bounds: new Box3().setFromObject(object), userData: object.userData,
+            count: mesh.count, vertices: mesh.geometry?.attributes.position?.count,
+            triangles: mesh.geometry ? (mesh.geometry.index?.count ?? mesh.geometry.attributes.position?.count ?? 0)/3 : null });
+        });
+        gl.domElement.dataset.arenaInspection = JSON.stringify({layers, boot: getCommercialMapBootSnapshot(),
+          cameraNavigating:useCommercialMapStore.getState().cameraNavigating, renderer:{calls:gl.info.render.calls,
+          triangles:gl.info.render.triangles,geometries:gl.info.memory.geometries,textures:gl.info.memory.textures},
+          camera:camera.position.toArray()});
+        return;
+      }
+      if (typeof request.keepRendering === 'boolean') {
+        keepRendering.current = request.keepRendering;
+        invalidate();
+        if (!request.target) return;
+      }
       if (request.release) {
         pose.current = null;
         return;
@@ -81,6 +106,7 @@ export function TerritoryQa() {
       ).detail;
       pose.current = { target, position };
       stopCommercialMapOrbitMotion(camera, controls);
+      controls.minDistance = 0.1;
       controls.minPolarAngle = 0;
       controls.maxPolarAngle = Math.PI / 2;
       controls.maxDistance = 1000;
@@ -109,6 +135,7 @@ export function TerritoryQa() {
     };
   }, [camera, controls, invalidate, gl, scene]);
   useFrame((_, delta) => {
+    if (keepRendering.current) invalidate();
     if (pose.current && controls) {
       camera.position.set(...pose.current.position);
       controls.target.set(...pose.current.target);

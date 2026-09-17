@@ -1,3 +1,4 @@
+import { SicrediArena } from './SicrediArena';
 import { SoyRestroom, GateNineTanks } from './SoyGateInfrastructure';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
@@ -456,11 +457,11 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     accent: '#aeb9b2',
     roof: '#efeee7',
     trim: '#0a7b4c',
-    dark: '#151b1b',
+    dark: '#414d48',
     glass: '#263537',
-    green: '#079255',
+    green: '#539536',
     white: '#f5f5ee',
-    platform: '#797d75',
+    platform: '#bab8aa',
     metal: '#727b78',
   },
   'amusement-park': {
@@ -678,6 +679,12 @@ function useLandmarkMaterials(
       result.platform.roughness = 0.9;
       result.metal.roughness = 0.46;
       result.metal.metalness = 0.36;
+    }
+    if (kind === 'sicredi-arena') {
+      result.roof.roughness = 0.64; result.roof.metalness = 0.2;
+      result.green.roughness = 0.73; result.green.metalness = 0.04;
+      result.metal.roughness = 0.62; result.metal.metalness = 0.28;
+      result.platform.roughness = 0.96;
     }
     if (kind === 'fenasoja-event-center') {
       result.wall.roughness = 0.9;
@@ -1052,71 +1059,6 @@ function createShieldGeometry(width: number, height: number) {
   shape.quadraticCurveTo(0, -height * 0.62, -width * 0.42, -height * 0.16);
   shape.closePath();
   const geometry = new THREE.ShapeGeometry(shape, 4);
-  geometry.computeVertexNormals();
-  geometry.computeBoundingBox();
-  geometry.computeBoundingSphere();
-  return geometry;
-}
-
-function createArenaShellGeometry(halfWidth: number, rise: number, depth: number) {
-  const segments = 32;
-  const positions: number[] = [];
-  const indices: number[] = [];
-  for (let index = 0; index <= segments; index += 1) {
-    const angle = Math.PI - index / segments * Math.PI;
-    const x = Math.cos(angle) * halfWidth;
-    const y = Math.sin(angle) * rise;
-    positions.push(x, y, depth / 2, x, y, -depth / 2);
-  }
-  for (let index = 0; index < segments; index += 1) {
-    const front = index * 2;
-    const back = front + 1;
-    const nextFront = front + 2;
-    const nextBack = front + 3;
-    indices.push(front, nextFront, back, nextFront, nextBack, back);
-  }
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-  geometry.computeBoundingBox();
-  geometry.computeBoundingSphere();
-  return geometry;
-}
-
-function createArchedFacadeGeometry(halfWidth: number, rise: number) {
-  const shape = new THREE.Shape();
-  shape.moveTo(-halfWidth, 0);
-  for (let index = 0; index <= 32; index += 1) {
-    const angle = Math.PI - index / 32 * Math.PI;
-    shape.lineTo(Math.cos(angle) * halfWidth, Math.sin(angle) * rise);
-  }
-  shape.lineTo(-halfWidth, 0);
-  shape.closePath();
-  const geometry = new THREE.ShapeGeometry(shape, 1);
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-function createEllipticalArchBandGeometry(
-  halfWidth: number,
-  rise: number,
-  thickness: number,
-) {
-  const innerHalfWidth = Math.max(0.1, halfWidth - thickness);
-  const innerRise = Math.max(0.1, rise - thickness * 0.82);
-  const shape = new THREE.Shape();
-  shape.moveTo(-halfWidth, 0);
-  for (let index = 0; index <= 32; index += 1) {
-    const angle = Math.PI - index / 32 * Math.PI;
-    shape.lineTo(Math.cos(angle) * halfWidth, Math.sin(angle) * rise);
-  }
-  for (let index = 32; index >= 0; index -= 1) {
-    const angle = Math.PI - index / 32 * Math.PI;
-    shape.lineTo(Math.cos(angle) * innerHalfWidth, Math.sin(angle) * innerRise);
-  }
-  shape.closePath();
-  const geometry = new THREE.ShapeGeometry(shape, 1);
   geometry.computeVertexNormals();
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
@@ -2695,112 +2637,6 @@ function FenasojaRestaurant({
             position: [x, slabHeight + 0.09, bodyFrontZ + depth * 0.13] as Vector3Tuple,
             scale: [depth * 0.08, 0.018, depth * 0.08] as Vector3Tuple,
           }))} />
-        </>
-      )}
-    </group>
-  );
-}
-
-function SicrediArena({
-  bounds,
-  height,
-  materials,
-  showDetail,
-  showFocusDetail,
-}: LandmarkModelProps) {
-  const width = bounds.width;
-  const depth = bounds.depth;
-  const halfWidth = Math.min(width * 0.455, height * 0.92);
-  const rise = Math.min(height * 0.83, halfWidth * 0.98);
-  const shellDepth = depth * 0.54;
-  const shellZ = -depth * 0.08;
-  const shellFrontZ = shellZ + shellDepth / 2;
-  const shellGeometry = useMemo(
-    () => createArenaShellGeometry(halfWidth, rise, shellDepth),
-    [halfWidth, rise, shellDepth],
-  );
-  const rearArch = useMemo(
-    () => createArchedFacadeGeometry(halfWidth * 0.86, rise * 0.84),
-    [halfWidth, rise],
-  );
-  const greenArch = useMemo(
-    () => createEllipticalArchBandGeometry(halfWidth, rise, width * 0.038),
-    [halfWidth, rise, width],
-  );
-  const innerArch = useMemo(
-    () => createEllipticalArchBandGeometry(
-      halfWidth - width * 0.056,
-      rise - width * 0.045,
-      width * 0.012,
-    ),
-    [halfWidth, rise, width],
-  );
-  const interiorRib = useMemo(
-    () => createEllipticalArchBandGeometry(
-      halfWidth - width * 0.075,
-      rise - width * 0.06,
-      width * 0.012,
-    ),
-    [halfWidth, rise, width],
-  );
-  const trussItems: InstanceTransform[] = [
-    ...[-0.62, -0.35, 0.35, 0.62].map((x) => ({
-      position: [x * halfWidth, rise * 0.36, shellFrontZ + 0.07] as Vector3Tuple,
-      scale: [0.065, rise * 0.72, 0.065] as Vector3Tuple,
-    })),
-    { position: [0, rise * 0.69, shellFrontZ + 0.07], scale: [halfWidth * 1.22, 0.065, 0.065] },
-  ];
-
-  useEffect(() => () => {
-    shellGeometry.dispose();
-    rearArch.dispose();
-    greenArch.dispose();
-    innerArch.dispose();
-    interiorRib.dispose();
-  }, [greenArch, innerArch, interiorRib, rearArch, shellGeometry]);
-
-  return (
-    <group dispose={null}>
-      <mesh geometry={UNIT_BOX} material={materials.platform} position={[0, 0.065, depth * 0.345]} scale={[width * 0.94, 0.13, depth * 0.29]} receiveShadow raycast={NO_RAYCAST} dispose={null} />
-      <mesh geometry={UNIT_BOX} material={materials.dark} position={[0, 0.15, shellZ]} scale={[halfWidth * 1.74, 0.23, shellDepth * 0.87]} receiveShadow raycast={NO_RAYCAST} dispose={null} />
-      <mesh geometry={shellGeometry} material={materials.white} position={[0, 0.18, shellZ]} castShadow receiveShadow raycast={NO_RAYCAST} />
-      <mesh geometry={rearArch} material={materials.dark} position={[0, 0.18, shellZ - shellDepth * 0.492]} raycast={NO_RAYCAST} />
-      <mesh geometry={UNIT_BOX} material={materials.glass} position={[0, rise * 0.31, shellZ - shellDepth * 0.485]} scale={[halfWidth * 1.34, rise * 0.51, 0.045]} raycast={NO_RAYCAST} dispose={null} />
-      <mesh geometry={greenArch} material={materials.green} position={[0, 0.18, shellFrontZ + 0.06]} castShadow raycast={NO_RAYCAST} />
-      <mesh geometry={innerArch} material={materials.white} position={[0, 0.18, shellFrontZ + 0.082]} raycast={NO_RAYCAST} />
-      <ScaledInstances material={materials.green} items={[
-        { position: [-halfWidth * 0.93, rise * 0.27, shellZ], scale: [width * 0.064, rise * 0.54, shellDepth * 0.86], rotation: [0, 0, -0.1] },
-        { position: [halfWidth * 0.93, rise * 0.27, shellZ], scale: [width * 0.064, rise * 0.54, shellDepth * 0.86], rotation: [0, 0, 0.1] },
-      ]} castShadow />
-      <ScaledInstances material={materials.dark} items={[
-        { position: [-halfWidth * 0.72, rise * 0.34, shellFrontZ + 0.1], scale: [width * 0.078, rise * 0.44, depth * 0.065] },
-        { position: [halfWidth * 0.72, rise * 0.34, shellFrontZ + 0.1], scale: [width * 0.078, rise * 0.44, depth * 0.065] },
-      ]} />
-      {showDetail && (
-        <>
-          <ScaledInstances material={materials.metal} items={trussItems} />
-          <SignagePanel title="SICREDI  |  ICATU" subtitle="COOPERA" position={[0, rise * 0.765, shellFrontZ + 0.14]} size={[halfWidth * 1.04, rise * 0.13]} background="#164936" />
-          <ScaledInstances material={materials.accent} items={[
-            { position: [0, 0.155, depth * 0.255], scale: [width * 0.68, 0.05, depth * 0.038] },
-            { position: [0, 0.115, depth * 0.302], scale: [width * 0.75, 0.04, depth * 0.038] },
-            { position: [0, 0.08, depth * 0.348], scale: [width * 0.81, 0.035, depth * 0.038] },
-          ]} />
-        </>
-      )}
-      {showFocusDetail && (
-        <>
-          <ScaledInstances geometry={interiorRib} material={materials.accent} items={[
-            { position: [0, 0.18, shellFrontZ - shellDepth * 0.25], scale: [1, 1, 1] },
-            { position: [0, 0.18, shellFrontZ - shellDepth * 0.52], scale: [1, 1, 1] },
-          ]} />
-          <ScaledInstances material={materials.metal} items={[-0.82, -0.55, 0.55, 0.82].map((x) => ({
-            position: [x * halfWidth, rise * 0.19, shellZ - shellDepth * 0.18] as Vector3Tuple,
-            scale: [0.042, rise * 0.38, 0.042] as Vector3Tuple,
-          }))} />
-          <ScaledInstances material={materials.dark} items={[
-            { position: [-halfWidth * 0.43, rise * 0.18, shellZ - shellDepth * 0.27], scale: [width * 0.09, rise * 0.27, depth * 0.055] },
-            { position: [halfWidth * 0.43, rise * 0.18, shellZ - shellDepth * 0.27], scale: [width * 0.09, rise * 0.27, depth * 0.055] },
-          ]} />
         </>
       )}
     </group>

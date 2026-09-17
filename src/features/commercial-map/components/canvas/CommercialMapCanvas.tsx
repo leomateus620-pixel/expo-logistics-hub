@@ -1,3 +1,4 @@
+import { arenaVegetationAllowed } from '../../data/arenaCanonicalLayout';
 import { createArenaParkingGeometry, isArenaParking } from '../../utils/arenaParkingGeometry';
 import { LightingPerformanceProbe } from '../../diagnostics/LightingPerformanceProbe';
 import { beginCommercialMapBoot, getCommercialMapBootSnapshot, markCommercialMapStage, measureCommercialMapSync } from '../../utils/performanceDiagnostics';
@@ -4578,7 +4579,7 @@ const Scene = memo(function Scene({
     const rearRoadCompatibleTrees = !isolatedArea
       ? selectRearRoadCompatibleTreesForPresentation(parkAccessCompatibleTrees)
       : parkAccessCompatibleTrees;
-    return rearRoadCompatibleTrees;
+    return rearRoadCompatibleTrees.filter(tree => arenaVegetationAllowed(tree.position, tree.canopyRadius));
   }, [entities, isolatedArea, rearParkingAvailable, sceneTrees]);
   const selectedLunarTreeEntity = selectedEntity
     && resolveStrategicLandmarkKind(selectedEntity) === 'lunar-tree'

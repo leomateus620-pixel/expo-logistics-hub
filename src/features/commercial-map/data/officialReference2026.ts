@@ -1,3 +1,4 @@
+import { ARENA_CANONICAL_LAYOUT, reconstructArenaEntity } from './arenaCanonicalLayout';
 import { ARENA_ROAD_CORRECTION } from './arenaRoadCorrection';
 import { SOY_RESTROOM, SOY_ROAD_CONNECTION, GATE_NINE_TANKS } from './soyGateInfrastructure';
 import { reconstructFenasojaEntity } from './fenasojaComplexReconstruction';
@@ -645,8 +646,8 @@ const namedStructures: Array<[string, string, MapClassification, string, PdfBoun
   ['D3', 'Espaço Mirante', 'ATTRACTION', 'structures', [3990, 2440, 4100, 2830], { height: 0.92 }],
   ['D4', 'Tenda da Pecuária', 'LIVESTOCK_AREA', 'exporural', [2925, 2525], { parent: 'N', width: 125, depth: 100, height: 0.74 }],
   ['D5', 'Núcleo dos Criadores de Cavalos Crioulos', 'LIVESTOCK_AREA', 'exporural', [1545, 2241], { width: 110, depth: 110, height: 0.7 }],
-  // ANALYST: keep F [4900, 2690, 5385, 3130]. Do not rotate or translate.
-  ['F', 'Arena Sicredi - Icatu', 'EVENT_VENUE', 'structures', [4900, 2690, 5385, 3130], { height: 1.35, metadata: { explicitNotWater: true, labelPriority: 'landmark' } }],
+  // Canonical reference-registered Arena: the architecture and masks share F.
+  ['F', 'Arena Sicredi - Icatu', 'EVENT_VENUE', 'structures', [...ARENA_CANONICAL_LAYOUT.arenaFootprint.sourceBounds], { height: 1.35, metadata: { explicitNotWater: true, labelPriority: 'landmark' } }],
   ['G', 'Árvore Lunar', 'LANDMARK', 'structures', [2152, 3334], { width: 92, depth: 92, height: 1.1 }],
   ['J', 'Parque de Diversões', 'ATTRACTION', 'structures', [930, 2450, 1600, 3000], { parent: 'X', height: 0.12, verificationStatus: 'NEEDS_REVIEW', metadata: { sourceDiscrepancy: 'Marcador J visível no mapa e ausente na legenda inferior.' } }],
 ];
@@ -1077,7 +1078,7 @@ export function isNonPermanentRemovedIdentifier(publicIdentifier: string) {
 export const OFFICIAL_REFERENCE_ENTITIES = [
   ...officialBaseEntities,
   ...pavilionModuleEntities,
-].map(reconstructFenasojaEntity).map(reconstructMiranteComplexEntity).map(withCommercialMapSegmentMetadata);
+].map(reconstructFenasojaEntity).map(reconstructMiranteComplexEntity).map(reconstructArenaEntity).map(withCommercialMapSegmentMetadata);
 
 export const OFFICIAL_RENDERED_ENTITIES = OFFICIAL_REFERENCE_ENTITIES.filter((entity) => (
   !nonPermanentRemovedIdentifiers.has(entity.publicIdentifier)
