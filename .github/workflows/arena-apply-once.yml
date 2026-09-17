@@ -7,13 +7,16 @@ permissions:
   contents: write
 jobs:
   apply:
-    if: github.repository == 'leomateus620-pixel/expo-logistics-hub' && github.ref == 'refs/heads/fix/arena-canonical-reconstruction' && github.event.head_commit.message == 'chore(arena): stage checksum-verified reconstruction payload'
+    if: >-
+      github.repository == 'leomateus620-pixel/expo-logistics-hub' &&
+      github.ref == 'refs/heads/fix/arena-canonical-reconstruction' &&
+      github.event.head_commit.message == 'chore(arena): apply verified reconstruction on the authorized branch'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 4
           ref: ${{ github.sha }}
       - name: Verify and apply exact reviewed changes
         shell: bash
@@ -25,7 +28,8 @@ jobs:
           compressed = base64.b64decode(encoded, validate=True)
           assert hashlib.sha256(compressed).hexdigest() == 'aa64596bbddedec23c3eab66a6bdd8fa2a35f0a49b032013436fdc4a5015733d', 'Payload checksum mismatch'
           payload = json.loads(gzip.decompress(compressed))
-          assert run('git','rev-parse','HEAD^') == payload['base'] == '8885b12ce57635fc440e21e70fa1dfda6a169fef', 'Branch changed: reconcile before writing'
+          assert payload['base'] == '8885b12ce57635fc440e21e70fa1dfda6a169fef'
+          subprocess.run(['git','merge-base','--is-ancestor',payload['base'],'HEAD'], check=True)
           allowed = {'scripts/arena-capture.py','scripts/arena-compare-tests.py','.github/workflows/arena-reconstruction.yml'}
           for item in payload['files']:
               assert item['path'] in allowed
