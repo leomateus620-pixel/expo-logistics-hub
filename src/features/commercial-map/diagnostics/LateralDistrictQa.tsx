@@ -72,6 +72,7 @@ export function LateralDistrictQaScene() {
   const schedulerFrame = useRef<number>();
   const hidden = useRef(false);
   const captureRequested = useRef(false);
+  const heldMirantePose = useRef<{ position: Vector3; target: Vector3 } | null>(null);
   useEffect(() => () => {
     if (sweep.current) useCommercialMapStore.getState().setCameraNavigating(false);
     if (schedulerFrame.current !== undefined) window.cancelAnimationFrame(schedulerFrame.current);
@@ -113,16 +114,16 @@ export function LateralDistrictQaScene() {
           target: new Vector3(lateral.centerX + 0.4, terrace.y, terrace.z),
         },
         'mirante-street': {
-          position: new Vector3(sidewalk.minX - 1.55, 1.55, lateral.centerZ + 0.35),
-          target: new Vector3(lateral.centerX + 0.15, terrace.y + 0.22, lateral.centerZ - 0.2),
+          position: new Vector3(sidewalk.minX - 2.8, 2.35, lateral.centerZ + 0.15),
+          target: new Vector3(lateral.centerX + 0.2, terrace.y + 0.55, lateral.centerZ - 0.45),
         },
         'mirante-arena': {
           position: new Vector3(lateral.maxX + 6.8, 3.2, terrace.z + 0.6),
           target: new Vector3(mirante.centerX, terrace.y + 0.12, terrace.z),
         },
         'mirante-stairs': {
-          position: new Vector3(mirante.minX - 0.45, 1.05, mirante.minZ - 1.15),
-          target: new Vector3(mirante.minX + 0.55, terrace.y + 0.12, mirante.minZ + 0.15),
+          position: new Vector3(mirante.minX - 0.85, 1.35, mirante.minZ - 1.65),
+          target: new Vector3(mirante.minX + 0.4, terrace.y + 0.28, mirante.minZ + 0.2),
         },
       };
       const mirantePose = miranteViews[view];
@@ -140,8 +141,17 @@ export function LateralDistrictQaScene() {
       const distance = view === 'maximum' ? controls.minDistance : view === 'close' ? 15 : Math.max(53, horizontalFit, portrait ? 36 / tangent : 0);
       controls.target.copy(center);
       camera.up.set(0, 1, 0);
-      if (mirantePose) camera.position.copy(mirantePose.position);
-      else camera.position.copy(center).addScaledVector(directions[view as keyof typeof directions].normalize(), distance);
+      if (mirantePose) {
+        heldMirantePose.current = {
+          position: mirantePose.position.clone(),
+          target: mirantePose.target.clone(),
+        };
+        controls.minDistance = 0.35;
+        camera.position.copy(mirantePose.position);
+      } else {
+        heldMirantePose.current = null;
+        camera.position.copy(center).addScaledVector(directions[view as keyof typeof directions].normalize(), distance);
+      }
       camera.lookAt(center);
       controls.update();
       camera.updateMatrixWorld();
@@ -171,6 +181,13 @@ export function LateralDistrictQaScene() {
   useFrame((_state, delta) => {
     const district = scene.getObjectByName('lateral-residential-district');
     if (district && hidden.current) district.visible = false;
+    const held = heldMirantePose.current;
+    if (held && controls && !sweep.current) {
+      controls.minDistance = 0.35;
+      controls.target.copy(held.target);
+      camera.position.copy(held.position);
+      camera.lookAt(held.target);
+    }
     const run = sweep.current;
     if (!run || !controls) return;
     const elapsed = performance.now() - run.started;

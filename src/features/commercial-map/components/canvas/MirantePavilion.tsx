@@ -13,6 +13,11 @@ import type { StrategicLandmarkBounds } from '../../utils/landmarks';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
+const LANDING_TACTILE_MATERIAL = new THREE.MeshStandardMaterial({
+  color: '#d4a82c',
+  roughness: 0.9,
+  metalness: 0,
+});
 const UNIT_CYLINDER = new THREE.CylinderGeometry(0.5, 0.5, 1, 10);
 const UNIT_TRIANGLE = new THREE.BufferGeometry();
 UNIT_TRIANGLE.setAttribute(
@@ -158,6 +163,7 @@ function createArchitecture(
   const stairSteps: InstanceTransform[] = [];
   const stairWalls: InstanceTransform[] = [];
   const stairRails: InstanceTransform[] = [];
+  const landingTactile: InstanceTransform[] = [];
   const curbBands: InstanceTransform[] = [];
   const benchSeats: InstanceTransform[] = [];
   const benchFrames: InstanceTransform[] = [];
@@ -230,6 +236,14 @@ function createArchitecture(
   stairSteps.push({
     position: [landing.centerX, landing.topY / 2, landing.centerZ],
     scale: [landing.width, landing.topY, landing.depth],
+  });
+  landingTactile.push({
+    position: [
+      landing.centerX,
+      landing.topY + 0.008,
+      landing.centerZ - landing.depth / 2 + landing.tactileOffsetFromNorth,
+    ],
+    scale: [landing.width * 0.92, 0.012, landing.tactileWidth],
   });
   stairWalls.push({
     position: [
@@ -395,6 +409,7 @@ function createArchitecture(
     stairSteps,
     stairWalls,
     stairRails,
+    landingTactile,
     curbBands,
     benchSeats,
     benchFrames,
@@ -496,6 +511,11 @@ export const MiranteArchitecture = memo(function MiranteArchitecture({
         material={materials.wall}
         items={architecture.stairWalls}
         castShadow={!reducedGraphics}
+        receiveShadow
+      />
+      <ScaledInstances
+        material={LANDING_TACTILE_MATERIAL}
+        items={architecture.landingTactile}
         receiveShadow
       />
 
