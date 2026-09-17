@@ -6,5 +6,6 @@ import { presentCommercialMapData } from '../hooks/useCommercialMap';
 // DEV-only route: same UI, official reference fixture, read-only permissions.
 const PREVIEW_DATA = presentCommercialMapData(OFFICIAL_REFERENCE_DATA);
 export default function CommercialMapInterfaceDiagnosticsPage() {
-  return <CommercialMapShell><CommercialMapPage previewData={PREVIEW_DATA} /></CommercialMapShell>;
+  return <CommercialMapShell><CommercialMapPage previewData={PREVIEW_DATA}
+    previewWebGLUnavailable={new URLSearchParams(window.location.search).get('webgl') === 'unavailable'} /></CommercialMapShell>;
 }

@@ -12,6 +12,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import { COMMERCIAL_MAP_ANIMATION, requestCommercialMapAnimationFrame } from '../../utils/frameActivity';
 import gsap from 'gsap';
 import * as THREE from 'three';
 import type { StrategicLandmarkBounds } from '../../utils/landmarks';
@@ -285,6 +286,7 @@ function ParkFence({
 }
 
 function FerrisWheel({ parkActive, reducedGraphics }: { parkActive: boolean; reducedGraphics: boolean }) {
+  const gl = useThree((state) => state.gl);
   const wheel = useRef<THREE.Group>(null);
   const cabins = useRef<Array<THREE.Group | null>>([]);
   const invalidate = useThree((state) => state.invalidate);
@@ -301,7 +303,7 @@ function FerrisWheel({ parkActive, reducedGraphics }: { parkActive: boolean; red
     cabins.current.forEach((cabin) => {
       if (cabin) cabin.rotation.z = -wheel.current!.rotation.z;
     });
-    invalidate();
+    requestCommercialMapAnimationFrame(gl, invalidate, COMMERCIAL_MAP_ANIMATION.rides);
   });
 
   const ringLeds = useMemo(() => {

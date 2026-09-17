@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import { COMMERCIAL_MAP_ANIMATION, requestCommercialMapAnimationFrame } from '../../utils/frameActivity';
 import * as THREE from 'three';
 import type { MapEntity } from '../../types';
 import type { CommercialMapQualityTier } from '../../utils/viewport';
@@ -236,7 +237,7 @@ export function CommercialMapRainLayer({entities, qualityTier, active=true}: {
         puddles:resources.puddles.geometry.instanceCount,wetMaterials:registry.size});
       cadence.current.report=now;
     }
-    if(active&&wet>0)invalidate();
+    if(active&&wet>0)requestCommercialMapAnimationFrame(gl,invalidate,COMMERCIAL_MAP_ANIMATION.rain);
   },.5);
   return <group ref={group} name="CommercialMapRain" visible={active}>
     {(['drops','splashes','runoff','puddles'] as const).map((kind)=><mesh key={kind}

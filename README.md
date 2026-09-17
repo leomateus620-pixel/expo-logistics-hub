@@ -5,7 +5,7 @@ Sistema web operacional da Comissão de Logística da Fenasoja 2028. A aplicaç�
 ## Requisitos
 
 - Node.js 20 ou superior;
-- npm;
+- npm, gerenciador canônico com `package-lock.json` para instalação reproduzível;
 - acesso às variáveis públicas do projeto Supabase.
 
 Crie o arquivo de ambiente local sem versionar credenciais:
@@ -18,7 +18,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=...
 ## Desenvolvimento local
 
 ```powershell
-npm.cmd install
+npm.cmd ci
 npm.cmd run dev
 ```
 

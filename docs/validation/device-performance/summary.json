@@ -1,0 +1,612 @@
+{
+  "interpretation": "Local fixture, warmed HTTP cache, sequential runs on one Intel UHD machine. Not production, cold cache, physical mobile, GPU headroom or input-to-photon.",
+  "reloads": {
+    "baseline-warm": {
+      "interactiveMs": {
+        "n": 20,
+        "median": 7065.5,
+        "p95NearestRank": 7873,
+        "p99NearestRank": 11284,
+        "min": 6486,
+        "max": 11284
+      },
+      "sceneMs": {
+        "n": 20,
+        "median": 4339,
+        "p95NearestRank": 4809,
+        "p99NearestRank": 4848,
+        "min": 4013,
+        "max": 4848
+      },
+      "directWarmupMs": {
+        "n": 20,
+        "median": 388,
+        "p95NearestRank": 478,
+        "p99NearestRank": 4370,
+        "min": 310,
+        "max": 4370
+      },
+      "firstPresentationOpportunityMs": {
+        "n": 20,
+        "median": 7036.79999999702,
+        "p95NearestRank": 7836.40000000596,
+        "p99NearestRank": 11258,
+        "min": 6460.800000011921,
+        "max": 11258
+      },
+      "longestStartupTaskMs": {
+        "n": 20,
+        "median": 764.5,
+        "p95NearestRank": 833,
+        "p99NearestRank": 852,
+        "min": 677,
+        "max": 852
+      },
+      "foregroundAtPresentation": true,
+      "buffers": [
+        "1351x640"
+      ]
+    },
+    "after-warm-fixed": {
+      "interactiveMs": {
+        "n": 20,
+        "median": 6688.5,
+        "p95NearestRank": 9629,
+        "p99NearestRank": 10881,
+        "min": 6353,
+        "max": 10881
+      },
+      "sceneMs": {
+        "n": 20,
+        "median": 4085.5,
+        "p95NearestRank": 4478,
+        "p99NearestRank": 4551,
+        "min": 3958,
+        "max": 4551
+      },
+      "directWarmupMs": {
+        "n": 20,
+        "median": 356.5,
+        "p95NearestRank": 3390,
+        "p99NearestRank": 3845,
+        "min": 327,
+        "max": 3845
+      },
+      "firstPresentationOpportunityMs": {
+        "n": 20,
+        "median": 6661.6500000059605,
+        "p95NearestRank": 9600.40000000596,
+        "p99NearestRank": 10849.899999976158,
+        "min": 6329.5,
+        "max": 10849.899999976158
+      },
+      "longestStartupTaskMs": {
+        "n": 20,
+        "median": 708.5,
+        "p95NearestRank": 773,
+        "p99NearestRank": 781,
+        "min": 682,
+        "max": 781
+      },
+      "foregroundAtPresentation": true,
+      "buffers": [
+        "1351x640"
+      ]
+    }
+  },
+  "lighting": {
+    "baseline-lighting.json": {
+      "nTransitions": 40,
+      "modes": {
+        "night": {
+          "interpretation": "Distributions of per-window percentiles; not pooled frame percentiles.",
+          "windowP50Ms": {
+            "n": 20,
+            "median": 24.799999997019768,
+            "p95NearestRank": 39.900000005960464,
+            "p99NearestRank": 41.80000001192093,
+            "min": 19.30000001192093,
+            "max": 41.80000001192093
+          },
+          "windowP95Ms": {
+            "n": 20,
+            "median": 33.24999998509884,
+            "p95NearestRank": 61.69999998807907,
+            "p99NearestRank": 84.69999998807907,
+            "min": 22.400000005960464,
+            "max": 84.69999998807907
+          },
+          "windowP99Ms": {
+            "n": 20,
+            "median": 41.3500000089407,
+            "p95NearestRank": 95.80000001192093,
+            "p99NearestRank": 165.30000001192093,
+            "min": 25.30000001192093,
+            "max": 165.30000001192093
+          },
+          "buffers": [
+            "1351x394@1"
+          ],
+          "programs": [
+            209
+          ],
+          "geometriesAtWindowEnd": [
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560
+          ],
+          "texturesAtWindowEnd": [
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149
+          ]
+        },
+        "sunrise": {
+          "interpretation": "Distributions of per-window percentiles; not pooled frame percentiles.",
+          "windowP50Ms": {
+            "n": 20,
+            "median": 29.099999994039536,
+            "p95NearestRank": 43.29999998211861,
+            "p99NearestRank": 49.5,
+            "min": 22.599999994039536,
+            "max": 49.5
+          },
+          "windowP95Ms": {
+            "n": 20,
+            "median": 39.849999994039536,
+            "p95NearestRank": 134.2999999821186,
+            "p99NearestRank": 298.2000000178814,
+            "min": 27.400000005960464,
+            "max": 298.2000000178814
+          },
+          "windowP99Ms": {
+            "n": 20,
+            "median": 73.75,
+            "p95NearestRank": 570.5,
+            "p99NearestRank": 4025.2000000178814,
+            "min": 31.19999998807907,
+            "max": 4025.2000000178814
+          },
+          "buffers": [
+            "1351x394@1"
+          ],
+          "programs": [
+            209
+          ],
+          "geometriesAtWindowEnd": [
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560
+          ],
+          "texturesAtWindowEnd": [
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149
+          ]
+        }
+      },
+      "allForeground": true,
+      "allReady": true,
+      "contextLosses": 0,
+      "errors": [],
+      "maxCameraDeltaWithinWindow": 0,
+      "maxTargetDeltaWithinWindow": 0,
+      "lifecycle": {
+        "canvasMounts": 1,
+        "controlsCreates": 1,
+        "rendererCreates": 1
+      }
+    },
+    "after-lighting-fixed.json": {
+      "nTransitions": 40,
+      "modes": {
+        "night": {
+          "interpretation": "Distributions of per-window percentiles; not pooled frame percentiles.",
+          "windowP50Ms": {
+            "n": 20,
+            "median": 19.950000002980232,
+            "p95NearestRank": 20.399999976158142,
+            "p99NearestRank": 20.900000005960464,
+            "min": 17.80000001192093,
+            "max": 20.900000005960464
+          },
+          "windowP95Ms": {
+            "n": 20,
+            "median": 23.19999998807907,
+            "p95NearestRank": 26.599999994039536,
+            "p99NearestRank": 30.100000023841858,
+            "min": 20.5,
+            "max": 30.100000023841858
+          },
+          "windowP99Ms": {
+            "n": 20,
+            "median": 28.349999994039536,
+            "p95NearestRank": 40.10000002384186,
+            "p99NearestRank": 43.5,
+            "min": 24.599999994039536,
+            "max": 43.5
+          },
+          "buffers": [
+            "1351x394@1"
+          ],
+          "programs": [
+            209
+          ],
+          "geometriesAtWindowEnd": [
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560
+          ],
+          "texturesAtWindowEnd": [
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149
+          ]
+        },
+        "sunrise": {
+          "interpretation": "Distributions of per-window percentiles; not pooled frame percentiles.",
+          "windowP50Ms": {
+            "n": 20,
+            "median": 22.799999982118607,
+            "p95NearestRank": 27.299999982118607,
+            "p99NearestRank": 29.299999982118607,
+            "min": 21.900000005960464,
+            "max": 29.299999982118607
+          },
+          "windowP95Ms": {
+            "n": 20,
+            "median": 27.599999994039536,
+            "p95NearestRank": 34.5,
+            "p99NearestRank": 38.20000001788139,
+            "min": 25.200000017881393,
+            "max": 38.20000001788139
+          },
+          "windowP99Ms": {
+            "n": 20,
+            "median": 32.650000005960464,
+            "p95NearestRank": 40.70000001788139,
+            "p99NearestRank": 52.80000001192093,
+            "min": 27.200000017881393,
+            "max": 52.80000001192093
+          },
+          "buffers": [
+            "1351x394@1"
+          ],
+          "programs": [
+            209
+          ],
+          "geometriesAtWindowEnd": [
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            560
+          ],
+          "texturesAtWindowEnd": [
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            149
+          ]
+        }
+      },
+      "allForeground": true,
+      "allReady": true,
+      "contextLosses": 0,
+      "errors": [],
+      "maxCameraDeltaWithinWindow": 0,
+      "maxTargetDeltaWithinWindow": 0,
+      "lifecycle": {
+        "canvasMounts": 1,
+        "controlsCreates": 1,
+        "rendererCreates": 1
+      }
+    },
+    "after-lighting-adaptive.json": {
+      "nTransitions": 40,
+      "modes": {
+        "night": {
+          "interpretation": "Distributions of per-window percentiles; not pooled frame percentiles.",
+          "windowP50Ms": {
+            "n": 20,
+            "median": 19.799999982118607,
+            "p95NearestRank": 20.399999976158142,
+            "p99NearestRank": 21.200000017881393,
+            "min": 17.900000005960464,
+            "max": 21.200000017881393
+          },
+          "windowP95Ms": {
+            "n": 20,
+            "median": 22.799999997019768,
+            "p95NearestRank": 27.80000001192093,
+            "p99NearestRank": 28.599999994039536,
+            "min": 20.69999998807907,
+            "max": 28.599999994039536
+          },
+          "windowP99Ms": {
+            "n": 20,
+            "median": 25.75,
+            "p95NearestRank": 41.19999998807907,
+            "p99NearestRank": 178.59999999403954,
+            "min": 22.69999998807907,
+            "max": 178.59999999403954
+          },
+          "buffers": [
+            "1351x394@1"
+          ],
+          "programs": [
+            209,
+            273,
+            274
+          ],
+          "geometriesAtWindowEnd": [
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559
+          ],
+          "texturesAtWindowEnd": [
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151
+          ]
+        },
+        "sunrise": {
+          "interpretation": "Distributions of per-window percentiles; not pooled frame percentiles.",
+          "windowP50Ms": {
+            "n": 20,
+            "median": 22.200000002980232,
+            "p95NearestRank": 23.5,
+            "p99NearestRank": 23.599999994039536,
+            "min": 19.200000017881393,
+            "max": 23.599999994039536
+          },
+          "windowP95Ms": {
+            "n": 20,
+            "median": 26.950000002980232,
+            "p95NearestRank": 31.700000017881397,
+            "p99NearestRank": 34.400000005960464,
+            "min": 23.80000001192093,
+            "max": 34.400000005960464
+          },
+          "windowP99Ms": {
+            "n": 20,
+            "median": 31.600000008940697,
+            "p95NearestRank": 38.900000005960464,
+            "p99NearestRank": 41.80000001192093,
+            "min": 26.80000001192093,
+            "max": 41.80000001192093
+          },
+          "buffers": [
+            "1351x394@1"
+          ],
+          "programs": [
+            209,
+            274
+          ],
+          "geometriesAtWindowEnd": [
+            560,
+            560,
+            560,
+            560,
+            560,
+            560,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559,
+            559
+          ],
+          "texturesAtWindowEnd": [
+            149,
+            149,
+            149,
+            149,
+            149,
+            149,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151,
+            151
+          ]
+        }
+      },
+      "allForeground": true,
+      "allReady": true,
+      "contextLosses": 0,
+      "errors": [],
+      "maxCameraDeltaWithinWindow": 0,
+      "maxTargetDeltaWithinWindow": 0,
+      "lifecycle": {
+        "canvasMounts": 1,
+        "controlsCreates": 1,
+        "rendererCreates": 1
+      }
+    }
+  }
+}

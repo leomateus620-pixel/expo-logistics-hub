@@ -216,6 +216,35 @@ describe('recuperação de navegação interrompida', () => {
     expect(onPointerCancel).not.toHaveBeenCalled();
   });
 
+  it.each(['lostpointercapture', 'pointerup-outside'] as const)('libera os controles reais após %s sem clique adicional', (reason) => {
+    const { element, canvas, camera, controls } = createControls();
+    const onCancel = vi.fn(() => stopCommercialMapOrbitMotion(camera, controls));
+    const onStart = vi.fn();
+    controls.addEventListener('start', onStart);
+    disposers.push(registerCommercialMapNavigationCancellation({ canvas, controlsElement: element, onCancel }));
+    pointer(canvas, 'pointerdown', 1);
+    pointer(canvas, 'pointerdown', 2);
+    const position = camera.position.clone();
+    const target = controls.target.clone();
+    pointer(reason === 'pointerup-outside' ? document : canvas, reason === 'pointerup-outside' ? 'pointerup' : reason, 1);
+    expect(onCancel).toHaveBeenCalledExactlyOnceWith(reason);
+    expect(camera.position.equals(position)).toBe(true);
+    expect(controls.target.equals(target)).toBe(true);
+    onStart.mockClear();
+    pointer(canvas, 'pointerdown', 3);
+    expect(onStart).toHaveBeenCalledTimes(1);
+  });
+
+  it('não cancela a soltura normal seguida de lostpointercapture', () => {
+    const { element, canvas } = createControls();
+    const onCancel = vi.fn();
+    disposers.push(registerCommercialMapNavigationCancellation({ canvas, controlsElement: element, onCancel }));
+    pointer(canvas, 'pointerdown', 1);
+    pointer(canvas, 'pointerup', 1);
+    pointer(canvas, 'lostpointercapture', 1);
+    expect(onCancel).not.toHaveBeenCalled();
+  });
+
   it('só cancela ao ocultar a aba e também libera a navegação na perda de contexto', () => {
     const { element, canvas } = createControls();
     const onCancel = vi.fn();

@@ -94,7 +94,7 @@ export function stopCommercialMapOrbitMotion(camera: Camera, controls: OrbitCont
   }
 }
 
-export type CommercialMapNavigationCancellation = 'pointercancel' | 'blur' | 'hidden' | 'context-lost';
+export type CommercialMapNavigationCancellation = 'pointercancel' | 'lostpointercapture' | 'pointerup-outside' | 'blur' | 'hidden' | 'context-lost';
 
 /**
  * A lost pointerup must not leave OrbitControls' private touch list or the map's
@@ -131,7 +131,19 @@ export function registerCommercialMapNavigationCancellation({
     }
   };
   const trackPointer = (event: PointerEvent) => activePointers.set(event.pointerId, event.pointerType);
-  const finishPointer = (event: PointerEvent) => activePointers.delete(event.pointerId);
+  const finishPointer = (event: PointerEvent) => {
+    if (!activePointers.has(event.pointerId)) return;
+    // A release outside the connected element never reaches OrbitControls.
+    // Clear its private pointer list through its normal cancellation handler.
+    if (!(event.target instanceof Node) || !controlsElement.contains(event.target)) {
+      cancel('pointerup-outside');
+    } else activePointers.delete(event.pointerId);
+  };
+  const lostCapture = (event: PointerEvent) => {
+    // The normal pointerup already removed this id in the capture phase.
+    // Only an unexpected capture loss cancels the gesture, including all fingers.
+    if (activePointers.has(event.pointerId)) cancel('lostpointercapture');
+  };
   const cancelPointer = (event: PointerEvent) => {
     activePointers.delete(event.pointerId);
     cancel('pointercancel');
@@ -142,6 +154,7 @@ export function registerCommercialMapNavigationCancellation({
 
   controlsElement.addEventListener('pointerdown', trackPointer, true);
   controlsElement.addEventListener('pointercancel', cancelPointer);
+  controlsElement.addEventListener('lostpointercapture', lostCapture);
   owner.addEventListener('pointerup', finishPointer, true);
   owner.addEventListener('visibilitychange', cancelHidden);
   view?.addEventListener('blur', cancelBlur);
@@ -152,6 +165,7 @@ export function registerCommercialMapNavigationCancellation({
     activePointers.clear();
     controlsElement.removeEventListener('pointerdown', trackPointer, true);
     controlsElement.removeEventListener('pointercancel', cancelPointer);
+    controlsElement.removeEventListener('lostpointercapture', lostCapture);
     owner.removeEventListener('pointerup', finishPointer, true);
     owner.removeEventListener('visibilitychange', cancelHidden);
     view?.removeEventListener('blur', cancelBlur);

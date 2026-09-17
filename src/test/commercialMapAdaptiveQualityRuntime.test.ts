@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
-  COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS,
   COMMERCIAL_MAP_QUALITY_SCENE_COMMIT_IDLE_MS,
   createCommercialMapFrameTimeWindow,
   createCommercialMapPixelRatioState,
@@ -30,22 +29,23 @@ describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
         16 * (COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES - 1) + 20
       ) / COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES,
       sampledFrames: COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES,
+      p95FrameTimeMs: 16,
     });
     expect(window.elapsedMs).toBe(0);
     expect(window.sampledFrames).toBe(0);
   });
 
-  it('descarta pausas do frameloop demand em vez de tratá-las como custo da GPU', () => {
+  it('preserva stalls ativos acima de 250 ms e rejeita apenas intervalos inválidos', () => {
     const window = createCommercialMapFrameTimeWindow();
     recordCommercialMapAdaptiveFrame(window, 17);
     recordCommercialMapAdaptiveFrame(window, 18);
 
     expect(recordCommercialMapAdaptiveFrame(
       window,
-      COMMERCIAL_MAP_ADAPTIVE_QUALITY_MAX_FRAME_GAP_MS + 1,
+      500,
     )).toBeNull();
-    expect(window.elapsedMs).toBe(0);
-    expect(window.sampledFrames).toBe(0);
+    expect(window.elapsedMs).toBe(535);
+    expect(window.sampledFrames).toBe(3);
     expect(recordCommercialMapAdaptiveFrame(window, Number.NaN)).toBeNull();
     expect(recordCommercialMapAdaptiveFrame(window, 0)).toBeNull();
   });

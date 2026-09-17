@@ -45,6 +45,7 @@ export interface CommercialMapAdaptiveQualityState {
   consecutiveFastWindows: number;
   lastDowngradeAtMs: number;
   downgradeStreak: number;
+  lastUpgradeAtMs?: number;
 }
 
 export interface CommercialMapAdaptiveQualitySample
@@ -52,6 +53,11 @@ export interface CommercialMapAdaptiveQualitySample
   averageFrameTimeMs: number;
   sampledFrames?: number;
   nowMs?: number;
+  /** Calibrated idle RAF interval, not inferred GPU capability. */
+  displayCadenceMs?: number | null;
+  p95FrameTimeMs?: number;
+  /** Never recover from the cheaper gesture DPR/direct workload. */
+  recoveryEligible?: boolean;
 }
 
 export type CommercialMapEnvironmentQualityTier = 'full' | 'balanced' | 'reduced';
@@ -356,7 +362,7 @@ function commercialMapQualityTierAt(index: number) {
 }
 
 /**
- * Resolves the highest sensible starting tier from stable device signals.
+ * Resolves a safety ceiling, not an initial tier or a GPU benchmark.
  * Unknown browser hints are not treated as weak hardware because Safari does
  * not expose deviceMemory. Runtime frame-time samples can still move the tier.
  */
@@ -382,8 +388,8 @@ export function resolveCommercialMapQualityCeiling({
   if (explicitlyWeak) return 'LOW';
 
   if (phoneOrMobile) {
-    const hasStrongMobileSignal = (memory !== undefined && memory >= 4)
-      || (cores !== undefined && cores >= 6);
+    const hasStrongMobileSignal = (memory === undefined && cores === undefined)
+      || (memory !== undefined && memory >= 4) || (cores !== undefined && cores >= 6);
     return hasStrongMobileSignal && nativePixelDemand <= 5_000_000
       ? 'HIGH'
       : 'MEDIUM';
@@ -407,9 +413,12 @@ export function resolveCommercialMapQualityCeiling({
 
 export function resolveCommercialMapEnvironmentQualityTier(
   adaptiveTier: CommercialMapQualityTier,
+  viewport?: { width: number; height: number },
 ): CommercialMapEnvironmentQualityTier {
   if (adaptiveTier === 'LOW') return 'reduced';
   if (adaptiveTier === 'MEDIUM') return 'balanced';
+  // Existing small-canvas effect cap, recomputed on orientation/resize.
+  if (viewport && Math.min(viewport.width, viewport.height) <= 720) return 'balanced';
   return 'full';
 }
 
@@ -438,7 +447,8 @@ export function createCommercialMapAdaptiveQualityState(
   capabilities: CommercialMapQualityCapabilitiesInput,
 ): CommercialMapAdaptiveQualityState {
   return {
-    tier: resolveCommercialMapQualityCeiling(capabilities),
+    // CPU/RAM hints can bound allocation but cannot justify an ULTRA GPU workload.
+    tier: commercialMapQualityTierAt(Math.min(2, commercialMapQualityTierIndex(resolveCommercialMapQualityCeiling(capabilities)))),
     consecutiveSlowWindows: 0,
     consecutiveFastWindows: 0,
     lastDowngradeAtMs: 0,
@@ -480,6 +490,7 @@ export function resolveCommercialMapAdaptiveQuality(
 
   if (currentIndex > ceilingIndex) {
     return {
+      ...state,
       tier: hardwareCeiling,
       consecutiveSlowWindows: 0,
       consecutiveFastWindows: 0,
@@ -498,6 +509,7 @@ export function resolveCommercialMapAdaptiveQuality(
     || sampledFrames < COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES) {
     return stableCommercialMapQualityDecision(
       {
+        ...state,
         tier: state.tier,
         consecutiveSlowWindows: 0,
         consecutiveFastWindows: 0,
@@ -517,6 +529,7 @@ export function resolveCommercialMapAdaptiveQuality(
     const consecutiveSlowWindows = Math.max(0, state.consecutiveSlowWindows) + 1;
     if (consecutiveSlowWindows >= COMMERCIAL_MAP_ADAPTIVE_QUALITY_SLOW_WINDOWS) {
       return {
+        ...state,
         tier: commercialMapQualityTierAt(currentIndex - 1),
         consecutiveSlowWindows: 0,
         consecutiveFastWindows: 0,
@@ -529,6 +542,7 @@ export function resolveCommercialMapAdaptiveQuality(
     }
     return stableCommercialMapQualityDecision(
       {
+        ...state,
         tier: state.tier,
         consecutiveSlowWindows,
         consecutiveFastWindows: 0,
@@ -540,15 +554,25 @@ export function resolveCommercialMapAdaptiveQuality(
     );
   }
 
-  const dwellElapsed = lastDowngradeAtMs <= 0
+  const dwellElapsed = (lastDowngradeAtMs <= 0
     || nowMs === undefined
-    || nowMs - lastDowngradeAtMs >= COMMERCIAL_MAP_ADAPTIVE_QUALITY_UPGRADE_DWELL_MS;
-  const requiredFastWindows = resolveCommercialMapAdaptiveUpgradeWindows(downgradeStreak);
+    || nowMs - lastDowngradeAtMs >= Math.max(COMMERCIAL_MAP_ADAPTIVE_QUALITY_UPGRADE_DWELL_MS, sample.displayCadenceMs ? 12_000 * Math.min(5, 1 + downgradeStreak) : 0))
+    && (!state.lastUpgradeAtMs || nowMs === undefined || nowMs - state.lastUpgradeAtMs >= 12_000);
+  const requiredFastWindows = Math.max(sample.displayCadenceMs ? 8 : 0, resolveCommercialMapAdaptiveUpgradeWindows(downgradeStreak));
+  // Vsync hides spare capacity: recovery is a bounded one-tier experiment.
+  // Measure the new workload before any further promotion; failed experiments
+  // retain their downgrade history and back off instead of oscillating.
+  const cadence = optionalFinitePositive(sample.displayCadenceMs);
+  const fastEnough = cadence
+    ? sample.averageFrameTimeMs <= cadence * 1.06
+      && (sample.p95FrameTimeMs ?? sample.averageFrameTimeMs) <= cadence * 1.25
+    : sample.averageFrameTimeMs <= preset.upgradeBelowFrameTimeMs;
 
-  if (canUpgrade && sample.averageFrameTimeMs <= preset.upgradeBelowFrameTimeMs) {
+  if (canUpgrade && sample.recoveryEligible !== false && fastEnough) {
     if (!dwellElapsed) {
       return stableCommercialMapQualityDecision(
         {
+          ...state,
           tier: state.tier,
           consecutiveSlowWindows: 0,
           consecutiveFastWindows: 0,
@@ -562,11 +586,13 @@ export function resolveCommercialMapAdaptiveQuality(
     const consecutiveFastWindows = Math.max(0, state.consecutiveFastWindows) + 1;
     if (consecutiveFastWindows >= requiredFastWindows) {
       return {
+        ...state,
         tier: commercialMapQualityTierAt(currentIndex + 1),
         consecutiveSlowWindows: 0,
         consecutiveFastWindows: 0,
-        lastDowngradeAtMs: 0,
-        downgradeStreak: 0,
+        lastDowngradeAtMs,
+        downgradeStreak,
+        lastUpgradeAtMs: nowMs,
         hardwareCeiling,
         changed: true,
         reason: 'sustained-fast-frames',
@@ -574,6 +600,7 @@ export function resolveCommercialMapAdaptiveQuality(
     }
     return stableCommercialMapQualityDecision(
       {
+        ...state,
         tier: state.tier,
         consecutiveSlowWindows: 0,
         consecutiveFastWindows,
@@ -587,6 +614,7 @@ export function resolveCommercialMapAdaptiveQuality(
 
   return stableCommercialMapQualityDecision(
     {
+      ...state,
       tier: state.tier,
       consecutiveSlowWindows: 0,
       consecutiveFastWindows: 0,

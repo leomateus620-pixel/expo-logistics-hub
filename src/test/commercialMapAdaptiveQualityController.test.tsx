@@ -7,11 +7,12 @@ import {
   resolveCommercialMapPixelRatio,
 } from '@/features/commercial-map/utils/viewport';
 import { resolveCommercialMapInteractionPixelRatio } from '@/features/commercial-map/utils/adaptiveQualityRuntime';
+import { commercialMapFrameActivity } from '@/features/commercial-map/utils/frameActivity';
 
 const runtime = vi.hoisted(() => {
   let pixelRatio = 1;
   return {
-    gl: { getPixelRatio: () => pixelRatio },
+    gl: { getPixelRatio: () => pixelRatio, domElement: document.createElement('canvas') },
     setDpr: vi.fn((next: number) => { pixelRatio = next; }),
     invalidate: vi.fn(),
     size: { width: 1280, height: 800 },
@@ -21,7 +22,10 @@ const runtime = vi.hoisted(() => {
 
 vi.mock('@react-three/fiber', () => ({
   useThree: (selector: (state: typeof runtime) => unknown) => selector(runtime),
-  useFrame: (callback: typeof runtime.frame) => { runtime.frame = callback; },
+  useFrame: (callback: typeof runtime.frame) => { runtime.frame = (state, delta) => {
+    commercialMapFrameActivity(runtime.gl).frames += 1;
+    callback?.(state, delta);
+  }; },
 }));
 vi.mock('@/features/commercial-map/utils/runtimeDiagnostics', () => ({
   recordCommercialMapQualityDecision: vi.fn(),
@@ -43,6 +47,9 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     runtime.setDpr(1);
     runtime.setDpr.mockClear();
     runtime.invalidate.mockClear();
+    runtime.gl.domElement.dataset.commercialMapHydration = 'complete';
+    delete runtime.gl.domElement.dataset.commercialMapPreparing;
+    Object.assign(commercialMapFrameActivity(runtime.gl), { requested: 0, path: 'direct', frames: 0 });
     useCommercialMapStore.setState({
       cameraNavigating: false,
       lunarLaunchPhase: 'idle',
@@ -150,8 +157,35 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     // Further adaptation resumes only when it can measure the applied tier.
     act(() => useCommercialMapStore.setState({ cameraNavigating: true }));
     act(() => {
-      for (let frame = 0; frame < 90; frame += 1) runtime.frame?.({}, 0.03);
+      for (let frame = 0; frame < 91; frame += 1) runtime.frame?.({}, 0.03);
     });
     expect(qualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'LOW', sceneTier: 'MEDIUM' });
+  });
+
+  it('não trata o intervalo ocioso inicial como stall, mas conta stalls no gesto ativo', () => {
+    const onQualityChange = vi.fn();
+    render(<CommercialMapAdaptiveQualityController active initialState={initialState} capabilityHints={capabilityHints} reducedGraphics={false} onQualityChange={onQualityChange} />);
+    act(() => useCommercialMapStore.setState({ cameraNavigating: true }));
+    act(() => runtime.frame?.({}, 10));
+    expect(onQualityChange.mock.lastCall?.[0].tier).toBe('HIGH');
+    act(() => { for (let i = 0; i < 90; i++) runtime.frame?.({}, 0.5); });
+    expect(onQualityChange.mock.lastCall?.[0].tier).toBe('MEDIUM');
+  });
+
+  it('amostra animação com compositor em repouso e ignora preparação e mudança de caminho', () => {
+    const onQualityChange = vi.fn();
+    render(<CommercialMapAdaptiveQualityController active initialState={initialState} capabilityHints={capabilityHints} reducedGraphics={false} onQualityChange={onQualityChange} />);
+    const run = (count: number) => {
+      for (let i = 0; i < count; i++) {
+        Object.assign(commercialMapFrameActivity(runtime.gl), { requested: 1, path: 'post' });
+        runtime.frame?.({}, 0.5);
+      }
+    };
+    runtime.gl.domElement.dataset.commercialMapPreparing = 'true';
+    act(() => run(100));
+    expect(onQualityChange.mock.lastCall?.[0].tier).toBe('HIGH');
+    delete runtime.gl.domElement.dataset.commercialMapPreparing;
+    act(() => run(91));
+    expect(onQualityChange.mock.lastCall?.[0].tier).toBe('MEDIUM');
   });
 });

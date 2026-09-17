@@ -579,7 +579,7 @@ export default function CommercialMapRenderingDiagnosticsPage() {
           <strong>Frame consistency</strong>
           <dl>
             <div><dt>FPS médio</dt><dd>{formatMetric(summary.averageFps)}</dd></div>
-            <div><dt>1% low</dt><dd>{formatMetric(summary.onePercentLowFps)}</dd></div>
+            <div><dt>1000 / p99 (aprox.)</dt><dd>{formatMetric(summary.inverseP99FpsApproximation)}</dd></div>
             <div><dt>Frame médio</dt><dd>{formatMetric(summary.averageFrameTimeMs, ' ms')}</dd></div>
             <div><dt>P95 / P99</dt><dd>{formatMetric(summary.p95FrameTimeMs)} / {formatMetric(summary.p99FrameTimeMs)} ms</dd></div>
             <div><dt>Amostras / jank</dt><dd>{summary.sampledFrames} / {summary.jankFrames}</dd></div>

@@ -1,0 +1,76 @@
+{
+  "base": "3c81b943c4b5871ff5dd6adea42f9ab28efee5c3",
+  "method": "Run the new cancellation tests against unmodified baseline cameraTransition.ts and installed three-stdlib OrbitControls",
+  "tests": [
+    {
+      "test": "entrega da transi\u00e7\u00e3o para o OrbitControls real n\u00e3o salta ao cancelar o arco 2.8 \u2192 -1.8 atrav\u00e9s de \u00b1\u03c0",
+      "status": "passed",
+      "failure": null
+    },
+    {
+      "test": "entrega da transi\u00e7\u00e3o para o OrbitControls real n\u00e3o salta ao cancelar o arco -2.8 \u2192 1.8 atrav\u00e9s de \u00b1\u03c0",
+      "status": "passed",
+      "failure": null
+    },
+    {
+      "test": "entrega da transi\u00e7\u00e3o para o OrbitControls real preserva tamb\u00e9m a dist\u00e2ncia intermedi\u00e1ria abaixo do limite final",
+      "status": "passed",
+      "failure": null
+    },
+    {
+      "test": "entrega da transi\u00e7\u00e3o para o OrbitControls real mant\u00e9m os limites expandidos can\u00f4nicos junto \u00e0 descontinuidade angular",
+      "status": "passed",
+      "failure": null
+    },
+    {
+      "test": "entrega da transi\u00e7\u00e3o para o OrbitControls real libera o voo comum antes de capturar a pose inicial do retorno lunar",
+      "status": "passed",
+      "failure": null
+    },
+    {
+      "test": "recupera\u00e7\u00e3o de navega\u00e7\u00e3o interrompida encerra todos os dedos pelo OrbitControls real no blur e permite o pr\u00f3ximo gesto",
+      "status": "passed",
+      "failure": null
+    },
+    {
+      "test": "recupera\u00e7\u00e3o de navega\u00e7\u00e3o interrompida cancela um pinch inteiro sem reentr\u00e2ncia ao receber pointercancel nativo",
+      "status": "passed",
+      "failure": null
+    },
+    {
+      "test": "recupera\u00e7\u00e3o de navega\u00e7\u00e3o interrompida libera os controles reais ap\u00f3s lostpointercapture sem clique adicional",
+      "status": "failed",
+      "failure": "AssertionError: expected \"spy\" to be called once with arguments: [ 'lostpointercapture' ]"
+    },
+    {
+      "test": "recupera\u00e7\u00e3o de navega\u00e7\u00e3o interrompida libera os controles reais ap\u00f3s pointerup-outside sem clique adicional",
+      "status": "failed",
+      "failure": "AssertionError: expected \"spy\" to be called once with arguments: [ 'pointerup-outside' ]"
+    },
+    {
+      "test": "recupera\u00e7\u00e3o de navega\u00e7\u00e3o interrompida n\u00e3o cancela a soltura normal seguida de lostpointercapture",
+      "status": "passed",
+      "failure": null
+    },
+    {
+      "test": "recupera\u00e7\u00e3o de navega\u00e7\u00e3o interrompida s\u00f3 cancela ao ocultar a aba e tamb\u00e9m libera a navega\u00e7\u00e3o na perda de contexto",
+      "status": "passed",
+      "failure": null
+    },
+    {
+      "test": "recupera\u00e7\u00e3o de navega\u00e7\u00e3o interrompida remove listeners de forma idempotente antes de registrar a pr\u00f3xima inst\u00e2ncia",
+      "status": "passed",
+      "failure": null
+    },
+    {
+      "test": "recupera\u00e7\u00e3o de navega\u00e7\u00e3o interrompida drena damping sem mover c\u00e2mera ou alvo e sem movimento residual nos pr\u00f3ximos frames",
+      "status": "passed",
+      "failure": null
+    },
+    {
+      "test": "recupera\u00e7\u00e3o de navega\u00e7\u00e3o interrompida preserva locks lunares e estado comercial enquanto libera somente navega\u00e7\u00e3o transit\u00f3ria",
+      "status": "passed",
+      "failure": null
+    }
+  ]
+}

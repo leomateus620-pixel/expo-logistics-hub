@@ -1,0 +1,13 @@
+{
+  "canvas": 0,
+  "retry": [
+    {
+      "disabled": true,
+      "text": "3D indisponível nesta sessão"
+    }
+  ],
+  "status": [
+    "1de 1691",
+    "Modo 2D acessível ativadoO navegador não disponibilizou WebGL 2. Consulte registros e detalhes pela tabela. A seleção múltipla de Vendas e os interiores exigem o mapa 3D. Verificação 3/3: WebGL 2 continua indisponível."
+  ]
+}

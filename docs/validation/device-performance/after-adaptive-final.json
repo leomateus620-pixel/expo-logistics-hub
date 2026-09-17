@@ -1,0 +1,18 @@
+{
+  "commercialMapCameraDiagnostics": "{\"position\":[3.8127,109.9563,104.2786],\"target\":[-2.2546,0.744,-0.3832],\"quaternion\":[-0.391939,0.026631,0.011351,0.919536],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.09462,\"far\":1283.245,\"distance\":151.3876,\"minDistance\":8.7889,\"maxDistance\":328.6701,\"desiredMinDistance\":8.7889,\"desiredMaxDistance\":328.6701,\"calculatedMaxDistance\":328.6701,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":6.2,\"diagonal\":198.05951217035},\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1351,\"height\":394,\"aspect\":3.42893,\"dpr\":1}}",
+  "commercialMapCameraTransition": "{\"status\":\"completed\",\"source\":\"preset:overview\",\"sequence\":2,\"startedAt\":24132.6,\"durationMs\":120,\"completedAt\":24260.2,\"elapsedMs\":127.6}",
+  "commercialMapEssentialReady": "true",
+  "commercialMapHydration": "complete",
+  "commercialMapInteractive": "true",
+  "commercialMapInteriorShaderWarmup": "{\"durationMs\":45.5,\"programsBefore\":202,\"programsAfter\":209,\"error\":null}",
+  "commercialMapQuality": "{\"logicalTier\":\"LOW\",\"sceneTier\":\"LOW\",\"baseDpr\":1,\"effectiveDpr\":1,\"hardwareCeiling\":\"HIGH\",\"reason\":\"sustained-slow-frames\"}",
+  "commercialMapRain": "{\"blend\":0,\"night\":0,\"tier\":\"LOW\",\"drops\":900,\"splashes\":0,\"runoff\":0,\"puddles\":24,\"wetMaterials\":525}",
+  "commercialMapReady": "true",
+  "commercialMapRenderHealth": "{\"status\":\"ready\",\"path\":\"direct\",\"presentedFrames\":11084,\"contextLosses\":0,\"lastErrorCode\":null}",
+  "commercialMapRendererInfo": "{\"at\":272903.3000000119,\"calls\":1107,\"triangles\":985098,\"geometries\":559,\"textures\":151,\"programs\":274,\"dpr\":1,\"width\":1351,\"height\":394,\"heapBytes\":138851823,\"qualityTier\":\"LOW\",\"gpuVendor\":\"Google Inc. (Intel)\",\"gpuRenderer\":\"ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)\"}",
+  "commercialMapSceneWarmup": "{\"durationMs\":341.59999999403954,\"parallel\":true}",
+  "commercialMapShaderCompilation": "{\"startedAt\":6446.5,\"durationMs\":0.7,\"programsBefore\":88,\"programsAfter\":88,\"geometries\":8,\"textures\":3}",
+  "commercialMapSunriseDiagnostics": "{\"qualityTier\":\"reduced\",\"progress\":1,\"direction\":[0,0.40674,-0.91355],\"horizonTarget\":[-2.25,0,-50000.38],\"sunWorld\":[-2.25,20336.83,-45677.66],\"sunNdc\":[0.1324,8.0697,1.0009],\"cameraPosition\":[3.81,109.96,104.28],\"cameraForward\":[-0.04008,-0.72141,-0.69135],\"sunViewDot\":0.33816,\"cameraFar\":1283.2451713105356,\"safeCameraMaxDistance\":265.047,\"fogNear\":702.581,\"fogFar\":1596.775,\"azimuthMapDegrees\":0,\"elevationDegrees\":24,\"renderer\":{\"calls\":0,\"triangles\":0,\"programs\":274,\"geometries\":559,\"textures\":151}}",
+  "engine": "three.js r170",
+  "territoryQa": "ready"
+}

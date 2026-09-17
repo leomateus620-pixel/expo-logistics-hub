@@ -1,0 +1,225 @@
+{
+  "baseCommit": "3c81b943c4b5871ff5dd6adea42f9ab28efee5c3",
+  "implementationCommit": "71c422ad73158422af6e0ddd2e4658a41e810f1a",
+  "productionDeploymentIdentity": "unverified",
+  "qaBuilds": [
+    {
+      "directory": "dist-baseline",
+      "source": "baseCommit",
+      "port": 4191,
+      "indexSha256": "ba10c0930d7fccede7d392f3989361ef9513edbd4ec6da782e32e01d31f85d8e"
+    },
+    {
+      "directory": "dist-after",
+      "source": "implementationCommit",
+      "port": 4192,
+      "indexSha256": "1447dd95c428b2984aae300403920222b476fd4549f3f71ba99f0426c9027cb1"
+    }
+  ],
+  "normalBuild": {
+    "directory": "dist",
+    "source": "implementationCommit",
+    "diagnostics": false,
+    "indexSha256": "42bd01fa7884a5be5b4d9661f467b39802447666999bb5eac3adc8c71263f7ae",
+    "manifestSha256": "91875ec96dc69020df84183f392920c9eb44545d0df37081c501a19d5852e53d"
+  },
+  "notes": [
+    "QA builds instrumented with the existing preview script; do not deploy them.",
+    "The measured renderer source is identical to the implementation commit. Final QA rebuild added fallback explanatory text only after benchmark series.",
+    "Evidence contains fixtures and no authentication material.",
+    "Source changes and evidence are separate commits; original checkout user changes remain unstaged and untouched."
+  ],
+  "evidence": [
+    {
+      "file": "after-adaptive-final.json",
+      "bytes": 2994,
+      "sha256": "fe61a35c751df2ed27d4d1facf9117239159621accd0c0d912053a5773233381"
+    },
+    {
+      "file": "after-context-night.png",
+      "bytes": 120357,
+      "sha256": "38cd9d96bfb058f4ad82fee1de73910886d0cb5767fb612d9877cb167756529c"
+    },
+    {
+      "file": "after-context-recovery.json",
+      "bytes": 12322,
+      "sha256": "037cab187a886538b1ac3d8950ccaf3287ae7889df2b427363a3cad8b19e98df"
+    },
+    {
+      "file": "after-fallback-details.png",
+      "bytes": 76018,
+      "sha256": "09ae418097ef078525588becf1141c119bbd6f61e96e0e5f821f897f76356156"
+    },
+    {
+      "file": "after-fallback-retry.json",
+      "bytes": 386,
+      "sha256": "23b5620c415ab9578f37ff2935af8591059d2dfc3669cd8ded8a03594b917b9e"
+    },
+    {
+      "file": "after-first-local-visit.json",
+      "bytes": 12359,
+      "sha256": "7f6bb6753a66309955b4ce0d9d3fc98ffb51fd9016728ac49ed0b55f571e49b1"
+    },
+    {
+      "file": "after-interior.json",
+      "bytes": 3116,
+      "sha256": "f3ec36b5578ce677c487b4c09243dd7ecce23ac90307056368bd7552586e9f35"
+    },
+    {
+      "file": "after-interior.png",
+      "bytes": 54609,
+      "sha256": "4a11174a9b18e8918904666a56ad47e81aa2d282a1680c38273eb193a1b86469"
+    },
+    {
+      "file": "after-lighting-adaptive.json",
+      "bytes": 86598,
+      "sha256": "36ed06c7494bd847fb23b599bb7e22afcd2b61fa15acbdd140bc6075a0601754"
+    },
+    {
+      "file": "after-lighting-fixed.json",
+      "bytes": 85932,
+      "sha256": "5f357ce8ff04fdb5c89c7e87317625307cb9f8deb4dcf529d97f33460fcee8e0"
+    },
+    {
+      "file": "after-lot.json",
+      "bytes": 3122,
+      "sha256": "23733ff3d61eb2a30039b933dc0eb9ea1d473620e5dda3b656af78ab70b7501d"
+    },
+    {
+      "file": "after-lot.png",
+      "bytes": 101867,
+      "sha256": "bb2ec82ab6798ec1251196f8361ef1ca48524b8438bebd824d3b174887960f17"
+    },
+    {
+      "file": "after-mobile-viewport.png",
+      "bytes": 52143,
+      "sha256": "69ce88b85ed61750ceec0cee003c57bfb75d1179cd787ea363ec82823b796226"
+    },
+    {
+      "file": "after-navigation.json",
+      "bytes": 7844,
+      "sha256": "68fb51f548f99dab3a7695c645111ff8c85266979659ca56dbedde8dcb5e4c07"
+    },
+    {
+      "file": "after-overview.json",
+      "bytes": 13946,
+      "sha256": "51c56d51fe1021780fd351a6433c212e414d17cabe58c0cacbcaefa6615e211c"
+    },
+    {
+      "file": "after-overview.png",
+      "bytes": 147418,
+      "sha256": "09959b90b4f6acfba1a22ef719ef3b90ad3e3a282e36093d57d38146de9bf717"
+    },
+    {
+      "file": "after-pavilion.json",
+      "bytes": 3130,
+      "sha256": "57773e910b7035ad79e379b1b2ef19a86506daba4d5dc4e9ce6e3b70ac502525"
+    },
+    {
+      "file": "after-pavilion.png",
+      "bytes": 150532,
+      "sha256": "8223cc20e2105ba7a140658cd8ca94eee6069973ca6d0ef37d2ed433a7f2e4a9"
+    },
+    {
+      "file": "after-rain-closeup.json",
+      "bytes": 2970,
+      "sha256": "0c859a45d2b4f8c7cc77aab8c47f531abd06d7ffc6c33fd5b6e8bbbd175d3d13"
+    },
+    {
+      "file": "after-rain-closeup.png",
+      "bytes": 135106,
+      "sha256": "845b793fb1c553430cfc7c5983736a8479b5e5fc345d6d492c787ffc9e71706e"
+    },
+    {
+      "file": "baseline-initial.json",
+      "bytes": 66717,
+      "sha256": "f3a105cd0f05ee84d62f18442baf65b1e31cc5ace780eb7a84f485aab69057aa"
+    },
+    {
+      "file": "baseline-interior.json",
+      "bytes": 2940,
+      "sha256": "05429e4f0e33a234245726e155706c4ee8f8432e675fe2e53165006dce261bb8"
+    },
+    {
+      "file": "baseline-interior.png",
+      "bytes": 54626,
+      "sha256": "3608188faf57253be8ae37b967f3d03633f7e242b171498c44a9a0e4c3a3f9ea"
+    },
+    {
+      "file": "baseline-lighting.json",
+      "bytes": 483048,
+      "sha256": "69f7d9cfa968447c2b71954c7039f038cf880219e98be535aebaf27018d06336"
+    },
+    {
+      "file": "baseline-lot.json",
+      "bytes": 2941,
+      "sha256": "c57f80a919cc3c97bd7349aacf17d1983e352074ff2e11bbf41daf7961499858"
+    },
+    {
+      "file": "baseline-lot.png",
+      "bytes": 101880,
+      "sha256": "9a0fccba58b13f7832b9b567861f6079e4b00c41b476f79e803931a7ab129551"
+    },
+    {
+      "file": "baseline-overview.png",
+      "bytes": 117636,
+      "sha256": "b23191a2e49b24b9fa39d996391f0176c9d7580e883336fe78335f7a6a8f7ecd"
+    },
+    {
+      "file": "baseline-pavilion.json",
+      "bytes": 2949,
+      "sha256": "fac5f0d26b640d13ed3dea0ea4c6a7253ac739d581d14e47a529661e39dcf31a"
+    },
+    {
+      "file": "baseline-pavilion.png",
+      "bytes": 150608,
+      "sha256": "6fd094bfcc64d88a879425bc59d2537e8eff6a6d7529071134c228e8731d1d5e"
+    },
+    {
+      "file": "bundle.json",
+      "bytes": 4428,
+      "sha256": "dcb2825b0626d1f4c63b72cd39f66cf9fd4acdb0f59a17c2cfeac27c10806013"
+    },
+    {
+      "file": "checks.json",
+      "bytes": 1696,
+      "sha256": "508f3aef5dd6bbabea4fabe04463b3f8c0346f5c4c0374b9c994844d901682e0"
+    },
+    {
+      "file": "pointer-regression-before.json",
+      "bytes": 3437,
+      "sha256": "bd038124df7f8661e943d80c32a88eab19b315af01a1d30d466c5c203c3c8676"
+    },
+    {
+      "file": "README.md",
+      "bytes": 21322,
+      "sha256": "ea7f9430074283cec620e5f58f74b92eef4c6a34c809bb6fae881a35bb8904c4"
+    },
+    {
+      "file": "reloads.json",
+      "bytes": 512500,
+      "sha256": "602d1e7c335e4aadcdc01541120f8e2bc4bd0e64d3d07bdc9b6f8fee39282711"
+    },
+    {
+      "file": "summarize.cjs",
+      "bytes": 3394,
+      "sha256": "b6c4a51a4bb2de945db2507be6a666f7f72452fc092acef6d078d6e2ad70e4a5"
+    },
+    {
+      "file": "summary.json",
+      "bytes": 14597,
+      "sha256": "1b6fb67babd42b0bff24c168c77e2f38b8660165ae994b019fb45db1945dc3bc"
+    },
+    {
+      "file": "test-baseline-comparison.json",
+      "bytes": 34190,
+      "sha256": "16674eeac2c03aae136fdce98632e646bdbb93fb42ccfe8abf73e8cd4e7674e7"
+    },
+    {
+      "file": "visual-pairs.json",
+      "bytes": 1863,
+      "sha256": "f3e44ba561130a57d4f52aa25c47828350068475068c86b476a6013310ea5802"
+    }
+  ],
+  "evidenceHashEncoding": "SHA-256: PNG raw bytes; text decoded as UTF-8 with CRLF normalized to LF"
+}

@@ -5,6 +5,7 @@ import { advanceRainBlend, commercialRainRuntime } from '../../utils/rainRuntime
 import { markCommercialMapStage } from '../../utils/performanceDiagnostics';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import { COMMERCIAL_MAP_ANIMATION, markCommercialMapPresentedFrame, requestCommercialMapAnimationFrame } from '../../utils/frameActivity';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import {
   BlendFunction,
@@ -26,7 +27,6 @@ import {
   resolveCommercialMapEnvironmentLayout,
   resolveCommercialMapShadowFrustum,
   resolveCommercialMapSunriseFrame,
-  resolveCommercialMapSunriseQualityTier,
   type CommercialMapEnvironmentExtent,
   type CommercialMapShadowFrustum,
   type CommercialMapEnvironmentMode,
@@ -1048,6 +1048,7 @@ export function SunrisePostProcessing({
       }
       if (contextIsLost()) return;
       presentedFrames.current += 1;
+      markCommercialMapPresentedFrame(gl, path);
     } catch (error) {
       if (contextIsLost()) return;
       lastErrorCode.current = error instanceof Error ? error.message : 'renderer-failed';
@@ -1060,6 +1061,7 @@ export function SunrisePostProcessing({
         direct();
         if (contextIsLost()) return;
         presentedFrames.current += 1;
+        markCommercialMapPresentedFrame(gl, 'direct');
       } catch {
         if (contextIsLost()) return;
         rendererFailed.current = true;
@@ -1153,32 +1155,10 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
   const mode: CommercialMapEnvironmentMode = hydrologicalModeActive ? 'hydrological' : 'normal';
   const palette = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes[mode];
-  const initialQualityTier = useRef<CommercialMapSunriseQualityTier | undefined>(undefined);
-  if (!initialQualityTier.current) {
-    const device = typeof navigator === 'undefined'
-      ? undefined
-      : navigator as Navigator & { deviceMemory?: number };
-    initialQualityTier.current = resolveCommercialMapSunriseQualityTier({
-      reducedGraphics,
-      viewportWidth: size.width,
-      viewportHeight: size.height,
-      deviceMemory: device?.deviceMemory,
-      hardwareConcurrency: device?.hardwareConcurrency,
-    });
-  }
-  const adaptiveEnvironmentTier = resolveCommercialMapEnvironmentQualityTier(adaptiveQualityTier);
-  const initialEnvironmentTier = initialQualityTier.current ?? 'balanced';
-  const qualityOrder: readonly CommercialMapSunriseQualityTier[] = [
-    'reduced',
-    'balanced',
-    'full',
-  ];
   const qualityTier: CommercialMapSunriseQualityTier = reducedGraphics
     ? 'reduced'
-    : qualityOrder[Math.min(
-        qualityOrder.indexOf(initialEnvironmentTier),
-        qualityOrder.indexOf(adaptiveEnvironmentTier),
-      )];
+    : resolveCommercialMapEnvironmentQualityTier(adaptiveQualityTier, size);
+  const initialQualityTier = useRef(qualityTier);
   const quality = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality[qualityTier];
   const cameraDistanceBounds = useMemo(
     () => resolveCommercialMapCameraDistanceBounds({
@@ -1506,7 +1486,9 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       : '';
     const diagnosticsStale = commercialMapDiagnosticsEnabled
       && cameraSignature !== timeline.current.lastCameraSignature;
-    if ((isRunning && !hasSunrisePlaybackFinished(playback.current) && !nightMode) || !nightSettled || !rainSettled) invalidate();
+    if ((isRunning && !hasSunrisePlaybackFinished(playback.current) && !nightMode) || !nightSettled || !rainSettled) {
+      requestCommercialMapAnimationFrame(gl, invalidate, COMMERCIAL_MAP_ANIMATION.environment);
+    }
     if (isRunning && hasSunrisePlaybackFinished(playback.current)) liveState.completeSunrise(liveState.sunriseSequence);
     if (!frameChanged && !diagnosticsStale) return;
 
