@@ -1,0 +1,47 @@
+# Auditoria espacial da revisão da PR 155
+
+A referência anterior desta revisão é o head `4f8bdf3777dc521d80ad67885278e79da7426e56` da PR 155 (`fix/test-drive-pecuaria-access`). A PR 152 corresponde à Arena e não é a origem destas três reconstruções. O trabalho preserva os proprietários canônicos, os IDs comerciais e as implantações existentes, com recorte justificado do fundo de D4 pelo limite do vizinho B28, além das revisões arquitetônicas e viárias.
+
+## Referências e grau de certeza
+
+| Setor | Fonte prioritária | Observado | Limite da evidência |
+|---|---|---|---|
+| Edificação junto ao Test Drive | `IMG_0860.jpeg`, `IMG_0859.jpeg` (anexos 7–9 após a correção do usuário) | Tijolo, duas águas escuras, varanda profunda, quatro apoios delgados, porta central, quatro janelas altas seguidas de vãos menores na lateral fotografada | Perspectivas não fornecem dimensões cadastrais; fachada oposta e traseira não estão documentadas integralmente |
+| Tenda da Pecuária | `IMG_0858.jpeg`, `IMG_0863.jpeg` (anexos 10–11) | Cobertura larga, empena clara, pilares escuros robustos e dois centrais em tijolo, fechamento no fundo/lado e passagem livre | Alturas, profundidades e escala dos pilares são estimadas; o nome D4 permanece o nome do sistema |
+| Acessos / Tuparendi | `IMG_0956.jpeg`, rede OSM já registrada no projeto, âncoras A1 e vias existentes | Anel ligado à avenida, ramais separados e divisor oeste alongado | O satélite não é levantamento topográfico; ajuste circular e larguras são estimativas registradas |
+| Estacionamentos junto às Etnias | `IMG_0965.jpeg`; estados antigos `IMG_0968.jpeg`, `IMG_0969 (1).jpeg`, `IMG_0970.jpeg` | Terreno natural contínuo com árvores e vias, sem paredes nas bordas cadastrais dos estacionamentos | Não determina material/substrato exato nem autoriza remover árvores, IDs ou vias |
+| Caminho e pátio dos Pavilhões 1/14/12 | `IMG_0967.jpeg`, `IMG_0971.jpeg`–`IMG_0973.jpeg` | Continuação pavimentada, pátio e copa central | Escala visual estimada; B23 continua protegido mesmo sem confirmação completa na foto |
+
+## Origem canônica e revisões
+
+O prédio Test Drive continua sendo `sede-costeiros` em `PARK_ACCESS_SPATIAL_PLAN.costeirosSetting`, renderizado pelo mesmo `buildCosteiros`. Não foi criado outro imóvel sobre o primeiro. O centro de origem PDF `[917.5,2972.5]`, a orientação da fachada `+Z` e o envelope de cobertura `85 × 247` da PR 155 foram preservados. O comprimento ampliado e as sete posições de vãos já estavam naquela PR; esta revisão corrige a distribuição das alturas, quatro apoios frontais, empena fechada atrás da varanda e detalhes de superfície. A lateral não fotografada conserva a interpretação anterior, sem apresentá-la como verificada.
+
+O envelope corresponde a aproximadamente `1.8545 × 5.3891` unidades do mapa, ou `12.36 × 35.93 m` somente usando a escala de trabalho `0.15 unidade/m`. O beiral está em `0.53`, a subida da cobertura em `0.28` e a soleira em `0.036` unidades. São parâmetros de reconstrução visual, não medições de campo. O solo apresentado de TEST-DRIVE está em `0.026`: a fundação começa em zero e termina em `0.036`, ficando embutida `0.026` e com soleira aparente `0.010` (cerca de 6.7 cm na escala de trabalho). Paredes e pilares partem dessa soleira; não foi necessário deslocamento vertical ou horizontal arbitrário.
+
+D4 continua usando o cadastro e o componente `LivestockTent`. A PR anterior já possuía receita agrupada e aberturas geométricas; a revisão diferencia o volume lateral fechado, a passagem posterior e a espessura dos pilares observada nas fotos. A identificação física integra a fachada. O footprint não é utilizado para renumerar ou recriar a entidade. A fachada permanece em x2840; o fundo passa a 2997, derivado de B28 menos três unidades de referência, resultando em centro 2918.5 e comprimento 157. Veja [auditoria do recuo](livestock-neighbor-clearance.md).
+
+O centro antigo de Tuparendi `[1110,4185]` correspondia a um nó sobre o anel registrado, não ao centro. `accessJunctionReconstruction.ts` deriva o centro dos pontos registrados e documenta quais segmentos transferem a propriedade de renderização para a união de pavimento. As vias antigas transferidas deixam de ser renderizadas no proprietário territorial. A classificação `PROTECTED_INFRASTRUCTURE` cobre os acessos e suas costuras para preservar o contexto nas regras de limpeza.
+
+As duas rótulas mantêm a fronteira canônica de 48 segmentos nos perfis completo e econômico, igual à utilizada no recorte do pavimento territorial. Assim, a troca de perfil não abre frestas entre contornos de resoluções diferentes. O detalhe das estruturas continua independente. O teste compara diretamente posições e índices do pavimento nos dois perfis.
+
+O asfalto de `ParkAccessInfrastructure` usa o mesmo perfil `highwayAsphalt` e o mesmo bundle PBR de `RegionalHighwayNetwork`, pelo pool existente com contagem de referências. Albedo, rugosidade, normal e UVs mundiais X/Z compartilham escala e fase na costura do Portão 1. Foram removidas as duas texturas procedurais privadas de asfalto/rugosidade e o shader adicional de granulação. Cada componente libera somente seu handle do pool; não há novo proprietário global de material, draw adicional ou alteração da implantação e dos parâmetros visuais das vias territoriais.
+
+EST-EXP-VIS e EST-VIS mantêm exatamente seus registros, limites, alturas cadastrais e geometria de picking recortada pelas vias. A revisão elimina as saias verticais e as duas superfícies coloridas independentes: o terreno ambiental existente é o único proprietário visual do chão. Borda e label permanecem disponíveis na seleção. Não há plano novo de transição. Uma primeira tentativa com fade foi rejeitada na captura intermediária, pois expunha uma faixa clara entre materiais distintos; esse estado não é o resultado final.
+
+O corte diagonal remanescente vinha de `RearParkEnvironmentLayer`: seu único patch atravessa o estacionamento, mas usava outra textura, escala e cor. A malha e sua cota permanecem; ela agora toma emprestada a mesma instância de material da base ambiental, com UV na mesma origem e orientação mundial. Esse compartilhamento remove dois materiais e um bundle próprio de texturas, sem criar plano ou draw adicional. A base mantém a propriedade e o descarte do material. A continuidade cobre as duas áreas cadastrais e o terreno traseiro adjacente.
+
+A borda reta mais à direita da captura superior pertence ao terreno funcional da Arena, `arena-front-natural-terrain`, de `ArenaFrontInfrastructure`, delimitado em z=3300 e recortado pelas zonas canônicas. A projeção de `[5350,3300]` e `[5350,3260]` na câmera de verificação resulta em `[1192.19,551.84]` e `[1232.93,551.84]` pixels, coincidindo com o degrau visível. Essa superfície preserva o relevo da Arena e não é uma placa de estacionamento duplicada; ficou fora desta correção localizada.
+
+Com a remoção das placas, o receptor vertical das árvores e da grama piloto passa a ser a base ambiental compartilhada ou o plano real do terreno traseiro, interpolado na mesma triangulação. Apenas o apoio Y de apresentação muda; inventário, IDs, espécies, posições X/Z, vias e cadastros permanecem iguais. O cálculo mantém os suportes de vias e de outras áreas existentes. Não se cria uma geometria de terreno adicional para amostrar a altura.
+
+O pátio utiliza uma única união de polígonos derivada de B1/B2/B3/B23 e da extremidade existente do Caminho do Bosque. Subtrai edifícios, ambulatório, vias, caminho antigo e a abertura da raiz. A árvore central utiliza o lote de instâncias existente. Detalhes e limites estão em `pavilion-courtyard-audit.md`.
+
+## Verificação e orçamento
+
+Na PR anterior, Test Drive tinha 171 caixas / 2,052 triângulos no perfil completo e 113 / 1,356 no reduzido, distribuídos nos três lotes de instâncias compartilhados com as portarias. A nova empena triangular requer um draw adicional; o teste de orçamento verifica que o total de triângulos permanece abaixo desses tetos. Essa conta é estática e não substitui métricas de cena/FPS.
+
+Nos estacionamentos, há dois draws visuais a menos quando deselecionados, sem os bundles de textura particulares nem o shader de transição descartado. A geometria remanescente serve ao raycast e à seleção; o teste verifica que o material invisível mantém o picking e que o asfalto continua vazio no recorte. Os testes também verificam registros imutáveis, UVs, ausência de saia e receptor das árvores. O pátio mantém quatro draws ambientais, acrescenta uma árvore na instância existente e fica abaixo de 60 triângulos de concreto.
+
+Validação focada executada: 4/4 testes de continuidade do estacionamento, 13/13 de árvores, 5/5 do piloto de vegetação, 12/12 de texturas abertas, 4/4 do pátio, 4/4 do compartilhamento de material/UV e 11/11 do ambiente. O teste demorado de células livres do piloto excedeu 30 s sob concorrência; executado isoladamente com o limite original de 30 s, passou em 13.46 s. Essa passagem isolada é distinta da suíte integrada final, executada com `--maxWorkers=1 --testTimeout=60000` para reduzir a concorrência e acomodar a carga da máquina, sem reduzir a cobertura.
+
+As capturas finais em `baseline/` e `after/` usam a mesma câmera e o renderer de produção com inventário de fixture. Não são dados autenticados de produção. A emulação de Chrome não certifica Safari/iPhone, aparelho Android físico ou desempenho térmico. As dimensões continuam sendo estimativas visuais registradas.

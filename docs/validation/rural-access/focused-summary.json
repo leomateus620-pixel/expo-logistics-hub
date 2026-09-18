@@ -1,0 +1,633 @@
+{
+  "counts": {
+    "suites": 16,
+    "passed": 136,
+    "failed": 0
+  },
+  "tests": [
+    {
+      "name": "test/commercialMapAccessJunction.test.ts",
+      "cases": [
+        {
+          "name": "registered Gate 1 and Tuparendi junction ownership fits the existing closed OSM ring, rather than treating an eastern lane node as its centre",
+          "status": "passed"
+        },
+        {
+          "name": "registered Gate 1 and Tuparendi junction ownership forms one connected pavement from Gate 1 through both circles to every retained arterial seam",
+          "status": "passed"
+        },
+        {
+          "name": "registered Gate 1 and Tuparendi junction ownership subtracts both complete islands and retains the source-defined western divider",
+          "status": "passed"
+        },
+        {
+          "name": "registered Gate 1 and Tuparendi junction ownership triangulates only the union once, without hidden overlapping approach asphalt",
+          "status": "passed"
+        },
+        {
+          "name": "registered Gate 1 and Tuparendi junction ownership keeps exactly the same canonical asphalt boundary in detailed and economy modes",
+          "status": "passed"
+        },
+        {
+          "name": "registered Gate 1 and Tuparendi junction ownership cuts old territory pavement and paint at the transferred owner boundary",
+          "status": "passed"
+        },
+        {
+          "name": "registered Gate 1 and Tuparendi junction ownership retains both roundabouts and their approach IDs even outside future context bounds",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapContinuousGround.test.ts",
+      "cases": [
+        {
+          "name": "continuidade do material na borda traseira do parque reutiliza exatamente o material vivo sem transferir sua propriedade ou descarte",
+          "status": "passed"
+        },
+        {
+          "name": "continuidade do material na borda traseira do parque mantém a troca de qualidade/hidrologia quando o proprietário anterior desmonta",
+          "status": "passed"
+        },
+        {
+          "name": "continuidade do material na borda traseira do parque iguala UV e fase à PlaneGeometry transformada: 0/0/200",
+          "status": "passed"
+        },
+        {
+          "name": "continuidade do material na borda traseira do parque iguala UV e fase à PlaneGeometry transformada: 12.5/-4.5/573",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapEnvironment.test.ts",
+      "cases": [
+        {
+          "name": "amanhecer premium compartilhado do Mapa Comercial mantém o terreno externo opaco atrás do mapa, sem borda alfa circular",
+          "status": "passed"
+        },
+        {
+          "name": "amanhecer premium compartilhado do Mapa Comercial limita o shader multiescala ao material do outer ground e preserva fallback PBR",
+          "status": "passed"
+        },
+        {
+          "name": "amanhecer premium compartilhado do Mapa Comercial ancora o sol no horizonte -Z definido pelas referências, sem reutilizar o sol diurno",
+          "status": "passed"
+        },
+        {
+          "name": "amanhecer premium compartilhado do Mapa Comercial resolve uma única timeline determinística, limitada e monotônica",
+          "status": "passed"
+        },
+        {
+          "name": "amanhecer premium compartilhado do Mapa Comercial seleciona um tier fixo e mantém o fog além de toda câmera e do mapa",
+          "status": "passed"
+        },
+        {
+          "name": "amanhecer premium compartilhado do Mapa Comercial explicita o orçamento visual e degrada somente as camadas caras por tier",
+          "status": "passed"
+        },
+        {
+          "name": "amanhecer premium compartilhado do Mapa Comercial mantém shaders, recursos e pós-processamento persistentes no Canvas compartilhado",
+          "status": "passed"
+        },
+        {
+          "name": "amanhecer premium compartilhado do Mapa Comercial usa um único vetor entre horizonTarget, céu integrado, esfera solar e iluminação",
+          "status": "passed"
+        },
+        {
+          "name": "amanhecer premium compartilhado do Mapa Comercial ajusta o frustum de sombra ao parque, não às BRs, e cobre o amanhecer inteiro",
+          "status": "passed"
+        },
+        {
+          "name": "amanhecer premium compartilhado do Mapa Comercial mantém bias de sombra no parque sem peter-pan e sem inflar o frustum com as BRs",
+          "status": "passed"
+        },
+        {
+          "name": "amanhecer premium compartilhado do Mapa Comercial permanece apresentação exterior sem domínio comercial paralelo",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapLateralResidentialStreetIntegration.test.ts",
+      "cases": [
+        {
+          "name": "residential street junctions with the existing avenue derives exactly four open mouths from the registered local streets",
+          "status": "passed"
+        },
+        {
+          "name": "residential street junctions with the existing avenue removes sidewalk across every street mouth and retains the intervening sidewalk",
+          "status": "passed"
+        },
+        {
+          "name": "residential street junctions with the existing avenue preserves original endpoints, bends and elevation outside the junction cuts",
+          "status": "passed"
+        },
+        {
+          "name": "residential street junctions with the existing avenue keeps actual rendered curb returns outside the entire carriageway width",
+          "status": "passed"
+        },
+        {
+          "name": "residential street junctions with the existing avenue removes only hidden downward curb faces while retaining tops and upright walls",
+          "status": "passed"
+        },
+        {
+          "name": "residential street junctions with the existing avenue does not mutate the GIS plan, avenue, other sidewalks or existing independent curb runs",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapLivestockTent.test.ts",
+      "cases": [
+        {
+          "name": "D4 and Test Drive photographic architecture publication keeps D4 cadastral identity, registered centre, parent and interaction semantics",
+          "status": "passed"
+        },
+        {
+          "name": "D4 and Test Drive photographic architecture publication derives the visible footprint from the same canonical specification",
+          "status": "passed"
+        },
+        {
+          "name": "D4 and Test Drive photographic architecture publication preserves the street-facing boundary and trims only the rear away from B28, including all roof vertices",
+          "status": "passed"
+        },
+        {
+          "name": "D4 and Test Drive photographic architecture publication does not overwrite a stamped later edit and leaves all other entities intact",
+          "status": "passed"
+        },
+        {
+          "name": "D4 and Test Drive photographic architecture publication preserves the west-facing front and swaps only model axes",
+          "status": "passed"
+        },
+        {
+          "name": "D4 and Test Drive photographic architecture publication has a semi-open front, real rear wing openings, brick piers and gable",
+          "status": "passed"
+        },
+        {
+          "name": "D4 and Test Drive photographic architecture publication retains the existing Test Drive anchor and updates the environmental exclusion polygon",
+          "status": "passed"
+        },
+        {
+          "name": "D4 and Test Drive photographic architecture publication replaces the old Costeiros box in the existing instanced architecture batches",
+          "status": "passed"
+        },
+        {
+          "name": "D4 and Test Drive photographic architecture publication measures the actual merged geometry budget at detail=false focus=false",
+          "status": "passed"
+        },
+        {
+          "name": "D4 and Test Drive photographic architecture publication measures the actual merged geometry budget at detail=true focus=false",
+          "status": "passed"
+        },
+        {
+          "name": "D4 and Test Drive photographic architecture publication measures the actual merged geometry budget at detail=true focus=true",
+          "status": "passed"
+        },
+        {
+          "name": "D4 and Test Drive photographic architecture publication retains the same roof and footprint across detail levels",
+          "status": "passed"
+        },
+        {
+          "name": "D4 and Test Drive photographic architecture publication rejects invalid dimensions before allocating GPU buffers",
+          "status": "passed"
+        },
+        {
+          "name": "D4 and Test Drive photographic architecture publication keeps runtime cleanup and contains no per-frame React work",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapOpenGroundTextures.test.ts",
+      "cases": [
+        {
+          "name": "texturas das áreas abertas do Mapa Comercial mantém perfis cromáticos estáveis e específicos para os dois IDs oficiais",
+          "status": "passed"
+        },
+        {
+          "name": "texturas das áreas abertas do Mapa Comercial registra os dois estacionamentos oficiais como superfícies verdes compactadas na cota real",
+          "status": "passed"
+        },
+        {
+          "name": "texturas das áreas abertas do Mapa Comercial expõe uma política power-of-two com mipmaps, trilinear, sRGB e repeat em unidades de mundo",
+          "status": "passed"
+        },
+        {
+          "name": "texturas das áreas abertas do Mapa Comercial limita a anisotropia à capacidade 1 do renderer",
+          "status": "passed"
+        },
+        {
+          "name": "texturas das áreas abertas do Mapa Comercial limita a anisotropia à capacidade 4 do renderer",
+          "status": "passed"
+        },
+        {
+          "name": "texturas das áreas abertas do Mapa Comercial limita a anisotropia à capacidade 8 do renderer",
+          "status": "passed"
+        },
+        {
+          "name": "texturas das áreas abertas do Mapa Comercial limita a anisotropia à capacidade 16 do renderer",
+          "status": "passed"
+        },
+        {
+          "name": "texturas das áreas abertas do Mapa Comercial reutiliza a fonte em cache e produz clones configurados sem mutá-la",
+          "status": "passed"
+        },
+        {
+          "name": "texturas das áreas abertas do Mapa Comercial fornece um bundle PBR linear compartilhado por superfície e isolado por entidade",
+          "status": "passed"
+        },
+        {
+          "name": "texturas das áreas abertas do Mapa Comercial mantém o gramado paisagístico geral sem faixas de corte repetitivas",
+          "status": "passed"
+        },
+        {
+          "name": "texturas das áreas abertas do Mapa Comercial descarta os três clones de um bundle apenas uma vez",
+          "status": "passed"
+        },
+        {
+          "name": "texturas das áreas abertas do Mapa Comercial reutiliza um único conjunto GPU para perfis de amostragem idênticos",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapParkAccessEnvironment.test.ts",
+      "cases": [
+        {
+          "name": "ambientação dos acessos, Caminho do Bosque e Sede Costeiros mantém as transições interpretadas abaixo das superfícies oficiais texturizadas",
+          "status": "passed"
+        },
+        {
+          "name": "ambientação dos acessos, Caminho do Bosque e Sede Costeiros deriva superfícies somente do contrato GIS e recorta clareira e footprints protegidos",
+          "status": "passed"
+        },
+        {
+          "name": "ambientação dos acessos, Caminho do Bosque e Sede Costeiros triangula o piso do bosque sem lançar faces fora do envelope ou dentro dos holes",
+          "status": "passed"
+        },
+        {
+          "name": "ambientação dos acessos, Caminho do Bosque e Sede Costeiros abre a clareira do bosque apenas na apresentação e preserva o inventário canônico",
+          "status": "passed"
+        },
+        {
+          "name": "ambientação dos acessos, Caminho do Bosque e Sede Costeiros enquadra o acesso de B22 com vegetação assimétrica e clearances sem mutar árvores oficiais",
+          "status": "passed"
+        },
+        {
+          "name": "ambientação dos acessos, Caminho do Bosque e Sede Costeiros builds bilateral natural tree bands along the motorhome road without invading any road",
+          "status": "passed"
+        },
+        {
+          "name": "ambientação dos acessos, Caminho do Bosque e Sede Costeiros mantém somente a faixa sul segura de B5 fora dos footprints e do estacionamento",
+          "status": "passed"
+        },
+        {
+          "name": "ambientação dos acessos, Caminho do Bosque e Sede Costeiros delimita o sub-bosque sem bloquear o piso do Caminho do Bosque",
+          "status": "passed"
+        },
+        {
+          "name": "ambientação dos acessos, Caminho do Bosque e Sede Costeiros respeita o orçamento estático de quatro draw calls e zero passe de sombra",
+          "status": "passed"
+        },
+        {
+          "name": "ambientação dos acessos, Caminho do Bosque e Sede Costeiros gera ribbons e amostragem reprodutíveis sem deslocar o eixo recebido",
+          "status": "passed"
+        },
+        {
+          "name": "ambientação dos acessos, Caminho do Bosque e Sede Costeiros mantém superfícies e vegetação independentes, não interativas e com descarte explícito",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapParkAccessInfrastructure.test.ts",
+      "cases": [
+        {
+          "name": "infraestrutura externa parametrizada do mapa comercial mantém portarias e Sede Costeiros em um perfil vertical humano e independente da largura",
+          "status": "passed"
+        },
+        {
+          "name": "infraestrutura externa parametrizada do mapa comercial fixa a leitura correta das duas fotografias do anexo 4",
+          "status": "passed"
+        },
+        {
+          "name": "infraestrutura externa parametrizada do mapa comercial diferencia a estrutura veicular do Portão 3 da fachada pedonal do Portão 2",
+          "status": "passed"
+        },
+        {
+          "name": "infraestrutura externa parametrizada do mapa comercial mescla vias, marcações, estacionamento, rotatória e estruturas dentro do budget",
+          "status": "passed"
+        },
+        {
+          "name": "infraestrutura externa parametrizada do mapa comercial elevates support-aware asphalt and gravel above supports with longitudinal UVs and skirts",
+          "status": "passed"
+        },
+        {
+          "name": "infraestrutura externa parametrizada do mapa comercial consome o contrato GIS por referência sem copiar ou mutar coordenadas",
+          "status": "passed"
+        },
+        {
+          "name": "infraestrutura externa parametrizada do mapa comercial isola somente as vias e meios-fios A6/A7 para a vista Exporural",
+          "status": "passed"
+        },
+        {
+          "name": "infraestrutura externa parametrizada do mapa comercial mantém a implantação GIS completa dentro do budget de desktop e mobile",
+          "status": "passed"
+        },
+        {
+          "name": "infraestrutura externa parametrizada do mapa comercial mantém material e hierarquia de profundidade sem custo por pedra",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapParkAccessSpatialPlan.test.ts",
+      "cases": [
+        {
+          "name": "park access spatial plan reuses the official isotropic PDF-to-local transformation",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan preserves A1, A2, A3, A6, A7 and A10 as official anchors without swapping gates",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan defines the Benvenuto axis as four coherent 3.5 m lanes ending at A3",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan contains every complete parking bay in segmented asphalt without paving B23 or B11",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan keeps the Gate 2 woodland path continuous and outside Pavilion 14",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan keeps the A1-A10-Rua Brasil axis continuous, asphalt and support-aware",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan keeps A6/A7 and the south road intact after the explicit eastern-link removal",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan keeps the motorhome road distinct, stone/gravel and explicitly above AREA-MOTORHOME",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan shares the protected B22 footprint, clipped access and vegetation clearances",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan makes A1 a local asphalt seam and links only the mini-roundabout to AV-TUPARENDI",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan keeps the A1 mini-roundabout dimensionally separate from the large roundabout",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan exports closed finite surfaces with traceable evidence",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan notches north-side sidewalks around every nearby official footprint and keeps A2/A3 clear",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan keeps the street-side tree band wholly outside roofs, sidewalks and parking asphalt",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan notches the Gate 3 arrival around B11/B42-02 and derives every approach heading from its trace",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan uses distinct deterministic elevations whenever road polygons overlap",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan registers the current annexes in revision .5 without leaking local paths",
+          "status": "passed"
+        },
+        {
+          "name": "park access spatial plan keeps protected commercial geometry read-only and uncertainty visible",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapParkingTerrainContinuity.test.ts",
+      "cases": [
+        {
+          "name": "continuidade natural dos estacionamentos junto às Etnias EST-EXP-VIS: preserva cadastro, recorta vias e elimina a saia de placa",
+          "status": "passed"
+        },
+        {
+          "name": "continuidade natural dos estacionamentos junto às Etnias EST-VIS: preserva cadastro, recorta vias e elimina a saia de placa",
+          "status": "passed"
+        },
+        {
+          "name": "continuidade natural dos estacionamentos junto às Etnias apoia árvores na superfície visual contínua sem modificar IDs ou posições x/z",
+          "status": "passed"
+        },
+        {
+          "name": "continuidade natural dos estacionamentos junto às Etnias deriva o receptor da triangulação real do terreno e da base compartilhada",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapPavilionCourtyard.test.ts",
+      "cases": [
+        {
+          "name": "pavement between Pavilions 1, 14 and 12 registers the continuation to the existing woodland cap and one connected court",
+          "status": "passed"
+        },
+        {
+          "name": "pavement between Pavilions 1, 14 and 12 preserves pavilion, emergency-service and road footprints without asphalt overlap",
+          "status": "passed"
+        },
+        {
+          "name": "pavement between Pavilions 1, 14 and 12 leaves an actual root opening and adds exactly one tree in the existing batch at both qualities",
+          "status": "passed"
+        },
+        {
+          "name": "pavement between Pavilions 1, 14 and 12 keeps the additional concrete geometry below sixty triangles",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapRuralMaterialDetail.test.ts",
+      "cases": [
+        {
+          "name": "rural material and geometry ownership installs the shader once and retains the upstream surface hook on repeated calls",
+          "status": "passed"
+        },
+        {
+          "name": "rural material and geometry ownership classifies only explicit brick and roof members within shared architecture batches",
+          "status": "passed"
+        },
+        {
+          "name": "rural material and geometry ownership releases outgoing render geometry including gables without disposing the next quality model",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapRuralPhotoRevision.test.ts",
+      "cases": [
+        {
+          "name": "photographic rural revision: actual openings and retained envelope has four slender porch supports and triangular closed gables behind the open porch",
+          "status": "passed"
+        },
+        {
+          "name": "photographic rural revision: actual openings and retained envelope uses four tall windows followed by three high windows on the photographed side",
+          "status": "passed"
+        },
+        {
+          "name": "photographic rural revision: actual openings and retained envelope keeps the right rear passage open and the dark piers broader than the two brick piers",
+          "status": "passed"
+        },
+        {
+          "name": "photographic rural revision: actual openings and retained envelope keeps Test Drive below the previous PR triangle allocation reduced=false",
+          "status": "passed"
+        },
+        {
+          "name": "photographic rural revision: actual openings and retained envelope keeps Test Drive below the previous PR triangle allocation reduced=true",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapSpatialBounds.test.ts",
+      "cases": [
+        {
+          "name": "canonical Commercial Map spatial policy preserves all unrelated official entities, lot IDs and calibration against main 42e89d1b",
+          "status": "passed"
+        },
+        {
+          "name": "canonical Commercial Map spatial policy contains every canonical park footprint, rear parking and authored lateral district",
+          "status": "passed"
+        },
+        {
+          "name": "canonical Commercial Map spatial policy preserves protected highway/access vertices and widths exactly, including distant junctions",
+          "status": "passed"
+        },
+        {
+          "name": "canonical Commercial Map spatial policy clips crossing segments without discarding near streets or connecting separate fragments",
+          "status": "passed"
+        },
+        {
+          "name": "canonical Commercial Map spatial policy never generates distant buildings, canopy instances or removable ponds",
+          "status": "passed"
+        },
+        {
+          "name": "canonical Commercial Map spatial policy fits the whole park and safe context at 1920x1080 and clamps excessive dolly",
+          "status": "passed"
+        },
+        {
+          "name": "canonical Commercial Map spatial policy fits the whole park and safe context at 1366x768 and clamps excessive dolly",
+          "status": "passed"
+        },
+        {
+          "name": "canonical Commercial Map spatial policy fits the whole park and safe context at 1024x768 and clamps excessive dolly",
+          "status": "passed"
+        },
+        {
+          "name": "canonical Commercial Map spatial policy fits the whole park and safe context at 390x844 and clamps excessive dolly",
+          "status": "passed"
+        },
+        {
+          "name": "canonical Commercial Map spatial policy fits the whole park and safe context at 844x390 and clamps excessive dolly",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapTrees.test.ts",
+      "cases": [
+        {
+          "name": "projeção das copas do estacionamento posterior preserva a área das elipses sob rotação/reflexão e mantém a origem PDF canônica",
+          "status": "passed"
+        },
+        {
+          "name": "projeção das copas do estacionamento posterior mantém IDs e variantes estáveis ao recalibrar sem misturar candidatos no inventário anterior",
+          "status": "passed"
+        },
+        {
+          "name": "projeção das copas do estacionamento posterior rejeita calibrações inválidas em vez de gerar copas invisíveis ou coordenadas NaN",
+          "status": "passed"
+        },
+        {
+          "name": "camada cartográfica de árvores do mapa comercial mantém inventário versionado por quadra e por área ambiental",
+          "status": "passed"
+        },
+        {
+          "name": "camada cartográfica de árvores do mapa comercial expõe dimensões, origem, sombra e estado de revisão para cada árvore",
+          "status": "passed"
+        },
+        {
+          "name": "camada cartográfica de árvores do mapa comercial apoia troncos e sombras na superfície real de lote, calçada, via ou quadra",
+          "status": "passed"
+        },
+        {
+          "name": "camada cartográfica de árvores do mapa comercial apoia os dez troncos e sombras do Portão 4 no topo visível sem alterar a extrusão canônica",
+          "status": "passed"
+        },
+        {
+          "name": "camada cartográfica de árvores do mapa comercial resolve sombras na via por posição e preserva os demais suportes fora do motorhome",
+          "status": "passed"
+        },
+        {
+          "name": "camada cartográfica de árvores do mapa comercial associa apenas árvores de lote ao identificador cadastral correto e tolera a copa na borda",
+          "status": "passed"
+        },
+        {
+          "name": "camada cartográfica de árvores do mapa comercial preserva troncos ambientais fora de vias, prédios, marcos e lotes comerciais",
+          "status": "passed"
+        },
+        {
+          "name": "camada cartográfica de árvores do mapa comercial mantém a única copa interna apoiada pelos anexos dentro do lote I-08",
+          "status": "passed"
+        },
+        {
+          "name": "camada cartográfica de árvores do mapa comercial seleciona todas as áreas no parque e somente o contexto pertinente em segmentos isolados",
+          "status": "passed"
+        },
+        {
+          "name": "camada cartográfica de árvores do mapa comercial mantém quatro draw calls primários, explicita o passe de sombra e reduz lóbulos sem ocultar árvores",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "test/commercialMapVegetationPilot.test.ts",
+      "cases": [
+        {
+          "name": "controlled three-zone vegetation pilot shares ground detail without disposing a texture that another pilot surface still uses",
+          "status": "passed"
+        },
+        {
+          "name": "controlled three-zone vegetation pilot partitions exact inventories without changing IDs, coordinates or species records",
+          "status": "passed"
+        },
+        {
+          "name": "controlled three-zone vegetation pilot keeps every complete grass tuft within authorized free cells and parking collars",
+          "status": "passed"
+        },
+        {
+          "name": "controlled three-zone vegetation pilot has bounded, finite reusable assets and folded leaf centers for continuous detail fade",
+          "status": "passed"
+        },
+        {
+          "name": "controlled three-zone vegetation pilot retains leaf alpha coverage at every mip so the distant core cannot disappear",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}
