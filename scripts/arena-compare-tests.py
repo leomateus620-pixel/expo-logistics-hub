@@ -35,16 +35,19 @@ new = set(af) - set(bf)
 new_suites = set(ass) - set(bs)
 changed = {name: {'before': bf[name], 'after': af[name]}
            for name in set(af) & set(bf) if af[name] != bf[name]}
+changed_suites = {name: {'before': bs[name], 'after': ass[name]}
+                  for name in set(ass) & set(bs) if ass[name] != bs[name]}
 report = {
     'baseline': {k: before[k] for k in ['numTotalTests', 'numPassedTests', 'numFailedTests']},
     'candidate': {k: after[k] for k in ['numTotalTests', 'numPassedTests', 'numFailedTests']},
     'newFailures': sorted(new), 'newFailedSuites': sorted(new_suites),
     'changedFailures': changed,
+    'changedSuiteFailures': changed_suites,
     'remainingBaselineFailures': sorted(set(af) & set(bf)),
     'fixedFailures': sorted(set(bf) - set(af)),
     'baselineSuiteFailures': sorted(bs), 'candidateSuiteFailures': sorted(ass),
 }
 Path(sys.argv[3]).write_text(json.dumps(report, indent=2))
 print(json.dumps(report, indent=2))
-if new or new_suites or changed:
+if new or new_suites or changed or changed_suites:
     raise SystemExit(1)

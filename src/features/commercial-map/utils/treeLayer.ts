@@ -1,5 +1,6 @@
 import type { CommercialLot, MapEntity } from '../types';
 import { OPEN_GROUND_PRESENTATION_HEIGHT } from '../constants';
+import { naturalParkingGroundElevationAt } from './naturalParkingGround';
 import {
   COMMERCIAL_TREE_AREA_SCENE_ANCHORS,
   COMMERCIAL_MAP_TREES,
@@ -179,6 +180,9 @@ function commercialTreeSupportElevationAtPosition(
   shadow: boolean,
 ) {
   const surfaceEntity = commercialTreeSurfaceEntityAtPosition(tree, point, entities);
+  if (surfaceEntity?.publicIdentifier === 'EST-EXP-VIS' || surfaceEntity?.publicIdentifier === 'EST-VIS') {
+    return naturalParkingGroundElevationAt(point) + (shadow ? TREE_SHADOW_CLEARANCE : TREE_SURFACE_CLEARANCE);
+  }
   const motorhomePresentation = tree.area === 'GATE_FOUR_DISTRICT'
     && surfaceEntity?.publicIdentifier === 'AREA-MOTORHOME'
     && surfaceEntity.classification === 'PARKING';

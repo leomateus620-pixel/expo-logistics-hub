@@ -1,3 +1,4 @@
+import { ACCESS_JUNCTION } from '@/features/commercial-map/data/accessJunctionReconstruction';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -160,7 +161,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     expect(maximumHeightMeters('gate3')).toBeGreaterThanOrEqual(4);
     expect(maximumHeightMeters('gate3')).toBeLessThanOrEqual(5.1);
     expect(maximumHeightMeters('costeiros')).toBeGreaterThanOrEqual(4);
-    expect(maximumHeightMeters('costeiros')).toBeLessThanOrEqual(5.1);
+    expect(maximumHeightMeters('costeiros')).toBeLessThanOrEqual(5.6);
   });
 
   it('fixa a leitura correta das duas fotografias do anexo 4', () => {
@@ -195,9 +196,12 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       .toHaveLength(4);
     expect(featureIds).toContain('gate2:left-facade');
     expect(featureIds.filter((id) => id.startsWith('gate2:inclined-fin-'))).toHaveLength(3);
-    expect(featureIds).toContain('costeiros:roof-ridge');
+    expect(featureIds).toContain('costeiros:roof--1');
+    expect(featureIds).toContain('costeiros:roof-1');
+    expect(architecture.gables?.getAttribute('position').count).toBeGreaterThan(0);
     expect(architecture.diagnostics.gateCount).toBe(3);
-    expect(architecture.diagnostics.estimatedDrawCalls).toBe(3);
+    expect(architecture.diagnostics.estimatedDrawCalls).toBe(4);
+    architecture.gables?.dispose();
   });
 
   it('mescla vias, marcações, estacionamento, rotatória e estruturas dentro do budget', () => {
@@ -214,7 +218,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       expect(detailed.geometries.whiteMarkings).not.toBeNull();
       expect(detailed.geometries.yellowMarkings).not.toBeNull();
       expect(detailed.geometries.landscape).not.toBeNull();
-      expect(detailed.geometries.roundaboutCurb).not.toBeNull();
+      expect(detailed.geometries.roundaboutCurb).toBeNull(); // Merged with existing concrete curb batch.
       expect(detailed.diagnostics).toMatchObject({
         roadSurfaceCount: 3,
         sidewalkSurfaceCount: 1,
@@ -267,7 +271,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     const snapshot = JSON.stringify(PARK_ACCESS_SPATIAL_PLAN);
     const input = adaptParkAccessSpatialPlan(PARK_ACCESS_SPATIAL_PLAN);
 
-    expect(input.roadSurfaces).toHaveLength(PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.length);
+    expect(input.roadSurfaces).toHaveLength(PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.length + ACCESS_JUNCTION.approaches.length);
     expect(input.sidewalkSurfaces).toHaveLength(PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.length + 4);
     expect(input.curbSegments).toHaveLength(16);
     expect(new Set(input.curbSegments?.map((segment) => segment.id)).size).toBe(16);
@@ -314,7 +318,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     expect(input.supportSurfaces.some((surface) => surface.id === 'A1')).toBe(false);
     expect(input.roundabouts).toHaveLength(2);
     expect(input.roundabouts[0].center).toBe(PARK_ACCESS_SPATIAL_PLAN.roundabouts[0].center);
-    expect(input.roundabouts[0].splitterIslands).toHaveLength(2);
+    expect(input.roundabouts[0].splitterIslands).toHaveLength(0);
     expect(input.roundabouts[1].center).toBe(PARK_ACCESS_SPATIAL_PLAN.roundabouts[1].center);
     expect(input.roundabouts[1].splitterIslands).toHaveLength(0);
     expect(input.costeiros).not.toBeNull();
@@ -373,7 +377,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       expect(detailed.diagnostics.surfaceTriangleCount + detailed.diagnostics.instancedTriangleCount)
         .toBeLessThanOrEqual(PARK_ACCESS_RENDER_BUDGET.maximumRenderedTriangles);
       expect(detailed.diagnostics).toMatchObject({
-        roadSurfaceCount: PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.length,
+        roadSurfaceCount: PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.length + ACCESS_JUNCTION.approaches.length,
         sidewalkSurfaceCount: 9,
         curbSegmentCount: 16,
         parkingBayCount: 43,
@@ -416,7 +420,9 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       renderer.indexOf("if (kind === 'cobblestone')"),
     );
 
-    expect(renderer).toContain('function createAsphaltTexture()');
+    expect(renderer).not.toContain('function createAsphaltTexture()');
+    expect(renderer).toContain('openGroundTextureBundleForEntity(HIGHWAY_ASPHALT_SURFACE_PROFILE, maxAnisotropy)');
+    expect(renderer).toContain('asphaltTextures?.dispose()');
     expect(renderer).toContain('function createGravelTexture()');
     expect(renderer).toContain('function createCobblestoneTexture()');
     expect(renderer).toContain('const size = 64;');
@@ -424,17 +430,18 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     expect(renderer).toContain('verticalJointJitter');
     expect(renderer).toContain('const COBBLESTONE_ROUGHNESS');
     expect(renderer).toContain("if (kind === 'asphalt')");
-    expect(renderer).toContain('color={ROAD_MATERIAL_COLORS.asphalt}');
-    expect(asphaltMaterial).toContain('color={ROAD_MATERIAL_COLORS.asphalt}');
-    expect(asphaltMaterial).toContain('map={reducedGraphics ? undefined : ASPHALT_TEXTURE}');
-    expect(asphaltMaterial).toContain('roughnessMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS}');
-    expect(asphaltMaterial).toContain('roughness={ROAD_SURFACE_PROFILE.asphaltRoughness}');
-    expect(asphaltMaterial).toContain('...PARK_SURFACE_PROFILES.asphalt, normalStrength: 0');
+
+    expect(asphaltMaterial).toContain('color={HIGHWAY_ASPHALT_SURFACE_PROFILE.baseColor}');
+    expect(asphaltMaterial).toContain('map={asphaltTextures?.map}');
+    expect(asphaltMaterial).toContain('roughnessMap={asphaltTextures?.roughnessMap}');
+    expect(asphaltMaterial).toContain('roughness={HIGHWAY_ASPHALT_SURFACE_PROFILE.roughness}');
+    expect(asphaltMaterial).not.toContain('applyParkSurfaceDetail');
+    expect(asphaltMaterial).toContain('normalScale={asphaltTextures ? HIGHWAY_ASPHALT_NORMAL_SCALE : undefined}');
     expect(asphaltMaterial).toContain('depthTest');
     expect(asphaltMaterial).toContain('depthWrite');
     expect(asphaltMaterial).not.toContain('bumpMap=');
     expect(asphaltMaterial).not.toContain('bumpScale=');
-    expect(renderer).toContain('map={reducedGraphics ? undefined : ASPHALT_TEXTURE}');
+    expect(renderer).toContain('map={asphaltTextures?.map}');
     expect(renderer).toContain("if (kind === 'gravel')");
     expect(renderer).toContain('map={reducedGraphics ? undefined : GRAVEL_TEXTURE}');
     expect(renderer).toContain("if (kind === 'cobblestone')");

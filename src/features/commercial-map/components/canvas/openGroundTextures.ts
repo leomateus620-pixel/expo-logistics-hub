@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { measureCommercialMapSync } from '../../utils/performanceDiagnostics';
+import { REGIONAL_HIGHWAY_PALETTE } from '../../data/regional-highways/contract';
 
 /**
  * Procedural ground textures for large open surfaces (motor home field and the
@@ -28,6 +29,16 @@ export interface OpenGroundSurfaceProfile {
   /** Optional visible top used by presentation-only ground treatments. */
   presentationHeight?: number;
 }
+
+/** Identical sampling and shading at the territorial/access ownership seam.
+ * Handles share the existing reference-counted texture pool; no new owner. */
+export const HIGHWAY_ASPHALT_SURFACE_PROFILE: Readonly<OpenGroundSurfaceProfile> = Object.freeze({
+  surface: 'highwayAsphalt',
+  tileWorldSize: 1,
+  baseColor: REGIONAL_HIGHWAY_PALETTE.carriageway,
+  roughness: 0.91,
+});
+export const HIGHWAY_ASPHALT_NORMAL_SCALE = new THREE.Vector2(0.26, 0.26);
 
 export const TEXTURED_OPEN_GROUND: Readonly<Record<string, OpenGroundSurfaceProfile>> = Object.freeze({
   'AREA-MOTORHOME': Object.freeze({

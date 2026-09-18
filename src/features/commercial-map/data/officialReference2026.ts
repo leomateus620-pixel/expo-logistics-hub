@@ -1,3 +1,4 @@
+import { reconstructRuralPavilionEntity, RURAL_PAVILION_NEIGHBOR_BOUNDS } from './ruralPavilionReconstruction';
 import { ARENA_CANONICAL_LAYOUT, reconstructArenaEntity } from './arenaCanonicalLayout';
 import { ARENA_ROAD_CORRECTION } from './arenaRoadCorrection';
 import { SOY_RESTROOM, SOY_ROAD_CONNECTION, GATE_NINE_TANKS } from './soyGateInfrastructure';
@@ -608,7 +609,7 @@ const bStructures: Array<[string, string, MapClassification, string, PdfBounds |
   ['B25', 'Comissão de Logística', 'SERVICE', 'structures', [4395, 3615], { parent: 'B', width: 120, depth: 120 }],
   ['B26', 'Comissão de Gastronomia', 'FOOD_AREA', 'food', [4260, 3682], { parent: 'B', width: 110, depth: 100 }],
   ['B27', 'Ketten Bebidas', 'FOOD_AREA', 'food', [4260, 3569], { parent: 'B', width: 110, depth: 105 }],
-  ['B28', 'Espaço do Cooperativismo', 'BUILDING', 'structures', [3000, 2480, 3220, 2570], { parent: 'N' }],
+  ['B28', 'Espaço do Cooperativismo', 'BUILDING', 'structures', [...RURAL_PAVILION_NEIGHBOR_BOUNDS.B28], { parent: 'N' }],
   ['B29', 'Casa Rotária', 'BUILDING', 'structures', [4570, 4820, 4740, 5050]],
   ['B30', 'Monumento do Voluntariado', 'LANDMARK', 'structures', [4060, 4147], { parent: 'A', width: 76, depth: 48 }],
   ['B31', 'Polícia Penal', 'SECURITY', 'safety', [4163, 4037], { parent: 'A', width: 74, depth: 54 }],
@@ -1078,7 +1079,7 @@ export function isNonPermanentRemovedIdentifier(publicIdentifier: string) {
 export const OFFICIAL_REFERENCE_ENTITIES = [
   ...officialBaseEntities,
   ...pavilionModuleEntities,
-].map(reconstructFenasojaEntity).map(reconstructMiranteComplexEntity).map(reconstructArenaEntity).map(withCommercialMapSegmentMetadata);
+].map(reconstructFenasojaEntity).map(reconstructMiranteComplexEntity).map(reconstructArenaEntity).map(reconstructRuralPavilionEntity).map(withCommercialMapSegmentMetadata);
 
 export const OFFICIAL_RENDERED_ENTITIES = OFFICIAL_REFERENCE_ENTITIES.filter((entity) => (
   !nonPermanentRemovedIdentifiers.has(entity.publicIdentifier)

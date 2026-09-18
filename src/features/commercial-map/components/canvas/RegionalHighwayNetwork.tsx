@@ -19,6 +19,8 @@ import { resolveRearRoadOwnerAtLocalPoint } from "../../utils/rearRoadNetwork";
 
 import {
   openGroundTextureBundleForEntity,
+  HIGHWAY_ASPHALT_SURFACE_PROFILE,
+  HIGHWAY_ASPHALT_NORMAL_SCALE,
   type OpenGroundSurfaceProfile,
 } from "./openGroundTextures";
 import { useCommercialMapStore } from "../../state/useCommercialMapStore";
@@ -38,12 +40,7 @@ interface RegionalHighwayNetworkProps {
 const NO_RAYCAST = () => undefined;
 
 const SURFACE_PROFILES = Object.freeze({
-  carriageway: Object.freeze({
-    surface: "highwayAsphalt",
-    tileWorldSize: 1,
-    baseColor: REGIONAL_HIGHWAY_PALETTE.carriageway,
-    roughness: 0.91,
-  }),
+  carriageway: HIGHWAY_ASPHALT_SURFACE_PROFILE,
   shoulder: Object.freeze({
     surface: "roadShoulder",
     tileWorldSize: 1,
@@ -56,7 +53,6 @@ const SURFACE_PROFILES = Object.freeze({
 
 // Grain must survive the 24° key: these read as pavement texture at the
 // pull-back and mip away cleanly before they can shimmer.
-const ASPHALT_NORMAL_SCALE = new THREE.Vector2(0.26, 0.26);
 const SHOULDER_NORMAL_SCALE = new THREE.Vector2(0.3, 0.3);
 
 function RegionalHighwayLabels({
@@ -310,7 +306,7 @@ export const RegionalHighwayNetwork = memo(function RegionalHighwayNetwork({
             map={surfaceTextures?.carriageway?.map}
             normalMap={surfaceTextures?.carriageway?.normalMap}
             normalScale={
-              surfaceTextures?.carriageway ? ASPHALT_NORMAL_SCALE : undefined
+              surfaceTextures?.carriageway ? HIGHWAY_ASPHALT_NORMAL_SCALE : undefined
             }
             roughnessMap={surfaceTextures?.carriageway?.roughnessMap}
             color={SURFACE_PROFILES.carriageway.baseColor}

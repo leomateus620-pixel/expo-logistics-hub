@@ -8,6 +8,7 @@ import {
 } from "./commercialSiteEnvironment";
 import { pointInPolygon, distanceToSegment } from "./spatialSurface";
 import { rearParkingEntityForPresentation } from "../data/rearParking";
+import { naturalParkingGroundElevationAt } from './naturalParkingGround';
 
 /** Explicit, closed pilot allowlist. Never opt in by proximity or a shared material. */
 export const VEGETATION_PILOT_AREAS = [
@@ -165,7 +166,7 @@ export function buildPilotGroundAnchors(
           area: "PARKING_EXHIBITORS_VISITORS",
           x,
           z,
-          y: 0.062,
+          y: naturalParkingGroundElevationAt([x, z]) + 0.002,
           scale: 0.45 + random() * 0.65,
           angle: a,
           tone: random(),

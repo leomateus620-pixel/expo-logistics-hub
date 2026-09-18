@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { Matrix4 } from 'three';
 import golden from './fixtures/arena-preservation-main-8783fea7.json';
+import originalD4 from './fixtures/rural-d4-pr155-4f8bdf37.json';
 import { ARENA_CANONICAL_LAYOUT as A, ARENA_VEGETATION, arenaSourceToLocal,
   arenaVegetationAllowed, reconstructArenaEntity } from '@/features/commercial-map/data/arenaCanonicalLayout';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
@@ -22,7 +23,12 @@ const intersects=(a:readonly number[],b:readonly number[])=>a[0]<b[2]&&a[2]>b[0]
 describe('Arena canônica: implantação, arquitetura e preservação da main 8783fea7',()=>{
  it('preserva todas as entidades exceto F, os lotes e integralmente o Mirante #151',()=>{
   expect(OFFICIAL_REFERENCE_DATA.entities).toHaveLength(golden.entityCount);
-  expect(hash(OFFICIAL_REFERENCE_DATA.entities.filter(e=>e.publicIdentifier!=='F'))).toBe(golden.entitiesWithoutArenaHash);
+  // Normalize only the separately tested D4 rear-clearance change to its
+  // exact original PR record. All other entities retain the historical guard.
+  expect(originalD4.sourceCommit).toBe('4f8bdf3777dc521d80ad67885278e79da7426e56');
+  expect(hash(originalD4.entity)).toBe('58886658e8936c04ef0c8a54fa3ff55bcf2fe26d5ac3235decc8eb73bff6395e');
+  expect(hash(OFFICIAL_REFERENCE_DATA.entities.filter(e=>e.publicIdentifier!=='F')
+    .map(e=>e.publicIdentifier==='D4'?originalD4.entity:e))).toBe(golden.entitiesWithoutArenaHash);
   expect(hash(OFFICIAL_REFERENCE_DATA.lots)).toBe(golden.lots);
   expect(MIRANTE_COMPLEX).toEqual(golden.mirante);
   expect(ARENA_FRONT_LAYOUT.stairs).toEqual(golden.stairs);

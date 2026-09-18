@@ -6,6 +6,7 @@ import {
   clipContextPolygon, isProtectedCommercialMapRoad, spatialBoundsContain, commercialMapNavigationExtent,
 } from '../features/commercial-map/data/commercialMapSpatialBounds';
 import { TERRITORY_ROADS } from '../features/commercial-map/data/territorialRoads';
+import { ACCESS_JUNCTION, retainedTerritoryAccessRoad } from '../features/commercial-map/data/accessJunctionReconstruction';
 import { TERRITORY_BUILDINGS, TERRITORY_PATCHES, TERRITORY_TREES } from '../features/commercial-map/data/territorialEnvironment';
 import { OFFICIAL_REFERENCE_DATA } from '../features/commercial-map/data/officialReference2026';
 import { REAR_PARKING_SCENE_SUPPORT_POINTS } from '../features/commercial-map/data/rearParking';
@@ -14,10 +15,17 @@ import { resolveCommercialMapCameraDistanceBounds, clampCommercialMapCameraPosit
 
 const before = JSON.parse(readFileSync('docs/validation/spatial-cleanup/before-inventory.json', 'utf8'));
 describe('canonical Commercial Map spatial policy', () => {
-  it('preserves every complete official entity, lot and calibration against main 42e89d1b', () => {
+  it('preserves all unrelated official entities, lot IDs and calibration against main 42e89d1b', () => {
     const canonical = JSON.parse(readFileSync('docs/validation/spatial-cleanup/core-baseline.json', 'utf8'));
     const hash = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
-    expect(OFFICIAL_REFERENCE_DATA.entities.map(e => ({ id: e.publicIdentifier, sha256: hash(e) }))).toEqual(canonical.entities);
+    // D4 is the explicitly requested reconstruction. Its footprint and visual
+    // provenance are tested separately; no other entity is exempted.
+    expect(OFFICIAL_REFERENCE_DATA.entities.map(e => e.publicIdentifier)).toEqual(canonical.entities.map((e: {id: string}) => e.id));
+    expect(OFFICIAL_REFERENCE_DATA.entities.filter(e => e.publicIdentifier !== 'D4').map(e => ({ id: e.publicIdentifier, sha256: hash(e) })))
+      .toEqual(canonical.entities.filter((e: {id: string}) => e.id !== 'D4'));
+    const livestock = OFFICIAL_REFERENCE_DATA.entities.find(e => e.publicIdentifier === 'D4')!;
+    expect(livestock.id).toBe('reference:2026:d4');
+    expect(livestock.metadata?.officialMeasurements).toBe(false);
     expect(hash(OFFICIAL_REFERENCE_DATA.lots)).toBe(canonical.lots);
     expect(hash(OFFICIAL_REFERENCE_DATA.calibration)).toBe(canonical.calibration);
   });
@@ -33,18 +41,28 @@ describe('canonical Commercial Map spatial policy', () => {
     expect(classifyCommercialMapPoint([-140, 100])).toBe('REMOVABLE_FAR_CONTEXT');
   });
   it('preserves protected highway/access vertices and widths exactly, including distant junctions', () => {
-    for (const road of before.roads.filter(isProtectedCommercialMapRoad)) {
+    for (const road of before.roads.filter(isProtectedCommercialMapRoad).flatMap(retainedTerritoryAccessRoad)) {
       expect(TERRITORY_ROADS.find(r => r.id === road.id), road.id).toEqual(road);
     }
     expect(TERRITORY_ROADS.some(r => r.id === 'osm-321026944-0')).toBe(true);
     expect(TERRITORY_ROADS.some(r => r.id === 'arena-br472-access')).toBe(true);
-    for (const road of before.roads.filter((r: { points: [number, number][] }) => r.points.every(p => spatialBoundsContain(bounds.nearContextBounds, p)))) {
+    for (const road of before.roads.filter((r: { points: [number, number][] }) => r.points.every(p => spatialBoundsContain(bounds.nearContextBounds, p))).flatMap(retainedTerritoryAccessRoad)) {
       expect(TERRITORY_ROADS.find(r => r.id === road.id), road.id).toEqual(road);
     }
     for (const road of TERRITORY_ROADS.filter(r => !isProtectedCommercialMapRoad(r))) {
       road.points.forEach(p => expect(spatialBoundsContain(bounds.nearContextBounds, p), road.id).toBe(true));
     }
     expect(TERRITORY_ROADS.length).toBeLessThan(before.roads.length / 2);
+    // The six transferred ways have exactly one new owner; they have not
+    // been pruned as distant context. Original provenance stays on disk.
+    ACCESS_JUNCTION.replacedTerritoryIds.forEach(id => {
+      expect(before.roads.some((road: {id: string}) => road.id === id)).toBe(true);
+      expect(TERRITORY_ROADS.some(road => road.id === id)).toBe(false);
+    });
+    const originalWest = before.roads.find((road: {id: string}) => road.id === ACCESS_JUNCTION.westRoadId);
+    const retainedWest = TERRITORY_ROADS.find(road => road.id === ACCESS_JUNCTION.westRoadId)!;
+    const transferredWest = ACCESS_JUNCTION.approaches.find(road => road.id === 'tuparendi-west-seam')!;
+    expect([...retainedWest.points, ...transferredWest.points.slice(1)]).toEqual(originalWest.points);
   });
   it('clips crossing segments without discarding near streets or connecting separate fragments', () => {
     const result = clipContextRoad({ id: 'crossing', points: [[-150, 0], [150, 0]] as const });

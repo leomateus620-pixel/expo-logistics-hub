@@ -97,7 +97,8 @@ describe('residential street junctions with the existing avenue', () => {
     const model = buildParkAccessRenderModel(adaptParkAccessSpatialPlan());
     try {
       expect(model.diagnostics.surfaceTriangleCount + model.diagnostics.instancedTriangleCount).toBeLessThanOrEqual(6000);
-      for (const geometry of [model.geometries.curbs!, model.geometries.roundaboutCurb!]) {
+      expect(model.geometries.roundaboutCurb).toBeNull(); // Same concrete, one batch.
+      for (const geometry of [model.geometries.curbs!]) {
         const normals = geometry.getAttribute('normal');
         const indices = geometry.index!;
         let upward = 0;

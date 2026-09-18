@@ -8,13 +8,9 @@ import {
   buildRearTreeInstances,
   sourcePolygonToLocal,
 } from '../../data/rearParkEnvironment';
-import {
-  openGroundTextureBundleForEntity,
-  type OpenGroundSurfaceProfile,
-} from './openGroundTextures';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { buildRearTerrainPatchGeometry } from '../../utils/rearTerrainGeometry';
-import { applyParkGroundDetail } from './terrainMaterial';
+import { alignContinuousGroundUv, useContinuousGround } from '../../utils/continuousGroundMaterial';
 import { clipContextPolygon } from '../../data/commercialMapSpatialBounds';
 
 interface RearParkEnvironmentLayerProps {
@@ -24,13 +20,6 @@ interface RearParkEnvironmentLayerProps {
 }
 
 const NO_RAYCAST = () => undefined;
-const REAR_TERRAIN_SURFACE_PROFILE = Object.freeze({
-  surface: 'grass',
-  tileWorldSize: 9,
-  baseColor: '#8aa465',
-  roughness: 0.97,
-} satisfies OpenGroundSurfaceProfile);
-const REAR_TERRAIN_NORMAL_SCALE = new THREE.Vector2(0.18, 0.18);
 
 /**
  * Extensão irregular e contínua do terreno até além da BR-472, com vegetação
@@ -41,7 +30,9 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
   visible = true,
   vegetationVisible = true,
 }: RearParkEnvironmentLayerProps) {
-  const maximumAnisotropy = useThree((state) => state.gl.capabilities.getMaxAnisotropy());
+  const scene = useThree((state) => state.scene);
+  const invalidate = useThree((state) => state.invalidate);
+  const continuousGround = useContinuousGround(scene);
   const canopyRef = useRef<THREE.InstancedMesh>(null);
   const trunkRef = useRef<THREE.InstancedMesh>(null);
   const poleRef = useRef<THREE.InstancedMesh>(null);
@@ -55,29 +46,11 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
 
   useEffect(() => () => terrain.forEach((entry) => entry.geometry.dispose()), [terrain]);
 
-  const grassTextures = useMemo(
-    () => openGroundTextureBundleForEntity(REAR_TERRAIN_SURFACE_PROFILE, maximumAnisotropy),
-    [maximumAnisotropy],
-  );
-
-  useEffect(() => () => grassTextures?.dispose(), [grassTextures]);
-
-  const terrainMaterials = useMemo(() => Object.fromEntries([false, true].map((reduced) => [
-    reduced ? 'reduced' : 'full',
-    applyParkGroundDetail(new THREE.MeshStandardMaterial({
-      name: `RearParkTerrainMaterial:${reduced ? 'reduced' : 'full'}`,
-      map: grassTextures?.map ?? null,
-      normalMap: grassTextures?.normalMap ?? null,
-      normalScale: grassTextures ? REAR_TERRAIN_NORMAL_SCALE : undefined,
-      roughnessMap: grassTextures?.roughnessMap ?? null,
-      color: REAR_TERRAIN_SURFACE_PROFILE.baseColor,
-      roughness: REAR_TERRAIN_SURFACE_PROFILE.roughness,
-      metalness: 0,
-    }), reduced),
-  ])) as Record<'full' | 'reduced', THREE.MeshStandardMaterial>, [grassTextures]);
-  const terrainMaterial = terrainMaterials[reducedGraphics ? 'reduced' : 'full'];
-
-  useEffect(() => () => Object.values(terrainMaterials).forEach((material) => material.dispose()), [terrainMaterials]);
+  useLayoutEffect(() => {
+    if (!continuousGround) return;
+    terrain.forEach(entry => alignContinuousGroundUv(entry.geometry, continuousGround));
+    invalidate();
+  }, [continuousGround, invalidate, terrain]);
 
   // Both tiers stay resident. Quality changes update references and instance
   // counts instead of reconstructing R3F objects with `dispose={null}`.
@@ -178,13 +151,13 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
 
   return (
     <group name="rear-park-environment" visible={visible}>
-      {terrain.map((entry) => (
+      {continuousGround && terrain.map((entry) => (
         <mesh
           key={entry.patch.id}
           geometry={entry.geometry}
           raycast={NO_RAYCAST}
-          receiveShadow={!reducedGraphics}
-          material={terrainMaterial}
+          receiveShadow
+          material={continuousGround.material}
           dispose={null}
         />
       ))}

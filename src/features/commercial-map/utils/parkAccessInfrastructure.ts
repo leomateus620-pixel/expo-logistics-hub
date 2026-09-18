@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { ACCESS_JUNCTION_CIRCLE_SEGMENTS, accessPavementGeometry, unionAccessPavement } from './accessJunctionGeometry';
+import { ACCESS_JUNCTION } from '../data/accessJunctionReconstruction';
 import { mergeBufferGeometries } from 'three-stdlib';
 import {
   PARK_ACCESS_ROAD_CURB_WIDTH_METERS,
@@ -34,6 +36,8 @@ export interface ParkAccessSurfaceVisual {
   elevation?: number;
   material?: ParkAccessRoadMaterial;
   supportAware?: boolean;
+  /** Included once in the shared, island-cut junction surface. */
+  junctionUnion?: boolean;
 }
 
 export interface ParkAccessMarkingVisual {
@@ -128,8 +132,10 @@ export const PARK_ACCESS_INFRASTRUCTURE_PROFILE = {
   dashLength: 0.44,
   dashGap: 0.3,
   minimumSegmentLength: 0.012,
-  detailedCircleSegments: 48,
-  reducedCircleSegments: 30,
+  detailedCircleSegments: ACCESS_JUNCTION_CIRCLE_SEGMENTS,
+  // Ownership clipping in the territory renderer uses this same 48-sided
+  // boundary. Reducing only one side would open small crescent-shaped gaps.
+  reducedCircleSegments: ACCESS_JUNCTION_CIRCLE_SEGMENTS,
   supportClearance: 0.009,
   detailedRibbonSampleSpacing: 0.42,
   reducedRibbonSampleSpacing: 0.62,
@@ -613,23 +619,6 @@ function circleGeometry(radius: number, segments: number, center: ParkAccessPoin
   return geometry;
 }
 
-function ringGeometry(
-  innerRadius: number,
-  outerRadius: number,
-  segments: number,
-  center: ParkAccessPoint,
-  elevation: number,
-) {
-  if (innerRadius < 0 || outerRadius <= innerRadius + EPSILON) return null;
-  const geometry = new THREE.RingGeometry(innerRadius, outerRadius, segments, 1);
-  geometry.rotateX(-Math.PI / 2);
-  geometry.translate(center[0], elevation, center[1]);
-  geometry.computeVertexNormals();
-  geometry.computeBoundingBox();
-  geometry.computeBoundingSphere();
-  return geometry;
-}
-
 function raisedRingGeometry(
   innerRadius: number,
   outerRadius: number,
@@ -639,23 +628,15 @@ function raisedRingGeometry(
   baseElevation: number,
 ) {
   if (innerRadius < 0 || outerRadius <= innerRadius + EPSILON || height <= 0) return null;
-  const shape = new THREE.Shape();
-  shape.absarc(0, 0, outerRadius, 0, Math.PI * 2, false);
-  const hole = new THREE.Path();
-  hole.absarc(0, 0, innerRadius, 0, Math.PI * 2, true);
-  shape.holes.push(hole);
-  const geometry = new THREE.ExtrudeGeometry(shape, {
-    depth: height,
-    bevelEnabled: false,
-    curveSegments: segments,
-    steps: 1,
-  });
-  geometry.rotateX(-Math.PI / 2);
-  geometry.translate(center[0], baseElevation, center[1]);
-  geometry.computeVertexNormals();
-  geometry.computeBoundingBox();
-  geometry.computeBoundingSphere();
-  return omitCurbUndersides(geometry);
+  // Only the top and outside wall are visible: the raised landscape owns the
+  // inner face and terrain owns the underside. Both use the same angular
+  // stations as the asphalt hole, avoiding hidden faces and seam slivers.
+  const top = new THREE.RingGeometry(innerRadius, outerRadius, segments);
+  top.rotateX(-Math.PI / 2);
+  top.translate(center[0], baseElevation + height, center[1]);
+  const side = new THREE.CylinderGeometry(outerRadius, outerRadius, height, segments, 1, true);
+  side.translate(center[0], baseElevation + height / 2, center[1]);
+  return mergeAndDispose([top, side]);
 }
 
 function triangleCount(geometry: THREE.BufferGeometry | null) {
@@ -680,8 +661,14 @@ export function buildParkAccessRenderModel(
   const asphaltParts: Array<THREE.BufferGeometry | null> = [];
   const cobblestoneParts: Array<THREE.BufferGeometry | null> = [];
   const gravelParts: Array<THREE.BufferGeometry | null> = [];
+  const junctionSurfaces = input.roadSurfaces.filter(surface => surface.junctionUnion);
+  // One triangulated surface per connected component. No stacked old ring,
+  // approach plane or hidden island asphalt survives this union/difference.
+  asphaltParts.push(accessPavementGeometry(unionAccessPavement(
+    junctionSurfaces.map(surface => surface.polygon), input.roundabouts, circleSegments), ACCESS_JUNCTION.elevation));
   input.roadSurfaces.forEach((surface) => {
     const material = surface.material ?? 'asphalt';
+    if (surface.junctionUnion) return;
     const defaultElevation = material === 'gravel'
       ? PARK_ACCESS_INFRASTRUCTURE_PROFILE.gravelElevation
       : material === 'cobblestone'
@@ -744,13 +731,6 @@ export function buildParkAccessRenderModel(
       Math.max(0.035, roundabout.curbWidth),
       (outerRadius - islandRadius) * 0.4,
     );
-    asphaltParts.push(ringGeometry(
-      islandRadius + curbWidth,
-      outerRadius,
-      circleSegments,
-      roundabout.center,
-      roundaboutElevation + 0.003,
-    ));
     landscapeParts.push(circleGeometry(
       islandRadius,
       circleSegments,
@@ -777,14 +757,8 @@ export function buildParkAccessRenderModel(
       roundabout.center,
       roundaboutElevation,
     ));
-    const dividerRadius = islandRadius + curbWidth + (outerRadius - islandRadius - curbWidth) * 0.5;
-    whiteMarkingParts.push(ringGeometry(
-      dividerRadius - 0.018,
-      dividerRadius + 0.018,
-      circleSegments,
-      roundabout.center,
-      roundaboutElevation + 0.008,
-    ));
+    // The reference has one circulation lane: no invented full-ring divider
+    // crossing every entry/exit mouth.
   });
 
   const geometries: ParkAccessGeometrySet = {
@@ -792,11 +766,11 @@ export function buildParkAccessRenderModel(
     cobblestone: mergeAndDispose(cobblestoneParts),
     gravel: mergeAndDispose(gravelParts),
     sidewalks: mergeAndDispose(sidewalkParts),
-    curbs: mergeAndDispose(curbParts),
+    curbs: mergeAndDispose([...curbParts, ...roundaboutCurbParts]),
     whiteMarkings: mergeAndDispose(whiteMarkingParts),
     yellowMarkings: mergeAndDispose(yellowMarkingParts),
     landscape: mergeAndDispose(landscapeParts),
-    roundaboutCurb: mergeAndDispose(roundaboutCurbParts),
+    roundaboutCurb: null,
   };
   const architecture = buildParkAccessArchitectureModel(
     input.gates,
@@ -804,7 +778,7 @@ export function buildParkAccessRenderModel(
     { reducedGraphics },
   );
   const surfaceTriangleCount = Object.values(geometries)
-    .reduce((total, geometry) => total + triangleCount(geometry), 0);
+    .reduce((total, geometry) => total + triangleCount(geometry), triangleCount(architecture.gables));
   const instancedTriangleCount = (
     architecture.diagnostics.opaqueInstanceCount
     + architecture.diagnostics.glassInstanceCount
@@ -815,7 +789,7 @@ export function buildParkAccessRenderModel(
   const estimatedShadowDrawCalls = [
     architecture.diagnostics.opaqueInstanceCount,
     architecture.diagnostics.metalInstanceCount,
-  ].filter((count) => count > 0).length;
+  ].filter((count) => count > 0).length + (architecture.gables ? 1 : 0);
 
   return {
     geometries,
@@ -839,5 +813,6 @@ export function buildParkAccessRenderModel(
 }
 
 export function disposeParkAccessRenderModel(model: ParkAccessRenderModel) {
+  model.architecture.gables?.dispose();
   Object.values(model.geometries).forEach((geometry) => geometry?.dispose());
 }

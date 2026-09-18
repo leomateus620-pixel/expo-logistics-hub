@@ -1,3 +1,5 @@
+import { ruralBuildingRecipe, buildRuralGeometry } from './ruralArchitecture';
+import { RURAL_PAVILIONS } from '../data/ruralPavilionReconstruction';
 import * as THREE from 'three';
 
 export type ParkAccessPoint = readonly [number, number];
@@ -32,6 +34,7 @@ export interface ParkAccessArchitectureInstance {
 }
 
 export interface ParkAccessArchitectureModel {
+  gables: THREE.BufferGeometry | null;
   opaque: readonly ParkAccessArchitectureInstance[];
   glass: readonly ParkAccessArchitectureInstance[];
   metal: readonly ParkAccessArchitectureInstance[];
@@ -417,64 +420,24 @@ function buildCosteiros(
   target: Record<ArchitectureBatch, ParkAccessArchitectureInstance[]>,
   reducedGraphics: boolean,
 ) {
-  const width = Math.max(0.76, finitePositive(placement.width, 1.75));
-  const depth = Math.max(0.58, finitePositive(placement.depth, 0.96));
-  const wallHeight = verticalMetersToLocal(
-    PARK_ACCESS_ARCHITECTURE_VERTICAL_PROFILE.costeirosEaveHeightMeters,
+  const spec = RURAL_PAVILIONS.testDrive;
+  const recipe = ruralBuildingRecipe(
+    'testDrive',
+    Math.max(0.76, finitePositive(placement.width, 1.75)),
+    Math.max(0.58, finitePositive(placement.depth, 0.96)),
+    spec.eaveHeight + spec.roofRise,
+    !reducedGraphics,
   );
-  const roofRun = width * 0.54;
-  const ridgeRise = Math.min(
-    verticalMetersToLocal(PARK_ACCESS_ARCHITECTURE_VERTICAL_PROFILE.costeirosRidgeRiseMeters),
-    roofRun * 0.55,
-  );
-  const roofPitch = Math.asin(ridgeRise / roofRun);
-  const roofPanelWidth = roofRun / Math.cos(roofPitch);
-  const roofY = wallHeight + ridgeRise * 0.52;
-
-  pushBox(target, 'opaque', 'costeiros:foundation', placement, {
-    position: [0, 0.028, 0],
-    scale: [width * 1.14, 0.056, depth * 1.18],
-    color: PARK_ACCESS_ARCHITECTURE_PALETTE.concrete,
-  });
-  pushBox(target, 'opaque', 'costeiros:walls', placement, {
-    position: [0, wallHeight * 0.5 + 0.05, 0],
-    scale: [width, wallHeight, depth],
-    color: PARK_ACCESS_ARCHITECTURE_PALETTE.costeirosWall,
-  });
-  [-1, 1].forEach((direction) => {
-    pushBox(target, 'opaque', `costeiros:roof-${direction < 0 ? 'west' : 'east'}`, placement, {
-      position: [direction * width * 0.255, roofY, 0],
-      scale: [roofPanelWidth, Math.max(0.055, width * 0.035), depth * 1.12],
-      rotation: [0, 0, direction * roofPitch],
-      color: PARK_ACCESS_ARCHITECTURE_PALETTE.roof,
-    });
-  });
-  pushBox(target, 'metal', 'costeiros:roof-ridge', placement, {
-    position: [0, wallHeight + ridgeRise + 0.04, 0],
-    scale: [Math.max(0.05, width * 0.04), Math.max(0.045, width * 0.025), depth * 1.14],
-    color: PARK_ACCESS_ARCHITECTURE_PALETTE.costeirosTrim,
-  });
-  pushBox(target, 'opaque', 'costeiros:door', placement, {
-    position: [-width * 0.26, wallHeight * 0.34 + 0.05, depth * 0.515],
-    scale: [width * 0.16, wallHeight * 0.68, Math.max(0.024, depth * 0.04)],
-    color: PARK_ACCESS_ARCHITECTURE_PALETTE.greenDoor,
-  });
-  [-width * 0.02, width * 0.24].forEach((x, index) => {
-    pushBox(target, 'glass', `costeiros:front-window-${index + 1}`, placement, {
-      position: [x, wallHeight * 0.54 + 0.05, depth * 0.515],
-      scale: [width * 0.16, wallHeight * 0.3, Math.max(0.024, depth * 0.04)],
-      color: PARK_ACCESS_ARCHITECTURE_PALETTE.glass,
-    });
-  });
-  if (!reducedGraphics) {
-    [-depth * 0.24, depth * 0.22].forEach((z, index) => {
-      pushBox(target, 'glass', `costeiros:side-window-${index + 1}`, placement, {
-        position: [width * 0.515, wallHeight * 0.54 + 0.05, z],
-        scale: [Math.max(0.024, width * 0.04), wallHeight * 0.28, depth * 0.2],
-        color: PARK_ACCESS_ARCHITECTURE_PALETTE.glass,
-      });
-    });
+  // Keep the existing placement, picking and three instanced material batches.
+  // Replace the former solid white box; never append a second building.
+  for (const part of recipe.boxes) {
+    pushBox(target, part.batch, `costeiros:${part.id}`, placement, part);
   }
+  const gables=buildRuralGeometry({...recipe,boxes:[]});
+  gables.glass.dispose();gables.metal.dispose();
+  gables.opaque.rotateY(placement.rotationRadians);
+  gables.opaque.translate(placement.anchor[0],placement.elevation??0,placement.anchor[1]);
+  return gables.opaque;
 }
 
 export function buildParkAccessArchitectureModel(
@@ -496,9 +459,10 @@ export function buildParkAccessArchitectureModel(
     if (gate.key === 'gate2') buildGate2(gate, target, reducedGraphics);
     if (gate.key === 'gate3') buildGate3(gate, target, reducedGraphics);
   });
-  if (costeiros) buildCosteiros(costeiros, target, reducedGraphics);
+  const gables=costeiros ? buildCosteiros(costeiros, target, reducedGraphics) : null;
 
   return {
+    gables,
     opaque: target.opaque,
     glass: target.glass,
     metal: target.metal,
@@ -508,7 +472,7 @@ export function buildParkAccessArchitectureModel(
       glassInstanceCount: target.glass.length,
       metalInstanceCount: target.metal.length,
       estimatedDrawCalls: [target.opaque.length, target.glass.length, target.metal.length]
-        .filter((count) => count > 0).length,
+        .filter((count) => count > 0).length + (gables ? 1 : 0),
     },
   };
 }

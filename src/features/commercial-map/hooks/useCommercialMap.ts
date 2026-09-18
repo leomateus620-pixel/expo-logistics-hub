@@ -1,3 +1,4 @@
+import { withRuralPavilionReconstruction } from '../data/ruralPavilionReconstruction';
 import { withArenaReconstruction } from '../data/arenaCanonicalLayout';
 import { measureCommercialMapStage, markCommercialMapStage } from '../utils/performanceDiagnostics';
 import { withFenasojaComplexReconstruction } from '../data/fenasojaComplexReconstruction';
@@ -123,7 +124,7 @@ export function commercialMapQueryKey(
  */
 export function presentCommercialMapData<T extends CommercialMapData>(data: T): T {
   return withCommercialMapSegments(withUnifiedFenasojaRestaurant(
-    withArenaReconstruction(withMiranteComplexReconstruction(withFenasojaComplexReconstruction(data))),
+    withRuralPavilionReconstruction(withArenaReconstruction(withMiranteComplexReconstruction(withFenasojaComplexReconstruction(data)))),
   ));
 }
 

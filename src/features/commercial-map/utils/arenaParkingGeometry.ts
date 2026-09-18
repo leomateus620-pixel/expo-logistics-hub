@@ -1,8 +1,6 @@
-import * as THREE from 'three';
 import polygonClipping, { type MultiPolygon } from 'polygon-clipping';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { MapEntity } from '../types';
-import { corridorPolygon, precisionSeamPolygons, sampleTerritoryRoad, territoryPolygonGeometry, territorySurfaceSkirt, UNIFIED_TERRITORY_ROADS } from './territorialRoadGeometry';
+import { corridorPolygon, precisionSeamPolygons, sampleTerritoryRoad, territoryPolygonGeometry, UNIFIED_TERRITORY_ROADS } from './territorialRoadGeometry';
 
 /** The parking/grass edge is derived from the SAME road samples as the asphalt.
  * The former nine-point parking outline did not cut the connector or Rua Brasil;
@@ -24,11 +22,11 @@ export function arenaParkingPolygons(entity: MapEntity): MultiPolygon {
 
 export function createArenaParkingGeometry(entity: MapEntity, height: number) {
   const polygons = arenaParkingPolygons(entity);
-  const top = territoryPolygonGeometry(polygons, height);
-  const flat = top.toNonIndexed();
-  const skirt = territorySurfaceSkirt(polygons, height, 0);
-  const geometry = mergeGeometries([flat, skirt])!;
-  top.dispose(); flat.dispose(); skirt.dispose();
+  // These are natural fields, not retaining slabs. Keep the road-cut picking
+  // surface and its canonical tree support height, but remove the fabricated
+  // vertical wall around every field/cut piece. GenericEntityMesh keeps this
+  // only for picking/selected outlines; the environment owns the visible ground.
+  const geometry = territoryPolygonGeometry(polygons, height);
   // Shared world-space UVs prevent a new origin/scale on each cut piece.
   geometry.computeBoundingBox(); geometry.computeBoundingSphere();
   return geometry;

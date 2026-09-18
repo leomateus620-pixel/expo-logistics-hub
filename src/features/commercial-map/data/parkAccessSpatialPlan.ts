@@ -1,3 +1,5 @@
+import { RURAL_PAVILIONS, ruralSourceRing } from './ruralPavilionReconstruction';
+import { ACCESS_JUNCTION, accessWorldToSource, sampleAccessCurve } from './accessJunctionReconstruction';
 import { MAP_REFERENCE_HEIGHT, MAP_REFERENCE_WIDTH } from '../constants';
 import type { Coordinate } from '../types';
 import { CHURRASCARIA_ACCESS_CORRECTION } from './annexSpatialCorrections';
@@ -384,9 +386,9 @@ const A6_SOURCE = [3276, 941] as const;
 const A7_SOURCE = [3267, 1703] as const;
 const A10_SOURCE = [1214, 3137] as const;
 const RUA_BRASIL_SEAM_SOURCE = [1640, 3143.5] as const;
-const ROUNDABOUT_SOURCE = [1110, 4185] as const;
+const ROUNDABOUT_SOURCE = accessWorldToSource(ACCESS_JUNCTION.center);
 const GATE_1_MINI_ROUNDABOUT_SOURCE = [341, 3718] as const;
-const COSTEIROS_CENTER_SOURCE = [917.5, 2972.5] as const;
+const COSTEIROS_CENTER_SOURCE = RURAL_PAVILIONS.testDrive.sourceCenter;
 const B22_SOURCE_BOUNDS = [742, 3538, 931, 3834] as const;
 const B22_CENTER_SOURCE = [836.5, 3686] as const;
 const B22_FOOTPRINT_SOURCE = sourceRectangle(...B22_SOURCE_BOUNDS);
@@ -440,13 +442,12 @@ const GATE_1_LOCAL_ACCESS_SOURCE = [
   A1_SOURCE,
 ] as const satisfies readonly ParkAccessSourcePoint[];
 
-const GATE_1_ROUNDABOUT_TUPARENDI_LINK_SOURCE = [
-  GATE_1_MINI_ROUNDABOUT_SOURCE,
-  [390, 3760],
-  [470, 3815],
-  [540, 3865],
-  [600, 3890],
-] as const satisfies readonly ParkAccessSourcePoint[];
+const GATE_1_ROUNDABOUT_TUPARENDI_LINK_SOURCE = sampleAccessCurve(
+  [399, 3768], // Circulation lane, outside the island; its centre is unchanged.
+  [450, 3788],
+  [510, 3910],
+  accessWorldToSource(ACCESS_JUNCTION.gate1AvenueJoin),
+);
 
 const BENVENUTO_FOUR_LANE_SOURCE = [
   [1234, 4200],
@@ -916,7 +917,9 @@ const SIDEWALK_SURFACES = [
   ),
   makeSidewalk(
     'gate-1-west-sidewalk',
-    GATE_1_LOCAL_ACCESS_SOURCE.map(([x, z]) => [x - 40, z] as const),
+    // The first control was inside the mini-roundabout island. Start at the
+    // approach outside its complete paved envelope, preserving the A1 end.
+    GATE_1_LOCAL_ACCESS_SOURCE.slice(2).map(([x, z]) => [x - 40, z] as const),
     1.6,
     'CONCRETE',
     {
@@ -1004,7 +1007,7 @@ const WOODLAND_OUTER_SOURCE = closeSourcePolygon([
 const WOODLAND_PATH_SURFACE_SOURCE = strokeSourcePath(WOODLAND_PATH_SOURCE, 3);
 const WOODLAND_PATH_CLEARANCE_SOURCE = strokeSourcePath(WOODLAND_PATH_SOURCE, 6.4);
 
-const COSTEIROS_BUILDING_SOURCE = sourceRectangle(875, 2880, 960, 3065);
+const COSTEIROS_BUILDING_SOURCE = ruralSourceRing(RURAL_PAVILIONS.testDrive);
 const COSTEIROS_YARD_SOURCE = closeSourcePolygon([
   [842, 2835],
   [1015, 2835],
@@ -1039,39 +1042,26 @@ const BENVENUTO_TREE_BAND_SEGMENTS_SOURCE = [
   notes: string;
 }[];
 
-const SPLITTER_ISLAND_SOURCES = [
-  {
-    id: 'roundabout-east-splitter',
-    sourcePdfPolygon: closeSourcePolygon([[1205, 4168], [1315, 4200], [1205, 4218]]),
-  },
-  {
-    id: 'roundabout-southwest-splitter',
-    sourcePdfPolygon: closeSourcePolygon([[1040, 4275], [1100, 4370], [1114, 4260]]),
-  },
-] as const;
-
 const ROUNDABOUTS = [
   {
     id: 'roundabout-tupareendi',
     center: parkAccessSourcePointToLocal(ROUNDABOUT_SOURCE),
     sourcePdfCenter: ROUNDABOUT_SOURCE,
-    outerRadius: parkAccessMetersToLocal(18),
-    outerRadiusMeters: 18,
-    islandRadius: parkAccessMetersToLocal(10.5),
-    islandRadiusMeters: 10.5,
-    circulatingWidth: parkAccessMetersToLocal(7.5),
-    circulatingWidthMeters: 7.5,
-    elevation: 0.05,
-    splitterIslands: SPLITTER_ISLAND_SOURCES.map((island) => ({
-      id: island.id,
-      sourcePdfPolygon: island.sourcePdfPolygon,
-      polygon: polygonToLocal(island.sourcePdfPolygon),
-    })),
+    outerRadius: ACCESS_JUNCTION.outerRadius,
+    outerRadiusMeters: ACCESS_JUNCTION.outerRadius / PARK_ACCESS_WORKING_MAP_UNITS_PER_METER,
+    islandRadius: ACCESS_JUNCTION.islandRadius,
+    islandRadiusMeters: ACCESS_JUNCTION.islandRadius / PARK_ACCESS_WORKING_MAP_UNITS_PER_METER,
+    circulatingWidth: 1.52,
+    circulatingWidthMeters: 1.52 / PARK_ACCESS_WORKING_MAP_UNITS_PER_METER,
+    elevation: ACCESS_JUNCTION.elevation,
+    // The west splitter is the hole enclosed by the registered divided
+    // approaches. The former detached triangles had no supporting road.
+    splitterIslands: [] as { id: string; polygon: ParkAccessPolygon; sourcePdfPolygon: ParkAccessSourcePolygon }[],
     approachRoadIds: ['benvenuto-four-lane-axis'] as const,
     connects: ['benvenuto-four-lane-axis', 'AV-TUPARENDI'] as const,
     sourceIds: ['annex-1-implantation', 'annex-2-satellite', 'annex-14-satellite-a1-a10-b22'] as const,
     confidence: 'DIMENSIONALLY_INFERRED' as const,
-    notes: 'Rotatória principal permanece restrita à Avenida Benvenuto de Conti e ao corredor oficial da Avenida Tupareendi; os raios não são dados as-built.',
+    notes: 'IMG_0956 confirma a ilha circular e os acessos divididos; o centro deriva do anel OSM registrado. O antigo controle [1110,4185] era um ponto da pista. As dimensões continuam estimadas.',
   },
   {
     id: 'gate-1-mini-roundabout',
@@ -1083,7 +1073,7 @@ const ROUNDABOUTS = [
     islandRadiusMeters: 7.5,
     circulatingWidth: parkAccessMetersToLocal(6.5),
     circulatingWidthMeters: 6.5,
-    elevation: 0.048,
+    elevation: ACCESS_JUNCTION.elevation,
     splitterIslands: [] as const,
     approachRoadIds: [
       'gate-1-local-access',
@@ -1486,7 +1476,7 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
         'annex-21-site-plan-gate-1-motorhome',
       ],
       confidence: 'FIELD_REVIEW_REQUIRED',
-      notes: 'Controle conservador [600,3890] encerra a ligação curta no corredor oficial da Tupareendi; tangência, meio-fio e cota exatos requerem conferência em campo.',
+      notes: 'Ligação termina no vértice registrado da Avenida Tuparendi compartilhado com a superfície canônica, eliminando o intervalo entre os geradores. Raios e altimetria permanecem sujeitos a campo.',
     },
   } satisfies Record<string, ParkAccessAnchor>,
   roadSurfaces: ROAD_SURFACES,

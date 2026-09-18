@@ -163,7 +163,6 @@ import { StrategicLandmarkMesh, StrategicLandmarkSelectionShaderWarmup } from '.
 import { CommercialMapInteriorShaderWarmup } from './CommercialMapInteriorShaderWarmup';
 import { TechnicalValidationOverlay } from './TechnicalValidationOverlay';
 import { CommercialTreeLayer } from './CommercialTreeLayer';
-import { applyPilotGroundMaterial } from './vegetationPilotMaterial';
 import { isVegetationPilotEnabled } from '../../utils/vegetationPilot';
 import { CommercialElectricalInfrastructureLayer } from './CommercialElectricalInfrastructureLayer';
 import { NightLightingLayer } from './NightLightingLayer';
@@ -359,7 +358,7 @@ const EXPORURAL_PARK_ACCESS_SURFACE_OWNER_IDENTIFIERS = [
   'RUA-GUSTAVO-BESSEL',
 ] as const;
 const PARK_ACCESS_ARCHITECTURE_OWNER_IDENTIFIERS = ['A1', 'A2', 'A3'] as const;
-const PARK_ACCESS_DETAILED_ROAD_SURFACE_IDENTIFIERS = ['AV-BENVENUTO-CONTI'] as const;
+const PARK_ACCESS_DETAILED_ROAD_SURFACE_IDENTIFIERS = ['AV-BENVENUTO-CONTI', 'AV-TUPARENDI'] as const;
 const PARK_ACCESS_SCENE_SUPPORT_POINTS = [
   ...PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.flatMap((surface) => (
     surface.polygon.map((position) => ({ position }))
@@ -859,6 +858,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   onCursor,
 }: EntityMeshProps) {
   const classification = entity.classification;
+  const naturalParking = isArenaParking(entity);
   const isRoad = classification === 'ROAD';
   const isQuadra = classification === 'QUADRA' || entity.metadata.renderMode === 'outline';
   const isPavilion = classification === 'PAVILION';
@@ -887,8 +887,8 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   const renderer = useThree((state) => state.gl);
   const maxAnisotropy = openGroundProfile ? renderer.capabilities.getMaxAnisotropy() : 1;
   const openGroundTextures = useMemo(
-    () => (openGroundProfile ? openGroundTextureBundleForEntity(openGroundProfile, maxAnisotropy) : null),
-    [maxAnisotropy, openGroundProfile],
+    () => (openGroundProfile && !naturalParking ? openGroundTextureBundleForEntity(openGroundProfile, maxAnisotropy) : null),
+    [maxAnisotropy, naturalParking, openGroundProfile],
   );
   const openGroundMaterialRef = useRef<THREE.MeshStandardMaterial>(null);
   const openGroundReducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
@@ -897,10 +897,6 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     // fBm so they never read as one flat tile next to the environment ground.
     if (!openGroundMaterialRef.current) return;
     if (openGroundProfile) {
-      if (entity.publicIdentifier === 'EST-EXP-VIS' && isVegetationPilotEnabled('ground')) {
-        applyPilotGroundMaterial(openGroundMaterialRef.current);
-        return;
-      }
       applyParkGroundDetail(openGroundMaterialRef.current, openGroundReducedGraphics);
       return;
     }
@@ -915,7 +911,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     if (!isFlat) {
       applyParkSurfaceDetail(openGroundMaterialRef.current, 'volume', openGroundReducedGraphics);
     }
-  }, [classification, entity.publicIdentifier, isFlat, openGroundProfile, openGroundReducedGraphics, openGroundTextures]);
+  }, [classification, isFlat, openGroundProfile, openGroundReducedGraphics, openGroundTextures]);
 
   const geometry = useMemo(
     () => isQuadra || isGate || isNationsPresentationSurface
@@ -985,7 +981,9 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     : selected
       ? '#174c31'
       : '#e9c84b';
-  const outlineGeometry = usesExporuralSteakhouseAnnexPresentation
+  const outlineGeometry = naturalParking
+    ? selected || hovered ? edges : null
+    : usesExporuralSteakhouseAnnexPresentation
     ? selected || hovered ? edges : null
     : isNationsPresentationSurface
       ? selected || hovered ? footprint : null
@@ -1057,7 +1055,11 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
           receiveShadow={!usesExporuralSteakhouseAnnexPresentation}
           {...interactionProps}
         >
-          {usesExporuralSteakhouseAnnexPresentation ? (
+          {usesExporuralSteakhouseAnnexPresentation || naturalParking ? (
+            // Natural parking is a semantic/picking area over the continuous
+            // environment ground. A second coloured top made false cadastral
+            // tiles and seams beside the Etnias. Keep the same ID, road-cut
+            // hit geometry and selected outline, with one visual terrain owner.
             <meshBasicMaterial visible={false} />
           ) : (
             <meshStandardMaterial

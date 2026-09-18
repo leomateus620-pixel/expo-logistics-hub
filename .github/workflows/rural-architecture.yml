@@ -1,0 +1,47 @@
+name: Rural architecture contracts
+on:
+  push:
+    branches: [fix/test-drive-pecuaria-access]
+  pull_request:
+    paths:
+      - 'src/features/commercial-map/**'
+      - 'src/test/commercialMapLivestockTent.test.ts'
+      - '.github/workflows/rural-architecture.yml'
+permissions:
+  contents: read
+concurrency:
+  group: rural-architecture-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  architecture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      VITE_SUPABASE_URL: https://qa.invalid
+      VITE_SUPABASE_PUBLISHABLE_KEY: qa-placeholder
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Architectural geometry and canonical integration contracts
+        run: |
+          mkdir -p rural-validation
+          git rev-parse HEAD > rural-validation/commit.txt
+          npm test -- --maxWorkers=2 --testTimeout=60000 src/test/commercialMapLivestockTent.test.ts src/test/commercialMapRuralPhotoRevision.test.ts src/test/commercialMapContinuousGround.test.ts src/test/commercialMapAccessJunction.test.ts src/test/commercialMapRuralMaterialDetail.test.ts src/test/commercialMapParkingTerrainContinuity.test.ts src/test/commercialMapPavilionCourtyard.test.ts src/test/commercialMapParkAccessInfrastructure.test.ts src/test/commercialMapParkAccessSpatialPlan.test.ts src/test/commercialMapParkAccessEnvironment.test.ts --reporter=json --outputFile=rural-validation/tests.json
+      - name: Complete repository typecheck
+        run: npm run typecheck
+      - name: Production build
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee rural-validation/build.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rural-architecture-${{ github.sha }}
+          path: rural-validation/
+          retention-days: 14

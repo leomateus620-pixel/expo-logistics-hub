@@ -1,4 +1,4 @@
-import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { mergeBufferGeometries } from 'three-stdlib';
@@ -10,6 +10,7 @@ import {
 } from '../../data/parkAccessEnvironment';
 import type { ParkAccessPolygon } from '../../data/parkAccessSpatialPlan';
 import type { ParkAccessEnvironmentPlacement } from '../../utils/parkAccessEnvironment';
+import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 
 const NO_RAYCAST = () => undefined;
 
@@ -230,6 +231,16 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
 }) {
   const treeRef = useRef<THREE.InstancedMesh>(null);
   const understoryRef = useRef<THREE.InstancedMesh>(null);
+  // Quality changes replace R3F instances when their geometry/count args
+  // change. dispose={null} leaves their instance buffers owned by this layer.
+  const bindTree = useCallback((mesh: THREE.InstancedMesh | null) => {
+    if (treeRef.current && treeRef.current !== mesh) disposeInstancedMesh(treeRef.current);
+    treeRef.current = mesh;
+  }, []);
+  const bindUnderstory = useCallback((mesh: THREE.InstancedMesh | null) => {
+    if (understoryRef.current && understoryRef.current !== mesh) disposeInstancedMesh(understoryRef.current);
+    understoryRef.current = mesh;
+  }, []);
   const { invalidate } = useThree();
   const presentation = useMemo(
     () => resolveParkAccessEnvironmentPresentation(reducedGraphics),
@@ -318,7 +329,7 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
       <group name="vegetacao-ambiental-acessos" visible={vegetationVisible} userData={VEGETATION_USER_DATA}>
         {presentation.ambientTrees.length > 0 && (
           <instancedMesh
-            ref={treeRef}
+            ref={bindTree}
             name="arborizacao-enquadramento-benvenuto-costeiros"
             args={[geometries.tree, materials.tree, presentation.ambientTrees.length]}
             count={presentation.ambientTrees.length}
@@ -331,7 +342,7 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
         )}
         {presentation.understory.length > 0 && (
           <instancedMesh
-            ref={understoryRef}
+            ref={bindUnderstory}
             name="sub-bosque-bordas-naturais"
             args={[geometries.understory, materials.understory, presentation.understory.length]}
             count={presentation.understory.length}

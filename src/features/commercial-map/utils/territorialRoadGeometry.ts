@@ -18,8 +18,18 @@ import {
   rearRoadLocalPath,
 } from "../data/rearParkRoadNetwork";
 import { OFFICIAL_REFERENCE_DATA, officialPdfPointToLocal } from '../data/officialReference2026';
+import { ACCESS_JUNCTION } from '../data/accessJunctionReconstruction';
+import { PARK_ACCESS_SPATIAL_PLAN } from '../data/parkAccessSpatialPlan';
+import { accessCircle, accessCorridor } from './accessJunctionGeometry';
 
 export const TERRITORY_ROAD_Y = 0.034;
+// Transfer also clips the last millimetres of the retained through-road seam;
+// neither pavement, shoulder nor its old paint may render beneath the new owner.
+const ACCESS_OWNERSHIP_CUT: MultiPolygon = polygonClipping.union(
+  [[accessCircle(ACCESS_JUNCTION.center, ACCESS_JUNCTION.outerRadius)]],
+  [[accessCircle(PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.center, PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.outerRadius)]],
+  ...ACCESS_JUNCTION.approaches.map(road => [[accessCorridor(road.points, road.width)]] as MultiPolygon),
+);
 export const UNIFIED_TERRITORY_ROADS: readonly TerritoryRoad[] = [
   ...TERRITORY_ROADS,
   ...GENERATED_REAR_ROAD_SEGMENTS.map((r) => ({
@@ -256,6 +266,7 @@ export function buildTerritoryRoadGeometry() {
   const officialMouths: MultiPolygon[] = OFFICIAL_REFERENCE_DATA.entities
     .filter(e => ['AV-IMIGRANTES', 'RUA-BRASIL'].includes(e.publicIdentifier))
     .map(e => [e.geometry.coordinates.map(r => r.map(p => [p[0], p[1]]))]);
+  officialMouths.push(ACCESS_OWNERSHIP_CUT);
   const brasilMouth = corridorPolygon(
     [[4510,3150], [4528,3150]].map(p => officialPdfPointToLocal(p as [number, number])),
     GENERATED_REAR_ROAD_SEGMENTS.find(r => r.id === 'portao5-street-curve')!.width,
@@ -349,15 +360,15 @@ export function buildTerritoryRoadGeometry() {
       TERRITORY_ROAD_Y,
     ),
     unpaved: territoryPolygonGeometry(unpaved, TERRITORY_ROAD_Y),
-    embankment: territorySurfaceSkirt(outer, TERRITORY_ROAD_Y - 0.003, -0.081),
+    embankment: territorySurfaceSkirt(polygonClipping.difference(outer, ACCESS_OWNERSHIP_CUT), TERRITORY_ROAD_Y - 0.003, -0.081),
     hitSurface: territoryPolygonGeometry(hitSurface, TERRITORY_ROAD_Y),
     shoulders: territoryPolygonGeometry(shoulders, TERRITORY_ROAD_Y - 0.003),
     edgeLines: territoryPolygonGeometry(
-      union(edgeBands),
+      polygonClipping.difference(union(edgeBands), ACCESS_OWNERSHIP_CUT),
       TERRITORY_ROAD_Y + 0.002,
     ),
     centerLines: territoryPolygonGeometry(
-      union(centerDashes),
+      polygonClipping.difference(union(centerDashes), ACCESS_OWNERSHIP_CUT),
       TERRITORY_ROAD_Y + 0.002,
     ),
     footprint: polygonClipping.difference(pavement, unpaved),
