@@ -1,3 +1,4 @@
+import { reconstructRuralPavilionEntity } from './ruralPavilionReconstruction';
 import { ARENA_CANONICAL_LAYOUT, reconstructArenaEntity } from './arenaCanonicalLayout';
 import { ARENA_ROAD_CORRECTION } from './arenaRoadCorrection';
 import { SOY_RESTROOM, SOY_ROAD_CONNECTION, GATE_NINE_TANKS } from './soyGateInfrastructure';
@@ -1078,7 +1079,7 @@ export function isNonPermanentRemovedIdentifier(publicIdentifier: string) {
 export const OFFICIAL_REFERENCE_ENTITIES = [
   ...officialBaseEntities,
   ...pavilionModuleEntities,
-].map(reconstructFenasojaEntity).map(reconstructMiranteComplexEntity).map(reconstructArenaEntity).map(withCommercialMapSegmentMetadata);
+].map(reconstructFenasojaEntity).map(reconstructMiranteComplexEntity).map(reconstructArenaEntity).map(reconstructRuralPavilionEntity).map(withCommercialMapSegmentMetadata);
 
 export const OFFICIAL_RENDERED_ENTITIES = OFFICIAL_REFERENCE_ENTITIES.filter((entity) => (
   !nonPermanentRemovedIdentifiers.has(entity.publicIdentifier)

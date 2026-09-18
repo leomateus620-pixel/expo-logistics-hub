@@ -1,3 +1,4 @@
+import { RURAL_PAVILIONS, ruralSourceRing } from './ruralPavilionReconstruction';
 import { MAP_REFERENCE_HEIGHT, MAP_REFERENCE_WIDTH } from '../constants';
 import type { Coordinate } from '../types';
 import { CHURRASCARIA_ACCESS_CORRECTION } from './annexSpatialCorrections';
@@ -386,7 +387,7 @@ const A10_SOURCE = [1214, 3137] as const;
 const RUA_BRASIL_SEAM_SOURCE = [1640, 3143.5] as const;
 const ROUNDABOUT_SOURCE = [1110, 4185] as const;
 const GATE_1_MINI_ROUNDABOUT_SOURCE = [341, 3718] as const;
-const COSTEIROS_CENTER_SOURCE = [917.5, 2972.5] as const;
+const COSTEIROS_CENTER_SOURCE = RURAL_PAVILIONS.testDrive.sourceCenter;
 const B22_SOURCE_BOUNDS = [742, 3538, 931, 3834] as const;
 const B22_CENTER_SOURCE = [836.5, 3686] as const;
 const B22_FOOTPRINT_SOURCE = sourceRectangle(...B22_SOURCE_BOUNDS);
@@ -1004,7 +1005,7 @@ const WOODLAND_OUTER_SOURCE = closeSourcePolygon([
 const WOODLAND_PATH_SURFACE_SOURCE = strokeSourcePath(WOODLAND_PATH_SOURCE, 3);
 const WOODLAND_PATH_CLEARANCE_SOURCE = strokeSourcePath(WOODLAND_PATH_SOURCE, 6.4);
 
-const COSTEIROS_BUILDING_SOURCE = sourceRectangle(875, 2880, 960, 3065);
+const COSTEIROS_BUILDING_SOURCE = ruralSourceRing(RURAL_PAVILIONS.testDrive);
 const COSTEIROS_YARD_SOURCE = closeSourcePolygon([
   [842, 2835],
   [1015, 2835],
