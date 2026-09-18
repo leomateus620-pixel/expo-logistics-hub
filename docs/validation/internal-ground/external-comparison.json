@@ -1,0 +1,15 @@
+{
+  "comparison": "unchanged external west field",
+  "crop": [
+    400,
+    160,
+    1100,
+    780
+  ],
+  "meanAbsoluteRgb": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "differentPixelFraction": 0.0
+}
