@@ -163,7 +163,6 @@ import { StrategicLandmarkMesh, StrategicLandmarkSelectionShaderWarmup } from '.
 import { CommercialMapInteriorShaderWarmup } from './CommercialMapInteriorShaderWarmup';
 import { TechnicalValidationOverlay } from './TechnicalValidationOverlay';
 import { CommercialTreeLayer } from './CommercialTreeLayer';
-import { isVegetationPilotEnabled } from '../../utils/vegetationPilot';
 import { CommercialElectricalInfrastructureLayer } from './CommercialElectricalInfrastructureLayer';
 import { NightLightingLayer } from './NightLightingLayer';
 import { CommercialPavilionInteriorScene } from './CommercialPavilionInteriorScene';
@@ -172,6 +171,7 @@ import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
 import { NationsDistrict } from './NationsDistrict';
 import { CommercialMapEnvironment } from './CommercialMapEnvironment';
 import { LateralResidentialDistrict } from './LateralResidentialDistrict';
+import { applyInteriorGroundMaterial } from './interiorGroundMaterial';
 import { applyParkGroundDetail } from './terrainMaterial';
 import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 import { CommercialMapAdaptiveQualityController } from './CommercialMapAdaptiveQuality';
@@ -887,7 +887,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   const renderer = useThree((state) => state.gl);
   const maxAnisotropy = openGroundProfile ? renderer.capabilities.getMaxAnisotropy() : 1;
   const openGroundTextures = useMemo(
-    () => (openGroundProfile && !naturalParking ? openGroundTextureBundleForEntity(openGroundProfile, maxAnisotropy) : null),
+    () => (openGroundProfile && !naturalParking && openGroundProfile.surface !== 'grass' ? openGroundTextureBundleForEntity(openGroundProfile, maxAnisotropy) : null),
     [maxAnisotropy, naturalParking, openGroundProfile],
   );
   const openGroundMaterialRef = useRef<THREE.MeshStandardMaterial>(null);
@@ -896,6 +896,10 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     // Presentation only: the large open fields share the park-scale terrain
     // fBm so they never read as one flat tile next to the environment ground.
     if (!openGroundMaterialRef.current) return;
+    if (openGroundProfile?.surface === 'grass' || classification === 'GREEN_AREA') {
+      applyInteriorGroundMaterial(openGroundMaterialRef.current);
+      return;
+    }
     if (openGroundProfile) {
       applyParkGroundDetail(openGroundMaterialRef.current, openGroundReducedGraphics);
       return;
@@ -5056,7 +5060,7 @@ const Scene = memo(function Scene({
       />
       <RuntimeFrameDiagnostics />
       {commercialMapDiagnosticsEnabled && <LightingPerformanceProbe />}
-      {LateralDistrictQaScene && window.location.pathname === '/__dev/commercial-map-rendering'
+      {LateralDistrictQaScene && (window.location.pathname === '/__dev/commercial-map-rendering' || (import.meta.env.DEV && new URLSearchParams(window.location.search).has('groundQa')))
         && <Suspense fallback={null}><LateralDistrictQaScene />{TerritoryQa && <TerritoryQa />}</Suspense>}
       <NavigationInteractionCoordinator
         onHover={setHoveredEntityId}

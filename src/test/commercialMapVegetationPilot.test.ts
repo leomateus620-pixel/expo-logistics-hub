@@ -1,3 +1,4 @@
+import { applyInteriorGroundMaterial } from '../features/commercial-map/components/canvas/interiorGroundMaterial';
 import { describe, it, expect } from "vitest";
 import { COMMERCIAL_MAP_TREES } from "@/features/commercial-map/data/commercialTrees";
 import { OFFICIAL_RENDERED_ENTITIES } from "@/features/commercial-map/data/officialReference2026";
@@ -23,16 +24,15 @@ import {
 } from "@/features/commercial-map/utils/commercialSiteEnvironment";
 import {
   createPilotLeafAtlas,
-  applyPilotGroundMaterial,
 } from "@/features/commercial-map/components/canvas/vegetationPilotMaterial";
 import * as THREE from "three";
 
 const pilot = COMMERCIAL_MAP_TREES.filter(isVegetationPilotTree);
 describe("controlled three-zone vegetation pilot", () => {
   it("shares ground detail without disposing a texture that another pilot surface still uses", () => {
-    const first = applyPilotGroundMaterial(new THREE.MeshStandardMaterial());
-    const second = applyPilotGroundMaterial(new THREE.MeshStandardMaterial());
-    applyPilotGroundMaterial(first);
+    const first = applyInteriorGroundMaterial(new THREE.MeshStandardMaterial());
+    const second = applyInteriorGroundMaterial(new THREE.MeshStandardMaterial());
+    applyInteriorGroundMaterial(first);
     const inspect = (material: THREE.MeshStandardMaterial) => {
       const shader = {
         uniforms: {},
@@ -41,7 +41,7 @@ describe("controlled three-zone vegetation pilot", () => {
           "#include <common>\n#include <color_fragment>\n#include <normal_fragment_maps>",
       } as Parameters<THREE.MeshStandardMaterial["onBeforeCompile"]>[0];
       material.onBeforeCompile(shader, {} as THREE.WebGLRenderer);
-      return shader.uniforms.pilotGroundNoise.value as THREE.Texture;
+      return shader.uniforms.interiorNoise.value as THREE.Texture;
     };
     const texture = inspect(first);
     expect(inspect(second)).toBe(texture);

@@ -256,7 +256,7 @@ describe('consulta espacial do estacionamento', () => {
 describe('materiais procedurais do estacionamento em Three r170', () => {
   it('gera albedo opaco não uniforme e normais unitárias sem tratar dados lineares como sRGB', () => {
     const set = own(createParkingMaterialSet(4, false));
-    for (const kind of ['gravel', 'soil', 'grass'] as const) {
+    for (const kind of ['gravel', 'soil'] as const) {
       const material = set.solid[kind];
       const albedo = material.map!, normal = material.normalMap!;
       const colorImage = textureImage(albedo), normalImage = textureImage(normal);
@@ -302,7 +302,7 @@ describe('materiais procedurais do estacionamento em Three r170', () => {
     expect(fullTextures.length).toBeLessThanOrEqual(PARKING_MATERIAL_BUDGET.maximumTextureCount);
     expect(bytes(reducedTextures)).toBe(bytes(fullTextures) / 2);
     expect(bytes(fullTextures) * 4 / 3).toBeLessThanOrEqual(2 * 1024 * 1024);
-    for (const kind of ['gravel', 'soil', 'grass'] as const) {
+    for (const kind of ['gravel', 'soil'] as const) {
       expect(reduced.solid[kind].normalMap).toBeNull();
       const reducedPixels = textureImage(reduced.solid[kind].map!).data;
       const fullPixels = textureImage(full.solid[kind].map!).data;

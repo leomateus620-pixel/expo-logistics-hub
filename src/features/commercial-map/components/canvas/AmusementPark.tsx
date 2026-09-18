@@ -1,3 +1,4 @@
+import { applyInteriorGroundMaterial } from './interiorGroundMaterial';
 import { BumperCarBody, bumperCarSpawn } from './BumperCarModel';
 import { preloadBumperPhysics } from '../../utils/preloadBumperPhysics';
 import {
@@ -149,6 +150,10 @@ function ParkTerrain({
   parkActive: boolean;
   reducedGraphics: boolean;
 }) {
+  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
+  useLayoutEffect(() => {
+    if (materialRef.current) applyInteriorGroundMaterial(materialRef.current, 'access-grass');
+  }, []);
   const geometry = useMemo(() => {
     const columns = reducedGraphics ? 14 : 26;
     const rows = reducedGraphics ? 12 : 22;
@@ -165,6 +170,7 @@ function ParkTerrain({
     ];
     const positions = new Float32Array((columns + 1) * (rows + 1) * 3);
     const colors = new Float32Array((columns + 1) * (rows + 1) * 3);
+    const interiorGrass = new Float32Array((columns + 1) * (rows + 1));
     const scratch = new THREE.Color();
     let vertex = 0;
     for (let row = 0; row <= rows; row += 1) {
@@ -182,6 +188,7 @@ function ParkTerrain({
           const soil = new THREE.Color().lerpColors(dirt, dirtDark, noise * 0.7);
           scratch.lerp(soil, Math.min(1, worn * 1.4));
         }
+        interiorGrass[vertex] = 1 - Math.min(1, worn * 1.4);
         positions.set([x, worn > 0.5 ? 0 : noise * 0.014, z], vertex * 3);
         colors.set([scratch.r, scratch.g, scratch.b], vertex * 3);
         vertex += 1;
@@ -199,6 +206,7 @@ function ParkTerrain({
     const result = new THREE.BufferGeometry();
     result.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     result.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    result.setAttribute('interiorGrass', new THREE.BufferAttribute(interiorGrass, 1));
     result.setIndex(indices);
     result.computeVertexNormals();
     result.computeBoundingSphere();
@@ -210,6 +218,7 @@ function ParkTerrain({
   return (
     <mesh geometry={geometry} position={[0, 0.035, 0]} receiveShadow raycast={NO_RAYCAST}>
       <meshStandardMaterial
+        ref={materialRef}
         vertexColors
         color={parkActive ? '#3d4763' : '#ffffff'}
         roughness={0.98}

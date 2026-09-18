@@ -1,0 +1,15 @@
+diff --git a/src/features/commercial-map/components/canvas/CommercialMapAdaptiveQuality.tsx b/src/features/commercial-map/components/canvas/CommercialMapAdaptiveQuality.tsx
+index 804a5828..efb90cb7 100644
+--- a/src/features/commercial-map/components/canvas/CommercialMapAdaptiveQuality.tsx
++++ b/src/features/commercial-map/components/canvas/CommercialMapAdaptiveQuality.tsx
+@@ -80 +80,2 @@ export function CommercialMapAdaptiveQualityController({
+-    && window.location.pathname === '/__dev/commercial-map-rendering'
++    && (window.location.pathname === '/__dev/commercial-map-rendering'
++      || (import.meta.env.DEV && new URLSearchParams(window.location.search).has('groundQa')))
+diff --git a/src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx b/src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx
+index 55c44004..0d8394c4 100644
+--- a/src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx
++++ b/src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx
+@@ -5059 +5059 @@ const Scene = memo(function Scene({
+-      {LateralDistrictQaScene && window.location.pathname === '/__dev/commercial-map-rendering'
++      {LateralDistrictQaScene && (window.location.pathname === '/__dev/commercial-map-rendering' || (import.meta.env.DEV && new URLSearchParams(window.location.search).has('groundQa')))

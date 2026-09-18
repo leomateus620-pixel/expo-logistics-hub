@@ -1,3 +1,4 @@
+import { applyInteriorGroundMaterial } from './interiorGroundMaterial';
 import * as THREE from 'three';
 import { OPEN_GROUND_TEXTURE_SAMPLING_POLICY } from './openGroundTextures';
 
@@ -7,7 +8,8 @@ export type ParkingSurfaceKind = 'gravel' | 'soil' | 'grass';
 export const PARKING_SURFACE_PROFILES = {
   gravel: { color: '#b2ada0', roughness: 0.96, normalScale: 0.26, tileMeters: 6, grain: 0.2 },
   soil: { color: '#af957c', roughness: 0.97, normalScale: 0.14, tileMeters: 6, grain: 0.1 },
-  grass: { color: '#89916a', roughness: 0.98, normalScale: 0.2, tileMeters: 6, grain: 0.16 },
+  // Physical geometry scale only; grass colour/detail comes from Quadras A/B.
+  grass: { roughness: 0.96, normalScale: 0.22, tileMeters: 6 },
 } as const;
 
 export const PARKING_MATERIAL_BUDGET = {
@@ -49,10 +51,10 @@ function sampling(texture: THREE.Texture, maxAnisotropy: number) {
   texture.needsUpdate = true;
 }
 
-function createSurfaceTextures(kind: ParkingSurfaceKind, maxAnisotropy: number, reduced: boolean) {
+function createSurfaceTextures(kind: Exclude<ParkingSurfaceKind, 'grass'>, maxAnisotropy: number, reduced: boolean) {
   const size = PARKING_MATERIAL_BUDGET.textureSize;
   const profile = PARKING_SURFACE_PROFILES[kind];
-  const seed = kind === 'gravel' ? 473 : kind === 'soil' ? 821 : 1229;
+  const seed = kind === 'gravel' ? 473 : 821;
   const base = new THREE.Color(profile.color).convertLinearToSRGB();
   const heights = new Float32Array(size * size);
   const colorData = new Uint8Array(size * size * 4);
@@ -64,10 +66,9 @@ function createSurfaceTextures(kind: ParkingSurfaceKind, maxAnisotropy: number, 
       const clumps = periodicNoise(x / 16, y / 16, size / 16, seed + 53);
       const grain = (stone - 0.5) * 2 + (fine - 0.5) * 0.55;
       const modulation = 1 + grain * profile.grain + (clumps - 0.5) * 0.13;
-      const dryGrass = kind === 'grass' ? Math.max(0, clumps - 0.52) * 0.3 : 0;
-      colorData[i * 4] = Math.round(THREE.MathUtils.clamp(base.r * modulation + dryGrass, 0, 1) * 255);
-      colorData[i * 4 + 1] = Math.round(THREE.MathUtils.clamp(base.g * modulation + dryGrass * 0.55, 0, 1) * 255);
-      colorData[i * 4 + 2] = Math.round(THREE.MathUtils.clamp(base.b * modulation - dryGrass * 0.2, 0, 1) * 255);
+      colorData[i * 4] = Math.round(THREE.MathUtils.clamp(base.r * modulation, 0, 1) * 255);
+      colorData[i * 4 + 1] = Math.round(THREE.MathUtils.clamp(base.g * modulation, 0, 1) * 255);
+      colorData[i * 4 + 2] = Math.round(THREE.MathUtils.clamp(base.b * modulation, 0, 1) * 255);
       colorData[i * 4 + 3] = 255;
       heights[i] = stone * 0.65 + fine * 0.16 + clumps * 0.19;
     }
@@ -117,17 +118,17 @@ float parkingNoise(vec2 p) {
 
 /** One resource owner per mounted sector; camera movement never rebuilds textures. */
 export function createParkingMaterialSet(maxAnisotropy: number, reducedGraphics: boolean) {
-  const textures = Object.fromEntries((['gravel', 'soil', 'grass'] as const)
-    .map((kind) => [kind, createSurfaceTextures(kind, maxAnisotropy, reducedGraphics)])) as Record<
+  const textures = Object.fromEntries((['gravel', 'soil'] as const)
+    .map((kind) => [kind, createSurfaceTextures(kind, maxAnisotropy, reducedGraphics)])) as Partial<Record<
       ParkingSurfaceKind, ReturnType<typeof createSurfaceTextures>
-    >;
+    >>;
 
   const createMaterial = (kind: ParkingSurfaceKind, feather: boolean) => {
     const profile = PARKING_SURFACE_PROFILES[kind];
     const material = new THREE.MeshStandardMaterial({
       name: `rear-parking-${kind}${feather ? '-feather' : ''}`,
-      map: textures[kind].albedo,
-      normalMap: textures[kind].normal,
+      map: textures[kind]?.albedo ?? null,
+      normalMap: textures[kind]?.normal ?? null,
       normalScale: new THREE.Vector2(profile.normalScale, profile.normalScale),
       color: '#ffffff',
       roughness: profile.roughness,
@@ -155,7 +156,7 @@ diffuseColor.a *= clamp(vParkingAlpha * (0.82 + parkingPatch * 0.36), 0.0, 1.0);
 roughnessFactor = clamp(roughnessFactor * (0.96 + parkingPatch * 0.04), 0.9, 1.0);`);
     };
     material.customProgramCacheKey = () => `rear-parking-ground-r170-v1-${feather ? 'feather' : 'solid'}`;
-    return material;
+    return kind === 'grass' ? applyInteriorGroundMaterial(material) : material;
   };
   const solid = { gravel: createMaterial('gravel', false), soil: createMaterial('soil', false), grass: createMaterial('grass', false) };
   const feather = { gravel: createMaterial('gravel', true), soil: createMaterial('soil', true), grass: createMaterial('grass', true) };

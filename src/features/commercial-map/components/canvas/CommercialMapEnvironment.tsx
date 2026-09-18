@@ -22,6 +22,7 @@ import {
 } from 'postprocessing';
 import * as THREE from 'three';
 import { COMMERCIAL_MAP_GROUND_ELEVATION } from '../../constants';
+import { applyInteriorGroundMaterial } from './interiorGroundMaterial';
 import { publishContinuousGround } from '../../utils/continuousGroundMaterial';
 import {
   COMMERCIAL_MAP_ENVIRONMENT_CONFIG,
@@ -1250,10 +1251,10 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       cameraDistanceBounds.maxDistance,
       [extent.centerX, extent.centerZ],
     );
-    if (!terrainDetail) return material;
+    if (!terrainDetail) return applyInteriorGroundMaterial(material, 'internal-base');
 
     try {
-      return applyTerrainMultiscaleDetail(material, terrainDetail);
+      return applyInteriorGroundMaterial(applyTerrainMultiscaleDetail(material, terrainDetail), 'internal-base');
     } catch (error) {
       // Shader customization is presentation-only. A driver/library mismatch
       // must retain the original opaque PBR terrain instead of losing Canvas.

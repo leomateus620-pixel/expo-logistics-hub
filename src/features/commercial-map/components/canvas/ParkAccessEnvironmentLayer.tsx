@@ -12,6 +12,8 @@ import type { ParkAccessPolygon } from '../../data/parkAccessSpatialPlan';
 import type { ParkAccessEnvironmentPlacement } from '../../utils/parkAccessEnvironment';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 
+import { applyInteriorGroundMaterial } from './interiorGroundMaterial';
+
 const NO_RAYCAST = () => undefined;
 
 const SURFACE_USER_DATA = Object.freeze({
@@ -83,6 +85,9 @@ function createSurfaceGeometry(surface: ParkAccessEnvironmentSurface) {
     uvs[index * 2 + 1] = position.getZ(index) * 0.34;
   }
   geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+  // Ownership attribute keeps soil, trails and concrete in this same batch unchanged.
+  const grass = ['WOODLAND_FLOOR', 'NATURAL_GRASS_EDGE', 'LIGHT_GRASS', 'FIELD_TRANSITION'].includes(surface.kind);
+  geometry.setAttribute('interiorGrass', new THREE.Float32BufferAttribute(new Float32Array(position.count).fill(grass ? 1 : 0), 1));
   colorGeometry(geometry, PARK_ACCESS_ENVIRONMENT_PALETTE[surface.kind]);
   geometry.computeVertexNormals();
   return geometry;
@@ -257,7 +262,7 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
     trail: proceduralTexture('textura-procedural-caminho-bosque', 29, true),
   }), []);
   const materials = useMemo(() => ({
-    environment: createGroundMaterial(textures.environment),
+    environment: applyInteriorGroundMaterial(createGroundMaterial(textures.environment), 'access-grass'),
     trail: createGroundMaterial(textures.trail),
     tree: new THREE.MeshStandardMaterial({
       color: '#ffffff',

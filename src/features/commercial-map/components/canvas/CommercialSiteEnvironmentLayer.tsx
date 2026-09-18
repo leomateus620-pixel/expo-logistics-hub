@@ -16,6 +16,7 @@ import {
   type OpenGroundSurfaceProfile,
   type OpenGroundTextureBundle,
 } from './openGroundTextures';
+import { acquireInteriorGroundMaterial, releaseInteriorGroundMaterial } from './interiorGroundMaterial';
 import { applyParkGroundDetail } from './terrainMaterial';
 import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 
@@ -117,6 +118,7 @@ function createMaterial(
   reducedGraphics: boolean,
 ) {
   const definition = COMMERCIAL_SITE_ENVIRONMENT_MATERIALS[materialId];
+  if (materialId === 'grass-dry-mix') return acquireInteriorGroundMaterial({ opacity, polygonOffsetFactor: definition.polygonOffsetFactor, polygonOffsetUnits: -1 });
   const material = new THREE.MeshStandardMaterial({
     name: `CommercialSiteEnvironment:${materialId}`,
     color: '#ffffff',
@@ -165,7 +167,7 @@ export const CommercialSiteEnvironmentLayer = memo(function CommercialSiteEnviro
   const textureBundles = useMemo(() => Object.freeze(Object.fromEntries(
     (Object.keys(SITE_MATERIAL_PROFILES) as CommercialSiteEnvironmentMaterialId[]).map((materialId) => [
       materialId,
-      openGroundTextureBundleForEntity(SITE_MATERIAL_PROFILES[materialId], maximumAnisotropy),
+      materialId === 'grass-dry-mix' ? null : openGroundTextureBundleForEntity(SITE_MATERIAL_PROFILES[materialId], maximumAnisotropy),
     ]),
   )) as Readonly<Record<CommercialSiteEnvironmentMaterialId, OpenGroundTextureBundle | null>>, [maximumAnisotropy]);
   const batches = useMemo(() => (
@@ -189,7 +191,8 @@ export const CommercialSiteEnvironmentLayer = memo(function CommercialSiteEnviro
   useEffect(() => () => {
     batches.forEach((batch) => {
       batch.geometry.dispose();
-      batch.material.dispose();
+      if (batch.materialId === 'grass-dry-mix') releaseInteriorGroundMaterial(batch.material);
+      else batch.material.dispose();
     });
   }, [batches]);
 

@@ -77,7 +77,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(materialSetup).toContain('qualityTier,');
     expect(materialSetup).toContain('[extent.centerX, extent.centerZ]');
     expect(materialSetup).toContain('applyTerrainMultiscaleDetail(material, terrainDetail)');
-    expect(materialSetup).toContain('if (!terrainDetail) return material;');
+    expect(materialSetup).toContain("if (!terrainDetail) return applyInteriorGroundMaterial(material, 'internal-base');");
     expect(materialSetup).toContain('catch (error)');
     expect(materialSetup).toContain('return createBaseMaterial();');
     expect(environment).toContain(

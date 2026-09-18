@@ -25,6 +25,9 @@ import { integrateGroundGeometryWithRearRoads } from '../../utils/rearRoadGround
 import { ArenaAccessStructure } from './ArenaAccessStructure';
 import { MiranteComplexGrounds } from './MiranteComplexGrounds';
 
+import { useInteriorGroundMaterial } from './interiorGroundMaterial';
+import { alignContinuousGroundUv, useContinuousGround } from '../../utils/continuousGroundMaterial';
+
 const NO_RAYCAST = () => undefined;
 const UNIT_Y = new THREE.Vector3(0, 1, 0);
 const BASE_Y = ARENA_TERRAIN_BASE_ELEVATION;
@@ -185,30 +188,14 @@ function createTerrainGeometry() {
   geometry.translate(bounds.centerX, 0, bounds.centerZ);
 
   const position = geometry.attributes.position as THREE.BufferAttribute;
-  const colors = new Float32Array(position.count * 3);
-  const grass = new THREE.Color('#8fa869');
-  const soil = new THREE.Color('#a98a63');
-  const color = new THREE.Color();
 
   for (let index = 0; index < position.count; index += 1) {
     const x = position.getX(index);
     const z = position.getZ(index);
     const elevation = arenaTerrainElevation(x, z);
     position.setY(index, elevation);
-    // Solo exposto onde a encosta é mais castigada; grama no restante.
-    const wear = THREE.MathUtils.clamp(
-      (Math.sin(x * 0.51 + z * 0.37) * 0.5 + 0.5) * 0.7
-      + (elevation - BASE_Y) * 0.35,
-      0,
-      1,
-    );
-    color.copy(grass).lerp(soil, wear * 0.42);
-    colors[index * 3] = color.r;
-    colors[index * 3 + 1] = color.g;
-    colors[index * 3 + 2] = color.b;
   }
   position.needsUpdate = true;
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
   // Exact subtraction preserves edge vertices/UVs: no grass teeth over steps.
   clipPlanarSurfaceGeometry(geometry, ARENA_TERRAIN_CUTS);
@@ -441,20 +428,35 @@ function buildMetalSegments(
 }
 
 function ArenaTerrain({ opacity }: { opacity: number }) {
-  const { invalidate } = useThree();
+  const { invalidate, scene } = useThree();
   const terrain = useMemo(createTerrainGeometry, []);
-  const texture = useMemo(() => tiledSurfaceTexture(
-    'grass',
-    terrain.bounds.width / 7.5,
-    terrain.bounds.depth / 7.5,
-  ), [terrain.bounds.depth, terrain.bounds.width]);
+  const fallback = useInteriorGroundMaterial(opacity, 0, 0, opacity > .94);
+  const continuousGround = useContinuousGround(scene);
+  // Borrow the existing surface so the feather matches its exterior texels,
+  // normal phase and illumination, including where the sloped mesh ends.
+  const ground = continuousGround?.material.userData.interiorGround ? continuousGround : null;
+  const faded = useMemo(() => {
+    if (!ground || opacity >= .999) return null;
+    const material = ground.material.clone();
+    material.onBeforeCompile = ground.material.onBeforeCompile;
+    material.customProgramCacheKey = ground.material.customProgramCacheKey;
+    material.opacity = opacity;
+    material.transparent = true;
+    material.depthWrite = opacity > .94;
+    return material;
+  }, [ground, opacity]);
+  const material = faded ?? ground?.material ?? fallback;
+  useLayoutEffect(() => {
+    if (ground) alignContinuousGroundUv(terrain.geometry, ground);
+    invalidate();
+  }, [ground, terrain, invalidate]);
+  useEffect(() => () => faded?.dispose(), [faded]);
 
   useEffect(() => {
     invalidate();
   }, [invalidate, opacity]);
 
   useEffect(() => () => terrain.geometry.dispose(), [terrain]);
-  useEffect(() => () => texture?.dispose(), [texture]);
 
   return (
     <mesh
@@ -463,17 +465,9 @@ function ArenaTerrain({ opacity }: { opacity: number }) {
       receiveShadow
       raycast={NO_RAYCAST}
       userData={TERRAIN_USER_DATA}
+      dispose={null}
     >
-      <meshStandardMaterial
-        map={texture ?? undefined}
-        vertexColors
-        color="#ffffff"
-        roughness={1}
-        metalness={0}
-        transparent={opacity < 0.999}
-        opacity={opacity}
-        depthWrite={opacity > 0.94}
-      />
+      <primitive object={material} attach="material" />
     </mesh>
   );
 }
