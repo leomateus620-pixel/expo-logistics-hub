@@ -9,6 +9,10 @@ type Scope = 'all' | 'internal-base' | 'access-grass';
 type Atlas = ReturnType<typeof createInteriorGroundReferenceAtlas>;
 let pool: { atlas: Atlas; users: number } | undefined;
 const installed = new WeakSet<THREE.MeshStandardMaterial>();
+// React Fast Refresh can retain a Three material after this module's WeakSet
+// is replaced. Tag the installed hook itself to avoid injecting GLSL twice.
+const HOOK_MARKER = Symbol.for('commercial-map.interior-ground-hook');
+type GroundHook = THREE.MeshStandardMaterial['onBeforeCompile'] & { [HOOK_MARKER]?: true };
 const materials = new Map<string, { material: THREE.MeshStandardMaterial; users: number }>();
 
 function acquireAtlas(material: THREE.MeshStandardMaterial) {
@@ -88,7 +92,7 @@ float interiorOwned(vec2 p) { float weight=0.; ${ownershipMask} return weight; }
  * soil and paving shaders remain byte-for-byte active everywhere else.
  */
 export function applyInteriorGroundMaterial(material: THREE.MeshStandardMaterial, scope: Scope = 'all') {
-  if (installed.has(material)) return material;
+  if (installed.has(material) || (material.onBeforeCompile as GroundHook)[HOOK_MARKER]) return material;
   const atlas = acquireAtlas(material);
   const noise = groundNoiseForMaterial(material);
   const upstream = material.onBeforeCompile;
@@ -162,6 +166,7 @@ export function applyInteriorGroundMaterial(material: THREE.MeshStandardMaterial
       }`);
   };
   material.customProgramCacheKey = () => `${upstreamKey}:park-interior-quadras-ab-v1:${scope}`;
+  (material.onBeforeCompile as GroundHook)[HOOK_MARKER] = true;
   installed.add(material);
   material.needsUpdate = true;
   return material;

@@ -78,4 +78,15 @@ describe('canonical interior ground ownership and resources', () => {
     expect(compile(nations).uniforms.interiorAlbedo.value).toBe(compile(site).uniforms.interiorAlbedo.value);
     releaseInteriorGroundMaterial(nations);releaseInteriorGroundMaterial(site);
   });
+  it('does not inject the shader again when Fast Refresh retains the material', async () => {
+    const material = applyInteriorGroundMaterial(new THREE.MeshStandardMaterial());
+    const before = compile(material);
+    vi.resetModules();
+    const refreshed = await import('../features/commercial-map/components/canvas/interiorGroundMaterial');
+    refreshed.applyInteriorGroundMaterial(material);
+    const after = compile(material);
+    expect(after.fragmentShader).toBe(before.fragmentShader);
+    expect(after.uniforms.interiorAlbedo.value).toBe(before.uniforms.interiorAlbedo.value);
+    material.dispose();
+  });
 });
