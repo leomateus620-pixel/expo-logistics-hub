@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { ROAD_MATERIAL_COLORS, ROAD_SURFACE_PROFILE } from '../../constants';
+import { ROAD_MATERIAL_COLORS } from '../../constants';
 import { applyRuralMaterialDetail, ruralSurfaceKind } from '../../utils/ruralMaterialDetail';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../../data/parkAccessSpatialPlan';
@@ -14,7 +14,8 @@ import {
   EXPORURAL_PARK_ACCESS_INFRASTRUCTURE_INPUT,
   PARK_ACCESS_INFRASTRUCTURE_INPUT,
 } from '../../utils/parkAccessSpatialPlanAdapter';
-import { applyParkSurfaceDetail, bindParkSurfaceMaterial, PARK_SURFACE_PROFILES } from './parkSurfaceMaterial';
+import { applyParkSurfaceDetail, bindParkSurfaceMaterial } from './parkSurfaceMaterial';
+import { openGroundTextureBundleForEntity, HIGHWAY_ASPHALT_SURFACE_PROFILE, HIGHWAY_ASPHALT_NORMAL_SCALE } from './openGroundTextures';
 
 export type ParkAccessInfrastructureScope = 'all' | 'exporural';
 
@@ -90,40 +91,6 @@ function createInfrastructureTexture(
 function roughnessTexture(colorTexture: THREE.DataTexture) {
   const texture = colorTexture.clone();
   texture.colorSpace = THREE.NoColorSpace;
-  texture.needsUpdate = true;
-  return texture;
-}
-
-function createAsphaltTexture() {
-  const size = 64;
-  const data = new Uint8Array(size * size * 4);
-  for (let y = 0; y < size; y += 1) {
-    for (let x = 0; x < size; x += 1) {
-      const fine = (textureNoise(x, y, 3107) - 0.5) * 12;
-      const aggregateNoise = textureNoise(Math.floor(x / 2), Math.floor(y / 2), 7739);
-      const aggregate = aggregateNoise > 0.82
-        ? 8 + (aggregateNoise - 0.82) * 20
-        : aggregateNoise < 0.12 ? -8 : 0;
-      const wear = Math.sin(x * 0.15 + y * 0.08) * 3.2
-        + Math.cos(y * 0.19 - x * 0.05) * 2.4;
-      const offset = (y * size + x) * 4;
-      data[offset] = THREE.MathUtils.clamp(Math.round(176 + fine + aggregate + wear), 0, 255);
-      data[offset + 1] = THREE.MathUtils.clamp(Math.round(179 + fine + aggregate + wear), 0, 255);
-      data[offset + 2] = THREE.MathUtils.clamp(Math.round(179 + fine + aggregate + wear * 0.8), 0, 255);
-      data[offset + 3] = 255;
-    }
-  }
-  const texture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat, THREE.UnsignedByteType);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  // The two-pixel aggregate is about five centimetres at the working scale,
-  // instead of reading as cobblestones on the reconstructed junctions.
-  texture.repeat.set(4, 4);
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = true;
-  texture.anisotropy = 4;
-  texture.colorSpace = THREE.SRGBColorSpace;
   texture.needsUpdate = true;
   return texture;
 }
@@ -214,8 +181,6 @@ function createCobblestoneTexture() {
   return texture;
 }
 
-const ASPHALT_TEXTURE = createAsphaltTexture();
-const ASPHALT_ROUGHNESS = roughnessTexture(ASPHALT_TEXTURE);
 const COBBLESTONE_TEXTURE = createCobblestoneTexture();
 const COBBLESTONE_ROUGHNESS = roughnessTexture(COBBLESTONE_TEXTURE);
 const GRAVEL_TEXTURE = createGravelTexture();
@@ -346,6 +311,17 @@ function SurfaceMaterial({
   reducedGraphics: boolean;
 }) {
   const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
+  const maxAnisotropy = useThree(state => state.gl.capabilities.getMaxAnisotropy());
+  const asphaltTextures = useMemo(() => kind === 'asphalt' && !reducedGraphics
+    ? openGroundTextureBundleForEntity(HIGHWAY_ASPHALT_SURFACE_PROFILE, maxAnisotropy)
+    : null, [kind, reducedGraphics, maxAnisotropy]);
+  useLayoutEffect(() => {
+    // Map presence changes shader defines. R3F assigns texture props without
+    // bumping material.version; do not depend on an unrelated envMap/path change
+    // to compile the textured or compatibility variant before old maps release.
+    if (kind === 'asphalt' && materialRef.current) materialRef.current.needsUpdate = true;
+  }, [asphaltTextures, kind]);
+  useEffect(() => () => asphaltTextures?.dispose(), [asphaltTextures]);
   // Parent meshes deliberately opt out of R3F disposal because their geometry
   // belongs to the render model. Their locally-created materials still belong
   // to this component and must be released when it leaves the tree.
@@ -361,10 +337,12 @@ function SurfaceMaterial({
   const transparent = opacity < 0.995;
   if (kind === 'asphalt') return (
     <meshStandardMaterial
-      color={ROAD_MATERIAL_COLORS.asphalt}
-      map={reducedGraphics ? undefined : ASPHALT_TEXTURE}
-      roughnessMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS}
-      roughness={ROAD_SURFACE_PROFILE.asphaltRoughness}
+      color={HIGHWAY_ASPHALT_SURFACE_PROFILE.baseColor}
+      map={asphaltTextures?.map}
+      normalMap={asphaltTextures?.normalMap}
+      normalScale={asphaltTextures ? HIGHWAY_ASPHALT_NORMAL_SCALE : undefined}
+      roughnessMap={asphaltTextures?.roughnessMap}
+      roughness={HIGHWAY_ASPHALT_SURFACE_PROFILE.roughness}
       metalness={0}
       transparent={transparent}
       opacity={opacity}
@@ -373,10 +351,8 @@ function SurfaceMaterial({
       polygonOffset
       polygonOffsetFactor={-1}
       polygonOffsetUnits={-1}
-      // Two superimposed normal perturbations produced bright crawling grain
-      // along the avenue at oblique views. Keep albedo/roughness detail while
-      // its broad, almost-flat asphalt uses the geometric surface normal.
-      ref={(material) => { ownMaterial(material); if (material) applyParkSurfaceDetail(material, { ...PARK_SURFACE_PROFILES.asphalt, normalStrength: 0 }, reducedGraphics); }}
+      // Match the retained territorial roadway without a second grain shader.
+      ref={ownMaterial}
     />
   );
   if (kind === 'cobblestone') return (

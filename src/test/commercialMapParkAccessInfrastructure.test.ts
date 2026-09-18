@@ -420,7 +420,9 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       renderer.indexOf("if (kind === 'cobblestone')"),
     );
 
-    expect(renderer).toContain('function createAsphaltTexture()');
+    expect(renderer).not.toContain('function createAsphaltTexture()');
+    expect(renderer).toContain('openGroundTextureBundleForEntity(HIGHWAY_ASPHALT_SURFACE_PROFILE, maxAnisotropy)');
+    expect(renderer).toContain('asphaltTextures?.dispose()');
     expect(renderer).toContain('function createGravelTexture()');
     expect(renderer).toContain('function createCobblestoneTexture()');
     expect(renderer).toContain('const size = 64;');
@@ -428,17 +430,18 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     expect(renderer).toContain('verticalJointJitter');
     expect(renderer).toContain('const COBBLESTONE_ROUGHNESS');
     expect(renderer).toContain("if (kind === 'asphalt')");
-    expect(renderer).toContain('color={ROAD_MATERIAL_COLORS.asphalt}');
-    expect(asphaltMaterial).toContain('color={ROAD_MATERIAL_COLORS.asphalt}');
-    expect(asphaltMaterial).toContain('map={reducedGraphics ? undefined : ASPHALT_TEXTURE}');
-    expect(asphaltMaterial).toContain('roughnessMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS}');
-    expect(asphaltMaterial).toContain('roughness={ROAD_SURFACE_PROFILE.asphaltRoughness}');
-    expect(asphaltMaterial).toContain('...PARK_SURFACE_PROFILES.asphalt, normalStrength: 0');
+
+    expect(asphaltMaterial).toContain('color={HIGHWAY_ASPHALT_SURFACE_PROFILE.baseColor}');
+    expect(asphaltMaterial).toContain('map={asphaltTextures?.map}');
+    expect(asphaltMaterial).toContain('roughnessMap={asphaltTextures?.roughnessMap}');
+    expect(asphaltMaterial).toContain('roughness={HIGHWAY_ASPHALT_SURFACE_PROFILE.roughness}');
+    expect(asphaltMaterial).not.toContain('applyParkSurfaceDetail');
+    expect(asphaltMaterial).toContain('normalScale={asphaltTextures ? HIGHWAY_ASPHALT_NORMAL_SCALE : undefined}');
     expect(asphaltMaterial).toContain('depthTest');
     expect(asphaltMaterial).toContain('depthWrite');
     expect(asphaltMaterial).not.toContain('bumpMap=');
     expect(asphaltMaterial).not.toContain('bumpScale=');
-    expect(renderer).toContain('map={reducedGraphics ? undefined : ASPHALT_TEXTURE}');
+    expect(renderer).toContain('map={asphaltTextures?.map}');
     expect(renderer).toContain("if (kind === 'gravel')");
     expect(renderer).toContain('map={reducedGraphics ? undefined : GRAVEL_TEXTURE}');
     expect(renderer).toContain("if (kind === 'cobblestone')");

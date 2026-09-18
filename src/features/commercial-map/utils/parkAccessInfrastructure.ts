@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { accessPavementGeometry, unionAccessPavement } from './accessJunctionGeometry';
+import { ACCESS_JUNCTION_CIRCLE_SEGMENTS, accessPavementGeometry, unionAccessPavement } from './accessJunctionGeometry';
 import { ACCESS_JUNCTION } from '../data/accessJunctionReconstruction';
 import { mergeBufferGeometries } from 'three-stdlib';
 import {
@@ -132,8 +132,10 @@ export const PARK_ACCESS_INFRASTRUCTURE_PROFILE = {
   dashLength: 0.44,
   dashGap: 0.3,
   minimumSegmentLength: 0.012,
-  detailedCircleSegments: 48,
-  reducedCircleSegments: 30,
+  detailedCircleSegments: ACCESS_JUNCTION_CIRCLE_SEGMENTS,
+  // Ownership clipping in the territory renderer uses this same 48-sided
+  // boundary. Reducing only one side would open small crescent-shaped gaps.
+  reducedCircleSegments: ACCESS_JUNCTION_CIRCLE_SEGMENTS,
   supportClearance: 0.009,
   detailedRibbonSampleSpacing: 0.42,
   reducedRibbonSampleSpacing: 0.62,

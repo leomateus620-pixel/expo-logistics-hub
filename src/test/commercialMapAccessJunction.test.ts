@@ -7,6 +7,7 @@ import { accessCircle, accessCorridor, accessPavementGeometry, unionAccessPaveme
 import { buildTerritoryRoadGeometry, TERRITORY_ROAD_Y } from '../features/commercial-map/utils/territorialRoadGeometry';
 import { clipContextRoad, isProtectedCommercialMapRoad } from '../features/commercial-map/data/commercialMapSpatialBounds';
 import { pointInPolygon } from '../features/commercial-map/utils/spatialSurface';
+import { buildParkAccessRenderModel, disposeParkAccessRenderModel } from '../features/commercial-map/utils/parkAccessInfrastructure';
 
 const input = PARK_ACCESS_INFRASTRUCTURE_INPUT;
 const unionSurfaces = input.roadSurfaces.filter(surface => surface.junctionUnion);
@@ -59,6 +60,11 @@ describe('registered Gate 1 and Tuparendi junction ownership', () => {
     const geometry = accessPavementGeometry(pavement, ACCESS_JUNCTION.elevation)!;
     try {
       const position = geometry.getAttribute('position');
+      const uv = geometry.getAttribute('uv');
+      for (let index = 0; index < position.count; index += 1) {
+        expect(uv.getX(index)).toBe(position.getX(index));
+        expect(uv.getY(index)).toBe(position.getZ(index));
+      }
       const indices = geometry.index!;
       let trianglesArea = 0;
       for (let i = 0; i < indices.count; i += 3) {
@@ -69,6 +75,22 @@ describe('registered Gate 1 and Tuparendi junction ownership', () => {
       expect(trianglesArea).toBeCloseTo(area(pavement), 3);
       expect(ACCESS_JUNCTION.elevation).toBe(TERRITORY_ROAD_Y);
     } finally { geometry.dispose(); }
+  });
+
+  it('keeps exactly the same canonical asphalt boundary in detailed and economy modes', () => {
+    // Isolate the actual renderer's junction layer from support-aware roads:
+    // architectural LOD can vary, but this shared ownership edge cannot.
+    const junctionInput = { ...input, roadSurfaces: unionSurfaces, sidewalkSurfaces: [], curbSegments: [],
+      parkingBays: [], markingSegments: [], gates: [], costeiros: null };
+    const detailed = buildParkAccessRenderModel(junctionInput);
+    const economy = buildParkAccessRenderModel(junctionInput, { reducedGraphics: true });
+    try {
+      expect(Array.from(economy.geometries.asphalt!.getAttribute('position').array))
+        .toEqual(Array.from(detailed.geometries.asphalt!.getAttribute('position').array));
+      expect(Array.from(economy.geometries.asphalt!.index!.array))
+        .toEqual(Array.from(detailed.geometries.asphalt!.index!.array));
+      expect(economy.diagnostics.withinBudget).toBe(true);
+    } finally { disposeParkAccessRenderModel(detailed); disposeParkAccessRenderModel(economy); }
   });
 
   it('cuts old territory pavement and paint at the transferred owner boundary', () => {

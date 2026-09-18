@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import originalD4 from './fixtures/rural-d4-pr155-4f8bdf37.json';
 import { OFFICIAL_REFERENCE_ENTITIES, officialPdfPointToLocal } from '@/features/commercial-map/data/officialReference2026';
 import { RURAL_PAVILIONS, RURAL_PAVILION_NEIGHBOR_BOUNDS, RURAL_PAVILION_REVISION, reconstructRuralPavilionEntity, ruralSourceBounds, ruralSourceRing } from '@/features/commercial-map/data/ruralPavilionReconstruction';
 import { PARK_ACCESS_SPATIAL_PLAN, parkAccessSourcePointToLocal } from '@/features/commercial-map/data/parkAccessSpatialPlan';
@@ -19,6 +20,22 @@ describe('D4 and Test Drive photographic architecture publication', () => {
     expect(tent).toMatchObject({ id: 'reference:2026:d4', publicIdentifier: 'D4', name: 'Tenda da Pecuária',
       classification: 'LIVESTOCK_AREA', parentEntityId: 'reference:2026:quadra-n',
       metadata: { ruralReconstructionRevision: RURAL_PAVILION_REVISION, officialMeasurements: false } });
+    // Aggregate historical hashes substitute D4's former record. Preserve its
+    // complete remaining contract here, allowing only the authorized footprint
+    // and explicit reconstruction metadata to differ from that frozen record.
+    const { reconstructionPlacementReason, ...metadata } = tent.metadata;
+    expect(reconstructionPlacementReason).toBe('Preserve street-facing x2840; trim rear to B28 west edge minus 3 source units, including roof envelope.');
+    expect(tent.metadata.reconstructionAnchors).toEqual(['D4', 'Q-Q-01', 'B9', 'B28']);
+    expect({
+      ...tent,
+      geometry: { ...tent.geometry, coordinates: originalD4.entity.geometry.coordinates },
+      metadata: {
+        ...metadata,
+        sourcePdfPolygon: originalD4.entity.metadata.sourcePdfPolygon,
+        ruralReconstructionRevision: originalD4.entity.metadata.ruralReconstructionRevision,
+        reconstructionAnchors: originalD4.entity.metadata.reconstructionAnchors,
+      },
+    }).toEqual(originalD4.entity);
     const centre = officialPdfPointToLocal(RURAL_PAVILIONS.livestock.sourceCenter);
     expect(bounds.centerX).toBeCloseTo(centre[0], 8);
     expect(bounds.centerZ).toBeCloseTo(centre[1], 8);

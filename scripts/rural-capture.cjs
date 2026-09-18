@@ -14,7 +14,9 @@ const local = (x,z) => [(x-600)/5500*120-60,(z-900)/4150*90.545455-90.545455/2];
 const poses = {};
 for(const [id,source,yaw] of [['test-drive',[917.5,2972.5],0],['pecuaria',[2925,2525],-Math.PI/2]]) {
   const [x,z]=local(...source);
-  for(const [name,[a,y,b]] of Object.entries({front:[.01,1.5,6.8],side:[6.5,2.4,.3],rear:[.01,2,-6.8],oblique:[5,4.7,6],top:[.01,10,0]}))
+  // The adjacent B28 occupies the low rear camera of D4. Raise that view
+  // above its roof without hiding or changing the neighbouring structure.
+  for(const [name,[a,y,b]] of Object.entries({front:[.01,1.5,6.8],side:[6.5,2.4,.3],rear:[.01,id==='pecuaria'?12:2,-6.8],oblique:[5,4.7,6],top:[.01,10,0]}))
     poses[`${id}-${name}`]={target:[x,.35,z],position:[x+a*Math.cos(yaw)+b*Math.sin(yaw),y,z-a*Math.sin(yaw)+b*Math.cos(yaw)]};
 }
 poses['access-top']={target:[-57,0,21],position:[-56.99,38,21]};
@@ -62,12 +64,14 @@ for(const [id,source,distance] of [['parking',[5250,3800],28],['pavilion-court',
       await page.waitForFunction(()=>!!document.querySelector('canvas')?.dataset.territoryReport,null,{timeout:60000});
       report.metrics.push(await page.locator('canvas').evaluate(c=>JSON.parse(c.dataset.territoryReport)));
     }
-    for(let i=0;i<4;i++) for(const mode of ['night','economy','day']) {
+    // Hydration/LOD and asynchronous shader compilation can finish after a
+    // transition. Six full cycles expose a bounded warmup separately from leaks.
+    for(let i=0;i<6;i++) for(const mode of ['night','economy','day']) {
       await page.evaluate(mode=>{const s=window.qaStore.getState();s.setNightModeActive(mode==='night');s.setReducedGraphics(mode==='economy');},mode);
-      await event({...poses['pecuaria-oblique'],keepRendering:true});await page.waitForTimeout(1200);
+      await event({...poses['pecuaria-oblique'],keepRendering:true});await page.waitForTimeout(3000);
       report.stress.push({mode,...await inspect()});
-      if(i===3 && mode==='economy')report.compatibilityNoticeVisible=await page.getByText('Perfil de compatibilidade ativo:',{exact:false}).count();
-      if(i===3 && mode==='night')await page.screenshot({path:path.join(output,'pecuaria-night.png')});
+      if(i===5 && mode==='economy')report.compatibilityNoticeVisible=await page.getByText('Perfil de compatibilidade ativo:',{exact:false}).count();
+      if(i===5 && mode==='night')await page.screenshot({path:path.join(output,'pecuaria-night.png')});
     }
     report.resourcePlateau={};
     for(const mode of ['night','economy','day']) {
@@ -121,6 +125,16 @@ for(const [id,source,distance] of [['parking',[5250,3800],28],['pavilion-court',
     }
     const states=[...Object.values(report.views),...report.stress,...(report.interactions||[])];
     if(states.some(s=>s.health.status!=='ready'||s.health.contextLosses||s.health.lastErrorCode))throw new Error('Renderer health failed');
+    // Record allocation budgets only after the live measurements, then dispose
+    // these CPU-only verification models without adding them to the scene.
+    report.accessBudgets=await page.evaluate(async()=>{
+      const {buildParkAccessRenderModel,disposeParkAccessRenderModel}=await import('/src/features/commercial-map/utils/parkAccessInfrastructure.ts');
+      const {PARK_ACCESS_INFRASTRUCTURE_INPUT}=await import('/src/features/commercial-map/utils/parkAccessSpatialPlanAdapter.ts');
+      return [false,true].map(reducedGraphics=>{
+        const model=buildParkAccessRenderModel(PARK_ACCESS_INFRASTRUCTURE_INPUT,{reducedGraphics});
+        try {return {reducedGraphics,...model.diagnostics};}finally {disposeParkAccessRenderModel(model);}
+      });
+    });
     report.overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);
     if(report.overflow)throw new Error('Horizontal overflow');
     report.status=report.errors.length?'failed':'passed';
