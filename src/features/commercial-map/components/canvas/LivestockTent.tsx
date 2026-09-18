@@ -3,6 +3,7 @@ import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { LIVESTOCK_TENT_RENDER_BUDGET, LIVESTOCK_TENT_REVISION } from '../../utils/livestockTent';
 import { ruralBuildingRecipe, buildRuralGeometry } from '../../utils/ruralArchitecture';
+import { applyRuralMaterialDetail } from '../../utils/ruralMaterialDetail';
 import type { StrategicLandmarkBounds } from '../../utils/landmarks';
 
 const NO_RAYCAST = () => undefined;
@@ -42,11 +43,15 @@ export const LivestockTent = memo(function LivestockTent({ bounds, height, showD
   const geometry=useMemo(()=>buildRuralGeometry(recipe),[recipe]);
   // Three batches cover all members, regardless of the number of openings.
   // Materials and geometry are owned here; no shared landmark material disposed.
-  const material=useMemo(()=>({
+  const material=useMemo(()=>{
+    const materials={
     opaque:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.87,metalness:.035}),
     metal:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.74,metalness:.13}),
     glass:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.49,metalness:.08}),
-  }),[]);
+    };
+    Object.values(materials).forEach(applyRuralMaterialDetail);
+    return materials;
+  },[]);
   const texture=useMemo(identityTexture,[]);
   const sign=useMemo(()=>new THREE.MeshStandardMaterial({map:texture,color:'#dcded3',roughness:.88,metalness:0}),[texture]);
   const signGeometry=useMemo(()=>new THREE.BoxGeometry(bounds.width*.39,.21,.022),[bounds.width]);

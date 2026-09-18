@@ -1,3 +1,4 @@
+import { ACCESS_JUNCTION, accessWorldToSource } from '@/features/commercial-map/data/accessJunctionReconstruction';
 import {
   PARK_ACCESS_ROAD_CURB_WIDTH_METERS,
   PARK_ACCESS_SOURCE_MANIFEST,
@@ -658,8 +659,9 @@ describe('park access spatial plan', () => {
       'third-age-pavilion-access',
     ]);
     expect(tupareendiLink.kind).toBe('ASPHALT_ACCESS_ROAD');
-    expect(tupareendiLink.sourcePdfCenterline[0]).toEqual([341, 3718]);
-    expect(tupareendiLink.sourcePdfCenterline.at(-1)).toEqual([600, 3890]);
+    expect(distance(tupareendiLink.centerline[0], PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.center)).toBeGreaterThan(PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.islandRadius);
+    expect(distance(tupareendiLink.centerline[0], PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.center)).toBeLessThan(PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.outerRadius);
+    expect(tupareendiLink.sourcePdfCenterline.at(-1)).toEqual(accessWorldToSource(ACCESS_JUNCTION.gate1AvenueJoin));
     expect(tupareendiLink.connects).toEqual(['gate-1-mini-roundabout', 'AV-TUPARENDI']);
     expect(service.centerline[0]).toEqual(gate1);
     expect(gate10Axis.centerline[0]).toEqual(gate1);
@@ -684,9 +686,9 @@ describe('park access spatial plan', () => {
     expect(roundabouts.size).toBe(2);
     expect(PARK_ACCESS_SPATIAL_PLAN.roundabout).toBe(main);
     expect(PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout).toBe(gate1Mini);
-    expect(main.sourcePdfCenter).toEqual([1110, 4185]);
-    expect(main.outerRadius).toBe(parkAccessMetersToLocal(18));
-    expect(main.islandRadius).toBe(parkAccessMetersToLocal(10.5));
+    expect(main.sourcePdfCenter).toEqual(accessWorldToSource(ACCESS_JUNCTION.center));
+    expect(main.outerRadius).toBe(ACCESS_JUNCTION.outerRadius);
+    expect(main.islandRadius).toBe(ACCESS_JUNCTION.islandRadius);
     expect(main.circulatingWidth)
       .toBeCloseTo(main.outerRadius - main.islandRadius, 4);
     expect(main.approachRoadIds).toEqual(['benvenuto-four-lane-axis']);

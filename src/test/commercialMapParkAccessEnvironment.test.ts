@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
+import polygonClipping, { type MultiPolygon } from 'polygon-clipping';
+import { PAVILION_COURTYARD } from '@/features/commercial-map/data/pavilionCourtyard';
 import {
   PARK_ACCESS_AMBIENT_TREE_FOOTPRINT_CLEARANCE,
   PARK_ACCESS_ENVIRONMENT_REVISION,
@@ -121,7 +123,7 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
     )!;
 
     expect(presentation.revision).toBe(PARK_ACCESS_ENVIRONMENT_REVISION);
-    expect(PARK_ACCESS_ENVIRONMENT_REVISION).toBe('2026.8-park-access-environment.r3');
+    expect(PARK_ACCESS_ENVIRONMENT_REVISION).toBe('2026.9-park-access-environment.r4');
     expect(presentation.diagnostics.sourceSpatialRevision).toBe(PARK_ACCESS_SPATIAL_PLAN.revision);
     expect(presentation.diagnostics.sourceSpatialRevision).toBe('2026.8-park-access-annexes.5');
     expect(woodlandFloor.polygon).toBe(PARK_ACCESS_SPATIAL_PLAN.woodlandMass.polygon);
@@ -141,8 +143,15 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
     woodlandFloor.holes.forEach((hole) => {
       expect(isParkAccessPolygonFullyContained(hole, woodlandFloor.polygon)).toBe(true);
     });
-    expect(naturalEdge.polygon).toBe(PARK_ACCESS_SPATIAL_PLAN.woodlandPath.edgeBands[0].polygon);
-    expect(naturalEdge.holes).toEqual([PARK_ACCESS_SPATIAL_PLAN.woodlandPath.surfacePolygon]);
+    // The former grass end-cap is cut at the new concrete connector. Preserve
+    // the GIS envelope, with no buried grass or invalid crossing Shape.holes.
+    const naturalEdges = presentation.environmentalSurfaces.filter(surface =>
+      surface.id.startsWith(naturalEdge.id));
+    for (const edge of naturalEdges) {
+      const polygons: MultiPolygon = [[edge.polygon, ...edge.holes]
+        .map(ring => ring.map(p => [p[0], p[1]]))];
+      expect(polygonClipping.intersection(polygons, PAVILION_COURTYARD.hardscape)).toEqual([]);
+    }
     expect(trail.polygon).toBe(PARK_ACCESS_SPATIAL_PLAN.woodlandPath.surfacePolygon);
     expect(trail.notes).toBe(PARK_ACCESS_SPATIAL_PLAN.woodlandPath.notes);
     expect(PARK_ACCESS_ENVIRONMENT_SOURCE_REFERENCES.join(' ')).toMatch(/Anexo 1/);

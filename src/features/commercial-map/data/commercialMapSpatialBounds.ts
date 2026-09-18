@@ -25,6 +25,10 @@ export const COMMERCIAL_MAP_SPATIAL_BOUNDS = Object.freeze({
   // Source extraction envelope, only used to document the retained through axes.
   farContextBounds: Object.freeze({ minX: -175, maxX: 230, minZ: -225, maxZ: 240 }),
   protectedRoads: Object.freeze([
+    'roundabout-tupareendi', 'gate-1-mini-roundabout', 'tuparendi-west-seam',
+    'gate-1-local-access', 'gate-1-roundabout-tupareendi-link',
+    'gate-1-apron', 'gate-2-apron', 'gate-3-arrival',
+    'benvenuto-four-lane-axis', 'benvenuto-roundabout-mouth',
     // Full BR-472 / ERS-344 axes, Tuparendi and the source's major collectors.
     'osm-38993601-0', 'osm-40144091-0', 'osm-50074637-0', 'osm-203230187-0',
     'osm-334317743-0', 'osm-334317744-0', 'osm-334317745-0', 'osm-334317748-0',

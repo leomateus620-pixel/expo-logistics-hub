@@ -21,6 +21,8 @@ import {
   ToneMappingMode,
 } from 'postprocessing';
 import * as THREE from 'three';
+import { COMMERCIAL_MAP_GROUND_ELEVATION } from '../../constants';
+import { publishContinuousGround } from '../../utils/continuousGroundMaterial';
 import {
   COMMERCIAL_MAP_ENVIRONMENT_CONFIG,
   COMMERCIAL_MAP_NIGHT_ATMOSPHERE,
@@ -1280,6 +1282,11 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   const activeGroundMaterial = hydrologicalModeActive
     ? hydrologicalGroundMaterial
     : normalGroundMaterial;
+  useLayoutEffect(() => publishContinuousGround(scene, {
+    material: activeGroundMaterial,
+    center: [extent.centerX, extent.centerZ],
+    size: layout.outerGroundSize,
+  }), [activeGroundMaterial, extent.centerX, extent.centerZ, layout.outerGroundSize, scene]);
   useLayoutEffect(() => {
     const terrainDetail = resolveTerrainMultiscaleQualityOptions(
       qualityTier,
@@ -1650,7 +1657,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       <mesh
         ref={outerGroundRef}
         rotation={[-Math.PI / 2, 0, 0]}
-        position={[extent.centerX, -0.08, extent.centerZ]}
+        position={[extent.centerX, COMMERCIAL_MAP_GROUND_ELEVATION, extent.centerZ]}
         receiveShadow
         raycast={NO_RAYCAST}
       >

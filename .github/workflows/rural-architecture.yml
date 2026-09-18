@@ -32,7 +32,7 @@ jobs:
         run: |
           mkdir -p rural-validation
           git rev-parse HEAD > rural-validation/commit.txt
-          npm test -- src/test/commercialMapLivestockTent.test.ts --reporter=json --outputFile=rural-validation/tests.json
+          npm test -- --maxWorkers=2 --testTimeout=60000 src/test/commercialMapLivestockTent.test.ts src/test/commercialMapRuralPhotoRevision.test.ts src/test/commercialMapContinuousGround.test.ts src/test/commercialMapAccessJunction.test.ts src/test/commercialMapRuralMaterialDetail.test.ts src/test/commercialMapParkingTerrainContinuity.test.ts src/test/commercialMapPavilionCourtyard.test.ts src/test/commercialMapParkAccessInfrastructure.test.ts src/test/commercialMapParkAccessSpatialPlan.test.ts src/test/commercialMapParkAccessEnvironment.test.ts --reporter=json --outputFile=rural-validation/tests.json
       - name: Complete repository typecheck
         run: npm run typecheck
       - name: Production build

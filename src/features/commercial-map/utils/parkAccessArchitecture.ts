@@ -1,4 +1,4 @@
-import { ruralBuildingRecipe } from './ruralArchitecture';
+import { ruralBuildingRecipe, buildRuralGeometry } from './ruralArchitecture';
 import { RURAL_PAVILIONS } from '../data/ruralPavilionReconstruction';
 import * as THREE from 'three';
 
@@ -34,6 +34,7 @@ export interface ParkAccessArchitectureInstance {
 }
 
 export interface ParkAccessArchitectureModel {
+  gables: THREE.BufferGeometry | null;
   opaque: readonly ParkAccessArchitectureInstance[];
   glass: readonly ParkAccessArchitectureInstance[];
   metal: readonly ParkAccessArchitectureInstance[];
@@ -432,6 +433,11 @@ function buildCosteiros(
   for (const part of recipe.boxes) {
     pushBox(target, part.batch, `costeiros:${part.id}`, placement, part);
   }
+  const gables=buildRuralGeometry({...recipe,boxes:[]});
+  gables.glass.dispose();gables.metal.dispose();
+  gables.opaque.rotateY(placement.rotationRadians);
+  gables.opaque.translate(placement.anchor[0],placement.elevation??0,placement.anchor[1]);
+  return gables.opaque;
 }
 
 export function buildParkAccessArchitectureModel(
@@ -453,9 +459,10 @@ export function buildParkAccessArchitectureModel(
     if (gate.key === 'gate2') buildGate2(gate, target, reducedGraphics);
     if (gate.key === 'gate3') buildGate3(gate, target, reducedGraphics);
   });
-  if (costeiros) buildCosteiros(costeiros, target, reducedGraphics);
+  const gables=costeiros ? buildCosteiros(costeiros, target, reducedGraphics) : null;
 
   return {
+    gables,
     opaque: target.opaque,
     glass: target.glass,
     metal: target.metal,
@@ -465,7 +472,7 @@ export function buildParkAccessArchitectureModel(
       glassInstanceCount: target.glass.length,
       metalInstanceCount: target.metal.length,
       estimatedDrawCalls: [target.opaque.length, target.glass.length, target.metal.length]
-        .filter((count) => count > 0).length,
+        .filter((count) => count > 0).length + (gables ? 1 : 0),
     },
   };
 }

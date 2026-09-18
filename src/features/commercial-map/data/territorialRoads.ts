@@ -1,6 +1,7 @@
 import { ARENA_CANONICAL_LAYOUT } from './arenaCanonicalLayout';
 import context from './territoryContext.generated.json';
 import { clipContextRoad } from './commercialMapSpatialBounds';
+import { retainedTerritoryAccessRoad } from './accessJunctionReconstruction';
 import { officialPdfPointToLocal } from "./officialReference2026";
 const source = context.provenance;
 
@@ -55,7 +56,7 @@ export const TERRITORY_REFERENCE = {
 // Full OSM provenance remains in the repository. Only the offline spatial
 // catalog is bundled; protected axes preserve their complete original vertices.
 export const TERRITORY_ROADS: readonly TerritoryRoad[] = Object.freeze(
-  (context.roads as unknown as TerritoryRoad[]).flatMap(clipContextRoad),
+  (context.roads as unknown as TerritoryRoad[]).flatMap(clipContextRoad).flatMap(retainedTerritoryAccessRoad),
 );
 export const TERRITORY_BR472 = TERRITORY_ROADS.filter((r) =>
   r.ref?.includes("472"),

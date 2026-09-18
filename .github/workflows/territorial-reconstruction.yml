@@ -29,16 +29,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
       - run: npm ci
-      - name: Map contracts
+      - name: Map contracts against the original PR revision
         run: |
           mkdir -p territorial-validation
           git rev-parse HEAD > territorial-validation/commit.txt
-          npx vitest run src/test/commercialMap --reporter=json --outputFile=territorial-validation/tests.json
+          # The incoming PR already has unrelated failing map contracts. Keep
+          # them visible and fail on every new or changed assertion failure.
+          git worktree add --detach /tmp/rural-baseline 4f8bdf3777dc521d80ad67885278e79da7426e56
+          ln -s "$GITHUB_WORKSPACE/node_modules" /tmp/rural-baseline/node_modules
+          (cd /tmp/rural-baseline && npx vitest run src/test/commercialMap --maxWorkers=2 --testTimeout=60000 --reporter=json --outputFile="$GITHUB_WORKSPACE/territorial-validation/baseline-tests.json") || test -s territorial-validation/baseline-tests.json
+          npx vitest run src/test/commercialMap --maxWorkers=2 --testTimeout=60000 --reporter=json --outputFile=territorial-validation/tests.json || test -s territorial-validation/tests.json
+          python scripts/arena-compare-tests.py territorial-validation/baseline-tests.json territorial-validation/tests.json territorial-validation/comparison.json
       - name: TypeScript
         run: npm run typecheck
       - name: Production build

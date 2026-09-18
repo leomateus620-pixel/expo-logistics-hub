@@ -1,7 +1,9 @@
-import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { ROAD_MATERIAL_COLORS, ROAD_SURFACE_PROFILE } from '../../constants';
+import { applyRuralMaterialDetail, ruralSurfaceKind } from '../../utils/ruralMaterialDetail';
+import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../../data/parkAccessSpatialPlan';
 import type { ParkAccessArchitectureInstance } from '../../utils/parkAccessArchitecture';
 import {
@@ -97,11 +99,11 @@ function createAsphaltTexture() {
   const data = new Uint8Array(size * size * 4);
   for (let y = 0; y < size; y += 1) {
     for (let x = 0; x < size; x += 1) {
-      const fine = (textureNoise(x, y, 3107) - 0.5) * 28;
+      const fine = (textureNoise(x, y, 3107) - 0.5) * 12;
       const aggregateNoise = textureNoise(Math.floor(x / 2), Math.floor(y / 2), 7739);
       const aggregate = aggregateNoise > 0.82
-        ? 28 + (aggregateNoise - 0.82) * 80
-        : aggregateNoise < 0.12 ? -22 : 0;
+        ? 8 + (aggregateNoise - 0.82) * 20
+        : aggregateNoise < 0.12 ? -8 : 0;
       const wear = Math.sin(x * 0.15 + y * 0.08) * 3.2
         + Math.cos(y * 0.19 - x * 0.05) * 2.4;
       const offset = (y * size + x) * 4;
@@ -114,7 +116,9 @@ function createAsphaltTexture() {
   const texture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat, THREE.UnsignedByteType);
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(0.5, 0.5);
+  // The two-pixel aggregate is about five centimetres at the working scale,
+  // instead of reading as cobblestones on the reconstructed junctions.
+  texture.repeat.set(4, 4);
   texture.minFilter = THREE.LinearMipmapLinearFilter;
   texture.magFilter = THREE.LinearFilter;
   texture.generateMipmaps = true;
@@ -249,7 +253,17 @@ const InstanceBatch = memo(function InstanceBatch({
 }: InstanceBatchProps) {
   const ref = useRef<THREE.InstancedMesh>(null);
   const { gl, invalidate } = useThree();
-  const geometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
+  const geometry = useMemo(() => {
+    const next = new THREE.BoxGeometry(1, 1, 1);
+    next.setAttribute('ruralSurface', new THREE.InstancedBufferAttribute(new Float32Array(instances.length), 1));
+    return next;
+  }, [instances.length]);
+  const bindInstance = useCallback((mesh: THREE.InstancedMesh | null) => {
+    // R3F reconstructs the instance when args/material/count change. Release
+    // the outgoing mesh, never whichever replacement ref.current later holds.
+    if (ref.current && ref.current !== mesh) disposeInstancedMesh(ref.current);
+    ref.current = mesh;
+  }, []);
   const material = useMemo(() => {
     const next = new THREE.MeshStandardMaterial({
       color: WHITE,
@@ -262,6 +276,7 @@ const InstanceBatch = memo(function InstanceBatch({
     if (materialKind !== 'glass') {
       applyParkSurfaceDetail(next, materialKind === 'metal' ? 'metal' : 'volume', reducedGraphics);
     }
+    applyRuralMaterialDetail(next);
     return next;
   }, [materialKind, reducedGraphics]);
 
@@ -278,6 +293,7 @@ const InstanceBatch = memo(function InstanceBatch({
     const quaternion = new THREE.Quaternion();
     const scale = new THREE.Vector3();
     const color = new THREE.Color();
+    const surface = geometry.getAttribute('ruralSurface') as THREE.InstancedBufferAttribute;
     instances.forEach((instance, index) => {
       position.fromArray(instance.position);
       quaternion.fromArray(instance.quaternion);
@@ -285,7 +301,10 @@ const InstanceBatch = memo(function InstanceBatch({
       matrix.compose(position, quaternion, scale);
       mesh.setMatrixAt(index, matrix);
       mesh.setColorAt(index, color.set(instance.color));
+      surface.setX(index, instance.featureId.startsWith('costeiros:')
+        ? ruralSurfaceKind(instance.featureId.slice(10), instance.color) : 0);
     });
+    surface.needsUpdate = true;
     mesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
@@ -295,17 +314,15 @@ const InstanceBatch = memo(function InstanceBatch({
     mesh.receiveShadow = materialKind !== 'glass';
     gl.shadowMap.needsUpdate = true;
     invalidate();
-  }, [gl, instances, invalidate, materialKind, opacity, reducedGraphics]);
+  }, [gl, geometry, instances, invalidate, materialKind, opacity, reducedGraphics]);
 
-  useEffect(() => () => {
-    geometry.dispose();
-    material.dispose();
-  }, [geometry, material]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  useEffect(() => () => material.dispose(), [material]);
 
   if (!instances.length || opacity <= 0.015) return null;
   return (
     <instancedMesh
-      ref={ref}
+      ref={bindInstance}
       name={name}
       args={[geometry, material, instances.length]}
       count={instances.length}
@@ -328,6 +345,19 @@ function SurfaceMaterial({
   opacity: number;
   reducedGraphics: boolean;
 }) {
+  const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
+  // Parent meshes deliberately opt out of R3F disposal because their geometry
+  // belongs to the render model. Their locally-created materials still belong
+  // to this component and must be released when it leaves the tree.
+  const ownMaterial = (material: THREE.MeshStandardMaterial | null) => {
+    if (material) materialRef.current = material;
+  };
+  const bindOwned = (kind: Parameters<typeof bindParkSurfaceMaterial>[0]) =>
+    (material: THREE.MeshStandardMaterial | null) => {
+      ownMaterial(material);
+      bindParkSurfaceMaterial(kind, reducedGraphics)(material);
+    };
+  useEffect(() => () => materialRef.current?.dispose(), []);
   const transparent = opacity < 0.995;
   if (kind === 'asphalt') return (
     <meshStandardMaterial
@@ -346,7 +376,7 @@ function SurfaceMaterial({
       // Two superimposed normal perturbations produced bright crawling grain
       // along the avenue at oblique views. Keep albedo/roughness detail while
       // its broad, almost-flat asphalt uses the geometric surface normal.
-      ref={(material) => { if (material) applyParkSurfaceDetail(material, { ...PARK_SURFACE_PROFILES.asphalt, normalStrength: 0 }, reducedGraphics); }}
+      ref={(material) => { ownMaterial(material); if (material) applyParkSurfaceDetail(material, { ...PARK_SURFACE_PROFILES.asphalt, normalStrength: 0 }, reducedGraphics); }}
     />
   );
   if (kind === 'cobblestone') return (
@@ -365,7 +395,7 @@ function SurfaceMaterial({
       polygonOffset
       polygonOffsetFactor={-1}
       polygonOffsetUnits={-1}
-      ref={bindParkSurfaceMaterial('concrete', reducedGraphics)}
+      ref={bindOwned('concrete')}
     />
   );
   if (kind === 'gravel') return (
@@ -384,7 +414,7 @@ function SurfaceMaterial({
       polygonOffset
       polygonOffsetFactor={-1}
       polygonOffsetUnits={-1}
-      ref={bindParkSurfaceMaterial('asphalt', reducedGraphics)}
+      ref={bindOwned('asphalt')}
     />
   );
   if (kind === 'sidewalks') return (
@@ -400,7 +430,7 @@ function SurfaceMaterial({
       opacity={opacity}
       depthTest
       depthWrite
-      ref={bindParkSurfaceMaterial('concrete', reducedGraphics)}
+      ref={bindOwned('concrete')}
     />
   );
   if (kind === 'curbs' || kind === 'roundaboutCurb') return (
@@ -412,11 +442,12 @@ function SurfaceMaterial({
       opacity={opacity}
       depthTest
       depthWrite
-      ref={bindParkSurfaceMaterial('concrete', reducedGraphics)}
+      ref={bindOwned('concrete')}
     />
   );
   if (kind === 'landscape') return (
     <meshStandardMaterial
+      ref={ownMaterial}
       color="#668351"
       roughness={1}
       metalness={0}
@@ -428,6 +459,7 @@ function SurfaceMaterial({
   );
   return (
     <meshStandardMaterial
+      ref={ownMaterial}
       color={kind === 'yellowMarkings' ? '#e2b43b' : '#ecebe4'}
       roughness={0.82}
       metalness={0}
@@ -482,6 +514,13 @@ export const ParkAccessInfrastructure = memo(function ParkAccessInfrastructure({
     ),
     [input, reducedGraphics],
   );
+  const gableMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    vertexColors: true, roughness: 0.91, metalness: 0,
+  }), []);
+  useEffect(() => {
+    configureInstanceMaterial(gableMaterial, normalizedArchitectureOpacity, 'opaque');
+  }, [gableMaterial, normalizedArchitectureOpacity]);
+  useEffect(() => () => gableMaterial.dispose(), [gableMaterial]);
 
   useEffect(() => {
     invalidate();
@@ -526,6 +565,8 @@ export const ParkAccessInfrastructure = memo(function ParkAccessInfrastructure({
       ))}
       {resolvedArchitectureVisible && (
         <>
+          {model.architecture.gables && <mesh name="costeiros-gable-infill" geometry={model.architecture.gables}
+            material={gableMaterial} castShadow={!reducedGraphics} receiveShadow raycast={NO_RAYCAST} dispose={null}/>}
           <InstanceBatch
             name="park-access-architecture-opaque"
             instances={model.architecture.opaque}

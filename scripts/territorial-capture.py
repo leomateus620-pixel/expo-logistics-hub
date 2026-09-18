@@ -22,6 +22,10 @@ def views():
     result['gate1-top']={'target':[-64,0,18], 'position':[-63.99,23,18]}
     result['main-roundabout-top']={'target':[-48.9,0,26.4], 'position':[-48.89,22,26.4]}
     result['access-oblique']={'target':[-55,0,22], 'position':[-75,19,44]}
+    for label, source, distance in [('parking', (5250,3800),28),('pavilion-court',(2670,3890),17)]:
+        x,z=local(*source)
+        result[f'{label}-top']={'target':[x,0,z],'position':[x+.01,distance,z]}
+        result[f'{label}-oblique']={'target':[x,0,z],'position':[x+distance*.5,distance*.6,z+distance*.65]}
     return result
 
 async def event(page, detail):
@@ -55,6 +59,9 @@ async def run(browser, base, out, name, size):
             await page.screenshot(path=str(out/f'{label}.png'))
             await event(page,{'inspectSpatial':True})
             report['views'][label]=await canvas.evaluate("c=>({pose:JSON.parse(c.dataset.territoryPose||'{}'),spatial:JSON.parse(c.dataset.spatialInspection||'{}'),health:JSON.parse(c.dataset.commercialMapRenderHealth||'{}')})")
+            health=report['views'][label]['health']
+            if health.get('status')!='ready' or health.get('contextLosses') or health.get('lastErrorCode'):
+                raise AssertionError(f'Render health at {label}: {health}')
         await event(page,{'keepRendering':False})
         for attempt in range(3):
             await canvas.evaluate("c=>delete c.dataset.territoryReport")
@@ -67,6 +74,10 @@ async def run(browser, base, out, name, size):
             await page.wait_for_timeout(2000)
             await page.screenshot(path=str(out/f'{label}-night.png'))
         await page.evaluate('window.__territorialStore.getState().setNightModeActive(false)')
+        await page.evaluate('window.__territorialStore.getState().setReducedGraphics(true)')
+        await page.wait_for_timeout(1500)
+        report['compatibilityNoticeCount']=await page.get_by_text('Perfil de compatibilidade ativo:',exact=False).count()
+        if report['compatibilityNoticeCount']: raise AssertionError('Compatibility banner is visible')
         await event(page,{'keepRendering':False})
         report['overflow']=await page.evaluate('document.documentElement.scrollWidth>innerWidth')
         if errors or report['overflow']: raise AssertionError('Page errors or overflow')

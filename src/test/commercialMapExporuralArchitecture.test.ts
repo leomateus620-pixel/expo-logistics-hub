@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import originalD4 from './fixtures/rural-d4-pr155-4f8bdf37.json';
 import * as THREE from 'three';
 import { OFFICIAL_REFERENCE_ENTITIES } from '@/features/commercial-map/data/officialReference2026';
 import {
@@ -34,8 +35,13 @@ describe('C4 / E-06 architecture and selection activity', () => {
     delete originalE07.source;
     const originalFrontage = { ...prior.find((e: { publicIdentifier: string }) => e.publicIdentifier === 'AV-IMIGRANTES') };
     delete originalFrontage.source;
-    // Normalize only the separately tested September footprint corrections.
-    const preserved = OFFICIAL_REFERENCE_ENTITIES.filter(e => !['RUA-MONTEVIDEU-COZINHA', 'RES-A9'].includes(e.publicIdentifier)).map(e => e.publicIdentifier === 'E-07' ? originalE07 : e.publicIdentifier === 'AV-IMIGRANTES' ? originalFrontage : e);
+    // D4's authorized rear clearance is checked by the reconstruction suite.
+    // Freeze its original PR record here, keeping every other aggregate input
+    // and the older expected hash intact (including pre-existing failures).
+    expect(originalD4.sourceCommit).toBe('4f8bdf3777dc521d80ad67885278e79da7426e56');
+    expect(createHash('sha256').update(JSON.stringify(originalD4.entity)).digest('hex'))
+      .toBe('58886658e8936c04ef0c8a54fa3ff55bcf2fe26d5ac3235decc8eb73bff6395e');
+    const preserved = OFFICIAL_REFERENCE_ENTITIES.filter(e => !['RUA-MONTEVIDEU-COZINHA', 'RES-A9'].includes(e.publicIdentifier)).map(e => e.publicIdentifier === 'E-07' ? originalE07 : e.publicIdentifier === 'AV-IMIGRANTES' ? originalFrontage : e.publicIdentifier === 'D4' ? originalD4.entity : e);
     const hash = createHash('sha256')
       .update(JSON.stringify(preserved))
       .digest('hex');

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { mergeBufferGeometries } from 'three-stdlib';
 import { RURAL_PAVILIONS } from '../data/ruralPavilionReconstruction';
+import { ruralSurfaceKind } from './ruralMaterialDetail';
 
 export type RuralBatch = 'opaque' | 'glass' | 'metal';
 export interface RuralBox {
@@ -23,8 +24,9 @@ export function ruralBuildingRecipe(kind: 'testDrive' | 'livestock', width: numb
   height: number, detailed = true, focused = false): RuralRecipe {
   if (![width, depth, height].every(v => Number.isFinite(v) && v > 0)) throw new Error('Invalid rural building envelope');
   const test = kind === 'testDrive';
+  const roofColor = test ? P.roof : '#656b6b';
   const floor = test ? RURAL_PAVILIONS.testDrive.floor : 0.035;
-  const eave = test ? RURAL_PAVILIONS.testDrive.eaveHeight : height * 0.66;
+  const eave = test ? RURAL_PAVILIONS.testDrive.eaveHeight : height * 0.70;
   const rise = test ? RURAL_PAVILIONS.testDrive.roofRise : height - eave;
   const half = width * 0.485, roofDepth = depth * 0.975;
   const sideX = width * 0.415, front = depth * 0.44, rear = -depth * 0.44;
@@ -41,28 +43,32 @@ export function ruralBuildingRecipe(kind: 'testDrive' | 'livestock', width: numb
   add('foundation', 'opaque', [0, floor / 2, 0], [width * .87, floor, depth * .92], P.concrete);
   for (const side of [-1,1]) {
     add(`roof-${side}`, 'opaque', [side*half/2,eave+rise/2,0],
-      [Math.hypot(half,rise),.025,roofDepth],P.roof,[0,0,-side*Math.atan2(rise,half)]);
+      [Math.hypot(half,rise),.025,roofDepth],roofColor,[0,0,-side*Math.atan2(rise,half)]);
     add(`eave-${side}`, 'metal', [side*half,eave,0], [.025,.042,roofDepth],P.wood);
   }
-  add('ridge','metal',[0,eave+rise+.01,0],[.055,.025,roofDepth],P.roof);
-  const doorWidth = width * (test ? .2 : .22), doorTop = eave * .83;
+  add('ridge','metal',[0,eave+rise+.01,0],[.055,.025,roofDepth],roofColor);
+  // IMG_0863: the closed wing occupies the left rear, leaving a through aisle.
+  const wingLeft = -sideX, wingRight = test ? sideX : width * .08;
+  const wingCenter = (wingLeft + wingRight) / 2, wingWidth = wingRight - wingLeft;
+  const doorWidth = width * (test ? .2 : .13), doorTop = eave * .83;
   // Front of the enclosed wing: door opening deliberately empty between jambs.
   for (const side of [-1,1]) {
-    const end = sideX, start = doorWidth/2;
-    add(`front-wall-${side}`,'opaque',[side*(end+start)/2,(eave+floor)/2,wallFront],
+    const end = wingWidth / 2, start = doorWidth/2;
+    add(`front-wall-${side}`,'opaque',[wingCenter+side*(end+start)/2,(eave+floor)/2,wallFront],
       [end-start,eave-floor,thickness],test?P.brick:P.light);
-    add(`door-jamb-${side}`,'opaque',[side*(doorWidth/2+.01),(floor+doorTop)/2,wallFront+.014],
+    add(`door-jamb-${side}`,'opaque',[wingCenter+side*(doorWidth/2+.01),(floor+doorTop)/2,wallFront+.014],
       [.035,doorTop-floor,.08],P.light);
   }
-  add('door-lintel','opaque',[0,(eave+doorTop)/2,wallFront],[doorWidth,eave-doorTop,thickness],test?P.brick:P.light);
-  add('door','metal',[0,(floor+doorTop)/2,wallFront-.018],[doorWidth*.95,doorTop-floor,.028],P.dark);
-  add('rear-wall','opaque',[0,(eave+floor)/2,rear],[sideX*2,eave-floor,thickness],test?P.brick:P.light);
+  add('door-lintel','opaque',[wingCenter,(eave+doorTop)/2,wallFront],[doorWidth,eave-doorTop,thickness],test?P.brick:P.light);
+  add('door','metal',[wingCenter,(floor+doorTop)/2,wallFront-.018],[doorWidth*.95,doorTop-floor,.028],P.dark);
+  add('rear-wall','opaque',[wingCenter,(eave+floor)/2,rear],[wingWidth,eave-floor,thickness],test?P.brick:P.light);
   const windowBays = test ? RURAL_PAVILIONS.testDrive.windowBays : 3;
   const wingDepth = wallFront - rear, pitch = wingDepth / windowBays;
   const opening = pitch*.53, bottom = floor+eave*.28, top = eave*.78;
   for (const side of [-1,1]) {
-    const x = side*sideX;
-    // Continuous sill and lintel bands; opaque masonry never covers a window.
+    const x = side < 0 ? wingLeft : wingRight;
+    // Four tall front windows and three high rear windows on the photographed
+    // side. The unobserved opposite elevation retains the prior layout.
     add(`side-sill-band-${side}`,'opaque',[x,(floor+bottom)/2,(rear+wallFront)/2],[thickness,bottom-floor,wingDepth],test?P.brick:P.light);
     add(`side-lintel-band-${side}`,'opaque',[x,(top+eave)/2,(rear+wallFront)/2],[thickness,eave-top,wingDepth],test?P.brick:P.light);
     for (let i=0;i<=windowBays;i++) {
@@ -73,22 +79,22 @@ export function ruralBuildingRecipe(kind: 'testDrive' | 'livestock', width: numb
     }
     for (let i=0;i<windowBays;i++) {
       const z=rear+pitch*(i+.5), face=x+side*(thickness/2+.009);
-      add(`window-${side}-${i}`,'glass',[x-side*.013,(top+bottom)/2,z],[.014,top-bottom-.016,opening-.012],P.pane);
+      const sill = test && side === 1 && i < 3 ? floor+eave*.53 : bottom;
+      if(sill>bottom) add(`high-window-infill-${side}-${i}`,'opaque',[x,(bottom+sill)/2,z],[thickness,sill-bottom,opening],P.brick);
+      add(`window-${side}-${i}`,'glass',[x-side*.013,(top+sill)/2,z],[.014,top-sill-.016,opening-.012],P.pane);
       for (const edge of [-1,1]) {
-        add(`window-jamb-${side}-${i}-${edge}`,'metal',[face,(top+bottom)/2,z+edge*opening/2],[.027,top-bottom+.025,.018],P.frame);
-        add(`window-rail-${side}-${i}-${edge}`,'metal',[face,edge<0?bottom:top,z],[.032,.018,opening+.02],P.frame);
+        if(detailed || edge===-1) add(`window-jamb-${side}-${i}-${edge}`,'metal',[face,(top+sill)/2,z+edge*opening/2],[.027,top-sill+.025,.018],P.frame);
+        add(`window-rail-${side}-${i}-${edge}`,'metal',[face,edge<0?sill:top,z],[.032,.018,opening+.02],P.frame);
       }
-      if (detailed) for(let j=1;j<4;j++) {
-        add(`window-louver-${side}-${i}-${j}`,'metal',[face,bottom+(top-bottom)*j/4,z],[.029,.011,opening],P.frame);
+      if (detailed) for(let j=1;j<2;j++) {
+        add(`window-louver-${side}-${i}-${j}`,'metal',[face,sill+(top-sill)*j/2,z],[.029,.011,opening],P.frame);
       }
-    }
-    if(test && detailed) for(const y of [floor+.045, floor+.09, top+.035,top+.075]) {
-      if(y<eave) add(`mortar-${side}-${y}`,'opaque',[x+side*(thickness/2+.001),y,(rear+wallFront)/2],[.003,.004,wingDepth],P.mortar);
     }
   }
   if (test) {
-    // The photographed front gable is an exposed truss above the recessed door.
+    // Triangular infill behind the porch truss follows the roof plane exactly.
     for(const side of [-1,1]) add(`porch-post-${side}`,'metal',[side*sideX,(eave+floor)/2,front], [.037,eave-floor,.037],P.wood);
+    for(const side of [-1,1]) add(`porch-center-post-${side}`,'metal',[side*sideX*.34,(eave+floor)/2,front],[.032,eave-floor,.032],P.wood);
     for(const z of [front,rear]) {
       beam(`gable-tie-${z}`,[-sideX,eave-.045],[sideX,eave-.045],z,.024);
       beam(`gable-left-${z}`,[-half,eave],[0,eave+rise],z,.022);
@@ -99,15 +105,15 @@ export function ruralBuildingRecipe(kind: 'testDrive' | 'livestock', width: numb
   } else {
     // Robust perimeter piers and two clay-brick central piers, framing—not
     // blocking—the clear middle entrance. Semi-open front, enclosed rear wing.
-    const post=.095;
+    const post=width*.057;
     for(const side of [-1,1]) {
       for(const z of [front,front-(front-wallFront)*.48,wallFront]) {
         add(`open-column-${side}-${z}`,'opaque',[side*sideX,(eave+floor)/2,z],[post,eave-floor,post],P.dark);
       }
       add(`brick-pier-${side}`,'opaque',[side*width*.16,(eave+floor)/2,front],[.093,eave-floor,.12],P.brick);
       add(`low-wall-${side}`,'opaque',[side*sideX,floor+.09,(front+wallFront)/2],[.075,.18,front-wallFront],P.dark);
-      add(`front-low-wall-${side}`,'opaque',[side*width*.325,floor+.09,front],[width*.19,.18,.075],P.dark);
-      if(detailed) for(let j=1;j<11;j++) add(`brick-joint-${side}-${j}`,'opaque',[side*width*.16,floor+(eave-floor)*j/11,front+.061],[.093,.004,.003],P.mortar);
+      const inner=width*.16+.0465;
+      add(`front-low-wall-${side}`,'opaque',[side*(sideX+inner)/2,floor+.09,front],[sideX-inner,.18,.075],P.dark);
     }
     for(const z of [front,front-(front-wallFront)*.5,wallFront,rear]) {
       beam(`frame-tie-${z}`,[-sideX,eave-.07],[sideX,eave-.07],z,.027,P.dark);
@@ -118,13 +124,15 @@ export function ruralBuildingRecipe(kind: 'testDrive' | 'livestock', width: numb
   if(detailed) for(const side of [-1,1]) for(const t of [.32,.68]) {
     add(`purlin-${side}-${t}`,'metal',[side*half*t,eave+rise*(1-t)-.032,0],[.021,.024,roofDepth*.96],P.wood);
   }
-  if(focused) for(const side of [-1,1]) for(let i=1;i<8;i++) {
-    const t=i/8;
-    add(`roof-seam-${side}-${i}`,'metal',[side*half*t,eave+rise*(1-t)+.016,0],[.008,.006,roofDepth], '#68685e');
+  if(focused) for(const side of [-1,1]) for(let i=1;i<12;i++) {
+    // Corrugation drains down the roof slope, perpendicular to the ridge.
+    add(`roof-seam-${side}-${i}`,'metal',[side*half/2,eave+rise/2+.016,-roofDepth/2+roofDepth*i/12],
+      [Math.hypot(half,rise),.006,.008], '#68685e',[0,0,-side*Math.atan2(rise,half)]);
   }
   return { boxes,width,depth,eave,rise,front,rear,wallFront,windowCount:windowBays*2,
-    gables:test?[]:[{z:front+.015,halfSpan:half*.96,bottom:eave,rise:rise*.92,color:P.light},
-      {z:rear,halfSpan:sideX,bottom:eave,rise:rise*.84,color:P.light}] };
+    gables:test?[{z:wallFront,halfSpan:half,bottom:eave,rise,color:P.wood},
+      {z:rear,halfSpan:half,bottom:eave,rise,color:P.wood}]:[{z:front+.015,halfSpan:half*.96,bottom:eave,rise:rise*.92,color:P.light},
+      {z:rear,halfSpan:half*.96,bottom:eave,rise:rise*.92,color:P.light}] };
 }
 
 /** Merge member buffers once, preserving real 3D openings and vertex colours.
@@ -133,18 +141,19 @@ export function ruralBuildingRecipe(kind: 'testDrive' | 'livestock', width: numb
 export function buildRuralGeometry(recipe: RuralRecipe) {
   const groups: Record<RuralBatch, THREE.BufferGeometry[]> = { opaque:[],glass:[],metal:[] };
   const color = new THREE.Color();
-  function paint(geometry: THREE.BufferGeometry, value: string) {
+  function paint(geometry: THREE.BufferGeometry, value: string, surface = 0) {
     color.set(value); const count=geometry.attributes.position.count;
     const colors=new Float32Array(count*3);
     for(let i=0;i<count;i++) color.toArray(colors,i*3);
     geometry.setAttribute('color',new THREE.BufferAttribute(colors,3));
+    geometry.setAttribute('ruralSurface',new THREE.BufferAttribute(new Float32Array(count).fill(surface),1));
     return geometry;
   }
   for(const item of recipe.boxes) {
     const g=new THREE.BoxGeometry(...item.scale);
     const m=new THREE.Matrix4().compose(new THREE.Vector3(...item.position),
       new THREE.Quaternion().setFromEuler(new THREE.Euler(...(item.rotation??[0,0,0]))),new THREE.Vector3(1,1,1));
-    g.applyMatrix4(m); groups[item.batch].push(paint(g,item.color));
+    g.applyMatrix4(m); groups[item.batch].push(paint(g,item.color,ruralSurfaceKind(item.id,item.color)));
   }
   for(const gable of recipe.gables) {
     const shape=new THREE.Shape();shape.moveTo(-gable.halfSpan,gable.bottom);shape.lineTo(gable.halfSpan,gable.bottom);shape.lineTo(0,gable.bottom+gable.rise);shape.closePath();
@@ -155,7 +164,8 @@ export function buildRuralGeometry(recipe: RuralRecipe) {
   const result={} as Record<RuralBatch,THREE.BufferGeometry>;
   for(const key of Object.keys(groups) as RuralBatch[]) {
     const inputs=groups[key].map(g=>g.index?g.toNonIndexed():g);
-    result[key]=mergeBufferGeometries(inputs,false) ?? new THREE.BufferGeometry();
+    result[key]=inputs.length ? mergeBufferGeometries(inputs,false)! : new THREE.BufferGeometry();
+    if(!inputs.length)result[key].setAttribute('position',new THREE.BufferAttribute(new Float32Array(),3));
     result[key].computeBoundingBox(); result[key].computeBoundingSphere();
     new Set([...inputs,...groups[key]]).forEach(g=>g.dispose());
   }

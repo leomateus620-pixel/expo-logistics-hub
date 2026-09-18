@@ -12,6 +12,7 @@ import {
 } from "../features/commercial-map/utils/territorialRoadGeometry";
 import * as district from "../features/commercial-map/data/lateralResidentialDistrict";
 import { isProtectedCommercialMapRoad, spatialBoundsContain, COMMERCIAL_MAP_SPATIAL_BOUNDS } from '../features/commercial-map/data/commercialMapSpatialBounds';
+import { retainedTerritoryAccessRoad } from '../features/commercial-map/data/accessJunctionReconstruction';
 
 it("preserves retained building anchors, protected roads and the complete adjacent lateral district", () => {
   const roadGeometry = buildTerritoryRoadGeometry();
@@ -57,7 +58,8 @@ it("preserves retained building anchors, protected roads and the complete adjace
   snapshot.buildings.forEach((b: { id: string }) => expect(b).toEqual(prior.buildings.find((p: { id: string }) => p.id === b.id)));
   const oldRoads = preserved(prior).roads;
   const newRoads = preserved(snapshot).roads;
-  oldRoads.filter(isProtectedCommercialMapRoad).forEach((road: { id: string }) => expect(newRoads.find((r: { id: string }) => r.id === road.id)).toEqual(road));
+  oldRoads.filter(isProtectedCommercialMapRoad).flatMap(retainedTerritoryAccessRoad)
+    .forEach((road: { id: string }) => expect(newRoads.find((r: { id: string }) => r.id === road.id)).toEqual(road));
   prior.trees.filter((t: { center: [number, number] }) => spatialBoundsContain(COMMERCIAL_MAP_SPATIAL_BOUNDS.coreBounds, t.center))
     .forEach((tree: { id?: string }) => {
       const { id: _id, ...anchor } = tree;

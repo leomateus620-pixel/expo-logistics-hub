@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { OFFICIAL_REFERENCE_ENTITIES, officialPdfPointToLocal } from '@/features/commercial-map/data/officialReference2026';
-import { RURAL_PAVILIONS, RURAL_PAVILION_REVISION, reconstructRuralPavilionEntity, ruralSourceRing } from '@/features/commercial-map/data/ruralPavilionReconstruction';
+import { RURAL_PAVILIONS, RURAL_PAVILION_NEIGHBOR_BOUNDS, RURAL_PAVILION_REVISION, reconstructRuralPavilionEntity, ruralSourceBounds, ruralSourceRing } from '@/features/commercial-map/data/ruralPavilionReconstruction';
 import { PARK_ACCESS_SPATIAL_PLAN, parkAccessSourcePointToLocal } from '@/features/commercial-map/data/parkAccessSpatialPlan';
 import { buildRuralGeometry, ruralBuildingRecipe } from '@/features/commercial-map/utils/ruralArchitecture';
 import { buildParkAccessArchitectureModel } from '@/features/commercial-map/utils/parkAccessArchitecture';
@@ -15,7 +15,7 @@ const modelBounds = livestockTentModelBounds(bounds);
 const recipe = (detail = true, focus = false) => ruralBuildingRecipe('livestock', modelBounds.width, modelBounds.depth, livestockTentVisualHeight(bounds), detail, focus);
 
 describe('D4 and Test Drive photographic architecture publication', () => {
-  it('keeps D4 cadastral identity, centre, parent and interaction semantics', () => {
+  it('keeps D4 cadastral identity, registered centre, parent and interaction semantics', () => {
     expect(tent).toMatchObject({ id: 'reference:2026:d4', publicIdentifier: 'D4', name: 'Tenda da Pecuária',
       classification: 'LIVESTOCK_AREA', parentEntityId: 'reference:2026:quadra-n',
       metadata: { ruralReconstructionRevision: RURAL_PAVILION_REVISION, officialMeasurements: false } });
@@ -30,8 +30,33 @@ describe('D4 and Test Drive photographic architecture publication', () => {
     const expected = ruralSourceRing(RURAL_PAVILIONS.livestock);
     expect(tent.metadata.sourcePdfPolygon).toEqual(expected);
     expect(tent.geometry.coordinates[0]).toEqual(expected.map(officialPdfPointToLocal));
-    expect(LIVESTOCK_TENT_LAYOUT.sourceFootprint).toEqual([170, 132]);
+    expect(LIVESTOCK_TENT_LAYOUT.sourceFootprint).toEqual([157, 132]);
     expect(LIVESTOCK_TENT_REVISION).toBe(RURAL_PAVILION_REVISION);
+  });
+
+  it('preserves the street-facing boundary and trims only the rear away from B28, including all roof vertices', () => {
+    const spec = RURAL_PAVILIONS.livestock;
+    const source = ruralSourceBounds(spec);
+    const neighbor = OFFICIAL_REFERENCE_ENTITIES.find(entity => entity.publicIdentifier === 'B28')!;
+    expect(neighbor.metadata.sourcePdfPolygon).toEqual([
+      [3000, 2480], [3220, 2480], [3220, 2570], [3000, 2570],
+    ]);
+    expect(source[0]).toBe(2840);
+    expect(source[2]).toBe(RURAL_PAVILION_NEIGHBOR_BOUNDS.B28[0] - spec.rearClearanceSource);
+    expect(spec.sourceCenter).toEqual([2918.5, 2525]);
+    const neighborMinX = Math.min(...neighbor.geometry.coordinates[0].map(p => p[0]));
+    expect(bounds.maxX).toBeLessThan(neighborMinX);
+    const g = buildRuralGeometry(recipe(true, true));
+    const yaw = LIVESTOCK_TENT_LAYOUT.facingRadians;
+    try {
+      for (const geometry of Object.values(g)) {
+        const positions = geometry.getAttribute('position');
+        for (let i = 0; i < positions.count; i++) {
+          const worldX = bounds.centerX + positions.getX(i) * Math.cos(yaw) + positions.getZ(i) * Math.sin(yaw);
+          expect(worldX).toBeLessThan(neighborMinX);
+        }
+      }
+    } finally { Object.values(g).forEach(geometry => geometry.dispose()); }
   });
 
   it('does not overwrite a stamped later edit and leaves all other entities intact', () => {
@@ -60,7 +85,7 @@ describe('D4 and Test Drive photographic architecture publication', () => {
     expect(r.windowCount).toBe(6);
     expect(r.wallFront).toBeLessThan(0);
     expect(r.gables).toHaveLength(2);
-    expect(r.eave / (r.eave + r.rise)).toBeCloseTo(0.66, 8);
+    expect(r.eave / (r.eave + r.rise)).toBeCloseTo(0.70, 8);
   });
 
   it('retains the existing Test Drive anchor and updates the environmental exclusion polygon', () => {
@@ -79,7 +104,8 @@ describe('D4 and Test Drive photographic architecture publication', () => {
     expect(ids).toContain('costeiros:porch-post-1');
     expect(ids).toContain('costeiros:door');
     expect(r.glass).toHaveLength(14);
-    expect(r.diagnostics.estimatedDrawCalls).toBe(3);
+    expect(r.diagnostics.estimatedDrawCalls).toBe(4);
+    r.gables?.dispose();
     expect(new Set(ids).size).toBe(ids.length);
   });
 

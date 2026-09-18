@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { CAMERA_PRESETS } from '@/features/commercial-map/constants';
+import { CAMERA_PRESETS, COMMERCIAL_MAP_GROUND_ELEVATION } from '@/features/commercial-map/constants';
 import {
   COMMERCIAL_MAP_ENVIRONMENT_CONFIG,
   commercialMapEnvironmentBudget,
@@ -44,7 +44,8 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     );
 
     expect(ground).toContain('layout.outerGroundSize, layout.outerGroundSize');
-    expect(ground).toContain('position={[extent.centerX, -0.08, extent.centerZ]}');
+    expect(ground).toContain('position={[extent.centerX, COMMERCIAL_MAP_GROUND_ELEVATION, extent.centerZ]}');
+    expect(COMMERCIAL_MAP_GROUND_ELEVATION).toBe(-0.08);
     expect(ground).toContain('receiveShadow');
     expect(ground).toContain(
       '<primitive object={activeGroundMaterial} attach="material" />',

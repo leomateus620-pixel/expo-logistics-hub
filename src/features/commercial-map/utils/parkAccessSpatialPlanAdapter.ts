@@ -13,6 +13,8 @@ import type {
 import { roadSurfaceHeight } from './roadInfrastructure';
 import { entitySurfaceElevation } from './spatialSurface';
 import { splitLateralResidentialSidewalk } from './lateralResidentialStreetIntegration';
+import { ACCESS_JUNCTION } from '../data/accessJunctionReconstruction';
+import { accessCorridor } from './accessJunctionGeometry';
 
 type SpatialPlan = typeof PARK_ACCESS_SPATIAL_PLAN;
 
@@ -80,7 +82,7 @@ export function adaptParkAccessSpatialPlan(
   const mapUnitsPerMeter = plan.coordinateFrame.workingMapUnitsPerMeter;
   const gateKeys = ['gate1', 'gate2', 'gate3'] as const satisfies readonly ParkAccessGateKey[];
   return {
-    roadSurfaces: plan.roadSurfaces.map((surface) => ({
+    roadSurfaces: [...plan.roadSurfaces.map((surface) => ({
       id: surface.id,
       polygon: surface.polygon,
       centerline: surface.centerline,
@@ -88,7 +90,11 @@ export function adaptParkAccessSpatialPlan(
       elevation: surface.elevation,
       material: roadMaterial(surface.kind),
       supportAware: surface.supportAware === true,
-    })),
+      junctionUnion: ACCESS_JUNCTION.unionRoadIds.includes(surface.id),
+    })), ...ACCESS_JUNCTION.approaches.map(road=>({
+      id:road.id, polygon:accessCorridor(road.points,road.width),centerline:road.points,
+      width:road.width,elevation:ACCESS_JUNCTION.elevation,material:'asphalt' as const,supportAware:false,junctionUnion:true,
+    }))],
     supportSurfaces: PARK_ACCESS_OFFICIAL_FLAT_SUPPORT_SURFACES,
     sidewalkSurfaces: plan.sidewalkSurfaces.flatMap((surface) => splitLateralResidentialSidewalk({
       id: surface.id,

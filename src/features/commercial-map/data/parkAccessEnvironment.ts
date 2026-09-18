@@ -15,6 +15,7 @@ import {
   type ParkAccessEnvironmentPlacement,
 } from '../utils/parkAccessEnvironment';
 import { distanceToPolygon, pointInPolygon } from '../utils/spatialSurface';
+import { PAVILION_COURTYARD, clipPavilionCourtyardSurface } from './pavilionCourtyard';
 
 export type ParkAccessEnvironmentSurfaceKind =
   | 'WOODLAND_FLOOR'
@@ -24,6 +25,7 @@ export type ParkAccessEnvironmentSurfaceKind =
   | 'COMPACTED_SOIL_PAVER_MIX'
   | 'FIELD_TRANSITION'
   | 'WOODLAND_TRAIL'
+  | 'PAVILION_CONCRETE'
   | 'WOODLAND_TRAIL_WEAR';
 
 export interface ParkAccessEnvironmentSurface {
@@ -50,7 +52,7 @@ export interface ParkAccessEnvironmentPresentation {
   };
 }
 
-export const PARK_ACCESS_ENVIRONMENT_REVISION = '2026.8-park-access-environment.r3';
+export const PARK_ACCESS_ENVIRONMENT_REVISION = '2026.9-park-access-environment.r4';
 export const PARK_ACCESS_AMBIENT_TREE_FOOTPRINT_CLEARANCE = {
   annexRelative: 0.3,
   narrowFieldReview: 0.08,
@@ -64,6 +66,7 @@ export const PARK_ACCESS_ENVIRONMENT_PALETTE: Readonly<Record<ParkAccessEnvironm
   COMPACTED_SOIL_PAVER_MIX: '#81796a',
   FIELD_TRANSITION: '#777c5f',
   WOODLAND_TRAIL: '#8a785d',
+  PAVILION_CONCRETE: '#b4b3a8',
   WOODLAND_TRAIL_WEAR: '#75644f',
 };
 
@@ -667,10 +670,27 @@ function createUnderstory(reducedGraphics: boolean) {
 export function resolveParkAccessEnvironmentPresentation(
   reducedGraphics: boolean,
 ): ParkAccessEnvironmentPresentation {
-  const environmentalSurfaces = createEnvironmentalSurfaces();
+  const concreteSurfaces: ParkAccessEnvironmentSurface[] = PAVILION_COURTYARD.hardscape.map((rings, index) => ({
+    id: `pavilions-1-14-12-concrete-${index}`,
+    kind: 'PAVILION_CONCRETE', polygon: rings[0], holes: rings.slice(1),
+    elevation: PAVILION_COURTYARD.elevation,
+    sourceIds: ['official-2026-park-map'], confidence: 'ANNEX_RELATIVE_TRACE',
+    notes: 'IMG_0967: ligação Caminho do Bosque/B1/B2 e pátio B2/B3 com abertura para raiz. B23 preservado; dimensões estimadas.',
+  }));
+  const environmentalSurfaces = [
+    ...createEnvironmentalSurfaces().flatMap(clipPavilionCourtyardSurface),
+    ...concreteSurfaces,
+  ];
   const trailSurfaces = createTrailSurfaces();
-  const ambientTrees = createAmbientTrees(reducedGraphics);
-  const understory = createUnderstory(reducedGraphics);
+  const ambientTrees = [...createAmbientTrees(reducedGraphics), {
+    sourceZoneId: 'pavilions-14-12-courtyard-tree',
+    position: PAVILION_COURTYARD.treePosition,
+    rotation: 0.35, scale: PAVILION_COURTYARD.treeScale,
+  }];
+  const understory = createUnderstory(reducedGraphics).filter(placement => !concreteSurfaces.some(
+    surface => pointInPolygon(placement.position, surface.polygon)
+      && !surface.holes.some(hole => pointInPolygon(placement.position, hole)),
+  ));
   return {
     revision: PARK_ACCESS_ENVIRONMENT_REVISION,
     environmentalSurfaces,
@@ -692,6 +712,7 @@ export function resolveParkAccessEnvironmentPresentation(
 }
 
 export const PARK_ACCESS_ENVIRONMENT_SOURCE_REFERENCES = [
+  'IMG_0967 — ligação entre Pavilhões 1/14 e pátio dos Pavilhões 14/12, árvore central e abertura de raiz; dimensões estimadas',
   'Anexo 1 — implantação registrada do bosque, vias e Sede Costeiros',
   'Anexo 3 — arborização linear e seção visual da Av. Benvenuto de Conti',
   'Anexo 5 — Caminho do Bosque entre Portão 2 e lateral superior/oeste do Pavilhão 14',

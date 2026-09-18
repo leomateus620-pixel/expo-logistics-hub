@@ -7,6 +7,8 @@ export const OFFICIAL_REFERENCE_IMAGE = '/maps/fenasoja-oficial-2026-park.webp';
 
 /** Shared visible top of the textured open-ground presentation, never cadastral height. */
 export const OPEN_GROUND_PRESENTATION_HEIGHT = 0.026;
+/** Continuous environment ground below semantic natural-field picking areas. */
+export const COMMERCIAL_MAP_GROUND_ELEVATION = -0.08;
 
 export const ROAD_MATERIAL_COLORS = {
   asphalt: '#4b5054',

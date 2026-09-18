@@ -1,11 +1,18 @@
 import { MAP_REFERENCE_HEIGHT, MAP_REFERENCE_WIDTH } from '../constants';
 import type { CommercialMapData, Coordinate, MapEntity } from '../types';
 
-/** Registered visual estimates, not surveyed dimensions. Existing centres and
- * street-facing axes remain fixed. Roof envelopes include the eaves/porch.
+/** Registered visual estimates, not surveyed dimensions. Street-facing axes
+ * remain fixed. Roof envelopes include the eaves/porch.
  * Test Drive = the existing `sede-costeiros`, never a second cadastral object.
  */
-export const RURAL_PAVILION_REVISION = '2026.9-rural-pavilions-photographs.1';
+export const RURAL_PAVILION_REVISION = '2026.9-rural-pavilions-photographs.2';
+/** Shared source bounds, also consumed by the official B28 entity. */
+export const RURAL_PAVILION_NEIGHBOR_BOUNDS = Object.freeze({
+  B28: [3000, 2480, 3220, 2570] as const,
+});
+const livestockFrontSourceX = 2840;
+const livestockRearClearance = 3;
+const livestockRearSourceX = RURAL_PAVILION_NEIGHBOR_BOUNDS.B28[0] - livestockRearClearance;
 export const RURAL_PAVILIONS = Object.freeze({
   testDrive: Object.freeze({
     id: 'sede-costeiros', sourceCenter: [917.5, 2972.5] as const,
@@ -17,8 +24,11 @@ export const RURAL_PAVILIONS = Object.freeze({
     frontAxis: '+Z', evidence: ['IMG_0860.jpeg', 'IMG_0859.jpeg'],
   }),
   livestock: Object.freeze({
-    id: 'D4', sourceCenter: [2925, 2525] as const,
-    sourceWidth: 170, sourceDepth: 132, yaw: -Math.PI / 2,
+    id: 'D4', sourceCenter: [(livestockFrontSourceX + livestockRearSourceX) / 2, 2525] as const,
+    sourceWidth: livestockRearSourceX - livestockFrontSourceX, sourceDepth: 132, yaw: -Math.PI / 2,
+    sourceFrontX: livestockFrontSourceX, sourceRearX: livestockRearSourceX,
+    rearClearanceSource: livestockRearClearance,
+    rearNeighborIdentifier: 'B28',
     roofHeight: 1.2, enclosedRearFraction: 0.36,
     evidence: ['IMG_0858.jpeg', 'IMG_0863.jpeg'],
   }),
@@ -49,7 +59,8 @@ export function reconstructRuralPavilionEntity(entity: MapEntity): MapEntity {
     geometry: { ...entity.geometry, coordinates: [sourceRing.map(toLocal)] },
     metadata: { ...entity.metadata, sourcePdfPolygon: sourceRing,
       ruralReconstructionRevision: RURAL_PAVILION_REVISION,
-      reconstructionAnchors: ['D4', 'Q-Q-01', 'B9'], officialMeasurements: false,
+      reconstructionAnchors: ['D4', 'Q-Q-01', 'B9', 'B28'], officialMeasurements: false,
+      reconstructionPlacementReason: 'Preserve street-facing x2840; trim rear to B28 west edge minus 3 source units, including roof envelope.',
       cartographicConfidence: 'reference_registered_estimate' },
   };
 }

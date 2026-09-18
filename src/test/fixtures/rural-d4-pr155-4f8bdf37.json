@@ -1,0 +1,88 @@
+{
+  "sourceCommit": "4f8bdf3777dc521d80ad67885278e79da7426e56",
+  "extraction": "OFFICIAL_REFERENCE_ENTITIES D4, unchanged PR 155 head before rear clearance revision",
+  "sha256": "58886658e8936c04ef0c8a54fa3ff55bcf2fe26d5ac3235decc8eb73bff6395e",
+  "entity": {
+    "id": "reference:2026:d4",
+    "projectId": "reference:fenasoja-2026",
+    "layerId": "reference:exporural",
+    "parentEntityId": "reference:2026:quadra-n",
+    "publicIdentifier": "D4",
+    "name": "Tenda da Pecuária",
+    "description": null,
+    "classification": "LIVESTOCK_AREA",
+    "verificationStatus": "NEEDS_REVIEW",
+    "isSellable": false,
+    "isArchived": false,
+    "geometry": {
+      "id": null,
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -11.127272727272725,
+            -11.258181874698792
+          ],
+          [
+            -7.4181818181818215,
+            -11.258181874698792
+          ],
+          [
+            -7.4181818181818215,
+            -8.378181860240964
+          ],
+          [
+            -11.127272727272725,
+            -8.378181860240964
+          ],
+          [
+            -11.127272727272725,
+            -11.258181874698792
+          ]
+        ]
+      ],
+      "elevation": 0,
+      "extrusionHeight": 0.74,
+      "rotation": 0,
+      "geometryVersion": 1,
+      "calibrationVersion": null
+    },
+    "metadata": {
+      "seedManaged": true,
+      "sourceRevision": "2026.3",
+      "source": "Mapa oficial Fenasoja 2026 — PDF Mapa do Parque 300x200",
+      "cartographicConfidence": "reference_registered_estimate",
+      "officialMeasurements": false,
+      "sourcePdfPolygon": [
+        [
+          2840,
+          2459
+        ],
+        [
+          3010,
+          2459
+        ],
+        [
+          3010,
+          2591
+        ],
+        [
+          2840,
+          2591
+        ],
+        [
+          2840,
+          2459
+        ]
+      ],
+      "parentPublicIdentifier": "QUADRA-N",
+      "buyerDataImported": false,
+      "ruralReconstructionRevision": "2026.9-rural-pavilions-photographs.1",
+      "reconstructionAnchors": [
+        "D4",
+        "Q-Q-01",
+        "B9"
+      ]
+    }
+  }
+}
