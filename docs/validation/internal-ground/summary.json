@@ -1,0 +1,262 @@
+{
+  "browser": "153.0.8010.47",
+  "fixture": true,
+  "viewport": {
+    "width": 1366,
+    "height": 900
+  },
+  "views": 67,
+  "performance": [
+    {
+      "view": "overview",
+      "beforeMedianMs": 24.85142746916033,
+      "afterMedianMs": 25.766094420600858,
+      "deltaPercent": 3.680540896797946,
+      "beforeSamplesMs": [
+        26.614601770069747,
+        23.710276679794777,
+        27.275909090854906,
+        24.704938271653997,
+        24.203225806595817,
+        24.997916666666665
+      ],
+      "afterSamplesMs": [
+        25.476271186339652,
+        25.766094420600858,
+        27.449771689497716
+      ],
+      "beforeCalls": [
+        696,
+        696,
+        696,
+        696,
+        696,
+        696
+      ],
+      "afterCalls": [
+        696,
+        696,
+        696
+      ]
+    },
+    {
+      "view": "quadraA-oblique",
+      "beforeMedianMs": 20.749904846880998,
+      "afterMedianMs": 21.572043010838144,
+      "deltaPercent": 3.96212980263726,
+      "beforeSamplesMs": [
+        20.246283783703237,
+        20.205387205387204,
+        20.385423728975198,
+        21.12982456140351,
+        21.1143859647868,
+        21.281205673589774
+      ],
+      "afterSamplesMs": [
+        25.5,
+        21.572043010838144,
+        21.04526315802022
+      ],
+      "beforeCalls": [
+        407,
+        407,
+        407,
+        408,
+        407,
+        407
+      ],
+      "afterCalls": [
+        407,
+        407,
+        407
+      ]
+    },
+    {
+      "view": "bosque-oblique",
+      "beforeMedianMs": 16.73022284124223,
+      "afterMedianMs": 17.065056818283416,
+      "deltaPercent": 2.001371889774095,
+      "beforeSamplesMs": [
+        16.712777777678436,
+        17.38323699428856,
+        16.94830508471209,
+        16.6631578946708,
+        16.712813370407126,
+        16.747632312077332
+      ],
+      "afterSamplesMs": [
+        17.05852272734046,
+        17.065056818283416,
+        17.792899408284022
+      ],
+      "beforeCalls": [
+        268,
+        268,
+        268,
+        268,
+        268,
+        268
+      ],
+      "afterCalls": [
+        268,
+        268,
+        268
+      ]
+    },
+    {
+      "view": "etnias-oblique",
+      "beforeMedianMs": 17.95996235048139,
+      "afterMedianMs": 18.533333333370127,
+      "deltaPercent": 3.192495461291256,
+      "beforeSamplesMs": [
+        17.93253731353959,
+        20.13422818791946,
+        19.923509933893254,
+        17.987387387423187,
+        17.756213017822017,
+        17.925000000035478
+      ],
+      "afterSamplesMs": [
+        18.81912225709066,
+        18.533333333370127,
+        17.983283582196307
+      ],
+      "beforeCalls": [
+        416,
+        414,
+        416,
+        414,
+        416,
+        416
+      ],
+      "afterCalls": [
+        414,
+        416,
+        416
+      ]
+    },
+    {
+      "view": "expositores-oblique",
+      "beforeMedianMs": 20.452381201246247,
+      "afterMedianMs": 19.42103559878266,
+      "deltaPercent": -5.04266761075598,
+      "beforeSamplesMs": [
+        21.18480565375237,
+        21.236749116607776,
+        20.838541666666668,
+        20.066220735825823,
+        19.25865384630668,
+        19.281028939021745
+      ],
+      "afterSamplesMs": [
+        19.42103559878266,
+        19.398709677496264,
+        20.863194444527227
+      ],
+      "beforeCalls": [
+        345,
+        346,
+        345,
+        345,
+        345,
+        345
+      ],
+      "afterCalls": [
+        344,
+        347,
+        345
+      ]
+    },
+    {
+      "view": "arena-oblique",
+      "beforeMedianMs": 17.012280096274417,
+      "afterMedianMs": 16.66565096956211,
+      "deltaPercent": -2.037523040713496,
+      "beforeSamplesMs": [
+        17.14057142853737,
+        47.7650793653632,
+        22.78560606051575,
+        16.666666666666668,
+        16.66592797777329,
+        16.88398876401146
+      ],
+      "afterSamplesMs": [
+        16.66565096956211,
+        16.66509695280952,
+        16.675623268632016
+      ],
+      "beforeCalls": [
+        296,
+        297,
+        296,
+        297,
+        297,
+        297
+      ],
+      "afterCalls": [
+        297,
+        297,
+        297
+      ]
+    }
+  ],
+  "scene": {
+    "before": {
+      "meshes": 930,
+      "instances": 23769,
+      "allocatedTriangles": 955513,
+      "geometries": 564,
+      "materials": 632,
+      "geometryBufferBytes": 13531408
+    },
+    "after": {
+      "meshes": 930,
+      "instances": 23769,
+      "allocatedTriangles": 955513,
+      "geometries": 564,
+      "materials": 630,
+      "geometryBufferBytes": 13081340
+    }
+  },
+  "renderer": {
+    "before": {
+      "geometries": 570,
+      "textures": 143,
+      "programs": 212,
+      "dpr": 0.72,
+      "width": 925,
+      "height": 586,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "after": {
+      "geometries": 583,
+      "textures": 130,
+      "programs": 222,
+      "dpr": 0.72,
+      "width": 925,
+      "height": 586,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  },
+  "health": {
+    "status": "ready",
+    "path": "post",
+    "presentedFrames": 13698,
+    "contextLosses": 0,
+    "lastErrorCode": null
+  },
+  "externalSample": {
+    "crop": [
+      400,
+      160,
+      1100,
+      780
+    ],
+    "meanAbsoluteRgb": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "differentPixelFraction": 0.0
+  }
+}

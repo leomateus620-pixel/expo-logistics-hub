@@ -1,0 +1,37 @@
+{
+  "surface": "Codex in-app browser",
+  "route": "/__dev/commercial-map-rendering?quality=fixed",
+  "procedure": [
+    "Full reload after installing the fix",
+    "Add a temporary comment to interiorGroundMaterial.ts to trigger Fast Refresh",
+    "Remove the temporary comment to trigger a second Fast Refresh",
+    "Zoom the live scene"
+  ],
+  "samples": [
+    {
+      "stage": "fresh",
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 284,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    {
+      "stage": "first-refresh",
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 310,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    {
+      "stage": "second-refresh-and-zoom",
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 365,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  ],
+  "temporaryCommentRemoved": true
+}

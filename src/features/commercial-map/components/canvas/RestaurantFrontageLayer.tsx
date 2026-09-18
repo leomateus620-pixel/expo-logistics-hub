@@ -9,7 +9,7 @@ import {
   type FrontageTree,
 } from '../../utils/restaurantFrontage';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
-import { applyParkGroundDetail } from './terrainMaterial';
+import { applyInteriorGroundMaterial } from './interiorGroundMaterial';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
@@ -127,12 +127,12 @@ export const RestaurantFrontageLayer = memo(function RestaurantFrontageLayer({
     concrete: surfaceMaterial(palette.concrete, 0.86, -0.9),
     joint: surfaceMaterial(palette.joint, 0.92, -1.2),
     connector: surfaceMaterial(palette.connector, 0.9, -0.8),
-    lawn: applyParkGroundDetail(surfaceMaterial(palette.lawn, 1, -0.5), reducedGraphics),
+    lawn: applyInteriorGroundMaterial(surfaceMaterial(palette.lawn, 1, -0.5)),
     hedge: surfaceMaterial(palette.hedge, 0.94, 0),
     shrub: surfaceMaterial(palette.shrub, 0.96, 0),
     soil: surfaceMaterial(palette.soil, 1, -1.1),
     pitCurb: surfaceMaterial(palette.pitCurb, 0.88, -1),
-  }), [reducedGraphics]);
+  }), []);
 
   useEffect(() => () => {
     Object.values(materials).forEach((material) => material.dispose());

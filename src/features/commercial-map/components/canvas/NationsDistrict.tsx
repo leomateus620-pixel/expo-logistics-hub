@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { useInteriorGroundMaterial } from './interiorGroundMaterial';
 import { ROAD_MATERIAL_COLORS } from '../../constants';
 import {
   NATIONS_DISTRICT_LAYOUT,
@@ -71,7 +72,6 @@ function createNoiseTexture(colorValue: string, variance: number) {
 }
 
 const ASPHALT_TEXTURE = createNoiseTexture(ROAD_MATERIAL_COLORS.asphalt, 0.13);
-const GRASS_TEXTURE = createNoiseTexture('#758b65', 0.18);
 
 function shapeFromPolygon(points: readonly NationsDistrictPoint[]) {
   const shape = new THREE.Shape();
@@ -188,12 +188,6 @@ function InstancedBatch({
 function createMaterials() {
   const common = { transparent: false, opacity: 1, depthWrite: true };
   return {
-    grass: new THREE.MeshStandardMaterial({
-      ...common,
-      color: '#ffffff',
-      map: GRASS_TEXTURE,
-      roughness: 0.97,
-    }),
     asphalt: new THREE.MeshStandardMaterial({
       ...common,
       color: '#ffffff',
@@ -239,6 +233,7 @@ export function NationsDistrict({ visible, opacity, reducedGraphics }: NationsDi
     NATIONS_DISTRICT_LAYOUT.islands.map((island) => islandPolygon(island, island.insetScale)),
   ), []);
   const materials = useMemo(() => createMaterials(), []);
+  const grassMaterial = useInteriorGroundMaterial(opacity, 0, 0, opacity > .42, opacity < .995);
   const curbItems = useMemo(() => [
     ...polygonEdgeTransforms(NATIONS_DISTRICT_LAYOUT.mainAsphalt, 0.105, 0.075, 0.075),
     ...NATIONS_DISTRICT_LAYOUT.islands.flatMap((island) => (
@@ -344,14 +339,8 @@ export function NationsDistrict({ visible, opacity, reducedGraphics }: NationsDi
   }, [invalidate, materials, opacity]);
 
   useEffect(() => {
-    const grassMap = reducedGraphics ? null : GRASS_TEXTURE;
     const asphaltMap = reducedGraphics ? null : ASPHALT_TEXTURE;
-    materials.grass.color.set(reducedGraphics ? '#758b65' : '#ffffff');
     materials.asphalt.color.set(reducedGraphics ? ROAD_MATERIAL_COLORS.asphalt : '#ffffff');
-    if (materials.grass.map !== grassMap) {
-      materials.grass.map = grassMap;
-      materials.grass.needsUpdate = true;
-    }
     if (materials.asphalt.map !== asphaltMap) {
       materials.asphalt.map = asphaltMap;
       materials.asphalt.needsUpdate = true;
@@ -366,11 +355,11 @@ export function NationsDistrict({ visible, opacity, reducedGraphics }: NationsDi
 
   return (
     <group visible={presentationVisible} dispose={null}>
-      <mesh geometry={grassGeometry} material={materials.grass} position={[0, 0.022, 0]} receiveShadow raycast={NO_RAYCAST} />
+      <mesh geometry={grassGeometry} material={grassMaterial} position={[0, 0.022, 0]} receiveShadow raycast={NO_RAYCAST} />
       <mesh geometry={asphaltGeometry} material={materials.asphalt} position={[0, 0.062, 0]} receiveShadow raycast={NO_RAYCAST} />
       <mesh geometry={civicGeometry} material={materials.paver} position={[0, 0.096, 0]} receiveShadow raycast={NO_RAYCAST} />
       <mesh geometry={islandPaverGeometry} material={materials.concrete} position={[0, 0.136, 0]} receiveShadow raycast={NO_RAYCAST} />
-      <mesh geometry={islandGrassGeometry} material={materials.grass} position={[0, 0.172, 0]} receiveShadow raycast={NO_RAYCAST} />
+      <mesh geometry={islandGrassGeometry} material={grassMaterial} position={[0, 0.172, 0]} receiveShadow raycast={NO_RAYCAST} />
       <InstancedBatch material={materials.curb} items={curbItems} receiveShadow />
       <InstancedBatch material={materials.timber} items={stairBands} />
       {!reducedGraphics && <InstancedBatch material={materials.timber} items={benchItems} />}

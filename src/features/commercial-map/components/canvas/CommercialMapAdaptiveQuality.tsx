@@ -75,9 +75,10 @@ export function CommercialMapAdaptiveQualityController({
   const cadenceCancel = useRef<(() => void) | null>(null);
   const activity = useRef(commercialMapFrameActivity(gl));
   // Opt-in, local QA only: compare identical initial quality before/after.
-  // The query has no effect on the authenticated route or normal builds.
+  // groundQa also enables comparison on the application route in DEV only.
   const fixedQualityForComparison = useRef(commercialMapDiagnosticsEnabled
-    && window.location.pathname === '/__dev/commercial-map-rendering'
+    && (window.location.pathname === '/__dev/commercial-map-rendering'
+      || (import.meta.env.DEV && new URLSearchParams(window.location.search).has('groundQa')))
     && new URLSearchParams(window.location.search).get('quality') === 'fixed');
 
   const resolveCapabilities = useCallback((): CommercialMapQualityCapabilitiesInput => ({

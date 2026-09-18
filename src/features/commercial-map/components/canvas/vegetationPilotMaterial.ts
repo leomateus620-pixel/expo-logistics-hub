@@ -1,46 +1,6 @@
 import * as THREE from "three";
 import { pilotRandom } from "../../utils/vegetationPilot";
 
-let groundNoisePool: { texture: THREE.DataTexture; users: number } | null =
-  null;
-const groundNoiseOwners = new WeakMap<THREE.Material, THREE.DataTexture>();
-
-function groundNoiseForMaterial(material: THREE.Material) {
-  const existing = groundNoiseOwners.get(material);
-  if (existing) return existing;
-  if (!groundNoisePool) {
-    const size = 256,
-      data = new Uint8Array(size * size * 4),
-      random = pilotRandom(77901);
-    for (let i = 0; i < data.length; i += 4) {
-      const value = Math.round(random() * 255);
-      data[i] = data[i + 1] = data[i + 2] = value;
-      data[i + 3] = 255;
-    }
-    const texture = new THREE.DataTexture(data, size, size);
-    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.generateMipmaps = true;
-    texture.minFilter = THREE.LinearMipmapLinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    texture.needsUpdate = true;
-    texture.name = "pilot-ground-noise-256";
-    groundNoisePool = { texture, users: 0 };
-  }
-  const pool = groundNoisePool;
-  pool.users++;
-  groundNoiseOwners.set(material, pool.texture);
-  const release = () => {
-    material.removeEventListener("dispose", release);
-    groundNoiseOwners.delete(material);
-    if (--pool.users === 0) {
-      pool.texture.dispose();
-      if (groundNoisePool === pool) groundNoisePool = null;
-    }
-  };
-  material.addEventListener("dispose", release);
-  return pool.texture;
-}
-
 /** One 256-square atlas, sixteen small leaves, baked vein/edge relief. Generated once per layer. */
 export function createPilotLeafAtlas() {
   const size = 256,
@@ -244,50 +204,5 @@ export function createPilotBarkMaterial() {
     );
   };
   material.customProgramCacheKey = () => "pilot-bark-r170-v1";
-  return material;
-}
-
-/** Nonperiodic world-space meadow detail; derivatives attenuate fine features before aliasing. */
-export function applyPilotGroundMaterial(material: THREE.MeshStandardMaterial) {
-  const noise = groundNoiseForMaterial(material);
-  material.onBeforeCompile = (shader) => {
-    shader.uniforms.pilotGroundNoise = { value: noise };
-    shader.vertexShader = shader.vertexShader.replace(
-      "#include <common>",
-      "#include <common>\nvarying vec3 vPilotGround;",
-    );
-    shader.vertexShader = shader.vertexShader.replace(
-      "#include <begin_vertex>",
-      "#include <begin_vertex>\nvPilotGround=(modelMatrix*vec4(position,1.)).xyz;",
-    );
-    shader.fragmentShader = shader.fragmentShader.replace(
-      "#include <common>",
-      `#include <common>
-      varying vec3 vPilotGround;
-      uniform sampler2D pilotGroundNoise;
-      float pilotNoise(vec2 p){return texture2D(pilotGroundNoise,(p+0.5)/256.).r;}`,
-    );
-    shader.fragmentShader = shader.fragmentShader.replace(
-      "#include <color_fragment>",
-      `#include <color_fragment>
-      vec2 p=vPilotGround.xz;
-      float meadow=pilotNoise(p*0.66+vec2(pilotNoise(p*0.21)*2.));
-      float clump=pilotNoise(p*4.2+meadow*3.);
-      float fineFade=1.-smoothstep(0.018,0.075,length(fwidth(p)));
-      float blade=pilotNoise(p*vec2(95.,31.)+clump*7.);
-      diffuseColor.rgb *= mix(vec3(0.76,0.82,0.62),vec3(1.08,1.06,0.88),meadow);
-      diffuseColor.rgb *= 0.86+clump*0.27;
-      diffuseColor.rgb *= 1.+(blade-0.5)*0.26*fineFade;`,
-    );
-    shader.fragmentShader = shader.fragmentShader.replace(
-      "#include <normal_fragment_maps>",
-      `#include <normal_fragment_maps>
-      float grassRelief=blade;
-      float reliefFade=1.-smoothstep(0.018,0.065,length(fwidth(vPilotGround.xz)));
-      normal=normalize(normal+vec3(dFdx(grassRelief),dFdy(grassRelief),0.)*0.16*reliefFade);`,
-    );
-  };
-  material.customProgramCacheKey = () => "pilot-ground-r170-v2-pooled-noise";
-  material.needsUpdate = true;
   return material;
 }

@@ -1,0 +1,2024 @@
+{
+  "phase": "baseline-fixed",
+  "fixture": true,
+  "route": "/mapa-comercial",
+  "browser": "153.0.8010.47",
+  "viewport": {
+    "width": 1366,
+    "height": 900
+  },
+  "errors": [],
+  "views": {},
+  "metrics": [
+    {
+      "name": "overview",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 226,
+      "meanMs": 26.614601770069747,
+      "p95Ms": 32.10000002384186,
+      "renderer": {
+        "at": 110206.80000001192,
+        "calls": 696,
+        "triangles": 649006,
+        "geometries": 554,
+        "textures": 143,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 174015159,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2744,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "overview",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 253,
+      "meanMs": 23.710276679794777,
+      "p95Ms": 28.19999998807907,
+      "renderer": {
+        "at": 117419,
+        "calls": 696,
+        "triangles": 649006,
+        "geometries": 554,
+        "textures": 143,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 161169009,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 3040,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "overview",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 220,
+      "meanMs": 27.275909090854906,
+      "p95Ms": 33,
+      "renderer": {
+        "at": 124578.40000003576,
+        "calls": 696,
+        "triangles": 649006,
+        "geometries": 554,
+        "textures": 143,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 172993027,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 3302,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "quadraA-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 296,
+      "meanMs": 20.246283783703237,
+      "p95Ms": 22.5,
+      "renderer": {
+        "at": 132578.80000001192,
+        "calls": 407,
+        "triangles": 675082,
+        "geometries": 563,
+        "textures": 145,
+        "programs": 214,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 161893864,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 3662,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "quadraA-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 297,
+      "meanMs": 20.205387205387204,
+      "p95Ms": 22.30000001192093,
+      "renderer": {
+        "at": 139519,
+        "calls": 407,
+        "triangles": 675082,
+        "geometries": 563,
+        "textures": 145,
+        "programs": 214,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 172565420,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 3997,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "quadraA-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 295,
+      "meanMs": 20.385423728975198,
+      "p95Ms": 22.5,
+      "renderer": {
+        "at": 146468.30000001192,
+        "calls": 407,
+        "triangles": 675106,
+        "geometries": 563,
+        "textures": 145,
+        "programs": 214,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 175624575,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4332,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "bosque-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 360,
+      "meanMs": 16.712777777678436,
+      "p95Ms": 17,
+      "renderer": {
+        "at": 154436.19999998808,
+        "calls": 268,
+        "triangles": 361960,
+        "geometries": 574,
+        "textures": 144,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 168126351,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4768,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "bosque-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 346,
+      "meanMs": 17.38323699428856,
+      "p95Ms": 19.69999998807907,
+      "renderer": {
+        "at": 161336.90000003576,
+        "calls": 268,
+        "triangles": 361960,
+        "geometries": 574,
+        "textures": 144,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 171948099,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 5159,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "bosque-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 354,
+      "meanMs": 16.94830508471209,
+      "p95Ms": 18.19999998807907,
+      "renderer": {
+        "at": 168220,
+        "calls": 268,
+        "triangles": 361960,
+        "geometries": 574,
+        "textures": 144,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 178048260,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 5565,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "etnias-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 335,
+      "meanMs": 17.93253731353959,
+      "p95Ms": 21,
+      "renderer": {
+        "at": 176139.19999998808,
+        "calls": 416,
+        "triangles": 649299,
+        "geometries": 567,
+        "textures": 143,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 172458883,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 5984,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "etnias-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 298,
+      "meanMs": 20.13422818791946,
+      "p95Ms": 28.600000023841858,
+      "renderer": {
+        "at": 183100.30000001192,
+        "calls": 414,
+        "triangles": 649263,
+        "geometries": 567,
+        "textures": 143,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 158273522,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 6332,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "etnias-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 302,
+      "meanMs": 19.923509933893254,
+      "p95Ms": 29.19999998807907,
+      "renderer": {
+        "at": 190080.60000002384,
+        "calls": 416,
+        "triangles": 649287,
+        "geometries": 567,
+        "textures": 143,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 159548410,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 6675,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "expositores-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 283,
+      "meanMs": 21.18480565375237,
+      "p95Ms": 26,
+      "renderer": {
+        "at": 198060.60000002384,
+        "calls": 345,
+        "triangles": 688371,
+        "geometries": 567,
+        "textures": 143,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 161522667,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 7023,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "expositores-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 283,
+      "meanMs": 21.236749116607776,
+      "p95Ms": 27.200000047683716,
+      "renderer": {
+        "at": 205073,
+        "calls": 346,
+        "triangles": 688443,
+        "geometries": 567,
+        "textures": 143,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 167658667,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 7345,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "expositores-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 288,
+      "meanMs": 20.838541666666668,
+      "p95Ms": 22.900000035762787,
+      "renderer": {
+        "at": 212036.80000001192,
+        "calls": 345,
+        "triangles": 688371,
+        "geometries": 567,
+        "textures": 143,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 169257196,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 7673,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "arena-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 350,
+      "meanMs": 17.14057142853737,
+      "p95Ms": 21.099999964237213,
+      "renderer": {
+        "at": 220039,
+        "calls": 296,
+        "triangles": 558790,
+        "geometries": 570,
+        "textures": 143,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 175109609,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 8101,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "arena-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 126,
+      "meanMs": 47.7650793653632,
+      "p95Ms": 197.69999998807907,
+      "renderer": {
+        "at": 226986.30000001192,
+        "calls": 297,
+        "triangles": 558850,
+        "geometries": 570,
+        "textures": 143,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 166731144,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 8298,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    },
+    {
+      "name": "arena-oblique",
+      "headquarters": {
+        "entityBounds": [
+          2.3114009394860453,
+          1.8623708206686942
+        ],
+        "contactBake": {
+          "durationMs": 1053.8999999761581,
+          "samples": 16167,
+          "rays": 8,
+          "maxDistanceMeters": 0.85
+        },
+        "resources": {
+          "materialCount": 24,
+          "geometryBatches": 33,
+          "instancedBatches": 3,
+          "instanceCapacity": 2652,
+          "geometryBufferBytes": 4189038,
+          "textureCount": 15,
+          "estimatedTextureBytes": 17476266.666666664,
+          "transparentBatches": 1
+        },
+        "renderCount": 1,
+        "lod": 0,
+        "rendersDuringMeasure": 0
+      },
+      "frames": 264,
+      "meanMs": 22.78560606051575,
+      "p95Ms": 44.69999998807907,
+      "renderer": {
+        "at": 234405.10000002384,
+        "calls": 296,
+        "triangles": 558790,
+        "geometries": 570,
+        "textures": 143,
+        "programs": 212,
+        "dpr": 0.72,
+        "width": 925,
+        "height": 586,
+        "heapBytes": 156963336,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 8566,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "visible": "visible",
+      "focused": true
+    }
+  ],
+  "poses": {
+    "overview": {
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "position": [
+        0.01,
+        115,
+        10
+      ]
+    },
+    "external": {
+      "target": [
+        -71.34545454545454,
+        0.3,
+        -0.5454545481927724
+      ],
+      "position": [
+        -71.33545454545454,
+        21.3,
+        -0.5454545481927724
+      ]
+    },
+    "quadraA-top": {
+      "target": [
+        19.854545454545445,
+        0.3,
+        21.272727379518074
+      ],
+      "position": [
+        19.864545454545446,
+        20.3,
+        21.272727379518074
+      ]
+    },
+    "quadraA-oblique": {
+      "target": [
+        19.854545454545445,
+        0.3,
+        21.272727379518074
+      ],
+      "position": [
+        28.854545454545445,
+        10.3,
+        34.272727379518074
+      ]
+    },
+    "quadraA-low": {
+      "target": [
+        19.854545454545445,
+        0.3,
+        21.272727379518074
+      ],
+      "position": [
+        22.854545454545445,
+        2.1,
+        27.272727379518074
+      ]
+    },
+    "quadraA-medium": {
+      "target": [
+        19.854545454545445,
+        0.3,
+        21.272727379518074
+      ],
+      "position": [
+        19.854545454545445,
+        11.3,
+        34.272727379518074
+      ]
+    },
+    "quadraA-far": {
+      "target": [
+        19.854545454545445,
+        0.3,
+        21.272727379518074
+      ],
+      "position": [
+        19.864545454545446,
+        37.3,
+        24.272727379518074
+      ]
+    },
+    "quadraB-top": {
+      "target": [
+        20.072727272727263,
+        0.3,
+        13.85454552409638
+      ],
+      "position": [
+        20.082727272727265,
+        20.3,
+        13.85454552409638
+      ]
+    },
+    "quadraB-oblique": {
+      "target": [
+        20.072727272727263,
+        0.3,
+        13.85454552409638
+      ],
+      "position": [
+        29.072727272727263,
+        10.3,
+        26.85454552409638
+      ]
+    },
+    "quadraB-low": {
+      "target": [
+        20.072727272727263,
+        0.3,
+        13.85454552409638
+      ],
+      "position": [
+        23.072727272727263,
+        2.1,
+        19.85454552409638
+      ]
+    },
+    "quadraB-medium": {
+      "target": [
+        20.072727272727263,
+        0.3,
+        13.85454552409638
+      ],
+      "position": [
+        20.072727272727263,
+        11.3,
+        26.85454552409638
+      ]
+    },
+    "quadraB-far": {
+      "target": [
+        20.072727272727263,
+        0.3,
+        13.85454552409638
+      ],
+      "position": [
+        20.082727272727265,
+        37.3,
+        16.85454552409638
+      ]
+    },
+    "bosque-top": {
+      "target": [
+        -28.363636363636367,
+        0.3,
+        14.072727343373494
+      ],
+      "position": [
+        -28.353636363636365,
+        20.3,
+        14.072727343373494
+      ]
+    },
+    "bosque-oblique": {
+      "target": [
+        -28.363636363636367,
+        0.3,
+        14.072727343373494
+      ],
+      "position": [
+        -19.363636363636367,
+        10.3,
+        27.072727343373494
+      ]
+    },
+    "bosque-low": {
+      "target": [
+        -28.363636363636367,
+        0.3,
+        14.072727343373494
+      ],
+      "position": [
+        -25.363636363636367,
+        2.1,
+        20.072727343373494
+      ]
+    },
+    "bosque-medium": {
+      "target": [
+        -28.363636363636367,
+        0.3,
+        14.072727343373494
+      ],
+      "position": [
+        -28.363636363636367,
+        11.3,
+        27.072727343373494
+      ]
+    },
+    "bosque-far": {
+      "target": [
+        -28.363636363636367,
+        0.3,
+        14.072727343373494
+      ],
+      "position": [
+        -28.353636363636365,
+        37.3,
+        17.072727343373494
+      ]
+    },
+    "etnias-top": {
+      "target": [
+        34.47272727272727,
+        0.3,
+        36.32727290963855
+      ],
+      "position": [
+        34.48272727272727,
+        20.3,
+        36.32727290963855
+      ]
+    },
+    "etnias-oblique": {
+      "target": [
+        34.47272727272727,
+        0.3,
+        36.32727290963855
+      ],
+      "position": [
+        43.47272727272727,
+        10.3,
+        49.32727290963855
+      ]
+    },
+    "etnias-low": {
+      "target": [
+        34.47272727272727,
+        0.3,
+        36.32727290963855
+      ],
+      "position": [
+        37.47272727272727,
+        2.1,
+        42.32727290963855
+      ]
+    },
+    "etnias-medium": {
+      "target": [
+        34.47272727272727,
+        0.3,
+        36.32727290963855
+      ],
+      "position": [
+        34.47272727272727,
+        11.3,
+        49.32727290963855
+      ]
+    },
+    "etnias-far": {
+      "target": [
+        34.47272727272727,
+        0.3,
+        36.32727290963855
+      ],
+      "position": [
+        34.48272727272727,
+        37.3,
+        39.32727290963855
+      ]
+    },
+    "expositores-top": {
+      "target": [
+        32.5090909090909,
+        0.3,
+        15.818181897590357
+      ],
+      "position": [
+        32.5190909090909,
+        20.3,
+        15.818181897590357
+      ]
+    },
+    "expositores-oblique": {
+      "target": [
+        32.5090909090909,
+        0.3,
+        15.818181897590357
+      ],
+      "position": [
+        41.5090909090909,
+        10.3,
+        28.818181897590357
+      ]
+    },
+    "expositores-low": {
+      "target": [
+        32.5090909090909,
+        0.3,
+        15.818181897590357
+      ],
+      "position": [
+        35.5090909090909,
+        2.1,
+        21.818181897590357
+      ]
+    },
+    "expositores-medium": {
+      "target": [
+        32.5090909090909,
+        0.3,
+        15.818181897590357
+      ],
+      "position": [
+        32.5090909090909,
+        11.3,
+        28.818181897590357
+      ]
+    },
+    "expositores-far": {
+      "target": [
+        32.5090909090909,
+        0.3,
+        15.818181897590357
+      ],
+      "position": [
+        32.5190909090909,
+        37.3,
+        18.818181897590357
+      ]
+    },
+    "visitantes-top": {
+      "target": [
+        48.65454545454544,
+        0.3,
+        18.43636372891566
+      ],
+      "position": [
+        48.66454545454544,
+        20.3,
+        18.43636372891566
+      ]
+    },
+    "visitantes-oblique": {
+      "target": [
+        48.65454545454544,
+        0.3,
+        18.43636372891566
+      ],
+      "position": [
+        57.65454545454544,
+        10.3,
+        31.43636372891566
+      ]
+    },
+    "visitantes-low": {
+      "target": [
+        48.65454545454544,
+        0.3,
+        18.43636372891566
+      ],
+      "position": [
+        51.65454545454544,
+        2.1,
+        24.43636372891566
+      ]
+    },
+    "visitantes-medium": {
+      "target": [
+        48.65454545454544,
+        0.3,
+        18.43636372891566
+      ],
+      "position": [
+        48.65454545454544,
+        11.3,
+        31.43636372891566
+      ]
+    },
+    "visitantes-far": {
+      "target": [
+        48.65454545454544,
+        0.3,
+        18.43636372891566
+      ],
+      "position": [
+        48.66454545454544,
+        37.3,
+        21.43636372891566
+      ]
+    },
+    "arena-top": {
+      "target": [
+        31.200000000000003,
+        0.3,
+        -3.8181818373493996
+      ],
+      "position": [
+        31.210000000000004,
+        20.3,
+        -3.8181818373493996
+      ]
+    },
+    "arena-oblique": {
+      "target": [
+        31.200000000000003,
+        0.3,
+        -3.8181818373493996
+      ],
+      "position": [
+        40.2,
+        10.3,
+        9.1818181626506
+      ]
+    },
+    "arena-low": {
+      "target": [
+        31.200000000000003,
+        0.3,
+        -3.8181818373493996
+      ],
+      "position": [
+        34.2,
+        2.1,
+        2.1818181626506004
+      ]
+    },
+    "arena-medium": {
+      "target": [
+        31.200000000000003,
+        0.3,
+        -3.8181818373493996
+      ],
+      "position": [
+        31.200000000000003,
+        11.3,
+        9.1818181626506
+      ]
+    },
+    "arena-far": {
+      "target": [
+        31.200000000000003,
+        0.3,
+        -3.8181818373493996
+      ],
+      "position": [
+        31.210000000000004,
+        37.3,
+        -0.8181818373493996
+      ]
+    },
+    "exporural-top": {
+      "target": [
+        40.8,
+        0.3,
+        -17.345454632530117
+      ],
+      "position": [
+        40.809999999999995,
+        20.3,
+        -17.345454632530117
+      ]
+    },
+    "exporural-oblique": {
+      "target": [
+        40.8,
+        0.3,
+        -17.345454632530117
+      ],
+      "position": [
+        49.8,
+        10.3,
+        -4.345454632530117
+      ]
+    },
+    "exporural-low": {
+      "target": [
+        40.8,
+        0.3,
+        -17.345454632530117
+      ],
+      "position": [
+        43.8,
+        2.1,
+        -11.345454632530117
+      ]
+    },
+    "exporural-medium": {
+      "target": [
+        40.8,
+        0.3,
+        -17.345454632530117
+      ],
+      "position": [
+        40.8,
+        11.3,
+        -4.345454632530117
+      ]
+    },
+    "exporural-far": {
+      "target": [
+        40.8,
+        0.3,
+        -17.345454632530117
+      ],
+      "position": [
+        40.809999999999995,
+        37.3,
+        -14.345454632530117
+      ]
+    },
+    "br472-top": {
+      "target": [
+        50.18181818181819,
+        0.3,
+        -1.418181825301204
+      ],
+      "position": [
+        50.191818181818185,
+        20.3,
+        -1.418181825301204
+      ]
+    },
+    "br472-oblique": {
+      "target": [
+        50.18181818181819,
+        0.3,
+        -1.418181825301204
+      ],
+      "position": [
+        59.18181818181819,
+        10.3,
+        11.581818174698796
+      ]
+    },
+    "br472-low": {
+      "target": [
+        50.18181818181819,
+        0.3,
+        -1.418181825301204
+      ],
+      "position": [
+        53.18181818181819,
+        2.1,
+        4.581818174698796
+      ]
+    },
+    "br472-medium": {
+      "target": [
+        50.18181818181819,
+        0.3,
+        -1.418181825301204
+      ],
+      "position": [
+        50.18181818181819,
+        11.3,
+        11.581818174698796
+      ]
+    },
+    "br472-far": {
+      "target": [
+        50.18181818181819,
+        0.3,
+        -1.418181825301204
+      ],
+      "position": [
+        50.191818181818185,
+        37.3,
+        1.581818174698796
+      ]
+    },
+    "motorhome-top": {
+      "target": [
+        -47.345454545454544,
+        0.3,
+        -19.527272825301207
+      ],
+      "position": [
+        -47.335454545454546,
+        20.3,
+        -19.527272825301207
+      ]
+    },
+    "motorhome-oblique": {
+      "target": [
+        -47.345454545454544,
+        0.3,
+        -19.527272825301207
+      ],
+      "position": [
+        -38.345454545454544,
+        10.3,
+        -6.527272825301207
+      ]
+    },
+    "motorhome-low": {
+      "target": [
+        -47.345454545454544,
+        0.3,
+        -19.527272825301207
+      ],
+      "position": [
+        -44.345454545454544,
+        2.1,
+        -13.527272825301207
+      ]
+    },
+    "motorhome-medium": {
+      "target": [
+        -47.345454545454544,
+        0.3,
+        -19.527272825301207
+      ],
+      "position": [
+        -47.345454545454544,
+        11.3,
+        -6.527272825301207
+      ]
+    },
+    "motorhome-far": {
+      "target": [
+        -47.345454545454544,
+        0.3,
+        -19.527272825301207
+      ],
+      "position": [
+        -47.335454545454546,
+        37.3,
+        -16.527272825301207
+      ]
+    },
+    "amusement-top": {
+      "target": [
+        -45.38181818181818,
+        0.3,
+        -5.563636391566263
+      ],
+      "position": [
+        -45.371818181818185,
+        20.3,
+        -5.563636391566263
+      ]
+    },
+    "amusement-oblique": {
+      "target": [
+        -45.38181818181818,
+        0.3,
+        -5.563636391566263
+      ],
+      "position": [
+        -36.38181818181818,
+        10.3,
+        7.436363608433737
+      ]
+    },
+    "amusement-low": {
+      "target": [
+        -45.38181818181818,
+        0.3,
+        -5.563636391566263
+      ],
+      "position": [
+        -42.38181818181818,
+        2.1,
+        0.4363636084337372
+      ]
+    },
+    "amusement-medium": {
+      "target": [
+        -45.38181818181818,
+        0.3,
+        -5.563636391566263
+      ],
+      "position": [
+        -45.38181818181818,
+        11.3,
+        7.436363608433737
+      ]
+    },
+    "amusement-far": {
+      "target": [
+        -45.38181818181818,
+        0.3,
+        -5.563636391566263
+      ],
+      "position": [
+        -45.371818181818185,
+        37.3,
+        -2.5636363915662628
+      ]
+    },
+    "rearParking-top": {
+      "target": [
+        -20.727272727272727,
+        0.3,
+        -42.000000210843375
+      ],
+      "position": [
+        -20.717272727272725,
+        20.3,
+        -42.000000210843375
+      ]
+    },
+    "rearParking-oblique": {
+      "target": [
+        -20.727272727272727,
+        0.3,
+        -42.000000210843375
+      ],
+      "position": [
+        -11.727272727272727,
+        10.3,
+        -29.000000210843375
+      ]
+    },
+    "rearParking-low": {
+      "target": [
+        -20.727272727272727,
+        0.3,
+        -42.000000210843375
+      ],
+      "position": [
+        -17.727272727272727,
+        2.1,
+        -36.000000210843375
+      ]
+    },
+    "rearParking-medium": {
+      "target": [
+        -20.727272727272727,
+        0.3,
+        -42.000000210843375
+      ],
+      "position": [
+        -20.727272727272727,
+        11.3,
+        -29.000000210843375
+      ]
+    },
+    "rearParking-far": {
+      "target": [
+        -20.727272727272727,
+        0.3,
+        -42.000000210843375
+      ],
+      "position": [
+        -20.717272727272725,
+        37.3,
+        -39.000000210843375
+      ]
+    },
+    "parkingSeam-top": {
+      "target": [
+        43.2,
+        0.3,
+        15.818181897590357
+      ],
+      "position": [
+        43.21,
+        20.3,
+        15.818181897590357
+      ]
+    },
+    "parkingSeam-oblique": {
+      "target": [
+        43.2,
+        0.3,
+        15.818181897590357
+      ],
+      "position": [
+        52.2,
+        10.3,
+        28.818181897590357
+      ]
+    },
+    "parkingSeam-low": {
+      "target": [
+        43.2,
+        0.3,
+        15.818181897590357
+      ],
+      "position": [
+        46.2,
+        2.1,
+        21.818181897590357
+      ]
+    },
+    "parkingSeam-medium": {
+      "target": [
+        43.2,
+        0.3,
+        15.818181897590357
+      ],
+      "position": [
+        43.2,
+        11.3,
+        28.818181897590357
+      ]
+    },
+    "parkingSeam-far": {
+      "target": [
+        43.2,
+        0.3,
+        15.818181897590357
+      ],
+      "position": [
+        43.21,
+        37.3,
+        18.818181897590357
+      ]
+    }
+  },
+  "final": {
+    "spatial": {
+      "objects": 1303,
+      "meshes": 930,
+      "instances": 23769,
+      "allocatedTriangles": 955513,
+      "geometries": 564,
+      "materials": 632,
+      "geometryBufferBytes": 13531408,
+      "groups": {
+        "core": {
+          "objects": 0,
+          "meshes": 573,
+          "instances": 7036
+        },
+        "territorial-environment-layer": {
+          "objects": 0,
+          "meshes": 70,
+          "instances": 265
+        },
+        "essential-site-context": {
+          "objects": 0,
+          "meshes": 11,
+          "instances": 31
+        },
+        "essential-quadras-context": {
+          "objects": 0,
+          "meshes": 3,
+          "instances": 68
+        },
+        "essential-rear-environment": {
+          "objects": 0,
+          "meshes": 4,
+          "instances": 194
+        },
+        "essential-residential-district": {
+          "objects": 0,
+          "meshes": 69,
+          "instances": 1872
+        },
+        "essential-parking-context": {
+          "objects": 0,
+          "meshes": 27,
+          "instances": 28
+        },
+        "essential-access-environment": {
+          "objects": 0,
+          "meshes": 4,
+          "instances": 65
+        },
+        "essential-landmark:reference:2026:j": {
+          "objects": 0,
+          "meshes": 97,
+          "instances": 159
+        },
+        "essential-nations-context": {
+          "objects": 0,
+          "meshes": 14,
+          "instances": 89
+        },
+        "essential-arena-context": {
+          "objects": 0,
+          "meshes": 21,
+          "instances": 440
+        },
+        "essential-vegetation": {
+          "objects": 0,
+          "meshes": 18,
+          "instances": 9147
+        },
+        "essential-electrical-detail": {
+          "objects": 0,
+          "meshes": 8,
+          "instances": 2428
+        },
+        "progressive-hydrology": {
+          "objects": 0,
+          "meshes": 7,
+          "instances": 1947
+        },
+        "progressive-rain": {
+          "objects": 0,
+          "meshes": 4,
+          "instances": 0
+        }
+      },
+      "renderer": {
+        "at": 234618.5,
+        "calls": 222,
+        "triangles": 542267,
+        "geometries": 570,
+        "textures": 143,
+        "programs": 212,
+        "dpr": 1,
+        "width": 1285,
+        "height": 814,
+        "heapBytes": 160683599,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "boot": {
+        "startedAt": 0,
+        "marks": {
+          "module-requested": 8332.800000011921,
+          "b12-worker:start": 8333,
+          "module-ready": 9825.5,
+          "essential-data:start": 9877.600000023842,
+          "reservation-maintenance:start": 9877.900000035763,
+          "project:start": 9878.100000023842,
+          "route-mounted": 9878.400000035763,
+          "renderer-module-requested": 9878.5,
+          "reservation-maintenance:end": 9982.699999988079,
+          "project:end": 10003.199999988079,
+          "essential-data:end": 10003.900000035763,
+          "essential-data:cached": 10269.5,
+          "b12-worker-geometry": 11349.900000035763,
+          "b12-worker-contact": 11349.900000035763,
+          "b12-worker:end": 11350,
+          "renderer-module-ready": 12618.900000035763,
+          "renderer:create:start": 12657.100000023842,
+          "webgl-context:start": 12657.199999988079,
+          "webgl-context:end": 12663.199999988079,
+          "renderer:create:end": 12679.100000023842,
+          "critical-scene:start": 12708.300000011921,
+          "environment:textures:start": 12831.800000011921,
+          "textures:start": 12832,
+          "textures:end": 12877.800000011921,
+          "environment:textures:end": 12878.100000023842,
+          "environment:materials:start": 12878.300000011921,
+          "environment:materials:end": 12878.400000035763,
+          "geometry-preparation:start": 14474,
+          "geometry-preparation:end": 14474.300000011921,
+          "b12-unpack:start": 14591.900000035763,
+          "b12-unpack:end": 14595.400000035763,
+          "b12-materials:start": 14595.400000035763,
+          "b12-materials:end": 14781.699999988079,
+          "postprocessing:start": 16407.100000023842,
+          "postprocessing:end": 16415.400000035763,
+          "critical-scene:end": 16659.100000023842,
+          "compile-direct:start": 16663.100000023842,
+          "compile-direct-js": 17186.30000001192,
+          "canvas-created": 17188,
+          "controls-created": 17201.400000035763,
+          "first-frame-requested": 17202.400000035763,
+          "compile-direct:end": 21690.600000023842,
+          "essential-scene:prepared": 21691.400000035763,
+          "shadow-preparation:start": 21734.19999998808,
+          "shadow-preparation:end": 21734.30000001192,
+          "first-draw": 23753.400000035763,
+          "commercial-map-ready": 23838.900000035763,
+          "first-interactive": 23838.900000035763,
+          "critical-post:start": 24571.30000001192,
+          "deferred-compile-js": 25101.30000001192,
+          "critical-post:end": 91305.40000003576,
+          "hydrate:rain:start": 92579.60000002384,
+          "rain-preparation:start": 93095.90000003576,
+          "rain-preparation:end": 93103.5,
+          "hydrate:rain:mounted": 93108.80000001192,
+          "hydrate:rain:end": 95377.30000001192,
+          "hydrate:hydrology:start": 95913.30000001192,
+          "hydrology-cpu:start": 95990.40000003576,
+          "hydrology-cpu:end": 96283.80000001192,
+          "hydrate:hydrology:mounted": 96321.80000001192,
+          "hydrate:hydrology:end": 99023.30000001192,
+          "hydrate:interior-shaders:start": 99737.19999998808,
+          "hydrate:interior-shaders:mounted": 99739.69999998808,
+          "interior-preparation:start": 99740.5,
+          "interior-preparation:end": 100185.80000001192,
+          "hydrate:interior-shaders:end": 100516,
+          "hydrate:physics-module:start": 101252.60000002384,
+          "hydrate:physics-module:mounted": 101296.69999998808,
+          "physics-preparation:start": 101297.80000001192,
+          "physics-preparation:end": 101684.40000003576,
+          "hydrate:physics-module:end": 101920.10000002384,
+          "secondary-hydration-complete": 101920.40000003576
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "camera": {
+        "position": [
+          40.2,
+          10.3,
+          9.1818181626506
+        ],
+        "target": [
+          31.200000000000003,
+          0.3,
+          -3.8181818373493996
+        ],
+        "minDistance": 0.1,
+        "maxDistance": 1000
+      }
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 8599,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "quality": {
+      "logicalTier": "HIGH",
+      "sceneTier": "HIGH",
+      "baseDpr": 1,
+      "effectiveDpr": 1,
+      "hardwareCeiling": "HIGH",
+      "reason": "viewport-sync"
+    }
+  },
+  "mutations": [],
+  "status": "passed"
+}
