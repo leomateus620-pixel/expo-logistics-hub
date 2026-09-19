@@ -14,6 +14,7 @@ import {
 } from '../../utils/commercialPavilions';
 import {
   createCommercialPavilionModuleProjectionFrame,
+  deriveCommercialPavilionModuleEnvelope,
   projectCommercialPavilionOfficialContentEnvelope,
   projectCommercialPavilionModuleRect,
   resolveCommercialPavilionModulePlan,
@@ -198,10 +199,12 @@ function createLowPerimeter(layout: CommercialPavilionLayout): InstanceTransform
 function PavilionInteriorCameraRig({
   entity,
   layout,
+  plan,
   interiorViewRotation,
 }: {
   entity: MapEntity;
   layout: CommercialPavilionLayout;
+  plan: CommercialPavilionModulePlan;
   reducedGraphics: boolean;
   interiorViewRotation: number;
 }) {
@@ -216,6 +219,60 @@ function PavilionInteriorCameraRig({
     const maximumDimension = Math.max(layout.width, layout.depth);
     const compact = size.width < 720 || size.height < 540;
     const portrait = size.height > size.width * 1.12;
+    if (plan.interiorPresentation?.mode === 'plan') {
+      const projectionFrame = createCommercialPavilionModuleProjectionFrame(plan, {
+        width: layout.interior.clearWidth,
+        depth: layout.interior.clearDepth,
+      });
+      const moduleEnvelope = projectCommercialPavilionModuleRect(
+        deriveCommercialPavilionModuleEnvelope(plan),
+        projectionFrame,
+      );
+      const safeMargin = portrait ? 1.2 : compact ? 1.15 : 1.1;
+      const fov = portrait ? 42 : compact ? 39 : 36;
+      const aspect = Math.max(0.45, size.width / Math.max(size.height, 1));
+      const visibleHeight = Math.max(
+        moduleEnvelope.depth * safeMargin,
+        moduleEnvelope.width * safeMargin / aspect,
+      );
+      const fitDistance = visibleHeight / (2 * Math.tan(THREE.MathUtils.degToRad(fov) / 2));
+      const panMarginX = moduleEnvelope.width * (portrait ? 0.22 : 0.16);
+      const panMarginZ = moduleEnvelope.depth * (portrait ? 0.2 : 0.14);
+      return {
+        entityId: entity.id,
+        position: toWorld(
+          moduleEnvelope.centerX,
+          layout.interior.floorY + fitDistance,
+          moduleEnvelope.centerZ + maximumDimension * 0.035,
+        ),
+        target: toWorld(moduleEnvelope.centerX, layout.interior.floorY, moduleEnvelope.centerZ),
+        fov,
+        near: Math.max(0.025, fitDistance / 800),
+        far: Math.max(120, fitDistance * 12),
+        minDistance: fitDistance * 0.34,
+        maxDistance: fitDistance * 1.08,
+        minPolarAngle: 0.01,
+        maxPolarAngle: 0.12,
+        dampingFactor: 0.1,
+        enablePan: true,
+        enableRotate: plan.interiorPresentation.enableRotate ?? false,
+        zoomToCursor: true,
+        panBounds: {
+          center,
+          facing,
+          min: [
+            moduleEnvelope.centerX - moduleEnvelope.width / 2 - panMarginX,
+            0,
+            moduleEnvelope.centerZ - moduleEnvelope.depth / 2 - panMarginZ,
+          ],
+          max: [
+            moduleEnvelope.centerX + moduleEnvelope.width / 2 + panMarginX,
+            layout.height * 0.12,
+            moduleEnvelope.centerZ + moduleEnvelope.depth / 2 + panMarginZ,
+          ],
+        },
+      };
+    }
     return {
       entityId: entity.id,
       position: toWorld(0, maximumDimension * (portrait ? 1.95 : compact ? 1.72 : 1.5), maximumDimension * (portrait ? 0.18 : 0.24)),
@@ -234,7 +291,7 @@ function PavilionInteriorCameraRig({
         max: [layout.interior.clearWidth * 0.62, layout.height * 0.32, layout.interior.clearDepth * 0.62],
       },
     };
-  }, [entity, interiorViewRotation, layout, size.height, size.width]);
+  }, [entity, interiorViewRotation, layout, plan, size.height, size.width]);
   useInteriorCameraRequest(request);
   return null;
 }
@@ -449,6 +506,7 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
       <PavilionInteriorCameraRig
         entity={entity}
         layout={layout}
+        plan={modulePlan}
         reducedGraphics={reducedGraphics}
         interiorViewRotation={interiorViewRotation}
       />

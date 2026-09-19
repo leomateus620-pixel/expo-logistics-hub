@@ -2539,7 +2539,7 @@ function CameraRig({
         controls.enabled = true;
         controls.enableDamping = true;
         controls.enablePan = interiorFrame?.enablePan ?? true;
-        controls.enableRotate = true;
+        controls.enableRotate = interiorFrame?.enableRotate ?? true;
         controls.enableZoom = true;
         controls.zoomToCursor = interiorFrame?.zoomToCursor ?? !miranteSelected;
       }
@@ -3069,7 +3069,7 @@ function CameraRig({
       controls.enabled = true;
       controls.enableDamping = true;
       controls.enablePan = interiorFrame?.enablePan ?? true;
-      controls.enableRotate = true;
+      controls.enableRotate = interiorFrame?.enableRotate ?? true;
       controls.enableZoom = true;
       controls.zoomToCursor = interiorFrame?.zoomToCursor ?? !miranteSelected;
     }
@@ -4167,7 +4167,7 @@ function CameraRig({
             controls.enabled = true;
             controls.enableDamping = true;
             controls.enablePan = interiorFrame?.enablePan ?? true;
-            controls.enableRotate = true;
+            controls.enableRotate = interiorFrame?.enableRotate ?? true;
             controls.enableZoom = true;
             controls.zoomToCursor = interiorFrame?.zoomToCursor ?? !miranteSelected;
           }
@@ -4237,7 +4237,7 @@ function CameraRig({
       enableDamping={!lunarCameraLocked && !transitionControlsLocked}
       dampingFactor={interiorFrame?.dampingFactor ?? (interiorEntity ? 0.11 : 0.14)}
       enablePan={!lunarCameraLocked && !transitionControlsLocked && (interiorFrame?.enablePan ?? true)}
-      enableRotate={!lunarCameraLocked && !transitionControlsLocked}
+      enableRotate={!lunarCameraLocked && !transitionControlsLocked && (interiorFrame?.enableRotate ?? true)}
       enableZoom={!lunarCameraLocked && !transitionControlsLocked}
       minDistance={appliedControlLimits.minDistance}
       maxDistance={appliedControlLimits.maxDistance}
@@ -4247,7 +4247,12 @@ function CameraRig({
       panSpeed={1.05}
       zoomSpeed={1.12}
       zoomToCursor={(interiorFrame?.zoomToCursor ?? !miranteSelected) && !lunarCameraLocked && !transitionControlsLocked}
-      touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE }}
+      touches={{
+        ONE: THREE.TOUCH.PAN,
+        TWO: interiorFrame?.enableRotate === false
+          ? THREE.TOUCH.DOLLY_PAN
+          : THREE.TOUCH.DOLLY_ROTATE,
+      }}
       minAzimuthAngle={appliedAngles.minAzimuthAngle}
       maxAzimuthAngle={appliedAngles.maxAzimuthAngle}
       onStart={handleControlsStart}
