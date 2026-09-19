@@ -3,8 +3,8 @@
 ## Pavilhão 1 / B1 — planta interativa com quarter-turn
 - [x] Preservar quarter-turn, orientação Math.PI/2 e Math.PI, 189 módulos, áreas, acessos e módulo irregular 141
 - [x] Ativar perfil compartilhado de PAN, zoom, lotes planos e numeração prioritária somente no plano derivado
-- [ ] Validar regressões automatizadas e TypeScript
-- [ ] Validar navegação visual desktop/mobile e capturar evidências
+- [x] Validar regressões automatizadas e TypeScript (119 testes)
+- [ ] Validar navegação visual desktop/mobile e capturar evidências — bloqueada pelo renderer WebGL automatizado: o DOM ficou vazio e a captura excedeu 30 segundos antes de abrir o interior
 - Não publicar (pedido do usuário)
 
 ## Pavilhão 14 / B2 — planta interativa com quarter-turn
