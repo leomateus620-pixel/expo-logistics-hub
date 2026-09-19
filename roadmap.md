@@ -3,8 +3,8 @@
 ## Pavilhão 12 / B3 — planta interativa horizontal
 - [x] Preservar orientação canônica de 180°, 257 módulos, áreas, corredores e acessos invertidos
 - [x] Ativar perfil compartilhado de PAN, zoom, lotes planos e numeração prioritária no plano derivado
-- [ ] Validar regressões automatizadas e TypeScript
-- [ ] Validar navegação visual desktop/mobile e capturar evidências
+- [x] Validar regressões automatizadas e TypeScript (66 testes)
+- [ ] Validar navegação visual desktop/mobile e capturar evidências — bloqueada pelo renderer WebGL automatizado, que permaneceu em 85% após 90 segundos nos dois viewports
 - Não publicar (pedido do usuário)
 
 ## Pavilhão 8 / B4 — planta interativa
