@@ -27,6 +27,11 @@ export interface CommercialPavilionInteriorPresentation {
   mode?: 'plan';
   navigationMode?: 'locked-plan';
   enableRotate?: boolean;
+  enablePan?: boolean;
+  mouseNavigation?: 'pan';
+  touchNavigation?: 'pan-dolly';
+  preserveCanonicalOrientation?: boolean;
+  includeWayfindingInFit?: boolean;
   flatModules?: boolean;
   numberPriority?: 'maximum';
   showAreaInsideModule?: boolean;
