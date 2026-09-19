@@ -405,7 +405,9 @@ export function deriveCommercialPavilionOfficialContentEnvelope(
     ...plan.cells,
     ...plan.cells.flatMap((cell) => cell.shape?.renderParts ?? []),
     ...plan.corridors,
-    ...plan.supportSpaces,
+    ...(plan.interiorPresentation.includeSupportSpacesInFit === false
+      ? []
+      : plan.supportSpaces),
   ];
   const points = plan.cells.flatMap((cell) => cell.shape?.footprint ?? []);
   const initial = rectEdges(rectangles[0]);

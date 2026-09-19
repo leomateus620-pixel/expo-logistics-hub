@@ -52,11 +52,14 @@ describe('enquadramento interno pelo conteúdo oficial dos Pavilhões 5, 8 e 13'
   it('ativa official-content somente nas três referências e planos autorizados', () => {
     [
       [PAVILION5_COMMERCIAL_REFERENCE, COMMERCIAL_PAVILION_MODULE_PLANS.B8],
-      [PAVILION8_COMMERCIAL_REFERENCE, COMMERCIAL_PAVILION_MODULE_PLANS.B4],
     ].forEach(([reference, plan]) => {
       expect(reference.interiorPresentation).toEqual(OFFICIAL_CONTENT_PRESENTATION);
       expect(plan.interiorPresentation).toEqual(OFFICIAL_CONTENT_PRESENTATION);
     });
+    expect(PAVILION8_COMMERCIAL_REFERENCE.interiorPresentation)
+      .toMatchObject(OFFICIAL_CONTENT_PRESENTATION);
+    expect(COMMERCIAL_PAVILION_MODULE_PLANS.B4.interiorPresentation)
+      .toMatchObject(OFFICIAL_CONTENT_PRESENTATION);
     expect(PAVILION13_COMMERCIAL_REFERENCE.interiorPresentation)
       .toMatchObject(OFFICIAL_CONTENT_PRESENTATION);
     expect(COMMERCIAL_PAVILION_MODULE_PLANS.B5.interiorPresentation)
