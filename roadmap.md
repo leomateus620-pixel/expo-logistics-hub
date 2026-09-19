@@ -1,5 +1,12 @@
 # Roadmap
 
+## Pavilhão 14 / B2 — planta interativa com quarter-turn
+- [x] Preservar quarter-turn, orientação Math.PI/2 e -Math.PI/2, 186 módulos, áreas e acessos
+- [x] Ativar perfil compartilhado de PAN, zoom, lotes planos e numeração prioritária no plano derivado
+- [x] Validar regressões automatizadas e TypeScript (81 testes)
+- [ ] Validar navegação visual desktop/mobile e capturar evidências — bloqueada pelo renderer WebGL automatizado, que deixou a prévia sem resposta antes da leitura da tela
+- Não publicar (pedido do usuário)
+
 ## Pavilhão 12 / B3 — planta interativa horizontal
 - [x] Preservar orientação canônica de 180°, 257 módulos, áreas, corredores e acessos invertidos
 - [x] Ativar perfil compartilhado de PAN, zoom, lotes planos e numeração prioritária no plano derivado

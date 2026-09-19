@@ -107,22 +107,30 @@ export function resolveCommercialPavilionWayfindingMarkers(
       }
       const projected = projectCommercialPavilionReferenceRect(corridor, frame);
       return access.edges.map((edge) => {
-        const frontOrRear = edge === 'front' || edge === 'rear';
+        const projectedEdge = transformCommercialPavilionReferenceWallEdge(
+          edge,
+          plan.projection.coordinateTransform,
+        );
+        const frontOrRear = projectedEdge === 'front' || projectedEdge === 'rear';
+        const quarterTurnFromFrontOrRear = plan.projection.coordinateTransform === 'quarter-turn-clockwise'
+          && (edge === 'front' || edge === 'rear');
         return markerAtEdge({
           access,
           kind,
-          edge,
+          edge: projectedEdge,
           centerX: frontOrRear
             ? projected.centerX
-            : edge === 'left'
+            : projectedEdge === 'left'
               ? frame.centerX - frame.width / 2
               : frame.centerX + frame.width / 2,
           centerZ: frontOrRear
-            ? edge === 'front'
+            ? projectedEdge === 'front'
               ? frame.centerZ + frame.depth / 2
               : frame.centerZ - frame.depth / 2
-            : projected.centerZ,
-          span: frontOrRear ? projected.width : projected.depth,
+            : quarterTurnFromFrontOrRear ? projected.centerX : projected.centerZ,
+          span: frontOrRear
+            ? projected.width
+            : quarterTurnFromFrontOrRear ? projected.width : projected.depth,
         });
       });
     }
