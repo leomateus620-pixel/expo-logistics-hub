@@ -54,7 +54,7 @@ describe('enquadramento interno pelo conteúdo oficial dos Pavilhões 5, 8 e 13'
       [PAVILION5_COMMERCIAL_REFERENCE, COMMERCIAL_PAVILION_MODULE_PLANS.B8],
     ].forEach(([reference, plan]) => {
       expect(reference.interiorPresentation).toEqual(OFFICIAL_CONTENT_PRESENTATION);
-      expect(plan.interiorPresentation).toEqual(OFFICIAL_CONTENT_PRESENTATION);
+      expect(plan.interiorPresentation).toMatchObject(OFFICIAL_CONTENT_PRESENTATION);
     });
     expect(PAVILION8_COMMERCIAL_REFERENCE.interiorPresentation)
       .toMatchObject(OFFICIAL_CONTENT_PRESENTATION);

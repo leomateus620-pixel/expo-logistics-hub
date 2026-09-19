@@ -111,13 +111,14 @@ describe('planta comercial fixa do Pavilhão 1', () => {
     expect(layer).not.toContain('<Html');
   });
 
-  it('não altera os perfis e orientações de B2, B3, B4, B5 e B6', () => {
+  it('não altera os perfis e orientações de B2, B3, B4, B5, B6 e B8', () => {
     const expected = {
       B2: [Math.PI / 2, -Math.PI / 2],
       B3: [Math.PI, Math.PI],
       B4: [Math.PI, 0],
       B5: [Math.PI, 0],
       B6: [Math.PI, Math.PI],
+      B8: [0, 0],
     } as const;
     (Object.keys(expected) as Array<keyof typeof expected>).forEach((identifier) => {
       expect(COMMERCIAL_PAVILION_MODULE_PLANS[identifier].interiorPresentation).toMatchObject({
