@@ -32,6 +32,7 @@ export interface CommercialPavilionInteriorPresentation {
   touchNavigation?: 'pan-dolly';
   preserveCanonicalOrientation?: boolean;
   includeWayfindingInFit?: boolean;
+  includeSupportSpacesInFit?: boolean;
   flatModules?: boolean;
   numberPriority?: 'maximum';
   showAreaInsideModule?: boolean;
