@@ -4247,7 +4247,12 @@ function CameraRig({
       panSpeed={1.05}
       zoomSpeed={1.12}
       zoomToCursor={(interiorFrame?.zoomToCursor ?? !miranteSelected) && !lunarCameraLocked && !transitionControlsLocked}
-      touches={{
+      mouseButtons={interiorFrame?.mouseButtons ?? {
+        LEFT: THREE.MOUSE.ROTATE,
+        MIDDLE: THREE.MOUSE.DOLLY,
+        RIGHT: THREE.MOUSE.PAN,
+      }}
+      touches={interiorFrame?.touches ?? {
         ONE: THREE.TOUCH.PAN,
         TWO: interiorFrame?.enableRotate === false
           ? THREE.TOUCH.DOLLY_PAN

@@ -19,6 +19,8 @@ export interface InteriorCameraRequest {
   enablePan?: boolean;
   enableRotate?: boolean;
   zoomToCursor?: boolean;
+  mouseButtons?: { LEFT: number; MIDDLE: number; RIGHT: number };
+  touches?: { ONE: number; TWO: number };
   panBounds?: {
     center: Vector3;
     facing: number;

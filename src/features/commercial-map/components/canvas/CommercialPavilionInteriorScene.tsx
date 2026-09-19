@@ -14,7 +14,6 @@ import {
 } from '../../utils/commercialPavilions';
 import {
   createCommercialPavilionModuleProjectionFrame,
-  deriveCommercialPavilionModuleEnvelope,
   projectCommercialPavilionOfficialContentEnvelope,
   projectCommercialPavilionModuleRect,
   resolveCommercialPavilionModulePlan,
@@ -223,55 +222,53 @@ function PavilionInteriorCameraRig({
     const compact = size.width < 720 || size.height < 540;
     const portrait = size.height > size.width * 1.12;
     if (plan.interiorPresentation?.mode === 'plan') {
-      const projectionFrame = createCommercialPavilionModuleProjectionFrame(plan, {
-        width: layout.interior.clearWidth,
-        depth: layout.interior.clearDepth,
-      });
-      const moduleEnvelope = projectCommercialPavilionModuleRect(
-        deriveCommercialPavilionModuleEnvelope(plan),
-        projectionFrame,
-      );
-      const safeMargin = portrait ? 1.2 : compact ? 1.15 : 1.1;
+      // The full presentation envelope (shell, corridors, accesses and
+      // wayfinding markers), never only the module rectangle.
+      const envelopeWidth = layout.width;
+      const envelopeDepth = layout.depth;
+      const rotationCos = Math.abs(Math.cos(interiorViewRotation));
+      const rotationSin = Math.abs(Math.sin(interiorViewRotation));
+      const screenWidth = envelopeWidth * rotationCos + envelopeDepth * rotationSin;
+      const screenDepth = envelopeWidth * rotationSin + envelopeDepth * rotationCos;
+      const safeMargin = portrait ? 1.16 : compact ? 1.12 : 1.1;
       const fov = portrait ? 42 : compact ? 39 : 36;
       const aspect = Math.max(0.45, size.width / Math.max(size.height, 1));
       const visibleHeight = Math.max(
-        moduleEnvelope.depth * safeMargin,
-        moduleEnvelope.width * safeMargin / aspect,
+        screenDepth * safeMargin,
+        (screenWidth * safeMargin) / aspect,
       );
       const fitDistance = visibleHeight / (2 * Math.tan(THREE.MathUtils.degToRad(fov) / 2));
-      const panMarginX = moduleEnvelope.width * (portrait ? 0.22 : 0.16);
-      const panMarginZ = moduleEnvelope.depth * (portrait ? 0.2 : 0.14);
+      const panMarginX = envelopeWidth * 0.35;
+      const panMarginZ = envelopeDepth * 0.35;
       return {
         entityId: entity.id,
-        position: planToWorld(
-          moduleEnvelope.centerX,
-          layout.interior.floorY + fitDistance,
-          moduleEnvelope.centerZ + maximumDimension * 0.035,
-        ),
-        target: planToWorld(moduleEnvelope.centerX, layout.interior.floorY, moduleEnvelope.centerZ),
+        position: toWorld(0, layout.interior.floorY + fitDistance, maximumDimension * 0.05),
+        target: toWorld(0, layout.interior.floorY, 0),
         fov,
         near: Math.max(0.025, fitDistance / 800),
         far: Math.max(120, fitDistance * 12),
-        minDistance: fitDistance * 0.34,
-        maxDistance: fitDistance * 1.08,
-        minPolarAngle: 0.01,
-        maxPolarAngle: 0.12,
+        minDistance: fitDistance * 0.16,
+        maxDistance: fitDistance * 1.15,
+        minPolarAngle: 0.02,
+        maxPolarAngle: 0.14,
         dampingFactor: 0.1,
         enablePan: true,
         enableRotate: plan.interiorPresentation.enableRotate ?? false,
         zoomToCursor: true,
+        mouseButtons: {
+          LEFT: THREE.MOUSE.PAN,
+          MIDDLE: THREE.MOUSE.DOLLY,
+          RIGHT: THREE.MOUSE.PAN,
+        },
+        touches: { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_PAN },
         panBounds: {
           center,
           facing,
-          min: [
-            moduleEnvelope.centerX - moduleEnvelope.width / 2 - panMarginX,
-            0,
-            moduleEnvelope.centerZ - moduleEnvelope.depth / 2 - panMarginZ,
-          ],
+          min: [-envelopeWidth / 2 - panMarginX, 0, -envelopeDepth / 2 - panMarginZ],
           max: [
-            moduleEnvelope.centerX + moduleEnvelope.width / 2 + panMarginX,
-            layout.height * 0.12,
-            moduleEnvelope.centerZ + moduleEnvelope.depth / 2 + panMarginZ,
+            envelopeWidth / 2 + panMarginX,
+            layout.height * 0.2,
+            envelopeDepth / 2 + panMarginZ,
           ],
         },
       };
