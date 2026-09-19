@@ -200,13 +200,13 @@ describe('enquadramento interno pelo conteúdo oficial dos Pavilhões 5, 8 e 13'
   });
 
   it('não altera pavilhões sem opt-in', () => {
-    (['B1', 'B10'] as const).forEach((identifier) => {
+    (['B10'] as const).forEach((identifier) => {
       const plan = COMMERCIAL_PAVILION_MODULE_PLANS[identifier];
       expect(plan.interiorPresentation).toBeUndefined();
       expect(commercialPavilionOfficialContentAspect(plan)).toBeNull();
     });
-    // B2/B3/B6 declaram apenas o perfil de planta; seguem fora do fit official-content.
-    (['B2', 'B3', 'B6'] as const).forEach((identifier) => {
+    // B1/B2/B3/B6 declaram apenas o perfil de planta; seguem fora do fit official-content.
+    (['B1', 'B2', 'B3', 'B6'] as const).forEach((identifier) => {
       const plan = COMMERCIAL_PAVILION_MODULE_PLANS[identifier];
       expect(plan.interiorPresentation?.fit).toBeUndefined();
       expect(commercialPavilionOfficialContentAspect(plan)).toBeNull();

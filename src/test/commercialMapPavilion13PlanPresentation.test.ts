@@ -114,7 +114,7 @@ describe('planta comercial fixa do Pavilhão 13', () => {
     expect(commercialPavilionFacingRadians({ publicIdentifier: 'B6' })).toBe(Math.PI);
     expect(commercialPavilionInteriorViewRotationRadians({ publicIdentifier: 'B6' })).toBe(Math.PI);
 
-    (['B1', 'B8', 'B10'] as const).forEach((identifier) => {
+    (['B8', 'B10'] as const).forEach((identifier) => {
       expect(COMMERCIAL_PAVILION_MODULE_PLANS[identifier].interiorPresentation?.mode)
         .not.toBe('plan');
     });
