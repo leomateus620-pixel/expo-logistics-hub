@@ -62,8 +62,8 @@ describe('planta comercial fixa do Pavilhão 1', () => {
     expect(module141?.shape?.footprint).toHaveLength(6);
     expect(module141?.shape?.renderParts).toHaveLength(2);
     expect(module141?.labelAnchor).toEqual(module141?.shape?.labelAnchor);
-    expect(module141?.labelAnchor?.[0]).toBeCloseTo(50.35 / 52.7, 12);
-    expect(module141?.labelAnchor?.[1]).toBeCloseTo(1.5 / 22.84, 12);
+    expect(module141?.labelAnchor?.[0]).toBeCloseTo(0.02 + (50.35 / 52.7) * 0.96, 12);
+    expect(module141?.labelAnchor?.[1]).toBeCloseTo(0.02 + (1.5 / 22.84) * 0.96, 12);
   });
 
   it('projeta os quatro acessos pela transformação canônica, sem remapeamento manual', () => {
