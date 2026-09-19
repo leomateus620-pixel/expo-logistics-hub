@@ -112,6 +112,8 @@ export function resolveCommercialPavilionWayfindingMarkers(
           plan.projection.coordinateTransform,
         );
         const frontOrRear = projectedEdge === 'front' || projectedEdge === 'rear';
+        const quarterTurnFromFrontOrRear = plan.projection.coordinateTransform === 'quarter-turn-clockwise'
+          && (edge === 'front' || edge === 'rear');
         return markerAtEdge({
           access,
           kind,
@@ -125,8 +127,10 @@ export function resolveCommercialPavilionWayfindingMarkers(
             ? projectedEdge === 'front'
               ? frame.centerZ + frame.depth / 2
               : frame.centerZ - frame.depth / 2
-            : projected.centerZ,
-          span: frontOrRear ? projected.width : projected.depth,
+            : quarterTurnFromFrontOrRear ? projected.centerX : projected.centerZ,
+          span: frontOrRear
+            ? projected.width
+            : quarterTurnFromFrontOrRear ? projected.width : projected.depth,
         });
       });
     }

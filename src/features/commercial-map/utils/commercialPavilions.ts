@@ -589,6 +589,8 @@ function createOfficialWallEntrances(
           plan.projection.coordinateTransform,
         );
         const frontOrRear = projectedEdge === 'front' || projectedEdge === 'rear';
+        const quarterTurnFromFrontOrRear = plan.projection.coordinateTransform === 'quarter-turn-clockwise'
+          && (edge === 'front' || edge === 'rear');
         const height = dimensions.shellHeight * 0.62;
         return {
           id: `${access.id}:${edge}`,
@@ -603,9 +605,11 @@ function createOfficialWallEntrances(
           centerY: dimensions.slabTopY + height / 2,
           centerZ: frontOrRear
             ? projectedEdge === 'front' ? dimensions.shellDepth / 2 : -dimensions.shellDepth / 2
-            : projected.centerZ,
+            : quarterTurnFromFrontOrRear ? projected.centerX : projected.centerZ,
           width: frontOrRear ? projected.width : dimensions.entranceDepth,
-          depth: frontOrRear ? dimensions.entranceDepth : projected.depth,
+          depth: frontOrRear
+            ? dimensions.entranceDepth
+            : quarterTurnFromFrontOrRear ? projected.width : projected.depth,
           height,
         };
       });
