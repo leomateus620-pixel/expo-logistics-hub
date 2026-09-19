@@ -23,7 +23,15 @@ export type CommercialPavilionReferenceProjectionFit =
 
 export interface CommercialPavilionInteriorPresentation {
   /** Fits the dedicated interior shell to the complete official-plan content. */
-  fit: 'official-content';
+  fit?: 'official-content';
+  mode?: 'plan';
+  navigationMode?: 'locked-plan';
+  enableRotate?: boolean;
+  flatModules?: boolean;
+  numberPriority?: 'maximum';
+  showAreaInsideModule?: boolean;
+  boundedPan?: boolean;
+  boundedZoom?: boolean;
 }
 
 export interface CommercialPavilionReferenceProjection {

@@ -17,6 +17,7 @@ export interface InteriorCameraRequest {
   maxAzimuthAngle?: number;
   dampingFactor?: number;
   enablePan?: boolean;
+  enableRotate?: boolean;
   zoomToCursor?: boolean;
   panBounds?: {
     center: Vector3;
