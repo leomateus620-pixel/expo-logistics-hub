@@ -216,6 +216,9 @@ function PavilionInteriorCameraRig({
     const toWorld = (x: number, y: number, z: number) => (
       new THREE.Vector3(x, y, z).applyAxisAngle(UP, facing + interiorViewRotation).add(center)
     );
+    const planToWorld = (x: number, y: number, z: number) => (
+      new THREE.Vector3(x, y, z).applyAxisAngle(UP, facing).add(center)
+    );
     const maximumDimension = Math.max(layout.width, layout.depth);
     const compact = size.width < 720 || size.height < 540;
     const portrait = size.height > size.width * 1.12;
@@ -240,12 +243,12 @@ function PavilionInteriorCameraRig({
       const panMarginZ = moduleEnvelope.depth * (portrait ? 0.2 : 0.14);
       return {
         entityId: entity.id,
-        position: toWorld(
+        position: planToWorld(
           moduleEnvelope.centerX,
           layout.interior.floorY + fitDistance,
           moduleEnvelope.centerZ + maximumDimension * 0.035,
         ),
-        target: toWorld(moduleEnvelope.centerX, layout.interior.floorY, moduleEnvelope.centerZ),
+        target: planToWorld(moduleEnvelope.centerX, layout.interior.floorY, moduleEnvelope.centerZ),
         fov,
         near: Math.max(0.025, fitDistance / 800),
         far: Math.max(120, fitDistance * 12),
