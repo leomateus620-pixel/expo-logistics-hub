@@ -821,7 +821,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       <instancedMesh
         ref={setModuleMesh}
         args={[unitBoxGeometry, moduleMaterial, projectedModuleParts.length]}
-        castShadow={mode === 'interior' && !reducedGraphics}
+        castShadow={mode === 'interior' && !reducedGraphics && !flatModules}
         receiveShadow
         {...(interactive
           ? {
