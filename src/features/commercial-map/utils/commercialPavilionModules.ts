@@ -187,6 +187,22 @@ interface OfficialCommercialPavilionReference {
   };
 }
 
+const PAVILION14_PLAN_PRESENTATION: CommercialPavilionInteriorPresentation = {
+  mode: 'plan',
+  navigationMode: 'locked-plan',
+  enableRotate: false,
+  enablePan: true,
+  mouseNavigation: 'pan',
+  touchNavigation: 'pan-dolly',
+  preserveCanonicalOrientation: true,
+  includeWayfindingInFit: true,
+  flatModules: true,
+  numberPriority: 'maximum',
+  showAreaInsideModule: false,
+  boundedPan: true,
+  boundedZoom: true,
+};
+
 const PAVILION12_PLAN_PRESENTATION: CommercialPavilionInteriorPresentation = {
   mode: 'plan',
   navigationMode: 'locked-plan',
@@ -283,11 +299,16 @@ export const COMMERCIAL_PAVILION_MODULE_PLANS = Object.fromEntries(
         '#D97706',
       )
       : publicIdentifier === 'B2'
-      ? buildOfficialCommercialPavilionPlan(
-        PAVILION14_COMMERCIAL_REFERENCE,
-        'parallel-double-island',
-        '#1683E7',
-      )
+      ? {
+          ...buildOfficialCommercialPavilionPlan(
+            PAVILION14_COMMERCIAL_REFERENCE,
+            'parallel-double-island',
+            '#1683E7',
+          ),
+          // Presentation only: the official quarter-turn projection and both
+          // canonical pavilion rotations remain owned by the B2 references.
+          interiorPresentation: PAVILION14_PLAN_PRESENTATION,
+        }
       : publicIdentifier === 'B3'
         ? {
             ...buildOfficialCommercialPavilionPlan(

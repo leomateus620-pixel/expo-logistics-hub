@@ -584,21 +584,25 @@ function createOfficialWallEntrances(
       }
       const projected = projectCommercialPavilionReferenceRect(corridor, frame);
       return access.edges.map((edge, edgeIndex): CommercialPavilionEntrance => {
-        const frontOrRear = edge === 'front' || edge === 'rear';
+        const projectedEdge = transformCommercialPavilionReferenceWallEdge(
+          edge,
+          plan.projection.coordinateTransform,
+        );
+        const frontOrRear = projectedEdge === 'front' || projectedEdge === 'rear';
         const height = dimensions.shellHeight * 0.62;
         return {
           id: `${access.id}:${edge}`,
           index: accessIndex * 4 + edgeIndex,
-          edge,
+          edge: projectedEdge,
           kind: access.kind ?? 'entrance',
           sourcePrecision: access.sourcePrecision,
           ...(access.connectsTo ? { connectsTo: access.connectsTo } : {}),
           centerX: frontOrRear
             ? projected.centerX
-            : edge === 'left' ? -dimensions.shellWidth / 2 : dimensions.shellWidth / 2,
+            : projectedEdge === 'left' ? -dimensions.shellWidth / 2 : dimensions.shellWidth / 2,
           centerY: dimensions.slabTopY + height / 2,
           centerZ: frontOrRear
-            ? edge === 'front' ? dimensions.shellDepth / 2 : -dimensions.shellDepth / 2
+            ? projectedEdge === 'front' ? dimensions.shellDepth / 2 : -dimensions.shellDepth / 2
             : projected.centerZ,
           width: frontOrRear ? projected.width : dimensions.entranceDepth,
           depth: frontOrRear ? dimensions.entranceDepth : projected.depth,
