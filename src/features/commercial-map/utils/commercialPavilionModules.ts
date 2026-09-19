@@ -187,6 +187,22 @@ interface OfficialCommercialPavilionReference {
   };
 }
 
+const PAVILION12_PLAN_PRESENTATION: CommercialPavilionInteriorPresentation = {
+  mode: 'plan',
+  navigationMode: 'locked-plan',
+  enableRotate: false,
+  enablePan: true,
+  mouseNavigation: 'pan',
+  touchNavigation: 'pan-dolly',
+  preserveCanonicalOrientation: true,
+  includeWayfindingInFit: true,
+  flatModules: true,
+  numberPriority: 'maximum',
+  showAreaInsideModule: false,
+  boundedPan: true,
+  boundedZoom: true,
+};
+
 function buildOfficialCommercialPavilionPlan(
   reference: OfficialCommercialPavilionReference,
   topology: CommercialPavilionModuleTopology,
@@ -273,11 +289,16 @@ export const COMMERCIAL_PAVILION_MODULE_PLANS = Object.fromEntries(
         '#1683E7',
       )
       : publicIdentifier === 'B3'
-        ? buildOfficialCommercialPavilionPlan(
-          PAVILION12_COMMERCIAL_REFERENCE,
-          'stacked-central-islands',
-          '#18DAB0',
-        )
+        ? {
+            ...buildOfficialCommercialPavilionPlan(
+              PAVILION12_COMMERCIAL_REFERENCE,
+              'stacked-central-islands',
+              '#18DAB0',
+            ),
+            // B3 keeps its official reference immutable. This derived profile
+            // only changes how the canonical 180-degree plan is presented.
+            interiorPresentation: PAVILION12_PLAN_PRESENTATION,
+          }
         : publicIdentifier === 'B4'
           ? buildOfficialCommercialPavilionPlan(
             PAVILION8_COMMERCIAL_REFERENCE,
