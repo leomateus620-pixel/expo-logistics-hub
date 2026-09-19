@@ -78,6 +78,15 @@ describe('planta comercial fixa do Pavilhão 8', () => {
     expect(envelope?.depth).toBeCloseTo((35.4 + 7.4) / 35.4, 12);
     expect((envelope?.centerZ ?? 0) - (envelope?.depth ?? 0) / 2)
       .toBeCloseTo(-7.4 / 35.4, 12);
+
+    const withoutSupportFit = deriveCommercialPavilionOfficialContentEnvelope({
+      ...plan,
+      interiorPresentation: {
+        ...plan.interiorPresentation,
+        includeSupportSpacesInFit: false,
+      },
+    });
+    expect(withoutSupportFit?.depth).toBeCloseTo(1, 12);
   });
 
   it('preserva os cinco acessos e as conexões oficiais', () => {
