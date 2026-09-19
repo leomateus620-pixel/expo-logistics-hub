@@ -47,7 +47,9 @@ describe('renderização compartilhada dos módulos internos', () => {
     expect(exterior).toContain('<CommercialPavilionModuleLayer');
     expect(exterior).toContain('mode="cutaway"');
     expect(interior).toContain('<CommercialPavilionModuleLayer');
-    expect(canvas).toContain('touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE }}');
+    expect(canvas).toContain('ONE: THREE.TOUCH.PAN');
+    expect(canvas).toContain('THREE.TOUCH.DOLLY_PAN');
+    expect(canvas).toContain('THREE.TOUCH.DOLLY_ROTATE');
     expect(canvas).toContain('setCameraNavigating(true)');
     expect(canvas).toContain('setCameraNavigating(false)');
     expect(interior).toContain('useInteriorCameraRequest(request)');
