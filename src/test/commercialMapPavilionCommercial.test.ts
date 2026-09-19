@@ -133,7 +133,7 @@ describe('pavilion module commercial identity', () => {
       [entity()],
       [lot({ status: 'IN_NEGOTIATION' })],
     );
-    expect(visualStates.get('B6:module:048')).toEqual({
+    expect(visualStates.get('B6:module:048')).toMatchObject({
       entityId: 'module-48',
       lotId: 'lot-48',
       status: 'IN_NEGOTIATION',

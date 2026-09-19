@@ -102,8 +102,11 @@ describe('registered Gate 1 and Tuparendi junction ownership', () => {
       expect(area(polygonClipping.intersection(model.footprint, owner))).toBeLessThan(1e-7);
       const sidewalk = input.sidewalkSurfaces.find(surface => surface.id === 'gate-1-west-sidewalk')!;
       const mini = PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout;
+      const sidewalkRing = sidewalk.polygon.map(
+        (point) => [point[0], point[1]] as [number, number],
+      );
       expect(area(polygonClipping.intersection([[accessCircle(mini.center, mini.outerRadius)]],
-        [[sidewalk.polygon.map(point => [point[0], point[1]])]]))).toBeLessThan(1e-7);
+        [[sidewalkRing]]))).toBeLessThan(1e-7);
     } finally { Object.values(model).forEach(value => { if (value && typeof value === 'object' && 'dispose' in value) value.dispose(); }); }
   });
 

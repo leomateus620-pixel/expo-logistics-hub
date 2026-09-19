@@ -355,6 +355,38 @@ function rectEdges(rect: CommercialPavilionReferenceRect) {
   };
 }
 
+export function deriveCommercialPavilionModuleEnvelope(
+  plan: Pick<CommercialPavilionModulePlan, 'cells'>,
+): NormalizedCommercialPavilionRect {
+  const rectangles = plan.cells.flatMap((cell) => (
+    cell.shape?.renderParts.length ? cell.shape.renderParts : [cell]
+  ));
+  const points = plan.cells.flatMap((cell) => cell.shape?.footprint ?? []);
+  const first = rectangles[0];
+  if (!first) throw new Error('O pavilhao comercial nao possui modulos para enquadramento.');
+  const bounds = rectangles.slice(1).reduce((current, rect) => {
+    const edges = rectEdges(rect);
+    return {
+      minX: Math.min(current.minX, edges.minX),
+      minZ: Math.min(current.minZ, edges.minZ),
+      maxX: Math.max(current.maxX, edges.maxX),
+      maxZ: Math.max(current.maxZ, edges.maxZ),
+    };
+  }, rectEdges(first));
+  points.forEach(([x, z]) => {
+    bounds.minX = Math.min(bounds.minX, x);
+    bounds.minZ = Math.min(bounds.minZ, z);
+    bounds.maxX = Math.max(bounds.maxX, x);
+    bounds.maxZ = Math.max(bounds.maxZ, z);
+  });
+  return {
+    centerX: (bounds.minX + bounds.maxX) / 2,
+    centerZ: (bounds.minZ + bounds.maxZ) / 2,
+    width: bounds.maxX - bounds.minX,
+    depth: bounds.maxZ - bounds.minZ,
+  };
+}
+
 /**
  * Source-space envelope used only by the dedicated pavilion interior. The
  * official boundary remains authoritative, while traced support wings may

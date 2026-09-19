@@ -11,7 +11,7 @@ describe('renderer operacional do interior comercial', () => {
 
     expect(interior).toContain('buildCommercialPavilionModuleVisualStateIndex');
     expect(commercial).toContain('record.lot.status');
-    expect(layer).toContain('moduleStateById.get(cell.id)?.status');
+    expect(layer).toContain('const persistedStatus = moduleState?.status ?? null');
     expect(layer).toContain('IN_NEGOTIATION:');
     expect(layer).toContain('UNAVAILABLE:');
     expect(`${layer}\n${interior}`).not.toMatch(/currentBuyer|exhibitorName|companyName/);
