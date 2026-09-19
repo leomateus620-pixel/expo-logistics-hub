@@ -114,7 +114,7 @@ describe('planta comercial fixa do Pavilhão 5', () => {
   it('mantém a discrepância documental do módulo 28 fora do status comercial', () => {
     const module28 = COMMERCIAL_PAVILION_MODULE_PLANS.B8.cells.find((cell) => cell.number === 28);
 
-    expect(module28?.id).toBe('B8:module:28');
+    expect(module28?.id).toBe('B8:module:028');
     expect(module28?.areaM2).toBe(3);
     expect(module28?.source?.discrepancy).toBe('manual-confirmation-required');
     expect(module28).not.toHaveProperty('status');
