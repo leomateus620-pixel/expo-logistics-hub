@@ -235,6 +235,24 @@ const PAVILION12_PLAN_PRESENTATION: CommercialPavilionInteriorPresentation = {
   boundedZoom: true,
 };
 
+const PAVILION5_PLAN_PRESENTATION: CommercialPavilionInteriorPresentation = {
+  fit: 'official-content',
+  mode: 'plan',
+  navigationMode: 'locked-plan',
+  enableRotate: false,
+  enablePan: true,
+  mouseNavigation: 'pan',
+  touchNavigation: 'pan-dolly',
+  preserveCanonicalOrientation: true,
+  includeWayfindingInFit: true,
+  includeSupportSpacesInFit: true,
+  flatModules: true,
+  numberPriority: 'maximum',
+  showAreaInsideModule: false,
+  boundedPan: true,
+  boundedZoom: true,
+};
+
 function buildOfficialCommercialPavilionPlan(
   reference: OfficialCommercialPavilionReference,
   topology: CommercialPavilionModuleTopology,
@@ -360,11 +378,16 @@ export const COMMERCIAL_PAVILION_MODULE_PLANS = Object.fromEntries(
             '#13CFAC',
           )
           : publicIdentifier === 'B8'
-            ? buildOfficialCommercialPavilionPlan(
-              PAVILION5_COMMERCIAL_REFERENCE,
-              'horticulture-u-gallery',
-              '#1F9BF0',
-            )
+            ? {
+                ...buildOfficialCommercialPavilionPlan(
+                  PAVILION5_COMMERCIAL_REFERENCE,
+                  'horticulture-u-gallery',
+                  '#1F9BF0',
+                ),
+                // Presentation only: B8 keeps its official identity projection,
+                // zero rotations and complete permanent support wing.
+                interiorPresentation: PAVILION5_PLAN_PRESENTATION,
+              }
             : buildOfficialCommercialPavilionPlan(
               PAVILION7_COMMERCIAL_REFERENCE,
               'agroindustry-six-runs',

@@ -1,5 +1,12 @@
 # Roadmap
 
+## Pavilhão 5 / B8 — planta interativa com apoios protegidos
+- [x] Preservar orientação 0/0, projeção identity, 81 módulos, áreas, corredores, acessos, apoios e discrepância do módulo 28
+- [x] Ativar perfil compartilhado de PAN, zoom, lotes planos, numeração prioritária e fit official-content
+- [x] Validar regressões automatizadas e TypeScript (124 testes)
+- [ ] Validar navegação visual desktop/mobile e capturar evidências — bloqueada pelo renderer WebGL automatizado: desktop e mobile permaneceram no carregamento, com DOM vazio e nenhum canvas após 90 segundos
+- Não publicar (pedido do usuário)
+
 ## Pavilhão 1 / B1 — planta interativa com quarter-turn
 - [x] Preservar quarter-turn, orientação Math.PI/2 e Math.PI, 189 módulos, áreas, acessos e módulo irregular 141
 - [x] Ativar perfil compartilhado de PAN, zoom, lotes planos e numeração prioritária somente no plano derivado
