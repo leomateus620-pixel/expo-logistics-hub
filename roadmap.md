@@ -3,7 +3,8 @@
 ## Pavilhão 13 / B5 — planta interativa
 - [x] Preservar orientação canônica, 103 módulos, áreas e geometrias irregulares
 - [x] Ativar perfil compartilhado de PAN, zoom, lotes planos e numeração prioritária
-- [ ] Validar regressões automatizadas e navegação visual desktop/mobile
+- [x] Validar regressões automatizadas (53 testes + TypeScript)
+- [ ] Validar navegação visual desktop/mobile — bloqueada pelo renderer WebGL automatizado, que permaneceu carregando por mais de 7 minutos
 - Não publicar (pedido do usuário)
 
 ## Avisos no celular (push / FCM)
