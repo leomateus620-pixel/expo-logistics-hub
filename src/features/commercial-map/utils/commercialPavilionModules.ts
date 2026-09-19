@@ -187,6 +187,22 @@ interface OfficialCommercialPavilionReference {
   };
 }
 
+const PAVILION1_PLAN_PRESENTATION: CommercialPavilionInteriorPresentation = {
+  mode: 'plan',
+  navigationMode: 'locked-plan',
+  enableRotate: false,
+  enablePan: true,
+  mouseNavigation: 'pan',
+  touchNavigation: 'pan-dolly',
+  preserveCanonicalOrientation: true,
+  includeWayfindingInFit: true,
+  flatModules: true,
+  numberPriority: 'maximum',
+  showAreaInsideModule: false,
+  boundedPan: true,
+  boundedZoom: true,
+};
+
 const PAVILION14_PLAN_PRESENTATION: CommercialPavilionInteriorPresentation = {
   mode: 'plan',
   navigationMode: 'locked-plan',
@@ -293,11 +309,16 @@ export const COMMERCIAL_PAVILION_MODULE_PLANS = Object.fromEntries(
   COMMERCIAL_PAVILION_PUBLIC_IDENTIFIERS.map((publicIdentifier) => [
     publicIdentifier,
     publicIdentifier === 'B1'
-      ? buildOfficialCommercialPavilionPlan(
-        PAVILION1_COMMERCIAL_REFERENCE,
-        'perimeter-central-island',
-        '#D97706',
-      )
+      ? {
+          ...buildOfficialCommercialPavilionPlan(
+            PAVILION1_COMMERCIAL_REFERENCE,
+            'perimeter-central-island',
+            '#D97706',
+          ),
+          // Presentation only: B1 retains its official quarter-turn projection
+          // and both canonical rotations from the immutable references.
+          interiorPresentation: PAVILION1_PLAN_PRESENTATION,
+        }
       : publicIdentifier === 'B2'
       ? {
           ...buildOfficialCommercialPavilionPlan(
