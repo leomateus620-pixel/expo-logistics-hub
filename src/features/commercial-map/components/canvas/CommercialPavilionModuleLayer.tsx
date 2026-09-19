@@ -113,6 +113,7 @@ function IrregularModuleMesh({
   color,
   borderColor,
   heightScale,
+  flatModules,
   interactive,
   castShadow,
   onPointerMove,
@@ -126,6 +127,7 @@ function IrregularModuleMesh({
   color: THREE.Color;
   borderColor: THREE.Color;
   heightScale: number;
+  flatModules: boolean;
   interactive: boolean;
   castShadow: boolean;
   onPointerMove: (moduleId: string, event: ThreeEvent<PointerEvent>) => void;
@@ -161,8 +163,8 @@ function IrregularModuleMesh({
     roughness: 0.78,
     metalness: 0.08,
   }), []);
-  const footprintScale = heightScale > 1 ? 0.97 : 0.94;
-  const cellHeight = moduleHeight * heightScale;
+  const footprintScale = flatModules ? 0.965 : heightScale > 1 ? 0.97 : 0.94;
+  const cellHeight = moduleHeight * (flatModules ? 1 : heightScale);
 
   useLayoutEffect(() => {
     moduleMaterial.color.copy(color);
@@ -234,10 +236,15 @@ function createModuleNumberTexture(
   layout: CommercialPavilionLayout,
   reducedGraphics: boolean,
   labelRotationRadians: number,
+  viewportWidth: number,
+  pixelRatio: number,
 ) {
   if (typeof document === 'undefined') return null;
   const aspect = Math.max(0.25, layout.interior.clearWidth / layout.interior.clearDepth);
-  const longSide = reducedGraphics ? 1536 : 2048;
+  const maximumPriority = plan.interiorPresentation?.numberPriority === 'maximum';
+  const longSide = maximumPriority
+    ? Math.min(3072, Math.max(2048, Math.round(viewportWidth * Math.min(pixelRatio, 2) * 1.5)))
+    : reducedGraphics ? 1536 : 2048;
   const width = aspect >= 1 ? longSide : Math.max(768, Math.round(longSide * aspect));
   const height = aspect >= 1 ? Math.max(768, Math.round(longSide / aspect)) : longSide;
   const canvas = document.createElement('canvas');
@@ -295,13 +302,18 @@ function createModuleNumberTexture(
     const usableWidth = isDepthOriented ? cellHeight : cellWidth;
     const usableHeight = isDepthOriented ? cellWidth : cellHeight;
     const fontSize = Math.floor(THREE.MathUtils.clamp(
-      Math.min(usableWidth * 0.42, usableHeight * 0.5),
+      Math.min(
+        usableWidth * (maximumPriority ? 0.62 : 0.42),
+        usableHeight * (maximumPriority ? 0.72 : 0.5),
+      ),
       7,
-      reducedGraphics ? 22 : 30,
+      maximumPriority ? 40 : reducedGraphics ? 22 : 30,
     ));
 
-    context.strokeStyle = 'rgba(248, 252, 246, 0.72)';
-    context.lineWidth = Math.max(1, Math.min(2.5, Math.min(cellWidth, cellHeight) * 0.055));
+    context.strokeStyle = maximumPriority
+      ? 'rgba(248, 252, 246, 0.96)'
+      : 'rgba(248, 252, 246, 0.72)';
+    context.lineWidth = Math.max(1, Math.min(maximumPriority ? 3.5 : 2.5, Math.min(cellWidth, cellHeight) * 0.07));
     if (orientedCell.shape?.footprint.length) {
       context.beginPath();
       orientedCell.shape.footprint.forEach(([x, z], index) => {
@@ -316,9 +328,11 @@ function createModuleNumberTexture(
     }
 
     if (fontSize < 7) return;
-    context.font = `800 ${fontSize}px Inter, Arial, sans-serif`;
-    context.lineWidth = Math.max(1.5, fontSize * 0.18);
-    context.strokeStyle = 'rgba(250, 253, 247, 0.92)';
+    context.font = `${maximumPriority ? 900 : 800} ${fontSize}px Inter, Arial, sans-serif`;
+    context.lineWidth = Math.max(1.5, fontSize * (maximumPriority ? 0.24 : 0.18));
+    context.strokeStyle = maximumPriority
+      ? 'rgba(255, 255, 252, 1)'
+      : 'rgba(250, 253, 247, 0.92)';
     context.save();
     context.translate(labelX, labelY);
     if (isDepthOriented) {
@@ -329,12 +343,13 @@ function createModuleNumberTexture(
     const areaSqm = orientedCell.areaM2 ?? null;
     const areaFontSize = Math.floor(fontSize * 0.62);
     const showArea = areaSqm != null
+      && plan.interiorPresentation?.showAreaInsideModule !== false
       && !reducedGraphics
       && areaFontSize >= 7
       && usableHeight > fontSize * 2.6;
     const numberOffset = showArea ? -areaFontSize * 0.72 : 0;
     context.strokeText(cell.label, 0, numberOffset);
-    context.fillStyle = '#173b2b';
+    context.fillStyle = maximumPriority ? '#082c20' : '#173b2b';
     context.fillText(cell.label, 0, numberOffset);
     if (showArea && areaSqm != null) {
       const areaText = `${areaSqm.toLocaleString('pt-BR', {
@@ -402,7 +417,7 @@ function createModuleNumberTexture(
   texture.minFilter = THREE.LinearMipmapLinearFilter;
   texture.magFilter = THREE.LinearFilter;
   texture.generateMipmaps = true;
-  texture.anisotropy = reducedGraphics ? 2 : 8;
+  texture.anisotropy = maximumPriority ? 12 : reducedGraphics ? 2 : 8;
   texture.needsUpdate = true;
   return texture;
 }
@@ -429,6 +444,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   const [corridorMesh, setCorridorMesh] = useDisposableInstancedMeshRef();
   const [supportSpaceMesh, setSupportSpaceMesh] = useDisposableInstancedMeshRef();
   const gl = useThree((state) => state.gl);
+  const viewportSize = useThree((state) => state.size);
   const invalidate = useThree((state) => state.invalidate);
   const hoveredModuleId = useCommercialMapStore((state) => state.hoveredModuleId);
   const selectedModuleId = useCommercialMapStore((state) => state.selectedModuleId);
@@ -437,12 +453,15 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   const salesSelectedLotIds = useSalesSelectedLotIds();
   const unitBoxGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const shortSide = Math.min(layout.interior.clearWidth, layout.interior.clearDepth);
-  const moduleHeight = THREE.MathUtils.clamp(
+  const flatModules = mode === 'interior' && plan.interiorPresentation?.flatModules === true;
+  const moduleHeight = flatModules ? 0.018 : THREE.MathUtils.clamp(
     shortSide * (mode === 'interior' ? 0.032 : 0.04),
     mode === 'interior' ? 0.085 : 0.1,
     mode === 'interior' ? 0.22 : 0.25,
   );
-  const moduleBaseHeight = THREE.MathUtils.clamp(moduleHeight * 0.18, 0.024, 0.045);
+  const moduleBaseHeight = flatModules
+    ? 0.012
+    : THREE.MathUtils.clamp(moduleHeight * 0.18, 0.024, 0.045);
   const floorY = layout.interior.floorY;
   const footprint = useMemo(() => ({
     width: layout.interior.clearWidth,
@@ -487,8 +506,15 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     plan.zones.map((zone, index) => [zone.id, index]),
   ), [plan.zones]);
   const numberTexture = useMemo(
-    () => createModuleNumberTexture(plan, layout, reducedGraphics, labelRotationRadians),
-    [labelRotationRadians, layout, plan, reducedGraphics],
+    () => createModuleNumberTexture(
+      plan,
+      layout,
+      reducedGraphics,
+      labelRotationRadians,
+      viewportSize.width,
+      gl.getPixelRatio(),
+    ),
+    [gl, labelRotationRadians, layout, plan, reducedGraphics, viewportSize.width],
   );
   const moduleMaterial = useMemo(() => new THREE.MeshStandardMaterial({
     color: '#ffffff',
@@ -539,7 +565,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       const isSelected = inCart || cell.id === activeSelectedId;
       const isHovered = !isSelected && cell.id === activeHoveredId;
       const persistedStatus = moduleState?.status ?? null;
-      const heightScale = inCart ? 1.42 : isSelected ? 1.34 : isHovered ? 1.14 : 1;
+      const heightScale = flatModules ? 1 : inCart ? 1.42 : isSelected ? 1.34 : isHovered ? 1.14 : 1;
       const cellHeight = moduleHeight * heightScale;
 
       object.position.set(
@@ -609,6 +635,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     activeSelectedId,
     floorY,
     filtersActive,
+    flatModules,
     invalidate,
     matchingEntityIds,
     moduleHeight,
@@ -621,6 +648,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     plan.colorCue,
     plan.zones.length,
     projectedModuleParts,
+    salesSelectedLotIds,
     zoneIndex,
   ]);
 
@@ -777,7 +805,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
         <instancedMesh
           ref={setSupportSpaceMesh}
           args={[unitBoxGeometry, supportSpaceMaterial, projectedSupportSpaces.length]}
-          castShadow={mode === 'interior' && !reducedGraphics}
+          castShadow={mode === 'interior' && !reducedGraphics && !flatModules}
           receiveShadow
           raycast={NO_RAYCAST}
           dispose={null}
@@ -834,9 +862,10 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
             moduleBaseHeight={moduleBaseHeight}
             color={color}
             borderColor={borderColor}
-            heightScale={isSelected ? 1.34 : isHovered ? 1.14 : 1}
+            heightScale={flatModules ? 1 : isSelected ? 1.34 : isHovered ? 1.14 : 1}
+            flatModules={flatModules}
             interactive={interactive}
-            castShadow={mode === 'interior' && !reducedGraphics}
+            castShadow={mode === 'interior' && !reducedGraphics && !flatModules}
             onPointerMove={handleIrregularPointerMove}
             onPointerOut={handlePointerOut}
             onClick={handleIrregularClick}
@@ -845,7 +874,11 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       })}
       {numberTexture && (
         <mesh
-          position={[0, floorY + moduleBaseHeight + moduleHeight * 1.42 + 0.018, 0]}
+          position={[
+            0,
+            floorY + moduleBaseHeight + moduleHeight * (flatModules ? 1 : 1.42) + 0.018,
+            0,
+          ]}
           rotation={[-Math.PI / 2, 0, 0]}
           geometry={labelGeometry}
           material={labelMaterial}
