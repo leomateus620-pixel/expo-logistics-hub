@@ -14,7 +14,6 @@ import {
 } from '../../utils/commercialPavilions';
 import {
   createCommercialPavilionModuleProjectionFrame,
-  deriveCommercialPavilionModuleEnvelope,
   projectCommercialPavilionOfficialContentEnvelope,
   projectCommercialPavilionModuleRect,
   resolveCommercialPavilionModulePlan,
