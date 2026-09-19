@@ -3,7 +3,8 @@
 ## Pavilhão 8 / B4 — planta interativa
 - [x] Preservar orientação, 114 módulos, módulo 90, áreas de apoio e acessos
 - [x] Ativar perfil compartilhado de PAN, zoom, lotes planos e numeração prioritária
-- [ ] Validar regressões automatizadas e navegação visual desktop/mobile
+- [x] Validar regressões automatizadas (65 testes + TypeScript)
+- [ ] Validar navegação visual desktop/mobile — bloqueada pelo renderer WebGL automatizado, que permaneceu em 85% após 110 segundos
 - Não publicar (pedido do usuário)
 
 ## Pavilhão 13 / B5 — planta interativa
