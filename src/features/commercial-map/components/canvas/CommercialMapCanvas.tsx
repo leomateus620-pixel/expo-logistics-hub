@@ -4316,6 +4316,8 @@ const Scene = memo(function Scene({
   sceneInteriorEntityId,
   isolatedArea,
   segmentOverride,
+  interactiveEntityIds = null,
+  publicFocusEntityIds = null,
   technicalValidationAllowed = false,
   renderQualityTier = 'HIGH',
 }: CommercialMapSceneProps) {
