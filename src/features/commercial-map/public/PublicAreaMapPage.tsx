@@ -191,6 +191,11 @@ export default function PublicAreaMapPage() {
           <button type="button" aria-pressed={viewMode === 'list' || !webglAvailable} onClick={() => setViewMode('list')}>
             <LayoutList aria-hidden="true" /><span>Lista</span>
           </button>
+          {parkContextActive && showMap && (
+            <button type="button" className="public-map-refit" onClick={refitArea}>
+              <Crosshair aria-hidden="true" /><span>Reenquadrar área</span>
+            </button>
+          )}
         </div>
       </header>
 
