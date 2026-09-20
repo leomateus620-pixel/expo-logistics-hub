@@ -49,7 +49,6 @@ export function PublicInterestDialog() {
 /** As consultas só montam com o diálogo aberto — nada roda no mapa fechado. */
 function PublicInterestContent() {
   const open = true;
-  const [revealed, setRevealed] = useState<Record<string, string>>({});
   const queryClient = useQueryClient();
   const { fromIso, toIso } = useMemo(rangeIso, [open]);
 
@@ -65,16 +64,6 @@ function PublicInterestContent() {
   });
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['public-map-admin'] });
-
-  const rotate = useMutation({
-    mutationFn: rotatePublicMapLink,
-    onSuccess: (result) => {
-      setRevealed((current) => ({ ...current, [result.slug]: result.token }));
-      void invalidate();
-      toast({ title: 'Nova chave gerada', description: 'O endereço anterior deixou de funcionar imediatamente.' });
-    },
-    onError: (error: Error) => toast({ title: 'Não foi possível gerar a chave', description: error.message, variant: 'destructive' }),
-  });
 
   const toggle = useMutation({
     mutationFn: ({ slug, active }: { slug: string; active: boolean }) => setPublicMapLinkActive(slug, active),
