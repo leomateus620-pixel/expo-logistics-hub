@@ -1910,6 +1910,20 @@ function setLunarLookQuaternion(
   quaternion.setFromRotationMatrix(matrix);
 }
 
+/** Dados mínimos de enquadramento de um recorte (segmento oficial ou link público). */
+type SegmentFraming = Pick<CommercialMapSegmentDefinition, 'id' | 'camera'>;
+
+/** Enquadramento neutro do recorte público: folga suficiente para ver o entorno. */
+const PUBLIC_FOCUS_FRAMING = {
+  id: 'public-focus' as CommercialMapSegmentId,
+  camera: {
+    direction: [0.58, 0.72, 0.6] as const,
+    padding: 1.22,
+    minDistanceRatio: 0.1,
+    maxDistanceRatio: 2.2,
+  },
+} satisfies SegmentFraming;
+
 function CameraRig({
   selectedEntity,
   interiorEntity,
