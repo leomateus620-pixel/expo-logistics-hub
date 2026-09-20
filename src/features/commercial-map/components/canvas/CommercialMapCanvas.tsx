@@ -2944,7 +2944,7 @@ function CameraRig({
     startCameraMove,
   ]);
 
-  const queueSegment = useCallback((segment: CommercialMapSegmentDefinition, segmentEntities: MapEntity[]) => {
+  const queueSegment = useCallback((segment: SegmentFraming, segmentEntities: MapEntity[]) => {
     setParkingControlLimits(null);
     if (segmentEntities.length === 0) {
       queuePreset(preset);
@@ -3083,7 +3083,7 @@ function CameraRig({
     if (interiorEntity) queueInterior();
     else if (parkingActive) queueParking();
     else if (selectedEntity) queueSelection(selectedEntity);
-    else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+    else if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
     else queuePreset(preset);
   };
 
@@ -3454,7 +3454,7 @@ function CameraRig({
         useCommercialMapStore.getState().setInteriorReturnView(null);
         interiorReturnLens.current = null;
       } else if (selectedEntity) queueSelection(selectedEntity);
-      else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+      else if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
       else queuePreset(preset);
     } else if (!initialized.current) {
       if (parkingActive) queueParking();
@@ -3471,7 +3471,7 @@ function CameraRig({
         returnView.current = null;
         useCommercialMapStore.getState().setInteriorReturnView(null);
       } else if (selectedEntity) queueSelection(selectedEntity);
-      else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+      else if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
       else queuePreset(preset);
       initialized.current = true;
     } else if (parkingActive) {
@@ -3483,14 +3483,14 @@ function CameraRig({
         queueParking();
       }
     } else if (presetChanged) {
-      if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+      if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
       else queuePreset(preset);
     } else if (segmentChanged) {
-      if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+      if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
       else queuePreset(preset);
     } else if (sequenceChanged) {
       if (selectedEntity) queueSelection(selectedEntity);
-      else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+      else if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
       else queuePreset(preset);
     } else if (selectionChanged && selectedEntity) {
       queueSelection(selectedEntity);
