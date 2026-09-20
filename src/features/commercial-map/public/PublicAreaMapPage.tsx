@@ -212,14 +212,16 @@ export default function PublicAreaMapPage() {
           <div className="public-map-canvas">
             <Suspense fallback={<p className="public-map-state" role="status">Preparando o mapa…</p>}>
               <CommercialMapCanvas
-                entities={data.entities}
+                entities={sceneEntities}
                 lots={canvasLots}
                 calibration={null}
                 matchingEntityIds={EMPTY_MATCHES}
                 filtersActive={false}
                 sceneSegmentId={sceneSegmentId}
                 sceneInteriorEntityId={pavilionEntity?.id ?? null}
-                isolatedArea={sceneSegmentId}
+                isolatedArea={parkContextActive ? null : sceneSegmentId}
+                interactiveEntityIds={interactionScope.interactiveEntityIds}
+                publicFocusEntityIds={interactionScope.interactiveEntityIds}
               />
             </Suspense>
           </div>
