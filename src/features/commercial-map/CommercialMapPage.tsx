@@ -355,7 +355,8 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const publishReady = data?.calibration?.status === 'VALIDATED' && projectStats?.review === 0;
   const hasManagementActions = permissions.isMapAdmin
     || permissions.canManageLots
-    || permissions.canEditGeometry;
+    || permissions.canEditGeometry
+    || permissions.canViewMapAnalytics;
   if (!isPreview && mapQuery.isLoading) return <MapPageSkeleton />;
   if (!data) {
     return (
