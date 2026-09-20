@@ -63,6 +63,7 @@ export default function PublicAreaMapPage() {
   const enterInterior = useCommercialMapStore((state) => state.enterInterior);
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
   const setSelectedModuleId = useCommercialMapStore((state) => state.setSelectedModuleId);
+  const clearSegmentFocus = useCommercialMapStore((state) => state.clearSegmentFocus);
 
   const data = inventory.data;
   const lots = useMemo(() => data?.lots ?? [], [data]);
