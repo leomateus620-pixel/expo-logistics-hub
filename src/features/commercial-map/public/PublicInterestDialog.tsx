@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Copy, KeyRound, Link2, LineChart, Loader2 } from 'lucide-react';
+import { Copy, ExternalLink, Link2, LineChart, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,7 +17,6 @@ import {
   fetchPublicMapInterest,
   fetchPublicMapLinks,
   interactionRate,
-  rotatePublicMapLink,
   setPublicMapLinkActive,
 } from './publicMapAdminService';
 import './public-interest.css';
