@@ -9800,6 +9800,10 @@ export type Database = {
         }
         Returns: number
       }
+      public_map_context: {
+        Args: { _slug: string; _token: string }
+        Returns: Json
+      }
       public_map_interest_summary: {
         Args: { _from?: string; _to?: string }
         Returns: Json
