@@ -377,6 +377,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
 
   const managementActions = hasManagementActions ? (
     <>
+          {permissions.canViewMapAnalytics && <PublicInterestDialog />}
               {permissions.canEditGeometry && (
                 <Button
                   size="sm"
