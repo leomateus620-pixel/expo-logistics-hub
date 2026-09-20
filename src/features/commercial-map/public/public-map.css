@@ -253,3 +253,57 @@
   width: 1rem;
   height: 1rem;
 }
+
+/* Nenhuma falha pode deixar apenas um retângulo preto: o estágio cobre o
+   canvas com texto legível e caminhos de recuperação. */
+.public-map-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  background: oklch(var(--background) / 0.92);
+  color: oklch(var(--foreground));
+  font-size: 0.9375rem;
+}
+
+.public-map-stage__spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 3px solid oklch(var(--muted));
+  border-top-color: oklch(var(--primary));
+  animation: public-map-stage-spin 900ms linear infinite;
+}
+
+@keyframes public-map-stage-spin { to { transform: rotate(360deg); } }
+
+.public-map-stage__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.public-map-stage__actions button {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid oklch(var(--border));
+  background: oklch(var(--primary));
+  color: oklch(var(--primary-foreground));
+  font-weight: 600;
+}
+
+.public-map-stage__actions button + button {
+  background: transparent;
+  color: oklch(var(--foreground));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-map-stage__spinner { animation-duration: 3s; }
+}
