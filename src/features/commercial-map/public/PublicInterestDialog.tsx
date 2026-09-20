@@ -100,13 +100,14 @@ function PublicInterestContent() {
 
   return (
     <>
-        <DialogHeader>
-          <DialogTitle>Interesse por áreas e lotes</DialogTitle>
-          <DialogDescription>
-            Consultas públicas dos últimos {RANGE_DAYS} dias, no horário de Brasília. Mede interesse, não venda.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogHeader className="public-interest-header">
+        <DialogTitle>Interesse por áreas e lotes</DialogTitle>
+        <DialogDescription>
+          Consultas públicas dos últimos {RANGE_DAYS} dias, no horário de Brasília. Mede interesse, não venda.
+        </DialogDescription>
+      </DialogHeader>
 
+      <div className="public-interest-scroll">
         {(interest.isLoading || links.isLoading) && (
           <p className="public-interest-state"><Loader2 className="animate-spin" />Carregando…</p>
         )}
@@ -191,6 +192,7 @@ function PublicInterestContent() {
             ))}
           </ul>
         </section>
+      </div>
     </>
   );
 }
