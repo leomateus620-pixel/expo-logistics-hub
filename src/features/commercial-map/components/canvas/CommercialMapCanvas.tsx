@@ -4970,7 +4970,7 @@ const Scene = memo(function Scene({
           onSelect={handleEntitySelect}
           onHover={handleEntityHover}
           onFocus={handleEntityFocus}
-          onEnterInterior={enterInterior}
+          onEnterInterior={handleEnterInterior}
           onCursor={setCanvasCursor}
           moduleStateById={selectedEntityId === entity.id ? selectedPavilionModuleState : undefined}
         />
