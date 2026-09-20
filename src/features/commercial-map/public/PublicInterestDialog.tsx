@@ -35,6 +35,21 @@ function rangeIso() {
 /** Mapa Comercial → Gestão → Interesse por áreas e lotes. */
 export function PublicInterestDialog() {
   const [open, setOpen] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline"><LineChart />Interesse por áreas e lotes</Button>
+      </DialogTrigger>
+      <DialogContent className="public-interest-dialog">
+        {open && <PublicInterestContent />}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/** As consultas só montam com o diálogo aberto — nada roda no mapa fechado. */
+function PublicInterestContent() {
+  const open = true;
   const [revealed, setRevealed] = useState<Record<string, string>>({});
   const queryClient = useQueryClient();
   const { fromIso, toIso } = useMemo(rangeIso, [open]);
@@ -84,11 +99,7 @@ export function PublicInterestDialog() {
   const maxDaily = Math.max(1, ...daily.map((day) => day.visits));
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" variant="outline"><LineChart />Interesse por áreas e lotes</Button>
-      </DialogTrigger>
-      <DialogContent className="public-interest-dialog">
+    <>
         <DialogHeader>
           <DialogTitle>Interesse por áreas e lotes</DialogTitle>
           <DialogDescription>
@@ -180,7 +191,6 @@ export function PublicInterestDialog() {
             ))}
           </ul>
         </section>
-      </DialogContent>
-    </Dialog>
+    </>
   );
 }
