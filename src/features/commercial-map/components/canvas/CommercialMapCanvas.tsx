@@ -3550,6 +3550,8 @@ function CameraRig({
     activePanel,
     activeSegment,
     activeSegmentEntities,
+    framingSegment,
+    framingSegmentEntities,
     camera,
     cameraDistanceBounds.maxDistance,
     cameraDistanceBounds.minDistance,
