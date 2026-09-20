@@ -15,7 +15,7 @@ import {
   usePublicMapTelemetry,
 } from './usePublicMapArea';
 import { buildPublicInteractionScope, canInspectLot } from './publicInteractionScope';
-import type { MapEntity, MapLayer } from '../types';
+import type { MapEntity } from '../types';
 import { usePublicScopeRevision } from './usePublicScopeRevision';
 import { useAppBuildFreshness } from './useAppBuildFreshness';
 import { PublicLotDetails } from './PublicLotDetails';
