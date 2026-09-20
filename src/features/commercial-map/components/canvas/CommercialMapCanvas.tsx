@@ -5132,6 +5132,7 @@ const Scene = memo(function Scene({
         exteriorRenderedEntities={exteriorRenderedEntities}
         resolvedSegmentByEntity={resolvedSegmentByEntity}
         segmentOverride={segmentOverride}
+        publicFocusEntityIds={publicFocusEntityIds}
         hydrologicalModeActive={hydrologicalModeActive}
       />
       <RuntimeFrameDiagnostics />
