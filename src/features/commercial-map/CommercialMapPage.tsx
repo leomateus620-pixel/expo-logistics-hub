@@ -73,6 +73,7 @@ import './commercial-map.css';
 import './commercial-map-mobile.css';
 
 import { useWebGLAvailability } from './hooks/useWebGLAvailability';
+import { PublicInterestDialog } from './public/PublicInterestDialog';
 
 function MapFeatureBoundary({ id, children }: { id: string; children: ReactNode }) {
   return <MapPanelBoundary resetKey={id} title="Ferramenta indisponível">
@@ -146,6 +147,7 @@ const COMMISSION_READ_ONLY_PERMISSIONS: MapPermissions = {
   canManageSales: false,
   canManageContracts: false,
   canManageLayers: false,
+  canViewMapAnalytics: false,
   isMapAdmin: false,
 };
 
@@ -354,7 +356,8 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const publishReady = data?.calibration?.status === 'VALIDATED' && projectStats?.review === 0;
   const hasManagementActions = permissions.isMapAdmin
     || permissions.canManageLots
-    || permissions.canEditGeometry;
+    || permissions.canEditGeometry
+    || permissions.canViewMapAnalytics;
   if (!isPreview && mapQuery.isLoading) return <MapPageSkeleton />;
   if (!data) {
     return (
@@ -375,6 +378,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
 
   const managementActions = hasManagementActions ? (
     <>
+          {permissions.canViewMapAnalytics && <PublicInterestDialog />}
               {permissions.canEditGeometry && (
                 <Button
                   size="sm"

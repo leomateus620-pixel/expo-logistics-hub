@@ -5445,6 +5445,142 @@ export type Database = {
           },
         ]
       }
+      public_map_events: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          event_id: string
+          event_type: string
+          id: string
+          link_id: string
+          lot_id: string | null
+          metadata: Json
+          occurred_at: string
+          page_view_id: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          event_id: string
+          event_type: string
+          id?: string
+          link_id: string
+          lot_id?: string | null
+          metadata?: Json
+          occurred_at?: string
+          page_view_id: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          event_id?: string
+          event_type?: string
+          id?: string
+          link_id?: string
+          lot_id?: string | null
+          metadata?: Json
+          occurred_at?: string
+          page_view_id?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_map_events_link_id_fkey"
+            columns: ["link_id"]
+            isOneToOne: false
+            referencedRelation: "public_map_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_map_events_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lot_pricing_2028"
+            referencedColumns: ["lot_id"]
+          },
+          {
+            foreignKeyName: "public_map_events_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_map_events_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
+          },
+        ]
+      }
+      public_map_links: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          display_name: string
+          id: string
+          is_active: boolean
+          org_id: string
+          project_id: string
+          revoked_at: string | null
+          scope_entity_ids: string[]
+          scope_key: string | null
+          scope_kind: string
+          slug: string
+          sort_order: number
+          token_hash: string | null
+          token_version: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          display_name: string
+          id?: string
+          is_active?: boolean
+          org_id: string
+          project_id: string
+          revoked_at?: string | null
+          scope_entity_ids?: string[]
+          scope_key?: string | null
+          scope_kind: string
+          slug: string
+          sort_order?: number
+          token_hash?: string | null
+          token_version?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          display_name?: string
+          id?: string
+          is_active?: boolean
+          org_id?: string
+          project_id?: string
+          revoked_at?: string | null
+          scope_entity_ids?: string[]
+          scope_key?: string | null
+          scope_kind?: string
+          slug?: string
+          sort_order?: number
+          token_hash?: string | null
+          token_version?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_map_links_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       public_mobility_forms: {
         Row: {
           committee_id: string
@@ -9663,6 +9799,79 @@ export type Database = {
           source_queue: string
         }
         Returns: number
+      }
+      public_map_interest_summary: {
+        Args: { _from?: string; _to?: string }
+        Returns: Json
+      }
+      public_map_inventory: {
+        Args: { _slug: string; _token: string }
+        Returns: Json
+      }
+      public_map_link_rotate: { Args: { _slug: string }; Returns: Json }
+      public_map_link_set_active: {
+        Args: { _active: boolean; _slug: string }
+        Returns: Json
+      }
+      public_map_links_overview: { Args: never; Returns: Json }
+      public_map_lot: {
+        Args: { _lot_id: string; _slug: string; _token: string }
+        Returns: Json
+      }
+      public_map_lot_availability: {
+        Args: { _status: string }
+        Returns: string
+      }
+      public_map_require_manager: {
+        Args: { _org_id: string }
+        Returns: undefined
+      }
+      public_map_resolve_link: {
+        Args: { _slug: string; _token: string }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          display_name: string
+          id: string
+          is_active: boolean
+          org_id: string
+          project_id: string
+          revoked_at: string | null
+          scope_entity_ids: string[]
+          scope_key: string | null
+          scope_kind: string
+          slug: string
+          sort_order: number
+          token_hash: string | null
+          token_version: number
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "public_map_links"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      public_map_scope_entity_ids: {
+        Args: { _link_id: string }
+        Returns: {
+          entity_id: string
+        }[]
+      }
+      public_map_track: {
+        Args: {
+          _duration_seconds?: number
+          _event_id: string
+          _event_type: string
+          _lot_id?: string
+          _metadata?: Json
+          _page_view_id: string
+          _session_id: string
+          _slug: string
+          _token: string
+        }
+        Returns: undefined
       }
       publish_commercial_map: {
         Args: { p_project_id: string; p_reason: string }

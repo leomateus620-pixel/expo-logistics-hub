@@ -1,0 +1,102 @@
+.public-interest-dialog {
+  max-width: min(760px, calc(100vw - 24px));
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+
+.public-interest-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.public-interest-state svg { width: 16px; height: 16px; }
+
+.public-interest-section { margin-top: 18px; }
+
+.public-interest-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: hsl(var(--muted-foreground));
+}
+
+.public-interest-section h3 svg { width: 14px; height: 14px; }
+
+.public-interest-spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 84px;
+  padding: 8px;
+  border-radius: 14px;
+  background: hsl(var(--muted) / 0.45);
+}
+
+.public-interest-spark span {
+  flex: 1;
+  min-width: 4px;
+  border-radius: 4px 4px 2px 2px;
+  background: hsl(var(--primary));
+}
+
+.public-interest-spark small { margin: auto; font-size: 0.8rem; color: hsl(var(--muted-foreground)); }
+
+.public-interest-rank { display: grid; gap: 6px; }
+
+.public-interest-rank li {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  border: 1px solid hsl(var(--border) / 0.6);
+  background: hsl(var(--card) / 0.7);
+  font-size: 0.82rem;
+}
+
+.public-interest-rank li.is-empty { display: block; color: hsl(var(--muted-foreground)); }
+.public-interest-rank span { color: hsl(var(--muted-foreground)); }
+.public-interest-rank em { font-style: normal; font-weight: 700; color: hsl(var(--primary)); }
+
+.public-interest-links { display: grid; gap: 8px; }
+
+.public-interest-links li {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid hsl(var(--border) / 0.6);
+  background: hsl(var(--card) / 0.7);
+}
+
+.public-interest-links strong { display: block; font-size: 0.86rem; font-weight: 700; }
+.public-interest-links small { color: hsl(var(--muted-foreground)); font-size: 0.74rem; }
+
+.public-interest-links-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.public-interest-token {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: hsl(var(--muted) / 0.6);
+  font-size: 0.72rem;
+  word-break: break-all;
+}
+
+@media (max-width: 640px) {
+  .public-interest-rank li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}

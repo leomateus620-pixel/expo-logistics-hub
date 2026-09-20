@@ -18,6 +18,7 @@ export function resolveMapPermissions(role: string | null, capabilities: Iterabl
     canManageSales: elevated || explicit('map.manage_sales'),
     canManageContracts: elevated || explicit('map.manage_contracts'),
     canManageLayers: elevated || explicit('map.manage_layers'),
+    canViewMapAnalytics: elevated || explicit('map.analytics.view'),
     isMapAdmin: elevated || explicit('map.admin'),
   };
 }

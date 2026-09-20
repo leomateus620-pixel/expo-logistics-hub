@@ -93,6 +93,12 @@ const CommercialMapInterfaceDiagnosticsPage = (import.meta.env.DEV || import.met
     return module;
   })
   : null;
+const PublicAreaMapPage = lazyWithRetry(async () => {
+  beginCommercialMapBoot();
+  const module = await import('./features/commercial-map/public/PublicAreaMapPage');
+  markCommercialMapStage('module-ready');
+  return module;
+});
 const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
 const UnsubscribePage = lazyWithRetry(() => import('./pages/UnsubscribePage'));
 const CommissionPortalPage = lazyWithRetry(() => import('./pages/commissions/CommissionPortalPage'));
@@ -487,6 +493,8 @@ const App = () => (
               <Route path="/eventos-restaurante-arena/:venueSlug" element={<VenueEventsModuleRoute />} />
               <Route path="/eventos-restaurante-arena/:venueSlug/:viewSlug" element={<VenueEventsModuleRoute />} />
               <Route path="/mapa-comercial" element={<CommercialMapRoute />} />
+              {/* Consulta pública por área: sem AuthGuard, OrgGuard ou capacidades. */}
+              <Route path="/areas/:slug/:token" element={<Suspended><PublicAreaMapPage /></Suspended>} />
               {ExteriorCatalogQa && <Route path="/__dev/exterior-catalog" element={<Suspended><ExteriorCatalogQa /></Suspended>} />}
               {CommissionAgendaPreviewPage && (
                 <Route path="/__dev/comissao-agenda" element={<Suspended><CommissionAgendaPreviewPage /></Suspended>} />
