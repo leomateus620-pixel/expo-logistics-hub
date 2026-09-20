@@ -1,6 +1,6 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { AlertTriangle, LayoutList, Map as MapIcon } from 'lucide-react';
+import { AlertTriangle, Crosshair, LayoutList, Map as MapIcon } from 'lucide-react';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import { useWebGLAvailability } from '../hooks/useWebGLAvailability';
 import { preloadCommercialMapCanvas } from '../utils/preloadCanvas';
