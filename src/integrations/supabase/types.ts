@@ -5531,6 +5531,7 @@ export type Database = {
           scope_kind: string
           slug: string
           sort_order: number
+          token: string | null
           token_hash: string | null
           token_version: number
           updated_at: string
@@ -5549,6 +5550,7 @@ export type Database = {
           scope_kind: string
           slug: string
           sort_order?: number
+          token?: string | null
           token_hash?: string | null
           token_version?: number
           updated_at?: string
@@ -5567,6 +5569,7 @@ export type Database = {
           scope_kind?: string
           slug?: string
           sort_order?: number
+          token?: string | null
           token_hash?: string | null
           token_version?: number
           updated_at?: string
@@ -9815,9 +9818,10 @@ export type Database = {
       public_map_link_rotate: { Args: { _slug: string }; Returns: Json }
       public_map_link_set_active: {
         Args: { _active: boolean; _slug: string }
-        Returns: Json
+        Returns: undefined
       }
       public_map_links_overview: { Args: never; Returns: Json }
+      public_map_links_provision_permanent: { Args: never; Returns: number }
       public_map_lot: {
         Args: { _lot_id: string; _slug: string; _token: string }
         Returns: Json
@@ -9846,6 +9850,7 @@ export type Database = {
           scope_kind: string
           slug: string
           sort_order: number
+          token: string | null
           token_hash: string | null
           token_version: number
           updated_at: string
