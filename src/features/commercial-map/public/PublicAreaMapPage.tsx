@@ -133,7 +133,7 @@ export default function PublicAreaMapPage() {
     setSelectedLotId(lot.id);
     track('lot_selected', { lotId: lot.id });
     track('lot_details_viewed', { lotId: lot.id });
-  }, [lotsByEntity, selectedEntityId, selectedModuleId, track]);
+  }, [interactionScope, lotsByEntity, selectedEntityId, selectedModuleId, track]);
 
   const selectedLot: PublicLot | null = useMemo(
     () => lots.find((lot) => lot.id === selectedLotId) ?? null,
