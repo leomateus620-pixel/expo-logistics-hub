@@ -4468,16 +4468,25 @@ const Scene = memo(function Scene({
       ? new Set(entities.map((entity) => entity.publicIdentifier))
       : null
   ), [entities, isolatedArea]);
+  // Consulta pública: o entorno é apenas contexto cartográfico. A verificação
+  // acontece aqui, no único ponto por onde passam clique, toque e hover.
+  const canInspectEntity = useCallback(
+    (entityId: string | null) => !interactiveEntityIds
+      || (Boolean(entityId) && interactiveEntityIds.has(entityId as string)),
+    [interactiveEntityIds],
+  );
   const handleEntitySelect = useCallback((entityId: string) => {
     if (hydrologicalModeActive) return;
+    if (!canInspectEntity(entityId)) return;
     // Em modo Vendas o clique pertence ao carrinho: não seleciona a entidade
     // nem abre o painel de detalhes padrão.
     if (dispatchSalesLotClick(lots.find((lot) => lot.entityId === entityId))) return;
     setSelectedEntityId(entityId);
-  }, [hydrologicalModeActive, lots, setSelectedEntityId]);
+  }, [canInspectEntity, hydrologicalModeActive, lots, setSelectedEntityId]);
   const handleEntityHover = useCallback((entityId: string | null) => {
-    if (!hydrologicalModeActive) setHoveredEntityId(entityId);
-  }, [hydrologicalModeActive, setHoveredEntityId]);
+    if (hydrologicalModeActive) return;
+    setHoveredEntityId(canInspectEntity(entityId) ? entityId : null);
+  }, [canInspectEntity, hydrologicalModeActive, setHoveredEntityId]);
   const handleEntityFocus = useCallback(() => {
     if (!hydrologicalModeActive) focusSelection();
   }, [focusSelection, hydrologicalModeActive]);
