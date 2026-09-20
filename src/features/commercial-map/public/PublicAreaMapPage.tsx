@@ -89,14 +89,6 @@ export default function PublicAreaMapPage() {
     return [...merged.values()];
   }, [context.data, data, usesParkContext]);
 
-  const sceneLayers = useMemo<MapLayer[]>(() => {
-    if (!data) return [];
-    if (!usesParkContext || !context.data) return data.layers;
-    const merged = new Map<string, MapLayer>();
-    context.data.layers.forEach((layer) => merged.set(layer.id, layer));
-    data.layers.forEach((layer) => merged.set(layer.id, layer));
-    return [...merged.values()];
-  }, [context.data, data, usesParkContext]);
 
   const interactionScope = useMemo(() => buildPublicInteractionScope(lots), [lots]);
   const parkContextActive = usesParkContext && Boolean(context.data);
