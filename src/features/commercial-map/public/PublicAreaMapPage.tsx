@@ -85,6 +85,7 @@ export default function PublicAreaMapPage() {
     const entityId = selectedModuleId ?? selectedEntityId;
     const lot = entityId ? lotsByEntity.get(entityId) ?? null : null;
     if (!lot) return;
+    setLotGoneNotice(false);
     setSelectedLotId(lot.id);
     track('lot_selected', { lotId: lot.id });
     track('lot_details_viewed', { lotId: lot.id });
