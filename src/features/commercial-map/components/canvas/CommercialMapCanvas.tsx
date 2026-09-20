@@ -1931,6 +1931,7 @@ function CameraRig({
   exteriorRenderedEntities: MapEntity[];
   resolvedSegmentByEntity: ReadonlyMap<string, CommercialMapSegmentDefinition>;
   segmentOverride?: CommercialMapSegmentDefinition | null;
+  publicFocusEntityIds?: ReadonlySet<string> | null;
   hydrologicalModeActive: boolean;
 }) {
   const controlsRef = useRef<OrbitControlsImpl>(null);
