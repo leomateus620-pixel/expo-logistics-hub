@@ -8,7 +8,14 @@ import { formatAreaSqmLabel } from '../utils/lotPricing2028';
 import { COMMERCIAL_MAP_SEGMENT_IDS, type CommercialMapSegmentId } from '../data/commercialMapSegments';
 import { getPublicArea } from './publicAreaRegistry';
 import { findPavilionEntity } from './publicMapService';
-import { usePublicCanvasLots, usePublicMapInventory, usePublicMapTelemetry } from './usePublicMapArea';
+import {
+  usePublicCanvasLots,
+  usePublicMapContext,
+  usePublicMapInventory,
+  usePublicMapTelemetry,
+} from './usePublicMapArea';
+import { buildPublicInteractionScope, canInspectLot } from './publicInteractionScope';
+import type { MapEntity, MapLayer } from '../types';
 import { usePublicScopeRevision } from './usePublicScopeRevision';
 import { useAppBuildFreshness } from './useAppBuildFreshness';
 import { PublicLotDetails } from './PublicLotDetails';
