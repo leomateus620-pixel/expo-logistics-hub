@@ -257,6 +257,14 @@ interface CommercialMapCanvasProps {
   sceneInteriorEntityId?: string | null;
   isolatedArea?: CommercialMapSegmentId | null;
   segmentOverride?: CommercialMapSegmentDefinition | null;
+  /**
+   * Consulta pública: o cenário é o parque inteiro, mas somente estas
+   * entidades podem ser inspecionadas (clique, toque, hover, cursor, teclado).
+   * Ausente em mapa administrativo, comissões e vendas.
+   */
+  interactiveEntityIds?: ReadonlySet<string> | null;
+  /** Consulta pública: entidades que definem o enquadramento inicial. */
+  publicFocusEntityIds?: ReadonlySet<string> | null;
   technicalValidationAllowed?: boolean;
   active?: boolean;
 }
