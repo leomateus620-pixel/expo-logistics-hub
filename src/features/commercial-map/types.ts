@@ -235,6 +235,8 @@ export interface MapPermissions {
   canManageSales: boolean;
   canManageContracts: boolean;
   canManageLayers: boolean;
+  /** Painel "Interesse por áreas e lotes" e gestão dos links públicos. */
+  canViewMapAnalytics: boolean;
   isMapAdmin: boolean;
 }
 
