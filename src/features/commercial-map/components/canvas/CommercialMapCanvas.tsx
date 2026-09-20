@@ -1964,6 +1964,24 @@ function CameraRig({
     () => activeSegment ? exteriorRenderedEntities.filter((entity) => resolvedSegmentByEntity.get(entity.id)?.id === activeSegment.id) : [],
     [activeSegment, exteriorRenderedEntities, resolvedSegmentByEntity],
   );
+  // Consulta pública: o enquadramento inicial e o "Reenquadrar área" usam os
+  // lotes do link, não o parque inteiro. Os limites de segurança da câmera
+  // continuam sendo os do parque, para o visitante poder explorar o entorno.
+  const publicFocusEntities = useMemo(
+    () => (publicFocusEntityIds && publicFocusEntityIds.size > 0
+      ? exteriorRenderedEntities.filter((entity) => publicFocusEntityIds.has(entity.id))
+      : []),
+    [exteriorRenderedEntities, publicFocusEntityIds],
+  );
+  const framingSegment = useMemo<SegmentFraming | null>(
+    () => (publicFocusEntities.length > 0
+      ? (activeSegment ?? PUBLIC_FOCUS_FRAMING)
+      : activeSegment),
+    [activeSegment, publicFocusEntities.length],
+  );
+  const framingSegmentEntities = publicFocusEntities.length > 0
+    ? publicFocusEntities
+    : activeSegmentEntities;
   const parkingInspectionOpen = useCommercialMapStore((state) => state.parkingInspectionOpen);
   const parkingCameraSequence = useCommercialMapStore((state) => state.parkingCameraSequence);
   const parkingCameraView = useCommercialMapStore((state) => state.parkingCameraView);
