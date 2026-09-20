@@ -1920,6 +1920,7 @@ function CameraRig({
   exteriorRenderedEntities,
   resolvedSegmentByEntity,
   segmentOverride,
+  publicFocusEntityIds,
   hydrologicalModeActive,
 }: {
   selectedEntity: MapEntity | null;
