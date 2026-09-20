@@ -9,6 +9,8 @@ import { COMMERCIAL_MAP_SEGMENT_IDS, type CommercialMapSegmentId } from '../data
 import { getPublicArea } from './publicAreaRegistry';
 import { findPavilionEntity } from './publicMapService';
 import { usePublicCanvasLots, usePublicMapInventory, usePublicMapTelemetry } from './usePublicMapArea';
+import { usePublicScopeRevision } from './usePublicScopeRevision';
+import { useAppBuildFreshness } from './useAppBuildFreshness';
 import { PublicLotDetails } from './PublicLotDetails';
 import { PublicLotList } from './PublicLotList';
 import type { PublicLot } from './publicMapTypes';
@@ -43,8 +45,11 @@ export default function PublicAreaMapPage() {
   const inventory = usePublicMapInventory(area ? slug : '', token);
   const track = usePublicMapTelemetry(area ? slug : '', token);
   const { available: webglAvailable } = useWebGLAvailability();
+  usePublicScopeRevision(area ? slug : '', token);
+  const buildOutdated = useAppBuildFreshness();
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
   const [selectedLotId, setSelectedLotId] = useState<string | null>(null);
+  const [lotGoneNotice, setLotGoneNotice] = useState(false);
 
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
   const selectedModuleId = useCommercialMapStore((state) => state.selectedModuleId);
@@ -80,6 +85,7 @@ export default function PublicAreaMapPage() {
     const entityId = selectedModuleId ?? selectedEntityId;
     const lot = entityId ? lotsByEntity.get(entityId) ?? null : null;
     if (!lot) return;
+    setLotGoneNotice(false);
     setSelectedLotId(lot.id);
     track('lot_selected', { lotId: lot.id });
     track('lot_details_viewed', { lotId: lot.id });
@@ -90,6 +96,17 @@ export default function PublicAreaMapPage() {
     [lots, selectedLotId],
   );
 
+  // O lote aberto pode ser arquivado, excluído ou movido para outra área: a
+  // ficha fecha com aviso, sem manter dado antigo nem buscar fora do escopo.
+  useEffect(() => {
+    if (!selectedLotId || !data) return;
+    if (lots.some((lot) => lot.id === selectedLotId)) return;
+    setSelectedLotId(null);
+    setSelectedEntityId(null);
+    setSelectedModuleId(null);
+    setLotGoneNotice(true);
+  }, [data, lots, selectedLotId, setSelectedEntityId, setSelectedModuleId]);
+
   const closeDetails = () => {
     setSelectedLotId(null);
     setSelectedEntityId(null);
@@ -97,6 +114,7 @@ export default function PublicAreaMapPage() {
   };
 
   const selectFromList = (lot: PublicLot) => {
+    setLotGoneNotice(false);
     setSelectedLotId(lot.id);
     track('lot_selected', { lotId: lot.id });
     track('lot_details_viewed', { lotId: lot.id });
@@ -134,6 +152,20 @@ export default function PublicAreaMapPage() {
 
       <div className="public-map-body">
         {inventory.isLoading && <p className="public-map-state" role="status">Carregando a área…</p>}
+
+        {lotGoneNotice && (
+          <p className="public-map-notice" role="status">
+            Este lote não está mais disponível para consulta nesta área.
+            <button type="button" onClick={() => setLotGoneNotice(false)}>Entendi</button>
+          </p>
+        )}
+
+        {buildOutdated && (
+          <p className="public-map-notice" role="status">
+            Nova versão da consulta disponível.
+            <button type="button" onClick={() => window.location.reload()}>Atualizar</button>
+          </p>
+        )}
 
         {data && showMap && (
           <div className="public-map-canvas">

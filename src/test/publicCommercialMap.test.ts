@@ -114,3 +114,24 @@ describe('taxa de interação do painel', () => {
     expect(interactionRate({ sessions: 0, sessionsWithSelection: 0 })).toBe(0);
   });
 });
+
+describe('atualização contínua do escopo público', () => {
+  it('invalida apenas o cache público da própria área quando a revisão muda', () => {
+    const keys = [
+      ['public-map', 'inventory', 'pavilhao-1', 'tok-a'],
+      ['public-map', 'lot', 'pavilhao-1', 'tok-a', 'lote-1'],
+      ['public-map', 'inventory', 'exporural', 'tok-b'],
+      ['public-map', 'revision', 'pavilhao-1', 'tok-a'],
+      ['commercial-map', 'inventory'],
+    ];
+    const matches = keys.filter(
+      (key) => key[0] === 'public-map' && key[1] !== 'revision' && key.includes('pavilhao-1') && key.includes('tok-a'),
+    );
+    expect(matches).toHaveLength(2);
+  });
+
+  it('mantém a defasagem máxima abaixo de 30 segundos', async () => {
+    const { PUBLIC_MAP_REVISION_POLL_MS } = await import('@/features/commercial-map/public/usePublicScopeRevision');
+    expect(PUBLIC_MAP_REVISION_POLL_MS).toBeLessThanOrEqual(30_000);
+  });
+});

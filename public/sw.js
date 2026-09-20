@@ -1,7 +1,7 @@
 // Service Worker — Fenasoja Logística
 // Strategy: never precache the HTML shell. Hashed assets are immutable (cache-first).
 // Navigations are network-first with a short timeout; cache is only used if truly offline.
-const CACHE_VERSION = '5';
+const CACHE_VERSION = '6';
 const CACHE_NAME = `fenasoja-v${CACHE_VERSION}`;
 const STATIC_ASSETS = [
   '/favicon.ico',

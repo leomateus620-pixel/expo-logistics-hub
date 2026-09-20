@@ -203,3 +203,31 @@
   .public-map-header { padding: 12px 14px; }
   .public-map-header h1 { font-size: 1rem; }
 }
+
+.public-map-notice {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: min(92vw, 34rem);
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.875rem;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card) / 0.96);
+  color: hsl(var(--card-foreground));
+  font-size: 0.875rem;
+  box-shadow: 0 12px 32px -18px hsl(var(--foreground) / 0.6);
+}
+
+.public-map-notice button {
+  flex: none;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.625rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-weight: 600;
+}

@@ -9859,6 +9859,10 @@ export type Database = {
           entity_id: string
         }[]
       }
+      public_map_scope_revision: {
+        Args: { _slug: string; _token: string }
+        Returns: Json
+      }
       public_map_track: {
         Args: {
           _duration_seconds?: number
