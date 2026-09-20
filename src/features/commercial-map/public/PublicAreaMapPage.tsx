@@ -1,6 +1,6 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { AlertTriangle, LayoutList, Map as MapIcon } from 'lucide-react';
+import { AlertTriangle, Crosshair, LayoutList, Map as MapIcon } from 'lucide-react';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import { useWebGLAvailability } from '../hooks/useWebGLAvailability';
 import { preloadCommercialMapCanvas } from '../utils/preloadCanvas';
@@ -8,7 +8,14 @@ import { formatAreaSqmLabel } from '../utils/lotPricing2028';
 import { COMMERCIAL_MAP_SEGMENT_IDS, type CommercialMapSegmentId } from '../data/commercialMapSegments';
 import { getPublicArea } from './publicAreaRegistry';
 import { findPavilionEntity } from './publicMapService';
-import { usePublicCanvasLots, usePublicMapInventory, usePublicMapTelemetry } from './usePublicMapArea';
+import {
+  usePublicCanvasLots,
+  usePublicMapContext,
+  usePublicMapInventory,
+  usePublicMapTelemetry,
+} from './usePublicMapArea';
+import { buildPublicInteractionScope, canInspectLot } from './publicInteractionScope';
+import type { MapEntity } from '../types';
 import { usePublicScopeRevision } from './usePublicScopeRevision';
 import { useAppBuildFreshness } from './useAppBuildFreshness';
 import { PublicLotDetails } from './PublicLotDetails';
@@ -56,6 +63,7 @@ export default function PublicAreaMapPage() {
   const enterInterior = useCommercialMapStore((state) => state.enterInterior);
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
   const setSelectedModuleId = useCommercialMapStore((state) => state.setSelectedModuleId);
+  const clearSegmentFocus = useCommercialMapStore((state) => state.clearSegmentFocus);
 
   const data = inventory.data;
   const lots = useMemo(() => data?.lots ?? [], [data]);
@@ -66,6 +74,31 @@ export default function PublicAreaMapPage() {
     [data],
   );
   const sceneSegmentId = segmentIdForScope(data?.scope.segmentSlug);
+  // Links de pavilhão mantêm a visualização dedicada do pavilhão, sem entorno.
+  const usesParkContext = Boolean(data) && !data?.scope.pavilionIdentifier;
+  const context = usePublicMapContext(usesParkContext ? slug : '', token);
+
+  // Contexto visual do parque + entidades oficiais do escopo. O escopo sempre
+  // prevalece: nenhum dado do entorno sobrescreve o que o link entrega.
+  const sceneEntities = useMemo<MapEntity[]>(() => {
+    if (!data) return [];
+    if (!usesParkContext || !context.data) return data.entities;
+    const merged = new Map<string, MapEntity>();
+    context.data.entities.forEach((entity) => merged.set(entity.id, entity));
+    data.entities.forEach((entity) => merged.set(entity.id, entity));
+    return [...merged.values()];
+  }, [context.data, data, usesParkContext]);
+
+
+  const interactionScope = useMemo(() => buildPublicInteractionScope(lots), [lots]);
+  const parkContextActive = usesParkContext && Boolean(context.data);
+
+  const refitArea = useCallback(() => {
+    clearSegmentFocus();
+    setSelectedEntityId(null);
+    setSelectedModuleId(null);
+  }, [clearSegmentFocus, setSelectedEntityId, setSelectedModuleId]);
+
 
   useEffect(() => { track('area_visit', { once: 'area_visit', metadata: { slug } }); }, [slug, track]);
 
@@ -83,13 +116,16 @@ export default function PublicAreaMapPage() {
 
   useEffect(() => {
     const entityId = selectedModuleId ?? selectedEntityId;
+    // Segunda verificação do mesmo contrato: mesmo que algo selecione uma
+    // entidade do entorno, nenhuma ficha comercial é aberta.
+    if (!canInspectLot(interactionScope, entityId)) return;
     const lot = entityId ? lotsByEntity.get(entityId) ?? null : null;
     if (!lot) return;
     setLotGoneNotice(false);
     setSelectedLotId(lot.id);
     track('lot_selected', { lotId: lot.id });
     track('lot_details_viewed', { lotId: lot.id });
-  }, [lotsByEntity, selectedEntityId, selectedModuleId, track]);
+  }, [interactionScope, lotsByEntity, selectedEntityId, selectedModuleId, track]);
 
   const selectedLot: PublicLot | null = useMemo(
     () => lots.find((lot) => lot.id === selectedLotId) ?? null,
@@ -147,6 +183,11 @@ export default function PublicAreaMapPage() {
           <button type="button" aria-pressed={viewMode === 'list' || !webglAvailable} onClick={() => setViewMode('list')}>
             <LayoutList aria-hidden="true" /><span>Lista</span>
           </button>
+          {parkContextActive && showMap && (
+            <button type="button" className="public-map-refit" onClick={refitArea}>
+              <Crosshair aria-hidden="true" /><span>Reenquadrar área</span>
+            </button>
+          )}
         </div>
       </header>
 
@@ -171,14 +212,16 @@ export default function PublicAreaMapPage() {
           <div className="public-map-canvas">
             <Suspense fallback={<p className="public-map-state" role="status">Preparando o mapa…</p>}>
               <CommercialMapCanvas
-                entities={data.entities}
+                entities={sceneEntities}
                 lots={canvasLots}
                 calibration={null}
                 matchingEntityIds={EMPTY_MATCHES}
                 filtersActive={false}
                 sceneSegmentId={sceneSegmentId}
                 sceneInteriorEntityId={pavilionEntity?.id ?? null}
-                isolatedArea={sceneSegmentId}
+                isolatedArea={parkContextActive ? null : sceneSegmentId}
+                interactiveEntityIds={interactionScope.interactiveEntityIds}
+                publicFocusEntityIds={interactionScope.interactiveEntityIds}
               />
             </Suspense>
           </div>

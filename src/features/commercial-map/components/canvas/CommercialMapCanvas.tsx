@@ -257,6 +257,14 @@ interface CommercialMapCanvasProps {
   sceneInteriorEntityId?: string | null;
   isolatedArea?: CommercialMapSegmentId | null;
   segmentOverride?: CommercialMapSegmentDefinition | null;
+  /**
+   * Consulta pública: o cenário é o parque inteiro, mas somente estas
+   * entidades podem ser inspecionadas (clique, toque, hover, cursor, teclado).
+   * Ausente em mapa administrativo, comissões e vendas.
+   */
+  interactiveEntityIds?: ReadonlySet<string> | null;
+  /** Consulta pública: entidades que definem o enquadramento inicial. */
+  publicFocusEntityIds?: ReadonlySet<string> | null;
   technicalValidationAllowed?: boolean;
   active?: boolean;
 }
@@ -1902,6 +1910,20 @@ function setLunarLookQuaternion(
   quaternion.setFromRotationMatrix(matrix);
 }
 
+/** Dados mínimos de enquadramento de um recorte (segmento oficial ou link público). */
+type SegmentFraming = Pick<CommercialMapSegmentDefinition, 'id' | 'camera'>;
+
+/** Enquadramento neutro do recorte público: folga suficiente para ver o entorno. */
+const PUBLIC_FOCUS_FRAMING = {
+  id: 'public-focus' as CommercialMapSegmentId,
+  camera: {
+    direction: [0.58, 0.72, 0.6] as const,
+    padding: 1.22,
+    minDistanceRatio: 0.1,
+    maxDistanceRatio: 2.2,
+  },
+} satisfies SegmentFraming;
+
 function CameraRig({
   selectedEntity,
   interiorEntity,
@@ -1912,6 +1934,7 @@ function CameraRig({
   exteriorRenderedEntities,
   resolvedSegmentByEntity,
   segmentOverride,
+  publicFocusEntityIds,
   hydrologicalModeActive,
 }: {
   selectedEntity: MapEntity | null;
@@ -1923,6 +1946,7 @@ function CameraRig({
   exteriorRenderedEntities: MapEntity[];
   resolvedSegmentByEntity: ReadonlyMap<string, CommercialMapSegmentDefinition>;
   segmentOverride?: CommercialMapSegmentDefinition | null;
+  publicFocusEntityIds?: ReadonlySet<string> | null;
   hydrologicalModeActive: boolean;
 }) {
   const controlsRef = useRef<OrbitControlsImpl>(null);
@@ -1954,6 +1978,24 @@ function CameraRig({
     () => activeSegment ? exteriorRenderedEntities.filter((entity) => resolvedSegmentByEntity.get(entity.id)?.id === activeSegment.id) : [],
     [activeSegment, exteriorRenderedEntities, resolvedSegmentByEntity],
   );
+  // Consulta pública: o enquadramento inicial e o "Reenquadrar área" usam os
+  // lotes do link, não o parque inteiro. Os limites de segurança da câmera
+  // continuam sendo os do parque, para o visitante poder explorar o entorno.
+  const publicFocusEntities = useMemo(
+    () => (publicFocusEntityIds && publicFocusEntityIds.size > 0
+      ? exteriorRenderedEntities.filter((entity) => publicFocusEntityIds.has(entity.id))
+      : []),
+    [exteriorRenderedEntities, publicFocusEntityIds],
+  );
+  const framingSegment = useMemo<SegmentFraming | null>(
+    () => (publicFocusEntities.length > 0
+      ? (activeSegment ?? PUBLIC_FOCUS_FRAMING)
+      : activeSegment),
+    [activeSegment, publicFocusEntities.length],
+  );
+  const framingSegmentEntities = publicFocusEntities.length > 0
+    ? publicFocusEntities
+    : activeSegmentEntities;
   const parkingInspectionOpen = useCommercialMapStore((state) => state.parkingInspectionOpen);
   const parkingCameraSequence = useCommercialMapStore((state) => state.parkingCameraSequence);
   const parkingCameraView = useCommercialMapStore((state) => state.parkingCameraView);
@@ -2902,7 +2944,7 @@ function CameraRig({
     startCameraMove,
   ]);
 
-  const queueSegment = useCallback((segment: CommercialMapSegmentDefinition, segmentEntities: MapEntity[]) => {
+  const queueSegment = useCallback((segment: SegmentFraming, segmentEntities: MapEntity[]) => {
     setParkingControlLimits(null);
     if (segmentEntities.length === 0) {
       queuePreset(preset);
@@ -3041,7 +3083,7 @@ function CameraRig({
     if (interiorEntity) queueInterior();
     else if (parkingActive) queueParking();
     else if (selectedEntity) queueSelection(selectedEntity);
-    else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+    else if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
     else queuePreset(preset);
   };
 
@@ -3412,7 +3454,7 @@ function CameraRig({
         useCommercialMapStore.getState().setInteriorReturnView(null);
         interiorReturnLens.current = null;
       } else if (selectedEntity) queueSelection(selectedEntity);
-      else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+      else if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
       else queuePreset(preset);
     } else if (!initialized.current) {
       if (parkingActive) queueParking();
@@ -3429,7 +3471,7 @@ function CameraRig({
         returnView.current = null;
         useCommercialMapStore.getState().setInteriorReturnView(null);
       } else if (selectedEntity) queueSelection(selectedEntity);
-      else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+      else if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
       else queuePreset(preset);
       initialized.current = true;
     } else if (parkingActive) {
@@ -3441,14 +3483,14 @@ function CameraRig({
         queueParking();
       }
     } else if (presetChanged) {
-      if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+      if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
       else queuePreset(preset);
     } else if (segmentChanged) {
-      if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+      if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
       else queuePreset(preset);
     } else if (sequenceChanged) {
       if (selectedEntity) queueSelection(selectedEntity);
-      else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+      else if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
       else queuePreset(preset);
     } else if (selectionChanged && selectedEntity) {
       queueSelection(selectedEntity);
@@ -3508,6 +3550,8 @@ function CameraRig({
     activePanel,
     activeSegment,
     activeSegmentEntities,
+    framingSegment,
+    framingSegmentEntities,
     camera,
     cameraDistanceBounds.maxDistance,
     cameraDistanceBounds.minDistance,
@@ -4308,6 +4352,8 @@ const Scene = memo(function Scene({
   sceneInteriorEntityId,
   isolatedArea,
   segmentOverride,
+  interactiveEntityIds = null,
+  publicFocusEntityIds = null,
   technicalValidationAllowed = false,
   renderQualityTier = 'HIGH',
 }: CommercialMapSceneProps) {
@@ -4458,16 +4504,36 @@ const Scene = memo(function Scene({
       ? new Set(entities.map((entity) => entity.publicIdentifier))
       : null
   ), [entities, isolatedArea]);
+  // Consulta pública: o entorno é apenas contexto cartográfico. A verificação
+  // acontece aqui, no único ponto por onde passam clique, toque e hover.
+  const canInspectEntity = useCallback(
+    (entityId: string | null) => !interactiveEntityIds
+      || (Boolean(entityId) && interactiveEntityIds.has(entityId as string)),
+    [interactiveEntityIds],
+  );
   const handleEntitySelect = useCallback((entityId: string) => {
     if (hydrologicalModeActive) return;
+    if (!canInspectEntity(entityId)) return;
     // Em modo Vendas o clique pertence ao carrinho: não seleciona a entidade
     // nem abre o painel de detalhes padrão.
     if (dispatchSalesLotClick(lots.find((lot) => lot.entityId === entityId))) return;
     setSelectedEntityId(entityId);
-  }, [hydrologicalModeActive, lots, setSelectedEntityId]);
+  }, [canInspectEntity, hydrologicalModeActive, lots, setSelectedEntityId]);
   const handleEntityHover = useCallback((entityId: string | null) => {
-    if (!hydrologicalModeActive) setHoveredEntityId(entityId);
-  }, [hydrologicalModeActive, setHoveredEntityId]);
+    if (hydrologicalModeActive) return;
+    const allowed = canInspectEntity(entityId);
+    setHoveredEntityId(allowed ? entityId : null);
+    // A camada já pediu o cursor de ação antes de avisar o hover; no escopo
+    // público o entorno volta imediatamente ao cursor de navegação.
+    if (interactiveEntityIds && entityId && !allowed) {
+      setCanvasCursor(useCommercialMapStore.getState().cameraNavigating ? 'grabbing' : 'grab');
+    }
+  }, [canInspectEntity, hydrologicalModeActive, interactiveEntityIds, setCanvasCursor, setHoveredEntityId]);
+  // Consulta pública: nenhuma entrada em interior de pavilhão pelo cenário.
+  const handleEnterInterior = useCallback((entityId: string) => {
+    if (interactiveEntityIds && !interactiveEntityIds.has(entityId)) return;
+    enterInterior(entityId);
+  }, [enterInterior, interactiveEntityIds]);
   const handleEntityFocus = useCallback(() => {
     if (!hydrologicalModeActive) focusSelection();
   }, [focusSelection, hydrologicalModeActive]);
@@ -4940,7 +5006,7 @@ const Scene = memo(function Scene({
           onSelect={handleEntitySelect}
           onHover={handleEntityHover}
           onFocus={handleEntityFocus}
-          onEnterInterior={enterInterior}
+          onEnterInterior={handleEnterInterior}
           onCursor={setCanvasCursor}
           moduleStateById={selectedEntityId === entity.id ? selectedPavilionModuleState : undefined}
         />
@@ -5066,6 +5132,7 @@ const Scene = memo(function Scene({
         exteriorRenderedEntities={exteriorRenderedEntities}
         resolvedSegmentByEntity={resolvedSegmentByEntity}
         segmentOverride={segmentOverride}
+        publicFocusEntityIds={publicFocusEntityIds}
         hydrologicalModeActive={hydrologicalModeActive}
       />
       <RuntimeFrameDiagnostics />
