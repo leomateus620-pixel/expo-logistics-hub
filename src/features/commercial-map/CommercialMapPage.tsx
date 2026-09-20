@@ -73,6 +73,7 @@ import './commercial-map.css';
 import './commercial-map-mobile.css';
 
 import { useWebGLAvailability } from './hooks/useWebGLAvailability';
+import { PublicInterestDialog } from './public/PublicInterestDialog';
 
 function MapFeatureBoundary({ id, children }: { id: string; children: ReactNode }) {
   return <MapPanelBoundary resetKey={id} title="Ferramenta indisponível">
