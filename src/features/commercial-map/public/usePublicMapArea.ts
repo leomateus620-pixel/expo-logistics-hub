@@ -41,6 +41,9 @@ export function usePublicMapInventory(slug: string, token: string) {
     queryKey: ['public-map', 'inventory', slug, token],
     queryFn: () => fetchPublicInventory(slug, token),
     enabled: Boolean(slug && token),
+    // Os dados só são substituídos quando a revisão muda; manter o resultado
+    // anterior evita remontar o Canvas e perder câmera/seleção.
+    placeholderData: (previous) => previous,
     staleTime: 5 * 60 * 1000,
     retry: false,
     meta: { persist: false },
