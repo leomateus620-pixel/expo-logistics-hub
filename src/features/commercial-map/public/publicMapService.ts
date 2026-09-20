@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { CommercialLot, CommercialStatus, MapEntity } from '../types';
-import type { PublicLot, PublicMapInventory } from './publicMapTypes';
+import type { PublicLot, PublicMapContext, PublicMapInventory } from './publicMapTypes';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const rpc = (name: string, args: Record<string, unknown>) => (supabase as any).rpc(name, args);
@@ -27,6 +27,17 @@ export async function fetchPublicInventory(slug: string, token: string): Promise
   assertScoped(error);
   if (!data) throw new PublicMapAccessError();
   return data as PublicMapInventory;
+}
+
+/**
+ * Contexto cartográfico do parque: geometria publicável, camadas e nomes de
+ * referência. Sem lotes, preços, status comercial ou qualquer dado interno.
+ */
+export async function fetchPublicContext(slug: string, token: string): Promise<PublicMapContext> {
+  const { data, error } = await rpc('public_map_context', { _slug: slug, _token: token });
+  assertScoped(error);
+  if (!data) throw new PublicMapAccessError();
+  return data as PublicMapContext;
 }
 
 export interface PublicScopeRevision {

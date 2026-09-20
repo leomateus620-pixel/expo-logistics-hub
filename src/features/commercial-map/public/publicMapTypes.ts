@@ -60,6 +60,13 @@ export interface PublicMapInventory {
   lots: PublicLot[];
 }
 
+/** Cenário publicável do parque. Contexto visual, sem nenhum dado comercial. */
+export interface PublicMapContext {
+  projectId: string;
+  layers: MapLayer[];
+  entities: MapEntity[];
+}
+
 export const PUBLIC_AVAILABILITY_LABEL: Record<PublicLotAvailability, string> = {
   AVAILABLE: 'Disponível',
   RESERVED: 'Sob consulta',
