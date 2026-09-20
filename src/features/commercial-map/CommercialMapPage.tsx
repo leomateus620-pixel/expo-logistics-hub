@@ -146,6 +146,7 @@ const COMMISSION_READ_ONLY_PERMISSIONS: MapPermissions = {
   canManageSales: false,
   canManageContracts: false,
   canManageLayers: false,
+  canViewMapAnalytics: false,
   isMapAdmin: false,
 };
 

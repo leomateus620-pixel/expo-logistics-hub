@@ -18,6 +18,7 @@ const permissions: MapPermissions = {
   canManageSales: false,
   canManageContracts: false,
   canManageLayers: false,
+  canViewMapAnalytics: false,
   isMapAdmin: false,
 };
 
