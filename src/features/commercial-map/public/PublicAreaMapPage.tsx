@@ -95,6 +95,17 @@ export default function PublicAreaMapPage() {
     [lots, selectedLotId],
   );
 
+  // O lote aberto pode ser arquivado, excluído ou movido para outra área: a
+  // ficha fecha com aviso, sem manter dado antigo nem buscar fora do escopo.
+  useEffect(() => {
+    if (!selectedLotId || !data) return;
+    if (lots.some((lot) => lot.id === selectedLotId)) return;
+    setSelectedLotId(null);
+    setSelectedEntityId(null);
+    setSelectedModuleId(null);
+    setLotGoneNotice(true);
+  }, [data, lots, selectedLotId, setSelectedEntityId, setSelectedModuleId]);
+
   const closeDetails = () => {
     setSelectedLotId(null);
     setSelectedEntityId(null);
@@ -102,6 +113,7 @@ export default function PublicAreaMapPage() {
   };
 
   const selectFromList = (lot: PublicLot) => {
+    setLotGoneNotice(false);
     setSelectedLotId(lot.id);
     track('lot_selected', { lotId: lot.id });
     track('lot_details_viewed', { lotId: lot.id });
