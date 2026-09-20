@@ -18,7 +18,7 @@ const RENDER_STATUS_MESSAGES: Record<Exclude<RenderHealthStatus, 'ready'>, strin
 
 function currentMapCanvas(): HTMLCanvasElement | null {
   return document.querySelector<HTMLCanvasElement>(
-    '.commercial-map-canvas canvas, canvas.commercial-map-canvas',
+    '.commercial-map-canvas canvas, canvas.commercial-map-canvas, .public-map-canvas canvas',
   );
 }
 

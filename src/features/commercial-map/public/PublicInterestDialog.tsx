@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Copy, KeyRound, Link2, LineChart, Loader2 } from 'lucide-react';
+import { Copy, ExternalLink, Link2, LineChart, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,7 +17,6 @@ import {
   fetchPublicMapInterest,
   fetchPublicMapLinks,
   interactionRate,
-  rotatePublicMapLink,
   setPublicMapLinkActive,
 } from './publicMapAdminService';
 import './public-interest.css';
@@ -50,7 +49,6 @@ export function PublicInterestDialog() {
 /** As consultas só montam com o diálogo aberto — nada roda no mapa fechado. */
 function PublicInterestContent() {
   const open = true;
-  const [revealed, setRevealed] = useState<Record<string, string>>({});
   const queryClient = useQueryClient();
   const { fromIso, toIso } = useMemo(rangeIso, [open]);
 
@@ -67,26 +65,16 @@ function PublicInterestContent() {
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['public-map-admin'] });
 
-  const rotate = useMutation({
-    mutationFn: rotatePublicMapLink,
-    onSuccess: (result) => {
-      setRevealed((current) => ({ ...current, [result.slug]: result.token }));
-      void invalidate();
-      toast({ title: 'Nova chave gerada', description: 'O endereço anterior deixou de funcionar imediatamente.' });
-    },
-    onError: (error: Error) => toast({ title: 'Não foi possível gerar a chave', description: error.message, variant: 'destructive' }),
-  });
-
   const toggle = useMutation({
     mutationFn: ({ slug, active }: { slug: string; active: boolean }) => setPublicMapLinkActive(slug, active),
     onSuccess: () => void invalidate(),
     onError: (error: Error) => toast({ title: 'Não foi possível alterar o link', description: error.message, variant: 'destructive' }),
   });
 
-  const copy = async (slug: string) => {
-    const token = revealed[slug];
+  // Endereço permanente: copiar nunca gera outra chave.
+  const copy = async (slug: string, token: string | null) => {
     if (!token) {
-      toast({ title: 'Gere uma chave primeiro', description: 'Por segurança a chave só pode ser copiada no momento em que é criada.' });
+      toast({ title: 'Endereço indisponível', description: 'Este destino ainda não possui endereço permanente.' });
       return;
     }
     await navigator.clipboard.writeText(publicAreaUrl(slug, token));
@@ -162,15 +150,15 @@ function PublicInterestContent() {
 
         <section className="public-interest-section" aria-label="Links públicos">
           <h3><Link2 />Links de consulta</h3>
+          <p className="public-interest-note">
+            Cada área tem um único endereço permanente. Copie e compartilhe: ele não muda.
+          </p>
           <ul className="public-interest-links">
             {(links.data ?? []).map((link) => (
               <li key={link.id}>
                 <div>
                   <strong>{link.displayName}</strong>
-                  <small>
-                    /areas/{link.slug}
-                    {link.hasToken ? ` · chave v${link.tokenVersion}` : ' · sem chave'}
-                  </small>
+                  <small>/areas/{link.slug}</small>
                 </div>
                 <div className="public-interest-links-actions">
                   <Switch
@@ -178,15 +166,25 @@ function PublicInterestContent() {
                     aria-label={`Ativar link ${link.displayName}`}
                     onCheckedChange={(active) => toggle.mutate({ slug: link.slug, active })}
                   />
-                  <Button size="sm" variant="ghost" onClick={() => rotate.mutate(link.slug)} disabled={rotate.isPending}>
-                    <KeyRound />Gerar chave
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => void copy(link.slug, link.token)}
+                    disabled={!link.token}
+                  >
+                    <Copy />Copiar link
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => void copy(link.slug)} disabled={!revealed[link.slug]}>
-                    <Copy />Copiar
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={!link.token}
+                    onClick={() => link.token && window.open(publicAreaUrl(link.slug, link.token), '_blank', 'noopener')}
+                  >
+                    <ExternalLink />Abrir visualização
                   </Button>
                 </div>
-                {revealed[link.slug] && (
-                  <code className="public-interest-token">{publicAreaUrl(link.slug, revealed[link.slug])}</code>
+                {link.token && (
+                  <code className="public-interest-token">{publicAreaUrl(link.slug, link.token)}</code>
                 )}
               </li>
             ))}

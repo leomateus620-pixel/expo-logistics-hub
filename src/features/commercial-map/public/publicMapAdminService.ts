@@ -11,6 +11,8 @@ export interface PublicMapLinkOverview {
   scopeKey: string | null;
   isActive: boolean;
   hasToken: boolean;
+  /** Chave permanente do destino. Só gestores autorizados a recebem. */
+  token: string | null;
   tokenVersion: number;
   revokedAt: string | null;
   updatedAt: string;
@@ -58,13 +60,6 @@ export async function fetchPublicMapLinks(): Promise<PublicMapLinkOverview[]> {
 export async function fetchPublicMapInterest(fromIso: string, toIso: string): Promise<PublicMapInterestSummary> {
   const { data, error } = await rpc('public_map_interest_summary', { _from: fromIso, _to: toIso });
   return unwrap<PublicMapInterestSummary>(data, error);
-}
-
-/** Gera uma nova chave e invalida a anterior. O valor em claro só aparece aqui. */
-export async function rotatePublicMapLink(slug: string): Promise<{ slug: string; token: string; tokenVersion: number }> {
-  const { data, error } = await rpc('public_map_link_rotate', { _slug: slug });
-  if (error) throw new Error(error.message || 'PUBLIC_MAP_ADMIN_ERROR');
-  return data as { slug: string; token: string; tokenVersion: number };
 }
 
 export async function setPublicMapLinkActive(slug: string, active: boolean): Promise<void> {

@@ -160,3 +160,9 @@
   .public-interest-links-actions { grid-template-columns: auto minmax(0, 1fr); }
   .public-interest-links-actions > button:last-child { grid-column: 2; }
 }
+
+.public-interest-note {
+  margin-bottom: 8px;
+  font-size: 0.8125rem;
+  color: oklch(var(--muted-foreground));
+}
