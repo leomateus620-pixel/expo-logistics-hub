@@ -5,7 +5,7 @@ import { useMapEntityFilter } from '@/features/commercial-map/hooks/useCommercia
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
 import { useCommercialMapStore } from '@/features/commercial-map/state/useCommercialMapStore';
 
-const permissions = { canView: true, canEdit: false, canEditGeometry: false, canManageLots: false, canManageSales: false, canManageContracts: false, canManageLayers: false, isMapAdmin: false };
+const permissions = { canView: true, canEdit: false, canEditGeometry: false, canManageLots: false, canManageSales: false, canManageContracts: false, canManageLayers: false, canViewMapAnalytics: false, isMapAdmin: false };
 function Harness() {
   const explorer = useMapEntityFilter(OFFICIAL_REFERENCE_DATA.entities, OFFICIAL_REFERENCE_DATA.lots);
   return <MapListView explorer={explorer} permissions={permissions} />;

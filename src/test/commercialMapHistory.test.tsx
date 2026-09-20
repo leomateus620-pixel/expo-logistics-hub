@@ -30,7 +30,7 @@ vi.mock('@/features/commercial-map/history/catalog', () => ({
 }));
 vi.mock('@/features/commercial-map/history/media', () => ({ HISTORY_IMAGES: mocks.images }));
 
-const permissions: MapPermissions = { canView: true, canEdit: true, canEditGeometry: true, canManageLots: true, canManageSales: true, canManageContracts: true, canManageLayers: true, isMapAdmin: true };
+const permissions: MapPermissions = { canView: true, canEdit: true, canEditGeometry: true, canManageLots: true, canManageSales: true, canManageContracts: true, canManageLayers: true, canViewMapAnalytics: true, isMapAdmin: true };
 
 function fixture(id = 'uuid-pavilhao-7', identifier = 'B10') {
   const entity: MapEntity = {

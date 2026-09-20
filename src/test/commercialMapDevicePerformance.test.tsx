@@ -70,7 +70,7 @@ it('abre detalhes de estande sem voar uma câmera inexistente no fallback', () =
   function Harness() {
     const explorer = useMapEntityFilter([stand], OFFICIAL_REFERENCE_DATA.lots);
     return <MapListView explorer={explorer} sceneAvailable={false} canRetry3D={false}
-      permissions={{ canView: true, canEdit: false, canEditGeometry: false, canManageLots: false, canManageSales: false, canManageContracts: false, canManageLayers: false, isMapAdmin: false }} />;
+      permissions={{ canView: true, canEdit: false, canEditGeometry: false, canManageLots: false, canManageSales: false, canManageContracts: false, canManageLayers: false, canViewMapAnalytics: false, isMapAdmin: false }} />;
   }
   render(<Harness />);
   fireEvent.click(screen.getByRole('button', { name: 'Ver detalhes' }));
