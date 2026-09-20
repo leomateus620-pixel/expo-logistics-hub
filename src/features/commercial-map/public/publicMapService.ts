@@ -29,6 +29,21 @@ export async function fetchPublicInventory(slug: string, token: string): Promise
   return data as PublicMapInventory;
 }
 
+export interface PublicScopeRevision {
+  slug: string;
+  revision: string;
+  lotCount: number;
+  serverTime: string;
+}
+
+/** Leitura leve da revisão oficial do escopo (sem inventário). */
+export async function fetchPublicScopeRevision(slug: string, token: string): Promise<PublicScopeRevision> {
+  const { data, error } = await rpc('public_map_scope_revision', { _slug: slug, _token: token });
+  assertScoped(error);
+  if (!data) throw new PublicMapAccessError();
+  return data as PublicScopeRevision;
+}
+
 export async function fetchPublicLot(slug: string, token: string, lotId: string): Promise<PublicLot> {
   const { data, error } = await rpc('public_map_lot', { _slug: slug, _token: token, _lot_id: lotId });
   assertScoped(error);
