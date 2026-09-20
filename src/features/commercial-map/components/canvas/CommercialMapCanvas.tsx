@@ -4485,8 +4485,19 @@ const Scene = memo(function Scene({
   }, [canInspectEntity, hydrologicalModeActive, lots, setSelectedEntityId]);
   const handleEntityHover = useCallback((entityId: string | null) => {
     if (hydrologicalModeActive) return;
-    setHoveredEntityId(canInspectEntity(entityId) ? entityId : null);
-  }, [canInspectEntity, hydrologicalModeActive, setHoveredEntityId]);
+    const allowed = canInspectEntity(entityId);
+    setHoveredEntityId(allowed ? entityId : null);
+    // A camada já pediu o cursor de ação antes de avisar o hover; no escopo
+    // público o entorno volta imediatamente ao cursor de navegação.
+    if (interactiveEntityIds && entityId && !allowed) {
+      setCanvasCursor(useCommercialMapStore.getState().cameraNavigating ? 'grabbing' : 'grab');
+    }
+  }, [canInspectEntity, hydrologicalModeActive, interactiveEntityIds, setCanvasCursor, setHoveredEntityId]);
+  // Consulta pública: nenhuma entrada em interior de pavilhão pelo cenário.
+  const handleEnterInterior = useCallback((entityId: string) => {
+    if (interactiveEntityIds && !interactiveEntityIds.has(entityId)) return;
+    enterInterior(entityId);
+  }, [enterInterior, interactiveEntityIds]);
   const handleEntityFocus = useCallback(() => {
     if (!hydrologicalModeActive) focusSelection();
   }, [focusSelection, hydrologicalModeActive]);
