@@ -71,10 +71,10 @@ function PublicInterestContent() {
     onError: (error: Error) => toast({ title: 'Não foi possível alterar o link', description: error.message, variant: 'destructive' }),
   });
 
-  const copy = async (slug: string) => {
-    const token = revealed[slug];
+  // Endereço permanente: copiar nunca gera outra chave.
+  const copy = async (slug: string, token: string | null) => {
     if (!token) {
-      toast({ title: 'Gere uma chave primeiro', description: 'Por segurança a chave só pode ser copiada no momento em que é criada.' });
+      toast({ title: 'Endereço indisponível', description: 'Este destino ainda não possui endereço permanente.' });
       return;
     }
     await navigator.clipboard.writeText(publicAreaUrl(slug, token));
@@ -150,15 +150,15 @@ function PublicInterestContent() {
 
         <section className="public-interest-section" aria-label="Links públicos">
           <h3><Link2 />Links de consulta</h3>
+          <p className="public-interest-note">
+            Cada área tem um único endereço permanente. Copie e compartilhe: ele não muda.
+          </p>
           <ul className="public-interest-links">
             {(links.data ?? []).map((link) => (
               <li key={link.id}>
                 <div>
                   <strong>{link.displayName}</strong>
-                  <small>
-                    /areas/{link.slug}
-                    {link.hasToken ? ` · chave v${link.tokenVersion}` : ' · sem chave'}
-                  </small>
+                  <small>/areas/{link.slug}</small>
                 </div>
                 <div className="public-interest-links-actions">
                   <Switch
@@ -166,15 +166,25 @@ function PublicInterestContent() {
                     aria-label={`Ativar link ${link.displayName}`}
                     onCheckedChange={(active) => toggle.mutate({ slug: link.slug, active })}
                   />
-                  <Button size="sm" variant="ghost" onClick={() => rotate.mutate(link.slug)} disabled={rotate.isPending}>
-                    <KeyRound />Gerar chave
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => void copy(link.slug, link.token)}
+                    disabled={!link.token}
+                  >
+                    <Copy />Copiar link
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => void copy(link.slug)} disabled={!revealed[link.slug]}>
-                    <Copy />Copiar
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={!link.token}
+                    onClick={() => link.token && window.open(publicAreaUrl(link.slug, link.token), '_blank', 'noopener')}
+                  >
+                    <ExternalLink />Abrir visualização
                   </Button>
                 </div>
-                {revealed[link.slug] && (
-                  <code className="public-interest-token">{publicAreaUrl(link.slug, revealed[link.slug])}</code>
+                {link.token && (
+                  <code className="public-interest-token">{publicAreaUrl(link.slug, link.token)}</code>
                 )}
               </li>
             ))}
