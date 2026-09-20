@@ -153,6 +153,20 @@ export default function PublicAreaMapPage() {
       <div className="public-map-body">
         {inventory.isLoading && <p className="public-map-state" role="status">Carregando a área…</p>}
 
+        {lotGoneNotice && (
+          <p className="public-map-notice" role="status">
+            Este lote não está mais disponível para consulta nesta área.
+            <button type="button" onClick={() => setLotGoneNotice(false)}>Entendi</button>
+          </p>
+        )}
+
+        {buildOutdated && (
+          <p className="public-map-notice" role="status">
+            Nova versão da consulta disponível.
+            <button type="button" onClick={() => window.location.reload()}>Atualizar</button>
+          </p>
+        )}
+
         {data && showMap && (
           <div className="public-map-canvas">
             <Suspense fallback={<p className="public-map-state" role="status">Preparando o mapa…</p>}>
