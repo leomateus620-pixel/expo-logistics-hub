@@ -9,6 +9,8 @@ import { COMMERCIAL_MAP_SEGMENT_IDS, type CommercialMapSegmentId } from '../data
 import { getPublicArea } from './publicAreaRegistry';
 import { findPavilionEntity } from './publicMapService';
 import { usePublicCanvasLots, usePublicMapInventory, usePublicMapTelemetry } from './usePublicMapArea';
+import { usePublicScopeRevision } from './usePublicScopeRevision';
+import { useAppBuildFreshness } from './useAppBuildFreshness';
 import { PublicLotDetails } from './PublicLotDetails';
 import { PublicLotList } from './PublicLotList';
 import type { PublicLot } from './publicMapTypes';
@@ -43,8 +45,11 @@ export default function PublicAreaMapPage() {
   const inventory = usePublicMapInventory(area ? slug : '', token);
   const track = usePublicMapTelemetry(area ? slug : '', token);
   const { available: webglAvailable } = useWebGLAvailability();
+  usePublicScopeRevision(area ? slug : '', token);
+  const buildOutdated = useAppBuildFreshness();
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
   const [selectedLotId, setSelectedLotId] = useState<string | null>(null);
+  const [lotGoneNotice, setLotGoneNotice] = useState(false);
 
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
   const selectedModuleId = useCommercialMapStore((state) => state.selectedModuleId);
