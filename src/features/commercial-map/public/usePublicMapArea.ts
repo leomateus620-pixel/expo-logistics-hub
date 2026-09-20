@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
+  fetchPublicContext,
   fetchPublicInventory,
   fetchPublicLot,
   toCanvasLot,
@@ -100,4 +101,21 @@ export function usePublicMapTelemetry(slug: string, token: string) {
 
 export function usePublicCanvasLots(lots: PublicLot[] | undefined) {
   return useMemo(() => (lots ?? []).map(toCanvasLot), [lots]);
+}
+
+/**
+ * Contexto cartográfico publicável do parque inteiro. É lido da mesma base
+ * oficial, sem lotes, preços ou status comercial, e serve apenas para o
+ * visitante entender o entorno da área do link.
+ */
+export function usePublicMapContext(slug: string, token: string) {
+  return useQuery({
+    queryKey: ['public-map', 'context', slug, token],
+    queryFn: () => fetchPublicContext(slug, token),
+    enabled: Boolean(slug && token),
+    placeholderData: (previous) => previous,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+    meta: { persist: false },
+  });
 }
