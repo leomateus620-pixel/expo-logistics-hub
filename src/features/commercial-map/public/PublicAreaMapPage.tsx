@@ -73,6 +73,39 @@ export default function PublicAreaMapPage() {
     [data],
   );
   const sceneSegmentId = segmentIdForScope(data?.scope.segmentSlug);
+  // Links de pavilhão mantêm a visualização dedicada do pavilhão, sem entorno.
+  const usesParkContext = Boolean(data) && !data?.scope.pavilionIdentifier;
+  const context = usePublicMapContext(usesParkContext ? slug : '', token);
+
+  // Contexto visual do parque + entidades oficiais do escopo. O escopo sempre
+  // prevalece: nenhum dado do entorno sobrescreve o que o link entrega.
+  const sceneEntities = useMemo<MapEntity[]>(() => {
+    if (!data) return [];
+    if (!usesParkContext || !context.data) return data.entities;
+    const merged = new Map<string, MapEntity>();
+    context.data.entities.forEach((entity) => merged.set(entity.id, entity));
+    data.entities.forEach((entity) => merged.set(entity.id, entity));
+    return [...merged.values()];
+  }, [context.data, data, usesParkContext]);
+
+  const sceneLayers = useMemo<MapLayer[]>(() => {
+    if (!data) return [];
+    if (!usesParkContext || !context.data) return data.layers;
+    const merged = new Map<string, MapLayer>();
+    context.data.layers.forEach((layer) => merged.set(layer.id, layer));
+    data.layers.forEach((layer) => merged.set(layer.id, layer));
+    return [...merged.values()];
+  }, [context.data, data, usesParkContext]);
+
+  const interactionScope = useMemo(() => buildPublicInteractionScope(lots), [lots]);
+  const parkContextActive = usesParkContext && Boolean(context.data);
+
+  const refitArea = useCallback(() => {
+    clearSegmentFocus();
+    setSelectedEntityId(null);
+    setSelectedModuleId(null);
+  }, [clearSegmentFocus, setSelectedEntityId, setSelectedModuleId]);
+
 
   useEffect(() => { track('area_visit', { once: 'area_visit', metadata: { slug } }); }, [slug, track]);
 
