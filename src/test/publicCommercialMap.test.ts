@@ -32,8 +32,10 @@ const lot: PublicLot = {
     resolutionStatus: 'OK',
     renovacaoPricePerSqm: 776,
     renovacaoTotal: 2328,
+    renovacaoRuleLabel: 'Pavilhão 1 — módulo padrão',
     segundaPricePerSqm: 854,
     segundaTotal: 2562,
+    segundaRuleLabel: 'Pavilhão 1 — módulo padrão',
   },
 };
 
