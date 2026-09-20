@@ -124,6 +124,9 @@ export default function PublicAreaMapPage() {
 
   useEffect(() => {
     const entityId = selectedModuleId ?? selectedEntityId;
+    // Segunda verificação do mesmo contrato: mesmo que algo selecione uma
+    // entidade do entorno, nenhuma ficha comercial é aberta.
+    if (!canInspectLot(interactionScope, entityId)) return;
     const lot = entityId ? lotsByEntity.get(entityId) ?? null : null;
     if (!lot) return;
     setLotGoneNotice(false);
