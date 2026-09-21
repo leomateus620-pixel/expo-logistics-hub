@@ -1,0 +1,12 @@
+*inventory.json
+*.log
+pdf-cells.json
+candidate-tests.json
+focused-tests.json
+*.png
+!before/p10Ground.png
+!before/cooperativism.png
+!after/p10Ground.png
+!after/cooperativism.png
+!after/headquarters.png
+!arena-detail/arenaEvents.png

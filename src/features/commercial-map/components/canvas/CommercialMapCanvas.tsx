@@ -61,7 +61,7 @@ import {
 import { normalizeMapEntityMetadata } from '../../utils/mapMetadata';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
 import { selectRearRoadCompatibleTreesForPresentation } from '../../utils/rearRoadTreeClearance';
-import { selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
+import { buildElectricalSceneLayout, selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
 import { selectCommercialHydrologicalInfrastructureForScene } from '../../utils/hydrologicalInfrastructure';
 import {
   HYDROLOGICAL_NODES,
@@ -4554,6 +4554,9 @@ const Scene = memo(function Scene({
     () => selectCommercialElectricalInfrastructureForScene(entities, lots),
     [entities, lots],
   );
+  const electricalSceneLayout = useMemo(() => buildElectricalSceneLayout(
+    sceneElectricalInfrastructure.nodes, sceneElectricalInfrastructure.connections, entities, !isolatedArea,
+  ), [sceneElectricalInfrastructure, entities, isolatedArea]);
   const sceneHydrologicalInfrastructure = useMemo(
     () => selectCommercialHydrologicalInfrastructureForScene(
       HYDROLOGICAL_NODES,
@@ -5196,6 +5199,7 @@ const Scene = memo(function Scene({
       </EssentialSceneLayer>}
       <EssentialSceneLayer id="electrical-detail">
       <CommercialElectricalInfrastructureLayer
+        resolvedScene={electricalSceneLayout}
         nodes={sceneElectricalInfrastructure.nodes}
         connections={sceneElectricalInfrastructure.connections}
         surfaceEntities={entities}
@@ -5205,6 +5209,7 @@ const Scene = memo(function Scene({
       />
       </EssentialSceneLayer>
       {!publicPolicy && <NightLightingLayer
+        resolvedScene={electricalSceneLayout}
         nodes={sceneElectricalInfrastructure.nodes}
         connections={sceneElectricalInfrastructure.connections}
         surfaceEntities={entities}
