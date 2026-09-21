@@ -60,10 +60,10 @@ function Signage() {
   );
   const geometry = useMemo(() => {
     const parts = [-1, 1].map((side, index) => {
-      const g = new THREE.PlaneGeometry(0.57, 0.075);
+      const g = new THREE.PlaneGeometry(0.28, 0.04);
       const uv = g.getAttribute('uv');
       for (let i = 0; i < uv.count; i++) uv.setX(i, (uv.getX(i) + index) / 2);
-      g.translate(side * 0.34, 0.417, 0.922);
+      g.translate(side * 0.34, 0.54, 0.922);
       return g;
     });
     const merged = mergeBufferGeometries(parts, false)!;

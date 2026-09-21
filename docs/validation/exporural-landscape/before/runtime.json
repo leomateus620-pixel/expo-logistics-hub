@@ -1,0 +1,1525 @@
+{
+  "phase": "before",
+  "fixture": true,
+  "browser": "153.0.8010.48",
+  "errors": [],
+  "views": {
+    "medium": {
+      "spatial": {
+        "objects": 1468,
+        "meshes": 930,
+        "instances": 23773,
+        "allocatedTriangles": 947277,
+        "geometries": 563,
+        "materials": 630,
+        "geometryBufferBytes": 12930876,
+        "groups": {
+          "core": {
+            "objects": 0,
+            "meshes": 573,
+            "instances": 7040
+          },
+          "territorial-environment-layer": {
+            "objects": 0,
+            "meshes": 70,
+            "instances": 265
+          },
+          "essential-site-context": {
+            "objects": 0,
+            "meshes": 11,
+            "instances": 31
+          },
+          "essential-quadras-context": {
+            "objects": 0,
+            "meshes": 3,
+            "instances": 68
+          },
+          "essential-rear-environment": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 194
+          },
+          "essential-residential-district": {
+            "objects": 0,
+            "meshes": 69,
+            "instances": 1872
+          },
+          "essential-parking-context": {
+            "objects": 0,
+            "meshes": 27,
+            "instances": 28
+          },
+          "essential-access-environment": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 65
+          },
+          "essential-landmark:reference:2026:j": {
+            "objects": 0,
+            "meshes": 97,
+            "instances": 159
+          },
+          "essential-nations-context": {
+            "objects": 0,
+            "meshes": 14,
+            "instances": 89
+          },
+          "essential-arena-context": {
+            "objects": 0,
+            "meshes": 21,
+            "instances": 440
+          },
+          "essential-vegetation": {
+            "objects": 0,
+            "meshes": 18,
+            "instances": 9147
+          },
+          "essential-electrical-detail": {
+            "objects": 0,
+            "meshes": 8,
+            "instances": 2428
+          },
+          "progressive-hydrology": {
+            "objects": 0,
+            "meshes": 7,
+            "instances": 1947
+          },
+          "progressive-rain": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 0
+          }
+        },
+        "renderer": {
+          "at": 143964.60000002384,
+          "calls": 141,
+          "triangles": 379646,
+          "geometries": 558,
+          "textures": 130,
+          "programs": 220,
+          "dpr": 1,
+          "width": 1285,
+          "height": 814,
+          "heapBytes": 153615727,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "boot": {
+          "startedAt": 0,
+          "marks": {
+            "module-requested": 20592.5,
+            "b12-worker:start": 20594.799999952316,
+            "module-ready": 23956.299999952316,
+            "essential-data:start": 24027,
+            "reservation-maintenance:start": 24027.399999976158,
+            "project:start": 24027.799999952316,
+            "route-mounted": 24029,
+            "renderer-module-requested": 24029.200000047684,
+            "reservation-maintenance:end": 24298.700000047684,
+            "project:end": 24300.100000023842,
+            "essential-data:end": 24300.899999976158,
+            "essential-data:cached": 24621.100000023842,
+            "b12-worker-geometry": 26984.200000047684,
+            "b12-worker-contact": 26984.299999952316,
+            "b12-worker:end": 26984.299999952316,
+            "renderer-module-ready": 31255.200000047684,
+            "renderer:create:start": 31315.700000047684,
+            "webgl-context:start": 31315.799999952316,
+            "webgl-context:end": 31334.5,
+            "renderer:create:end": 31356.700000047684,
+            "critical-scene:start": 31393.899999976158,
+            "environment:textures:start": 31529.899999976158,
+            "textures:start": 31530.200000047684,
+            "textures:end": 31590.600000023842,
+            "environment:textures:end": 31590.899999976158,
+            "environment:materials:start": 31591.100000023842,
+            "environment:materials:end": 31591.299999952316,
+            "geometry-preparation:start": 33631.10000002384,
+            "geometry-preparation:end": 33631.5,
+            "b12-unpack:start": 33819.299999952316,
+            "b12-unpack:end": 33824.299999952316,
+            "b12-materials:start": 33824.5,
+            "b12-materials:end": 34083.60000002384,
+            "postprocessing:start": 36341.60000002384,
+            "postprocessing:end": 36355.89999997616,
+            "critical-scene:end": 36712.700000047684,
+            "compile-direct:start": 36719.299999952316,
+            "compile-direct-js": 38775.10000002384,
+            "canvas-created": 38777.200000047684,
+            "controls-created": 39033.89999997616,
+            "first-frame-requested": 39035.299999952316,
+            "compile-direct:end": 44333,
+            "essential-scene:prepared": 44334.10000002384,
+            "shadow-preparation:start": 44378.10000002384,
+            "shadow-preparation:end": 44378.60000002384,
+            "first-draw": 47265.799999952316,
+            "commercial-map-ready": 47934.39999997616,
+            "first-interactive": 47934.5,
+            "critical-post:start": 48748.60000002384,
+            "deferred-compile-js": 49348.700000047684,
+            "critical-post:end": 119751.29999995232,
+            "hydrate:rain:start": 121035.60000002384,
+            "rain-preparation:start": 123481.70000004768,
+            "rain-preparation:end": 123489.60000002384,
+            "hydrate:rain:mounted": 123526.39999997616,
+            "hydrate:rain:end": 125524,
+            "hydrate:hydrology:start": 126269.79999995232,
+            "hydrology-cpu:start": 128065.5,
+            "hydrology-cpu:end": 128970.20000004768,
+            "hydrate:hydrology:mounted": 129045.89999997616,
+            "hydrate:hydrology:end": 131527.29999995232,
+            "hydrate:interior-shaders:start": 132221.39999997616,
+            "hydrate:interior-shaders:mounted": 132223.5,
+            "interior-preparation:start": 132224,
+            "interior-preparation:end": 132603.70000004768,
+            "hydrate:interior-shaders:end": 132935.29999995232,
+            "hydrate:physics-module:start": 133653.5,
+            "hydrate:physics-module:mounted": 133655.20000004768,
+            "physics-preparation:start": 133655.5,
+            "physics-preparation:end": 134088,
+            "hydrate:physics-module:end": 134303.10000002384,
+            "secondary-hydration-complete": 134303.39999997616
+          },
+          "interactive": true,
+          "commercialMapReady": true,
+          "failed": false
+        },
+        "camera": {
+          "position": [
+            40.8,
+            24.18,
+            2.6999999999999993
+          ],
+          "target": [
+            40.8,
+            0.18,
+            -17.3
+          ],
+          "minDistance": 0.1,
+          "maxDistance": 1000
+        }
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 1831,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "top": {
+      "spatial": {
+        "objects": 1465,
+        "meshes": 927,
+        "instances": 23740,
+        "allocatedTriangles": 947493,
+        "geometries": 564,
+        "materials": 629,
+        "geometryBufferBytes": 12945180,
+        "groups": {
+          "core": {
+            "objects": 0,
+            "meshes": 570,
+            "instances": 7007
+          },
+          "territorial-environment-layer": {
+            "objects": 0,
+            "meshes": 70,
+            "instances": 265
+          },
+          "essential-site-context": {
+            "objects": 0,
+            "meshes": 11,
+            "instances": 31
+          },
+          "essential-quadras-context": {
+            "objects": 0,
+            "meshes": 3,
+            "instances": 68
+          },
+          "essential-rear-environment": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 194
+          },
+          "essential-residential-district": {
+            "objects": 0,
+            "meshes": 69,
+            "instances": 1872
+          },
+          "essential-parking-context": {
+            "objects": 0,
+            "meshes": 27,
+            "instances": 28
+          },
+          "essential-access-environment": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 65
+          },
+          "essential-landmark:reference:2026:j": {
+            "objects": 0,
+            "meshes": 97,
+            "instances": 159
+          },
+          "essential-nations-context": {
+            "objects": 0,
+            "meshes": 14,
+            "instances": 89
+          },
+          "essential-arena-context": {
+            "objects": 0,
+            "meshes": 21,
+            "instances": 440
+          },
+          "essential-vegetation": {
+            "objects": 0,
+            "meshes": 18,
+            "instances": 9147
+          },
+          "essential-electrical-detail": {
+            "objects": 0,
+            "meshes": 8,
+            "instances": 2428
+          },
+          "progressive-hydrology": {
+            "objects": 0,
+            "meshes": 7,
+            "instances": 1947
+          },
+          "progressive-rain": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 0
+          }
+        },
+        "renderer": {
+          "at": 146647.89999997616,
+          "calls": 131,
+          "triangles": 452083,
+          "geometries": 561,
+          "textures": 130,
+          "programs": 220,
+          "dpr": 1,
+          "width": 1285,
+          "height": 814,
+          "heapBytes": 169436761,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "boot": {
+          "startedAt": 0,
+          "marks": {
+            "module-requested": 20592.5,
+            "b12-worker:start": 20594.799999952316,
+            "module-ready": 23956.299999952316,
+            "essential-data:start": 24027,
+            "reservation-maintenance:start": 24027.399999976158,
+            "project:start": 24027.799999952316,
+            "route-mounted": 24029,
+            "renderer-module-requested": 24029.200000047684,
+            "reservation-maintenance:end": 24298.700000047684,
+            "project:end": 24300.100000023842,
+            "essential-data:end": 24300.899999976158,
+            "essential-data:cached": 24621.100000023842,
+            "b12-worker-geometry": 26984.200000047684,
+            "b12-worker-contact": 26984.299999952316,
+            "b12-worker:end": 26984.299999952316,
+            "renderer-module-ready": 31255.200000047684,
+            "renderer:create:start": 31315.700000047684,
+            "webgl-context:start": 31315.799999952316,
+            "webgl-context:end": 31334.5,
+            "renderer:create:end": 31356.700000047684,
+            "critical-scene:start": 31393.899999976158,
+            "environment:textures:start": 31529.899999976158,
+            "textures:start": 31530.200000047684,
+            "textures:end": 31590.600000023842,
+            "environment:textures:end": 31590.899999976158,
+            "environment:materials:start": 31591.100000023842,
+            "environment:materials:end": 31591.299999952316,
+            "geometry-preparation:start": 33631.10000002384,
+            "geometry-preparation:end": 33631.5,
+            "b12-unpack:start": 33819.299999952316,
+            "b12-unpack:end": 33824.299999952316,
+            "b12-materials:start": 33824.5,
+            "b12-materials:end": 34083.60000002384,
+            "postprocessing:start": 36341.60000002384,
+            "postprocessing:end": 36355.89999997616,
+            "critical-scene:end": 36712.700000047684,
+            "compile-direct:start": 36719.299999952316,
+            "compile-direct-js": 38775.10000002384,
+            "canvas-created": 38777.200000047684,
+            "controls-created": 39033.89999997616,
+            "first-frame-requested": 39035.299999952316,
+            "compile-direct:end": 44333,
+            "essential-scene:prepared": 44334.10000002384,
+            "shadow-preparation:start": 44378.10000002384,
+            "shadow-preparation:end": 44378.60000002384,
+            "first-draw": 47265.799999952316,
+            "commercial-map-ready": 47934.39999997616,
+            "first-interactive": 47934.5,
+            "critical-post:start": 48748.60000002384,
+            "deferred-compile-js": 49348.700000047684,
+            "critical-post:end": 119751.29999995232,
+            "hydrate:rain:start": 121035.60000002384,
+            "rain-preparation:start": 123481.70000004768,
+            "rain-preparation:end": 123489.60000002384,
+            "hydrate:rain:mounted": 123526.39999997616,
+            "hydrate:rain:end": 125524,
+            "hydrate:hydrology:start": 126269.79999995232,
+            "hydrology-cpu:start": 128065.5,
+            "hydrology-cpu:end": 128970.20000004768,
+            "hydrate:hydrology:mounted": 129045.89999997616,
+            "hydrate:hydrology:end": 131527.29999995232,
+            "hydrate:interior-shaders:start": 132221.39999997616,
+            "hydrate:interior-shaders:mounted": 132223.5,
+            "interior-preparation:start": 132224,
+            "interior-preparation:end": 132603.70000004768,
+            "hydrate:interior-shaders:end": 132935.29999995232,
+            "hydrate:physics-module:start": 133653.5,
+            "hydrate:physics-module:mounted": 133655.20000004768,
+            "physics-preparation:start": 133655.5,
+            "physics-preparation:end": 134088,
+            "hydrate:physics-module:end": 134303.10000002384,
+            "secondary-hydration-complete": 134303.39999997616
+          },
+          "interactive": true,
+          "commercialMapReady": true,
+          "failed": false
+        },
+        "camera": {
+          "position": [
+            40.809999999999995,
+            34.18,
+            -17.3
+          ],
+          "target": [
+            40.8,
+            0.18,
+            -17.3
+          ],
+          "minDistance": 0.1,
+          "maxDistance": 1000
+        }
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 1906,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "r2": {
+      "spatial": {
+        "objects": 1528,
+        "meshes": 985,
+        "instances": 24898,
+        "allocatedTriangles": 972343,
+        "geometries": 581,
+        "materials": 645,
+        "geometryBufferBytes": 13060398,
+        "groups": {
+          "core": {
+            "objects": 0,
+            "meshes": 628,
+            "instances": 8165
+          },
+          "territorial-environment-layer": {
+            "objects": 0,
+            "meshes": 70,
+            "instances": 265
+          },
+          "essential-site-context": {
+            "objects": 0,
+            "meshes": 11,
+            "instances": 31
+          },
+          "essential-quadras-context": {
+            "objects": 0,
+            "meshes": 3,
+            "instances": 68
+          },
+          "essential-rear-environment": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 194
+          },
+          "essential-residential-district": {
+            "objects": 0,
+            "meshes": 69,
+            "instances": 1872
+          },
+          "essential-parking-context": {
+            "objects": 0,
+            "meshes": 27,
+            "instances": 28
+          },
+          "essential-access-environment": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 65
+          },
+          "essential-landmark:reference:2026:j": {
+            "objects": 0,
+            "meshes": 97,
+            "instances": 159
+          },
+          "essential-nations-context": {
+            "objects": 0,
+            "meshes": 14,
+            "instances": 89
+          },
+          "essential-arena-context": {
+            "objects": 0,
+            "meshes": 21,
+            "instances": 440
+          },
+          "essential-vegetation": {
+            "objects": 0,
+            "meshes": 18,
+            "instances": 9147
+          },
+          "essential-electrical-detail": {
+            "objects": 0,
+            "meshes": 8,
+            "instances": 2428
+          },
+          "progressive-hydrology": {
+            "objects": 0,
+            "meshes": 7,
+            "instances": 1947
+          },
+          "progressive-rain": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 0
+          }
+        },
+        "renderer": {
+          "at": 149346.20000004768,
+          "calls": 174,
+          "triangles": 368104,
+          "geometries": 576,
+          "textures": 130,
+          "programs": 224,
+          "dpr": 1,
+          "width": 1285,
+          "height": 814,
+          "heapBytes": 156617784,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "boot": {
+          "startedAt": 0,
+          "marks": {
+            "module-requested": 20592.5,
+            "b12-worker:start": 20594.799999952316,
+            "module-ready": 23956.299999952316,
+            "essential-data:start": 24027,
+            "reservation-maintenance:start": 24027.399999976158,
+            "project:start": 24027.799999952316,
+            "route-mounted": 24029,
+            "renderer-module-requested": 24029.200000047684,
+            "reservation-maintenance:end": 24298.700000047684,
+            "project:end": 24300.100000023842,
+            "essential-data:end": 24300.899999976158,
+            "essential-data:cached": 24621.100000023842,
+            "b12-worker-geometry": 26984.200000047684,
+            "b12-worker-contact": 26984.299999952316,
+            "b12-worker:end": 26984.299999952316,
+            "renderer-module-ready": 31255.200000047684,
+            "renderer:create:start": 31315.700000047684,
+            "webgl-context:start": 31315.799999952316,
+            "webgl-context:end": 31334.5,
+            "renderer:create:end": 31356.700000047684,
+            "critical-scene:start": 31393.899999976158,
+            "environment:textures:start": 31529.899999976158,
+            "textures:start": 31530.200000047684,
+            "textures:end": 31590.600000023842,
+            "environment:textures:end": 31590.899999976158,
+            "environment:materials:start": 31591.100000023842,
+            "environment:materials:end": 31591.299999952316,
+            "geometry-preparation:start": 33631.10000002384,
+            "geometry-preparation:end": 33631.5,
+            "b12-unpack:start": 33819.299999952316,
+            "b12-unpack:end": 33824.299999952316,
+            "b12-materials:start": 33824.5,
+            "b12-materials:end": 34083.60000002384,
+            "postprocessing:start": 36341.60000002384,
+            "postprocessing:end": 36355.89999997616,
+            "critical-scene:end": 36712.700000047684,
+            "compile-direct:start": 36719.299999952316,
+            "compile-direct-js": 38775.10000002384,
+            "canvas-created": 38777.200000047684,
+            "controls-created": 39033.89999997616,
+            "first-frame-requested": 39035.299999952316,
+            "compile-direct:end": 44333,
+            "essential-scene:prepared": 44334.10000002384,
+            "shadow-preparation:start": 44378.10000002384,
+            "shadow-preparation:end": 44378.60000002384,
+            "first-draw": 47265.799999952316,
+            "commercial-map-ready": 47934.39999997616,
+            "first-interactive": 47934.5,
+            "critical-post:start": 48748.60000002384,
+            "deferred-compile-js": 49348.700000047684,
+            "critical-post:end": 119751.29999995232,
+            "hydrate:rain:start": 121035.60000002384,
+            "rain-preparation:start": 123481.70000004768,
+            "rain-preparation:end": 123489.60000002384,
+            "hydrate:rain:mounted": 123526.39999997616,
+            "hydrate:rain:end": 125524,
+            "hydrate:hydrology:start": 126269.79999995232,
+            "hydrology-cpu:start": 128065.5,
+            "hydrology-cpu:end": 128970.20000004768,
+            "hydrate:hydrology:mounted": 129045.89999997616,
+            "hydrate:hydrology:end": 131527.29999995232,
+            "hydrate:interior-shaders:start": 132221.39999997616,
+            "hydrate:interior-shaders:mounted": 132223.5,
+            "interior-preparation:start": 132224,
+            "interior-preparation:end": 132603.70000004768,
+            "hydrate:interior-shaders:end": 132935.29999995232,
+            "hydrate:physics-module:start": 133653.5,
+            "hydrate:physics-module:mounted": 133655.20000004768,
+            "physics-preparation:start": 133655.5,
+            "physics-preparation:end": 134088,
+            "hydrate:physics-module:end": 134303.10000002384,
+            "secondary-hydration-complete": 134303.39999997616
+          },
+          "interactive": true,
+          "commercialMapReady": true,
+          "failed": false
+        },
+        "camera": {
+          "position": [
+            14.11272727272727,
+            3.18,
+            -9.04381491733902
+          ],
+          "target": [
+            10.11272727272727,
+            0.18,
+            -14.04381491733902
+          ],
+          "minDistance": 0.1,
+          "maxDistance": 1000
+        }
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2017,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "r2reverse": {
+      "spatial": {
+        "objects": 1531,
+        "meshes": 988,
+        "instances": 24950,
+        "allocatedTriangles": 973263,
+        "geometries": 583,
+        "materials": 646,
+        "geometryBufferBytes": 13108630,
+        "groups": {
+          "core": {
+            "objects": 0,
+            "meshes": 631,
+            "instances": 8217
+          },
+          "territorial-environment-layer": {
+            "objects": 0,
+            "meshes": 70,
+            "instances": 265
+          },
+          "essential-site-context": {
+            "objects": 0,
+            "meshes": 11,
+            "instances": 31
+          },
+          "essential-quadras-context": {
+            "objects": 0,
+            "meshes": 3,
+            "instances": 68
+          },
+          "essential-rear-environment": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 194
+          },
+          "essential-residential-district": {
+            "objects": 0,
+            "meshes": 69,
+            "instances": 1872
+          },
+          "essential-parking-context": {
+            "objects": 0,
+            "meshes": 27,
+            "instances": 28
+          },
+          "essential-access-environment": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 65
+          },
+          "essential-landmark:reference:2026:j": {
+            "objects": 0,
+            "meshes": 97,
+            "instances": 159
+          },
+          "essential-nations-context": {
+            "objects": 0,
+            "meshes": 14,
+            "instances": 89
+          },
+          "essential-arena-context": {
+            "objects": 0,
+            "meshes": 21,
+            "instances": 440
+          },
+          "essential-vegetation": {
+            "objects": 0,
+            "meshes": 18,
+            "instances": 9147
+          },
+          "essential-electrical-detail": {
+            "objects": 0,
+            "meshes": 8,
+            "instances": 2428
+          },
+          "progressive-hydrology": {
+            "objects": 0,
+            "meshes": 7,
+            "instances": 1947
+          },
+          "progressive-rain": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 0
+          }
+        },
+        "renderer": {
+          "at": 151683.5,
+          "calls": 220,
+          "triangles": 504562,
+          "geometries": 578,
+          "textures": 131,
+          "programs": 224,
+          "dpr": 1,
+          "width": 1285,
+          "height": 814,
+          "heapBytes": 177356113,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "boot": {
+          "startedAt": 0,
+          "marks": {
+            "module-requested": 20592.5,
+            "b12-worker:start": 20594.799999952316,
+            "module-ready": 23956.299999952316,
+            "essential-data:start": 24027,
+            "reservation-maintenance:start": 24027.399999976158,
+            "project:start": 24027.799999952316,
+            "route-mounted": 24029,
+            "renderer-module-requested": 24029.200000047684,
+            "reservation-maintenance:end": 24298.700000047684,
+            "project:end": 24300.100000023842,
+            "essential-data:end": 24300.899999976158,
+            "essential-data:cached": 24621.100000023842,
+            "b12-worker-geometry": 26984.200000047684,
+            "b12-worker-contact": 26984.299999952316,
+            "b12-worker:end": 26984.299999952316,
+            "renderer-module-ready": 31255.200000047684,
+            "renderer:create:start": 31315.700000047684,
+            "webgl-context:start": 31315.799999952316,
+            "webgl-context:end": 31334.5,
+            "renderer:create:end": 31356.700000047684,
+            "critical-scene:start": 31393.899999976158,
+            "environment:textures:start": 31529.899999976158,
+            "textures:start": 31530.200000047684,
+            "textures:end": 31590.600000023842,
+            "environment:textures:end": 31590.899999976158,
+            "environment:materials:start": 31591.100000023842,
+            "environment:materials:end": 31591.299999952316,
+            "geometry-preparation:start": 33631.10000002384,
+            "geometry-preparation:end": 33631.5,
+            "b12-unpack:start": 33819.299999952316,
+            "b12-unpack:end": 33824.299999952316,
+            "b12-materials:start": 33824.5,
+            "b12-materials:end": 34083.60000002384,
+            "postprocessing:start": 36341.60000002384,
+            "postprocessing:end": 36355.89999997616,
+            "critical-scene:end": 36712.700000047684,
+            "compile-direct:start": 36719.299999952316,
+            "compile-direct-js": 38775.10000002384,
+            "canvas-created": 38777.200000047684,
+            "controls-created": 39033.89999997616,
+            "first-frame-requested": 39035.299999952316,
+            "compile-direct:end": 44333,
+            "essential-scene:prepared": 44334.10000002384,
+            "shadow-preparation:start": 44378.10000002384,
+            "shadow-preparation:end": 44378.60000002384,
+            "first-draw": 47265.799999952316,
+            "commercial-map-ready": 47934.39999997616,
+            "first-interactive": 47934.5,
+            "critical-post:start": 48748.60000002384,
+            "deferred-compile-js": 49348.700000047684,
+            "critical-post:end": 119751.29999995232,
+            "hydrate:rain:start": 121035.60000002384,
+            "rain-preparation:start": 123481.70000004768,
+            "rain-preparation:end": 123489.60000002384,
+            "hydrate:rain:mounted": 123526.39999997616,
+            "hydrate:rain:end": 125524,
+            "hydrate:hydrology:start": 126269.79999995232,
+            "hydrology-cpu:start": 128065.5,
+            "hydrology-cpu:end": 128970.20000004768,
+            "hydrate:hydrology:mounted": 129045.89999997616,
+            "hydrate:hydrology:end": 131527.29999995232,
+            "hydrate:interior-shaders:start": 132221.39999997616,
+            "hydrate:interior-shaders:mounted": 132223.5,
+            "interior-preparation:start": 132224,
+            "interior-preparation:end": 132603.70000004768,
+            "hydrate:interior-shaders:end": 132935.29999995232,
+            "hydrate:physics-module:start": 133653.5,
+            "hydrate:physics-module:mounted": 133655.20000004768,
+            "physics-preparation:start": 133655.5,
+            "physics-preparation:end": 134088,
+            "hydrate:physics-module:end": 134303.10000002384,
+            "secondary-hydration-complete": 134303.39999997616
+          },
+          "interactive": true,
+          "commercialMapReady": true,
+          "failed": false
+        },
+        "camera": {
+          "position": [
+            6.11272727272727,
+            2.68,
+            -18.04381491733902
+          ],
+          "target": [
+            10.11272727272727,
+            0.18,
+            -14.04381491733902
+          ],
+          "minDistance": 0.1,
+          "maxDistance": 1000
+        }
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2097,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "r14": {
+      "spatial": {
+        "objects": 1531,
+        "meshes": 988,
+        "instances": 24950,
+        "allocatedTriangles": 973263,
+        "geometries": 583,
+        "materials": 646,
+        "geometryBufferBytes": 13108630,
+        "groups": {
+          "core": {
+            "objects": 0,
+            "meshes": 631,
+            "instances": 8217
+          },
+          "territorial-environment-layer": {
+            "objects": 0,
+            "meshes": 70,
+            "instances": 265
+          },
+          "essential-site-context": {
+            "objects": 0,
+            "meshes": 11,
+            "instances": 31
+          },
+          "essential-quadras-context": {
+            "objects": 0,
+            "meshes": 3,
+            "instances": 68
+          },
+          "essential-rear-environment": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 194
+          },
+          "essential-residential-district": {
+            "objects": 0,
+            "meshes": 69,
+            "instances": 1872
+          },
+          "essential-parking-context": {
+            "objects": 0,
+            "meshes": 27,
+            "instances": 28
+          },
+          "essential-access-environment": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 65
+          },
+          "essential-landmark:reference:2026:j": {
+            "objects": 0,
+            "meshes": 97,
+            "instances": 159
+          },
+          "essential-nations-context": {
+            "objects": 0,
+            "meshes": 14,
+            "instances": 89
+          },
+          "essential-arena-context": {
+            "objects": 0,
+            "meshes": 21,
+            "instances": 440
+          },
+          "essential-vegetation": {
+            "objects": 0,
+            "meshes": 18,
+            "instances": 9147
+          },
+          "essential-electrical-detail": {
+            "objects": 0,
+            "meshes": 8,
+            "instances": 2428
+          },
+          "progressive-hydrology": {
+            "objects": 0,
+            "meshes": 7,
+            "instances": 1947
+          },
+          "progressive-rain": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 0
+          }
+        },
+        "renderer": {
+          "at": 153971.39999997616,
+          "calls": 159,
+          "triangles": 354247,
+          "geometries": 579,
+          "textures": 131,
+          "programs": 224,
+          "dpr": 1,
+          "width": 1285,
+          "height": 814,
+          "heapBytes": 166827184,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "boot": {
+          "startedAt": 0,
+          "marks": {
+            "module-requested": 20592.5,
+            "b12-worker:start": 20594.799999952316,
+            "module-ready": 23956.299999952316,
+            "essential-data:start": 24027,
+            "reservation-maintenance:start": 24027.399999976158,
+            "project:start": 24027.799999952316,
+            "route-mounted": 24029,
+            "renderer-module-requested": 24029.200000047684,
+            "reservation-maintenance:end": 24298.700000047684,
+            "project:end": 24300.100000023842,
+            "essential-data:end": 24300.899999976158,
+            "essential-data:cached": 24621.100000023842,
+            "b12-worker-geometry": 26984.200000047684,
+            "b12-worker-contact": 26984.299999952316,
+            "b12-worker:end": 26984.299999952316,
+            "renderer-module-ready": 31255.200000047684,
+            "renderer:create:start": 31315.700000047684,
+            "webgl-context:start": 31315.799999952316,
+            "webgl-context:end": 31334.5,
+            "renderer:create:end": 31356.700000047684,
+            "critical-scene:start": 31393.899999976158,
+            "environment:textures:start": 31529.899999976158,
+            "textures:start": 31530.200000047684,
+            "textures:end": 31590.600000023842,
+            "environment:textures:end": 31590.899999976158,
+            "environment:materials:start": 31591.100000023842,
+            "environment:materials:end": 31591.299999952316,
+            "geometry-preparation:start": 33631.10000002384,
+            "geometry-preparation:end": 33631.5,
+            "b12-unpack:start": 33819.299999952316,
+            "b12-unpack:end": 33824.299999952316,
+            "b12-materials:start": 33824.5,
+            "b12-materials:end": 34083.60000002384,
+            "postprocessing:start": 36341.60000002384,
+            "postprocessing:end": 36355.89999997616,
+            "critical-scene:end": 36712.700000047684,
+            "compile-direct:start": 36719.299999952316,
+            "compile-direct-js": 38775.10000002384,
+            "canvas-created": 38777.200000047684,
+            "controls-created": 39033.89999997616,
+            "first-frame-requested": 39035.299999952316,
+            "compile-direct:end": 44333,
+            "essential-scene:prepared": 44334.10000002384,
+            "shadow-preparation:start": 44378.10000002384,
+            "shadow-preparation:end": 44378.60000002384,
+            "first-draw": 47265.799999952316,
+            "commercial-map-ready": 47934.39999997616,
+            "first-interactive": 47934.5,
+            "critical-post:start": 48748.60000002384,
+            "deferred-compile-js": 49348.700000047684,
+            "critical-post:end": 119751.29999995232,
+            "hydrate:rain:start": 121035.60000002384,
+            "rain-preparation:start": 123481.70000004768,
+            "rain-preparation:end": 123489.60000002384,
+            "hydrate:rain:mounted": 123526.39999997616,
+            "hydrate:rain:end": 125524,
+            "hydrate:hydrology:start": 126269.79999995232,
+            "hydrology-cpu:start": 128065.5,
+            "hydrology-cpu:end": 128970.20000004768,
+            "hydrate:hydrology:mounted": 129045.89999997616,
+            "hydrate:hydrology:end": 131527.29999995232,
+            "hydrate:interior-shaders:start": 132221.39999997616,
+            "hydrate:interior-shaders:mounted": 132223.5,
+            "interior-preparation:start": 132224,
+            "interior-preparation:end": 132603.70000004768,
+            "hydrate:interior-shaders:end": 132935.29999995232,
+            "hydrate:physics-module:start": 133653.5,
+            "hydrate:physics-module:mounted": 133655.20000004768,
+            "physics-preparation:start": 133655.5,
+            "physics-preparation:end": 134088,
+            "hydrate:physics-module:end": 134303.10000002384,
+            "secondary-hydration-complete": 134303.39999997616
+          },
+          "interactive": true,
+          "commercialMapReady": true,
+          "failed": false
+        },
+        "camera": {
+          "position": [
+            9.759999999999998,
+            3.18,
+            -11.197530284949266
+          ],
+          "target": [
+            5.759999999999998,
+            0.18,
+            -16.197530284949266
+          ],
+          "minDistance": 0.1,
+          "maxDistance": 1000
+        }
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2213,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "boundary": {
+      "spatial": {
+        "objects": 1528,
+        "meshes": 985,
+        "instances": 24898,
+        "allocatedTriangles": 972435,
+        "geometries": 582,
+        "materials": 645,
+        "geometryBufferBytes": 13076814,
+        "groups": {
+          "core": {
+            "objects": 0,
+            "meshes": 628,
+            "instances": 8165
+          },
+          "territorial-environment-layer": {
+            "objects": 0,
+            "meshes": 70,
+            "instances": 265
+          },
+          "essential-site-context": {
+            "objects": 0,
+            "meshes": 11,
+            "instances": 31
+          },
+          "essential-quadras-context": {
+            "objects": 0,
+            "meshes": 3,
+            "instances": 68
+          },
+          "essential-rear-environment": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 194
+          },
+          "essential-residential-district": {
+            "objects": 0,
+            "meshes": 69,
+            "instances": 1872
+          },
+          "essential-parking-context": {
+            "objects": 0,
+            "meshes": 27,
+            "instances": 28
+          },
+          "essential-access-environment": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 65
+          },
+          "essential-landmark:reference:2026:j": {
+            "objects": 0,
+            "meshes": 97,
+            "instances": 159
+          },
+          "essential-nations-context": {
+            "objects": 0,
+            "meshes": 14,
+            "instances": 89
+          },
+          "essential-arena-context": {
+            "objects": 0,
+            "meshes": 21,
+            "instances": 440
+          },
+          "essential-vegetation": {
+            "objects": 0,
+            "meshes": 18,
+            "instances": 9147
+          },
+          "essential-electrical-detail": {
+            "objects": 0,
+            "meshes": 8,
+            "instances": 2428
+          },
+          "progressive-hydrology": {
+            "objects": 0,
+            "meshes": 7,
+            "instances": 1947
+          },
+          "progressive-rain": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 0
+          }
+        },
+        "renderer": {
+          "at": 156184.5,
+          "calls": 210,
+          "triangles": 384247,
+          "geometries": 580,
+          "textures": 131,
+          "programs": 224,
+          "dpr": 1,
+          "width": 1285,
+          "height": 814,
+          "heapBytes": 154606688,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "boot": {
+          "startedAt": 0,
+          "marks": {
+            "module-requested": 20592.5,
+            "b12-worker:start": 20594.799999952316,
+            "module-ready": 23956.299999952316,
+            "essential-data:start": 24027,
+            "reservation-maintenance:start": 24027.399999976158,
+            "project:start": 24027.799999952316,
+            "route-mounted": 24029,
+            "renderer-module-requested": 24029.200000047684,
+            "reservation-maintenance:end": 24298.700000047684,
+            "project:end": 24300.100000023842,
+            "essential-data:end": 24300.899999976158,
+            "essential-data:cached": 24621.100000023842,
+            "b12-worker-geometry": 26984.200000047684,
+            "b12-worker-contact": 26984.299999952316,
+            "b12-worker:end": 26984.299999952316,
+            "renderer-module-ready": 31255.200000047684,
+            "renderer:create:start": 31315.700000047684,
+            "webgl-context:start": 31315.799999952316,
+            "webgl-context:end": 31334.5,
+            "renderer:create:end": 31356.700000047684,
+            "critical-scene:start": 31393.899999976158,
+            "environment:textures:start": 31529.899999976158,
+            "textures:start": 31530.200000047684,
+            "textures:end": 31590.600000023842,
+            "environment:textures:end": 31590.899999976158,
+            "environment:materials:start": 31591.100000023842,
+            "environment:materials:end": 31591.299999952316,
+            "geometry-preparation:start": 33631.10000002384,
+            "geometry-preparation:end": 33631.5,
+            "b12-unpack:start": 33819.299999952316,
+            "b12-unpack:end": 33824.299999952316,
+            "b12-materials:start": 33824.5,
+            "b12-materials:end": 34083.60000002384,
+            "postprocessing:start": 36341.60000002384,
+            "postprocessing:end": 36355.89999997616,
+            "critical-scene:end": 36712.700000047684,
+            "compile-direct:start": 36719.299999952316,
+            "compile-direct-js": 38775.10000002384,
+            "canvas-created": 38777.200000047684,
+            "controls-created": 39033.89999997616,
+            "first-frame-requested": 39035.299999952316,
+            "compile-direct:end": 44333,
+            "essential-scene:prepared": 44334.10000002384,
+            "shadow-preparation:start": 44378.10000002384,
+            "shadow-preparation:end": 44378.60000002384,
+            "first-draw": 47265.799999952316,
+            "commercial-map-ready": 47934.39999997616,
+            "first-interactive": 47934.5,
+            "critical-post:start": 48748.60000002384,
+            "deferred-compile-js": 49348.700000047684,
+            "critical-post:end": 119751.29999995232,
+            "hydrate:rain:start": 121035.60000002384,
+            "rain-preparation:start": 123481.70000004768,
+            "rain-preparation:end": 123489.60000002384,
+            "hydrate:rain:mounted": 123526.39999997616,
+            "hydrate:rain:end": 125524,
+            "hydrate:hydrology:start": 126269.79999995232,
+            "hydrology-cpu:start": 128065.5,
+            "hydrology-cpu:end": 128970.20000004768,
+            "hydrate:hydrology:mounted": 129045.89999997616,
+            "hydrate:hydrology:end": 131527.29999995232,
+            "hydrate:interior-shaders:start": 132221.39999997616,
+            "hydrate:interior-shaders:mounted": 132223.5,
+            "interior-preparation:start": 132224,
+            "interior-preparation:end": 132603.70000004768,
+            "hydrate:interior-shaders:end": 132935.29999995232,
+            "hydrate:physics-module:start": 133653.5,
+            "hydrate:physics-module:mounted": 133655.20000004768,
+            "physics-preparation:start": 133655.5,
+            "physics-preparation:end": 134088,
+            "hydrate:physics-module:end": 134303.10000002384,
+            "secondary-hydration-complete": 134303.39999997616
+          },
+          "interactive": true,
+          "commercialMapReady": true,
+          "failed": false
+        },
+        "camera": {
+          "position": [
+            12.936363636363634,
+            2.68,
+            -11.120672601144143
+          ],
+          "target": [
+            7.936363636363634,
+            0.18,
+            -15.120672601144143
+          ],
+          "minDistance": 0.1,
+          "maxDistance": 1000
+        }
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2296,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "control": {
+      "spatial": {
+        "objects": 1465,
+        "meshes": 927,
+        "instances": 23740,
+        "allocatedTriangles": 933137,
+        "geometries": 562,
+        "materials": 629,
+        "geometryBufferBytes": 12855324,
+        "groups": {
+          "core": {
+            "objects": 0,
+            "meshes": 570,
+            "instances": 7007
+          },
+          "territorial-environment-layer": {
+            "objects": 0,
+            "meshes": 70,
+            "instances": 265
+          },
+          "essential-site-context": {
+            "objects": 0,
+            "meshes": 11,
+            "instances": 31
+          },
+          "essential-quadras-context": {
+            "objects": 0,
+            "meshes": 3,
+            "instances": 68
+          },
+          "essential-rear-environment": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 194
+          },
+          "essential-residential-district": {
+            "objects": 0,
+            "meshes": 69,
+            "instances": 1872
+          },
+          "essential-parking-context": {
+            "objects": 0,
+            "meshes": 27,
+            "instances": 28
+          },
+          "essential-access-environment": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 65
+          },
+          "essential-landmark:reference:2026:j": {
+            "objects": 0,
+            "meshes": 97,
+            "instances": 159
+          },
+          "essential-nations-context": {
+            "objects": 0,
+            "meshes": 14,
+            "instances": 89
+          },
+          "essential-arena-context": {
+            "objects": 0,
+            "meshes": 21,
+            "instances": 440
+          },
+          "essential-vegetation": {
+            "objects": 0,
+            "meshes": 18,
+            "instances": 9147
+          },
+          "essential-electrical-detail": {
+            "objects": 0,
+            "meshes": 8,
+            "instances": 2428
+          },
+          "progressive-hydrology": {
+            "objects": 0,
+            "meshes": 7,
+            "instances": 1947
+          },
+          "progressive-rain": {
+            "objects": 0,
+            "meshes": 4,
+            "instances": 0
+          }
+        },
+        "renderer": {
+          "at": 158375.10000002384,
+          "calls": 146,
+          "triangles": 336453,
+          "geometries": 579,
+          "textures": 130,
+          "programs": 222,
+          "dpr": 1,
+          "width": 1285,
+          "height": 814,
+          "heapBytes": 165878639,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "boot": {
+          "startedAt": 0,
+          "marks": {
+            "module-requested": 20592.5,
+            "b12-worker:start": 20594.799999952316,
+            "module-ready": 23956.299999952316,
+            "essential-data:start": 24027,
+            "reservation-maintenance:start": 24027.399999976158,
+            "project:start": 24027.799999952316,
+            "route-mounted": 24029,
+            "renderer-module-requested": 24029.200000047684,
+            "reservation-maintenance:end": 24298.700000047684,
+            "project:end": 24300.100000023842,
+            "essential-data:end": 24300.899999976158,
+            "essential-data:cached": 24621.100000023842,
+            "b12-worker-geometry": 26984.200000047684,
+            "b12-worker-contact": 26984.299999952316,
+            "b12-worker:end": 26984.299999952316,
+            "renderer-module-ready": 31255.200000047684,
+            "renderer:create:start": 31315.700000047684,
+            "webgl-context:start": 31315.799999952316,
+            "webgl-context:end": 31334.5,
+            "renderer:create:end": 31356.700000047684,
+            "critical-scene:start": 31393.899999976158,
+            "environment:textures:start": 31529.899999976158,
+            "textures:start": 31530.200000047684,
+            "textures:end": 31590.600000023842,
+            "environment:textures:end": 31590.899999976158,
+            "environment:materials:start": 31591.100000023842,
+            "environment:materials:end": 31591.299999952316,
+            "geometry-preparation:start": 33631.10000002384,
+            "geometry-preparation:end": 33631.5,
+            "b12-unpack:start": 33819.299999952316,
+            "b12-unpack:end": 33824.299999952316,
+            "b12-materials:start": 33824.5,
+            "b12-materials:end": 34083.60000002384,
+            "postprocessing:start": 36341.60000002384,
+            "postprocessing:end": 36355.89999997616,
+            "critical-scene:end": 36712.700000047684,
+            "compile-direct:start": 36719.299999952316,
+            "compile-direct-js": 38775.10000002384,
+            "canvas-created": 38777.200000047684,
+            "controls-created": 39033.89999997616,
+            "first-frame-requested": 39035.299999952316,
+            "compile-direct:end": 44333,
+            "essential-scene:prepared": 44334.10000002384,
+            "shadow-preparation:start": 44378.10000002384,
+            "shadow-preparation:end": 44378.60000002384,
+            "first-draw": 47265.799999952316,
+            "commercial-map-ready": 47934.39999997616,
+            "first-interactive": 47934.5,
+            "critical-post:start": 48748.60000002384,
+            "deferred-compile-js": 49348.700000047684,
+            "critical-post:end": 119751.29999995232,
+            "hydrate:rain:start": 121035.60000002384,
+            "rain-preparation:start": 123481.70000004768,
+            "rain-preparation:end": 123489.60000002384,
+            "hydrate:rain:mounted": 123526.39999997616,
+            "hydrate:rain:end": 125524,
+            "hydrate:hydrology:start": 126269.79999995232,
+            "hydrology-cpu:start": 128065.5,
+            "hydrology-cpu:end": 128970.20000004768,
+            "hydrate:hydrology:mounted": 129045.89999997616,
+            "hydrate:hydrology:end": 131527.29999995232,
+            "hydrate:interior-shaders:start": 132221.39999997616,
+            "hydrate:interior-shaders:mounted": 132223.5,
+            "interior-preparation:start": 132224,
+            "interior-preparation:end": 132603.70000004768,
+            "hydrate:interior-shaders:end": 132935.29999995232,
+            "hydrate:physics-module:start": 133653.5,
+            "hydrate:physics-module:mounted": 133655.20000004768,
+            "physics-preparation:start": 133655.5,
+            "physics-preparation:end": 134088,
+            "hydrate:physics-module:end": 134303.10000002384,
+            "secondary-hydration-complete": 134303.39999997616
+          },
+          "interactive": true,
+          "commercialMapReady": true,
+          "failed": false
+        },
+        "camera": {
+          "position": [
+            -62,
+            24.18,
+            12
+          ],
+          "target": [
+            -62,
+            0.18,
+            0
+          ],
+          "minDistance": 0.1,
+          "maxDistance": 1000
+        }
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2379,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  },
+  "inventorySha256": "060d67f464058ccff71441f3960c2d97c1d19fc8f7858a2f7a05937c834e78cf",
+  "poses": {
+    "medium": {
+      "target": [
+        40.8,
+        0.18,
+        -17.3
+      ],
+      "position": [
+        40.8,
+        24.18,
+        2.6999999999999993
+      ]
+    },
+    "top": {
+      "target": [
+        40.8,
+        0.18,
+        -17.3
+      ],
+      "position": [
+        40.809999999999995,
+        34.18,
+        -17.3
+      ]
+    },
+    "r2": {
+      "target": [
+        10.11272727272727,
+        0.18,
+        -14.04381491733902
+      ],
+      "position": [
+        14.11272727272727,
+        3.18,
+        -9.04381491733902
+      ]
+    },
+    "r2reverse": {
+      "target": [
+        10.11272727272727,
+        0.18,
+        -14.04381491733902
+      ],
+      "position": [
+        6.11272727272727,
+        2.68,
+        -18.04381491733902
+      ]
+    },
+    "r14": {
+      "target": [
+        5.759999999999998,
+        0.18,
+        -16.197530284949266
+      ],
+      "position": [
+        9.759999999999998,
+        3.18,
+        -11.197530284949266
+      ]
+    },
+    "boundary": {
+      "target": [
+        7.936363636363634,
+        0.18,
+        -15.120672601144143
+      ],
+      "position": [
+        12.936363636363634,
+        2.68,
+        -11.120672601144143
+      ]
+    },
+    "control": {
+      "target": [
+        -62,
+        0.18,
+        0
+      ],
+      "position": [
+        -62,
+        24.18,
+        12
+      ]
+    }
+  },
+  "mutations": [],
+  "status": "passed"
+}

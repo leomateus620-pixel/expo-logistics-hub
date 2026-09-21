@@ -1,0 +1,66 @@
+{
+  "status": "passed",
+  "inventoryUnchanged": true,
+  "controlUnchanged": true,
+  "before": {
+    "at": 149346.20000004768,
+    "calls": 174,
+    "triangles": 368104,
+    "geometries": 576,
+    "textures": 130,
+    "programs": 224,
+    "dpr": 1,
+    "width": 1285,
+    "height": 814,
+    "heapBytes": 156617784,
+    "qualityTier": "HIGH",
+    "gpuVendor": "Google Inc. (Intel)",
+    "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+  },
+  "after": {
+    "at": 77103.29999995232,
+    "calls": 178,
+    "triangles": 392158,
+    "geometries": 582,
+    "textures": 130,
+    "programs": 226,
+    "dpr": 1,
+    "width": 1285,
+    "height": 814,
+    "heapBytes": 174316757,
+    "qualityTier": "HIGH",
+    "gpuVendor": "Google Inc. (Intel)",
+    "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+  },
+  "plateau": {
+    "night": true,
+    "economy": true,
+    "day": true
+  },
+  "allHealthy": true,
+  "errors": [],
+  "selections": [
+    {
+      "id": "Q-R-02",
+      "selected": "reference:2026:q-r-02",
+      "panel": true
+    },
+    {
+      "id": "Q-R-14",
+      "selected": "reference:2026:q-r-14",
+      "panel": true
+    },
+    {
+      "id": "E-07",
+      "selected": "reference:2026:e-07",
+      "panel": true
+    },
+    {
+      "id": "D1",
+      "selected": "reference:2026:d1",
+      "panel": true
+    }
+  ],
+  "canvasRetained": true,
+  "mobileOverflow": false
+}

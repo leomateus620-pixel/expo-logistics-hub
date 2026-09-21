@@ -1,4 +1,4 @@
-import { memo, useLayoutEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import {
   createCooperativismLayout,
@@ -326,6 +326,9 @@ function GastronomicAlamedaArchitecture({
   reducedGraphics: boolean;
 }) {
   const layout = useMemo(() => createGastronomicAlamedaLayout(bounds, height), [bounds, height]);
+  const porchFrontZ = layout.platform.frontZ - .18;
+  const porchRun = porchFrontZ - layout.building.centerZ;
+  const porchEaveY = layout.roof.ridgeY - porchRun * Math.tan(layout.roof.angle);
   const bays = useMemo(() => {
     const bayWidth = layout.building.width / layout.building.bayCount;
     const openings: InstanceTransform[] = [];
@@ -341,29 +344,39 @@ function GastronomicAlamedaArchitecture({
       columns.push({
         position: [
           -layout.building.width / 2 + bayWidth * index,
-          layout.building.wallBaseY + layout.building.wallHeight * 0.5,
-          layout.building.frontZ + 0.09,
+          (layout.platform.topY + porchEaveY) / 2,
+          porchFrontZ,
         ],
-        scale: [layout.building.columnRadius * 2, layout.building.wallHeight, layout.building.columnRadius * 2],
+        scale: [layout.building.columnRadius * 2, porchEaveY - layout.platform.topY, layout.building.columnRadius * 2],
       });
     }
     return { openings, columns };
-  }, [layout]);
+  }, [layout, porchFrontZ, porchEaveY]);
   const roofCenterY = (layout.roof.eaveY + layout.roof.ridgeY) / 2;
   const roofCenterZ = layout.building.centerZ;
   const roofRibs = useMemo<InstanceTransform[]>(() => {
-    if (!showDetail) return [];
     const ribs: InstanceTransform[] = [];
     for (let index = 0; index < layout.roof.ribCount; index += 1) {
       const x = -layout.roof.width / 2
         + layout.roof.width * (index / Math.max(1, layout.roof.ribCount - 1));
       ribs.push(
-        beamBetween([x, layout.roof.ridgeY + 0.01, roofCenterZ], [x, layout.roof.eaveY + 0.01, roofCenterZ + layout.roof.halfSpan], 0.016),
-        beamBetween([x, layout.roof.ridgeY + 0.01, roofCenterZ], [x, layout.roof.eaveY + 0.01, roofCenterZ - layout.roof.halfSpan], 0.016),
+        beamBetween([x, layout.roof.ridgeY + 0.04, roofCenterZ], [x, porchEaveY + 0.04, porchFrontZ], 0.016),
+        beamBetween([x, layout.roof.ridgeY + 0.04, roofCenterZ], [x, layout.roof.eaveY + 0.04, roofCenterZ - layout.roof.halfSpan], 0.016),
       );
     }
     return ribs;
-  }, [layout, roofCenterZ, showDetail]);
+  }, [layout, roofCenterZ, porchEaveY, porchFrontZ]);
+  const gable = useMemo(() => {
+    const shape = new THREE.Shape();
+    shape.moveTo(-layout.building.depth / 2, 0);
+    shape.lineTo(layout.building.depth / 2, 0);
+    shape.lineTo(0, layout.roof.rise);
+    shape.closePath();
+    const geometry = new THREE.ExtrudeGeometry(shape, {depth: .024, bevelEnabled: false});
+    geometry.rotateY(Math.PI / 2);
+    return geometry;
+  }, [layout]);
+  useEffect(() => () => gable.dispose(), [gable]);
   const poles = useMemo<InstanceTransform[]>(() => layout.flagpoles.positionsX.map((x, index) => ({
     position: [x, layout.flagpoles.heights[index] / 2, layout.flagpoles.lineZ],
     scale: [layout.flagpoles.radius * 2, layout.flagpoles.heights[index], layout.flagpoles.radius * 2],
@@ -387,13 +400,55 @@ function GastronomicAlamedaArchitecture({
   const stairRails = useMemo<InstanceTransform[]>(() => [-1, 1].flatMap((side) => {
     const x = side * layout.access.stairWidth / 2;
     return [
-      beamBetween([x, layout.access.stepRise, layout.access.frontZ], [x, layout.platform.topY + layout.access.railingHeight, stairBackZ], 0.025),
-      {
-        position: [x, railingY, (layout.building.frontZ + stairBackZ) / 2],
-        scale: [0.026, layout.access.railingHeight, Math.max(0.2, stairBackZ - layout.building.frontZ)],
-      },
+      beamBetween([x, layout.access.railingHeight + layout.access.stepRise, layout.access.frontZ], [x, layout.platform.topY + layout.access.railingHeight, stairBackZ], 0.025),
+      beamBetween([x, layout.platform.topY + layout.access.railingHeight, stairBackZ], [x, layout.platform.topY + layout.access.railingHeight, layout.building.frontZ], .022),
+      beamBetween([x, layout.platform.topY, stairBackZ], [x, layout.platform.topY + layout.access.railingHeight, stairBackZ], .022),
     ];
-  }), [layout, railingY, stairBackZ]);
+  }), [layout, stairBackZ]);
+  // Solid perimeter foundation reaches below grade. Split around the access
+  // openings so the low stair/ramp surfaces are not buried in a floating slab.
+  const foundations = useMemo<InstanceTransform[]>(() => {
+    const top = layout.platform.topY, back = layout.platform.centerZ - layout.platform.depth / 2;
+    const front = layout.platform.frontZ, half = layout.platform.width / 2;
+    const rampLeft = layout.access.rampCenterX - layout.access.rampWidth / 2;
+    const rampRight = layout.access.rampCenterX + layout.access.rampWidth / 2;
+    const stairLeft = -layout.access.stairWidth / 2, stairRight = -stairLeft;
+    const spans = [[-half, rampLeft], [rampRight, stairLeft], [stairRight, half]];
+    const rearFront = Math.min(stairBackZ, layout.building.frontZ + .12);
+    const parts: InstanceTransform[] = [{position: [0, (top - .035) / 2, (back + rearFront) / 2], scale: [half * 2, top + .035, rearFront - back]}];
+    for (const [left, right] of spans) if (right > left) parts.push({position: [(left + right) / 2, (top - .035) / 2, (rearFront + front) / 2], scale: [right - left, top + .035, front - rearFront]});
+    return parts;
+  }, [layout, stairBackZ]);
+  const porchRails = useMemo<InstanceTransform[]>(() => {
+    const rails: InstanceTransform[] = [], y = layout.platform.topY, railH = layout.access.railingHeight;
+    const half = layout.platform.width / 2, z = layout.platform.frontZ - .09;
+    const rampLeft = layout.access.rampCenterX - layout.access.rampWidth / 2, rampRight = layout.access.rampCenterX + layout.access.rampWidth / 2;
+    const spans = [[-half, rampLeft], [rampRight, -layout.access.stairWidth / 2], [layout.access.stairWidth / 2, half]];
+    for (const [left, right] of spans) if (right - left > .04) {
+      for (const fraction of [.2, .4, .6, .8, 1]) rails.push(beamBetween([left, y + railH * fraction, z], [right, y + railH * fraction, z], fraction === 1 ? .019 : .009));
+      const count = Math.ceil((right - left) / .5);
+      for (let i = 0; i <= count; i++) rails.push(beamBetween([left + (right-left)*i/count, y, z], [left + (right-left)*i/count, y+railH,z],.018));
+    }
+    for (const side of [-1,1]) for (const f of [.25,.5,.75,1]) rails.push(beamBetween([side*half,y+railH*f,z],[side*half,y+railH*f,layout.building.frontZ],.012));
+    return rails;
+  }, [layout]);
+  const blockJoints = useMemo<InstanceTransform[]>(() => {
+    if (!showDetail) return [];
+    return foundations.flatMap(({position,scale}) => Array.from({length: 4}, (_,i) => ({position: [position[0], .015+i*.055, position[2]+scale![2]/2+.001] as Vector3Tuple, scale: [scale![0],.005,.003] as Vector3Tuple})));
+  }, [foundations, showDetail]);
+  const masonry = useMemo<InstanceTransform[]>(() => {
+    const items: InstanceTransform[] = [], half = layout.building.width / 2;
+    for (let i = 1; i < 10; i++) {
+      const y = layout.platform.topY + i * layout.building.wallHeight * .06;
+      items.push({position: [0,y,layout.building.centerZ-layout.building.depth/2-.002],scale:[layout.building.width,.004,.004]});
+      for(const side of [-1,1]) items.push({position:[side*(half+.002),y,layout.building.centerZ],scale:[.004,.004,layout.building.depth]});
+    }
+    for (let i = 0; i <= 32; i++) {
+      const x = -half + layout.building.width*i/32;
+      items.push({position:[x,layout.platform.topY+layout.building.wallHeight*.8,layout.building.centerZ-layout.building.depth/2-.003],scale:[.007,layout.building.wallHeight*.35,.006]});
+    }
+    return items;
+  }, [layout]);
   const rampStart: Vector3Tuple = [layout.access.rampCenterX, 0.025, layout.access.frontZ];
   const rampEnd: Vector3Tuple = [layout.access.rampCenterX, layout.platform.topY, layout.building.frontZ + 0.12];
   const rampVector = new THREE.Vector3(...rampEnd).sub(new THREE.Vector3(...rampStart));
@@ -402,32 +457,20 @@ function GastronomicAlamedaArchitecture({
 
   return (
     <group name="arquitetura-d1-alameda-gastronomica" raycast={NO_RAYCAST} dispose={null}>
+      <ScaledInstances material={materials.dark} items={foundations} receiveShadow />
+      <ScaledInstances material={materials.trim} items={blockJoints} />
+      <ScaledInstances material={materials.dark} items={masonry} />
+      <ScaledInstances material={materials.metal} items={porchRails} />
       <mesh
         geometry={UNIT_BOX}
-        material={materials.platform}
-        position={[0, layout.platform.centerY, layout.platform.centerZ]}
-        scale={[layout.platform.width, layout.platform.thickness, layout.platform.depth]}
-        castShadow={!reducedGraphics}
-        receiveShadow
-        raycast={NO_RAYCAST}
-      />
-      <mesh
-        geometry={UNIT_BOX}
-        material={materials.dark}
-        position={[0, layout.platform.topY * 0.43, layout.platform.frontZ - 0.035]}
-        scale={[layout.platform.width, layout.platform.topY * 0.86, 0.085]}
-        receiveShadow
-        raycast={NO_RAYCAST}
-      />
-      <mesh
-        geometry={UNIT_BOX}
-        material={materials.dark}
+        material={materials.wall}
         position={[0, layout.building.wallCenterY, layout.building.centerZ]}
         scale={[layout.building.width, layout.building.wallHeight, layout.building.depth]}
         castShadow={!reducedGraphics}
         receiveShadow
         raycast={NO_RAYCAST}
       />
+      {[-1, 1].map(side => <mesh key={side} geometry={gable} material={materials.trim} position={[side * layout.building.width / 2, layout.roof.eaveY, layout.building.centerZ]} raycast={NO_RAYCAST} />)}
       <ScaledInstances material={materials.glass} items={bays.openings} />
       <ScaledInstances
         geometry={UNIT_CYLINDER}
@@ -439,9 +482,9 @@ function GastronomicAlamedaArchitecture({
       <mesh
         geometry={UNIT_BOX}
         material={materials.roof}
-        position={[0, roofCenterY, roofCenterZ + layout.roof.halfSpan / 2]}
+        position={[0, (layout.roof.ridgeY + porchEaveY) / 2, roofCenterZ + porchRun / 2]}
         rotation={[layout.roof.angle, 0, 0]}
-        scale={[layout.roof.width, layout.roof.thickness, layout.roof.slopeLength]}
+        scale={[layout.roof.width, layout.roof.thickness, Math.hypot(porchRun, layout.roof.ridgeY - porchEaveY)]}
         castShadow={!reducedGraphics}
         receiveShadow
         raycast={NO_RAYCAST}
@@ -459,11 +502,11 @@ function GastronomicAlamedaArchitecture({
       <mesh
         geometry={UNIT_BOX}
         material={materials.metal}
-        position={[0, layout.roof.ridgeY + 0.018, roofCenterZ]}
+        position={[0, layout.roof.ridgeY + 0.048, roofCenterZ]}
         scale={[layout.roof.width, 0.048, 0.065]}
         raycast={NO_RAYCAST}
       />
-      <ScaledInstances material={materials.trim} items={roofRibs} />
+      <ScaledInstances material={materials.roof} items={roofRibs} />
 
       <ScaledInstances
         geometry={UNIT_CYLINDER}
@@ -478,8 +521,7 @@ function GastronomicAlamedaArchitecture({
       />
       <ScaledInstances material={materials.metal} items={stairRails} />
 
-      {showDetail && (
-        <>
+      <>
           <mesh
             geometry={UNIT_BOX}
             material={materials.platform}
@@ -507,8 +549,7 @@ function GastronomicAlamedaArchitecture({
               ];
             })}
           />
-        </>
-      )}
+      </>
     </group>
   );
 }

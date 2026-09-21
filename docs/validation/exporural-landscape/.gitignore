@@ -1,0 +1,5 @@
+**/inventory.json
+after/
+*-console.json
+*.log
+candidate/

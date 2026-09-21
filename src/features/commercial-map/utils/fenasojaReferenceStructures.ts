@@ -247,8 +247,8 @@ export function createCooperativismLayout(
 
 export function gastronomicAlamedaVisualHeight(bounds: ReferenceStructureBounds): number {
   const longSide = Math.max(finiteOr(bounds.width, 3.25), finiteOr(bounds.depth, 4.58));
-  // Includes the tall empty flagpoles, which are the highest real feature.
-  return clamp(longSide * 0.69, 2.9, 3.28);
+  // Photo proportion: empty masts rise only modestly above the roof ridge.
+  return clamp(longSide * 0.40, 1.75, 1.95);
 }
 
 export function createGastronomicAlamedaLayout(
@@ -260,9 +260,9 @@ export function createGastronomicAlamedaLayout(
   // the Arena staircase without spilling into adjacent roads.
   const width = Math.max(4, finiteOr(bounds.width, 4.58));
   const depth = Math.max(2.3, finiteOr(bounds.depth, 2.47));
-  const visualHeight = clamp(finiteOr(requestedVisualHeight, 3.1), 2.9, 3.28);
-  const platformTopY = clamp(depth * 0.105, 0.29, 0.36);
-  const platformThickness = clamp(depth * 0.038, 0.1, 0.13);
+  const visualHeight = clamp(finiteOr(requestedVisualHeight, 1.85), 1.75, 1.95);
+  const platformTopY = clamp(depth * 0.075, 0.20, 0.25);
+  const platformThickness = platformTopY + 0.035;
   const platformFrontZ = depth / 2 - depth * 0.045;
   const buildingDepth = depth * 0.58;
   const rearMargin = depth * 0.055;
@@ -276,9 +276,9 @@ export function createGastronomicAlamedaLayout(
   // The fitted width already includes the roof silhouette; wall inset creates
   // the visible overhang while the roof itself stays inside the official lot.
   const roofWidth = width;
-  const stepCount = 5;
+  const stepCount = 4;
   const stairRun = Math.min(depth * 0.25, 0.74);
-  const poleLineZ = platformFrontZ - depth * 0.055;
+  const poleLineZ = platformFrontZ - depth * 0.012;
   const poleSpan = width * 0.92;
   const leftPoleCount = 8;
   const rightPoleCount = GASTRONOMIC_ALAMEDA_FLAGPOLE_COUNT - leftPoleCount;
@@ -293,10 +293,10 @@ export function createGastronomicAlamedaLayout(
     ...sidePolePositions(leftPoleCount, -poleSpan / 2, -centralClearance, 0.2),
     ...sidePolePositions(rightPoleCount, centralClearance, poleSpan / 2, 0.8),
   ];
-  const minimumPoleHeight = visualHeight * 0.78;
+  const minimumPoleHeight = visualHeight * 0.9;
   const maximumPoleHeight = visualHeight;
   const heights = positionsX.map((_, index) => {
-    const deterministic = 0.86 + 0.14 * (0.5 + 0.5 * Math.sin(index * 2.17 + 0.4));
+    const deterministic = 0.94 + 0.06 * (0.5 + 0.5 * Math.sin(index * 2.17 + 0.4));
     return clamp(visualHeight * deterministic, minimumPoleHeight, maximumPoleHeight);
   });
 
@@ -353,7 +353,7 @@ export function createGastronomicAlamedaLayout(
       lineZ: poleLineZ,
       minimumHeight: minimumPoleHeight,
       maximumHeight: maximumPoleHeight,
-      radius: clamp(width * 0.0042, 0.017, 0.022),
+      radius: clamp(width * 0.0023, 0.009, 0.012),
       positionsX,
       heights,
     },
