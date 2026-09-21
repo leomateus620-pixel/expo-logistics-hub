@@ -21,6 +21,7 @@ import {
   createCommercialPavilionModuleProjectionFrame,
   projectCommercialPavilionModuleRect,
 } from '@/features/commercial-map/utils/commercialPavilionModules';
+import { pointInPolygon } from '@/features/commercial-map/utils/spatialSurface';
 
 const EPSILON = 1e-10;
 const METRIC_WIDTH = 52.7;
@@ -322,6 +323,9 @@ describe('projeção oficial do Pavilhão 1', () => {
     expect(module141.shape.renderParts).toHaveLength(2);
     expect(module141.id).toBe('B1:module:141');
     expect(module141.shape.footprint).toHaveLength(6);
+    expect(pointInPolygon([50, 1.5], metricPoints)).toBe(true);
+    expect(pointInPolygon([51, 3.75], metricPoints)).toBe(true);
+    expect(pointInPolygon([48.75, 3.75], metricPoints)).toBe(false);
   });
 
   it('preserva os frames stretch legados e reconhece as projeções oficiais posteriores', () => {

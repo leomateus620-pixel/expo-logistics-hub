@@ -53,7 +53,7 @@ describe('resumo comercial contextual', () => {
     const park = resolveContextualMapScope(input);
     expect(park.totalCount).toBe(1579);
     expect(park.nonCommercialCount).toBeGreaterThan(0);
-    expect(deriveContextualMapSummary(park).byStatus.BLOCKED).toBe(1577);
+    expect(deriveContextualMapSummary(park).byStatus.BLOCKED).toBe(1579);
   });
 
   it('separa contagem total e filtrada e mantém cores e áreas vinculadas aos mesmos registros', () => {
