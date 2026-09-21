@@ -5,7 +5,7 @@ import { prepareCommercialMapCriticalPost, prepareCommercialScene } from '../../
 import { scheduleCommercialMapSceneTask } from './DeferredSceneLayer';
 import { COMMERCIAL_MAP_PREPARING_EVENT } from '../../utils/renderingHealth';
 
-export function CommercialMapSceneShaderWarmup() {
+export function CommercialMapSceneShaderWarmup({ preparePost = true }: { preparePost?: boolean }) {
   const gl = useThree((state) => state.gl);
   const scene = useThree((state) => state.scene);
   const camera = useThree((state) => state.camera);
@@ -37,7 +37,7 @@ export function CommercialMapSceneShaderWarmup() {
           parallel: gl.extensions.has('KHR_parallel_shader_compile'),
         });
         delete gl.domElement.dataset.commercialMapPreparing;
-        cancelPostTask = scheduleCommercialMapSceneTask(gl.domElement, {
+        if (preparePost) cancelPostTask = scheduleCommercialMapSceneTask(gl.domElement, {
           id: 'critical-post-shaders', priority: 0,
           run: (complete) => {
             void prepareCommercialMapCriticalPost(gl, scene, camera, signal).catch((error) => {
@@ -76,6 +76,6 @@ export function CommercialMapSceneShaderWarmup() {
       gl.domElement.removeEventListener('webglcontextlost', lost);
       gl.domElement.removeEventListener('webglcontextrestored', prepare);
     };
-  }, [camera, gl, invalidate, scene]);
+  }, [camera, gl, invalidate, preparePost, scene]);
   return null;
 }

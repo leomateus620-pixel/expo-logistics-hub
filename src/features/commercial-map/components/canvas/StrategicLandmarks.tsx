@@ -1,3 +1,4 @@
+import { useSceneVegetationEnabled } from './PublicScenePolicyContext';
 import { SicrediArena } from './SicrediArena';
 import { SoyRestroom, GateNineTanks } from './SoyGateInfrastructure';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -2975,23 +2976,24 @@ function LunarTree({
   sceneDiagonal,
   onRocketSelect,
 }: LandmarkModelProps) {
+  const vegetationEnabled = useSceneVegetationEnabled();
   const footprint = Math.max(bounds.width, bounds.depth);
   const trunkHeight = height * 0.52;
   const crownBaseY = trunkHeight * 0.78;
   // The asymmetric crown preserves the mature landmark while opening the real memorial clearing.
-  const canopyItems: InstanceTransform[] = [
+  const canopyItems: InstanceTransform[] = vegetationEnabled ? [
     { position: [-footprint * 0.3, crownBaseY + height * 0.19, -footprint * 0.08], scale: [footprint * 1.1, height * 0.46, footprint * 1.08], rotation: [0.08, 0.25, -0.04] },
     { position: [-footprint * 0.56, crownBaseY + height * 0.12, -footprint * 0.06], scale: [footprint * 0.82, height * 0.34, footprint * 0.76], rotation: [-0.05, 0.8, 0.08] },
     { position: [-footprint * 0.24, crownBaseY + height * 0.13, -footprint * 0.36], scale: [footprint * 0.72, height * 0.36, footprint * 0.7], rotation: [0.06, 1.5, -0.04] },
     { position: [-footprint * 0.22, crownBaseY + height * 0.21, footprint * 0.31], scale: [footprint * 0.68, height * 0.3, footprint * 0.7], rotation: [-0.08, 2.1, 0.06] },
     { position: [-footprint * 0.53, crownBaseY + height * 0.2, footprint * 0.25], scale: [footprint * 0.72, height * 0.32, footprint * 0.68], rotation: [0.04, 2.8, -0.06] },
     { position: [-footprint * 0.28, crownBaseY + height * 0.31, -footprint * 0.04], scale: [footprint * 0.82, height * 0.32, footprint * 0.78], rotation: [0.06, 3.4, 0.04] },
-  ];
-  const branchItems: InstanceTransform[] = [
+  ] : [];
+  const branchItems: InstanceTransform[] = vegetationEnabled ? [
     { position: [-footprint * 0.12, trunkHeight * 0.72, 0], scale: [footprint * 0.13, trunkHeight * 0.52, footprint * 0.13], rotation: [0, 0, -0.52] },
     { position: [-footprint * 0.2, trunkHeight * 0.69, -footprint * 0.04], scale: [footprint * 0.12, trunkHeight * 0.47, footprint * 0.12], rotation: [0.2, 0, 0.55] },
     { position: [-footprint * 0.08, trunkHeight * 0.74, footprint * 0.12], scale: [footprint * 0.11, trunkHeight * 0.42, footprint * 0.11], rotation: [0.52, 0.4, 0.08] },
-  ];
+  ] : [];
 
   return (
     <group
@@ -3014,7 +3016,7 @@ function LunarTree({
         raycast={NO_RAYCAST}
         dispose={null}
       />
-      <mesh
+      {vegetationEnabled && <><mesh
         name="tronco-arvore-lunar"
         geometry={UNIT_CYLINDER}
         material={materials.accent}
@@ -3053,6 +3055,7 @@ function LunarTree({
           />
         </>
       )}
+      </>}
       <ApolloXIVReplica
         height={height}
         materials={materials}

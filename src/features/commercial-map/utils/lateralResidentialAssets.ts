@@ -83,21 +83,21 @@ function crownGeometry() {
       return geometry;
     });
   const merged = mergeGeometries(parts)!;
-  parts.forEach((geometry) => geometry.dispose());
+  parts.forEach((geometry) => geometry?.dispose());
   return merged;
 }
 
-export function createResidentialSharedAssets() {
+export function createResidentialSharedAssets(vegetationEnabled = true) {
   const box = new THREE.BoxGeometry(1, 1, 1);
   const plane = new THREE.PlaneGeometry(1, 1); plane.rotateX(-Math.PI / 2);
-  const geometries: Record<ResidentialBatchKind, THREE.BufferGeometry> = {
+  const geometries: Record<ResidentialBatchKind, THREE.BufferGeometry | null> = {
     masonry: box, hipRoof: createResidentialRoof(true), gableRoof: createResidentialRoof(false), flatRoof: box,
-    trunk: new THREE.CylinderGeometry(.5, .6, 1, 7), canopy: crownGeometry(), palm: createResidentialPalm(true),
+    trunk: new THREE.CylinderGeometry(.5, .6, 1, 7), canopy: vegetationEnabled ? crownGeometry() : null, palm: vegetationEnabled ? createResidentialPalm(true) : null,
     detail: box, glass: box, solar: box, poolRect: poolGeometry(false, false),
     poolRounded: poolGeometry(true, false), poolKidney: poolGeometry(false, true), lamp: box, lightPool: plane,
   };
-  const farPalm = createResidentialPalm(false);
-  const materials = Object.fromEntries<THREE.Material>(Object.keys(geometries).map((key) => {
+  const farPalm = vegetationEnabled ? createResidentialPalm(false) : null;
+  const materials = Object.fromEntries<THREE.Material>(Object.keys(geometries).filter(key => geometries[key as ResidentialBatchKind]).map((key) => {
     const kind = key as ResidentialBatchKind;
     const material = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: kind.startsWith('pool') ? .42 : .88,
       metalness: kind === 'solar' ? .15 : 0, name: `district-${kind}` });
@@ -130,7 +130,7 @@ export function createResidentialSharedAssets() {
     fragmentShader: 'varying vec2 vPool; uniform float brightness; void main(){float r=length(vPool); float a=pow(max(0.0,1.0-r),2.0)*brightness;gl_FragColor=vec4(1.0,0.79,0.43,a);}',
   });
   return { geometries, farPalm, materials, dispose() {
-    new Set([...Object.values(geometries), farPalm]).forEach((geometry) => geometry.dispose());
+    new Set([...Object.values(geometries), farPalm]).forEach((geometry) => geometry?.dispose());
     Object.values(materials).forEach((material) => material.dispose());
   } };
 }

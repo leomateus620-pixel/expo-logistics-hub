@@ -669,6 +669,7 @@ function createUnderstory(reducedGraphics: boolean) {
 
 export function resolveParkAccessEnvironmentPresentation(
   reducedGraphics: boolean,
+  vegetationEnabled = true,
 ): ParkAccessEnvironmentPresentation {
   const concreteSurfaces: ParkAccessEnvironmentSurface[] = PAVILION_COURTYARD.hardscape.map((rings, index) => ({
     id: `pavilions-1-14-12-concrete-${index}`,
@@ -682,12 +683,12 @@ export function resolveParkAccessEnvironmentPresentation(
     ...concreteSurfaces,
   ];
   const trailSurfaces = createTrailSurfaces();
-  const ambientTrees = [...createAmbientTrees(reducedGraphics), {
+  const ambientTrees = vegetationEnabled ? [...createAmbientTrees(reducedGraphics), {
     sourceZoneId: 'pavilions-14-12-courtyard-tree',
     position: PAVILION_COURTYARD.treePosition,
     rotation: 0.35, scale: PAVILION_COURTYARD.treeScale,
-  }];
-  const understory = createUnderstory(reducedGraphics).filter(placement => !concreteSurfaces.some(
+  }] : [];
+  const understory = (vegetationEnabled ? createUnderstory(reducedGraphics) : []).filter(placement => !concreteSurfaces.some(
     surface => pointInPolygon(placement.position, surface.polygon)
       && !surface.holes.some(hole => pointInPolygon(placement.position, hole)),
   ));

@@ -1,3 +1,4 @@
+import { markCommercialMapStage } from '../utils/performanceDiagnostics';
 import { supabase } from '@/integrations/supabase/client';
 import type { CommercialLot, CommercialStatus, MapEntity } from '../types';
 import type { PublicLot, PublicMapContext, PublicMapInventory } from './publicMapTypes';
@@ -21,11 +22,22 @@ function assertScoped(error: { message?: string } | null) {
   throw new Error(message || 'PUBLIC_MAP_UNAVAILABLE');
 }
 
+async function publicRpc(name: string, args: Record<string, unknown>, signal?: AbortSignal) {
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  if (signal?.aborted) abort();
+  signal?.addEventListener('abort', abort, { once: true });
+  const timeout = setTimeout(abort, 20_000);
+  markCommercialMapStage(name + ':start');
+  try { return await rpc(name, args).abortSignal(controller.signal); }
+  finally { clearTimeout(timeout); signal?.removeEventListener('abort', abort); markCommercialMapStage(name + ':end'); }
+}
+
 /** Inventário do escopo do link. Toda validação de token/escopo acontece no servidor. */
-export async function fetchPublicInventory(slug: string, token: string): Promise<PublicMapInventory> {
-  const { data, error } = await rpc('public_map_inventory', { _slug: slug, _token: token });
+export async function fetchPublicInventory(slug: string, token: string, signal?: AbortSignal): Promise<PublicMapInventory> {
+  const { data, error } = await publicRpc('public_map_inventory', { _slug: slug, _token: token }, signal);
   assertScoped(error);
-  if (!data) throw new PublicMapAccessError();
+  if (!data) throw new Error('PUBLIC_MAP_UNAVAILABLE');
   return data as PublicMapInventory;
 }
 
@@ -33,32 +45,33 @@ export async function fetchPublicInventory(slug: string, token: string): Promise
  * Contexto cartográfico do parque: geometria publicável, camadas e nomes de
  * referência. Sem lotes, preços, status comercial ou qualquer dado interno.
  */
-export async function fetchPublicContext(slug: string, token: string): Promise<PublicMapContext> {
-  const { data, error } = await rpc('public_map_context', { _slug: slug, _token: token });
+export async function fetchPublicContext(slug: string, token: string, signal?: AbortSignal): Promise<PublicMapContext> {
+  const { data, error } = await publicRpc('public_map_context', { _slug: slug, _token: token }, signal);
   assertScoped(error);
-  if (!data) throw new PublicMapAccessError();
+  if (!data) throw new Error('PUBLIC_MAP_UNAVAILABLE');
   return data as PublicMapContext;
 }
 
 export interface PublicScopeRevision {
   slug: string;
   revision: string;
+  contextRevision?: string;
   lotCount: number;
   serverTime: string;
 }
 
 /** Leitura leve da revisão oficial do escopo (sem inventário). */
-export async function fetchPublicScopeRevision(slug: string, token: string): Promise<PublicScopeRevision> {
-  const { data, error } = await rpc('public_map_scope_revision', { _slug: slug, _token: token });
+export async function fetchPublicScopeRevision(slug: string, token: string, signal?: AbortSignal): Promise<PublicScopeRevision> {
+  const { data, error } = await publicRpc('public_map_scope_revision', { _slug: slug, _token: token }, signal);
   assertScoped(error);
-  if (!data) throw new PublicMapAccessError();
+  if (!data) throw new Error('PUBLIC_MAP_UNAVAILABLE');
   return data as PublicScopeRevision;
 }
 
-export async function fetchPublicLot(slug: string, token: string, lotId: string): Promise<PublicLot> {
-  const { data, error } = await rpc('public_map_lot', { _slug: slug, _token: token, _lot_id: lotId });
+export async function fetchPublicLot(slug: string, token: string, lotId: string, signal?: AbortSignal): Promise<PublicLot> {
+  const { data, error } = await publicRpc('public_map_lot', { _slug: slug, _token: token, _lot_id: lotId }, signal);
   assertScoped(error);
-  if (!data) throw new PublicMapAccessError();
+  if (!data) throw new Error('PUBLIC_MAP_UNAVAILABLE');
   return data as PublicLot;
 }
 

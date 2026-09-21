@@ -1,0 +1,27 @@
+const http = require('node:http');
+const fs = require('node:fs');
+const path = require('node:path');
+const zlib = require('node:zlib');
+const root = path.resolve(process.argv[2]);
+const baselineRoot = process.env.PUBLIC_PREVIEW_BASELINE ? path.resolve(process.env.PUBLIC_PREVIEW_BASELINE) : null;
+const types = {'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.wasm':'application/wasm','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.woff2':'font/woff2'};
+const encoded = new Map();
+for(const port of process.argv.slice(3).map(Number)) http.createServer((req,res)=>{
+  const url = new URL(req.url,'http://localhost');
+  const requestedBuild = url.searchParams.get('qaBuild');
+  if (baselineRoot && ['baseline','candidate'].includes(requestedBuild)) res.setHeader('Set-Cookie', 'publicPreviewBuild='+requestedBuild+'; Path=/; SameSite=Lax');
+  const useBaseline = baselineRoot && (requestedBuild ? requestedBuild === 'baseline' : /publicPreviewBuild=baseline/.test(req.headers.cookie || ''));
+  const activeRoot = useBaseline ? baselineRoot : root;
+  const pathname = decodeURIComponent(url.pathname);
+  let file = path.resolve(activeRoot,'.'+pathname);
+  if(!file.startsWith(activeRoot+path.sep))file=path.join(activeRoot,'index.html');
+  if(!fs.existsSync(file)||fs.statSync(file).isDirectory())file=path.join(activeRoot,'index.html');
+  const ext=path.extname(file);
+  const gzip=/\b(gzip)\b/.test(req.headers['accept-encoding']||'')&&['.js','.css','.html','.json'].includes(ext);
+  const key=file+gzip;
+  if(!encoded.has(key))encoded.set(key,gzip?zlib.gzipSync(fs.readFileSync(file)):fs.readFileSync(file));
+  res.setHeader('Content-Type',(types[ext]||'application/octet-stream') + (['.html','.js','.css','.json'].includes(ext) ? '; charset=utf-8' : ''));
+  res.setHeader('Cache-Control',ext==='.html'?'no-store':'public, max-age=31536000, immutable');
+  if(gzip)res.setHeader('Content-Encoding','gzip');
+  res.end(encoded.get(key));
+}).listen(port,'127.0.0.1',()=>console.log('Preview '+port));

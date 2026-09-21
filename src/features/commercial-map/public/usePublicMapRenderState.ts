@@ -19,12 +19,12 @@ function publicCanvas(): HTMLCanvasElement | null {
  * renderizador confirma quadros apresentados. Nenhuma tela preta silenciosa:
  * a demora vira `slow` e a falha do contexto gráfico vira `failed`.
  */
-export function usePublicMapRenderState(enabled: boolean): PublicMapRenderState {
+export function usePublicMapRenderState(enabled: boolean, attempt = 0): PublicMapRenderState {
   const [state, setState] = useState<PublicMapRenderState>('preparing');
 
   useEffect(() => {
+    setState('preparing');
     if (!enabled) {
-      setState('preparing');
       return undefined;
     }
     let slowTimer: number | null = window.setTimeout(() => {
@@ -38,11 +38,11 @@ export function usePublicMapRenderState(enabled: boolean): PublicMapRenderState 
         setState('failed');
         return;
       }
-      if (health.presentedFrames > 0 && (health.status === 'ready' || health.status === 'degraded')) {
+      if (health.presentedFrames > 0 && publicCanvas()?.dataset.commercialMapReady === 'true' && (health.status === 'ready' || health.status === 'degraded')) {
         if (slowTimer !== null) { window.clearTimeout(slowTimer); slowTimer = null; }
         setState('ready');
       } else if (health.status === 'context-lost' || health.status === 'recovering') {
-        setState((current) => (current === 'ready' ? current : 'preparing'));
+        setState('failed');
       }
     };
 
@@ -57,7 +57,7 @@ export function usePublicMapRenderState(enabled: boolean): PublicMapRenderState 
       window.removeEventListener(COMMERCIAL_MAP_RENDER_HEALTH_EVENT, read);
       window.removeEventListener(COMMERCIAL_MAP_PREPARING_EVENT, read);
     };
-  }, [enabled]);
+  }, [attempt, enabled]);
 
   return state;
 }

@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import {
   UNPRICED_PAVILION_LABEL,
@@ -22,26 +22,40 @@ function stageValue(pricePerSqm: number | null, total: number | null, publishabl
 export const PublicLotDetails = memo(function PublicLotDetails({
   lot,
   onClose,
+  compact = false,
 }: {
   lot: PublicLot;
   onClose: () => void;
+  compact?: boolean;
 }) {
+  const [expanded, setExpanded] = useState(false);
+  const closeButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    setExpanded(false);
+    closeButton.current?.focus({ preventScroll: true });
+  }, [lot.id]);
+  useEffect(() => {
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', escape);
+    return () => window.removeEventListener('keydown', escape);
+  }, [onClose]);
   const publishable = lot.pricing.resolutionStatus === 'OK';
   const renovacao = stageValue(lot.pricing.renovacaoPricePerSqm, lot.pricing.renovacaoTotal, publishable);
   const segunda = stageValue(lot.pricing.segundaPricePerSqm, lot.pricing.segundaTotal, publishable);
   const area = formatAreaSqmLabel(lot.officialAreaSqm) ?? 'Metragem não informada';
 
   return (
-    <aside className="public-map-details" aria-label={`Lote ${lot.displayName}`}>
+    <aside className={`public-map-details${compact ? ' is-compact' : ''}${expanded ? ' is-expanded' : ''}`} aria-label={`Lote ${lot.displayName}`}>
       <header>
         <div>
           <strong>{lot.displayName}</strong>
           <small>{lot.publicIdentifier}</small>
         </div>
-        <button type="button" onClick={onClose} aria-label="Fechar ficha do lote">
+        <button ref={closeButton} type="button" onClick={onClose} aria-label="Fechar ficha do lote">
           <X aria-hidden="true" />
         </button>
       </header>
+      {compact && <button type="button" className="public-map-details-expand" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? 'Recolher ficha' : 'Expandir ficha'}</button>}
 
       <dl className="public-map-details-grid">
         <div>

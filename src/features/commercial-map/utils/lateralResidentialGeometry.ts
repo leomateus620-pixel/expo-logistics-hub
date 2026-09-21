@@ -484,7 +484,7 @@ function addRoads(cells: ResidentialRenderCell[]) {
 }
 
 /** No THREE objects, browser state or random global state are created here. */
-export function buildLateralResidentialRenderPlan(blocks: readonly DistrictBlock[] = LATERAL_DISTRICT_BLOCKS) {
+export function buildLateralResidentialRenderPlan(blocks: readonly DistrictBlock[] = LATERAL_DISTRICT_BLOCKS, vegetationEnabled = true) {
   const cells = blocks.map((block) => {
     const cell = newCell(block.id, block.polygon);
     surface(cell, `${block.id}-ground`, block.polygon, 0, '#7e9465');
@@ -492,7 +492,7 @@ export function buildLateralResidentialRenderPlan(blocks: readonly DistrictBlock
     return cell;
   });
   if (!cells.length) return cells;
-  LATERAL_DISTRICT_VEGETATION.forEach((tree) => {
+  if (vegetationEnabled) LATERAL_DISTRICT_VEGETATION.forEach((tree) => {
     const [x, z] = lateralDistrictPointToWorld(tree.center);
     const cell = cells.reduce((best, current) => Math.hypot(current.center[0] - x, current.center[1] - z) < Math.hypot(best.center[0] - x, best.center[1] - z) ? current : best);
     addVegetation(cell, tree.id, tree.center, tree.kind, tree.height, tree.crownRadius);

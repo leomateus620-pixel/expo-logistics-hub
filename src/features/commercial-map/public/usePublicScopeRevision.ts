@@ -1,64 +1,46 @@
 import { useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchPublicScopeRevision } from './publicMapService';
-
-/** Defasagem máxima aceita com a página ativa e conectada. */
+import { fetchPublicScopeRevision, PublicMapAccessError } from './publicMapService';
 export const PUBLIC_MAP_REVISION_POLL_MS = 15_000;
 
-/**
- * Observa a revisão oficial do escopo e recarrega os dados públicos quando ela
- * muda. Nada de Realtime sobre tabelas internas: só esta RPC validada por token.
- */
-export function usePublicScopeRevision(slug: string, token: string) {
-  const queryClient = useQueryClient();
-  const lastRevision = useRef<string | null>(null);
-
+/** Poll only revisions after the authorized inventory has arrived. React Query
+ * owns focus/reconnect refetches; no competing visibility listener. */
+export function usePublicScopeRevision(slug: string, token: string, initialRevision?: string, initialContextRevision?: string) {
+  const client = useQueryClient();
+  const last = useRef({ scope: slug + token, revision: initialRevision, context: initialContextRevision, contextChecked: Date.now() });
   const query = useQuery({
     queryKey: ['public-map', 'revision', slug, token],
-    queryFn: () => fetchPublicScopeRevision(slug, token),
+    queryFn: ({ signal }) => fetchPublicScopeRevision(slug, token, signal),
     enabled: Boolean(slug && token),
-    refetchInterval: PUBLIC_MAP_REVISION_POLL_MS,
-    refetchIntervalInBackground: false,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    staleTime: 0,
-    retry: false,
-    meta: { persist: false },
+    initialData: initialRevision ? { slug, revision: initialRevision, contextRevision: initialContextRevision, lotCount: 0, serverTime: '' } : undefined,
+    refetchInterval: PUBLIC_MAP_REVISION_POLL_MS, refetchIntervalInBackground: false,
+    refetchOnWindowFocus: 'always', refetchOnReconnect: 'always',
+    staleTime: PUBLIC_MAP_REVISION_POLL_MS, retry: false, meta: { persist: false },
   });
-
-  const revision = query.data?.revision ?? null;
-
   useEffect(() => {
-    if (!revision) return;
-    if (lastRevision.current === null) {
-      lastRevision.current = revision;
-      return;
+    if (!slug || !query.data) return;
+    const next = query.data;
+    const scope = slug + token;
+    if (last.current.scope !== scope) last.current = { scope, revision: initialRevision, context: initialContextRevision, contextChecked: Date.now() };
+    const changed = last.current.revision && last.current.revision !== next.revision;
+    const contextChanged = next.contextRevision
+      ? last.current.context !== next.contextRevision
+      : Date.now() - last.current.contextChecked >= 60_000; // Compatible with the previous RPC during rollout.
+    if (changed) void client.invalidateQueries({ predicate: item => {
+      const key = item.queryKey;
+      return key[0] === 'public-map' && (key[1] === 'inventory' || key[1] === 'lot') && key[2] === slug && key[3] === token;
+    } });
+    if (contextChanged) {
+      void client.invalidateQueries({ queryKey: ['public-map', 'context', slug, token] });
+      last.current.contextChecked = Date.now();
     }
-    if (lastRevision.current === revision) return;
-    lastRevision.current = revision;
-    // Invalida somente o namespace público desta área (inventário, geometria,
-    // preços, somatórios, disponibilidade e ficha do lote).
-    void queryClient.invalidateQueries({
-      predicate: (item) => {
-        const key = item.queryKey as unknown[];
-        return key[0] === 'public-map' && key[1] !== 'revision' && key.includes(slug) && key.includes(token);
-      },
-    });
-  }, [queryClient, revision, slug, token]);
-
-  // Revalida ao voltar para a aba e ao recuperar conexão, sem esperar o poll.
+    last.current.revision = next.revision;
+    last.current.context = next.contextRevision;
+  }, [client, initialContextRevision, initialRevision, query.data, slug, token]);
   useEffect(() => {
-    if (!slug || !token) return undefined;
-    const revalidate = () => {
-      if (document.visibilityState === 'visible') void query.refetch();
-    };
-    document.addEventListener('visibilitychange', revalidate);
-    window.addEventListener('online', revalidate);
-    return () => {
-      document.removeEventListener('visibilitychange', revalidate);
-      window.removeEventListener('online', revalidate);
-    };
-  }, [query, slug, token]);
-
-  return { revision, lotCount: query.data?.lotCount ?? null };
+    if (!(query.error instanceof PublicMapAccessError)) return;
+    // A revoked token must retire the already displayed inventory too.
+    void client.invalidateQueries({ queryKey: ['public-map', 'inventory', slug, token] });
+  }, [client, query.error, slug, token]);
+  return { revision: query.data?.revision ?? null, lotCount: query.data?.lotCount ?? null };
 }

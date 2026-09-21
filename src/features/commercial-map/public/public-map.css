@@ -2,7 +2,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
   background:
     radial-gradient(120% 80% at 50% 0%, oklch(var(--primary) / 0.16), transparent 62%),
     oklch(var(--background));
@@ -67,7 +68,21 @@
   min-height: 0;
 }
 
-.public-map-canvas { position: relative; flex: 1; min-height: 60dvh; }
+.public-map-canvas { position: relative; flex: 1; min-height: 0; }
+/* Drei HTML labels stay inside the canvas stacking context, below the sheet. */
+.public-map-shell[data-public-external] .public-map-canvas { isolation: isolate; }
+.public-map-shell[data-public-external] .commercial-map-label { display: flex; flex-wrap: wrap; gap: 4px 8px; min-width: 150px; max-width: 210px; padding: 8px 10px; border: 1px solid #69747d; border-radius: 10px; background: #fffffff2; color: #26313b; font-size: 12px; box-shadow: 0 3px 12px #0002; }
+.public-map-shell[data-public-external] .commercial-map-label[data-map-label-mode='focus'] { display: none; }
+.public-map-canvas.is-concealed { position: absolute; inset: 0; visibility: hidden; pointer-events: none; }
+.public-map-shell button:focus-visible, .public-map-shell input:focus-visible { outline: 3px solid #377ddd; outline-offset: 3px; }
+.public-map-shell button { min-height: 44px; }
+.public-map-state button { margin: 8px; padding: 8px 16px; border: 1px solid currentColor; border-radius: 10px; }
+.public-map-legend { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; flex-wrap: wrap; gap: 8px 14px; width: fit-content; max-width: calc(100% - 24px); padding: 9px 12px; border-radius: 12px; background: #fffffff0; color: #26313b; font-size: 12px; box-shadow: 0 2px 10px #0002; pointer-events: none; }
+.public-map-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.public-map-legend i { display: block; width: 12px; height: 12px; border: 1px solid #495460; border-radius: 3px; }
+.public-map-legend .is-selection { background: #ffec8b; border: 2px solid #142331; }
+.public-map-legend .is-context { background: #a2a2a2; }
+.public-map-details-expand { display: none; }
 
 .public-map-state {
   margin: auto;
@@ -144,7 +159,7 @@
 
 .public-map-details header strong { display: block; font-size: 1rem; font-weight: 700; }
 .public-map-details header small { color: oklch(var(--muted-foreground)); font-size: 0.75rem; }
-.public-map-details header button { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; }
+.public-map-details header button { min-width: 44px; height: 44px; display: grid; place-items: center; border-radius: 10px; }
 .public-map-details header button svg { width: 16px; height: 16px; }
 
 .public-map-details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -193,6 +208,13 @@
 .public-map-invalid p { font-size: 0.86rem; color: oklch(var(--muted-foreground)); }
 
 @media (max-width: 640px) {
+  .public-map-header { gap: 4px; }
+  .public-map-view-switch { flex-wrap: wrap; }
+  .public-map-view-switch button { padding: 0 9px; font-size: 0.75rem; }
+  .public-map-legend { top: 6px; left: 6px; right: 6px; font-size: 10px; padding: 6px 8px; gap: 5px 10px; }
+  .public-map-details.is-compact { max-height: 29dvh; }
+  .public-map-details.is-compact.is-expanded { max-height: min(65dvh, 100% - 12px); }
+  .public-map-details-expand { display: block; width: 100%; font-size: 0.8rem; }
   .public-map-details {
     right: 8px;
     left: 8px;

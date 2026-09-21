@@ -1,3 +1,10 @@
+import { publicLotOutlinePositions } from '../../public/publicLotOutline';
+import { PUBLIC_NAVIGATION_SAVE_EVENT, savePublicNavigation, type PublicNavigation } from '../../public/publicNavigation';
+import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
+import { PublicScenePolicyContext, usePublicScenePolicy } from './PublicScenePolicyContext';
+import { PublicContextGroup, PublicMaterialPool } from './PublicContextGroup';
+import { PublicLotNumbers } from './PublicLotNumbers';
+import { PublicMapEnvironment } from './PublicMapEnvironment';
 import { arenaVegetationAllowed } from '../../data/arenaCanonicalLayout';
 import { createArenaParkingGeometry, isArenaParking } from '../../utils/arenaParkingGeometry';
 import { LightingPerformanceProbe } from '../../diagnostics/LightingPerformanceProbe';
@@ -265,6 +272,8 @@ interface CommercialMapCanvasProps {
   interactiveEntityIds?: ReadonlySet<string> | null;
   /** Consulta pública: entidades que definem o enquadramento inicial. */
   publicFocusEntityIds?: ReadonlySet<string> | null;
+  publicScenePolicy?: PublicExternalScenePolicy | null;
+  initialPublicView?: PublicNavigation | null;
   technicalValidationAllowed?: boolean;
   active?: boolean;
 }
@@ -1304,8 +1313,11 @@ function eventBatchId(event: ThreeEvent<MouseEvent | PointerEvent>): number | nu
 }
 
 function LotSelectionOutline({ entity }: { entity: MapEntity }) {
+  const publicPolicy = usePublicScenePolicy();
   const geometry = useMemo(() => createEntityGeometry(entity), [entity]);
-  const edges = useMemo(() => new THREE.EdgesGeometry(geometry, 28), [geometry]);
+  const edges = useMemo(() => publicPolicy
+    ? new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(publicLotOutlinePositions(entity), 3))
+    : new THREE.EdgesGeometry(geometry, 28), [entity, geometry, publicPolicy]);
   useEffect(() => () => {
     edges.dispose();
     geometry.dispose();
@@ -1313,7 +1325,7 @@ function LotSelectionOutline({ entity }: { entity: MapEntity }) {
 
   return (
     <lineSegments geometry={edges} position={[0, entity.geometry.elevation + 0.085, 0]} raycast={NO_RAYCAST}>
-      <lineBasicMaterial color="#fff1a8" toneMapped={false} />
+      <lineBasicMaterial color={publicPolicy ? '#142331' : '#fff1a8'} depthTest={!publicPolicy} toneMapped={false} />
     </lineSegments>
   );
 }
@@ -1444,6 +1456,10 @@ function BatchedLots({
   onFocus: () => void;
   onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
 }) {
+  const publicPolicy = usePublicScenePolicy();
+  const geometryEntitiesRef = useRef<MapEntity[]>([]);
+  if (geometryEntitiesRef.current.length !== entries.length || entries.some((entry, i) => entry.entity !== geometryEntitiesRef.current[i])) geometryEntitiesRef.current = entries.map(entry => entry.entity);
+  const geometryEntities = geometryEntitiesRef.current;
   const invalidate = useThree((state) => state.invalidate);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const hoveredRef = useRef<string | null>(null);
@@ -1468,7 +1484,7 @@ function BatchedLots({
       return nonIndexed;
     });
     const vertexCount = sourceGeometries.reduce((sum, geometry) => sum + geometry.getAttribute('position').count, 0);
-    const material = new THREE.MeshStandardMaterial({
+    const material = publicPolicy ? new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -2 }) : new THREE.MeshStandardMaterial({
       color: '#ffffff',
       roughness: 0.94,
       metalness: 0,
@@ -1491,7 +1507,7 @@ function BatchedLots({
       const batchId = mesh.addInstance(geometryId);
       matrix.makeTranslation(0, entry.entity.geometry.elevation, 0);
       mesh.setMatrixAt(batchId, matrix);
-      const segment = segmentByEntity.get(entry.entity.id) ?? null;
+      const segment = publicPolicy ? null : segmentByEntity.get(entry.entity.id) ?? null;
       mesh.setColorAt(batchId, lotColor(
         entry,
         segment,
@@ -1506,7 +1522,9 @@ function BatchedLots({
       entityByBatchId.set(batchId, entry.entity.id);
       batchIdByEntity.set(entry.entity.id, batchId);
 
-      const edgeGeometry = new THREE.EdgesGeometry(geometry, 28);
+      const edgeGeometry = publicPolicy
+        ? new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(publicLotOutlinePositions(entry.entity), 3))
+        : new THREE.EdgesGeometry(geometry, 28);
       const positions = edgeGeometry.getAttribute('position');
       const borderColor = segment
         ? new THREE.Color(segment.palette.edge).lerp(new THREE.Color(STATUS_CONFIG[entry.lot.status].border), 0.12)
@@ -1533,11 +1551,13 @@ function BatchedLots({
     mesh.castShadow = false;
     mesh.receiveShadow = true;
     return { mesh, material, edgeGeometry, entityByBatchId, batchIdByEntity, raycast: mesh.raycast };
-  }, [entries, segmentByEntity]);
+  // Entity identities are structurally shared by React Query across price/status updates.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [geometryEntities, publicPolicy ? null : segmentByEntity]);
 
   useLayoutEffect(() => {
     if (!batch) return;
-    applyParkSurfaceDetail(batch.material, 'lot', reducedGraphics);
+    if (batch.material instanceof THREE.MeshStandardMaterial) applyParkSurfaceDetail(batch.material, 'lot', reducedGraphics);
   }, [batch, reducedGraphics]);
 
   useEffect(() => () => {
@@ -1559,7 +1579,7 @@ function BatchedLots({
     const salesSelected = salesSelectedLotIds.has(entry.lot.id);
     const color = lotColor(
       entry,
-      segmentByEntity.get(entityId) ?? null,
+      publicPolicy ? null : segmentByEntity.get(entityId) ?? null,
       filtersActive,
       matchingEntityIds.has(entityId),
       selected,
@@ -1569,27 +1589,32 @@ function BatchedLots({
       scratch.blend,
     );
     // Realce do carrinho: dourado sólido, mantendo geometria e status originais.
+    if (publicPolicy && selected) color.set('#ffed91');
     if (salesSelected) color.lerp(scratch.blend.set('#f2c94c'), 0.62);
     batch.mesh.setColorAt(batchId, color);
     const lift = salesSelected ? 0.09 : selected ? 0.055 : hovered ? 0.035 : 0;
     scratch.matrix.makeTranslation(0, entry.entity.geometry.elevation + lift, 0);
     batch.mesh.setMatrixAt(batchId, scratch.matrix);
-  }, [batch, entryByEntity, filtersActive, infrastructureMode, matchingEntityIds, salesSelectedLotIds, segmentByEntity]);
+  }, [batch, entryByEntity, filtersActive, infrastructureMode, matchingEntityIds, publicPolicy, salesSelectedLotIds, segmentByEntity]);
 
+  const previousPublicStatuses = useRef<{ batch: typeof batch; statuses: Map<string, CommercialLot['status']> }>({ batch: null, statuses: new Map() });
   useEffect(() => {
     if (!batch) return;
-    entries.forEach((entry) => applyVisualState(entry.entity.id));
-    invalidate();
-  }, [applyVisualState, batch, entries, invalidate, salesSelectedLotIds]);
-
-  useEffect(() => {
-    if (!batch) return;
-    entries.forEach((entry) => applyVisualState(entry.entity.id));
-    previousTransientRef.current = { ...visualStateRef.current };
-    batch.mesh.computeBoundingBox();
-    batch.mesh.computeBoundingSphere();
-    invalidate();
-  }, [applyVisualState, batch, entries, filtersActive, invalidate, matchingEntityIds]);
+    const previous = previousPublicStatuses.current;
+    let changed = false;
+    entries.forEach(entry => {
+      if (!publicPolicy || previous.batch !== batch || previous.statuses.get(entry.entity.id) !== entry.lot.status) {
+        applyVisualState(entry.entity.id);
+        changed = true;
+      }
+    });
+    previousPublicStatuses.current = { batch, statuses: new Map(entries.map(entry => [entry.entity.id, entry.lot.status])) };
+    if (!publicPolicy || previous.batch !== batch) {
+      batch.mesh.computeBoundingBox();
+      batch.mesh.computeBoundingSphere();
+    }
+    if (changed) invalidate();
+  }, [applyVisualState, batch, entries, filtersActive, invalidate, matchingEntityIds, publicPolicy, salesSelectedLotIds]);
 
   useEffect(() => {
     if (!batch) return;
@@ -1609,9 +1634,10 @@ function BatchedLots({
     if (!batch) return;
     const opacity = entries.length > 0 ? (layerOpacity[entries[0].entity.layerId] ?? 1) : 1;
     batch.material.opacity = opacity;
+    const transparencyChanged = batch.material.transparent !== (opacity < 0.995);
     batch.material.transparent = opacity < 0.995;
     batch.material.depthWrite = opacity > 0.42;
-    batch.material.needsUpdate = true;
+    if (transparencyChanged) batch.material.needsUpdate = true;
     invalidate();
   }, [batch, entries, invalidate, layerOpacity]);
 
@@ -1641,7 +1667,7 @@ function BatchedLots({
 
   return (
     <>
-      {!infrastructureMode ? (
+      {!infrastructureMode && !publicPolicy ? (
         <SegmentLotAccents
           entries={entries}
           segmentByEntity={segmentByEntity}
@@ -1682,6 +1708,8 @@ function BatchedLots({
       />
       <lineSegments geometry={batch.edgeGeometry} raycast={NO_RAYCAST}>
         <lineBasicMaterial
+          depthTest={!publicPolicy}
+          depthWrite={false}
           vertexColors
           transparent
           opacity={Math.min(
@@ -1692,6 +1720,7 @@ function BatchedLots({
           toneMapped={false}
         />
       </lineSegments>
+      {publicPolicy && <PublicLotNumbers entities={geometryEntities} />}
       {selectedEntity && <LotSelectionOutline entity={selectedEntity} />}
     </>
   );
@@ -1935,6 +1964,7 @@ function CameraRig({
   resolvedSegmentByEntity,
   segmentOverride,
   publicFocusEntityIds,
+  initialPublicView,
   hydrologicalModeActive,
 }: {
   selectedEntity: MapEntity | null;
@@ -1947,8 +1977,10 @@ function CameraRig({
   resolvedSegmentByEntity: ReadonlyMap<string, CommercialMapSegmentDefinition>;
   segmentOverride?: CommercialMapSegmentDefinition | null;
   publicFocusEntityIds?: ReadonlySet<string> | null;
+  initialPublicView?: PublicNavigation | null;
   hydrologicalModeActive: boolean;
 }) {
+  const publicPolicy = usePublicScenePolicy();
   const controlsRef = useRef<OrbitControlsImpl>(null);
   useEffect(() => {
     const controls = controlsRef.current;
@@ -1961,6 +1993,13 @@ function CameraRig({
   const size = useThree((state) => state.size);
   const invalidate = useThree((state) => state.invalidate);
   const gl = useThree((state) => state.gl);
+  const restoreView = useRef(initialPublicView);
+  useEffect(() => {
+    if (!gl.domElement.closest('.public-map-shell')) return;
+    const save = () => savePublicNavigation({ position: camera.position.toArray() as [number, number, number], target: controlsRef.current?.target.toArray() as [number, number, number], zoom: camera.zoom });
+    window.addEventListener(PUBLIC_NAVIGATION_SAVE_EVENT, save);
+    return () => window.removeEventListener(PUBLIC_NAVIGATION_SAVE_EVENT, save);
+  }, [camera, gl]);
   const interiorFrame = interiorRequest?.entityId === interiorEntity?.id ? interiorRequest : null;
   const desiredAngles = useMemo(() => ({
     minPolarAngle: interiorFrame?.minPolarAngle ?? COMMERCIAL_MAP_MIN_POLAR_ANGLE,
@@ -2467,6 +2506,19 @@ function CameraRig({
   ) => {
     if (source !== 'panel-layout') clampQueuedCameraPose(minDistance, maxDistance, clampTarget);
     const controls = controlsRef.current;
+    if (publicPolicy && !initialized.current && camera instanceof THREE.PerspectiveCamera) {
+      camera.position.copy(targetPosition.current);
+      camera.lookAt(targetLookAt.current);
+      if (controls) { controls.target.copy(targetLookAt.current); controls.update(); }
+      camera.fov = nextLens.fov ?? 38; camera.near = nextLens.near ?? camera.near; camera.far = nextLens.far ?? camera.far; camera.zoom = nextLens.zoom ?? 1;
+      applyContextualCameraViewOffset(camera, size.width, size.height, nextLens.viewOffset);
+      camera.updateProjectionMatrix();
+      setAppliedControlLimits({ minDistance, maxDistance });
+      setCameraNavigating(false);
+      writeCameraDiagnostics(true);
+      invalidate();
+      return;
+    }
     const currentTarget = controls?.target ?? targetLookAt.current;
     const currentDistance = camera.position.distanceTo(currentTarget);
     const scratch = transitionScratch.current;
@@ -2549,6 +2601,9 @@ function CameraRig({
   }, [
     camera,
     cameraFarPlane,
+    publicPolicy,
+    size.width,
+    size.height,
     clampQueuedCameraPose,
     controlsMaximumDistance,
     controlsMinimumDistance,
@@ -2556,6 +2611,7 @@ function CameraRig({
     gl,
     invalidate,
     setCameraNavigating,
+    writeCameraDiagnostics,
   ]);
 
   const cancelCameraTransition = useCallback((preserveView = true) => {
@@ -3457,7 +3513,16 @@ function CameraRig({
       else if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
       else queuePreset(preset);
     } else if (!initialized.current) {
-      if (parkingActive) queueParking();
+      if (publicPolicy && restoreView.current?.position && restoreView.current.target) {
+        targetPosition.current.set(...restoreView.current.position);
+        targetLookAt.current.set(...restoreView.current.target);
+        startCameraMove(controlsMinimumDistance, controlsMaximumDistance, true, { zoom: restoreView.current.zoom ?? 1 }, 'public-restore');
+        preserveManualView.current = true;
+        resizeRefitSuppressedUntil.current = Date.now() + COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS;
+        cancelScheduledResizeRefit();
+        pendingResizeRefit.current = false;
+        restoreView.current = null;
+      } else if (parkingActive) queueParking();
       else if (returnView.current) {
         targetPosition.current.set(...returnView.current.position);
         targetLookAt.current.set(...returnView.current.target);
@@ -3493,7 +3558,7 @@ function CameraRig({
       else if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
       else queuePreset(preset);
     } else if (selectionChanged && selectedEntity) {
-      queueSelection(selectedEntity);
+      if (!publicPolicy) queueSelection(selectedEntity);
     } else if (parkingClosed) {
       cancelCameraTransition(true);
       preserveManualView.current = true;
@@ -3528,7 +3593,7 @@ function CameraRig({
       cancelScheduledResizeRefit();
       pendingResizeRefit.current = false;
       animating.current = false;
-    } else if (detailsLayoutChanged && selectedEntity && !suppressDetailsRefit) {
+    } else if (!publicPolicy && detailsLayoutChanged && selectedEntity && !suppressDetailsRefit) {
       queueSelection(selectedEntity);
     }
 
@@ -3552,6 +3617,7 @@ function CameraRig({
     activeSegmentEntities,
     framingSegment,
     framingSegmentEntities,
+    publicPolicy,
     camera,
     cameraDistanceBounds.maxDistance,
     cameraDistanceBounds.minDistance,
@@ -4340,6 +4406,8 @@ function NightAwareResidentialDistrict(props: ComponentProps<typeof LateralResid
   return <LateralResidentialDistrict {...props} nightMode={night || props.nightMode} />;
 }
 
+const EMPTY_PUBLIC_SALES: ReadonlySet<string> = new Set();
+
 const Scene = memo(function Scene({
   entities,
   parkingOwnerEntities = entities,
@@ -4354,12 +4422,14 @@ const Scene = memo(function Scene({
   segmentOverride,
   interactiveEntityIds = null,
   publicFocusEntityIds = null,
+  initialPublicView,
   technicalValidationAllowed = false,
   renderQualityTier = 'HIGH',
 }: CommercialMapSceneProps) {
   // Suspend before constructing siblings. Suspending only inside B12 makes
   // React replay terrain/road/material preparation while its worker finishes.
-  if (entities.some((entity) => resolveStrategicLandmarkKind(entity) === 'fenasoja-headquarters')) {
+  const publicPolicy = usePublicScenePolicy();
+  if (!publicPolicy && entities.some((entity) => resolveStrategicLandmarkKind(entity) === 'fenasoja-headquarters')) {
     readPreparedHeadquartersGeometry();
   }
   const bootStarted = useRef(false);
@@ -4516,9 +4586,9 @@ const Scene = memo(function Scene({
     if (!canInspectEntity(entityId)) return;
     // Em modo Vendas o clique pertence ao carrinho: não seleciona a entidade
     // nem abre o painel de detalhes padrão.
-    if (dispatchSalesLotClick(lots.find((lot) => lot.entityId === entityId))) return;
+    if (!interactiveEntityIds && dispatchSalesLotClick(lots.find((lot) => lot.entityId === entityId))) return;
     setSelectedEntityId(entityId);
-  }, [canInspectEntity, hydrologicalModeActive, lots, setSelectedEntityId]);
+  }, [canInspectEntity, hydrologicalModeActive, interactiveEntityIds, lots, setSelectedEntityId]);
   const handleEntityHover = useCallback((entityId: string | null) => {
     if (hydrologicalModeActive) return;
     const allowed = canInspectEntity(entityId);
@@ -4648,10 +4718,11 @@ const Scene = memo(function Scene({
     });
   }, [layerOpacity, selectedEntityId, structuralEntities]);
   const sceneTrees = useMemo(
-    () => selectCommercialTreesForScene(entities, lots),
-    [entities, lots],
+    () => publicPolicy ? [] : selectCommercialTreesForScene(entities, lots),
+    [entities, lots, publicPolicy],
   );
   const rearRoadCompatibleSceneTrees = useMemo(() => {
+    if (publicPolicy) return [];
     const baseTrees = (!isolatedArea
       || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry)
       ? selectParkAccessCompatibleTreesForPresentation(sceneTrees)
@@ -4664,7 +4735,7 @@ const Scene = memo(function Scene({
       ? selectRearRoadCompatibleTreesForPresentation(parkAccessCompatibleTrees)
       : parkAccessCompatibleTrees;
     return rearRoadCompatibleTrees.filter(tree => arenaVegetationAllowed(tree.position, tree.canopyRadius));
-  }, [entities, isolatedArea, rearParkingAvailable, sceneTrees]);
+  }, [entities, isolatedArea, publicPolicy, rearParkingAvailable, sceneTrees]);
   const selectedLunarTreeEntity = selectedEntity
     && resolveStrategicLandmarkKind(selectedEntity) === 'lunar-tree'
     ? selectedEntity
@@ -4853,7 +4924,7 @@ const Scene = memo(function Scene({
 
   return (
     <>
-      <NightAwareEnvironment
+      {publicPolicy ? <PublicMapEnvironment extent={environmentExtent} /> : <NightAwareEnvironment
         extent={environmentExtent}
         shadowExtent={shadowExtent}
         active={!interiorEntity}
@@ -4861,10 +4932,10 @@ const Scene = memo(function Scene({
         reducedGraphics={reducedGraphics}
         adaptiveQualityTier={renderQualityTier}
         nightMode={nightAtmosphereActive}
-      />
+      />}
       <InteriorCameraRequestContext.Provider value={setInteriorCameraRequest}>
         {interiorContent}
-        <group ref={exteriorGroup} visible={!interiorEntity}>
+        <PublicContextGroup><group ref={exteriorGroup} visible={!interiorEntity}>
       {!isolatedArea && (
         <group visible={!hydrologicalModeActive}>
           <ReferenceUnderlay calibration={calibration} />
@@ -4971,8 +5042,8 @@ const Scene = memo(function Scene({
           />
         </group>
       )}
-      <BatchedLots
-        salesSelectedLotIds={salesSelectedLotIds}
+      <group userData={{ publicActive: true }}><BatchedLots
+        salesSelectedLotIds={interactiveEntityIds ? EMPTY_PUBLIC_SALES : salesSelectedLotIds}
         entries={lotEntries}
         selectedEntityId={selectedEntityId}
         hoveredEntityId={hoveredEntityId}
@@ -4986,9 +5057,10 @@ const Scene = memo(function Scene({
         onFocus={handleEntityFocus}
         onCursor={setCanvasCursor}
       />
+      </group>
       {structuralEntities.map((entity) => {
         const mesh = (
-        <EntityMesh
+        <PublicContextGroup active={publicPolicy?.activeScope.has(entity.id) ?? false}><EntityMesh
           key={entity.id}
           entity={entity}
           segment={segmentByEntity.get(entity.id) ?? null}
@@ -5009,19 +5081,19 @@ const Scene = memo(function Scene({
           onEnterInterior={handleEnterInterior}
           onCursor={setCanvasCursor}
           moduleStateById={selectedEntityId === entity.id ? selectedPavilionModuleState : undefined}
-        />
+        /></PublicContextGroup>
         );
         const kind = resolveStrategicLandmarkKind(entity);
         // These authored landmarks are essential park content; keep their
         // EntityMesh identity and picking props intact after one-time admission.
         // Lunar memorial retains its zero-intensity engine light in Stage 1:
         // late insertion would change every lit shader's global light count.
-        if (kind === 'amusement-park') {
+        if (kind === 'amusement-park' || (publicPolicy && kind === 'fenasoja-headquarters')) {
           return salesPresentationActive
             ? null
             : <EssentialSceneLayer key={entity.id} id={`landmark:${entity.id}`}>{mesh}</EssentialSceneLayer>;
         }
-        return mesh;
+        return <group key={entity.id}>{mesh}</group>;
       })}
       <EssentialSceneLayer id="nations-context">
       <NationsDistrict
@@ -5045,7 +5117,7 @@ const Scene = memo(function Scene({
         />
         </EssentialSceneLayer>
       )}
-      <EssentialSceneLayer id="vegetation">
+      {!publicPolicy && <EssentialSceneLayer id="vegetation">
       <CommercialTreeLayer
         trees={presentedSceneTrees}
         surfaceEntities={treeSurfaceEntities}
@@ -5053,7 +5125,7 @@ const Scene = memo(function Scene({
         reducedGraphics={reducedGraphics}
         qualityTier={reducedGraphics ? 'LOW' : 'HIGH'}
       />
-      </EssentialSceneLayer>
+      </EssentialSceneLayer>}
       <EssentialSceneLayer id="electrical-detail">
       <CommercialElectricalInfrastructureLayer
         nodes={sceneElectricalInfrastructure.nodes}
@@ -5064,15 +5136,15 @@ const Scene = memo(function Scene({
         reducedGraphics={reducedGraphics}
       />
       </EssentialSceneLayer>
-      <NightLightingLayer
+      {!publicPolicy && <NightLightingLayer
         nodes={sceneElectricalInfrastructure.nodes}
         connections={sceneElectricalInfrastructure.connections}
         surfaceEntities={entities}
         rearRoadsActive={!isolatedArea}
         polesVisible={electricalNetworkVisible}
         reducedGraphics={reducedGraphics}
-      />
-      <DeferredSceneLayer id="hydrology" priority={10}>
+      />}
+      {!publicPolicy && <><DeferredSceneLayer id="hydrology" priority={10}>
         <CommercialHydrologicalInfrastructureLayer
           nodes={sceneHydrologicalInfrastructure.nodes}
           segments={sceneHydrologicalInfrastructure.segments}
@@ -5085,7 +5157,7 @@ const Scene = memo(function Scene({
       </DeferredSceneLayer>
       <DeferredSceneLayer id="rain" priority={5}>
         <CommercialMapRainLayer entities={entities} qualityTier={renderQualityTier} active={!interiorEntity && !salesPresentationActive} />
-      </DeferredSceneLayer>
+      </DeferredSceneLayer></>}
       {contextualLabelEntities.filter((entity) => (
         (!parkingInspectionOpen || ['PAVILHAO-09', 'D5', 'PISTA-CAMPEIRA', 'J'].includes(entity.publicIdentifier))
       )).map((entity) => (
@@ -5120,7 +5192,7 @@ const Scene = memo(function Scene({
           <QuadrasABValidationOverlay />
         </Suspense>
       )}
-        </group>
+        </group></PublicContextGroup>
       </InteriorCameraRequestContext.Provider>
       <CameraRig
         selectedEntity={selectedEntity}
@@ -5133,6 +5205,7 @@ const Scene = memo(function Scene({
         resolvedSegmentByEntity={resolvedSegmentByEntity}
         segmentOverride={segmentOverride}
         publicFocusEntityIds={publicFocusEntityIds}
+        initialPublicView={initialPublicView}
         hydrologicalModeActive={hydrologicalModeActive}
       />
       <RuntimeFrameDiagnostics />
@@ -5143,14 +5216,14 @@ const Scene = memo(function Scene({
         onHover={setHoveredEntityId}
         onCursor={setCanvasCursor}
       />
-      <StrategicLandmarkSelectionShaderWarmup />
+      {!publicPolicy && <><StrategicLandmarkSelectionShaderWarmup />
       <DeferredSceneLayer id="interior-shaders" priority={140} waitForMilestone="interior-preparation:end">
       <CommercialMapInteriorShaderWarmup reducedGraphics={reducedGraphics} />
       </DeferredSceneLayer>
       <DeferredSceneLayer id="physics-module" priority={150} waitForMilestone="physics-preparation:end">
         <DeferredPhysicsPreload />
-      </DeferredSceneLayer>
-      <CommercialMapSceneShaderWarmup />
+      </DeferredSceneLayer></>}
+      <CommercialMapSceneShaderWarmup preparePost={!publicPolicy} />
       <CommercialMapInteractiveBoot />
     </>
   );
@@ -5260,20 +5333,22 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
   } | null>(null);
   if (!initialRenderConfig.current) {
     const initialDirection = new THREE.Vector3(0.04, 0.72, 0.69).normalize();
-    const initialAspect = initialViewport.current.width / Math.max(initialViewport.current.height, 1);
+    const publicViewport = props.publicScenePolicy ? document.querySelector('.public-map-body')?.getBoundingClientRect() : null;
+    const initialAspect = (publicViewport?.width ?? initialViewport.current.width) / Math.max(publicViewport?.height ?? initialViewport.current.height, 1);
+    const initialExtent = props.publicScenePolicy?.focusBounds ?? extent;
     const initialCameraBounds = resolveCommercialMapCameraDistanceBounds({
-      bounds: extent,
+      bounds: initialExtent,
       verticalFovDegrees: 38,
       aspect: initialAspect,
     });
     const requestedInitialDistance = fitDistanceForDirection(
-      extent,
+      initialExtent,
       38,
       initialAspect,
       initialDirection,
       1.1,
     );
-    const initialTarget = new THREE.Vector3(extent.centerX, 0, extent.centerZ);
+    const initialTarget = new THREE.Vector3(initialExtent.centerX, 0, initialExtent.centerZ);
     const initialDistance = THREE.MathUtils.clamp(
       requestedInitialDistance,
       initialCameraBounds.minDistance,
@@ -5327,13 +5402,16 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
       frameloop="demand"
       camera={initialRenderConfig.current.camera}
       dpr={initialPixelRatio}
-      shadows={reducedGraphics ? false : COMMERCIAL_MAP_SHADOW_MAP_CONFIG}
+      shadows={props.publicScenePolicy || reducedGraphics ? false : COMMERCIAL_MAP_SHADOW_MAP_CONFIG}
       gl={createRenderer}
         onCreated={({ gl, scene, camera }) => {
           markCommercialMapStage('canvas-created');
           canvasCleanup.current?.();
           const disposeGestureGuard = registerMapGestureGuard(gl.domElement);
           const disposeDiagnostics = registerCommercialMapRuntimeDiagnostics({ gl, scene, camera });
+          if (commercialMapDiagnosticsEnabled) gl.debug.onShaderError = (context, program, vertex, fragment) => {
+            gl.domElement.dataset.commercialMapShaderError = JSON.stringify({ program: context.getProgramInfoLog(program), vertex: context.getShaderInfoLog(vertex), fragment: context.getShaderInfoLog(fragment) });
+          };
           const renderShadows = gl.shadowMap.render;
           gl.shadowMap.render = (...args: Parameters<typeof renderShadows>) => {
             if (!gl.shadowMap.enabled || (!gl.shadowMap.autoUpdate && !gl.shadowMap.needsUpdate) || !args[0].length) {
@@ -5375,13 +5453,13 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
       {/* Adaptive DPR stays imperative inside the R3F root. Only this child
           owns scene-tier state, so a DPR decision cannot reconfigure Canvas
           and resize the drawing buffer a second time through React props. */}
-      <AdaptiveCommercialMapScene
+      <PublicScenePolicyContext.Provider value={props.publicScenePolicy ?? null}><PublicMaterialPool><AdaptiveCommercialMapScene
         sceneProps={props}
         active={active}
         reducedGraphics={reducedGraphics}
         initialQualityState={initialQualityState}
         capabilityHints={capabilityHints}
-      />
+      /></PublicMaterialPool></PublicScenePolicyContext.Provider>
     </Canvas>
   );
 });

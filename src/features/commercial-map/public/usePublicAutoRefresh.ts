@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useAppBuildFreshness } from './useAppBuildFreshness';
+import { PUBLIC_NAVIGATION_SAVE_EVENT } from './publicNavigation';
 
 const LAST_RELOAD_KEY = 'fenasoja-public-map-auto-reload';
 const MIN_INTERVAL_MS = 10 * 60 * 1000;
@@ -23,6 +24,8 @@ export function usePublicAutoRefresh(blocked: boolean): void {
     if (Date.now() - last < MIN_INTERVAL_MS) return undefined;
 
     const timer = window.setTimeout(() => {
+      if (document.visibilityState !== 'visible') return;
+      window.dispatchEvent(new Event(PUBLIC_NAVIGATION_SAVE_EVENT));
       try { window.sessionStorage.setItem(LAST_RELOAD_KEY, String(Date.now())); } catch { /* sessão indisponível */ }
       window.location.reload();
     }, SETTLE_MS);

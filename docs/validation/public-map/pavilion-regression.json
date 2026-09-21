@@ -1,0 +1,58 @@
+[
+  {
+    "slug": "pavilhao-1",
+    "count": 189,
+    "first": "Lote Módulo 137",
+    "second": "Lote Módulo 140",
+    "canvasMounts": 1,
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":651,\"contextLosses\":0,\"lastErrorCode\":null}"
+  },
+  {
+    "slug": "pavilhao-3",
+    "count": 214,
+    "first": "confirmed",
+    "second": "confirmed",
+    "canvasMounts": 1,
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":644,\"contextLosses\":0,\"lastErrorCode\":null}"
+  },
+  {
+    "slug": "pavilhao-5",
+    "count": 81,
+    "first": "Lote Módulo 01",
+    "second": "Lote Módulo 02",
+    "canvasMounts": 1,
+    "health": "{\"status\":\"ready\",\"path\":\"direct\",\"presentedFrames\":259,\"contextLosses\":0,\"lastErrorCode\":null}"
+  },
+  {
+    "slug": "pavilhao-8",
+    "count": 114,
+    "first": "Lote Módulo 01",
+    "second": "Lote Módulo 02",
+    "canvasMounts": 1,
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":909,\"contextLosses\":0,\"lastErrorCode\":null}"
+  },
+  {
+    "slug": "pavilhao-12",
+    "count": 257,
+    "first": "Lote Módulo 01",
+    "second": "Lote Módulo 02",
+    "canvasMounts": 1,
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":649,\"contextLosses\":0,\"lastErrorCode\":null}"
+  },
+  {
+    "slug": "pavilhao-13",
+    "count": 103,
+    "first": "Lote Módulo 25",
+    "second": "Lote Módulo 26",
+    "canvasMounts": 1,
+    "health": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":622,\"contextLosses\":0,\"lastErrorCode\":null}"
+  },
+  {
+    "slug": "pavilhao-14",
+    "count": 186,
+    "first": "Lote Módulo 01",
+    "second": "Lote Módulo 02",
+    "canvasMounts": 1,
+    "health": "{\"status\":\"ready\",\"path\":\"direct\",\"presentedFrames\":184,\"contextLosses\":0,\"lastErrorCode\":null}"
+  }
+]

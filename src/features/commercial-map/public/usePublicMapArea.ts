@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
+  PublicMapAccessError,
   fetchPublicContext,
   fetchPublicInventory,
   fetchPublicLot,
@@ -8,6 +9,7 @@ import {
   trackPublicMapEvent,
   type PublicTelemetryInput,
 } from './publicMapService';
+import type { CommercialLot } from '../types';
 import type { PublicLot } from './publicMapTypes';
 
 const SESSION_KEY = 'fenasoja-public-map-session';
@@ -40,13 +42,12 @@ export function resolvePublicSessionId(now = Date.now()): string {
 export function usePublicMapInventory(slug: string, token: string) {
   return useQuery({
     queryKey: ['public-map', 'inventory', slug, token],
-    queryFn: () => fetchPublicInventory(slug, token),
+    queryFn: ({ signal }) => fetchPublicInventory(slug, token, signal),
     enabled: Boolean(slug && token),
     // Os dados só são substituídos quando a revisão muda; manter o resultado
     // anterior evita remontar o Canvas e perder câmera/seleção.
-    placeholderData: (previous) => previous,
     staleTime: 5 * 60 * 1000,
-    retry: false,
+    retry: (count, error) => !(error instanceof PublicMapAccessError) && count < 1,
     meta: { persist: false },
   });
 }
@@ -54,17 +55,17 @@ export function usePublicMapInventory(slug: string, token: string) {
 export function usePublicLot(slug: string, token: string, lotId: string | null) {
   return useQuery({
     queryKey: ['public-map', 'lot', slug, token, lotId],
-    queryFn: () => fetchPublicLot(slug, token, lotId as string),
+    queryFn: ({ signal }) => fetchPublicLot(slug, token, lotId as string, signal),
     enabled: Boolean(slug && token && lotId),
     staleTime: 5 * 60 * 1000,
-    retry: false,
+    retry: (count, error) => !(error instanceof PublicMapAccessError) && count < 1,
     meta: { persist: false },
   });
 }
 
 export function usePublicMapTelemetry(slug: string, token: string) {
   const sessionId = useMemo(() => resolvePublicSessionId(), []);
-  const pageViewId = useMemo(() => randomId(), []);
+  const pageViewId = useMemo(() => ({ slug, token, id: randomId() }), [slug, token]);
   const sentOnce = useRef(new Set<string>());
 
   const track = useCallback((
@@ -73,13 +74,13 @@ export function usePublicMapTelemetry(slug: string, token: string) {
   ) => {
     if (!slug || !token) return;
     if (options?.once) {
-      if (sentOnce.current.has(options.once)) return;
-      sentOnce.current.add(options.once);
+      if (sentOnce.current.has(pageViewId.id + options.once)) return;
+      sentOnce.current.add(pageViewId.id + options.once);
     }
     void trackPublicMapEvent(slug, token, {
       eventId: randomId(),
       sessionId,
-      pageViewId,
+      pageViewId: pageViewId.id,
       eventType,
       lotId: options?.lotId ?? null,
       durationSeconds: options?.durationSeconds ?? null,
@@ -100,7 +101,18 @@ export function usePublicMapTelemetry(slug: string, token: string) {
 }
 
 export function usePublicCanvasLots(lots: PublicLot[] | undefined) {
-  return useMemo(() => (lots ?? []).map(toCanvasLot), [lots]);
+  const cache = useRef(new Map<string, { source: PublicLot; value: CommercialLot }>());
+  return useMemo(() => {
+    const next = new Map<string, { source: PublicLot; value: CommercialLot }>();
+    const result = (lots ?? []).map(lot => {
+      const previous = cache.current.get(lot.id);
+      const record = previous?.source === lot ? previous : { source: lot, value: toCanvasLot(lot) };
+      next.set(lot.id, record);
+      return record.value;
+    });
+    cache.current = next;
+    return result;
+  }, [lots]);
 }
 
 /**
@@ -111,11 +123,10 @@ export function usePublicCanvasLots(lots: PublicLot[] | undefined) {
 export function usePublicMapContext(slug: string, token: string) {
   return useQuery({
     queryKey: ['public-map', 'context', slug, token],
-    queryFn: () => fetchPublicContext(slug, token),
+    queryFn: ({ signal }) => fetchPublicContext(slug, token, signal),
     enabled: Boolean(slug && token),
-    placeholderData: (previous) => previous,
     staleTime: 5 * 60 * 1000,
-    retry: false,
+    retry: (count, error) => !(error instanceof PublicMapAccessError) && count < 1,
     meta: { persist: false },
   });
 }

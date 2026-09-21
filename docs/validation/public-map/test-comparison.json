@@ -1,0 +1,426 @@
+{
+  "baseline": {
+    "tests": 2121,
+    "passed": 2030,
+    "failed": 91
+  },
+  "candidate": {
+    "tests": 2135,
+    "passed": 2045,
+    "failed": 90
+  },
+  "newFailures": [
+    {
+      "name": "ambientação dos acessos, Caminho do Bosque e Sede Costeiros mantém superfícies e vegetação independentes, não interativas e com descarte explícito",
+      "file": "test/commercialMapParkAccessEnvironment.test.ts"
+    },
+    {
+      "name": "controlled three-zone vegetation pilot keeps every complete grass tuft within authorized free cells and parking collars",
+      "file": "test/commercialMapVegetationPilot.test.ts"
+    }
+  ],
+  "resolved": [
+    {
+      "name": "NE cloverleaf BR-344 × BR-472 builds a gap-free overpass mesh that never enters the park and never z-fights",
+      "file": "test/commercialMapNeCloverleaf.test.ts"
+    },
+    {
+      "name": "interações da inteligência de patrocínios aplica filtros sobre os 100 registros, ordena a tabela e recupera o estado sem resultados",
+      "file": "test/financialSponsorshipScenarioInteractions.test.tsx"
+    },
+    {
+      "name": "interações da inteligência de patrocínios abre o mesmo drawer controlado pelo Pareto e pela carteira",
+      "file": "test/financialSponsorshipScenarioInteractions.test.tsx"
+    }
+  ],
+  "baselineFailures": [
+    {
+      "name": "Alvorada brand composition presents the unchanged official symbol and a single edition without location bands",
+      "file": "features/alvorada/AlvoradaBrandHero.test.tsx"
+    },
+    {
+      "name": "AgendaMeetingWorkspace bloqueia seed/offline sem fabricar um UUID ou montar captura",
+      "file": "test/agendaMeetingWorkspace.test.tsx"
+    },
+    {
+      "name": "AgendaMeetingWorkspace exige consentimento informado antes de iniciar a sessão canônica",
+      "file": "test/agendaMeetingWorkspace.test.tsx"
+    },
+    {
+      "name": "AgendaMeetingWorkspace expõe estado inequívoco, telemetria real e proteção de captura ativa",
+      "file": "test/agendaMeetingWorkspace.test.tsx"
+    },
+    {
+      "name": "AgendaMeetingWorkspace renderiza conhecimento tipado, lacunas e ações sem superfície de áudio histórico",
+      "file": "test/agendaMeetingWorkspace.test.tsx"
+    },
+    {
+      "name": "integração do portal: ecossistema direto e introdução embutida na contagem abre o Ecossistema Fenasoja diretamente pelo bloco de marca, sem planeta nem alvorada",
+      "file": "test/alvoradaPortalIntegration.test.tsx"
+    },
+    {
+      "name": "referência cartográfica oficial Fenasoja 2026 inclui a rede viária e todas as instâncias repetidas da legenda",
+      "file": "test/commercialMap2026Reference.test.ts"
+    },
+    {
+      "name": "referência cartográfica oficial Fenasoja 2026 mantém os 26 centros sanitários vetoriais oficiais e nenhum volume renderizado",
+      "file": "test/commercialMap2026Reference.test.ts"
+    },
+    {
+      "name": "Arena canônica: implantação, arquitetura e preservação da main 8783fea7 preserva todas as entidades exceto F, os lotes e integralmente o Mirante #151",
+      "file": "test/commercialMapArenaCanonical.test.ts"
+    },
+    {
+      "name": "atmosphere resource lifetime is independent of Hydrological visibility keeps hidden vegetation and electrical geometry on their normal physical inputs",
+      "file": "test/commercialMapAtmospherePersistence.test.tsx"
+    },
+    {
+      "name": "resumo comercial contextual retorna ao segmento e ao parque sem transportar os totais do interior",
+      "file": "test/commercialMapContextualLegend.test.tsx"
+    },
+    {
+      "name": "infraestrutura elétrica cartográfica do Mapa Comercial orienta cruzetas perpendicularmente às cadeias aceitas, incluindo trechos diagonais",
+      "file": "test/commercialMapElectricalInfrastructure.test.ts"
+    },
+    {
+      "name": "infraestrutura elétrica cartográfica do Mapa Comercial apoia cada equipamento em uma superfície existente ou no piso técnico seguro",
+      "file": "test/commercialMapElectricalInfrastructure.test.ts"
+    },
+    {
+      "name": "infraestrutura elétrica cartográfica do Mapa Comercial preserva as 13 âncoras conflitantes e projeta só sua apresentação à fachada livre",
+      "file": "test/commercialMapElectricalInfrastructure.test.ts"
+    },
+    {
+      "name": "infraestrutura elétrica cartográfica do Mapa Comercial mantém todas as fases acima da folga técnica mínima em estruturas existentes",
+      "file": "test/commercialMapElectricalInfrastructure.test.ts"
+    },
+    {
+      "name": "infraestrutura elétrica cartográfica do Mapa Comercial mantém uma única linha batched, geometrias instanciadas e orçamento fixo de draw calls",
+      "file": "test/commercialMapElectricalInfrastructure.test.ts"
+    },
+    {
+      "name": "explorador compartilhado de entidades do mapa comercial expõe somente facetas derivadas dos metadados existentes",
+      "file": "test/commercialMapExplorer.test.ts"
+    },
+    {
+      "name": "C4 / E-06 architecture and selection activity preserves the complete approved official inventory and compound placement",
+      "file": "test/commercialMapExporuralArchitecture.test.ts"
+    },
+    {
+      "name": "fidelidade cartográfica dourada da Exporural 2026.4 preserva os 95 lotes dentro do mesmo perímetro canônico e fora das sete ruas",
+      "file": "test/commercialMapExporuralCartographicFidelity.test.ts"
+    },
+    {
+      "name": "reconstrução arquitetônica de B28 e D1 mantém D1 reta no eixo oficial e orienta sua fachada para leste, diante da Arena",
+      "file": "test/commercialMapFenasojaReferenceStructures.test.ts"
+    },
+    {
+      "name": "regras comerciais e segurança importa somente os lotes e módulos numerados pela planta e os mantém comercialmente bloqueados",
+      "file": "test/commercialMapGeometry.test.ts"
+    },
+    {
+      "name": "história integrada ao painel comercial persistente carrega o conteúdo apenas ao abrir e restaura informações, ações, seleção e foco ao fechar",
+      "file": "test/commercialMapHistory.test.tsx"
+    },
+    {
+      "name": "história integrada ao painel comercial persistente mantém conteúdo comprovado sem foto e não inventa imagem ou data de captura",
+      "file": "test/commercialMapHistory.test.tsx"
+    },
+    {
+      "name": "história integrada ao painel comercial persistente mostra uma foto sem controles de galeria e separa publicação de data fotográfica não confirmada",
+      "file": "test/commercialMapHistory.test.tsx"
+    },
+    {
+      "name": "história integrada ao painel comercial persistente exclui imagens sem correspondência, verificação ou autorização mesmo quando citadas no catálogo",
+      "file": "test/commercialMapHistory.test.tsx"
+    },
+    {
+      "name": "história integrada ao painel comercial persistente navega por botões, teclado e swipe sem propagar gestos ao mapa, carregando só a foto ativa e miniaturas próximas",
+      "file": "test/commercialMapHistory.test.tsx"
+    },
+    {
+      "name": "história integrada ao painel comercial persistente respeita economia de dados, mantém só a miniatura ativa e permite escolher outra imagem",
+      "file": "test/commercialMapHistory.test.tsx"
+    },
+    {
+      "name": "história integrada ao painel comercial persistente abre a foto completa sob demanda e Escape fecha primeiro a ampliação, depois a história com foco recuperado",
+      "file": "test/commercialMapHistory.test.tsx"
+    },
+    {
+      "name": "história integrada ao painel comercial persistente recupera falha fotográfica sem perder texto, fontes ou navegação para outra foto",
+      "file": "test/commercialMapHistory.test.tsx"
+    },
+    {
+      "name": "história integrada ao painel comercial persistente mantém a foto e seu acervo na ampliação mesmo se a miniatura falhar",
+      "file": "test/commercialMapHistory.test.tsx"
+    },
+    {
+      "name": "história integrada ao painel comercial persistente preserva o atalho global de busca dentro da história",
+      "file": "test/commercialMapHistory.test.tsx"
+    },
+    {
+      "name": "história integrada ao painel comercial persistente troca A→B durante a abertura lazy sem exibir história antiga ou substituir o painel",
+      "file": "test/commercialMapHistory.test.tsx"
+    },
+    {
+      "name": "história integrada ao painel comercial persistente preserva permissões de leitura e o estado expansível do painel inferior ao entrar e voltar",
+      "file": "test/commercialMapHistory.test.tsx"
+    },
+    {
+      "name": "história integrada ao painel comercial persistente preserva câmera até o layout de fechamento e retoma resize comercial ou nova seleção",
+      "file": "test/commercialMapHistory.test.tsx"
+    },
+    {
+      "name": "arquitetura independente do Mapa Comercial leva a Gestão ao cabeçalho preservando gates de permissão e modos ativos",
+      "file": "test/commercialMapIndependence.test.ts"
+    },
+    {
+      "name": "arquitetura mobile-first do Mapa Comercial mantém antialias, gestos GIS completos e DPR adaptativo no canvas compartilhado",
+      "file": "test/commercialMapMobileExperience.test.ts"
+    },
+    {
+      "name": "NE cloverleaf BR-344 × BR-472 builds a gap-free overpass mesh that never enters the park and never z-fights",
+      "file": "test/commercialMapNeCloverleaf.test.ts"
+    },
+    {
+      "name": "limpeza estrutural dos blocos não permanentes mantém ruas, quadras, lotes e pavilhões intocados",
+      "file": "test/commercialMapNonPermanentCleanup.test.ts"
+    },
+    {
+      "name": "seleção no painel persistente do mapa comercial recolhe e restaura o resumo sem apagar a seleção nem entrar no interior",
+      "file": "test/commercialMapPanelSelection.test.tsx"
+    },
+    {
+      "name": "seleção no painel persistente do mapa comercial preserva o aside A→B, fecha a edição aberta e inicia o draft real de LotEditDialog com os dados de B",
+      "file": "test/commercialMapPanelSelection.test.tsx"
+    },
+    {
+      "name": "seleção no painel persistente do mapa comercial fecha o modal de Reservar ao trocar a entidade sem substituir o painel",
+      "file": "test/commercialMapPanelSelection.test.tsx"
+    },
+    {
+      "name": "seleção no painel persistente do mapa comercial fecha o modal de Dividir ao trocar a entidade sem substituir o painel",
+      "file": "test/commercialMapPanelSelection.test.tsx"
+    },
+    {
+      "name": "seleção no painel persistente do mapa comercial fecha o modal de Verificar entidade ao trocar a entidade sem substituir o painel",
+      "file": "test/commercialMapPanelSelection.test.tsx"
+    },
+    {
+      "name": "seleção no painel persistente do mapa comercial limpa altura transitória e estado do sheet na seleção e no unmount",
+      "file": "test/commercialMapPanelSelection.test.tsx"
+    },
+    {
+      "name": "Pavilhão 4 — Cozinha da Soja B7 reutiliza os postes frontais e a recepção elétrica oficiais sem duplicá-los",
+      "file": "test/commercialMapPavilionFourSoyKitchen.test.ts"
+    },
+    {
+      "name": "cartão operacional do módulo interno mantém o módulo 'B1' neutro e sem área individual inventada",
+      "file": "test/commercialMapPavilionModuleCard.test.tsx"
+    },
+    {
+      "name": "cartão operacional do módulo interno mantém o módulo 'B2' neutro e sem área individual inventada",
+      "file": "test/commercialMapPavilionModuleCard.test.tsx"
+    },
+    {
+      "name": "cartão operacional do módulo interno mantém o módulo 'B3' neutro e sem área individual inventada",
+      "file": "test/commercialMapPavilionModuleCard.test.tsx"
+    },
+    {
+      "name": "cartão operacional do módulo interno mantém o módulo 'B8' neutro e sem área individual inventada",
+      "file": "test/commercialMapPavilionModuleCard.test.tsx"
+    },
+    {
+      "name": "cartão operacional do módulo interno não converte a área modular total em medida individual",
+      "file": "test/commercialMapPavilionModuleCard.test.tsx"
+    },
+    {
+      "name": "cartão operacional do módulo interno oferece somente operações válidas para um módulo disponível e persistido",
+      "file": "test/commercialMapPavilionModuleCard.test.tsx"
+    },
+    {
+      "name": "cartão operacional do módulo interno expõe versões privadas de contrato no próprio cartão do módulo",
+      "file": "test/commercialMapPavilionModuleCard.test.tsx"
+    },
+    {
+      "name": "cartão operacional do módulo interno não oferece venda direta enquanto o módulo permanece bloqueado",
+      "file": "test/commercialMapPavilionModuleCard.test.tsx"
+    },
+    {
+      "name": "cartão operacional do módulo interno abre no dock com resumo, expande voluntariamente e descarta formulário ao selecionar outro módulo",
+      "file": "test/commercialMapPavilionModuleCard.test.tsx"
+    },
+    {
+      "name": "orientação visual das plantas internas comerciais não intercepta lotes e descarta recursos GPU ao trocar de interior",
+      "file": "test/commercialMapPavilionWayfinding.test.ts"
+    },
+    {
+      "name": "orientação visual das plantas internas comerciais apresenta os acessos como marcadores compactos fixos com rótulo apenas sob interação",
+      "file": "test/commercialMapPavilionWayfinding.test.ts"
+    },
+    {
+      "name": "modelo de apresentação do mapa comercial mantém histerese entre níveis de rótulo durante pequenos movimentos de zoom",
+      "file": "test/commercialMapPresentation.test.ts"
+    },
+    {
+      "name": "modelo de apresentação do mapa comercial mantém os limites exatos e normaliza entradas inválidas da histerese",
+      "file": "test/commercialMapPresentation.test.ts"
+    },
+    {
+      "name": "rodovias regionais — contrato compartilhado e BR-472 exterior expande zoom/pan regionais e mantém o enquadramento padrão no parque",
+      "file": "test/commercialMapRegionalHighways.test.ts"
+    },
+    {
+      "name": "September 13 precision road correction preserves every complete official record except the explicitly shortened road",
+      "file": "test/commercialMapRoadPrecision.test.ts"
+    },
+    {
+      "name": "legenda acessível dos segmentos comerciais apresenta os três segmentos, seus inventários e solicita foco",
+      "file": "test/commercialMapSegmentLegend.test.tsx"
+    },
+    {
+      "name": "commercial site environment presentation layer composes every reusable no-environment mask family and accepts no intersecting cell",
+      "file": "test/commercialMapSiteEnvironment.test.ts"
+    },
+    {
+      "name": "E07 / Montevideo / A9 reference-aligned infrastructure preserves every existing entity except the authorized E07 footprint",
+      "file": "test/commercialMapSoyGateInfrastructure.test.ts"
+    },
+    {
+      "name": "portais comerciais por comissão isola inventário, busca e métricas entre Exporural e Indústria",
+      "file": "test/commissionMapPortals.test.ts"
+    },
+    {
+      "name": "Dashboard executivo do cronograma renderiza indicadores reais e mantém o recorte exato no drill-down",
+      "file": "test/cronogramaDashboardIntegration.test.tsx"
+    },
+    {
+      "name": "integridade do cronograma oficial preserva os totais oficiais por ano e os registros sem data",
+      "file": "test/cronogramaDataIntegrity.test.ts"
+    },
+    {
+      "name": "integridade do cronograma oficial mescla banco e seed sem apagar oficiais ou eventos manuais",
+      "file": "test/cronogramaDataIntegrity.test.ts"
+    },
+    {
+      "name": "cadastro móvel e histórico remove a entrada duplicada do histórico ao desmontar um overlay ainda aberto",
+      "file": "test/cronogramaMobilePresentation.test.tsx"
+    },
+    {
+      "name": "cadastro móvel e histórico mantém o defaultYear informado ao criar um evento sem data",
+      "file": "test/cronogramaMobilePresentation.test.tsx"
+    },
+    {
+      "name": "cadastro móvel e histórico fecha pelo voltar quando limpo e mantém o cadastro quando voltar encontra alterações",
+      "file": "test/cronogramaMobilePresentation.test.tsx"
+    },
+    {
+      "name": "interações do cadastro do cronograma abre o popover desktop, agrupa unidades e busca sem acento pelo contexto institucional",
+      "file": "test/cronogramaRegistrationInteractions.test.tsx"
+    },
+    {
+      "name": "interações do cadastro do cronograma mantém seleção semântica, opera por teclado e gerencia múltiplos responsáveis sem duplicar nome externo",
+      "file": "test/cronogramaRegistrationInteractions.test.tsx"
+    },
+    {
+      "name": "navegador do ciclo na linha do tempo renderiza ano atual, etapas, totais e mantém botões semanticamente focáveis",
+      "file": "test/cronogramaTimeline.test.tsx"
+    },
+    {
+      "name": "navegador do ciclo na linha do tempo seleciona 2027 e 2028 rapidamente, abre o mês correto e não limpa filtros",
+      "file": "test/cronogramaTimeline.test.tsx"
+    },
+    {
+      "name": "navegador do ciclo na linha do tempo mostra contagem filtrada e recuperação explícita sem trocar o ano",
+      "file": "test/cronogramaTimeline.test.tsx"
+    },
+    {
+      "name": "navegador do ciclo na linha do tempo mantém anos sem eventos visíveis, identificados e indisponíveis",
+      "file": "test/cronogramaTimeline.test.tsx"
+    },
+    {
+      "name": "navegador do ciclo na linha do tempo reconcilia uma URL persistida para um ano que ficou indisponível",
+      "file": "test/cronogramaTimeline.test.tsx"
+    },
+    {
+      "name": "navegador do ciclo na linha do tempo Ir para hoje restaura julho de 2026 e atualiza o ano",
+      "file": "test/cronogramaTimeline.test.tsx"
+    },
+    {
+      "name": "navegador do ciclo na linha do tempo restaura ano e mês ao navegar pelo histórico externo",
+      "file": "test/cronogramaTimeline.test.tsx"
+    },
+    {
+      "name": "navegador do ciclo na linha do tempo acompanha rolagem manual e bloqueia realimentação durante navegação programática",
+      "file": "test/cronogramaTimeline.test.tsx"
+    },
+    {
+      "name": "navegador do ciclo na linha do tempo sincroniza filtros temporais com o ano do período principal",
+      "file": "test/cronogramaTimeline.test.tsx"
+    },
+    {
+      "name": "navegador do ciclo na linha do tempo mantém o ano após refetch e abertura de detalhes",
+      "file": "test/cronogramaTimeline.test.tsx"
+    },
+    {
+      "name": "navegador do ciclo na linha do tempo usa movimento reduzido e mantém um único seletor horizontal no mobile",
+      "file": "test/cronogramaTimeline.test.tsx"
+    },
+    {
+      "name": "componentes críticos preservados separa leitura e edição e protege alterações não salvas",
+      "file": "test/cronogramaTimeline.test.tsx"
+    },
+    {
+      "name": "gatilho explícito no detalhe desktop bloqueia cliques repetidos, conclui uma vez e fecha somente após sucesso",
+      "file": "test/eventHarvestCompletion.test.tsx"
+    },
+    {
+      "name": "gatilho explícito no detalhe desktop mantém o detalhe e exibe a falha quando o backend rejeita a conclusão",
+      "file": "test/eventHarvestCompletion.test.tsx"
+    },
+    {
+      "name": "interações da inteligência de patrocínios aplica filtros sobre os 100 registros, ordena a tabela e recupera o estado sem resultados",
+      "file": "test/financialSponsorshipScenarioInteractions.test.tsx"
+    },
+    {
+      "name": "interações da inteligência de patrocínios abre o mesmo drawer controlado pelo Pareto e pela carteira",
+      "file": "test/financialSponsorshipScenarioInteractions.test.tsx"
+    },
+    {
+      "name": "contrato de apresentação de Eventos Restaurante e Arena organiza a navegação em planejamento, gestão e controle",
+      "file": "test/venueEventsPresentation.test.ts"
+    },
+    {
+      "name": "contrato de apresentação de Eventos Restaurante e Arena exibe o seletor de workspaces em duas metades sem ações do hero",
+      "file": "test/venueEventsPresentation.test.ts"
+    },
+    {
+      "name": "contrato de apresentação de Eventos Restaurante e Arena expõe etapas, obrigatoriedade e foco de contexto para tecnologias assistivas",
+      "file": "test/venueEventsPresentation.test.ts"
+    }
+  ],
+  "investigation": {
+    "newFailuresRechecked": {
+      "files": [
+        "commercialMapParkAccessEnvironment.test.ts",
+        "commercialMapVegetationPilot.test.ts"
+      ],
+      "passed": 16,
+      "failed": 0,
+      "notes": "Explicit nullable material disposal guard restored the source contract; vegetation test passed in isolation after contention ceased."
+    },
+    "publicFocused": {
+      "passed": 35,
+      "failed": 0
+    },
+    "typecheck": "passed",
+    "scopedLint": "passed",
+    "build": "passed",
+    "bundleIndependence": "passed"
+  },
+  "publicFocused": {
+    "tests": 37,
+    "passed": 37,
+    "failed": 0
+  }
+}
