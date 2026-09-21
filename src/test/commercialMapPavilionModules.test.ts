@@ -344,7 +344,9 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
           );
           expect(cell.group).toBeTruthy();
           expect(cell.cluster).toBeTruthy();
-          expect(cell.source?.referenceYear).toBe(publicIdentifier === 'B6' ? 2028 : 2026);
+          expect(cell.source?.referenceYear).toBe(
+            publicIdentifier === 'B5' || publicIdentifier === 'B6' ? 2028 : 2026,
+          );
         }
       });
     });
