@@ -1,4 +1,5 @@
 import { ARENA_CANONICAL_LAYOUT } from '../data/arenaCanonicalLayout';
+import { SOY_RESTROOM_PRESENTATION } from './soyGateArchitecture';
 import { SOY_RESTROOM } from '../data/soyGateInfrastructure';
 import type { MapEntity } from '../types';
 import { resolveCrioulosArchitectureEnvelope } from '../data/gateFourDistrict';
@@ -323,7 +324,7 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     focusDirection: [-1, 0.30, 0.12],
     visualHeight: () => 8.35 * FENASOJA_COMPLEX.registration.unitsPerMeter,
   },
-  'E-07': { kind: 'soy-restroom', aliases: ['Sanitários Cozinha da Soja', 'Banheiro Cozinha da Soja', 'Masculino Feminino'], facingRadians: SOY_RESTROOM.facingRadians, focusDirection: [0.96, 0.40, 0.05], visualHeight: () => 0.64 },
+  'E-07': { kind: 'soy-restroom', aliases: ['Sanitários Cozinha da Soja', 'Banheiro Cozinha da Soja', 'Masculino Feminino'], facingRadians: SOY_RESTROOM.facingRadians, focusDirection: [0.96, 0.40, 0.05], visualHeight: () => SOY_RESTROOM_PRESENTATION.visualHeight },
   'RES-A9': { kind: 'gate-nine-tanks', aliases: ['Caixas de água Portão 9', 'Reservatórios Portão 9'], facingRadians: 0, focusDirection: [0.5, 0.4, 0.8], visualHeight: () => 1.47 },
   B13: {
     kind: 'lactalis-cultural-stage',
