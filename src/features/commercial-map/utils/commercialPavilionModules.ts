@@ -67,6 +67,7 @@ export interface NormalizedCommercialPavilionRect {
   centerZ: number;
   width: number;
   depth: number;
+  metricAspectRatio?: number;
 }
 
 /** Pavilion-local X/Z rectangle expressed in the model's world-unit scale. */
@@ -204,6 +205,9 @@ const PAVILION1_PLAN_PRESENTATION: CommercialPavilionInteriorPresentation = {
 };
 
 const PAVILION14_PLAN_PRESENTATION: CommercialPavilionInteriorPresentation = {
+  // Quarter-turn atlas, viewed with the existing -PI/2 interior camera.
+  // Text follows the long cell axis, independently of spatial numbering.
+  moduleLabelRotationRadians: Math.PI,
   mode: 'plan',
   navigationMode: 'locked-plan',
   enableRotate: false,

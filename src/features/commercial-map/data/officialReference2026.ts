@@ -42,6 +42,7 @@ import {
   createCommercialPavilionReferenceProjectionFrame,
   DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION,
   projectCommercialPavilionReferencePoint,
+  projectCommercialPavilionReferenceRect,
   type CommercialPavilionReferenceCell,
   type CommercialPavilionReferenceProjection,
 } from './commercialPavilionReference';
@@ -754,7 +755,7 @@ function pavilionModuleGeometry(
   facingRadians: number,
   projection: CommercialPavilionReferenceProjection,
 ): PolygonGeometry {
-  const projectPoint = pavilionModulePointProjector(pavilion, facingRadians, projection);
+  const projectPoint = pavilionModulePointProjector(pavilion, facingRadians, projection, cell);
   const normalizedFootprint = cell.shape?.footprint ?? [
     [cell.centerX - cell.width / 2, cell.centerZ - cell.depth / 2],
     [cell.centerX + cell.width / 2, cell.centerZ - cell.depth / 2],
@@ -779,6 +780,7 @@ function pavilionModulePointProjector(
   pavilion: MapEntity,
   facingRadians: number,
   projection: CommercialPavilionReferenceProjection,
+  metricCell?: CommercialPavilionReferenceCell,
 ): (point: readonly [number, number]) => Coordinate {
   const ring = pavilion.geometry.coordinates[0];
   const xs = ring.map(([x]) => x);
@@ -802,11 +804,21 @@ function pavilionModulePointProjector(
   );
   const cosine = Math.cos(facingRadians);
   const sine = Math.sin(facingRadians);
+  // Keep reference polygon/picking geometry consistent with the metric cell
+  // containment used by the instanced renderer, without changing persisted IDs.
+  const projectedCell = metricCell?.metricAspectRatio
+    ? projectCommercialPavilionReferenceRect(metricCell, projectionFrame) : null;
+  const rawCell = projectedCell && metricCell
+    ? projectCommercialPavilionReferenceRect({ ...metricCell, metricAspectRatio: undefined }, projectionFrame) : null;
   return (point) => {
-    const [localX, localZ] = projectCommercialPavilionReferencePoint(
+    let [localX, localZ] = projectCommercialPavilionReferencePoint(
       point,
       projectionFrame,
     );
+    if (projectedCell && rawCell) {
+      localX = rawCell.centerX + (localX - rawCell.centerX) * projectedCell.width / rawCell.width;
+      localZ = rawCell.centerZ + (localZ - rawCell.centerZ) * projectedCell.depth / rawCell.depth;
+    }
     return [
       centerX + localX * cosine + localZ * sine,
       centerZ - localX * sine + localZ * cosine,

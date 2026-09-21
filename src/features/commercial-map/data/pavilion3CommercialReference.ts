@@ -137,7 +137,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     id: 'perimeter-37-40',
     label: 'Módulos 37–40',
     role: 'perimeter',
-    bounds: rect(0.285, 0.91, 0.18, 0.075),
+    bounds: rect(0.285, 0.91, 4 / 32 + 3 * PAVILION3_COMMERCIAL_MODULE_GAP, 3 / 44.48),
     numberRange: [37, 40],
     orientation: 'north-south',
     sequenceOrientation: 'x-increasing',
@@ -148,7 +148,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     id: 'perimeter-41-47',
     label: 'Módulos 41–47',
     role: 'perimeter',
-    bounds: rect(0.64, 0.91, 0.3, 0.075),
+    bounds: rect(0.64, 0.91, 7 / 32 + 6 * PAVILION3_COMMERCIAL_MODULE_GAP, 3 / 44.48),
     numberRange: [41, 47],
     orientation: 'north-south',
     sequenceOrientation: 'x-increasing',
@@ -162,7 +162,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     bounds: rect(0.3275, PAIRED_COLUMN_CENTER_Z, 0.095, PAIRED_COLUMN_DEPTH),
     numberRange: [48, 79],
     orientation: 'east-west',
-    sequenceOrientation: 'z-decreasing',
+    sequenceOrientation: 'z-increasing',
     group: 'island-1',
     cluster: 'island-1-east-column',
   },
@@ -173,7 +173,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     bounds: rect(0.4325, PAIRED_COLUMN_CENTER_Z, 0.095, PAIRED_COLUMN_DEPTH),
     numberRange: [80, 111],
     orientation: 'east-west',
-    sequenceOrientation: 'z-increasing',
+    sequenceOrientation: 'z-decreasing',
     group: 'island-1',
     cluster: 'island-1-west-column',
   },
@@ -184,7 +184,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     bounds: rect(0.5975, PAIRED_COLUMN_CENTER_Z, 0.095, PAIRED_COLUMN_DEPTH),
     numberRange: [112, 143],
     orientation: 'east-west',
-    sequenceOrientation: 'z-decreasing',
+    sequenceOrientation: 'z-increasing',
     group: 'island-2',
     cluster: 'island-2-east-column',
   },
@@ -195,7 +195,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     bounds: rect(0.7025, PAIRED_COLUMN_CENTER_Z, 0.095, PAIRED_COLUMN_DEPTH),
     numberRange: [144, 175],
     orientation: 'east-west',
-    sequenceOrientation: 'z-increasing',
+    sequenceOrientation: 'z-decreasing',
     group: 'island-2',
     cluster: 'island-2-west-column',
   },
@@ -334,7 +334,11 @@ export const PAVILION3_COMMERCIAL_REFERENCE_CELLS =
     sourceDocument: SOURCE_DOCUMENT,
     referenceYear: 2028,
     shapeForNumber: (number) => number === 36 ? PAVILION3_MODULE_36_SHAPE : null,
-  });
+  }).map((cell) => cell.number >= 37 && cell.number <= 47
+    // 1 x 3 m in the same 32 x 44.48 m reference frame. Contain the
+    // metric aspect at projection time without changing the traced shell,
+    // corridors, other cells or the special lot 36.
+    ? { ...cell, metricAspectRatio: 1 / 3 } : cell);
 
 if (PAVILION3_COMMERCIAL_REFERENCE_CELLS.length !== 214) {
   throw new Error(

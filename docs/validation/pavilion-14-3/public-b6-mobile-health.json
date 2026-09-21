@@ -1,0 +1,19 @@
+{
+  "canvas": {
+    "commercialMapCameraDiagnostics": "{\"position\":[4.6909,11.2524,21.4385],\"target\":[4.6909,0.1102,21.0982],\"quaternion\":[-0.696228,0,0,0.717821],\"controlsEnabled\":true,\"interiorEntityId\":\"reference:2026:b6\",\"fov\":42,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.025,\"far\":133.706,\"distance\":11.1473,\"minDistance\":1.7827,\"maxDistance\":511.2739,\"desiredMinDistance\":1.7827,\"desiredMaxDistance\":12.8134,\"calculatedMaxDistance\":511.2739,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":2.6248431688452625,\"diagonal\":198.05951217035},\"boundingSphereRadius\":73.6257,\"viewport\":{\"width\":328.9473571777344,\"height\":529.4270629882812,\"aspect\":0.62133,\"dpr\":1.13}}",
+    "commercialMapCameraTransition": "{\"status\":\"completed\",\"source\":\"interior:reference:2026:b6\",\"sequence\":1,\"startedAt\":4413.4,\"durationMs\":120,\"completedAt\":4615.2,\"elapsedMs\":201.8}",
+    "commercialMapEssentialReady": "true",
+    "commercialMapHydration": "complete",
+    "commercialMapInteractive": "true",
+    "commercialMapInteriorShaderWarmup": "{\"durationMs\":0.5,\"programsBefore\":119,\"programsAfter\":119,\"error\":null}",
+    "commercialMapQuality": "{\"logicalTier\":\"HIGH\",\"sceneTier\":\"HIGH\",\"baseDpr\":1.13,\"effectiveDpr\":1.13,\"hardwareCeiling\":\"HIGH\",\"reason\":\"viewport-sync\"}",
+    "commercialMapRain": "{\"blend\":0,\"night\":0,\"tier\":\"HIGH\",\"drops\":3000,\"splashes\":0,\"runoff\":0,\"puddles\":0,\"wetMaterials\":65}",
+    "commercialMapReady": "true",
+    "commercialMapRenderHealth": "{\"status\":\"ready\",\"path\":\"direct\",\"presentedFrames\":187,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "commercialMapSceneWarmup": "{\"durationMs\":249.69999998807907,\"parallel\":true}",
+    "commercialMapShaderCompilation": "{\"startedAt\":4402,\"durationMs\":0.5,\"programsBefore\":56,\"programsAfter\":56,\"geometries\":0,\"textures\":0}",
+    "engine": "three.js r170",
+    "exteriorReport": "{\"buildings\":22,\"trees\":111,\"used\":[\"H02\",\"H03\",\"H04\",\"H05\",\"H06\",\"H08\",\"H09\",\"H10\",\"H15\",\"H17\",\"R03\",\"R04\",\"R05\"],\"groundTriangles\":507,\"architectures\":3192,\"vegetation\":11840,\"draws\":28,\"lods\":{\"map\":10,\"far\":18}}"
+  },
+  "errors": "[]"
+}

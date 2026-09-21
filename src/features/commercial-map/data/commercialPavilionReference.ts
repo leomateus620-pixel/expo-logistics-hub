@@ -38,6 +38,8 @@ export interface CommercialPavilionInteriorPresentation {
   showAreaInsideModule?: boolean;
   boundedPan?: boolean;
   boundedZoom?: boolean;
+  /** Absolute atlas angle; independent from camera and numbering direction. */
+  moduleLabelRotationRadians?: number;
 }
 
 export interface CommercialPavilionReferenceProjection {
@@ -74,6 +76,8 @@ export interface CommercialPavilionReferenceRect {
   centerZ: number;
   width: number;
   depth: number;
+  /** Opt-in metric proportions contained in the projected rectangle. */
+  metricAspectRatio?: number;
 }
 
 export type CommercialPavilionReferencePoint = readonly [x: number, z: number];
@@ -240,11 +244,16 @@ export function projectCommercialPavilionReferenceRect(
     rect,
     frame.coordinateTransform,
   );
+  const width = transformed.width * frame.width;
+  const depth = transformed.depth * frame.depth;
+  const aspect = rect.metricAspectRatio === undefined ? undefined
+    : frame.coordinateTransform === 'quarter-turn-clockwise'
+      ? 1 / rect.metricAspectRatio : rect.metricAspectRatio;
   return {
     centerX: frame.centerX + (transformed.centerX - 0.5) * frame.width,
     centerZ: frame.centerZ + (transformed.centerZ - 0.5) * frame.depth,
-    width: transformed.width * frame.width,
-    depth: transformed.depth * frame.depth,
+    width: aspect === undefined ? width : Math.min(width, depth * aspect),
+    depth: aspect === undefined ? depth : Math.min(depth, width / aspect),
   };
 }
 

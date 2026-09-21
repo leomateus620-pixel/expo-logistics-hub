@@ -320,6 +320,10 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
           'width',
           'zoneId',
         ];
+        if (publicIdentifier === 'B6' && cell.number >= 37 && cell.number <= 47) {
+          officialReferenceKeys.push('metricAspectRatio');
+          officialReferenceKeys.sort();
+        }
         expect(Object.keys(cell).sort()).toEqual(
           OFFICIAL_REFERENCE_PAVILIONS.has(publicIdentifier)
             ? cell.shape
@@ -429,10 +433,11 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
       Array.from({ length: 32 }, (_, index) => pavilion3Cell(112 + index)),
       Array.from({ length: 32 }, (_, index) => pavilion3Cell(144 + index)),
     ];
-    expectStrictlyDecreasing(columns[0].map((cell) => cell.centerZ));
-    expectStrictlyIncreasing(columns[1].map((cell) => cell.centerZ));
-    expectStrictlyDecreasing(columns[2].map((cell) => cell.centerZ));
-    expectStrictlyIncreasing(columns[3].map((cell) => cell.centerZ));
+    // In the canonical view, the top of the official plan is source +Z.
+    expectStrictlyIncreasing(columns[0].map((cell) => cell.centerZ));
+    expectStrictlyDecreasing(columns[1].map((cell) => cell.centerZ));
+    expectStrictlyIncreasing(columns[2].map((cell) => cell.centerZ));
+    expectStrictlyDecreasing(columns[3].map((cell) => cell.centerZ));
     columns.forEach((column) => {
       expect(column).toHaveLength(32);
       expect(new Set(column.map((cell) => cell.centerX)).size).toBe(1);
@@ -742,9 +747,9 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     const west = [107, 108, 109, 110, 111].map(pavilion3Cell);
 
     expect(new Set(east.map((cell) => cell.centerX)).size).toBe(1);
-    expectStrictlyDecreasing(east.map((cell) => cell.centerZ));
+    expectStrictlyIncreasing(east.map((cell) => cell.centerZ));
     expect(new Set(west.map((cell) => cell.centerX)).size).toBe(1);
-    expectStrictlyIncreasing(west.map((cell) => cell.centerZ));
+    expectStrictlyDecreasing(west.map((cell) => cell.centerZ));
     expect(west[0].centerX).toBeGreaterThan(east[0].centerX);
     expect(edges(east[0]).right).toBeLessThan(edges(west[0]).left);
 
