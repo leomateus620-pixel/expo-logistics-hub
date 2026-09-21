@@ -92,11 +92,12 @@ const EXPECTED_PLANS = {
     pavilionNumber: 3,
     category: 'Indústria e Comércio',
     moduleCount: 214,
-    totalAreaSquareMeters: 1423.66,
+    totalAreaSquareMeters: 1423,
     moduleAreaSquareMeters: 663,
     ranges: [
       [1, 19],
-      [20, 36],
+      [20, 35],
+      [36, 36],
       [37, 40],
       [41, 47],
       [48, 79],
@@ -343,7 +344,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
           );
           expect(cell.group).toBeTruthy();
           expect(cell.cluster).toBeTruthy();
-          expect(cell.source?.referenceYear).toBe(2026);
+          expect(cell.source?.referenceYear).toBe(publicIdentifier === 'B6' ? 2028 : 2026);
         }
       });
     });
@@ -734,7 +735,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     expect(cell(94).centerZ).toBeGreaterThan(cell(123).centerZ);
   });
 
-  it('espelha as extremidades das colunas pareadas de Pavilhão 3', () => {
+  it('pareia as extremidades das colunas do Pavilhão 3 conforme a planta 2028', () => {
     const east = [48, 49, 50, 51, 52].map(pavilion3Cell);
     const west = [107, 108, 109, 110, 111].map(pavilion3Cell);
 
@@ -742,8 +743,8 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     expectStrictlyDecreasing(east.map((cell) => cell.centerZ));
     expect(new Set(west.map((cell) => cell.centerX)).size).toBe(1);
     expectStrictlyIncreasing(west.map((cell) => cell.centerZ));
-    expect(east[0].centerX).toBeGreaterThan(west[0].centerX);
-    expect(edges(west[0]).right).toBeLessThan(edges(east[0]).left);
+    expect(west[0].centerX).toBeGreaterThan(east[0].centerX);
+    expect(edges(east[0]).right).toBeLessThan(edges(west[0]).left);
 
     expect(pavilion3Cell(48).centerZ).toBeCloseTo(pavilion3Cell(111).centerZ, 12);
     expect(pavilion3Cell(49).centerZ).toBeCloseTo(pavilion3Cell(110).centerZ, 12);
@@ -794,7 +795,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
       .filter((cell) => cell.source?.discrepancy === 'official-range-omission')
       .map((cell) => cell.number);
     expect(discrepancyNumbers).toEqual([]);
-    expect(plan.cells.every((cell) => cell.source?.referenceYear === 2026)).toBe(true);
+    expect(plan.cells.every((cell) => cell.source?.referenceYear === 2028)).toBe(true);
 
     const exposedLabels = [
       ...plan.zones.map((zone) => zone.label),

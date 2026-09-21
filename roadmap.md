@@ -52,3 +52,11 @@
 - [x] Ícone/branding Fenasoja na notificação
 - [x] Testes do conteúdo do aviso
 - Não publicar (pedido do usuário)
+
+## Pavilhão 3 / B6 — planta oficial Fenasoja 2028
+- [ ] Corrigir a numeração/âncoras das quatro colunas centrais conforme a planta oficial
+- [ ] Modelar B6-M036 como lote único em L de 24,00 m²
+- [ ] Atualizar totais, fonte documental e revisão somente do B6
+- [ ] Reconciliar geometrias e áreas persistidas preservando IDs, status, preços e histórico
+- [ ] Validar renderização, hit-test, rota pública, desktop/mobile e testes
+- Não publicar (pedido do usuário)

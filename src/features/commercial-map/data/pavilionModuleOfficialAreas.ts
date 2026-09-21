@@ -17,7 +17,7 @@ export const PAVILION_MODULE_AREA_REVISION = '2026.4-pavilion-module-areas.1' as
 
 export const PAVILION_MODULE_AREA_SOURCE_DOCUMENTS = {
   B1: 'Pavilhao_01_Lotes_e_Metragens.pdf',
-  B6: 'Pavilhao_03_Lotes_e_Metragens.pdf',
+  B6: 'Planta Pavilhão 3 — Fenasoja 2028 (desenho set/2026).pdf',
   B8: 'Pavilhao_05_Lotes_e_Metragens.pdf',
   B10: 'Pavilhao_07_Lotes_e_Metragens.pdf',
   B4: 'Pavilhao_08_Lotes_e_Metragens.pdf',

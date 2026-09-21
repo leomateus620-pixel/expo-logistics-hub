@@ -167,7 +167,10 @@ describe('contrato persistido dos Pavilhões 1, 3 e 5', () => {
   it('mantém IDs e sequências; trata o frame p5.1 como snapshot supersedido por p5.2', () => {
     expect(parsedRuns).toHaveLength(20);
 
-    for (const [pavilionIdentifier, reference] of Object.entries(references)) {
+    // B6 foi supersedido pela planta oficial 2028 e possui contrato dedicado.
+    for (const [pavilionIdentifier, reference] of Object.entries(references).filter(
+      ([identifier]) => identifier !== 'B6',
+    )) {
       const sqlRuns = parsedRuns.filter((run) => run.pavilionIdentifier === pavilionIdentifier);
       const regularReferenceRuns = reference.runs.filter((run) => (
         pavilionIdentifier !== 'B1' || run.id !== 'northeast-141'
