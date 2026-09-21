@@ -286,7 +286,7 @@ export const PAVILION13_MODULE_METRIC_FOOTPRINTS = {
   78: [
     [0, 0],
     [6, 0],
-    [3, 3],
+    [6, 3],
     [3, 3],
   ],
   79: [
