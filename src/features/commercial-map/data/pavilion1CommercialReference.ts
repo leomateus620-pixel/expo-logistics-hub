@@ -100,7 +100,7 @@ export const PAVILION1_COMMERCIAL_REFERENCE_RUNS = [
     id: 'northeast-141',
     label: 'Módulo 141',
     role: 'perimeter',
-    bounds: PROJECT.rect(48, 0, 4.7, 4.5),
+    bounds: PROJECT.rect(48, 0, 4.5, 4.5),
     numberRange: [141, 141],
     orientation: 'east-west',
     sequenceOrientation: 'x-increasing',
@@ -193,17 +193,17 @@ export const PAVILION1_COMMERCIAL_WALL_ACCESSES = [
 const MODULE_141_SHAPE: CommercialPavilionReferenceCellShape = {
   footprint: PROJECT.polygon([
     [48, 0],
-    [52.7, 0],
-    [52.7, 4.5],
-    [49.2, 4.5],
-    [49.2, 3],
+    [52.5, 0],
+    [52.5, 4.5],
+    [49.5, 4.5],
+    [49.5, 3],
     [48, 3],
   ]),
   renderParts: [
-    PROJECT.rect(48, 0, 4.7, 3),
-    PROJECT.rect(49.2, 3, 3.5, 1.5),
+    PROJECT.rect(48, 0, 4.5, 3),
+    PROJECT.rect(49.5, 3, 3, 1.5),
   ],
-  labelAnchor: PROJECT.point(50.35, 1.5),
+  labelAnchor: PROJECT.point(50.25, 1.5),
 };
 
 export const PAVILION1_COMMERCIAL_REFERENCE_CELLS =
@@ -228,7 +228,7 @@ export const PAVILION1_COMMERCIAL_REFERENCE = {
   category: 'Indústria, Comércio e Serviços',
   moduleCount: 189,
   totalAreaM2: 1201.5,
-  modularAreaM2: 587.85,
+  modularAreaM2: 586.5,
   individualAreaM2: null,
   moduleGap: PAVILION1_COMMERCIAL_MODULE_GAP,
   projection: PAVILION1_COMMERCIAL_REFERENCE_PROJECTION,

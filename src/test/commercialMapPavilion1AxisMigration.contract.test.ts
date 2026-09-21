@@ -55,7 +55,7 @@ describe('migration da projeção oficial do Pavilhão 1', () => {
       metricDepthM: 22.84,
     });
     expect(PAVILION1_COMMERCIAL_REFERENCE.moduleCount).toBe(189);
-    expect(PAVILION1_COMMERCIAL_REFERENCE.modularAreaM2).toBe(587.85);
+    expect(PAVILION1_COMMERCIAL_REFERENCE.modularAreaM2).toBe(586.5);
 
     expect(sql).toContain('least(clear_width / 22.84, clear_depth / 52.70)');
     expect(sql).toContain('22.84 * uniform_scale as frame_width');

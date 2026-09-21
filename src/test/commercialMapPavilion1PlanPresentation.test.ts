@@ -27,7 +27,7 @@ describe('planta comercial fixa do Pavilhão 1', () => {
     });
     expect(plan.projection).toEqual(PAVILION1_COMMERCIAL_REFERENCE_PROJECTION);
     expect(PAVILION1_COMMERCIAL_REFERENCE.moduleCount).toBe(189);
-    expect(PAVILION1_COMMERCIAL_REFERENCE.modularAreaM2).toBe(587.85);
+    expect(PAVILION1_COMMERCIAL_REFERENCE.modularAreaM2).toBe(586.5);
     expect(plan.cells).toHaveLength(189);
     expect(plan.zones.map((zone) => zone.numberRange)).toEqual([
       [1, 6], [7, 57], [58, 58], [59, 64],
@@ -58,11 +58,11 @@ describe('planta comercial fixa do Pavilhão 1', () => {
     const module141 = COMMERCIAL_PAVILION_MODULE_PLANS.B1.cells.find((cell) => cell.number === 141);
 
     expect(module141?.id).toBe('B1:module:141');
-    expect(module141?.areaM2).toBe(19.35);
+    expect(module141?.areaM2).toBe(18);
     expect(module141?.shape?.footprint).toHaveLength(6);
     expect(module141?.shape?.renderParts).toHaveLength(2);
     expect(module141?.labelAnchor).toEqual(module141?.shape?.labelAnchor);
-    expect(module141?.labelAnchor?.[0]).toBeCloseTo(0.02 + (50.35 / 52.7) * 0.96, 12);
+    expect(module141?.labelAnchor?.[0]).toBeCloseTo(0.02 + (50.25 / 52.7) * 0.96, 12);
     expect(module141?.labelAnchor?.[1]).toBeCloseTo(0.02 + (1.5 / 22.84) * 0.96, 12);
   });
 

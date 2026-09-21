@@ -13,7 +13,7 @@
  * Os valores são áreas em m², nunca lados, preços ou cotas de corredor.
  */
 
-export const PAVILION_MODULE_AREA_REVISION = '2026.4-pavilion-module-areas.1' as const;
+export const PAVILION_MODULE_AREA_REVISION = '2026.4-pavilion-module-areas.2' as const;
 
 export const PAVILION_MODULE_AREA_SOURCE_DOCUMENTS = {
   B1: 'Pavilhao_01_Lotes_e_Metragens.pdf',
@@ -78,7 +78,7 @@ const PAVILION_AREA_PLANS: readonly PavilionAreaPlan[] = [
     pavilionId: 'B1',
     pavilionNumber: 1,
     moduleCount: 189,
-    expectedTotalSqm: 587.85,
+    expectedTotalSqm: 586.5,
     bands: [
       {
         ranges: [[1, 57], [65, 140], [142, 189]],
@@ -100,9 +100,9 @@ const PAVILION_AREA_PLANS: readonly PavilionAreaPlan[] = [
       },
       {
         ranges: [[141, 141]],
-        areaSqm: 19.35,
+        areaSqm: 18,
         evidence: 'written',
-        method: 'Área escrita no croqui; recorte em L: 4,7 × 4,5 − 1,2 × 1,5',
+        method: 'Área oficial; recorte em L: 4,5 × 4,5 − 1,5 × 1,5',
       },
     ],
   },
