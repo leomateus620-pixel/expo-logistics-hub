@@ -127,7 +127,10 @@ describe('contrato persistido dos Pavilhões 8 e 13', () => {
     expect(sql).toContain("21.70, 35.40, 0.00, round(pi()::numeric, 6), 'center', 'end'");
     expect(sql).toContain("21.00, 35.35, 0.00, round(pi()::numeric, 6), 'center', 'end'");
 
-    for (const [pavilionIdentifier, reference] of Object.entries(references)) {
+    // B5 foi supersedido pela planta oficial 2028 e possui contrato dedicado.
+    for (const [pavilionIdentifier, reference] of Object.entries(references).filter(
+      ([identifier]) => identifier !== 'B5',
+    )) {
       const runs = parsedRuns.filter((run) => run.pavilionIdentifier === pavilionIdentifier);
       expect(runs).toHaveLength(reference.runs.length);
       reference.runs.forEach((expectedRun) => {
