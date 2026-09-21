@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { resolveModuleInteractionState } from '@/features/commercial-map/components/canvas/CommercialPavilionModuleLayer';
+import {
+  resolveModuleInteractionState,
+  resolveModuleVisualGeometry,
+} from '@/features/commercial-map/components/canvas/CommercialPavilionModuleLayer';
 import type { CommercialPavilionModuleVisualState } from '@/features/commercial-map/utils/pavilionModuleCommercial';
 
 function state(cellId: string, lotId: string): CommercialPavilionModuleVisualState {
@@ -56,5 +59,15 @@ describe('seleção visual compartilhada dos módulos comerciais', () => {
       'B5:module:030',
       new Set(),
     )).toEqual({ inCart: false, isSelected: true, isHovered: false });
+  });
+
+  it.each([
+    [{ inCart: false, isSelected: false, isHovered: false }, false, { heightScale: 1, footprintScaleX: 0.91, footprintScaleZ: 0.9 }],
+    [{ inCart: false, isSelected: false, isHovered: true }, false, { heightScale: 1.14, footprintScaleX: 0.955, footprintScaleZ: 0.945 }],
+    [{ inCart: false, isSelected: true, isHovered: false }, false, { heightScale: 1.34, footprintScaleX: 0.955, footprintScaleZ: 0.945 }],
+    [{ inCart: true, isSelected: true, isHovered: false }, false, { heightScale: 1.42, footprintScaleX: 0.955, footprintScaleZ: 0.945 }],
+    [{ inCart: true, isSelected: true, isHovered: false }, true, { heightScale: 1, footprintScaleX: 0.955, footprintScaleZ: 0.945 }],
+  ] as const)('resolve a mesma geometria visual para qualquer tipo de módulo', (interaction, flatModules, expected) => {
+    expect(resolveModuleVisualGeometry(interaction, flatModules)).toEqual(expected);
   });
 });

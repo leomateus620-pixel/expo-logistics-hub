@@ -62,8 +62,11 @@ describe('renderer operacional do interior comercial', () => {
     const layer = read('src/features/commercial-map/components/canvas/CommercialPavilionModuleLayer.tsx');
 
     expect(layer.match(/resolveModuleInteractionState\(/g)).toHaveLength(3);
+    expect(layer.match(/resolveModuleVisualGeometry\(/g)).toHaveLength(3);
     expect(layer).toContain('salesSelectedLotIds.has(moduleState.lotId)');
     expect(layer).toMatch(/projectedIrregularModules\.map[\s\S]*?resolveModuleInteractionState\(/);
+    expect(layer).toMatch(/projectedIrregularModules\.map[\s\S]*?resolveModuleVisualGeometry\(/);
+    expect(layer).not.toContain('heightScale > 1');
     expect(layer).toContain('module.footprint.forEach');
     expect(layer).toContain('new THREE.ExtrudeGeometry(shape');
     expect(layer).not.toMatch(/module\.cell\.id\s*===\s*['"]B[1456]/);
