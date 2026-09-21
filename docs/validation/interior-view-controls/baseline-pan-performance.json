@@ -1,0 +1,18 @@
+{
+  "canvas": {
+    "commercialMapCameraDiagnostics": "{\"position\":[0.439,12.1861,13.7982],\"target\":[1.4029,0.4651,15.312],\"quaternion\":[0.201047,0.7185,0.624347,-0.231365],\"controlsEnabled\":true,\"interiorEntityId\":\"reference:2026:b6\",\"fov\":36,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.025,\"far\":138.274,\"distance\":11.8577,\"minDistance\":1.8437,\"maxDistance\":13.2513,\"desiredMinDistance\":1.8437,\"desiredMaxDistance\":13.2513,\"calculatedMaxDistance\":328.6701,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":6.2,\"diagonal\":198.05951217035},\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1351,\"height\":724,\"aspect\":1.86602,\"dpr\":0.72}}",
+    "commercialMapCameraTransition": "{\"status\":\"completed\",\"source\":\"interior:reference:2026:b6\",\"sequence\":10,\"startedAt\":46290.5,\"durationMs\":120,\"completedAt\":47004.2,\"elapsedMs\":713.7}",
+    "commercialMapEssentialReady": "true",
+    "commercialMapInteractive": "true",
+    "commercialMapQuality": "{\"logicalTier\":\"HIGH\",\"sceneTier\":\"HIGH\",\"baseDpr\":1,\"effectiveDpr\":0.72,\"hardwareCeiling\":\"HIGH\",\"reason\":\"viewport-sync\"}",
+    "commercialMapRain": "{\"blend\":0,\"night\":0,\"tier\":\"HIGH\",\"drops\":3000,\"splashes\":122,\"runoff\":128,\"puddles\":64,\"wetMaterials\":545}",
+    "commercialMapReady": "true",
+    "commercialMapRenderHealth": "{\"status\":\"ready\",\"path\":\"direct\",\"presentedFrames\":84,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "commercialMapRendererInfo": "{\"at\":98727.30000001192,\"calls\":10,\"triangles\":5450,\"geometries\":6,\"textures\":3,\"programs\":193,\"dpr\":0.72,\"width\":972,\"height\":521,\"heapBytes\":247323751,\"qualityTier\":\"HIGH\",\"gpuVendor\":\"Google Inc. (Intel)\",\"gpuRenderer\":\"ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)\"}",
+    "commercialMapSceneWarmup": "{\"durationMs\":387.0999999642372,\"parallel\":true}",
+    "commercialMapShaderCompilation": "{\"startedAt\":15660.8,\"durationMs\":0.3,\"programsBefore\":92,\"programsAfter\":92,\"geometries\":0,\"textures\":0}",
+    "engine": "three.js r170",
+    "exteriorReport": "{\"buildings\":22,\"trees\":111,\"used\":[\"H02\",\"H03\",\"H04\",\"H05\",\"H06\",\"H08\",\"H09\",\"H10\",\"H15\",\"H17\",\"R03\",\"R04\",\"R05\"],\"groundTriangles\":507,\"architectures\":4616,\"vegetation\":28952,\"draws\":28,\"lods\":{\"map\":24,\"near\":2,\"far\":2}}"
+  },
+  "performance": "{\"sampledFrames\":28,\"averageFrameTimeMs\":1013.31,\"p95FrameTimeMs\":1017,\"p50FrameTimeMs\":1016.3,\"p99FrameTimeMs\":1017.1,\"averageFps\":1,\"inverseP99FpsApproximation\":1,\"stallsOver250Ms\":28,\"stallDurationMs\":28372.699999999997,\"jankFrames\":28,\"longTasks\":0,\"reactCommits\":11,\"qualityChanges\":0,\"contextLost\":0,\"contextRestored\":0,\"renderer\":{\"at\":98727.30000001192,\"calls\":10,\"triangles\":5450,\"geometries\":6,\"textures\":3,\"programs\":193,\"dpr\":0.72,\"width\":972,\"height\":521,\"heapBytes\":247323751,\"qualityTier\":\"HIGH\",\"gpuVendor\":\"Google Inc. (Intel)\",\"gpuRenderer\":\"ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)\"}}"
+}

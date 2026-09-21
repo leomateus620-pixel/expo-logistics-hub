@@ -1,0 +1,10 @@
+{
+  "camera": "{\"position\":[-18.0844,3.3553,22.0006],\"target\":[-18.0844,0.1036,21.8705],\"quaternion\":[-0.692824,0,0,0.721107],\"controlsEnabled\":true,\"interiorEntityId\":\"reference:2026:b2\",\"fov\":36,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":-0.04834254143646409},\"near\":0.025,\"far\":120,\"distance\":3.2543,\"minDistance\":1.4241,\"maxDistance\":10.2358,\"desiredMinDistance\":1.4241,\"desiredMaxDistance\":10.2358,\"calculatedMaxDistance\":328.6701,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":6.2,\"diagonal\":198.05951217035},\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1351,\"height\":724,\"aspect\":1.86602,\"dpr\":1}}",
+  "panels": [
+    {
+      "height": 24,
+      "width": 280
+    }
+  ],
+  "selection": "B2:module:076"
+}

@@ -1,3 +1,4 @@
+import type { InteriorViewAction, InteriorViewCommand } from '../hooks/useInteriorCameraRequest';
 import { create } from 'zustand';
 import type {
   CameraPreset,
@@ -72,6 +73,8 @@ const PARKING_INSPECTION_MODE = {
   interiorEntityId: null,
   interiorReturnView: null,
   interiorReturnContext: null,
+  interiorViewCommand: null,
+  interiorViewOrientation: null,
   selectedHydrologicalElementId: null,
   hydrologicalModeActive: false,
   activePanel: null,
@@ -85,6 +88,10 @@ interface CommercialMapState {
   interiorEntityId: string | null;
   interiorReturnView: CommercialMapCameraView | null;
   interiorReturnContext: InteriorReturnContext | null;
+  interiorViewCommand: InteriorViewCommand | null;
+  interiorViewSequence: number;
+  interiorViewOrientation: 'vertical' | 'horizontal' | null;
+  requestInteriorView: (entityId: string, action: InteriorViewAction) => void;
   hoveredEntityId: string | null;
   hoveredModuleId: string | null;
   selectedModuleId: string | null;
@@ -213,6 +220,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   interiorEntityId: null,
   interiorReturnView: null,
   interiorReturnContext: null,
+  interiorViewCommand: null,
+  interiorViewOrientation: null,
   hoveredEntityId: null,
   hoveredModuleId: null,
   selectedModuleId: null,
@@ -279,6 +288,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
       interiorEntityId: null,
       interiorReturnView: null,
       interiorReturnContext: null,
+      interiorViewCommand: null,
+      interiorViewOrientation: null,
       hoveredEntityId: null,
       hoveredModuleId: null,
       selectedModuleId: null,
@@ -340,6 +351,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
           hoveredModuleId: null,
           selectedModuleId: null,
           interiorEntityId: selectedEntityId,
+          interiorViewCommand: null,
+          interiorViewOrientation: null,
           interiorReturnView: state.interiorEntityId ? state.interiorReturnView : null,
           interiorReturnContext: state.interiorReturnContext ?? {
             activeSegmentId: state.activeSegmentId,
@@ -363,6 +376,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     hoveredModuleId: null,
     selectedModuleId: null,
     interiorEntityId: selectedEntityId,
+    interiorViewCommand: null,
+    interiorViewOrientation: null,
     // Keep the camera captured on the first interior entry so a chain such as
     // P13 -> P8 -> P12 still returns to the exact same map view.
     interiorReturnView: state.interiorReturnView,
@@ -376,6 +391,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     ...state.interiorReturnContext,
     interiorEntityId: null,
     interiorReturnContext: null,
+    interiorViewCommand: null,
+    interiorViewOrientation: null,
     hoveredModuleId: null,
     selectedModuleId: null,
     activePanel: state.selectedEntityId ? 'details' : null,
@@ -383,6 +400,14 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     cameraNavigating: false,
     cameraSequence: state.cameraSequence + 1,
   })),
+  interiorViewSequence: 0,
+  requestInteriorView: (entityId, action) => set((state) => state.interiorEntityId !== entityId
+    ? state
+    : {
+        interiorViewCommand: { entityId, action, requestId: state.interiorViewSequence + 1 },
+        interiorViewSequence: state.interiorViewSequence + 1,
+        interiorViewOrientation: action === 'inspect' ? state.interiorViewOrientation : action,
+      }),
   setInteriorReturnView: (interiorReturnView) => set({ interiorReturnView }),
   setHoveredEntityId: (hoveredEntityId) => set((state) => (
     state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning ? state : { hoveredEntityId }
@@ -428,6 +453,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     interiorEntityId: null,
     interiorReturnView: null,
     interiorReturnContext: null,
+    interiorViewCommand: null,
+    interiorViewOrientation: null,
     activePanel: 'details',
     workspaceMode: '3d',
     cameraSequence: state.cameraSequence + 1,
@@ -470,6 +497,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     interiorEntityId: null,
     interiorReturnView: null,
     interiorReturnContext: null,
+    interiorViewCommand: null,
+    interiorViewOrientation: null,
   })),
   requestSegmentFocus: (activeSegmentId) => set((state) => ({
     ...CLEARED_PARKING_INSPECTION,
@@ -483,6 +512,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     interiorEntityId: null,
     interiorReturnView: null,
     interiorReturnContext: null,
+    interiorViewCommand: null,
+    interiorViewOrientation: null,
     cameraNavigating: false,
     cameraSequence: state.workspaceMode === 'list' ? state.cameraSequence : state.cameraSequence + 1,
   })),
@@ -496,6 +527,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     interiorEntityId: null,
     interiorReturnView: null,
     interiorReturnContext: null,
+    interiorViewCommand: null,
+    interiorViewOrientation: null,
     activePanel: null,
     cameraPreset: 'overview',
     cameraNavigating: false,
@@ -530,6 +563,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
       interiorEntityId: null,
       interiorReturnView: null,
       interiorReturnContext: null,
+      interiorViewCommand: null,
+      interiorViewOrientation: null,
       hoveredEntityId: null,
       hoveredModuleId: null,
       selectedModuleId: null,

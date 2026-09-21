@@ -1,3 +1,5 @@
+import { InteriorViewControls } from '../InteriorViewControls';
+import { clampInteriorPan, resolveInteriorView, interpolateInteriorOrbit } from '../../utils/interiorView';
 import { publicLotOutlinePositions } from '../../public/publicLotOutline';
 import { PUBLIC_NAVIGATION_SAVE_EVENT, savePublicNavigation, type PublicNavigation } from '../../public/publicNavigation';
 import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
@@ -2216,6 +2218,10 @@ function CameraRig({
   const previousSelection = useRef<string | null>(selectedEntity?.id ?? null);
   const previousInterior = useRef<string | null>(null);
   const previousInteriorFrame = useRef<InteriorCameraRequest | null>(null);
+  const interiorCommand = useCommercialMapStore(state => state.interiorViewCommand);
+  const consumedInteriorCommand = useRef(0);
+  const interiorOverview = useRef<'vertical' | 'horizontal' | null>(null);
+  const interiorOrbitScratch = useRef({ from: new THREE.Spherical(), to: new THREE.Spherical(), offset: new THREE.Vector3() });
   const previousSegment = useRef(activeSegment?.id ?? null);
   const previousDetailsLayout = useRef(activePanel === 'details');
   const previousParking = useRef({
@@ -2309,14 +2315,7 @@ function CameraRig({
     if (interiorEntity) {
       const bounds = interiorFrame?.panBounds;
       if (!bounds) return;
-      const local = cameraScratch.current.interiorTarget.copy(target).sub(bounds.center)
-        .applyAxisAngle(transitionScratch.current.up, -bounds.facing);
-      local.set(
-        THREE.MathUtils.clamp(local.x, bounds.min[0], bounds.max[0]),
-        THREE.MathUtils.clamp(local.y, bounds.min[1], bounds.max[1]),
-        THREE.MathUtils.clamp(local.z, bounds.min[2], bounds.max[2]),
-      );
-      target.copy(local.applyAxisAngle(transitionScratch.current.up, bounds.facing).add(bounds.center));
+      clampInteriorPan(position, target, bounds, cameraScratch.current.interiorTarget, cameraScratch.current.targetShift);
       return;
     }
     const framingExtent = parkingActive
@@ -2581,6 +2580,7 @@ function CameraRig({
         travel,
         typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches),
       );
+      if (source.startsWith('interior-view:')) transition.durationMs = Math.min(320, transition.durationMs);
       gl.domElement.dataset.commercialMapCameraTransition = JSON.stringify({
         status: 'running',
         source,
@@ -2747,7 +2747,7 @@ function CameraRig({
   useEffect(() => {
     if (lunarCameraLockedRef.current || !(camera instanceof THREE.PerspectiveCamera)) return;
     if (interiorEntity && !interiorFrame) return;
-    if (navigation.current.active || navigation.current.settling) {
+    if (navigation.current.active || navigation.current.settling || (interiorFrame?.pavilion && preserveManualView.current)) {
       const activeTarget = controlsRef.current?.target ?? targetLookAt.current;
       const currentDistance = camera.position.distanceTo(activeTarget);
       setAppliedControlLimits((previous) => ({
@@ -3113,6 +3113,17 @@ function CameraRig({
   const queueInterior = useCallback(() => {
     if (!interiorFrame) return;
     setParkingControlLimits(null);
+    const overview = interiorOverview.current && resolveInteriorView({
+      frame: interiorFrame, action: interiorOverview.current, position: camera.position,
+      target: controlsRef.current?.target ?? interiorFrame.target, selectedModuleId: null,
+      width: size.width, height: size.height, insets: readContextualViewportInsets(gl.domElement),
+    });
+    if (overview) {
+      targetPosition.current.copy(overview.position);
+      targetLookAt.current.copy(overview.target);
+      startCameraMove(interiorFrame.minDistance, interiorFrame.maxDistance, true, overview, `interior-view:${interiorFrame.entityId}:refit`);
+      return;
+    }
     targetPosition.current.copy(interiorFrame.position);
     targetLookAt.current.copy(interiorFrame.target);
     const contextualLens = fitCameraAboveContextualPanel(
@@ -3120,7 +3131,7 @@ function CameraRig({
       readContextualViewportInsets(gl.domElement), interiorFrame.maxDistance,
     );
     startCameraMove(interiorFrame.minDistance, interiorFrame.maxDistance, true, { ...interiorFrame, ...contextualLens }, `interior:${interiorFrame.entityId}`);
-  }, [gl, interiorFrame, size.height, size.width, startCameraMove]);
+  }, [camera, gl, interiorFrame, size.height, size.width, startCameraMove]);
 
   resizeRefitView.current = () => {
     // A panel can change the free screen center without changing the user's
@@ -3488,7 +3499,14 @@ function CameraRig({
           interiorReturnLens.current = { fov: camera.fov, near: camera.near, far: camera.far, zoom: camera.zoom, viewOffset: readContextualCameraViewOffset(camera) };
         }
       }
-      if (interiorFrame && (interiorChanged || interiorFrame !== previousInteriorFrame.current)) queueInterior();
+      if (interiorChanged) {
+        cancelCameraTransition(true);
+        interiorOverview.current = null;
+      }
+      const geometryChanged = interiorFrame?.pavilion
+        ? interiorFrame.pavilion.key !== previousInteriorFrame.current?.pavilion?.key
+        : interiorFrame !== previousInteriorFrame.current;
+      if (interiorFrame && (interiorChanged || geometryChanged)) queueInterior();
       previousInterior.current = interiorId;
       previousInteriorFrame.current = interiorFrame;
       previousSelection.current = selectedId;
@@ -3647,10 +3665,33 @@ function CameraRig({
     startCameraMove,
   ]);
 
+  useLayoutEffect(() => {
+    if (!interiorFrame?.pavilion || !interiorCommand
+      || interiorCommand.entityId !== interiorEntity?.id
+      || interiorCommand.requestId <= consumedInteriorCommand.current) return;
+    consumedInteriorCommand.current = interiorCommand.requestId;
+    cancelScheduledResizeRefit();
+    pendingResizeRefit.current = false;
+    const frame = resolveInteriorView({
+      frame: interiorFrame, action: interiorCommand.action, position: camera.position,
+      target: controlsRef.current?.target ?? interiorFrame.target,
+      selectedModuleId: useCommercialMapStore.getState().selectedModuleId,
+      width: size.width, height: size.height, insets: readContextualViewportInsets(gl.domElement),
+    });
+    if (!frame) return;
+    targetPosition.current.copy(frame.position);
+    targetLookAt.current.copy(frame.target);
+    if (interiorCommand.action !== 'inspect') interiorOverview.current = interiorCommand.action;
+    startCameraMove(interiorFrame.minDistance, interiorFrame.maxDistance, true, frame,
+      `interior-view:${interiorFrame.entityId}:${interiorCommand.action}:${interiorCommand.requestId}`);
+    preserveManualView.current = interiorCommand.action === 'inspect';
+  }, [camera, cancelScheduledResizeRefit, gl, interiorCommand, interiorEntity?.id, interiorFrame, size.width, size.height, startCameraMove]);
+
   useEffect(() => {
     const previous = previousViewportSize.current;
-    const resized = Math.abs(previous.width - size.width) >= 2
-      || Math.abs(previous.height - size.height) >= 2;
+    const resizeThreshold = interiorFrame?.pavilion ? 24 : 2;
+    const resized = Math.abs(previous.width - size.width) >= resizeThreshold
+      || Math.abs(previous.height - size.height) >= resizeThreshold;
 
     if (!resized || !initialized.current) return undefined;
     previousViewportSize.current = { width: size.width, height: size.height };
@@ -3661,6 +3702,7 @@ function CameraRig({
     return undefined;
   }, [
     scheduleResizeRefit,
+    interiorFrame?.pavilion,
     size.height,
     size.width,
     lunarCameraLocked,
@@ -4215,27 +4257,34 @@ function CameraRig({
           now - transition.startedAt,
           transition.durationMs,
         );
-        perspective.position.lerpVectors(
-          transition.fromPosition,
-          transition.toPosition,
-          progress,
-        );
-        perspective.quaternion.slerpQuaternions(
-          transition.fromQuaternion,
-          transition.toQuaternion,
-          progress,
-        );
-        stabilizeCameraTransitionUp(
-          perspective.quaternion,
-          perspective.up,
-          transitionScratch.current.direction,
-          transitionScratch.current.matrix,
-        );
-        controls?.target.lerpVectors(
-          transition.fromTarget,
-          transition.toTarget,
-          progress,
-        );
+        if (transition.source.startsWith(`interior-view:${interiorEntity?.id}:`)) {
+          interpolateInteriorOrbit(transition.fromPosition, transition.fromTarget,
+            transition.toPosition, transition.toTarget, progress, perspective.position,
+            controls?.target ?? targetLookAt.current, interiorOrbitScratch.current);
+          perspective.lookAt(controls?.target ?? targetLookAt.current);
+        } else {
+          perspective.position.lerpVectors(
+            transition.fromPosition,
+            transition.toPosition,
+            progress,
+          );
+          perspective.quaternion.slerpQuaternions(
+            transition.fromQuaternion,
+            transition.toQuaternion,
+            progress,
+          );
+          stabilizeCameraTransitionUp(
+            perspective.quaternion,
+            perspective.up,
+            transitionScratch.current.direction,
+            transitionScratch.current.matrix,
+          );
+          controls?.target.lerpVectors(
+            transition.fromTarget,
+            transition.toTarget,
+            progress,
+          );
+        }
         perspective.fov = THREE.MathUtils.lerp(
           transition.fromLens.fov,
           transition.toLens.fov,
@@ -4293,12 +4342,16 @@ function CameraRig({
             completedAt: Number(now.toFixed(2)),
             elapsedMs: Number((now - transition.startedAt).toFixed(2)),
           });
+          const completedDistance = perspective.position.distanceTo(transition.toTarget);
           setAppliedControlLimits({
-            minDistance: effectiveControlsMinimumDistance,
-            maxDistance: effectiveControlsMaximumDistance,
+            minDistance: preserveManualView.current ? Math.min(effectiveControlsMinimumDistance, completedDistance) : effectiveControlsMinimumDistance,
+            maxDistance: preserveManualView.current ? Math.max(effectiveControlsMaximumDistance, completedDistance) : effectiveControlsMaximumDistance,
           });
           setAppliedAngles(desiredAngles);
           writeCameraDiagnostics(true);
+          // Demand rendering needs a final frame after controls synchronize
+          // matrixWorld so HTML access markers settle at the completed pose.
+          invalidate();
         } else {
           writeCameraDiagnostics();
           invalidate();
@@ -4337,7 +4390,8 @@ function CameraRig({
         invalidate();
       }
     }
-  });
+  // Controls update at -1; project DOM labels only after this camera pose.
+  }, -0.5);
 
   return (
     <OrbitControls
@@ -5396,6 +5450,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
   }, []);
 
   return (
+    <>
     <Canvas
       className="commercial-map-canvas"
       events={createCommercialMapEvents}
@@ -5461,5 +5516,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
         capabilityHints={capabilityHints}
       /></PublicMaterialPool></PublicScenePolicyContext.Provider>
     </Canvas>
+    <InteriorViewControls entities={entities} active={active} />
+    </>
   );
 });

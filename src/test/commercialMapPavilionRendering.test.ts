@@ -54,7 +54,9 @@ describe('renderização compartilhada dos módulos internos', () => {
     expect(canvas).toContain('setCameraNavigating(false)');
     expect(interior).toContain('useInteriorCameraRequest(request)');
     expect(interior).toContain('mode="interior"');
-    expect(interior).toContain('labelRotationRadians={interiorViewRotation}');
+    expect(interior).toContain('labelRotationRadians={labelRotation}');
+    expect(interior).toContain('screenAlignedLabels={viewOrientation !== null}');
+    expect(interior).toContain(': interiorViewRotation;');
     expect(interior).toContain('interiorViewRotation={interiorViewRotation}');
     expect(interior).toContain('applyAxisAngle(UP, facing + interiorViewRotation)');
     expect(exterior).not.toContain('labelRotationRadians=');

@@ -1,3 +1,4 @@
+import { pavilionViewRotation } from '../../utils/interiorView';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import { useInteriorCameraRequest, type InteriorCameraRequest } from '../../hooks/useInteriorCameraRequest';
@@ -218,6 +219,19 @@ function PavilionInteriorCameraRig({
     const planToWorld = (x: number, y: number, z: number) => (
       new THREE.Vector3(x, y, z).applyAxisAngle(UP, facing).add(center)
     );
+    const definition = resolveCommercialPavilionDefinition(entity)!;
+    const projection = createCommercialPavilionModuleProjectionFrame(plan, {
+      width: layout.interior.clearWidth, depth: layout.interior.clearDepth,
+    });
+    const modules = plan.cells.map(cell => {
+      const rect = projectCommercialPavilionModuleRect(cell, projection);
+      return { id: cell.id, center: planToWorld(rect.centerX, layout.interior.floorY, rect.centerZ), width: rect.width, depth: rect.depth };
+    });
+    const pavilion = {
+      key: JSON.stringify([entity.id, center.toArray(), facing, layout.width, layout.depth, layout.interior.floorY, interiorViewRotation, modules]),
+      facing, defaultRotation: interiorViewRotation, readingAxis: definition.interiorReadingAxis,
+      width: layout.width, depth: layout.depth, modules,
+    };
     const maximumDimension = Math.max(layout.width, layout.depth);
     const compact = size.width < 720 || size.height < 540;
     const portrait = size.height > size.width * 1.12;
@@ -242,6 +256,7 @@ function PavilionInteriorCameraRig({
       const panMarginZ = envelopeDepth * 0.35;
       return {
         entityId: entity.id,
+        pavilion,
         position: toWorld(0, layout.interior.floorY + fitDistance, maximumDimension * 0.05),
         target: toWorld(0, layout.interior.floorY, 0),
         fov,
@@ -275,6 +290,7 @@ function PavilionInteriorCameraRig({
     }
     return {
       entityId: entity.id,
+      pavilion,
       position: toWorld(0, maximumDimension * (portrait ? 1.95 : compact ? 1.72 : 1.5), maximumDimension * (portrait ? 0.18 : 0.24)),
       target: toWorld(0, layout.interior.floorY, 0),
       fov: portrait ? 47 : compact ? 44 : 40,
@@ -318,6 +334,10 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const facing = strategicLandmarkFacingRadians(entity);
   const interiorViewRotation = commercialPavilionInteriorViewRotationRadians(entity);
+  const viewOrientation = useCommercialMapStore(state => state.interiorEntityId === entity.id ? state.interiorViewOrientation : null);
+  const labelRotation = definition && viewOrientation
+    ? pavilionViewRotation({ readingAxis: definition.interiorReadingAxis, defaultRotation: interiorViewRotation }, viewOrientation)
+    : interiorViewRotation;
   const physicalModelBounds = useMemo(
     () => commercialPavilionModelBounds(bounds, facing),
     [bounds, facing],
@@ -491,7 +511,8 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
           moduleStateById={moduleStateById}
           matchingEntityIds={matchingEntityIds}
           filtersActive={filtersActive}
-          labelRotationRadians={interiorViewRotation}
+          labelRotationRadians={labelRotation}
+          screenAlignedLabels={viewOrientation !== null}
         />
         <CommercialPavilionWayfindingLayer
           layout={layout}

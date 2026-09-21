@@ -1,0 +1,17 @@
+{
+  "commit": "eee1fc0d90db0640c003050070c9a79f0928b7a3",
+  "files": 5,
+  "passedFiles": 1,
+  "failedFiles": 4,
+  "tests": 46,
+  "passed": 33,
+  "failed": 13,
+  "failingFiles": {
+    "commercialMapContextualLegend.test.tsx": 1,
+    "commercialMapPavilionFourSoyKitchen.test.ts": 1,
+    "commercialMapPavilionModuleCard.test.tsx": 9,
+    "commercialMapPavilionWayfinding.test.ts": 2
+  },
+  "passedFile": "commercialMapPavilionRendering.test.ts",
+  "durationSeconds": 4.28
+}

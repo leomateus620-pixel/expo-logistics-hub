@@ -1,9 +1,26 @@
 import { createContext, useContext, useLayoutEffect, type Dispatch, type SetStateAction } from 'react';
 import type { Vector3 } from 'three';
 
+export type InteriorViewAction = 'vertical' | 'horizontal' | 'inspect';
+export interface InteriorViewCommand {
+  entityId: string;
+  action: InteriorViewAction;
+  requestId: number;
+}
+export interface PavilionCameraGeometry {
+  key: string;
+  facing: number;
+  defaultRotation: number;
+  readingAxis: 'x' | 'z';
+  width: number;
+  depth: number;
+  modules: readonly { id: string; center: Vector3; width: number; depth: number }[];
+}
+
 /** Interior scenes describe a view; only the persistent CameraRig may move it. */
 export interface InteriorCameraRequest {
   entityId: string;
+  pavilion?: PavilionCameraGeometry;
   position: Vector3;
   target: Vector3;
   fov: number;

@@ -1,0 +1,19 @@
+/* The wrapper occupies only its buttons; surrounding map gestures pass through. */
+.commercial-map-interior-view-controls {
+  position: absolute; z-index: 24;
+  top: max(10px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right));
+  display: flex; gap: 4px; padding: 4px; border-radius: 12px;
+  background: rgba(255,255,255,.96); box-shadow: 0 3px 16px #163e2924;
+  pointer-events: none;
+}
+.commercial-map-interior-view-controls button {
+  pointer-events: auto; display: flex; align-items: center; justify-content: center;
+  gap: 5px; min-width: 44px; min-height: 44px; padding: 6px 9px;
+  border-radius: 8px; color: #254e3a; font-size: 11px; font-weight: 700;
+}
+.commercial-map-interior-view-controls button:hover { background: #e7f1e8; }
+.commercial-map-interior-view-controls button:focus-visible { outline: 3px solid #207449; outline-offset: 1px; }
+@media (max-width: 720px) {
+  .commercial-map-interior-view-controls { gap: 0; padding: 3px; }
+  .commercial-map-interior-view-controls button { flex-direction: column; gap: 2px; padding: 4px 7px; font-size: 9px; }
+}

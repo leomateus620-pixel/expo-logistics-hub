@@ -39,6 +39,7 @@ interface CommercialPavilionModuleLayerProps {
   filtersActive?: boolean;
   /** Keeps plan labels upright for the pavilion's canonical interior viewpoint. */
   labelRotationRadians?: number;
+  screenAlignedLabels?: boolean;
 }
 
 const EMPTY_MODULE_STATE = new Map<string, CommercialPavilionModuleVisualState>();
@@ -238,6 +239,7 @@ function createModuleNumberTexture(
   labelRotationRadians: number,
   viewportWidth: number,
   pixelRatio: number,
+  screenAlignedLabels = false,
 ) {
   if (typeof document === 'undefined') return null;
   const aspect = Math.max(0.25, layout.interior.clearWidth / layout.interior.clearDepth);
@@ -299,12 +301,13 @@ function createModuleNumberTexture(
         visualSequenceOrientation?.startsWith('z-')
         && cellHeight > cellWidth * 0.86
       );
-    const explicitLabelRotation = plan.interiorPresentation?.moduleLabelRotationRadians;
+    // Explicit shortcuts own screen reading, while entry keeps the approved atlas.
+    const explicitLabelRotation = screenAlignedLabels ? -labelRotationRadians : plan.interiorPresentation?.moduleLabelRotationRadians;
     const labelAlongDepth = explicitLabelRotation === undefined ? isDepthOriented
       : Math.abs(Math.sin(explicitLabelRotation)) > Math.abs(Math.cos(explicitLabelRotation));
     const usableWidth = labelAlongDepth ? cellHeight : cellWidth;
     const usableHeight = labelAlongDepth ? cellWidth : cellHeight;
-    const fontSize = Math.floor(THREE.MathUtils.clamp(
+    let fontSize = Math.floor(THREE.MathUtils.clamp(
       Math.min(
         usableWidth * (maximumPriority ? 0.62 : 0.42),
         usableHeight * (maximumPriority ? 0.72 : 0.5),
@@ -332,6 +335,10 @@ function createModuleNumberTexture(
 
     if (fontSize < 7) return;
     context.font = `${maximumPriority ? 900 : 800} ${fontSize}px Inter, Arial, sans-serif`;
+    if (screenAlignedLabels) {
+      fontSize *= Math.min(1, usableWidth * 0.78 / Math.max(1, context.measureText(cell.label).width));
+      context.font = `${maximumPriority ? 900 : 800} ${fontSize}px Inter, Arial, sans-serif`;
+    }
     context.lineWidth = Math.max(1.5, fontSize * (maximumPriority ? 0.24 : 0.18));
     context.strokeStyle = maximumPriority
       ? 'rgba(255, 255, 252, 1)'
@@ -403,7 +410,7 @@ function createModuleNumberTexture(
 
     if (fontSize >= 7 && lines.length > 0) {
       context.translate(projectedSupport.centerX, projectedSupport.centerY);
-      context.rotate(labelRotationRadians);
+      context.rotate(screenAlignedLabels ? -labelRotationRadians : labelRotationRadians);
       context.font = `800 ${fontSize}px Inter, Arial, sans-serif`;
       context.lineWidth = Math.max(1.5, fontSize * 0.16);
       context.strokeStyle = 'rgba(247, 250, 245, 0.94)';
@@ -444,6 +451,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   matchingEntityIds,
   filtersActive = false,
   labelRotationRadians = 0,
+  screenAlignedLabels = false,
 }: CommercialPavilionModuleLayerProps) {
   const interactive = mode === 'interior';
   const [moduleBaseMesh, setModuleBaseMesh] = useDisposableInstancedMeshRef();
@@ -520,8 +528,9 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       labelRotationRadians,
       viewportSize.width,
       gl.getPixelRatio(),
+      screenAlignedLabels,
     ),
-    [gl, labelRotationRadians, layout, plan, reducedGraphics, viewportSize.width],
+    [gl, labelRotationRadians, screenAlignedLabels, layout, plan, reducedGraphics, viewportSize.width],
   );
   const moduleMaterial = useMemo(() => new THREE.MeshStandardMaterial({
     color: '#ffffff',

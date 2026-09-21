@@ -24,14 +24,21 @@ export function resolveContextualViewportInsets(viewport: ViewportRect, panels: 
   return insets;
 }
 
-export const COMMERCIAL_MAP_OBSTRUCTION_SELECTOR = '[data-commercial-map-camera-obstruction], .commercial-map-details-panel, .commercial-map-contextual-panel';
+export const COMMERCIAL_MAP_OBSTRUCTION_SELECTOR = '[data-commercial-map-camera-obstruction], .commercial-map-details-panel, .commercial-map-contextual-panel, .public-map-details';
 
 export function readContextualViewportInsets(canvas: HTMLCanvasElement): ContextualViewportInsets {
-  const shell = canvas.closest('.commercial-map-shell') ?? canvas.parentElement;
+  const shell = canvas.closest('.commercial-map-shell, .public-map-shell, [data-interior-qa-shell]') ?? canvas.parentElement;
   const panels = Array.from(shell?.querySelectorAll<HTMLElement>(COMMERCIAL_MAP_OBSTRUCTION_SELECTOR) ?? [])
     .filter((panel) => panel.getClientRects().length > 0 && getComputedStyle(panel).visibility !== 'hidden')
     .map((panel) => panel.getBoundingClientRect());
-  return resolveContextualViewportInsets(canvas.getBoundingClientRect(), panels);
+  const viewport = canvas.getBoundingClientRect();
+  const insets = resolveContextualViewportInsets(viewport, panels);
+  const controls = shell?.querySelector<HTMLElement>('[data-commercial-map-interior-controls]');
+  if (controls?.getClientRects().length) {
+    const rect = controls.getBoundingClientRect();
+    insets.top = Math.max(0, Math.min(viewport.height * 0.3, rect.bottom - viewport.top + 8));
+  }
+  return insets;
 }
 
 export interface ContextualCameraViewOffset { x: number; y: number }
