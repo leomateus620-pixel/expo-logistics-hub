@@ -14,11 +14,11 @@ export type Pavilion13CommercialReferenceCell =
   CommercialPavilionReferenceCell<'B5'>;
 
 /**
- * Official internal plan: 21.00 m x 35.35 m. The origin is the north-west
+ * Official internal plan: 19.80 m x 37.80 m. The origin is the north-west
  * corner of the drawing and the two public entrances remain on the south edge.
  */
-const PROJECT = createCommercialPavilionMetricProjector(21, 35.35, 0);
-const SOURCE_DOCUMENT = 'Croqui Pavilhão 13 - Fenasoja 2026_page-0001.jpg' as const;
+const PROJECT = createCommercialPavilionMetricProjector(19.8, 37.8, 0);
+const SOURCE_DOCUMENT = 'Planta Pavilhão 13 — Fenasoja 2028 (desenho set/2026).pdf' as const;
 
 /** Official cadastral divisions meet; the renderer supplies the visual joint. */
 export const PAVILION13_COMMERCIAL_MODULE_GAP = 0;
@@ -26,8 +26,8 @@ export const PAVILION13_COMMERCIAL_MODULE_GAP = 0;
 export const PAVILION13_COMMERCIAL_REFERENCE_PROJECTION = {
   coordinateTransform: 'identity',
   fit: 'metric-contain',
-  metricWidthM: 21,
-  metricDepthM: 35.35,
+  metricWidthM: 19.8,
+  metricDepthM: 37.8,
   alignX: 'center',
   alignZ: 'end',
 } as const satisfies CommercialPavilionReferenceProjection;
@@ -37,7 +37,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_RUNS = [
     id: 'east-lower-01-15',
     label: 'Módulos 01–15',
     role: 'perimeter',
-    bounds: PROJECT.rect(18, 20.35, 3, 15),
+    bounds: PROJECT.rect(16.8, 22.8, 3, 15),
     numberRange: [1, 15],
     orientation: 'east-west',
     sequenceOrientation: 'z-decreasing',
@@ -48,7 +48,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_RUNS = [
     id: 'east-upper-16-24',
     label: 'Módulos 16–24',
     role: 'perimeter',
-    bounds: PROJECT.rect(18, 5.65, 3, 9),
+    bounds: PROJECT.rect(16.8, 6, 3, 9),
     numberRange: [16, 24],
     orientation: 'east-west',
     sequenceOrientation: 'z-decreasing',
@@ -59,7 +59,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_RUNS = [
     id: 'northeast-irregular-25',
     label: 'Módulo 25',
     role: 'perimeter',
-    bounds: PROJECT.rect(18, 0, 3, 5.65),
+    bounds: PROJECT.rect(16.8, 0, 3, 6),
     numberRange: [25, 25],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
@@ -70,7 +70,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_RUNS = [
     id: 'northeast-irregular-26',
     label: 'Módulo 26',
     role: 'perimeter',
-    bounds: PROJECT.rect(14.6, 0, 6.4, 3),
+    bounds: PROJECT.rect(13.8, 0, 6, 3),
     numberRange: [26, 26],
     orientation: 'north-south',
     sequenceOrientation: 'x-increasing',
@@ -81,7 +81,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_RUNS = [
     id: 'north-27-29',
     label: 'Módulos 27–29',
     role: 'perimeter',
-    bounds: PROJECT.rect(9, 0, 3, 3),
+    bounds: PROJECT.rect(8.4, 0, 3, 3),
     numberRange: [27, 29],
     orientation: 'north-south',
     sequenceOrientation: 'x-decreasing',
@@ -92,7 +92,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_RUNS = [
     id: 'central-east-30-53',
     label: 'Módulos 30–53',
     role: 'island',
-    bounds: PROJECT.rect(10.5, 6.8, 3, 24),
+    bounds: PROJECT.rect(9.9, 9.25, 3, 24),
     numberRange: [30, 53],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
@@ -103,7 +103,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_RUNS = [
     id: 'central-west-54-77',
     label: 'Módulos 54–77',
     role: 'island',
-    bounds: PROJECT.rect(7.5, 6.8, 3, 24),
+    bounds: PROJECT.rect(6.9, 9.25, 3, 24),
     numberRange: [54, 77],
     orientation: 'east-west',
     sequenceOrientation: 'z-decreasing',
@@ -114,7 +114,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_RUNS = [
     id: 'northwest-irregular-78',
     label: 'Módulo 78',
     role: 'perimeter',
-    bounds: PROJECT.rect(0, 0, 6.4, 3),
+    bounds: PROJECT.rect(0, 0, 6, 3),
     numberRange: [78, 78],
     orientation: 'north-south',
     sequenceOrientation: 'x-increasing',
@@ -125,7 +125,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_RUNS = [
     id: 'northwest-irregular-79',
     label: 'Módulo 79',
     role: 'perimeter',
-    bounds: PROJECT.rect(0, 0, 3, 5.65),
+    bounds: PROJECT.rect(0, 0, 3, 6),
     numberRange: [79, 79],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
@@ -136,7 +136,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_RUNS = [
     id: 'west-upper-80-88',
     label: 'Módulos 80–88',
     role: 'perimeter',
-    bounds: PROJECT.rect(0, 5.65, 3, 9),
+    bounds: PROJECT.rect(0, 6, 3, 9),
     numberRange: [80, 88],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
@@ -147,7 +147,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_RUNS = [
     id: 'west-lower-89-103',
     label: 'Módulos 89–103',
     role: 'perimeter',
-    bounds: PROJECT.rect(0, 20.35, 3, 15),
+    bounds: PROJECT.rect(0, 22.8, 3, 15),
     numberRange: [89, 103],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
@@ -161,49 +161,49 @@ export const PAVILION13_COMMERCIAL_REFERENCE_CORRIDORS = [
     id: 'northwest-entry',
     label: 'Acesso norte',
     kind: 'access',
-    ...PROJECT.rect(6.4, 0, 2.6, 3),
+    ...PROJECT.rect(6, 0, 2.4, 3),
   },
   {
     id: 'northeast-entry',
     label: 'Acesso norte',
     kind: 'access',
-    ...PROJECT.rect(12, 0, 2.6, 3),
+    ...PROJECT.rect(11.4, 0, 2.4, 3),
   },
   {
     id: 'north-distribution',
     label: 'Circulação norte',
     kind: 'cross',
-    ...PROJECT.rect(3, 3, 15, 3.8),
+    ...PROJECT.rect(3, 6, 13.8, 3.25),
   },
   {
     id: 'west-main-aisle',
     label: 'Corredor principal oeste',
     kind: 'main',
-    ...PROJECT.rect(3, 6.8, 4.5, 24),
+    ...PROJECT.rect(3, 9.25, 3.9, 24),
   },
   {
     id: 'east-main-aisle',
     label: 'Corredor principal leste',
     kind: 'main',
-    ...PROJECT.rect(13.5, 6.8, 4.5, 24),
+    ...PROJECT.rect(12.9, 9.25, 3.9, 24),
   },
   {
     id: 'west-cross-access',
     label: 'Acesso lateral oeste',
     kind: 'access',
-    ...PROJECT.rect(0, 15.5, 7.5, 4),
+    ...PROJECT.rect(0, 15, 6.9, 7.8),
   },
   {
     id: 'east-cross-access',
     label: 'Acesso lateral leste',
     kind: 'access',
-    ...PROJECT.rect(13.5, 15.5, 7.5, 4),
+    ...PROJECT.rect(12.9, 15, 6.9, 7.8),
   },
   {
     id: 'south-distribution',
     label: 'Circulação e acessos sul',
     kind: 'main',
-    ...PROJECT.rect(3, 30.8, 15, 4.55),
+    ...PROJECT.rect(3, 33.25, 13.8, 4.55),
   },
 ] as const satisfies readonly CommercialPavilionReferenceCorridor[];
 
@@ -230,7 +230,7 @@ export const PAVILION13_COMMERCIAL_WALL_ACCESSES = [
     id: 'southwest-entrance',
     label: 'Entrada',
     wall: 'front',
-    centerAlongWallM: 6.6,
+    centerAlongWallM: 6.3,
     openingWidthM: 3,
     kind: 'entrance',
     sourcePrecision: 'plan-traced',
@@ -240,7 +240,7 @@ export const PAVILION13_COMMERCIAL_WALL_ACCESSES = [
     id: 'southeast-entrance',
     label: 'Entrada',
     wall: 'front',
-    centerAlongWallM: 14.7,
+    centerAlongWallM: 13.5,
     openingWidthM: 3,
     kind: 'entrance',
     sourcePrecision: 'plan-traced',
@@ -270,30 +270,30 @@ export const PAVILION13_COMMERCIAL_WALL_ACCESSES = [
 
 const DIAGONAL_RENDER_SLICES = 12;
 
-const MODULE_METRIC_FOOTPRINTS = {
+export const PAVILION13_MODULE_METRIC_FOOTPRINTS = {
   25: [
-    [21, 0],
-    [21, 5.65],
-    [18, 5.65],
-    [18, 3],
+    [19.8, 0],
+    [19.8, 6],
+    [16.8, 6],
+    [16.8, 3],
   ],
   26: [
-    [14.6, 0],
-    [21, 0],
-    [18, 3],
-    [14.6, 3],
+    [13.8, 0],
+    [19.8, 0],
+    [16.8, 3],
+    [13.8, 3],
   ],
   78: [
     [0, 0],
-    [6.4, 0],
-    [6.4, 3],
+    [6, 0],
+    [6, 3],
     [3, 3],
   ],
   79: [
     [0, 0],
     [3, 3],
-    [3, 5.65],
-    [0, 5.65],
+    [3, 6],
+    [0, 6],
   ],
 } as const;
 
@@ -307,46 +307,46 @@ function diagonalPartitionParts(
       const top = index * sliceDepth;
       const midpointZ = top + sliceDepth / 2;
       if (side === 'west-upper') {
-        return PROJECT.rect(midpointZ, top, 6.4 - midpointZ, sliceDepth);
+        return PROJECT.rect(midpointZ, top, 6 - midpointZ, sliceDepth);
       }
       if (side === 'west-lower') {
         return PROJECT.rect(0, top, midpointZ, sliceDepth);
       }
       if (side === 'east-upper') {
-        return PROJECT.rect(14.6, top, 6.4 - midpointZ, sliceDepth);
+        return PROJECT.rect(13.8, top, 6 - midpointZ, sliceDepth);
       }
-      return PROJECT.rect(21 - midpointZ, top, midpointZ, sliceDepth);
+      return PROJECT.rect(19.8 - midpointZ, top, midpointZ, sliceDepth);
     },
   );
 
   if (side === 'west-lower') {
-    diagonalParts.push(PROJECT.rect(0, 3, 3, 2.65));
+    diagonalParts.push(PROJECT.rect(0, 3, 3, 3));
   } else if (side === 'east-lower') {
-    diagonalParts.push(PROJECT.rect(18, 3, 3, 2.65));
+    diagonalParts.push(PROJECT.rect(16.8, 3, 3, 3));
   }
   return diagonalParts;
 }
 
 const MODULE_SHAPES = {
   25: {
-    footprint: PROJECT.polygon(MODULE_METRIC_FOOTPRINTS[25]),
+    footprint: PROJECT.polygon(PAVILION13_MODULE_METRIC_FOOTPRINTS[25]),
     renderParts: diagonalPartitionParts('east-lower'),
-    labelAnchor: PROJECT.point(19.5, 3.75),
+    labelAnchor: PROJECT.point(18.3, 4.5),
   },
   26: {
-    footprint: PROJECT.polygon(MODULE_METRIC_FOOTPRINTS[26]),
+    footprint: PROJECT.polygon(PAVILION13_MODULE_METRIC_FOOTPRINTS[26]),
     renderParts: diagonalPartitionParts('east-upper'),
-    labelAnchor: PROJECT.point(17.5, 1.45),
+    labelAnchor: PROJECT.point(16.2, 1.35),
   },
   78: {
-    footprint: PROJECT.polygon(MODULE_METRIC_FOOTPRINTS[78]),
+    footprint: PROJECT.polygon(PAVILION13_MODULE_METRIC_FOOTPRINTS[78]),
     renderParts: diagonalPartitionParts('west-upper'),
-    labelAnchor: PROJECT.point(3.5, 1.45),
+    labelAnchor: PROJECT.point(3.6, 1.35),
   },
   79: {
-    footprint: PROJECT.polygon(MODULE_METRIC_FOOTPRINTS[79]),
+    footprint: PROJECT.polygon(PAVILION13_MODULE_METRIC_FOOTPRINTS[79]),
     renderParts: diagonalPartitionParts('west-lower'),
-    labelAnchor: PROJECT.point(1.5, 3.75),
+    labelAnchor: PROJECT.point(1.5, 4.5),
   },
 } as const satisfies Record<25 | 26 | 78 | 79, CommercialPavilionReferenceCellShape>;
 
@@ -356,7 +356,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_CELLS =
     runs: PAVILION13_COMMERCIAL_REFERENCE_RUNS,
     moduleGap: PAVILION13_COMMERCIAL_MODULE_GAP,
     sourceDocument: SOURCE_DOCUMENT,
-    referenceYear: 2026,
+    referenceYear: 2028,
     shapeForNumber: (number) => (
       number === 25 || number === 26 || number === 78 || number === 79
         ? MODULE_SHAPES[number]
@@ -387,13 +387,13 @@ const REGULAR_MODULE_AREA_M2 = PAVILION13_COMMERCIAL_REFERENCE_CELLS
     + (cell.width * PROJECT.widthMeters / NORMALIZED_METRIC_SPAN)
       * (cell.depth * PROJECT.depthMeters / NORMALIZED_METRIC_SPAN)
   ), 0);
-const IRREGULAR_MODULE_AREA_M2 = Object.values(MODULE_METRIC_FOOTPRINTS)
+const IRREGULAR_MODULE_AREA_M2 = Object.values(PAVILION13_MODULE_METRIC_FOOTPRINTS)
   .reduce((area, footprint) => area + metricPolygonArea(footprint), 0);
 export const PAVILION13_COMMERCIAL_GEOMETRIC_AREA_M2 =
   REGULAR_MODULE_AREA_M2 + IRREGULAR_MODULE_AREA_M2;
 
-if (Math.abs(PAVILION13_COMMERCIAL_GEOMETRIC_AREA_M2 - 351.3) > 1e-9) {
-  throw new Error('B5: a geometria modular não fecha a área oficial de 351,30 m².');
+if (Math.abs(PAVILION13_COMMERCIAL_GEOMETRIC_AREA_M2 - 351) > 1e-9) {
+  throw new Error('B5: a geometria modular não fecha a área oficial de 351,00 m².');
 }
 
 export const PAVILION13_COMMERCIAL_REFERENCE = {
@@ -401,8 +401,8 @@ export const PAVILION13_COMMERCIAL_REFERENCE = {
   pavilionNumber: 13,
   category: 'Indústria e Comércio',
   moduleCount: 103,
-  totalAreaM2: 709.05,
-  modularAreaM2: 351.3,
+  totalAreaM2: 709,
+  modularAreaM2: 351,
   individualAreaM2: null,
   moduleGap: PAVILION13_COMMERCIAL_MODULE_GAP,
   boundary: { centerX: 0.5, centerZ: 0.5, width: 1, depth: 1 },
@@ -431,11 +431,11 @@ export const PAVILION13_COMMERCIAL_REFERENCE = {
   cells: PAVILION13_COMMERCIAL_REFERENCE_CELLS,
   source: {
     document: SOURCE_DOCUMENT,
-    referenceYear: 2026,
+    referenceYear: 2028,
     interpretation: 'official-metric-polygons',
     metricDimensions: {
-      widthM: 21,
-      depthM: 35.35,
+      widthM: 19.8,
+      depthM: 37.8,
     },
     geometricModuleAreaM2: PAVILION13_COMMERCIAL_GEOMETRIC_AREA_M2,
   },

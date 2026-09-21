@@ -22,7 +22,7 @@ export const PAVILION_MODULE_AREA_SOURCE_DOCUMENTS = {
   B10: 'Pavilhao_07_Lotes_e_Metragens.pdf',
   B4: 'Pavilhao_08_Lotes_e_Metragens.pdf',
   B3: 'Pavilhao_12_Lotes_e_Metragens.pdf',
-  B5: 'Pavilhao_13_Lotes_e_Metragens.pdf',
+  B5: 'Planta Pavilhão 13 — Fenasoja 2028 (desenho set/2026).pdf',
   B2: 'Pavilhao_14_Lotes_e_Metragens.pdf',
 } as const;
 
@@ -212,7 +212,7 @@ const PAVILION_AREA_PLANS: readonly PavilionAreaPlan[] = [
     pavilionId: 'B5',
     pavilionNumber: 13,
     moduleCount: 103,
-    expectedTotalSqm: 351.3,
+    expectedTotalSqm: 351,
     bands: [
       {
         ranges: [[1, 24], [27, 77], [80, 103]],
@@ -221,23 +221,10 @@ const PAVILION_AREA_PLANS: readonly PavilionAreaPlan[] = [
         method: NOMINAL(1, 3),
       },
       {
-        ranges: [[25, 25], [79, 79]],
-        areaSqm: 12.45,
+        ranges: [[25, 26], [78, 79]],
+        areaSqm: 13.5,
         evidence: 'written',
-        method: 'Área escrita no croqui; (5,65 + 2,65) ÷ 2 × 3',
-      },
-      {
-        ranges: [[26, 26]],
-        areaSqm: 14.7,
-        evidence: 'written',
-        method: 'Área escrita no croqui; (6,40 + 3,40) ÷ 2 × 3',
-      },
-      {
-        ranges: [[78, 78]],
-        areaSqm: 14.7,
-        evidence: 'disputed',
-        method: 'Área escrita no croqui (14,70 m²); as cotas de 6,80 × 3,40 × 3 m levariam a 15,30 m²',
-        caveat: 'Área expressa no croqui; cotas divergentes — confirmar com o responsável pela planta.',
+        method: 'Área escrita na planta 2028; metade do envelope 6 × 6 dividida pela diagonal com retorno de 3 m',
       },
     ],
   },

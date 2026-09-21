@@ -17,11 +17,12 @@ describe('planta comercial fixa do Pavilhão 13', () => {
     expect(commercialPavilionInteriorViewRotationRadians({ publicIdentifier: 'B5' })).toBe(0);
     expect(PAVILION13_COMMERCIAL_REFERENCE.projection).toMatchObject({
       coordinateTransform: 'identity',
-      metricWidthM: 21,
-      metricDepthM: 35.35,
+      metricWidthM: 19.8,
+      metricDepthM: 37.8,
     });
     expect(PAVILION13_COMMERCIAL_REFERENCE.moduleCount).toBe(103);
-    expect(PAVILION13_COMMERCIAL_REFERENCE.modularAreaM2).toBe(351.3);
+    expect(PAVILION13_COMMERCIAL_REFERENCE.modularAreaM2).toBe(351);
+    expect(PAVILION13_COMMERCIAL_REFERENCE.totalAreaM2).toBe(709);
     expect(plan.cells).toHaveLength(103);
     expect(plan.zones.map((zone) => zone.numberRange)).toEqual([
       [1, 15], [16, 24], [25, 25], [26, 26], [27, 29],
@@ -48,10 +49,10 @@ describe('planta comercial fixa do Pavilhão 13', () => {
   it('mantém polígonos, divisões diagonais e âncoras dos quatro módulos irregulares', () => {
     const plan = COMMERCIAL_PAVILION_MODULE_PLANS.B5;
     const expectedAnchors = new Map([
-      [25, [19.5 / 21, 3.75 / 35.35]],
-      [26, [17.5 / 21, 1.45 / 35.35]],
-      [78, [3.5 / 21, 1.45 / 35.35]],
-      [79, [1.5 / 21, 3.75 / 35.35]],
+      [25, [18.3 / 19.8, 4.5 / 37.8]],
+      [26, [16.2 / 19.8, 1.35 / 37.8]],
+      [78, [3.6 / 19.8, 1.35 / 37.8]],
+      [79, [1.5 / 19.8, 4.5 / 37.8]],
     ] as const);
 
     expectedAnchors.forEach((anchor, number) => {

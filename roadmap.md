@@ -42,6 +42,14 @@
 - [ ] Validar navegação visual desktop/mobile — bloqueada pelo renderer WebGL automatizado, que permaneceu carregando por mais de 7 minutos
 - Não publicar (pedido do usuário)
 
+## Pavilhão 13 / B5 — planta oficial Fenasoja 2028
+- [ ] Reconstruir frame métrico e corredores pelas cotas 3,90 / 3,25 / 4,55
+- [ ] Tornar B5-M025/026/078/079 simétricos, diagonais e com 13,50 m²
+- [ ] Atualizar totais, fonte e revisão exclusiva do B5, preservando ordem e câmera
+- [ ] Reconciliar geometria e áreas persistidas sem alterar IDs, status, preços ou histórico
+- [ ] Validar hit-test, rota pública, desktop/mobile, soma 351 e regressões
+- Não publicar (pedido do usuário)
+
 ## Avisos no celular (push / FCM)
 - [x] Tabelas `push_devices` e `push_send_log` com RLS por usuário
 - [x] Edge function `send-push-notification` via conector FCM (gateway)
