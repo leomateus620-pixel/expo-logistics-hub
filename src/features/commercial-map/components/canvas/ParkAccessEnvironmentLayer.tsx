@@ -1,3 +1,4 @@
+import { useSceneVegetationEnabled } from './PublicScenePolicyContext';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -99,7 +100,7 @@ function mergeSurfaceGeometries(surfaces: readonly ParkAccessEnvironmentSurface[
     .map(createSurfaceGeometry);
   if (!geometries.length) return new THREE.BufferGeometry();
   const merged = mergeBufferGeometries(geometries, false) ?? new THREE.BufferGeometry();
-  geometries.forEach((geometry) => geometry.dispose());
+  geometries.forEach((geometry) => geometry?.dispose());
   merged.computeBoundingBox();
   merged.computeBoundingSphere();
   return merged;
@@ -234,6 +235,7 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
   surfacesVisible?: boolean;
   vegetationVisible?: boolean;
 }) {
+  const vegetationEnabled = useSceneVegetationEnabled();
   const treeRef = useRef<THREE.InstancedMesh>(null);
   const understoryRef = useRef<THREE.InstancedMesh>(null);
   // Quality changes replace R3F instances when their geometry/count args
@@ -248,15 +250,15 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
   }, []);
   const { invalidate } = useThree();
   const presentation = useMemo(
-    () => resolveParkAccessEnvironmentPresentation(reducedGraphics),
-    [reducedGraphics],
+    () => resolveParkAccessEnvironmentPresentation(reducedGraphics, vegetationEnabled),
+    [reducedGraphics, vegetationEnabled],
   );
   const geometries = useMemo(() => ({
     environment: mergeSurfaceGeometries(presentation.environmentalSurfaces),
     trail: mergeSurfaceGeometries(presentation.trailSurfaces),
-    tree: createAmbientTreeGeometry(reducedGraphics),
-    understory: createUnderstoryGeometry(),
-  }), [presentation, reducedGraphics]);
+    tree: vegetationEnabled ? createAmbientTreeGeometry(reducedGraphics) : null,
+    understory: vegetationEnabled ? createUnderstoryGeometry() : null,
+  }), [presentation, reducedGraphics, vegetationEnabled]);
   const textures = useMemo(() => ({
     environment: proceduralTexture('textura-procedural-entorno-acessos', 17, false),
     trail: proceduralTexture('textura-procedural-caminho-bosque', 29, true),
@@ -264,21 +266,21 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
   const materials = useMemo(() => ({
     environment: applyInteriorGroundMaterial(createGroundMaterial(textures.environment), 'access-grass'),
     trail: createGroundMaterial(textures.trail),
-    tree: new THREE.MeshStandardMaterial({
+    tree: vegetationEnabled ? new THREE.MeshStandardMaterial({
       color: '#ffffff',
       vertexColors: true,
       roughness: 0.92,
       metalness: 0,
       flatShading: false,
-    }),
-    understory: new THREE.MeshStandardMaterial({
+    }) : null,
+    understory: vegetationEnabled ? new THREE.MeshStandardMaterial({
       color: '#ffffff',
       vertexColors: true,
       roughness: 0.96,
       metalness: 0,
       flatShading: true,
-    }),
-  }), [textures]);
+    }) : null,
+  }), [textures, vegetationEnabled]);
 
   useLayoutEffect(() => {
     writePlacements(treeRef.current, presentation.ambientTrees, 0.035);
@@ -295,7 +297,7 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
   }, [geometries]);
 
   useEffect(() => () => {
-    Object.values(materials).forEach((material) => material.dispose());
+    Object.values(materials).forEach((material) => { if (material) material.dispose(); });
   }, [materials]);
 
   useEffect(() => () => {
@@ -332,7 +334,7 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
         />
       </group>
       <group name="vegetacao-ambiental-acessos" visible={vegetationVisible} userData={VEGETATION_USER_DATA}>
-        {presentation.ambientTrees.length > 0 && (
+        {geometries.tree && materials.tree && presentation.ambientTrees.length > 0 && (
           <instancedMesh
             ref={bindTree}
             name="arborizacao-enquadramento-benvenuto-costeiros"
@@ -345,7 +347,7 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
             dispose={null}
           />
         )}
-        {presentation.understory.length > 0 && (
+        {geometries.understory && materials.understory && presentation.understory.length > 0 && (
           <instancedMesh
             ref={bindUnderstory}
             name="sub-bosque-bordas-naturais"

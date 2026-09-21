@@ -45,6 +45,8 @@ export interface PublicMapScope {
 }
 
 export interface PublicMapInventory {
+  revision?: string;
+  contextRevision?: string;
   scope: PublicMapScope;
   project: {
     id: string;

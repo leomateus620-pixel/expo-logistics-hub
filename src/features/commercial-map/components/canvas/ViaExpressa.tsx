@@ -1,3 +1,4 @@
+import { useSceneVegetationEnabled } from './PublicScenePolicyContext';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -12,8 +13,7 @@ import type { StrategicLandmarkBounds } from '../../utils/landmarks';
 const NO_RAYCAST = () => undefined;
 const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
 const UNIT_PLANE = new THREE.PlaneGeometry(1, 1);
-const UNIT_CYLINDER = new THREE.CylinderGeometry(0.5, 0.5, 1, 7);
-const UNIT_CANOPY = new THREE.IcosahedronGeometry(0.5, 1);
+
 
 type Vector3Tuple = [number, number, number];
 
@@ -260,9 +260,12 @@ export const ViaExpressa = memo(function ViaExpressa({
   showDetail: boolean;
   showFocusDetail: boolean;
 }) {
+  const vegetationEnabled = useSceneVegetationEnabled();
+  const treeGeometry = useMemo(() => vegetationEnabled ? { trunk: new THREE.CylinderGeometry(0.5, 0.5, 1, 7), canopy: new THREE.IcosahedronGeometry(0.5, 1) } : null, [vegetationEnabled]);
+  useEffect(() => () => { treeGeometry?.trunk.dispose(); treeGeometry?.canopy.dispose(); }, [treeGeometry]);
   const layout = useMemo(
-    () => createViaExpressaLayout(bounds, height),
-    [bounds, height],
+    () => createViaExpressaLayout(bounds, height, vegetationEnabled),
+    [bounds, height, vegetationEnabled],
   );
 
   const architecture = useMemo(() => {
@@ -456,13 +459,13 @@ export const ViaExpressa = memo(function ViaExpressa({
         <>
           <PavilionInstances material={materials.trim} items={architecture.purlins} />
           <PavilionInstances
-            geometry={UNIT_CYLINDER}
+            geometry={treeGeometry?.trunk}
             material={materials.accent}
             items={architecture.trunks}
             castShadow
           />
           <PavilionInstances
-            geometry={UNIT_CANOPY}
+            geometry={treeGeometry?.canopy}
             material={materials.green}
             items={architecture.canopies}
             castShadow

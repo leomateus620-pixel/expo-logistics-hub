@@ -1,3 +1,4 @@
+import { useSceneVegetationEnabled } from './PublicScenePolicyContext';
 import { treeIntersectsGeneratedRearRoadCorridor } from '../../utils/rearRoadTreeClearance';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
@@ -1014,6 +1015,7 @@ function ArenaStructures({
   opacity: number;
 }) {
   const { gl, invalidate } = useThree();
+  const vegetationEnabled = useSceneVegetationEnabled();
   const plazaPoints = useMemo(() => sourcePolygonToLocal(ARENA_FRONT_LAYOUT.plaza.sourcePolygon), []);
   const plazaGeometry = useMemo(
     () => createWorldTiledHorizontalPolygonGeometry(plazaPoints, BASE_Y),
@@ -1064,7 +1066,7 @@ function ArenaStructures({
         opacity={opacity}
         subset="arena-structures"
       />
-      <ArenaVegetation reducedGraphics={reducedGraphics} opacity={opacity} />
+      {vegetationEnabled && <ArenaVegetation reducedGraphics={reducedGraphics} opacity={opacity} />}
     </group>
   );
 }

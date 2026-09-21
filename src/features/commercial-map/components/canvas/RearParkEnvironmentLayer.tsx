@@ -1,3 +1,4 @@
+import { useSceneVegetationEnabled } from './PublicScenePolicyContext';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -30,6 +31,7 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
   visible = true,
   vegetationVisible = true,
 }: RearParkEnvironmentLayerProps) {
+  const vegetationEnabled = useSceneVegetationEnabled();
   const scene = useThree((state) => state.scene);
   const invalidate = useThree((state) => state.invalidate);
   const continuousGround = useContinuousGround(scene);
@@ -55,34 +57,34 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
   // Both tiers stay resident. Quality changes update references and instance
   // counts instead of reconstructing R3F objects with `dispose={null}`.
   const treeResources = useMemo(() => ({
-    trunk: {
+    trunk: vegetationEnabled ? {
       full: new THREE.CylinderGeometry(0.055, 0.085, 1, 6),
       reduced: new THREE.CylinderGeometry(0.055, 0.085, 1, 4),
-    },
-    canopy: {
+    } : null,
+    canopy: vegetationEnabled ? {
       full: new THREE.IcosahedronGeometry(0.5, 1),
       reduced: new THREE.IcosahedronGeometry(0.5, 0),
-    },
-    trunkMaterial: new THREE.MeshStandardMaterial({ color: '#6a5340', roughness: 0.95, metalness: 0 }),
-    canopyMaterial: new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.92, metalness: 0, flatShading: true }),
+    } : null,
+    trunkMaterial: vegetationEnabled ? new THREE.MeshStandardMaterial({ color: '#6a5340', roughness: 0.95, metalness: 0 }) : null,
+    canopyMaterial: vegetationEnabled ? new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.92, metalness: 0, flatShading: true }) : null,
     poleGeometry: new THREE.CylinderGeometry(0.022, 0.03, 0.84, 5),
     poleMaterial: new THREE.MeshStandardMaterial({ color: '#9aa0a2', roughness: 0.7, metalness: 0.2 }),
-  }), []);
+  }), [vegetationEnabled]);
 
   useEffect(() => () => {
-    treeResources.trunk.full.dispose();
-    treeResources.trunk.reduced.dispose();
-    treeResources.canopy.full.dispose();
-    treeResources.canopy.reduced.dispose();
-    treeResources.trunkMaterial.dispose();
-    treeResources.canopyMaterial.dispose();
+    treeResources.trunk?.full.dispose();
+    treeResources.trunk?.reduced.dispose();
+    treeResources.canopy?.full.dispose();
+    treeResources.canopy?.reduced.dispose();
+    treeResources.trunkMaterial?.dispose();
+    treeResources.canopyMaterial?.dispose();
     treeResources.poleGeometry.dispose();
     treeResources.poleMaterial.dispose();
   }, [treeResources]);
 
   const trees = useMemo(
-    () => (vegetationVisible ? buildRearTreeInstances(reducedGraphics) : []),
-    [reducedGraphics, vegetationVisible],
+    () => (vegetationEnabled && vegetationVisible ? buildRearTreeInstances(reducedGraphics) : []),
+    [reducedGraphics, vegetationEnabled, vegetationVisible],
   );
   const poles = useMemo(() => buildRearPoleInstances(reducedGraphics), [reducedGraphics]);
 
@@ -162,7 +164,7 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
         />
       ))}
 
-      <instancedMesh
+      {treeResources.trunk && treeResources.canopy && treeResources.trunkMaterial && treeResources.canopyMaterial && <><instancedMesh
         ref={trunkRef}
         args={[treeResources.trunk.full, treeResources.trunkMaterial, REAR_ENVIRONMENT_BUDGET.maximumTreeInstances]}
         geometry={treeResources.trunk[reducedGraphics ? 'reduced' : 'full']}
@@ -180,6 +182,7 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
         dispose={null}
       />
 
+      </>}
       <instancedMesh
         ref={poleRef}
         args={[treeResources.poleGeometry, treeResources.poleMaterial, REAR_ENVIRONMENT_BUDGET.maximumPoleInstances]}

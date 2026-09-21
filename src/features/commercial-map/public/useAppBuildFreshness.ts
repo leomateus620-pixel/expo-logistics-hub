@@ -14,6 +14,13 @@ function loadedAssets(): Set<string> {
   return found;
 }
 
+/** Compare executable entry scripts only. Modulepreload links and inline text
+ * do not identify a different application build. */
+export function servedEntryAssets(html: string): string[] {
+  const parsed = new DOMParser().parseFromString(html, 'text/html');
+  return [...parsed.querySelectorAll('script[src]')].flatMap(node => (node.getAttribute('src') ?? '').match(ASSET_PATTERN) ?? []);
+}
+
 /**
  * Detecta publicação de código/assets novos (modelos, texturas, componentes):
  * o servidor passa a apontar para bundles diferentes dos que estão carregados.
@@ -30,7 +37,7 @@ export function useAppBuildFreshness(): boolean {
         const response = await fetch(`${window.location.origin}/index.html`, { cache: 'no-store' });
         if (!response.ok) return;
         const html = await response.text();
-        const served = html.match(ASSET_PATTERN) ?? [];
+        const served = servedEntryAssets(html);
         if (served.length === 0) return;
         const current = loadedAssets();
         if (current.size === 0) return;

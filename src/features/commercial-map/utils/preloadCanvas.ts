@@ -3,8 +3,8 @@ import { preloadHeadquartersGeometry } from '../components/canvas/headquarters/h
 
 let pending: Promise<{ default: typeof import('../components/canvas/CommercialMapCanvas').CommercialMapCanvas }> | undefined;
 
-export function preloadCommercialMapCanvas() {
-  void preloadHeadquartersGeometry().catch(() => undefined);
+export function preloadCommercialMapCanvas({ prepareHeadquarters = true }: { prepareHeadquarters?: boolean } = {}) {
+  if (prepareHeadquarters) void preloadHeadquartersGeometry().catch(() => undefined);
   markCommercialMapStage('renderer-module-requested');
   return pending ??= import('../components/canvas/CommercialMapCanvas').then((module) => {
     markCommercialMapStage('renderer-module-ready');

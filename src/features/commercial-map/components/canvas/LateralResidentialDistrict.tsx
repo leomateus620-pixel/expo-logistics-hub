@@ -1,3 +1,4 @@
+import { useSceneVegetationEnabled } from './PublicScenePolicyContext';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -22,8 +23,9 @@ function DistrictCell({ cell, assets, reducedGraphics, vegetationVisible, nightM
     const batches: Partial<Record<ResidentialBatchKind, THREE.InstancedMesh>> = {};
     const transform = new THREE.Object3D(); const color = new THREE.Color();
     (Object.entries(cell.batches) as [ResidentialBatchKind, ResidentialRenderCell['batches'][ResidentialBatchKind]][]).forEach(([kind, instances]) => {
-      if (!instances.length) return;
-      const mesh = new THREE.InstancedMesh(assets.geometries[kind], assets.materials[kind], instances.length);
+      const geometry = assets.geometries[kind];
+      if (!instances.length || !geometry) return;
+      const mesh = new THREE.InstancedMesh(geometry, assets.materials[kind], instances.length);
       mesh.name = `${cell.id}-${kind}`; mesh.raycast = NO_RAYCAST;
       mesh.userData.presentationOnly = true;
       const ordered = kind === 'trunk' ? [...instances].sort((a, b) => Number(b.id.includes('-pole-')) - Number(a.id.includes('-pole-'))) : instances;
@@ -70,7 +72,7 @@ function DistrictCell({ cell, assets, reducedGraphics, vegetationVisible, nightM
       if (VEGETATION.has(kind) && kind !== 'trunk') mesh.visible = vegetationVisible;
       const cast = !reducedGraphics && nearShadows.current && (kind === 'masonry' || kind === 'hipRoof' || kind === 'gableRoof');
       if (mesh.castShadow !== cast) { mesh.castShadow = cast; gl.shadowMap.needsUpdate = true; }
-      if (kind === 'palm') mesh.geometry = fullPalm.current && !reducedGraphics ? assets.geometries.palm : assets.farPalm;
+      if (kind === 'palm') mesh.geometry = fullPalm.current && !reducedGraphics ? assets.geometries.palm! : assets.farPalm!;
     }
   });
   return <primitive object={compiled.group} dispose={null} />;
@@ -79,8 +81,9 @@ function DistrictCell({ cell, assets, reducedGraphics, vegetationVisible, nightM
 export const LateralResidentialDistrict = memo(function LateralResidentialDistrict({
   reducedGraphics, vegetationVisible = true, nightMode = false, visible = true,
 }: { reducedGraphics: boolean; vegetationVisible?: boolean; nightMode?: boolean; visible?: boolean }) {
-  const assets = useMemo(createResidentialSharedAssets, []);
-  const cells = useMemo(() => buildLateralResidentialRenderPlan(), []);
+  const vegetationEnabled = useSceneVegetationEnabled();
+  const assets = useMemo(() => createResidentialSharedAssets(vegetationEnabled), [vegetationEnabled]);
+  const cells = useMemo(() => buildLateralResidentialRenderPlan(undefined, vegetationEnabled), [vegetationEnabled]);
   const audit = useMemo(() => auditLateralResidentialRenderPlan(cells), [cells]);
   useEffect(() => () => assets.dispose(), [assets]);
   const invalidate = useThree((state) => state.invalidate);

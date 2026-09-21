@@ -1,0 +1,102 @@
+[
+  {
+    "slug": "pavilhao-1",
+    "lotCount": 189,
+    "authorizedStatus": 200,
+    "authorizedIdMatches": true,
+    "crossScopeStatus": 401,
+    "crossScopeMessage": "PUBLIC_MAP_LOT_OUT_OF_SCOPE",
+    "invalidStatus": 401,
+    "invalidMessage": "PUBLIC_MAP_LINK_INVALID"
+  },
+  {
+    "slug": "pavilhao-3",
+    "lotCount": 214,
+    "authorizedStatus": 200,
+    "authorizedIdMatches": true,
+    "crossScopeStatus": 401,
+    "crossScopeMessage": "PUBLIC_MAP_LOT_OUT_OF_SCOPE",
+    "invalidStatus": 401,
+    "invalidMessage": "PUBLIC_MAP_LINK_INVALID"
+  },
+  {
+    "slug": "pavilhao-5",
+    "lotCount": 81,
+    "authorizedStatus": 200,
+    "authorizedIdMatches": true,
+    "crossScopeStatus": 401,
+    "crossScopeMessage": "PUBLIC_MAP_LOT_OUT_OF_SCOPE",
+    "invalidStatus": 401,
+    "invalidMessage": "PUBLIC_MAP_LINK_INVALID"
+  },
+  {
+    "slug": "pavilhao-8",
+    "lotCount": 114,
+    "authorizedStatus": 200,
+    "authorizedIdMatches": true,
+    "crossScopeStatus": 401,
+    "crossScopeMessage": "PUBLIC_MAP_LOT_OUT_OF_SCOPE",
+    "invalidStatus": 401,
+    "invalidMessage": "PUBLIC_MAP_LINK_INVALID"
+  },
+  {
+    "slug": "pavilhao-12",
+    "lotCount": 257,
+    "authorizedStatus": 200,
+    "authorizedIdMatches": true,
+    "crossScopeStatus": 401,
+    "crossScopeMessage": "PUBLIC_MAP_LOT_OUT_OF_SCOPE",
+    "invalidStatus": 401,
+    "invalidMessage": "PUBLIC_MAP_LINK_INVALID"
+  },
+  {
+    "slug": "pavilhao-13",
+    "lotCount": 103,
+    "authorizedStatus": 200,
+    "authorizedIdMatches": true,
+    "crossScopeStatus": 401,
+    "crossScopeMessage": "PUBLIC_MAP_LOT_OUT_OF_SCOPE",
+    "invalidStatus": 401,
+    "invalidMessage": "PUBLIC_MAP_LINK_INVALID"
+  },
+  {
+    "slug": "pavilhao-14",
+    "lotCount": 186,
+    "authorizedStatus": 200,
+    "authorizedIdMatches": true,
+    "crossScopeStatus": 401,
+    "crossScopeMessage": "PUBLIC_MAP_LOT_OUT_OF_SCOPE",
+    "invalidStatus": 401,
+    "invalidMessage": "PUBLIC_MAP_LINK_INVALID"
+  },
+  {
+    "slug": "exporural",
+    "lotCount": 95,
+    "authorizedStatus": 200,
+    "authorizedIdMatches": true,
+    "crossScopeStatus": 401,
+    "crossScopeMessage": "PUBLIC_MAP_LOT_OUT_OF_SCOPE",
+    "invalidStatus": 401,
+    "invalidMessage": "PUBLIC_MAP_LINK_INVALID"
+  },
+  {
+    "slug": "industria-comercio-servicos-externo",
+    "lotCount": 105,
+    "authorizedStatus": 200,
+    "authorizedIdMatches": true,
+    "crossScopeStatus": 401,
+    "crossScopeMessage": "PUBLIC_MAP_LOT_OUT_OF_SCOPE",
+    "invalidStatus": 401,
+    "invalidMessage": "PUBLIC_MAP_LINK_INVALID"
+  },
+  {
+    "slug": "espaco-automovel",
+    "lotCount": 64,
+    "authorizedStatus": 200,
+    "authorizedIdMatches": true,
+    "crossScopeStatus": 401,
+    "crossScopeMessage": "PUBLIC_MAP_LOT_OUT_OF_SCOPE",
+    "invalidStatus": 401,
+    "invalidMessage": "PUBLIC_MAP_LINK_INVALID"
+  }
+]

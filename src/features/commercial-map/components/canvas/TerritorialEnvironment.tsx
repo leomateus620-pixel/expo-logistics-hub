@@ -1,3 +1,4 @@
+import { useSceneVegetationEnabled } from './PublicScenePolicyContext';
 import { memo, useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
@@ -37,7 +38,7 @@ interface Instance {
   rotation: number;
   color: string;
 }
-function buildTerritorialScene() {
+function buildTerritorialScene(vegetationEnabled = true) {
   const group = new THREE.Group();
   group.name = "territorial-environment";
   const box = new THREE.BoxGeometry(1, 1, 1);
@@ -46,7 +47,7 @@ function buildTerritorialScene() {
     metalness: 0,
   });
   const yardMaterial = createExteriorGroundMaterial(true);
-  const shrub = new THREE.IcosahedronGeometry(1, 1);
+  const shrub = vegetationEnabled ? new THREE.IcosahedronGeometry(1, 1) : null;
   const geometries = { box, shrub };
   const batches = new Map<
     string,
@@ -94,7 +95,7 @@ function buildTerritorialScene() {
     if (b.kind === "house") {
       const planted = offset(-w * 0.53, d * 0.66, 0.1);
       if (
-        territoryRoadClearance([planted[0], planted[2]]) > 0.3 &&
+        shrub && territoryRoadClearance([planted[0], planted[2]]) > 0.3 &&
         !TERRITORY_TREES.some(
           (t) =>
             Math.hypot(t.center[0] - planted[0], t.center[1] - planted[2]) <
@@ -257,7 +258,7 @@ function buildTerritorialScene() {
   });
   const ground = grounds.length ? mergeGeometries(grounds) : null,
     ponds = water.length ? mergeGeometries(water) : null;
-  grounds.forEach((g) => g.dispose());
+  grounds.forEach((g) => g?.dispose());
   water.forEach((g) => g.dispose());
   return {
     group,
@@ -282,11 +283,12 @@ export const TerritorialEnvironment = memo(function TerritorialEnvironment({
   reducedGraphics?: boolean;
   vegetationVisible?: boolean;
 }) {
+  const vegetationEnabled = useSceneVegetationEnabled();
   const treesVisible = useCommercialMapStore((s) => s.treesVisible);
   const lastDiagnostic = useRef(-1);
   const renderer = useThree((state) => state.gl);
   const viewportHeight = useThree((state) => state.size.height);
-  const architecture = useMemo(buildExteriorArchitectureScene, []);
+  const architecture = useMemo(() => buildExteriorArchitectureScene(vegetationEnabled), [vegetationEnabled]);
   const fishing = useMemo(buildExteriorFishingScene, []);
   const groundMaterial = useMemo(() => createExteriorGroundMaterial(), []);
   const water = useMemo(
@@ -296,7 +298,7 @@ export const TerritorialEnvironment = memo(function TerritorialEnvironment({
     },
     [],
   );
-  const plan = useMemo(buildTerritorialScene, []);
+  const plan = useMemo(() => buildTerritorialScene(vegetationEnabled), [vegetationEnabled]);
   useEffect(() => () => plan.dispose(), [plan]);
   useEffect(
     () => () => {
@@ -315,7 +317,7 @@ export const TerritorialEnvironment = memo(function TerritorialEnvironment({
       lastDiagnostic.current = Math.floor(clock.elapsedTime);
       renderer.domElement.dataset.exteriorReport = JSON.stringify({
         buildings: TERRITORY_BUILDINGS.length,
-        trees: TERRITORY_TREES.length,
+        trees: vegetationEnabled ? TERRITORY_TREES.length : 0,
         used: architecture.group.userData.modelsUsed,
         groundTriangles: (plan.ground?.getAttribute("position")?.count ?? 0) / 3,
         architectures: architecture.meshes

@@ -1,0 +1,250 @@
+{
+  "entry": "src/pages/CommercialMapPage.tsx",
+  "chunks": [
+    {
+      "key": "src/pages/CommercialMapPage.tsx",
+      "file": "assets/CommercialMapPage-pbLeEeN3.js",
+      "bytes": 1457,
+      "gzipBytes": 747
+    },
+    {
+      "key": "_react-vendor-Cze6uWs8.js",
+      "file": "assets/react-vendor-Cze6uWs8.js",
+      "bytes": 192974,
+      "gzipBytes": 64161
+    },
+    {
+      "key": "_module-runtime-CEDABylm.js",
+      "file": "assets/module-runtime-CEDABylm.js",
+      "bytes": 1244,
+      "gzipBytes": 724
+    },
+    {
+      "key": "_CommercialMapPage-DZuWH9es.js",
+      "file": "assets/CommercialMapPage-DZuWH9es.js",
+      "bytes": 128418,
+      "gzipBytes": 36594
+    },
+    {
+      "key": "index.html",
+      "file": "assets/index-DoV9nWwd.js",
+      "bytes": 601985,
+      "gzipBytes": 160546
+    },
+    {
+      "key": "_ui-radix-P81l1CXk.js",
+      "file": "assets/ui-radix-P81l1CXk.js",
+      "bytes": 137075,
+      "gzipBytes": 41211
+    },
+    {
+      "key": "_data-vendor-BB8ZE5qF.js",
+      "file": "assets/data-vendor-BB8ZE5qF.js",
+      "bytes": 221547,
+      "gzipBytes": 59643
+    },
+    {
+      "key": "_commercial-map-mobile-CoybcMuo.js",
+      "file": "assets/commercial-map-mobile-CoybcMuo.js",
+      "bytes": 45093,
+      "gzipBytes": 14236
+    },
+    {
+      "key": "_profilerDiagnostics-B9LAZMtv.js",
+      "file": "assets/profilerDiagnostics-B9LAZMtv.js",
+      "bytes": 337941,
+      "gzipBytes": 100599
+    },
+    {
+      "key": "_constants-D6ONG09A.js",
+      "file": "assets/constants-D6ONG09A.js",
+      "bytes": 4582,
+      "gzipBytes": 2260
+    },
+    {
+      "key": "_fenasojaComplexReconstruction-DOMXX3VX.js",
+      "file": "assets/fenasojaComplexReconstruction-DOMXX3VX.js",
+      "bytes": 4050,
+      "gzipBytes": 1961
+    },
+    {
+      "key": "_commercialMapSpatialBounds-CHRJJlNJ.js",
+      "file": "assets/commercialMapSpatialBounds-CHRJJlNJ.js",
+      "bytes": 41236,
+      "gzipBytes": 13013
+    },
+    {
+      "key": "_useSalesSelection-Bg_16WJ7.js",
+      "file": "assets/useSalesSelection-Bg_16WJ7.js",
+      "bytes": 16480,
+      "gzipBytes": 3993
+    },
+    {
+      "key": "_state-vendor-CDfFiNsr.js",
+      "file": "assets/state-vendor-CDfFiNsr.js",
+      "bytes": 2203,
+      "gzipBytes": 1034
+    },
+    {
+      "key": "_textarea-5GRPfU_W.js",
+      "file": "assets/textarea-5GRPfU_W.js",
+      "bytes": 522,
+      "gzipBytes": 339
+    },
+    {
+      "key": "_publicAreaRegistry-D1X8SXlj.js",
+      "file": "assets/publicAreaRegistry-D1X8SXlj.js",
+      "bytes": 4319,
+      "gzipBytes": 2030
+    },
+    {
+      "key": "_dropdown-menu-BV8nBY7A.js",
+      "file": "assets/dropdown-menu-BV8nBY7A.js",
+      "bytes": 3759,
+      "gzipBytes": 1109
+    },
+    {
+      "key": "_maximize-2-CdlY5Ja-.js",
+      "file": "assets/maximize-2-CdlY5Ja-.js",
+      "bytes": 467,
+      "gzipBytes": 314
+    },
+    {
+      "key": "_moon-CSbqv-Ap.js",
+      "file": "assets/moon-CSbqv-Ap.js",
+      "bytes": 311,
+      "gzipBytes": 251
+    },
+    {
+      "key": "_map-BWc_YWcY.js",
+      "file": "assets/map-BWc_YWcY.js",
+      "bytes": 594,
+      "gzipBytes": 377
+    },
+    {
+      "key": "_ellipsis-BkfxMEIh.js",
+      "file": "assets/ellipsis-BkfxMEIh.js",
+      "bytes": 390,
+      "gzipBytes": 265
+    },
+    {
+      "key": "_sliders-horizontal-DK89JMGG.js",
+      "file": "assets/sliders-horizontal-DK89JMGG.js",
+      "bytes": 753,
+      "gzipBytes": 369
+    },
+    {
+      "key": "_warehouse-DjCgeqKK.js",
+      "file": "assets/warehouse-DjCgeqKK.js",
+      "bytes": 901,
+      "gzipBytes": 435
+    },
+    {
+      "key": "_scroll-area-CA8JjPvG.js",
+      "file": "assets/scroll-area-CA8JjPvG.js",
+      "bytes": 2094,
+      "gzipBytes": 897
+    },
+    {
+      "key": "_chevron-up-eDydR-8V.js",
+      "file": "assets/chevron-up-eDydR-8V.js",
+      "bytes": 296,
+      "gzipBytes": 246
+    },
+    {
+      "key": "_rotate-ccw-CILJzUXY.js",
+      "file": "assets/rotate-ccw-CILJzUXY.js",
+      "bytes": 368,
+      "gzipBytes": 286
+    },
+    {
+      "key": "_dialog-C_xiovkR.js",
+      "file": "assets/dialog-C_xiovkR.js",
+      "bytes": 2518,
+      "gzipBytes": 987
+    },
+    {
+      "key": "_select-BiHH09iG.js",
+      "file": "assets/select-BiHH09iG.js",
+      "bytes": 3030,
+      "gzipBytes": 1109
+    },
+    {
+      "key": "_save-DKu5dBGR.js",
+      "file": "assets/save-DKu5dBGR.js",
+      "bytes": 918,
+      "gzipBytes": 441
+    },
+    {
+      "key": "_label-CtvpV3YH.js",
+      "file": "assets/label-CtvpV3YH.js",
+      "bytes": 370,
+      "gzipBytes": 270
+    },
+    {
+      "key": "_switch-BjQ6TgRN.js",
+      "file": "assets/switch-BjQ6TgRN.js",
+      "bytes": 852,
+      "gzipBytes": 454
+    },
+    {
+      "key": "_hydrologicalPresentation-CRcBGVqE.js",
+      "file": "assets/hydrologicalPresentation-CRcBGVqE.js",
+      "bytes": 689,
+      "gzipBytes": 345
+    },
+    {
+      "key": "_info-BeFerTM7.js",
+      "file": "assets/info-BeFerTM7.js",
+      "bytes": 368,
+      "gzipBytes": 279
+    },
+    {
+      "key": "_chart-line-oEg6gKcL.js",
+      "file": "assets/chart-line-oEg6gKcL.js",
+      "bytes": 352,
+      "gzipBytes": 275
+    },
+    {
+      "key": "_link-2-B2X-Kf7r.js",
+      "file": "assets/link-2-B2X-Kf7r.js",
+      "bytes": 410,
+      "gzipBytes": 308
+    },
+    {
+      "key": "_database-zap-CXragjfA.js",
+      "file": "assets/database-zap-CXragjfA.js",
+      "bytes": 507,
+      "gzipBytes": 348
+    },
+    {
+      "key": "_send-zM0GfS9n.js",
+      "file": "assets/send-zM0GfS9n.js",
+      "bytes": 459,
+      "gzipBytes": 331
+    },
+    {
+      "key": "_badge-check-CJCvrgz6.js",
+      "file": "assets/badge-check-CJCvrgz6.js",
+      "bytes": 484,
+      "gzipBytes": 314
+    },
+    {
+      "key": "_skip-forward-DgPVBIRB.js",
+      "file": "assets/skip-forward-DgPVBIRB.js",
+      "bytes": 365,
+      "gzipBytes": 287
+    },
+    {
+      "key": "_CommercialMapShell-Be9uQgP6.js",
+      "file": "assets/CommercialMapShell-Be9uQgP6.js",
+      "bytes": 3687,
+      "gzipBytes": 1396
+    }
+  ],
+  "staticBytes": 1766068,
+  "staticGzipBytes": 514784,
+  "rendererRequiredBeforeQuery": false,
+  "physicsRequiredBeforeQuery": false,
+  "pdfRequiredBeforeQuery": false
+}

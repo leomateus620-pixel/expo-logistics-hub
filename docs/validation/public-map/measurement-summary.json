@@ -1,0 +1,2298 @@
+[
+  {
+    "file": "measured-baseline-automovel-desktop-1-cold.json",
+    "readyMs": 19271.7001953125,
+    "navigationCount": 2,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 5856.300000011921,
+      "ready": 19271.7001953125
+    },
+    "sceneWarmup": "{\"durationMs\":2581.7999999523163,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 392.199999988079,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 4942.199999988079,
+        "status": 200
+      },
+      {
+        "duration": 732.6999999880791,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 4941.5,
+        "status": 200
+      },
+      {
+        "duration": 1716.199999988079,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 5683.699999988079,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 15537.899999976158,
+      "calls": 396,
+      "dpr": 1,
+      "geometries": 337,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 416151047,
+      "height": 771,
+      "programs": 106,
+      "qualityTier": "HIGH",
+      "textures": 59,
+      "triangles": 352675,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-baseline-automovel-desktop-1-warm.json",
+    "readyMs": 6006.89990234375,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 1098.4000000357628,
+      "ready": 6006.89990234375
+    },
+    "sceneWarmup": "{\"durationMs\":220.30000001192093,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 394.5,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 268.9000000357628,
+        "status": 200
+      },
+      {
+        "duration": 644.8999999761581,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 268.30000001192093,
+        "status": 200
+      },
+      {
+        "duration": 1726,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 927.8000000119208,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 6007,
+      "calls": 396,
+      "dpr": 1,
+      "geometries": 337,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 534398160,
+      "height": 771,
+      "programs": 101,
+      "qualityTier": "HIGH",
+      "textures": 59,
+      "triangles": 352675,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-baseline-automovel-desktop-2-cold.json",
+    "readyMs": 21386.699951171875,
+    "navigationCount": 2,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 5552.800000011921,
+      "ready": 21386.699951171875
+    },
+    "sceneWarmup": "{\"durationMs\":2656.199999988079,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 367.9000000357628,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 4620,
+        "status": 200
+      },
+      {
+        "duration": 747.8999999761581,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 4619.100000023842,
+        "status": 200
+      },
+      {
+        "duration": 1745.300000011921,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 5379.900000035763,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 18028.700000047684,
+      "calls": 396,
+      "dpr": 1,
+      "geometries": 337,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 795140208,
+      "height": 771,
+      "programs": 106,
+      "qualityTier": "HIGH",
+      "textures": 59,
+      "triangles": 352675,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-baseline-automovel-desktop-2-warm.json",
+    "readyMs": 6242.10009765625,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 1411.7000000476835,
+      "ready": 6242.10009765625
+    },
+    "sceneWarmup": "{\"durationMs\":2588,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 679.5999999642372,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 253.70000004768372,
+        "status": 200
+      },
+      {
+        "duration": 986.5,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 238.9000000357628,
+        "status": 200
+      },
+      {
+        "duration": 1740.5999999642372,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 1235.2000000476835,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 6242.300000011921,
+      "calls": 396,
+      "dpr": 1,
+      "geometries": 337,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 893037058,
+      "height": 771,
+      "programs": 106,
+      "qualityTier": "HIGH",
+      "textures": 59,
+      "triangles": 352675,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-baseline-automovel-mobile-1-cold.json",
+    "readyMs": 22491.2001953125,
+    "navigationCount": 2,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 5695.5,
+      "ready": 22491.2001953125
+    },
+    "sceneWarmup": "{\"durationMs\":234.5,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 416.89999997615814,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 4856.199999988079,
+        "status": 200
+      },
+      {
+        "duration": 647.4000000357628,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 4854.899999976158,
+        "status": 200
+      },
+      {
+        "duration": 1843.5,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 5513.899999976158,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 19241.19999998808,
+      "calls": 492,
+      "dpr": 1,
+      "geometries": 437,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 529420004,
+      "height": 645,
+      "programs": 110,
+      "qualityTier": "HIGH",
+      "textures": 65,
+      "triangles": 458581,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-baseline-automovel-mobile-1-warm.json",
+    "readyMs": 6079.699951171875,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 1098.0999999642372,
+      "ready": 6079.699951171875
+    },
+    "sceneWarmup": "{\"durationMs\":218.80000001192093,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 345.30000001192093,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 257.5,
+        "status": 200
+      },
+      {
+        "duration": 656.7999999523163,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 255.80000001192093,
+        "status": 200
+      },
+      {
+        "duration": 1837.199999988079,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 923.5,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 6079.800000011921,
+      "calls": 492,
+      "dpr": 1,
+      "geometries": 437,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 758494513,
+      "height": 645,
+      "programs": 105,
+      "qualityTier": "HIGH",
+      "textures": 65,
+      "triangles": 458581,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-baseline-automovel-mobile-2-failure.json",
+    "readyMs": null,
+    "navigationCount": 2,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 1008.6999999880792
+    },
+    "requests": [
+      {
+        "duration": 372.60000002384186,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 186,
+        "status": 200
+      },
+      {
+        "duration": 643.1000000238419,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 184.80000001192093,
+        "status": 200
+      },
+      {
+        "duration": 1920.9000000357628,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 838,
+        "status": 200
+      },
+      {
+        "duration": 325.0999999642372,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 15566.400000035765,
+        "status": 200
+      },
+      {
+        "duration": 475.39999997615814,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 30900.60000002384,
+        "status": 200
+      }
+    ],
+    "renderer": null
+  },
+  {
+    "file": "measured-baseline-automovel-mobile-2-warm-failure.json",
+    "readyMs": null,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 1135.100000023842
+    },
+    "requests": [
+      {
+        "duration": 349,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 309.2000000476837,
+        "status": 200
+      },
+      {
+        "duration": 638.6000000238419,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 308.60000002384186,
+        "status": 200
+      },
+      {
+        "duration": 1730.800000011921,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 958,
+        "status": 200
+      },
+      {
+        "duration": 350.89999997615814,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 15661.700000047684,
+        "status": 200
+      },
+      {
+        "duration": 498.800000011921,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 31015.900000035763,
+        "status": 200
+      }
+    ],
+    "renderer": null
+  },
+  {
+    "file": "measured-baseline-exporural-desktop-cold-1.json",
+    "readyMs": 16262.89990234375,
+    "navigationCount": 2,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 1095.199999988079,
+      "ready": 16262.89990234375
+    },
+    "sceneWarmup": "{\"durationMs\":5324.699999988079,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 381.39999997615814,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 171,
+        "status": 200
+      },
+      {
+        "duration": 664.5999999642372,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 170.30000001192093,
+        "status": 200
+      },
+      {
+        "duration": 980.8000000119208,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 854,
+        "status": 200
+      },
+      {
+        "duration": 360.300000011921,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 15752,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 21265.60000002384,
+      "calls": 1301,
+      "dpr": 1,
+      "geometries": 861,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 228476528,
+      "height": 771,
+      "programs": 171,
+      "qualityTier": "HIGH",
+      "textures": 103,
+      "triangles": 984658,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-baseline-exporural-desktop-cold-2.json",
+    "readyMs": 4768.39990234375,
+    "navigationCount": 2,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 1309.100000023842,
+      "ready": 4768.39990234375
+    },
+    "sceneWarmup": "{\"durationMs\":328.39999997615814,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 342.89999997615814,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 326.10000002384186,
+        "status": 200
+      },
+      {
+        "duration": 794.1999999880791,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 325.30000001192093,
+        "status": 200
+      },
+      {
+        "duration": 739.8000000119209,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 1137.800000011921,
+        "status": 200
+      },
+      {
+        "duration": 2821.800000011921,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 15680.899999976158,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 24220.10000002384,
+      "calls": 1005,
+      "dpr": 1,
+      "geometries": 862,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 366443517,
+      "height": 771,
+      "programs": 267,
+      "qualityTier": "HIGH",
+      "textures": 129,
+      "triangles": 615654,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-baseline-exporural-desktop-warm-1.json",
+    "readyMs": 2057.60009765625,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 1175.5,
+      "ready": 2057.60009765625
+    },
+    "sceneWarmup": "{\"durationMs\":2369.099999964237,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 369.39999997615814,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 290.30000001192093,
+        "status": 200
+      },
+      {
+        "duration": 700.3999999761581,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 288.4000000357628,
+        "status": 200
+      },
+      {
+        "duration": 793.9000000357628,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 1004,
+        "status": 200
+      },
+      {
+        "duration": 346.5,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 15711.600000023842,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 18158.60000002384,
+      "calls": 986,
+      "dpr": 1,
+      "geometries": 861,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 189193376,
+      "height": 771,
+      "programs": 198,
+      "qualityTier": "HIGH",
+      "textures": 103,
+      "triangles": 615635,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-baseline-exporural-desktop-warm-2.json",
+    "readyMs": 12942.199951171877,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 1914.399999976158,
+      "ready": 12942.199951171877
+    },
+    "sceneWarmup": "{\"durationMs\":4533.400000035763,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 1050.300000011921,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 242.39999997615817,
+        "status": 200
+      },
+      {
+        "duration": 1486,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 241.5,
+        "status": 200
+      },
+      {
+        "duration": 1395.399999976158,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 1741,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 15535.299999952316,
+      "calls": 1301,
+      "dpr": 1,
+      "geometries": 861,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 325956911,
+      "height": 771,
+      "programs": 166,
+      "qualityTier": "HIGH",
+      "textures": 103,
+      "triangles": 984658,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-baseline-exporural-mobile-1-cold.json",
+    "readyMs": 5324.69970703125,
+    "navigationCount": 2,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 1758.300000011921,
+      "ready": 5324.69970703125
+    },
+    "sceneWarmup": "{\"durationMs\":173.70000004768372,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 347.80000001192093,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 791.3999999761581,
+        "status": 200
+      },
+      {
+        "duration": 773.8000000119209,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 790.8000000119209,
+        "status": 200
+      },
+      {
+        "duration": 755,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 1589.800000011921,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 2592.100000023842,
+      "calls": 100,
+      "dpr": 1,
+      "geometries": 91,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 391780564,
+      "height": 645,
+      "programs": 46,
+      "qualityTier": "HIGH",
+      "textures": 28,
+      "triangles": 70546,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-baseline-exporural-mobile-1-warm.json",
+    "readyMs": 9071.10009765625,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 1309.100000023842,
+      "ready": 9071.10009765625
+    },
+    "sceneWarmup": "{\"durationMs\":2555.800000011921,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 366.0999999642372,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 336.80000001192093,
+        "status": 200
+      },
+      {
+        "duration": 793,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 336.19999998807907,
+        "status": 200
+      },
+      {
+        "duration": 731.7999999523163,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 1140.600000023842,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 9071.19999998808,
+      "calls": 606,
+      "dpr": 1,
+      "geometries": 512,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 608158816,
+      "height": 645,
+      "programs": 140,
+      "qualityTier": "HIGH",
+      "textures": 83,
+      "triangles": 530979,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-baseline-exporural-mobile-2-cold.json",
+    "readyMs": 16586.199951171875,
+    "navigationCount": 2,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 6716.199999988079,
+      "ready": 16586.199951171875
+    },
+    "sceneWarmup": "{\"durationMs\":2113.199999988079,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 416.199999988079,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 5677.400000035763,
+        "status": 200
+      },
+      {
+        "duration": 686,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 5676.699999988079,
+        "status": 200
+      },
+      {
+        "duration": 794.6999999880791,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 6491.5,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 13870.30000001192,
+      "calls": 606,
+      "dpr": 1,
+      "geometries": 512,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 592483155,
+      "height": 645,
+      "programs": 140,
+      "qualityTier": "HIGH",
+      "textures": 83,
+      "triangles": 530979,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-baseline-exporural-mobile-2-warm.json",
+    "readyMs": 2217.89990234375,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 1419.199999988079,
+      "ready": 2217.89990234375
+    },
+    "sceneWarmup": "{\"durationMs\":157.5,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 451.5,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 206.19999998807907,
+        "status": 200
+      },
+      {
+        "duration": 757.3000000119209,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 201.39999997615817,
+        "status": 200
+      },
+      {
+        "duration": 873.5999999642372,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 1244,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 2218,
+      "calls": 100,
+      "dpr": 1,
+      "geometries": 91,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 625248539,
+      "height": 645,
+      "programs": 46,
+      "qualityTier": "HIGH",
+      "textures": 28,
+      "triangles": 70546,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-baseline-industria-desktop-1-cold.json",
+    "readyMs": 14216.699951171877,
+    "navigationCount": 2,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 1286,
+      "ready": 14216.699951171877
+    },
+    "sceneWarmup": "{\"durationMs\":4294.399999976158,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 421,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 172.60000002384186,
+        "status": 200
+      },
+      {
+        "duration": 859.1000000238419,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 172,
+        "status": 200
+      },
+      {
+        "duration": 1140.9000000357628,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 1052.199999988079,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 13658.400000035765,
+      "calls": 1132,
+      "dpr": 1,
+      "geometries": 693,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 453115041,
+      "height": 771,
+      "programs": 155,
+      "qualityTier": "HIGH",
+      "textures": 100,
+      "triangles": 1055790,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-baseline-industria-desktop-1-warm.json",
+    "readyMs": 9591.39990234375,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 1262.0999999642372,
+      "ready": 9591.39990234375
+    },
+    "sceneWarmup": "{\"durationMs\":2569.300000011921,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 559.5,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 376.800000011921,
+        "status": 200
+      },
+      {
+        "duration": 672.3000000119209,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 376.0999999642372,
+        "status": 200
+      },
+      {
+        "duration": 955.399999976158,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 1060.800000011921,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 9591.69999998808,
+      "calls": 805,
+      "dpr": 1,
+      "geometries": 655,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 224136100,
+      "height": 771,
+      "programs": 143,
+      "qualityTier": "HIGH",
+      "textures": 98,
+      "triangles": 683107,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-baseline-industria-desktop-2-cold.json",
+    "readyMs": 21733.400146484375,
+    "navigationCount": 2,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 7402.5,
+      "ready": 21733.400146484375
+    },
+    "sceneWarmup": "{\"durationMs\":5714,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 439.699999988079,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 6105,
+        "status": 200
+      },
+      {
+        "duration": 1095.2000000476835,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 6104.199999988079,
+        "status": 200
+      },
+      {
+        "duration": 897.5,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 7223,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 18918.900000035763,
+      "calls": 805,
+      "dpr": 1,
+      "geometries": 655,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 520343023,
+      "height": 771,
+      "programs": 143,
+      "qualityTier": "HIGH",
+      "textures": 98,
+      "triangles": 683107,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-baseline-industria-desktop-2-warm.json",
+    "readyMs": 7772.699951171875,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 1407.0999999642372,
+      "ready": 7772.699951171875
+    },
+    "sceneWarmup": "{\"durationMs\":1419.6000000238419,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 497.60000002384186,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 276.0999999642372,
+        "status": 200
+      },
+      {
+        "duration": 946.9000000357628,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 275.2999999523163,
+        "status": 200
+      },
+      {
+        "duration": 888.5999999642372,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 1232.199999988079,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 7772.799999952316,
+      "calls": 805,
+      "dpr": 1,
+      "geometries": 655,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 635590850,
+      "height": 771,
+      "programs": 143,
+      "qualityTier": "HIGH",
+      "textures": 98,
+      "triangles": 683107,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-baseline-industria-mobile-1-cold.json",
+    "readyMs": 10437.900146484377,
+    "navigationCount": 2,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 1510.699999988079,
+      "ready": 10437.900146484377
+    },
+    "sceneWarmup": "{\"durationMs\":504.30000001192093,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 382.300000011921,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 312.5999999642372,
+        "status": 200
+      },
+      {
+        "duration": 998.899999976158,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 312,
+        "status": 200
+      },
+      {
+        "duration": 885,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 1337.399999976158,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 7642.099999964237,
+      "calls": 635,
+      "dpr": 1,
+      "geometries": 513,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 501152870,
+      "height": 621,
+      "programs": 143,
+      "qualityTier": "HIGH",
+      "textures": 97,
+      "triangles": 568347,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-baseline-industria-mobile-1-warm.json",
+    "readyMs": 6313.60009765625,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 1169.5,
+      "ready": 6313.60009765625
+    },
+    "sceneWarmup": "{\"durationMs\":343.5,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 423.39999997615814,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 216.9000000357628,
+        "status": 200
+      },
+      {
+        "duration": 754.3000000119209,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 215.5,
+        "status": 200
+      },
+      {
+        "duration": 893.1000000238419,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 984.3000000119208,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 6313.700000047684,
+      "calls": 635,
+      "dpr": 1,
+      "geometries": 513,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 619401821,
+      "height": 621,
+      "programs": 143,
+      "qualityTier": "HIGH",
+      "textures": 97,
+      "triangles": 567915,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-baseline-industria-mobile-2-cold.json",
+    "readyMs": 19157.300048828125,
+    "navigationCount": 2,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 5461.199999988079,
+      "ready": 19157.300048828125
+    },
+    "sceneWarmup": "{\"durationMs\":5369.100000023842,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 465.800000011921,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 4424.699999988079,
+        "status": 200
+      },
+      {
+        "duration": 824.6999999880791,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 4424.100000023842,
+        "status": 200
+      },
+      {
+        "duration": 887,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 5285.300000011921,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 16518,
+      "calls": 635,
+      "dpr": 1,
+      "geometries": 513,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 384223094,
+      "height": 621,
+      "programs": 143,
+      "qualityTier": "HIGH",
+      "textures": 97,
+      "triangles": 568467,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-baseline-industria-mobile-2-warm.json",
+    "readyMs": 6739.10009765625,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 1498.5,
+      "ready": 6739.10009765625
+    },
+    "sceneWarmup": "{\"durationMs\":353.7000000476837,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 470.0999999642372,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 627.1000000238419,
+        "status": 200
+      },
+      {
+        "duration": 681.5999999642372,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 623.6000000238419,
+        "status": 200
+      },
+      {
+        "duration": 897.8000000119209,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 1322.699999988079,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 6739.399999976158,
+      "calls": 635,
+      "dpr": 1,
+      "geometries": 513,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 514848708,
+      "height": 621,
+      "programs": 143,
+      "qualityTier": "HIGH",
+      "textures": 97,
+      "triangles": 568035,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-candidate-automovel-desktop-1-cold.json",
+    "readyMs": 6163.5,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 4734,
+      "ready": 6163.5
+    },
+    "sceneWarmup": "{\"durationMs\":1433.699999988079,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 840.8000000119209,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 1073.199999988079,
+        "status": 200
+      },
+      {
+        "duration": 977.5,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 1073.899999976158,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 6277.599999964237,
+      "calls": 283,
+      "dpr": 1,
+      "geometries": 218,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 430221973,
+      "height": 767,
+      "programs": 54,
+      "qualityTier": "HIGH",
+      "textures": 42,
+      "triangles": 194466,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-candidate-automovel-desktop-1-warm.json",
+    "readyMs": 3532.60009765625,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 3300.399999976158,
+      "ready": 3532.60009765625
+    },
+    "sceneWarmup": "{\"durationMs\":201.69999998807907,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 588.9000000357628,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 326.69999998807907,
+        "status": 200
+      },
+      {
+        "duration": 711.8000000119209,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 325.89999997615814,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 3532.800000011921,
+      "calls": 283,
+      "dpr": 1,
+      "geometries": 218,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 504594660,
+      "height": 767,
+      "programs": 54,
+      "qualityTier": "HIGH",
+      "textures": 42,
+      "triangles": 194466,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-candidate-automovel-desktop-2-cold.json",
+    "readyMs": 6625,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 5104.199999988079,
+      "ready": 6625
+    },
+    "sceneWarmup": "{\"durationMs\":1462.699999988079,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 816.1999999880791,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 1458.699999988079,
+        "status": 200
+      },
+      {
+        "duration": 973.600000023842,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 1462.0999999642372,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 6625.099999964237,
+      "calls": 283,
+      "dpr": 1,
+      "geometries": 218,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 385040023,
+      "height": 767,
+      "programs": 54,
+      "qualityTier": "HIGH",
+      "textures": 42,
+      "triangles": 194466,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-candidate-automovel-desktop-2-warm.json",
+    "readyMs": 3935.800048828125,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 3628.599999964237,
+      "ready": 3935.800048828125
+    },
+    "sceneWarmup": "{\"durationMs\":195.20000004768372,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 538,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 272.19999998807907,
+        "status": 200
+      },
+      {
+        "duration": 916.8000000119208,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 270.89999997615814,
+        "status": 200
+      },
+      {
+        "duration": 442.699999988079,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 16208.19999998808,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 26862.89999997616,
+      "calls": 381,
+      "dpr": 1,
+      "geometries": 317,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 288605750,
+      "height": 767,
+      "programs": 111,
+      "qualityTier": "HIGH",
+      "textures": 42,
+      "triangles": 204333,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-candidate-automovel-mobile-1-cold.json",
+    "readyMs": 5803.5,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 4260.5,
+      "ready": 5803.5
+    },
+    "sceneWarmup": "{\"durationMs\":1441.6000000238419,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 742.5,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 920.6999999880792,
+        "status": 200
+      },
+      {
+        "duration": 752.6000000238419,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 920,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 5803.600000023842,
+      "calls": 365,
+      "dpr": 1,
+      "geometries": 307,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 916149631,
+      "height": 649,
+      "programs": 54,
+      "qualityTier": "HIGH",
+      "textures": 40,
+      "triangles": 191784,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-candidate-automovel-mobile-1-warm.json",
+    "readyMs": 3627.89990234375,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 1229.100000023842,
+      "ready": 3627.89990234375
+    },
+    "sceneWarmup": "{\"durationMs\":175.89999997615814,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 510.9000000357628,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 342.89999997615814,
+        "status": 200
+      },
+      {
+        "duration": 873,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 341.89999997615814,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 3627.899999976158,
+      "calls": 365,
+      "dpr": 1,
+      "geometries": 307,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 1030741416,
+      "height": 649,
+      "programs": 54,
+      "qualityTier": "HIGH",
+      "textures": 40,
+      "triangles": 191784,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-candidate-automovel-mobile-2-cold.json",
+    "readyMs": 4009.5,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 3746.299999952316,
+      "ready": 4009.5
+    },
+    "sceneWarmup": "{\"durationMs\":194.89999997615814,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 509.60000002384186,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 547.3999999761581,
+        "status": 200
+      },
+      {
+        "duration": 699.8000000119209,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 545.2999999523163,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 4009.599999964237,
+      "calls": 365,
+      "dpr": 1,
+      "geometries": 307,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 554708701,
+      "height": 649,
+      "programs": 54,
+      "qualityTier": "HIGH",
+      "textures": 40,
+      "triangles": 191784,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-candidate-automovel-mobile-2-warm.json",
+    "readyMs": 3488.89990234375,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 985.1999999880792,
+      "ready": 3488.89990234375
+    },
+    "sceneWarmup": "{\"durationMs\":201.10000002384186,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 574.1000000238419,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 200.69999998807907,
+        "status": 200
+      },
+      {
+        "duration": 630.3000000119209,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 200,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 3489,
+      "calls": 365,
+      "dpr": 1,
+      "geometries": 307,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 649869337,
+      "height": 649,
+      "programs": 54,
+      "qualityTier": "HIGH",
+      "textures": 40,
+      "triangles": 191784,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-candidate-exporural-desktop-cold-1.json",
+    "readyMs": 5902.39990234375,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 3932.699999988079,
+      "ready": 5902.39990234375
+    },
+    "sceneWarmup": "{\"durationMs\":1665,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 669.0999999642372,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 701.6000000238419,
+        "status": 200
+      },
+      {
+        "duration": 766.5,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 700.6999999880791,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 12206.900000035765,
+      "calls": 949,
+      "dpr": 1,
+      "geometries": 808,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 302837890,
+      "height": 767,
+      "programs": 120,
+      "qualityTier": "HIGH",
+      "textures": 73,
+      "triangles": 326840,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-candidate-exporural-desktop-cold-2.json",
+    "readyMs": 8209.5,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 6369.099999964237,
+      "ready": 8209.5
+    },
+    "sceneWarmup": "{\"durationMs\":1636.7000000476837,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 2210.5,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 625.5,
+        "status": 200
+      },
+      {
+        "duration": 3046.800000011921,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 628.0999999642372,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 15816.5,
+      "calls": 954,
+      "dpr": 1,
+      "geometries": 812,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 537466101,
+      "height": 767,
+      "programs": 123,
+      "qualityTier": "HIGH",
+      "textures": 74,
+      "triangles": 327687,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-candidate-exporural-desktop-warm-1.json",
+    "readyMs": 3950.5,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 3511.899999976158,
+      "ready": 3950.5
+    },
+    "sceneWarmup": "{\"durationMs\":194.0999999642372,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 719.1999999880791,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 339.5,
+        "status": 200
+      },
+      {
+        "duration": 781,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 346.19999998807907,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 13329.600000023842,
+      "calls": 954,
+      "dpr": 1,
+      "geometries": 812,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 192094240,
+      "height": 767,
+      "programs": 123,
+      "qualityTier": "HIGH",
+      "textures": 74,
+      "triangles": 327687,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-candidate-exporural-desktop-warm-2.json",
+    "readyMs": 4147.300048828125,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 3630.900000035763,
+      "ready": 4147.300048828125
+    },
+    "sceneWarmup": "{\"durationMs\":206.89999997615814,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 741.6999999880791,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 278.9000000357628,
+        "status": 200
+      },
+      {
+        "duration": 1114.5999999642372,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 277.60000002384186,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 15140,
+      "calls": 954,
+      "dpr": 1,
+      "geometries": 812,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 304338005,
+      "height": 767,
+      "programs": 123,
+      "qualityTier": "HIGH",
+      "textures": 74,
+      "triangles": 327687,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-candidate-exporural-mobile-1-cold.json",
+    "readyMs": 4600.60009765625,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 4074.5,
+      "ready": 4600.60009765625
+    },
+    "sceneWarmup": "{\"durationMs\":452.10000002384186,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 800.6000000238419,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 725.3000000119209,
+        "status": 200
+      },
+      {
+        "duration": 938.899999976158,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 721.2000000476837,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 4726.600000023842,
+      "calls": 521,
+      "dpr": 1,
+      "geometries": 439,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 716362635,
+      "height": 649,
+      "programs": 66,
+      "qualityTier": "HIGH",
+      "textures": 52,
+      "triangles": 208954,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-candidate-exporural-mobile-1-warm.json",
+    "readyMs": 3721.89990234375,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 3332.5,
+      "ready": 3721.89990234375
+    },
+    "sceneWarmup": "{\"durationMs\":204.60000002384186,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 702.5,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 232.89999997615817,
+        "status": 200
+      },
+      {
+        "duration": 753.5,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 233.39999997615817,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 8330.399999976158,
+      "calls": 568,
+      "dpr": 1,
+      "geometries": 476,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 324618656,
+      "height": 649,
+      "programs": 120,
+      "qualityTier": "HIGH",
+      "textures": 67,
+      "triangles": 275174,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-candidate-exporural-mobile-2-cold.json",
+    "readyMs": 4997.10009765625,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 4566.599999964237,
+      "ready": 4997.10009765625
+    },
+    "sceneWarmup": "{\"durationMs\":295.30000001192093,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 739.1999999880791,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 637.6999999880791,
+        "status": 200
+      },
+      {
+        "duration": 793.3000000119209,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 640.0999999642372,
+        "status": 200
+      },
+      {
+        "duration": 369.89999997615814,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 16447.30000001192,
+        "status": 200
+      },
+      {
+        "duration": 321.19999998807907,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 31835.89999997616,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 40694.30000001192,
+      "calls": 578,
+      "dpr": 1,
+      "geometries": 482,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 338878931,
+      "height": 649,
+      "programs": 123,
+      "qualityTier": "HIGH",
+      "textures": 68,
+      "triangles": 276339,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-candidate-exporural-mobile-2-warm.json",
+    "readyMs": 3821,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 3433.600000023842,
+      "ready": 3821
+    },
+    "sceneWarmup": "{\"durationMs\":199.30000001192093,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 805,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 259,
+        "status": 200
+      },
+      {
+        "duration": 851.3000000119209,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 257.5,
+        "status": 200
+      },
+      {
+        "duration": 364,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 16144.600000023842,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 18924.80000001192,
+      "calls": 578,
+      "dpr": 1,
+      "geometries": 482,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 394141341,
+      "height": 649,
+      "programs": 123,
+      "qualityTier": "HIGH",
+      "textures": 68,
+      "triangles": 276339,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-candidate-industria-desktop-1-cold.json",
+    "readyMs": 5891.800048828125,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 3840.299999952316,
+      "ready": 5891.800048828125
+    },
+    "sceneWarmup": "{\"durationMs\":1866.800000011921,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 581.8999999761581,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 719.1999999880791,
+        "status": 200
+      },
+      {
+        "duration": 731.8999999761581,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 715.6999999880791,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 5892,
+      "calls": 618,
+      "dpr": 1,
+      "geometries": 497,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 333650609,
+      "height": 767,
+      "programs": 62,
+      "qualityTier": "HIGH",
+      "textures": 56,
+      "triangles": 248005,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-candidate-industria-desktop-1-warm.json",
+    "readyMs": 3809.39990234375,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 1307.899999976158,
+      "ready": 3809.39990234375
+    },
+    "sceneWarmup": "{\"durationMs\":183.0999999642372,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 715.6999999880791,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 325,
+        "status": 200
+      },
+      {
+        "duration": 776.5,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 325.80000001192093,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 3809.899999976158,
+      "calls": 618,
+      "dpr": 1,
+      "geometries": 497,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 426537031,
+      "height": 767,
+      "programs": 62,
+      "qualityTier": "HIGH",
+      "textures": 56,
+      "triangles": 248005,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-candidate-industria-desktop-2-cold.json",
+    "readyMs": 6111.699951171875,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 4012.900000035763,
+      "ready": 6111.699951171875
+    },
+    "sceneWarmup": "{\"durationMs\":1895.1000000238419,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 702.1999999880791,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 754.7000000476837,
+        "status": 200
+      },
+      {
+        "duration": 798.8999999761581,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 753.6000000238419,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 6111.800000011921,
+      "calls": 618,
+      "dpr": 1,
+      "geometries": 497,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 717042236,
+      "height": 767,
+      "programs": 62,
+      "qualityTier": "HIGH",
+      "textures": 56,
+      "triangles": 248005,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-candidate-industria-desktop-2-warm.json",
+    "readyMs": 3654.300048828125,
+    "navigationCount": 1,
+    "viewport": [
+      1366,
+      900,
+      1
+    ],
+    "events": {
+      "canvas": 3196.199999988079,
+      "ready": 3654.300048828125
+    },
+    "sceneWarmup": "{\"durationMs\":204,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 567.3000000119209,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 268.89999997615814,
+        "status": 200
+      },
+      {
+        "duration": 687.9000000357628,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 267.7999999523163,
+        "status": 200
+      },
+      {
+        "duration": 676.8000000119209,
+        "name": "/rest/v1/rpc/public_map_scope_revision",
+        "start": 15971.599999964235,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 21047.89999997616,
+      "calls": 770,
+      "dpr": 1,
+      "geometries": 617,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 245362690,
+      "height": 767,
+      "programs": 119,
+      "qualityTier": "HIGH",
+      "textures": 71,
+      "triangles": 337383,
+      "width": 1351
+    }
+  },
+  {
+    "file": "measured-candidate-industria-mobile-1-cold.json",
+    "readyMs": 4977.39990234375,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 4627.699999988079,
+      "ready": 4977.39990234375
+    },
+    "sceneWarmup": "{\"durationMs\":208.4000000357628,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 585.1999999880791,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 598.5,
+        "status": 200
+      },
+      {
+        "duration": 940,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 595.3999999761581,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 5094.5,
+      "calls": 526,
+      "dpr": 1,
+      "geometries": 404,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 722995254,
+      "height": 625,
+      "programs": 62,
+      "qualityTier": "HIGH",
+      "textures": 54,
+      "triangles": 226216,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-candidate-industria-mobile-1-warm.json",
+    "readyMs": 4127.699951171875,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 3760.099999964237,
+      "ready": 4127.699951171875
+    },
+    "sceneWarmup": "{\"durationMs\":194.20000004768372,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 688.0999999642372,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 245.5,
+        "status": 200
+      },
+      {
+        "duration": 850.2000000476837,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 243.0999999642372,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 4127.800000011921,
+      "calls": 526,
+      "dpr": 1,
+      "geometries": 404,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 807043095,
+      "height": 625,
+      "programs": 62,
+      "qualityTier": "HIGH",
+      "textures": 54,
+      "triangles": 226216,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-candidate-industria-mobile-2-cold.json",
+    "readyMs": 4696.60009765625,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 4298.600000023842,
+      "ready": 4696.60009765625
+    },
+    "sceneWarmup": "{\"durationMs\":339.10000002384186,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 1147.100000023842,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 522.8000000119209,
+        "status": 200
+      },
+      {
+        "duration": 1235.5,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 521.5,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 4826.699999988079,
+      "calls": 526,
+      "dpr": 1,
+      "geometries": 404,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 707437025,
+      "height": 625,
+      "programs": 62,
+      "qualityTier": "HIGH",
+      "textures": 54,
+      "triangles": 226216,
+      "width": 375
+    }
+  },
+  {
+    "file": "measured-candidate-industria-mobile-2-warm.json",
+    "readyMs": 3520.5,
+    "navigationCount": 1,
+    "viewport": [
+      390,
+      844,
+      1
+    ],
+    "events": {
+      "canvas": 3120.199999988079,
+      "ready": 3520.5
+    },
+    "sceneWarmup": "{\"durationMs\":215.0999999642372,\"parallel\":true}",
+    "requests": [
+      {
+        "duration": 521.5999999642372,
+        "name": "/rest/v1/rpc/public_map_context",
+        "start": 220.5,
+        "status": 200
+      },
+      {
+        "duration": 722.6999999880791,
+        "name": "/rest/v1/rpc/public_map_inventory",
+        "start": 219.5,
+        "status": 200
+      }
+    ],
+    "renderer": {
+      "at": 13906.30000001192,
+      "calls": 606,
+      "dpr": 1,
+      "geometries": 481,
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuVendor": "Google Inc. (Intel)",
+      "heapBytes": 813463970,
+      "height": 625,
+      "programs": 119,
+      "qualityTier": "HIGH",
+      "textures": 70,
+      "triangles": 298759,
+      "width": 375
+    }
+  }
+]

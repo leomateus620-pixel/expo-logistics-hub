@@ -201,6 +201,7 @@ export interface ViaExpressaRenderDiagnostics {
 export function createViaExpressaLayout(
   bounds: ViaExpressaBounds,
   requestedHeight = viaExpressaVisualHeight(bounds),
+  vegetationEnabled = true,
 ): ViaExpressaLayout {
   const width = Math.max(2.2, finiteOr(bounds.width, 3.05));
   const depth = Math.max(2.4, finiteOr(bounds.depth, 3.82));
@@ -239,7 +240,7 @@ export function createViaExpressaLayout(
   const sideX = width / 2 - treeCanopy - clamp(width * 0.02, 0.04, 0.07);
   const treeZFront = clamp(frontZ - fillDepth * 0.16, -depth / 2 + treeCanopy, depth / 2 - treeCanopy);
   const treeZRear = clamp(rearZ + fillDepth * 0.2, -depth / 2 + treeCanopy, depth / 2 - treeCanopy);
-  const trees: ViaExpressaTreePose[] = [-1, 1].flatMap((side) => (
+  const trees: ViaExpressaTreePose[] = (vegetationEnabled ? [-1, 1] : []).flatMap((side) => (
     [treeZFront, treeZRear].map((z, index) => ({
       x: side * sideX,
       z,

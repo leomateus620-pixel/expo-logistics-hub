@@ -15,14 +15,14 @@ import {
 import { createExteriorTree } from "./exteriorVegetation";
 import { disposeInstancedMesh } from "./instancedMeshDisposal";
 
-export function buildExteriorArchitectureScene() {
+export function buildExteriorArchitectureScene(vegetationEnabled = true) {
   const group = new THREE.Group();
   group.name = "exterior-architecture-and-vegetation";
   const material = createArchitectureMaterial();
-  const foliage = new THREE.MeshStandardMaterial({
+  const foliage = vegetationEnabled ? new THREE.MeshStandardMaterial({
     vertexColors: true,
     roughness: 0.97,
-  });
+  }) : null;
   const geometries = new Map<
     string,
     {
@@ -105,7 +105,7 @@ export function buildExteriorArchitectureScene() {
       tint,
     );
   }
-  TERRITORY_TREES.forEach((tree, i) => {
+  if (vegetationEnabled) TERRITORY_TREES.forEach((tree, i) => {
     const id = `territory-tree-${i}`,
       species = exteriorIdHash(id) % 3,
       key = `tree-${species}`;
@@ -136,7 +136,7 @@ export function buildExteriorArchitectureScene() {
     const pair = geometries.get(key)!;
     const mesh = new THREE.InstancedMesh(
       pair.map,
-      trees ? foliage : material,
+      trees ? foliage! : material,
       entries.length,
     );
     mesh.name = `exterior-cell:${cell}`;
@@ -216,7 +216,7 @@ export function buildExteriorArchitectureScene() {
         p.far.dispose();
       });
       material.dispose();
-      foliage.dispose();
+      foliage?.dispose();
     },
   };
 }
