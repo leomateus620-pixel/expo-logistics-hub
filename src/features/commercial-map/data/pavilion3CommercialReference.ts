@@ -217,7 +217,12 @@ export const PAVILION3_COMMERCIAL_REFERENCE_CORRIDORS = [
     id: 'west-longitudinal',
     label: 'Circulação longitudinal oeste',
     kind: 'main',
-    ...rect(0.19, 0.475, 0.15, 0.73),
+    ...rect(
+      0.19,
+      (0.11 + MODULE_36_TOP - PAVILION3_COMMERCIAL_MODULE_GAP) / 2,
+      0.15,
+      MODULE_36_TOP - PAVILION3_COMMERCIAL_MODULE_GAP - 0.11,
+    ),
   },
   {
     id: 'central-longitudinal',
@@ -241,7 +246,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE_CORRIDORS = [
     id: 'south-distribution',
     label: 'Distribuição sul',
     kind: 'cross',
-    ...rect(0.505, 0.861, 0.78, 0.018),
+    ...rect(0.5375, 0.861, 0.715, 0.018),
   },
   {
     id: 'west-lateral-access',
