@@ -244,15 +244,17 @@ export const PAVILION8_COMMERCIAL_SUPPORT_SPACES = [
   },
 ] as const satisfies readonly CommercialPavilionReferenceSupportSpace[];
 
+export const PAVILION8_MODULE_90_METRIC_FOOTPRINT = [
+  [0, 0],
+  [5.5, 0],
+  [5.5, 3],
+  [4, 3],
+  [4, 5],
+  [0, 5],
+] as const;
+
 const MODULE_90_SHAPE: CommercialPavilionReferenceCellShape = {
-  footprint: PROJECT.polygon([
-    [0, 0],
-    [5.5, 0],
-    [5.5, 3],
-    [4, 3],
-    [4, 5],
-    [0, 5],
-  ]),
+  footprint: PROJECT.polygon(PAVILION8_MODULE_90_METRIC_FOOTPRINT),
   renderParts: [
     PROJECT.rect(0, 0, 4, 5),
     PROJECT.rect(4, 0, 1.5, 3),

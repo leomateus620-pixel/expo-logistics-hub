@@ -63,6 +63,7 @@ describe('registry público das dez áreas', () => {
     expect(getPublicArea('pavilhao-14')?.pavilionIdentifier).toBe('B2');
     expect(getPublicArea('pavilhao-3')?.pavilionIdentifier).toBe('B6');
     expect(getPublicArea('pavilhao-5')?.pavilionIdentifier).toBe('B8');
+    expect(getPublicArea('pavilhao-8')?.pavilionIdentifier).toBe('B4');
   });
 
   it('rejeita slug fora do registro', () => {

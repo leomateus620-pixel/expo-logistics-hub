@@ -76,12 +76,10 @@ const parsedRuns = [...runSection.matchAll(runPattern)].map((match): ParsedRun =
 }));
 
 const references = {
-  B4: PAVILION8_COMMERCIAL_REFERENCE,
   B5: PAVILION13_COMMERCIAL_REFERENCE,
 } as const;
 
 const metricFrames = {
-  B4: { width: 21.7, depth: 35.4, inset: 0 },
   B5: { width: 21, depth: 35.35, inset: 0 },
 } as const;
 
@@ -129,7 +127,7 @@ describe('contrato persistido dos Pavilhões 8 e 13', () => {
 
     // B4 e B5 foram supersedidos pelas plantas oficiais 2028 e possuem contratos dedicados.
     for (const [pavilionIdentifier, reference] of Object.entries(references).filter(
-      ([identifier]) => identifier !== 'B4' && identifier !== 'B5',
+      ([identifier]) => identifier !== 'B5',
     )) {
       const runs = parsedRuns.filter((run) => run.pavilionIdentifier === pavilionIdentifier);
       expect(runs).toHaveLength(reference.runs.length);
