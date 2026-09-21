@@ -77,6 +77,8 @@ export interface CommercialPavilionDefinition {
    * persisted module geometry and exterior cutaway remain authoritative.
    */
   interiorViewRotationRadians: number;
+  /** Official local reading axis, including the quarter-turn projection. */
+  interiorReadingAxis: 'x' | 'z';
   focusDirection: readonly [number, number, number];
   visualHeight: {
     scale: number;
@@ -212,6 +214,7 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
     entranceCount: 1,
     facingRadians: Math.PI / 2,
     interiorViewRotationRadians: Math.PI,
+    interiorReadingAxis: 'z',
     focusDirection: [0.92, 1.44, -0.92],
     visualHeight: { scale: 0.49, min: 2.35, max: 2.72 },
     facade: {
@@ -231,6 +234,7 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
     entranceCount: 2,
     facingRadians: Math.PI / 2,
     interiorViewRotationRadians: -Math.PI / 2,
+    interiorReadingAxis: 'z',
     focusDirection: [0.94, 0.76, 0.12],
     visualHeight: { scale: 0.47, min: 2.25, max: 2.58 },
     facade: {
@@ -250,6 +254,7 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
     entranceCount: 2,
     facingRadians: Math.PI,
     interiorViewRotationRadians: Math.PI,
+    interiorReadingAxis: 'x',
     focusDirection: [0.04, 0.78, -0.95],
     visualHeight: { scale: 0.43, min: 2.48, max: 2.82 },
     facade: {
@@ -269,6 +274,7 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
     entranceCount: 2,
     facingRadians: Math.PI,
     interiorViewRotationRadians: 0,
+    interiorReadingAxis: 'z',
     focusDirection: [-0.06, 0.8, -0.95],
     visualHeight: { scale: 0.53, min: 2.1, max: 2.42 },
     facade: {
@@ -293,6 +299,7 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
     entranceCount: 2,
     facingRadians: Math.PI,
     interiorViewRotationRadians: 0,
+    interiorReadingAxis: 'z',
     focusDirection: [-0.14, 0.78, -0.94],
     visualHeight: { scale: 0.5, min: 2.08, max: 2.38 },
     facade: {
@@ -317,6 +324,7 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
     entranceCount: 3,
     facingRadians: Math.PI,
     interiorViewRotationRadians: Math.PI,
+    interiorReadingAxis: 'z',
     focusDirection: [-0.22, 0.76, -0.92],
     visualHeight: { scale: 0.47, min: 2.35, max: 2.68 },
     facade: {
@@ -336,6 +344,7 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
     entranceCount: 2,
     facingRadians: 0,
     interiorViewRotationRadians: 0,
+    interiorReadingAxis: 'z',
     focusDirection: [0.12, 0.84, 0.96],
     visualHeight: { scale: 0.45, min: 2.2, max: 2.54 },
     facade: {
@@ -355,6 +364,7 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
     entranceCount: 2,
     facingRadians: 0,
     interiorViewRotationRadians: 0,
+    interiorReadingAxis: 'x',
     focusDirection: [0.08, 0.8, 0.98],
     visualHeight: { scale: 0.44, min: 2.22, max: 2.56 },
     facade: {

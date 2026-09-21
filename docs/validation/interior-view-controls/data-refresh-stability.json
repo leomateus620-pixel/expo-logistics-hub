@@ -1,0 +1,10 @@
+{
+  "before": {
+    "camera": "{\"position\":[0.7964,13.0563,15.6888],\"target\":[0.7964,0.3001,15.312],\"quaternion\":[-0.69659,0,0,0.71747],\"controlsEnabled\":true,\"interiorEntityId\":\"reference:2026:b6\",\"fov\":36,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":-0.04834254143646409},\"near\":0.025,\"far\":138.274,\"distance\":12.7617,\"minDistance\":1.8437,\"maxDistance\":13.2513,\"desiredMinDistance\":1.8437,\"desiredMaxDistance\":13.2513,\"calculatedMaxDistance\":328.6701,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":6.2,\"diagonal\":198.05951217035},\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1351,\"height\":724,\"aspect\":1.86602,\"dpr\":0.72}}",
+    "transition": "{\"status\":\"completed\",\"source\":\"interior:reference:2026:b6\",\"sequence\":44,\"startedAt\":200541.2,\"durationMs\":120,\"completedAt\":201349.6,\"elapsedMs\":808.4}"
+  },
+  "after": {
+    "camera": "{\"position\":[0.7964,13.0569,15.6888],\"target\":[0.7964,0.3007,15.312],\"quaternion\":[-0.69659,0,0,0.71747],\"controlsEnabled\":true,\"interiorEntityId\":\"reference:2026:b6\",\"fov\":36,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":-0.04834254143646409},\"near\":0.025,\"far\":138.274,\"distance\":12.7617,\"minDistance\":1.8437,\"maxDistance\":13.2513,\"desiredMinDistance\":1.8437,\"desiredMaxDistance\":13.2513,\"calculatedMaxDistance\":328.6701,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":6.2,\"diagonal\":198.05951217035},\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1351,\"height\":724,\"aspect\":1.86602,\"dpr\":1}}",
+    "transition": "{\"status\":\"completed\",\"source\":\"interior:reference:2026:b6\",\"sequence\":44,\"startedAt\":200541.2,\"durationMs\":120,\"completedAt\":201349.6,\"elapsedMs\":808.4}"
+  }
+}

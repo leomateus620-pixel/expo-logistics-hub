@@ -1,0 +1,20 @@
+{
+  "canvas": {
+    "commercialMapCameraDiagnostics": "{\"position\":[0.7964,13.034,15.8012],\"target\":[0.7964,0.2778,15.4244],\"quaternion\":[-0.69659,0,0,0.71747],\"controlsEnabled\":true,\"interiorEntityId\":\"reference:2026:b6\",\"fov\":36,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":-0.04834254143646409},\"near\":0.025,\"far\":138.274,\"distance\":12.7617,\"minDistance\":1.8437,\"maxDistance\":13.2513,\"desiredMinDistance\":1.8437,\"desiredMaxDistance\":13.2513,\"calculatedMaxDistance\":328.6701,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":6.2,\"diagonal\":198.05951217035},\"boundingSphereRadius\":79.8989,\"viewport\":{\"width\":1351,\"height\":724,\"aspect\":1.86602,\"dpr\":0.72}}",
+    "commercialMapCameraTransition": "{\"status\":\"completed\",\"source\":\"interior:reference:2026:b6\",\"sequence\":44,\"startedAt\":200541.2,\"durationMs\":120,\"completedAt\":201349.6,\"elapsedMs\":808.4}",
+    "commercialMapEssentialReady": "true",
+    "commercialMapHydration": "complete",
+    "commercialMapInteractive": "true",
+    "commercialMapInteriorShaderWarmup": "{\"durationMs\":0.7,\"programsBefore\":193,\"programsAfter\":193,\"error\":null}",
+    "commercialMapQuality": "{\"logicalTier\":\"HIGH\",\"sceneTier\":\"HIGH\",\"baseDpr\":1,\"effectiveDpr\":0.72,\"hardwareCeiling\":\"HIGH\",\"reason\":\"viewport-sync\"}",
+    "commercialMapRain": "{\"blend\":0,\"night\":0,\"tier\":\"HIGH\",\"drops\":3000,\"splashes\":122,\"runoff\":128,\"puddles\":64,\"wetMaterials\":566}",
+    "commercialMapReady": "true",
+    "commercialMapRenderHealth": "{\"status\":\"ready\",\"path\":\"direct\",\"presentedFrames\":261,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "commercialMapRendererInfo": "{\"at\":234822.30000001192,\"calls\":16,\"triangles\":5538,\"geometries\":6,\"textures\":3,\"programs\":192,\"dpr\":0.72,\"width\":972,\"height\":521,\"heapBytes\":138388160,\"qualityTier\":\"HIGH\",\"gpuVendor\":\"Google Inc. (Intel)\",\"gpuRenderer\":\"ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)\"}",
+    "commercialMapSceneWarmup": "{\"durationMs\":457,\"parallel\":true}",
+    "commercialMapShaderCompilation": "{\"startedAt\":198317.3,\"durationMs\":4.5,\"programsBefore\":191,\"programsAfter\":192,\"geometries\":6,\"textures\":3}",
+    "engine": "three.js r170",
+    "exteriorReport": "{\"buildings\":22,\"trees\":111,\"used\":[\"H02\",\"H03\",\"H04\",\"H05\",\"H06\",\"H08\",\"H09\",\"H10\",\"H15\",\"H17\",\"R03\",\"R04\",\"R05\"],\"groundTriangles\":507,\"architectures\":4616,\"vegetation\":26980,\"draws\":28,\"lods\":{\"map\":22,\"far\":4,\"near\":2}}"
+  },
+  "performance": "{\"sampledFrames\":28,\"averageFrameTimeMs\":1013.99,\"p95FrameTimeMs\":1017.5,\"p50FrameTimeMs\":1016.3,\"p99FrameTimeMs\":1017.7,\"averageFps\":1,\"inverseP99FpsApproximation\":1,\"stallsOver250Ms\":28,\"stallDurationMs\":28391.800000000003,\"jankFrames\":28,\"longTasks\":0,\"reactCommits\":10,\"qualityChanges\":0,\"contextLost\":0,\"contextRestored\":0,\"renderer\":{\"at\":234822.30000001192,\"calls\":16,\"triangles\":5538,\"geometries\":6,\"textures\":3,\"programs\":192,\"dpr\":0.72,\"width\":972,\"height\":521,\"heapBytes\":138388160,\"qualityTier\":\"HIGH\",\"gpuVendor\":\"Google Inc. (Intel)\",\"gpuRenderer\":\"ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)\"}}"
+}

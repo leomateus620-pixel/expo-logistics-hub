@@ -1,0 +1,288 @@
+{
+  "command": "npx vitest run <commercialMapPavilion*, commercialMapCameraTransition, commercialMapInteriorView, commercialMapRuntimeStability, commercialMapContextualLegend>",
+  "files": 37,
+  "passedFiles": 33,
+  "tests": 321,
+  "passed": 308,
+  "failed": 13,
+  "results": [
+    {
+      "file": "commercialMapCameraTransition.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "commercialMapContextualLegend.test.tsx",
+      "status": "failed",
+      "tests": 16,
+      "failures": [
+        {
+          "name": "resumo comercial contextual retorna ao segmento e ao parque sem transportar os totais do interior",
+          "message": "AssertionError: expected 1579 to be 1577 // Object.is equality\n    at C:\\Users\\Leonardo\\Desktop\\expo-logistics-hub-interior-controls\\src\\test\\commercialMapContextualLegend.test.tsx:54:29\n    at file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@vitest/ru"
+        }
+      ]
+    },
+    {
+      "file": "commercialMapInteriorView.test.tsx",
+      "status": "passed",
+      "tests": 37,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion12PlanPresentation.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion13Official2028.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion13PlanPresentation.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion143Corrections.test.ts",
+      "status": "passed",
+      "tests": 29,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion14OfficialFrame.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion14PlanPresentation.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion1AxisMigration.contract.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion1AxisProjection.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion1PlanPresentation.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion3Migration.contract.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion3Official2028.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion3PlanPresentation.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion5OfficialFrame.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion5PlanPresentation.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion7OfficialLayout.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion8Official2028.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilion8PlanPresentation.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilionAccessTooltip.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilionCommercial.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilionCourtyard.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilionFamily.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilionFourSoyKitchen.test.ts",
+      "status": "failed",
+      "tests": 7,
+      "failures": [
+        {
+          "name": "Pavilhão 4 — Cozinha da Soja B7 reutiliza os postes frontais e a recepção elétrica oficiais sem duplicá-los",
+          "message": "AssertionError: expected 3.163636363636364 to be less than 3.000945454545455\n    at C:\\Users\\Leonardo\\Desktop\\expo-logistics-hub-interior-controls\\src\\test\\commercialMapPavilionFourSoyKitchen.test.ts:147:41\n    at file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/nod"
+        }
+      ]
+    },
+    {
+      "file": "commercialMapPavilionLegend.test.tsx",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilionModuleCard.test.tsx",
+      "status": "failed",
+      "tests": 9,
+      "failures": [
+        {
+          "name": "cartão operacional do módulo interno mantém o módulo 'B1' neutro e sem área individual inventada",
+          "message": "Error: No QueryClient set, use QueryClientProvider to set one\n    at useQueryClient (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/QueryClientProvider.tsx:18:11)\n    at useBaseQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useBaseQuery.ts:54:18)\n    at Module.useQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useQuery.ts:46:10)\n    at Module.useLotP"
+        },
+        {
+          "name": "cartão operacional do módulo interno mantém o módulo 'B2' neutro e sem área individual inventada",
+          "message": "Error: No QueryClient set, use QueryClientProvider to set one\n    at useQueryClient (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/QueryClientProvider.tsx:18:11)\n    at useBaseQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useBaseQuery.ts:54:18)\n    at Module.useQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useQuery.ts:46:10)\n    at Module.useLotP"
+        },
+        {
+          "name": "cartão operacional do módulo interno mantém o módulo 'B3' neutro e sem área individual inventada",
+          "message": "Error: No QueryClient set, use QueryClientProvider to set one\n    at useQueryClient (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/QueryClientProvider.tsx:18:11)\n    at useBaseQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useBaseQuery.ts:54:18)\n    at Module.useQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useQuery.ts:46:10)\n    at Module.useLotP"
+        },
+        {
+          "name": "cartão operacional do módulo interno mantém o módulo 'B8' neutro e sem área individual inventada",
+          "message": "Error: No QueryClient set, use QueryClientProvider to set one\n    at useQueryClient (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/QueryClientProvider.tsx:18:11)\n    at useBaseQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useBaseQuery.ts:54:18)\n    at Module.useQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useQuery.ts:46:10)\n    at Module.useLotP"
+        },
+        {
+          "name": "cartão operacional do módulo interno não converte a área modular total em medida individual",
+          "message": "Error: No QueryClient set, use QueryClientProvider to set one\n    at useQueryClient (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/QueryClientProvider.tsx:18:11)\n    at useBaseQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useBaseQuery.ts:54:18)\n    at Module.useQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useQuery.ts:46:10)\n    at Module.useLotP"
+        },
+        {
+          "name": "cartão operacional do módulo interno oferece somente operações válidas para um módulo disponível e persistido",
+          "message": "Error: No QueryClient set, use QueryClientProvider to set one\n    at useQueryClient (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/QueryClientProvider.tsx:18:11)\n    at useBaseQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useBaseQuery.ts:54:18)\n    at Module.useQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useQuery.ts:46:10)\n    at Module.useLotP"
+        },
+        {
+          "name": "cartão operacional do módulo interno expõe versões privadas de contrato no próprio cartão do módulo",
+          "message": "Error: No QueryClient set, use QueryClientProvider to set one\n    at useQueryClient (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/QueryClientProvider.tsx:18:11)\n    at useBaseQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useBaseQuery.ts:54:18)\n    at Module.useQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useQuery.ts:46:10)\n    at Module.useLotP"
+        },
+        {
+          "name": "cartão operacional do módulo interno não oferece venda direta enquanto o módulo permanece bloqueado",
+          "message": "Error: No QueryClient set, use QueryClientProvider to set one\n    at useQueryClient (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/QueryClientProvider.tsx:18:11)\n    at useBaseQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useBaseQuery.ts:54:18)\n    at Module.useQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useQuery.ts:46:10)\n    at Module.useLotP"
+        },
+        {
+          "name": "cartão operacional do módulo interno abre no dock com resumo, expande voluntariamente e descarta formulário ao selecionar outro módulo",
+          "message": "Error: No QueryClient set, use QueryClientProvider to set one\n    at useQueryClient (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/QueryClientProvider.tsx:18:11)\n    at useBaseQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useBaseQuery.ts:54:18)\n    at Module.useQuery (file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@tanstack/react-query/src/useQuery.ts:46:10)\n    at Module.useLotP"
+        }
+      ]
+    },
+    {
+      "file": "commercialMapPavilionModules.test.ts",
+      "status": "passed",
+      "tests": 18,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilionOfficialContentFraming.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilionOperationalRenderer.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilionRendering.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilions1214Migration.contract.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilions135Migration.contract.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilions5714Migration.contract.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilions813Migration.contract.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "commercialMapPavilionWayfinding.test.ts",
+      "status": "failed",
+      "tests": 11,
+      "failures": [
+        {
+          "name": "orientação visual das plantas internas comerciais não intercepta lotes e descarta recursos GPU ao trocar de interior",
+          "message": "AssertionError: expected 'import {\\r\\n  memo,\\r\\n  useCallback,…' to contain 'event.stopPropagation();\\n    lastPoi…'\n    at C:\\Users\\Leonardo\\Desktop\\expo-logistics-hub-interior-controls\\src\\test\\commercialMapPavilionWayfinding.test.ts:307:19\n    at file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///C:/Users/Le"
+        },
+        {
+          "name": "orientação visual das plantas internas comerciais apresenta os acessos como marcadores compactos fixos com rótulo apenas sob interação",
+          "message": "AssertionError: expected 'import {\\r\\n  memo,\\r\\n  useCallback,…' to contain '{open ? (\\n            <PavilionAcces…'\n    at C:\\Users\\Leonardo\\Desktop\\expo-logistics-hub-interior-controls\\src\\test\\commercialMapPavilionWayfinding.test.ts:336:19\n    at file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///C:/Users/Leonardo/Desktop/expo-logistics-hub/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///C:/Users/Le"
+        }
+      ]
+    },
+    {
+      "file": "commercialMapRuntimeStability.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    }
+  ]
+}

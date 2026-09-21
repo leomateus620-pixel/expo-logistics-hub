@@ -24,3 +24,6 @@ artifacts/alvorada/
 *.njsproj
 *.sln
 *.sw?
+
+# Local interior renderer QA
+.qa-vite-cache/
