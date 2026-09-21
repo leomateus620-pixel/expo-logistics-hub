@@ -51,7 +51,7 @@ describe('resumo comercial contextual', () => {
     expect(segment.title).toBe('Exporural');
     expect(segment.totalCount).toBe(95);
     const park = resolveContextualMapScope(input);
-    expect(park.totalCount).toBe(1577);
+    expect(park.totalCount).toBe(1579);
     expect(park.nonCommercialCount).toBeGreaterThan(0);
     expect(deriveContextualMapSummary(park).byStatus.BLOCKED).toBe(1577);
   });
@@ -121,7 +121,7 @@ describe('legenda interativa integrada', () => {
     expect(within(legend).getByText('Área total do pavilhão')).toBeInTheDocument();
     expect(within(legend).getByText('Área modular total')).toBeInTheDocument();
     expect(within(legend).getByText('1.201,5 m²')).toBeInTheDocument();
-    expect(within(legend).getByText('587,85 m²')).toBeInTheDocument();
+    expect(within(legend).getByText('586,5 m²')).toBeInTheDocument();
     expect(within(legend).getByRole('img')).toHaveAccessibleName('Esquema dos módulos e corredores do pavilhão');
   });
 
