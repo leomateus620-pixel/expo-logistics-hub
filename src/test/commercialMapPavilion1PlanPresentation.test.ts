@@ -101,7 +101,7 @@ describe('planta comercial fixa do Pavilhão 1', () => {
   it('mantém seleção e Vendas, lotes planos, instancing e atlas numérico único', () => {
     const layer = read('src/features/commercial-map/components/canvas/CommercialPavilionModuleLayer.tsx');
 
-    expect(layer).toContain('const heightScale = flatModules ? 1');
+    expect(layer).toContain('const visualGeometry = resolveModuleVisualGeometry(interaction, flatModules)');
     expect(layer).toContain('dispatchSalesModuleClick');
     expect(layer).toContain('THREE.InstancedMesh');
     expect(layer).toContain('new THREE.CanvasTexture(canvas)');

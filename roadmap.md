@@ -4,7 +4,7 @@
 - [x] Centralizar a seleção visual de regulares e irregulares pela seleção persistente de Vendas
 - [x] Atualizar o footprint do B1-M141 para 18,00 m² e o total modular do B1 para 586,50 m²
 - [x] Reconciliar área e geometria persistidas do mesmo B1-M141, preservando identidade e estado comercial
-- [ ] Validar seleção individual/múltipla, remoção, limpeza, preço derivado e regressões automatizadas
+- [x] Validar seleção individual/múltipla, remoção, limpeza, preço derivado e regressões automatizadas
 - [ ] Validar visualmente desktop/mobile — sujeito à disponibilidade do renderer WebGL automatizado
 - Não publicar (pedido do usuário)
 
