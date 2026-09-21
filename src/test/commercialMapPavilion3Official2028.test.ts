@@ -37,7 +37,7 @@ describe('Pavilhão 3 — planta oficial Fenasoja 2028', () => {
     expect(module36?.shape?.footprint).toHaveLength(6);
     expect(module36?.shape?.renderParts).toHaveLength(2);
     expect(polygonArea(module36?.shape?.footprint ?? [])).toBeGreaterThan(0);
-    expect(sql).toContain("baseline.public_identifier = 'b6-m036'");
+    expect(sql).toContain("where public_identifier = 'b6-m036'");
     expect(sql).toContain("'coordinates', jsonb_build_array(world_ring)");
   });
 
