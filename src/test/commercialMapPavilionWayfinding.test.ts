@@ -99,8 +99,8 @@ describe('orientação visual das plantas internas comerciais', () => {
 
     const southwestEntrance = markerFor('B5', 'southwest-entrance');
     const southeastEntrance = markerFor('B5', 'southeast-entrance');
-    const southwestPoint = projectCommercialPavilionReferencePoint([6.6 / 21, 1], frame);
-    const southeastPoint = projectCommercialPavilionReferencePoint([14.7 / 21, 1], frame);
+    const southwestPoint = projectCommercialPavilionReferencePoint([6.3 / 19.8, 1], frame);
+    const southeastPoint = projectCommercialPavilionReferencePoint([13.5 / 19.8, 1], frame);
     expect(southwestEntrance).toMatchObject({
       kind: 'entrance',
       edge: 'front',

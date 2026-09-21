@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  PAVILION_MODULE_AREA_SOURCE_DOCUMENTS,
   PAVILION_MODULE_AREA_TOTALS,
   PAVILION_MODULE_OFFICIAL_AREAS,
   formatAreaSqm,
@@ -78,6 +79,15 @@ describe('metragens oficiais dos lotes internos dos pavilhões', () => {
     expect(getPavilionModuleArea('B2', 36)?.areaSqm).toBe(3.5);
     expect(getPavilionModuleArea('B2', 151)?.areaSqm).toBe(3.5);
     expect(getPavilionModuleArea('B2', 152)?.areaSqm).toBe(3);
+  });
+
+  it('atribui a fonte oficial 2028 sem alterar as áreas do B4', () => {
+    expect(PAVILION_MODULE_AREA_SOURCE_DOCUMENTS.B4)
+      .toBe('Planta PAVILHÃO 8 - Fenasoja 2028.pdf');
+    const pavilion8 = [...PAVILION_MODULE_OFFICIAL_AREAS.values()]
+      .filter((entry) => entry.pavilionId === 'B4');
+    expect(pavilion8).toHaveLength(114);
+    expect(pavilion8.reduce((sum, entry) => sum + entry.areaSqm, 0)).toBe(438.5);
   });
 
   it('remove a ressalva superada do B5-M078 pela planta oficial 2028', () => {

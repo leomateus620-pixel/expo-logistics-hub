@@ -48,7 +48,7 @@ describe('legenda inteligente das plantas internas', () => {
     const legend = screen.getByRole('region', {
       name: 'Legenda da planta interna do Pavilhão 8',
     });
-    expect(within(legend).getByText('Indústria e Comércio')).toBeInTheDocument();
+    expect(within(legend).getByText('Indústria, Comércio e Serviços')).toBeInTheDocument();
     expect(within(legend).getByText('114')).toBeInTheDocument();
     expect(within(legend).getByText('01–114')).toBeInTheDocument();
     expect(within(legend).getByText('760,2 m²')).toBeInTheDocument();
@@ -74,8 +74,8 @@ describe('legenda inteligente das plantas internas', () => {
     expect(within(legend).getByText('Indústria e Comércio')).toBeInTheDocument();
     expect(within(legend).getByText('103')).toBeInTheDocument();
     expect(within(legend).getByText('01–103')).toBeInTheDocument();
-    expect(within(legend).getByText('709,05 m²')).toBeInTheDocument();
-    expect(within(legend).getByText('351,3 m²')).toBeInTheDocument();
+    expect(within(legend).getByText('709 m²')).toBeInTheDocument();
+    expect(within(legend).getByText('351 m²')).toBeInTheDocument();
     expect(within(legend).getByText('01–26')).toBeInTheDocument();
     expect(within(legend).getByText('27–29')).toBeInTheDocument();
     expect(within(legend).getByText('30–77')).toBeInTheDocument();

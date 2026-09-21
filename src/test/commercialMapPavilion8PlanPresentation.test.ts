@@ -25,7 +25,7 @@ describe('planta comercial fixa do Pavilhão 8', () => {
     expect(PAVILION8_COMMERCIAL_REFERENCE.projection).toMatchObject({
       coordinateTransform: 'identity',
       metricWidthM: 21.7,
-      metricDepthM: 35.4,
+      metricDepthM: 35,
     });
     expect(PAVILION8_COMMERCIAL_REFERENCE.moduleCount).toBe(114);
     expect(PAVILION8_COMMERCIAL_REFERENCE.modularAreaM2).toBe(438.5);
@@ -61,7 +61,7 @@ describe('planta comercial fixa do Pavilhão 8', () => {
     expect(module90?.shape?.footprint).toHaveLength(6);
     expect(module90?.shape?.renderParts).toHaveLength(2);
     expect(module90?.shape?.labelAnchor[0]).toBeCloseTo(2 / 21.7, 12);
-    expect(module90?.shape?.labelAnchor[1]).toBeCloseTo(2.5 / 35.4, 12);
+    expect(module90?.shape?.labelAnchor[1]).toBeCloseTo(2.5 / 35, 12);
     expect(module90?.labelAnchor).toEqual(module90?.shape?.labelAnchor);
   });
 
@@ -75,9 +75,9 @@ describe('planta comercial fixa do Pavilhão 8', () => {
     expect(plan.supportSpaces).toEqual(PAVILION8_COMMERCIAL_SUPPORT_SPACES);
     expect(envelope).not.toBeNull();
     expect(envelope?.width).toBeCloseTo(1, 12);
-    expect(envelope?.depth).toBeCloseTo((35.4 + 7.4) / 35.4, 12);
+    expect(envelope?.depth).toBeCloseTo((35 + 7.4) / 35, 12);
     expect((envelope?.centerZ ?? 0) - (envelope?.depth ?? 0) / 2)
-      .toBeCloseTo(-7.4 / 35.4, 12);
+      .toBeCloseTo(-7.4 / 35, 12);
 
     const withoutSupportFit = deriveCommercialPavilionOfficialContentEnvelope({
       ...plan,

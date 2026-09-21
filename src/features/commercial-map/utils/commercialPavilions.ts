@@ -261,8 +261,8 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
   B4: {
     publicIdentifier: 'B4',
     pavilionNumber: 8,
-    officialName: 'Pavilhão 8 — Indústria e Comércio',
-    activity: 'Indústria e Comércio',
+    officialName: 'Pavilhão 8 — Indústria, Comércio e Serviços',
+    activity: 'Indústria, Comércio e Serviços',
     variant: 'monitor-industrial',
     roofProfile: 'raised-monitor',
     entrancePattern: 'paired-offset',

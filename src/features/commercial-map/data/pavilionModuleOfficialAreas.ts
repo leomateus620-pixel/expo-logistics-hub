@@ -20,7 +20,7 @@ export const PAVILION_MODULE_AREA_SOURCE_DOCUMENTS = {
   B6: 'Planta Pavilhão 3 — Fenasoja 2028 (desenho set/2026).pdf',
   B8: 'Pavilhao_05_Lotes_e_Metragens.pdf',
   B10: 'Pavilhao_07_Lotes_e_Metragens.pdf',
-  B4: 'Pavilhao_08_Lotes_e_Metragens.pdf',
+  B4: 'Planta PAVILHÃO 8 - Fenasoja 2028.pdf',
   B3: 'Pavilhao_12_Lotes_e_Metragens.pdf',
   B5: 'Planta Pavilhão 13 — Fenasoja 2028 (desenho set/2026).pdf',
   B2: 'Pavilhao_14_Lotes_e_Metragens.pdf',

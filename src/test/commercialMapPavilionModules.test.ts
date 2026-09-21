@@ -74,7 +74,7 @@ const EXPECTED_PLANS = {
   },
   B4: {
     pavilionNumber: 8,
-    category: 'Indústria e Comércio',
+    category: 'Indústria, Comércio e Serviços',
     moduleCount: 114,
     totalAreaSquareMeters: 760.2,
     moduleAreaSquareMeters: 438.5,
@@ -345,7 +345,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
           expect(cell.group).toBeTruthy();
           expect(cell.cluster).toBeTruthy();
           expect(cell.source?.referenceYear).toBe(
-            publicIdentifier === 'B5' || publicIdentifier === 'B6' ? 2028 : 2026,
+            publicIdentifier === 'B4' || publicIdentifier === 'B5' || publicIdentifier === 'B6' ? 2028 : 2026,
           );
         }
       });
@@ -533,7 +533,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
       coordinateTransform: 'identity',
       fit: 'metric-contain',
       metricWidthM: 21.7,
-      metricDepthM: 35.4,
+      metricDepthM: 35,
       alignX: 'center',
       alignZ: 'end',
     });
@@ -563,13 +563,13 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     const eastLower = plan.zones.find((zone) => zone.id === 'east-lower-01-20')!;
     const westUpper = plan.zones.find((zone) => zone.id === 'west-upper-91-100')!;
     const westLower = plan.zones.find((zone) => zone.id === 'west-lower-101-114')!;
-    expect((edges(eastLower.bounds).top - edges(eastUpper.bounds).bottom) * 35.4)
+    expect((edges(eastLower.bounds).top - edges(eastUpper.bounds).bottom) * 35)
       .toBeCloseTo(4, 12);
-    expect((edges(westLower.bounds).top - edges(westUpper.bounds).bottom) * 35.4)
+    expect((edges(westLower.bounds).top - edges(westUpper.bounds).bottom) * 35)
       .toBeCloseTo(4, 12);
     ['west-cross-access', 'east-cross-access'].forEach((corridorId) => {
       const access = plan.corridors.find((corridor) => corridor.id === corridorId)!;
-      expect(access.depth * 35.4).toBeCloseTo(4, 12);
+      expect(access.depth * 35).toBeCloseTo(4, 12);
     });
 
     const irregular = cell(90);
@@ -578,7 +578,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     expect(irregular.shape?.renderParts).toHaveLength(2);
     expect(irregular.areaM2).toBe(24.5);
     expect(PAVILION8_COMMERCIAL_GEOMETRIC_AREA_M2).toBe(438.5);
-    expect(metricAreaForPlan(plan, 21.7, 35.4)).toBeCloseTo(438.5, 9);
+    expect(metricAreaForPlan(plan, 21.7, 35)).toBeCloseTo(438.5, 9);
     expectNoModuleRenderPartOverlaps(plan);
   });
 

@@ -35,6 +35,15 @@
 - [ ] Validar navegação visual desktop/mobile — bloqueada pelo renderer WebGL automatizado, que permaneceu em 85% após 110 segundos
 - Não publicar (pedido do usuário)
 
+## Pavilhão 8 / B4 — planta oficial Fenasoja 2028
+- [x] Reconciliar o frame métrico em 21,70 × 35,00 m e os gaps superior/inferior em 3,00 m
+- [x] Preservar 114 módulos, 438,50 m², 760,20 m², corredores laterais e módulo 90 em L
+- [x] Atualizar nome, fonte documental e revisão exclusivamente do B4
+- [x] Reconciliar geometrias persistidas preservando IDs, status, preços e histórico
+- [x] Validar hit-test, rota pública e regressões automatizadas (77 testes + TypeScript)
+- [ ] Validar navegação visual desktop/mobile — bloqueada pelo renderer WebGL automatizado, que permaneceu em 85% até o limite da captura
+- Não publicar (pedido do usuário)
+
 ## Pavilhão 13 / B5 — planta interativa
 - [x] Preservar orientação canônica, 103 módulos, áreas e geometrias irregulares
 - [x] Ativar perfil compartilhado de PAN, zoom, lotes planos e numeração prioritária
