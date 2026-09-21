@@ -40,7 +40,8 @@
 - [x] Preservar 114 módulos, 438,50 m², 760,20 m², corredores laterais e módulo 90 em L
 - [x] Atualizar nome, fonte documental e revisão exclusivamente do B4
 - [x] Reconciliar geometrias persistidas preservando IDs, status, preços e histórico
-- [ ] Validar hit-test, rota pública, desktop/mobile e regressões
+- [x] Validar hit-test, rota pública e regressões automatizadas (77 testes + TypeScript)
+- [ ] Validar navegação visual desktop/mobile — bloqueada pelo renderer WebGL automatizado, que permaneceu em 85% até o limite da captura
 - Não publicar (pedido do usuário)
 
 ## Pavilhão 13 / B5 — planta interativa
