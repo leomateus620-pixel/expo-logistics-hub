@@ -7,8 +7,8 @@ import type {
 } from '../../data/electricalInfrastructure';
 import type { MapEntity } from '../../types';
 import {
-  buildElectricalPoleCrossarmLayouts,
-  resolveElectricalNodePlacements,
+  buildElectricalSceneLayout,
+  type ElectricalSceneLayout,
 } from '../../utils/electricalInfrastructure';
 import { buildNightLampFixtures, NIGHT_LIGHTING_CONFIG } from '../../utils/nightLighting';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
@@ -173,6 +173,7 @@ function NightLightingInstances({
   rearRoadsActive,
   polesVisible,
   reducedGraphics,
+  resolvedScene,
 }: {
   nodes: readonly CommercialElectricalNode[];
   connections: readonly CommercialElectricalConnection[];
@@ -180,6 +181,7 @@ function NightLightingInstances({
   rearRoadsActive: boolean;
   polesVisible: boolean;
   reducedGraphics: boolean;
+  resolvedScene?: ElectricalSceneLayout;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const armRef = useRef<THREE.InstancedMesh>(null);
@@ -200,10 +202,9 @@ function NightLightingInstances({
   const config = NIGHT_LIGHTING_CONFIG;
 
   const fixtures = useMemo(() => {
-    const placements = resolveElectricalNodePlacements(nodes, surfaceEntities, rearRoadsActive);
-    const layouts = buildElectricalPoleCrossarmLayouts(nodes, connections, placements);
-    return buildNightLampFixtures(placements, layouts);
-  }, [connections, nodes, rearRoadsActive, surfaceEntities]);
+    const layout = resolvedScene ?? buildElectricalSceneLayout(nodes, connections, surfaceEntities, rearRoadsActive);
+    return buildNightLampFixtures(layout.placements, layout.crossarms);
+  }, [connections, nodes, rearRoadsActive, surfaceEntities, resolvedScene]);
 
   const lampValues = useMemo(() => {
     const values = new Float32Array(fixtures.length * 4);
@@ -541,6 +542,7 @@ export const NightLightingLayer = memo(function NightLightingLayer(props: {
   rearRoadsActive?: boolean;
   polesVisible: boolean;
   reducedGraphics: boolean;
+  resolvedScene?: ElectricalSceneLayout;
 }) {
   if (props.nodes.length === 0) return null;
   return (
@@ -552,6 +554,7 @@ export const NightLightingLayer = memo(function NightLightingLayer(props: {
       rearRoadsActive={props.rearRoadsActive ?? false}
       polesVisible={props.polesVisible}
       reducedGraphics={props.reducedGraphics}
+      resolvedScene={props.resolvedScene}
     />
   );
 });

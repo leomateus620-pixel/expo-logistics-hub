@@ -9,6 +9,7 @@ import {
   resolveParkAccessElectricalClearancePosition,
   resolveRearRoadElectricalClearancePosition,
 } from '../data/electricalPresentation';
+import { buildElectricalPoleConstraints, resolveElectricalPoleClearance } from './electricalPolePlacement';
 import type { CommercialLot, Coordinate, MapClassification, MapEntity } from '../types';
 import {
   closestPointOnSegment,
@@ -79,6 +80,7 @@ export interface ResolvedElectricalNodePlacement {
   rotationRadians: number;
   sourceAnchorPreserved: true;
   placementStatus: 'DIRECT' | 'PROJECTED_FREE' | 'PROJECTED_FALLBACK' | 'PROJECTED_CLEARANCE';
+  poleAudit?: { sourceLotIdentifier: string | null; conflicts: readonly string[]; resolved: boolean };
 }
 
 export interface ElectricalPoleCrossarmLayout {
@@ -86,6 +88,21 @@ export interface ElectricalPoleCrossarmLayout {
   nodeId: string;
   sourceAlignmentChainId: string | null;
   rotationRadians: number;
+}
+
+export interface ElectricalSceneLayout {
+  placements: readonly ResolvedElectricalNodePlacement[];
+  crossarms: readonly ElectricalPoleCrossarmLayout[];
+}
+
+export function buildElectricalSceneLayout(
+  nodes: readonly CommercialElectricalNode[],
+  connections: readonly CommercialElectricalConnection[],
+  entities: readonly MapEntity[],
+  rearRoadsActive = false,
+): ElectricalSceneLayout {
+  const placements = resolveElectricalNodePlacements(nodes, entities, rearRoadsActive);
+  return { placements, crossarms: buildElectricalPoleCrossarmLayouts(nodes, connections, placements) };
 }
 
 function surfacePriority(node: CommercialElectricalNode, entity: MapEntity) {
@@ -248,6 +265,8 @@ export function resolveElectricalNodePlacements(
   rearRoadsActive = false,
 ): readonly ResolvedElectricalNodePlacement[] {
   const surfaces = indexElectricalSurfaces(entities);
+  const poleSurfaces = surfaces.filter(s => s.entity.geometry.extrusionHeight < 0.3
+    || s.entity.classification === 'SELLABLE_LOT' || s.entity.classification === 'QUADRA');
   const entityByIdentifier = new Map(entities.map((entity) => [entity.publicIdentifier, entity]));
   const obstacles = entities.filter((entity) => (
     ELECTRICAL_OBSTACLE_CLASSIFICATIONS.has(entity.classification)
@@ -255,6 +274,7 @@ export function resolveElectricalNodePlacements(
   const rearRoadFootprints = rearRoadsActive
     ? buildRearRoadCorridorFootprints(undefined, { includeShoulders: true })
     : [];
+  const poleConstraints = buildElectricalPoleConstraints(entities, rearRoadsActive, rearRoadFootprints);
   return nodes.map((node) => {
     const facade = resolveFacadePresentation(node, entityByIdentifier, obstacles, rearRoadFootprints);
     const architectureClearance = facade
@@ -301,13 +321,21 @@ export function resolveElectricalNodePlacements(
         }
       }
     }
+    const poleClearance = node.type === 'POLE'
+      ? resolveElectricalPoleClearance(node, renderPosition, entityByIdentifier, poleConstraints)
+      : null;
+    if (poleClearance) {
+      precisionClearance ||= Math.hypot(renderPosition[0] - poleClearance.position[0], renderPosition[1] - poleClearance.position[1]) > 1e-6;
+      renderPosition = poleClearance.position;
+    }
     return {
       node,
       renderPosition,
-      groundElevation: groundElevationAtPosition(node, renderPosition, surfaces),
+      groundElevation: groundElevationAtPosition(node, renderPosition, node.type === 'POLE' ? poleSurfaces : surfaces),
       rotationRadians: facade?.rotationRadians ?? node.rotationRadians,
       sourceAnchorPreserved: true,
-      placementStatus: facade?.placementStatus
+      poleAudit: poleClearance ? { sourceLotIdentifier: poleClearance.sourceLotIdentifier, conflicts: poleClearance.conflicts, resolved: poleClearance.resolved } : undefined,
+      placementStatus: precisionClearance ? 'PROJECTED_CLEARANCE' : facade?.placementStatus
         ?? (precisionClearance || rearRoadClearance || parkAccessClearance || architectureClearance
           ? 'PROJECTED_CLEARANCE'
           : 'DIRECT'),
@@ -497,15 +525,16 @@ export function buildElectricalWirePositions(
   surfaceEntities: readonly MapEntity[],
   reducedGraphics = false,
   resolvedPlacements?: readonly ResolvedElectricalNodePlacement[],
+  resolvedCrossarms?: readonly ElectricalPoleCrossarmLayout[],
 ) {
   const placements = resolvedPlacements
     ?? resolveElectricalNodePlacements(nodes, surfaceEntities);
   const placementByNodeId = new Map(placements.map((placement) => [placement.node.id, placement]));
-  const crossarmByPoleChain = new Map(buildElectricalPoleCrossarmLayouts(
+  const crossarmByPoleChain = new Map((resolvedCrossarms ?? buildElectricalPoleCrossarmLayouts(
     nodes,
     connections,
     placements,
-  ).map((layout) => [`${layout.nodeId}::${layout.sourceAlignmentChainId}`, layout]));
+  )).map((layout) => [`${layout.nodeId}::${layout.sourceAlignmentChainId}`, layout]));
   const samples = reducedGraphics ? ELECTRICAL_WIRE_REDUCED_SAMPLES : ELECTRICAL_WIRE_SAMPLES;
   const positions: number[] = [];
 

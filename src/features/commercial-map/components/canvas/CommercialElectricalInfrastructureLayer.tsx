@@ -7,9 +7,9 @@ import type {
 } from '../../data/electricalInfrastructure';
 import type { MapEntity } from '../../types';
 import {
-  buildElectricalPoleCrossarmLayouts,
+  buildElectricalSceneLayout,
+  type ElectricalSceneLayout,
   buildElectricalWirePositions,
-  resolveElectricalNodePlacements,
 } from '../../utils/electricalInfrastructure';
 
 const NO_RAYCAST = () => undefined;
@@ -101,6 +101,7 @@ function CommercialElectricalInfrastructureInstances({
   visible,
   reducedGraphics,
   rearRoadsActive = false,
+  resolvedScene,
 }: {
   nodes: readonly CommercialElectricalNode[];
   connections: readonly CommercialElectricalConnection[];
@@ -108,6 +109,7 @@ function CommercialElectricalInfrastructureInstances({
   visible: boolean;
   reducedGraphics: boolean;
   rearRoadsActive?: boolean;
+  resolvedScene?: ElectricalSceneLayout;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const poleRef = useRef<THREE.InstancedMesh>(null);
@@ -123,17 +125,14 @@ function CommercialElectricalInfrastructureInstances({
   const { gl, invalidate } = useThree();
   const poles = useMemo(() => nodes.filter((node) => node.type === 'POLE'), [nodes]);
   const transformers = useMemo(() => nodes.filter((node) => node.type === 'TRANSFORMER'), [nodes]);
-  const resolvedPlacements = useMemo(
-    () => resolveElectricalNodePlacements(nodes, surfaceEntities, rearRoadsActive),
-    [nodes, rearRoadsActive, surfaceEntities],
+  const layout = useMemo(
+    () => resolvedScene ?? buildElectricalSceneLayout(nodes, connections, surfaceEntities, rearRoadsActive),
+    [resolvedScene, nodes, connections, rearRoadsActive, surfaceEntities],
   );
+  const { placements: resolvedPlacements, crossarms: crossarmLayouts } = layout;
   const placementByNodeId = useMemo(() => new Map(
     resolvedPlacements.map((placement) => [placement.node.id, placement]),
   ), [resolvedPlacements]);
-  const crossarmLayouts = useMemo(
-    () => buildElectricalPoleCrossarmLayouts(nodes, connections, resolvedPlacements),
-    [connections, nodes, resolvedPlacements],
-  );
   const geometries = useMemo(() => ({
     pole: new THREE.CylinderGeometry(0.78, 1, 1, reducedGraphics ? 6 : 8, 1),
     crossarm: new THREE.BoxGeometry(1, 1, 1),
@@ -153,11 +152,12 @@ function CommercialElectricalInfrastructureInstances({
       surfaceEntities,
       reducedGraphics,
       resolvedPlacements,
+      crossarmLayouts,
     ), 3));
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
     return geometry;
-  }, [connections, nodes, reducedGraphics, resolvedPlacements, surfaceEntities]);
+  }, [connections, nodes, reducedGraphics, resolvedPlacements, crossarmLayouts, surfaceEntities]);
 
   useLayoutEffect(() => {
     const poleMesh = poleRef.current;
@@ -326,6 +326,7 @@ function CommercialElectricalInfrastructureInstances({
   }, [materials]);
 
   useFrame((_state, delta) => {
+    if (!transitionPending.current) return;
     const group = groupRef.current;
     if (!group) return;
     const target = visible ? 1 : 0;
@@ -451,6 +452,7 @@ export const CommercialElectricalInfrastructureLayer = memo(function CommercialE
   visible: boolean;
   reducedGraphics: boolean;
   rearRoadsActive?: boolean;
+  resolvedScene?: ElectricalSceneLayout;
 }) {
   if (props.nodes.length === 0) return null;
   return (
