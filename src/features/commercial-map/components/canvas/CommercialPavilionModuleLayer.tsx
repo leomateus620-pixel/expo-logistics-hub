@@ -299,8 +299,11 @@ function createModuleNumberTexture(
         visualSequenceOrientation?.startsWith('z-')
         && cellHeight > cellWidth * 0.86
       );
-    const usableWidth = isDepthOriented ? cellHeight : cellWidth;
-    const usableHeight = isDepthOriented ? cellWidth : cellHeight;
+    const explicitLabelRotation = plan.interiorPresentation?.moduleLabelRotationRadians;
+    const labelAlongDepth = explicitLabelRotation === undefined ? isDepthOriented
+      : Math.abs(Math.sin(explicitLabelRotation)) > Math.abs(Math.cos(explicitLabelRotation));
+    const usableWidth = labelAlongDepth ? cellHeight : cellWidth;
+    const usableHeight = labelAlongDepth ? cellWidth : cellHeight;
     const fontSize = Math.floor(THREE.MathUtils.clamp(
       Math.min(
         usableWidth * (maximumPriority ? 0.62 : 0.42),
@@ -335,10 +338,14 @@ function createModuleNumberTexture(
       : 'rgba(250, 253, 247, 0.92)';
     context.save();
     context.translate(labelX, labelY);
-    if (isDepthOriented) {
-      context.rotate(visualSequenceOrientation === 'z-decreasing' ? -Math.PI / 2 : Math.PI / 2);
+    if (explicitLabelRotation !== undefined) {
+      context.rotate(explicitLabelRotation);
+    } else {
+      if (isDepthOriented) {
+        context.rotate(visualSequenceOrientation === 'z-decreasing' ? -Math.PI / 2 : Math.PI / 2);
+      }
+      context.rotate(labelRotationRadians);
     }
-    context.rotate(labelRotationRadians);
     // Rótulo secundário com a metragem oficial, só quando cabe sem encobrir o número.
     const areaSqm = orientedCell.areaM2 ?? null;
     const areaFontSize = Math.floor(fontSize * 0.62);

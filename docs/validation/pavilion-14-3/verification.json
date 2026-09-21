@@ -1,0 +1,228 @@
+{
+  "baseline-defects": {
+    "passed": 18,
+    "failed": 9,
+    "failedCases": [
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "B6: topo-base 144 a 175"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "B6: topo-base 143 a 112"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "B6: topo-base 80 a 111"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "B6: topo-base 79 a 48"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "B6: extremos e pares das ilhas nas posições exigidas"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "37–47: 1 x 3 m, escala uniforme em quadro 32 x 44"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "37–47: 1 x 3 m, escala uniforme em quadro 8 x 15"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "37–47: 1 x 3 m, escala uniforme em quadro 19 x 11"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "limita a orientação explícita do atlas ao B2; demais perfis mantêm o padrão"
+      }
+    ]
+  },
+  "baseline-tests": {
+    "passed": 260,
+    "failed": 21,
+    "failedCases": [
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "B6: topo-base 144 a 175"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "B6: topo-base 143 a 112"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "B6: topo-base 80 a 111"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "B6: topo-base 79 a 48"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "B6: extremos e pares das ilhas nas posições exigidas"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "37–47: 1 x 3 m, escala uniforme em quadro 32 x 44"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "37–47: 1 x 3 m, escala uniforme em quadro 8 x 15"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "37–47: 1 x 3 m, escala uniforme em quadro 19 x 11"
+      },
+      {
+        "file": "commercialMapPavilion143Corrections.test.ts",
+        "title": "limita a orientação explícita do atlas ao B2; demais perfis mantêm o padrão"
+      },
+      {
+        "file": "commercialMapPavilionFourSoyKitchen.test.ts",
+        "title": "reutiliza os postes frontais e a recepção elétrica oficiais sem duplicá-los"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "mantém o módulo 'B1' neutro e sem área individual inventada"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "mantém o módulo 'B2' neutro e sem área individual inventada"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "mantém o módulo 'B3' neutro e sem área individual inventada"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "mantém o módulo 'B8' neutro e sem área individual inventada"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "não converte a área modular total em medida individual"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "oferece somente operações válidas para um módulo disponível e persistido"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "expõe versões privadas de contrato no próprio cartão do módulo"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "não oferece venda direta enquanto o módulo permanece bloqueado"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "abre no dock com resumo, expande voluntariamente e descarta formulário ao selecionar outro módulo"
+      },
+      {
+        "file": "commercialMapPavilionWayfinding.test.ts",
+        "title": "não intercepta lotes e descarta recursos GPU ao trocar de interior"
+      },
+      {
+        "file": "commercialMapPavilionWayfinding.test.ts",
+        "title": "apresenta os acessos como marcadores compactos fixos com rótulo apenas sob interação"
+      }
+    ]
+  },
+  "candidate-tests": {
+    "passed": 269,
+    "failed": 12,
+    "failedCases": [
+      {
+        "file": "commercialMapPavilionFourSoyKitchen.test.ts",
+        "title": "reutiliza os postes frontais e a recepção elétrica oficiais sem duplicá-los"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "mantém o módulo 'B1' neutro e sem área individual inventada"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "mantém o módulo 'B2' neutro e sem área individual inventada"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "mantém o módulo 'B3' neutro e sem área individual inventada"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "mantém o módulo 'B8' neutro e sem área individual inventada"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "não converte a área modular total em medida individual"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "oferece somente operações válidas para um módulo disponível e persistido"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "expõe versões privadas de contrato no próprio cartão do módulo"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "não oferece venda direta enquanto o módulo permanece bloqueado"
+      },
+      {
+        "file": "commercialMapPavilionModuleCard.test.tsx",
+        "title": "abre no dock com resumo, expande voluntariamente e descarta formulário ao selecionar outro módulo"
+      },
+      {
+        "file": "commercialMapPavilionWayfinding.test.ts",
+        "title": "não intercepta lotes e descarta recursos GPU ao trocar de interior"
+      },
+      {
+        "file": "commercialMapPavilionWayfinding.test.ts",
+        "title": "apresenta os acessos como marcadores compactos fixos com rótulo apenas sob interação"
+      }
+    ]
+  },
+  "focused-tests": {
+    "passed": 74,
+    "failed": 0,
+    "failedCases": []
+  },
+  "public-contracts": {
+    "passed": 10,
+    "failed": 0,
+    "failedCases": []
+  },
+  "cameraPairs": {
+    "b2": {
+      "position": true,
+      "target": true,
+      "quaternion": true,
+      "fov": true,
+      "viewport": true
+    },
+    "b6": {
+      "position": true,
+      "target": true,
+      "quaternion": true,
+      "fov": true,
+      "viewport": true
+    },
+    "b2-mobile": {
+      "position": true,
+      "target": true,
+      "quaternion": true,
+      "fov": true,
+      "viewport": true
+    }
+  },
+  "checks": {
+    "typecheck": "passed",
+    "build": "passed",
+    "productionAndTestEslint": "passed",
+    "qaEslint": "0 errors, 1 entrypoint Fast Refresh warning",
+    "newFailuresInExpandedSuite": 0
+  }
+}
