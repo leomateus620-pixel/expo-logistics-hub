@@ -53,7 +53,7 @@ const EXPECTED_PLANS = {
     category: 'Indústria, Comércio e Serviços',
     moduleCount: 189,
     totalAreaSquareMeters: 1201.5,
-    moduleAreaSquareMeters: 587.85,
+    moduleAreaSquareMeters: 586.5,
     ranges: [[1, 6], [7, 57], [58, 58], [59, 64], [65, 102], [103, 140], [141, 141], [142, 189]],
   },
   B2: {

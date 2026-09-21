@@ -9,7 +9,7 @@ import {
 import { COMMERCIAL_PAVILION_MODULE_PLANS } from '@/features/commercial-map/utils/commercialPavilionModules';
 
 const EXPECTED_TOTALS: Record<string, number> = {
-  B1: 587.85,
+  B1: 586.5,
   B6: 663,
   B8: 244.5,
   B10: 427.5,
@@ -24,7 +24,7 @@ describe('metragens oficiais dos lotes internos dos pavilhões', () => {
     expect(PAVILION_MODULE_OFFICIAL_AREAS.size).toBe(1315);
     const total = [...PAVILION_MODULE_OFFICIAL_AREAS.values()]
       .reduce((sum, entry) => sum + entry.areaSqm, 0);
-    expect(total).toBeCloseTo(4099.35, 10);
+    expect(total).toBeCloseTo(4098, 10);
   });
 
   it('fecha a soma documental de cada pavilhão lote a lote', () => {
@@ -48,7 +48,7 @@ describe('metragens oficiais dos lotes internos dos pavilhões', () => {
     expect(getPavilionModuleArea('B1', 64)?.areaSqm).toBe(3.5);
     expect(getPavilionModuleArea('B1', 65)?.areaSqm).toBe(3);
     expect(getPavilionModuleArea('B1', 140)?.areaSqm).toBe(3);
-    expect(getPavilionModuleArea('B1', 141)?.areaSqm).toBe(19.35);
+    expect(getPavilionModuleArea('B1', 141)?.areaSqm).toBe(18);
     expect(getPavilionModuleArea('B1', 142)?.areaSqm).toBe(3);
 
     expect(getPavilionModuleArea('B6', 35)?.areaSqm).toBe(3);

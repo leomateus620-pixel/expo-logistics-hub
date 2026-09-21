@@ -37,6 +37,7 @@ describe('computeLotTotal — matemática decimal exata', () => {
     expect(computeLotTotal(3.5, 665)).toBe(2327.5);
     expect(computeLotTotal(14.7, 776)).toBe(11407.2);
     expect(computeLotTotal(24, 854)).toBe(20496);
+    expect(computeLotTotal(18, 776)).toBe(13968);
     expect(computeLotTotal(208.2, 55)).toBe(11451);
     expect(computeLotTotal(207.38, 61)).toBe(12650.18);
     expect(computeLotTotal(575.85, 24.2)).toBe(13935.57);

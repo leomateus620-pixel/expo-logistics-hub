@@ -21,6 +21,7 @@ import {
   createCommercialPavilionModuleProjectionFrame,
   projectCommercialPavilionModuleRect,
 } from '@/features/commercial-map/utils/commercialPavilionModules';
+import { pointInPolygon } from '@/features/commercial-map/utils/spatialSurface';
 
 const EPSILON = 1e-10;
 const METRIC_WIDTH = 52.7;
@@ -235,9 +236,9 @@ describe('projeção oficial do Pavilhão 1', () => {
     expect(PAVILION1_COMMERCIAL_REFERENCE.cells.reduce(
       (sum, cell) => sum + metricCellArea(cell),
       0,
-    )).toBeCloseTo(587.85, 10);
+    )).toBeCloseTo(586.5, 10);
     expect(PAVILION1_COMMERCIAL_REFERENCE.cells.reduce((sum, cell) => sum + (cell.areaM2 ?? 0), 0))
-      .toBeCloseTo(587.85, 10);
+      .toBeCloseTo(586.5, 10);
   });
 
   it('projeta todos os módulos e renderParts dentro do frame sem sobreposição', () => {
@@ -306,11 +307,25 @@ describe('projeção oficial do Pavilhão 1', () => {
 
     const module141 = entity('B1-M141');
     expect(module141.geometry.coordinates[0]).toHaveLength(7);
-    expect(module141.metadata.layoutRevision).toBe('2026.4-p1.2');
+    expect(module141.metadata.layoutRevision).toBe('2026.4-p1.3');
     expect(module141.metadata.planCoordinateTransform).toBe('quarter-turn-clockwise');
     expect(module141.metadata.projectionFit).toBe('metric-contain');
     expect(module141.metadata.metricReference).toEqual({ widthM: 52.7, depthM: 22.84 });
-    expect(module141.metadata.areaM2).toBe(19.35);
+    expect(module141.metadata.areaM2).toBe(18);
+  });
+
+  it('mantém o footprint oficial de 18 m² do B1-M141 e o recorte vazio', () => {
+    const module141 = PAVILION1_COMMERCIAL_REFERENCE.cells.find((cell) => cell.number === 141);
+    if (!module141?.shape) throw new Error('B1-M141 sem footprint irregular.');
+    const metricPoints = module141.shape.footprint.map(([x, z]) => [metricX(x), metricZ(z)] as const);
+
+    expect(polygonArea(metricPoints)).toBeCloseTo(18, 10);
+    expect(module141.shape.renderParts).toHaveLength(2);
+    expect(module141.id).toBe('B1:module:141');
+    expect(module141.shape.footprint).toHaveLength(6);
+    expect(pointInPolygon([50, 1.5], metricPoints)).toBe(true);
+    expect(pointInPolygon([51, 3.75], metricPoints)).toBe(true);
+    expect(pointInPolygon([48.75, 3.75], metricPoints)).toBe(false);
   });
 
   it('preserva os frames stretch legados e reconhece as projeções oficiais posteriores', () => {

@@ -858,7 +858,7 @@ const pavilionModuleReferences: readonly PavilionModuleReference[] = [
     publicIdentifier: 'B1',
     pavilionNumber: 1,
     block: 'P1',
-    layoutRevision: '2026.4-p1.2',
+    layoutRevision: '2026.4-p1.3',
     source: 'Croqui Pavilhão 1 - Fenasoja 2026.pdf',
     facingRadians: Math.PI / 2,
     segmentId: 'industria-comercio-servicos',

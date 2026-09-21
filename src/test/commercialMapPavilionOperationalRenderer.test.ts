@@ -58,6 +58,22 @@ describe('renderer operacional do interior comercial', () => {
     expect(layer).not.toMatch(/setSelectedModuleId\(supportSpace/);
   });
 
+  it('resolve seleção de regulares e irregulares pela mesma fonte do carrinho', () => {
+    const layer = read('src/features/commercial-map/components/canvas/CommercialPavilionModuleLayer.tsx');
+
+    expect(layer.match(/resolveModuleInteractionState\(/g)).toHaveLength(3);
+    expect(layer.match(/resolveModuleVisualGeometry\(/g)).toHaveLength(3);
+    expect(layer).toContain('salesSelectedLotIds.has(moduleState.lotId)');
+    expect(layer).toMatch(/projectedIrregularModules\.map[\s\S]*?resolveModuleInteractionState\(/);
+    expect(layer).toMatch(/projectedIrregularModules\.map[\s\S]*?resolveModuleVisualGeometry\(/);
+    expect(layer).not.toContain('heightScale > 1');
+    expect(layer).toContain('module.footprint.forEach');
+    expect(layer).toContain('new THREE.ExtrudeGeometry(shape');
+    expect(layer).not.toMatch(/module\.cell\.id\s*===\s*['"]B[1456]/);
+    expect(layer).not.toContain('<Text');
+    expect(layer).not.toContain('<Html');
+  });
+
   it('concentra legenda contextual e seleção de módulo na Dock do interior', () => {
     const page = read('src/features/commercial-map/CommercialMapPage.tsx');
     const dock = read('src/features/commercial-map/components/dock/CommercialMapDock.tsx');

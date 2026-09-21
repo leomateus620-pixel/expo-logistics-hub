@@ -44,6 +44,54 @@ interface CommercialPavilionModuleLayerProps {
 
 const EMPTY_MODULE_STATE = new Map<string, CommercialPavilionModuleVisualState>();
 
+export interface ModuleInteractionState {
+  inCart: boolean;
+  isSelected: boolean;
+  isHovered: boolean;
+}
+
+export interface ModuleVisualGeometry {
+  heightScale: number;
+  footprintScaleX: number;
+  footprintScaleZ: number;
+}
+
+export function resolveModuleInteractionState(
+  cellId: string,
+  moduleState: CommercialPavilionModuleVisualState | null,
+  activeSelectedId: string | null,
+  activeHoveredId: string | null,
+  salesSelectedLotIds: ReadonlySet<string>,
+): ModuleInteractionState {
+  const inCart = Boolean(moduleState?.lotId && salesSelectedLotIds.has(moduleState.lotId));
+  const isSelected = inCart || cellId === activeSelectedId;
+  return {
+    inCart,
+    isSelected,
+    isHovered: !isSelected && cellId === activeHoveredId,
+  };
+}
+
+export function resolveModuleVisualGeometry(
+  interaction: ModuleInteractionState,
+  flatModules: boolean,
+): ModuleVisualGeometry {
+  const emphasized = interaction.isSelected || interaction.isHovered;
+  return {
+    heightScale: flatModules
+      ? 1
+      : interaction.inCart
+        ? 1.42
+        : interaction.isSelected
+          ? 1.34
+          : interaction.isHovered
+            ? 1.14
+            : 1,
+    footprintScaleX: emphasized ? 0.955 : 0.91,
+    footprintScaleZ: emphasized ? 0.945 : 0.9,
+  };
+}
+
 function useDisposableInstancedMeshRef() {
   const mesh = useRef<THREE.InstancedMesh | null>(null);
   const setMesh = useCallback((next: THREE.InstancedMesh | null) => {
@@ -114,7 +162,8 @@ function IrregularModuleMesh({
   color,
   borderColor,
   heightScale,
-  flatModules,
+  footprintScaleX,
+  footprintScaleZ,
   interactive,
   castShadow,
   onPointerMove,
@@ -128,7 +177,8 @@ function IrregularModuleMesh({
   color: THREE.Color;
   borderColor: THREE.Color;
   heightScale: number;
-  flatModules: boolean;
+  footprintScaleX: number;
+  footprintScaleZ: number;
   interactive: boolean;
   castShadow: boolean;
   onPointerMove: (moduleId: string, event: ThreeEvent<PointerEvent>) => void;
@@ -164,8 +214,7 @@ function IrregularModuleMesh({
     roughness: 0.78,
     metalness: 0.08,
   }), []);
-  const footprintScale = flatModules ? 0.965 : heightScale > 1 ? 0.97 : 0.94;
-  const cellHeight = moduleHeight * (flatModules ? 1 : heightScale);
+  const cellHeight = moduleHeight * heightScale;
 
   useLayoutEffect(() => {
     moduleMaterial.color.copy(color);
@@ -197,7 +246,7 @@ function IrregularModuleMesh({
       />
       <mesh
         position={[0, floorY + moduleBaseHeight + 0.008, 0]}
-        scale={[footprintScale, cellHeight, footprintScale]}
+        scale={[footprintScaleX, cellHeight, footprintScaleZ]}
         geometry={geometry}
         material={moduleMaterial}
         castShadow={castShadow}
@@ -577,11 +626,17 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     const borderColor = new THREE.Color();
     projectedModuleParts.forEach(({ cell, projected, shaped }, index) => {
       const moduleState = moduleStateById.get(cell.id) ?? null;
-      const inCart = Boolean(moduleState?.lotId && salesSelectedLotIds.has(moduleState.lotId));
-      const isSelected = inCart || cell.id === activeSelectedId;
-      const isHovered = !isSelected && cell.id === activeHoveredId;
+      const interaction = resolveModuleInteractionState(
+        cell.id,
+        moduleState,
+        activeSelectedId,
+        activeHoveredId,
+        salesSelectedLotIds,
+      );
+      const { isSelected, isHovered } = interaction;
       const persistedStatus = moduleState?.status ?? null;
-      const heightScale = flatModules ? 1 : inCart ? 1.42 : isSelected ? 1.34 : isHovered ? 1.14 : 1;
+      const visualGeometry = resolveModuleVisualGeometry(interaction, flatModules);
+      const { heightScale } = visualGeometry;
       const cellHeight = moduleHeight * heightScale;
 
       object.position.set(
@@ -607,12 +662,12 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       object.scale.set(
         Math.max(
           0.012,
-          projected.width * (shaped ? 1 : isSelected || isHovered ? 0.955 : 0.91),
+          projected.width * (shaped ? 1 : visualGeometry.footprintScaleX),
         ),
         cellHeight,
         Math.max(
           0.012,
-          projected.depth * (shaped ? 1 : isSelected || isHovered ? 0.945 : 0.9),
+          projected.depth * (shaped ? 1 : visualGeometry.footprintScaleZ),
         ),
       );
       object.updateMatrix();
@@ -849,9 +904,17 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
         dispose={null}
       />
       {projectedIrregularModules.map((module) => {
-        const isSelected = module.cell.id === activeSelectedId;
-        const isHovered = !isSelected && module.cell.id === activeHoveredId;
-        const persistedStatus = moduleStateById.get(module.cell.id)?.status ?? null;
+        const moduleState = moduleStateById.get(module.cell.id) ?? null;
+        const interaction = resolveModuleInteractionState(
+          module.cell.id,
+          moduleState,
+          activeSelectedId,
+          activeHoveredId,
+          salesSelectedLotIds,
+        );
+        const { isSelected, isHovered } = interaction;
+        const visualGeometry = resolveModuleVisualGeometry(interaction, flatModules);
+        const persistedStatus = moduleState?.status ?? null;
         const zoneBaseColor = zoneColor(
           plan.colorCue,
           zoneIndex.get(module.cell.zoneId) ?? 0,
@@ -860,7 +923,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
         const color = persistedStatus
           ? MODULE_STATUS_COLORS[persistedStatus].clone().lerp(zoneBaseColor, 0.12)
           : zoneBaseColor;
-        if (filtersActive && !matchingEntityIds?.has(moduleStateById.get(module.cell.id)?.entityId ?? '')) {
+        if (filtersActive && !matchingEntityIds?.has(moduleState?.entityId ?? '')) {
           color.lerp(FILTERED_MODULE_COLOR, 0.82);
         }
         if (isSelected) color.lerp(SELECTED_COLOR, 0.82);
@@ -878,8 +941,9 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
             moduleBaseHeight={moduleBaseHeight}
             color={color}
             borderColor={borderColor}
-            heightScale={flatModules ? 1 : isSelected ? 1.34 : isHovered ? 1.14 : 1}
-            flatModules={flatModules}
+            heightScale={visualGeometry.heightScale}
+            footprintScaleX={visualGeometry.footprintScaleX}
+            footprintScaleZ={visualGeometry.footprintScaleZ}
             interactive={interactive}
             castShadow={mode === 'interior' && !reducedGraphics && !flatModules}
             onPointerMove={handleIrregularPointerMove}

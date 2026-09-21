@@ -1,5 +1,13 @@
 # Roadmap
 
+## Seleção sistêmica de módulos irregulares + B1-M141 oficial
+- [x] Centralizar a seleção visual de regulares e irregulares pela seleção persistente de Vendas
+- [x] Atualizar o footprint do B1-M141 para 18,00 m² e o total modular do B1 para 586,50 m²
+- [x] Reconciliar área e geometria persistidas do mesmo B1-M141, preservando identidade e estado comercial
+- [x] Validar seleção individual/múltipla, remoção, limpeza, preço derivado e regressões automatizadas
+- [ ] Validar visualmente desktop/mobile — sujeito à disponibilidade do renderer WebGL automatizado
+- Não publicar (pedido do usuário)
+
 ## Pavilhão 5 / B8 — planta interativa com apoios protegidos
 - [x] Preservar orientação 0/0, projeção identity, 81 módulos, áreas, corredores, acessos, apoios e discrepância do módulo 28
 - [x] Ativar perfil compartilhado de PAN, zoom, lotes planos, numeração prioritária e fit official-content

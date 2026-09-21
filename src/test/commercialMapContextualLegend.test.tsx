@@ -51,9 +51,9 @@ describe('resumo comercial contextual', () => {
     expect(segment.title).toBe('Exporural');
     expect(segment.totalCount).toBe(95);
     const park = resolveContextualMapScope(input);
-    expect(park.totalCount).toBe(1577);
+    expect(park.totalCount).toBe(1579);
     expect(park.nonCommercialCount).toBeGreaterThan(0);
-    expect(deriveContextualMapSummary(park).byStatus.BLOCKED).toBe(1577);
+    expect(deriveContextualMapSummary(park).byStatus.BLOCKED).toBe(1579);
   });
 
   it('separa contagem total e filtrada e mantém cores e áreas vinculadas aos mesmos registros', () => {
@@ -68,7 +68,7 @@ describe('resumo comercial contextual', () => {
     expect(summary.officialArea).toEqual({ squareMeters: 20, informedCount: 2, missingCount: 1 });
     expect(summary.availableOfficialArea).toEqual({ squareMeters: 12, informedCount: 1, missingCount: 1 });
     expect(scope.plan!.stats.totalAreaSquareMeters).toBe(1201.5);
-    expect(scope.plan!.stats.moduleAreaSquareMeters).toBe(587.85);
+    expect(scope.plan!.stats.moduleAreaSquareMeters).toBe(586.5);
   });
 
   it('não transforma cadastro ausente, arquivado ou módulo ambíguo em bloqueado', () => {
@@ -121,7 +121,7 @@ describe('legenda interativa integrada', () => {
     expect(within(legend).getByText('Área total do pavilhão')).toBeInTheDocument();
     expect(within(legend).getByText('Área modular total')).toBeInTheDocument();
     expect(within(legend).getByText('1.201,5 m²')).toBeInTheDocument();
-    expect(within(legend).getByText('587,85 m²')).toBeInTheDocument();
+    expect(within(legend).getByText('586,5 m²')).toBeInTheDocument();
     expect(within(legend).getByRole('img')).toHaveAccessibleName('Esquema dos módulos e corredores do pavilhão');
   });
 
