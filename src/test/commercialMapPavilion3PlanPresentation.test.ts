@@ -12,7 +12,7 @@ describe('planta comercial fixa do Pavilhão 3', () => {
     expect(PAVILION3_COMMERCIAL_REFERENCE.modularAreaM2).toBe(663);
     expect(plan.cells).toHaveLength(214);
     expect(plan.zones.map((zone) => zone.numberRange)).toEqual([
-      [1, 19], [20, 36], [37, 40], [41, 47], [48, 79],
+      [1, 19], [20, 35], [36, 36], [37, 40], [41, 47], [48, 79],
       [80, 111], [112, 143], [144, 175], [176, 214],
     ]);
     expect(plan.interiorPresentation).toMatchObject({
@@ -29,6 +29,28 @@ describe('planta comercial fixa do Pavilhão 3', () => {
       expect(COMMERCIAL_PAVILION_MODULE_PLANS[identifier].interiorPresentation?.mode)
         .not.toBe('plan');
     });
+  });
+
+  it('segue a numeração oficial das ilhas e mantém o módulo 36 como um único L', () => {
+    const plan = COMMERCIAL_PAVILION_MODULE_PLANS.B6;
+    const byNumber = new Map(plan.cells.map((cell) => [cell.number, cell]));
+    const module36 = byNumber.get(36);
+
+    expect(PAVILION3_COMMERCIAL_REFERENCE.totalAreaM2).toBe(1423);
+    expect(PAVILION3_COMMERCIAL_REFERENCE.source).toMatchObject({
+      referenceYear: 2028,
+      document: expect.stringContaining('Fenasoja 2028'),
+    });
+    expect(module36?.id).toBe('B6:module:036');
+    expect(module36?.areaM2).toBe(24);
+    expect(module36?.shape?.footprint).toHaveLength(6);
+    expect(module36?.shape?.renderParts).toHaveLength(2);
+
+    // A câmera canônica do B6 inverte o eixo X na tela: os maiores X ficam à esquerda.
+    expect(byNumber.get(80)?.centerX).toBeGreaterThan(byNumber.get(79)?.centerX ?? Infinity);
+    expect(byNumber.get(144)?.centerX).toBeGreaterThan(byNumber.get(143)?.centerX ?? Infinity);
+    expect(byNumber.get(79)?.centerZ).toBeCloseTo(byNumber.get(80)?.centerZ ?? Infinity, 12);
+    expect(byNumber.get(143)?.centerZ).toBeCloseTo(byNumber.get(144)?.centerZ ?? Infinity, 12);
   });
 
   it('enquadra o envelope completo, preserva a orientação canônica e converte o arraste em pan', () => {

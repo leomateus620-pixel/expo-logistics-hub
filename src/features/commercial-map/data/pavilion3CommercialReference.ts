@@ -3,6 +3,7 @@ import {
   commercialPavilionReferenceRect as rect,
   type CommercialPavilionModuleSource,
   type CommercialPavilionReferenceCell,
+  type CommercialPavilionReferenceCellShape,
   type CommercialPavilionReferenceCorridor,
   type CommercialPavilionReferenceModuleOrientation,
   type CommercialPavilionReferenceRect,
@@ -49,6 +50,49 @@ const PAIRED_COLUMN_DEPTH = (
   STANDARD_CELL_DEPTH * 32 + PAVILION3_COMMERCIAL_MODULE_GAP * 31
 );
 const PAIRED_COLUMN_CENTER_Z = 0.2 + PAIRED_COLUMN_DEPTH / 2;
+const PERIMETER_CELL_DEPTH = (
+  0.32 - PAVILION3_COMMERCIAL_MODULE_GAP * 16
+) / 17;
+const PERIMETER_20_35_DEPTH = (
+  PERIMETER_CELL_DEPTH * 16 + PAVILION3_COMMERCIAL_MODULE_GAP * 15
+);
+const MODULE_36_TOP = 0.52 + PERIMETER_20_35_DEPTH + PAVILION3_COMMERCIAL_MODULE_GAP;
+const MODULE_36_ONE_METER = PERIMETER_CELL_DEPTH;
+const MODULE_36_LEFT = 0.0275;
+const MODULE_36_MIDDLE_X = MODULE_36_LEFT + 0.075;
+const MODULE_36_RIGHT = MODULE_36_LEFT + 0.15;
+const MODULE_36_NOTCH_Z = MODULE_36_TOP + MODULE_36_ONE_METER * 2;
+const MODULE_36_BOTTOM = MODULE_36_TOP + MODULE_36_ONE_METER * 5;
+
+/** Lote oficial único de 24 m²: 6 × 5 m menos o recorte interno de 3 × 2 m. */
+export const PAVILION3_MODULE_36_SHAPE: CommercialPavilionReferenceCellShape = {
+  footprint: [
+    [MODULE_36_LEFT, MODULE_36_TOP],
+    [MODULE_36_MIDDLE_X, MODULE_36_TOP],
+    [MODULE_36_MIDDLE_X, MODULE_36_NOTCH_Z],
+    [MODULE_36_RIGHT, MODULE_36_NOTCH_Z],
+    [MODULE_36_RIGHT, MODULE_36_BOTTOM],
+    [MODULE_36_LEFT, MODULE_36_BOTTOM],
+  ],
+  renderParts: [
+    rect(
+      (MODULE_36_LEFT + MODULE_36_MIDDLE_X) / 2,
+      (MODULE_36_TOP + MODULE_36_BOTTOM) / 2,
+      MODULE_36_MIDDLE_X - MODULE_36_LEFT,
+      MODULE_36_BOTTOM - MODULE_36_TOP,
+    ),
+    rect(
+      (MODULE_36_MIDDLE_X + MODULE_36_RIGHT) / 2,
+      (MODULE_36_NOTCH_Z + MODULE_36_BOTTOM) / 2,
+      MODULE_36_RIGHT - MODULE_36_MIDDLE_X,
+      MODULE_36_BOTTOM - MODULE_36_NOTCH_Z,
+    ),
+  ],
+  labelAnchor: [
+    (MODULE_36_LEFT + MODULE_36_RIGHT) / 2,
+    (MODULE_36_NOTCH_Z + MODULE_36_BOTTOM) / 2,
+  ],
+};
 
 export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
   {
@@ -63,15 +107,31 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     cluster: 'perimeter-01-19',
   },
   {
-    id: 'perimeter-20-36',
-    label: 'Módulos 20–36',
+    id: 'perimeter-20-35',
+    label: 'Módulos 20–35',
     role: 'perimeter',
-    bounds: rect(0.065, 0.68, 0.075, 0.32),
-    numberRange: [20, 36],
+    bounds: rect(0.065, 0.52 + PERIMETER_20_35_DEPTH / 2, 0.075, PERIMETER_20_35_DEPTH),
+    numberRange: [20, 35],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
     group: 'perimeter-west',
-    cluster: 'perimeter-20-36',
+    cluster: 'perimeter-20-35',
+  },
+  {
+    id: 'special-36',
+    label: 'Módulo 36 — lote em L',
+    role: 'perimeter',
+    bounds: rect(
+      (MODULE_36_LEFT + MODULE_36_RIGHT) / 2,
+      (MODULE_36_TOP + MODULE_36_BOTTOM) / 2,
+      MODULE_36_RIGHT - MODULE_36_LEFT,
+      MODULE_36_BOTTOM - MODULE_36_TOP,
+    ),
+    numberRange: [36, 36],
+    orientation: 'east-west',
+    sequenceOrientation: 'z-increasing',
+    group: 'perimeter-west',
+    cluster: 'special-36',
   },
   {
     id: 'perimeter-37-40',
@@ -99,7 +159,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     id: 'island-1-east-column',
     label: 'Módulos 48–79',
     role: 'island',
-    bounds: rect(0.4325, PAIRED_COLUMN_CENTER_Z, 0.095, PAIRED_COLUMN_DEPTH),
+    bounds: rect(0.3275, PAIRED_COLUMN_CENTER_Z, 0.095, PAIRED_COLUMN_DEPTH),
     numberRange: [48, 79],
     orientation: 'east-west',
     sequenceOrientation: 'z-decreasing',
@@ -110,7 +170,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     id: 'island-1-west-column',
     label: 'Módulos 80–111',
     role: 'island',
-    bounds: rect(0.3275, PAIRED_COLUMN_CENTER_Z, 0.095, PAIRED_COLUMN_DEPTH),
+    bounds: rect(0.4325, PAIRED_COLUMN_CENTER_Z, 0.095, PAIRED_COLUMN_DEPTH),
     numberRange: [80, 111],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
@@ -121,7 +181,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     id: 'island-2-east-column',
     label: 'Módulos 112–143',
     role: 'island',
-    bounds: rect(0.7025, PAIRED_COLUMN_CENTER_Z, 0.095, PAIRED_COLUMN_DEPTH),
+    bounds: rect(0.5975, PAIRED_COLUMN_CENTER_Z, 0.095, PAIRED_COLUMN_DEPTH),
     numberRange: [112, 143],
     orientation: 'east-west',
     sequenceOrientation: 'z-decreasing',
@@ -132,7 +192,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     id: 'island-2-west-column',
     label: 'Módulos 144–175',
     role: 'island',
-    bounds: rect(0.5975, PAIRED_COLUMN_CENTER_Z, 0.095, PAIRED_COLUMN_DEPTH),
+    bounds: rect(0.7025, PAIRED_COLUMN_CENTER_Z, 0.095, PAIRED_COLUMN_DEPTH),
     numberRange: [144, 175],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
@@ -259,7 +319,7 @@ export const PAVILION3_COMMERCIAL_WALL_ACCESSES = [
   },
 ] as const satisfies readonly CommercialPavilionReferenceWallAccess[];
 
-const SOURCE_DOCUMENT = 'Croqui Pavilhão 3 - Fenasoja 2026.pdf' as const;
+const SOURCE_DOCUMENT = 'Planta Pavilhão 3 — Fenasoja 2028 (desenho set/2026).pdf' as const;
 
 export const PAVILION3_COMMERCIAL_REFERENCE_CELLS =
   buildCommercialPavilionReferenceCells({
@@ -267,7 +327,8 @@ export const PAVILION3_COMMERCIAL_REFERENCE_CELLS =
     runs: PAVILION3_COMMERCIAL_REFERENCE_RUNS,
     moduleGap: PAVILION3_COMMERCIAL_MODULE_GAP,
     sourceDocument: SOURCE_DOCUMENT,
-    referenceYear: 2026,
+    referenceYear: 2028,
+    shapeForNumber: (number) => number === 36 ? PAVILION3_MODULE_36_SHAPE : null,
   });
 
 if (PAVILION3_COMMERCIAL_REFERENCE_CELLS.length !== 214) {
@@ -281,7 +342,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE = {
   pavilionNumber: 3,
   category: 'Indústria e Comércio',
   moduleCount: 214,
-  totalAreaM2: 1423.66,
+  totalAreaM2: 1423,
   modularAreaM2: 663,
   individualAreaM2: null,
   moduleGap: PAVILION3_COMMERCIAL_MODULE_GAP,
@@ -307,7 +368,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE = {
   cells: PAVILION3_COMMERCIAL_REFERENCE_CELLS,
   source: {
     document: SOURCE_DOCUMENT,
-    referenceYear: 2026,
+    referenceYear: 2028,
     interpretation: 'official-reference-runs',
   },
 } as const;
