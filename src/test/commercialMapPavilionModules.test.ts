@@ -84,8 +84,8 @@ const EXPECTED_PLANS = {
     pavilionNumber: 13,
     category: 'Indústria e Comércio',
     moduleCount: 103,
-    totalAreaSquareMeters: 709.05,
-    moduleAreaSquareMeters: 351.3,
+    totalAreaSquareMeters: 709,
+    moduleAreaSquareMeters: 351,
     ranges: [[1, 26], [27, 29], [30, 77], [78, 103]],
   },
   B6: {
@@ -610,8 +610,8 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     expect(plan.projection).toEqual({
       coordinateTransform: 'identity',
       fit: 'metric-contain',
-      metricWidthM: 21,
-      metricDepthM: 35.35,
+      metricWidthM: 19.8,
+      metricDepthM: 37.8,
       alignX: 'center',
       alignZ: 'end',
     });
@@ -646,11 +646,11 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     [25, 26, 78, 79].forEach((number) => {
       expect(cell(number).shape?.footprint).toHaveLength(4);
       expect(cell(number).shape?.renderParts.length).toBeGreaterThanOrEqual(12);
-      expect(cell(number).areaM2).toBe(number === 25 || number === 79 ? 12.45 : 14.7);
+      expect(cell(number).areaM2).toBe(13.5);
     });
-    expect(metricAreaForPlan(plan, 21, 35.35)).toBeCloseTo(351.3, 9);
+    expect(metricAreaForPlan(plan, 19.8, 37.8)).toBeCloseTo(351, 9);
     expect(PAVILION13_COMMERCIAL_REFERENCE.source.geometricModuleAreaM2)
-      .toBeCloseTo(351.3, 9);
+      .toBeCloseTo(351, 9);
     expectNoModuleRenderPartOverlaps(plan);
     expect(plan.supportSpaces).toEqual([]);
   });

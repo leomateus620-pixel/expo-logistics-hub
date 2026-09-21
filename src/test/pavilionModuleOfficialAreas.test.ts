@@ -14,7 +14,7 @@ const EXPECTED_TOTALS: Record<string, number> = {
   B10: 427.5,
   B4: 438.5,
   B3: 771,
-  B5: 351.3,
+  B5: 351,
   B2: 616,
 };
 
@@ -23,7 +23,7 @@ describe('metragens oficiais dos lotes internos dos pavilhões', () => {
     expect(PAVILION_MODULE_OFFICIAL_AREAS.size).toBe(1315);
     const total = [...PAVILION_MODULE_OFFICIAL_AREAS.values()]
       .reduce((sum, entry) => sum + entry.areaSqm, 0);
-    expect(total).toBeCloseTo(4099.65, 10);
+    expect(total).toBeCloseTo(4099.35, 10);
   });
 
   it('fecha a soma documental de cada pavilhão lote a lote', () => {
@@ -67,9 +67,12 @@ describe('metragens oficiais dos lotes internos dos pavilhões', () => {
     expect(getPavilionModuleArea('B4', 90)?.areaSqm).toBe(24.5);
     expect(getPavilionModuleArea('B4', 91)?.areaSqm).toBe(4);
 
-    expect(getPavilionModuleArea('B5', 25)?.areaSqm).toBe(12.45);
-    expect(getPavilionModuleArea('B5', 26)?.areaSqm).toBe(14.7);
-    expect(getPavilionModuleArea('B5', 79)?.areaSqm).toBe(12.45);
+    [25, 26, 78, 79].forEach((number) => {
+      expect(getPavilionModuleArea('B5', number)?.areaSqm).toBe(13.5);
+      expect(getPavilionModuleArea('B5', number)?.evidence).toBe('written');
+      expect(getPavilionModuleArea('B5', number)?.validationStatus).toBe('VALIDATED');
+      expect(getPavilionModuleArea('B5', number)?.caveat).toBeNull();
+    });
 
     expect(getPavilionModuleArea('B2', 35)?.areaSqm).toBe(3);
     expect(getPavilionModuleArea('B2', 36)?.areaSqm).toBe(3.5);
@@ -77,12 +80,12 @@ describe('metragens oficiais dos lotes internos dos pavilhões', () => {
     expect(getPavilionModuleArea('B2', 152)?.areaSqm).toBe(3);
   });
 
-  it('não promove a ressalva do B5-M078 a área validada', () => {
-    const disputed = getPavilionModuleArea('B5', 78);
-    expect(disputed?.areaSqm).toBe(14.7);
-    expect(disputed?.evidence).toBe('disputed');
-    expect(disputed?.validationStatus).toBe('UNVALIDATED');
-    expect(disputed?.caveat).toContain('cotas divergentes');
+  it('remove a ressalva superada do B5-M078 pela planta oficial 2028', () => {
+    const validated = getPavilionModuleArea('B5', 78);
+    expect(validated?.areaSqm).toBe(13.5);
+    expect(validated?.evidence).toBe('written');
+    expect(validated?.validationStatus).toBe('VALIDATED');
+    expect(validated?.caveat).toBeNull();
   });
 
   it('registra as ressalvas documentais dos pavilhões 7 e 14', () => {
