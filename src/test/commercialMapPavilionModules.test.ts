@@ -74,7 +74,7 @@ const EXPECTED_PLANS = {
   },
   B4: {
     pavilionNumber: 8,
-    category: 'Indústria e Comércio',
+    category: 'Indústria, Comércio e Serviços',
     moduleCount: 114,
     totalAreaSquareMeters: 760.2,
     moduleAreaSquareMeters: 438.5,

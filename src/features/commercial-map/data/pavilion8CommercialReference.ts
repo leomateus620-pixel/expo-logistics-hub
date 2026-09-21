@@ -14,13 +14,13 @@ export type Pavilion8CommercialReferenceCell =
   CommercialPavilionReferenceCell<'B4'>;
 
 /**
- * Official commercial hall: 21.70 m x 35.40 m. The support wing is traced
+ * Official commercial hall: 21.70 m x 35.00 m. The support wing is traced
  * north of the measured hall because the official plan does not publish its
  * complete enclosing dimensions.
  */
-const PROJECT = createCommercialPavilionMetricProjector(21.7, 35.4, 0);
+const PROJECT = createCommercialPavilionMetricProjector(21.7, 35, 0);
 const SOURCE_DOCUMENT =
-  'Croqui Pavilhão 8- Fenasoja 2026 com cozinha_page-0001 (2).jpg' as const;
+  'Planta PAVILHÃO 8 - Fenasoja 2028.pdf' as const;
 
 /** Official metric divisions are contiguous; the renderer adds visual joints. */
 export const PAVILION8_COMMERCIAL_MODULE_GAP = 0;
@@ -29,7 +29,7 @@ export const PAVILION8_COMMERCIAL_REFERENCE_PROJECTION = {
   coordinateTransform: 'identity',
   fit: 'metric-contain',
   metricWidthM: 21.7,
-  metricDepthM: 35.4,
+  metricDepthM: 35,
   alignX: 'center',
   alignZ: 'end',
 } as const satisfies CommercialPavilionReferenceProjection;
@@ -72,7 +72,7 @@ export const PAVILION8_COMMERCIAL_REFERENCE_RUNS = [
     id: 'central-east-38-63',
     label: 'Módulos 38–63',
     role: 'island',
-    bounds: PROJECT.rect(10.85, 5, 3.5, 26),
+    bounds: PROJECT.rect(10.85, 6, 3.5, 26),
     numberRange: [38, 63],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
@@ -83,7 +83,7 @@ export const PAVILION8_COMMERCIAL_REFERENCE_RUNS = [
     id: 'central-west-64-89',
     label: 'Módulos 64–89',
     role: 'island',
-    bounds: PROJECT.rect(7.35, 5, 3.5, 26),
+    bounds: PROJECT.rect(7.35, 6, 3.5, 26),
     numberRange: [64, 89],
     orientation: 'east-west',
     sequenceOrientation: 'z-decreasing',
@@ -142,7 +142,7 @@ export const PAVILION8_COMMERCIAL_REFERENCE_CORRIDORS = [
     id: 'north-distribution',
     label: 'Acesso à porta de emergência',
     kind: 'access',
-    ...PROJECT.rect(5.5, 3, 12.2, 2),
+    ...PROJECT.rect(5.5, 3, 12.2, 3),
   },
   {
     id: 'west-cross-access',
@@ -160,7 +160,7 @@ export const PAVILION8_COMMERCIAL_REFERENCE_CORRIDORS = [
     id: 'south-entrance',
     label: 'Entradas e saídas principais',
     kind: 'access',
-    ...PROJECT.rect(4, 31, 13.7, 4.4),
+    ...PROJECT.rect(4, 32, 13.7, 3),
   },
 ] as const satisfies readonly CommercialPavilionReferenceCorridor[];
 
@@ -266,7 +266,7 @@ export const PAVILION8_COMMERCIAL_REFERENCE_CELLS =
     runs: PAVILION8_COMMERCIAL_REFERENCE_RUNS,
     moduleGap: PAVILION8_COMMERCIAL_MODULE_GAP,
     sourceDocument: SOURCE_DOCUMENT,
-    referenceYear: 2026,
+    referenceYear: 2028,
     shapeForNumber: (number) => number === 90 ? MODULE_90_SHAPE : null,
   });
 
@@ -286,7 +286,7 @@ if (Math.abs(PAVILION8_COMMERCIAL_GEOMETRIC_AREA_M2 - 438.5) > 1e-9) {
 export const PAVILION8_COMMERCIAL_REFERENCE = {
   publicIdentifier: 'B4',
   pavilionNumber: 8,
-  category: 'Indústria e Comércio',
+  category: 'Indústria, Comércio e Serviços',
   moduleCount: 114,
   totalAreaM2: 760.2,
   modularAreaM2: 438.5,
@@ -319,7 +319,7 @@ export const PAVILION8_COMMERCIAL_REFERENCE = {
   cells: PAVILION8_COMMERCIAL_REFERENCE_CELLS,
   source: {
     document: SOURCE_DOCUMENT,
-    referenceYear: 2026,
+    referenceYear: 2028,
     interpretation: 'official-reference-runs',
   },
 } as const;

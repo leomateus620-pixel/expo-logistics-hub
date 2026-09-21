@@ -48,7 +48,7 @@ describe('legenda inteligente das plantas internas', () => {
     const legend = screen.getByRole('region', {
       name: 'Legenda da planta interna do Pavilhão 8',
     });
-    expect(within(legend).getByText('Indústria e Comércio')).toBeInTheDocument();
+    expect(within(legend).getByText('Indústria, Comércio e Serviços')).toBeInTheDocument();
     expect(within(legend).getByText('114')).toBeInTheDocument();
     expect(within(legend).getByText('01–114')).toBeInTheDocument();
     expect(within(legend).getByText('760,2 m²')).toBeInTheDocument();
