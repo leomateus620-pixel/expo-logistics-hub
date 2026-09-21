@@ -80,6 +80,8 @@ const references = {
 } as const;
 
 const metricFrames = {
+  // Quadro histórico desta migration; B4 foi supersedido pelo contrato 2028.
+  B4: { width: 21.7, depth: 35.4, inset: 0 },
   B5: { width: 21, depth: 35.35, inset: 0 },
 } as const;
 
