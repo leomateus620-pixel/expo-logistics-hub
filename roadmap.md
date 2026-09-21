@@ -39,7 +39,7 @@
 - [x] Reconciliar o frame métrico em 21,70 × 35,00 m e os gaps superior/inferior em 3,00 m
 - [x] Preservar 114 módulos, 438,50 m², 760,20 m², corredores laterais e módulo 90 em L
 - [x] Atualizar nome, fonte documental e revisão exclusivamente do B4
-- [ ] Reconciliar geometrias persistidas preservando IDs, status, preços e histórico
+- [x] Reconciliar geometrias persistidas preservando IDs, status, preços e histórico
 - [ ] Validar hit-test, rota pública, desktop/mobile e regressões
 - Não publicar (pedido do usuário)
 

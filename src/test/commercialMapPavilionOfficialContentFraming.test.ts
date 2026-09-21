@@ -138,9 +138,9 @@ describe('enquadramento interno pelo conteúdo oficial dos Pavilhões 5, 8 e 13'
     expect(commercialPavilionOfficialContentAspect(COMMERCIAL_PAVILION_MODULE_PLANS.B8))
       .toBeCloseTo(25.5 / 43.5, 12);
     expect(commercialPavilionOfficialContentAspect(COMMERCIAL_PAVILION_MODULE_PLANS.B5))
-      .toBeCloseTo(21 / 35.35, 12);
+      .toBeCloseTo(19.8 / 37.8, 12);
     expect(commercialPavilionOfficialContentAspect(COMMERCIAL_PAVILION_MODULE_PLANS.B4))
-      .toBeCloseTo(21.7 / (35 + 7.4) * (35 / 35.4), 12);
+      .toBeCloseTo(21.7 / (35 + 7.4), 12);
   });
 
   it('faz o envelope oficial preencher integralmente o clear frame interno', () => {

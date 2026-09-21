@@ -5,7 +5,6 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   PAVILION8_COMMERCIAL_REFERENCE,
-  PAVILION8_COMMERCIAL_SUPPORT_SPACES,
 } from '@/features/commercial-map/data/pavilion8CommercialReference';
 import { PAVILION13_COMMERCIAL_REFERENCE } from '@/features/commercial-map/data/pavilion13CommercialReference';
 
@@ -183,7 +182,7 @@ describe('contrato persistido dos Pavilhões 8 e 13', () => {
     expect(sql).toContain("raise exception 'pavilions_8_13_normalized_overlap_invalid'");
   });
 
-  it('mantém os três apoios do Pavilhão 8 como metadata não comercial', () => {
+  it('mantém os três apoios históricos do Pavilhão 8 como metadata não comercial', () => {
     const supportPattern = /\('B4',\s*'([^']+)',\s*'([^']+)',\s*'([^']+)',\s*'([^']+)',\s*([\d.-]+),\s*([\d.-]+),\s*([\d.-]+),\s*([\d.-]+)\)/g;
     const supports = [...supportSection.matchAll(supportPattern)].map((match) => ({
       id: match[1],
@@ -197,13 +196,16 @@ describe('contrato persistido dos Pavilhões 8 e 13', () => {
     }));
     expect(supports).toHaveLength(3);
     supports.forEach((support) => {
-      const expected = PAVILION8_COMMERCIAL_SUPPORT_SPACES.find(
-        (candidate) => candidate.id === support.id,
-      );
+      const expected = {
+        sanitarios: { label: 'Sanitários', kind: 'sanitary', sourcePrecision: 'plan-traced', left: 0, top: -7.4, width: 7.1, depth: 7.4 },
+        cozinha: { label: 'Cozinha', kind: 'kitchen', sourcePrecision: 'plan-traced', left: 7.1, top: -7.4, width: 11.9, depth: 7.4 },
+        'apoio-cozinha': { label: 'Apoio de serviço', kind: 'service', sourcePrecision: 'plan-traced', left: 19, top: -6.4, width: 2.7, depth: 6.4 },
+      }[support.id];
       expect(expected, support.id).toBeDefined();
-      expect(support.label).toBe(expected!.label);
-      expect(support.kind).toBe(expected!.kind);
-      expect(support.sourcePrecision).toBe(expected!.sourcePrecision);
+      if (!expected) return;
+      expect(support.label).toBe(expected.label);
+      expect(support.kind).toBe(expected.kind);
+      expect(support.sourcePrecision).toBe(expected.sourcePrecision);
       expect(normalizedBounds({
         pavilionIdentifier: 'B4',
         id: support.id,
@@ -217,10 +219,10 @@ describe('contrato persistido dos Pavilhões 8 e 13', () => {
         referenceAreaM2: 0,
         ...support,
       })).toMatchObject({
-        centerX: expect.closeTo(expected!.centerX, 12),
-        centerZ: expect.closeTo(expected!.centerZ, 12),
-        width: expect.closeTo(expected!.width, 12),
-        depth: expect.closeTo(expected!.depth, 12),
+        centerX: expect.closeTo((expected.left + expected.width / 2) / 21.7, 12),
+        centerZ: expect.closeTo((expected.top + expected.depth / 2) / 35.4, 12),
+        width: expect.closeTo(expected.width / 21.7, 12),
+        depth: expect.closeTo(expected.depth / 35.4, 12),
       });
     });
     expect(supportPersistence).toContain("'type', 'permanent-non-commercial'");

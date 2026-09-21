@@ -14,7 +14,7 @@ import {
   commercialPavilionInteriorViewRotationRadians,
 } from '@/features/commercial-map/utils/commercialPavilions';
 
-const migration = readFileSync(resolve('supabase/migrations/20260921024500_pavilion_8_official_2028.sql'), 'utf8');
+const migration = readFileSync(resolve('supabase/migrations/20260921023313_3aaddbf5-1ca5-449c-af27-32d488c1ba3e.sql'), 'utf8');
 const sql = migration.replace(/\s+/g, ' ').toLowerCase();
 const metric = (value: number, axis: 'x' | 'z') => value * (axis === 'x' ? 21.7 : 35);
 const edge = (id: string, side: 'top' | 'bottom') => {
