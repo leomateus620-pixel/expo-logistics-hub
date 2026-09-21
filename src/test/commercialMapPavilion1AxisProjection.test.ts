@@ -313,6 +313,17 @@ describe('projeção oficial do Pavilhão 1', () => {
     expect(module141.metadata.areaM2).toBe(18);
   });
 
+  it('mantém o footprint oficial de 18 m² do B1-M141 e o recorte vazio', () => {
+    const module141 = PAVILION1_COMMERCIAL_REFERENCE.cells.find((cell) => cell.number === 141);
+    if (!module141?.shape) throw new Error('B1-M141 sem footprint irregular.');
+    const metricPoints = module141.shape.footprint.map(([x, z]) => [metricX(x), metricZ(z)] as const);
+
+    expect(polygonArea(metricPoints)).toBeCloseTo(18, 10);
+    expect(module141.shape.renderParts).toHaveLength(2);
+    expect(module141.id).toBe('B1:module:141');
+    expect(module141.shape.footprint).toHaveLength(6);
+  });
+
   it('preserva os frames stretch legados e reconhece as projeções oficiais posteriores', () => {
     ['B3', 'B6'].forEach((identifier) => {
       const plan = COMMERCIAL_PAVILION_MODULE_PLANS[identifier as 'B3' | 'B6'];
