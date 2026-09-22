@@ -1,4 +1,6 @@
 import { InteriorViewControls } from '../InteriorViewControls';
+import { useVisitStore } from '../../visit/useVisitStore';
+import { useVisitCameraLease } from '../../visit/useVisitCameraLease';
 import { clampInteriorPan, resolveInteriorView, interpolateInteriorOrbit } from '../../utils/interiorView';
 import { publicLotOutlinePositions } from '../../public/publicLotOutline';
 import { PUBLIC_NAVIGATION_SAVE_EVENT, savePublicNavigation, type PublicNavigation } from '../../public/publicNavigation';
@@ -34,6 +36,7 @@ import { Html, OrbitControls, useTexture } from '@react-three/drei';
 import { CommercialMapSceneShaderWarmup } from './CommercialMapSceneShaderWarmup';
 import { readPreparedHeadquartersGeometry } from './headquarters/headquartersPreparationResource';
 import { CommercialMapInteractiveBoot, DeferredSceneLayer } from './DeferredSceneLayer';
+import { COMMERCIAL_MAP_CANONICAL_CONTENT, readCommercialMapQaQualityTier } from '../../utils/executionPolicy';
 import { EssentialSceneLayer } from './EssentialSceneLayer';
 import { commercialMapNavigationExtent } from '../../data/commercialMapSpatialBounds';
 import { preloadBumperPhysics } from '../../utils/preloadBumperPhysics';
@@ -244,6 +247,17 @@ const CommercialHydrologicalInfrastructureLayer = lazy(async () => ({
   default: (await import('./CommercialHydrologicalInfrastructureLayer')).CommercialHydrologicalInfrastructureLayer,
 }));
 const CommercialMapRainLayer = lazy(() => import('./CommercialMapRainLayer'));
+const VisitMode = lazy(() => import('../../visit/VisitMode'));
+
+class VisitFeatureBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch(error: Error) {
+    console.error('Visit mode failed', error);
+    useVisitStore.setState({ error: 'Não foi possível preparar a visita. Saia e tente novamente.', phase: 'active' });
+  }
+  render() { return this.state.failed ? null : this.props.children; }
+}
 
 function DeferredPhysicsPreload() {
   useEffect(() => {
@@ -913,7 +927,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     [maxAnisotropy, naturalParking, openGroundProfile],
   );
   const openGroundMaterialRef = useRef<THREE.MeshStandardMaterial>(null);
-  const openGroundReducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  const openGroundReducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
   useLayoutEffect(() => {
     // Presentation only: the large open fields share the park-scale terrain
     // fBm so they never read as one flat tile next to the environment ground.
@@ -1467,7 +1481,7 @@ function BatchedLots({
   if (geometryEntitiesRef.current.length !== entries.length || entries.some((entry, i) => entry.entity !== geometryEntitiesRef.current[i])) geometryEntitiesRef.current = entries.map(entry => entry.entity);
   const geometryEntities = geometryEntitiesRef.current;
   const invalidate = useThree((state) => state.invalidate);
-  const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  const reducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
   const hoveredRef = useRef<string | null>(null);
   const pendingHoverRef = useRef<string | null>(null);
   const hoverFrameRef = useRef<number | null>(null);
@@ -2010,6 +2024,9 @@ function CameraRig({
   const invalidate = useThree((state) => state.invalidate);
   const gl = useThree((state) => state.gl);
   const restoreView = useRef(initialPublicView);
+  const visitLease = useVisitCameraLease(camera, controlsRef, invalidate);
+  const visitEnabled = visitLease.enabled;
+  const visitRestoredAt = visitLease.restoredAt;
   useEffect(() => {
     if (!gl.domElement.closest('.public-map-shell')) return;
     const save = () => savePublicNavigation({ position: camera.position.toArray() as [number, number, number], target: controlsRef.current?.target.toArray() as [number, number, number], zoom: camera.zoom });
@@ -2517,6 +2534,8 @@ function CameraRig({
     nextLens: Partial<CameraLensState> = {},
     source = 'navigation',
   ) => {
+    if ((useVisitStore.getState().enabled && !useCommercialMapStore.getState().interiorEntityId)
+      || performance.now() - visitRestoredAt.current < 300) return;
     if (source !== 'panel-layout') clampQueuedCameraPose(minDistance, maxDistance, clampTarget);
     const controls = controlsRef.current;
     if (publicPolicy && !initialized.current && camera instanceof THREE.PerspectiveCamera) {
@@ -2626,6 +2645,7 @@ function CameraRig({
     invalidate,
     setCameraNavigating,
     writeCameraDiagnostics,
+    visitRestoredAt,
   ]);
 
   const cancelCameraTransition = useCallback((preserveView = true) => {
@@ -2727,6 +2747,7 @@ function CameraRig({
   }, [gl, invalidate]);
 
   const enforceDesiredCameraLimits = useCallback(() => {
+    if (useVisitStore.getState().enabled && !useCommercialMapStore.getState().interiorEntityId) return false;
     const controls = controlsRef.current;
     const currentTarget = controls?.target ?? targetLookAt.current;
     targetPosition.current.copy(camera.position);
@@ -2760,6 +2781,7 @@ function CameraRig({
 
   useEffect(() => {
     if (lunarCameraLockedRef.current || !(camera instanceof THREE.PerspectiveCamera)) return;
+    if (useVisitStore.getState().enabled && !useCommercialMapStore.getState().interiorEntityId) return;
     if (interiorEntity && !interiorFrame) return;
     if (navigation.current.active || navigation.current.settling || (interiorFrame?.pavilion && preserveManualView.current)) {
       const activeTarget = controlsRef.current?.target ?? targetLookAt.current;
@@ -3420,6 +3442,7 @@ function CameraRig({
   ]);
 
   const scheduleResizeRefit = useCallback(() => {
+    if (useVisitStore.getState().enabled && !useCommercialMapStore.getState().interiorEntityId) return;
     if (
       lunarCameraLockedRef.current
       || shouldSuppressCommercialMapResizeRefit(Date.now(), resizeRefitSuppressedUntil.current)
@@ -3466,6 +3489,23 @@ function CameraRig({
   useLayoutEffect(() => {
     const selectedId = selectedEntity?.id ?? null;
     const interiorId = interiorEntity?.id ?? null;
+    if ((visitEnabled && !interiorId) || performance.now() - visitRestoredAt.current < 300) {
+      cancelScheduledResizeRefit();
+      cameraTransition.current.active = false;
+      animating.current = false;
+      navigation.current.active = navigation.current.navigating = navigation.current.settling = false;
+      previousSelection.current = selectedId; previousInterior.current = interiorId;
+      previousPreset.current = preset; previousSequence.current = cameraSequence;
+      previousSegment.current = activeSegment?.id ?? null;
+      previousDetailsLayout.current = activePanel === 'details';
+      previousParking.current = { active: parkingActive, sequence: parkingCameraSequence,
+        blockId: selectedParkingBlockId, spaceId: selectedParkingSpaceId, view: parkingCameraView };
+      targetPosition.current.copy(camera.position);
+      targetLookAt.current.copy(controlsRef.current?.target ?? targetLookAt.current);
+      preserveManualView.current = true;
+      setTransitionControlsLocked(false); setCameraNavigating(false);
+      return;
+    }
     const interiorChanged = interiorId !== previousInterior.current;
     const exitingInterior = !interiorId && previousInterior.current !== null;
     const selectionChanged = selectedId !== previousSelection.current;
@@ -3647,6 +3687,8 @@ function CameraRig({
     activePanel,
     activeSegment,
     activeSegmentEntities,
+    visitEnabled,
+    visitRestoredAt,
     framingSegment,
     framingSegmentEntities,
     publicPolicy,
@@ -3677,6 +3719,7 @@ function CameraRig({
     selectedParkingBlockId,
     selectedParkingSpaceId,
     startCameraMove,
+    setCameraNavigating,
   ]);
 
   useLayoutEffect(() => {
@@ -4013,6 +4056,7 @@ function CameraRig({
   }, [camera, cancelScheduledResizeRefit, gl, setCameraNavigating]);
 
   useFrame(() => {
+    if (visitLease.apply(Boolean(interiorEntity))) { writeCameraDiagnostics(); return; }
     const path = lunarPath.current;
     const snapshot = path.snapshot;
     const perspective = camera instanceof THREE.PerspectiveCamera ? camera : null;
@@ -4411,7 +4455,7 @@ function CameraRig({
     <OrbitControls
       ref={controlsRef}
       makeDefault
-      enabled={!lunarCameraLocked && !transitionControlsLocked}
+      enabled={!(visitEnabled && !interiorEntity) && !lunarCameraLocked && !transitionControlsLocked}
       enableDamping={!lunarCameraLocked && !transitionControlsLocked}
       dampingFactor={interiorFrame?.dampingFactor ?? (interiorEntity ? 0.11 : 0.14)}
       enablePan={!lunarCameraLocked && !transitionControlsLocked && (interiorFrame?.enablePan ?? true)}
@@ -4497,6 +4541,7 @@ const Scene = memo(function Scene({
   // Suspend before constructing siblings. Suspending only inside B12 makes
   // React replay terrain/road/material preparation while its worker finishes.
   const publicPolicy = usePublicScenePolicy();
+  const visitEnabled = useVisitStore(state => state.enabled);
   if (!publicPolicy && entities.some((entity) => resolveStrategicLandmarkKind(entity) === 'fenasoja-headquarters')) {
     readPreparedHeadquartersGeometry();
   }
@@ -4528,7 +4573,8 @@ const Scene = memo(function Scene({
   );
   const rearParkingAvailable = rearParkingVisibleInArea(isolatedArea) && parkingPresentation.visible;
   const rearParkingEnabled = rearParkingAvailable && !hydrologicalModeActive;
-  const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  // Legacy presentation props are canonical; hardware controls execution only.
+  const reducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
   // Preset visual de Vendas: oculta apenas ambientação decorativa.
   const salesPresentationActive = useCommercialMapStore((state) => state.salesPresentationActive);
   const salesSelectedLotIds = useSalesSelectedLotIds();
@@ -4653,6 +4699,7 @@ const Scene = memo(function Scene({
     [interactiveEntityIds],
   );
   const handleEntitySelect = useCallback((entityId: string) => {
+    if (useVisitStore.getState().enabled) return;
     if (hydrologicalModeActive) return;
     if (!canInspectEntity(entityId)) return;
     // Em modo Vendas o clique pertence ao carrinho: não seleciona a entidade
@@ -4661,6 +4708,7 @@ const Scene = memo(function Scene({
     setSelectedEntityId(entityId);
   }, [canInspectEntity, hydrologicalModeActive, interactiveEntityIds, lots, setSelectedEntityId]);
   const handleEntityHover = useCallback((entityId: string | null) => {
+    if (useVisitStore.getState().enabled) return;
     if (hydrologicalModeActive) return;
     const allowed = canInspectEntity(entityId);
     setHoveredEntityId(allowed ? entityId : null);
@@ -4672,10 +4720,12 @@ const Scene = memo(function Scene({
   }, [canInspectEntity, hydrologicalModeActive, interactiveEntityIds, setCanvasCursor, setHoveredEntityId]);
   // Consulta pública: nenhuma entrada em interior de pavilhão pelo cenário.
   const handleEnterInterior = useCallback((entityId: string) => {
+    if (useVisitStore.getState().enabled) return;
     if (interactiveEntityIds && !interactiveEntityIds.has(entityId)) return;
     enterInterior(entityId);
   }, [enterInterior, interactiveEntityIds]);
   const handleEntityFocus = useCallback(() => {
+    if (useVisitStore.getState().enabled) return;
     if (!hydrologicalModeActive) focusSelection();
   }, [focusSelection, hydrologicalModeActive]);
   const handlePavilionInteriorNavigate = useCallback((targetEntityId: string) => {
@@ -4825,6 +4875,30 @@ const Scene = memo(function Scene({
   const treeSurfaceEntities = useMemo(() => rearParkingAvailable
     ? [...exteriorRenderedEntities, ...REAR_PARKING_GROUND_SUPPORTS]
     : exteriorRenderedEntities, [exteriorRenderedEntities, rearParkingAvailable]);
+  useEffect(() => {
+    if (!commercialMapDiagnosticsEnabled) return;
+    gl.domElement.dataset.commercialMapInventory = JSON.stringify({
+      entityIds: entities.map(entity => entity.id).sort(),
+      presentedEntityIds: exteriorRenderedEntities.map(entity => entity.id).sort(),
+      lotIds: lots.map(lot => lot.id).sort(),
+      entitiesByType: entities.reduce<Record<string, number>>((counts, entity) => {
+        counts[entity.classification] = (counts[entity.classification] ?? 0) + 1;
+        return counts;
+      }, {}),
+      commercialTreeIds: rearRoadCompatibleSceneTrees.map(tree => tree.id).sort(),
+      presentedCommercialTreeIds: presentedSceneTrees.map(tree => tree.id).sort(),
+      treeCoverage: 'Canonical commercial tree layer; procedural territorial/access inventories are validated separately.',
+    });
+    gl.domElement.dataset.commercialMapInventoryCounts = JSON.stringify({
+      entities: entities.length, presentedEntities: exteriorRenderedEntities.length,
+      lots: lots.length, commercialTrees: rearRoadCompatibleSceneTrees.length,
+      presentedCommercialTrees: presentedSceneTrees.length,
+    });
+    return () => {
+      delete gl.domElement.dataset.commercialMapInventory;
+      delete gl.domElement.dataset.commercialMapInventoryCounts;
+    };
+  }, [entities, exteriorRenderedEntities, gl, lots, presentedSceneTrees, rearRoadCompatibleSceneTrees]);
   const parkAccessScope = parkAccessInfrastructureScopeForArea(isolatedArea);
   const parkAccessPresentation = useMemo(() => {
     const resolveOwners = (identifiers: readonly string[]) => {
@@ -4931,7 +5005,7 @@ const Scene = memo(function Scene({
   const contextualLabel = useContextualMapLabel({
     selectedEntityId,
     hoveredEntityId,
-    enabled: labelsVisible && !interiorEntity && !hydrologicalModeActive && !lunarCinematicActive,
+    enabled: labelsVisible && !visitEnabled && !interiorEntity && !hydrologicalModeActive && !lunarCinematicActive,
   });
   const contextualLabelEntities = useMemo(() => {
     const ids = [contextualLabel.selectedId, contextualLabel.hoveredId].filter(
@@ -5028,6 +5102,7 @@ const Scene = memo(function Scene({
         <group visible={!hydrologicalModeActive}>
           <CommercialSiteEnvironmentLayer
             entities={siteEnvironmentEntities}
+            preserveVisitGroundPlacement={visitEnabled}
             activeOwnerIdentifiers={activeSiteEnvironmentOwnerIdentifiers}
             reducedGraphics={reducedGraphics}
           />
@@ -5045,6 +5120,7 @@ const Scene = memo(function Scene({
         <group visible={!hydrologicalModeActive}>
           <QuadrasABEnvironmentLayer
             entities={siteEnvironmentEntities}
+            preserveVisitGroundPlacement={visitEnabled}
             reducedGraphics={reducedGraphics}
           />
         </group>
@@ -5055,6 +5131,7 @@ const Scene = memo(function Scene({
           <EssentialSceneLayer id="rear-environment">
           <RearParkEnvironmentLayer
             reducedGraphics={reducedGraphics}
+            preserveVisitTreePlacement={visitEnabled}
             vegetationVisible={treesVisible}
           />
           </EssentialSceneLayer>
@@ -5086,7 +5163,7 @@ const Scene = memo(function Scene({
         <RearParkingLayer
           active={rearParkingEnabled}
           reducedGraphics={reducedGraphics}
-          labelsVisible={labelsVisible}
+          labelsVisible={labelsVisible && !visitEnabled}
           opacity={parkingPresentation.opacity}
         />
         </EssentialSceneLayer>
@@ -5097,6 +5174,7 @@ const Scene = memo(function Scene({
             <EssentialSceneLayer id="access-environment">
             <ParkAccessEnvironmentLayer
               reducedGraphics={reducedGraphics}
+              preserveVisitTreePlacement={visitEnabled}
               surfacesVisible
               vegetationVisible={treesVisible}
             />
@@ -5194,7 +5272,7 @@ const Scene = memo(function Scene({
         surfaceEntities={treeSurfaceEntities}
         visible={treesVisible && !hydrologicalModeActive && !salesPresentationActive}
         reducedGraphics={reducedGraphics}
-        qualityTier={reducedGraphics ? 'LOW' : 'HIGH'}
+        qualityTier={renderQualityTier}
       />
       </EssentialSceneLayer>}
       <EssentialSceneLayer id="electrical-detail">
@@ -5282,6 +5360,9 @@ const Scene = memo(function Scene({
         hydrologicalModeActive={hydrologicalModeActive}
       />
       <RuntimeFrameDiagnostics />
+      {visitEnabled && !publicPolicy && <VisitFeatureBoundary><Suspense fallback={null}>
+        <VisitMode entities={entities} lots={lots} trees={presentedSceneTrees} electricalPlacements={electricalSceneLayout.placements} siteEnvironmentEntities={siteEnvironmentEntities}/>
+      </Suspense></VisitFeatureBoundary>}
       {commercialMapDiagnosticsEnabled && <LightingPerformanceProbe />}
       {LateralDistrictQaScene && (window.location.pathname === '/__dev/commercial-map-rendering' || (import.meta.env.DEV && new URLSearchParams(window.location.search).has('groundQa')))
         && <Suspense fallback={null}><LateralDistrictQaScene />{TerritoryQa && <TerritoryQa />}</Suspense>}
@@ -5370,12 +5451,13 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
     dpr: typeof window === 'undefined' ? 1 : window.devicePixelRatio,
     reducedGraphics,
   });
-  const initialQualityState = useRef(createInitialCommercialMapQualityState({
+  const initialQaTier = useRef(readCommercialMapQaQualityTier(commercialMapDiagnosticsEnabled, typeof window === 'undefined' ? '' : window.location.search)).current;
+  const initialQualityState = useRef({ ...createInitialCommercialMapQualityState({
     viewportWidth: initialViewport.current.width,
     viewportHeight: initialViewport.current.height,
     devicePixelRatio: initialViewport.current.dpr,
     capabilityHints,
-  })).current;
+  }), ...(initialQaTier ? { tier: initialQaTier } : {}) }).current;
   const initialPixelRatio = useRef(initialViewport.current.reducedGraphics
     ? resolveCommercialMapPixelRatio({
         devicePixelRatio: initialViewport.current.dpr,
@@ -5476,7 +5558,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
       frameloop="demand"
       camera={initialRenderConfig.current.camera}
       dpr={initialPixelRatio}
-      shadows={props.publicScenePolicy || reducedGraphics ? false : COMMERCIAL_MAP_SHADOW_MAP_CONFIG}
+      shadows={props.publicScenePolicy ? false : COMMERCIAL_MAP_SHADOW_MAP_CONFIG}
       gl={createRenderer}
         onCreated={({ gl, scene, camera }) => {
           markCommercialMapStage('canvas-created');
@@ -5509,6 +5591,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
           gl.domElement.style.cursor = 'grab';
       }}
       onPointerMissed={(event) => {
+        if (useVisitStore.getState().enabled) return;
         if (!isMapSelectionClick(undefined, event)) return;
         // Empty-ground orbit/pan must not close parking or reset a close-up camera.
         const interactionState = useCommercialMapStore.getState();

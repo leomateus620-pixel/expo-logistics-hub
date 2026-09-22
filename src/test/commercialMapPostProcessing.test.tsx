@@ -24,6 +24,7 @@ vi.mock('@react-three/fiber', () => ({
 import { SunrisePostProcessing } from '@/features/commercial-map/components/canvas/CommercialMapEnvironment';
 import { COMMERCIAL_MAP_RENDER_RETRY_EVENT, readCommercialMapRenderHealth } from '@/features/commercial-map/utils/renderingHealth';
 import { prepareCommercialMapCriticalPost, prepareCommercialScene } from '@/features/commercial-map/utils/sceneShaderWarmup';
+import { visitRuntime } from '@/features/commercial-map/visit/visitRuntime';
 
 function createRenderer() {
   const size = new THREE.Vector2(1366, 768);
@@ -108,11 +109,13 @@ function restoreContext(gl: THREE.WebGLRenderer) {
 }
 
 beforeEach(() => {
+  visitRuntime.renderingActive = false;
   // Real composer, passes, effects and lifecycle; only GPU submission is mocked.
   vi.spyOn(EffectComposer.prototype, 'render').mockImplementation(() => {});
 });
 
 afterEach(() => {
+  visitRuntime.renderingActive = false;
   cleanup();
   vi.useRealTimers();
   vi.restoreAllMocks();
@@ -120,6 +123,32 @@ afterEach(() => {
 });
 
 describe('Commercial Map persistent post-processing with installed postprocessing classes', () => {
+  it('preserva todos os efeitos e o mesmo compositor em movimento e repouso da visita', () => {
+    const state = createRuntime();
+    const addPass = vi.spyOn(EffectComposer.prototype, 'addPass');
+    const dispose = vi.spyOn(EffectComposer.prototype, 'dispose');
+    render(<SunrisePostProcessing qualityTier="balanced" enabled />);
+    drawFrame();
+    const composer = addPass.mock.instances[0] as unknown as EffectComposer;
+    const targets = [composer.inputBuffer, composer.outputBuffer];
+    const passes = [...composer.passes];
+    for (let cycle = 0; cycle < 20; cycle++) {
+      const previousPostFrames = vi.mocked(composer.render).mock.calls.length;
+      const previousDirectFrames = vi.mocked(state.gl.render).mock.calls.length;
+      visitRuntime.renderingActive = true;
+      drawFrame();
+      expect(composer.render).toHaveBeenCalledTimes(previousPostFrames + 1);
+      expect(state.gl.render).toHaveBeenCalledTimes(previousDirectFrames);
+      visitRuntime.renderingActive = false;
+      drawFrame();
+      expect(composer.render).toHaveBeenCalledTimes(previousPostFrames + 2);
+      expectScreenBound(state.gl);
+    }
+    expect([composer.inputBuffer, composer.outputBuffer]).toEqual(targets);
+    expect(composer.passes).toEqual(passes);
+    expect(dispose).not.toHaveBeenCalled();
+    expect(state.setDpr).not.toHaveBeenCalled();
+  });
   it('keeps the first usable frame and gesture DIRECT until background POST readiness without remounting', async () => {
     const state = createRuntime();
     await prepareCommercialScene(state.gl, state.scene, state.camera);
@@ -199,9 +228,9 @@ describe('Commercial Map persistent post-processing with installed postprocessin
     expect(composer.passes).toHaveLength(4);
     expect(composer.passes[0]).toBeInstanceOf(RenderPass);
     expect(composer.passes.slice(1).every((pass) => pass instanceof EffectPass)).toBe(true);
-    expect(composer.passes[3].enabled).toBe(false);
-    expect(composer.passes[3].renderToScreen).toBe(false);
-    expect(composer.passes[2].renderToScreen).toBe(true);
+    expect(composer.passes[3].enabled).toBe(true);
+    expect(composer.passes[3].renderToScreen).toBe(true);
+    expect(composer.passes[2].renderToScreen).toBe(false);
     expect(composer.autoRenderToScreen).toBe(false);
     expect(composer.inputBuffer.texture.type).toBe(THREE.HalfFloatType);
     expect(composer.multisampling).toBe(0);
@@ -240,8 +269,8 @@ describe('Commercial Map persistent post-processing with installed postprocessin
         const directFrames = vi.mocked(gl.render).mock.calls.length;
         drawFrame();
         expectScreenBound(gl);
-        expect(vi.mocked(composer.render).mock.calls.length - postFrames).toBe(tier === 'reduced' ? 0 : 1);
-        expect(vi.mocked(gl.render).mock.calls.length - directFrames).toBe(tier === 'reduced' ? 1 : 0);
+        expect(vi.mocked(composer.render).mock.calls.length - postFrames).toBe(1);
+        expect(vi.mocked(gl.render).mock.calls.length - directFrames).toBe(0);
         expect(gl.toneMapping).toBe(THREE.ACESFilmicToneMapping);
       }
     }
@@ -253,7 +282,7 @@ describe('Commercial Map persistent post-processing with installed postprocessin
     expect(dispose).toHaveBeenCalledTimes(1);
   });
 
-  it('never owns DPR; interaction renders direct without resizing dormant post targets', () => {
+  it('never owns DPR; interaction keeps effects and resizes targets only after an actual DPR change', () => {
     const state = createRuntime();
     const addPass = vi.spyOn(EffectComposer.prototype, 'addPass');
     const setSize = vi.spyOn(EffectComposer.prototype, 'setSize');
@@ -264,7 +293,7 @@ describe('Commercial Map persistent post-processing with installed postprocessin
     state.gl.setRenderTarget((addPass.mock.instances[0] as unknown as EffectComposer).inputBuffer);
     drawFrame();
     expectScreenBound(state.gl);
-    expect(state.gl.render).toHaveBeenCalledOnce();
+    expect(state.gl.render).not.toHaveBeenCalled();
     expect(setSize).toHaveBeenCalledTimes(sizeCallsAtRest);
     view.rerender(<SunrisePostProcessing qualityTier="full" enabled />);
     drawFrame();
@@ -481,7 +510,7 @@ describe('Commercial Map persistent post-processing with installed postprocessin
   it('bounds failed direct recovery and resumes only after a manual retry', () => {
     const { gl } = createRuntime();
     vi.mocked(gl.render).mockImplementation(() => { throw new Error('direct-render-failed'); });
-    render(<SunrisePostProcessing qualityTier="reduced" enabled />);
+    render(<SunrisePostProcessing qualityTier="reduced" enabled={false} />);
     drawFrame();
     expect(gl.render).toHaveBeenCalledTimes(2);
     expect(gl.resetState).toHaveBeenCalledOnce();
@@ -520,7 +549,7 @@ describe('Commercial Map persistent post-processing with installed postprocessin
       } else {
         vi.mocked(gl.render).mockImplementation(failContext);
       }
-      render(<SunrisePostProcessing qualityTier={phase === 'direct-render' ? 'reduced' : 'balanced'} enabled />);
+      render(<SunrisePostProcessing qualityTier="balanced" enabled={phase !== 'direct-render'} />);
       drawFrame();
       expect(dispose).not.toHaveBeenCalled();
       expect(gl.resetState).not.toHaveBeenCalled();
@@ -605,7 +634,7 @@ describe('Commercial Map persistent post-processing with installed postprocessin
     vi.mocked(gl.render).mockImplementation(() => {
       gl.debug.onShaderError?.(gl.getContext(), {} as THREE.WebGLProgram, {} as WebGLShader, {} as WebGLShader);
     });
-    render(<SunrisePostProcessing qualityTier="reduced" enabled />);
+    render(<SunrisePostProcessing qualityTier="reduced" enabled={false} />);
     drawFrame();
     expect(gl.render).toHaveBeenCalledOnce();
     expect(gl.resetState).not.toHaveBeenCalled();

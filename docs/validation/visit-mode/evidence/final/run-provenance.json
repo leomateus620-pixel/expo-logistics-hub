@@ -1,0 +1,49 @@
+{
+  "candidateSourceCommit": "015939d3e5b4d17ae61caa57a7d33ee4e62883f9",
+  "baselineCommit": "8d48bb48378dfae73aae2a98dc9e1fdf367e96ce",
+  "recordedAt": "2026-09-22T04:59:18.124Z",
+  "cpu": {
+    "Name": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+    "NumberOfCores": 4,
+    "NumberOfLogicalProcessors": 4
+  },
+  "os": {
+    "Caption": "Microsoft Windows 11 Home Single Language",
+    "Version": "10.0.26200",
+    "TotalVisibleMemorySize": 8178816
+  },
+  "renderer": "Chrome 153 headless, ANGLE Intel UHD D3D11",
+  "data": "canonical QA fixture using existing Canvas and presentation pipeline",
+  "desktopViewport": "1440x900, DPR 1, actual canvas 1425x772",
+  "mobileViewports": [
+    "390x844",
+    "844x390",
+    "320x568",
+    "1024x768"
+  ],
+  "mobileEmulation": "Chromium touch, deviceScaleFactor 3; same desktop GPU, no phone CPU or thermal emulation",
+  "cache": "Fresh browser context per command; local assets and fixture; OS and GPU driver caches not cleared",
+  "commands": [
+    "node scripts/commercial-map-performance/visit-scenarios.cjs all",
+    "node scripts/commercial-map-performance/visit-scenarios.cjs mobile"
+  ],
+  "limitations": [
+    "No physical iPhone, Android or Safari run",
+    "No authenticated production payload/network timing",
+    "Regional starts are separate segments, not a continuous cross-park route",
+    "Heap after explicit GC is not OS RAM or GPU memory",
+    "One 180-second full-hydration timeout; retry completed. MEDIUM mobile quality window was below 30 FPS. Three-second startup target not achieved."
+  ],
+  "builds": {
+    "route": "e444e91e",
+    "cycles": "e444e91e",
+    "qualityDesktop": "e444e91e",
+    "endurance": "7979ecaa",
+    "startupMatrix": "b49524f3",
+    "startupPrewarmedFinal": "015939d3",
+    "checks": "015939d3",
+    "mobile": "015939d3",
+    "contextRecovery": "015939d3",
+    "qualityMobile": "015939d3"
+  }
+}

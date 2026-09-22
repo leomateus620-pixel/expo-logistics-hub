@@ -441,7 +441,7 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
     expect(selectCommercialTreesForScene(automotive.entities, automotive.lots)).toEqual([]);
   });
 
-  it('mantém quatro draw calls primários, explicita o passe de sombra e reduz lóbulos sem ocultar árvores', () => {
+  it('mantém quatro draw calls primários e os mesmos lóbulos e sombras em todos os perfis', () => {
     const full = commercialTreeInstanceBudget(COMMERCIAL_MAP_TREES.length);
     const reduced = commercialTreeInstanceBudget(COMMERCIAL_MAP_TREES.length, true);
     expect(full).toMatchObject({
@@ -456,7 +456,6 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
     expect(reduced.treeCount).toBe(full.treeCount);
     expect(reduced.canopyInstances).toBe(COMMERCIAL_MAP_TREES.length * COMMERCIAL_TREE_REDUCED_CANOPY_LOBES);
     expect(reduced.drawCalls).toBe(COMMERCIAL_TREE_LAYER_DRAW_CALL_BUDGET);
-    expect(reduced.shadowDrawCalls).toBe(0);
-    expect(reduced.maximumPassDrawCalls).toBe(COMMERCIAL_TREE_LAYER_DRAW_CALL_BUDGET);
+    expect(reduced).toEqual(full);
   });
 });

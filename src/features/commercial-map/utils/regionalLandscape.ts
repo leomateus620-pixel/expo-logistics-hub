@@ -38,13 +38,13 @@ export interface RegionalLandscapeInstance {
 export const REGIONAL_LANDSCAPE_INSTANCE_BUDGET = Object.freeze({
   full: 840,
   balanced: 840,
-  reduced: 220,
+  reduced: 840,
 } satisfies Record<RegionalLandscapeQualityTier, number>);
 
 export const REGIONAL_LANDSCAPE_DRAW_CALL_BUDGET = Object.freeze({
   full: 3,
   balanced: 3,
-  reduced: 2,
+  reduced: 3,
 } satisfies Record<RegionalLandscapeQualityTier, number>);
 
 /**

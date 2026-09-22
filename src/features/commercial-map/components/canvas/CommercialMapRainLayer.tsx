@@ -9,6 +9,7 @@ import { buildRainGroundAnchors, buildRainRunoffAnchors, type RainGroundAnchor }
 import { commercialMapDiagnosticsEnabled, markCommercialMapStage } from '../../utils/performanceDiagnostics';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { RainWetSurfaceRegistry } from './rainWetSurfaces';
+import { resolveCommercialMapExecutionPolicy } from '../../utils/executionPolicy';
 
 const NO_RAYCAST = () => undefined;
 // Fixed world-space period: moving/zooming only recycles particles at a faded
@@ -119,6 +120,7 @@ export function CommercialMapRainLayer({entities, qualityTier, active=true}: {
   const registry=useMemo(()=>new RainWetSurfaceRegistry(),[]);
   const tier=resolveRainQuality(qualityTier,gl.capabilities.maxTextureSize,(navigator as Navigator & {deviceMemory?:number}).deviceMemory);
   const budget=COMMERCIAL_RAIN_BUDGETS[tier];
+  const execution=resolveCommercialMapExecutionPolicy(tier);
   const resources=useMemo(()=>{
     markCommercialMapStage('rain-preparation:start');
     const ground=buildRainGroundAnchors(entities,160);
@@ -219,7 +221,7 @@ export function CommercialMapRainLayer({entities, qualityTier, active=true}: {
     resources.puddles.geometry.instanceCount=hydrology?0:Math.min(budget.puddles,resources.groundCount);
     const surfaceWet=active&&!hydrology?wet:0;
     if((surfaceWet!==cadence.current.lastWet && (surfaceWet===0 || surfaceWet===1))
-      || (now-cadence.current.wet>32 && surfaceWet>0)) {
+      || (now-cadence.current.wet>1000/execution.effectUpdateHz && surfaceWet>0)) {
       registry.update(surfaceWet);cadence.current.wet=now;cadence.current.lastWet=surfaceWet;
     }
     if(now-cadence.current.lamps>1000){

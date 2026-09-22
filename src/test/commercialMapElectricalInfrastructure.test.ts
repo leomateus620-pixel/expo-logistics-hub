@@ -676,7 +676,7 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
       true,
     );
     expect(fullWires.length).toBe(budget.conductorVertices * 3);
-    expect(reducedWires.length).toBeLessThan(fullWires.length);
+    expect(reducedWires).toEqual(fullWires);
     expect([...fullWires].every(Number.isFinite)).toBe(true);
     let wireCursor = 0;
     const floatsPerConductor = (ELECTRICAL_WIRE_SAMPLES - 1) * 2 * 3;

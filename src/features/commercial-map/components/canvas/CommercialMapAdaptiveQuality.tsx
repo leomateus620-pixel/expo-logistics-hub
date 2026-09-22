@@ -5,6 +5,12 @@ import { sampleCommercialMapDisplayCadence } from '../../utils/displayCadence';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { recordCommercialMapQualityDecision } from '../../utils/runtimeDiagnostics';
 import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
+import { isCommercialMapProgramPreparationActive } from '../../utils/sceneShaderWarmup';
+import { readCommercialMapQaQualityTier, resolveCommercialMapExecutionPolicy } from '../../utils/executionPolicy';
+import {
+  capVisitPixelRatio, createInitialVisitQuality, publishVisitQualityTier,
+  readVisitQuality, resolveVisitQualityDecision, subscribeVisitQuality,
+} from '../../visit/VisitQualityManager';
 import {
   resolveCommercialMapAdaptiveQuality,
   resolveCommercialMapPixelRatio,
@@ -61,11 +67,20 @@ export function CommercialMapAdaptiveQualityController({
   const gl = useThree((state) => state.gl);
   const invalidate = useThree((state) => state.invalidate);
   const setDpr = useThree((state) => state.setDpr);
+  const getRendererState = useThree((state) => state.get);
   const size = useThree((state) => state.size);
   const qualityState = useRef<CommercialMapAdaptiveQualityState>({ ...initialState });
+  const visitSessionActive = useRef(false);
+  const normalQuality = useRef<{
+    state: CommercialMapAdaptiveQualityState;
+    sceneTier: CommercialMapQualityTier;
+    pendingTier: CommercialMapQualityTier | null;
+  } | null>(null);
   const committedSceneTier = useRef<CommercialMapQualityTier>(initialState.tier);
   const pendingSceneTier = useRef<CommercialMapQualityTier | null>(null);
   const pixelRatioState = useRef(createCommercialMapPixelRatioState(gl.getPixelRatio()));
+  const pendingPixelRatioBase = useRef<number | undefined>();
+  const pixelRatioSyncDeferred = useRef(false);
   const idleCommitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const frameWindow = useRef(createCommercialMapFrameTimeWindow());
   const lastDiagnosticSignature = useRef('');
@@ -74,12 +89,16 @@ export function CommercialMapAdaptiveQualityController({
   const displayCadence = useRef<number | null>(null);
   const cadenceCancel = useRef<(() => void) | null>(null);
   const activity = useRef(commercialMapFrameActivity(gl));
+  const executionReportAt = useRef(0);
+  const lastMeasuredWindow = useRef<{ averageFrameTimeMs: number; p95FrameTimeMs: number; sampledFrames: number } | null>(null);
+  const qaOverrideSnapshot = useRef<{ state: CommercialMapAdaptiveQualityState; fixed: boolean; qaTier: CommercialMapQualityTier | null } | null>(null);
   // Opt-in, local QA only: compare identical initial quality before/after.
   // groundQa also enables comparison on the application route in DEV only.
-  const fixedQualityForComparison = useRef(commercialMapDiagnosticsEnabled
+  const initialQaTier = useRef(readCommercialMapQaQualityTier(commercialMapDiagnosticsEnabled, typeof window === 'undefined' ? '' : window.location.search));
+  const fixedQualityForComparison = useRef(initialQaTier.current !== null || (commercialMapDiagnosticsEnabled
     && (window.location.pathname === '/__dev/commercial-map-rendering'
       || (import.meta.env.DEV && new URLSearchParams(window.location.search).has('groundQa')))
-    && new URLSearchParams(window.location.search).get('quality') === 'fixed');
+    && new URLSearchParams(window.location.search).get('quality') === 'fixed'));
 
   const resolveCapabilities = useCallback((): CommercialMapQualityCapabilitiesInput => ({
     devicePixelRatio: typeof window === 'undefined' ? 1 : window.devicePixelRatio,
@@ -90,10 +109,22 @@ export function CommercialMapAdaptiveQualityController({
 
   const resolveTierPixelRatio = useCallback((tier: CommercialMapQualityTier) => {
     const capabilities = resolveCapabilities();
-    return reducedGraphics
-      ? resolveCommercialMapPixelRatio({ ...capabilities, reducedGraphics: true })
-      : resolveCommercialMapQualityPixelRatio({ ...capabilities, qualityTier: tier });
+    const adaptiveDpr = resolveCommercialMapQualityPixelRatio({ ...capabilities, qualityTier: tier });
+    const dpr = reducedGraphics
+      ? Math.min(adaptiveDpr, resolveCommercialMapPixelRatio({ ...capabilities, reducedGraphics: true }))
+      : adaptiveDpr;
+    return readVisitQuality().enabled ? capVisitPixelRatio(dpr, tier) : dpr;
   }, [reducedGraphics, resolveCapabilities]);
+
+  const resolveQuality = useCallback((sample: Parameters<typeof resolveCommercialMapAdaptiveQuality>[1]) => {
+    if (initialQaTier.current && !readVisitQuality().enabled) return {
+      ...qualityState.current, tier: initialQaTier.current, hardwareCeiling: initialQaTier.current,
+      changed: qualityState.current.tier !== initialQaTier.current, reason: 'stable' as const,
+    };
+    return readVisitQuality().enabled
+      ? resolveVisitQualityDecision(qualityState.current, sample)
+      : resolveCommercialMapAdaptiveQuality(qualityState.current, sample);
+  }, []);
 
   const cancelIdleCommit = useCallback(() => {
     if (idleCommitTimer.current === null) return;
@@ -102,20 +133,36 @@ export function CommercialMapAdaptiveQualityController({
   }, []);
 
   const syncPixelRatio = useCallback((baseDpr?: number) => {
+    if (baseDpr !== undefined && Number.isFinite(baseDpr) && baseDpr > 0) pendingPixelRatioBase.current = baseDpr;
+    // Resizing a drawing buffer can synchronously flush programs still linking
+    // in the driver. Initial camera autofit is not a reason to do that before
+    // the first presentation. This gate owns adaptive DPR only; actual viewport
+    // resize and camera projection remain owned by R3F.
+    if (gl.domElement.dataset.commercialMapReady !== 'true' || isCommercialMapProgramPreparationActive(gl)) {
+      pixelRatioSyncDeferred.current = true;
+      return;
+    }
+    const requestedBase = pendingPixelRatioBase.current;
+    pendingPixelRatioBase.current = undefined;
+    pixelRatioSyncDeferred.current = false;
     const nextDpr = updateCommercialMapPixelRatioState(
       pixelRatioState.current,
       isCommercialMapHeavyQualityGestureActive(useCommercialMapStore.getState()),
-      baseDpr,
-    );
-    if (nextDpr !== null && Math.abs(gl.getPixelRatio() - nextDpr) > 0.005) {
+      requestedBase,
+    ) ?? pixelRatioState.current.effectiveDpr;
+    const storeDpr = getRendererState().viewport.dpr;
+    // A matching GPU value alone is insufficient: an obsolete R3F DPR would
+    // be reapplied by its next ResizeObserver notification.
+    if (Math.abs(gl.getPixelRatio() - nextDpr) > 0.005 || Math.abs(storeDpr - nextDpr) > 0.005) {
       setDpr(nextDpr);
-      const quality = gl.domElement?.dataset.commercialMapQuality;
-      if (quality) gl.domElement.dataset.commercialMapQuality = JSON.stringify({ ...JSON.parse(quality), effectiveDpr: nextDpr });
       // A demand canvas must present the resized drawing buffer even when
       // this is the last transition after OrbitControls has stopped moving.
       invalidate();
     }
-  }, [gl, invalidate, setDpr]);
+    const quality = gl.domElement?.dataset.commercialMapQuality;
+    if (quality) gl.domElement.dataset.commercialMapQuality = JSON.stringify({ ...JSON.parse(quality),
+      baseDpr: pixelRatioState.current.baseDpr, effectiveDpr: nextDpr });
+  }, [getRendererState, gl, invalidate, setDpr]);
 
   const publishQuality = useCallback((
     logicalTier: CommercialMapQualityTier,
@@ -128,6 +175,7 @@ export function CommercialMapAdaptiveQualityController({
     const effectiveDpr = pixelRatioState.current.effectiveDpr;
 
     committedSceneTier.current = sceneTier;
+    publishVisitQualityTier(sceneTier);
     if (gl.domElement) {
       gl.domElement.dataset.commercialMapQuality = JSON.stringify({ logicalTier, sceneTier, baseDpr: pixelRatioState.current.baseDpr, effectiveDpr, hardwareCeiling, reason });
       gl.domElement.dispatchEvent(new Event(COMMERCIAL_MAP_QUALITY_EVENT, { bubbles: true }));
@@ -170,14 +218,14 @@ export function CommercialMapAdaptiveQualityController({
       logicalTier,
       logicalTier,
       nextDpr,
-      resolveCommercialMapAdaptiveQuality(qualityState.current, {
+      resolveQuality({
         ...resolveCapabilities(),
         averageFrameTimeMs: Number.NaN,
         sampledFrames: 0,
       }).hardwareCeiling,
       reason,
     );
-  }, [cancelIdleCommit, publishQuality, resolveCapabilities, resolveTierPixelRatio]);
+  }, [cancelIdleCommit, publishQuality, resolveCapabilities, resolveQuality, resolveTierPixelRatio]);
 
   const scheduleIdleCommit = useCallback(() => {
     if (pendingSceneTier.current === null || idleCommitTimer.current !== null) return;
@@ -233,7 +281,7 @@ export function CommercialMapAdaptiveQualityController({
     displayCadence.current = null;
     samplingSignature.current = '';
     const capabilities = resolveCapabilities();
-    const decision = resolveCommercialMapAdaptiveQuality(qualityState.current, {
+    const decision = resolveQuality({
       ...capabilities,
       averageFrameTimeMs: Number.NaN,
       sampledFrames: 0,
@@ -244,7 +292,41 @@ export function CommercialMapAdaptiveQualityController({
       decision,
       decision.reason === 'hardware-cap' ? decision.reason : 'viewport-sync',
     );
-  }, [applyQualityDecision, resolveCapabilities]);
+  }, [applyQualityDecision, resolveCapabilities, resolveQuality]);
+
+  useEffect(() => {
+    const syncVisitSession = () => {
+      const enabled = readVisitQuality().enabled;
+      if (enabled === visitSessionActive.current) return;
+      visitSessionActive.current = enabled;
+      cancelIdleCommit();
+      resetCommercialMapFrameTimeWindow(frameWindow.current);
+      samplingSignature.current = '';
+      if (enabled) {
+        normalQuality.current = {
+          state: { ...qualityState.current },
+          sceneTier: committedSceneTier.current,
+          pendingTier: pendingSceneTier.current,
+        };
+        qualityState.current = createInitialVisitQuality(resolveCapabilities());
+        pendingSceneTier.current = null;
+        const tier = qualityState.current.tier;
+        publishQuality(tier, tier, resolveTierPixelRatio(tier), 'HIGH', 'visit-enter');
+      } else if (normalQuality.current) {
+        const saved = normalQuality.current;
+        normalQuality.current = null;
+        qualityState.current = saved.state;
+        pendingSceneTier.current = saved.pendingTier;
+        const ceiling = resolveQuality({ ...resolveCapabilities(), averageFrameTimeMs: Number.NaN, sampledFrames: 0 }).hardwareCeiling;
+        publishQuality(saved.state.tier, saved.sceneTier, resolveTierPixelRatio(saved.state.tier), ceiling, 'visit-exit-restore');
+        scheduleIdleCommit();
+      }
+      invalidate();
+    };
+    const unsubscribe = subscribeVisitQuality(syncVisitSession);
+    syncVisitSession();
+    return unsubscribe;
+  }, [cancelIdleCommit, invalidate, publishQuality, resolveCapabilities, resolveQuality, resolveTierPixelRatio, scheduleIdleCommit]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return undefined;
@@ -258,6 +340,36 @@ export function CommercialMapAdaptiveQualityController({
     document.addEventListener('visibilitychange', resetWindow);
     return () => document.removeEventListener('visibilitychange', resetWindow);
   }, []);
+
+  useEffect(() => {
+    if (!commercialMapDiagnosticsEnabled) return;
+    const override = (event: Event) => {
+      const tier = (event as CustomEvent<{ tier: CommercialMapQualityTier | null }>).detail?.tier;
+      if (tier === null) {
+        const saved = qaOverrideSnapshot.current;
+        if (!saved) return;
+        qaOverrideSnapshot.current = null;
+        fixedQualityForComparison.current = saved.fixed;
+        initialQaTier.current = saved.qaTier;
+        qualityState.current = saved.state;
+        publishQuality(saved.state.tier, saved.state.tier, resolveTierPixelRatio(saved.state.tier), saved.state.tier, 'qa-override-release');
+      } else {
+        if (tier !== 'LOW' && tier !== 'MEDIUM' && tier !== 'HIGH' && tier !== 'ULTRA') return;
+        qaOverrideSnapshot.current ??= { state: { ...qualityState.current }, fixed: fixedQualityForComparison.current, qaTier: initialQaTier.current };
+        fixedQualityForComparison.current = true;
+        initialQaTier.current = tier;
+        qualityState.current = { ...qualityState.current, tier };
+        publishQuality(tier, tier, resolveTierPixelRatio(tier), tier, 'qa-override');
+      }
+      cancelIdleCommit();
+      pendingSceneTier.current = null;
+      resetCommercialMapFrameTimeWindow(frameWindow.current);
+      samplingSignature.current = '';
+      invalidate();
+    };
+    gl.domElement.addEventListener('commercial-map-quality-test', override);
+    return () => gl.domElement.removeEventListener('commercial-map-quality-test', override);
+  }, [cancelIdleCommit, gl, invalidate, publishQuality, resolveTierPixelRatio]);
 
   useEffect(() => () => { cancelIdleCommit(); cadenceCancel.current?.(); }, [cancelIdleCommit]);
 
@@ -278,7 +390,28 @@ export function CommercialMapAdaptiveQualityController({
   useFrame((_frameState, deltaSeconds) => {
     const store = useCommercialMapStore.getState();
     const gestureActive = isCommercialMapHeavyQualityGestureActive(store);
+    // Visit motion is an external mutable signal, not a React/store update.
+    // Observe its edges here; the sole DPR owner performs no per-frame writes.
+    if (pixelRatioSyncDeferred.current || pixelRatioState.current.gestureActive !== gestureActive) {
+      samplingSignature.current = '';
+      syncPixelRatio();
+    }
     const frame = activity.current;
+    const now = performance.now();
+    if (commercialMapDiagnosticsEnabled && now - executionReportAt.current >= 1000) {
+      executionReportAt.current = now;
+      gl.domElement.dataset.commercialMapExecution = JSON.stringify({
+        initialTier: initialState.tier,
+        tier: qualityState.current.tier,
+        sceneTier: committedSceneTier.current,
+        policy: resolveCommercialMapExecutionPolicy(committedSceneTier.current),
+        dpr: gl.getPixelRatio(),
+        shadowResolution: Number(gl.domElement.dataset.commercialMapShadowResolution) || null,
+        lastFrameWindow: lastMeasuredWindow.current,
+        inventory: gl.domElement.dataset.commercialMapInventoryCounts ? JSON.parse(gl.domElement.dataset.commercialMapInventoryCounts) : null,
+        hardwareRestrictedActions: [],
+      });
+    }
     const requested = frame.requested;
     frame.requested = 0;
     const ready = gl.domElement?.dataset.commercialMapHydration === 'complete'
@@ -322,8 +455,9 @@ export function CommercialMapAdaptiveQualityController({
       deltaSeconds * 1000,
     );
     if (!completedWindow) return;
+    lastMeasuredWindow.current = { ...completedWindow };
 
-    const decision = resolveCommercialMapAdaptiveQuality(qualityState.current, {
+    const decision = resolveQuality({
       ...resolveCapabilities(),
       averageFrameTimeMs: completedWindow.averageFrameTimeMs,
       sampledFrames: completedWindow.sampledFrames,

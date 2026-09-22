@@ -1,4 +1,5 @@
-import { measureCommercialMapStage, markCommercialMapStage } from '../utils/performanceDiagnostics';
+import { captureCommercialMapStageRecorder, type CommercialMapStageRecorder } from '../utils/performanceDiagnostics';
+import { awaitCommercialMapRequest, measureCommercialMapOperation, throwIfMapRequestAborted } from '../utils/commercialMapOperation';
 import { supabase } from '@/integrations/supabase/client';
 import { OFFICIAL_REFERENCE_DATA, OFFICIAL_REFERENCE_REVISION } from '../data/officialReference2026';
 import { reconcileExporuralReference } from '../data/reconcileExporuralReference';
@@ -95,14 +96,25 @@ const db = supabase as any;
 // page signals the end.
 const MAP_PAGE_SIZE = 1000;
 
+export interface CommercialMapFetchOptions {
+  includeReferenceImage?: boolean;
+  signal?: AbortSignal;
+  recordStage?: CommercialMapStageRecorder;
+}
+interface MapReadContext { signal?: AbortSignal; recordStage: CommercialMapStageRecorder }
+// Existing migration-backed query builders are untyped; preserve their payload.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function fetchAllRows(buildQuery: () => any, stage = 'paged-query'): Promise<{ data: any[] | null; error: any }> {
+const mapRequest = (query: any, context: MapReadContext): Promise<any> => awaitCommercialMapRequest(query, context.signal);
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fetchAllRows(buildQuery: () => any, stage: string, context: MapReadContext): Promise<{ data: any[] | null; error: any }> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const all: any[] = [];
   for (let from = 0; ; from += MAP_PAGE_SIZE) {
-    const { data, error } = await measureCommercialMapStage<Awaited<ReturnType<typeof fetchAllRows>>>(`${stage}:page-${from / MAP_PAGE_SIZE}`, () => buildQuery()
+    throwIfMapRequestAborted(context.signal);
+    const { data, error } = await measureCommercialMapOperation<Awaited<ReturnType<typeof fetchAllRows>>>(context.recordStage, `${stage}:page-${from / MAP_PAGE_SIZE}`, () => mapRequest(buildQuery()
       .order('id')
-      .range(from, from + MAP_PAGE_SIZE - 1));
+      .range(from, from + MAP_PAGE_SIZE - 1), context));
     if (error) return { data: null, error };
     const rows = data ?? [];
     all.push(...rows);
@@ -332,17 +344,18 @@ export async function signedReferenceUrl(calibration: MapCalibration | null): Pr
 async function fetchCommissionCommercialMap(
   project: MapProject,
   scope: Extract<CommercialMapQueryScope, { mode: 'commission' }>,
+  context: MapReadContext,
 ): Promise<CommercialMapData> {
   const localSegment = getCommercialMapSegment(scope.segmentId as CommercialMapSegmentId);
   if (!localSegment) throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
 
-  const segmentResult = await db
+  const segmentResult = await mapRequest(db
     .from('map_segments')
     .select('id, project_id, slug, display_name, boundary_data, camera_config, is_active')
     .eq('project_id', project.id)
     .eq('slug', scope.segmentId)
     .eq('is_active', true)
-    .maybeSingle();
+    .maybeSingle(), context);
 
   if (segmentResult.error) {
     if (isMissingMapSegmentInfrastructure(segmentResult.error)) {
@@ -378,9 +391,9 @@ async function fetchCommissionCommercialMap(
     throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
   }
 
-  const inventoryResult = await db.rpc('get_commission_map_segment_inventory', {
+  const inventoryResult = await mapRequest(db.rpc('get_commission_map_segment_inventory', {
     p_segment_id: segment.id,
-  });
+  }), context);
   if (inventoryResult.error) {
     if (isMissingMapSegmentInfrastructure(inventoryResult.error)) {
       throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
@@ -410,9 +423,9 @@ async function fetchCommissionCommercialMap(
     throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
   }
 
-  const maintenanceResult = await db.rpc('expire_commission_segment_reservations', {
+  const maintenanceResult = await mapRequest(db.rpc('expire_commission_segment_reservations', {
     p_segment_id: segment.id,
-  });
+  }), context);
   if (maintenanceResult.error) {
     if (isMissingMapSegmentInfrastructure(maintenanceResult.error)) {
       throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
@@ -425,7 +438,7 @@ async function fetchCommissionCommercialMap(
     .select('*')
     .eq('project_id', project.id)
     .eq('segment_id', segment.id)
-    .eq('is_archived', false));
+    .eq('is_archived', false), 'commission-entities', context);
 
   if (entitiesResult.error) {
     if (isMissingMapSegmentInfrastructure(entitiesResult.error)) {
@@ -440,8 +453,8 @@ async function fetchCommissionCommercialMap(
   const entityIds = entityRows.map((entity) => entity.id);
   const layerIds = [...new Set(entityRows.map((entity) => entity.layer_id))];
   const [layersResult, geometriesResult, lotsResult] = await Promise.all([
-    db.from('map_layers').select('*').eq('project_id', project.id).in('id', layerIds).order('sort_order'),
-    fetchAllRows(() => db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true).in('entity_id', entityIds)),
+    mapRequest(db.from('map_layers').select('*').eq('project_id', project.id).in('id', layerIds).order('sort_order'), context),
+    fetchAllRows(() => db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true).in('entity_id', entityIds), 'commission-geometries', context),
     fetchAllRows(() => db.from('commercial_lots').select(`
       *,
       lot_prices(is_active, pricing_mode, base_price, price_per_sqm, asking_price, minimum_price),
@@ -449,7 +462,7 @@ async function fetchCommissionCommercialMap(
       lot_negotiations(status, company_name, contact_name),
       lot_sales(status, buyer_name, sale_date, salesperson_name, contract_number),
       lot_contracts(is_active, contract_number)
-    `).eq('project_id', project.id).is('archived_at', null).in('entity_id', entityIds)),
+    `).eq('project_id', project.id).is('archived_at', null).in('entity_id', entityIds), 'commission-lots', context),
   ]);
 
   const firstError = [layersResult, geometriesResult, lotsResult]
@@ -501,21 +514,23 @@ async function fetchCommissionCommercialMap(
 export async function fetchCommercialMap(
   orgId: string,
   scope: CommercialMapQueryScope = { mode: 'full' },
-  options: { includeReferenceImage?: boolean } = {},
+  options: CommercialMapFetchOptions = {},
 ): Promise<CommercialMapData> {
+  const context: MapReadContext = { signal: options.signal, recordStage: options.recordStage ?? captureCommercialMapStageRecorder() };
+  throwIfMapRequestAborted(context.signal);
   // Both promises are observed immediately; business rows still wait for expiry.
   const [maintenance, { data: projectRow, error: projectError }] = await Promise.all([
     scope.mode === 'full'
-      ? measureCommercialMapStage<{ error: { code?: string; message?: string } | null }>('reservation-maintenance', () => db.rpc('expire_commercial_reservations', { p_org_id: orgId }))
+      ? measureCommercialMapOperation<{ error: { code?: string; message?: string } | null }>(context.recordStage, 'reservation-maintenance', () => mapRequest(db.rpc('expire_commercial_reservations', { p_org_id: orgId }), context))
       : Promise.resolve({ error: null }),
-    measureCommercialMapStage<{ data: ProjectRow | null; error: { code?: string; message?: string } | null }>('project', () => db
+    measureCommercialMapOperation<{ data: ProjectRow | null; error: { code?: string; message?: string } | null }>(context.recordStage, 'project', () => mapRequest(db
     .from('map_projects')
     .select('*')
     .eq('org_id', orgId)
     .eq('is_archived', false)
     .order('updated_at', { ascending: false })
     .limit(1)
-    .maybeSingle()),
+    .maybeSingle(), context)),
   ]);
   if (maintenance.error && !isMissingReservationMaintenance(maintenance.error)) throw maintenance.error;
 
@@ -541,14 +556,14 @@ export async function fetchCommercialMap(
   const project = mapProject(projectRow);
 
   if (scope.mode === 'commission') {
-    return fetchCommissionCommercialMap(project, scope);
+    return fetchCommissionCommercialMap(project, scope, context);
   }
 
-  const calibrationPromise = measureCommercialMapStage('calibration', async () => {
-    const result = await db.from('map_calibrations').select('*').eq('project_id', project.id).order('version', { ascending: false }).limit(1).maybeSingle();
+  const calibrationPromise = measureCommercialMapOperation(context.recordStage, 'calibration', async () => {
+    const result = await mapRequest(db.from('map_calibrations').select('*').eq('project_id', project.id).order('version', { ascending: false }).limit(1).maybeSingle(), context);
     const mapped = result.data ? mapCalibration(result.data) : null;
     return { ...result, calibration: result.error || options.includeReferenceImage === false
-      ? mapped : await measureCommercialMapStage('reference-signing', () => signedReferenceUrl(mapped)) };
+      ? mapped : await measureCommercialMapOperation(context.recordStage, 'reference-signing', () => awaitCommercialMapRequest(signedReferenceUrl(mapped), context.signal)) };
   });
   const [
     layersResult,
@@ -559,13 +574,13 @@ export async function fetchCommercialMap(
     lotPresenceResult,
     segmentsResult,
   ] = await Promise.all([
-    db.from('map_layers').select('*').eq('project_id', project.id).order('sort_order'),
-    fetchAllRows(() => db.from('map_entities').select('*').eq('project_id', project.id).eq('is_archived', false), 'entities'),
-    fetchAllRows(() => db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true), 'geometries'),
+    mapRequest(db.from('map_layers').select('*').eq('project_id', project.id).order('sort_order'), context),
+    fetchAllRows(() => db.from('map_entities').select('*').eq('project_id', project.id).eq('is_archived', false), 'entities', context),
+    fetchAllRows(() => db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true), 'geometries', context),
     calibrationPromise,
-    fetchAllRows(() => db.from('commercial_lots').select(COMMERCIAL_LOT_SELECT).eq('project_id', project.id).is('archived_at', null), 'lots'),
-    db.from('commercial_lots').select('id').eq('project_id', project.id).limit(1),
-    db.from('map_segments').select('id, slug').eq('project_id', project.id).eq('is_active', true),
+    fetchAllRows(() => db.from('commercial_lots').select(COMMERCIAL_LOT_SELECT).eq('project_id', project.id).is('archived_at', null), 'lots', context),
+    mapRequest(db.from('commercial_lots').select('id').eq('project_id', project.id).limit(1), context),
+    mapRequest(db.from('map_segments').select('id, slug').eq('project_id', project.id).eq('is_active', true), context),
   ]);
 
   const segmentLookupError = segmentsResult.error
@@ -583,7 +598,8 @@ export async function fetchCommercialMap(
     .find((result) => result.error)?.error;
   if (firstError || segmentLookupError) throw firstError ?? segmentLookupError;
   const transformationStartedAt = performance.now();
-  markCommercialMapStage('inventory-transformation:start');
+  throwIfMapRequestAborted(context.signal);
+  context.recordStage('inventory-transformation:start');
   const segmentSlugById = new Map<string, CommercialMapSegmentId>(
     ((segmentsResult.data ?? []) as SegmentLookupRow[])
       .map((segment) => [segment.id, segment.slug] as const)
@@ -618,7 +634,8 @@ export async function fetchCommercialMap(
     entities,
     lots: lotRows.map(mapLot),
   });
-  markCommercialMapStage('inventory-transformation:end', performance.now() - transformationStartedAt);
+  throwIfMapRequestAborted(context.signal);
+  context.recordStage('inventory-transformation:end', { duration: performance.now() - transformationStartedAt });
   return result;
 }
 

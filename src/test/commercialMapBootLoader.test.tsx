@@ -4,12 +4,83 @@ import { act, cleanup, fireEvent, render, renderHook, screen } from '@testing-li
 import { useCommercialMapBootVisit } from '@/features/commercial-map/hooks/useCommercialMapBootVisit';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CommercialMapBootLoader, commercialMapBootProgress } from '@/features/commercial-map/components/CommercialMapBootLoader';
-import { beginCommercialMapBoot, getCommercialMapBootSnapshot, markCommercialMapStage, measureCommercialMapStage, summarizeCommercialMapBoot, resetCommercialMapReady } from '@/features/commercial-map/utils/performanceDiagnostics';
+import { beginCommercialMapBoot, captureCommercialMapStageRecorder, claimCommercialMapBootVisit, releaseCommercialMapBootVisit, getCommercialMapBootSnapshot, markCommercialMapStage, measureCommercialMapStage, summarizeCommercialMapBoot, resetCommercialMapReady } from '@/features/commercial-map/utils/performanceDiagnostics';
 
 beforeEach(() => beginCommercialMapBoot());
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 describe('Commercial Map real readiness loader', () => {
+  it('keeps concurrent module completions attached to the boot that requested them', async () => {
+    const now = vi.spyOn(performance, 'now').mockReturnValue(100);
+    let finishPrevious!: () => void;
+    const previousModule = new Promise<void>(resolve => { finishPrevious = resolve; });
+    const previousRecord = captureCommercialMapStageRecorder();
+    const previousImport = previousModule.then(() => previousRecord('module-ready'));
+
+    now.mockReturnValue(200);
+    beginCommercialMapBoot();
+    let finishCurrent!: () => void;
+    const currentModule = new Promise<void>(resolve => { finishCurrent = resolve; });
+    const currentRecord = captureCommercialMapStageRecorder();
+    const currentImport = currentModule.then(() => currentRecord('module-ready'));
+
+    now.mockReturnValue(250);
+    finishPrevious();
+    await previousImport;
+    expect(getCommercialMapBootSnapshot().marks['module-ready']).toBeUndefined();
+    expect(getCommercialMapBootSnapshot().startedAt).toBe(200);
+
+    now.mockReturnValue(300);
+    finishCurrent();
+    await currentImport;
+    expect(getCommercialMapBootSnapshot().marks['module-ready']).toBe(300);
+    expect(getCommercialMapBootSnapshot().failed).toBe(false);
+  });
+  it('retains a successor lazy boot when the previous page cleanup runs before its claim', () => {
+    const previous = {}, next = {};
+    claimCommercialMapBootVisit(previous);
+    beginCommercialMapBoot();
+    const requestedAt = getCommercialMapBootSnapshot().marks['module-requested'];
+    const record = captureCommercialMapStageRecorder();
+    releaseCommercialMapBootVisit(previous);
+    record('module-ready');
+    claimCommercialMapBootVisit(next);
+    expect(getCommercialMapBootSnapshot().marks['module-requested']).toBe(requestedAt);
+    expect(getCommercialMapBootSnapshot().marks['module-ready']).toBeDefined();
+    releaseCommercialMapBootVisit(next);
+  });
+  it('excludes Portal dwell from first route timing and reports document age separately', () => {
+    const now = vi.spyOn(performance, 'now').mockReturnValue(120_000);
+    beginCommercialMapBoot();
+    now.mockReturnValue(122_500);
+    markCommercialMapStage('first-interactive');
+    expect(summarizeCommercialMapBoot()).toMatchObject({ interactiveMs: 2500, documentToInteractiveMs: 122500, routeStartedAt: 120000 });
+  });
+  it('ignores pre-route and obsolete asynchronous completion without muting the new route', async () => {
+    const owner = {};
+    claimCommercialMapBootVisit(owner);
+    const stale = captureCommercialMapStageRecorder();
+    releaseCommercialMapBootVisit(owner);
+    const outside = captureCommercialMapStageRecorder();
+    markCommercialMapStage('prewarm-should-not-enter-boot');
+    beginCommercialMapBoot();
+    stale('essential-data:end', { failed: true });
+    outside('b12-worker:end');
+    expect(getCommercialMapBootSnapshot().marks['prewarm-should-not-enter-boot']).toBeUndefined();
+    expect(getCommercialMapBootSnapshot().marks['essential-data:end']).toBeUndefined();
+    expect(getCommercialMapBootSnapshot().marks['b12-worker:end']).toBeUndefined();
+    captureCommercialMapStageRecorder()('essential-data:end', { duration: 3 });
+    expect(getCommercialMapBootSnapshot().marks['essential-data:end']).toBeDefined();
+    expect(getCommercialMapBootSnapshot().failed).toBe(false);
+  });
+  it('does not finish an old measured operation in a new boot generation', async () => {
+    let finish!: (value: string) => void;
+    const pending = measureCommercialMapStage('essential-data', () => new Promise<string>(resolve => { finish = resolve; }));
+    beginCommercialMapBoot();
+    finish('old data');
+    await pending;
+    expect(getCommercialMapBootSnapshot().marks['essential-data:end']).toBeUndefined();
+  });
   it('requires a new ready event after context loss, even when the route already presented once', async () => {
     render(<CommercialMapBootLoader />);
     await act(async () => markCommercialMapStage('commercial-map-ready'));

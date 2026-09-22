@@ -1,4 +1,5 @@
 import { useSceneVegetationEnabled } from './PublicScenePolicyContext';
+import { COMMERCIAL_MAP_CANONICAL_CONTENT } from '../../utils/executionPolicy';
 import { SicrediArena } from './SicrediArena';
 import { SoyRestroom, GateNineTanks } from './SoyGateInfrastructure';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -509,7 +510,7 @@ function useLandmarkMaterials(
   segment: CommercialMapSegmentDefinition | null,
 ): LandmarkMaterialSet {
   const invalidate = useThree((state) => state.invalidate);
-  const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  const reducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
   const materials = useMemo<LandmarkMaterialSet>(() => {
     const palette = LANDMARK_PALETTES[kind];
     const result = {
@@ -1458,7 +1459,7 @@ function useArchitecturalDetail(
   bounds: StrategicLandmarkBounds,
   selected: boolean,
 ) {
-  const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  const reducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
   const invalidate = useThree((state) => state.invalidate);
   const [near, setNear] = useState(selected);
   const nearRef = useRef(near);

@@ -6,6 +6,7 @@ import {
 } from '../../data/quadrasABEnvironment';
 import {
   buildQuadrasABEnvironmentPlan,
+  quadrasABGroundVertexHeight,
   type QuadrasABEnvironmentCell,
 } from '../../utils/quadrasABEnvironment';
 import { commercialSitePolygonBounds } from '../../utils/commercialSiteEnvironment';
@@ -38,7 +39,7 @@ function createCellGeometry(
       const vertex = cellIndex * 4 + vertexIndex;
       const offset = vertex * 3;
       positions[offset] = x;
-      positions[offset + 1] = 0.0315 + Math.sin(x * 0.91 + z * 0.37) * 0.00045;
+      positions[offset + 1] = quadrasABGroundVertexHeight(x, z);
       positions[offset + 2] = z;
       normals[offset + 1] = 1;
       uvs[vertex * 2] = (x - bounds.minimumX) / Math.max(1e-6, bounds.maximumX - bounds.minimumX);
@@ -103,16 +104,18 @@ function DetailInstances({ anchors, reducedGraphics }: {
 export const QuadrasABEnvironmentLayer = memo(function QuadrasABEnvironmentLayer({
   entities,
   reducedGraphics,
+  preserveVisitGroundPlacement = false,
   visible = true,
 }: {
   entities: readonly MapEntity[];
   reducedGraphics: boolean;
+  preserveVisitGroundPlacement?: boolean;
   visible?: boolean;
 }) {
   const groundMaterial = useInteriorGroundMaterial(1, -0.62, -1);
   const plan = useMemo(
-    () => buildQuadrasABEnvironmentPlan({ entities, reducedGraphics }),
-    [entities, reducedGraphics],
+    () => buildQuadrasABEnvironmentPlan({ entities, reducedGraphics, preserveVisitGroundPlacement }),
+    [entities, reducedGraphics, preserveVisitGroundPlacement],
   );
   const batches = useMemo(() => ([
     { quadra: 'A' as const, reference: QUADRAS_AB_SPATIAL_REFERENCE.quadraA },

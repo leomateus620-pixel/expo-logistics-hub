@@ -120,6 +120,18 @@ describe('bounded B12 preparation owner', () => {
     expect(fallback).toHaveBeenCalledTimes(1); expect(worker.terminate).toHaveBeenCalledTimes(1);
   });
 
+  it('records the worker on its original prewarm operation when the route joins in flight', async () => {
+    const worker = fakeWorker(), createWorker = vi.fn(() => worker);
+    const resource = createHeadquartersPreparationResource({ createWorker, fallback: vi.fn(async () => payload) });
+    const prewarm = vi.fn(), route = vi.fn();
+    const pending = resource.preload(prewarm);
+    expect(resource.preload(route)).toBe(pending);
+    worker.onmessage!({ data: { ok: true, packed: payload } } as MessageEvent); await pending;
+    expect(prewarm.mock.calls.some(([stage]) => stage === 'b12-worker:end')).toBe(true);
+    expect(route.mock.calls).toEqual([['b12-worker:cached', { source: 'prefetched' }]]);
+    expect(createWorker).toHaveBeenCalledTimes(1);
+  });
+
   it('times out a silent worker and surfaces a failed fallback through the map boundary', async () => {
     vi.useFakeTimers();
     const worker = fakeWorker(); const failure = new Error('CPU preparation failed');

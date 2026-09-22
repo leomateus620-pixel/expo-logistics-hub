@@ -2,8 +2,9 @@ import { deserializeQueryCache } from './lib/queryPersistence';
 import { Suspense, type ReactNode } from 'react';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
 import { CommercialMapBootLoader } from '@/features/commercial-map/components/CommercialMapBootLoader';
-import { beginCommercialMapBoot, markCommercialMapStage } from '@/features/commercial-map/utils/performanceDiagnostics';
+import { beginCommercialMapBoot, captureCommercialMapStageRecorder } from '@/features/commercial-map/utils/performanceDiagnostics';
 import { preloadHeadquartersGeometry } from '@/features/commercial-map/components/canvas/headquarters/headquartersPreparationResource';
+import { loadCommercialMapRouteModule } from '@/features/commercial-map/utils/loadCommercialMapRouteModule';
 import { Toaster } from '@/components/ui/toaster';
 import PushPermissionPrompt from '@/components/notifications/PushPermissionPrompt';
 import { Toaster as Sonner } from '@/components/ui/sonner';
@@ -67,36 +68,42 @@ const FenasojaCountdownExperiencePage = lazyWithRetry(
 );
 const CommercialMapPage = lazyWithRetry(async () => {
   beginCommercialMapBoot();
+  const record = captureCommercialMapStageRecorder();
   void preloadHeadquartersGeometry().catch(() => undefined);
-  const module = await import('./pages/CommercialMapPage');
-  markCommercialMapStage('module-ready');
+  const module = await loadCommercialMapRouteModule();
+  record('module-ready');
   return module;
 });
 const CommercialMapRenderingDiagnosticsPage = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
   ? lazyWithRetry(async () => {
     beginCommercialMapBoot();
+    const record = captureCommercialMapStageRecorder();
     void preloadHeadquartersGeometry().catch(() => undefined);
     const module = await import('./features/commercial-map/diagnostics/CommercialMapRenderingDiagnosticsPage');
-    markCommercialMapStage('module-ready');
+    record('module-ready');
     return module;
   })
   : null;
 const ExteriorCatalogQa = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
   ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/ExteriorCatalogQa'))
   : null;
+const CommercialMapPrewarmDiagnosticsPage = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
+  ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/CommercialMapPrewarmDiagnosticsPage')) : null;
 const CommercialMapInterfaceDiagnosticsPage = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
   ? lazyWithRetry(async () => {
     beginCommercialMapBoot();
+    const record = captureCommercialMapStageRecorder();
     void preloadHeadquartersGeometry().catch(() => undefined);
     const module = await import('./features/commercial-map/diagnostics/CommercialMapInterfaceDiagnosticsPage');
-    markCommercialMapStage('module-ready');
+    record('module-ready');
     return module;
   })
   : null;
 const PublicAreaMapPage = lazyWithRetry(async () => {
   beginCommercialMapBoot();
+  const record = captureCommercialMapStageRecorder();
   const module = await import('./features/commercial-map/public/PublicAreaMapPage');
-  markCommercialMapStage('module-ready');
+  record('module-ready');
   return module;
 });
 const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
@@ -110,9 +117,10 @@ const CommissionAgendaPreviewPage = (import.meta.env.DEV || import.meta.env.VITE
 const FinancialManagementPage = lazyWithRetry(() => import('./pages/commissions/FinancialManagementPage'));
 const CommissionCommercialMapPage = lazyWithRetry(async () => {
   beginCommercialMapBoot();
+  const record = captureCommercialMapStageRecorder();
   void preloadHeadquartersGeometry().catch(() => undefined);
   const module = await import('./pages/commissions/CommissionCommercialMapPage');
-  markCommercialMapStage('module-ready');
+  record('module-ready');
   return module;
 });
 const AdminPortalPage = lazyWithRetry(() => import('./pages/admin/AdminPortalPage'));
@@ -496,6 +504,7 @@ const App = () => (
               {/* Consulta pública por área: sem AuthGuard, OrgGuard ou capacidades. */}
               <Route path="/areas/:slug/:token" element={<Suspended><PublicAreaMapPage /></Suspended>} />
               {ExteriorCatalogQa && <Route path="/__dev/exterior-catalog" element={<Suspended><ExteriorCatalogQa /></Suspended>} />}
+              {CommercialMapPrewarmDiagnosticsPage && <Route path="/__dev/commercial-map-prewarm" element={<Suspended><CommercialMapPrewarmDiagnosticsPage /></Suspended>} />}
               {CommissionAgendaPreviewPage && (
                 <Route path="/__dev/comissao-agenda" element={<Suspended><CommissionAgendaPreviewPage /></Suspended>} />
               )}

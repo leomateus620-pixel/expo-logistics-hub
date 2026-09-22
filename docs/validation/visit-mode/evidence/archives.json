@@ -1,0 +1,92 @@
+[
+  {
+    "source": "baseline-close-repeat-traditional.json",
+    "rawBytes": 1577011,
+    "gzipBytes": 18804,
+    "sha256": "b8ecf482dcff54834ad314bd7bd765f59dd93f4b910807153f27f7ce7fb1de0b"
+  },
+  {
+    "source": "baseline-tests.json",
+    "rawBytes": 1289054,
+    "gzipBytes": 144481,
+    "sha256": "324a1bc20be3b71fc921f07d11ff99cd3cb7b35fa71d1abf90bac97ec58a50b6"
+  },
+  {
+    "source": "baseline-traditional.json",
+    "rawBytes": 2140496,
+    "gzipBytes": 26556,
+    "sha256": "3ed13f91025b2f523fc5a7ab38e9c93ee8e6d75de35294278c4848ae1a185173"
+  },
+  {
+    "source": "candidate-close-repeat-traditional.json",
+    "rawBytes": 1555083,
+    "gzipBytes": 18997,
+    "sha256": "c4648448bc5a92ebde32aabdadb5631056787151e8ad028c3efaab565ba84c84"
+  },
+  {
+    "source": "candidate-tests.json",
+    "rawBytes": 1347966,
+    "gzipBytes": 153360,
+    "sha256": "8fa6a49a9c5c256e76877f825d15d7c935d25c0723e67965d656a3090d1985f6"
+  },
+  {
+    "source": "candidate-traditional.json",
+    "rawBytes": 2045498,
+    "gzipBytes": 25648,
+    "sha256": "c9dfeca58308faac415aa87ba7c1ddd0ba6f8aea52730de69fb79ed027aaf324"
+  },
+  {
+    "source": "collision-source-audit.json",
+    "rawBytes": 392092,
+    "gzipBytes": 12356,
+    "sha256": "6b35efb7f0636d6191558a60100d570cbf95c18f8a7e26c8d3d24084bf64bf68"
+  },
+  {
+    "source": "final/boot-progress.json",
+    "rawBytes": 223722,
+    "gzipBytes": 20774,
+    "sha256": "2f88d1ffad99f76784a8576a6fb2e6c353ea36c4b79b837667a2523da6ca147f"
+  },
+  {
+    "source": "final/quality-parity-desktop.json",
+    "rawBytes": 14573155,
+    "gzipBytes": 732078,
+    "sha256": "f65c240b20b9b3d92544da53b944742a5693871264ce618ea85ba6962731cdea"
+  },
+  {
+    "source": "final/quality-parity-mobile.json",
+    "rawBytes": 16368741,
+    "gzipBytes": 757921,
+    "sha256": "6929325459461ddec0201d7dc920dfa55bda9b696219800b681994e95c776b79"
+  },
+  {
+    "source": "final/startup-delivery-prewarmed.json",
+    "rawBytes": 2095363,
+    "gzipBytes": 148492,
+    "sha256": "865dc4de4c5bccfcc0b58ee762d153b60b7270ab3eb1a5d9b85ad600192b3f58"
+  },
+  {
+    "source": "final/startup-desktop-b49524f3.json",
+    "rawBytes": 10585798,
+    "gzipBytes": 738107,
+    "sha256": "e11cc7f749766d2d207c8f71a3e9966460d359fb560721784ce738ee7031b04a"
+  },
+  {
+    "source": "final/startup-diagnostic.json",
+    "rawBytes": 1276894,
+    "gzipBytes": 90604,
+    "sha256": "6ba0ca7cfb823b6848208ad85814cf643f0c12eead97f8d945dd7a982d07187c"
+  },
+  {
+    "source": "final/startup-shader-final.json",
+    "rawBytes": 1273232,
+    "gzipBytes": 90519,
+    "sha256": "5dad7b2df06e03e399b82f1a045dfe27be555a0a3dfc33b3812c508a9655198f"
+  },
+  {
+    "source": "startup-before-prewarm.json",
+    "rawBytes": 619459,
+    "gzipBytes": 32806,
+    "sha256": "4c852c3e7006ecc7926532bb8195cd47e246ac98ed94a77ebe4f82c0eff147bd"
+  }
+]

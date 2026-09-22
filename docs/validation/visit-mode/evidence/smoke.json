@@ -1,0 +1,483 @@
+{
+  "fixture": true,
+  "before": {
+    "environment": {
+      "at": 75836.69999992847,
+      "position": [
+        3.9370884151670626,
+        112.19501247300705,
+        106.42403846803235
+      ],
+      "quaternion": [
+        -0.3919388644454563,
+        0.026630852900829772,
+        0.011351018127214578,
+        0.9195356864192147
+      ],
+      "target": [
+        -2.2546344999999945,
+        0.744,
+        -0.3831818185993967
+      ],
+      "projection": [
+        1.5733689807478843,
+        0,
+        0,
+        0,
+        0,
+        2.9042108776758226,
+        0,
+        0,
+        0,
+        0,
+        -1.0010037603030404,
+        -1,
+        0,
+        0,
+        -1.2880705620296615,
+        0
+      ],
+      "materials": 686,
+      "objects": 1478,
+      "threeListeners": 332,
+      "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+      "geometries": 557,
+      "textures": 130,
+      "programs": 223,
+      "calls": 811,
+      "triangles": 671903,
+      "width": 1425,
+      "height": 772,
+      "dpr": 1,
+      "sceneId": "f087daa5-0590-482b-a5f2-346e5eaf2934",
+      "cameraId": "dfc7bfc8-f603-4d56-bfff-59bd5481f663"
+    },
+    "renderer": {
+      "at": 75837.10000002384,
+      "calls": 811,
+      "triangles": 671903,
+      "geometries": 557,
+      "textures": 130,
+      "programs": 223,
+      "dpr": 1,
+      "width": 1425,
+      "height": 772,
+      "heapBytes": 108075487,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 2002,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "identity": {
+      "canvasMounts": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeCanvases": 1,
+      "activeControls": 1
+    },
+    "character": null,
+    "poiCount": 0,
+    "visible": "visible",
+    "focused": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "canvas": {
+      "width": 1425,
+      "height": 772
+    }
+  },
+  "first": {
+    "environment": {
+      "at": 86793.79999995232,
+      "position": [
+        -57.3536349608913,
+        0.299,
+        6.837158343217684
+      ],
+      "quaternion": [
+        -0.015818457736208314,
+        -0.7109091313463235,
+        -0.015998155235107017,
+        0.7029239236164443
+      ],
+      "target": [
+        -56.95406538505268,
+        0.2810060743849359,
+        6.841671956527073
+      ],
+      "projection": [
+        0.8503840459892649,
+        0,
+        0,
+        0,
+        0,
+        1.5696855771174902,
+        0,
+        0,
+        0,
+        0,
+        -1.0000888928396818,
+        -1,
+        0,
+        0,
+        -0.016000711142717453,
+        0
+      ],
+      "materials": 694,
+      "objects": 1491,
+      "threeListeners": 339,
+      "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+      "geometries": 560,
+      "textures": 131,
+      "programs": 224,
+      "calls": 743,
+      "triangles": 689364,
+      "width": 1425,
+      "height": 772,
+      "dpr": 1,
+      "sceneId": "f087daa5-0590-482b-a5f2-346e5eaf2934",
+      "cameraId": "dfc7bfc8-f603-4d56-bfff-59bd5481f663"
+    },
+    "renderer": {
+      "at": 86794.19999992847,
+      "calls": 743,
+      "triangles": 689364,
+      "geometries": 560,
+      "textures": 131,
+      "programs": 224,
+      "dpr": 1,
+      "width": 1425,
+      "height": 772,
+      "heapBytes": 141515613,
+      "qualityTier": "MEDIUM",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 2462,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "identity": {
+      "canvasMounts": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeCanvases": 1,
+      "activeControls": 1
+    },
+    "character": {
+      "position": {
+        "x": -57.3536349608913,
+        "y": 0.056,
+        "z": 6.837158343217684
+      },
+      "yaw": 1.5820920350073153,
+      "pitch": -0.045,
+      "movement": "idle",
+      "phase": "active",
+      "cameraMode": "first",
+      "distanceMetres": 0,
+      "colliders": 2432
+    },
+    "visit": {
+      "active": true,
+      "sampledFrames": 257,
+      "totalSampledFrames": 257,
+      "averageFps": 45.64588032647933,
+      "averageFrameTimeMs": 21.907782100981777,
+      "p95FrameTimeMs": 31.5,
+      "p99FrameTimeMs": 43.10000002384186,
+      "stallsOver50Ms": 1,
+      "unpresentedActiveFrames": 0,
+      "longestPresentationGapMs": 57.799999952316284,
+      "presentedFrames": 432,
+      "entryMs": 4618,
+      "elapsedMs": 10854.100000023842,
+      "qualityPreset": "BALANCED",
+      "renderer": {
+        "calls": 743,
+        "triangles": 689364,
+        "geometries": 560,
+        "textures": 131,
+        "programs": 224,
+        "dpr": 1,
+        "width": 1425,
+        "height": 772,
+        "heapBytes": 141515613
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2466,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "events": [
+        {
+          "at": 921.5,
+          "type": "entry-requested"
+        },
+        {
+          "at": 4618,
+          "type": "controls-ready"
+        }
+      ]
+    },
+    "poiCount": 0,
+    "visible": "visible",
+    "focused": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "canvas": {
+      "width": 1425,
+      "height": 772
+    }
+  },
+  "third": {
+    "environment": {
+      "at": 104235.79999995232,
+      "position": [
+        -51.927312395922165,
+        0.41648997726485576,
+        6.8984551066133495
+      ],
+      "quaternion": [
+        -0.053240520773752784,
+        -0.7090475401357548,
+        -0.05384533248059884,
+        0.7010832425220478
+      ],
+      "target": [
+        -50.837554466720405,
+        0.25000607438493594,
+        6.910765217769671
+      ],
+      "projection": [
+        0.8503840459892649,
+        0,
+        0,
+        0,
+        0,
+        1.5696855771174902,
+        0,
+        0,
+        0,
+        0,
+        -1.0000888928396818,
+        -1,
+        0,
+        0,
+        -0.016000711142717453,
+        0
+      ],
+      "materials": 697,
+      "objects": 1498,
+      "threeListeners": 348,
+      "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+      "geometries": 571,
+      "textures": 132,
+      "programs": 224,
+      "calls": 680,
+      "triangles": 691604,
+      "width": 1425,
+      "height": 772,
+      "dpr": 1,
+      "sceneId": "f087daa5-0590-482b-a5f2-346e5eaf2934",
+      "cameraId": "dfc7bfc8-f603-4d56-bfff-59bd5481f663"
+    },
+    "renderer": {
+      "at": 104237.19999992847,
+      "calls": 680,
+      "triangles": 691604,
+      "geometries": 571,
+      "textures": 132,
+      "programs": 224,
+      "dpr": 1,
+      "width": 1425,
+      "height": 772,
+      "heapBytes": 137295172,
+      "qualityTier": "MEDIUM",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 3194,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "identity": {
+      "canvasMounts": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeCanvases": 1,
+      "activeControls": 1
+    },
+    "character": {
+      "position": {
+        "x": -51.41035999008576,
+        "y": 0.025,
+        "z": 6.904294698515226
+      },
+      "yaw": 1.5820920350073153,
+      "pitch": -0.045,
+      "movement": "run",
+      "phase": "active",
+      "cameraMode": "third",
+      "distanceMetres": 39.62436100784822,
+      "colliders": 2432
+    },
+    "visit": {
+      "active": true,
+      "sampledFrames": 986,
+      "totalSampledFrames": 986,
+      "averageFps": 44.146156911663596,
+      "averageFrameTimeMs": 22.65202839742084,
+      "p95FrameTimeMs": 31,
+      "p99FrameTimeMs": 48.199999928474426,
+      "stallsOver50Ms": 9,
+      "unpresentedActiveFrames": 0,
+      "longestPresentationGapMs": 109,
+      "presentedFrames": 1187,
+      "entryMs": 4618,
+      "elapsedMs": 28297.899999976158,
+      "qualityPreset": "BALANCED",
+      "renderer": {
+        "calls": 680,
+        "triangles": 691604,
+        "geometries": 571,
+        "textures": 132,
+        "programs": 224,
+        "dpr": 1,
+        "width": 1425,
+        "height": 772,
+        "heapBytes": 137295172
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 3221,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "events": [
+        {
+          "at": 921.5,
+          "type": "entry-requested"
+        },
+        {
+          "at": 4618,
+          "type": "controls-ready"
+        }
+      ]
+    },
+    "poiCount": 0,
+    "visible": "visible",
+    "focused": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "canvas": {
+      "width": 1425,
+      "height": 772
+    }
+  },
+  "after": {
+    "environment": {
+      "at": 108464.39999997616,
+      "position": [
+        3.9370884151670626,
+        112.19501247300705,
+        106.42403846803235
+      ],
+      "quaternion": [
+        -0.3919388644454563,
+        0.026630852900829772,
+        0.011351018127214578,
+        0.9195356864192147
+      ],
+      "target": [
+        -2.2546344999999945,
+        0.744,
+        -0.3831818185993967
+      ],
+      "projection": [
+        1.5733689807478843,
+        0,
+        0,
+        0,
+        0,
+        2.9042108776758226,
+        0,
+        0,
+        0,
+        0,
+        -1.0010037603030404,
+        -1,
+        0,
+        0,
+        -1.2880705620296615,
+        0
+      ],
+      "materials": 686,
+      "objects": 1478,
+      "threeListeners": 343,
+      "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+      "geometries": 564,
+      "textures": 131,
+      "programs": 224,
+      "calls": 810,
+      "triangles": 671211,
+      "width": 1425,
+      "height": 772,
+      "dpr": 1,
+      "sceneId": "f087daa5-0590-482b-a5f2-346e5eaf2934",
+      "cameraId": "dfc7bfc8-f603-4d56-bfff-59bd5481f663"
+    },
+    "renderer": {
+      "at": 108464.5,
+      "calls": 810,
+      "triangles": 671211,
+      "geometries": 564,
+      "textures": 131,
+      "programs": 224,
+      "dpr": 1,
+      "width": 1425,
+      "height": 772,
+      "heapBytes": 126008170,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 3379,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "identity": {
+      "canvasMounts": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeCanvases": 1,
+      "activeControls": 1
+    },
+    "character": null,
+    "visit": null,
+    "poiCount": 0,
+    "visible": "visible",
+    "focused": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "canvas": {
+      "width": 1425,
+      "height": 772
+    }
+  },
+  "errors": []
+}

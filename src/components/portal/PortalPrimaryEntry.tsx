@@ -19,6 +19,7 @@ interface PortalPrimaryEntryProps {
   expanded?: boolean;
   index: number;
   onSelect?: () => void;
+  onIntent?: () => void;
   onToggle?: () => void;
 }
 
@@ -62,6 +63,7 @@ export function PortalPrimaryEntry({
   expanded = false,
   index,
   onSelect,
+  onIntent,
   onToggle,
 }: PortalPrimaryEntryProps) {
   const Icon = entry.icon;
@@ -127,6 +129,9 @@ export function PortalPrimaryEntry({
           to={access.target}
           className="portal-primary-entry__control"
           onClick={onSelect}
+          onFocus={access.state === 'allowed' ? onIntent : undefined}
+          onPointerEnter={access.state === 'allowed' ? onIntent : undefined}
+          onTouchStart={access.state === 'allowed' ? onIntent : undefined}
           aria-label={`${actionLabel}: ${entry.title}`}
           aria-describedby={statusId}
         >

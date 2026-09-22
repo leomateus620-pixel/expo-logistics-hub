@@ -109,7 +109,7 @@ export const RegionalLandscapeLayer = memo(function RegionalLandscapeLayer({
   const trunkRef = useRef<THREE.InstancedMesh>(null);
   const canopyRef = useRef<THREE.InstancedMesh>(null);
   const shadowRef = useRef<THREE.InstancedMesh>(null);
-  const fakeShadows = qualityTier !== 'reduced';
+  const fakeShadows = true;
   const landscapeDetail: RegionalLandscapeQualityTier = fakeShadows ? 'full' : 'reduced';
   const plan = useMemo(() => buildRegionalLandscapePlan(landscapeDetail), [landscapeDetail]);
   const diagnostics = useMemo(() => regionalLandscapeDiagnostics(qualityTier), [qualityTier]);

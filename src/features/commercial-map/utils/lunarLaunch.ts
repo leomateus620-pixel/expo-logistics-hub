@@ -34,8 +34,8 @@ export const LUNAR_LAUNCH_HIT_TARGET = Object.freeze({
 
 export const LUNAR_LAUNCH_RENDER_BUDGET = Object.freeze({
   standard: Object.freeze({ hotParticles: 64, sparks: 24, dust: 32, smoke: 22 }),
-  mobile: Object.freeze({ hotParticles: 42, sparks: 14, dust: 22, smoke: 14 }),
-  reduced: Object.freeze({ hotParticles: 28, sparks: 8, dust: 14, smoke: 10 }),
+  mobile: Object.freeze({ hotParticles: 64, sparks: 24, dust: 32, smoke: 22 }),
+  reduced: Object.freeze({ hotParticles: 64, sparks: 24, dust: 32, smoke: 22 }),
   primaryDrawCalls: 6,
   dynamicLights: 1,
 });
@@ -209,7 +209,7 @@ export function resolveLunarLaunchQuality({
     mobile,
     portrait,
     ...budget,
-    shadowRefreshDuringIgnition: tier === 'standard',
+    shadowRefreshDuringIgnition: true,
   };
 }
 

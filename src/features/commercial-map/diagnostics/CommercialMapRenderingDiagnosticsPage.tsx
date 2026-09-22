@@ -2,11 +2,13 @@ import { LightingBenchmark } from './LightingBenchmark';
 import { EnvironmentBenchmark } from './EnvironmentBenchmark';
 import { useCommercialMapBootVisit } from '../hooks/useCommercialMapBootVisit';
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useVisitStore } from '../visit/useVisitStore';
+import { VISIT_SPAWN_LABELS, VISIT_SPAWN_POINTS, visitSpawnEntity, type VisitSpawnId } from '../visit/VisitSpawnManager';
+import { VisitOverlay } from '../visit/VisitOverlay';
 import { CommercialMapCanvas } from '../components/canvas/CommercialMapCanvas';
 import { CommercialMapRendererStatus } from '../components/CommercialMapRendererStatus';
-import { OFFICIAL_REFERENCE_DATA } from '../data/officialReference2026';
-import persistedStageLayout from '../../../test/fixtures/soyGatePersistedLayout.json';
-import { presentCommercialMapData } from '../hooks/useCommercialMap';
+import { DIAGNOSTICS_MAP_DATA } from './commercialMapDiagnosticsData';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import {
   summarizeCommercialMapRuntimeDiagnostics,
@@ -24,21 +26,12 @@ import {
 } from './renderingStressResources';
 import type { CameraPreset, Coordinate } from '../types';
 import { LateralDistrictQaPanel } from './LateralDistrictQa';
-import { getCommercialMapBootSnapshot, markCommercialMapStage, summarizeCommercialMapBoot } from '../utils/performanceDiagnostics';
+import { commercialMapDiagnosticsEnabled, getCommercialMapBootSnapshot, markCommercialMapStage, summarizeCommercialMapBoot } from '../utils/performanceDiagnostics';
 import '../commercial-map.css';
 import '../commercial-map-mobile.css';
 import './commercial-map-rendering-diagnostics.css';
 
 const EMPTY_MATCHING_ENTITY_IDS = new Set<string>();
-// Same client presentation pipeline as the authenticated map, so diagnostics
-// render the unified Restaurante and segment tags instead of raw cadastral rows.
-const DIAGNOSTICS_MAP_DATA = presentCommercialMapData(new URLSearchParams(window.location.search).has('persistedStage') ? {
-  ...OFFICIAL_REFERENCE_DATA,
-  entities: OFFICIAL_REFERENCE_DATA.entities.map((entity) => {
-    const row = persistedStageLayout[entity.publicIdentifier as keyof typeof persistedStageLayout];
-    return row ? { ...entity, geometry: { ...entity.geometry, coordinates: row.geometry.coordinates as Coordinate[][] } } : entity;
-  }),
-} : OFFICIAL_REFERENCE_DATA);
 markCommercialMapStage('fixture-data-ready');
 const MAXIMUM_ZOOM_WHEEL_STEPS = 80;
 const QA_CAMERA_PRESETS: readonly CameraPreset[] = [
@@ -48,6 +41,7 @@ const QA_CAMERA_PRESETS: readonly CameraPreset[] = [
 const STRESS_CYCLES = 20;
 const STRESS_IDLE_MS = 650;
 const STRESS_TRANSITION_TIMEOUT_MS = 15_000;
+const VISIT_SPAWN_QA_EVENT = 'commercial-map:visit-spawn-qa';
 
 type StressPhase = 'hydrology' | 'quality';
 type StressStatus = 'idle' | 'running' | 'passed' | 'failed' | 'cancelled' | 'inconclusive';
@@ -154,9 +148,7 @@ async function waitForStressPresentation(
     if (presented && idleSince !== null && performance.now() - idleSince >= STRESS_IDLE_MS) {
       window.__commercialMapRuntimeDiagnostics?.capture();
       const runtime = summarizeCommercialMapRuntimeDiagnostics();
-      const expectedPath = target.reducedGraphics || runtime.renderer?.qualityTier === 'LOW'
-        ? 'direct'
-        : 'post';
+      const expectedPath = 'post'; // quality budgets preserve the authored effects
       if (health.path === expectedPath) {
         return {
           elapsedMs: Math.round(elapsedMs),
@@ -185,6 +177,8 @@ function formatMetric(value: number | null, suffix = '') {
  * App.tsx excludes the route and dynamic import from production builds.
  */
 export default function CommercialMapRenderingDiagnosticsPage() {
+  const qualityQa = new URLSearchParams(window.location.search).get('qualityQa');
+  const qualityQaQuery = qualityQa && ['LOW', 'MEDIUM', 'HIGH', 'ULTRA'].includes(qualityQa) ? `&qualityQa=${qualityQa}` : '';
   const newBootVisit = useCommercialMapBootVisit();
   if (newBootVisit) markCommercialMapStage('fixture-data-ready');
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
@@ -198,6 +192,7 @@ export default function CommercialMapRenderingDiagnosticsPage() {
   const [foregroundCounts, setForegroundCounts] = useState({ blurEvents: 0, hiddenEvents: 0 });
   const [timing, setTiming] = useState(readCommercialMapRenderTiming);
   const [timingEnvironmentValid, setTimingEnvironmentValid] = useState(true);
+  const [visitQaStatus, setVisitQaStatus] = useState('idle');
   const stressAbort = useRef<AbortController | null>(null);
   const mounted = useRef(true);
   const maximumZoomFrame = useRef<number | null>(null);
@@ -206,6 +201,46 @@ export default function CommercialMapRenderingDiagnosticsPage() {
   const [schedulerReport, setSchedulerReport] = useState<{
     status: string; intervalsMs: number[]; elapsedMs: number;
   }>({ status: 'idle', intervalsMs: [], elapsedMs: 0 });
+
+  useEffect(() => {
+    // This control belongs to the compiled QA route only. Calling a source URL
+    // from automation could otherwise instantiate a second Zustand store.
+    if (!commercialMapDiagnosticsEnabled || window.location.pathname !== '/__dev/commercial-map-rendering') return;
+    let cancelPending: (() => void) | undefined;
+    const requestSpawn = (event: Event) => {
+      const spawnId = (event as CustomEvent<{ spawnId?: unknown }>).detail?.spawnId;
+      if (typeof spawnId !== 'string') return;
+      const target = visitSpawnEntity(spawnId, DIAGNOSTICS_MAP_DATA.entities);
+      if (!target) { setVisitQaStatus(`unavailable:${spawnId}`); return; }
+      cancelPending?.(); cancelPending = undefined;
+      const start = () => {
+        useVisitStore.getState().start({ entityId: target.id });
+        setVisitQaStatus(`requested:${spawnId}:${target.publicIdentifier}`);
+      };
+      if (!useVisitStore.getState().enabled) { start(); return; }
+      // Regional QA uses the same normal exit, restoration, spawn validation
+      // and entry flight as the UI. It never mutates the character position.
+      setVisitQaStatus(`waiting-for-exit:${spawnId}`);
+      cancelPending = useVisitStore.subscribe(state => {
+        if (state.enabled) return;
+        cancelPending?.(); cancelPending = undefined;
+        // Let the completed visit unmount and its camera handoff finish before
+        // starting a new measured session; do not batch false/true into one render.
+        const frame = window.requestAnimationFrame(() => {
+          const nextFrame = window.requestAnimationFrame(() => { cancelPending = undefined; start(); });
+          cancelPending = () => window.cancelAnimationFrame(nextFrame);
+        });
+        cancelPending = () => window.cancelAnimationFrame(frame);
+      });
+      useVisitStore.getState().exit();
+    };
+    window.addEventListener(VISIT_SPAWN_QA_EVENT, requestSpawn);
+    return () => {
+      window.removeEventListener(VISIT_SPAWN_QA_EVENT, requestSpawn);
+      cancelPending?.();
+      if (useVisitStore.getState().enabled) { useVisitStore.getState().exit(); useVisitStore.getState().finishExit(); }
+    };
+  }, []);
 
   useEffect(() => {
     mounted.current = true;
@@ -452,6 +487,8 @@ export default function CommercialMapRenderingDiagnosticsPage() {
         </div>
         <fieldset disabled={stressRunning} className="commercial-map-rendering-diagnostics__manual-controls">
         <nav aria-label="Cenários de câmera">
+          <Link to={`/__dev/commercial-map-prewarm?persistedStage=1&policy=idle${qualityQaQuery}`}>Voltar ao diagnóstico de preparação</Link>
+          <button type="button" onClick={() => useVisitStore.getState().start()}>Modo Visita</button>
           <button type="button" onClick={() => requestPreset('overview')}>Geral</button>
           <button type="button" onClick={() => requestPreset('commercial')}>Close-up</button>
           <button type="button" onClick={zoomToMinimumDistance}>Zoom máximo</button>
@@ -531,6 +568,18 @@ export default function CommercialMapRenderingDiagnosticsPage() {
         </details>
         <small>Contadores confirmam draws enviados ao framebuffer da tela; screenshots validam os pixels exibidos.</small>
         <LateralDistrictQaPanel />
+        <details>
+          <summary>Pontos de entrada da visita · QA</summary>
+          <nav aria-label="Pontos de entrada do Modo Visita QA" style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {(Object.keys(VISIT_SPAWN_POINTS) as VisitSpawnId[]).map(spawnId => <button key={spawnId} type="button"
+              disabled={stressRunning || !renderer} data-visit-spawn-qa={spawnId}
+              onClick={() => window.dispatchEvent(new CustomEvent(VISIT_SPAWN_QA_EVENT, { detail: { spawnId } }))}>
+              {VISIT_SPAWN_LABELS[spawnId]}
+            </button>)}
+          </nav>
+          <output data-visit-spawn-qa-status={visitQaStatus}>{visitQaStatus}</output>
+          <small>Usa saída e entrada normais; os deslocamentos entre regiões não contam como rota caminhada.</small>
+        </details>
         <div className="commercial-map-district-qa" style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           <button type="button" aria-pressed={!nightModeActive} onClick={() => useCommercialMapStore.getState().setNightModeActive(false)}>Dia QA</button>
           <button type="button" aria-pressed={nightModeActive} onClick={() => useCommercialMapStore.getState().toggleNightMode()}>Noite QA</button>
@@ -553,6 +602,7 @@ export default function CommercialMapRenderingDiagnosticsPage() {
       </div>
 
       <div className="commercial-map-viewport commercial-map-rendering-diagnostics__viewport">
+        <VisitOverlay />
         <div className="commercial-map-stage">
           <CommercialMapCanvas
             active

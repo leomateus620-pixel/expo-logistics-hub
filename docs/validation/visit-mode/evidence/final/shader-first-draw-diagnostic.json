@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "buildCommit": "7979ecaa",
+  "diagnosticOnly": true,
+  "capture": "Chromium headless on local QA fixture, prewarmed Portal, Intel UHD/ANGLE D3D11; wrapped existing GL calls only, no added GL queries. Not a qualifying performance benchmark or GPU elapsed-time measurement.",
+  "rawArtifact": "artifacts/visit-mode/startup-gl-probe-prewarmed-1-gl-programs.json",
+  "rawCommitted": false,
+  "phaseTimesMs": {
+    "essentialPrepared": 13225.300000071526,
+    "firstDraw": 14755.899999976158
+  },
+  "counts": {
+    "preparedMaterialPrograms": 92,
+    "programsLinkedBeforePreparation": 94,
+    "programsLinkedByFirstDraw": 100,
+    "newlyLinkedDuringFirstDraw": 6
+  },
+  "firstDrawPrograms": [
+    {
+      "id": 95,
+      "linkedAtMs": 13275.899999976158,
+      "lastStage": "shadow-preparation:end",
+      "firstProgramInfoLogSynchronousMs": 370.4,
+      "readinessPolledBeforeFirstUse": false,
+      "shaders": [
+        {
+          "type": "vertex",
+          "sha256": "32bf2ceb479530e567f6387aac2e3dd6ee473fca4d03801cedeef56fe55d2f00",
+          "relevantDefines": [
+            "#define SHADER_TYPE MeshStandardMaterial",
+            "#define SHADER_NAME ",
+            "#define USE_INSTANCING",
+            "#define USE_BUMPMAP",
+            "#define BUMPMAP_UV uv"
+          ]
+        },
+        {
+          "type": "fragment",
+          "sha256": "93f9c14c6f2c9758332483ed614961962aeb11e7dec9c1d35e79a137710da05b",
+          "relevantDefines": [
+            "#define SHADER_TYPE MeshStandardMaterial",
+            "#define SHADER_NAME ",
+            "#define USE_BUMPMAP"
+          ]
+        }
+      ],
+      "diagnosis": "Final map/bump-map features installed by passive effects in CommercialPavilion/LivestockPavilion after the scene warmup layout effect."
+    },
+    {
+      "id": 96,
+      "linkedAtMs": 13649.399999976158,
+      "lastStage": "shadow-preparation:end",
+      "firstProgramInfoLogSynchronousMs": 272.1,
+      "readinessPolledBeforeFirstUse": false,
+      "shaders": [
+        {
+          "type": "vertex",
+          "sha256": "1e8d09d9ca7eb4b137fd24ccb813fed5d05847a2a9344171ef076b3a121b112b",
+          "relevantDefines": [
+            "#define SHADER_TYPE MeshStandardMaterial",
+            "#define SHADER_NAME ",
+            "#define USE_INSTANCING",
+            "#define USE_MAP",
+            "#define USE_BUMPMAP",
+            "#define BUMPMAP_UV uv"
+          ]
+        },
+        {
+          "type": "fragment",
+          "sha256": "437082421637e10fc78ff79e9ef03bde47c69683432b9fc3f7220b9804d152dc",
+          "relevantDefines": [
+            "#define SHADER_TYPE MeshStandardMaterial",
+            "#define SHADER_NAME ",
+            "#define USE_MAP",
+            "#define USE_BUMPMAP"
+          ]
+        }
+      ],
+      "diagnosis": "Final map/bump-map features installed by passive effects in CommercialPavilion/LivestockPavilion after the scene warmup layout effect."
+    },
+    {
+      "id": 97,
+      "linkedAtMs": 13925.100000023842,
+      "lastStage": "shadow-preparation:end",
+      "firstProgramInfoLogSynchronousMs": 263.4,
+      "readinessPolledBeforeFirstUse": false,
+      "shaders": [
+        {
+          "type": "vertex",
+          "sha256": "4109a6483e059ce8ad48d57520139a07a469b92dfc14a1c768801bd4d56c3d22",
+          "relevantDefines": [
+            "#define SHADER_TYPE MeshStandardMaterial",
+            "#define SHADER_NAME ",
+            "#define USE_BUMPMAP",
+            "#define BUMPMAP_UV uv"
+          ]
+        },
+        {
+          "type": "fragment",
+          "sha256": "93f9c14c6f2c9758332483ed614961962aeb11e7dec9c1d35e79a137710da05b",
+          "relevantDefines": [
+            "#define SHADER_TYPE MeshStandardMaterial",
+            "#define SHADER_NAME ",
+            "#define USE_BUMPMAP"
+          ]
+        }
+      ],
+      "diagnosis": "Final map/bump-map features installed by passive effects in CommercialPavilion/LivestockPavilion after the scene warmup layout effect."
+    },
+    {
+      "id": 98,
+      "linkedAtMs": 14193,
+      "lastStage": "shadow-preparation:end",
+      "firstProgramInfoLogSynchronousMs": 269.3,
+      "readinessPolledBeforeFirstUse": false,
+      "shaders": [
+        {
+          "type": "vertex",
+          "sha256": "3dccfc71055cd1d7c05f7044b43eaf516957d2c0bc21a8d92638fd5045ee4d41",
+          "relevantDefines": [
+            "#define SHADER_TYPE MeshStandardMaterial",
+            "#define SHADER_NAME ",
+            "#define USE_MAP",
+            "#define USE_BUMPMAP",
+            "#define BUMPMAP_UV uv"
+          ]
+        },
+        {
+          "type": "fragment",
+          "sha256": "437082421637e10fc78ff79e9ef03bde47c69683432b9fc3f7220b9804d152dc",
+          "relevantDefines": [
+            "#define SHADER_TYPE MeshStandardMaterial",
+            "#define SHADER_NAME ",
+            "#define USE_MAP",
+            "#define USE_BUMPMAP"
+          ]
+        }
+      ],
+      "diagnosis": "Final map/bump-map features installed by passive effects in CommercialPavilion/LivestockPavilion after the scene warmup layout effect."
+    },
+    {
+      "id": 99,
+      "linkedAtMs": 14470.700000047684,
+      "lastStage": "shadow-preparation:end",
+      "firstProgramInfoLogSynchronousMs": 150,
+      "readinessPolledBeforeFirstUse": false,
+      "shaders": [
+        {
+          "type": "vertex",
+          "sha256": "ebba6171a616c7ede7eb982d5ad32956d26ba4403198bd68da70b91df37b452a",
+          "relevantDefines": [
+            "#define SHADER_TYPE MeshStandardMaterial",
+            "#define SHADER_NAME ",
+            "#define USE_INSTANCING",
+            "#define USE_MAP",
+            "#define USE_BUMPMAP",
+            "#define BUMPMAP_UV uv"
+          ]
+        },
+        {
+          "type": "fragment",
+          "sha256": "832e561fe474e0748ab71de9049afb8c3b928da188b7d2a2befab6012eee1d3d",
+          "relevantDefines": [
+            "#define SHADER_TYPE MeshStandardMaterial",
+            "#define SHADER_NAME ",
+            "#define USE_MAP",
+            "#define USE_BUMPMAP"
+          ]
+        }
+      ],
+      "diagnosis": "Final map/bump-map features installed by passive effects in CommercialPavilion/LivestockPavilion after the scene warmup layout effect."
+    },
+    {
+      "id": 100,
+      "linkedAtMs": 14659.700000047684,
+      "lastStage": "shadow-preparation:end",
+      "firstProgramInfoLogSynchronousMs": 94.2,
+      "readinessPolledBeforeFirstUse": false,
+      "shaders": [
+        {
+          "type": "vertex",
+          "sha256": "a286c57820447573958fc2d5ebe2aaa47718e16efa2baef86569ce0648f070dd",
+          "relevantDefines": [
+            "#define SHADER_TYPE ShaderMaterial",
+            "#define SHADER_NAME ",
+            "#define USE_ALPHA_TO_COVERAGE ",
+            "#define USE_LINE_COLOR_ALPHA 1"
+          ]
+        },
+        {
+          "type": "fragment",
+          "sha256": "668199e80ce3bdba516a2ef1bbc532c876016a144d00efb7dd9b6ada482f7f7d",
+          "relevantDefines": [
+            "#define SHADER_TYPE ShaderMaterial",
+            "#define SHADER_NAME ",
+            "#define USE_ALPHA_TO_COVERAGE ",
+            "#define USE_LINE_COLOR_ALPHA 1"
+          ]
+        }
+      ],
+      "diagnosis": "Identical GLSL to program 35. three-stdlib LineMaterial mutates USE_LINE_COLOR_ALPHA in onBeforeCompile after Three r170 calculates its program cache key."
+    }
+  ],
+  "sourceEquality": {
+    "earlierProgramId": 35,
+    "firstDrawProgramId": 100,
+    "vertexByteEqual": true,
+    "fragmentByteEqual": true
+  },
+  "measuredSynchronousInfoLogTotalMs": 1419.4,
+  "sourceCorrections": [
+    "Install existing pavilion texture features in useLayoutEffect before the later scene warmup sibling; preserve material and texture ownership/cleanup.",
+    "Initialize USE_LINE_COLOR_ALPHA=1 in the already-transparent canonical parking LineMaterial factory so compile and draw calculate the same key."
+  ],
+  "limits": "No object names are exposed by GL. Material attribution combines exact shader feature changes with the canonical source assignments. Residual shadow depth programs 101-109 were created after first draw and are not counted here. New build must be measured; this report does not claim a startup improvement or the 3-second target.",
+  "followupDiagnostic": {
+    "buildCommit": "b49524f3",
+    "rawArtifact": "artifacts/visit-mode/shader-probe-after-b49524f3-prewarmed-1-gl-programs.json",
+    "diagnosticOnly": true,
+    "newlyLinkedProgramsBeforeFirstDraw": [],
+    "preparedToFirstDrawMs": 76.9,
+    "residual": {
+      "programId": 6,
+      "readinessTrueObservedAtMs": 6642.100000023842,
+      "synchronousGetProgramInfoLogMs": 5652.300000071526,
+      "otherCapturedProgramId": 5,
+      "otherReadinessPollCount": 2,
+      "otherReadyObservedAtMs": 12307.600000023842,
+      "finding": "Reflection of one ready program started while another captured program was not yet ready. Existing polling skipped unfinished programs and reflected the next ready one. The driver blocked getProgramInfoLog for 5652.3 ms in this diagnostic run."
+    },
+    "followupCorrection": "Poll all captured programs to readiness before starting any uniform/attribute reflection. Keep bounded reflection batches, cancellation and the real first-draw barrier.",
+    "limitation": "Separate CPU-profile run did not reproduce this 5-second reflection stall (285.8 ms total synchronous introspection, maximum batch245.9 ms). Timing varies; validate the new all-links barrier separately. No qualifying startup target claim."
+  }
+}

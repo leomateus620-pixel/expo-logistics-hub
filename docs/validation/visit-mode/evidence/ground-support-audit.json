@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-09-22T02:56:26.815Z",
+  "source": "official-reference",
+  "purpose": "Canonical cell counts and support regression; not measured GPU draw calls or FPS",
+  "reportedHeadquartersPoint": {
+    "x": 15.654378,
+    "y": -0.08,
+    "z": 18.145764
+  },
+  "correctedHeadquartersHeight": 0.03188175810822679,
+  "broadphaseSupportGroups": 2,
+  "fineGridCellSize": 0.4,
+  "quadrasAB": {
+    "visitCells": 1052,
+    "traditionalReducedCells": 1052
+  },
+  "commercialSite": {
+    "visitCells": 542,
+    "traditionalReducedCells": 542
+  },
+  "supportTrianglesAboveTraditionalReduced": 0,
+  "addedSupportMaterialGroups": 0
+}

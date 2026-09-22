@@ -1,8 +1,8 @@
-import { withRuralPavilionReconstruction } from '../data/ruralPavilionReconstruction';
-import { withArenaReconstruction } from '../data/arenaCanonicalLayout';
-import { measureCommercialMapStage, markCommercialMapStage } from '../utils/performanceDiagnostics';
-import { withFenasojaComplexReconstruction } from '../data/fenasojaComplexReconstruction';
-import { withMiranteComplexReconstruction } from '../data/miranteComplexReconstruction';
+import { captureCommercialMapStageRecorder, getCommercialMapBootSnapshot, measureCommercialMapStage, markCommercialMapStage } from '../utils/performanceDiagnostics';
+import { createCommercialMapRouteDataObservation } from '../utils/routeDataObservation';
+import { commercialMapQueryOptions, FULL_COMMERCIAL_MAP_SCOPE } from '../queries/commercialMapQuery';
+export { commercialMapQueryKey, FULL_COMMERCIAL_MAP_SCOPE } from '../queries/commercialMapQuery';
+export { presentCommercialMapData } from '../utils/presentCommercialMapData';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCapabilities } from '@/hooks/useCapabilities';
@@ -13,7 +13,6 @@ import {
   applyExporuralReference,
   bootstrapOfficialReference,
   createCommercialLot,
-  fetchCommercialMap,
   signedReferenceUrl,
   fetchLotActivity,
   fetchLotContractVersions,
@@ -35,7 +34,6 @@ import {
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import type {
   CommercialLot,
-  CommercialMapData,
   CommercialMapQueryScope,
   MapEntity,
   MapPermissions,
@@ -50,8 +48,7 @@ import {
 } from '../utils/entityExplorer';
 import { resolveMapPermissions } from '../utils/permissions';
 import { resolveContextualMapScope } from '../utils/contextualMapSummary';
-import { getCommercialMapSegment, withCommercialMapSegments } from '../data/commercialMapSegments';
-import { withUnifiedFenasojaRestaurant } from '../utils/fenasojaRestaurant';
+import { getCommercialMapSegment } from '../data/commercialMapSegments';
 
 const MAP_ERROR_MESSAGES: Record<string, string> = {
   MAP_PERMISSION_DENIED: 'Você não possui permissão para concluir esta operação.',
@@ -105,29 +102,6 @@ export function useMapPermissions(): MapPermissions {
   return resolveMapPermissions(myRole, capSet);
 }
 
-export const FULL_COMMERCIAL_MAP_SCOPE: CommercialMapQueryScope = { mode: 'full' };
-
-export function commercialMapQueryKey(
-  userId: string | null | undefined,
-  orgId: string | null | undefined,
-  scope: CommercialMapQueryScope,
-) {
-  return scope.mode === 'commission'
-    ? ['commercial-map', 'commission', userId, orgId, scope.commissionId, scope.segmentId] as const
-    : ['commercial-map', 'full', userId, orgId] as const;
-}
-
-/**
- * Client presentation pipeline shared by the official fallback and persisted
- * rows. The restaurant unification runs before segment tagging so the single
- * "Restaurante" inherits C2's segment membership; cadastral rows are not edited.
- */
-export function presentCommercialMapData<T extends CommercialMapData>(data: T): T {
-  return withCommercialMapSegments(withUnifiedFenasojaRestaurant(
-    withRuralPavilionReconstruction(withArenaReconstruction(withMiranteComplexReconstruction(withFenasojaComplexReconstruction(data)))),
-  ));
-}
-
 export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIAL_MAP_SCOPE) {
   const { orgId } = useCurrentOrg();
   const { user } = useAuth();
@@ -138,16 +112,20 @@ export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIA
   const scopeKey = scope.mode === 'commission'
     ? `commission:${scope.commissionId}:${scope.segmentId}`
     : 'full-map';
-  const query = useQuery({
-    queryKey: commercialMapQueryKey(user?.id, orgId, scope),
-    queryFn: () => measureCommercialMapStage('essential-data', () => fetchCommercialMap(orgId!, scope, { includeReferenceImage: false })),
-    select: presentCommercialMapData,
-    enabled: Boolean(orgId && user),
-    staleTime: 30_000,
-    retry: 1,
-    // Business status must be revalidated after a fresh document load.
-    meta: { persist: false },
-  });
+  const queryClient = useQueryClient();
+  const options = commercialMapQueryOptions(user?.id, orgId, scope);
+  const identity = JSON.stringify(options.queryKey); // internal comparison only
+  const bootStartedAt = getCommercialMapBootSnapshot().startedAt;
+  const routeData = useRef<{ identity: string; client: typeof queryClient; bootStartedAt: number;
+    observation: ReturnType<typeof createCommercialMapRouteDataObservation> }>();
+  if (options.enabled && (routeData.current?.identity !== identity || routeData.current.client !== queryClient
+    || routeData.current.bootStartedAt !== bootStartedAt)) {
+    routeData.current = { identity, client: queryClient, bootStartedAt, observation: createCommercialMapRouteDataObservation(
+      queryClient.getQueryState(options.queryKey), captureCommercialMapStageRecorder(),
+    ) };
+  }
+  const query = useQuery(options);
+  if (options.enabled) routeData.current?.observation.observe(query.data !== undefined, query.isError);
 
   useEffect(() => {
     if (query.data) markCommercialMapStage('essential-data:cached');

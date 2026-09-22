@@ -1,0 +1,4526 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-22T04:58:23.615Z",
+  "directory": "C:\\Users\\Leonardo\\.codex\\worktrees\\fenasoja-visit-mode\\expo-logistics-hub\\docs\\validation\\visit-mode\\evidence\\final",
+  "route": {
+    "status": "observations-complete",
+    "missing": [],
+    "failures": [],
+    "errors": [],
+    "rowCount": 9,
+    "rows": [
+      {
+        "region": "entrance",
+        "metrics": {
+          "fps": 43.65,
+          "p95": 29.4,
+          "p99": 35.8,
+          "longestGap": 87.3,
+          "entryMs": 5020.7,
+          "elapsedMs": 26054.4,
+          "sampledFrames": 862,
+          "totalSampledFrames": 862,
+          "stallsOver50Ms": 1,
+          "unpresentedActiveFrames": 1,
+          "presentedFrames": 1082,
+          "renderer": {
+            "calls": 769,
+            "triangles": 670000,
+            "geometries": 569,
+            "textures": 131,
+            "programs": 222,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 146521570
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 2604,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 2618,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "poi": null,
+        "poiCount": 0,
+        "travelledMetres": 38.63
+      },
+      {
+        "region": "brasilia",
+        "metrics": {
+          "fps": 45.25,
+          "p95": 24.3,
+          "p99": 30.6,
+          "longestGap": 59.2,
+          "entryMs": 3790.8,
+          "elapsedMs": 23349.1,
+          "sampledFrames": 828,
+          "totalSampledFrames": 828,
+          "stallsOver50Ms": 2,
+          "unpresentedActiveFrames": 1,
+          "presentedFrames": 1035,
+          "renderer": {
+            "calls": 393,
+            "triangles": 684388,
+            "geometries": 588,
+            "textures": 132,
+            "programs": 222,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 180258582
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 3842,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 3850,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "poi": "D3Espaço MiranteEstrutura do Parque de Exposições da Fenasoja.ConhecerAcessar interior",
+        "poiCount": 1,
+        "travelledMetres": 39.78
+      },
+      {
+        "region": "exporural",
+        "metrics": {
+          "fps": 43.24,
+          "p95": 24.3,
+          "p99": 25.5,
+          "longestGap": 164.3,
+          "entryMs": 4195.4,
+          "elapsedMs": 23115.6,
+          "sampledFrames": 763,
+          "totalSampledFrames": 763,
+          "stallsOver50Ms": 4,
+          "unpresentedActiveFrames": 1,
+          "presentedFrames": 982,
+          "renderer": {
+            "calls": 436,
+            "triangles": 688949,
+            "geometries": 596,
+            "textures": 132,
+            "programs": 225,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 223596068
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 4998,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 5039,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "poi": "Q-R-01Lote 01896,85 m²BloqueadoValor oficial ainda não definidoValores e detalhes",
+        "poiCount": 1,
+        "travelledMetres": 39.3
+      },
+      {
+        "region": "ics",
+        "metrics": {
+          "fps": 43.85,
+          "p95": 23.9,
+          "p99": 26,
+          "longestGap": 96,
+          "entryMs": 3792.8,
+          "elapsedMs": 22392.7,
+          "sampledFrames": 760,
+          "totalSampledFrames": 760,
+          "stallsOver50Ms": 3,
+          "unpresentedActiveFrames": 1,
+          "presentedFrames": 965,
+          "renderer": {
+            "calls": 346,
+            "triangles": 712091,
+            "geometries": 614,
+            "textures": 137,
+            "programs": 225,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 117587186
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 6195,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 6202,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "poi": "Q-E-08Lote 08246,19 m²BloqueadoValor oficial ainda não definidoValores e detalhes",
+        "poiCount": 1,
+        "travelledMetres": 39.98
+      },
+      {
+        "region": "pavilion",
+        "metrics": {
+          "fps": 50.8,
+          "p95": 20.7,
+          "p99": 35.8,
+          "longestGap": 83.3,
+          "entryMs": 4024,
+          "elapsedMs": 22547.7,
+          "sampledFrames": 876,
+          "totalSampledFrames": 876,
+          "stallsOver50Ms": 4,
+          "unpresentedActiveFrames": 1,
+          "presentedFrames": 1107,
+          "renderer": {
+            "calls": 321,
+            "triangles": 503106,
+            "geometries": 615,
+            "textures": 134,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 134554406
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 7480,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 7496,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "poi": "B1Pavilhão 1 — Indústria, Comércio e ServiçosEstrutura do Parque de Exposições da Fenasoja.ConhecerAcessar interior",
+        "poiCount": 1,
+        "travelledMetres": 23.77
+      },
+      {
+        "region": "restaurant",
+        "metrics": {
+          "fps": 47.84,
+          "p95": 21.7,
+          "p99": 22.9,
+          "longestGap": 84.6,
+          "entryMs": 4230.5,
+          "elapsedMs": 22672.7,
+          "sampledFrames": 822,
+          "totalSampledFrames": 822,
+          "stallsOver50Ms": 3,
+          "unpresentedActiveFrames": 1,
+          "presentedFrames": 1048,
+          "renderer": {
+            "calls": 327,
+            "triangles": 363922,
+            "geometries": 613,
+            "textures": 133,
+            "programs": 227,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 195148606
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 8715,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 8729,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "poi": "C2RestauranteEstrutura do Parque de Exposições da Fenasoja.Conhecer",
+        "poiCount": 1,
+        "travelledMetres": 23.64
+      },
+      {
+        "region": "headquarters",
+        "metrics": {
+          "fps": 42.17,
+          "p95": 25.8,
+          "p99": 27.7,
+          "longestGap": 98.7,
+          "entryMs": 3909.1,
+          "elapsedMs": 22420.7,
+          "sampledFrames": 727,
+          "totalSampledFrames": 727,
+          "stallsOver50Ms": 2,
+          "unpresentedActiveFrames": 1,
+          "presentedFrames": 944,
+          "renderer": {
+            "calls": 209,
+            "triangles": 574546,
+            "geometries": 622,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 250343022
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 9850,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 9865,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "poi": "B12Sede Fenasoja / Comissão CentralEstrutura do Parque de Exposições da Fenasoja.ConhecerAcessar interior",
+        "poiCount": 1,
+        "travelledMetres": 35.23
+      },
+      {
+        "region": "arena",
+        "metrics": {
+          "fps": 50.53,
+          "p95": 20.6,
+          "p99": 22.2,
+          "longestGap": 82.1,
+          "entryMs": 4076.5,
+          "elapsedMs": 22448.2,
+          "sampledFrames": 865,
+          "totalSampledFrames": 865,
+          "stallsOver50Ms": 2,
+          "unpresentedActiveFrames": 1,
+          "presentedFrames": 1092,
+          "renderer": {
+            "calls": 125,
+            "triangles": 385617,
+            "geometries": 618,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 132261732
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 11133,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 11147,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "poi": "FArena Sicredi - IcatuEstrutura do Parque de Exposições da Fenasoja.Conhecer",
+        "poiCount": 0,
+        "travelledMetres": 23.74
+      },
+      {
+        "region": "exterior",
+        "metrics": {
+          "fps": 56.99,
+          "p95": 18.8,
+          "p99": 26.5,
+          "longestGap": 71.9,
+          "entryMs": 3721.9,
+          "elapsedMs": 22153.1,
+          "sampledFrames": 980,
+          "totalSampledFrames": 980,
+          "stallsOver50Ms": 3,
+          "unpresentedActiveFrames": 1,
+          "presentedFrames": 1206,
+          "renderer": {
+            "calls": 162,
+            "triangles": 442009,
+            "geometries": 623,
+            "textures": 135,
+            "programs": 225,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 147383985
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 12544,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 12548,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "poi": null,
+        "poiCount": 1,
+        "travelledMetres": 38.91
+      }
+    ],
+    "hardware": {
+      "fixture": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "initialCanvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "initialDpr": 1,
+      "emulationOnly": false,
+      "physicalMobileValidated": false,
+      "limitation": "Local fixture renderer measurement; not production network traffic or physical mobile validation."
+    },
+    "executionCompletion": "not-recorded",
+    "build": null,
+    "note": "Coverage status is not acceptance or proof that the harness process exited successfully.",
+    "expectedRegions": [
+      "entrance",
+      "brasilia",
+      "exporural",
+      "ics",
+      "pavilion",
+      "restaurant",
+      "headquarters",
+      "arena",
+      "exterior"
+    ],
+    "method": "separate grounded regional starts, continuous walking inside each segment",
+    "summary": {
+      "fps": {
+        "min": 42.17,
+        "max": 56.99,
+        "observed": 9,
+        "missing": 0
+      },
+      "p95": {
+        "min": 18.8,
+        "max": 29.4,
+        "observed": 9,
+        "missing": 0
+      },
+      "p99": {
+        "min": 22.2,
+        "max": 35.8,
+        "observed": 9,
+        "missing": 0
+      },
+      "worstGapMs": 164.3,
+      "drawCalls": {
+        "min": 125,
+        "max": 769,
+        "observed": 9,
+        "missing": 0
+      },
+      "triangles": {
+        "min": 363922,
+        "max": 712091,
+        "observed": 9,
+        "missing": 0
+      },
+      "windowsBelow30Fps": 0,
+      "note": "Ranges of recorded windows, not pooled percentiles or averaged FPS. Overlapping/cumulative windows must not be summed."
+    }
+  },
+  "cycles": {
+    "status": "observations-complete",
+    "missing": [],
+    "failures": [],
+    "errors": [],
+    "rowCount": 20,
+    "rows": [
+      {
+        "cycle": 1,
+        "metrics": {
+          "fps": 46.95,
+          "p95": 26.6,
+          "p99": 27.5,
+          "longestGap": 34.3,
+          "entryMs": 3969.8,
+          "elapsedMs": 6460.9,
+          "sampledFrames": 261,
+          "totalSampledFrames": 261,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 263,
+          "renderer": {
+            "calls": 757,
+            "triangles": 690625,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 185581057
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 12992,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 13010,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 59196056,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 13170,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 2,
+        "metrics": {
+          "fps": 47.64,
+          "p95": 26.5,
+          "p99": 33.7,
+          "longestGap": 37.8,
+          "entryMs": 3835.1,
+          "elapsedMs": 6363.8,
+          "sampledFrames": 251,
+          "totalSampledFrames": 251,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 253,
+          "renderer": {
+            "calls": 745,
+            "triangles": 689483,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 160752764
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 13428,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 13439,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 59597744,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 13588,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 3,
+        "metrics": {
+          "fps": 49.84,
+          "p95": 26,
+          "p99": 27,
+          "longestGap": 33,
+          "entryMs": 4165,
+          "elapsedMs": 6677,
+          "sampledFrames": 266,
+          "totalSampledFrames": 266,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 268,
+          "renderer": {
+            "calls": 757,
+            "triangles": 690625,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 141844407
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 13878,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 13893,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 59495748,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 14061,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 4,
+        "metrics": {
+          "fps": 49.01,
+          "p95": 26,
+          "p99": 26.8,
+          "longestGap": 37,
+          "entryMs": 3946.2,
+          "elapsedMs": 6433.4,
+          "sampledFrames": 261,
+          "totalSampledFrames": 261,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 263,
+          "renderer": {
+            "calls": 745,
+            "triangles": 689483,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 150695990
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 14319,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 14335,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 59550176,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 14508,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 5,
+        "metrics": {
+          "fps": 41.58,
+          "p95": 37.3,
+          "p99": 47.5,
+          "longestGap": 66.8,
+          "entryMs": 4182.5,
+          "elapsedMs": 6937.3,
+          "sampledFrames": 242,
+          "totalSampledFrames": 242,
+          "stallsOver50Ms": 1,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 244,
+          "renderer": {
+            "calls": 757,
+            "triangles": 690625,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 144980023
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 14731,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 14763,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 59615048,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 14904,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 6,
+        "metrics": {
+          "fps": 45.14,
+          "p95": 33.7,
+          "p99": 39.9,
+          "longestGap": 43,
+          "entryMs": 4380.6,
+          "elapsedMs": 6863.5,
+          "sampledFrames": 257,
+          "totalSampledFrames": 257,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 259,
+          "renderer": {
+            "calls": 745,
+            "triangles": 689483,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 141512801
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 15160,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 15192,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 59992608,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 15354,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 7,
+        "metrics": {
+          "fps": 49.56,
+          "p95": 26.6,
+          "p99": 33.6,
+          "longestGap": 68.1,
+          "entryMs": 3840.1,
+          "elapsedMs": 6399.3,
+          "sampledFrames": 263,
+          "totalSampledFrames": 263,
+          "stallsOver50Ms": 1,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 265,
+          "renderer": {
+            "calls": 757,
+            "triangles": 690625,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 147423472
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 15629,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 15640,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 59651544,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 15813,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 8,
+        "metrics": {
+          "fps": 48.67,
+          "p95": 25.9,
+          "p99": 27.1,
+          "longestGap": 38.8,
+          "entryMs": 3879.5,
+          "elapsedMs": 6375.5,
+          "sampledFrames": 257,
+          "totalSampledFrames": 257,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 259,
+          "renderer": {
+            "calls": 745,
+            "triangles": 689483,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 143515874
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 16068,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 16081,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 59741488,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 16221,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 9,
+        "metrics": {
+          "fps": 49.74,
+          "p95": 26,
+          "p99": 26.6,
+          "longestGap": 39.3,
+          "entryMs": 3978.8,
+          "elapsedMs": 6488.7,
+          "sampledFrames": 268,
+          "totalSampledFrames": 268,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 270,
+          "renderer": {
+            "calls": 757,
+            "triangles": 690625,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 141989771
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 16510,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 16526,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 59411468,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 16693,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 10,
+        "metrics": {
+          "fps": 48.64,
+          "p95": 26.3,
+          "p99": 27.3,
+          "longestGap": 34.9,
+          "entryMs": 3978,
+          "elapsedMs": 6510.4,
+          "sampledFrames": 259,
+          "totalSampledFrames": 259,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 261,
+          "renderer": {
+            "calls": 745,
+            "triangles": 689483,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 145142104
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 16962,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 16976,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 60024980,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 17118,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 11,
+        "metrics": {
+          "fps": 50.06,
+          "p95": 25.9,
+          "p99": 26.9,
+          "longestGap": 36.6,
+          "entryMs": 3881.6,
+          "elapsedMs": 6424.6,
+          "sampledFrames": 266,
+          "totalSampledFrames": 266,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 268,
+          "renderer": {
+            "calls": 757,
+            "triangles": 690625,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 157478383
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 17407,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 17420,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 59892328,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 17559,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 12,
+        "metrics": {
+          "fps": 46.61,
+          "p95": 27.3,
+          "p99": 43.8,
+          "longestGap": 49.7,
+          "entryMs": 4721.7,
+          "elapsedMs": 7197.5,
+          "sampledFrames": 283,
+          "totalSampledFrames": 283,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 285,
+          "renderer": {
+            "calls": 745,
+            "triangles": 689483,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 155785084
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 17880,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 17881,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 59811100,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 18025,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 13,
+        "metrics": {
+          "fps": 49.32,
+          "p95": 26.3,
+          "p99": 27.1,
+          "longestGap": 36.9,
+          "entryMs": 3863,
+          "elapsedMs": 6379.4,
+          "sampledFrames": 262,
+          "totalSampledFrames": 262,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 264,
+          "renderer": {
+            "calls": 757,
+            "triangles": 690625,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 138867479
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 18312,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 18325,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 60534408,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 18493,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 14,
+        "metrics": {
+          "fps": 47.75,
+          "p95": 26.4,
+          "p99": 29,
+          "longestGap": 40.3,
+          "entryMs": 4510,
+          "elapsedMs": 7022.7,
+          "sampledFrames": 272,
+          "totalSampledFrames": 272,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 274,
+          "renderer": {
+            "calls": 745,
+            "triangles": 689483,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 152860629
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 18764,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 18797,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 60247968,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 18957,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 15,
+        "metrics": {
+          "fps": 49.66,
+          "p95": 26.4,
+          "p99": 27,
+          "longestGap": 36.3,
+          "entryMs": 3955.4,
+          "elapsedMs": 6471.5,
+          "sampledFrames": 264,
+          "totalSampledFrames": 264,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 266,
+          "renderer": {
+            "calls": 757,
+            "triangles": 690625,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 140631903
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 19233,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 19246,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 60016472,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 19385,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 16,
+        "metrics": {
+          "fps": 48.59,
+          "p95": 26.3,
+          "p99": 26.7,
+          "longestGap": 38.5,
+          "entryMs": 4072.2,
+          "elapsedMs": 6558.3,
+          "sampledFrames": 265,
+          "totalSampledFrames": 265,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 267,
+          "renderer": {
+            "calls": 745,
+            "triangles": 689483,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 146481810
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 19668,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 19689,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 60020672,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 19855,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 17,
+        "metrics": {
+          "fps": 45.4,
+          "p95": 29.1,
+          "p99": 36.5,
+          "longestGap": 39.4,
+          "entryMs": 4509,
+          "elapsedMs": 7148.4,
+          "sampledFrames": 268,
+          "totalSampledFrames": 268,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 270,
+          "renderer": {
+            "calls": 757,
+            "triangles": 690625,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 156950405
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 20100,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 20139,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 59877840,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 20286,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 18,
+        "metrics": {
+          "fps": 48.75,
+          "p95": 26.3,
+          "p99": 26.6,
+          "longestGap": 34,
+          "entryMs": 3917.4,
+          "elapsedMs": 6388.6,
+          "sampledFrames": 258,
+          "totalSampledFrames": 258,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 260,
+          "renderer": {
+            "calls": 745,
+            "triangles": 689483,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 141714808
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 20561,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 20574,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 60261836,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 20718,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 19,
+        "metrics": {
+          "fps": 49.13,
+          "p95": 26.4,
+          "p99": 27.1,
+          "longestGap": 36.1,
+          "entryMs": 4125.5,
+          "elapsedMs": 6661.7,
+          "sampledFrames": 273,
+          "totalSampledFrames": 273,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 275,
+          "renderer": {
+            "calls": 757,
+            "triangles": 690625,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 147739006
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 21007,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 21031,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 60091840,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 21192,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      },
+      {
+        "cycle": 20,
+        "metrics": {
+          "fps": 49.07,
+          "p95": 26,
+          "p99": 27.2,
+          "longestGap": 34.1,
+          "entryMs": 3847.2,
+          "elapsedMs": 6326.6,
+          "sampledFrames": 257,
+          "totalSampledFrames": 257,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 259,
+          "renderer": {
+            "calls": 745,
+            "triangles": 689483,
+            "geometries": 619,
+            "textures": 131,
+            "programs": 224,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 140960174
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 21456,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 21467,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "geometries": 612,
+        "textures": 131,
+        "programs": 224,
+        "threeListeners": 375,
+        "dom": {
+          "documents": 1,
+          "nodes": 561,
+          "jsEventListeners": 352
+        },
+        "heapAfterGc": 59956684,
+        "restoration": {
+          "complete": true,
+          "poseDelta": {
+            "position": 0,
+            "quaternion": 0,
+            "target": 0,
+            "projection": 0
+          },
+          "sameScene": true,
+          "sameCamera": true,
+          "identityEqual": {
+            "canvasMounts": true,
+            "rendererCreates": true,
+            "controlsCreates": true,
+            "activeCanvases": true,
+            "activeControls": true
+          },
+          "beforeIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "afterIdentity": {
+            "canvasMounts": 1,
+            "rendererCreates": 1,
+            "controlsCreates": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "equalWithinTolerance": true
+        },
+        "returnedHealth": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 21611,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": null
+        }
+      }
+    ],
+    "hardware": {
+      "fixture": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "initialCanvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "initialDpr": 1,
+      "emulationOnly": false,
+      "physicalMobileValidated": false,
+      "limitation": "Local fixture renderer measurement; not production network traffic or physical mobile validation."
+    },
+    "executionCompletion": "not-recorded",
+    "build": null,
+    "note": "Coverage status is not acceptance or proof that the harness process exited successfully.",
+    "expectedCycles": 20,
+    "warmCycle": 5,
+    "warmTrends": {
+      "geometries": {
+        "samples": 16,
+        "missing": 0,
+        "first": 612,
+        "last": 612,
+        "delta": 0,
+        "range": {
+          "min": 612,
+          "max": 612,
+          "observed": 16,
+          "missing": 0
+        },
+        "slopePerObservationIndex": 0,
+        "strictlyIncreasing": false,
+        "lastFiveRange": {
+          "min": 612,
+          "max": 612,
+          "observed": 5,
+          "missing": 0
+        }
+      },
+      "textures": {
+        "samples": 16,
+        "missing": 0,
+        "first": 131,
+        "last": 131,
+        "delta": 0,
+        "range": {
+          "min": 131,
+          "max": 131,
+          "observed": 16,
+          "missing": 0
+        },
+        "slopePerObservationIndex": 0,
+        "strictlyIncreasing": false,
+        "lastFiveRange": {
+          "min": 131,
+          "max": 131,
+          "observed": 5,
+          "missing": 0
+        }
+      },
+      "programs": {
+        "samples": 16,
+        "missing": 0,
+        "first": 224,
+        "last": 224,
+        "delta": 0,
+        "range": {
+          "min": 224,
+          "max": 224,
+          "observed": 16,
+          "missing": 0
+        },
+        "slopePerObservationIndex": 0,
+        "strictlyIncreasing": false,
+        "lastFiveRange": {
+          "min": 224,
+          "max": 224,
+          "observed": 5,
+          "missing": 0
+        }
+      },
+      "threeListeners": {
+        "samples": 16,
+        "missing": 0,
+        "first": 375,
+        "last": 375,
+        "delta": 0,
+        "range": {
+          "min": 375,
+          "max": 375,
+          "observed": 16,
+          "missing": 0
+        },
+        "slopePerObservationIndex": 0,
+        "strictlyIncreasing": false,
+        "lastFiveRange": {
+          "min": 375,
+          "max": 375,
+          "observed": 5,
+          "missing": 0
+        }
+      },
+      "domNodes": {
+        "samples": 16,
+        "missing": 0,
+        "first": 561,
+        "last": 561,
+        "delta": 0,
+        "range": {
+          "min": 561,
+          "max": 561,
+          "observed": 16,
+          "missing": 0
+        },
+        "slopePerObservationIndex": 0,
+        "strictlyIncreasing": false,
+        "lastFiveRange": {
+          "min": 561,
+          "max": 561,
+          "observed": 5,
+          "missing": 0
+        }
+      },
+      "domListeners": {
+        "samples": 16,
+        "missing": 0,
+        "first": 352,
+        "last": 352,
+        "delta": 0,
+        "range": {
+          "min": 352,
+          "max": 352,
+          "observed": 16,
+          "missing": 0
+        },
+        "slopePerObservationIndex": 0,
+        "strictlyIncreasing": false,
+        "lastFiveRange": {
+          "min": 352,
+          "max": 352,
+          "observed": 5,
+          "missing": 0
+        }
+      },
+      "domDocuments": {
+        "samples": 16,
+        "missing": 0,
+        "first": 1,
+        "last": 1,
+        "delta": 0,
+        "range": {
+          "min": 1,
+          "max": 1,
+          "observed": 16,
+          "missing": 0
+        },
+        "slopePerObservationIndex": 0,
+        "strictlyIncreasing": false,
+        "lastFiveRange": {
+          "min": 1,
+          "max": 1,
+          "observed": 5,
+          "missing": 0
+        }
+      },
+      "heapAfterGcBytes": {
+        "samples": 16,
+        "missing": 0,
+        "first": 59615048,
+        "last": 59956684,
+        "delta": 341636,
+        "range": {
+          "min": 59411468,
+          "max": 60534408,
+          "observed": 16,
+          "missing": 0
+        },
+        "slopePerObservationIndex": 29951.55,
+        "strictlyIncreasing": false,
+        "lastFiveRange": {
+          "min": 59877840,
+          "max": 60261836,
+          "observed": 5,
+          "missing": 0
+        }
+      }
+    },
+    "trendLimit": "Explicit GC boundaries compare retained JavaScript heap, not OS RAM. Trends/plateaus are observations, not an automatic memory-leak verdict."
+  },
+  "checks": {
+    "status": "observations-complete",
+    "missing": [],
+    "failures": [],
+    "errors": [],
+    "rowCount": 6,
+    "rows": [
+      {
+        "name": "headquarters-focus",
+        "failed": null,
+        "metrics": {
+          "fps": 48.02,
+          "p95": 26.5,
+          "p99": 27.7,
+          "longestGap": 39.9,
+          "entryMs": 4251.6,
+          "elapsedMs": 6476.6,
+          "sampledFrames": 242,
+          "totalSampledFrames": 242,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 249,
+          "renderer": {
+            "calls": 258,
+            "triangles": 741281,
+            "geometries": 587,
+            "textures": 131,
+            "programs": 222,
+            "dpr": 1,
+            "width": 1425,
+            "height": 772,
+            "heapBytes": 173677456
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 2274,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 2281,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "health": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 2274,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 2281,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        "observationMs": null,
+        "poi": "B12Sede Fenasoja / Comissão CentralEstrutura do Parque de Exposições da Fenasoja.ConhecerAcessar interior",
+        "poiCount": 1,
+        "focusPause": null
+      },
+      {
+        "name": "explicit-interior",
+        "failed": null,
+        "metrics": {
+          "fps": 48.02,
+          "p95": 26.5,
+          "p99": 27.7,
+          "longestGap": 39.9,
+          "entryMs": 4251.6,
+          "elapsedMs": 13985.6,
+          "sampledFrames": 242,
+          "totalSampledFrames": 242,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 403,
+          "renderer": {
+            "calls": 60,
+            "triangles": 41332,
+            "geometries": 645,
+            "textures": 175,
+            "programs": 233,
+            "dpr": 1,
+            "width": 1425,
+            "height": 772,
+            "heapBytes": 176327600
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "direct",
+              "presentedFrames": 2418,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "direct",
+              "presentedFrames": 2435,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "health": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "direct",
+            "presentedFrames": 2418,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": {
+            "status": "ready",
+            "path": "direct",
+            "presentedFrames": 2435,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        "observationMs": null,
+        "poi": null,
+        "poiCount": 0,
+        "focusPause": null
+      },
+      {
+        "name": "interior-return",
+        "failed": null,
+        "metrics": {
+          "fps": 46.88,
+          "p95": 26.3,
+          "p99": 27.5,
+          "longestGap": 39.9,
+          "entryMs": 4251.6,
+          "elapsedMs": 15933.7,
+          "sampledFrames": 318,
+          "totalSampledFrames": 318,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 484,
+          "renderer": {
+            "calls": 260,
+            "triangles": 742615,
+            "geometries": 612,
+            "textures": 170,
+            "programs": 237,
+            "dpr": 0.9,
+            "width": 1282,
+            "height": 694,
+            "heapBytes": 180362281
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 2485,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 2516,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "health": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 2485,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 2516,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        "observationMs": null,
+        "poi": "B12Sede Fenasoja / Comissão CentralEstrutura do Parque de Exposições da Fenasoja.ConhecerAcessar interior",
+        "poiCount": 1,
+        "focusPause": null
+      },
+      {
+        "name": "night-transition",
+        "failed": null,
+        "metrics": {
+          "fps": 46.7,
+          "p95": 26.4,
+          "p99": 28.1,
+          "longestGap": 39.9,
+          "entryMs": 4251.6,
+          "elapsedMs": 21979.1,
+          "sampledFrames": 326,
+          "totalSampledFrames": 326,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 703,
+          "renderer": {
+            "calls": 267,
+            "triangles": 768853,
+            "geometries": 596,
+            "textures": 169,
+            "programs": 237,
+            "dpr": 0.85,
+            "width": 1211,
+            "height": 656,
+            "heapBytes": 174063521
+          },
+          "quality": "PERFORMANCE",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 2707,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 2735,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "health": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 2707,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 2735,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        "observationMs": 6039,
+        "poi": "B12Sede Fenasoja / Comissão CentralEstrutura do Parque de Exposições da Fenasoja.ConhecerAcessar interior",
+        "poiCount": 1,
+        "focusPause": null
+      },
+      {
+        "name": "night",
+        "failed": null,
+        "metrics": {
+          "fps": 38.73,
+          "p95": 29.9,
+          "p99": 31.4,
+          "longestGap": 113.5,
+          "entryMs": 4251.6,
+          "elapsedMs": 32415.7,
+          "sampledFrames": 402,
+          "totalSampledFrames": 402,
+          "stallsOver50Ms": 2,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 1107,
+          "renderer": {
+            "calls": 267,
+            "triangles": 773603,
+            "geometries": 596,
+            "textures": 169,
+            "programs": 237,
+            "dpr": 0.85,
+            "width": 1211,
+            "height": 656,
+            "heapBytes": 196772923
+          },
+          "quality": "PERFORMANCE",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 3106,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 3139,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "health": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 3106,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 3139,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        "observationMs": null,
+        "poi": "B12Sede Fenasoja / Comissão CentralEstrutura do Parque de Exposições da Fenasoja.ConhecerAcessar interior",
+        "poiCount": 1,
+        "focusPause": null
+      },
+      {
+        "name": "focus-pause",
+        "failed": null,
+        "metrics": null,
+        "health": {
+          "complete": true,
+          "flags": [],
+          "value": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 3396,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          },
+          "visitHealth": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 3397,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        "observationMs": null,
+        "poi": null,
+        "poiCount": null,
+        "focusPause": {
+          "pausedFocused": false,
+          "stillPausedFocused": false,
+          "movedMetres": 0,
+          "heldPosition": true,
+          "resumedFocused": true
+        }
+      }
+    ],
+    "hardware": {
+      "fixture": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "initialCanvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "initialDpr": 1,
+      "emulationOnly": false,
+      "physicalMobileValidated": false,
+      "limitation": "Local fixture renderer measurement; not production network traffic or physical mobile validation."
+    },
+    "executionCompletion": "final-snapshot-recorded",
+    "build": null,
+    "note": "Coverage status is not acceptance or proof that the harness process exited successfully.",
+    "expectedChecks": [
+      "headquarters-focus",
+      "explicit-interior",
+      "interior-return",
+      "night-transition",
+      "night",
+      "focus-pause"
+    ],
+    "restoration": {
+      "complete": true,
+      "poseDelta": {
+        "position": 0,
+        "quaternion": 0,
+        "target": 0,
+        "projection": 0
+      },
+      "sameScene": true,
+      "sameCamera": true,
+      "identityEqual": {
+        "canvasMounts": true,
+        "rendererCreates": true,
+        "controlsCreates": true,
+        "activeCanvases": true,
+        "activeControls": true
+      },
+      "beforeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "afterIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "equalWithinTolerance": true
+    }
+  },
+  "endurance": {
+    "status": "observations-complete",
+    "missing": [],
+    "failures": [],
+    "errors": [],
+    "rowCount": 5,
+    "rows": [
+      {
+        "minute": 1,
+        "metrics": {
+          "fps": 41.98,
+          "p95": 28.2,
+          "p99": 43.9,
+          "longestGap": 148.4,
+          "entryMs": 4487.4,
+          "elapsedMs": 72952.2,
+          "sampledFrames": 2551,
+          "totalSampledFrames": 2551,
+          "stallsOver50Ms": 15,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 3041,
+          "renderer": {
+            "calls": 365,
+            "triangles": 640671,
+            "geometries": 581,
+            "textures": 132,
+            "programs": 222,
+            "dpr": 0.85,
+            "width": 1211,
+            "height": 656,
+            "heapBytes": 119843690
+          },
+          "quality": "PERFORMANCE",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 4721,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 4768,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1
+        }
+      },
+      {
+        "minute": 2,
+        "metrics": {
+          "fps": 48.62,
+          "p95": 25.7,
+          "p99": 34.3,
+          "longestGap": 148.4,
+          "entryMs": 4487.4,
+          "elapsedMs": 132559.8,
+          "sampledFrames": 3600,
+          "totalSampledFrames": 5492,
+          "stallsOver50Ms": 4,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 6053,
+          "renderer": {
+            "calls": 293,
+            "triangles": 588262,
+            "geometries": 581,
+            "textures": 132,
+            "programs": 222,
+            "dpr": 0.85,
+            "width": 1211,
+            "height": 656,
+            "heapBytes": 137263344
+          },
+          "quality": "PERFORMANCE",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 7730,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 7780,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1
+        }
+      },
+      {
+        "minute": 3,
+        "metrics": {
+          "fps": 52.8,
+          "p95": 20.4,
+          "p99": 21.9,
+          "longestGap": 148.4,
+          "entryMs": 4487.4,
+          "elapsedMs": 192159.4,
+          "sampledFrames": 3600,
+          "totalSampledFrames": 8592,
+          "stallsOver50Ms": 3,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 9232,
+          "renderer": {
+            "calls": 212,
+            "triangles": 506559,
+            "geometries": 581,
+            "textures": 132,
+            "programs": 222,
+            "dpr": 0.85,
+            "width": 1211,
+            "height": 656,
+            "heapBytes": 122362842
+          },
+          "quality": "PERFORMANCE",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 10904,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 10959,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1
+        }
+      },
+      {
+        "minute": 4,
+        "metrics": {
+          "fps": 58.95,
+          "p95": 18.5,
+          "p99": 23.6,
+          "longestGap": 148.4,
+          "entryMs": 4487.4,
+          "elapsedMs": 251625.7,
+          "sampledFrames": 3600,
+          "totalSampledFrames": 12027,
+          "stallsOver50Ms": 7,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 12745,
+          "renderer": {
+            "calls": 201,
+            "triangles": 505425,
+            "geometries": 581,
+            "textures": 132,
+            "programs": 222,
+            "dpr": 0.85,
+            "width": 1211,
+            "height": 656,
+            "heapBytes": 125847503
+          },
+          "quality": "PERFORMANCE",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 14420,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 14472,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1
+        }
+      },
+      {
+        "minute": 5,
+        "metrics": {
+          "fps": 59.4,
+          "p95": 18.2,
+          "p99": 21.9,
+          "longestGap": 148.4,
+          "entryMs": 4487.4,
+          "elapsedMs": 311038.3,
+          "sampledFrames": 3600,
+          "totalSampledFrames": 15483,
+          "stallsOver50Ms": 3,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 16280,
+          "renderer": {
+            "calls": 163,
+            "triangles": 358416,
+            "geometries": 581,
+            "textures": 132,
+            "programs": 222,
+            "dpr": 0.85,
+            "width": 1211,
+            "height": 656,
+            "heapBytes": 124172137
+          },
+          "quality": "PERFORMANCE",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 17961,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 18007,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1
+        }
+      }
+    ],
+    "hardware": {
+      "fixture": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "initialCanvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "initialDpr": 1,
+      "emulationOnly": false,
+      "physicalMobileValidated": false,
+      "limitation": "Local fixture renderer measurement; not production network traffic or physical mobile validation."
+    },
+    "executionCompletion": "final-snapshot-recorded",
+    "build": null,
+    "note": "Coverage status is not acceptance or proof that the harness process exited successfully.",
+    "expectedMinutes": 5,
+    "summary": {
+      "fps": {
+        "min": 41.98,
+        "max": 59.4,
+        "observed": 5,
+        "missing": 0
+      },
+      "p95": {
+        "min": 18.2,
+        "max": 28.2,
+        "observed": 5,
+        "missing": 0
+      },
+      "p99": {
+        "min": 21.9,
+        "max": 43.9,
+        "observed": 5,
+        "missing": 0
+      },
+      "worstGapMs": 148.4,
+      "drawCalls": {
+        "min": 163,
+        "max": 365,
+        "observed": 5,
+        "missing": 0
+      },
+      "triangles": {
+        "min": 358416,
+        "max": 640671,
+        "observed": 5,
+        "missing": 0
+      },
+      "windowsBelow30Fps": 0,
+      "note": "Ranges of recorded windows, not pooled percentiles or averaged FPS. Overlapping/cumulative windows must not be summed."
+    },
+    "restoration": {
+      "complete": true,
+      "poseDelta": {
+        "position": 0,
+        "quaternion": 0,
+        "target": 0,
+        "projection": 0
+      },
+      "sameScene": true,
+      "sameCamera": true,
+      "identityEqual": {
+        "canvasMounts": true,
+        "rendererCreates": true,
+        "controlsCreates": true,
+        "activeCanvases": true,
+        "activeControls": true
+      },
+      "beforeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "afterIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "equalWithinTolerance": true
+    },
+    "fpsTrend": {
+      "samples": 5,
+      "missing": 0,
+      "first": 41.98,
+      "last": 59.4,
+      "delta": 17.42,
+      "range": {
+        "min": 41.98,
+        "max": 59.4,
+        "observed": 5,
+        "missing": 0
+      },
+      "slopePerObservationIndex": 4.52,
+      "strictlyIncreasing": true,
+      "lastFiveRange": {
+        "min": 41.98,
+        "max": 59.4,
+        "observed": 5,
+        "missing": 0
+      }
+    },
+    "heapTrend": {
+      "samples": 5,
+      "missing": 0,
+      "first": 119843690,
+      "last": 124172137,
+      "delta": 4328447,
+      "range": {
+        "min": 119843690,
+        "max": 137263344,
+        "observed": 5,
+        "missing": 0
+      },
+      "slopePerObservationIndex": -275894.7,
+      "strictlyIncreasing": false,
+      "lastFiveRange": {
+        "min": 119843690,
+        "max": 137263344,
+        "observed": 5,
+        "missing": 0
+      }
+    },
+    "limitation": "Minute labels are harness checkpoints, not an independent stopwatch. Telemetry windows may overlap and heap samples have no explicit GC."
+  },
+  "mobile": {
+    "status": "observations-complete",
+    "missing": [],
+    "failures": [],
+    "errors": [],
+    "rowCount": 4,
+    "rows": [
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "metrics": {
+          "fps": 48.15,
+          "p95": 29.9,
+          "p99": 38.8,
+          "longestGap": 68,
+          "entryMs": 4920.9,
+          "elapsedMs": 20303.3,
+          "sampledFrames": 533,
+          "totalSampledFrames": 533,
+          "stallsOver50Ms": 2,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 911,
+          "renderer": {
+            "calls": 555,
+            "triangles": 609324,
+            "geometries": 551,
+            "textures": 131,
+            "programs": 221,
+            "dpr": 0.99,
+            "width": 386,
+            "height": 619,
+            "heapBytes": 137306503
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 1290,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 1324,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "travelledMetres": 13.79,
+        "yawDeltaRadians": -0.04486523437499979,
+        "layout": {
+          "viewport": 390,
+          "scrollWidth": 390,
+          "touchAction": "none",
+          "buttons": [
+            {
+              "name": "1ª pessoa",
+              "x": 131.625,
+              "y": 234,
+              "width": 62.421875,
+              "height": 40
+            },
+            {
+              "name": "3ª pessoa",
+              "x": 194.046875,
+              "y": 234,
+              "width": 64.5625,
+              "height": 40
+            },
+            {
+              "name": "Ativar noite na visita",
+              "x": 262.609375,
+              "y": 234,
+              "width": 32,
+              "height": 40
+            },
+            {
+              "name": "Sair do Modo Visita",
+              "x": 296.609375,
+              "y": 234,
+              "width": 33,
+              "height": 40
+            },
+            {
+              "name": "Avançar",
+              "x": 14,
+              "y": 709,
+              "width": 89.875,
+              "height": 49
+            },
+            {
+              "name": "Voltar",
+              "x": 14,
+              "y": 765,
+              "width": 89.875,
+              "height": 49
+            },
+            {
+              "name": "Correr",
+              "x": 295.71875,
+              "y": 765,
+              "width": 80.28125,
+              "height": 49
+            }
+          ]
+        },
+        "inputChecks": {
+          "contactCount": 2,
+          "runningRequested": false,
+          "release": "touchCancel",
+          "runLatchedBefore": false,
+          "runLatchedAfter": false,
+          "walkingAndLooking": true,
+          "stoppedAfterRelease": true,
+          "latchPreserved": true,
+          "latchResetOnNewVisit": true
+        },
+        "expandedPOI": {
+          "region": "exporural",
+          "id": "reference:2026:q-r-01",
+          "text": "Q-R-01Lote 01896,85 m²BloqueadoValor oficial ainda não definidoSegmento: ExporuralQuadra RResumir",
+          "expanded": true,
+          "card": {
+            "left": 75,
+            "right": 315,
+            "top": 411.8125,
+            "bottom": 612.5,
+            "width": 240,
+            "height": 200.6875
+          },
+          "bar": {
+            "left": 54.390625,
+            "right": 335.609375,
+            "top": 227,
+            "bottom": 281,
+            "width": 281.21875,
+            "height": 54
+          },
+          "canvas": {
+            "left": 0,
+            "right": 390,
+            "top": 218,
+            "bottom": 844,
+            "width": 390,
+            "height": 626
+          },
+          "controls": [
+            {
+              "name": "Avançar",
+              "left": 14,
+              "right": 103.875,
+              "top": 709,
+              "bottom": 758,
+              "width": 89.875,
+              "height": 49
+            },
+            {
+              "name": "Voltar",
+              "left": 14,
+              "right": 103.875,
+              "top": 765,
+              "bottom": 814,
+              "width": 89.875,
+              "height": 49
+            },
+            {
+              "name": "Correr",
+              "left": 295.71875,
+              "right": 376,
+              "top": 765,
+              "bottom": 814,
+              "width": 80.28125,
+              "height": 49
+            }
+          ],
+          "belowHeader": true,
+          "aboveControls": true,
+          "overlapsHeader": false,
+          "overlappingControls": [],
+          "insideViewport": true,
+          "scrollHeight": 199,
+          "clientHeight": 199,
+          "officialPriceRows": 0,
+          "passed": true
+        }
+      },
+      {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "metrics": {
+          "fps": 45.58,
+          "p95": 31.6,
+          "p99": 53.4,
+          "longestGap": 76.5,
+          "entryMs": 4813.7,
+          "elapsedMs": 19258.1,
+          "sampledFrames": 482,
+          "totalSampledFrames": 482,
+          "stallsOver50Ms": 5,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 744,
+          "renderer": {
+            "calls": 785,
+            "triangles": 669249,
+            "geometries": 569,
+            "textures": 131,
+            "programs": 222,
+            "dpr": 0.99,
+            "width": 835,
+            "height": 229,
+            "heapBytes": 241564450
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 2611,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 2638,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "travelledMetres": 30.61,
+        "yawDeltaRadians": -0.04486523437499935,
+        "layout": {
+          "viewport": 844,
+          "scrollWidth": 844,
+          "touchAction": "none",
+          "buttons": [
+            {
+              "name": "1ª pessoa",
+              "x": 358.625,
+              "y": 171,
+              "width": 62.421875,
+              "height": 40
+            },
+            {
+              "name": "3ª pessoa",
+              "x": 421.046875,
+              "y": 171,
+              "width": 64.5625,
+              "height": 40
+            },
+            {
+              "name": "Ativar noite na visita",
+              "x": 489.609375,
+              "y": 171,
+              "width": 32,
+              "height": 40
+            },
+            {
+              "name": "Sair do Modo Visita",
+              "x": 523.609375,
+              "y": 171,
+              "width": 33,
+              "height": 40
+            },
+            {
+              "name": "Avançar",
+              "x": 14,
+              "y": 282,
+              "width": 89.875,
+              "height": 43
+            },
+            {
+              "name": "Voltar",
+              "x": 14,
+              "y": 330,
+              "width": 89.875,
+              "height": 43
+            },
+            {
+              "name": "Correr",
+              "x": 749.71875,
+              "y": 330,
+              "width": 80.28125,
+              "height": 43
+            }
+          ]
+        },
+        "inputChecks": {
+          "contactCount": 2,
+          "runningRequested": true,
+          "release": "touchEnd",
+          "runLatchedBefore": true,
+          "runLatchedAfter": true,
+          "walkingAndLooking": true,
+          "stoppedAfterRelease": true,
+          "latchPreserved": true,
+          "latchResetOnNewVisit": true
+        },
+        "expandedPOI": {
+          "region": "exporural",
+          "id": "reference:2026:q-r-01",
+          "text": "Q-R-01Lote 01896,85 m²BloqueadoValor oficial ainda não definidoSegmento: ExporuralQuadra RResumir",
+          "expanded": true,
+          "card": {
+            "left": 304.5,
+            "right": 539.5,
+            "top": 220,
+            "bottom": 340,
+            "width": 235,
+            "height": 120
+          },
+          "bar": {
+            "left": 281.390625,
+            "right": 562.609375,
+            "top": 164,
+            "bottom": 218,
+            "width": 281.21875,
+            "height": 54
+          },
+          "canvas": {
+            "left": 0,
+            "right": 844,
+            "top": 158,
+            "bottom": 390,
+            "width": 844,
+            "height": 232
+          },
+          "controls": [
+            {
+              "name": "Avançar",
+              "left": 14,
+              "right": 103.875,
+              "top": 282,
+              "bottom": 325,
+              "width": 89.875,
+              "height": 43
+            },
+            {
+              "name": "Voltar",
+              "left": 14,
+              "right": 103.875,
+              "top": 330,
+              "bottom": 373,
+              "width": 89.875,
+              "height": 43
+            },
+            {
+              "name": "Correr",
+              "left": 749.71875,
+              "right": 830,
+              "top": 330,
+              "bottom": 373,
+              "width": 80.28125,
+              "height": 43
+            }
+          ],
+          "belowHeader": true,
+          "aboveControls": false,
+          "overlapsHeader": false,
+          "overlappingControls": [],
+          "insideViewport": true,
+          "scrollHeight": 199,
+          "clientHeight": 118,
+          "officialPriceRows": 0,
+          "passed": true
+        }
+      },
+      {
+        "viewport": {
+          "width": 320,
+          "height": 568
+        },
+        "metrics": {
+          "fps": 50.3,
+          "p95": 28.5,
+          "p99": 38.4,
+          "longestGap": 50,
+          "entryMs": 4012.3,
+          "elapsedMs": 18090.3,
+          "sampledFrames": 515,
+          "totalSampledFrames": 515,
+          "stallsOver50Ms": 0,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 770,
+          "renderer": {
+            "calls": 636,
+            "triangles": 637364,
+            "geometries": 569,
+            "textures": 131,
+            "programs": 222,
+            "dpr": 0.99,
+            "width": 316,
+            "height": 316,
+            "heapBytes": 179336070
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 3988,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 3995,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "travelledMetres": 12.72,
+        "yawDeltaRadians": -0.04486519775390674,
+        "layout": {
+          "viewport": 320,
+          "scrollWidth": 320,
+          "touchAction": "none",
+          "buttons": [
+            {
+              "name": "1ª pessoa",
+              "x": 96.625,
+              "y": 264,
+              "width": 62.421875,
+              "height": 40
+            },
+            {
+              "name": "3ª pessoa",
+              "x": 159.046875,
+              "y": 264,
+              "width": 64.5625,
+              "height": 40
+            },
+            {
+              "name": "Ativar noite na visita",
+              "x": 227.609375,
+              "y": 264,
+              "width": 32,
+              "height": 40
+            },
+            {
+              "name": "Sair do Modo Visita",
+              "x": 261.609375,
+              "y": 264,
+              "width": 33,
+              "height": 40
+            },
+            {
+              "name": "Avançar",
+              "x": 14,
+              "y": 433,
+              "width": 89.875,
+              "height": 49
+            },
+            {
+              "name": "Voltar",
+              "x": 14,
+              "y": 489,
+              "width": 89.875,
+              "height": 49
+            },
+            {
+              "name": "Correr",
+              "x": 225.71875,
+              "y": 489,
+              "width": 80.28125,
+              "height": 49
+            }
+          ]
+        },
+        "inputChecks": {
+          "contactCount": 2,
+          "runningRequested": false,
+          "release": "touchCancel",
+          "runLatchedBefore": false,
+          "runLatchedAfter": false,
+          "walkingAndLooking": true,
+          "stoppedAfterRelease": true,
+          "latchPreserved": true,
+          "latchResetOnNewVisit": true
+        },
+        "expandedPOI": {
+          "region": "exporural",
+          "id": "reference:2026:q-r-01",
+          "text": "Q-R-01Lote 01896,85 m²BloqueadoValor oficial ainda não definidoSegmento: ExporuralQuadra RResumir",
+          "expanded": true,
+          "card": {
+            "left": 40,
+            "right": 280,
+            "top": 316,
+            "bottom": 396,
+            "width": 240,
+            "height": 80
+          },
+          "bar": {
+            "left": 19.390625,
+            "right": 300.609375,
+            "top": 257,
+            "bottom": 311,
+            "width": 281.21875,
+            "height": 54
+          },
+          "canvas": {
+            "left": 0,
+            "right": 320,
+            "top": 248,
+            "bottom": 568,
+            "width": 320,
+            "height": 320
+          },
+          "controls": [
+            {
+              "name": "Avançar",
+              "left": 14,
+              "right": 103.875,
+              "top": 433,
+              "bottom": 482,
+              "width": 89.875,
+              "height": 49
+            },
+            {
+              "name": "Voltar",
+              "left": 14,
+              "right": 103.875,
+              "top": 489,
+              "bottom": 538,
+              "width": 89.875,
+              "height": 49
+            },
+            {
+              "name": "Correr",
+              "left": 225.71875,
+              "right": 306,
+              "top": 489,
+              "bottom": 538,
+              "width": 80.28125,
+              "height": 49
+            }
+          ],
+          "belowHeader": true,
+          "aboveControls": true,
+          "overlapsHeader": false,
+          "overlappingControls": [],
+          "insideViewport": true,
+          "scrollHeight": 199,
+          "clientHeight": 78,
+          "officialPriceRows": 0,
+          "passed": true
+        }
+      },
+      {
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "metrics": {
+          "fps": 37.4,
+          "p95": 37.6,
+          "p99": 48.9,
+          "longestGap": 111.1,
+          "entryMs": 4956.5,
+          "elapsedMs": 20861.8,
+          "sampledFrames": 418,
+          "totalSampledFrames": 418,
+          "stallsOver50Ms": 4,
+          "unpresentedActiveFrames": 0,
+          "presentedFrames": 760,
+          "renderer": {
+            "calls": 689,
+            "triangles": 688892,
+            "geometries": 570,
+            "textures": 131,
+            "programs": 222,
+            "dpr": 0.99,
+            "width": 1013,
+            "height": 633,
+            "heapBytes": 262505522
+          },
+          "quality": "BALANCED",
+          "health": {
+            "complete": true,
+            "flags": [],
+            "value": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 5374,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            },
+            "visitHealth": {
+              "status": "ready",
+              "path": "post",
+              "presentedFrames": 5387,
+              "contextLosses": 0,
+              "lastErrorCode": null
+            }
+          },
+          "complete": true
+        },
+        "travelledMetres": 31.94,
+        "yawDeltaRadians": -0.044865087890625155,
+        "layout": {
+          "viewport": 1024,
+          "scrollWidth": 1024,
+          "touchAction": "none",
+          "buttons": [
+            {
+              "name": "1ª pessoa",
+              "x": 448.625,
+              "y": 144,
+              "width": 62.421875,
+              "height": 40
+            },
+            {
+              "name": "3ª pessoa",
+              "x": 511.046875,
+              "y": 144,
+              "width": 64.5625,
+              "height": 40
+            },
+            {
+              "name": "Ativar noite na visita",
+              "x": 579.609375,
+              "y": 144,
+              "width": 32,
+              "height": 40
+            },
+            {
+              "name": "Sair do Modo Visita",
+              "x": 613.609375,
+              "y": 144,
+              "width": 33,
+              "height": 40
+            },
+            {
+              "name": "Avançar",
+              "x": 14,
+              "y": 633,
+              "width": 89.875,
+              "height": 49
+            },
+            {
+              "name": "Voltar",
+              "x": 14,
+              "y": 689,
+              "width": 89.875,
+              "height": 49
+            },
+            {
+              "name": "Correr",
+              "x": 929.71875,
+              "y": 689,
+              "width": 80.28125,
+              "height": 49
+            }
+          ]
+        },
+        "inputChecks": {
+          "contactCount": 2,
+          "runningRequested": true,
+          "release": "touchEnd",
+          "runLatchedBefore": true,
+          "runLatchedAfter": true,
+          "walkingAndLooking": true,
+          "stoppedAfterRelease": true,
+          "latchPreserved": true,
+          "latchResetOnNewVisit": true
+        },
+        "expandedPOI": {
+          "region": "exporural",
+          "id": "reference:2026:q-r-01",
+          "text": "Q-R-01Lote 01896,85 m²BloqueadoValor oficial ainda não definidoSegmento: ExporuralQuadra RResumir",
+          "expanded": true,
+          "card": {
+            "left": 392,
+            "right": 632,
+            "top": 330.640625,
+            "bottom": 531.328125,
+            "width": 240,
+            "height": 200.6875
+          },
+          "bar": {
+            "left": 371.390625,
+            "right": 652.609375,
+            "top": 137,
+            "bottom": 191,
+            "width": 281.21875,
+            "height": 54
+          },
+          "canvas": {
+            "left": 0,
+            "right": 1024,
+            "top": 128,
+            "bottom": 768,
+            "width": 1024,
+            "height": 640
+          },
+          "controls": [
+            {
+              "name": "Avançar",
+              "left": 14,
+              "right": 103.875,
+              "top": 633,
+              "bottom": 682,
+              "width": 89.875,
+              "height": 49
+            },
+            {
+              "name": "Voltar",
+              "left": 14,
+              "right": 103.875,
+              "top": 689,
+              "bottom": 738,
+              "width": 89.875,
+              "height": 49
+            },
+            {
+              "name": "Correr",
+              "left": 929.71875,
+              "right": 1010,
+              "top": 689,
+              "bottom": 738,
+              "width": 80.28125,
+              "height": 49
+            }
+          ],
+          "belowHeader": true,
+          "aboveControls": true,
+          "overlapsHeader": false,
+          "overlappingControls": [],
+          "insideViewport": true,
+          "scrollHeight": 199,
+          "clientHeight": 199,
+          "officialPriceRows": 0,
+          "passed": true
+        }
+      }
+    ],
+    "hardware": {
+      "fixture": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "initialCanvas": {
+        "width": 390,
+        "height": 626
+      },
+      "initialDpr": 1.75,
+      "emulationOnly": true,
+      "physicalMobileValidated": false,
+      "limitation": "Chromium touch/viewport emulation on the reported host GPU; not physical iPhone/Safari or Android performance."
+    },
+    "executionCompletion": "final-snapshot-recorded",
+    "build": null,
+    "note": "Coverage status is not acceptance or proof that the harness process exited successfully.",
+    "expectedViewports": [
+      "390x844",
+      "844x390",
+      "320x568",
+      "1024x768"
+    ],
+    "summary": {
+      "fps": {
+        "min": 37.4,
+        "max": 50.3,
+        "observed": 4,
+        "missing": 0
+      },
+      "p95": {
+        "min": 28.5,
+        "max": 37.6,
+        "observed": 4,
+        "missing": 0
+      },
+      "p99": {
+        "min": 38.4,
+        "max": 53.4,
+        "observed": 4,
+        "missing": 0
+      },
+      "worstGapMs": 111.1,
+      "drawCalls": {
+        "min": 555,
+        "max": 785,
+        "observed": 4,
+        "missing": 0
+      },
+      "triangles": {
+        "min": 609324,
+        "max": 688892,
+        "observed": 4,
+        "missing": 0
+      },
+      "windowsBelow30Fps": 0,
+      "note": "Ranges of recorded windows, not pooled percentiles or averaged FPS. Overlapping/cumulative windows must not be summed."
+    },
+    "restoration": {
+      "complete": true,
+      "poseDelta": {
+        "position": 0,
+        "quaternion": 0,
+        "target": 0,
+        "projection": 2.8464989948502133
+      },
+      "sameScene": true,
+      "sameCamera": true,
+      "identityEqual": {
+        "canvasMounts": true,
+        "rendererCreates": true,
+        "controlsCreates": true,
+        "activeCanvases": true,
+        "activeControls": true
+      },
+      "beforeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "afterIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "equalWithinTolerance": false
+    },
+    "restorationNote": "Orientation/viewport changes legitimately affect projection; inspect deltas without requiring projection equality across sizes."
+  },
+  "status": "observations-complete",
+  "acceptance": "manual-review-required",
+  "incompleteScenarios": [],
+  "failedScenarios": [],
+  "sameBuildVerified": false,
+  "provenanceNote": "Timestamps do not prove a common commit; same-build evidence requires build metadata on every scenario.",
+  "baselineTraditional": null,
+  "candidateTraditional": null,
+  "tests": null,
+  "smoke": null,
+  "sources": {
+    "route.json": {
+      "status": "read",
+      "bytes": 80897,
+      "modifiedAt": "2026-09-22T03:42:57.100Z"
+    },
+    "cycles.json": {
+      "status": "read",
+      "bytes": 146554,
+      "modifiedAt": "2026-09-22T03:46:31.753Z"
+    },
+    "checks.json": {
+      "status": "read",
+      "bytes": 38654,
+      "modifiedAt": "2026-09-22T04:43:21.551Z"
+    },
+    "endurance.json": {
+      "status": "read",
+      "bytes": 25244,
+      "modifiedAt": "2026-09-22T04:06:08.379Z"
+    },
+    "mobile.json": {
+      "status": "read",
+      "bytes": 70107,
+      "modifiedAt": "2026-09-22T04:46:21.386Z"
+    },
+    "baseline-traditional.json": {
+      "status": "missing"
+    },
+    "candidate-traditional.json": {
+      "status": "missing"
+    },
+    "baseline-tests.json": {
+      "status": "missing"
+    },
+    "candidate-tests.json": {
+      "status": "missing"
+    },
+    "smoke.json": {
+      "status": "missing"
+    }
+  }
+}

@@ -60,12 +60,12 @@ describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
 
     for (const inactive of [
       { mapActive: false, reducedGraphics: false, documentVisibilityState: 'visible' as const, continuousRendering: true },
-      { mapActive: true, reducedGraphics: true, documentVisibilityState: 'visible' as const, continuousRendering: true },
       { mapActive: true, reducedGraphics: false, documentVisibilityState: 'hidden' as const, continuousRendering: true },
       { mapActive: true, reducedGraphics: false, documentVisibilityState: 'visible' as const, continuousRendering: false },
     ]) {
       expect(isCommercialMapAdaptiveQualitySamplingActive(inactive)).toBe(false);
     }
+    expect(isCommercialMapAdaptiveQualitySamplingActive({ mapActive: true, reducedGraphics: true, documentVisibilityState: 'visible', continuousRendering: true })).toBe(true);
   });
 
   it('integra pelo estado do R3F sem remount, timer paralelo ou reduced-motion', () => {
@@ -106,11 +106,11 @@ describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
       gestureActive: true,
     })).toBe(false);
 
-    expect(resolveCommercialMapInteractionPixelRatio(2)).toBe(1);
-    expect(resolveCommercialMapInteractionPixelRatio(1)).toBe(0.72);
-    expect(resolveCommercialMapInteractionPixelRatio(0.8)).toBe(0.72);
+    expect(resolveCommercialMapInteractionPixelRatio(2)).toBe(1.35);
+    expect(resolveCommercialMapInteractionPixelRatio(1)).toBe(0.9);
+    expect(resolveCommercialMapInteractionPixelRatio(0.8)).toBe(0.8);
     expect(resolveCommercialMapInteractionPixelRatio(0.65)).toBe(0.65);
-    expect(resolveCommercialMapInteractionPixelRatio(Number.NaN)).toBe(0.72);
+    expect(resolveCommercialMapInteractionPixelRatio(Number.NaN)).toBe(0.85);
     expect(shouldApplyCommercialMapPixelRatioNow({
       currentDpr: 1.35,
       nextDpr: 1.75,
@@ -136,7 +136,7 @@ describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
       fromTier: 'HIGH',
       toTier: 'ULTRA',
       gestureActive: true,
-    })).toBe(false);
+    })).toBe(true);
     expect(shouldDeferCommercialMapSceneQuality({
       fromTier: 'HIGH',
       toTier: 'MEDIUM',
@@ -146,11 +146,11 @@ describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
 
   it('reduz o DPR uma vez por gesto e restaura a base mais recente, não um snapshot antigo', () => {
     const state = createCommercialMapPixelRatioState(1.5);
-    expect(updateCommercialMapPixelRatioState(state, true)).toBe(1);
+    expect(updateCommercialMapPixelRatioState(state, true)).toBe(1.35);
     expect(updateCommercialMapPixelRatioState(state, true)).toBeNull();
     expect(updateCommercialMapPixelRatioState(state, true, 1.2)).toBeNull();
     expect(state.baseDpr).toBe(1.2);
-    expect(state.effectiveDpr).toBe(1);
+    expect(state.effectiveDpr).toBe(1.35);
     expect(updateCommercialMapPixelRatioState(state, false)).toBe(1.2);
     expect(updateCommercialMapPixelRatioState(state, false)).toBeNull();
   });
@@ -158,7 +158,7 @@ describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
   it('retém mudanças de viewport e reduced graphics até o fim do gesto sem acumular escalas', () => {
     const state = createCommercialMapPixelRatioState(1.25);
     for (let cycle = 0; cycle < 20; cycle += 1) {
-      expect(updateCommercialMapPixelRatioState(state, true)).toBe(0.9);
+      expect(updateCommercialMapPixelRatioState(state, true)).toBe(1.125);
       expect(updateCommercialMapPixelRatioState(state, true, 0.8)).toBeNull();
       expect(updateCommercialMapPixelRatioState(state, true, 1.25)).toBeNull();
       expect(updateCommercialMapPixelRatioState(state, false)).toBe(1.25);

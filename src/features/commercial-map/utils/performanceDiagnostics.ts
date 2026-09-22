@@ -7,6 +7,7 @@ export interface PerformanceEvent {
   at: number;
   duration?: number;
   failed?: boolean;
+  detail?: Record<string, unknown>;
 }
 
 export interface CommercialMapBootSnapshot {
@@ -23,10 +24,24 @@ let longTaskObserver: PerformanceObserver | undefined;
 let notificationPending = false;
 let publicationPending = false;
 let bootSession = 0;
+let bootActive = false;
 let claimedBootSession = -1;
 let bootVisitOwner: object | string | undefined;
 const syncTotals: Record<string, number> = {};
 const PREFIX = 'commercial-map:';
+
+/** Capture ownership when an asynchronous operation starts. A prewarm or an
+ * obsolete route must never publish completion into a later route's boot. */
+export type CommercialMapStageRecorder = (stage: string, detail?: Record<string, unknown>) => void;
+export function captureCommercialMapStageRecorder(): CommercialMapStageRecorder {
+  const session = bootSession;
+  const active = bootActive;
+  return (stage, detail) => {
+    if (!active || !bootActive || session !== bootSession) return;
+    markCommercialMapStage(stage, typeof detail?.duration === 'number' ? detail.duration : undefined,
+      typeof detail?.failed === 'boolean' ? detail.failed : undefined, detail);
+  };
+}
 
 function notifyBootListeners() {
   if (notificationPending) return;
@@ -51,8 +66,10 @@ export const subscribeCommercialMapBoot = (listener: () => void) => {
 /** A route session, not a query/refetch or environment toggle. No commercial payloads. */
 export function beginCommercialMapBoot() {
   bootSession += 1;
-  const initialNavigation = !snapshot.marks['module-requested'];
-  snapshot = { startedAt: initialNavigation ? 0 : performance.now(), marks: {}, interactive: false, commercialMapReady: false, failed: false };
+  bootActive = true;
+  // Always relative to the actual route activation, never to Portal dwell time.
+  // Document navigation remains a separate clock in the diagnostic summary.
+  snapshot = { startedAt: performance.now(), marks: {}, interactive: false, commercialMapReady: false, failed: false };
   for (const name of Object.keys(syncTotals)) delete syncTotals[name];
   if (commercialMapDiagnosticsEnabled && typeof window !== 'undefined') {
     window.__commercialMapPerformance = { events: [], longTasks: [] };
@@ -64,7 +81,7 @@ export function beginCommercialMapBoot() {
         for (const entry of list.getEntries()) tasks.push({ at: entry.startTime, duration: entry.duration });
         if (tasks.length > 500) tasks.splice(0, tasks.length - 500);
       });
-      longTaskObserver.observe({ type: 'longtask', buffered: initialNavigation });
+      longTaskObserver.observe({ type: 'longtask', buffered: false });
     }
   }
   for (const entry of performance.getEntriesByType?.('mark') ?? []) if (entry.name.startsWith(PREFIX)) performance.clearMarks(entry.name);
@@ -78,7 +95,7 @@ export function beginCommercialMapBoot() {
 export function claimCommercialMapBootVisit(owner: object | string) {
   if (bootVisitOwner === owner && claimedBootSession === bootSession) return false;
   const cachedVisit = claimedBootSession === bootSession;
-  if (cachedVisit) beginCommercialMapBoot();
+  if (cachedVisit || !bootActive) beginCommercialMapBoot();
   bootVisitOwner = owner;
   claimedBootSession = bootSession;
   if (cachedVisit) markCommercialMapStage('module-ready');
@@ -86,7 +103,15 @@ export function claimCommercialMapBootVisit(owner: object | string) {
 }
 
 export function releaseCommercialMapBootVisit(owner: object | string) {
-  if (bootVisitOwner === owner) bootVisitOwner = undefined;
+  if (bootVisitOwner === owner) {
+    bootVisitOwner = undefined;
+    // A successor's lazy factory can start before the previous page's queued
+    // cleanup. That older page must not close the new, still-unclaimed boot.
+    if (claimedBootSession === bootSession) {
+      bootActive = false;
+      longTaskObserver?.disconnect();
+    }
+  }
 }
 
 /** Durations overlap: do not add these independent critical-path spans together. */
@@ -95,10 +120,13 @@ export function summarizeCommercialMapBoot() {
   const span = (start: string, end: string) => m[start] !== undefined && m[end] !== undefined
     ? Math.round(m[end] - m[start]) : null;
   return {
+    routeStartedAt: snapshot.startedAt,
+    documentToInteractiveMs: m['first-interactive'] === undefined ? null : Math.round(m['first-interactive']),
     navigationToModuleMs: m['module-requested'] === undefined ? null : Math.round(m['module-requested'] - snapshot.startedAt),
     moduleMs: span('module-requested', 'module-ready'),
     rendererModuleMs: span('renderer-module-requested', 'renderer-module-ready'),
     dataMs: span('essential-data:start', 'essential-data:end'),
+    routeDataWaitMs: span('route-data-wait:start', 'route-data-wait:end'),
     rendererMs: span('renderer:create:start', 'renderer:create:end'),
     headquartersWorkerMs: span('b12-worker:start', 'b12-worker:end'),
     webglContextMs: span('webgl-context:start', 'webgl-context:end'),
@@ -106,6 +134,7 @@ export function summarizeCommercialMapBoot() {
     entityGeometryCpuMs: syncTotals['geometry-preparation'] ?? null,
     environmentMaterialMs: span('environment:materials:start', 'environment:materials:end'),
     proceduralTextureCpuMs: syncTotals.textures ?? null,
+    textureUploadMs: span('texture-upload:start', 'texture-upload:end'),
     cpuStagesMs: Object.fromEntries(Object.entries(syncTotals).map(([name, duration]) => [name, Math.round(duration)])),
     shaderDirectMs: span('compile-direct:start', 'compile-direct:end'),
     shaderPostMs: span('compile-post:start', 'compile-post:end'),
@@ -125,8 +154,8 @@ declare global {
   }
 }
 
-export function markCommercialMapStage(name: string, duration?: number, failed?: boolean) {
-  if (typeof window === 'undefined') return;
+export function markCommercialMapStage(name: string, duration?: number, failed?: boolean, detail?: Record<string, unknown>) {
+  if (typeof window === 'undefined' || !bootActive) return;
   const at = performance.now();
   const first = snapshot.marks[name] === undefined;
   if (first || failed || (name === 'essential-data:end' && snapshot.failed)
@@ -151,7 +180,7 @@ export function markCommercialMapStage(name: string, duration?: number, failed?:
   }
   if (!commercialMapDiagnosticsEnabled) return;
   const diagnostics = window.__commercialMapPerformance ??= { events: [] };
-  diagnostics.events.push({ name, at, duration, failed });
+  diagnostics.events.push({ name, at, duration, failed, detail });
   if (diagnostics.events.length > 500) diagnostics.events.splice(0, diagnostics.events.length - 500);
   diagnostics.summary = summarizeCommercialMapBoot();
   if (!publicationPending) {
@@ -177,13 +206,14 @@ export function measureCommercialMapSync<T>(name: string, task: () => T): T {
 
 export async function measureCommercialMapStage<T>(name: string, task: () => PromiseLike<T>): Promise<T> {
   const start = performance.now();
-  markCommercialMapStage(`${name}:start`);
+  const record = captureCommercialMapStageRecorder();
+  record(`${name}:start`);
   try {
     const result = await task();
-    markCommercialMapStage(`${name}:end`, performance.now() - start);
+    record(`${name}:end`, { duration: performance.now() - start });
     return result;
   } catch (error) {
-    markCommercialMapStage(`${name}:end`, performance.now() - start, true);
+    record(`${name}:end`, { duration: performance.now() - start, failed: true });
     throw error;
   }
 }

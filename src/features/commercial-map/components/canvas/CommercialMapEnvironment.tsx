@@ -1,5 +1,6 @@
 import { advanceSunrisePlayback, hasSunrisePlaybackFinished, updateSolarShadow } from '../../utils/lightingTransition';
 import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
+import { COMMERCIAL_MAP_CANONICAL_CONTENT, resolveCommercialMapExecutionPolicy } from '../../utils/executionPolicy';
 import { isCommercialMapPostReady, isCommercialSceneCompiling } from '../../utils/sceneShaderWarmup';
 import { advanceRainBlend, commercialRainRuntime } from '../../utils/rainRuntime';
 import { markCommercialMapStage } from '../../utils/performanceDiagnostics';
@@ -650,8 +651,7 @@ function createCommercialMapPostProcessing(
     luminanceThreshold: 3.2,
     luminanceSmoothing: 0.16,
     mipmapBlur: true,
-    // Keep the authored full-quality glow at rest. Interaction frames bypass
-    // this persistent stack, so these levels never tax orbit/pan/zoom.
+    // Keep the authored glow and the same persistent effects while navigating.
     levels: COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality.full.bloomLevels,
   });
   const toneMapping = new ToneMappingEffect({ mode: ToneMappingMode.ACES_FILMIC });
@@ -1013,7 +1013,7 @@ export function SunrisePostProcessing({
     };
     try {
       const current = pipeline.current;
-      if (enabled && !interactionActive && isCommercialMapPostReady(gl)
+      if (enabled && isCommercialMapPostReady(gl)
         && quality.bloomEnabled && current && !postFailed.current) {
         try {
           bindCommercialMapScreen(gl, size.width, size.height);
@@ -1162,7 +1162,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     ? 'reduced'
     : resolveCommercialMapEnvironmentQualityTier(adaptiveQualityTier, size);
   const initialQualityTier = useRef(qualityTier);
-  const quality = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality[qualityTier];
+  const shadowMapSize = resolveCommercialMapExecutionPolicy(reducedGraphics ? 'LOW' : adaptiveQualityTier).shadowMapSize;
   const cameraDistanceBounds = useMemo(
     () => resolveCommercialMapCameraDistanceBounds({
       bounds: extent,
@@ -1214,9 +1214,22 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     return target;
   }, [shadowAnchor]);
   const sunLight = useMemo(
-    () => configureSunLight(sunTarget, shadowFrustum, qualityTier),
-    [qualityTier, shadowFrustum, sunTarget],
+    () => configureSunLight(sunTarget, shadowFrustum, initialQualityTier.current),
+    [shadowFrustum, sunTarget],
   );
+  useLayoutEffect(() => {
+    const shadow = sunLight.shadow;
+    if (commercialMapDiagnosticsEnabled) gl.domElement.dataset.commercialMapShadowResolution = String(shadowMapSize);
+    if (shadow.mapSize.x === shadowMapSize) return;
+    // Only the target changes. Keep the light count/identity and shader layout.
+    shadow.map?.dispose();
+    shadow.map = null;
+    shadow.mapSize.set(shadowMapSize, shadowMapSize);
+    shadow.radius = resolveShadowRadiusTexels(3, shadowMapSize);
+    shadow.needsUpdate = true;
+    gl.shadowMap.needsUpdate = true;
+    invalidate();
+  }, [gl, invalidate, shadowMapSize, sunLight]);
   const activeGroundTextures = useMemo(() => {
     markCommercialMapStage('environment:textures:start');
     const repeatX = layout.outerGroundSize / ACTIVE_GROUND_PROFILE.tileWorldSize;
@@ -1247,7 +1260,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     const material = createBaseMaterial();
     markCommercialMapStage('environment:materials:end');
     const terrainDetail = resolveTerrainMultiscaleQualityOptions(
-      initialQualityTier.current as CommercialMapSunriseQualityTier,
+      COMMERCIAL_MAP_CANONICAL_CONTENT.materialProfile,
       cameraDistanceBounds.maxDistance,
       [extent.centerX, extent.centerZ],
     );
@@ -1290,7 +1303,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   }), [activeGroundMaterial, extent.centerX, extent.centerZ, layout.outerGroundSize, scene]);
   useLayoutEffect(() => {
     const terrainDetail = resolveTerrainMultiscaleQualityOptions(
-      qualityTier,
+      COMMERCIAL_MAP_CANONICAL_CONTENT.materialProfile,
       cameraDistanceBounds.maxDistance,
       [extent.centerX, extent.centerZ],
     );
@@ -1305,11 +1318,10 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     extent.centerX,
     extent.centerZ,
     normalGroundMaterial,
-    qualityTier,
   ]);
-  const reflectionTextureWidth = qualityTier === 'reduced'
-    ? COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.reducedTextureWidth
-    : COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.fullTextureWidth;
+  // PMREM dimensions enter every PBR program cache key. A technical tier must
+  // never invalidate the park's materials or alter its reflection definition.
+  const reflectionTextureWidth = COMMERCIAL_MAP_CANONICAL_CONTENT.reflectionTextureWidth;
   const { sky, celestialSun, reflectionTexture } = useCommercialMapAtmosphereResources({
     initialFrame, mode, palette, cloudOpacity,
     skyScale: layout.skyScale,
@@ -1528,7 +1540,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       celestialSun.material.uniforms.uRainBlend.value = rainBlend;
       sky.material.uniforms.nightBlend.value = nightBlend;
       sky.material.uniforms.rainBlend.value = rainBlend;
-      sunLight.shadow.radius = resolveShadowRadiusTexels(frame.shadowRadius + rainBlend * 1.5, quality.shadowMapSize);
+      sunLight.shadow.radius = resolveShadowRadiusTexels(frame.shadowRadius + rainBlend * 1.5, sunLight.shadow.mapSize.x);
       sunTarget.updateMatrixWorld();
       sunLight.updateMatrixWorld();
       if (ambientRef.current) {
@@ -1669,16 +1681,14 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       </mesh>
       <group visible={mode === 'normal'}>
         <EssentialSceneLayer id="territorial-context">
-          <TerritorialEnvironment reducedGraphics={qualityTier !== 'full'} />
+          <TerritorialEnvironment reducedGraphics={COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics} />
         </EssentialSceneLayer>
       </group>
       </group>
-      {/* The persistent composer remains allocated, but native MSAA renders
-          interaction frames directly. The refined post stack resumes after
-          damping settles, without target churn or a shader rebuild. */}
+      {/* Motion keeps the same effects; the DPR owner controls framebuffer cost. */}
       <SunrisePostProcessing
         qualityTier={qualityTier}
-        enabled={active && !cameraNavigating}
+        enabled={active}
         interactionActive={active && cameraNavigating}
       />
     </>

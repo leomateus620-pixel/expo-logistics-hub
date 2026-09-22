@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-09-22T02:42:52.169Z",
+  "source": "official-reference with the canonical restaurant unification",
+  "purpose": "Numerical regression at captured route coordinates; visual validation remains separate",
+  "characterRadius": 0.045,
+  "points": [
+    {
+      "name": "ICS seam",
+      "recordedPosition": {
+        "x": 7.549700669234649,
+        "y": -0.08,
+        "z": 6.2753844668157965
+      },
+      "pointHeight": -0.08,
+      "footSupportHeight": 0.13
+    },
+    {
+      "name": "Rua Bolivia margin on Brasilia route",
+      "recordedPosition": {
+        "x": 11.645069315449598,
+        "y": -0.08,
+        "z": -8.690192608452394
+      },
+      "pointHeight": -0.08,
+      "footSupportHeight": -0.08
+    },
+    {
+      "name": "Restaurant lawn",
+      "recordedPosition": {
+        "x": -16.31856149,
+        "y": -0.08,
+        "z": 5.89025731
+      },
+      "pointHeight": 0.03,
+      "footSupportHeight": 0.03
+    }
+  ],
+  "groundSurfaceCount": 5430,
+  "addedVisualMeshes": 0
+}

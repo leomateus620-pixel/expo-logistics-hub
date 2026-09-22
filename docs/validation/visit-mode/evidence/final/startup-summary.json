@@ -1,0 +1,565 @@
+{
+  "method": "Same local fixture renderer; fresh browser/context per case except SPA reopen. Route clock and click clock remain separate. No auth/network or physical mobile certification.",
+  "percentileLimit": "Exploratory samples. With n=3, nearest-rank p95 equals the observed maximum; it is not a production-tail estimate.",
+  "completeLimit": "Fully-presented time is the harness observation of hydration complete plus post ready, not an exact first-post timestamp. Null means not observed.",
+  "excluded": [],
+  "failures": [],
+  "groups": [
+    {
+      "name": "startup-desktop-b49524f3 / direct / automatic / desktop",
+      "samples": 3,
+      "routeToInteractiveMs": {
+        "n": 3,
+        "min": 12333,
+        "median": 12483,
+        "max": 14004,
+        "p95NearestRank": 14004
+      },
+      "clickToInteractiveMs": null,
+      "documentToInteractiveMs": {
+        "n": 3,
+        "min": 12733,
+        "median": 12958,
+        "max": 14529,
+        "p95NearestRank": 14529
+      },
+      "completePresentationObservedMs": null,
+      "longestRouteTaskMs": {
+        "n": 3,
+        "min": 679,
+        "median": 680,
+        "max": 696,
+        "p95NearestRank": 696
+      },
+      "sceneMs": {
+        "n": 3,
+        "min": 3628,
+        "median": 3667,
+        "max": 3715,
+        "p95NearestRank": 3715
+      },
+      "shaderDirectMs": {
+        "n": 3,
+        "min": 6111,
+        "median": 6443,
+        "max": 7699,
+        "p95NearestRank": 7699
+      },
+      "firstDrawCalls": {
+        "n": 3,
+        "min": 792,
+        "median": 792,
+        "max": 792,
+        "p95NearestRank": 792
+      },
+      "firstDrawTriangles": {
+        "n": 3,
+        "min": 671884,
+        "median": 671884,
+        "max": 671884,
+        "p95NearestRank": 671884
+      },
+      "firstDrawPrograms": {
+        "n": 3,
+        "min": 99,
+        "median": 99,
+        "max": 99,
+        "p95NearestRank": 99
+      },
+      "freshPrewarmChecks": []
+    },
+    {
+      "name": "startup-desktop-b49524f3 / immediate / automatic / desktop",
+      "samples": 3,
+      "routeToInteractiveMs": {
+        "n": 3,
+        "min": 12772,
+        "median": 12805,
+        "max": 13133,
+        "p95NearestRank": 13133
+      },
+      "clickToInteractiveMs": {
+        "n": 3,
+        "min": 12773.9,
+        "median": 12806.7,
+        "max": 13136,
+        "p95NearestRank": 13136
+      },
+      "documentToInteractiveMs": {
+        "n": 3,
+        "min": 13505,
+        "median": 13657,
+        "max": 14030,
+        "p95NearestRank": 14030
+      },
+      "completePresentationObservedMs": null,
+      "longestRouteTaskMs": {
+        "n": 3,
+        "min": 678,
+        "median": 679,
+        "max": 725,
+        "p95NearestRank": 725
+      },
+      "sceneMs": {
+        "n": 3,
+        "min": 3598,
+        "median": 3643,
+        "max": 3669,
+        "p95NearestRank": 3669
+      },
+      "shaderDirectMs": {
+        "n": 3,
+        "min": 6299,
+        "median": 6763,
+        "max": 6857,
+        "p95NearestRank": 6857
+      },
+      "firstDrawCalls": {
+        "n": 3,
+        "min": 792,
+        "median": 792,
+        "max": 792,
+        "p95NearestRank": 792
+      },
+      "firstDrawTriangles": {
+        "n": 3,
+        "min": 671884,
+        "median": 671884,
+        "max": 671884,
+        "p95NearestRank": 671884
+      },
+      "firstDrawPrograms": {
+        "n": 3,
+        "min": 99,
+        "median": 99,
+        "max": 99,
+        "p95NearestRank": 99
+      },
+      "freshPrewarmChecks": [
+        {
+          "round": 1,
+          "contexts": 0,
+          "canvases": 0,
+          "bootCreated": false,
+          "stages": {
+            "modules": "pending",
+            "data": "pending",
+            "cpu": "pending",
+            "assets": "pending"
+          }
+        },
+        {
+          "round": 2,
+          "contexts": 0,
+          "canvases": 0,
+          "bootCreated": false,
+          "stages": {
+            "modules": "pending",
+            "data": "pending",
+            "cpu": "pending",
+            "assets": "pending"
+          }
+        },
+        {
+          "round": 3,
+          "contexts": 0,
+          "canvases": 0,
+          "bootCreated": false,
+          "stages": {
+            "modules": "running",
+            "data": "pending",
+            "cpu": "pending",
+            "assets": "pending"
+          }
+        }
+      ]
+    },
+    {
+      "name": "startup-desktop-b49524f3 / prewarmed / automatic / desktop",
+      "samples": 3,
+      "routeToInteractiveMs": {
+        "n": 3,
+        "min": 11555,
+        "median": 12657,
+        "max": 12739,
+        "p95NearestRank": 12739
+      },
+      "clickToInteractiveMs": {
+        "n": 3,
+        "min": 11556.6,
+        "median": 12658.8,
+        "max": 12741.1,
+        "p95NearestRank": 12741.1
+      },
+      "documentToInteractiveMs": {
+        "n": 3,
+        "min": 14012,
+        "median": 15036,
+        "max": 15519,
+        "p95NearestRank": 15519
+      },
+      "completePresentationObservedMs": null,
+      "longestRouteTaskMs": {
+        "n": 3,
+        "min": 4451,
+        "median": 5720,
+        "max": 6287,
+        "p95NearestRank": 6287
+      },
+      "sceneMs": {
+        "n": 3,
+        "min": 3679,
+        "median": 4063,
+        "max": 4243,
+        "p95NearestRank": 4243
+      },
+      "shaderDirectMs": {
+        "n": 3,
+        "min": 6501,
+        "median": 7018,
+        "max": 7227,
+        "p95NearestRank": 7227
+      },
+      "firstDrawCalls": {
+        "n": 3,
+        "min": 792,
+        "median": 792,
+        "max": 792,
+        "p95NearestRank": 792
+      },
+      "firstDrawTriangles": {
+        "n": 3,
+        "min": 671884,
+        "median": 671884,
+        "max": 671884,
+        "p95NearestRank": 671884
+      },
+      "firstDrawPrograms": {
+        "n": 3,
+        "min": 99,
+        "median": 99,
+        "max": 99,
+        "p95NearestRank": 99
+      },
+      "freshPrewarmChecks": [
+        {
+          "round": 1,
+          "contexts": 0,
+          "canvases": 0,
+          "bootCreated": false,
+          "stages": {
+            "modules": "complete",
+            "data": "complete",
+            "cpu": "complete",
+            "assets": "complete"
+          }
+        },
+        {
+          "round": 2,
+          "contexts": 0,
+          "canvases": 0,
+          "bootCreated": false,
+          "stages": {
+            "modules": "complete",
+            "data": "complete",
+            "cpu": "complete",
+            "assets": "complete"
+          }
+        },
+        {
+          "round": 3,
+          "contexts": 0,
+          "canvases": 0,
+          "bootCreated": false,
+          "stages": {
+            "modules": "complete",
+            "data": "complete",
+            "cpu": "complete",
+            "assets": "complete"
+          }
+        }
+      ]
+    },
+    {
+      "name": "startup-desktop-b49524f3 / intent / automatic / desktop",
+      "samples": 3,
+      "routeToInteractiveMs": {
+        "n": 3,
+        "min": 11477,
+        "median": 11889,
+        "max": 12076,
+        "p95NearestRank": 12076
+      },
+      "clickToInteractiveMs": {
+        "n": 3,
+        "min": 11478.2,
+        "median": 11890.4,
+        "max": 12077.5,
+        "p95NearestRank": 12077.5
+      },
+      "documentToInteractiveMs": {
+        "n": 3,
+        "min": 13553,
+        "median": 13952,
+        "max": 14194,
+        "p95NearestRank": 14194
+      },
+      "completePresentationObservedMs": null,
+      "longestRouteTaskMs": {
+        "n": 3,
+        "min": 674,
+        "median": 677,
+        "max": 678,
+        "p95NearestRank": 678
+      },
+      "sceneMs": {
+        "n": 3,
+        "min": 3753,
+        "median": 3761,
+        "max": 3791,
+        "p95NearestRank": 3791
+      },
+      "shaderDirectMs": {
+        "n": 3,
+        "min": 6533,
+        "median": 6810,
+        "max": 6984,
+        "p95NearestRank": 6984
+      },
+      "firstDrawCalls": {
+        "n": 3,
+        "min": 792,
+        "median": 792,
+        "max": 792,
+        "p95NearestRank": 792
+      },
+      "firstDrawTriangles": {
+        "n": 3,
+        "min": 671884,
+        "median": 671884,
+        "max": 671884,
+        "p95NearestRank": 671884
+      },
+      "firstDrawPrograms": {
+        "n": 3,
+        "min": 99,
+        "median": 99,
+        "max": 99,
+        "p95NearestRank": 99
+      },
+      "freshPrewarmChecks": [
+        {
+          "round": 1,
+          "contexts": 0,
+          "canvases": 0,
+          "bootCreated": false,
+          "stages": {
+            "modules": "complete",
+            "data": "complete",
+            "cpu": "running",
+            "assets": "pending"
+          }
+        },
+        {
+          "round": 2,
+          "contexts": 0,
+          "canvases": 0,
+          "bootCreated": false,
+          "stages": {
+            "modules": "complete",
+            "data": "complete",
+            "cpu": "running",
+            "assets": "pending"
+          }
+        },
+        {
+          "round": 3,
+          "contexts": 0,
+          "canvases": 0,
+          "bootCreated": false,
+          "stages": {
+            "modules": "complete",
+            "data": "complete",
+            "cpu": "running",
+            "assets": "pending"
+          }
+        }
+      ]
+    },
+    {
+      "name": "startup-desktop-b49524f3 / reopen / automatic / desktop",
+      "samples": 3,
+      "routeToInteractiveMs": {
+        "n": 3,
+        "min": 4866,
+        "median": 4963,
+        "max": 7424,
+        "p95NearestRank": 7424
+      },
+      "clickToInteractiveMs": {
+        "n": 3,
+        "min": 4866.7,
+        "median": 4963.3,
+        "max": 7425.5,
+        "p95NearestRank": 7425.5
+      },
+      "documentToInteractiveMs": {
+        "n": 3,
+        "min": 71513,
+        "median": 73449,
+        "max": 78217,
+        "p95NearestRank": 78217
+      },
+      "completePresentationObservedMs": null,
+      "longestRouteTaskMs": {
+        "n": 3,
+        "min": 3382,
+        "median": 3464,
+        "max": 3537,
+        "p95NearestRank": 3537
+      },
+      "sceneMs": {
+        "n": 3,
+        "min": 3007,
+        "median": 3081,
+        "max": 3229,
+        "p95NearestRank": 3229
+      },
+      "shaderDirectMs": {
+        "n": 3,
+        "min": 638,
+        "median": 661,
+        "max": 2975,
+        "p95NearestRank": 2975
+      },
+      "firstDrawCalls": {
+        "n": 3,
+        "min": 792,
+        "median": 792,
+        "max": 792,
+        "p95NearestRank": 792
+      },
+      "firstDrawTriangles": {
+        "n": 3,
+        "min": 671884,
+        "median": 671884,
+        "max": 671884,
+        "p95NearestRank": 671884
+      },
+      "firstDrawPrograms": {
+        "n": 3,
+        "min": 108,
+        "median": 108,
+        "max": 108,
+        "p95NearestRank": 108
+      },
+      "freshPrewarmChecks": []
+    },
+    {
+      "name": "startup-delivery-prewarmed / prewarmed / automatic / desktop",
+      "samples": 3,
+      "routeToInteractiveMs": {
+        "n": 3,
+        "min": 11257,
+        "median": 11717,
+        "max": 12009,
+        "p95NearestRank": 12009
+      },
+      "clickToInteractiveMs": {
+        "n": 3,
+        "min": 11258.3,
+        "median": 11718.5,
+        "max": 12009.9,
+        "p95NearestRank": 12009.9
+      },
+      "documentToInteractiveMs": {
+        "n": 3,
+        "min": 13725,
+        "median": 14444,
+        "max": 14502,
+        "p95NearestRank": 14502
+      },
+      "completePresentationObservedMs": null,
+      "longestRouteTaskMs": {
+        "n": 3,
+        "min": 4024,
+        "median": 4052,
+        "max": 4096,
+        "p95NearestRank": 4096
+      },
+      "sceneMs": {
+        "n": 3,
+        "min": 3629,
+        "median": 3642,
+        "max": 3708,
+        "p95NearestRank": 3708
+      },
+      "shaderDirectMs": {
+        "n": 3,
+        "min": 6202,
+        "median": 6606,
+        "max": 6920,
+        "p95NearestRank": 6920
+      },
+      "firstDrawCalls": {
+        "n": 3,
+        "min": 792,
+        "median": 792,
+        "max": 792,
+        "p95NearestRank": 792
+      },
+      "firstDrawTriangles": {
+        "n": 3,
+        "min": 671884,
+        "median": 671884,
+        "max": 671884,
+        "p95NearestRank": 671884
+      },
+      "firstDrawPrograms": {
+        "n": 3,
+        "min": 99,
+        "median": 99,
+        "max": 99,
+        "p95NearestRank": 99
+      },
+      "freshPrewarmChecks": [
+        {
+          "round": 1,
+          "contexts": 0,
+          "canvases": 0,
+          "bootCreated": false,
+          "stages": {
+            "modules": "complete",
+            "data": "complete",
+            "cpu": "complete",
+            "assets": "complete"
+          }
+        },
+        {
+          "round": 2,
+          "contexts": 0,
+          "canvases": 0,
+          "bootCreated": false,
+          "stages": {
+            "modules": "complete",
+            "data": "complete",
+            "cpu": "complete",
+            "assets": "complete"
+          }
+        },
+        {
+          "round": 3,
+          "contexts": 0,
+          "canvases": 0,
+          "bootCreated": false,
+          "stages": {
+            "modules": "complete",
+            "data": "complete",
+            "cpu": "complete",
+            "assets": "complete"
+          }
+        }
+      ]
+    }
+  ]
+}

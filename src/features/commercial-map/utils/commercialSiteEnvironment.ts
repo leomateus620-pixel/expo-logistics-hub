@@ -422,14 +422,17 @@ function planSignature(cells: readonly CommercialSiteEnvironmentCell[]) {
 
 export function buildCommercialSiteEnvironmentPlan({
   entities = OFFICIAL_REFERENCE_ENTITIES,
-  reducedGraphics = false,
+  reducedGraphics: _legacyReducedGraphics = false,
+  preserveVisitGroundPlacement: _preserveVisitGroundPlacement = false,
   treatmentOwnerIdentifiers,
 }: {
   entities?: readonly MapEntity[];
   reducedGraphics?: boolean;
+  preserveVisitGroundPlacement?: boolean;
   /** Optional presentation-only scope; omitted preserves the complete shared plan. */
   treatmentOwnerIdentifiers?: readonly string[];
 } = {}): CommercialSiteEnvironmentPlan {
+  const reducedGraphics = false;
   const hardSurfaceMasks = buildCommercialSiteHardSurfaceMasks(entities);
   const entitiesByIdentifier = new Map<string, MapEntity[]>();
   entities.forEach((entity) => {

@@ -25,6 +25,7 @@ const NO_RAYCAST = () => undefined;
 interface CommercialSiteEnvironmentLayerProps {
   entities: readonly MapEntity[];
   reducedGraphics: boolean;
+  preserveVisitGroundPlacement?: boolean;
   activeOwnerIdentifiers?: ReadonlySet<string> | null;
   visible?: boolean;
   opacity?: number;
@@ -147,13 +148,14 @@ function createMaterial(
 export const CommercialSiteEnvironmentLayer = memo(function CommercialSiteEnvironmentLayer({
   entities,
   reducedGraphics,
+  preserveVisitGroundPlacement = false,
   activeOwnerIdentifiers,
   visible = true,
   opacity = 1,
 }: CommercialSiteEnvironmentLayerProps) {
   const renderer = useThree((state) => state.gl);
   const maximumAnisotropy = renderer.capabilities.getMaxAnisotropy();
-  const plan = useMemo(() => buildCommercialSiteEnvironmentPlan({ entities, reducedGraphics }), [entities, reducedGraphics]);
+  const plan = useMemo(() => buildCommercialSiteEnvironmentPlan({ entities, reducedGraphics, preserveVisitGroundPlacement }), [entities, reducedGraphics, preserveVisitGroundPlacement]);
   const activeCells = useMemo(
     () => selectCommercialSiteEnvironmentCells(plan, activeOwnerIdentifiers),
     [activeOwnerIdentifiers, plan],

@@ -228,10 +228,13 @@ function writePlacements(
 
 export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLayer({
   reducedGraphics,
+  preserveVisitTreePlacement = false,
   surfacesVisible = true,
   vegetationVisible = true,
 }: {
   reducedGraphics: boolean;
+  /** Quality can simplify leaves without moving a trunk away from its collider. */
+  preserveVisitTreePlacement?: boolean;
   surfacesVisible?: boolean;
   vegetationVisible?: boolean;
 }) {
@@ -250,8 +253,14 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
   }, []);
   const { invalidate } = useThree();
   const presentation = useMemo(
-    () => resolveParkAccessEnvironmentPresentation(reducedGraphics, vegetationEnabled),
-    [reducedGraphics, vegetationEnabled],
+    () => {
+      const result = resolveParkAccessEnvironmentPresentation(reducedGraphics, vegetationEnabled);
+      if (!preserveVisitTreePlacement || !reducedGraphics || !vegetationEnabled) return result;
+      // The existing reduced generator changes spacing, not just density.
+      // Keep trunk positions physical while retaining reduced understory/detail.
+      return { ...result, ambientTrees: resolveParkAccessEnvironmentPresentation(false, true).ambientTrees };
+    },
+    [reducedGraphics, preserveVisitTreePlacement, vegetationEnabled],
   );
   const geometries = useMemo(() => ({
     environment: mergeSurfaceGeometries(presentation.environmentalSurfaces),

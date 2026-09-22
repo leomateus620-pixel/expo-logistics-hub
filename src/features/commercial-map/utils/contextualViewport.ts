@@ -1,4 +1,4 @@
-import { MathUtils, Vector3, type PerspectiveCamera } from 'three';
+import type { Vector3, PerspectiveCamera } from 'three';
 
 export interface ContextualViewportInsets { left: number; right: number; top: number; bottom: number }
 type ViewportRect = Pick<DOMRect, 'left' | 'right' | 'top' | 'bottom' | 'width' | 'height'>;
@@ -18,9 +18,9 @@ export function resolveContextualViewportInsets(viewport: ViewportRect, panels: 
       else if (panel.right >= viewport.right - 24) insets.right = Math.max(insets.right, viewport.right - panel.left);
     }
   }
-  insets.left = MathUtils.clamp(insets.left, 0, viewport.width * 0.6);
-  insets.right = MathUtils.clamp(insets.right, 0, viewport.width * 0.6);
-  insets.bottom = MathUtils.clamp(insets.bottom, 0, viewport.height * 0.78);
+  insets.left = Math.max(0, Math.min(viewport.width * 0.6, insets.left));
+  insets.right = Math.max(0, Math.min(viewport.width * 0.6, insets.right));
+  insets.bottom = Math.max(0, Math.min(viewport.height * 0.78, insets.bottom));
   return insets;
 }
 

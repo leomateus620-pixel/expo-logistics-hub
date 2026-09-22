@@ -1,0 +1,22 @@
+const path = require('node:path');
+const { out, launch, boot, click, snapshot, enter, leave, save } = require('./visit-browser.cjs');
+let browser;
+(async () => {
+  const session = await launch(); browser = session.browser;
+  const { page, errors } = session;
+  await boot(page);
+  const before = await snapshot(page);
+  await enter(page); await page.waitForTimeout(5000);
+  const first = await snapshot(page); console.log('first', JSON.stringify(first.visit));
+  await page.screenshot({ path: path.join(out, 'candidate-first.png') });
+  await page.keyboard.down('KeyW'); await page.waitForTimeout(5000); await page.keyboard.up('KeyW');
+  await click(page, '3ª pessoa'); await page.waitForTimeout(1500);
+  await page.keyboard.down('KeyW'); await page.keyboard.down('ShiftLeft'); await page.waitForTimeout(10000);
+  await page.keyboard.up('KeyW'); await page.keyboard.up('ShiftLeft');
+  const third = await snapshot(page); console.log('third', JSON.stringify(third.visit));
+  await page.screenshot({ path: path.join(out, 'candidate-third.png') });
+  await leave(page);
+  const after = await snapshot(page);
+  save('smoke.json', { fixture: true, before, first, third, after, errors });
+  console.log('returned', JSON.stringify({ identity: after.identity, errors }));
+})().catch(e => { console.error(e); process.exitCode = 1; }).finally(async () => { await browser?.close(); });

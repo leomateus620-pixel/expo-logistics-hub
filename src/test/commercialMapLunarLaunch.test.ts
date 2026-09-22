@@ -112,7 +112,7 @@ describe('experiência cinematográfica do Foguete Lunar', () => {
     expect(LUNAR_LAUNCH_HIT_TARGET.radius).toBeLessThanOrEqual(0.5);
   });
 
-  it('reduz partículas antes de reduzir a experiência de câmera', () => {
+  it('preserva partículas e efeitos em desktop, mobile e preferência técnica reduzida', () => {
     const standard = resolveLunarLaunchQuality({
       viewportWidth: 1440,
       viewportHeight: 900,
@@ -138,8 +138,9 @@ describe('experiência cinematográfica do Foguete Lunar', () => {
     expect(standard.tier).toBe('standard');
     expect(mobile).toMatchObject({ tier: 'mobile', mobile: true, portrait: true });
     expect(reduced.tier).toBe('reduced');
-    expect(standard.hotParticles).toBeGreaterThan(mobile.hotParticles);
-    expect(mobile.hotParticles).toBeGreaterThan(reduced.hotParticles);
+    for (const quality of [mobile, reduced]) {
+      expect(quality).toMatchObject({ hotParticles: standard.hotParticles, smoke: standard.smoke, dust: standard.dust, sparks: standard.sparks, shadowRefreshDuringIgnition: true });
+    }
     expect(LUNAR_LAUNCH_RENDER_BUDGET.primaryDrawCalls).toBeLessThanOrEqual(6);
   });
 
@@ -227,7 +228,7 @@ describe('experiência cinematográfica do Foguete Lunar', () => {
     expect(pageSource).toContain('lunarLaunchPreviousPanel === \'details\'');
     expect(canvasSource).toContain('interface LunarCameraSnapshot');
     expect(canvasSource).toContain('scratch.quaternion.slerpQuaternions(');
-    expect(canvasSource).toContain('enabled={!lunarCameraLocked && !transitionControlsLocked}');
+    expect(canvasSource).toContain('enabled={!(visitEnabled && !interiorEntity) && !lunarCameraLocked && !transitionControlsLocked}');
     expect(canvasSource).toContain('completeLunarLaunch(false)');
     expect(canvasSource).toContain('const liveLaunchState = useCommercialMapStore.getState()');
     expect(canvasSource).toContain('liveLaunchState.lunarLaunchSkipRequested');

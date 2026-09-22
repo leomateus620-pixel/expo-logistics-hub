@@ -29,6 +29,8 @@ import {
   useMapPermissions,
 } from './hooks/useCommercialMap';
 import { useCommercialMapStore } from './state/useCommercialMapStore';
+import { useVisitStore } from './visit/useVisitStore';
+import { VisitOverlay } from './visit/VisitOverlay';
 import { preloadCommercialMapCanvas } from './utils/preloadCanvas';
 const CommercialMapCanvas = lazy(preloadCommercialMapCanvas);
 import { CommercialMapRendererStatus } from './components/CommercialMapRendererStatus';
@@ -71,6 +73,7 @@ import { canHandleCommercialMapEscape } from './utils/contextualNavigation';
 import type { CommercialMapData, CommercialMapQueryScope, MapPermissions } from './types';
 import './commercial-map.css';
 import './commercial-map-mobile.css';
+import './visit/visit.css';
 
 import { useWebGLAvailability } from './hooks/useWebGLAvailability';
 import { PublicInterestDialog } from './public/PublicInterestDialog';
@@ -175,11 +178,14 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const permissions = isCommissionScope || isPreview ? COMMISSION_READ_ONLY_PERMISSIONS : resolvedPermissions;
   const { bootstrap, exporuralSync, publish } = useMapMutations();
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
+  const visitEnabled = useVisitStore((state) => state.enabled);
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const exitInterior = useCommercialMapStore((state) => state.exitInterior);
   const activePanel = useCommercialMapStore((state) => state.activePanel);
   const setActivePanel = useCommercialMapStore((state) => state.setActivePanel);
   const workspaceMode = useCommercialMapStore((state) => state.workspaceMode);
+  const workspaceBeforeVisit = useRef(workspaceMode);
+  if (!visitEnabled) workspaceBeforeVisit.current = workspaceMode;
   const setWorkspaceMode = useCommercialMapStore((state) => state.setWorkspaceMode);
   const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
@@ -207,8 +213,21 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     : 'full-map';
   const lunarLaunchActive = lunarLaunchPhase !== 'idle';
   const lunarCinematicUiActive = lunarLaunchActive || lunarLaunchReturning;
+  const previousMapScope = useRef(mapScopeKey);
+
+  useEffect(() => () => {
+    const visit = useVisitStore.getState();
+    if (visit.enabled) { visit.exit(); visit.finishExit(); }
+  }, []);
 
   useEffect(() => {
+    // A commission change replaces the authorized snapshot. Do not carry a
+    // visitor or return selection from the previous scope into the new one.
+    if (previousMapScope.current !== mapScopeKey && useVisitStore.getState().enabled) {
+      useVisitStore.getState().exit();
+      useVisitStore.getState().finishExit();
+    }
+    previousMapScope.current = mapScopeKey;
     activateScope(mapScopeKey, lockedSegmentId);
   }, [activateScope, lockedSegmentId, mapScopeKey]);
 
@@ -284,6 +303,16 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
 
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
+      const visit = useVisitStore.getState();
+      if (visit.enabled) {
+        if (visit.activeInterior && canHandleCommercialMapEscape(event)) {
+          event.preventDefault();
+          visit.leaveInterior();
+        }
+        // Desktop visit input owns Escape outside an explicitly opened interior.
+        // Hidden map search and panels must never steal keyboard focus here.
+        return;
+      }
       if (
         !lunarCinematicUiActive
         && (event.metaKey || event.ctrlKey)
@@ -326,7 +355,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   useEffect(() => {
     if (interiorEntityId) {
       lastInteriorEntityId.current = interiorEntityId;
-      const frame = window.requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('[data-map-interior-back]')?.focus());
+      const frame = window.requestAnimationFrame(() => document.querySelector<HTMLButtonElement>(
+        visitEnabled ? '[data-visit-leave-interior]' : '[data-map-interior-back]',
+      )?.focus());
       return () => window.cancelAnimationFrame(frame);
     }
     if (!lastInteriorEntityId.current) return undefined;
@@ -342,7 +373,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
       lastInteriorEntityId.current = null;
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [interiorEntityId]);
+  }, [interiorEntityId, visitEnabled]);
 
   useEffect(() => {
     if (workspaceMode === 'edit' && !selectedEntity) setWorkspaceMode('3d');
@@ -472,15 +503,18 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
 
   return (
     <section
-      className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${hydrologicalModeActive ? 'is-hydrological-mode' : ''} ${parkingInspectionOpen ? 'is-parking-inspection' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''} ${lunarCinematicUiActive ? 'is-lunar-launch-active' : ''} ${lunarLaunchReturnAvailable ? 'has-lunar-launch-return' : ''}`}
+      className={`commercial-map-shell ${visitEnabled ? 'is-visit-mode' : ''} ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${hydrologicalModeActive ? 'is-hydrological-mode' : ''} ${parkingInspectionOpen ? 'is-parking-inspection' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''} ${lunarCinematicUiActive ? 'is-lunar-launch-active' : ''} ${lunarLaunchReturnAvailable ? 'has-lunar-launch-return' : ''}`}
       aria-label="Plataforma de gestão do mapa comercial"
     >
       <CommercialMapHeaderTools
         managementActions={managementActions}
         salesAvailable={webglAvailable && data.source === 'database' && permissions.canManageSales}
+        visitAvailable={areaScope === 'park' && webglAvailable && !interiorEntity && !lunarCinematicUiActive}
+        visitEntityId={selectedLot && selectedEntity?.classification !== 'INTERNAL_STAND' ? selectedEntity?.id : undefined}
       />
 
       <div className="commercial-map-body">
+        <div style={{ display: visitEnabled && !interiorEntity ? 'none' : 'contents' }} data-visit-preserved-dock>
         <CommercialMapDock
           entities={scopedData.entities}
           lots={scopedData.lots}
@@ -504,11 +538,15 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
             synchronizing={bootstrap.isPending}
           /> : null}
         />
+        </div>
 
         <div id="commercial-map-viewport" className={`commercial-map-viewport${webglAvailable ? '' : ' is-webgl-fallback'}`}>
 
-        {webglAvailable && workspaceMode === '3d' && permissions.canManageSales && (
+        {webglAvailable && workspaceMode === '3d' && permissions.canManageSales
+          && (!visitEnabled || workspaceBeforeVisit.current === '3d') && (
+          <div style={{ display: visitEnabled ? 'none' : 'contents' }} data-visit-preserved-sales>
           <SalesModeLayer projectId={data.project?.id ?? null} />
+          </div>
         )}
 
         {webglAvailable && (
@@ -538,6 +576,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
               </Profiler>
               </Suspense>
               <CommercialMapRendererStatus />
+              <VisitOverlay />
               <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer"
                 style={{position:'absolute',right:8,bottom:8,zIndex:5,fontSize:10,padding:'2px 5px',borderRadius:3,background:'#f5f7efdd',color:'#384b42'}}>
                 Entorno © OpenStreetMap
@@ -575,7 +614,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                   Restaurando a vista anterior…
                 </div>
               )}
-              {lunarLaunchReturnAvailable && !lunarCinematicUiActive && (
+              {lunarLaunchReturnAvailable && !lunarCinematicUiActive && !visitEnabled && (
                 <button
                   type="button"
                   className="commercial-map-lunar-return"
@@ -587,7 +626,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                 </button>
               )}
               {!interiorEntity && (
-                <>
+                <div style={{ display: visitEnabled ? 'none' : 'contents' }} data-visit-preserved-controls>
                   {!lunarCinematicUiActive && <CommercialMapTopBar
                     areaScope={areaScope}
                     permissions={permissions}
@@ -609,10 +648,10 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                   {parkingAvailable && !lunarCinematicUiActive && (
                     <ParkingInspector blocks={REAR_PARKING_BLOCKS} />
                   )}
-                </>
+                </div>
               )}
 
-              {!interiorEntityId && scopedData.lots.length === 0 && (
+              {!visitEnabled && !interiorEntityId && scopedData.lots.length === 0 && (
                 <div className="commercial-map-onboarding-note">
                   <Sparkles />
                   <span><strong>Parque digitalizado, cadastro comercial protegido</strong>A base não contém lotes fictícios. Trace e valide cada unidade antes de ativar preços e vendas.</span>
@@ -620,7 +659,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
               )}
             </div>
 
-            {workspaceMode === '3d' && !interiorEntityId && activePanel === 'layers' && (
+            {!visitEnabled && workspaceMode === '3d' && !interiorEntityId && activePanel === 'layers' && (
               <MapFeatureBoundary id="layers">
               <LayersPanel
                 layers={data.layers}
@@ -630,14 +669,14 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
               />
               </MapFeatureBoundary>
             )}
-            {workspaceMode === '3d' && !interiorEntityId && activePanel === 'results' && <MapFeatureBoundary id="results"><ResultsPanel explorer={mapFilter} /></MapFeatureBoundary>}
+            {!visitEnabled && workspaceMode === '3d' && !interiorEntityId && activePanel === 'results' && <MapFeatureBoundary id="results"><ResultsPanel explorer={mapFilter} /></MapFeatureBoundary>}
             {workspaceMode === '3d' && !interiorEntityId
               && selectedEntity
               && (activePanel === 'details' || lunarLaunchPreviousPanel === 'details')
               && (
                 <div
                   className="commercial-map-details-panel-presence"
-                  hidden={activePanel !== 'details' || lunarCinematicUiActive}
+                  hidden={visitEnabled || activePanel !== 'details' || lunarCinematicUiActive}
                 >
                   <MapPanelBoundary resetKey={selectedEntity.id}>
                     <Suspense fallback={<EntityDetailsPanelSkeleton />}>
@@ -646,7 +685,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                   </MapPanelBoundary>
                 </div>
               )}
-            {workspaceMode === '3d' && !interiorEntityId && activePanel === 'calibration' && <MapFeatureBoundary id="calibration"><CalibrationPanel project={data.project} calibration={data.calibration} /></MapFeatureBoundary>}
+            {!visitEnabled && workspaceMode === '3d' && !interiorEntityId && activePanel === 'calibration' && <MapFeatureBoundary id="calibration"><CalibrationPanel project={data.project} calibration={data.calibration} /></MapFeatureBoundary>}
           </>
         )}
 

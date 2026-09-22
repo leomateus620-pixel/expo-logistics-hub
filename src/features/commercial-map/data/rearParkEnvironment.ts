@@ -204,7 +204,8 @@ export interface RearTreeInstance {
 }
 
 /** Instâncias determinísticas, filtradas por terreno, vias e geometria oficial. */
-export function buildRearTreeInstances(reducedGraphics = false): RearTreeInstance[] {
+export function buildRearTreeInstances(_legacyReducedGraphics = false): RearTreeInstance[] {
+  const reducedGraphics = false;
   const corridors = rearRoadCorridors(true);
   const budget = reducedGraphics
     ? REAR_ENVIRONMENT_BUDGET.reducedTreeInstances
@@ -270,8 +271,7 @@ export interface RearPoleInstance {
 }
 
 /** Postes apenas no acesso A5–BR; nenhuma das três vias vira corredor urbano. */
-export function buildRearPoleInstances(reducedGraphics = false): RearPoleInstance[] {
-  if (reducedGraphics) return [];
+export function buildRearPoleInstances(_legacyReducedGraphics = false): RearPoleInstance[] {
   const spacing = rearRoadSourceToLocalLength(90);
   const poles: RearPoleInstance[] = [];
   const footprints = buildRearRoadCorridorFootprints(undefined, { includeShoulders: true });

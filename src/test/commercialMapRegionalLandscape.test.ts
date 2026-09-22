@@ -68,11 +68,11 @@ describe('entorno regional cenográfico do Mapa Comercial', () => {
     });
   });
 
-  it('limita a camada a três draw calls e elimina a sombra falsa no reduced', () => {
+  it('mantém três draw calls e a mesma sombra em todos os perfis', () => {
     expect(REGIONAL_LANDSCAPE_DRAW_CALL_BUDGET).toEqual({
       full: 3,
       balanced: 3,
-      reduced: 2,
+      reduced: 3,
     });
     QUALITY_TIERS.forEach((qualityTier) => {
       expect(regionalLandscapeDiagnostics(qualityTier).drawCalls)
@@ -83,7 +83,7 @@ describe('entorno regional cenográfico do Mapa Comercial', () => {
       'src/features/commercial-map/components/canvas/RegionalLandscapeLayer.tsx',
     );
     expect(component.match(/<instancedMesh\b/g)).toHaveLength(3);
-    expect(component).toContain("const fakeShadows = qualityTier !== 'reduced';");
+    expect(component).toContain('const fakeShadows = true;');
     expect(component).toContain('{fakeShadows && geometries.shadow && materials.shadow && (');
     expect(component.match(/castShadow=\{false\}/g)).toHaveLength(3);
     expect(component).not.toContain('castShadow={true}');
