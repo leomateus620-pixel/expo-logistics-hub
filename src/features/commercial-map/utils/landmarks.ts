@@ -1,5 +1,5 @@
 import { ARENA_CANONICAL_LAYOUT } from '../data/arenaCanonicalLayout';
-import { SOY_RESTROOM_PRESENTATION } from './soyGateArchitecture';
+import { SOY_RESTROOM_PRESENTATION } from './soyGatePresentation';
 import { SOY_RESTROOM } from '../data/soyGateInfrastructure';
 import type { MapEntity } from '../types';
 import { resolveCrioulosArchitectureEnvelope } from '../data/gateFourDistrict';

@@ -3,6 +3,8 @@ import { mergeBufferGeometries } from 'three-stdlib';
 import { GATE_NINE_TANKS } from '../data/soyGateInfrastructure';
 import { hydrologicalPlanPointToWorldXZ } from '../data/hydrologicalInfrastructure';
 import type { StrategicLandmarkBounds } from './landmarks';
+import { SOY_RESTROOM_PRESENTATION } from './soyGatePresentation';
+export { SOY_RESTROOM_PRESENTATION } from './soyGatePresentation';
 
 type V3 = [number, number, number];
 type MaterialKey =
@@ -39,9 +41,6 @@ function builder() {
     });
   return { add, box, finish };
 }
-
-/** Photo-derived display dimensions; cadastral source bounds stay unchanged. */
-export const SOY_RESTROOM_PRESENTATION = { wallHeight: 0.78, roofRise: 0.19, visualHeight: 1.2 } as const;
 
 export function buildSoyRestroomParts() {
   const b = builder();
