@@ -1,9 +1,10 @@
 import { useContext, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { List, Settings2, ShoppingCart } from 'lucide-react';
+import { Footprints, List, Settings2, ShoppingCart } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { useSalesStore } from '../../sales/useSalesSelection';
+import { useVisitStore } from '../../visit/useVisitStore';
 
 import { CommercialMapHeaderHost } from './headerHost';
 
@@ -11,7 +12,9 @@ import { CommercialMapHeaderHost } from './headerHost';
 export function CommercialMapHeaderTools({
   managementActions,
   salesAvailable = false,
-}: { managementActions?: ReactNode; salesAvailable?: boolean }) {
+  visitAvailable = false,
+  visitEntityId,
+}: { managementActions?: ReactNode; salesAvailable?: boolean; visitAvailable?: boolean; visitEntityId?: string }) {
   const host = useContext(CommercialMapHeaderHost);
   const [managementOpen, setManagementOpen] = useState(false);
   const mode = useCommercialMapStore((state) => state.workspaceMode);
@@ -19,8 +22,21 @@ export function CommercialMapHeaderTools({
   const setMode = useCommercialMapStore((state) => state.setWorkspaceMode);
   const salesActive = useSalesStore((state) => state.salesModeActive);
   const toggleSalesMode = useSalesStore((state) => state.toggleSalesMode);
+  const checkoutOpen = useSalesStore((state) => state.checkoutOpen);
+  const visitEnabled = useVisitStore((state) => state.enabled);
+  const startVisit = useVisitStore((state) => state.start);
+  const canStartVisit = !checkoutOpen && (mode === '3d' || mode === 'list');
   const managing = managementOpen || mode === 'edit' || mode === 'create' || panel === 'calibration';
-  const content = <div className="commercial-map-header-tools" aria-label="Ferramentas do mapa">
+  const content = <div className="commercial-map-header-tools" aria-label="Ferramentas do mapa"
+    hidden={visitEnabled} style={visitEnabled ? { display: 'none' } : undefined}>
+    {visitAvailable && <button type="button" aria-label="Modo Visita" disabled={!canStartVisit}
+      onClick={() => startVisit()} data-commercial-map-visit-start>
+      <Footprints aria-hidden="true" /><span>Modo Visita</span>
+    </button>}
+    {visitAvailable && visitEntityId && <button type="button" aria-label="Visitar este lote" disabled={!canStartVisit}
+      onClick={() => startVisit({ entityId: visitEntityId })} data-commercial-map-visit-lot>
+      <Footprints aria-hidden="true" /><span>Visitar este lote</span>
+    </button>}
     {salesAvailable && <button
       type="button"
       className={salesActive ? 'is-active' : ''}

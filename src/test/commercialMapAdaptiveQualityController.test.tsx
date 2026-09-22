@@ -8,6 +8,7 @@ import {
 } from '@/features/commercial-map/utils/viewport';
 import { resolveCommercialMapInteractionPixelRatio } from '@/features/commercial-map/utils/adaptiveQualityRuntime';
 import { commercialMapFrameActivity } from '@/features/commercial-map/utils/frameActivity';
+import { beginVisitQualitySession, readVisitQuality, setVisitQualityMotion } from '@/features/commercial-map/visit/VisitQualityManager';
 
 const runtime = vi.hoisted(() => {
   let pixelRatio = 1;
@@ -170,6 +171,46 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     expect(onQualityChange.mock.lastCall?.[0].tier).toBe('HIGH');
     act(() => { for (let i = 0; i < 90; i++) runtime.frame?.({}, 0.5); });
     expect(onQualityChange.mock.lastCall?.[0].tier).toBe('MEDIUM');
+  });
+
+  it('restaura o orçamento anterior após 20 visitas sem recriar o proprietário do DPR', () => {
+    const onQualityChange = vi.fn();
+    render(<CommercialMapAdaptiveQualityController active initialState={initialState} capabilityHints={capabilityHints} reducedGraphics={false} onQualityChange={onQualityChange} />);
+    const originalDpr = runtime.gl.getPixelRatio();
+    const originalTier = onQualityChange.mock.lastCall?.[0].sceneTier;
+    for (let cycle = 0; cycle < 20; cycle++) {
+      let release: () => void = () => undefined;
+      act(() => { release = beginVisitQualitySession(); });
+      expect(runtime.gl.getPixelRatio()).toBe(1.1);
+      expect(onQualityChange.mock.lastCall?.[0].sceneTier).toBe('MEDIUM');
+      act(() => release());
+      expect(runtime.gl.getPixelRatio()).toBe(originalDpr);
+      expect(onQualityChange.mock.lastCall?.[0].sceneTier).toBe(originalTier);
+      expect(readVisitQuality().enabled).toBe(false);
+      expect(useCommercialMapStore.getState().cameraNavigating).toBe(false);
+    }
+  });
+
+  it('adapta visita em caminhada contínua e não exporta o downgrade para o modo tradicional', () => {
+    const onQualityChange = vi.fn();
+    render(<CommercialMapAdaptiveQualityController active initialState={initialState} capabilityHints={capabilityHints} reducedGraphics={false} onQualityChange={onQualityChange} />);
+    const originalDpr = runtime.gl.getPixelRatio();
+    let release: () => void = () => undefined;
+    act(() => { release = beginVisitQualitySession(); setVisitQualityMotion(true); });
+    try {
+      act(() => {
+        for (let i = 0; i < 100; i++) {
+          commercialMapFrameActivity(runtime.gl).requested = 8;
+          runtime.frame?.({}, 0.05);
+        }
+      });
+      expect(onQualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'LOW', sceneTier: 'LOW' });
+      expect(runtime.gl.getPixelRatio()).toBe(0.85);
+      expect(readVisitQuality().preset).toBe('PERFORMANCE');
+      expect(useCommercialMapStore.getState().cameraNavigating).toBe(false);
+    } finally { act(() => release()); }
+    expect(runtime.gl.getPixelRatio()).toBe(originalDpr);
+    expect(onQualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'HIGH', sceneTier: 'HIGH' });
   });
 
   it('amostra animação com compositor em repouso e ignora preparação e mudança de caminho', () => {

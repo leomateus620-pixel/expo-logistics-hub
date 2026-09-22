@@ -16,6 +16,8 @@ import { clipContextPolygon } from '../../data/commercialMapSpatialBounds';
 
 interface RearParkEnvironmentLayerProps {
   reducedGraphics: boolean;
+  /** Visit colliders keep the same physical tree inventory across quality tiers. */
+  preserveVisitTreePlacement?: boolean;
   visible?: boolean;
   vegetationVisible?: boolean;
 }
@@ -28,6 +30,7 @@ const NO_RAYCAST = () => undefined;
  */
 export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
   reducedGraphics,
+  preserveVisitTreePlacement = false,
   visible = true,
   vegetationVisible = true,
 }: RearParkEnvironmentLayerProps) {
@@ -83,8 +86,8 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
   }, [treeResources]);
 
   const trees = useMemo(
-    () => (vegetationEnabled && vegetationVisible ? buildRearTreeInstances(reducedGraphics) : []),
-    [reducedGraphics, vegetationEnabled, vegetationVisible],
+    () => (vegetationEnabled && vegetationVisible ? buildRearTreeInstances(reducedGraphics && !preserveVisitTreePlacement) : []),
+    [reducedGraphics, preserveVisitTreePlacement, vegetationEnabled, vegetationVisible],
   );
   const poles = useMemo(() => buildRearPoleInstances(reducedGraphics), [reducedGraphics]);
 

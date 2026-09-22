@@ -6,6 +6,10 @@ import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { recordCommercialMapQualityDecision } from '../../utils/runtimeDiagnostics';
 import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
 import {
+  capVisitPixelRatio, createInitialVisitQuality, publishVisitQualityTier,
+  readVisitQuality, resolveVisitQualityDecision, subscribeVisitQuality,
+} from '../../visit/VisitQualityManager';
+import {
   resolveCommercialMapAdaptiveQuality,
   resolveCommercialMapPixelRatio,
   resolveCommercialMapQualityPixelRatio,
@@ -63,6 +67,12 @@ export function CommercialMapAdaptiveQualityController({
   const setDpr = useThree((state) => state.setDpr);
   const size = useThree((state) => state.size);
   const qualityState = useRef<CommercialMapAdaptiveQualityState>({ ...initialState });
+  const visitSessionActive = useRef(false);
+  const normalQuality = useRef<{
+    state: CommercialMapAdaptiveQualityState;
+    sceneTier: CommercialMapQualityTier;
+    pendingTier: CommercialMapQualityTier | null;
+  } | null>(null);
   const committedSceneTier = useRef<CommercialMapQualityTier>(initialState.tier);
   const pendingSceneTier = useRef<CommercialMapQualityTier | null>(null);
   const pixelRatioState = useRef(createCommercialMapPixelRatioState(gl.getPixelRatio()));
@@ -90,10 +100,17 @@ export function CommercialMapAdaptiveQualityController({
 
   const resolveTierPixelRatio = useCallback((tier: CommercialMapQualityTier) => {
     const capabilities = resolveCapabilities();
-    return reducedGraphics
+    const dpr = reducedGraphics
       ? resolveCommercialMapPixelRatio({ ...capabilities, reducedGraphics: true })
       : resolveCommercialMapQualityPixelRatio({ ...capabilities, qualityTier: tier });
+    return readVisitQuality().enabled ? capVisitPixelRatio(dpr, tier) : dpr;
   }, [reducedGraphics, resolveCapabilities]);
+
+  const resolveQuality = useCallback((sample: Parameters<typeof resolveCommercialMapAdaptiveQuality>[1]) => {
+    return readVisitQuality().enabled
+      ? resolveVisitQualityDecision(qualityState.current, sample)
+      : resolveCommercialMapAdaptiveQuality(qualityState.current, sample);
+  }, []);
 
   const cancelIdleCommit = useCallback(() => {
     if (idleCommitTimer.current === null) return;
@@ -128,6 +145,7 @@ export function CommercialMapAdaptiveQualityController({
     const effectiveDpr = pixelRatioState.current.effectiveDpr;
 
     committedSceneTier.current = sceneTier;
+    publishVisitQualityTier(sceneTier);
     if (gl.domElement) {
       gl.domElement.dataset.commercialMapQuality = JSON.stringify({ logicalTier, sceneTier, baseDpr: pixelRatioState.current.baseDpr, effectiveDpr, hardwareCeiling, reason });
       gl.domElement.dispatchEvent(new Event(COMMERCIAL_MAP_QUALITY_EVENT, { bubbles: true }));
@@ -170,14 +188,14 @@ export function CommercialMapAdaptiveQualityController({
       logicalTier,
       logicalTier,
       nextDpr,
-      resolveCommercialMapAdaptiveQuality(qualityState.current, {
+      resolveQuality({
         ...resolveCapabilities(),
         averageFrameTimeMs: Number.NaN,
         sampledFrames: 0,
       }).hardwareCeiling,
       reason,
     );
-  }, [cancelIdleCommit, publishQuality, resolveCapabilities, resolveTierPixelRatio]);
+  }, [cancelIdleCommit, publishQuality, resolveCapabilities, resolveQuality, resolveTierPixelRatio]);
 
   const scheduleIdleCommit = useCallback(() => {
     if (pendingSceneTier.current === null || idleCommitTimer.current !== null) return;
@@ -233,7 +251,7 @@ export function CommercialMapAdaptiveQualityController({
     displayCadence.current = null;
     samplingSignature.current = '';
     const capabilities = resolveCapabilities();
-    const decision = resolveCommercialMapAdaptiveQuality(qualityState.current, {
+    const decision = resolveQuality({
       ...capabilities,
       averageFrameTimeMs: Number.NaN,
       sampledFrames: 0,
@@ -244,7 +262,41 @@ export function CommercialMapAdaptiveQualityController({
       decision,
       decision.reason === 'hardware-cap' ? decision.reason : 'viewport-sync',
     );
-  }, [applyQualityDecision, resolveCapabilities]);
+  }, [applyQualityDecision, resolveCapabilities, resolveQuality]);
+
+  useEffect(() => {
+    const syncVisitSession = () => {
+      const enabled = readVisitQuality().enabled;
+      if (enabled === visitSessionActive.current) return;
+      visitSessionActive.current = enabled;
+      cancelIdleCommit();
+      resetCommercialMapFrameTimeWindow(frameWindow.current);
+      samplingSignature.current = '';
+      if (enabled) {
+        normalQuality.current = {
+          state: { ...qualityState.current },
+          sceneTier: committedSceneTier.current,
+          pendingTier: pendingSceneTier.current,
+        };
+        qualityState.current = createInitialVisitQuality(resolveCapabilities());
+        pendingSceneTier.current = null;
+        const tier = qualityState.current.tier;
+        publishQuality(tier, tier, resolveTierPixelRatio(tier), 'HIGH', 'visit-enter');
+      } else if (normalQuality.current) {
+        const saved = normalQuality.current;
+        normalQuality.current = null;
+        qualityState.current = saved.state;
+        pendingSceneTier.current = saved.pendingTier;
+        const ceiling = resolveQuality({ ...resolveCapabilities(), averageFrameTimeMs: Number.NaN, sampledFrames: 0 }).hardwareCeiling;
+        publishQuality(saved.state.tier, saved.sceneTier, resolveTierPixelRatio(saved.state.tier), ceiling, 'visit-exit-restore');
+        scheduleIdleCommit();
+      }
+      invalidate();
+    };
+    const unsubscribe = subscribeVisitQuality(syncVisitSession);
+    syncVisitSession();
+    return unsubscribe;
+  }, [cancelIdleCommit, invalidate, publishQuality, resolveCapabilities, resolveQuality, resolveTierPixelRatio, scheduleIdleCommit]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return undefined;
@@ -323,7 +375,7 @@ export function CommercialMapAdaptiveQualityController({
     );
     if (!completedWindow) return;
 
-    const decision = resolveCommercialMapAdaptiveQuality(qualityState.current, {
+    const decision = resolveQuality({
       ...resolveCapabilities(),
       averageFrameTimeMs: completedWindow.averageFrameTimeMs,
       sampledFrames: completedWindow.sampledFrames,

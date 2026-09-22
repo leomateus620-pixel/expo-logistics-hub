@@ -1,5 +1,7 @@
 import { advanceSunrisePlayback, hasSunrisePlaybackFinished, updateSolarShadow } from '../../utils/lightingTransition';
 import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
+import { createVisitReflectionBudget, readVisitQuality, resolveVisitReflectionWidth } from '../../visit/VisitQualityManager';
+import { visitRuntime } from '../../visit/visitRuntime';
 import { isCommercialMapPostReady, isCommercialSceneCompiling } from '../../utils/sceneShaderWarmup';
 import { advanceRainBlend, commercialRainRuntime } from '../../utils/rainRuntime';
 import { markCommercialMapStage } from '../../utils/performanceDiagnostics';
@@ -1013,7 +1015,7 @@ export function SunrisePostProcessing({
     };
     try {
       const current = pipeline.current;
-      if (enabled && !interactionActive && isCommercialMapPostReady(gl)
+      if (enabled && !interactionActive && !visitRuntime.renderingActive && isCommercialMapPostReady(gl)
         && quality.bloomEnabled && current && !postFailed.current) {
         try {
           bindCommercialMapScreen(gl, size.width, size.height);
@@ -1307,9 +1309,13 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     normalGroundMaterial,
     qualityTier,
   ]);
-  const reflectionTextureWidth = qualityTier === 'reduced'
+  const reflectionBudget = useRef(createVisitReflectionBudget());
+  const requestedReflectionTextureWidth = qualityTier === 'reduced'
     ? COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.reducedTextureWidth
     : COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.fullTextureWidth;
+  const reflectionTextureWidth = resolveVisitReflectionWidth(
+    reflectionBudget.current, requestedReflectionTextureWidth, readVisitQuality().enabled,
+  );
   const { sky, celestialSun, reflectionTexture } = useCommercialMapAtmosphereResources({
     initialFrame, mode, palette, cloudOpacity,
     skyScale: layout.skyScale,
