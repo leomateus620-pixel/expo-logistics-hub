@@ -28,11 +28,12 @@ describe('independent rain environment', () => {
     for(let i=0;i<120;i++)blend=advanceRainBlend(blend,false,1/60);
     expect(blend).toBe(0);
   });
-  it('scales by measured capability and has no low-tier splash/runoff cost', () => {
+  it('selects execution cadence by capability while preserving every rain effect', () => {
     expect(resolveRainQuality('ULTRA',2048,8)).toBe('LOW');
     expect(resolveRainQuality('HIGH',4096,8)).toBe('MEDIUM');
     expect(resolveRainQuality('HIGH',16384,2)).toBe('LOW');
-    expect(COMMERCIAL_RAIN_BUDGETS.LOW.splashes).toBe(0);
+    expect(COMMERCIAL_RAIN_BUDGETS.LOW).toEqual(COMMERCIAL_RAIN_BUDGETS.HIGH);
+    expect(COMMERCIAL_RAIN_BUDGETS.LOW.splashes).toBeGreaterThan(0);
     expect(COMMERCIAL_RAIN_BUDGETS.HIGH.drops).toBeLessThanOrEqual(4000);
   });
 });

@@ -178,13 +178,13 @@ describe('commercial site environment presentation layer', () => {
     expect(reducedPlan.diagnostics).toMatchObject({
       treatmentCount: 5,
       activeTreatmentCount: 5,
-      maximumDrawCalls: COMMERCIAL_SITE_ENVIRONMENT_RENDER_BUDGET.maximumReducedDrawCalls,
-      maximumCells: COMMERCIAL_SITE_ENVIRONMENT_RENDER_BUDGET.maximumReducedCells,
+      maximumDrawCalls: COMMERCIAL_SITE_ENVIRONMENT_RENDER_BUDGET.maximumFullDrawCalls,
+      maximumCells: COMMERCIAL_SITE_ENVIRONMENT_RENDER_BUDGET.maximumFullCells,
       withinDrawCallBudget: true,
       withinCellBudget: true,
     });
     expect(fullPlan.diagnostics.materialDrawCalls).toBeLessThanOrEqual(5);
-    expect(reducedPlan.diagnostics.materialDrawCalls).toBeLessThanOrEqual(4);
+    expect(reducedPlan).toEqual(fullPlan);
   });
 
   it('reuses the full plan in the industrial route and limits it to owners present in that segment', () => {

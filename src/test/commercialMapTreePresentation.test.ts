@@ -109,18 +109,18 @@ describe('apresentação profissional e instanciada das árvores comerciais', ()
   it('mantém um lote de instâncias por categoria em cada grupo e respeita o orçamento full/reduced', () => {
     expect(COMMERCIAL_TREE_PRESENTATION_DRAW_CALLS).toEqual({
       fullGraphics: 5,
-      reducedGraphics: 4,
+      reducedGraphics: 5,
       fullGraphicsShadowPass: 3,
-      reducedGraphicsShadowPass: 0,
+      reducedGraphicsShadowPass: 3,
     });
     expect(QUADRAS_AB_TREE_PRESENTATION_DRAW_CALLS).toEqual({
       fullGraphics: 5,
-      reducedGraphics: 4,
+      reducedGraphics: 5,
       fullGraphicsShadowPass: 3,
-      reducedGraphicsShadowPass: 0,
+      reducedGraphicsShadowPass: 3,
     });
     expect(COMMERCIAL_TREE_PRESENTATION_DRAW_CALLS.fullGraphics + QUADRAS_AB_TREE_PRESENTATION_DRAW_CALLS.fullGraphics).toBe(10);
-    expect(COMMERCIAL_TREE_PRESENTATION_DRAW_CALLS.reducedGraphics + QUADRAS_AB_TREE_PRESENTATION_DRAW_CALLS.reducedGraphics).toBe(8);
+    expect(COMMERCIAL_TREE_PRESENTATION_DRAW_CALLS.reducedGraphics + QUADRAS_AB_TREE_PRESENTATION_DRAW_CALLS.reducedGraphics).toBe(10);
     expect(rendererSource.match(/<instancedMesh/g)).toHaveLength(5);
     expect(rendererSource.match(/raycast=\{NO_RAYCAST\}/g)).toHaveLength(5);
     expect(rendererSource).not.toMatch(/<mesh(?:\s|>)/);
@@ -174,9 +174,9 @@ describe('apresentação profissional e instanciada das árvores comerciais', ()
       trunks: 274,
       branches: 548,
       crowns: 822,
-      shadows: 274,
-      contactPatches: 0,
-      castsDynamicShadows: false,
+      shadows: 0,
+      contactPatches: 274,
+      castsDynamicShadows: true,
     });
     expect(resolveCommercialTreeLodInstanceCounts(plan.countByTier, 'far', 7, false)).toEqual({
       trees: 274,

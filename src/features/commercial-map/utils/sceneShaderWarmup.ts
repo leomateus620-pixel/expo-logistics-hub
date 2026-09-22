@@ -11,16 +11,71 @@ export const isCommercialSceneCompiling = (renderer: THREE.WebGLRenderer) => pen
 /** Unmanaged renderers retain the existing standalone compositor behavior. */
 export const isCommercialMapPostReady = (renderer: THREE.WebGLRenderer) => criticalPost.get(renderer)?.ready ?? true;
 
-function renderObjects(root: THREE.Object3D) {
+/** Use the admitted map renderer, never a speculative context. Upload known
+ * textures while the driver is linking programs instead of piling every upload
+ * into the first draw. Two uploads per task bound admission on slower devices. */
+export async function prepareCommercialMapTextures(renderer: THREE.WebGLRenderer, objects: THREE.Object3D[], signal?: AbortSignal) {
+  if (!renderer.initTexture) return; // minimal diagnostic renderer fixtures
+  const textures = new Set<THREE.Texture>();
+  const materials = new Set<THREE.Material>();
+  const collect = (value: unknown) => {
+    if (!(value instanceof THREE.Texture) || value.isRenderTargetTexture || !value.image
+      || (value as THREE.VideoTexture).isVideoTexture || value.version === 0) return;
+    textures.add(value);
+  };
+  for (const object of objects) {
+    const material = (object as THREE.Mesh).material;
+    for (const value of Array.isArray(material) ? material : [material]) if (value) materials.add(value);
+  }
+  for (const material of materials) {
+    Object.values(material).forEach(collect);
+    if ('uniforms' in material) for (const uniform of Object.values((material as THREE.ShaderMaterial).uniforms)) {
+      if (Array.isArray(uniform.value)) uniform.value.forEach(collect); else collect(uniform.value);
+    }
+  }
+  markCommercialMapStage('texture-upload:start', undefined, undefined, { count: textures.size });
+  let uploads = 0;
+  for (const texture of textures) {
+    if (uploads % 2 === 0) await nextPreparationSlot(signal);
+    if (signal?.aborted) throw new DOMException('Texture preparation cancelled', 'AbortError');
+    renderer.initTexture(texture);
+    uploads++;
+  }
+  markCommercialMapStage('texture-upload:end', undefined, undefined, { count: uploads });
+}
+
+export function commercialMapShaderRepresentatives(root: THREE.Object3D) {
   const variants = new Map<string, THREE.Object3D>();
+  const geometryKeys = new WeakMap<THREE.BufferGeometry, string>();
   root.traverse((object) => {
-    const mesh = object as THREE.Mesh & { isInstancedMesh?: boolean; instanceColor?: unknown; isSkinnedMesh?: boolean; isBatchedMesh?: boolean };
+    const mesh = object as THREE.Mesh & { isInstancedMesh?: boolean; instanceColor?: unknown; morphTexture?: unknown; isSkinnedMesh?: boolean; isBatchedMesh?: boolean; _colorsTexture?: unknown };
     if (!mesh.material) return;
     const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-    const key = `${materials.map((material) => material.uuid).join(',')}:${Boolean(mesh.isInstancedMesh)}:${Boolean(mesh.instanceColor)}:${Boolean(mesh.isSkinnedMesh)}:${Boolean(mesh.isBatchedMesh)}:${object.type}`;
+    // Equal materials on different color/tangent/morph attributes can require
+    // different programs. Vertex count/positions don't change a shader program.
+    let geometryKey = mesh.geometry ? geometryKeys.get(mesh.geometry) : '';
+    if (mesh.geometry && geometryKey === undefined) {
+      geometryKey = JSON.stringify([
+        Object.entries(mesh.geometry.attributes).sort(([a], [b]) => a.localeCompare(b))
+          .map(([name, attribute]) => [name, attribute.itemSize, attribute.normalized, attribute.array.constructor.name]),
+        Object.entries(mesh.geometry.morphAttributes).sort(([a], [b]) => a.localeCompare(b))
+          .map(([name, attributes]) => [name, attributes?.length]), mesh.geometry.morphTargetsRelative,
+      ]);
+      geometryKeys.set(mesh.geometry, geometryKey);
+    }
+    const key = `${materials.map((material) => material.uuid).join(',')}:${geometryKey}:${Boolean(mesh.isInstancedMesh)}:${Boolean(mesh.instanceColor)}:${Boolean(mesh.morphTexture)}:${Boolean(mesh.isSkinnedMesh)}:${Boolean(mesh.isBatchedMesh)}:${Boolean(mesh._colorsTexture)}:${object.type}:${object.receiveShadow}`;
     if (!variants.has(key)) variants.set(key, object);
   });
   return [...variants.values()];
+}
+
+function shaderBatch<T extends THREE.Object3D>(batch: T): T {
+  // A compile-only view: every renderable already appears in the flat snapshot.
+  // Recursing their real children would compile duplicates and gather child
+  // lights twice (the unchanged target scene already supplies every light).
+  batch.traverse = callback => { callback(batch); for (const object of batch.children) callback(object); };
+  batch.traverseVisible = callback => { if (batch.visible) callback(batch); };
+  return batch;
 }
 
 /** The usable first view and every gesture share one critical DIRECT variant.
@@ -29,7 +84,12 @@ function renderObjects(root: THREE.Object3D) {
 export function prepareCommercialScene(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera, signal?: AbortSignal) {
   const ticket = {};
   pending.set(renderer, ticket);
-  criticalPost.set(renderer, { ticket, objects: renderObjects(scene), ready: false });
+  const objects = commercialMapShaderRepresentatives(scene);
+  criticalPost.set(renderer, { ticket, objects, ready: false });
+  const representatives = shaderBatch(new THREE.Scene());
+  // Compile traverses object references; no add(), reparenting or scene mutation.
+  representatives.children = objects;
+  markCommercialMapStage('shader-representatives', undefined, undefined, { count: objects.length });
   const compile = (offscreen: boolean) => {
     const target = renderer.getRenderTarget();
     const face = renderer.getActiveCubeFace();
@@ -41,7 +101,7 @@ export function prepareCommercialScene(renderer: THREE.WebGLRenderer, scene: THR
       renderer.setRenderTarget(null);
       renderer.toneMapping = offscreen ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
       renderer.outputColorSpace = THREE.SRGBColorSpace;
-      return measureCommercialMapStage(offscreen ? 'compile-post' : 'compile-direct', () => compileCommercialMapPrograms(renderer, scene, camera, scene, signal));
+      return measureCommercialMapStage(offscreen ? 'compile-post' : 'compile-direct', () => compileCommercialMapPrograms(renderer, representatives, camera, scene, signal));
     } catch (error) {
       return Promise.reject(error);
     } finally {
@@ -51,7 +111,9 @@ export function prepareCommercialScene(renderer: THREE.WebGLRenderer, scene: THR
       renderer.setRenderTarget(target, face, level);
     }
   };
-  return compile(false).finally(() => {
+  // The real first-draw barrier still waits for every required program/upload.
+  return Promise.all([compile(false), prepareCommercialMapTextures(renderer, objects, signal)]).then(() => undefined).finally(() => {
+    representatives.children = [];
     if (pending.get(renderer) === ticket) pending.delete(renderer);
   });
 }
@@ -67,9 +129,14 @@ export function compileCommercialMapPrograms(
   const materials = renderer.compile(objects, camera, scene);
   const programs = new Set<{ isReady: () => boolean }>();
   materials.forEach((material) => {
-    const properties = renderer.properties.get(material) as { currentProgram?: { isReady: () => boolean } };
-    const program = properties.currentProgram;
-    if (program) programs.add(program);
+    const properties = renderer.properties.get(material) as {
+      currentProgram?: { isReady: () => boolean };
+      programs?: Map<string, { isReady: () => boolean }>;
+    };
+    // One shared material can compile instanced/plain, morph or double-sided
+    // variants in a single call. currentProgram alone misses all but the last.
+    if (properties.programs) properties.programs.forEach(program => programs.add(program));
+    else if (properties.currentProgram) programs.add(properties.currentProgram);
   });
   return new Promise<void>((resolve, reject) => {
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -121,7 +188,8 @@ function nextPreparationSlot(signal?: AbortSignal) {
     const abort = () => {
       clearTimeout(timer);
       if (idle !== undefined) window.cancelIdleCallback(idle);
-      reject(new Error('Layer preparation cancelled'));
+      signal?.removeEventListener('abort', abort);
+      reject(new DOMException('Layer preparation cancelled', 'AbortError'));
     };
     const attempt = () => {
       if (signal?.aborted) { abort(); return; }
@@ -149,7 +217,7 @@ export async function prepareCommercialSceneLayer(
   camera: THREE.Camera,
   signal?: AbortSignal,
 ) {
-  return prepareObjectVariants(renderer, renderObjects(layer), scene, camera, [false, true], signal);
+  return prepareObjectVariants(renderer, commercialMapShaderRepresentatives(layer), scene, camera, [false, true], signal);
 }
 
 async function prepareObjectVariants(
@@ -158,7 +226,7 @@ async function prepareObjectVariants(
 ) {
   if (!objects.length) return;
   const linearTarget = new THREE.WebGLRenderTarget(1, 1);
-  const batch = new THREE.Group();
+  const batch = shaderBatch(new THREE.Group());
   try {
     for (let start = 0; start < objects.length; start += 8) {
       batch.children = objects.slice(start, start + 8);

@@ -533,7 +533,7 @@ describe('área posterior — exclusões espaciais, profundidade e ambiente', ()
     expect(first).toEqual(second);
     expect(first.length).toBeGreaterThan(60);
     expect(first.length).toBeLessThanOrEqual(REAR_ENVIRONMENT_BUDGET.maximumTreeInstances);
-    expect(reduced.length).toBeLessThan(first.length);
+    expect(reduced).toEqual(first);
     first.forEach((tree) => {
       expect(pointIsInsideAnyRearRoadCorridor([tree.x, tree.z], GENERATED_REAR_ROAD_SEGMENTS)).toBe(false);
     });

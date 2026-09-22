@@ -7,6 +7,7 @@ interface ColliderBase extends VisitBounds { id: string; minY: number; maxY: num
 export interface VisitPolygonCollider extends ColliderBase { kind: 'polygon'; polygon: VisitRing }
 export interface VisitCircleCollider extends ColliderBase { kind: 'circle'; x: number; z: number; radius: number }
 export type VisitCollider = VisitPolygonCollider | VisitCircleCollider;
+export interface VisitGroundSupport { height: number; maximumRise: number }
 export interface VisitGroundSurface extends VisitBounds {
   id: string;
   polygon: VisitRing;
@@ -15,6 +16,10 @@ export interface VisitGroundSurface extends VisitBounds {
   height: number | ((x: number, z: number) => number);
   /** Proven upper bound for functional heights; absent means no early cull. */
   maximumHeight?: number;
+  /** A decorative commercial slab is traversable despite its cadastral lift. */
+  maximumStepRise?: number;
+  /** Dense source cells retain their own fine grid for capsule-foot support. */
+  supportAt?: (x: number, z: number, radius: number) => VisitGroundSupport;
 }
 
 export const VISIT_METERS_TO_WORLD = 0.15;

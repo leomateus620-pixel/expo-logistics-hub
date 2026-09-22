@@ -288,10 +288,10 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
         expect(pointInPolygon(placement.position, footprint)).toBe(false);
       });
     });
-    expect(reduced.ambientTrees.filter((placement) => placement.sourceZoneId.startsWith('third-age-access-')).length)
-      .toBeLessThan(denseTrees.length + sparseTrees.length);
-    expect(reduced.understory.filter((placement) => placement.sourceZoneId.startsWith('third-age-access-')).length)
-      .toBeLessThan(denseUnderstory.length + sparseUnderstory.length);
+    expect(reduced.ambientTrees.filter((placement) => placement.sourceZoneId.startsWith('third-age-access-')))
+      .toEqual(full.ambientTrees.filter((placement) => placement.sourceZoneId.startsWith('third-age-access-')));
+    expect(reduced.understory.filter((placement) => placement.sourceZoneId.startsWith('third-age-access-')))
+      .toEqual(full.understory.filter((placement) => placement.sourceZoneId.startsWith('third-age-access-')));
   });
 
   it('builds bilateral natural tree bands along the motorhome road without invading any road', () => {
@@ -318,8 +318,8 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
     expect(fieldTrees.length).toBeLessThanOrEqual(7);
     expect(reducedForestTrees.length).toBeGreaterThan(0);
     expect(reducedFieldTrees.length).toBeGreaterThan(0);
-    expect(reducedForestTrees.length).toBeLessThan(forestTrees.length);
-    expect(reducedFieldTrees.length).toBeLessThan(fieldTrees.length);
+    expect(reducedForestTrees).toEqual(forestTrees);
+    expect(reducedFieldTrees).toEqual(fieldTrees);
     expect(forestTrees.reduce((sum, tree) => sum + tree.scale[0], 0) / forestTrees.length)
       .toBeGreaterThan(fieldTrees.reduce((sum, tree) => sum + tree.scale[0], 0) / fieldTrees.length);
 
@@ -393,8 +393,8 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
         PARK_ACCESS_SPATIAL_PLAN.woodlandPath.surfacePolygon,
       )).toBe(false);
     });
-    expect(reduced.understory.length).toBeLessThan(full.understory.length);
-    expect(reduced.ambientTrees.length).toBeLessThan(full.ambientTrees.length);
+    expect(reduced.understory).toEqual(full.understory);
+    expect(reduced.ambientTrees).toEqual(full.ambientTrees);
   });
 
   it('respeita o orçamento estático de quatro draw calls e zero passe de sombra', () => {

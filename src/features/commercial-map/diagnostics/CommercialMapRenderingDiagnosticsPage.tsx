@@ -2,14 +2,13 @@ import { LightingBenchmark } from './LightingBenchmark';
 import { EnvironmentBenchmark } from './EnvironmentBenchmark';
 import { useCommercialMapBootVisit } from '../hooks/useCommercialMapBootVisit';
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useVisitStore } from '../visit/useVisitStore';
 import { VISIT_SPAWN_LABELS, VISIT_SPAWN_POINTS, visitSpawnEntity, type VisitSpawnId } from '../visit/VisitSpawnManager';
 import { VisitOverlay } from '../visit/VisitOverlay';
 import { CommercialMapCanvas } from '../components/canvas/CommercialMapCanvas';
 import { CommercialMapRendererStatus } from '../components/CommercialMapRendererStatus';
-import { OFFICIAL_REFERENCE_DATA } from '../data/officialReference2026';
-import persistedStageLayout from '../../../test/fixtures/soyGatePersistedLayout.json';
-import { presentCommercialMapData } from '../hooks/useCommercialMap';
+import { DIAGNOSTICS_MAP_DATA } from './commercialMapDiagnosticsData';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import {
   summarizeCommercialMapRuntimeDiagnostics,
@@ -33,15 +32,6 @@ import '../commercial-map-mobile.css';
 import './commercial-map-rendering-diagnostics.css';
 
 const EMPTY_MATCHING_ENTITY_IDS = new Set<string>();
-// Same client presentation pipeline as the authenticated map, so diagnostics
-// render the unified Restaurante and segment tags instead of raw cadastral rows.
-const DIAGNOSTICS_MAP_DATA = presentCommercialMapData(new URLSearchParams(window.location.search).has('persistedStage') ? {
-  ...OFFICIAL_REFERENCE_DATA,
-  entities: OFFICIAL_REFERENCE_DATA.entities.map((entity) => {
-    const row = persistedStageLayout[entity.publicIdentifier as keyof typeof persistedStageLayout];
-    return row ? { ...entity, geometry: { ...entity.geometry, coordinates: row.geometry.coordinates as Coordinate[][] } } : entity;
-  }),
-} : OFFICIAL_REFERENCE_DATA);
 markCommercialMapStage('fixture-data-ready');
 const MAXIMUM_ZOOM_WHEEL_STEPS = 80;
 const QA_CAMERA_PRESETS: readonly CameraPreset[] = [
@@ -158,9 +148,7 @@ async function waitForStressPresentation(
     if (presented && idleSince !== null && performance.now() - idleSince >= STRESS_IDLE_MS) {
       window.__commercialMapRuntimeDiagnostics?.capture();
       const runtime = summarizeCommercialMapRuntimeDiagnostics();
-      const expectedPath = target.reducedGraphics || runtime.renderer?.qualityTier === 'LOW'
-        ? 'direct'
-        : 'post';
+      const expectedPath = 'post'; // quality budgets preserve the authored effects
       if (health.path === expectedPath) {
         return {
           elapsedMs: Math.round(elapsedMs),
@@ -189,6 +177,8 @@ function formatMetric(value: number | null, suffix = '') {
  * App.tsx excludes the route and dynamic import from production builds.
  */
 export default function CommercialMapRenderingDiagnosticsPage() {
+  const qualityQa = new URLSearchParams(window.location.search).get('qualityQa');
+  const qualityQaQuery = qualityQa && ['LOW', 'MEDIUM', 'HIGH', 'ULTRA'].includes(qualityQa) ? `&qualityQa=${qualityQa}` : '';
   const newBootVisit = useCommercialMapBootVisit();
   if (newBootVisit) markCommercialMapStage('fixture-data-ready');
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
@@ -497,6 +487,7 @@ export default function CommercialMapRenderingDiagnosticsPage() {
         </div>
         <fieldset disabled={stressRunning} className="commercial-map-rendering-diagnostics__manual-controls">
         <nav aria-label="Cenários de câmera">
+          <Link to={`/__dev/commercial-map-prewarm?persistedStage=1&policy=idle${qualityQaQuery}`}>Voltar ao diagnóstico de preparação</Link>
           <button type="button" onClick={() => useVisitStore.getState().start()}>Modo Visita</button>
           <button type="button" onClick={() => requestPreset('overview')}>Geral</button>
           <button type="button" onClick={() => requestPreset('commercial')}>Close-up</button>

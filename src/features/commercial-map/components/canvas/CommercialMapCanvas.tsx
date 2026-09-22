@@ -36,6 +36,7 @@ import { Html, OrbitControls, useTexture } from '@react-three/drei';
 import { CommercialMapSceneShaderWarmup } from './CommercialMapSceneShaderWarmup';
 import { readPreparedHeadquartersGeometry } from './headquarters/headquartersPreparationResource';
 import { CommercialMapInteractiveBoot, DeferredSceneLayer } from './DeferredSceneLayer';
+import { COMMERCIAL_MAP_CANONICAL_CONTENT, readCommercialMapQaQualityTier } from '../../utils/executionPolicy';
 import { EssentialSceneLayer } from './EssentialSceneLayer';
 import { commercialMapNavigationExtent } from '../../data/commercialMapSpatialBounds';
 import { preloadBumperPhysics } from '../../utils/preloadBumperPhysics';
@@ -926,7 +927,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     [maxAnisotropy, naturalParking, openGroundProfile],
   );
   const openGroundMaterialRef = useRef<THREE.MeshStandardMaterial>(null);
-  const openGroundReducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  const openGroundReducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
   useLayoutEffect(() => {
     // Presentation only: the large open fields share the park-scale terrain
     // fBm so they never read as one flat tile next to the environment ground.
@@ -1480,7 +1481,7 @@ function BatchedLots({
   if (geometryEntitiesRef.current.length !== entries.length || entries.some((entry, i) => entry.entity !== geometryEntitiesRef.current[i])) geometryEntitiesRef.current = entries.map(entry => entry.entity);
   const geometryEntities = geometryEntitiesRef.current;
   const invalidate = useThree((state) => state.invalidate);
-  const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  const reducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
   const hoveredRef = useRef<string | null>(null);
   const pendingHoverRef = useRef<string | null>(null);
   const hoverFrameRef = useRef<number | null>(null);
@@ -4572,7 +4573,8 @@ const Scene = memo(function Scene({
   );
   const rearParkingAvailable = rearParkingVisibleInArea(isolatedArea) && parkingPresentation.visible;
   const rearParkingEnabled = rearParkingAvailable && !hydrologicalModeActive;
-  const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  // Legacy presentation props are canonical; hardware controls execution only.
+  const reducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
   // Preset visual de Vendas: oculta apenas ambientação decorativa.
   const salesPresentationActive = useCommercialMapStore((state) => state.salesPresentationActive);
   const salesSelectedLotIds = useSalesSelectedLotIds();
@@ -4873,6 +4875,30 @@ const Scene = memo(function Scene({
   const treeSurfaceEntities = useMemo(() => rearParkingAvailable
     ? [...exteriorRenderedEntities, ...REAR_PARKING_GROUND_SUPPORTS]
     : exteriorRenderedEntities, [exteriorRenderedEntities, rearParkingAvailable]);
+  useEffect(() => {
+    if (!commercialMapDiagnosticsEnabled) return;
+    gl.domElement.dataset.commercialMapInventory = JSON.stringify({
+      entityIds: entities.map(entity => entity.id).sort(),
+      presentedEntityIds: exteriorRenderedEntities.map(entity => entity.id).sort(),
+      lotIds: lots.map(lot => lot.id).sort(),
+      entitiesByType: entities.reduce<Record<string, number>>((counts, entity) => {
+        counts[entity.classification] = (counts[entity.classification] ?? 0) + 1;
+        return counts;
+      }, {}),
+      commercialTreeIds: rearRoadCompatibleSceneTrees.map(tree => tree.id).sort(),
+      presentedCommercialTreeIds: presentedSceneTrees.map(tree => tree.id).sort(),
+      treeCoverage: 'Canonical commercial tree layer; procedural territorial/access inventories are validated separately.',
+    });
+    gl.domElement.dataset.commercialMapInventoryCounts = JSON.stringify({
+      entities: entities.length, presentedEntities: exteriorRenderedEntities.length,
+      lots: lots.length, commercialTrees: rearRoadCompatibleSceneTrees.length,
+      presentedCommercialTrees: presentedSceneTrees.length,
+    });
+    return () => {
+      delete gl.domElement.dataset.commercialMapInventory;
+      delete gl.domElement.dataset.commercialMapInventoryCounts;
+    };
+  }, [entities, exteriorRenderedEntities, gl, lots, presentedSceneTrees, rearRoadCompatibleSceneTrees]);
   const parkAccessScope = parkAccessInfrastructureScopeForArea(isolatedArea);
   const parkAccessPresentation = useMemo(() => {
     const resolveOwners = (identifiers: readonly string[]) => {
@@ -5246,7 +5272,7 @@ const Scene = memo(function Scene({
         surfaceEntities={treeSurfaceEntities}
         visible={treesVisible && !hydrologicalModeActive && !salesPresentationActive}
         reducedGraphics={reducedGraphics}
-        qualityTier={reducedGraphics ? 'LOW' : 'HIGH'}
+        qualityTier={renderQualityTier}
       />
       </EssentialSceneLayer>}
       <EssentialSceneLayer id="electrical-detail">
@@ -5425,12 +5451,13 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
     dpr: typeof window === 'undefined' ? 1 : window.devicePixelRatio,
     reducedGraphics,
   });
-  const initialQualityState = useRef(createInitialCommercialMapQualityState({
+  const initialQaTier = useRef(readCommercialMapQaQualityTier(commercialMapDiagnosticsEnabled, typeof window === 'undefined' ? '' : window.location.search)).current;
+  const initialQualityState = useRef({ ...createInitialCommercialMapQualityState({
     viewportWidth: initialViewport.current.width,
     viewportHeight: initialViewport.current.height,
     devicePixelRatio: initialViewport.current.dpr,
     capabilityHints,
-  })).current;
+  }), ...(initialQaTier ? { tier: initialQaTier } : {}) }).current;
   const initialPixelRatio = useRef(initialViewport.current.reducedGraphics
     ? resolveCommercialMapPixelRatio({
         devicePixelRatio: initialViewport.current.dpr,
@@ -5531,7 +5558,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
       frameloop="demand"
       camera={initialRenderConfig.current.camera}
       dpr={initialPixelRatio}
-      shadows={props.publicScenePolicy || reducedGraphics ? false : COMMERCIAL_MAP_SHADOW_MAP_CONFIG}
+      shadows={props.publicScenePolicy ? false : COMMERCIAL_MAP_SHADOW_MAP_CONFIG}
       gl={createRenderer}
         onCreated={({ gl, scene, camera }) => {
           markCommercialMapStage('canvas-created');

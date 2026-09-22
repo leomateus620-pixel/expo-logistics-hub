@@ -23,6 +23,7 @@ import {
   type VegetationLodTier,
 } from '../../utils/vegetationLod';
 import type { CommercialMapQualityTier } from '../../utils/viewport';
+import { resolveCommercialMapContentPolicy, resolveCommercialMapExecutionPolicy } from '../../utils/executionPolicy';
 import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 import { isVegetationPilotEnabled, isVegetationPilotTree } from '../../utils/vegetationPilot';
 import { VegetationPilotTreeLayer } from './VegetationPilotTreeLayer';
@@ -91,8 +92,9 @@ export function resolveCommercialTreeLodInstanceCounts(
   countByTier: Readonly<Record<VegetationLodTier, number>>,
   tier: VegetationLodTier,
   lobeCount: number,
-  reducedGraphics: boolean,
+  _legacyReducedGraphics: boolean,
 ): CommercialTreeLodInstanceCounts {
+  const reducedGraphics = false;
   // The full inventory is the near prefix; lower tiers never shrink it.
   const trees = Math.max(countByTier.near, countByTier[tier]);
   // Branches are the first detail to go: reduced sheds them past near, full
@@ -121,9 +123,9 @@ export function resolveCommercialTreeLodInstanceCounts(
 // eslint-disable-next-line react-refresh/only-export-components
 export const COMMERCIAL_TREE_PRESENTATION_DRAW_CALLS = {
   fullGraphics: 5,
-  reducedGraphics: 4,
+  reducedGraphics: 5,
   fullGraphicsShadowPass: 3,
-  reducedGraphicsShadowPass: 0,
+  reducedGraphicsShadowPass: 3,
 } as const;
 
 // The reference-driven A/B inventory is one additional instanced batch set;
@@ -131,9 +133,9 @@ export const COMMERCIAL_TREE_PRESENTATION_DRAW_CALLS = {
 // eslint-disable-next-line react-refresh/only-export-components
 export const QUADRAS_AB_TREE_PRESENTATION_DRAW_CALLS = {
   fullGraphics: 5,
-  reducedGraphics: 4,
+  reducedGraphics: 5,
   fullGraphicsShadowPass: 3,
-  reducedGraphicsShadowPass: 0,
+  reducedGraphicsShadowPass: 3,
 } as const;
 
 const QUADRAS_AB_FOLIAGE_PALETTES: Readonly<Record<CommercialTreeSpeciesGroup, readonly [string, string, string, string]>> = {
@@ -540,7 +542,9 @@ function CommercialTreeInstances({
   const visibilityProgress = useRef(visible ? 1 : 0);
   const transitionPending = useRef(true);
   const { camera, gl, invalidate } = useThree();
-  const effectiveReducedGraphics = reducedGraphics || qualityTier === 'LOW';
+  const effectiveReducedGraphics = resolveCommercialMapContentPolicy(qualityTier, reducedGraphics).reducedGraphics;
+  const execution = resolveCommercialMapExecutionPolicy(qualityTier);
+  const lodElapsed = useRef(Number.POSITIVE_INFINITY);
   const lobeCount = effectiveReducedGraphics
     ? COMMERCIAL_TREE_REDUCED_CANOPY_LOBES
     : COMMERCIAL_TREE_CANOPY_LOBES;
@@ -784,8 +788,13 @@ function CommercialTreeInstances({
     const group = groupRef.current;
     if (!group) return;
     const lodController = lodControllerRef.current;
-    const distance = vegetationLodDistanceToAnchor(state.camera.position, lodScene.anchor);
-    const changedTier = lodController?.update(distance, lodScene.diagonal) ?? null;
+    lodElapsed.current += delta;
+    let changedTier: VegetationLodTier | null = null;
+    if (lodElapsed.current >= 1 / execution.lodUpdateHz) {
+      lodElapsed.current = 0;
+      const distance = vegetationLodDistanceToAnchor(state.camera.position, lodScene.anchor);
+      changedTier = lodController?.update(distance, lodScene.diagonal) ?? null;
+    }
     if (changedTier) {
       lodTargetCountsRef.current = resolveCommercialTreeLodInstanceCounts(
         lodPlan.countByTier,
@@ -933,12 +942,13 @@ export const CommercialTreeLayer = memo(function CommercialTreeLayer(props: {
   }), [props.trees, pilotEnabled]);
   const lodScene = useMemo(() => resolveCommercialTreeLodSceneMetrics(props.trees), [props.trees]);
   const qualityTier = props.qualityTier ?? 'HIGH';
+  const content = resolveCommercialMapContentPolicy(qualityTier, props.reducedGraphics);
   if (props.trees.length === 0) return null;
   return (
     <>
       {treeGroups.pilot.length > 0 && <>
-        <VegetationPilotTreeLayer {...props} trees={treeGroups.pilot} reducedGraphics={props.reducedGraphics || qualityTier === 'LOW'} />
-        <VegetationPilotGroundLayer entities={props.surfaceEntities} trees={treeGroups.pilot} visible={props.visible} reducedGraphics={props.reducedGraphics || qualityTier === 'LOW'} />
+        <VegetationPilotTreeLayer {...props} trees={treeGroups.pilot} reducedGraphics={content.reducedGraphics} />
+        <VegetationPilotGroundLayer entities={props.surfaceEntities} trees={treeGroups.pilot} visible={props.visible} reducedGraphics={content.reducedGraphics} />
       </>}
       {treeGroups.legacy.length > 0 && (
         <CommercialTreeInstances

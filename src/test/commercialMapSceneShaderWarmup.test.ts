@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as THREE from 'three';
-import { compileCommercialMapPrograms, isCommercialMapPostReady, isCommercialSceneCompiling,
+import { commercialMapShaderRepresentatives, compileCommercialMapPrograms, prepareCommercialMapTextures, isCommercialMapPostReady, isCommercialSceneCompiling,
   prepareCommercialMapCriticalPost, prepareCommercialScene } from '@/features/commercial-map/utils/sceneShaderWarmup';
 afterEach(() => vi.useRealTimers());
 
@@ -35,6 +35,45 @@ function rendererFixture() {
 }
 
 describe('non-rendering commercial scene preparation', () => {
+  it('uploads each ordinary texture once and leaves render targets owned by their renderer', async () => {
+    vi.useFakeTimers();
+    const texture = new THREE.DataTexture(new Uint8Array(4), 1, 1); texture.needsUpdate = true;
+    const target = new THREE.WebGLRenderTarget(1, 1);
+    const material = new THREE.MeshStandardMaterial({ map: texture, normalMap: texture, envMap: target.texture });
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(), material);
+    const renderer = { initTexture: vi.fn() } as unknown as THREE.WebGLRenderer;
+    const promise = prepareCommercialMapTextures(renderer, [mesh, mesh]);
+    expect(renderer.initTexture).not.toHaveBeenCalled();
+    await vi.runAllTimersAsync(); await promise;
+    expect(renderer.initTexture).toHaveBeenCalledExactlyOnceWith(texture);
+    texture.dispose(); target.dispose(); mesh.geometry.dispose(); material.dispose();
+  });
+  it('deduplicates equal program features without losing vertex-alpha, instancing or morph variants', () => {
+    const scene = new THREE.Scene();
+    const material = new THREE.MeshStandardMaterial({ vertexColors: true });
+    const geometry = new THREE.BoxGeometry();
+    const sameFeatures = new THREE.BoxGeometry(2, 3, 4);
+    const rgba = geometry.clone(); rgba.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(rgba.attributes.position.count * 4), 4));
+    const morph = geometry.clone(); morph.morphAttributes.position = [geometry.attributes.position.clone()];
+    const meshes = [new THREE.Mesh(geometry, material), new THREE.Mesh(sameFeatures, material), new THREE.Mesh(rgba, material),
+      new THREE.InstancedMesh(geometry, material, 1), new THREE.Mesh(morph, material)];
+    scene.add(...meshes);
+    expect(commercialMapShaderRepresentatives(scene)).toEqual([meshes[0], meshes[2], meshes[3], meshes[4]]);
+    expect(meshes.every(mesh => mesh.parent === scene)).toBe(true);
+    [geometry, sameFeatures, rgba, morph].forEach(value => value.dispose()); material.dispose();
+  });
+  it('waits for every program of a shared material, including a non-current variant', async () => {
+    vi.useFakeTimers();
+    const material = new THREE.MeshBasicMaterial(); let firstReady = false;
+    const first = { isReady: () => firstReady }, last = { isReady: () => true };
+    const gl = { compile: () => new Set([material]), properties: { get: () => ({ currentProgram: last,
+      programs: new Map([['plain', first], ['instanced', last]]) }) } } as unknown as THREE.WebGLRenderer;
+    let completed = false;
+    const preparation = compileCommercialMapPrograms(gl, new THREE.Group(), new THREE.Camera(), new THREE.Scene()).then(() => { completed = true; });
+    await vi.advanceTimersByTimeAsync(20); expect(completed).toBe(false);
+    firstReady = true; await vi.advanceTimersByTimeAsync(10); await preparation;
+    expect(completed).toBe(true); material.dispose();
+  });
   it('prepares only DIRECT before interaction and restores state without rendering or toggling visibility', async () => {
     const { gl, initialTarget, pending, states } = rendererFixture();
     const scene = new THREE.Scene();

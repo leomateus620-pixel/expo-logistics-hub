@@ -169,14 +169,14 @@ function selectDetailAnchors(cells: readonly QuadrasABEnvironmentCell[], maximum
 
 export function buildQuadrasABEnvironmentPlan({
   entities = OFFICIAL_RENDERED_ENTITIES,
-  reducedGraphics: requestedReducedGraphics = false,
-  preserveVisitGroundPlacement = false,
+  reducedGraphics: _legacyReducedGraphics = false,
+  preserveVisitGroundPlacement: _preserveVisitGroundPlacement = false,
 }: {
   entities?: readonly MapEntity[];
   reducedGraphics?: boolean;
   preserveVisitGroundPlacement?: boolean;
 } = {}): QuadrasABEnvironmentPlan {
-  const reducedGraphics = requestedReducedGraphics && !preserveVisitGroundPlacement;
+  const reducedGraphics = false;
   // Reuse the exact existing plan, including its graphics-mode cell size,
   // instead of approximating the headquarters contact ring with another mesh.
   const sitePlan = buildCommercialSiteEnvironmentPlan({

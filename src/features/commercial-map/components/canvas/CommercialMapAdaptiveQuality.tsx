@@ -5,6 +5,7 @@ import { sampleCommercialMapDisplayCadence } from '../../utils/displayCadence';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { recordCommercialMapQualityDecision } from '../../utils/runtimeDiagnostics';
 import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
+import { readCommercialMapQaQualityTier, resolveCommercialMapExecutionPolicy } from '../../utils/executionPolicy';
 import {
   capVisitPixelRatio, createInitialVisitQuality, publishVisitQualityTier,
   readVisitQuality, resolveVisitQualityDecision, subscribeVisitQuality,
@@ -84,12 +85,16 @@ export function CommercialMapAdaptiveQualityController({
   const displayCadence = useRef<number | null>(null);
   const cadenceCancel = useRef<(() => void) | null>(null);
   const activity = useRef(commercialMapFrameActivity(gl));
+  const executionReportAt = useRef(0);
+  const lastMeasuredWindow = useRef<{ averageFrameTimeMs: number; p95FrameTimeMs: number; sampledFrames: number } | null>(null);
+  const qaOverrideSnapshot = useRef<{ state: CommercialMapAdaptiveQualityState; fixed: boolean; qaTier: CommercialMapQualityTier | null } | null>(null);
   // Opt-in, local QA only: compare identical initial quality before/after.
   // groundQa also enables comparison on the application route in DEV only.
-  const fixedQualityForComparison = useRef(commercialMapDiagnosticsEnabled
+  const initialQaTier = useRef(readCommercialMapQaQualityTier(commercialMapDiagnosticsEnabled, typeof window === 'undefined' ? '' : window.location.search));
+  const fixedQualityForComparison = useRef(initialQaTier.current !== null || (commercialMapDiagnosticsEnabled
     && (window.location.pathname === '/__dev/commercial-map-rendering'
       || (import.meta.env.DEV && new URLSearchParams(window.location.search).has('groundQa')))
-    && new URLSearchParams(window.location.search).get('quality') === 'fixed');
+    && new URLSearchParams(window.location.search).get('quality') === 'fixed'));
 
   const resolveCapabilities = useCallback((): CommercialMapQualityCapabilitiesInput => ({
     devicePixelRatio: typeof window === 'undefined' ? 1 : window.devicePixelRatio,
@@ -100,13 +105,18 @@ export function CommercialMapAdaptiveQualityController({
 
   const resolveTierPixelRatio = useCallback((tier: CommercialMapQualityTier) => {
     const capabilities = resolveCapabilities();
+    const adaptiveDpr = resolveCommercialMapQualityPixelRatio({ ...capabilities, qualityTier: tier });
     const dpr = reducedGraphics
-      ? resolveCommercialMapPixelRatio({ ...capabilities, reducedGraphics: true })
-      : resolveCommercialMapQualityPixelRatio({ ...capabilities, qualityTier: tier });
+      ? Math.min(adaptiveDpr, resolveCommercialMapPixelRatio({ ...capabilities, reducedGraphics: true }))
+      : adaptiveDpr;
     return readVisitQuality().enabled ? capVisitPixelRatio(dpr, tier) : dpr;
   }, [reducedGraphics, resolveCapabilities]);
 
   const resolveQuality = useCallback((sample: Parameters<typeof resolveCommercialMapAdaptiveQuality>[1]) => {
+    if (initialQaTier.current && !readVisitQuality().enabled) return {
+      ...qualityState.current, tier: initialQaTier.current, hardwareCeiling: initialQaTier.current,
+      changed: qualityState.current.tier !== initialQaTier.current, reason: 'stable' as const,
+    };
     return readVisitQuality().enabled
       ? resolveVisitQualityDecision(qualityState.current, sample)
       : resolveCommercialMapAdaptiveQuality(qualityState.current, sample);
@@ -311,6 +321,36 @@ export function CommercialMapAdaptiveQualityController({
     return () => document.removeEventListener('visibilitychange', resetWindow);
   }, []);
 
+  useEffect(() => {
+    if (!commercialMapDiagnosticsEnabled) return;
+    const override = (event: Event) => {
+      const tier = (event as CustomEvent<{ tier: CommercialMapQualityTier | null }>).detail?.tier;
+      if (tier === null) {
+        const saved = qaOverrideSnapshot.current;
+        if (!saved) return;
+        qaOverrideSnapshot.current = null;
+        fixedQualityForComparison.current = saved.fixed;
+        initialQaTier.current = saved.qaTier;
+        qualityState.current = saved.state;
+        publishQuality(saved.state.tier, saved.state.tier, resolveTierPixelRatio(saved.state.tier), saved.state.tier, 'qa-override-release');
+      } else {
+        if (tier !== 'LOW' && tier !== 'MEDIUM' && tier !== 'HIGH' && tier !== 'ULTRA') return;
+        qaOverrideSnapshot.current ??= { state: { ...qualityState.current }, fixed: fixedQualityForComparison.current, qaTier: initialQaTier.current };
+        fixedQualityForComparison.current = true;
+        initialQaTier.current = tier;
+        qualityState.current = { ...qualityState.current, tier };
+        publishQuality(tier, tier, resolveTierPixelRatio(tier), tier, 'qa-override');
+      }
+      cancelIdleCommit();
+      pendingSceneTier.current = null;
+      resetCommercialMapFrameTimeWindow(frameWindow.current);
+      samplingSignature.current = '';
+      invalidate();
+    };
+    gl.domElement.addEventListener('commercial-map-quality-test', override);
+    return () => gl.domElement.removeEventListener('commercial-map-quality-test', override);
+  }, [cancelIdleCommit, gl, invalidate, publishQuality, resolveTierPixelRatio]);
+
   useEffect(() => () => { cancelIdleCommit(); cadenceCancel.current?.(); }, [cancelIdleCommit]);
 
   useEffect(() => {
@@ -330,7 +370,28 @@ export function CommercialMapAdaptiveQualityController({
   useFrame((_frameState, deltaSeconds) => {
     const store = useCommercialMapStore.getState();
     const gestureActive = isCommercialMapHeavyQualityGestureActive(store);
+    // Visit motion is an external mutable signal, not a React/store update.
+    // Observe its edges here; the sole DPR owner performs no per-frame writes.
+    if (pixelRatioState.current.gestureActive !== gestureActive) {
+      samplingSignature.current = '';
+      syncPixelRatio();
+    }
     const frame = activity.current;
+    const now = performance.now();
+    if (commercialMapDiagnosticsEnabled && now - executionReportAt.current >= 1000) {
+      executionReportAt.current = now;
+      gl.domElement.dataset.commercialMapExecution = JSON.stringify({
+        initialTier: initialState.tier,
+        tier: qualityState.current.tier,
+        sceneTier: committedSceneTier.current,
+        policy: resolveCommercialMapExecutionPolicy(committedSceneTier.current),
+        dpr: gl.getPixelRatio(),
+        shadowResolution: Number(gl.domElement.dataset.commercialMapShadowResolution) || null,
+        lastFrameWindow: lastMeasuredWindow.current,
+        inventory: gl.domElement.dataset.commercialMapInventoryCounts ? JSON.parse(gl.domElement.dataset.commercialMapInventoryCounts) : null,
+        hardwareRestrictedActions: [],
+      });
+    }
     const requested = frame.requested;
     frame.requested = 0;
     const ready = gl.domElement?.dataset.commercialMapHydration === 'complete'
@@ -374,6 +435,7 @@ export function CommercialMapAdaptiveQualityController({
       deltaSeconds * 1000,
     );
     if (!completedWindow) return;
+    lastMeasuredWindow.current = { ...completedWindow };
 
     const decision = resolveQuality({
       ...resolveCapabilities(),

@@ -66,6 +66,27 @@ describe('commercial map initial data pipeline', () => {
     expect(backend.events.some((e) => e.table === 'commercial_lots')).toBe(false);
   });
 
+  it('aborts before requests and refuses late private results after authorization changes', async () => {
+    const alreadyAborted = new AbortController(); alreadyAborted.abort();
+    await expect(fetchCommercialMap('org', { mode: 'full' }, { signal: alreadyAborted.signal })).rejects.toMatchObject({ name: 'AbortError' });
+    expect(backend.events).toHaveLength(0);
+    const controller = new AbortController(), pendingProject = deferred<unknown>();
+    backend.wait.map_projects = pendingProject.promise;
+    const request = fetchCommercialMap('org', { mode: 'full' }, { signal: controller.signal }); await settle();
+    controller.abort(); pendingProject.resolve({ data: project, error: null });
+    await expect(request).rejects.toMatchObject({ name: 'AbortError' });
+    expect(backend.events.some(event => event.table === 'commercial_lots')).toBe(false);
+  });
+
+  it('retains its operation recorder after other operations start', async () => {
+    const record = vi.fn(), pendingProject = deferred<unknown>();
+    backend.wait.map_projects = pendingProject.promise;
+    const request = fetchCommercialMap('org', { mode: 'full' }, { includeReferenceImage: false, recordStage: record }); await settle();
+    pendingProject.resolve({ data: project, error: null }); await request;
+    expect(record.mock.calls.some(([stage]) => stage === 'project:end')).toBe(true);
+    expect(record.mock.calls.some(([stage]) => stage === 'inventory-transformation:end')).toBe(true);
+  });
+
   it('propagates denied project access without falling back to full or reference inventory', async () => {
     backend.wait.map_projects = Promise.resolve({ data: null, error: new Error('project-access-denied') });
     await expect(fetchCommercialMap('org')).rejects.toThrow('project-access-denied');

@@ -5,10 +5,11 @@ import {
   type CommercialMapAdaptiveQualityState,
   type CommercialMapQualityTier,
 } from './viewport';
+import { visitRuntime } from '../visit/visitRuntime';
 
-export const COMMERCIAL_MAP_INTERACTION_MIN_PIXEL_RATIO = 0.72;
-export const COMMERCIAL_MAP_INTERACTION_MAX_PIXEL_RATIO = 1;
-export const COMMERCIAL_MAP_INTERACTION_PIXEL_RATIO_SCALE = 0.72;
+export const COMMERCIAL_MAP_INTERACTION_MIN_PIXEL_RATIO = 0.85;
+export const COMMERCIAL_MAP_INTERACTION_MAX_PIXEL_RATIO = 1.35;
+export const COMMERCIAL_MAP_INTERACTION_PIXEL_RATIO_SCALE = 0.9;
 // DPR changes resize the drawing buffer and every post-processing target.
 // Wait for OrbitControls damping to finish, then require a meaningful idle
 // window so those allocations never land in the tail of the same gesture.
@@ -90,6 +91,7 @@ export function isCommercialMapHeavyQualityGestureActive(state: {
   lunarLaunchReturning: boolean;
 }) {
   return state.cameraNavigating
+    || visitRuntime.renderingActive
     || state.lunarLaunchPhase !== 'idle'
     || state.lunarLaunchReturning;
 }
@@ -110,8 +112,8 @@ export function shouldApplyCommercialMapPixelRatioNow({
 /**
  * A deterministic, bounded render scale for camera motion. It changes only at
  * gesture boundaries and never mutates the logical adaptive-quality tier.
- * The full-resolution post stack therefore stays allocated while the default
- * framebuffer alone becomes cheaper to orbit, pan and zoom.
+ * The same post stack remains active. Its drawing-buffer targets resize only
+ * at the motion boundary, never repeatedly during orbit, walking or zoom.
  */
 export function resolveCommercialMapInteractionPixelRatio(restingDpr: number) {
   if (!Number.isFinite(restingDpr) || restingDpr <= 0) {
@@ -175,7 +177,7 @@ export function shouldDeferCommercialMapSceneQuality({
 
 export function isCommercialMapAdaptiveQualitySamplingActive({
   mapActive,
-  reducedGraphics,
+  reducedGraphics: _reducedGraphics,
   documentVisibilityState,
   continuousRendering,
 }: {
@@ -185,7 +187,6 @@ export function isCommercialMapAdaptiveQualitySamplingActive({
   continuousRendering: boolean;
 }) {
   return mapActive
-    && !reducedGraphics
     && documentVisibilityState === 'visible'
     && continuousRendering;
 }

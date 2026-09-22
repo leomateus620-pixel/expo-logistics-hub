@@ -4,6 +4,7 @@ import { lazyWithRetry } from '@/lib/lazyWithRetry';
 import { CommercialMapBootLoader } from '@/features/commercial-map/components/CommercialMapBootLoader';
 import { beginCommercialMapBoot, markCommercialMapStage } from '@/features/commercial-map/utils/performanceDiagnostics';
 import { preloadHeadquartersGeometry } from '@/features/commercial-map/components/canvas/headquarters/headquartersPreparationResource';
+import { loadCommercialMapRouteModule } from '@/features/commercial-map/utils/loadCommercialMapRouteModule';
 import { Toaster } from '@/components/ui/toaster';
 import PushPermissionPrompt from '@/components/notifications/PushPermissionPrompt';
 import { Toaster as Sonner } from '@/components/ui/sonner';
@@ -68,7 +69,7 @@ const FenasojaCountdownExperiencePage = lazyWithRetry(
 const CommercialMapPage = lazyWithRetry(async () => {
   beginCommercialMapBoot();
   void preloadHeadquartersGeometry().catch(() => undefined);
-  const module = await import('./pages/CommercialMapPage');
+  const module = await loadCommercialMapRouteModule();
   markCommercialMapStage('module-ready');
   return module;
 });
@@ -84,6 +85,8 @@ const CommercialMapRenderingDiagnosticsPage = (import.meta.env.DEV || import.met
 const ExteriorCatalogQa = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
   ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/ExteriorCatalogQa'))
   : null;
+const CommercialMapPrewarmDiagnosticsPage = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
+  ? lazyWithRetry(() => import('./features/commercial-map/diagnostics/CommercialMapPrewarmDiagnosticsPage')) : null;
 const CommercialMapInterfaceDiagnosticsPage = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
   ? lazyWithRetry(async () => {
     beginCommercialMapBoot();
@@ -496,6 +499,7 @@ const App = () => (
               {/* Consulta pública por área: sem AuthGuard, OrgGuard ou capacidades. */}
               <Route path="/areas/:slug/:token" element={<Suspended><PublicAreaMapPage /></Suspended>} />
               {ExteriorCatalogQa && <Route path="/__dev/exterior-catalog" element={<Suspended><ExteriorCatalogQa /></Suspended>} />}
+              {CommercialMapPrewarmDiagnosticsPage && <Route path="/__dev/commercial-map-prewarm" element={<Suspended><CommercialMapPrewarmDiagnosticsPage /></Suspended>} />}
               {CommissionAgendaPreviewPage && (
                 <Route path="/__dev/comissao-agenda" element={<Suspended><CommissionAgendaPreviewPage /></Suspended>} />
               )}

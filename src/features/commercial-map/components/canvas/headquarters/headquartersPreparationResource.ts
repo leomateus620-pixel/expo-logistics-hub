@@ -1,4 +1,4 @@
-import { markCommercialMapStage } from '../../../utils/performanceDiagnostics';
+import { captureCommercialMapStageRecorder, type CommercialMapStageRecorder } from '../../../utils/performanceDiagnostics';
 import type { PackedHeadquartersGeometry } from './headquartersGeometryPacking';
 import type { HeadquartersWorkerResponse } from './headquartersGeometryWorker';
 
@@ -27,9 +27,9 @@ export function createHeadquartersPreparationResource({
   let ready: PackedHeadquartersGeometry | undefined;
   let failure: unknown;
   let failed = false;
-  const preload = () => {
-    if (pending) return pending;
-    markCommercialMapStage('b12-worker:start');
+  const preload = (recordStage: CommercialMapStageRecorder = captureCommercialMapStageRecorder()) => {
+    if (pending) { recordStage('b12-worker:cached', { source: ready ? 'cached' : 'prefetched' }); return pending; }
+    recordStage('b12-worker:start', { source: 'cold' });
     const work = new Promise<PackedHeadquartersGeometry>((resolve, reject) => {
       let worker: HeadquartersPreparationWorker | undefined;
       let timer: ReturnType<typeof setTimeout> | undefined;
@@ -61,13 +61,13 @@ export function createHeadquartersPreparationResource({
     });
     pending = work.then((packed) => {
       ready = packed;
-      markCommercialMapStage('b12-worker-geometry', packed.timings.geometryMs);
-      markCommercialMapStage('b12-worker-contact', packed.timings.contactMs);
-      markCommercialMapStage('b12-worker:end');
+      recordStage('b12-worker-geometry', { duration: packed.timings.geometryMs });
+      recordStage('b12-worker-contact', { duration: packed.timings.contactMs });
+      recordStage('b12-worker:end');
       return packed;
     }, (error: unknown) => {
       workerFailed = true;
-      markCommercialMapStage('b12-worker:end', undefined, true);
+      recordStage('b12-worker:end', { failed: true });
       throw error;
     });
     // A failed warm preload must not start expensive main-thread preparation
@@ -83,18 +83,19 @@ export function createHeadquartersPreparationResource({
       if (failed) throw failure;
       if (workerFailed) {
         if (!fallbackPending) {
-          markCommercialMapStage('b12-worker:fallback');
-          markCommercialMapStage('b12-fallback:start');
+          const recordStage = captureCommercialMapStageRecorder();
+          recordStage('b12-worker:fallback');
+          recordStage('b12-fallback:start');
           fallbackPending = Promise.resolve().then(fallback).then((packed) => {
             ready = packed;
-            markCommercialMapStage('b12-fallback-geometry', packed.timings.geometryMs);
-            markCommercialMapStage('b12-fallback-contact', packed.timings.contactMs);
-            markCommercialMapStage('b12-fallback:end');
+            recordStage('b12-fallback-geometry', { duration: packed.timings.geometryMs });
+            recordStage('b12-fallback-contact', { duration: packed.timings.contactMs });
+            recordStage('b12-fallback:end');
             return packed;
           }, (error: unknown) => {
             failed = true;
             failure = error;
-            markCommercialMapStage('b12-fallback:end', undefined, true);
+            recordStage('b12-fallback:end', { failed: true });
             throw error;
           });
           void fallbackPending.catch(() => undefined);

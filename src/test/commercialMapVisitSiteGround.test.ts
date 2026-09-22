@@ -47,7 +47,7 @@ describe('Visit support on the actual A/B and site-treatment soil', () => {
     for (const cell of sites.cells) expect(siteGround.heightAt(...cell.center)).toBeCloseTo(cell.elevation, 10);
   }, 15000);
 
-  it('preserves the same physical cells through visit quality switches and leaves traditional quality reduction intact', () => {
+  it('preserves the same physical cells through every technical profile in traditional and visit modes', () => {
     const quadraHigh = buildQuadrasABEnvironmentPlan({ entities, reducedGraphics: false, preserveVisitGroundPlacement: true });
     const quadraLow = buildQuadrasABEnvironmentPlan({ entities, reducedGraphics: true, preserveVisitGroundPlacement: true });
     const siteHigh = buildCommercialSiteEnvironmentPlan({ entities, reducedGraphics: false, preserveVisitGroundPlacement: true });
@@ -56,8 +56,8 @@ describe('Visit support on the actual A/B and site-treatment soil', () => {
     const normalSiteLow = buildCommercialSiteEnvironmentPlan({ entities, reducedGraphics: true });
     expect(quadraLow.cells).toEqual(quadraHigh.cells);
     expect(siteLow.cells).toEqual(siteHigh.cells);
-    expect(normalQuadraLow.cells.length).toBeLessThan(quadraHigh.cells.length);
-    expect(normalSiteLow.cells.length).toBeLessThan(siteHigh.cells.length);
+    expect(normalQuadraLow.cells).toEqual(quadraHigh.cells);
+    expect(normalSiteLow.cells).toEqual(siteHigh.cells);
     if (process.env.VISIT_COLLISION_AUDIT === '1') {
       const destination = resolve(process.cwd(), 'artifacts/visit-mode');
       mkdirSync(destination, { recursive: true });

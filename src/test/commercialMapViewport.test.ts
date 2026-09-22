@@ -11,6 +11,7 @@ import {
   COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS,
   COMMERCIAL_MAP_MAX_DISTANCE_FRAMING_MARGIN,
   COMMERCIAL_MAP_MIN_POLAR_ANGLE,
+  COMMERCIAL_MAP_MIN_PRESENTATION_DPR,
   COMMERCIAL_MAP_QUALITY_PRESETS,
   COMMERCIAL_MAP_QUALITY_TIER_ORDER,
   COMMERCIAL_MAP_TOP_DIRECTION,
@@ -236,7 +237,7 @@ describe('viewport mobile do Mapa Comercial', () => {
     })).toBe(1.35);
   });
 
-  it('mantém piso de 1x quando ele cabe e permite subamostragem para honrar o orçamento real', () => {
+  it('mantém nitidez mínima e respeita um DPR nativo abaixo do piso técnico', () => {
     expect(resolveCommercialMapPixelRatio({
       devicePixelRatio: 0.75,
       viewportWidth: 393,
@@ -248,7 +249,7 @@ describe('viewport mobile do Mapa Comercial', () => {
       viewportWidth: 7680,
       viewportHeight: 4320,
       reducedGraphics: true,
-    })).toBe(0.16);
+    })).toBe(0.5);
     expect(resolveCommercialMapPixelRatio({
       devicePixelRatio: Number.NaN,
       viewportWidth: 1920,
@@ -280,11 +281,11 @@ describe('viewport mobile do Mapa Comercial', () => {
     })).toBe(1.14);
   });
 
-  it('nunca excede o orçamento de pixels, nem por piso nem por arredondamento', () => {
+  it('honra o orçamento até o piso de nitidez; não torna telas grandes ilegíveis', () => {
     const cases = [
       { width: 393, height: 852, dpr: 3, reducedGraphics: false, budget: 4_800_000 },
       { width: 2560, height: 1440, dpr: 2, reducedGraphics: false, budget: 4_800_000 },
-      { width: 7680, height: 4320, dpr: 1, reducedGraphics: true, budget: 900_000 },
+      { width: 7680, height: 4320, dpr: 1, reducedGraphics: true, budget: 1_500_000 },
     ] as const;
 
     for (const sample of cases) {
@@ -294,7 +295,8 @@ describe('viewport mobile do Mapa Comercial', () => {
         viewportHeight: sample.height,
         reducedGraphics: sample.reducedGraphics,
       });
-      expect(sample.width * sample.height * ratio * ratio).toBeLessThanOrEqual(sample.budget);
+      const floorPixels = sample.width * sample.height * COMMERCIAL_MAP_MIN_PRESENTATION_DPR ** 2;
+      expect(sample.width * sample.height * ratio * ratio).toBeLessThanOrEqual(Math.ceil(Math.max(sample.budget, floorPixels)));
     }
   });
 
@@ -318,7 +320,7 @@ describe('viewport mobile do Mapa Comercial', () => {
         viewportHeight: 2160,
       });
       expect(ratio).toBeLessThanOrEqual(preset.maximumPixelRatio);
-      expect(3840 * 2160 * ratio * ratio).toBeLessThanOrEqual(preset.pixelBudget);
+      expect(3840 * 2160 * ratio * ratio).toBeLessThanOrEqual(Math.ceil(Math.max(preset.pixelBudget, 3840 * 2160 * COMMERCIAL_MAP_MIN_PRESENTATION_DPR ** 2)));
     }
   });
 
@@ -567,12 +569,12 @@ describe('viewport mobile do Mapa Comercial', () => {
     });
   });
 
-  it('mantém HIGH e ULTRA no mesmo stack ambiental e só reconstrói em MEDIUM/LOW', () => {
+  it('preserva o stack ambiental e posterga alterações do alvo de sombras em todos os tiers', () => {
     expect(resolveCommercialMapEnvironmentQualityTier('ULTRA')).toBe('full');
     expect(resolveCommercialMapEnvironmentQualityTier('HIGH')).toBe('full');
     expect(resolveCommercialMapEnvironmentQualityTier('MEDIUM')).toBe('balanced');
     expect(resolveCommercialMapEnvironmentQualityTier('LOW')).toBe('reduced');
-    expect(commercialMapQualitySceneRebuildsOnTierChange('HIGH', 'ULTRA')).toBe(false);
+    expect(commercialMapQualitySceneRebuildsOnTierChange('HIGH', 'ULTRA')).toBe(true);
     expect(commercialMapQualitySceneRebuildsOnTierChange('HIGH', 'MEDIUM')).toBe(true);
     expect(commercialMapQualitySceneRebuildsOnTierChange('MEDIUM', 'LOW')).toBe(true);
   });

@@ -1,5 +1,5 @@
 import { VisitSpatialIndex, visitPointInRing } from './VisitSpatialIndex';
-import { VISIT_CHARACTER_HEIGHT, VISIT_CHARACTER_RADIUS, VISIT_MAX_STEP, type VisitBounds, type VisitCollider, type VisitVector3 } from './visitTypes';
+import { VISIT_CHARACTER_HEIGHT, VISIT_CHARACTER_RADIUS, VISIT_MAX_STEP, type VisitBounds, type VisitCollider, type VisitGroundSupport, type VisitVector3 } from './visitTypes';
 
 const SKIN = 0.00008;
 // Authored ground is -.08 while roads reach .032. This support transition is
@@ -104,9 +104,16 @@ export class VisitCollisionSystem {
     return true;
   }
 
-  move(position: VisitVector3, dx: number, dz: number, radius = VISIT_CHARACTER_RADIUS, height = VISIT_CHARACTER_HEIGHT, heightAt?: (x: number, z: number) => number) {
+  move(position: VisitVector3, dx: number, dz: number, radius = VISIT_CHARACTER_RADIUS, height = VISIT_CHARACTER_HEIGHT, heightAt?: (x: number, z: number) => number, supportAt?: (x: number, z: number, radius: number) => VisitGroundSupport) {
     if (!Number.isFinite(position.x) || !Number.isFinite(position.y) || !Number.isFinite(position.z) || !Number.isFinite(dx) || !Number.isFinite(dz)) return position;
     this.diagnostics.moves++;
+    // Revalidate a restored/stationary pose too, before evaluating body Y.
+    // The support query owns presentation-only lot steps; obstacle steps keep
+    // their original .045 limit and continuous wall sweep.
+    if (supportAt) {
+      const support = supportAt(position.x, position.z, radius);
+      if (support.height - position.y <= support.maximumRise + .0001) position.y = support.height;
+    }
     const distance = Math.hypot(dx, dz);
     // Ground samples remain bounded even for a background-tab delta. Collision
     // itself uses a continuous sweep and does not depend on frame rate.
@@ -139,9 +146,10 @@ export class VisitCollisionSystem {
         const t = this.best.t < 1 ? Math.max(0, this.best.t - SKIN / Math.max(Math.hypot(rx, rz), SKIN)) : 1;
         const nx = Math.max(this.bounds.minX + radius, Math.min(this.bounds.maxX - radius, position.x + rx * t));
         const nz = Math.max(this.bounds.minZ + radius, Math.min(this.bounds.maxZ - radius, position.z + rz * t));
-        const nextY = heightAt ? heightAt(nx, nz) : position.y;
+        const support = supportAt?.(nx, nz, radius);
+        const nextY = support ? support.height : heightAt ? heightAt(nx, nz) : position.y;
         // A tall ledge is a boundary, not a teleport to a roof/platform.
-        if (nextY - position.y > MAX_AUTHORED_SURFACE_RISE + 0.0001) break;
+        if (nextY - position.y > (support?.maximumRise ?? MAX_AUTHORED_SURFACE_RISE) + 0.0001) break;
         position.x = nx; position.z = nz; position.y = nextY;
         if (this.best.t >= 1) break;
         this.diagnostics.collisions++;

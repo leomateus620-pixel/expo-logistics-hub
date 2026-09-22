@@ -13,7 +13,7 @@ export interface CommercialMapQualityPreset {
   tier: CommercialMapQualityTier;
   pixelBudget: number;
   maximumPixelRatio: number;
-  shadowMapSize: 512 | 1024 | 2048 | 4096;
+  shadowMapSize: 512 | 1024 | 1536 | 2048 | 4096;
   vegetationDensity: number;
   distantVegetationDensity: number;
   ambientOcclusionResolutionScale: number;
@@ -97,7 +97,8 @@ interface CommercialMapCameraPositionClampInput {
 }
 
 const STANDARD_PIXEL_BUDGET = 4_800_000;
-const REDUCED_PIXEL_BUDGET = 900_000;
+const REDUCED_PIXEL_BUDGET = 1_500_000;
+export const COMMERCIAL_MAP_MIN_PRESENTATION_DPR = 0.85;
 
 export const COMMERCIAL_MAP_QUALITY_TIER_ORDER = [
   'LOW',
@@ -116,12 +117,12 @@ export const COMMERCIAL_MAP_QUALITY_PRESETS = {
     tier: 'LOW',
     pixelBudget: REDUCED_PIXEL_BUDGET,
     maximumPixelRatio: 1,
-    shadowMapSize: 512,
-    vegetationDensity: 0.45,
-    distantVegetationDensity: 0.2,
-    ambientOcclusionResolutionScale: 0,
+    shadowMapSize: 1024,
+    vegetationDensity: 1,
+    distantVegetationDensity: 1,
+    ambientOcclusionResolutionScale: 0.5,
     maximumAnisotropy: 2,
-    lodDistanceScale: 0.72,
+    lodDistanceScale: 1,
     downgradeAboveFrameTimeMs: Number.POSITIVE_INFINITY,
     upgradeBelowFrameTimeMs: 16.4,
   },
@@ -129,12 +130,12 @@ export const COMMERCIAL_MAP_QUALITY_PRESETS = {
     tier: 'MEDIUM',
     pixelBudget: 2_000_000,
     maximumPixelRatio: 1.35,
-    shadowMapSize: 1024,
-    vegetationDensity: 0.7,
-    distantVegetationDensity: 0.45,
+    shadowMapSize: 1536,
+    vegetationDensity: 1,
+    distantVegetationDensity: 1,
     ambientOcclusionResolutionScale: 0.5,
     maximumAnisotropy: 4,
-    lodDistanceScale: 0.86,
+    lodDistanceScale: 1,
     downgradeAboveFrameTimeMs: 25,
     upgradeBelowFrameTimeMs: 16.2,
   },
@@ -144,7 +145,7 @@ export const COMMERCIAL_MAP_QUALITY_PRESETS = {
     maximumPixelRatio: 1.75,
     shadowMapSize: 2048,
     vegetationDensity: 1,
-    distantVegetationDensity: 0.75,
+    distantVegetationDensity: 1,
     ambientOcclusionResolutionScale: 0.75,
     maximumAnisotropy: 8,
     lodDistanceScale: 1,
@@ -160,7 +161,7 @@ export const COMMERCIAL_MAP_QUALITY_PRESETS = {
     distantVegetationDensity: 1,
     ambientOcclusionResolutionScale: 1,
     maximumAnisotropy: 16,
-    lodDistanceScale: 1.12,
+    lodDistanceScale: 1,
     downgradeAboveFrameTimeMs: 19.5,
     upgradeBelowFrameTimeMs: 0,
   },
@@ -423,15 +424,14 @@ export function resolveCommercialMapEnvironmentQualityTier(
 }
 
 /**
- * HIGH and ULTRA share the full environment stack (shadow map, terrain
- * program, composer, regional instances). HIGH↔MEDIUM and MEDIUM↔LOW do not.
+ * Scene content and material programs are shared. Shadow target allocation is
+ * deferred until navigation settles, including the HIGH/ULTRA resolution step.
  */
 export function commercialMapQualitySceneRebuildsOnTierChange(
   from: CommercialMapQualityTier,
   to: CommercialMapQualityTier,
 ) {
-  return resolveCommercialMapEnvironmentQualityTier(from)
-    !== resolveCommercialMapEnvironmentQualityTier(to);
+  return from !== to;
 }
 
 export function resolveCommercialMapAdaptiveUpgradeWindows(downgradeStreak: number) {
@@ -663,11 +663,12 @@ export function resolveCommercialMapQualityPixelRatio({
   ...viewport
 }: CommercialMapQualityPixelRatioInput) {
   const preset = COMMERCIAL_MAP_QUALITY_PRESETS[qualityTier];
-  return resolveBudgetedCommercialMapPixelRatio({
+  const budgeted = resolveBudgetedCommercialMapPixelRatio({
     ...viewport,
     pixelBudget: preset.pixelBudget,
     maximumPixelRatio: preset.maximumPixelRatio,
   });
+  return Math.max(Math.min(finitePositive(viewport.devicePixelRatio, 1), COMMERCIAL_MAP_MIN_PRESENTATION_DPR), budgeted);
 }
 
 export function resolveCommercialMapPixelRatio({
@@ -682,13 +683,14 @@ export function resolveCommercialMapPixelRatio({
   // Alterar DPR em onStart/onEnd redimensiona o drawing buffer durante o gesto.
   // O orçamento é calculado por viewport e
   // permanece estável durante órbita, pan, pinça e animações da câmera.
-  return resolveBudgetedCommercialMapPixelRatio({
+  const budgeted = resolveBudgetedCommercialMapPixelRatio({
     devicePixelRatio,
     viewportWidth: safeWidth,
     viewportHeight: safeHeight,
     pixelBudget: reducedGraphics ? REDUCED_PIXEL_BUDGET : STANDARD_PIXEL_BUDGET,
     maximumPixelRatio: reducedGraphics ? 1.35 : isPhoneViewport ? 2.25 : 1.75,
   });
+  return Math.max(Math.min(finitePositive(devicePixelRatio, 1), COMMERCIAL_MAP_MIN_PRESENTATION_DPR), budgeted);
 }
 
 export function resolveCommercialMapSheetSnap(

@@ -48,6 +48,7 @@ import {
   type PortalEntryId,
 } from '@/modules/portal/portalRegistry';
 import { useCommissionPeople } from '@/hooks/useCommissionPeople';
+import { useCommercialMapPrewarm } from '@/features/commercial-map/hooks/useCommercialMapPrewarm';
 import type { OfficialUnitEntry } from '@/modules/commissions/officialCommissionCatalog';
 import { ChevronDown } from 'lucide-react';
 import '@/styles/commission-portal.css';
@@ -115,7 +116,7 @@ export default function CommissionPortalPage() {
     hasFullAccess,
     isLoading: capabilitiesLoading,
   } = useCapabilities();
-  const { hasOrg, myRole, isLoading: orgLoading } = useCurrentOrg();
+  const { hasOrg, orgId, myRole, isLoading: orgLoading } = useCurrentOrg();
   const [expandedEntry, setExpandedEntry] = useState<PortalEntryId | null>(null);
   const [ecosystemOpen, setEcosystemOpen] = useState(false);
   const portalRef = useRef<HTMLDivElement>(null);
@@ -181,6 +182,9 @@ export default function CommissionPortalPage() {
   const agendaFenasojaAccess = resolveCapabilityAccess(agendaFenasojaDestination);
   const agendaVenueAccess = resolveCapabilityAccess(agendaVenueDestination);
   const mapAccess = resolveCapabilityAccess(commercialMapDestination);
+  const mapPrewarm = useCommercialMapPrewarm({ userId: user?.id, orgId,
+    authorized: !accessLoading && Boolean(user && orgId && hasOrg) && mapAccess.state === 'allowed',
+    paused: ecosystemOpen });
   const financeAccess = resolveCommissionAccess(financePortalModule);
   const adminAccess = resolveAdminAccess();
 
@@ -344,7 +348,9 @@ export default function CommissionPortalPage() {
     if (entryId === 'agenda-restaurante-arena') {
       return () => saveSelectedModule(agendaVenueDestination.storageSlug);
     }
-    if (entryId === 'mapa-comercial') return () => saveSelectedModule(commercialMapDestination.storageSlug);
+    if (entryId === 'mapa-comercial') return () => {
+      mapPrewarm.onNavigate(); saveSelectedModule(commercialMapDestination.storageSlug);
+    };
     if (entryId === 'financeiro') return () => saveSelectedModule(financePortalModule.slug);
     return undefined;
   };
@@ -451,6 +457,7 @@ export default function CommissionPortalPage() {
               access={getEntryAccess(entry.id)}
               onToggle={entry.kind === 'expandable' ? () => toggleEntry(entry.id) : undefined}
               onSelect={getEntrySelection(entry.id)}
+              onIntent={entry.id === 'mapa-comercial' ? mapPrewarm.onIntent : undefined}
             >
               {entry.id === 'comissoes' && (
                 <div className="portal-commissions-panel">

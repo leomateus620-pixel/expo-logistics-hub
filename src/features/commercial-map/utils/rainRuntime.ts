@@ -25,9 +25,9 @@ export function advanceRainBlend(current: number, active: boolean, delta: number
 }
 
 export const COMMERCIAL_RAIN_BUDGETS = {
-  LOW: { drops: 900, splashes: 0, runoff: 0, puddles: 24 },
-  MEDIUM: { drops: 1800, splashes: 64, runoff: 64, puddles: 40 },
-  HIGH: { drops: 3000, splashes: 128, runoff: 128, puddles: 64 },
+  LOW: { drops: 4000, splashes: 160, runoff: 160, puddles: 80 },
+  MEDIUM: { drops: 4000, splashes: 160, runoff: 160, puddles: 80 },
+  HIGH: { drops: 4000, splashes: 160, runoff: 160, puddles: 80 },
   ULTRA: { drops: 4000, splashes: 160, runoff: 160, puddles: 80 },
 } as const;
 

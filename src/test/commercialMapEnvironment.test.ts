@@ -74,7 +74,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(materialSetup).toContain("name: 'CommercialMapOuterGroundMaterial'");
     expect(materialSetup).toContain('new THREE.MeshStandardMaterial({');
     expect(materialSetup).toContain('resolveTerrainMultiscaleQualityOptions(');
-    expect(materialSetup).toContain('qualityTier,');
+    expect(materialSetup).toContain('COMMERCIAL_MAP_CANONICAL_CONTENT.materialProfile,');
     expect(materialSetup).toContain('[extent.centerX, extent.centerZ]');
     expect(materialSetup).toContain('applyTerrainMultiscaleDetail(material, terrainDetail)');
     expect(materialSetup).toContain("if (!terrainDetail) return applyInteriorGroundMaterial(material, 'internal-base');");
@@ -269,7 +269,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
       cloudInstances: 0,
       cloudsIntegratedInSky: true,
       animatedLayers: 4,
-      postProcessingPasses: 3,
+      postProcessingPasses: 4,
       shadowMapSize: 1536,
     });
     expect(commercialMapEnvironmentBudget('reduced')).toMatchObject({
@@ -280,8 +280,8 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
       cloudInstances: 0,
       cloudsIntegratedInSky: true,
       animatedLayers: 4,
-      postProcessingPasses: 0,
-      shadowMapSize: 512,
+      postProcessingPasses: 4,
+      shadowMapSize: 1024,
     });
     expect(COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality.full).toMatchObject({
       bloomLevels: 7,
@@ -289,18 +289,18 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
       smaaPreset: 'ultra',
     });
     expect(COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality.balanced).toMatchObject({
-      bloomLevels: 5,
+      bloomLevels: 7,
       bloomEnabled: true,
-      smaaPreset: 'high',
+      smaaPreset: 'ultra',
     });
     expect(COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality.reduced).toMatchObject({
-      bloomLevels: 0,
-      bloomEnabled: false,
-      smaaPreset: 'renderer-msaa',
-      sharpenStrength: 0,
-      shadowMapSize: 512,
+      bloomLevels: 7,
+      bloomEnabled: true,
+      smaaPreset: 'ultra',
+      sharpenStrength: 0.16,
+      shadowMapSize: 1024,
     });
-    expect(COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality.balanced.sharpenStrength).toBe(0);
+    expect(COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality.balanced.sharpenStrength).toBe(0.16);
     expect(COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality.full.sharpenStrength).toBeGreaterThan(0);
     const environment = source(
       'src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx',
@@ -436,7 +436,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).not.toContain('projectedSunPosition.copy(sun.position)');
     expect(environment).toContain('...camera.matrixWorld.elements');
     expect(environment).toContain('cameraPosition: camera.matrixWorld.elements');
-    expect(environment).toContain('enabled={active && !cameraNavigating}');
+    expect(environment).toContain('enabled={active}');
     expect(environmentData).not.toContain('cameraNavigating');
     expect(authoredSunriseSources).not.toContain('prefers-reduced-motion');
     expect(authoredSunriseSources).not.toContain('matchMedia(');

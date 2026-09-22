@@ -17,7 +17,8 @@ import {
 } from './spatialSurface';
 
 export const COMMERCIAL_TREE_CANOPY_LOBES = 7;
-export const COMMERCIAL_TREE_REDUCED_CANOPY_LOBES = 3;
+/** Legacy name kept for callers; profiles share the authored silhouette. */
+export const COMMERCIAL_TREE_REDUCED_CANOPY_LOBES = COMMERCIAL_TREE_CANOPY_LOBES;
 export const COMMERCIAL_TREE_BRANCHES = 2;
 /** Static ground shadow + trunk + branch + crown in the primary color pass. */
 export const COMMERCIAL_TREE_LAYER_DRAW_CALL_BUDGET = 4;
@@ -210,11 +211,11 @@ function commercialTreeSupportElevationAtPosition(
   return 0.036 + shadowOffset;
 }
 
-export function commercialTreeInstanceBudget(treeCount: number, reducedGraphics = false) {
+export function commercialTreeInstanceBudget(treeCount: number, _legacyReducedGraphics = false) {
   const normalizedCount = Math.max(0, Math.floor(treeCount));
-  const canopyLobes = reducedGraphics ? COMMERCIAL_TREE_REDUCED_CANOPY_LOBES : COMMERCIAL_TREE_CANOPY_LOBES;
+  const canopyLobes = COMMERCIAL_TREE_CANOPY_LOBES;
   const drawCalls = normalizedCount > 0 ? COMMERCIAL_TREE_LAYER_DRAW_CALL_BUDGET : 0;
-  const shadowDrawCalls = normalizedCount > 0 && !reducedGraphics
+  const shadowDrawCalls = normalizedCount > 0
     ? COMMERCIAL_TREE_LAYER_SHADOW_DRAW_CALL_BUDGET
     : 0;
   return {

@@ -486,8 +486,9 @@ export function buildElectricalPoleCrossarmLayouts(
 export function electricalInfrastructureInstanceBudget(
   nodes: readonly CommercialElectricalNode[],
   connections: readonly CommercialElectricalConnection[],
-  reducedGraphics = false,
+  _legacyReducedGraphics = false,
 ) {
+  const reducedGraphics = false;
   const poleCount = nodes.filter((node) => node.type === 'POLE').length;
   const transformerCount = nodes.length - poleCount;
   const crossarmCount = buildElectricalPoleCrossarmLayouts(nodes, connections).length;
@@ -523,10 +524,11 @@ export function buildElectricalWirePositions(
   nodes: readonly CommercialElectricalNode[],
   connections: readonly CommercialElectricalConnection[],
   surfaceEntities: readonly MapEntity[],
-  reducedGraphics = false,
+  _legacyReducedGraphics = false,
   resolvedPlacements?: readonly ResolvedElectricalNodePlacement[],
   resolvedCrossarms?: readonly ElectricalPoleCrossarmLayout[],
 ) {
+  const reducedGraphics = false;
   const placements = resolvedPlacements
     ?? resolveElectricalNodePlacements(nodes, surfaceEntities);
   const placementByNodeId = new Map(placements.map((placement) => [placement.node.id, placement]));

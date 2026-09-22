@@ -9,6 +9,7 @@ import {
 import { resolveCommercialMapInteractionPixelRatio } from '@/features/commercial-map/utils/adaptiveQualityRuntime';
 import { commercialMapFrameActivity } from '@/features/commercial-map/utils/frameActivity';
 import { beginVisitQualitySession, readVisitQuality, setVisitQualityMotion } from '@/features/commercial-map/visit/VisitQualityManager';
+import { visitRuntime } from '@/features/commercial-map/visit/visitRuntime';
 
 const runtime = vi.hoisted(() => {
   let pixelRatio = 1;
@@ -48,6 +49,7 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     runtime.setDpr(1);
     runtime.setDpr.mockClear();
     runtime.invalidate.mockClear();
+    visitRuntime.renderingActive = false;
     runtime.gl.domElement.dataset.commercialMapHydration = 'complete';
     delete runtime.gl.domElement.dataset.commercialMapPreparing;
     Object.assign(commercialMapFrameActivity(runtime.gl), { requested: 0, path: 'direct', frames: 0 });
@@ -59,8 +61,32 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
   });
 
   afterEach(() => {
+    visitRuntime.renderingActive = false;
     cleanup();
+    window.history.replaceState({}, '', '/');
     vi.useRealTimers();
+  });
+
+  it('fixa o perfil QA antes do primeiro frame, mantém override no resize e remove o listener ao desmontar', () => {
+    window.history.replaceState({}, '', '/?qualityQa=HIGH');
+    const onQualityChange = vi.fn();
+    const props = { active: true, initialState, capabilityHints, reducedGraphics: false, onQualityChange };
+    const view = render(<CommercialMapAdaptiveQualityController {...props} />);
+    expect(onQualityChange.mock.lastCall?.[0].sceneTier).toBe('HIGH');
+    for (let cycle = 0; cycle < 20; cycle++) {
+      const tier = cycle % 2 ? 'MEDIUM' : 'LOW';
+      act(() => runtime.gl.domElement.dispatchEvent(new CustomEvent('commercial-map-quality-test', { detail: { tier } })));
+      expect(onQualityChange.mock.lastCall?.[0].sceneTier).toBe(tier);
+      runtime.size = { width: 1200 + cycle, height: 800 };
+      view.rerender(<CommercialMapAdaptiveQualityController {...props} />);
+      expect(onQualityChange.mock.lastCall?.[0].sceneTier).toBe(tier);
+    }
+    act(() => runtime.gl.domElement.dispatchEvent(new CustomEvent('commercial-map-quality-test', { detail: { tier: null } })));
+    expect(onQualityChange.mock.lastCall?.[0].sceneTier).toBe('HIGH');
+    view.unmount();
+    onQualityChange.mockClear();
+    runtime.gl.domElement.dispatchEvent(new CustomEvent('commercial-map-quality-test', { detail: { tier: 'LOW' } }));
+    expect(onQualityChange).not.toHaveBeenCalled();
   });
 
   it('altera o drawing buffer somente nas bordas do gesto e restaura a base reduced mais recente', () => {
@@ -191,19 +217,29 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     }
   });
 
-  it('adapta visita em caminhada contínua e não exporta o downgrade para o modo tradicional', () => {
+  it('aplica DPR uma vez na caminhada e posterga o alvo de sombras até repouso sem degradar o modo tradicional', () => {
     const onQualityChange = vi.fn();
     render(<CommercialMapAdaptiveQualityController active initialState={initialState} capabilityHints={capabilityHints} reducedGraphics={false} onQualityChange={onQualityChange} />);
     const originalDpr = runtime.gl.getPixelRatio();
     let release: () => void = () => undefined;
     act(() => { release = beginVisitQualitySession(); setVisitQualityMotion(true); });
     try {
+      runtime.setDpr.mockClear();
+      visitRuntime.renderingActive = true;
+      act(() => runtime.frame?.({}, .016));
+      expect(runtime.gl.getPixelRatio()).toBe(.99);
+      expect(runtime.setDpr).toHaveBeenCalledTimes(1);
       act(() => {
         for (let i = 0; i < 100; i++) {
           commercialMapFrameActivity(runtime.gl).requested = 8;
           runtime.frame?.({}, 0.05);
         }
       });
+      expect(onQualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'LOW', sceneTier: 'MEDIUM' });
+      expect(runtime.gl.getPixelRatio()).toBe(.99);
+      expect(runtime.setDpr).toHaveBeenCalledTimes(1);
+      visitRuntime.renderingActive = false;
+      act(() => { runtime.frame?.({}, .016); vi.advanceTimersByTime(650); });
       expect(onQualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'LOW', sceneTier: 'LOW' });
       expect(runtime.gl.getPixelRatio()).toBe(0.85);
       expect(readVisitQuality().preset).toBe('PERFORMANCE');

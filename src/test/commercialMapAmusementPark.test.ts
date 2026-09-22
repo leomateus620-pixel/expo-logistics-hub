@@ -61,7 +61,8 @@ describe('Parque de Diversões J', () => {
     expect(environmentConfigSource).toContain("background: '#050916'");
     expect(environmentSource).toContain('const nightTarget = nightMode ? 1 : 0;');
     expect(environmentSource).toContain('<SunrisePostProcessing');
-    expect(environmentSource).toContain('enabled={active && !cameraNavigating}');
+    expect(environmentSource).toContain('enabled={active}');
+    expect(environmentSource).not.toContain('enabled={active && !cameraNavigating}');
     expect(environmentSource).toContain('interactionActive={active && cameraNavigating}');
   });
 

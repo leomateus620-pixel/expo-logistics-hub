@@ -330,13 +330,13 @@ export function buildVisitWorld({ entities, trees, electricalPlacements = [], si
   for (const collider of colliders) maxHeight = Math.max(maxHeight, collider.maxY);
   const world: VisitWorld = {
     bounds, maxHeight, ground, collisions,
-    move: (position, dx, dz, radius = VISIT_CHARACTER_RADIUS, height = VISIT_CHARACTER_HEIGHT) => collisions.move(position, dx, dz, radius, height, ground.heightAt),
+    move: (position, dx, dz, radius = VISIT_CHARACTER_RADIUS, height = VISIT_CHARACTER_HEIGHT) => collisions.move(position, dx, dz, radius, height, ground.heightAt, ground.supportAt),
     cameraProbe: (from, to, radius = .025) => visitTerrainCameraFraction(ground, from, to, radius, collisions.cameraProbe(from, to, radius)),
     occluded: (from, to, ignoreId) => collisions.occluded(from, to, ignoreId) || visitTerrainOccluded(ground, from, to),
     resolveSpawn(preferred) {
       const x = Math.max(bounds.minX + 0.1, Math.min(bounds.maxX - 0.1, Number.isFinite(preferred.x) ? preferred.x : 0));
       const z = Math.max(bounds.minZ + 0.1, Math.min(bounds.maxZ - 0.1, Number.isFinite(preferred.z) ? preferred.z : 0));
-      const result = { x, y: ground.heightAt(x, z), z };
+      const result = { x, y: ground.supportAt(x, z).height, z };
       const arrivalTop = { x, y: maxHeight + 1, z }, arrivalEye = { x, y: result.y + 0.24, z };
       const valid = () => {
         if (!collisions.isFree(result)) return false;
@@ -351,7 +351,7 @@ export function buildVisitWorld({ entities, trees, electricalPlacements = [], si
         for (let sample = 0; sample < samples; sample++) {
           const angle = sample / samples * Math.PI * 2;
           result.x = x + Math.cos(angle) * radius; result.z = z + Math.sin(angle) * radius;
-          result.y = ground.heightAt(result.x, result.z);
+          result.y = ground.supportAt(result.x, result.z).height;
           if (valid()) return result;
         }
       }

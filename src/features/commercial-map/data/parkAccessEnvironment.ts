@@ -668,9 +668,10 @@ function createUnderstory(reducedGraphics: boolean) {
 }
 
 export function resolveParkAccessEnvironmentPresentation(
-  reducedGraphics: boolean,
+  _legacyReducedGraphics: boolean,
   vegetationEnabled = true,
 ): ParkAccessEnvironmentPresentation {
+  const reducedGraphics = false;
   const concreteSurfaces: ParkAccessEnvironmentSurface[] = PAVILION_COURTYARD.hardscape.map((rings, index) => ({
     id: `pavilions-1-14-12-concrete-${index}`,
     kind: 'PAVILION_CONCRETE', polygon: rings[0], holes: rings.slice(1),
