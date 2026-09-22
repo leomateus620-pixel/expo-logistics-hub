@@ -53,8 +53,13 @@ export function resolveVisitSpawn(request: VisitSpawnRequest, entities: readonly
   const gate = visitSpawnEntity('entrance', entities);
   if (gate && (!requested || requested.id === gate.id)) {
     const position = world.resolveSpawn(defaultVisitSpawn());
-    const anchor = geometryCentroid(gate.geometry);
-    return { position, yaw: Math.atan2(anchor[0] - position.x, -(anchor[1] - position.z)) };
+    const road = visitSpawnEntity('brasilia', entities);
+    const anchor = geometryCentroid((road ?? gate).geometry);
+    // The arrival is already inside the gate. Face circulation into the park,
+    // never back toward the gate facade and the external avenue.
+    const dx = road ? anchor[0] - position.x : position.x - anchor[0];
+    const dz = road ? anchor[1] - position.z : position.z - anchor[1];
+    return { position, yaw: Math.atan2(dx, -dz) };
   }
   const entity = requested ?? entities.find(e => !e.isArchived && e.classification === 'ROAD')
     ?? entities.find(e => !e.isArchived && e.classification !== 'INTERNAL_STAND');

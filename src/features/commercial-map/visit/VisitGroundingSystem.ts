@@ -1,4 +1,4 @@
-import { ShapeUtils, Vector2 } from 'three';
+import { ShapeUtils, Vector2, type BufferGeometry } from 'three';
 import { COMMERCIAL_MAP_GROUND_ELEVATION, OPEN_GROUND_PRESENTATION_HEIGHT } from '../constants';
 import type { MapEntity } from '../types';
 import { REAR_TERRAIN_PATCHES, sourcePolygonToLocal } from '../data/rearParkEnvironment';
@@ -10,7 +10,7 @@ import { roadSurfaceHeight } from '../utils/roadInfrastructure';
 import { resolveParkAccessEnvironmentPresentation } from '../data/parkAccessEnvironment';
 import { PARK_ACCESS_INFRASTRUCTURE_INPUT } from '../utils/parkAccessSpatialPlanAdapter';
 import { ARENA_FRONT_LAYOUT, sourceBoundsToLocal } from '../data/parkEnvironment';
-import { arenaStairTreadElevation, arenaTerrainElevation } from '../data/arenaTerrain';
+import { arenaStairTreadElevation, arenaTerrainElevation, ARENA_TERRAIN_TOP_ELEVATION } from '../data/arenaTerrain';
 import { NATIONS_DISTRICT_LAYOUT } from '../data/nationsDistrict';
 import { ARENA_TERRAIN_CUTS } from '../data/arenaSectorZoning';
 import { resolveOpenGroundProfile } from '../components/canvas/openGroundTextures';
@@ -18,14 +18,17 @@ import { REAR_PARKING_SURFACES, REAR_PARKING_ELEVATIONS } from '../data/rearPark
 import { TERRITORY_ROADS } from '../data/territorialRoads';
 import { corridorPolygon, sampleTerritoryRoad, TERRITORY_ROAD_Y } from '../utils/territorialRoadGeometry';
 import { VisitSpatialIndex, visitPointInRing, visitRingBounds } from './VisitSpatialIndex';
-import type { VisitBounds, VisitGroundSurface, VisitRing } from './visitTypes';
+import type { VisitBounds, VisitGroundSurface, VisitRing, VisitVector3 } from './visitTypes';
+import { buildExporuralLandscape, isExporuralLandscapeLot } from '../utils/exporuralLandscape';
+import { buildQuadrasABEnvironmentPlan, quadrasABGroundVertexHeight } from '../utils/quadrasABEnvironment';
+import { buildCommercialSiteEnvironmentPlan } from '../utils/commercialSiteEnvironment';
 
 export function visitBoundsRing(bounds: VisitBounds): VisitRing {
   return [[bounds.minX, bounds.minZ], [bounds.maxX, bounds.minZ], [bounds.maxX, bounds.maxZ], [bounds.minX, bounds.maxZ]];
 }
 
-export function visitGroundSurface(id: string, polygon: VisitRing, height: VisitGroundSurface['height'], holes?: readonly VisitRing[]): VisitGroundSurface {
-  return { id, polygon, height, holes, ...visitRingBounds(polygon) };
+export function visitGroundSurface(id: string, polygon: VisitRing, height: VisitGroundSurface['height'], holes?: readonly VisitRing[], maximumHeight?: number): VisitGroundSurface {
+  return { id, polygon, height, holes, maximumHeight, ...visitRingBounds(polygon) };
 }
 
 const ARENA_GROUND_BOUNDS = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.terrain.sourceBounds);
@@ -46,8 +49,14 @@ export function visitArenaTerrainHeight(x: number, z: number) {
 
 export class VisitGroundingSystem {
   readonly index: VisitSpatialIndex<VisitGroundSurface>;
+  readonly maximumHeight: number;
   private readonly candidates: VisitGroundSurface[] = [];
-  constructor(readonly surfaces: readonly VisitGroundSurface[], readonly fallback = COMMERCIAL_MAP_GROUND_ELEVATION) { this.index = new VisitSpatialIndex(surfaces, 3); }
+  constructor(readonly surfaces: readonly VisitGroundSurface[], readonly fallback = COMMERCIAL_MAP_GROUND_ELEVATION, cellSize = 3) {
+    this.index = new VisitSpatialIndex(surfaces, cellSize);
+    let top = fallback;
+    for (const surface of surfaces) top = Math.max(top, typeof surface.height === 'number' ? surface.height : surface.maximumHeight ?? Infinity);
+    this.maximumHeight = top;
+  }
 
   /** Stable bound callback can be passed straight into collision movement. */
   heightAt = (x: number, z: number) => {
@@ -66,12 +75,113 @@ export class VisitGroundingSystem {
   };
 }
 
-/** Ground adapters read the same owner data as the scene. No second terrain or
- * collider mesh is allocated. Only rear terrain's existing triangles are kept. */
-export function buildVisitGroundSurfaces(entities: readonly MapEntity[], includeContext = true): VisitGroundSurface[] {
+/** POI cadence only: bounded height-field visibility for banks/terraces which
+ * are walkable support rather than wall colliders. No renderer raycast. */
+export function visitTerrainOccluded(ground: Pick<VisitGroundingSystem, 'heightAt'>, from: VisitVector3, to: VisitVector3) {
+  const dx = to.x - from.x, dy = to.y - from.y, dz = to.z - from.z;
+  const steps = Math.min(2048, Math.max(1, Math.ceil(Math.hypot(dx, dz) / .08)));
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    if (ground.heightAt(from.x + dx * t, from.z + dz * t) > from.y + dy * t + .003) return true;
+  }
+  return false;
+}
+
+/** Short camera booms need at most ~12 local samples, followed by a bounded
+ * refinement only when hitting terrain. No temporary vectors/arrays/closures.
+ * Functional surfaces without a proven ceiling intentionally disable the
+ * aerial early-out rather than risk missing an unknown high surface. */
+export function visitTerrainCameraFraction(ground: Pick<VisitGroundingSystem, 'heightAt'> & { maximumHeight?: number }, from: VisitVector3, to: VisitVector3, radius = .025, maximumFraction = 1) {
+  const dx = to.x - from.x, dy = to.y - from.y, dz = to.z - from.z;
+  if (Math.min(from.y, from.y + dy * maximumFraction) - radius > (ground.maximumHeight ?? Infinity)) return maximumFraction;
+  if (from.y - radius <= ground.heightAt(from.x, from.z)) return 0;
+  const steps = Math.min(2048, Math.max(1, Math.ceil(Math.hypot(dx, dz) * maximumFraction / .06)));
+  let previous = 0;
+  for (let i = 1; i <= steps; i++) {
+    const t = maximumFraction * i / steps;
+    if (from.y + dy * t - radius <= ground.heightAt(from.x + dx * t, from.z + dz * t)) {
+      let low = previous, high = t;
+      for (let pass = 0; pass < 10; pass++) {
+        const mid = (low + high) / 2;
+        if (from.y + dy * mid - radius <= ground.heightAt(from.x + dx * mid, from.z + dz * mid)) high = mid;
+        else low = mid;
+      }
+      return Math.max(0, low - .00008);
+    }
+    previous = t;
+  }
+  return maximumFraction;
+}
+
+/** Extract exact support planes from an existing source builder, then discard
+ * its temporary BufferGeometry. Dense landscape detail has its own fine grid;
+ * it does not flood the park-wide broad phase with thousands of tiny facets. */
+export function visitGeometryGroundSurface(id: string, geometry: BufferGeometry): VisitGroundSurface | null {
+  const positions = geometry.getAttribute('position'), indices = geometry.index;
+  const triangles: VisitGroundSurface[] = [];
+  const count = indices?.count ?? positions.count;
+  let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+  for (let i = 0; i + 2 < count; i += 3) {
+    const ai = indices ? indices.getX(i) : i, bi = indices ? indices.getX(i + 1) : i + 1, ci = indices ? indices.getX(i + 2) : i + 2;
+    const ax = positions.getX(ai), az = positions.getZ(ai), ay = positions.getY(ai);
+    const bx = positions.getX(bi), bz = positions.getZ(bi), by = positions.getY(bi);
+    const cx = positions.getX(ci), cz = positions.getZ(ci), cy = positions.getY(ci);
+    const denominator = (bx - ax) * (cz - az) - (cx - ax) * (bz - az);
+    if (Math.abs(denominator) < 1e-12) continue;
+    const slopeX = ((by - ay) * (cz - az) - (cy - ay) * (bz - az)) / denominator;
+    const slopeZ = ((bx - ax) * (cy - ay) - (cx - ax) * (by - ay)) / denominator;
+    triangles.push(visitGroundSurface(`${id}:${i / 3}`, [[ax, az], [bx, bz], [cx, cz]], (x, z) => ay + slopeX * (x - ax) + slopeZ * (z - az), undefined, Math.max(ay, by, cy)));
+    minX = Math.min(minX, ax, bx, cx); maxX = Math.max(maxX, ax, bx, cx);
+    minZ = Math.min(minZ, az, bz, cz); maxZ = Math.max(maxZ, az, bz, cz);
+  }
+  if (!triangles.length) return null;
+  const detail = new VisitGroundingSystem(triangles, -Infinity, .2);
+  return visitGroundSurface(id, visitBoundsRing({ minX, maxX, minZ, maxZ }), detail.heightAt, undefined, detail.maximumHeight);
+}
+
+/** Actual soil support behind the pilot's decorative grass blades. Keep the
+ * canonical hard-surface masks and treatment exclusions, and interpolate the
+ * same two triangles as QuadrasABEnvironmentLayer (not its styling token Y). */
+export function buildVisitSiteGroundSurfaces(entities: readonly MapEntity[]): VisitGroundSurface[] {
+  const quadras = buildQuadrasABEnvironmentPlan({ entities, preserveVisitGroundPlacement: true });
+  const site = buildCommercialSiteEnvironmentPlan({ entities, preserveVisitGroundPlacement: true });
+  const quadraSurfaces: VisitGroundSurface[] = [];
+  for (const cell of quadras.cells) {
+    const points = cell.polygon.map(([x, z]) => [Math.fround(x), Math.fround(z)] as const);
+    const heights = cell.polygon.map(([x, z]) => Math.fround(quadrasABGroundVertexHeight(x, z)));
+    for (const [ai, bi, ci] of [[0, 2, 1], [0, 3, 2]]) {
+      const a = points[ai], b = points[bi], c = points[ci];
+      const ay = heights[ai], by = heights[bi], cy = heights[ci];
+      const denominator = (b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1]);
+      const slopeX = ((by - ay) * (c[1] - a[1]) - (cy - ay) * (b[1] - a[1])) / denominator;
+      const slopeZ = ((b[0] - a[0]) * (cy - ay) - (c[0] - a[0]) * (by - ay)) / denominator;
+      quadraSurfaces.push(visitGroundSurface(`${cell.id}:${bi}`, [a, b, c], (x, z) => ay + slopeX * (x - a[0]) + slopeZ * (z - a[1]), undefined, Math.max(ay, by, cy)));
+    }
+  }
+  const siteSurfaces = site.cells.map(cell => visitGroundSurface(cell.id, cell.polygon, cell.elevation));
+  const result: VisitGroundSurface[] = [];
+  for (const [id, cells] of [['quadras-ab:support', quadraSurfaces], ['commercial-site:support', siteSurfaces]] as const) {
+    if (!cells.length) continue;
+    let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+    for (const cell of cells) {
+      minX = Math.min(minX, cell.minX); maxX = Math.max(maxX, cell.maxX);
+      minZ = Math.min(minZ, cell.minZ); maxZ = Math.max(maxZ, cell.maxZ);
+    }
+    const detail = new VisitGroundingSystem(cells, -Infinity, .4);
+    result.push(visitGroundSurface(id, visitBoundsRing({ minX, maxX, minZ, maxZ }), detail.heightAt, undefined, detail.maximumHeight));
+  }
+  return result;
+}
+
+/** Ground adapters read the same owner data as the scene. No renderable terrain
+ * or collider mesh remains allocated; only numeric support planes are retained. */
+export function buildVisitGroundSurfaces(entities: readonly MapEntity[], includeContext = true, siteEnvironmentEntities: readonly MapEntity[] = entities): VisitGroundSurface[] {
   const surfaces: VisitGroundSurface[] = [];
   for (const entity of entities) {
     if (entity.isArchived || entity.geometry.coordinates[0]?.length < 3) continue;
+    // D1 is classified FOOD_AREA, but its cadastral extrusion is a picking
+    // volume. The Alameda adapter supplies the actual split floor and stairs.
+    if (entity.publicIdentifier === 'D1') continue;
     const classification = entity.classification;
     let height: number | null = null;
     if (classification === 'ROAD' || classification === 'PEDESTRIAN_PATH') height = entity.geometry.elevation + roadSurfaceHeight(entity);
@@ -87,7 +197,19 @@ export function buildVisitGroundSurfaces(entities: readonly MapEntity[], include
     }
     if (height !== null) surfaces.push(visitGroundSurface(entity.id, entity.geometry.coordinates[0], height, entity.geometry.coordinates.slice(1)));
   }
+  if (entities.some(isExporuralLandscapeLot)) {
+    const landscape = buildExporuralLandscape(entities);
+    for (const key of ['borders', 'slopes', 'terrace'] as const) {
+      const geometry = landscape[key];
+      if (!geometry) continue;
+      try {
+        const surface = visitGeometryGroundSurface(`exporural:${key}`, geometry);
+        if (surface) surfaces.push(surface);
+      } finally { geometry.dispose(); }
+    }
+  }
   if (!includeContext) return surfaces;
+  surfaces.push(...buildVisitSiteGroundSurfaces(siteEnvironmentEntities));
   for (const patch of REAR_TERRAIN_PATCHES) {
     const polygon = clipContextPolygon(sourcePolygonToLocal(patch.sourcePolygon));
     const points = polygon.map(p => new Vector2(p[0], p[1]));
@@ -100,7 +222,7 @@ export function buildVisitGroundSurfaces(entities: readonly MapEntity[], include
         const u = ((b[1] - c[1]) * (x - c[0]) + (c[0] - b[0]) * (z - c[1])) / denominator;
         const v = ((c[1] - a[1]) * (x - c[0]) + (a[0] - c[0]) * (z - c[1])) / denominator;
         return u * ya + v * yb + (1 - u - v) * yc;
-      }));
+      }, undefined, Math.max(ya, yb, yc)));
     });
   }
   for (const patch of TERRITORY_PATCHES) if (patch.kind !== 'water') surfaces.push(visitGroundSurface(patch.id, patch.ring, 0.015));
@@ -123,12 +245,12 @@ export function buildVisitGroundSurfaces(entities: readonly MapEntity[], include
     // Spatially partition long ribbons into quads rather than scanning a full
     // highway's hundreds of vertices every time a visitor takes one step.
     for (let i = 0; i < count - 1; i++) {
-      surfaces.push(visitGroundSurface(`${road.segmentId}:${i}`, [road.polygon[i], road.polygon[i + 1], road.polygon[2 * count - i - 2], road.polygon[2 * count - i - 1]], (x, z) => base + rearRoadTerrainElevationAt(x, z)));
+      surfaces.push(visitGroundSurface(`${road.segmentId}:${i}`, [road.polygon[i], road.polygon[i + 1], road.polygon[2 * count - i - 2], road.polygon[2 * count - i - 1]], (x, z) => base + rearRoadTerrainElevationAt(x, z), undefined, base + .003));
     }
   });
   if (entities.some(entity => entity.publicIdentifier === 'F')) {
     const arena = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.terrain.sourceBounds);
-    surfaces.push(visitGroundSurface('arena-terrain', visitBoundsRing(arena), visitArenaTerrainHeight, ARENA_TERRAIN_CUTS.map(cut => cut.polygon)));
+    surfaces.push(visitGroundSurface('arena-terrain', visitBoundsRing(arena), visitArenaTerrainHeight, ARENA_TERRAIN_CUTS.map(cut => cut.polygon), ARENA_TERRAIN_TOP_ELEVATION + .012));
     const plaza = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.plaza.sourceBounds);
     surfaces.push(visitGroundSurface('arena-plaza', visitBoundsRing(plaza), ARENA_FRONT_LAYOUT.plaza.elevation));
     const config = ARENA_FRONT_LAYOUT.stairs, stairs = sourceBoundsToLocal(config.sourceBounds);

@@ -33,6 +33,7 @@ export function buildVisitPOIs(
   entities: readonly MapEntity[],
   lots: readonly CommercialLot[],
   unitsPerMeter = EXPORURAL_MAP_UNITS_PER_METER,
+  groundHeight?: (x: number, z: number) => number,
 ): VisitPOI[] {
   const scale = Number.isFinite(unitsPerMeter) && unitsPerMeter > 0 ? unitsPerMeter : EXPORURAL_MAP_UNITS_PER_METER;
   const lotByEntity = new Map(lots.map(lot => [lot.entityId, lot]));
@@ -55,7 +56,8 @@ export function buildVisitPOIs(
     }
     pois.push({
       id: entity.id, type, name: metadata.officialDisplayName,
-      position: { x: metadata.labelAnchor[0], y: entity.geometry.elevation + 1.25 * scale, z: metadata.labelAnchor[1] },
+      position: { x: metadata.labelAnchor[0], y: Math.max(entity.geometry.elevation,
+        groundHeight?.(metadata.labelAnchor[0], metadata.labelAnchor[1]) ?? entity.geometry.elevation) + 1.25 * scale, z: metadata.labelAnchor[1] },
       interactionRadius: (lot ? 14 : 28) * scale,
       priority: lot ? 1.05 : type === 'PAVILION' ? 1.02 : 1,
       description: entity.description, interiorAvailable: strategicLandmarkSupportsInterior(entity),

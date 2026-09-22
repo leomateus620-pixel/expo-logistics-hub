@@ -227,7 +227,7 @@ describe('experiência cinematográfica do Foguete Lunar', () => {
     expect(pageSource).toContain('lunarLaunchPreviousPanel === \'details\'');
     expect(canvasSource).toContain('interface LunarCameraSnapshot');
     expect(canvasSource).toContain('scratch.quaternion.slerpQuaternions(');
-    expect(canvasSource).toContain('enabled={!lunarCameraLocked && !transitionControlsLocked}');
+    expect(canvasSource).toContain('enabled={!(visitEnabled && !interiorEntity) && !lunarCameraLocked && !transitionControlsLocked}');
     expect(canvasSource).toContain('completeLunarLaunch(false)');
     expect(canvasSource).toContain('const liveLaunchState = useCommercialMapStore.getState()');
     expect(canvasSource).toContain('liveLaunchState.lunarLaunchSkipRequested');

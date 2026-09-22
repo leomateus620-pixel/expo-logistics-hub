@@ -1,10 +1,16 @@
 const keys = new Set<string>();
 const touches = new Map<number, number>();
 let touchRun = false;
+const touchRunListeners = new Set<() => void>();
 let wake: (() => void) | null = null;
+function updateTouchRun(value: boolean) {
+  if (touchRun === value) return;
+  touchRun = value;
+  for (const listener of touchRunListeners) listener();
+}
 export const visitInput = {
   forward: 0, strafe: 0, lookX: 0, lookY: 0, run: false, enabled: false,
-  reset() { keys.clear(); touches.clear(); touchRun = false; this.forward = this.strafe = this.lookX = this.lookY = 0; this.run = false; },
+  reset() { keys.clear(); touches.clear(); updateTouchRun(false); this.forward = this.strafe = this.lookX = this.lookY = 0; this.run = false; },
 };
 function recompute() {
   let touch = 0; for (const value of touches.values()) touch += value;
@@ -15,7 +21,9 @@ function recompute() {
 }
 export function setTouchMove(pointerId: number, value: number) { touches.set(pointerId, value); recompute(); }
 export function clearTouch(pointerId: number) { touches.delete(pointerId); recompute(); }
-export function setTouchRun(value: boolean) { touchRun = value; recompute(); }
+export function setTouchRun(value: boolean) { updateTouchRun(value); recompute(); }
+export function getTouchRun() { return touchRun; }
+export function subscribeTouchRun(listener: () => void) { touchRunListeners.add(listener); return () => { touchRunListeners.delete(listener); }; }
 export function addLook(dx: number, dy: number) {
   if (!visitInput.enabled) return;
   visitInput.lookX += Math.max(-300, Math.min(300, dx));

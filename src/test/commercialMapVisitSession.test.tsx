@@ -16,6 +16,7 @@ const runtime = vi.hoisted(() => ({
   frame: null as null | ((state: unknown, delta: number) => void),
   character: null as VisitCharacterController | null,
   camera: null as PerspectiveCamera | null,
+  size: { width: 1440, height: 900 },
   invalidate: vi.fn(), setEvents: vi.fn(),
   prepare: vi.fn<() => Promise<void>>(),
   gl: { domElement: document.createElement('canvas'), getContext: () => ({ isContextLost: () => false }) },
@@ -61,6 +62,7 @@ beforeEach(() => {
   visitInput.reset(); visitInput.enabled = false;
   runtime.camera = new PerspectiveCamera(38, 1.5, .03, 600);
   runtime.character = null; runtime.frame = null; runtime.builds = 0;
+  runtime.size = { width: 1440, height: 900 };
   runtime.rejectedRoute = false;
   runtime.invalidate.mockClear(); runtime.setEvents.mockClear();
   runtime.prepare.mockReset().mockResolvedValue(undefined);
@@ -115,6 +117,7 @@ describe('lease da câmera, saída e isolamento de sessão', () => {
     act(() => { expect(hook.result.current.apply(false)).toBe(true); });
     expect(camera.position.y).toBe(.243); expect(camera.view?.enabled).toBe(false);
     fixture.setPending(4);
+    act(() => useVisitStore.setState({ phase: 'active' }));
     act(() => useVisitStore.getState().exit());
     expect(useVisitStore.getState().enabled).toBe(true);
     act(() => useVisitStore.getState().finishExit());
@@ -222,7 +225,8 @@ describe('entrada e dados atualizados no controlador real', () => {
     act(() => { for (let i = 0; i < 60; i++) runtime.frame?.({}, 1 / 60); });
     const character = runtime.character!, position = { ...character.position }, count = runtime.builds;
     expect(character.distance).toBeGreaterThan(.1);
-    view.rerender(<VisitMode entities={[{ ...road, name: 'Entrada com dado atualizado' }]} lots={[]} trees={[]} />);
+    const refreshed = { entities: [{ ...road, name: 'Entrada com dado atualizado' }], lots: [], trees: [] };
+    view.rerender(<VisitMode {...refreshed} />);
     expect(runtime.builds).toBeGreaterThan(count);
     expect(runtime.character).toBe(character);
     expect(character.position).toEqual(position);
@@ -232,6 +236,14 @@ describe('entrada e dados atualizados no controlador real', () => {
     runtime.invalidate.mockClear();
     act(() => { for (let i = 0; i < 60; i++) runtime.frame?.({}, 1 / 60); });
     expect(runtime.invalidate).not.toHaveBeenCalled();
+    runtime.size = { width: 900, height: 1440 };
+    view.rerender(<VisitMode {...refreshed} />);
+    expect(runtime.invalidate).toHaveBeenCalled();
+    act(() => runtime.frame?.({}, 1 / 60));
+    expect(visitRuntime.renderingActive).toBe(true);
+    act(() => { for (let i = 0; i < 180; i++) runtime.frame?.({}, 1 / 60); });
+    expect(visitRuntime.renderingActive).toBe(false);
+    runtime.invalidate.mockClear();
     const restPosition = { ...character.position };
     fireEvent.keyDown(window, { code: 'KeyW' });
     expect(runtime.invalidate).toHaveBeenCalled();

@@ -13,14 +13,18 @@ import { arenaTerrainElevation } from '../features/commercial-map/data/arenaTerr
 import { VISIT_CHARACTER_HEIGHT, VISIT_CHARACTER_RADIUS } from '../features/commercial-map/visit/visitTypes';
 import { buildRearTreeInstances } from '../features/commercial-map/data/rearParkEnvironment';
 import { treeIntersectsGeneratedRearRoadCorridor } from '../features/commercial-map/utils/rearRoadTreeClearance';
+import { buildElectricalSceneLayout, selectCommercialElectricalInfrastructureForScene } from '../features/commercial-map/utils/electricalInfrastructure';
 
 const bounds = { minX: -10, maxX: 10, minZ: -10, maxZ: 10 };
 const entities = OFFICIAL_REFERENCE_DATA.entities;
 const trees = selectCommercialTreesForScene(entities, OFFICIAL_REFERENCE_DATA.lots);
+const electrical = selectCommercialElectricalInfrastructureForScene(entities, OFFICIAL_REFERENCE_DATA.lots);
+const electricalPlacements = buildElectricalSceneLayout(electrical.nodes, electrical.connections, entities, true).placements;
+const buildCanonicalWorld = () => buildVisitWorld({ entities, trees, electricalPlacements });
 
 describe('Visit canonical world coverage', () => {
   it('maps every closed canonical building to a physics owner and never uses a lot as a blocker', () => {
-    const world = buildVisitWorld({ entities, trees });
+    const world = buildCanonicalWorld();
     const owners = new Set(world.collisions.colliders.map(collider => collider.id));
     const solid = new Set(['PAVILION', 'BUILDING', 'RESTAURANT', 'RESTROOM', 'CHEMICAL_RESTROOM', 'ADMINISTRATION', 'SECURITY', 'EMERGENCY', 'SERVICE', 'EVENT_VENUE']);
     const missing = entities.filter(entity => !entity.isArchived && solid.has(entity.classification)
@@ -38,7 +42,7 @@ describe('Visit canonical world coverage', () => {
       writeFileSync(resolve(destination, 'collision-source-audit.json'), JSON.stringify({
         schemaVersion: 1, generatedAt: new Date().toISOString(), source: 'official-reference',
         purpose: 'Numerical source coverage; not a browser performance or physical-device result',
-        entityCount: entities.length, suppliedTreeCount: trees.length,
+        entityCount: entities.length, suppliedTreeCount: trees.length, electricalPlacementCount: electricalPlacements.length,
         colliderCount: world.collisions.colliders.length,
         physicalColliderCount: world.collisions.colliders.filter(c => !c.cameraOnly).length,
         cameraOnlyColliderCount: world.collisions.colliders.filter(c => c.cameraOnly).length,
@@ -54,7 +58,7 @@ describe('Visit canonical world coverage', () => {
   }, 15000);
 
   it('keeps the source trunk inventory separate from camera-only crowns', () => {
-    const world = buildVisitWorld({ entities, trees });
+    const world = buildCanonicalWorld();
     const byId = new Map(world.collisions.colliders.map(collider => [collider.id, collider]));
     for (const tree of trees) {
       const collider = byId.get(tree.id);
@@ -75,7 +79,7 @@ describe('Visit canonical world coverage', () => {
   });
 
   it('blocks low authored scrub foliage while keeping normal tree crowns and road corridors free', () => {
-    const world = buildVisitWorld({ entities, trees });
+    const world = buildCanonicalWorld();
     const byId = new Map(world.collisions.colliders.map(collider => [collider.id, collider]));
     let scrubCount = 0;
     for (const tree of buildRearTreeInstances(false)) {
@@ -123,7 +127,7 @@ describe('Visit canonical world coverage', () => {
 
   it('uses the visible Nations island heights and keeps identity/commercial inputs immutable', () => {
     const before = JSON.stringify(OFFICIAL_REFERENCE_DATA);
-    const world = buildVisitWorld({ entities, trees });
+    const world = buildCanonicalWorld();
     for (const island of NATIONS_DISTRICT_LAYOUT.islands) {
       const source = world.ground.surfaces.find(surface => surface.id === `nations:island:${island.id}:${island.insetScale}`);
       expect(source?.height).toBe(0.172);

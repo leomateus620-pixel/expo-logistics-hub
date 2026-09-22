@@ -1,10 +1,10 @@
 import { LightingBenchmark } from './LightingBenchmark';
 import { EnvironmentBenchmark } from './EnvironmentBenchmark';
 import { useCommercialMapBootVisit } from '../hooks/useCommercialMapBootVisit';
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useVisitStore } from '../visit/useVisitStore';
 import { VISIT_SPAWN_LABELS, VISIT_SPAWN_POINTS, visitSpawnEntity, type VisitSpawnId } from '../visit/VisitSpawnManager';
-const VisitHUD = lazy(() => import('../visit/VisitHUD'));
+import { VisitOverlay } from '../visit/VisitOverlay';
 import { CommercialMapCanvas } from '../components/canvas/CommercialMapCanvas';
 import { CommercialMapRendererStatus } from '../components/CommercialMapRendererStatus';
 import { OFFICIAL_REFERENCE_DATA } from '../data/officialReference2026';
@@ -189,7 +189,6 @@ function formatMetric(value: number | null, suffix = '') {
  * App.tsx excludes the route and dynamic import from production builds.
  */
 export default function CommercialMapRenderingDiagnosticsPage() {
-  const visitEnabled = useVisitStore(s => s.enabled);
   const newBootVisit = useCommercialMapBootVisit();
   if (newBootVisit) markCommercialMapStage('fixture-data-ready');
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
@@ -612,7 +611,7 @@ export default function CommercialMapRenderingDiagnosticsPage() {
       </div>
 
       <div className="commercial-map-viewport commercial-map-rendering-diagnostics__viewport">
-        {visitEnabled && <Suspense fallback={null}><VisitHUD/></Suspense>}
+        <VisitOverlay />
         <div className="commercial-map-stage">
           <CommercialMapCanvas
             active

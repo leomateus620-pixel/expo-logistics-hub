@@ -49,6 +49,12 @@ const materialIds = Object.freeze(
   Object.keys(QUADRAS_AB_GROUND_MATERIALS) as QuadrasABGroundMaterialId[],
 );
 
+/** Shared by the visible cell vertices and visit grounding. The plan's material
+ * elevation is a styling token; this is the actual rendered support height. */
+export function quadrasABGroundVertexHeight(x: number, z: number) {
+  return 0.0315 + Math.sin(x * 0.91 + z * 0.37) * 0.00045;
+}
+
 function deterministicUnit(value: string) {
   let hash = 2166136261;
   for (let index = 0; index < value.length; index += 1) {
@@ -163,11 +169,14 @@ function selectDetailAnchors(cells: readonly QuadrasABEnvironmentCell[], maximum
 
 export function buildQuadrasABEnvironmentPlan({
   entities = OFFICIAL_RENDERED_ENTITIES,
-  reducedGraphics = false,
+  reducedGraphics: requestedReducedGraphics = false,
+  preserveVisitGroundPlacement = false,
 }: {
   entities?: readonly MapEntity[];
   reducedGraphics?: boolean;
+  preserveVisitGroundPlacement?: boolean;
 } = {}): QuadrasABEnvironmentPlan {
+  const reducedGraphics = requestedReducedGraphics && !preserveVisitGroundPlacement;
   // Reuse the exact existing plan, including its graphics-mode cell size,
   // instead of approximating the headquarters contact ring with another mesh.
   const sitePlan = buildCommercialSiteEnvironmentPlan({

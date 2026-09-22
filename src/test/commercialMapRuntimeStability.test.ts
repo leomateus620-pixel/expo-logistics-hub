@@ -51,7 +51,7 @@ describe('contrato de estabilidade do mapa comercial', () => {
     expect(canvas).toContain('perspective.quaternion.slerpQuaternions');
     expect(canvas).toContain('resolveCameraTransitionProgress');
     expect(canvas).toContain('setCameraNavigating(true)');
-    expect(canvas).toContain('enabled={!lunarCameraLocked && !transitionControlsLocked}');
+    expect(canvas).toContain('enabled={!(visitEnabled && !interiorEntity) && !lunarCameraLocked && !transitionControlsLocked}');
   });
 
   it('adapta DPR pelo estado do R3F e expõe telemetria de renderer, qualidade e contexto WebGL', () => {

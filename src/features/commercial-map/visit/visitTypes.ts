@@ -13,6 +13,8 @@ export interface VisitGroundSurface extends VisitBounds {
   holes?: readonly VisitRing[];
   /** The renderer's plane, or its exact authored elevation function. */
   height: number | ((x: number, z: number) => number);
+  /** Proven upper bound for functional heights; absent means no early cull. */
+  maximumHeight?: number;
 }
 
 export const VISIT_METERS_TO_WORLD = 0.15;

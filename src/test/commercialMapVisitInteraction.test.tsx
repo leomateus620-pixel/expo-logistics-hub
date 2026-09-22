@@ -5,7 +5,7 @@ import { buildVisitPOIs } from '@/features/commercial-map/visit/VisitPOIManager'
 import { VisitInteractionManager } from '@/features/commercial-map/visit/VisitInteractionManager';
 import { VisitHUD } from '@/features/commercial-map/visit/VisitHUD';
 import { useVisitStore } from '@/features/commercial-map/visit/useVisitStore';
-import { visitInput } from '@/features/commercial-map/visit/VisitInputManager';
+import { addLook, installVisitInput, visitInput } from '@/features/commercial-map/visit/VisitInputManager';
 import type { LotPricing2028 } from '@/features/commercial-map/utils/lotPricing2028';
 
 const pricingQuery = vi.hoisted(() => ({ data: null as unknown, isLoading: false, isError: false }));
@@ -50,6 +50,15 @@ describe('Visit POIs from the canonical authorized map snapshot', () => {
     const pois = buildVisitPOIs([headquarters, generic], [], 1);
     expect(pois.find(p => p.id === 'B12')?.interiorAvailable).toBe(true);
     expect(pois.find(p => p.id === generic.id)?.interiorAvailable).toBe(false);
+  });
+
+  it('places a lot badge above its authored terrace without changing the cadastral elevation', () => {
+    const source = entity('Q-R-02', 0, 3, 'SELLABLE_LOT');
+    const lot = { id: 'r2-lot', entityId: source.id, status: 'AVAILABLE' } as CommercialLot;
+    const [poi] = buildVisitPOIs([source], [lot], .15, () => .47);
+    expect(poi.position.y).toBeCloseTo(.47 + 1.25 * .15);
+    expect(source.geometry.elevation).toBe(0);
+    expect(poi.lot).toBe(lot);
   });
 });
 
@@ -111,8 +120,8 @@ describe('Visit HUD official values and independent touch controls', () => {
     pricingQuery.data = null; pricingQuery.isError = false; pricingQuery.isLoading = false;
   });
   afterEach(() => { cleanup(); visitInput.reset(); useVisitStore.setState({ enabled: false, activePOI: null, activeInterior: null }); vi.useRealTimers(); });
-  function showLot() {
-    const sourceEntity = entity('Q-A-18', 0, 3, 'SELLABLE_LOT');
+  function showLot(entityOverrides: Partial<MapEntity> = {}) {
+    const sourceEntity = { ...entity('Q-A-18', 0, 3, 'SELLABLE_LOT'), ...entityOverrides };
     const lot = { id: 'lot-18', entityId: sourceEntity.id, lotNumber: '18', block: 'A', officialAreaSqm: 39, askingPrice: 777, status: 'AVAILABLE' } as CommercialLot;
     useVisitStore.setState({ activePOI: buildVisitPOIs([sourceEntity], [lot], 1)[0] });
     return render(<VisitHUD />);
@@ -137,6 +146,19 @@ describe('Visit HUD official values and independent touch controls', () => {
     expect(screen.queryByText(/98\.765/)).not.toBeInTheDocument();
     expect(screen.queryByText(/777/)).not.toBeInTheDocument();
   });
+  it('shows the authorized canonical segment only in expanded details, ahead of divergent legacy metadata', () => {
+    showLot({ segmentId: 'industria-comercio-servicos', segmentSource: 'database',
+      metadata: { segmentId: 'exporural', segmentName: 'Nome legado incorreto' } });
+    expect(screen.queryByText(/Segmento:/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Valores e detalhes' }));
+    expect(screen.getByText('Segmento: Indústria, Comércio e Serviços')).toBeInTheDocument();
+    expect(screen.queryByText(/Nome legado incorreto|Segmento: Exporural/)).not.toBeInTheDocument();
+  });
+  it('omits the segment field when the authorized lot has no canonical membership', () => {
+    showLot();
+    fireEvent.click(screen.getByRole('button', { name: 'Valores e detalhes' }));
+    expect(screen.queryByText(/Segmento:/)).not.toBeInTheDocument();
+  });
   it('removes the single card after a short fade when focus is lost', () => {
     vi.useFakeTimers();
     const rendered = showLot();
@@ -158,7 +180,7 @@ describe('Visit HUD official values and independent touch controls', () => {
     render(<VisitHUD />);
     expect(screen.queryByRole('button', { name: 'Acessar interior' })).not.toBeInTheDocument();
   });
-  it('keeps movement and run pointers independent and clears cancellation and unmount', () => {
+  it('latches running so two pointers can walk and look, and clears movement cancellation and unmount', () => {
     const pointer = (element: HTMLElement, name: string, id: number) => {
       const event = new Event(name, { bubbles: true });
       Object.assign(event, { pointerId: id, button: 0, pointerType: 'touch' });
@@ -169,15 +191,36 @@ describe('Visit HUD official values and independent touch controls', () => {
     const backButton = screen.getByRole('button', { name: 'Voltar' });
     const runButton = screen.getByRole('button', { name: 'Correr' });
     pointer(forwardButton, 'pointerdown', 11);
-    pointer(runButton, 'pointerdown', 12);
+    fireEvent.click(runButton);
     expect(visitInput.forward).toBe(1); expect(visitInput.run).toBe(true);
-    pointer(runButton, 'pointerup', 12);
-    expect(visitInput.forward).toBe(1); expect(visitInput.run).toBe(false);
+    expect(runButton).toHaveAttribute('aria-pressed', 'true');
+    visitInput.enabled = true; addLook(12, 4);
+    expect(visitInput.lookX).toBe(12); expect(visitInput.forward).toBe(1); expect(visitInput.run).toBe(true);
+    fireEvent.click(runButton);
+    expect(visitInput.run).toBe(false); expect(runButton).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(runButton);
     pointer(backButton, 'pointerdown', 13);
     expect(visitInput.forward).toBe(0);
     pointer(forwardButton, 'pointercancel', 11);
     expect(visitInput.forward).toBe(-1);
     rendered.unmount();
     expect(visitInput.forward).toBe(0); expect(visitInput.run).toBe(false);
+  });
+  it('clears the run toggle on blur, phase change and input reset without leaving a stale pressed button', () => {
+    const canvas = document.createElement('canvas');
+    const dispose = installVisitInput(canvas, () => undefined);
+    const rendered = render(<VisitHUD />);
+    const runButton = screen.getByRole('button', { name: 'Correr' });
+    fireEvent.click(runButton);
+    fireEvent(window, new Event('blur'));
+    expect(visitInput.run).toBe(false); expect(runButton).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(runButton);
+    act(() => visitInput.reset());
+    expect(runButton).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(runButton);
+    act(() => useVisitStore.setState({ phase: 'entering' }));
+    expect(visitInput.run).toBe(false); expect(runButton).toHaveAttribute('aria-pressed', 'false');
+    expect(runButton).toBeDisabled();
+    rendered.unmount(); dispose();
   });
 });

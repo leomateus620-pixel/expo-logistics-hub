@@ -5076,6 +5076,7 @@ const Scene = memo(function Scene({
         <group visible={!hydrologicalModeActive}>
           <CommercialSiteEnvironmentLayer
             entities={siteEnvironmentEntities}
+            preserveVisitGroundPlacement={visitEnabled}
             activeOwnerIdentifiers={activeSiteEnvironmentOwnerIdentifiers}
             reducedGraphics={reducedGraphics}
           />
@@ -5093,6 +5094,7 @@ const Scene = memo(function Scene({
         <group visible={!hydrologicalModeActive}>
           <QuadrasABEnvironmentLayer
             entities={siteEnvironmentEntities}
+            preserveVisitGroundPlacement={visitEnabled}
             reducedGraphics={reducedGraphics}
           />
         </group>
@@ -5333,7 +5335,7 @@ const Scene = memo(function Scene({
       />
       <RuntimeFrameDiagnostics />
       {visitEnabled && !publicPolicy && <VisitFeatureBoundary><Suspense fallback={null}>
-        <VisitMode entities={entities} lots={lots} trees={presentedSceneTrees}/>
+        <VisitMode entities={entities} lots={lots} trees={presentedSceneTrees} electricalPlacements={electricalSceneLayout.placements} siteEnvironmentEntities={siteEnvironmentEntities}/>
       </Suspense></VisitFeatureBoundary>}
       {commercialMapDiagnosticsEnabled && <LightingPerformanceProbe />}
       {LateralDistrictQaScene && (window.location.pathname === '/__dev/commercial-map-rendering' || (import.meta.env.DEV && new URLSearchParams(window.location.search).has('groundQa')))

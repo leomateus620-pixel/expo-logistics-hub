@@ -8,7 +8,7 @@ import { resolveParkAccessEnvironmentPresentation } from '../data/parkAccessEnvi
 import { TERRITORY_BUILDINGS, TERRITORY_TREES, TERRITORY_PATCHES } from '../data/territorialEnvironment';
 import { buildRearTreeInstances } from '../data/rearParkEnvironment';
 import { buildLateralResidentialRenderPlan } from '../utils/lateralResidentialGeometry';
-import { resolveStrategicLandmarkKind, strategicLandmarkVisualHeight, strategicLandmarkBounds } from '../utils/landmarks';
+import { resolveStrategicLandmarkKind, strategicLandmarkVisualHeight, strategicLandmarkBounds, strategicLandmarkFacingRadians } from '../utils/landmarks';
 import { commercialTreeGroundElevation } from '../utils/treeLayer';
 import { complexLocalToWorld, complexWorldPolygon, FENASOJA_COMPLEX } from '../data/fenasojaComplexReconstruction';
 import { ARENA_FRONT_LAYOUT, sourceBoundsToLocal, sourcePolygonToLocal } from '../data/parkEnvironment';
@@ -20,9 +20,14 @@ import { createArenaAccessLayout } from '../utils/arenaAccessStructure';
 import { GATE_FOUR_DISTRICT_LAYOUT } from '../data/gateFourDistrict';
 import { NATIONS_DISTRICT_LAYOUT } from '../data/nationsDistrict';
 import { VisitCollisionSystem } from './VisitCollisionSystem';
-import { VisitGroundingSystem, buildVisitGroundSurfaces, visitGroundSurface, visitBoundsRing } from './VisitGroundingSystem';
+import { VisitGroundingSystem, buildVisitGroundSurfaces, visitGroundSurface, visitBoundsRing, visitTerrainOccluded, visitTerrainCameraFraction } from './VisitGroundingSystem';
 import { visitRingBounds } from './VisitSpatialIndex';
 import { VISIT_CHARACTER_RADIUS, VISIT_CHARACTER_HEIGHT, type VisitBounds, type VisitCollider, type VisitPoint2, type VisitRing, type VisitVector3 } from './visitTypes';
+import type { ResolvedElectricalNodePlacement } from '../utils/electricalInfrastructure';
+import { createGastronomicAlamedaLayout, fitRotatedStructureBounds } from '../utils/fenasojaReferenceStructures';
+import { EXPORURAL_WELL, isExporuralLandscapeLot } from '../utils/exporuralLandscape';
+import { visitPointInRing } from './VisitSpatialIndex';
+import { SOY_RESTROOM_PRESENTATION } from '../utils/soyGateArchitecture';
 
 const SOLID_CLASSIFICATIONS = new Set(['PAVILION', 'BUILDING', 'RESTAURANT', 'RESTROOM', 'CHEMICAL_RESTROOM', 'ADMINISTRATION', 'SECURITY', 'EMERGENCY', 'SERVICE', 'EVENT_VENUE']);
 
@@ -56,13 +61,15 @@ export interface VisitWorld {
  * The structure entity's ground footprint is deliberately solid: interior access
  * is an explicit navigation action, never an accidental walk through a facade.
  * Open gates and freestanding canopies instead retain individual piers/walls. */
-export function buildVisitWorld({ entities, trees, includeContext = entities.some(entity => ['A1', 'F', 'B12', 'EXPORURAL'].includes(entity.publicIdentifier)) }: {
+export function buildVisitWorld({ entities, trees, electricalPlacements = [], siteEnvironmentEntities = entities, includeContext = entities.some(entity => ['A1', 'F', 'B12', 'EXPORURAL'].includes(entity.publicIdentifier)) }: {
   entities: readonly MapEntity[];
   trees: readonly CommercialMapTree[];
+  electricalPlacements?: readonly ResolvedElectricalNodePlacement[];
+  siteEnvironmentEntities?: readonly MapEntity[];
   includeContext?: boolean;
 }): VisitWorld {
   const colliders: VisitCollider[] = [];
-  const surfaces = buildVisitGroundSurfaces(entities, includeContext);
+  const surfaces = buildVisitGroundSurfaces(entities, includeContext, siteEnvironmentEntities);
   const identifiers = new Set(entities.map(entity => entity.publicIdentifier));
   const polygon = (id: string, ring: VisitRing, base: number, height: number) => {
     if (ring.length >= 3 && ring.every(p => Number.isFinite(p[0]) && Number.isFinite(p[1])) && height > 0) colliders.push(visitPolygonCollider(id, ring, base, base + height));
@@ -92,6 +99,64 @@ export function buildVisitWorld({ entities, trees, includeContext = entities.som
       polygon(entity.id, complexWorldPolygon('headquarters', 'footprint'), entity.geometry.elevation, strategicLandmarkVisualHeight(entity) ?? 1.3);
       const monument = complexLocalToWorld(FENASOJA_COMPLEX.headquarters.monument.position, 'headquarters');
       trunk(`${entity.id}:monument`, monument[0], monument[1], 0.11, entity.geometry.elevation, 0.44);
+      continue;
+    }
+    if (kind === 'soy-restroom') {
+      const b = strategicLandmarkBounds(entity), yaw = strategicLandmarkFacingRadians(entity), base = entity.geometry.elevation;
+      // E-07 is the local 1.3 x 1.8 model in map units, rotated by its owner. The
+      // raised presentation roof height comes from the same landmark contract.
+      const h = SOY_RESTROOM_PRESENTATION.visualHeight;
+      box(entity.id, b.centerX, base + h / 2, b.centerZ, 1.3, h, 1.8, yaw);
+      surfaces.push(visitGroundSurface(`${entity.id}:platform`, visitBoxPolygon(b.centerX, b.centerZ, 1.46, 2.08, yaw), base + .036));
+      continue;
+    }
+    if (kind === 'gastronomic-alameda') {
+      const b = strategicLandmarkBounds(entity), yaw = strategicLandmarkFacingRadians(entity), base = entity.geometry.elevation;
+      const layout = createGastronomicAlamedaLayout(fitRotatedStructureBounds(b, yaw), strategicLandmarkVisualHeight(entity) ?? undefined);
+      const c = Math.cos(yaw), s = Math.sin(yaw);
+      const point = (x: number, z: number): [number, number] => [b.centerX + x * c + z * s, b.centerZ - x * s + z * c];
+      const part = (id: string, x: number, y: number, z: number, w: number, h: number, d: number) => {
+        const p = point(x, z); box(id, p[0], base + y, p[1], w, h, d, yaw);
+      };
+      const floor = (id: string, x: number, z: number, w: number, d: number, y: number | ((localZ: number) => number)) => {
+        const p = point(x, z);
+        surfaces.push(visitGroundSurface(id, visitBoxPolygon(p[0], p[1], w, d, yaw), typeof y === 'number' ? base + y : (wx, wz) => base + y((wx - b.centerX) * s + (wz - b.centerZ) * c), undefined, typeof y === 'number' ? base + y : base + Math.max(y(z - d / 2), y(z + d / 2))));
+      };
+      const porchZ = layout.platform.frontZ - .18;
+      const porchEave = layout.roof.ridgeY - (porchZ - layout.building.centerZ) * Math.tan(layout.roof.angle);
+      const roofBack = layout.building.centerZ - layout.roof.halfSpan, roofTop = layout.roof.ridgeY + .08;
+      part(entity.id, 0, (layout.platform.topY + roofTop) / 2, layout.building.centerZ, layout.building.width, roofTop - layout.platform.topY, layout.building.depth);
+      // The roof volume is above the walkable porch, not an invisible wall
+      // across the whole selectable envelope.
+      const roofBottom = Math.min(porchEave, layout.roof.eaveY) - layout.roof.thickness;
+      part(`${entity.id}:roof`, 0, (roofBottom + roofTop) / 2, (roofBack + porchZ) / 2, layout.roof.width, roofTop - roofBottom, porchZ - roofBack);
+      for (let i = 0; i <= layout.building.bayCount; i++) {
+        const p = point(-layout.building.width / 2 + layout.building.width * i / layout.building.bayCount, porchZ);
+        trunk(`${entity.id}:porch-pier:${i}`, ...p, layout.building.columnRadius, base + layout.platform.topY, porchEave - layout.platform.topY);
+      }
+      const front = layout.platform.frontZ, back = layout.platform.centerZ - layout.platform.depth / 2;
+      const stairBack = front - layout.access.stairRun, rearFront = Math.min(stairBack, layout.building.frontZ + .12);
+      const half = layout.platform.width / 2, rampLeft = layout.access.rampCenterX - layout.access.rampWidth / 2, rampRight = layout.access.rampCenterX + layout.access.rampWidth / 2;
+      const spans = [[-half, rampLeft], [rampRight, -layout.access.stairWidth / 2], [layout.access.stairWidth / 2, half]];
+      floor(`${entity.id}:foundation-rear`, 0, (back + rearFront) / 2, half * 2, rearFront - back, layout.platform.topY);
+      for (let i = 0; i < spans.length; i++) {
+        const [left, right] = spans[i]; if (right <= left) continue;
+        floor(`${entity.id}:foundation:${i}`, (left + right) / 2, (rearFront + front) / 2, right - left, front - rearFront, layout.platform.topY);
+        part(`${entity.id}:porch-rail:${i}`, (left + right) / 2, layout.platform.topY + layout.access.railingHeight / 2, front - .09, right - left, layout.access.railingHeight, .019);
+      }
+      for (let i = 0; i < layout.access.stepCount; i++) floor(`${entity.id}:step:${i}`, 0, front - layout.access.stepDepth * (i + .5), layout.access.stairWidth, layout.access.stepDepth + .01, layout.access.stepRise * (i + 1));
+      const rampBack = layout.building.frontZ + .12, rampRun = front - rampBack, rampAngle = Math.atan2(layout.platform.topY, rampRun);
+      const rampLength = Math.hypot(layout.platform.topY - .025, rampRun), rampCenterZ = (front + rampBack) / 2;
+      floor(`${entity.id}:ramp`, layout.access.rampCenterX, rampCenterZ + .035 * Math.sin(rampAngle), layout.access.rampWidth, rampLength * Math.cos(rampAngle), z => layout.platform.topY / 2 + .035 / Math.cos(rampAngle) - Math.tan(rampAngle) * (z - rampCenterZ));
+      for (const side of [-1, 1]) {
+        part(`${entity.id}:side-rail:${side}`, side * half, layout.platform.topY + layout.access.railingHeight / 2, (front - .09 + layout.building.frontZ) / 2, .018, layout.access.railingHeight, front - .09 - layout.building.frontZ);
+        part(`${entity.id}:stair-rail:${side}`, side * layout.access.stairWidth / 2, (layout.platform.topY + layout.access.railingHeight) / 2, (front + layout.building.frontZ) / 2, .025, layout.platform.topY + layout.access.railingHeight, front - layout.building.frontZ);
+        part(`${entity.id}:ramp-rail:${side}`, layout.access.rampCenterX + side * layout.access.rampWidth / 2, (layout.platform.topY + layout.access.railingHeight) / 2, rampCenterZ, .025, layout.platform.topY + layout.access.railingHeight, rampRun);
+      }
+      layout.flagpoles.positionsX.forEach((x, i) => {
+        const p = point(x, layout.flagpoles.lineZ);
+        trunk(`${entity.id}:flagpole:${i}`, ...p, layout.flagpoles.radius, base, layout.flagpoles.heights[i]);
+      });
       continue;
     }
     if (kind === 'nations-portico') {
@@ -154,6 +219,23 @@ export function buildVisitWorld({ entities, trees, includeContext = entities.som
     const base = commercialTreeGroundElevation(tree, entities);
     trunk(tree.id, tree.position[0], tree.position[1], tree.trunkRadius, base, tree.trunkHeight);
     crown(tree.id, tree.position[0], tree.position[1], tree.canopyRadius, base + tree.trunkHeight * 0.85, base + tree.trunkHeight + tree.crownHeight);
+  }
+  const wellLot = entities.find(entity => entity.publicIdentifier === 'Q-R-02' && isExporuralLandscapeLot(entity) && visitPointInRing(...EXPORURAL_WELL.position, entity.geometry.coordinates[0]));
+  if (wellLot) {
+    const base = wellLot.geometry.elevation + wellLot.geometry.extrusionHeight, [x, z] = EXPORURAL_WELL.position;
+    // The 0.56-square fence is a closed physical enclosure within a traversable
+    // lot. Keep its small footprint, never make the whole lot inaccessible.
+    box('exporural:well-fence', x, base + .2, z, .578, .4, .578);
+    trunk('exporural:well-pole', x - .12, z - .12, .023, base, 1.3);
+    surfaces.push(visitGroundSurface('exporural:well-base', visitBoxPolygon(x, z, .66, .66), base + .0265));
+  }
+  for (const placement of electricalPlacements) {
+    const { node, renderPosition: [x, z], groundElevation: y, rotationRadians: yaw } = placement;
+    if (node.type === 'POLE') trunk(node.id, x, z, node.radius, y, node.height);
+    else {
+      box(node.id, x, y + .05 + node.height / 2, z, node.radius * 1.72, node.height + .1, node.radius * 1.55, yaw);
+      box(`${node.id}:plinth`, x, y + .025, z, node.radius * 2, .05, node.radius * 1.55, yaw);
+    }
   }
 
   if (includeContext) {
@@ -249,8 +331,8 @@ export function buildVisitWorld({ entities, trees, includeContext = entities.som
   const world: VisitWorld = {
     bounds, maxHeight, ground, collisions,
     move: (position, dx, dz, radius = VISIT_CHARACTER_RADIUS, height = VISIT_CHARACTER_HEIGHT) => collisions.move(position, dx, dz, radius, height, ground.heightAt),
-    cameraProbe: (from, to, radius) => collisions.cameraProbe(from, to, radius),
-    occluded: (from, to, ignoreId) => collisions.occluded(from, to, ignoreId),
+    cameraProbe: (from, to, radius = .025) => visitTerrainCameraFraction(ground, from, to, radius, collisions.cameraProbe(from, to, radius)),
+    occluded: (from, to, ignoreId) => collisions.occluded(from, to, ignoreId) || visitTerrainOccluded(ground, from, to),
     resolveSpawn(preferred) {
       const x = Math.max(bounds.minX + 0.1, Math.min(bounds.maxX - 0.1, Number.isFinite(preferred.x) ? preferred.x : 0));
       const z = Math.max(bounds.minZ + 0.1, Math.min(bounds.maxZ - 0.1, Number.isFinite(preferred.z) ? preferred.z : 0));

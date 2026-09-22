@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Group, Vector3 } from 'three';
 import type { CommercialLot, MapEntity } from '../types';
 import type { CommercialMapTree } from '../data/commercialTrees';
+import type { ResolvedElectricalNodePlacement } from '../utils/electricalInfrastructure';
 import { requestCommercialMapAnimationFrame, COMMERCIAL_MAP_ANIMATION } from '../utils/frameActivity';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import { buildVisitWorld } from './VisitWorld';
@@ -19,19 +20,20 @@ import { prepareCommercialSceneLayer } from '../utils/sceneShaderWarmup';
 import { resolveVisitSpawn } from './VisitSpawnManager';
 import { VisitFrameScheduler } from './VisitFrameScheduler';
 
-interface Props { entities: MapEntity[]; lots: CommercialLot[]; trees: readonly CommercialMapTree[] }
+interface Props { entities: MapEntity[]; lots: CommercialLot[]; trees: readonly CommercialMapTree[]; electricalPlacements?: readonly ResolvedElectricalNodePlacement[]; siteEnvironmentEntities?: readonly MapEntity[] }
 const moving = () => visitRuntime.moving;
 const quality = (qualityPreset: 'HIGH' | 'BALANCED' | 'PERFORMANCE') => useVisitStore.setState({ qualityPreset });
 
 /** Lazy visit systems share the exterior and publish poses to the original CameraRig. */
-export default function VisitMode({ entities, lots, trees }: Props) {
+export default function VisitMode({ entities, lots, trees, electricalPlacements, siteEnvironmentEntities }: Props) {
   const gl = useThree(s => s.gl), camera = useThree(s => s.camera), invalidate = useThree(s => s.invalidate);
   const scene = useThree(s => s.scene);
+  const width = useThree(s => s.size.width), height = useThree(s => s.size.height);
   const setEvents = useThree(s => s.setEvents);
   const phase = useVisitStore(s => s.phase);
   const requestAt = useRef(useVisitStore.getState().requestedAtMs).current;
-  const world = useMemo(() => buildVisitWorld({ entities, trees }), [entities, trees]);
-  const pois = useMemo(() => buildVisitPOIs(entities, lots), [entities, lots]);
+  const world = useMemo(() => buildVisitWorld({ entities, trees, electricalPlacements, siteEnvironmentEntities }), [entities, trees, electricalPlacements, siteEnvironmentEntities]);
+  const pois = useMemo(() => buildVisitPOIs(entities, lots, .15, world.ground.heightAt), [entities, lots, world]);
   const interactions = useMemo(() => new VisitInteractionManager(pois, .15), [pois]);
   const session = useVisitStore(s => s.session);
   const runtime = useMemo(() => {
@@ -71,7 +73,7 @@ export default function VisitMode({ entities, lots, trees }: Props) {
       delete gl.domElement.dataset.visitMode; delete gl.domElement.dataset.visitCharacter;
     };
   }, [gl, invalidate, runtime]);
-  useEffect(() => { runtime.scheduler.wake(); invalidate(); }, [world, interactions, runtime, invalidate]);
+  useEffect(() => { runtime.scheduler.wake(); invalidate(); }, [world, interactions, runtime, invalidate, width, height]);
   useEffect(() => {
     visitInput.reset(); runtime.character.stop(); runtime.scheduler.wake(); invalidate();
   }, [phase, runtime, invalidate]);

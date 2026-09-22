@@ -1,12 +1,13 @@
-import { memo, useEffect, useRef, useState, type PointerEvent } from 'react';
+import { memo, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type PointerEvent } from 'react';
 import { ArrowDown, ArrowLeft, ArrowUp, DoorOpen, Footprints, Moon, Sun, X } from 'lucide-react';
 import { STATUS_CONFIG } from '../constants';
+import { resolveCommercialMapSegment } from '../data/commercialMapSegments';
 import { useLotPricing2028 } from '../hooks/useLotPricing2028';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import { formatAreaSqmLabel, formatBrl, formatPricePerSqm } from '../utils/lotPricing2028';
 import { normalizeMapEntityMetadata } from '../utils/mapMetadata';
 import { useVisitStore } from './useVisitStore';
-import { clearTouch, setTouchMove, setTouchRun } from './VisitInputManager';
+import { clearTouch, getTouchRun, setTouchMove, setTouchRun, subscribeTouchRun } from './VisitInputManager';
 import type { VisitPOI } from './VisitPOIManager';
 import './visit.css';
 
@@ -16,6 +17,7 @@ const VisitLotInformation = memo(function VisitLotInformation({ poi, expanded }:
   const query = useLotPricing2028(lot.id);
   const pricing = query.data;
   const metadata = normalizeMapEntityMetadata(poi.entity, lot);
+  const segment = expanded ? resolveCommercialMapSegment(poi.entity, lot) : null;
   const area = pricing?.officialAreaSqm ?? lot.officialAreaSqm;
   const ready = pricing?.resolutionStatus === 'OK';
   const secondTotal = ready ? formatBrl(pricing.segundaTotal) : null;
@@ -30,6 +32,7 @@ const VisitLotInformation = memo(function VisitLotInformation({ poi, expanded }:
         : pricing && pricing.resolutionStatus !== 'EXCLUIDO' && pricing.resolutionStatus !== 'OK'
           ? 'Valor pendente de conferência' : 'Valor oficial ainda não definido'}</small>}
     {expanded && <div className="visit-poi__details">
+      {segment && <p>Segmento: {segment.name}</p>}
       <p>{[metadata.block ? `Quadra ${metadata.block}` : null, pricing?.pavilion, lot.levelLabel].filter(Boolean).join(' · ')}</p>
       {ready && <dl>
         <div><dt>Renovação</dt><dd>{formatBrl(pricing.renovacaoTotal) ?? 'Não definido'}</dd></div>
@@ -44,10 +47,21 @@ const VisitLotInformation = memo(function VisitLotInformation({ poi, expanded }:
 
 const VisitContextCard = memo(function VisitContextCard({ poi, visible }: { poi: VisitPOI; visible: boolean }) {
   const [expanded, setExpanded] = useState(false);
+  const card = useRef<HTMLElement>(null);
   const enterInterior = useVisitStore(state => state.enterInterior);
   const metadata = normalizeMapEntityMetadata(poi.entity, poi.lot ?? undefined);
   const title = poi.lot && metadata.lotNumber ? `Lote ${metadata.lotNumber}` : poi.name;
-  return <section className={`visit-poi${visible ? ' is-visible' : ''}`} data-visit-poi-card
+  useLayoutEffect(() => {
+    const element = card.current;
+    if (!element) return;
+    const measure = () => element.style.setProperty('--visit-poi-height', `${element.getBoundingClientRect().height}px`);
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  return <section ref={card} className={`visit-poi${visible ? ' is-visible' : ''}`} data-visit-poi-card
     data-visit-poi-id={poi.id} aria-label={`Informações de ${title}`} aria-hidden={!visible}>
     <small className="visit-poi__identifier">{poi.entity.publicIdentifier}</small>
     <h2>{title}</h2>
@@ -67,13 +81,11 @@ const VisitContextCard = memo(function VisitContextCard({ poi, visible }: { poi:
 
 function VisitTouchControls() {
   const pointers = useRef(new Set<number>());
-  const runPointer = useRef<number | null>(null);
-  const isRunning = useVisitStore(state => state.isRunning);
+  const runSelected = useSyncExternalStore(subscribeTouchRun, getTouchRun, getTouchRun);
   const enabled = useVisitStore(state => state.phase === 'active');
   const clear = (event: PointerEvent<HTMLButtonElement>) => {
     clearTouch(event.pointerId);
     pointers.current.delete(event.pointerId);
-    if (runPointer.current === event.pointerId) { runPointer.current = null; setTouchRun(false); }
   };
   useEffect(() => {
     const ownedPointers = pointers.current;
@@ -82,6 +94,7 @@ function VisitTouchControls() {
       ownedPointers.clear(); setTouchRun(false);
     };
   }, []);
+  useEffect(() => { if (!enabled) setTouchRun(false); }, [enabled]);
   const press = (event: PointerEvent<HTMLButtonElement>, direction: number) => {
     event.preventDefault(); event.stopPropagation();
     if (!enabled) return;
@@ -101,13 +114,8 @@ function VisitTouchControls() {
       </button>
     </div>
     <div className="visit-touch__look"><span>Arraste para olhar</span>
-      <button type="button" aria-label="Correr" aria-pressed={isRunning} disabled={!enabled}
-        onPointerDown={event => {
-          event.preventDefault(); event.stopPropagation();
-          if (!enabled) return;
-          event.currentTarget.setPointerCapture?.(event.pointerId);
-          runPointer.current = event.pointerId; setTouchRun(true);
-        }} onPointerUp={clear} onPointerCancel={clear} onLostPointerCapture={clear}>
+      <button type="button" aria-label="Correr" aria-pressed={runSelected} disabled={!enabled}
+        onClick={event => { event.stopPropagation(); if (enabled) setTouchRun(!getTouchRun()); }}>
         <Footprints aria-hidden="true" /><span>Correr</span>
       </button>
     </div>

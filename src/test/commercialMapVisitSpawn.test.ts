@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
 import { withUnifiedFenasojaRestaurant } from '@/features/commercial-map/utils/fenasojaRestaurant';
 import { selectCommercialTreesForScene } from '@/features/commercial-map/utils/treeLayer';
+import { geometryCentroid } from '@/features/commercial-map/utils/geometry';
 import { buildVisitWorld, type VisitWorld } from '@/features/commercial-map/visit/VisitWorld';
 import { resolveVisitDeepLink, resolveVisitSpawn, VISIT_SPAWN_POINTS, visitSpawnEntity } from '@/features/commercial-map/visit/VisitSpawnManager';
 
@@ -19,6 +20,22 @@ describe('Verified visit spawn registry', () => {
     expect(visitSpawnEntity('stage', data.entities)?.name).toContain('Lactalis');
     expect(visitSpawnEntity('exporural', data.entities)?.publicIdentifier).toBe('Q-R-02');
     expect(visitSpawnEntity('ics', data.entities)?.publicIdentifier).toBe('QUADRA-E');
+  });
+
+  it('faces into the park toward canonical Rua Brasília at both default and explicit entrance arrivals', () => {
+    const road = visitSpawnEntity('brasilia', data.entities)!;
+    const anchor = geometryCentroid(road.geometry);
+    for (const request of [{}, { spawnId: 'entrance' }, { entityId: visitSpawnEntity('entrance', data.entities)!.id }]) {
+      const spawn = resolveVisitSpawn(request, data.entities, world);
+      const dx = anchor[0] - spawn.position.x, dz = anchor[1] - spawn.position.z;
+      const alignment = (Math.sin(spawn.yaw) * dx - Math.cos(spawn.yaw) * dz) / Math.hypot(dx, dz);
+      expect(alignment).toBeGreaterThan(.999);
+    }
+    const gate = visitSpawnEntity('entrance', data.entities)!;
+    const restricted = resolveVisitSpawn({}, [gate], world);
+    const gateAnchor = geometryCentroid(gate.geometry);
+    const dx = restricted.position.x - gateAnchor[0], dz = restricted.position.z - gateAnchor[1];
+    expect(Math.sin(restricted.yaw) * dx - Math.cos(restricted.yaw) * dz).toBeGreaterThan(0);
   });
 
   it.each(Object.keys(VISIT_SPAWN_POINTS))('resolves %s to a canonical, grounded, unobstructed arrival', spawnId => {

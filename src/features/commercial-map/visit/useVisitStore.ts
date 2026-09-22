@@ -58,7 +58,8 @@ export const useVisitStore = create<VisitState>((set, get) => ({
   },
   exit: () => {
     if (!get().enabled || get().phase === 'exiting') return;
-    if (get().error) { get().finishExit(); return; }
+    // No flight exists while the lazy controller/shaders are still pending.
+    if (get().error || get().phase === 'loading') { get().finishExit(); return; }
     if (typeof document !== 'undefined' && document.pointerLockElement) document.exitPointerLock();
     set({ phase: 'exiting', activePOI: null, activeInterior: null, isRunning: false, movementMode: 'idle' });
     useCommercialMapStore.setState({ interiorEntityId: null, activePanel: null });

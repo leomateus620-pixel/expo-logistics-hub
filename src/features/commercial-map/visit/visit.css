@@ -15,7 +15,7 @@
 .visit-hud__error { position: absolute; top: 82px; left: 50%; transform: translateX(-50%); padding: 10px 15px; width: max-content; max-width: calc(100% - 30px); background: #fff6e7; border: 1px solid #dec497; border-radius: 12px; font-size: 12px; }
 .visit-hud__desktop-help { position: absolute; bottom: 17px; left: 50%; transform: translateX(-50%); margin: 0; padding: 8px 14px; border-radius: 12px; background: #fcfefad9; text-align: center; white-space: nowrap; font-size: 11px; line-height: 1.7; }
 .visit-hud__desktop-help span { color: #566b61; font-size: 10px; }
-.visit-poi { position: absolute; left: clamp(145px, var(--visit-poi-x, 50%), calc(100% - 145px)); top: clamp(170px, var(--visit-poi-y, 57%), calc(100% - 130px)); width: 260px; max-width: calc(100% - 28px); transform: translate(-50%, -100%); padding: 12px 14px 8px; border: 1px solid #ffffffb5; border-radius: 14px; background: #fcfefaf2; box-shadow: 0 6px 28px #183b3426; pointer-events: none; opacity: 0; transition: opacity 140ms ease; }
+.visit-poi { --visit-poi-top-gap: 80px; --visit-poi-bottom-gap: 130px; position: absolute; left: clamp(145px, var(--visit-poi-x, 50%), calc(100% - 145px)); top: clamp(calc(var(--visit-poi-height, 170px) + var(--visit-poi-top-gap)), var(--visit-poi-y, 57%), calc(100% - var(--visit-poi-bottom-gap))); width: 260px; max-width: calc(100% - 28px); max-height: calc(100% - var(--visit-poi-top-gap) - var(--visit-poi-bottom-gap)); box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain; transform: translate(-50%, -100%); padding: 12px 14px 8px; border: 1px solid #ffffffb5; border-radius: 14px; background: #fcfefaf2; box-shadow: 0 6px 28px #183b3426; pointer-events: none; opacity: 0; transition: opacity 140ms ease; }
 .visit-poi.is-visible { opacity: 1; pointer-events: auto; animation: visit-card-in 160ms ease-out; }
 .visit-poi[aria-hidden="true"] button { pointer-events: none; }
 .visit-poi h2 { margin: 1px 0 5px; font-size: 14px; font-weight: 750; line-height: 1.3; }
@@ -47,11 +47,11 @@
   .visit-hud .visit-touch button:active, .visit-hud .visit-touch button[aria-pressed="true"] { background: #275a4bdc; color: white; }
   .visit-touch__look { display: grid; gap: 9px; justify-items: end; }
   .visit-touch__look > span { font-size: 10px; background: #fcfefaad; border-radius: 7px; padding: 4px 7px; }
-  .visit-poi { top: clamp(165px, var(--visit-poi-y, 52%), calc(100% - 172px)); width: 240px; left: clamp(130px, var(--visit-poi-x, 50%), calc(100% - 130px)); }
+  .visit-poi { --visit-poi-top-gap: 68px; --visit-poi-bottom-gap: 172px; width: 240px; left: clamp(130px, var(--visit-poi-x, 50%), calc(100% - 130px)); }
 }
 @media (max-height: 520px) and (orientation: landscape) {
   .visit-hud__bar { top: 6px; }.visit-hud__intro { top: 60px; padding: 7px 13px; }
-  .visit-poi { top: clamp(155px, var(--visit-poi-y, 65%), calc(100% - 50px)); width: 235px; }
+  .visit-poi { --visit-poi-top-gap: 62px; --visit-poi-bottom-gap: 50px; width: 235px; }
   .visit-touch { bottom: 17px; }.visit-touch__movement { gap: 5px; }
   .visit-hud .visit-touch button { min-height: 43px; }
   .visit-poi__details { max-height: 82px; }

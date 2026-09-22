@@ -30,9 +30,9 @@ import {
 } from './hooks/useCommercialMap';
 import { useCommercialMapStore } from './state/useCommercialMapStore';
 import { useVisitStore } from './visit/useVisitStore';
+import { VisitOverlay } from './visit/VisitOverlay';
 import { preloadCommercialMapCanvas } from './utils/preloadCanvas';
 const CommercialMapCanvas = lazy(preloadCommercialMapCanvas);
-const VisitHUD = lazy(() => import('./visit/VisitHUD'));
 import { CommercialMapRendererStatus } from './components/CommercialMapRendererStatus';
 import { MapToolbar } from './components/controls/MapToolbar';
 import { CommercialMapTopBar } from './components/controls/CommercialMapTopBar';
@@ -509,7 +509,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
       <CommercialMapHeaderTools
         managementActions={managementActions}
         salesAvailable={webglAvailable && data.source === 'database' && permissions.canManageSales}
-        visitAvailable={webglAvailable && !interiorEntity && !lunarCinematicUiActive}
+        visitAvailable={areaScope === 'park' && webglAvailable && !interiorEntity && !lunarCinematicUiActive}
         visitEntityId={selectedLot && selectedEntity?.classification !== 'INTERNAL_STAND' ? selectedEntity?.id : undefined}
       />
 
@@ -576,9 +576,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
               </Profiler>
               </Suspense>
               <CommercialMapRendererStatus />
-              {visitEnabled && <Suspense fallback={<div role="status" style={{ position: 'absolute', top: 18, left: '50%', transform: 'translateX(-50%)', padding: '10px 16px', borderRadius: 12, background: '#fcfefaf0', zIndex: 42, fontSize: 12 }}>Preparando Modo Visita…</div>}>
-                <VisitHUD />
-              </Suspense>}
+              <VisitOverlay />
               <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer"
                 style={{position:'absolute',right:8,bottom:8,zIndex:5,fontSize:10,padding:'2px 5px',borderRadius:3,background:'#f5f7efdd',color:'#384b42'}}>
                 Entorno © OpenStreetMap

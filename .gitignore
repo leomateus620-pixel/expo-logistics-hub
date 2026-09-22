@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+dist-qa/
 artifacts/alvorada-qa-dist/
 artifacts/alvorada/
 *.local
