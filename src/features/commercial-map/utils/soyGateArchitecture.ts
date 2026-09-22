@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import { mergeBufferGeometries } from 'three-stdlib';
-import { SOY_RESTROOM, GATE_NINE_TANKS } from '../data/soyGateInfrastructure';
+import { GATE_NINE_TANKS } from '../data/soyGateInfrastructure';
 import { hydrologicalPlanPointToWorldXZ } from '../data/hydrologicalInfrastructure';
 import type { StrategicLandmarkBounds } from './landmarks';
 
 type V3 = [number, number, number];
 type MaterialKey =
-  'wall' | 'roof' | 'trim' | 'platform' | 'metal' | 'accent' | 'dark';
+  'wall' | 'roof' | 'trim' | 'platform' | 'metal' | 'accent' | 'dark' | 'glass';
 
 /** Static detail is merged once per material, never rebuilt for selection. */
 function builder() {
@@ -40,19 +40,22 @@ function builder() {
   return { add, box, finish };
 }
 
+/** Photo-derived display dimensions; cadastral source bounds stay unchanged. */
+export const SOY_RESTROOM_PRESENTATION = { wallHeight: 0.78, roofRise: 0.19, visualHeight: 1.2 } as const;
+
 export function buildSoyRestroomParts() {
   const b = builder();
   const {
     wallHeight: h,
     roofRise: rise,
-    wallThickness: t,
-  } = SOY_RESTROOM.assumed;
+    } = SOY_RESTROOM_PRESENTATION;
+  const t = 0.035;
   // Local X is across the entrances; +Z points toward B7 after parent yaw.
   const w = 1.3,
     d = 1.8,
     floor = 0.036,
     door = 0.24,
-    doorH = 0.33;
+    doorH = 0.46;
   b.box('platform', [1.46, floor + 0.08, 2.08], [0, (floor - 0.08) / 2, 0]);
   b.box('accent', [w, 0.095, t], [0, 0.08, -d / 2]);
   [-1, 1].forEach((side) => {
@@ -62,7 +65,7 @@ export function buildSoyRestroomParts() {
     b.box('accent', [t + 0.004, 0.095, d], [(side * (w - t)) / 2, 0.08, 0]);
     // Real recessed openings, with the opaque door set behind the facade.
     const cx = side * 0.34;
-    b.box('dark', [door, doorH, 0.018], [cx, floor + doorH / 2, d / 2 - 0.09]);
+    b.box('accent', [door, doorH, 0.018], [cx, floor + doorH / 2, d / 2 - 0.09]);
     b.box(
       'trim',
       [door + 0.035, 0.022, 0.11],
@@ -83,16 +86,16 @@ export function buildSoyRestroomParts() {
     b.box(
       'metal',
       [0.01, 0.044, 0.016],
-      [cx + 0.08, floor + 0.16, d / 2 - 0.075],
+      [cx + 0.08, floor + 0.23, d / 2 - 0.075],
     );
     // High-level ventilation in the long side, below the eaves.
     [-0.48, 0.38].forEach((z) => {
-      b.box('dark', [0.008, 0.065, 0.23], [side * (w / 2 + 0.001), 0.398, z]);
-      [0, 1, 2].forEach((i) =>
+      b.box('dark', [0.008, 0.15, 0.23], [side * (w / 2 + 0.001), 0.47, z]);
+      [0, 1, 2, 3].forEach((i) =>
         b.box(
           'trim',
           [0.012, 0.009, 0.245],
-          [side * (w / 2 + 0.007), 0.373 + i * 0.025, z],
+          [side * (w / 2 + 0.007), 0.407 + i * 0.042, z],
         ),
       );
     });
@@ -137,6 +140,33 @@ export function buildSoyRestroomParts() {
     });
     b.add('wall', g, [0, floor + h, (end * d) / 2 - t / 2]);
   });
+  // Trapezoidal clerestory panes and slender mullions, as visible in the photo.
+  [-1, 1].forEach((end) => {
+    [-1, 1].forEach((side) => {
+      const pane = new THREE.Shape();
+      pane.moveTo(side * 0.055, 0.64);
+      pane.lineTo(side * 0.54, 0.64);
+      pane.lineTo(side * 0.54, 0.79);
+      pane.lineTo(side * 0.055, 0.93);
+      pane.closePath();
+      b.add('glass', new THREE.ExtrudeGeometry(pane, {depth: 0.006, bevelEnabled: false}), [0, 0, end * 0.924]);
+    });
+    b.box('trim', [1.13, 0.024, 0.018], [0, 0.627, end * 0.931]);
+    b.box('trim', [0.035, 0.31, 0.018], [0, 0.78, end * 0.931]);
+    [-1, 1].forEach((side) =>
+      b.box('trim', [0.025, 0.19, 0.018], [side * 0.553, 0.72, end * 0.931]),
+    );
+  });
+  // Narrow glass-block strips beside the recessed entries.
+  [-1, 1].forEach((side) => {
+    const x = side * 0.16;
+    b.box('glass', [0.06, 0.32, 0.012], [x, 0.30, 0.925]);
+    for (let i = 0; i <= 5; i++)
+      b.box('trim', [0.067, 0.005, 0.017], [x, 0.14 + i * 0.064, 0.935]);
+  });
+  // The open rectangular crown is separate from the pitched corrugated roof.
+  [-1, 1].forEach((side) => b.box('dark', [0.075, 0.4, 0.06], [side * 0.48, 0.98, -0.52]));
+  b.box('dark', [1.035, 0.075, 0.06], [0, 1.16, -0.52]);
   return b.finish();
 }
 

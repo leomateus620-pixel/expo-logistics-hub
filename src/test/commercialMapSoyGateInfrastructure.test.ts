@@ -200,7 +200,7 @@ describe('E07 / Montevideo / A9 reference-aligned infrastructure', () => {
       buildSoyRestroomParts(),
       buildGateNineTankParts(bounds),
     ]) {
-      expect(parts.length).toBeLessThanOrEqual(7);
+      expect(parts.length).toBeLessThanOrEqual(8);
       const box = new Box3();
       parts.forEach((p) => {
         expect(p.geometry.index).toBeNull();

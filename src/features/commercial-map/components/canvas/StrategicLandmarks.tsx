@@ -228,7 +228,7 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     platform: '#85817a',
     metal: '#69757b',
   },
-  'soy-restroom': { wall: '#d8d5c8', accent: '#969887', roof: '#b3b9b8', trim: '#e3dfd3', dark: '#384845', glass: '#596660', green: '#486344', white: '#eeeadd', platform: '#a09e90', metal: '#767f7b' },
+  'soy-restroom': { wall: '#858e92', accent: '#77715f', roof: '#555c5b', trim: '#9a9d98', dark: '#3e484c', glass: '#657976', green: '#486344', white: '#eeeadd', platform: '#71776f', metal: '#727978' },
   'gate-nine-tanks': { wall: '#bec4c4', accent: '#91664c', roof: '#aeb6b7', trim: '#b1bab7', dark: '#525b59', glass: '#697572', green: '#4d6150', white: '#e2e5df', platform: '#a4a095', metal: '#68726d' },
   'lactalis-cultural-stage': {
     wall: LACTALIS_STAGE_LAYOUT.palette.cladding,
@@ -344,7 +344,7 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     metal: '#5b6060',
   },
   'gastronomic-alameda': {
-    wall: '#393936',
+    wall: '#42494b',
     accent: '#324f6b',
     roof: '#aaa9a4',
     trim: '#c6c5bd',

@@ -114,6 +114,10 @@ describe('reconstrução arquitetônica de B28 e D1', () => {
 
     expect(visualHeight).not.toBeNull();
     const layout = createGastronomicAlamedaLayout(fittedBounds, visualHeight!);
+    expect(layout.platform.centerY - layout.platform.thickness / 2).toBeLessThanOrEqual(0);
+    expect(layout.platform.topY).toBeLessThanOrEqual(.25);
+    expect(layout.flagpoles.maximumHeight / layout.roof.ridgeY).toBeLessThan(1.5);
+    expect(layout.flagpoles.radius).toBeLessThanOrEqual(.012);
     const positions = layout.flagpoles.positionsX;
     const heights = layout.flagpoles.heights;
 

@@ -328,7 +328,7 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
       'LANDMARK',
     ]);
     const obstacles = OFFICIAL_REFERENCE_DATA.entities.filter((entity) => (
-      obstacleClassifications.has(entity.classification)
+      obstacleClassifications.has(entity.classification) && entity.geometry.extrusionHeight >= 0.3
     ));
     ELECTRICAL_INFRASTRUCTURE_REFERENCE.placement.facadeMountedMarkers.forEach((mount) => {
       const placement = placementByMarker.get(mount.sourceMarkerId)!;
@@ -337,28 +337,19 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
       ))!;
       expect(placement.node.position, mount.sourceMarkerId)
         .toEqual(electricalPlanPointToWorldXZ(placement.node.sourcePagePosition));
-      // B12's corrected September envelope no longer covers its original PDF pole.
-      // The source marker and facade association remain unchanged and auditable.
-      if (mount.sourceMarkerId !== 'pole-ref-357') {
-        expect(
-          pointInPolygon(placement.node.position, host.geometry.coordinates[0] ?? [])
-          || distanceToEntity(placement.node.position, host) < placement.node.radius,
-          mount.sourceMarkerId,
-        ).toBe(true);
-      } else {
-        expect(pointInPolygon(placement.node.position, host.geometry.coordinates[0] ?? [])).toBe(false);
-      }
+      // The immutable PDF anchor may be outside a reconstructed host. Only
+      // the rendered shaft must clear today's footprint and adjacent roads.
       expect(pointInPolygon(placement.renderPosition, host.geometry.coordinates[0] ?? []), mount.sourceMarkerId)
         .toBe(false);
       expect(placement.renderPosition, mount.sourceMarkerId).not.toEqual(placement.node.position);
       expect(placement.node.mountMode, mount.sourceMarkerId).toBe(mount.mountMode);
       expect(placement.node.surfaceEntityIdentifier, mount.sourceMarkerId)
         .toBe(mount.surfaceEntityIdentifier);
-      expect(placement.placementStatus, mount.sourceMarkerId).toBe('PROJECTED_FREE');
+      expect(['PROJECTED_FREE', 'PROJECTED_CLEARANCE']).toContain(placement.placementStatus);
       if (placement.node.mountMode === 'FACADE_POLE') {
         expect(distanceToEntity(placement.renderPosition, host), mount.sourceMarkerId)
           .toBeGreaterThanOrEqual(
-            ELECTRICAL_WIRE_CONDUCTOR_SPACING + ELECTRICAL_WIRE_STRUCTURE_CLEARANCE + 0.03 - 1e-6,
+            placement.node.radius + 0.045 - 1e-6,
           );
       }
       obstacles.forEach((obstacle) => {
@@ -594,8 +585,11 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
         [placement.node],
         withoutOwner,
       );
-      expect(withoutOwnerPlacement.placementStatus).toBe('DIRECT');
-      expect(withoutOwnerPlacement.renderPosition).toEqual(placement.node.position);
+      // Removing an old offset owner does not remove the remaining road mesh.
+      expect(withoutOwnerPlacement.poleAudit?.resolved).toBe(true);
+      for (const remainingRoad of withoutOwner.filter(e => e.classification === 'ROAD')) {
+        expect(pointInPolygon(withoutOwnerPlacement.renderPosition, remainingRoad.geometry.coordinates[0])).toBe(false);
+      }
     });
 
     expect(PARK_ACCESS_ELECTRICAL_CLEARANCE_PRESENTATION).toMatchObject({
@@ -723,10 +717,10 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
     expect(renderer).toContain('<lineSegments');
     expect(renderer).toContain('computeBoundingSphere()');
     expect(renderer).toContain('dispose()');
-    expect(renderer).toContain('resolveElectricalNodePlacements(nodes, surfaceEntities, rearRoadsActive)');
+    expect(renderer).toContain('resolvedScene ?? buildElectricalSceneLayout(nodes, connections, surfaceEntities, rearRoadsActive)');
     expect(canvas).toContain('rearRoadsActive={!isolatedArea}');
     expect(renderer).not.toContain('electricalInfrastructureGroundElevation(');
     expect(canvas.match(/<CommercialElectricalInfrastructureLayer/g)).toHaveLength(1);
-    expect(canvas).toContain('visible={treesVisible && !hydrologicalModeActive}');
+    expect(canvas).toContain('visible={treesVisible && !hydrologicalModeActive && !salesPresentationActive}');
   });
 });

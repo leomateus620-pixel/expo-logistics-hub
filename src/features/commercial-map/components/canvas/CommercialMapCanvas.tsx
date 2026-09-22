@@ -63,7 +63,7 @@ import {
 import { normalizeMapEntityMetadata } from '../../utils/mapMetadata';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
 import { selectRearRoadCompatibleTreesForPresentation } from '../../utils/rearRoadTreeClearance';
-import { selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
+import { buildElectricalSceneLayout, selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
 import { selectCommercialHydrologicalInfrastructureForScene } from '../../utils/hydrologicalInfrastructure';
 import {
   HYDROLOGICAL_NODES,
@@ -185,6 +185,9 @@ import { LateralResidentialDistrict } from './LateralResidentialDistrict';
 import { applyInteriorGroundMaterial } from './interiorGroundMaterial';
 import { applyParkGroundDetail } from './terrainMaterial';
 import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
+import { ExporuralLandscape } from './ExporuralLandscape';
+import { applyExporuralTurfMaterial } from './exporuralTurfMaterial';
+import { isExporuralLandscapeLot } from '../../utils/exporuralLandscape';
 import { CommercialMapAdaptiveQualityController } from './CommercialMapAdaptiveQuality';
 import { RuntimeFrameDiagnostics } from './CommercialMapRuntimeFrameDiagnostics';
 import {
@@ -1314,6 +1317,7 @@ function lotColor(
   const color = segment
     ? target.set(status.color).lerp(blend.set(segment.palette.surface), SEGMENT_LOT_SURFACE_WEIGHT)
     : target.set(status.color);
+  if (segment && isExporuralLandscapeLot(entry.entity)) color.lerp(blend.set('#7f9561'), 0.48);
   if (infrastructureMode) color.lerp(blend.set('#c7d1cf'), 0.98);
   else if (filtersActive && !isMatch && !selected) color.lerp(blend.set('#c7d1c9'), 0.76);
   if (hovered) color.lerp(blend.set('#ffffff'), 0.1);
@@ -1387,7 +1391,7 @@ function SegmentLotAccents({
       const horizontal = width >= depth;
       const [centerX, centerZ] = geometryCentroid(entity.geometry);
       position.set(
-        centerX,
+        centerX + (entity.publicIdentifier === 'Q-R-02' ? -0.7 : 0),
         entity.geometry.elevation + Math.max(0.025, entity.geometry.extrusionHeight) + 0.024,
         centerZ,
       );
@@ -1493,6 +1497,9 @@ function BatchedLots({
     if (entries.length === 0) return null;
     const sourceGeometries = entries.map(({ entity }) => {
       const geometry = createEntityGeometry(entity);
+      geometry.setAttribute('exporuralTurf', new THREE.Float32BufferAttribute(
+        new Float32Array(geometry.getAttribute('position').count).fill(isExporuralLandscapeLot(entity) ? 1 : 0), 1,
+      ));
       if (!geometry.index) return geometry;
       const nonIndexed = geometry.toNonIndexed();
       geometry.dispose();
@@ -1507,6 +1514,7 @@ function BatchedLots({
       polygonOffsetFactor: -3,
       polygonOffsetUnits: -2,
     });
+    if (material instanceof THREE.MeshStandardMaterial) applyExporuralTurfMaterial(material);
     const mesh = new THREE.BatchedMesh(entries.length, vertexCount, 0, material);
     const entityByBatchId = new Map<number, string>();
     const batchIdByEntity = new Map<string, number>();
@@ -1683,13 +1691,19 @@ function BatchedLots({
   return (
     <>
       {!infrastructureMode && !publicPolicy ? (
-        <SegmentLotAccents
-          entries={entries}
-          segmentByEntity={segmentByEntity}
-          matchingEntityIds={matchingEntityIds}
-          filtersActive={filtersActive}
-          layerOpacity={layerOpacity}
-        />
+        <>
+          <ExporuralLandscape
+            entities={geometryEntities}
+            opacity={entries.length ? layerOpacity[entries[0].entity.layerId] ?? 1 : 1}
+          />
+          <SegmentLotAccents
+            entries={entries}
+            segmentByEntity={segmentByEntity}
+            matchingEntityIds={matchingEntityIds}
+            filtersActive={filtersActive}
+            layerOpacity={layerOpacity}
+          />
+        </>
       ) : null}
       <primitive
         object={batch.mesh}
@@ -4584,6 +4598,9 @@ const Scene = memo(function Scene({
     () => selectCommercialElectricalInfrastructureForScene(entities, lots),
     [entities, lots],
   );
+  const electricalSceneLayout = useMemo(() => buildElectricalSceneLayout(
+    sceneElectricalInfrastructure.nodes, sceneElectricalInfrastructure.connections, entities, !isolatedArea,
+  ), [sceneElectricalInfrastructure, entities, isolatedArea]);
   const sceneHydrologicalInfrastructure = useMemo(
     () => selectCommercialHydrologicalInfrastructureForScene(
       HYDROLOGICAL_NODES,
@@ -5232,6 +5249,7 @@ const Scene = memo(function Scene({
       </EssentialSceneLayer>}
       <EssentialSceneLayer id="electrical-detail">
       <CommercialElectricalInfrastructureLayer
+        resolvedScene={electricalSceneLayout}
         nodes={sceneElectricalInfrastructure.nodes}
         connections={sceneElectricalInfrastructure.connections}
         surfaceEntities={entities}
@@ -5241,6 +5259,7 @@ const Scene = memo(function Scene({
       />
       </EssentialSceneLayer>
       {!publicPolicy && <NightLightingLayer
+        resolvedScene={electricalSceneLayout}
         nodes={sceneElectricalInfrastructure.nodes}
         connections={sceneElectricalInfrastructure.connections}
         surfaceEntities={entities}
