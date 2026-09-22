@@ -191,7 +191,7 @@ function prepareCompiledPrograms(
   });
   return new Promise<void>((resolve, reject) => {
     let timer: ReturnType<typeof setTimeout> | undefined;
-    let settled = false, reflecting = false, synchronousMs = 0, maximumBatchMs = 0, batches = 0, initialized = 0;
+    let settled = false, reflecting = false, linksReady = false, synchronousMs = 0, maximumBatchMs = 0, batches = 0, initialized = 0;
     const startedAt = performance.now(), programCount = programs.size;
     const cleanup = () => {
       clearTimeout(timer);
@@ -214,8 +214,17 @@ function prepareCompiledPrograms(
       if (signal?.aborted) { abort(); return; }
       let batchPrograms = 0, batchMs = 0;
       try {
+        if (!linksReady) {
+          let allReady = true;
+          for (const program of programs) if (!program.isReady()) allReady = false;
+          if (!allReady) { timer = setTimeout(check, 10); return; }
+          linksReady = true;
+          // A ready program's getProgramInfoLog still blocked the measured
+          // driver for 5.65 s while another captured program was linking.
+          // Finish polling the whole batch before issuing reflection queries.
+          record('program-links-ready', { programCount, elapsedMs: performance.now() - startedAt });
+        }
         for (const program of programs) {
-          if (!program.isReady()) continue;
           if (!initializedPrograms.has(program) && (program.getUniforms || program.getAttributes)) {
             const start = performance.now();
             try {

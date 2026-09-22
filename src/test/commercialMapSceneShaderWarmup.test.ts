@@ -36,6 +36,25 @@ function rendererFixture() {
 }
 
 describe('non-rendering commercial scene preparation', () => {
+  it('waits for every captured link before reflecting any ready program, then retains bounded initialization', async () => {
+    vi.useFakeTimers();
+    let secondReady = false;
+    const ready = { isReady: () => true, getUniforms: vi.fn(), getAttributes: vi.fn() };
+    const pending = { isReady: () => secondReady, getUniforms: vi.fn(), getAttributes: vi.fn() };
+    const material = new THREE.MeshBasicMaterial();
+    const gl = { compile: () => new Set([material]), properties: { get: () => ({ programs: new Map([['ready', ready], ['pending', pending]]) }) } } as unknown as THREE.WebGLRenderer;
+    const stage = vi.fn(), scene = new THREE.Scene();
+    const preparation = compileCommercialMapPrograms(gl, scene, new THREE.Camera(), scene, undefined, stage);
+    await vi.advanceTimersByTimeAsync(50);
+    expect(ready.getUniforms).not.toHaveBeenCalled(); expect(pending.getUniforms).not.toHaveBeenCalled();
+    expect(isCommercialMapProgramPreparationActive(gl)).toBe(true);
+    expect(stage.mock.calls.some(call => call[0] === 'program-links-ready')).toBe(false);
+    secondReady = true; await vi.runAllTimersAsync(); await preparation;
+    expect(ready.getUniforms).toHaveBeenCalledOnce(); expect(pending.getUniforms).toHaveBeenCalledOnce();
+    expect(stage.mock.calls.map(call => call[0])).toEqual(['program-links-ready', 'program-introspection']);
+    expect(isCommercialMapProgramPreparationActive(gl)).toBe(false);
+    expect(vi.getTimerCount()).toBe(0); material.dispose();
+  });
   it('keeps the resize scheduling signal active until every overlapping program job settles without acquiring the draw gate', async () => {
     vi.useFakeTimers();
     const { gl, pending, initialTarget } = rendererFixture();

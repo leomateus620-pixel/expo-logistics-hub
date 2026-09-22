@@ -51,16 +51,30 @@ export default function VisitMode({ entities, lots, trees, electricalPlacements,
   const avatarReady = useRef(false);
 
   useEffect(() => {
-    const controller = new AbortController();
-    avatarReady.current = false;
-    if (avatarGroup.current) void prepareCommercialSceneLayer(gl, avatarGroup.current, scene, camera, controller.signal).then(() => {
-      if (controller.signal.aborted) return;
-      avatarReady.current = true; invalidate();
-    }, () => {
-      if (!controller.signal.aborted) useVisitStore.setState({ error: 'Não foi possível preparar o personagem. Saia e tente novamente.' });
-    });
-    return () => controller.abort();
-  }, [camera, gl, invalidate, scene]);
+    let disposed = false;
+    let controller: AbortController | undefined;
+    const prepare = () => {
+      controller?.abort();
+      const current = new AbortController();
+      controller = current;
+      avatarReady.current = false;
+      if (avatarGroup.current) void prepareCommercialSceneLayer(gl, avatarGroup.current, scene, camera, current.signal).then(() => {
+        if (disposed || current.signal.aborted || controller !== current) return;
+        avatarReady.current = true; runtime.scheduler.wake(); invalidate();
+      }, () => {
+        if (!disposed && !current.signal.aborted && controller === current) useVisitStore.setState({ error: 'Não foi possível preparar o personagem. Saia e tente novamente.' });
+      });
+    };
+    const lost = () => { controller?.abort(); avatarReady.current = false; };
+    gl.domElement.addEventListener('webglcontextlost', lost);
+    gl.domElement.addEventListener('webglcontextrestored', prepare);
+    prepare();
+    return () => {
+      disposed = true; controller?.abort();
+      gl.domElement.removeEventListener('webglcontextlost', lost);
+      gl.domElement.removeEventListener('webglcontextrestored', prepare);
+    };
+  }, [camera, gl, invalidate, runtime, scene]);
 
   useEffect(() => {
     const cleanup = installVisitInput(gl.domElement, invalidate);
@@ -122,6 +136,13 @@ export default function VisitMode({ entities, lots, trees, electricalPlacements,
       }
       if (runtime.flight.step(dt)) { visitCameraFrame.restored = true; useVisitStore.getState().finishExit(); }
       animate(); return;
+    }
+    if (runtime.started && !avatarReady.current) {
+      // Context recovery retains the visitor's pose, but no movement or avatar
+      // draw can race the replacement program preparation. Completion wakes us.
+      visitInput.enabled = false; visitInput.reset(); runtime.character.stop();
+      visitRuntime.moving = false; visitRuntime.renderingActive = false;
+      avatar.current?.update(runtime.character, false); return;
     }
     if (!runtime.started) {
       visitRuntime.renderingActive = true;

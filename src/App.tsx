@@ -2,7 +2,7 @@ import { deserializeQueryCache } from './lib/queryPersistence';
 import { Suspense, type ReactNode } from 'react';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
 import { CommercialMapBootLoader } from '@/features/commercial-map/components/CommercialMapBootLoader';
-import { beginCommercialMapBoot, markCommercialMapStage } from '@/features/commercial-map/utils/performanceDiagnostics';
+import { beginCommercialMapBoot, captureCommercialMapStageRecorder } from '@/features/commercial-map/utils/performanceDiagnostics';
 import { preloadHeadquartersGeometry } from '@/features/commercial-map/components/canvas/headquarters/headquartersPreparationResource';
 import { loadCommercialMapRouteModule } from '@/features/commercial-map/utils/loadCommercialMapRouteModule';
 import { Toaster } from '@/components/ui/toaster';
@@ -68,17 +68,19 @@ const FenasojaCountdownExperiencePage = lazyWithRetry(
 );
 const CommercialMapPage = lazyWithRetry(async () => {
   beginCommercialMapBoot();
+  const record = captureCommercialMapStageRecorder();
   void preloadHeadquartersGeometry().catch(() => undefined);
   const module = await loadCommercialMapRouteModule();
-  markCommercialMapStage('module-ready');
+  record('module-ready');
   return module;
 });
 const CommercialMapRenderingDiagnosticsPage = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
   ? lazyWithRetry(async () => {
     beginCommercialMapBoot();
+    const record = captureCommercialMapStageRecorder();
     void preloadHeadquartersGeometry().catch(() => undefined);
     const module = await import('./features/commercial-map/diagnostics/CommercialMapRenderingDiagnosticsPage');
-    markCommercialMapStage('module-ready');
+    record('module-ready');
     return module;
   })
   : null;
@@ -90,16 +92,18 @@ const CommercialMapPrewarmDiagnosticsPage = (import.meta.env.DEV || import.meta.
 const CommercialMapInterfaceDiagnosticsPage = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
   ? lazyWithRetry(async () => {
     beginCommercialMapBoot();
+    const record = captureCommercialMapStageRecorder();
     void preloadHeadquartersGeometry().catch(() => undefined);
     const module = await import('./features/commercial-map/diagnostics/CommercialMapInterfaceDiagnosticsPage');
-    markCommercialMapStage('module-ready');
+    record('module-ready');
     return module;
   })
   : null;
 const PublicAreaMapPage = lazyWithRetry(async () => {
   beginCommercialMapBoot();
+  const record = captureCommercialMapStageRecorder();
   const module = await import('./features/commercial-map/public/PublicAreaMapPage');
-  markCommercialMapStage('module-ready');
+  record('module-ready');
   return module;
 });
 const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
@@ -113,9 +117,10 @@ const CommissionAgendaPreviewPage = (import.meta.env.DEV || import.meta.env.VITE
 const FinancialManagementPage = lazyWithRetry(() => import('./pages/commissions/FinancialManagementPage'));
 const CommissionCommercialMapPage = lazyWithRetry(async () => {
   beginCommercialMapBoot();
+  const record = captureCommercialMapStageRecorder();
   void preloadHeadquartersGeometry().catch(() => undefined);
   const module = await import('./pages/commissions/CommissionCommercialMapPage');
-  markCommercialMapStage('module-ready');
+  record('module-ready');
   return module;
 });
 const AdminPortalPage = lazyWithRetry(() => import('./pages/admin/AdminPortalPage'));

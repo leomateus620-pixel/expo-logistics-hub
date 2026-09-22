@@ -3,7 +3,11 @@ on:
   pull_request:
     paths:
       - 'src/features/commercial-map/**'
+      - 'src/App.tsx'
+      - 'src/components/portal/PortalPrimaryEntry.tsx'
+      - 'src/pages/commissions/CommissionPortalPage.tsx'
       - 'src/test/commercialMap*'
+      - 'scripts/commercial-map-performance/**'
       - 'scripts/spatial-cleanup/**'
       - 'docs/validation/spatial-cleanup/**'
       - '.github/workflows/commercial-map-spatial.yml'

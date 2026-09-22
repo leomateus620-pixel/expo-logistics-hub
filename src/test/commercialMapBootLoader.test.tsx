@@ -10,6 +10,32 @@ beforeEach(() => beginCommercialMapBoot());
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 describe('Commercial Map real readiness loader', () => {
+  it('keeps concurrent module completions attached to the boot that requested them', async () => {
+    const now = vi.spyOn(performance, 'now').mockReturnValue(100);
+    let finishPrevious!: () => void;
+    const previousModule = new Promise<void>(resolve => { finishPrevious = resolve; });
+    const previousRecord = captureCommercialMapStageRecorder();
+    const previousImport = previousModule.then(() => previousRecord('module-ready'));
+
+    now.mockReturnValue(200);
+    beginCommercialMapBoot();
+    let finishCurrent!: () => void;
+    const currentModule = new Promise<void>(resolve => { finishCurrent = resolve; });
+    const currentRecord = captureCommercialMapStageRecorder();
+    const currentImport = currentModule.then(() => currentRecord('module-ready'));
+
+    now.mockReturnValue(250);
+    finishPrevious();
+    await previousImport;
+    expect(getCommercialMapBootSnapshot().marks['module-ready']).toBeUndefined();
+    expect(getCommercialMapBootSnapshot().startedAt).toBe(200);
+
+    now.mockReturnValue(300);
+    finishCurrent();
+    await currentImport;
+    expect(getCommercialMapBootSnapshot().marks['module-ready']).toBe(300);
+    expect(getCommercialMapBootSnapshot().failed).toBe(false);
+  });
   it('retains a successor lazy boot when the previous page cleanup runs before its claim', () => {
     const previous = {}, next = {};
     claimCommercialMapBootVisit(previous);

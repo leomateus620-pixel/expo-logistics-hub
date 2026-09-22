@@ -15,10 +15,11 @@ import VisitMode from '@/features/commercial-map/visit/VisitMode';
 const runtime = vi.hoisted(() => ({
   frame: null as null | ((state: unknown, delta: number) => void),
   character: null as VisitCharacterController | null,
+  avatarVisible: false,
   camera: null as PerspectiveCamera | null,
   size: { width: 1440, height: 900 },
   invalidate: vi.fn(), setEvents: vi.fn(),
-  prepare: vi.fn<() => Promise<void>>(),
+  prepare: vi.fn<(signal?: AbortSignal) => Promise<void>>(),
   gl: { domElement: document.createElement('canvas'), getContext: () => ({ isContextLost: () => false }) },
   builds: 0,
   rejectedRoute: false,
@@ -29,12 +30,12 @@ vi.mock('@react-three/fiber', () => ({
 }));
 vi.mock('@/features/commercial-map/visit/VisitPerformanceManager', () => ({ VisitPerformanceManager: () => null }));
 vi.mock('@/features/commercial-map/utils/sceneShaderWarmup', () => ({
-  prepareCommercialSceneLayer: () => runtime.prepare(),
+  prepareCommercialSceneLayer: (_gl: unknown, _layer: unknown, _scene: unknown, _camera: unknown, signal?: AbortSignal) => runtime.prepare(signal),
 }));
 vi.mock('@/features/commercial-map/visit/VisitCharacter', async () => {
   const { forwardRef, useImperativeHandle } = await import('react');
   return { VisitCharacter: forwardRef(function Character(_props, ref) {
-    useImperativeHandle(ref, () => ({ update(character: VisitCharacterController) { runtime.character = character; } }), []);
+    useImperativeHandle(ref, () => ({ update(character: VisitCharacterController, visible: boolean) { runtime.character = character; runtime.avatarVisible = visible; } }), []);
     return null;
   }) };
 });
@@ -61,7 +62,7 @@ beforeEach(() => {
   visitCameraFrame.ready = false; visitCameraFrame.initial.captured = false;
   visitInput.reset(); visitInput.enabled = false;
   runtime.camera = new PerspectiveCamera(38, 1.5, .03, 600);
-  runtime.character = null; runtime.frame = null; runtime.builds = 0;
+  runtime.character = null; runtime.avatarVisible = false; runtime.frame = null; runtime.builds = 0;
   runtime.size = { width: 1440, height: 900 };
   runtime.rejectedRoute = false;
   runtime.invalidate.mockClear(); runtime.setEvents.mockClear();
@@ -180,6 +181,57 @@ describe('lease da câmera, saída e isolamento de sessão', () => {
 });
 
 describe('entrada e dados atualizados no controlador real', () => {
+  it('aborta programas do contexto perdido, ignora conclusão antiga e retoma a mesma posição após restauração', async () => {
+    const pending: { signal?: AbortSignal; resolve: () => void }[] = [];
+    runtime.prepare.mockImplementation(signal => new Promise<void>(resolve => pending.push({ signal, resolve })));
+    const road = { id: 'road', publicIdentifier: 'A1', classification: 'ROAD', name: 'Entrada',
+      geometry: { coordinates: [[[1,1],[3,1],[3,3],[1,3],[1,1]]], elevation: 0, extrusionHeight: .01 },
+    } as MapEntity;
+    act(() => useVisitStore.getState().start());
+    visitCameraFrame.initial.captured = true;
+    Object.assign(visitCameraFrame.initial.position, { x: 5, y: 10, z: 10 });
+    Object.assign(visitCameraFrame.initial.target, { x: 0, y: 0, z: 0 });
+    const view = render(<VisitMode entities={[road]} lots={[]} trees={[]} />);
+    fireEvent(runtime.gl.domElement, new Event('webglcontextlost'));
+    expect(pending[0].signal?.aborted).toBe(true);
+    fireEvent(runtime.gl.domElement, new Event('webglcontextrestored'));
+    expect(pending).toHaveLength(2);
+    await act(async () => pending[0].resolve());
+    act(() => { for (let i = 0; i < 180; i++) runtime.frame?.({}, 1 / 60); });
+    expect(useVisitStore.getState()).toMatchObject({ phase: 'loading', error: null });
+    expect(visitInput.enabled).toBe(false);
+    await act(async () => pending[1].resolve());
+    act(() => { for (let i = 0; i < 180; i++) runtime.frame?.({}, 1 / 60); });
+    expect(useVisitStore.getState().phase).toBe('active');
+    act(() => useVisitStore.setState({ cameraMode: 'third' }));
+    fireEvent.keyDown(window, { code: 'KeyW' });
+    act(() => { for (let i = 0; i < 30; i++) runtime.frame?.({}, 1 / 60); });
+    const character = runtime.character!, position = { ...character.position };
+    fireEvent(runtime.gl.domElement, new Event('webglcontextlost'));
+    fireEvent(runtime.gl.domElement, new Event('webglcontextrestored'));
+    expect(pending).toHaveLength(3);
+    act(() => { for (let i = 0; i < 30; i++) runtime.frame?.({}, 1 / 60); });
+    expect(visitInput.enabled).toBe(false); expect(visitRuntime.renderingActive).toBe(false);
+    expect(character.position).toEqual(position);
+    await act(async () => pending[2].resolve());
+    act(() => runtime.frame?.({}, 1 / 60));
+    expect(visitInput.enabled).toBe(true); expect(runtime.character).toBe(character);
+    expect(character.position).toEqual(position);
+    act(() => { for (let i = 0; i < 210; i++) runtime.frame?.({}, 1 / 60); });
+    expect(visitRuntime.renderingActive).toBe(false);
+    fireEvent(runtime.gl.domElement, new Event('webglcontextlost'));
+    fireEvent(runtime.gl.domElement, new Event('webglcontextrestored'));
+    act(() => runtime.frame?.({}, 1 / 60));
+    expect(runtime.avatarVisible).toBe(false);
+    await act(async () => pending[3].resolve());
+    act(() => runtime.frame?.({}, 1 / 60));
+    expect(runtime.avatarVisible).toBe(true);
+    expect(character.position).toEqual(position);
+    view.unmount();
+    expect(pending[3].signal?.aborted).toBe(true);
+    fireEvent(runtime.gl.domElement, new Event('webglcontextrestored'));
+    expect(pending).toHaveLength(4);
+  });
   it('rota de entrada bloqueada mantém a lente, interrompe o loop e permite saída explícita', async () => {
     act(() => useVisitStore.getState().start());
     visitCameraFrame.initial.captured = true;
