@@ -19,7 +19,10 @@ async function ready(page) {
 async function capture(page) {
   return page.evaluate(() => {
     const canvas = document.querySelector('canvas');
+    canvas?.dispatchEvent(new Event('commercial-map-snapshot-environment'));
+    const observed = window.__commercialMapEnvironmentSnapshot;
     return { at: performance.now(), boot: structuredClone(window.__commercialMapPerformance), prewarm: structuredClone(window.__commercialMapPrewarm),
+      camera: observed ? { position: observed.position, quaternion: observed.quaternion, target: observed.target } : null,
       activationAt: window.__commercialMapPrewarmQa?.activateAt,
       renderer: window.__commercialMapRuntimeDiagnostics?.capture(),
       identity: { canvasMounts: window.__commercialMapRuntimeDiagnostics?.canvasMounts,
@@ -97,6 +100,8 @@ async function capture(page) {
       await page.mouse.move(box.x + box.width * .45, box.y + box.height * .55); await page.mouse.down();
       await page.mouse.move(box.x + box.width * .5, box.y + box.height * .58, { steps: 8 }); await page.mouse.up();
       await page.waitForTimeout(600); const afterGesture = await capture(page);
+      const gestureCameraChanged = presentation.camera && afterGesture.camera ?
+        JSON.stringify(presentation.camera) !== JSON.stringify(afterGesture.camera) : null;
       // Keep the existing real first-interactive barrier distinct from the
       // later fully hydrated presentation with the prepared compositor.
       if (round === 1) await page.screenshot({ path: path.join(out, `${label}-${scenario}-interactive.png`) });
@@ -112,13 +117,14 @@ async function capture(page) {
       const clickToInteractiveMs = presentation.activationAt == null ? null : presentation.boot.summary.documentToInteractiveMs - presentation.activationAt;
       const row = { round, scenario, mobileEmulation: mobile, physicalMobile: false, tierRequested: tier || 'automatic',
         condition: 'local fixture; new browser/context per case except SPA reopen; OS/driver caches not cleared; no private query',
-        beforeClick, clickToInteractiveMs, presentation, afterGesture, completePresentation, diagnosticCpuProfiling: Boolean(profiler),
+        beforeClick, clickToInteractiveMs, presentation, afterGesture, gestureCameraChanged, completePresentation, diagnosticCpuProfiling: Boolean(profiler),
         fullyPresentedObservedMs: completePresentation ? completePresentation.at - (presentation.activationAt ?? presentation.boot.summary.routeStartedAt) : null,
         completeObservationRequested: observeComplete, diagnosticGlProbe: process.env.STARTUP_GL_PROBE === '1', errors };
       rows.push(row); fs.writeFileSync(path.join(out, `${label}.json`), JSON.stringify(rows, null, 2));
       if (round === 1) await page.screenshot({ path: path.join(out, `${label}-${scenario}.png`) });
       console.log(JSON.stringify({ round, scenario, clickToInteractiveMs, fullyPresentedObservedMs: row.fullyPresentedObservedMs, boot: presentation.boot.summary, errors }));
-      if (errors.length || presentation.health.contextLosses || afterGesture.health.status !== 'ready' || !presentation.renderer.calls) throw Error('Invalid startup');
+      if (errors.length || presentation.health.contextLosses || afterGesture.health.status !== 'ready' || !presentation.renderer.calls
+        || gestureCameraChanged === false) throw Error('Invalid startup or unresponsive gesture');
     } finally { await browser.close(); }
   }
 })().catch(error => { console.error(error); process.exitCode = 1; });

@@ -17,7 +17,31 @@ async function launch(mobile = false) {
 async function boot(page, port = 5183) {
   await page.goto(`${process.env.VISIT_BASE_URL || `http://127.0.0.1:${port}`}/__dev/commercial-map-rendering?persistedStage=1${process.env.VISIT_EXTRA_QUERY ? `&${process.env.VISIT_EXTRA_QUERY}` : ''}`,
     { waitUntil: 'domcontentloaded', timeout: 120000 });
-  await page.waitForFunction(() => document.querySelector('canvas')?.dataset.commercialMapHydration === 'complete', null, { timeout: 180000 });
+  const progress = process.env.VISIT_BOOT_DEBUG === '1' ? setInterval(async () => {
+    try {
+      const state = await page.evaluate(() => ({ at: performance.now(), boot: window.__commercialMapPerformance,
+        canvas: document.querySelector('canvas') ? { ...document.querySelector('canvas').dataset } : null,
+        focused: document.hasFocus(), visibility: document.visibilityState }));
+      save('boot-progress.json', state);
+      console.log(JSON.stringify({ bootProgress: state.at, health: state.canvas?.commercialMapRenderHealth,
+        stage: state.boot?.events?.at(-1), hydration: state.canvas?.commercialMapHydration }));
+    } catch { /* page closure is handled by the owning harness */ }
+  }, 20000) : null;
+  try {
+    await page.waitForFunction(() => document.querySelector('canvas')?.dataset.commercialMapHydration === 'complete', null, { timeout: 180000 });
+  } catch (error) {
+    save('boot-failure.json', await page.evaluate(() => ({ boot: window.__commercialMapPerformance,
+      canvas: document.querySelector('canvas') ? { ...document.querySelector('canvas').dataset } : null,
+      renderer: window.__commercialMapRuntimeDiagnostics?.capture(), body: document.body.innerText })));
+    await page.screenshot({ path: path.join(out, 'boot-failure.png') });
+    throw error;
+  } finally { clearInterval(progress); }
+  if (process.env.VISIT_BOOT_CAPTURE) save(process.env.VISIT_BOOT_CAPTURE, await page.evaluate(() => ({
+    at: performance.now(), boot: window.__commercialMapPerformance,
+    health: JSON.parse(document.querySelector('canvas').dataset.commercialMapRenderHealth || 'null'),
+    hydration: document.querySelector('canvas').dataset.commercialMapHydration,
+    renderer: window.__commercialMapRuntimeDiagnostics?.capture(),
+  })));
   await page.waitForTimeout(6000);
   console.log('hydrated');
 }

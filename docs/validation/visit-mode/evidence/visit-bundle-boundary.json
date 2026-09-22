@@ -1,0 +1,57 @@
+{
+  "method": "Read existing compiled manifests/assets and rounded gzip sizes already reported by Vite build logs. No build, recompression, test or browser was run during renderer measurement.",
+  "dependencyChanges": false,
+  "dependencyComparison": "package.json and package-lock.json unchanged against 8d48bb48378dfae73aae2a98dc9e1fdf367e96ce",
+  "runtimeCommit": "046e538f",
+  "normalProduction": {
+    "manifest": "dist/.vite/manifest.json",
+    "manifestModifiedAt": "2026-09-22T02:24:39.677Z",
+    "note": "Final normal-production build, including canonical soil grounding, terrain camera probes and eager visit recovery controls. Artifact sizes are not deployed traffic measurements.",
+    "route": "src/pages/CommercialMapPage.tsx",
+    "routeEntry": "assets/CommercialMapPage-NavAsk0Z.js",
+    "staticClosureChunks": 38,
+    "staticClosureRawBytes": 2935015,
+    "staticClosureGzipBytesFromExistingReport": 865736,
+    "visitChunks": [
+      { "file": "assets/VisitMode-4IXANIRe.js", "rawBytes": 46589, "gzipBytesApproximateFromBuildLog": 17410, "isDynamicEntry": true, "inRouteStaticClosure": false },
+      { "file": "assets/VisitHUD-Cozcji-W.js", "rawBytes": 8226, "gzipBytesApproximateFromBuildLog": 3170, "isDynamicEntry": true, "inRouteStaticClosure": false },
+      { "file": "assets/VisitInputManager-C3yFo-_y.js", "rawBytes": 3564, "gzipBytesApproximateFromBuildLog": 1260, "inRouteStaticClosure": false, "importedBy": ["VisitMode", "VisitHUD"] }
+    ]
+  },
+  "candidateQa": {
+    "manifest": "dist-qa/.vite/manifest.json",
+    "manifestModifiedAt": "2026-09-22T02:23:45.608Z",
+    "route": "src/pages/CommercialMapPage.tsx",
+    "routeEntry": "assets/CommercialMapPage-DEE-IEF1.js",
+    "staticClosureChunks": 44,
+    "staticClosureRawBytes": 2942582,
+    "visitChunks": [
+      { "file": "assets/VisitMode-BAabMY6Z.js", "rawBytes": 21198, "gzipBytesApproximateFromBuildLog": 7890, "isDynamicEntry": true, "inRouteStaticClosure": false },
+      { "file": "assets/VisitHUD-DxVd2FHD.js", "rawBytes": 7621, "gzipBytesApproximateFromBuildLog": 2870, "isDynamicEntry": true, "inRouteStaticClosure": false },
+      { "file": "assets/VisitInputManager-C3yFo-_y.js", "rawBytes": 3564, "gzipBytesApproximateFromBuildLog": 1260, "inRouteStaticClosure": false },
+      { "file": "assets/VisitSpawnManager-C9tVL5NO.js", "rawBytes": 28603, "gzipBytesApproximateFromBuildLog": 11440, "inRouteStaticClosure": false, "note": "Shared by the QA diagnostics route and lazy VisitMode; this split is specific to diagnostics-enabled build reachability." }
+    ]
+  },
+  "roughMatchedQaComparison": {
+    "baselineCommit": "8d48bb48378dfae73aae2a98dc9e1fdf367e96ce",
+    "baselineManifestAvailable": false,
+    "method": "Sum the deduplicated explicit static JS imports plus the route entry in each compiled CommercialMapPage entry. Candidate result agrees with its full manifest static closure. Baseline has no manifest, so this is a rough artifact comparison.",
+    "baselineEntry": "assets/CommercialMapPage-CFQXuCIb.js",
+    "candidateEntry": "assets/CommercialMapPage-DEE-IEF1.js",
+    "baselineFiles": 42,
+    "candidateFiles": 44,
+    "baselineRawBytes": 2934814,
+    "candidateRawBytes": 2942582,
+    "rawDeltaBytes": 7768,
+    "rawDeltaPercentApproximate": 0.265,
+    "threeAlreadyInBaselineStaticImports": true,
+    "gzipDelta": null
+  },
+  "limitations": [
+    "These are compiled artifact bytes, not network transfer, cache, cold-start latency or production traffic measurements.",
+    "Per-chunk gzip values are rounded build-log values; no recompression was performed during the FPS run.",
+    "The regular route eagerly includes small visit state/quality/camera-lease bridges, compact loading/error exit controls and scoped CSS; heavy visit controller and HUD remain dynamic.",
+    "Shared dependencies, CSS and runtime preload behavior mean lazy chunk sizes are not a complete first-visit network budget.",
+    "The diagnostics route may import shared spawn/world helpers for its explicit QA controls; use the normal-production manifest for end-user lazy boundaries."
+  ]
+}

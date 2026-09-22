@@ -1,0 +1,3848 @@
+{
+  "at": 37761.60000002384,
+  "boot": {
+    "events": [
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.2000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.3000000715256,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.3000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.3000000715256,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.3000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.399999976158,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.399999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.399999976158,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.399999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.5,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.5
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.5,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.600000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.600000023842,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.600000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.7000000476837,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.7000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.7000000476837,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.7000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.7000000476837,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.7000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.8000000715256,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.8000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.8000000715256,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.8000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.8000000715256,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.8000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.899999976158,
+        "duration": 0.09999990463256836
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3725.899999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3725.899999976158,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.100000023842,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.100000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.100000023842,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.100000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.100000023842,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.2000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.2000000476837,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.2000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.2000000476837,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.3000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.3000000715256,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.3000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.399999976158,
+        "duration": 0.09999990463256836
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.399999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.399999976158,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.399999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.5,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.5
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.600000023842,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.600000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.7000000476837,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.7000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.7000000476837,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.7000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.7000000476837,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.8000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.8000000715256,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.8000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.899999976158,
+        "duration": 0.09999990463256836
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.899999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.899999976158,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3726.899999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3726.899999976158,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.100000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.100000023842,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.100000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.100000023842,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.100000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.2000000476837,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.2000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.2000000476837,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.2000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.3000000715256,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.3000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.3000000715256,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.3000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.3000000715256,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.399999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.399999976158,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.399999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.399999976158,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.399999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.399999976158,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.399999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.5,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.5
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.600000023842,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.600000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.600000023842,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.600000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.600000023842,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.600000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.7000000476837,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.7000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.8000000715256,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.8000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3727.899999976158,
+        "duration": 0.09999990463256836
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3727.899999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.100000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.100000023842,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.100000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.100000023842,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.2000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.2000000476837,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.2000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.2000000476837,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.2000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.3000000715256,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.3000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.399999976158,
+        "duration": 0.09999990463256836
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.399999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.399999976158,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.399999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.5,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.600000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.600000023842,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.600000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.600000023842,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.600000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.600000023842,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.600000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.7000000476837,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.7000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.7000000476837,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.7000000476837
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.7000000476837,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.8000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.8000000715256,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.8000000715256
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.899999976158,
+        "duration": 0.09999990463256836
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.899999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.899999976158,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.899999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3728.899999976158,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3728.899999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3729,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3729
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3729.100000023842,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3729.100000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3729.100000023842,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 3729.100000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 3729.100000023842,
+        "duration": 0
+      },
+      {
+        "name": "b12-unpack:start",
+        "at": 4046.399999976158
+      },
+      {
+        "name": "b12-unpack:end",
+        "at": 4050.5,
+        "duration": 4.100000023841858
+      },
+      {
+        "name": "b12-materials:start",
+        "at": 4050.5
+      },
+      {
+        "name": "b12-materials:end",
+        "at": 4247.700000047684,
+        "duration": 197.20000004768372
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 4263
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 4263.300000071526,
+        "duration": 0.30000007152557373
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 4277.800000071526
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 4277.800000071526,
+        "duration": 0
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 4278.200000047684
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 4278.300000071526,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 4278.600000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 4278.700000047684,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 4279.100000023842
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 4279.200000047684,
+        "duration": 0.10000002384185791
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 4379.399999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 4379.600000023842,
+        "duration": 0.20000004768371582
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 4379.899999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 4380.100000023842,
+        "duration": 0.20000004768371582
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 4380.399999976158
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 4384.399999976158,
+        "duration": 4
+      },
+      {
+        "name": "geometry-preparation:start",
+        "at": 4385.300000071526
+      },
+      {
+        "name": "geometry-preparation:end",
+        "at": 4387,
+        "duration": 1.6999999284744263
+      },
+      {
+        "name": "postprocessing:start",
+        "at": 5530.899999976158
+      },
+      {
+        "name": "postprocessing:end",
+        "at": 5539.800000071526
+      },
+      {
+        "name": "critical-scene:end",
+        "at": 5794.5
+      },
+      {
+        "name": "shader-representatives",
+        "at": 5800.100000023842,
+        "detail": {
+          "count": 728
+        }
+      },
+      {
+        "name": "compile-direct:start",
+        "at": 5800.5
+      },
+      {
+        "name": "compile-direct-js",
+        "at": 6209.300000071526,
+        "duration": 409.2000000476837
+      },
+      {
+        "name": "controls-created",
+        "at": 6222.899999976158
+      },
+      {
+        "name": "first-frame-requested",
+        "at": 6224.100000023842
+      },
+      {
+        "name": "program-links-ready",
+        "at": 12049.700000047684,
+        "detail": {
+          "programCount": 97,
+          "elapsedMs": 5842.600000023842
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 12562.5,
+        "duration": 46.19999933242798,
+        "detail": {
+          "duration": 46.19999933242798,
+          "programCount": 97,
+          "initializedPrograms": 97,
+          "batches": 49,
+          "maximumBatchMs": 2.3000000715255737,
+          "elapsedMs": 6355.5,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "compile-direct:end",
+        "at": 12562.899999976158,
+        "duration": 6762.399999976158,
+        "detail": {
+          "duration": 6762.399999976158
+        }
+      },
+      {
+        "name": "texture-upload:programs-ready",
+        "at": 12563
+      },
+      {
+        "name": "texture-upload:start",
+        "at": 12575.899999976158,
+        "detail": {
+          "count": 97,
+          "additionalCompiledUniformTextures": 4
+        }
+      },
+      {
+        "name": "texture-upload:end",
+        "at": 13379.300000071526,
+        "detail": {
+          "count": 97
+        }
+      },
+      {
+        "name": "essential-scene:prepared",
+        "at": 13379.800000071526
+      },
+      {
+        "name": "shadow-preparation:start",
+        "at": 13484.899999976158
+      },
+      {
+        "name": "shadow-preparation:end",
+        "at": 13485.100000023842
+      },
+      {
+        "name": "first-draw",
+        "at": 13594.5
+      },
+      {
+        "name": "commercial-map-ready",
+        "at": 13864.5
+      },
+      {
+        "name": "first-interactive",
+        "at": 13864.600000023842
+      },
+      {
+        "name": "critical-post:start",
+        "at": 14749.700000047684
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 15311.399999976158,
+        "duration": 13.099999904632568
+      },
+      {
+        "name": "program-links-ready",
+        "at": 16729.200000047684,
+        "detail": {
+          "programCount": 15,
+          "elapsedMs": 1417.8999999761581
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 17098,
+        "duration": 22.99999988079071,
+        "detail": {
+          "duration": 22.99999988079071,
+          "programCount": 15,
+          "initializedPrograms": 7,
+          "batches": 7,
+          "maximumBatchMs": 4.399999976158142,
+          "elapsedMs": 1786.6999999284744,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 17670.100000023842,
+        "duration": 13.799999952316284
+      },
+      {
+        "name": "program-links-ready",
+        "at": 18882.600000023842,
+        "detail": {
+          "programCount": 14,
+          "elapsedMs": 1212.7000000476837
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 19140.600000023842,
+        "duration": 14.299999952316284,
+        "detail": {
+          "duration": 14.299999952316284,
+          "programCount": 14,
+          "initializedPrograms": 6,
+          "batches": 5,
+          "maximumBatchMs": 4.099999904632568,
+          "elapsedMs": 1470.7000000476837,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 19689.5,
+        "duration": 18.100000023841858
+      },
+      {
+        "name": "program-links-ready",
+        "at": 20190.100000023842,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 502.89999997615814
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 20225.5,
+        "duration": 4.600000023841858,
+        "detail": {
+          "duration": 4.600000023841858,
+          "programCount": 8,
+          "initializedPrograms": 3,
+          "batches": 2,
+          "maximumBatchMs": 2.399999976158142,
+          "elapsedMs": 538.2999999523163,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 20785.899999976158,
+        "duration": 3.399999976158142
+      },
+      {
+        "name": "program-links-ready",
+        "at": 21114.200000047684,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 328.39999997615814
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 21149.300000071526,
+        "duration": 2.700000047683716,
+        "detail": {
+          "duration": 2.700000047683716,
+          "programCount": 8,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 2.700000047683716,
+          "elapsedMs": 363.39999997615814,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 21683.800000071526,
+        "duration": 9.900000095367432
+      },
+      {
+        "name": "program-links-ready",
+        "at": 21967.399999976158,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 286.6999999284744
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 21977.899999976158,
+        "duration": 1.5999999046325684,
+        "detail": {
+          "duration": 1.5999999046325684,
+          "programCount": 8,
+          "initializedPrograms": 3,
+          "batches": 2,
+          "maximumBatchMs": 1.2999999523162842,
+          "elapsedMs": 297.1999999284744,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 22001.100000023842,
+        "duration": 6.799999952316284
+      },
+      {
+        "name": "program-links-ready",
+        "at": 22260.899999976158,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 260
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 22278.200000047684,
+        "duration": 1.7000000476837158,
+        "detail": {
+          "duration": 1.7000000476837158,
+          "programCount": 8,
+          "initializedPrograms": 3,
+          "batches": 2,
+          "maximumBatchMs": 1.2000000476837158,
+          "elapsedMs": 277.3000000715256,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 22299.100000023842,
+        "duration": 4.799999952316284
+      },
+      {
+        "name": "program-links-ready",
+        "at": 22541.399999976158,
+        "detail": {
+          "programCount": 10,
+          "elapsedMs": 242.39999997615814
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 22561.399999976158,
+        "duration": 1.7999999523162842,
+        "detail": {
+          "duration": 1.7999999523162842,
+          "programCount": 10,
+          "initializedPrograms": 3,
+          "batches": 2,
+          "maximumBatchMs": 1.2000000476837158,
+          "elapsedMs": 262.39999997615814,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 22586.600000023842,
+        "duration": 8.799999952316284
+      },
+      {
+        "name": "program-links-ready",
+        "at": 22832.300000071526,
+        "detail": {
+          "programCount": 10,
+          "elapsedMs": 248.70000004768372
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 22839.200000047684,
+        "duration": 2.100000023841858,
+        "detail": {
+          "duration": 2.100000023841858,
+          "programCount": 10,
+          "initializedPrograms": 4,
+          "batches": 2,
+          "maximumBatchMs": 1.2000000476837158,
+          "elapsedMs": 255.60000002384186,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 22848.899999976158,
+        "duration": 4.399999976158142
+      },
+      {
+        "name": "program-links-ready",
+        "at": 23206.200000047684,
+        "detail": {
+          "programCount": 6,
+          "elapsedMs": 357.39999997615814
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 23213.300000071526,
+        "duration": 1.399999976158142,
+        "detail": {
+          "duration": 1.399999976158142,
+          "programCount": 6,
+          "initializedPrograms": 3,
+          "batches": 2,
+          "maximumBatchMs": 0.8999999761581421,
+          "elapsedMs": 364.5,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 23236.399999976158,
+        "duration": 8.700000047683716
+      },
+      {
+        "name": "program-links-ready",
+        "at": 23660.800000071526,
+        "detail": {
+          "programCount": 12,
+          "elapsedMs": 424.60000002384186
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 23678.800000071526,
+        "duration": 2.0000001192092896,
+        "detail": {
+          "duration": 2.0000001192092896,
+          "programCount": 12,
+          "initializedPrograms": 4,
+          "batches": 2,
+          "maximumBatchMs": 1.2000000476837158,
+          "elapsedMs": 442.60000002384186,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 23697,
+        "duration": 2.799999952316284
+      },
+      {
+        "name": "program-links-ready",
+        "at": 24157.600000023842,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 460.7000000476837
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 24158.399999976158,
+        "duration": 0.6999999284744263,
+        "detail": {
+          "duration": 0.6999999284744263,
+          "programCount": 8,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.6999999284744263,
+          "elapsedMs": 461.5,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 24168.100000023842,
+        "duration": 7.299999952316284
+      },
+      {
+        "name": "program-links-ready",
+        "at": 24888.700000047684,
+        "detail": {
+          "programCount": 13,
+          "elapsedMs": 720.7000000476837
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 24895.300000071526,
+        "duration": 2.100000023841858,
+        "detail": {
+          "duration": 2.100000023841858,
+          "programCount": 13,
+          "initializedPrograms": 4,
+          "batches": 2,
+          "maximumBatchMs": 1.100000023841858,
+          "elapsedMs": 727.3000000715256,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 24912.600000023842,
+        "duration": 1.7000000476837158
+      },
+      {
+        "name": "program-links-ready",
+        "at": 24936,
+        "detail": {
+          "programCount": 6,
+          "elapsedMs": 23.5
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 24937.100000023842,
+        "duration": 0.8999999761581421,
+        "detail": {
+          "duration": 0.8999999761581421,
+          "programCount": 6,
+          "initializedPrograms": 2,
+          "batches": 1,
+          "maximumBatchMs": 0.8999999761581421,
+          "elapsedMs": 24.600000023841858,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "program-links-ready",
+        "at": 24945,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 24945.100000023842,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 24945.100000023842,
+        "duration": 0.8999999761581421
+      },
+      {
+        "name": "program-links-ready",
+        "at": 24961.5,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 24961.700000047684,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.20000004768371582,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 24961.700000047684,
+        "duration": 0.8000000715255737
+      },
+      {
+        "name": "program-links-ready",
+        "at": 24978.300000071526,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 24978.5,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.19999992847442627,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 24978.600000023842,
+        "duration": 0.8999999761581421
+      },
+      {
+        "name": "program-links-ready",
+        "at": 24994.800000071526,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 24994.899999976158,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.09999990463256836,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 24995,
+        "duration": 0.7999999523162842
+      },
+      {
+        "name": "program-links-ready",
+        "at": 25011.5,
+        "detail": {
+          "programCount": 6,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 25011.5,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 6,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 25011.700000047684,
+        "duration": 0.8999999761581421
+      },
+      {
+        "name": "program-links-ready",
+        "at": 25028.300000071526,
+        "detail": {
+          "programCount": 5,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 25028.5,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 5,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.19999992847442627,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 25028.5,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 25045,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 25045,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 25045,
+        "duration": 0.8999999761581421
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 25065.5,
+        "duration": 4.399999976158142
+      },
+      {
+        "name": "program-links-ready",
+        "at": 25489.300000071526,
+        "detail": {
+          "programCount": 10,
+          "elapsedMs": 425
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 25490,
+        "duration": 0.6000000238418579,
+        "detail": {
+          "duration": 0.6000000238418579,
+          "programCount": 10,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.6000000238418579,
+          "elapsedMs": 425.6999999284744,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "program-links-ready",
+        "at": 25495.200000047684,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 25495.300000071526,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 25495.300000071526,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 25511.899999976158,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 25512,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 25512.100000023842,
+        "duration": 1.100000023841858
+      },
+      {
+        "name": "program-links-ready",
+        "at": 25528.5,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0.10000002384185791
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 25528.600000023842,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.20000004768371582,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 25528.600000023842,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 25545.399999976158,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0.09999990463256836
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 25545.600000023842,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.2999999523162842,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 25545.600000023842,
+        "duration": 1.399999976158142
+      },
+      {
+        "name": "program-links-ready",
+        "at": 25561.600000023842,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 25561.700000047684,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 25561.800000071526,
+        "duration": 0.9000000953674316
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 25584.800000071526,
+        "duration": 7.300000071525574
+      },
+      {
+        "name": "program-links-ready",
+        "at": 26090.700000047684,
+        "detail": {
+          "programCount": 14,
+          "elapsedMs": 507.10000002384186
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 26107.200000047684,
+        "duration": 1.5,
+        "detail": {
+          "duration": 1.5,
+          "programCount": 14,
+          "initializedPrograms": 3,
+          "batches": 2,
+          "maximumBatchMs": 1,
+          "elapsedMs": 523.6000000238419,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "program-links-ready",
+        "at": 26112.100000023842,
+        "detail": {
+          "programCount": 14,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 26112.300000071526,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 14,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.20000004768371582,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 26112.300000071526,
+        "duration": 1.3000000715255737
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 26130.399999976158,
+        "duration": 3
+      },
+      {
+        "name": "program-links-ready",
+        "at": 26619.399999976158,
+        "detail": {
+          "programCount": 14,
+          "elapsedMs": 489.09999990463257
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 26620.200000047684,
+        "duration": 0.6000000238418579,
+        "detail": {
+          "duration": 0.6000000238418579,
+          "programCount": 14,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.6000000238418579,
+          "elapsedMs": 489.89999997615814,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "program-links-ready",
+        "at": 26628.5,
+        "detail": {
+          "programCount": 13,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 26628.700000047684,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 13,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.20000004768371582,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 26628.700000047684,
+        "duration": 1.2000000476837158
+      },
+      {
+        "name": "program-links-ready",
+        "at": 26645,
+        "detail": {
+          "programCount": 14,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 26645.100000023842,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 14,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 26645.200000047684,
+        "duration": 1.100000023841858
+      },
+      {
+        "name": "program-links-ready",
+        "at": 26661.800000071526,
+        "detail": {
+          "programCount": 14,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 26661.899999976158,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 14,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.09999990463256836,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 26662.399999976158,
+        "duration": 1.6999999284744263
+      },
+      {
+        "name": "program-links-ready",
+        "at": 26678.600000023842,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 0.10000002384185791
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 26678.600000023842,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 8,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 26678.700000047684,
+        "duration": 1.2000000476837158
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 26696.5,
+        "duration": 2.299999952316284
+      },
+      {
+        "name": "program-links-ready",
+        "at": 26916.5,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 220
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 26917.399999976158,
+        "duration": 0.7000000476837158,
+        "detail": {
+          "duration": 0.7000000476837158,
+          "programCount": 8,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.7000000476837158,
+          "elapsedMs": 220.89999997615814,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "program-links-ready",
+        "at": 26928.700000047684,
+        "detail": {
+          "programCount": 12,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 26928.800000071526,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 12,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 26928.800000071526,
+        "duration": 1.100000023841858
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 26946.600000023842,
+        "duration": 2.5
+      },
+      {
+        "name": "program-links-ready",
+        "at": 27177.300000071526,
+        "detail": {
+          "programCount": 10,
+          "elapsedMs": 230.80000007152557
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 27178,
+        "duration": 0.6000000238418579,
+        "detail": {
+          "duration": 0.6000000238418579,
+          "programCount": 10,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.6000000238418579,
+          "elapsedMs": 231.5,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "program-links-ready",
+        "at": 27195.200000047684,
+        "detail": {
+          "programCount": 10,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 27195.300000071526,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 10,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 27195.399999976158,
+        "duration": 1.1999999284744263
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 27214,
+        "duration": 3.1999999284744263
+      },
+      {
+        "name": "program-links-ready",
+        "at": 27424.700000047684,
+        "detail": {
+          "programCount": 10,
+          "elapsedMs": 210.80000007152557
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 27425.300000071526,
+        "duration": 0.5,
+        "detail": {
+          "duration": 0.5,
+          "programCount": 10,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.5,
+          "elapsedMs": 211.40000009536743,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 27435.300000071526,
+        "duration": 7.600000023841858
+      },
+      {
+        "name": "program-links-ready",
+        "at": 27866.5,
+        "detail": {
+          "programCount": 10,
+          "elapsedMs": 431.2999999523163
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 27885,
+        "duration": 2.3000000715255737,
+        "detail": {
+          "duration": 2.3000000715255737,
+          "programCount": 10,
+          "initializedPrograms": 4,
+          "batches": 2,
+          "maximumBatchMs": 1.2000000476837158,
+          "elapsedMs": 449.7999999523163,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 27899.200000047684,
+        "duration": 5.200000047683716
+      },
+      {
+        "name": "program-links-ready",
+        "at": 28137.399999976158,
+        "detail": {
+          "programCount": 14,
+          "elapsedMs": 238.19999992847443
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 28144.800000071526,
+        "duration": 1.600000023841858,
+        "detail": {
+          "duration": 1.600000023841858,
+          "programCount": 14,
+          "initializedPrograms": 3,
+          "batches": 2,
+          "maximumBatchMs": 1,
+          "elapsedMs": 245.5,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 28171,
+        "duration": 10.299999952316284
+      },
+      {
+        "name": "program-links-ready",
+        "at": 28585,
+        "detail": {
+          "programCount": 12,
+          "elapsedMs": 415.6999999284744
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 28601.5,
+        "duration": 2,
+        "detail": {
+          "duration": 2,
+          "programCount": 12,
+          "initializedPrograms": 4,
+          "batches": 2,
+          "maximumBatchMs": 1,
+          "elapsedMs": 432.1999999284744,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 28615,
+        "duration": 4.299999952316284
+      },
+      {
+        "name": "program-links-ready",
+        "at": 29103.600000023842,
+        "detail": {
+          "programCount": 12,
+          "elapsedMs": 488.60000002384186
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 29111.300000071526,
+        "duration": 1.1999999284744263,
+        "detail": {
+          "duration": 1.1999999284744263,
+          "programCount": 12,
+          "initializedPrograms": 2,
+          "batches": 1,
+          "maximumBatchMs": 1.1999999284744263,
+          "elapsedMs": 496.3000000715256,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "program-links-ready",
+        "at": 29128.899999976158,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 29129,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 8,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 29129.100000023842,
+        "duration": 1.399999976158142
+      },
+      {
+        "name": "program-links-ready",
+        "at": 29145.100000023842,
+        "detail": {
+          "programCount": 2,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 29145.100000023842,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 2,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 29145.200000047684,
+        "duration": 1.2000000476837158
+      },
+      {
+        "name": "program-links-ready",
+        "at": 29161.800000071526,
+        "detail": {
+          "programCount": 6,
+          "elapsedMs": 0.10000002384185791
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 29161.899999976158,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 6,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.19999992847442627,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 29161.899999976158,
+        "duration": 1
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 29181.300000071526,
+        "duration": 3.399999976158142
+      },
+      {
+        "name": "program-links-ready",
+        "at": 29394.200000047684,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 213.20000004768372
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 29395,
+        "duration": 0.6999999284744263,
+        "detail": {
+          "duration": 0.6999999284744263,
+          "programCount": 8,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.6999999284744263,
+          "elapsedMs": 214,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 29412.200000047684,
+        "duration": 1.5
+      },
+      {
+        "name": "program-links-ready",
+        "at": 29427.399999976158,
+        "detail": {
+          "programCount": 10,
+          "elapsedMs": 15.299999952316284
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 29428,
+        "duration": 0.3999999761581421,
+        "detail": {
+          "duration": 0.3999999761581421,
+          "programCount": 10,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.3999999761581421,
+          "elapsedMs": 15.799999952316284,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 29446.700000047684,
+        "duration": 2.700000047683716
+      },
+      {
+        "name": "program-links-ready",
+        "at": 29886.800000071526,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 440.2000000476837
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 29887.600000023842,
+        "duration": 0.5,
+        "detail": {
+          "duration": 0.5,
+          "programCount": 8,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.5,
+          "elapsedMs": 441,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 29895.5,
+        "duration": 1.5
+      },
+      {
+        "name": "program-links-ready",
+        "at": 29910.600000023842,
+        "detail": {
+          "programCount": 10,
+          "elapsedMs": 15.200000047683716
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 29911.200000047684,
+        "duration": 0.2999999523162842,
+        "detail": {
+          "duration": 0.2999999523162842,
+          "programCount": 10,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.2999999523162842,
+          "elapsedMs": 15.800000071525574,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "program-links-ready",
+        "at": 29928.5,
+        "detail": {
+          "programCount": 9,
+          "elapsedMs": 0.10000002384185791
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 29928.5,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 9,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 29928.5,
+        "duration": 1.1999999284744263
+      },
+      {
+        "name": "program-links-ready",
+        "at": 29945.300000071526,
+        "detail": {
+          "programCount": 12,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 29945.399999976158,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 12,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.09999990463256836,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 29945.5,
+        "duration": 1.399999976158142
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 29965.100000023842,
+        "duration": 4.399999976158142
+      },
+      {
+        "name": "program-links-ready",
+        "at": 30373.399999976158,
+        "detail": {
+          "programCount": 11,
+          "elapsedMs": 408.2999999523163
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 30374.700000047684,
+        "duration": 1.100000023841858,
+        "detail": {
+          "duration": 1.100000023841858,
+          "programCount": 11,
+          "initializedPrograms": 2,
+          "batches": 1,
+          "maximumBatchMs": 1.100000023841858,
+          "elapsedMs": 409.60000002384186,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 30378.300000071526,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 30404.100000023842,
+        "detail": {
+          "programCount": 14,
+          "elapsedMs": 25.899999976158142
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 30404.600000023842,
+        "duration": 0.5,
+        "detail": {
+          "duration": 0.5,
+          "programCount": 14,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.5,
+          "elapsedMs": 26.399999976158142,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "program-links-ready",
+        "at": 30411.5,
+        "detail": {
+          "programCount": 14,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 30411.600000023842,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 14,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 30411.700000047684,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 30428.100000023842,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 30428.200000047684,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 8,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 30428.200000047684,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 30445,
+        "detail": {
+          "programCount": 6,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 30445,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 6,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 30445.100000023842,
+        "duration": 1.100000023841858
+      },
+      {
+        "name": "program-links-ready",
+        "at": 30461.600000023842,
+        "detail": {
+          "programCount": 6,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 30461.700000047684,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 6,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 30461.700000047684,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 30478.399999976158,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 30478.5,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 8,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 30478.5,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 30494.899999976158,
+        "detail": {
+          "programCount": 6,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 30495,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 6,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 30495,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 30511.899999976158,
+        "detail": {
+          "programCount": 6,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 30511.899999976158,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 6,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.09999990463256836,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 30512,
+        "duration": 1.399999976158142
+      },
+      {
+        "name": "program-links-ready",
+        "at": 30528.200000047684,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 30528.399999976158,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 8,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.19999992847442627,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 30528.399999976158,
+        "duration": 1.0999999046325684
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 30547,
+        "duration": 3.100000023841858
+      },
+      {
+        "name": "program-links-ready",
+        "at": 30777.200000047684,
+        "detail": {
+          "programCount": 10,
+          "elapsedMs": 230.30000007152557
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 30777.800000071526,
+        "duration": 0.6000000238418579,
+        "detail": {
+          "duration": 0.6000000238418579,
+          "programCount": 10,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.6000000238418579,
+          "elapsedMs": 230.90000009536743,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 30796.399999976158,
+        "duration": 2.399999976158142
+      },
+      {
+        "name": "program-links-ready",
+        "at": 30993.800000071526,
+        "detail": {
+          "programCount": 14,
+          "elapsedMs": 197.40000009536743
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 30994.300000071526,
+        "duration": 0.40000009536743164,
+        "detail": {
+          "duration": 0.40000009536743164,
+          "programCount": 14,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.40000009536743164,
+          "elapsedMs": 197.90000009536743,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31013.600000023842,
+        "duration": 2.799999952316284
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31243.800000071526,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 230.5
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31244.600000023842,
+        "duration": 0.5,
+        "detail": {
+          "duration": 0.5,
+          "programCount": 8,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.5,
+          "elapsedMs": 231.19999992847443,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31262.5,
+        "detail": {
+          "programCount": 10,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31262.700000047684,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 10,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.20000004768371582,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31262.700000047684,
+        "duration": 0.8999999761581421
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31278.5,
+        "duration": 1.1999999284744263
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31324.300000071526,
+        "detail": {
+          "programCount": 12,
+          "elapsedMs": 45.90000009536743
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31325.300000071526,
+        "duration": 0.8999999761581421,
+        "detail": {
+          "duration": 0.8999999761581421,
+          "programCount": 12,
+          "initializedPrograms": 3,
+          "batches": 2,
+          "maximumBatchMs": 0.5999999046325684,
+          "elapsedMs": 46.90000009536743,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31330.700000047684,
+        "duration": 3.100000023841858
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31637.200000047684,
+        "detail": {
+          "programCount": 10,
+          "elapsedMs": 306.60000002384186
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31637.800000071526,
+        "duration": 0.5,
+        "detail": {
+          "duration": 0.5,
+          "programCount": 10,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.5,
+          "elapsedMs": 307.2000000476837,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31644.700000047684,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31644.800000071526,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31644.899999976158,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31661.600000023842,
+        "detail": {
+          "programCount": 2,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31661.700000047684,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 2,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31661.700000047684,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31678.100000023842,
+        "detail": {
+          "programCount": 2,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31678.399999976158,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 2,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.2999999523162842,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31678.399999976158,
+        "duration": 1.0999999046325684
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31694.899999976158,
+        "detail": {
+          "programCount": 2,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31695,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 2,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31695.100000023842,
+        "duration": 1.100000023841858
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31711.5,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0.10000002384185791
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31711.5,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31711.600000023842,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31728.100000023842,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31728.200000047684,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31728.200000047684,
+        "duration": 0.8999999761581421
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31744.700000047684,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31744.899999976158,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.19999992847442627,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31744.899999976158,
+        "duration": 0.8999999761581421
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31762.200000047684,
+        "detail": {
+          "programCount": 2,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31762.300000071526,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 2,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31762.700000047684,
+        "duration": 1.2000000476837158
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31777.899999976158,
+        "detail": {
+          "programCount": 4,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31778.100000023842,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 4,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.20000004768371582,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31778.100000023842,
+        "duration": 0.8999999761581421
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31795.300000071526,
+        "detail": {
+          "programCount": 2,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31795.5,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 2,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.19999992847442627,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31795.5,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31811.5,
+        "detail": {
+          "programCount": 2,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31811.600000023842,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 2,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31811.600000023842,
+        "duration": 0.8999999761581421
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31828.399999976158,
+        "detail": {
+          "programCount": 6,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31828.600000023842,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 6,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.20000004768371582,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31828.600000023842,
+        "duration": 1.2000000476837158
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31844.800000071526,
+        "detail": {
+          "programCount": 6,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31844.800000071526,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 6,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31844.899999976158,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 31861.5,
+        "detail": {
+          "programCount": 10,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 31861.600000023842,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 10,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31861.600000023842,
+        "duration": 1
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 31880.899999976158,
+        "duration": 3.5
+      },
+      {
+        "name": "program-links-ready",
+        "at": 32309.200000047684,
+        "detail": {
+          "programCount": 14,
+          "elapsedMs": 428.3000000715256
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 32310,
+        "duration": 0.6999999284744263,
+        "detail": {
+          "duration": 0.6999999284744263,
+          "programCount": 14,
+          "initializedPrograms": 2,
+          "batches": 1,
+          "maximumBatchMs": 0.6999999284744263,
+          "elapsedMs": 429.10000002384186,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "program-links-ready",
+        "at": 32311.200000047684,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 32311.200000047684,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 8,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 32311.200000047684,
+        "duration": 0.8000000715255737
+      },
+      {
+        "name": "program-links-ready",
+        "at": 32327.899999976158,
+        "detail": {
+          "programCount": 10,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 32327.899999976158,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 10,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 32327.899999976158,
+        "duration": 0.7999999523162842
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 32345.899999976158,
+        "duration": 2.0999999046325684
+      },
+      {
+        "name": "program-links-ready",
+        "at": 32718.300000071526,
+        "detail": {
+          "programCount": 6,
+          "elapsedMs": 372.40000009536743
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 32719.200000047684,
+        "duration": 0.8000000715255737,
+        "detail": {
+          "duration": 0.8000000715255737,
+          "programCount": 6,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.8000000715255737,
+          "elapsedMs": 373.3000000715256,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "program-links-ready",
+        "at": 32728.200000047684,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 32728.300000071526,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 8,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 32728.300000071526,
+        "duration": 1
+      },
+      {
+        "name": "program-links-ready",
+        "at": 32744.700000047684,
+        "detail": {
+          "programCount": 8,
+          "elapsedMs": 0
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 32744.800000071526,
+        "duration": 0,
+        "detail": {
+          "duration": 0,
+          "programCount": 8,
+          "initializedPrograms": 0,
+          "batches": 0,
+          "maximumBatchMs": 0,
+          "elapsedMs": 0.10000002384185791,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 32744.899999976158,
+        "duration": 1.0999999046325684
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 32770.5,
+        "duration": 9.199999928474426
+      },
+      {
+        "name": "program-links-ready",
+        "at": 33186.200000047684,
+        "detail": {
+          "programCount": 14,
+          "elapsedMs": 418
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 33193,
+        "duration": 1.899999976158142,
+        "detail": {
+          "duration": 1.899999976158142,
+          "programCount": 14,
+          "initializedPrograms": 4,
+          "batches": 2,
+          "maximumBatchMs": 1.100000023841858,
+          "elapsedMs": 424.7999999523163,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 33202.39999997616,
+        "duration": 8.5
+      },
+      {
+        "name": "program-links-ready",
+        "at": 33576.89999997616,
+        "detail": {
+          "programCount": 9,
+          "elapsedMs": 375.59999990463257
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 33594.300000071526,
+        "duration": 1.100000023841858,
+        "detail": {
+          "duration": 1.100000023841858,
+          "programCount": 9,
+          "initializedPrograms": 3,
+          "batches": 2,
+          "maximumBatchMs": 0.6000000238418579,
+          "elapsedMs": 393,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 33611.60000002384,
+        "duration": 1.100000023841858
+      },
+      {
+        "name": "program-links-ready",
+        "at": 33627.300000071526,
+        "detail": {
+          "programCount": 7,
+          "elapsedMs": 15.800000071525574
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 33627.89999997616,
+        "duration": 0.40000009536743164,
+        "detail": {
+          "duration": 0.40000009536743164,
+          "programCount": 7,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.40000009536743164,
+          "elapsedMs": 16.399999976158142,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 33644.700000047684,
+        "duration": 0.8999999761581421
+      },
+      {
+        "name": "program-links-ready",
+        "at": 33705.60000002384,
+        "detail": {
+          "programCount": 6,
+          "elapsedMs": 61
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 33706.10000002384,
+        "duration": 0.3999999761581421,
+        "detail": {
+          "duration": 0.3999999761581421,
+          "programCount": 6,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.3999999761581421,
+          "elapsedMs": 61.5,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "critical-post:end",
+        "at": 33706.300000071526
+      },
+      {
+        "name": "hydrate:rain:start",
+        "at": 34113.5
+      },
+      {
+        "name": "rain-preparation:start",
+        "at": 34132.700000047684
+      },
+      {
+        "name": "rain-preparation:end",
+        "at": 34137.89999997616
+      },
+      {
+        "name": "hydrate:rain:mounted",
+        "at": 34140
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 34175.5,
+        "duration": 1.600000023841858
+      },
+      {
+        "name": "program-links-ready",
+        "at": 34259.5,
+        "detail": {
+          "programCount": 1,
+          "elapsedMs": 84.69999992847443
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 34260.200000047684,
+        "duration": 0.6000000238418579,
+        "detail": {
+          "duration": 0.6000000238418579,
+          "programCount": 1,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.6000000238418579,
+          "elapsedMs": 85.39999997615814,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 34262.800000071526,
+        "duration": 0.9000000953674316
+      },
+      {
+        "name": "program-links-ready",
+        "at": 34337.300000071526,
+        "detail": {
+          "programCount": 2,
+          "elapsedMs": 74.5
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 34338,
+        "duration": 0.5,
+        "detail": {
+          "duration": 0.5,
+          "programCount": 2,
+          "initializedPrograms": 1,
+          "batches": 1,
+          "maximumBatchMs": 0.5,
+          "elapsedMs": 75.19999992847443,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "hydrate:rain:end",
+        "at": 34951.60000002384
+      },
+      {
+        "name": "hydrate:hydrology:start",
+        "at": 35043.700000047684
+      },
+      {
+        "name": "hydrology-cpu:start",
+        "at": 35062.39999997616
+      },
+      {
+        "name": "hydrology-cpu:end",
+        "at": 35136.200000047684,
+        "duration": 73.80000007152557
+      },
+      {
+        "name": "hydrate:hydrology:mounted",
+        "at": 35145.60000002384
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 35170.60000002384,
+        "duration": 5.100000023841858
+      },
+      {
+        "name": "program-links-ready",
+        "at": 35392.60000002384,
+        "detail": {
+          "programCount": 3,
+          "elapsedMs": 222.10000002384186
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 35408.89999997616,
+        "duration": 1.1999999284744263,
+        "detail": {
+          "duration": 1.1999999284744263,
+          "programCount": 3,
+          "initializedPrograms": 3,
+          "batches": 2,
+          "maximumBatchMs": 0.7999999523162842,
+          "elapsedMs": 238.39999997615814,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "deferred-compile-js",
+        "at": 35413.300000071526,
+        "duration": 2.9000000953674316
+      },
+      {
+        "name": "program-links-ready",
+        "at": 35606.10000002384,
+        "detail": {
+          "programCount": 6,
+          "elapsedMs": 192.89999997615814
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 35626.39999997616,
+        "duration": 1,
+        "detail": {
+          "duration": 1,
+          "programCount": 6,
+          "initializedPrograms": 3,
+          "batches": 2,
+          "maximumBatchMs": 0.5,
+          "elapsedMs": 213.19999992847443,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "hydrate:hydrology:end",
+        "at": 36228.39999997616
+      },
+      {
+        "name": "hydrate:interior-shaders:start",
+        "at": 36324.60000002384
+      },
+      {
+        "name": "hydrate:interior-shaders:mounted",
+        "at": 36326.10000002384
+      },
+      {
+        "name": "interior-preparation:start",
+        "at": 36326.5
+      },
+      {
+        "name": "program-links-ready",
+        "at": 36584,
+        "detail": {
+          "programCount": 7,
+          "elapsedMs": 245
+        }
+      },
+      {
+        "name": "program-introspection",
+        "at": 36777.200000047684,
+        "duration": 17.299999952316284,
+        "detail": {
+          "duration": 17.299999952316284,
+          "programCount": 7,
+          "initializedPrograms": 7,
+          "batches": 6,
+          "maximumBatchMs": 4.100000023841858,
+          "elapsedMs": 438.2000000476837,
+          "outcome": "complete"
+        }
+      },
+      {
+        "name": "interior-preparation:end",
+        "at": 36777.5,
+        "duration": 449.89999997615814,
+        "failed": false
+      },
+      {
+        "name": "hydrate:interior-shaders:end",
+        "at": 37002.60000002384
+      },
+      {
+        "name": "hydrate:physics-module:start",
+        "at": 37093.700000047684
+      },
+      {
+        "name": "hydrate:physics-module:mounted",
+        "at": 37094.89999997616
+      },
+      {
+        "name": "physics-preparation:start",
+        "at": 37095.10000002384
+      },
+      {
+        "name": "physics-preparation:end",
+        "at": 37449.200000047684
+      },
+      {
+        "name": "hydrate:physics-module:end",
+        "at": 37724.200000047684
+      },
+      {
+        "name": "secondary-hydration-complete",
+        "at": 37724.800000071526
+      }
+    ],
+    "longTasks": [
+      {
+        "at": 597.3999999761581,
+        "duration": 57
+      },
+      {
+        "at": 987.7000000476837,
+        "duration": 191
+      },
+      {
+        "at": 1259.6000000238419,
+        "duration": 164
+      },
+      {
+        "at": 2041,
+        "duration": 203
+      },
+      {
+        "at": 2245.5,
+        "duration": 139
+      },
+      {
+        "at": 2386.399999976158,
+        "duration": 68
+      },
+      {
+        "at": 2457.399999976158,
+        "duration": 56
+      },
+      {
+        "at": 2516,
+        "duration": 147
+      },
+      {
+        "at": 2663.600000023842,
+        "duration": 119
+      },
+      {
+        "at": 2817.5,
+        "duration": 104
+      },
+      {
+        "at": 2966.8000000715256,
+        "duration": 587
+      },
+      {
+        "at": 3555,
+        "duration": 51
+      },
+      {
+        "at": 3645.7000000476837,
+        "duration": 65
+      },
+      {
+        "at": 3751.5,
+        "duration": 207
+      },
+      {
+        "at": 4045,
+        "duration": 204
+      },
+      {
+        "at": 4390.5,
+        "duration": 283
+      },
+      {
+        "at": 4682.200000047684,
+        "duration": 113
+      },
+      {
+        "at": 4804.300000071526,
+        "duration": 693
+      },
+      {
+        "at": 5523,
+        "duration": 715
+      },
+      {
+        "at": 13405.200000047684,
+        "duration": 192
+      },
+      {
+        "at": 13597.399999976158,
+        "duration": 51
+      },
+      {
+        "at": 14586.200000047684,
+        "duration": 133
+      },
+      {
+        "at": 15356.800000071526,
+        "duration": 65
+      },
+      {
+        "at": 15422.300000071526,
+        "duration": 80
+      },
+      {
+        "at": 15502.700000047684,
+        "duration": 65
+      },
+      {
+        "at": 15568.800000071526,
+        "duration": 65
+      },
+      {
+        "at": 15634.399999976158,
+        "duration": 66
+      },
+      {
+        "at": 15701,
+        "duration": 73
+      },
+      {
+        "at": 15774.300000071526,
+        "duration": 53
+      },
+      {
+        "at": 15828.600000023842,
+        "duration": 64
+      },
+      {
+        "at": 15894.700000047684,
+        "duration": 67
+      },
+      {
+        "at": 15962.100000023842,
+        "duration": 52
+      },
+      {
+        "at": 16064.399999976158,
+        "duration": 50
+      },
+      {
+        "at": 16256.700000047684,
+        "duration": 58
+      },
+      {
+        "at": 17670.300000071526,
+        "duration": 72
+      },
+      {
+        "at": 17743.300000071526,
+        "duration": 99
+      },
+      {
+        "at": 17843.200000047684,
+        "duration": 64
+      },
+      {
+        "at": 17908,
+        "duration": 64
+      },
+      {
+        "at": 17980.5,
+        "duration": 54
+      },
+      {
+        "at": 18035.399999976158,
+        "duration": 59
+      },
+      {
+        "at": 18095.800000071526,
+        "duration": 65
+      },
+      {
+        "at": 18161.100000023842,
+        "duration": 65
+      },
+      {
+        "at": 18227.100000023842,
+        "duration": 69
+      },
+      {
+        "at": 18296.5,
+        "duration": 55
+      },
+      {
+        "at": 18353.100000023842,
+        "duration": 52
+      },
+      {
+        "at": 18407.800000071526,
+        "duration": 50
+      },
+      {
+        "at": 18599.5,
+        "duration": 53
+      },
+      {
+        "at": 19689.800000071526,
+        "duration": 96
+      },
+      {
+        "at": 19786.5,
+        "duration": 76
+      },
+      {
+        "at": 19863.800000071526,
+        "duration": 57
+      },
+      {
+        "at": 19922.5,
+        "duration": 52
+      },
+      {
+        "at": 21684,
+        "duration": 67
+      },
+      {
+        "at": 21751.200000047684,
+        "duration": 50
+      },
+      {
+        "at": 33710.10000002384,
+        "duration": 397
+      },
+      {
+        "at": 36339.200000047684,
+        "duration": 70
+      },
+      {
+        "at": 36410.200000047684,
+        "duration": 52
+      },
+      {
+        "at": 36462.89999997616,
+        "duration": 78
+      }
+    ],
+    "summary": {
+      "routeStartedAt": 511.8000000715256,
+      "documentToInteractiveMs": 13865,
+      "navigationToModuleMs": 0,
+      "moduleMs": 667,
+      "rendererModuleMs": null,
+      "dataMs": null,
+      "routeDataWaitMs": null,
+      "rendererMs": 151,
+      "headquartersWorkerMs": 1527,
+      "webglContextMs": 144,
+      "sceneMs": 3753,
+      "entityGeometryCpuMs": 17.50000011920929,
+      "environmentMaterialMs": 0,
+      "proceduralTextureCpuMs": 213.59999990463257,
+      "textureUploadMs": 803,
+      "cpuStagesMs": {
+        "textures": 214,
+        "geometry-preparation": 18,
+        "b12-unpack": 4,
+        "b12-materials": 197
+      },
+      "shaderDirectMs": 6762,
+      "shaderPostMs": null,
+      "shadowMs": 0,
+      "postprocessingMs": 9,
+      "physicsMs": 354,
+      "firstDrawMs": 7370,
+      "interactiveMs": 13353,
+      "controlsResponseMs": null,
+      "hydrationMs": 23860
+    }
+  },
+  "health": {
+    "status": "ready",
+    "path": "post",
+    "presentedFrames": 293,
+    "contextLosses": 0,
+    "lastErrorCode": null
+  },
+  "hydration": "complete",
+  "renderer": {
+    "at": 37761.60000002384,
+    "calls": 802,
+    "triangles": 625495,
+    "geometries": 547,
+    "textures": 131,
+    "programs": 222,
+    "dpr": 1.75,
+    "width": 682,
+    "height": 1095,
+    "heapBytes": 131788365,
+    "qualityTier": "HIGH",
+    "gpuVendor": "Google Inc. (Intel)",
+    "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+  }
+}

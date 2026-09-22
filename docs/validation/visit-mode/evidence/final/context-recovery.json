@@ -1,0 +1,710 @@
+{
+  "fixture": true,
+  "intentionalContextLoss": true,
+  "duringEntry": false,
+  "interruptedPhase": "active",
+  "before": {
+    "environment": {
+      "at": 104457.30000007153,
+      "position": [
+        13.396363636363638,
+        0.4259899764005883,
+        -12.20456651322757
+      ],
+      "quaternion": [
+        0,
+        0.9969617646090929,
+        0.07789248941665426,
+        0
+      ],
+      "target": [
+        13.396363636363638,
+        0.2595060735206685,
+        -11.145639582128188
+      ],
+      "projection": [
+        0.8503840459892649,
+        0,
+        0,
+        0,
+        0,
+        1.5696855771174902,
+        0,
+        0,
+        0,
+        0,
+        -1.0000888928396818,
+        -1,
+        0,
+        0,
+        -0.016000711142717453,
+        0
+      ],
+      "materials": 708,
+      "objects": 1549,
+      "threeListeners": 366,
+      "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+      "geometries": 578,
+      "textures": 132,
+      "programs": 221,
+      "calls": 454,
+      "triangles": 690458,
+      "width": 1282,
+      "height": 694,
+      "dpr": 0.9,
+      "sceneId": "6529d596-9570-44fa-a3d7-d5963957390f",
+      "cameraId": "9d4fc44e-c53f-438f-b577-838ffe16621b"
+    },
+    "renderer": {
+      "at": 104457.70000004768,
+      "calls": 454,
+      "triangles": 690458,
+      "geometries": 578,
+      "textures": 132,
+      "programs": 221,
+      "dpr": 0.9,
+      "width": 1282,
+      "height": 694,
+      "heapBytes": 138529802,
+      "qualityTier": "MEDIUM",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 2854,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "identity": {
+      "canvasMounts": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeCanvases": 1,
+      "activeControls": 1
+    },
+    "character": {
+      "position": {
+        "x": 13.396363636363638,
+        "y": 0.03449999913573265,
+        "z": -11.545234650467325
+      },
+      "yaw": 3.141592653589793,
+      "pitch": -0.045,
+      "movement": "idle",
+      "phase": "active",
+      "cameraMode": "third",
+      "distanceMetres": 2.1832845390531475,
+      "colliders": 2432
+    },
+    "visit": {
+      "active": true,
+      "sampledFrames": 368,
+      "totalSampledFrames": 368,
+      "averageFps": 44.410653729266805,
+      "averageFrameTimeMs": 22.517119565411754,
+      "p95FrameTimeMs": 30.199999928474426,
+      "p99FrameTimeMs": 39.89999997615814,
+      "stallsOver50Ms": 2,
+      "unpresentedActiveFrames": 0,
+      "longestPresentationGapMs": 91,
+      "presentedFrames": 370,
+      "entryMs": 5482.599999904633,
+      "elapsedMs": 10177.599999904633,
+      "qualityPreset": "BALANCED",
+      "renderer": {
+        "calls": 454,
+        "triangles": 690458,
+        "geometries": 578,
+        "textures": 132,
+        "programs": 221,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 138529802
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2858,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "events": [
+        {
+          "at": 1825.0999999046326,
+          "type": "entry-requested"
+        },
+        {
+          "at": 5482.599999904633,
+          "type": "controls-ready"
+        }
+      ]
+    },
+    "poi": "D3Espaço MiranteEstrutura do Parque de Exposições da Fenasoja.ConhecerAcessar interior",
+    "poiCount": 1,
+    "visible": "visible",
+    "focused": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "canvas": {
+      "width": 1425,
+      "height": 772
+    }
+  },
+  "lost": {
+    "environment": {
+      "at": 104619.10000002384,
+      "position": [
+        13.396363636363638,
+        0.4259899764005883,
+        -12.204566513227372
+      ],
+      "quaternion": [
+        0,
+        0.9969617646090918,
+        0.07789248941666864,
+        0
+      ],
+      "target": [
+        13.396363636363638,
+        0.2595060735206685,
+        -11.145639582128188
+      ],
+      "projection": [
+        0.8503840459892649,
+        0,
+        0,
+        0,
+        0,
+        1.5696855771174902,
+        0,
+        0,
+        0,
+        0,
+        -1.0000888928396818,
+        -1,
+        0,
+        0,
+        -0.016000711142717453,
+        0
+      ],
+      "materials": 708,
+      "objects": 1549,
+      "threeListeners": 366,
+      "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+      "geometries": 578,
+      "textures": 132,
+      "programs": 221,
+      "calls": 0,
+      "triangles": 0,
+      "width": 1282,
+      "height": 694,
+      "dpr": 0.9,
+      "sceneId": "6529d596-9570-44fa-a3d7-d5963957390f",
+      "cameraId": "9d4fc44e-c53f-438f-b577-838ffe16621b"
+    },
+    "renderer": {
+      "at": 104619.40000009537,
+      "calls": 0,
+      "triangles": 0,
+      "geometries": 578,
+      "textures": 132,
+      "programs": 221,
+      "dpr": 0.9,
+      "width": 1282,
+      "height": 694,
+      "heapBytes": 139642060,
+      "qualityTier": "MEDIUM",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "health": {
+      "status": "context-lost",
+      "path": "suspended",
+      "presentedFrames": 2859,
+      "contextLosses": 1,
+      "lastErrorCode": "context-lost"
+    },
+    "identity": {
+      "canvasMounts": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeCanvases": 1,
+      "activeControls": 1
+    },
+    "character": {
+      "position": {
+        "x": 13.396363636363638,
+        "y": 0.03449999913573265,
+        "z": -11.545234650467325
+      },
+      "yaw": 3.141592653589793,
+      "pitch": -0.045,
+      "movement": "idle",
+      "phase": "active",
+      "cameraMode": "third",
+      "distanceMetres": 2.1832845390531475,
+      "colliders": 2432
+    },
+    "visit": {
+      "active": true,
+      "sampledFrames": 370,
+      "totalSampledFrames": 370,
+      "averageFps": 43.81186946406372,
+      "averageFrameTimeMs": 22.82486486499374,
+      "p95FrameTimeMs": 30.699999928474426,
+      "p99FrameTimeMs": 39.89999997615814,
+      "stallsOver50Ms": 3,
+      "unpresentedActiveFrames": 0,
+      "longestPresentationGapMs": 133.79999995231628,
+      "presentedFrames": 371,
+      "entryMs": 5482.599999904633,
+      "elapsedMs": 10339.399999976158,
+      "qualityPreset": "BALANCED",
+      "renderer": {
+        "calls": 454,
+        "triangles": 690458,
+        "geometries": 578,
+        "textures": 132,
+        "programs": 221,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 139642060
+      },
+      "health": {
+        "status": "context-lost",
+        "path": "suspended",
+        "presentedFrames": 2859,
+        "contextLosses": 1,
+        "lastErrorCode": "context-lost"
+      },
+      "events": [
+        {
+          "at": 1825.0999999046326,
+          "type": "entry-requested"
+        },
+        {
+          "at": 5482.599999904633,
+          "type": "controls-ready"
+        },
+        {
+          "at": 10323,
+          "type": "context-lost"
+        }
+      ]
+    },
+    "poi": "D3Espaço MiranteEstrutura do Parque de Exposições da Fenasoja.ConhecerAcessar interior",
+    "poiCount": 1,
+    "visible": "visible",
+    "focused": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "canvas": {
+      "width": 1425,
+      "height": 772
+    }
+  },
+  "recovered": {
+    "environment": {
+      "at": 117260.90000009537,
+      "position": [
+        13.396363636363638,
+        0.42598997640058844,
+        -12.2045665132269
+      ],
+      "quaternion": [
+        0,
+        0.9969617646090893,
+        0.07789248941670268,
+        0
+      ],
+      "target": [
+        13.396363636363638,
+        0.25950607352066857,
+        -11.145639582128188
+      ],
+      "projection": [
+        0.8503840459892649,
+        0,
+        0,
+        0,
+        0,
+        1.5696855771174902,
+        0,
+        0,
+        0,
+        0,
+        -1.0000888928396818,
+        -1,
+        0,
+        0,
+        -0.016000711142717453,
+        0
+      ],
+      "materials": 708,
+      "objects": 1549,
+      "threeListeners": 660,
+      "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+      "geometries": 392,
+      "textures": 108,
+      "programs": 137,
+      "calls": 435,
+      "triangles": 690439,
+      "width": 1282,
+      "height": 694,
+      "dpr": 0.9,
+      "sceneId": "6529d596-9570-44fa-a3d7-d5963957390f",
+      "cameraId": "9d4fc44e-c53f-438f-b577-838ffe16621b"
+    },
+    "renderer": {
+      "at": 117261.60000002384,
+      "calls": 435,
+      "triangles": 690439,
+      "geometries": 392,
+      "textures": 108,
+      "programs": 137,
+      "dpr": 0.9,
+      "width": 1282,
+      "height": 694,
+      "heapBytes": 123195531,
+      "qualityTier": "MEDIUM",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 2860,
+      "contextLosses": 1,
+      "lastErrorCode": null
+    },
+    "identity": {
+      "canvasMounts": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeCanvases": 1,
+      "activeControls": 1
+    },
+    "character": {
+      "position": {
+        "x": 13.396363636363638,
+        "y": 0.03449999913573265,
+        "z": -11.545234650467325
+      },
+      "yaw": 3.141592653589793,
+      "pitch": -0.045,
+      "movement": "idle",
+      "phase": "active",
+      "cameraMode": "third",
+      "distanceMetres": 2.1832845390531475,
+      "colliders": 2432
+    },
+    "visit": {
+      "active": true,
+      "sampledFrames": 406,
+      "totalSampledFrames": 406,
+      "averageFps": 43.19884235570738,
+      "averageFrameTimeMs": 23.1487684731413,
+      "p95FrameTimeMs": 30.699999928474426,
+      "p99FrameTimeMs": 39.89999997615814,
+      "stallsOver50Ms": 4,
+      "unpresentedActiveFrames": 63,
+      "longestPresentationGapMs": 1328.0999999046326,
+      "presentedFrames": 409,
+      "entryMs": 5482.599999904633,
+      "elapsedMs": 22981.699999928474,
+      "qualityPreset": "BALANCED",
+      "renderer": {
+        "calls": 435,
+        "triangles": 690439,
+        "geometries": 392,
+        "textures": 108,
+        "programs": 137,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 123195531
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2897,
+        "contextLosses": 1,
+        "lastErrorCode": null
+      },
+      "events": [
+        {
+          "at": 1825.0999999046326,
+          "type": "entry-requested"
+        },
+        {
+          "at": 5482.599999904633,
+          "type": "controls-ready"
+        },
+        {
+          "at": 10323,
+          "type": "context-lost"
+        }
+      ]
+    },
+    "poi": "D3Espaço MiranteEstrutura do Parque de Exposições da Fenasoja.ConhecerAcessar interior",
+    "poiCount": 1,
+    "visible": "visible",
+    "focused": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "canvas": {
+      "width": 1425,
+      "height": 772
+    }
+  },
+  "movingAgain": {
+    "environment": {
+      "at": 120113.60000002384,
+      "position": [
+        13.046932350489392,
+        0.42598997640058844,
+        -12.2045665132269
+      ],
+      "quaternion": [
+        -2.7762983718328225e-9,
+        0.9969617646090885,
+        0.07789248941670243,
+        3.553440575068177e-8
+      ],
+      "target": [
+        13.04693227500337,
+        0.25950607352066857,
+        -11.145639582128188
+      ],
+      "projection": [
+        0.8503840459892649,
+        0,
+        0,
+        0,
+        0,
+        1.5696855771174902,
+        0,
+        0,
+        0,
+        0,
+        -1.0000888928396818,
+        -1,
+        0,
+        0,
+        -0.016000711142717453,
+        0
+      ],
+      "materials": 708,
+      "objects": 1549,
+      "threeListeners": 661,
+      "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+      "geometries": 393,
+      "textures": 108,
+      "programs": 139,
+      "calls": 439,
+      "triangles": 690541,
+      "width": 1282,
+      "height": 694,
+      "dpr": 0.9,
+      "sceneId": "6529d596-9570-44fa-a3d7-d5963957390f",
+      "cameraId": "9d4fc44e-c53f-438f-b577-838ffe16621b"
+    },
+    "renderer": {
+      "at": 120114,
+      "calls": 439,
+      "triangles": 690541,
+      "geometries": 393,
+      "textures": 108,
+      "programs": 139,
+      "dpr": 0.9,
+      "width": 1282,
+      "height": 694,
+      "heapBytes": 125345513,
+      "qualityTier": "MEDIUM",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 2969,
+      "contextLosses": 1,
+      "lastErrorCode": null
+    },
+    "identity": {
+      "canvasMounts": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeCanvases": 1,
+      "activeControls": 1
+    },
+    "character": {
+      "position": {
+        "x": 13.04693227500337,
+        "y": 0.03449999913573265,
+        "z": -11.545234650467325
+      },
+      "yaw": 3.141592653589793,
+      "pitch": -0.045,
+      "movement": "idle",
+      "phase": "active",
+      "cameraMode": "third",
+      "distanceMetres": 4.512826948121607,
+      "colliders": 2432
+    },
+    "visit": {
+      "active": true,
+      "sampledFrames": 502,
+      "totalSampledFrames": 502,
+      "averageFps": 41.5810748121454,
+      "averageFrameTimeMs": 24.049402390818198,
+      "p95FrameTimeMs": 35.39999997615814,
+      "p99FrameTimeMs": 82.60000002384186,
+      "stallsOver50Ms": 7,
+      "unpresentedActiveFrames": 63,
+      "longestPresentationGapMs": 1328.0999999046326,
+      "presentedFrames": 507,
+      "entryMs": 5482.599999904633,
+      "elapsedMs": 25834.099999904633,
+      "qualityPreset": "BALANCED",
+      "renderer": {
+        "calls": 439,
+        "triangles": 690541,
+        "geometries": 393,
+        "textures": 108,
+        "programs": 139,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 125345513
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2995,
+        "contextLosses": 1,
+        "lastErrorCode": null
+      },
+      "events": [
+        {
+          "at": 1825.0999999046326,
+          "type": "entry-requested"
+        },
+        {
+          "at": 5482.599999904633,
+          "type": "controls-ready"
+        },
+        {
+          "at": 10323,
+          "type": "context-lost"
+        }
+      ]
+    },
+    "poi": "D3Espaço MiranteEstrutura do Parque de Exposições da Fenasoja.ConhecerAcessar interior",
+    "poiCount": 1,
+    "visible": "visible",
+    "focused": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "canvas": {
+      "width": 1425,
+      "height": 772
+    }
+  },
+  "returned": {
+    "environment": {
+      "at": 124073.20000004768,
+      "position": [
+        3.9370884151670626,
+        112.19501247300705,
+        106.42403846803235
+      ],
+      "quaternion": [
+        -0.3919388644454563,
+        0.026630852900829772,
+        0.011351018127214578,
+        0.9195356864192147
+      ],
+      "target": [
+        -2.2546344999999945,
+        0.744,
+        -0.3831818185993967
+      ],
+      "projection": [
+        1.5733689807478843,
+        0,
+        0,
+        0,
+        0,
+        2.9042108776758226,
+        0,
+        0,
+        0,
+        0,
+        -1.0010037603030404,
+        -1,
+        0,
+        0,
+        -1.2880705620296615,
+        0
+      ],
+      "materials": 686,
+      "objects": 1478,
+      "threeListeners": 686,
+      "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+      "geometries": 569,
+      "textures": 105,
+      "programs": 156,
+      "calls": 793,
+      "triangles": 671392,
+      "width": 1425,
+      "height": 772,
+      "dpr": 1,
+      "sceneId": "6529d596-9570-44fa-a3d7-d5963957390f",
+      "cameraId": "9d4fc44e-c53f-438f-b577-838ffe16621b"
+    },
+    "renderer": {
+      "at": 124073.5,
+      "calls": 793,
+      "triangles": 671392,
+      "geometries": 569,
+      "textures": 105,
+      "programs": 156,
+      "dpr": 1,
+      "width": 1425,
+      "height": 772,
+      "heapBytes": 133440837,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 3116,
+      "contextLosses": 1,
+      "lastErrorCode": null
+    },
+    "identity": {
+      "canvasMounts": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeCanvases": 1,
+      "activeControls": 1
+    },
+    "character": null,
+    "visit": null,
+    "poiCount": 0,
+    "visible": "visible",
+    "focused": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "canvas": {
+      "width": 1425,
+      "height": 772
+    }
+  },
+  "drift": 0,
+  "travelledAfterRecovery": 2.329542409068459,
+  "passed": true,
+  "errors": []
+}
