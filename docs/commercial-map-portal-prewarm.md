@@ -17,6 +17,8 @@ O Portal autoriza a preparação somente após autenticação, organização e c
 
 A entrada existente do Portal conserva destino, semântica de Link, foco de teclado e estado de acesso. Nenhum painel de progresso ou etapa obrigatória foi acrescentado ao usuário.
 
+A auditoria do manifest também detectou uma dependência eager de Three já presente na baseline: metadados de landmarks importavam uma constante do módulo que constrói a arquitetura do Portão 9, e controles HTML importavam `MathUtils` somente para limitar três valores. A constante agora vive em `soyGatePresentation.ts` e continua reexportada pelo módulo antigo; `contextualViewport.ts` usa os tipos de câmera/vetor sem importar o renderer em runtime e mantém a mesma expressão matemática de clamp. Isso separa dados/UI de geometria sem alterar a geometria ou o comportamento dos controles. Um teste de fronteira avalia a rota inteira com imports de Three/stdlib proibidos, além dos testes existentes dos cálculos de câmera e obstrução.
+
 ## Política de execução, segurança e cache
 
 O prewarm especulativo espera dois frames para permitir a apresentação do Portal, depois idle time com limite de espera. Navegadores sem idle callback usam um timeout conservador; poucos núcleos aumentam esse intervalo. Save-Data, slow-2g e 2g suspendem especulação, permitindo promoção por intenção explícita. A aba oculta não admite novas etapas. Import/parse já iniciados não são interrompíveis; a preparação não promete ausência de long tasks apenas por usar idle callback.

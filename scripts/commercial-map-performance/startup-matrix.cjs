@@ -7,6 +7,7 @@ fs.mkdirSync(out, { recursive: true });
 const base = process.env.STARTUP_BASE_URL || 'http://127.0.0.1:5183';
 const scenarios = (process.env.STARTUP_CASES || 'direct,immediate,prewarmed,intent,reopen').split(',');
 const mobile = process.env.STARTUP_MOBILE === '1';
+const observeComplete = process.env.STARTUP_COMPLETE !== '0';
 const tier = process.env.STARTUP_TIER || '';
 const label = process.env.STARTUP_LABEL || `startup-after-${mobile ? 'mobile-emulation' : 'desktop'}${tier ? `-${tier}` : ''}`;
 const query = `persistedStage=1${tier ? `&qualityQa=${tier}` : ''}`;
@@ -86,13 +87,27 @@ async function capture(page) {
       await page.mouse.move(box.x + box.width * .45, box.y + box.height * .55); await page.mouse.down();
       await page.mouse.move(box.x + box.width * .5, box.y + box.height * .58, { steps: 8 }); await page.mouse.up();
       await page.waitForTimeout(600); const afterGesture = await capture(page);
+      // Keep the existing real first-interactive barrier distinct from the
+      // later fully hydrated presentation with the prepared compositor.
+      if (round === 1) await page.screenshot({ path: path.join(out, `${label}-${scenario}-interactive.png`) });
+      let completePresentation = null;
+      if (observeComplete) {
+        await page.waitForFunction(() => {
+          const canvas = document.querySelector('canvas');
+          const health = JSON.parse(canvas?.dataset.commercialMapRenderHealth || '{}');
+          return canvas?.dataset.commercialMapHydration === 'complete' && health.status === 'ready' && health.path === 'post';
+        }, null, { timeout: 180000 });
+        completePresentation = await capture(page);
+      }
       const clickToInteractiveMs = presentation.activationAt == null ? null : presentation.boot.summary.documentToInteractiveMs - presentation.activationAt;
       const row = { round, scenario, mobileEmulation: mobile, physicalMobile: false, tierRequested: tier || 'automatic',
         condition: 'local fixture; new browser/context per case except SPA reopen; OS/driver caches not cleared; no private query',
-        beforeClick, clickToInteractiveMs, presentation, afterGesture, errors };
+        beforeClick, clickToInteractiveMs, presentation, afterGesture, completePresentation,
+        fullyPresentedObservedMs: completePresentation ? completePresentation.at - (presentation.activationAt ?? presentation.boot.summary.routeStartedAt) : null,
+        completeObservationRequested: observeComplete, errors };
       rows.push(row); fs.writeFileSync(path.join(out, `${label}.json`), JSON.stringify(rows, null, 2));
       if (round === 1) await page.screenshot({ path: path.join(out, `${label}-${scenario}.png`) });
-      console.log(JSON.stringify({ round, scenario, clickToInteractiveMs, boot: presentation.boot.summary, errors }));
+      console.log(JSON.stringify({ round, scenario, clickToInteractiveMs, fullyPresentedObservedMs: row.fullyPresentedObservedMs, boot: presentation.boot.summary, errors }));
       if (errors.length || presentation.health.contextLosses || afterGesture.health.status !== 'ready' || !presentation.renderer.calls) throw Error('Invalid startup');
     } finally { await browser.close(); }
   }

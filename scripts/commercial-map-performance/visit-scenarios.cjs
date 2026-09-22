@@ -103,16 +103,22 @@ async function look(page) {
     await page.screenshot({ path: path.join(out, 'visit-night.png') });
     await click(page, 'Ativar dia na visita'); await page.waitForTimeout(3000);
     save('checks.json', { fixture: true, before, rows, errors });
+    // Playwright enables forced focus for every Chromium page. Disable that
+    // test harness override so another real tab can produce an actual blur.
+    // Do not replace document.hasFocus or dispatch a synthetic blur event.
+    await cdp.send('Emulation.setFocusEmulationEnabled', { enabled: false });
     await page.keyboard.down('KeyW'); await page.waitForTimeout(700);
     const other = await page.context().newPage(); await other.goto('about:blank'); await other.bringToFront();
     await page.waitForTimeout(1800); const paused = await snapshot(page);
     await page.waitForTimeout(1800); const stillPaused = await snapshot(page);
     await other.close(); await page.bringToFront(); await page.keyboard.up('KeyW'); await page.waitForTimeout(1500);
-    rows.push({ name: 'focus-pause', paused, stillPaused, resumed: await snapshot(page) });
+    const resumed = await snapshot(page);
+    rows.push({ name: 'focus-pause', forcedFocusEmulationDisabled: true, paused, stillPaused, resumed });
     await leave(page);
     save('checks.json', { fixture: true, before, rows, after: await snapshot(page), errors });
     if (rows.some(row => row.failed)) throw Error('An explicit interior check did not execute');
-    if (paused.focused || stillPaused.focused || distance(paused.character.position, stillPaused.character.position) > .03) {
+    if (paused.focused || stillPaused.focused || distance(paused.character.position, stillPaused.character.position) > .03
+      || resumed.character.movement !== 'idle') {
       throw Error('Visit did not pause on focus loss');
     }
     console.log('checks', JSON.stringify(rows.map(r => ({ name: r.name, failed: r.failed, health: r.health, poi: r.poi }))));
