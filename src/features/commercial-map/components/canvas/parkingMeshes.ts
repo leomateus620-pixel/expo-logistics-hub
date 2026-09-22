@@ -113,6 +113,9 @@ export function createParkingLineBatch(
     polygonOffsetUnits: -2,
   });
   material.toneMapped = false;
+  // three-stdlib's hook adds this define after Three calculates the cache key.
+  // Seed the already-transparent variant so compile and draw use the same key.
+  material.defines.USE_LINE_COLOR_ALPHA = '1';
   const object = new LineSegments2(geometry, material);
   object.name = 'rear-parking-instanced-markings';
   object.raycast = NO_RAYCAST;

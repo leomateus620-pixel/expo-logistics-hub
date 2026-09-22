@@ -2,6 +2,7 @@
 // physical mobile or production p95 certification is implied by this harness.
 const fs = require('node:fs'); const path = require('node:path');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const { installCommercialMapGlProgramProbe } = require('./gl-program-probe.cjs');
 const out = path.resolve(process.env.STARTUP_OUTPUT || 'docs/validation/visit-mode/evidence');
 fs.mkdirSync(out, { recursive: true });
 const base = process.env.STARTUP_BASE_URL || 'http://127.0.0.1:5183';
@@ -36,6 +37,7 @@ async function capture(page) {
     try {
       const context = await browser.newContext(mobile ? { viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true }
         : { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+      if (process.env.STARTUP_GL_PROBE === '1') await context.addInitScript(installCommercialMapGlProgramProbe);
       await context.addInitScript(() => {
         window.__startupProbe = { contexts: 0, contextRequests: 0, longTasks: [] };
         const contexts = new WeakSet();
@@ -55,6 +57,8 @@ async function capture(page) {
       });
       const page = await context.newPage(); const errors = [];
       page.on('pageerror', e => errors.push(e.message));
+      const profiler = process.env.STARTUP_PROFILE === '1' ? await context.newCDPSession(page) : null;
+      if (profiler) { await profiler.send('Profiler.enable'); await profiler.send('Profiler.start'); }
       let beforeClick;
       if (scenario === 'direct') await page.goto(`${base}/__dev/commercial-map-rendering?${query}`, { waitUntil: 'domcontentloaded', timeout: 120000 });
       else {
@@ -83,6 +87,12 @@ async function capture(page) {
         }
       }
       await ready(page); const presentation = await capture(page);
+      if (process.env.STARTUP_GL_PROBE === '1') fs.writeFileSync(path.join(out, `${label}-${scenario}-${round}-gl-programs.json`), JSON.stringify(await page.evaluate(() => ({ probe: window.__commercialMapGlProgramProbe, boot: window.__commercialMapPerformance, capturedAt: performance.now(), capturePhase: 'first-ready-before-gesture', diagnosticOnly: true })), null, 2));
+      if (profiler) {
+        const { profile } = await profiler.send('Profiler.stop');
+        fs.writeFileSync(path.join(out, `${label}-${scenario}-${round}.cpuprofile`), JSON.stringify(profile));
+        await profiler.detach();
+      }
       const box = await page.locator('canvas').first().boundingBox();
       await page.mouse.move(box.x + box.width * .45, box.y + box.height * .55); await page.mouse.down();
       await page.mouse.move(box.x + box.width * .5, box.y + box.height * .58, { steps: 8 }); await page.mouse.up();
@@ -102,9 +112,9 @@ async function capture(page) {
       const clickToInteractiveMs = presentation.activationAt == null ? null : presentation.boot.summary.documentToInteractiveMs - presentation.activationAt;
       const row = { round, scenario, mobileEmulation: mobile, physicalMobile: false, tierRequested: tier || 'automatic',
         condition: 'local fixture; new browser/context per case except SPA reopen; OS/driver caches not cleared; no private query',
-        beforeClick, clickToInteractiveMs, presentation, afterGesture, completePresentation,
+        beforeClick, clickToInteractiveMs, presentation, afterGesture, completePresentation, diagnosticCpuProfiling: Boolean(profiler),
         fullyPresentedObservedMs: completePresentation ? completePresentation.at - (presentation.activationAt ?? presentation.boot.summary.routeStartedAt) : null,
-        completeObservationRequested: observeComplete, errors };
+        completeObservationRequested: observeComplete, diagnosticGlProbe: process.env.STARTUP_GL_PROBE === '1', errors };
       rows.push(row); fs.writeFileSync(path.join(out, `${label}.json`), JSON.stringify(rows, null, 2));
       if (round === 1) await page.screenshot({ path: path.join(out, `${label}-${scenario}.png`) });
       console.log(JSON.stringify({ round, scenario, clickToInteractiveMs, fullyPresentedObservedMs: row.fullyPresentedObservedMs, boot: presentation.boot.summary, errors }));

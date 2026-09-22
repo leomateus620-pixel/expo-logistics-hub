@@ -5,6 +5,7 @@ import { sampleCommercialMapDisplayCadence } from '../../utils/displayCadence';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { recordCommercialMapQualityDecision } from '../../utils/runtimeDiagnostics';
 import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
+import { isCommercialMapProgramPreparationActive } from '../../utils/sceneShaderWarmup';
 import { readCommercialMapQaQualityTier, resolveCommercialMapExecutionPolicy } from '../../utils/executionPolicy';
 import {
   capVisitPixelRatio, createInitialVisitQuality, publishVisitQualityTier,
@@ -66,6 +67,7 @@ export function CommercialMapAdaptiveQualityController({
   const gl = useThree((state) => state.gl);
   const invalidate = useThree((state) => state.invalidate);
   const setDpr = useThree((state) => state.setDpr);
+  const getRendererState = useThree((state) => state.get);
   const size = useThree((state) => state.size);
   const qualityState = useRef<CommercialMapAdaptiveQualityState>({ ...initialState });
   const visitSessionActive = useRef(false);
@@ -77,6 +79,8 @@ export function CommercialMapAdaptiveQualityController({
   const committedSceneTier = useRef<CommercialMapQualityTier>(initialState.tier);
   const pendingSceneTier = useRef<CommercialMapQualityTier | null>(null);
   const pixelRatioState = useRef(createCommercialMapPixelRatioState(gl.getPixelRatio()));
+  const pendingPixelRatioBase = useRef<number | undefined>();
+  const pixelRatioSyncDeferred = useRef(false);
   const idleCommitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const frameWindow = useRef(createCommercialMapFrameTimeWindow());
   const lastDiagnosticSignature = useRef('');
@@ -129,20 +133,36 @@ export function CommercialMapAdaptiveQualityController({
   }, []);
 
   const syncPixelRatio = useCallback((baseDpr?: number) => {
+    if (baseDpr !== undefined && Number.isFinite(baseDpr) && baseDpr > 0) pendingPixelRatioBase.current = baseDpr;
+    // Resizing a drawing buffer can synchronously flush programs still linking
+    // in the driver. Initial camera autofit is not a reason to do that before
+    // the first presentation. This gate owns adaptive DPR only; actual viewport
+    // resize and camera projection remain owned by R3F.
+    if (gl.domElement.dataset.commercialMapReady !== 'true' || isCommercialMapProgramPreparationActive(gl)) {
+      pixelRatioSyncDeferred.current = true;
+      return;
+    }
+    const requestedBase = pendingPixelRatioBase.current;
+    pendingPixelRatioBase.current = undefined;
+    pixelRatioSyncDeferred.current = false;
     const nextDpr = updateCommercialMapPixelRatioState(
       pixelRatioState.current,
       isCommercialMapHeavyQualityGestureActive(useCommercialMapStore.getState()),
-      baseDpr,
-    );
-    if (nextDpr !== null && Math.abs(gl.getPixelRatio() - nextDpr) > 0.005) {
+      requestedBase,
+    ) ?? pixelRatioState.current.effectiveDpr;
+    const storeDpr = getRendererState().viewport.dpr;
+    // A matching GPU value alone is insufficient: an obsolete R3F DPR would
+    // be reapplied by its next ResizeObserver notification.
+    if (Math.abs(gl.getPixelRatio() - nextDpr) > 0.005 || Math.abs(storeDpr - nextDpr) > 0.005) {
       setDpr(nextDpr);
-      const quality = gl.domElement?.dataset.commercialMapQuality;
-      if (quality) gl.domElement.dataset.commercialMapQuality = JSON.stringify({ ...JSON.parse(quality), effectiveDpr: nextDpr });
       // A demand canvas must present the resized drawing buffer even when
       // this is the last transition after OrbitControls has stopped moving.
       invalidate();
     }
-  }, [gl, invalidate, setDpr]);
+    const quality = gl.domElement?.dataset.commercialMapQuality;
+    if (quality) gl.domElement.dataset.commercialMapQuality = JSON.stringify({ ...JSON.parse(quality),
+      baseDpr: pixelRatioState.current.baseDpr, effectiveDpr: nextDpr });
+  }, [getRendererState, gl, invalidate, setDpr]);
 
   const publishQuality = useCallback((
     logicalTier: CommercialMapQualityTier,
@@ -372,7 +392,7 @@ export function CommercialMapAdaptiveQualityController({
     const gestureActive = isCommercialMapHeavyQualityGestureActive(store);
     // Visit motion is an external mutable signal, not a React/store update.
     // Observe its edges here; the sole DPR owner performs no per-frame writes.
-    if (pixelRatioState.current.gestureActive !== gestureActive) {
+    if (pixelRatioSyncDeferred.current || pixelRatioState.current.gestureActive !== gestureActive) {
       samplingSignature.current = '';
       syncPixelRatio();
     }

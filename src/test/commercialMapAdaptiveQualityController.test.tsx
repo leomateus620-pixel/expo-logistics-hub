@@ -13,9 +13,13 @@ import { visitRuntime } from '@/features/commercial-map/visit/visitRuntime';
 
 const runtime = vi.hoisted(() => {
   let pixelRatio = 1;
+  let storeDpr = 1;
   return {
     gl: { getPixelRatio: () => pixelRatio, domElement: document.createElement('canvas') },
-    setDpr: vi.fn((next: number) => { pixelRatio = next; }),
+    setDpr: vi.fn((next: number) => { pixelRatio = storeDpr = next; }),
+    get: () => ({ viewport: { dpr: storeDpr } }),
+    setStoreDprOnly: (next: number) => { storeDpr = next; },
+    programsPreparing: false,
     invalidate: vi.fn(),
     size: { width: 1280, height: 800 },
     frame: null as null | ((state: unknown, deltaSeconds: number) => void),
@@ -31,6 +35,9 @@ vi.mock('@react-three/fiber', () => ({
 }));
 vi.mock('@/features/commercial-map/utils/runtimeDiagnostics', () => ({
   recordCommercialMapQualityDecision: vi.fn(),
+}));
+vi.mock('@/features/commercial-map/utils/sceneShaderWarmup', () => ({
+  isCommercialMapProgramPreparationActive: () => runtime.programsPreparing,
 }));
 
 const capabilityHints = { deviceMemoryGb: 8, hardwareConcurrency: 8 };
@@ -49,8 +56,10 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     runtime.setDpr(1);
     runtime.setDpr.mockClear();
     runtime.invalidate.mockClear();
+    runtime.programsPreparing = false;
     visitRuntime.renderingActive = false;
     runtime.gl.domElement.dataset.commercialMapHydration = 'complete';
+    runtime.gl.domElement.dataset.commercialMapReady = 'true';
     delete runtime.gl.domElement.dataset.commercialMapPreparing;
     Object.assign(commercialMapFrameActivity(runtime.gl), { requested: 0, path: 'direct', frames: 0 });
     useCommercialMapStore.setState({
@@ -65,6 +74,63 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     cleanup();
     window.history.replaceState({}, '', '/');
     vi.useRealTimers();
+  });
+
+  it('não redimensiona 1→0.9→1 quando o autofit termina durante a compilação inicial', () => {
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 1 });
+    runtime.gl.domElement.dataset.commercialMapReady = 'false';
+    runtime.programsPreparing = true;
+    render(<CommercialMapAdaptiveQualityController active initialState={initialState} capabilityHints={capabilityHints} reducedGraphics={false} />);
+    act(() => useCommercialMapStore.setState({ cameraNavigating: true }));
+    act(() => runtime.frame?.({}, .016));
+    act(() => useCommercialMapStore.setState({ cameraNavigating: false }));
+    act(() => runtime.frame?.({}, .016));
+    expect(runtime.setDpr).not.toHaveBeenCalled();
+    runtime.programsPreparing = false;
+    act(() => runtime.frame?.({}, .016));
+    expect(runtime.setDpr).not.toHaveBeenCalled();
+    runtime.gl.domElement.dataset.commercialMapReady = 'true';
+    act(() => { runtime.frame?.({}, .016); runtime.frame?.({}, .016); });
+    expect(runtime.setDpr).not.toHaveBeenCalled();
+    expect(runtime.gl.getPixelRatio()).toBe(1);
+  });
+
+  it('retém somente a última base enquanto shaders de uma camada opcional estão pendentes', () => {
+    const props = { active: true, initialState, capabilityHints, reducedGraphics: false };
+    const view = render(<CommercialMapAdaptiveQualityController {...props} />);
+    runtime.setDpr.mockClear();
+    runtime.programsPreparing = true;
+    act(() => useCommercialMapStore.setState({ cameraNavigating: true }));
+    view.rerender(<CommercialMapAdaptiveQualityController {...props} reducedGraphics />);
+    act(() => useCommercialMapStore.setState({ cameraNavigating: false }));
+    act(() => runtime.frame?.({}, .016));
+    expect(runtime.setDpr).not.toHaveBeenCalled();
+    runtime.programsPreparing = false;
+    act(() => { runtime.frame?.({}, .016); runtime.frame?.({}, .016); });
+    const reducedDpr = resolveCommercialMapPixelRatio({ viewportWidth: 1280, viewportHeight: 800, devicePixelRatio: 2, reducedGraphics: true });
+    expect(runtime.setDpr).toHaveBeenCalledExactlyOnceWith(reducedDpr);
+  });
+
+  it('reconcilia o DPR do R3F mesmo quando o renderer já corresponde à base desejada', () => {
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 1 });
+    runtime.setStoreDprOnly(.9);
+    render(<CommercialMapAdaptiveQualityController active initialState={initialState} capabilityHints={capabilityHints} reducedGraphics={false} />);
+    expect(runtime.setDpr).toHaveBeenCalledExactlyOnceWith(1);
+    expect(runtime.get().viewport.dpr).toBe(1);
+  });
+
+  it('conserva a restauração da visita quando a compilação adia entrada e saída', () => {
+    render(<CommercialMapAdaptiveQualityController active initialState={initialState} capabilityHints={capabilityHints} reducedGraphics={false} />);
+    const originalDpr = runtime.gl.getPixelRatio();
+    runtime.setDpr.mockClear(); runtime.programsPreparing = true;
+    let release: () => void = () => undefined;
+    act(() => { release = beginVisitQualitySession(); });
+    act(() => { release(); runtime.frame?.({}, .016); });
+    expect(runtime.setDpr).not.toHaveBeenCalled();
+    runtime.programsPreparing = false;
+    act(() => { runtime.frame?.({}, .016); runtime.frame?.({}, .016); });
+    expect(runtime.setDpr).not.toHaveBeenCalled();
+    expect(runtime.gl.getPixelRatio()).toBe(originalDpr);
   });
 
   it('fixa o perfil QA antes do primeiro frame, mantém override no resize e remove o listener ao desmontar', () => {

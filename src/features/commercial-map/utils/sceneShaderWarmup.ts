@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 
 const pending = new WeakMap<THREE.WebGLRenderer, object>();
+const programPreparations = new WeakMap<THREE.WebGLRenderer, number>();
 interface PreparedProgram {
   isReady: () => boolean;
   getUniforms?: () => unknown;
@@ -17,12 +18,15 @@ const criticalPost = new WeakMap<THREE.WebGLRenderer, {
 }>();
 
 export const isCommercialSceneCompiling = (renderer: THREE.WebGLRenderer) => pending.has(renderer);
+/** A resize can block the driver while any critical, post or layer programs
+ * link. This scheduling signal does not acquire or extend the draw gate. */
+export const isCommercialMapProgramPreparationActive = (renderer: THREE.WebGLRenderer) => (programPreparations.get(renderer) ?? 0) > 0;
 /** Unmanaged renderers retain the existing standalone compositor behavior. */
 export const isCommercialMapPostReady = (renderer: THREE.WebGLRenderer) => criticalPost.get(renderer)?.ready ?? true;
 
 /** Use the admitted map renderer, never a speculative context. Call after
- * program linking: uploads concurrent with linking coincided with a 4.956 s
- * main-thread task on the measured Intel device. Two uploads per task bound
+ * program linking to keep upload admission separate from the link barrier.
+ * Two uploads per task bound
  * admission; compiled custom uniforms use the same deduplicated texture set. */
 export async function prepareCommercialMapTextures(renderer: THREE.WebGLRenderer, objects: THREE.Object3D[], signal?: AbortSignal,
   record: CommercialMapStageRecorder = captureCommercialMapStageRecorder()) {
@@ -156,6 +160,23 @@ export function compileCommercialMapPrograms(
   record: CommercialMapStageRecorder = captureCommercialMapStageRecorder(),
 ) {
   if (signal?.aborted) return Promise.reject(new DOMException('Shader preparation cancelled', 'AbortError'));
+  programPreparations.set(renderer, (programPreparations.get(renderer) ?? 0) + 1);
+  const release = () => {
+    const remaining = (programPreparations.get(renderer) ?? 1) - 1;
+    if (remaining > 0) programPreparations.set(renderer, remaining); else programPreparations.delete(renderer);
+  };
+  try {
+    return prepareCompiledPrograms(renderer, objects, camera, scene, signal, record).finally(release);
+  } catch (error) {
+    release();
+    return Promise.reject(error);
+  }
+}
+
+function prepareCompiledPrograms(
+  renderer: THREE.WebGLRenderer, objects: THREE.Object3D, camera: THREE.Camera, scene: THREE.Scene,
+  signal: AbortSignal | undefined, record: CommercialMapStageRecorder,
+) {
   const materials = renderer.compile(objects, camera, scene);
   const programs = new Set<PreparedProgram>();
   materials.forEach((material) => {

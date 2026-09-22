@@ -45,5 +45,17 @@ jobs:
           src/test/commercialMapCameraTransition.test.ts
           src/test/commercialMapViewport.test.ts
       - run: npm run typecheck
+      - name: Visit, authorized prewarm and full-content quality contracts
+        run: >-
+          npx vitest run --maxWorkers=2 --testTimeout=60000
+          src/test/commercialMapVisit
+          src/test/commercialMapPrewarm.test.ts
+          src/test/commercialMapPortalPrewarm.test.tsx
+          src/test/commercialMapSharedQuery.test.ts
+          src/test/commercialMapRouteDataObservation.test.ts
+          src/test/commercialMapAdaptiveQualityRuntime.test.ts
+          src/test/commercialMapAdaptiveQualityController.test.tsx
+          src/test/commercialMapExecutionParity.test.ts
+          src/test/commercialMapMaterialPreparation.test.tsx
       - run: npm run build -- --manifest
       - run: node scripts/commercial-map-performance/bundle-report.cjs dist --assert-independent

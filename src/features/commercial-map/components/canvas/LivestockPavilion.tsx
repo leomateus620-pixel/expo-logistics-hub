@@ -235,7 +235,9 @@ export const LivestockPavilion = memo(function LivestockPavilion({
     }),
   }), []);
 
-  useEffect(() => {
+  // The scene warmup captures this committed material in its layout effect;
+  // map/bump-map presence must already match the first real draw.
+  useLayoutEffect(() => {
     const targets = [
       {
         material: materials.platform,

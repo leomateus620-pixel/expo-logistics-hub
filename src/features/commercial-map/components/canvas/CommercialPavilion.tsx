@@ -710,7 +710,10 @@ export const CommercialPavilion = memo(function CommercialPavilion({
     zinc: createCommercialPavilionTexture('zinc'),
   }), []);
 
-  useEffect(() => {
+  // Program-defining maps must be installed before the scene warmup sibling's
+  // layout effect. Installing them passively compiled five cold variants in
+  // the first presented draw on the measured renderer.
+  useLayoutEffect(() => {
     materials.wall.bumpMap = textures.concrete;
     materials.wall.bumpScale = 0.012;
     materials.roof.map = textures.zinc;

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as THREE from 'three';
 import * as diagnostics from '@/features/commercial-map/utils/performanceDiagnostics';
-import { commercialMapShaderRepresentatives, compileCommercialMapPrograms, prepareCommercialMapTextures, isCommercialMapPostReady, isCommercialSceneCompiling,
+import { commercialMapShaderRepresentatives, compileCommercialMapPrograms, prepareCommercialMapTextures, isCommercialMapPostReady, isCommercialSceneCompiling, isCommercialMapProgramPreparationActive,
   prepareCommercialMapCriticalPost, prepareCommercialScene } from '@/features/commercial-map/utils/sceneShaderWarmup';
 afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); });
 
@@ -36,6 +36,32 @@ function rendererFixture() {
 }
 
 describe('non-rendering commercial scene preparation', () => {
+  it('keeps the resize scheduling signal active until every overlapping program job settles without acquiring the draw gate', async () => {
+    vi.useFakeTimers();
+    const { gl, pending, initialTarget } = rendererFixture();
+    const scene = new THREE.Scene(), camera = new THREE.Camera(), aborted = new AbortController();
+    const first = compileCommercialMapPrograms(gl, scene, camera, scene);
+    const second = compileCommercialMapPrograms(gl, scene, camera, scene, aborted.signal);
+    const rejected = expect(second).rejects.toMatchObject({ name: 'AbortError' });
+    expect(isCommercialMapProgramPreparationActive(gl)).toBe(true);
+    expect(isCommercialSceneCompiling(gl)).toBe(false);
+    aborted.abort(); await rejected;
+    expect(isCommercialMapProgramPreparationActive(gl)).toBe(true);
+    pending[0].resolve(); await vi.runAllTimersAsync(); await first;
+    expect(isCommercialMapProgramPreparationActive(gl)).toBe(false);
+    expect(vi.getTimerCount()).toBe(0);
+    expect(gl.getRenderTarget()).toBe(initialTarget); initialTarget?.dispose();
+  });
+  it('releases the resize scheduling signal when compile throws synchronously or cancellation precedes compile', async () => {
+    const compile = vi.fn(() => { throw Error('compile failed'); });
+    const gl = { compile } as unknown as THREE.WebGLRenderer, scene = new THREE.Scene(), camera = new THREE.Camera();
+    await expect(compileCommercialMapPrograms(gl, scene, camera, scene)).rejects.toThrow('compile failed');
+    expect(isCommercialMapProgramPreparationActive(gl)).toBe(false);
+    const controller = new AbortController(); controller.abort();
+    await expect(compileCommercialMapPrograms(gl, scene, camera, scene, controller.signal)).rejects.toMatchObject({ name: 'AbortError' });
+    expect(isCommercialMapProgramPreparationActive(gl)).toBe(false);
+    expect(compile).toHaveBeenCalledOnce();
+  });
   it('uploads each ordinary texture once and leaves render targets owned by their renderer', async () => {
     vi.useFakeTimers();
     const texture = new THREE.DataTexture(new Uint8Array(4), 1, 1); texture.needsUpdate = true;

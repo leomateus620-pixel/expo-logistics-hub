@@ -14,11 +14,12 @@ const range = values => {
   return known.length ? { min: round(Math.min(...known)), max: round(Math.max(...known)), observed: known.length, missing: values.length - known.length } : null;
 };
 function read(name) {
-  const file = path.join(dir, name);
+  let file = path.join(dir, name);
+  if (!fs.existsSync(file) && fs.existsSync(file + '.gz')) file += '.gz';
   if (!fs.existsSync(file)) { sources[name] = { status: 'missing' }; return null; }
   try {
-    const before = fs.statSync(file), raw = fs.readFileSync(file, 'utf8'), after = fs.statSync(file);
-    const data = JSON.parse(raw);
+    const before = fs.statSync(file), raw = fs.readFileSync(file), after = fs.statSync(file);
+    const data = JSON.parse((file.endsWith('.gz') ? require('node:zlib').gunzipSync(raw) : raw).toString('utf8'));
     if (before.size !== after.size || before.mtimeMs !== after.mtimeMs) {
       sources[name] = { status: 'changing', bytes: after.size, modifiedAt: after.mtime.toISOString() };
       return null;
