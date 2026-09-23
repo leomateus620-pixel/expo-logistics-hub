@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { CommercialMapBootLoader } from './CommercialMapBootLoader';
+import { getCommercialMapBootSnapshot, subscribeCommercialMapBoot } from '../utils/performanceDiagnostics';
 import {
   COMMERCIAL_MAP_RENDER_HEALTH_EVENT,
   COMMERCIAL_MAP_PREPARING_EVENT,
@@ -22,9 +23,10 @@ function currentMapCanvas(): HTMLCanvasElement | null {
   );
 }
 
-/** A passive notice: never overlays an input-capturing surface over the map. */
-export function CommercialMapRendererStatus() {
+/** Boot cover until presentation; passive graphics notices after the map opens. */
+export function CommercialMapRendererStatus({ active = true, onOpenList }: { active?: boolean; onOpenList?: () => void }) {
   const [status, setStatus] = useState<RenderHealthStatus>('ready');
+  const boot = useSyncExternalStore(subscribeCommercialMapBoot, getCommercialMapBootSnapshot, getCommercialMapBootSnapshot);
 
   useEffect(() => {
     const updateStatus = () => {
@@ -43,14 +45,21 @@ export function CommercialMapRendererStatus() {
     };
   }, []);
 
-  if (status === 'ready') return <CommercialMapBootLoader />;
-
   const retry = () => {
     const canvas = currentMapCanvas();
     // A stale notice must not retry a different/already recovered renderer.
     if (!canvas || readCommercialMapRenderHealth(canvas)?.status !== 'failed') return;
     canvas.dispatchEvent(new CustomEvent(COMMERCIAL_MAP_RENDER_RETRY_EVENT, { bubbles: true }));
   };
+
+  // A degraded renderer must pass the same boot barrier as the normal path.
+  // Keep recovery actions reachable while the initial cover is still present.
+  if (!boot.commercialMapReady || status === 'ready') return <CommercialMapBootLoader active={active}
+    onOpenList={onOpenList} error={status === 'failed' ? RENDER_STATUS_MESSAGES.failed : undefined}
+    onRetry={() => {
+      if (readCommercialMapRenderHealth(currentMapCanvas())?.status === 'failed') retry();
+      else window.location.reload();
+    }} />;
 
   return (
     <div

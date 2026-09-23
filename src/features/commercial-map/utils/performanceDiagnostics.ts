@@ -12,13 +12,14 @@ export interface PerformanceEvent {
 
 export interface CommercialMapBootSnapshot {
   startedAt: number;
+  preparationAttempt: number;
   marks: Readonly<Record<string, number>>;
   interactive: boolean;
   commercialMapReady: boolean;
   failed: boolean;
 }
 
-let snapshot: CommercialMapBootSnapshot = { startedAt: 0, marks: {}, interactive: false, commercialMapReady: false, failed: false };
+let snapshot: CommercialMapBootSnapshot = { startedAt: 0, preparationAttempt: 0, marks: {}, interactive: false, commercialMapReady: false, failed: false };
 const listeners = new Set<() => void>();
 let longTaskObserver: PerformanceObserver | undefined;
 let notificationPending = false;
@@ -55,7 +56,11 @@ function notifyBootListeners() {
 export const getCommercialMapBootSnapshot = () => snapshot;
 /** Context recovery must pass the same presentation barrier as the first visit. */
 export function resetCommercialMapReady() {
-  snapshot = { ...snapshot, commercialMapReady: false, interactive: false, failed: false };
+  const marks = { ...snapshot.marks };
+  delete marks['essential-scene:prepared'];
+  delete marks['commercial-map-ready'];
+  snapshot = { ...snapshot, marks, preparationAttempt: snapshot.preparationAttempt + 1,
+    commercialMapReady: false, interactive: false, failed: false };
   notifyBootListeners();
 }
 export const subscribeCommercialMapBoot = (listener: () => void) => {
@@ -69,7 +74,7 @@ export function beginCommercialMapBoot() {
   bootActive = true;
   // Always relative to the actual route activation, never to Portal dwell time.
   // Document navigation remains a separate clock in the diagnostic summary.
-  snapshot = { startedAt: performance.now(), marks: {}, interactive: false, commercialMapReady: false, failed: false };
+  snapshot = { startedAt: performance.now(), preparationAttempt: 0, marks: {}, interactive: false, commercialMapReady: false, failed: false };
   for (const name of Object.keys(syncTotals)) delete syncTotals[name];
   if (commercialMapDiagnosticsEnabled && typeof window !== 'undefined') {
     window.__commercialMapPerformance = { events: [], longTasks: [] };

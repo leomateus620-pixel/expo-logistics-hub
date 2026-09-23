@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { commercialMapDiagnosticsEnabled, getCommercialMapBootSnapshot, markCommercialMapStage } from '../../utils/performanceDiagnostics';
 import { retainHydrologyPreparationOwner } from '../../utils/hydrologyPreparationResource';
-import { createSceneHydrationQueue, qualifiesCommercialMapReady, type SceneHydrationTask } from '../../utils/progressiveSceneBoot';
+import { createSceneHydrationQueue, qualifiesCommercialMapReady, qualifiesInteractiveFrame, type SceneHydrationTask } from '../../utils/progressiveSceneBoot';
 import { COMMERCIAL_MAP_PREPARING_EVENT } from '../../utils/renderingHealth';
 import { readLatestCommercialMapRenderHealth } from '../../utils/renderingHealth';
 import { isCommercialSceneCompiling, prepareCommercialSceneLayer } from '../../utils/sceneShaderWarmup';
@@ -57,14 +57,15 @@ export function CommercialMapInteractiveBoot() {
   const gl = useThree((state) => state.gl);
   const invalidate = useThree((state) => state.invalidate);
   const controls = useThree((state) => state.controls);
-  const timing = useRef({ last: 0, responsive: 0, ready: false });
+  const timing = useRef({ last: 0, responsive: 0, ready: false, baseline: null as number | null, reportedAt: 0 });
   useEffect(() => {
     const canvas = gl.domElement;
     const releaseHydrologyOwner = retainHydrologyPreparationOwner(canvas);
     const reset = () => {
-      timing.current = { last: 0, responsive: 0, ready: false };
+      timing.current = { last: 0, responsive: 0, ready: false, baseline: null, reportedAt: 0 };
       canvas.dataset.commercialMapReady = 'false';
       canvas.dataset.commercialMapInteractive = 'false';
+      delete canvas.dataset.commercialMapReadiness;
       invalidate();
     };
     canvas.addEventListener('webglcontextlost', reset);
@@ -103,15 +104,31 @@ export function CommercialMapInteractiveBoot() {
     frame.last = now;
     frame.responsive = interval > 0 && interval <= 100 ? frame.responsive + 1 : 0;
     const health = readLatestCommercialMapRenderHealth(gl.domElement);
-    if (qualifiesCommercialMapReady({
-      essentialPrepared: gl.domElement.dataset.commercialMapEssentialReady === 'true',
-      presentedFrames: health?.presentedFrames ?? 0,
-      consecutiveResponsiveFrames: frame.responsive,
-      preparing: isCommercialSceneCompiling(gl) || Boolean(gl.domElement.dataset.commercialMapPreparing)
-        || health?.status === 'failed' || health?.status === 'context-lost',
+    const essentialPrepared = gl.domElement.dataset.commercialMapEssentialReady === 'true';
+    const preparing = isCommercialSceneCompiling(gl) || Boolean(gl.domElement.dataset.commercialMapPreparing);
+    const healthyScreen = Boolean(health && (health.status === 'ready' || health.status === 'degraded')
+      && (health.path === 'direct' || health.path === 'post'));
+    const presented = health?.presentedFrames ?? 0;
+    // This callback precedes the screen owner. Capture the counter before its
+    // first prepared draw; lifetime counters must not qualify a recovered boot.
+    if (!essentialPrepared || preparing || !healthyScreen || frame.baseline === null || presented < frame.baseline) {
+      frame.baseline = presented;
+    }
+    const readiness = {
+      essentialPrepared, preparing, healthyScreen,
+      presentedFrames: Math.max(0, presented - frame.baseline),
       controlsInstalled: Boolean(controls),
-      frameIntervalMs: interval,
-    })) {
+    };
+    const ready = qualifiesCommercialMapReady(readiness);
+    if (ready || !frame.reportedAt || now - frame.reportedAt >= 1000) {
+      frame.reportedAt = now;
+      // One bounded production snapshot, no per-frame DOM/React publication.
+      gl.domElement.dataset.commercialMapReadiness = JSON.stringify({ ...readiness,
+        frameIntervalMs: interval, responsive: qualifiesInteractiveFrame({ ...readiness,
+          consecutiveResponsiveFrames: frame.responsive, frameIntervalMs: interval }),
+        status: health?.status ?? null, path: health?.path ?? null, lastErrorCode: health?.lastErrorCode ?? null });
+    }
+    if (ready) {
       frame.ready = true;
       gl.domElement.dataset.commercialMapInteractive = 'true';
       gl.domElement.dataset.commercialMapReady = 'true';
