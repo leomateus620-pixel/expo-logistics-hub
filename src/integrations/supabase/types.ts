@@ -1008,6 +1008,7 @@ export type Database = {
           before_data: Json | null
           cart_id: string
           created_at: string
+          cycle_year: number
           id: string
           org_id: string
         }
@@ -1018,6 +1019,7 @@ export type Database = {
           before_data?: Json | null
           cart_id: string
           created_at?: string
+          cycle_year?: number
           id?: string
           org_id: string
         }
@@ -1028,6 +1030,7 @@ export type Database = {
           before_data?: Json | null
           cart_id?: string
           created_at?: string
+          cycle_year?: number
           id?: string
           org_id?: string
         }
@@ -1047,6 +1050,7 @@ export type Database = {
           comissao: string | null
           created_at: string
           created_by_user_id: string
+          cycle_year: number
           empresa_slug: string | null
           fim_em: string
           id: string
@@ -1065,6 +1069,7 @@ export type Database = {
           comissao?: string | null
           created_at?: string
           created_by_user_id: string
+          cycle_year?: number
           empresa_slug?: string | null
           fim_em: string
           id?: string
@@ -1083,6 +1088,7 @@ export type Database = {
           comissao?: string | null
           created_at?: string
           created_by_user_id?: string
+          cycle_year?: number
           empresa_slug?: string | null
           fim_em?: string
           id?: string
@@ -2466,6 +2472,7 @@ export type Database = {
           codigo: string
           comissao: string | null
           created_at: string
+          cycle_year: number
           devolucao_em: string | null
           devolucao_prevista_em: string | null
           empresa_slug: string | null
@@ -2484,6 +2491,7 @@ export type Database = {
           codigo: string
           comissao?: string | null
           created_at?: string
+          cycle_year?: number
           devolucao_em?: string | null
           devolucao_prevista_em?: string | null
           empresa_slug?: string | null
@@ -2502,6 +2510,7 @@ export type Database = {
           codigo?: string
           comissao?: string | null
           created_at?: string
+          cycle_year?: number
           devolucao_em?: string | null
           devolucao_prevista_em?: string | null
           empresa_slug?: string | null
@@ -2750,6 +2759,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by_user_id: string
+          cycle_year: number
           descricao: string | null
           external_id: string | null
           fim_em: string
@@ -2766,6 +2776,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by_user_id: string
+          cycle_year?: number
           descricao?: string | null
           external_id?: string | null
           fim_em: string
@@ -2782,6 +2793,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by_user_id?: string
+          cycle_year?: number
           descricao?: string | null
           external_id?: string | null
           fim_em?: string
@@ -2810,6 +2822,7 @@ export type Database = {
           acted_at: string
           acted_by: string
           action: string
+          cycle_year: number
           expense_id: string
           id: string
           new_status: Database["public"]["Enums"]["expense_status"]
@@ -2821,6 +2834,7 @@ export type Database = {
           acted_at?: string
           acted_by: string
           action: string
+          cycle_year?: number
           expense_id: string
           id?: string
           new_status: Database["public"]["Enums"]["expense_status"]
@@ -2832,6 +2846,7 @@ export type Database = {
           acted_at?: string
           acted_by?: string
           action?: string
+          cycle_year?: number
           expense_id?: string
           id?: string
           new_status?: Database["public"]["Enums"]["expense_status"]
@@ -2904,6 +2919,7 @@ export type Database = {
         Row: {
           access_key: string | null
           created_at: string
+          cycle_year: number
           document_type: string | null
           expense_id: string
           extracted_payload_json: Json | null
@@ -2925,6 +2941,7 @@ export type Database = {
         Insert: {
           access_key?: string | null
           created_at?: string
+          cycle_year?: number
           document_type?: string | null
           expense_id: string
           extracted_payload_json?: Json | null
@@ -2946,6 +2963,7 @@ export type Database = {
         Update: {
           access_key?: string | null
           created_at?: string
+          cycle_year?: number
           document_type?: string | null
           expense_id?: string
           extracted_payload_json?: Json | null
@@ -2987,6 +3005,7 @@ export type Database = {
           category_id: string | null
           created_at: string
           created_by_user_id: string
+          cycle_year: number
           description: string | null
           event_id: string | null
           expense_date: string
@@ -3010,6 +3029,7 @@ export type Database = {
           category_id?: string | null
           created_at?: string
           created_by_user_id: string
+          cycle_year?: number
           description?: string | null
           event_id?: string | null
           expense_date?: string
@@ -3033,6 +3053,7 @@ export type Database = {
           category_id?: string | null
           created_at?: string
           created_by_user_id?: string
+          cycle_year?: number
           description?: string | null
           event_id?: string | null
           expense_date?: string
@@ -3152,6 +3173,7 @@ export type Database = {
         Row: {
           created_at: string
           cupom_fiscal_url: string | null
+          cycle_year: number
           id: string
           km_abastecimento: number | null
           litros: number | null
@@ -3166,6 +3188,7 @@ export type Database = {
         Insert: {
           created_at?: string
           cupom_fiscal_url?: string | null
+          cycle_year?: number
           id?: string
           km_abastecimento?: number | null
           litros?: number | null
@@ -3180,6 +3203,7 @@ export type Database = {
         Update: {
           created_at?: string
           cupom_fiscal_url?: string | null
+          cycle_year?: number
           id?: string
           km_abastecimento?: number | null
           litros?: number | null
@@ -3534,6 +3558,7 @@ export type Database = {
           checkin_em: string | null
           checkout_em: string | null
           created_at: string
+          cycle_year: number
           email: string | null
           hotel_nome: string | null
           id: string
@@ -3549,6 +3574,7 @@ export type Database = {
           checkin_em?: string | null
           checkout_em?: string | null
           created_at?: string
+          cycle_year?: number
           email?: string | null
           hotel_nome?: string | null
           id?: string
@@ -3564,6 +3590,7 @@ export type Database = {
           checkin_em?: string | null
           checkout_em?: string | null
           created_at?: string
+          cycle_year?: number
           email?: string | null
           hotel_nome?: string | null
           id?: string
@@ -5928,6 +5955,7 @@ export type Database = {
       schedule_shifts: {
         Row: {
           created_at: string
+          cycle_year: number
           fim_em: string
           id: string
           inicio_em: string
@@ -5940,6 +5968,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          cycle_year?: number
           fim_em: string
           id?: string
           inicio_em: string
@@ -5952,6 +5981,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          cycle_year?: number
           fim_em?: string
           id?: string
           inicio_em?: string
@@ -5983,6 +6013,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by_user_id: string
+          cycle_year: number
           data_fim: string
           data_inicio: string
           id: string
@@ -5994,6 +6025,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by_user_id: string
+          cycle_year?: number
           data_fim: string
           data_inicio: string
           id?: string
@@ -6005,6 +6037,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by_user_id?: string
+          cycle_year?: number
           data_fim?: string
           data_inicio?: string
           id?: string
@@ -6030,6 +6063,7 @@ export type Database = {
           after_data: Json | null
           before_data: Json | null
           created_at: string
+          cycle_year: number
           id: string
           org_id: string
           scooter_id: string
@@ -6040,6 +6074,7 @@ export type Database = {
           after_data?: Json | null
           before_data?: Json | null
           created_at?: string
+          cycle_year?: number
           id?: string
           org_id: string
           scooter_id: string
@@ -6050,6 +6085,7 @@ export type Database = {
           after_data?: Json | null
           before_data?: Json | null
           created_at?: string
+          cycle_year?: number
           id?: string
           org_id?: string
           scooter_id?: string
@@ -6069,6 +6105,7 @@ export type Database = {
           comissao: string | null
           created_at: string
           created_by_user_id: string
+          cycle_year: number
           empresa_slug: string | null
           fim_em: string
           id: string
@@ -6087,6 +6124,7 @@ export type Database = {
           comissao?: string | null
           created_at?: string
           created_by_user_id: string
+          cycle_year?: number
           empresa_slug?: string | null
           fim_em: string
           id?: string
@@ -6105,6 +6143,7 @@ export type Database = {
           comissao?: string | null
           created_at?: string
           created_by_user_id?: string
+          cycle_year?: number
           empresa_slug?: string | null
           fim_em?: string
           id?: string
@@ -6126,6 +6165,7 @@ export type Database = {
           codigo: string
           comissao: string | null
           created_at: string
+          cycle_year: number
           devolucao_em: string | null
           devolucao_prevista_em: string | null
           empresa_slug: string | null
@@ -6145,6 +6185,7 @@ export type Database = {
           codigo: string
           comissao?: string | null
           created_at?: string
+          cycle_year?: number
           devolucao_em?: string | null
           devolucao_prevista_em?: string | null
           empresa_slug?: string | null
@@ -6164,6 +6205,7 @@ export type Database = {
           codigo?: string
           comissao?: string | null
           created_at?: string
+          cycle_year?: number
           devolucao_em?: string | null
           devolucao_prevista_em?: string | null
           empresa_slug?: string | null
@@ -6226,6 +6268,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by_user_id: string
+          cycle_year: number
           funcao: string | null
           id: string
           member_user_id: string
@@ -6237,6 +6280,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by_user_id: string
+          cycle_year?: number
           funcao?: string | null
           id?: string
           member_user_id: string
@@ -6248,6 +6292,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by_user_id?: string
+          cycle_year?: number
           funcao?: string | null
           id?: string
           member_user_id?: string
@@ -6303,6 +6348,7 @@ export type Database = {
           completed_at: string | null
           created_at: string
           created_by_user_id: string
+          cycle_year: number
           descricao: string | null
           due_em: string | null
           id: string
@@ -6319,6 +6365,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           created_by_user_id: string
+          cycle_year?: number
           descricao?: string | null
           due_em?: string | null
           id?: string
@@ -6335,6 +6382,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           created_by_user_id?: string
+          cycle_year?: number
           descricao?: string | null
           due_em?: string | null
           id?: string
@@ -6359,6 +6407,7 @@ export type Database = {
       transport_guests: {
         Row: {
           created_at: string
+          cycle_year: number
           guest_id: string
           id: string
           org_id: string
@@ -6366,6 +6415,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          cycle_year?: number
           guest_id: string
           id?: string
           org_id: string
@@ -6373,6 +6423,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          cycle_year?: number
           guest_id?: string
           id?: string
           org_id?: string
@@ -6634,6 +6685,7 @@ export type Database = {
         Row: {
           chegada_destino_em: string | null
           created_at: string
+          cycle_year: number
           destino: string
           destino_lat: number | null
           destino_lat_chegada: number | null
@@ -6681,6 +6733,7 @@ export type Database = {
         Insert: {
           chegada_destino_em?: string | null
           created_at?: string
+          cycle_year?: number
           destino: string
           destino_lat?: number | null
           destino_lat_chegada?: number | null
@@ -6728,6 +6781,7 @@ export type Database = {
         Update: {
           chegada_destino_em?: string | null
           created_at?: string
+          cycle_year?: number
           destino?: string
           destino_lat?: number | null
           destino_lat_chegada?: number | null
@@ -6856,6 +6910,7 @@ export type Database = {
       vehicle_usage: {
         Row: {
           created_at: string
+          cycle_year: number
           devolucao_em: string | null
           id: string
           km_chegada: number | null
@@ -6870,6 +6925,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          cycle_year?: number
           devolucao_em?: string | null
           id?: string
           km_chegada?: number | null
@@ -6884,6 +6940,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          cycle_year?: number
           devolucao_em?: string | null
           id?: string
           km_chegada?: number | null
@@ -6919,6 +6976,7 @@ export type Database = {
           categoria: string | null
           cor: string | null
           created_at: string
+          cycle_year: number
           documento_url: string | null
           id: string
           km_atual: number | null
@@ -6938,6 +6996,7 @@ export type Database = {
           categoria?: string | null
           cor?: string | null
           created_at?: string
+          cycle_year?: number
           documento_url?: string | null
           id?: string
           km_atual?: number | null
@@ -6957,6 +7016,7 @@ export type Database = {
           categoria?: string | null
           cor?: string | null
           created_at?: string
+          cycle_year?: number
           documento_url?: string | null
           id?: string
           km_atual?: number | null
