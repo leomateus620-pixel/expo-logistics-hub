@@ -41,6 +41,8 @@ export async function fetchSalesPricing(lotIds: string[]): Promise<LotPricing202
   return (data ?? []).map((row) => mapRow(row as PricingRow));
 }
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const ERROR_MESSAGES: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
   [/MAP_PERMISSION_DENIED/, () => 'Você não tem permissão para registrar vendas neste mapa.'],
   [/LOT_NOT_SELLABLE:(.+)/, (match) => `O espaço ${match[1]} não está mais disponível para venda.`],
