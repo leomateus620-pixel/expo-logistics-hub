@@ -55,12 +55,48 @@ const ERROR_MESSAGES: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
   [/AUTH_REQUIRED/, () => 'Sessão expirada. Entre novamente para concluir a venda.'],
 ];
 
-export function describeSalesError(message: string): string {
+const KIND_FALLBACK: Record<SalesErrorKind, string> = {
+  BUSINESS: 'Não foi possível concluir a venda. Nenhum espaço foi alterado.',
+  AUTH: 'Sessão expirada ou sem permissão para registrar vendas. Entre novamente e tente de novo.',
+  SCHEMA: 'Erro interno ao gravar a venda. Nenhum espaço foi alterado. Avise a equipe técnica com o código da falha.',
+  NETWORK: 'A conexão falhou antes da resposta do servidor. Não é possível confirmar se a venda foi registrada — tente novamente sem alterar a seleção.',
+  UNKNOWN: 'Não foi possível concluir a venda. Nenhum espaço foi alterado.',
+};
+
+export function describeSalesError(message: string, kind: SalesErrorKind = 'UNKNOWN'): string {
   for (const [pattern, format] of ERROR_MESSAGES) {
     const match = message.match(pattern);
     if (match) return format(match);
   }
-  return 'Não foi possível concluir a venda. Nenhum espaço foi alterado.';
+  return KIND_FALLBACK[kind];
+}
+
+type PostgrestLikeError = {
+  message?: string;
+  code?: string | null;
+  details?: unknown;
+  hint?: unknown;
+  status?: number | null;
+};
+
+function buildSalesError(raw: PostgrestLikeError, payload: SalesOrderPayload): SalesOrderError {
+  const message = raw.message ?? 'Erro desconhecido';
+  const code = raw.code ?? null;
+  const kind = classifySalesError(message, code);
+  const diagnostics = {
+    operation: 'register_commercial_sale_order' as const,
+    kind,
+    correlationId: payload.idempotencyKey,
+    code,
+    details: sanitizeDiagnosticText(raw.details),
+    hint: sanitizeDiagnosticText(raw.hint),
+    rawMessage: sanitizeDiagnosticText(message),
+    httpStatus: typeof raw.status === 'number' ? raw.status : null,
+    stage: payload.stage,
+    lotCount: payload.lotIds.length,
+  };
+  logSalesFailure(diagnostics);
+  return new SalesOrderError(describeSalesError(message, kind), diagnostics);
 }
 
 /** Uma única transação no servidor: ou vende todos os espaços, ou nenhum. */
