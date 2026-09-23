@@ -139,12 +139,12 @@ export function CommercialDashboardLotChart({
             onBlur={() => onHoverStatus(null)}
             onClick={() => onToggleStatus(status)}
             aria-pressed={highlightedStatus === status}
-            aria-label={`${STATUS_CONFIG[status].label}: ${formatDashboardAreaWithCoverage(summary.areaSqm, summary.lotCount, summary.areaPendingCount, aggregate.commercialLots)}, ${aggregate.totalAreaSqm > 0 ? formatDashboardPercentage(summary.areaPercentage) : 'percentual de área pendente'}, ${formatDashboardInteger(summary.lotCount)} lotes`}
+            aria-label={`${STATUS_CONFIG[status].label}: ${formatDashboardInteger(summary.lotCount)} lotes, ${aggregate.commercialLots > 0 ? formatDashboardPercentage(summary.lotPercentage) : 'percentual pendente'}, ${formatDashboardAreaWithCoverage(summary.areaSqm, summary.lotCount, summary.areaPendingCount, aggregate.commercialLots)}`}
           >
             <i style={{ backgroundColor: STATUS_CONFIG[status].color }} aria-hidden="true" />
             <span>{STATUS_CONFIG[status].label}</span>
-            <strong>{aggregate.totalAreaSqm > 0 ? formatDashboardPercentage(summary.areaPercentage) : '—'}</strong>
-            <small>{formatDashboardInteger(summary.lotCount)}</small>
+            <strong>{formatDashboardInteger(summary.lotCount)}</strong>
+            <small>{aggregate.commercialLots > 0 ? formatDashboardPercentage(summary.lotPercentage) : '—'}</small>
           </button>;
         })}
       </div>
@@ -153,13 +153,16 @@ export function CommercialDashboardLotChart({
         {aggregate.unavailableAreaSqm > 0 ? ` · ${formatDashboardArea(aggregate.unavailableAreaSqm)}` : ''}.
       </p>}
       <p className="commercial-dashboard-screen-reader-only">
-        {aggregate.totalAreaSqm > 0
-          ? `${formatDashboardPercentage(aggregate.soldAreaPercentage)} da área comercial cadastrada foi vendida. A área total considerada é ${formatDashboardArea(aggregate.totalAreaSqm)}.`
-          : 'Percentual vendido pendente porque não há metragem oficial válida.'}
+        {aggregate.commercialLots > 0
+          ? `${formatDashboardPercentage(aggregate.soldLotPercentage)} dos lotes comerciais foram vendidos: ${formatDashboardInteger(aggregate.soldLots)} de ${formatDashboardInteger(aggregate.commercialLots)}.`
+          : 'Percentual vendido pendente porque não há lotes comerciais cadastrados.'}
       </p>
     </div>
   );
 }
+
+/** @deprecated Nome anterior mantido para importações existentes. */
+export const CommercialDashboardAreaChart = CommercialDashboardLotChart;
 
 export function CommercialDashboardValueChart({
   aggregate,
