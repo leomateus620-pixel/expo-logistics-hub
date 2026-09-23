@@ -15,6 +15,7 @@ import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persist
 import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthProvider';
 import { CapabilitiesProvider } from './contexts/CapabilitiesProvider';
+import { LogisticsCycleProvider } from './contexts/LogisticsCycleProvider';
 import { useAuth } from './hooks/useAuth';
 import { useCapabilities } from './hooks/useCapabilities';
 import AuthGuard from './components/AuthGuard';
@@ -478,7 +479,8 @@ const App = () => (
     }}
   >
     <AuthProvider>
-      <CapabilitiesProvider>
+      <LogisticsCycleProvider>
+       <CapabilitiesProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -524,7 +526,8 @@ const App = () => (
             <PushPermissionPrompt />
           </BrowserRouter>
         </TooltipProvider>
-      </CapabilitiesProvider>
+       </CapabilitiesProvider>
+      </LogisticsCycleProvider>
     </AuthProvider>
   </PersistQueryClientProvider>
 );

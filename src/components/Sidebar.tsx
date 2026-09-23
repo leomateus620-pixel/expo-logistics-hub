@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { isToday, parseISO } from 'date-fns';
 import { useMemo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 /* ── Menu groups with required capability ── */
 const operacao = [
@@ -77,6 +78,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
   const { events: fenasojaEvents } = useFenasojaEvents();
   const { tasks } = useTasks();
   const { members } = useOrgMembers();
+  const { cycleYear } = useLogisticsCycle();
 
   // Filter groups based on capabilities. Use primitive deps so memo is stable.
   const groups = useMemo(() => {
@@ -182,7 +184,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
   /* ── Header renderer ── */
   const renderHeader = (mobile: boolean) => (
     <div className={cn('flex min-h-[64px] items-center border-b border-sidebar-border p-3', collapsed ? 'flex-col gap-2' : 'gap-3')}>
-      <FenasojaBrand compact markOnly={collapsed} subtitle="Logística" tone="dark" className={cn('min-w-0', !collapsed && 'flex-1')} />
+      <FenasojaBrand compact markOnly={collapsed} subtitle={collapsed ? 'Logística' : `Logística · ${cycleYear}`} tone="dark" className={cn('min-w-0', !collapsed && 'flex-1')} />
       {!collapsed && contextLine && <span className="sr-only">{contextLine}</span>}
       <div className="flex items-center gap-1 shrink-0">
         <button

@@ -17,7 +17,6 @@ import {
   Loader2,
   LockKeyhole,
   Mail,
-  Route,
   ShieldCheck,
   UsersRound,
   type LucideIcon,
@@ -136,6 +135,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
     selectedSlug === 'eventos-restaurante-arena' || returnTo?.startsWith('/eventos-restaurante-arena');
   const isCommercialMapLogin = selectedSlug === 'mapa-comercial' || returnTo?.startsWith('/mapa-comercial');
   const isFinancialLogin = selectedSlug === 'financeiro-gerencial';
+  const isLogisticsLogin = selectedSlug === 'logistica';
   const selectedModule = resolveCommissionRouteModule(selectedSlug) ?? getCommissionModule(selectedSlug);
   const commissionMapPortal = getCommissionMapPortal(selectedSlug);
   const isCommissionMapLogin = Boolean(commissionMapPortal);
@@ -339,7 +339,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
       data-module={selectedSlug}
       data-commission-theme={commissionMapPortal?.theme}
     >
-      {!isCronogramaLogin && !isCommercialMapLogin && !isCommissionMapLogin && !isFinancialLogin && (
+      {!isLogisticsLogin && !isCronogramaLogin && !isCommercialMapLogin && !isCommissionMapLogin && !isFinancialLogin && (
         <div className="auth-screen__cycle" aria-hidden="true">
           <span>2026</span>
           <i />
@@ -349,8 +349,14 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
         </div>
       )}
 
-      <div className="auth-layout">
-        {isCronogramaLogin ? (
+      <div className="auth-layout" data-logistics-login={isLogisticsLogin || undefined}>
+        {isLogisticsLogin ? (
+          <section className="auth-hero auth-hero--logistics" aria-labelledby="login-hero-title">
+            <FenasojaBrand scale="display" subtitle="Comissão de Logística" tone="dark" />
+            <h1 id="login-hero-title">Comissão de Logística</h1>
+            <p>Fenasoja 2028</p>
+          </section>
+        ) : isCronogramaLogin ? (
           <CronogramaLoginHero />
         ) : isVenueEventsLogin ? (
           <VenueEventsLoginHero />
@@ -409,7 +415,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           aria-labelledby="login-title"
           aria-busy={phase === 'submitting'}
         >
-          {!isCronogramaLogin && !isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && !isFinancialLogin && (
+          {!isLogisticsLogin && !isCronogramaLogin && !isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && !isFinancialLogin && (
             <div className="auth-panel__brand-row">
               <FenasojaBrand
                 compact
@@ -438,7 +444,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           )}
 
           <div className="auth-panel__heading">
-            {!isCronogramaLogin && !isVenueEventsLogin && (
+            {!isLogisticsLogin && !isCronogramaLogin && !isVenueEventsLogin && (
               <p className="auth-panel__eyebrow">
                 <ShieldCheck aria-hidden="true" />
                 {isCommercialMapLogin
@@ -451,7 +457,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
               </p>
             )}
             <h2 id="login-title">Entrar</h2>
-            {!isCronogramaLogin && <p>
+            {!isLogisticsLogin && !isCronogramaLogin && <p>
               {isVenueEventsLogin
                 ? 'Informe suas credenciais para continuar.'
                 : isFinancialLogin
@@ -624,7 +630,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           </form>
 
           <div className="auth-panel__footer">
-            {!isCronogramaLogin && !isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && !isFinancialLogin && (
+            {!isLogisticsLogin && !isCronogramaLogin && !isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && !isFinancialLogin && (
               <div className="auth-restricted-note">
                 <span className="auth-restricted-note__icon" aria-hidden="true">
                   <ShieldCheck />
