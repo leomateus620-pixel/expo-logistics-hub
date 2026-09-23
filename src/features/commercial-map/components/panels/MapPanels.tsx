@@ -38,7 +38,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CLASSIFICATION_LABELS, STATUS_CONFIG } from '../../constants';
-import { useLotActivity, useLotContractVersions, useMapMutations } from '../../hooks/useCommercialMap';
+import { useLotActivity, useLotContractVersions, useLotSaleHistory, useMapMutations } from '../../hooks/useCommercialMap';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
@@ -61,6 +61,7 @@ import { LotPricing2028Panel } from './LotPricing2028Panel';
 import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { getHistoryIdForEntity } from '../../history/bindings';
 import { HistoryExperience } from '../../history/HistoryExperience';
+import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
@@ -337,6 +338,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
     requestAnimationFrame(() => historyTriggerRef.current?.focus({ preventScroll: true }));
   };
   const activity = useLotActivity(lot?.id ?? null);
+  const saleHistory = useLotSaleHistory(lot?.id ?? null, lot?.status === 'SOLD');
   const contracts = useLotContractVersions(lot?.id ?? null, permissions.canManageContracts);
   const areaMapUnits = polygonAreaMapUnits(entity.geometry);
   const areaDifferenceSqm = lot?.officialAreaSqm != null && lot.calculatedAreaSqm != null
@@ -528,6 +530,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
               </div>
             </TabsContent>
             <TabsContent value="history">
+              <LotSaleHistoryCard sale={saleHistory.data} loading={saleHistory.isLoading} />
               <div className="commercial-map-activity">
                 {!lot && <div className="commercial-map-empty compact"><History /><strong>Histórico disponível após a importação</strong></div>}
                 {lot && activity.isLoading && <p>Carregando histórico auditável…</p>}

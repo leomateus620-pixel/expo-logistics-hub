@@ -13,7 +13,7 @@ import {
 import { useSalesStore } from '../../sales/useSalesSelection';
 import { Button } from '@/components/ui/button';
 import { STATUS_CONFIG } from '../../constants';
-import { useLotContractVersions } from '../../hooks/useCommercialMap';
+import { useLotContractVersions, useLotSaleHistory } from '../../hooks/useCommercialMap';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type {
   CommercialLot,
@@ -33,6 +33,7 @@ import { LotAvailabilityDialog } from '../commercial/LotAvailabilityDialog';
 import { LotEditDialog } from '../commercial/LotEditDialog';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
 import { LotPricing2028Panel } from './LotPricing2028Panel';
+import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
 
 const AREA_VALIDATION_LABELS: Record<string, string> = {
   VALIDATED: 'Área conferida no croqui oficial',
@@ -102,6 +103,7 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
     persisted ? lot?.id ?? null : null,
     persisted && permissions.canManageContracts,
   );
+  const saleHistory = useLotSaleHistory(persisted ? lot?.id ?? null : null, lot?.status === 'SOLD');
 
   useLayoutEffect(() => {
     setWorkflow(null);
@@ -213,6 +215,8 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
             <dd>{persisted ? 'Persistido e auditável' : 'Referência em leitura'}</dd>
           </div>
         </dl>
+
+        <LotSaleHistoryCard sale={saleHistory.data} loading={saleHistory.isLoading} />
 
         {persisted && permissions.canManageContracts && (
           <section
