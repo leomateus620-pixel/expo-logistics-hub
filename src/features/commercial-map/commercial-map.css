@@ -1068,6 +1068,23 @@
 .commercial-map-activity span { display: flex; flex-direction: column; }
 .commercial-map-activity strong { font-size: 9px; text-transform: capitalize; }
 .commercial-map-activity small { margin-top: 2px; color: #7b8980; font-size: 8px; }
+.commercial-sale-history { display: grid; gap: 9px; margin: 10px 0 12px; padding: 11px; border: 1px solid oklch(var(--border)); border-radius: 10px; background: oklch(var(--card)); color: oklch(var(--card-foreground)); }
+.commercial-sale-history > header { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+.commercial-sale-history > header svg { width: 16px; color: oklch(var(--destructive)); }
+.commercial-sale-history > header div { display: flex; min-width: 0; flex-direction: column; }
+.commercial-sale-history > header strong { font-size: 10px; }
+.commercial-sale-history > header span { overflow: hidden; color: oklch(var(--muted-foreground)); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.commercial-sale-history > header b { font-size: 11px; }
+.commercial-sale-history dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin: 0; }
+.commercial-sale-history dl div { display: flex; min-width: 0; flex-direction: column; padding: 6px; border-radius: 7px; background: oklch(var(--muted)); }
+.commercial-sale-history dt { color: oklch(var(--muted-foreground)); font-size: 8px; }
+.commercial-sale-history dd { overflow-wrap: anywhere; font-size: 9px; font-weight: 700; }
+.commercial-sale-history__installments { display: grid; max-height: 180px; gap: 4px; overflow-y: auto; }
+.commercial-sale-history__installments > div { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; align-items: center; gap: 6px; padding: 6px 2px; border-top: 1px solid oklch(var(--border)); }
+.commercial-sale-history__installments svg { width: 12px; color: oklch(var(--muted-foreground)); }
+.commercial-sale-history__installments span { display: flex; flex-direction: column; }
+.commercial-sale-history__installments strong, .commercial-sale-history__installments b { font-size: 9px; }
+.commercial-sale-history__installments small { color: oklch(var(--muted-foreground)); font-size: 8px; }
 
 .commercial-map-empty { display: flex; min-height: 200px; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 25px; color: #738078; text-align: center; }
 .commercial-map-empty svg { width: 24px; height: 24px; color: #97a39b; }

@@ -24,11 +24,6 @@ export function paymentErrors(value: SalesPaymentDraft) {
   };
 }
 
-function formatDueDate(iso: string): string {
-  const [year, month, day] = iso.split('-');
-  return `${day}/${month}/${year}`;
-}
-
 export function SalesPaymentForm({ value, onChange, installments, showErrors }: Props) {
   const errors = paymentErrors(value);
   const set = (patch: Partial<SalesPaymentDraft>) => onChange({ ...value, ...patch });
