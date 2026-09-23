@@ -16,7 +16,7 @@ interface Props {
 
 export function paymentErrors(value: SalesPaymentDraft) {
   return {
-    firstDueDate: value.dueDates.every(Boolean) ? null : 'Informe todos os vencimentos.',
+    firstDueDate: value.dueDates.length > 0 && value.dueDates.every(Boolean) ? null : 'Informe todos os vencimentos.',
     installmentCount: value.paymentType === 'INSTALLMENTS' && value.installmentCount < 2
       ? 'Parcelado exige pelo menos 2 parcelas.'
       : value.dueDates.length > 36 ? 'O limite é de 36 vencimentos.'
