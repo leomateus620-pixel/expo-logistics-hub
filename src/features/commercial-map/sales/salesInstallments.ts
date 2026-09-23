@@ -4,13 +4,25 @@ function toCents(value: number): number {
   return Math.round((value + Number.EPSILON) * 100);
 }
 
-function addMonthsIso(isoDate: string, months: number): string {
+export function addMonthsIso(isoDate: string, months: number): string {
   const [year, month, day] = isoDate.split('-').map(Number);
   if (!year || !month || !day) return isoDate;
   const base = new Date(Date.UTC(year, month - 1 + months, 1));
   const lastDay = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth() + 1, 0)).getUTCDate();
   base.setUTCDate(Math.min(day, lastDay));
   return base.toISOString().slice(0, 10);
+}
+
+export function buildInstallmentScheduleFromDates(total: number, dueDates: string[]): SalesInstallment[] {
+  if (!Number.isFinite(total) || total <= 0 || dueDates.length === 0) return [];
+  const totalCents = toCents(total);
+  const baseCents = Math.floor(totalCents / dueDates.length);
+  const remainder = totalCents - baseCents * dueDates.length;
+  return dueDates.map((dueDate, index) => ({
+    number: index + 1,
+    dueDate,
+    amount: (index === dueDates.length - 1 ? baseCents + remainder : baseCents) / 100,
+  }));
 }
 
 /**
@@ -24,20 +36,11 @@ export function buildInstallmentSchedule(
   firstDueDate: string,
 ): SalesInstallment[] {
   if (!Number.isFinite(total) || total <= 0) return [];
-  const installments = Math.max(1, Math.floor(count));
-  const totalCents = toCents(total);
-  const baseCents = Math.floor(totalCents / installments);
-  const remainder = totalCents - baseCents * installments;
-
-  return Array.from({ length: installments }, (_, index) => {
-    const isLast = index === installments - 1;
-    const cents = isLast ? baseCents + remainder : baseCents;
-    return {
-      number: index + 1,
-      dueDate: addMonthsIso(firstDueDate, index),
-      amount: cents / 100,
-    } satisfies SalesInstallment;
-  });
+  const installments = Math.max(1, Math.min(36, Math.floor(count)));
+  return buildInstallmentScheduleFromDates(
+    total,
+    Array.from({ length: installments }, (_, index) => addMonthsIso(firstDueDate, index)),
+  );
 }
 
 export function installmentsSum(installments: SalesInstallment[]): number {
