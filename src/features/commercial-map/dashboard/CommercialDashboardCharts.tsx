@@ -71,7 +71,7 @@ export function CommercialDashboardLotChart({
               <PieChart>
                 <Pie
                   data={rows}
-                  dataKey="areaSqm"
+                  dataKey="lotCount"
                   nameKey="name"
                   cx="50%"
                   cy="50%"
@@ -99,32 +99,34 @@ export function CommercialDashboardLotChart({
                 <Tooltip
                   active={canHover() ? undefined : false}
                   content={({ active, payload }) => {
-                    const row = active ? payload?.[0]?.payload as AreaChartRow | undefined : undefined;
+                    const row = active ? payload?.[0]?.payload as LotChartRow | undefined : undefined;
                     if (!row) return null;
                     return <div className="commercial-dashboard-chart-tooltip">
                       <strong>{row.name}</strong>
-                      <span>{formatDashboardArea(row.areaSqm)} · {formatDashboardPercentage(row.percentage)}</span>
-                      <small>{formatDashboardInteger(row.lotCount)} {row.lotCount === 1 ? 'lote' : 'lotes'}</small>
+                      <span>{formatDashboardInteger(row.lotCount)} {row.lotCount === 1 ? 'lote' : 'lotes'} · {formatDashboardPercentage(row.percentage)}</span>
+                      <small>{formatDashboardAreaWithCoverage(row.areaSqm, row.lotCount, aggregate.byStatus[row.status].areaPendingCount, aggregate.commercialLots)}</small>
                     </div>;
                   }}
                 />
               </PieChart>
             </ResponsiveContainer>
             <div className="commercial-dashboard-donut-center">
-              <strong>{formatDashboardPercentage(aggregate.soldAreaPercentage)}</strong>
-              <span>área vendida</span>
+              <strong>{formatDashboardPercentage(aggregate.soldLotPercentage)}</strong>
+              <span>lotes vendidos</span>
             </div>
           </div>
           <div className="commercial-dashboard-donut-detail">
-            <strong>{formatDashboardArea(aggregate.soldAreaSqm)}</strong>
-            <span>vendidos de {formatDashboardArea(aggregate.totalAreaSqm)} cadastrados</span>
+            <strong>{formatDashboardInteger(aggregate.soldLots)} de {formatDashboardInteger(aggregate.commercialLots)} lotes</strong>
+            <span>{aggregate.totalAreaSqm > 0
+              ? `${formatDashboardPercentage(aggregate.soldAreaPercentage)} da área · ${formatDashboardArea(aggregate.soldAreaSqm)} de ${formatDashboardArea(aggregate.totalAreaSqm)}`
+              : 'Área oficial pendente de cadastro'}</span>
           </div>
         </div>
       ) : (
-        <div className="commercial-dashboard-chart-empty">Ainda não há metragem oficial válida para compor o gráfico de área.</div>
+        <div className="commercial-dashboard-chart-empty">Ainda não há lotes comerciais cadastrados para compor o gráfico.</div>
       )}
 
-      <div className="commercial-dashboard-status-list" aria-label="Distribuição comercial por área e quantidade">
+      <div className="commercial-dashboard-status-list" aria-label="Distribuição comercial por quantidade de lotes e área">
         {AREA_STATUSES.map((status) => {
           const summary = aggregate.byStatus[status];
           return <button
