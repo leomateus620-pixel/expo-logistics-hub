@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildInstallmentSchedule, installmentsSum } from '@/features/commercial-map/sales/salesInstallments';
+import { buildInstallmentSchedule, buildInstallmentScheduleFromDates, installmentsSum } from '@/features/commercial-map/sales/salesInstallments';
 import { summarizeCart } from '@/features/commercial-map/sales/salesPricing';
 import type { SalesSelectionEntry } from '@/features/commercial-map/sales/salesTypes';
 import { isValidCnpj, isValidCpf, isValidDocument, isValidPhoneBr } from '@/features/commercial-map/sales/salesValidation';
@@ -75,6 +75,14 @@ describe('cronograma de parcelas', () => {
     const schedule = buildInstallmentSchedule(18900, 1, '2028-05-10');
     expect(schedule).toHaveLength(1);
     expect(schedule[0].amount).toBe(18900);
+  });
+
+  it('aceita até 36 vencimentos personalizados e preserva a soma exata', () => {
+    const dueDates = Array.from({ length: 30 }, (_, index) => `2028-${String((index % 12) + 1).padStart(2, '0')}-10`);
+    const schedule = buildInstallmentScheduleFromDates(1000, dueDates);
+    expect(schedule).toHaveLength(30);
+    expect(schedule.map((item) => item.dueDate)).toEqual(dueDates);
+    expect(installmentsSum(schedule)).toBe(1000);
   });
 });
 

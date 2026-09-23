@@ -101,6 +101,18 @@ export interface CommercialMapFetchOptions {
   signal?: AbortSignal;
   recordStage?: CommercialMapStageRecorder;
 }
+
+export interface LotSaleHistory {
+  orderId: string;
+  buyerName: string;
+  stage: string;
+  paymentType: string;
+  paymentMethod: string;
+  officialArea: number;
+  itemTotal: number;
+  createdAt: string;
+  installments: Array<{ number: number; dueDate: string; amount: number; status: string }>;
+}
 interface MapReadContext { signal?: AbortSignal; recordStage: CommercialMapStageRecorder }
 // Existing migration-backed query builders are untyped; preserve their payload.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1174,4 +1186,40 @@ export async function fetchLotActivity(lotId: string): Promise<MapActivity[]> {
     afterState: row.after_state,
     createdAt: row.created_at,
   }));
+}
+
+export async function fetchLotSaleHistory(lotId: string): Promise<LotSaleHistory | null> {
+  const { data: item, error: itemError } = await db
+    .from('lot_sale_order_items')
+    .select('order_id,official_area_snapshot,item_total')
+    .eq('lot_id', lotId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (itemError) throw itemError;
+  if (!item) return null;
+
+  const [{ data: order, error: orderError }, { data: installments, error: installmentsError }] = await Promise.all([
+    db.from('lot_sale_orders').select('id,buyer_name,stage,payment_type,payment_method,created_at').eq('id', item.order_id).maybeSingle(),
+    db.from('lot_sale_installments').select('installment_number,due_date,amount,payment_status').eq('order_id', item.order_id).order('installment_number'),
+  ]);
+  if (orderError) throw orderError;
+  if (installmentsError) throw installmentsError;
+  if (!order) return null;
+  return {
+    orderId: order.id,
+    buyerName: order.buyer_name,
+    stage: order.stage,
+    paymentType: order.payment_type,
+    paymentMethod: order.payment_method,
+    officialArea: Number(item.official_area_snapshot),
+    itemTotal: Number(item.item_total),
+    createdAt: order.created_at,
+    installments: (installments ?? []).map((row: { installment_number: number; due_date: string; amount: number | string; payment_status: string }) => ({
+      number: row.installment_number,
+      dueDate: row.due_date,
+      amount: Number(row.amount),
+      status: row.payment_status,
+    })),
+  };
 }

@@ -8,6 +8,7 @@ import { summarizeCart } from '@/features/commercial-map/sales/salesPricing';
 import type { CommercialLot } from '@/features/commercial-map/types';
 import type { LotPricing2028 } from '@/features/commercial-map/utils/lotPricing2028';
 import { useCommercialMapStore } from '@/features/commercial-map/state/useCommercialMapStore';
+import { STATUS_CONFIG } from '@/features/commercial-map/constants';
 
 function lot(id: string, overrides: Partial<CommercialLot> = {}): CommercialLot {
   return {
@@ -139,6 +140,12 @@ describe('cálculo da multi-seleção', () => {
 });
 
 describe('preset visual do modo Vendas', () => {
+  it('reserva o vermelho para vendidos e usa grafite nos bloqueados', () => {
+    expect(STATUS_CONFIG.SOLD.color).toBe('#dc2626');
+    expect(STATUS_CONFIG.BLOCKED.color).toBe('#64748b');
+    expect(STATUS_CONFIG.BLOCKED.color).not.toBe(STATUS_CONFIG.SOLD.color);
+  });
+
   it('não liga o modo gráfico reduzido do mapa', () => {
     useCommercialMapStore.getState().setSalesPresentationActive(true);
     expect(useCommercialMapStore.getState().salesPresentationActive).toBe(true);

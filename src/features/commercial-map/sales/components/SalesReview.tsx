@@ -46,6 +46,12 @@ export function SalesReview({ summary, stage, buyer, payment, installments }: Pr
         <dd className="sales-review__total">{formatBrl(summary.valueTotal)}</dd>
       </dl>
 
+      <div className="sales-review__list" aria-label="Vencimentos finais">
+        {installments.map((item) => (
+          <div key={item.number}><span>{String(item.number).padStart(2, '0')} · {item.dueDate.split('-').reverse().join('/')}</span><strong>{formatBrl(item.amount)}</strong></div>
+        ))}
+      </div>
+
       <p className="sales-cart__empty">
         Valores do espaço por m², sem taxa administrativa, PPCI, limpeza ou licença.
       </p>

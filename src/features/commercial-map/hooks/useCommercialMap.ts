@@ -15,6 +15,7 @@ import {
   createCommercialLot,
   signedReferenceUrl,
   fetchLotActivity,
+  fetchLotSaleHistory,
   fetchLotContractVersions,
   mergeCommercialLots,
   publishCommercialMap,
@@ -405,6 +406,15 @@ export function useLotActivity(lotId: string | null) {
     queryFn: () => fetchLotActivity(lotId!),
     enabled: Boolean(lotId && !lotId.startsWith('reference:')),
     staleTime: 15_000,
+  });
+}
+
+export function useLotSaleHistory(lotId: string | null, enabled = true) {
+  return useQuery({
+    queryKey: ['commercial-map', 'sale-history', lotId],
+    queryFn: () => fetchLotSaleHistory(lotId as string),
+    enabled: Boolean(lotId && enabled && !lotId.startsWith('reference:')),
+    staleTime: 30_000,
   });
 }
 

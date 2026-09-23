@@ -88,11 +88,11 @@ export const STATUS_CONFIG: Record<CommercialStatus, {
     description: 'Negociação comercial em andamento.',
   },
   SOLD: {
-    label: 'Vendido', shortLabel: 'Vendido', color: '#7c3aed', surface: '#ede9fe', border: '#5b21b6', symbol: '◆',
+    label: 'Vendido', shortLabel: 'Vendido', color: '#dc2626', surface: '#fee2e2', border: '#991b1b', symbol: '◆',
     description: 'Venda confirmada e vinculada ao contrato.',
   },
   BLOCKED: {
-    label: 'Bloqueado', shortLabel: 'Bloqueado', color: '#ef4444', surface: '#fee2e2', border: '#b91c1c', symbol: '⌧',
+    label: 'Bloqueado', shortLabel: 'Bloqueado', color: '#64748b', surface: '#e2e8f0', border: '#334155', symbol: '⌧',
     description: 'Lote bloqueado por decisão administrativa.',
   },
   UNAVAILABLE: {

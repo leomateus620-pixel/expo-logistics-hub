@@ -42,6 +42,7 @@ export interface SalesPaymentDraft {
   installmentCount: number;
   paymentMethod: SalesPaymentMethod;
   firstDueDate: string;
+  dueDates: string[];
 }
 
 export interface SalesInstallment {

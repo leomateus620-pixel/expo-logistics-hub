@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatBrl } from '../../utils/lotPricing2028';
-import { buildInstallmentSchedule } from '../salesInstallments';
+import { buildInstallmentScheduleFromDates } from '../salesInstallments';
 import type { SalesCartSummary } from '../salesPricing';
 import { useSalesCheckout } from '../useSalesCheckout';
 import { useSalesStore } from '../useSalesSelection';
@@ -35,11 +35,13 @@ export function SalesCheckoutDialog({ summary }: Props) {
   const [step, setStep] = useState(0);
   const [showErrors, setShowErrors] = useState(false);
   const [buyer, setBuyer] = useState<SalesBuyerDraft>(EMPTY_BUYER);
+  const initialDueDate = defaultDueDate();
   const [payment, setPayment] = useState<SalesPaymentDraft>({
     paymentType: 'CASH',
     installmentCount: 1,
     paymentMethod: 'PIX',
-    firstDueDate: defaultDueDate(),
+    firstDueDate: initialDueDate,
+    dueDates: [initialDueDate],
   });
   // Chave de idempotência por tentativa de checkout: reenvio não duplica a venda.
   const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID());
@@ -55,12 +57,8 @@ export function SalesCheckoutDialog({ summary }: Props) {
   }, [open]);
 
   const installments = useMemo(
-    () => buildInstallmentSchedule(
-      summary.valueTotal,
-      payment.paymentType === 'CASH' ? 1 : payment.installmentCount,
-      payment.firstDueDate,
-    ),
-    [summary.valueTotal, payment.paymentType, payment.installmentCount, payment.firstDueDate],
+    () => buildInstallmentScheduleFromDates(summary.valueTotal, payment.dueDates),
+    [summary.valueTotal, payment.dueDates],
   );
 
   const stepValid = useMemo(() => {
@@ -93,7 +91,7 @@ export function SalesCheckoutDialog({ summary }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(next) => !checkout.isPending && setOpen(next)}>
-      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="sales-checkout-dialog sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Finalizar venda</DialogTitle>
           <DialogDescription>
@@ -110,15 +108,17 @@ export function SalesCheckoutDialog({ summary }: Props) {
           ))}
         </div>
 
-        {step === 0 && <SalesBuyerForm value={buyer} onChange={setBuyer} showErrors={showErrors} />}
-        {step === 1 && (
-          <SalesPaymentForm value={payment} onChange={setPayment} installments={installments} showErrors={showErrors} />
-        )}
-        {step === 2 && (
-          <SalesReview summary={summary} stage={stage} buyer={buyer} payment={payment} installments={installments} />
-        )}
+        <div className="sales-checkout-dialog__body">
+          {step === 0 && <SalesBuyerForm value={buyer} onChange={setBuyer} showErrors={showErrors} />}
+          {step === 1 && (
+            <SalesPaymentForm value={payment} onChange={setPayment} installments={installments} showErrors={showErrors} />
+          )}
+          {step === 2 && (
+            <SalesReview summary={summary} stage={stage} buyer={buyer} payment={payment} installments={installments} />
+          )}
+        </div>
 
-        <div className="flex gap-2 pt-1">
+        <div className="sales-checkout-dialog__actions">
           <Button
             type="button"
             variant="outline"
