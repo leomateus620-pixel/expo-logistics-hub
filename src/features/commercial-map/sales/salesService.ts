@@ -128,6 +128,10 @@ export async function registerSaleOrder(payload: SalesOrderPayload): Promise<str
     p_expected_total: payload.expectedTotal,
     p_notes: payload.buyer.notes,
   });
-  if (error) throw new Error(describeSalesError(error.message));
-  return data as string;
+  if (error) throw buildSalesError(error as PostgrestLikeError, payload);
+  // Retorno nulo/inválido nunca é tratado como sucesso.
+  if (typeof data !== 'string' || !UUID_PATTERN.test(data)) {
+    throw buildSalesError({ message: 'INVALID_ORDER_ID_RETURNED', code: null }, payload);
+  }
+  return data;
 }
