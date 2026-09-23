@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 import type { LotPricing2028 } from '../utils/lotPricing2028';
 import { fetchSalesPricing, registerSaleOrder } from './salesService';
+import { SalesOrderError } from './salesErrors';
 import { summarizeCart, type SalesCartSummary } from './salesPricing';
 import { useSalesStore } from './useSalesSelection';
 import type { SalesOrderPayload } from './salesTypes';
