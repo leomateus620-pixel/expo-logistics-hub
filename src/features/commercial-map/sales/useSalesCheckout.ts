@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 import type { LotPricing2028 } from '../utils/lotPricing2028';
 import { fetchSalesPricing, registerSaleOrder } from './salesService';
+import { SalesOrderError } from './salesErrors';
 import { summarizeCart, type SalesCartSummary } from './salesPricing';
 import { useSalesStore } from './useSalesSelection';
 import type { SalesOrderPayload } from './salesTypes';
@@ -43,7 +44,14 @@ export function useSalesCheckout() {
       toast({ title: 'Venda registrada', description: 'Os espaços já constam como vendidos no mapa.' });
     },
     onError: (error: Error) => {
-      toast({ title: 'Venda não concluída', description: error.message, variant: 'destructive' });
+      const indeterminate = error instanceof SalesOrderError && error.indeterminate;
+      // Seleção e formulário são preservados; a mesma chave de idempotência é reaproveitada.
+      if (indeterminate) void queryClient.invalidateQueries({ queryKey: ['commercial-map'] });
+      toast({
+        title: indeterminate ? 'Resultado não confirmado' : 'Venda não concluída',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
   });
 }

@@ -1,6 +1,13 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { LotPricing2028, LotPricingResolution } from '../utils/lotPricing2028';
 import type { SalesOrderPayload } from './salesTypes';
+import {
+  SalesOrderError,
+  classifySalesError,
+  logSalesFailure,
+  sanitizeDiagnosticText,
+  type SalesErrorKind,
+} from './salesErrors';
 
 const PRICING_COLUMNS = 'lot_id,public_identifier,pavilion,block,lot_num,corner_status,corner_confirmed,official_area_sqm,area_validation_status,renovacao_price_per_sqm,renovacao_total,renovacao_rule_label,segunda_price_per_sqm,segunda_total,segunda_rule_label,resolution_status';
 
@@ -41,6 +48,8 @@ export async function fetchSalesPricing(lotIds: string[]): Promise<LotPricing202
   return (data ?? []).map((row) => mapRow(row as PricingRow));
 }
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const ERROR_MESSAGES: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
   [/MAP_PERMISSION_DENIED/, () => 'Você não tem permissão para registrar vendas neste mapa.'],
   [/LOT_NOT_SELLABLE:(.+)/, (match) => `O espaço ${match[1]} não está mais disponível para venda.`],
@@ -53,12 +62,48 @@ const ERROR_MESSAGES: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
   [/AUTH_REQUIRED/, () => 'Sessão expirada. Entre novamente para concluir a venda.'],
 ];
 
-export function describeSalesError(message: string): string {
+const KIND_FALLBACK: Record<SalesErrorKind, string> = {
+  BUSINESS: 'Não foi possível concluir a venda. Nenhum espaço foi alterado.',
+  AUTH: 'Sessão expirada ou sem permissão para registrar vendas. Entre novamente e tente de novo.',
+  SCHEMA: 'Erro interno ao gravar a venda. Nenhum espaço foi alterado. Avise a equipe técnica com o código da falha.',
+  NETWORK: 'A conexão falhou antes da resposta do servidor. Não é possível confirmar se a venda foi registrada — tente novamente sem alterar a seleção.',
+  UNKNOWN: 'Não foi possível concluir a venda. Nenhum espaço foi alterado.',
+};
+
+export function describeSalesError(message: string, kind: SalesErrorKind = 'UNKNOWN'): string {
   for (const [pattern, format] of ERROR_MESSAGES) {
     const match = message.match(pattern);
     if (match) return format(match);
   }
-  return 'Não foi possível concluir a venda. Nenhum espaço foi alterado.';
+  return KIND_FALLBACK[kind];
+}
+
+type PostgrestLikeError = {
+  message?: string;
+  code?: string | null;
+  details?: unknown;
+  hint?: unknown;
+  status?: number | null;
+};
+
+function buildSalesError(raw: PostgrestLikeError, payload: SalesOrderPayload): SalesOrderError {
+  const message = raw.message ?? 'Erro desconhecido';
+  const code = raw.code ?? null;
+  const kind = classifySalesError(message, code);
+  const diagnostics = {
+    operation: 'register_commercial_sale_order' as const,
+    kind,
+    correlationId: payload.idempotencyKey,
+    code,
+    details: sanitizeDiagnosticText(raw.details),
+    hint: sanitizeDiagnosticText(raw.hint),
+    rawMessage: sanitizeDiagnosticText(message),
+    httpStatus: typeof raw.status === 'number' ? raw.status : null,
+    stage: payload.stage,
+    lotCount: payload.lotIds.length,
+  };
+  logSalesFailure(diagnostics);
+  return new SalesOrderError(describeSalesError(message, kind), diagnostics);
 }
 
 /** Uma única transação no servidor: ou vende todos os espaços, ou nenhum. */
@@ -83,6 +128,10 @@ export async function registerSaleOrder(payload: SalesOrderPayload): Promise<str
     p_expected_total: payload.expectedTotal,
     p_notes: payload.buyer.notes,
   });
-  if (error) throw new Error(describeSalesError(error.message));
-  return data as string;
+  if (error) throw buildSalesError(error as PostgrestLikeError, payload);
+  // Retorno nulo/inválido nunca é tratado como sucesso.
+  if (typeof data !== 'string' || !UUID_PATTERN.test(data)) {
+    throw buildSalesError({ message: 'INVALID_ORDER_ID_RETURNED', code: null }, payload);
+  }
+  return data;
 }
