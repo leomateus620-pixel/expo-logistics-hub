@@ -167,8 +167,8 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
         </div>
         <div className="commercial-dashboard-overview-grid">
           <div className="commercial-dashboard-overview-analysis">
-            <div className="commercial-dashboard-subheading"><strong>Distribuição por área</strong><span>Dados comerciais do próprio mapa</span></div>
-            <CommercialDashboardAreaChart aggregate={overall} highlightedStatus={highlightedStatus} onHoverStatus={onHoverStatus} onToggleStatus={onToggleStatus} />
+            <div className="commercial-dashboard-subheading"><strong>Distribuição dos lotes</strong><span>Dados comerciais do próprio mapa</span></div>
+            <CommercialDashboardLotChart aggregate={overall} highlightedStatus={highlightedStatus} onHoverStatus={onHoverStatus} onToggleStatus={onToggleStatus} />
             <CommercialDashboardValueChart aggregate={overall} highlightedStatus={highlightedStatus} onHoverStatus={onHoverStatus} onToggleStatus={onToggleStatus} />
             <div className="commercial-dashboard-potential-breakdown" aria-label="Potencial por situação comercial">
               <div><span>Disponível</span><strong>{displayedValue(overall.availableValue, overall.availableLots, overall.byStatus.AVAILABLE.pricedLotCount)}</strong></div>
