@@ -1,0 +1,3389 @@
+{
+  "profile": "desktop",
+  "motion": "reduce",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "region": "exporural",
+  "rows": [
+    {
+      "label": "map-before-visit",
+      "at": 1790145838933,
+      "environment": {
+        "at": 49999.299999952316,
+        "position": [
+          3.9370884151670626,
+          112.19501247300705,
+          106.42403846803235
+        ],
+        "quaternion": [
+          -0.3919388644454563,
+          0.026630852900829772,
+          0.011351018127214578,
+          0.9195356864192147
+        ],
+        "target": [
+          -2.2546344999999945,
+          0.744,
+          -0.3831818185993967
+        ],
+        "projection": [
+          1.5733689807478843,
+          0,
+          0,
+          0,
+          0,
+          2.9042108776758226,
+          0,
+          0,
+          0,
+          0,
+          -1.0010037603030404,
+          -1,
+          0,
+          0,
+          -1.2880705620296615,
+          0
+        ],
+        "materials": 686,
+        "objects": 1478,
+        "threeListeners": 332,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 557,
+        "textures": 131,
+        "programs": 222,
+        "calls": 811,
+        "triangles": 672011,
+        "width": 1425,
+        "height": 772,
+        "dpr": 1,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 49999.60000002384,
+        "calls": 811,
+        "triangles": 672011,
+        "geometries": 557,
+        "textures": 131,
+        "programs": 222,
+        "dpr": 1,
+        "width": 1425,
+        "height": 772,
+        "heapBytes": 124683884,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 273,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": null,
+      "poiCount": 0,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": null,
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "walk-start",
+      "at": 1790145846722,
+      "environment": {
+        "at": 57800.10000002384,
+        "position": [
+          10.11272727272727,
+          0.373,
+          -16.071634219993083
+        ],
+        "quaternion": [
+          0,
+          0.9997468856785308,
+          0.022498101610553614,
+          0
+        ],
+        "target": [
+          10.11272727272727,
+          0.3550060743849359,
+          -15.672039151653946
+        ],
+        "projection": [
+          0.8503840459892649,
+          0,
+          0,
+          0,
+          0,
+          1.5696855771174902,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 716,
+        "objects": 1563,
+        "threeListeners": 371,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 569,
+        "textures": 132,
+        "programs": 224,
+        "calls": 499,
+        "triangles": 655314,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 57800.5,
+        "calls": 499,
+        "triangles": 655314,
+        "geometries": 569,
+        "textures": 132,
+        "programs": 224,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 123245940,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 523,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 10.11272727272727,
+          "y": 0.13,
+          "z": -16.071634219993083
+        },
+        "yaw": 3.141592653589793,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 0,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 252,
+        "totalSampledFrames": 252,
+        "averageFps": 40.635985422802726,
+        "averageFrameTimeMs": 24.60873015863555,
+        "p95FrameTimeMs": 45.39999997615814,
+        "p99FrameTimeMs": 72.60000002384186,
+        "stallsOver50Ms": 6,
+        "unpresentedActiveFrames": 0,
+        "longestPresentationGapMs": 94.79999995231628,
+        "presentedFrames": 254,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 7796.899999976158,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 499,
+          "triangles": 655314,
+          "geometries": 569,
+          "textures": 132,
+          "programs": 224,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 123245940
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 528,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poi": "Q-R-01Lote 01896,85 m²BloqueadoExporuralValor oficial ainda não definidoValores e detalhes",
+      "poiCount": 1,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "walk",
+        "mode": "walk",
+        "cart": null,
+        "helicopter": null
+      },
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "walk-after-forward",
+      "at": 1790145854002,
+      "environment": {
+        "at": 65088.699999928474,
+        "position": [
+          10.11272727272727,
+          0.373,
+          -14.766187519112128
+        ],
+        "quaternion": [
+          0,
+          0.9997468856785308,
+          0.022498101610553614,
+          0
+        ],
+        "target": [
+          10.11272727272727,
+          0.3550060743849359,
+          -14.366592450772991
+        ],
+        "projection": [
+          0.8503840459892649,
+          0,
+          0,
+          0,
+          0,
+          1.5696855771174902,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 716,
+        "objects": 1563,
+        "threeListeners": 371,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 569,
+        "textures": 132,
+        "programs": 224,
+        "calls": 493,
+        "triangles": 654650,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 65089,
+        "calls": 493,
+        "triangles": 654650,
+        "geometries": 569,
+        "textures": 132,
+        "programs": 224,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 138724560,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 747,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 10.11272727272727,
+          "y": 0.13,
+          "z": -14.766187519112128
+        },
+        "yaw": 3.141592653589793,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 8.702978005873033,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 225,
+        "totalSampledFrames": 225,
+        "averageFps": 31.340102795224936,
+        "averageFrameTimeMs": 31.90800000031789,
+        "p95FrameTimeMs": 37.39999997615814,
+        "p99FrameTimeMs": 47.300000071525574,
+        "stallsOver50Ms": 0,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 66.10000002384186,
+        "presentedFrames": 482,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 15085.299999952316,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 493,
+          "triangles": 654650,
+          "geometries": 569,
+          "textures": 132,
+          "programs": 224,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 138724560
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 756,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poi": "Q-R-02Lote 02896,85 m²BloqueadoExporuralValor oficial ainda não definidoValores e detalhes",
+      "poiCount": 1,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "walk",
+        "mode": "walk",
+        "cart": null,
+        "helicopter": null
+      },
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "cart-ready",
+      "at": 1790145856732,
+      "environment": {
+        "at": 67797.69999992847,
+        "position": [
+          9.562727272727269,
+          0.6164131503310002,
+          -15.375368637578799
+        ],
+        "quaternion": [
+          0,
+          0.9964842320915248,
+          0.0837805179798032,
+          0
+        ],
+        "target": [
+          9.562727272727269,
+          0.3440363947348146,
+          -13.766996290996898
+        ],
+        "projection": [
+          0.8342285979402512,
+          0,
+          0,
+          0,
+          0,
+          1.539864963814583,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 729,
+        "objects": 1598,
+        "threeListeners": 371,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 599,
+        "textures": 134,
+        "programs": 228,
+        "calls": 524,
+        "triangles": 669386,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 67798,
+        "calls": 524,
+        "triangles": 669386,
+        "geometries": 599,
+        "textures": 134,
+        "programs": 228,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 137134379,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 794,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 9.562727272727269,
+          "y": 0.13,
+          "z": -14.566187519112129
+        },
+        "yaw": 3.141592653589793,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 8.702978005873033,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 288,
+        "totalSampledFrames": 288,
+        "averageFps": 29.15186298603291,
+        "averageFrameTimeMs": 34.30312500024835,
+        "p95FrameTimeMs": 38.90000009536743,
+        "p99FrameTimeMs": 55.60000002384186,
+        "stallsOver50Ms": 4,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 571.7000000476837,
+        "presentedFrames": 545,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 17794.299999952316,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 524,
+          "triangles": 669386,
+          "geometries": 599,
+          "textures": 134,
+          "programs": 228,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 137134379
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 819,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poiCount": 0,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "cart-driving",
+        "mode": "cart",
+        "cart": {
+          "position": {
+            "x": 9.562727272727269,
+            "y": 0.13,
+            "z": -14.566187519112129
+          },
+          "yaw": 3.141592653589793,
+          "speed": 0,
+          "steering": 0,
+          "blocked": false
+        },
+        "helicopter": null
+      },
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "cart-after-forward",
+      "at": 1790145862791,
+      "environment": {
+        "at": 73856.79999995232,
+        "position": [
+          9.562727272727269,
+          0.40647497983972597,
+          -11.137945354233644
+        ],
+        "quaternion": [
+          0,
+          0.9967217010373489,
+          0.08090643164306384,
+          0
+        ],
+        "target": [
+          9.562727272727269,
+          0.13403639473481463,
+          -9.4708576045977
+        ],
+        "projection": [
+          0.8342285979402512,
+          0,
+          0,
+          0,
+          0,
+          1.539864963814583,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 730,
+        "objects": 1599,
+        "threeListeners": 373,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 599,
+        "textures": 134,
+        "programs": 228,
+        "calls": 495,
+        "triangles": 704419,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 73857.10000002384,
+        "calls": 495,
+        "triangles": 704419,
+        "geometries": 599,
+        "textures": 134,
+        "programs": 228,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 151342823,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 978,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 9.562727272727269,
+          "y": -0.08,
+          "z": -10.71207483275012
+        },
+        "yaw": 3.141592653589793,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 8.702978005873033,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 179,
+        "totalSampledFrames": 179,
+        "averageFps": 30.00033519915609,
+        "averageFrameTimeMs": 33.332960893987945,
+        "p95FrameTimeMs": 33.700000047683716,
+        "p99FrameTimeMs": 34.799999952316284,
+        "stallsOver50Ms": 0,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 35.199999928474426,
+        "presentedFrames": 727,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 23853.399999976158,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 495,
+          "triangles": 704419,
+          "geometries": 599,
+          "textures": 134,
+          "programs": 228,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 151342823
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 1001,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poiCount": 0,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "cart-driving",
+        "mode": "cart",
+        "cart": {
+          "position": {
+            "x": 9.562727272727269,
+            "y": -0.08,
+            "z": -10.71207483275012
+          },
+          "yaw": 3.141592653589793,
+          "speed": 0.78,
+          "steering": 0,
+          "blocked": false
+        },
+        "helicopter": null
+      },
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "cart-after-brake-reverse-steer",
+      "at": 1790145869429,
+      "environment": {
+        "at": 80494.19999992847,
+        "position": [
+          9.535106786026239,
+          0.40641315033100023,
+          -9.950052907474207
+        ],
+        "quaternion": [
+          -0.062388023876800966,
+          0.6650303108442156,
+          0.05590859347893271,
+          0.742102856287726
+        ],
+        "target": [
+          7.936223491287848,
+          0.13403639473481463,
+          -10.125730401745063
+        ],
+        "projection": [
+          0.8342285979402512,
+          0,
+          0,
+          0,
+          0,
+          1.539864963814583,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 730,
+        "objects": 1599,
+        "threeListeners": 394,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 614,
+        "textures": 137,
+        "programs": 231,
+        "calls": 484,
+        "triangles": 435223,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 80494.60000002384,
+        "calls": 484,
+        "triangles": 435223,
+        "geometries": 614,
+        "textures": 137,
+        "programs": 231,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 152532740,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 1182,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 8.819908207045108,
+          "y": -0.08,
+          "z": -10.02882109416259
+        },
+        "yaw": 4.815449889696148,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 8.702978005873033,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 370,
+        "totalSampledFrames": 370,
+        "averageFps": 29.366477768838212,
+        "averageFrameTimeMs": 34.05243243236799,
+        "p95FrameTimeMs": 34.59999990463257,
+        "p99FrameTimeMs": 37,
+        "stallsOver50Ms": 2,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 326.39999997615814,
+        "presentedFrames": 918,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 30490.899999976158,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 484,
+          "triangles": 435223,
+          "geometries": 614,
+          "textures": 137,
+          "programs": 231,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 152532740
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 1192,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poiCount": 0,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "cart-driving",
+        "mode": "cart",
+        "cart": {
+          "position": {
+            "x": 8.819908207045108,
+            "y": -0.08,
+            "z": -10.02882109416259
+          },
+          "yaw": 4.815449889696148,
+          "speed": 0.47364000002741824,
+          "steering": 0.06290821914253503,
+          "blocked": false
+        },
+        "helicopter": null
+      },
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "cart-exited",
+      "at": 1790145871713,
+      "environment": {
+        "at": 82804.19999992847,
+        "position": [
+          9.932687681339242,
+          0.39727580222249054,
+          -11.103733830642112
+        ],
+        "quaternion": [
+          -0.027873072240205445,
+          0.9192016640949244,
+          0.06617234962362918,
+          0.3871855016840147
+        ],
+        "target": [
+          8.830437680449398,
+          0.17431545232851925,
+          -10.027474437111646
+        ],
+        "projection": [
+          0.8503840459892649,
+          0,
+          0,
+          0,
+          0,
+          1.5696855771174902,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 730,
+        "objects": 1599,
+        "threeListeners": 394,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 614,
+        "textures": 137,
+        "programs": 231,
+        "calls": 646,
+        "triangles": 609407,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 82805.39999997616,
+        "calls": 646,
+        "triangles": 609407,
+        "geometries": 614,
+        "textures": 137,
+        "programs": 231,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 138505781,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 1243,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 9.227642110620346,
+          "y": -0.08,
+          "z": -9.983829743350181
+        },
+        "yaw": 4.8218296192942525,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 8.702978005873033,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 439,
+        "totalSampledFrames": 439,
+        "averageFps": 29.44470900722395,
+        "averageFrameTimeMs": 33.96195899761348,
+        "p95FrameTimeMs": 34.700000047683716,
+        "p99FrameTimeMs": 39.39999997615814,
+        "stallsOver50Ms": 2,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 326.39999997615814,
+        "presentedFrames": 987,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 32802.299999952316,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 642,
+          "triangles": 744907,
+          "geometries": 614,
+          "textures": 137,
+          "programs": 231,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 138505781
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 1261,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poi": "B7Pavilhão 4 — Cozinha da SojaEstrutura do Parque de Exposições da Fenasoja.Conhecer",
+      "poiCount": 1,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "walk",
+        "mode": "walk",
+        "cart": {
+          "position": {
+            "x": 8.730633436537012,
+            "y": -0.08,
+            "z": -10.038440895012874
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0,
+          "steering": 0,
+          "blocked": false
+        },
+        "helicopter": null
+      },
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "cart-repeat-exited",
+      "at": 1790145873804,
+      "environment": {
+        "at": 84895.60000002384,
+        "position": [
+          9.46421575007891,
+          0.32000565375502843,
+          -10.382804885529193
+        ],
+        "quaternion": [
+          -0.05010146140989963,
+          0.629787398855562,
+          0.040762411713811134,
+          0.7740775811238892
+        ],
+        "target": [
+          8.152964779236243,
+          0.1459128207865388,
+          -10.65522520208764
+        ],
+        "projection": [
+          0.8503840459892649,
+          0,
+          0,
+          0,
+          0,
+          1.5696855771174902,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 730,
+        "objects": 1599,
+        "threeListeners": 395,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 614,
+        "textures": 137,
+        "programs": 231,
+        "calls": 486,
+        "triangles": 442898,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 84896,
+        "calls": 486,
+        "triangles": 442898,
+        "geometries": 614,
+        "textures": 137,
+        "programs": 231,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 146991092,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 1305,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 8.074563104484026,
+          "y": -0.08,
+          "z": -10.663839952641842
+        },
+        "yaw": 4.8218296192942525,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 8.702978005873033,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 502,
+        "totalSampledFrames": 502,
+        "averageFps": 29.525243495077394,
+        "averageFrameTimeMs": 33.869322709115856,
+        "p95FrameTimeMs": 34.59999990463257,
+        "p99FrameTimeMs": 38.60000002384186,
+        "stallsOver50Ms": 2,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 326.39999997615814,
+        "presentedFrames": 1050,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 34892.39999997616,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 481,
+          "triangles": 432292,
+          "geometries": 614,
+          "textures": 137,
+          "programs": 231,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 146991092
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 1324,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poi": "B7Pavilhão 4 — Cozinha da SojaEstrutura do Parque de Exposições da Fenasoja.Conhecer",
+      "poiCount": 1,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "cart-driving",
+        "mode": "cart",
+        "cart": {
+          "position": {
+            "x": 8.074563104484026,
+            "y": -0.08,
+            "z": -10.663839952641842
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0.7388299999177457,
+          "steering": 0,
+          "blocked": false
+        },
+        "helicopter": null
+      },
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "helicopter-landed-near-visitor",
+      "at": 1790145888864,
+      "environment": {
+        "at": 99943.39999997616,
+        "position": [
+          8.97077658787518,
+          0.3114899772648558,
+          -11.119328416670758
+        ],
+        "quaternion": [
+          -0.026409195430378136,
+          0.9379112466673445,
+          0.07327888034250545,
+          0.33801664673115833
+        ],
+        "target": [
+          8.295255646699319,
+          0.14500607438493587,
+          -10.303854503268854
+        ],
+        "projection": [
+          0.8503840459892649,
+          0,
+          0,
+          0,
+          0,
+          1.5696855771174902,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 730,
+        "objects": 1622,
+        "threeListeners": 395,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 632,
+        "textures": 137,
+        "programs": 231,
+        "calls": 655,
+        "triangles": 663927,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 99943.69999992847,
+        "calls": 655,
+        "triangles": 663927,
+        "geometries": 632,
+        "textures": 137,
+        "programs": 231,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 146702572,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 1861,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 8.55016920940719,
+          "y": -0.08,
+          "z": -10.611580508326176
+        },
+        "yaw": 3.8333995468716284,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 8.702978005873033,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 1057,
+        "totalSampledFrames": 1057,
+        "averageFps": 32.96830114996722,
+        "averageFrameTimeMs": 30.332166509010257,
+        "p95FrameTimeMs": 34.199999928474426,
+        "p99FrameTimeMs": 39.5,
+        "stallsOver50Ms": 4,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 326.39999997615814,
+        "presentedFrames": 1605,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 49940.10000002384,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 655,
+          "triangles": 663927,
+          "geometries": 632,
+          "textures": 137,
+          "programs": 231,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 146702572
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 1879,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poiCount": 0,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "helicopter-landed",
+        "mode": "helicopter",
+        "cart": {
+          "position": {
+            "x": 8.053160535323856,
+            "y": -0.08,
+            "z": -10.666191659988868
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0,
+          "steering": 0,
+          "blocked": false
+        },
+        "helicopter": {
+          "position": {
+            "x": 7.689646823246459,
+            "y": -0.08,
+            "z": -9.57138763057886
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0,
+          "flightState": "landed",
+          "mainRotorAngle": 5.137060729760927,
+          "blocked": false,
+          "visible": true
+        }
+      },
+      "notice": "Helicóptero pousado. Aproxime-se para embarcar.",
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "helicopter-boarded",
+      "at": 1790145896980,
+      "environment": {
+        "at": 108057.69999992847,
+        "position": [
+          8.759328289623234,
+          0.7514701587549965,
+          -9.453851378522867
+        ],
+        "quaternion": [
+          -0.10958655339603589,
+          0.6601095886314934,
+          0.0982047826435548,
+          0.7366151905693166
+        ],
+        "target": [
+          6.402067280385527,
+          0.029897031128245058,
+          -9.71286645249811
+        ],
+        "projection": [
+          0.8342285979402512,
+          0,
+          0,
+          0,
+          0,
+          1.539864963814583,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 730,
+        "objects": 1622,
+        "threeListeners": 395,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 632,
+        "textures": 137,
+        "programs": 231,
+        "calls": 489,
+        "triangles": 448737,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 108057.89999997616,
+        "calls": 489,
+        "triangles": 448737,
+        "geometries": 632,
+        "textures": 137,
+        "programs": 231,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 159427608,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2220,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 8.012684004850257,
+          "y": -0.08,
+          "z": -9.962740277862386
+        },
+        "yaw": 3.8333995468716284,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 14.319952239928305,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 1418,
+        "totalSampledFrames": 1418,
+        "averageFps": 35.293297757933736,
+        "averageFrameTimeMs": 28.333991537393402,
+        "p95FrameTimeMs": 33.89999997615814,
+        "p99FrameTimeMs": 38.60000002384186,
+        "stallsOver50Ms": 5,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 326.39999997615814,
+        "presentedFrames": 1966,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 58054.39999997616,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 489,
+          "triangles": 448737,
+          "geometries": 632,
+          "textures": 137,
+          "programs": 231,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 159427608
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 2240,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poiCount": 0,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "helicopter-landed",
+        "mode": "helicopter",
+        "cart": {
+          "position": {
+            "x": 8.053160535323856,
+            "y": -0.08,
+            "z": -10.666191659988868
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0,
+          "steering": 0,
+          "blocked": false
+        },
+        "helicopter": {
+          "position": {
+            "x": 7.689646823246459,
+            "y": -0.08,
+            "z": -9.57138763057886
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0,
+          "flightState": "landed",
+          "mainRotorAngle": 2.844901516018437,
+          "blocked": false,
+          "visible": true
+        }
+      },
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "helicopter-grounded-near-summon",
+      "at": 1790145908500,
+      "environment": {
+        "at": 119573.79999995232,
+        "position": [
+          8.772286696806939,
+          0.7618352406679876,
+          -9.452427512950857
+        ],
+        "quaternion": [
+          -0.11049034795473998,
+          0.6599885877051764,
+          0.09901470818132761,
+          0.736480165837162
+        ],
+        "target": [
+          6.402067280385527,
+          0.029897031128245058,
+          -9.71286645249811
+        ],
+        "projection": [
+          0.8342285979402512,
+          0,
+          0,
+          0,
+          0,
+          1.539864963814583,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 730,
+        "objects": 1622,
+        "threeListeners": 395,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 632,
+        "textures": 137,
+        "programs": 231,
+        "calls": 489,
+        "triangles": 448737,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 119574.39999997616,
+        "calls": 489,
+        "triangles": 448737,
+        "geometries": 632,
+        "textures": 137,
+        "programs": 231,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 144905036,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2713,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 7.689646823246459,
+          "y": -0.07035202588510776,
+          "z": -9.57138763057886
+        },
+        "yaw": 4.8218296192942525,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 14.319952239928305,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 502,
+        "totalSampledFrames": 502,
+        "averageFps": 43.83207599860863,
+        "averageFrameTimeMs": 22.81434262962455,
+        "p95FrameTimeMs": 24.200000047683716,
+        "p99FrameTimeMs": 30.200000047683716,
+        "stallsOver50Ms": 1,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 72.5,
+        "presentedFrames": 2471,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 69571,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 489,
+          "triangles": 448737,
+          "geometries": 632,
+          "textures": 137,
+          "programs": 231,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 144905036
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 2745,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poiCount": 0,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "helicopter-landing",
+        "mode": "helicopter",
+        "cart": {
+          "position": {
+            "x": 8.053160535323856,
+            "y": -0.08,
+            "z": -10.666191659988868
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0,
+          "steering": 0,
+          "blocked": false
+        },
+        "helicopter": {
+          "position": {
+            "x": 7.689646823246459,
+            "y": -0.07035202588510776,
+            "z": -9.57138763057886
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0.08,
+          "flightState": "landing",
+          "mainRotorAngle": 1.477200627186682,
+          "blocked": false,
+          "visible": true
+        }
+      },
+      "notice": "Pouso concluído. Você pode sair do helicóptero.",
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "helicopter-exited",
+      "at": 1790145909024,
+      "environment": {
+        "at": 120108.29999995232,
+        "position": [
+          8.815886201989741,
+          0.3114899772648557,
+          -9.609926152679245
+        ],
+        "quaternion": [
+          -0.057829861188189,
+          0.7241206867129413,
+          0.06117575763684859,
+          0.6845162269127669
+        ],
+        "target": [
+          7.8391519345671785,
+          0.14500607438493587,
+          -9.554960057511362
+        ],
+        "projection": [
+          0.8503840459892649,
+          0,
+          0,
+          0,
+          0,
+          1.5696855771174902,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 730,
+        "objects": 1622,
+        "threeListeners": 398,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 633,
+        "textures": 137,
+        "programs": 231,
+        "calls": 518,
+        "triangles": 463757,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 120108.79999995232,
+        "calls": 518,
+        "triangles": 463757,
+        "geometries": 633,
+        "textures": 137,
+        "programs": 231,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 156243326,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2752,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 7.689646823246459,
+          "y": -0.07035202588510776,
+          "z": -9.57138763057886
+        },
+        "yaw": 4.8218296192942525,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 14.319952239928305,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 522,
+        "totalSampledFrames": 522,
+        "averageFps": 43.56025835748106,
+        "averageFrameTimeMs": 22.956704980797237,
+        "p95FrameTimeMs": 25.100000023841858,
+        "p99FrameTimeMs": 33.5,
+        "stallsOver50Ms": 1,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 72.5,
+        "presentedFrames": 2491,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 70105.69999992847,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 529,
+          "triangles": 466663,
+          "geometries": 633,
+          "textures": 137,
+          "programs": 231,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 156243326
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 2765,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poi": "B7Pavilhão 4 — Cozinha da SojaEstrutura do Parque de Exposições da Fenasoja.Conhecer",
+      "poiCount": 1,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "helicopter-landing",
+        "mode": "helicopter",
+        "cart": {
+          "position": {
+            "x": 8.053160535323856,
+            "y": -0.08,
+            "z": -10.666191659988868
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0,
+          "steering": 0,
+          "blocked": false
+        },
+        "helicopter": {
+          "position": {
+            "x": 7.689646823246459,
+            "y": -0.07035202588510776,
+            "z": -9.57138763057886
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0.08,
+          "flightState": "landing",
+          "mainRotorAngle": 1.477200627186682,
+          "blocked": false,
+          "visible": true
+        }
+      },
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "helicopter-repeat-landed",
+      "at": 1790145922579,
+      "environment": {
+        "at": 133655.69999992847,
+        "position": [
+          8.517540853458192,
+          0.3114899772648557,
+          -8.914948204565853
+        ],
+        "quaternion": [
+          -0.0760101049491158,
+          0.2178512490950802,
+          0.017020688974173005,
+          0.9728687441583177
+        ],
+        "target": [
+          8.065941523089602,
+          0.14500607438493587,
+          -9.872750005679622
+        ],
+        "projection": [
+          0.8503840459892649,
+          0,
+          0,
+          0,
+          0,
+          1.5696855771174902,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 730,
+        "objects": 1622,
+        "threeListeners": 406,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 635,
+        "textures": 137,
+        "programs": 231,
+        "calls": 313,
+        "triangles": 445471,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 133656.10000002384,
+        "calls": 313,
+        "triangles": 445471,
+        "geometries": 635,
+        "textures": 137,
+        "programs": 231,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 166111543,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 3444,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 8.236356364738127,
+          "y": -0.08,
+          "z": -9.511315363749898
+        },
+        "yaw": 5.842600131308127,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 14.319952239928305,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 1243,
+        "totalSampledFrames": 1243,
+        "averageFps": 48.66380086595882,
+        "averageFrameTimeMs": 20.549155269528434,
+        "p95FrameTimeMs": 24.300000071525574,
+        "p99FrameTimeMs": 33,
+        "stallsOver50Ms": 2,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 72.5,
+        "presentedFrames": 3212,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 83652.89999997616,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 313,
+          "triangles": 445471,
+          "geometries": 635,
+          "textures": 137,
+          "programs": 231,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 166111543
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 3486,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poiCount": 0,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "helicopter-arriving",
+        "mode": "helicopter",
+        "cart": {
+          "position": {
+            "x": 8.053160535323856,
+            "y": -0.08,
+            "z": -10.666191659988868
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0,
+          "steering": 0,
+          "blocked": false
+        },
+        "helicopter": {
+          "position": {
+            "x": 7.661554321125279,
+            "y": -0.07708341918883654,
+            "z": -10.732831884579024
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0,
+          "flightState": "arriving",
+          "mainRotorAngle": 3.3635019606727186,
+          "blocked": false,
+          "visible": true
+        }
+      },
+      "notice": "Helicóptero pousado. Aproxime-se para embarcar.",
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "helicopter-aloft",
+      "at": 1790145933536,
+      "environment": {
+        "at": 144609.69999992847,
+        "position": [
+          8.925346503719009,
+          2.357030004890271,
+          -10.593966810078976
+        ],
+        "quaternion": [
+          -0.0923151034793963,
+          0.6622273513148267,
+          0.08272716305939884,
+          0.7389783984206041
+        ],
+        "target": [
+          6.373974778264348,
+          1.7055791208878919,
+          -10.874310706498274
+        ],
+        "projection": [
+          0.8342285979402512,
+          0,
+          0,
+          0,
+          0,
+          1.539864963814583,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 730,
+        "objects": 1622,
+        "threeListeners": 406,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 635,
+        "textures": 137,
+        "programs": 231,
+        "calls": 473,
+        "triangles": 435361,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 144610.10000002384,
+        "calls": 473,
+        "triangles": 435361,
+        "geometries": 635,
+        "textures": 137,
+        "programs": 231,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 168005590,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 4009,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 7.661554321125279,
+          "y": 1.0539700594529497,
+          "z": -10.732831884579024
+        },
+        "yaw": 4.8218296192942525,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 19.985434864214337,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 1791,
+        "totalSampledFrames": 1791,
+        "averageFps": 49.06849315068493,
+        "averageFrameTimeMs": 20.379676158570632,
+        "p95FrameTimeMs": 24.5,
+        "p99FrameTimeMs": 33,
+        "stallsOver50Ms": 2,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 72.5,
+        "presentedFrames": 3760,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 94607.5,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 473,
+          "triangles": 435361,
+          "geometries": 635,
+          "textures": 137,
+          "programs": 231,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 168005590
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 4034,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poiCount": 0,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "helicopter-flying",
+        "mode": "helicopter",
+        "cart": {
+          "position": {
+            "x": 8.053160535323856,
+            "y": -0.08,
+            "z": -10.666191659988868
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0,
+          "steering": 0,
+          "blocked": false
+        },
+        "helicopter": {
+          "position": {
+            "x": 7.661554321125279,
+            "y": 1.0539700594529497,
+            "z": -10.732831884579024
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0.5491126964273522,
+          "flightState": "flying",
+          "mainRotorAngle": 2.8206190585102062,
+          "blocked": false,
+          "visible": true
+        }
+      },
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "helicopter-after-forward",
+      "at": 1790145938115,
+      "environment": {
+        "at": 149193.5,
+        "position": [
+          4.509092665029605,
+          2.5791716322340936,
+          -11.07922334732238
+        ],
+        "quaternion": [
+          -0.0911960254236143,
+          0.6623518588378857,
+          0.08172431358723717,
+          0.7391173361582232
+        ],
+        "target": [
+          1.4909659413861478,
+          1.818322567694394,
+          -11.410854131324514
+        ],
+        "projection": [
+          0.8342285979402512,
+          0,
+          0,
+          0,
+          0,
+          1.539864963814583,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 733,
+        "objects": 1633,
+        "threeListeners": 413,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 637,
+        "textures": 139,
+        "programs": 232,
+        "calls": 460,
+        "triangles": 428065,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 149193.79999995232,
+        "calls": 460,
+        "triangles": 428065,
+        "geometries": 637,
+        "textures": 139,
+        "programs": 232,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 152771828,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 4217,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 3.2763429425020636,
+          "y": 1.7084255019573367,
+          "z": -11.214677486394018
+        },
+        "yaw": 4.8218296192942525,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 19.985434864214337,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 1976,
+        "totalSampledFrames": 1976,
+        "averageFps": 48.1010316404912,
+        "averageFrameTimeMs": 20.789574898809555,
+        "p95FrameTimeMs": 25.799999952316284,
+        "p99FrameTimeMs": 33.5,
+        "stallsOver50Ms": 5,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 102.60000002384186,
+        "presentedFrames": 3945,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 99190.89999997616,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 461,
+          "triangles": 428129,
+          "geometries": 637,
+          "textures": 139,
+          "programs": 232,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 152771828
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 4219,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poiCount": 0,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "helicopter-flying",
+        "mode": "helicopter",
+        "cart": {
+          "position": {
+            "x": 8.053160535323856,
+            "y": -0.08,
+            "z": -10.666191659988868
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0,
+          "steering": 0,
+          "blocked": false
+        },
+        "helicopter": {
+          "position": {
+            "x": 3.2763429425020636,
+            "y": 1.7084255019573367,
+            "z": -11.214677486394018
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 1.2491813848186837,
+          "flightState": "flying",
+          "mainRotorAngle": 3.7834451520188193,
+          "blocked": false,
+          "visible": true
+        }
+      },
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "helicopter-hover",
+      "at": 1790145945014,
+      "environment": {
+        "at": 156084.69999992847,
+        "position": [
+          2.544097653800292,
+          2.5398971835903175,
+          -13.136158526297166
+        ],
+        "quaternion": [
+          -0.14666777436750228,
+          -0.08001333819017113,
+          -0.011903544659467469,
+          0.9858725755888987
+        ],
+        "target": [
+          2.9265151137345766,
+          1.8183225782567367,
+          -15.476590278491228
+        ],
+        "projection": [
+          0.8342285979402512,
+          0,
+          0,
+          0,
+          0,
+          1.539864963814583,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 733,
+        "objects": 1633,
+        "threeListeners": 413,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 637,
+        "textures": 139,
+        "programs": 232,
+        "calls": 182,
+        "triangles": 384370,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 156085,
+        "calls": 182,
+        "triangles": 384370,
+        "geometries": 637,
+        "textures": 139,
+        "programs": 232,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 119620372,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 4477,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 2.7174493169570644,
+          "y": 1.7084255471284917,
+          "z": -14.198238659395061
+        },
+        "yaw": 6.445141476394787,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 19.985434864214337,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 2275,
+        "totalSampledFrames": 2275,
+        "averageFps": 47.41647925865365,
+        "averageFrameTimeMs": 21.089714285724767,
+        "p95FrameTimeMs": 25.800000071525574,
+        "p99FrameTimeMs": 33,
+        "stallsOver50Ms": 6,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 102.60000002384186,
+        "presentedFrames": 4244,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 106082.29999995232,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 182,
+          "triangles": 384370,
+          "geometries": 637,
+          "textures": 139,
+          "programs": 232,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 119620372
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 4518,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poiCount": 0,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "helicopter-flying",
+        "mode": "helicopter",
+        "cart": {
+          "position": {
+            "x": 8.053160535323856,
+            "y": -0.08,
+            "z": -10.666191659988868
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0,
+          "steering": 0,
+          "blocked": false
+        },
+        "helicopter": {
+          "position": {
+            "x": 2.7174493169570644,
+            "y": 1.7084255471284917,
+            "z": -14.198238659395061
+          },
+          "yaw": 6.445141476394787,
+          "speed": 0.00003834122128407816,
+          "flightState": "flying",
+          "mainRotorAngle": 1.402047555080872,
+          "blocked": false,
+          "visible": true
+        }
+      },
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "helicopter-grounded",
+      "at": 1790145951794,
+      "environment": {
+        "at": 162863.29999995232,
+        "position": [
+          2.539998740589971,
+          1.0934673954243184,
+          -13.113896865826343
+        ],
+        "quaternion": [
+          -0.14856858176749435,
+          -0.08011092761411935,
+          -0.012076130142615755,
+          0.9855778928472267
+        ],
+        "target": [
+          2.9266453965402284,
+          0.3548970358966166,
+          -15.47657503734782
+        ],
+        "projection": [
+          0.8342285979402512,
+          0,
+          0,
+          0,
+          0,
+          1.539864963814583,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 733,
+        "objects": 1633,
+        "threeListeners": 413,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 637,
+        "textures": 139,
+        "programs": 232,
+        "calls": 178,
+        "triangles": 383842,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 162863.60000002384,
+        "calls": 178,
+        "triangles": 383842,
+        "geometries": 637,
+        "textures": 139,
+        "programs": 232,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 122558048,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 4807,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 2.71745055163642,
+          "y": 0.31862168362037535,
+          "z": -14.19825001877418
+        },
+        "yaw": 6.445395101934632,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 19.985434864214337,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 2590,
+        "totalSampledFrames": 2590,
+        "averageFps": 47.298420159677725,
+        "averageFrameTimeMs": 21.142355212373623,
+        "p95FrameTimeMs": 25.59999990463257,
+        "p99FrameTimeMs": 32.800000071525574,
+        "stallsOver50Ms": 6,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 102.60000002384186,
+        "presentedFrames": 4559,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 112861.19999992847,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 179,
+          "triangles": 383874,
+          "geometries": 637,
+          "textures": 139,
+          "programs": 232,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 122558048
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 4833,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poi": "Q-R-18Lote 18450,00 m²BloqueadoExporuralValor oficial ainda não definidoValores e detalhes",
+      "poiCount": 1,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "helicopter-landing",
+        "mode": "helicopter",
+        "cart": {
+          "position": {
+            "x": 8.053160535323856,
+            "y": -0.08,
+            "z": -10.666191659988868
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0,
+          "steering": 0,
+          "blocked": false
+        },
+        "helicopter": {
+          "position": {
+            "x": 2.71745055163642,
+            "y": 0.31862168362037535,
+            "z": -14.19825001877418
+          },
+          "yaw": 6.445395101934632,
+          "speed": 0.08,
+          "flightState": "landing",
+          "mainRotorAngle": 0.35976180122044354,
+          "blocked": false,
+          "visible": true
+        }
+      },
+      "notice": "Pouso concluído. Você pode sair do helicóptero.",
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "helicopter-repeat-exited",
+      "at": 1790145951911,
+      "environment": {
+        "at": 162989.69999992847,
+        "position": [
+          4.5923282684432145,
+          0.4560003095613747,
+          -11.784221059267159
+        ],
+        "quaternion": [
+          -0.012033246921503886,
+          0.34176142894773226,
+          0.004376398633906,
+          0.9396995124970149
+        ],
+        "target": [
+          2.6931602475938665,
+          0.3802742813326825,
+          -14.04981948081979
+        ],
+        "projection": [
+          0.8503840459892649,
+          0,
+          0,
+          0,
+          0,
+          1.5696855771174902,
+          0,
+          0,
+          0,
+          0,
+          -1.0000888928396818,
+          -1,
+          0,
+          0,
+          -0.016000711142717453,
+          0
+        ],
+        "materials": 733,
+        "objects": 1633,
+        "threeListeners": 413,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 637,
+        "textures": 139,
+        "programs": 232,
+        "calls": 270,
+        "triangles": 404122,
+        "width": 1282,
+        "height": 694,
+        "dpr": 0.9,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 162990,
+        "calls": 270,
+        "triangles": 404122,
+        "geometries": 637,
+        "textures": 139,
+        "programs": 232,
+        "dpr": 0.9,
+        "width": 1282,
+        "height": 694,
+        "heapBytes": 121373918,
+        "qualityTier": "LOW",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 4807,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": {
+        "position": {
+          "x": 2.628625889599883,
+          "y": 0.24500000476837158,
+          "z": -13.655469971780837
+        },
+        "yaw": 6.445395101934632,
+        "pitch": -0.045,
+        "movement": "idle",
+        "phase": "active",
+        "cameraMode": "third",
+        "distanceMetres": 19.985434864214337,
+        "colliders": 2432
+      },
+      "visit": {
+        "active": true,
+        "sampledFrames": 2594,
+        "totalSampledFrames": 2594,
+        "averageFps": 47.269950780147695,
+        "averageFrameTimeMs": 21.155088666180234,
+        "p95FrameTimeMs": 25.59999990463257,
+        "p99FrameTimeMs": 33,
+        "stallsOver50Ms": 7,
+        "unpresentedActiveFrames": 1,
+        "longestPresentationGapMs": 102.60000002384186,
+        "presentedFrames": 4563,
+        "entryMs": 6516.899999976158,
+        "elapsedMs": 112987.10000002384,
+        "qualityPreset": "BALANCED",
+        "renderer": {
+          "calls": 396,
+          "triangles": 412223,
+          "geometries": 637,
+          "textures": 139,
+          "programs": 232,
+          "dpr": 0.9,
+          "width": 1282,
+          "height": 694,
+          "heapBytes": 121373918
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 4837,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "events": [
+          {
+            "at": 1494.1999999284744,
+            "type": "entry-requested"
+          },
+          {
+            "at": 6516.899999976158,
+            "type": "controls-ready"
+          }
+        ]
+      },
+      "poi": "Q-R-18Lote 18450,00 m²BloqueadoExporuralValor oficial ainda não definidoValores e detalhes",
+      "poiCount": 1,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": {
+        "phase": "helicopter-landing",
+        "mode": "helicopter",
+        "cart": {
+          "position": {
+            "x": 8.053160535323856,
+            "y": -0.08,
+            "z": -10.666191659988868
+          },
+          "yaw": 4.8218296192942525,
+          "speed": 0,
+          "steering": 0,
+          "blocked": false
+        },
+        "helicopter": {
+          "position": {
+            "x": 2.71745055163642,
+            "y": 0.31862168362037535,
+            "z": -14.19825001877418
+          },
+          "yaw": 6.445395101934632,
+          "speed": 0.08,
+          "flightState": "landing",
+          "mainRotorAngle": 0.35976180122044354,
+          "blocked": false,
+          "visible": true
+        }
+      },
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "label": "map-after-visit",
+      "at": 1790145955632,
+      "environment": {
+        "at": 166711.19999992847,
+        "position": [
+          3.9370884151670626,
+          112.19501247300705,
+          106.42403846803235
+        ],
+        "quaternion": [
+          -0.3919388644454563,
+          0.026630852900829772,
+          0.011351018127214578,
+          0.9195356864192147
+        ],
+        "target": [
+          -2.2546344999999945,
+          0.744,
+          -0.3831818185993967
+        ],
+        "projection": [
+          1.5733689807478843,
+          0,
+          0,
+          0,
+          0,
+          2.9042108776758226,
+          0,
+          0,
+          0,
+          0,
+          -1.0010037603030404,
+          -1,
+          0,
+          0,
+          -1.2880705620296615,
+          0
+        ],
+        "materials": 686,
+        "objects": 1478,
+        "threeListeners": 361,
+        "listenerCoverage": "Three scene objects and OrbitControls; DOM listeners require browser debugger",
+        "geometries": 638,
+        "textures": 134,
+        "programs": 226,
+        "calls": 812,
+        "triangles": 671147,
+        "width": 1425,
+        "height": 772,
+        "dpr": 1,
+        "sceneId": "5833d9bb-b38a-48e9-a95a-5b99e02b3a0a",
+        "cameraId": "397372eb-2956-46a4-b682-3266c78f8476"
+      },
+      "renderer": {
+        "at": 166711.60000002384,
+        "calls": 812,
+        "triangles": 671147,
+        "geometries": 638,
+        "textures": 134,
+        "programs": 226,
+        "dpr": 1,
+        "width": 1425,
+        "height": 772,
+        "heapBytes": 126949884,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 4984,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "character": null,
+      "visit": null,
+      "poiCount": 0,
+      "visible": "visible",
+      "focused": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "canvas": {
+        "width": 1425,
+        "height": 772
+      },
+      "vehicle": null,
+      "notice": null,
+      "reducedMotion": true,
+      "webglRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  ],
+  "findings": [
+    {
+      "check": "walk-moved",
+      "passed": true
+    },
+    {
+      "check": "cart-moved",
+      "passed": true,
+      "distanceWorld": 3.859829607531474
+    },
+    {
+      "check": "cart-stayed-in-visit",
+      "passed": true
+    },
+    {
+      "check": "cart-click-card",
+      "passed": true,
+      "attempts": [
+        {
+          "px": 0.5,
+          "py": 0.5,
+          "card": null
+        },
+        {
+          "px": 0.62,
+          "py": 0.57,
+          "card": null
+        },
+        {
+          "px": 0.38,
+          "py": 0.57,
+          "card": null
+        },
+        {
+          "px": 0.5,
+          "py": 0.67,
+          "card": null
+        },
+        {
+          "px": 0.7,
+          "py": 0.48,
+          "card": null
+        },
+        {
+          "px": 0.3,
+          "py": 0.48,
+          "card": "reference:2026:b7"
+        }
+      ],
+      "card": "reference:2026:b7"
+    },
+    {
+      "check": "cart-repeat-resources",
+      "before": {
+        "geometries": 614,
+        "textures": 137,
+        "programs": 231
+      },
+      "after": {
+        "geometries": 614,
+        "textures": 137,
+        "programs": 231
+      },
+      "delta": {
+        "geometries": 0,
+        "textures": 0,
+        "programs": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "boarding-walk",
+      "passed": true,
+      "attempts": [
+        {
+          "step": 0,
+          "distance": 1.3500000000000005,
+          "key": "KeyW",
+          "ms": 1300
+        },
+        {
+          "step": 1,
+          "distance": 1.0673154584557605,
+          "key": "KeyW",
+          "ms": 1300
+        },
+        {
+          "step": 2,
+          "distance": 0.7889073826638898,
+          "key": "KeyW",
+          "ms": 1300
+        }
+      ],
+      "input": "Automated keyboard path in both Chromium profiles; vehicle controls use touch in mobile profile"
+    },
+    {
+      "check": "landing-and-exit",
+      "passed": true
+    },
+    {
+      "check": "helicopter-repeat-resources",
+      "before": {
+        "geometries": 632,
+        "textures": 137,
+        "programs": 231
+      },
+      "after": {
+        "geometries": 635,
+        "textures": 137,
+        "programs": 231
+      },
+      "delta": {
+        "geometries": 3,
+        "textures": 0,
+        "programs": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "helicopter-repeat-boarding",
+      "passed": true,
+      "attempts": [
+        {
+          "step": 0,
+          "distance": 1.35,
+          "key": "KeyW",
+          "ms": 1300
+        },
+        {
+          "step": 1,
+          "distance": 1.071029576456426,
+          "key": "KeyW",
+          "ms": 1300
+        },
+        {
+          "step": 2,
+          "distance": 0.7905833545664919,
+          "key": "KeyW",
+          "ms": 1300
+        }
+      ]
+    },
+    {
+      "check": "helicopter-moved",
+      "passed": true,
+      "distanceWorld": 4.459884073091876
+    },
+    {
+      "check": "helicopter-rotor-active",
+      "passed": true,
+      "landedAngle": 5.137060729760927,
+      "hoverAngle": 1.402047555080872
+    },
+    {
+      "check": "helicopter-stayed-in-visit",
+      "passed": true
+    },
+    {
+      "check": "helicopter-click-card",
+      "passed": true,
+      "attempts": [
+        {
+          "px": 0.5,
+          "py": 0.5,
+          "card": "reference:2026:q-r-18"
+        }
+      ],
+      "card": "reference:2026:q-r-18"
+    },
+    {
+      "check": "helicopter-repeat-exit-resources",
+      "before": {
+        "geometries": 633,
+        "textures": 137,
+        "programs": 231
+      },
+      "after": {
+        "geometries": 637,
+        "textures": 139,
+        "programs": 232
+      },
+      "delta": {
+        "geometries": 4,
+        "textures": 2,
+        "programs": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "canvas-renderer-identity",
+      "passed": true
+    },
+    {
+      "check": "renderer-health",
+      "passed": true
+    },
+    {
+      "check": "motion-setting-applied",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "errors": []
+}

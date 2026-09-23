@@ -8,6 +8,11 @@
 .visit-hud__title { font-size: 12px; font-weight: 750; padding-right: 8px; }
 .visit-hud__cameras { display: flex; padding: 2px; background: #183b3409; border-radius: 11px; }
 .visit-hud__cameras button[aria-pressed="true"] { background: #255e4e; color: white; }
+.visit-hud__mobility { display: flex; align-items: center; gap: 1px; padding: 2px; border-radius: 11px; background: #183b3409; }
+.visit-hud__mobility button[aria-pressed="true"] { background: #255e4e; color: white; }
+.visit-hud .visit-hud__vehicle-action { color: #fff; background: #255e4e; white-space: nowrap; }
+.visit-hud .visit-hud__vehicle-action:hover { background: #1b4c3e; }
+.visit-hud__vehicle-notice { position: absolute; top: 82px; left: 50%; transform: translateX(-50%); margin: 0; padding: 8px 12px; width: max-content; max-width: calc(100% - 28px); border-radius: 10px; background: #fcfefae8; box-shadow: 0 4px 16px #173d3420; font-size: 11px; text-align: center; }
 .visit-hud .visit-hud__icon { padding: 8px; }
 .visit-hud__exit { border-left: 1px solid #1a42351a !important; border-radius: 0 9px 9px 0 !important; }
 .visit-hud__intro { position: absolute; left: 50%; top: 88px; transform: translateX(-50%); width: max-content; max-width: calc(100% - 36px); display: grid; gap: 3px; padding: 11px 16px; background: #fcfefaf0; border-radius: 13px; box-shadow: 0 6px 20px #183b3420; text-align: center; font-size: 12px; animation: visit-card-in 200ms ease-out; }
@@ -21,6 +26,7 @@
 .visit-poi h2 { margin: 1px 0 5px; font-size: 14px; font-weight: 750; line-height: 1.3; }
 .visit-poi__identifier { color: #63776d; font-size: 9px; letter-spacing: .06em; }
 .visit-poi__facts { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: 11px; }
+.visit-poi__segment { margin: 4px 0 0; color: #496c5d; font-size: 10px; line-height: 1.35; }
 .visit-poi__price { display: flex; align-items: baseline; gap: 7px; margin: 6px 0 0; font-size: 14px; }
 .visit-poi__price small { font-size: 10px; color: #63776d; }
 .visit-poi__pending { display: block; margin-top: 5px; color: #63776d; font-size: 10px; }
@@ -34,11 +40,18 @@
 .visit-poi__details dl div { display: flex; justify-content: space-between; gap: 6px; }
 .visit-poi__details dt { color: #63776d; }.visit-poi__details dd { margin: 0; }
 .visit-touch { display: none; }
+.visit-touch__vehicle-pad { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.visit-touch__vehicle-pad button { display: flex; flex-direction: column; gap: 1px; }
+.visit-touch__vehicle-pad button svg { width: 17px; height: 17px; }
 @keyframes visit-card-in { from { opacity: 0; } to { opacity: 1; } }
 @media (pointer: coarse), (max-width: 720px) {
   .visit-hud__bar { gap: 2px; padding: 4px 5px 4px 10px; top: max(9px, env(safe-area-inset-top)); }
   .visit-hud__title { font-size: 10px; padding-right: 3px; }
   .visit-hud__bar button { padding: 7px 8px; font-size: 10px; min-height: 40px; }
+  .visit-hud__mobility { gap: 0; }
+  .visit-hud__mobility button { min-width: 36px; }
+  .visit-hud__bar .visit-hud__vehicle-action { position: absolute; left: 50%; top: calc(100% + 6px); transform: translateX(-50%); min-height: 33px; padding: 6px 11px; box-shadow: 0 4px 14px #173d3420; }
+  .visit-hud__vehicle-notice { top: 103px; }
   .visit-hud__exit span { display: none; }
   .visit-hud__desktop-help { display: none; }
   .visit-touch { display: flex; align-items: flex-end; justify-content: space-between; position: absolute; left: max(14px, env(safe-area-inset-left)); right: max(14px, env(safe-area-inset-right)); bottom: max(30px, env(safe-area-inset-bottom)); }
@@ -47,13 +60,25 @@
   .visit-hud .visit-touch button:active, .visit-hud .visit-touch button[aria-pressed="true"] { background: #275a4bdc; color: white; }
   .visit-touch__look { display: grid; gap: 9px; justify-items: end; }
   .visit-touch__look > span { font-size: 10px; background: #fcfefaad; border-radius: 7px; padding: 4px 7px; }
+  .visit-touch--vehicle { gap: 10px; }
+  .visit-touch__vehicle-pad { width: min(37vw, 178px); }
+  .visit-touch__vehicle-pad--flight { width: min(37vw, 178px); }
+  .visit-hud .visit-touch__vehicle-pad button { min-width: 0; min-height: 48px; padding: 4px 3px; font-size: 9px; line-height: 1.1; }
   .visit-poi { --visit-poi-top-gap: 68px; --visit-poi-bottom-gap: 172px; width: 240px; left: clamp(130px, var(--visit-poi-x, 50%), calc(100% - 130px)); }
+}
+@media (max-width: 520px) {
+  .visit-hud__title { display: none; }
+  .visit-hud__cameras button { padding-inline: 5px; }
+  .visit-hud .visit-hud__icon { padding-inline: 5px; }
 }
 @media (max-height: 520px) and (orientation: landscape) {
   .visit-hud__bar { top: 6px; }.visit-hud__intro { top: 60px; padding: 7px 13px; }
+  .visit-hud__bar .visit-hud__vehicle-action { left: auto; right: 6px; top: calc(100% + 4px); transform: none; }
+  .visit-hud__vehicle-notice { top: 59px; left: auto; right: 12px; transform: none; max-width: min(240px, 38vw); padding: 5px 8px; font-size: 10px; }
   .visit-poi { --visit-poi-top-gap: 62px; --visit-poi-bottom-gap: 50px; width: 235px; }
   .visit-touch { bottom: 17px; }.visit-touch__movement { gap: 5px; }
   .visit-hud .visit-touch button { min-height: 43px; }
+  .visit-hud .visit-touch__vehicle-pad button { min-height: 38px; }
   .visit-poi__details { max-height: 82px; }
 }
 @media (prefers-reduced-motion: reduce) { .visit-poi, .visit-hud__intro { animation: none !important; transition: none !important; } }
