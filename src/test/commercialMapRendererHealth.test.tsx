@@ -89,6 +89,26 @@ describe('Commercial Map lightweight rendering health', () => {
 });
 
 describe('Commercial Map renderer recovery notice', () => {
+  it('keeps the boot cover for degraded frames, exposes failed recovery/list actions and accepts late readiness', async () => {
+    beginCommercialMapBoot();
+    const canvas = createCanvas(), retry = vi.fn(), list = vi.fn();
+    canvas.addEventListener(COMMERCIAL_MAP_RENDER_RETRY_EVENT, retry);
+    render(<CommercialMapRendererStatus onOpenList={list} />);
+    act(() => publishCommercialMapRenderHealth(canvas, health({ status: 'degraded', path: 'direct' })));
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    act(() => publishCommercialMapRenderHealth(canvas, health({ status: 'failed', path: 'suspended' })));
+    fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
+    expect(retry).toHaveBeenCalledOnce();
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir lista' }));
+    expect(list).toHaveBeenCalledOnce();
+    act(() => publishCommercialMapRenderHealth(canvas, health({ status: 'recovering', path: 'suspended' })));
+    expect(screen.queryByRole('button')).toBeNull();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    act(() => publishCommercialMapRenderHealth(canvas, health()));
+    await act(async () => markCommercialMapStage('commercial-map-ready'));
+    expect(screen.queryByRole('progressbar')).toBeNull();
+    expect(document.querySelector('canvas')).toBe(canvas);
+  });
   it('stays hidden when ready and when no renderer has published a state', () => {
     const canvas = createCanvas();
     render(<CommercialMapRendererStatus />);

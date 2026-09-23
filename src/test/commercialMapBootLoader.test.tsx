@@ -7,9 +7,64 @@ import { CommercialMapBootLoader, commercialMapBootProgress } from '@/features/c
 import { beginCommercialMapBoot, captureCommercialMapStageRecorder, claimCommercialMapBootVisit, releaseCommercialMapBootVisit, getCommercialMapBootSnapshot, markCommercialMapStage, measureCommercialMapStage, summarizeCommercialMapBoot, resetCommercialMapReady } from '@/features/commercial-map/utils/performanceDiagnostics';
 
 beforeEach(() => beginCommercialMapBoot());
-afterEach(() => { cleanup(); vi.restoreAllMocks(); });
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks(); });
 
 describe('Commercial Map real readiness loader', () => {
+  it('offers retry and list after 30 visible active seconds without granting readiness, then accepts late success', async () => {
+    vi.useFakeTimers();
+    const retry = vi.fn(), list = vi.fn();
+    render(<CommercialMapBootLoader onRetry={retry} onOpenList={list} />);
+    await act(async () => vi.advanceTimersByTime(29_999));
+    expect(screen.queryByRole('button')).toBeNull();
+    await act(async () => vi.advanceTimersByTime(251));
+    expect(screen.getByRole('status')).toHaveTextContent('demorando');
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
+    expect(getCommercialMapBootSnapshot().commercialMapReady).toBe(false);
+    fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir lista' }));
+    expect(retry).toHaveBeenCalledOnce(); expect(list).toHaveBeenCalledOnce();
+    expect(document.querySelector('[data-map-boot-wait]')).toBeInTheDocument();
+    await act(async () => markCommercialMapStage('commercial-map-ready'));
+    expect(screen.queryByRole('progressbar')).toBeNull();
+  });
+  it('pauses the stall clock in a hidden tab or inactive 3D workspace', async () => {
+    vi.useFakeTimers();
+    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
+    const view = render(<CommercialMapBootLoader />);
+    await act(async () => vi.advanceTimersByTime(10_000));
+    hidden.mockReturnValue(true);
+    act(() => document.dispatchEvent(new Event('visibilitychange')));
+    await act(async () => vi.advanceTimersByTime(90_000));
+    hidden.mockReturnValue(false);
+    act(() => document.dispatchEvent(new Event('visibilitychange')));
+    view.rerender(<CommercialMapBootLoader active={false} />);
+    await act(async () => vi.advanceTimersByTime(90_000));
+    expect(screen.queryByRole('button')).toBeNull();
+    view.rerender(<CommercialMapBootLoader active />);
+    await act(async () => vi.advanceTimersByTime(19_750));
+    expect(screen.queryByRole('button')).toBeNull();
+    await act(async () => vi.advanceTimersByTime(250));
+    expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument();
+  });
+  it('resets the timeout on stage progress, new preparation and route reentry and cancels on unmount', async () => {
+    vi.useFakeTimers();
+    const view = render(<CommercialMapBootLoader />);
+    await act(async () => vi.advanceTimersByTime(25_000));
+    await act(async () => markCommercialMapStage('essential-data:cached'));
+    await act(async () => vi.advanceTimersByTime(25_000));
+    expect(screen.queryByRole('button')).toBeNull();
+    await act(async () => vi.advanceTimersByTime(5_000));
+    expect(screen.getByRole('button')).toBeInTheDocument();
+    await act(async () => resetCommercialMapReady());
+    expect(screen.queryByRole('button')).toBeNull();
+    await act(async () => vi.advanceTimersByTime(25_000));
+    await act(async () => beginCommercialMapBoot());
+    await act(async () => vi.advanceTimersByTime(10_000));
+    expect(screen.queryByRole('button')).toBeNull();
+    view.unmount();
+    await act(async () => vi.advanceTimersByTime(90_000));
+    expect(getCommercialMapBootSnapshot().marks['boot-stalled']).toBeUndefined();
+  });
   it('keeps concurrent module completions attached to the boot that requested them', async () => {
     const now = vi.spyOn(performance, 'now').mockReturnValue(100);
     let finishPrevious!: () => void;

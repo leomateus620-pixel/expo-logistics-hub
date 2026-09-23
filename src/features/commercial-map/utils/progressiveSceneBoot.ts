@@ -65,8 +65,8 @@ export function createSceneHydrationQueue(host: SceneHydrationHost) {
   };
 }
 
-/** Two responsive frame intervals after three successful draws qualify boot.
- * This is event-loop readiness, not a claim of measured input-to-photon latency. */
+/** Optional responsiveness measurement, never a loading gate. This is event-loop
+ * cadence, not a claim of measured input-to-photon latency. */
 export function qualifiesInteractiveFrame(input: {
   presentedFrames: number;
   consecutiveResponsiveFrames: number;
@@ -79,8 +79,15 @@ export function qualifiesInteractiveFrame(input: {
     && input.frameIntervalMs > 0 && input.frameIntervalMs <= 100;
 }
 
-export function qualifiesCommercialMapReady(input: Parameters<typeof qualifiesInteractiveFrame>[0] & {
+/** Presentation readiness is independent of frame rate. The caller supplies
+ * only successful screen draws belonging to the current prepared attempt. */
+export function qualifiesCommercialMapReady(input: {
   essentialPrepared: boolean;
+  presentedFrames: number;
+  preparing: boolean;
+  controlsInstalled: boolean;
+  healthyScreen: boolean;
 }) {
-  return input.essentialPrepared && qualifiesInteractiveFrame(input);
+  return input.essentialPrepared && !input.preparing && input.controlsInstalled
+    && input.healthyScreen && input.presentedFrames >= 3;
 }

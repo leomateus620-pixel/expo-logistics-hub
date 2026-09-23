@@ -9,11 +9,12 @@ describe('progressive boot ordering and readiness',()=>{
   it('requires actual draws, controls, unblocked intervals and finished critical preparation',()=>{
     const ready={presentedFrames:3,consecutiveResponsiveFrames:2,preparing:false,controlsInstalled:true,frameIntervalMs:20};
     expect(qualifiesInteractiveFrame(ready)).toBe(true);
-    expect(qualifiesCommercialMapReady({ ...ready, essentialPrepared: false })).toBe(false);
-    expect(qualifiesCommercialMapReady({ ...ready, essentialPrepared: true })).toBe(true);
+    expect(qualifiesCommercialMapReady({ ...ready, healthyScreen: true, essentialPrepared: false })).toBe(false);
+    expect(qualifiesCommercialMapReady({ ...ready, healthyScreen: true, essentialPrepared: true })).toBe(true);
     for(const override of [{presentedFrames:0},{controlsInstalled:false},{preparing:true},{frameIntervalMs:120},{consecutiveResponsiveFrames:0}]){
       expect(qualifiesInteractiveFrame({...ready,...override})).toBe(false);
-      expect(qualifiesCommercialMapReady({...ready,...override,essentialPrepared:true})).toBe(false);
+      expect(qualifiesCommercialMapReady({...ready,...override,healthyScreen:true,essentialPrepared:true}))
+        .toBe('frameIntervalMs' in override || 'consecutiveResponsiveFrames' in override);
     }
   });
   it('admits one ordered task, yields to gestures and cancels scheduled work on disposal',()=>{
