@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { getPartner } from '@/lib/partners';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 export interface CartUsageSession {
   id: string;
@@ -38,9 +39,10 @@ function periodSinceIso(period: ReportPeriod): string | null {
 
 export function useCartUsageReport(period: ReportPeriod = '7d') {
   const { orgId } = useCurrentOrg();
+  const { cycleYear } = useLogisticsCycle();
 
   return useQuery({
-    queryKey: ['cart-usage-report', orgId, period],
+    queryKey: ['cart-usage-report', orgId, cycleYear, period],
     queryFn: async (): Promise<CartUsageSession[]> => {
       if (!orgId) return [];
       const since = periodSinceIso(period);
@@ -50,6 +52,7 @@ export function useCartUsageReport(period: ReportPeriod = '7d') {
         .from('cart_history')
         .select('*')
         .eq('org_id', orgId)
+        .eq('cycle_year', cycleYear)
         .in('action', ['retirada', 'devolucao'])
         .order('created_at', { ascending: true })
         .limit(1000);
@@ -58,7 +61,7 @@ export function useCartUsageReport(period: ReportPeriod = '7d') {
 
       // Fetch carts and members for enrichment
       const [{ data: carts }, { data: members }] = await Promise.all([
-        (supabase as any).from('electric_carts').select('id, codigo, nome').eq('org_id', orgId),
+        (supabase as any).from('electric_carts').select('id, codigo, nome').eq('org_id', orgId).eq('cycle_year', cycleYear),
         (supabase as any).from('org_members').select('user_id, nome_exibicao').eq('org_id', orgId),
       ]);
 

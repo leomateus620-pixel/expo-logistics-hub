@@ -47,7 +47,7 @@ export function useExpenses(filters?: ExpenseFilters) {
   });
 
   const { data: reimbursements = [], isLoading: loadingReimb } = useQuery({
-    queryKey: ['reimbursements', orgId],
+    queryKey: ['reimbursements', orgId, cycleYear],
     queryFn: async () => {
       if (!orgId) return [];
       const { data, error } = await (supabase as any)
@@ -57,7 +57,7 @@ export function useExpenses(filters?: ExpenseFilters) {
         .order('requested_at', { ascending: false })
         .limit(500);
       if (error) throw error;
-      return data || [];
+      return (data || []).filter((row: any) => row.expenses?.cycle_year == null || row.expenses?.cycle_year === cycleYear);
     },
     enabled: !!orgId,
     staleTime: 30000,
