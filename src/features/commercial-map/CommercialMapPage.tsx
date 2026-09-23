@@ -1,13 +1,14 @@
 import { commercialMapDiagnosticsEnabled } from './utils/performanceDiagnostics';
 import { CommercialMapBootLoader } from './components/CommercialMapBootLoader';
 import { useCommercialMapBootVisit } from './hooks/useCommercialMapBootVisit';
-import { Profiler, lazy, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Profiler, lazy, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   AlertTriangle,
   ArrowLeft,
   BadgeCheck,
   Box,
+  ChartNoAxesCombined,
   DatabaseZap,
   MapPinPlus,
   MousePointer2,
@@ -46,6 +47,7 @@ const LayersPanel = lazy(() => import('./components/panels/MapPanels').then((m) 
 const MapListView = lazy(() => import('./components/panels/EntityExplorer').then((m) => ({ default: m.MapListView })));
 const ResultsPanel = lazy(() => import('./components/panels/EntityExplorer').then((m) => ({ default: m.ResultsPanel })));
 const CalibrationPanel = lazy(() => import('./components/panels/CalibrationPanel').then((m) => ({ default: m.CalibrationPanel })));
+const CommercialDashboard = lazy(() => import('./dashboard/CommercialDashboard'));
 import { PavilionModuleCard } from './components/panels/PavilionModuleCard';
 import { HydrologicalNetworkLegend } from './components/panels/HydrologicalNetworkLegend';
 import { ParkingInspector } from './components/panels/ParkingInspector';
@@ -70,6 +72,8 @@ import { lunarLaunchPhaseLabel } from './utils/lunarLaunch';
 import { recordCommercialMapProfiler } from './utils/profilerDiagnostics';
 import { markCommercialMapStage } from './utils/performanceDiagnostics';
 import { canHandleCommercialMapEscape } from './utils/contextualNavigation';
+import { resolveCommercialPavilionModuleNavigationTarget } from './utils/pavilionModuleCommercial';
+import { useCommercialDashboardSync } from './dashboard/useCommercialDashboardSync';
 import type { CommercialMapData, CommercialMapQueryScope, MapPermissions } from './types';
 import './commercial-map.css';
 import './commercial-map-mobile.css';
@@ -114,6 +118,16 @@ function EntityDetailsPanelSkeleton() {
       </div>
     </aside>
   );
+}
+
+function CommercialDashboardSkeleton() {
+  return <div className="mx-auto max-w-[1500px] space-y-5 p-6 md:p-10" role="status" aria-label="Preparando Dashboard Comercial">
+    <div className="h-8 w-64 animate-pulse rounded-lg bg-white" aria-hidden="true" />
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4" aria-hidden="true">
+      {Array.from({ length: 4 }, (_, index) => <div key={index} className="h-24 animate-pulse rounded-xl bg-white" />)}
+    </div>
+    <div className="h-64 animate-pulse rounded-xl bg-white" aria-hidden="true" />
+  </div>;
 }
 
 interface CommercialMapPageProps {
@@ -206,6 +220,16 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const requestLunarLaunchReturn = useCommercialMapStore((state) => state.requestLunarLaunchReturn);
   const lastInteriorEntityId = useRef<string | null>(null);
   const [publishReason, setPublishReason] = useState('Publicação após revisão cartográfica e comercial');
+  const [dashboardOpen, setDashboardOpen] = useState(false);
+  const dashboardOverlayRef = useRef<HTMLDivElement>(null);
+  const dashboardDockRef = useRef<HTMLDivElement>(null);
+  const dashboardViewportRef = useRef<HTMLDivElement>(null);
+  const closeDashboard = useCallback(() => {
+    setDashboardOpen(false);
+    window.requestAnimationFrame(() => document.querySelector<HTMLButtonElement>(
+      '.commercial-map-header-tools button[aria-label="Gestão"]',
+    )?.focus());
+  }, []);
   const technicalValidationAllowed = !isCommissionScope
     && canUseTechnicalValidationOverlay(areaScope, permissions);
   const mapScopeKey = scope.mode === 'commission'
@@ -214,6 +238,29 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const lunarLaunchActive = lunarLaunchPhase !== 'idle';
   const lunarCinematicUiActive = lunarLaunchActive || lunarLaunchReturning;
   const previousMapScope = useRef(mapScopeKey);
+
+  useEffect(() => {
+    if (!permissions.canViewMapAnalytics || isCommissionScope || visitEnabled) setDashboardOpen(false);
+  }, [isCommissionScope, permissions.canViewMapAnalytics, visitEnabled]);
+
+  useEffect(() => {
+    if (dashboardDockRef.current) dashboardDockRef.current.inert = dashboardOpen;
+    if (dashboardViewportRef.current) dashboardViewportRef.current.inert = dashboardOpen;
+  }, [dashboardOpen]);
+
+  useEffect(() => {
+    if (dashboardOpen && dashboardOverlayRef.current
+      && !dashboardOverlayRef.current.contains(document.activeElement)) {
+      dashboardOverlayRef.current.focus({ preventScroll: true });
+    }
+  }, [dashboardOpen]);
+
+  useCommercialDashboardSync({
+    open: dashboardOpen,
+    enabled: !isPreview && !isCommissionScope && permissions.canViewMapAnalytics,
+    isFetching: mapQuery.isFetching,
+    refetch: mapQuery.refetch,
+  });
 
   useEffect(() => () => {
     const visit = useVisitStore.getState();
@@ -313,6 +360,13 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
         // Hidden map search and panels must never steal keyboard focus here.
         return;
       }
+      if (dashboardOpen) {
+        if (event.key === 'Escape' && !event.defaultPrevented && !event.isComposing) {
+          event.preventDefault();
+          closeDashboard();
+        }
+        return;
+      }
       if (
         !lunarCinematicUiActive
         && (event.metaKey || event.ctrlKey)
@@ -341,7 +395,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     return () => window.removeEventListener('keydown', shortcut);
   }, [
     activePanel,
+    dashboardOpen,
     closeParkingInspection,
+    closeDashboard,
     exitInterior,
     interiorEntityId,
     parkingInspectionOpen,
@@ -409,6 +465,18 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
 
   const managementActions = hasManagementActions ? (
     <>
+          {permissions.canViewMapAnalytics && (
+            <Button
+              size="sm"
+              variant="outline"
+              data-commercial-dashboard-trigger
+              aria-pressed={dashboardOpen}
+              onClick={() => setDashboardOpen(true)}
+            >
+              <ChartNoAxesCombined />
+              Dashboard Comercial
+            </Button>
+          )}
           {permissions.canViewMapAnalytics && <PublicInterestDialog />}
               {permissions.canEditGeometry && (
                 <Button
@@ -501,20 +569,37 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     </>
   ) : null;
 
+  const handleDashboardViewLot = (entityId: string) => {
+    const entity = data.entities.find((candidate) => candidate.id === entityId);
+    if (!entity) return;
+    setDashboardOpen(false);
+    if (activeSegmentId) clearSegmentFocus();
+    const moduleTarget = resolveCommercialPavilionModuleNavigationTarget(entity);
+    if (moduleTarget) {
+      useCommercialMapStore.getState().enterInterior(moduleTarget.pavilionEntityId);
+      useCommercialMapStore.getState().setSelectedModuleId(moduleTarget.moduleId);
+      return;
+    }
+    useCommercialMapStore.getState().selectEntityFromExplorer(entityId);
+  };
+
   return (
     <section
-      className={`commercial-map-shell ${visitEnabled ? 'is-visit-mode' : ''} ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${hydrologicalModeActive ? 'is-hydrological-mode' : ''} ${parkingInspectionOpen ? 'is-parking-inspection' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''} ${lunarCinematicUiActive ? 'is-lunar-launch-active' : ''} ${lunarLaunchReturnAvailable ? 'has-lunar-launch-return' : ''}`}
+      className={`commercial-map-shell ${dashboardOpen ? 'is-dashboard-open' : ''} ${visitEnabled ? 'is-visit-mode' : ''} ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${hydrologicalModeActive ? 'is-hydrological-mode' : ''} ${parkingInspectionOpen ? 'is-parking-inspection' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''} ${lunarCinematicUiActive ? 'is-lunar-launch-active' : ''} ${lunarLaunchReturnAvailable ? 'has-lunar-launch-return' : ''}`}
       aria-label="Plataforma de gestão do mapa comercial"
     >
       <CommercialMapHeaderTools
         managementActions={managementActions}
+        dashboardOpen={dashboardOpen}
         salesAvailable={webglAvailable && data.source === 'database' && permissions.canManageSales}
         visitAvailable={areaScope === 'park' && webglAvailable && !interiorEntity && !lunarCinematicUiActive}
         visitEntityId={selectedLot && selectedEntity?.classification !== 'INTERNAL_STAND' ? selectedEntity?.id : undefined}
       />
 
       <div className="commercial-map-body">
-        <div style={{ display: visitEnabled && !interiorEntity ? 'none' : 'contents' }} data-visit-preserved-dock>
+        <div ref={dashboardDockRef} aria-hidden={dashboardOpen || undefined}
+          style={{ display: visitEnabled && !interiorEntity ? 'none' : 'contents', pointerEvents: dashboardOpen ? 'none' : undefined }}
+          data-visit-preserved-dock>
         <CommercialMapDock
           entities={scopedData.entities}
           lots={scopedData.lots}
@@ -540,7 +625,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
         />
         </div>
 
-        <div id="commercial-map-viewport" className={`commercial-map-viewport${webglAvailable ? '' : ' is-webgl-fallback'}`}>
+        <div ref={dashboardViewportRef} id="commercial-map-viewport" aria-hidden={dashboardOpen || undefined}
+          className={`commercial-map-viewport${webglAvailable ? '' : ' is-webgl-fallback'}`}
+          style={dashboardOpen ? { pointerEvents: 'none' } : undefined}>
 
         {webglAvailable && workspaceMode === '3d' && permissions.canManageSales
           && (!visitEnabled || workspaceBeforeVisit.current === '3d') && (
@@ -735,6 +822,48 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
           </span></div>
         )}
         </div>
+        {dashboardOpen && permissions.canViewMapAnalytics && !isCommissionScope && (
+          <div
+            ref={dashboardOverlayRef}
+            className="commercial-dashboard-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Dashboard Comercial"
+            tabIndex={-1}
+            onKeyDown={(event) => {
+              if (event.key !== 'Tab') return;
+              const focusable = Array.from(event.currentTarget.querySelectorAll<HTMLElement>(
+                'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+              )).filter((element) => !element.hasAttribute('disabled') && element.getClientRects().length > 0);
+              const first = focusable[0];
+              const last = focusable[focusable.length - 1];
+              if (!first || !last) {
+                event.preventDefault();
+                return;
+              }
+              if (event.shiftKey && (document.activeElement === first || !event.currentTarget.contains(document.activeElement))) {
+                event.preventDefault();
+                last.focus();
+              } else if (!event.shiftKey && (document.activeElement === last || !event.currentTarget.contains(document.activeElement))) {
+                event.preventDefault();
+                first.focus();
+              }
+            }}
+            style={{ position: 'absolute', inset: 0, zIndex: 60, overflow: 'auto', background: '#f5f7f3' }}
+          >
+            <MapPanelBoundary resetKey="dashboard" title="Dashboard indisponível">
+              <Suspense fallback={<CommercialDashboardSkeleton />}>
+                <CommercialDashboard
+                  data={data}
+                  dataUpdatedAt={mapQuery.dataUpdatedAt}
+                  isFetching={mapQuery.isFetching}
+                  onClose={closeDashboard}
+                  onViewLot={handleDashboardViewLot}
+                />
+              </Suspense>
+            </MapPanelBoundary>
+          </div>
+        )}
       </div>
     </section>
   );

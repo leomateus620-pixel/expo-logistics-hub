@@ -1,4 +1,4 @@
-import { useContext, useState, type ReactNode } from 'react';
+import { useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Footprints, List, Settings2, ShoppingCart } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -11,12 +11,16 @@ import { CommercialMapHeaderHost } from './headerHost';
 /** The workspace owns permissions/actions; the module shell owns their placement. */
 export function CommercialMapHeaderTools({
   managementActions,
+  dashboardOpen = false,
   salesAvailable = false,
   visitAvailable = false,
   visitEntityId,
-}: { managementActions?: ReactNode; salesAvailable?: boolean; visitAvailable?: boolean; visitEntityId?: string }) {
+}: { managementActions?: ReactNode; dashboardOpen?: boolean; salesAvailable?: boolean; visitAvailable?: boolean; visitEntityId?: string }) {
   const host = useContext(CommercialMapHeaderHost);
   const [managementOpen, setManagementOpen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (dashboardOpen) setManagementOpen(false); }, [dashboardOpen]);
+  useEffect(() => { if (contentRef.current) contentRef.current.inert = dashboardOpen; }, [dashboardOpen]);
   const mode = useCommercialMapStore((state) => state.workspaceMode);
   const panel = useCommercialMapStore((state) => state.activePanel);
   const setMode = useCommercialMapStore((state) => state.setWorkspaceMode);
@@ -26,9 +30,10 @@ export function CommercialMapHeaderTools({
   const visitEnabled = useVisitStore((state) => state.enabled);
   const startVisit = useVisitStore((state) => state.start);
   const canStartVisit = !checkoutOpen && (mode === '3d' || mode === 'list');
-  const managing = managementOpen || mode === 'edit' || mode === 'create' || panel === 'calibration';
-  const content = <div className="commercial-map-header-tools" aria-label="Ferramentas do mapa"
-    hidden={visitEnabled} style={visitEnabled ? { display: 'none' } : undefined}>
+  const managing = managementOpen || dashboardOpen || mode === 'edit' || mode === 'create' || panel === 'calibration';
+  const content = <div ref={contentRef} className="commercial-map-header-tools" aria-label="Ferramentas do mapa"
+    aria-hidden={dashboardOpen || undefined} hidden={visitEnabled}
+    style={visitEnabled ? { display: 'none' } : dashboardOpen ? { pointerEvents: 'none' } : undefined}>
     {visitAvailable && <button type="button" aria-label="Modo Visita" disabled={!canStartVisit}
       onClick={() => startVisit()} data-commercial-map-visit-start>
       <Footprints aria-hidden="true" /><span>Modo Visita</span>
