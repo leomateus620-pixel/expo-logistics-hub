@@ -91,7 +91,7 @@ describe('registerSaleOrder', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const { registerSaleOrder } = await import('@/features/commercial-map/sales/salesService');
 
-    const failure = await registerSaleOrder({
+    const failure: SalesOrderError = await registerSaleOrder({
       idempotencyKey: 'key-2',
       stage: 'SEGUNDA_ETAPA',
       lotIds: ['a'],
