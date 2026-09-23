@@ -16,7 +16,7 @@ export function useTransportGuests() {
       const { data } = await (supabase as any)
         .from('transport_guests')
         .select('*')
-        .eq('org_id', orgId);
+        .eq('org_id', orgId)
         .eq('cycle_year', cycleYear);
       return data || [];
     },

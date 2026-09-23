@@ -2,19 +2,22 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { logAudit } from '@/services/auditService';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 export function useVehicles() {
   const { orgId } = useCurrentOrg();
+  const { cycleYear } = useLogisticsCycle();
   const qc = useQueryClient();
 
   const { data: vehicles = [], isLoading } = useQuery({
-    queryKey: ['vehicles', orgId],
+    queryKey: ['vehicles', orgId, cycleYear],
     queryFn: async () => {
       if (!orgId) return [];
       const { data } = await (supabase as any)
         .from('vehicles')
         .select('*')
         .eq('org_id', orgId)
+        .eq('cycle_year', cycleYear)
         .order('modelo', { ascending: true });
       return data || [];
     },
@@ -26,7 +29,7 @@ export function useVehicles() {
     mutationFn: async (vehicle: Record<string, any>) => {
       const { data, error } = await (supabase as any)
         .from('vehicles')
-        .insert({ ...vehicle, org_id: orgId })
+        .insert({ ...vehicle, org_id: orgId, cycle_year: cycleYear })
         .select()
         .single();
       if (error) throw error;

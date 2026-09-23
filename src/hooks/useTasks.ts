@@ -3,16 +3,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { logAudit } from '@/services/auditService';
 import { nowSP } from '@/lib/utils';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 export function useTasks() {
   const { orgId } = useCurrentOrg();
+  const { cycleYear } = useLogisticsCycle();
   const qc = useQueryClient();
 
   const { data: tasks = [], isLoading } = useQuery({
-    queryKey: ['tasks', orgId],
+    queryKey: ['tasks', orgId, cycleYear],
     queryFn: async () => {
       if (!orgId) return [];
-      const { data } = await (supabase as any).from('tasks').select('*').eq('org_id', orgId).order('due_em', { ascending: true }).limit(1000);
+      const { data } = await (supabase as any).from('tasks').select('*').eq('org_id', orgId).eq('cycle_year', cycleYear).order('due_em', { ascending: true }).limit(1000);
       return data || [];
     },
     enabled: !!orgId,
@@ -23,7 +25,7 @@ export function useTasks() {
     mutationFn: async (task: Record<string, any>) => {
       const user = (await supabase.auth.getUser()).data.user;
       const { data, error } = await (supabase as any).from('tasks')
-        .insert({ ...task, org_id: orgId, created_by_user_id: user?.id })
+        .insert({ ...task, org_id: orgId, created_by_user_id: user?.id, cycle_year: cycleYear })
         .select().single();
       if (error) throw error;
       await logAudit({ orgId: orgId!, entity: 'tasks', entityId: data.id, action: 'create', after: data });
