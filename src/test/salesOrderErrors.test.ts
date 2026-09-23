@@ -99,7 +99,7 @@ describe('registerSaleOrder', () => {
       payment: { paymentType: 'CASH', installmentCount: 1, paymentMethod: 'BOLETO', firstDueDate: '2026-10-01' },
       installments: [],
       expectedTotal: 10,
-    }).catch((error: unknown) => error as SalesOrderError);
+    }).then(() => null).catch((error: unknown) => error as SalesOrderError) as unknown as SalesOrderError;
 
     expect(failure).toBeInstanceOf(SalesOrderError);
     expect(failure.diagnostics.code).toBe('42703');
