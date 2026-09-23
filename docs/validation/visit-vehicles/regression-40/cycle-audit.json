@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "cycles": 40,
+  "delta": {
+    "geometries": 0,
+    "textures": 0,
+    "programs": 0,
+    "nodes": 0,
+    "listeners": 0,
+    "heapBytes": 4017712
+  },
+  "first": {
+    "geometries": 564,
+    "textures": 132,
+    "programs": 221,
+    "heapBytes": 55668320
+  },
+  "last": {
+    "geometries": 564,
+    "textures": 132,
+    "programs": 221,
+    "heapBytes": 59686032
+  }
+}

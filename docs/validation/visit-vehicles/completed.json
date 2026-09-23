@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-23T06:56:48.693Z",
+  "passed": true,
+  "profiles": [
+    "desktop",
+    "mobile"
+  ],
+  "motions": [
+    "no-preference",
+    "reduce"
+  ],
+  "sourceCommit": "6104c7f8998c4a9bf188d12d53741cc02b6428c7"
+}

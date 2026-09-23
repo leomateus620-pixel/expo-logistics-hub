@@ -46,7 +46,7 @@ async function look(page) {
       save('route.json', { fixture: true, method: 'separate grounded regional starts, continuous walking inside each segment', before, rows, errors });
     }
   } else if (mode === 'cycles') {
-    for (let cycle = 1; cycle <= 20; cycle++) {
+    for (let cycle = 1; cycle <= Number(process.env.VISIT_CYCLES || 20); cycle++) {
       await enter(page); await click(page, cycle % 2 ? '3ª pessoa' : '1ª pessoa');
       await travel(page, 'KeyW', 1200);
       const active = await snapshot(page);

@@ -1,5 +1,7 @@
 const keys = new Set<string>();
 const touches = new Map<number, number>();
+type VehicleAxis = 'forward' | 'strafe' | 'yaw' | 'vertical' | 'brake';
+const vehicleTouches = new Map<number, { axis: VehicleAxis; value: number }>();
 let touchRun = false;
 const touchRunListeners = new Set<() => void>();
 let wake: (() => void) | null = null;
@@ -47,18 +49,24 @@ function updateTouchRun(value: boolean) {
   for (const listener of touchRunListeners) listener();
 }
 export const visitInput = {
-  forward: 0, strafe: 0, lookX: 0, lookY: 0, run: false, enabled: false,
-  reset() { keys.clear(); touches.clear(); updateTouchRun(false); this.forward = this.strafe = this.lookX = this.lookY = 0; this.run = false; },
+  forward: 0, strafe: 0, yaw: 0, vertical: 0, brake: false, lookX: 0, lookY: 0, run: false, enabled: false,
+  reset() { keys.clear(); touches.clear(); vehicleTouches.clear(); updateTouchRun(false); this.forward = this.strafe = this.yaw = this.vertical = this.lookX = this.lookY = 0; this.brake = false; this.run = false; },
 };
 function recompute() {
   let touch = 0; for (const value of touches.values()) touch += value;
-  visitInput.forward = Math.max(-1, Math.min(1, touch + Number(keys.has('KeyW') || keys.has('ArrowUp')) - Number(keys.has('KeyS') || keys.has('ArrowDown'))));
-  visitInput.strafe = Number(keys.has('KeyD') || keys.has('ArrowRight')) - Number(keys.has('KeyA') || keys.has('ArrowLeft'));
+  const vehicle = { forward: 0, strafe: 0, yaw: 0, vertical: 0, brake: 0 };
+  for (const { axis, value } of vehicleTouches.values()) vehicle[axis] += value;
+  visitInput.forward = Math.max(-1, Math.min(1, touch + vehicle.forward + Number(keys.has('KeyW') || keys.has('ArrowUp')) - Number(keys.has('KeyS') || keys.has('ArrowDown'))));
+  visitInput.strafe = Math.max(-1, Math.min(1, vehicle.strafe + Number(keys.has('KeyD') || keys.has('ArrowRight')) - Number(keys.has('KeyA') || keys.has('ArrowLeft'))));
+  visitInput.yaw = Math.max(-1, Math.min(1, vehicle.yaw + Number(keys.has('KeyE')) - Number(keys.has('KeyQ'))));
+  visitInput.vertical = Math.max(-1, Math.min(1, vehicle.vertical + Number(keys.has('Space')) - Number(keys.has('ControlLeft') || keys.has('ControlRight'))));
+  visitInput.brake = vehicle.brake > 0 || keys.has('Space');
   visitInput.run = touchRun || keys.has('ShiftLeft') || keys.has('ShiftRight');
   wake?.();
 }
 export function setTouchMove(pointerId: number, value: number) { touches.set(pointerId, value); recompute(); }
-export function clearTouch(pointerId: number) { touches.delete(pointerId); recompute(); }
+export function setTouchVehicle(pointerId: number, axis: VehicleAxis, value: number) { vehicleTouches.set(pointerId, { axis, value }); recompute(); }
+export function clearTouch(pointerId: number) { touches.delete(pointerId); vehicleTouches.delete(pointerId); recompute(); }
 export function setTouchRun(value: boolean) { updateTouchRun(value); recompute(); }
 export function getTouchRun() { return touchRun; }
 export function subscribeTouchRun(listener: () => void) { touchRunListeners.add(listener); return () => { touchRunListeners.delete(listener); }; }
@@ -67,14 +75,15 @@ export function addLook(dx: number, dy: number) {
   visitInput.lookX += Math.max(-300, Math.min(300, dx));
   visitInput.lookY += Math.max(-300, Math.min(300, dy)); wake?.();
 }
-const movementKeys = new Set(['KeyW','KeyS','KeyA','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight']);
+const movementKeys = new Set(['KeyW','KeyS','KeyA','KeyD','KeyQ','KeyE','Space','ControlLeft','ControlRight','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight']);
 const editable = (target: EventTarget | null) => target instanceof Element && Boolean(target.closest('input,textarea,select,[contenteditable="true"],[role="dialog"]'));
 
 /** One listener lifetime per visit. Touch IDs are independent of keyboard/lock. */
-export function installVisitInput(canvas: HTMLCanvasElement, invalidate: () => void) {
+export function installVisitInput(canvas: HTMLCanvasElement, invalidate: () => void,
+  options: { onTap?: (clientX: number, clientY: number) => void; allowPointerLock?: () => boolean } = {}) {
   wake = invalidate;
   let lockTicket: PointerLockTicket | null = null;
-  let drag: { id: number; x: number; y: number } | null = null;
+  let drag: { id: number; x: number; y: number; startX: number; startY: number; moved: boolean } | null = null;
   const previousTouch = canvas.style.touchAction;
   const previousTabIndex = canvas.getAttribute('tabindex');
   canvas.style.touchAction = 'none'; canvas.tabIndex = 0;
@@ -89,9 +98,9 @@ export function installVisitInput(canvas: HTMLCanvasElement, invalidate: () => v
   const down = (event: PointerEvent) => {
     if (!visitInput.enabled || event.button !== 0) return;
     canvas.focus({ preventScroll: true });
-    drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    drag = { id: event.pointerId, x: event.clientX, y: event.clientY, startX: event.clientX, startY: event.clientY, moved: false };
     canvas.setPointerCapture(event.pointerId);
-    if (event.pointerType === 'mouse' && !document.pointerLockElement && canvas.requestPointerLock && (!lockTicket || lockTicket.settled)) {
+    if (event.pointerType === 'mouse' && (options.allowPointerLock?.() ?? true) && !document.pointerLockElement && canvas.requestPointerLock && (!lockTicket || lockTicket.settled)) {
       stopLatePointerLockGuard();
       const ticket: PointerLockTicket = { canvas, cancelled: false, settled: false };
       latestPointerLockTicket = lockTicket = ticket;
@@ -112,12 +121,15 @@ export function installVisitInput(canvas: HTMLCanvasElement, invalidate: () => v
   const move = (event: PointerEvent) => {
     if (document.pointerLockElement === canvas) { addLook(event.movementX, event.movementY); return; }
     if (drag?.id !== event.pointerId) return;
+    if (Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) > 7) drag.moved = true;
     addLook(event.clientX - drag.x, event.clientY - drag.y);
     drag.x = event.clientX; drag.y = event.clientY; event.preventDefault();
   };
   const up = (event: PointerEvent) => {
     if (drag?.id !== event.pointerId) return;
+    const tapped = event.type === 'pointerup' && !drag.moved && Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) <= 7;
     drag = null; if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+    if (tapped) options.onTap?.(event.clientX, event.clientY);
   };
   const lock = () => {
     if (document.pointerLockElement !== canvas) reset();

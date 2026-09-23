@@ -1,0 +1,14 @@
+{
+  "at": "2026-09-23T06:38:38.134Z",
+  "sourceCommit": "6104c7f8998c4a9bf188d12d53741cc02b6428c7",
+  "sourceStatus": "M src/features/commercial-map/visit/VisitCharacter.tsx\n M src/features/commercial-map/visit/VisitCharacterController.ts\n M src/features/commercial-map/visit/VisitHUD.tsx\n M src/features/commercial-map/visit/VisitInputManager.ts\n M src/features/commercial-map/visit/VisitMode.tsx\n M src/features/commercial-map/visit/useVisitStore.ts\n M src/features/commercial-map/visit/visit.css\n M src/test/commercialMapVisitCharacter.test.ts\n M supabase/functions/mcp/index.ts\n?? .worktrees/\n?? dist-visit-vehicles-final-qa/\n?? dist-visit-vehicles-qa/\n?? docs/validation/visit-vehicles/\n?? scripts/commercial-map-performance/visit-asset-audit.ts\n?? scripts/commercial-map-performance/visit-sojinha-scene.cjs\n?? scripts/commercial-map-performance/visit-vehicle-context.cjs\n?? scripts/commercial-map-performance/visit-vehicles-walk-compare.cjs\n?? scripts/commercial-map-performance/visit-vehicles.cjs\n?? src/features/commercial-map/visit/VisitSojinhaModel.tsx\n?? src/features/commercial-map/visit/vehicles/\n?? src/test/commercialMapVisitVehicleInteraction.test.ts\n?? src/test/commercialMapVisitVehicles.test.ts",
+  "platform": "win32",
+  "arch": "x64",
+  "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+  "renderer": "Recorded in per-row runtime diagnostics",
+  "fixture": true,
+  "emulatedMobile": true,
+  "physicalMobile": false,
+  "cache": "New browser/context per motion and viewport; OS/GPU caches not cleared",
+  "historicalBaseline": "docs/validation/visit-mode/evidence/final/summary.json is contextual only; not a controlled same-build comparison"
+}

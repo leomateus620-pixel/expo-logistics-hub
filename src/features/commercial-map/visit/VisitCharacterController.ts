@@ -11,7 +11,7 @@ export class VisitCharacterController {
   movement: 'idle' | 'walk' | 'run' = 'idle';
   constructor(position: VisitVector3) { this.position = position; }
   stop() { this.velocityX = this.velocityZ = 0; this.movement = 'idle'; }
-  step(rawDelta: number, input: typeof visitInput, world: VisitWorld) {
+  step(rawDelta: number, input: Pick<typeof visitInput, 'forward' | 'strafe' | 'lookX' | 'lookY' | 'run'>, world: VisitWorld) {
     const dt = Math.min(0.05, Math.max(0, rawDelta));
     this.yaw += input.lookX * 0.0024;
     this.pitch = Math.max(-1.2, Math.min(1.1, this.pitch - input.lookY * 0.0024));

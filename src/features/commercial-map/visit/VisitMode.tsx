@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Group, Vector3 } from 'three';
+import { Group, Raycaster, Vector2, Vector3 } from 'three';
 import type { CommercialLot, MapEntity } from '../types';
 import type { CommercialMapTree } from '../data/commercialTrees';
 import type { ResolvedElectricalNodePlacement } from '../utils/electricalInfrastructure';
@@ -16,9 +16,16 @@ import { installVisitInput, visitInput } from './VisitInputManager';
 import { useVisitStore } from './useVisitStore';
 import { visitCameraFrame, visitRuntime } from './visitRuntime';
 import { VisitPerformanceManager } from './VisitPerformanceManager';
-import { prepareCommercialSceneLayer } from '../utils/sceneShaderWarmup';
+import { commercialMapShaderRepresentatives, prepareCommercialMapTextures, prepareCommercialSceneLayer } from '../utils/sceneShaderWarmup';
 import { resolveVisitSpawn } from './VisitSpawnManager';
 import { VisitFrameScheduler } from './VisitFrameScheduler';
+import { VisitVehicleManager } from './vehicles/VisitVehicleManager';
+import { VisitVehicleInteraction } from './vehicles/VisitVehicleInteraction';
+import type { VisitCartModelHandle } from './vehicles/VisitCartModel';
+import type { VisitHelicopterModelHandle } from './vehicles/VisitHelicopterModel';
+
+const VisitCartModel = lazy(() => import('./vehicles/VisitCartModel').then(module => ({ default: module.VisitCartModel })));
+const VisitHelicopterModel = lazy(() => import('./vehicles/VisitHelicopterModel').then(module => ({ default: module.VisitHelicopterModel })));
 
 interface Props { entities: MapEntity[]; lots: CommercialLot[]; trees: readonly CommercialMapTree[]; electricalPlacements?: readonly ResolvedElectricalNodePlacement[]; siteEnvironmentEntities?: readonly MapEntity[] }
 const moving = () => visitRuntime.moving;
@@ -31,28 +38,41 @@ export default function VisitMode({ entities, lots, trees, electricalPlacements,
   const width = useThree(s => s.size.width), height = useThree(s => s.size.height);
   const setEvents = useThree(s => s.setEvents);
   const phase = useVisitStore(s => s.phase);
+  const mobilityMode = useVisitStore(s => s.mobilityMode);
   const requestAt = useRef(useVisitStore.getState().requestedAtMs).current;
   const world = useMemo(() => buildVisitWorld({ entities, trees, electricalPlacements, siteEnvironmentEntities }), [entities, trees, electricalPlacements, siteEnvironmentEntities]);
   const pois = useMemo(() => buildVisitPOIs(entities, lots, .15, world.ground.heightAt), [entities, lots, world]);
   const interactions = useMemo(() => new VisitInteractionManager(pois, .15), [pois]);
+  const vehicleInteraction = useMemo(() => new VisitVehicleInteraction(pois, .15), [pois]);
   const session = useVisitStore(s => s.session);
   const runtime = useMemo(() => {
     const spawn = resolveVisitSpawn({ entityId: useVisitStore.getState().requestedEntityId ?? undefined }, entities, world);
     const character = new VisitCharacterController(spawn.position);
     character.yaw = spawn.yaw;
     character.bodyYaw = character.yaw;
-    return { character, cameras: new VisitCameras(), flight: new VisitCameraFlight(), scheduler: new VisitFrameScheduler(), started: false,
+    return { character, cameras: new VisitCameras(), vehicles: new VisitVehicleManager(world, character), flight: new VisitCameraFlight(), scheduler: new VisitFrameScheduler(), started: false,
       exiting: false, interior: false, queryTime: 0, publishTime: 0, projection: new Vector3() };
   // A new data snapshot rebuilds the index, never the visitor's position.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
   const avatar = useRef<VisitCharacterHandle>(null);
+  const cartModel = useRef<VisitCartModelHandle>(null);
+  const helicopterModel = useRef<VisitHelicopterModelHandle>(null);
+  const cartLayer = useRef<Group>(null);
+  const helicopterLayer = useRef<Group>(null);
+  const vehiclePreparation = useRef({
+    cart: { ready: false, pending: false, controller: null as AbortController | null },
+    helicopter: { ready: false, pending: false, controller: null as AbortController | null },
+  });
+  const pointerRay = useRef(new Raycaster());
+  const pointerNdc = useRef(new Vector2());
   const avatarGroup = useRef<Group>(null);
   const avatarReady = useRef(false);
 
   useEffect(() => {
     let disposed = false;
     let controller: AbortController | undefined;
+    const preparations = vehiclePreparation.current;
     const prepare = () => {
       controller?.abort();
       const current = new AbortController();
@@ -65,29 +85,75 @@ export default function VisitMode({ entities, lots, trees, electricalPlacements,
         if (!disposed && !current.signal.aborted && controller === current) useVisitStore.setState({ error: 'Não foi possível preparar o personagem. Saia e tente novamente.' });
       });
     };
-    const lost = () => { controller?.abort(); avatarReady.current = false; };
+    const lost = () => {
+      controller?.abort(); avatarReady.current = false;
+      for (const preparation of Object.values(preparations)) {
+        preparation.controller?.abort(); preparation.controller = null; preparation.pending = false; preparation.ready = false;
+      }
+    };
     gl.domElement.addEventListener('webglcontextlost', lost);
     gl.domElement.addEventListener('webglcontextrestored', prepare);
     prepare();
     return () => {
       disposed = true; controller?.abort();
+      for (const preparation of Object.values(preparations)) preparation.controller?.abort();
       gl.domElement.removeEventListener('webglcontextlost', lost);
       gl.domElement.removeEventListener('webglcontextrestored', prepare);
     };
   }, [camera, gl, invalidate, runtime, scene]);
 
   useEffect(() => {
-    const cleanup = installVisitInput(gl.domElement, invalidate);
+    const cleanup = installVisitInput(gl.domElement, invalidate, {
+      allowPointerLock: () => useVisitStore.getState().mobilityMode === 'walk',
+      onTap: (clientX, clientY) => {
+        const state = useVisitStore.getState();
+        if (state.phase !== 'active' || state.mobilityMode === 'walk') return;
+        const rect = gl.domElement.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+        pointerNdc.current.set((clientX - rect.left) / rect.width * 2 - 1, 1 - (clientY - rect.top) / rect.height * 2);
+        pointerRay.current.setFromCamera(pointerNdc.current, camera);
+        const poi = vehicleInteraction.pick(pointerRay.current.ray.origin, pointerRay.current.ray.direction, world);
+        state.setActivePOI(poi);
+        if (poi) {
+          const host = gl.domElement.closest<HTMLElement>('.commercial-map-viewport, .commercial-map-rendering-diagnostics__viewport');
+          if (host) {
+            host.style.setProperty('--visit-poi-x', `${Math.max(17, Math.min(83, (clientX - rect.left) / rect.width * 100))}%`);
+            host.style.setProperty('--visit-poi-y', `${Math.max(24, Math.min(68, (clientY - rect.top) / rect.height * 100 - 5))}%`);
+          }
+        }
+        runtime.scheduler.wake(); invalidate();
+      },
+    });
     const unsubscribe = useVisitStore.subscribe((state, previous) => {
-      if (state.cameraMode !== previous.cameraMode) { runtime.scheduler.wake(); invalidate(); }
+      if (state.cameraMode !== previous.cameraMode || state.mobilityPhase !== previous.mobilityPhase) { runtime.scheduler.wake(); invalidate(); }
     });
     gl.domElement.dataset.visitMode = 'true';
     invalidate();
     return () => { unsubscribe(); cleanup(); visitCameraFrame.ready = false; visitRuntime.moving = false; visitRuntime.renderingActive = false;
-      delete gl.domElement.dataset.visitMode; delete gl.domElement.dataset.visitCharacter;
+      delete gl.domElement.dataset.visitMode; delete gl.domElement.dataset.visitCharacter; delete gl.domElement.dataset.visitVehicle;
     };
-  }, [gl, invalidate, runtime]);
+  }, [camera, gl, invalidate, runtime, vehicleInteraction, world]);
+  useEffect(() => { runtime.vehicles.setWorld(world); }, [runtime, world]);
   useEffect(() => { runtime.scheduler.wake(); invalidate(); }, [world, interactions, runtime, invalidate, width, height]);
+  const prepareVehicle = (kind: 'cart' | 'helicopter', layer: Group | null, modelReady: boolean) => {
+    const preparation = vehiclePreparation.current[kind];
+    if (!modelReady || !layer || preparation.ready || preparation.pending) return;
+    preparation.pending = true;
+    const controller = new AbortController();
+    preparation.controller = controller;
+    void prepareCommercialSceneLayer(gl, layer, scene, camera, controller.signal)
+      .then(() => prepareCommercialMapTextures(gl, commercialMapShaderRepresentatives(layer), controller.signal))
+      .then(() => {
+        if (controller.signal.aborted || preparation.controller !== controller) return;
+        preparation.ready = true; preparation.pending = false; preparation.controller = null;
+        runtime.scheduler.wake(); invalidate();
+      }, () => {
+        if (controller.signal.aborted || preparation.controller !== controller) return;
+        preparation.pending = false; preparation.controller = null;
+        useVisitStore.setState({ mobilityMode: 'walk', mobilityPhase: 'walk', canBoardHelicopter: false,
+          vehicleNotice: 'Não foi possível preparar o veículo. Tente novamente.' });
+      });
+  };
   useEffect(() => {
     visitInput.reset(); runtime.character.stop(); runtime.scheduler.wake(); invalidate();
   }, [phase, runtime, invalidate]);
@@ -163,22 +229,46 @@ export default function VisitMode({ entities, lots, trees, electricalPlacements,
       animate(); return;
     }
     visitInput.enabled = true;
-    const changing = Boolean(visitInput.forward || visitInput.strafe || visitInput.lookX || visitInput.lookY
-      || runtime.character.velocityX || runtime.character.velocityZ || visitInput.run !== state.isRunning);
+    if (state.mobilityMode === 'cart') prepareVehicle('cart', cartLayer.current, Boolean(cartModel.current));
+    if (state.mobilityMode === 'helicopter') prepareVehicle('helicopter', helicopterLayer.current, Boolean(helicopterModel.current));
+    const changing = Boolean(visitInput.forward || visitInput.strafe || visitInput.yaw || visitInput.vertical || visitInput.brake
+      || visitInput.lookX || visitInput.lookY || runtime.character.velocityX || runtime.character.velocityZ
+      || runtime.vehicles.functionalMotion || visitInput.run !== state.isRunning);
     const awake = runtime.scheduler.step(dt, changing);
     visitRuntime.renderingActive = awake;
     if (!awake) { visitRuntime.moving = false; return; }
-    runtime.character.step(dt, visitInput, world);
-    const distance = runtime.cameras.update(runtime.character, world, state.cameraMode, dt);
-    runtime.cameras.publish();
-    avatar.current?.update(runtime.character, distance > .19);
-    visitRuntime.moving = runtime.character.movement !== 'idle';
+    const walking = state.mobilityPhase === 'walk' || state.mobilityPhase === 'helicopter-requested'
+      || state.mobilityPhase === 'helicopter-arriving' || state.mobilityPhase === 'helicopter-landed';
+    const manualLook = Math.abs(visitInput.lookX) + Math.abs(visitInput.lookY) > .01;
+    if (walking) runtime.character.step(dt, visitInput, world);
+    runtime.vehicles.step(dt, visitInput, {
+      cart: Boolean(cartModel.current && vehiclePreparation.current.cart.ready),
+      helicopter: Boolean(helicopterModel.current && vehiclePreparation.current.helicopter.ready),
+    }, manualLook);
+    if (!walking) visitInput.lookX = visitInput.lookY = 0;
+    const current = useVisitStore.getState();
+    const occupied = runtime.vehicles.occupiesVehicle;
+    let distance = 0;
+    if (occupied && current.mobilityMode === 'cart' && runtime.vehicles.cart) {
+      runtime.vehicles.cameras.update('cart', runtime.vehicles.cart, world, current.cameraMode, dt);
+      distance = runtime.vehicles.cameras.position.distanceTo(runtime.vehicles.cameras.eye);
+    } else if (occupied && current.mobilityMode === 'helicopter' && runtime.vehicles.helicopter) {
+      runtime.vehicles.cameras.update('helicopter', runtime.vehicles.helicopter, world, current.cameraMode, dt);
+      distance = runtime.vehicles.cameras.position.distanceTo(runtime.vehicles.cameras.eye);
+    } else {
+      distance = runtime.cameras.update(runtime.character, world, current.cameraMode, dt);
+      runtime.cameras.publish();
+    }
+    if (runtime.vehicles.cart) cartModel.current?.update(runtime.vehicles.cart);
+    if (runtime.vehicles.helicopter) helicopterModel.current?.update(runtime.vehicles.helicopter);
+    avatar.current?.update(runtime.character, !occupied && distance > .19);
+    visitRuntime.moving = runtime.vehicles.functionalMotion || runtime.character.movement !== 'idle';
     if (state.movementMode !== runtime.character.movement || state.isRunning !== visitInput.run) {
       useVisitStore.setState({ movementMode: runtime.character.movement, isRunning: visitInput.run });
     }
     runtime.queryTime += dt;
     runtime.publishTime += dt;
-    if (runtime.queryTime >= .1) {
+    if (runtime.queryTime >= .1 && current.mobilityMode === 'walk') {
       runtime.queryTime = 0;
       const poi = interactions.update(runtime.cameras.eye, runtime.cameras.direction, world);
       state.setActivePOI(poi);
@@ -196,6 +286,7 @@ export default function VisitMode({ entities, lots, trees, electricalPlacements,
       gl.domElement.dataset.visitCharacter = JSON.stringify({ position: runtime.character.position, yaw: runtime.character.yaw,
         pitch: runtime.character.pitch, movement: runtime.character.movement, phase: state.phase, cameraMode: state.cameraMode,
         distanceMetres: runtime.character.distance / .15, colliders: world.collisions.colliders.length });
+      gl.domElement.dataset.visitVehicle = JSON.stringify(runtime.vehicles.diagnostics());
     }
     // The quiet deadline covers camera springs and deceleration. A final frame
     // resumes the refined renderer; then only input/data/environment can wake it.
@@ -203,6 +294,12 @@ export default function VisitMode({ entities, lots, trees, electricalPlacements,
   }, -2);
   return <>
     <group ref={avatarGroup}><VisitCharacter ref={avatar}/></group>
+    <group ref={cartLayer}><Suspense fallback={null}>
+      {(mobilityMode === 'cart' || runtime.vehicles.cart) && <VisitCartModel ref={cartModel} />}
+    </Suspense></group>
+    <group ref={helicopterLayer}><Suspense fallback={null}>
+      {(mobilityMode === 'helicopter' || runtime.vehicles.helicopter) && <VisitHelicopterModel ref={helicopterModel} />}
+    </Suspense></group>
     <VisitPerformanceManager ready={phase === 'active'} requestedAtMs={requestAt} getMoving={moving} onQualityChange={quality}/>
   </>;
 }

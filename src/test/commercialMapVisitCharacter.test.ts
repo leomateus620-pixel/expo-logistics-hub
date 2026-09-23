@@ -6,7 +6,7 @@ import type { visitInput } from '@/features/commercial-map/visit/VisitInputManag
 import type { VisitWorld } from '@/features/commercial-map/visit/VisitWorld';
 import type { VisitCollider } from '@/features/commercial-map/visit/visitTypes';
 
-const input = (): typeof visitInput => ({ forward: 0, strafe: 0, lookX: 0, lookY: 0, run: false, enabled: true, reset() {} });
+const input = (): typeof visitInput => ({ forward: 0, strafe: 0, yaw: 0, vertical: 0, brake: false, lookX: 0, lookY: 0, run: false, enabled: true, reset() {} });
 function worldWith(colliders: VisitCollider[] = []): VisitWorld {
   const bounds = { minX: -100, maxX: 100, minZ: -100, maxZ: 100 };
   const ground = new VisitGroundingSystem([], 0), collisions = new VisitCollisionSystem(colliders, bounds);
