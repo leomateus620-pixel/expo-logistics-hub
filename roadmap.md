@@ -3,10 +3,10 @@
 ## Logística 2028, acesso do presidente e login institucional
 - [x] Auditar cadastro e permissões do presidente Eduardo
 - [x] Separar estruturalmente os dados operacionais em ciclos 2026 e 2028, preservando a base existente em 2026
-- [ ] Conectar todos os menus e fluxos operacionais ao ciclo ativo, com 2028 como padrão vazio
-- [ ] Adicionar troca de ciclo nas Configurações e identificação do ano ativo
-- [ ] Atualizar e validar o acesso de Eduardo com segurança
-- [ ] Aplicar e validar o novo login institucional da Logística em desktop e celular
+- [x] Conectar todos os menus e fluxos operacionais ao ciclo ativo, com 2028 como padrão vazio
+- [x] Adicionar troca de ciclo nas Configurações e identificação do ano ativo
+- [x] Atualizar e validar o acesso de Eduardo com segurança
+- [x] Aplicar e validar o novo login institucional da Logística em desktop e celular
 - Não publicar (pedido do usuário)
 
 ## Seleção sistêmica de módulos irregulares + B1-M141 oficial
