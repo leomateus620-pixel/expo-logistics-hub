@@ -52,7 +52,7 @@ export function useExpenses(filters?: ExpenseFilters) {
       if (!orgId) return [];
       const { data, error } = await (supabase as any)
         .from('reimbursements')
-        .select('*, expenses(title, amount, expense_date, paid_by_name)')
+        .select('*, expenses(title, amount, expense_date, paid_by_name, cycle_year)')
         .eq('org_id', orgId)
         .order('requested_at', { ascending: false })
         .limit(500);
