@@ -26,11 +26,13 @@ interface ChartProps {
   compact?: boolean;
 }
 
-interface AreaChartRow {
+interface LotChartRow {
   status: CommercialStatus;
   name: string;
   areaSqm: number;
+  /** Share of commercial lot count — the dashboard's primary metric. */
   percentage: number;
+  areaPercentage: number;
   lotCount: number;
 }
 
@@ -40,7 +42,7 @@ function canHover() {
     && window.matchMedia('(hover: hover)').matches;
 }
 
-export function CommercialDashboardAreaChart({
+export function CommercialDashboardLotChart({
   aggregate,
   highlightedStatus,
   onHoverStatus,
@@ -48,13 +50,14 @@ export function CommercialDashboardAreaChart({
   compact = false,
 }: ChartProps) {
   // Five fixed status buckets come from the single analytics snapshot.
-  const rows: AreaChartRow[] = AREA_STATUSES.flatMap((status) => {
+  const rows: LotChartRow[] = AREA_STATUSES.flatMap((status) => {
     const summary = aggregate.byStatus[status];
-    return summary.areaSqm > 0 ? [{
+    return summary.lotCount > 0 ? [{
       status,
       name: STATUS_CONFIG[status].label,
       areaSqm: summary.areaSqm,
-      percentage: summary.areaPercentage,
+      percentage: summary.lotPercentage,
+      areaPercentage: summary.areaPercentage,
       lotCount: summary.lotCount,
     }] : [];
   });
