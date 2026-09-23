@@ -1,6 +1,13 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { LotPricing2028, LotPricingResolution } from '../utils/lotPricing2028';
 import type { SalesOrderPayload } from './salesTypes';
+import {
+  SalesOrderError,
+  classifySalesError,
+  logSalesFailure,
+  sanitizeDiagnosticText,
+  type SalesErrorKind,
+} from './salesErrors';
 
 const PRICING_COLUMNS = 'lot_id,public_identifier,pavilion,block,lot_num,corner_status,corner_confirmed,official_area_sqm,area_validation_status,renovacao_price_per_sqm,renovacao_total,renovacao_rule_label,segunda_price_per_sqm,segunda_total,segunda_rule_label,resolution_status';
 
