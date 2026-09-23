@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { useAuth } from './useAuth';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 interface ExpenseFilters {
   status?: string;
@@ -15,16 +16,18 @@ interface ExpenseFilters {
 export function useExpenses(filters?: ExpenseFilters) {
   const { orgId } = useCurrentOrg();
   const { user } = useAuth();
+  const { cycleYear } = useLogisticsCycle();
   const qc = useQueryClient();
 
   const { data: expenses = [], isLoading } = useQuery({
-    queryKey: ['expenses', orgId, filters],
+    queryKey: ['expenses', orgId, cycleYear, filters],
     queryFn: async () => {
       if (!orgId) return [];
       let q = (supabase as any)
         .from('expenses')
         .select('*, expense_categories(name, icon), expense_documents(id, file_url, extraction_status), vehicles(id, modelo, marca, placa), transports(id, titulo, destino, inicio_em)')
         .eq('org_id', orgId)
+        .eq('cycle_year', cycleYear)
         .order('expense_date', { ascending: false })
         .limit(500);
 
@@ -44,17 +47,17 @@ export function useExpenses(filters?: ExpenseFilters) {
   });
 
   const { data: reimbursements = [], isLoading: loadingReimb } = useQuery({
-    queryKey: ['reimbursements', orgId],
+    queryKey: ['reimbursements', orgId, cycleYear],
     queryFn: async () => {
       if (!orgId) return [];
       const { data, error } = await (supabase as any)
         .from('reimbursements')
-        .select('*, expenses(title, amount, expense_date, paid_by_name)')
+        .select('*, expenses(title, amount, expense_date, paid_by_name, cycle_year)')
         .eq('org_id', orgId)
         .order('requested_at', { ascending: false })
         .limit(500);
       if (error) throw error;
-      return data || [];
+      return (data || []).filter((row: any) => row.expenses?.cycle_year == null || row.expenses?.cycle_year === cycleYear);
     },
     enabled: !!orgId,
     staleTime: 30000,
@@ -64,7 +67,7 @@ export function useExpenses(filters?: ExpenseFilters) {
     mutationFn: async (expense: Record<string, any>) => {
       const { data, error } = await (supabase as any)
         .from('expenses')
-        .insert({ ...expense, org_id: orgId, created_by_user_id: user?.id })
+        .insert({ ...expense, org_id: orgId, created_by_user_id: user?.id, cycle_year: cycleYear })
         .select()
         .single();
       if (error) throw error;
@@ -108,6 +111,7 @@ export function useExpenses(filters?: ExpenseFilters) {
       await (supabase as any).from('expense_approvals').insert({
         expense_id: id,
         org_id: orgId,
+        cycle_year: cycleYear,
         action: newStatus,
         previous_status: expense?.status || 'rascunho',
         new_status: newStatus,
@@ -159,7 +163,7 @@ export function useExpenses(filters?: ExpenseFilters) {
     mutationFn: async (doc: Record<string, any>) => {
       const { data, error } = await (supabase as any)
         .from('expense_documents')
-        .insert({ ...doc, org_id: orgId })
+        .insert({ ...doc, org_id: orgId, cycle_year: cycleYear })
         .select()
         .single();
       if (error) throw error;

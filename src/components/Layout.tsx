@@ -8,6 +8,7 @@ import PageTransition from './PageTransition';
 import { UpcomingEventsBell } from './UpcomingEventsBell';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDriverAutoArm } from '@/hooks/useDriverAutoArm';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 const routeLabels: Array<[string, string]> = [
   ['/transports', 'Transportes'],
@@ -32,6 +33,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { cycleYear } = useLogisticsCycle();
 
   useDriverAutoArm();
 
@@ -76,7 +78,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             <h1 className="truncate text-sm font-bold text-foreground sm:text-base">{routeLabel}</h1>
           </div>
           <UpcomingEventsBell />
-          <span className="rounded-md border border-primary/10 bg-accent px-2 py-1 text-[10px] font-black tracking-[0.08em] text-accent-foreground shadow-[var(--elevation-1)]">FENASOJA 2028</span>
+          <span className="rounded-md border border-primary/10 bg-accent px-2 py-1 text-[10px] font-black tracking-[0.08em] text-accent-foreground shadow-[var(--elevation-1)]">FENASOJA {cycleYear}</span>
         </header>
 
         <PageTransition>{children}</PageTransition>

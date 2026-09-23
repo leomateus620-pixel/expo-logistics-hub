@@ -721,6 +721,7 @@ async function handleCompleteReturn(admin: any, userId: string, payload: any) {
 // ── CREATE ──────────────────────────────────────────────────
 async function handleCreate(admin: any, userId: string, payload: any) {
   const { transport, guestIds } = payload;
+  if (![2026, 2028].includes(Number(transport?.cycle_year))) return err("Ciclo da Logística inválido.", 400);
 
   const { data, error } = await admin
     .from("transports")
@@ -765,6 +766,11 @@ async function handleUpdate(admin: any, userId: string, payload: any) {
     .eq("id", id)
     .single();
 
+  if (!before) return err("Transporte não encontrado.", 404);
+  if (updates?.cycle_year != null && Number(updates.cycle_year) !== Number(before.cycle_year)) {
+    return err("Não é permitido transferir um transporte entre ciclos.", 400);
+  }
+
   if (expectedUpdatedAt && before?.updated_at !== expectedUpdatedAt) {
     return err("Registro modificado por outro usuário. Recarregue os dados.", 409);
   }
@@ -804,6 +810,7 @@ async function handleUpdate(admin: any, userId: string, payload: any) {
     try {
       await admin.from("vehicle_usage").insert({
         org_id: orgId,
+        cycle_year: before.cycle_year,
         vehicle_id: vehicleUsage.vehicle_id,
         responsavel_user_id: vehicleUsage.responsavel_user_id,
         km_saida: vehicleUsage.km_saida,

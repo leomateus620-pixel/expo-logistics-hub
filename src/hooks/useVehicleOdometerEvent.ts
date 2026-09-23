@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { useVehicles } from './useVehicles';
 import { PERIOD_START, PERIOD_END } from '@/lib/dashboardPeriod';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 export interface VehicleOdometerEvent {
   vehicleId: string;
@@ -24,16 +25,18 @@ const COST_PER_KM = 0.65;
 
 export function useVehicleOdometerEvent() {
   const { orgId } = useCurrentOrg();
+  const { cycleYear } = useLogisticsCycle();
   const { vehicles, isLoading: loadingV } = useVehicles();
 
   const { data: fuel = [], isLoading: loadingF } = useQuery({
-    queryKey: ['fuel-records-odometer-event', orgId],
+    queryKey: ['fuel-records-odometer-event', orgId, cycleYear],
     queryFn: async () => {
       if (!orgId) return [];
       const { data } = await (supabase as any)
         .from('fuel_records')
         .select('vehicle_id, valor, litros, created_at')
         .eq('org_id', orgId)
+        .eq('cycle_year', cycleYear)
         .gte('created_at', `${PERIOD_START}T00:00:00-03:00`)
         .lte('created_at', `${PERIOD_END}T23:59:59-03:00`);
       return data || [];

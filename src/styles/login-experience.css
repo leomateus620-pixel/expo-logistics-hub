@@ -22,6 +22,92 @@
     );
 }
 
+.auth-screen[data-module='logistica'] {
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(oklch(var(--brand-navy-950) / 0.94), oklch(var(--brand-navy-950) / 0.94)),
+    oklch(var(--brand-navy-950));
+}
+
+.auth-screen[data-module='logistica']::before {
+  background-image: linear-gradient(oklch(var(--brand-gold-400) / 0.045) 1px, transparent 1px), linear-gradient(90deg, oklch(var(--brand-gold-400) / 0.035) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+.auth-screen[data-module='logistica']::after { display: none; }
+
+.auth-layout[data-logistics-login='true'] {
+  width: min(100%, 25rem);
+  min-height: calc(100svh - 2.5rem);
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  gap: 1.35rem;
+}
+
+.auth-hero--logistics {
+  display: grid;
+  justify-items: center;
+  padding: 0;
+  text-align: center;
+}
+
+.auth-hero--logistics h1 {
+  margin-top: 1.25rem;
+  color: oklch(var(--brand-soft-white));
+  font-size: 1.35rem;
+  font-weight: 850;
+  letter-spacing: 0;
+}
+
+.auth-hero--logistics p {
+  margin-top: 0.3rem;
+  color: oklch(var(--brand-gold-400));
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.auth-layout[data-logistics-login='true'] .auth-panel {
+  border-radius: 1rem;
+  padding: 2rem;
+  background: oklch(var(--brand-soft-white));
+  box-shadow: 0 30px 70px -34px oklch(var(--brand-navy-950) / 0.9);
+  backdrop-filter: none;
+}
+
+.auth-layout[data-logistics-login='true'] .auth-panel::after {
+  left: 2rem;
+  right: 2rem;
+  width: auto;
+  height: 2px;
+  background: oklch(var(--brand-gold-400));
+}
+
+.auth-layout[data-logistics-login='true'] .auth-panel__heading {
+  margin-top: 0;
+  text-align: center;
+}
+
+.auth-layout[data-logistics-login='true'] .auth-panel__heading h2 {
+  margin-top: 0;
+  font-size: 1.65rem;
+  letter-spacing: 0;
+}
+
+.auth-layout[data-logistics-login='true'] .auth-panel__footer {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 520px) {
+  .auth-screen[data-module='logistica'] { padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); }
+  .auth-layout[data-logistics-login='true'] { min-height: calc(100svh - 2rem); gap: 1rem; }
+  .auth-layout[data-logistics-login='true'] .auth-panel { padding: 1.5rem; }
+}
+
 .auth-screen::before {
   position: absolute;
   z-index: -2;

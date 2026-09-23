@@ -1,16 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 export function useFuelRecords(vehicleId?: string) {
   const { orgId } = useCurrentOrg();
+  const { cycleYear } = useLogisticsCycle();
   const qc = useQueryClient();
 
   const { data: records = [], isLoading } = useQuery({
-    queryKey: ['fuel-records', orgId, vehicleId],
+    queryKey: ['fuel-records', orgId, cycleYear, vehicleId],
     queryFn: async () => {
       if (!orgId) return [];
-      let q = (supabase as any).from('fuel_records').select('*').eq('org_id', orgId).order('created_at', { ascending: false });
+      let q = (supabase as any).from('fuel_records').select('*').eq('org_id', orgId).eq('cycle_year', cycleYear).order('created_at', { ascending: false });
       if (vehicleId) q = q.eq('vehicle_id', vehicleId);
       const { data } = await q;
       return data || [];
@@ -21,7 +23,7 @@ export function useFuelRecords(vehicleId?: string) {
 
   const create = useMutation({
     mutationFn: async (record: Record<string, any>) => {
-      const { data, error } = await (supabase as any).from('fuel_records').insert({ ...record, org_id: orgId }).select().single();
+      const { data, error } = await (supabase as any).from('fuel_records').insert({ ...record, org_id: orgId, cycle_year: cycleYear }).select().single();
       if (error) throw error;
       return data;
     },

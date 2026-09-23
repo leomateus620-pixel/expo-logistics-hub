@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { toast } from 'sonner';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 // Fenasoja return-trip window (SP timezone): 29/04/2026 → 10/05/2026
 const RETURN_WINDOW_START = new Date('2026-04-29T03:00:00.000Z');
@@ -16,13 +17,14 @@ export function isInReturnTripWindow(inicioEm: string | null | undefined): boole
 
 export function useTransports() {
   const { orgId } = useCurrentOrg();
+  const { cycleYear } = useLogisticsCycle();
   const qc = useQueryClient();
 
   const { data: transports = [], isLoading } = useQuery({
-    queryKey: ['transports', orgId],
+    queryKey: ['transports', orgId, cycleYear],
     queryFn: async () => {
       if (!orgId) return [];
-      const { data } = await (supabase as any).from('transports').select('*').eq('org_id', orgId).order('inicio_em', { ascending: false }).limit(1000);
+      const { data } = await (supabase as any).from('transports').select('*').eq('org_id', orgId).eq('cycle_year', cycleYear).order('inicio_em', { ascending: false }).limit(1000);
       return data || [];
     },
     enabled: !!orgId,
@@ -64,7 +66,7 @@ export function useTransports() {
   const create = useMutation({
     mutationFn: async (params: { transport: Record<string, any>; guestIds?: string[] }) => {
       const result = await invokeLifecycle('create', {
-        transport: { ...params.transport, org_id: orgId },
+        transport: { ...params.transport, org_id: orgId, cycle_year: cycleYear },
         guestIds: params.guestIds || [],
       });
       const newId = result?.data?.id ?? result?.id;

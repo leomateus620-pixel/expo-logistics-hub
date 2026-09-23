@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { logAudit } from '@/services/auditService';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 export type ReservationStatus = 'agendada' | 'em_andamento' | 'concluida' | 'cancelada';
 export type ReservationTipo = 'interno' | 'empresa' | 'outros';
@@ -41,16 +42,18 @@ export interface UpsertScooterReservationInput {
 
 export function useScooterReservations() {
   const { orgId } = useCurrentOrg();
+  const { cycleYear } = useLogisticsCycle();
   const qc = useQueryClient();
 
   const { data: reservations = [], isLoading } = useQuery({
-    queryKey: ['scooter-reservations', orgId],
+    queryKey: ['scooter-reservations', orgId, cycleYear],
     queryFn: async () => {
       if (!orgId) return [];
       const { data, error } = await (supabase as any)
         .from('scooter_reservations')
         .select('*')
         .eq('org_id', orgId)
+        .eq('cycle_year', cycleYear)
         .order('inicio_em', { ascending: true });
       if (error) throw error;
       return (data || []) as ScooterReservation[];
@@ -76,7 +79,7 @@ export function useScooterReservations() {
     mutationFn: async (input: UpsertScooterReservationInput) => {
       const userId = (await supabase.auth.getUser()).data.user?.id;
       if (!userId) throw new Error('Não autenticado');
-      const payload = { ...buildPayload(input), org_id: orgId, status: input.status || 'agendada', created_by_user_id: userId };
+      const payload = { ...buildPayload(input), org_id: orgId, cycle_year: cycleYear, status: input.status || 'agendada', created_by_user_id: userId };
       const { data, error } = await (supabase as any)
         .from('scooter_reservations')
         .insert(payload)

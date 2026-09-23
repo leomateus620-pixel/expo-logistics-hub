@@ -1,5 +1,14 @@
 # Roadmap
 
+## Logística 2028, acesso do presidente e login institucional
+- [x] Auditar cadastro e permissões do presidente Eduardo
+- [x] Separar estruturalmente os dados operacionais em ciclos 2026 e 2028, preservando a base existente em 2026
+- [ ] Conectar todos os menus e fluxos operacionais ao ciclo ativo, com 2028 como padrão vazio
+- [ ] Adicionar troca de ciclo nas Configurações e identificação do ano ativo
+- [ ] Atualizar e validar o acesso de Eduardo com segurança
+- [ ] Aplicar e validar o novo login institucional da Logística em desktop e celular
+- Não publicar (pedido do usuário)
+
 ## Seleção sistêmica de módulos irregulares + B1-M141 oficial
 - [x] Centralizar a seleção visual de regulares e irregulares pela seleção persistente de Vendas
 - [x] Atualizar o footprint do B1-M141 para 18,00 m² e o total modular do B1 para 586,50 m²

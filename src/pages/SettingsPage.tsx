@@ -4,13 +4,14 @@ import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Settings, Users, Shield, ShieldCheck, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Settings, Users, Shield, ShieldCheck, Loader2, ChevronDown, ChevronUp, CalendarRange } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import NotificationRecipientsSection from '@/components/settings/NotificationRecipientsSection';
 import PushNotificationsSection from '@/components/settings/PushNotificationsSection';
 
 import { presentFenasojaProductName } from '@/lib/fenasoja-brand';
+import { useLogisticsCycle, type LogisticsCycleYear } from '@/contexts/LogisticsCycleProvider';
 
 const roleLabels: Record<string, string> = {
   admin: 'Administrador',
@@ -58,6 +59,7 @@ export default function SettingsPage() {
   const { orgId, orgName, myRole } = useCurrentOrg();
   const { members } = useOrgMembers();
   const { user } = useAuth();
+  const { cycleYear, setCycleYear } = useLogisticsCycle();
   const [auditLoading, setAuditLoading] = useState(false);
   const [auditSummary, setAuditSummary] = useState<AuditSummary | null>(null);
   const [auditReportId, setAuditReportId] = useState<string | null>(null);
@@ -122,6 +124,33 @@ export default function SettingsPage() {
         </h1>
         <p className="text-sm text-muted-foreground mt-1">Gerenciar organização e permissões</p>
       </div>
+
+      {isAdmin && (
+        <div className="rounded-xl border bg-card p-4 sm:p-5">
+          <h2 className="mb-2 flex items-center gap-2 font-semibold">
+            <CalendarRange className="h-4 w-4 text-primary" /> Ciclo da Logística
+          </h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Escolha a edição usada em todos os menus operacionais. O histórico de 2026 permanece preservado.
+          </p>
+          <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Ciclo da Logística">
+            {([2028, 2026] as LogisticsCycleYear[]).map((year) => (
+              <Button
+                key={year}
+                type="button"
+                variant={cycleYear === year ? 'default' : 'outline'}
+                className="h-auto min-h-14 flex-col gap-0.5 rounded-xl"
+                role="radio"
+                aria-checked={cycleYear === year}
+                onClick={() => setCycleYear(year)}
+              >
+                <span className="text-base font-bold">{year}</span>
+                <span className="text-[10px] font-medium opacity-75">{year === 2028 ? 'Padrão atual' : 'Histórico preservado'}</span>
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="rounded-xl border bg-card p-4 sm:p-5">
         <h2 className="font-semibold flex items-center gap-2 mb-3">

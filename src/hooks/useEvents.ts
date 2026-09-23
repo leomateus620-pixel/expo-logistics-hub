@@ -2,16 +2,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { logAudit } from '@/services/auditService';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 export function useEvents() {
   const { orgId } = useCurrentOrg();
+  const { cycleYear } = useLogisticsCycle();
   const qc = useQueryClient();
 
   const { data: events = [], isLoading } = useQuery({
-    queryKey: ['events', orgId],
+    queryKey: ['events', orgId, cycleYear],
     queryFn: async () => {
       if (!orgId) return [];
-      const { data } = await (supabase as any).from('events').select('*').eq('org_id', orgId).order('inicio_em').limit(1000);
+      const { data } = await (supabase as any).from('events').select('*').eq('org_id', orgId).eq('cycle_year', cycleYear).order('inicio_em').limit(1000);
       return data || [];
     },
     enabled: !!orgId,
@@ -22,7 +24,7 @@ export function useEvents() {
     mutationFn: async (event: Record<string, any>) => {
       const user = (await supabase.auth.getUser()).data.user;
       const { data, error } = await (supabase as any).from('events')
-        .insert({ ...event, org_id: orgId, created_by_user_id: user?.id })
+        .insert({ ...event, org_id: orgId, created_by_user_id: user?.id, cycle_year: cycleYear })
         .select().single();
       if (error) throw error;
       await logAudit({ orgId: orgId!, entity: 'events', entityId: data.id, action: 'create', after: data });

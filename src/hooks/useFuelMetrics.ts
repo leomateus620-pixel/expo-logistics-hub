@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { useVehicles } from './useVehicles';
 import { PERIOD_START, PERIOD_END } from '@/lib/dashboardPeriod';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 const dayKey = (iso: string | null | undefined) => {
   if (!iso) return '';
@@ -24,16 +25,18 @@ const periodDays = (() => {
 
 export function useFuelMetrics() {
   const { orgId } = useCurrentOrg();
+  const { cycleYear } = useLogisticsCycle();
   const { vehicles } = useVehicles();
 
   const { data: records = [], isLoading } = useQuery({
-    queryKey: ['fuel-records-dashboard', orgId],
+    queryKey: ['fuel-records-dashboard', orgId, cycleYear],
     queryFn: async () => {
       if (!orgId) return [];
       const { data } = await (supabase as any)
         .from('fuel_records')
         .select('*')
         .eq('org_id', orgId)
+        .eq('cycle_year', cycleYear)
         .gte('created_at', `${PERIOD_START}T00:00:00-03:00`)
         .lte('created_at', `${PERIOD_END}T23:59:59-03:00`)
         .order('created_at', { ascending: true });
