@@ -9,13 +9,13 @@ import type { CommercialSegmentDashboardSnapshot } from './commercialDashboardTy
 type ComparisonMode = 'area' | 'lots' | 'value';
 
 const COMPARISON_OPTIONS: readonly { id: ComparisonMode; label: string }[] = [
-  { id: 'area', label: 'Área' },
   { id: 'lots', label: 'Quantidade de lotes' },
+  { id: 'area', label: 'Área' },
   { id: 'value', label: 'Valor comercial' },
 ];
 
 export function CommercialDashboardComparison({ segments }: { segments: readonly CommercialSegmentDashboardSnapshot[] }) {
-  const [mode, setMode] = useState<ComparisonMode>('area');
+  const [mode, setMode] = useState<ComparisonMode>('lots');
 
   return <section className="commercial-dashboard-comparison" aria-labelledby="commercial-dashboard-comparison-title">
     <div className="commercial-dashboard-section-heading">

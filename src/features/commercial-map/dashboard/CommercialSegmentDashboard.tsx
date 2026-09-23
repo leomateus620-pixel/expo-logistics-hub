@@ -1,7 +1,7 @@
 import { type CSSProperties } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { CommercialMiniMap } from './CommercialMiniMap';
-import { CommercialDashboardAreaChart, CommercialDashboardValueChart } from './CommercialDashboardCharts';
+import { CommercialDashboardLotChart, CommercialDashboardValueChart } from './CommercialDashboardCharts';
 import { useDashboardStatusHighlight } from './useDashboardStatusHighlight';
 import {
   formatDashboardAreaWithCoverage,
@@ -38,11 +38,11 @@ export function CommercialSegmentDashboard({ snapshot, onViewLot }: CommercialSe
         <span className="commercial-dashboard-eyebrow">Segmento comercial</span>
         <h2 id={`commercial-dashboard-segment-${snapshot.segmentId}`}>{snapshot.segment.name}</h2>
       </div>
-      <div className="commercial-dashboard-segment-lead" aria-label={snapshot.totalAreaSqm > 0
-        ? `${formatDashboardPercentage(snapshot.soldAreaPercentage)} da área do segmento vendida`
-        : 'Percentual pendente de metragem oficial'}>
-        <strong>{snapshot.totalAreaSqm > 0 ? formatDashboardPercentage(snapshot.soldAreaPercentage) : '—'}</strong>
-        <span>{snapshot.totalAreaSqm > 0 ? 'da área vendida' : 'área pendente'}</span>
+      <div className="commercial-dashboard-segment-lead" aria-label={snapshot.commercialLots > 0
+        ? `${formatDashboardPercentage(snapshot.soldLotPercentage)} dos lotes do segmento vendidos`
+        : 'Percentual pendente de inventário comercial'}>
+        <strong>{snapshot.commercialLots > 0 ? formatDashboardPercentage(snapshot.soldLotPercentage) : '—'}</strong>
+        <span>{snapshot.commercialLots > 0 ? 'dos lotes vendidos' : 'inventário pendente'}</span>
       </div>
     </header>
 
@@ -65,8 +65,8 @@ export function CommercialSegmentDashboard({ snapshot, onViewLot }: CommercialSe
             <div><span>Área disponível</span><strong>{formatDashboardAreaWithCoverage(snapshot.availableAreaSqm, snapshot.availableLots, snapshot.byStatus.AVAILABLE.areaPendingCount, snapshot.commercialLots)}</strong></div>
           </div>
           <div className="commercial-dashboard-segment-chart">
-            <div className="commercial-dashboard-subheading"><strong>Ocupação por área</strong><span>Base: metragem oficial cadastrada</span></div>
-            <CommercialDashboardAreaChart
+            <div className="commercial-dashboard-subheading"><strong>Distribuição dos lotes</strong><span>Base: inventário comercial do segmento</span></div>
+            <CommercialDashboardLotChart
               aggregate={snapshot}
               highlightedStatus={highlightedStatus}
               onHoverStatus={onHoverStatus}

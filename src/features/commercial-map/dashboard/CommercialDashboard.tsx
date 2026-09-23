@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { ChartNoAxesCombined, Clock3, RefreshCw, X } from 'lucide-react';
 import type { CommercialMapData } from '../types';
 import { CommercialMiniMap } from './CommercialMiniMap';
-import { CommercialDashboardAreaChart, CommercialDashboardValueChart } from './CommercialDashboardCharts';
+import { CommercialDashboardLotChart, CommercialDashboardValueChart } from './CommercialDashboardCharts';
 import { CommercialDashboardComparison } from './CommercialDashboardComparison';
 import { CommercialSegmentDashboard } from './CommercialSegmentDashboard';
 import { buildCommercialDashboardSnapshot } from './commercialDashboardAnalytics';
@@ -88,6 +88,33 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
     <main className="commercial-dashboard-content">
       <section className="commercial-dashboard-kpis" aria-label="Indicadores comerciais principais">
         <Kpi
+          label="Lotes comerciais"
+          value={formatDashboardInteger(overall.commercialLots)}
+          detail={overall.commercialLots === 0 ? 'Nenhum espaço comercial cadastrado' : 'Inventário comercial ativo'}
+        />
+        <Kpi
+          label="Lotes vendidos"
+          value={<>{formatDashboardInteger(overall.soldLots)} <em>/ {formatDashboardInteger(overall.commercialLots)}</em></>}
+          detail="Do inventário comercial ativo"
+          progress={overall.commercialLots > 0 ? overall.soldLotPercentage : null}
+        />
+        <Kpi
+          label="% dos lotes vendidos"
+          value={overall.commercialLots > 0 ? formatDashboardPercentage(overall.soldLotPercentage) : '—'}
+          detail={overall.commercialLots > 0
+            ? `${formatDashboardInteger(overall.soldLots)} de ${formatDashboardInteger(overall.commercialLots)} lotes`
+            : 'Percentual pendente de inventário'}
+          progress={overall.commercialLots > 0 ? overall.soldLotPercentage : null}
+        />
+        <Kpi
+          label="Lotes disponíveis"
+          value={formatDashboardInteger(overall.availableLots)}
+          detail={overall.commercialLots > 0
+            ? `${formatDashboardPercentage(overall.byStatus.AVAILABLE.lotPercentage)} do inventário comercial`
+            : 'Percentual pendente de inventário'}
+          progress={overall.commercialLots > 0 ? overall.byStatus.AVAILABLE.lotPercentage : null}
+        />
+        <Kpi
           label="Área comercial cadastrada"
           value={formatDashboardAreaWithCoverage(overall.totalAreaSqm, overall.commercialLots, overall.lotsWithoutOfficialArea, overall.commercialLots)}
           detail={overall.commercialLots === 0 ? 'Nenhum espaço comercial cadastrado' : 'Metragem oficial dos espaços em oferta'}
@@ -103,12 +130,6 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
           value={formatDashboardAreaWithCoverage(overall.availableAreaSqm, overall.availableLots, overall.byStatus.AVAILABLE.areaPendingCount, overall.commercialLots)}
           detail={overall.totalAreaSqm > 0 ? `${formatDashboardPercentage(overall.byStatus.AVAILABLE.areaPercentage)} do total comercial` : 'Percentual pendente de metragem oficial'}
           progress={overall.totalAreaSqm > 0 ? overall.byStatus.AVAILABLE.areaPercentage : null}
-        />
-        <Kpi
-          label="Lotes vendidos"
-          value={<>{formatDashboardInteger(overall.soldLots)} <em>/ {formatDashboardInteger(overall.commercialLots)}</em></>}
-          detail="Do inventário comercial ativo"
-          progress={overall.commercialLots > 0 ? overall.soldLotPercentage : null}
         />
         <Kpi
           label="Valor comercial dos lotes vendidos"
@@ -146,8 +167,8 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
         </div>
         <div className="commercial-dashboard-overview-grid">
           <div className="commercial-dashboard-overview-analysis">
-            <div className="commercial-dashboard-subheading"><strong>Distribuição por área</strong><span>Dados comerciais do próprio mapa</span></div>
-            <CommercialDashboardAreaChart aggregate={overall} highlightedStatus={highlightedStatus} onHoverStatus={onHoverStatus} onToggleStatus={onToggleStatus} />
+            <div className="commercial-dashboard-subheading"><strong>Distribuição dos lotes</strong><span>Dados comerciais do próprio mapa</span></div>
+            <CommercialDashboardLotChart aggregate={overall} highlightedStatus={highlightedStatus} onHoverStatus={onHoverStatus} onToggleStatus={onToggleStatus} />
             <CommercialDashboardValueChart aggregate={overall} highlightedStatus={highlightedStatus} onHoverStatus={onHoverStatus} onToggleStatus={onToggleStatus} />
             <div className="commercial-dashboard-potential-breakdown" aria-label="Potencial por situação comercial">
               <div><span>Disponível</span><strong>{displayedValue(overall.availableValue, overall.availableLots, overall.byStatus.AVAILABLE.pricedLotCount)}</strong></div>
