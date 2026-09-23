@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 /**
  * Fonte única de verdade para KM rodados = tabela `vehicle_usage`.
@@ -21,16 +22,18 @@ import { useCurrentOrg } from './useCurrentOrg';
  */
 export function useVehicleUsage(vehicleId?: string) {
   const { orgId } = useCurrentOrg();
+  const { cycleYear } = useLogisticsCycle();
   const qc = useQueryClient();
 
   const { data: usages = [], isLoading } = useQuery({
-    queryKey: ['vehicle_usage', orgId, vehicleId],
+    queryKey: ['vehicle_usage', orgId, cycleYear, vehicleId],
     queryFn: async () => {
       if (!orgId) return [];
       let query = (supabase as any)
         .from('vehicle_usage')
         .select('*')
         .eq('org_id', orgId)
+        .eq('cycle_year', cycleYear)
         .order('retirada_em', { ascending: false });
       if (vehicleId) query = query.eq('vehicle_id', vehicleId);
       const { data } = await query;
@@ -67,6 +70,7 @@ export function useVehicleUsage(vehicleId?: string) {
       .from('vehicle_usage')
       .select('id, km_saida, km_chegada, observacoes')
       .eq('org_id', orgId)
+      .eq('cycle_year', cycleYear)
       .eq('vehicle_id', vehicleIdToCheck);
 
     const start = Number(kmSaida);
@@ -92,6 +96,7 @@ export function useVehicleUsage(vehicleId?: string) {
       .from('vehicle_usage')
       .select('km_chegada')
       .eq('org_id', orgId)
+      .eq('cycle_year', cycleYear)
       .eq('vehicle_id', vehicleIdToSync)
       .not('km_chegada', 'is', null)
       .order('km_chegada', { ascending: false })
@@ -129,7 +134,7 @@ export function useVehicleUsage(vehicleId?: string) {
       }
       const { data, error } = await (supabase as any)
         .from('vehicle_usage')
-        .insert({ ...usage, org_id: orgId })
+        .insert({ ...usage, org_id: orgId, cycle_year: cycleYear })
         .select()
         .single();
       if (error) throw error;

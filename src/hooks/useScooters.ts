@@ -3,19 +3,22 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { logAudit } from '@/services/auditService';
 import { nowSP } from '@/lib/utils';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 export function useScooters() {
   const { orgId } = useCurrentOrg();
+  const { cycleYear } = useLogisticsCycle();
   const qc = useQueryClient();
 
   const { data: scooters = [], isLoading } = useQuery({
-    queryKey: ['scooters', orgId],
+    queryKey: ['scooters', orgId, cycleYear],
     queryFn: async () => {
       if (!orgId) return [];
       const { data } = await (supabase as any)
         .from('scooters')
         .select('*')
         .eq('org_id', orgId)
+        .eq('cycle_year', cycleYear)
         .order('codigo');
       return data || [];
     },
@@ -27,7 +30,7 @@ export function useScooters() {
     mutationFn: async (scooter: Record<string, any>) => {
       const { data, error } = await (supabase as any)
         .from('scooters')
-        .insert({ ...scooter, org_id: orgId })
+        .insert({ ...scooter, org_id: orgId, cycle_year: cycleYear })
         .select().single();
       if (error) throw error;
       await logAudit({ orgId: orgId!, entity: 'scooters', entityId: data.id, action: 'create', after: data });
@@ -42,7 +45,7 @@ export function useScooters() {
       const { data, error } = await (supabase as any).from('scooters').update(updates).eq('id', id).select().single();
       if (error) throw error;
       await (supabase as any).from('scooter_history').insert({
-        org_id: orgId, scooter_id: id, action: 'mudanca_status',
+        org_id: orgId, scooter_id: id, cycle_year: cycleYear, action: 'mudanca_status',
         before_data: before, after_data: data,
         actor_user_id: (await supabase.auth.getUser()).data.user?.id,
       });
@@ -107,7 +110,7 @@ export function useScooters() {
       if (error) throw error;
       const user = (await supabase.auth.getUser()).data.user;
       await (supabase as any).from('scooter_history').insert({
-        org_id: orgId, scooter_id: id, action: 'retirada',
+        org_id: orgId, scooter_id: id, cycle_year: cycleYear, action: 'retirada',
         before_data: before, after_data: data, actor_user_id: user?.id,
       });
       return data;
@@ -135,7 +138,7 @@ export function useScooters() {
       if (error) throw error;
       const user = (await supabase.auth.getUser()).data.user;
       await (supabase as any).from('scooter_history').insert({
-        org_id: orgId, scooter_id: id, action: 'devolucao',
+        org_id: orgId, scooter_id: id, cycle_year: cycleYear, action: 'devolucao',
         before_data: before, after_data: data, actor_user_id: user?.id,
       });
       return data;
@@ -144,10 +147,10 @@ export function useScooters() {
   });
 
   const { data: history = [] } = useQuery({
-    queryKey: ['scooter-history', orgId],
+    queryKey: ['scooter-history', orgId, cycleYear],
     queryFn: async () => {
       if (!orgId) return [];
-      const { data } = await (supabase as any).from('scooter_history').select('*').eq('org_id', orgId).order('created_at', { ascending: false }).limit(200);
+      const { data } = await (supabase as any).from('scooter_history').select('*').eq('org_id', orgId).eq('cycle_year', cycleYear).order('created_at', { ascending: false }).limit(200);
       return data || [];
     },
     enabled: !!orgId,

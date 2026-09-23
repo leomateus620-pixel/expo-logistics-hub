@@ -2,19 +2,22 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { useCallback } from 'react';
+import { useLogisticsCycle } from '@/contexts/LogisticsCycleProvider';
 
 export function useTransportGuests() {
   const { orgId } = useCurrentOrg();
+  const { cycleYear } = useLogisticsCycle();
   const qc = useQueryClient();
 
   const { data: transportGuests = [], isLoading } = useQuery({
-    queryKey: ['transport-guests', orgId],
+    queryKey: ['transport-guests', orgId, cycleYear],
     queryFn: async () => {
       if (!orgId) return [];
       const { data } = await (supabase as any)
         .from('transport_guests')
         .select('*')
         .eq('org_id', orgId);
+        .eq('cycle_year', cycleYear);
       return data || [];
     },
     enabled: !!orgId,
