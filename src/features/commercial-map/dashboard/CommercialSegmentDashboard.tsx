@@ -65,8 +65,8 @@ export function CommercialSegmentDashboard({ snapshot, onViewLot }: CommercialSe
             <div><span>Área disponível</span><strong>{formatDashboardAreaWithCoverage(snapshot.availableAreaSqm, snapshot.availableLots, snapshot.byStatus.AVAILABLE.areaPendingCount, snapshot.commercialLots)}</strong></div>
           </div>
           <div className="commercial-dashboard-segment-chart">
-            <div className="commercial-dashboard-subheading"><strong>Ocupação por área</strong><span>Base: metragem oficial cadastrada</span></div>
-            <CommercialDashboardAreaChart
+            <div className="commercial-dashboard-subheading"><strong>Distribuição dos lotes</strong><span>Base: inventário comercial do segmento</span></div>
+            <CommercialDashboardLotChart
               aggregate={snapshot}
               highlightedStatus={highlightedStatus}
               onHoverStatus={onHoverStatus}
