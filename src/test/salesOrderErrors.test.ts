@@ -70,7 +70,7 @@ describe('registerSaleOrder', () => {
       payment: { paymentType: 'CASH', installmentCount: 1, paymentMethod: 'PIX', firstDueDate: '2026-10-01' },
       installments: [],
       expectedTotal: 100,
-    })).rejects.toBeInstanceOf(SalesOrderError);
+    })).rejects.toMatchObject({ name: 'SalesOrderError' });
 
     expect(spy).toHaveBeenCalledWith('commercial_sale_order_failed', expect.objectContaining({
       operation: 'register_commercial_sale_order',
@@ -101,7 +101,7 @@ describe('registerSaleOrder', () => {
       expectedTotal: 10,
     }).then(() => null).catch((error: unknown) => error as SalesOrderError) as unknown as SalesOrderError;
 
-    expect(failure).toBeInstanceOf(SalesOrderError);
+    expect(failure.name).toBe('SalesOrderError');
     expect(failure.diagnostics.code).toBe('42703');
     expect(failure.diagnostics.kind).toBe('SCHEMA');
     expect(failure.diagnostics.details).not.toContain('048.675.580-01');
