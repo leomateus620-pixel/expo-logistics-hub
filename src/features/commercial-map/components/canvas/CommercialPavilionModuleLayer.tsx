@@ -24,6 +24,9 @@ import { dispatchSalesModuleClick } from '../../sales/salesInteraction';
 import { useSalesSelectedLotIds } from '../../sales/useSalesSelection';
 import type { CommercialStatus } from '../../types';
 import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
+import { SoldLotLocks } from './SoldLotLocks';
+import { isSoldLot, soldLotSurfaceColor, type SoldLotSurface } from '../../utils/soldLotPresentation';
+import type { Coordinate } from '../../types';
 
 const NO_RAYCAST = () => undefined;
 
@@ -63,7 +66,7 @@ export function resolveModuleInteractionState(
   activeHoveredId: string | null,
   salesSelectedLotIds: ReadonlySet<string>,
 ): ModuleInteractionState {
-  const inCart = Boolean(moduleState?.lotId && salesSelectedLotIds.has(moduleState.lotId));
+  const inCart = Boolean(!isSoldLot(moduleState?.status) && moduleState?.lotId && salesSelectedLotIds.has(moduleState.lotId));
   const isSelected = inCart || cellId === activeSelectedId;
   return {
     inCart,
@@ -684,6 +687,8 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       }
       if (isSelected) color.lerp(SELECTED_COLOR, 0.82);
       else if (isHovered) color.lerp(HOVER_COLOR, 0.55);
+      const soldColor = soldLotSurfaceColor(persistedStatus);
+      if (soldColor) color.set(soldColor);
       moduleMesh.current?.setColorAt(index, color);
 
       borderColor.copy(color).multiplyScalar(isSelected ? 0.68 : isHovered ? 0.56 : 0.43);
@@ -806,6 +811,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   const salesToggle = useCallback((moduleId: string) => {
     const state = moduleStateById.get(moduleId) ?? null;
     return dispatchSalesModuleClick(state && {
+      status: state.status,
       lotId: state.lotId,
       publicIdentifier: state.publicIdentifier,
       displayName: state.displayName,
@@ -861,8 +867,39 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     gl.domElement.style.cursor = 'grab';
   }, [gl, interactive, setHoveredModuleId]);
 
+  const lockSurfaces = useMemo(() => {
+    const surfaces: SoldLotSurface[] = [];
+    const add = (cell: OrientedModuleCell, ring: Coordinate[], preferredAnchor?: Coordinate) => {
+      const state = moduleStateById.get(cell.id);
+      const interaction = resolveModuleInteractionState(cell.id, state ?? null, activeSelectedId, activeHoveredId, salesSelectedLotIds);
+      const visual = resolveModuleVisualGeometry(interaction, flatModules);
+      surfaces.push({ id: cell.id, status: state?.status ?? null, preferredAnchor, geometry: {
+        coordinates: [ring], elevation: floorY + moduleBaseHeight + 0.008,
+        extrusionHeight: moduleHeight * visual.heightScale,
+      } });
+    };
+    // A decomposed cell still represents one lot; use its largest safe part.
+    const primaryParts = new Map<string, (typeof projectedModuleParts)[number]>();
+    for (const part of projectedModuleParts) {
+      const previous = primaryParts.get(part.cell.id);
+      if (!previous || part.projected.width * part.projected.depth > previous.projected.width * previous.projected.depth) primaryParts.set(part.cell.id, part);
+    }
+    for (const { cell, projected } of primaryParts.values()) {
+      const { centerX: x, centerZ: z, width, depth } = projected;
+      const w = width * 0.45, d = depth * 0.44;
+      const anchor: Coordinate = width > depth * 1.8 ? [x + width * .30, z]
+        : depth > width * 1.8 ? [x, z - depth * .30] : [x + width * .28, z - depth * .28];
+      add(cell, [[x - w, z - d], [x + w, z - d], [x + w, z + d], [x - w, z + d]], anchor);
+    }
+    for (const { cell, footprint, center } of projectedIrregularModules) {
+      add(cell, footprint.map(([x, z]) => [center[0] + (x - center[0]) * 0.91, center[1] + (z - center[1]) * 0.90]));
+    }
+    return surfaces;
+  }, [projectedModuleParts, projectedIrregularModules, moduleStateById, activeSelectedId, activeHoveredId, salesSelectedLotIds, flatModules, floorY, moduleBaseHeight, moduleHeight]);
+
   return (
     <group raycast={NO_RAYCAST} dispose={null}>
+      <SoldLotLocks surfaces={lockSurfaces} />
       {projectedCorridors.length > 0 && (
         <instancedMesh
           ref={setCorridorMesh}
@@ -928,6 +965,8 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
         }
         if (isSelected) color.lerp(SELECTED_COLOR, 0.82);
         else if (isHovered) color.lerp(HOVER_COLOR, 0.55);
+        const soldColor = soldLotSurfaceColor(persistedStatus);
+        if (soldColor) color.set(soldColor);
         const borderColor = color.clone().multiplyScalar(
           isSelected ? 0.68 : isHovered ? 0.56 : 0.43,
         );

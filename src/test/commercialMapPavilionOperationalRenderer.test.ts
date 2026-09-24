@@ -61,8 +61,9 @@ describe('renderer operacional do interior comercial', () => {
   it('resolve seleção de regulares e irregulares pela mesma fonte do carrinho', () => {
     const layer = read('src/features/commercial-map/components/canvas/CommercialPavilionModuleLayer.tsx');
 
-    expect(layer.match(/resolveModuleInteractionState\(/g)).toHaveLength(3);
-    expect(layer.match(/resolveModuleVisualGeometry\(/g)).toHaveLength(3);
+    // Regular cells, irregular cells and their sold markers share the same elevation rule.
+    expect(layer.match(/resolveModuleInteractionState\(/g)).toHaveLength(4);
+    expect(layer.match(/resolveModuleVisualGeometry\(/g)).toHaveLength(4);
     expect(layer).toContain('salesSelectedLotIds.has(moduleState.lotId)');
     expect(layer).toMatch(/projectedIrregularModules\.map[\s\S]*?resolveModuleInteractionState\(/);
     expect(layer).toMatch(/projectedIrregularModules\.map[\s\S]*?resolveModuleVisualGeometry\(/);

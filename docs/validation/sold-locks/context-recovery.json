@@ -1,0 +1,13 @@
+{
+  "health": {
+    "status": "ready",
+    "path": "direct",
+    "presentedFrames": 572,
+    "contextLosses": 1,
+    "lastErrorCode": null
+  },
+  "locks": 264,
+  "canvasMounts": 1,
+  "rendererCreates": 1,
+  "controlsCreates": 1
+}
