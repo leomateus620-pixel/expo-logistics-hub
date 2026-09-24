@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import type { CommercialLot } from '../../types';
 import { ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
@@ -16,7 +17,7 @@ import '../sales-mode.css';
  * barra/gaveta mobile e checkout. Nenhuma geometria, área ou cadastro muda aqui,
  * e `reducedGraphics` nunca é acionado — pavilhões mantêm a arquitetura normal.
  */
-export function SalesModeLayer({ projectId }: { projectId: string | null }) {
+export function SalesModeLayer({ projectId, lots }: { projectId: string | null; lots: readonly CommercialLot[] }) {
   const active = useSalesStore((state) => state.salesModeActive);
   const selectionCount = useSalesStore((state) => state.selection.length);
   const checkoutOpen = useSalesStore((state) => state.checkoutOpen);
@@ -28,6 +29,15 @@ export function SalesModeLayer({ projectId }: { projectId: string | null }) {
 
   const { summary, loading } = useSalesCart();
   useSalesEligibility(projectId, active);
+
+  useLayoutEffect(() => {
+    const store = useSalesStore.getState();
+    const soldIds = new Set(lots.filter(lot => lot.status === 'SOLD').map(lot => lot.id));
+    const soldSelection = store.selection.filter(entry => soldIds.has(entry.lotId));
+    if (!soldSelection.length) return;
+    soldSelection.forEach(entry => store.removeLot(entry.lotId));
+    store.setCheckoutOpen(false);
+  }, [lots]);
 
   // Ambientação decorativa some enquanto o modo Vendas está ativo e volta ao sair.
   useEffect(() => {

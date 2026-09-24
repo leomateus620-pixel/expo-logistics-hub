@@ -1,14 +1,17 @@
 import { LightingBenchmark } from './LightingBenchmark';
 import { EnvironmentBenchmark } from './EnvironmentBenchmark';
 import { useCommercialMapBootVisit } from '../hooks/useCommercialMapBootVisit';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useVisitStore } from '../visit/useVisitStore';
 import { VISIT_SPAWN_LABELS, VISIT_SPAWN_POINTS, visitSpawnEntity, type VisitSpawnId } from '../visit/VisitSpawnManager';
 import { VisitOverlay } from '../visit/VisitOverlay';
 import { CommercialMapCanvas } from '../components/canvas/CommercialMapCanvas';
 import { CommercialMapRendererStatus } from '../components/CommercialMapRendererStatus';
-import { DIAGNOSTICS_MAP_DATA } from './commercialMapDiagnosticsData';
+import { DIAGNOSTICS_MAP_DATA, DIAGNOSTICS_DATA_QUERY_KEY } from './commercialMapDiagnosticsData';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import type { CommercialMapData, CommercialStatus } from '../types';
+import { publicFocusBounds, type PublicExternalScenePolicy } from '../public/publicScenePolicy';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import {
   summarizeCommercialMapRuntimeDiagnostics,
@@ -177,6 +180,36 @@ function formatMetric(value: number | null, suffix = '') {
  * App.tsx excludes the route and dynamic import from production builds.
  */
 export default function CommercialMapRenderingDiagnosticsPage() {
+  const queryClient = useQueryClient();
+  const { data: fixture } = useQuery({ queryKey: DIAGNOSTICS_DATA_QUERY_KEY,
+    queryFn: () => DIAGNOSTICS_MAP_DATA, initialData: DIAGNOSTICS_MAP_DATA, enabled: false });
+  const [soldQaPresentation, setSoldQaPresentation] = useState({ public: false, filters: false });
+  const soldQaPublicPolicy = useMemo<PublicExternalScenePolicy | null>(() => {
+    if (!soldQaPresentation.public) return null;
+    const external = fixture.entities.filter(entity => entity.classification === 'SELLABLE_LOT');
+    const ids = new Set(external.map(entity => entity.id));
+    return { mode: 'public-external', vegetationEnabled: false, contextAppearance: 'grayscale',
+      activeScope: ids, interactiveEntityIds: ids,
+      interactiveLotIds: new Set(fixture.lots.filter(lot => ids.has(lot.entityId)).map(lot => lot.id)),
+      focusBounds: publicFocusBounds(external) };
+  }, [fixture.entities, fixture.lots, soldQaPresentation.public]);
+  useEffect(() => {
+    if (!new URLSearchParams(window.location.search).has('soldLocksQa')) return;
+    const update = (event: Event) => {
+      const { status, entityId } = (event as CustomEvent<{ status: CommercialStatus; entityId?: string }>).detail;
+      if (!['AVAILABLE', 'SOLD', 'RESERVED', 'BLOCKED'].includes(status)) return;
+      queryClient.setQueryData<CommercialMapData>(DIAGNOSTICS_DATA_QUERY_KEY, previous => previous && ({
+        ...previous, lots: previous.lots.map(lot => !entityId || lot.entityId === entityId ? { ...lot, status } : lot),
+      }));
+    };
+    const presentation = (event: Event) => setSoldQaPresentation((event as CustomEvent<{ public: boolean; filters: boolean }>).detail);
+    window.addEventListener('commercial-map:qa-lot-status', update);
+    window.addEventListener('commercial-map:qa-lot-presentation', presentation);
+    return () => {
+      window.removeEventListener('commercial-map:qa-lot-status', update);
+      window.removeEventListener('commercial-map:qa-lot-presentation', presentation);
+    };
+  }, [queryClient]);
   const qualityQa = new URLSearchParams(window.location.search).get('qualityQa');
   const qualityQaQuery = qualityQa && ['LOW', 'MEDIUM', 'HIGH', 'ULTRA'].includes(qualityQa) ? `&qualityQa=${qualityQa}` : '';
   const newBootVisit = useCommercialMapBootVisit();
@@ -609,10 +642,12 @@ export default function CommercialMapRenderingDiagnosticsPage() {
             entities={DIAGNOSTICS_MAP_DATA.entities}
             parkingOwnerEntities={DIAGNOSTICS_MAP_DATA.entities}
             siteEnvironmentEntities={DIAGNOSTICS_MAP_DATA.entities}
-            lots={DIAGNOSTICS_MAP_DATA.lots}
+            lots={fixture.lots}
+            publicScenePolicy={soldQaPublicPolicy}
+            interactiveEntityIds={soldQaPublicPolicy?.interactiveEntityIds}
             calibration={DIAGNOSTICS_MAP_DATA.calibration}
             matchingEntityIds={EMPTY_MATCHING_ENTITY_IDS}
-            filtersActive={false}
+            filtersActive={soldQaPresentation.filters}
           />
           <CommercialMapRendererStatus />
         </div>

@@ -8,6 +8,10 @@ import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
 import { PublicScenePolicyContext, usePublicScenePolicy } from './PublicScenePolicyContext';
 import { PublicContextGroup, PublicMaterialPool } from './PublicContextGroup';
 import { PublicLotNumbers } from './PublicLotNumbers';
+import { SoldLotLocks } from './SoldLotLocks';
+import type { Coordinate } from '../../types';
+import { isSoldLot, soldLotSurfaceColor } from '../../utils/soldLotPresentation';
+import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { PublicMapEnvironment } from './PublicMapEnvironment';
 import { arenaVegetationAllowed } from '../../data/arenaCanonicalLayout';
 import { createArenaParkingGeometry, isArenaParking } from '../../utils/arenaParkingGeometry';
@@ -1315,6 +1319,8 @@ function lotColor(
   blend = new THREE.Color(),
 ) {
   const status = STATUS_CONFIG[entry.lot.status];
+  const soldColor = soldLotSurfaceColor(entry.lot.status);
+  if (soldColor) return target.set(soldColor);
   const color = segment
     ? target.set(status.color).lerp(blend.set(segment.palette.surface), SEGMENT_LOT_SURFACE_WEIGHT)
     : target.set(status.color);
@@ -1365,7 +1371,7 @@ function SegmentLotAccents({
 }) {
   const invalidate = useThree((state) => state.invalidate);
   const accents = useMemo(() => {
-    const accentedEntries = entries.filter((entry) => segmentByEntity.has(entry.entity.id));
+    const accentedEntries = entries.filter((entry) => !isSoldLot(entry.lot.status) && segmentByEntity.has(entry.entity.id));
     if (accentedEntries.length === 0) return null;
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshStandardMaterial({
@@ -1412,7 +1418,7 @@ function SegmentLotAccents({
   }, [entries, segmentByEntity]);
 
   useEffect(() => () => {
-    accents?.mesh.dispose?.();
+    disposeInstancedMesh(accents?.mesh);
     accents?.geometry.dispose();
     accents?.material.dispose();
   }, [accents]);
@@ -1448,6 +1454,7 @@ function SegmentLotAccents({
 
 function BatchedLots({
   entries,
+  obstacles,
   selectedEntityId,
   hoveredEntityId,
   matchingEntityIds,
@@ -1462,6 +1469,7 @@ function BatchedLots({
   onCursor,
 }: {
   entries: LotEntry[];
+  obstacles: readonly Coordinate[][];
   selectedEntityId: string | null;
   hoveredEntityId: string | null;
   matchingEntityIds: ReadonlySet<string>;
@@ -1494,6 +1502,10 @@ function BatchedLots({
   });
   visualStateRef.current = { selectedEntityId, hoveredEntityId };
   const entryByEntity = useMemo(() => new Map(entries.map((entry) => [entry.entity.id, entry])), [entries]);
+  const lockSurfaces = useMemo(() => entries.map(({ entity, lot }) => ({
+    id: entity.id, status: lot.status, geometry: entity.geometry,
+  })), [entries]);
+  const soldEntityIds = useMemo(() => new Set(entries.filter(entry => isSoldLot(entry.lot.status)).map(entry => entry.entity.id)), [entries]);
   const batch = useMemo(() => {
     if (entries.length === 0) return null;
     const sourceGeometries = entries.map(({ entity }) => {
@@ -1600,7 +1612,7 @@ function BatchedLots({
     const selected = currentSelection === entityId;
     const hovered = currentHover === entityId;
     const scratch = visualScratch.current;
-    const salesSelected = salesSelectedLotIds.has(entry.lot.id);
+    const salesSelected = !isSoldLot(entry.lot.status) && salesSelectedLotIds.has(entry.lot.id);
     const color = lotColor(
       entry,
       publicPolicy ? null : segmentByEntity.get(entityId) ?? null,
@@ -1613,7 +1625,7 @@ function BatchedLots({
       scratch.blend,
     );
     // Realce do carrinho: dourado sólido, mantendo geometria e status originais.
-    if (publicPolicy && selected) color.set('#ffed91');
+    if (publicPolicy && selected && !isSoldLot(entry.lot.status)) color.set('#ffed91');
     if (salesSelected) color.lerp(scratch.blend.set('#f2c94c'), 0.62);
     batch.mesh.setColorAt(batchId, color);
     const lift = salesSelected ? 0.09 : selected ? 0.055 : hovered ? 0.035 : 0;
@@ -1691,6 +1703,7 @@ function BatchedLots({
 
   return (
     <>
+      <SoldLotLocks surfaces={lockSurfaces} obstacles={obstacles} selectedId={selectedEntityId} hoveredId={hoveredEntityId} />
       {!infrastructureMode && !publicPolicy ? (
         <>
           <ExporuralLandscape
@@ -1750,7 +1763,7 @@ function BatchedLots({
           toneMapped={false}
         />
       </lineSegments>
-      {publicPolicy && <PublicLotNumbers entities={geometryEntities} />}
+      {publicPolicy && <PublicLotNumbers entities={geometryEntities} soldEntityIds={soldEntityIds} />}
       {selectedEntity && <LotSelectionOutline entity={selectedEntity} />}
     </>
   );
@@ -1803,7 +1816,7 @@ const EntityLabel = memo(function EntityLabel({
       calculatePosition={calculateContextualLabelPosition}
       style={{
         pointerEvents: 'none',
-        transform: 'translate3d(-50%, -100%, 0)',
+        transform: isSoldLot(lot?.status) ? 'translate3d(-50%, calc(-100% - 24px), 0)' : 'translate3d(-50%, -100%, 0)',
         visibility: cinematicHidden ? 'hidden' : 'visible',
       }}
     >
@@ -4814,6 +4827,9 @@ const Scene = memo(function Scene({
   const nonLotEntities = useMemo(() => exteriorRenderedEntities.filter((entity) => (
     !lotByEntity.has(entity.id)
   )), [exteriorRenderedEntities, lotByEntity]);
+  const lotLockObstacles = useMemo(() => nonLotEntities
+    .filter(entity => ['PAVILION', 'BUILDING', 'RESTAURANT', 'RESTROOM', 'CHEMICAL_RESTROOM', 'ADMINISTRATION', 'SECURITY', 'EMERGENCY', 'SERVICE'].includes(entity.classification))
+    .map(entity => entity.geometry.coordinates[0]), [nonLotEntities]);
   const circulationEntities = useMemo(() => (
     withGateFourDistrictPresentationEntities(nonLotEntities).filter((entity) => (
       (entity.classification === 'ROAD' || entity.classification === 'PEDESTRIAN_PATH')
@@ -5192,6 +5208,7 @@ const Scene = memo(function Scene({
         </group>
       )}
       <group userData={{ publicActive: true }}><BatchedLots
+        obstacles={lotLockObstacles}
         salesSelectedLotIds={interactiveEntityIds ? EMPTY_PUBLIC_SALES : salesSelectedLotIds}
         entries={lotEntries}
         selectedEntityId={selectedEntityId}

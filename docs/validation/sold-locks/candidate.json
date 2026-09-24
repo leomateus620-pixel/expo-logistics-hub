@@ -1,0 +1,26 @@
+{
+  "health": {
+    "status": "ready",
+    "path": "post",
+    "presentedFrames": 2413,
+    "contextLosses": 0,
+    "lastErrorCode": null
+  },
+  "renderer": {
+    "at": 97661.89999997616,
+    "calls": 811,
+    "triangles": 671903,
+    "geometries": 558,
+    "textures": 131,
+    "programs": 222,
+    "dpr": 1,
+    "width": 1425,
+    "height": 772,
+    "heapBytes": 209192847,
+    "qualityTier": "HIGH",
+    "gpuVendor": "Google Inc. (Intel)",
+    "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+  },
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+  "errors": []
+}

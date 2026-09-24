@@ -1,4 +1,4 @@
-import type { CommercialLot } from '../types';
+import type { CommercialLot, CommercialStatus } from '../types';
 import { isSellableLot, toSalesEntry } from './salesEntry';
 import { useSalesStore } from './useSalesSelection';
 
@@ -23,6 +23,7 @@ export function isSalesModeActive(): boolean {
 }
 
 export interface SalesModuleClickTarget {
+  status?: CommercialStatus | null;
   lotId: string | null;
   publicIdentifier: string | null;
   displayName?: string | null;
@@ -37,7 +38,7 @@ export function dispatchSalesModuleClick(target: SalesModuleClickTarget | null |
   const state = useSalesStore.getState();
   if (!state.salesModeActive) return false;
   const lotId = target?.lotId ?? null;
-  if (!lotId || !state.eligibleLotIds?.has(lotId)) return true;
+  if (!lotId || target?.status === 'SOLD' || !state.eligibleLotIds?.has(lotId)) return true;
   const publicIdentifier = target?.publicIdentifier ?? lotId;
   state.toggleLot({
     lotId,

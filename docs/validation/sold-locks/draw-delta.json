@@ -1,0 +1,14 @@
+{
+  "withLocks": {
+    "calls": 77,
+    "triangles": 94553
+  },
+  "withoutLocks": {
+    "calls": 76,
+    "triangles": 46505
+  },
+  "restored": {
+    "calls": 77,
+    "triangles": 94553
+  }
+}

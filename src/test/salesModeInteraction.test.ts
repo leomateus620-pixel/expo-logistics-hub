@@ -55,6 +55,12 @@ beforeEach(() => {
 });
 
 describe('elegibilidade comercial', () => {
+  it('SOLD blocks clicks even while server eligibility cache still contains the lot', () => {
+    expect(isSellableLot(lot('a', { status: 'SOLD' }), new Set(['a']))).toBe(false);
+    expect(dispatchSalesLotClick(lot('a', { status: 'SOLD' }))).toBe(true);
+    expect(dispatchSalesModuleClick({ lotId: 'b', publicIdentifier: 'P1-M001', status: 'SOLD' })).toBe(true);
+    expect(useSalesStore.getState().selection).toHaveLength(0);
+  });
   it('usa o conjunto decidido pelo servidor, não o status bruto', () => {
     const eligible = new Set(['a']);
     expect(isSellableLot(lot('a'), eligible)).toBe(true);
