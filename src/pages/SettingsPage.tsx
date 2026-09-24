@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useAuth } from '@/hooks/useAuth';
+import { useCapabilities } from '@/hooks/useCapabilities';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Settings, Users, Shield, ShieldCheck, Loader2, ChevronDown, ChevronUp, CalendarRange } from 'lucide-react';
@@ -67,8 +68,11 @@ export default function SettingsPage() {
   const [showFindings, setShowFindings] = useState(false);
   const [loadingFindings, setLoadingFindings] = useState(false);
 
+  const { hasCapability, capSet } = useCapabilities();
+  const isRestricted = capSet.has('restricted_scope');
   const isAdmin = myRole === 'admin';
-  const canSeeAudit = myRole === 'admin' || myRole === 'operador';
+  const canSeeAudit = myRole === 'admin' || (myRole === 'operador' && !isRestricted);
+  const canSwitchCycle = isAdmin || myRole === 'gestor' || hasCapability('logistica_access');
 
   const runAudit = async () => {
     if (!orgId) return;
@@ -125,7 +129,7 @@ export default function SettingsPage() {
         <p className="text-sm text-muted-foreground mt-1">Gerenciar organização e permissões</p>
       </div>
 
-      {isAdmin && (
+      {canSwitchCycle && (
         <div className="rounded-xl border bg-card p-4 sm:p-5">
           <h2 className="mb-2 flex items-center gap-2 font-semibold">
             <CalendarRange className="h-4 w-4 text-primary" /> Ciclo da Logística

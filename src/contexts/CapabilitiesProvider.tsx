@@ -39,11 +39,16 @@ const VENUE_OPERATOR_CAPABILITIES = new Set([
   "venue_reports_view",
 ]);
 
+/** Operators marked `restricted_scope` only get their explicit capabilities. */
+export function resolveRestrictedScope(role: string | null | undefined, caps: ReadonlySet<string>) {
+  return role === "operador" && caps.has("restricted_scope");
+}
+
 export function CapabilitiesProvider({ children }: { children: ReactNode }) {
   const { user, loading: authLoading } = useAuth();
   const { orgId, myRole, isLoading: orgLoading } = useCurrentOrg();
 
-  const hasFullAccessByRole =
+  const roleIsElevated =
     myRole === "admin" || myRole === "gestor" || myRole === "operador";
   const roleResolved =
     !authLoading &&
@@ -53,6 +58,8 @@ export function CapabilitiesProvider({ children }: { children: ReactNode }) {
     myRole !== null &&
     myRole !== undefined;
 
+  // Capabilities are always loaded for operators so a `restricted_scope`
+  // marker can demote them to explicit, per-capability access.
   const { data: capabilities = [], isLoading: capLoading } = useQuery({
     queryKey: ["user-capabilities", user?.id, orgId],
     queryFn: async () => {
@@ -65,18 +72,20 @@ export function CapabilitiesProvider({ children }: { children: ReactNode }) {
       if (error) throw error;
       return (data || []).map((row) => row.capability);
     },
-    enabled: roleResolved && !hasFullAccessByRole,
+    enabled: roleResolved && myRole !== "admin" && myRole !== "gestor",
     staleTime: 60000,
   });
 
   const capSet = useMemo(() => new Set<string>(capabilities), [capabilities]);
+  const isRestricted = resolveRestrictedScope(myRole, capSet);
+  const hasFullAccessByRole = roleIsElevated && !isRestricted;
   const hasFullAccess = hasFullAccessByRole || capSet.has("full_access");
 
   const isLoading =
     authLoading ||
     (!!user &&
       (orgLoading || (!!orgId && (myRole === null || myRole === undefined)))) ||
-    (roleResolved && !hasFullAccessByRole && capLoading);
+    (roleResolved && myRole !== "admin" && myRole !== "gestor" && capLoading);
 
   const hasCapability = useCallback(
     (cap: string) => {
@@ -84,14 +93,14 @@ export function CapabilitiesProvider({ children }: { children: ReactNode }) {
         if (myRole === "admin") return true;
         if (myRole === "gestor" && VENUE_GESTOR_CAPABILITIES.has(cap))
           return true;
-        if (myRole === "operador" && VENUE_OPERATOR_CAPABILITIES.has(cap))
+        if (!isRestricted && myRole === "operador" && VENUE_OPERATOR_CAPABILITIES.has(cap))
           return true;
         return capSet.has(cap) || capSet.has("venue_events_full_access");
       }
       if (hasFullAccess) return true;
       return capSet.has(cap);
     },
-    [hasFullAccess, capSet, myRole],
+    [hasFullAccess, capSet, myRole, isRestricted],
   );
 
   const value = useMemo(
