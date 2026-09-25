@@ -25,6 +25,10 @@ export function useLotPriceOverride(lotId: string | null) {
       if (total === null) await clearLotPriceOverride(lotId, stage);
       else await setLotPriceOverride(lotId, stage, total);
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['commercial-map'] }),
+    onSuccess: () => {
+      // A gravação já terminou: não mantenha o formulário bloqueado enquanto
+      // as demais leituras do mapa se atualizam em segundo plano.
+      void queryClient.invalidateQueries({ queryKey: ['commercial-map'] });
+    },
   });
 }

@@ -1,5 +1,7 @@
 .lot-pricing-2028 {
   display: grid;
+  min-width: 0;
+  width: 100%;
   gap: 0.5rem;
   padding: 0.75rem;
   border: 1px solid oklch(var(--border));
@@ -47,6 +49,7 @@
 
 .lot-pricing-2028-stages {
   display: grid;
+  min-width: 0;
   gap: 0.5rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -59,6 +62,7 @@
 
 .lot-pricing-2028-stage {
   display: grid;
+  min-width: 0;
   gap: 0.125rem;
   padding: 0.5rem 0.625rem;
   border-radius: 0.75rem;
@@ -122,15 +126,19 @@
 .lot-pricing-2028-edit svg { width: 0.8rem; height: 0.8rem; }
 
 .lot-pricing-2028-manual { font-style: normal; color: oklch(var(--primary)); }
-.lot-pricing-2028-sold { font-size: 0.7rem; color: oklch(var(--muted-foreground)); font-variant-numeric: tabular-nums; }
 
 .lot-pricing-2028-stage.is-editing {
+  grid-column: 1 / -1;
+  min-width: 0;
   gap: 0.375rem;
+  padding: 0.625rem;
   border: 1px solid oklch(var(--primary) / 0.45);
   background: oklch(var(--card));
 }
 .lot-pricing-2028-edit-field {
   display: flex;
+  width: 100%;
+  min-width: 0;
   align-items: center;
   gap: 0.375rem;
   min-height: 2.75rem;
@@ -165,4 +173,34 @@
 .lot-pricing-2028-edit-actions .is-primary { background: oklch(var(--primary)); color: oklch(var(--primary-foreground)); }
 .lot-pricing-2028-edit-actions .is-secondary { border: 1px solid oklch(var(--border)); color: oklch(var(--foreground)); }
 .lot-pricing-2028-edit-actions button:disabled { opacity: 0.55; }
-.lot-pricing-2028-restore { font-size: 0.7rem; text-align: left; color: oklch(var(--primary)); text-decoration: underline; }
+.lot-pricing-2028-restore {
+  width: fit-content;
+  max-width: 100%;
+  min-height: 2.75rem;
+  padding: 0.375rem 0;
+  overflow-wrap: anywhere;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  text-align: left;
+  color: oklch(var(--primary));
+  text-decoration: underline;
+}
+
+@media (max-width: 420px) {
+  .lot-pricing-2028-stage.is-editing {
+    padding: 0.625rem;
+  }
+
+  .lot-pricing-2028-edit-field {
+    min-height: 3rem;
+  }
+
+  .lot-pricing-2028-edit-field input {
+    width: 100%;
+    font-size: 1.05rem;
+  }
+
+  .lot-pricing-2028-edit-actions button {
+    min-height: 2.75rem;
+  }
+}
