@@ -161,6 +161,7 @@ const COMMISSION_READ_ONLY_PERMISSIONS: MapPermissions = {
   canEdit: false,
   canEditGeometry: false,
   canManageLots: false,
+  canEditPricing: false,
   canManageSales: false,
   canManageContracts: false,
   canManageLayers: false,

@@ -232,6 +232,8 @@ export interface MapPermissions {
   canEdit: boolean;
   canEditGeometry: boolean;
   canManageLots: boolean;
+  /** Edição manual dos valores 2028 (Renovação / 2ª Etapa). */
+  canEditPricing: boolean;
   canManageSales: boolean;
   canManageContracts: boolean;
   canManageLayers: boolean;

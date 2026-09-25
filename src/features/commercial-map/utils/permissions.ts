@@ -15,6 +15,7 @@ export function resolveMapPermissions(role: string | null, capabilities: Iterabl
     canEdit: elevated || explicit('map.edit'),
     canEditGeometry: elevated || explicit('map.edit_geometry'),
     canManageLots: elevated || explicit('map.manage_lots'),
+    canEditPricing: elevated || explicit('map.edit') || explicit('map.manage_lots'),
     canManageSales: elevated || explicit('map.manage_sales'),
     canManageContracts: elevated || explicit('map.manage_contracts'),
     canManageLayers: elevated || explicit('map.manage_layers'),
