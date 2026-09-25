@@ -1192,26 +1192,33 @@ export async function fetchLotActivity(lotId: string): Promise<MapActivity[]> {
 }
 
 export async function fetchLotSaleHistory(lotId: string): Promise<LotSaleHistory | null> {
+  const { data: sale, error: saleError } = await db
+    .from('lot_sales')
+    .select('id,sale_date,salesperson_name,contract_number,status,created_at')
+    .eq('lot_id', lotId)
+    .eq('status', 'CONFIRMED')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (saleError) throw saleError;
+  if (!sale) return null;
+
   const { data: item, error: itemError } = await db
     .from('lot_sale_order_items')
     .select('order_id,sale_id,official_area_snapshot,item_total')
-    .eq('lot_id', lotId)
+    .eq('sale_id', sale.id)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
   if (itemError) throw itemError;
   if (!item) return null;
 
-  const [{ data: order, error: orderError }, { data: installments, error: installmentsError }, { data: sale, error: saleError }] = await Promise.all([
+  const [{ data: order, error: orderError }, { data: installments, error: installmentsError }] = await Promise.all([
     db.from('lot_sale_orders').select('id,buyer_name,stage,payment_type,payment_method,created_at').eq('id', item.order_id).maybeSingle(),
     db.from('lot_sale_installments').select('installment_number,due_date,amount,payment_status').eq('order_id', item.order_id).order('installment_number'),
-    item.sale_id
-      ? db.from('lot_sales').select('sale_date,salesperson_name,contract_number,status').eq('id', item.sale_id).eq('status', 'CONFIRMED').maybeSingle()
-      : Promise.resolve({ data: null, error: null }),
   ]);
   if (orderError) throw orderError;
   if (installmentsError) throw installmentsError;
-  if (saleError) throw saleError;
   if (!order) return null;
   return {
     orderId: order.id,

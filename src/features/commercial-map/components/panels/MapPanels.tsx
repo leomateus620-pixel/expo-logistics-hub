@@ -58,7 +58,6 @@ import { getHistoryIdForEntity } from '../../history/bindings';
 import { HistoryExperience } from '../../history/HistoryExperience';
 import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
 
-const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
 const areaNumber = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const dateTime = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo' });
@@ -463,7 +462,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
                       {lot.status !== 'SOLD' && lot.reservationExpiresAt && <div><dt>Reserva até</dt><dd>{dateTime.format(new Date(lot.reservationExpiresAt))}</dd></div>}
                     </dl>
                   </div>
-                  {permissions.canManageContracts && (
+                  {permissions.canManageContracts && (lot.status === 'SOLD' || Boolean(contracts.data?.length)) && (
                     <section className="commercial-map-contract-action" aria-label="Contrato da venda">
                       <div className="commercial-map-contract-action__heading">
                         <FileLock2 aria-hidden="true" />
