@@ -29,6 +29,12 @@ vi.mock('@/features/commercial-map/hooks/useCommercialMap', () => ({
     sale: mutation,
     contract: mutation,
   }),
+  useLotSaleHistory: () => ({ data: null, isLoading: false }),
+}));
+
+vi.mock('@/features/commercial-map/hooks/useLotPricing2028', () => ({
+  useLotPricing2028: () => ({ data: null, isLoading: false, isError: false }),
+  useLotPriceOverride: () => ({ isPending: false, mutateAsync: vi.fn() }),
 }));
 
 vi.mock('@/hooks/useCurrentOrg', () => ({
