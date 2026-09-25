@@ -1,11 +1,12 @@
 # Roadmap
 
 ## Sidebar comercial por estado do lote
-- [ ] Destacar venda confirmada com comprador, data/hora, etapa e responsável
-- [ ] Diferenciar as composições de lotes vendidos e disponíveis
-- [ ] Marcar a etapa oficial efetivamente usada na venda
-- [ ] Tornar contrato compacto e remover ações técnicas da lateral
-- [ ] Validar atualização automática, histórico, desktop, celular, testes e build
+- [x] Destacar venda confirmada com comprador, data/hora, etapa e responsável
+- [x] Diferenciar as composições de lotes vendidos e disponíveis
+- [x] Marcar a etapa oficial efetivamente usada na venda
+- [x] Tornar contrato compacto e remover ações técnicas da lateral
+- [x] Validar atualização automática, histórico, testes e build
+- [ ] Validar visualmente desktop/celular — bloqueada pelo renderer WebGL automatizado, que permaneceu em 55% sem abrir a lateral
 - Não publicar (pedido permanente do usuário)
 
 ## Comprador em lotes vendidos no Mapa Comercial

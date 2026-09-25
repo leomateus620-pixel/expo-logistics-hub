@@ -1,12 +1,11 @@
 import { memo, useLayoutEffect, useMemo, useState } from 'react';
 import {
   CalendarClock,
+  CheckCircle2,
   FileLock2,
   FileText,
   Handshake,
-  PencilLine,
   RefreshCw,
-  ShieldCheck,
   ShoppingBag,
   X,
 } from 'lucide-react';
@@ -29,11 +28,26 @@ import {
 } from '../../data/pavilionModuleOfficialAreas';
 import { CompactDetailSheetControls } from './CompactDetailSheet';
 import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
-import { LotAvailabilityDialog } from '../commercial/LotAvailabilityDialog';
-import { LotEditDialog } from '../commercial/LotEditDialog';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
 import { LotPricing2028Panel } from './LotPricing2028Panel';
 import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
+import type { LotPricingStage } from '../../utils/lotPricing2028';
+
+const saleDateTime = new Intl.DateTimeFormat('pt-BR', {
+  dateStyle: 'short',
+  timeStyle: 'short',
+  timeZone: 'America/Sao_Paulo',
+});
+
+function saleStageLabel(stage: string | null | undefined): string | null {
+  if (stage === 'RENOVACAO') return 'Renovação';
+  if (stage === 'SEGUNDA_ETAPA') return '2ª Etapa';
+  return null;
+}
+
+function confirmedStage(stage: string | null | undefined): LotPricingStage | null {
+  return stage === 'RENOVACAO' || stage === 'SEGUNDA_ETAPA' ? stage : null;
+}
 
 const AREA_VALIDATION_LABELS: Record<string, string> = {
   VALIDATED: 'Área conferida no croqui oficial',
@@ -78,8 +92,6 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
   const setSelectedModuleId = useCommercialMapStore((state) => state.setSelectedModuleId);
   const sheet = useCompactDetailSheet(selectedModuleId);
   const [workflow, setWorkflow] = useState<LotWorkflow>(null);
-  const [editingLot, setEditingLot] = useState(false);
-  const [availabilityOpen, setAvailabilityOpen] = useState(false);
   const cell = plan.cells.find((candidate) => candidate.id === selectedModuleId) ?? null;
   const zone = cell ? plan.zones.find((candidate) => candidate.id === cell.zoneId) ?? null : null;
   const commercialIndex = useMemo(
@@ -90,12 +102,6 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
   const lot = record?.lot ?? null;
   const status = lot ? STATUS_CONFIG[lot.status] : null;
   const persisted = source === 'database' && Boolean(lot && !lot.id.startsWith('reference:'));
-  const canSetAvailability = Boolean(
-    persisted
-    && lot
-    && ['AVAILABLE', 'BLOCKED', 'UNAVAILABLE'].includes(lot.status)
-    && (permissions.canManageLots || permissions.canManageSales),
-  );
   const canReserve = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'IN_NEGOTIATION'].includes(lot.status));
   const canNegotiate = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED'].includes(lot.status));
   const canSell = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED', 'IN_NEGOTIATION'].includes(lot.status));
@@ -107,8 +113,6 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
 
   useLayoutEffect(() => {
     setWorkflow(null);
-    setEditingLot(false);
-    setAvailabilityOpen(false);
   }, [selectedModuleId]);
 
   if (!cell) return null;
@@ -166,6 +170,22 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
         </div>
         <CompactDetailSheetControls sheet={sheet} subject="módulo" embedded={embedded} />
         <div className="commercial-pavilion-module-details" hidden={embedded && sheet.sheetState !== 'expanded'}>
+        {lot?.status === 'SOLD' && (
+          <section className="commercial-map-sale-confirmed" aria-label="Venda confirmada">
+            <header><CheckCircle2 aria-hidden="true" /><span>Venda confirmada</span></header>
+            <strong className="commercial-map-sale-confirmed__buyer">{saleHistory.data?.buyerName || lot.currentBuyer}</strong>
+            <p>
+              {saleHistory.data?.createdAt
+                ? `Vendido em ${saleDateTime.format(new Date(saleHistory.data.createdAt))}`
+                : lot.saleDate ? `Vendido em ${saleDateTime.format(new Date(`${lot.saleDate}T12:00:00-03:00`))}` : 'Data da venda não informada'}
+            </p>
+            <div>
+              {saleStageLabel(saleHistory.data?.stage) && <span>{saleStageLabel(saleHistory.data?.stage)}</span>}
+              {(saleHistory.data?.salespersonName || lot.salespersonName) && <span>Responsável: {saleHistory.data?.salespersonName || lot.salespersonName}</span>}
+              {(saleHistory.data?.contractNumber || lot.activeContractNumber) && <span>Contrato: {saleHistory.data?.contractNumber || lot.activeContractNumber}</span>}
+            </div>
+          </section>
+        )}
         <dl>
           <div>
             <dt>Localização</dt>
@@ -198,36 +218,31 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
           <div>
             <dt>Valores oficiais 2028</dt>
             <dd>
-              <LotPricing2028Panel lotId={persisted ? lot?.id ?? null : null} officialAreaSqm={individualArea} compact />
+              <LotPricing2028Panel
+                lotId={persisted ? lot?.id ?? null : null}
+                officialAreaSqm={individualArea}
+                compact
+                confirmedStage={lot?.status === 'SOLD' ? confirmedStage(saleHistory.data?.stage) : null}
+              />
               {!persisted ? <small className="commercial-pavilion-module-area-origin">Disponível após sincronizar o cadastro.</small> : null}
             </dd>
-          </div>
-          <div>
-            <dt>Vínculo comercial</dt>
-            <dd>{lot?.currentBuyer || 'Sem vínculo'}</dd>
-          </div>
-          <div>
-            <dt>Contrato</dt>
-            <dd>{lot?.activeContractNumber || 'Não anexado'}</dd>
-          </div>
-          <div>
-            <dt>Cadastro</dt>
-            <dd>{persisted ? 'Persistido e auditável' : 'Referência em leitura'}</dd>
           </div>
         </dl>
 
         <LotSaleHistoryCard sale={saleHistory.data} loading={saleHistory.isLoading} />
 
-        {persisted && permissions.canManageContracts && (
+        {persisted && permissions.canManageContracts && lot && (lot.status === 'SOLD' || Boolean(contracts.data?.length)) && (
           <section
             className="commercial-pavilion-module-contracts"
-            aria-label="Documentos privados do módulo"
+            aria-label="Contrato da venda"
           >
-            <strong>Documentos privados</strong>
-            {contracts.isLoading && <p>Carregando contratos autorizados…</p>}
-            {contracts.isError && <p>Não foi possível gerar o acesso temporário aos contratos.</p>}
-            {contracts.data?.length === 0 && <p>Nenhum contrato anexado.</p>}
-            {contracts.data?.map((contractVersion) => (
+            <div className="commercial-pavilion-module-contracts__heading">
+              <FileLock2 aria-hidden="true" />
+              <span><strong>{contracts.data?.length ? 'Contrato anexado ✓' : 'Contrato da venda'}</strong>{!contracts.data?.length && <small>Adicione o documento referente à comercialização deste espaço.</small>}</span>
+            </div>
+            {contracts.isLoading && <p>Carregando documentos autorizados…</p>}
+            {contracts.isError && <p>Não foi possível gerar o acesso temporário aos documentos.</p>}
+            {contracts.data?.filter((contractVersion) => !contractVersion.supersededAt).map((contractVersion) => (
               <a
                 href={contractVersion.signedUrl}
                 target="_blank"
@@ -237,14 +252,13 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
                 <FileText aria-hidden="true" />
                 <span>
                   <b>{contractVersion.originalName}</b>
-                  <small>
-                    Versão {contractVersion.version}
-                    {contractVersion.supersededAt ? ' · substituído' : ' · ativo'}
-                  </small>
+                  <small>Visualizar · Versão {contractVersion.version}</small>
                 </span>
-                <FileLock2 aria-hidden="true" />
               </a>
             ))}
+            <Button size="sm" variant="outline" onClick={() => setWorkflow('contract')}>
+              <FileLock2 />{contracts.data?.length ? 'Substituir contrato' : '+ Anexar contrato'}
+            </Button>
           </section>
         )}
 
@@ -256,12 +270,6 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
 
         {persisted && lot ? (
           <div className="commercial-pavilion-module-actions" aria-label="Operações comerciais do módulo">
-            {permissions.canManageLots && (
-              <Button size="sm" variant="outline" onClick={() => setEditingLot(true)}><PencilLine />Editar</Button>
-            )}
-            {canSetAvailability && (
-              <Button size="sm" variant="outline" onClick={() => setAvailabilityOpen(true)}><ShieldCheck />Situação</Button>
-            )}
             {canReserve && (
               <Button size="sm" variant="outline" onClick={() => setWorkflow('reserve')}><CalendarClock />Reservar</Button>
             )}
@@ -272,9 +280,6 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
                 nenhum botão duplicado de venda aparece aqui. */}
             {canSell && !salesModeActive && (
               <Button size="sm" onClick={() => setWorkflow('sell')}><ShoppingBag />Vender</Button>
-            )}
-            {permissions.canManageContracts && (
-              <Button size="sm" variant="outline" onClick={() => setWorkflow('contract')}><FileLock2 />Contrato</Button>
             )}
           </div>
         ) : permissions.isMapAdmin && onSynchronize ? (
@@ -296,11 +301,7 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
       </aside>
 
       {lot && (
-        <>
-          <LotWorkflowDialog key={`workflow:${lot.id}`} lot={lot} workflow={workflow} onClose={() => setWorkflow(null)} />
-          <LotEditDialog key={`edit:${lot.id}`} lot={lot} open={editingLot} onClose={() => setEditingLot(false)} />
-          <LotAvailabilityDialog key={`availability:${lot.id}`} lot={lot} open={availabilityOpen} onClose={() => setAvailabilityOpen(false)} />
-        </>
+        <LotWorkflowDialog key={`workflow:${lot.id}`} lot={lot} workflow={workflow} onClose={() => setWorkflow(null)} />
       )}
     </>
   );
