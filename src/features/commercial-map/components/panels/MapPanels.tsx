@@ -1,6 +1,5 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
-  BadgeCheck,
   BookOpen,
   Building2,
   CalendarClock,
@@ -12,13 +11,10 @@ import {
   DoorOpen,
   FileLock2,
   FileText,
-  Focus,
   History,
   Info,
   Layers3,
   LockKeyhole,
-  MapPinned,
-  PencilLine,
   Ruler,
   Scissors,
   ShieldAlert,
@@ -43,6 +39,7 @@ import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
 import { polygonAreaMapUnits } from '../../utils/geometry';
+import type { LotPricingStage } from '../../utils/lotPricing2028';
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkSupportsInterior,
@@ -53,8 +50,6 @@ import type { CommercialMapAreaScope } from '../../utils/areaScope';
 import type { CommercialLot, MapEntity, MapLayer, MapPermissions } from '../../types';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
 import { LotStructureDialog, type LotStructureOperation } from '../commercial/LotStructureDialog';
-import { LotEditDialog } from '../commercial/LotEditDialog';
-import { EntityVerificationDialog } from '../commercial/EntityVerificationDialog';
 import { PavilionPlanLegend } from './PavilionPlanLegend';
 import { CompactDetailSheetControls } from './CompactDetailSheet';
 import { LotPricing2028Panel } from './LotPricing2028Panel';
@@ -66,7 +61,15 @@ import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
 const areaNumber = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const dateTime = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+const dateTime = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo' });
+
+function saleStage(value: string | null | undefined): LotPricingStage | null {
+  return value === 'RENOVACAO' || value === 'SEGUNDA_ETAPA' ? value : null;
+}
+
+function saleStageLabel(value: string | null | undefined) {
+  return value === 'RENOVACAO' ? 'Renovação' : value === 'SEGUNDA_ETAPA' ? '2ª Etapa' : null;
+}
 
 function PanelHeader({ title, eyebrow, onClose }: { title: string; eyebrow: string; onClose: () => void }) {
   return (
@@ -321,13 +324,9 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
   const salesSelection = useSalesStore((state) => state.selection);
   const toggleSalesLot = useSalesStore((state) => state.toggleLot);
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
-  const focusSelection = useCommercialMapStore((state) => state.focusSelection);
   const enterInterior = useCommercialMapStore((state) => state.enterInterior);
-  const setWorkspaceMode = useCommercialMapStore((state) => state.setWorkspaceMode);
   const [workflow, setWorkflow] = useState<LotWorkflow>(null);
   const [structureOperation, setStructureOperation] = useState<LotStructureOperation>(null);
-  const [editingLot, setEditingLot] = useState(false);
-  const [verificationOpen, setVerificationOpen] = useState(false);
   const [historyEntityId, setHistoryEntityId] = useState<string | null>(null);
   const historyTriggerRef = useRef<HTMLButtonElement>(null);
   const historyId = getHistoryIdForEntity(entity);
@@ -341,9 +340,6 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
   const saleHistory = useLotSaleHistory(lot?.id ?? null, lot?.status === 'SOLD');
   const contracts = useLotContractVersions(lot?.id ?? null, permissions.canManageContracts);
   const areaMapUnits = polygonAreaMapUnits(entity.geometry);
-  const areaDifferenceSqm = lot?.officialAreaSqm != null && lot.calculatedAreaSqm != null
-    ? lot.calculatedAreaSqm - lot.officialAreaSqm
-    : null;
   const status = lot ? STATUS_CONFIG[lot.status] : null;
   const metadata = normalizeMapEntityMetadata(entity, lot);
   const structuralReady = lot ? ['AVAILABLE', 'BLOCKED', 'UNAVAILABLE'].includes(lot.status) : false;
@@ -361,8 +357,6 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
   useLayoutEffect(() => {
     setWorkflow(null);
     setStructureOperation(null);
-    setEditingLot(false);
-    setVerificationOpen(false);
     setHistoryEntityId(null);
   }, [entity.id]);
 
@@ -422,14 +416,24 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
             </details>
           )}
 
-          <div className="commercial-map-detail-primary" aria-label="Informações principais do lote selecionado">
-            {lot && <div><span>Quadra / lote</span><strong>{[lot.block, lot.lotNumber].filter(Boolean).join(' · ') || 'Não informado'}</strong></div>}
-            {lot && <div><span>Empresa</span><strong>{lot.currentBuyer || 'Sem vínculo ativo'}</strong></div>}
-            {lot && <div><span>Área oficial</span><strong>{lot.officialAreaSqm != null ? `${areaNumber.format(lot.officialAreaSqm)} m²` : 'Área não informada'}</strong></div>}
-            {lot && <div><span>Área calculada</span><strong>{lot.calculatedAreaSqm != null ? `${areaNumber.format(lot.calculatedAreaSqm)} m²` : 'Sem calibração'}</strong></div>}
-          </div>
+          {lot?.status === 'SOLD' && (
+            <section className="commercial-map-sale-confirmed" aria-label="Venda confirmada">
+              <header><CheckCircle2 aria-hidden="true" /><span>Venda confirmada</span></header>
+              <strong className="commercial-map-sale-confirmed__buyer">{saleHistory.data?.buyerName || lot.currentBuyer}</strong>
+              <p>
+                {saleHistory.data?.createdAt
+                  ? `Vendido em ${dateTime.format(new Date(saleHistory.data.createdAt))}`
+                  : lot.saleDate ? `Vendido em ${dateTime.format(new Date(`${lot.saleDate}T12:00:00-03:00`))}` : 'Data da venda não informada'}
+              </p>
+              <div>
+                {saleStageLabel(saleHistory.data?.stage) && <span>{saleStageLabel(saleHistory.data?.stage)}</span>}
+                {(saleHistory.data?.salespersonName || lot.salespersonName) && <span>Responsável: {saleHistory.data?.salespersonName || lot.salespersonName}</span>}
+                {(saleHistory.data?.contractNumber || lot.activeContractNumber) && <span>Contrato: {saleHistory.data?.contractNumber || lot.activeContractNumber}</span>}
+              </div>
+            </section>
+          )}
 
-          {lot && <LotPricing2028Panel lotId={lot.id} officialAreaSqm={lot.officialAreaSqm} />}
+          {lot && <LotPricing2028Panel lotId={lot.id} officialAreaSqm={lot.officialAreaSqm} confirmedStage={lot.status === 'SOLD' ? saleStage(saleHistory.data?.stage) : null} />}
 
           <Tabs defaultValue="overview" className="commercial-map-detail-tabs">
             <TabsList>
@@ -439,54 +443,42 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
             <TabsContent value="overview">
               <div className="commercial-map-detail-grid">
                 <DetailMetric icon={Ruler} label="Área oficial" value={lot?.officialAreaSqm != null ? `${areaNumber.format(lot.officialAreaSqm)} m²` : 'Área não informada'} warning={!lot?.officialAreaSqm} />
-                {lot ? (
-                  <DetailMetric
-                    icon={MapPinned}
-                    label="Área calculada"
-                    value={lot.calculatedAreaSqm != null ? `${areaNumber.format(lot.calculatedAreaSqm)} m²` : 'Sem calibração'}
-                    warning={lot.areaValidationStatus !== 'VALIDATED'}
-                  />
-                ) : (
-                  <DetailMetric icon={MapPinned} label="Área cartográfica" value={`${number.format(areaMapUnits)} un²`} warning={!entity.geometry.calibrationVersion} />
-                )}
-                {areaDifferenceSqm != null && (
-                  <DetailMetric
-                    icon={BadgeCheck}
-                    label="Diferença geométrica"
-                    value={`${areaDifferenceSqm >= 0 ? '+' : ''}${areaNumber.format(areaDifferenceSqm)} m²`}
-                    warning={Math.abs(areaDifferenceSqm) > 0.01}
-                  />
-                )}
-                {lot && <DetailMetric icon={Tag} label="Preço solicitado" value={lot.askingPrice ? currency.format(lot.askingPrice) : 'A negociar'} />}
                 {lot && <DetailMetric icon={Building2} label="Bloco / lote" value={[lot.block, lot.lotNumber].filter(Boolean).join(' · ') || 'Não informado'} />}
                 {lot?.levelLabel && <DetailMetric icon={Layers3} label="Piso / nível" value={lot.levelLabel} />}
+                {!lot && <DetailMetric icon={Ruler} label="Área cartográfica" value={`${number.format(areaMapUnits)} un²`} warning={!entity.geometry.calibrationVersion} />}
               </div>
 
               {lot ? (
                 <>
-                  <div className="commercial-map-detail-section">
-                    <h3>Dados comerciais</h3>
+                  <div className="commercial-map-detail-section commercial-map-commercial-facts">
+                    <h3>{lot.status === 'SOLD' ? 'Características do espaço' : 'Informações comerciais'}</h3>
                     <dl>
-                      <div><dt>Expositor atual</dt><dd>{lot.currentBuyer || 'Nenhum vínculo ativo'}</dd></div>
-                      <div><dt>Infraestrutura</dt><dd>{lot.infrastructure.length ? lot.infrastructure.join(', ') : 'Não informada'}</dd></div>
-                      <div><dt>Reserva até</dt><dd>{lot.reservationExpiresAt ? dateTime.format(new Date(lot.reservationExpiresAt)) : 'Sem reserva ativa'}</dd></div>
-                      <div><dt>Contrato</dt><dd>{lot.activeContractNumber || 'Não vinculado'}</dd></div>
+                      {entity.metadata.segmentName && <div><dt>Segmento</dt><dd>{String(entity.metadata.segmentName)}</dd></div>}
+                      {lot.infrastructure.length > 0 && <div><dt>Infraestrutura</dt><dd>{lot.infrastructure.join(', ')}</dd></div>}
+                      {lot.hasElectricity && <div><dt>Energia elétrica</dt><dd>Disponível</dd></div>}
+                      {lot.hasWater && <div><dt>Água</dt><dd>Disponível</dd></div>}
+                      {lot.hasInternet && <div><dt>Internet</dt><dd>Disponível</dd></div>}
+                      {lot.isCorner && <div><dt>Posição</dt><dd>Lote de esquina</dd></div>}
+                      {lot.isCovered && <div><dt>Cobertura</dt><dd>Área coberta</dd></div>}
+                      {lot.status !== 'SOLD' && lot.reservationExpiresAt && <div><dt>Reserva até</dt><dd>{dateTime.format(new Date(lot.reservationExpiresAt))}</dd></div>}
                     </dl>
                   </div>
                   {permissions.canManageContracts && (
-                    <div className="commercial-map-detail-section commercial-map-contract-list">
-                      <h3>Documentos privados</h3>
+                    <section className="commercial-map-contract-action" aria-label="Contrato da venda">
+                      <div className="commercial-map-contract-action__heading">
+                        <FileLock2 aria-hidden="true" />
+                        <span><strong>{contracts.data?.length ? 'Contrato anexado ✓' : 'Contrato da venda'}</strong>{!contracts.data?.length && <small>Adicione o documento referente à comercialização deste espaço.</small>}</span>
+                      </div>
                       {contracts.isLoading && <p>Carregando documentos autorizados…</p>}
                       {contracts.isError && <p>Não foi possível gerar o acesso temporário aos documentos.</p>}
-                      {contracts.data?.length === 0 && <p>Nenhum contrato anexado a este lote.</p>}
-                      {contracts.data?.map((contract) => (
+                      {contracts.data?.filter((contract) => !contract.supersededAt).map((contract) => (
                         <a href={contract.signedUrl} target="_blank" rel="noreferrer" key={contract.id}>
                           <FileText />
-                          <span><strong>{contract.originalName}</strong><small>Versão {contract.version} · {(contract.fileSize / 1024 / 1024).toFixed(2)} MB{contract.supersededAt ? ' · substituído' : ' · ativo'}</small></span>
-                          <FileLock2 />
+                          <span><strong>{contract.originalName}</strong><small>Visualizar · Versão {contract.version}</small></span>
                         </a>
                       ))}
-                    </div>
+                      <Button variant="outline" onClick={() => setWorkflow('contract')}><FileLock2 className="h-4 w-4" />{contracts.data?.length ? 'Substituir contrato' : '+ Anexar contrato'}</Button>
+                    </section>
                   )}
                 </>
               ) : (
@@ -497,10 +489,6 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
               )}
 
               <div className="commercial-map-detail-actions">
-                {sceneAvailable && <Button variant="outline" onClick={focusSelection}><Focus className="h-4 w-4" />Centralizar</Button>}
-                {permissions.isMapAdmin && <Button variant="outline" onClick={() => setVerificationOpen(true)}><BadgeCheck className="h-4 w-4" />{entity.verificationStatus === 'VERIFIED' ? 'Reabrir revisão' : 'Verificar entidade'}</Button>}
-                {lot && permissions.canManageLots && <Button variant="outline" onClick={() => setEditingLot(true)}><PencilLine className="h-4 w-4" />Editar lote</Button>}
-                {permissions.canEditGeometry && <Button variant="outline" onClick={() => setWorkspaceMode('edit')}><Ruler className="h-4 w-4" />Editar geometria</Button>}
                 {lot && permissions.canManageLots && structuralReady && (
                   <>
                     <Button variant="outline" onClick={() => setStructureOperation('split')}><Scissors className="h-4 w-4" />Dividir</Button>
@@ -526,7 +514,6 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
                     <Button onClick={() => setWorkflow('sell')}><ShoppingBag className="h-4 w-4" />Marcar vendido</Button>
                   )
                 )}
-                {lot && permissions.canManageContracts && <Button variant="outline" onClick={() => setWorkflow('contract')}><FileLock2 className="h-4 w-4" />Anexar contrato</Button>}
               </div>
             </TabsContent>
             <TabsContent value="history">
@@ -549,8 +536,6 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
       </aside>
       {lot && <LotWorkflowDialog key={`workflow:${lot.id}`} lot={lot} workflow={workflow} onClose={() => setWorkflow(null)} />}
       {lot && <LotStructureDialog key={`structure:${lot.id}`} operation={structureOperation} lot={lot} entity={entity} entities={entities} lots={lots} onClose={() => setStructureOperation(null)} />}
-      {lot && <LotEditDialog key={`edit:${lot.id}`} lot={lot} open={editingLot} onClose={() => setEditingLot(false)} />}
-      <EntityVerificationDialog key={`verification:${entity.id}`} entity={entity} open={verificationOpen} onClose={() => setVerificationOpen(false)} />
     </>
   );
 }
