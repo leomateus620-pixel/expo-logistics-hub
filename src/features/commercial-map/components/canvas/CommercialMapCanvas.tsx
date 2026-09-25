@@ -11,6 +11,7 @@ import { PublicLotNumbers } from './PublicLotNumbers';
 import { SoldLotLocks } from './SoldLotLocks';
 import type { Coordinate } from '../../types';
 import { isSoldLot, soldLotSurfaceColor } from '../../utils/soldLotPresentation';
+import { resolveLotTooltipPresentation } from '../../utils/lotTooltipPresentation';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { PublicMapEnvironment } from './PublicMapEnvironment';
 import { arenaVegetationAllowed } from '../../data/arenaCanonicalLayout';
@@ -1798,6 +1799,7 @@ const EntityLabel = memo(function EntityLabel({
   const contextualRoadAnchor = rearContextualLabelAnchorForOfficialOwner(entity.publicIdentifier);
   const dimmed = Boolean(lot && filtersActive && !isMatch && !selected);
   const status = lot ? STATUS_CONFIG[lot.status] : null;
+  const lotPresentation = lot ? resolveLotTooltipPresentation(lot) : null;
   const labelHeight = entityLabelHeight(entity);
 
   const mode = selected ? 'focus' : 'hover';
@@ -1821,13 +1823,16 @@ const EntityLabel = memo(function EntityLabel({
       }}
     >
       {lot ? (
-        <div data-map-entity-id={entity.id} data-map-label-mode={mode} className={`commercial-map-label is-lot ${variant} ${dimmed ? 'is-dimmed' : ''}`}>
+        <div data-map-entity-id={entity.id} data-map-label-mode={mode} className={`commercial-map-label is-lot ${lotPresentation?.buyerName ? 'has-buyer' : ''} ${variant} ${dimmed ? 'is-dimmed' : ''}`}>
           <span aria-label={`Lote ${metadata.lotNumber ?? ''}`}>{metadata.lotNumber}</span>
           {metadata.block && <strong>{quadraLabel(metadata.block)}</strong>}
           {lot.officialAreaSqm && (
             <small className="commercial-map-label-area">{AREA_NUMBER.format(lot.officialAreaSqm)} m²</small>
           )}
           {status && <small><b aria-hidden="true">{status.symbol}</b> {status.label}</small>}
+          {lotPresentation?.buyerName && (
+            <small className="commercial-map-label-buyer"><span>Comprador:</span> {lotPresentation.buyerName}</small>
+          )}
         </div>
       ) : isRoad ? (
         <div data-map-entity-id={entity.id} data-map-label-mode={mode} className={`commercial-map-label is-road ${variant}`}><span>{contextualDisplayName}</span></div>

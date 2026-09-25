@@ -21,6 +21,7 @@ const lot: PublicLot = {
   levelLabel: null,
   pavilion: 'B1',
   availability: 'AVAILABLE',
+  buyerName: null,
   officialAreaSqm: 3,
   isCorner: false,
   isCovered: true,
@@ -77,8 +78,8 @@ describe('registry público das dez áreas', () => {
   });
 });
 
-describe('payload público não vaza dado interno', () => {
-  it('converte para o canvas mantendo campos internos nulos', () => {
+describe('payload público respeita a allowlist comercial', () => {
+  it('converte para o canvas mantendo dados privados nulos', () => {
     const canvasLot = toCanvasLot(lot);
     expect(canvasLot.status).toBe('AVAILABLE');
     expect(canvasLot.officialAreaSqm).toBe(3);
@@ -94,6 +95,18 @@ describe('payload público não vaza dado interno', () => {
     const canvasLot = toCanvasLot({ ...lot, availability: 'UNAVAILABLE' });
     expect(canvasLot.status).toBe('BLOCKED');
     expect(canvasLot.currentBuyer).toBeNull();
+  });
+
+  it('repassa somente o comprador de lote vendido ao canvas', () => {
+    const canvasLot = toCanvasLot({ ...lot, availability: 'SOLD', buyerName: '  Leonardo  ' });
+    expect(canvasLot.status).toBe('SOLD');
+    expect(canvasLot.currentBuyer).toBe('Leonardo');
+    expect(canvasLot.activeContractNumber).toBeNull();
+    expect(canvasLot.salespersonName).toBeNull();
+  });
+
+  it('não mostra vínculo comercial em lote não vendido', () => {
+    expect(toCanvasLot({ ...lot, buyerName: 'Empresa reservante' }).currentBuyer).toBeNull();
   });
 });
 

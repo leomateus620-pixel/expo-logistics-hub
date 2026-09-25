@@ -66,6 +66,12 @@ export const PublicLotDetails = memo(function PublicLotDetails({
           <dt>Disponibilidade</dt>
           <dd data-availability={lot.availability}>{PUBLIC_AVAILABILITY_LABEL[lot.availability]}</dd>
         </div>
+        {lot.availability === 'SOLD' && lot.buyerName?.trim() && (
+          <div>
+            <dt>Comprador</dt>
+            <dd>{lot.buyerName.trim()}</dd>
+          </div>
+        )}
         {lot.block && (
           <div>
             <dt>Quadra</dt>

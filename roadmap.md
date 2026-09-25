@@ -1,5 +1,12 @@
 # Roadmap
 
+## Comprador em lotes vendidos no Mapa Comercial
+- [ ] Exibir o comprador no tooltip compartilhado somente para lotes `SOLD`
+- [ ] Liberar somente o nome do comprador nos links públicos autorizados por token
+- [ ] Atualizar automaticamente links públicos após venda ou reversão
+- [ ] Validar privacidade, desktop, toque móvel e regressões automatizadas
+- Não publicar (pedido permanente do usuário)
+
 ## Logística 2028, acesso do presidente e login institucional
 - [x] Auditar cadastro e permissões do presidente Eduardo
 - [x] Separar estruturalmente os dados operacionais em ciclos 2026 e 2028, preservando a base existente em 2026
