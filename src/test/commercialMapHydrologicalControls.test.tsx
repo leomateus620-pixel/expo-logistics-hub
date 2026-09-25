@@ -14,7 +14,7 @@ const permissions: MapPermissions = {
   canView: true,
   canEdit: false,
   canEditGeometry: false,
-  canManageLots: false,
+  canManageLots: false, canEditPricing: false,
   canManageSales: false,
   canManageContracts: false,
   canManageLayers: false,
