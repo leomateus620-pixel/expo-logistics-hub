@@ -31,7 +31,7 @@ const entity = { id: 'e-1', publicIdentifier: 'R-01', name: 'Rural 1', classific
 } as unknown as MapEntity;
 const lot: PublicLot = {
   id:'l-1', entityId:'e-1', publicIdentifier:'R-01', displayName:'Rural 1', block:'R', lotNumber:'1', levelLabel:null,
-  availability:'AVAILABLE', officialAreaSqm:100, isCorner:false, isCovered:false, infrastructure:[],
+  availability:'AVAILABLE', buyerName:null, officialAreaSqm:100, isCorner:false, isCovered:false, infrastructure:[],
   hasElectricity:false, hasWater:false, hasInternet:false,
   pricing:{ resolutionStatus:'OK', renovacaoPricePerSqm:100, renovacaoTotal:10000, renovacaoRuleLabel:'Exporural',
     segundaPricePerSqm:110, segundaTotal:11000, segundaRuleLabel:'Exporural' },
@@ -67,8 +67,10 @@ describe('public page lifecycle', () => {
     const policy = mocks.props.mock.calls.at(-1)?.[0].publicScenePolicy;
     const selectionEvents = () => mocks.track.mock.calls.filter(call => call[2].eventType === 'lot_selected').length;
     expect(selectionEvents()).toBe(1);
-    await act(async () => client.setQueryData(key, { ...inventory, lots:[{ ...lot, availability:'SOLD', pricing:{ ...lot.pricing, renovacaoTotal:12000 } }] }));
+    await act(async () => client.setQueryData(key, { ...inventory, lots:[{ ...lot, availability:'SOLD', buyerName:'Leonardo', pricing:{ ...lot.pricing, renovacaoTotal:12000 } }] }));
     await waitFor(() => expect(screen.getByRole('complementary')).toHaveTextContent('Comercializado'));
+    expect(screen.getByRole('complementary')).toHaveTextContent('Comprador');
+    expect(screen.getByRole('complementary')).toHaveTextContent('Leonardo');
     expect(screen.getByTestId('scene')).toBe(canvas);
     expect(mocks.mount).toHaveBeenCalledTimes(1);
     expect(mocks.props.mock.calls.at(-1)?.[0].publicScenePolicy).toBe(policy);

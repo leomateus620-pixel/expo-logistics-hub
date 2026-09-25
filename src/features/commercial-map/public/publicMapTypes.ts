@@ -13,7 +13,7 @@ export interface PublicLotPricing {
   segundaRuleLabel: string | null;
 }
 
-/** Allowlist pública: nada de comprador, contrato, reserva nominal ou preço mínimo. */
+/** Allowlist pública: comprador de lote vendido, sem contatos, contrato, reserva nominal ou preço mínimo. */
 export interface PublicLot {
   id: string;
   entityId: string;
@@ -23,6 +23,7 @@ export interface PublicLot {
   levelLabel: string | null;
   displayName: string;
   availability: PublicLotAvailability;
+  buyerName: string | null;
   officialAreaSqm: number | null;
   isCorner: boolean;
   isCovered: boolean;
