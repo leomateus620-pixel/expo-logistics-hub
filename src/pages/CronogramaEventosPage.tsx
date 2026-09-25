@@ -408,11 +408,17 @@ export default function CronogramaEventosPage() {
     year,
     month,
     replace,
+    reason,
   }: {
     year: CronogramaCycleYear;
     month: string | null;
     replace: boolean;
+    reason?: string;
   }) => {
+    // A rolagem não grava o mês no endereço: senão, ao reabrir a agenda
+    // (PWA/histórico/favorito) o último mês rolado — ex.: junho — vira
+    // "link direto" e substitui o mês atual.
+    if (reason === 'observer') return;
     setSearchParams((current) => {
       const currentYear = current.get('timelineYear');
       const currentMonth = current.get('timelineMonth');
