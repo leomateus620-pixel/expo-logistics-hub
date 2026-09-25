@@ -9,7 +9,7 @@ import {
   type SalesErrorKind,
 } from './salesErrors';
 
-const PRICING_COLUMNS = 'lot_id,public_identifier,pavilion,block,lot_num,corner_status,corner_confirmed,official_area_sqm,area_validation_status,renovacao_price_per_sqm,renovacao_total,renovacao_rule_label,segunda_price_per_sqm,segunda_total,segunda_rule_label,resolution_status';
+const PRICING_COLUMNS = 'lot_id,public_identifier,pavilion,block,lot_num,corner_status,corner_confirmed,official_area_sqm,area_validation_status,renovacao_price_per_sqm,renovacao_total,renovacao_rule_label,segunda_price_per_sqm,segunda_total,segunda_rule_label,resolution_status,renovacao_default_total,segunda_default_total,renovacao_is_manual,segunda_is_manual';
 
 const numeric = (value: unknown): number | null =>
   value === null || value === undefined ? null : Number(value);
@@ -34,6 +34,10 @@ function mapRow(row: PricingRow): LotPricing2028 {
     segundaTotal: numeric(row.segunda_total),
     segundaRuleLabel: (row.segunda_rule_label as string) ?? null,
     resolutionStatus: ((row.resolution_status as string) ?? 'SEM_REGRA') as LotPricingResolution,
+    renovacaoDefaultTotal: numeric(row.renovacao_default_total as never),
+    segundaDefaultTotal: numeric(row.segunda_default_total as never),
+    renovacaoIsManual: Boolean(row.renovacao_is_manual),
+    segundaIsManual: Boolean(row.segunda_is_manual),
   };
 }
 

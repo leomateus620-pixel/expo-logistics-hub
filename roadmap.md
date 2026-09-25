@@ -110,3 +110,7 @@
 - [ ] Reconciliar geometrias e áreas persistidas preservando IDs, status, preços e histórico
 - [ ] Validar renderização, hit-test, rota pública, desktop/mobile e testes
 - Não publicar (pedido do usuário)
+
+## Edição manual de valores 2028
+- [x] Override por lote/etapa na fonte oficial, RPCs com permissão, histórico, edição inline na lateral e nos módulos.
+- [ ] Revisar 9 testes antigos de `commercialMapPavilionModuleCard.test.tsx` (expectativas desatualizadas desde o redesign da lateral/áreas; não relacionados aos preços).

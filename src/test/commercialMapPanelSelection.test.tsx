@@ -52,7 +52,7 @@ const permissions: MapPermissions = {
   canView: true,
   canEdit: true,
   canEditGeometry: true,
-  canManageLots: true,
+  canManageLots: true, canEditPricing: true,
   canManageSales: true,
   canManageContracts: true,
   canManageLayers: true,

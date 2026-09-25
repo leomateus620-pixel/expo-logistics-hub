@@ -18,6 +18,10 @@ interface PricingRow {
   segunda_total: number | string | null;
   segunda_rule_label: string | null;
   resolution_status: string | null;
+  renovacao_default_total?: number | string | null;
+  segunda_default_total?: number | string | null;
+  renovacao_is_manual?: boolean | null;
+  segunda_is_manual?: boolean | null;
 }
 
 const numeric = (value: number | string | null): number | null =>
@@ -41,6 +45,10 @@ function mapRow(row: PricingRow): LotPricing2028 {
     segundaTotal: numeric(row.segunda_total),
     segundaRuleLabel: row.segunda_rule_label,
     resolutionStatus: (row.resolution_status ?? 'SEM_REGRA') as LotPricingResolution,
+    renovacaoDefaultTotal: numeric(row.renovacao_default_total ?? null),
+    segundaDefaultTotal: numeric(row.segunda_default_total ?? null),
+    renovacaoIsManual: Boolean(row.renovacao_is_manual),
+    segundaIsManual: Boolean(row.segunda_is_manual),
   };
 }
 
@@ -49,11 +57,37 @@ export async function fetchLotPricing2028(lotId: string): Promise<LotPricing2028
   const { data, error } = await supabase
     .from('commercial_lot_pricing_2028')
     .select(
-      'lot_id,public_identifier,pavilion,block,lot_num,corner_status,corner_confirmed,official_area_sqm,area_validation_status,renovacao_price_per_sqm,renovacao_total,renovacao_rule_label,segunda_price_per_sqm,segunda_total,segunda_rule_label,resolution_status',
+      'lot_id,public_identifier,pavilion,block,lot_num,corner_status,corner_confirmed,official_area_sqm,area_validation_status,renovacao_price_per_sqm,renovacao_total,renovacao_rule_label,segunda_price_per_sqm,segunda_total,segunda_rule_label,resolution_status,renovacao_default_total,segunda_default_total,renovacao_is_manual,segunda_is_manual',
     )
     .eq('lot_id', lotId)
     .maybeSingle();
 
   if (error) throw error;
   return data ? mapRow(data as unknown as PricingRow) : null;
+}
+
+export type LotPriceOverrideStage = 'RENOVACAO' | 'SEGUNDA_ETAPA';
+
+const OVERRIDE_ERRORS: Array<[RegExp, string]> = [
+  [/FORBIDDEN/, 'Você não tem permissão para editar valores deste mapa.'],
+  [/INVALID_VALUE/, 'Informe um valor válido (R$ 0,00 ou maior).'],
+  [/LOT_EXCLUDED/, 'Este espaço não possui valor comercial definido.'],
+  [/LOT_NOT_FOUND/, 'Lote não encontrado ou arquivado.'],
+  [/AUTH_REQUIRED/, 'Sessão expirada. Entre novamente.'],
+];
+
+function describeOverrideError(message: string): string {
+  return OVERRIDE_ERRORS.find(([re]) => re.test(message))?.[1] ?? 'Não foi possível salvar o valor. Tente novamente.';
+}
+
+/** Grava o valor manual da etapa na fonte oficial (override por lote). */
+export async function setLotPriceOverride(lotId: string, stage: LotPriceOverrideStage, total: number): Promise<void> {
+  const { error } = await supabase.rpc('set_lot_price_override', { p_lot_id: lotId, p_stage: stage, p_total: total });
+  if (error) throw new Error(describeOverrideError(error.message));
+}
+
+/** Remove o override e volta ao valor calculado pela regra oficial. */
+export async function clearLotPriceOverride(lotId: string, stage: LotPriceOverrideStage): Promise<void> {
+  const { error } = await supabase.rpc('clear_lot_price_override', { p_lot_id: lotId, p_stage: stage });
+  if (error) throw new Error(describeOverrideError(error.message));
 }
