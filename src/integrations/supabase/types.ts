@@ -1178,6 +1178,61 @@ export type Database = {
           },
         ]
       }
+      commercial_lot_price_overrides: {
+        Row: {
+          created_at: string
+          id: string
+          lot_id: string
+          previous_total: number | null
+          stage: string
+          total: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lot_id: string
+          previous_total?: number | null
+          stage: string
+          total: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lot_id?: string
+          previous_total?: number | null
+          stage?: string
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commercial_lot_price_overrides_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lot_pricing_2028"
+            referencedColumns: ["lot_id"]
+          },
+          {
+            foreignKeyName: "commercial_lot_price_overrides_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commercial_lot_price_overrides_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
+          },
+        ]
+      }
       commercial_lots: {
         Row: {
           accessibility_notes: string | null
@@ -8729,11 +8784,15 @@ export type Database = {
           pavilion: string | null
           project_id: string | null
           public_identifier: string | null
+          renovacao_default_total: number | null
+          renovacao_is_manual: boolean | null
           renovacao_price_per_sqm: number | null
           renovacao_rule_id: string | null
           renovacao_rule_label: string | null
           renovacao_total: number | null
           resolution_status: string | null
+          segunda_default_total: number | null
+          segunda_is_manual: boolean | null
           segunda_price_per_sqm: number | null
           segunda_rule_id: string | null
           segunda_rule_label: string | null
@@ -9583,6 +9642,10 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      clear_lot_price_override: {
+        Args: { p_lot_id: string; p_stage: string }
+        Returns: Json
+      }
       commission_leadership_user_ids: {
         Args: { _commission_id: string }
         Returns: {
@@ -10106,6 +10169,10 @@ export type Database = {
           p_rotation: number
         }
         Returns: number
+      }
+      set_lot_price_override: {
+        Args: { p_lot_id: string; p_stage: string; p_total: number }
+        Returns: Json
       }
       set_map_entity_verification: {
         Args: { p_entity_id: string; p_reason: string; p_status: string }
