@@ -225,6 +225,7 @@ export function MobileCronogramaTimeline({
       : firstFilteredMonthByYear[resolvedYear]
         ?? firstCompleteMonthByYear[resolvedYear]
         ?? `${resolvedYear}-01`;
+    if (reason !== 'reconcile' && reason !== 'temporal-filter') userNavigatedRef.current = true;
     setPosition({ year: resolvedYear, month: resolvedMonth });
     onPositionChangeRef.current?.({
       year: resolvedYear,
@@ -239,16 +240,33 @@ export function MobileCronogramaTimeline({
     if (signature === requestedSignatureRef.current) return;
     requestedSignatureRef.current = signature;
     const monthYear = yearFromMonth(requestedMonth);
-    const year = requestedYear ?? monthYear;
+    const initialYear = yearFromMonth(initialMonth);
+    const year = requestedYear ?? monthYear ?? initialYear;
     if (!year) return;
     const resolvedYear = closestAvailableYear(year, availableYears);
     const month = monthYear === resolvedYear && requestedMonth
       ? requestedMonth
-      : firstFilteredMonthByYear[resolvedYear]
+      : initialYear === resolvedYear && initialMonth
+        ? initialMonth
+        : firstFilteredMonthByYear[resolvedYear]
         ?? firstCompleteMonthByYear[resolvedYear]
         ?? `${resolvedYear}-01`;
     setPosition({ year: resolvedYear, month });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availableYears, firstCompleteMonthByYear, firstFilteredMonthByYear, requestedMonth, requestedYear]);
+
+  // Os eventos chegam de forma assíncrona: sem link direto e sem navegação da
+  // usuária, a posição acompanha o mês inicial (que prioriza o mês atual).
+  const userNavigatedRef = useRef(Boolean(requestedYear || requestedMonth));
+  const initialMonthRef = useRef(initialMonth);
+  useEffect(() => {
+    if (initialMonthRef.current === initialMonth) return;
+    initialMonthRef.current = initialMonth;
+    if (userNavigatedRef.current || requestedYear || requestedMonth) return;
+    const year = yearFromMonth(initialMonth);
+    if (!year || !initialMonth) return;
+    setPosition({ year: closestAvailableYear(year, availableYears), month: initialMonth });
+  }, [availableYears, initialMonth, requestedMonth, requestedYear]);
 
   useEffect(() => {
     if (temporalFocusRef.current === temporalFocusKey) return;
