@@ -38,6 +38,9 @@ vi.mock('@/features/commercial-map/hooks/useCommercialMap', () => ({
     };
   },
 }));
+vi.mock('@/features/commercial-map/hooks/useLotPricing2028', () => ({
+  useLotPricing2028: () => ({ data: null, isLoading: false, isError: false }),
+}));
 
 vi.mock('@/features/commercial-map/state/useCommercialMapStore', () => ({
   useCommercialMapStore: (selector: (state: typeof mocks.store) => unknown) => selector(mocks.store),
@@ -124,6 +127,35 @@ afterEach(() => {
 });
 
 describe('seleção no painel persistente do mapa comercial', () => {
+  it('diferencia lote vendido com a venda canônica e lote disponível sem campos vazios', () => {
+    const sold = fixture('A', 0);
+    sold.lot.status = 'SOLD';
+    sold.lot.currentBuyer = 'BOTOLI';
+    sold.lot.saleDate = '2026-09-24';
+    sold.lot.salespersonName = 'Leonardo';
+    mocks.saleHistory.mockReturnValueOnce({
+      data: {
+        orderId: 'order-1', buyerName: 'BOTOLI', stage: 'SEGUNDA_ETAPA', paymentType: 'CASH', paymentMethod: 'PIX',
+        officialArea: 100, itemTotal: 5921, createdAt: '2026-09-24T17:32:00Z', saleDate: '2026-09-24',
+        salespersonName: 'Leonardo', contractNumber: null, installments: [],
+      },
+      isLoading: false,
+      isError: false,
+    });
+    const view = render(panel(sold));
+    const aside = screen.getByRole('complementary');
+    expect(within(aside).getByLabelText('Venda confirmada')).toHaveTextContent('BOTOLI');
+    expect(within(aside).getByLabelText('Venda confirmada')).toHaveTextContent('24/09/2026');
+    expect(within(aside).getByLabelText('Venda confirmada')).toHaveTextContent('2ª Etapa');
+    expect(within(aside).getByLabelText('Venda confirmada')).toHaveTextContent('Leonardo');
+    expect(within(aside).getByRole('region', { name: 'Contrato da venda' })).toBeVisible();
+
+    view.rerender(panel(first));
+    expect(screen.queryByLabelText('Venda confirmada')).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Contrato da venda' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Nenhum contrato anexado a este lote.')).not.toBeInTheDocument();
+  });
+
   it('oferece uma única entrada para o interior no resumo com identificação e módulos do pavilhão', () => {
     const pavilion = OFFICIAL_REFERENCE_ENTITIES.find((candidate) => candidate.publicIdentifier === 'B1')!;
     render(<EntityDetailsPanel entity={pavilion} entities={OFFICIAL_REFERENCE_ENTITIES}

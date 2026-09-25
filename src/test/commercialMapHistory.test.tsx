@@ -22,6 +22,9 @@ vi.mock('@/features/commercial-map/hooks/useCommercialMap', () => ({
     return { lotUpdate: mutation, reservation: mutation, negotiation: mutation, sale: mutation, contract: mutation, split: mutation, merge: mutation, verification: mutation, layerLock: mutation };
   },
 }));
+vi.mock('@/features/commercial-map/hooks/useLotPricing2028', () => ({
+  useLotPricing2028: () => ({ data: null, isLoading: false, isError: false }),
+}));
 vi.mock('@/features/commercial-map/state/useCommercialMapStore', () => ({
   useCommercialMapStore: (selector: (state: typeof mocks.store) => unknown) => selector(mocks.store),
 }));
