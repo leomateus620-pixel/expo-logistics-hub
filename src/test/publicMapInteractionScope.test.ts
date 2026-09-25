@@ -18,6 +18,7 @@ function lot(id: string, entityId: string): PublicLot {
     levelLabel: null,
     pavilion: null,
     availability: 'AVAILABLE',
+    buyerName: null,
     officialAreaSqm: 100,
     isCorner: false,
     isCovered: false,
