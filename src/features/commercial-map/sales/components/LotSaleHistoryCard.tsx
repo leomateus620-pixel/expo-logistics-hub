@@ -3,6 +3,10 @@ import { formatBrl } from '../../utils/lotPricing2028';
 import type { LotSaleHistory } from '../../services/commercialMapService';
 
 const date = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo' });
+const dateTime = new Intl.DateTimeFormat('pt-BR', {
+  timeZone: 'America/Sao_Paulo',
+  day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+});
 
 export function LotSaleHistoryCard({ sale, loading }: { sale: LotSaleHistory | null | undefined; loading: boolean }) {
   if (loading) return <p>Carregando dados da venda…</p>;
@@ -10,11 +14,13 @@ export function LotSaleHistoryCard({ sale, loading }: { sale: LotSaleHistory | n
 
   return (
     <section className="commercial-sale-history" aria-label="Resumo da venda e vencimentos">
-      <header><ReceiptText aria-hidden="true" /><div><strong>Venda confirmada</strong><span>{sale.buyerName}</span></div><b>{formatBrl(sale.itemTotal)}</b></header>
+      <header><ReceiptText aria-hidden="true" /><div><strong>Venda registrada</strong><span>{dateTime.format(new Date(sale.createdAt))}</span></div><b>{formatBrl(sale.itemTotal)}</b></header>
+      <p className="commercial-sale-history__trace"><strong>Comprador:</strong> {sale.buyerName} · <strong>Etapa:</strong> {sale.stage === 'RENOVACAO' ? 'Renovação' : '2ª Etapa'}{sale.salespersonName ? <> · <strong>Responsável:</strong> {sale.salespersonName}</> : null}</p>
       <dl>
         <div><dt>Etapa</dt><dd>{sale.stage === 'RENOVACAO' ? 'Renovação' : '2ª Etapa'}</dd></div>
         <div><dt>Forma</dt><dd>{sale.paymentType === 'CASH' ? 'À vista' : `${sale.installments.length} parcelas`} · {sale.paymentMethod}</dd></div>
         <div><dt>Área</dt><dd>{sale.officialArea.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m²</dd></div>
+        {sale.contractNumber && <div><dt>Contrato</dt><dd>{sale.contractNumber}</dd></div>}
       </dl>
       <div className="commercial-sale-history__installments">
         {sale.installments.map((installment) => (

@@ -111,6 +111,9 @@ export interface LotSaleHistory {
   officialArea: number;
   itemTotal: number;
   createdAt: string;
+  saleDate: string | null;
+  salespersonName: string | null;
+  contractNumber: string | null;
   installments: Array<{ number: number; dueDate: string; amount: number; status: string }>;
 }
 interface MapReadContext { signal?: AbortSignal; recordStage: CommercialMapStageRecorder }
@@ -1191,7 +1194,7 @@ export async function fetchLotActivity(lotId: string): Promise<MapActivity[]> {
 export async function fetchLotSaleHistory(lotId: string): Promise<LotSaleHistory | null> {
   const { data: item, error: itemError } = await db
     .from('lot_sale_order_items')
-    .select('order_id,official_area_snapshot,item_total')
+    .select('order_id,sale_id,official_area_snapshot,item_total')
     .eq('lot_id', lotId)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -1199,12 +1202,16 @@ export async function fetchLotSaleHistory(lotId: string): Promise<LotSaleHistory
   if (itemError) throw itemError;
   if (!item) return null;
 
-  const [{ data: order, error: orderError }, { data: installments, error: installmentsError }] = await Promise.all([
+  const [{ data: order, error: orderError }, { data: installments, error: installmentsError }, { data: sale, error: saleError }] = await Promise.all([
     db.from('lot_sale_orders').select('id,buyer_name,stage,payment_type,payment_method,created_at').eq('id', item.order_id).maybeSingle(),
     db.from('lot_sale_installments').select('installment_number,due_date,amount,payment_status').eq('order_id', item.order_id).order('installment_number'),
+    item.sale_id
+      ? db.from('lot_sales').select('sale_date,salesperson_name,contract_number,status').eq('id', item.sale_id).eq('status', 'CONFIRMED').maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
   ]);
   if (orderError) throw orderError;
   if (installmentsError) throw installmentsError;
+  if (saleError) throw saleError;
   if (!order) return null;
   return {
     orderId: order.id,
@@ -1215,6 +1222,9 @@ export async function fetchLotSaleHistory(lotId: string): Promise<LotSaleHistory
     officialArea: Number(item.official_area_snapshot),
     itemTotal: Number(item.item_total),
     createdAt: order.created_at,
+    saleDate: sale?.sale_date ?? null,
+    salespersonName: sale?.salesperson_name ?? null,
+    contractNumber: sale?.contract_number ?? null,
     installments: (installments ?? []).map((row: { installment_number: number; due_date: string; amount: number | string; payment_status: string }) => ({
       number: row.installment_number,
       dueDate: row.due_date,

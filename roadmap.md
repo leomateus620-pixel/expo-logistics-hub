@@ -1,5 +1,13 @@
 # Roadmap
 
+## Sidebar comercial por estado do lote
+- [ ] Destacar venda confirmada com comprador, data/hora, etapa e responsável
+- [ ] Diferenciar as composições de lotes vendidos e disponíveis
+- [ ] Marcar a etapa oficial efetivamente usada na venda
+- [ ] Tornar contrato compacto e remover ações técnicas da lateral
+- [ ] Validar atualização automática, histórico, desktop, celular, testes e build
+- Não publicar (pedido permanente do usuário)
+
 ## Comprador em lotes vendidos no Mapa Comercial
 - [x] Exibir o comprador no tooltip compartilhado somente para lotes `SOLD`
 - [x] Liberar somente o nome do comprador nos links públicos autorizados por token

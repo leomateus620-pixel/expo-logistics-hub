@@ -65,12 +65,26 @@
   background: oklch(var(--muted) / 0.45);
 }
 
+.lot-pricing-2028-stage.is-confirmed {
+  border: 1px solid oklch(var(--primary) / 0.45);
+  background: oklch(var(--primary) / 0.08);
+  box-shadow: inset 3px 0 oklch(var(--primary));
+}
+
 .lot-pricing-2028-stage-title {
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: oklch(var(--muted-foreground));
+}
+
+.lot-pricing-2028-stage-title b {
+  float: right;
+  color: oklch(var(--primary));
+  font-size: 0.64rem;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .lot-pricing-2028-total {
