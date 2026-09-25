@@ -113,4 +113,5 @@
 
 ## Edição manual de valores 2028
 - [x] Override por lote/etapa na fonte oficial, RPCs com permissão, histórico, edição inline na lateral e nos módulos.
+- [x] Corrigir contenção responsiva do editor e remover “Vendido por” dos cards de preço.
 - [ ] Revisar 9 testes antigos de `commercialMapPavilionModuleCard.test.tsx` (expectativas desatualizadas desde o redesign da lateral/áreas; não relacionados aos preços).

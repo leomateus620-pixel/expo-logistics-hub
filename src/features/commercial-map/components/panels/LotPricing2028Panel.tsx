@@ -23,8 +23,6 @@ interface Props {
   confirmedStage?: LotPricingStage | null;
   /** Mostra o ícone de edição manual (apenas usuários com permissão). */
   canEdit?: boolean;
-  /** Valor efetivamente registrado na venda (snapshot), para lotes vendidos. */
-  soldTotal?: number | null;
 }
 
 const STAGE_LABEL: Record<LotPricingStage, string> = { RENOVACAO: 'Renovação', SEGUNDA_ETAPA: '2ª Etapa' };
@@ -35,10 +33,9 @@ interface StageProps {
   area: number | null;
   confirmed: boolean;
   canEdit: boolean;
-  soldTotal: number | null;
 }
 
-function StageBlock({ stage, pricing, area, confirmed, canEdit, soldTotal }: StageProps) {
+function StageBlock({ stage, pricing, area, confirmed, canEdit }: StageProps) {
   const isRen = stage === 'RENOVACAO';
   const total = isRen ? pricing.renovacaoTotal : pricing.segundaTotal;
   const pricePerSqm = isRen ? pricing.renovacaoPricePerSqm : pricing.segundaPricePerSqm;
@@ -123,14 +120,11 @@ function StageBlock({ stage, pricing, area, confirmed, canEdit, soldTotal }: Sta
         {formatPricePerSqm(pricePerSqm) ?? (total != null ? 'Sem área para preço/m²' : 'Valor/m² não definido')}
         {isManual && <em className="lot-pricing-2028-manual"> · manual</em>}
       </small>
-      {confirmed && soldTotal != null && total != null && Math.abs(soldTotal - total) >= 0.005 && (
-        <small className="lot-pricing-2028-sold">Vendido por {formatBrl(soldTotal)}</small>
-      )}
     </div>
   );
 }
 
-function PricingBody({ pricing, fallbackArea, confirmedStage, canEdit, soldTotal }: { pricing: LotPricing2028; fallbackArea: number | null; confirmedStage: LotPricingStage | null; canEdit: boolean; soldTotal: number | null }) {
+function PricingBody({ pricing, fallbackArea, confirmedStage, canEdit }: { pricing: LotPricing2028; fallbackArea: number | null; confirmedStage: LotPricingStage | null; canEdit: boolean }) {
   const area = pricing.officialAreaSqm ?? fallbackArea;
   const areaLabel = formatAreaSqmLabel(area) ?? 'Área não informada';
   const areaRow = (
@@ -170,7 +164,7 @@ function PricingBody({ pricing, fallbackArea, confirmedStage, canEdit, soldTotal
       {areaRow}
       <div className="lot-pricing-2028-stages">
         {(['RENOVACAO', 'SEGUNDA_ETAPA'] as const).map((stage) => (
-          <StageBlock key={stage} stage={stage} pricing={pricing} area={area} confirmed={confirmedStage === stage} canEdit={canEdit} soldTotal={confirmedStage === stage ? soldTotal : null} />
+          <StageBlock key={stage} stage={stage} pricing={pricing} area={area} confirmed={confirmedStage === stage} canEdit={canEdit} />
         ))}
       </div>
       {ruleLabel && ruleLabel !== 'Valor manual' && <small className="lot-pricing-2028-rule">{ruleLabel}</small>}
@@ -185,7 +179,6 @@ export const LotPricing2028Panel = memo(function LotPricing2028Panel({
   compact = false,
   confirmedStage = null,
   canEdit = false,
-  soldTotal = null,
 }: Props) {
   const query = useLotPricing2028(lotId);
 
@@ -202,7 +195,7 @@ export const LotPricing2028Panel = memo(function LotPricing2028Panel({
       {!query.isLoading && !query.isError && !query.data && (
         <p className="lot-pricing-2028-state">Lote sem correspondência na tabela oficial 2028.</p>
       )}
-      {query.data && <PricingBody pricing={query.data} fallbackArea={officialAreaSqm} confirmedStage={confirmedStage} canEdit={canEdit} soldTotal={soldTotal} />}
+      {query.data && <PricingBody pricing={query.data} fallbackArea={officialAreaSqm} confirmedStage={confirmedStage} canEdit={canEdit} />}
     </section>
   );
 });
