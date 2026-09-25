@@ -173,6 +173,25 @@ export default function CronogramaEventosPage() {
   const selectedPresenceRef = useRef({ id: '', seenInData: false });
   const overlayOpenRef = useRef({ drawer: false, create: false, filters: false });
   const activeView = resolveCronogramaView(searchParams);
+  // Ao recarregar ou voltar a uma aba antiga, o mês gravado no endereço é
+  // posição antiga, não link direto: a agenda deve reabrir no mês atual.
+  const staleTimelineCleanedRef = useRef(false);
+  useEffect(() => {
+    if (staleTimelineCleanedRef.current) return;
+    staleTimelineCleanedRef.current = true;
+    const entry = typeof performance !== 'undefined'
+      ? performance.getEntriesByType?.('navigation')?.[0] as PerformanceNavigationTiming | undefined
+      : undefined;
+    const restored = entry?.type === 'reload' || entry?.type === 'back_forward';
+    if (!restored || !searchParams.has('timelineMonth') || searchParams.has('event')) return;
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.delete('timelineYear');
+      next.delete('timelineMonth');
+      return next;
+    }, { replace: true });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const requestedTimelineYear = isCronogramaCycleYear(searchParams.get('timelineYear'))
     ? Number(searchParams.get('timelineYear')) as CronogramaCycleYear
     : null;
@@ -408,11 +427,17 @@ export default function CronogramaEventosPage() {
     year,
     month,
     replace,
+    reason,
   }: {
     year: CronogramaCycleYear;
     month: string | null;
     replace: boolean;
+    reason?: string;
   }) => {
+    // A rolagem não grava o mês no endereço: senão, ao reabrir a agenda
+    // (PWA/histórico/favorito) o último mês rolado — ex.: junho — vira
+    // "link direto" e substitui o mês atual.
+    if (reason === 'observer') return;
     setSearchParams((current) => {
       const currentYear = current.get('timelineYear');
       const currentMonth = current.get('timelineMonth');
