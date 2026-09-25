@@ -53,6 +53,7 @@ import { LotStructureDialog, type LotStructureOperation } from '../commercial/Lo
 import { PavilionPlanLegend } from './PavilionPlanLegend';
 import { CompactDetailSheetControls } from './CompactDetailSheet';
 import { LotPricing2028Panel } from './LotPricing2028Panel';
+import { describePriceActivity } from '../../utils/priceActivity';
 import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { getHistoryIdForEntity } from '../../history/bindings';
 import { HistoryExperience } from '../../history/HistoryExperience';
@@ -432,7 +433,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
             </section>
           )}
 
-          {lot && <LotPricing2028Panel lotId={lot.id} officialAreaSqm={lot.officialAreaSqm} confirmedStage={lot.status === 'SOLD' ? saleStage(saleHistory.data?.stage) : null} />}
+          {lot && <LotPricing2028Panel lotId={lot.id} officialAreaSqm={lot.officialAreaSqm} confirmedStage={lot.status === 'SOLD' ? saleStage(saleHistory.data?.stage) : null} canEdit={permissions.canEditPricing && !lot.id.startsWith('reference:')} soldTotal={lot.status === 'SOLD' ? saleHistory.data?.itemTotal ?? null : null} />}
 
           <Tabs defaultValue="overview" className="commercial-map-detail-tabs">
             <TabsList>
@@ -524,7 +525,9 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
                 {activity.data?.map((item) => (
                   <div key={item.id}>
                     <i><CheckCircle2 /></i>
-                    <span><strong>{item.action.replace(/_/g, ' ')}</strong><small>{dateTime.format(new Date(item.createdAt))}{item.reason ? ` · ${item.reason}` : ''}</small></span>
+                    {(() => { const price = describePriceActivity(item); return price
+                      ? <span><strong>{price.title}</strong><small>{price.detail}</small><small>{[price.actor, dateTime.format(new Date(item.createdAt))].filter(Boolean).join(' · ')}</small></span>
+                      : <span><strong>{item.action.replace(/_/g, ' ')}</strong><small>{dateTime.format(new Date(item.createdAt))}{item.reason ? ` · ${item.reason}` : ''}</small></span>; })()}
                   </div>
                 ))}
               </div>

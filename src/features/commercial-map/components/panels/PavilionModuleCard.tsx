@@ -223,6 +223,8 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
                 officialAreaSqm={individualArea}
                 compact
                 confirmedStage={lot?.status === 'SOLD' ? confirmedStage(saleHistory.data?.stage) : null}
+                canEdit={persisted && permissions.canEditPricing}
+                soldTotal={lot?.status === 'SOLD' ? saleHistory.data?.itemTotal ?? null : null}
               />
               {!persisted ? <small className="commercial-pavilion-module-area-origin">Disponível após sincronizar o cadastro.</small> : null}
             </dd>
