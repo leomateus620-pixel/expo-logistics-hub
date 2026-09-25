@@ -6,6 +6,7 @@ import {
   formatBrl,
   formatPricePerSqm,
   type LotPricing2028,
+  type LotPricingStage,
 } from '../../utils/lotPricing2028';
 import './lot-pricing-2028.css';
 
@@ -14,19 +15,20 @@ interface Props {
   /** Área persistida do lote, usada como fallback de exibição. */
   officialAreaSqm?: number | null;
   compact?: boolean;
+  confirmedStage?: LotPricingStage | null;
 }
 
-function StageBlock({ title, pricePerSqm, total }: { title: string; pricePerSqm: number | null; total: number | null }) {
+function StageBlock({ title, pricePerSqm, total, confirmed }: { title: string; pricePerSqm: number | null; total: number | null; confirmed: boolean }) {
   return (
-    <div className="lot-pricing-2028-stage">
-      <span className="lot-pricing-2028-stage-title">{title}</span>
+    <div className={`lot-pricing-2028-stage${confirmed ? ' is-confirmed' : ''}`}>
+      <span className="lot-pricing-2028-stage-title">{title}{confirmed && <b>✓ Confirmado</b>}</span>
       <strong className="lot-pricing-2028-total">{formatBrl(total) ?? UNPRICED_PAVILION_LABEL}</strong>
       <small className="lot-pricing-2028-unit">{formatPricePerSqm(pricePerSqm) ?? 'Valor/m² não definido'}</small>
     </div>
   );
 }
 
-function PricingBody({ pricing, fallbackArea }: { pricing: LotPricing2028; fallbackArea: number | null }) {
+function PricingBody({ pricing, fallbackArea, confirmedStage }: { pricing: LotPricing2028; fallbackArea: number | null; confirmedStage: LotPricingStage | null }) {
   const area = pricing.officialAreaSqm ?? fallbackArea;
   const areaLabel = formatAreaSqmLabel(area) ?? 'Área não informada';
 
@@ -67,8 +69,8 @@ function PricingBody({ pricing, fallbackArea }: { pricing: LotPricing2028; fallb
         <strong>{areaLabel}</strong>
       </div>
       <div className="lot-pricing-2028-stages">
-        <StageBlock title="Renovação" pricePerSqm={pricing.renovacaoPricePerSqm} total={pricing.renovacaoTotal} />
-        <StageBlock title="2ª Etapa" pricePerSqm={pricing.segundaPricePerSqm} total={pricing.segundaTotal} />
+        <StageBlock title="Renovação" pricePerSqm={pricing.renovacaoPricePerSqm} total={pricing.renovacaoTotal} confirmed={confirmedStage === 'RENOVACAO'} />
+        <StageBlock title="2ª Etapa" pricePerSqm={pricing.segundaPricePerSqm} total={pricing.segundaTotal} confirmed={confirmedStage === 'SEGUNDA_ETAPA'} />
       </div>
       {pricing.renovacaoRuleLabel && (
         <small className="lot-pricing-2028-rule">{pricing.renovacaoRuleLabel}</small>
@@ -82,6 +84,7 @@ export const LotPricing2028Panel = memo(function LotPricing2028Panel({
   lotId,
   officialAreaSqm = null,
   compact = false,
+  confirmedStage = null,
 }: Props) {
   const query = useLotPricing2028(lotId);
 
@@ -98,7 +101,7 @@ export const LotPricing2028Panel = memo(function LotPricing2028Panel({
       {!query.isLoading && !query.isError && !query.data && (
         <p className="lot-pricing-2028-state">Lote sem correspondência na tabela oficial 2028.</p>
       )}
-      {query.data && <PricingBody pricing={query.data} fallbackArea={officialAreaSqm} />}
+      {query.data && <PricingBody pricing={query.data} fallbackArea={officialAreaSqm} confirmedStage={confirmedStage} />}
     </section>
   );
 });

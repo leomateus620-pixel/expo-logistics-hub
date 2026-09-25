@@ -7,6 +7,7 @@ import { OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS } from '@/features
 const mocks = vi.hoisted(() => ({
   activity: vi.fn(() => ({ data: [], isLoading: false, isError: false })),
   contracts: vi.fn(() => ({ data: [], isLoading: false, isError: false })),
+  saleHistory: vi.fn(() => ({ data: null, isLoading: false, isError: false })),
   mutate: vi.fn(),
   mutateAsync: vi.fn(),
   fetch: vi.fn(),
@@ -21,6 +22,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@/features/commercial-map/hooks/useCommercialMap', () => ({
   useLotActivity: mocks.activity,
   useLotContractVersions: mocks.contracts,
+  useLotSaleHistory: mocks.saleHistory,
   useMapMutations: () => {
     const mutation = { isPending: false, mutate: mocks.mutate, mutateAsync: mocks.mutateAsync };
     return {
@@ -35,6 +37,9 @@ vi.mock('@/features/commercial-map/hooks/useCommercialMap', () => ({
       layerLock: mutation,
     };
   },
+}));
+vi.mock('@/features/commercial-map/hooks/useLotPricing2028', () => ({
+  useLotPricing2028: () => ({ data: null, isLoading: false, isError: false }),
 }));
 
 vi.mock('@/features/commercial-map/state/useCommercialMapStore', () => ({
@@ -122,6 +127,35 @@ afterEach(() => {
 });
 
 describe('seleção no painel persistente do mapa comercial', () => {
+  it('diferencia lote vendido com a venda canônica e lote disponível sem campos vazios', () => {
+    const sold = fixture('A', 0);
+    sold.lot.status = 'SOLD';
+    sold.lot.currentBuyer = 'BOTOLI';
+    sold.lot.saleDate = '2026-09-24';
+    sold.lot.salespersonName = 'Leonardo';
+    mocks.saleHistory.mockReturnValueOnce({
+      data: {
+        orderId: 'order-1', buyerName: 'BOTOLI', stage: 'SEGUNDA_ETAPA', paymentType: 'CASH', paymentMethod: 'PIX',
+        officialArea: 100, itemTotal: 5921, createdAt: '2026-09-24T17:32:00Z', saleDate: '2026-09-24',
+        salespersonName: 'Leonardo', contractNumber: null, installments: [],
+      },
+      isLoading: false,
+      isError: false,
+    });
+    const view = render(panel(sold));
+    const aside = screen.getByRole('complementary');
+    expect(within(aside).getByLabelText('Venda confirmada')).toHaveTextContent('BOTOLI');
+    expect(within(aside).getByLabelText('Venda confirmada')).toHaveTextContent('24/09/2026');
+    expect(within(aside).getByLabelText('Venda confirmada')).toHaveTextContent('2ª Etapa');
+    expect(within(aside).getByLabelText('Venda confirmada')).toHaveTextContent('Leonardo');
+    expect(within(aside).getByRole('region', { name: 'Contrato da venda' })).toBeVisible();
+
+    view.rerender(panel(first));
+    expect(screen.queryByLabelText('Venda confirmada')).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Contrato da venda' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Nenhum contrato anexado a este lote.')).not.toBeInTheDocument();
+  });
+
   it('oferece uma única entrada para o interior no resumo com identificação e módulos do pavilhão', () => {
     const pavilion = OFFICIAL_REFERENCE_ENTITIES.find((candidate) => candidate.publicIdentifier === 'B1')!;
     render(<EntityDetailsPanel entity={pavilion} entities={OFFICIAL_REFERENCE_ENTITIES}
@@ -149,42 +183,25 @@ describe('seleção no painel persistente do mapa comercial', () => {
     expect(mocks.store.enterInterior).not.toHaveBeenCalled();
   });
 
-  it('preserva o aside A→B, fecha a edição aberta e inicia o draft real de LotEditDialog com os dados de B', () => {
+  it('preserva o aside A→B e atualiza os dados comerciais sem expor ações técnicas', () => {
     const view = render(panel());
     const aside = screen.getByRole('complementary');
-    fireEvent.click(within(aside).getByRole('button', { name: 'Editar lote' }));
-    const firstDialog = screen.getByRole('dialog', { name: 'Editar LOT-A' });
-    fireEvent.change(within(firstDialog).getByLabelText('Identificador público *'), {
-      target: { value: 'RASCUNHO-EXCLUSIVO-A' },
-    });
-    fireEvent.change(within(firstDialog).getByLabelText('Nome de exibição *'), {
-      target: { value: 'Nome não salvo de A' },
-    });
+    expect(within(aside).queryByRole('button', { name: 'Editar lote' })).not.toBeInTheDocument();
+    expect(within(aside).queryByRole('button', { name: 'Verificar entidade' })).not.toBeInTheDocument();
 
     view.rerender(panel(second));
 
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByRole('complementary')).toBe(aside);
     expect(aside).toHaveTextContent('LOT-B');
     expect(mocks.activity).toHaveBeenLastCalledWith(second.lot.id);
     expect(mocks.contracts).toHaveBeenLastCalledWith(second.lot.id, true);
 
-    fireEvent.click(within(aside).getByRole('button', { name: 'Editar lote' }));
-    const secondDialog = screen.getByRole('dialog', { name: 'Editar LOT-B' });
-    expect(within(secondDialog).getByLabelText('Identificador público *')).toHaveValue('LOT-B');
-    expect(within(secondDialog).getByLabelText('Nome de exibição *')).toHaveValue('Lote B');
-    expect(within(secondDialog).getByLabelText('Descrição')).toHaveValue('Descrição B');
-    expect(screen.queryByDisplayValue('RASCUNHO-EXCLUSIVO-A')).not.toBeInTheDocument();
-    expect(screen.queryByDisplayValue('Nome não salvo de A')).not.toBeInTheDocument();
-
     view.rerender(panel(first));
     expect(screen.getByRole('complementary')).toBe(aside);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    fireEvent.click(within(aside).getByRole('button', { name: 'Editar lote' }));
-    expect(within(screen.getByRole('dialog')).getByLabelText('Identificador público *')).toHaveValue('LOT-A');
   });
 
-  it.each(['Reservar', 'Dividir', 'Verificar entidade'])(
+  it.each(['Reservar', 'Dividir'])(
     'fecha o modal de %s ao trocar a entidade sem substituir o painel',
     (action) => {
       const view = render(panel());

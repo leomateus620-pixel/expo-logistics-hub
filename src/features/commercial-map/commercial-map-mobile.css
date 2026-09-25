@@ -309,6 +309,10 @@
 
   .commercial-map-detail-primary span { color: #73818a; font-size: 0.52rem; font-weight: 800; letter-spacing: 0.055em; text-transform: uppercase; }
   .commercial-map-detail-primary strong { overflow: hidden; color: #18344e; font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
+  .commercial-map-sale-confirmed { margin: 0.6rem 0.8rem 0.2rem; padding: 0.7rem 0.75rem; }
+  .commercial-map-sale-confirmed__buyer { font-size: 1rem; }
+  .commercial-map-details-panel .lot-pricing-2028 { margin: 0.6rem 0.8rem 0; }
+  .commercial-map-contract-action > button { width: 100%; }
   .commercial-map-detail-tabs { padding-inline: 0.8rem; }
   .commercial-map-detail-tabs [role="tablist"] { min-height: 2.75rem; }
 }

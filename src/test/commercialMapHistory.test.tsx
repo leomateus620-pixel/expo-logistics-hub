@@ -8,6 +8,7 @@ import type { HistoryImage } from '@/features/commercial-map/history/mediaTypes'
 const mocks = vi.hoisted(() => ({
   activity: vi.fn(() => ({ data: [], isLoading: false, isError: false })),
   contracts: vi.fn(() => ({ data: [], isLoading: false, isError: false })),
+  saleHistory: vi.fn(() => ({ data: null, isLoading: false, isError: false })),
   mutate: vi.fn(), mutateAsync: vi.fn(),
   entries: [] as HistoryEntry[], images: [] as HistoryImage[], getHistory: vi.fn(),
   store: { setSelectedEntityId: vi.fn(), focusSelection: vi.fn(), enterInterior: vi.fn(), setWorkspaceMode: vi.fn() },
@@ -15,10 +16,14 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@/features/commercial-map/hooks/useCommercialMap', () => ({
   useLotActivity: mocks.activity, useLotContractVersions: mocks.contracts,
+  useLotSaleHistory: mocks.saleHistory,
   useMapMutations: () => {
     const mutation = { isPending: false, mutate: mocks.mutate, mutateAsync: mocks.mutateAsync };
     return { lotUpdate: mutation, reservation: mutation, negotiation: mutation, sale: mutation, contract: mutation, split: mutation, merge: mutation, verification: mutation, layerLock: mutation };
   },
+}));
+vi.mock('@/features/commercial-map/hooks/useLotPricing2028', () => ({
+  useLotPricing2028: () => ({ data: null, isLoading: false, isError: false }),
 }));
 vi.mock('@/features/commercial-map/state/useCommercialMapStore', () => ({
   useCommercialMapStore: (selector: (state: typeof mocks.store) => unknown) => selector(mocks.store),
@@ -116,7 +121,7 @@ describe('história integrada ao painel comercial persistente', () => {
     const trigger = screen.getByRole('button', { name: 'Conhecer a história' });
     expect(aside.querySelector('img')).toBeNull();
     expect(mocks.getHistory).not.toHaveBeenCalled();
-    expect(screen.getByRole('button', { name: 'Editar lote' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Editar lote' })).not.toBeInTheDocument();
     await openHistory();
     expect(screen.getByRole('complementary')).toBe(aside);
     expect(screen.getByAltText('Registro primeira')).toHaveAttribute('src', '/history/test/primeira.webp');
@@ -124,10 +129,9 @@ describe('história integrada ao painel comercial persistente', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Voltar às informações' }));
     await waitFor(() => expect(trigger).toHaveFocus());
     expect(screen.getByRole('complementary')).toBe(aside);
-    expect(screen.getByRole('button', { name: 'Editar lote' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Editar lote' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Reservar' })).toBeVisible();
-    expect(screen.getByText(/R\$\s*1\.200,00/)).toBeVisible();
-    expect(screen.getByRole('heading', { name: 'Dados comerciais' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Informações comerciais' })).toBeVisible();
     expect(aside.querySelector('img')).toBeNull();
     expect(mocks.activity).toHaveBeenLastCalledWith('uuid-pavilhao-7-lot');
   });
