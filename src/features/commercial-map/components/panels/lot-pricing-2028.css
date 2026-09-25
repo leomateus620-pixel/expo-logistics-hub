@@ -105,3 +105,64 @@
   font-size: 0.7rem;
   color: oklch(var(--muted-foreground));
 }
+
+.lot-pricing-2028-edit {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-left: 0.25rem;
+  vertical-align: middle;
+  border-radius: 0.4rem;
+  color: oklch(var(--muted-foreground));
+  background: transparent;
+}
+.lot-pricing-2028-edit:hover,
+.lot-pricing-2028-edit:focus-visible { color: oklch(var(--primary)); background: oklch(var(--primary) / 0.1); outline: none; }
+.lot-pricing-2028-edit svg { width: 0.8rem; height: 0.8rem; }
+
+.lot-pricing-2028-manual { font-style: normal; color: oklch(var(--primary)); }
+.lot-pricing-2028-sold { font-size: 0.7rem; color: oklch(var(--muted-foreground)); font-variant-numeric: tabular-nums; }
+
+.lot-pricing-2028-stage.is-editing {
+  gap: 0.375rem;
+  border: 1px solid oklch(var(--primary) / 0.45);
+  background: oklch(var(--card));
+}
+.lot-pricing-2028-edit-field {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0 0.625rem;
+  border: 1px solid oklch(var(--border));
+  border-radius: 0.625rem;
+  background: oklch(var(--background));
+}
+.lot-pricing-2028-edit-field span { font-size: 0.8rem; color: oklch(var(--muted-foreground)); }
+.lot-pricing-2028-edit-field input {
+  flex: 1;
+  min-width: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: transparent;
+  color: oklch(var(--foreground));
+  outline: none;
+}
+.lot-pricing-2028-edit-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.375rem; }
+.lot-pricing-2028-edit-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-height: 2.5rem;
+  border-radius: 0.625rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.lot-pricing-2028-edit-actions button svg { width: 0.9rem; height: 0.9rem; }
+.lot-pricing-2028-edit-actions .is-primary { background: oklch(var(--primary)); color: oklch(var(--primary-foreground)); }
+.lot-pricing-2028-edit-actions .is-secondary { border: 1px solid oklch(var(--border)); color: oklch(var(--foreground)); }
+.lot-pricing-2028-edit-actions button:disabled { opacity: 0.55; }
+.lot-pricing-2028-restore { font-size: 0.7rem; text-align: left; color: oklch(var(--primary)); text-decoration: underline; }
