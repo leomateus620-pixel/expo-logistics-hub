@@ -62,7 +62,7 @@ describe('resumo do carrinho de vendas', () => {
 describe('cronograma de parcelas', () => {
   it('fecha exatamente o total mesmo com divisão inexata', () => {
     const schedule = buildInstallmentSchedule(100, 3, '2028-01-31');
-    expect(schedule.map((item) => item.amount)).toEqual([33.33, 33.33, 33.34]);
+    expect(schedule.map((item) => item.amount)).toEqual([33.34, 33.33, 33.33]);
     expect(installmentsSum(schedule)).toBe(100);
   });
 

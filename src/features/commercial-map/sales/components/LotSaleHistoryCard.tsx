@@ -1,5 +1,6 @@
 import { CalendarDays, ReceiptText } from 'lucide-react';
 import { formatBrl } from '../../utils/lotPricing2028';
+import { paymentMethodLabel } from '../salesTypes';
 import type { LotSaleHistory } from '../../services/commercialMapService';
 
 const date = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo' });
@@ -18,7 +19,9 @@ export function LotSaleHistoryCard({ sale, loading }: { sale: LotSaleHistory | n
       <p className="commercial-sale-history__trace"><strong>Comprador:</strong> {sale.buyerName} · <strong>Etapa:</strong> {sale.stage === 'RENOVACAO' ? 'Renovação' : '2ª Etapa'}{sale.salespersonName ? <> · <strong>Responsável:</strong> {sale.salespersonName}</> : null}</p>
       <dl>
         <div><dt>Etapa</dt><dd>{sale.stage === 'RENOVACAO' ? 'Renovação' : '2ª Etapa'}</dd></div>
-        <div><dt>Forma</dt><dd>{sale.paymentType === 'CASH' ? 'À vista' : `${sale.installments.length} parcelas`} · {sale.paymentMethod}</dd></div>
+        <div><dt>Forma</dt><dd>{sale.paymentType === 'CASH' ? 'À vista' : `${sale.installments.length} parcelas`} · {paymentMethodLabel(sale.paymentMethod)}</dd></div>
+        {(sale.feesTotal ?? 0) > 0 && <div><dt>Taxas da venda</dt><dd>{formatBrl(sale.feesTotal ?? 0)} (adm. {formatBrl(sale.fees?.admin ?? 0)} · PPCI {formatBrl(sale.fees?.ppci ?? 0)} · limpeza/licença {formatBrl(sale.fees?.cleaning ?? 0)})</dd></div>}
+        {sale.orderTotal !== undefined && sale.orderTotal !== sale.itemTotal && <div><dt>Total da venda</dt><dd>{formatBrl(sale.orderTotal)} · espaços {formatBrl(sale.spacesSubtotal ?? 0)}</dd></div>}
         <div><dt>Área</dt><dd>{sale.officialArea.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m²</dd></div>
         {sale.contractNumber && <div><dt>Contrato</dt><dd>{sale.contractNumber}</dd></div>}
       </dl>

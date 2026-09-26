@@ -1,13 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { formatBrl } from '../../utils/lotPricing2028';
-import { buildInstallmentScheduleFromDates } from '../salesInstallments';
+import { draftsToInstallments, monthlyDueDates, redistribute } from '../salesInstallments';
+import { formatCents, toCents } from '../salesMoney';
 import type { SalesCartSummary } from '../salesPricing';
 import { useSalesCheckout } from '../useSalesCheckout';
 import { useSalesStore } from '../useSalesSelection';
-import type { SalesBuyerDraft, SalesPaymentDraft } from '../salesTypes';
+import { useExhibitorAutosave } from '../useExhibitorAutosave';
+import type { SalesBuyerDraft, SalesFeesDraft, SalesPaymentDraft } from '../salesTypes';
+import { feesTotalCents } from '../salesTypes';
 import { SalesBuyerForm, buyerErrors } from './SalesBuyerForm';
 import { SalesPaymentForm, paymentErrors } from './SalesPaymentForm';
 import { SalesReview } from './SalesReview';
@@ -15,11 +17,10 @@ import { SalesReview } from './SalesReview';
 const STEPS = ['Expositor', 'Pagamento', 'Revisão'] as const;
 
 const EMPTY_BUYER: SalesBuyerDraft = { buyerName: '', documentNumber: '', phone: '', email: '', notes: '' };
+const EMPTY_FEES: SalesFeesDraft = { adminCents: 0, ppciCents: 0, cleaningCents: 0 };
 
-function defaultDueDate(): string {
-  const today = new Date();
-  today.setDate(today.getDate() + 30);
-  return today.toISOString().slice(0, 10);
+function initialPayment(totalCents: number): SalesPaymentDraft {
+  return { paymentMethod: 'PIX', countInput: '3', installments: [{ dueDate: monthlyDueDates(1)[0], amountCents: totalCents }], manualAmounts: false };
 }
 
 interface Props {
@@ -32,21 +33,19 @@ export function SalesCheckoutDialog({ summary }: Props) {
   const stage = useSalesStore((state) => state.stage);
   const selection = useSalesStore((state) => state.selection);
 
+  const spacesCents = toCents(summary.valueTotal);
   const [step, setStep] = useState(0);
   const [showErrors, setShowErrors] = useState(false);
   const [buyer, setBuyer] = useState<SalesBuyerDraft>(EMPTY_BUYER);
-  const initialDueDate = defaultDueDate();
-  const [payment, setPayment] = useState<SalesPaymentDraft>({
-    paymentType: 'CASH',
-    installmentCount: 1,
-    paymentMethod: 'PIX',
-    firstDueDate: initialDueDate,
-    dueDates: [initialDueDate],
-  });
+  const [fees, setFees] = useState<SalesFeesDraft>(EMPTY_FEES);
+  const totalCents = spacesCents + feesTotalCents(fees);
+  const [payment, setPayment] = useState<SalesPaymentDraft>(() => initialPayment(totalCents));
+  const [advancing, setAdvancing] = useState(false);
   // Chave de idempotência por tentativa de checkout: reenvio não duplica a venda.
   const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID());
 
   const checkout = useSalesCheckout();
+  const autosave = useExhibitorAutosave(buyer, selection[0]?.lotId ?? null, open);
 
   useEffect(() => {
     if (open) {
@@ -56,65 +55,101 @@ export function SalesCheckoutDialog({ summary }: Props) {
     }
   }, [open]);
 
-  const installments = useMemo(
-    () => buildInstallmentScheduleFromDates(summary.valueTotal, payment.dueDates),
-    [summary.valueTotal, payment.dueDates],
-  );
+  // Total mudou (taxas/etapa): recalcula apenas se os valores ainda são automáticos; datas preservadas.
+  const lastTotal = useRef(totalCents);
+  useEffect(() => {
+    if (lastTotal.current === totalCents) return;
+    lastTotal.current = totalCents;
+    setPayment((current) => {
+      if (current.paymentMethod !== 'BOLETO_PARCELADO') {
+        return { ...current, installments: [{ dueDate: current.installments[0]?.dueDate ?? monthlyDueDates(1)[0], amountCents: totalCents }] };
+      }
+      return current.manualAmounts ? current : { ...current, installments: redistribute(totalCents, current.installments) };
+    });
+  }, [totalCents]);
 
   const stepValid = useMemo(() => {
     if (step === 0) return Object.values(buyerErrors(buyer)).every((error) => error === null);
-    if (step === 1) return Object.values(paymentErrors(payment)).every((error) => error === null);
-    return summary.ready;
-  }, [step, buyer, payment, summary.ready]);
+    if (step === 1) return Object.values(paymentErrors(payment, totalCents)).every((error) => error === null);
+    return summary.ready && Object.values(paymentErrors(payment, totalCents)).every((error) => error === null);
+  }, [step, buyer, payment, totalCents, summary.ready]);
 
-  const advance = () => {
+  const advance = async () => {
     if (!stepValid) {
       setShowErrors(true);
       return;
     }
     setShowErrors(false);
+    if (step === 0) {
+      setAdvancing(true);
+      await autosave.flush(); // falha no cadastro não bloqueia a venda (dados vão como cópia na venda)
+      setAdvancing(false);
+    }
     setStep((current) => current + 1);
   };
 
   const confirm = () => {
-    if (!summary.ready || checkout.isPending) return;
+    if (!stepValid || checkout.isPending) return;
     checkout.mutate({
       idempotencyKey,
       stage,
       lotIds: selection.map((item) => item.lotId),
       buyer,
-      payment,
-      installments,
-      expectedTotal: summary.valueTotal,
+      exhibitorId: autosave.exhibitorId,
+      paymentMethod: payment.paymentMethod,
+      fees,
+      installments: draftsToInstallments(payment.installments),
+      expectedTotal: totalCents / 100,
+    }, {
+      onSuccess: () => {
+        setBuyer(EMPTY_BUYER);
+        setFees(EMPTY_FEES);
+        setPayment(initialPayment(0));
+        autosave.reset();
+      },
     });
   };
 
   return (
     <Dialog open={open} onOpenChange={(next) => !checkout.isPending && setOpen(next)}>
-      <DialogContent className="sales-checkout-dialog sm:max-w-xl">
+      <DialogContent className="sales-checkout-dialog sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Finalizar venda</DialogTitle>
           <DialogDescription>
-            {selection.length} espaço{selection.length === 1 ? '' : 's'} · {formatBrl(summary.valueTotal)}
+            {selection.length} espaço{selection.length === 1 ? '' : 's'} · {formatCents(totalCents)}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="sales-checkout-steps">
+        <ol className="sales-checkout-steps">
           {STEPS.map((label, index) => (
-            <span key={label} className={index === step ? 'is-active' : ''}>
-              {index + 1}. {label}
-              {index < STEPS.length - 1 ? ' ›' : ''}
-            </span>
+            <li key={label} className={index === step ? 'is-active' : index < step ? 'is-done' : ''} aria-current={index === step ? 'step' : undefined}>
+              <span>{index + 1}</span>{label}
+            </li>
           ))}
-        </div>
+        </ol>
 
         <div className="sales-checkout-dialog__body">
-          {step === 0 && <SalesBuyerForm value={buyer} onChange={setBuyer} showErrors={showErrors} />}
+          {step === 0 && (
+            <SalesBuyerForm
+              value={buyer}
+              onChange={setBuyer}
+              showErrors={showErrors}
+              saveStatus={autosave.status}
+              onRetrySave={() => { void autosave.flush(); }}
+            />
+          )}
           {step === 1 && (
-            <SalesPaymentForm value={payment} onChange={setPayment} installments={installments} showErrors={showErrors} />
+            <SalesPaymentForm
+              value={payment}
+              onChange={setPayment}
+              fees={fees}
+              onFeesChange={setFees}
+              spacesCents={spacesCents}
+              showErrors={showErrors}
+            />
           )}
           {step === 2 && (
-            <SalesReview summary={summary} stage={stage} buyer={buyer} payment={payment} installments={installments} />
+            <SalesReview summary={summary} stage={stage} buyer={buyer} payment={payment} fees={fees} spacesCents={spacesCents} />
           )}
         </div>
 
@@ -129,14 +164,15 @@ export function SalesCheckoutDialog({ summary }: Props) {
             {step === 0 ? 'Cancelar' : 'Voltar'}
           </Button>
           {step < 2 ? (
-            <Button type="button" className="h-11 flex-1 rounded-xl" onClick={advance}>
+            <Button type="button" className="h-11 flex-1 rounded-xl" disabled={advancing} onClick={() => { void advance(); }}>
+              {advancing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Continuar
             </Button>
           ) : (
             <Button
               type="button"
               className="h-11 flex-1 rounded-xl"
-              disabled={!summary.ready || checkout.isPending}
+              disabled={!stepValid || checkout.isPending}
               onClick={confirm}
             >
               {checkout.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

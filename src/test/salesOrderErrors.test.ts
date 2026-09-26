@@ -67,7 +67,9 @@ describe('registerSaleOrder', () => {
       stage: 'RENOVACAO',
       lotIds: ['a', 'b'],
       buyer: { buyerName: 'Fixture', documentNumber: '', phone: '', email: '', notes: '' },
-      payment: { paymentType: 'CASH', installmentCount: 1, paymentMethod: 'PIX', firstDueDate: '2026-10-01', dueDates: ['2026-10-01'] },
+      exhibitorId: null,
+      paymentMethod: 'PIX',
+      fees: { adminCents: 0, ppciCents: 0, cleaningCents: 0 },
       installments: [],
       expectedTotal: 100,
     })).rejects.toMatchObject({ name: 'SalesOrderError' });
@@ -96,7 +98,9 @@ describe('registerSaleOrder', () => {
       stage: 'SEGUNDA_ETAPA',
       lotIds: ['a'],
       buyer: { buyerName: 'Fixture', documentNumber: '', phone: '', email: '', notes: '' },
-      payment: { paymentType: 'CASH', installmentCount: 1, paymentMethod: 'BOLETO', firstDueDate: '2026-10-01', dueDates: ['2026-10-01'] },
+      exhibitorId: null,
+      paymentMethod: 'BOLETO_AVISTA',
+      fees: { adminCents: 0, ppciCents: 0, cleaningCents: 0 },
       installments: [],
       expectedTotal: 10,
     }).then(() => null).catch((error: unknown) => error as SalesOrderError) as unknown as SalesOrderError;

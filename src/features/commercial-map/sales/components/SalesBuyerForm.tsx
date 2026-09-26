@@ -1,12 +1,20 @@
+import { useState } from 'react';
+import { AlertCircle, BookUser, Check, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import type { SalesBuyerDraft } from '../salesTypes';
 import { formatDocument, formatPhoneBr, isValidDocument, isValidEmail, isValidPhoneBr } from '../salesValidation';
+import type { AutosaveStatus } from '../useExhibitorAutosave';
+import type { CommercialExhibitor } from '../exhibitorService';
+import { ExhibitorBookDialog } from './ExhibitorBookDialog';
 
 interface Props {
   value: SalesBuyerDraft;
   onChange: (value: SalesBuyerDraft) => void;
   showErrors: boolean;
+  saveStatus?: AutosaveStatus;
+  onRetrySave?: () => void;
 }
 
 export function buyerErrors(value: SalesBuyerDraft) {
@@ -18,12 +26,43 @@ export function buyerErrors(value: SalesBuyerDraft) {
   };
 }
 
-export function SalesBuyerForm({ value, onChange, showErrors }: Props) {
+function SaveIndicator({ status, onRetry }: { status: AutosaveStatus; onRetry?: () => void }) {
+  if (status === 'saving') return <span className="sales-autosave"><Loader2 className="h-3 w-3 animate-spin" />Salvando</span>;
+  if (status === 'saved') return <span className="sales-autosave is-saved"><Check className="h-3 w-3" />Salvo</span>;
+  if (status === 'error') {
+    return (
+      <button type="button" className="sales-autosave is-error" onClick={onRetry}>
+        <AlertCircle className="h-3 w-3" />Não salvo · tentar de novo
+      </button>
+    );
+  }
+  return null;
+}
+
+export function SalesBuyerForm({ value, onChange, showErrors, saveStatus = 'idle', onRetrySave }: Props) {
   const errors = buyerErrors(value);
+  const [bookOpen, setBookOpen] = useState(false);
   const set = (patch: Partial<SalesBuyerDraft>) => onChange({ ...value, ...patch });
+  const pick = (item: CommercialExhibitor) => set({
+    buyerName: item.name.toUpperCase(),
+    documentNumber: formatDocument(item.documentNumber),
+    phone: item.phone ? formatPhoneBr(item.phone) : '',
+    email: item.email ?? '',
+  });
 
   return (
     <div className="sales-sheet-body">
+      <div className="sales-section-head">
+        <strong>Dados do expositor</strong>
+        <div className="sales-section-head__tools">
+          <SaveIndicator status={saveStatus} onRetry={onRetrySave} />
+          <Button type="button" variant="outline" size="sm" className="h-9 rounded-lg" onClick={() => setBookOpen(true)} aria-label="Expositores cadastrados">
+            <BookUser className="h-4 w-4" />
+            <span className="sales-hide-xs">Expositores cadastrados</span>
+          </Button>
+        </div>
+      </div>
+
       <div className="sales-field">
         <label htmlFor="sales-buyer-name">Nome / Razão social</label>
         <Input
@@ -74,7 +113,7 @@ export function SalesBuyerForm({ value, onChange, showErrors }: Props) {
       </div>
 
       <div className="sales-field">
-        <label htmlFor="sales-buyer-notes">Observações (opcional)</label>
+        <label htmlFor="sales-buyer-notes">Observações da venda (opcional)</label>
         <Textarea
           id="sales-buyer-notes"
           rows={2}
@@ -82,6 +121,8 @@ export function SalesBuyerForm({ value, onChange, showErrors }: Props) {
           onChange={(event) => set({ notes: event.target.value })}
         />
       </div>
+
+      <ExhibitorBookDialog open={bookOpen} onOpenChange={setBookOpen} onSelect={pick} />
     </div>
   );
 }
