@@ -128,8 +128,7 @@ describe('legenda inteligente das plantas internas', () => {
     expect(within(legend).getAllByText('57')).toHaveLength(2);
     expect(within(legend).getByText('Identificação')).toBeInTheDocument();
     expect(within(legend).getByText('01–57')).toBeInTheDocument();
-    expect(legend.querySelector('.commercial-pavilion-plan-source-note'))
-      .not.toHaveTextContent('Divergência documental');
+    expect(legend.querySelector('.commercial-pavilion-plan-source-note')).toBeNull();
     expect(within(legend).getByText('Apoio permanente')).toBeInTheDocument();
     [
       'Cozinha do Pavilhão 7 · apoio permanente não comercial',

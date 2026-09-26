@@ -144,7 +144,7 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(pavilion14.metadata.aliases).toEqual(expect.arrayContaining([
       'Pavilhão 14 — Comércio e Artesanato',
     ]));
-    expect(pavilion7).toMatchObject({ name: 'Pavilhão 7 — Agroindústrias' });
+    expect(pavilion7).toMatchObject({ name: 'Pavilhão 7 — Agricultura Familiar / Agroindústrias' });
     expect(pavilion7.metadata.aliases).toEqual(expect.arrayContaining([
       'Pavilhão 7 — Agricultura Familiar',
       'Pavilhão 7 — Agricultura familiar / soja e derivados',
