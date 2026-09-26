@@ -18,7 +18,7 @@ import '../sales-mode.css';
  * barra/gaveta mobile e checkout. Nenhuma geometria, área ou cadastro muda aqui,
  * e `reducedGraphics` nunca é acionado — pavilhões mantêm a arquitetura normal.
  */
-export function SalesModeLayer({ projectId, lots, entities }: { projectId: string | null; lots: readonly CommercialLot[]; entities: readonly MapEntity[] }) {
+export function SalesModeLayer({ projectId, lots, entities = [] }: { projectId: string | null; lots: readonly CommercialLot[]; entities?: readonly MapEntity[] }) {
   const active = useSalesStore((state) => state.salesModeActive);
   const selectionCount = useSalesStore((state) => state.selection.length);
   const checkoutOpen = useSalesStore((state) => state.checkoutOpen);

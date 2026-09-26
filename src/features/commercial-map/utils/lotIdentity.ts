@@ -14,7 +14,7 @@ export interface LotIdentity {
 /** Presentation only: neither pricing nor the technical identifier is inferred from a code. */
 export function resolveLotIdentity(
   lot: LotFields,
-  entity?: Pick<MapEntity, 'metadata' | 'parentEntityId'> | null,
+  entity?: Pick<MapEntity, 'metadata' | 'parentEntityId' | 'segmentId'> | null,
   pavilion?: Pick<MapEntity, 'publicIdentifier' | 'id'> | null,
   scopedArea?: string | null,
 ): LotIdentity {

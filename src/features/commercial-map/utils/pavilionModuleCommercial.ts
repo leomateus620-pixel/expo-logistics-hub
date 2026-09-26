@@ -15,9 +15,9 @@ export interface CommercialPavilionModuleVisualState {
   publicIdentifier: string | null;
   displayName: string | null;
   block: string | null;
-  number: string | null;
-  area: string | null;
-  location: string | null;
+  number?: string | null;
+  area?: string | null;
+  location?: string | null;
 }
 
 export interface CommercialPavilionModuleNavigationTarget {
