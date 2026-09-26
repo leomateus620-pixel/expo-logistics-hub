@@ -180,13 +180,13 @@ export function SalesCheckoutDialog({ summary }: Props) {
             type="button"
             variant="outline"
             className="h-11 flex-1 rounded-xl"
-            disabled={checkout.isPending}
+            disabled={checkout.isPending || logoUploading}
             onClick={() => (step === 0 ? setOpen(false) : setStep((current) => current - 1))}
           >
             {step === 0 ? 'Cancelar' : 'Voltar'}
           </Button>
           {step < 2 ? (
-            <Button type="button" className="h-11 flex-1 rounded-xl" disabled={advancing} onClick={() => { void advance(); }}>
+             <Button type="button" className="h-11 flex-1 rounded-xl" disabled={advancing || logoUploading} onClick={() => { void advance(); }}>
               {advancing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Continuar
             </Button>
@@ -194,7 +194,7 @@ export function SalesCheckoutDialog({ summary }: Props) {
             <Button
               type="button"
               className="h-11 flex-1 rounded-xl"
-              disabled={!stepValid || checkout.isPending}
+               disabled={!stepValid || checkout.isPending || logoUploading}
               onClick={confirm}
             >
               {checkout.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
