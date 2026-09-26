@@ -133,3 +133,5 @@
 - [x] Etapa 4: 65 R (29.564,26 m²) + 35 S (16.203,53 m²), R-56 = 249,03 m², transversal ativa
 - [ ] 56 lotes novos BLOCKED — aguardando decisão do usuário sobre precificação/liberação para venda
 - Não publicar (pedido permanente do usuário)
+
+- [ ] Logo opcional da venda: tratamento, vínculo privado, mapa interno/público e teste sem venda real.
