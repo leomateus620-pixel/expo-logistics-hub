@@ -40,15 +40,16 @@ const lot: PublicLot = {
   },
 };
 
-describe('registry público das dez áreas', () => {
-  it('expõe exatamente dez escopos, sem Pavilhão 7', () => {
-    expect(PUBLIC_MAP_AREAS).toHaveLength(10);
-    expect(PUBLIC_MAP_EXCLUDED_PAVILIONS).toContain('B10');
-    expect(PUBLIC_MAP_AREAS.some((area) => area.pavilionIdentifier === 'B10')).toBe(false);
+describe('registry público das onze áreas', () => {
+  it('inclui Pavilhão 7 sem abrir um link sem token no servidor', () => {
+    expect(PUBLIC_MAP_AREAS).toHaveLength(11);
+    expect(PUBLIC_MAP_EXCLUDED_PAVILIONS).not.toContain('B10');
+    expect(PUBLIC_MAP_AREAS.some((area) => area.pavilionIdentifier === 'B10')).toBe(true);
     expect(PUBLIC_MAP_AREAS.map((area) => area.slug)).toEqual([
       'pavilhao-1',
       'pavilhao-3',
       'pavilhao-5',
+      'pavilhao-7',
       'pavilhao-8',
       'pavilhao-12',
       'pavilhao-13',
@@ -65,12 +66,13 @@ describe('registry público das dez áreas', () => {
     expect(getPublicArea('pavilhao-3')?.pavilionIdentifier).toBe('B6');
     expect(getPublicArea('pavilhao-5')?.pavilionIdentifier).toBe('B8');
     expect(getPublicArea('pavilhao-8')?.pavilionIdentifier).toBe('B4');
+    expect(getPublicArea('pavilhao-7')?.pavilionIdentifier).toBe('B10');
   });
 
   it('rejeita slug fora do registro', () => {
-    expect(isPublicAreaSlug('pavilhao-7')).toBe(false);
+    expect(isPublicAreaSlug('pavilhao-7')).toBe(true);
     expect(isPublicAreaSlug('parque')).toBe(false);
-    expect(getPublicArea('pavilhao-7')).toBeUndefined();
+    expect(getPublicArea('parque')).toBeUndefined();
   });
 
   it('monta o endereço com escopo e chave', () => {

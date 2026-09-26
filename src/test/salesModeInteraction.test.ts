@@ -67,16 +67,16 @@ describe('elegibilidade comercial', () => {
     expect(isSellableLot(lot('z'), eligible)).toBe(false);
   });
 
-  it('separa bloqueio técnico de bloqueio comercial e exclui o Pavilhão 7', () => {
+  it('separa bloqueio técnico de bloqueio comercial e libera P7 com Renovação precificada', () => {
     const rows = [
       { lotId: 'tecnico', isSellable: true, ineligibleReason: null, statusOrigin: 'TECHNICAL_BLOCK' },
       { lotId: 'comercial', isSellable: false, ineligibleReason: 'BLOQUEIO_COMERCIAL_EXPLICITO', statusOrigin: 'COMMERCIAL_BLOCK' },
-      { lotId: 'p7', isSellable: false, ineligibleReason: 'PAVILHAO_7_SEM_PRECO', statusOrigin: 'TECHNICAL_BLOCK' },
+      { lotId: 'p7', isSellable: true, ineligibleReason: null, statusOrigin: null },
     ];
     const eligible = buildEligibleLotIds(rows);
     expect(eligible.has('tecnico')).toBe(true);
     expect(eligible.has('comercial')).toBe(false);
-    expect(eligible.has('p7')).toBe(false);
+    expect(eligible.has('p7')).toBe(true);
   });
 
   it('nunca aceita lote arquivado ou de referência', () => {
