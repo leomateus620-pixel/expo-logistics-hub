@@ -20,8 +20,8 @@ const EXPECTED_TOTALS: Record<string, number> = {
 };
 
 describe('metragens oficiais dos lotes internos dos pavilhões', () => {
-  it('cobre exatamente os 1.315 módulos cadastrados', () => {
-    expect(PAVILION_MODULE_OFFICIAL_AREAS.size).toBe(1315);
+  it('cobre exatamente os 1.201 módulos ativos cadastrados', () => {
+    expect(PAVILION_MODULE_OFFICIAL_AREAS.size).toBe(1201);
     const total = [...PAVILION_MODULE_OFFICIAL_AREAS.values()]
       .reduce((sum, entry) => sum + entry.areaSqm, 0);
     expect(total).toBeCloseTo(4098, 10);
@@ -98,9 +98,12 @@ describe('metragens oficiais dos lotes internos dos pavilhões', () => {
     expect(validated?.caveat).toBeNull();
   });
 
-  it('registra as ressalvas documentais dos pavilhões 7 e 14', () => {
+  it('registra a confirmação do Pavilhão 7 e a ressalva do 14', () => {
     const p7 = PAVILION_MODULE_AREA_TOTALS.find((item) => item.pavilionId === 'B10');
-    expect(p7?.documentalCaveat).toContain('57 módulos');
+    expect(p7?.moduleCount).toBe(57);
+    expect(p7?.documentalCaveat).toBeNull();
+    expect(getPavilionModuleArea('B10', 57)?.areaSqm).toBe(7.5);
+    expect(getPavilionModuleArea('B10', 58)).toBeNull();
     const p14 = PAVILION_MODULE_AREA_TOTALS.find((item) => item.pavilionId === 'B2');
     expect(p14?.stampedTotalSqm).toBe(616.16);
     expect(p14?.documentalCaveat).toContain('0,16');

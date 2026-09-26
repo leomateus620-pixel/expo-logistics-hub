@@ -1176,7 +1176,7 @@ export const OFFICIAL_REFERENCE_LOTS: CommercialLot[] = officialLotEntities.map(
 
 export const OFFICIAL_REFERENCE_DATA: CommercialMapData = {
   source: 'official-reference',
-  sourceMessage: 'Planta oficial 2026 digitalizada sem importar compradores. Os 95 lotes da Exporural possuem áreas cadastrais validadas; os 1.315 módulos dos Pavilhões 1, 3, 5, 7, 8, 12, 13 e 14 permanecem sem área individual e todos os 1.577 lotes/módulos ficam bloqueados até liberação comercial.',
+  sourceMessage: 'Referência cartográfica sem importar compradores: os 95 lotes da Exporural possuem áreas cadastrais validadas; o inventário ativo dos oito pavilhões contém 1.201 módulos, incluindo os 57 boxes oficiais de 7,50 m² do Pavilhão 7. Disponibilidade e preços comerciais devem ser consultados na base persistida.',
   project: {
     id: 'reference:fenasoja-2026',
     orgId: null,
