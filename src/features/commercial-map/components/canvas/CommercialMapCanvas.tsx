@@ -1489,6 +1489,7 @@ function BatchedLots({
   const geometryEntitiesRef = useRef<MapEntity[]>([]);
   if (geometryEntitiesRef.current.length !== entries.length || entries.some((entry, i) => entry.entity !== geometryEntitiesRef.current[i])) geometryEntitiesRef.current = entries.map(entry => entry.entity);
   const geometryEntities = geometryEntitiesRef.current;
+  const numberedLots = useMemo(() => entries.filter(entry => entry.lot.lotNumber != null && String(entry.lot.lotNumber).trim()).map(entry => entry.lot), [entries]);
   const numberedEntities = useMemo(() => entries.filter(entry => entry.lot.lotNumber != null && String(entry.lot.lotNumber).trim()).map(entry => entry.entity), [entries]);
   const invalidate = useThree((state) => state.invalidate);
   const reducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
@@ -1765,7 +1766,7 @@ function BatchedLots({
           toneMapped={false}
         />
       </lineSegments>
-      {numberedEntities.length > 0 && <PublicLotNumbers entities={numberedEntities} lots={entries.map(entry => entry.lot)} soldEntityIds={soldEntityIds} />}
+      {numberedEntities.length > 0 && <PublicLotNumbers entities={numberedEntities} lots={numberedLots} soldEntityIds={soldEntityIds} />}
       {selectedEntity && <LotSelectionOutline entity={selectedEntity} />}
     </>
   );

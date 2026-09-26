@@ -205,8 +205,8 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
           <span><i className="is-selection" />Selecionado</span><span><i className="is-context" />Contexto do parque</span>
         </div>}
       </div>}
-      {data && !showMap && <PublicLotList lots={lots} selectedLotId={selectedLotId} onSelect={selectFromList} />}
-      {selectedLot && <PublicLotDetails lot={selectedLot} onClose={closeDetails} compact={usesParkContext} />}
+      {data && !showMap && <PublicLotList lots={lots} selectedLotId={selectedLotId} onSelect={selectFromList} areaName={data.scope.name} />}
+      {selectedLot && <PublicLotDetails lot={selectedLot} onClose={closeDetails} compact={usesParkContext} areaName={data?.scope.name} />}
     </div>
     <footer className="public-map-footer"><span>Fenasoja 2028 · Consulta pública do Mapa Comercial</span><span>Valores oficiais sujeitos a confirmação pela organização.</span></footer>
   </main>;

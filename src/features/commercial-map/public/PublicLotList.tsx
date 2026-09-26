@@ -2,16 +2,19 @@ import { memo, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { formatAreaSqmLabel, formatBrl } from '../utils/lotPricing2028';
 import { PUBLIC_AVAILABILITY_LABEL, type PublicLot } from './publicMapTypes';
+import { resolveLotIdentity } from '../utils/lotIdentity';
 
 /** Lista acessível do mesmo escopo — nunca amplia para o parque inteiro. */
 export const PublicLotList = memo(function PublicLotList({
   lots,
   selectedLotId,
   onSelect,
+  areaName,
 }: {
   lots: PublicLot[];
   selectedLotId: string | null;
   onSelect: (lot: PublicLot) => void;
+  areaName?: string | null;
 }) {
   const [term, setTerm] = useState('');
   const filtered = useMemo(() => {
@@ -43,7 +46,7 @@ export const PublicLotList = memo(function PublicLotList({
               className={selectedLotId === lot.id ? 'is-selected' : ''}
               onClick={() => onSelect(lot)}
             >
-              <strong>{lot.displayName}</strong>
+               <strong>{resolveLotIdentity(lot, null, null, areaName).full}</strong>
               <span>{formatAreaSqmLabel(lot.officialAreaSqm) ?? 'Metragem não informada'}</span>
               <span>
                 {lot.pricing.resolutionStatus === 'OK'

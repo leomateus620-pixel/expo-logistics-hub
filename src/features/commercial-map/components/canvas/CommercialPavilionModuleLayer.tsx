@@ -816,6 +816,9 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       publicIdentifier: state.publicIdentifier,
       displayName: state.displayName,
       context: state.block,
+      number: state.number,
+      area: state.area,
+      location: state.location,
     });
   }, [moduleStateById]);
 
