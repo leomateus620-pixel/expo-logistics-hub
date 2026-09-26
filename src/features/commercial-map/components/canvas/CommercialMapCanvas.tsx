@@ -8,6 +8,7 @@ import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
 import { PublicScenePolicyContext, usePublicScenePolicy } from './PublicScenePolicyContext';
 import { PublicContextGroup, PublicMaterialPool } from './PublicContextGroup';
 import { PublicLotNumbers } from './PublicLotNumbers';
+import { resolveLotIdentity } from '../../utils/lotIdentity';
 import { SoldLotLocks } from './SoldLotLocks';
 import type { Coordinate } from '../../types';
 import { isSoldLot, soldLotSurfaceColor } from '../../utils/soldLotPresentation';
@@ -1826,8 +1827,9 @@ const EntityLabel = memo(function EntityLabel({
     >
       {lot ? (
         <div data-map-entity-id={entity.id} data-map-label-mode={mode} className={`commercial-map-label is-lot ${lotPresentation?.buyerName ? 'has-buyer' : ''} ${variant} ${dimmed ? 'is-dimmed' : ''}`}>
-          <span aria-label={`Lote ${metadata.lotNumber ?? ''}`}>{metadata.lotNumber}</span>
+          <span aria-label={resolveLotIdentity(lot, entity).full}>{resolveLotIdentity(lot, entity).title}</span>
           {metadata.block && <strong>{quadraLabel(metadata.block)}</strong>}
+          {entity.segmentId && typeof entity.metadata.segmentName === 'string' && <small>{entity.metadata.segmentName}</small>}
           {lot.officialAreaSqm && (
             <small className="commercial-map-label-area">{AREA_NUMBER.format(lot.officialAreaSqm)} m²</small>
           )}

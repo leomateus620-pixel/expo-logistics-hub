@@ -31,6 +31,7 @@ import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
 import { LotPricing2028Panel } from './LotPricing2028Panel';
 import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
+import { resolveLotIdentity } from '../../utils/lotIdentity';
 import type { LotPricingStage } from '../../utils/lotPricing2028';
 
 const saleDateTime = new Intl.DateTimeFormat('pt-BR', {
@@ -146,8 +147,8 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
       >
         <header>
           <div>
-            <strong>Módulo {cell.label}</strong>
-            <small>{pavilion.publicIdentifier} · Pavilhão {plan.stats.pavilionNumber}</small>
+            <strong>{lot ? resolveLotIdentity(lot, record?.entity, pavilion).title : `Módulo ${cell.label}`}</strong>
+            <small>{lot ? resolveLotIdentity(lot, record?.entity, pavilion).location : `${pavilion.publicIdentifier} · Pavilhão ${plan.stats.pavilionNumber}`}</small>
           </div>
           <button
             type="button"
