@@ -1,5 +1,6 @@
-import type { CommercialLot } from '../types';
+import type { CommercialLot, MapEntity } from '../types';
 import type { SalesSelectionEntry } from './salesTypes';
+import { resolveLotIdentity } from '../utils/lotIdentity';
 
 /**
  * Elegibilidade comercial é decidida no servidor pela view
@@ -17,11 +18,15 @@ export function isSellableLot(
   return eligibleLotIds.has(lot.id);
 }
 
-export function toSalesEntry(lot: CommercialLot, context?: string | null): SalesSelectionEntry {
+export function toSalesEntry(lot: CommercialLot, context?: string | null, entity?: MapEntity | null, pavilion?: MapEntity | null): SalesSelectionEntry {
+  const identity = resolveLotIdentity(lot, entity, pavilion);
   return {
     lotId: lot.id,
     publicIdentifier: lot.publicIdentifier,
     displayName: lot.displayName || lot.publicIdentifier,
     context: context ?? lot.block ?? null,
+    title: identity.title,
+    location: identity.location,
+    area: identity.area,
   };
 }

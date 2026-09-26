@@ -40,6 +40,10 @@ export interface SalesSelectionEntry {
   displayName: string;
   /** Contexto de origem: pavilhão (módulo interno) ou quadra externa. */
   context: string | null;
+  /** Display-only official identity; refreshed by lot ID when inventory changes. */
+  title?: string;
+  location?: string | null;
+  area?: string | null;
 }
 
 export interface SalesBuyerDraft {

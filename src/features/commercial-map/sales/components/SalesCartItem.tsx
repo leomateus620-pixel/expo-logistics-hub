@@ -13,7 +13,7 @@ export function SalesCartItem({ line, onRemove }: Props) {
 
   return (
     <article className={`sales-cart__item${line.unpriced ? ' is-pending' : ''}`}>
-      <strong>{line.entry.publicIdentifier}</strong>
+      <strong>{line.entry.title ?? line.entry.displayName}</strong>
       <b>{line.unpriced ? line.pendingReason : formatBrl(line.total)}</b>
       <button
         type="button"
@@ -24,7 +24,7 @@ export function SalesCartItem({ line, onRemove }: Props) {
         <X aria-hidden="true" />
       </button>
       <small>
-        {[line.entry.context, areaLabel, priceLabel].filter(Boolean).join(' · ')}
+        {[line.entry.location, line.entry.area, areaLabel, priceLabel].filter(Boolean).join(' · ')}
       </small>
     </article>
   );

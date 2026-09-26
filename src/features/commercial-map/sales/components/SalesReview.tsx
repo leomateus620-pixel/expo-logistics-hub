@@ -21,7 +21,7 @@ export function SalesReview({ summary, stage, buyer, payment, fees, spacesCents 
   const feesCents = feesTotalCents(fees);
   const totalCents = spacesCents + feesCents;
   const n = payment.installments.length;
-  const segments = Array.from(new Set(summary.lines.map((line) => line.entry.context).filter(Boolean)));
+  const areas = Array.from(new Set(summary.lines.map((line) => line.entry.area).filter(Boolean)));
 
   return (
     <div className="sales-sheet-body sales-review">
@@ -39,11 +39,11 @@ export function SalesReview({ summary, stage, buyer, payment, fees, spacesCents 
         <h3>Espaços</h3>
         <ul className="sales-review__lots">
           {summary.lines.map((line) => (
-            <li key={line.entry.lotId}><span>{line.entry.publicIdentifier}</span><strong>{formatCents(Math.round(line.total * 100))}</strong></li>
+            <li key={line.entry.lotId}><span><b>{line.entry.title ?? line.entry.displayName}</b><small>{[line.entry.location, line.entry.area].filter(Boolean).join(' · ')}</small></span><strong>{formatCents(Math.round(line.total * 100))}</strong></li>
           ))}
         </ul>
         <dl className="sales-review__dl">
-          {segments.length > 0 && <div><dt>Segmento / pavilhão</dt><dd>{segments.join(', ')}</dd></div>}
+          {areas.length > 0 && <div><dt>{areas.length > 1 ? 'Múltiplas áreas' : 'Área'}</dt><dd>{areas.join(', ')}</dd></div>}
           <div><dt>Quantidade</dt><dd>{summary.lines.length} espaço{summary.lines.length === 1 ? '' : 's'}</dd></div>
           <div><dt>Área total</dt><dd>{formatAreaSqmLabel(summary.areaTotal)}</dd></div>
           <div><dt>Modalidade</dt><dd>{SALES_STAGE_LABELS[stage]}</dd></div>
