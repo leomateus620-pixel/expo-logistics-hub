@@ -1,6 +1,7 @@
 import { commercialMapDiagnosticsEnabled } from './utils/performanceDiagnostics';
 import { CommercialMapBootLoader } from './components/CommercialMapBootLoader';
 import { useCommercialMapBootVisit } from './hooks/useCommercialMapBootVisit';
+import { useExporuralRevisionSelection } from './hooks/useExporuralRevisionSelection';
 import { Profiler, lazy, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -286,6 +287,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   }, [activateScope, activeSegmentId, isCommissionScope, lockedSegmentId, mapScopeKey]);
 
   const data = isPreview ? previewData : mapQuery.data;
+  useExporuralRevisionSelection(data);
   const scopedSegment = useMemo(
     () => withPersistedCamera(registeredScopedSegment, data),
     [data, registeredScopedSegment],

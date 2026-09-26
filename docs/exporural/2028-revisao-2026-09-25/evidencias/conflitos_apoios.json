@@ -1,0 +1,44 @@
+[
+  {
+    "revision": "before",
+    "lot": "Q-S-24",
+    "support": "B37",
+    "overlap_scene_units": 3.518836381301201,
+    "overlap_sqm": 156.39272805783116
+  },
+  {
+    "revision": "before",
+    "lot": "Q-S-25",
+    "support": "B38",
+    "overlap_scene_units": 3.4350545626987743,
+    "overlap_sqm": 152.66909167550108
+  },
+  {
+    "revision": "after",
+    "lot": "Q-S-22",
+    "support": "B37",
+    "overlap_scene_units": 0.023144307506500133,
+    "overlap_sqm": 1.0286358891777838
+  },
+  {
+    "revision": "after",
+    "lot": "Q-S-23",
+    "support": "B37",
+    "overlap_scene_units": 3.4826126382869016,
+    "overlap_sqm": 154.7827839238623
+  },
+  {
+    "revision": "after",
+    "lot": "Q-S-23",
+    "support": "B38",
+    "overlap_scene_units": 0.029523423192839647,
+    "overlap_sqm": 1.3121521419039843
+  },
+  {
+    "revision": "after",
+    "lot": "Q-S-24",
+    "support": "B38",
+    "overlap_scene_units": 3.392605345833961,
+    "overlap_sqm": 150.78245981484272
+  }
+]

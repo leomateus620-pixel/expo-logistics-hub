@@ -1,0 +1,26 @@
+{
+  "kind": "SYNTAX_ONLY_NOT_DATABASE_EXECUTION",
+  "parser": "v8.4",
+  "files": {
+    "preflight.sql": {
+      "statements": 21,
+      "plpgsql_blocks": 1,
+      "parsed": true
+    },
+    "carregar_payload.sql": {
+      "statements": 2,
+      "plpgsql_blocks": 0,
+      "parsed": true
+    },
+    "migration_proposta.sql": {
+      "statements": 2,
+      "plpgsql_blocks": 2,
+      "parsed": true
+    },
+    "verificacao_pos_migracao.sql": {
+      "statements": 4,
+      "plpgsql_blocks": 1,
+      "parsed": true
+    }
+  }
+}

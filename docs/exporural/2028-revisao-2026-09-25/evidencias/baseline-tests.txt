@@ -1,0 +1,44 @@
+
+> vite_react_shadcn_ts@0.0.0 test
+> vitest run src/test/commercialMapExporural.test.ts src/test/commercialMapExporuralCartographicFidelity.test.ts src/test/exporuralFidelityMigration.contract.test.ts
+
+
+ RUN  v3.2.4 C:/Users/Leonardo/Desktop/expo-logistics-hub
+
+ ✓ src/test/exporuralFidelityMigration.contract.test.ts (6 tests) 9ms
+ ❯ src/test/commercialMapExporuralCartographicFidelity.test.ts (6 tests | 1 failed) 42ms
+   ✓ fidelidade cartográfica dourada da Exporural 2026.4 > versiona a correção e registra os recortes oficial/estado atual por hash 3ms
+   ✓ fidelidade cartográfica dourada da Exporural 2026.4 > mantém A8, A9 e Rua 15 de Novembro como uma rede contínua pelas quatro transversais 2ms
+   × fidelidade cartográfica dourada da Exporural 2026.4 > preserva os 95 lotes dentro do mesmo perímetro canônico e fora das sete ruas 22ms
+     → expected [ { …(38) }, { …(38) }, …(1577) ] to have a length of 1577 but got 1579
+   ✓ fidelidade cartográfica dourada da Exporural 2026.4 > mantém o contorno visual fora de B8 e D3 sem perder os lotes limítrofes 6ms
+   ✓ fidelidade cartográfica dourada da Exporural 2026.4 > remove exatamente os cinco overlays e conserva lotes e apoios válidos sem blocos não permanentes 8ms
+   ✓ fidelidade cartográfica dourada da Exporural 2026.4 > fixa vértices dourados para A7, ilhas centrais e leque R-56–R-59 2ms
+ ✓ src/test/commercialMapExporural.test.ts (11 tests) 61ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/commercialMapExporuralCartographicFidelity.test.ts > fidelidade cartográfica dourada da Exporural 2026.4 > preserva os 95 lotes dentro do mesmo perímetro canônico e fora das sete ruas
+AssertionError: expected [ { …(38) }, { …(38) }, …(1577) ] to have a length of 1577 but got 1579
+
+- Expected
++ Received
+
+- 1577
++ 1579
+
+ ❯ src/test/commercialMapExporuralCartographicFidelity.test.ts:120:42
+    118|
+    119|     expect(scoped.lots).toHaveLength(95);
+    120|     expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(1577);
+       |                                          ^
+    121|     scoped.lots.forEach((lot) => {
+    122|       const entity = entitiesById.get(lot.entityId)!;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 22 passed (23)
+   Start at  21:43:07
+   Duration  9.45s (transform 701ms, setup 3.66s, collect 2.69s, tests 113ms, environment 18.35s, prepare 1.17s)

@@ -13,6 +13,14 @@ export const isExporuralLandscapeLot = (entity: MapEntity) =>
   /^Q-[RS]-\d{2}$/.test(entity.publicIdentifier) &&
   entity.metadata.areaCode === "EXPORURAL";
 
+/** Ring start and junction count are not parcel identities. Find the southern
+ * corners on each half of the footprint, including rings with extra T nodes. */
+export function exporuralSouthernCorners(ring: Coordinate[]): [Coordinate, Coordinate] {
+  const middle = (Math.min(...ring.map(p => p[0])) + Math.max(...ring.map(p => p[0]))) / 2;
+  const south = (points: Coordinate[]) => points.reduce((a, b) => b[1] > a[1] ? b : a);
+  return [south(ring.filter(p => p[0] <= middle)), south(ring.filter(p => p[0] > middle))];
+}
+
 /** Presentation only, derived from current cadastral rings. Never writes entities. */
 export function buildExporuralLandscape(entities: readonly MapEntity[]) {
   const borders: THREE.BufferGeometry[] = [],
@@ -97,8 +105,9 @@ export function buildExporuralLandscape(entities: readonly MapEntity[]) {
       const r13Ring = withoutClosingPoint(r13.geometry.coordinates[0]);
       // Behind P5 the verge is narrower: retain the building's ground footprint
       // and widen only after passing its eastern facade.
-      const rearA = r13Ring[3],
-        rearB = r13Ring[2];
+      const [rearA, rearB] = exporuralSouthernCorners(r13Ring);
+      const [r14SouthWest, r14SouthEast] = exporuralSouthernCorners(ring);
+      const [r2SouthWest, r2SouthEast] = exporuralSouthernCorners(r2Ring);
       const wideningX = 1.65;
       const rearControl: Coordinate = [
         wideningX,
@@ -108,17 +117,25 @@ export function buildExporuralLandscape(entities: readonly MapEntity[]) {
           (wideningX - rearA[0]) / (rearB[0] - rearA[0]),
         ),
       ];
-      const edge = [
+      // Keep the R13/R14 junction by coordinate, not ring index. The new R14
+      // includes a shared T node on its eastern edge and ends exactly at R02.
+      const candidates = [
         rearA,
         rearControl,
-        ring[ring.length - 1],
-        ring[ring.length - 2],
-        ring[2],
-        r2Ring[3],
-        r2Ring[2],
+        rearB,
+        r14SouthWest,
+        r14SouthEast,
+        r2SouthWest,
+        r2SouthEast,
       ];
-      const widths = [0.48, 0.48, 1.6, 0.8, 0.48, 0.48, 0.48];
-      const heights = [0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22];
+      const candidateWidths = [0.48, 0.48, 1.6, 0.8, 0.48, 0.48, 0.48];
+      const sections = candidates.map((point, index) => ({ point, width: candidateWidths[index] }))
+        .filter(({ point }, index) => index === 0 || Math.hypot(
+          point[0] - candidates[index - 1][0], point[1] - candidates[index - 1][1],
+        ) > 0.001);
+      const edge = sections.map(s => s.point);
+      const widths = sections.map(s => s.width);
+      const heights = sections.map(() => 0.22);
       const lengths = edge
         .slice(1)
         .map((p, i) => Math.hypot(p[0] - edge[i][0], p[1] - edge[i][1]));

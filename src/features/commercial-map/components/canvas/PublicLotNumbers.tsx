@@ -3,6 +3,7 @@ import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { MapEntity } from '../../types';
 import { placeSoldLock } from '../../utils/soldLotPresentation';
+import { hasRevisedExporuralNumbers, lotNumberAnchor } from '../../utils/exporuralRevisionPresentation';
 
 /** One atlas and one instanced draw. The vertex shader reveals numbers only
  * when their real footprint occupies enough screen space; no React frame updates. */
@@ -25,6 +26,7 @@ export function PublicLotNumbers({ entities, soldEntityIds }: { entities: readon
       const x = i % columns * cellWidth, y = Math.floor(i / columns) * cellHeight;
       context.fillStyle = '#ffffffdd'; context.fillRect(x + 2, y + 2, cellWidth - 4, cellHeight - 4);
       context.fillStyle = '#15292b';
+      context.font = hasRevisedExporuralNumbers(entity) ? '700 34px sans-serif' : '600 23px sans-serif';
       const label = String(entity.metadata.lotNumber ?? entity.publicIdentifier);
       context.fillText(label, x + cellWidth / 2, y + cellHeight / 2, cellWidth - 12);
       rectangles.set([x / atlas.width, 1 - (y + cellHeight) / atlas.height, cellWidth / atlas.width, cellHeight / atlas.height], i * 4);
@@ -59,9 +61,8 @@ export function PublicLotNumbers({ entities, soldEntityIds }: { entities: readon
     const mesh = new THREE.InstancedMesh(geometry, material, entities.length);
     const matrix = new THREE.Matrix4();
     entities.forEach((entity, i) => {
-      const ring = entity.geometry.coordinates[0] ?? [];
-      const xs = ring.map(p => p[0]), zs = ring.map(p => p[1]);
-      matrix.makeTranslation((Math.min(...xs)+Math.max(...xs))/2, entity.geometry.elevation + Math.max(.08, entity.geometry.extrusionHeight) + .16, (Math.min(...zs)+Math.max(...zs))/2);
+      const [x, z] = lotNumberAnchor(entity);
+      matrix.makeTranslation(x, entity.geometry.elevation + Math.max(.08, entity.geometry.extrusionHeight) + .16, z);
       mesh.setMatrixAt(i, matrix);
     });
     mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingSphere(); mesh.raycast = () => undefined;

@@ -1,0 +1,2167 @@
+[
+  {
+    "physical_parcel": "R oeste parcela 01",
+    "previous_codes": [
+      "Q-R-01"
+    ],
+    "proposed_codes": [
+      "Q-R-01"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "parcela_preservada_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-01": 896.85
+    },
+    "proposed_areas_sqm": {
+      "Q-R-01": "896.85"
+    },
+    "previous_geometry_versions": {
+      "Q-R-01": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-01": "bf0e69d81b8c8d5bcf93f013f7386303c52ae0868936cb91ceb5ac9f7a0ecfd1"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-01": "60bea6d31b03890b51a59a4b5856db832faa976390a11cd41ae85df18f06fbf7"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R oeste parcela 02",
+    "previous_codes": [
+      "Q-R-02"
+    ],
+    "proposed_codes": [
+      "Q-R-02"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "parcela_preservada_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-02": 896.85
+    },
+    "proposed_areas_sqm": {
+      "Q-R-02": "896.85"
+    },
+    "previous_geometry_versions": {
+      "Q-R-02": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-02": "247fd37debd9082f461aa3f284ab16a710426f691aadd000bc8ab55235c94783"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-02": "3b5d47e9a3ad0aa22f8421979e8a93b51857f96602ff8bd33de48326cb430b8b"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R oeste parcela 05",
+    "previous_codes": [
+      "Q-R-05"
+    ],
+    "proposed_codes": [
+      "Q-R-05"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "parcela_preservada_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-05": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-R-05": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-05": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-05": "c14ef40e07b8f5182775d0466c58619e076c0de282a0aba61392835f39430a56"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-05": "0c9dd4c98f31c9d4f352c68718a3459903d3547283c18c029d713a1193f19999"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R oeste parcela 06",
+    "previous_codes": [
+      "Q-R-06"
+    ],
+    "proposed_codes": [
+      "Q-R-06"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "parcela_preservada_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-06": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-R-06": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-06": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-06": "6b344a1a687e5b61df3ca561e69979dd3450417ba510fd11dc4c73006b07a292"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-06": "5af75aec7865d6e5ace43902c9cd7f664d26522ba53e26fe4cf224ff329af1d0"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R oeste parcela 07",
+    "previous_codes": [
+      "Q-R-07"
+    ],
+    "proposed_codes": [
+      "Q-R-07"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "parcela_preservada_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-07": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-R-07": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-07": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-07": "f1f924f2f7c1c40426bf70a3fae3107567f349a97cc9502849bf20edde1038c0"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-07": "005203ed638d6be24562103e6c8ff7b2e92a032aca1a8bf7b9fbdba906c8900d"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R oeste parcela 08",
+    "previous_codes": [
+      "Q-R-08"
+    ],
+    "proposed_codes": [
+      "Q-R-08"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "parcela_preservada_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-08": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-R-08": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-08": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-08": "2a9a7faf7cde6b14c5591ac9dc73fc03bf0758cf3808618e3f40e6d881d4b383"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-08": "3b7c075bbc1d815d5567b26b91ae508ce704d77785328b86f9e832b95003a07f"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R oeste parcela 13",
+    "previous_codes": [
+      "Q-R-13"
+    ],
+    "proposed_codes": [
+      "Q-R-13"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "parcela_preservada_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-13": 575.85
+    },
+    "proposed_areas_sqm": {
+      "Q-R-13": "575.85"
+    },
+    "previous_geometry_versions": {
+      "Q-R-13": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-13": "ffdfae0d8b5b326405a61545691373b171fbf756c79f5dbd61571823f0829ead"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-13": "437b068a9577d196223d365bca0a494122bd777c3ae24dfee5f3b65a76934c89"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R oeste parcela 14",
+    "previous_codes": [
+      "Q-R-14"
+    ],
+    "proposed_codes": [
+      "Q-R-14"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "parcela_preservada_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-14": 896.85
+    },
+    "proposed_areas_sqm": {
+      "Q-R-14": "896.85"
+    },
+    "previous_geometry_versions": {
+      "Q-R-14": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-14": "4b11a5650be91242d499825c567913707ee56e4934e5752cd2a5d423240f7bad"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-14": "0c66b4f1a15b90cd61e77abb3a36a2f44ca02bb7c2ae9285dcc0a20d603092bb"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R oeste parcela 15",
+    "previous_codes": [
+      "Q-R-15"
+    ],
+    "proposed_codes": [
+      "Q-R-15"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "parcela_preservada_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-15": 472.1
+    },
+    "proposed_areas_sqm": {
+      "Q-R-15": "472.10"
+    },
+    "previous_geometry_versions": {
+      "Q-R-15": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-15": "84435e32bbbd663bbe8c827d3eb0e605c6528de173f8b3bf4901a03ea85d3c1d"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-15": "b64bd51e91eb93105875a49ba4aa05924d35e4e8e2ec01d67db09ee3c8ab8ec7"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R oeste parcela 16",
+    "previous_codes": [
+      "Q-R-16"
+    ],
+    "proposed_codes": [
+      "Q-R-16"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "parcela_preservada_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-16": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-R-16": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-16": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-16": "7dd7d445f2cef7b1e3feabe9f750b09f3229e9aabfae4a457b71491cc76e030e"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-16": "3527ca7bbf6202bd7c2dfc62831b0fcaad81b188269f95afdbda1d425d2b9646"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R oeste parcela 17",
+    "previous_codes": [
+      "Q-R-17"
+    ],
+    "proposed_codes": [
+      "Q-R-17"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "parcela_preservada_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-17": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-R-17": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-17": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-17": "052aff59daa12b99bb66e674c81df275a7a836b19003fa8c6282d071b485fd57"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-17": "fb60e4f9dcfa5351e65448781bc1e6b1f7ff0adc2cc67324435aff5dd840b18f"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R oeste parcela 18",
+    "previous_codes": [
+      "Q-R-18"
+    ],
+    "proposed_codes": [
+      "Q-R-18"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "parcela_preservada_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-18": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-R-18": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-18": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-18": "dacca9057a1ae24b6cd3743d52acd965c47c607169ce2344a6dbff2274288742"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-18": "110ab2d174822cc72846bda25739658198602305a7b993558ecaefde8fb3f236"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R oeste parcela 19",
+    "previous_codes": [
+      "Q-R-19"
+    ],
+    "proposed_codes": [
+      "Q-R-19"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "parcela_preservada_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-19": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-R-19": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-19": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-19": "fe62db5ffa9b8603ba4a0598ebb6ef5c7b06214853b4126fc21d1d2d3da91731"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-19": "98a63435a2cafb50e7dae01333f63a63ff35e9a02a4c753ce6a57af843665e22"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R dupla central 03",
+    "previous_codes": [
+      "Q-R-03"
+    ],
+    "proposed_codes": [
+      "Q-R-03"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "ajuste_area_limite_candidato",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-03": 995.45
+    },
+    "proposed_areas_sqm": {
+      "Q-R-03": "650.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-03": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-03": "05e8ce6f9c5d66affecd0d8a33fb8c2ef765f08f500ebefcf9662d74b7444d55"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-03": "fbbd721216259bf9f6d50e631f0fa7de259c14d58c6abf8886dc080928e036b6"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R dupla central 04",
+    "previous_codes": [
+      "Q-R-04"
+    ],
+    "proposed_codes": [
+      "Q-R-04"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "ajuste_area_limite_candidato",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-04": 1000
+    },
+    "proposed_areas_sqm": {
+      "Q-R-04": "644.75"
+    },
+    "previous_geometry_versions": {
+      "Q-R-04": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-04": "639f294e2d23ff0d1436f2544f408158e605cd4dce3e17e4588070b969f201ed"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-04": "dd1c28e09a3ab5fb844ecfdabf919f34726420c17709eaef1d2703104e4c140c"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R faixa superior leste posicao 1",
+    "previous_codes": [
+      "Q-R-48"
+    ],
+    "proposed_codes": [
+      "Q-R-40"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-48": 500
+    },
+    "proposed_areas_sqm": {
+      "Q-R-40": "500.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-48": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-48": "359c8e841b370f79ed883d955de3edffd1a3ff7b1e3c1df6112665eba5f96492"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-40": "6ffdb6afa3d553cf9707ab56ef41d62f4859a5c71c43eebc2256ef7a08683f44"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R faixa superior leste posicao 2",
+    "previous_codes": [
+      "Q-R-49"
+    ],
+    "proposed_codes": [
+      "Q-R-41"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-49": 500
+    },
+    "proposed_areas_sqm": {
+      "Q-R-41": "500.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-49": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-49": "bc5ab25a9ee0761742d13ee74495cbe74c32c804dd3f4a9c6eb7c624215ec226"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-41": "6ca20ba2a338763e68a56fa005955bc17ef75fe157672db11929b418eab6eadc"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R faixa superior leste posicao 3",
+    "previous_codes": [
+      "Q-R-50"
+    ],
+    "proposed_codes": [
+      "Q-R-42"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-50": 500
+    },
+    "proposed_areas_sqm": {
+      "Q-R-42": "500.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-50": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-50": "d8d5887f5e31c6b6958477fc8d1815c3e836fcb2f043a9bc881b8316d3d626a5"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-42": "74fff74fb8922f24263e30833d367ab54d3847b5378842214807f7d3742c1d50"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R faixa superior leste posicao 4",
+    "previous_codes": [
+      "Q-R-51"
+    ],
+    "proposed_codes": [
+      "Q-R-43"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-51": 500
+    },
+    "proposed_areas_sqm": {
+      "Q-R-43": "500.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-51": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-51": "2efa38c52a2c256d49821f62186d111f48bacd211ce8bfdd7fbf66c1246fb456"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-43": "89857a0703c8b52d534eb1ccc42189d837441152532c94f54944d8e2bd852f88"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R faixa superior leste posicao 5",
+    "previous_codes": [
+      "Q-R-52"
+    ],
+    "proposed_codes": [
+      "Q-R-44"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-52": 500
+    },
+    "proposed_areas_sqm": {
+      "Q-R-44": "500.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-52": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-52": "5aec849bc92c0aa37209099f2a63e11b64a37d18804078b38f58053248966765"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-44": "34f88ddc71d3ac13dc270abc3334ae7f3d020ef05422747677477114fff7c8f2"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R faixa superior leste posicao 6",
+    "previous_codes": [
+      "Q-R-53"
+    ],
+    "proposed_codes": [
+      "Q-R-45"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-53": 500
+    },
+    "proposed_areas_sqm": {
+      "Q-R-45": "500.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-53": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-53": "92171e742841d0996047a99cd28c63d8a5c92b44409aabeaeb9efe5499ed2408"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-45": "63445c41d59650fb42fe2da7b72642a6d5c64c0421464f2a8e24bacba65e5c5b"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R faixa superior leste posicao 7",
+    "previous_codes": [
+      "Q-R-54"
+    ],
+    "proposed_codes": [
+      "Q-R-46"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-54": 500
+    },
+    "proposed_areas_sqm": {
+      "Q-R-46": "500.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-54": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-54": "f22f38282be146e2a090324ebfaf397d245cc222e45e728a0f11a53eb51617b1"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-46": "7dbd8a9b483686bf8d60f39d4299ccfb6f49c58cffc79be313550ecca5c71ecc"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R faixa superior leste posicao 8",
+    "previous_codes": [
+      "Q-R-55"
+    ],
+    "proposed_codes": [
+      "Q-R-47"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-55": 705.35
+    },
+    "proposed_areas_sqm": {
+      "Q-R-47": "705.35"
+    },
+    "previous_geometry_versions": {
+      "Q-R-55": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-55": "dbffaf3aed175d36e174bc87d00852303334a6a2aed43576ee155af177bc0ecd"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-47": "daf4fe3239158815c19fd20d6b20cc0ef05f54a9e4288094f91964ef6554afd5"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R perimetro inferior posicao 1",
+    "previous_codes": [
+      "Q-R-56"
+    ],
+    "proposed_codes": [
+      "Q-R-62"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_e_ajuste_limite_candidatos",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-56": 471
+    },
+    "proposed_areas_sqm": {
+      "Q-R-62": "471.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-56": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-56": "9bc83e7a67fc70f3918ecc8d586ad59d235875eb95d7dfb3fc20a93fd59e4abf"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-62": "70b10f8a9c79934f81a56b39801bc75ca244714936cbb6945a32cae3c72011e3"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R perimetro inferior posicao 2",
+    "previous_codes": [
+      "Q-R-57"
+    ],
+    "proposed_codes": [
+      "Q-R-63"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_e_ajuste_limite_candidatos",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-57": 471
+    },
+    "proposed_areas_sqm": {
+      "Q-R-63": "471.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-57": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-57": "807d5389edd43b49eff33b2bfbedee51f181a4a2336edf7e25ab95a7134b7b00"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-63": "29135492e1fb67a5a60334b0db429ce5fcf62905b1d3f2b11daa44dc67fd3467"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R perimetro inferior posicao 3",
+    "previous_codes": [
+      "Q-R-58"
+    ],
+    "proposed_codes": [
+      "Q-R-64"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_e_ajuste_limite_candidatos",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-58": 471
+    },
+    "proposed_areas_sqm": {
+      "Q-R-64": "471.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-58": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-58": "1adb7ff17583d3e02834772b8b39b073872a78592bb8cea2e97d6b719d378028"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-64": "84e6cd96deb290b79c4413f97f8d41e22f26081c5b0e0a761c82dff28aa9d071"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R perimetro inferior posicao 4",
+    "previous_codes": [
+      "Q-R-59"
+    ],
+    "proposed_codes": [
+      "Q-R-65"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_e_ajuste_limite_candidatos",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-59": 471
+    },
+    "proposed_areas_sqm": {
+      "Q-R-65": "471.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-59": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-59": "a5d2c71d3f3086995bf801168831fa6341d96b3fdb209ef13f555ef1587a0005"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-65": "39bc43b4a74a0684e79388d3e3272e23d91e597651b83c7dcdb0b121f86a2b99"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R ilha central leste posicao 1",
+    "previous_codes": [
+      "Q-R-28"
+    ],
+    "proposed_codes": [
+      "Q-R-26"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-28": 495
+    },
+    "proposed_areas_sqm": {
+      "Q-R-26": "495.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-28": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-28": "a8be3541254634df3237c9118ddee23adbe686467b065de4e79e69dad5420ea3"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-26": "a30433508c963dc2ced17e2f86fb1dfb46e9a4f36250149bcd4be020393b18c1"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R ilha central leste posicao 2",
+    "previous_codes": [
+      "Q-R-29"
+    ],
+    "proposed_codes": [
+      "Q-R-27"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-29": 495
+    },
+    "proposed_areas_sqm": {
+      "Q-R-27": "495.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-29": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-29": "2bf425db39be9939aeabb3d96b212d0c321cda446b932b5867525ea07a52c84f"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-27": "18247fc70b2bf19a904df68b242b6f97e28aa86f78bf668b8c4020927bd9e314"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R ilha central leste posicao 3",
+    "previous_codes": [
+      "Q-R-30"
+    ],
+    "proposed_codes": [
+      "Q-R-28"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-30": 495
+    },
+    "proposed_areas_sqm": {
+      "Q-R-28": "495.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-30": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-30": "cf75d0563469aaa03c58c475c91f83281c9f197dbd6a0f61303d183d97e81ccd"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-28": "d6aba49cb540ef9b07acb13a3033ff553073bfad9592394cf550c8b851979ccd"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R pequena ilha oeste coluna 1",
+    "previous_codes": [
+      "Q-R-41"
+    ],
+    "proposed_codes": [
+      "Q-R-48",
+      "Q-R-55"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "divisao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-41": 498.16
+    },
+    "proposed_areas_sqm": {
+      "Q-R-48": "249.64",
+      "Q-R-55": "249.60"
+    },
+    "previous_geometry_versions": {
+      "Q-R-41": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-41": "70a44a64f86abda5075de8dd6ce6384cd00f100cab187ccdd3371ea9e7547c94"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-48": "7c2e69b45b514fcf227226c65d7c51046df7c6874f2401d76287796ad9d11e2f",
+      "Q-R-55": "ec4ae8060f105139e21081b606a1b684ae56c015ad165aa3f111170ba3d5a63e"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R pequena ilha oeste coluna 2",
+    "previous_codes": [
+      "Q-R-42"
+    ],
+    "proposed_codes": [
+      "Q-R-49",
+      "Q-R-56"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "divisao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-42": 498.16
+    },
+    "proposed_areas_sqm": {
+      "Q-R-49": "249.12",
+      "Q-R-56": "249.03"
+    },
+    "previous_geometry_versions": {
+      "Q-R-42": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-42": "ede24a220e061e47f44672cdbf839081bbb0d3bc8252a11343c770f3d7953fe8"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-49": "ec38515c0efbdb896e8999fa9095db1d09a7a0ff1a99fcf86c335ad711cde725",
+      "Q-R-56": "834a49db7e4b661b7597d13586615632bb70ac9a1cc8d0f604ded294c4f522b3"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R pequena ilha oeste coluna 3",
+    "previous_codes": [
+      "Q-R-43"
+    ],
+    "proposed_codes": [
+      "Q-R-50",
+      "Q-R-57"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "divisao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-43": 498.16
+    },
+    "proposed_areas_sqm": {
+      "Q-R-50": "250.05",
+      "Q-R-57": "248.02"
+    },
+    "previous_geometry_versions": {
+      "Q-R-43": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-43": "ade701c8deb3a29aa2f0880de9637f75a9d18ce5bd56df9573ed65e94581e0d8"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-50": "69cd20e0b3e7cee89ae04e44d9232ba284f0425948db729c24df905331344483",
+      "Q-R-57": "c052e13f7dbba7a32530b9afef6ed067b493fdac931f98639b9eaf513926b8e0"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R pequena ilha leste coluna 1",
+    "previous_codes": [
+      "Q-R-44"
+    ],
+    "proposed_codes": [
+      "Q-R-51",
+      "Q-R-58"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "divisao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-44": 500
+    },
+    "proposed_areas_sqm": {
+      "Q-R-51": "251.01",
+      "Q-R-58": "249.12"
+    },
+    "previous_geometry_versions": {
+      "Q-R-44": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-44": "583cd9d3e57eb8b88f573ae05b04eb3048d67942ec140ac7b54d6f37c29550dd"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-51": "ffd54f49be0df76d01d6243c465c0ccc6f11a30cecaa3bd7df6327941bf7eb36",
+      "Q-R-58": "8020fc5dfe59c8ec5afa6e26754abd8d1642c5529f64292a1dee091fe27631ce"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R pequena ilha leste coluna 2",
+    "previous_codes": [
+      "Q-R-45"
+    ],
+    "proposed_codes": [
+      "Q-R-52",
+      "Q-R-59"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "divisao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-45": 500
+    },
+    "proposed_areas_sqm": {
+      "Q-R-52": "250.00",
+      "Q-R-59": "250.00"
+    },
+    "previous_geometry_versions": {
+      "Q-R-45": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-45": "94330fca6eaa9b24aaee0f1d1fc393ed258ef4ba111fe2d22b26f0d2669765a5"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-52": "bfb38cbc5aeda85bdd7fb78158c1def688c480302c9f1fc5489049d0fc85b638",
+      "Q-R-59": "b0580f0992f72b97f2e632b98672f522b9c79db0fe019b2408ca6227859cac3a"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R pequena ilha leste coluna 3",
+    "previous_codes": [
+      "Q-R-46"
+    ],
+    "proposed_codes": [
+      "Q-R-53",
+      "Q-R-60"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "divisao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-46": 500
+    },
+    "proposed_areas_sqm": {
+      "Q-R-53": "249.96",
+      "Q-R-60": "250.03"
+    },
+    "previous_geometry_versions": {
+      "Q-R-46": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-46": "a5c9275a507522759ff6b05e93689721c6e9d407e4359b8adb48a760600aea62"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-53": "0772c2a96ed05dee055cbdee01f2514ed4c07b80188b2637515d10b8fcfd0cf1",
+      "Q-R-60": "0f11b811e7cf76b48be01fa99618f33abcee5e9a17f449c7978a27c89ad4dad7"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R pequena ilha leste coluna 4",
+    "previous_codes": [
+      "Q-R-47"
+    ],
+    "proposed_codes": [
+      "Q-R-54",
+      "Q-R-61"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "divisao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-47": 598.9
+    },
+    "proposed_areas_sqm": {
+      "Q-R-54": "356.69",
+      "Q-R-61": "242.21"
+    },
+    "previous_geometry_versions": {
+      "Q-R-47": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-47": "f749e74c4dc523c10acba31f189d6d0aa68191163edd66725bd00283be5684b3"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-54": "f81569bc14a5de7ded144294fc807357994dd54ab8a9d954bd161b626de8f2f9",
+      "Q-R-61": "ddde5ad226ccbdbd73c302f3740c2d084390411e0ab80869f83d5fe0716432d6"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R faixa central superior cortada pela transversal",
+    "previous_codes": [
+      "Q-R-09",
+      "Q-R-10",
+      "Q-R-11",
+      "Q-R-12",
+      "Q-R-31",
+      "Q-R-32",
+      "Q-R-33",
+      "Q-R-34",
+      "Q-R-35",
+      "Q-R-36",
+      "Q-R-37",
+      "Q-R-38",
+      "Q-R-39",
+      "Q-R-40"
+    ],
+    "proposed_codes": [
+      "Q-R-09",
+      "Q-R-10",
+      "Q-R-11",
+      "Q-R-12",
+      "Q-R-29",
+      "Q-R-30",
+      "Q-R-31",
+      "Q-R-32",
+      "Q-R-33",
+      "Q-R-34",
+      "Q-R-35",
+      "Q-R-36",
+      "Q-R-37",
+      "Q-R-38",
+      "Q-R-39"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "reparcelamento_correspondencia_pendente",
+    "confidence": "low",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-09": 500,
+      "Q-R-10": 500,
+      "Q-R-11": 500,
+      "Q-R-12": 500,
+      "Q-R-31": 500,
+      "Q-R-32": 500,
+      "Q-R-33": 500,
+      "Q-R-34": 500,
+      "Q-R-35": 500,
+      "Q-R-36": 500,
+      "Q-R-37": 500,
+      "Q-R-38": 500,
+      "Q-R-39": 500,
+      "Q-R-40": 491.26
+    },
+    "proposed_areas_sqm": {
+      "Q-R-09": "453.42",
+      "Q-R-10": "453.42",
+      "Q-R-11": "452.42",
+      "Q-R-12": "452.42",
+      "Q-R-29": "452.42",
+      "Q-R-30": "452.42",
+      "Q-R-31": "452.42",
+      "Q-R-32": "447.55",
+      "Q-R-33": "447.55",
+      "Q-R-34": "447.55",
+      "Q-R-35": "447.55",
+      "Q-R-36": "447.55",
+      "Q-R-37": "447.55",
+      "Q-R-38": "447.55",
+      "Q-R-39": "447.55"
+    },
+    "previous_geometry_versions": {
+      "Q-R-09": 5,
+      "Q-R-10": 5,
+      "Q-R-11": 5,
+      "Q-R-12": 5,
+      "Q-R-31": 5,
+      "Q-R-32": 5,
+      "Q-R-33": 5,
+      "Q-R-34": 5,
+      "Q-R-35": 5,
+      "Q-R-36": 5,
+      "Q-R-37": 5,
+      "Q-R-38": 5,
+      "Q-R-39": 5,
+      "Q-R-40": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-09": "a5144b66392727ef8844fcf5cbe1f911c8071dc1a2054959c04ddf6072a8df68",
+      "Q-R-10": "70add9e4f8724a030e2cd8d8452dc484ba586f9434de760db26a684f63eb01f7",
+      "Q-R-11": "7295d6ed3a653e9902e79ce43acedb2f2c2bc1ecad647a72a7aadc2f5f288a6d",
+      "Q-R-12": "325968cef8574f56e4f09c5615f6ec401e012a68ddeff260f2a901b42e752118",
+      "Q-R-31": "141b1867441bd1bbcc1eef439306e3da821e7d5a9d4ab04711b11d032e1863eb",
+      "Q-R-32": "b14e250b14f8eca97e64d02f317d6211353313cb8014b2e7a56ae8ffe2eb3ff5",
+      "Q-R-33": "f7099328bdf1daef735032f0274fc128b5eb45c4b660c57d992f9f9bc11f46cb",
+      "Q-R-34": "c87ec6d7fe8d0acfbec579fcf5b8d860061fc4e61fc495429a54cebbbcd42f9b",
+      "Q-R-35": "bd9fe306cc32fc0d9bcdb9324987e8ff2cdf0e86e695679c6e9387c0b76bb7c3",
+      "Q-R-36": "8f159b75796fe2917a4dd0b24bc04af58fbaba4956dbacb44f5208233bf24a93",
+      "Q-R-37": "eff73b9ae29acd5a721f2189fd25c7e51136fd04c7e2d6d428a32c736519aa12",
+      "Q-R-38": "50c26f91d133e74a6f2f8cd1bac3fa46a13f185b792f5f535e3cfdffa6e29686",
+      "Q-R-39": "24e15519632ba4f2cd630d20c4ef1929218320772c68928d01c8e6471dc10201",
+      "Q-R-40": "6a71a44a47d227e5f96c54cdf69c5bc318df9c94ced18712350a9f8e73b33d71"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-09": "7c3d95ff3fa2b168cac077da55a1da1532471b52d04e89fb5431f35edd3c98b7",
+      "Q-R-10": "327941ced90a18d120a131ef9a35a6408a2d57012276effe1c680df383d9630a",
+      "Q-R-11": "7c731c8d0efa72296910379a6969ad9c3fbbbdb652144d835e3c7a2f1b0ba370",
+      "Q-R-12": "f780b1236adfb83499ab9237de2c80e688342cac9b018daac7b0b5f4845449f9",
+      "Q-R-29": "639542ccef11e34953f7178ea9b6c70007f39874b4c354c46ca26a830152efa9",
+      "Q-R-30": "b424de910ae3b30565b5a61b3e42aa04b53ce1c35b2442bf62e06cec3a0bda95",
+      "Q-R-31": "7ac0b267794f1c968585984a35c34a239f5660f8944cf4a4816bcec2ad8d9c39",
+      "Q-R-32": "db10a0b26eeb44712143862ba56ed150356ec948ef173a015f2fde2a0f227f16",
+      "Q-R-33": "e83a1864fbfd314e450a08231a6f3bd33cbfdb3d965b2892164fc042a70d1cae",
+      "Q-R-34": "78fb1e644eae93eda85189cc5ff735766c1395097dfde805e978d2faf4de3d8d",
+      "Q-R-35": "fec5a04c7cf2e963811c33fba5f5c9be2ae90f3cdddaf2343712d382a5e4cac2",
+      "Q-R-36": "e204e8afc7cf79260a29e4bf7073da4bb063b10fd8e91f3eea8be47e69d136ac",
+      "Q-R-37": "c2676991562d6d4f30535d2ea1f9a1a12e803789e91d858d4fc85f83dd12c835",
+      "Q-R-38": "01a0f924908df27c16170b7311e17b7d9a72bcbf58c0410a4a1c3c03a5d5a859",
+      "Q-R-39": "7db6486376bec518ffd5dc0b2abbd49094796a4290054a8ac46aee0985eaac13"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "R faixa central inferior e nova passagem",
+    "previous_codes": [
+      "Q-R-20",
+      "Q-R-21",
+      "Q-R-22",
+      "Q-R-23",
+      "Q-R-24",
+      "Q-R-25",
+      "Q-R-26",
+      "Q-R-27"
+    ],
+    "proposed_codes": [
+      "Q-R-20",
+      "Q-R-21",
+      "Q-R-22",
+      "Q-R-23",
+      "Q-R-24",
+      "Q-R-25"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "reparcelamento_correspondencia_pendente",
+    "confidence": "low",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-R-20": 500,
+      "Q-R-21": 500,
+      "Q-R-22": 500,
+      "Q-R-23": 500,
+      "Q-R-24": 500,
+      "Q-R-25": 500,
+      "Q-R-26": 500,
+      "Q-R-27": 500
+    },
+    "proposed_areas_sqm": {
+      "Q-R-20": "500.00",
+      "Q-R-21": "500.00",
+      "Q-R-22": "500.00",
+      "Q-R-23": "504.28",
+      "Q-R-24": "504.28",
+      "Q-R-25": "504.28"
+    },
+    "previous_geometry_versions": {
+      "Q-R-20": 5,
+      "Q-R-21": 5,
+      "Q-R-22": 5,
+      "Q-R-23": 5,
+      "Q-R-24": 5,
+      "Q-R-25": 5,
+      "Q-R-26": 5,
+      "Q-R-27": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-R-20": "64733143ab19a2949322e32be6920be90d90f2b458cb82437d032d6125b42213",
+      "Q-R-21": "776804b66ee744ac700f4405ad4b55150b8a0383398d65319aa05a7f76a1203c",
+      "Q-R-22": "2c3fd969a145ee2f56c88a77e71d6fa1b425668a82f988dee3eaa4a608f07290",
+      "Q-R-23": "f9e2b4edb0fbe93444e058c11500577fa7815754987b9c73c800b52e01119fe4",
+      "Q-R-24": "d71afd02a243752f0fff0377645be095387028c7558be75439fdac5fac2d3e46",
+      "Q-R-25": "a98f0f102029362d8a0bf0c89e7d48f5d87255fa17e494c00d0c902a04aeb230",
+      "Q-R-26": "05997a0dcf8f3eb7be69a854542f175b6820f243d39b331a1346df1711fa2d79",
+      "Q-R-27": "ead79dcdce4f96a65836de4a6beeb409359468f36545269f35e1afe6fbcc9fb7"
+    },
+    "proposed_geometry_hashes": {
+      "Q-R-20": "54cf3f8d795591f14cf3b5a8e6975c421d528d27039b437164e9c0350a610171",
+      "Q-R-21": "e7ea374d5c52353edb2ea52a4455252d3d11f8a8992a9fb534e305c2b1e3ed22",
+      "Q-R-22": "219dbb510e2bc0c21664d6704243c49be868398ce8422e66f236e145388ef447",
+      "Q-R-23": "7e440cf4541c46f0892e054cd9c2cb48841aa4cee06119541b8824c89f643af9",
+      "Q-R-24": "84e1784f0d20da2e15caccc43cf2b9dc040698337837330ee449718f003d857b",
+      "Q-R-25": "26b67753821423188c3f669c939de8c3e3808d9710386f6d28bfccc7641fa319"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S superior direita posicao 6",
+    "previous_codes": [
+      "Q-S-19"
+    ],
+    "proposed_codes": [
+      "Q-S-18"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-19": 411.83
+    },
+    "proposed_areas_sqm": {
+      "Q-S-18": "411.83"
+    },
+    "previous_geometry_versions": {
+      "Q-S-19": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-19": "93015b923bc8e7b5760ca9ee1e4691782d14ef66950dc82fc3996fe110c39f68"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-18": "7f43cb18d8b1707295ecccab479743e7985ae55a9e74432597eedf1dd61256e1"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S superior direita posicao 5",
+    "previous_codes": [
+      "Q-S-20"
+    ],
+    "proposed_codes": [
+      "Q-S-19"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-20": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-S-19": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-S-20": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-20": "d238a3ca3eca53a0868a8d185f6663b3355ea6239ec51aead4f1d14fc9fc32b8"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-19": "6aae8f54668cb77924ab9f68b05d0c9bba37932e71875090b7d0fb60bc77a29b"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S superior direita posicao 4",
+    "previous_codes": [
+      "Q-S-21"
+    ],
+    "proposed_codes": [
+      "Q-S-20"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-21": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-S-20": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-S-21": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-21": "1a97d1578015283e28f74ffebbc109ebd558e3f4cd2ec2bf604c617679ddab76"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-20": "3af38862fbe7e2533cc0401f90a28deb7f1ec1bcc3f43fabe0725fb405f31765"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S superior direita posicao 3",
+    "previous_codes": [
+      "Q-S-22"
+    ],
+    "proposed_codes": [
+      "Q-S-21"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-22": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-S-21": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-S-22": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-22": "074ee8377fefcf20a59de470295006d91d83df86184d5a0c933aea3008e504bb"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-21": "efb9f9341f06157603a4804d92d39280a2eff2798550a382d9f19fd87c000f85"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S superior direita posicao 2",
+    "previous_codes": [
+      "Q-S-23"
+    ],
+    "proposed_codes": [
+      "Q-S-22"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-23": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-S-22": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-S-23": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-23": "538f73a07ddf1541822caf88ba29f00bf70b4863ad0c263be4e4ad129663763f"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-22": "1543dcd409cd06c27948b60d51f988792ddc43d36d0c2e472f1a5fa662072f93"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S superior direita posicao 1",
+    "previous_codes": [
+      "Q-S-24"
+    ],
+    "proposed_codes": [
+      "Q-S-23"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-24": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-S-23": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-S-24": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-24": "da32ab02dbcceff06a29750f946ac3aee7d903b07c2dd68aac23d0e7bdcbaf99"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-23": "af7269ca9fad3ae91124ccbaf730f02134a651cb82b695a6745f73b13d27dafa"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S superior direita posicao 0",
+    "previous_codes": [
+      "Q-S-25"
+    ],
+    "proposed_codes": [
+      "Q-S-24"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-25": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-S-24": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-S-25": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-25": "c83cc81ec34fc006657275f3441d3ad89aba1e51fcdfcd0109b127c3d3d6dacb"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-24": "783d7e58ea8770fec3b9b42a98b22a47f4ca0d736e40a8d71ff8feab61f9f96e"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S inferior direita posicao 1",
+    "previous_codes": [
+      "Q-S-12"
+    ],
+    "proposed_codes": [
+      "Q-S-11"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-12": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-S-11": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-S-12": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-12": "cbd12da6437243cb063c2eef3499ccd1b76f84f11893b8a5e999b3cc914f66ba"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-11": "d65630c633b639ec05c8bdd685b81f97ddafcb019a5762811a542edb200fda09"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S inferior direita posicao 2",
+    "previous_codes": [
+      "Q-S-13"
+    ],
+    "proposed_codes": [
+      "Q-S-12"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-13": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-S-12": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-S-13": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-13": "99940710d0e0719287ee4891b5827bd024e3cb2e08ab0628a6bcd199d8c8b793"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-12": "53cab6656a66635570c67d7511e62bd564085bf63974622130b0ff5155ea862e"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S inferior direita posicao 3",
+    "previous_codes": [
+      "Q-S-14"
+    ],
+    "proposed_codes": [
+      "Q-S-13"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-14": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-S-13": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-S-14": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-14": "25491067229ac774a1b72315c76488677a0c8c0c9955c53e9e314465791d0332"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-13": "0d3f06867750cc729928432096349471844ca7a89a7431479e19829fafd1b838"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S inferior direita posicao 4",
+    "previous_codes": [
+      "Q-S-15"
+    ],
+    "proposed_codes": [
+      "Q-S-14"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-15": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-S-14": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-S-15": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-15": "aaaedcae890aec341ea79fe29c55f637829e35c21372eb4d0de8332d065dbe43"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-14": "ac795aa4ffe33f17aa0cc6b20dfe9f36801011640c99f93200fa448042d93591"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S inferior direita posicao 5",
+    "previous_codes": [
+      "Q-S-16"
+    ],
+    "proposed_codes": [
+      "Q-S-15"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-16": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-S-15": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-S-16": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-16": "3108ed3669701629fd4f190b59ddfcdd51cc76d47207bcced7cfb3f5a846cccb"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-15": "e32793a0b6f57e04e50291a46e3314f46a7590c95c874e927578135d82955998"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S inferior direita posicao 6",
+    "previous_codes": [
+      "Q-S-17"
+    ],
+    "proposed_codes": [
+      "Q-S-16"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-17": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-S-16": "450.00"
+    },
+    "previous_geometry_versions": {
+      "Q-S-17": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-17": "f8dd9f21ada6222551e9c0bdcb1984368a6cbc1e1a98e20aa50e79ccffba6f24"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-16": "a7a90829394baebfba421ca54d5a502016fb2ed3df24bfe3ed71843dbe447436"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S inferior direita posicao 7",
+    "previous_codes": [
+      "Q-S-18"
+    ],
+    "proposed_codes": [
+      "Q-S-17"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "renumeracao_candidata",
+    "confidence": "medium",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-18": 348.98
+    },
+    "proposed_areas_sqm": {
+      "Q-S-17": "348.98"
+    },
+    "previous_geometry_versions": {
+      "Q-S-18": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-18": "568834169b8d1578c9792a38bdd6b8a31bfbd73cef0a70848b75b321baf136e8"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-17": "697b285037fce8169fc7ee6297cd32969a74a4de9ebcff3fdfc4a80bbe896bf2"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S superior esquerda terminal maior trocado de lado",
+    "previous_codes": [
+      "Q-S-26",
+      "Q-S-27",
+      "Q-S-28",
+      "Q-S-29",
+      "Q-S-30",
+      "Q-S-31",
+      "Q-S-32",
+      "Q-S-33",
+      "Q-S-34",
+      "Q-S-35",
+      "Q-S-36"
+    ],
+    "proposed_codes": [
+      "Q-S-25",
+      "Q-S-26",
+      "Q-S-27",
+      "Q-S-28",
+      "Q-S-29",
+      "Q-S-30",
+      "Q-S-31",
+      "Q-S-32",
+      "Q-S-33",
+      "Q-S-34",
+      "Q-S-35"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "reparcelamento_correspondencia_pendente",
+    "confidence": "low",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-26": 650.05,
+      "Q-S-27": 450,
+      "Q-S-28": 450,
+      "Q-S-29": 450,
+      "Q-S-30": 450,
+      "Q-S-31": 450,
+      "Q-S-32": 450,
+      "Q-S-33": 450,
+      "Q-S-34": 450,
+      "Q-S-35": 450,
+      "Q-S-36": 450
+    },
+    "proposed_areas_sqm": {
+      "Q-S-25": "450.00",
+      "Q-S-26": "450.00",
+      "Q-S-27": "450.00",
+      "Q-S-28": "450.00",
+      "Q-S-29": "450.00",
+      "Q-S-30": "450.00",
+      "Q-S-31": "450.00",
+      "Q-S-32": "450.00",
+      "Q-S-33": "450.00",
+      "Q-S-34": "450.00",
+      "Q-S-35": "649.97"
+    },
+    "previous_geometry_versions": {
+      "Q-S-26": 5,
+      "Q-S-27": 5,
+      "Q-S-28": 5,
+      "Q-S-29": 5,
+      "Q-S-30": 5,
+      "Q-S-31": 5,
+      "Q-S-32": 5,
+      "Q-S-33": 5,
+      "Q-S-34": 5,
+      "Q-S-35": 5,
+      "Q-S-36": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-26": "d3ceb26b727352863501632343cd244eb704ed61e6c8f75294bd422b7b6b4a85",
+      "Q-S-27": "b8ab4f532b5bd684653d6b3a370043c5c424920195afa3747e01875d78c9d4f7",
+      "Q-S-28": "46e1e9e5d9c2759ed1931f7945009996ac19965220501782322aca8695b045e2",
+      "Q-S-29": "6e3a97cd77d06b470838ef46c11af44bf99f753349fecb9187eba04ee3287d22",
+      "Q-S-30": "5e4e8d06d53f26379f6b42f7051efa6d9a03f931c5339e2d1e66a5c90bc47505",
+      "Q-S-31": "1a12bb5d70a1ca32ec0e4dae7bc3301cb4386a041bcd198918b3ca1aef60fde0",
+      "Q-S-32": "6145fe5991104f53b12771fe632c63ebf9242c025c34a8d9cf4cf302b8cc9d94",
+      "Q-S-33": "5945c3e64aa4f00d53e608371000f3b77e0649f9434387b63199cebe17b9487f",
+      "Q-S-34": "404f6b9de93a050d7a4b01b1da30f76889ac0a59efe49acf72715743fc720427",
+      "Q-S-35": "9e89f067b881e5bcb8f6bafc34261baff4bd9f43fbd8c7112d2fe8d5c93b7361",
+      "Q-S-36": "c3d617229ecf7cdacabc16318d0599c35fa1ce7e0a0d5d1c451674256ede1f5c"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-25": "6eeb6975ff576ac8cf5139211388b75efb905cf9341482a1bb9b96062f87c71b",
+      "Q-S-26": "1b18b51432de414370ad0f3743a325554799880691a19d46fb96494997801bc5",
+      "Q-S-27": "2cc839669c8ab6ff224843ddb8d26bc41065a0a8c32c457148ac6661beb3dc9b",
+      "Q-S-28": "acacfb7f1e63fc9731c1b85c1743e6672c5987d11466defa6eb78d478150900e",
+      "Q-S-29": "791e76d5bd8ae235b9a783b39b9534b6220707b66f8dfc0c7ca25d3d3adb6a46",
+      "Q-S-30": "608ef098cda79181f0fa6db8696904e453bad45d7a6a5822e4edaae82b8763f6",
+      "Q-S-31": "b83090be1d96d8504a454f23227c2bdf0d7bfa92e78e45b5419f38811f468fe2",
+      "Q-S-32": "0931c8895ec08080b89e1a2630b5209fde3ff31389e1985ed0e4f24a11b4d70b",
+      "Q-S-33": "c4f308e4e2fe8c1f7f6db669530a9488cd25d3dc9196692218afa755e202b41a",
+      "Q-S-34": "bfd6500898a8e1b7ae8d9cd43ee9a2278ca905b3239ba6e31ca6483e020d3d63",
+      "Q-S-35": "2415b7ede603ab0169167d3dc53c000d72633c7518d53aa431db8f6df28927cf"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  },
+  {
+    "physical_parcel": "S inferior esquerda cortada pela transversal",
+    "previous_codes": [
+      "Q-S-01",
+      "Q-S-02",
+      "Q-S-03",
+      "Q-S-04",
+      "Q-S-05",
+      "Q-S-06",
+      "Q-S-07",
+      "Q-S-08",
+      "Q-S-09",
+      "Q-S-10",
+      "Q-S-11"
+    ],
+    "proposed_codes": [
+      "Q-S-01",
+      "Q-S-02",
+      "Q-S-03",
+      "Q-S-04",
+      "Q-S-05",
+      "Q-S-06",
+      "Q-S-07",
+      "Q-S-08",
+      "Q-S-09",
+      "Q-S-10"
+    ],
+    "previous_revision": "2026.4-exporural.1",
+    "proposed_revision": "2028-exporural-2026-09-25.1",
+    "action": "reparcelamento_correspondencia_pendente",
+    "confidence": "low",
+    "status": "PENDING_APPROVAL",
+    "evidence": "Repository geometry + registered numbering/dimensions rasters; no live UUID or legal identity verified",
+    "previous_areas_sqm": {
+      "Q-S-01": 467.13,
+      "Q-S-02": 450,
+      "Q-S-03": 450,
+      "Q-S-04": 450,
+      "Q-S-05": 450,
+      "Q-S-06": 450,
+      "Q-S-07": 450,
+      "Q-S-08": 450,
+      "Q-S-09": 450,
+      "Q-S-10": 450,
+      "Q-S-11": 563.94
+    },
+    "proposed_areas_sqm": {
+      "Q-S-01": "500.00",
+      "Q-S-02": "500.00",
+      "Q-S-03": "500.00",
+      "Q-S-04": "692.09",
+      "Q-S-05": "450.11",
+      "Q-S-06": "450.11",
+      "Q-S-07": "450.11",
+      "Q-S-08": "450.11",
+      "Q-S-09": "450.11",
+      "Q-S-10": "450.11"
+    },
+    "previous_geometry_versions": {
+      "Q-S-01": 5,
+      "Q-S-02": 5,
+      "Q-S-03": 5,
+      "Q-S-04": 5,
+      "Q-S-05": 5,
+      "Q-S-06": 5,
+      "Q-S-07": 5,
+      "Q-S-08": 5,
+      "Q-S-09": 5,
+      "Q-S-10": 5,
+      "Q-S-11": 5
+    },
+    "previous_geometry_hashes": {
+      "Q-S-01": "bddd5cabb5edd3246b073cd0d9ddabb92741a96eac0b90a642e02d778c5539be",
+      "Q-S-02": "e5a01d3178ab55ea01b4a2f4dd449d9a0551fdb927ca9a4ccab022467aa106b6",
+      "Q-S-03": "aaed40dc784dd8d683018839742c4eebc50580eb810444a546c76ae24741aa62",
+      "Q-S-04": "15455141f658372968008195e47a04948cfe8dd8571e0af4407a63437eddfabc",
+      "Q-S-05": "171c9455cee2ae545a59c84995912d39b0f8ceecc2c072c8b8836b7da34efe77",
+      "Q-S-06": "75c0f01542e56dde8328aefae2aeb76226e872769c310ffd4e55d8087c90b5fe",
+      "Q-S-07": "683929bb515236b3334226d0ff4597470dda2ac5371d2d350be4e3d82b6188c1",
+      "Q-S-08": "ce37dd305fc160897bff381c3d5d7df7a8271ac13dc86e1beffb58ef41ed3ce2",
+      "Q-S-09": "91af7f29abf52c21e4f46cdb88e63da0a36ba84ea7154d2f6d5cad42b41e8878",
+      "Q-S-10": "2c34c3609692f5419086a1fa5f790d841c67e39e930a074e731079697fa5f99d",
+      "Q-S-11": "3019f4b9586ab9c3fc1a86386aebd3bf7f860a78c16e802b83e827e4fe024614"
+    },
+    "proposed_geometry_hashes": {
+      "Q-S-01": "18aeb647a2578120a162c20f5155859b49935bb3507aa0e54e443a9fbba3b873",
+      "Q-S-02": "3744dec3bee96d99c3c9df284ea404c173d49ff07cb888aed5e5ff4b95fe3756",
+      "Q-S-03": "9263a2b1846a8866e3ebfdaa11921cb71c2dfe45fd66a52caac8833dc76fcc40",
+      "Q-S-04": "8ba9d595968d6dc52a93818aae3192740236ef3915507a417e7dba9cdffcea96",
+      "Q-S-05": "1904c0e5f35512eb47d840313361f324213e98358377f004d94e7c03f3c62563",
+      "Q-S-06": "19321b4c19a61d14604852a8975ce6e723e37b1aec3dee705885d1f2e71902e3",
+      "Q-S-07": "beba978495adc8f678b46f9c8b62ac6076bd1aa4bc22617fa2b59c80a49d9950",
+      "Q-S-08": "794a060506bcca3ebea849c85cc10536181c10760962ee0da1255d6e76600d9f",
+      "Q-S-09": "5c38d9aa68d9d48d22c3c5e7d49cb4b7b76522962dec2adf94977f89e3412f89",
+      "Q-S-10": "8a66803c6767f9a31e340c91c02905e526d8f6879e51aeede73b3c218e7a1ae8"
+    },
+    "proposed_geometry_version": 6,
+    "production_entity_ids": null,
+    "production_lot_ids": null,
+    "required_approval": "Resolve UUIDs and physical continuity; inspect reservations, negotiations, sales, contracts and price history; approve all parent/child allocations explicitly"
+  }
+]

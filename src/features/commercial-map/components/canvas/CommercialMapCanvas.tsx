@@ -8,6 +8,7 @@ import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
 import { PublicScenePolicyContext, usePublicScenePolicy } from './PublicScenePolicyContext';
 import { PublicContextGroup, PublicMaterialPool } from './PublicContextGroup';
 import { PublicLotNumbers } from './PublicLotNumbers';
+import { hasRevisedExporuralNumbers } from '../../utils/exporuralRevisionPresentation';
 import { SoldLotLocks } from './SoldLotLocks';
 import type { Coordinate } from '../../types';
 import { isSoldLot, soldLotSurfaceColor } from '../../utils/soldLotPresentation';
@@ -1489,6 +1490,8 @@ function BatchedLots({
   const geometryEntitiesRef = useRef<MapEntity[]>([]);
   if (geometryEntitiesRef.current.length !== entries.length || entries.some((entry, i) => entry.entity !== geometryEntitiesRef.current[i])) geometryEntitiesRef.current = entries.map(entry => entry.entity);
   const geometryEntities = geometryEntitiesRef.current;
+  const numberedEntities = useMemo(() => publicPolicy ? geometryEntities
+    : geometryEntities.filter(hasRevisedExporuralNumbers), [geometryEntities, publicPolicy]);
   const invalidate = useThree((state) => state.invalidate);
   const reducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
   const hoveredRef = useRef<string | null>(null);
@@ -1764,7 +1767,7 @@ function BatchedLots({
           toneMapped={false}
         />
       </lineSegments>
-      {publicPolicy && <PublicLotNumbers entities={geometryEntities} soldEntityIds={soldEntityIds} />}
+      {numberedEntities.length > 0 && <PublicLotNumbers entities={numberedEntities} soldEntityIds={soldEntityIds} />}
       {selectedEntity && <LotSelectionOutline entity={selectedEntity} />}
     </>
   );

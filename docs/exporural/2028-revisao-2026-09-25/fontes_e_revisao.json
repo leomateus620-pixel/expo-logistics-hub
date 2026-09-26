@@ -1,0 +1,57 @@
+{
+  "revision": "2028-exporural-2026-09-25.1",
+  "base_commit": "552f06fe86d928921fe3e9fa455b8972bfa3dca9",
+  "sources": [
+    {
+      "filename": "Fenasoja_Parque_Ajustes_300dpi.png",
+      "role": "areas-dimensions-boundaries",
+      "sha256": "37e04a91c738ce4f4f3a1470f5c02d5eed010138e11982a41344a9984e5fb323",
+      "width": 9934,
+      "height": 7017,
+      "dpi": [
+        299.9994,
+        299.9994
+      ]
+    },
+    {
+      "filename": "Fenasoja_So_Numeros_300dpi.png",
+      "role": "numbering-topology",
+      "sha256": "63b86b947f75e1a0c7b50125824c37ecd35f0f50c9c1f75e0c788c029ed3052e",
+      "width": 9934,
+      "height": 7017,
+      "dpi": [
+        299.9994,
+        299.9994
+      ]
+    },
+    {
+      "filename": "WhatsApp Image 2026-09-25 at 20.25.06.jpeg",
+      "role": "visual-before-only",
+      "sha256": "083ad695b9dc51a0ce40f586b1e672c3c6f59e85acf0ef5600eb578bc85fde64",
+      "width": 986,
+      "height": 579,
+      "dpi": null
+    }
+  ],
+  "pdf_cad_available": false,
+  "scope": "R/S lots and directly affected roads only",
+  "totals": {
+    "R": {
+      "count": 65,
+      "official_area_sqm": "29564.26"
+    },
+    "S": {
+      "count": 35,
+      "official_area_sqm": "16203.53"
+    },
+    "all": {
+      "count": 100,
+      "official_area_sqm": "45767.79"
+    }
+  },
+  "excluded_unnumbered_area_sqm": "568.78",
+  "excluded_area_destination": "PENDING",
+  "global_reference_revision_unchanged": "2026.4",
+  "previous_geometry_revision": "2026.4-exporural.1",
+  "geometry_version": 6
+}

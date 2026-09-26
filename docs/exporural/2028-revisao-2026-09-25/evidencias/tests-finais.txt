@@ -1,0 +1,47 @@
+
+> vite_react_shadcn_ts@0.0.0 test
+> vitest run src/test/exporural2028Revision.test.ts src/test/commercialMapExporural.test.ts src/test/commercialMapExporuralCartographicFidelity.test.ts src/test/exporuralFidelityMigration.contract.test.ts src/test/commercialDashboardAnalytics.test.ts src/test/commercialMapSalesSelection.test.ts
+
+
+ RUN  v3.2.4 C:/Users/Leonardo/Desktop/expo-logistics-hub
+
+ ❯ src/test/commercialMapExporuralCartographicFidelity.test.ts (6 tests | 1 failed) 156ms
+   ✓ fidelidade cartográfica dourada da Exporural 2026.4 > versiona a correção e registra os recortes oficial/estado atual por hash 4ms
+   ✓ fidelidade cartográfica dourada da Exporural 2026.4 > mantém A8, A9 e Rua 15 de Novembro como uma rede contínua pelas quatro transversais 2ms
+   × fidelidade cartográfica dourada da Exporural 2026.4 > preserva os 95 lotes dentro do mesmo perímetro canônico e fora das sete ruas 47ms
+     → expected [ { …(38) }, { …(38) }, …(1577) ] to have a length of 1577 but got 1579
+   ✓ fidelidade cartográfica dourada da Exporural 2026.4 > mantém o contorno visual fora de B8 e D3 sem perder os lotes limítrofes 10ms
+   ✓ fidelidade cartográfica dourada da Exporural 2026.4 > remove exatamente os cinco overlays e conserva lotes e apoios válidos sem blocos não permanentes 11ms
+   ✓ fidelidade cartográfica dourada da Exporural 2026.4 > fixa vértices dourados para A7, ilhas centrais e leque R-56–R-59 76ms
+ ✓ src/test/commercialMapExporural.test.ts (11 tests) 484ms
+ ✓ src/test/exporural2028Revision.test.ts (13 tests) 2009ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > não apresenta auto-interseção, lotes sobrepostos ou invasão de vias e estruturas protegidas  1129ms
+ ✓ src/test/commercialDashboardAnalytics.test.ts (8 tests) 18ms
+ ✓ src/test/exporuralFidelityMigration.contract.test.ts (6 tests) 14ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/commercialMapExporuralCartographicFidelity.test.ts > fidelidade cartográfica dourada da Exporural 2026.4 > preserva os 95 lotes dentro do mesmo perímetro canônico e fora das sete ruas
+AssertionError: expected [ { …(38) }, { …(38) }, …(1577) ] to have a length of 1577 but got 1579
+
+- Expected
++ Received
+
+- 1577
++ 1579
+
+ ❯ src/test/commercialMapExporuralCartographicFidelity.test.ts:120:42
+    118|
+    119|     expect(scoped.lots).toHaveLength(95);
+    120|     expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(1577);
+       |                                          ^
+    121|     scoped.lots.forEach((lot) => {
+    122|       const entity = entitiesById.get(lot.entityId)!;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 43 passed (44)
+   Start at  22:17:17
+   Duration  23.29s (transform 5.05s, setup 5.15s, collect 24.05s, tests 2.68s, environment 19.76s, prepare 3.99s)

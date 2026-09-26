@@ -1,0 +1,96 @@
+
+> vite_react_shadcn_ts@0.0.0 test
+> vitest run src/test/exporural2028Revision.test.ts src/test/commercialMapExporuralLandscape.test.ts
+
+
+ RUN  v3.2.4 C:/Users/Leonardo/Desktop/expo-logistics-hub
+
+ ❯ src/test/exporural2028Revision.test.ts (14 tests | 1 failed) 21397ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > contém 100 códigos explícitos e somas decimais exatas, sem R66/S36/área sem número 40ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > preserva a revisão global, não modifica banco e rejeita fixture sobre dados persistidos 7ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > é determinística, somente leitura e não reutiliza identidade nominal para R56 274ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > conta entidades e lotes separadamente, incluindo três superfícies viárias novas 4ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > mantém todas as entidades, áreas e identidades fora do escopo por referência  309ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > valida anéis, hashes e labels internos sem equiparar área impressa à área calculada 70ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > preserva sequência geométrica de todas as faixas e a dupla R01/R02 3ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > não apresenta auto-interseção, lotes sobrepostos ou invasão de vias e estruturas protegidas  923ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > conecta a transversal às três ruas e a mantém nos três pares corretos 24ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > mantém 15 de Novembro à esquerda da ilha e divisórias horizontais compartilhadas sem ruas 6ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > cobre todos os pais e filhos sem inventar UUIDs ou identidade jurídica 10ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > busca/lista/dashboard usam as mesmas 100 entidades e a área proposta de R56 115ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > invalida seleção por mudança física/versionada, preservando recargas idênticas 25ms
+   × proposta Exporural 2028, isolada da referência persistida > gera paisagismo finito e limitado com anéis rotacionados e junções adicionais 19574ms
+     → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/commercialMapExporuralLandscape.test.ts (5 tests | 3 failed) 28766ms
+   × Exporural presentation boundaries and infrastructure > preserves every entity, commercial record and official ring while creating bounded presentation meshes 7132ms
+     → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+   ✓ Exporural presentation boundaries and infrastructure > adds no landscape to another segment, building, path or road 26ms
+   × Exporural presentation boundaries and infrastructure > keeps every slope triangle outside all commercial lots, roads and buildings 7435ms
+     → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+   × Exporural presentation boundaries and infrastructure > joins a single rising cut face to a level terrace without a reverse berm or parcel overlap 14144ms
+     → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+   ✓ Exporural presentation boundaries and infrastructure > keeps the turf hook through full/economy transitions without duplicate shader declarations 23ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/commercialMapExporuralLandscape.test.ts > Exporural presentation boundaries and infrastructure > preserves every entity, commercial record and official ring while creating bounded presentation meshes
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/commercialMapExporuralLandscape.test.ts:19:3
+     17|
+     18| describe("Exporural presentation boundaries and infrastructure", () =>…
+     19|   it("preserves every entity, commercial record and official ring whil…
+       |   ^
+     20|     const before = JSON.stringify(OFFICIAL_REFERENCE_DATA);
+     21|     const model = buildExporuralLandscape(OFFICIAL_REFERENCE_DATA.enti…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/test/commercialMapExporuralLandscape.test.ts > Exporural presentation boundaries and infrastructure > keeps every slope triangle outside all commercial lots, roads and buildings
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/commercialMapExporuralLandscape.test.ts:85:3
+     83|         ).toBe(true);
+     84|   });
+     85|   it("keeps every slope triangle outside all commercial lots, roads an…
+       |   ^
+     86|     const model = buildExporuralLandscape(OFFICIAL_REFERENCE_DATA.enti…
+     87|     const geometry = model.slopes!,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/test/commercialMapExporuralLandscape.test.ts > Exporural presentation boundaries and infrastructure > joins a single rising cut face to a level terrace without a reverse berm or parcel overlap
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/commercialMapExporuralLandscape.test.ts:155:3
+    153|     geometry.dispose();
+    154|   });
+    155|   it("joins a single rising cut face to a level terrace without a reve…
+       |   ^
+    156|     const before = JSON.stringify(OFFICIAL_REFERENCE_DATA);
+    157|     const model = buildExporuralLandscape(OFFICIAL_REFERENCE_DATA.enti…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/test/exporural2028Revision.test.ts > proposta Exporural 2028, isolada da referência persistida > gera paisagismo finito e limitado com anéis rotacionados e junções adicionais
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/exporural2028Revision.test.ts:184:3
+    182|     expect(changed[0].lotId).toBe(OFFICIAL_REFERENCE_DATA.lots.find(l=…
+    183|   });
+    184|   it('gera paisagismo finito e limitado com anéis rotacionados e junçõ…
+       |   ^
+    185|     const model=buildExporuralLandscape(after.entities);
+    186|     for (const geometry of Object.values(model)) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  4 failed | 15 passed (19)
+   Start at  22:20:31
+   Duration  41.28s (transform 2.99s, setup 3.76s, collect 11.99s, tests 50.16s, environment 8.49s, prepare 853ms)
