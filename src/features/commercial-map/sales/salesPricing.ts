@@ -8,7 +8,7 @@ export interface SalesCartLine {
   areaSqm: number | null;
   pricePerSqm: number | null;
   total: number | null;
-  /** Pavilhão 7 e afins: sem preço oficial, impede o fechamento. */
+  /** Etapa sem preço oficial: impede somente o fechamento nesta etapa. */
   unpriced: boolean;
   pendingReason: string | null;
 }

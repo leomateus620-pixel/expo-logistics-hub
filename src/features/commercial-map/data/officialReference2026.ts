@@ -585,7 +585,7 @@ const bStructures: Array<[string, string, MapClassification, string, PdfBounds |
   ['B7', 'Pavilhão 4 — Cozinha da Soja', 'PAVILION', 'pavilions', [3495, 2497, 3666, 2568], { parent: 'N' }],
   ['B8', 'Pavilhão 5 — Veterinária, Pequenos Animais e Rações', 'PAVILION', 'pavilions', [3198, 2203, 3411, 2390]],
   ['B9', 'Pavilhões 6, 10 e 11 — Pecuária', 'PAVILION', 'pavilions', [2319, 2256, 3179, 2389]],
-  ['B10', 'Pavilhão 7 — Agroindústrias', 'PAVILION', 'pavilions', [1973, 2252, 2309, 2379], {
+  ['B10', 'Pavilhão 7 — Agricultura Familiar / Agroindústrias', 'PAVILION', 'pavilions', [1973, 2252, 2309, 2379], {
     metadata: {
       aliases: [
         'Pavilhão 7 — Agricultura Familiar',

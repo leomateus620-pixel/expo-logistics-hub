@@ -234,7 +234,7 @@ if (Math.abs(PAVILION7_COMMERCIAL_GEOMETRIC_AREA_M2 - 427.5) > 1e-9) {
 export const PAVILION7_COMMERCIAL_REFERENCE = {
   publicIdentifier: 'B10',
   pavilionNumber: 7,
-  category: 'Agroindústrias',
+  category: 'Agricultura Familiar / Agroindústrias',
   moduleCount: 57,
   sourceDeclaredModuleCount: 57,
   totalAreaM2: 917,
