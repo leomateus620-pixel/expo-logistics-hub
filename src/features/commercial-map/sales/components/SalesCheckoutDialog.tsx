@@ -152,6 +152,8 @@ export function SalesCheckoutDialog({ summary }: Props) {
               value={buyer}
               onChange={setBuyer}
               showErrors={showErrors}
+               logoPreview={logoPreview}
+               onLogoChange={changeLogo}
               saveStatus={autosave.status}
               onRetrySave={() => { void autosave.flush(); }}
             />
