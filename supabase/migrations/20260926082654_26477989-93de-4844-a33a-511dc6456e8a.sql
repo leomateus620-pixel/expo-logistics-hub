@@ -1,0 +1,1 @@
+SELECT 'fix precision before insert' AS status;
