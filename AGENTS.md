@@ -5,3 +5,4 @@
 - Identificação comercial exibida deve resolver número/quadra/segmento/pavilhão a partir de lotes e entidades persistidos, mantendo códigos técnicos e snapshots históricos distintos — por quê: renumeração não pode ser inferida de IDs nem reescrever vendas anteriores.
 
 - Identidade visual opcional de venda fica vinculada ao pedido confirmado em bucket privado; mapas só recebem URLs temporárias após autorização por projeto ou link de escopo — por quê: evitar vazamento e aplicar a mesma imagem a todos os itens sem replicar arquivos.
+- Espaços comerciais sem número podem manter `lot_number` nulo e uma faixa de preço explícita independente do número — por quê: a área de 568,78 m² da Expo Rural deve ser vendável sem inventar identidade ou mudar os preços das demais parcelas.
