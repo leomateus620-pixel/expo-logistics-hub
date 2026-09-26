@@ -134,4 +134,5 @@
 - [ ] 56 lotes novos BLOCKED — aguardando decisão do usuário sobre precificação/liberação para venda
 - Não publicar (pedido permanente do usuário)
 
-- [ ] Logo opcional da venda: tratamento, vínculo privado, mapa interno/público e teste sem venda real.
+- [x] Imagem opcional na venda: tratamento local, vínculo privado ao pedido, exibição compartilhada nos lotes vendidos dos mapas interno e público, fallback do cadeado; teste local com anexo e regressões sem venda real.
+- [ ] Validar ponta a ponta uma venda com upload e exibição autenticada, incluindo link público: bloqueado até haver uma venda de teste isolada e autorização explícita para divulgar a foto pessoal anexada. Não registrar venda de teste na base oficial.
