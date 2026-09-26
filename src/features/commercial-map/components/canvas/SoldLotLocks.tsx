@@ -89,7 +89,8 @@ function SoldLogoGroup({ url, surfaces, obstacles, placements }: {
   useEffect(() => {
     let live = true;
     const image = new Image();
-    image.onload = () => { if (!live) return; assets.texture.image = image; assets.texture.needsUpdate = true; invalidate(); };
+    assets.mesh.visible = false;
+    image.onload = () => { if (!live) return; assets.texture.image = image; assets.texture.needsUpdate = true; assets.mesh.visible = true; invalidate(); };
     image.onerror = () => { if (live) { assets.mesh.visible = false; invalidate(); } };
     image.src = url;
     return () => { live = false; image.src = ''; };
