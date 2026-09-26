@@ -1104,6 +1104,56 @@ export type Database = {
         }
         Relationships: []
       }
+      commercial_exhibitors: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          document_normalized: string
+          document_number: string
+          email: string | null
+          id: string
+          name: string
+          org_id: string
+          phone: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          document_normalized: string
+          document_number: string
+          email?: string | null
+          id?: string
+          name: string
+          org_id: string
+          phone?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          document_normalized?: string
+          document_number?: string
+          email?: string | null
+          id?: string
+          name?: string
+          org_id?: string
+          phone?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commercial_exhibitors_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       commercial_lot_corner_audit: {
         Row: {
           adjacent_roads: Json
@@ -4173,6 +4223,11 @@ export type Database = {
           created_at: string
           document_number: string | null
           email: string | null
+          exhibitor_id: string | null
+          fee_admin: number
+          fee_cleaning_license: number
+          fee_ppci: number
+          fees_total: number
           first_due_date: string | null
           id: string
           idempotency_key: string
@@ -4187,6 +4242,7 @@ export type Database = {
           reverted_at: string | null
           reverted_by: string | null
           salesperson_user_id: string
+          spaces_subtotal: number | null
           stage: string
           status: string
           updated_at: string
@@ -4196,6 +4252,11 @@ export type Database = {
           created_at?: string
           document_number?: string | null
           email?: string | null
+          exhibitor_id?: string | null
+          fee_admin?: number
+          fee_cleaning_license?: number
+          fee_ppci?: number
+          fees_total?: number
           first_due_date?: string | null
           id?: string
           idempotency_key: string
@@ -4210,6 +4271,7 @@ export type Database = {
           reverted_at?: string | null
           reverted_by?: string | null
           salesperson_user_id: string
+          spaces_subtotal?: number | null
           stage: string
           status?: string
           updated_at?: string
@@ -4219,6 +4281,11 @@ export type Database = {
           created_at?: string
           document_number?: string | null
           email?: string | null
+          exhibitor_id?: string | null
+          fee_admin?: number
+          fee_cleaning_license?: number
+          fee_ppci?: number
+          fees_total?: number
           first_due_date?: string | null
           id?: string
           idempotency_key?: string
@@ -4233,11 +4300,19 @@ export type Database = {
           reverted_at?: string | null
           reverted_by?: string | null
           salesperson_user_id?: string
+          spaces_subtotal?: number | null
           stage?: string
           status?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lot_sale_orders_exhibitor_id_fkey"
+            columns: ["exhibitor_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_exhibitors"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lot_sale_orders_project_id_fkey"
             columns: ["project_id"]
@@ -10088,7 +10163,11 @@ export type Database = {
           p_buyer_name: string
           p_document_number: string
           p_email: string
+          p_exhibitor_id?: string
           p_expected_total: number
+          p_fee_admin?: number
+          p_fee_cleaning_license?: number
+          p_fee_ppci?: number
           p_first_due_date: string
           p_idempotency_key: string
           p_installment_count: number
@@ -10248,6 +10327,16 @@ export type Database = {
           p_lot_id: string
           p_patch: Json
           p_reason: string
+        }
+        Returns: string
+      }
+      upsert_commercial_exhibitor: {
+        Args: {
+          p_document: string
+          p_email: string
+          p_name: string
+          p_phone: string
+          p_project_id: string
         }
         Returns: string
       }
