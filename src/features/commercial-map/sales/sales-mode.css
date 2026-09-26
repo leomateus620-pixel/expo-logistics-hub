@@ -385,3 +385,9 @@
   .sales-hide-xs { display: none; }
   .sales-installment-card { grid-template-columns: 1fr; }
 }
+
+.sales-logo-field__row { display: flex; align-items: center; gap: 10px; min-height: 52px; }
+.sales-logo-field__row img { width: 52px; height: 52px; object-fit: contain; border: 1px solid oklch(var(--border)); border-radius: 6px; background: oklch(var(--background)); }
+.sales-logo-field__row input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.sales-logo-field__pick { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 12px; border: 1px solid oklch(var(--border)); border-radius: 8px; cursor: pointer; color: oklch(var(--foreground)); }
+.sales-logo-field__note { font-size: .72rem; color: oklch(var(--muted-foreground)); line-height: 1.4; }

@@ -13,6 +13,9 @@ import { feesTotalCents } from '../salesTypes';
 import { SalesBuyerForm, buyerErrors } from './SalesBuyerForm';
 import { SalesPaymentForm, paymentErrors } from './SalesPaymentForm';
 import { SalesReview } from './SalesReview';
+import { uploadSaleLogo } from '../saleLogo';
+import { toast } from '@/hooks/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
 
 const STEPS = ['Expositor', 'Pagamento', 'Revisão'] as const;
 
@@ -35,6 +38,14 @@ export function SalesCheckoutDialog({ summary }: Props) {
 
   const spacesCents = toCents(summary.valueTotal);
   const [step, setStep] = useState(0);
+  const queryClient = useQueryClient();
+  const [logoImage, setLogoImage] = useState<Blob | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const changeLogo = (image: Blob | null, preview: string | null) => {
+    setLogoImage(image);
+    setLogoPreview(current => { if (current) URL.revokeObjectURL(current); return preview; });
+  };
   const [showErrors, setShowErrors] = useState(false);
   const [buyer, setBuyer] = useState<SalesBuyerDraft>(EMPTY_BUYER);
   const [fees, setFees] = useState<SalesFeesDraft>(EMPTY_FEES);
@@ -52,7 +63,7 @@ export function SalesCheckoutDialog({ summary }: Props) {
       setStep(0);
       setShowErrors(false);
       setIdempotencyKey(crypto.randomUUID());
-    }
+    } else { changeLogo(null, null); }
   }, [open]);
 
   // Total mudou (taxas/etapa): recalcula apenas se os valores ainda são automáticos; datas preservadas.
@@ -101,7 +112,14 @@ export function SalesCheckoutDialog({ summary }: Props) {
       installments: draftsToInstallments(payment.installments),
       expectedTotal: totalCents / 100,
     }, {
-      onSuccess: () => {
+      onSuccess: async (orderId) => {
+        if (logoImage) {
+          setLogoUploading(true);
+          try { await uploadSaleLogo(orderId, idempotencyKey, logoImage); await queryClient.invalidateQueries({ queryKey: ['commercial-map'] }); }
+          catch (error) { toast({ title: 'Venda registrada sem imagem', description: error instanceof Error ? error.message : 'Não foi possível associar a imagem.', variant: 'destructive' }); }
+          finally { setLogoUploading(false); }
+        }
+        changeLogo(null, null);
         setBuyer(EMPTY_BUYER);
         setFees(EMPTY_FEES);
         setPayment(initialPayment(0));
@@ -111,7 +129,7 @@ export function SalesCheckoutDialog({ summary }: Props) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !checkout.isPending && setOpen(next)}>
+    <Dialog open={open} onOpenChange={(next) => !checkout.isPending && !logoUploading && setOpen(next)}>
       <DialogContent className="sales-checkout-dialog sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Finalizar venda</DialogTitle>
