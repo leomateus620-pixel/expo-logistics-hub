@@ -9892,7 +9892,6 @@ export type Database = {
         Args: { p_segment_id: string }
         Returns: number
       }
-      exporural_add_unnumbered_56878: { Args: never; Returns: Json }
       get_commission_map_segment_inventory: {
         Args: { p_segment_id: string }
         Returns: {
