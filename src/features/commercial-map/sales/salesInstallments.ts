@@ -56,3 +56,10 @@ export function buildInstallmentScheduleFromDates(total: number, dueDates: strin
 export function installmentsSum(installments: SalesInstallment[]): number {
   return installments.reduce((sum, item) => sum + toCents(item.amount), 0) / 100;
 }
+
+/** Compatibilidade: cronograma mensal a partir do primeiro vencimento. */
+export function buildInstallmentSchedule(total: number, count: number, firstDueDate: string): SalesInstallment[] {
+  if (!Number.isFinite(total) || total <= 0) return [];
+  const n = Math.max(1, Math.min(36, Math.floor(count)));
+  return buildInstallmentScheduleFromDates(total, monthlyDueDates(n, firstDueDate));
+}
