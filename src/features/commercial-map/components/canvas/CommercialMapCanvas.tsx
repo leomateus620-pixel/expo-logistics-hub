@@ -8,7 +8,6 @@ import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
 import { PublicScenePolicyContext, usePublicScenePolicy } from './PublicScenePolicyContext';
 import { PublicContextGroup, PublicMaterialPool } from './PublicContextGroup';
 import { PublicLotNumbers } from './PublicLotNumbers';
-import { hasRevisedExporuralNumbers } from '../../utils/exporuralRevisionPresentation';
 import { SoldLotLocks } from './SoldLotLocks';
 import type { Coordinate } from '../../types';
 import { isSoldLot, soldLotSurfaceColor } from '../../utils/soldLotPresentation';
