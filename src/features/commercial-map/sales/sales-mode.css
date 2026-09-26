@@ -298,3 +298,86 @@
   .sales-mobile-bar { padding: 9px 11px; font-size: 0.74rem; }
   .sales-mobile-bar__cta { padding: 6px 9px; }
 }
+
+/* ---- Checkout 2028: expositores, taxas e parcelas ---- */
+.sales-checkout-dialog { display: flex; flex-direction: column; max-height: min(92dvh, 900px); overflow: hidden; }
+.sales-checkout-dialog__body { flex: 1 1 auto; overscroll-behavior: contain; }
+.sales-checkout-steps { list-style: none; padding: 0; flex-wrap: wrap; gap: 6px 14px; }
+.sales-checkout-steps li { display: inline-flex; align-items: center; gap: 6px; }
+.sales-checkout-steps li span { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 999px; border: 1px solid oklch(var(--border)); font-size: .68rem; font-weight: 700; }
+.sales-checkout-steps li.is-active { color: oklch(var(--primary)); font-weight: 700; }
+.sales-checkout-steps li.is-active span { background: oklch(var(--primary)); color: oklch(var(--primary-foreground)); border-color: transparent; }
+.sales-checkout-steps li.is-done span { border-color: oklch(var(--primary)); color: oklch(var(--primary)); }
+.sales-section-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.sales-section-head > strong { font-size: .9rem; }
+.sales-section-head__tools { display: flex; align-items: center; gap: 8px; }
+.sales-autosave { display: inline-flex; align-items: center; gap: 4px; font-size: .7rem; color: oklch(var(--muted-foreground)); background: none; border: 0; padding: 0; }
+.sales-autosave.is-saved { color: oklch(var(--primary)); }
+.sales-autosave.is-error { color: oklch(var(--destructive)); text-decoration: underline; cursor: pointer; min-height: 32px; }
+.sales-block { display: flex; flex-direction: column; gap: 10px; padding: 12px 0; border-bottom: 1px solid oklch(var(--border)); }
+.sales-block:last-child { border-bottom: 0; }
+.sales-block h3 { font-size: .86rem; font-weight: 700; margin: 0; }
+.sales-block__hint { font-size: .72rem; color: oklch(var(--muted-foreground)); margin: 0; }
+.sales-fees-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.sales-money { position: relative; }
+.sales-money > span { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: .8rem; color: oklch(var(--muted-foreground)); pointer-events: none; }
+.sales-money input { padding-left: 36px; text-align: right; font-variant-numeric: tabular-nums; }
+.sales-totals { display: flex; flex-direction: column; gap: 4px; margin: 0; font-size: .8rem; }
+.sales-totals > div { display: flex; justify-content: space-between; gap: 12px; }
+.sales-totals dt { color: oklch(var(--muted-foreground)); }
+.sales-totals dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.sales-totals .is-sub dt { padding-left: 12px; }
+.sales-totals .is-strong dt, .sales-totals .is-strong dd { color: oklch(var(--foreground)); font-weight: 700; }
+.sales-totals .is-final { padding-top: 6px; border-top: 1px solid oklch(var(--border)); }
+.sales-totals .is-final dd { font-size: 1.25rem; }
+.sales-totals .is-alert dt, .sales-totals .is-alert dd { color: oklch(var(--destructive)); font-weight: 700; }
+.sales-method-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+.sales-segmented { display: grid; grid-template-columns: repeat(3, auto); gap: 4px; padding: 4px; border-radius: 12px; background: oklch(var(--muted)); }
+.sales-segmented button { min-height: 40px; padding: 0 12px; border-radius: 9px; border: 0; background: transparent; font-size: .8rem; font-weight: 600; color: oklch(var(--muted-foreground)); cursor: pointer; }
+.sales-segmented button.is-active { background: oklch(var(--primary)); color: oklch(var(--primary-foreground)); }
+.sales-count { display: flex; flex-direction: column; gap: 5px; min-width: 220px; }
+.sales-count label { font-size: .76rem; font-weight: 600; color: oklch(var(--muted-foreground)); }
+.sales-count__row { display: flex; gap: 8px; }
+.sales-count__row input { width: 72px; text-align: center; }
+.sales-field__warn { font-size: .72rem; color: oklch(var(--foreground)); }
+.sales-installments-header h3 { margin: 0; }
+.sales-installments { list-style: none; margin: 0; padding: 0 3px 0 0; max-height: 40dvh; }
+.sales-installment-card { display: grid; grid-template-columns: 90px minmax(0, 1fr) minmax(0, 1fr); align-items: end; gap: 10px; padding: 10px; border: 1px solid oklch(var(--border)); border-radius: 12px; background: oklch(var(--background)); }
+.sales-installment-card__num { align-self: center; font-size: .74rem; font-weight: 700; color: oklch(var(--muted-foreground)); }
+.sales-installment-card__amount { display: flex; align-items: center; min-height: 40px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.sales-link { display: inline-flex; align-items: center; gap: 4px; background: none; border: 0; font-size: .74rem; font-weight: 600; color: oklch(var(--primary)); cursor: pointer; min-height: 32px; }
+.sales-review__dl { display: flex; flex-direction: column; gap: 6px; margin: 0; font-size: .82rem; }
+.sales-review__dl > div { display: grid; grid-template-columns: minmax(110px, auto) 1fr; gap: 12px; }
+.sales-review__dl dt { color: oklch(var(--muted-foreground)); }
+.sales-review__dl dd { margin: 0; text-align: right; font-weight: 600; overflow-wrap: anywhere; }
+.sales-review__dl dd.is-muted { color: oklch(var(--muted-foreground)); font-weight: 500; font-style: italic; }
+.sales-review__email { color: oklch(var(--primary)); }
+.sales-review__lots { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: .8rem; }
+.sales-review__lots li { display: flex; justify-content: space-between; gap: 10px; font-variant-numeric: tabular-nums; }
+.sales-exhibitor-book__search { position: relative; }
+.sales-exhibitor-book__search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: oklch(var(--muted-foreground)); }
+.sales-exhibitor-book__search input { padding-left: 34px; }
+.sales-exhibitor-book__list { display: flex; flex-direction: column; gap: 6px; max-height: 55dvh; overflow-y: auto; }
+.sales-exhibitor-book__item { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 48px; padding: 10px 12px; text-align: left; border: 1px solid oklch(var(--border)); border-radius: 10px; background: oklch(var(--background)); cursor: pointer; overflow-wrap: anywhere; }
+.sales-exhibitor-book__item:hover, .sales-exhibitor-book__item:focus-visible { border-color: oklch(var(--primary)); }
+.sales-exhibitor-book__item strong { font-size: .84rem; }
+.sales-exhibitor-book__item span { font-size: .74rem; color: oklch(var(--muted-foreground)); }
+.sales-exhibitor-book__empty { display: flex; gap: 6px; align-items: center; font-size: .8rem; color: oklch(var(--muted-foreground)); }
+
+@media (max-width: 640px) {
+  .sales-checkout-dialog { max-height: calc(100dvh - 12px); }
+  .sales-fees-grid { grid-template-columns: 1fr; }
+  .sales-method-row { flex-direction: column; align-items: stretch; }
+  .sales-segmented { grid-template-columns: 1fr; }
+  .sales-count { min-width: 0; }
+  .sales-count__row input { flex: 0 0 80px; }
+  .sales-count__row button { flex: 1; }
+  .sales-installment-card { grid-template-columns: 1fr 1fr; }
+  .sales-installment-card__num { grid-column: 1 / -1; }
+  .sales-review__dl > div { grid-template-columns: 1fr; gap: 0; }
+  .sales-review__dl dd { text-align: left; }
+}
+@media (max-width: 380px) {
+  .sales-hide-xs { display: none; }
+  .sales-installment-card { grid-template-columns: 1fr; }
+}
