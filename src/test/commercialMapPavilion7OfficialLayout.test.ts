@@ -41,20 +41,14 @@ function positiveAreaOverlap(
 }
 
 describe('referência oficial do Pavilhão 7', () => {
-  it('adota as 171 divisões desenhadas e documenta a divergência do rodapé', () => {
+  it('adota os 57 boxes oficiais de 7,50 m²', () => {
     expect(PAVILION7_COMMERCIAL_REFERENCE.publicIdentifier).toBe('B10');
-    expect(PAVILION7_COMMERCIAL_REFERENCE.moduleCount).toBe(171);
+    expect(PAVILION7_COMMERCIAL_REFERENCE.moduleCount).toBe(57);
     expect(PAVILION7_COMMERCIAL_REFERENCE.sourceDeclaredModuleCount).toBe(57);
-    expect(PAVILION7_COMMERCIAL_REFERENCE.totalAreaM2).toBe(918.66);
+    expect(PAVILION7_COMMERCIAL_REFERENCE.totalAreaM2).toBe(917);
     expect(PAVILION7_COMMERCIAL_REFERENCE.modularAreaM2).toBe(427.5);
-    expect(PAVILION7_COMMERCIAL_REFERENCE.individualAreaM2).toBeNull();
-    expect(PAVILION7_COMMERCIAL_REFERENCE.source.discrepancy).toEqual({
-      kind: 'declared-count-conflicts-with-drawn-inventory',
-      declaredModuleCount: 57,
-      drawnModuleCount: 171,
-      resolution: 'drawn-inventory-and-aggregate-area-prevail',
-      centralIslandPlacement: 'centered-manual-confirmation-required',
-    });
+    expect(PAVILION7_COMMERCIAL_REFERENCE.individualAreaM2).toBe(7.5);
+    expect(PAVILION7_COMMERCIAL_REFERENCE.source.discrepancy).toBeNull();
   });
 
   it('preserva o frame métrico oficial, sem giro e ancorado à fachada sul', () => {
@@ -68,19 +62,19 @@ describe('referência oficial do Pavilhão 7', () => {
     });
   });
 
-  it('gera IDs contínuos, lotes neutros de 1,00 x 2,50 m e área agregada exata', () => {
-    expect(PAVILION7_COMMERCIAL_REFERENCE_CELLS).toHaveLength(171);
+  it('gera IDs contínuos, boxes de 3,00 x 2,50 m e área agregada exata', () => {
+    expect(PAVILION7_COMMERCIAL_REFERENCE_CELLS).toHaveLength(57);
     expect(PAVILION7_COMMERCIAL_REFERENCE_CELLS.map(({ number }) => number))
-      .toEqual(Array.from({ length: 171 }, (_, index) => index + 1));
+      .toEqual(Array.from({ length: 57 }, (_, index) => index + 1));
     expect(new Set(PAVILION7_COMMERCIAL_REFERENCE_CELLS.map(({ id }) => id)).size)
-      .toBe(171);
+      .toBe(57);
     expect(cell(1).id).toBe('B10:module:001');
-    expect(cell(171).id).toBe('B10:module:171');
+    expect(cell(57).id).toBe('B10:module:057');
 
     PAVILION7_COMMERCIAL_REFERENCE_CELLS.forEach((module) => {
-      expect(module.width * 49.9).toBeCloseTo(1, 10);
+      expect(module.width * 49.9).toBeCloseTo(3, 10);
       expect(module.depth * 18.3).toBeCloseTo(2.5, 10);
-      expect(module.areaM2).toBe(2.5);
+      expect(module.areaM2).toBe(7.5);
       expect(module.type).toBe('commercial-lot');
       expect(module.source.discrepancy).toBeNull();
     });
@@ -93,23 +87,30 @@ describe('referência oficial do Pavilhão 7', () => {
     expect(geometricArea).toBeCloseTo(427.5, 8);
   });
 
-  it('reproduz os cinco runs e os sentidos numéricos do desenho', () => {
+  it('reproduz os seis runs e os sentidos numéricos do desenho', () => {
     expect(PAVILION7_COMMERCIAL_REFERENCE_RUNS.map(({ numberRange }) => numberRange))
-      .toEqual([[1, 21], [22, 42], [43, 84], [85, 126], [127, 171]]);
+      .toEqual([[1, 4], [5, 15], [16, 29], [30, 43], [44, 49], [50, 57]]);
 
-    expect(cell(1).centerX).toBeLessThan(cell(21).centerX);
-    expect(metricEdges(cell(21)).right).toBeCloseTo(21.2, 10);
-    expect(metricEdges(cell(22)).left).toBeCloseTo(28.7, 10);
-    expect(cell(43).centerX).toBeLessThan(cell(84).centerX);
-    expect(cell(85).centerX).toBeGreaterThan(cell(126).centerX);
-    expect(cell(127).centerX).toBeLessThan(cell(171).centerX);
+    expect(cell(1).centerX).toBeLessThan(cell(4).centerX);
+    expect(metricEdges(cell(4)).right).toBeCloseTo(15.7, 10);
+    expect(metricEdges(cell(5)).left).toBeCloseTo(16.4, 10);
+    expect(cell(5).centerX).toBeLessThan(cell(15).centerX);
+    expect(cell(16).centerX).toBeLessThan(cell(29).centerX);
+    expect(cell(43).centerX).toBeLessThan(cell(30).centerX);
+    expect(cell(44).centerX).toBeLessThan(cell(49).centerX);
+    expect(cell(50).centerX).toBeLessThan(cell(57).centerX);
 
     expect(metricEdges(PAVILION7_COMMERCIAL_REFERENCE_RUNS[2].bounds).left)
       .toBeCloseTo(3.95, 10);
     expect(metricEdges(PAVILION7_COMMERCIAL_REFERENCE_RUNS[2].bounds).right)
       .toBeCloseTo(45.95, 10);
-    expect(cell(43).width).toBeCloseTo(cell(85).width, 12);
-    expect(cell(43).depth).toBeCloseTo(cell(85).depth, 12);
+    expect(cell(16).width).toBeCloseTo(cell(43).width, 12);
+    expect(cell(16).depth).toBeCloseTo(cell(43).depth, 12);
+    PAVILION7_COMMERCIAL_REFERENCE_CELLS.forEach((module, index) => {
+      PAVILION7_COMMERCIAL_REFERENCE_CELLS.slice(index + 1).forEach((other) => {
+        expect(positiveAreaOverlap(module, other)).toBe(false);
+      });
+    });
   });
 
   it('mantém corredores livres e o vão frontal oficial de 7,50 m', () => {

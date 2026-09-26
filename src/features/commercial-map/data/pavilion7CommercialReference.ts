@@ -137,7 +137,7 @@ export const PAVILION7_COMMERCIAL_REFERENCE_CORRIDORS = [
     id: 'northwest-access',
     label: 'Entrada e saída norte',
     kind: 'access',
-    ...PROJECT.rect(0.2, 0.2, 4.5, 2.5),
+    ...PROJECT.rect(0.2, 0.2, 3.5, 2.5),
   },
 ] as const satisfies readonly CommercialPavilionReferenceCorridor[];
 
