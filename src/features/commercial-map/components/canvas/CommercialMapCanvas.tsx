@@ -1490,8 +1490,8 @@ function BatchedLots({
   const geometryEntitiesRef = useRef<MapEntity[]>([]);
   if (geometryEntitiesRef.current.length !== entries.length || entries.some((entry, i) => entry.entity !== geometryEntitiesRef.current[i])) geometryEntitiesRef.current = entries.map(entry => entry.entity);
   const geometryEntities = geometryEntitiesRef.current;
-  const numberedEntities = useMemo(() => publicPolicy ? geometryEntities
-    : geometryEntities.filter(hasRevisedExporuralNumbers), [geometryEntities, publicPolicy]);
+  // Numeração fixa removida no mapa interno (Exporural): o número aparece só ao consultar o lote.
+  const numberedEntities = useMemo(() => publicPolicy ? geometryEntities : [], [geometryEntities, publicPolicy]);
   const invalidate = useThree((state) => state.invalidate);
   const reducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
   const hoveredRef = useRef<string | null>(null);
