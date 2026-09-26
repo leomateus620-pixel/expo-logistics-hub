@@ -22,6 +22,14 @@ export function SoldLotLocks({ surfaces, obstacles = NO_OBSTACLES, selectedId, h
   // Weak caching permits status/query refreshes without recomputing polygon search.
   const placementCache = useMemo(() => ({ obstacles: stableObstacles, values: new WeakMap<SoldLotSurface['geometry'], ReturnType<typeof placeSoldLock>>() }), [stableObstacles]);
   const placements = placementCache.values;
+  const logoGroups = useMemo(() => {
+    const groups = new Map<string, SoldLotSurface[]>();
+    for (const surface of surfaces) if (isSoldLot(surface.status) && surface.logoUrl) {
+      const group = groups.get(surface.logoUrl) ?? [];
+      group.push(surface); groups.set(surface.logoUrl, group);
+    }
+    return groups;
+  }, [surfaces]);
   const resources = useMemo(() => {
     const geometry = createSoldLockGeometry();
     const material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.48, metalness: 0.16 });
@@ -37,7 +45,7 @@ export function SoldLotLocks({ surfaces, obstacles = NO_OBSTACLES, selectedId, h
     let count = 0;
     const ids: string[] = [];
     for (const surface of surfaces) {
-      if (!isSoldLot(surface.status)) continue;
+      if (!isSoldLot(surface.status) || surface.logoUrl) continue;
       if (!placements.has(surface.geometry)) placements.set(surface.geometry, placeSoldLock(surface, stableObstacles));
       const placement = placements.get(surface.geometry);
       if (!placement) continue;
@@ -57,5 +65,51 @@ export function SoldLotLocks({ surfaces, obstacles = NO_OBSTACLES, selectedId, h
   useEffect(() => () => {
     disposeInstancedMesh(resources.mesh); resources.geometry.dispose(); resources.material.dispose();
   }, [resources]);
-  return <primitive object={resources.mesh} dispose={null} />;
+  return <>
+    <primitive object={resources.mesh} dispose={null} />
+    {[...logoGroups].map(([url, group]) => <SoldLogoGroup key={url} url={url} surfaces={group} obstacles={stableObstacles} placements={placements} />)}
+  </>;
+}
+
+function SoldLogoGroup({ url, surfaces, obstacles, placements }: {
+  url: string; surfaces: SoldLotSurface[]; obstacles: readonly Coordinate[][];
+  placements: WeakMap<SoldLotSurface['geometry'], ReturnType<typeof placeSoldLock>>;
+}) {
+  const invalidate = useThree(state => state.invalidate);
+  const assets = useMemo(() => {
+    const texture = new THREE.Texture();
+    texture.colorSpace = THREE.SRGBColorSpace;
+    const geometry = new THREE.PlaneGeometry(1, 1);
+    const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, transparent: true, depthWrite: false });
+    const mesh = new THREE.InstancedMesh(geometry, material, Math.max(1, surfaces.length));
+    mesh.name = 'sold-lot-logos'; mesh.raycast = NO_RAYCAST;
+    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    return { mesh, geometry, material, texture };
+  }, [surfaces.length]);
+  useEffect(() => {
+    let live = true;
+    const image = new Image();
+    image.onload = () => { if (!live) return; assets.texture.image = image; assets.texture.needsUpdate = true; invalidate(); };
+    image.onerror = () => { if (live) { assets.mesh.visible = false; invalidate(); } };
+    image.src = url;
+    return () => { live = false; image.src = ''; };
+  }, [assets, url, invalidate]);
+  useLayoutEffect(() => {
+    const matrix = new THREE.Matrix4(), position = new THREE.Vector3(), rotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0)), scale = new THREE.Vector3();
+    let count = 0;
+    for (const surface of surfaces) {
+      if (!placements.has(surface.geometry)) placements.set(surface.geometry, placeSoldLock(surface, obstacles));
+      const placement = placements.get(surface.geometry);
+      if (!placement) continue;
+      position.fromArray(placement.position);
+      const size = Math.max(0.06, Math.min(placement.scale * 1.25, placement.clearance * 1.45));
+      scale.set(size, size, 1);
+      matrix.compose(position, rotation, scale);
+      assets.mesh.setMatrixAt(count++, matrix);
+    }
+    assets.mesh.count = count; assets.mesh.instanceMatrix.needsUpdate = true;
+    assets.mesh.computeBoundingBox(); assets.mesh.computeBoundingSphere(); invalidate();
+  }, [assets, surfaces, obstacles, placements, invalidate]);
+  useEffect(() => () => { disposeInstancedMesh(assets.mesh); assets.geometry.dispose(); assets.material.dispose(); assets.texture.dispose(); }, [assets]);
+  return <primitive object={assets.mesh} dispose={null} />;
 }

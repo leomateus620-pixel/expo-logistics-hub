@@ -167,6 +167,7 @@ export interface CommercialLot {
   commercialNotes: string | null;
   internalNotes: string | null;
   currentBuyer: string | null;
+  saleLogoUrl?: string | null;
   reservationExpiresAt: string | null;
   saleDate: string | null;
   salespersonName: string | null;

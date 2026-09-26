@@ -880,7 +880,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       const state = moduleStateById.get(cell.id);
       const interaction = resolveModuleInteractionState(cell.id, state ?? null, activeSelectedId, activeHoveredId, salesSelectedLotIds);
       const visual = resolveModuleVisualGeometry(interaction, flatModules);
-      surfaces.push({ id: cell.id, status: state?.status ?? null, preferredAnchor, geometry: {
+      surfaces.push({ id: cell.id, status: state?.status ?? null, logoUrl: state?.logoUrl, preferredAnchor, geometry: {
         coordinates: [ring], elevation: floorY + moduleBaseHeight + 0.008,
         extrusionHeight: moduleHeight * visual.heightScale,
       } });
