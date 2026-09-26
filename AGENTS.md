@@ -6,3 +6,4 @@
 
 - Identidade visual opcional de venda fica vinculada ao pedido confirmado em bucket privado; mapas só recebem URLs temporárias após autorização por projeto ou link de escopo — por quê: evitar vazamento e aplicar a mesma imagem a todos os itens sem replicar arquivos.
 - Espaços comerciais sem número podem manter `lot_number` nulo e uma faixa de preço explícita independente do número — por quê: a área de 568,78 m² da Expo Rural deve ser vendável sem inventar identidade ou mudar os preços das demais parcelas.
+- A cena externa e o corte dos pavilhões não montam atlas numéricos permanentes; a identificação contextual usa a seleção, enquanto a planta interna detalhada conserva sua numeração — por quê: manter o mapa navegável sem poluição e preservar a leitura da planta interna.

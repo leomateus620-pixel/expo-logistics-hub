@@ -7,7 +7,6 @@ import { PUBLIC_NAVIGATION_SAVE_EVENT, savePublicNavigation, type PublicNavigati
 import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
 import { PublicScenePolicyContext, usePublicScenePolicy } from './PublicScenePolicyContext';
 import { PublicContextGroup, PublicMaterialPool } from './PublicContextGroup';
-import { PublicLotNumbers } from './PublicLotNumbers';
 import { resolveLotIdentity } from '../../utils/lotIdentity';
 import { SoldLotLocks } from './SoldLotLocks';
 import type { Coordinate } from '../../types';
@@ -1490,8 +1489,6 @@ function BatchedLots({
   const geometryEntitiesRef = useRef<MapEntity[]>([]);
   if (geometryEntitiesRef.current.length !== entries.length || entries.some((entry, i) => entry.entity !== geometryEntitiesRef.current[i])) geometryEntitiesRef.current = entries.map(entry => entry.entity);
   const geometryEntities = geometryEntitiesRef.current;
-  const numberedLots = useMemo(() => entries.filter(entry => entry.lot.lotNumber != null && String(entry.lot.lotNumber).trim()).map(entry => entry.lot), [entries]);
-  const numberedEntities = useMemo(() => entries.filter(entry => entry.lot.lotNumber != null && String(entry.lot.lotNumber).trim()).map(entry => entry.entity), [entries]);
   const invalidate = useThree((state) => state.invalidate);
   const reducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
   const hoveredRef = useRef<string | null>(null);
@@ -1509,7 +1506,6 @@ function BatchedLots({
   const lockSurfaces = useMemo(() => entries.map(({ entity, lot }) => ({
     id: entity.id, status: lot.status, logoUrl: lot.saleLogoUrl, geometry: entity.geometry,
   })), [entries]);
-  const soldEntityIds = useMemo(() => new Set(entries.filter(entry => isSoldLot(entry.lot.status)).map(entry => entry.entity.id)), [entries]);
   const batch = useMemo(() => {
     if (entries.length === 0) return null;
     const sourceGeometries = entries.map(({ entity }) => {
@@ -1767,7 +1763,6 @@ function BatchedLots({
           toneMapped={false}
         />
       </lineSegments>
-      {numberedEntities.length > 0 && <PublicLotNumbers entities={numberedEntities} lots={numberedLots} soldEntityIds={soldEntityIds} />}
       {selectedEntity && <LotSelectionOutline entity={selectedEntity} />}
     </>
   );

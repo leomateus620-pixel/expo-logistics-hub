@@ -72,7 +72,6 @@
 /* Drei HTML labels stay inside the canvas stacking context, below the sheet. */
 .public-map-shell[data-public-external] .public-map-canvas { isolation: isolate; }
 .public-map-shell[data-public-external] .commercial-map-label { display: flex; flex-wrap: wrap; gap: 4px 8px; min-width: 150px; max-width: 210px; padding: 8px 10px; border: 1px solid #69747d; border-radius: 10px; background: #fffffff2; color: #26313b; font-size: 12px; box-shadow: 0 3px 12px #0002; }
-.public-map-shell[data-public-external] .commercial-map-label[data-map-label-mode='focus'] { display: none; }
 .public-map-shell[data-public-external] .commercial-map-label.has-buyer { max-width: min(230px, calc(100vw - 32px)); }
 .public-map-canvas.is-concealed { position: absolute; inset: 0; visibility: hidden; pointer-events: none; }
 .public-map-shell button:focus-visible, .public-map-shell input:focus-visible { outline: 3px solid #377ddd; outline-offset: 3px; }

@@ -576,7 +576,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     plan.zones.map((zone, index) => [zone.id, index]),
   ), [plan.zones]);
   const numberTexture = useMemo(
-    () => createModuleNumberTexture(
+    () => mode === 'cutaway' ? null : createModuleNumberTexture(
       plan,
       layout,
       reducedGraphics,
@@ -586,7 +586,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       screenAlignedLabels,
       moduleStateById,
     ),
-    [gl, labelRotationRadians, screenAlignedLabels, layout, plan, reducedGraphics, viewportSize.width, moduleStateById],
+    [gl, labelRotationRadians, screenAlignedLabels, layout, mode, plan, reducedGraphics, viewportSize.width, moduleStateById],
   );
   const moduleMaterial = useMemo(() => new THREE.MeshStandardMaterial({
     color: '#ffffff',
