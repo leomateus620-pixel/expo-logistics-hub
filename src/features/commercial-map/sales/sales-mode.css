@@ -118,7 +118,7 @@
 
 .sales-cart__item {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 2px 10px;
   align-items: center;
   padding: 10px 12px;
@@ -131,7 +131,6 @@
 .sales-cart__item small { grid-area: 2 / 1; font-size: 0.72rem; color: oklch(var(--muted-foreground)); }
 .sales-cart__item b { grid-area: 1 / 2 / span 2 / 3; align-self: center; font-size: 0.92rem; text-align: right; }
 .sales-cart__item.is-pending b { color: oklch(var(--muted-foreground)); font-weight: 500; font-size: 0.74rem; }
-.sales-cart__item { grid-template-columns: minmax(0, 1fr) auto auto; }
 .sales-cart__item strong, .sales-cart__item small { min-width: 0; overflow-wrap: anywhere; }
 
 .sales-cart__remove {

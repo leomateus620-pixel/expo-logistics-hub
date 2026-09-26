@@ -24,7 +24,7 @@ export function toSalesEntry(lot: CommercialLot, context?: string | null, entity
     lotId: lot.id,
     publicIdentifier: lot.publicIdentifier,
     displayName: lot.displayName || lot.publicIdentifier,
-    context: context ?? lot.block ?? null,
+    context: context ?? identity.area ?? identity.location,
     title: identity.title,
     location: identity.location,
     area: identity.area,
