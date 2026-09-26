@@ -1,5 +1,10 @@
 # Roadmap
 
+## Legendas contextuais dos lotes
+- [x] Retirar números permanentes da cena externa e dos cortes dos pavilhões, preservando a planta interna detalhada.
+- [x] Manter identificação contextual do lote selecionado também nos links públicos.
+- [ ] Conferir visualmente mapa administrativo, Modo Vendas e links públicos em desktop e celular.
+
 ## Identificação oficial dos espaços comerciais
 - [x] Resolver número/quadra/segmento/pavilhão a partir do cadastro oficial sem deduzir metragem ou renumeração do código técnico.
 - [x] Aplicar identificação no mapa, seleção, carrinho, revisão, painel, mini mapa, consulta pública e detalhe de venda sem mudar snapshots.
