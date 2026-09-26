@@ -120,5 +120,8 @@
 - [x] Preflight somente-leitura do banco vivo contra a proposta (projeto, revisão, inventário, vínculos, colisões, vias, calibrações, snapshots)
 - [x] Cruzar crosswalk/manifesto com inventário vivo: 13 preservações candidatas já têm área oficial idêntica — nenhuma escrita necessária
 - [x] Confirmar ausência de vínculos comerciais nos 95 lotes R/S e ausência de colisões de identificadores
-- [ ] Renumeração, divisões, reparcelamentos, via transversal e novas geometrias — bloqueados pelo próprio relatório (calibração, B37/B38 sobre S-22/S-23/S-24, approvals_resolvidas.json não resolvido); Q-S-36 existe ativo no banco e sua eliminação depende dessa resolução
+- [x] Etapa 1: pacote reextraído (24 arquivos, SHA256 conferidos); cópia de segurança cbe3e0e7-7102-45e7-b0fe-46c4e1061334 (111 entidades, 95 lotes, 111 geometrias)
+- [ ] Etapa 2: decisões do usuário (renumerações, divisões, B37/B38, Q-S-36, 568,78 m², área oficial) → approvals_resolvidas.json (hoje cartography_approved=false) — aguardando usuário
+- [ ] Etapa 3: migração Exporural (bloqueada pela Etapa 2)
+- [ ] Etapa 4: verificação pós-migração
 - Não publicar (pedido permanente do usuário)
