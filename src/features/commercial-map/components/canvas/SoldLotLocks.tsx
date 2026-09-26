@@ -45,7 +45,7 @@ export function SoldLotLocks({ surfaces, obstacles = NO_OBSTACLES, selectedId, h
     let count = 0;
     const ids: string[] = [];
     for (const surface of surfaces) {
-      if (!isSoldLot(surface.status) || surface.logoUrl) continue;
+      if (!isSoldLot(surface.status)) continue;
       if (!placements.has(surface.geometry)) placements.set(surface.geometry, placeSoldLock(surface, stableObstacles));
       const placement = placements.get(surface.geometry);
       if (!placement) continue;
@@ -103,6 +103,7 @@ function SoldLogoGroup({ url, surfaces, obstacles, placements }: {
       if (!placement) continue;
       position.fromArray(placement.position);
       const size = Math.max(0.06, Math.min(placement.scale * 1.25, placement.clearance * 1.45));
+      position.y += placement.scale * 0.12 + 0.015;
       scale.set(size, size, 1);
       matrix.compose(position, rotation, scale);
       assets.mesh.setMatrixAt(count++, matrix);
