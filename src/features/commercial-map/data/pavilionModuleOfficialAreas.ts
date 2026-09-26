@@ -19,7 +19,7 @@ export const PAVILION_MODULE_AREA_SOURCE_DOCUMENTS = {
   B1: 'Pavilhao_01_Lotes_e_Metragens.pdf',
   B6: 'Planta Pavilhão 3 — Fenasoja 2028 (desenho set/2026).pdf',
   B8: 'Pavilhao_05_Lotes_e_Metragens.pdf',
-  B10: 'Pavilhao_07_Lotes_e_Metragens.pdf',
+  B10: 'Ajuste_Pav07.pdf (setembro/2026)',
   B4: 'Planta PAVILHÃO 8 - Fenasoja 2028.pdf',
   B3: 'Pavilhao_12_Lotes_e_Metragens.pdf',
   B5: 'Planta Pavilhão 13 — Fenasoja 2028 (desenho set/2026).pdf',
@@ -149,16 +149,14 @@ const PAVILION_AREA_PLANS: readonly PavilionAreaPlan[] = [
   {
     pavilionId: 'B10',
     pavilionNumber: 7,
-    moduleCount: 171,
+    moduleCount: 57,
     expectedTotalSqm: 427.5,
-    documentalCaveat:
-      'O carimbo do croqui registra 57 módulos, mas a malha desenha e numera 171 células, que são as unidades cadastradas. A soma de 427,50 m² coincide nas duas leituras.',
     bands: [
       {
-        ranges: [[1, 171]],
-        areaSqm: 2.5,
-        evidence: 'nominal',
-        method: NOMINAL(1, 2.5),
+        ranges: [[1, 57]],
+        areaSqm: 7.5,
+        evidence: 'written',
+        method: 'Croqui oficial setembro/2026: 57 boxes × 7,50 m² (3,00 × 2,50 m)',
       },
     ],
   },

@@ -356,7 +356,7 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
   B10: {
     publicIdentifier: 'B10',
     pavilionNumber: 7,
-    officialName: 'Pavilhão 7 — Agroindústrias',
+    officialName: 'Pavilhão 7 — Agricultura Familiar / Agroindústrias',
     activity: 'Agroindústrias / Agricultura Familiar',
     variant: 'agroindustry-market',
     roofProfile: 'longitudinal-gable',

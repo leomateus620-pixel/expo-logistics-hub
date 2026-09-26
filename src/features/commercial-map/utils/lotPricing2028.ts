@@ -87,8 +87,8 @@ export function formatAreaSqmLabel(value: number | null | undefined): string | n
   return `${AREA_FORMATTER.format(value)} m²`;
 }
 
-/** Pavilhão 7 (bloco interno B10) permanece sem preço oficial definido. */
-export const UNPRICED_PAVILION_LABEL = 'Ainda não definido';
+/** Mensagem para uma etapa sem valor, sem bloquear as demais etapas do lote. */
+export const UNPRICED_PAVILION_LABEL = 'Valor ainda não definido';
 
 export function isPricingExcluded(pricing: Pick<LotPricing2028, 'resolutionStatus'> | null | undefined): boolean {
   return pricing?.resolutionStatus === 'EXCLUIDO';
@@ -98,8 +98,7 @@ export function isPricingAvailable(pricing: LotPricing2028 | null | undefined): 
   return Boolean(
     pricing
     && pricing.resolutionStatus === 'OK'
-    && pricing.renovacaoTotal != null
-    && pricing.segundaTotal != null,
+    && (pricing.renovacaoTotal != null || pricing.segundaTotal != null),
   );
 }
 

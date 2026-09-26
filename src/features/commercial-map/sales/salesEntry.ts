@@ -4,8 +4,8 @@ import { resolveLotIdentity } from '../utils/lotIdentity';
 
 /**
  * Elegibilidade comercial é decidida no servidor pela view
- * `commercial_sale_eligibility` (área oficial, preço 2028 resolvido, Pavilhão 7
- * fora, sem venda/reserva/negociação/contrato e bloqueio apenas técnico).
+ * `commercial_sale_eligibility` (área oficial, preço 2028 resolvido,
+ * sem venda/reserva/negociação/contrato e bloqueio apenas técnico).
  * O cliente só espelha esse conjunto; nunca inventa regra de status.
  */
 export function isSellableLot(

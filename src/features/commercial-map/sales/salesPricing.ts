@@ -44,7 +44,13 @@ export function buildCartLine(
   }
   const pricePerSqm = stage === 'RENOVACAO' ? pricing.renovacaoPricePerSqm : pricing.segundaPricePerSqm;
   const total = stageTotal(pricing, stage);
-  if (pricing.resolutionStatus !== 'OK' || pricePerSqm == null || total == null) {
+  if (pricePerSqm == null || total == null) {
+    return {
+      entry, pricing, areaSqm: pricing.officialAreaSqm, pricePerSqm: null, total: null,
+      unpriced: true, pendingReason: pricing.resolutionStatus === 'REGRA_AMBIGUA' ? 'Pendente de conferência' : 'Valor ainda não definido',
+    };
+  }
+  if (pricing.resolutionStatus !== 'OK' && pricing.resolutionStatus !== 'SEM_REGRA') {
     return {
       entry, pricing, areaSqm: pricing.officialAreaSqm, pricePerSqm, total: null,
       unpriced: true, pendingReason: 'Pendente de conferência',
