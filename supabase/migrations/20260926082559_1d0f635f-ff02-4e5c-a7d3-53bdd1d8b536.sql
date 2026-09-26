@@ -1,0 +1,1 @@
+SELECT 'geometry conflict requires correction' AS status;
