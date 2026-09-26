@@ -14,7 +14,7 @@ export type Pavilion7CommercialReferenceCell =
 
 /**
  * Official commercial hall: 49.90 m x 18.30 m. The source drawing places the
- * public entrance on its south edge. September 2026 CROQUI HORTI 2025:
+ * public entrance on its south edge. Official September 2026 drawing:
  * 57 independent 3.00 x 2.50 m boxes, 427.50 m² commercial / 917.00 m² total.
  */
 const PROJECT = createCommercialPavilionMetricProjector(49.9, 18.3, 0);

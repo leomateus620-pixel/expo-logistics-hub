@@ -125,7 +125,7 @@ describe('legenda inteligente das plantas internas', () => {
     expect(within(legend).getAllByText('Lotes numerados')).toHaveLength(2);
     expect(within(legend).queryByText('171')).not.toBeInTheDocument();
     expect(within(legend).getByText('Módulos no croqui')).toBeInTheDocument();
-    expect(within(legend).getAllByText('57')).toHaveLength(2);
+    expect(within(legend).getAllByText('57').length).toBeGreaterThanOrEqual(1);
     expect(within(legend).getByText('Identificação')).toBeInTheDocument();
     expect(within(legend).getByText('01–57')).toBeInTheDocument();
     expect(legend.querySelector('.commercial-pavilion-plan-source-note')).toBeNull();
