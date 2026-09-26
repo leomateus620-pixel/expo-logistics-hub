@@ -115,3 +115,10 @@
 - [x] Override por lote/etapa na fonte oficial, RPCs com permissão, histórico, edição inline na lateral e nos módulos.
 - [x] Corrigir contenção responsiva do editor e remover “Vendido por” dos cards de preço.
 - [ ] Revisar 9 testes antigos de `commercialMapPavilionModuleCard.test.tsx` (expectativas desatualizadas desde o redesign da lateral/áreas; não relacionados aos preços).
+
+## Exporural 2028 — preflight e áreas oficiais (relatório Codex 25/09/2026)
+- [x] Preflight somente-leitura do banco vivo contra a proposta (projeto, revisão, inventário, vínculos, colisões, vias, calibrações, snapshots)
+- [x] Cruzar crosswalk/manifesto com inventário vivo: 13 preservações candidatas já têm área oficial idêntica — nenhuma escrita necessária
+- [x] Confirmar ausência de vínculos comerciais nos 95 lotes R/S e ausência de colisões de identificadores
+- [ ] Renumeração, divisões, reparcelamentos, via transversal e novas geometrias — bloqueados pelo próprio relatório (calibração, B37/B38 sobre S-22/S-23/S-24, approvals_resolvidas.json não resolvido); Q-S-36 existe ativo no banco e sua eliminação depende dessa resolução
+- Não publicar (pedido permanente do usuário)
