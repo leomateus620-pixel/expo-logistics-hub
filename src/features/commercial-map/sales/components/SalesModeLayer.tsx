@@ -42,13 +42,14 @@ export function SalesModeLayer({ projectId, lots, entities = [] }: { projectId: 
 
   useLayoutEffect(() => {
     const store = useSalesStore.getState();
-    if (!store.selection.length) return;
+    if (!store.selection.length || !entities.length) return;
     const byId = new Map(lots.map(lot => [lot.id, lot]));
     const byEntity = new Map(entities.map(entity => [entity.id, entity]));
     const next = store.selection.map(entry => {
       const lot = byId.get(entry.lotId);
       if (!lot) return entry;
       const entity = byEntity.get(lot.entityId);
+      if (!entity) return entry;
       const parent = entity?.parentEntityId ? byEntity.get(entity.parentEntityId) : null;
       return toSalesEntry(lot, null, entity, parent);
     });
