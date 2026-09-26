@@ -1,0 +1,12 @@
+
+ RUN  v3.2.4 C:/Users/Leonardo/Desktop/expo-logistics-hub
+
+ ✓ src/test/exporural2028Revision.test.ts (15 tests) 2567ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > não apresenta auto-interseção, lotes sobrepostos ou invasão de vias e estruturas protegidas  939ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > gera paisagismo finito e limitado com anéis rotacionados e junções adicionais  1126ms
+ ✓ src/test/publicMapScenePolicy.test.ts (9 tests) 328ms
+
+ Test Files  2 passed (2)
+      Tests  24 passed (24)
+   Start at  22:50:35
+   Duration  22.62s (transform 3.63s, setup 1.06s, collect 10.59s, tests 2.89s, environment 3.74s, prepare 622ms)

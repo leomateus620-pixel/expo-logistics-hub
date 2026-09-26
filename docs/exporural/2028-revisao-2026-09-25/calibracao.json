@@ -1,0 +1,210 @@
+{
+  "revision": "2028-exporural-2026-09-25.1",
+  "status": "REQUIRES_CARTOGRAPHIC_APPROVAL",
+  "coordinateSystem": "LOCAL_NORMALIZED",
+  "srid": 0,
+  "units": "scene units; 0.15 scene units per metre",
+  "nativeRaster": {
+    "width": 9934,
+    "height": 7017,
+    "origin": "top left",
+    "x": "right",
+    "y": "down"
+  },
+  "inspectionGrid": {
+    "width": 1888,
+    "height": 1333.6114354741292,
+    "nativePixelsPerGridUnit": 5.2616525423728815
+  },
+  "rasterGridToHistoricalSourceAffine": [
+    [
+      1.5056770501648136,
+      0.017094028627930902
+    ],
+    [
+      -0.00038893441509291193,
+      1.5053614459728695
+    ],
+    [
+      3151.3107458024915,
+      770.1650528245467
+    ]
+  ],
+  "historicalSourceToLocal": {
+    "crop": [
+      600,
+      900,
+      5500,
+      4150
+    ],
+    "width": 120,
+    "height": 90.54545454545455
+  },
+  "controls": [
+    {
+      "name": "S west upper corner",
+      "raster_native_px": [
+        3025.976,
+        1730.031
+      ],
+      "repository_source": [
+        4004,
+        1277
+      ],
+      "fitted_source": [
+        4017.097735716593,
+        1274.9586721243493
+      ],
+      "residual_m": 1.9281244109106996
+    },
+    {
+      "name": "S east island upper west corner",
+      "raster_native_px": [
+        7224.775,
+        1696.883
+      ],
+      "repository_source": [
+        5227,
+        1277
+      ],
+      "fitted_source": [
+        5218.630472034929,
+        1279.115929859809
+      ],
+      "residual_m": 1.2556877647777849
+    },
+    {
+      "name": "R central upper west tangent",
+      "raster_native_px": [
+        2926.005,
+        3433.754
+      ],
+      "repository_source": [
+        3994,
+        1763
+      ],
+      "fitted_source": [
+        3988.3639347998546,
+        1762.0699217864337
+      ],
+      "residual_m": 0.8308787921893754
+    },
+    {
+      "name": "R small west island west tangent",
+      "raster_native_px": [
+        7254.24,
+        4493.977
+      ],
+      "repository_source": [
+        5228,
+        2080
+      ],
+      "fitted_source": [
+        5226.8555059807895,
+        2079.461801099303
+      ],
+      "residual_m": 0.18395972921696127
+    },
+    {
+      "name": "R01 west upper corner",
+      "raster_native_px": [
+        1855.785,
+        4565.01
+      ],
+      "repository_source": [
+        3687,
+        2080
+      ],
+      "fitted_source": [
+        3682.0256018970867,
+        2082.2457072476795
+      ],
+      "residual_m": 0.793865238647533
+    },
+    {
+      "name": "R62 west upper corner",
+      "raster_native_px": [
+        7807.24,
+        5514.212
+      ],
+      "repository_source": [
+        5378,
+        2374
+      ],
+      "fitted_source": [
+        5385.026749570025,
+        2373.147967882238
+      ],
+      "residual_m": 1.02955896326204
+    }
+  ],
+  "independentChecks": [
+    {
+      "name": "R13 southwest",
+      "raster_native_px": [
+        322.013,
+        4898.072
+      ],
+      "repository_source": [
+        3244,
+        2165
+      ],
+      "fitted_source": [
+        3243.0961222255683,
+        2172.5521774327203
+      ],
+      "residual_m": 1.1063382019052532
+    },
+    {
+      "name": "R02 southeast",
+      "raster_native_px": [
+        2759.211,
+        5678.375
+      ],
+      "repository_source": [
+        3940,
+        2415.095355731225
+      ],
+      "fitted_source": [
+        3940.4680528881513,
+        2403.7152339309546
+      ],
+      "residual_m": 1.6566898914776942
+    },
+    {
+      "name": "R west band northeast",
+      "raster_native_px": [
+        2735.533,
+        3387.978
+      ],
+      "repository_source": [
+        3943.012028601695,
+        1763
+      ],
+      "fitted_source": [
+        3933.8618093133,
+        1748.3544733701387
+      ],
+      "residual_m": 2.511852870531252
+    }
+  ],
+  "gridAxesScaleSourceUnits": [
+    1.5057740817293102,
+    1.505361496216609
+  ],
+  "gridXRotationDegrees": 0.6504539727570954,
+  "precision": "Raster digitization and repository registration; not a cadastral survey or centimetric accuracy",
+  "extraction": {
+    "source": "Fenasoja_So_Numeros_300dpi.png",
+    "threshold": 230,
+    "simplificationNativePx": 3.2,
+    "sharedEndpointSnapGridPx": 1.4,
+    "note": "Extracted closed white faces. Shared divider nodes averaged; junctions snapped. No area fitting."
+  },
+  "previousAreaTolerancePercent": 0.15,
+  "areaToleranceApproved": false,
+  "controlsRmseMeters": 1.1334923857862276,
+  "controlsMaxMeters": 1.9281244109106996,
+  "independentChecksRmseMeters": 1.8509466457928507,
+  "independentChecksMaxMeters": 2.511852870531252
+}

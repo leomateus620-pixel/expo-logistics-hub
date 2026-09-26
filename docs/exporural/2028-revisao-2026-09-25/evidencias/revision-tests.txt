@@ -1,0 +1,14 @@
+
+> vite_react_shadcn_ts@0.0.0 test
+> vitest run src/test/exporural2028Revision.test.ts
+
+
+ RUN  v3.2.4 C:/Users/Leonardo/Desktop/expo-logistics-hub
+
+ ✓ src/test/exporural2028Revision.test.ts (11 tests) 994ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > não apresenta auto-interseção, lotes sobrepostos ou invasão de vias e estruturas protegidas  549ms
+
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+   Start at  22:04:24
+   Duration  13.50s (transform 2.28s, setup 1.96s, collect 4.60s, tests 994ms, environment 4.34s, prepare 520ms)

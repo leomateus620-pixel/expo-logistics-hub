@@ -1,0 +1,92 @@
+
+ RUN  v3.2.4 C:/Users/Leonardo/Desktop/expo-logistics-hub
+
+ ❯ src/test/commercialMapExporuralLandscape.test.ts (5 tests | 1 failed) 11714ms
+   ✓ Exporural presentation boundaries and infrastructure > preserves every entity, commercial record and official ring while creating bounded presentation meshes  2511ms
+   ✓ Exporural presentation boundaries and infrastructure > adds no landscape to another segment, building, path or road 3ms
+   ✓ Exporural presentation boundaries and infrastructure > keeps every slope triangle outside all commercial lots, roads and buildings  3525ms
+   × Exporural presentation boundaries and infrastructure > joins a single rising cut face to a level terrace without a reverse berm or parcel overlap 5662ms
+     → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+   ✓ Exporural presentation boundaries and infrastructure > keeps the turf hook through full/economy transitions without duplicate shader declarations 9ms
+ ❯ src/test/commercialMapExplorer.test.ts (6 tests | 1 failed) 887ms
+   ✓ explorador compartilhado de entidades do mapa comercial > indexa a base completa e prioriza identificadores exatos ou internos 111ms
+   ✓ explorador compartilhado de entidades do mapa comercial > busca sem acentos por nome, quadra, lote, pavilhão e rua 125ms
+   ✓ explorador compartilhado de entidades do mapa comercial > inclui empresa, contrato e palavras-chave armazenadas sem inventar dados de produção 262ms
+   ✓ explorador compartilhado de entidades do mapa comercial > filtra cada situação comercial e combina texto, tipo, local e verificação 266ms
+   ✓ explorador compartilhado de entidades do mapa comercial > ordena por relevância, nome, localização e situação com desempate estável 54ms
+   × explorador compartilhado de entidades do mapa comercial > expõe somente facetas derivadas dos metadados existentes 48ms
+     → expected 264 to be 262 // Object.is equality
+ ❯ src/test/commercialMapExporuralArchitecture.test.ts (6 tests | 1 failed) 280ms
+   × C4 / E-06 architecture and selection activity > preserves the complete approved official inventory and compound placement 252ms
+     → expected '89ebe510b6605d96d9f66b8057a8e21089b2c…' to be '5abf0ed204b10d98e17d1a6f171add3a6c3b6…' // Object.is equality
+   ✓ C4 / E-06 architecture and selection activity > builds actual apertures, with conserved wall area and no solid piece across an opening 3ms
+   ✓ C4 / E-06 architecture and selection activity > keeps the same roof planes and openings in both detail levels, without overlapping north/south panels 13ms
+   ✓ C4 / E-06 architecture and selection activity > uses the documented photo vector for yaw and keeps its rotor axis independent of blade phase 1ms
+   ✓ C4 / E-06 architecture and selection activity > runs the same moderate wind speed at 30, 60 and 120 frames per second 7ms
+   ✓ C4 / E-06 architecture and selection activity > converges to a fully idle state after rapid and repeated selections 2ms
+ ✓ src/test/exporural2028Revision.test.ts (14 tests) 2651ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > não apresenta auto-interseção, lotes sobrepostos ou invasão de vias e estruturas protegidas  769ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > gera paisagismo finito e limitado com anéis rotacionados e junções adicionais  1228ms
+ ✓ src/test/commercialMapExporural.test.ts (11 tests) 818ms
+ ✓ src/test/commercialDashboardAnalytics.test.ts (8 tests) 26ms
+stderr | src/test/commercialMapIrregularSalesSelection.test.ts
+WARNING: Multiple instances of Three.js being imported.
+
+ ✓ src/test/commercialMapIrregularSalesSelection.test.ts (12 tests) 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/commercialMapExplorer.test.ts > explorador compartilhado de entidades do mapa comercial > expõe somente facetas derivadas dos metadados existentes
+AssertionError: expected 264 to be 262 // Object.is equality
+
+- Expected
++ Received
+
+- 262
++ 264
+
+ ❯ src/test/commercialMapExplorer.test.ts:125:93
+    123|   it('expõe somente facetas derivadas dos metadados existentes', () =>…
+    124|     const facets = buildEntityExplorerFacets(officialIndex);
+    125|     expect(facets.classifications.find((option) => option.value === 'S…
+       |                                                                                             ^
+    126|     expect(facets.classifications.find((option) => option.value === 'I…
+    127|     expect(facets.locations.find((option) => option.value === 'block:S…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/test/commercialMapExporuralArchitecture.test.ts > C4 / E-06 architecture and selection activity > preserves the complete approved official inventory and compound placement
+AssertionError: expected '89ebe510b6605d96d9f66b8057a8e21089b2c…' to be '5abf0ed204b10d98e17d1a6f171add3a6c3b6…' // Object.is equality
+
+Expected: "5abf0ed204b10d98e17d1a6f171add3a6c3b6b37e51f36311c9fed3b57548444"
+Received: "89ebe510b6605d96d9f66b8057a8e21089b2c5c2f8fbcdf262a408dbc9e99f94"
+
+ ❯ src/test/commercialMapExporuralArchitecture.test.ts:48:18
+     46|       .update(JSON.stringify(preserved))
+     47|       .digest('hex');
+     48|     expect(hash).toBe(baseline.officialEntitiesSha256);
+       |                  ^
+     49|     expect(EXPORURAL_STEAKHOUSE_LAYOUT.mainBuilding).toEqual(
+     50|       baseline.layout.mainBuilding,
+
+ Test Files  3 failed | 4 passed (7)
+      Tests  3 failed | 59 passed (62)
+   Start at  22:30:18
+   Duration  54.24s (transform 1.90s, setup 2.96s, collect 11.58s, tests 16.38s, environment 15.93s, prepare 2.47s)
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/test/commercialMapExporuralLandscape.test.ts > Exporural presentation boundaries and infrastructure > joins a single rising cut face to a level terrace without a reverse berm or parcel overlap
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/commercialMapExporuralLandscape.test.ts:155:3
+    153|     geometry.dispose();
+    154|   });
+    155|   it("joins a single rising cut face to a level terrace without a reve…
+       |   ^
+    156|     const before = JSON.stringify(OFFICIAL_REFERENCE_DATA);
+    157|     const model = buildExporuralLandscape(OFFICIAL_REFERENCE_DATA.enti…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯

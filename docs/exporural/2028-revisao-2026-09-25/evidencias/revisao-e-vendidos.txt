@@ -1,0 +1,46 @@
+
+ RUN  v3.2.4 C:/Users/Leonardo/Desktop/expo-logistics-hub
+
+ ❯ src/test/exporural2028Revision.test.ts (15 tests | 1 failed) 7541ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > numera somente a revisão nova e usa a âncora interna da mesma entidade 32ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > contém 100 códigos explícitos e somas decimais exatas, sem R66/S36/área sem número 94ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > preserva a revisão global, não modifica banco e rejeita fixture sobre dados persistidos 5ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > é determinística, somente leitura e não reutiliza identidade nominal para R56 110ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > conta entidades e lotes separadamente, incluindo três superfícies viárias novas 2ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > mantém todas as entidades, áreas e identidades fora do escopo por referência 156ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > valida anéis, hashes e labels internos sem equiparar área impressa à área calculada 70ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > preserva sequência geométrica de todas as faixas e a dupla R01/R02 4ms
+   × proposta Exporural 2028, isolada da referência persistida > não apresenta auto-interseção, lotes sobrepostos ou invasão de vias e estruturas protegidas 2181ms
+     → Q-S-22/B37: expected 0.02314430750664087 to be less than 1e-8
+   ✓ proposta Exporural 2028, isolada da referência persistida > conecta a transversal às três ruas e a mantém nos três pares corretos 10ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > mantém 15 de Novembro à esquerda da ilha e divisórias horizontais compartilhadas sem ruas 1ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > cobre todos os pais e filhos sem inventar UUIDs ou identidade jurídica 16ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > busca/lista/dashboard usam as mesmas 100 entidades e a área proposta de R56 141ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > invalida seleção por mudança física/versionada, preservando recargas idênticas 66ms
+   ✓ proposta Exporural 2028, isolada da referência persistida > gera paisagismo finito e limitado com anéis rotacionados e junções adicionais  4631ms
+ ✓ src/test/soldLotSynchronization.test.tsx (1 test) 606ms
+   ✓ confirmed sale -> shared map query -> sold presentation > refreshes every active map scope after confirmation and reverses from refreshed official status  594ms
+ ✓ src/test/soldLotPresentation.test.ts (8 tests) 630ms
+   ✓ official SOLD presentation > fits all valid cadastral lot polygons in the canonical reference inventory  392ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/exporural2028Revision.test.ts > proposta Exporural 2028, isolada da referência persistida > não apresenta auto-interseção, lotes sobrepostos ou invasão de vias e estruturas protegidas
+AssertionError: Q-S-22/B37: expected 0.02314430750664087 to be less than 1e-8
+ ❯ forEach src/test/exporural2028Revision.test.ts:131:140
+    129|     shapes.forEach((a,i) => {
+    130|       shapes.slice(0,i).forEach(b => expect(overlap(a.geometry.coordin…
+    131|       obstacles.forEach(b => expect(overlap(a.geometry.coordinates,b.g…
+       |                                                                                                                                            ^
+    132|     });
+    133|     roads.forEach(r=>expect(validateGeometry(byCode.get(r.public_ident…
+ ❯ forEach src/test/exporural2028Revision.test.ts:131:17
+ ❯ src/test/exporural2028Revision.test.ts:129:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 23 passed (24)
+   Start at  22:51:13
+   Duration  102.68s (transform 8.58s, setup 5.64s, collect 50.88s, tests 8.78s, environment 22.53s, prepare 2.91s)

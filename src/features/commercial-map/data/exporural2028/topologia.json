@@ -1,0 +1,148 @@
+{
+  "S superior esquerda": [
+    "Q-S-35",
+    "Q-S-34",
+    "Q-S-33",
+    "Q-S-32",
+    "Q-S-31",
+    "Q-S-30",
+    "Q-S-29",
+    "Q-S-28",
+    "Q-S-27",
+    "Q-S-26",
+    "Q-S-25"
+  ],
+  "S superior direita": [
+    "Q-S-24",
+    "Q-S-23",
+    "Q-S-22",
+    "Q-S-21",
+    "Q-S-20",
+    "Q-S-19",
+    "Q-S-18"
+  ],
+  "S inferior oeste": [
+    "Q-S-01",
+    "Q-S-02",
+    "Q-S-03",
+    "Q-S-04"
+  ],
+  "S inferior centro": [
+    "Q-S-05",
+    "Q-S-06",
+    "Q-S-07",
+    "Q-S-08",
+    "Q-S-09",
+    "Q-S-10"
+  ],
+  "S inferior leste": [
+    "Q-S-11",
+    "Q-S-12",
+    "Q-S-13",
+    "Q-S-14",
+    "Q-S-15",
+    "Q-S-16",
+    "Q-S-17"
+  ],
+  "R superior oeste": [
+    "Q-R-15",
+    "Q-R-16",
+    "Q-R-17",
+    "Q-R-18",
+    "Q-R-19",
+    "Q-R-05",
+    "Q-R-06",
+    "Q-R-07",
+    "Q-R-08"
+  ],
+  "R superior central oeste": [
+    "Q-R-09",
+    "Q-R-10",
+    "Q-R-11",
+    "Q-R-12",
+    "Q-R-29",
+    "Q-R-30",
+    "Q-R-31"
+  ],
+  "R superior central leste": [
+    "Q-R-32",
+    "Q-R-33",
+    "Q-R-34",
+    "Q-R-35",
+    "Q-R-36",
+    "Q-R-37",
+    "Q-R-38",
+    "Q-R-39"
+  ],
+  "R superior direita": [
+    "Q-R-40",
+    "Q-R-41",
+    "Q-R-42",
+    "Q-R-43",
+    "Q-R-44",
+    "Q-R-45",
+    "Q-R-46",
+    "Q-R-47"
+  ],
+  "R faixa rasa oeste": [
+    "Q-R-13"
+  ],
+  "R longitudinal oeste": [
+    "Q-R-14"
+  ],
+  "R dupla oeste superior": [
+    "Q-R-01"
+  ],
+  "R dupla oeste inferior": [
+    "Q-R-02"
+  ],
+  "R dupla central superior": [
+    "Q-R-03"
+  ],
+  "R dupla central inferior": [
+    "Q-R-04"
+  ],
+  "R inferior central oeste": [
+    "Q-R-20",
+    "Q-R-21",
+    "Q-R-22"
+  ],
+  "R inferior central meio": [
+    "Q-R-23",
+    "Q-R-24",
+    "Q-R-25"
+  ],
+  "R inferior central leste": [
+    "Q-R-26",
+    "Q-R-27",
+    "Q-R-28"
+  ],
+  "R pequena ilha superior oeste": [
+    "Q-R-48",
+    "Q-R-49",
+    "Q-R-50"
+  ],
+  "R pequena ilha superior leste": [
+    "Q-R-51",
+    "Q-R-52",
+    "Q-R-53",
+    "Q-R-54"
+  ],
+  "R pequena ilha inferior oeste": [
+    "Q-R-55",
+    "Q-R-56",
+    "Q-R-57"
+  ],
+  "R pequena ilha inferior leste": [
+    "Q-R-58",
+    "Q-R-59",
+    "Q-R-60",
+    "Q-R-61"
+  ],
+  "R perimetro inferior": [
+    "Q-R-62",
+    "Q-R-63",
+    "Q-R-64",
+    "Q-R-65"
+  ]
+}

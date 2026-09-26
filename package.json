@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "preview:exporural": "vite --config scripts/exporural/preview.vite.config.ts",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
