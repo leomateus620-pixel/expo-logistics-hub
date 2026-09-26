@@ -4,7 +4,8 @@
 - [x] Confirmar dez endereços ativos e identificar erro comum de consulta à coluna inexistente de venda.
 - [x] Corrigir a função de revisão em nova migração sem trocar chaves, dados ou permissões.
 - [x] Validar inventário e revisão dos dez links sem login; conferir listas de pavilhão e segmento e rejeição de chave inválida.
-- [ ] Confirmar a cena 3D e seleção no navegador automatizado, caso o carregamento WebGL se complete; nenhuma atualização da interface de produção.
+- [x] Confirmar seleção e cena 3D de pavilhão no navegador sem login; seleção e ficha da Exporural também funcionam pela lista.
+- [ ] Conferir a cena 3D da Exporural após o carregamento WebGL; no navegador automatizado permaneceu em “Preparando o mapa da área…”. Nenhuma atualização da interface de produção.
 
 ## Legendas contextuais dos lotes
 - [x] Retirar números permanentes da cena externa e dos cortes dos pavilhões, preservando a planta interna detalhada.
