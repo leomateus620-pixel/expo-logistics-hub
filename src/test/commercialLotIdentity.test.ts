@@ -10,7 +10,7 @@ const lot = (number: string, block = 'R') => ({
 const entity = (number: string, area: string | null = 'Exporural') => ({
   id: `entity-${number}`, parentEntityId: null, segmentId: area ? 'segment-id' : null,
   metadata: { segmentName: area },
-} as MapEntity);
+} as unknown as MapEntity);
 
 describe('identificação comercial oficial', () => {
   it.each(['20', '21', '22'])('usa lote cadastrado Q-R-%s sem extrair dígitos do código', number => {
