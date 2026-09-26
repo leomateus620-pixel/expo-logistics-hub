@@ -338,9 +338,10 @@ export const PAVILION_MODULE_AREA_TOTALS = PAVILION_AREA_PLANS.map((plan) => ({
 
 export const PAVILION_MODULE_AREA_TOTAL_COUNT = PAVILION_MODULE_OFFICIAL_AREAS.size;
 
-if (PAVILION_MODULE_AREA_TOTAL_COUNT !== 1315) {
+// Active official reference: previous 1,315 included 114 superseded P7 cells.
+if (PAVILION_MODULE_AREA_TOTAL_COUNT !== 1201) {
   throw new Error(
-    `A referência de áreas cobriu ${PAVILION_MODULE_AREA_TOTAL_COUNT} módulos; o cadastro tem 1.315.`,
+    `A referência de áreas cobriu ${PAVILION_MODULE_AREA_TOTAL_COUNT} módulos; o cadastro ativo tem 1.201.`,
   );
 }
 
