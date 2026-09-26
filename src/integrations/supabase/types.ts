@@ -4232,6 +4232,7 @@ export type Database = {
           id: string
           idempotency_key: string
           installment_count: number
+          logo_path: string | null
           negotiated_total: number
           notes: string | null
           official_area_total: number
@@ -4261,6 +4262,7 @@ export type Database = {
           id?: string
           idempotency_key: string
           installment_count?: number
+          logo_path?: string | null
           negotiated_total?: number
           notes?: string | null
           official_area_total?: number
@@ -4290,6 +4292,7 @@ export type Database = {
           id?: string
           idempotency_key?: string
           installment_count?: number
+          logo_path?: string | null
           negotiated_total?: number
           notes?: string | null
           official_area_total?: number
@@ -9665,6 +9668,10 @@ export type Database = {
         Args: { p_dry_run?: boolean; p_stage: string }
         Returns: Json
       }
+      attach_commercial_sale_logo: {
+        Args: { p_order_id: string; p_path: string }
+        Returns: boolean
+      }
       audit_check_rls_status: {
         Args: never
         Returns: {
@@ -10059,6 +10066,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      public_map_sale_logos: {
+        Args: { _slug: string; _token: string }
+        Returns: Json
       }
       public_map_scope_entity_ids: {
         Args: { _link_id: string }
