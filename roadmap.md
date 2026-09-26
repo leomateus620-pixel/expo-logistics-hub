@@ -1,5 +1,11 @@
 # Roadmap
 
+## Links públicos do Mapa Comercial
+- [x] Confirmar dez endereços ativos e identificar erro comum de consulta à coluna inexistente de venda.
+- [x] Corrigir a função de revisão em nova migração sem trocar chaves, dados ou permissões.
+- [x] Validar inventário e revisão dos dez links sem login; conferir listas de pavilhão e segmento e rejeição de chave inválida.
+- [ ] Confirmar a cena 3D e seleção no navegador automatizado, caso o carregamento WebGL se complete; nenhuma atualização da interface de produção.
+
 ## Legendas contextuais dos lotes
 - [x] Retirar números permanentes da cena externa e dos cortes dos pavilhões, preservando a planta interna detalhada.
 - [x] Manter identificação contextual do lote selecionado também nos links públicos.
