@@ -1,0 +1,14 @@
+CREATE SCHEMA IF NOT EXISTS app_private;
+GRANT USAGE ON SCHEMA app_private TO anon, authenticated;
+ALTER FUNCTION public.attach_commercial_sale_logo(uuid,text) SET SCHEMA app_private;
+ALTER FUNCTION public.public_map_sale_logos(text,text) SET SCHEMA app_private;
+REVOKE ALL ON FUNCTION app_private.attach_commercial_sale_logo(uuid,text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION app_private.attach_commercial_sale_logo(uuid,text) TO authenticated;
+REVOKE ALL ON FUNCTION app_private.public_map_sale_logos(text,text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION app_private.public_map_sale_logos(text,text) TO anon, authenticated;
+CREATE FUNCTION public.attach_commercial_sale_logo(p_order_id uuid, p_path text) RETURNS boolean LANGUAGE sql SECURITY INVOKER SET search_path = public, pg_temp AS $$ SELECT app_private.attach_commercial_sale_logo(p_order_id, p_path) $$;
+REVOKE ALL ON FUNCTION public.attach_commercial_sale_logo(uuid,text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.attach_commercial_sale_logo(uuid,text) TO authenticated;
+CREATE FUNCTION public.public_map_sale_logos(_slug text, _token text) RETURNS jsonb LANGUAGE sql SECURITY INVOKER SET search_path = public, pg_temp AS $$ SELECT app_private.public_map_sale_logos(_slug, _token) $$;
+REVOKE ALL ON FUNCTION public.public_map_sale_logos(text,text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.public_map_sale_logos(text,text) TO anon, authenticated;

@@ -10,6 +10,8 @@ import { claimCommercialMapBootVisit, releaseCommercialMapBootVisit } from '../u
 import { formatAreaSqmLabel } from '../utils/lotPricing2028';
 import { buildPavilionModuleCommercialIndex } from '../utils/pavilionModuleCommercial';
 import { STATUS_CONFIG } from '../constants';
+import { fetchSaleLogoUrls } from '../sales/saleLogo';
+import { useQuery } from '@tanstack/react-query';
 import { getPublicArea } from './publicAreaRegistry';
 import { findPavilionEntity, PublicMapAccessError } from './publicMapService';
 import { usePublicCanvasLots, usePublicMapContext, usePublicMapInventory, usePublicMapTelemetry } from './usePublicMapArea';
@@ -72,7 +74,13 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
   const setSelectedModuleId = useCommercialMapStore(state => state.setSelectedModuleId);
   const data = inventory.data;
   const lots = useMemo(() => data?.lots ?? [], [data?.lots]);
-  const canvasLots = usePublicCanvasLots(lots);
+  const logos = useQuery({
+    queryKey: ['public-map', 'sale-logos', slug, token, data?.revision],
+    queryFn: () => fetchSaleLogoUrls({ slug, token }),
+    enabled: Boolean(data), staleTime: 10 * 60 * 1000, refetchInterval: 10 * 60 * 1000,
+    meta: { persist: false },
+  });
+  const canvasLots = usePublicCanvasLots(lots, logos.data);
   const lotsByEntity = useMemo(() => new Map(lots.map(lot => [lot.entityId, lot])), [lots]);
   const pavilionEntity = useMemo(() => data ? findPavilionEntity(data.entities, data.scope.pavilionIdentifier) : null, [data]);
   const inventoryEntities = data?.entities;

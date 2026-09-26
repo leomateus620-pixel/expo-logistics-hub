@@ -133,3 +133,6 @@
 - [x] Etapa 4: 65 R (29.564,26 m²) + 35 S (16.203,53 m²), R-56 = 249,03 m², transversal ativa
 - [ ] 56 lotes novos BLOCKED — aguardando decisão do usuário sobre precificação/liberação para venda
 - Não publicar (pedido permanente do usuário)
+
+- [x] Imagem opcional na venda: tratamento local, vínculo privado ao pedido, exibição compartilhada nos lotes vendidos dos mapas interno e público, fallback do cadeado; teste local com anexo e regressões sem venda real.
+- [ ] Validar ponta a ponta uma venda com upload e exibição autenticada, incluindo link público: bloqueado até haver uma venda de teste isolada e autorização explícita para divulgar a foto pessoal anexada. Não registrar venda de teste na base oficial.

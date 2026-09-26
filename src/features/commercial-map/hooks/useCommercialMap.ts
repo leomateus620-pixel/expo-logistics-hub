@@ -125,7 +125,7 @@ export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIA
       queryClient.getQueryState(options.queryKey), captureCommercialMapStageRecorder(),
     ) };
   }
-  const query = useQuery(options);
+  const query = useQuery({ ...options, refetchInterval: 10 * 60_000 });
   if (options.enabled) routeData.current?.observation.observe(query.data !== undefined, query.isError);
 
   useEffect(() => {

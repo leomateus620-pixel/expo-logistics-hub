@@ -14,6 +14,7 @@ export function soldLotSurfaceColor(status: CommercialStatus | null | undefined)
 export interface SoldLotSurface {
   id: string;
   status: CommercialStatus | null;
+  logoUrl?: string | null;
   geometry: Pick<PolygonGeometry, 'coordinates' | 'elevation' | 'extrusionHeight'>;
   /** Optional cadastral-space anchor away from an existing central number. */
   preferredAnchor?: Coordinate;
