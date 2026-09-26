@@ -510,6 +510,7 @@ async function fetchCommissionCommercialMap(
     throw commissionMapError('MAP_SEGMENT_INVENTORY_MISMATCH');
   }
 
+  const logoUrls = await fetchSaleLogoUrls({ projectId: project.id });
   return {
     source: 'database',
     sourceMessage: project.isPublished
@@ -521,7 +522,7 @@ async function fetchCommissionCommercialMap(
     calibration: null,
     layers: (layersResult.data ?? []).map(mapLayer),
     entities,
-    lots: lotRows.map(mapLot),
+    lots: lotRows.map(row => ({ ...mapLot(row), saleLogoUrl: row.status === 'SOLD' ? logoUrls[row.id] ?? null : null })),
     scope: {
       mode: 'commission',
       commissionId: scope.commissionId,
