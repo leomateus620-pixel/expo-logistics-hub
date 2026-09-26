@@ -1,0 +1,1 @@
+A execução final completou as asserções e gravou resultados.json sem erros. O encerramento do processo de automação aguardava browser.close; foram encerrados somente os processos próprios do runner Exporural após a gravação dos resultados. Não é evidência de estabilidade universal.

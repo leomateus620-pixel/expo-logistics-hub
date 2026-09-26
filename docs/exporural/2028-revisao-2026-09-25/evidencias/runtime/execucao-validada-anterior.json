@@ -27,14 +27,14 @@
           -21.3251744550595
         ],
         "renderer": {
-          "geometries": 109,
+          "geometries": 110,
           "textures": 32
         },
         "identity": {
           "canvas": 1,
           "renderer": 2,
           "controls": 3,
-          "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+          "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
         },
         "workspaceMode": "3d"
       }
@@ -57,13 +57,13 @@
         ],
         "renderer": {
           "geometries": 110,
-          "textures": 58
+          "textures": 32
         },
         "identity": {
           "canvas": 1,
           "renderer": 2,
           "controls": 3,
-          "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+          "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
         },
         "workspaceMode": "3d"
       }
@@ -85,14 +85,14 @@
           -21.92511194660063
         ],
         "renderer": {
-          "geometries": 110,
+          "geometries": 111,
           "textures": 58
         },
         "identity": {
           "canvas": 1,
           "renderer": 2,
           "controls": 3,
-          "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+          "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
         },
         "workspaceMode": "3d"
       }
@@ -114,14 +114,14 @@
           -16.45005723306407
         ],
         "renderer": {
-          "geometries": 110,
+          "geometries": 111,
           "textures": 58
         },
         "identity": {
           "canvas": 1,
           "renderer": 2,
           "controls": 3,
-          "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+          "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
         },
         "workspaceMode": "3d"
       }
@@ -143,14 +143,14 @@
           -10.55004680409792
         ],
         "renderer": {
-          "geometries": 110,
+          "geometries": 111,
           "textures": 58
         },
         "identity": {
           "canvas": 1,
           "renderer": 2,
           "controls": 3,
-          "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+          "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
         },
         "workspaceMode": "3d"
       }
@@ -172,14 +172,14 @@
           -24.050098922349623
         ],
         "renderer": {
-          "geometries": 110,
+          "geometries": 111,
           "textures": 58
         },
         "identity": {
           "canvas": 1,
           "renderer": 2,
           "controls": 3,
-          "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+          "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
         },
         "workspaceMode": "3d"
       }
@@ -201,14 +201,14 @@
           -21.3251744550595
         ],
         "renderer": {
-          "geometries": 108,
+          "geometries": 109,
           "textures": 57
         },
         "identity": {
           "canvas": 1,
           "renderer": 2,
           "controls": 3,
-          "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+          "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
         },
         "workspaceMode": "3d"
       }
@@ -230,14 +230,14 @@
           -29.87511715606293
         ],
         "renderer": {
-          "geometries": 108,
+          "geometries": 109,
           "textures": 57
         },
         "identity": {
           "canvas": 1,
           "renderer": 2,
           "controls": 3,
-          "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+          "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
         },
         "workspaceMode": "3d"
       }
@@ -259,14 +259,14 @@
           -21.92511194660063
         ],
         "renderer": {
-          "geometries": 108,
+          "geometries": 109,
           "textures": 57
         },
         "identity": {
           "canvas": 1,
           "renderer": 2,
           "controls": 3,
-          "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+          "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
         },
         "workspaceMode": "3d"
       }
@@ -288,14 +288,14 @@
           -16.45005723306407
         ],
         "renderer": {
-          "geometries": 108,
+          "geometries": 109,
           "textures": 57
         },
         "identity": {
           "canvas": 1,
           "renderer": 2,
           "controls": 3,
-          "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+          "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
         },
         "workspaceMode": "3d"
       }
@@ -317,14 +317,14 @@
           -10.55004680409792
         ],
         "renderer": {
-          "geometries": 108,
+          "geometries": 109,
           "textures": 57
         },
         "identity": {
           "canvas": 1,
           "renderer": 2,
           "controls": 3,
-          "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+          "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
         },
         "workspaceMode": "3d"
       }
@@ -346,14 +346,14 @@
           -24.050098922349623
         ],
         "renderer": {
-          "geometries": 108,
+          "geometries": 109,
           "textures": 57
         },
         "identity": {
           "canvas": 1,
           "renderer": 2,
           "controls": 3,
-          "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+          "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
         },
         "workspaceMode": "3d"
       }
@@ -372,18 +372,18 @@
         -15.096390394076403
       ],
       "renderer": {
-        "geometries": 110,
+        "geometries": 111,
         "textures": 58
       },
       "identity": {
         "canvas": 1,
         "renderer": 2,
         "controls": 3,
-        "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+        "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
       },
       "workspaceMode": "3d"
     },
-    "body": "PRÉVIA LOCAL · Proposta 2028 · 100 lotes · 45.767,79 m² · Cartografia e conflitos B37/B38 pendentes · Somente leituraVer antes\nIr para o mapa comercial\nPortal\nGESTÃO TERRITORIAL\nMapa Comercial\nBuscar no mapa\nLista e tabela\nFENASOJA 2028\nSair\n56\nQUADRA R\n249,03 m²\n⌧ Bloqueado\nEntorno © OpenStreetMap\nEstacionamento posterior\nQ-R-56 · LOTE COMERCIAL\nQuadra R · Lote 56\n⌧\nBloqueado\n249,03 m² de área oficial\n\nProposta cadastral 2028. Prévia local sem liberação comercial.\n\nVALORES OFICIAIS 2028\n\nLote sem correspondência na tabela oficial 2028.\n\nVisão geral\nHistórico\nÁrea oficial\n249,03 m²\nBloco / lote\nR · 56\nINFORMAÇÕES COMERCIAIS\nSegmento\nExporural"
+    "body": "PRÉVIA LOCAL · Proposta 2028 · 100 lotes · 45.767,79 m² · Somente leituraVer antes\nIr para o mapa comercial\nPortal\nGESTÃO TERRITORIAL\nMapa Comercial\nBuscar no mapa\nLista e tabela\nFENASOJA 2028\nSair\n56\nQUADRA R\n249,03 m²\n⌧ Bloqueado\nEntorno © OpenStreetMap\nEstacionamento posterior\nQ-R-56 · LOTE COMERCIAL\nQuadra R · Lote 56\n⌧\nBloqueado\n249,03 m² de área oficial\n\nProposta cadastral 2028. Prévia local sem liberação comercial.\n\nVALORES OFICIAIS 2028\n\nLote sem correspondência na tabela oficial 2028.\n\nVisão geral\nHistórico\nÁrea oficial\n249,03 m²\nBloco / lote\nR · 56\nINFORMAÇÕES COMERCIAIS\nSegmento\nExporural"
   },
   "selectionAfterRevision": {
     "selectedEntityId": null,
@@ -393,14 +393,14 @@
       -15.096390394076403
     ],
     "renderer": {
-      "geometries": 102,
+      "geometries": 103,
       "textures": 57
     },
     "identity": {
       "canvas": 1,
       "renderer": 2,
       "controls": 3,
-      "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+      "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
     },
     "workspaceMode": "3d"
   },
@@ -408,22 +408,22 @@
     "engine": "three.js r170",
     "commercialMapQuality": "{\"logicalTier\":\"HIGH\",\"sceneTier\":\"HIGH\",\"baseDpr\":1,\"effectiveDpr\":1,\"hardwareCeiling\":\"HIGH\",\"reason\":\"viewport-sync\"}",
     "commercialMapShadowResolution": "2048",
-    "commercialMapCameraTransition": "{\"status\":\"completed\",\"source\":\"selection:reference:preview:2028-exporural-2026-09-25.1:Q-R-56\",\"sequence\":3,\"startedAt\":78603.4,\"durationMs\":460,\"completedAt\":79063,\"elapsedMs\":459.6}",
+    "commercialMapCameraTransition": "{\"status\":\"completed\",\"source\":\"selection:reference:preview:2028-exporural-2026-09-25.1:Q-R-56\",\"sequence\":3,\"startedAt\":64217.1,\"durationMs\":460,\"completedAt\":64692.6,\"elapsedMs\":475.5}",
     "commercialMapEssentialReady": "true",
     "commercialMapReady": "true",
-    "commercialMapShaderCompilation": "{\"startedAt\":14868.6,\"durationMs\":5.1,\"programsBefore\":50,\"programsAfter\":50,\"geometries\":8,\"textures\":3}",
+    "commercialMapShaderCompilation": "{\"startedAt\":7583.6,\"durationMs\":0.9,\"programsBefore\":50,\"programsAfter\":50,\"geometries\":8,\"textures\":3}",
     "commercialMapExecution": "{\"initialTier\":\"HIGH\",\"tier\":\"HIGH\",\"sceneTier\":\"HIGH\",\"policy\":{\"shadowMapSize\":2048,\"effectUpdateHz\":45,\"lodUpdateHz\":20,\"taskBudgetMs\":4},\"dpr\":1,\"shadowResolution\":2048,\"lastFrameWindow\":null,\"inventory\":{\"entities\":116,\"presentedEntities\":116,\"lots\":100,\"commercialTrees\":29,\"presentedCommercialTrees\":29},\"hardwareRestrictedActions\":[]}",
     "commercialMapCameraDiagnostics": "{\"position\":[45.2597,12.865,-15.0964],\"target\":[45.2597,0.14,-15.4146],\"quaternion\":[-0.698213,0,0,0.71589],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.035,\"far\":1282.943,\"distance\":12.729,\"minDistance\":8.205,\"maxDistance\":150.4254,\"desiredMinDistance\":8.205,\"desiredMaxDistance\":150.4254,\"calculatedMaxDistance\":328.5927,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":4.466909090909102,\"diagonal\":198.05951217035},\"boundingSphereRadius\":63.6842,\"viewport\":{\"width\":1361.21875,\"height\":916.8125,\"aspect\":1.48473,\"dpr\":1}}",
-    "commercialMapReadiness": "{\"essentialPrepared\":true,\"preparing\":false,\"healthyScreen\":true,\"presentedFrames\":3,\"controlsInstalled\":true,\"frameIntervalMs\":40.89999997615814,\"responsive\":true,\"status\":\"ready\",\"path\":\"direct\",\"lastErrorCode\":null}",
+    "commercialMapReadiness": "{\"essentialPrepared\":true,\"preparing\":false,\"healthyScreen\":true,\"presentedFrames\":3,\"controlsInstalled\":true,\"frameIntervalMs\":110.39999997615814,\"responsive\":false,\"status\":\"ready\",\"path\":\"direct\",\"lastErrorCode\":null}",
     "exteriorReport": "{\"buildings\":22,\"trees\":111,\"used\":[\"H02\",\"H03\",\"H04\",\"H05\",\"H06\",\"H08\",\"H09\",\"H10\",\"H15\",\"H17\",\"R03\",\"R04\",\"R05\"],\"groundTriangles\":507,\"architectures\":4440,\"vegetation\":36164,\"draws\":28,\"lods\":{\"map\":17,\"far\":5,\"near\":6}}",
-    "commercialMapSceneWarmup": "{\"durationMs\":4813.399999976158,\"parallel\":true}",
-    "commercialMapSunriseDiagnostics": "{\"qualityTier\":\"full\",\"progress\":1,\"direction\":[0,0.40674,-0.91355],\"horizonTarget\":[0.35,0,-50021.13],\"sunWorld\":[0.35,20336.83,-45698.4],\"sunNdc\":[0,-6.9881,1.0001],\"cameraPosition\":[45.26,12.87,-15.1],\"cameraForward\":[0,-0.99969,-0.025],\"sunViewDot\":-0.38377,\"cameraFar\":1282.9430551682904,\"safeCameraMaxDistance\":211.258,\"fogNear\":560.076,\"fogFar\":1272.9,\"azimuthMapDegrees\":0,\"elevationDegrees\":24,\"renderer\":{\"calls\":0,\"triangles\":0,\"programs\":111,\"geometries\":83,\"textures\":53}}",
-    "commercialMapRenderHealth": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":1196,\"contextLosses\":0,\"lastErrorCode\":null}",
+    "commercialMapSceneWarmup": "{\"durationMs\":4839.699999928474,\"parallel\":true}",
+    "commercialMapSunriseDiagnostics": "{\"qualityTier\":\"full\",\"progress\":1,\"direction\":[0,0.40674,-0.91355],\"horizonTarget\":[0.35,0,-50021.13],\"sunWorld\":[0.35,20336.83,-45698.4],\"sunNdc\":[0,-6.9881,1.0001],\"cameraPosition\":[45.26,12.87,-15.1],\"cameraForward\":[0,-0.99969,-0.025],\"sunViewDot\":-0.38377,\"cameraFar\":1282.9430551682904,\"safeCameraMaxDistance\":211.258,\"fogNear\":560.076,\"fogFar\":1272.9,\"azimuthMapDegrees\":0,\"elevationDegrees\":24,\"renderer\":{\"calls\":0,\"triangles\":0,\"programs\":111,\"geometries\":84,\"textures\":53}}",
+    "commercialMapRenderHealth": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":1075,\"contextLosses\":0,\"lastErrorCode\":null}",
     "commercialMapInteractive": "true",
     "commercialMapRain": "{\"blend\":0,\"night\":0,\"tier\":\"HIGH\",\"drops\":4000,\"splashes\":37,\"runoff\":0,\"puddles\":37,\"wetMaterials\":30}",
-    "commercialMapInteriorShaderWarmup": "{\"durationMs\":876.2,\"programsBefore\":116,\"programsAfter\":121,\"error\":null}",
+    "commercialMapInteriorShaderWarmup": "{\"durationMs\":811.9,\"programsBefore\":116,\"programsAfter\":121,\"error\":null}",
     "commercialMapHydration": "complete",
-    "commercialMapRendererInfo": "{\"at\":80242.30000007153,\"calls\":64,\"triangles\":71764,\"geometries\":110,\"textures\":58,\"programs\":114,\"dpr\":1,\"width\":1361,\"height\":916,\"heapBytes\":106220248,\"qualityTier\":\"HIGH\",\"gpuVendor\":\"Google Inc. (Intel)\",\"gpuRenderer\":\"ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)\"}",
+    "commercialMapRendererInfo": "{\"at\":65600.30000007153,\"calls\":64,\"triangles\":71764,\"geometries\":111,\"textures\":58,\"programs\":114,\"dpr\":1,\"width\":1361,\"height\":916,\"heapBytes\":117287010,\"qualityTier\":\"HIGH\",\"gpuVendor\":\"Google Inc. (Intel)\",\"gpuRenderer\":\"ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)\"}",
     "commercialMapInventory": "{\"entityIds\":[\"reference:2026:b37\",\"reference:2026:b38\",\"reference:2026:c4\",\"reference:2026:exporural\",\"reference:2026:quadra-r\",\"reference:2026:quadra-s\",\"reference:preview:2028-exporural-2026-09-25.1:EXPORURAL-ACESSO-TRANSVERSAL-01\",\"reference:preview:2028-exporural-2026-09-25.1:EXPORURAL-PASSAGEM-INTERNA-01\",\"reference:preview:2028-exporural-2026-09-25.1:EXPORURAL-PASSAGEM-INTERNA-02\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-01\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-02\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-03\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-04\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-05\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-06\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-07\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-08\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-09\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-10\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-11\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-12\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-13\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-14\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-15\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-16\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-17\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-18\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-19\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-20\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-21\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-22\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-23\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-24\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-25\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-26\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-27\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-28\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-29\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-30\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-31\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-32\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-33\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-34\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-35\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-36\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-37\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-38\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-39\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-40\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-41\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-42\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-43\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-44\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-45\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-46\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-47\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-48\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-49\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-50\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-51\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-52\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-53\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-54\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-55\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-56\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-57\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-58\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-59\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-60\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-61\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-62\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-63\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-64\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-65\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-01\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-02\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-03\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-04\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-05\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-06\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-07\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-08\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-09\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-10\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-11\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-12\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-13\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-14\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-15\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-16\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-17\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-18\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-19\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-20\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-21\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-22\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-23\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-24\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-25\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-26\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-27\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-28\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-29\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-30\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-31\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-32\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-33\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-34\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-35\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-15-NOVEMBRO\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-BRUNO-SCHWARTZ\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-EMANUEL-BRACHMANN\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-GUSTAVO-BESSEL\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-JOHAN-MULLER\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-PASTOR-ALBERT-LEHENBAUER\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-UBIRETAMA\"],\"presentedEntityIds\":[\"reference:2026:b37\",\"reference:2026:b38\",\"reference:2026:c4\",\"reference:2026:exporural\",\"reference:2026:quadra-r\",\"reference:2026:quadra-s\",\"reference:preview:2028-exporural-2026-09-25.1:EXPORURAL-ACESSO-TRANSVERSAL-01\",\"reference:preview:2028-exporural-2026-09-25.1:EXPORURAL-PASSAGEM-INTERNA-01\",\"reference:preview:2028-exporural-2026-09-25.1:EXPORURAL-PASSAGEM-INTERNA-02\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-01\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-02\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-03\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-04\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-05\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-06\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-07\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-08\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-09\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-10\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-11\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-12\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-13\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-14\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-15\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-16\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-17\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-18\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-19\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-20\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-21\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-22\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-23\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-24\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-25\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-26\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-27\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-28\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-29\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-30\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-31\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-32\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-33\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-34\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-35\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-36\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-37\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-38\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-39\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-40\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-41\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-42\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-43\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-44\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-45\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-46\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-47\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-48\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-49\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-50\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-51\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-52\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-53\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-54\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-55\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-56\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-57\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-58\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-59\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-60\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-61\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-62\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-63\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-64\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-65\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-01\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-02\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-03\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-04\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-05\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-06\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-07\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-08\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-09\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-10\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-11\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-12\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-13\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-14\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-15\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-16\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-17\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-18\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-19\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-20\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-21\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-22\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-23\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-24\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-25\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-26\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-27\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-28\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-29\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-30\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-31\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-32\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-33\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-34\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-35\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-15-NOVEMBRO\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-BRUNO-SCHWARTZ\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-EMANUEL-BRACHMANN\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-GUSTAVO-BESSEL\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-JOHAN-MULLER\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-PASTOR-ALBERT-LEHENBAUER\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-UBIRETAMA\"],\"lotIds\":[\"reference:preview:2028-exporural-2026-09-25.1:Q-R-01:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-02:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-03:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-04:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-05:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-06:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-07:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-08:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-09:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-10:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-11:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-12:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-13:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-14:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-15:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-16:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-17:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-18:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-19:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-20:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-21:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-22:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-23:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-24:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-25:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-26:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-27:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-28:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-29:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-30:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-31:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-32:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-33:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-34:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-35:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-36:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-37:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-38:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-39:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-40:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-41:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-42:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-43:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-44:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-45:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-46:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-47:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-48:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-49:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-50:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-51:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-52:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-53:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-54:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-55:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-56:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-57:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-58:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-59:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-60:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-61:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-62:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-63:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-64:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-65:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-01:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-02:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-03:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-04:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-05:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-06:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-07:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-08:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-09:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-10:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-11:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-12:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-13:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-14:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-15:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-16:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-17:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-18:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-19:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-20:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-21:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-22:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-23:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-24:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-25:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-26:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-27:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-28:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-29:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-30:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-31:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-32:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-33:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-34:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-35:lot\"],\"entitiesByType\":{\"RURAL_EXHIBITION\":1,\"QUADRA\":2,\"ADMINISTRATION\":1,\"ATTRACTION\":1,\"RESTAURANT\":1,\"SELLABLE_LOT\":100,\"ROAD\":10},\"commercialTreeIds\":[\"tree-rear-parking-campeira-01\",\"tree-rear-parking-campeira-02\",\"tree-rear-parking-campeira-03\",\"tree-rear-parking-campeira-04\",\"tree-rear-parking-campeira-05\",\"tree-rear-parking-east-01\",\"tree-rear-parking-east-02\",\"tree-rear-parking-east-03\",\"tree-rear-parking-east-04\",\"tree-rear-parking-east-06\",\"tree-rear-parking-east-07\",\"tree-rear-parking-east-08\",\"tree-rear-parking-east-09\",\"tree-rear-parking-east-10\",\"tree-rear-parking-east-11\",\"tree-rear-parking-east-12\",\"tree-rear-parking-east-13\",\"tree-rear-parking-junction-01\",\"tree-rear-parking-junction-02\",\"tree-rear-parking-junction-03\",\"tree-rear-parking-junction-04\",\"tree-rear-parking-junction-05\",\"tree-rear-parking-junction-06\",\"tree-rear-parking-south-02\",\"tree-rear-parking-south-03\",\"tree-rear-parking-south-04\",\"tree-rear-parking-west-01\",\"tree-rear-parking-west-02\",\"tree-rear-parking-west-03\"],\"presentedCommercialTreeIds\":[\"tree-rear-parking-campeira-01\",\"tree-rear-parking-campeira-02\",\"tree-rear-parking-campeira-03\",\"tree-rear-parking-campeira-04\",\"tree-rear-parking-campeira-05\",\"tree-rear-parking-east-01\",\"tree-rear-parking-east-02\",\"tree-rear-parking-east-03\",\"tree-rear-parking-east-04\",\"tree-rear-parking-east-06\",\"tree-rear-parking-east-07\",\"tree-rear-parking-east-08\",\"tree-rear-parking-east-09\",\"tree-rear-parking-east-10\",\"tree-rear-parking-east-11\",\"tree-rear-parking-east-12\",\"tree-rear-parking-east-13\",\"tree-rear-parking-junction-01\",\"tree-rear-parking-junction-02\",\"tree-rear-parking-junction-03\",\"tree-rear-parking-junction-04\",\"tree-rear-parking-junction-05\",\"tree-rear-parking-junction-06\",\"tree-rear-parking-south-02\",\"tree-rear-parking-south-03\",\"tree-rear-parking-south-04\",\"tree-rear-parking-west-01\",\"tree-rear-parking-west-02\",\"tree-rear-parking-west-03\"],\"treeCoverage\":\"Canonical commercial tree layer; procedural territorial/access inventories are validated separately.\"}",
     "commercialMapInventoryCounts": "{\"entities\":116,\"presentedEntities\":116,\"lots\":100,\"commercialTrees\":29,\"presentedCommercialTrees\":29}"
   },
@@ -431,7 +431,7 @@
     "canvas": 1,
     "renderer": 2,
     "controls": 3,
-    "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+    "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
   },
   "contextRecovery": {
     "supported": true,
@@ -439,31 +439,31 @@
       "engine": "three.js r170",
       "commercialMapQuality": "{\"logicalTier\":\"HIGH\",\"sceneTier\":\"HIGH\",\"baseDpr\":1,\"effectiveDpr\":1,\"hardwareCeiling\":\"HIGH\",\"reason\":\"viewport-sync\"}",
       "commercialMapShadowResolution": "2048",
-      "commercialMapCameraTransition": "{\"status\":\"completed\",\"source\":\"selection:reference:preview:2028-exporural-2026-09-25.1:Q-R-56\",\"sequence\":3,\"startedAt\":78603.4,\"durationMs\":460,\"completedAt\":79063,\"elapsedMs\":459.6}",
+      "commercialMapCameraTransition": "{\"status\":\"completed\",\"source\":\"selection:reference:preview:2028-exporural-2026-09-25.1:Q-R-56\",\"sequence\":3,\"startedAt\":64217.1,\"durationMs\":460,\"completedAt\":64692.6,\"elapsedMs\":475.5}",
       "commercialMapEssentialReady": "true",
       "commercialMapReady": "true",
-      "commercialMapShaderCompilation": "{\"startedAt\":14868.6,\"durationMs\":5.1,\"programsBefore\":50,\"programsAfter\":50,\"geometries\":8,\"textures\":3}",
+      "commercialMapShaderCompilation": "{\"startedAt\":7583.6,\"durationMs\":0.9,\"programsBefore\":50,\"programsAfter\":50,\"geometries\":8,\"textures\":3}",
       "commercialMapExecution": "{\"initialTier\":\"HIGH\",\"tier\":\"HIGH\",\"sceneTier\":\"HIGH\",\"policy\":{\"shadowMapSize\":2048,\"effectUpdateHz\":45,\"lodUpdateHz\":20,\"taskBudgetMs\":4},\"dpr\":1,\"shadowResolution\":2048,\"lastFrameWindow\":null,\"inventory\":{\"entities\":116,\"presentedEntities\":116,\"lots\":100,\"commercialTrees\":29,\"presentedCommercialTrees\":29},\"hardwareRestrictedActions\":[]}",
       "commercialMapCameraDiagnostics": "{\"position\":[45.2597,12.865,-15.0964],\"target\":[45.2597,0.14,-15.4146],\"quaternion\":[-0.698213,0,0,0.71589],\"controlsEnabled\":true,\"interiorEntityId\":null,\"fov\":38,\"zoom\":1,\"viewOffset\":{\"x\":0,\"y\":0},\"near\":0.035,\"far\":1282.943,\"distance\":12.729,\"minDistance\":8.205,\"maxDistance\":150.4254,\"desiredMinDistance\":8.205,\"desiredMaxDistance\":150.4254,\"calculatedMaxDistance\":328.5927,\"navigationBounds\":{\"minX\":-77,\"maxX\":77,\"minZ\":-62.2727275,\"maxZ\":62.2727275,\"width\":154,\"depth\":124.545455,\"centerX\":0,\"centerZ\":0,\"maxHeight\":4.466909090909102,\"diagonal\":198.05951217035},\"boundingSphereRadius\":63.6842,\"viewport\":{\"width\":1361.21875,\"height\":916.8125,\"aspect\":1.48473,\"dpr\":1}}",
       "exteriorReport": "{\"buildings\":22,\"trees\":111,\"used\":[\"H02\",\"H03\",\"H04\",\"H05\",\"H06\",\"H08\",\"H09\",\"H10\",\"H15\",\"H17\",\"R03\",\"R04\",\"R05\"],\"groundTriangles\":507,\"architectures\":4440,\"vegetation\":36164,\"draws\":28,\"lods\":{\"map\":17,\"far\":5,\"near\":6}}",
-      "commercialMapSceneWarmup": "{\"durationMs\":5580,\"parallel\":true}",
-      "commercialMapSunriseDiagnostics": "{\"qualityTier\":\"full\",\"progress\":1,\"direction\":[0,0.40674,-0.91355],\"horizonTarget\":[0.35,0,-50021.13],\"sunWorld\":[0.35,20336.83,-45698.4],\"sunNdc\":[0,-6.9881,1.0001],\"cameraPosition\":[45.26,12.87,-15.1],\"cameraForward\":[0,-0.99969,-0.025],\"sunViewDot\":-0.38377,\"cameraFar\":1282.9430551682904,\"safeCameraMaxDistance\":211.258,\"fogNear\":560.076,\"fogFar\":1272.9,\"azimuthMapDegrees\":0,\"elevationDegrees\":24,\"renderer\":{\"calls\":0,\"triangles\":0,\"programs\":111,\"geometries\":83,\"textures\":53}}",
-      "commercialMapRenderHealth": "{\"status\":\"ready\",\"path\":\"direct\",\"presentedFrames\":1197,\"contextLosses\":1,\"lastErrorCode\":null}",
+      "commercialMapSceneWarmup": "{\"durationMs\":783.1000000238419,\"parallel\":true}",
+      "commercialMapSunriseDiagnostics": "{\"qualityTier\":\"full\",\"progress\":1,\"direction\":[0,0.40674,-0.91355],\"horizonTarget\":[0.35,0,-50021.13],\"sunWorld\":[0.35,20336.83,-45698.4],\"sunNdc\":[0,-6.9881,1.0001],\"cameraPosition\":[45.26,12.87,-15.1],\"cameraForward\":[0,-0.99969,-0.025],\"sunViewDot\":-0.38377,\"cameraFar\":1282.9430551682904,\"safeCameraMaxDistance\":211.258,\"fogNear\":560.076,\"fogFar\":1272.9,\"azimuthMapDegrees\":0,\"elevationDegrees\":24,\"renderer\":{\"calls\":0,\"triangles\":0,\"programs\":111,\"geometries\":84,\"textures\":53}}",
+      "commercialMapRenderHealth": "{\"status\":\"ready\",\"path\":\"post\",\"presentedFrames\":1106,\"contextLosses\":1,\"lastErrorCode\":null}",
       "commercialMapInteractive": "true",
       "commercialMapRain": "{\"blend\":0,\"night\":0,\"tier\":\"HIGH\",\"drops\":4000,\"splashes\":37,\"runoff\":0,\"puddles\":37,\"wetMaterials\":32}",
-      "commercialMapInteriorShaderWarmup": "{\"durationMs\":4678.8,\"programsBefore\":55,\"programsAfter\":60,\"error\":null}",
+      "commercialMapInteriorShaderWarmup": "{\"durationMs\":143.4,\"programsBefore\":55,\"programsAfter\":60,\"error\":null}",
       "commercialMapHydration": "complete",
-      "commercialMapRendererInfo": "{\"at\":80242.30000007153,\"calls\":64,\"triangles\":71764,\"geometries\":110,\"textures\":58,\"programs\":114,\"dpr\":1,\"width\":1361,\"height\":916,\"heapBytes\":106220248,\"qualityTier\":\"HIGH\",\"gpuVendor\":\"Google Inc. (Intel)\",\"gpuRenderer\":\"ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)\"}",
+      "commercialMapRendererInfo": "{\"at\":65600.30000007153,\"calls\":64,\"triangles\":71764,\"geometries\":111,\"textures\":58,\"programs\":114,\"dpr\":1,\"width\":1361,\"height\":916,\"heapBytes\":117287010,\"qualityTier\":\"HIGH\",\"gpuVendor\":\"Google Inc. (Intel)\",\"gpuRenderer\":\"ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)\"}",
       "commercialMapInventory": "{\"entityIds\":[\"reference:2026:b37\",\"reference:2026:b38\",\"reference:2026:c4\",\"reference:2026:exporural\",\"reference:2026:quadra-r\",\"reference:2026:quadra-s\",\"reference:preview:2028-exporural-2026-09-25.1:EXPORURAL-ACESSO-TRANSVERSAL-01\",\"reference:preview:2028-exporural-2026-09-25.1:EXPORURAL-PASSAGEM-INTERNA-01\",\"reference:preview:2028-exporural-2026-09-25.1:EXPORURAL-PASSAGEM-INTERNA-02\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-01\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-02\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-03\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-04\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-05\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-06\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-07\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-08\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-09\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-10\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-11\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-12\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-13\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-14\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-15\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-16\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-17\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-18\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-19\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-20\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-21\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-22\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-23\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-24\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-25\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-26\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-27\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-28\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-29\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-30\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-31\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-32\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-33\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-34\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-35\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-36\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-37\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-38\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-39\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-40\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-41\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-42\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-43\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-44\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-45\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-46\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-47\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-48\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-49\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-50\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-51\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-52\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-53\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-54\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-55\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-56\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-57\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-58\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-59\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-60\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-61\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-62\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-63\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-64\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-65\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-01\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-02\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-03\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-04\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-05\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-06\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-07\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-08\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-09\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-10\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-11\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-12\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-13\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-14\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-15\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-16\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-17\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-18\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-19\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-20\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-21\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-22\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-23\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-24\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-25\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-26\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-27\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-28\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-29\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-30\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-31\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-32\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-33\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-34\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-35\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-15-NOVEMBRO\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-BRUNO-SCHWARTZ\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-EMANUEL-BRACHMANN\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-GUSTAVO-BESSEL\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-JOHAN-MULLER\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-PASTOR-ALBERT-LEHENBAUER\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-UBIRETAMA\"],\"presentedEntityIds\":[\"reference:2026:b37\",\"reference:2026:b38\",\"reference:2026:c4\",\"reference:2026:exporural\",\"reference:2026:quadra-r\",\"reference:2026:quadra-s\",\"reference:preview:2028-exporural-2026-09-25.1:EXPORURAL-ACESSO-TRANSVERSAL-01\",\"reference:preview:2028-exporural-2026-09-25.1:EXPORURAL-PASSAGEM-INTERNA-01\",\"reference:preview:2028-exporural-2026-09-25.1:EXPORURAL-PASSAGEM-INTERNA-02\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-01\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-02\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-03\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-04\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-05\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-06\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-07\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-08\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-09\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-10\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-11\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-12\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-13\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-14\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-15\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-16\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-17\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-18\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-19\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-20\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-21\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-22\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-23\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-24\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-25\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-26\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-27\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-28\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-29\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-30\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-31\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-32\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-33\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-34\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-35\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-36\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-37\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-38\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-39\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-40\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-41\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-42\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-43\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-44\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-45\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-46\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-47\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-48\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-49\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-50\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-51\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-52\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-53\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-54\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-55\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-56\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-57\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-58\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-59\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-60\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-61\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-62\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-63\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-64\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-65\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-01\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-02\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-03\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-04\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-05\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-06\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-07\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-08\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-09\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-10\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-11\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-12\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-13\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-14\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-15\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-16\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-17\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-18\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-19\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-20\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-21\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-22\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-23\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-24\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-25\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-26\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-27\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-28\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-29\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-30\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-31\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-32\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-33\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-34\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-35\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-15-NOVEMBRO\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-BRUNO-SCHWARTZ\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-EMANUEL-BRACHMANN\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-GUSTAVO-BESSEL\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-JOHAN-MULLER\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-PASTOR-ALBERT-LEHENBAUER\",\"reference:preview:2028-exporural-2026-09-25.1:RUA-UBIRETAMA\"],\"lotIds\":[\"reference:preview:2028-exporural-2026-09-25.1:Q-R-01:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-02:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-03:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-04:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-05:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-06:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-07:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-08:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-09:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-10:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-11:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-12:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-13:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-14:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-15:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-16:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-17:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-18:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-19:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-20:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-21:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-22:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-23:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-24:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-25:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-26:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-27:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-28:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-29:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-30:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-31:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-32:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-33:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-34:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-35:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-36:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-37:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-38:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-39:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-40:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-41:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-42:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-43:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-44:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-45:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-46:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-47:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-48:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-49:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-50:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-51:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-52:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-53:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-54:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-55:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-56:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-57:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-58:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-59:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-60:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-61:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-62:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-63:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-64:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-R-65:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-01:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-02:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-03:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-04:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-05:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-06:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-07:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-08:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-09:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-10:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-11:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-12:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-13:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-14:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-15:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-16:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-17:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-18:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-19:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-20:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-21:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-22:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-23:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-24:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-25:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-26:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-27:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-28:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-29:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-30:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-31:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-32:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-33:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-34:lot\",\"reference:preview:2028-exporural-2026-09-25.1:Q-S-35:lot\"],\"entitiesByType\":{\"RURAL_EXHIBITION\":1,\"QUADRA\":2,\"ADMINISTRATION\":1,\"ATTRACTION\":1,\"RESTAURANT\":1,\"SELLABLE_LOT\":100,\"ROAD\":10},\"commercialTreeIds\":[\"tree-rear-parking-campeira-01\",\"tree-rear-parking-campeira-02\",\"tree-rear-parking-campeira-03\",\"tree-rear-parking-campeira-04\",\"tree-rear-parking-campeira-05\",\"tree-rear-parking-east-01\",\"tree-rear-parking-east-02\",\"tree-rear-parking-east-03\",\"tree-rear-parking-east-04\",\"tree-rear-parking-east-06\",\"tree-rear-parking-east-07\",\"tree-rear-parking-east-08\",\"tree-rear-parking-east-09\",\"tree-rear-parking-east-10\",\"tree-rear-parking-east-11\",\"tree-rear-parking-east-12\",\"tree-rear-parking-east-13\",\"tree-rear-parking-junction-01\",\"tree-rear-parking-junction-02\",\"tree-rear-parking-junction-03\",\"tree-rear-parking-junction-04\",\"tree-rear-parking-junction-05\",\"tree-rear-parking-junction-06\",\"tree-rear-parking-south-02\",\"tree-rear-parking-south-03\",\"tree-rear-parking-south-04\",\"tree-rear-parking-west-01\",\"tree-rear-parking-west-02\",\"tree-rear-parking-west-03\"],\"presentedCommercialTreeIds\":[\"tree-rear-parking-campeira-01\",\"tree-rear-parking-campeira-02\",\"tree-rear-parking-campeira-03\",\"tree-rear-parking-campeira-04\",\"tree-rear-parking-campeira-05\",\"tree-rear-parking-east-01\",\"tree-rear-parking-east-02\",\"tree-rear-parking-east-03\",\"tree-rear-parking-east-04\",\"tree-rear-parking-east-06\",\"tree-rear-parking-east-07\",\"tree-rear-parking-east-08\",\"tree-rear-parking-east-09\",\"tree-rear-parking-east-10\",\"tree-rear-parking-east-11\",\"tree-rear-parking-east-12\",\"tree-rear-parking-east-13\",\"tree-rear-parking-junction-01\",\"tree-rear-parking-junction-02\",\"tree-rear-parking-junction-03\",\"tree-rear-parking-junction-04\",\"tree-rear-parking-junction-05\",\"tree-rear-parking-junction-06\",\"tree-rear-parking-south-02\",\"tree-rear-parking-south-03\",\"tree-rear-parking-south-04\",\"tree-rear-parking-west-01\",\"tree-rear-parking-west-02\",\"tree-rear-parking-west-03\"],\"treeCoverage\":\"Canonical commercial tree layer; procedural territorial/access inventories are validated separately.\"}",
       "commercialMapInventoryCounts": "{\"entities\":116,\"presentedEntities\":116,\"lots\":100,\"commercialTrees\":29,\"presentedCommercialTrees\":29}",
-      "commercialMapReadiness": "{\"essentialPrepared\":true,\"preparing\":false,\"healthyScreen\":true,\"presentedFrames\":3,\"controlsInstalled\":true,\"frameIntervalMs\":68.90000009536743,\"responsive\":true,\"status\":\"ready\",\"path\":\"direct\",\"lastErrorCode\":null}"
+      "commercialMapReadiness": "{\"essentialPrepared\":true,\"preparing\":false,\"healthyScreen\":true,\"presentedFrames\":3,\"controlsInstalled\":true,\"frameIntervalMs\":46,\"responsive\":true,\"status\":\"ready\",\"path\":\"direct\",\"lastErrorCode\":null}"
     },
     "canvasCount": 1,
     "identity": {
       "canvas": 1,
       "renderer": 2,
       "controls": 3,
-      "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+      "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
     }
   },
   "mobile": {
@@ -479,18 +479,18 @@
         -19.875325500661642
       ],
       "renderer": {
-        "geometries": 86,
-        "textures": 32
+        "geometries": 87,
+        "textures": 58
       },
       "identity": {
         "canvas": 1,
         "renderer": 2,
         "controls": 3,
-        "camera": "bb1060f9-56da-41fd-a1a6-d761bbb1a638"
+        "camera": "2bdb9bdd-4c88-4b24-9c57-07e054e99ad5"
       },
       "workspaceMode": "3d"
     },
-    "body": "PRÉVIA LOCAL · Proposta 2028 · 100 lotes · 45.767,79 m² · Cartografia e conflitos B37/B38 pendentes · Somente leituraVer antes\nIr para o mapa comercial\nMapa Comercial\nExporural\nEntorno © OpenStreetMap\nFiltros\nEstacionamento posterior"
+    "body": "PRÉVIA LOCAL · Proposta 2028 · 100 lotes · 45.767,79 m² · Somente leituraVer antes\nIr para o mapa comercial\nMapa Comercial\nExporural\nEntorno © OpenStreetMap\nFiltros\nEstacionamento posterior"
   },
   "buttons": [
     "Ver antes",
@@ -510,7 +510,7 @@
     "Estacionamento posterior"
   ],
   "fullFallback": {
-    "body": "PRÉVIA LOCAL · Proposta 2028 · 100 lotes · 45.767,79 m² · Cartografia e conflitos B37/B38 pendentes · Somente leituraVer antes\nIr para o mapa comercial\nMapa Comercial\nSegmentos e legenda\nALTERNATIVA ACESSÍVEL AO MAPA 3D\nEntidades · Parque Fenasoja\nVerificar suporte 3D\nBuscar entidades do parque\n1699\nde 1699\nDisponível\n0\nReservado\n0\nNegociação\n0\nVendido\n0\nBloqueado\n1584\nIndisponível\n0\nTipos\nFiltrar por localização\nLocalização\nQuadra A (1)\nQuadra B (3)\nQuadra C (2)\nQuadra D (13)\nQuadra E (14)\nQuadra F (10)\nQuadra G (10)\nQuadra I (17)\nQuadra J (17)\nQuadra L (17)\nQuadra M (17)\nQuadra N (4)\nQuadra O (15)\nQuadra P (15)\nQuadra P1 (189)\nQuadra P3 (214)\nQuadra P5 (81)\nQuadra P7 (171)\nQuadra P8 (114)\nQuadra P12 (257)\nQuadra P13 (103)\nQuadra P14 (186)\nQuadra Q (7)\nQuadra R (67)\nQuadra S (38)\nQuadra T (13)\nQuadra U (13)\nQuadra V (7)\nQuadra X (2)\nAlameda Mercosul (1)\nAvenida Benvenuto de Conti (1)\nAvenida dos Imigrantes (1)\nAvenida Tuparendi (1)\nCalçada do Arvoredo (1)\nCorredor existente — denominação a confirmar (1)\nPassagem interna — denominação a confirmar (1)\nRodovia RS 472 (1)\nRua 15 de Novembro (1)\nRua Argentina (1)\nRua Argentina (trecho leste) (1)\nRua Bolívia (1)\nRua Brasil (1)\nRua Brasília (1)\nRua Bruno Schwartz (1)\nRua Buenos Aires (1)\nRua Chile (1)\nRua Emanuel Brachmann (1)\nRua Gustavo Bessel (1)\nRua Interna das Quadras V, U e T (1)\nRua Interna Oeste (1)\nRua Johan Muller (1)\nRua Leste da Exporural (1)\nRua Montevidéu (1)\nRua Montevidéu — conexão Cozinha da Soja (1)\nRua Montevidéu (trecho sul) (1)\nRua Paraguai (1)\nRua Pastor Albert Lehenbauer (1)\nRua Ubiretama (1)\nRua Ubiretama (lateral do Q-R-55) (1)\nRua Uruguai (1)\nRua Uruguai (trecho leste) (1)\nVia interna — denominação a confirmar (1)\nVerificação\nOrdenar entidades\nRelevância / nome\nNome A–Z\nLocalização\nSituação comercial\nConfortável\nLimpar\nEntidades do parque filtradas e sincronizadas com o mapa comercial 3D\nENTIDADE\tTIPO\tLOCALIZAÇÃO\tSITUAÇÃO\tÁREA OFICIAL\tVERIFICAÇÃO\tEMPRESA / OCUPANTE\t\nAÇÕES\nAL\nAlameda Gastronômica\nD1\nIndústria, Comércio e Serviços\nÁrea de alimentação\nQuadra F\nNão comercial\nNão validada\nPrecisa de revisão\nSem vínculo ativo\nVer detalhes\nRU\nAlameda Mercosul\nALAMEDA-MERCOSUL\nRua / circulação veicular\nAlameda Mercosul\nNão comercial\nNão validada\nPrecisa de revisão\nSem vínculo ativo\nVer detalhes\nET\nÁrea de estacionamento de veículos test drive\nTEST-DRIVE\nEstacionamento\nNão informada\nNão comercial\nNão validada\nPrecisa de revisão\nSem vínculo ativo\nVer detalhes\nAT\nÁrea de Lazer\nB38\nExporural\nAtração / área de visitantes\nQuadra S\nNão comercial\nNão validada\nPrecisa de revisão\nSem vínculo ativo\nVer detalhes\nET\nÁrea para Motor Home / Trailer para Expositores\nAREA-MOTORHOME\nEstacionamento\nNão informada\nNão comercial\nNão validada\nPrecisa de revisão\nSem vínculo ativo\nVer detalhes\nAnterior\n1–50 de 1699\nPróxima\nModo 2D acessível ativado\nO navegador não disponibilizou WebGL 2. Consulte registros e detalhes pela tabela. A seleção múltipla de Vendas e os interiores exigem o mapa 3D.",
+    "body": "PRÉVIA LOCAL · Proposta 2028 · 100 lotes · 45.767,79 m² · Somente leituraVer antes\nIr para o mapa comercial\nMapa Comercial\nSegmentos e legenda\nALTERNATIVA ACESSÍVEL AO MAPA 3D\nEntidades · Parque Fenasoja\nVerificar suporte 3D\nBuscar entidades do parque\n1699\nde 1699\nDisponível\n0\nReservado\n0\nNegociação\n0\nVendido\n0\nBloqueado\n1584\nIndisponível\n0\nTipos\nFiltrar por localização\nLocalização\nQuadra A (1)\nQuadra B (3)\nQuadra C (2)\nQuadra D (13)\nQuadra E (14)\nQuadra F (10)\nQuadra G (10)\nQuadra I (17)\nQuadra J (17)\nQuadra L (17)\nQuadra M (17)\nQuadra N (4)\nQuadra O (15)\nQuadra P (15)\nQuadra P1 (189)\nQuadra P3 (214)\nQuadra P5 (81)\nQuadra P7 (171)\nQuadra P8 (114)\nQuadra P12 (257)\nQuadra P13 (103)\nQuadra P14 (186)\nQuadra Q (7)\nQuadra R (67)\nQuadra S (38)\nQuadra T (13)\nQuadra U (13)\nQuadra V (7)\nQuadra X (2)\nAlameda Mercosul (1)\nAvenida Benvenuto de Conti (1)\nAvenida dos Imigrantes (1)\nAvenida Tuparendi (1)\nCalçada do Arvoredo (1)\nCorredor existente — denominação a confirmar (1)\nPassagem interna — denominação a confirmar (1)\nRodovia RS 472 (1)\nRua 15 de Novembro (1)\nRua Argentina (1)\nRua Argentina (trecho leste) (1)\nRua Bolívia (1)\nRua Brasil (1)\nRua Brasília (1)\nRua Bruno Schwartz (1)\nRua Buenos Aires (1)\nRua Chile (1)\nRua Emanuel Brachmann (1)\nRua Gustavo Bessel (1)\nRua Interna das Quadras V, U e T (1)\nRua Interna Oeste (1)\nRua Johan Muller (1)\nRua Leste da Exporural (1)\nRua Montevidéu (1)\nRua Montevidéu — conexão Cozinha da Soja (1)\nRua Montevidéu (trecho sul) (1)\nRua Paraguai (1)\nRua Pastor Albert Lehenbauer (1)\nRua Ubiretama (1)\nRua Ubiretama (lateral do Q-R-55) (1)\nRua Uruguai (1)\nRua Uruguai (trecho leste) (1)\nVia interna — denominação a confirmar (1)\nVerificação\nOrdenar entidades\nRelevância / nome\nNome A–Z\nLocalização\nSituação comercial\nConfortável\nLimpar\nEntidades do parque filtradas e sincronizadas com o mapa comercial 3D\nENTIDADE\tTIPO\tLOCALIZAÇÃO\tSITUAÇÃO\tÁREA OFICIAL\tVERIFICAÇÃO\tEMPRESA / OCUPANTE\t\nAÇÕES\nAL\nAlameda Gastronômica\nD1\nIndústria, Comércio e Serviços\nÁrea de alimentação\nQuadra F\nNão comercial\nNão validada\nPrecisa de revisão\nSem vínculo ativo\nVer detalhes\nRU\nAlameda Mercosul\nALAMEDA-MERCOSUL\nRua / circulação veicular\nAlameda Mercosul\nNão comercial\nNão validada\nPrecisa de revisão\nSem vínculo ativo\nVer detalhes\nET\nÁrea de estacionamento de veículos test drive\nTEST-DRIVE\nEstacionamento\nNão informada\nNão comercial\nNão validada\nPrecisa de revisão\nSem vínculo ativo\nVer detalhes\nAT\nÁrea de Lazer\nB38\nExporural\nAtração / área de visitantes\nQuadra S\nNão comercial\nNão validada\nPrecisa de revisão\nSem vínculo ativo\nVer detalhes\nET\nÁrea para Motor Home / Trailer para Expositores\nAREA-MOTORHOME\nEstacionamento\nNão informada\nNão comercial\nNão validada\nPrecisa de revisão\nSem vínculo ativo\nVer detalhes\nAnterior\n1–50 de 1699\nPróxima\nModo 2D acessível ativado\nO navegador não disponibilizou WebGL 2. Consulte registros e detalhes pela tabela. A seleção múltipla de Vendas e os interiores exigem o mapa 3D.",
     "buttons": [
       "Ver antes",
       "Buscar no mapa",
@@ -581,31 +581,5 @@
       "Anterior",
       "Próxima"
     ]
-  },
-  "cameraComparison": [
-    {
-      "name": "geral",
-      "maxDelta": 0
-    },
-    {
-      "name": "faixas_s",
-      "maxDelta": 0
-    },
-    {
-      "name": "central_r",
-      "maxDelta": 0
-    },
-    {
-      "name": "subdivisoes",
-      "maxDelta": 0
-    },
-    {
-      "name": "perimetro_62_65",
-      "maxDelta": 0
-    },
-    {
-      "name": "nova_via",
-      "maxDelta": 0
-    }
-  ]
+  }
 }

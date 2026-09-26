@@ -1,0 +1,24 @@
+{
+  "document_sha256": "7be52ef87828b58c20d3853eb81ee13186cda3ead220f7673a58525d3c6cd33c",
+  "pdf_sha256": "5ee109b19fdcef05b361317a59d06459d6e87de5ebbdd9f689b880a092c93c60",
+  "pages": 13,
+  "visual_review": "Todas as 13 paginas finais inspecionadas: texto, tabelas, margens, repeticao de cabecalhos e rodapes legiveis.",
+  "renderer": "render_docx.py; LibreOffice 26.2.6 extraido localmente do MSI oficial; Poppler",
+  "render_note": "PDF e 13 PNGs produzidos; substituicao de page-4.png encontrou bloqueio transitorio do Windows. Copia dos PNGs finais repetida com sucesso, sem alterar seu conteudo.",
+  "same_content_evidence": "../documento-conteudo.json",
+  "page_hashes": {
+    "page-1.png": "68b06df0fc2d3dae951263cae2d7b627ca113dc7820779e77d7651bf02e4205f",
+    "page-2.png": "a8c729708722a33ae859ad602d37915765fc6b7cdb77a148cda0f113be662457",
+    "page-3.png": "44f2afc54624164103100c2a79a3cff682deab9cac643594e9b83a41ca952e1d",
+    "page-4.png": "90167756989861947f9c815703fe234f060ea3a161edba9133e66a55419d8843",
+    "page-5.png": "62919a25e449b2875ab1c3c5e2f30afd003418d64b2c10c190d382f6421af70b",
+    "page-6.png": "5f136396121336d36d833b2f5f16cc89adad62fe11c526135256f19cccd4d832",
+    "page-7.png": "7acb6b5701a9e9519e6c4c22a9566d65754bd00062c640d2078b619d5e385b49",
+    "page-8.png": "5192fc6281a163a2503e4153a829e077987cc1c87c44980123b44f502e6e3113",
+    "page-9.png": "fafe34b1133e28325696e79985bf040e44108259eda22111cf5442c0d91f7397",
+    "page-10.png": "c3246373380d402982934c4a005c91deeb1a37f054aacd5d187460fcc488c2e5",
+    "page-11.png": "c470a847399bff65e591f4c16e3000d6ddbd8fff6bf048418c7ddcf60611644e",
+    "page-12.png": "9386b65637ef99f643ecfe4d7b91f3a4f9edf5cc984864409eef0479a99fb15f",
+    "page-13.png": "8889fccb81fb80c3cc46899efcd1df0a0ea9fbfa70ccb8a02a2e492347867cb8"
+  }
+}

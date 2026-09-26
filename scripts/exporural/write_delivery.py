@@ -109,6 +109,7 @@ add('p','A releitura após COMMIT deve ocorrer em sessão nova. Conferir as 100 
 add('p','Os testes locais cobriram códigos/somas, sequências e vizinhança, rótulos internos, polígonos simples/fechados, divisas compartilhadas, ausência de lote-lote e lote-via em todas as ruas carregadas, B7/B8/D3 preservados, ausência de S-36/R-66, identidade R-56, fixture determinística, seleção obsoleta, métricas e invariância externa. O teste de paisagismo da referência antiga também passou. A proposta SQL passou pelo parser PostgreSQL/PLpgSQL pglast; esse resultado é somente sintático, não execução nem prova de RLS, triggers ou concorrência.')
 add('p','Comandos e saídas: npm run typecheck e ESLint dos arquivos alterados terminaram com código 0; npm run build -- --manifest passou, com avisos existentes de tamanho de chunks e Browserslist antigo. A checagem focal inicial passou 20 testes de revisão/paisagismo; ao ampliar a proteção para B37/B38/C4, a suíte manteve UMA FALHA de aceitação por sobreposição com B37/B38. Essa verificação não foi removida ou relaxada para passar. Os demais testes de revisão, paisagismo, política pública e SOLD passaram nas execuções registradas. Foi necessário aumentar somente o timeout do runner para 60 s em testes pesados de paisagismo; nenhuma tolerância geométrica foi relaxada. A suíte ampliada anterior registrou 59 passes e três falhas: uma por timeout depois resolvida, uma expectativa antiga do explorador (262 versus 264) e um hash histórico de arquitetura. A auditoria inicial também encontrou expectativa global 1577 versus 1579. As falhas de snapshots/contagens históricas foram preservadas e não são consideradas passes.')
 add('p','evidencias/runtime contém capturas reais de antes/depois na mesma câmera, viewport desktop 1440 × 1000, zoom e camadas para seis vistas: geral, faixas S, faixa central R, subdivisões, perímetro 62–65 e transversal. O clique no novo R-56 apresentou 249,03 m²; trocar revisão limpou seleção. Foi injetada perda de contexto WebGL e verificada recuperação. Viewport mobile 390 × 844 e a rota completa com fallback acessível também foram exercitados. resultados.json registra navegador, erros, bloqueios de rede, estado, inventário e recursos. Pranchas técnicas de sobreposição em evidencias/pranchas usam exatamente as coordenadas da fixture, mas não são screenshots do renderer.')
+add('p','A recuperação WebGL teve resultados mistos nas repetições: execucao-validada-anterior.json registra sucesso com as mesmas identidades de Canvas, renderer, câmera e controles; tentativa-contexto-timeout.json registra uma espera de recuperação que excedeu 90 s durante execução concorrente de outras tarefas locais. Isso não comprova a causa da falha. O ensaio final fica em resultados.json. Estabilidade sob pressão de recursos permanece pendente e não se declara aceite universal do renderer.')
 add('p','Limites: as rotas reais de componentes foram testadas com fixtures e Supabase substituído por stub, sem sessão autenticada real nem dados vivos de comissão. O fallback acessível denominado 2D é a lista/tabela existente; não foi criada uma segunda maquete 2D. Não houve teste em celular físico, Safari/iOS, Android, produção, CI remota ou banco isolado, pois Docker/psql não estavam disponíveis. Não há certificação universal de FPS/memória ou prazo de cold start. A primeira captura revelou e motivou a correção dos índices do paisagismo; uma navegação de fallback excedeu timeout sob carga e foi repetida no ensaio final, concluído sem erros. Os logs registram as tentativas de diagnóstico e o JSON de runtime registra a execução final.')
 add('h','K Pendências para autorização')
 table(['Pendência','Responsável pela resolução','Efeito'],[
@@ -152,6 +153,8 @@ normal=doc.styles['Normal'];normal.font.name='Arial';normal.font.size=Pt(11)
 normal.paragraph_format.space_after=Pt(7);normal.paragraph_format.line_spacing=1.08
 for style,size in [('Title',22),('Heading 1',15)]:
     doc.styles[style].font.name='Arial';doc.styles[style].font.size=Pt(size);doc.styles[style].font.color.rgb=RGBColor(0,0,0)
+for border in doc.styles.element.xpath('.//w:pBdr'):
+    border.getparent().remove(border)
 doc.styles['Heading 1'].paragraph_format.space_before=Pt(15)
 footer=section.footer.paragraphs[0];footer.alignment=2
 footer.add_run('Exporural 2028  •  Proposta local  •  ').font.size=Pt(9)
@@ -162,6 +165,9 @@ for kind,value in blocks:
         t=doc.add_table(rows=1,cols=len(value[0]));t.autofit=False
         widths=[7.1/len(value[0])]*len(value[0])
         if len(value[0])==2:widths=[2.35,4.75]
+        if value[0][0]=='Grupo físico':widths=[2.2,1.55,1.7,1.65]
+        table_width=t._tbl.tblPr.find(qn('w:tblW'))
+        table_width.set(qn('w:type'),'dxa');table_width.set(qn('w:w'),str(round(7.1*1440)))
         for i,w in enumerate(widths):t.columns[i].width=Inches(w)
         for i,txt in enumerate(value[0]):t.rows[0].cells[i].text=txt
         repeat=OxmlElement('w:tblHeader');t.rows[0]._tr.get_or_add_trPr().append(repeat)
