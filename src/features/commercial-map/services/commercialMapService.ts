@@ -1,6 +1,7 @@
 import { captureCommercialMapStageRecorder, type CommercialMapStageRecorder } from '../utils/performanceDiagnostics';
 import { awaitCommercialMapRequest, measureCommercialMapOperation, throwIfMapRequestAborted } from '../utils/commercialMapOperation';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchSaleLogoUrls } from '../sales/saleLogo';
 import { OFFICIAL_REFERENCE_DATA, OFFICIAL_REFERENCE_REVISION } from '../data/officialReference2026';
 import { reconcileExporuralReference } from '../data/reconcileExporuralReference';
 import type {
@@ -645,6 +646,7 @@ export async function fetchCommercialMap(
     };
   }
 
+  const logoUrls = await fetchSaleLogoUrls({ projectId: project.id });
   const result = reconcileExporuralReference({
     source: 'database',
     sourceMessage: project.isPublished ? null : 'Projeto cartográfico em rascunho. Alterações ainda não estão publicadas para toda a equipe.',
@@ -652,7 +654,7 @@ export async function fetchCommercialMap(
     calibration: calibrationResult.calibration,
     layers: (layersResult.data ?? []).map(mapLayer),
     entities,
-    lots: lotRows.map(mapLot),
+    lots: lotRows.map(row => ({ ...mapLot(row), saleLogoUrl: row.status === 'SOLD' ? logoUrls[row.id] ?? null : null })),
   });
   throwIfMapRequestAborted(context.signal);
   context.recordStage('inventory-transformation:end', { duration: performance.now() - transformationStartedAt });
