@@ -519,7 +519,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
               </div>
             </TabsContent>
             <TabsContent value="history">
-              <LotSaleHistoryCard sale={saleHistory.data} loading={saleHistory.isLoading} />
+              <LotSaleHistoryCard sale={saleHistory.data} loading={saleHistory.isLoading} currentIdentity={lotIdentity} />
               <div className="commercial-map-activity">
                 {!lot && <div className="commercial-map-empty compact"><History /><strong>Histórico disponível após a importação</strong></div>}
                 {lot && activity.isLoading && <p>Carregando histórico auditável…</p>}

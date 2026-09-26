@@ -231,7 +231,7 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
           </div>
         </dl>
 
-        <LotSaleHistoryCard sale={saleHistory.data} loading={saleHistory.isLoading} />
+        <LotSaleHistoryCard sale={saleHistory.data} loading={saleHistory.isLoading} currentIdentity={lot ? resolveLotIdentity(lot, record?.entity, pavilion) : null} />
 
         {persisted && permissions.canManageContracts && lot && (lot.status === 'SOLD' || Boolean(contracts.data?.length)) && (
           <section
