@@ -9728,6 +9728,7 @@ export type Database = {
         Args: { p_lot_id: string; p_stage: string }
         Returns: Json
       }
+      commercial_sale_logos: { Args: { p_project_id: string }; Returns: Json }
       commission_leadership_user_ids: {
         Args: { _commission_id: string }
         Returns: {
