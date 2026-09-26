@@ -1,5 +1,12 @@
 # Roadmap
 
+## Identificação oficial dos espaços comerciais
+- [x] Resolver número/quadra/segmento/pavilhão a partir do cadastro oficial sem deduzir metragem ou renumeração do código técnico.
+- [x] Aplicar identificação no mapa, seleção, carrinho, revisão, painel, mini mapa, consulta pública e detalhe de venda sem mudar snapshots.
+- [x] Conferir Q-R-20/21/22 e validar 53 testes focais e compilação.
+- [ ] Conferir visualmente os rótulos em desktop/celular com sessão autorizada — prévia automatizada permaneceu na abertura, sem canvas.
+- Não publicar (pedido do usuário)
+
 ## Sidebar comercial por estado do lote
 - [x] Destacar venda confirmada com comprador, data/hora, etapa e responsável
 - [x] Diferenciar as composições de lotes vendidos e disponíveis
