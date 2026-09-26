@@ -117,11 +117,11 @@ const EXPECTED_PLANS = {
   },
   B10: {
     pavilionNumber: 7,
-    category: 'Agroindústrias',
-    moduleCount: 171,
-    totalAreaSquareMeters: 918.66,
+    category: 'Agricultura Familiar / Agroindústrias',
+    moduleCount: 57,
+    totalAreaSquareMeters: 917,
     moduleAreaSquareMeters: 427.5,
-    ranges: [[1, 42], [43, 126], [127, 171]],
+    ranges: [[1, 15], [16, 29], [30, 43], [44, 49], [50, 57]],
   },
 } as const satisfies Readonly<Record<CommercialPavilionPublicIdentifier, {
   pavilionNumber: number;
@@ -414,11 +414,12 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     expect(cell('B4', 90).centerZ).toBeLessThan(cell('B4', 114).centerZ);
     expect(cell('B8', 1).centerX).toBe(cell('B8', 43).centerX);
     expect(cell('B8', 1).centerZ).toBeGreaterThan(cell('B8', 43).centerZ);
-    expect(cell('B10', 1).centerX).toBeLessThan(cell('B10', 21).centerX);
-    expect(cell('B10', 22).centerX).toBeLessThan(cell('B10', 42).centerX);
-    expect(cell('B10', 43).centerX).toBeLessThan(cell('B10', 84).centerX);
-    expect(cell('B10', 85).centerX).toBeGreaterThan(cell('B10', 126).centerX);
-    expect(cell('B10', 127).centerX).toBeLessThan(cell('B10', 171).centerX);
+    expect(cell('B10', 1).centerX).toBeLessThan(cell('B10', 4).centerX);
+    expect(cell('B10', 5).centerX).toBeLessThan(cell('B10', 15).centerX);
+    expect(cell('B10', 16).centerX).toBeLessThan(cell('B10', 29).centerX);
+    expect(cell('B10', 43).centerX).toBeLessThan(cell('B10', 30).centerX);
+    expect(cell('B10', 44).centerX).toBeLessThan(cell('B10', 49).centerX);
+    expect(cell('B10', 50).centerX).toBeLessThan(cell('B10', 57).centerX);
   });
 
   it('usa as 214 células da referência única e forma duas ilhas com pares de 32 sem tails', () => {
@@ -696,14 +697,14 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     ]));
   });
 
-  it('reconstrói o Pavilhão 7 com 171 lotes e preserva a contagem documental de 57', () => {
+  it('reconstrói o Pavilhão 7 com 57 boxes oficiais', () => {
     const plan = COMMERCIAL_PAVILION_MODULE_PLANS.B10;
     expect(plan.cells).toBe(PAVILION7_COMMERCIAL_REFERENCE_CELLS);
     expect(plan.cells).toBe(PAVILION7_COMMERCIAL_REFERENCE.cells);
     expect(plan.stats.sourceDeclaredModuleCount).toBe(57);
-    expect(plan.stats.moduleCount).toBe(171);
+    expect(plan.stats.moduleCount).toBe(57);
     expect(plan.stats.moduleAreaSquareMeters).toBe(427.5);
-    expect(plan.documentDiscrepancies).toHaveLength(1);
+    expect(plan.documentDiscrepancies).toHaveLength(0);
     expect(plan.supportSpaces.map((space) => space.type))
       .toEqual(['permanent-non-commercial', 'permanent-non-commercial']);
     expect(plan.wallAccesses).toHaveLength(4);

@@ -26,7 +26,7 @@ const VisitLotInformation = memo(function VisitLotInformation({ poi, expanded }:
   const metadata = normalizeMapEntityMetadata(poi.entity, lot);
   const segment = resolveCommercialMapSegment(poi.entity, lot);
   const area = pricing?.officialAreaSqm ?? lot.officialAreaSqm;
-  const ready = pricing?.resolutionStatus === 'OK';
+  const ready = pricing?.resolutionStatus === 'OK' || pricing?.renovacaoTotal != null;
   const secondTotal = ready ? formatBrl(pricing.segundaTotal) : null;
   return <>
     <div className="visit-poi__facts">

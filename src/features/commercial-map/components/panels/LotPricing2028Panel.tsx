@@ -146,7 +146,7 @@ function PricingBody({ pricing, fallbackArea, confirmedStage, canEdit }: { prici
     );
   }
 
-  if (pricing.resolutionStatus !== 'OK' && !canEdit) {
+  if (pricing.resolutionStatus !== 'OK' && !canEdit && pricing.renovacaoTotal == null && pricing.segundaTotal == null) {
     return (
       <>
         {areaRow}

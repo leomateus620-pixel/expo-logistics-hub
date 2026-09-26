@@ -5,6 +5,7 @@ import { dispatchSalesLotClick, dispatchSalesModuleClick } from '@/features/comm
 import { useSalesStore } from '@/features/commercial-map/sales/useSalesSelection';
 import { buildEligibleLotIds } from '@/features/commercial-map/sales/salesEligibility';
 import { summarizeCart } from '@/features/commercial-map/sales/salesPricing';
+import { buildCartLine } from '@/features/commercial-map/sales/salesPricing';
 import type { CommercialLot } from '@/features/commercial-map/types';
 import type { LotPricing2028 } from '@/features/commercial-map/utils/lotPricing2028';
 import { useCommercialMapStore } from '@/features/commercial-map/state/useCommercialMapStore';
@@ -67,16 +68,27 @@ describe('elegibilidade comercial', () => {
     expect(isSellableLot(lot('z'), eligible)).toBe(false);
   });
 
-  it('separa bloqueio técnico de bloqueio comercial e exclui o Pavilhão 7', () => {
+  it('separa bloqueio técnico de bloqueio comercial e libera P7 com Renovação precificada', () => {
     const rows = [
       { lotId: 'tecnico', isSellable: true, ineligibleReason: null, statusOrigin: 'TECHNICAL_BLOCK' },
       { lotId: 'comercial', isSellable: false, ineligibleReason: 'BLOQUEIO_COMERCIAL_EXPLICITO', statusOrigin: 'COMMERCIAL_BLOCK' },
-      { lotId: 'p7', isSellable: false, ineligibleReason: 'PAVILHAO_7_SEM_PRECO', statusOrigin: 'TECHNICAL_BLOCK' },
+      { lotId: 'p7', isSellable: true, ineligibleReason: null, statusOrigin: null },
     ];
     const eligible = buildEligibleLotIds(rows);
     expect(eligible.has('tecnico')).toBe(true);
     expect(eligible.has('comercial')).toBe(false);
-    expect(eligible.has('p7')).toBe(false);
+    expect(eligible.has('p7')).toBe(true);
+  });
+
+  it('permite Renovação do P7 por R$ 2.580,00 e impede apenas a 2ª Etapa sem preço', () => {
+    const entry = toSalesEntry(lot('p7', { block: 'P7', status: 'AVAILABLE', officialAreaSqm: 7.5 }));
+    const official = { ...pricing('p7', 7.5, 344, 0), pavilion: 'P7', segundaPricePerSqm: null, segundaTotal: null };
+    const renewal = buildCartLine(entry, official, 'RENOVACAO');
+    expect(renewal.unpriced).toBe(false);
+    expect(renewal.total).toBe(2580);
+    const second = buildCartLine(entry, official, 'SEGUNDA_ETAPA');
+    expect(second.unpriced).toBe(true);
+    expect(second.pendingReason).toBe('Valor ainda não definido');
   });
 
   it('nunca aceita lote arquivado ou de referência', () => {

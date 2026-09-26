@@ -30,7 +30,6 @@ type PavilionIdentifier = 'B2' | 'B8' | 'B10';
 const references = {
   B2: PAVILION14_COMMERCIAL_REFERENCE,
   B8: PAVILION5_COMMERCIAL_REFERENCE,
-  B10: PAVILION7_COMMERCIAL_REFERENCE,
 } as const;
 
 const metricFrames = {
@@ -96,7 +95,7 @@ describe('contrato persistido dos Pavilhões 5, 7 e 14', () => {
     expect(sql).toContain("null, 57,");
   });
 
-  it('mantém os 15 runs SQL em paridade métrica com as referências cliente', () => {
+  it('mantém os 15 runs históricos SQL sem alterar a migração legada; P7 é corrigido em migração posterior', () => {
     expect(parsedRuns).toHaveLength(15);
 
     for (const [identifier, reference] of Object.entries(references)) {

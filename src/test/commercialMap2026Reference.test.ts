@@ -77,7 +77,7 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(lotsByBlock.get('G')).toContain(4);
   });
 
-  it('incorpora os 1.315 módulos neutros dos oito pavilhões oficiais sem inventar área, comprador ou contrato', () => {
+  it('incorpora 1.201 módulos cartográficos dos oito pavilhões sem inventar comprador ou contrato', () => {
     const pavilionReferences = [
       { publicIdentifier: 'B1', block: 'P1', moduleCount: 189, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B2', block: 'P14', moduleCount: 186, segmentId: 'industria-comercio-servicos' },
@@ -86,10 +86,10 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
       { publicIdentifier: 'B5', block: 'P13', moduleCount: 103, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B6', block: 'P3', moduleCount: 214, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B8', block: 'P5', moduleCount: 81, segmentId: null },
-      { publicIdentifier: 'B10', block: 'P7', moduleCount: 171, segmentId: null },
+      { publicIdentifier: 'B10', block: 'P7', moduleCount: 57, segmentId: null },
     ] as const;
 
-    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(1579);
+    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(1465);
     pavilionReferences.forEach((reference) => {
       const pavilion = OFFICIAL_REFERENCE_DATA.entities.find(
         (entity) => entity.publicIdentifier === reference.publicIdentifier,
@@ -144,7 +144,7 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(pavilion14.metadata.aliases).toEqual(expect.arrayContaining([
       'Pavilhão 14 — Comércio e Artesanato',
     ]));
-    expect(pavilion7).toMatchObject({ name: 'Pavilhão 7 — Agroindústrias' });
+    expect(pavilion7).toMatchObject({ name: 'Pavilhão 7 — Agricultura Familiar / Agroindústrias' });
     expect(pavilion7.metadata.aliases).toEqual(expect.arrayContaining([
       'Pavilhão 7 — Agricultura Familiar',
       'Pavilhão 7 — Agricultura familiar / soja e derivados',
@@ -165,11 +165,11 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
       areaM2: 4.5,
     });
     expect(moduleFor(pavilion7).metadata).toMatchObject({
-      layoutRevision: '2026.4-p7.1',
+      layoutRevision: '2028.1-p7.57',
       planCoordinateTransform: 'identity',
       projectionFit: 'metric-contain',
       metricReference: { widthM: 49.9, depthM: 18.3 },
-      areaM2: 2.5,
+      areaM2: 7.5,
     });
   });
 
@@ -300,7 +300,7 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(new Set(lotIdentifiers).size).toBe(lotIdentifiers.length);
     expect(externalLotIdentifiers).toHaveLength(264);
     expect(externalLotIdentifiers.every((identifier) => /^Q-[A-Z]-\d{2}$/.test(identifier))).toBe(true);
-    expect(pavilionModuleIdentifiers).toHaveLength(1315);
+    expect(pavilionModuleIdentifiers).toHaveLength(1201);
     expect(pavilionModuleIdentifiers.every((identifier) => /^B(?:1|2|3|4|5|6|8|10)-M\d{3}$/.test(identifier))).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.entities
       .filter((entity) => entity.classification === 'SELLABLE_LOT' || entity.classification === 'INTERNAL_STAND')

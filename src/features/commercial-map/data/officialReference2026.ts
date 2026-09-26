@@ -585,7 +585,7 @@ const bStructures: Array<[string, string, MapClassification, string, PdfBounds |
   ['B7', 'Pavilhão 4 — Cozinha da Soja', 'PAVILION', 'pavilions', [3495, 2497, 3666, 2568], { parent: 'N' }],
   ['B8', 'Pavilhão 5 — Veterinária, Pequenos Animais e Rações', 'PAVILION', 'pavilions', [3198, 2203, 3411, 2390]],
   ['B9', 'Pavilhões 6, 10 e 11 — Pecuária', 'PAVILION', 'pavilions', [2319, 2256, 3179, 2389]],
-  ['B10', 'Pavilhão 7 — Agroindústrias', 'PAVILION', 'pavilions', [1973, 2252, 2309, 2379], {
+  ['B10', 'Pavilhão 7 — Agricultura Familiar / Agroindústrias', 'PAVILION', 'pavilions', [1973, 2252, 2309, 2379], {
     metadata: {
       aliases: [
         'Pavilhão 7 — Agricultura Familiar',
@@ -933,8 +933,8 @@ const pavilionModuleReferences: readonly PavilionModuleReference[] = [
     publicIdentifier: 'B10',
     pavilionNumber: 7,
     block: 'P7',
-    layoutRevision: '2026.4-p7.1',
-    source: 'Croqui Pavilhão 7 - Fenasoja 2026_page-0001.jpg',
+    layoutRevision: '2028.1-p7.57',
+    source: 'Ajuste_Pav07.pdf (setembro/2026)',
     facingRadians: 0,
     segmentId: null,
     cells: PAVILION7_COMMERCIAL_REFERENCE_CELLS,
@@ -1176,7 +1176,7 @@ export const OFFICIAL_REFERENCE_LOTS: CommercialLot[] = officialLotEntities.map(
 
 export const OFFICIAL_REFERENCE_DATA: CommercialMapData = {
   source: 'official-reference',
-  sourceMessage: 'Planta oficial 2026 digitalizada sem importar compradores. Os 95 lotes da Exporural possuem áreas cadastrais validadas; os 1.315 módulos dos Pavilhões 1, 3, 5, 7, 8, 12, 13 e 14 permanecem sem área individual e todos os 1.577 lotes/módulos ficam bloqueados até liberação comercial.',
+  sourceMessage: 'Referência cartográfica sem importar compradores: os 95 lotes da Exporural possuem áreas cadastrais validadas; o inventário ativo dos oito pavilhões contém 1.201 módulos, incluindo os 57 boxes oficiais de 7,50 m² do Pavilhão 7. Disponibilidade e preços comerciais devem ser consultados na base persistida.',
   project: {
     id: 'reference:fenasoja-2026',
     orgId: null,
