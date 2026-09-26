@@ -165,11 +165,11 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
       areaM2: 4.5,
     });
     expect(moduleFor(pavilion7).metadata).toMatchObject({
-      layoutRevision: '2026.4-p7.1',
+      layoutRevision: '2028.1-p7.57',
       planCoordinateTransform: 'identity',
       projectionFit: 'metric-contain',
       metricReference: { widthM: 49.9, depthM: 18.3 },
-      areaM2: 2.5,
+      areaM2: 7.5,
     });
   });
 
