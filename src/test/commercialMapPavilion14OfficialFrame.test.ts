@@ -114,8 +114,8 @@ describe('enquadramento oficial do Pavilhão 14', () => {
     expect(PAVILION14_COMMERCIAL_WALL_ACCESSES).toHaveLength(3);
     expect(PAVILION14_COMMERCIAL_WALL_ACCESSES.every(
       ({ edges, sourcePrecision }) => (
-        edges[0] === 'front'
-        && edges[1] === 'rear'
+        edges[0] === 'left'
+        && edges[1] === 'right'
         && sourcePrecision === 'official-metric'
       ),
     )).toBe(true);

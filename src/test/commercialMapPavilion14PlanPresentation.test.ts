@@ -59,31 +59,31 @@ describe('planta comercial fixa do Pavilhão 14', () => {
     expect(PAVILION14_COMMERCIAL_REFERENCE).not.toHaveProperty('interiorPresentation');
   });
 
-  it('projeta cada acesso transversal de front/rear para left/right pelo quarter-turn', () => {
+  it('projeta as laterais esquerda/direita do PDF nas paredes rear/front pelo quarter-turn', () => {
     const layout = createCommercialPavilionLayout(
       { width: 35, depth: 33 },
       COMMERCIAL_PAVILION_DEFINITIONS.B2,
       undefined,
       COMMERCIAL_PAVILION_MODULE_PLANS.B2,
     );
-    const left = layout.exterior.facade.leftEntrances;
-    const right = layout.exterior.facade.rightEntrances;
+    const left = layout.exterior.facade.rearEntrances;
+    const right = layout.exterior.facade.entrances;
 
     expect(left.map((access) => access.id)).toEqual([
-      'north-transverse-access:front',
-      'central-transverse-access:front',
-      'south-transverse-access:front',
+      'north-transverse-access:left',
+      'central-transverse-access:left',
+      'south-transverse-access:left',
     ]);
     expect(right.map((access) => access.id)).toEqual([
-      'north-transverse-access:rear',
-      'central-transverse-access:rear',
-      'south-transverse-access:rear',
+      'north-transverse-access:right',
+      'central-transverse-access:right',
+      'south-transverse-access:right',
     ]);
-    expect(left.map((access) => access.edge)).toEqual(['left', 'left', 'left']);
-    expect(right.map((access) => access.edge)).toEqual(['right', 'right', 'right']);
-    expect(left.map((access) => access.centerZ)).toEqual([...right.map((access) => access.centerZ)]);
-    expect(left[0].centerZ).toBeGreaterThan(left[1].centerZ);
-    expect(left[1].centerZ).toBeGreaterThan(left[2].centerZ);
+    expect(left.map((access) => access.edge)).toEqual(['rear', 'rear', 'rear']);
+    expect(right.map((access) => access.edge)).toEqual(['front', 'front', 'front']);
+    expect(left.map((access) => access.centerX)).toEqual([...right.map((access) => access.centerX)]);
+    expect(left[0].centerX).toBeGreaterThan(left[1].centerX);
+    expect(left[1].centerX).toBeGreaterThan(left[2].centerX);
   });
 
   it('usa câmera e controles compartilhados sem rotação nem recentralização manual', () => {
@@ -106,7 +106,7 @@ describe('planta comercial fixa do Pavilhão 14', () => {
   it('mantém seleção comercial, lotes planos, instancing e atlas único sem labels DOM', () => {
     const layer = read('src/features/commercial-map/components/canvas/CommercialPavilionModuleLayer.tsx');
 
-    expect(layer).toContain('const heightScale = flatModules ? 1');
+    expect(layer).toMatch(/heightScale: flatModules\s+\? 1/);
     expect(layer).toContain('dispatchSalesModuleClick');
     expect(layer).toContain('THREE.InstancedMesh');
     expect(layer).toContain('new THREE.CanvasTexture(canvas)');

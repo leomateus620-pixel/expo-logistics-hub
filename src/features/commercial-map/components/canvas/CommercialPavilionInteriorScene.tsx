@@ -33,6 +33,7 @@ import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { createCommercialPavilionTexture } from './commercialPavilionTextures';
 import { CommercialPavilionModuleLayer } from './CommercialPavilionModuleLayer';
 import { CommercialPavilionWayfindingLayer } from './CommercialPavilionWayfindingLayer';
+import { CommercialPavilionDimensionsLayer } from './CommercialPavilionDimensionsLayer';
 
 const NO_RAYCAST = () => undefined;
 const UP = new THREE.Vector3(0, 1, 0);
@@ -520,6 +521,7 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
           entities={entities}
           onNavigate={onNavigate}
         />
+        <CommercialPavilionDimensionsLayer layout={layout} plan={modulePlan} />
         <InteriorInstances geometry={unitBoxGeometry} material={materials.structure} items={columns} castShadow />
         <InteriorInstances geometry={unitBoxGeometry} material={materials.structure} items={beams} castShadow />
         <InteriorInstances geometry={unitBoxGeometry} material={materials.threshold} items={thresholds} />

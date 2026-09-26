@@ -285,16 +285,16 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
       layouts.B1.exterior.shell.width * 0.45,
     );
 
-    expect(layouts.B2.exterior.facade.entrances).toHaveLength(2);
-    expect(layouts.B2.exterior.facade.rearEntrances).toHaveLength(0);
-    expect(layouts.B2.exterior.facade.leftEntrances).toHaveLength(3);
-    expect(layouts.B2.exterior.facade.rightEntrances).toHaveLength(3);
+    expect(layouts.B2.exterior.facade.entrances).toHaveLength(3);
+    expect(layouts.B2.exterior.facade.rearEntrances).toHaveLength(3);
+    expect(layouts.B2.exterior.facade.leftEntrances).toHaveLength(0);
+    expect(layouts.B2.exterior.facade.rightEntrances).toHaveLength(0);
     expect(layouts.B2.exterior.facade.centralMass).toBeNull();
-    const pavilion14Left = layouts.B2.exterior.facade.leftEntrances;
-    expect(pavilion14Left[0].centerZ).toBeGreaterThan(pavilion14Left[1].centerZ);
-    expect(pavilion14Left[1].centerZ).toBeGreaterThan(pavilion14Left[2].centerZ);
-    expect(pavilion14Left[0].depth).toBeCloseTo(pavilion14Left[2].depth, 12);
-    expect(pavilion14Left[1].depth / pavilion14Left[0].depth).toBeCloseTo(5 / 4, 12);
+    const pavilion14Left = layouts.B2.exterior.facade.rearEntrances;
+    expect(pavilion14Left[0].centerX).toBeGreaterThan(pavilion14Left[1].centerX);
+    expect(pavilion14Left[1].centerX).toBeGreaterThan(pavilion14Left[2].centerX);
+    expect(pavilion14Left[0].width).toBeCloseTo(pavilion14Left[2].width, 12);
+    expect(pavilion14Left[1].width / pavilion14Left[0].width).toBeCloseTo(5 / 4, 12);
 
     expect(layouts.B10.exterior.facade.entrances).toHaveLength(1);
     expect(layouts.B10.exterior.facade.rearEntrances).toHaveLength(1);
