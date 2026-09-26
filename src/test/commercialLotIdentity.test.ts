@@ -29,4 +29,26 @@ describe('identificação comercial oficial', () => {
     expect(entries.map(entry => entry.area)).toEqual(['Exporural', 'Indústria, Comércio e Serviços']);
     expect(entries.map(entry => entry.lotId)).toEqual(['id-20', 'id-5']);
   });
+  it('mantém o espaço de 568,78 m² sem número visível, inclusive na seleção, e mostra um número somente após edição', () => {
+    const unnumbered = {
+      ...lot('20'),
+      id: 'f53e2989-747b-437f-9ef6-d4beb31bea33',
+      publicIdentifier: 'EXPORURAL-AREA-56878',
+      displayName: 'Área comercial · Quadra R',
+      lotNumber: null,
+      officialAreaSqm: 568.78,
+    };
+    const identity = resolveLotIdentity(unnumbered, entity('20'));
+    expect(identity.number).toBeNull();
+    expect(identity.title).toBe('Área comercial · Quadra R');
+    expect(identity.full).not.toContain('EXPORURAL-AREA-56878');
+    expect(toSalesEntry(unnumbered, null, entity('20'))).toMatchObject({
+      lotId: unnumbered.id, title: 'Área comercial · Quadra R',
+    });
+
+    const edited = { ...unnumbered, lotNumber: 'TESTE' };
+    expect(resolveLotIdentity(edited, entity('20')).title).toBe('Lote TESTE');
+    expect(toSalesEntry(edited, null, entity('20')).title).toBe('Lote TESTE');
+    expect(resolveLotIdentity({ ...edited, lotNumber: null }, entity('20')).title).toBe(identity.title);
+  });
 });

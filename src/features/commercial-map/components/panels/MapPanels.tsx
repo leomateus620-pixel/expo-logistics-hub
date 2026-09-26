@@ -383,7 +383,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
           <HistoryExperience key={entity.id} historyId={historyId} onClose={closeHistory} />
         </>}
         <div className="commercial-map-commercial-view" hidden={historyOpen}>
-        <PanelHeader eyebrow={`${entity.publicIdentifier} · ${CLASSIFICATION_LABELS[entity.classification]}`} title={lotIdentity?.full ?? metadata.officialDisplayName} onClose={() => setSelectedEntityId(null)} />
+        <PanelHeader eyebrow={lot && !lotIdentity?.number ? CLASSIFICATION_LABELS[entity.classification] : `${entity.publicIdentifier} · ${CLASSIFICATION_LABELS[entity.classification]}`} title={lotIdentity?.full ?? metadata.officialDisplayName} onClose={() => setSelectedEntityId(null)} />
         {historyId && <Button ref={historyTriggerRef} variant="outline" className="commercial-map-history-trigger" onClick={() => setHistoryEntityId(entity.id)}><BookOpen aria-hidden="true" />Conhecer a história</Button>}
         <div className="commercial-map-selection-summary" aria-label="Resumo da seleção">
           {status ? (

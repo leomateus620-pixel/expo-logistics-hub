@@ -93,7 +93,7 @@ export function LotEditDialog({ lot, open, onClose }: Props) {
         <form onSubmit={submit}>
           <DialogHeader className="px-6 pt-6">
             <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><PencilLine className="h-5 w-5" /></div>
-            <DialogTitle>Editar {lot.publicIdentifier}</DialogTitle>
+            <DialogTitle>Editar {lot.lotNumber ? `lote ${lot.lotNumber}` : lot.displayName}</DialogTitle>
             <DialogDescription>Cadastro, medidas oficiais e preço são salvos juntos com controle de concorrência e histórico.</DialogDescription>
           </DialogHeader>
           <ScrollArea className="max-h-[68dvh] px-6">

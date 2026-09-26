@@ -136,3 +136,12 @@
 
 - [x] Imagem opcional na venda: tratamento local, vínculo privado ao pedido, exibição compartilhada nos lotes vendidos dos mapas interno e público, fallback do cadeado; teste local com anexo e regressões sem venda real.
 - [ ] Validar ponta a ponta uma venda com upload e exibição autenticada, incluindo link público: bloqueado até haver uma venda de teste isolada e autorização explícita para divulgar a foto pessoal anexada. Não registrar venda de teste na base oficial.
+
+## Expo Rural — área comercial de 568,78 m² sem número
+- [x] Investigar exclusão do inventário antigo e descartar reutilização da praça/via arquivada.
+- [x] Cadastrar polígono irregular exclusivo acima do Mirante, lote disponível sem número, 568,78 m² oficiais e segmento Expo Rural; validar ausência de interseção.
+- [x] Resolver preços da faixa R 01–12 explicitamente para este lote: R$ 27,50/m² e R$ 30,25/m², sem alterar os demais.
+- [ ] Verificar visualmente mapa normal, vendas, links públicos e seleção múltipla no navegador autenticado; não criar venda real de teste.
+- [x] Validar apresentação do número temporário e retorno a vazio em fixture isolada; a edição administrativa aceita número vazio, sem escrever número fictício na base oficial.
+- [ ] Conferir a edição persistida ponta a ponta somente em ambiente isolado; o banco oficial permanece sem número.
+- Não publicar (pedido permanente do usuário).
