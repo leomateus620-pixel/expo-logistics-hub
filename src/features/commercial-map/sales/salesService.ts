@@ -63,6 +63,10 @@ const ERROR_MESSAGES: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
   [/INSTALLMENTS_MISMATCH/, () => 'A soma das parcelas não fecha com o valor total.'],
   [/LOT_PROJECT_MISMATCH/, () => 'Os espaços selecionados pertencem a projetos diferentes.'],
   [/BUYER_REQUIRED/, () => 'Informe o nome do expositor.'],
+  [/INSTALLMENT_COUNT_INVALID/, () => 'A quantidade de parcelas não combina com a forma de pagamento.'],
+  [/INVALID_FEE/, () => 'As taxas não podem ser negativas.'],
+  [/INVALID_PAYMENT_METHOD/, () => 'Escolha PIX, Boleto à vista ou Boleto parcelado.'],
+  [/INSTALLMENT_(AMOUNT|DATE)_INVALID/, () => 'Confira valores e datas das parcelas.'],
   [/AUTH_REQUIRED/, () => 'Sessão expirada. Entre novamente para concluir a venda.'],
 ];
 
@@ -112,7 +116,8 @@ function buildSalesError(raw: PostgrestLikeError, payload: SalesOrderPayload): S
 
 /** Uma única transação no servidor: ou vende todos os espaços, ou nenhum. */
 export async function registerSaleOrder(payload: SalesOrderPayload): Promise<string> {
-  const { data, error } = await supabase.rpc('register_commercial_sale_order', {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('register_commercial_sale_order', {
     p_idempotency_key: payload.idempotencyKey,
     p_stage: payload.stage,
     p_lot_ids: payload.lotIds,
@@ -120,10 +125,10 @@ export async function registerSaleOrder(payload: SalesOrderPayload): Promise<str
     p_document_number: payload.buyer.documentNumber,
     p_phone: payload.buyer.phone,
     p_email: payload.buyer.email,
-    p_payment_type: payload.payment.paymentType,
-    p_installment_count: payload.payment.installmentCount,
-    p_payment_method: payload.payment.paymentMethod,
-    p_first_due_date: payload.payment.firstDueDate || null,
+    p_payment_type: payload.paymentMethod === 'BOLETO_PARCELADO' ? 'INSTALLMENTS' : 'CASH',
+    p_installment_count: payload.installments.length,
+    p_payment_method: payload.paymentMethod,
+    p_first_due_date: payload.installments[0]?.dueDate || null,
     p_installments: payload.installments.map((item) => ({
       number: item.number,
       due_date: item.dueDate,
@@ -131,6 +136,10 @@ export async function registerSaleOrder(payload: SalesOrderPayload): Promise<str
     })),
     p_expected_total: payload.expectedTotal,
     p_notes: payload.buyer.notes,
+    p_exhibitor_id: payload.exhibitorId,
+    p_fee_admin: payload.fees.adminCents / 100,
+    p_fee_ppci: payload.fees.ppciCents / 100,
+    p_fee_cleaning_license: payload.fees.cleaningCents / 100,
   });
   if (error) throw buildSalesError(error as PostgrestLikeError, payload);
   // Retorno nulo/inválido nunca é tratado como sucesso.

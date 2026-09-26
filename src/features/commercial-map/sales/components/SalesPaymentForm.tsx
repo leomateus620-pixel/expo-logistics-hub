@@ -64,7 +64,7 @@ export function SalesPaymentForm({ value, onChange, fees, onFeesChange, spacesCe
     setConfirmReplace(false);
     const existing = value.installments.map((item) => item.dueDate);
     const defaults = monthlyDueDates(parsedCount);
-    const dates = defaults.map((date, index) => existing[index] ?? (index > 0 && existing.length ? defaults[index] : date));
+    const dates = defaults.map((date, index) => existing[index] ?? date);
     set({ installments: buildDraftSchedule(totalCents, dates), manualAmounts: false });
   };
 

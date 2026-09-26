@@ -110,6 +110,10 @@ export interface LotSaleHistory {
   paymentMethod: string;
   officialArea: number;
   itemTotal: number;
+  spacesSubtotal?: number;
+  feesTotal?: number;
+  fees?: { admin: number; ppci: number; cleaning: number };
+  orderTotal?: number;
   createdAt: string;
   saleDate: string | null;
   salespersonName: string | null;
@@ -1214,7 +1218,7 @@ export async function fetchLotSaleHistory(lotId: string): Promise<LotSaleHistory
   if (!item) return null;
 
   const [{ data: order, error: orderError }, { data: installments, error: installmentsError }] = await Promise.all([
-    db.from('lot_sale_orders').select('id,buyer_name,stage,payment_type,payment_method,created_at').eq('id', item.order_id).maybeSingle(),
+    db.from('lot_sale_orders').select('id,buyer_name,email,stage,payment_type,payment_method,created_at,spaces_subtotal,fees_total,fee_admin,fee_ppci,fee_cleaning_license,negotiated_total').eq('id', item.order_id).maybeSingle(),
     db.from('lot_sale_installments').select('installment_number,due_date,amount,payment_status').eq('order_id', item.order_id).order('installment_number'),
   ]);
   if (orderError) throw orderError;
@@ -1228,6 +1232,10 @@ export async function fetchLotSaleHistory(lotId: string): Promise<LotSaleHistory
     paymentMethod: order.payment_method,
     officialArea: Number(item.official_area_snapshot),
     itemTotal: Number(item.item_total),
+    spacesSubtotal: Number(order.spaces_subtotal ?? order.negotiated_total ?? 0),
+    feesTotal: Number(order.fees_total ?? 0),
+    fees: { admin: Number(order.fee_admin ?? 0), ppci: Number(order.fee_ppci ?? 0), cleaning: Number(order.fee_cleaning_license ?? 0) },
+    orderTotal: Number(order.negotiated_total ?? 0),
     createdAt: order.created_at,
     saleDate: sale?.sale_date ?? null,
     salespersonName: sale?.salesperson_name ?? null,
