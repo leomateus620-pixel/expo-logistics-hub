@@ -28,12 +28,13 @@ Deno.serve(async (req) => {
     if (error) return json({ error: 'Link ou acesso indisponível' }, 403);
     const paths = data && typeof data === 'object' && !Array.isArray(data) ? data as Record<string, unknown> : {};
     const uniquePaths = [...new Set(Object.values(paths).filter((path): path is string => typeof path === 'string' && /^[a-f0-9-]{36}\/[a-f0-9-]{36}\.webp$/i.test(path)))];
+    if (uniquePaths.length === 0) return json({ logos: {}, expiresIn: 900 });
     const admin = createClient(url, service, { auth: { persistSession: false } });
     const signed = await Promise.all(uniquePaths.map(async (path) => {
       const { data: result, error: signError } = await admin.storage.from('commercial-sale-logos').createSignedUrl(path, 900);
       return [path, signError ? null : result?.signedUrl ?? null] as const;
     }));
     const urls = new Map(signed);
-    return json({ logos: Object.fromEntries(Object.entries(paths).filter(([, path]) => typeof path === 'string' && urls.has(path)).map(([id, path]) => [id, urls.get(path as string)])), expiresIn: 900 });
+    return json({ logos: Object.fromEntries(Object.entries(paths).filter(([, path]) => typeof path === 'string' && Boolean(urls.get(path))).map(([id, path]) => [id, urls.get(path as string)])), expiresIn: 900 });
   } catch { return json({ error: 'Solicitação inválida' }, 400); }
 });
