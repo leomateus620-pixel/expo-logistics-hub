@@ -62,7 +62,7 @@ describe('public page lifecycle', () => {
   it('keeps the same Canvas, policy, camera state and selected lot on commercial revision', async () => {
     page(); await screen.findByTestId('scene');
     act(() => useCommercialMapStore.getState().setSelectedEntityId('e-1'));
-    await screen.findByRole('complementary', { name:'Lote Rural 1' });
+    await screen.findByRole('complementary', { name:'Lote 1 · Quadra R · Exporural' });
     const canvas = screen.getByTestId('scene');
     const policy = mocks.props.mock.calls.at(-1)?.[0].publicScenePolicy;
     const selectionEvents = () => mocks.track.mock.calls.filter(call => call[2].eventType === 'lot_selected').length;
