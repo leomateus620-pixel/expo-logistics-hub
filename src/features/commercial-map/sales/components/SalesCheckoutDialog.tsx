@@ -42,6 +42,7 @@ export function SalesCheckoutDialog({ summary }: Props) {
   const [logoImage, setLogoImage] = useState<Blob | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [logoUploading, setLogoUploading] = useState(false);
+  const uploadingRef = useRef(false);
   const changeLogo = (image: Blob | null, preview: string | null) => {
     setLogoImage(image);
     setLogoPreview(current => { if (current) URL.revokeObjectURL(current); return preview; });
@@ -63,7 +64,7 @@ export function SalesCheckoutDialog({ summary }: Props) {
       setStep(0);
       setShowErrors(false);
       setIdempotencyKey(crypto.randomUUID());
-    } else { changeLogo(null, null); }
+    } else if (!uploadingRef.current) { changeLogo(null, null); }
   }, [open]);
 
   // Total mudou (taxas/etapa): recalcula apenas se os valores ainda são automáticos; datas preservadas.
@@ -114,10 +115,11 @@ export function SalesCheckoutDialog({ summary }: Props) {
     }, {
       onSuccess: async (orderId) => {
         if (logoImage) {
+          uploadingRef.current = true;
           setLogoUploading(true);
           try { await uploadSaleLogo(orderId, idempotencyKey, logoImage); await queryClient.invalidateQueries({ queryKey: ['commercial-map'] }); }
           catch (error) { toast({ title: 'Venda registrada sem imagem', description: error instanceof Error ? error.message : 'Não foi possível associar a imagem.', variant: 'destructive' }); }
-          finally { setLogoUploading(false); }
+          finally { uploadingRef.current = false; setLogoUploading(false); }
         }
         changeLogo(null, null);
         setBuyer(EMPTY_BUYER);
