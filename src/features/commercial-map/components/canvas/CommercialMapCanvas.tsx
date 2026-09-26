@@ -1506,7 +1506,6 @@ function BatchedLots({
   const lockSurfaces = useMemo(() => entries.map(({ entity, lot }) => ({
     id: entity.id, status: lot.status, logoUrl: lot.saleLogoUrl, geometry: entity.geometry,
   })), [entries]);
-  const soldEntityIds = useMemo(() => new Set(entries.filter(entry => isSoldLot(entry.lot.status)).map(entry => entry.entity.id)), [entries]);
   const batch = useMemo(() => {
     if (entries.length === 0) return null;
     const sourceGeometries = entries.map(({ entity }) => {
