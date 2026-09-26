@@ -1,4 +1,4 @@
-import type { CommercialLot, CommercialStatus } from '../types';
+import type { CommercialLot, CommercialStatus, MapEntity } from '../types';
 import { isSellableLot, toSalesEntry } from './salesEntry';
 import { useSalesStore } from './useSalesSelection';
 
@@ -10,11 +10,12 @@ import { useSalesStore } from './useSalesSelection';
 export function dispatchSalesLotClick(
   lot: CommercialLot | null | undefined,
   context?: string | null,
+  entity?: MapEntity | null,
 ): boolean {
   const state = useSalesStore.getState();
   if (!state.salesModeActive) return false;
   if (!isSellableLot(lot, state.eligibleLotIds)) return true;
-  state.toggleLot(toSalesEntry(lot as CommercialLot, context));
+  state.toggleLot(toSalesEntry(lot as CommercialLot, context, entity));
   return true;
 }
 
@@ -28,6 +29,9 @@ export interface SalesModuleClickTarget {
   publicIdentifier: string | null;
   displayName?: string | null;
   context?: string | null;
+  number?: string | null;
+  area?: string | null;
+  location?: string | null;
 }
 
 /**
@@ -45,6 +49,9 @@ export function dispatchSalesModuleClick(target: SalesModuleClickTarget | null |
     publicIdentifier,
     displayName: target?.displayName || publicIdentifier,
     context: target?.context ?? null,
+    title: target?.number ? `Módulo ${target.number}` : target?.displayName || publicIdentifier,
+    location: target?.location ?? null,
+    area: target?.area ?? null,
   });
   return true;
 }

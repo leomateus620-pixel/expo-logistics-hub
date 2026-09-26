@@ -635,7 +635,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
         {webglAvailable && workspaceMode === '3d' && permissions.canManageSales
           && (!visitEnabled || workspaceBeforeVisit.current === '3d') && (
           <div style={{ display: visitEnabled ? 'none' : 'contents' }} data-visit-preserved-sales>
-          <SalesModeLayer projectId={data.project?.id ?? null} lots={data.lots} />
+          <SalesModeLayer projectId={data.project?.id ?? null} lots={data.lots} entities={data.entities} />
           </div>
         )}
 

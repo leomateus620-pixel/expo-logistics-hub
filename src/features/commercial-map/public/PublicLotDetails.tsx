@@ -7,6 +7,7 @@ import {
   formatPricePerSqm,
 } from '../utils/lotPricing2028';
 import { PUBLIC_AVAILABILITY_LABEL, type PublicLot } from './publicMapTypes';
+import { resolveLotIdentity } from '../utils/lotIdentity';
 
 const PENDING_LABEL = 'Valor sob consulta';
 
@@ -23,10 +24,12 @@ export const PublicLotDetails = memo(function PublicLotDetails({
   lot,
   onClose,
   compact = false,
+  areaName,
 }: {
   lot: PublicLot;
   onClose: () => void;
   compact?: boolean;
+  areaName?: string | null;
 }) {
   const [expanded, setExpanded] = useState(false);
   const closeButton = useRef<HTMLButtonElement>(null);
@@ -43,13 +46,14 @@ export const PublicLotDetails = memo(function PublicLotDetails({
   const renovacao = stageValue(lot.pricing.renovacaoPricePerSqm, lot.pricing.renovacaoTotal, publishable);
   const segunda = stageValue(lot.pricing.segundaPricePerSqm, lot.pricing.segundaTotal, publishable);
   const area = formatAreaSqmLabel(lot.officialAreaSqm) ?? 'Metragem não informada';
+  const identity = resolveLotIdentity(lot, null, null, areaName);
 
   return (
-    <aside className={`public-map-details${compact ? ' is-compact' : ''}${expanded ? ' is-expanded' : ''}`} aria-label={`Lote ${lot.displayName}`}>
+     <aside className={`public-map-details${compact ? ' is-compact' : ''}${expanded ? ' is-expanded' : ''}`} aria-label={identity.full}>
       <header>
         <div>
-          <strong>{lot.displayName}</strong>
-          <small>{lot.publicIdentifier}</small>
+           <strong>{identity.title}</strong>
+           <small>{[identity.location, identity.area].filter(Boolean).join(' · ')}</small>
         </div>
         <button ref={closeButton} type="button" onClick={onClose} aria-label="Fechar ficha do lote">
           <X aria-hidden="true" />
@@ -84,6 +88,7 @@ export const PublicLotDetails = memo(function PublicLotDetails({
             <dd>{lot.pavilion}</dd>
           </div>
         )}
+        {identity.area && <div><dt>Área</dt><dd>{identity.area}</dd></div>}
         <div>
           <dt>Esquina</dt>
           <dd>{lot.isCorner ? 'Sim' : 'Não'}</dd>

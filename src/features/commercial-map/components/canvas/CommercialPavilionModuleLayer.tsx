@@ -292,6 +292,7 @@ function createModuleNumberTexture(
   viewportWidth: number,
   pixelRatio: number,
   screenAlignedLabels = false,
+  moduleStateById: ReadonlyMap<string, CommercialPavilionModuleVisualState> = EMPTY_MODULE_STATE,
 ) {
   if (typeof document === 'undefined') return null;
   const aspect = Math.max(0.25, layout.interior.clearWidth / layout.interior.clearDepth);
@@ -335,6 +336,8 @@ function createModuleNumberTexture(
 
   plan.cells.forEach((cell) => {
     const orientedCell = cell as OrientedModuleCell;
+    const officialNumber = moduleStateById.get(cell.id)?.number;
+    const label = officialNumber ?? cell.label;
     const projectedCell = canvasRect(cell);
     const left = projectedCell.centerX - projectedCell.width / 2;
     const top = projectedCell.centerY - projectedCell.height / 2;
@@ -388,7 +391,7 @@ function createModuleNumberTexture(
     if (fontSize < 7) return;
     context.font = `${maximumPriority ? 900 : 800} ${fontSize}px Inter, Arial, sans-serif`;
     if (screenAlignedLabels) {
-      fontSize *= Math.min(1, usableWidth * 0.78 / Math.max(1, context.measureText(cell.label).width));
+      fontSize *= Math.min(1, usableWidth * 0.78 / Math.max(1, context.measureText(label).width));
       context.font = `${maximumPriority ? 900 : 800} ${fontSize}px Inter, Arial, sans-serif`;
     }
     context.lineWidth = Math.max(1.5, fontSize * (maximumPriority ? 0.24 : 0.18));
@@ -406,7 +409,7 @@ function createModuleNumberTexture(
       context.rotate(labelRotationRadians);
     }
     // Rótulo secundário com a metragem oficial, só quando cabe sem encobrir o número.
-    const areaSqm = orientedCell.areaM2 ?? null;
+    const areaSqm = moduleStateById.get(cell.id)?.lotId ? null : orientedCell.areaM2 ?? null;
     const areaFontSize = Math.floor(fontSize * 0.62);
     const showArea = areaSqm != null
       && plan.interiorPresentation?.showAreaInsideModule !== false
@@ -414,9 +417,9 @@ function createModuleNumberTexture(
       && areaFontSize >= 7
       && usableHeight > fontSize * 2.6;
     const numberOffset = showArea ? -areaFontSize * 0.72 : 0;
-    context.strokeText(cell.label, 0, numberOffset);
+    context.strokeText(label, 0, numberOffset);
     context.fillStyle = maximumPriority ? '#082c20' : '#173b2b';
-    context.fillText(cell.label, 0, numberOffset);
+    context.fillText(label, 0, numberOffset);
     if (showArea && areaSqm != null) {
       const areaText = `${areaSqm.toLocaleString('pt-BR', {
         minimumFractionDigits: 2,
@@ -581,8 +584,9 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       viewportSize.width,
       gl.getPixelRatio(),
       screenAlignedLabels,
+      moduleStateById,
     ),
-    [gl, labelRotationRadians, screenAlignedLabels, layout, plan, reducedGraphics, viewportSize.width],
+    [gl, labelRotationRadians, screenAlignedLabels, layout, plan, reducedGraphics, viewportSize.width, moduleStateById],
   );
   const moduleMaterial = useMemo(() => new THREE.MeshStandardMaterial({
     color: '#ffffff',
@@ -816,6 +820,9 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       publicIdentifier: state.publicIdentifier,
       displayName: state.displayName,
       context: state.block,
+      number: state.number,
+      area: state.area,
+      location: state.location,
     });
   }, [moduleStateById]);
 

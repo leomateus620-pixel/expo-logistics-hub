@@ -2,6 +2,7 @@ import { CalendarDays, ReceiptText } from 'lucide-react';
 import { formatBrl } from '../../utils/lotPricing2028';
 import { paymentMethodLabel } from '../salesTypes';
 import type { LotSaleHistory } from '../../services/commercialMapService';
+import type { LotIdentity } from '../../utils/lotIdentity';
 
 const date = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo' });
 const dateTime = new Intl.DateTimeFormat('pt-BR', {
@@ -9,7 +10,7 @@ const dateTime = new Intl.DateTimeFormat('pt-BR', {
   day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
 });
 
-export function LotSaleHistoryCard({ sale, loading }: { sale: LotSaleHistory | null | undefined; loading: boolean }) {
+export function LotSaleHistoryCard({ sale, loading, currentIdentity }: { sale: LotSaleHistory | null | undefined; loading: boolean; currentIdentity?: LotIdentity | null }) {
   if (loading) return <p>Carregando dados da venda…</p>;
   if (!sale) return null;
 
@@ -17,7 +18,9 @@ export function LotSaleHistoryCard({ sale, loading }: { sale: LotSaleHistory | n
     <section className="commercial-sale-history" aria-label="Resumo da venda e vencimentos">
       <header><ReceiptText aria-hidden="true" /><div><strong>Venda registrada</strong><span>{dateTime.format(new Date(sale.createdAt))}</span></div><b>{formatBrl(sale.itemTotal)}</b></header>
       <p className="commercial-sale-history__trace"><strong>Comprador:</strong> {sale.buyerName} · <strong>Etapa:</strong> {sale.stage === 'RENOVACAO' ? 'Renovação' : '2ª Etapa'}{sale.salespersonName ? <> · <strong>Responsável:</strong> {sale.salespersonName}</> : null}</p>
+      {currentIdentity && <p className="commercial-sale-history__trace"><strong>Identificação atual:</strong> {currentIdentity.full}</p>}
       <dl>
+        <div><dt>Código registrado na venda</dt><dd>{sale.publicIdentifierSnapshot}</dd></div>
         <div><dt>Etapa</dt><dd>{sale.stage === 'RENOVACAO' ? 'Renovação' : '2ª Etapa'}</dd></div>
         <div><dt>Forma</dt><dd>{sale.paymentType === 'CASH' ? 'À vista' : `${sale.installments.length} parcelas`} · {paymentMethodLabel(sale.paymentMethod)}</dd></div>
         {(sale.feesTotal ?? 0) > 0 && <div><dt>Taxas da venda</dt><dd>{formatBrl(sale.feesTotal ?? 0)} (adm. {formatBrl(sale.fees?.admin ?? 0)} · PPCI {formatBrl(sale.fees?.ppci ?? 0)} · limpeza/licença {formatBrl(sale.fees?.cleaning ?? 0)})</dd></div>}

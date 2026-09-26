@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import type { CommercialLot } from '../../types';
+import type { CommercialLot, MapEntity } from '../../types';
+import { toSalesEntry } from '../salesEntry';
 import { ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
@@ -17,7 +18,7 @@ import '../sales-mode.css';
  * barra/gaveta mobile e checkout. Nenhuma geometria, área ou cadastro muda aqui,
  * e `reducedGraphics` nunca é acionado — pavilhões mantêm a arquitetura normal.
  */
-export function SalesModeLayer({ projectId, lots }: { projectId: string | null; lots: readonly CommercialLot[] }) {
+export function SalesModeLayer({ projectId, lots, entities = [] }: { projectId: string | null; lots: readonly CommercialLot[]; entities?: readonly MapEntity[] }) {
   const active = useSalesStore((state) => state.salesModeActive);
   const selectionCount = useSalesStore((state) => state.selection.length);
   const checkoutOpen = useSalesStore((state) => state.checkoutOpen);
@@ -38,6 +39,24 @@ export function SalesModeLayer({ projectId, lots }: { projectId: string | null; 
     soldSelection.forEach(entry => store.removeLot(entry.lotId));
     store.setCheckoutOpen(false);
   }, [lots]);
+
+  useLayoutEffect(() => {
+    const store = useSalesStore.getState();
+    if (!store.selection.length || !entities.length) return;
+    const byId = new Map(lots.map(lot => [lot.id, lot]));
+    const byEntity = new Map(entities.map(entity => [entity.id, entity]));
+    const next = store.selection.map(entry => {
+      const lot = byId.get(entry.lotId);
+      if (!lot) return entry;
+      const entity = byEntity.get(lot.entityId);
+      if (!entity) return entry;
+      const parent = entity?.parentEntityId ? byEntity.get(entity.parentEntityId) : null;
+      return toSalesEntry(lot, null, entity, parent);
+    });
+    if (next.some((entry, index) => JSON.stringify(entry) !== JSON.stringify(store.selection[index]))) {
+      useSalesStore.setState({ selection: next });
+    }
+  }, [entities, lots]);
 
   // Ambientação decorativa some enquanto o modo Vendas está ativo e volta ao sair.
   useEffect(() => {

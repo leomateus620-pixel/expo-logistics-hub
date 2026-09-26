@@ -1,13 +1,13 @@
 import { useEffect, useLayoutEffect, useMemo } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import type { MapEntity } from '../../types';
+import type { CommercialLot, MapEntity } from '../../types';
 import { placeSoldLock } from '../../utils/soldLotPresentation';
 import { hasRevisedExporuralNumbers, lotNumberAnchor } from '../../utils/exporuralRevisionPresentation';
 
 /** One atlas and one instanced draw. The vertex shader reveals numbers only
  * when their real footprint occupies enough screen space; no React frame updates. */
-export function PublicLotNumbers({ entities, soldEntityIds }: { entities: readonly MapEntity[]; soldEntityIds?: ReadonlySet<string> }) {
+export function PublicLotNumbers({ entities, lots, soldEntityIds }: { entities: readonly MapEntity[]; lots: readonly CommercialLot[]; soldEntityIds?: ReadonlySet<string> }) {
   const size = useThree(state => state.size);
   const invalidate = useThree(state => state.invalidate);
   const resources = useMemo(() => {
@@ -22,12 +22,13 @@ export function PublicLotNumbers({ entities, soldEntityIds }: { entities: readon
     const rectangles = new Float32Array(entities.length * 4);
     const widths = new Float32Array(entities.length);
     const lockScales = new Float32Array(entities.length);
+    const lotByEntity = new Map(lots.map(lot => [lot.entityId, lot]));
     entities.forEach((entity, i) => {
       const x = i % columns * cellWidth, y = Math.floor(i / columns) * cellHeight;
       context.fillStyle = '#ffffffdd'; context.fillRect(x + 2, y + 2, cellWidth - 4, cellHeight - 4);
       context.fillStyle = '#15292b';
       context.font = hasRevisedExporuralNumbers(entity) ? '700 34px sans-serif' : '600 23px sans-serif';
-      const label = String(entity.metadata.lotNumber ?? entity.publicIdentifier);
+      const label = String(lotByEntity.get(entity.id)?.lotNumber ?? '');
       context.fillText(label, x + cellWidth / 2, y + cellHeight / 2, cellWidth - 12);
       rectangles.set([x / atlas.width, 1 - (y + cellHeight) / atlas.height, cellWidth / atlas.width, cellHeight / atlas.height], i * 4);
       const points = entity.geometry.coordinates[0] ?? [];
@@ -68,7 +69,7 @@ export function PublicLotNumbers({ entities, soldEntityIds }: { entities: readon
     mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingSphere(); mesh.raycast = () => undefined;
     mesh.name = 'public-authorized-lot-numbers'; mesh.renderOrder = 6;
     return { mesh, geometry, material, texture, lockScales };
-  }, [entities]);
+  }, [entities, lots]);
   useLayoutEffect(() => {
     if (!resources) return;
     const offsets = resources.geometry.getAttribute('labelVerticalOffset');

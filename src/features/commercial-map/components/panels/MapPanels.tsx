@@ -25,6 +25,7 @@ import {
   X,
 } from 'lucide-react';
 import { toSalesEntry } from '../../sales/salesEntry';
+import { resolveLotIdentity } from '../../utils/lotIdentity';
 import { useSalesStore } from '../../sales/useSalesSelection';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -342,6 +343,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
   const areaMapUnits = polygonAreaMapUnits(entity.geometry);
   const status = lot ? STATUS_CONFIG[lot.status] : null;
   const metadata = normalizeMapEntityMetadata(entity, lot);
+  const lotIdentity = lot ? resolveLotIdentity(lot, entity, entities.find(parent => parent.id === entity.parentEntityId)) : null;
   const structuralReady = lot ? ['AVAILABLE', 'BLOCKED', 'UNAVAILABLE'].includes(lot.status) : false;
   const landmarkKind = resolveStrategicLandmarkKind(entity);
   const pavilionPlan = landmarkKind === 'commercial-pavilion'
@@ -381,7 +383,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
           <HistoryExperience key={entity.id} historyId={historyId} onClose={closeHistory} />
         </>}
         <div className="commercial-map-commercial-view" hidden={historyOpen}>
-        <PanelHeader eyebrow={`${entity.publicIdentifier} · ${CLASSIFICATION_LABELS[entity.classification]}`} title={metadata.officialDisplayName} onClose={() => setSelectedEntityId(null)} />
+        <PanelHeader eyebrow={`${entity.publicIdentifier} · ${CLASSIFICATION_LABELS[entity.classification]}`} title={lotIdentity?.full ?? metadata.officialDisplayName} onClose={() => setSelectedEntityId(null)} />
         {historyId && <Button ref={historyTriggerRef} variant="outline" className="commercial-map-history-trigger" onClick={() => setHistoryEntityId(entity.id)}><BookOpen aria-hidden="true" />Conhecer a história</Button>}
         <div className="commercial-map-selection-summary" aria-label="Resumo da seleção">
           {status ? (
@@ -443,7 +445,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
             <TabsContent value="overview">
               <div className="commercial-map-detail-grid">
                 <DetailMetric icon={Ruler} label="Área oficial" value={lot?.officialAreaSqm != null ? `${areaNumber.format(lot.officialAreaSqm)} m²` : 'Área não informada'} warning={!lot?.officialAreaSqm} />
-                {lot && <DetailMetric icon={Building2} label="Bloco / lote" value={[lot.block, lot.lotNumber].filter(Boolean).join(' · ') || 'Não informado'} />}
+                 {lot && <DetailMetric icon={Building2} label="Identificação oficial" value={lotIdentity?.full ?? 'Não informado'} />}
                 {lot?.levelLabel && <DetailMetric icon={Layers3} label="Piso / nível" value={lot.levelLabel} />}
                 {!lot && <DetailMetric icon={Ruler} label="Área cartográfica" value={`${number.format(areaMapUnits)} un²`} warning={!entity.geometry.calibrationVersion} />}
               </div>
@@ -453,7 +455,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
                   <div className="commercial-map-detail-section commercial-map-commercial-facts">
                     <h3>{lot.status === 'SOLD' ? 'Características do espaço' : 'Informações comerciais'}</h3>
                     <dl>
-                      {entity.metadata.segmentName && <div><dt>Segmento</dt><dd>{String(entity.metadata.segmentName)}</dd></div>}
+                       {lotIdentity?.area && <div><dt>Segmento</dt><dd>{lotIdentity.area}</dd></div>}
                       {lot.infrastructure.length > 0 && <div><dt>Infraestrutura</dt><dd>{lot.infrastructure.join(', ')}</dd></div>}
                       {lot.hasElectricity && <div><dt>Energia elétrica</dt><dd>Disponível</dd></div>}
                       {lot.hasWater && <div><dt>Água</dt><dd>Disponível</dd></div>}
@@ -505,7 +507,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
                   salesModeActive ? (
                     <Button
                       variant={salesSelection.some((item) => item.lotId === lot.id) ? 'secondary' : 'default'}
-                      onClick={() => toggleSalesLot(toSalesEntry(lot))}
+                       onClick={() => toggleSalesLot(toSalesEntry(lot, null, entity, entities.find(parent => parent.id === entity.parentEntityId)))}
                     >
                       <ShoppingCart className="h-4 w-4" />
                       {salesSelection.some((item) => item.lotId === lot.id) ? 'Na venda' : 'Adicionar à venda'}
@@ -517,7 +519,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
               </div>
             </TabsContent>
             <TabsContent value="history">
-              <LotSaleHistoryCard sale={saleHistory.data} loading={saleHistory.isLoading} />
+              <LotSaleHistoryCard sale={saleHistory.data} loading={saleHistory.isLoading} currentIdentity={lotIdentity} />
               <div className="commercial-map-activity">
                 {!lot && <div className="commercial-map-empty compact"><History /><strong>Histórico disponível após a importação</strong></div>}
                 {lot && activity.isLoading && <p>Carregando histórico auditável…</p>}

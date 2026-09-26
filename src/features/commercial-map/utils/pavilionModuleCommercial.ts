@@ -1,4 +1,5 @@
 import type { CommercialLot, CommercialStatus, MapEntity } from '../types';
+import { resolveLotIdentity } from './lotIdentity';
 
 export interface PavilionModuleCommercialRecord {
   entity: MapEntity;
@@ -14,6 +15,9 @@ export interface CommercialPavilionModuleVisualState {
   publicIdentifier: string | null;
   displayName: string | null;
   block: string | null;
+  number?: string | null;
+  area?: string | null;
+  location?: string | null;
 }
 
 export interface CommercialPavilionModuleNavigationTarget {
@@ -136,13 +140,19 @@ export function buildCommercialPavilionModuleVisualStateIndex(
   return new Map(
     [...commercialIndex]
       .filter(([moduleKey]) => !validModuleKeys || validModuleKeys.has(moduleKey))
-      .map(([moduleKey, record]) => [moduleKey, {
-        entityId: record.entity.id,
-        lotId: record.lot.id,
-        status: record.lot.status,
-        publicIdentifier: record.lot.publicIdentifier ?? record.entity.publicIdentifier ?? null,
-        displayName: record.lot.displayName ?? null,
-        block: record.lot.block ?? null,
-      }]),
+      .map(([moduleKey, record]) => {
+        const identity = resolveLotIdentity(record.lot, record.entity, pavilion);
+        return [moduleKey, {
+          entityId: record.entity.id,
+          lotId: record.lot.id,
+          status: record.lot.status,
+          publicIdentifier: record.lot.publicIdentifier ?? record.entity.publicIdentifier ?? null,
+          displayName: record.lot.displayName ?? null,
+          block: record.lot.block ?? null,
+          number: identity.number,
+          area: identity.area,
+          location: identity.location,
+        }];
+      }),
   );
 }

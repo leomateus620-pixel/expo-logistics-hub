@@ -3,6 +3,7 @@ import { ArrowUpRight, MapPinned } from 'lucide-react';
 import { STATUS_CONFIG } from '../constants';
 import type { CommercialStatus } from '../types';
 import { formatAreaSqmLabel, formatBrl, formatPricePerSqm } from '../utils/lotPricing2028';
+import { resolveLotIdentity } from '../utils/lotIdentity';
 import {
   buildCommercialMiniMapGeometry,
   type CommercialMiniMapItem,
@@ -72,7 +73,7 @@ export function CommercialMiniMap({
               const config = STATUS_CONFIG[lot.status];
               const isActive = activeLot?.entity.id === entity.id;
               const isDimmed = highlightedStatus !== null && highlightedStatus !== lot.status && !isActive;
-              const identifier = lot.publicIdentifier || entity.publicIdentifier;
+              const identifier = resolveLotIdentity(lot, entity).full;
               const area = lot.officialAreaSqm != null && Number.isFinite(lot.officialAreaSqm) && lot.officialAreaSqm > 0
                 ? formatAreaSqmLabel(lot.officialAreaSqm) : 'área oficial pendente';
               const price = value != null && Number.isFinite(value) ? formatBrl(value) : null;
@@ -138,7 +139,7 @@ export function CommercialMiniMap({
             aria-live="polite"
           >
             <strong className="block truncate text-sm font-bold text-[color:var(--map-ink)]">
-              {activeLot.lot.publicIdentifier || activeLot.entity.publicIdentifier}
+              {resolveLotIdentity(activeLot.lot, activeLot.entity).full}
             </strong>
             <span className="mt-1 block text-xs text-[color:var(--map-muted)]">
               {activeLot.lot.officialAreaSqm != null

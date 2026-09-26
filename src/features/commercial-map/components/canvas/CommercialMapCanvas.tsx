@@ -8,6 +8,7 @@ import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
 import { PublicScenePolicyContext, usePublicScenePolicy } from './PublicScenePolicyContext';
 import { PublicContextGroup, PublicMaterialPool } from './PublicContextGroup';
 import { PublicLotNumbers } from './PublicLotNumbers';
+import { resolveLotIdentity } from '../../utils/lotIdentity';
 import { SoldLotLocks } from './SoldLotLocks';
 import type { Coordinate } from '../../types';
 import { isSoldLot, soldLotSurfaceColor } from '../../utils/soldLotPresentation';
@@ -1489,8 +1490,8 @@ function BatchedLots({
   const geometryEntitiesRef = useRef<MapEntity[]>([]);
   if (geometryEntitiesRef.current.length !== entries.length || entries.some((entry, i) => entry.entity !== geometryEntitiesRef.current[i])) geometryEntitiesRef.current = entries.map(entry => entry.entity);
   const geometryEntities = geometryEntitiesRef.current;
-  // Numeração fixa removida no mapa interno (Exporural): o número aparece só ao consultar o lote.
-  const numberedEntities = useMemo(() => publicPolicy ? geometryEntities : [], [geometryEntities, publicPolicy]);
+  const numberedLots = useMemo(() => entries.filter(entry => entry.lot.lotNumber != null && String(entry.lot.lotNumber).trim()).map(entry => entry.lot), [entries]);
+  const numberedEntities = useMemo(() => entries.filter(entry => entry.lot.lotNumber != null && String(entry.lot.lotNumber).trim()).map(entry => entry.entity), [entries]);
   const invalidate = useThree((state) => state.invalidate);
   const reducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
   const hoveredRef = useRef<string | null>(null);
@@ -1766,7 +1767,7 @@ function BatchedLots({
           toneMapped={false}
         />
       </lineSegments>
-      {numberedEntities.length > 0 && <PublicLotNumbers entities={numberedEntities} soldEntityIds={soldEntityIds} />}
+      {numberedEntities.length > 0 && <PublicLotNumbers entities={numberedEntities} lots={numberedLots} soldEntityIds={soldEntityIds} />}
       {selectedEntity && <LotSelectionOutline entity={selectedEntity} />}
     </>
   );
@@ -1826,8 +1827,9 @@ const EntityLabel = memo(function EntityLabel({
     >
       {lot ? (
         <div data-map-entity-id={entity.id} data-map-label-mode={mode} className={`commercial-map-label is-lot ${lotPresentation?.buyerName ? 'has-buyer' : ''} ${variant} ${dimmed ? 'is-dimmed' : ''}`}>
-          <span aria-label={`Lote ${metadata.lotNumber ?? ''}`}>{metadata.lotNumber}</span>
+          <span aria-label={resolveLotIdentity(lot, entity).full}>{resolveLotIdentity(lot, entity).title}</span>
           {metadata.block && <strong>{quadraLabel(metadata.block)}</strong>}
+          {entity.segmentId && typeof entity.metadata.segmentName === 'string' && <small>{entity.metadata.segmentName}</small>}
           {lot.officialAreaSqm && (
             <small className="commercial-map-label-area">{AREA_NUMBER.format(lot.officialAreaSqm)} m²</small>
           )}
@@ -4724,9 +4726,9 @@ const Scene = memo(function Scene({
     if (!canInspectEntity(entityId)) return;
     // Em modo Vendas o clique pertence ao carrinho: não seleciona a entidade
     // nem abre o painel de detalhes padrão.
-    if (!interactiveEntityIds && dispatchSalesLotClick(lots.find((lot) => lot.entityId === entityId))) return;
+    if (!interactiveEntityIds && dispatchSalesLotClick(lots.find((lot) => lot.entityId === entityId), null, entities.find(entity => entity.id === entityId))) return;
     setSelectedEntityId(entityId);
-  }, [canInspectEntity, hydrologicalModeActive, interactiveEntityIds, lots, setSelectedEntityId]);
+  }, [canInspectEntity, entities, hydrologicalModeActive, interactiveEntityIds, lots, setSelectedEntityId]);
   const handleEntityHover = useCallback((entityId: string | null) => {
     if (useVisitStore.getState().enabled) return;
     if (hydrologicalModeActive) return;

@@ -104,6 +104,7 @@ export interface CommercialMapFetchOptions {
 
 export interface LotSaleHistory {
   orderId: string;
+  publicIdentifierSnapshot: string;
   buyerName: string;
   stage: string;
   paymentType: string;
@@ -1209,7 +1210,7 @@ export async function fetchLotSaleHistory(lotId: string): Promise<LotSaleHistory
 
   const { data: item, error: itemError } = await db
     .from('lot_sale_order_items')
-    .select('order_id,sale_id,official_area_snapshot,item_total')
+    .select('order_id,sale_id,public_identifier,official_area_snapshot,item_total')
     .eq('sale_id', sale.id)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -1226,6 +1227,7 @@ export async function fetchLotSaleHistory(lotId: string): Promise<LotSaleHistory
   if (!order) return null;
   return {
     orderId: order.id,
+    publicIdentifierSnapshot: item.public_identifier,
     buyerName: order.buyer_name,
     stage: order.stage,
     paymentType: order.payment_type,
