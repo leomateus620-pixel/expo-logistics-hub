@@ -27,6 +27,7 @@ export interface CommercialPavilionWayfindingMarker {
   span: number;
   sourcePrecision: CommercialPavilionReferenceSourcePrecision;
   targetPublicIdentifier?: string;
+  orientToWall?: boolean;
 }
 
 function markerKind(
@@ -96,7 +97,7 @@ export function resolveCommercialPavilionWayfindingMarkers(
   const metricDepthM = plan.projection.metricDepthM;
 
   return plan.wallAccesses.flatMap((access) => {
-    if (access.structuralOpening !== false) return [];
+    if (access.structuralOpening !== false && !('showMarker' in access && access.showMarker)) return [];
     const kind = markerKind(access);
     if (!kind) return [];
 
@@ -114,7 +115,7 @@ export function resolveCommercialPavilionWayfindingMarkers(
         const frontOrRear = projectedEdge === 'front' || projectedEdge === 'rear';
         const quarterTurnFromFrontOrRear = plan.projection.coordinateTransform === 'quarter-turn-clockwise'
           && (edge === 'front' || edge === 'rear');
-        return markerAtEdge({
+        const marker = markerAtEdge({
           access,
           kind,
           edge: projectedEdge,
@@ -132,6 +133,8 @@ export function resolveCommercialPavilionWayfindingMarkers(
             ? projected.width
             : quarterTurnFromFrontOrRear ? projected.width : projected.depth,
         });
+        return { ...marker, id: access.edges.length > 1 ? `${access.id}:${edge}` : access.id,
+          ...('showMarker' in access && access.showMarker ? { orientToWall: true } : {}) };
       });
     }
 

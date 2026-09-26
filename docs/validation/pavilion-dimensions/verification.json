@@ -1,0 +1,23 @@
+{
+  "baseline": "d3ec0cc2",
+  "cases": 36,
+  "commercialEqual": true,
+  "uniqueCases": 36,
+  "canvasesValid": true,
+  "errors": [],
+  "noOverflow": true,
+  "mobileBosque": [
+    {
+      "action": "vertical",
+      "visible": true
+    },
+    {
+      "action": "horizontal",
+      "visible": true
+    },
+    {
+      "action": "inspect",
+      "visible": false
+    }
+  ]
+}

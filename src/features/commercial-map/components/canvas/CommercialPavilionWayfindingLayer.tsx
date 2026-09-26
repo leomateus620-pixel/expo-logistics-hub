@@ -15,6 +15,7 @@ import {
   type RefObject,
 } from 'react';
 import { Html } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
 import { ArrowRightLeft, ArrowUpDown, LogIn, LogOut, ShieldAlert } from 'lucide-react';
 import * as THREE from 'three';
 import type { MapEntity } from '../../types';
@@ -206,10 +207,24 @@ function PavilionAccessMarker({
   const reactId = useId();
   const tooltipId = `pavilion-access-tooltip-${reactId}`;
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const markerGroupRef = useRef<THREE.Group>(null);
+  const iconRef = useRef<HTMLSpanElement>(null);
+  const arrowPoints = useMemo(() => [new THREE.Vector3(), new THREE.Vector3()], []);
   const htmlRef = useRef<HTMLDivElement>(null);
   const lastPointerType = useRef('');
   const [hovered, setHovered] = useState(false);
   const open = hovered || active;
+
+  useFrame(({ camera, size }) => {
+    if (!marker.orientToWall || !markerGroupRef.current || !iconRef.current) return;
+    markerGroupRef.current.updateWorldMatrix(true, false);
+    const [origin, normal] = arrowPoints;
+    origin.set(0, 0, 0).applyMatrix4(markerGroupRef.current.matrixWorld).project(camera);
+    normal.set(frontOrRear ? 0 : 1, 0, frontOrRear ? 1 : 0)
+      .applyMatrix4(markerGroupRef.current.matrixWorld).project(camera);
+    const angle = Math.atan2(-(normal.y - origin.y) * size.height, (normal.x - origin.x) * size.width);
+    iconRef.current.style.transform = `rotate(${angle * 180 / Math.PI - 90}deg)`;
+  });
 
   // drei only refreshes the host z-index when the marker moves on screen, so
   // promote the open marker immediately to keep its bubble above neighbours.
@@ -266,6 +281,7 @@ function PavilionAccessMarker({
 
   return (
     <group
+      ref={markerGroupRef}
       name={`pavilion-wayfinding:${marker.id}`}
       position={[x, 0, z]}
       userData={{
@@ -328,7 +344,7 @@ function PavilionAccessMarker({
           onDoubleClick={(event) => event.stopPropagation()}
           onClick={handleClick}
         >
-          <span className="commercial-pavilion-access-marker-icon" aria-hidden="true">
+          <span ref={iconRef} className="commercial-pavilion-access-marker-icon" aria-hidden="true">
             <WayfindingIcon kind={marker.kind} />
           </span>
           {open ? (

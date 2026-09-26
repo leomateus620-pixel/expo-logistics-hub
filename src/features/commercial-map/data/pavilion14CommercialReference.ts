@@ -107,27 +107,33 @@ export const PAVILION14_COMMERCIAL_REFERENCE_CORRIDORS = [
 ] as const satisfies readonly CommercialPavilionReferenceCorridor[];
 
 /**
- * Plain reference contract until the shared plan type owns official wall
- * accesses. Each transverse corridor opens on both sides of the source plan;
- * after projection they become the front and rear pavilion accesses.
+ * The 2028 PDF shows three bidirectional openings on EACH SOURCE side.
+ * Left/right become rear/front after the canonical quarter-turn. Previously
+ * front/rear was transformed twice, placing the openings on the wrong walls.
  */
 export const PAVILION14_COMMERCIAL_WALL_ACCESSES = [
   {
     id: 'north-transverse-access',
     corridorId: 'north-distribution',
-    edges: ['front', 'rear'],
+    edges: ['left', 'right'],
+    kind: 'gate',
+    showMarker: true,
     sourcePrecision: 'official-metric',
   },
   {
     id: 'central-transverse-access',
     corridorId: 'central-distribution',
-    edges: ['front', 'rear'],
+    edges: ['left', 'right'],
+    kind: 'gate',
+    showMarker: true,
     sourcePrecision: 'official-metric',
   },
   {
     id: 'south-transverse-access',
     corridorId: 'south-distribution',
-    edges: ['front', 'rear'],
+    edges: ['left', 'right'],
+    kind: 'gate',
+    showMarker: true,
     sourcePrecision: 'official-metric',
   },
 ] as const satisfies readonly CommercialPavilionReferenceWallAccess[];

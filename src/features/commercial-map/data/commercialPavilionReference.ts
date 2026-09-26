@@ -321,7 +321,7 @@ export interface CommercialPavilionReferenceMetricWallAccess {
 
 /**
  * An opening whose position and span are already represented by a corridor.
- * Edges refer to the final projected pavilion frame.
+ * Edges refer to the source plan, before its coordinate transform is applied.
  */
 export interface CommercialPavilionReferenceCorridorWallAccess {
   id: string;
@@ -333,6 +333,8 @@ export interface CommercialPavilionReferenceCorridorWallAccess {
   connectsTo?: string;
   /** False keeps the current simplified shell intact and renders wayfinding only. */
   structuralOpening?: boolean;
+  /** Opt in to the shared icons for an actual structural opening as well. */
+  showMarker?: boolean;
 }
 
 export type CommercialPavilionReferenceWallAccess =

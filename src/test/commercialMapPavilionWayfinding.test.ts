@@ -245,11 +245,22 @@ describe('orientação visual das plantas internas comerciais', () => {
     expect(pavilion12To8.targetPublicIdentifier).toBe('B4');
   });
 
-  it('mantém acessos estruturais legados fora da camada UI-only', () => {
-    expect(resolveCommercialPavilionWayfindingMarkers(
-      COMMERCIAL_PAVILION_MODULE_PLANS.B2,
-      FOOTPRINT,
-    )).toEqual([]);
+  it('exibe os seis acessos bidirecionais do Pavilhão 14 nas duas laterais, mantendo o P7', () => {
+    const markers = markersFor('B2');
+    expect(markers).toHaveLength(6);
+    expect(new Set(markers.map(m => m.id)).size).toBe(6);
+    expect(markers.every(m => m.kind === 'bidirectional' && m.orientToWall)).toBe(true);
+    const layout = createCommercialPavilionLayout(FOOTPRINT, COMMERCIAL_PAVILION_DEFINITIONS.B2, undefined, COMMERCIAL_PAVILION_MODULE_PLANS.B2);
+    const projected = resolveCommercialPavilionWayfindingMarkers(COMMERCIAL_PAVILION_MODULE_PLANS.B2, { width: layout.interior.clearWidth, depth: layout.interior.clearDepth });
+    for (const edge of ['front', 'rear'] as const) {
+      const side = projected.filter(m => m.edge === edge);
+      const openings = edge === 'front' ? layout.exterior.facade.entrances : layout.exterior.facade.rearEntrances;
+      expect(side).toHaveLength(3);
+      side.forEach((marker, index) => {
+        expect(marker.position[0]).toBeCloseTo(openings[index].centerX, 12);
+        expect(marker.span).toBeCloseTo(openings[index].width, 12);
+      });
+    }
     expect(resolveCommercialPavilionWayfindingMarkers(
       COMMERCIAL_PAVILION_MODULE_PLANS.B10,
       FOOTPRINT,
@@ -304,7 +315,7 @@ describe('orientação visual das plantas internas comerciais', () => {
     expect(layer).toContain('style={HTML_HOST_STYLE}');
     expect(layer).toContain('calculatePosition={calculateWayfindingMarkerPosition}');
     expect(layer).toContain('THREE.MathUtils.clamp');
-    expect(layer).toContain('event.stopPropagation();\n    lastPointerType.current = event.pointerType;');
+    expect(layer).toMatch(/event\.stopPropagation\(\);\s+lastPointerType.current = event.pointerType;/);
     expect(layer).toContain('geometry.dispose()');
     expect(layer).toContain('surface.dispose()');
     expect(layer).toContain('accent.dispose()');
@@ -333,7 +344,7 @@ describe('orientação visual das plantas internas comerciais', () => {
     expect(layer).toContain('function PavilionAccessMarker(');
     expect(layer).not.toContain('<strong>{marker.label}</strong>');
     expect(layer).toContain('aria-label={canNavigate ? `${marker.label}. Abrir vista interna` : marker.label}');
-    expect(layer).toContain('{open ? (\n            <PavilionAccessTooltip');
+    expect(layer).toMatch(/\{open \? \(\s+<PavilionAccessTooltip/);
     expect(layer).toContain("if (event.pointerType === 'mouse') setHovered(true);");
     expect(layer).toContain('if (isKeyboardFocus(event.currentTarget)) setHovered(true);');
     expect(layer).toContain("if (pointerType === 'touch' && !active)");
