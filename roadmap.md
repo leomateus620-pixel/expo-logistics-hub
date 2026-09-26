@@ -121,7 +121,8 @@
 - [x] Cruzar crosswalk/manifesto com inventário vivo: 13 preservações candidatas já têm área oficial idêntica — nenhuma escrita necessária
 - [x] Confirmar ausência de vínculos comerciais nos 95 lotes R/S e ausência de colisões de identificadores
 - [x] Etapa 1: pacote reextraído (24 arquivos, SHA256 conferidos); cópia de segurança cbe3e0e7-7102-45e7-b0fe-46c4e1061334 (111 entidades, 95 lotes, 111 geometrias)
-- [ ] Etapa 2: decisões do usuário (renumerações, divisões, B37/B38, Q-S-36, 568,78 m², área oficial) → approvals_resolvidas.json (hoje cartography_approved=false) — aguardando usuário
-- [ ] Etapa 3: migração Exporural (bloqueada pela Etapa 2)
-- [ ] Etapa 4: verificação pós-migração
+- [x] Etapa 2: planta aprovada; B37/B38 arquivados; Q-S-36 arquivado; 568,78 m² = via
+- [x] Etapa 3: aplicada (snapshot c74019df-476c-4943-8a20-c9a6c3173cd9): 44 lotes preservados, 51 arquivados, 56 criados, 3 vias novas
+- [x] Etapa 4: 65 R (29.564,26 m²) + 35 S (16.203,53 m²), R-56 = 249,03 m², transversal ativa
+- [ ] 56 lotes novos BLOCKED — aguardando decisão do usuário sobre precificação/liberação para venda
 - Não publicar (pedido permanente do usuário)
