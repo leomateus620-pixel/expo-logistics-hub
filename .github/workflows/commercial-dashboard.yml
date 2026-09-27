@@ -1,0 +1,27 @@
+name: Commercial Dashboard scopes
+on:
+  pull_request:
+    paths:
+      - 'src/features/commercial-map/dashboard/**'
+      - 'src/features/commercial-map/data/commercialMapSegments.ts'
+      - 'src/features/commercial-map/utils/commercialPavilion*.ts'
+      - 'src/features/commercial-map/data/pavilion*'
+      - 'src/test/commercialDashboard*'
+      - '.github/workflows/commercial-dashboard.yml'
+permissions:
+  contents: read
+jobs:
+  dashboard:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: oven-sh/setup-bun@v2
+        with: {bun-version: '1.3.0'}
+      - run: bun install --frozen-lockfile
+      - run: npx vitest run --maxWorkers=2 src/test/commercialDashboard src/test/commercialMapSegments.test.ts src/test/commercialLotIdentity.test.ts src/test/commercialMapPavilionWayfinding.test.ts src/test/commercialMapPavilion7OfficialLayout.test.ts
+      - run: npx eslint src/features/commercial-map/dashboard
+      - run: npm run typecheck

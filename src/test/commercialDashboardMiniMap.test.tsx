@@ -19,7 +19,7 @@ function record(
   options: { value?: number | null; area?: number | null; archived?: boolean } = {},
 ): CommercialMiniMapItem {
   const entity = {
-    id, publicIdentifier: id, isArchived: options.archived ?? false,
+    id, publicIdentifier: id, isArchived: options.archived ?? false, metadata: {},
     geometry: { type: 'Polygon', coordinates },
   } as MapEntity;
   const lot = {
