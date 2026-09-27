@@ -1,0 +1,105 @@
+{
+  "device": "desktop",
+  "fixture": "OFFICIAL_REFERENCE_DATA, test-only analytics permission",
+  "timings": [
+    {
+      "scope": "Exporural",
+      "ms": 64.79999995231628
+    },
+    {
+      "scope": "Indústria, Comércio e Serviços",
+      "ms": 37.200000047683716
+    },
+    {
+      "scope": "Espaço do Automóvel",
+      "ms": 22.300000071525574
+    },
+    {
+      "scope": "Pavilhão 1",
+      "ms": 26.299999952316284,
+      "modules": 189,
+      "accesses": 4
+    },
+    {
+      "scope": "Pavilhão 3",
+      "ms": 122.5,
+      "modules": 214,
+      "accesses": 6
+    },
+    {
+      "scope": "Pavilhão 5",
+      "ms": 63,
+      "modules": 81,
+      "accesses": 3
+    },
+    {
+      "scope": "Pavilhão 7",
+      "ms": 45.5,
+      "modules": 57,
+      "accesses": 4
+    },
+    {
+      "scope": "Pavilhão 8",
+      "ms": 89.19999992847443,
+      "modules": 114,
+      "accesses": 5
+    },
+    {
+      "scope": "Pavilhão 12",
+      "ms": 157.20000004768372,
+      "modules": 257,
+      "accesses": 3
+    },
+    {
+      "scope": "Pavilhão 14",
+      "ms": 104.79999995231628,
+      "modules": 186,
+      "accesses": 6
+    }
+  ],
+  "errors": [],
+  "layout": {
+    "width": 1440,
+    "overlayWidth": 1417,
+    "scrollWidth": 1417,
+    "canvases": 1,
+    "sameCanvas": true,
+    "plans": 1,
+    "selectedPavilionButtons": [
+      {
+        "width": 158.984375,
+        "height": 101.9375
+      },
+      {
+        "width": 159,
+        "height": 101.9375
+      },
+      {
+        "width": 159,
+        "height": 101.9375
+      },
+      {
+        "width": 159,
+        "height": 101.9375
+      },
+      {
+        "width": 158.984375,
+        "height": 101.9375
+      },
+      {
+        "width": 159,
+        "height": 101.9375
+      },
+      {
+        "width": 159,
+        "height": 101.9375
+      },
+      {
+        "width": 159,
+        "height": 101.9375
+      }
+    ],
+    "health": "{\"status\":\"ready\",\"path\":\"direct\",\"presentedFrames\":318,\"contextLosses\":0,\"lastErrorCode\":null}"
+  },
+  "url": "http://127.0.0.1:5189/__dev/commercial-map-interface"
+}

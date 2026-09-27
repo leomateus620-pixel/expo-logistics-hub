@@ -1,14 +1,11 @@
-import { useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ChartNoAxesCombined, Clock3, RefreshCw, X } from 'lucide-react';
 import type { CommercialMapData } from '../types';
-import { CommercialMiniMap } from './CommercialMiniMap';
+import { CommercialDashboardSpaces } from './CommercialDashboardSpaces';
 import { CommercialDashboardLotChart, CommercialDashboardValueChart } from './CommercialDashboardCharts';
-import { CommercialDashboardComparison } from './CommercialDashboardComparison';
-import { CommercialSegmentDashboard } from './CommercialSegmentDashboard';
 import { buildCommercialDashboardSnapshot } from './commercialDashboardAnalytics';
 import { useDashboardStatusHighlight } from './useDashboardStatusHighlight';
 import {
-  formatDashboardArea,
   formatDashboardAreaWithCoverage,
   formatDashboardCurrency,
   formatDashboardInteger,
@@ -45,8 +42,15 @@ function displayedValue(value: number, lotCount: number, pricedLotCount: number)
   return formatDashboardCurrency(value, true);
 }
 
+function focusDashboardSection(id: string) {
+  const heading = document.getElementById(id);
+  heading?.focus({ preventScroll: true });
+  heading?.scrollIntoView({ block: 'start' });
+}
+
 export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, onViewLot }: CommercialDashboardProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const [consolidatedOpen, setConsolidatedOpen] = useState(false);
   const { highlightedStatus, onHoverStatus, onToggleStatus } = useDashboardStatusHighlight();
   const snapshot = useMemo(
     () => buildCommercialDashboardSnapshot({ entities: data.entities, lots: data.lots }),
@@ -86,6 +90,10 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
     </header>
 
     <main className="commercial-dashboard-content">
+      <nav className="commercial-dashboard-jump" aria-label="Navegar entre visões gerenciais">
+        <button type="button" onClick={() => focusDashboardSection('dashboard-external-title')}>Áreas externas <strong>{formatDashboardInteger(snapshot.external.totalLots)}</strong></button>
+        <button type="button" onClick={() => focusDashboardSection('dashboard-internal-title')}>Pavilhões internos <strong>{formatDashboardInteger(snapshot.internal.totalLots)}</strong></button>
+      </nav>
       <section className="commercial-dashboard-kpis" aria-label="Indicadores comerciais principais">
         <Kpi
           label="Lotes comerciais"
@@ -154,52 +162,20 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
       {(overall.lotsWithoutOfficialArea > 0 || overall.lotsWithoutPrice > 0 || snapshot.unclassifiedLots > 0) && <div className="commercial-dashboard-integrity" role="note">
         {overall.lotsWithoutOfficialArea > 0 && <span>{formatDashboardInteger(overall.lotsWithoutOfficialArea)} {overall.lotsWithoutOfficialArea === 1 ? 'espaço fora do cálculo de área' : 'espaços fora do cálculo de área'}</span>}
         {overall.lotsWithoutPrice > 0 && <span>{formatDashboardInteger(overall.lotsWithoutPrice)} {overall.lotsWithoutPrice === 1 ? 'espaço sem valor definido' : 'espaços sem valor definido'}</span>}
-        {snapshot.unclassifiedLots > 0 && <span>{formatDashboardInteger(snapshot.unclassifiedLots)} {snapshot.unclassifiedLots === 1 ? 'espaço sem segmento' : 'espaços sem segmento'} incluído na visão geral</span>}
+        {snapshot.unclassifiedLots > 0 && <span>{formatDashboardInteger(snapshot.unclassifiedLots)} {snapshot.unclassifiedLots === 1 ? 'espaço com classificação pendente incluído' : 'espaços com classificação pendente incluídos'} na visão geral</span>}
       </div>}
 
-      <section className="commercial-dashboard-overview" aria-labelledby="commercial-dashboard-overview-title">
-        <div className="commercial-dashboard-section-heading">
-          <div>
-            <span className="commercial-dashboard-eyebrow">Panorama do parque</span>
-            <h2 id="commercial-dashboard-overview-title">Visão geral</h2>
-          </div>
-          <p>A área indisponível não compõe o percentual de comercialização.</p>
-        </div>
-        <div className="commercial-dashboard-overview-grid">
-          <div className="commercial-dashboard-overview-analysis">
-            <div className="commercial-dashboard-subheading"><strong>Distribuição dos lotes</strong><span>Dados comerciais do próprio mapa</span></div>
-            <CommercialDashboardLotChart aggregate={overall} highlightedStatus={highlightedStatus} onHoverStatus={onHoverStatus} onToggleStatus={onToggleStatus} />
-            <CommercialDashboardValueChart aggregate={overall} highlightedStatus={highlightedStatus} onHoverStatus={onHoverStatus} onToggleStatus={onToggleStatus} />
-            <div className="commercial-dashboard-potential-breakdown" aria-label="Potencial por situação comercial">
-              <div><span>Disponível</span><strong>{displayedValue(overall.availableValue, overall.availableLots, overall.byStatus.AVAILABLE.pricedLotCount)}</strong></div>
-              <div><span>Reservado</span><strong>{displayedValue(overall.reservedValue, overall.reservedLots, overall.byStatus.RESERVED.pricedLotCount)}</strong></div>
-              <div><span>Em negociação</span><strong>{displayedValue(overall.negotiationValue, overall.negotiationLots, overall.byStatus.IN_NEGOTIATION.pricedLotCount)}</strong></div>
-            </div>
-            {overall.blockedLots > 0 && <p className="commercial-dashboard-data-note">
-              {formatDashboardInteger(overall.blockedLots)} {overall.blockedLots === 1 ? 'lote bloqueado' : 'lotes bloqueados'} contabilizados na área comercial, fora do potencial pendente.
-            </p>}
-          </div>
-          <div className="commercial-dashboard-overview-map">
-            <div className="commercial-dashboard-subheading"><strong>Onde estão os espaços</strong><span>Cores correspondem à situação comercial</span></div>
-            <CommercialMiniMap
-              items={overall.records}
-              title="Mapa comercial geral da Fenasoja"
-              highlightedStatus={highlightedStatus}
-              onViewLot={onViewLot}
-            />
-          </div>
-        </div>
-      </section>
-
-      <div className="commercial-dashboard-segments" aria-label="Indicadores por segmento comercial">
-        {snapshot.segments.map((segment) => <CommercialSegmentDashboard
-          key={segment.segmentId}
-          snapshot={segment}
-          onViewLot={onViewLot}
-        />)}
-      </div>
-
-      <CommercialDashboardComparison segments={snapshot.segments} />
+      {snapshot.orphanLots > 0 && <p className="commercial-dashboard-pending">
+        {snapshot.orphanLots} lotes sem entidade cadastral carregada, fora dos indicadores conforme o contrato atual do mapa.
+      </p>}
+      <details className="commercial-dashboard-scope-analysis commercial-dashboard-consolidated" onToggle={(event) => setConsolidatedOpen(event.currentTarget.open)}>
+        <summary>Resumo consolidado · distribuição de todo o inventário</summary>
+        {consolidatedOpen && <div className="commercial-dashboard-overview-grid">
+          <CommercialDashboardLotChart aggregate={overall} highlightedStatus={highlightedStatus} onHoverStatus={onHoverStatus} onToggleStatus={onToggleStatus} />
+          <CommercialDashboardValueChart aggregate={overall} highlightedStatus={highlightedStatus} onHoverStatus={onHoverStatus} onToggleStatus={onToggleStatus} />
+        </div>}
+      </details>
+      <CommercialDashboardSpaces snapshot={snapshot} data={data} onViewLot={onViewLot} />
 
       <footer className="commercial-dashboard-footer">
         Fonte: cadastro comercial carregado pelo Mapa Comercial. Áreas usam apenas metragem oficial válida; valores representam preços comerciais cadastrados.

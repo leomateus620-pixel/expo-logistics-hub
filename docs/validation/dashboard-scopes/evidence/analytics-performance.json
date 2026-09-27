@@ -1,0 +1,15 @@
+{
+  "fixture": "OFFICIAL_REFERENCE_DATA",
+  "environment": "Node/Vitest on Windows; warmed 100 samples",
+  "before": {
+    "medianMs": 2.118800000000192,
+    "p95Ms": 2.725199999999859
+  },
+  "after": {
+    "medianMs": 3.105800000000272,
+    "p95Ms": 4.259900000000016
+  },
+  "beforeInitialLotPaths": 2780,
+  "afterInitialLotPaths": 252,
+  "maximumSinglePavilionLotPaths": 257
+}

@@ -1,0 +1,105 @@
+{
+  "device": "mobile",
+  "fixture": "OFFICIAL_REFERENCE_DATA, test-only analytics permission",
+  "timings": [
+    {
+      "scope": "Exporural",
+      "ms": 54
+    },
+    {
+      "scope": "Indústria, Comércio e Serviços",
+      "ms": 36.60000002384186
+    },
+    {
+      "scope": "Espaço do Automóvel",
+      "ms": 24.100000023841858
+    },
+    {
+      "scope": "Pavilhão 1",
+      "ms": 32.200000047683716,
+      "modules": 189,
+      "accesses": 4
+    },
+    {
+      "scope": "Pavilhão 3",
+      "ms": 115.60000002384186,
+      "modules": 214,
+      "accesses": 6
+    },
+    {
+      "scope": "Pavilhão 5",
+      "ms": 58.40000009536743,
+      "modules": 81,
+      "accesses": 3
+    },
+    {
+      "scope": "Pavilhão 7",
+      "ms": 49.799999952316284,
+      "modules": 57,
+      "accesses": 4
+    },
+    {
+      "scope": "Pavilhão 8",
+      "ms": 119.79999995231628,
+      "modules": 114,
+      "accesses": 5
+    },
+    {
+      "scope": "Pavilhão 12",
+      "ms": 109.39999997615814,
+      "modules": 257,
+      "accesses": 3
+    },
+    {
+      "scope": "Pavilhão 14",
+      "ms": 89,
+      "modules": 186,
+      "accesses": 6
+    }
+  ],
+  "errors": [],
+  "layout": {
+    "width": 390,
+    "overlayWidth": 390,
+    "scrollWidth": 390,
+    "canvases": 1,
+    "sameCanvas": true,
+    "plans": 1,
+    "selectedPavilionButtons": [
+      {
+        "width": 84.5,
+        "height": 92.5
+      },
+      {
+        "width": 84.5,
+        "height": 92.5
+      },
+      {
+        "width": 84.5,
+        "height": 92.5
+      },
+      {
+        "width": 84.5,
+        "height": 92.5
+      },
+      {
+        "width": 84.5,
+        "height": 92.5
+      },
+      {
+        "width": 84.5,
+        "height": 92.5
+      },
+      {
+        "width": 84.5,
+        "height": 92.5
+      },
+      {
+        "width": 84.5,
+        "height": 92.5
+      }
+    ],
+    "health": "{\"status\":\"ready\",\"path\":\"direct\",\"presentedFrames\":293,\"contextLosses\":0,\"lastErrorCode\":null}"
+  },
+  "url": "http://127.0.0.1:5189/__dev/commercial-map-interface"
+}

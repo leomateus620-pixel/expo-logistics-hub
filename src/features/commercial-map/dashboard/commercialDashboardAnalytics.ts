@@ -1,6 +1,8 @@
 import { COMMERCIAL_MAP_SEGMENTS, buildCommercialMapSegmentIndex, type CommercialMapSegmentId } from '../data/commercialMapSegments';
 import type { CommercialLot, CommercialMapData, CommercialStatus } from '../types';
 import { computeLotTotal } from '../utils/lotPricing2028';
+import { COMMERCIAL_PAVILION_DEFINITIONS, type CommercialPavilionPublicIdentifier } from '../utils/commercialPavilions';
+import { classifyDashboardLot } from './commercialDashboardClassification';
 import type {
   CommercialDashboardSnapshot,
   CommercialSegmentDashboardSnapshot,
@@ -166,14 +168,22 @@ export function buildCommercialDashboardSnapshot(
   const entityById = new Map(data.entities.map((entity) => [entity.id, entity]));
   const segmentIndex = buildCommercialMapSegmentIndex(data.entities, data.lots);
   const overall = makeAccumulator();
+  const external = makeAccumulator();
+  const internal = makeAccumulator();
+  const unclassified = makeAccumulator();
+  const pavilionDefinitions = Object.values(COMMERCIAL_PAVILION_DEFINITIONS).sort((a, b) => a.pavilionNumber - b.pavilionNumber);
+  const pavilionAccumulators = new Map(pavilionDefinitions.map((definition) => [definition.publicIdentifier, makeAccumulator()]));
   const segmentAccumulators = new Map<CommercialMapSegmentId, MutableAggregate>(
     COMMERCIAL_MAP_SEGMENTS.map((segment) => [segment.id, makeAccumulator()]),
   );
-  let unclassifiedLots = 0;
+  let orphanLots = 0;
+  const seenLotIds = new Set<string>();
 
   for (const lot of data.lots) {
     const entity = entityById.get(lot.entityId);
-    if (lot.archivedAt != null || !entity || entity.isArchived) continue;
+    if (lot.archivedAt != null || entity?.isArchived || seenLotIds.has(lot.id)) continue;
+    seenLotIds.add(lot.id);
+    if (!entity) { orphanLots += 1; continue; }
 
     const segmentId = segmentIndex.get(entity.id)?.id ?? null;
     const record: DashboardLotRecord = Object.freeze({
@@ -182,10 +192,16 @@ export function buildCommercialDashboardSnapshot(
       segmentId,
       value: resolveDashboardLotValue(lot),
       officialAreaSqm: validOfficialArea(lot.officialAreaSqm),
+      ...classifyDashboardLot(entity, lot, entityById, segmentId),
     });
     addRecord(overall, record);
-    if (segmentId) addRecord(segmentAccumulators.get(segmentId)!, record);
-    else unclassifiedLots += 1;
+    if (record.category === 'internal' && record.pavilion) {
+      addRecord(internal, record);
+      addRecord(pavilionAccumulators.get(record.pavilion.publicIdentifier.trim().toUpperCase() as CommercialPavilionPublicIdentifier)!, record);
+    } else if (record.category === 'external' && segmentId) {
+      addRecord(external, record);
+      addRecord(segmentAccumulators.get(segmentId)!, record);
+    } else addRecord(unclassified, record);
   }
 
   const segments = COMMERCIAL_MAP_SEGMENTS.map((segment): CommercialSegmentDashboardSnapshot => Object.freeze({
@@ -195,7 +211,16 @@ export function buildCommercialDashboardSnapshot(
   }));
   return Object.freeze({
     overall: finishAccumulator(overall),
+    external: finishAccumulator(external),
+    internal: finishAccumulator(internal),
+    unclassified: finishAccumulator(unclassified),
+    pavilions: Object.freeze(pavilionDefinitions.map((definition) => Object.freeze({
+      ...finishAccumulator(pavilionAccumulators.get(definition.publicIdentifier)!),
+      definition,
+      entity: data.entities.find((entity) => !entity.isArchived && entity.publicIdentifier.trim().toUpperCase() === definition.publicIdentifier) ?? null,
+    }))),
+    orphanLots,
     segments: Object.freeze(segments),
-    unclassifiedLots,
+    unclassifiedLots: unclassified.records.length,
   });
 }

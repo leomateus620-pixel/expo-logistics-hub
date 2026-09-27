@@ -1,5 +1,6 @@
 import type { CommercialLot, CommercialStatus, MapEntity } from '../types';
 import type { CommercialMapSegmentDefinition, CommercialMapSegmentId } from '../data/commercialMapSegments';
+import type { CommercialPavilionDefinition } from '../utils/commercialPavilions';
 
 /** A cadastral lot joined to the exact entity already loaded by the map query. */
 export interface DashboardLotRecord {
@@ -10,6 +11,10 @@ export interface DashboardLotRecord {
   readonly value: number | null;
   /** Invalid or absent official area stays pending instead of becoming zero. */
   readonly officialAreaSqm: number | null;
+  readonly category: 'external' | 'internal' | 'unclassified';
+  readonly pavilion: MapEntity | null;
+  readonly blockCode: string | null;
+  readonly classificationIssue: string | null;
 }
 
 export interface DashboardStatusSummary {
@@ -77,7 +82,19 @@ export interface CommercialSegmentDashboardSnapshot extends DashboardAggregate {
 
 export interface CommercialDashboardSnapshot {
   readonly overall: DashboardAggregate;
+  readonly external: DashboardAggregate;
+  readonly internal: DashboardAggregate;
+  readonly unclassified: DashboardAggregate;
+  readonly pavilions: readonly CommercialPavilionDashboardSnapshot[];
+  /** Existing contract excludes lots whose cadastral entity is missing. Report them explicitly. */
+  readonly orphanLots: number;
+  /** These segment aggregates contain external inventory only. */
   readonly segments: readonly CommercialSegmentDashboardSnapshot[];
   /** Active lots with no single official segment remain in overall totals. */
   readonly unclassifiedLots: number;
+}
+
+export interface CommercialPavilionDashboardSnapshot extends DashboardAggregate {
+  readonly definition: CommercialPavilionDefinition;
+  readonly entity: MapEntity | null;
 }
