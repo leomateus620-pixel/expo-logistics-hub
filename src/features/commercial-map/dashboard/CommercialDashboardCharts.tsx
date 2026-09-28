@@ -23,11 +23,12 @@ function phaseSummary(aggregate: DashboardAggregate, phase: CommercialPhase) {
       areaSqm: total.areaSqm + row.areaSqm,
       value: total.value + row.value,
       areaPendingCount: total.areaPendingCount + row.areaPendingCount,
+      pricePendingCount: total.pricePendingCount + row.pricePendingCount,
       pricedLotCount: total.pricedLotCount + row.pricedLotCount,
       lotPercentage: total.lotPercentage + row.lotPercentage,
       areaPercentage: total.areaPercentage + row.areaPercentage,
     };
-  }, { lotCount: 0, areaSqm: 0, value: 0, areaPendingCount: 0, pricedLotCount: 0, lotPercentage: 0, areaPercentage: 0 });
+  }, { lotCount: 0, areaSqm: 0, value: 0, areaPendingCount: 0, pricePendingCount: 0, pricedLotCount: 0, lotPercentage: 0, areaPercentage: 0 });
 }
 
 interface ChartProps {

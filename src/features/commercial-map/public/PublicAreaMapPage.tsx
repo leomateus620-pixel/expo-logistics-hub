@@ -23,7 +23,7 @@ import { usePublicAutoRefresh } from './usePublicAutoRefresh';
 import { usePublicMapRenderState } from './usePublicMapRenderState';
 import { PublicLotDetails } from './PublicLotDetails';
 import { PublicLotList } from './PublicLotList';
-import { PUBLIC_AVAILABILITY_LABEL, type PublicLot } from './publicMapTypes';
+import type { PublicLot } from './publicMapTypes';
 import './public-map.css';
 
 const loadPublicCanvas = () => preloadCommercialMapCanvas({ prepareHeadquarters: false });
