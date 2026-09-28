@@ -4135,6 +4135,9 @@ export type Database = {
       }
       lot_sale_order_items: {
         Row: {
+          cancelled_at: string | null
+          cancelled_by: string | null
+          contract_state: string
           created_at: string
           id: string
           item_total: number
@@ -4148,8 +4151,13 @@ export type Database = {
           pricing_stage: string
           public_identifier: string
           sale_id: string | null
+          signed_at: string | null
+          signed_by: string | null
         }
         Insert: {
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          contract_state?: string
           created_at?: string
           id?: string
           item_total: number
@@ -4163,8 +4171,13 @@ export type Database = {
           pricing_stage: string
           public_identifier: string
           sale_id?: string | null
+          signed_at?: string | null
+          signed_by?: string | null
         }
         Update: {
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          contract_state?: string
           created_at?: string
           id?: string
           item_total?: number
@@ -4178,6 +4191,8 @@ export type Database = {
           pricing_stage?: string
           public_identifier?: string
           sale_id?: string | null
+          signed_at?: string | null
+          signed_by?: string | null
         }
         Relationships: [
           {
@@ -9697,6 +9712,10 @@ export type Database = {
         Returns: string
       }
       can_view_commercial_map: { Args: { _org_id: string }; Returns: boolean }
+      cancel_sale_order_items: {
+        Args: { p_item_ids: string[]; p_order_id: string; p_reason?: string }
+        Returns: Json
+      }
       claim_google_sync_batch: {
         Args: { batch_size?: number }
         Returns: {
@@ -9742,6 +9761,10 @@ export type Database = {
           target_user_id: string
         }
         Returns: boolean
+      }
+      confirm_sale_order_items: {
+        Args: { p_item_ids: string[]; p_order_id: string }
+        Returns: Json
       }
       create_commercial_lot: {
         Args: {
