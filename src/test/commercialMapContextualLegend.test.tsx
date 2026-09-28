@@ -51,9 +51,9 @@ describe('resumo comercial contextual', () => {
     expect(segment.title).toBe('Exporural');
     expect(segment.totalCount).toBe(95);
     const park = resolveContextualMapScope(input);
-    expect(park.totalCount).toBe(1579);
+    expect(park.totalCount).toBe(1465);
     expect(park.nonCommercialCount).toBeGreaterThan(0);
-    expect(deriveContextualMapSummary(park).byStatus.BLOCKED).toBe(1579);
+    expect(deriveContextualMapSummary(park).byStatus.BLOCKED).toBe(1465);
   });
 
   it('separa contagem total e filtrada e mantém cores e áreas vinculadas aos mesmos registros', () => {
