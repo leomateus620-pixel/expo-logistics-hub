@@ -107,6 +107,7 @@ export async function trackPublicMapEvent(slug: string, token: string, input: Pu
 const AVAILABILITY_TO_STATUS: Record<PublicLot['availability'], CommercialStatus> = {
   AVAILABLE: 'AVAILABLE',
   RESERVED: 'RESERVED',
+  SALE_OPEN: 'SALE_OPEN',
   SOLD: 'SOLD',
   UNAVAILABLE: 'BLOCKED',
 };

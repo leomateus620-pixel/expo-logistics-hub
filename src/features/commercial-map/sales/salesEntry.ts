@@ -13,7 +13,7 @@ export function isSellableLot(
   eligibleLotIds?: ReadonlySet<string> | null,
 ): boolean {
   // A map refresh can precede the eligibility refresh after another sale.
-  if (!lot || lot.status === 'SOLD' || lot.id.startsWith('reference:') || lot.archivedAt) return false;
+  if (!lot || lot.status === 'SOLD' || lot.status === 'SALE_OPEN' || lot.id.startsWith('reference:') || lot.archivedAt) return false;
   if (!eligibleLotIds) return false;
   return eligibleLotIds.has(lot.id);
 }

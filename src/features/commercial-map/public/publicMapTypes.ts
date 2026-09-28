@@ -1,7 +1,7 @@
 import type { MapEntity, MapLayer } from '../types';
 import type { LotPricingResolution } from '../utils/lotPricing2028';
 
-export type PublicLotAvailability = 'AVAILABLE' | 'RESERVED' | 'SOLD' | 'UNAVAILABLE';
+export type PublicLotAvailability = 'AVAILABLE' | 'RESERVED' | 'SALE_OPEN' | 'SOLD' | 'UNAVAILABLE';
 
 export interface PublicLotPricing {
   resolutionStatus: LotPricingResolution;
@@ -73,6 +73,7 @@ export interface PublicMapContext {
 export const PUBLIC_AVAILABILITY_LABEL: Record<PublicLotAvailability, string> = {
   AVAILABLE: 'Disponível',
   RESERVED: 'Sob consulta',
+  SALE_OPEN: 'Venda em aberto',
   SOLD: 'Comercializado',
   UNAVAILABLE: 'Indisponível',
 };
