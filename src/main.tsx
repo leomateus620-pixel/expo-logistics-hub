@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import PublicMapApp from "./features/commercial-map/public/PublicMapApp";
-import { isPublicMapHost, legacyPublicLinkRedirect } from "./features/commercial-map/public/publicMapHost";
+import { isPublicMapHost, resolveCanonicalRedirect } from "./features/commercial-map/public/publicMapHost";
 import "./styles/tokens.css";
 import "./index.css";
 import "./styles/cronograma-operational-overrides.css";
@@ -67,7 +67,7 @@ window.addEventListener('unhandledrejection', (e) => {
 });
 
 const publicHost = isPublicMapHost(window.location.hostname);
-const legacyRedirect = legacyPublicLinkRedirect(window.location);
+const legacyRedirect = resolveCanonicalRedirect(window.location);
 
 if (!publicHost && !legacyRedirect && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
