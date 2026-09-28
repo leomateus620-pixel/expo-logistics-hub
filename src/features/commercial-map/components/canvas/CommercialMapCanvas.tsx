@@ -370,7 +370,6 @@ const PRECISE_HOVER_CAPABLE = typeof window === 'undefined'
   || window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches;
 const MAP_BACKGROUND_COLOR = new THREE.Color('#dfe8de');
 const AREA_NUMBER = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const SEGMENT_LOT_SURFACE_WEIGHT = 0.94;
 const STATUS_MARK_LONG_RATIO = 0.34;
 const STATUS_MARK_SHORT_RATIO = 0.09;
 const DETAILED_PARK_ACCESS_GATE_HIT_AREAS = new Map<string, {
