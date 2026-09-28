@@ -57,10 +57,11 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
     [data.entities, data.lots],
   );
   const { overall } = snapshot;
-  const pendingLotCount = overall.availableLots + overall.reservedLots + overall.negotiationLots;
+  const pendingLotCount = overall.availableLots + overall.reservedLots + overall.negotiationLots + overall.saleOpenLots;
   const pendingPricedLotCount = overall.byStatus.AVAILABLE.pricedLotCount
     + overall.byStatus.RESERVED.pricedLotCount
-    + overall.byStatus.IN_NEGOTIATION.pricedLotCount;
+    + overall.byStatus.IN_NEGOTIATION.pricedLotCount
+    + overall.byStatus.SALE_OPEN.pricedLotCount;
   const pendingUnpricedLotCount = pendingLotCount - pendingPricedLotCount;
   const updatedAtLabel = dataUpdatedAt > 0 && Number.isFinite(dataUpdatedAt)
     ? `Atualizado às ${new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(dataUpdatedAt)}`
@@ -115,6 +116,14 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
           progress={overall.commercialLots > 0 ? overall.soldLotPercentage : null}
         />
         <Kpi
+          label="Vendas em aberto"
+          value={formatDashboardInteger(overall.saleOpenLots)}
+          detail={overall.saleOpenLots === 0
+            ? 'Nenhuma venda aguardando assinatura'
+            : `Carteira em aberto · ${displayedValue(overall.saleOpenValue, overall.saleOpenLots, overall.byStatus.SALE_OPEN.pricedLotCount)} · nunca receita realizada`}
+          progress={overall.commercialLots > 0 ? overall.byStatus.SALE_OPEN.lotPercentage : null}
+        />
+        <Kpi
           label="Lotes disponíveis"
           value={formatDashboardInteger(overall.availableLots)}
           detail={overall.commercialLots > 0
@@ -155,7 +164,7 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
             ? 'Nenhum valor pendente cadastrado'
             : pendingUnpricedLotCount > 0
               ? `Subtotal cadastrado · ${formatDashboardInteger(pendingUnpricedLotCount)} sem preço`
-              : 'Disponível, reservado e em negociação'}
+              : 'Disponível, reservado, em negociação e venda em aberto'}
         />
       </section>
 
