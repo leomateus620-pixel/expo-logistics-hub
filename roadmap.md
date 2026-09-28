@@ -1,5 +1,11 @@
 # Roadmap
 
+## Quatro situações visíveis no Mapa Comercial
+- [x] Remover situações antigas das legendas, filtros, listas, painéis, minimapas, dashboard e links públicos.
+- [x] Usar verde, amarelo, azul e vermelho nas superfícies, mantendo os estados operacionais antigos restritos no cadastro.
+- [x] Validar contagem contextual, apresentação pública, indicadores e tipagem sem alterar vendas nem publicar.
+- [ ] Conferir visualmente a cena 3D autenticada em desktop e celular quando o carregamento WebGL automatizado estiver disponível.
+
 ## Links públicos do Mapa Comercial
 - [x] Confirmar dez endereços ativos e identificar erro comum de consulta à coluna inexistente de venda.
 - [x] Corrigir a função de revisão em nova migração sem trocar chaves, dados ou permissões.

@@ -1,6 +1,7 @@
 import { memo, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type PointerEvent, type ReactNode } from 'react';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, CarFront, DoorOpen, Footprints, Moon, RotateCcw, RotateCw, Sun, X } from 'lucide-react';
 import { STATUS_CONFIG } from '../constants';
+import { toCommercialPhase } from '../types';
 import { resolveCommercialMapSegment } from '../data/commercialMapSegments';
 import { useLotPricing2028 } from '../hooks/useLotPricing2028';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
@@ -31,7 +32,7 @@ const VisitLotInformation = memo(function VisitLotInformation({ poi, expanded }:
   return <>
     <div className="visit-poi__facts">
       <span>{formatAreaSqmLabel(area) ?? 'Área não informada'}</span>
-      <span>{STATUS_CONFIG[lot.status].label}</span>
+      <span>{STATUS_CONFIG[toCommercialPhase(lot.status)].label}</span>
     </div>
     {segment && <p className="visit-poi__segment">{segment.name}</p>}
     {secondTotal && <p className="visit-poi__price"><strong>{secondTotal}</strong><small>2ª Etapa</small></p>}

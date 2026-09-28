@@ -1,5 +1,6 @@
 import type { InteriorViewAction, InteriorViewCommand } from '../hooks/useInteriorCameraRequest';
 import { create } from 'zustand';
+import { toCommercialPhase } from '../types';
 import type {
   CameraPreset,
   CommercialStatus,
@@ -416,9 +417,9 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   setSelectedModuleId: (selectedModuleId) => set({ selectedModuleId }),
   setSearch: (search) => set({ search }),
   toggleStatus: (status) => set((state) => ({
-    statusFilters: state.statusFilters.includes(status)
-      ? state.statusFilters.filter((candidate) => candidate !== status)
-      : [...state.statusFilters, status],
+    statusFilters: state.statusFilters.some((candidate) => toCommercialPhase(candidate) === toCommercialPhase(status))
+      ? state.statusFilters.filter((candidate) => toCommercialPhase(candidate) !== toCommercialPhase(status))
+      : [...state.statusFilters, toCommercialPhase(status)],
   })),
   clearStatuses: () => set({ statusFilters: [] }),
   toggleClassification: (classification) => set((state) => ({

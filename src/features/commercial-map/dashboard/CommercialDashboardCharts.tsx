@@ -1,6 +1,6 @@
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
-import { STATUS_CONFIG } from '../constants';
-import type { CommercialStatus } from '../types';
+import { COMMERCIAL_PHASES, STATUS_CONFIG } from '../constants';
+import { toCommercialPhase, type CommercialStatus, type CommercialPhase } from '../types';
 import {
   formatDashboardArea,
   formatDashboardAreaWithCoverage,
@@ -10,13 +10,26 @@ import {
 } from './commercialDashboardFormatters';
 import type { DashboardAggregate } from './commercialDashboardTypes';
 
-const AREA_STATUSES: readonly CommercialStatus[] = [
-  'SOLD', 'SALE_OPEN', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'BLOCKED',
-];
+const AREA_STATUSES = COMMERCIAL_PHASES;
+const VALUE_STATUSES = COMMERCIAL_PHASES.filter((status) => status !== 'BLOCKED');
 
-const VALUE_STATUSES: readonly CommercialStatus[] = [
-  'SOLD', 'SALE_OPEN', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION',
-];
+function phaseSummary(aggregate: DashboardAggregate, phase: CommercialPhase) {
+  const statuses = (Object.keys(aggregate.byStatus) as CommercialStatus[]).filter((status) =>
+    status !== 'UNAVAILABLE' && toCommercialPhase(status) === phase);
+  return statuses.reduce((total, status) => {
+    const row = aggregate.byStatus[status];
+    return {
+      lotCount: total.lotCount + row.lotCount,
+      areaSqm: total.areaSqm + row.areaSqm,
+      value: total.value + row.value,
+      areaPendingCount: total.areaPendingCount + row.areaPendingCount,
+      pricePendingCount: total.pricePendingCount + row.pricePendingCount,
+      pricedLotCount: total.pricedLotCount + row.pricedLotCount,
+      lotPercentage: total.lotPercentage + row.lotPercentage,
+      areaPercentage: total.areaPercentage + row.areaPercentage,
+    };
+  }, { lotCount: 0, areaSqm: 0, value: 0, areaPendingCount: 0, pricePendingCount: 0, pricedLotCount: 0, lotPercentage: 0, areaPercentage: 0 });
+}
 
 interface ChartProps {
   aggregate: DashboardAggregate;
@@ -27,7 +40,7 @@ interface ChartProps {
 }
 
 interface LotChartRow {
-  status: CommercialStatus;
+  status: CommercialPhase;
   name: string;
   areaSqm: number;
   /** Share of commercial lot count — the dashboard's primary metric. */
@@ -49,9 +62,9 @@ export function CommercialDashboardLotChart({
   onToggleStatus,
   compact = false,
 }: ChartProps) {
-  // Five fixed status buckets come from the single analytics snapshot.
+  // The four displayed phases group legacy operational states without rewriting them.
   const rows: LotChartRow[] = AREA_STATUSES.flatMap((status) => {
-    const summary = aggregate.byStatus[status];
+    const summary = phaseSummary(aggregate, status);
     return summary.lotCount > 0 ? [{
       status,
       name: STATUS_CONFIG[status].label,
@@ -104,7 +117,7 @@ export function CommercialDashboardLotChart({
                     return <div className="commercial-dashboard-chart-tooltip">
                       <strong>{row.name}</strong>
                       <span>{formatDashboardInteger(row.lotCount)} {row.lotCount === 1 ? 'lote' : 'lotes'} · {formatDashboardPercentage(row.percentage)}</span>
-                      <small>{formatDashboardAreaWithCoverage(row.areaSqm, row.lotCount, aggregate.byStatus[row.status].areaPendingCount, aggregate.commercialLots)}</small>
+                      <small>{formatDashboardAreaWithCoverage(row.areaSqm, row.lotCount, phaseSummary(aggregate, row.status).areaPendingCount, aggregate.commercialLots)}</small>
                     </div>;
                   }}
                 />
@@ -128,7 +141,7 @@ export function CommercialDashboardLotChart({
 
       <div className="commercial-dashboard-status-list" aria-label="Distribuição comercial por quantidade de lotes e área">
         {AREA_STATUSES.map((status) => {
-          const summary = aggregate.byStatus[status];
+          const summary = phaseSummary(aggregate, status);
           return <button
             key={status}
             type="button"
@@ -149,7 +162,7 @@ export function CommercialDashboardLotChart({
         })}
       </div>
       {aggregate.byStatus.UNAVAILABLE.lotCount > 0 && <p className="commercial-dashboard-chart-exclusion">
-        {formatDashboardInteger(aggregate.byStatus.UNAVAILABLE.lotCount)} {aggregate.byStatus.UNAVAILABLE.lotCount === 1 ? 'espaço indisponível' : 'espaços indisponíveis'} fora da área comercial ativa
+        {formatDashboardInteger(aggregate.byStatus.UNAVAILABLE.lotCount)} {aggregate.byStatus.UNAVAILABLE.lotCount === 1 ? 'espaço fora da área comercial ativa' : 'espaços fora da área comercial ativa'}
         {aggregate.unavailableAreaSqm > 0 ? ` · ${formatDashboardArea(aggregate.unavailableAreaSqm)}` : ''}.
       </p>}
       <p className="commercial-dashboard-screen-reader-only">
@@ -171,7 +184,7 @@ export function CommercialDashboardValueChart({
   onToggleStatus,
 }: Omit<ChartProps, 'compact'>) {
   const rows = VALUE_STATUSES.flatMap((status) => {
-    const summary = aggregate.byStatus[status];
+    const summary = phaseSummary(aggregate, status);
     return summary.pricedLotCount > 0 ? [{ status, summary }] : [];
   });
   const maxValue = Math.max(...rows.map((row) => row.summary.value), 0);

@@ -1,5 +1,5 @@
 import { CLASSIFICATION_LABELS, STATUS_CONFIG, VERIFICATION_LABELS } from '../constants';
-import type { CommercialLot, Coordinate, MapClassification, MapEntity } from '../types';
+import { toCommercialPhase, type CommercialLot, type Coordinate, type MapClassification, type MapEntity } from '../types';
 import { geometryCentroid } from './geometry';
 import { strategicLandmarkSearchAliases } from './landmarks';
 
@@ -133,7 +133,7 @@ export function normalizeMapEntityMetadata(entity: MapEntity, lot?: CommercialLo
     lot?.levelLabel,
     CLASSIFICATION_LABELS[entity.classification],
     VERIFICATION_LABELS[entity.verificationStatus],
-    lot ? STATUS_CONFIG[lot.status].label : 'Não comercial',
+    lot ? STATUS_CONFIG[toCommercialPhase(lot.status)].label : 'Não comercial',
     lot?.displayName,
     entity.description,
     lot?.description,

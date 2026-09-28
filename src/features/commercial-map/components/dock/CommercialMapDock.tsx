@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ArrowLeft, CarFront, Check, ChevronDown, ChevronUp, Factory, FilterX, Layers3, PanelLeftClose, PanelLeftOpen, RotateCcw, Tractor } from 'lucide-react';
 import { STATUS_CONFIG } from '../../constants';
+import { toCommercialPhase } from '../../types';
 import { commercialMapSegmentInventory, type CommercialMapSegmentId } from '../../data/commercialMapSegments';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CommercialLot, MapEntity } from '../../types';
@@ -154,7 +155,7 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
             setModuleLegendOpen(open);
             if (open) event.currentTarget.dispatchEvent(new Event('commercial-map-expand-context', { bubbles: true }));
           }}>
-            <summary><span>Legenda do pavilhão{statusFilters.length > 0 && !moduleLegendOpen && <small>Filtro: {statusFilters.map((status) => STATUS_CONFIG[status].shortLabel).join(', ')}</small>}</span><ChevronDown aria-hidden="true" /></summary>
+             <summary><span>Legenda do pavilhão{statusFilters.length > 0 && !moduleLegendOpen && <small>Filtro: {[...new Set(statusFilters.map(toCommercialPhase))].map((status) => STATUS_CONFIG[status].label).join(', ')}</small>}</span><ChevronDown aria-hidden="true" /></summary>
             {moduleLegendOpen && <ContextualMapLegend
               entities={entities} lots={lots} interiorEntity={interiorEntity} activeSegmentId={activeSegmentId}
               scopeTitle={scopeTitle} matchingEntityIds={matchingEntityIds} filtersActive={filtersActive}

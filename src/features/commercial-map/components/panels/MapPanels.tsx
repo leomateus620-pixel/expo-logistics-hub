@@ -34,7 +34,7 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { CLASSIFICATION_LABELS, STATUS_CONFIG } from '../../constants';
+import { CLASSIFICATION_LABELS, COMMERCIAL_PHASES, STATUS_CONFIG } from '../../constants';
 import { useLotActivity, useLotContractVersions, useLotSaleHistory, useMapMutations } from '../../hooks/useCommercialMap';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
@@ -48,7 +48,7 @@ import {
 import { normalizeMapEntityMetadata } from '../../utils/mapMetadata';
 import { resolveCommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
 import type { CommercialMapAreaScope } from '../../utils/areaScope';
-import type { CommercialLot, MapEntity, MapLayer, MapPermissions } from '../../types';
+import { toCommercialPhase, type CommercialLot, type MapEntity, type MapLayer, type MapPermissions } from '../../types';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
 import { LotStructureDialog, type LotStructureOperation } from '../commercial/LotStructureDialog';
 import { PavilionPlanLegend } from './PavilionPlanLegend';
@@ -101,11 +101,11 @@ export function CommercialSummary({
   const toggleStatus = useCommercialMapStore((state) => state.toggleStatus);
   const statusFilters = useCommercialMapStore((state) => state.statusFilters);
   const totals = useMemo(() => {
-    const byStatus = Object.fromEntries(Object.keys(STATUS_CONFIG).map((key) => [key, 0])) as Record<string, number>;
+    const byStatus = Object.fromEntries(COMMERCIAL_PHASES.map((key) => [key, 0])) as Record<string, number>;
     let availableArea = 0;
     let soldValue = 0;
     lots.forEach((lot) => {
-      byStatus[lot.status] += 1;
+      byStatus[toCommercialPhase(lot.status)] += 1;
       if (lot.status === 'AVAILABLE') availableArea += lot.officialAreaSqm ?? 0;
       if (lot.status === 'SOLD') soldValue += lot.askingPrice ?? 0;
     });
@@ -128,19 +128,19 @@ export function CommercialSummary({
           <span>{segmentName ? 'lotes no segmento' : scope === 'exporural' ? 'lotes Exporural' : 'lotes cadastrados'}</span>
         )}
       </div>
-      {(['BLOCKED', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'SOLD'] as const).map((status) => {
+      {COMMERCIAL_PHASES.map((status) => {
         const button = (
           <button
             type="button"
             key={status}
-            className={statusFilters.includes(status) ? 'is-active' : ''}
+            className={statusFilters.some((candidate) => toCommercialPhase(candidate) === status) ? 'is-active' : ''}
             onClick={() => toggleStatus(status)}
-            aria-pressed={statusFilters.includes(status)}
+            aria-pressed={statusFilters.some((candidate) => toCommercialPhase(candidate) === status)}
             aria-label={`${STATUS_CONFIG[status].label}: ${totals.byStatus[status]} ${totals.byStatus[status] === 1 ? 'lote' : 'lotes'}`}
           >
             <i style={{ background: STATUS_CONFIG[status].color }} />
             <strong>{totals.byStatus[status]}</strong>
-            {!isCompact && <span>{STATUS_CONFIG[status].shortLabel}</span>}
+            {!isCompact && <span>{STATUS_CONFIG[status].label}</span>}
           </button>
         );
 
@@ -176,12 +176,15 @@ export function StatusLegend({ scope = 'park' }: { scope?: CommercialMapAreaScop
       </button>
       {expanded && (
         <div>
-          {(Object.entries(STATUS_CONFIG) as Array<[keyof typeof STATUS_CONFIG, (typeof STATUS_CONFIG)[keyof typeof STATUS_CONFIG]]>).map(([key, config]) => (
+           {COMMERCIAL_PHASES.map((key) => {
+             const config = STATUS_CONFIG[key];
+             return (
             <span key={key} title={config.description}>
               <i style={{ background: config.color, borderColor: config.border }}>{config.symbol}</i>
               {config.label}
             </span>
-          ))}
+             );
+           })}
         </div>
       )}
     </div>
@@ -342,7 +345,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
   const saleHistory = useLotSaleHistory(lot?.id ?? null, lot?.status === 'SOLD' || lot?.status === 'SALE_OPEN');
   const contracts = useLotContractVersions(lot?.id ?? null, permissions.canManageContracts);
   const areaMapUnits = polygonAreaMapUnits(entity.geometry);
-  const status = lot ? STATUS_CONFIG[lot.status] : null;
+  const status = lot ? STATUS_CONFIG[toCommercialPhase(lot.status)] : null;
   const metadata = normalizeMapEntityMetadata(entity, lot);
   const lotIdentity = lot ? resolveLotIdentity(lot, entity, entities.find(parent => parent.id === entity.parentEntityId)) : null;
   const structuralReady = lot ? ['AVAILABLE', 'BLOCKED', 'UNAVAILABLE'].includes(lot.status) : false;

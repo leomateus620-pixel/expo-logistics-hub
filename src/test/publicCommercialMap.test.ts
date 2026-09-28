@@ -8,7 +8,8 @@ import {
 } from '@/features/commercial-map/public/publicAreaRegistry';
 import { findPavilionEntity, toCanvasLot } from '@/features/commercial-map/public/publicMapService';
 import { interactionRate } from '@/features/commercial-map/public/publicMapAdminService';
-import type { PublicLot } from '@/features/commercial-map/public/publicMapTypes';
+import { PUBLIC_AVAILABILITY_LABEL, type PublicLot } from '@/features/commercial-map/public/publicMapTypes';
+import { toCommercialPhase } from '@/features/commercial-map/types';
 import type { MapEntity } from '@/features/commercial-map/types';
 
 const lot: PublicLot = {
@@ -81,6 +82,12 @@ describe('registry público das onze áreas', () => {
 });
 
 describe('payload público respeita a allowlist comercial', () => {
+  it('mostra somente as quatro fases sem apresentar reserva como venda aberta ou disponível', () => {
+    expect(PUBLIC_AVAILABILITY_LABEL).toMatchObject({ AVAILABLE: 'Disponível', SALE_OPEN: 'Venda em aberto', SOLD: 'Vendido', UNAVAILABLE: 'Bloqueado', RESERVED: 'Bloqueado' });
+    expect(toCanvasLot({ ...lot, availability: 'RESERVED' }).status).toBe('BLOCKED');
+    expect(toCommercialPhase('IN_NEGOTIATION')).toBe('BLOCKED');
+    expect(toCommercialPhase('RESERVED')).not.toBe('SALE_OPEN');
+  });
   it('converte para o canvas mantendo dados privados nulos', () => {
     const canvasLot = toCanvasLot(lot);
     expect(canvasLot.status).toBe('AVAILABLE');

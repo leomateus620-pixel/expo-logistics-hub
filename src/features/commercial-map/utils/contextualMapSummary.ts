@@ -1,10 +1,10 @@
-import { STATUS_CONFIG } from '../constants';
+import { COMMERCIAL_PHASES } from '../constants';
 import {
   buildCommercialMapSegmentIndex,
   getCommercialMapSegment,
   type CommercialMapSegmentId,
 } from '../data/commercialMapSegments';
-import type { CommercialLot, CommercialStatus, MapEntity } from '../types';
+import { toCommercialPhase, type CommercialLot, type CommercialPhase, type CommercialStatus, type MapEntity } from '../types';
 import {
   resolveCommercialPavilionModulePlan,
   type CommercialPavilionModulePlan,
@@ -141,11 +141,11 @@ export function deriveContextualMapSummary(
     filtersActive?: boolean;
   } = {},
 ) {
-  const byStatus = Object.fromEntries(Object.keys(STATUS_CONFIG).map((status) => [status, 0])) as Record<CommercialStatus, number>;
-  scope.lots.forEach((lot) => { byStatus[lot.status] += 1; });
+  const byStatus = Object.fromEntries(COMMERCIAL_PHASES.map((status) => [status, 0])) as Record<CommercialPhase, number>;
+  scope.lots.forEach((lot) => { byStatus[toCommercialPhase(lot.status)] += 1; });
   const hasFilters = filtersActive || statusFilters.length > 0;
   const filteredLots = hasFilters ? scope.lots.filter((lot) => (
-    (statusFilters.length === 0 || statusFilters.includes(lot.status))
+    (statusFilters.length === 0 || statusFilters.some((status) => toCommercialPhase(status) === toCommercialPhase(lot.status)))
     && (!matchingEntityIds || matchingEntityIds.has(lot.entityId))
   )) : scope.lots;
   return {

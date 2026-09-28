@@ -51,9 +51,9 @@ describe('resumo comercial contextual', () => {
     expect(segment.title).toBe('Exporural');
     expect(segment.totalCount).toBe(95);
     const park = resolveContextualMapScope(input);
-    expect(park.totalCount).toBe(1579);
+    expect(park.totalCount).toBe(1465);
     expect(park.nonCommercialCount).toBeGreaterThan(0);
-    expect(deriveContextualMapSummary(park).byStatus.BLOCKED).toBe(1579);
+    expect(deriveContextualMapSummary(park).byStatus.BLOCKED).toBe(1465);
   });
 
   it('separa contagem total e filtrada e mantém cores e áreas vinculadas aos mesmos registros', () => {
@@ -64,9 +64,10 @@ describe('resumo comercial contextual', () => {
     expect(scope.totalCount).toBe(189);
     expect(summary.filteredCount).toBe(1);
     expect(summary.byStatus.AVAILABLE).toBe(2);
-    expect(summary.byStatus.RESERVED).toBe(1);
+    expect(summary.byStatus.BLOCKED).toBe(1);
     expect(summary.officialArea).toEqual({ squareMeters: 20, informedCount: 2, missingCount: 1 });
     expect(summary.availableOfficialArea).toEqual({ squareMeters: 12, informedCount: 1, missingCount: 1 });
+    expect(deriveContextualMapSummary(scope, { statusFilters: ['BLOCKED'] }).filteredCount).toBe(1);
     expect(scope.plan!.stats.totalAreaSquareMeters).toBe(1201.5);
     expect(scope.plan!.stats.moduleAreaSquareMeters).toBe(586.5);
   });

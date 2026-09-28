@@ -1,8 +1,8 @@
 import { memo, useId, useMemo, type CSSProperties } from 'react';
 import { ChevronDown, FilterX } from 'lucide-react';
-import { STATUS_CONFIG } from '../../constants';
+import { COMMERCIAL_PHASES, STATUS_CONFIG } from '../../constants';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
-import type { CommercialStatus } from '../../types';
+import { toCommercialPhase } from '../../types';
 import {
   deriveContextualMapSummary,
   resolveContextualMapScope,
@@ -14,7 +14,6 @@ import './contextual-map-legend.css';
 
 const area = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
 const count = new Intl.NumberFormat('pt-BR');
-const STATUS_ORDER: readonly CommercialStatus[] = ['AVAILABLE', 'SALE_OPEN', 'SOLD', 'BLOCKED', 'RESERVED', 'IN_NEGOTIATION', 'UNAVAILABLE'];
 
 export interface ContextualMapLegendProps extends ContextualMapScopeInput {
   matchingEntityIds?: ReadonlySet<string>;
@@ -88,9 +87,9 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
       )}
     </div>
     <div className="commercial-context-statuses" role="group" aria-label="Filtrar por situação comercial">
-      {STATUS_ORDER.map((status) => {
+      {COMMERCIAL_PHASES.map((status) => {
         const config = STATUS_CONFIG[status];
-        const selected = statusFilters.includes(status);
+        const selected = statusFilters.some((candidate) => toCommercialPhase(candidate) === status);
         return <button
           key={status}
           type="button"
@@ -100,12 +99,10 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
           onClick={() => toggleStatus(status)}
           style={{ '--status-color': config.color, '--status-border': config.border, '--status-surface': config.surface } as CSSProperties}
         >
-          <i aria-hidden="true" /><span>{config.shortLabel}</span><strong>{count.format(summary.byStatus[status])}</strong>
+          <i aria-hidden="true" /><span>{config.label}</span><strong>{count.format(summary.byStatus[status])}</strong>
         </button>;
       })}
     </div>
-    {scope.unregisteredModuleCount > 0 && <p className="commercial-context-neutral"><i style={{ background: scope.plan?.colorCue }} aria-hidden="true" /><span>Sem situação cadastrada</span><strong>{count.format(scope.unregisteredModuleCount)}</strong></p>}
-    {scope.nonCommercialCount > 0 && <p className="commercial-context-neutral"><i aria-hidden="true" /><span>Não comercial{scope.plan ? ' · apoios' : ' · estruturas'}</span><strong>{count.format(scope.nonCommercialCount)}</strong></p>}
     {scope.kind === 'interior' && scope.totalCount === 0 && <p className="commercial-context-note">Nenhum lote interno cadastrado neste local.</p>}
   </>;
 
@@ -123,7 +120,7 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
         {scope.plan && !compact && <small>Identificação 01–{String(scope.plan.cells.length).padStart(2, '0')}</small>}
       </div>
     </div>
-    {statusFilters.length > 0 && <p className="commercial-context-filter-note">Filtro: {statusFilters.map((status) => STATUS_CONFIG[status].shortLabel).join(', ')}</p>}
+     {statusFilters.length > 0 && <p className="commercial-context-filter-note">Filtro: {[...new Set(statusFilters.map(toCommercialPhase))].map((status) => STATUS_CONFIG[status].label).join(', ')}</p>}
     {compact ? <details className="commercial-context-expand"><summary>Situações e legenda<ChevronDown aria-hidden="true" /></summary>{statuses}</details> : statuses}
     {!compact && <dl className="commercial-context-primary-area"><OfficialArea label="Área oficial dos lotes no escopo" value={summary.officialArea} /></dl>}
     <details className="commercial-context-expand" key={`${scope.kind}:${interiorEntity?.id ?? activeSegmentId ?? 'park'}`}>
@@ -132,6 +129,8 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
       <dl className="commercial-context-areas">
         {compact && <OfficialArea label="Área oficial dos lotes no escopo" value={summary.officialArea} />}
         <OfficialArea label="Área oficial dos lotes disponíveis" value={summary.availableOfficialArea} />
+        {scope.unregisteredModuleCount > 0 && <div><dt>Módulos sem situação cadastrada</dt><dd>{count.format(scope.unregisteredModuleCount)}</dd></div>}
+        {scope.nonCommercialCount > 0 && <div><dt>{scope.plan ? 'Apoios não comerciais' : 'Estruturas não comerciais'}</dt><dd>{count.format(scope.nonCommercialCount)}</dd></div>}
         {scope.plan && <>
           <div><dt>Área total do pavilhão</dt><dd>{area.format(scope.plan.stats.totalAreaSquareMeters)} m²</dd></div>
           <div><dt>Área modular total</dt><dd>{area.format(scope.plan.stats.moduleAreaSquareMeters)} m²</dd></div>

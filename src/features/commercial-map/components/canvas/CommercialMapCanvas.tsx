@@ -9,7 +9,7 @@ import { PublicScenePolicyContext, usePublicScenePolicy } from './PublicScenePol
 import { PublicContextGroup, PublicMaterialPool } from './PublicContextGroup';
 import { resolveLotIdentity } from '../../utils/lotIdentity';
 import { SoldLotLocks } from './SoldLotLocks';
-import type { Coordinate } from '../../types';
+import { toCommercialPhase, type Coordinate } from '../../types';
 import { isSoldLot, soldLotSurfaceColor } from '../../utils/soldLotPresentation';
 import { resolveLotTooltipPresentation } from '../../utils/lotTooltipPresentation';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
@@ -370,7 +370,6 @@ const PRECISE_HOVER_CAPABLE = typeof window === 'undefined'
   || window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches;
 const MAP_BACKGROUND_COLOR = new THREE.Color('#dfe8de');
 const AREA_NUMBER = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const SEGMENT_LOT_SURFACE_WEIGHT = 0.94;
 const STATUS_MARK_LONG_RATIO = 0.34;
 const STATUS_MARK_SHORT_RATIO = 0.09;
 const DETAILED_PARK_ACCESS_GATE_HIT_AREAS = new Map<string, {
@@ -1319,13 +1318,10 @@ function lotColor(
   target = new THREE.Color(),
   blend = new THREE.Color(),
 ) {
-  const status = STATUS_CONFIG[entry.lot.status];
+  const status = STATUS_CONFIG[toCommercialPhase(entry.lot.status)];
   const soldColor = soldLotSurfaceColor(entry.lot.status);
   if (soldColor) return target.set(soldColor);
-  const color = segment
-    ? target.set(status.color).lerp(blend.set(segment.palette.surface), SEGMENT_LOT_SURFACE_WEIGHT)
-    : target.set(status.color);
-  if (segment && isExporuralLandscapeLot(entry.entity)) color.lerp(blend.set('#7f9561'), 0.48);
+  const color = target.set(status.color);
   if (infrastructureMode) color.lerp(blend.set('#c7d1cf'), 0.98);
   else if (filtersActive && !isMatch && !selected) color.lerp(blend.set('#c7d1c9'), 0.76);
   if (hovered) color.lerp(blend.set('#ffffff'), 0.1);
@@ -1427,10 +1423,8 @@ function SegmentLotAccents({
   useEffect(() => {
     if (!accents) return;
     accents.accentedEntries.forEach(({ entity, lot }, index) => {
-      const segment = segmentByEntity.get(entity.id)!;
-      // Segment owns the lot surface; this roof band keeps commercial status visible as a second channel.
-      const color = new THREE.Color(STATUS_CONFIG[lot.status].color)
-        .lerp(new THREE.Color(segment.palette.accent), 0.08);
+      // Commercial phase owns the full surface; segment identity remains on the outline.
+      const color = new THREE.Color(STATUS_CONFIG[toCommercialPhase(lot.status)].color);
       if (filtersActive && !matchingEntityIds.has(entity.id)) color.lerp(MAP_BACKGROUND_COLOR, 0.86);
       accents.mesh.setColorAt(index, color);
     });
@@ -1563,8 +1557,8 @@ function BatchedLots({
         : new THREE.EdgesGeometry(geometry, 28);
       const positions = edgeGeometry.getAttribute('position');
       const borderColor = segment
-        ? new THREE.Color(segment.palette.edge).lerp(new THREE.Color(STATUS_CONFIG[entry.lot.status].border), 0.12)
-        : new THREE.Color(STATUS_CONFIG[entry.lot.status].border);
+        ? new THREE.Color(segment.palette.edge).lerp(new THREE.Color(STATUS_CONFIG[toCommercialPhase(entry.lot.status)].border), 0.12)
+        : new THREE.Color(STATUS_CONFIG[toCommercialPhase(entry.lot.status)].border);
       for (let positionIndex = 0; positionIndex < positions.count; positionIndex += 1) {
         edgePositions.push(
           positions.getX(positionIndex),
@@ -1796,7 +1790,7 @@ const EntityLabel = memo(function EntityLabel({
     ?? metadata.officialDisplayName;
   const contextualRoadAnchor = rearContextualLabelAnchorForOfficialOwner(entity.publicIdentifier);
   const dimmed = Boolean(lot && filtersActive && !isMatch && !selected);
-  const status = lot ? STATUS_CONFIG[lot.status] : null;
+  const status = lot ? STATUS_CONFIG[toCommercialPhase(lot.status)] : null;
   const lotPresentation = lot ? resolveLotTooltipPresentation(lot) : null;
   const labelHeight = entityLabelHeight(entity);
 

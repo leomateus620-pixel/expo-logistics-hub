@@ -45,7 +45,9 @@ export function toCommercialPhase(status: CommercialStatus): CommercialPhase {
     case 'SALE_OPEN': return 'SALE_OPEN';
     case 'SOLD': return 'SOLD';
     case 'BLOCKED':
-    case 'UNAVAILABLE': return 'BLOCKED';
+    case 'UNAVAILABLE':
+    case 'RESERVED':
+    case 'IN_NEGOTIATION': return 'BLOCKED';
     default: return 'AVAILABLE';
   }
 }
