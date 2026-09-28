@@ -184,6 +184,10 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
         />
       </section>
 
+      {(legacyUnverified.data ?? 0) > 0 && <div className="commercial-dashboard-integrity" role="note">
+        <span>{formatDashboardInteger(legacyUnverified.data ?? 0)} vendidos legados — comprovação de assinatura pendente (mantidos como Vendido)</span>
+      </div>}
+
       {(overall.lotsWithoutOfficialArea > 0 || overall.lotsWithoutPrice > 0 || snapshot.unclassifiedLots > 0) && <div className="commercial-dashboard-integrity" role="note">
         {overall.lotsWithoutOfficialArea > 0 && <span>{formatDashboardInteger(overall.lotsWithoutOfficialArea)} {overall.lotsWithoutOfficialArea === 1 ? 'espaço fora do cálculo de área' : 'espaços fora do cálculo de área'}</span>}
         {overall.lotsWithoutPrice > 0 && <span>{formatDashboardInteger(overall.lotsWithoutPrice)} {overall.lotsWithoutPrice === 1 ? 'espaço sem valor definido' : 'espaços sem valor definido'}</span>}
