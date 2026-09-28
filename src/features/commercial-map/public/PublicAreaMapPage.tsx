@@ -210,7 +210,6 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
         </PublicCanvasBoundary>
         {usesParkContext && renderState === 'ready' && <div className="public-map-legend" aria-label="Legenda de disponibilidade">
           {COMMERCIAL_PHASES.map(status => <span key={status}><i style={{background: STATUS_CONFIG[status].color}} />{STATUS_CONFIG[status].label}</span>)}
-          <span><i className="is-selection" />Selecionado</span><span><i className="is-context" />Contexto do parque</span>
         </div>}
       </div>}
       {data && !showMap && <PublicLotList lots={lots} selectedLotId={selectedLotId} onSelect={selectFromList} areaName={data.scope.name} />}

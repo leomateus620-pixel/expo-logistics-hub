@@ -1423,8 +1423,7 @@ function SegmentLotAccents({
   useEffect(() => {
     if (!accents) return;
     accents.accentedEntries.forEach(({ entity, lot }, index) => {
-      const segment = segmentByEntity.get(entity.id)!;
-      // Segment owns the lot surface; this roof band keeps commercial status visible as a second channel.
+      // Commercial phase owns the full surface; segment identity remains on the outline.
       const color = new THREE.Color(STATUS_CONFIG[toCommercialPhase(lot.status)].color);
       if (filtersActive && !matchingEntityIds.has(entity.id)) color.lerp(MAP_BACKGROUND_COLOR, 0.86);
       accents.mesh.setColorAt(index, color);
