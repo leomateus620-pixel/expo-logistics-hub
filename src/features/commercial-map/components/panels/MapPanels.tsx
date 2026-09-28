@@ -59,6 +59,7 @@ import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { getHistoryIdForEntity } from '../../history/bindings';
 import { HistoryExperience } from '../../history/HistoryExperience';
 import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
+import { SaleOpenSection } from '../../sales/components/SaleOpenSection';
 
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
 const areaNumber = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -338,7 +339,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
     requestAnimationFrame(() => historyTriggerRef.current?.focus({ preventScroll: true }));
   };
   const activity = useLotActivity(lot?.id ?? null);
-  const saleHistory = useLotSaleHistory(lot?.id ?? null, lot?.status === 'SOLD');
+  const saleHistory = useLotSaleHistory(lot?.id ?? null, lot?.status === 'SOLD' || lot?.status === 'SALE_OPEN');
   const contracts = useLotContractVersions(lot?.id ?? null, permissions.canManageContracts);
   const areaMapUnits = polygonAreaMapUnits(entity.geometry);
   const status = lot ? STATUS_CONFIG[lot.status] : null;
@@ -416,6 +417,10 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
               <summary>Planta e áreas oficiais</summary>
               <PavilionPlanLegend plan={pavilionPlan} />
             </details>
+          )}
+
+          {lot?.status === 'SALE_OPEN' && (
+            <SaleOpenSection lotId={lot.id} canManageSales={permissions.canManageSales} />
           )}
 
           {lot?.status === 'SOLD' && (
