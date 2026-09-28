@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { ChartNoAxesCombined, Clock3, RefreshCw, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { CommercialMapData } from '../types';
@@ -60,19 +59,19 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
   );
   const { overall } = snapshot;
   // Vendidos legados sem comprovação de assinatura: indicador interno, sem reclassificar os lotes.
-  const legacyUnverified = useQuery({
-    queryKey: ['commercial-map', 'legacy-unverified-sales'],
-    queryFn: async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { count, error } = await (supabase as any)
-        .from('lot_sale_order_items')
-        .select('id', { count: 'exact', head: true })
-        .eq('contract_state', 'LEGACY_UNVERIFIED');
-      if (error) throw error;
-      return count ?? 0;
-    },
-    staleTime: 5 * 60_000,
-  });
+  const [legacyUnverifiedCount, setLegacyUnverifiedCount] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from('lot_sale_order_items')
+      .select('id', { count: 'exact', head: true })
+      .eq('contract_state', 'LEGACY_UNVERIFIED')
+      .then(({ count, error }: { count: number | null; error: unknown }) => {
+        if (!cancelled && !error) setLegacyUnverifiedCount(count ?? 0);
+      });
+    return () => { cancelled = true; };
+  }, [dataUpdatedAt]);
   const pendingLotCount = overall.availableLots + overall.reservedLots + overall.negotiationLots + overall.saleOpenLots;
   const pendingPricedLotCount = overall.byStatus.AVAILABLE.pricedLotCount
     + overall.byStatus.RESERVED.pricedLotCount
@@ -184,8 +183,8 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
         />
       </section>
 
-      {(legacyUnverified.data ?? 0) > 0 && <div className="commercial-dashboard-integrity" role="note">
-        <span>{formatDashboardInteger(legacyUnverified.data ?? 0)} vendidos legados — comprovação de assinatura pendente (mantidos como Vendido)</span>
+      {legacyUnverifiedCount > 0 && <div className="commercial-dashboard-integrity" role="note">
+        <span>{formatDashboardInteger(legacyUnverifiedCount)} vendidos legados — comprovação de assinatura pendente (mantidos como Vendido)</span>
       </div>}
 
       {(overall.lotsWithoutOfficialArea > 0 || overall.lotsWithoutPrice > 0 || snapshot.unclassifiedLots > 0) && <div className="commercial-dashboard-integrity" role="note">
