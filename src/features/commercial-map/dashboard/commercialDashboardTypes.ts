@@ -39,9 +39,11 @@ export interface DashboardAggregate {
   readonly byStatus: DashboardStatusBreakdown;
   /** Includes UNAVAILABLE, which is reported separately from commercial inventory. */
   readonly totalLots: number;
-  /** SOLD + AVAILABLE + RESERVED + IN_NEGOTIATION + BLOCKED. */
+  /** SOLD + SALE_OPEN + AVAILABLE + RESERVED + IN_NEGOTIATION + BLOCKED. */
   readonly commercialLots: number;
   readonly soldLots: number;
+  /** Vendas em aberto: carteira registrada aguardando assinatura, nunca receita realizada. */
+  readonly saleOpenLots: number;
   readonly availableLots: number;
   readonly reservedLots: number;
   readonly negotiationLots: number;
@@ -50,6 +52,7 @@ export interface DashboardAggregate {
   /** Valid official area of commercial inventory; excludes UNAVAILABLE. */
   readonly totalAreaSqm: number;
   readonly soldAreaSqm: number;
+  readonly saleOpenAreaSqm: number;
   readonly availableAreaSqm: number;
   readonly reservedAreaSqm: number;
   readonly negotiationAreaSqm: number;
@@ -59,6 +62,7 @@ export interface DashboardAggregate {
   readonly soldAreaPercentage: number;
   readonly soldLotPercentage: number;
   readonly soldValue: number;
+  readonly saleOpenValue: number;
   readonly availableValue: number;
   readonly reservedValue: number;
   readonly negotiationValue: number;

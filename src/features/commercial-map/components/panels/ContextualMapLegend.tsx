@@ -14,7 +14,7 @@ import './contextual-map-legend.css';
 
 const area = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
 const count = new Intl.NumberFormat('pt-BR');
-const STATUS_ORDER: readonly CommercialStatus[] = ['AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'SOLD', 'BLOCKED', 'UNAVAILABLE'];
+const STATUS_ORDER: readonly CommercialStatus[] = ['AVAILABLE', 'SALE_OPEN', 'SOLD', 'BLOCKED', 'RESERVED', 'IN_NEGOTIATION', 'UNAVAILABLE'];
 
 export interface ContextualMapLegendProps extends ContextualMapScopeInput {
   matchingEntityIds?: ReadonlySet<string>;
