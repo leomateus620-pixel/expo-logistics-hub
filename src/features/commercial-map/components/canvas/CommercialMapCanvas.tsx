@@ -9,7 +9,7 @@ import { PublicScenePolicyContext, usePublicScenePolicy } from './PublicScenePol
 import { PublicContextGroup, PublicMaterialPool } from './PublicContextGroup';
 import { resolveLotIdentity } from '../../utils/lotIdentity';
 import { SoldLotLocks } from './SoldLotLocks';
-import type { Coordinate } from '../../types';
+import { toCommercialPhase, type Coordinate } from '../../types';
 import { isSoldLot, soldLotSurfaceColor } from '../../utils/soldLotPresentation';
 import { resolveLotTooltipPresentation } from '../../utils/lotTooltipPresentation';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';

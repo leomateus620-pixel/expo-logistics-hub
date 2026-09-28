@@ -41,7 +41,6 @@ import type { MapEntityFilterResult } from '../../hooks/useCommercialMap';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type {
   CommercialLot,
-  CommercialStatus,
   EntitySortOrder,
   MapClassification,
   MapPermissions,

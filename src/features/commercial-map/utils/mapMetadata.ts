@@ -1,5 +1,5 @@
 import { CLASSIFICATION_LABELS, STATUS_CONFIG, VERIFICATION_LABELS } from '../constants';
-import type { CommercialLot, Coordinate, MapClassification, MapEntity } from '../types';
+import { toCommercialPhase, type CommercialLot, type Coordinate, type MapClassification, type MapEntity } from '../types';
 import { geometryCentroid } from './geometry';
 import { strategicLandmarkSearchAliases } from './landmarks';
 

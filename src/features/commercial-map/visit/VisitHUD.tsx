@@ -1,6 +1,7 @@
 import { memo, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type PointerEvent, type ReactNode } from 'react';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, CarFront, DoorOpen, Footprints, Moon, RotateCcw, RotateCw, Sun, X } from 'lucide-react';
 import { STATUS_CONFIG } from '../constants';
+import { toCommercialPhase } from '../types';
 import { resolveCommercialMapSegment } from '../data/commercialMapSegments';
 import { useLotPricing2028 } from '../hooks/useLotPricing2028';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';

@@ -3,7 +3,6 @@ import { useThree, type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { CommercialPavilionLayout } from '../../utils/commercialPavilions';
 import { STATUS_CONFIG } from '../../constants';
-import { toCommercialPhase } from '../../types';
 import {
   createCommercialPavilionModuleProjectionFrame,
   projectCommercialPavilionModuleRect,

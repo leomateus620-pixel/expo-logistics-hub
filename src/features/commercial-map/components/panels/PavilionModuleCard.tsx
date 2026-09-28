@@ -12,6 +12,7 @@ import {
 import { useSalesStore } from '../../sales/useSalesSelection';
 import { Button } from '@/components/ui/button';
 import { STATUS_CONFIG } from '../../constants';
+import { toCommercialPhase } from '../../types';
 import { useLotContractVersions, useLotSaleHistory } from '../../hooks/useCommercialMap';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type {
