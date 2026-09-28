@@ -110,7 +110,7 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
     persisted ? lot?.id ?? null : null,
     persisted && permissions.canManageContracts,
   );
-  const saleHistory = useLotSaleHistory(persisted ? lot?.id ?? null : null, lot?.status === 'SOLD');
+  const saleHistory = useLotSaleHistory(persisted ? lot?.id ?? null : null, lot?.status === 'SOLD' || lot?.status === 'SALE_OPEN');
 
   useLayoutEffect(() => {
     setWorkflow(null);
