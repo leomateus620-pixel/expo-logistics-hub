@@ -28,7 +28,7 @@ export interface CommercialMiniMapProps {
 }
 const EMPTY_OUTLINES: readonly MiniMapOutline[] = [];
 const EMPTY_ACCESSES: readonly DashboardAccessMarker[] = [];
-const STATUS_ORDER: readonly CommercialStatus[] = ['SOLD', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'BLOCKED', 'UNAVAILABLE'];
+const STATUS_ORDER: readonly CommercialStatus[] = ['SOLD', 'SALE_OPEN', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'BLOCKED', 'UNAVAILABLE'];
 const ACCESS_SYMBOL = { entrance: '↘', exit: '↗', bidirectional: '↔', emergency: '⚠', connection: '⇄' };
 const ACCESS_LABEL = { entrance: 'Entrada', exit: 'Saída', bidirectional: 'Entrada e saída', emergency: 'Saída de emergência', connection: 'Conexão entre pavilhões' };
 function identity(item: CommercialMiniMapItem) {
