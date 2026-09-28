@@ -99,7 +99,7 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
           onClick={() => toggleStatus(status)}
           style={{ '--status-color': config.color, '--status-border': config.border, '--status-surface': config.surface } as CSSProperties}
         >
-          <i aria-hidden="true" /><span>{config.shortLabel}</span><strong>{count.format(summary.byStatus[status])}</strong>
+          <i aria-hidden="true" /><span>{config.label}</span><strong>{count.format(summary.byStatus[status])}</strong>
         </button>;
       })}
     </div>

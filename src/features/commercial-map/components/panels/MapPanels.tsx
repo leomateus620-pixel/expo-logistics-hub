@@ -140,7 +140,7 @@ export function CommercialSummary({
           >
             <i style={{ background: STATUS_CONFIG[status].color }} />
             <strong>{totals.byStatus[status]}</strong>
-            {!isCompact && <span>{STATUS_CONFIG[status].shortLabel}</span>}
+            {!isCompact && <span>{STATUS_CONFIG[status].label}</span>}
           </button>
         );
 

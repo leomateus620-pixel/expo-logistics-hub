@@ -154,7 +154,7 @@ export function CommercialMiniMap({
     </div>
     <div className="commercial-dashboard-map-legend" aria-label="Legenda das situações comerciais">
        {COMMERCIAL_PHASES.filter((status) => statusCounts.has(status)).map((status) => <span key={status}>
-        <i style={{ backgroundColor: STATUS_CONFIG[status].color }} />{STATUS_CONFIG[status].shortLabel} {statusCounts.get(status)}
+        <i style={{ backgroundColor: STATUS_CONFIG[status].color }} />{STATUS_CONFIG[status].label} {statusCounts.get(status)}
       </span>)}
       {outlines.some(({ kind }) => kind === 'segment') && <span>━ Contorno cadastral da área</span>}
       {!!blocks.length && <span>┄ Limite de quadra</span>}
