@@ -30,3 +30,22 @@ describe('domínio dedicado dos links públicos', () => {
     expect(isPublicAreaPath('/login/admin')).toBe(false);
   });
 });
+
+import { resolveCanonicalRedirect } from '@/features/commercial-map/public/publicMapHost';
+
+describe('endereço canônico de todo o sistema', () => {
+  const r = (h: string, p: string, s = '', hash = '') => resolveCanonicalRedirect({ hostname: h, pathname: p, search: s, hash });
+  it('aplica a tabela de domínios', () => {
+    expect(r('fenasoja-gestao.lovable.app', '/login/admin', '?x=1', '#a')).toBe('https://fenasojagestao.com/login/admin?x=1#a');
+    expect(r('www.fenasojagestao.com', '/mapa-comercial')).toBe('https://fenasojagestao.com/mapa-comercial');
+    expect(r('fenasojagestao.com', '/areas/exporural/t')).toBe('https://mapafenasoja.com/areas/exporural/t');
+    expect(r('fenasoja-gestao.lovable.app', '/areas/pavilhao-1/t')).toBe('https://mapafenasoja.com/areas/pavilhao-1/t');
+    expect(r('www.mapafenasoja.com', '/areas/pavilhao-1/t')).toBe('https://mapafenasoja.com/areas/pavilhao-1/t');
+    expect(r('mapafenasoja.com', '/areas/pavilhao-1/t')).toBeNull();
+    expect(r('fenasojagestao.com', '/')).toBeNull();
+  });
+  it('preview e localhost não redirecionam', () => {
+    expect(r('id-preview--abc.lovable.app', '/')).toBeNull();
+    expect(r('localhost', '/areas/exporural/t')).toBeNull();
+  });
+});

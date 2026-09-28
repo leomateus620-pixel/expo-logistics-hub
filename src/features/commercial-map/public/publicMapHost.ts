@@ -18,12 +18,31 @@ export function isPublicAreaPath(pathname: string): boolean {
   return AREA_PATH.test(pathname);
 }
 
+export const INTERNAL_CANONICAL_ORIGIN = 'https://fenasojagestao.com';
+export const PUBLISHED_LOVABLE_HOST = 'fenasoja-gestao.lovable.app';
+
+type Loc = Pick<Location, 'hostname' | 'pathname' | 'search' | 'hash'>;
+
 /**
- * Links antigos abertos no domínio interno devem ir para o domínio público,
- * preservando caminho e parâmetros. Retorna null quando não há redirecionamento.
+ * Endereço canônico: sistema em fenasojagestao.com, links públicos em
+ * mapafenasoja.com. Preview do editor e localhost nunca redirecionam.
+ * Retorna null quando o endereço atual já é o correto.
  */
-export function legacyPublicLinkRedirect(location: Pick<Location, 'hostname' | 'pathname' | 'search' | 'hash'>): string | null {
-  if (!isInternalProductionHost(location.hostname)) return null;
-  if (!location.pathname.startsWith('/areas/')) return null;
-  return `${PUBLIC_MAP_CANONICAL_ORIGIN}${location.pathname}${location.search}${location.hash}`;
+export function resolveCanonicalRedirect(location: Loc): string | null {
+  const host = location.hostname.toLowerCase();
+  const rest = `${location.pathname}${location.search}${location.hash}`;
+  const isArea = location.pathname.startsWith('/areas/');
+  const isInternalAlias = host === PUBLISHED_LOVABLE_HOST || host === 'www.fenasojagestao.com';
+
+  if (host === 'www.mapafenasoja.com') return `${PUBLIC_MAP_CANONICAL_ORIGIN}${rest}`;
+  if (host === 'fenasojagestao.com' || isInternalAlias) {
+    if (isArea) return `${PUBLIC_MAP_CANONICAL_ORIGIN}${rest}`;
+    if (isInternalAlias) return `${INTERNAL_CANONICAL_ORIGIN}${rest}`;
+  }
+  return null;
+}
+
+/** Compatibilidade: redirecionamento de links públicos antigos. */
+export function legacyPublicLinkRedirect(location: Loc): string | null {
+  return resolveCanonicalRedirect(location);
 }
