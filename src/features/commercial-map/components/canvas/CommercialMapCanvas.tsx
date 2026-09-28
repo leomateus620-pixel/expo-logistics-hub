@@ -1322,10 +1322,7 @@ function lotColor(
   const status = STATUS_CONFIG[toCommercialPhase(entry.lot.status)];
   const soldColor = soldLotSurfaceColor(entry.lot.status);
   if (soldColor) return target.set(soldColor);
-  const color = segment
-    ? target.set(status.color).lerp(blend.set(segment.palette.surface), SEGMENT_LOT_SURFACE_WEIGHT)
-    : target.set(status.color);
-  if (segment && isExporuralLandscapeLot(entry.entity)) color.lerp(blend.set('#7f9561'), 0.48);
+  const color = target.set(status.color);
   if (infrastructureMode) color.lerp(blend.set('#c7d1cf'), 0.98);
   else if (filtersActive && !isMatch && !selected) color.lerp(blend.set('#c7d1c9'), 0.76);
   if (hovered) color.lerp(blend.set('#ffffff'), 0.1);
@@ -1429,8 +1426,7 @@ function SegmentLotAccents({
     accents.accentedEntries.forEach(({ entity, lot }, index) => {
       const segment = segmentByEntity.get(entity.id)!;
       // Segment owns the lot surface; this roof band keeps commercial status visible as a second channel.
-      const color = new THREE.Color(STATUS_CONFIG[toCommercialPhase(lot.status)].color)
-        .lerp(new THREE.Color(segment.palette.accent), 0.08);
+      const color = new THREE.Color(STATUS_CONFIG[toCommercialPhase(lot.status)].color);
       if (filtersActive && !matchingEntityIds.has(entity.id)) color.lerp(MAP_BACKGROUND_COLOR, 0.86);
       accents.mesh.setColorAt(index, color);
     });
