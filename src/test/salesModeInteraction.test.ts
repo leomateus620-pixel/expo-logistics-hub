@@ -158,10 +158,13 @@ describe('cálculo da multi-seleção', () => {
 });
 
 describe('preset visual do modo Vendas', () => {
-  it('reserva o vermelho para vendidos e usa grafite nos bloqueados', () => {
-    expect(STATUS_CONFIG.SOLD.color).toBe('#dc2626');
-    expect(STATUS_CONFIG.BLOCKED.color).toBe('#64748b');
-    expect(STATUS_CONFIG.BLOCKED.color).not.toBe(STATUS_CONFIG.SOLD.color);
+  it('usa as quatro fases: verde disponível, amarelo venda em aberto, azul vendido e vermelho bloqueado', () => {
+    expect(STATUS_CONFIG.AVAILABLE.color).toBe('#22c55e');
+    expect(STATUS_CONFIG.SALE_OPEN.color).toBe('#eab308');
+    expect(STATUS_CONFIG.SOLD.color).toBe('#2563eb');
+    expect(STATUS_CONFIG.BLOCKED.color).toBe('#dc2626');
+    const colors = [STATUS_CONFIG.AVAILABLE, STATUS_CONFIG.SALE_OPEN, STATUS_CONFIG.SOLD, STATUS_CONFIG.BLOCKED].map((s) => s.color);
+    expect(new Set(colors).size).toBe(4);
   });
 
   it('não liga o modo gráfico reduzido do mapa', () => {

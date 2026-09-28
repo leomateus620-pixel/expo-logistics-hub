@@ -381,9 +381,9 @@ export function useMapMutations() {
     mutationFn: registerLotSale,
     onSuccess: async () => {
       await invalidate();
-      toast.success('Venda confirmada no mapa comercial.');
+      toast.success('Venda em aberto registrada no mapa comercial.', { description: 'O espaço ficará amarelo até a confirmação da assinatura do contrato.' });
     },
-    onError: (error) => toast.error('A venda não foi confirmada', { description: errorMessage(error) }),
+    onError: (error) => toast.error('A venda não foi registrada', { description: errorMessage(error) }),
   });
   const contract = useMutation({
     mutationFn: uploadLotContract,

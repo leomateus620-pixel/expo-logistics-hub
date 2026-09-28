@@ -42,7 +42,7 @@ export function dispatchSalesModuleClick(target: SalesModuleClickTarget | null |
   const state = useSalesStore.getState();
   if (!state.salesModeActive) return false;
   const lotId = target?.lotId ?? null;
-  if (!lotId || target?.status === 'SOLD' || !state.eligibleLotIds?.has(lotId)) return true;
+  if (!lotId || target?.status === 'SOLD' || target?.status === 'SALE_OPEN' || !state.eligibleLotIds?.has(lotId)) return true;
   const publicIdentifier = target?.publicIdentifier ?? lotId;
   state.toggleLot({
     lotId,

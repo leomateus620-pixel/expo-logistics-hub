@@ -209,7 +209,7 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
           </div>}
         </PublicCanvasBoundary>
         {usesParkContext && renderState === 'ready' && <div className="public-map-legend" aria-label="Legenda de disponibilidade">
-          {(['AVAILABLE','RESERVED','SOLD','BLOCKED'] as const).map(status => <span key={status}><i style={{background: STATUS_CONFIG[status].color}} />{PUBLIC_AVAILABILITY_LABEL[status === 'BLOCKED' ? 'UNAVAILABLE' : status]}</span>)}
+          {(['AVAILABLE','RESERVED','SALE_OPEN','SOLD','BLOCKED'] as const).map(status => <span key={status}><i style={{background: STATUS_CONFIG[status].color}} />{PUBLIC_AVAILABILITY_LABEL[status === 'BLOCKED' ? 'UNAVAILABLE' : status]}</span>)}
           <span><i className="is-selection" />Selecionado</span><span><i className="is-context" />Contexto do parque</span>
         </div>}
       </div>}

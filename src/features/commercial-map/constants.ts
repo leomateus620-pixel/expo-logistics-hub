@@ -84,15 +84,19 @@ export const STATUS_CONFIG: Record<CommercialStatus, {
     description: 'Reserva ativa com prazo de expiração.',
   },
   IN_NEGOTIATION: {
-    label: 'Em negociação', shortLabel: 'Negociação', color: '#3b82f6', surface: '#dbeafe', border: '#1d4ed8', symbol: '⇄',
+    label: 'Em negociação', shortLabel: 'Negociação', color: '#0ea5e9', surface: '#e0f2fe', border: '#0369a1', symbol: '⇄',
     description: 'Negociação comercial em andamento.',
   },
+  SALE_OPEN: {
+    label: 'Venda em aberto', shortLabel: 'Em aberto', color: '#eab308', surface: '#fef9c3', border: '#a16207', symbol: '✎',
+    description: 'Venda registrada aguardando confirmação da assinatura do contrato.',
+  },
   SOLD: {
-    label: 'Vendido', shortLabel: 'Vendido', color: '#dc2626', surface: '#fee2e2', border: '#991b1b', symbol: '◆',
-    description: 'Venda confirmada e vinculada ao contrato.',
+    label: 'Vendido', shortLabel: 'Vendido', color: '#2563eb', surface: '#dbeafe', border: '#1e40af', symbol: '◆',
+    description: 'Contrato assinado confirmado por usuário autorizado.',
   },
   BLOCKED: {
-    label: 'Bloqueado', shortLabel: 'Bloqueado', color: '#64748b', surface: '#e2e8f0', border: '#334155', symbol: '⌧',
+    label: 'Bloqueado', shortLabel: 'Bloqueado', color: '#dc2626', surface: '#fee2e2', border: '#991b1b', symbol: '⌧',
     description: 'Lote bloqueado por decisão administrativa.',
   },
   UNAVAILABLE: {
@@ -100,6 +104,9 @@ export const STATUS_CONFIG: Record<CommercialStatus, {
     description: 'Espaço fora do fluxo comercial.',
   },
 };
+
+/** Paleta canônica das quatro fases comerciais (projeção de STATUS_CONFIG). */
+export const COMMERCIAL_PHASES = ['AVAILABLE', 'SALE_OPEN', 'SOLD', 'BLOCKED'] as const;
 
 export const CLASSIFICATION_COLORS: Record<MapClassification, string> = {
   SELLABLE_LOT: '#3cab57',

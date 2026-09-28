@@ -148,3 +148,97 @@ export async function registerSaleOrder(payload: SalesOrderPayload): Promise<str
   }
   return data;
 }
+
+// ---------------------------------------------------------------------------
+// Venda em aberto: confirmação de assinatura e cancelamento
+// ---------------------------------------------------------------------------
+
+export interface OpenSaleItem {
+  itemId: string;
+  orderId: string;
+  lotId: string;
+  publicIdentifier: string;
+  itemTotal: number | null;
+  pricingStage: string | null;
+}
+
+export interface OpenSaleOrder {
+  orderId: string;
+  buyerName: string;
+  stage: string | null;
+  createdAt: string | null;
+  negotiatedTotal: number | null;
+  items: OpenSaleItem[];
+}
+
+/** Itens ainda aguardando assinatura do pedido que envolve o lote. */
+export async function fetchLotOpenSaleOrder(lotId: string): Promise<OpenSaleOrder | null> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from('lot_sale_order_items')
+    .select('id,order_id,lot_id,public_identifier,item_total,pricing_stage,lot_sale_orders!inner(id,buyer_name,stage,created_at,negotiated_total,status)')
+    .eq('lot_id', lotId)
+    .eq('contract_state', 'PENDING_SIGNATURE')
+    .eq('lot_sale_orders.status', 'CONFIRMED')
+    .limit(1);
+  if (error) throw error;
+  const row = data?.[0];
+  if (!row) return null;
+  const order = row.lot_sale_orders;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: siblings, error: siblingsError } = await (supabase as any)
+    .from('lot_sale_order_items')
+    .select('id,order_id,lot_id,public_identifier,item_total,pricing_stage')
+    .eq('order_id', order.id)
+    .eq('contract_state', 'PENDING_SIGNATURE')
+    .order('public_identifier');
+  if (siblingsError) throw siblingsError;
+  return {
+    orderId: order.id,
+    buyerName: order.buyer_name,
+    stage: order.stage,
+    createdAt: order.created_at,
+    negotiatedTotal: order.negotiated_total === null || order.negotiated_total === undefined ? null : Number(order.negotiated_total),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    items: (siblings ?? []).map((item: any) => ({
+      itemId: item.id,
+      orderId: item.order_id,
+      lotId: item.lot_id,
+      publicIdentifier: item.public_identifier,
+      itemTotal: item.item_total === null || item.item_total === undefined ? null : Number(item.item_total),
+      pricingStage: item.pricing_stage,
+    })),
+  };
+}
+
+const CONTRACT_ERROR_MESSAGES: Array<[RegExp, string]> = [
+  [/MAP_PERMISSION_DENIED/, 'Você não tem permissão para confirmar ou cancelar vendas neste mapa.'],
+  [/ORDER_NOT_FOUND/, 'O pedido não foi encontrado. Atualize o mapa e tente novamente.'],
+  [/ORDER_NOT_ACTIVE/, 'Este pedido não está mais ativo. Atualize o mapa para ver a situação atual.'],
+  [/ITEM_NOT_PENDING:(.+)/, 'O item $1 não está mais aguardando assinatura. Atualize o mapa.'],
+  [/LOT_NOT_SALE_OPEN:(.+)/, 'O espaço $1 não está mais com venda em aberto. Atualize o mapa.'],
+  [/ITEM_NOT_IN_ORDER/, 'Um dos itens não pertence a este pedido.'],
+  [/AUTH_REQUIRED/, 'Sessão expirada. Entre novamente para continuar.'],
+];
+
+function describeContractError(message: string): string {
+  for (const [pattern, text] of CONTRACT_ERROR_MESSAGES) {
+    const match = message.match(pattern);
+    if (match) return text.replace('$1', match[1] ?? '');
+  }
+  return 'Não foi possível concluir a operação. Nenhum espaço foi alterado — atualize o mapa e tente novamente.';
+}
+
+/** Confirma a assinatura do contrato de um ou vários itens do mesmo pedido. */
+export async function confirmSaleOrderItems(orderId: string, itemIds: string[]): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.rpc as any)('confirm_sale_order_items', { p_order_id: orderId, p_item_ids: itemIds });
+  if (error) throw new Error(describeContractError(error.message ?? ''));
+}
+
+/** Cancela itens ainda em aberto; cada lote volta a Disponível. */
+export async function cancelSaleOrderItems(orderId: string, itemIds: string[], reason?: string): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.rpc as any)('cancel_sale_order_items', { p_order_id: orderId, p_item_ids: itemIds, p_reason: reason ?? null });
+  if (error) throw new Error(describeContractError(error.message ?? ''));
+}

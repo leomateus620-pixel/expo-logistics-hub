@@ -18,12 +18,13 @@ const collator = new Intl.Collator('pt-BR', { numeric: true, sensitivity: 'base'
 
 const STATUS_SORT_ORDER: Record<CommercialStatus | 'NOT_COMMERCIAL', number> = {
   AVAILABLE: 0,
-  RESERVED: 1,
-  IN_NEGOTIATION: 2,
-  SOLD: 3,
-  BLOCKED: 4,
-  UNAVAILABLE: 5,
-  NOT_COMMERCIAL: 6,
+  SALE_OPEN: 1,
+  SOLD: 2,
+  RESERVED: 3,
+  IN_NEGOTIATION: 4,
+  BLOCKED: 5,
+  UNAVAILABLE: 6,
+  NOT_COMMERCIAL: 7,
 };
 
 const LOCATION_GROUP_ORDER: Record<EntityLocationGroup, number> = {

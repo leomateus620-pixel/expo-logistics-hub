@@ -56,8 +56,8 @@ export function LotWorkflowDialog({ lot, workflow, onClose }: Props) {
     if (workflow === 'sell') return {
       icon: ShoppingBag,
       title: `Registrar venda de ${lot.publicIdentifier}`,
-      description: 'Esta operação altera o status comercial e gera um registro de auditoria.',
-      submit: 'Confirmar venda',
+      description: 'O espaço ficará como Venda em aberto (amarelo) até a confirmação da assinatura do contrato. A operação gera registro de auditoria.',
+      submit: 'Registrar venda em aberto',
     };
     if (workflow === 'contract') return {
       icon: FileLock2,

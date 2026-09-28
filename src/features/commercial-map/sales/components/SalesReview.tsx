@@ -84,6 +84,13 @@ export function SalesReview({ summary, stage, buyer, payment, fees, spacesCents 
           ))}
         </ol>
       </section>
+
+      <section className="sales-block">
+        <p className="sales-block__hint">
+          Ao concluir, os espaços ficam como <strong>Venda em aberto</strong> (amarelo) no mapa.
+          Eles passam a <strong>Vendido</strong> (azul) somente após a confirmação explícita da assinatura do contrato.
+        </p>
+      </section>
     </div>
   );
 }

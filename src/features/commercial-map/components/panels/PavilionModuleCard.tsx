@@ -31,6 +31,7 @@ import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
 import { LotPricing2028Panel } from './LotPricing2028Panel';
 import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
+import { SaleOpenSection } from '../../sales/components/SaleOpenSection';
 import { resolveLotIdentity } from '../../utils/lotIdentity';
 import type { LotPricingStage } from '../../utils/lotPricing2028';
 
@@ -110,7 +111,7 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
     persisted ? lot?.id ?? null : null,
     persisted && permissions.canManageContracts,
   );
-  const saleHistory = useLotSaleHistory(persisted ? lot?.id ?? null : null, lot?.status === 'SOLD');
+  const saleHistory = useLotSaleHistory(persisted ? lot?.id ?? null : null, lot?.status === 'SOLD' || lot?.status === 'SALE_OPEN');
 
   useLayoutEffect(() => {
     setWorkflow(null);
@@ -171,6 +172,9 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
         </div>
         <CompactDetailSheetControls sheet={sheet} subject="módulo" embedded={embedded} />
         <div className="commercial-pavilion-module-details" hidden={embedded && sheet.sheetState !== 'expanded'}>
+        {persisted && lot?.status === 'SALE_OPEN' && (
+          <SaleOpenSection lotId={lot.id} canManageSales={permissions.canManageSales} />
+        )}
         {lot?.status === 'SOLD' && (
           <section className="commercial-map-sale-confirmed" aria-label="Venda confirmada">
             <header><CheckCircle2 aria-hidden="true" /><span>Venda confirmada</span></header>

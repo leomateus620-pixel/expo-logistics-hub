@@ -31,9 +31,24 @@ export type CommercialStatus =
   | 'AVAILABLE'
   | 'RESERVED'
   | 'IN_NEGOTIATION'
+  | 'SALE_OPEN'
   | 'SOLD'
   | 'BLOCKED'
   | 'UNAVAILABLE';
+
+/** As quatro fases comerciais exibidas em todo o ecossistema. */
+export type CommercialPhase = 'AVAILABLE' | 'SALE_OPEN' | 'SOLD' | 'BLOCKED';
+
+/** Projeta qualquer estado interno em uma das quatro fases públicas. */
+export function toCommercialPhase(status: CommercialStatus): CommercialPhase {
+  switch (status) {
+    case 'SALE_OPEN': return 'SALE_OPEN';
+    case 'SOLD': return 'SOLD';
+    case 'BLOCKED':
+    case 'UNAVAILABLE': return 'BLOCKED';
+    default: return 'AVAILABLE';
+  }
+}
 
 export type VerificationStatus = 'DRAFT' | 'NEEDS_REVIEW' | 'VERIFIED' | 'ARCHIVED';
 export type AreaValidationStatus = 'UNVALIDATED' | 'CALCULATED' | 'VALIDATED' | 'REJECTED';

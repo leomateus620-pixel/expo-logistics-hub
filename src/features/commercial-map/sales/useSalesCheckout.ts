@@ -41,7 +41,7 @@ export function useSalesCheckout() {
       clearSelection();
       setCheckoutOpen(false);
       void queryClient.invalidateQueries({ queryKey: ['commercial-map'] });
-      toast({ title: 'Venda registrada', description: 'Os espaços já constam como vendidos no mapa.' });
+      toast({ title: 'Venda em aberto registrada', description: 'Os espaços ficam amarelos no mapa até a confirmação da assinatura do contrato.' });
     },
     onError: (error: Error) => {
       const indeterminate = error instanceof SalesOrderError && error.indeterminate;

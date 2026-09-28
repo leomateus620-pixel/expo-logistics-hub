@@ -13,7 +13,7 @@ import type {
 } from './commercialDashboardTypes';
 
 const COMMERCIAL_STATUSES: readonly CommercialStatus[] = [
-  'SOLD', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'BLOCKED',
+  'SOLD', 'SALE_OPEN', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'BLOCKED',
 ];
 const ALL_STATUSES: readonly CommercialStatus[] = [...COMMERCIAL_STATUSES, 'UNAVAILABLE'];
 /** commercial_lots.official_area_sqm is numeric(14,4). */
@@ -75,6 +75,7 @@ function makeAccumulator(): MutableAggregate {
     records: [],
     byStatus: {
       SOLD: makeMutableStatusSummary(),
+      SALE_OPEN: makeMutableStatusSummary(),
       AVAILABLE: makeMutableStatusSummary(),
       RESERVED: makeMutableStatusSummary(),
       IN_NEGOTIATION: makeMutableStatusSummary(),
@@ -129,6 +130,7 @@ function finishAccumulator(accumulator: MutableAggregate): DashboardAggregate {
     totalLots: accumulator.records.length,
     commercialLots,
     soldLots: buckets.SOLD.lotCount,
+    saleOpenLots: buckets.SALE_OPEN.lotCount,
     availableLots: buckets.AVAILABLE.lotCount,
     reservedLots: buckets.RESERVED.lotCount,
     negotiationLots: buckets.IN_NEGOTIATION.lotCount,
@@ -136,6 +138,7 @@ function finishAccumulator(accumulator: MutableAggregate): DashboardAggregate {
     unavailableLots: buckets.UNAVAILABLE.lotCount,
     totalAreaSqm,
     soldAreaSqm: statusSummary.SOLD.areaSqm,
+    saleOpenAreaSqm: statusSummary.SALE_OPEN.areaSqm,
     availableAreaSqm: statusSummary.AVAILABLE.areaSqm,
     reservedAreaSqm: statusSummary.RESERVED.areaSqm,
     negotiationAreaSqm: statusSummary.IN_NEGOTIATION.areaSqm,
@@ -144,6 +147,7 @@ function finishAccumulator(accumulator: MutableAggregate): DashboardAggregate {
     soldAreaPercentage: statusSummary.SOLD.areaPercentage,
     soldLotPercentage: statusSummary.SOLD.lotPercentage,
     soldValue: statusSummary.SOLD.value,
+    saleOpenValue: statusSummary.SALE_OPEN.value,
     availableValue: statusSummary.AVAILABLE.value,
     reservedValue: statusSummary.RESERVED.value,
     negotiationValue: statusSummary.IN_NEGOTIATION.value,
@@ -151,7 +155,7 @@ function finishAccumulator(accumulator: MutableAggregate): DashboardAggregate {
     totalKnownValue: knownValueCents / 100,
     knownValueLots,
     soldValuePercentage: knownValueCents > 0 ? (buckets.SOLD.valueCents / knownValueCents) * 100 : null,
-    pendingValue: (buckets.AVAILABLE.valueCents + buckets.RESERVED.valueCents + buckets.IN_NEGOTIATION.valueCents) / 100,
+    pendingValue: (buckets.AVAILABLE.valueCents + buckets.RESERVED.valueCents + buckets.IN_NEGOTIATION.valueCents + buckets.SALE_OPEN.valueCents) / 100,
     lotsWithoutOfficialArea,
     lotsWithoutPrice,
   });
