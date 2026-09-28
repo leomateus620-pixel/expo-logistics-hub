@@ -1,4 +1,4 @@
-import type { CommercialStatus, MapClassification, MapLayer, VerificationStatus } from './types';
+import type { CommercialPhase, CommercialStatus, MapClassification, MapLayer, VerificationStatus } from './types';
 
 export const MAP_REFERENCE_WIDTH = 120;
 /** Park-only crop of the official 2026 PDF: 5,500 x 4,150 PDF points. */
@@ -106,7 +106,7 @@ export const STATUS_CONFIG: Record<CommercialStatus, {
 };
 
 /** Paleta canônica das quatro fases comerciais (projeção de STATUS_CONFIG). */
-export const COMMERCIAL_PHASES = ['AVAILABLE', 'SALE_OPEN', 'SOLD', 'BLOCKED'] as const;
+export const COMMERCIAL_PHASES: readonly CommercialPhase[] = ['AVAILABLE', 'SALE_OPEN', 'SOLD', 'BLOCKED'];
 
 export const CLASSIFICATION_COLORS: Record<MapClassification, string> = {
   SELLABLE_LOT: '#3cab57',

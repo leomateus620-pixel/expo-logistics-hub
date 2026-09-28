@@ -1,8 +1,8 @@
 import { memo, useId, useMemo, type CSSProperties } from 'react';
 import { ChevronDown, FilterX } from 'lucide-react';
-import { STATUS_CONFIG } from '../../constants';
+import { COMMERCIAL_PHASES, STATUS_CONFIG } from '../../constants';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
-import type { CommercialStatus } from '../../types';
+import { toCommercialPhase } from '../../types';
 import {
   deriveContextualMapSummary,
   resolveContextualMapScope,
@@ -14,7 +14,6 @@ import './contextual-map-legend.css';
 
 const area = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
 const count = new Intl.NumberFormat('pt-BR');
-const STATUS_ORDER: readonly CommercialStatus[] = ['AVAILABLE', 'SALE_OPEN', 'SOLD', 'BLOCKED', 'RESERVED', 'IN_NEGOTIATION', 'UNAVAILABLE'];
 
 export interface ContextualMapLegendProps extends ContextualMapScopeInput {
   matchingEntityIds?: ReadonlySet<string>;
@@ -88,9 +87,9 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
       )}
     </div>
     <div className="commercial-context-statuses" role="group" aria-label="Filtrar por situação comercial">
-      {STATUS_ORDER.map((status) => {
+      {COMMERCIAL_PHASES.map((status) => {
         const config = STATUS_CONFIG[status];
-        const selected = statusFilters.includes(status);
+        const selected = statusFilters.some((candidate) => toCommercialPhase(candidate) === status);
         return <button
           key={status}
           type="button"
@@ -123,7 +122,7 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
         {scope.plan && !compact && <small>Identificação 01–{String(scope.plan.cells.length).padStart(2, '0')}</small>}
       </div>
     </div>
-    {statusFilters.length > 0 && <p className="commercial-context-filter-note">Filtro: {statusFilters.map((status) => STATUS_CONFIG[status].shortLabel).join(', ')}</p>}
+     {statusFilters.length > 0 && <p className="commercial-context-filter-note">Filtro: {[...new Set(statusFilters.map(toCommercialPhase))].map((status) => STATUS_CONFIG[status].label).join(', ')}</p>}
     {compact ? <details className="commercial-context-expand"><summary>Situações e legenda<ChevronDown aria-hidden="true" /></summary>{statuses}</details> : statuses}
     {!compact && <dl className="commercial-context-primary-area"><OfficialArea label="Área oficial dos lotes no escopo" value={summary.officialArea} /></dl>}
     <details className="commercial-context-expand" key={`${scope.kind}:${interiorEntity?.id ?? activeSegmentId ?? 'park'}`}>
