@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { ChartNoAxesCombined, Clock3, RefreshCw, X } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import type { CommercialMapData } from '../types';
 import { CommercialDashboardSpaces } from './CommercialDashboardSpaces';
 import { CommercialDashboardLotChart, CommercialDashboardValueChart } from './CommercialDashboardCharts';
@@ -57,6 +59,20 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
     [data.entities, data.lots],
   );
   const { overall } = snapshot;
+  // Vendidos legados sem comprovação de assinatura: indicador interno, sem reclassificar os lotes.
+  const legacyUnverified = useQuery({
+    queryKey: ['commercial-map', 'legacy-unverified-sales'],
+    queryFn: async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { count, error } = await (supabase as any)
+        .from('lot_sale_order_items')
+        .select('id', { count: 'exact', head: true })
+        .eq('contract_state', 'LEGACY_UNVERIFIED');
+      if (error) throw error;
+      return count ?? 0;
+    },
+    staleTime: 5 * 60_000,
+  });
   const pendingLotCount = overall.availableLots + overall.reservedLots + overall.negotiationLots + overall.saleOpenLots;
   const pendingPricedLotCount = overall.byStatus.AVAILABLE.pricedLotCount
     + overall.byStatus.RESERVED.pricedLotCount
