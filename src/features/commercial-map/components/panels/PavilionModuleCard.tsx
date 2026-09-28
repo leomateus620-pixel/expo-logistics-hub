@@ -31,6 +31,7 @@ import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
 import { LotPricing2028Panel } from './LotPricing2028Panel';
 import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
+import { SaleOpenSection } from '../../sales/components/SaleOpenSection';
 import { resolveLotIdentity } from '../../utils/lotIdentity';
 import type { LotPricingStage } from '../../utils/lotPricing2028';
 
