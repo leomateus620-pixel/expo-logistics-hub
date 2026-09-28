@@ -1027,8 +1027,17 @@
 .commercial-map-segment-tag { display: inline-flex; min-width: 0; max-width: 180px; align-items: center; gap: 4px; color: #526159; font-weight: 750; }
 .commercial-map-segment-tag i { width: 6px; height: 6px; flex: 0 0 auto; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(18,35,27,.16); }
 .commercial-map-detail-hero > p { margin: 11px 0; color: #66746c; font-size: 10px; line-height: 1.55; }
-.commercial-map-sale-confirmed { display: grid; gap: 6px; margin: 12px 15px 4px; padding: 13px 14px; border: 1px solid oklch(var(--destructive) / .22); border-left: 3px solid oklch(var(--destructive)); border-radius: 8px; background: oklch(var(--destructive) / .045); color: oklch(var(--foreground)); }
-.commercial-map-sale-confirmed header { display: flex; align-items: center; gap: 6px; color: oklch(var(--destructive)); font-size: 9px; font-weight: 850; letter-spacing: .07em; text-transform: uppercase; }
+.commercial-map-sale-confirmed { display: grid; gap: 6px; margin: 12px 15px 4px; padding: 13px 14px; border: 1px solid rgba(37, 99, 235, .22); border-left: 3px solid #2563eb; border-radius: 8px; background: rgba(37, 99, 235, .05); color: oklch(var(--foreground)); }
+.commercial-map-sale-confirmed header { display: flex; align-items: center; gap: 6px; color: #1e40af; font-size: 9px; font-weight: 850; letter-spacing: .07em; text-transform: uppercase; }
+.commercial-map-sale-open { display: grid; gap: 6px; margin: 12px 15px 4px; padding: 13px 14px; border: 1px solid rgba(234, 179, 8, .35); border-left: 3px solid #eab308; border-radius: 8px; background: rgba(234, 179, 8, .07); color: oklch(var(--foreground)); }
+.commercial-map-sale-open header { display: flex; align-items: center; gap: 6px; color: #a16207; font-size: 9px; font-weight: 850; letter-spacing: .07em; text-transform: uppercase; }
+.commercial-map-sale-open header svg { width: 14px; height: 14px; }
+.commercial-map-sale-open__buyer { overflow-wrap: anywhere; font-size: 17px; line-height: 1.18; }
+.commercial-map-sale-open p { margin: 0; color: oklch(var(--muted-foreground)); font-size: 10px; }
+.commercial-map-sale-open > div { display: flex; flex-wrap: wrap; gap: 5px 10px; color: #3d5948; font-size: 9px; font-weight: 700; }
+.commercial-map-sale-open > div span + span::before { margin-right: 10px; color: #9ba99f; content: '·'; }
+.commercial-map-sale-open__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.commercial-map-sale-open__loading { display: flex; align-items: center; gap: 6px; margin: 12px 15px 4px; color: oklch(var(--muted-foreground)); font-size: 11px; }
 .commercial-map-sale-confirmed header svg { width: 14px; height: 14px; }
 .commercial-map-sale-confirmed__buyer { overflow-wrap: anywhere; font-size: 17px; line-height: 1.18; }
 .commercial-map-sale-confirmed p { margin: 0; color: oklch(var(--muted-foreground)); font-size: 10px; }
