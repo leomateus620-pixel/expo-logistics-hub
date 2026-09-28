@@ -171,6 +171,9 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
         </div>
         <CompactDetailSheetControls sheet={sheet} subject="módulo" embedded={embedded} />
         <div className="commercial-pavilion-module-details" hidden={embedded && sheet.sheetState !== 'expanded'}>
+        {persisted && lot?.status === 'SALE_OPEN' && (
+          <SaleOpenSection lotId={lot.id} canManageSales={permissions.canManageSales} />
+        )}
         {lot?.status === 'SOLD' && (
           <section className="commercial-map-sale-confirmed" aria-label="Venda confirmada">
             <header><CheckCircle2 aria-hidden="true" /><span>Venda confirmada</span></header>
