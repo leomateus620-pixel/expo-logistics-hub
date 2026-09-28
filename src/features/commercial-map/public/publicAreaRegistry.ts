@@ -7,6 +7,8 @@
  * apenas para rótulos, navegação e validação do slug no cliente.
  */
 
+import { PUBLIC_MAP_CANONICAL_ORIGIN } from './publicMapHost';
+
 export type PublicAreaKind = 'PAVILION' | 'SEGMENT' | 'SEGMENT_EXTERNAL' | 'ENTITY_SET';
 
 export interface PublicAreaDefinition {
@@ -53,10 +55,16 @@ export function isPublicAreaSlug(slug?: string | null): boolean {
 /** Áreas publicadas dependem de links opacos autorizados pelo servidor. */
 export const PUBLIC_MAP_EXCLUDED_PAVILIONS: readonly string[] = [];
 
-export function publicMapOrigin(): string {
+/**
+ * Origem oficial dos links públicos. Em produção é sempre mapafenasoja.com;
+ * previews e localhost mantêm a própria origem para testes.
+ */
+export function publicMapOrigin(hostname: string = typeof window === 'undefined' ? '' : window.location.hostname): string {
   const configured = (import.meta.env as Record<string, string | undefined>)['VITE_PUBLIC_MAP_ORIGIN'];
   if (configured) return configured.replace(/\/$/, '');
-  return typeof window === 'undefined' ? '' : window.location.origin;
+  const isTestHost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.lovable.app') || hostname.endsWith('.lovableproject.com');
+  if (isTestHost && typeof window !== 'undefined') return window.location.origin;
+  return PUBLIC_MAP_CANONICAL_ORIGIN;
 }
 
 export function publicAreaUrl(slug: string, token: string): string {

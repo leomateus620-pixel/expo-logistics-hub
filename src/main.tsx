@@ -1,5 +1,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
+import PublicMapApp from "./features/commercial-map/public/PublicMapApp";
+import { isPublicMapHost, legacyPublicLinkRedirect } from "./features/commercial-map/public/publicMapHost";
 import "./styles/tokens.css";
 import "./index.css";
 import "./styles/cronograma-operational-overrides.css";
@@ -64,7 +66,10 @@ window.addEventListener('unhandledrejection', (e) => {
   if (isChunkError(msg, stack)) nukeCachesAndReload();
 });
 
-if ('serviceWorker' in navigator) {
+const publicHost = isPublicMapHost(window.location.hostname);
+const legacyRedirect = legacyPublicLinkRedirect(window.location);
+
+if (!publicHost && !legacyRedirect && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then((reg) => {
       // When a new SW is found, ask it to take over immediately
@@ -88,4 +93,8 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+if (legacyRedirect) {
+  window.location.replace(legacyRedirect);
+} else {
+  createRoot(document.getElementById("root")!).render(publicHost ? <PublicMapApp /> : <App />);
+}
