@@ -103,8 +103,6 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
         </button>;
       })}
     </div>
-    {scope.unregisteredModuleCount > 0 && <p className="commercial-context-neutral"><i style={{ background: scope.plan?.colorCue }} aria-hidden="true" /><span>Sem situação cadastrada</span><strong>{count.format(scope.unregisteredModuleCount)}</strong></p>}
-    {scope.nonCommercialCount > 0 && <p className="commercial-context-neutral"><i aria-hidden="true" /><span>Não comercial{scope.plan ? ' · apoios' : ' · estruturas'}</span><strong>{count.format(scope.nonCommercialCount)}</strong></p>}
     {scope.kind === 'interior' && scope.totalCount === 0 && <p className="commercial-context-note">Nenhum lote interno cadastrado neste local.</p>}
   </>;
 
@@ -131,6 +129,8 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
       <dl className="commercial-context-areas">
         {compact && <OfficialArea label="Área oficial dos lotes no escopo" value={summary.officialArea} />}
         <OfficialArea label="Área oficial dos lotes disponíveis" value={summary.availableOfficialArea} />
+        {scope.unregisteredModuleCount > 0 && <div><dt>Módulos sem situação cadastrada</dt><dd>{count.format(scope.unregisteredModuleCount)}</dd></div>}
+        {scope.nonCommercialCount > 0 && <div><dt>{scope.plan ? 'Apoios não comerciais' : 'Estruturas não comerciais'}</dt><dd>{count.format(scope.nonCommercialCount)}</dd></div>}
         {scope.plan && <>
           <div><dt>Área total do pavilhão</dt><dd>{area.format(scope.plan.stats.totalAreaSquareMeters)} m²</dd></div>
           <div><dt>Área modular total</dt><dd>{area.format(scope.plan.stats.moduleAreaSquareMeters)} m²</dd></div>
