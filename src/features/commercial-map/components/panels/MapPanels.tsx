@@ -345,7 +345,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
   const saleHistory = useLotSaleHistory(lot?.id ?? null, lot?.status === 'SOLD' || lot?.status === 'SALE_OPEN');
   const contracts = useLotContractVersions(lot?.id ?? null, permissions.canManageContracts);
   const areaMapUnits = polygonAreaMapUnits(entity.geometry);
-  const status = lot ? STATUS_CONFIG[lot.status] : null;
+  const status = lot ? STATUS_CONFIG[toCommercialPhase(lot.status)] : null;
   const metadata = normalizeMapEntityMetadata(entity, lot);
   const lotIdentity = lot ? resolveLotIdentity(lot, entity, entities.find(parent => parent.id === entity.parentEntityId)) : null;
   const structuralReady = lot ? ['AVAILABLE', 'BLOCKED', 'UNAVAILABLE'].includes(lot.status) : false;

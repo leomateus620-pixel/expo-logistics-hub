@@ -133,7 +133,7 @@ export function normalizeMapEntityMetadata(entity: MapEntity, lot?: CommercialLo
     lot?.levelLabel,
     CLASSIFICATION_LABELS[entity.classification],
     VERIFICATION_LABELS[entity.verificationStatus],
-    lot ? STATUS_CONFIG[lot.status].label : 'Não comercial',
+    lot ? STATUS_CONFIG[toCommercialPhase(lot.status)].label : 'Não comercial',
     lot?.displayName,
     entity.description,
     lot?.description,

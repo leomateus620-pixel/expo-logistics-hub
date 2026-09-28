@@ -1319,7 +1319,7 @@ function lotColor(
   target = new THREE.Color(),
   blend = new THREE.Color(),
 ) {
-  const status = STATUS_CONFIG[entry.lot.status];
+  const status = STATUS_CONFIG[toCommercialPhase(entry.lot.status)];
   const soldColor = soldLotSurfaceColor(entry.lot.status);
   if (soldColor) return target.set(soldColor);
   const color = segment
@@ -1429,7 +1429,7 @@ function SegmentLotAccents({
     accents.accentedEntries.forEach(({ entity, lot }, index) => {
       const segment = segmentByEntity.get(entity.id)!;
       // Segment owns the lot surface; this roof band keeps commercial status visible as a second channel.
-      const color = new THREE.Color(STATUS_CONFIG[lot.status].color)
+      const color = new THREE.Color(STATUS_CONFIG[toCommercialPhase(lot.status)].color)
         .lerp(new THREE.Color(segment.palette.accent), 0.08);
       if (filtersActive && !matchingEntityIds.has(entity.id)) color.lerp(MAP_BACKGROUND_COLOR, 0.86);
       accents.mesh.setColorAt(index, color);
@@ -1563,8 +1563,8 @@ function BatchedLots({
         : new THREE.EdgesGeometry(geometry, 28);
       const positions = edgeGeometry.getAttribute('position');
       const borderColor = segment
-        ? new THREE.Color(segment.palette.edge).lerp(new THREE.Color(STATUS_CONFIG[entry.lot.status].border), 0.12)
-        : new THREE.Color(STATUS_CONFIG[entry.lot.status].border);
+        ? new THREE.Color(segment.palette.edge).lerp(new THREE.Color(STATUS_CONFIG[toCommercialPhase(entry.lot.status)].border), 0.12)
+        : new THREE.Color(STATUS_CONFIG[toCommercialPhase(entry.lot.status)].border);
       for (let positionIndex = 0; positionIndex < positions.count; positionIndex += 1) {
         edgePositions.push(
           positions.getX(positionIndex),
@@ -1796,7 +1796,7 @@ const EntityLabel = memo(function EntityLabel({
     ?? metadata.officialDisplayName;
   const contextualRoadAnchor = rearContextualLabelAnchorForOfficialOwner(entity.publicIdentifier);
   const dimmed = Boolean(lot && filtersActive && !isMatch && !selected);
-  const status = lot ? STATUS_CONFIG[lot.status] : null;
+  const status = lot ? STATUS_CONFIG[toCommercialPhase(lot.status)] : null;
   const lotPresentation = lot ? resolveLotTooltipPresentation(lot) : null;
   const labelHeight = entityLabelHeight(entity);
 

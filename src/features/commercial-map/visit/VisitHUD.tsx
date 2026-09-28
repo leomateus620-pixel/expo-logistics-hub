@@ -31,7 +31,7 @@ const VisitLotInformation = memo(function VisitLotInformation({ poi, expanded }:
   return <>
     <div className="visit-poi__facts">
       <span>{formatAreaSqmLabel(area) ?? 'Área não informada'}</span>
-      <span>{STATUS_CONFIG[lot.status].label}</span>
+      <span>{STATUS_CONFIG[toCommercialPhase(lot.status)].label}</span>
     </div>
     {segment && <p className="visit-poi__segment">{segment.name}</p>}
     {secondTotal && <p className="visit-poi__price"><strong>{secondTotal}</strong><small>2ª Etapa</small></p>}

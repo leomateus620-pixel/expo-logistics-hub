@@ -102,7 +102,7 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
   );
   const record = cell ? commercialIndex.get(cell.id) ?? null : null;
   const lot = record?.lot ?? null;
-  const status = lot ? STATUS_CONFIG[lot.status] : null;
+  const status = lot ? STATUS_CONFIG[toCommercialPhase(lot.status)] : null;
   const persisted = source === 'database' && Boolean(lot && !lot.id.startsWith('reference:'));
   const canReserve = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'IN_NEGOTIATION'].includes(lot.status));
   const canNegotiate = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED'].includes(lot.status));

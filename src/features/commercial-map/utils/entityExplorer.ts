@@ -164,7 +164,7 @@ export function buildEntityExplorerIndex(entities: MapEntity[], lots: Commercial
     const segment = segmentByEntity.get(entity.id) ?? null;
     const location = buildLocation(entity, lot, metadata);
     const commercialStatus = lot?.status ?? 'NOT_COMMERCIAL';
-    const statusLabel = lot ? STATUS_CONFIG[lot.status].label : 'Não comercial';
+    const statusLabel = lot ? STATUS_CONFIG[toCommercialPhase(lot.status)].label : 'Não comercial';
     const identifiers = normalizedValues([
       entity.id,
       entity.publicIdentifier,

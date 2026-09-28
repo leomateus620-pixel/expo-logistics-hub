@@ -64,7 +64,7 @@ describe('resumo comercial contextual', () => {
     expect(scope.totalCount).toBe(189);
     expect(summary.filteredCount).toBe(1);
     expect(summary.byStatus.AVAILABLE).toBe(2);
-    expect(summary.byStatus.RESERVED).toBe(1);
+    expect(summary.byStatus.BLOCKED).toBe(1);
     expect(summary.officialArea).toEqual({ squareMeters: 20, informedCount: 2, missingCount: 1 });
     expect(summary.availableOfficialArea).toEqual({ squareMeters: 12, informedCount: 1, missingCount: 1 });
     expect(scope.plan!.stats.totalAreaSquareMeters).toBe(1201.5);

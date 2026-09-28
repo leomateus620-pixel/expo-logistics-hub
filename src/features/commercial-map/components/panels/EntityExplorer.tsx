@@ -109,7 +109,7 @@ function classificationInitial(classification: MapClassification): string {
 
 function EntityStatusBadge({ item }: { item: EntityExplorerItem }) {
   if (!item.lot) return <span className="commercial-map-entity-status is-neutral">Não comercial</span>;
-  const config = STATUS_CONFIG[item.lot.status];
+  const config = STATUS_CONFIG[toCommercialPhase(item.lot.status)];
   return (
     <span
       className="commercial-map-entity-status"
@@ -371,7 +371,7 @@ function ResultCard({
   const accessibleContext = [
     CLASSIFICATION_LABELS[item.entity.classification],
     item.locationLabel,
-    item.lot ? STATUS_CONFIG[item.lot.status].label : 'Não comercial',
+    item.lot ? STATUS_CONFIG[toCommercialPhase(item.lot.status)].label : 'Não comercial',
     item.companyLabel,
     item.segment?.name,
   ].filter(Boolean).join(', ');
