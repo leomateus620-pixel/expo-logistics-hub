@@ -11,11 +11,11 @@ import {
 import type { DashboardAggregate } from './commercialDashboardTypes';
 
 const AREA_STATUSES: readonly CommercialStatus[] = [
-  'SOLD', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'BLOCKED',
+  'SOLD', 'SALE_OPEN', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'BLOCKED',
 ];
 
 const VALUE_STATUSES: readonly CommercialStatus[] = [
-  'SOLD', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION',
+  'SOLD', 'SALE_OPEN', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION',
 ];
 
 interface ChartProps {
