@@ -9,7 +9,7 @@ import { preloadCommercialMapCanvas } from '../utils/preloadCanvas';
 import { claimCommercialMapBootVisit, releaseCommercialMapBootVisit } from '../utils/performanceDiagnostics';
 import { formatAreaSqmLabel } from '../utils/lotPricing2028';
 import { buildPavilionModuleCommercialIndex } from '../utils/pavilionModuleCommercial';
-import { STATUS_CONFIG } from '../constants';
+import { COMMERCIAL_PHASES, STATUS_CONFIG } from '../constants';
 import { fetchSaleLogoUrls } from '../sales/saleLogo';
 import { useQuery } from '@tanstack/react-query';
 import { getPublicArea } from './publicAreaRegistry';
@@ -209,7 +209,7 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
           </div>}
         </PublicCanvasBoundary>
         {usesParkContext && renderState === 'ready' && <div className="public-map-legend" aria-label="Legenda de disponibilidade">
-          {(['AVAILABLE','RESERVED','SALE_OPEN','SOLD','BLOCKED'] as const).map(status => <span key={status}><i style={{background: STATUS_CONFIG[status].color}} />{PUBLIC_AVAILABILITY_LABEL[status === 'BLOCKED' ? 'UNAVAILABLE' : status]}</span>)}
+          {COMMERCIAL_PHASES.map(status => <span key={status}><i style={{background: STATUS_CONFIG[status].color}} />{STATUS_CONFIG[status].label}</span>)}
           <span><i className="is-selection" />Selecionado</span><span><i className="is-context" />Contexto do parque</span>
         </div>}
       </div>}

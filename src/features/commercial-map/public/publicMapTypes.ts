@@ -72,8 +72,8 @@ export interface PublicMapContext {
 
 export const PUBLIC_AVAILABILITY_LABEL: Record<PublicLotAvailability, string> = {
   AVAILABLE: 'Disponível',
-  RESERVED: 'Sob consulta',
+  RESERVED: 'Disponível',
   SALE_OPEN: 'Venda em aberto',
   SOLD: 'Comercializado',
-  UNAVAILABLE: 'Indisponível',
+  UNAVAILABLE: 'Bloqueado',
 };

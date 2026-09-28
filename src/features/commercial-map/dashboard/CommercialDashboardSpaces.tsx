@@ -5,7 +5,8 @@ import type { CommercialDashboardSnapshot, DashboardAggregate } from './commerci
 import { CommercialMiniMap } from './CommercialMiniMap';
 import { buildDashboardExternalBoundaries } from './commercialDashboardBoundaries';
 import { formatDashboardAreaWithCoverage, formatDashboardCurrency, formatDashboardInteger, formatDashboardPercentage } from './commercialDashboardFormatters';
-import { STATUS_CONFIG } from '../constants';
+import { COMMERCIAL_PHASES, STATUS_CONFIG } from '../constants';
+import { toCommercialPhase } from '../types';
 import { CommercialDashboardLotChart, CommercialDashboardValueChart } from './CommercialDashboardCharts';
 import { useDashboardStatusHighlight } from './useDashboardStatusHighlight';
 import { CommercialDashboardComparison } from './CommercialDashboardComparison';
@@ -14,7 +15,7 @@ const PavilionPlan = lazy(() => import('./CommercialDashboardPavilion'));
 
 function Metrics({ aggregate, title }: { aggregate: DashboardAggregate; title: string }) {
   return <div className="commercial-dashboard-scope-metrics" aria-label={`Indicadores de ${title}`}>
-    <div><span>Lotes comerciais</span><strong>{formatDashboardInteger(aggregate.commercialLots)}</strong><small>{aggregate.unavailableLots} indisponíveis à parte</small></div>
+    <div><span>Lotes comerciais</span><strong>{formatDashboardInteger(aggregate.commercialLots)}</strong><small>{aggregate.unavailableLots} fora da área comercial ativa</small></div>
     <div><span>Vendidos</span><strong>{aggregate.commercialLots ? formatDashboardPercentage(aggregate.soldLotPercentage) : '—'}</strong><small>{aggregate.soldLots} de {aggregate.commercialLots} lotes</small></div>
     <div><span>Área comercial oficial</span><strong>{formatDashboardAreaWithCoverage(aggregate.totalAreaSqm, aggregate.commercialLots, aggregate.lotsWithoutOfficialArea, aggregate.commercialLots)}</strong><small>{aggregate.lotsWithoutOfficialArea} sem metragem</small></div>
     <div><span>Valor comercial conhecido</span><strong>{aggregate.knownValueLots ? formatDashboardCurrency(aggregate.totalKnownValue, true) : '—'}</strong><small>{aggregate.knownValueLots} de {aggregate.commercialLots} com preço · não é receita</small></div>
@@ -26,15 +27,23 @@ function Analysis({ aggregate, highlight }: { aggregate: DashboardAggregate; hig
     {open && <CommercialDashboardLotChart aggregate={aggregate} {...highlight} />}
     {open && <CommercialDashboardValueChart aggregate={aggregate} {...highlight} />}
     <div className="commercial-dashboard-status-table-wrap"><table className="commercial-dashboard-status-table">
-      <caption>Valores comerciais cadastrados; indisponíveis fora dos percentuais</caption>
+      <caption>Valores comerciais cadastrados; espaços fora da área comercial ativa excluídos dos percentuais</caption>
       <thead><tr><th>Situação</th><th>Lotes</th><th>% lotes</th><th>Área oficial</th><th>% área</th><th>Valor conhecido</th><th>Sem área / preço</th></tr></thead>
-      <tbody>{Object.entries(aggregate.byStatus).map(([status, row]) => <tr key={status}>
-        <th>{STATUS_CONFIG[status as keyof typeof STATUS_CONFIG].label}</th><td>{row.lotCount}</td>
-        <td>{status !== 'UNAVAILABLE' && aggregate.commercialLots ? formatDashboardPercentage(row.lotPercentage) : '—'}</td>
-        <td>{formatDashboardAreaWithCoverage(row.areaSqm, row.lotCount, row.areaPendingCount, aggregate.totalLots)}</td>
-        <td>{status !== 'UNAVAILABLE' && aggregate.totalAreaSqm > 0 ? formatDashboardPercentage(row.areaPercentage) : '—'}</td>
-        <td>{row.pricedLotCount ? formatDashboardCurrency(row.value) : '—'}</td><td>{row.areaPendingCount} / {row.pricePendingCount}</td>
-      </tr>)}</tbody>
+      <tbody>{COMMERCIAL_PHASES.map((phase) => {
+        const rows = Object.entries(aggregate.byStatus).filter(([status]) => status !== 'UNAVAILABLE' && toCommercialPhase(status as keyof typeof aggregate.byStatus) === phase).map(([, row]) => row);
+        const lotCount = rows.reduce((sum, row) => sum + row.lotCount, 0);
+        const areaSqm = rows.reduce((sum, row) => sum + row.areaSqm, 0);
+        const areaPendingCount = rows.reduce((sum, row) => sum + row.areaPendingCount, 0);
+        const pricePendingCount = rows.reduce((sum, row) => sum + row.pricePendingCount, 0);
+        const value = rows.reduce((sum, row) => sum + row.value, 0);
+        return <tr key={phase}>
+          <th>{STATUS_CONFIG[phase].label}</th><td>{lotCount}</td>
+          <td>{aggregate.commercialLots ? formatDashboardPercentage(100 * lotCount / aggregate.commercialLots) : '—'}</td>
+          <td>{formatDashboardAreaWithCoverage(areaSqm, lotCount, areaPendingCount, aggregate.totalLots)}</td>
+          <td>{aggregate.totalAreaSqm > 0 ? formatDashboardPercentage(100 * areaSqm / aggregate.totalAreaSqm) : '—'}</td>
+          <td>{value ? formatDashboardCurrency(value) : '—'}</td><td>{areaPendingCount} / {pricePendingCount}</td>
+        </tr>;
+      })}</tbody>
     </table></div>
   </details>;
 }
@@ -67,7 +76,7 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot }: {
     <div className="commercial-dashboard-reconciliation" role="note" aria-label="Reconciliação do inventário ativo">
       <strong>{snapshot.overall.totalLots} registros ativos</strong>
       <span>= {snapshot.external.totalLots} externos + {snapshot.internal.totalLots} internos + {snapshot.unclassified.totalLots} pendentes de classificação</span>
-      <small>Inclui indisponíveis; percentuais comerciais os excluem.</small>
+      <small>Espaços fora da área comercial ativa permanecem separados dos percentuais.</small>
     </div>
     <section className="commercial-dashboard-spaces" aria-labelledby="dashboard-external-title">
       <div className="commercial-dashboard-section-heading"><div><span className="commercial-dashboard-eyebrow">Áreas e quadras do parque</span>
