@@ -198,7 +198,7 @@ export function SalesCheckoutDialog({ summary }: Props) {
               onClick={confirm}
             >
               {checkout.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Confirmar venda
+              Registrar venda em aberto
             </Button>
           )}
         </div>
