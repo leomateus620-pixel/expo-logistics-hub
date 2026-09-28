@@ -1,4 +1,5 @@
-import { CLASSIFICATION_LABELS, STATUS_CONFIG, VERIFICATION_LABELS } from '../constants';
+import { CLASSIFICATION_LABELS, COMMERCIAL_PHASES, STATUS_CONFIG, VERIFICATION_LABELS } from '../constants';
+import { toCommercialPhase } from '../types';
 import type {
   CommercialLot,
   CommercialStatus,
@@ -234,13 +235,13 @@ export function buildEntityExplorerFacets(items: EntityExplorerItem[]): EntityEx
   const verifications = new Map<VerificationStatus, number>();
   const locations = new Map<string, EntityLocationOption>();
   const statusCounts = Object.fromEntries(
-    (Object.keys(STATUS_CONFIG) as CommercialStatus[]).map((status) => [status, 0]),
+    COMMERCIAL_PHASES.map((status) => [status, 0]),
   ) as Record<CommercialStatus, number>;
 
   items.forEach((item) => {
     classifications.set(item.entity.classification, (classifications.get(item.entity.classification) ?? 0) + 1);
     verifications.set(item.entity.verificationStatus, (verifications.get(item.entity.verificationStatus) ?? 0) + 1);
-    if (item.lot) statusCounts[item.lot.status] += 1;
+    if (item.lot) statusCounts[toCommercialPhase(item.lot.status)] += 1;
     item.locationFacets.forEach((facet) => {
       const current = locations.get(facet.value);
       locations.set(facet.value, { ...facet, count: (current?.count ?? 0) + 1 });
@@ -318,7 +319,7 @@ export function filterAndSortEntityExplorerItems(
 ): EntityExplorerItem[] {
   const query = normalizeExplorerText(criteria.query);
   const candidates = items.filter((item) => {
-    if (criteria.statusFilters.length > 0 && (!item.lot || !criteria.statusFilters.includes(item.lot.status))) return false;
+    if (criteria.statusFilters.length > 0 && (!item.lot || !criteria.statusFilters.some((status) => toCommercialPhase(status) === toCommercialPhase(item.lot?.status ?? 'AVAILABLE')))) return false;
     if (criteria.classificationFilters.length > 0 && !criteria.classificationFilters.includes(item.entity.classification)) return false;
     if (criteria.locationFilter && !item.locationFacets.some((facet) => facet.value === criteria.locationFilter)) return false;
     if (criteria.verificationFilters.length > 0 && !criteria.verificationFilters.includes(item.entity.verificationStatus)) return false;

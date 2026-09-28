@@ -1,7 +1,7 @@
 import { useId, useMemo, useState } from 'react';
 import { ArrowUpRight, MapPinned } from 'lucide-react';
-import { STATUS_CONFIG } from '../constants';
-import type { CommercialStatus } from '../types';
+import { COMMERCIAL_PHASES, STATUS_CONFIG } from '../constants';
+import { toCommercialPhase, type CommercialStatus, type CommercialPhase } from '../types';
 import { formatAreaSqmLabel, formatBrl } from '../utils/lotPricing2028';
 import { resolveLotIdentity } from '../utils/lotIdentity';
 import { buildCommercialMiniMapGeometry, type CommercialMiniMapItem, type MiniMapOutline } from './commercialDashboardGeometry';
@@ -28,7 +28,6 @@ export interface CommercialMiniMapProps {
 }
 const EMPTY_OUTLINES: readonly MiniMapOutline[] = [];
 const EMPTY_ACCESSES: readonly DashboardAccessMarker[] = [];
-const STATUS_ORDER: readonly CommercialStatus[] = ['SOLD', 'SALE_OPEN', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'BLOCKED', 'UNAVAILABLE'];
 const ACCESS_SYMBOL = { entrance: '↘', exit: '↗', bidirectional: '↔', emergency: '⚠', connection: '⇄' };
 const ACCESS_LABEL = { entrance: 'Entrada', exit: 'Saída', bidirectional: 'Entrada e saída', emergency: 'Saída de emergência', connection: 'Conexão entre pavilhões' };
 function identity(item: CommercialMiniMapItem) {
@@ -54,8 +53,11 @@ export function CommercialMiniMap({
     ?? items.find(({ entity }) => entity.id === hoveredEntityId) ?? null;
   const activeSelected = activeLot?.entity.id === selectedEntityId;
   const statusCounts = useMemo(() => {
-    const counts = new Map<CommercialStatus, number>();
-    for (const { lot } of items) counts.set(lot.status, (counts.get(lot.status) ?? 0) + 1);
+    const counts = new Map<CommercialPhase, number>();
+    for (const { lot } of items) {
+      const phase = toCommercialPhase(lot.status);
+      counts.set(phase, (counts.get(phase) ?? 0) + 1);
+    }
     return counts;
   }, [items]);
   const blocks = geometry.outlines.filter((outline) => outline.kind === 'block');
@@ -69,7 +71,7 @@ export function CommercialMiniMap({
       <label htmlFor={selectId}>Selecionar {numbered ? 'módulo' : 'lote'}</label>
       <select id={selectId} value={activeSelected ? selectedEntityId ?? '' : ''} onChange={(event) => select(event.target.value || null)}>
         <option value="">Escolha um espaço</option>
-        {items.map((item) => <option key={item.lot.id} value={item.entity.id}>{identity(item)} · {STATUS_CONFIG[item.lot.status].label}</option>)}
+        {items.map((item) => <option key={item.lot.id} value={item.entity.id}>{identity(item)} · {STATUS_CONFIG[toCommercialPhase(item.lot.status)].label}</option>)}
       </select>
       <button type="button" aria-label={`Reduzir planta de ${title}`} disabled={zoom === 1} onClick={() => setZoom((value) => Math.max(1, value - 0.5))}>−</button>
       <button type="button" aria-label={`Ampliar planta de ${title}`} disabled={zoom === 3} onClick={() => setZoom((value) => Math.min(3, value + 0.5))}>+</button>
@@ -83,12 +85,12 @@ export function CommercialMiniMap({
             data-outline={outline.kind}><title>{outline.kind === 'segment' ? 'Contorno cadastral' : 'Pavilhão'} · {outline.label}</title></path>)}
           {geometry.lots.map((item, index) => {
             const { entity, lot, value, path } = item;
-            const config = STATUS_CONFIG[lot.status];
+            const config = STATUS_CONFIG[toCommercialPhase(lot.status)];
             const isActive = activeLot?.entity.id === entity.id;
             const area = lot.officialAreaSqm != null && Number.isFinite(lot.officialAreaSqm) && lot.officialAreaSqm > 0 ? formatAreaSqmLabel(lot.officialAreaSqm) : 'área oficial pendente';
             return <path key={lot.id} d={path} fill={config.color} fillRule="evenodd" stroke={isActive ? '#172e20' : config.border}
               strokeWidth={isActive ? 3.5 : 1.3} vectorEffect="non-scaling-stroke"
-              opacity={highlightedStatus && highlightedStatus !== lot.status && !isActive ? 0.16 : 0.92}
+              opacity={highlightedStatus && toCommercialPhase(highlightedStatus) !== toCommercialPhase(lot.status) && !isActive ? 0.16 : 0.92}
               role="button" tabIndex={keyboardStopId === entity.id ? 0 : -1} aria-pressed={selectedEntityId === entity.id}
               aria-label={`${identity(item)}, ${area}, ${config.label}, ${value == null ? 'valor não definido' : formatBrl(value)}`}
               data-entity-id={entity.id} data-status={lot.status}
@@ -151,7 +153,7 @@ export function CommercialMiniMap({
       </div>
     </div>
     <div className="commercial-dashboard-map-legend" aria-label="Legenda das situações comerciais">
-      {STATUS_ORDER.filter((status) => statusCounts.has(status)).map((status) => <span key={status}>
+       {COMMERCIAL_PHASES.filter((status) => statusCounts.has(status)).map((status) => <span key={status}>
         <i style={{ backgroundColor: STATUS_CONFIG[status].color }} />{STATUS_CONFIG[status].shortLabel} {statusCounts.get(status)}
       </span>)}
       {outlines.some(({ kind }) => kind === 'segment') && <span>━ Contorno cadastral da área</span>}
@@ -164,7 +166,7 @@ export function CommercialMiniMap({
     {geometry.lots.length < items.length && <p className="commercial-dashboard-data-note">{items.length - geometry.lots.length} espaços sem geometria válida; incluídos nos indicadores e no seletor.</p>}
     <div className="commercial-dashboard-lot-detail" role="status" aria-live="polite">
       {activeLot ? <><strong>{identity(activeLot)}</strong>
-        <span>{activeLot.lot.officialAreaSqm != null && Number.isFinite(activeLot.lot.officialAreaSqm) && activeLot.lot.officialAreaSqm > 0 ? formatAreaSqmLabel(activeLot.lot.officialAreaSqm) : 'Área oficial pendente'} · {STATUS_CONFIG[activeLot.lot.status].label}</span>
+         <span>{activeLot.lot.officialAreaSqm != null && Number.isFinite(activeLot.lot.officialAreaSqm) && activeLot.lot.officialAreaSqm > 0 ? formatAreaSqmLabel(activeLot.lot.officialAreaSqm) : 'Área oficial pendente'} · {STATUS_CONFIG[toCommercialPhase(activeLot.lot.status)].label}</span>
         <span>{activeLot.value == null ? 'Valor não definido' : formatBrl(activeLot.value)} · valor comercial cadastrado</span>
         {activeSelected && <button type="button" onClick={() => onViewLot(activeLot.entity.id)}>Ver no mapa <ArrowUpRight aria-hidden="true" /></button>}
       </> : <span>Selecione um espaço na planta ou na lista para consultar seus dados.</span>}

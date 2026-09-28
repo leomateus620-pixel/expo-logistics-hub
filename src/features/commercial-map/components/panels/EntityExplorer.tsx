@@ -35,7 +35,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { CLASSIFICATION_LABELS, STATUS_CONFIG, VERIFICATION_LABELS } from '../../constants';
+import { CLASSIFICATION_LABELS, COMMERCIAL_PHASES, STATUS_CONFIG, VERIFICATION_LABELS } from '../../constants';
+import { toCommercialPhase } from '../../types';
 import type { MapEntityFilterResult } from '../../hooks/useCommercialMap';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type {
@@ -219,9 +220,9 @@ function ExplorerControls({ explorer, variant, inputRef, onSearchKeyDown, onEsca
       </div>
 
       <div className="commercial-map-status-filters" role="group" aria-label="Filtrar por situação comercial">
-        {(Object.keys(STATUS_CONFIG) as CommercialStatus[]).map((status) => {
+        {COMMERCIAL_PHASES.map((status) => {
           const config = STATUS_CONFIG[status];
-          const selected = statusFilters.includes(status);
+          const selected = statusFilters.some((candidate) => toCommercialPhase(candidate) === status);
           const count = explorer.facets.statusCounts[status];
           return (
             <button
@@ -339,7 +340,7 @@ function ExplorerControls({ explorer, variant, inputRef, onSearchKeyDown, onEsca
         <div className="commercial-map-active-filters" aria-label={`${activeFilterCount} filtros ativos`}>
           <span>{activeFilterCount} {activeFilterCount === 1 ? 'filtro ativo' : 'filtros ativos'}</span>
           {search.trim() && <button type="button" onClick={() => setSearch('')}>Busca: “{search.trim()}”<X /></button>}
-          {statusFilters.map((status) => <button type="button" key={status} onClick={() => toggleStatus(status)}>{STATUS_CONFIG[status].shortLabel}<X /></button>)}
+          {[...new Set(statusFilters.map(toCommercialPhase))].map((status) => <button type="button" key={status} onClick={() => toggleStatus(status)}>{STATUS_CONFIG[status].label}<X /></button>)}
           {classificationFilters.map((classification) => <button type="button" key={classification} onClick={() => toggleClassification(classification)}>{CLASSIFICATION_LABELS[classification]}<X /></button>)}
           {locationFilter && <button type="button" onClick={() => setLocationFilter(null)}>{activeLocation?.label ?? 'Localização'}<X /></button>}
           {verificationFilters.map((status) => <button type="button" key={status} onClick={() => toggleVerification(status)}>{VERIFICATION_LABELS[status]}<X /></button>)}
