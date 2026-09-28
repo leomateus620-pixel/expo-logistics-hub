@@ -518,7 +518,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
                       {salesSelection.some((item) => item.lotId === lot.id) ? 'Na venda' : 'Adicionar à venda'}
                     </Button>
                   ) : (
-                    <Button onClick={() => setWorkflow('sell')}><ShoppingBag className="h-4 w-4" />Marcar vendido</Button>
+                    <Button onClick={() => setWorkflow('sell')}><ShoppingBag className="h-4 w-4" />Registrar venda</Button>
                   )
                 )}
               </div>
