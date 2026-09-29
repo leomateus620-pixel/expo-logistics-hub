@@ -299,16 +299,16 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     ),
     [areaScope, data?.entities, data?.lots],
   );
-  // Comissões: no modo visita o parque inteiro aparece como contexto, mas só
-  // os lotes do próprio segmento podem ser selecionados.
-  const commissionVisitEntities = useMemo(() => {
-    if (!isCommissionScope || !visitEnabled || !data?.parkContextEntities?.length) return null;
+  // Contexto cartográfico em ambos os modos, sem inventário comercial de
+  // outros segmentos. A seleção permanece restrita ao segmento autorizado.
+  const commissionSceneEntities = useMemo(() => {
+    if (!isCommissionScope || !data?.parkContextEntities?.length) return null;
     const own = new Set(scopedData.entities.map((entity) => entity.id));
     return [...scopedData.entities, ...data.parkContextEntities.filter((entity) => !own.has(entity.id))];
-  }, [data?.parkContextEntities, isCommissionScope, scopedData.entities, visitEnabled]);
+  }, [data?.parkContextEntities, isCommissionScope, scopedData.entities]);
   const commissionInteractiveEntityIds = useMemo(
-    () => (commissionVisitEntities ? new Set(scopedData.entities.map((entity) => entity.id)) as ReadonlySet<string> : null),
-    [commissionVisitEntities, scopedData.entities],
+    () => (isCommissionScope ? new Set(scopedData.entities.map((entity) => entity.id)) as ReadonlySet<string> : null),
+    [isCommissionScope, scopedData.entities],
   );
   const parkingAvailable = rearParkingVisibleInArea(areaScope) && !hydrologicalModeActive
     && rearParkingLayerPresentation(data?.entities ?? [], layerVisibility, layerOpacity).visible;
@@ -661,9 +661,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
               <Profiler id="CommercialMapCanvas" onRender={recordCommercialMapProfiler}>
                 <CommercialMapCanvas
                   active={workspaceMode === '3d'}
-                  entities={commissionVisitEntities ?? scopedData.entities}
-                  parkingOwnerEntities={commissionVisitEntities ?? data.entities}
-                  siteEnvironmentEntities={commissionVisitEntities ?? data.entities}
+                  entities={commissionSceneEntities ?? scopedData.entities}
+                  parkingOwnerEntities={commissionSceneEntities ?? data.entities}
+                  siteEnvironmentEntities={commissionSceneEntities ?? data.entities}
                   interactiveEntityIds={commissionInteractiveEntityIds}
                   lots={scopedData.lots}
                   calibration={data.calibration}
@@ -671,7 +671,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                   filtersActive={scenePresentation.filtersActive}
                   sceneSegmentId={scenePresentation.activeSegmentId}
                   sceneInteriorEntityId={scenePresentation.interiorEntityId}
-                  isolatedArea={areaScope === 'park' || commissionVisitEntities ? null : areaScope}
+                  isolatedArea={areaScope === 'park' || commissionSceneEntities ? null : areaScope}
                   segmentOverride={isCommissionScope ? scopedSegment : null}
                   technicalValidationAllowed={technicalValidationAllowed}
                 />

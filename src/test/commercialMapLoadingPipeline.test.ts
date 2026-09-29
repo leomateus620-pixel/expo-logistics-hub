@@ -36,7 +36,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: {
   storage: { from: () => ({ createSignedUrl: backend.sign }) },
 } }));
 vi.mock('@/features/commercial-map/data/reconcileExporuralReference', () => ({ reconcileExporuralReference: (data: unknown) => data }));
-import { fetchCommercialMap, COMMERCIAL_LOT_SELECT } from '@/features/commercial-map/services/commercialMapService';
+import { fetchCommercialMap, COMMERCIAL_LOT_SELECT, isValidCommissionCameraValues } from '@/features/commercial-map/services/commercialMapService';
 
 function deferred<T>() {
   let resolve!: (v: T) => void;
@@ -51,6 +51,12 @@ beforeEach(() => {
 });
 
 describe('commercial map initial data pipeline', () => {
+  it('accepts a signed camera direction for the automobile area without accepting invalid distances', () => {
+    expect(isValidCommissionCameraValues([-0.56, 0.74, 0.62, 1.14, 0.1, 1.9])).toBe(true);
+    expect(isValidCommissionCameraValues([0.62, 0.72, 0.46, 1.08, 0.12, 2.2])).toBe(true);
+    expect(isValidCommissionCameraValues([0, 0, 0, 1.14, 0.1, 1.9])).toBe(false);
+    expect(isValidCommissionCameraValues([-0.56, 0.74, 0.62, 1.14, 0, 1.9])).toBe(false);
+  });
   it('starts project during maintenance and only reads commercial status after maintenance completes', async () => {
     const maintenance = deferred<unknown>(); backend.wait.expire_commercial_reservations = maintenance.promise;
     const request = fetchCommercialMap('org'); await settle();

@@ -362,6 +362,14 @@ export async function signedReferenceUrl(calibration: MapCalibration | null): Pr
   return { ...calibration, referenceImageUrl: data.signedUrl };
 }
 
+/** A view direction is a vector, not a positive-only distance. */
+export function isValidCommissionCameraValues(values: readonly number[]): boolean {
+  return values.length === 6
+    && values.every(Number.isFinite)
+    && values.slice(0, 3).some((value) => value !== 0)
+    && values.slice(3).every((value) => value > 0);
+}
+
 async function fetchCommissionCommercialMap(
   project: MapProject,
   scope: Extract<CommercialMapQueryScope, { mode: 'commission' }>,
@@ -407,7 +415,7 @@ async function fetchCommissionCommercialMap(
     || !Array.isArray(persistedDirection)
     || persistedDirection.length !== 3
     || cameraValues.length !== 6
-    || cameraValues.some((value) => !Number.isFinite(value) || value <= 0)
+    || !isValidCommissionCameraValues(cameraValues)
   ) {
     throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
   }
@@ -512,9 +520,9 @@ async function fetchCommissionCommercialMap(
     fetchSaleLogoUrls({ projectId: project.id }),
     // Contexto do parque para o modo visita: somente formas e estruturas,
     // sem lotes, preços ou compradores de outros segmentos.
-    mapRequest(db.rpc('commission_map_park_context', { p_segment_id: segment.id }), context)
-      .catch(() => ({ data: null, error: null })),
+    mapRequest(db.rpc('commission_map_park_context', { p_segment_id: segment.id }), context),
   ]);
+  if (parkContextResult.error) throw parkContextResult.error;
   const parkContext = (parkContextResult?.data ?? null) as { layers?: LayerRow[]; entities?: MapEntity[] } | null;
   const scopedLayers = (layersResult.data ?? []).map(mapLayer);
   const knownLayerIds = new Set(scopedLayers.map((layer) => layer.id));
