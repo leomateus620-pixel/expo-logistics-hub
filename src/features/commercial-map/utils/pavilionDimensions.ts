@@ -10,6 +10,9 @@ export interface ResolvedPavilionDimension extends PavilionDimensionAnnotation {
   startPoint: Point;
   endPoint: Point;
   label: string;
+  /** Points toward the chosen side of the real edge, projected with the plan. */
+  labelSidePoint?: Point;
+  ownerNumber?: number;
 }
 const edge = (rect: Rect, axis: 'x' | 'z', fraction: number) => axis === 'x'
   ? rect.centerX + rect.width * (fraction - 0.5)
@@ -29,7 +32,25 @@ export function resolvePavilionDimensions(plan: CommercialPavilionModulePlan, fo
     const anchor = item.anchor;
     let start: Point;
     let end: Point;
-    if (anchor.kind === 'context') {
+    let labelSidePoint: Point | undefined;
+    if (anchor.kind === 'lot-edge') {
+      const cell = plan.cells.find(cell => cell.number === anchor.number);
+      if (!cell) throw new Error(`Cota: lote ${anchor.number} inexistente em ${plan.publicIdentifier}`);
+      const polygon = cell.shape?.footprint ?? [
+        [edge(cell, 'x', 0), edge(cell, 'z', 0)], [edge(cell, 'x', 1), edge(cell, 'z', 0)],
+        [edge(cell, 'x', 1), edge(cell, 'z', 1)], [edge(cell, 'x', 0), edge(cell, 'z', 1)],
+      ] as readonly Point[];
+      start = polygon[anchor.edge]; end = polygon[(anchor.edge + 1) % polygon.length];
+      if (!start || !end) throw new Error(`Cota: borda inválida em ${item.id}`);
+      const winding = Math.sign(polygon.reduce((sum, a, i) => {
+        const b = polygon[(i + 1) % polygon.length]; return sum + a[0] * b[1] - b[0] * a[1];
+      }, 0));
+      const side = winding * (anchor.placement === 'inside' ? 1 : -1);
+      labelSidePoint = projectCommercialPavilionReferencePoint([
+        (start[0] + end[0]) / 2 - (end[1] - start[1]) * side,
+        (start[1] + end[1]) / 2 + (end[0] - start[0]) * side,
+      ], frame);
+    } else if (anchor.kind === 'context') {
       const corridor = rectFor({ kind: 'corridor', id: anchor.corridor });
       // Outside the source-plan left wall, aligned with that existing side.
       const x = edge(plan.boundary, 'x', 0) - corridor.width * 0.8;
@@ -73,7 +94,8 @@ export function resolvePavilionDimensions(plan: CommercialPavilionModulePlan, fo
         startPoint = [x, startPoint[1]]; endPoint = [x, endPoint[1]];
       }
     }
-    return { ...item, label: item.unit ? `${item.value} ${item.unit}` : item.value, startPoint, endPoint };
+    return { ...item, label: item.unit ? `${item.value} ${item.unit}` : item.value, startPoint, endPoint, labelSidePoint,
+      ...(anchor.kind === 'lot-edge' ? { ownerNumber: anchor.number } : {}) };
   });
 }
 
@@ -82,12 +104,13 @@ export const dimensionRectsOverlap = (a: DimensionScreenRect, b: DimensionScreen
   a.left < b.right + margin && a.right > b.left - margin && a.top < b.bottom + margin && a.bottom > b.top - margin;
 
 /** Fixed CSS-pixel typography, with LOD based on the actual projected modules. */
-export function layoutDimensionOnScreen({ dimension, start, end, modulePixels, width, height, obstacles, previouslyVisible = false }: {
-  dimension: Pick<ResolvedPavilionDimension, 'type' | 'priority' | 'label'>;
+export function layoutDimensionOnScreen({ dimension, start, end, sidePoint, modulePixels, width, height, obstacles, previouslyVisible = false }: {
+  dimension: Pick<ResolvedPavilionDimension, 'type' | 'priority' | 'label' | 'minModulePixels'>;
+  sidePoint?: Point;
   start: Point; end: Point; modulePixels: number; width: number; height: number;
   obstacles: readonly DimensionScreenRect[]; previouslyVisible?: boolean;
 }) {
-  const threshold = [0, 0, 9, 24][dimension.priority];
+  const threshold = dimension.minModulePixels ?? [0, 0, 9, 24][dimension.priority];
   if (modulePixels < threshold * (previouslyVisible ? 0.88 : 1)) return null;
   const dx = end[0] - start[0]; const dy = end[1] - start[1];
   const length = Math.hypot(dx, dy);
@@ -98,7 +121,12 @@ export function layoutDimensionOnScreen({ dimension, start, end, modulePixels, w
   const fontSize = dimension.priority === 3 ? 10.5 : 11.5;
   const textWidth = dimension.label.length * fontSize * 0.56 + 4;
   const textHeight = fontSize + 4;
-  const cx = (start[0] + end[0]) / 2; const cy = (start[1] + end[1]) / 2;
+  let cx = (start[0] + end[0]) / 2; let cy = (start[1] + end[1]) / 2;
+  if (sidePoint) {
+    const nx = sidePoint[0] - cx, ny = sidePoint[1] - cy, norm = Math.hypot(nx, ny);
+    if (!Number.isFinite(norm) || norm < 0.001) return null;
+    cx += nx / norm * 13; cy += ny / norm * 13;
+  }
   let textBounds: DimensionScreenRect | undefined;
   let textAngle = angle;
   let perpendicular = false;
@@ -114,7 +142,9 @@ export function layoutDimensionOnScreen({ dimension, start, end, modulePixels, w
     const bounds = { left: cx - halfWidth, right: cx + halfWidth, top: cy - halfHeight, bottom: cy + halfHeight };
     // No clamping: moving a dimension severs its relationship to geometry.
     if (bounds.left < viewportMargin || bounds.top < viewportMargin || bounds.right > width - viewportMargin || bounds.bottom > height - viewportMargin) continue;
-    if (obstacles.some(rect => dimensionRectsOverlap(bounds, rect, 3))) continue;
+    // Edge labels already have a 13px inset. A 1.5px halo clearance avoids
+    // unnecessarily suppressing the two adjoining 1.50m/2m notch readings.
+    if (obstacles.some(rect => dimensionRectsOverlap(bounds, rect, sidePoint ? 1.5 : 3))) continue;
     textBounds = bounds; textAngle = candidate; perpendicular = rotate; break;
   }
   if (!textBounds) return null;

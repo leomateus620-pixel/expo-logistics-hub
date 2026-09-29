@@ -2,6 +2,8 @@ import { memo, useEffect, useMemo, useRef } from 'react';
 import { Html } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { projectCommercialPavilionReferencePoint } from '../../data/commercialPavilionReference';
+import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
 import type { CommercialPavilionLayout } from '../../utils/commercialPavilions';
 import { createCommercialPavilionModuleProjectionFrame, projectCommercialPavilionModuleRect, type CommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
 import { COMMERCIAL_MAP_OBSTRUCTION_SELECTOR } from '../../utils/contextualViewport';
@@ -30,8 +32,15 @@ export const CommercialPavilionDimensionsLayer = memo(function CommercialPavilio
   const dimensions = useMemo(() => resolvePavilionDimensions(plan, footprint).sort((a, b) => a.priority - b.priority), [plan, footprint]);
   const geometry = useMemo(() => {
     const frame = createCommercialPavilionModuleProjectionFrame(plan, footprint);
-    const parts = [...plan.cells.flatMap(cell => cell.shape?.renderParts ?? [cell]), ...plan.supportSpaces];
-    return parts.map(part => projectCommercialPavilionModuleRect(part, frame));
+    const parts = plan.cells.flatMap(cell => (cell.shape?.renderParts ?? [cell]).map(part => ({
+      ...projectCommercialPavilionModuleRect(part, frame), number: cell.number,
+    })));
+    return {
+      parts: [...parts, ...plan.supportSpaces.map(part => ({ ...projectCommercialPavilionModuleRect(part, frame), number: -1 }))],
+      numbers: plan.cells.filter(cell => cell.shape).map(cell => ({ number: cell.number,
+        anchor: projectCommercialPavilionReferencePoint(cell.shape!.labelAnchor, frame),
+        rect: projectCommercialPavilionModuleRect(cell, frame) })),
+    };
   }, [plan, footprint]);
   const host = gl.domElement.parentElement;
 
@@ -64,23 +73,36 @@ export const CommercialPavilionDimensionsLayer = memo(function CommercialPavilio
       return scratch.z < -1 || scratch.z > 1 ? [NaN, NaN] as const
         : [((scratch.x + 1) / 2) * size.width, ((1 - scratch.y) / 2) * size.height] as const;
     };
-    const obstacles: DimensionScreenRect[] = geometry.map(rect => {
+    const lotObstacles = geometry.parts.map(rect => {
       const points = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([x, z]) => project(rect.centerX + x * rect.width / 2, rect.centerZ + z * rect.depth / 2));
-      return { left: Math.min(...points.map(p => p[0])), right: Math.max(...points.map(p => p[0])), top: Math.min(...points.map(p => p[1])), bottom: Math.max(...points.map(p => p[1])) };
+      return { number: rect.number, left: Math.min(...points.map(p => p[0])), right: Math.max(...points.map(p => p[0])), top: Math.min(...points.map(p => p[1])), bottom: Math.max(...points.map(p => p[1])) };
     });
-    const moduleSizes = obstacles.slice(0, plan.cells.length).map(rect => Math.min(rect.right - rect.left, rect.bottom - rect.top)).sort((a, b) => a - b);
+    const moduleSizes = lotObstacles.filter(rect => rect.number !== -1).map(rect => Math.min(rect.right - rect.left, rect.bottom - rect.top)).filter(Number.isFinite).sort((a, b) => a - b);
     const modulePixels = moduleSizes[Math.floor(moduleSizes.length / 2)] ?? 0;
+    const obstacles: DimensionScreenRect[] = geometry.numbers.map(({ anchor, rect }) => {
+      const [x,y] = project(...anchor);
+      const a=project(rect.centerX-rect.width/2,rect.centerZ-rect.depth/2), b=project(rect.centerX+rect.width/2,rect.centerZ+rect.depth/2);
+      const radius=Math.max(10,Math.min(Math.abs(a[0]-b[0]),Math.abs(a[1]-b[1]))*.25);
+      return {left:x-radius,right:x+radius,top:y-radius*.55,bottom:y+radius*.55};
+    });
     const canvasRect = gl.domElement.getBoundingClientRect();
     const shell = gl.domElement.closest('.commercial-map-shell, .public-map-shell, [data-interior-qa-shell]') ?? host;
     shell?.querySelectorAll<HTMLElement>(OBSTRUCTIONS).forEach(element => {
-      if (!element.getClientRects().length || element.hidden) return;
+      if (!element.getClientRects().length || element.hidden || getComputedStyle(element).visibility === 'hidden') return;
       const rect = element.getBoundingClientRect();
       obstacles.push({ left: rect.left - canvasRect.left, right: rect.right - canvasRect.left, top: rect.top - canvasRect.top, bottom: rect.bottom - canvasRect.top });
     });
     for (const dimension of dimensions) {
       const node = nodes.current.get(dimension.id);
       if (!node) continue;
-      const result = layoutDimensionOnScreen({ dimension, start: project(...dimension.startPoint), end: project(...dimension.endPoint), modulePixels, width: size.width, height: size.height, obstacles, previouslyVisible: visible.current.has(dimension.id) });
+      const start=project(...dimension.startPoint), end=project(...dimension.endPoint);
+      if (commercialMapDiagnosticsEnabled) {
+        node.dataset.planAnchorX=String((start[0]+end[0])/2);
+        node.dataset.planAnchorY=String((start[1]+end[1])/2);
+      }
+      const result = layoutDimensionOnScreen({ dimension, start, end,
+        sidePoint: dimension.labelSidePoint && project(...dimension.labelSidePoint), modulePixels, width: size.width, height: size.height,
+        obstacles: [...lotObstacles.filter(rect => !(dimension.anchor.kind === 'lot-edge' && dimension.anchor.placement === 'inside' && rect.number === dimension.ownerNumber)), ...obstacles], previouslyVisible: visible.current.has(dimension.id) });
       node.style.display = result ? '' : 'none';
       if (!result) { visible.current.delete(dimension.id); continue; }
       visible.current.add(dimension.id);

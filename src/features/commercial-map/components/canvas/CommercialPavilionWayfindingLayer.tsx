@@ -20,7 +20,8 @@ import { ArrowRightLeft, ArrowUpDown, LogIn, LogOut, ShieldAlert } from 'lucide-
 import * as THREE from 'three';
 import './pavilion-wayfinding.css';
 import { COMMERCIAL_MAP_OBSTRUCTION_SELECTOR } from '../../utils/contextualViewport';
-import { dimensionRectsOverlap, type DimensionScreenRect } from '../../utils/pavilionDimensions';
+import { type DimensionScreenRect } from '../../utils/pavilionDimensions';
+import { layoutPavilionAccess } from '../../utils/pavilionAccessVisibility';
 import { createCommercialPavilionModuleProjectionFrame, projectCommercialPavilionModuleRect, type CommercialPavilionLocalRect } from '../../utils/commercialPavilionModules';
 import type { MapEntity } from '../../types';
 import type { CommercialPavilionLayout } from '../../utils/commercialPavilions';
@@ -207,41 +208,60 @@ function PavilionAccessMarker({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const markerGroupRef = useRef<THREE.Group>(null);
   const iconRef = useRef<HTMLSpanElement>(null);
+  const leaderRef = useRef<SVGLineElement>(null);
   const arrowPoints = useMemo(() => [new THREE.Vector3(), new THREE.Vector3()], []);
   const htmlRef = useRef<HTMLDivElement>(null);
   const lastPointerType = useRef('');
   const [hovered, setHovered] = useState(false);
   const open = hovered || active;
+  const lastProjection = useRef('');
+  useEffect(() => {
+    const dirty = () => { lastProjection.current = ''; };
+    window.addEventListener('commercial-map-panel-resize', dirty);
+    return () => window.removeEventListener('commercial-map-panel-resize', dirty);
+  }, []);
 
   useFrame(({ camera, size, gl }) => {
     if (!markerGroupRef.current || !iconRef.current || !buttonRef.current) return;
     camera.updateMatrixWorld();
     markerGroupRef.current.updateWorldMatrix(true, false);
+    const signature=[size.width,size.height,open,...camera.matrixWorld.elements,...camera.projectionMatrix.elements,...markerGroupRef.current.matrixWorld.elements].join(',');
+    if (signature === lastProjection.current) return;
+    lastProjection.current=signature;
     const [origin, normal] = arrowPoints;
-    origin.set(0, layout.interior.floorY + 0.05, 0).applyMatrix4(markerGroupRef.current.matrixWorld).project(camera);
+    origin.set(marker.position[0]-x, layout.interior.floorY + 0.05, marker.position[1]-z).applyMatrix4(markerGroupRef.current.matrixWorld).project(camera);
     const px = (origin.x + 1) * size.width / 2, py = (1 - origin.y) * size.height / 2;
-    const box = { left: px - 22, right: px + 22, top: py - 22, bottom: py + 22 };
-    let hidden = origin.z < -1 || origin.z > 1 || box.left < 0 || box.right > size.width || box.top < 0 || box.bottom > size.height;
-    // Avoid targets over module numbers/lot picking. Hidden markers have no hit
-    // box; the physical threshold meshes remain informative and noninteractive.
+    const obstacles: DimensionScreenRect[] = [];
     const parent = markerGroupRef.current.parent;
-    if (!hidden && parent) for (const rect of protectedRects) {
+    if (parent) for (const rect of protectedRects) {
       const bounds: DimensionScreenRect = { left:Infinity, top:Infinity, right:-Infinity, bottom:-Infinity };
       for (const [dx, dz] of [[-1,-1],[1,-1],[1,1],[-1,1]]) {
         normal.set(rect.centerX + dx * rect.width / 2, layout.interior.floorY + 0.05, rect.centerZ + dz * rect.depth / 2).applyMatrix4(parent.matrixWorld).project(camera);
         const x = (normal.x+1)*size.width/2, y=(1-normal.y)*size.height/2;
         bounds.left=Math.min(bounds.left,x); bounds.right=Math.max(bounds.right,x); bounds.top=Math.min(bounds.top,y); bounds.bottom=Math.max(bounds.bottom,y);
       }
-      if (dimensionRectsOverlap(box,bounds,2)) { hidden=true; break; }
+      obstacles.push(bounds);
     }
     const canvasRect=gl.domElement.getBoundingClientRect();
     const shell=gl.domElement.closest('.public-map-shell, .commercial-map-shell') ?? gl.domElement.parentElement;
-    if (!hidden) shell?.querySelectorAll<HTMLElement>(`${COMMERCIAL_MAP_OBSTRUCTION_SELECTOR}, [data-commercial-map-interior-controls]`).forEach(element => {
+    shell?.querySelectorAll<HTMLElement>(`${COMMERCIAL_MAP_OBSTRUCTION_SELECTOR}, [data-commercial-map-interior-controls]`).forEach(element => {
       if(!element.getClientRects().length) return;
       const rect=element.getBoundingClientRect();
-      if(dimensionRectsOverlap(box,{left:rect.left-canvasRect.left,right:rect.right-canvasRect.left,top:rect.top-canvasRect.top,bottom:rect.bottom-canvasRect.top},4)) hidden=true;
+      obstacles.push({left:rect.left-canvasRect.left-4,right:rect.right-canvasRect.left+4,top:rect.top-canvasRect.top-4,bottom:rect.bottom-canvasRect.top+4});
     });
-    buttonRef.current.style.visibility = hidden ? 'hidden' : '';
+    const outwardX=marker.edge==='left'?-1:marker.edge==='right'?1:0;
+    const outwardZ=marker.edge==='rear'?-1:marker.edge==='front'?1:0;
+    normal.set(marker.position[0]-x+outwardX, layout.interior.floorY+.05, marker.position[1]-z+outwardZ)
+      .applyMatrix4(markerGroupRef.current.matrixWorld).project(camera);
+    const badge = origin.z < -1 || origin.z > 1 ? null : layoutPavilionAccess([px,py],
+      [(normal.x-origin.x)*size.width, -(normal.y-origin.y)*size.height],size,obstacles);
+    buttonRef.current.style.visibility = badge ? '' : 'hidden';
+    if (badge) {
+      buttonRef.current.style.width=buttonRef.current.style.height=`${badge.size}px`;
+      buttonRef.current.style.transform=`translate(${badge.dx}px, ${badge.dy}px)`;
+      leaderRef.current?.setAttribute('x1',String(badge.size/2-badge.dx));
+      leaderRef.current?.setAttribute('y1',String(badge.size/2-badge.dy));
+    }
     if (!marker.orientToWall) return;
     origin.set(0, 0, 0).applyMatrix4(markerGroupRef.current.matrixWorld).project(camera);
     normal.set(frontOrRear ? 0 : 1, 0, frontOrRear ? 1 : 0)
@@ -340,7 +360,7 @@ function PavilionAccessMarker({
       />
       <Html
         ref={htmlRef}
-        position={[0, layout.interior.floorY + 0.05, 0]}
+        position={[marker.position[0]-x, layout.interior.floorY + 0.05, marker.position[1]-z]}
         center
         eps={0.001}
         zIndexRange={open ? ACTIVE_MARKER_Z_INDEX_RANGE : MARKER_Z_INDEX_RANGE}
@@ -368,6 +388,7 @@ function PavilionAccessMarker({
           onDoubleClick={(event) => event.stopPropagation()}
           onClick={handleClick}
         >
+          <svg className="commercial-pavilion-access-leader" aria-hidden="true"><line ref={leaderRef} x2="50%" y2="50%" /></svg>
           <span ref={iconRef} className="commercial-pavilion-access-marker-icon" aria-hidden="true">
             <WayfindingIcon kind={marker.kind} />
           </span>

@@ -32,6 +32,7 @@ jobs:
           src/test/commercialMapSceneShaderWarmup.test.ts
           src/test/commercialMapPavilionWayfinding.test.ts
           src/test/commercialMapPavilionDimensions.test.ts
+          src/test/commercialMapPavilionEdgeDimensions.test.ts
           src/test/commercialMapInteriorView.test.tsx
           src/test/commercialMapInteractiveBoot.test.tsx
           src/test/commercialMapRendererHealth.test.tsx

@@ -26,6 +26,7 @@
   outline: none;
 }
 .commercial-pavilion-access-marker-icon {
+  position: relative;
   display: grid;
   width: 30px;
   height: 30px;
@@ -47,7 +48,9 @@
   box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--access-accent), 0 4px 10px rgba(15, 35, 25, .2);
 }
 .commercial-pavilion-access-marker[aria-disabled="true"] { cursor: default; }
-.commercial-pavilion-access-marker[aria-disabled="true"] .commercial-pavilion-access-marker-icon { opacity: .62; }
+.commercial-pavilion-access-marker[aria-disabled="true"] .commercial-pavilion-access-marker-icon { opacity: 1; }
+.commercial-pavilion-access-leader { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.commercial-pavilion-access-leader line { stroke: var(--access-accent); stroke-width: 1.5; }
 .commercial-pavilion-access-marker.is-entrance {
   --access-accent: #16815c;
   --access-accent-soft: #1f9469;
