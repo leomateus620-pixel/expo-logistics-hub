@@ -461,6 +461,13 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     || permissions.canViewMapAnalytics;
   if (!isPreview && mapQuery.isLoading) return <MapPageSkeleton />;
   if (!data) {
+    const commissionFailure = isCommissionScope
+      ? /MAP_PERMISSION_DENIED|42501|403/i.test(String(mapQuery.error ?? ''))
+        ? 'Seu acesso a este segmento não pôde ser confirmado.'
+        : /57014|timeout|failed to fetch|network/i.test(String(mapQuery.error ?? ''))
+          ? 'A conexão demorou a responder. Tente novamente.'
+          : 'Não foi possível carregar os dados deste segmento. Tente novamente.'
+      : null;
     return (
       <section className="commercial-map-shell" aria-label="Falha ao carregar o mapa comercial">
         <div className="commercial-map-page-error" role="alert">
@@ -468,7 +475,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
           <span>
             <strong>{isCommissionScope ? 'Segmento comercial indisponível' : 'Não foi possível sincronizar o mapa'}</strong>
             {isCommissionScope
-              ? 'A configuração persistida ou a autorização desta comissão não pôde ser confirmada. Nenhum dado do parque completo foi carregado.'
+              ? commissionFailure
               : 'A base local não substituiu silenciosamente uma falha de rede ou permissão. Tente novamente após verificar sua conexão.'}
           </span>
           <Button onClick={() => mapQuery.refetch()} disabled={mapQuery.isFetching}><RefreshCw className={mapQuery.isFetching ? 'animate-spin' : ''} />Tentar novamente</Button>

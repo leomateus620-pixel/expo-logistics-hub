@@ -228,7 +228,7 @@ export interface CommercialMapData {
   layers: MapLayer[];
   entities: MapEntity[];
   lots: CommercialLot[];
-  /** Commission scope only: off-segment park geometry for visit mode (never commercial data). */
+  /** Commission scope only: off-segment park geometry for normal and visit views (never commercial data). */
   parkContextEntities?: MapEntity[];
   scope?: {
     mode: 'full' | 'commission';

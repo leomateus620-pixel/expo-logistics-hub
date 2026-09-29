@@ -56,6 +56,10 @@
 .commercial-map-page-error > svg { width: 24px; height: 24px; color: #ad601d; }
 .commercial-map-page-error span { display: flex; flex-direction: column; gap: 3px; color: var(--map-muted); font-size: 12px; }
 .commercial-map-page-error strong { color: var(--map-ink); font-size: 14px; }
+@media (max-width: 640px) {
+  .commercial-map-page-error { grid-template-columns: auto minmax(0, 1fr); width: min(100% - 32px, 420px); }
+  .commercial-map-page-error > button { grid-column: 1 / -1; width: 100%; }
+}
 
 .commercial-map-command-header {
   position: relative;
