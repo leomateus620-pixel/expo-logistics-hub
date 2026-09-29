@@ -143,6 +143,22 @@ async function fetchAllRows(buildQuery: () => any, stage: string, context: MapRe
   }
 }
 
+/** Keep PostgREST URL filters bounded for large commission segments. */
+async function fetchCommissionRowsByEntity(
+  entityIds: readonly string[], stage: string, context: MapReadContext,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  buildQuery: (ids: string[]) => any,
+): Promise<{ data: any[] | null; error: any }> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rows: any[] = [];
+  for (let offset = 0; offset < entityIds.length; offset += 100) {
+    const result = await fetchAllRows(() => buildQuery(entityIds.slice(offset, offset + 100)), `${stage}:${offset}`, context);
+    if (result.error) return result;
+    rows.push(...(result.data ?? []));
+  }
+  return { data: rows, error: null };
+}
+
 function isMissingMapInfrastructure(error: { code?: string; message?: string }): boolean {
   return error.code === '42P01'
     || error.code === 'PGRST205'
@@ -478,21 +494,20 @@ async function fetchCommissionCommercialMap(
   if (entityRows.length === 0) throw commissionMapError('MAP_SEGMENT_EMPTY');
 
   const entityIds = entityRows.map((entity) => entity.id);
-  const layerIds = [...new Set(entityRows.map((entity) => entity.layer_id))];
-  const [layersResult, geometriesResult, lotsResult] = await Promise.all([
-    mapRequest(db.from('map_layers').select('*').eq('project_id', project.id).in('id', layerIds).order('sort_order'), context),
-    fetchAllRows(() => db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true).in('entity_id', entityIds), 'commission-geometries', context),
-    fetchAllRows(() => db.from('commercial_lots').select(`
+  const [geometriesResult, lotsResult, parkContextResult] = await Promise.all([
+    fetchCommissionRowsByEntity(entityIds, 'commission-geometries', context, (ids) => db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true).in('entity_id', ids)),
+    fetchCommissionRowsByEntity(entityIds, 'commission-lots', context, (ids) => db.from('commercial_lots').select(`
       *,
       lot_prices(is_active, pricing_mode, base_price, price_per_sqm, asking_price, minimum_price),
       lot_reservations(status, company_name, expires_at, responsible_name),
       lot_negotiations(status, company_name, contact_name),
       lot_sales(status, buyer_name, sale_date, salesperson_name, contract_number),
       lot_contracts(is_active, contract_number)
-    `).eq('project_id', project.id).is('archived_at', null).in('entity_id', entityIds), 'commission-lots', context),
+    `).eq('project_id', project.id).is('archived_at', null).in('entity_id', ids)),
+    mapRequest(db.rpc('commission_map_park_context', { p_segment_id: segment.id }), context),
   ]);
 
-  const firstError = [layersResult, geometriesResult, lotsResult]
+  const firstError = [geometriesResult, lotsResult, parkContextResult]
     .find((result) => result.error)?.error;
   if (firstError) throw firstError;
 
@@ -516,17 +531,9 @@ async function fetchCommissionCommercialMap(
     throw commissionMapError('MAP_SEGMENT_INVENTORY_MISMATCH');
   }
 
-  const [logoUrls, parkContextResult] = await Promise.all([
-    fetchSaleLogoUrls({ projectId: project.id }),
-    // Contexto do parque para o modo visita: somente formas e estruturas,
-    // sem lotes, preços ou compradores de outros segmentos.
-    mapRequest(db.rpc('commission_map_park_context', { p_segment_id: segment.id }), context),
-  ]);
-  if (parkContextResult.error) throw parkContextResult.error;
+  const logoUrls = await fetchSaleLogoUrls({ projectId: project.id });
   const parkContext = (parkContextResult?.data ?? null) as { layers?: LayerRow[]; entities?: MapEntity[] } | null;
-  const scopedLayers = (layersResult.data ?? []).map(mapLayer);
-  const knownLayerIds = new Set(scopedLayers.map((layer) => layer.id));
-  const contextLayers = (parkContext?.layers ?? []).map(mapLayer).filter((layer) => !knownLayerIds.has(layer.id));
+  const contextLayers = (parkContext?.layers ?? []).map(mapLayer);
   const parkContextEntities = (parkContext?.entities ?? []).map((entity) => ({
     ...entity,
     segmentId: null,
@@ -542,7 +549,7 @@ async function fetchCommissionCommercialMap(
     // A calibration may reference the complete park plan. Commission scopes
     // deliberately omit it so the API response cannot reveal off-segment geometry.
     calibration: null,
-    layers: [...scopedLayers, ...contextLayers],
+    layers: contextLayers,
     entities,
     lots: lotRows.map(row => ({ ...mapLot(row), saleLogoUrl: row.status === 'SOLD' ? logoUrls[row.id] ?? null : null })),
     scope: {
