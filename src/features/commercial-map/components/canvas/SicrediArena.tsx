@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { ARENA_CANONICAL_LAYOUT } from '../../data/arenaCanonicalLayout';
 import { createArenaArchitecture } from '../../utils/arenaArchitecture';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
+import { ArenaRoofBrand } from './ArenaRoofBrand';
 
 const NO_RAYCAST = () => undefined;
 interface Props {
@@ -47,6 +48,7 @@ export function SicrediArena({bounds,materials,showDetail,reducedGraphics}:Props
     <mesh name="arena-columns-purlins" geometry={geometry.structure} material={materials.metal} castShadow={!reducedGraphics} receiveShadow raycast={NO_RAYCAST}/>
     <mesh name="arena-mounted-sign-backing" geometry={geometry.signBacking} material={materials.green} raycast={NO_RAYCAST}/>
     <mesh name="arena-mounted-sign-lettering" geometry={geometry.signFace} material={identity.material} raycast={NO_RAYCAST}/>
+    <ArenaRoofBrand width={bounds.width} depth={bounds.depth} />
     <lineSegments name="arena-interior-court" geometry={geometry.courtLines} material={identity.marking} visible={showDetail} raycast={NO_RAYCAST}/>
     <lineSegments name="arena-roof-sheet-joints" geometry={geometry.seams} material={identity.seam} visible={showDetail && !reducedGraphics} raycast={NO_RAYCAST}/>
   </group>;

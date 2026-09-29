@@ -98,7 +98,12 @@ async def main():
                 (output / f'{stem}-progress.json').write_text(json.dumps(report, indent=2))
                 if report['errors'] or state.get('boot', {}).get('failed'):
                     raise AssertionError('Runtime failed while hydrating; see progress report')
-                if all(f'hydrate:{layer}:end' in marks for layer in REQUIRED_LAYERS):
+                # Current canonical layers mount as EssentialSceneLayer. Older
+                # baseline revisions still use the deferred hydration marks.
+                essential_ready = {layer['name'] for layer in state.get('layers', [])
+                                   if layer['visible'] and layer['ancestorsVisible']}
+                if all(f'hydrate:{layer}:end' in marks or f'essential-{layer}' in essential_ready
+                       for layer in REQUIRED_LAYERS):
                     ready = True
                     break
                 if time.monotonic() - last_progress > 90:
@@ -107,9 +112,9 @@ async def main():
             if not ready:
                 raise AssertionError('Required Arena/environment layers not hydrated within the QA budget')
             report['hydratedMs'] = round((time.monotonic()-start)*1000)
-            required_names = {f'progressive-{layer}' for layer in REQUIRED_LAYERS}
             visible = {layer['name'] for layer in state['layers'] if layer['visible'] and layer['ancestorsVisible']}
-            if not required_names <= visible:
+            if not all(f'progressive-{layer}' in visible or f'essential-{layer}' in visible
+                       for layer in REQUIRED_LAYERS):
                 raise AssertionError('A required layer is still hidden')
             if args.phase == 'after':
                 roots = [layer for layer in state['layers'] if layer['name'] == 'arena-sicredi-icatu-canonical']

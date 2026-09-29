@@ -27,6 +27,13 @@ export function TerritoryQa() {
     const receive = (event: Event) => {
       if (!controls) return;
       const request = (event as CustomEvent).detail;
+      // Read-only local A/B render-cost audit; never touches entity/store data.
+      if (typeof request.roofBrandVisible === 'boolean') {
+        const branding = scene.getObjectByName('arena-fenasoja-roof-brand');
+        if (branding) branding.visible = request.roofBrandVisible;
+        invalidate();
+        return;
+      }
       if (request.inspectSpatial) {
         const geometries = new Set<import('three').BufferGeometry>();
         const materials = new Set<import('three').Material>();
@@ -67,7 +74,7 @@ export function TerritoryQa() {
         scene.updateMatrixWorld(true);
         const layers: unknown[] = [];
         scene.traverse(object => {
-          if (!/progressive-|arena|mirante|sicredi/i.test(object.name)) return;
+          if (!/progressive-|essential-|arena|mirante|sicredi/i.test(object.name)) return;
           const mesh = object as Mesh & { count?: number };
           layers.push({ name: object.name, visible: object.visible,
             ancestorsVisible: (() => { let parent = object.parent; while(parent) { if(!parent.visible) return false; parent=parent.parent; } return true; })(),
