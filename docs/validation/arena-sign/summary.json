@@ -1,0 +1,2068 @@
+{
+  "baseCommit": "4294ddbb52f84c6784d4e2eb0ed890cf667a2eaf",
+  "method": "Existing map diagnostics fixture, HIGH quality, post pipeline warmed; mobile is desktop Chrome emulation. Same-scene A/B toggles only branding visibility.",
+  "runs": {
+    "before-desktop": {
+      "status": "passed",
+      "browser": "154.0.8037.58",
+      "mobileEmulation": false,
+      "capturedAt": "2026-09-29T11:02:40.892Z",
+      "fullLocalReportSha256": "92f2955117ffa792de39ee53826700e42bd19f9a6753e80626cb3b7236f9bdbe",
+      "errors": [],
+      "views": {
+        "day-overview": {
+          "camera": [
+            28.99,
+            48,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 550,
+            "triangles": 964899,
+            "geometries": 356,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "day-aerial": {
+          "camera": [
+            38.11,
+            22,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 101,
+            "triangles": 469130,
+            "geometries": 356,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "day-front": {
+          "camera": [
+            23,
+            6.8,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 109,
+            "triangles": 484472,
+            "geometries": 360,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "day-rear": {
+          "camera": [
+            53,
+            6.8,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 649,
+            "triangles": 703803,
+            "geometries": 539,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "day-left": {
+          "camera": [
+            37,
+            12,
+            -20
+          ],
+          "renderer": {
+            "calls": 172,
+            "triangles": 495653,
+            "geometries": 554,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "day-right": {
+          "camera": [
+            37,
+            12,
+            13
+          ],
+          "renderer": {
+            "calls": 144,
+            "triangles": 525005,
+            "geometries": 557,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "day-oblique": {
+          "camera": [
+            25,
+            15,
+            9
+          ],
+          "renderer": {
+            "calls": 135,
+            "triangles": 494789,
+            "geometries": 558,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "day-close": {
+          "camera": [
+            29,
+            7.2,
+            1
+          ],
+          "renderer": {
+            "calls": 108,
+            "triangles": 492200,
+            "geometries": 558,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-overview": {
+          "camera": [
+            28.99,
+            48,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 239,
+            "triangles": 620722,
+            "geometries": 548,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-aerial": {
+          "camera": [
+            38.11,
+            22,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 106,
+            "triangles": 495320,
+            "geometries": 548,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-front": {
+          "camera": [
+            23,
+            6.8,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 114,
+            "triangles": 510662,
+            "geometries": 548,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-rear": {
+          "camera": [
+            53,
+            6.8,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 663,
+            "triangles": 733681,
+            "geometries": 563,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-left": {
+          "camera": [
+            37,
+            12,
+            -20
+          ],
+          "renderer": {
+            "calls": 179,
+            "triangles": 521891,
+            "geometries": 563,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-right": {
+          "camera": [
+            37,
+            12,
+            13
+          ],
+          "renderer": {
+            "calls": 149,
+            "triangles": 551195,
+            "geometries": 563,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-oblique": {
+          "camera": [
+            25,
+            15,
+            9
+          ],
+          "renderer": {
+            "calls": 140,
+            "triangles": 520979,
+            "geometries": 563,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-close": {
+          "camera": [
+            29,
+            7.2,
+            1
+          ],
+          "renderer": {
+            "calls": 132,
+            "triangles": 518409,
+            "geometries": 564,
+            "textures": 131
+          },
+          "ready": true
+        }
+      },
+      "arena": [
+        {
+          "name": "arena-sicredi-icatu-canonical",
+          "visible": true,
+          "ancestorsVisible": true,
+          "bounds": {
+            "isBox3": true,
+            "min": {
+              "x": 33.55636358434504,
+              "y": 0.016999999850988386,
+              "z": -7.020403477685108
+            },
+            "max": {
+              "x": 42.68164777929133,
+              "y": 2.2215573329925538,
+              "z": -0.13596019460405184
+            }
+          },
+          "userData": {
+            "revision": "2026.9-arena-canonical.1",
+            "canonicalFootprint": [
+              4888,
+              2653.27734375,
+              5306.2421875,
+              2968.72265625
+            ],
+            "openFront": true,
+            "openRear": true
+          },
+          "triangles": null
+        }
+      ],
+      "performance": [
+        {
+          "frames": 195,
+          "meanMs": 30.962051281562218,
+          "p95Ms": 39.09999990463257,
+          "renderer": {
+            "at": 64719.60000014305,
+            "calls": 142,
+            "triangles": 489067,
+            "geometries": 566,
+            "textures": 131,
+            "programs": 211,
+            "dpr": 0.9,
+            "width": 1296,
+            "height": 810,
+            "heapBytes": 194588202,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 1427,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 209,
+          "meanMs": 28.83540669810829,
+          "p95Ms": 32.90000009536743,
+          "renderer": {
+            "at": 71722.80000019073,
+            "calls": 142,
+            "triangles": 489067,
+            "geometries": 566,
+            "textures": 131,
+            "programs": 214,
+            "dpr": 0.9,
+            "width": 1296,
+            "height": 810,
+            "heapBytes": 216515196,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 1666,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 213,
+          "meanMs": 28.284507042925124,
+          "p95Ms": 31.100000143051147,
+          "renderer": {
+            "at": 78819.10000014305,
+            "calls": 143,
+            "triangles": 489307,
+            "geometries": 566,
+            "textures": 131,
+            "programs": 217,
+            "dpr": 0.9,
+            "width": 1296,
+            "height": 810,
+            "heapBytes": 214885614,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 1910,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        }
+      ],
+      "medianMeanMs": 28.83540669810829,
+      "final": {
+        "renderer": {
+          "at": 84385.90000009537,
+          "calls": 154,
+          "triangles": 494808,
+          "geometries": 567,
+          "textures": 131,
+          "programs": 224,
+          "dpr": 1,
+          "width": 1440,
+          "height": 900,
+          "heapBytes": 207253620,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "canvasMounts": 1,
+        "activeCanvases": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeControls": 1,
+        "contextLost": 0,
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 2038,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "overflow": false
+      }
+    },
+    "before-mobile": {
+      "status": "passed",
+      "browser": "154.0.8037.58",
+      "mobileEmulation": true,
+      "capturedAt": "2026-09-29T11:03:55.519Z",
+      "fullLocalReportSha256": "9fa639cc2fbc55da622ed6f29217de0b9e821e2e6d81591c4bd8fee8e3f9fc65",
+      "errors": [],
+      "views": {
+        "day-overview": {
+          "camera": [
+            28.983499999999996,
+            79.19999999999999,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 526,
+            "triangles": 875421,
+            "geometries": 354,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "day-aerial": {
+          "camera": [
+            38.103500000000004,
+            35.584999999999994,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 96,
+            "triangles": 449516,
+            "geometries": 354,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "day-front": {
+          "camera": [
+            13.172000000000004,
+            9.79,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 94,
+            "triangles": 462282,
+            "geometries": 362,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "day-rear": {
+          "camera": [
+            62.672,
+            9.79,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 432,
+            "triangles": 552467,
+            "geometries": 490,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "day-left": {
+          "camera": [
+            36.272,
+            18.76,
+            -30.673000000000002
+          ],
+          "renderer": {
+            "calls": 161,
+            "triangles": 453837,
+            "geometries": 507,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "day-right": {
+          "camera": [
+            36.272,
+            18.76,
+            23.776999999999994
+          ],
+          "renderer": {
+            "calls": 112,
+            "triangles": 479197,
+            "geometries": 513,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "day-oblique": {
+          "camera": [
+            16.472,
+            23.71,
+            17.177
+          ],
+          "renderer": {
+            "calls": 108,
+            "triangles": 480794,
+            "geometries": 514,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "day-close": {
+          "camera": [
+            23.072000000000003,
+            10.19,
+            3.9769999999999994
+          ],
+          "renderer": {
+            "calls": 85,
+            "triangles": 446972,
+            "geometries": 516,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-overview": {
+          "camera": [
+            28.983499999999996,
+            79.19999999999999,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 218,
+            "triangles": 531952,
+            "geometries": 506,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-aerial": {
+          "camera": [
+            38.103500000000004,
+            35.584999999999994,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 101,
+            "triangles": 475706,
+            "geometries": 506,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-front": {
+          "camera": [
+            13.172000000000004,
+            9.79,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 99,
+            "triangles": 488472,
+            "geometries": 506,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-rear": {
+          "camera": [
+            62.672,
+            9.79,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 437,
+            "triangles": 578657,
+            "geometries": 520,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-left": {
+          "camera": [
+            36.272,
+            18.76,
+            -30.673000000000002
+          ],
+          "renderer": {
+            "calls": 166,
+            "triangles": 480027,
+            "geometries": 520,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-right": {
+          "camera": [
+            36.272,
+            18.76,
+            23.776999999999994
+          ],
+          "renderer": {
+            "calls": 117,
+            "triangles": 505387,
+            "geometries": 520,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-oblique": {
+          "camera": [
+            16.472,
+            23.71,
+            17.177
+          ],
+          "renderer": {
+            "calls": 113,
+            "triangles": 506984,
+            "geometries": 520,
+            "textures": 105
+          },
+          "ready": true
+        },
+        "night-close": {
+          "camera": [
+            23.072000000000003,
+            10.19,
+            3.9769999999999994
+          ],
+          "renderer": {
+            "calls": 90,
+            "triangles": 473162,
+            "geometries": 520,
+            "textures": 105
+          },
+          "ready": true
+        }
+      },
+      "arena": [
+        {
+          "name": "arena-sicredi-icatu-canonical",
+          "visible": true,
+          "ancestorsVisible": true,
+          "bounds": {
+            "isBox3": true,
+            "min": {
+              "x": 33.55636358434504,
+              "y": 0.016999999850988386,
+              "z": -7.020403477685108
+            },
+            "max": {
+              "x": 42.68164777929133,
+              "y": 2.2215573329925538,
+              "z": -0.13596019460405184
+            }
+          },
+          "userData": {
+            "revision": "2026.9-arena-canonical.1",
+            "canonicalFootprint": [
+              4888,
+              2653.27734375,
+              5306.2421875,
+              2968.72265625
+            ],
+            "openFront": true,
+            "openRear": true
+          },
+          "triangles": null
+        }
+      ],
+      "performance": [
+        {
+          "frames": 360,
+          "meanMs": 16.666111110978655,
+          "p95Ms": 17.200000047683716,
+          "renderer": {
+            "at": 52941.700000047684,
+            "calls": 123,
+            "triangles": 481175,
+            "geometries": 524,
+            "textures": 131,
+            "programs": 210,
+            "dpr": 0.9,
+            "width": 351,
+            "height": 759,
+            "heapBytes": 175180656,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 1539,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 361,
+          "meanMs": 16.66592797810351,
+          "p95Ms": 17.100000143051147,
+          "renderer": {
+            "at": 59875.799999952316,
+            "calls": 123,
+            "triangles": 481175,
+            "geometries": 524,
+            "textures": 131,
+            "programs": 211,
+            "dpr": 0.9,
+            "width": 351,
+            "height": 759,
+            "heapBytes": 195633299,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 1962,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 361,
+          "meanMs": 16.6664819948561,
+          "p95Ms": 17.200000047683716,
+          "renderer": {
+            "at": 66841.39999985695,
+            "calls": 123,
+            "triangles": 481175,
+            "geometries": 524,
+            "textures": 131,
+            "programs": 212,
+            "dpr": 0.9,
+            "width": 351,
+            "height": 759,
+            "heapBytes": 189157291,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 2387,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        }
+      ],
+      "medianMeanMs": 16.666111110978655,
+      "final": {
+        "renderer": {
+          "at": 72058.29999995232,
+          "calls": 127,
+          "triangles": 480813,
+          "geometries": 522,
+          "textures": 131,
+          "programs": 225,
+          "dpr": 1,
+          "width": 390,
+          "height": 844,
+          "heapBytes": 192647453,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "canvasMounts": 1,
+        "activeCanvases": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeControls": 1,
+        "contextLost": 0,
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 2679,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "overflow": false
+      }
+    },
+    "after-desktop": {
+      "status": "passed",
+      "browser": "154.0.8037.58",
+      "mobileEmulation": false,
+      "capturedAt": "2026-09-29T15:48:38.460Z",
+      "fullLocalReportSha256": "ded51e97b44a015d65dc3a23473e710de3d4ec7da9c50a909ac59a7f6c2d8b62",
+      "errors": [],
+      "views": {
+        "day-overview": {
+          "camera": [
+            29,
+            48,
+            -3.57
+          ],
+          "renderer": {
+            "calls": 251,
+            "triangles": 555839,
+            "geometries": 366,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-aerial": {
+          "camera": [
+            38.12,
+            22,
+            -3.57
+          ],
+          "renderer": {
+            "calls": 126,
+            "triangles": 486271,
+            "geometries": 366,
+            "textures": 133
+          },
+          "ready": true
+        },
+        "day-reference": {
+          "camera": [
+            38.12,
+            18,
+            8
+          ],
+          "renderer": {
+            "calls": 144,
+            "triangles": 533015,
+            "geometries": 366,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-front": {
+          "camera": [
+            23,
+            6.8,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 131,
+            "triangles": 494085,
+            "geometries": 370,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-rear": {
+          "camera": [
+            53,
+            6.8,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 671,
+            "triangles": 713416,
+            "geometries": 542,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-left": {
+          "camera": [
+            37,
+            12,
+            -20
+          ],
+          "renderer": {
+            "calls": 194,
+            "triangles": 505266,
+            "geometries": 558,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-right": {
+          "camera": [
+            37,
+            12,
+            13
+          ],
+          "renderer": {
+            "calls": 166,
+            "triangles": 534618,
+            "geometries": 561,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-oblique": {
+          "camera": [
+            25,
+            15,
+            9
+          ],
+          "renderer": {
+            "calls": 157,
+            "triangles": 504402,
+            "geometries": 562,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-close": {
+          "camera": [
+            29,
+            7.2,
+            1
+          ],
+          "renderer": {
+            "calls": 130,
+            "triangles": 501813,
+            "geometries": 562,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-overview": {
+          "camera": [
+            29,
+            48,
+            -3.57
+          ],
+          "renderer": {
+            "calls": 258,
+            "triangles": 582077,
+            "geometries": 552,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-aerial": {
+          "camera": [
+            38.12,
+            22,
+            -3.57
+          ],
+          "renderer": {
+            "calls": 131,
+            "triangles": 512461,
+            "geometries": 552,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-reference": {
+          "camera": [
+            38.12,
+            18,
+            8
+          ],
+          "renderer": {
+            "calls": 149,
+            "triangles": 559205,
+            "geometries": 552,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-front": {
+          "camera": [
+            23,
+            6.8,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 136,
+            "triangles": 520275,
+            "geometries": 552,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-rear": {
+          "camera": [
+            53,
+            6.8,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 685,
+            "triangles": 743294,
+            "geometries": 567,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-left": {
+          "camera": [
+            37,
+            12,
+            -20
+          ],
+          "renderer": {
+            "calls": 201,
+            "triangles": 531504,
+            "geometries": 567,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-right": {
+          "camera": [
+            37,
+            12,
+            13
+          ],
+          "renderer": {
+            "calls": 171,
+            "triangles": 560808,
+            "geometries": 567,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-oblique": {
+          "camera": [
+            25,
+            15,
+            9
+          ],
+          "renderer": {
+            "calls": 162,
+            "triangles": 530592,
+            "geometries": 567,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-close": {
+          "camera": [
+            29,
+            7.2,
+            1
+          ],
+          "renderer": {
+            "calls": 135,
+            "triangles": 528003,
+            "geometries": 567,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "recovered": {
+          "camera": [
+            25,
+            15,
+            9
+          ],
+          "renderer": {
+            "calls": 138,
+            "triangles": 504383,
+            "geometries": 305,
+            "textures": 106
+          },
+          "ready": true
+        }
+      },
+      "arena": [
+        {
+          "name": "arena-sicredi-icatu-canonical",
+          "visible": true,
+          "ancestorsVisible": true,
+          "bounds": {
+            "isBox3": true,
+            "min": {
+              "x": 33.55636358434504,
+              "y": 0.016999999850988386,
+              "z": -7.020403477685108
+            },
+            "max": {
+              "x": 42.68164777929133,
+              "y": 2.385735942840576,
+              "z": -0.13596019460405184
+            }
+          },
+          "userData": {
+            "revision": "2026.9-arena-canonical.1",
+            "canonicalFootprint": [
+              4888,
+              2653.27734375,
+              5306.2421875,
+              2968.72265625
+            ],
+            "openFront": true,
+            "openRear": true
+          },
+          "triangles": null
+        },
+        {
+          "name": "arena-fenasoja-roof-brand",
+          "visible": true,
+          "ancestorsVisible": true,
+          "bounds": {
+            "isBox3": true,
+            "min": {
+              "x": 34.10388088399714,
+              "y": 2.1725952167510987,
+              "z": -4.4615093202754394
+            },
+            "max": {
+              "x": 42.13926840001887,
+              "y": 2.385735942840576,
+              "z": -2.69485435201372
+            }
+          },
+          "userData": {
+            "officialSymbol": "/alvorada/fenasoja-symbol-official.png",
+            "roofConforming": true,
+            "horizontal": true,
+            "layout": {
+              "length": 8.03025,
+              "wordWidth": 5.8620825000000005,
+              "symbolSize": 1.766655,
+              "gap": 0.40151250000000005,
+              "symbolCenterU": -3.1317975000000002,
+              "wordCenterU": 1.08408375,
+              "rotation": 1.5707963267948966,
+              "relief": 0.137648864327372,
+              "bevel": 0.004473588090639589,
+              "seating": 0.0206473296491058
+            }
+          },
+          "triangles": null
+        },
+        {
+          "name": "arena-brand-letter-faces",
+          "visible": true,
+          "ancestorsVisible": true,
+          "bounds": {
+            "isBox3": true,
+            "min": {
+              "x": 36.272048236673534,
+              "y": 2.2176243801116944,
+              "z": -4.037691953913822
+            },
+            "max": {
+              "x": 42.13413047963923,
+              "y": 2.383327199935913,
+              "z": -3.1186717183753383
+            }
+          },
+          "userData": {},
+          "vertices": 8292,
+          "triangles": 2764
+        },
+        {
+          "name": "arena-brand-relief-edges",
+          "visible": true,
+          "ancestorsVisible": true,
+          "bounds": {
+            "isBox3": true,
+            "min": {
+              "x": 34.12154722387141,
+              "y": 2.1725952167510987,
+              "z": -4.443842801587238
+            },
+            "max": {
+              "x": 42.13926840001887,
+              "y": 2.383327199935913,
+              "z": -2.7125208707019217
+            }
+          },
+          "userData": {},
+          "vertices": 17898,
+          "triangles": 5966
+        },
+        {
+          "name": "arena-brand-official-symbol",
+          "visible": true,
+          "ancestorsVisible": true,
+          "bounds": {
+            "isBox3": true,
+            "min": {
+              "x": 34.10388088399714,
+              "y": 2.3142485160827637,
+              "z": -4.4615093202754394
+            },
+            "max": {
+              "x": 35.87053561384028,
+              "y": 2.385735942840576,
+              "z": -2.69485435201372
+            }
+          },
+          "userData": {},
+          "vertices": 2592,
+          "triangles": 864
+        }
+      ],
+      "performance": [
+        {
+          "frames": 144,
+          "meanMs": 41.829166665673256,
+          "p95Ms": 35.200000047683716,
+          "renderer": {
+            "at": 98725,
+            "calls": 145,
+            "triangles": 498661,
+            "geometries": 569,
+            "textures": 132,
+            "programs": 225,
+            "dpr": 0.9,
+            "width": 1296,
+            "height": 810,
+            "heapBytes": 180133937,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 1944,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 182,
+          "meanMs": 33.042857142595146,
+          "p95Ms": 35,
+          "renderer": {
+            "at": 105790.39999985695,
+            "calls": 145,
+            "triangles": 498661,
+            "geometries": 569,
+            "textures": 132,
+            "programs": 225,
+            "dpr": 0.9,
+            "width": 1296,
+            "height": 810,
+            "heapBytes": 194887210,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 2157,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 183,
+          "meanMs": 32.90054644782686,
+          "p95Ms": 34.799999952316284,
+          "renderer": {
+            "at": 112841.19999980927,
+            "calls": 145,
+            "triangles": 498661,
+            "geometries": 569,
+            "textures": 132,
+            "programs": 225,
+            "dpr": 0.9,
+            "width": 1296,
+            "height": 810,
+            "heapBytes": 181004112,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 2371,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        }
+      ],
+      "medianMeanMs": 33.042857142595146,
+      "sameSceneBaseline": [
+        {
+          "frames": 185,
+          "meanMs": 32.51567567619117,
+          "p95Ms": 34,
+          "renderer": {
+            "at": 119905.29999995232,
+            "calls": 143,
+            "triangles": 489307,
+            "geometries": 569,
+            "textures": 132,
+            "programs": 225,
+            "dpr": 0.9,
+            "width": 1296,
+            "height": 810,
+            "heapBytes": 162265397,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 2588,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 183,
+          "meanMs": 32.959562842311755,
+          "p95Ms": 35.09999990463257,
+          "renderer": {
+            "at": 127008,
+            "calls": 143,
+            "triangles": 489307,
+            "geometries": 569,
+            "textures": 132,
+            "programs": 225,
+            "dpr": 0.9,
+            "width": 1296,
+            "height": 810,
+            "heapBytes": 176397438,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 2804,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 183,
+          "meanMs": 32.967213114754095,
+          "p95Ms": 35.09999990463257,
+          "renderer": {
+            "at": 134065.5,
+            "calls": 142,
+            "triangles": 489067,
+            "geometries": 569,
+            "textures": 132,
+            "programs": 225,
+            "dpr": 0.9,
+            "width": 1296,
+            "height": 810,
+            "heapBytes": 161782192,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 3017,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        }
+      ],
+      "baselineMedianMeanMs": 32.959562842311755,
+      "resources": [
+        {
+          "at": 143960.29999995232,
+          "calls": 157,
+          "triangles": 504402,
+          "geometries": 570,
+          "textures": 132,
+          "programs": 225,
+          "dpr": 1,
+          "width": 1440,
+          "height": 900,
+          "heapBytes": 157668429,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        {
+          "at": 148520.59999990463,
+          "calls": 157,
+          "triangles": 504402,
+          "geometries": 570,
+          "textures": 132,
+          "programs": 225,
+          "dpr": 1,
+          "width": 1440,
+          "height": 900,
+          "heapBytes": 157694032,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      ],
+      "resourceGrowth": {
+        "geometries": 0,
+        "textures": 0,
+        "programs": 0
+      },
+      "final": {
+        "renderer": {
+          "at": 139213.09999990463,
+          "calls": 157,
+          "triangles": 504402,
+          "geometries": 570,
+          "textures": 132,
+          "programs": 225,
+          "dpr": 1,
+          "width": 1440,
+          "height": 900,
+          "heapBytes": 171368583,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "canvasMounts": 1,
+        "activeCanvases": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeControls": 1,
+        "contextLost": 0,
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 3141,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "overflow": false
+      },
+      "recovery": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "contextLost": 1,
+        "contextRestored": 1
+      }
+    },
+    "after-mobile": {
+      "status": "passed",
+      "browser": "154.0.8037.58",
+      "mobileEmulation": true,
+      "capturedAt": "2026-09-29T15:44:31.473Z",
+      "fullLocalReportSha256": "1d9931fb2aeabe18353d6a1cefc13ac4643d3f36654e1fa103ebddd456868c47",
+      "errors": [],
+      "views": {
+        "day-overview": {
+          "camera": [
+            29,
+            79.19999999999999,
+            -3.5635
+          ],
+          "renderer": {
+            "calls": 178,
+            "triangles": 464683,
+            "geometries": 324,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-aerial": {
+          "camera": [
+            38.12,
+            35.584999999999994,
+            -3.5635
+          ],
+          "renderer": {
+            "calls": 115,
+            "triangles": 477651,
+            "geometries": 324,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-reference": {
+          "camera": [
+            38.12,
+            28.984999999999996,
+            15.527
+          ],
+          "renderer": {
+            "calls": 122,
+            "triangles": 488337,
+            "geometries": 324,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-front": {
+          "camera": [
+            13.172000000000004,
+            9.79,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 116,
+            "triangles": 471895,
+            "geometries": 333,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-rear": {
+          "camera": [
+            62.672,
+            9.79,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 454,
+            "triangles": 562080,
+            "geometries": 499,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-left": {
+          "camera": [
+            36.272,
+            18.76,
+            -30.673000000000002
+          ],
+          "renderer": {
+            "calls": 183,
+            "triangles": 463450,
+            "geometries": 515,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-right": {
+          "camera": [
+            36.272,
+            18.76,
+            23.776999999999994
+          ],
+          "renderer": {
+            "calls": 134,
+            "triangles": 488810,
+            "geometries": 521,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-oblique": {
+          "camera": [
+            16.472,
+            23.71,
+            17.177
+          ],
+          "renderer": {
+            "calls": 130,
+            "triangles": 490407,
+            "geometries": 522,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-close": {
+          "camera": [
+            23.072000000000003,
+            10.19,
+            3.9769999999999994
+          ],
+          "renderer": {
+            "calls": 107,
+            "triangles": 456585,
+            "geometries": 524,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-overview": {
+          "camera": [
+            29,
+            79.19999999999999,
+            -3.5635
+          ],
+          "renderer": {
+            "calls": 185,
+            "triangles": 490921,
+            "geometries": 515,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-aerial": {
+          "camera": [
+            38.12,
+            35.584999999999994,
+            -3.5635
+          ],
+          "renderer": {
+            "calls": 120,
+            "triangles": 503841,
+            "geometries": 515,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-reference": {
+          "camera": [
+            38.12,
+            28.984999999999996,
+            15.527
+          ],
+          "renderer": {
+            "calls": 127,
+            "triangles": 514527,
+            "geometries": 515,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-front": {
+          "camera": [
+            13.172000000000004,
+            9.79,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 121,
+            "triangles": 498085,
+            "geometries": 515,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-rear": {
+          "camera": [
+            62.672,
+            9.79,
+            -3.58
+          ],
+          "renderer": {
+            "calls": 459,
+            "triangles": 588270,
+            "geometries": 529,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-left": {
+          "camera": [
+            36.272,
+            18.76,
+            -30.673000000000002
+          ],
+          "renderer": {
+            "calls": 188,
+            "triangles": 489640,
+            "geometries": 529,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-right": {
+          "camera": [
+            36.272,
+            18.76,
+            23.776999999999994
+          ],
+          "renderer": {
+            "calls": 139,
+            "triangles": 515000,
+            "geometries": 529,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-oblique": {
+          "camera": [
+            16.472,
+            23.71,
+            17.177
+          ],
+          "renderer": {
+            "calls": 135,
+            "triangles": 516597,
+            "geometries": 529,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-close": {
+          "camera": [
+            23.072000000000003,
+            10.19,
+            3.9769999999999994
+          ],
+          "renderer": {
+            "calls": 112,
+            "triangles": 482775,
+            "geometries": 529,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "recovered": {
+          "camera": [
+            16.472,
+            23.71,
+            17.177
+          ],
+          "renderer": {
+            "calls": 111,
+            "triangles": 490388,
+            "geometries": 299,
+            "textures": 108
+          },
+          "ready": true
+        }
+      },
+      "arena": [
+        {
+          "name": "arena-sicredi-icatu-canonical",
+          "visible": true,
+          "ancestorsVisible": true,
+          "bounds": {
+            "isBox3": true,
+            "min": {
+              "x": 33.55636358434504,
+              "y": 0.016999999850988386,
+              "z": -7.020403477685108
+            },
+            "max": {
+              "x": 42.68164777929133,
+              "y": 2.385735942840576,
+              "z": -0.13596019460405184
+            }
+          },
+          "userData": {
+            "revision": "2026.9-arena-canonical.1",
+            "canonicalFootprint": [
+              4888,
+              2653.27734375,
+              5306.2421875,
+              2968.72265625
+            ],
+            "openFront": true,
+            "openRear": true
+          },
+          "triangles": null
+        },
+        {
+          "name": "arena-fenasoja-roof-brand",
+          "visible": true,
+          "ancestorsVisible": true,
+          "bounds": {
+            "isBox3": true,
+            "min": {
+              "x": 34.10388088399714,
+              "y": 2.1725952167510987,
+              "z": -4.4615093202754394
+            },
+            "max": {
+              "x": 42.13926840001887,
+              "y": 2.385735942840576,
+              "z": -2.69485435201372
+            }
+          },
+          "userData": {
+            "officialSymbol": "/alvorada/fenasoja-symbol-official.png",
+            "roofConforming": true,
+            "horizontal": true,
+            "layout": {
+              "length": 8.03025,
+              "wordWidth": 5.8620825000000005,
+              "symbolSize": 1.766655,
+              "gap": 0.40151250000000005,
+              "symbolCenterU": -3.1317975000000002,
+              "wordCenterU": 1.08408375,
+              "rotation": 1.5707963267948966,
+              "relief": 0.137648864327372,
+              "bevel": 0.004473588090639589,
+              "seating": 0.0206473296491058
+            }
+          },
+          "triangles": null
+        },
+        {
+          "name": "arena-brand-letter-faces",
+          "visible": true,
+          "ancestorsVisible": true,
+          "bounds": {
+            "isBox3": true,
+            "min": {
+              "x": 36.272048236673534,
+              "y": 2.2176243801116944,
+              "z": -4.037691953913822
+            },
+            "max": {
+              "x": 42.13413047963923,
+              "y": 2.383327199935913,
+              "z": -3.1186717183753383
+            }
+          },
+          "userData": {},
+          "vertices": 8292,
+          "triangles": 2764
+        },
+        {
+          "name": "arena-brand-relief-edges",
+          "visible": true,
+          "ancestorsVisible": true,
+          "bounds": {
+            "isBox3": true,
+            "min": {
+              "x": 34.12154722387141,
+              "y": 2.1725952167510987,
+              "z": -4.443842801587238
+            },
+            "max": {
+              "x": 42.13926840001887,
+              "y": 2.383327199935913,
+              "z": -2.7125208707019217
+            }
+          },
+          "userData": {},
+          "vertices": 17898,
+          "triangles": 5966
+        },
+        {
+          "name": "arena-brand-official-symbol",
+          "visible": true,
+          "ancestorsVisible": true,
+          "bounds": {
+            "isBox3": true,
+            "min": {
+              "x": 34.10388088399714,
+              "y": 2.3142485160827637,
+              "z": -4.4615093202754394
+            },
+            "max": {
+              "x": 35.87053561384028,
+              "y": 2.385735942840576,
+              "z": -2.69485435201372
+            }
+          },
+          "userData": {},
+          "vertices": 2592,
+          "triangles": 864
+        }
+      ],
+      "performance": [
+        {
+          "frames": 361,
+          "meanMs": 16.66565097005744,
+          "p95Ms": 17.200000047683716,
+          "renderer": {
+            "at": 72892.29999995232,
+            "calls": 126,
+            "triangles": 490769,
+            "geometries": 532,
+            "textures": 132,
+            "programs": 226,
+            "dpr": 0.9,
+            "width": 351,
+            "height": 759,
+            "heapBytes": 167027054,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 2704,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 361,
+          "meanMs": 16.665373961350923,
+          "p95Ms": 17.199999809265137,
+          "renderer": {
+            "at": 79824.90000009537,
+            "calls": 126,
+            "triangles": 490769,
+            "geometries": 532,
+            "textures": 132,
+            "programs": 226,
+            "dpr": 0.9,
+            "width": 351,
+            "height": 759,
+            "heapBytes": 186475047,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 3067,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 361,
+          "meanMs": 16.666204986149584,
+          "p95Ms": 17.100000143051147,
+          "renderer": {
+            "at": 86741.59999990463,
+            "calls": 126,
+            "triangles": 490769,
+            "geometries": 532,
+            "textures": 132,
+            "programs": 226,
+            "dpr": 0.9,
+            "width": 351,
+            "height": 759,
+            "heapBytes": 178576728,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 3492,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        }
+      ],
+      "medianMeanMs": 16.66565097005744,
+      "sameSceneBaseline": [
+        {
+          "frames": 361,
+          "meanMs": 16.66592797810351,
+          "p95Ms": 17,
+          "renderer": {
+            "at": 93673.79999995232,
+            "calls": 123,
+            "triangles": 481175,
+            "geometries": 532,
+            "textures": 132,
+            "programs": 226,
+            "dpr": 0.9,
+            "width": 351,
+            "height": 759,
+            "heapBytes": 171188453,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 3917,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 361,
+          "meanMs": 16.665650969397,
+          "p95Ms": 17.09999990463257,
+          "renderer": {
+            "at": 100590.5,
+            "calls": 123,
+            "triangles": 481175,
+            "geometries": 532,
+            "textures": 132,
+            "programs": 226,
+            "dpr": 0.9,
+            "width": 351,
+            "height": 759,
+            "heapBytes": 163336791,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 4340,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 361,
+          "meanMs": 16.66592797810351,
+          "p95Ms": 17.09999990463257,
+          "renderer": {
+            "at": 107507.29999995232,
+            "calls": 123,
+            "triangles": 481175,
+            "geometries": 532,
+            "textures": 132,
+            "programs": 226,
+            "dpr": 0.9,
+            "width": 351,
+            "height": 759,
+            "heapBytes": 181348161,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 4766,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        }
+      ],
+      "baselineMedianMeanMs": 16.66592797810351,
+      "resources": [
+        {
+          "at": 117207.40000009537,
+          "calls": 130,
+          "triangles": 490407,
+          "geometries": 530,
+          "textures": 132,
+          "programs": 226,
+          "dpr": 1,
+          "width": 390,
+          "height": 844,
+          "heapBytes": 186768299,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        {
+          "at": 121823.09999990463,
+          "calls": 130,
+          "triangles": 490407,
+          "geometries": 530,
+          "textures": 132,
+          "programs": 226,
+          "dpr": 1,
+          "width": 390,
+          "height": 844,
+          "heapBytes": 183432164,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      ],
+      "resourceGrowth": {
+        "geometries": 0,
+        "textures": 0,
+        "programs": 0
+      },
+      "final": {
+        "renderer": {
+          "at": 112639.90000009537,
+          "calls": 130,
+          "triangles": 490407,
+          "geometries": 530,
+          "textures": 132,
+          "programs": 226,
+          "dpr": 1,
+          "width": 390,
+          "height": 844,
+          "heapBytes": 193002791,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "canvasMounts": 1,
+        "activeCanvases": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeControls": 1,
+        "contextLost": 0,
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 5057,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "overflow": false
+      },
+      "recovery": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "contextLost": 1,
+        "contextRestored": 1
+      }
+    }
+  }
+}
