@@ -40,7 +40,7 @@ describe('pavement between Pavilions 1, 14 and 12', () => {
         expect(polygonClipping.intersection(surface, polygon(entity.geometry.coordinates)), entity.publicIdentifier).toEqual([]);
       }
     }
-    for (const source of [[2835, 3810], [2997, 3810], [3060, 3810], [3210, 3784], [3360, 3784], [3550, 3783]] as const) {
+    for (const source of [[2700, 4000], [2750, 4130], [2835, 3810], [2997, 3810], [3060, 3810], [3210, 3784], [3360, 3784], [3550, 3783]] as const) {
       expect(contains(PAVILION_COURTYARD.hardscape, point(source)), source.join(',')).toBe(true);
     }
     for (const source of [[3000, 4095], [3210, 4108], [3360, 4065], [3550, 4105]] as const) {

@@ -23,7 +23,9 @@ const snapshot = page => page.evaluate(() => ({
       await page.waitForFunction(() => document.querySelector('[data-visit-hud]')?.dataset.visitPhase === 'active', null, { timeout: 90000 });
       await page.waitForTimeout(1500);
       const report = { device, method: 'Actual keyboard walk from canonical B2 entrance, no pose teleport', start: await snapshot(page), route: [], errors };
-      const targetZ = await page.evaluate(() => window.__benvenutoQa.point([2700, 3800])[1]);
+      // Telemetry publishes at 1 Hz: stop before the desired street center to
+      // allow a final sample interval and deceleration, avoiding the sidewalk.
+      const targetZ = await page.evaluate(() => window.__benvenutoQa.point([2700, 3820])[1]);
       await page.keyboard.down('d');
       for (let step = 0; step < 50; step++) {
         await page.waitForTimeout(1000);

@@ -33,7 +33,15 @@ const cornerX = p1.maxX + gap * 0.55;
 // removed temporary booths (see NON_PERMANENT_REMOVED_IDENTIFIERS_2026),
 // not visible buildings. Only their historical green presentation masks are
 // excepted here; their source records and every pavilion footprint stay intact.
-const retiredFrontageMasks = ['B33', 'B34'] as const;
+// The follow-up screenshot also removes B23's green notch beside the courtyard
+// tree. It is another retired support, not a visible permanent building.
+const retiredFrontageMasks = ['B23', 'B33', 'B34'] as const;
+const avenue = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.find(s => s.id === 'benvenuto-four-lane-axis')!;
+// Terminate on the existing asphalt notch, including the old B23 green edge.
+// Derive the boundary from the rendered avenue; do not invent a road width.
+const courtyardAvenueEdgeZ = Math.min(...avenue.polygon
+  .filter(([x, z]) => x > p14.maxX && x < p12.minX && z >= clinic.maxZ)
+  .map(p => p[1]));
 const protectedPolygons = OFFICIAL_REFERENCE_ENTITIES
   .filter(entity => !['ROAD', 'PEDESTRIAN_PATH', 'LANDSCAPE', 'PARKING'].includes(entity.classification))
   .filter(entity => !retiredFrontageMasks.includes(entity.publicIdentifier as 'B33'))
@@ -66,16 +74,16 @@ const b1RootOpening = root(treePositionB1, b1RootRadius);
 const requested = polygonClipping.union(
   [rectangle(p1.minX, p1.maxZ, cornerX, sidewalkEdgeZ)],
   [rectangle(p1.maxX, treePositionB1[1] - b1RootRadius * 1.6, cornerX, sidewalkEdgeZ)],
-  [rectangle(p14.maxX, p14.minZ, p12.minX, Math.max(p14.maxZ, p12.maxZ))],
+  [rectangle(p14.maxX, p14.minZ, p12.minX, courtyardAvenueEdgeZ)],
   // Annex 5: inner frontage up to actual facades; B4/B6 have narrow thresholds.
   [rectangle(p12.minX, argentina.maxZ, p3.maxX, p12.minZ)],
 );
 const hardscape = polygonClipping.difference(requested,
   ...protectedPolygons, ...roadPolygons, road, polygon(trail.surfacePolygon),
-  ...sidewalks,
+  ...sidewalks, polygon(avenue.polygon),
   [[rootOpening]], [[b1RootOpening]]);
 const occupied = polygonClipping.union(road, hardscape,
-  ...sidewalks, polygon(PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.find(s => s.id === 'benvenuto-four-lane-axis')!.polygon));
+  ...sidewalks, polygon(avenue.polygon));
 const trees = [
   { sourceZoneId: 'pavilions-14-12-courtyard-tree', position: courtyardCenter, radius: rootRadius,
     rootOpening, rotation: 0.35, scale: [1.85, 1.12, 1.85] as const },
@@ -84,9 +92,10 @@ const trees = [
 ];
 
 export const PAVILION_COURTYARD = Object.freeze({
-  revision: '2026.9-benvenuto-pavilion-surfaces.2',
+  revision: '2026.9-benvenuto-pavilion-surfaces.3',
   evidence: ['fdc85e65-5dc2-43b4-a0a8-970c6908e1c3.jpg', '7db5c4bb-32aa-4f1d-93c4-a3a9ae5fdce5.jpg',
-    'c4037d48-20fa-4a38-8292-042506f51f75.jpg'] as const,
+    'c4037d48-20fa-4a38-8292-042506f51f75.jpg',
+    'codex-clipboard-6ab48a88-adaf-4ecb-a7f0-0201f950ebb9.png'] as const,
   anchorIdentifiers: ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B23', 'B34', 'B41', 'ALAMEDA-MERCOSUL'] as const,
   protectedPolygons, officialMeasurements: false,
   retiredFrontageMasks,
