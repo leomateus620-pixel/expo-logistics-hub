@@ -23,15 +23,18 @@ function MountedArenaRoofBrand({ width, depth }: Props) {
     map.generateMipmaps = true; map.needsUpdate = true;
     return {
       map,
-      faces: new THREE.MeshStandardMaterial({ color: '#0b2e43', roughness: 0.32, metalness: 0.16, emissive: '#eef2ef' }),
-      returns: new THREE.MeshStandardMaterial({ color: '#143c48', roughness: 0.4, metalness: 0.32, emissive: '#376779' }),
+      faces: new THREE.MeshStandardMaterial({ color: '#b5dcf4', roughness: 0.46, metalness: 0.06, emissive: '#eef2ef' }),
+      returns: new THREE.MeshStandardMaterial({ color: '#397fad', roughness: 0.4, metalness: 0.32, emissive: '#376779' }),
       symbol: new THREE.MeshStandardMaterial({ map, emissiveMap: map, emissive: '#ffffff', color: '#ffffff',
         alphaTest: 0.035, roughness: 0.46, metalness: 0, depthWrite: true }),
     };
   }, [gl, source]);
   useLayoutEffect(() => {
-    materials.faces.color.set(night ? '#eef2ef' : '#0b2e43');
+    materials.faces.color.set(night ? '#eef2ef' : '#b5dcf4');
+    materials.faces.roughness = night ? 0.32 : 0.46;
+    materials.faces.metalness = night ? 0.16 : 0.06;
     materials.faces.emissiveIntensity = night ? 0.65 : 0;
+    materials.returns.color.set(night ? '#143c48' : '#397fad');
     materials.returns.emissiveIntensity = night ? 0.12 : 0;
     materials.symbol.emissiveIntensity = night ? 0.75 : 0;
     invalidate();

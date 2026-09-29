@@ -15,7 +15,7 @@ Base: `4294ddbb52f84c6784d4e2eb0ed890cf667a2eaf` (origin/main no início do trab
 - Três meshes/draws principais para o conjunto completo: faces das letras, laterais do relevo e símbolo. Sombras usam as luzes já existentes. Nenhuma luz dinâmica, pós-processamento, Canvas, câmera ou controle adicional.
 - Materiais compartilhados entre as letras. Fonte e imagem aproveitam o cache do loader. Somente a cópia da textura pertencente à inscrição é liberada no desmontar.
 - Mipmaps, anisotropia limitada à capacidade da GPU, recorte alpha com depth-write e geometria estável em todas as distâncias. Emissão noturna moderada nas faces e menor nas laterais; a emissão do símbolo usa a própria textura RGB.
-- As letras usam azul profundo durante o dia para contrastar com a cobertura clara e emissão branca suave à noite. As cores do símbolo vêm diretamente da imagem oficial, sem tintura.
+- As letras usam azul gelo `#b5dcf4` durante o dia, próximo do branco, com chanfros e laterais em azul médio `#397fad` para definir o contorno sobre a cobertura clara. O acabamento diurno acetinado (roughness 0,46 / metalness 0,06) evita reflexos metálicos excessivos. À noite, faces, laterais, emissão e acabamento retomam exatamente os valores aprovados. As cores do símbolo vêm diretamente da imagem oficial, sem tintura.
 - A inscrição permanece única e fixa sobre a cobertura; não gira nem muda de escala conforme a câmera. A leitura principal é aérea e inclinada. Em vistas rasantes, a curvatura do próprio telhado oculta naturalmente partes da escrita. Não há placa vertical, pedestal ou estrutura aérea de fixação.
 
 ## Reprodução
@@ -37,16 +37,18 @@ As capturas usam o mesmo Canvas e a mesma cena do mapa. Somente os painéis de d
 
 As duas falhas preexistentes foram reproduzidas sem a implementação: `commercialMapArenaCanonical.test.ts` espera 1692 entidades e encontra 1578; `commercialMapRuntimeStability.test.ts` exige a string histórica `setEditingLot(false);` no painel. O segundo teste e o painel são idênticos entre a base desta branch e o main local onde foi reproduzido. Nenhum snapshot ou painel foi alterado para mascarar essas divergências. Resultados em [tests.json](tests.json) e [baseline-runtime-tests.json](baseline-runtime-tests.json).
 
+O CI espacial também possui duas falhas anteriores, em `commercialMapSpatialBounds` e `commercialMapRearRoadTreeClearance`: [execução da PR anterior incorporada à base](https://github.com/leomateus620-pixel/expo-logistics-hub/actions/runs/36553682105) e [primeira execução desta PR](https://github.com/leomateus620-pixel/expo-logistics-hub/actions/runs/36562525427) registram os mesmos 146 testes aprovados e 2 falhos. Esse resultado é separado dos 111 testes locais selecionados acima.
+
 ### Desempenho observado
 
 Chrome 154, Windows, Intel UHD/D3D11, três janelas por cenário. Valores abaixo são a mediana das médias de intervalo entre frames, não tempo exclusivo de GPU. O A/B oculta somente a inscrição na mesma cena, mantendo câmera, qualidade, programas aquecidos e pipeline.
 
 | Viewport | Sem inscrição (A/B) | Com inscrição | Diferença |
 | --- | --- | --- | --- |
-| Desktop 1440 × 900 | 28,72 ms | 30,17 ms | +1,44 ms / +5,0% |
+| Desktop 1440 × 900 | 31,80 ms | 29,84 ms | Janelas sobrepostas; não indica ganho |
 | Mobile emulado 390 × 844 | 16,6662 ms | 16,6664 ms | Dentro da variação de medição |
 
-O custo geométrico medido é **3 draws e 7.254 triângulos**. Há um pequeno custo de frame no desktop; os resultados não sustentam uma promessa de custo zero ou de 60 FPS nesse equipamento. A rodada antes da implementação mediu 28,84 ms no desktop e 16,67 ms no mobile emulado. Os contadores estabilizados tiveram crescimento 0/0/0 em geometrias/texturas/programas nos dois viewports.
+O custo geométrico medido é **3 draws e 7.254 triângulos**. No desktop, as três médias com inscrição variaram de 29,01 a 33,20 ms; sem inscrição, de 28,76 a 32,47 ms. Esses ensaios curtos em equipamento compartilhado não isolam o custo de GPU nem sustentam uma promessa de ganho, custo zero ou 60 FPS. A rodada antes da implementação mediu 28,84 ms no desktop e 16,67 ms no mobile emulado. Os contadores estabilizados tiveram crescimento 0/0/0 em geometrias/texturas/programas nos dois viewports.
 
 O [resumo dos relatórios](summary.json) conserva métricas, câmeras, GPU, estado do renderer, recuperação e SHA-256 dos relatórios locais completos. O runner regenera os relatórios completos `report.json` junto das capturas. Dispositivos móveis físicos e produção não foram validados por esses ensaios locais.
 
