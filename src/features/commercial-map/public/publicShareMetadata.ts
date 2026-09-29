@@ -36,8 +36,8 @@ function setMeta(selector: string, attribute: string, value: string | null) {
   if (value === null) { matches.forEach(node => node.remove()); return; }
   const node = matches[0] ?? document.createElement('meta');
   if (!matches.length) {
-    const [key, name] = attribute.split(':');
-    node.setAttribute(key, name);
+    const separator = attribute.indexOf(':');
+    node.setAttribute(attribute.slice(0, separator), attribute.slice(separator + 1));
     document.head.append(node);
   }
   node.content = value;
