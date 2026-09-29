@@ -1,0 +1,2862 @@
+{
+  "base": "a259b87e",
+  "unitTests": 183,
+  "browser": "Microsoft Edge / Chromium, Windows, DPR 1",
+  "before": [
+    {
+      "pavilion": 1,
+      "mobile": false,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B1:dimension:north-clearance",
+              "text": "5,40 m"
+            },
+            {
+              "id": "B1:dimension:south-clearance",
+              "text": "5,40 m"
+            }
+          ],
+          "visibleAccesses": 0,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B1:dimension:north-clearance",
+              "text": "5,40 m"
+            },
+            {
+              "id": "B1:dimension:south-clearance",
+              "text": "5,40 m"
+            },
+            {
+              "id": "B1:dimension:island-side",
+              "text": "4,00 m"
+            }
+          ],
+          "visibleAccesses": 3,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B1:dimension:island-side",
+              "text": "4,00 m"
+            }
+          ],
+          "visibleAccesses": 1,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null
+        }
+      ]
+    },
+    {
+      "pavilion": 3,
+      "mobile": false,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B6:dimension:west-aisle",
+              "text": "4,40 m"
+            },
+            {
+              "id": "B6:dimension:east-aisle",
+              "text": "4,40 m"
+            }
+          ],
+          "visibleAccesses": 2,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B6:dimension:west-aisle",
+              "text": "4,40 m"
+            },
+            {
+              "id": "B6:dimension:east-aisle",
+              "text": "4,40 m"
+            },
+            {
+              "id": "B6:dimension:central-aisle",
+              "text": "4,40 m"
+            }
+          ],
+          "visibleAccesses": 6,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B6:dimension:module-frontage",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 0,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null
+        }
+      ]
+    },
+    {
+      "pavilion": 8,
+      "mobile": false,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B4:dimension:west-aisle",
+              "text": "3,35 m"
+            },
+            {
+              "id": "B4:dimension:east-aisle",
+              "text": "3,35 m"
+            },
+            {
+              "id": "B4:dimension:north-clearance",
+              "text": "3,00 m"
+            }
+          ],
+          "visibleAccesses": 0,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B4:dimension:west-aisle",
+              "text": "3,35 m"
+            },
+            {
+              "id": "B4:dimension:east-aisle",
+              "text": "3,35 m"
+            },
+            {
+              "id": "B4:dimension:north-clearance",
+              "text": "3,00 m"
+            }
+          ],
+          "visibleAccesses": 5,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B4:dimension:north-clearance",
+              "text": "3,00 m"
+            }
+          ],
+          "visibleAccesses": 2,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null
+        }
+      ]
+    },
+    {
+      "pavilion": 13,
+      "mobile": false,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [],
+          "visibleAccesses": 4,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [],
+          "visibleAccesses": 4,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        {
+          "view": "detail",
+          "dimensions": [],
+          "visibleAccesses": 2,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null
+        }
+      ]
+    }
+  ],
+  "candidate": [
+    {
+      "pavilion": 1,
+      "mobile": false,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B1:dimension:north-clearance",
+              "text": "5,40 m"
+            },
+            {
+              "id": "B1:dimension:south-clearance",
+              "text": "5,40 m"
+            }
+          ],
+          "visibleAccesses": 4,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 19,
+            "triangles": 9804,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B1:dimension:north-clearance",
+              "text": "5,40 m"
+            },
+            {
+              "id": "B1:dimension:south-clearance",
+              "text": "5,40 m"
+            },
+            {
+              "id": "B1:dimension:island-side",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-0",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-1",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-121-edge-0",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-65-edge-2",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-84-edge-2",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-32-edge-0",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 4,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 19,
+            "triangles": 9804,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B1:dimension:lot-141-edge-4",
+              "text": "1,50 m"
+            },
+            {
+              "id": "B1:dimension:island-side",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-0",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-1",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-65-edge-2",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 2,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 15,
+            "triangles": 9756,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail-zoom",
+          "dimensions": [
+            {
+              "id": "B1:dimension:lot-141-edge-4",
+              "text": "1,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-5",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B1:dimension:island-side",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-0",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-1",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-3",
+              "text": "1,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-65-edge-2",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-64-edge-3",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 2,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 15,
+            "triangles": 9756,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        }
+      ],
+      "warm": {
+        "geometries": 7,
+        "textures": 3,
+        "programs": 9
+      },
+      "final": {
+        "geometries": 7,
+        "textures": 3,
+        "programs": 9
+      }
+    },
+    {
+      "pavilion": 3,
+      "mobile": false,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B6:dimension:west-aisle",
+              "text": "4,40 m"
+            },
+            {
+              "id": "B6:dimension:east-aisle",
+              "text": "4,40 m"
+            }
+          ],
+          "visibleAccesses": 6,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 22,
+            "triangles": 5610,
+            "geometries": 7,
+            "textures": 2,
+            "programs": 8,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B6:dimension:west-aisle",
+              "text": "4,40 m"
+            },
+            {
+              "id": "B6:dimension:east-aisle",
+              "text": "4,40 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-0",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:central-aisle",
+              "text": "4,40 m"
+            },
+            {
+              "id": "B6:dimension:lower-clearance",
+              "text": "4,25 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-4",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-144-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-80-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-202-edge-3",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-135-edge-3",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-71-edge-3",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-152-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-25-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-47-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-44-edge-0",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-39-edge-0",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 6,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 22,
+            "triangles": 5610,
+            "geometries": 7,
+            "textures": 2,
+            "programs": 8,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B6:dimension:lot-36-edge-0",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-4",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-144-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-143-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-80-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-79-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-47-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-44-edge-0",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-39-edge-0",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 3,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 16,
+            "triangles": 5538,
+            "geometries": 7,
+            "textures": 2,
+            "programs": 8,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail-zoom",
+          "dimensions": [
+            {
+              "id": "B6:dimension:lot-36-edge-0",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-1",
+              "text": "2,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-4",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-37-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-39-edge-0",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 1,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 14,
+            "triangles": 5514,
+            "geometries": 7,
+            "textures": 2,
+            "programs": 8,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        }
+      ],
+      "warm": {
+        "geometries": 7,
+        "textures": 2,
+        "programs": 8
+      },
+      "final": {
+        "geometries": 7,
+        "textures": 2,
+        "programs": 8
+      }
+    },
+    {
+      "pavilion": 8,
+      "mobile": false,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B4:dimension:west-aisle",
+              "text": "3,35 m"
+            },
+            {
+              "id": "B4:dimension:east-aisle",
+              "text": "3,35 m"
+            },
+            {
+              "id": "B4:dimension:north-clearance",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:side-depth",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-96-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-23-edge-3",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-21-edge-2",
+              "text": "4,00 m"
+            }
+          ],
+          "visibleAccesses": 5,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 21,
+            "triangles": 3150,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B4:dimension:west-aisle",
+              "text": "3,35 m"
+            },
+            {
+              "id": "B4:dimension:east-aisle",
+              "text": "3,35 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:north-clearance",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:side-depth",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-96-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-23-edge-3",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-21-edge-2",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-20-edge-0",
+              "text": "4,00 m"
+            }
+          ],
+          "visibleAccesses": 5,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 21,
+            "triangles": 3150,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B4:dimension:lot-90-edge-0",
+              "text": "5,50 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-4",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B4:dimension:north-clearance",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-3",
+              "text": "2,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-26-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-96-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-23-edge-3",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-21-edge-2",
+              "text": "4,00 m"
+            }
+          ],
+          "visibleAccesses": 2,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 15,
+            "triangles": 3078,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail-zoom",
+          "dimensions": [
+            {
+              "id": "B4:dimension:lot-90-edge-0",
+              "text": "5,50 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-4",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B4:dimension:north-clearance",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-2",
+              "text": "1,50 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-3",
+              "text": "2,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-31-edge-2",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-26-edge-1",
+              "text": "3,00 m"
+            }
+          ],
+          "visibleAccesses": 1,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 13,
+            "triangles": 3054,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        }
+      ],
+      "warm": {
+        "geometries": 7,
+        "textures": 3,
+        "programs": 9
+      },
+      "final": {
+        "geometries": 7,
+        "textures": 3,
+        "programs": 9
+      }
+    },
+    {
+      "pavilion": 13,
+      "mobile": false,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B5:dimension:west-aisle",
+              "text": "3,90 m"
+            },
+            {
+              "id": "B5:dimension:east-aisle",
+              "text": "3,90 m"
+            },
+            {
+              "id": "B5:dimension:north-clearance",
+              "text": "3,25 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-79-edge-3",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-25-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-82-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-20-edge-3",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 6,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 28,
+            "triangles": 2966,
+            "geometries": 10,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B5:dimension:west-aisle",
+              "text": "3,90 m"
+            },
+            {
+              "id": "B5:dimension:east-aisle",
+              "text": "3,90 m"
+            },
+            {
+              "id": "B5:dimension:north-clearance",
+              "text": "3,25 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-79-edge-3",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-25-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-30-edge-0",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-82-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-20-edge-3",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-88-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-16-edge-2",
+              "text": "3,00 m"
+            }
+          ],
+          "visibleAccesses": 6,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 27,
+            "triangles": 2870,
+            "geometries": 10,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B5:dimension:north-clearance",
+              "text": "3,25 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-79-edge-3",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-25-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-77-edge-0",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-30-edge-0",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-82-edge-1",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 2,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 19,
+            "triangles": 2774,
+            "geometries": 10,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail-zoom",
+          "dimensions": [
+            {
+              "id": "B5:dimension:lot-78-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-79-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-79-edge-3",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-25-edge-2",
+              "text": "3,00 m"
+            }
+          ],
+          "visibleAccesses": 2,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 19,
+            "triangles": 2774,
+            "geometries": 10,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        }
+      ],
+      "warm": {
+        "geometries": 10,
+        "textures": 3,
+        "programs": 9
+      },
+      "final": {
+        "geometries": 10,
+        "textures": 3,
+        "programs": 9
+      }
+    }
+  ],
+  "mobile": [
+    {
+      "pavilion": 1,
+      "mobile": true,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B1:dimension:north-clearance",
+              "text": "5,40 m"
+            },
+            {
+              "id": "B1:dimension:south-clearance",
+              "text": "5,40 m"
+            }
+          ],
+          "visibleAccesses": 4,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 19,
+            "triangles": 9804,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B1:dimension:north-clearance",
+              "text": "5,40 m"
+            },
+            {
+              "id": "B1:dimension:south-clearance",
+              "text": "5,40 m"
+            }
+          ],
+          "visibleAccesses": 4,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 19,
+            "triangles": 9804,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B1:dimension:north-clearance",
+              "text": "5,40 m"
+            },
+            {
+              "id": "B1:dimension:south-clearance",
+              "text": "5,40 m"
+            },
+            {
+              "id": "B1:dimension:island-side",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-0",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-1",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-121-edge-0",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-84-edge-2",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-32-edge-0",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 1,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 19,
+            "triangles": 9804,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail-zoom",
+          "dimensions": [
+            {
+              "id": "B1:dimension:lot-141-edge-4",
+              "text": "1,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-0",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-1",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-2",
+              "text": "3,00 m"
+            }
+          ],
+          "visibleAccesses": 1,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 14,
+            "triangles": 9744,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        }
+      ]
+    },
+    {
+      "pavilion": 3,
+      "mobile": true,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B6:dimension:west-aisle",
+              "text": "4,40 m"
+            },
+            {
+              "id": "B6:dimension:east-aisle",
+              "text": "4,40 m"
+            }
+          ],
+          "visibleAccesses": 6,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 22,
+            "triangles": 5610,
+            "geometries": 7,
+            "textures": 2,
+            "programs": 8,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B6:dimension:west-aisle",
+              "text": "4,40 m"
+            },
+            {
+              "id": "B6:dimension:east-aisle",
+              "text": "4,40 m"
+            }
+          ],
+          "visibleAccesses": 6,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 22,
+            "triangles": 5610,
+            "geometries": 7,
+            "textures": 2,
+            "programs": 8,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B6:dimension:west-aisle",
+              "text": "4,40 m"
+            }
+          ],
+          "visibleAccesses": 4,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 20,
+            "triangles": 5586,
+            "geometries": 7,
+            "textures": 2,
+            "programs": 8,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail-zoom",
+          "dimensions": [
+            {
+              "id": "B6:dimension:lot-36-edge-0",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-1",
+              "text": "2,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-4",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-37-edge-3",
+              "text": "3,00 m"
+            }
+          ],
+          "visibleAccesses": 1,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 12,
+            "triangles": 5490,
+            "geometries": 7,
+            "textures": 2,
+            "programs": 8,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        }
+      ]
+    },
+    {
+      "pavilion": 8,
+      "mobile": true,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B4:dimension:west-aisle",
+              "text": "3,35 m"
+            },
+            {
+              "id": "B4:dimension:east-aisle",
+              "text": "3,35 m"
+            },
+            {
+              "id": "B4:dimension:north-clearance",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:side-depth",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-96-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-23-edge-3",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-21-edge-2",
+              "text": "4,00 m"
+            }
+          ],
+          "visibleAccesses": 5,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 22,
+            "triangles": 3234,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B4:dimension:west-aisle",
+              "text": "3,35 m"
+            },
+            {
+              "id": "B4:dimension:east-aisle",
+              "text": "3,35 m"
+            }
+          ],
+          "visibleAccesses": 5,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 21,
+            "triangles": 3150,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B4:dimension:west-aisle",
+              "text": "3,35 m"
+            },
+            {
+              "id": "B4:dimension:east-aisle",
+              "text": "3,35 m"
+            }
+          ],
+          "visibleAccesses": 5,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 21,
+            "triangles": 3150,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail-zoom",
+          "dimensions": [
+            {
+              "id": "B4:dimension:lot-90-edge-0",
+              "text": "5,50 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-4",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-2",
+              "text": "1,50 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-96-edge-1",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 0,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 11,
+            "triangles": 3030,
+            "geometries": 7,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        }
+      ]
+    },
+    {
+      "pavilion": 13,
+      "mobile": true,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B5:dimension:west-aisle",
+              "text": "3,90 m"
+            },
+            {
+              "id": "B5:dimension:east-aisle",
+              "text": "3,90 m"
+            },
+            {
+              "id": "B5:dimension:north-clearance",
+              "text": "3,25 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-79-edge-3",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-25-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-82-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-20-edge-3",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 6,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 27,
+            "triangles": 2870,
+            "geometries": 10,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B5:dimension:west-aisle",
+              "text": "3,90 m"
+            },
+            {
+              "id": "B5:dimension:east-aisle",
+              "text": "3,90 m"
+            },
+            {
+              "id": "B5:dimension:lot-25-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-30-edge-0",
+              "text": "3,00 m"
+            }
+          ],
+          "visibleAccesses": 4,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 27,
+            "triangles": 2870,
+            "geometries": 10,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B5:dimension:west-aisle",
+              "text": "3,90 m"
+            },
+            {
+              "id": "B5:dimension:east-aisle",
+              "text": "3,90 m"
+            },
+            {
+              "id": "B5:dimension:north-clearance",
+              "text": "3,25 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-79-edge-3",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-82-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-88-edge-2",
+              "text": "3,00 m"
+            }
+          ],
+          "visibleAccesses": 1,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 27,
+            "triangles": 2870,
+            "geometries": 10,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail-zoom",
+          "dimensions": [
+            {
+              "id": "B5:dimension:lot-78-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-79-edge-1",
+              "text": "3,00 m"
+            }
+          ],
+          "visibleAccesses": 1,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 13,
+            "triangles": 2702,
+            "geometries": 10,
+            "textures": 3,
+            "programs": 9,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        }
+      ]
+    }
+  ],
+  "admin": [
+    {
+      "pavilion": 1,
+      "mobile": false,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B1:dimension:north-clearance",
+              "text": "5,40 m"
+            },
+            {
+              "id": "B1:dimension:south-clearance",
+              "text": "5,40 m"
+            },
+            {
+              "id": "B1:dimension:island-side",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-0",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-121-edge-0",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-84-edge-2",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-32-edge-0",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 4,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 18,
+            "triangles": 4890,
+            "geometries": 561,
+            "textures": 104,
+            "programs": 152,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B1:dimension:north-clearance",
+              "text": "5,40 m"
+            },
+            {
+              "id": "B1:dimension:south-clearance",
+              "text": "5,40 m"
+            },
+            {
+              "id": "B1:dimension:island-side",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-0",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-1",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-121-edge-0",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-65-edge-2",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-84-edge-2",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-32-edge-0",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 4,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 18,
+            "triangles": 4890,
+            "geometries": 561,
+            "textures": 104,
+            "programs": 158,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B1:dimension:lot-141-edge-4",
+              "text": "1,50 m"
+            },
+            {
+              "id": "B1:dimension:island-side",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-0",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-1",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-65-edge-2",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 2,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 14,
+            "triangles": 4842,
+            "geometries": 561,
+            "textures": 104,
+            "programs": 183,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail-zoom",
+          "dimensions": [
+            {
+              "id": "B1:dimension:lot-141-edge-4",
+              "text": "1,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-5",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B1:dimension:island-side",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-0",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-1",
+              "text": "4,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-141-edge-3",
+              "text": "1,50 m"
+            },
+            {
+              "id": "B1:dimension:lot-65-edge-2",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B1:dimension:lot-64-edge-3",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 2,
+          "totalAccesses": 4,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 14,
+            "triangles": 4842,
+            "geometries": 561,
+            "textures": 103,
+            "programs": 199,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        }
+      ],
+      "warm": {
+        "geometries": 561,
+        "textures": 103,
+        "programs": 207
+      },
+      "final": {
+        "geometries": 561,
+        "textures": 103,
+        "programs": 207
+      }
+    },
+    {
+      "pavilion": 3,
+      "mobile": false,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B6:dimension:west-aisle",
+              "text": "4,40 m"
+            },
+            {
+              "id": "B6:dimension:east-aisle",
+              "text": "4,40 m"
+            }
+          ],
+          "visibleAccesses": 6,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 22,
+            "triangles": 5610,
+            "geometries": 560,
+            "textures": 103,
+            "programs": 144,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B6:dimension:west-aisle",
+              "text": "4,40 m"
+            },
+            {
+              "id": "B6:dimension:east-aisle",
+              "text": "4,40 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-0",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:central-aisle",
+              "text": "4,40 m"
+            },
+            {
+              "id": "B6:dimension:lower-clearance",
+              "text": "4,25 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-4",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-144-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-143-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-80-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-79-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-135-edge-3",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-71-edge-3",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-152-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-25-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-47-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-44-edge-0",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-39-edge-0",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 6,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 22,
+            "triangles": 5610,
+            "geometries": 560,
+            "textures": 103,
+            "programs": 151,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B6:dimension:lot-36-edge-0",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-4",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-144-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-143-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-80-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-79-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-25-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-47-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-44-edge-0",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-39-edge-0",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 3,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 16,
+            "triangles": 5538,
+            "geometries": 560,
+            "textures": 103,
+            "programs": 175,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail-zoom",
+          "dimensions": [
+            {
+              "id": "B6:dimension:lot-36-edge-0",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-1",
+              "text": "2,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-4",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-36-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-80-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-79-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-37-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B6:dimension:lot-39-edge-0",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 2,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 14,
+            "triangles": 5514,
+            "geometries": 560,
+            "textures": 103,
+            "programs": 188,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        }
+      ],
+      "warm": {
+        "geometries": 560,
+        "textures": 102,
+        "programs": 207
+      },
+      "final": {
+        "geometries": 560,
+        "textures": 102,
+        "programs": 207
+      }
+    },
+    {
+      "pavilion": 8,
+      "mobile": false,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B4:dimension:west-aisle",
+              "text": "3,35 m"
+            },
+            {
+              "id": "B4:dimension:east-aisle",
+              "text": "3,35 m"
+            },
+            {
+              "id": "B4:dimension:north-clearance",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-96-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-23-edge-3",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 5,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 21,
+            "triangles": 3150,
+            "geometries": 560,
+            "textures": 104,
+            "programs": 141,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B4:dimension:lot-90-edge-0",
+              "text": "5,50 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-4",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B4:dimension:side-depth",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-3",
+              "text": "2,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-26-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-96-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-23-edge-3",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-21-edge-2",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-20-edge-0",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B4:dimension:module-frontage",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 5,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 21,
+            "triangles": 3150,
+            "geometries": 560,
+            "textures": 104,
+            "programs": 152,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B4:dimension:lot-90-edge-0",
+              "text": "5,50 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-4",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-2",
+              "text": "1,50 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-31-edge-2",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-26-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-96-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-23-edge-3",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-21-edge-2",
+              "text": "4,00 m"
+            }
+          ],
+          "visibleAccesses": 2,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 15,
+            "triangles": 3078,
+            "geometries": 560,
+            "textures": 104,
+            "programs": 180,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail-zoom",
+          "dimensions": [
+            {
+              "id": "B4:dimension:lot-90-edge-0",
+              "text": "5,50 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-4",
+              "text": "4,00 m"
+            },
+            {
+              "id": "B4:dimension:north-clearance",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-2",
+              "text": "1,50 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-3",
+              "text": "2,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-90-edge-5",
+              "text": "5,00 m"
+            },
+            {
+              "id": "B4:dimension:lot-31-edge-2",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 0,
+          "totalAccesses": 5,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 11,
+            "triangles": 3030,
+            "geometries": 560,
+            "textures": 104,
+            "programs": 197,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        }
+      ],
+      "warm": {
+        "geometries": 560,
+        "textures": 103,
+        "programs": 207
+      },
+      "final": {
+        "geometries": 560,
+        "textures": 103,
+        "programs": 207
+      }
+    },
+    {
+      "pavilion": 13,
+      "mobile": false,
+      "pass": true,
+      "errorCount": 0,
+      "views": [
+        {
+          "view": "vertical",
+          "dimensions": [
+            {
+              "id": "B5:dimension:west-aisle",
+              "text": "3,90 m"
+            },
+            {
+              "id": "B5:dimension:east-aisle",
+              "text": "3,90 m"
+            },
+            {
+              "id": "B5:dimension:north-clearance",
+              "text": "3,25 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-79-edge-3",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-25-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-82-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-20-edge-3",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-88-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-16-edge-2",
+              "text": "3,00 m"
+            }
+          ],
+          "visibleAccesses": 6,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 27,
+            "triangles": 2870,
+            "geometries": 563,
+            "textures": 103,
+            "programs": 199,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "horizontal",
+          "dimensions": [
+            {
+              "id": "B5:dimension:west-aisle",
+              "text": "3,90 m"
+            },
+            {
+              "id": "B5:dimension:east-aisle",
+              "text": "3,90 m"
+            },
+            {
+              "id": "B5:dimension:north-clearance",
+              "text": "3,25 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-79-edge-3",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-25-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-77-edge-0",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-30-edge-0",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-82-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-20-edge-3",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-88-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-16-edge-2",
+              "text": "3,00 m"
+            }
+          ],
+          "visibleAccesses": 6,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 27,
+            "triangles": 2870,
+            "geometries": 563,
+            "textures": 103,
+            "programs": 201,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail",
+          "dimensions": [
+            {
+              "id": "B5:dimension:north-clearance",
+              "text": "3,25 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-79-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-79-edge-3",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-3",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-25-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-25-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-77-edge-0",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-30-edge-0",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-82-edge-1",
+              "text": "1,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-20-edge-3",
+              "text": "1,00 m"
+            }
+          ],
+          "visibleAccesses": 2,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 19,
+            "triangles": 2774,
+            "geometries": 563,
+            "textures": 103,
+            "programs": 207,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        },
+        {
+          "view": "detail-zoom",
+          "dimensions": [
+            {
+              "id": "B5:dimension:lot-78-edge-0",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-78-edge-2",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-79-edge-1",
+              "text": "3,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-79-edge-3",
+              "text": "6,00 m"
+            },
+            {
+              "id": "B5:dimension:lot-26-edge-3",
+              "text": "3,00 m"
+            }
+          ],
+          "visibleAccesses": 2,
+          "totalAccesses": 6,
+          "status": "ready",
+          "contextLosses": 0,
+          "lastErrorCode": null,
+          "resources": {
+            "calls": 19,
+            "triangles": 2774,
+            "geometries": 563,
+            "textures": 103,
+            "programs": 207,
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          }
+        }
+      ],
+      "warm": {
+        "geometries": 563,
+        "textures": 103,
+        "programs": 207
+      },
+      "final": {
+        "geometries": 563,
+        "textures": 103,
+        "programs": 207
+      }
+    }
+  ]
+}

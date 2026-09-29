@@ -3,6 +3,7 @@ import { useThree, type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { CommercialPavilionLayout } from '../../utils/commercialPavilions';
 import { STATUS_CONFIG } from '../../constants';
+import { pavilionCirculationInfill } from '../../utils/pavilionCirculationInfill';
 import {
   createCommercialPavilionModuleProjectionFrame,
   projectCommercialPavilionModuleRect,
@@ -565,10 +566,12 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       )),
     } satisfies ProjectedIrregularModule];
   }), [plan.cells, projectionFrame]);
-  const projectedCorridors = useMemo(() => plan.corridors.map((corridor) => ({
+  const projectedCorridors = useMemo(() => [...plan.corridors, ...pavilionCirculationInfill(plan).map((rect, index) => ({
+    ...rect, id: `visual-infill-${index}`, label: '', kind: 'main' as const,
+  }))].map((corridor) => ({
     ...corridor,
     projected: projectCommercialPavilionModuleRect(corridor, projectionFrame),
-  })), [plan.corridors, projectionFrame]);
+  })), [plan, projectionFrame]);
   const projectedSupportSpaces = useMemo(() => plan.supportSpaces.map((supportSpace) => ({
     ...supportSpace,
     projected: projectCommercialPavilionModuleRect(supportSpace, projectionFrame),

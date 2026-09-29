@@ -315,7 +315,7 @@ describe('orientação visual das plantas internas comerciais', () => {
     expect(layer).toContain('style={HTML_HOST_STYLE}');
     expect(layer).toContain('calculatePosition={calculateWayfindingMarkerPosition}');
     expect(layer).not.toContain('THREE.MathUtils.clamp');
-    expect(layer).toContain('dimensionRectsOverlap(box');
+    expect(layer).toContain('layoutPavilionAccess([px,py]');
     expect(layer).toMatch(/event\.stopPropagation\(\);\s+lastPointerType.current = event.pointerType;/);
     expect(layer).toContain('geometry.dispose()');
     expect(layer).toContain('surface.dispose()');
@@ -352,7 +352,7 @@ describe('orientação visual das plantas internas comerciais', () => {
     expect(layer).toContain("document.addEventListener('pointerdown', closeOnOutsidePointer, true)");
     expect(layer).toContain('}, [plan.publicIdentifier]);');
     // Floor-level anchors avoid parallax; screen coordinates are never clamped.
-    expect(layer).toContain('position={[0, layout.interior.floorY + 0.05, 0]}');
+    expect(layer).toContain('position={[marker.position[0]-x, layout.interior.floorY + 0.05, marker.position[1]-z]}');
     expect(layer).toContain("import './pavilion-wayfinding.css'");
     expect(layer).toContain('const inset = Math.min(layout.interior.clearWidth, layout.interior.clearDepth) * 0.022;');
     expect(layer).not.toContain('distanceFactor');

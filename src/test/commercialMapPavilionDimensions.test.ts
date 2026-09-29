@@ -9,7 +9,7 @@ describe('cotas auxiliares, sem contrato comercial', () => {
     const plan = plans[id]; const before = JSON.stringify(plan);
     const dimensions = resolvePavilionDimensions(plan, { width: 33, depth: 50 });
     expect(dimensions.length).toBeGreaterThan(0);
-    expect(dimensions.length).toBeLessThanOrEqual(6);
+    expect(dimensions.length).toBeLessThanOrEqual(30);
     expect(plan.cells).toHaveLength(count);
     expect(JSON.stringify(plan)).toBe(before);
     expect(new Set(dimensions.map(d => d.id)).size).toBe(dimensions.length);
@@ -17,8 +17,8 @@ describe('cotas auxiliares, sem contrato comercial', () => {
     expect(plan).not.toHaveProperty('dimensionAnnotations');
     expect(dimensions.every(d => !('areaM2' in d) && !('price' in d) && !('lotId' in d))).toBe(true);
   });
-  it('não acrescenta nenhuma anotação ao Pavilhão 13 ou 7', () => {
-    expect(resolvePavilionDimensions(plans.B5, { width: 20, depth: 40 })).toEqual([]);
+  it('inclui o Pavilhão 13 solicitado sem acrescentar cotas ao Pavilhão 7', () => {
+    expect(resolvePavilionDimensions(plans.B5, { width: 20, depth: 40 })).toHaveLength(19);
     expect(resolvePavilionDimensions(plans.B10, { width: 20, depth: 40 })).toEqual([]);
   });
   it('segue os extremos do corredor e a mesma transformação de quarto de volta dos módulos', () => {
@@ -39,7 +39,7 @@ describe('cotas auxiliares, sem contrato comercial', () => {
   it('distingue profundidade de 4 m e corredores de 3,35 m no Pavilhão 8', () => {
     const annotations = PAVILION_DIMENSION_ANNOTATIONS.filter(d => d.pavilionId === 'B4');
     expect(annotations.filter(d => d.value === '3,35').every(d => d.anchor.kind === 'corridor')).toBe(true);
-    expect(annotations.find(d => d.value === '4,00')?.anchor.kind).toBe('cell-edge');
+    expect(annotations.find(d => d.id.endsWith(':side-depth'))?.anchor.kind).toBe('cell-edge');
   });
   it('coloca o Bosque fora da lateral esquerda da planta, usando a projeção oficial', () => {
     const dimensions = resolvePavilionDimensions(plans.B2, { width: 33, depth: 35 });

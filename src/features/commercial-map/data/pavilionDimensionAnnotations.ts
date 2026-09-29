@@ -4,11 +4,12 @@
  * Values are printed references, NOT measurements of the historical geometry.
  * This registry deliberately lives outside CommercialPavilionModulePlan/cells.
  */
-export type DimensionPavilionId = 'B1' | 'B6' | 'B8' | 'B4' | 'B3' | 'B2';
+export type DimensionPavilionId = 'B1' | 'B6' | 'B8' | 'B4' | 'B3' | 'B2' | 'B5';
 export type DimensionRectReference = { kind: 'zone' | 'corridor'; id: string } | { kind: 'boundary' };
 export type DimensionAnchor =
   | { kind: 'corridor'; id: string; axis: 'x' | 'z'; at?: number }
   | { kind: 'cell-edge'; number: number; axis: 'x' | 'z'; lane: string }
+  | { kind: 'lot-edge'; number: number; edge: number; placement: 'inside' | 'outside' }
   | { kind: 'gap'; axis: 'x' | 'z'; from: DimensionRectReference; fromEdge: 0 | 1; to: DimensionRectReference; toEdge: 0 | 1 }
   | { kind: 'context'; side: 'left'; corridor: string };
 
@@ -20,20 +21,59 @@ export interface PavilionDimensionAnnotation {
   value: string;
   unit: 'm' | null;
   priority: 1 | 2 | 3;
+  minModulePixels?: number;
   anchor: DimensionAnchor;
   source: { document: string; page: 1; reference: string };
 }
 
-const numbers = { B1: 1, B6: 3, B8: 5, B4: 8, B3: 12, B2: 14 };
+const numbers = { B1: 1, B6: 3, B8: 5, B4: 8, B3: 12, B2: 14, B5: 13 };
 function dimension(pavilionId: DimensionPavilionId, id: string, value: string, priority: 1 | 2 | 3, anchor: DimensionAnchor, reference: string): PavilionDimensionAnnotation {
   return { id: `${pavilionId}:dimension:${id}`, pavilionId, type: 'linear', value, unit: 'm', priority, anchor,
     source: { document: `Planta PAVILHÃO ${numbers[pavilionId]} - Fenasoja 2028.pdf`, page: 1, reference } };
 }
 const zone = (id: string): DimensionRectReference => ({ kind: 'zone', id });
 
+/** Readings supplied on 29/09/2026, attachments 4–8. Edge indices follow
+ * the EXISTING polygon, or the rectangle NW → NE → SE → SW. No inferred
+ * diagonal lengths, areas or new commercial geometry are introduced. */
+function lotEdge(pavilion: DimensionPavilionId, number: number, edge: number, value: string, placement: 'inside' | 'outside' = 'outside') {
+  return { ...dimension(pavilion, `lot-${number}-edge-${edge}`, value, placement === 'inside' ? 2 : 3,
+    { kind: 'lot-edge', number, edge, placement }, `Anexos de 29/09/2026: cota linear da borda ${edge} do lote ${number}.`), minModulePixels: 9 };
+}
+const specialEdges = (pavilion: DimensionPavilionId, number: number, values: readonly (string | null)[], insideEdges: readonly number[] = []) =>
+  values.flatMap((value, edge) => value === null ? [] : [lotEdge(pavilion, number, edge, value, insideEdges.includes(edge) ? 'inside' : 'outside')]);
+
 export const PAVILION_DIMENSION_ANNOTATIONS: readonly PavilionDimensionAnnotation[] = [
-  dimension('B1', 'north-clearance', '5,40', 1, { kind: 'corridor', id: 'north-distribution', axis: 'z' }, 'Entre a ilha 103–140 e a faixa 142–189; PDF 5,40, referência histórica 5,42.'),
-  dimension('B1', 'south-clearance', '5,40', 1, { kind: 'corridor', id: 'south-distribution', axis: 'z' }, 'Entre a ilha 65–102 e a faixa 07–58.'),
+  ...specialEdges('B1', 141, ['4,50', '4,50', '3,00', '1,50', '1,50', '3,00'], [4,5]),
+  ...[121, 65].map(number => lotEdge('B1', number, number === 121 ? 0 : 2, '1,00')),
+  lotEdge('B1', 84, 2, '1,00'),
+  lotEdge('B1', 32, 0, '1,00'),
+  lotEdge('B1', 64, 3, '1,00'),
+
+  ...specialEdges('B6', 36, ['3,00', '2,00', '3,00', '3,00', '6,00', '5,00'], [0]),
+  ...[144, 143, 80, 79].map(number => lotEdge('B6', number, 2, '3,00')),
+  ...[202, 135, 71].map(number => lotEdge('B6', number, 3, '1,00')),
+  ...[152, 88, 25].map(number => lotEdge('B6', number, 1, '1,00')),
+  lotEdge('B6', 47, 1, '3,00'), lotEdge('B6', 37, 3, '3,00'),
+  lotEdge('B6', 44, 0, '1,00'), lotEdge('B6', 39, 0, '1,00'),
+
+  ...specialEdges('B4', 90, ['5,50', '3,00', '1,50', '2,00', '4,00', '5,00'], [0,1,4]),
+  lotEdge('B4', 31, 2, '1,00'), lotEdge('B4', 26, 1, '3,00'),
+  lotEdge('B4', 96, 1, '1,00'), lotEdge('B4', 23, 3, '1,00'),
+  lotEdge('B4', 21, 2, '4,00'), lotEdge('B4', 20, 0, '4,00'),
+
+  ...specialEdges('B5', 78, ['6,00', '3,00', '3,00', null]),
+  ...specialEdges('B5', 79, [null, '3,00', null, '6,00']),
+  ...specialEdges('B5', 26, ['6,00', null, '3,00', '3,00']),
+  ...specialEdges('B5', 25, ['6,00', null, '3,00', null]),
+  ...[77, 30].map(number => lotEdge('B5', number, 0, '3,00')),
+  lotEdge('B5', 82, 1, '1,00'), lotEdge('B5', 20, 3, '1,00'),
+  lotEdge('B5', 88, 2, '3,00'), lotEdge('B5', 16, 2, '3,00'),
+  dimension('B5', 'west-aisle', '3,90', 1, { kind: 'corridor', id: 'west-main-aisle', axis: 'x', at: 0.3 }, 'Anexo 8: corredor oeste.'),
+  dimension('B5', 'east-aisle', '3,90', 1, { kind: 'corridor', id: 'east-main-aisle', axis: 'x', at: 0.36 }, 'Anexo 8: corredor leste.'),
+  dimension('B5', 'north-clearance', '3,25', 2, { kind: 'corridor', id: 'north-distribution', axis: 'z' }, 'Anexo 8: distância informada acima da ilha; sem alterar o traçado existente.'),
+  dimension('B1', 'north-clearance', '5,40', 1, { kind: 'corridor', id: 'north-distribution', axis: 'z', at: 0.38 }, 'Entre a ilha 103–140 e a faixa 142–189; PDF 5,40, referência histórica 5,42. Afastada das cotas de frente.'),
+  dimension('B1', 'south-clearance', '5,40', 1, { kind: 'corridor', id: 'south-distribution', axis: 'z', at: 0.38 }, 'Entre a ilha 65–102 e a faixa 07–58; afastada das cotas de frente.'),
   dimension('B1', 'island-side', '4,00', 2, { kind: 'gap', axis: 'x', from: zone('central-south-65-102'), fromEdge: 1, to: zone('east-59-64'), toEdge: 0 }, 'Lateral da ilha junto aos boxes 64/65.'),
   dimension('B1', 'module-depth', '3,00', 3, { kind: 'cell-edge', number: 103, axis: 'z', lane: 'west-access' }, 'Profundidade da fileira central.'),
   dimension('B1', 'module-frontage', '1,00', 3, { kind: 'cell-edge', number: 80, axis: 'x', lane: 'south-distribution' }, 'Frente representativa de um box; não é distância entre boxes.'),
