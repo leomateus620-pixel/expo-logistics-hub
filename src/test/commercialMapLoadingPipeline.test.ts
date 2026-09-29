@@ -34,6 +34,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: {
     return query;
   },
   storage: { from: () => ({ createSignedUrl: backend.sign }) },
+  functions: { invoke: () => Promise.resolve({ data: { logos: {} }, error: null }) },
 } }));
 vi.mock('@/features/commercial-map/data/reconcileExporuralReference', () => ({ reconcileExporuralReference: (data: unknown) => data }));
 import { fetchCommercialMap, COMMERCIAL_LOT_SELECT, isValidCommissionCameraValues } from '@/features/commercial-map/services/commercialMapService';
