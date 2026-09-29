@@ -9754,10 +9754,6 @@ export type Database = {
           user_id: string
         }[]
       }
-      commission_map_own_layers: {
-        Args: { p_segment_id: string }
-        Returns: Json
-      }
       commission_map_park_context: {
         Args: { p_segment_id: string }
         Returns: Json
