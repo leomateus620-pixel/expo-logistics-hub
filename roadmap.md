@@ -1,5 +1,12 @@
 # Roadmap
 
+## Prévia de compartilhamento dos mapas públicos
+- [x] Preparar onze imagens específicas por área, com correção da planta do Pavilhão 7 para 57 boxes.
+- [x] Atualizar as prévias no navegador apenas após validação do link, sem revelar escopo de links inválidos.
+- [x] Testar cobertura das áreas, unicidade das imagens e descarte de tags duplicadas.
+- [ ] Entregar HTML personalizado aos aplicativos de mensagens: a hospedagem Vite ainda fornece a página genérica antes de executar JavaScript; exige renderização no servidor ou interceptação por proxy, sem publicar sem autorização.
+- [ ] Conferir o resultado no domínio publicado após implementação do HTML por link e publicação autorizada.
+
 ## Quatro situações visíveis no Mapa Comercial
 - [x] Remover situações antigas das legendas, filtros, listas, painéis, minimapas, dashboard e links públicos.
 - [x] Usar verde, amarelo, azul e vermelho nas superfícies, mantendo os estados operacionais antigos restritos no cadastro.
