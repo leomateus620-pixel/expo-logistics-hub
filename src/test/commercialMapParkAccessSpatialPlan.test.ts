@@ -1,5 +1,7 @@
+import polygonClipping from 'polygon-clipping';
 import { ACCESS_JUNCTION, accessWorldToSource } from '@/features/commercial-map/data/accessJunctionReconstruction';
 import {
+  BENVENUTO_PARKING_RUNS,
   PARK_ACCESS_ROAD_CURB_WIDTH_METERS,
   PARK_ACCESS_SOURCE_MANIFEST,
   PARK_ACCESS_SPATIAL_PLAN,
@@ -312,7 +314,14 @@ describe('park access spatial plan', () => {
       'benvenuto-parking-apron-west',
       'benvenuto-parking-apron-east',
     ]);
-    expect(PARK_ACCESS_SPATIAL_PLAN.parkingBays).toHaveLength(43);
+    expect(new Set(PARK_ACCESS_SPATIAL_PLAN.parkingBays.map(b => b.runId)).size).toBe(BENVENUTO_PARKING_RUNS.length);
+    for (const bay of PARK_ACCESS_SPATIAL_PLAN.parkingBays) {
+      expect(bay.rotation).toBeGreaterThan(0);
+      expect(bay.rotation).toBeCloseTo(Math.PI / 6);
+      const run = BENVENUTO_PARKING_RUNS.find(r => r.id === bay.runId)!;
+      expect(Math.min(...bay.sourcePdfPolygon.map(p => p[0]))).toBeGreaterThanOrEqual(run.start - .001);
+      expect(Math.max(...bay.sourcePdfPolygon.map(p => p[0]))).toBeLessThanOrEqual(run.end + .001);
+    }
   });
 
   it('contains every complete parking bay in segmented asphalt without paving B23 or B11', () => {
@@ -748,13 +757,16 @@ describe('park access spatial plan', () => {
     expect(northSidewalks.map((surface) => surface.id)).toEqual([
       'benvenuto-north-sidewalk',
       'benvenuto-north-sidewalk-b3',
+      'benvenuto-north-sidewalk-b4',
       'benvenuto-north-sidewalk-b5',
+      'benvenuto-north-sidewalk-b6',
     ]);
     northSidewalks.forEach((surface) => {
       expect(surface.adjacentOfficialIdentifiers?.length).toBeGreaterThan(0);
       nearbyFootprints.forEach(({ identifier, polygon }) => {
-        expect(polygonsIntersect(surface.polygon, polygon), `${surface.id}/${identifier}`)
-          .toBe(false);
+        expect(polygonClipping.intersection(
+          [[surface.polygon.map(p => [...p])]], [[polygon.map(p => [...p])]],
+        ), `${surface.id}/${identifier}`).toEqual([]);
       });
       expect(pointInPolygon(PARK_ACCESS_SPATIAL_PLAN.anchors.gate2.point, surface.polygon))
         .toBe(false);
@@ -763,7 +775,7 @@ describe('park access spatial plan', () => {
     });
     expect(PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge.sidewalkOmissions
       .map(({ officialIdentifier }) => officialIdentifier))
-      .toEqual(['B4', 'B6', 'B11']);
+      .toEqual(['B11']);
   });
 
   it('keeps the street-side tree band wholly outside roofs, sidewalks and parking asphalt', () => {
@@ -787,8 +799,9 @@ describe('park access spatial plan', () => {
           .toBe(false);
       });
       PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.forEach((sidewalk) => {
-        expect(polygonsIntersect(segment.polygon, sidewalk.polygon), `${segment.id}/${sidewalk.id}`)
-          .toBe(false);
+        expect(polygonClipping.intersection([[segment.polygon.map(p => [...p])]],
+          [[sidewalk.polygon, ...(sidewalk.holes ?? [])].map(r => r.map(p => [...p] as [number, number]))]),
+        `${segment.id}/${sidewalk.id}`).toEqual([]);
       });
       expect(polygonsIntersect(
         segment.polygon,

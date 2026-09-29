@@ -15,6 +15,7 @@ import { entitySurfaceElevation } from './spatialSurface';
 import { splitLateralResidentialSidewalk } from './lateralResidentialStreetIntegration';
 import { ACCESS_JUNCTION } from '../data/accessJunctionReconstruction';
 import { accessCorridor } from './accessJunctionGeometry';
+import { PAVILION_COURTYARD } from '../data/pavilionCourtyard';
 
 type SpatialPlan = typeof PARK_ACCESS_SPATIAL_PLAN;
 
@@ -82,7 +83,11 @@ export function adaptParkAccessSpatialPlan(
   const mapUnitsPerMeter = plan.coordinateFrame.workingMapUnitsPerMeter;
   const gateKeys = ['gate1', 'gate2', 'gate3'] as const satisfies readonly ParkAccessGateKey[];
   return {
-    roadSurfaces: [...plan.roadSurfaces.map((surface) => ({
+    roadSurfaces: [...PAVILION_COURTYARD.road.map((rings, index) => ({
+      id: `${PAVILION_COURTYARD.roadIdentifier}-${index}`,
+      polygon: rings[0], holes: rings.slice(1),
+      material: 'asphalt' as const, elevation: PAVILION_COURTYARD.roadElevation,
+    })), ...plan.roadSurfaces.map((surface) => ({
       id: surface.id,
       polygon: surface.polygon,
       centerline: surface.centerline,
@@ -96,12 +101,27 @@ export function adaptParkAccessSpatialPlan(
       width:road.width,elevation:ACCESS_JUNCTION.elevation,material:'asphalt' as const,supportAware:false,junctionUnion:true,
     }))],
     supportSurfaces: PARK_ACCESS_OFFICIAL_FLAT_SUPPORT_SURFACES,
-    sidewalkSurfaces: plan.sidewalkSurfaces.flatMap((surface) => splitLateralResidentialSidewalk({
+    sidewalkSurfaces: [...PAVILION_COURTYARD.hardscape.map((rings, index) => ({
+      id: `pavilions-concrete-${index}`, polygon: rings[0], holes: rings.slice(1),
+      elevation: PAVILION_COURTYARD.elevation, omitPerimeterCurbs: true,
+    })), ...plan.sidewalkSurfaces.flatMap((surface) => splitLateralResidentialSidewalk({
       id: surface.id,
       polygon: surface.polygon,
-      elevation: surface.elevation,
-    })),
-    curbSegments: plan.roadSurfaces.flatMap((surface) => (
+      elevation: surface.elevation, holes: surface.holes, omitPerimeterCurbs: surface.omitPerimeterCurbs,
+    }))],
+    curbSegments: [
+      ...PAVILION_COURTYARD.curbCenterlines.flatMap((line, edge) => line.slice(0, -1).map((from, i) => ({
+        id: `pavilion-1-sidewalk:curb-${edge}-${i}`, from, to: line[i + 1], elevation: 0.025,
+      }))),
+      ...plan.benvenutoPavilionEdge.parkingCurb.slice(0, -1).map((from, i) => {
+        const to = plan.benvenutoPavilionEdge.parkingCurb[i + 1];
+        const dx = to[0] - from[0], dz = to[1] - from[1], length = Math.hypot(dx, dz);
+        const x = dz / length * 0.0375, z = -dx / length * 0.0375;
+        return { id: `benvenuto-frontages:curb-${i}`,
+          from: [from[0] + x, from[1] + z] as const,
+          to: [to[0] + x, to[1] + z] as const, elevation: 0.025 };
+      }),
+      ...plan.roadSurfaces.flatMap((surface) => (
       (surface.curbCenterlines ?? []).flatMap((centerline, edgeIndex) => (
         centerline.slice(0, -1).map((from, segmentIndex) => ({
           id: `${surface.id}:curb-${edgeIndex + 1}-${segmentIndex + 1}`,
@@ -110,12 +130,14 @@ export function adaptParkAccessSpatialPlan(
           elevation: surface.elevation,
         }))
       ))
-    )),
-    parkingBays: plan.parkingBays.map((bay) => ({
+    ))],
+    parkingBays: plan.parkingBays.map((bay, index) => ({
       id: bay.id,
       center: bay.center,
       size: bay.size,
       rotationRadians: bay.rotation,
+      endDivider: plan.parkingBays[index + 1]?.runId !== bay.runId,
+      elevation: plan.roadSurfaces.find(s => s.id === 'benvenuto-four-lane-axis')!.elevation + 0.002,
     })),
     markingSegments: plan.markingSegments.map((marking) => ({
       id: marking.id,

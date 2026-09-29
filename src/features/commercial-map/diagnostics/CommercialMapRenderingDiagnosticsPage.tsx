@@ -1,4 +1,5 @@
 import { LightingBenchmark } from './LightingBenchmark';
+import { installBenvenutoSurfaceQa } from './benvenutoSurfaceQa';
 import { EnvironmentBenchmark } from './EnvironmentBenchmark';
 import { useCommercialMapBootVisit } from '../hooks/useCommercialMapBootVisit';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -180,6 +181,7 @@ function formatMetric(value: number | null, suffix = '') {
  * App.tsx excludes the route and dynamic import from production builds.
  */
 export default function CommercialMapRenderingDiagnosticsPage() {
+  useEffect(installBenvenutoSurfaceQa, []);
   const queryClient = useQueryClient();
   const { data: fixture } = useQuery({ queryKey: DIAGNOSTICS_DATA_QUERY_KEY,
     queryFn: () => DIAGNOSTICS_MAP_DATA, initialData: DIAGNOSTICS_MAP_DATA, enabled: false });

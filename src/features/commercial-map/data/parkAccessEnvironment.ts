@@ -209,7 +209,8 @@ export function selectParkAccessCompatibleTreesForPresentation<
       tree.position[0] - PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.center[0],
       tree.position[1] - PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.center[1],
     );
-    return !pointInPolygon(tree.position, PARK_ACCESS_SPATIAL_PLAN.woodlandPath.clearancePolygon)
+    return !pavilionPavementContains(tree.position)
+      && !pointInPolygon(tree.position, PARK_ACCESS_SPATIAL_PLAN.woodlandPath.clearancePolygon)
       && !pointInPolygon(tree.position, THIRD_AGE_SETTING.accessClearancePolygon)
       && gate1RoundaboutDistance
         >= PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.outerRadius + canopyRadius
@@ -218,6 +219,11 @@ export function selectParkAccessCompatibleTreesForPresentation<
         && distanceToPolygon(tree.position, surface.polygon) >= canopyRadius
       ));
   });
+}
+
+function pavilionPavementContains(point: ParkAccessPoint) {
+  return PAVILION_COURTYARD.occupied.some(rings => pointInPolygon(point, rings[0])
+    && !rings.slice(1).some(hole => pointInPolygon(point, hole)));
 }
 
 function polylineLength(points: readonly ParkAccessPoint[]) {
@@ -672,27 +678,23 @@ export function resolveParkAccessEnvironmentPresentation(
   vegetationEnabled = true,
 ): ParkAccessEnvironmentPresentation {
   const reducedGraphics = false;
-  const concreteSurfaces: ParkAccessEnvironmentSurface[] = PAVILION_COURTYARD.hardscape.map((rings, index) => ({
-    id: `pavilions-1-14-12-concrete-${index}`,
-    kind: 'PAVILION_CONCRETE', polygon: rings[0], holes: rings.slice(1),
-    elevation: PAVILION_COURTYARD.elevation,
-    sourceIds: ['official-2026-park-map'], confidence: 'ANNEX_RELATIVE_TRACE',
-    notes: 'IMG_0967: ligação Caminho do Bosque/B1/B2 e pátio B2/B3 com abertura para raiz. B23 preservado; dimensões estimadas.',
-  }));
-  const environmentalSurfaces = [
+  // Concrete uses the existing infrastructure batch and shared sidewalk PBR.
+  const environmentalSurfaces: ParkAccessEnvironmentSurface[] = [
     ...createEnvironmentalSurfaces().flatMap(clipPavilionCourtyardSurface),
-    ...concreteSurfaces,
+    ...PAVILION_COURTYARD.trees.map(tree => ({
+      id: `${tree.sourceZoneId}:root-bed`, kind: 'EXPOSED_SOIL' as const,
+      polygon: tree.rootOpening, holes: [], elevation: 0.035,
+      sourceIds: ['official-2026-park-map'] as const, confidence: 'ANNEX_RELATIVE_TRACE' as const,
+      notes: 'Solo natural na abertura real do passeio; tronco fora da circulacao.',
+    })),
   ];
-  const trailSurfaces = createTrailSurfaces();
-  const ambientTrees = vegetationEnabled ? [...createAmbientTrees(reducedGraphics), {
-    sourceZoneId: 'pavilions-14-12-courtyard-tree',
-    position: PAVILION_COURTYARD.treePosition,
-    rotation: 0.35, scale: PAVILION_COURTYARD.treeScale,
-  }] : [];
-  const understory = (vegetationEnabled ? createUnderstory(reducedGraphics) : []).filter(placement => !concreteSurfaces.some(
-    surface => pointInPolygon(placement.position, surface.polygon)
-      && !surface.holes.some(hole => pointInPolygon(placement.position, hole)),
-  ));
+  const trailSurfaces = createTrailSurfaces().flatMap(clipPavilionCourtyardSurface);
+  const ambientTrees = vegetationEnabled ? [
+    ...createAmbientTrees(reducedGraphics).filter(tree => !pavilionPavementContains(tree.position)),
+    ...PAVILION_COURTYARD.trees,
+  ] : [];
+  const understory = (vegetationEnabled ? createUnderstory(reducedGraphics) : [])
+    .filter(placement => !pavilionPavementContains(placement.position));
   return {
     revision: PARK_ACCESS_ENVIRONMENT_REVISION,
     environmentalSurfaces,

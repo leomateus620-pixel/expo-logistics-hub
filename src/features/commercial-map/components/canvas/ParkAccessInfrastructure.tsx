@@ -55,39 +55,6 @@ function textureNoise(x: number, y: number, seed: number) {
   return ((value ^ (value >>> 16)) & 0xffff) / 0xffff;
 }
 
-function createInfrastructureTexture(
-  seed: number,
-  base: readonly [number, number, number],
-  amplitude: number,
-  jointEvery = 0,
-) {
-  const size = 64;
-  const data = new Uint8Array(size * size * 4);
-  for (let y = 0; y < size; y += 1) {
-    for (let x = 0; x < size; x += 1) {
-      const noise = (textureNoise(x, y, seed) - 0.5) * amplitude;
-      const broad = Math.sin((x + seed) * 0.17) * 2.2 + Math.cos((y - seed) * 0.13) * 1.8;
-      const joint = jointEvery > 0 && (x % jointEvery <= 1 || y % jointEvery <= 1) ? -18 : 0;
-      const offset = (y * size + x) * 4;
-      data[offset] = THREE.MathUtils.clamp(Math.round(base[0] + noise + broad + joint), 0, 255);
-      data[offset + 1] = THREE.MathUtils.clamp(Math.round(base[1] + noise + broad + joint), 0, 255);
-      data[offset + 2] = THREE.MathUtils.clamp(Math.round(base[2] + noise + broad + joint), 0, 255);
-      data[offset + 3] = 255;
-    }
-  }
-  const texture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat, THREE.UnsignedByteType);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(0.42, 0.42);
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = true;
-  texture.anisotropy = 4;
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.needsUpdate = true;
-  return texture;
-}
-
 function roughnessTexture(colorTexture: THREE.DataTexture) {
   const texture = colorTexture.clone();
   texture.colorSpace = THREE.NoColorSpace;
@@ -185,8 +152,10 @@ const COBBLESTONE_TEXTURE = createCobblestoneTexture();
 const COBBLESTONE_ROUGHNESS = roughnessTexture(COBBLESTONE_TEXTURE);
 const GRAVEL_TEXTURE = createGravelTexture();
 const GRAVEL_ROUGHNESS = roughnessTexture(GRAVEL_TEXTURE);
-const PAVER_TEXTURE = createInfrastructureTexture(1947, [210, 205, 194], 13, 16);
-const PAVER_ROUGHNESS = roughnessTexture(PAVER_TEXTURE);
+const CONCRETE_PROFILE = Object.freeze({
+  surface: 'concrete' as const, tileWorldSize: 1.8, baseColor: '#c9c7be', roughness: 0.94,
+});
+const CONCRETE_NORMAL_SCALE = new THREE.Vector2(0.12, 0.12);
 
 function configureInstanceMaterial(
   material: THREE.MeshStandardMaterial,
@@ -315,12 +284,16 @@ function SurfaceMaterial({
   const asphaltTextures = useMemo(() => kind === 'asphalt' && !reducedGraphics
     ? openGroundTextureBundleForEntity(HIGHWAY_ASPHALT_SURFACE_PROFILE, maxAnisotropy)
     : null, [kind, reducedGraphics, maxAnisotropy]);
+  const concreteTextures = useMemo(() => kind === 'sidewalks' && !reducedGraphics
+    ? openGroundTextureBundleForEntity(CONCRETE_PROFILE, maxAnisotropy)
+    : null, [kind, reducedGraphics, maxAnisotropy]);
+  useEffect(() => () => concreteTextures?.dispose(), [concreteTextures]);
   useLayoutEffect(() => {
     // Map presence changes shader defines. R3F assigns texture props without
     // bumping material.version; do not depend on an unrelated envMap/path change
     // to compile the textured or compatibility variant before old maps release.
-    if (kind === 'asphalt' && materialRef.current) materialRef.current.needsUpdate = true;
-  }, [asphaltTextures, kind]);
+    if ((kind === 'asphalt' || kind === 'sidewalks') && materialRef.current) materialRef.current.needsUpdate = true;
+  }, [asphaltTextures, concreteTextures, kind]);
   useEffect(() => () => asphaltTextures?.dispose(), [asphaltTextures]);
   // Parent meshes deliberately opt out of R3F disposal because their geometry
   // belongs to the render model. Their locally-created materials still belong
@@ -395,11 +368,11 @@ function SurfaceMaterial({
   );
   if (kind === 'sidewalks') return (
     <meshStandardMaterial
-      color="#c9c4b8"
-      map={reducedGraphics ? undefined : PAVER_TEXTURE}
-      roughnessMap={reducedGraphics ? undefined : PAVER_ROUGHNESS}
-      bumpMap={reducedGraphics ? undefined : PAVER_ROUGHNESS}
-      bumpScale={0.005}
+      color={CONCRETE_PROFILE.baseColor}
+      map={concreteTextures?.map}
+      roughnessMap={concreteTextures?.roughnessMap}
+      normalMap={concreteTextures?.normalMap}
+      normalScale={CONCRETE_NORMAL_SCALE}
       roughness={0.95}
       metalness={0}
       transparent={transparent}

@@ -2,9 +2,6 @@ import polygonClipping, { type MultiPolygon, type Ring } from 'polygon-clipping'
 import { OFFICIAL_REFERENCE_ENTITIES } from './officialReference2026';
 import { PARK_ACCESS_SPATIAL_PLAN, type ParkAccessPoint, type ParkAccessPolygon } from './parkAccessSpatialPlan';
 
-/** IMG_0967: relative hardscape/tree registration against B1/B2/B3. The image
- * is not an orthophoto: all dimensions remain visual estimates. Building and
- * emergency-service footprints are read-only constraints, including B23. */
 const footprint = (id: string) => {
   const entity = OFFICIAL_REFERENCE_ENTITIES.find(candidate => candidate.publicIdentifier === id);
   if (!entity) throw new Error(`Missing courtyard anchor ${id}`);
@@ -17,79 +14,105 @@ const bounds = (ring: ParkAccessPolygon) => ({
 const rectangle = (minX: number, minZ: number, maxX: number, maxZ: number): Ring =>
   [[minX, minZ], [maxX, minZ], [maxX, maxZ], [minX, maxZ], [minX, minZ]];
 const polygon = (ring: ParkAccessPolygon): MultiPolygon => [[ring.map(p => [p[0], p[1]])]];
+const sidewalks = PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.filter(s => s.id.startsWith('benvenuto-')).map(s =>
+  [[s.polygon, ...(s.holes ?? [])].map(r => r.map(p => [p[0], p[1]]))] as MultiPolygon);
 const p1 = bounds(footprint('B1'));
 const p14 = bounds(footprint('B2'));
 const p12 = bounds(footprint('B3'));
+const p3 = bounds(footprint('B6'));
 const clinic = bounds(footprint('B23'));
+const mercosul = bounds(footprint('ALAMEDA-MERCOSUL'));
+const argentina = bounds(footprint('RUA-ARGENTINA'));
 const trail = PARK_ACCESS_SPATIAL_PLAN.woodlandPath;
-const pathEnd = trail.centerline[trail.centerline.length - 1];
 const gap = p14.minZ - p1.maxZ;
-const walkwayZ = (p1.maxZ + p14.minZ) / 2;
-const walkwayHalfWidth = gap * 0.37;
-const capIndex = trail.centerline.length - 1;
-const capA = trail.surfacePolygon[capIndex];
-const capB = trail.surfacePolygon[capIndex + 1];
-const capNorth = capA[1] < capB[1] ? capA : capB;
-const capSouth = capA[1] < capB[1] ? capB : capA;
-const connector: Ring = [
-  [...capNorth],
-  [p14.minX + gap * 0.5, walkwayZ - walkwayHalfWidth],
-  [p12.minX, walkwayZ - walkwayHalfWidth],
-  [p12.minX, walkwayZ + walkwayHalfWidth],
-  [p14.minX + gap * 0.5, walkwayZ + walkwayHalfWidth],
-  [...capSouth], [...capNorth],
-];
-const courtyardCenter: ParkAccessPoint = [
-  (p14.maxX + p12.minX) / 2,
-  (p14.minZ + clinic.minZ) / 2,
-];
-const rootRadius = (p12.minX - p14.maxX) * 0.11;
-const rootOpening: Ring = Array.from({ length: 17 }, (_, index) => {
-  const angle = index / 16 * Math.PI * 2;
-  return [courtyardCenter[0] + Math.cos(angle) * rootRadius,
-    courtyardCenter[1] + Math.sin(angle) * rootRadius];
-});
-const protectedPolygons = ['B1', 'B2', 'B3', 'B23'].map(id => polygon(footprint(id)));
-const roadPolygons = OFFICIAL_REFERENCE_ENTITIES
-  .filter(entity => entity.classification === 'ROAD')
+// Annex 3 establishes sidewalk / street / B14, not surveyed widths.
+// Relative proportions are confined to the existing official gap.
+const sidewalkEdgeZ = p1.maxZ + gap * 0.26;
+const cornerX = p1.maxX + gap * 0.55;
+// Annex 5 explicitly asks for a continuous paved frontage. B33/B34 are
+// removed temporary booths (see NON_PERMANENT_REMOVED_IDENTIFIERS_2026),
+// not visible buildings. Only their historical green presentation masks are
+// excepted here; their source records and every pavilion footprint stay intact.
+const retiredFrontageMasks = ['B33', 'B34'] as const;
+const protectedPolygons = OFFICIAL_REFERENCE_ENTITIES
+  .filter(entity => !['ROAD', 'PEDESTRIAN_PATH', 'LANDSCAPE', 'PARKING'].includes(entity.classification))
+  .filter(entity => !retiredFrontageMasks.includes(entity.publicIdentifier as 'B33'))
+  .filter(entity => {
+    const b = bounds(entity.geometry.coordinates[0]);
+    return b.maxX >= p1.minX && b.minX <= p3.maxX
+      && b.maxZ >= p1.maxZ - gap && b.minZ <= p12.maxZ;
+  })
   .map(entity => polygon(entity.geometry.coordinates[0]));
-// A single union joins the woodland cap, the B1/B2 gap and the B2/B3 court.
-// Existing trail takes precedence at the seam, so no brown path remains below
-// a new concrete plane; B23 remains an explicit notch, never paved over.
+const roadPolygons = OFFICIAL_REFERENCE_ENTITIES
+  .filter(entity => ['ROAD', 'PEDESTRIAN_PATH'].includes(entity.classification))
+  .map(entity => polygon(entity.geometry.coordinates[0]));
+const road = polygonClipping.difference(polygonClipping.union(
+  [rectangle(p1.minX, sidewalkEdgeZ, p12.minX, p14.minZ)],
+  [rectangle(mercosul.minX, mercosul.maxZ, mercosul.maxX, p12.minZ)],
+), ...protectedPolygons, ...roadPolygons);
+const courtyardCenter: ParkAccessPoint = [
+  (p14.maxX + p12.minX) / 2, (p14.minZ + clinic.minZ) / 2,
+];
+const treePositionB1: ParkAccessPoint = [p1.maxX + gap * 0.28, p1.maxZ - gap * 0.6];
+const root = (center: ParkAccessPoint, radius: number): Ring =>
+  Array.from({ length: 17 }, (_, i) => [
+    center[0] + Math.cos(i / 16 * Math.PI * 2) * radius,
+    center[1] + Math.sin(i / 16 * Math.PI * 2) * radius,
+  ]);
+const rootRadius = (p12.minX - p14.maxX) * 0.11;
+const rootOpening = root(courtyardCenter, rootRadius);
+const b1RootRadius = gap * 0.17;
+const b1RootOpening = root(treePositionB1, b1RootRadius);
 const requested = polygonClipping.union(
-  [connector],
-  [rectangle(p14.maxX, walkwayZ, p12.minX, Math.max(p14.maxZ, p12.maxZ))],
+  [rectangle(p1.minX, p1.maxZ, cornerX, sidewalkEdgeZ)],
+  [rectangle(p1.maxX, treePositionB1[1] - b1RootRadius * 1.6, cornerX, sidewalkEdgeZ)],
+  [rectangle(p14.maxX, p14.minZ, p12.minX, Math.max(p14.maxZ, p12.maxZ))],
+  // Annex 5: inner frontage up to actual facades; B4/B6 have narrow thresholds.
+  [rectangle(p12.minX, argentina.maxZ, p3.maxX, p12.minZ)],
 );
 const hardscape = polygonClipping.difference(requested,
-  ...protectedPolygons, ...roadPolygons, polygon(trail.surfacePolygon), [[rootOpening]]);
+  ...protectedPolygons, ...roadPolygons, road, polygon(trail.surfacePolygon),
+  ...sidewalks,
+  [[rootOpening]], [[b1RootOpening]]);
+const occupied = polygonClipping.union(road, hardscape,
+  ...sidewalks, polygon(PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.find(s => s.id === 'benvenuto-four-lane-axis')!.polygon));
+const trees = [
+  { sourceZoneId: 'pavilions-14-12-courtyard-tree', position: courtyardCenter, radius: rootRadius,
+    rootOpening, rotation: 0.35, scale: [1.85, 1.12, 1.85] as const },
+  { sourceZoneId: 'pavilion-1-sidewalk-tree', position: treePositionB1, radius: b1RootRadius,
+    rootOpening: b1RootOpening, rotation: 0.62, scale: [1.2, 1.05, 1.2] as const },
+];
 
 export const PAVILION_COURTYARD = Object.freeze({
-  revision: '2026.9-pavilions-1-14-12-courtyard.1',
-  evidence: ['IMG_0967.jpeg', 'IMG_0971.jpeg', 'IMG_0972.jpeg', 'IMG_0973.jpeg'] as const,
-  anchorIdentifiers: ['B1', 'B2', 'B3', 'B23'] as const,
-  protectedPolygons,
-  officialMeasurements: false,
-  pathEnd,
-  walkwayZ,
-  treePosition: courtyardCenter,
-  rootOpening,
-  rootRadius,
-  hardscape,
-  elevation: 0.044,
-  // Same existing ambient-tree batch, one broad mature crown. This is a visual
-  // tree placement, not an invented official inventory identifier/species.
-  treeScale: [1.85, 1.12, 1.85] as const,
+  revision: '2026.9-benvenuto-pavilion-surfaces.2',
+  evidence: ['fdc85e65-5dc2-43b4-a0a8-970c6908e1c3.jpg', '7db5c4bb-32aa-4f1d-93c4-a3a9ae5fdce5.jpg',
+    'c4037d48-20fa-4a38-8292-042506f51f75.jpg'] as const,
+  anchorIdentifiers: ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B23', 'B34', 'B41', 'ALAMEDA-MERCOSUL'] as const,
+  protectedPolygons, officialMeasurements: false,
+  retiredFrontageMasks,
+  // Presentation-only access. The cadastral RUA-ARGENTINA remains untouched.
+  roadIdentifier: 'pavilions-1-14-access', road, occupied,
+  pathEnd: trail.centerline[trail.centerline.length - 1],
+  walkwayZ: (p1.maxZ + sidewalkEdgeZ) / 2,
+  streetCenterline: [[p1.minX, (sidewalkEdgeZ + p14.minZ) / 2],
+    [p14.maxX, (sidewalkEdgeZ + p14.minZ) / 2],
+    [(mercosul.minX + mercosul.maxX) / 2, mercosul.maxZ]] as readonly ParkAccessPoint[],
+  treePosition: courtyardCenter, rootOpening, rootRadius, trees,
+  hardscape, elevation: 0.068, roadElevation: 0.044, treeScale: trees[0].scale,
+  curbCenterlines: [
+    // On the sidewalk side; building thresholds and junction mouths stay open.
+    [[p1.minX, sidewalkEdgeZ - 0.0375], [cornerX, sidewalkEdgeZ - 0.0375]],
+  ] as readonly (readonly ParkAccessPoint[])[],
 });
 
-/** Cut complete polygons, including holes and disconnected pieces. Adding a
- * crossing ring to Shape.holes would be invalid and could leave grass strips. */
+/** Boolean cuts retain holes and disconnected pieces instead of overlays. */
 export function clipPavilionCourtyardSurface<Surface extends {
   id: string; polygon: ParkAccessPolygon; holes: readonly ParkAccessPolygon[];
 }>(surface: Surface): Surface[] {
   const original: MultiPolygon = [[surface.polygon, ...surface.holes]
     .map(ring => ring.map(p => [p[0], p[1]]))];
-  if (!polygonClipping.intersection(original, hardscape).length) return [surface];
-  return polygonClipping.difference(original, hardscape).map((rings, index) => ({
+  if (!polygonClipping.intersection(original, occupied).length) return [surface];
+  return polygonClipping.difference(original, occupied).map((rings, index) => ({
     ...surface, id: index ? `${surface.id}:courtyard-cut-${index}` : surface.id,
     polygon: rings[0], holes: rings.slice(1),
   }));

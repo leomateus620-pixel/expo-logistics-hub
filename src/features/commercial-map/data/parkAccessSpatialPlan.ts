@@ -46,7 +46,9 @@ export type ParkAccessSourceId =
   | 'annex-20-satellite-gate-1-roundabout'
   | 'annex-21-site-plan-gate-1-motorhome'
   | 'annex-22-aerial-motorhome-road'
-  | 'annex-23-satellite-gates-6-7';
+  | 'annex-23-satellite-gates-6-7'
+  | 'benvenuto-2026-09-satellite'
+  | 'benvenuto-2026-09-frontages';
 
 export interface ParkAccessEvidence {
   sourceIds: readonly ParkAccessSourceId[];
@@ -145,6 +147,8 @@ export interface ParkAccessSidewalkSurface extends ParkAccessEvidence {
   centerline: readonly ParkAccessPoint[];
   sourcePdfPolygon: ParkAccessSourcePolygon;
   polygon: ParkAccessPolygon;
+  holes?: readonly ParkAccessPolygon[];
+  omitPerimeterCurbs?: boolean;
   segmentOf?: 'benvenuto-north-sidewalk';
   adjacentOfficialIdentifiers?: readonly string[];
 }
@@ -176,6 +180,7 @@ export interface ParkAccessParkingBay extends ParkAccessEvidence {
   sizeMeters: readonly [number, number];
   /** Three.js yaw around +Y; 0 aligns bay depth to local +z. */
   rotation: number;
+  runId: string;
   zoneId: 'benvenuto-woodland-edge' | 'benvenuto-pavilion-edge';
 }
 
@@ -520,7 +525,16 @@ const WOODLAND_PATH_SOURCE = [
 ] as const satisfies readonly ParkAccessSourcePoint[];
 
 const BENVENUTO_PARKING_APRON_WEST_SOURCE = sourceRectangle(1385, 4100, 2650, 4148);
-const BENVENUTO_PARKING_APRON_EAST_SOURCE = sourceRectangle(2790, 4103, 3722, 4148);
+// B4/B6 have no room for sidewalk + full-depth diagonal bays simultaneously.
+// Return pavement to the pedestrian edge here; keep the travel lane unchanged.
+const BENVENUTO_EAST_CURB_SOURCE = [
+  [2790, 4103], [3156, 4103], [3156, 4114], [3307, 4114],
+  [3307, 4103], [3445, 4103], [3445, 4114], [3680, 4114],
+  [3680, 4103], [3722, 4103],
+] as const;
+const BENVENUTO_PARKING_APRON_EAST_SOURCE = closeSourcePolygon([
+  ...BENVENUTO_EAST_CURB_SOURCE, [3722, 4148], [2790, 4148],
+]);
 /**
  * Two usable parking bands joined only by a narrow asphalt seam south of B23.
  * The eastern band stops before B11; neither protected footprint is paved over.
@@ -530,8 +544,7 @@ const BENVENUTO_PARKING_CUTOUT_SOURCE = closeSourcePolygon([
   [2650, 4100],
   [2650, 4142],
   [2790, 4142],
-  [2790, 4103],
-  [3722, 4103],
+  ...BENVENUTO_EAST_CURB_SOURCE,
   [3722, 4148],
   [1385, 4148],
 ]);
@@ -547,8 +560,7 @@ const BENVENUTO_ASPHALT_WITH_PARKING_SOURCE = closeSourcePolygon([
   ...BENVENUTO_SOUTH_EDGE_SOURCE,
   BENVENUTO_NORTH_EDGE_SOURCE[0],
   [3722, 4158],
-  [3722, 4103],
-  [2790, 4103],
+  ...BENVENUTO_EAST_CURB_SOURCE.slice().reverse(),
   [2790, 4142],
   [2650, 4142],
   [2650, 4100],
@@ -663,6 +675,7 @@ const ROAD_SURFACES = [
       },
       BENVENUTO_ASPHALT_WITH_PARKING_SOURCE,
     ),
+    polygon: BENVENUTO_ASPHALT_WITH_PARKING_SOURCE.map(officialPdfPointToLocal),
     mergedApronIds: ['benvenuto-parking-apron-west', 'benvenuto-parking-apron-east'],
   },
   makeRoadSurface(
@@ -880,30 +893,27 @@ const SIDEWALK_SURFACES = [
     },
     { segmentOf: 'benvenuto-north-sidewalk', adjacentOfficialIdentifiers: ['B2', 'B23'] },
   ),
-  makeSidewalk(
-    'benvenuto-north-sidewalk-b3',
-    [[2792, 4097], [3147, 4097]],
-    1.6,
-    'CONCRETE',
-    {
-      sourceIds: ['official-2026-park-map', 'annex-3-street-context'],
+  ...([
+    ['benvenuto-north-sidewalk-b3', ['B3'], [[2790,4089],[3147,4089],[3147,4100],[3156,4100],[3156,4103],[2790,4103]]],
+    ['benvenuto-north-sidewalk-b4', ['B4'], [[3156,4100],[3296,4100],[3296,4051],[3307,4051],[3307,4114],[3156,4114]]],
+    ['benvenuto-north-sidewalk-b5', ['B5'], [[3307,4051],[3445,4051],[3445,4103],[3307,4103]]],
+    ['benvenuto-north-sidewalk-b6', ['B6'], [[3445,4098],[3670,4098],[3670,4103],[3680,4103],[3680,4114],[3445,4114]]],
+  ] as const).map(([id, adjacentOfficialIdentifiers, sourceRing]): ParkAccessSidewalkSurface => {
+    const sourcePdfPolygon = closeSourcePolygon(sourceRing);
+    const boundsZ = sourceRing.map(p => p[1]);
+    return {
+      id, adjacentOfficialIdentifiers, sourcePdfPolygon, polygon: sourcePdfPolygon.map(officialPdfPointToLocal),
+      elevation: 0.068, widthMeters: 1.6, surface: 'CONCRETE',
+      segmentOf: 'benvenuto-north-sidewalk', omitPerimeterCurbs: true,
+      sourcePdfCenterline: [sourceRing[0], sourceRing[1]],
+      centerline: pathToLocal([sourceRing[0], sourceRing[1]]),
+      // Retained natural tree bed in the B5 recess, not grass at the facade.
+      holes: id.endsWith('-b5') ? [polygonToLocal(sourceRectangle(3310, 4081, 3442, 4096))] : [],
+      sourceIds: ['official-2026-park-map', 'benvenuto-2026-09-satellite', 'benvenuto-2026-09-frontages'],
       confidence: 'ANNEX_RELATIVE_TRACE',
-      notes: 'Trecho recortado diante de B3; cabe entre o footprint e o apron leste sem invadir B23 ou B4.',
-    },
-    { segmentOf: 'benvenuto-north-sidewalk', adjacentOfficialIdentifiers: ['B3', 'B4'] },
-  ),
-  makeSidewalk(
-    'benvenuto-north-sidewalk-b5',
-    [[3307, 4070], [3445, 4070]],
-    1.6,
-    'CONCRETE',
-    {
-      sourceIds: ['official-2026-park-map', 'annex-3-street-context'],
-      confidence: 'ANNEX_RELATIVE_TRACE',
-      notes: 'Trecho recortado diante de B5; B4, B6 e B11 são omitidos por falta de corredor livre defensável.',
-    },
-    { segmentOf: 'benvenuto-north-sidewalk', adjacentOfficialIdentifiers: ['B4', 'B5', 'B6'] },
-  ),
+      notes: `Pavimento termina na fachada oficial e no recuo asfaltado; largura variável (${Math.max(...boundsZ) - Math.min(...boundsZ)} pontos PDF), não medida as-built. B4/B6 ganham faixa pedonal à custa do recuo, sem mover pista ou prédio.`,
+    };
+  }),
   makeSidewalk(
     'benvenuto-south-sidewalk',
     [[1240, 4270], [2300, 4270], [3000, 4272], [3915, 4280]],
@@ -964,28 +974,44 @@ const MARKING_SEGMENTS = [
   localSegment('benvenuto-south-edge', 'EDGE_WHITE', [1280, 4248], [3890, 4264], 0.12, null),
 ] as const satisfies readonly ParkAccessMarkingSegment[];
 
-const PARKING_BAY_SOURCE_X = [
-  ...Array.from({ length: 22 }, (_, index) => 1410 + index * 58),
-  ...Array.from({ length: 21 }, (_, index) => round(2812 + index * 44.4, 3)),
-];
-
-const PARKING_BAYS: readonly ParkAccessParkingBay[] = PARKING_BAY_SOURCE_X.map((sourceX, index) => {
-  const sourcePdfCenter = [sourceX, 4124] as const;
-  const sourcePdfPolygon = rotatedSourceRectangle(sourcePdfCenter, 2.7, 5.2, -Math.PI / 3);
-  return {
-    id: `benvenuto-bay-${String(index + 1).padStart(2, '0')}`,
-    sourcePdfCenter,
-    center: parkAccessSourcePointToLocal(sourcePdfCenter),
-    sourcePdfPolygon,
-    polygon: polygonToLocal(sourcePdfPolygon),
-    size: [parkAccessMetersToLocal(2.7), parkAccessMetersToLocal(5.2)],
-    sizeMeters: [2.7, 5.2],
-    rotation: -Math.PI / 3,
-    zoneId: sourceX < 2300 ? 'benvenuto-woodland-edge' : 'benvenuto-pavilion-edge',
-    sourceIds: ['annex-1-implantation', 'annex-5-woodland-path'],
-    confidence: 'DIMENSIONALLY_INFERRED',
-    notes: 'Vaga inclinada no recorte lateral asfaltado; o anexo confirma a lógica e orientação, mas não individualiza cada medida ou numeração.',
-  } satisfies ParkAccessParkingBay;
+/**
+ * Registration: in annex 1, image-up = source +X, image-right = source +Z.
+ * Bay separators lean up/right: positive Three yaw, approximately 30 degrees
+ * from the cross-street axis (visual range 25–40, not an executive angle).
+ * Each interval is an independent run with unpainted ends/access clearances.
+ */
+export const BENVENUTO_PARKING_RUNS = [
+  { id: 'woodland-west', start: 1400, end: 1790, z: 4124 },
+  { id: 'woodland-east', start: 1835, end: 2250, z: 4124 },
+  { id: 'b14-approach', start: 2310, end: 2400, z: 4124 },
+  { id: 'b14-front', start: 2425, end: 2640, z: 4124 },
+  { id: 'b12-front', start: 2800, end: 3147, z: 4125.5 },
+  { id: 'b13-front', start: 3310, end: 3442, z: 4125.5 },
+] as const;
+const PARKING_ROTATION = Math.PI / 6;
+const PARKING_WIDTH_METERS = 2.7;
+const PARKING_DEPTH_METERS = 5.2;
+const PARKING_PITCH = parkAccessMetersToSourcePdf(PARKING_WIDTH_METERS / Math.cos(PARKING_ROTATION));
+const PARKING_HALF_X = parkAccessMetersToSourcePdf(
+  PARKING_WIDTH_METERS * Math.cos(PARKING_ROTATION) + PARKING_DEPTH_METERS * Math.sin(PARKING_ROTATION),
+) / 2;
+const PARKING_BAYS: readonly ParkAccessParkingBay[] = BENVENUTO_PARKING_RUNS.flatMap(run => {
+  const count = Math.max(0, Math.floor((run.end - run.start - 2 * PARKING_HALF_X) / PARKING_PITCH) + 1);
+  return Array.from({ length: count }, (_, index): ParkAccessParkingBay => {
+    const sourcePdfCenter = [round(run.start + PARKING_HALF_X + index * PARKING_PITCH, 3), run.z] as const;
+    const sourcePdfPolygon = rotatedSourceRectangle(sourcePdfCenter, PARKING_WIDTH_METERS, PARKING_DEPTH_METERS, PARKING_ROTATION);
+    return {
+      id: `benvenuto-${run.id}-bay-${index + 1}`, runId: run.id,
+      sourcePdfCenter, center: parkAccessSourcePointToLocal(sourcePdfCenter),
+      sourcePdfPolygon, polygon: polygonToLocal(sourcePdfPolygon),
+      size: [parkAccessMetersToLocal(PARKING_WIDTH_METERS), parkAccessMetersToLocal(PARKING_DEPTH_METERS)],
+      sizeMeters: [PARKING_WIDTH_METERS, PARKING_DEPTH_METERS], rotation: PARKING_ROTATION,
+      zoneId: run.start < 2300 ? 'benvenuto-woodland-edge' : 'benvenuto-pavilion-edge',
+      sourceIds: ['official-2026-park-map', 'benvenuto-2026-09-satellite'],
+      confidence: 'ANNEX_RELATIVE_TRACE',
+      notes: 'Sentido registrado pelos pavilhões/cruzamentos; ângulo, espaçamento e contagem são estimativas visuais. Interromper em B4/B6 preserva passeio e pista nos footprints oficiais.',
+    };
+  });
 });
 
 const WOODLAND_OUTER_SOURCE = closeSourcePolygon([
@@ -1094,6 +1120,13 @@ const ROUNDABOUTS = [
 ] as const;
 
 export const PARK_ACCESS_SOURCE_MANIFEST: readonly ParkAccessSourceManifestEntry[] = [
+  { id: 'benvenuto-2026-09-satellite', file: 'attachment:535f30fa-7cb3-4088-aa20-89bce2f72b92.jpg',
+    role: 'Alinhamento relativo das vagas, recuos e fachadas da Avenida Benvenuto de Conti.',
+    metricUse: 'RELATIVE_ONLY', interpretation: 'B2/B3/B4/B5/B6 e cruzamentos são âncoras; inclinação positiva estimada, sem medir larguras pelo raster.' },
+  { id: 'benvenuto-2026-09-frontages', file: 'attachment:c4037d48-20fa-4a38-8292-042506f51f75.jpg',
+    role: 'Faixas de grama residuais diante das fachadas internas dos pavilhões.',
+    metricUse: 'VISUAL_ONLY', interpretation: 'Comparar apresentação existente, conservando footprints e identidades oficiais; não usar pixels como metros.' },
+
   {
     id: 'official-2026-park-map',
     file: '/maps/fenasoja-oficial-2026-park.webp',
@@ -1736,24 +1769,24 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
       omittedOfficialIdentifiers: ['B1', 'B2', 'B3', 'B4', 'B6'] as const,
       omissionReason: 'Não existe corredor sul livre simultaneamente de footprint, passeio e apron; B6 dispõe de menos de 0,75 m, e nenhuma árvore é deslocada artificialmente para o norte.',
     },
+    sourcePdfParkingCurb: BENVENUTO_EAST_CURB_SOURCE,
+    parkingCurb: BENVENUTO_EAST_CURB_SOURCE.map(officialPdfPointToLocal),
     parkingAprons: [
       {
         id: 'benvenuto-parking-apron-west',
         sourcePdfPolygon: BENVENUTO_PARKING_APRON_WEST_SOURCE,
-        polygon: polygonToLocal(BENVENUTO_PARKING_APRON_WEST_SOURCE),
+        polygon: BENVENUTO_PARKING_APRON_WEST_SOURCE.map(officialPdfPointToLocal),
         roadSurfaceId: 'benvenuto-four-lane-axis',
       },
       {
         id: 'benvenuto-parking-apron-east',
         sourcePdfPolygon: BENVENUTO_PARKING_APRON_EAST_SOURCE,
-        polygon: polygonToLocal(BENVENUTO_PARKING_APRON_EAST_SOURCE),
+        polygon: BENVENUTO_PARKING_APRON_EAST_SOURCE.map(officialPdfPointToLocal),
         roadSurfaceId: 'benvenuto-four-lane-axis',
       },
     ] as const,
     parkingProtectedFootprintIdentifiers: ['B2', 'B3', 'B4', 'B5', 'B6', 'B11', 'B23'] as const,
     sidewalkOmissions: [
-      { officialIdentifier: 'B4', reason: 'Corredor entre footprint e apron menor que a largura pedonal parametrizada.' },
-      { officialIdentifier: 'B6', reason: 'Corredor residual insuficiente tanto para a banda arbórea quanto para o passeio sem invadir footprint ou apron.' },
       { officialIdentifier: 'B11', reason: 'Recorte obrigatório para preservar Portão 3 e o footprint administrativo.' },
     ] as const,
     transitionBands: [
@@ -1769,7 +1802,7 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
       },
     ].map((band) => ({ ...band, polygon: polygonToLocal(band.sourcePdfPolygon) })),
     sourcePdfParkingCutout: BENVENUTO_PARKING_CUTOUT_SOURCE,
-    parkingCutout: polygonToLocal(BENVENUTO_PARKING_CUTOUT_SOURCE),
+    parkingCutout: BENVENUTO_PARKING_CUTOUT_SOURCE.map(officialPdfPointToLocal),
     sourceIds: ['annex-1-implantation', 'annex-3-street-context', 'annex-5-woodland-path'],
     confidence: 'ANNEX_REGISTERED_TRACE' as const,
     notes: 'Aprons, passeios recortados e árvores street-side usam corredores distintos; B23 e B11 são notches obrigatórios e nenhuma árvore substitui o inventário oficial.',

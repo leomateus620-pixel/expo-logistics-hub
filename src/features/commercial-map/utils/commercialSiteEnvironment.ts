@@ -11,6 +11,7 @@ import {
 import { SOY_RESTROOM } from '../data/soyGateInfrastructure';
 import { OFFICIAL_REFERENCE_ENTITIES, officialPdfPointToLocal } from '../data/officialReference2026';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../data/parkAccessSpatialPlan';
+import { PAVILION_COURTYARD } from '../data/pavilionCourtyard';
 import { REAR_PARKING_ROWS, REAR_PARKING_SURFACES } from '../data/rearParking';
 import { buildRearRoadCorridorFootprints } from './rearRoadNetwork';
 import { distanceToPolygon, distanceToSegment, pointInPolygon } from './spatialSurface';
@@ -298,6 +299,11 @@ export function buildCommercialSiteHardSurfaceMasks(
 
   PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.forEach((surface) => {
     const mask = makeMask(`park-access:road:${surface.id}`, surface.id, 'PARK_ACCESS_ROAD', surface.polygon);
+    if (mask) masks.push(mask);
+  });
+  PAVILION_COURTYARD.occupied.forEach((rings, index) => {
+    const id = `pavilion-pavement:${index}`;
+    const mask = makeMask(id, id, 'PARK_ACCESS_SIDEWALK', rings[0]);
     if (mask) masks.push(mask);
   });
   PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.forEach((surface) => {

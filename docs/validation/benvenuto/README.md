@@ -1,0 +1,77 @@
+# Benvenuto e entorno dos pavilhões
+
+## Registro anterior à alteração
+
+Base: `4294ddbb` (origin/main na criação do checkout). Fonte métrica: transformação isotrópica do PDF oficial (crop 600,900; 5500 × 4150 pontos; mapa 120 × 90,545455). A escala de trabalho é 0,15 unidade/m, herdada do projeto, não levantamento do perímetro. Nenhum anexo fornece levantamento topográfico.
+
+| Superfície existente | Origem | Responsável visual |
+| --- | --- | --- |
+| Avenida e recuo asfaltado | parkAccessSpatialPlan, benvenuto-four-lane-axis | ParkAccessInfrastructure, lote agrupado de asfalto |
+| Polígono cadastral AV-BENVENUTO-CONTI | officialReference2026 | RoadInfrastructure; suprimido quando o detalhamento está ativo; entidade permanece selecionável |
+| 43 vagas uniformes, yaw −60° | PARKING_BAY_SOURCE_X | Marcação branca agrupada de ParkAccessInfrastructure |
+| Passeios sul, B2, B3 e B5 | SIDEWALK_SURFACES | ParkAccessInfrastructure, passeios e bordas agrupados |
+| União de concreto B1/B2/B3 | PAVILION_COURTYARD.hardscape | ParkAccessEnvironmentLayer, lote ambiental |
+| Grama/solo de transição | parkAccessEnvironment e transitionBands | ParkAccessEnvironmentLayer |
+| Árvore central B2/B3 | PAVILION_COURTYARD.treePosition | Instâncias ambientais; também consumidas pela colisão da visita |
+| Piso de contexto e inventário de árvores | CommercialSiteEnvironmentLayer / TreeLayer | Preservados; conferir exclusões para áreas corrigidas |
+
+## Registro dos anexos
+
+Os cinco arquivos do pedido são referências visuais, não instruções nem medições. A transformação da captura para o mapa é uma correspondência local por fachada; não se presume uma homografia global precisa de imagens de interface, coberturas com perspectiva e vegetação.
+
+| Anexo | Arquivo | Âncoras e leitura |
+| --- | --- | --- |
+| 1 | 535f30fa-7cb3-4088-aa20-89bce2f72b92.jpg | B2 na parte inferior, B3 imediatamente acima, B4/B5/B6 em sequência rumo ao topo; avenida à direita. A direção para o topo corresponde a +X do PDF; direita a +Z. As linhas das vagas avançam para +X e +Z, oposto ao yaw atual. Interrupções nas bocas laterais e áreas sem pintura. |
+| 2 | f913fbf4-6926-449b-9808-d69969f89738.jpg | Mesma sequência na apresentação atual; evidencia afastamentos verdes, inclinação das vagas e descontinuidade dos passeios. |
+| 3 | fdc85e65-5dc2-43b4-a0a8-970c6908e1c3.jpg | B1 à esquerda, B2 à direita; corredor entre maxZ de B1 e minZ de B2. Calçada contorna B1 e inclui ilha de árvore no extremo junto à ligação interna. A legenda de rua não altera o cadastro. |
+| 4 | 7db5c4bb-32aa-4f1d-93c4-a3a9ae5fdce5.jpg | Vista oblíqua do mesmo corredor; concreto contínuo atual apaga a separação entre rua e passeio. |
+| 5 | c4037d48-20fa-4a38-8292-042506f51f75.jpg | B3/B4/B5/B6 vistos pela face interna; faixa verde entre a circulação interna e fachadas, além da frente da avenida tratada pelos passeios existentes. |
+
+Âncoras no PDF (minX, minZ, maxX, maxZ): B1=(2298,3600,2655,3759); B2=(2418,3833,2658,4074); B3=(2792,3827,3147,4089); B4=(3172,3788,3296,4100); B5=(3307,3788,3445,4051); B6=(3460,3786,3670,4098). RUA-ARGENTINA=(2820,3716,3940,3780): não é o corredor B1/B2. Alameda Mercosul termina em Z=3780, X=2786..2828 e é a âncora de ligação interna.
+
+Ângulo das vagas, fases de espaçamento, largura de passeio e dimensões dos canteiros serão aproximações de apresentação, identificadas no código. Coberturas e ruas oficiais prevalecem sobre a imagem quando a compatibilidade dimensional não é demonstrável. A quantidade de vagas renderizadas não representa inventário comercial ou projeto de sinalização executiva.
+
+## Decisões de implementação
+
+- A avenida conserva seu eixo e pista. Os recuos diante de B4/B6 cedem espaço ao passeio; ali não se desenham vagas cujo envelope invadiria a circulação. São 67 vagas de apresentação em seis trechos, dimensionadas por envelopes completos e espaçamento projetado. Não é contagem aferida em campo. O yaw visual passa de −60° para +30° (faixa visual estimada de 25° a 40° em relação ao eixo transversal).
+- O corredor B1/B14 passa a asfalto, ligado ao extremo da Alameda Mercosul. A calçada própria acompanha B1 e contém uma abertura de solo para a árvore. O pátio B14/B12 conserva sua árvore. RUA-ARGENTINA não foi movida ou renomeada.
+- O concreto das fachadas internas e da avenida termina nos footprints B3/B4/B5/B6; o canteiro de B5 permanece. B4/B6 têm soleiras internas estreitas conforme o cadastro, sem declaração de acessibilidade dimensional.
+- A revisão visual detectou duas lacunas verdes decorrentes de B33/B34. O próprio cadastro identifica esses apoios como temporários removidos do payload visível. A correção excepciona somente suas máscaras históricas de solo verde nesta frente, atendendo ao pedido de pavimentação contínua. Nenhum registro, polígono cadastral ou edifício renderizado foi alterado. B23 continua reservado.
+- Concreto foi transferido do lote ambiental para o lote existente de passeios. Asfalto, passeios, marcações e meios-fios continuam agrupados, sem componentes por vaga, luzes adicionais ou trabalho por frame. As marcações adjacentes usam união geométrica; solo/trilha/contexto recebem recortes reais. O suporte da visita respeita as mesmas aberturas.
+- O concreto reutiliza o gerador PBR do projeto, com juntas de aproximadamente 3 m na escala de trabalho, normal discreta e UV no espaço do mapa. Essas proporções são de apresentação.
+
+Galeria: [comparação lado a lado](comparison.html). A cor dos lotes na fixture pertence ao estado da base local; não representa consulta à disponibilidade de produção.
+
+## Protocolo antes/depois
+
+Mesmos builds de produção com diagnóstico opt-in, fixture oficial local, navegador Chrome/ANGLE D3D11, câmera e sequência repetidas. Desktop 1440 × 900 e mobile emulado 390 × 844, DPR 1 e 3 respectivamente. Registrar entrada, FPS em movimento, draw calls, geometrias, texturas, programas, contexto e erros. Contagens de recursos e bytes de buffers/texturas estimados não são leitura de VRAM física. Nenhuma evidência local certifica dispositivo físico, Safari/iOS ou publicação em produção.
+
+## Resultado local — 29/09/2026
+
+Chrome 154 headless, Windows, Intel UHD via ANGLE D3D11. Execuções sequenciais sem builds/testes concorrentes. Contexto novo por dispositivo, servidor local sem limitação de rede; cache do driver e aquecimento do sistema não controlados. Três navegações de 8 s; o diagnóstico conserva no máximo 240 amostras por janela. Nenhum ganho de desempenho é atribuído à alteração.
+
+| Métrica | Desktop antes → depois | Mobile emulado antes → depois |
+| --- | --- | --- |
+| Mapa pronto (s) | 20,830 → 20,366 | 18,433 → 14,413 |
+| Hidratação completa (s) | 114,467 → 113,960 | 44,757 → 38,743 |
+| FPS das amostras em navegação | 28,34 → 28,38 | 53,63 → 53,70 |
+| Tempo de quadro P95 (ms) | 40,8 → 40,9 | 22,5 → 22,4 |
+| Draw calls, vista aérea | 263 → 263 | 186 → 186 |
+| Triângulos, vista aérea | 383.400 → 383.462 | 322.712 → 322.774 |
+| Geometrias / texturas / programas | 562/131/222 → 562/130/222 | 549/131/222 → 549/130/222 |
+| Buffers de geometria (MiB) | 13,255 → 13,255 | 13,156 → 13,155 |
+| Texturas RGBA + mipmaps estimados (MiB) | 45,953 → 46,911 | 46,953 → 47,911 |
+
+O custo estimado de texturas cresce cerca de 0,96 MiB com o concreto PBR. Não inclui render targets, alocação do driver ou VRAM real. Os tempos de entrada permanecem altos; esta correção não resolve o carregamento geral. A variação de entrada mobile é uma observação de uma execução, sem inferência de melhoria.
+
+As seis câmeras e alvos têm diferença exatamente zero entre antes/depois nos dois formatos. O perfil adaptativo ficou MEDIUM durante navegação; DPR desktop 0,9 e mobile 1,35 → 1,215 em ambos. As três alternâncias de qualidade mantiveram recursos aquecidos em 592/135/222 no desktop e 582/133/222 no mobile. Nenhum erro de página ou perda espontânea de contexto foi observado.
+
+O teste adicional selecionou B14 pelo mesmo método do explorador, abriu/fechou seu interior, entrou/saiu da visita e realizou gestos reais do navegador. No mobile, touchCancel interrompeu a caminhada sem deriva; retrato e paisagem não apresentaram overflow. Uma perda WebGL intencional por dispositivo recuperou a cena pelo fallback direct existente, sem deriva do personagem, e permitiu retomar movimento (2,48 m / 2,67 m). Canvas, renderer e controles permaneceram 1/1/1.
+
+Validação automática: 111 testes em 14 arquivos passaram; incluem os quatro arquivos obrigatórios, infraestrutura, integração, colisão, apoio no solo e contratos públicos. TypeScript, ESLint dos arquivos alterados, build normal e build de diagnóstico passaram. O orçamento original de 6.000 triângulos da infraestrutura foi mantido. O teste de colisão percorre o novo asfalto, verifica a calçada e bloqueia o footprint de B1 e o tronco da árvore.
+
+Os JSON completos estão em `before/`, `after/` e [summary.json](summary.json). `diagnostics/initial-before-*` é a primeira sondagem sem amostras válidas de navegação e foi excluída da comparação de FPS; `intermediate-after-*` documenta a revisão anterior à remoção dos dois recortes históricos B33/B34. A tabela e a galeria usam somente a geometria final de `after/`.
+
+Para repetir: `VITE_COMMERCIAL_MAP_DIAGNOSTICS=true npm run build`, servir com Vite preview, definir `PLAYWRIGHT_MODULE` para Playwright instalado, `BENVENUTO_URL` para esse servidor e executar `node scripts/commercial-map-performance/benvenuto.cjs after`. `BENVENUTO_SMOKE=1` habilita interações e perda de contexto depois das medições. A base 4294ddbb recebeu somente o mesmo probe opt-in de diagnóstico, sem as correções de superfície. `benvenuto-summary.cjs` consolida os dois conjuntos. `benvenuto-walk.cjs` exercita separadamente a caminhada real desde B14 até o novo corredor; não participa da medição comparativa de FPS.
+
+Limites: não houve consulta a dados comerciais de produção, deploy, levantamento físico das vagas, medição de VRAM física ou teste em smartphone real. Os hashes de `officialReference2026`, `CommercialMapCanvas` e `RoadInfrastructure` continuam iguais à base em [preservation.json](preservation.json).

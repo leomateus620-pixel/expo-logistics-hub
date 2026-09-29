@@ -322,7 +322,7 @@ export function buildVisitGroundSurfaces(entities: readonly MapEntity[], include
   const environment = resolveParkAccessEnvironmentPresentation(false, false);
   for (const surface of [...environment.environmentalSurfaces, ...environment.trailSurfaces]) surfaces.push(visitGroundSurface(surface.id, surface.polygon, surface.elevation, surface.holes));
   for (const surface of [...PARK_ACCESS_INFRASTRUCTURE_INPUT.roadSurfaces, ...PARK_ACCESS_INFRASTRUCTURE_INPUT.sidewalkSurfaces]) {
-    surfaces.push(visitGroundSurface(surface.id, surface.polygon, surface.elevation ?? 0.04));
+    surfaces.push(visitGroundSurface(surface.id, surface.polygon, surface.elevation ?? 0.04, surface.holes));
   }
   buildRearRoadCorridorFootprints(GENERATED_REAR_ROAD_SEGMENTS, { includeShoulders: false, samplesPerWorldUnit: 5 }).forEach((road, index) => {
     const count = road.centerline.length, base = GENERATED_REAR_ROAD_SEGMENTS[index].elevationOffset;
