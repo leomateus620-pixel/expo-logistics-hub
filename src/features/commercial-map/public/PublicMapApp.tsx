@@ -1,13 +1,15 @@
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
+import { applyPublicShareMetadata } from './publicShareMetadata';
 
 const PublicAreaMapPage = lazyWithRetry(() => import('./PublicAreaMapPage'));
 
 const client = new QueryClient({ defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } } });
 
 function InvalidLink() {
+  useEffect(() => { applyPublicShareMetadata('', false, window.location.href); }, []);
   return (
     <main className="flex min-h-[100dvh] items-center justify-center bg-background p-6 text-center text-foreground">
       <div className="max-w-sm space-y-2">

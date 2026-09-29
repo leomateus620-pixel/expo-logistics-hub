@@ -8,3 +8,6 @@
 - Espaços comerciais sem número podem manter `lot_number` nulo e uma faixa de preço explícita independente do número — por quê: a área de 568,78 m² da Expo Rural deve ser vendável sem inventar identidade ou mudar os preços das demais parcelas.
 - A cena externa e o corte dos pavilhões não montam atlas numéricos permanentes; a identificação contextual usa a seleção, enquanto a planta interna detalhada conserva sua numeração — por quê: manter o mapa navegável sem poluição e preservar a leitura da planta interna.
 - Fluxo comercial em quatro fases: vendas (checkout e registro individual) criam Venda em aberto (`SALE_OPEN`, amarelo, `lot_sales.status=OPEN`, item `PENDING_SIGNATURE`); só `confirm_sale_order_items` (permissão map.manage_sales, idempotente) marca Vendido azul; `cancel_sale_order_items` devolve a Disponível sem apagar histórico; os 57 itens históricos ficam `LEGACY_UNVERIFIED` e continuam SOLD — por quê: anexar contrato não comprova assinatura e venda aberta nunca é receita realizada.
+<!-- LOVABLE:BEGIN -->
+- Prévia pública: imagem por área e metadados de escopo somente após validar o token; nunca incluir comprador nem token na imagem — por quê: proteger links revogados e dados comerciais.
+<!-- LOVABLE:END -->
