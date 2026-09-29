@@ -28,6 +28,8 @@ import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 import { isVegetationPilotEnabled, isVegetationPilotTree } from '../../utils/vegetationPilot';
 import { VegetationPilotTreeLayer } from './VegetationPilotTreeLayer';
 import { VegetationPilotGroundLayer } from './VegetationPilotGroundLayer';
+import { createInternalFoliageMaterial, createInternalLeafAtlas, createInternalLeafLobe, internalTreeCrownCastsShadow, isInternalParkVegetationPoint, INTERNAL_TREE_TRUNK_RADIUS_FACTOR } from '../../utils/internalTreeVisuals';
+import { createPilotBarkMaterial } from './vegetationPilotMaterial';
 
 const NO_RAYCAST = () => undefined;
 const SHADOW_OPACITY = 0.105;
@@ -326,7 +328,7 @@ function createIrregularContactPatchGeometry() {
   return geometry;
 }
 
-function createTreeMaterials(shadowTexture: THREE.Texture, referenceQuadras = false, reducedGraphics = false) {
+function createTreeMaterials(shadowTexture: THREE.Texture, referenceQuadras = false, reducedGraphics = false, leafAtlas: THREE.Texture | null = null) {
   const materials = {
     trunk: new THREE.MeshStandardMaterial({
       color: '#ffffff',
@@ -350,7 +352,7 @@ function createTreeMaterials(shadowTexture: THREE.Texture, referenceQuadras = fa
       // the directional-light response or making the foliage self-lit.
       emissive: referenceQuadras ? '#354629' : '#416946',
       emissiveIntensity: referenceQuadras ? 0.075 : 0.3,
-    }),
+    }) as THREE.MeshStandardMaterial | THREE.MeshLambertMaterial,
     contactPatch: new THREE.MeshStandardMaterial({
       color: '#ffffff',
       roughness: 1,
@@ -376,7 +378,16 @@ function createTreeMaterials(shadowTexture: THREE.Texture, referenceQuadras = fa
       polygonOffsetUnits: -1,
     }),
   };
-  applyParkSurfaceDetail(materials.trunk, 'volume', reducedGraphics);
+  if (leafAtlas) {
+    materials.trunk.dispose();
+    materials.crown.dispose();
+    materials.trunk = createPilotBarkMaterial();
+    // Instance colors are sufficient; these geometries have no vertex color attribute.
+    materials.trunk.vertexColors = false;
+    materials.crown = createInternalFoliageMaterial(leafAtlas);
+    materials.contactPatch.vertexColors = false;
+  }
+  if (!leafAtlas) applyParkSurfaceDetail(materials.trunk, 'volume', reducedGraphics);
   return materials;
 }
 
@@ -467,6 +478,7 @@ function setCommercialTreeCastShadow(
   trunk: THREE.InstancedMesh | null,
   branch: THREE.InstancedMesh | null,
   crown: THREE.InstancedMesh | null,
+  crownShadowAllowed = true,
 ) {
   let changed = false;
   if (trunk && trunk.castShadow !== castShadow) {
@@ -477,8 +489,9 @@ function setCommercialTreeCastShadow(
     branch.castShadow = castShadow;
     changed = true;
   }
-  if (crown && crown.castShadow !== castShadow) {
-    crown.castShadow = castShadow;
+  const crownShadow = castShadow && crownShadowAllowed;
+  if (crown && crown.castShadow !== crownShadow) {
+    crown.castShadow = crownShadow;
     changed = true;
   }
   return changed;
@@ -524,6 +537,7 @@ function CommercialTreeInstances({
   qualityTier,
   lodScene,
   referenceQuadras = false,
+  internalPark = false,
 }: {
   trees: readonly CommercialMapTree[];
   surfaceEntities: readonly MapEntity[];
@@ -532,6 +546,7 @@ function CommercialTreeInstances({
   qualityTier: CommercialMapQualityTier;
   lodScene: CommercialTreeLodSceneMetrics;
   referenceQuadras?: boolean;
+  internalPark?: boolean;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const trunkRef = useRef<THREE.InstancedMesh>(null);
@@ -544,6 +559,7 @@ function CommercialTreeInstances({
   const { camera, gl, invalidate } = useThree();
   const effectiveReducedGraphics = resolveCommercialMapContentPolicy(qualityTier, reducedGraphics).reducedGraphics;
   const execution = resolveCommercialMapExecutionPolicy(qualityTier);
+  const crownShadowAllowed = !internalPark || internalTreeCrownCastsShadow(qualityTier);
   const lodElapsed = useRef(Number.POSITIVE_INFINITY);
   const lobeCount = effectiveReducedGraphics
     ? COMMERCIAL_TREE_REDUCED_CANOPY_LOBES
@@ -592,14 +608,15 @@ function CommercialTreeInstances({
       2,
     ),
     branch: new THREE.CylinderGeometry(0.42, 0.74, 1, 6, 1),
-    crown: createCrownGeometry(effectiveReducedGraphics, referenceQuadras),
+    crown: internalPark ? createInternalLeafLobe() : createCrownGeometry(effectiveReducedGraphics, referenceQuadras),
     shadow: new THREE.PlaneGeometry(2, 2, 1, 1),
     contactPatch: createIrregularContactPatchGeometry(),
-  }), [effectiveReducedGraphics, referenceQuadras]);
+  }), [effectiveReducedGraphics, referenceQuadras, internalPark]);
   const shadowTexture = useMemo(createSoftShadowTexture, []);
+  const leafAtlas = useMemo(() => internalPark ? createInternalLeafAtlas() : null, [internalPark]);
   const materials = useMemo(
-    () => createTreeMaterials(shadowTexture, referenceQuadras, effectiveReducedGraphics),
-    [effectiveReducedGraphics, referenceQuadras, shadowTexture],
+    () => createTreeMaterials(shadowTexture, referenceQuadras, effectiveReducedGraphics, leafAtlas),
+    [effectiveReducedGraphics, referenceQuadras, shadowTexture, leafAtlas],
   );
 
   useLayoutEffect(() => {
@@ -638,9 +655,9 @@ function CommercialTreeInstances({
       transform.position.set(x, groundY + tree.trunkHeight / 2, z);
       transform.rotation.set(0, profile.rotation, 0);
       transform.scale.set(
-        tree.trunkRadius * profile.trunkScaleX,
+        tree.trunkRadius * profile.trunkScaleX * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1),
         tree.trunkHeight,
-        tree.trunkRadius * profile.trunkScaleZ,
+        tree.trunkRadius * profile.trunkScaleZ * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1),
       );
       transform.updateMatrix();
       trunkMesh.setMatrixAt(treeIndex, transform.matrix);
@@ -662,7 +679,8 @@ function CommercialTreeInstances({
         quaternion.setFromUnitVectors(UNIT_Y, direction.clone().normalize());
         transform.position.copy(midpoint);
         transform.quaternion.copy(quaternion);
-        transform.scale.set(tree.trunkRadius * 0.52, direction.length(), tree.trunkRadius * 0.52);
+        const branchRadius = tree.trunkRadius * 0.52 * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1);
+        transform.scale.set(branchRadius, direction.length(), branchRadius);
         transform.updateMatrix();
         branchMesh.setMatrixAt(instanceIndex, transform.matrix);
         branchMesh.setColorAt(instanceIndex, trunkColor);
@@ -757,6 +775,7 @@ function CommercialTreeInstances({
     lobeCount,
     lodPlan,
     referenceQuadras,
+    internalPark,
     surfaceEntities,
   ]);
 
@@ -769,11 +788,12 @@ function CommercialTreeInstances({
       trunkRef.current,
       branchRef.current,
       crownRef.current,
+      crownShadowAllowed,
     );
     transitionPending.current = true;
     gl.shadowMap.needsUpdate = true;
     invalidate();
-  }, [gl, invalidate, visible]);
+  }, [crownShadowAllowed, gl, invalidate, visible]);
 
   useEffect(() => () => {
     Object.values(geometries).forEach((geometry) => geometry.dispose());
@@ -783,6 +803,7 @@ function CommercialTreeInstances({
     Object.values(materials).forEach((material) => material.dispose());
     shadowTexture.dispose();
   }, [materials, shadowTexture]);
+  useEffect(() => () => leafAtlas?.dispose(), [leafAtlas]);
 
   useFrame((state, delta) => {
     const group = groupRef.current;
@@ -811,6 +832,7 @@ function CommercialTreeInstances({
         trunkRef.current,
         branchRef.current,
         crownRef.current,
+        crownShadowAllowed,
       )) gl.shadowMap.needsUpdate = true;
     }
 
@@ -849,6 +871,7 @@ function CommercialTreeInstances({
           trunkRef.current,
           branchRef.current,
           crownRef.current,
+          crownShadowAllowed,
         );
         transitionPending.current = false;
         gl.shadowMap.needsUpdate = true;
@@ -865,7 +888,7 @@ function CommercialTreeInstances({
       name={referenceQuadras ? 'camada-arvores-quadras-ab' : 'camada-arvores-comerciais'}
       visible={visible || visibilityProgress.current > 0.002}
       userData={{
-        presentationVariant: referenceQuadras ? 'quadras-ab-reference' : 'legacy',
+        presentationVariant: internalPark ? 'internal-leaf-clusters' : referenceQuadras ? 'quadras-ab-reference' : 'legacy',
         treeCount: trees.length,
         vegetationLodTier: renderedLodTier,
         visibleTreeCount: jsxLodCounts.trees,
@@ -918,8 +941,8 @@ function CommercialTreeInstances({
         name="copas-arvores-comerciais"
         args={[geometries.crown, materials.crown, trees.length * lobeCount]}
         count={jsxLodCounts.crowns}
-        castShadow={!effectiveReducedGraphics}
-        receiveShadow={!effectiveReducedGraphics}
+        castShadow={!effectiveReducedGraphics && crownShadowAllowed}
+        receiveShadow={!effectiveReducedGraphics && crownShadowAllowed}
         frustumCulled
         raycast={NO_RAYCAST}
       />
@@ -938,7 +961,10 @@ export const CommercialTreeLayer = memo(function CommercialTreeLayer(props: {
   const treeGroups = useMemo(() => ({
     pilot: pilotEnabled ? props.trees.filter(isVegetationPilotTree) : [],
     referenceQuadras: pilotEnabled ? [] : props.trees.filter((tree) => tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B'),
-    legacy: props.trees.filter((tree) => pilotEnabled ? !isVegetationPilotTree(tree) : tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B'),
+    legacy: props.trees.filter((tree) => !isInternalParkVegetationPoint(tree.position)
+      && (pilotEnabled ? !isVegetationPilotTree(tree) : tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B')),
+    internal: props.trees.filter((tree) => isInternalParkVegetationPoint(tree.position)
+      && (pilotEnabled ? !isVegetationPilotTree(tree) : tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B')),
   }), [props.trees, pilotEnabled]);
   const lodScene = useMemo(() => resolveCommercialTreeLodSceneMetrics(props.trees), [props.trees]);
   const qualityTier = props.qualityTier ?? 'HIGH';
@@ -957,6 +983,10 @@ export const CommercialTreeLayer = memo(function CommercialTreeLayer(props: {
           qualityTier={qualityTier}
           lodScene={lodScene}
         />
+      )}
+      {treeGroups.internal.length > 0 && (
+        <CommercialTreeInstances {...props} trees={treeGroups.internal}
+          qualityTier={qualityTier} lodScene={lodScene} internalPark />
       )}
       {treeGroups.referenceQuadras.length > 0 && (
         <CommercialTreeInstances

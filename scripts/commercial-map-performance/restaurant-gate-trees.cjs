@@ -3,17 +3,18 @@ const path = require('node:path');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const phase = process.argv[2] || 'before';
 const base = process.env.BENVENUTO_URL || 'http://127.0.0.1:5196';
-const out = path.resolve('docs/validation/benvenuto', phase);
+const out = path.resolve('docs/validation/restaurant-gate-trees', phase);
 fs.mkdirSync(out, { recursive: true });
 const views = [
-  ['01-avenue-aerial', [2990, 3980], [-.01, 44, 0]],
-  ['02-avenue-oblique', [2990, 3980], [-19, 34, 7]],
-  ['03-b1-b14-aerial', [2580, 3800], [-.01, 22, 0]],
-  ['04-b1-b14-oblique', [2580, 3800], [-11, 12, 5]],
-  ['05-inner-frontages', [3260, 3845], [-15, 22, -8]],
-  ['06-parking-close', [2940, 4115], [-1.6, 1.4, 2.1]],
-];
-async function pose(page, point, offset) {
+  ['01-restaurant-aerial', [2550, 3480], [-.01, 22, 0]],
+  ['02-restaurant-oblique', [2540, 3440], [13, 9, 9]],
+  ['03-restaurant-ground', [2500, 3320], [7, 1.25, 2]],
+  ['04-arvoredo', [2760, 3350], [5, 6, 8]],
+  ['05-gate2-front', [1274, 4040], [1.5, 1.7, 7]],
+  ['06-gate2-side', [1274, 4040], [-5, 3, 4]],
+  ['07-internal-trees', [2960, 3300], [35, 45, 22]],
+  ['08-grove-ground', [2250, 3740], [-5, 1.8, 5]],
+];async function pose(page, point, offset) {
   await page.evaluate(({ point, offset }) => {
     const q = window.__benvenutoQa;
     const [x, z] = q.point(point);
@@ -57,8 +58,8 @@ async function snapshot(page) {
   const browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--use-angle=d3d11'] });
   try {
     for (const mobile of [false, true]) {
+      if (process.env.BENVENUTO_MOBILE_OVERVIEW_ONLY === '1' && !mobile) continue;
       const device = mobile ? 'mobile-emulated' : 'desktop';
-      if (process.env.BENVENUTO_DEVICE && process.env.BENVENUTO_DEVICE !== device) continue;
       const context = await browser.newContext(mobile
         ? { viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true }
         : { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
@@ -80,6 +81,25 @@ async function snapshot(page) {
       await page.waitForTimeout(7000);
       const report = { phase, device, base, cache: 'new browser context; local production fixture; no network throttling',
         entry: await page.evaluate(() => window.__qaEntry), userAgent: await page.evaluate(() => navigator.userAgent), views: [], errors };
+      if (process.env.BENVENUTO_MOBILE_OVERVIEW_ONLY === '1') {
+        // Additional portrait framing; keep the eight benchmark cameras unchanged.
+        for (const [name, point, offset] of [
+          ['09-restaurant-mobile-overview', [2540, 3440], [26, 18, 18]],
+          ['10-gate2-mobile-overview', [1274, 4040], [2.5, 3, 13]],
+        ]) {
+          await pose(page, point, offset);
+          await page.screenshot({ path: path.join(out, device + '-' + name + '.png') });
+          report.views.push({ name, ...await snapshot(page) });
+        }
+        fs.writeFileSync(path.join(out, device + '-overview.json'), JSON.stringify(report, null, 2));
+        await context.close(); continue;
+      }
+      if (process.env.BENVENUTO_SUPPLEMENT_ONLY === '1') {
+        const supplemental = await require('./restaurant-gate-smoke.cjs')(page, mobile, snapshot, out, device);
+        fs.writeFileSync(path.join(out, device + '-supplement.json'), JSON.stringify(supplemental, null, 2));
+        console.log(JSON.stringify({ phase, device, supplementalPassed: supplemental.passed }));
+        await context.close(); continue;
+      }
       for (const [name, point, offset] of views) {
         await pose(page, point, offset);
         await page.screenshot({ path: path.join(out, device + '-' + name + '.png') });
@@ -115,7 +135,7 @@ async function snapshot(page) {
       await page.evaluate(() => {
         const q = window.__benvenutoQa;
         q.map.getState().setNightModeActive(false);
-        q.visit.getState().start({ entityId: q.data.entities.find(e => e.publicIdentifier === 'B2').id });
+        q.visit.getState().start({ entityId: q.data.entities.find(e => e.publicIdentifier === 'C2').id });
       });
       await page.waitForFunction(() => document.querySelector('[data-visit-hud]')?.dataset.visitPhase === 'active', null, { timeout: 90000 });
       await page.waitForTimeout(2200);
@@ -135,6 +155,15 @@ async function snapshot(page) {
           const s = await snapshot(page);
           report.resourceCycles.push({ cycle, reduced, renderer: s.renderer, health: s.health, identity: s.identity });
         }
+      }
+      // Preserve completed measurements even when a later interaction check fails.
+      fs.writeFileSync(path.join(out, device + '.json'), JSON.stringify(report, null, 2));
+      try {
+        report.accessSmoke = await require('./restaurant-gate-smoke.cjs')(page, mobile, snapshot, out, device);
+      } catch (error) {
+        report.accessSmoke = { passed: false, error: String(error) };
+        fs.writeFileSync(path.join(out, device + '.json'), JSON.stringify(report, null, 2));
+        throw error;
       }
       report.overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
       if (process.env.BENVENUTO_SMOKE === '1') {

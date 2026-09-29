@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import * as THREE from 'three';
 import {
   OFFICIAL_REFERENCE_DATA,
   OFFICIAL_RENDERED_ENTITIES,
@@ -15,8 +16,10 @@ import {
   RESTAURANT_FRONTAGE_LAYOUT,
   buildRestaurantFrontagePlan,
   frontageBounds,
+  restaurantFrontageTreePitBounds,
   restaurantFrontageFacesWalkway,
 } from '@/features/commercial-map/utils/restaurantFrontage';
+import { createRestaurantFrontageSlabGeometry } from '@/features/commercial-map/utils/restaurantFrontageGeometry';
 import {
   strategicLandmarkBounds,
   strategicLandmarkFacingRadians,
@@ -167,6 +170,12 @@ describe('Restaurante unificado (C2 + C3) diante da Calçada do Arvoredo', () =>
     expect(layout.groundElevation + layout.ridgeHeight).toBeLessThanOrEqual(layout.height);
     expect(layout.bodyBackZ).toBeGreaterThanOrEqual(-layout.slabDepth / 2);
     expect(layout.serviceCenterZ - layout.serviceDepth / 2).toBeGreaterThanOrEqual(-layout.slabDepth / 2);
+    expect(layout.bodyDepth).toBeGreaterThan(layout.depth * 2 / 3);
+    const pavilionHeight = strategicLandmarkVisualHeight(byIdentifier(unification.entities, 'B1')!)!;
+    expect(layout.groundElevation + layout.ridgeHeight).toBeGreaterThan(pavilionHeight * 0.55);
+    expect(layout.groundElevation + layout.ridgeHeight).toBeLessThan(pavilionHeight * 0.8);
+    expect(layout.bodyCenterZ - layout.roofDepth / 2).toBeGreaterThan(-layout.depth / 2);
+    expect(layout.canopyFrontZ).toBeLessThan(layout.depth / 2);
 
     const roof = FENASOJA_RESTAURANT_LAYOUT.palette.roof;
     const [r, g, b] = [1, 3, 5].map((offset) => parseInt(roof.slice(offset, offset + 2), 16));
@@ -214,14 +223,18 @@ describe('Calçada do Arvoredo refinada como frontal do Restaurante', () => {
 
   it('mantém a identidade arborizada com canteiros das árvores existentes e arbustos dentro da laje', () => {
     const slab = plan.slab!;
-    expect(plan.treePits.length).toBeGreaterThanOrEqual(3);
+    expect(plan.treePits).toHaveLength(12);
     plan.treePits.forEach(([x, z]) => {
-      expect(x).toBeGreaterThan(slab.minX - RESTAURANT_FRONTAGE_LAYOUT.treePit.slabTolerance);
-      expect(x).toBeLessThan(slab.maxX + RESTAURANT_FRONTAGE_LAYOUT.treePit.slabTolerance);
-      expect(z).toBeGreaterThan(slab.minZ);
-      expect(z).toBeLessThan(slab.maxZ);
+      const pit = restaurantFrontageTreePitBounds([x, z]);
+      expect(pit.minX).toBeGreaterThanOrEqual(slab.minX);
+      expect(pit.maxX).toBeLessThanOrEqual(slab.maxX);
+      expect(pit.minZ).toBeGreaterThanOrEqual(slab.minZ);
+      expect(pit.maxZ).toBeLessThanOrEqual(slab.maxZ);
+      expect(COMMERCIAL_MAP_TREES.some((tree) => tree.position[0] === x && tree.position[1] === z)).toBe(true);
     });
-    expect(plan.shrubs.length).toBeGreaterThan(3);
+    // The corrected trunk row consumes the former shrub pockets; keep only
+    // those that retain the authored clearance instead of filling the gaps.
+    expect(plan.shrubs).toHaveLength(3);
     plan.shrubs.forEach((shrub) => {
       expect(shrub.position[0]).toBeLessThan(slab.maxX);
       expect(shrub.position[0]).toBeGreaterThan(slab.minX);
@@ -232,6 +245,49 @@ describe('Calçada do Arvoredo refinada como frontal do Restaurante', () => {
     });
     expect(plan.lawn!.maxX).toBeCloseTo(walkway.minX, 9);
     expect(plan.lawn!.minZ).toBeGreaterThan(ruaBrasil.maxZ);
+  });
+
+  it('recorta aberturas reais abaixo do concreto e mantém as juntas fora dos canteiros', () => {
+    const slab = plan.slab!;
+    const geometry = createRestaurantFrontageSlabGeometry(slab, plan.treePits);
+    const material = new THREE.MeshBasicMaterial();
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.updateMatrixWorld();
+    try {
+      const raycaster = new THREE.Raycaster();
+      const hitAt = (x: number, z: number) => {
+        raycaster.set(new THREE.Vector3(x, 1, z), new THREE.Vector3(0, -1, 0));
+        return raycaster.intersectObject(mesh);
+      };
+      for (const [x, z] of plan.treePits) {
+        expect(hitAt(x, z)).toHaveLength(0);
+        const pit = restaurantFrontageTreePitBounds([x, z]);
+        for (const joint of plan.joints) {
+          const overlaps = joint.center[0] - joint.size[0] / 2 < pit.maxX - 1e-8
+            && joint.center[0] + joint.size[0] / 2 > pit.minX + 1e-8
+            && joint.center[1] - joint.size[1] / 2 < pit.maxZ - 1e-8
+            && joint.center[1] + joint.size[1] / 2 > pit.minZ + 1e-8;
+          expect(overlaps).toBe(false);
+        }
+      }
+      const concreteHits = hitAt(slab.minX + 0.2, (slab.minZ + slab.maxZ) / 2);
+      expect(concreteHits.length).toBeGreaterThan(0);
+      expect(concreteHits[0].point.y).toBeCloseTo(RESTAURANT_FRONTAGE_LAYOUT.slab.topElevation, 6);
+      expect(RESTAURANT_FRONTAGE_LAYOUT.treePit.soilElevation).toBeLessThan(RESTAURANT_FRONTAGE_LAYOUT.slab.topElevation);
+      expect(geometry.getAttribute('position').count / 3).toBeLessThan(400);
+    } finally {
+      geometry.dispose();
+      material.dispose();
+    }
+  });
+
+  it('não abre um canteiro parcial quando o tronco não cabe integralmente na laje', () => {
+    const slab = plan.slab!;
+    const outsidePit = buildRestaurantFrontagePlan({
+      entities,
+      trees: [{ position: [slab.maxX - 0.05, (slab.minZ + slab.maxZ) / 2] }],
+    });
+    expect(outsidePit.treePits).toHaveLength(0);
   });
 
   it('é determinístico, fica dentro do orçamento de desenho e desaparece sem os donos oficiais', () => {

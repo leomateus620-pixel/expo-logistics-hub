@@ -181,8 +181,9 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
     expect(commercialTreeGroundElevation(tree('tree-d-01'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.134, 6);
     expect(commercialTreeGroundElevation(tree('tree-i-01'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.03, 6);
     expect(commercialTreeGroundElevation(tree('tree-j-11'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.036, 6);
-    expect(commercialTreeGroundElevation(tree('tree-i-05'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.036, 6);
-    expect(commercialTreeGroundElevation(tree('tree-i-06'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.036, 6);
+    // These two corrected trunks now stand at the cadastral lot edge, off the asphalt.
+    expect(commercialTreeGroundElevation(tree('tree-i-05'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.134, 6);
+    expect(commercialTreeGroundElevation(tree('tree-i-06'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.134, 6);
     expect(commercialTreeGroundElevation(tree('tree-e-08'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.029, 6);
     for (const id of ['tree-parking-west-01', 'tree-parking-east-01']) {
       expect(commercialTreeGroundElevation(tree(id), OFFICIAL_REFERENCE_DATA.entities))

@@ -28,6 +28,8 @@ import { createGastronomicAlamedaLayout, fitRotatedStructureBounds } from '../ut
 import { EXPORURAL_WELL, isExporuralLandscapeLot } from '../utils/exporuralLandscape';
 import { visitPointInRing } from './VisitSpatialIndex';
 import { SOY_RESTROOM_PRESENTATION } from '../utils/soyGateArchitecture';
+import { isInternalParkVegetationPoint, INTERNAL_TREE_TRUNK_RADIUS_FACTOR } from '../utils/internalTreeVisuals';
+import { createFenasojaRestaurantLayout } from '../utils/fenasojaRestaurant';
 
 const SOLID_CLASSIFICATIONS = new Set(['PAVILION', 'BUILDING', 'RESTAURANT', 'RESTROOM', 'CHEMICAL_RESTROOM', 'ADMINISTRATION', 'SECURITY', 'EMERGENCY', 'SERVICE', 'EVENT_VENUE']);
 
@@ -108,6 +110,33 @@ export function buildVisitWorld({ entities, trees, electricalPlacements = [], si
       const h = SOY_RESTROOM_PRESENTATION.visualHeight;
       box(entity.id, b.centerX, base + h / 2, b.centerZ, 1.3, h, 1.8, yaw);
       surfaces.push(visitGroundSurface(`${entity.id}:platform`, visitBoxPolygon(b.centerX, b.centerZ, 1.46, 2.08, yaw), base + .036));
+      continue;
+    }
+    if (kind === 'fenasoja-restaurant') {
+      const b = strategicLandmarkBounds(entity), yaw = strategicLandmarkFacingRadians(entity);
+      const layout = createFenasojaRestaurantLayout(fitRotatedStructureBounds(b, yaw), strategicLandmarkVisualHeight(entity) ?? undefined);
+      const c = Math.cos(yaw), s = Math.sin(yaw), base = entity.geometry.elevation + layout.groundElevation;
+      const point = (x: number, z: number): [number, number] => [b.centerX + x * c + z * s, b.centerZ - x * s + z * c];
+      const part = (id: string, x: number, y: number, z: number, w: number, h: number, d: number) => {
+        const p = point(x, z); box(id, p[0], base + y, p[1], w, h, d, yaw);
+      };
+      const floor = (id: string, x: number, z: number, w: number, d: number, height: number) => {
+        const p = point(x, z);
+        surfaces.push(visitGroundSurface(id, visitBoxPolygon(p[0], p[1], w, d, yaw), base + height));
+      };
+      // Collide with the actual hall and pillars, leaving the covered porch open.
+      part(entity.id, 0, layout.ridgeHeight / 2, layout.bodyCenterZ, layout.bodyWidth, layout.ridgeHeight, layout.bodyDepth);
+      part(`${entity.id}:service`, layout.serviceCenterX, layout.slabHeight + layout.serviceHeight / 2, layout.serviceCenterZ,
+        layout.serviceWidth, layout.serviceHeight, layout.serviceDepth);
+      layout.pillarXs.forEach((x, i) => part(`${entity.id}:pillar-${i}`, x, layout.slabHeight + layout.pillarHeight / 2,
+        layout.pillarZ, layout.pillarSize, layout.pillarHeight, layout.pillarSize));
+      floor(`${entity.id}:slab`, 0, 0, layout.slabWidth, layout.slabDepth, layout.slabHeight);
+      for (let i = 0; i < 2; i++) floor(`${entity.id}:step-${i}`, 0, layout.terraceFrontZ + layout.stepDepth * (i + .5),
+        layout.width * (.24 + i * .02), layout.stepDepth, layout.slabHeight * (i === 0 ? .66 : .33));
+      const canopyBottom = layout.canopyFrontHeight - .045;
+      part(`${entity.id}:canopy`, 0, (canopyBottom + layout.canopyRearHeight + .03) / 2,
+        layout.bodyFrontZ + layout.canopyDepth / 2, layout.canopyWidth,
+        layout.canopyRearHeight + .03 - canopyBottom, layout.canopyDepth);
       continue;
     }
     if (kind === 'gastronomic-alameda') {
@@ -217,7 +246,8 @@ export function buildVisitWorld({ entities, trees, electricalPlacements = [], si
   }
   for (const tree of trees) {
     const base = commercialTreeGroundElevation(tree, entities);
-    trunk(tree.id, tree.position[0], tree.position[1], tree.trunkRadius, base, tree.trunkHeight);
+    trunk(tree.id, tree.position[0], tree.position[1], tree.trunkRadius
+      * (isInternalParkVegetationPoint(tree.position) ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1), base, tree.trunkHeight);
     crown(tree.id, tree.position[0], tree.position[1], tree.canopyRadius, base + tree.trunkHeight * 0.85, base + tree.trunkHeight + tree.crownHeight);
   }
   const wellLot = entities.find(entity => entity.publicIdentifier === 'Q-R-02' && isExporuralLandscapeLot(entity) && visitPointInRing(...EXPORURAL_WELL.position, entity.geometry.coordinates[0]));
@@ -244,14 +274,25 @@ export function buildVisitWorld({ entities, trees, electricalPlacements = [], si
     for (const part of [...gates.opaque, ...gates.glass, ...gates.metal]) {
       const q = part.quaternion;
       const yaw = Math.atan2(2 * (q[3] * q[1] + q[0] * q[2]), 1 - 2 * (q[1] ** 2 + q[2] ** 2));
-      box(part.featureId, ...part.position, part.scale[0], part.scale[1], part.scale[2], yaw);
+      if (part.featureId === 'gate2:pedestrian-apron') {
+        surfaces.push(visitGroundSurface(part.featureId,
+          visitBoxPolygon(part.position[0], part.position[2], part.scale[0], part.scale[2], yaw),
+          part.position[1] + part.scale[1] / 2));
+      }
+      // Inclined A2 supports also occupy depth. Bound their pitch conservatively
+      // in the existing yaw-oriented collision box instead of ignoring the lean.
+      const pitch = part.featureId.startsWith('gate2:inclined-fin-') ? .22 : 0;
+      const height = part.scale[1] * Math.cos(pitch) + part.scale[2] * Math.sin(pitch);
+      const depth = part.scale[2] * Math.cos(pitch) + part.scale[1] * Math.sin(pitch);
+      box(part.featureId, ...part.position, part.scale[0], height, depth, yaw);
     }
     const costeiros = input.costeiros;
     if (costeiros) box('costeiros-building', costeiros.anchor[0], 0.3, costeiros.anchor[1], costeiros.width, 0.6, costeiros.depth, costeiros.rotationRadians);
     const environment = resolveParkAccessEnvironmentPresentation(false);
     for (let i = 0; i < environment.ambientTrees.length; i++) {
       const tree = environment.ambientTrees[i];
-      trunk(`park-access-tree:${i}`, tree.position[0], tree.position[1], 0.145 * Math.max(tree.scale[0], tree.scale[2]), 0.015, 1.38 * tree.scale[1]);
+      const radius = isInternalParkVegetationPoint(tree.position) ? .084 : .145;
+      trunk(`park-access-tree:${i}`, tree.position[0], tree.position[1], radius * Math.max(tree.scale[0], tree.scale[2]), 0.035, 1.38 * tree.scale[1]);
       crown(`park-access-tree:${i}`, tree.position[0], tree.position[1], Math.max(tree.scale[0], tree.scale[2]), 0.015 + 1.1 * tree.scale[1], 0.015 + 3 * tree.scale[1]);
     }
     for (const tree of buildRearTreeInstances(false)) {

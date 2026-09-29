@@ -11,6 +11,7 @@ import {
 } from '../features/commercial-map/utils/lateralResidentialStreetIntegration';
 import {
   PARK_ACCESS_INFRASTRUCTURE_PROFILE,
+  PARK_ACCESS_RENDER_BUDGET,
   buildParkAccessRenderModel,
   disposeParkAccessRenderModel,
 } from '../features/commercial-map/utils/parkAccessInfrastructure';
@@ -96,7 +97,8 @@ describe('residential street junctions with the existing avenue', () => {
   it('removes only hidden downward curb faces while retaining tops and upright walls', () => {
     const model = buildParkAccessRenderModel(adaptParkAccessSpatialPlan());
     try {
-      expect(model.diagnostics.surfaceTriangleCount + model.diagnostics.instancedTriangleCount).toBeLessThanOrEqual(6000);
+      expect(model.diagnostics.surfaceTriangleCount + model.diagnostics.instancedTriangleCount)
+        .toBeLessThanOrEqual(PARK_ACCESS_RENDER_BUDGET.maximumRenderedTriangles);
       expect(model.geometries.roundaboutCurb).toBeNull(); // Same concrete, one batch.
       for (const geometry of [model.geometries.curbs!]) {
         const normals = geometry.getAttribute('normal');

@@ -206,8 +206,9 @@ describe('apresentação profissional e instanciada das árvores comerciais', ()
     expect(rendererSource).toContain("pilotEnabled ? !isVegetationPilotTree(tree) : tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B'");
     expect(rendererSource).toContain('trees={treeGroups.legacy}');
     expect(rendererSource).toContain('trees={treeGroups.referenceQuadras}');
-    expect(rendererSource.match(/lodScene=\{lodScene\}/g)).toHaveLength(2);
-    expect(rendererSource.match(/<CommercialTreeInstances\b/g)).toHaveLength(2);
+    expect(rendererSource.match(/lodScene=\{lodScene\}/g)).toHaveLength(3);
+    expect(rendererSource).toContain('isInternalParkVegetationPoint(tree.position)');
+    expect(rendererSource.match(/<CommercialTreeInstances\b/g)).toHaveLength(3);
     expect(rendererSource).toContain('vertexColors: !referenceQuadras');
     expect(rendererSource).toContain('referenceQuadras ? mergeVertices(sourceGeometry, 1e-5) : sourceGeometry');
     expect(rendererSource).toContain('if (referenceQuadras) sourceGeometry.dispose()');

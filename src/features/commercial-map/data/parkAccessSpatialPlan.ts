@@ -191,6 +191,8 @@ export interface ParkAccessGateDefinition extends ParkAccessEvidence {
   sourcePdfAnchor: ParkAccessSourcePoint;
   /** Heading of the arrival flow: 0 is local +x and PI/2 is local +z. */
   approachHeadingRadians: number;
+  /** Architectural frontage can face the avenue while the internal path turns. */
+  facadeRotationRadians?: number;
   width: number;
   depth: number;
   widthMeters: number;
@@ -532,12 +534,18 @@ const BENVENUTO_EAST_CURB_SOURCE = [
   [3307, 4103], [3445, 4103], [3445, 4114], [3680, 4114],
   [3680, 4103], [3722, 4103],
 ] as const;
+// Continue the neighboring parking/sidewalk edges across B14–B12 in one
+// straight run. The retired B23 mask must not push concrete into this apron.
+const BENVENUTO_COURTYARD_CURB_SOURCE = [
+  [2650, 4100], BENVENUTO_EAST_CURB_SOURCE[0],
+] as const satisfies readonly ParkAccessSourcePoint[];
 const BENVENUTO_PARKING_APRON_EAST_SOURCE = closeSourcePolygon([
   ...BENVENUTO_EAST_CURB_SOURCE, [3722, 4148], [2790, 4148],
 ]);
 /**
- * Two usable parking bands joined only by a narrow asphalt seam south of B23.
- * The eastern band stops before B11; neither protected footprint is paved over.
+ * Parking eligibility retains its two bands and the narrow link south of B23.
+ * Restoring the courtyard asphalt edge does not authorize bays in that access.
+ * The eastern band still stops before B11.
  */
 const BENVENUTO_PARKING_CUTOUT_SOURCE = closeSourcePolygon([
   [1385, 4100],
@@ -555,25 +563,34 @@ const BENVENUTO_SOUTH_EDGE_SOURCE = BENVENUTO_TRAVEL_SURFACE_SOURCE
   .slice(0, BENVENUTO_CENTERLINE_POINT_COUNT);
 const BENVENUTO_NORTH_EDGE_SOURCE = BENVENUTO_TRAVEL_SURFACE_SOURCE
   .slice(BENVENUTO_CENTERLINE_POINT_COUNT, BENVENUTO_CENTERLINE_POINT_COUNT * 2);
+// Shared vertex prevents the four-decimal map conversion from creating a seam.
+const GATE_2_AVENUE_CORNER = BENVENUTO_NORTH_EDGE_SOURCE[BENVENUTO_NORTH_EDGE_SOURCE.length - 1];
+const GATE_2_AVENUE_JOIN: ParkAccessSourcePoint = [
+  1350,
+  GATE_2_AVENUE_CORNER[1] + (4149 - GATE_2_AVENUE_CORNER[1])
+    * (1350 - GATE_2_AVENUE_CORNER[0]) / (1385 - GATE_2_AVENUE_CORNER[0]),
+];
 /** Single merged asphalt polygon: four travel lanes plus the notched lateral apron. */
 const BENVENUTO_ASPHALT_WITH_PARKING_SOURCE = closeSourcePolygon([
   ...BENVENUTO_SOUTH_EDGE_SOURCE,
   BENVENUTO_NORTH_EDGE_SOURCE[0],
   [3722, 4158],
   ...BENVENUTO_EAST_CURB_SOURCE.slice().reverse(),
-  [2790, 4142],
-  [2650, 4142],
-  [2650, 4100],
+  BENVENUTO_COURTYARD_CURB_SOURCE[0],
   [1385, 4100],
   [1385, 4149],
+  GATE_2_AVENUE_JOIN,
   BENVENUTO_NORTH_EDGE_SOURCE[BENVENUTO_NORTH_EDGE_SOURCE.length - 1],
 ]);
 
 const GATE_1_APRON_SOURCE = sourceRectangle(640, 3260, 728, 3352);
+// Meet the already-authored avenue edge exactly. The old apron stopped 6–8m
+// short of it and exposed a grass ramp across the pedestrian arrival.
 const GATE_2_APRON_SOURCE = closeSourcePolygon([
   [1206, 3984],
   [1328, 3978],
-  [1350, 4088],
+  GATE_2_AVENUE_JOIN,
+  GATE_2_AVENUE_CORNER,
   [1205, 4100],
 ]);
 const GATE_3_APRON_SOURCE = closeSourcePolygon([
@@ -606,7 +623,7 @@ function makeRoadSurface(
   const overlapSafeElevationById: Readonly<Record<string, number>> = {
     'gate-1-local-access': 0.046,
     'gate-1-apron': 0.056,
-    'gate-2-apron': 0.057,
+    'gate-2-apron': 0.044,
     'gate-3-arrival': 0.058,
     'gate-7-gustavo-bessel-link': 0.046,
     'acesso-churrascaria': 0.048,
@@ -671,7 +688,7 @@ const ROAD_SURFACES = [
       {
         sourceIds: ['official-2026-park-map', 'annex-1-implantation', 'annex-3-street-context', 'annex-5-woodland-path'],
         confidence: 'DIMENSIONALLY_INFERRED',
-        notes: 'Quatro faixas de 3,5 m mantêm o eixo oficial da Benvenuto; o mesmo polígono asfaltado incorpora dois aprons laterais recortados para B23 e B11.',
+        notes: 'Quatro faixas de 3,5 m mantêm o eixo oficial da Benvenuto; o mesmo polígono asfaltado incorpora os aprons laterais e a borda reta do pátio B14/B12. O recorte do edifício B11 permanece; a máscara aposentada de B23 não interrompe a faixa asfaltada.',
       },
       BENVENUTO_ASPHALT_WITH_PARKING_SOURCE,
     ),
@@ -697,19 +714,24 @@ const ROAD_SURFACES = [
     },
     GATE_1_APRON_SOURCE,
   ),
-  makeRoadSurface(
-    'gate-2-apron',
-    'GATE_APRON',
-    [[1274, 4040], [1325, 3972]],
-    12,
-    ['A2', 'gate-2-woodland-connector', 'benvenuto-four-lane-axis'],
-    {
-      sourceIds: ['official-2026-park-map', 'annex-1-implantation', 'gate-composite-lower-gate-2', 'annex-5-woodland-path'],
-      confidence: 'ANNEX_REGISTERED_TRACE',
-      notes: 'A2 é o Portão 2. O painel inferior da composição fotográfica é a sua referência arquitetônica e não pode ser usado para o Portão 3.',
-    },
-    GATE_2_APRON_SOURCE,
-  ),
+  {
+    ...makeRoadSurface(
+      'gate-2-apron',
+      'GATE_APRON',
+      [[1274, 4040], [1325, 3972]],
+      12,
+      ['A2', 'gate-2-woodland-connector', 'benvenuto-four-lane-axis'],
+      {
+        sourceIds: ['official-2026-park-map', 'annex-1-implantation', 'gate-composite-lower-gate-2', 'annex-5-woodland-path'],
+        confidence: 'ANNEX_REGISTERED_TRACE',
+        notes: 'A2 é o Portão 2. O apron encontra a borda já cadastrada na apresentação da Benvenuto, sem faixa de grama ou sobreposição; dimensões arquitetônicas continuam estimativas visuais. O painel inferior da composição fotográfica não pode ser usado para o Portão 3.',
+      },
+      GATE_2_APRON_SOURCE,
+    ),
+    // Match the avenue's unrounded conversion: independently rounding this
+    // shared edge creates a thin coplanar overlap despite identical PDF points.
+    polygon: GATE_2_APRON_SOURCE.map(officialPdfPointToLocal),
+  },
   makeRoadSurface(
     'gate-3-arrival',
     'GATE_APRON',
@@ -1560,6 +1582,7 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
       officialEntityIdentifier: 'A2',
       anchor: parkAccessSourcePointToLocal(A2_SOURCE),
       sourcePdfAnchor: A2_SOURCE,
+      facadeRotationRadians: 0,
       approachHeadingRadians: parkAccessHeadingBetween(
         WOODLAND_PATH_SOURCE[0],
         WOODLAND_PATH_SOURCE[1],
@@ -1771,6 +1794,8 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
     },
     sourcePdfParkingCurb: BENVENUTO_EAST_CURB_SOURCE,
     parkingCurb: BENVENUTO_EAST_CURB_SOURCE.map(officialPdfPointToLocal),
+    sourcePdfCourtyardCurb: BENVENUTO_COURTYARD_CURB_SOURCE,
+    courtyardCurb: BENVENUTO_COURTYARD_CURB_SOURCE.map(officialPdfPointToLocal),
     parkingAprons: [
       {
         id: 'benvenuto-parking-apron-west',
@@ -1805,7 +1830,7 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
     parkingCutout: BENVENUTO_PARKING_CUTOUT_SOURCE.map(officialPdfPointToLocal),
     sourceIds: ['annex-1-implantation', 'annex-3-street-context', 'annex-5-woodland-path'],
     confidence: 'ANNEX_REGISTERED_TRACE' as const,
-    notes: 'Aprons, passeios recortados e árvores street-side usam corredores distintos; B23 e B11 são notches obrigatórios e nenhuma árvore substitui o inventário oficial.',
+    notes: 'Aprons, passeios recortados e árvores street-side usam corredores distintos. Vagas continuam fora de B23/B11; a borda visual do pátio B14/B12 liga os recuos vizinhos sem a saliência da máscara aposentada de B23. Nenhuma árvore substitui o inventário oficial.',
   },
   provenance: PARK_ACCESS_SOURCE_MANIFEST,
   protectedCommercialGeometry: {

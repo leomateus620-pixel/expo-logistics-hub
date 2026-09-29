@@ -37,11 +37,11 @@ const cornerX = p1.maxX + gap * 0.55;
 // tree. It is another retired support, not a visible permanent building.
 const retiredFrontageMasks = ['B23', 'B33', 'B34'] as const;
 const avenue = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.find(s => s.id === 'benvenuto-four-lane-axis')!;
-// Terminate on the existing asphalt notch, including the old B23 green edge.
-// Derive the boundary from the rendered avenue; do not invent a road width.
-const courtyardAvenueEdgeZ = Math.min(...avenue.polygon
-  .filter(([x, z]) => x > p14.maxX && x < p12.minX && z >= clinic.maxZ)
-  .map(p => p[1]));
+// The follow-up requires the courtyard edge to continue the neighboring
+// sidewalks, not the old B23 notch. Both owners use the same straight curb;
+// subtraction by the avenue below trims this envelope exactly to that edge.
+const courtyardAvenueEdgeZ = Math.max(...PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge
+  .courtyardCurb.map(p => p[1]));
 const protectedPolygons = OFFICIAL_REFERENCE_ENTITIES
   .filter(entity => !['ROAD', 'PEDESTRIAN_PATH', 'LANDSCAPE', 'PARKING'].includes(entity.classification))
   .filter(entity => !retiredFrontageMasks.includes(entity.publicIdentifier as 'B33'))
@@ -92,10 +92,11 @@ const trees = [
 ];
 
 export const PAVILION_COURTYARD = Object.freeze({
-  revision: '2026.9-benvenuto-pavilion-surfaces.3',
+  revision: '2026.9-benvenuto-pavilion-surfaces.4',
   evidence: ['fdc85e65-5dc2-43b4-a0a8-970c6908e1c3.jpg', '7db5c4bb-32aa-4f1d-93c4-a3a9ae5fdce5.jpg',
     'c4037d48-20fa-4a38-8292-042506f51f75.jpg',
-    'codex-clipboard-6ab48a88-adaf-4ecb-a7f0-0201f950ebb9.png'] as const,
+    'codex-clipboard-6ab48a88-adaf-4ecb-a7f0-0201f950ebb9.png',
+    'codex-clipboard-4958e7fa-f7ea-4021-b175-84202b101a98.png'] as const,
   anchorIdentifiers: ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B23', 'B34', 'B41', 'ALAMEDA-MERCOSUL'] as const,
   protectedPolygons, officialMeasurements: false,
   retiredFrontageMasks,

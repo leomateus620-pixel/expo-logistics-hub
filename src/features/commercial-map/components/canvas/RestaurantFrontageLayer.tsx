@@ -9,6 +9,7 @@ import {
   type FrontageTree,
 } from '../../utils/restaurantFrontage';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
+import { createRestaurantFrontageSlabGeometry } from '../../utils/restaurantFrontageGeometry';
 import { applyInteriorGroundMaterial } from './interiorGroundMaterial';
 
 const NO_RAYCAST = () => undefined;
@@ -123,6 +124,11 @@ export const RestaurantFrontageLayer = memo(function RestaurantFrontageLayer({
     () => buildRestaurantFrontagePlan({ entities, trees }),
     [entities, trees],
   );
+  const slabGeometry = useMemo(
+    () => plan.slab ? createRestaurantFrontageSlabGeometry(plan.slab, plan.treePits) : null,
+    [plan.slab, plan.treePits],
+  );
+  useEffect(() => () => slabGeometry?.dispose(), [slabGeometry]);
   const materials = useMemo(() => ({
     concrete: surfaceMaterial(palette.concrete, 0.86, -0.9),
     joint: surfaceMaterial(palette.joint, 0.92, -1.2),
@@ -148,23 +154,29 @@ export const RestaurantFrontageLayer = memo(function RestaurantFrontageLayer({
       scale: [radius * 2, radius * 2 * flatten, radius * 2 * (0.92 + shrub.variant * 0.05)],
     };
   }), [plan.shrubs]);
-  const pitCurbs = useMemo<InstanceItem[]>(() => plan.treePits.map(([x, z]) => ({
-    position: [x, RESTAURANT_FRONTAGE_LAYOUT.treePit.elevation, z],
-    scale: [RESTAURANT_FRONTAGE_LAYOUT.treePit.size, 0.003, RESTAURANT_FRONTAGE_LAYOUT.treePit.size],
-  })), [plan.treePits]);
+  const pitCurbs = useMemo<InstanceItem[]>(() => {
+    const { size, curbWidth, soilElevation, curbTopElevation } = RESTAURANT_FRONTAGE_LAYOUT.treePit;
+    const inner = size - curbWidth * 2;
+    const offset = (size - curbWidth) / 2;
+    const height = curbTopElevation - soilElevation;
+    const y = soilElevation + height / 2;
+    return plan.treePits.flatMap(([x, z]): InstanceItem[] => [
+      { position: [x - offset, y, z], scale: [curbWidth, height, size] },
+      { position: [x + offset, y, z], scale: [curbWidth, height, size] },
+      { position: [x, y, z - offset], scale: [inner, height, curbWidth] },
+      { position: [x, y, z + offset], scale: [inner, height, curbWidth] },
+    ]);
+  }, [plan.treePits]);
   const pitSoil = useMemo<InstanceItem[]>(() => plan.treePits.map(([x, z]) => {
     const inner = RESTAURANT_FRONTAGE_LAYOUT.treePit.size - RESTAURANT_FRONTAGE_LAYOUT.treePit.curbWidth * 2;
     return {
-      position: [x, RESTAURANT_FRONTAGE_LAYOUT.treePit.elevation + 0.0016, z],
+      position: [x, RESTAURANT_FRONTAGE_LAYOUT.treePit.soilElevation - 0.0015, z],
       scale: [inner, 0.003, inner],
     };
   }), [plan.treePits]);
 
-  if (!visible || !plan.available || !plan.slab) return null;
-  const slab = RESTAURANT_FRONTAGE_LAYOUT.slab;
+  if (!visible || !plan.available || !plan.slab || !slabGeometry) return null;
   const connector = RESTAURANT_FRONTAGE_LAYOUT.connector;
-  const [slabX, slabZ] = rectCenter(plan.slab);
-  const [slabWidth, slabDepth] = rectSize(plan.slab);
 
   return (
     <group
@@ -193,10 +205,8 @@ export const RestaurantFrontageLayer = memo(function RestaurantFrontageLayer({
       )}
       <mesh
         name="restaurant-frontage:concrete-slab"
-        geometry={UNIT_BOX}
+        geometry={slabGeometry}
         material={materials.concrete}
-        position={[slabX, slab.topElevation - slab.thickness / 2, slabZ]}
-        scale={[slabWidth, slab.thickness, slabDepth]}
         raycast={NO_RAYCAST}
         receiveShadow
         renderOrder={2}
@@ -216,10 +226,10 @@ export const RestaurantFrontageLayer = memo(function RestaurantFrontageLayer({
           dispose={null}
         />
       )}
+      <BoxInstances name="restaurant-frontage:tree-pit-curbs" items={pitCurbs} material={materials.pitCurb} />
+      <BoxInstances name="restaurant-frontage:tree-pit-soil" items={pitSoil} material={materials.soil} />
       {vegetationVisible && (
         <>
-          <BoxInstances name="restaurant-frontage:tree-pit-curbs" items={pitCurbs} material={materials.pitCurb} />
-          <BoxInstances name="restaurant-frontage:tree-pit-soil" items={pitSoil} material={materials.soil} />
           <BoxInstances name="restaurant-frontage:hedges" items={hedges} material={materials.hedge} castShadow receiveShadow />
           <BoxInstances name="restaurant-frontage:shrubs" geometry={UNIT_SHRUB} items={shrubs} material={materials.shrub} castShadow />
         </>

@@ -324,7 +324,7 @@ describe('park access spatial plan', () => {
     }
   });
 
-  it('contains every complete parking bay in segmented asphalt without paving B23 or B11', () => {
+  it('contains every complete parking bay outside B23/B11 and preserves the B11 asphalt notch', () => {
     const road = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces
       .find((surface) => surface.id === 'benvenuto-four-lane-axis')!;
     const aprons = PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge.parkingAprons;
@@ -347,7 +347,11 @@ describe('park access spatial plan', () => {
         polygonsIntersect(PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge.parkingCutout, polygon),
         `parking-cutout/${identifier}`,
       ).toBe(false);
-      expect(polygonsIntersect(road.polygon, polygon), `merged-asphalt/${identifier}`).toBe(false);
+      // B23 is a retired support mask: the requested straight courtyard edge
+      // restores asphalt through its frontage, while no bay enters its record.
+      if (identifier === 'B11') {
+        expect(polygonsIntersect(road.polygon, polygon), `merged-asphalt/${identifier}`).toBe(false);
+      }
     });
 
     expect(new Set(PARK_ACCESS_SPATIAL_PLAN.parkingBays.map((bay) => bay.id)).size)
@@ -854,13 +858,18 @@ describe('park access spatial plan', () => {
     );
   });
 
-  it('uses distinct deterministic elevations whenever road polygons overlap', () => {
+  it('uses distinct deterministic elevations wherever road polygons share area, allowing flush shared edges', () => {
     const roads = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces;
     for (let firstIndex = 0; firstIndex < roads.length; firstIndex += 1) {
       for (let secondIndex = firstIndex + 1; secondIndex < roads.length; secondIndex += 1) {
         const first = roads[firstIndex];
         const second = roads[secondIndex];
-        if (polygonsIntersect(first.polygon, second.polygon)) {
+        // Touching edges are a continuous join, not a coplanar surface overlap.
+        const overlap = polygonClipping.intersection(
+          [first.polygon.map(point => [...point])],
+          [second.polygon.map(point => [...point])],
+        );
+        if (overlap.length > 0) {
           expect(first.elevation, `${first.id}/${second.id}`).not.toBe(second.elevation);
         }
       }

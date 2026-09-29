@@ -14,7 +14,7 @@ export const FENASOJA_RESTAURANT_PUBLIC_IDENTIFIER = 'C2';
 export const FENASOJA_RESTAURANT_ABSORBED_IDENTIFIER = 'C3';
 export const FENASOJA_RESTAURANT_PRESENTATION_NAME = 'Restaurante';
 export const FENASOJA_RESTAURANT_FRONTAGE_IDENTIFIER = 'CALCADA-ARVOREDO';
-export const FENASOJA_RESTAURANT_REVISION = '2026.9-c2-restaurante-unificado.1';
+export const FENASOJA_RESTAURANT_REVISION = '2026.9-c2-restaurante-unificado.3';
 
 /** Two adjacent cadastral rectangles may carry sub-point rounding after persistence. */
 const UNIFICATION_GAP_TOLERANCE = 0.12;
@@ -45,9 +45,13 @@ export const FENASOJA_RESTAURANT_LAYOUT = Object.freeze({
   facingRadians: Math.PI / 2,
   /** Camera approaches from the walkway so the covered entrance reads first. */
   focusDirection: [0.9, 0.46, 0.24] as const,
-  /** Above the 1.05 cadastral extrusion even for the raw C2 half; ridge ≈ 7.5–8.8 m. */
-  minimumVisualHeight: 1.1,
-  maximumVisualHeight: 1.3,
+  /**
+   * Visual estimate after the matched C2/B1 oblique comparison, not a surveyed
+   * elevation. The resulting ridge is about three quarters of B1's ridge;
+   * most of the added presence belongs to the hall walls, not a taller roof.
+   */
+  minimumVisualHeight: 1.96,
+  maximumVisualHeight: 2.1,
   /** Plinth and steps start on the visible ground plane instead of inside it. */
   groundElevation: OPEN_GROUND_PRESENTATION_HEIGHT + 0.002,
   footprintFill: Object.freeze({ width: 0.985, depth: 0.985 }),
@@ -79,14 +83,13 @@ export interface FenasojaRestaurantBounds {
 }
 
 /**
- * One-storey dining hall with a pitched roof: eave about 3.5 m, ridge near 7 m
- * at the 0.147 world-units-per-metre scene scale. Bounded so persisted
+ * One-storey hall with a higher eave and a restrained pitched roof. Bounded so persisted
  * geometry cannot inflate the mass into a pavilion-sized silhouette.
  */
 export function fenasojaRestaurantVisualHeight(bounds: FenasojaRestaurantBounds): number {
   const shortSide = Math.min(finiteOr(bounds.width, 3.9), finiteOr(bounds.depth, 6.2));
   return clamp(
-    shortSide * 0.3,
+    shortSide * 0.53,
     FENASOJA_RESTAURANT_LAYOUT.minimumVisualHeight,
     FENASOJA_RESTAURANT_LAYOUT.maximumVisualHeight,
   );
@@ -153,19 +156,19 @@ export function createFenasojaRestaurantLayout(
   const slabWidth = width * FENASOJA_RESTAURANT_LAYOUT.footprintFill.width;
   const slabDepth = depth * FENASOJA_RESTAURANT_LAYOUT.footprintFill.depth;
   const bodyWidth = width * 0.94;
-  const bodyDepth = depth * 0.6;
+  const bodyDepth = depth * 0.74;
   // Hall pushed back so the covered frontage and terrace fit on the plinth;
   // the rear service annex still ends inside the slab.
-  const bodyCenterZ = -depth * 0.11;
+  const bodyCenterZ = -depth * 0.07;
   const bodyFrontZ = bodyCenterZ + bodyDepth / 2;
   const bodyBackZ = bodyCenterZ - bodyDepth / 2;
-  const wallHeight = height * 0.44;
-  const roofRise = height * 0.36;
+  const wallHeight = height * 0.69;
+  const roofRise = height * 0.2;
   const eaveHeight = slabHeight + wallHeight;
-  const canopyWidth = width * 0.58;
-  const canopyDepth = depth * 0.2;
+  const canopyWidth = width * 0.72;
+  const canopyDepth = depth * 0.15;
   const canopyRearHeight = eaveHeight - 0.02;
-  const canopyFrontHeight = slabHeight + wallHeight * 0.78;
+  const canopyFrontHeight = slabHeight + wallHeight * 0.88;
   const canopyFrontZ = bodyFrontZ + canopyDepth;
   const pillarSize = Math.max(0.055, width * 0.012);
   const pillarInset = pillarSize * 0.9;
@@ -190,8 +193,8 @@ export function createFenasojaRestaurantLayout(
     bodyBackZ,
     wallHeight,
     plinthHeight: Math.min(0.08, wallHeight * 0.16),
-    roofWidth: bodyWidth,
-    roofDepth: bodyDepth + depth * 0.12,
+    roofWidth: bodyWidth + width * 0.025,
+    roofDepth: bodyDepth + depth * 0.06,
     roofRise,
     eaveHeight,
     ridgeHeight: eaveHeight + roofRise,
@@ -205,20 +208,22 @@ export function createFenasojaRestaurantLayout(
     pillarHeight: canopyFrontHeight - slabHeight - 0.012,
     pillarZ,
     pillarXs,
-    doorWidth: width * 0.1,
-    doorHeight: wallHeight * 0.74,
+    doorWidth: width * 0.13,
+    // Openings keep their own proportions as the hall eave rises; they do not
+    // inherit the full wall-height increase or become pavilion-sized portals.
+    doorHeight: Math.min(0.98, wallHeight * 0.72),
     terraceFrontZ: slabDepth / 2,
     stepDepth: depth * 0.045,
     frontWindowXs: [-0.435, -0.365, 0.365, 0.435].map((ratio) => ratio * width),
     porchWindowXs: [-0.235, -0.155, 0.155, 0.235].map((ratio) => ratio * width),
     rearWindowXs: [-0.4, -0.25, -0.1, 0.1, 0.25, 0.4].map((ratio) => ratio * width),
     windowWidth: width * 0.055,
-    windowHeight: wallHeight * 0.42,
+    windowHeight: Math.min(0.54, wallHeight * 0.4),
     serviceWidth: width * 0.2,
-    serviceDepth: depth * 0.08,
+    serviceDepth: depth * 0.04,
     serviceHeight: wallHeight * 0.72,
     serviceCenterX: -width * 0.3,
-    serviceCenterZ: bodyBackZ - depth * 0.04,
+    serviceCenterZ: bodyBackZ - depth * 0.02,
   };
 }
 

@@ -1,4 +1,5 @@
-import { officialPdfPointToLocal } from './officialReference2026';
+import { OFFICIAL_REFERENCE_DATA, officialPdfPointToLocal } from './officialReference2026';
+import { pointInPolygon } from '../utils/spatialSurface';
 import { NATIONS_DISTRICT_LAYOUT } from './nationsDistrict';
 import { GATE_FOUR_DISTRICT_LAYOUT } from './gateFourDistrict';
 
@@ -55,6 +56,8 @@ export interface CommercialMapTree {
   position: readonly [number, number];
   /** Reproducible point in the official 2026 PDF crop before local conversion. */
   sourcePosition: readonly [number, number];
+  /** Preserved provenance for the explicitly requested local access corrections. */
+  previousSourcePosition?: readonly [number, number];
   canopyRadius: number;
   trunkRadius: number;
   trunkHeight: number;
@@ -160,6 +163,22 @@ const TREE_AREA_ID_PREFIX: Readonly<Record<CommercialTreeArea, string>> = {
   NATIONS_DISTRICT: 'nations',
 };
 
+/** Only the two user-authorized correction areas; counts and IDs never change.
+ * These are placement estimates constrained by the existing pavement/lot edges,
+ * not surveyed trunk coordinates. Unlisted records retain their original point.
+ */
+export const LOCAL_TREE_ACCESS_CORRECTIONS: Readonly<Record<string, readonly [number, number]>> = {
+  '2775,3305': [2756, 3305], '2785,3337': [2756, 3337],
+  '2795,3370': [2756, 3370], '2810,3402': [2756, 3402],
+  '2825,3428': [2756, 3428], '2780,3470': [2756, 3470],
+  '2792,3500': [2756, 3500], '2804,3530': [2756, 3530],
+  '2812,3560': [2756, 3546],
+  '2820,3590': [2844, 3590], '2828,3625': [2844, 3625],
+  '2818,3692': [2844, 3692],
+  '1080,4050': [1080, 3968], '1240,4025': [1175, 3900],
+  '1405,4070': [1435, 4010],
+};
+
 function buildTrees(area: CommercialTreeArea, blueprints: readonly TreeBlueprint[]): CommercialMapTree[] {
   return blueprints.map((blueprint, index) => {
     const speciesGroup = blueprint.speciesGroup ?? (index % 5 === 1 ? 'OPEN_CANOPY' : 'MATURE_BROADLEAF');
@@ -168,6 +187,12 @@ function buildTrees(area: CommercialTreeArea, blueprints: readonly TreeBlueprint
     const canopyRadius = round(dimensions.canopyRadius * scale);
     const shadowRotation = blueprint.shadowRotation ?? DEFAULT_SHADOW_ROTATION + ((index % 3) - 1) * 0.035;
     const id = `tree-${TREE_AREA_ID_PREFIX[area]}-${String(index + 1).padStart(2, '0')}`;
+    const corrected = LOCAL_TREE_ACCESS_CORRECTIONS[`${blueprint.sourcePosition[0]},${blueprint.sourcePosition[1]}`];
+    const sourcePosition = corrected ?? blueprint.sourcePosition;
+    const position = sourceToLocal(sourcePosition);
+    const correctedLot = corrected && area === 'I' && sourcePosition[0] > 2782
+      ? OFFICIAL_REFERENCE_DATA.entities.find(entity => entity.classification === 'SELLABLE_LOT'
+        && pointInPolygon(position, entity.geometry.coordinates[0])) : undefined;
 
     return {
       id,
@@ -176,11 +201,16 @@ function buildTrees(area: CommercialTreeArea, blueprints: readonly TreeBlueprint
       contributesToCommercialMetrics: false,
       area,
       quadra: isCommercialTreeQuadra(area) ? area : null,
-      relatedLotId: blueprint.relatedLotId ?? null,
-      surfaceEntityIdentifier: blueprint.surfaceEntityIdentifier ?? null,
-      placement: blueprint.placement,
-      position: sourceToLocal(blueprint.sourcePosition),
-      sourcePosition: blueprint.sourcePosition,
+      relatedLotId: correctedLot?.publicIdentifier ?? blueprint.relatedLotId ?? null,
+      surfaceEntityIdentifier: corrected && area !== 'PAVILIONS_1_14_GROVE'
+        ? (sourcePosition[0] < 2782 ? 'CALCADA-ARVOREDO' : correctedLot?.publicIdentifier ?? 'QUADRA-I')
+        : blueprint.surfaceEntityIdentifier ?? null,
+      placement: correctedLot ? 'LOT_EDGE'
+        : corrected && area !== 'PAVILIONS_1_14_GROVE' && sourcePosition[0] < 2782
+          ? 'SIDEWALK_EDGE' : blueprint.placement,
+      position,
+      sourcePosition,
+      ...(corrected ? { previousSourcePosition: blueprint.sourcePosition } : {}),
       canopyRadius,
       trunkRadius: round(dimensions.trunkRadius * scale),
       trunkHeight: round(dimensions.trunkHeight * scale),

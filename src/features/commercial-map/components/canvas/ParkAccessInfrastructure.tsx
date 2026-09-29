@@ -5,7 +5,12 @@ import { ROAD_MATERIAL_COLORS } from '../../constants';
 import { applyRuralMaterialDetail, ruralSurfaceKind } from '../../utils/ruralMaterialDetail';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../../data/parkAccessSpatialPlan';
-import type { ParkAccessArchitectureInstance } from '../../utils/parkAccessArchitecture';
+import {
+  PARK_ACCESS_GATE2_IDENTITY,
+  parkAccessGate2IdentityPlacement,
+  type ParkAccessArchitectureInstance,
+  type ParkAccessGatePlacement,
+} from '../../utils/parkAccessArchitecture';
 import {
   buildParkAccessRenderModel,
   disposeParkAccessRenderModel,
@@ -270,6 +275,71 @@ const InstanceBatch = memo(function InstanceBatch({
   );
 });
 
+/** One small, owned texture shared by the whole sign; no historic date/ad. */
+const Gate2Identity = memo(function Gate2Identity({
+  placement,
+  opacity,
+}: { placement: ParkAccessGatePlacement; opacity: number }) {
+  const invalidate = useThree(state => state.invalidate);
+  const panel = useMemo(() => parkAccessGate2IdentityPlacement(placement), [placement]);
+  const quaternion = useMemo(() => new THREE.Quaternion().fromArray(panel.quaternion), [panel]);
+  const resources = useMemo(() => {
+    const canvas = typeof document === 'undefined' ? null : document.createElement('canvas');
+    if (canvas) { canvas.width = 512; canvas.height = 128; }
+    const paint = (symbol?: HTMLImageElement) => {
+      const context = canvas?.getContext('2d');
+      if (!context) return;
+      context.fillStyle = '#174f38';
+      context.fillRect(0, 0, 512, 128);
+      if (symbol) context.drawImage(symbol, 12, 16, 96, 96);
+      context.fillStyle = '#f3f1e5';
+      context.font = 'bold 54px Arial, sans-serif';
+      context.textBaseline = 'middle';
+      context.fillText(PARK_ACCESS_GATE2_IDENTITY.wordmark, 124, 68, 372);
+    };
+    paint();
+    const texture = canvas ? new THREE.CanvasTexture(canvas) : null;
+    if (texture) {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.anisotropy = 2;
+      texture.minFilter = THREE.LinearMipmapLinearFilter;
+    }
+    const material = new THREE.MeshStandardMaterial({
+      color: texture ? '#ffffff' : '#174f38', map: texture, roughness: 0.86, metalness: 0,
+    });
+    return { paint, texture, material, geometry: new THREE.PlaneGeometry(1, 1) };
+  }, []);
+  useEffect(() => {
+    if (!resources.texture || typeof Image === 'undefined') return;
+    const symbol = new Image();
+    symbol.decoding = 'async';
+    symbol.onload = () => {
+      resources.paint(symbol);
+      resources.texture!.needsUpdate = true;
+      invalidate();
+    };
+    symbol.src = PARK_ACCESS_GATE2_IDENTITY.symbolAsset;
+    return () => { symbol.onload = null; };
+  }, [invalidate, resources]);
+  useEffect(() => {
+    configureInstanceMaterial(resources.material, opacity, 'opaque');
+    invalidate();
+  }, [invalidate, opacity, resources]);
+  useEffect(() => () => {
+    resources.texture?.dispose();
+    resources.material.dispose();
+    resources.geometry.dispose();
+  }, [resources]);
+  return (
+    <group position={panel.position} quaternion={quaternion}>
+      <mesh name="marca-oficial-portao-2" geometry={resources.geometry} material={resources.material}
+        position={[0, 0, panel.scale[2] / 2 + 0.001]}
+        scale={[panel.scale[0] * 0.97, panel.scale[1] * 0.88, 1]}
+        receiveShadow raycast={NO_RAYCAST} userData={FEATURE_USER_DATA} dispose={null} />
+    </group>
+  );
+});
+
 function SurfaceMaterial({
   kind,
   opacity,
@@ -456,6 +526,7 @@ export const ParkAccessInfrastructure = memo(function ParkAccessInfrastructure({
   const input = scope === 'exporural'
     ? EXPORURAL_PARK_ACCESS_INFRASTRUCTURE_INPUT
     : PARK_ACCESS_INFRASTRUCTURE_INPUT;
+  const gate2 = input.gates.find(gate => gate.key === 'gate2');
   const model = useMemo(
     () => buildParkAccessRenderModel(
       input,
@@ -514,6 +585,7 @@ export const ParkAccessInfrastructure = memo(function ParkAccessInfrastructure({
       ))}
       {resolvedArchitectureVisible && (
         <>
+          {gate2 && <Gate2Identity placement={gate2} opacity={normalizedArchitectureOpacity} />}
           {model.architecture.gables && <mesh name="costeiros-gable-infill" geometry={model.architecture.gables}
             material={gableMaterial} castShadow={!reducedGraphics} receiveShadow raycast={NO_RAYCAST} dispose={null}/>}
           <InstanceBatch

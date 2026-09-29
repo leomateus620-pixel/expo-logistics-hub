@@ -40,7 +40,7 @@ describe('pavement between Pavilions 1, 14 and 12', () => {
         expect(polygonClipping.intersection(surface, polygon(entity.geometry.coordinates)), entity.publicIdentifier).toEqual([]);
       }
     }
-    for (const source of [[2700, 4000], [2750, 4130], [2835, 3810], [2997, 3810], [3060, 3810], [3210, 3784], [3360, 3784], [3550, 3783]] as const) {
+    for (const source of [[2700, 4000], [2750, 4095], [2835, 3810], [2997, 3810], [3060, 3810], [3210, 3784], [3360, 3784], [3550, 3783]] as const) {
       expect(contains(PAVILION_COURTYARD.hardscape, point(source)), source.join(',')).toBe(true);
     }
     for (const source of [[3000, 4095], [3210, 4108], [3360, 4065], [3550, 4105]] as const) {
@@ -48,6 +48,32 @@ describe('pavement between Pavilions 1, 14 and 12', () => {
         contains(polygon([s.polygon, ...(s.holes ?? [])]), point(source))), source.join(',')).toBe(true);
     }
     expect(PAVILION_COURTYARD.officialMeasurements).toBe(false);
+  });
+
+  it('keeps the B14/B12 concrete edge straight and fills the former projection with the existing asphalt owner', () => {
+    const avenue = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.find(surface => surface.id === 'benvenuto-four-lane-axis')!;
+    const asphalt = polygon([avenue.polygon]);
+    const [start, end] = PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge.courtyardCurb;
+    expect(PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge.sourcePdfCourtyardCurb)
+      .toEqual([[2650, 4100], [2790, 4103]]);
+    // Interior samples on both sides of the same line detect a concrete ledge,
+    // residual grass, a crack, or an independently rounded pavement overlay.
+    for (const t of [.1, .3, .5, .7, .9]) {
+      const x = start[0] + (end[0] - start[0]) * t;
+      const z = start[1] + (end[1] - start[1]) * t;
+      expect(contains(PAVILION_COURTYARD.hardscape, [x, z - .0001])).toBe(true);
+      expect(contains(PAVILION_COURTYARD.hardscape, [x, z + .0001])).toBe(false);
+      expect(contains(asphalt, [x, z - .0001])).toBe(false);
+      expect(contains(asphalt, [x, z + .0001])).toBe(true);
+    }
+    for (const source of [[2700, 4110], [2750, 4130]] as const) {
+      expect(contains(asphalt, point(source))).toBe(true);
+      expect(contains(PAVILION_COURTYARD.hardscape, point(source))).toBe(false);
+      expect(contains(PAVILION_COURTYARD.occupied, point(source))).toBe(true);
+    }
+    expect(polygonClipping.intersection(asphalt, PAVILION_COURTYARD.hardscape)).toEqual([]);
+    expect(contains(asphalt, PAVILION_COURTYARD.treePosition)).toBe(false);
+    expect(contains(PAVILION_COURTYARD.hardscape, PAVILION_COURTYARD.treePosition)).toBe(false);
   });
 
   it('has one infrastructure owner, no natural-ground overlap and two actual root openings', () => {
@@ -59,7 +85,8 @@ describe('pavement between Pavilions 1, 14 and 12', () => {
         expect(contains(PAVILION_COURTYARD.road, tree.position)).toBe(false);
         expect(presentation.ambientTrees.filter(p => p.sourceZoneId === tree.sourceZoneId)).toHaveLength(1);
       }
-      expect(presentation.diagnostics.primaryDrawCalls).toBe(4);
+      // Interior leaf cards and unchanged exterior trees have separate batches.
+      expect(presentation.diagnostics.primaryDrawCalls).toBe(5);
       expect(presentation.diagnostics.shadowDrawCalls).toBe(0);
       for (const ground of [...presentation.environmentalSurfaces, ...presentation.trailSurfaces]) {
         expect(polygonClipping.intersection(polygon([ground.polygon, ...ground.holes]),

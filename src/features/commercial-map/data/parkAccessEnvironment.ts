@@ -706,6 +706,8 @@ export function resolveParkAccessEnvironmentPresentation(
         environmentalSurfaceCount: environmentalSurfaces.length,
         trailSurfaceCount: trailSurfaces.length,
         ambientTreeCount: ambientTrees.length,
+        // Internal leaf clusters and the unchanged outer road trees are separate batches.
+        ambientTreeMaterialGroups: ambientTrees.length ? 2 : 0,
         understoryCount: understory.length,
       }),
       environmentalSurfaceCount: environmentalSurfaces.length,

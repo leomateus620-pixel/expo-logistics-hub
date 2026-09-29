@@ -163,7 +163,8 @@ export function adaptParkAccessSpatialPlan(
       return {
         key,
         anchor: gate.anchor,
-        rotationRadians: gateRotationFromArrivalHeading(gate.approachHeadingRadians),
+        rotationRadians: ('facadeRotationRadians' in gate ? gate.facadeRotationRadians : undefined)
+          ?? gateRotationFromArrivalHeading(gate.approachHeadingRadians),
         width: gate.width,
         depth: gate.depth,
       };

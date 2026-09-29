@@ -195,13 +195,13 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       .toHaveLength(4);
     expect(featureIds.filter((id) => /^gate3:fence-(left|right)-post-\d+$/.test(id)))
       .toHaveLength(4);
-    expect(featureIds).toContain('gate2:left-facade');
-    expect(featureIds.filter((id) => id.startsWith('gate2:inclined-fin-'))).toHaveLength(3);
+    expect(featureIds).toContain('gate2:service-core');
+    expect(featureIds.filter((id) => id.startsWith('gate2:inclined-fin-'))).toHaveLength(4);
     expect(featureIds).toContain('costeiros:roof--1');
     expect(featureIds).toContain('costeiros:roof-1');
     expect(architecture.gables?.getAttribute('position').count).toBeGreaterThan(0);
     expect(architecture.diagnostics.gateCount).toBe(3);
-    expect(architecture.diagnostics.estimatedDrawCalls).toBe(4);
+    expect(architecture.diagnostics.estimatedDrawCalls).toBe(5); // Includes the one official A2 identity panel.
     architecture.gables?.dispose();
   });
 

@@ -148,9 +148,9 @@ export const PARK_ACCESS_INFRASTRUCTURE_PROFILE = {
 } as const;
 
 export const PARK_ACCESS_RENDER_BUDGET = {
-  maximumPrimaryDrawCalls: 12,
+  maximumPrimaryDrawCalls: 13, // One shared official identity panel on A2; infrastructure remains batched.
   maximumShadowDrawCalls: 3,
-  maximumRenderedTriangles: 6_000,
+  maximumRenderedTriangles: 6_200, // A2 now includes recessed service openings and four physical buttresses.
 } as const;
 
 const EPSILON = 1e-6;
