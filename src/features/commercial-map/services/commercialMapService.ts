@@ -407,7 +407,11 @@ async function fetchCommissionCommercialMap(
     || !Array.isArray(persistedDirection)
     || persistedDirection.length !== 3
     || cameraValues.length !== 6
-    || cameraValues.some((value) => !Number.isFinite(value) || value <= 0)
+    // Camera direction is a vector: negative X/Z components are valid. Only
+    // padding and distance ratios must be strictly positive.
+    || cameraValues.some((value) => !Number.isFinite(value))
+    || cameraValues.slice(0, 3).every((value) => value === 0)
+    || cameraValues.slice(3).some((value) => value <= 0)
   ) {
     throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
   }
@@ -512,9 +516,9 @@ async function fetchCommissionCommercialMap(
     fetchSaleLogoUrls({ projectId: project.id }),
     // Contexto do parque para o modo visita: somente formas e estruturas,
     // sem lotes, preços ou compradores de outros segmentos.
-    mapRequest(db.rpc('commission_map_park_context', { p_segment_id: segment.id }), context)
-      .catch(() => ({ data: null, error: null })),
+    mapRequest(db.rpc('commission_map_park_context', { p_segment_id: segment.id }), context),
   ]);
+  if (parkContextResult.error) throw parkContextResult.error;
   const parkContext = (parkContextResult?.data ?? null) as { layers?: LayerRow[]; entities?: MapEntity[] } | null;
   const scopedLayers = (layersResult.data ?? []).map(mapLayer);
   const knownLayerIds = new Set(scopedLayers.map((layer) => layer.id));
