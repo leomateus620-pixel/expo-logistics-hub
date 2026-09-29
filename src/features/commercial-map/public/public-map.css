@@ -68,7 +68,7 @@
   min-height: 0;
 }
 
-.public-map-canvas { position: relative; flex: 1; min-height: 0; }
+.public-map-canvas { position: relative; flex: 1; min-height: 0; isolation: isolate; }
 /* Drei HTML labels stay inside the canvas stacking context, below the sheet. */
 .public-map-shell[data-public-external] .public-map-canvas { isolation: isolate; }
 .public-map-shell[data-public-external] .commercial-map-label { display: flex; flex-wrap: wrap; gap: 4px 8px; min-width: 150px; max-width: 210px; padding: 8px 10px; border: 1px solid #69747d; border-radius: 10px; background: #fffffff2; color: #26313b; font-size: 12px; box-shadow: 0 3px 12px #0002; }
@@ -77,7 +77,10 @@
 .public-map-shell button:focus-visible, .public-map-shell input:focus-visible { outline: 3px solid #377ddd; outline-offset: 3px; }
 .public-map-shell button { min-height: 44px; }
 .public-map-state button { margin: 8px; padding: 8px 16px; border: 1px solid currentColor; border-radius: 10px; }
-.public-map-legend { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; flex-wrap: wrap; gap: 8px 14px; width: fit-content; max-width: calc(100% - 24px); padding: 9px 12px; border-radius: 12px; background: #fffffff0; color: #26313b; font-size: 12px; box-shadow: 0 2px 10px #0002; pointer-events: none; }
+.public-map-legend { position: relative; flex: none; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; padding: 9px 18px; border-bottom: 1px solid #d7dedb; background: #f9fbfa; color: #26313b; font-size: 12px; pointer-events: none; }
+.public-map-legend__statuses { display: flex; gap: 8px 16px; }
+.public-map-segment { color: var(--segment-color, #244b35); border-left: 3px solid var(--segment-accent, #a8be72); padding-left: 9px; letter-spacing: .02em; animation: public-map-segment-enter 240ms ease-out both; }
+@keyframes public-map-segment-enter { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 .public-map-legend span { display: inline-flex; align-items: center; gap: 5px; }
 .public-map-legend i { display: block; width: 12px; height: 12px; border: 1px solid #495460; border-radius: 3px; }
 .public-map-legend .is-selection { background: #ffec8b; border: 2px solid #142331; }
@@ -165,7 +168,9 @@
 .public-map-details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .public-map-details-grid dt { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: oklch(var(--muted-foreground)); }
 .public-map-details-grid dd { font-size: 0.86rem; font-weight: 600; }
-.public-map-details-grid dd[data-availability='AVAILABLE'] { color: oklch(var(--primary)); }
+.public-map-shell [data-availability='AVAILABLE'] { color: #167b42; }
+.public-map-shell [data-availability='SOLD'] { color: #245cbb; }
+.public-map-shell [data-availability='UNAVAILABLE'] { color: #b5222b; }
 
 .public-map-details-stages { margin-top: 14px; display: grid; gap: 8px; }
 .public-map-details-stages h3,
@@ -211,7 +216,8 @@
   .public-map-header { gap: 4px; }
   .public-map-view-switch { flex-wrap: wrap; }
   .public-map-view-switch button { padding: 0 9px; font-size: 0.75rem; }
-  .public-map-legend { top: 6px; left: 6px; right: 6px; font-size: 10px; padding: 6px 8px; gap: 5px 10px; }
+  .public-map-legend { font-size: 11px; padding: 7px 12px; gap: 6px 10px; }
+  .public-map-legend__statuses { gap: 8px 12px; }
   .public-map-details.is-compact { max-height: 29dvh; }
   .public-map-details.is-compact.is-expanded { max-height: min(65dvh, 100% - 12px); }
   .public-map-details-expand { display: block; width: 100%; font-size: 0.8rem; }
@@ -327,5 +333,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .public-map-stage__spinner { animation-duration: 3s; }
+  .public-map-stage__spinner, .public-map-segment { animation: none; }
 }

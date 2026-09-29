@@ -36,6 +36,27 @@ function rendererFixture() {
 }
 
 describe('non-rendering commercial scene preparation', () => {
+  it('rejects a program disposed during async linking instead of polling its deleted WebGL handle forever', async () => {
+    vi.useFakeTimers();
+    const program={program:{} as WebGLProgram,isReady:vi.fn(()=>false),getUniforms:vi.fn()};
+    const material=new THREE.MeshBasicMaterial(),scene=new THREE.Scene();
+    const gl={compile:()=>new Set([material]),properties:{get:()=>({currentProgram:program})}} as unknown as THREE.WebGLRenderer;
+    const preparation=compileCommercialMapPrograms(gl,scene,new THREE.Camera(),scene);
+    const rejected=expect(preparation).rejects.toThrow('SCENE_PROGRAM_RETIRED');
+    program.program=undefined;
+    await vi.advanceTimersByTimeAsync(20);await rejected;
+    expect(program.isReady).toHaveBeenCalledTimes(1);expect(program.getUniforms).not.toHaveBeenCalled();
+    expect(isCommercialMapProgramPreparationActive(gl)).toBe(false);expect(vi.getTimerCount()).toBe(0);
+    material.dispose();
+  });
+  it('bounds a genuinely stalled driver without ever accepting a timeout as readiness', async () => {
+    vi.useFakeTimers();
+    const {gl,initialTarget}=rendererFixture(),scene=new THREE.Scene();
+    const preparation=compileCommercialMapPrograms(gl,scene,new THREE.Camera(),scene);
+    const rejected=expect(preparation).rejects.toThrow('SHADER_PREPARATION_TIMEOUT');
+    await vi.advanceTimersByTimeAsync(20_100);await rejected;
+    expect(isCommercialMapProgramPreparationActive(gl)).toBe(false);expect(vi.getTimerCount()).toBe(0);initialTarget.dispose();
+  });
   it('waits for every captured link before reflecting any ready program, then retains bounded initialization', async () => {
     vi.useFakeTimers();
     let secondReady = false;

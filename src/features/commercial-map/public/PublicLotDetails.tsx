@@ -8,6 +8,7 @@ import {
 } from '../utils/lotPricing2028';
 import { PUBLIC_AVAILABILITY_LABEL, type PublicLot } from './publicMapTypes';
 import { resolveLotIdentity } from '../utils/lotIdentity';
+import { publicAvailability } from './publicAvailability';
 
 const PENDING_LABEL = 'Valor sob consulta';
 
@@ -68,7 +69,7 @@ export const PublicLotDetails = memo(function PublicLotDetails({
         </div>
         <div>
           <dt>Disponibilidade</dt>
-          <dd data-availability={lot.availability}>{PUBLIC_AVAILABILITY_LABEL[lot.availability]}</dd>
+          <dd data-availability={publicAvailability(lot.availability)}>{PUBLIC_AVAILABILITY_LABEL[lot.availability]}</dd>
         </div>
         {lot.availability === 'SOLD' && lot.buyerName?.trim() && (
           <div>

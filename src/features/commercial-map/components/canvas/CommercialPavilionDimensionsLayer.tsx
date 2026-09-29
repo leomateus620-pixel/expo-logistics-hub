@@ -51,6 +51,9 @@ export const CommercialPavilionDimensionsLayer = memo(function CommercialPavilio
 
   useFrame(({ camera, size }) => {
     if (!group.current || !svg.current || !dimensions.length) return;
+    // CameraRig moves at -0.5. matrixWorld otherwise remains the preceding
+    // frame until Html/render, making the SVG visibly trail camera gestures.
+    camera.updateMatrixWorld();
     group.current.updateWorldMatrix(true, false);
     const projection = [plan.publicIdentifier, size.width, size.height, ...camera.matrixWorld.elements, ...camera.projectionMatrix.elements, ...group.current.matrixWorld.elements].join(',');
     if (projection === lastProjection.current && !dirty.current) return;
@@ -58,7 +61,8 @@ export const CommercialPavilionDimensionsLayer = memo(function CommercialPavilio
     dirty.current = false;
     const project = (x: number, z: number) => {
       scratch.set(x, layout.interior.floorY + 0.045, z).applyMatrix4(group.current!.matrixWorld).project(camera);
-      return [((scratch.x + 1) / 2) * size.width, ((1 - scratch.y) / 2) * size.height] as const;
+      return scratch.z < -1 || scratch.z > 1 ? [NaN, NaN] as const
+        : [((scratch.x + 1) / 2) * size.width, ((1 - scratch.y) / 2) * size.height] as const;
     };
     const obstacles: DimensionScreenRect[] = geometry.map(rect => {
       const points = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([x, z]) => project(rect.centerX + x * rect.width / 2, rect.centerZ + z * rect.depth / 2));

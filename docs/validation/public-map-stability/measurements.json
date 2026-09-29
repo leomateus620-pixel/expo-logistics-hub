@@ -1,0 +1,1590 @@
+{
+  "base": "24bd261e",
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+  "device": "Intel UHD Graphics / ANGLE Direct3D11 / Windows / DPR 1",
+  "cache": "new browser context per link; HTTP cache disabled; --disable-gpu-shader-disk-cache; OS and driver caches retained",
+  "before": [
+    {
+      "slug": "pavilhao-3",
+      "mode": "desktop",
+      "ready": "false",
+      "manualRetry": true,
+      "lots": 214,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1483.744
+        },
+        {
+          "name": "public_map_scope_revision",
+          "status": 200,
+          "durationMs": 398.563
+        },
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1112.38
+        },
+        {
+          "name": "public_map_scope_revision",
+          "status": 200,
+          "durationMs": 397.903
+        }
+      ],
+      "programProbe": {
+        "deleted": 2,
+        "polledDeleted": 2
+      },
+      "timing": {
+        "routeStartedAt": 461.09999990463257,
+        "documentToInteractiveMs": null,
+        "navigationToModuleMs": 0,
+        "moduleMs": 125,
+        "rendererModuleMs": 872,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 63,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 55,
+        "sceneMs": 1465,
+        "entityGeometryCpuMs": null,
+        "environmentMaterialMs": 0,
+        "proceduralTextureCpuMs": 223.09999990463257,
+        "textureUploadMs": null,
+        "cpuStagesMs": {
+          "textures": 223
+        },
+        "shaderDirectMs": null,
+        "shaderPostMs": null,
+        "shadowMs": null,
+        "postprocessingMs": 12,
+        "physicsMs": null,
+        "firstDrawMs": null,
+        "interactiveMs": null,
+        "controlsResponseMs": null,
+        "hydrationMs": null
+      },
+      "firstHealth": null,
+      "identity": {
+        "canvas": 2,
+        "renderer": 2,
+        "controls": 2
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": false,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "pavilhao-1",
+      "mode": "desktop",
+      "ready": "false",
+      "manualRetry": true,
+      "lots": 189,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1241.308
+        },
+        {
+          "name": "public_map_scope_revision",
+          "status": 200,
+          "durationMs": 792.258
+        },
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1093.668
+        },
+        {
+          "name": "public_map_scope_revision",
+          "status": 200,
+          "durationMs": 372.387
+        }
+      ],
+      "programProbe": {
+        "deleted": 2,
+        "polledDeleted": 2
+      },
+      "timing": {
+        "routeStartedAt": 621.0999999046326,
+        "documentToInteractiveMs": null,
+        "navigationToModuleMs": 0,
+        "moduleMs": 92,
+        "rendererModuleMs": 374,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 15,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 6,
+        "sceneMs": 1253,
+        "entityGeometryCpuMs": null,
+        "environmentMaterialMs": 0,
+        "proceduralTextureCpuMs": 213.099999666214,
+        "textureUploadMs": null,
+        "cpuStagesMs": {
+          "textures": 213
+        },
+        "shaderDirectMs": null,
+        "shaderPostMs": null,
+        "shadowMs": null,
+        "postprocessingMs": 7,
+        "physicsMs": null,
+        "firstDrawMs": null,
+        "interactiveMs": null,
+        "controlsResponseMs": null,
+        "hydrationMs": null
+      },
+      "firstHealth": null,
+      "identity": {
+        "canvas": 2,
+        "renderer": 2,
+        "controls": 2
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": false,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "pavilhao-14",
+      "mode": "desktop",
+      "ready": "false",
+      "manualRetry": true,
+      "lots": 186,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1573.78
+        },
+        {
+          "name": "public_map_scope_revision",
+          "status": 200,
+          "durationMs": 461.16
+        },
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1823.837
+        },
+        {
+          "name": "public_map_scope_revision",
+          "status": 200,
+          "durationMs": 516.042
+        }
+      ],
+      "programProbe": {
+        "deleted": 2,
+        "polledDeleted": 2
+      },
+      "timing": {
+        "routeStartedAt": 438.7000000476837,
+        "documentToInteractiveMs": null,
+        "navigationToModuleMs": 0,
+        "moduleMs": 101,
+        "rendererModuleMs": 324,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 14,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 4,
+        "sceneMs": 1260,
+        "entityGeometryCpuMs": null,
+        "environmentMaterialMs": 0,
+        "proceduralTextureCpuMs": 216.39999961853027,
+        "textureUploadMs": null,
+        "cpuStagesMs": {
+          "textures": 216
+        },
+        "shaderDirectMs": null,
+        "shaderPostMs": null,
+        "shadowMs": null,
+        "postprocessingMs": 7,
+        "physicsMs": null,
+        "firstDrawMs": null,
+        "interactiveMs": null,
+        "controlsResponseMs": null,
+        "hydrationMs": null
+      },
+      "firstHealth": null,
+      "identity": {
+        "canvas": 2,
+        "renderer": 2,
+        "controls": 2
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": false,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "exporural",
+      "mode": "desktop",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 101,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_context",
+          "status": 200,
+          "durationMs": 1222.524
+        },
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1637.17
+        }
+      ],
+      "programProbe": {
+        "deleted": 0,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 452.7000000476837,
+        "documentToInteractiveMs": 7883,
+        "navigationToModuleMs": 0,
+        "moduleMs": 82,
+        "rendererModuleMs": 351,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 11,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 5,
+        "sceneMs": 2169,
+        "entityGeometryCpuMs": 22.6999990940094,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": 172.60000014305115,
+        "textureUploadMs": 612,
+        "cpuStagesMs": {
+          "textures": 173,
+          "geometry-preparation": 23
+        },
+        "shaderDirectMs": 2506,
+        "shaderPostMs": null,
+        "shadowMs": null,
+        "postprocessingMs": 9,
+        "physicsMs": null,
+        "firstDrawMs": 2985,
+        "interactiveMs": 7430,
+        "controlsResponseMs": null,
+        "hydrationMs": null
+      },
+      "firstDrawMs": 7693.899999856949,
+      "readyMs": 7882.599999904633,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    }
+  ],
+  "after": [
+    {
+      "slug": "pavilhao-1",
+      "mode": "desktop",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 189,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1227.931
+        }
+      ],
+      "programProbe": {
+        "deleted": 1,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 908,
+        "documentToInteractiveMs": 3645,
+        "navigationToModuleMs": 0,
+        "moduleMs": 222,
+        "rendererModuleMs": 716,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 50,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 44,
+        "sceneMs": 80,
+        "entityGeometryCpuMs": null,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": null,
+        "textureUploadMs": 683,
+        "cpuStagesMs": {},
+        "shaderDirectMs": 182,
+        "shaderPostMs": null,
+        "shadowMs": 42,
+        "postprocessingMs": 8,
+        "physicsMs": null,
+        "firstDrawMs": 912,
+        "interactiveMs": 2737,
+        "controlsResponseMs": null,
+        "hydrationMs": 3
+      },
+      "firstDrawMs": 3615,
+      "readyMs": 3644.7000000476837,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "pavilhao-3",
+      "mode": "desktop",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 214,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1156.326
+        }
+      ],
+      "programProbe": {
+        "deleted": 1,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 446,
+        "documentToInteractiveMs": 2926,
+        "navigationToModuleMs": 0,
+        "moduleMs": 81,
+        "rendererModuleMs": 666,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 10,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 4,
+        "sceneMs": 73,
+        "entityGeometryCpuMs": null,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": null,
+        "textureUploadMs": 807,
+        "cpuStagesMs": {},
+        "shaderDirectMs": 59,
+        "shaderPostMs": null,
+        "shadowMs": 49,
+        "postprocessingMs": 6,
+        "physicsMs": null,
+        "firstDrawMs": 914,
+        "interactiveMs": 2480,
+        "controlsResponseMs": null,
+        "hydrationMs": 4
+      },
+      "firstDrawMs": 2879.0999999046326,
+      "readyMs": 2925.399999856949,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "pavilhao-5",
+      "mode": "desktop",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 81,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1300.674
+        }
+      ],
+      "programProbe": {
+        "deleted": 1,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 418.09999990463257,
+        "documentToInteractiveMs": 3088,
+        "navigationToModuleMs": 0,
+        "moduleMs": 85,
+        "rendererModuleMs": 414,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 14,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 6,
+        "sceneMs": 82,
+        "entityGeometryCpuMs": null,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": null,
+        "textureUploadMs": 857,
+        "cpuStagesMs": {},
+        "shaderDirectMs": 60,
+        "shaderPostMs": null,
+        "shadowMs": 2,
+        "postprocessingMs": 8,
+        "physicsMs": null,
+        "firstDrawMs": 970,
+        "interactiveMs": 2670,
+        "controlsResponseMs": null,
+        "hydrationMs": 4
+      },
+      "firstDrawMs": 3046.0999999046326,
+      "readyMs": 3087.7000000476837,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "pavilhao-8",
+      "mode": "desktop",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 114,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 942.035
+        }
+      ],
+      "programProbe": {
+        "deleted": 1,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 402.30000019073486,
+        "documentToInteractiveMs": 2710,
+        "navigationToModuleMs": 0,
+        "moduleMs": 81,
+        "rendererModuleMs": 373,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 14,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 5,
+        "sceneMs": 73,
+        "entityGeometryCpuMs": null,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": null,
+        "textureUploadMs": 905,
+        "cpuStagesMs": {},
+        "shaderDirectMs": 70,
+        "shaderPostMs": null,
+        "shadowMs": 45,
+        "postprocessingMs": 7,
+        "physicsMs": null,
+        "firstDrawMs": 1024,
+        "interactiveMs": 2308,
+        "controlsResponseMs": null,
+        "hydrationMs": 4
+      },
+      "firstDrawMs": 2666.7000000476837,
+      "readyMs": 2709.100000143051,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "pavilhao-12",
+      "mode": "desktop",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 257,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1186.067
+        }
+      ],
+      "programProbe": {
+        "deleted": 1,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 388.40000009536743,
+        "documentToInteractiveMs": 2961,
+        "navigationToModuleMs": 1,
+        "moduleMs": 83,
+        "rendererModuleMs": 335,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 15,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 6,
+        "sceneMs": 76,
+        "entityGeometryCpuMs": null,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": null,
+        "textureUploadMs": 915,
+        "cpuStagesMs": {},
+        "shaderDirectMs": 58,
+        "shaderPostMs": null,
+        "shadowMs": 53,
+        "postprocessingMs": 7,
+        "physicsMs": null,
+        "firstDrawMs": 1038,
+        "interactiveMs": 2572,
+        "controlsResponseMs": null,
+        "hydrationMs": 3
+      },
+      "firstDrawMs": 2912,
+      "readyMs": 2960,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "pavilhao-13",
+      "mode": "desktop",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 103,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1258.885
+        }
+      ],
+      "programProbe": {
+        "deleted": 1,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 427.40000009536743,
+        "documentToInteractiveMs": 3108,
+        "navigationToModuleMs": 0,
+        "moduleMs": 83,
+        "rendererModuleMs": 355,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 14,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 5,
+        "sceneMs": 83,
+        "entityGeometryCpuMs": null,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": null,
+        "textureUploadMs": 914,
+        "cpuStagesMs": {},
+        "shaderDirectMs": 66,
+        "shaderPostMs": null,
+        "shadowMs": 46,
+        "postprocessingMs": 8,
+        "physicsMs": null,
+        "firstDrawMs": 1030,
+        "interactiveMs": 2680,
+        "controlsResponseMs": null,
+        "hydrationMs": 4
+      },
+      "firstDrawMs": 3068,
+      "readyMs": 3107.300000190735,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "pavilhao-14",
+      "mode": "desktop",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 186,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 2077.628
+        }
+      ],
+      "programProbe": {
+        "deleted": 1,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 433.69999980926514,
+        "documentToInteractiveMs": 3988,
+        "navigationToModuleMs": 0,
+        "moduleMs": 87,
+        "rendererModuleMs": 350,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 10,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 3,
+        "sceneMs": 66,
+        "entityGeometryCpuMs": null,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": null,
+        "textureUploadMs": 911,
+        "cpuStagesMs": {},
+        "shaderDirectMs": 59,
+        "shaderPostMs": null,
+        "shadowMs": 84,
+        "postprocessingMs": 7,
+        "physicsMs": null,
+        "firstDrawMs": 1067,
+        "interactiveMs": 3555,
+        "controlsResponseMs": null,
+        "hydrationMs": 2
+      },
+      "firstDrawMs": 3918.199999809265,
+      "readyMs": 3988.0999999046326,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "exporural",
+      "mode": "desktop",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 101,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1140.534
+        },
+        {
+          "name": "public_map_context",
+          "status": 200,
+          "durationMs": 1538.199
+        }
+      ],
+      "programProbe": {
+        "deleted": 0,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 432.89999985694885,
+        "documentToInteractiveMs": 7859,
+        "navigationToModuleMs": 0,
+        "moduleMs": 81,
+        "rendererModuleMs": 337,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 10,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 4,
+        "sceneMs": 2192,
+        "entityGeometryCpuMs": 19.199999570846558,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": 186.19999980926514,
+        "textureUploadMs": 621,
+        "cpuStagesMs": {
+          "textures": 186,
+          "geometry-preparation": 19
+        },
+        "shaderDirectMs": 2559,
+        "shaderPostMs": null,
+        "shadowMs": null,
+        "postprocessingMs": 8,
+        "physicsMs": null,
+        "firstDrawMs": 3064,
+        "interactiveMs": 7426,
+        "controlsResponseMs": null,
+        "hydrationMs": null
+      },
+      "firstDrawMs": 7651.799999952316,
+      "readyMs": 7858.699999809265,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "industria-comercio-servicos-externo",
+      "mode": "desktop",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 105,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1422.646
+        },
+        {
+          "name": "public_map_context",
+          "status": 200,
+          "durationMs": 1704.445
+        }
+      ],
+      "programProbe": {
+        "deleted": 0,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 408.7999999523163,
+        "documentToInteractiveMs": 7564,
+        "navigationToModuleMs": 0,
+        "moduleMs": 82,
+        "rendererModuleMs": 355,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 10,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 4,
+        "sceneMs": 2168,
+        "entityGeometryCpuMs": 29.300000190734863,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": 185.30000019073486,
+        "textureUploadMs": 608,
+        "cpuStagesMs": {
+          "textures": 185,
+          "geometry-preparation": 29
+        },
+        "shaderDirectMs": 2161,
+        "shaderPostMs": null,
+        "shadowMs": null,
+        "postprocessingMs": 8,
+        "physicsMs": null,
+        "firstDrawMs": 2629,
+        "interactiveMs": 7155,
+        "controlsResponseMs": null,
+        "hydrationMs": null
+      },
+      "firstDrawMs": 7392.5,
+      "readyMs": 7563.600000143051,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "espaco-automovel",
+      "mode": "desktop",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 64,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1264.89
+        },
+        {
+          "name": "public_map_context",
+          "status": 200,
+          "durationMs": 1436.094
+        }
+      ],
+      "programProbe": {
+        "deleted": 0,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 457.7999999523163,
+        "documentToInteractiveMs": 7567,
+        "navigationToModuleMs": 0,
+        "moduleMs": 99,
+        "rendererModuleMs": 444,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 12,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 4,
+        "sceneMs": 2330,
+        "entityGeometryCpuMs": 25.699998140335083,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": 186.19999980926514,
+        "textureUploadMs": 619,
+        "cpuStagesMs": {
+          "textures": 186,
+          "geometry-preparation": 26
+        },
+        "shaderDirectMs": 2332,
+        "shaderPostMs": null,
+        "shadowMs": null,
+        "postprocessingMs": 11,
+        "physicsMs": null,
+        "firstDrawMs": 2737,
+        "interactiveMs": 7109,
+        "controlsResponseMs": null,
+        "hydrationMs": null
+      },
+      "firstDrawMs": 7493,
+      "readyMs": 7566.700000047684,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    }
+  ],
+  "mobile": [
+    {
+      "slug": "pavilhao-1",
+      "mode": "mobile",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 189,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1264.683
+        }
+      ],
+      "programProbe": {
+        "deleted": 0,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 502.19999980926514,
+        "documentToInteractiveMs": 2709,
+        "navigationToModuleMs": 0,
+        "moduleMs": 96,
+        "rendererModuleMs": 445,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 107,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 100,
+        "sceneMs": 64,
+        "entityGeometryCpuMs": null,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": null,
+        "textureUploadMs": 17,
+        "cpuStagesMs": {},
+        "shaderDirectMs": 238,
+        "shaderPostMs": null,
+        "shadowMs": 39,
+        "postprocessingMs": 7,
+        "physicsMs": null,
+        "firstDrawMs": 292,
+        "interactiveMs": 2207,
+        "controlsResponseMs": null,
+        "hydrationMs": 2
+      },
+      "firstDrawMs": 2688.5999999046326,
+      "readyMs": 2709.2999999523163,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "pavilhao-3",
+      "mode": "mobile",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 214,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1088.265
+        }
+      ],
+      "programProbe": {
+        "deleted": 1,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 403.60000014305115,
+        "documentToInteractiveMs": 2157,
+        "navigationToModuleMs": 0,
+        "moduleMs": 78,
+        "rendererModuleMs": 322,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 13,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 4,
+        "sceneMs": 71,
+        "entityGeometryCpuMs": null,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": null,
+        "textureUploadMs": 143,
+        "cpuStagesMs": {},
+        "shaderDirectMs": 90,
+        "shaderPostMs": null,
+        "shadowMs": 42,
+        "postprocessingMs": 7,
+        "physicsMs": null,
+        "firstDrawMs": 282,
+        "interactiveMs": 1753,
+        "controlsResponseMs": null,
+        "hydrationMs": 1
+      },
+      "firstDrawMs": 2118.100000143051,
+      "readyMs": 2156.7999999523163,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "pavilhao-14",
+      "mode": "mobile",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 186,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1611.703
+        }
+      ],
+      "programProbe": {
+        "deleted": 1,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 407.59999990463257,
+        "documentToInteractiveMs": 2603,
+        "navigationToModuleMs": 0,
+        "moduleMs": 79,
+        "rendererModuleMs": 334,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 14,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 6,
+        "sceneMs": 57,
+        "entityGeometryCpuMs": null,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": null,
+        "textureUploadMs": 140,
+        "cpuStagesMs": {},
+        "shaderDirectMs": 85,
+        "shaderPostMs": null,
+        "shadowMs": 69,
+        "postprocessingMs": 7,
+        "physicsMs": null,
+        "firstDrawMs": 284,
+        "interactiveMs": 2195,
+        "controlsResponseMs": null,
+        "hydrationMs": 1
+      },
+      "firstDrawMs": 2570.7999999523163,
+      "readyMs": 2602.5999999046326,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "exporural",
+      "mode": "mobile",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 101,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 1141.418
+        },
+        {
+          "name": "public_map_context",
+          "status": 200,
+          "durationMs": 1515.696
+        },
+        {
+          "name": "public_map_scope_revision",
+          "status": 200,
+          "durationMs": 380.585
+        }
+      ],
+      "programProbe": {
+        "deleted": 0,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 393.2000000476837,
+        "documentToInteractiveMs": 7830,
+        "navigationToModuleMs": 0,
+        "moduleMs": 76,
+        "rendererModuleMs": 328,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 13,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 4,
+        "sceneMs": 2201,
+        "entityGeometryCpuMs": 28.100001573562622,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": 172.90000009536743,
+        "textureUploadMs": 622,
+        "cpuStagesMs": {
+          "textures": 173,
+          "geometry-preparation": 28
+        },
+        "shaderDirectMs": 2613,
+        "shaderPostMs": null,
+        "shadowMs": null,
+        "postprocessingMs": 11,
+        "physicsMs": null,
+        "firstDrawMs": 3111,
+        "interactiveMs": 7437,
+        "controlsResponseMs": null,
+        "hydrationMs": null
+      },
+      "firstDrawMs": 7719.799999952316,
+      "readyMs": 7830.299999952316,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "industria-comercio-servicos-externo",
+      "mode": "mobile",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 105,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 894.39
+        },
+        {
+          "name": "public_map_context",
+          "status": 200,
+          "durationMs": 1112.514
+        },
+        {
+          "name": "public_map_scope_revision",
+          "status": 200,
+          "durationMs": 411.441
+        }
+      ],
+      "programProbe": {
+        "deleted": 0,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 476.5,
+        "documentToInteractiveMs": 7416,
+        "navigationToModuleMs": 0,
+        "moduleMs": 107,
+        "rendererModuleMs": 386,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 14,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 6,
+        "sceneMs": 2096,
+        "entityGeometryCpuMs": 25.09999990463257,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": 170.40000009536743,
+        "textureUploadMs": 614,
+        "cpuStagesMs": {
+          "textures": 170,
+          "geometry-preparation": 25
+        },
+        "shaderDirectMs": 2627,
+        "shaderPostMs": null,
+        "shadowMs": null,
+        "postprocessingMs": 7,
+        "physicsMs": null,
+        "firstDrawMs": 3118,
+        "interactiveMs": 6940,
+        "controlsResponseMs": null,
+        "hydrationMs": null
+      },
+      "firstDrawMs": 7284,
+      "readyMs": 7415.799999952316,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slug": "espaco-automovel",
+      "mode": "mobile",
+      "ready": "true",
+      "manualRetry": false,
+      "lots": 64,
+      "errors": [],
+      "consoleErrors": [],
+      "requests": [
+        {
+          "name": "public_map_context",
+          "status": 200,
+          "durationMs": 2420.328
+        },
+        {
+          "name": "public_map_inventory",
+          "status": 200,
+          "durationMs": 2699.611
+        },
+        {
+          "name": "public_map_scope_revision",
+          "status": 200,
+          "durationMs": 460.72
+        }
+      ],
+      "programProbe": {
+        "deleted": 0,
+        "polledDeleted": 0
+      },
+      "timing": {
+        "routeStartedAt": 756.6000001430511,
+        "documentToInteractiveMs": 12179,
+        "navigationToModuleMs": 1,
+        "moduleMs": 172,
+        "rendererModuleMs": 1266,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 16,
+        "headquartersWorkerMs": null,
+        "webglContextMs": 5,
+        "sceneMs": 4501,
+        "entityGeometryCpuMs": 88.80000233650208,
+        "environmentMaterialMs": null,
+        "proceduralTextureCpuMs": 316.40000009536743,
+        "textureUploadMs": 603,
+        "cpuStagesMs": {
+          "textures": 316,
+          "geometry-preparation": 89
+        },
+        "shaderDirectMs": 2788,
+        "shaderPostMs": null,
+        "shadowMs": null,
+        "postprocessingMs": 9,
+        "physicsMs": null,
+        "firstDrawMs": 3215,
+        "interactiveMs": 11422,
+        "controlsResponseMs": null,
+        "hydrationMs": null
+      },
+      "firstDrawMs": 11959.299999952316,
+      "readyMs": 12178.400000095367,
+      "firstHealth": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "close": [
+        {
+          "method": "X",
+          "preserved": true,
+          "sheetClosed": true
+        },
+        {
+          "method": "Escape",
+          "preserved": true,
+          "sheetClosed": true
+        }
+      ],
+      "overflow": false
+    }
+  ]
+}

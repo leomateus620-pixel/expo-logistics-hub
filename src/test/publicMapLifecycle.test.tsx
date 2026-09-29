@@ -10,6 +10,7 @@ import { usePublicMapInventory } from '@/features/commercial-map/public/usePubli
 import { usePublicScopeRevision } from '@/features/commercial-map/public/usePublicScopeRevision';
 import type { PublicMapInventory, PublicLot } from '@/features/commercial-map/public/publicMapTypes';
 import type { MapEntity } from '@/features/commercial-map/types';
+import { PUBLIC_MAP_AREAS } from '@/features/commercial-map/public/publicAreaRegistry';
 
 const mocks = vi.hoisted(() => ({ inventory: vi.fn(), context: vi.fn(), revision: vi.fn(), track: vi.fn(), mount: vi.fn(), props: vi.fn() }));
 vi.mock('@/features/commercial-map/public/publicMapService', async (original) => ({
@@ -45,7 +46,7 @@ let client: QueryClient;
 const initialState = useCommercialMapStore.getState();
 function wrapper({ children }: { children: ReactNode }) { return <QueryClientProvider client={client}>{children}</QueryClientProvider>; }
 function LinkChange() { const navigate = useNavigate(); return <button onClick={() => navigate('/areas/espaco-automovel/other-token')}>Outro link</button>; }
-function page() { return render(<QueryClientProvider client={client}><MemoryRouter initialEntries={['/areas/exporural/test-token']}>
+function page(slug = 'exporural') { return render(<QueryClientProvider client={client}><MemoryRouter initialEntries={[`/areas/${slug}/test-token`]}>
   <LinkChange /><Routes><Route path="/areas/:slug/:token" element={<PublicAreaMapPage />} /></Routes>
 </MemoryRouter></QueryClientProvider>); }
 beforeEach(() => {
@@ -68,13 +69,13 @@ describe('public page lifecycle', () => {
     const selectionEvents = () => mocks.track.mock.calls.filter(call => call[2].eventType === 'lot_selected').length;
     expect(selectionEvents()).toBe(1);
     await act(async () => client.setQueryData(key, { ...inventory, lots:[{ ...lot, availability:'SOLD', buyerName:'Leonardo', pricing:{ ...lot.pricing, renovacaoTotal:12000 } }] }));
-    await waitFor(() => expect(screen.getByRole('complementary')).toHaveTextContent('Comercializado'));
+    await waitFor(() => expect(screen.getByRole('complementary')).toHaveTextContent('Vendido'));
     expect(screen.getByRole('complementary')).toHaveTextContent('Comprador');
     expect(screen.getByRole('complementary')).toHaveTextContent('Leonardo');
     expect(screen.getByTestId('scene')).toBe(canvas);
     expect(mocks.mount).toHaveBeenCalledTimes(1);
     expect(mocks.props.mock.calls.at(-1)?.[0].publicScenePolicy).toBe(policy);
-    expect(screen.getByRole('complementary')).toHaveTextContent('Comercializado');
+    expect(screen.getByRole('complementary')).toHaveTextContent('Vendido');
     expect(selectionEvents()).toBe(1);
     expect(useCommercialMapStore.getState().selectedEntityId).toBe('e-1');
     fireEvent.click(screen.getByRole('button', { name:'Lista' }));
@@ -133,5 +134,43 @@ describe('independent public revisions', () => {
     invalidate.mockClear();
     await act(async () => client.setQueryData(['public-map','revision','exporural','token'], { revision:'r2', contextRevision:'c2' }));
     await waitFor(() => expect(invalidate).toHaveBeenCalledWith({queryKey:['public-map','context','exporural','token']}));
+  });
+});
+
+describe('direct pavilion inspection without leaving the interior', () => {
+  it.each(PUBLIC_MAP_AREAS.filter(area => area.kind === 'PAVILION'))('$slug: X, another module, Escape, revision and tab return preserve the parent and camera command', async area => {
+    const parent = { ...entity, id:'pavilion', publicIdentifier:area.pavilionIdentifier!, classification:'PAVILION', name:area.name } as MapEntity;
+    const entities = [1,2].map(n => ({ ...entity, id:`e-${n}`, parentEntityId:parent.id, publicIdentifier:`${area.pavilionIdentifier}-M00${n}`, classification:'INTERNAL_STAND',
+      metadata:{ pavilionPublicIdentifier:area.pavilionIdentifier, pavilionModuleKey:`${area.pavilionIdentifier}:module:00${n}` } } as MapEntity));
+    const lots=[1,2].map(n=>({...lot,id:`l-${n}`,entityId:`e-${n}`,lotNumber:String(n),block:null}));
+    const data={...inventory,scope:{...inventory.scope,slug:area.slug,name:area.name,kind:'PAVILION' as const,pavilionIdentifier:area.pavilionIdentifier!,lotCount:2},entities:[parent,...entities],lots};
+    mocks.inventory.mockResolvedValue(data);
+    page(area.slug);await screen.findByTestId('scene');
+    expect(mocks.context).not.toHaveBeenCalled();
+    expect(useCommercialMapStore.getState().interiorEntityId).toBe(parent.id);
+    act(()=>useCommercialMapStore.getState().requestInteriorView(parent.id,'horizontal'));
+    const before=useCommercialMapStore.getState();
+    const canvas=screen.getByTestId('scene');
+    for(const n of [1,2]) {
+      if(n===1) {
+        fireEvent.click(screen.getByRole('button',{name:'Lista'}));
+        fireEvent.click(screen.getAllByRole('button').find(button=>button.textContent?.startsWith('Lote 1'))!);
+        fireEvent.click(screen.getByRole('button',{name:'Mapa'}));
+      } else act(()=>useCommercialMapStore.getState().setSelectedModuleId(`${area.pavilionIdentifier}:module:002`));
+      await screen.findByRole('complementary');
+      if(n===1) fireEvent.click(screen.getByRole('button',{name:'Fechar ficha do lote'}));
+      else fireEvent.keyDown(window,{key:'Escape'});
+      expect(screen.queryByRole('complementary')).toBeNull();
+      expect(useCommercialMapStore.getState()).toMatchObject({interiorEntityId:parent.id,selectedEntityId:parent.id,selectedModuleId:null,
+        interiorViewOrientation:'horizontal',cameraSequence:before.cameraSequence,interiorViewCommand:before.interiorViewCommand,interiorReturnView:before.interiorReturnView});
+    }
+    await act(async()=>client.setQueryData(['public-map','inventory',area.slug,'test-token'],{...data,revision:'r2',lots:lots.map(l=>({...l,pricing:{...l.pricing,renovacaoTotal:12000}}))}));
+    fireEvent(document,new Event('visibilitychange'));fireEvent(window,new Event('focus'));
+    expect(useCommercialMapStore.getState().interiorEntityId).toBe(parent.id);
+    expect(useCommercialMapStore.getState().cameraSequence).toBe(before.cameraSequence);
+    expect(screen.getByTestId('scene')).toBe(canvas);expect(mocks.mount).toHaveBeenCalledTimes(1);
+    // The administrative setter retains its explicit deselection/exit semantics.
+    act(()=>useCommercialMapStore.getState().setSelectedEntityId(null));
+    expect(useCommercialMapStore.getState().interiorEntityId).toBeNull();
   });
 });
