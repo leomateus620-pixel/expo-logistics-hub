@@ -299,6 +299,17 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     ),
     [areaScope, data?.entities, data?.lots],
   );
+  // Comissões: no modo visita o parque inteiro aparece como contexto, mas só
+  // os lotes do próprio segmento podem ser selecionados.
+  const commissionVisitEntities = useMemo(() => {
+    if (!isCommissionScope || !visitEnabled || !data?.parkContextEntities?.length) return null;
+    const own = new Set(scopedData.entities.map((entity) => entity.id));
+    return [...scopedData.entities, ...data.parkContextEntities.filter((entity) => !own.has(entity.id))];
+  }, [data?.parkContextEntities, isCommissionScope, scopedData.entities, visitEnabled]);
+  const commissionInteractiveEntityIds = useMemo(
+    () => (isCommissionScope ? new Set(scopedData.entities.map((entity) => entity.id)) as ReadonlySet<string> : null),
+    [isCommissionScope, scopedData.entities],
+  );
   const parkingAvailable = rearParkingVisibleInArea(areaScope) && !hydrologicalModeActive
     && rearParkingLayerPresentation(data?.entities ?? [], layerVisibility, layerOpacity).visible;
   useEffect(() => {
@@ -595,7 +606,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
         managementActions={managementActions}
         dashboardOpen={dashboardOpen}
         salesAvailable={webglAvailable && data.source === 'database' && permissions.canManageSales}
-        visitAvailable={areaScope === 'park' && webglAvailable && !interiorEntity && !lunarCinematicUiActive}
+        visitAvailable={(areaScope === 'park' || isCommissionScope) && webglAvailable && !interiorEntity && !lunarCinematicUiActive}
         visitEntityId={selectedLot && selectedEntity?.classification !== 'INTERNAL_STAND' ? selectedEntity?.id : undefined}
       />
 
@@ -650,16 +661,17 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
               <Profiler id="CommercialMapCanvas" onRender={recordCommercialMapProfiler}>
                 <CommercialMapCanvas
                   active={workspaceMode === '3d'}
-                  entities={scopedData.entities}
-                  parkingOwnerEntities={data.entities}
-                  siteEnvironmentEntities={data.entities}
+                  entities={commissionVisitEntities ?? scopedData.entities}
+                  parkingOwnerEntities={commissionVisitEntities ?? data.entities}
+                  siteEnvironmentEntities={commissionVisitEntities ?? data.entities}
+                  interactiveEntityIds={commissionInteractiveEntityIds}
                   lots={scopedData.lots}
                   calibration={data.calibration}
                   matchingEntityIds={scenePresentation.matchingEntityIds}
                   filtersActive={scenePresentation.filtersActive}
                   sceneSegmentId={scenePresentation.activeSegmentId}
                   sceneInteriorEntityId={scenePresentation.interiorEntityId}
-                  isolatedArea={areaScope === 'park' ? null : areaScope}
+                  isolatedArea={areaScope === 'park' || commissionVisitEntities ? null : areaScope}
                   segmentOverride={isCommissionScope ? scopedSegment : null}
                   technicalValidationAllowed={technicalValidationAllowed}
                 />
