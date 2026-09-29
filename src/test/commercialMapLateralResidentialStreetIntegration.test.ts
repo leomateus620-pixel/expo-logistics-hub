@@ -11,6 +11,7 @@ import {
 } from '../features/commercial-map/utils/lateralResidentialStreetIntegration';
 import {
   PARK_ACCESS_INFRASTRUCTURE_PROFILE,
+  PARK_ACCESS_RENDER_BUDGET,
   buildParkAccessRenderModel,
   disposeParkAccessRenderModel,
 } from '../features/commercial-map/utils/parkAccessInfrastructure';
@@ -96,7 +97,8 @@ describe('residential street junctions with the existing avenue', () => {
   it('removes only hidden downward curb faces while retaining tops and upright walls', () => {
     const model = buildParkAccessRenderModel(adaptParkAccessSpatialPlan());
     try {
-      expect(model.diagnostics.surfaceTriangleCount + model.diagnostics.instancedTriangleCount).toBeLessThanOrEqual(6000);
+      expect(model.diagnostics.surfaceTriangleCount + model.diagnostics.instancedTriangleCount)
+        .toBeLessThanOrEqual(PARK_ACCESS_RENDER_BUDGET.maximumRenderedTriangles);
       expect(model.geometries.roundaboutCurb).toBeNull(); // Same concrete, one batch.
       for (const geometry of [model.geometries.curbs!]) {
         const normals = geometry.getAttribute('normal');
@@ -120,7 +122,10 @@ describe('residential street junctions with the existing avenue', () => {
   it('does not mutate the GIS plan, avenue, other sidewalks or existing independent curb runs', () => {
     const snapshot = JSON.stringify(PARK_ACCESS_SPATIAL_PLAN);
     const input = adaptParkAccessSpatialPlan();
-    expect(input.sidewalkSurfaces).toHaveLength(PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.length + 4);
+    // Courtyard paving is owned by the same infrastructure batch; only the
+    // original urban sidewalk is split by these four residential junctions.
+    expect(input.sidewalkSurfaces.filter(({ id }) => !id.startsWith('pavilions-concrete-')))
+      .toHaveLength(PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.length + 4);
     for (const source of PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.filter(({ id }) => id !== original.id)) {
       const adapted = input.sidewalkSurfaces.find(({ id }) => id === source.id)!;
       expect(adapted.polygon).toBe(source.polygon);
@@ -130,10 +135,11 @@ describe('residential street junctions with the existing avenue', () => {
       expect(input.roadSurfaces.find(({ id }) => id === source.id)!.polygon).toBe(source.polygon);
     }
     const artery = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.find(({ id }) => id === 'benvenuto-four-lane-axis')!;
-    // Benvenuto has no separate curb runs to cut: its curbs come from the
-    // sidewalk loops. Four exclusive curb runs of the nonexistent A7 road were removed.
+    // The new pavilion-facing curb runs do not alter the original road curbs
+    // or the urban sidewalk splits on the opposite side of Benvenuto.
     expect(artery.curbCenterlines).toEqual([]);
-    expect(input.curbSegments).toHaveLength(16);
+    expect(input.curbSegments!.filter(({ id }) => !id.startsWith('pavilion-1-sidewalk:')
+      && !id.startsWith('benvenuto-frontages:'))).toHaveLength(16);
     expect(input.curbSegments!.some(({ id }) => id.startsWith(`${artery.id}:`))).toBe(false);
     expect(JSON.stringify(PARK_ACCESS_SPATIAL_PLAN)).toBe(snapshot);
   });

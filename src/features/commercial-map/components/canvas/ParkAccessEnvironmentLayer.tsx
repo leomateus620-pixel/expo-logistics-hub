@@ -14,6 +14,7 @@ import type { ParkAccessEnvironmentPlacement } from '../../utils/parkAccessEnvir
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 
 import { applyInteriorGroundMaterial } from './interiorGroundMaterial';
+import { createInternalFoliageMaterial, createInternalLeafAtlas, createInternalLeafLobe, isInternalParkVegetationPoint } from '../../utils/internalTreeVisuals';
 
 const NO_RAYCAST = () => undefined;
 
@@ -202,6 +203,43 @@ function createUnderstoryGeometry() {
   return merged;
 }
 
+function createInternalAmbientTree() {
+  const parts: THREE.BufferGeometry[] = [];
+  const trunk = toNonIndexedOwned(new THREE.CylinderGeometry(.045, .084, 1.38, 7, 1));
+  trunk.translate(0, .69, 0);
+  colorGeometry(trunk, '#80715b');
+  trunk.setAttribute('internalFoliage', new THREE.Float32BufferAttribute(new Float32Array(trunk.getAttribute('position').count), 1));
+  parts.push(trunk);
+  for (let i = 0; i < 3; i++) {
+    const leaf = createInternalLeafLobe();
+    leaf.scale(.67 - i * .07, .46, .6 - i * .04);
+    leaf.rotateY(i * 2.399);
+    leaf.translate(Math.sin(i * 2.4) * .08, 1.52 + i * .45, Math.cos(i * 2.4) * .06);
+    colorGeometry(leaf, ['#829660', '#7f9c59', '#739156'][i]);
+    leaf.setAttribute('internalFoliage', new THREE.Float32BufferAttribute(new Float32Array(leaf.getAttribute('position').count).fill(1), 1));
+    parts.push(leaf);
+  }
+  const merged = mergeBufferGeometries(parts, false)!;
+  parts.forEach(part => part.dispose());
+  merged.computeBoundingBox(); merged.computeBoundingSphere();
+  return merged;
+}
+
+function createInternalAmbientMaterial(atlas: THREE.Texture) {
+  const material = createInternalFoliageMaterial(atlas, true);
+  const foliageHook = material.onBeforeCompile;
+  material.onBeforeCompile = (shader, renderer) => {
+    foliageHook.call(material, shader, renderer);
+    shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nattribute float internalFoliage; varying float vInternalFoliage;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvInternalFoliage = internalFoliage;');
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vInternalFoliage;')
+      .replace('#include <map_fragment>', '#ifdef USE_MAP\n diffuseColor *= mix(vec4(1.), texture2D(map, vMapUv), vInternalFoliage);\n#endif');
+  };
+  material.customProgramCacheKey = () => 'internal-ambient-foliage-v1';
+  material.forceSinglePass = true;
+  return material;
+}
+
 function refreshInstanceBounds(mesh: THREE.InstancedMesh | null) {
   if (!mesh) return;
   mesh.instanceMatrix.needsUpdate = true;
@@ -240,6 +278,7 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
 }) {
   const vegetationEnabled = useSceneVegetationEnabled();
   const treeRef = useRef<THREE.InstancedMesh>(null);
+  const internalTreeRef = useRef<THREE.InstancedMesh>(null);
   const understoryRef = useRef<THREE.InstancedMesh>(null);
   // Quality changes replace R3F instances when their geometry/count args
   // change. dispose={null} leaves their instance buffers owned by this layer.
@@ -250,6 +289,10 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
   const bindUnderstory = useCallback((mesh: THREE.InstancedMesh | null) => {
     if (understoryRef.current && understoryRef.current !== mesh) disposeInstancedMesh(understoryRef.current);
     understoryRef.current = mesh;
+  }, []);
+  const bindInternalTree = useCallback((mesh: THREE.InstancedMesh | null) => {
+    if (internalTreeRef.current && internalTreeRef.current !== mesh) disposeInstancedMesh(internalTreeRef.current);
+    internalTreeRef.current = mesh;
   }, []);
   const { invalidate } = useThree();
   const presentation = useMemo(
@@ -262,19 +305,26 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
     },
     [reducedGraphics, preserveVisitTreePlacement, vegetationEnabled],
   );
+  const treeGroups = useMemo(() => ({
+    internal: presentation.ambientTrees.filter(tree => isInternalParkVegetationPoint(tree.position)),
+    external: presentation.ambientTrees.filter(tree => !isInternalParkVegetationPoint(tree.position)),
+  }), [presentation]);
   const geometries = useMemo(() => ({
     environment: mergeSurfaceGeometries(presentation.environmentalSurfaces),
     trail: mergeSurfaceGeometries(presentation.trailSurfaces),
     tree: vegetationEnabled ? createAmbientTreeGeometry(reducedGraphics) : null,
+    internalTree: vegetationEnabled ? createInternalAmbientTree() : null,
     understory: vegetationEnabled ? createUnderstoryGeometry() : null,
   }), [presentation, reducedGraphics, vegetationEnabled]);
   const textures = useMemo(() => ({
     environment: proceduralTexture('textura-procedural-entorno-acessos', 17, false),
     trail: proceduralTexture('textura-procedural-caminho-bosque', 29, true),
+    leafAtlas: createInternalLeafAtlas(),
   }), []);
   const materials = useMemo(() => ({
     environment: applyInteriorGroundMaterial(createGroundMaterial(textures.environment), 'access-grass'),
     trail: createGroundMaterial(textures.trail),
+    internalTree: vegetationEnabled ? createInternalAmbientMaterial(textures.leafAtlas) : null,
     tree: vegetationEnabled ? new THREE.MeshStandardMaterial({
       color: '#ffffff',
       vertexColors: true,
@@ -292,17 +342,18 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
   }), [textures, vegetationEnabled]);
 
   useLayoutEffect(() => {
-    writePlacements(treeRef.current, presentation.ambientTrees, 0.035);
+    writePlacements(treeRef.current, treeGroups.external, 0.035);
+    writePlacements(internalTreeRef.current, treeGroups.internal, 0.035);
     writePlacements(understoryRef.current, presentation.understory, 0.034);
     invalidate();
-  }, [invalidate, presentation]);
+  }, [invalidate, presentation, treeGroups]);
 
   useEffect(() => {
     invalidate();
   }, [invalidate, surfacesVisible, vegetationVisible]);
 
   useEffect(() => () => {
-    Object.values(geometries).forEach((geometry) => geometry.dispose());
+    Object.values(geometries).forEach((geometry) => geometry?.dispose());
   }, [geometries]);
 
   useEffect(() => () => {
@@ -343,12 +394,18 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
         />
       </group>
       <group name="vegetacao-ambiental-acessos" visible={vegetationVisible} userData={VEGETATION_USER_DATA}>
-        {geometries.tree && materials.tree && presentation.ambientTrees.length > 0 && (
+        {geometries.internalTree && materials.internalTree && treeGroups.internal.length > 0 && (
+          <instancedMesh ref={bindInternalTree} name="arvores-internas-acessos-folhagem"
+            args={[geometries.internalTree, materials.internalTree, treeGroups.internal.length]}
+            count={treeGroups.internal.length} frustumCulled castShadow={false} receiveShadow={false}
+            raycast={NO_RAYCAST} dispose={null} />
+        )}
+        {geometries.tree && materials.tree && treeGroups.external.length > 0 && (
           <instancedMesh
             ref={bindTree}
             name="arborizacao-enquadramento-benvenuto-costeiros"
-            args={[geometries.tree, materials.tree, presentation.ambientTrees.length]}
-            count={presentation.ambientTrees.length}
+            args={[geometries.tree, materials.tree, treeGroups.external.length]}
+            count={treeGroups.external.length}
             frustumCulled
             castShadow={false}
             receiveShadow={false}

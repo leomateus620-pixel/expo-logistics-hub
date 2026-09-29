@@ -36,11 +36,11 @@ export interface FrontageTree {
  * Presentation-only refinement of the official Calçada do Arvoredo
  * (PEDESTRIAN_PATH rectPdf([2630, 3110, 2782, 3565])) in front of the unified
  * Restaurante. It never replaces the cadastral surface: the persisted pedestrian
- * mesh and its curbs remain the selectable owner; the smooth slab, joints,
- * planting and tree pits are layered just above it.
+ * mesh and its curbs remain the selectable owner. The presentation slab has
+ * real tree openings; soil sits below its top and above the cadastral base.
  */
 export const RESTAURANT_FRONTAGE_LAYOUT = Object.freeze({
-  revision: '2026.9-calcada-arvoredo-frontage.1',
+  revision: '2026.9-calcada-arvoredo-frontage.2',
   walkwayIdentifier: FENASOJA_RESTAURANT_FRONTAGE_IDENTIFIER,
   restaurantIdentifier: FENASOJA_RESTAURANT_PUBLIC_IDENTIFIER,
   slab: Object.freeze({
@@ -84,18 +84,19 @@ export const RESTAURANT_FRONTAGE_LAYOUT = Object.freeze({
     baseElevation: ROAD_INFRASTRUCTURE.pedestrianHeight + 0.013,
   }),
   treePit: Object.freeze({
-    size: 0.46,
+    // Fits the closest preserved pair without overlapping their planting beds.
+    size: 0.32,
     curbWidth: 0.035,
-    elevation: ROAD_INFRASTRUCTURE.pedestrianHeight + 0.0148,
-    slabTolerance: 0.1,
+    soilElevation: ROAD_INFRASTRUCTURE.pedestrianHeight + 0.004,
+    curbTopElevation: ROAD_INFRASTRUCTURE.pedestrianHeight + 0.021,
   }),
   roadClearance: 0.06,
   renderBudget: Object.freeze({
     maximumDrawCalls: 9,
-    maximumJoints: 24,
+    maximumJoints: 36,
     maximumShrubs: 26,
     maximumHedgeSegments: 18,
-    maximumTreePits: 10,
+    maximumTreePits: 12,
   }),
   palette: Object.freeze({
     concrete: '#d3cfc6',
@@ -233,7 +234,39 @@ function clipRectByRoads(
   return { rect: result, clippedBy };
 }
 
-function buildJoints(slab: FrontageRect): FrontageBox[] {
+export function restaurantFrontageTreePitBounds([x, z]: FrontagePoint): FrontageRect {
+  const half = RESTAURANT_FRONTAGE_LAYOUT.treePit.size / 2;
+  return { minX: x - half, maxX: x + half, minZ: z - half, maxZ: z + half };
+}
+
+/** Cut each straight joint at the outside of the pit curb, never across soil. */
+function clipJointsAroundTreePits(joints: readonly FrontageBox[], pits: readonly FrontagePoint[]): FrontageBox[] {
+  return joints.flatMap((joint) => {
+    const alongX = joint.size[0] > joint.size[1];
+    let pieces: FrontageRect[] = [{
+      minX: joint.center[0] - joint.size[0] / 2,
+      maxX: joint.center[0] + joint.size[0] / 2,
+      minZ: joint.center[1] - joint.size[1] / 2,
+      maxZ: joint.center[1] + joint.size[1] / 2,
+    }];
+    for (const pit of pits) {
+      const bounds = restaurantFrontageTreePitBounds(pit);
+      pieces = pieces.flatMap((piece) => {
+        if (!rectsIntersect(piece, bounds)) return [piece];
+        return (alongX
+          ? [{ ...piece, maxX: bounds.minX }, { ...piece, minX: bounds.maxX }]
+          : [{ ...piece, maxZ: bounds.minZ }, { ...piece, minZ: bounds.maxZ }])
+          .filter((part) => rectWidth(part) > 0.008 && rectDepth(part) > 0.008);
+      });
+    }
+    return pieces.map((piece) => ({
+      center: [(piece.minX + piece.maxX) / 2, (piece.minZ + piece.maxZ) / 2] as FrontagePoint,
+      size: [rectWidth(piece), rectDepth(piece)] as FrontagePoint,
+    }));
+  });
+}
+
+function buildJoints(slab: FrontageRect, pits: readonly FrontagePoint[]): FrontageBox[] {
   const { jointSpacing, jointWidth } = RESTAURANT_FRONTAGE_LAYOUT.slab;
   const longAxis: 'x' | 'z' = rectDepth(slab) >= rectWidth(slab) ? 'z' : 'x';
   const length = longAxis === 'z' ? rectDepth(slab) : rectWidth(slab);
@@ -252,7 +285,7 @@ function buildJoints(slab: FrontageRect): FrontageBox[] {
   joints.push(longAxis === 'z'
     ? { center: [centerX, centerZ], size: [jointWidth, length - 0.02] }
     : { center: [centerX, centerZ], size: [length - 0.02, jointWidth] });
-  return joints.slice(0, RESTAURANT_FRONTAGE_LAYOUT.renderBudget.maximumJoints);
+  return clipJointsAroundTreePits(joints, pits).slice(0, RESTAURANT_FRONTAGE_LAYOUT.renderBudget.maximumJoints);
 }
 
 interface FrontageOrientation {
@@ -321,11 +354,11 @@ function buildHedges(
 }
 
 function buildTreePits(slab: FrontageRect, trees: readonly FrontageTree[]): FrontagePoint[] {
-  const tolerance = RESTAURANT_FRONTAGE_LAYOUT.treePit.slabTolerance;
+  const half = RESTAURANT_FRONTAGE_LAYOUT.treePit.size / 2;
   return trees
     .filter(({ position: [x, z] }) => (
-      x >= slab.minX - tolerance && x <= slab.maxX + tolerance
-      && z >= slab.minZ - tolerance && z <= slab.maxZ + tolerance
+      x - half >= slab.minX && x + half <= slab.maxX
+      && z - half >= slab.minZ && z + half <= slab.maxZ
     ))
     .map(({ position }) => position)
     .sort((first, second) => first[1] - second[1] || first[0] - second[0])
@@ -390,11 +423,11 @@ export function buildRestaurantFrontagePlan({
   );
   if (rectWidth(slab) <= 0.3 || rectDepth(slab) <= 0.3) return EMPTY_PLAN;
 
-  const joints = buildJoints(slab);
+  const treePits = buildTreePits(slab, trees);
+  const joints = buildJoints(slab, treePits);
   const connector = buildConnector(restaurant, walkway, orientation);
   const { rect: lawn } = clipRectByRoads(buildLawn(restaurant, walkway, orientation), roads);
   const hedges = buildHedges(slab, connector, orientation);
-  const treePits = buildTreePits(slab, trees);
   const shrubs = buildShrubs(slab, trees, orientation);
   // slab, joints, connector, lawn, hedges, shrubs, pit soil, pit curbs
   const drawCalls = 4 + (hedges.length ? 1 : 0) + (shrubs.length ? 1 : 0) + (treePits.length ? 2 : 0);

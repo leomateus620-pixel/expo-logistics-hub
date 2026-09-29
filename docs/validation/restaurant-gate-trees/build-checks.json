@@ -1,0 +1,27 @@
+[
+  {
+    "name": "restaurant-final-tests",
+    "exit": 0,
+    "seconds": 79.754
+  },
+  {
+    "name": "restaurant-typecheck",
+    "exit": 0,
+    "seconds": 72.631
+  },
+  {
+    "name": "restaurant-scoped-lint",
+    "exit": 0,
+    "seconds": 6.943
+  },
+  {
+    "name": "restaurant-production-build",
+    "exit": 0,
+    "seconds": 76.417
+  },
+  {
+    "name": "restaurant-diagnostic-build",
+    "exit": 0,
+    "seconds": 969.913
+  }
+]

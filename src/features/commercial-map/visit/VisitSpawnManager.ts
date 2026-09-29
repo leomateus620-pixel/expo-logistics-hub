@@ -2,6 +2,7 @@ import type { CommercialLot, MapEntity } from '../types';
 import { geometryCentroid } from '../utils/geometry';
 import { strategicLandmarkFocusDirection } from '../utils/landmarks';
 import { defaultVisitSpawn, type VisitWorld } from './VisitWorld';
+import { PARK_ACCESS_SPATIAL_PLAN } from '../data/parkAccessSpatialPlan';
 
 export interface VisitSpawnRequest { entityId?: string; spawnId?: string }
 /** Registry targets canonical IDs; adding an entry never duplicates a model. */
@@ -50,6 +51,22 @@ export function resolveVisitSpawn(request: VisitSpawnRequest, entities: readonly
     : request.spawnId ? visitSpawnEntity(request.spawnId, entities) : undefined;
   if ((request.entityId || request.spawnId) && !requested) throw new Error('Este ponto de visita não está disponível no mapa autorizado.');
   if (requested?.classification === 'INTERNAL_STAND') throw new Error('Acesse este espaço pela entrada explícita do interior.');
+  if (requested?.publicIdentifier === 'A2') {
+    // A2's cadastral diamond is a point marker, not the gatehouse footprint.
+    // Arriving beside that tiny diamond put the visitor behind the service wall.
+    // Use the existing architecture's avenue-facing right passage for all callers.
+    const gate2 = PARK_ACCESS_SPATIAL_PLAN.gates.gate2;
+    const yaw = gate2.facadeRotationRadians;
+    const cosine = Math.cos(yaw), sine = Math.sin(yaw);
+    const passageX = gate2.width * .36;
+    const arrivalZ = gate2.depth / 2 + .36;
+    const position = world.resolveSpawn({
+      x: gate2.anchor[0] + passageX * cosine + arrivalZ * sine,
+      z: gate2.anchor[1] - passageX * sine + arrivalZ * cosine,
+    });
+    // Face through the covered passage toward the internal woodland connector.
+    return { position, yaw: -yaw };
+  }
   const gate = visitSpawnEntity('entrance', entities);
   if (gate && (!requested || requested.id === gate.id)) {
     const position = world.resolveSpawn(defaultVisitSpawn());

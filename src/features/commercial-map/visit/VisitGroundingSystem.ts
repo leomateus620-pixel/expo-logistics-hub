@@ -22,7 +22,8 @@ import { VISIT_CHARACTER_RADIUS, type VisitBounds, type VisitGroundSupport, type
 import { buildExporuralLandscape, isExporuralLandscapeLot } from '../utils/exporuralLandscape';
 import { buildQuadrasABEnvironmentPlan, quadrasABGroundVertexHeight } from '../utils/quadrasABEnvironment';
 import { buildCommercialSiteEnvironmentPlan } from '../utils/commercialSiteEnvironment';
-import { buildRestaurantFrontagePlan, RESTAURANT_FRONTAGE_LAYOUT } from '../utils/restaurantFrontage';
+import { buildRestaurantFrontagePlan, RESTAURANT_FRONTAGE_LAYOUT, restaurantFrontageTreePitBounds } from '../utils/restaurantFrontage';
+import { COMMERCIAL_MAP_TREES } from '../data/commercialTrees';
 
 export function visitBoundsRing(bounds: VisitBounds): VisitRing {
   return [[bounds.minX, bounds.minZ], [bounds.maxX, bounds.minZ], [bounds.maxX, bounds.maxZ], [bounds.minX, bounds.maxZ]];
@@ -255,13 +256,18 @@ export function buildVisitGroundSurfaces(entities: readonly MapEntity[], include
       surfaces.push(surface);
     }
   }
-  const frontage = buildRestaurantFrontagePlan({ entities });
+  const frontage = buildRestaurantFrontagePlan({ entities, trees: COMMERCIAL_MAP_TREES });
   if (frontage.available) {
     for (const [kind, rect, height] of [
       ['slab', frontage.slab, RESTAURANT_FRONTAGE_LAYOUT.slab.topElevation],
       ['lawn', frontage.lawn, RESTAURANT_FRONTAGE_LAYOUT.lawn.elevation],
       ['connector', frontage.connector, RESTAURANT_FRONTAGE_LAYOUT.connector.topElevation],
-    ] as const) if (rect) surfaces.push(visitGroundSurface(`restaurant-frontage:${kind}`, visitBoundsRing(rect), height));
+    ] as const) if (rect) surfaces.push(visitGroundSurface(`restaurant-frontage:${kind}`, visitBoundsRing(rect), height,
+      kind === 'slab' ? frontage.treePits.map(position => visitBoundsRing(restaurantFrontageTreePitBounds(position))) : undefined));
+    for (const [i, position] of frontage.treePits.entries()) {
+      surfaces.push(visitGroundSurface(`restaurant-frontage:tree-soil-${i}`,
+        visitBoundsRing(restaurantFrontageTreePitBounds(position)), RESTAURANT_FRONTAGE_LAYOUT.treePit.soilElevation));
+    }
   }
   // Preserve the road owner's generated junctions and small curb tops too.
   // Only numerical facets survive; temporary source buffers are all disposed.
@@ -322,7 +328,7 @@ export function buildVisitGroundSurfaces(entities: readonly MapEntity[], include
   const environment = resolveParkAccessEnvironmentPresentation(false, false);
   for (const surface of [...environment.environmentalSurfaces, ...environment.trailSurfaces]) surfaces.push(visitGroundSurface(surface.id, surface.polygon, surface.elevation, surface.holes));
   for (const surface of [...PARK_ACCESS_INFRASTRUCTURE_INPUT.roadSurfaces, ...PARK_ACCESS_INFRASTRUCTURE_INPUT.sidewalkSurfaces]) {
-    surfaces.push(visitGroundSurface(surface.id, surface.polygon, surface.elevation ?? 0.04));
+    surfaces.push(visitGroundSurface(surface.id, surface.polygon, surface.elevation ?? 0.04, surface.holes));
   }
   buildRearRoadCorridorFootprints(GENERATED_REAR_ROAD_SEGMENTS, { includeShoulders: false, samplesPerWorldUnit: 5 }).forEach((road, index) => {
     const count = road.centerline.length, base = GENERATED_REAR_ROAD_SEGMENTS[index].elevationOffset;

@@ -1,3 +1,4 @@
+import { PAVILION_COURTYARD } from '@/features/commercial-map/data/pavilionCourtyard';
 import { ACCESS_JUNCTION } from '@/features/commercial-map/data/accessJunctionReconstruction';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -194,13 +195,13 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       .toHaveLength(4);
     expect(featureIds.filter((id) => /^gate3:fence-(left|right)-post-\d+$/.test(id)))
       .toHaveLength(4);
-    expect(featureIds).toContain('gate2:left-facade');
-    expect(featureIds.filter((id) => id.startsWith('gate2:inclined-fin-'))).toHaveLength(3);
+    expect(featureIds).toContain('gate2:service-core');
+    expect(featureIds.filter((id) => id.startsWith('gate2:inclined-fin-'))).toHaveLength(4);
     expect(featureIds).toContain('costeiros:roof--1');
     expect(featureIds).toContain('costeiros:roof-1');
     expect(architecture.gables?.getAttribute('position').count).toBeGreaterThan(0);
     expect(architecture.diagnostics.gateCount).toBe(3);
-    expect(architecture.diagnostics.estimatedDrawCalls).toBe(4);
+    expect(architecture.diagnostics.estimatedDrawCalls).toBe(5); // Includes the one official A2 identity panel.
     architecture.gables?.dispose();
   });
 
@@ -271,15 +272,16 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     const snapshot = JSON.stringify(PARK_ACCESS_SPATIAL_PLAN);
     const input = adaptParkAccessSpatialPlan(PARK_ACCESS_SPATIAL_PLAN);
 
-    expect(input.roadSurfaces).toHaveLength(PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.length + ACCESS_JUNCTION.approaches.length);
-    expect(input.sidewalkSurfaces).toHaveLength(PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.length + 4);
-    expect(input.curbSegments).toHaveLength(16);
-    expect(new Set(input.curbSegments?.map((segment) => segment.id)).size).toBe(16);
+    expect(input.roadSurfaces).toHaveLength(PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.length + ACCESS_JUNCTION.approaches.length + PAVILION_COURTYARD.road.length);
+    expect(input.sidewalkSurfaces).toHaveLength(PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.length + 4 + PAVILION_COURTYARD.hardscape.length);
+    expect(input.curbSegments).toHaveLength(26);
+    expect(new Set(input.curbSegments?.map((segment) => segment.id)).size).toBe(26);
     expect(input.curbSegments?.every((segment) => segment.id.includes(':curb-'))).toBe(true);
-    expect(input.parkingBays).toHaveLength(43);
+    expect(input.parkingBays).toHaveLength(PARK_ACCESS_SPATIAL_PLAN.parkingBays.length);
     expect(input.markingSegments).toHaveLength(5);
     expect(input.gates).toHaveLength(3);
-    expect(input.roadSurfaces[0].polygon).toBe(PARK_ACCESS_SPATIAL_PLAN.roadSurfaces[0].polygon);
+    expect(input.roadSurfaces.find(s => s.id === PARK_ACCESS_SPATIAL_PLAN.roadSurfaces[0].id)?.polygon)
+      .toBe(PARK_ACCESS_SPATIAL_PLAN.roadSurfaces[0].polygon);
     expect(input.gates[0].anchor).toBe(PARK_ACCESS_SPATIAL_PLAN.gates.gate1.anchor);
     expect(input.gates[1].anchor).toBe(PARK_ACCESS_SPATIAL_PLAN.gates.gate2.anchor);
     expect(input.gates[2].anchor).toBe(PARK_ACCESS_SPATIAL_PLAN.gates.gate3.anchor);
@@ -377,10 +379,10 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       expect(detailed.diagnostics.surfaceTriangleCount + detailed.diagnostics.instancedTriangleCount)
         .toBeLessThanOrEqual(PARK_ACCESS_RENDER_BUDGET.maximumRenderedTriangles);
       expect(detailed.diagnostics).toMatchObject({
-        roadSurfaceCount: PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.length + ACCESS_JUNCTION.approaches.length,
-        sidewalkSurfaceCount: 9,
-        curbSegmentCount: 16,
-        parkingBayCount: 43,
+        roadSurfaceCount: PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.length + ACCESS_JUNCTION.approaches.length + PAVILION_COURTYARD.road.length,
+        sidewalkSurfaceCount: input.sidewalkSurfaces.length,
+        curbSegmentCount: 26,
+        parkingBayCount: PARK_ACCESS_SPATIAL_PLAN.parkingBays.length,
         markingSegmentCount: 5,
         roundaboutCount: 2,
         withinBudget: true,

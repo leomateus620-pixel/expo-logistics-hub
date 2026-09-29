@@ -31,6 +31,8 @@ export interface ParkAccessFlatSupportSurface {
 export interface ParkAccessSurfaceVisual {
   id: string;
   polygon: readonly ParkAccessPoint[];
+  holes?: readonly (readonly ParkAccessPoint[])[];
+  omitPerimeterCurbs?: boolean;
   centerline?: readonly ParkAccessPoint[];
   width?: number;
   elevation?: number;
@@ -57,6 +59,7 @@ export interface ParkAccessParkingBayVisual {
   center: ParkAccessPoint;
   size: readonly [number, number];
   rotationRadians: number;
+  endDivider?: boolean;
   elevation?: number;
 }
 
@@ -145,9 +148,9 @@ export const PARK_ACCESS_INFRASTRUCTURE_PROFILE = {
 } as const;
 
 export const PARK_ACCESS_RENDER_BUDGET = {
-  maximumPrimaryDrawCalls: 12,
+  maximumPrimaryDrawCalls: 13, // One shared official identity panel on A2; infrastructure remains batched.
   maximumShadowDrawCalls: 3,
-  maximumRenderedTriangles: 6_000,
+  maximumRenderedTriangles: 6_200, // A2 now includes recessed service openings and four physical buttresses.
 } as const;
 
 const EPSILON = 1e-6;
@@ -160,7 +163,8 @@ function openPolygon(points: readonly ParkAccessPoint[]) {
   return [...points];
 }
 
-function createHorizontalPolygonGeometry(points: readonly ParkAccessPoint[], elevation: number) {
+function createHorizontalPolygonGeometry(points: readonly ParkAccessPoint[], elevation: number,
+  holes: readonly (readonly ParkAccessPoint[])[] = []) {
   const ring = openPolygon(points);
   if (ring.length < 3) return null;
   const shape = new THREE.Shape();
@@ -169,6 +173,7 @@ function createHorizontalPolygonGeometry(points: readonly ParkAccessPoint[], ele
     else shape.lineTo(x, -z);
   });
   shape.closePath();
+  shape.holes = holes.map(ring => new THREE.Path(openPolygon(ring).map(([x, z]) => new THREE.Vector2(x, -z))));
   const geometry = new THREE.ShapeGeometry(shape, 1);
   geometry.rotateX(-Math.PI / 2);
   geometry.translate(0, elevation, 0);
@@ -586,27 +591,27 @@ function rotateLocalPoint(
   ];
 }
 
-function parkingBayGeometries(bay: ParkAccessParkingBayVisual) {
+function parkingBayMarkingPolygons(bay: ParkAccessParkingBayVisual) {
   const width = Math.max(0.12, bay.size[0]);
   const depth = Math.max(0.2, bay.size[1]);
   const halfWidth = width * 0.5;
   const halfDepth = depth * 0.5;
-  const elevation = bay.elevation ?? PARK_ACCESS_INFRASTRUCTURE_PROFILE.markingElevation;
   const lineWidth = Math.min(
     PARK_ACCESS_INFRASTRUCTURE_PROFILE.parkingMarkingWidth,
     width * 0.13,
   );
-  const segments = [
+  const segments: (readonly [ParkAccessPoint, ParkAccessPoint])[] = [
     [[-halfWidth, -halfDepth], [-halfWidth, halfDepth]],
-    [[halfWidth, -halfDepth], [halfWidth, halfDepth]],
-    [[-halfWidth, -halfDepth], [halfWidth, -halfDepth]],
-  ] as const;
-  return segments.map(([localFrom, localTo]) => createHorizontalStripGeometry(
-    rotateLocalPoint(bay.center, localFrom, bay.rotationRadians),
-    rotateLocalPoint(bay.center, localTo, bay.rotationRadians),
-    lineWidth,
-    elevation,
-  ));
+  ];
+  if (bay.endDivider !== false) segments.push([[halfWidth, -halfDepth], [halfWidth, halfDepth]]);
+  return segments.map(([localFrom, localTo]) => {
+    const from = rotateLocalPoint(bay.center, localFrom, bay.rotationRadians);
+    const to = rotateLocalPoint(bay.center, localTo, bay.rotationRadians);
+    const dx = to[0] - from[0], dz = to[1] - from[1], length = Math.hypot(dx, dz);
+    const x = -dz / length * lineWidth / 2, z = dx / length * lineWidth / 2;
+    return [[from[0] + x, from[1] + z], [to[0] + x, to[1] + z],
+      [to[0] - x, to[1] - z], [from[0] - x, from[1] - z]] as ParkAccessPoint[];
+  });
 }
 
 function circleGeometry(radius: number, segments: number, center: ParkAccessPoint, elevation: number) {
@@ -679,6 +684,7 @@ export function buildParkAccessRenderModel(
       : createHorizontalPolygonGeometry(
         surface.polygon,
         surface.elevation ?? defaultElevation,
+        surface.holes,
       );
     if (material === 'gravel') gravelParts.push(geometry);
     else if (material === 'cobblestone') cobblestoneParts.push(geometry);
@@ -688,9 +694,11 @@ export function buildParkAccessRenderModel(
   const sidewalkParts = input.sidewalkSurfaces.map((surface) => createHorizontalPolygonGeometry(
     surface.polygon,
     surface.elevation ?? PARK_ACCESS_INFRASTRUCTURE_PROFILE.sidewalkElevation,
+    surface.holes,
   ));
   const curbParts: Array<THREE.BufferGeometry | null> = [];
   input.sidewalkSurfaces.forEach((surface) => {
+    if (surface.omitPerimeterCurbs) return;
     const polygon = openPolygon(surface.polygon);
     polygon.forEach((from, index) => {
       const to = polygon[(index + 1) % polygon.length];
@@ -715,7 +723,17 @@ export function buildParkAccessRenderModel(
     const target = marking.color === 'yellow' ? yellowMarkingParts : whiteMarkingParts;
     target.push(...markingGeometries(marking));
   });
-  input.parkingBays.forEach((bay) => whiteMarkingParts.push(...parkingBayGeometries(bay)));
+  // Adjacent angled bays share part of a divider: triangulate the union once,
+  // without coplanar duplicate strips or a draw call per marking.
+  const parkingByElevation = new Map<number, ParkAccessParkingBayVisual[]>();
+  input.parkingBays.forEach(bay => {
+    const elevation = bay.elevation ?? PARK_ACCESS_INFRASTRUCTURE_PROFILE.markingElevation;
+    const group = parkingByElevation.get(elevation) ?? [];
+    group.push(bay); parkingByElevation.set(elevation, group);
+  });
+  parkingByElevation.forEach((bays, elevation) => whiteMarkingParts.push(accessPavementGeometry(
+    unionAccessPavement(bays.flatMap(parkingBayMarkingPolygons), []), elevation,
+  )));
 
   const landscapeParts: Array<THREE.BufferGeometry | null> = [];
   const roundaboutCurbParts: Array<THREE.BufferGeometry | null> = [];

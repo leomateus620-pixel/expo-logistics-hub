@@ -41,7 +41,7 @@ export interface PolylinePlacementOptions {
   exclusionClearance?: number;
 }
 
-export const PARK_ACCESS_ENVIRONMENT_PRIMARY_DRAW_CALL_BUDGET = 4;
+export const PARK_ACCESS_ENVIRONMENT_PRIMARY_DRAW_CALL_BUDGET = 5;
 export const PARK_ACCESS_ENVIRONMENT_SHADOW_DRAW_CALL_BUDGET = 0;
 
 const EPSILON = 1e-6;
@@ -241,11 +241,12 @@ export function parkAccessEnvironmentBudget(input: {
   environmentalSurfaceCount: number;
   trailSurfaceCount: number;
   ambientTreeCount: number;
+  ambientTreeMaterialGroups?: number;
   understoryCount: number;
 }) {
   const environmentalSurfaceDrawCalls = input.environmentalSurfaceCount > 0 ? 1 : 0;
   const trailSurfaceDrawCalls = input.trailSurfaceCount > 0 ? 1 : 0;
-  const ambientTreeDrawCalls = input.ambientTreeCount > 0 ? 1 : 0;
+  const ambientTreeDrawCalls = input.ambientTreeCount > 0 ? input.ambientTreeMaterialGroups ?? 1 : 0;
   const understoryDrawCalls = input.understoryCount > 0 ? 1 : 0;
   const primaryDrawCalls = environmentalSurfaceDrawCalls
     + trailSurfaceDrawCalls

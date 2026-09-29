@@ -126,7 +126,8 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
     expect(PARK_ACCESS_ENVIRONMENT_REVISION).toBe('2026.9-park-access-environment.r4');
     expect(presentation.diagnostics.sourceSpatialRevision).toBe(PARK_ACCESS_SPATIAL_PLAN.revision);
     expect(presentation.diagnostics.sourceSpatialRevision).toBe('2026.8-park-access-annexes.5');
-    expect(woodlandFloor.polygon).toBe(PARK_ACCESS_SPATIAL_PLAN.woodlandMass.polygon);
+    expect(polygonClipping.difference([[woodlandFloor.polygon.map(p => [...p])]],
+      [[PARK_ACCESS_SPATIAL_PLAN.woodlandMass.polygon.map(p => [...p])]])).toEqual([]);
     const candidateHoles = [
       PARK_ACCESS_SPATIAL_PLAN.woodlandMass.pathClearancePolygon,
       ...officialFootprints(PARK_ACCESS_SPATIAL_PLAN.woodlandMass.protectedFootprintIdentifiers),
@@ -135,7 +136,11 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
       polygon,
       woodlandFloor.polygon,
     ));
-    expect(woodlandFloor.holes).toEqual(expectedHoles);
+    expect(woodlandFloor.holes).toHaveLength(expectedHoles.length);
+    for (const hole of expectedHoles) {
+      expect(woodlandFloor.holes.some(actual =>
+        polygonClipping.xor([[actual.map(p => [...p])]], [[hole.map(p => [...p])]]).length === 0)).toBe(true);
+    }
     expect(candidateHoles.some((polygon) => !isParkAccessPolygonFullyContained(
       polygon,
       woodlandFloor.polygon,
@@ -152,7 +157,9 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
         .map(ring => ring.map(p => [p[0], p[1]]))];
       expect(polygonClipping.intersection(polygons, PAVILION_COURTYARD.hardscape)).toEqual([]);
     }
-    expect(trail.polygon).toBe(PARK_ACCESS_SPATIAL_PLAN.woodlandPath.surfacePolygon);
+    expect(polygonClipping.difference([[trail.polygon.map(p => [...p])]],
+      [[PARK_ACCESS_SPATIAL_PLAN.woodlandPath.surfacePolygon.map(p => [...p])]])).toEqual([]);
+    expect(polygonClipping.intersection([[trail.polygon.map(p => [...p])]], PAVILION_COURTYARD.road)).toEqual([]);
     expect(trail.notes).toBe(PARK_ACCESS_SPATIAL_PLAN.woodlandPath.notes);
     expect(PARK_ACCESS_ENVIRONMENT_SOURCE_REFERENCES.join(' ')).toMatch(/Anexo 1/);
     expect(PARK_ACCESS_ENVIRONMENT_SOURCE_REFERENCES.join(' ')).toMatch(/Anexo 3/);

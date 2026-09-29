@@ -149,7 +149,7 @@ export function createPilotTreeAsset(family: number) {
     centers: THREE.Vector3[] = [];
   const origin = new THREE.Vector3(),
     fork = new THREE.Vector3(0.06, 1.35, 0.035);
-  wood.push(branch(origin, fork, 0.14, random));
+  wood.push(branch(origin, fork, 0.09, random));
   for (let i = 0; i < 5; i++) {
     const angle = i * 2.399 + random() * 0.4;
     wood.push(
@@ -160,7 +160,7 @@ export function createPilotTreeAsset(family: number) {
           Math.sin(angle) * 0.25,
         ),
         new THREE.Vector3(0, 0.3, 0),
-        0.052,
+        0.035,
         random,
       ),
     );
@@ -175,7 +175,7 @@ export function createPilotTreeAsset(family: number) {
       Math.sin(angle) * spread,
     );
     const start = fork.clone().add(new THREE.Vector3(0, i * 0.036, 0));
-    wood.push(branch(start, end, 0.065 - (i / 9) * 0.02, random));
+    wood.push(branch(start, end, 0.044 - (i / 9) * 0.014, random));
     for (let j = 0; j < 2; j++) {
       const tip = end
         .clone()

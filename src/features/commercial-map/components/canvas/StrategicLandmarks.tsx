@@ -88,6 +88,8 @@ import {
 import { LunarRocketLaunchRig } from './LunarRocketLaunchEffects';
 import type { CommercialMapSegmentDefinition } from '../../data/commercialMapSegments';
 import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
+import { createInternalFoliageMaterial, createInternalLeafAtlas, createInternalLeafLobe } from '../../utils/internalTreeVisuals';
+import { createPilotBarkMaterial } from './vegetationPilotMaterial';
 
 const NO_RAYCAST = () => undefined;
 const MAP_BACKGROUND_COLOR = new THREE.Color('#dfe8de');
@@ -2552,6 +2554,9 @@ function FenasojaRestaurant({
     scale: [width * 0.055, 0.05, 0.075] as Vector3Tuple,
   }));
   const umbrellaXs = [-width * 0.39, width * 0.39];
+  // The enlarged hall leaves a shallower terrace. Keep the table canopies on
+  // that terrace instead of carrying their rims beyond the official footprint.
+  const umbrellaZ = Math.min(bodyFrontZ + depth * 0.13, slabDepth / 2 - depth * 0.08);
 
   useEffect(() => () => {
     roof.dispose();
@@ -2562,7 +2567,7 @@ function FenasojaRestaurant({
     <group position={[0, groundElevation, 0]} dispose={null}>
       {/* Ground contact: concrete plinth plus a thin apron that meets the lawn. */}
       <mesh geometry={UNIT_BOX} material={materials.platform} position={[0, slabHeight / 2, 0]} scale={[slabWidth, slabHeight, slabDepth]} receiveShadow raycast={NO_RAYCAST} dispose={null} />
-      <mesh geometry={UNIT_BOX} material={materials.platform} position={[0, 0.008, 0]} scale={[slabWidth + 0.09, 0.016, slabDepth + 0.09]} receiveShadow raycast={NO_RAYCAST} dispose={null} />
+      <mesh geometry={UNIT_BOX} material={materials.platform} position={[0, 0.008, 0]} scale={[Math.min(width, slabWidth + 0.09), 0.016, Math.min(depth, slabDepth + 0.09)]} receiveShadow raycast={NO_RAYCAST} dispose={null} />
 
       {/* Single elongated dining hall. */}
       <mesh geometry={UNIT_BOX} material={materials.wall} position={[0, slabHeight + wallHeight / 2, bodyCenterZ]} scale={[bodyWidth, wallHeight, bodyDepth]} castShadow receiveShadow raycast={NO_RAYCAST} dispose={null} />
@@ -2615,7 +2620,6 @@ function FenasojaRestaurant({
         <>
           <SignagePanel title="RESTAURANTE" position={[0, canopyFrontHeight + 0.028, canopyFrontZ + 0.02]} size={[canopyWidth * 0.42, wallHeight * 0.16]} background="#2f3f3b" />
           <ScaledInstances material={materials.metal} items={[
-            { position: [0, slabHeight + wallHeight * 0.34, canopyFrontZ + stepDepth * 0.5], scale: [0.014, wallHeight * 0.68, 0.014] },
             { position: [-doorWidth * 0.95, slabHeight + wallHeight * 0.34, canopyFrontZ + stepDepth * 0.5], scale: [0.014, wallHeight * 0.68, 0.014] },
             { position: [doorWidth * 0.95, slabHeight + wallHeight * 0.34, canopyFrontZ + stepDepth * 0.5], scale: [0.014, wallHeight * 0.68, 0.014] },
           ]} />
@@ -2628,15 +2632,15 @@ function FenasojaRestaurant({
       {showFocusDetail && (
         <>
           <ScaledInstances geometry={UNIT_CYLINDER} material={materials.metal} items={umbrellaXs.map((x) => ({
-            position: [x, slabHeight + wallHeight * 0.32, bodyFrontZ + depth * 0.13] as Vector3Tuple,
+            position: [x, slabHeight + wallHeight * 0.32, umbrellaZ] as Vector3Tuple,
             scale: [0.022, wallHeight * 0.64, 0.022] as Vector3Tuple,
           }))} />
           <ScaledInstances geometry={UNIT_CONE} material={materials.white} items={umbrellaXs.map((x) => ({
-            position: [x, slabHeight + wallHeight * 0.68, bodyFrontZ + depth * 0.13] as Vector3Tuple,
+            position: [x, slabHeight + wallHeight * 0.68, umbrellaZ] as Vector3Tuple,
             scale: [depth * 0.16, wallHeight * 0.16, depth * 0.16] as Vector3Tuple,
           }))} />
           <ScaledInstances geometry={UNIT_CYLINDER} material={materials.trim} items={umbrellaXs.map((x) => ({
-            position: [x, slabHeight + 0.09, bodyFrontZ + depth * 0.13] as Vector3Tuple,
+            position: [x, slabHeight + 0.09, umbrellaZ] as Vector3Tuple,
             scale: [depth * 0.08, 0.018, depth * 0.08] as Vector3Tuple,
           }))} />
         </>
@@ -2978,6 +2982,24 @@ function LunarTree({
   onRocketSelect,
 }: LandmarkModelProps) {
   const vegetationEnabled = useSceneVegetationEnabled();
+  const foliage = useMemo(() => {
+    if (!vegetationEnabled) return null;
+    const geometry = createInternalLeafLobe();
+    // UNIT_SHRUB had radius .5: retain the six existing memorial crown masses.
+    geometry.scale(.5, .5, .5);
+    const atlas = createInternalLeafAtlas();
+    const crown = createInternalFoliageMaterial(atlas);
+    crown.color.set('#789660');
+    const bark = createPilotBarkMaterial();
+    bark.vertexColors = false;
+    bark.color.set('#82705c');
+    return { geometry, atlas, crown, bark };
+  }, [vegetationEnabled]);
+  useEffect(() => () => {
+    if (!foliage) return;
+    foliage.geometry.dispose(); foliage.atlas.dispose();
+    foliage.crown.dispose(); foliage.bark.dispose();
+  }, [foliage]);
   const footprint = Math.max(bounds.width, bounds.depth);
   const trunkHeight = height * 0.52;
   const crownBaseY = trunkHeight * 0.78;
@@ -2991,9 +3013,9 @@ function LunarTree({
     { position: [-footprint * 0.28, crownBaseY + height * 0.31, -footprint * 0.04], scale: [footprint * 0.82, height * 0.32, footprint * 0.78], rotation: [0.06, 3.4, 0.04] },
   ] : [];
   const branchItems: InstanceTransform[] = vegetationEnabled ? [
-    { position: [-footprint * 0.12, trunkHeight * 0.72, 0], scale: [footprint * 0.13, trunkHeight * 0.52, footprint * 0.13], rotation: [0, 0, -0.52] },
-    { position: [-footprint * 0.2, trunkHeight * 0.69, -footprint * 0.04], scale: [footprint * 0.12, trunkHeight * 0.47, footprint * 0.12], rotation: [0.2, 0, 0.55] },
-    { position: [-footprint * 0.08, trunkHeight * 0.74, footprint * 0.12], scale: [footprint * 0.11, trunkHeight * 0.42, footprint * 0.11], rotation: [0.52, 0.4, 0.08] },
+    { position: [-footprint * 0.12, trunkHeight * 0.72, 0], scale: [footprint * 0.085, trunkHeight * 0.52, footprint * 0.085], rotation: [0, 0, -0.52] },
+    { position: [-footprint * 0.2, trunkHeight * 0.69, -footprint * 0.04], scale: [footprint * 0.08, trunkHeight * 0.47, footprint * 0.08], rotation: [0.2, 0, 0.55] },
+    { position: [-footprint * 0.08, trunkHeight * 0.74, footprint * 0.12], scale: [footprint * 0.075, trunkHeight * 0.42, footprint * 0.075], rotation: [0.52, 0.4, 0.08] },
   ] : [];
 
   return (
@@ -3017,20 +3039,20 @@ function LunarTree({
         raycast={NO_RAYCAST}
         dispose={null}
       />
-      {vegetationEnabled && <><mesh
+      {foliage && <><mesh
         name="tronco-arvore-lunar"
         geometry={UNIT_CYLINDER}
-        material={materials.accent}
+        material={foliage.bark}
         position={[0, trunkHeight / 2, 0]}
-        scale={[footprint * 0.2, trunkHeight, footprint * 0.2]}
+        scale={[footprint * 0.13, trunkHeight, footprint * 0.13]}
         castShadow
         receiveShadow
         raycast={NO_RAYCAST}
         dispose={null}
       />
       <ScaledInstances
-        geometry={UNIT_SHRUB}
-        material={materials.green}
+        geometry={foliage.geometry}
+        material={foliage.crown}
         items={canopyItems}
         castShadow
         receiveShadow
@@ -3039,13 +3061,13 @@ function LunarTree({
         <>
           <ScaledInstances
             geometry={UNIT_CYLINDER}
-            material={materials.wall}
+            material={foliage.bark}
             items={branchItems}
             castShadow
           />
           <ScaledInstances
-            geometry={UNIT_SHRUB}
-            material={materials.trim}
+            geometry={foliage.geometry}
+            material={foliage.crown}
             items={canopyItems.slice(1).map((item, index) => ({
               ...item,
               position: [item.position[0] * 1.03, item.position[1] + height * 0.035, item.position[2] * 1.03],

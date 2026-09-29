@@ -1,0 +1,151 @@
+{
+  "baseline": "9ddda43f",
+  "normalization": "UTF-8 LF",
+  "sourceFiles": [
+    {
+      "path": "src/features/commercial-map/components/canvas/CommercialTreeLayer.tsx",
+      "sha256": "ddeae5c70c472d29b238224e0c8610a8418c126e6bcdd1bacd45a9eeb75986e3"
+    },
+    {
+      "path": "src/features/commercial-map/components/canvas/ParkAccessEnvironmentLayer.tsx",
+      "sha256": "c33f7e1cbde625092175efb87dbc0f012dbca8f87958dca73268d300cc2a599f"
+    },
+    {
+      "path": "src/features/commercial-map/components/canvas/ParkAccessInfrastructure.tsx",
+      "sha256": "dcfa8c5836b4082f7c14981ff207d775bd629aff858d80d5e375fa79ded752be"
+    },
+    {
+      "path": "src/features/commercial-map/components/canvas/RestaurantFrontageLayer.tsx",
+      "sha256": "ab1619811f22dcfc0e81f9bb768b61b2a40df28062f5f178023cff4d3e6b30f0"
+    },
+    {
+      "path": "src/features/commercial-map/components/canvas/StrategicLandmarks.tsx",
+      "sha256": "4143664f6086d3445d65c044c3eefb6026d5be00f4d538d3155cb83c59887a41"
+    },
+    {
+      "path": "src/features/commercial-map/data/commercialTrees.ts",
+      "sha256": "b5108484bb918be5c0c9916d3392615131a8c5afdcb2439c19318a8c00db2c73"
+    },
+    {
+      "path": "src/features/commercial-map/data/parkAccessEnvironment.ts",
+      "sha256": "2dd3f08aa7e25fafad8c6e8e33aa3fc6786233c0e543a1cfe6d386c23e50d808"
+    },
+    {
+      "path": "src/features/commercial-map/data/parkAccessSpatialPlan.ts",
+      "sha256": "d0fee49bc4b07cb617b7593bf09790f7e9948d0e9920a4168f0afc82d42d4d5c"
+    },
+    {
+      "path": "src/features/commercial-map/data/pavilionCourtyard.ts",
+      "sha256": "4044d051ff465659f087939e0b004a098650839a7d0015680bb7a98755561244"
+    },
+    {
+      "path": "src/features/commercial-map/diagnostics/CommercialMapRenderingDiagnosticsPage.tsx",
+      "sha256": "34d92f4b8ff1c8150dfbf36a48dd7a7fcaed0c7d6b9c540980f12cda56b96fe5"
+    },
+    {
+      "path": "src/features/commercial-map/diagnostics/benvenutoSurfaceQa.ts",
+      "sha256": "1be13c67dab161b1b666ace262e6f7bb9dc47a224a4c60902d08d8e34b5ed80f"
+    },
+    {
+      "path": "src/features/commercial-map/utils/commercialSiteEnvironment.ts",
+      "sha256": "f39a98a03c7ff7bb5e697bf6a2ffb45a84d808fd40334ac0e2bd427773fd2dcd"
+    },
+    {
+      "path": "src/features/commercial-map/utils/fenasojaRestaurant.ts",
+      "sha256": "0e816636a53a5b39cba9aca3525e55b77a4af6031a8fef90ae6e7d5eb6fdb8a5"
+    },
+    {
+      "path": "src/features/commercial-map/utils/internalTreeVisuals.ts",
+      "sha256": "bd7140719eb197ae021bcd659e363612b7c79cc62085bc3999fb24a550b2c4b8"
+    },
+    {
+      "path": "src/features/commercial-map/utils/parkAccessArchitecture.ts",
+      "sha256": "bd2cccb35e7ff04c4011d94fffc14f70c4804b4a15c334ced3f1b4507e1b34a3"
+    },
+    {
+      "path": "src/features/commercial-map/utils/parkAccessEnvironment.ts",
+      "sha256": "30bbe8624152c7bcf7ae2fe30ab613dd9b4082e0768abecfaae37f6eab4fdc1d"
+    },
+    {
+      "path": "src/features/commercial-map/utils/parkAccessInfrastructure.ts",
+      "sha256": "18e03cb7b55879dd10cf955c079453c81db103861b66286f4e88c4fb358213c0"
+    },
+    {
+      "path": "src/features/commercial-map/utils/parkAccessSpatialPlanAdapter.ts",
+      "sha256": "741f70e3cac208b5f59f642909bdb285d5f29fc001a164b84e173d6d71aec9c1"
+    },
+    {
+      "path": "src/features/commercial-map/utils/restaurantFrontage.ts",
+      "sha256": "3e7e2639a9f4f2352a10ba5756b5a165302ff961bd5efc26bd795156768f44e2"
+    },
+    {
+      "path": "src/features/commercial-map/utils/restaurantFrontageGeometry.ts",
+      "sha256": "b8d5d5f52310db230dc4d3282687fec103d894bd0169461a22f7aa8914182248"
+    },
+    {
+      "path": "src/features/commercial-map/utils/vegetationPilotAssets.ts",
+      "sha256": "382e932965f295a05257a91435332a42c618a64c689424dac5d6f064f3b764f8"
+    },
+    {
+      "path": "src/features/commercial-map/visit/VisitGroundingSystem.ts",
+      "sha256": "df440005736f9e282e40f57995f4ee4d5b0dfc7cc142b1f474aae7ba64902f08"
+    },
+    {
+      "path": "src/features/commercial-map/visit/VisitSpawnManager.ts",
+      "sha256": "b6df6a396f967cefdea8fd684380cf011af87f1774b8bd5e9d64672e3d7bd389"
+    },
+    {
+      "path": "src/features/commercial-map/visit/VisitWorld.ts",
+      "sha256": "9c4dd0abbdcc596bfcbf1a54bd3a61383c0c1e8f39e40a232986955cc6d39348"
+    },
+    {
+      "path": "src/test/commercialMapFenasojaRestaurant.test.ts",
+      "sha256": "ee0e268c9dac9b569dcc640b2412f3437df0dfe5de16ea1e0f0be9e573ccb2db"
+    },
+    {
+      "path": "src/test/commercialMapGateTwoArchitecture.test.ts",
+      "sha256": "8bc81dde0e01682347d6974b575c674bf815a11927f6b36a83147a0d0895ea3e"
+    },
+    {
+      "path": "src/test/commercialMapGateTwoArrival.test.ts",
+      "sha256": "a9208349887035e1a4f4a8a38f4a3823326dae2f671a57ce13489b44a58b3894"
+    },
+    {
+      "path": "src/test/commercialMapInternalVegetationScope.test.ts",
+      "sha256": "3343ed4ab7943b1030b42b089588dc30a7a66f6fc24c825ec5ad86a7890648f1"
+    },
+    {
+      "path": "src/test/commercialMapLateralResidentialStreetIntegration.test.ts",
+      "sha256": "de80252cef6d5bf66b0f70ab9e09cb4a6c913d71c673328dae5cbbd8be8a5fc4"
+    },
+    {
+      "path": "src/test/commercialMapParkAccessEnvironment.test.ts",
+      "sha256": "0fed9c774a4d58e9909de802b6bd7f73fd79cb3e3d084d8d8097c3b7748e64f3"
+    },
+    {
+      "path": "src/test/commercialMapParkAccessInfrastructure.test.ts",
+      "sha256": "d9e208c425a6f796a59eece131f4438f86e8c052cc46ef69be10f698129c5457"
+    },
+    {
+      "path": "src/test/commercialMapParkAccessSpatialPlan.test.ts",
+      "sha256": "1dccda2fca6eb5e8aec4c3348b009fb64efcd975d74a2c12c8680153a4c01c76"
+    },
+    {
+      "path": "src/test/commercialMapPavilionCourtyard.test.ts",
+      "sha256": "abf6faddb3b8613f308ce853fe5860ed45211a86a9cce796338a50c8a991442e"
+    },
+    {
+      "path": "src/test/commercialMapRestaurantGateVisit.test.ts",
+      "sha256": "e210b45b5d34228809559b355a3008815f52017f2597c529870903ebfefd4266"
+    },
+    {
+      "path": "src/test/commercialMapTreePresentation.test.ts",
+      "sha256": "b56ead7834971bcf4a9a126bc7bbfcaa76119f7bb9bae1779cc70618e889d81f"
+    },
+    {
+      "path": "src/test/commercialMapTrees.test.ts",
+      "sha256": "8391cb797847b80d5ae585752fa1df8060a97d69d2ef935271447b86d5fcb662"
+    }
+  ],
+  "sourceCommit": "a56197e5141c3810c5971f4dadd898c669a33ef3"
+}

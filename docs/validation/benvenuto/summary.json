@@ -1,0 +1,554 @@
+{
+  "base": "4294ddbb",
+  "browser": "Chrome 154 headless / Windows / ANGLE D3D11 / Intel UHD",
+  "conditions": "One fresh context per device; production diagnostic fixture; sequential runs without parallel builds/tests; 3 x 8 s navigation; adaptive quality unchanged.",
+  "memoryLimit": "Buffer bytes and RGBA/mipmap texture estimate are not measured physical VRAM; render targets and driver allocation excluded.",
+  "devices": {
+    "desktop": {
+      "before": {
+        "entrySeconds": {
+          "canvas": 1.583,
+          "ready": 20.83,
+          "hydrated": 114.467
+        },
+        "navigation": {
+          "samples": 682,
+          "fps": 28.339,
+          "p95ms": 40.8
+        },
+        "runs": [
+          {
+            "samples": 218,
+            "fps": 27.171,
+            "p95ms": 43.2,
+            "calls": 331,
+            "dpr": 0.9,
+            "tier": "MEDIUM"
+          },
+          {
+            "samples": 232,
+            "fps": 28.969,
+            "p95ms": 36.9,
+            "calls": 340,
+            "dpr": 0.9,
+            "tier": "MEDIUM"
+          },
+          {
+            "samples": 232,
+            "fps": 28.878,
+            "p95ms": 36.8,
+            "calls": 348,
+            "dpr": 0.9,
+            "tier": "MEDIUM"
+          }
+        ],
+        "aerial": {
+          "at": 123967.79999995232,
+          "calls": 263,
+          "triangles": 383400,
+          "geometries": 562,
+          "textures": 131,
+          "programs": 222,
+          "dpr": 1,
+          "width": 1440,
+          "height": 900,
+          "heapBytes": 90585979,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "geometryBufferBytes": 13899236,
+        "textureBytesEstimate": 48185344.00000002,
+        "visitTravelMetres": 2.892,
+        "warmedResources": [
+          {
+            "geometries": 592,
+            "textures": 136,
+            "programs": 222
+          },
+          {
+            "geometries": 592,
+            "textures": 136,
+            "programs": 222
+          },
+          {
+            "geometries": 592,
+            "textures": 136,
+            "programs": 222
+          },
+          {
+            "geometries": 592,
+            "textures": 136,
+            "programs": 222
+          },
+          {
+            "geometries": 592,
+            "textures": 136,
+            "programs": 222
+          },
+          {
+            "geometries": 592,
+            "textures": 136,
+            "programs": 222
+          }
+        ],
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 2497,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "identity": {
+          "canvases": 1,
+          "renderers": 1,
+          "controls": 1,
+          "activeCanvases": 1,
+          "activeControls": 1
+        },
+        "errors": [],
+        "overflow": false
+      },
+      "after": {
+        "entrySeconds": {
+          "canvas": 2.106,
+          "ready": 14.025,
+          "hydrated": 75.9
+        },
+        "navigation": {
+          "samples": 720,
+          "fps": 34.479,
+          "p95ms": 30.7
+        },
+        "runs": [
+          {
+            "samples": 240,
+            "fps": 34.012,
+            "p95ms": 31,
+            "calls": 334,
+            "dpr": 0.9,
+            "tier": "MEDIUM"
+          },
+          {
+            "samples": 240,
+            "fps": 34.722,
+            "p95ms": 30.3,
+            "calls": 344,
+            "dpr": 0.9,
+            "tier": "MEDIUM"
+          },
+          {
+            "samples": 240,
+            "fps": 34.712,
+            "p95ms": 30.5,
+            "calls": 353,
+            "dpr": 0.9,
+            "tier": "MEDIUM"
+          }
+        ],
+        "aerial": {
+          "at": 85228.20000004768,
+          "calls": 267,
+          "triangles": 387161,
+          "geometries": 571,
+          "textures": 135,
+          "programs": 236,
+          "dpr": 1,
+          "width": 1440,
+          "height": 900,
+          "heapBytes": 98367332,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "geometryBufferBytes": 13975546,
+        "textureBytesEstimate": 50348032.000000015,
+        "visitTravelMetres": 2.881,
+        "warmedResources": [
+          {
+            "geometries": 600,
+            "textures": 140,
+            "programs": 237
+          },
+          {
+            "geometries": 600,
+            "textures": 140,
+            "programs": 237
+          },
+          {
+            "geometries": 600,
+            "textures": 140,
+            "programs": 237
+          },
+          {
+            "geometries": 600,
+            "textures": 140,
+            "programs": 237
+          },
+          {
+            "geometries": 600,
+            "textures": 140,
+            "programs": 237
+          },
+          {
+            "geometries": 600,
+            "textures": 140,
+            "programs": 237
+          }
+        ],
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 2091,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "identity": {
+          "canvases": 1,
+          "renderers": 1,
+          "controls": 1,
+          "activeCanvases": 1,
+          "activeControls": 1
+        },
+        "errors": [],
+        "overflow": false,
+        "smoke": {
+          "selectedInterior": {
+            "selected": "reference:2026:b2",
+            "interior": "reference:2026:b2"
+          },
+          "recoveryDrift": 0,
+          "travelAfterRecoveryMetres": 2.589,
+          "recoveredHealth": {
+            "status": "ready",
+            "path": "direct",
+            "presentedFrames": 4117,
+            "contextLosses": 1,
+            "lastErrorCode": null
+          },
+          "returnedHealth": {
+            "status": "ready",
+            "path": "direct",
+            "presentedFrames": 4449,
+            "contextLosses": 1,
+            "lastErrorCode": null
+          },
+          "identity": {
+            "canvases": 1,
+            "renderers": 1,
+            "controls": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          }
+        }
+      },
+      "cameraDeltas": [
+        {
+          "view": "01-avenue-aerial",
+          "position": 0,
+          "target": 0
+        },
+        {
+          "view": "02-avenue-oblique",
+          "position": 0,
+          "target": 0
+        },
+        {
+          "view": "03-b1-b14-aerial",
+          "position": 0,
+          "target": 0
+        },
+        {
+          "view": "04-b1-b14-oblique",
+          "position": 0,
+          "target": 0
+        },
+        {
+          "view": "05-inner-frontages",
+          "position": 0,
+          "target": 0
+        },
+        {
+          "view": "06-parking-close",
+          "position": 0,
+          "target": 0
+        }
+      ]
+    },
+    "mobile-emulated": {
+      "before": {
+        "entrySeconds": {
+          "canvas": 1.156,
+          "ready": 18.433,
+          "hydrated": 44.757
+        },
+        "navigation": {
+          "samples": 720,
+          "fps": 53.63,
+          "p95ms": 22.5
+        },
+        "runs": [
+          {
+            "samples": 240,
+            "fps": 48.395,
+            "p95ms": 22.8,
+            "calls": 205,
+            "dpr": 1.35,
+            "tier": "MEDIUM"
+          },
+          {
+            "samples": 240,
+            "fps": 57.127,
+            "p95ms": 18.2,
+            "calls": 209,
+            "dpr": 1.215,
+            "tier": "MEDIUM"
+          },
+          {
+            "samples": 240,
+            "fps": 56.272,
+            "p95ms": 18.2,
+            "calls": 212,
+            "dpr": 1.215,
+            "tier": "MEDIUM"
+          }
+        ],
+        "aerial": {
+          "at": 54981.799999952316,
+          "calls": 186,
+          "triangles": 322712,
+          "geometries": 549,
+          "textures": 131,
+          "programs": 222,
+          "dpr": 1.75,
+          "width": 682,
+          "height": 1477,
+          "heapBytes": 89952585,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "geometryBufferBytes": 13794692,
+        "textureBytesEstimate": 49233920.000000015,
+        "visitTravelMetres": 2.877,
+        "warmedResources": [
+          {
+            "geometries": 582,
+            "textures": 134,
+            "programs": 222
+          },
+          {
+            "geometries": 582,
+            "textures": 134,
+            "programs": 222
+          },
+          {
+            "geometries": 582,
+            "textures": 134,
+            "programs": 222
+          },
+          {
+            "geometries": 582,
+            "textures": 134,
+            "programs": 222
+          },
+          {
+            "geometries": 582,
+            "textures": 134,
+            "programs": 222
+          },
+          {
+            "geometries": 582,
+            "textures": 134,
+            "programs": 222
+          }
+        ],
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 382,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "identity": {
+          "canvases": 1,
+          "renderers": 1,
+          "controls": 1,
+          "activeCanvases": 1,
+          "activeControls": 1
+        },
+        "errors": [],
+        "overflow": false
+      },
+      "after": {
+        "entrySeconds": {
+          "canvas": 1.236,
+          "ready": 13.928,
+          "hydrated": 34.622
+        },
+        "navigation": {
+          "samples": 720,
+          "fps": 59.155,
+          "p95ms": 17.7
+        },
+        "runs": [
+          {
+            "samples": 240,
+            "fps": 58.71,
+            "p95ms": 17.9,
+            "calls": 209,
+            "dpr": 1.35,
+            "tier": "HIGH"
+          },
+          {
+            "samples": 240,
+            "fps": 59.999,
+            "p95ms": 17.1,
+            "calls": 213,
+            "dpr": 1.35,
+            "tier": "HIGH"
+          },
+          {
+            "samples": 240,
+            "fps": 58.773,
+            "p95ms": 17.8,
+            "calls": 216,
+            "dpr": 1.35,
+            "tier": "HIGH"
+          }
+        ],
+        "aerial": {
+          "at": 44373.39999985695,
+          "calls": 189,
+          "triangles": 325941,
+          "geometries": 558,
+          "textures": 135,
+          "programs": 236,
+          "dpr": 1.75,
+          "width": 682,
+          "height": 1477,
+          "heapBytes": 109364117,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "geometryBufferBytes": 13871002,
+        "textureBytesEstimate": 51396608.000000015,
+        "visitTravelMetres": 2.882,
+        "warmedResources": [
+          {
+            "geometries": 590,
+            "textures": 138,
+            "programs": 237
+          },
+          {
+            "geometries": 590,
+            "textures": 138,
+            "programs": 237
+          },
+          {
+            "geometries": 590,
+            "textures": 138,
+            "programs": 237
+          },
+          {
+            "geometries": 590,
+            "textures": 138,
+            "programs": 237
+          },
+          {
+            "geometries": 590,
+            "textures": 138,
+            "programs": 237
+          },
+          {
+            "geometries": 590,
+            "textures": 138,
+            "programs": 237
+          }
+        ],
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 509,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "identity": {
+          "canvases": 1,
+          "renderers": 1,
+          "controls": 1,
+          "activeCanvases": 1,
+          "activeControls": 1
+        },
+        "errors": [],
+        "overflow": false,
+        "smoke": {
+          "selectedInterior": {
+            "selected": "reference:2026:b2",
+            "interior": "reference:2026:b2"
+          },
+          "recoveryDrift": 0,
+          "travelAfterRecoveryMetres": 2.66,
+          "recoveredHealth": {
+            "status": "ready",
+            "path": "direct",
+            "presentedFrames": 3881,
+            "contextLosses": 1,
+            "lastErrorCode": null
+          },
+          "returnedHealth": {
+            "status": "ready",
+            "path": "direct",
+            "presentedFrames": 4322,
+            "contextLosses": 1,
+            "lastErrorCode": null
+          },
+          "identity": {
+            "canvases": 1,
+            "renderers": 1,
+            "controls": 1,
+            "activeCanvases": 1,
+            "activeControls": 1
+          },
+          "touchStopped": true,
+          "touchDrift": 0,
+          "touchTravelMetres": 2.63,
+          "landscapeOverflow": false
+        }
+      },
+      "cameraDeltas": [
+        {
+          "view": "01-avenue-aerial",
+          "position": 0,
+          "target": 0
+        },
+        {
+          "view": "02-avenue-oblique",
+          "position": 0,
+          "target": 0
+        },
+        {
+          "view": "03-b1-b14-aerial",
+          "position": 0,
+          "target": 0
+        },
+        {
+          "view": "04-b1-b14-oblique",
+          "position": 0,
+          "target": 0
+        },
+        {
+          "view": "05-inner-frontages",
+          "position": 0,
+          "target": 0
+        },
+        {
+          "view": "06-parking-close",
+          "position": 0,
+          "target": 0
+        }
+      ]
+    }
+  }
+}

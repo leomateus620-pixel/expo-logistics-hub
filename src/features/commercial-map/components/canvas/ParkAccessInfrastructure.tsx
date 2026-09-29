@@ -5,7 +5,12 @@ import { ROAD_MATERIAL_COLORS } from '../../constants';
 import { applyRuralMaterialDetail, ruralSurfaceKind } from '../../utils/ruralMaterialDetail';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../../data/parkAccessSpatialPlan';
-import type { ParkAccessArchitectureInstance } from '../../utils/parkAccessArchitecture';
+import {
+  PARK_ACCESS_GATE2_IDENTITY,
+  parkAccessGate2IdentityPlacement,
+  type ParkAccessArchitectureInstance,
+  type ParkAccessGatePlacement,
+} from '../../utils/parkAccessArchitecture';
 import {
   buildParkAccessRenderModel,
   disposeParkAccessRenderModel,
@@ -53,39 +58,6 @@ function textureNoise(x: number, y: number, seed: number) {
   let value = (x * 374761393 + y * 668265263 + seed * 1442695041) >>> 0;
   value = Math.imul(value ^ (value >>> 13), 1274126177) >>> 0;
   return ((value ^ (value >>> 16)) & 0xffff) / 0xffff;
-}
-
-function createInfrastructureTexture(
-  seed: number,
-  base: readonly [number, number, number],
-  amplitude: number,
-  jointEvery = 0,
-) {
-  const size = 64;
-  const data = new Uint8Array(size * size * 4);
-  for (let y = 0; y < size; y += 1) {
-    for (let x = 0; x < size; x += 1) {
-      const noise = (textureNoise(x, y, seed) - 0.5) * amplitude;
-      const broad = Math.sin((x + seed) * 0.17) * 2.2 + Math.cos((y - seed) * 0.13) * 1.8;
-      const joint = jointEvery > 0 && (x % jointEvery <= 1 || y % jointEvery <= 1) ? -18 : 0;
-      const offset = (y * size + x) * 4;
-      data[offset] = THREE.MathUtils.clamp(Math.round(base[0] + noise + broad + joint), 0, 255);
-      data[offset + 1] = THREE.MathUtils.clamp(Math.round(base[1] + noise + broad + joint), 0, 255);
-      data[offset + 2] = THREE.MathUtils.clamp(Math.round(base[2] + noise + broad + joint), 0, 255);
-      data[offset + 3] = 255;
-    }
-  }
-  const texture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat, THREE.UnsignedByteType);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(0.42, 0.42);
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = true;
-  texture.anisotropy = 4;
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.needsUpdate = true;
-  return texture;
 }
 
 function roughnessTexture(colorTexture: THREE.DataTexture) {
@@ -185,8 +157,10 @@ const COBBLESTONE_TEXTURE = createCobblestoneTexture();
 const COBBLESTONE_ROUGHNESS = roughnessTexture(COBBLESTONE_TEXTURE);
 const GRAVEL_TEXTURE = createGravelTexture();
 const GRAVEL_ROUGHNESS = roughnessTexture(GRAVEL_TEXTURE);
-const PAVER_TEXTURE = createInfrastructureTexture(1947, [210, 205, 194], 13, 16);
-const PAVER_ROUGHNESS = roughnessTexture(PAVER_TEXTURE);
+const CONCRETE_PROFILE = Object.freeze({
+  surface: 'concrete' as const, tileWorldSize: 1.8, baseColor: '#c9c7be', roughness: 0.94,
+});
+const CONCRETE_NORMAL_SCALE = new THREE.Vector2(0.12, 0.12);
 
 function configureInstanceMaterial(
   material: THREE.MeshStandardMaterial,
@@ -301,6 +275,71 @@ const InstanceBatch = memo(function InstanceBatch({
   );
 });
 
+/** One small, owned texture shared by the whole sign; no historic date/ad. */
+const Gate2Identity = memo(function Gate2Identity({
+  placement,
+  opacity,
+}: { placement: ParkAccessGatePlacement; opacity: number }) {
+  const invalidate = useThree(state => state.invalidate);
+  const panel = useMemo(() => parkAccessGate2IdentityPlacement(placement), [placement]);
+  const quaternion = useMemo(() => new THREE.Quaternion().fromArray(panel.quaternion), [panel]);
+  const resources = useMemo(() => {
+    const canvas = typeof document === 'undefined' ? null : document.createElement('canvas');
+    if (canvas) { canvas.width = 512; canvas.height = 128; }
+    const paint = (symbol?: HTMLImageElement) => {
+      const context = canvas?.getContext('2d');
+      if (!context) return;
+      context.fillStyle = '#174f38';
+      context.fillRect(0, 0, 512, 128);
+      if (symbol) context.drawImage(symbol, 12, 16, 96, 96);
+      context.fillStyle = '#f3f1e5';
+      context.font = 'bold 54px Arial, sans-serif';
+      context.textBaseline = 'middle';
+      context.fillText(PARK_ACCESS_GATE2_IDENTITY.wordmark, 124, 68, 372);
+    };
+    paint();
+    const texture = canvas ? new THREE.CanvasTexture(canvas) : null;
+    if (texture) {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.anisotropy = 2;
+      texture.minFilter = THREE.LinearMipmapLinearFilter;
+    }
+    const material = new THREE.MeshStandardMaterial({
+      color: texture ? '#ffffff' : '#174f38', map: texture, roughness: 0.86, metalness: 0,
+    });
+    return { paint, texture, material, geometry: new THREE.PlaneGeometry(1, 1) };
+  }, []);
+  useEffect(() => {
+    if (!resources.texture || typeof Image === 'undefined') return;
+    const symbol = new Image();
+    symbol.decoding = 'async';
+    symbol.onload = () => {
+      resources.paint(symbol);
+      resources.texture!.needsUpdate = true;
+      invalidate();
+    };
+    symbol.src = PARK_ACCESS_GATE2_IDENTITY.symbolAsset;
+    return () => { symbol.onload = null; };
+  }, [invalidate, resources]);
+  useEffect(() => {
+    configureInstanceMaterial(resources.material, opacity, 'opaque');
+    invalidate();
+  }, [invalidate, opacity, resources]);
+  useEffect(() => () => {
+    resources.texture?.dispose();
+    resources.material.dispose();
+    resources.geometry.dispose();
+  }, [resources]);
+  return (
+    <group position={panel.position} quaternion={quaternion}>
+      <mesh name="marca-oficial-portao-2" geometry={resources.geometry} material={resources.material}
+        position={[0, 0, panel.scale[2] / 2 + 0.001]}
+        scale={[panel.scale[0] * 0.97, panel.scale[1] * 0.88, 1]}
+        receiveShadow raycast={NO_RAYCAST} userData={FEATURE_USER_DATA} dispose={null} />
+    </group>
+  );
+});
+
 function SurfaceMaterial({
   kind,
   opacity,
@@ -315,12 +354,16 @@ function SurfaceMaterial({
   const asphaltTextures = useMemo(() => kind === 'asphalt' && !reducedGraphics
     ? openGroundTextureBundleForEntity(HIGHWAY_ASPHALT_SURFACE_PROFILE, maxAnisotropy)
     : null, [kind, reducedGraphics, maxAnisotropy]);
+  const concreteTextures = useMemo(() => kind === 'sidewalks' && !reducedGraphics
+    ? openGroundTextureBundleForEntity(CONCRETE_PROFILE, maxAnisotropy)
+    : null, [kind, reducedGraphics, maxAnisotropy]);
+  useEffect(() => () => concreteTextures?.dispose(), [concreteTextures]);
   useLayoutEffect(() => {
     // Map presence changes shader defines. R3F assigns texture props without
     // bumping material.version; do not depend on an unrelated envMap/path change
     // to compile the textured or compatibility variant before old maps release.
-    if (kind === 'asphalt' && materialRef.current) materialRef.current.needsUpdate = true;
-  }, [asphaltTextures, kind]);
+    if ((kind === 'asphalt' || kind === 'sidewalks') && materialRef.current) materialRef.current.needsUpdate = true;
+  }, [asphaltTextures, concreteTextures, kind]);
   useEffect(() => () => asphaltTextures?.dispose(), [asphaltTextures]);
   // Parent meshes deliberately opt out of R3F disposal because their geometry
   // belongs to the render model. Their locally-created materials still belong
@@ -395,11 +438,11 @@ function SurfaceMaterial({
   );
   if (kind === 'sidewalks') return (
     <meshStandardMaterial
-      color="#c9c4b8"
-      map={reducedGraphics ? undefined : PAVER_TEXTURE}
-      roughnessMap={reducedGraphics ? undefined : PAVER_ROUGHNESS}
-      bumpMap={reducedGraphics ? undefined : PAVER_ROUGHNESS}
-      bumpScale={0.005}
+      color={CONCRETE_PROFILE.baseColor}
+      map={concreteTextures?.map}
+      roughnessMap={concreteTextures?.roughnessMap}
+      normalMap={concreteTextures?.normalMap}
+      normalScale={CONCRETE_NORMAL_SCALE}
       roughness={0.95}
       metalness={0}
       transparent={transparent}
@@ -483,6 +526,7 @@ export const ParkAccessInfrastructure = memo(function ParkAccessInfrastructure({
   const input = scope === 'exporural'
     ? EXPORURAL_PARK_ACCESS_INFRASTRUCTURE_INPUT
     : PARK_ACCESS_INFRASTRUCTURE_INPUT;
+  const gate2 = input.gates.find(gate => gate.key === 'gate2');
   const model = useMemo(
     () => buildParkAccessRenderModel(
       input,
@@ -541,6 +585,7 @@ export const ParkAccessInfrastructure = memo(function ParkAccessInfrastructure({
       ))}
       {resolvedArchitectureVisible && (
         <>
+          {gate2 && <Gate2Identity placement={gate2} opacity={normalizedArchitectureOpacity} />}
           {model.architecture.gables && <mesh name="costeiros-gable-infill" geometry={model.architecture.gables}
             material={gableMaterial} castShadow={!reducedGraphics} receiveShadow raycast={NO_RAYCAST} dispose={null}/>}
           <InstanceBatch
