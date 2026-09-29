@@ -51,6 +51,7 @@ describe('portais comerciais por comissão', () => {
     expect(COMMISSION_MAP_PORTALS.map((portal) => portal.slug)).toEqual([
       'exporural',
       'industria-comercio-servicos',
+      'espaco-automovel',
     ]);
 
     COMMISSION_MAP_PORTALS.forEach((portal) => {

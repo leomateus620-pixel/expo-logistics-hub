@@ -11,3 +11,4 @@
 <!-- LOVABLE:BEGIN -->
 - Prévia pública: imagem por área e metadados de escopo somente após validar o token; nunca incluir comprador nem token na imagem — por quê: proteger links revogados e dados comerciais.
 <!-- LOVABLE:END -->
+- Acesso de comissão a segmento do mapa (`map_can_access_segment`) depende só de segmento ativo + capability; completude é estrutural (lotes com geometria), sem contagens fixas de baseline, e a view `commercial_lot_pricing_2028` é security_invoker — por quê: reparcelamentos não podem derrubar portais nem expor preços de outros segmentos.

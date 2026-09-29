@@ -438,8 +438,6 @@ async function fetchCommissionCommercialMap(
     || !Number.isInteger(lineageDelta)
     || expectedLotCount <= 0
     || expectedEntityCount < expectedLotCount
-    || expectedEntityCount !== baselineEntityCount + lineageDelta
-    || expectedLotCount !== baselineLotCount + lineageDelta
   ) {
     throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
   }
@@ -510,8 +508,24 @@ async function fetchCommissionCommercialMap(
     throw commissionMapError('MAP_SEGMENT_INVENTORY_MISMATCH');
   }
 
-  const logoUrls = await fetchSaleLogoUrls({ projectId: project.id });
+  const [logoUrls, parkContextResult] = await Promise.all([
+    fetchSaleLogoUrls({ projectId: project.id }),
+    // Contexto do parque para o modo visita: somente formas e estruturas,
+    // sem lotes, preços ou compradores de outros segmentos.
+    mapRequest(db.rpc('commission_map_park_context', { p_segment_id: segment.id }), context)
+      .catch(() => ({ data: null, error: null })),
+  ]);
+  const parkContext = (parkContextResult?.data ?? null) as { layers?: LayerRow[]; entities?: MapEntity[] } | null;
+  const scopedLayers = (layersResult.data ?? []).map(mapLayer);
+  const knownLayerIds = new Set(scopedLayers.map((layer) => layer.id));
+  const contextLayers = (parkContext?.layers ?? []).map(mapLayer).filter((layer) => !knownLayerIds.has(layer.id));
+  const parkContextEntities = (parkContext?.entities ?? []).map((entity) => ({
+    ...entity,
+    segmentId: null,
+    metadata: entity.metadata ?? {},
+  })) as MapEntity[];
   return {
+    parkContextEntities,
     source: 'database',
     sourceMessage: project.isPublished
       ? null
@@ -520,7 +534,7 @@ async function fetchCommissionCommercialMap(
     // A calibration may reference the complete park plan. Commission scopes
     // deliberately omit it so the API response cannot reveal off-segment geometry.
     calibration: null,
-    layers: (layersResult.data ?? []).map(mapLayer),
+    layers: [...scopedLayers, ...contextLayers],
     entities,
     lots: lotRows.map(row => ({ ...mapLot(row), saleLogoUrl: row.status === 'SOLD' ? logoUrls[row.id] ?? null : null })),
     scope: {

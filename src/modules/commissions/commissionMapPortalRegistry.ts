@@ -1,12 +1,12 @@
-import { Factory, MapPinned, Tractor, type LucideIcon } from 'lucide-react';
+import { Car, Factory, MapPinned, Tractor, type LucideIcon } from 'lucide-react';
 import {
   COMMERCIAL_MAP_SEGMENT_IDS,
   type CommercialMapSegmentId,
 } from '@/features/commercial-map/data/commercialMapSegments';
 import type { CommissionModule } from './commissionRegistry';
 
-export type CommissionMapPortalId = 'exporural' | 'industria-comercio-servicos';
-export type CommissionMapPortalTheme = 'rural' | 'industry';
+export type CommissionMapPortalId = 'exporural' | 'industria-comercio-servicos' | 'espaco-automovel';
+export type CommissionMapPortalTheme = 'rural' | 'industry' | 'automotive';
 
 export interface CommissionMapPortalConfig {
   id: CommissionMapPortalId;
@@ -105,6 +105,45 @@ export const COMMISSION_MAP_PORTALS: readonly CommissionMapPortalConfig[] = [
       basePath: '/comissoes/industria-comercio-servicos',
       defaultMenuPath: 'mapa-comercial',
       order: 11,
+      publicPortal: true,
+      menus: [{ ...mapMenu }],
+    },
+  },
+  {
+    id: 'espaco-automovel',
+    slug: 'espaco-automovel',
+    name: 'Espaço do Automóvel',
+    shortName: 'Espaço do Automóvel',
+    capability: 'espaco_automovel_access',
+    segmentId: COMMERCIAL_MAP_SEGMENT_IDS.automotive,
+    theme: 'automotive',
+    icon: Car,
+    loginPath: '/login/espaco-automovel',
+    basePath: '/comissoes/espaco-automovel',
+    mapPath: '/comissoes/espaco-automovel/mapa-comercial',
+    module: {
+      slug: 'espaco-automovel',
+      name: 'Espaço do Automóvel',
+      shortName: 'Espaço do Automóvel',
+      description: 'Quadras U, P, T e O do Espaço do Automóvel.',
+      icon: Car,
+      accentClass: 'from-orange-800/28 via-amber-500/12 to-transparent',
+      visual: {
+        tone: 'amber',
+        accentColor: 'hsl(16 45% 42%)',
+        accentGradient: 'from-orange-800/28 via-amber-500/12 to-transparent',
+        iconBackground: 'bg-orange-800/10 text-orange-800 dark:text-orange-200',
+        surfaceTint: 'bg-orange-800/[0.06]',
+        chartThemeKey: 'automotive-commercial',
+        motionHint: 'vitrine automotiva e circulação',
+      },
+      status: 'active',
+      capability: 'espaco_automovel_access',
+      sensitive: false,
+      adminOnly: false,
+      basePath: '/comissoes/espaco-automovel',
+      defaultMenuPath: 'mapa-comercial',
+      order: 12,
       publicPortal: true,
       menus: [{ ...mapMenu }],
     },
