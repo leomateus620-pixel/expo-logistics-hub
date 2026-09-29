@@ -362,6 +362,14 @@ export async function signedReferenceUrl(calibration: MapCalibration | null): Pr
   return { ...calibration, referenceImageUrl: data.signedUrl };
 }
 
+/** A view direction is a vector, not a positive-only distance. */
+export function isValidCommissionCameraValues(values: readonly number[]): boolean {
+  return values.length === 6
+    && values.every(Number.isFinite)
+    && values.slice(0, 3).some((value) => value !== 0)
+    && values.slice(3).every((value) => value > 0);
+}
+
 async function fetchCommissionCommercialMap(
   project: MapProject,
   scope: Extract<CommercialMapQueryScope, { mode: 'commission' }>,
