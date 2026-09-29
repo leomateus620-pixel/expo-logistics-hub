@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { CalendarPlus } from 'lucide-react';
+import { CalendarPlus, MapPinned } from 'lucide-react';
+import { useCapabilities } from '@/hooks/useCapabilities';
+import { getCommissionMapPortal } from '@/modules/commissions/commissionMapPortalRegistry';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useCommissionPeople } from '@/hooks/useCommissionPeople';
 import { useAuth } from '@/hooks/useAuth';
@@ -116,14 +118,20 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
     [module.basePath, metrics.total, events.length, unit.leads.length, unit.members.length, documents.length],
   );
 
+  const { hasCapability } = useCapabilities();
+  const mapPortal = entry.mapPortalSlug ? getCommissionMapPortal(entry.mapPortalSlug) : undefined;
   const sidebarItems = useMemo<CommissionMenuItem[]>(
     () => navigation.map((item) => ({
       label: item.label,
       path: WORKSPACE_SECTION_PATHS[item.id],
       description: `${item.label} da frente.`,
       icon: item.icon,
-    })),
-    [navigation],
+    })).concat(
+      mapPortal && hasCapability(mapPortal.capability)
+        ? [{ label: 'Mapa Comercial', path: mapPortal.mapPath, description: 'Mapa comercial do segmento.', icon: MapPinned }]
+        : [],
+    ),
+    [navigation, mapPortal, hasCapability],
   );
 
   const agendaPath = `${module.basePath}/${WORKSPACE_SECTION_PATHS.agenda}`;
