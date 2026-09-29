@@ -1,0 +1,379 @@
+{
+  "phase": "before",
+  "device": "mobile-emulated",
+  "base": "http://127.0.0.1:5199",
+  "cache": "new browser context; local production fixture; no network throttling",
+  "entry": {
+    "canvas": 1270.6000001430511,
+    "ready": 14895.600000143051,
+    "hydrated": 40399.700000047684
+  },
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+  "views": [
+    {
+      "name": "09-restaurant-mobile-overview",
+      "renderer": {
+        "at": 49969.10000014305,
+        "calls": 318,
+        "triangles": 363189,
+        "geometries": 559,
+        "textures": 132,
+        "programs": 222,
+        "dpr": 1.75,
+        "width": 682,
+        "height": 1477,
+        "heapBytes": 90528185,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 339,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvases": 1,
+        "renderers": 1,
+        "controls": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "camera": [
+        8.327272727272732,
+        18.000000000000004,
+        28.14545459638554
+      ],
+      "target": [
+        -17.672727272727272,
+        0,
+        10.145454596385541
+      ],
+      "bufferBytes": 13998176,
+      "textureBytesEstimate": 54782634.66666667,
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 6282.799999952316,
+          "duration": 49.2
+        },
+        {
+          "type": "render-frame",
+          "at": 6295.299999952316,
+          "duration": 12.5
+        },
+        {
+          "type": "render-frame",
+          "at": 6301.900000095367,
+          "duration": 6.6
+        },
+        {
+          "type": "render-frame",
+          "at": 13086.200000047684,
+          "duration": 6784.2
+        },
+        {
+          "type": "render-frame",
+          "at": 40745.799999952316,
+          "duration": 28.3
+        },
+        {
+          "type": "render-frame",
+          "at": 40818,
+          "duration": 72.5
+        },
+        {
+          "type": "render-frame",
+          "at": 40844.200000047684,
+          "duration": 26.2
+        },
+        {
+          "type": "render-frame",
+          "at": 40873.40000009537,
+          "duration": 29.3
+        },
+        {
+          "type": "render-frame",
+          "at": 40903.299999952316,
+          "duration": 29.8
+        },
+        {
+          "type": "render-frame",
+          "at": 40932.90000009537,
+          "duration": 29.7
+        },
+        {
+          "type": "render-frame",
+          "at": 40966.60000014305,
+          "duration": 33.7
+        },
+        {
+          "type": "render-frame",
+          "at": 41001.700000047684,
+          "duration": 35.1
+        },
+        {
+          "type": "render-frame",
+          "at": 41027.5,
+          "duration": 25.7
+        },
+        {
+          "type": "render-frame",
+          "at": 41056.10000014305,
+          "duration": 28.6
+        },
+        {
+          "type": "render-frame",
+          "at": 41084.5,
+          "duration": 28.4
+        },
+        {
+          "type": "render-frame",
+          "at": 41116.10000014305,
+          "duration": 31.5
+        },
+        {
+          "type": "render-frame",
+          "at": 41146.60000014305,
+          "duration": 30.6
+        },
+        {
+          "type": "render-frame",
+          "at": 41181.799999952316,
+          "duration": 35.2
+        },
+        {
+          "type": "render-frame",
+          "at": 41215.40000009537,
+          "duration": 33.7
+        },
+        {
+          "type": "render-frame",
+          "at": 41262.299999952316,
+          "duration": 46.8
+        },
+        {
+          "type": "render-frame",
+          "at": 41312,
+          "duration": 49.5
+        },
+        {
+          "type": "render-frame",
+          "at": 41344.299999952316,
+          "duration": 32.6
+        },
+        {
+          "type": "render-frame",
+          "at": 41377.5,
+          "duration": 33.1
+        },
+        {
+          "type": "render-frame",
+          "at": 41408.90000009537,
+          "duration": 31.5
+        },
+        {
+          "type": "render-frame",
+          "at": 41451,
+          "duration": 42.1
+        },
+        {
+          "type": "render-frame",
+          "at": 41478.799999952316,
+          "duration": 27.8
+        },
+        {
+          "type": "render-frame",
+          "at": 41508.40000009537,
+          "duration": 29.6
+        }
+      ],
+      "character": null
+    },
+    {
+      "name": "10-gate2-mobile-overview",
+      "renderer": {
+        "at": 52208,
+        "calls": 175,
+        "triangles": 344816,
+        "geometries": 562,
+        "textures": 131,
+        "programs": 222,
+        "dpr": 1.75,
+        "width": 682,
+        "height": 1477,
+        "heapBytes": 91943419,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 342,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "identity": {
+        "canvases": 1,
+        "renderers": 1,
+        "controls": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "camera": [
+        -42.79454545454546,
+        2.9999999999999996,
+        36.23636375301206
+      ],
+      "target": [
+        -45.29454545454546,
+        0,
+        23.236363753012057
+      ],
+      "bufferBytes": 14441728,
+      "textureBytesEstimate": 51811669.33333334,
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 6282.799999952316,
+          "duration": 49.2
+        },
+        {
+          "type": "render-frame",
+          "at": 6295.299999952316,
+          "duration": 12.5
+        },
+        {
+          "type": "render-frame",
+          "at": 6301.900000095367,
+          "duration": 6.6
+        },
+        {
+          "type": "render-frame",
+          "at": 13086.200000047684,
+          "duration": 6784.2
+        },
+        {
+          "type": "render-frame",
+          "at": 40745.799999952316,
+          "duration": 28.3
+        },
+        {
+          "type": "render-frame",
+          "at": 40818,
+          "duration": 72.5
+        },
+        {
+          "type": "render-frame",
+          "at": 40844.200000047684,
+          "duration": 26.2
+        },
+        {
+          "type": "render-frame",
+          "at": 40873.40000009537,
+          "duration": 29.3
+        },
+        {
+          "type": "render-frame",
+          "at": 40903.299999952316,
+          "duration": 29.8
+        },
+        {
+          "type": "render-frame",
+          "at": 40932.90000009537,
+          "duration": 29.7
+        },
+        {
+          "type": "render-frame",
+          "at": 40966.60000014305,
+          "duration": 33.7
+        },
+        {
+          "type": "render-frame",
+          "at": 41001.700000047684,
+          "duration": 35.1
+        },
+        {
+          "type": "render-frame",
+          "at": 41027.5,
+          "duration": 25.7
+        },
+        {
+          "type": "render-frame",
+          "at": 41056.10000014305,
+          "duration": 28.6
+        },
+        {
+          "type": "render-frame",
+          "at": 41084.5,
+          "duration": 28.4
+        },
+        {
+          "type": "render-frame",
+          "at": 41116.10000014305,
+          "duration": 31.5
+        },
+        {
+          "type": "render-frame",
+          "at": 41146.60000014305,
+          "duration": 30.6
+        },
+        {
+          "type": "render-frame",
+          "at": 41181.799999952316,
+          "duration": 35.2
+        },
+        {
+          "type": "render-frame",
+          "at": 41215.40000009537,
+          "duration": 33.7
+        },
+        {
+          "type": "render-frame",
+          "at": 41262.299999952316,
+          "duration": 46.8
+        },
+        {
+          "type": "render-frame",
+          "at": 41312,
+          "duration": 49.5
+        },
+        {
+          "type": "render-frame",
+          "at": 41344.299999952316,
+          "duration": 32.6
+        },
+        {
+          "type": "render-frame",
+          "at": 41377.5,
+          "duration": 33.1
+        },
+        {
+          "type": "render-frame",
+          "at": 41408.90000009537,
+          "duration": 31.5
+        },
+        {
+          "type": "render-frame",
+          "at": 41451,
+          "duration": 42.1
+        },
+        {
+          "type": "render-frame",
+          "at": 41478.799999952316,
+          "duration": 27.8
+        },
+        {
+          "type": "render-frame",
+          "at": 41508.40000009537,
+          "duration": 29.6
+        }
+      ],
+      "character": null
+    }
+  ],
+  "errors": []
+}

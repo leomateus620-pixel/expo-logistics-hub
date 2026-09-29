@@ -1,0 +1,12 @@
+{
+  "refinement": "Disable canonical internal leaf shadow receiving in MEDIUM/LOW, retain lit diffuse surfaces and trunk/branch shadows",
+  "targetedPassed": 13,
+  "productionBuild": {
+    "exit": 0,
+    "viteSeconds": 41.09
+  },
+  "diagnosticBuild": {
+    "exit": 0,
+    "viteSeconds": 49.08
+  }
+}

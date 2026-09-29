@@ -1,0 +1,423 @@
+{
+  "device": "desktop",
+  "method": "Actual keyboard walk from canonical B2 entrance, no pose teleport",
+  "start": {
+    "character": {
+      "position": {
+        "x": -14.898181818181822,
+        "y": 0.068,
+        "z": 21.649091016265068
+      },
+      "yaw": -1.4647441031793402,
+      "pitch": -0.045,
+      "movement": "idle",
+      "phase": "active",
+      "cameraMode": "first",
+      "distanceMetres": 0,
+      "colliders": 2434
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 2404,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  "route": [
+    {
+      "character": {
+        "position": {
+          "x": -14.888652605022136,
+          "y": 0.068,
+          "z": 21.55957416537103
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 0.6001508142839657,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2436,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "character": {
+        "position": {
+          "x": -14.864935408689448,
+          "y": 0.068,
+          "z": 21.336776260427623
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 2.0938622522658656,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2469,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "character": {
+        "position": {
+          "x": -14.841571521473961,
+          "y": 0.068,
+          "z": 21.117297319918535
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 3.565322246101312,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2500,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "character": {
+        "position": {
+          "x": -14.817917542534293,
+          "y": 0.068,
+          "z": 20.895093275333746
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 5.05505224623955,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2531,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "character": {
+        "position": {
+          "x": -14.794438539498172,
+          "y": 0.068,
+          "z": 20.67453294378231
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 6.5337622461704115,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2594,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "character": {
+        "position": {
+          "x": -14.770920397120328,
+          "y": 0.068,
+          "z": 20.453604939626857
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 8.014937245824656,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2631,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "character": {
+        "position": {
+          "x": -14.747455207968878,
+          "y": 0.068,
+          "z": 20.23317437487077
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 9.492777245893834,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2661,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "character": {
+        "position": {
+          "x": -14.723672299420684,
+          "y": 0.068,
+          "z": 20.009759173357455
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 10.990627245893798,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2691,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "character": {
+        "position": {
+          "x": -14.69995155336447,
+          "y": 0.068,
+          "z": 19.78692792252636
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 12.484562245824655,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2721,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "character": {
+        "position": {
+          "x": -14.676507085045504,
+          "y": 0.068,
+          "z": 19.566692008014876
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 13.96109724575552,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2751,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "character": {
+        "position": {
+          "x": -14.65297973340207,
+          "y": 0.068,
+          "z": 19.345677492576566
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 15.442852245893821,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2782,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "character": {
+        "position": {
+          "x": -14.629459288706466,
+          "y": 0.068,
+          "z": 19.1247278605875
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 16.924172245755532,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2814,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "character": {
+        "position": {
+          "x": -14.60607237824394,
+          "y": 0.068,
+          "z": 18.905032641091033
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 18.39708224603213,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2848,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "character": {
+        "position": {
+          "x": -14.582749932591163,
+          "y": 0.068,
+          "z": 18.6859430001104
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 19.86593224603213,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2882,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "character": {
+        "position": {
+          "x": -14.535923158439726,
+          "y": 0.044,
+          "z": 18.246055121718108
+        },
+        "yaw": -1.4647441031793402,
+        "pitch": -0.045,
+        "movement": "walk",
+        "phase": "active",
+        "cameraMode": "first",
+        "distanceMetres": 22.815087246170297,
+        "colliders": 2434
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2915,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  ],
+  "errors": [],
+  "arrival": {
+    "character": {
+      "position": {
+        "x": -14.532706028691324,
+        "y": 0.044,
+        "z": 18.215833599839193
+      },
+      "yaw": -1.4647441031793402,
+      "pitch": -0.045,
+      "movement": "idle",
+      "phase": "active",
+      "cameraMode": "first",
+      "distanceMetres": 23.01770240503016,
+      "colliders": 2434
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 2988,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  "walked": {
+    "character": {
+      "position": {
+        "x": -15.84240948230266,
+        "y": 0.044,
+        "z": 18.076413554777318
+      },
+      "yaw": -1.4647441031793402,
+      "pitch": -0.045,
+      "movement": "idle",
+      "phase": "active",
+      "cameraMode": "first",
+      "distanceMetres": 31.798391027396605,
+      "colliders": 2434
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 3293,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  "travelMetres": 8.780688622366487,
+  "passed": true
+}

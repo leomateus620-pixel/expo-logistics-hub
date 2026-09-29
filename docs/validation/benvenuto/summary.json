@@ -111,95 +111,95 @@
       },
       "after": {
         "entrySeconds": {
-          "canvas": 2.341,
-          "ready": 20.366,
-          "hydrated": 113.96
+          "canvas": 2.106,
+          "ready": 14.025,
+          "hydrated": 75.9
         },
         "navigation": {
-          "samples": 683,
-          "fps": 28.382,
-          "p95ms": 40.9
+          "samples": 720,
+          "fps": 34.479,
+          "p95ms": 30.7
         },
         "runs": [
           {
-            "samples": 218,
-            "fps": 27.137,
-            "p95ms": 43.2,
-            "calls": 331,
+            "samples": 240,
+            "fps": 34.012,
+            "p95ms": 31,
+            "calls": 334,
             "dpr": 0.9,
             "tier": "MEDIUM"
           },
           {
-            "samples": 233,
-            "fps": 29.036,
-            "p95ms": 36.7,
-            "calls": 339,
+            "samples": 240,
+            "fps": 34.722,
+            "p95ms": 30.3,
+            "calls": 344,
             "dpr": 0.9,
             "tier": "MEDIUM"
           },
           {
-            "samples": 232,
-            "fps": 28.976,
-            "p95ms": 36.9,
-            "calls": 349,
+            "samples": 240,
+            "fps": 34.712,
+            "p95ms": 30.5,
+            "calls": 353,
             "dpr": 0.9,
             "tier": "MEDIUM"
           }
         ],
         "aerial": {
-          "at": 123478.09999990463,
-          "calls": 263,
-          "triangles": 383462,
-          "geometries": 562,
-          "textures": 130,
-          "programs": 222,
+          "at": 85228.20000004768,
+          "calls": 267,
+          "triangles": 387161,
+          "geometries": 571,
+          "textures": 135,
+          "programs": 236,
           "dpr": 1,
           "width": 1440,
           "height": 900,
-          "heapBytes": 92772143,
+          "heapBytes": 98367332,
           "qualityTier": "HIGH",
           "gpuVendor": "Google Inc. (Intel)",
           "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
         },
-        "geometryBufferBytes": 13898656,
-        "textureBytesEstimate": 49190229.33333335,
-        "visitTravelMetres": 2.901,
+        "geometryBufferBytes": 13975546,
+        "textureBytesEstimate": 50348032.000000015,
+        "visitTravelMetres": 2.881,
         "warmedResources": [
           {
-            "geometries": 592,
-            "textures": 135,
-            "programs": 222
+            "geometries": 600,
+            "textures": 140,
+            "programs": 237
           },
           {
-            "geometries": 592,
-            "textures": 135,
-            "programs": 222
+            "geometries": 600,
+            "textures": 140,
+            "programs": 237
           },
           {
-            "geometries": 592,
-            "textures": 135,
-            "programs": 222
+            "geometries": 600,
+            "textures": 140,
+            "programs": 237
           },
           {
-            "geometries": 592,
-            "textures": 135,
-            "programs": 222
+            "geometries": 600,
+            "textures": 140,
+            "programs": 237
           },
           {
-            "geometries": 592,
-            "textures": 135,
-            "programs": 222
+            "geometries": 600,
+            "textures": 140,
+            "programs": 237
           },
           {
-            "geometries": 592,
-            "textures": 135,
-            "programs": 222
+            "geometries": 600,
+            "textures": 140,
+            "programs": 237
           }
         ],
         "health": {
           "status": "ready",
           "path": "post",
-          "presentedFrames": 2513,
+          "presentedFrames": 2091,
           "contextLosses": 0,
           "lastErrorCode": null
         },
@@ -218,18 +218,18 @@
             "interior": "reference:2026:b2"
           },
           "recoveryDrift": 0,
-          "travelAfterRecoveryMetres": 2.484,
+          "travelAfterRecoveryMetres": 2.589,
           "recoveredHealth": {
             "status": "ready",
             "path": "direct",
-            "presentedFrames": 4263,
+            "presentedFrames": 4117,
             "contextLosses": 1,
             "lastErrorCode": null
           },
           "returnedHealth": {
             "status": "ready",
             "path": "direct",
-            "presentedFrames": 4479,
+            "presentedFrames": 4449,
             "contextLosses": 1,
             "lastErrorCode": null
           },
@@ -382,95 +382,95 @@
       },
       "after": {
         "entrySeconds": {
-          "canvas": 1.332,
-          "ready": 14.413,
-          "hydrated": 38.743
+          "canvas": 1.236,
+          "ready": 13.928,
+          "hydrated": 34.622
         },
         "navigation": {
           "samples": 720,
-          "fps": 53.697,
-          "p95ms": 22.4
+          "fps": 59.155,
+          "p95ms": 17.7
         },
         "runs": [
           {
             "samples": 240,
-            "fps": 47.83,
-            "p95ms": 23.2,
-            "calls": 205,
-            "dpr": 1.35,
-            "tier": "MEDIUM"
-          },
-          {
-            "samples": 240,
-            "fps": 57.177,
-            "p95ms": 18.5,
+            "fps": 58.71,
+            "p95ms": 17.9,
             "calls": 209,
-            "dpr": 1.215,
-            "tier": "MEDIUM"
+            "dpr": 1.35,
+            "tier": "HIGH"
           },
           {
             "samples": 240,
-            "fps": 57.234,
-            "p95ms": 18.5,
-            "calls": 212,
-            "dpr": 1.215,
-            "tier": "MEDIUM"
+            "fps": 59.999,
+            "p95ms": 17.1,
+            "calls": 213,
+            "dpr": 1.35,
+            "tier": "HIGH"
+          },
+          {
+            "samples": 240,
+            "fps": 58.773,
+            "p95ms": 17.8,
+            "calls": 216,
+            "dpr": 1.35,
+            "tier": "HIGH"
           }
         ],
         "aerial": {
-          "at": 48962.59999990463,
-          "calls": 186,
-          "triangles": 322774,
-          "geometries": 549,
-          "textures": 130,
-          "programs": 222,
+          "at": 44373.39999985695,
+          "calls": 189,
+          "triangles": 325941,
+          "geometries": 558,
+          "textures": 135,
+          "programs": 236,
           "dpr": 1.75,
           "width": 682,
           "height": 1477,
-          "heapBytes": 89368329,
+          "heapBytes": 109364117,
           "qualityTier": "HIGH",
           "gpuVendor": "Google Inc. (Intel)",
           "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
         },
-        "geometryBufferBytes": 13794112,
-        "textureBytesEstimate": 50238805.33333335,
-        "visitTravelMetres": 2.903,
+        "geometryBufferBytes": 13871002,
+        "textureBytesEstimate": 51396608.000000015,
+        "visitTravelMetres": 2.882,
         "warmedResources": [
           {
-            "geometries": 582,
-            "textures": 133,
-            "programs": 222
+            "geometries": 590,
+            "textures": 138,
+            "programs": 237
           },
           {
-            "geometries": 582,
-            "textures": 133,
-            "programs": 222
+            "geometries": 590,
+            "textures": 138,
+            "programs": 237
           },
           {
-            "geometries": 582,
-            "textures": 133,
-            "programs": 222
+            "geometries": 590,
+            "textures": 138,
+            "programs": 237
           },
           {
-            "geometries": 582,
-            "textures": 133,
-            "programs": 222
+            "geometries": 590,
+            "textures": 138,
+            "programs": 237
           },
           {
-            "geometries": 582,
-            "textures": 133,
-            "programs": 222
+            "geometries": 590,
+            "textures": 138,
+            "programs": 237
           },
           {
-            "geometries": 582,
-            "textures": 133,
-            "programs": 222
+            "geometries": 590,
+            "textures": 138,
+            "programs": 237
           }
         ],
         "health": {
           "status": "ready",
           "path": "post",
-          "presentedFrames": 363,
+          "presentedFrames": 509,
           "contextLosses": 0,
           "lastErrorCode": null
         },
@@ -489,18 +489,18 @@
             "interior": "reference:2026:b2"
           },
           "recoveryDrift": 0,
-          "travelAfterRecoveryMetres": 2.67,
+          "travelAfterRecoveryMetres": 2.66,
           "recoveredHealth": {
             "status": "ready",
             "path": "direct",
-            "presentedFrames": 3604,
+            "presentedFrames": 3881,
             "contextLosses": 1,
             "lastErrorCode": null
           },
           "returnedHealth": {
             "status": "ready",
             "path": "direct",
-            "presentedFrames": 4026,
+            "presentedFrames": 4322,
             "contextLosses": 1,
             "lastErrorCode": null
           },
@@ -513,7 +513,7 @@
           },
           "touchStopped": true,
           "touchDrift": 0,
-          "touchTravelMetres": 2.653,
+          "touchTravelMetres": 2.63,
           "landscapeOverflow": false
         }
       },

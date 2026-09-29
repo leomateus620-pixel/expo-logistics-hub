@@ -38,6 +38,7 @@ Os cinco arquivos do pedido são referências visuais, não instruções nem med
 - O concreto das fachadas internas e da avenida termina nos footprints B3/B4/B5/B6; o canteiro de B5 permanece. B4/B6 têm soleiras internas estreitas conforme o cadastro, sem declaração de acessibilidade dimensional.
 - A revisão visual detectou duas lacunas verdes decorrentes de B33/B34. O próprio cadastro identifica esses apoios como temporários removidos do payload visível. A correção excepciona somente suas máscaras históricas de solo verde nesta frente, atendendo ao pedido de pavimentação contínua. Nenhum registro, polígono cadastral ou edifício renderizado foi alterado.
 - Na revisão do usuário, a captura `codex-clipboard-6ab48a88-adaf-4ecb-a7f0-0201f950ebb9.png` apontou o recorte junto à árvore entre P14/P12. A máscara histórica de B23 também foi retirada desse pátio: concreto contínuo até a borda do asfalto existente, recortado pelo próprio asfalto, com a abertura de solo da árvore preservada. B23 permanece no cadastro original; o recorte de estacionamento da avenida e as vagas permanecem iguais. A revisão anterior a esse ajuste está em `diagnostics/before-b23-edge-*`.
+- A indicação seguinte, `codex-clipboard-4958e7fa-f7ea-4021-b175-84202b101a98.png`, corrige a saliência desse concreto: a borda B14/B12 agora liga os extremos vizinhos `[2650,4100]` e `[2790,4103]` por uma linha contínua no sistema PDF. O mesmo polígono da avenida preenche o recuo antigo de B23; o concreto é recortado pela aresta compartilhada. Árvore, abertura no piso, cadastro e elegibilidade das vagas permanecem. Não há novo mesh, rua duplicada ou vaga nesse recuo. As capturas anteriores à borda reta estão em `diagnostics/before-straight-edge-*`.
 - Concreto foi transferido do lote ambiental para o lote existente de passeios. Asfalto, passeios, marcações e meios-fios continuam agrupados, sem componentes por vaga, luzes adicionais ou trabalho por frame. As marcações adjacentes usam união geométrica; solo/trilha/contexto recebem recortes reais. O suporte da visita respeita as mesmas aberturas.
 - O concreto reutiliza o gerador PBR do projeto, com juntas de aproximadamente 3 m na escala de trabalho, normal discreta e UV no espaço do mapa. Essas proporções são de apresentação.
 
@@ -47,7 +48,9 @@ Galeria: [comparação lado a lado](comparison.html). A cor dos lotes na fixture
 
 Mesmos builds de produção com diagnóstico opt-in, fixture oficial local, navegador Chrome/ANGLE D3D11, câmera e sequência repetidas. Desktop 1440 × 900 e mobile emulado 390 × 844, DPR 1 e 3 respectivamente. Registrar entrada, FPS em movimento, draw calls, geometrias, texturas, programas, contexto e erros. Contagens de recursos e bytes de buffers/texturas estimados não são leitura de VRAM física. Nenhuma evidência local certifica dispositivo físico, Safari/iOS ou publicação em produção.
 
-## Resultado local — 29/09/2026
+## Resultado histórico da primeira correção — 92bcbe4e
+
+Esta seção conserva a medição da primeira implementação, antes da revisão B23 e da ampliação para restaurante/A2/árvores. A comparação da versão atual está em [RESULTS.md](RESULTS.md), regenerada a partir dos JSON atuais. Não usar a tabela histórica para atribuir desempenho à folhagem nova.
 
 Chrome 154 headless, Windows, Intel UHD via ANGLE D3D11. Execuções sequenciais sem builds/testes concorrentes. Contexto novo por dispositivo, servidor local sem limitação de rede; cache do driver e aquecimento do sistema não controlados. Três navegações de 8 s; o diagnóstico conserva no máximo 240 amostras por janela. Nenhum ganho de desempenho é atribuído à alteração.
 
@@ -71,7 +74,7 @@ O teste adicional selecionou B14 pelo mesmo método do explorador, abriu/fechou 
 
 Validação automática: 111 testes em 14 arquivos passaram; incluem os quatro arquivos obrigatórios, infraestrutura, integração, colisão, apoio no solo e contratos públicos. TypeScript, ESLint dos arquivos alterados, build normal e build de diagnóstico passaram. O orçamento original de 6.000 triângulos da infraestrutura foi mantido. O teste de colisão percorre o novo asfalto, verifica a calçada e bloqueia o footprint de B1 e o tronco da árvore.
 
-Os JSON completos estão em `before/`, `after/` e [summary.json](summary.json). `diagnostics/initial-before-*` é a primeira sondagem sem amostras válidas de navegação e foi excluída da comparação de FPS; `intermediate-after-*` documenta a revisão anterior à remoção dos dois recortes históricos B33/B34. A tabela e a galeria usam somente a geometria final de `after/`.
+Os JSON atuais estão em `before/`, `after/` e [summary.json](summary.json). `diagnostics/initial-before-*` é a primeira sondagem sem amostras válidas de navegação e foi excluída da comparação de FPS; `intermediate-after-*` documenta a revisão anterior à remoção dos dois recortes históricos B33/B34. A galeria acompanha os PNG atuais; a tabela acima é histórica.
 
 Para repetir: `VITE_COMMERCIAL_MAP_DIAGNOSTICS=true npm run build`, servir com Vite preview, definir `PLAYWRIGHT_MODULE` para Playwright instalado, `BENVENUTO_URL` para esse servidor e executar `node scripts/commercial-map-performance/benvenuto.cjs after`. `BENVENUTO_SMOKE=1` habilita interações e perda de contexto depois das medições. A base 4294ddbb recebeu somente o mesmo probe opt-in de diagnóstico, sem as correções de superfície. `benvenuto-summary.cjs` consolida os dois conjuntos. `benvenuto-walk.cjs` exercita separadamente a caminhada real desde B14 até o novo corredor; não participa da medição comparativa de FPS.
 
@@ -82,3 +85,17 @@ Limites: não houve consulta a dados comerciais de produção, deploy, levantame
 Após a indicação do usuário, 57 testes passaram na revisão de B23, incluindo os quatro contratos obrigatórios, infraestrutura, calçadas laterais e apoio da visita. O percurso real de teclado, partindo da entrada de B14, chegou ao corredor B1/B14 e percorreu 8,78 m em desktop e 8,43 m em mobile emulado, com apoio a Y=0,044 em ambos os extremos. Esses percursos precedem somente a remoção da máscara B23, que não altera a rua percorrida. Capturas `after/*-visit-street*.png` e traces `after/*-street-walk.json`.
 
 O primeiro job spatial remoto falhou em duas asserções. A reprodução isolada da base 4294ddbb confirmou as mesmas duas falhas: inventário histórico de entidades e lista histórica de postes junto às ruas posteriores, com 19 testes passando. Resultados em `baseline-spatial-tests.json`. O contrato de calçadas laterais foi atualizado para contar separadamente os novos trechos, preservando os 16 meios-fios independentes originais; os 20 testes relacionados passaram. Não foram afrouxados budgets ou comparações geométricas para esconder falhas.
+
+## Validação integrada final
+
+A fonte final `a56197e5` inclui restaurante, A2, árvores internas e o alinhamento contínuo B14/B12. 130 testes dirigidos em 17 arquivos, checagem TypeScript, lint alterado e builds normal/diagnóstico passaram. As câmeras das seis vistas têm deltas zero nos dois perfis.
+
+FPS desktop: 28,339 → 34,479; mobile emulado: 53,630 → 59,155. P95 desktop: 40,800 → 30,700 ms; mobile: 22,500 → 17,700 ms. Entrada, calls dos três percursos, estimativas parciais de memória e recursos aquecidos estão em [RESULTS.md](RESULTS.md). A hidratação completa e as oscilações mobile continuam sendo limitações do mapa; não há comprovação de ganho geral em aparelhos físicos.
+
+A rodada anterior à borda reta deu 30,895 FPS/P95 37,1 ms no desktop e 52,751 FPS/P95 31 ms no mobile e está preservada em `diagnostics/pre-alignment-*`. A repetição da base mobile está em `diagnostics/repeat-before/mobile-emulated.json`; evidenciou variação mesmo no código original. Nenhuma rodada foi apagada para apresentar somente ganhos.
+
+Seleção e interior B14, Modo Visita, toque cancelado e retrato/paisagem passaram no roteiro final. A perda WebGL intencional recuperou a cena, manteve o personagem sem deriva e permitiu retomar movimento; Canvas/renderer/controles seguem 1/1/1.
+
+Uma tentativa de exportar um PNG mobile terminou com erro de gravação do sistema de arquivos. A repetição isolada em `diagnostics/aligned-mobile` terminou com os testes de interação completos; seus PNG/JSON foram copiados integralmente para `after/`. Por isso o campo `phase` do JSON mobile conserva esse nome de diagnóstico. As métricas não foram editadas.
+
+A comparação ampliada dos mesmos 41 arquivos de contrato produziu 288 testes passando e 50 falhando na base 4294ddbb e no candidato, sem falhas novas. Resultados e condições em `ci-contract-comparison.json`. Esse comparativo precede apenas o ajuste pontual de borda, coberto depois pelos 130 testes. Checks remotos anteriores à ampliação estão em `ci-before-expansion.json`; não representam o estado do novo commit publicado.

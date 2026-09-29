@@ -1,0 +1,4727 @@
+{
+  "base": "9ddda43f",
+  "canonicalTrees": [
+    {
+      "id": "tree-d-01",
+      "area": "D",
+      "position": [
+        6.8073,
+        11.5418
+      ],
+      "sourcePosition": [
+        3662,
+        3504
+      ],
+      "trunkRadius": 0.173,
+      "canopyRadius": 1.102
+    },
+    {
+      "id": "tree-d-02",
+      "area": "D",
+      "position": [
+        7.3091,
+        11.8909
+      ],
+      "sourcePosition": [
+        3685,
+        3520
+      ],
+      "trunkRadius": 0.143,
+      "canopyRadius": 0.898
+    },
+    {
+      "id": "tree-d-03",
+      "area": "D",
+      "position": [
+        7.8982,
+        12.24
+      ],
+      "sourcePosition": [
+        3712,
+        3536
+      ],
+      "trunkRadius": 0.187,
+      "canopyRadius": 1.193
+    },
+    {
+      "id": "tree-d-04",
+      "area": "D",
+      "position": [
+        8.5091,
+        11.6073
+      ],
+      "sourcePosition": [
+        3740,
+        3507
+      ],
+      "trunkRadius": 0.154,
+      "canopyRadius": 0.979
+    },
+    {
+      "id": "tree-d-05",
+      "area": "D",
+      "position": [
+        9.0109,
+        12
+      ],
+      "sourcePosition": [
+        3763,
+        3525
+      ],
+      "trunkRadius": 0.192,
+      "canopyRadius": 1.224
+    },
+    {
+      "id": "tree-d-06",
+      "area": "D",
+      "position": [
+        9.7091,
+        11.5418
+      ],
+      "sourcePosition": [
+        3795,
+        3504
+      ],
+      "trunkRadius": 0.147,
+      "canopyRadius": 0.924
+    },
+    {
+      "id": "tree-d-07",
+      "area": "D",
+      "position": [
+        10.4073,
+        12.1527
+      ],
+      "sourcePosition": [
+        3827,
+        3532
+      ],
+      "trunkRadius": 0.171,
+      "canopyRadius": 1.074
+    },
+    {
+      "id": "tree-d-08",
+      "area": "D",
+      "position": [
+        11.1927,
+        11.6073
+      ],
+      "sourcePosition": [
+        3863,
+        3507
+      ],
+      "trunkRadius": 0.173,
+      "canopyRadius": 1.102
+    },
+    {
+      "id": "tree-d-09",
+      "area": "D",
+      "position": [
+        12,
+        12
+      ],
+      "sourcePosition": [
+        3900,
+        3525
+      ],
+      "trunkRadius": 0.14,
+      "canopyRadius": 0.88
+    },
+    {
+      "id": "tree-i-01",
+      "area": "I",
+      "position": [
+        -12.4364,
+        10.8
+      ],
+      "sourcePosition": [
+        2780,
+        3470
+      ],
+      "trunkRadius": 0.189,
+      "canopyRadius": 1.204
+    },
+    {
+      "id": "tree-i-02",
+      "area": "I",
+      "position": [
+        -12.1745,
+        11.4545
+      ],
+      "sourcePosition": [
+        2792,
+        3500
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.091
+    },
+    {
+      "id": "tree-i-03",
+      "area": "I",
+      "position": [
+        -11.9127,
+        12.1091
+      ],
+      "sourcePosition": [
+        2804,
+        3530
+      ],
+      "trunkRadius": 0.151,
+      "canopyRadius": 0.95
+    },
+    {
+      "id": "tree-i-04",
+      "area": "I",
+      "position": [
+        -11.7382,
+        12.7636
+      ],
+      "sourcePosition": [
+        2812,
+        3560
+      ],
+      "trunkRadius": 0.192,
+      "canopyRadius": 1.224
+    },
+    {
+      "id": "tree-i-05",
+      "area": "I",
+      "position": [
+        -11.5636,
+        13.4182
+      ],
+      "sourcePosition": [
+        2820,
+        3590
+      ],
+      "trunkRadius": 0.205,
+      "canopyRadius": 1.306
+    },
+    {
+      "id": "tree-i-06",
+      "area": "I",
+      "position": [
+        -11.3891,
+        14.1818
+      ],
+      "sourcePosition": [
+        2828,
+        3625
+      ],
+      "trunkRadius": 0.157,
+      "canopyRadius": 0.986
+    },
+    {
+      "id": "tree-i-07",
+      "area": "I",
+      "position": [
+        -11.2145,
+        14.9455
+      ],
+      "sourcePosition": [
+        2836,
+        3660
+      ],
+      "trunkRadius": 0.162,
+      "canopyRadius": 1.021
+    },
+    {
+      "id": "tree-i-08",
+      "area": "I",
+      "position": [
+        -11.6073,
+        15.6436
+      ],
+      "sourcePosition": [
+        2818,
+        3692
+      ],
+      "trunkRadius": 0.16,
+      "canopyRadius": 1.02
+    },
+    {
+      "id": "tree-i-09",
+      "area": "I",
+      "position": [
+        -10.5164,
+        11.5418
+      ],
+      "sourcePosition": [
+        2868,
+        3504
+      ],
+      "trunkRadius": 0.168,
+      "canopyRadius": 1.071
+    },
+    {
+      "id": "tree-i-10",
+      "area": "I",
+      "position": [
+        -9.4909,
+        11.4545
+      ],
+      "sourcePosition": [
+        2915,
+        3500
+      ],
+      "trunkRadius": 0.119,
+      "canopyRadius": 0.67
+    },
+    {
+      "id": "tree-i-11",
+      "area": "I",
+      "position": [
+        -8.5091,
+        11.4982
+      ],
+      "sourcePosition": [
+        2960,
+        3502
+      ],
+      "trunkRadius": 0.137,
+      "canopyRadius": 0.862
+    },
+    {
+      "id": "tree-i-12",
+      "area": "I",
+      "position": [
+        -5.2364,
+        12.5455
+      ],
+      "sourcePosition": [
+        3110,
+        3550
+      ],
+      "trunkRadius": 0.129,
+      "canopyRadius": 0.81
+    },
+    {
+      "id": "tree-i-13",
+      "area": "I",
+      "position": [
+        -6.3273,
+        16.4291
+      ],
+      "sourcePosition": [
+        3060,
+        3728
+      ],
+      "trunkRadius": 0.179,
+      "canopyRadius": 1.142
+    },
+    {
+      "id": "tree-i-14",
+      "area": "I",
+      "position": [
+        -5.0182,
+        16.6473
+      ],
+      "sourcePosition": [
+        3120,
+        3738
+      ],
+      "trunkRadius": 0.192,
+      "canopyRadius": 1.224
+    },
+    {
+      "id": "tree-i-15",
+      "area": "I",
+      "position": [
+        -3.8182,
+        16.4073
+      ],
+      "sourcePosition": [
+        3175,
+        3727
+      ],
+      "trunkRadius": 0.151,
+      "canopyRadius": 0.95
+    },
+    {
+      "id": "tree-j-01",
+      "area": "J",
+      "position": [
+        -13.3091,
+        5.1273
+      ],
+      "sourcePosition": [
+        2740,
+        3210
+      ],
+      "trunkRadius": 0.146,
+      "canopyRadius": 0.915
+    },
+    {
+      "id": "tree-j-02",
+      "area": "J",
+      "position": [
+        -13.0909,
+        5.7818
+      ],
+      "sourcePosition": [
+        2750,
+        3240
+      ],
+      "trunkRadius": 0.168,
+      "canopyRadius": 1.056
+    },
+    {
+      "id": "tree-j-03",
+      "area": "J",
+      "position": [
+        -12.8291,
+        6.48
+      ],
+      "sourcePosition": [
+        2762,
+        3272
+      ],
+      "trunkRadius": 0.202,
+      "canopyRadius": 1.285
+    },
+    {
+      "id": "tree-j-04",
+      "area": "J",
+      "position": [
+        -12.5455,
+        7.2
+      ],
+      "sourcePosition": [
+        2775,
+        3305
+      ],
+      "trunkRadius": 0.16,
+      "canopyRadius": 1.003
+    },
+    {
+      "id": "tree-j-05",
+      "area": "J",
+      "position": [
+        -12.3273,
+        7.8982
+      ],
+      "sourcePosition": [
+        2785,
+        3337
+      ],
+      "trunkRadius": 0.2,
+      "canopyRadius": 1.275
+    },
+    {
+      "id": "tree-j-06",
+      "area": "J",
+      "position": [
+        -12.1091,
+        8.6182
+      ],
+      "sourcePosition": [
+        2795,
+        3370
+      ],
+      "trunkRadius": 0.179,
+      "canopyRadius": 1.142
+    },
+    {
+      "id": "tree-j-07",
+      "area": "J",
+      "position": [
+        -11.7818,
+        9.3164
+      ],
+      "sourcePosition": [
+        2810,
+        3402
+      ],
+      "trunkRadius": 0.151,
+      "canopyRadius": 0.95
+    },
+    {
+      "id": "tree-j-08",
+      "area": "J",
+      "position": [
+        -11.4545,
+        9.8836
+      ],
+      "sourcePosition": [
+        2825,
+        3428
+      ],
+      "trunkRadius": 0.173,
+      "canopyRadius": 1.102
+    },
+    {
+      "id": "tree-j-09",
+      "area": "J",
+      "position": [
+        -10.6909,
+        9.9709
+      ],
+      "sourcePosition": [
+        2860,
+        3432
+      ],
+      "trunkRadius": 0.184,
+      "canopyRadius": 1.173
+    },
+    {
+      "id": "tree-j-10",
+      "area": "J",
+      "position": [
+        -9.6,
+        9.9273
+      ],
+      "sourcePosition": [
+        2910,
+        3430
+      ],
+      "trunkRadius": 0.14,
+      "canopyRadius": 0.88
+    },
+    {
+      "id": "tree-j-11",
+      "area": "J",
+      "position": [
+        -8.5091,
+        4.2982
+      ],
+      "sourcePosition": [
+        2960,
+        3172
+      ],
+      "trunkRadius": 0.106,
+      "canopyRadius": 0.595
+    },
+    {
+      "id": "tree-j-12",
+      "area": "J",
+      "position": [
+        -4.5818,
+        4.2545
+      ],
+      "sourcePosition": [
+        3140,
+        3170
+      ],
+      "trunkRadius": 0.099,
+      "canopyRadius": 0.558
+    },
+    {
+      "id": "tree-j-13",
+      "area": "J",
+      "position": [
+        -1.2,
+        4.2982
+      ],
+      "sourcePosition": [
+        3295,
+        3172
+      ],
+      "trunkRadius": 0.163,
+      "canopyRadius": 1.04
+    },
+    {
+      "id": "tree-j-14",
+      "area": "J",
+      "position": [
+        0.9818,
+        4.3855
+      ],
+      "sourcePosition": [
+        3395,
+        3176
+      ],
+      "trunkRadius": 0.148,
+      "canopyRadius": 0.933
+    },
+    {
+      "id": "tree-e-01",
+      "area": "E",
+      "position": [
+        12.6982,
+        5.1273
+      ],
+      "sourcePosition": [
+        3932,
+        3210
+      ],
+      "trunkRadius": 0.195,
+      "canopyRadius": 1.244
+    },
+    {
+      "id": "tree-e-02",
+      "area": "E",
+      "position": [
+        12.5455,
+        5.7818
+      ],
+      "sourcePosition": [
+        3925,
+        3240
+      ],
+      "trunkRadius": 0.162,
+      "canopyRadius": 1.021
+    },
+    {
+      "id": "tree-e-03",
+      "area": "E",
+      "position": [
+        12.6545,
+        6.48
+      ],
+      "sourcePosition": [
+        3930,
+        3272
+      ],
+      "trunkRadius": 0.198,
+      "canopyRadius": 1.265
+    },
+    {
+      "id": "tree-e-04",
+      "area": "E",
+      "position": [
+        12.72,
+        7.2
+      ],
+      "sourcePosition": [
+        3933,
+        3305
+      ],
+      "trunkRadius": 0.205,
+      "canopyRadius": 1.306
+    },
+    {
+      "id": "tree-e-05",
+      "area": "E",
+      "position": [
+        12.6545,
+        7.8982
+      ],
+      "sourcePosition": [
+        3930,
+        3337
+      ],
+      "trunkRadius": 0.157,
+      "canopyRadius": 0.986
+    },
+    {
+      "id": "tree-e-06",
+      "area": "E",
+      "position": [
+        12.6109,
+        8.6182
+      ],
+      "sourcePosition": [
+        3928,
+        3370
+      ],
+      "trunkRadius": 0.189,
+      "canopyRadius": 1.204
+    },
+    {
+      "id": "tree-e-07",
+      "area": "E",
+      "position": [
+        12.6982,
+        9.2727
+      ],
+      "sourcePosition": [
+        3932,
+        3400
+      ],
+      "trunkRadius": 0.151,
+      "canopyRadius": 0.95
+    },
+    {
+      "id": "tree-e-08",
+      "area": "E",
+      "position": [
+        12.7418,
+        9.8182
+      ],
+      "sourcePosition": [
+        3934,
+        3425
+      ],
+      "trunkRadius": 0.143,
+      "canopyRadius": 0.898
+    },
+    {
+      "id": "tree-e-09",
+      "area": "E",
+      "position": [
+        3.8182,
+        4.32
+      ],
+      "sourcePosition": [
+        3525,
+        3173
+      ],
+      "trunkRadius": 0.112,
+      "canopyRadius": 0.632
+    },
+    {
+      "id": "tree-e-10",
+      "area": "E",
+      "position": [
+        5.4545,
+        4.2545
+      ],
+      "sourcePosition": [
+        3600,
+        3170
+      ],
+      "trunkRadius": 0.103,
+      "canopyRadius": 0.583
+    },
+    {
+      "id": "tree-e-11",
+      "area": "E",
+      "position": [
+        7.2,
+        4.3636
+      ],
+      "sourcePosition": [
+        3680,
+        3175
+      ],
+      "trunkRadius": 0.168,
+      "canopyRadius": 1.071
+    },
+    {
+      "id": "tree-e-12",
+      "area": "E",
+      "position": [
+        8.9455,
+        4.2982
+      ],
+      "sourcePosition": [
+        3760,
+        3172
+      ],
+      "trunkRadius": 0.151,
+      "canopyRadius": 0.95
+    },
+    {
+      "id": "tree-e-13",
+      "area": "E",
+      "position": [
+        10.4727,
+        4.3636
+      ],
+      "sourcePosition": [
+        3830,
+        3175
+      ],
+      "trunkRadius": 0.108,
+      "canopyRadius": 0.608
+    },
+    {
+      "id": "tree-e-14",
+      "area": "E",
+      "position": [
+        11.9564,
+        4.4291
+      ],
+      "sourcePosition": [
+        3898,
+        3178
+      ],
+      "trunkRadius": 0.154,
+      "canopyRadius": 0.968
+    },
+    {
+      "id": "tree-quadra-a-01",
+      "area": "QUADRA_A",
+      "position": [
+        15.84,
+        18.7855
+      ],
+      "sourcePosition": [
+        4076,
+        3836
+      ],
+      "trunkRadius": 0.127,
+      "canopyRadius": 0.807
+    },
+    {
+      "id": "tree-quadra-a-02",
+      "area": "QUADRA_A",
+      "position": [
+        17.6727,
+        18.7418
+      ],
+      "sourcePosition": [
+        4160,
+        3834
+      ],
+      "trunkRadius": 0.116,
+      "canopyRadius": 0.73
+    },
+    {
+      "id": "tree-quadra-a-03",
+      "area": "QUADRA_A",
+      "position": [
+        19.68,
+        18.8291
+      ],
+      "sourcePosition": [
+        4252,
+        3838
+      ],
+      "trunkRadius": 0.139,
+      "canopyRadius": 0.886
+    },
+    {
+      "id": "tree-quadra-a-04",
+      "area": "QUADRA_A",
+      "position": [
+        21.8182,
+        18.7855
+      ],
+      "sourcePosition": [
+        4350,
+        3836
+      ],
+      "trunkRadius": 0.145,
+      "canopyRadius": 0.925
+    },
+    {
+      "id": "tree-quadra-a-05",
+      "area": "QUADRA_A",
+      "position": [
+        24.1745,
+        18.8291
+      ],
+      "sourcePosition": [
+        4458,
+        3838
+      ],
+      "trunkRadius": 0.151,
+      "canopyRadius": 0.965
+    },
+    {
+      "id": "tree-quadra-a-06",
+      "area": "QUADRA_A",
+      "position": [
+        15.7964,
+        20.1818
+      ],
+      "sourcePosition": [
+        4074,
+        3900
+      ],
+      "trunkRadius": 0.138,
+      "canopyRadius": 0.882
+    },
+    {
+      "id": "tree-quadra-a-07",
+      "area": "QUADRA_A",
+      "position": [
+        16.0145,
+        21.7091
+      ],
+      "sourcePosition": [
+        4084,
+        3970
+      ],
+      "trunkRadius": 0.127,
+      "canopyRadius": 0.798
+    },
+    {
+      "id": "tree-quadra-a-08",
+      "area": "QUADRA_A",
+      "position": [
+        15.7527,
+        23.2364
+      ],
+      "sourcePosition": [
+        4072,
+        4040
+      ],
+      "trunkRadius": 0.152,
+      "canopyRadius": 0.968
+    },
+    {
+      "id": "tree-quadra-a-09",
+      "area": "QUADRA_A",
+      "position": [
+        24.2182,
+        20.0073
+      ],
+      "sourcePosition": [
+        4460,
+        3892
+      ],
+      "trunkRadius": 0.135,
+      "canopyRadius": 0.863
+    },
+    {
+      "id": "tree-quadra-a-10",
+      "area": "QUADRA_A",
+      "position": [
+        24,
+        21.7527
+      ],
+      "sourcePosition": [
+        4450,
+        3972
+      ],
+      "trunkRadius": 0.142,
+      "canopyRadius": 0.906
+    },
+    {
+      "id": "tree-quadra-a-11",
+      "area": "QUADRA_A",
+      "position": [
+        24.2618,
+        23.4545
+      ],
+      "sourcePosition": [
+        4462,
+        4050
+      ],
+      "trunkRadius": 0.149,
+      "canopyRadius": 0.948
+    },
+    {
+      "id": "tree-quadra-a-12",
+      "area": "QUADRA_A",
+      "position": [
+        24.0436,
+        24.6327
+      ],
+      "sourcePosition": [
+        4452,
+        4104
+      ],
+      "trunkRadius": 0.136,
+      "canopyRadius": 0.854
+    },
+    {
+      "id": "tree-quadra-a-13",
+      "area": "QUADRA_A",
+      "position": [
+        20.9018,
+        24.6764
+      ],
+      "sourcePosition": [
+        4308,
+        4106
+      ],
+      "trunkRadius": 0.124,
+      "canopyRadius": 0.788
+    },
+    {
+      "id": "tree-quadra-a-14",
+      "area": "QUADRA_A",
+      "position": [
+        22.5164,
+        24.5891
+      ],
+      "sourcePosition": [
+        4382,
+        4102
+      ],
+      "trunkRadius": 0.13,
+      "canopyRadius": 0.827
+    },
+    {
+      "id": "tree-quadra-a-15",
+      "area": "QUADRA_A",
+      "position": [
+        17.0618,
+        20.3564
+      ],
+      "sourcePosition": [
+        4132,
+        3908
+      ],
+      "trunkRadius": 0.123,
+      "canopyRadius": 0.774
+    },
+    {
+      "id": "tree-quadra-a-16",
+      "area": "QUADRA_A",
+      "position": [
+        18.5455,
+        19.5709
+      ],
+      "sourcePosition": [
+        4200,
+        3872
+      ],
+      "trunkRadius": 0.128,
+      "canopyRadius": 0.816
+    },
+    {
+      "id": "tree-quadra-a-17",
+      "area": "QUADRA_A",
+      "position": [
+        20.3345,
+        20.0945
+      ],
+      "sourcePosition": [
+        4282,
+        3896
+      ],
+      "trunkRadius": 0.126,
+      "canopyRadius": 0.792
+    },
+    {
+      "id": "tree-quadra-a-18",
+      "area": "QUADRA_A",
+      "position": [
+        22.6036,
+        20.6182
+      ],
+      "sourcePosition": [
+        4386,
+        3920
+      ],
+      "trunkRadius": 0.138,
+      "canopyRadius": 0.877
+    },
+    {
+      "id": "tree-quadra-a-19",
+      "area": "QUADRA_A",
+      "position": [
+        17.4545,
+        21.9709
+      ],
+      "sourcePosition": [
+        4150,
+        3982
+      ],
+      "trunkRadius": 0.154,
+      "canopyRadius": 0.979
+    },
+    {
+      "id": "tree-quadra-a-20",
+      "area": "QUADRA_A",
+      "position": [
+        18.3273,
+        23.6291
+      ],
+      "sourcePosition": [
+        4190,
+        4058
+      ],
+      "trunkRadius": 0.115,
+      "canopyRadius": 0.722
+    },
+    {
+      "id": "tree-quadra-a-21",
+      "area": "QUADRA_A",
+      "position": [
+        19.8545,
+        23.4545
+      ],
+      "sourcePosition": [
+        4260,
+        4050
+      ],
+      "trunkRadius": 0.125,
+      "canopyRadius": 0.796
+    },
+    {
+      "id": "tree-quadra-a-22",
+      "area": "QUADRA_A",
+      "position": [
+        21.3818,
+        23.0618
+      ],
+      "sourcePosition": [
+        4330,
+        4032
+      ],
+      "trunkRadius": 0.123,
+      "canopyRadius": 0.774
+    },
+    {
+      "id": "tree-quadra-b-01",
+      "area": "QUADRA_B",
+      "position": [
+        19.1564,
+        12.3273
+      ],
+      "sourcePosition": [
+        4228,
+        3540
+      ],
+      "trunkRadius": 0.093,
+      "canopyRadius": 0.583
+    },
+    {
+      "id": "tree-quadra-b-02",
+      "area": "QUADRA_B",
+      "position": [
+        20.9455,
+        12.2836
+      ],
+      "sourcePosition": [
+        4310,
+        3538
+      ],
+      "trunkRadius": 0.097,
+      "canopyRadius": 0.611
+    },
+    {
+      "id": "tree-quadra-b-03",
+      "area": "QUADRA_B",
+      "position": [
+        22.7782,
+        12.3709
+      ],
+      "sourcePosition": [
+        4394,
+        3542
+      ],
+      "trunkRadius": 0.102,
+      "canopyRadius": 0.64
+    },
+    {
+      "id": "tree-quadra-b-04",
+      "area": "QUADRA_B",
+      "position": [
+        24.4364,
+        12.3273
+      ],
+      "sourcePosition": [
+        4470,
+        3540
+      ],
+      "trunkRadius": 0.106,
+      "canopyRadius": 0.668
+    },
+    {
+      "id": "tree-quadra-b-05",
+      "area": "QUADRA_B",
+      "position": [
+        19.3091,
+        13.8545
+      ],
+      "sourcePosition": [
+        4235,
+        3610
+      ],
+      "trunkRadius": 0.125,
+      "canopyRadius": 0.796
+    },
+    {
+      "id": "tree-quadra-b-06",
+      "area": "QUADRA_B",
+      "position": [
+        21.8182,
+        13.0691
+      ],
+      "sourcePosition": [
+        4350,
+        3574
+      ],
+      "trunkRadius": 0.106,
+      "canopyRadius": 0.669
+    },
+    {
+      "id": "tree-quadra-b-07",
+      "area": "QUADRA_B",
+      "position": [
+        22.6909,
+        13.9855
+      ],
+      "sourcePosition": [
+        4390,
+        3616
+      ],
+      "trunkRadius": 0.132,
+      "canopyRadius": 0.827
+    },
+    {
+      "id": "tree-quadra-b-08",
+      "area": "QUADRA_B",
+      "position": [
+        24.4364,
+        13.8982
+      ],
+      "sourcePosition": [
+        4470,
+        3612
+      ],
+      "trunkRadius": 0.122,
+      "canopyRadius": 0.775
+    },
+    {
+      "id": "tree-quadra-b-09",
+      "area": "QUADRA_B",
+      "position": [
+        19.5273,
+        15.3818
+      ],
+      "sourcePosition": [
+        4245,
+        3680
+      ],
+      "trunkRadius": 0.104,
+      "canopyRadius": 0.651
+    },
+    {
+      "id": "tree-quadra-b-10",
+      "area": "QUADRA_B",
+      "position": [
+        21.3818,
+        15.0764
+      ],
+      "sourcePosition": [
+        4330,
+        3666
+      ],
+      "trunkRadius": 0.138,
+      "canopyRadius": 0.877
+    },
+    {
+      "id": "tree-quadra-b-11",
+      "area": "QUADRA_B",
+      "position": [
+        23.1273,
+        15.12
+      ],
+      "sourcePosition": [
+        4410,
+        3668
+      ],
+      "trunkRadius": 0.112,
+      "canopyRadius": 0.704
+    },
+    {
+      "id": "tree-quadra-b-12",
+      "area": "QUADRA_B",
+      "position": [
+        24.48,
+        15.2727
+      ],
+      "sourcePosition": [
+        4472,
+        3675
+      ],
+      "trunkRadius": 0.098,
+      "canopyRadius": 0.616
+    },
+    {
+      "id": "tree-parking-west-01",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        26.8364,
+        7.3091
+      ],
+      "sourcePosition": [
+        4580,
+        3310
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.013
+    },
+    {
+      "id": "tree-parking-west-02",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        29.6727,
+        7.4836
+      ],
+      "sourcePosition": [
+        4710,
+        3318
+      ],
+      "trunkRadius": 0.146,
+      "canopyRadius": 0.917
+    },
+    {
+      "id": "tree-parking-west-03",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        32.5091,
+        7.6145
+      ],
+      "sourcePosition": [
+        4840,
+        3324
+      ],
+      "trunkRadius": 0.175,
+      "canopyRadius": 1.113
+    },
+    {
+      "id": "tree-parking-west-04",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        35.3455,
+        7.7455
+      ],
+      "sourcePosition": [
+        4970,
+        3330
+      ],
+      "trunkRadius": 0.182,
+      "canopyRadius": 1.162
+    },
+    {
+      "id": "tree-parking-west-05",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        38.1818,
+        7.8764
+      ],
+      "sourcePosition": [
+        5100,
+        3336
+      ],
+      "trunkRadius": 0.19,
+      "canopyRadius": 1.212
+    },
+    {
+      "id": "tree-parking-west-06",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        40.9091,
+        7.9636
+      ],
+      "sourcePosition": [
+        5225,
+        3340
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.013
+    },
+    {
+      "id": "tree-parking-west-07",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        26.6182,
+        10.1455
+      ],
+      "sourcePosition": [
+        4570,
+        3440
+      ],
+      "trunkRadius": 0.146,
+      "canopyRadius": 0.917
+    },
+    {
+      "id": "tree-parking-west-08",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        26.5091,
+        13.2
+      ],
+      "sourcePosition": [
+        4565,
+        3580
+      ],
+      "trunkRadius": 0.175,
+      "canopyRadius": 1.113
+    },
+    {
+      "id": "tree-parking-west-09",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        26.4,
+        16.2545
+      ],
+      "sourcePosition": [
+        4560,
+        3720
+      ],
+      "trunkRadius": 0.182,
+      "canopyRadius": 1.162
+    },
+    {
+      "id": "tree-parking-west-10",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        26.2909,
+        19.3091
+      ],
+      "sourcePosition": [
+        4555,
+        3860
+      ],
+      "trunkRadius": 0.19,
+      "canopyRadius": 1.212
+    },
+    {
+      "id": "tree-parking-west-11",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        26.1818,
+        22.3636
+      ],
+      "sourcePosition": [
+        4550,
+        4000
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.013
+    },
+    {
+      "id": "tree-parking-west-12",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        29.2364,
+        23.4545
+      ],
+      "sourcePosition": [
+        4690,
+        4050
+      ],
+      "trunkRadius": 0.146,
+      "canopyRadius": 0.917
+    },
+    {
+      "id": "tree-parking-west-13",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        32.2909,
+        23.5636
+      ],
+      "sourcePosition": [
+        4830,
+        4055
+      ],
+      "trunkRadius": 0.175,
+      "canopyRadius": 1.113
+    },
+    {
+      "id": "tree-parking-west-14",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        35.3455,
+        23.6727
+      ],
+      "sourcePosition": [
+        4970,
+        4060
+      ],
+      "trunkRadius": 0.182,
+      "canopyRadius": 1.162
+    },
+    {
+      "id": "tree-parking-west-15",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        38.4,
+        23.7818
+      ],
+      "sourcePosition": [
+        5110,
+        4065
+      ],
+      "trunkRadius": 0.19,
+      "canopyRadius": 1.212
+    },
+    {
+      "id": "tree-parking-west-16",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        40.6909,
+        23.4545
+      ],
+      "sourcePosition": [
+        5215,
+        4050
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.013
+    },
+    {
+      "id": "tree-parking-west-17",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        41.4545,
+        10.8
+      ],
+      "sourcePosition": [
+        5250,
+        3470
+      ],
+      "trunkRadius": 0.146,
+      "canopyRadius": 0.917
+    },
+    {
+      "id": "tree-parking-west-18",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        41.2364,
+        13.8545
+      ],
+      "sourcePosition": [
+        5240,
+        3610
+      ],
+      "trunkRadius": 0.175,
+      "canopyRadius": 1.113
+    },
+    {
+      "id": "tree-parking-west-19",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        41.1273,
+        16.9091
+      ],
+      "sourcePosition": [
+        5235,
+        3750
+      ],
+      "trunkRadius": 0.182,
+      "canopyRadius": 1.162
+    },
+    {
+      "id": "tree-parking-west-20",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        40.9091,
+        19.9636
+      ],
+      "sourcePosition": [
+        5225,
+        3890
+      ],
+      "trunkRadius": 0.19,
+      "canopyRadius": 1.212
+    },
+    {
+      "id": "tree-parking-west-21",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        27.0545,
+        5.6727
+      ],
+      "sourcePosition": [
+        4590,
+        3235
+      ],
+      "trunkRadius": 0.124,
+      "canopyRadius": 0.777
+    },
+    {
+      "id": "tree-parking-west-22",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        30.3273,
+        5.7818
+      ],
+      "sourcePosition": [
+        4740,
+        3240
+      ],
+      "trunkRadius": 0.13,
+      "canopyRadius": 0.815
+    },
+    {
+      "id": "tree-parking-west-23",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        33.6,
+        5.9345
+      ],
+      "sourcePosition": [
+        4890,
+        3247
+      ],
+      "trunkRadius": 0.136,
+      "canopyRadius": 0.853
+    },
+    {
+      "id": "tree-parking-west-24",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        36.8727,
+        6.0436
+      ],
+      "sourcePosition": [
+        5040,
+        3252
+      ],
+      "trunkRadius": 0.142,
+      "canopyRadius": 0.891
+    },
+    {
+      "id": "tree-parking-west-25",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        40.0364,
+        6.1527
+      ],
+      "sourcePosition": [
+        5185,
+        3257
+      ],
+      "trunkRadius": 0.148,
+      "canopyRadius": 0.929
+    },
+    {
+      "id": "tree-parking-west-26",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        28.5818,
+        11.0182
+      ],
+      "sourcePosition": [
+        4660,
+        3480
+      ],
+      "trunkRadius": 0.165,
+      "canopyRadius": 1.051
+    },
+    {
+      "id": "tree-parking-west-27",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        31.6364,
+        11.1927
+      ],
+      "sourcePosition": [
+        4800,
+        3488
+      ],
+      "trunkRadius": 0.151,
+      "canopyRadius": 0.951
+    },
+    {
+      "id": "tree-parking-west-28",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        34.6909,
+        11.3236
+      ],
+      "sourcePosition": [
+        4940,
+        3494
+      ],
+      "trunkRadius": 0.181,
+      "canopyRadius": 1.154
+    },
+    {
+      "id": "tree-parking-west-29",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        37.7455,
+        11.4545
+      ],
+      "sourcePosition": [
+        5080,
+        3500
+      ],
+      "trunkRadius": 0.189,
+      "canopyRadius": 1.205
+    },
+    {
+      "id": "tree-parking-west-30",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        29.0182,
+        14.7273
+      ],
+      "sourcePosition": [
+        4680,
+        3650
+      ],
+      "trunkRadius": 0.197,
+      "canopyRadius": 1.257
+    },
+    {
+      "id": "tree-parking-west-31",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        32.0727,
+        14.9018
+      ],
+      "sourcePosition": [
+        4820,
+        3658
+      ],
+      "trunkRadius": 0.165,
+      "canopyRadius": 1.051
+    },
+    {
+      "id": "tree-parking-west-32",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        35.1273,
+        15.0327
+      ],
+      "sourcePosition": [
+        4960,
+        3664
+      ],
+      "trunkRadius": 0.151,
+      "canopyRadius": 0.951
+    },
+    {
+      "id": "tree-parking-west-33",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        38.1818,
+        15.1636
+      ],
+      "sourcePosition": [
+        5100,
+        3670
+      ],
+      "trunkRadius": 0.181,
+      "canopyRadius": 1.154
+    },
+    {
+      "id": "tree-parking-west-34",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        28.5818,
+        18.4364
+      ],
+      "sourcePosition": [
+        4660,
+        3820
+      ],
+      "trunkRadius": 0.189,
+      "canopyRadius": 1.205
+    },
+    {
+      "id": "tree-parking-west-35",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        31.6364,
+        18.6109
+      ],
+      "sourcePosition": [
+        4800,
+        3828
+      ],
+      "trunkRadius": 0.197,
+      "canopyRadius": 1.257
+    },
+    {
+      "id": "tree-parking-west-36",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        34.6909,
+        18.7418
+      ],
+      "sourcePosition": [
+        4940,
+        3834
+      ],
+      "trunkRadius": 0.165,
+      "canopyRadius": 1.051
+    },
+    {
+      "id": "tree-parking-west-37",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        37.7455,
+        18.8727
+      ],
+      "sourcePosition": [
+        5080,
+        3840
+      ],
+      "trunkRadius": 0.151,
+      "canopyRadius": 0.951
+    },
+    {
+      "id": "tree-parking-west-38",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        29.8909,
+        21.9273
+      ],
+      "sourcePosition": [
+        4720,
+        3980
+      ],
+      "trunkRadius": 0.181,
+      "canopyRadius": 1.154
+    },
+    {
+      "id": "tree-parking-west-39",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        33.6,
+        22.1018
+      ],
+      "sourcePosition": [
+        4890,
+        3988
+      ],
+      "trunkRadius": 0.189,
+      "canopyRadius": 1.205
+    },
+    {
+      "id": "tree-parking-west-40",
+      "area": "PARKING_EXHIBITORS_VISITORS",
+      "position": [
+        37.3091,
+        22.2545
+      ],
+      "sourcePosition": [
+        5060,
+        3995
+      ],
+      "trunkRadius": 0.197,
+      "canopyRadius": 1.257
+    },
+    {
+      "id": "tree-parking-east-01",
+      "area": "PARKING_VISITORS",
+      "position": [
+        45.2727,
+        10.8436
+      ],
+      "sourcePosition": [
+        5425,
+        3472
+      ],
+      "trunkRadius": 0.155,
+      "canopyRadius": 0.985
+    },
+    {
+      "id": "tree-parking-east-02",
+      "area": "PARKING_VISITORS",
+      "position": [
+        47.7818,
+        11.1273
+      ],
+      "sourcePosition": [
+        5540,
+        3485
+      ],
+      "trunkRadius": 0.142,
+      "canopyRadius": 0.892
+    },
+    {
+      "id": "tree-parking-east-03",
+      "area": "PARKING_VISITORS",
+      "position": [
+        50.4,
+        11.4109
+      ],
+      "sourcePosition": [
+        5660,
+        3498
+      ],
+      "trunkRadius": 0.17,
+      "canopyRadius": 1.082
+    },
+    {
+      "id": "tree-parking-east-04",
+      "area": "PARKING_VISITORS",
+      "position": [
+        53.0182,
+        11.6727
+      ],
+      "sourcePosition": [
+        5780,
+        3510
+      ],
+      "trunkRadius": 0.177,
+      "canopyRadius": 1.13
+    },
+    {
+      "id": "tree-parking-east-05",
+      "area": "PARKING_VISITORS",
+      "position": [
+        55.4182,
+        12
+      ],
+      "sourcePosition": [
+        5890,
+        3525
+      ],
+      "trunkRadius": 0.185,
+      "canopyRadius": 1.178
+    },
+    {
+      "id": "tree-parking-east-06",
+      "area": "PARKING_VISITORS",
+      "position": [
+        44.5091,
+        13.4182
+      ],
+      "sourcePosition": [
+        5390,
+        3590
+      ],
+      "trunkRadius": 0.155,
+      "canopyRadius": 0.985
+    },
+    {
+      "id": "tree-parking-east-07",
+      "area": "PARKING_VISITORS",
+      "position": [
+        44.5091,
+        16.6909
+      ],
+      "sourcePosition": [
+        5390,
+        3740
+      ],
+      "trunkRadius": 0.142,
+      "canopyRadius": 0.892
+    },
+    {
+      "id": "tree-parking-east-08",
+      "area": "PARKING_VISITORS",
+      "position": [
+        44.4,
+        19.9636
+      ],
+      "sourcePosition": [
+        5385,
+        3890
+      ],
+      "trunkRadius": 0.17,
+      "canopyRadius": 1.082
+    },
+    {
+      "id": "tree-parking-east-09",
+      "area": "PARKING_VISITORS",
+      "position": [
+        44.2909,
+        23.4545
+      ],
+      "sourcePosition": [
+        5380,
+        4050
+      ],
+      "trunkRadius": 0.177,
+      "canopyRadius": 1.13
+    },
+    {
+      "id": "tree-parking-east-10",
+      "area": "PARKING_VISITORS",
+      "position": [
+        56.1818,
+        13.8545
+      ],
+      "sourcePosition": [
+        5925,
+        3610
+      ],
+      "trunkRadius": 0.185,
+      "canopyRadius": 1.178
+    },
+    {
+      "id": "tree-parking-east-11",
+      "area": "PARKING_VISITORS",
+      "position": [
+        55.8545,
+        17.5636
+      ],
+      "sourcePosition": [
+        5910,
+        3780
+      ],
+      "trunkRadius": 0.155,
+      "canopyRadius": 0.985
+    },
+    {
+      "id": "tree-parking-east-12",
+      "area": "PARKING_VISITORS",
+      "position": [
+        55.5273,
+        21.4909
+      ],
+      "sourcePosition": [
+        5895,
+        3960
+      ],
+      "trunkRadius": 0.142,
+      "canopyRadius": 0.892
+    },
+    {
+      "id": "tree-parking-east-13",
+      "area": "PARKING_VISITORS",
+      "position": [
+        55.0909,
+        25.4182
+      ],
+      "sourcePosition": [
+        5875,
+        4140
+      ],
+      "trunkRadius": 0.17,
+      "canopyRadius": 1.082
+    },
+    {
+      "id": "tree-parking-east-14",
+      "area": "PARKING_VISITORS",
+      "position": [
+        46.4727,
+        25.6364
+      ],
+      "sourcePosition": [
+        5480,
+        4150
+      ],
+      "trunkRadius": 0.177,
+      "canopyRadius": 1.13
+    },
+    {
+      "id": "tree-parking-east-15",
+      "area": "PARKING_VISITORS",
+      "position": [
+        49.3091,
+        26.0291
+      ],
+      "sourcePosition": [
+        5610,
+        4168
+      ],
+      "trunkRadius": 0.185,
+      "canopyRadius": 1.178
+    },
+    {
+      "id": "tree-parking-east-16",
+      "area": "PARKING_VISITORS",
+      "position": [
+        52.1455,
+        26.4655
+      ],
+      "sourcePosition": [
+        5740,
+        4188
+      ],
+      "trunkRadius": 0.155,
+      "canopyRadius": 0.985
+    },
+    {
+      "id": "tree-parking-east-17",
+      "area": "PARKING_VISITORS",
+      "position": [
+        45.0545,
+        9.3818
+      ],
+      "sourcePosition": [
+        5415,
+        3405
+      ],
+      "trunkRadius": 0.126,
+      "canopyRadius": 0.793
+    },
+    {
+      "id": "tree-parking-east-18",
+      "area": "PARKING_VISITORS",
+      "position": [
+        48,
+        9.7091
+      ],
+      "sourcePosition": [
+        5550,
+        3420
+      ],
+      "trunkRadius": 0.132,
+      "canopyRadius": 0.832
+    },
+    {
+      "id": "tree-parking-east-19",
+      "area": "PARKING_VISITORS",
+      "position": [
+        50.9455,
+        10.1018
+      ],
+      "sourcePosition": [
+        5685,
+        3438
+      ],
+      "trunkRadius": 0.139,
+      "canopyRadius": 0.871
+    },
+    {
+      "id": "tree-parking-east-20",
+      "area": "PARKING_VISITORS",
+      "position": [
+        53.8909,
+        10.4727
+      ],
+      "sourcePosition": [
+        5820,
+        3455
+      ],
+      "trunkRadius": 0.145,
+      "canopyRadius": 0.91
+    },
+    {
+      "id": "tree-parking-east-21",
+      "area": "PARKING_VISITORS",
+      "position": [
+        46.6909,
+        14.2909
+      ],
+      "sourcePosition": [
+        5490,
+        3630
+      ],
+      "trunkRadius": 0.162,
+      "canopyRadius": 1.032
+    },
+    {
+      "id": "tree-parking-east-22",
+      "area": "PARKING_VISITORS",
+      "position": [
+        49.5273,
+        14.64
+      ],
+      "sourcePosition": [
+        5620,
+        3646
+      ],
+      "trunkRadius": 0.149,
+      "canopyRadius": 0.934
+    },
+    {
+      "id": "tree-parking-east-23",
+      "area": "PARKING_VISITORS",
+      "position": [
+        52.3636,
+        14.9891
+      ],
+      "sourcePosition": [
+        5750,
+        3662
+      ],
+      "trunkRadius": 0.178,
+      "canopyRadius": 1.133
+    },
+    {
+      "id": "tree-parking-east-24",
+      "area": "PARKING_VISITORS",
+      "position": [
+        46.6909,
+        18.4364
+      ],
+      "sourcePosition": [
+        5490,
+        3820
+      ],
+      "trunkRadius": 0.186,
+      "canopyRadius": 1.184
+    },
+    {
+      "id": "tree-parking-east-25",
+      "area": "PARKING_VISITORS",
+      "position": [
+        49.5273,
+        18.8291
+      ],
+      "sourcePosition": [
+        5620,
+        3838
+      ],
+      "trunkRadius": 0.194,
+      "canopyRadius": 1.234
+    },
+    {
+      "id": "tree-parking-east-26",
+      "area": "PARKING_VISITORS",
+      "position": [
+        52.3636,
+        19.2
+      ],
+      "sourcePosition": [
+        5750,
+        3855
+      ],
+      "trunkRadius": 0.162,
+      "canopyRadius": 1.032
+    },
+    {
+      "id": "tree-parking-east-27",
+      "area": "PARKING_VISITORS",
+      "position": [
+        46.6909,
+        22.5818
+      ],
+      "sourcePosition": [
+        5490,
+        4010
+      ],
+      "trunkRadius": 0.149,
+      "canopyRadius": 0.934
+    },
+    {
+      "id": "tree-parking-east-28",
+      "area": "PARKING_VISITORS",
+      "position": [
+        49.5273,
+        22.9745
+      ],
+      "sourcePosition": [
+        5620,
+        4028
+      ],
+      "trunkRadius": 0.178,
+      "canopyRadius": 1.133
+    },
+    {
+      "id": "tree-parking-east-29",
+      "area": "PARKING_VISITORS",
+      "position": [
+        52.3636,
+        23.3455
+      ],
+      "sourcePosition": [
+        5750,
+        4045
+      ],
+      "trunkRadius": 0.186,
+      "canopyRadius": 1.184
+    },
+    {
+      "id": "tree-pavilions-1-14-01",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -49.5273,
+        6.9818
+      ],
+      "sourcePosition": [
+        1080,
+        3295
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.107
+    },
+    {
+      "id": "tree-pavilions-1-14-02",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -45.7091,
+        7.3091
+      ],
+      "sourcePosition": [
+        1255,
+        3310
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.002
+    },
+    {
+      "id": "tree-pavilions-1-14-03",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -42,
+        6.8727
+      ],
+      "sourcePosition": [
+        1425,
+        3290
+      ],
+      "trunkRadius": 0.191,
+      "canopyRadius": 1.216
+    },
+    {
+      "id": "tree-pavilions-1-14-04",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -38.0727,
+        7.5273
+      ],
+      "sourcePosition": [
+        1605,
+        3320
+      ],
+      "trunkRadius": 0.199,
+      "canopyRadius": 1.27
+    },
+    {
+      "id": "tree-pavilions-1-14-05",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -34.0364,
+        7.0909
+      ],
+      "sourcePosition": [
+        1790,
+        3300
+      ],
+      "trunkRadius": 0.208,
+      "canopyRadius": 1.324
+    },
+    {
+      "id": "tree-pavilions-1-14-06",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -30.1091,
+        7.7018
+      ],
+      "sourcePosition": [
+        1970,
+        3328
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.107
+    },
+    {
+      "id": "tree-pavilions-1-14-07",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -40.1455,
+        6
+      ],
+      "sourcePosition": [
+        1510,
+        3250
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.002
+    },
+    {
+      "id": "tree-pavilions-1-14-08",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -23.3455,
+        7.7455
+      ],
+      "sourcePosition": [
+        2280,
+        3330
+      ],
+      "trunkRadius": 0.191,
+      "canopyRadius": 1.216
+    },
+    {
+      "id": "tree-pavilions-1-14-09",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -50.9455,
+        9.8182
+      ],
+      "sourcePosition": [
+        1015,
+        3425
+      ],
+      "trunkRadius": 0.199,
+      "canopyRadius": 1.27
+    },
+    {
+      "id": "tree-pavilions-1-14-10",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -47.6727,
+        10.2545
+      ],
+      "sourcePosition": [
+        1165,
+        3445
+      ],
+      "trunkRadius": 0.208,
+      "canopyRadius": 1.324
+    },
+    {
+      "id": "tree-pavilions-1-14-11",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -43.9636,
+        9.6655
+      ],
+      "sourcePosition": [
+        1335,
+        3418
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.107
+    },
+    {
+      "id": "tree-pavilions-1-14-12",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -40.3636,
+        10.4073
+      ],
+      "sourcePosition": [
+        1500,
+        3452
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.002
+    },
+    {
+      "id": "tree-pavilions-1-14-13",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -36.6545,
+        9.9709
+      ],
+      "sourcePosition": [
+        1670,
+        3432
+      ],
+      "trunkRadius": 0.191,
+      "canopyRadius": 1.216
+    },
+    {
+      "id": "tree-pavilions-1-14-14",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -32.8364,
+        10.5818
+      ],
+      "sourcePosition": [
+        1845,
+        3460
+      ],
+      "trunkRadius": 0.199,
+      "canopyRadius": 1.27
+    },
+    {
+      "id": "tree-pavilions-1-14-15",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -29.2364,
+        9.8836
+      ],
+      "sourcePosition": [
+        2010,
+        3428
+      ],
+      "trunkRadius": 0.208,
+      "canopyRadius": 1.324
+    },
+    {
+      "id": "tree-pavilions-1-14-16",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -25.6364,
+        10.3636
+      ],
+      "sourcePosition": [
+        2175,
+        3450
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.107
+    },
+    {
+      "id": "tree-pavilions-1-14-17",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -22.6909,
+        9.9273
+      ],
+      "sourcePosition": [
+        2310,
+        3430
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.002
+    },
+    {
+      "id": "tree-pavilions-1-14-18",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -50.4,
+        12.5018
+      ],
+      "sourcePosition": [
+        1040,
+        3548
+      ],
+      "trunkRadius": 0.191,
+      "canopyRadius": 1.216
+    },
+    {
+      "id": "tree-pavilions-1-14-19",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -47.2364,
+        13.0255
+      ],
+      "sourcePosition": [
+        1185,
+        3572
+      ],
+      "trunkRadius": 0.199,
+      "canopyRadius": 1.27
+    },
+    {
+      "id": "tree-pavilions-1-14-20",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -43.9636,
+        12.2836
+      ],
+      "sourcePosition": [
+        1335,
+        3538
+      ],
+      "trunkRadius": 0.208,
+      "canopyRadius": 1.324
+    },
+    {
+      "id": "tree-pavilions-1-14-21",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -40.8,
+        13.2
+      ],
+      "sourcePosition": [
+        1480,
+        3580
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.107
+    },
+    {
+      "id": "tree-pavilions-1-14-22",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -37.6364,
+        12.5455
+      ],
+      "sourcePosition": [
+        1625,
+        3550
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.002
+    },
+    {
+      "id": "tree-pavilions-1-14-23",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -34.3636,
+        13.3309
+      ],
+      "sourcePosition": [
+        1775,
+        3586
+      ],
+      "trunkRadius": 0.191,
+      "canopyRadius": 1.216
+    },
+    {
+      "id": "tree-pavilions-1-14-24",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -31.2,
+        12.3709
+      ],
+      "sourcePosition": [
+        1920,
+        3542
+      ],
+      "trunkRadius": 0.199,
+      "canopyRadius": 1.27
+    },
+    {
+      "id": "tree-pavilions-1-14-25",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -27.9273,
+        12.9818
+      ],
+      "sourcePosition": [
+        2070,
+        3570
+      ],
+      "trunkRadius": 0.208,
+      "canopyRadius": 1.324
+    },
+    {
+      "id": "tree-pavilions-1-14-26",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -24.8727,
+        12.5891
+      ],
+      "sourcePosition": [
+        2210,
+        3552
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.107
+    },
+    {
+      "id": "tree-pavilions-1-14-27",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -50.6182,
+        15.3818
+      ],
+      "sourcePosition": [
+        1030,
+        3680
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.002
+    },
+    {
+      "id": "tree-pavilions-1-14-28",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -47.7818,
+        14.6836
+      ],
+      "sourcePosition": [
+        1160,
+        3648
+      ],
+      "trunkRadius": 0.191,
+      "canopyRadius": 1.216
+    },
+    {
+      "id": "tree-pavilions-1-14-29",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -44.9455,
+        15.6436
+      ],
+      "sourcePosition": [
+        1290,
+        3692
+      ],
+      "trunkRadius": 0.199,
+      "canopyRadius": 1.27
+    },
+    {
+      "id": "tree-pavilions-1-14-30",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -42,
+        14.9455
+      ],
+      "sourcePosition": [
+        1425,
+        3660
+      ],
+      "trunkRadius": 0.208,
+      "canopyRadius": 1.324
+    },
+    {
+      "id": "tree-pavilions-1-14-31",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -39.2727,
+        15.8182
+      ],
+      "sourcePosition": [
+        1550,
+        3700
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.107
+    },
+    {
+      "id": "tree-pavilions-1-14-32",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -36.3273,
+        14.8364
+      ],
+      "sourcePosition": [
+        1685,
+        3655
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.002
+    },
+    {
+      "id": "tree-pavilions-1-14-33",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -33.6,
+        15.6
+      ],
+      "sourcePosition": [
+        1810,
+        3690
+      ],
+      "trunkRadius": 0.191,
+      "canopyRadius": 1.216
+    },
+    {
+      "id": "tree-pavilions-1-14-34",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -30.7636,
+        15.12
+      ],
+      "sourcePosition": [
+        1940,
+        3668
+      ],
+      "trunkRadius": 0.199,
+      "canopyRadius": 1.27
+    },
+    {
+      "id": "tree-pavilions-1-14-35",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -27.8182,
+        15.9273
+      ],
+      "sourcePosition": [
+        2075,
+        3705
+      ],
+      "trunkRadius": 0.208,
+      "canopyRadius": 1.324
+    },
+    {
+      "id": "tree-pavilions-1-14-36",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -24.8727,
+        15.2727
+      ],
+      "sourcePosition": [
+        2210,
+        3675
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.107
+    },
+    {
+      "id": "tree-pavilions-1-14-37",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -49.7455,
+        17.8909
+      ],
+      "sourcePosition": [
+        1070,
+        3795
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.002
+    },
+    {
+      "id": "tree-pavilions-1-14-38",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -46.3636,
+        18.6545
+      ],
+      "sourcePosition": [
+        1225,
+        3830
+      ],
+      "trunkRadius": 0.191,
+      "canopyRadius": 1.216
+    },
+    {
+      "id": "tree-pavilions-1-14-39",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -43.0909,
+        17.7382
+      ],
+      "sourcePosition": [
+        1375,
+        3788
+      ],
+      "trunkRadius": 0.199,
+      "canopyRadius": 1.27
+    },
+    {
+      "id": "tree-pavilions-1-14-40",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -39.6,
+        18.5455
+      ],
+      "sourcePosition": [
+        1535,
+        3825
+      ],
+      "trunkRadius": 0.208,
+      "canopyRadius": 1.324
+    },
+    {
+      "id": "tree-pavilions-1-14-41",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -36.2182,
+        18
+      ],
+      "sourcePosition": [
+        1690,
+        3800
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.107
+    },
+    {
+      "id": "tree-pavilions-1-14-42",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -32.9455,
+        18.8727
+      ],
+      "sourcePosition": [
+        1840,
+        3840
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.002
+    },
+    {
+      "id": "tree-pavilions-1-14-43",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -29.5636,
+        17.8255
+      ],
+      "sourcePosition": [
+        1995,
+        3792
+      ],
+      "trunkRadius": 0.191,
+      "canopyRadius": 1.216
+    },
+    {
+      "id": "tree-pavilions-1-14-44",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -26.4,
+        18.6109
+      ],
+      "sourcePosition": [
+        2140,
+        3828
+      ],
+      "trunkRadius": 0.199,
+      "canopyRadius": 1.27
+    },
+    {
+      "id": "tree-pavilions-1-14-45",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -25.0909,
+        18.1091
+      ],
+      "sourcePosition": [
+        2200,
+        3805
+      ],
+      "trunkRadius": 0.208,
+      "canopyRadius": 1.324
+    },
+    {
+      "id": "tree-pavilions-1-14-46",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -51.0545,
+        20.6182
+      ],
+      "sourcePosition": [
+        1010,
+        3920
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.107
+    },
+    {
+      "id": "tree-pavilions-1-14-47",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -47.7818,
+        21.4909
+      ],
+      "sourcePosition": [
+        1160,
+        3960
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.002
+    },
+    {
+      "id": "tree-pavilions-1-14-48",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -44.2909,
+        20.7927
+      ],
+      "sourcePosition": [
+        1320,
+        3928
+      ],
+      "trunkRadius": 0.191,
+      "canopyRadius": 1.216
+    },
+    {
+      "id": "tree-pavilions-1-14-49",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -40.6909,
+        21.7091
+      ],
+      "sourcePosition": [
+        1485,
+        3970
+      ],
+      "trunkRadius": 0.199,
+      "canopyRadius": 1.27
+    },
+    {
+      "id": "tree-pavilions-1-14-50",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -37.0909,
+        21.0109
+      ],
+      "sourcePosition": [
+        1650,
+        3938
+      ],
+      "trunkRadius": 0.208,
+      "canopyRadius": 1.324
+    },
+    {
+      "id": "tree-pavilions-1-14-51",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -33.4909,
+        21.9273
+      ],
+      "sourcePosition": [
+        1815,
+        3980
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.107
+    },
+    {
+      "id": "tree-pavilions-1-14-52",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -30.1091,
+        21.0982
+      ],
+      "sourcePosition": [
+        1970,
+        3942
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.002
+    },
+    {
+      "id": "tree-pavilions-1-14-53",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -26.6182,
+        21.7527
+      ],
+      "sourcePosition": [
+        2130,
+        3972
+      ],
+      "trunkRadius": 0.191,
+      "canopyRadius": 1.216
+    },
+    {
+      "id": "tree-pavilions-1-14-54",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -23.7818,
+        21.0545
+      ],
+      "sourcePosition": [
+        2260,
+        3940
+      ],
+      "trunkRadius": 0.199,
+      "canopyRadius": 1.27
+    },
+    {
+      "id": "tree-pavilions-1-14-55",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -51.7091,
+        21.9273
+      ],
+      "sourcePosition": [
+        980,
+        3980
+      ],
+      "trunkRadius": 0.208,
+      "canopyRadius": 1.324
+    },
+    {
+      "id": "tree-pavilions-1-14-56",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -49.5273,
+        23.4545
+      ],
+      "sourcePosition": [
+        1080,
+        4050
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.107
+    },
+    {
+      "id": "tree-pavilions-1-14-57",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -46.0364,
+        22.9091
+      ],
+      "sourcePosition": [
+        1240,
+        4025
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.002
+    },
+    {
+      "id": "tree-pavilions-1-14-58",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -42.4364,
+        23.8909
+      ],
+      "sourcePosition": [
+        1405,
+        4070
+      ],
+      "trunkRadius": 0.191,
+      "canopyRadius": 1.216
+    },
+    {
+      "id": "tree-pavilions-1-14-59",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -38.8364,
+        23.2364
+      ],
+      "sourcePosition": [
+        1570,
+        4040
+      ],
+      "trunkRadius": 0.199,
+      "canopyRadius": 1.27
+    },
+    {
+      "id": "tree-pavilions-1-14-60",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -35.1273,
+        24.1091
+      ],
+      "sourcePosition": [
+        1740,
+        4080
+      ],
+      "trunkRadius": 0.208,
+      "canopyRadius": 1.324
+    },
+    {
+      "id": "tree-pavilions-1-14-61",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -31.6364,
+        23.4109
+      ],
+      "sourcePosition": [
+        1900,
+        4048
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.107
+    },
+    {
+      "id": "tree-pavilions-1-14-62",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -28.1455,
+        24.1527
+      ],
+      "sourcePosition": [
+        2060,
+        4082
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.002
+    },
+    {
+      "id": "tree-pavilions-1-14-63",
+      "area": "PAVILIONS_1_14_GROVE",
+      "position": [
+        -24.7636,
+        23.5636
+      ],
+      "sourcePosition": [
+        2215,
+        4055
+      ],
+      "trunkRadius": 0.191,
+      "canopyRadius": 1.216
+    },
+    {
+      "id": "tree-rua-brasil-01",
+      "area": "RUA_BRASIL_GROVE",
+      "position": [
+        -36.9818,
+        4.7345
+      ],
+      "sourcePosition": [
+        1655,
+        3192
+      ],
+      "trunkRadius": 0.134,
+      "canopyRadius": 0.842
+    },
+    {
+      "id": "tree-rua-brasil-02",
+      "area": "RUA_BRASIL_GROVE",
+      "position": [
+        -35.6727,
+        5.2364
+      ],
+      "sourcePosition": [
+        1715,
+        3215
+      ],
+      "trunkRadius": 0.141,
+      "canopyRadius": 0.883
+    },
+    {
+      "id": "tree-rua-brasil-03",
+      "area": "RUA_BRASIL_GROVE",
+      "position": [
+        -34.1455,
+        4.6473
+      ],
+      "sourcePosition": [
+        1785,
+        3188
+      ],
+      "trunkRadius": 0.147,
+      "canopyRadius": 0.924
+    },
+    {
+      "id": "tree-rua-brasil-04",
+      "area": "RUA_BRASIL_GROVE",
+      "position": [
+        -32.9455,
+        5.0836
+      ],
+      "sourcePosition": [
+        1840,
+        3208
+      ],
+      "trunkRadius": 0.154,
+      "canopyRadius": 0.966
+    },
+    {
+      "id": "tree-rua-brasil-05",
+      "area": "RUA_BRASIL_GROVE",
+      "position": [
+        -31.3091,
+        4.6691
+      ],
+      "sourcePosition": [
+        1915,
+        3189
+      ],
+      "trunkRadius": 0.16,
+      "canopyRadius": 1.007
+    },
+    {
+      "id": "tree-rua-brasil-06",
+      "area": "RUA_BRASIL_GROVE",
+      "position": [
+        -30.1091,
+        5.3236
+      ],
+      "sourcePosition": [
+        1970,
+        3219
+      ],
+      "trunkRadius": 0.134,
+      "canopyRadius": 0.842
+    },
+    {
+      "id": "tree-rua-brasil-07",
+      "area": "RUA_BRASIL_GROVE",
+      "position": [
+        -28.4727,
+        4.6909
+      ],
+      "sourcePosition": [
+        2045,
+        3190
+      ],
+      "trunkRadius": 0.141,
+      "canopyRadius": 0.883
+    },
+    {
+      "id": "tree-rua-brasil-08",
+      "area": "RUA_BRASIL_GROVE",
+      "position": [
+        -27.0545,
+        5.2145
+      ],
+      "sourcePosition": [
+        2110,
+        3214
+      ],
+      "trunkRadius": 0.147,
+      "canopyRadius": 0.924
+    },
+    {
+      "id": "tree-rua-brasil-09",
+      "area": "RUA_BRASIL_GROVE",
+      "position": [
+        -25.7455,
+        4.6691
+      ],
+      "sourcePosition": [
+        2170,
+        3189
+      ],
+      "trunkRadius": 0.154,
+      "canopyRadius": 0.966
+    },
+    {
+      "id": "tree-rua-brasil-10",
+      "area": "RUA_BRASIL_GROVE",
+      "position": [
+        -24.1091,
+        5.3018
+      ],
+      "sourcePosition": [
+        2245,
+        3218
+      ],
+      "trunkRadius": 0.16,
+      "canopyRadius": 1.007
+    },
+    {
+      "id": "tree-rua-brasil-11",
+      "area": "RUA_BRASIL_GROVE",
+      "position": [
+        -22.9091,
+        4.7782
+      ],
+      "sourcePosition": [
+        2300,
+        3194
+      ],
+      "trunkRadius": 0.134,
+      "canopyRadius": 0.842
+    },
+    {
+      "id": "tree-rua-brasil-12",
+      "area": "RUA_BRASIL_GROVE",
+      "position": [
+        -21.3818,
+        5.3455
+      ],
+      "sourcePosition": [
+        2370,
+        3220
+      ],
+      "trunkRadius": 0.141,
+      "canopyRadius": 0.883
+    },
+    {
+      "id": "tree-terceira-idade-01",
+      "area": "TERCEIRA_IDADE_EDGE",
+      "position": [
+        -56.0727,
+        11.3455
+      ],
+      "sourcePosition": [
+        780,
+        3495
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.013
+    },
+    {
+      "id": "tree-terceira-idade-02",
+      "area": "TERCEIRA_IDADE_EDGE",
+      "position": [
+        -53.8909,
+        11.3455
+      ],
+      "sourcePosition": [
+        880,
+        3495
+      ],
+      "trunkRadius": 0.146,
+      "canopyRadius": 0.917
+    },
+    {
+      "id": "tree-terceira-idade-03",
+      "area": "TERCEIRA_IDADE_EDGE",
+      "position": [
+        -52.0364,
+        13.2
+      ],
+      "sourcePosition": [
+        965,
+        3580
+      ],
+      "trunkRadius": 0.175,
+      "canopyRadius": 1.113
+    },
+    {
+      "id": "tree-terceira-idade-04",
+      "area": "TERCEIRA_IDADE_EDGE",
+      "position": [
+        -51.9273,
+        15.3818
+      ],
+      "sourcePosition": [
+        970,
+        3680
+      ],
+      "trunkRadius": 0.182,
+      "canopyRadius": 1.162
+    },
+    {
+      "id": "tree-terceira-idade-05",
+      "area": "TERCEIRA_IDADE_EDGE",
+      "position": [
+        -51.9273,
+        17.5636
+      ],
+      "sourcePosition": [
+        970,
+        3780
+      ],
+      "trunkRadius": 0.19,
+      "canopyRadius": 1.212
+    },
+    {
+      "id": "tree-terceira-idade-06",
+      "area": "TERCEIRA_IDADE_EDGE",
+      "position": [
+        -57.6,
+        13.2
+      ],
+      "sourcePosition": [
+        710,
+        3580
+      ],
+      "trunkRadius": 0.159,
+      "canopyRadius": 1.013
+    },
+    {
+      "id": "tree-terceira-idade-07",
+      "area": "TERCEIRA_IDADE_EDGE",
+      "position": [
+        -57.7091,
+        16.0364
+      ],
+      "sourcePosition": [
+        705,
+        3710
+      ],
+      "trunkRadius": 0.146,
+      "canopyRadius": 0.917
+    },
+    {
+      "id": "tree-terceira-idade-08",
+      "area": "TERCEIRA_IDADE_EDGE",
+      "position": [
+        -55.8545,
+        19.5273
+      ],
+      "sourcePosition": [
+        790,
+        3870
+      ],
+      "trunkRadius": 0.175,
+      "canopyRadius": 1.113
+    },
+    {
+      "id": "tree-terceira-idade-09",
+      "area": "TERCEIRA_IDADE_EDGE",
+      "position": [
+        -53.8909,
+        19.5273
+      ],
+      "sourcePosition": [
+        880,
+        3870
+      ],
+      "trunkRadius": 0.182,
+      "canopyRadius": 1.162
+    },
+    {
+      "id": "tree-gate-four-01",
+      "area": "GATE_FOUR_DISTRICT",
+      "position": [
+        -43.6364,
+        -20.6182
+      ],
+      "sourcePosition": [
+        1350,
+        2030
+      ],
+      "trunkRadius": 0.136,
+      "canopyRadius": 0.87
+    },
+    {
+      "id": "tree-gate-four-02",
+      "area": "GATE_FOUR_DISTRICT",
+      "position": [
+        -42.3273,
+        -20.6182
+      ],
+      "sourcePosition": [
+        1410,
+        2030
+      ],
+      "trunkRadius": 0.152,
+      "canopyRadius": 0.945
+    },
+    {
+      "id": "tree-gate-four-03",
+      "area": "GATE_FOUR_DISTRICT",
+      "position": [
+        -41.1273,
+        -22.5818
+      ],
+      "sourcePosition": [
+        1465,
+        1940
+      ],
+      "trunkRadius": 0.13,
+      "canopyRadius": 0.815
+    },
+    {
+      "id": "tree-gate-four-04",
+      "area": "GATE_FOUR_DISTRICT",
+      "position": [
+        -43.6364,
+        -17.7818
+      ],
+      "sourcePosition": [
+        1350,
+        2160
+      ],
+      "trunkRadius": 0.18,
+      "canopyRadius": 1.146
+    },
+    {
+      "id": "tree-gate-four-05",
+      "area": "GATE_FOUR_DISTRICT",
+      "position": [
+        -42,
+        -16.9091
+      ],
+      "sourcePosition": [
+        1425,
+        2200
+      ],
+      "trunkRadius": 0.175,
+      "canopyRadius": 1.116
+    },
+    {
+      "id": "tree-gate-four-06",
+      "area": "GATE_FOUR_DISTRICT",
+      "position": [
+        -43.0909,
+        -15.0545
+      ],
+      "sourcePosition": [
+        1375,
+        2285
+      ],
+      "trunkRadius": 0.127,
+      "canopyRadius": 0.786
+    },
+    {
+      "id": "tree-gate-four-07",
+      "area": "GATE_FOUR_DISTRICT",
+      "position": [
+        -41.4545,
+        -13.2
+      ],
+      "sourcePosition": [
+        1450,
+        2370
+      ],
+      "trunkRadius": 0.15,
+      "canopyRadius": 0.943
+    },
+    {
+      "id": "tree-gate-four-08",
+      "area": "GATE_FOUR_DISTRICT",
+      "position": [
+        -38.8364,
+        -12.9818
+      ],
+      "sourcePosition": [
+        1570,
+        2380
+      ],
+      "trunkRadius": 0.151,
+      "canopyRadius": 0.965
+    },
+    {
+      "id": "tree-gate-four-09",
+      "area": "GATE_FOUR_DISTRICT",
+      "position": [
+        -45.6,
+        -17.4545
+      ],
+      "sourcePosition": [
+        1260,
+        2175
+      ],
+      "trunkRadius": 0.183,
+      "canopyRadius": 1.167
+    },
+    {
+      "id": "tree-gate-four-10",
+      "area": "GATE_FOUR_DISTRICT",
+      "position": [
+        -45.4909,
+        -14.4
+      ],
+      "sourcePosition": [
+        1265,
+        2315
+      ],
+      "trunkRadius": 0.143,
+      "canopyRadius": 0.897
+    },
+    {
+      "id": "tree-nations-01",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        25.6364,
+        28.5164
+      ],
+      "sourcePosition": [
+        4525,
+        4282
+      ],
+      "trunkRadius": 0.134,
+      "canopyRadius": 0.857
+    },
+    {
+      "id": "tree-nations-02",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        27.4909,
+        28.1236
+      ],
+      "sourcePosition": [
+        4610,
+        4264
+      ],
+      "trunkRadius": 0.162,
+      "canopyRadius": 1.03
+    },
+    {
+      "id": "tree-nations-03",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        29.4982,
+        28.2982
+      ],
+      "sourcePosition": [
+        4702,
+        4272
+      ],
+      "trunkRadius": 0.125,
+      "canopyRadius": 0.783
+    },
+    {
+      "id": "tree-nations-04",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        30.5455,
+        29.2364
+      ],
+      "sourcePosition": [
+        4750,
+        4315
+      ],
+      "trunkRadius": 0.17,
+      "canopyRadius": 1.081
+    },
+    {
+      "id": "tree-nations-05",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        38.6618,
+        28.4727
+      ],
+      "sourcePosition": [
+        5122,
+        4280
+      ],
+      "trunkRadius": 0.15,
+      "canopyRadius": 0.959
+    },
+    {
+      "id": "tree-nations-06",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        40.5382,
+        28.0364
+      ],
+      "sourcePosition": [
+        5208,
+        4260
+      ],
+      "trunkRadius": 0.178,
+      "canopyRadius": 1.132
+    },
+    {
+      "id": "tree-nations-07",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        42.3709,
+        28.6909
+      ],
+      "sourcePosition": [
+        5292,
+        4290
+      ],
+      "trunkRadius": 0.158,
+      "canopyRadius": 1.01
+    },
+    {
+      "id": "tree-nations-08",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        42.8073,
+        30.8727
+      ],
+      "sourcePosition": [
+        5312,
+        4390
+      ],
+      "trunkRadius": 0.122,
+      "canopyRadius": 0.766
+    },
+    {
+      "id": "tree-nations-09",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        42.9818,
+        32.9455
+      ],
+      "sourcePosition": [
+        5320,
+        4485
+      ],
+      "trunkRadius": 0.166,
+      "canopyRadius": 1.061
+    },
+    {
+      "id": "tree-nations-10",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        42.7636,
+        35.0182
+      ],
+      "sourcePosition": [
+        5310,
+        4580
+      ],
+      "trunkRadius": 0.147,
+      "canopyRadius": 0.938
+    },
+    {
+      "id": "tree-nations-11",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        42.9382,
+        37.3091
+      ],
+      "sourcePosition": [
+        5318,
+        4685
+      ],
+      "trunkRadius": 0.174,
+      "canopyRadius": 1.112
+    },
+    {
+      "id": "tree-nations-12",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        42.5891,
+        39.7091
+      ],
+      "sourcePosition": [
+        5302,
+        4795
+      ],
+      "trunkRadius": 0.155,
+      "canopyRadius": 0.989
+    },
+    {
+      "id": "tree-nations-13",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        42.2182,
+        41.8909
+      ],
+      "sourcePosition": [
+        5285,
+        4895
+      ],
+      "trunkRadius": 0.119,
+      "canopyRadius": 0.748
+    },
+    {
+      "id": "tree-nations-14",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        42.7636,
+        44.1818
+      ],
+      "sourcePosition": [
+        5310,
+        5000
+      ],
+      "trunkRadius": 0.163,
+      "canopyRadius": 1.04
+    },
+    {
+      "id": "tree-nations-15",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        40.8,
+        46.1018
+      ],
+      "sourcePosition": [
+        5220,
+        5088
+      ],
+      "trunkRadius": 0.144,
+      "canopyRadius": 0.918
+    },
+    {
+      "id": "tree-nations-16",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        39.1636,
+        46.8436
+      ],
+      "sourcePosition": [
+        5145,
+        5122
+      ],
+      "trunkRadius": 0.171,
+      "canopyRadius": 1.091
+    },
+    {
+      "id": "tree-nations-17",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        37.2,
+        47.2364
+      ],
+      "sourcePosition": [
+        5055,
+        5140
+      ],
+      "trunkRadius": 0.152,
+      "canopyRadius": 0.969
+    },
+    {
+      "id": "tree-nations-18",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        35.1273,
+        47.4109
+      ],
+      "sourcePosition": [
+        4960,
+        5148
+      ],
+      "trunkRadius": 0.157,
+      "canopyRadius": 0.986
+    },
+    {
+      "id": "tree-nations-19",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        33.12,
+        47.1927
+      ],
+      "sourcePosition": [
+        4868,
+        5138
+      ],
+      "trunkRadius": 0.16,
+      "canopyRadius": 1.02
+    },
+    {
+      "id": "tree-nations-20",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        31.1564,
+        46.8
+      ],
+      "sourcePosition": [
+        4778,
+        5120
+      ],
+      "trunkRadius": 0.141,
+      "canopyRadius": 0.898
+    },
+    {
+      "id": "tree-nations-21",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        29.2364,
+        46.1891
+      ],
+      "sourcePosition": [
+        4690,
+        5092
+      ],
+      "trunkRadius": 0.168,
+      "canopyRadius": 1.071
+    },
+    {
+      "id": "tree-nations-22",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        25.4836,
+        32.2909
+      ],
+      "sourcePosition": [
+        4518,
+        4455
+      ],
+      "trunkRadius": 0.149,
+      "canopyRadius": 0.949
+    },
+    {
+      "id": "tree-nations-23",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        25.2655,
+        35.6291
+      ],
+      "sourcePosition": [
+        4508,
+        4608
+      ],
+      "trunkRadius": 0.154,
+      "canopyRadius": 0.968
+    },
+    {
+      "id": "tree-nations-24",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        25.7891,
+        39.0545
+      ],
+      "sourcePosition": [
+        4532,
+        4765
+      ],
+      "trunkRadius": 0.157,
+      "canopyRadius": 1
+    },
+    {
+      "id": "tree-nations-25",
+      "area": "NATIONS_DISTRICT",
+      "position": [
+        25.4182,
+        42.4364
+      ],
+      "sourcePosition": [
+        4515,
+        4920
+      ],
+      "trunkRadius": 0.138,
+      "canopyRadius": 0.877
+    }
+  ],
+  "ambientFull": [
+    {
+      "sourceZoneId": "benvenuto-tree-band-b5",
+      "position": [
+        -0.04359999999999997,
+        24.298
+      ],
+      "rotation": 1.4693957513398512,
+      "scale": [
+        0.8303981711649437,
+        0.9897828589415001,
+        0.8168006723575023
+      ]
+    },
+    {
+      "sourceZoneId": "benvenuto-tree-band-b5",
+      "position": [
+        0.5673,
+        24.2692
+      ],
+      "rotation": 1.483104554395048,
+      "scale": [
+        0.7363732604591336,
+        0.8918962737253157,
+        0.7837998840562488
+      ]
+    },
+    {
+      "sourceZoneId": "benvenuto-tree-band-b5",
+      "position": [
+        1.1782,
+        24.298
+      ],
+      "rotation": 1.5010483982694298,
+      "scale": [
+        0.7469818330885777,
+        0.8514714071993972,
+        0.6674907819180265
+      ]
+    },
+    {
+      "sourceZoneId": "third-age-access-dense-tree-band",
+      "position": [
+        -59.75032900967413,
+        9.08515287486646
+      ],
+      "rotation": 0.25347897676158454,
+      "scale": [
+        0.841720931267011,
+        0.9535298965030932,
+        0.9590564963647467
+      ]
+    },
+    {
+      "sourceZoneId": "third-age-access-dense-tree-band",
+      "position": [
+        -59.52140334620734,
+        10.267110491194313
+      ],
+      "rotation": 0.12053404355382069,
+      "scale": [
+        0.8250849991982053,
+        0.865701913965764,
+        0.7814578399582831
+      ]
+    },
+    {
+      "sourceZoneId": "third-age-access-dense-tree-band",
+      "position": [
+        -58.79406723406283,
+        11.145876658097025
+      ],
+      "rotation": 0.8027005408513751,
+      "scale": [
+        0.6839487239767043,
+        0.7684469806357926,
+        0.7479552773850965
+      ]
+    },
+    {
+      "sourceZoneId": "third-age-access-sparse-tree-band",
+      "position": [
+        -58.40309266766542,
+        9.650381828712986
+      ],
+      "rotation": 0.2563161977456655,
+      "scale": [
+        0.6992881803976451,
+        0.7036801941352081,
+        0.7908626155577928
+      ]
+    },
+    {
+      "sourceZoneId": "third-age-access-sparse-tree-band",
+      "position": [
+        -57.11271343820114,
+        11.033919806268734
+      ],
+      "rotation": 0.7133153876472693,
+      "scale": [
+        0.7613857122393337,
+        0.7042685218258761,
+        0.676066246825578
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -58.062704485410585,
+        4.14427951047281
+      ],
+      "rotation": 2.849312083220581,
+      "scale": [
+        1.0195080050780743,
+        1.24477449796765,
+        1.0300886048194091
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -57.25996703437623,
+        0.20434170984588887
+      ],
+      "rotation": 3.1487400330112942,
+      "scale": [
+        1.2411809819042658,
+        1.3157464076951437,
+        1.1480607174660369
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -56.755991277434504,
+        -3.803892197225664
+      ],
+      "rotation": 2.9730003907998177,
+      "scale": [
+        1.1269871417975186,
+        1.2600492300929327,
+        1.2250225232275425
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -56.630721223407974,
+        -7.841160300624741
+      ],
+      "rotation": 3.0377868093785505,
+      "scale": [
+        0.8720456487502761,
+        1.037539315896367,
+        0.8635637703158943
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -56.10048008735371,
+        -11.846706046597436
+      ],
+      "rotation": 3.010692886619416,
+      "scale": [
+        0.9404932602931281,
+        1.0305390606355942,
+        0.9594262309045154
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -53.885058699146605,
+        -27.822395150812333
+      ],
+      "rotation": 2.9302481875250614,
+      "scale": [
+        0.7455372561170406,
+        0.9217872833964211,
+        0.814918177554005
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -51.44406804524595,
+        -30.961824859728267
+      ],
+      "rotation": 2.409870143583112,
+      "scale": [
+        0.937619221901211,
+        0.971345845773918,
+        0.92843389114699
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -47.554909106412346,
+        -31.399333849923448
+      ],
+      "rotation": 1.5427391399279469,
+      "scale": [
+        1.0596802643406322,
+        1.1321963930815,
+        1.0889600428159119
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -43.520076112355554,
+        -31.602695753975972
+      ],
+      "rotation": 1.475976202929097,
+      "scale": [
+        1.1358430443029972,
+        1.1867874641047602,
+        0.9838579333995957
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-field-side-trees",
+      "position": [
+        -54.5496829438505,
+        -4.30799630384628
+      ],
+      "rotation": 3.150286408418908,
+      "scale": [
+        0.8644647344595839,
+        0.8643310331936667,
+        0.9489592437912574
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-field-side-trees",
+      "position": [
+        -53.89473574446158,
+        -10.834097717187715
+      ],
+      "rotation": 3.111871419810642,
+      "scale": [
+        0.7340821111035333,
+        0.6415573889140199,
+        0.7119652427197357
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-field-side-trees",
+      "position": [
+        -49.57897842802336,
+        -29.258071719513207
+      ],
+      "rotation": 1.6766782941347627,
+      "scale": [
+        0.7390193296847486,
+        0.7083618341969781,
+        0.685260062655948
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-field-side-trees",
+      "position": [
+        -43.02762422472055,
+        -29.111768495805066
+      ],
+      "rotation": 1.5776713736406154,
+      "scale": [
+        0.9570635345067886,
+        0.8437697270117336,
+        0.9194510646744385
+      ]
+    },
+    {
+      "sourceZoneId": "pavilions-14-12-courtyard-tree",
+      "position": [
+        -13.636363636363637,
+        20.214545556024095
+      ],
+      "radius": 0.3216000000000006,
+      "rootOpening": [
+        [
+          -13.314763636363637,
+          20.214545556024095
+        ],
+        [
+          -13.339243978708007,
+          20.33761654787271
+        ],
+        [
+          -13.408958095534043,
+          20.44195109685369
+        ],
+        [
+          -13.513292644515024,
+          20.511665213679727
+        ],
+        [
+          -13.636363636363637,
+          20.536145556024096
+        ],
+        [
+          -13.759434628212249,
+          20.511665213679727
+        ],
+        [
+          -13.86376917719323,
+          20.44195109685369
+        ],
+        [
+          -13.933483294019267,
+          20.33761654787271
+        ],
+        [
+          -13.957963636363637,
+          20.214545556024095
+        ],
+        [
+          -13.933483294019267,
+          20.09147456417548
+        ],
+        [
+          -13.86376917719323,
+          19.987140015194502
+        ],
+        [
+          -13.75943462821225,
+          19.917425898368464
+        ],
+        [
+          -13.636363636363637,
+          19.892945556024095
+        ],
+        [
+          -13.513292644515024,
+          19.917425898368464
+        ],
+        [
+          -13.408958095534043,
+          19.987140015194502
+        ],
+        [
+          -13.339243978708007,
+          20.09147456417548
+        ],
+        [
+          -13.314763636363637,
+          20.214545556024095
+        ]
+      ],
+      "rotation": 0.35,
+      "scale": [
+        1.85,
+        1.12,
+        1.85
+      ]
+    },
+    {
+      "sourceZoneId": "pavilion-1-sidewalk-tree",
+      "position": [
+        -14.711563634094198,
+        16.13672735373495
+      ],
+      "radius": 0.27447272865060146,
+      "rootOpening": [
+        [
+          -14.437090905443597,
+          16.13672735373495
+        ],
+        [
+          -14.457983897861382,
+          16.241763519625575
+        ],
+        [
+          -14.517482106414581,
+          16.330808881414566
+        ],
+        [
+          -14.606527468203574,
+          16.390307089967767
+        ],
+        [
+          -14.711563634094198,
+          16.41120008238555
+        ],
+        [
+          -14.816599799984822,
+          16.390307089967767
+        ],
+        [
+          -14.905645161773814,
+          16.330808881414566
+        ],
+        [
+          -14.965143370327013,
+          16.241763519625575
+        ],
+        [
+          -14.986036362744798,
+          16.13672735373495
+        ],
+        [
+          -14.965143370327013,
+          16.031691187844327
+        ],
+        [
+          -14.905645161773814,
+          15.942645826055335
+        ],
+        [
+          -14.816599799984822,
+          15.883147617502136
+        ],
+        [
+          -14.711563634094198,
+          15.86225462508435
+        ],
+        [
+          -14.606527468203574,
+          15.883147617502136
+        ],
+        [
+          -14.517482106414581,
+          15.942645826055335
+        ],
+        [
+          -14.457983897861382,
+          16.031691187844327
+        ],
+        [
+          -14.437090905443597,
+          16.13672735373495
+        ]
+      ],
+      "rotation": 0.62,
+      "scale": [
+        1.2,
+        1.05,
+        1.2
+      ]
+    }
+  ],
+  "ambientReduced": [
+    {
+      "sourceZoneId": "benvenuto-tree-band-b5",
+      "position": [
+        -0.04359999999999997,
+        24.298
+      ],
+      "rotation": 1.4693957513398512,
+      "scale": [
+        0.8303981711649437,
+        0.9897828589415001,
+        0.8168006723575023
+      ]
+    },
+    {
+      "sourceZoneId": "benvenuto-tree-band-b5",
+      "position": [
+        0.5673,
+        24.2692
+      ],
+      "rotation": 1.483104554395048,
+      "scale": [
+        0.7363732604591336,
+        0.8918962737253157,
+        0.7837998840562488
+      ]
+    },
+    {
+      "sourceZoneId": "benvenuto-tree-band-b5",
+      "position": [
+        1.1782,
+        24.298
+      ],
+      "rotation": 1.5010483982694298,
+      "scale": [
+        0.7469818330885777,
+        0.8514714071993972,
+        0.6674907819180265
+      ]
+    },
+    {
+      "sourceZoneId": "third-age-access-dense-tree-band",
+      "position": [
+        -59.75032900967413,
+        9.08515287486646
+      ],
+      "rotation": 0.25347897676158454,
+      "scale": [
+        0.841720931267011,
+        0.9535298965030932,
+        0.9590564963647467
+      ]
+    },
+    {
+      "sourceZoneId": "third-age-access-dense-tree-band",
+      "position": [
+        -59.52140334620734,
+        10.267110491194313
+      ],
+      "rotation": 0.12053404355382069,
+      "scale": [
+        0.8250849991982053,
+        0.865701913965764,
+        0.7814578399582831
+      ]
+    },
+    {
+      "sourceZoneId": "third-age-access-dense-tree-band",
+      "position": [
+        -58.79406723406283,
+        11.145876658097025
+      ],
+      "rotation": 0.8027005408513751,
+      "scale": [
+        0.6839487239767043,
+        0.7684469806357926,
+        0.7479552773850965
+      ]
+    },
+    {
+      "sourceZoneId": "third-age-access-sparse-tree-band",
+      "position": [
+        -58.40309266766542,
+        9.650381828712986
+      ],
+      "rotation": 0.2563161977456655,
+      "scale": [
+        0.6992881803976451,
+        0.7036801941352081,
+        0.7908626155577928
+      ]
+    },
+    {
+      "sourceZoneId": "third-age-access-sparse-tree-band",
+      "position": [
+        -57.11271343820114,
+        11.033919806268734
+      ],
+      "rotation": 0.7133153876472693,
+      "scale": [
+        0.7613857122393337,
+        0.7042685218258761,
+        0.676066246825578
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -58.062704485410585,
+        4.14427951047281
+      ],
+      "rotation": 2.849312083220581,
+      "scale": [
+        1.0195080050780743,
+        1.24477449796765,
+        1.0300886048194091
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -57.25996703437623,
+        0.20434170984588887
+      ],
+      "rotation": 3.1487400330112942,
+      "scale": [
+        1.2411809819042658,
+        1.3157464076951437,
+        1.1480607174660369
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -56.755991277434504,
+        -3.803892197225664
+      ],
+      "rotation": 2.9730003907998177,
+      "scale": [
+        1.1269871417975186,
+        1.2600492300929327,
+        1.2250225232275425
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -56.630721223407974,
+        -7.841160300624741
+      ],
+      "rotation": 3.0377868093785505,
+      "scale": [
+        0.8720456487502761,
+        1.037539315896367,
+        0.8635637703158943
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -56.10048008735371,
+        -11.846706046597436
+      ],
+      "rotation": 3.010692886619416,
+      "scale": [
+        0.9404932602931281,
+        1.0305390606355942,
+        0.9594262309045154
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -53.885058699146605,
+        -27.822395150812333
+      ],
+      "rotation": 2.9302481875250614,
+      "scale": [
+        0.7455372561170406,
+        0.9217872833964211,
+        0.814918177554005
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -51.44406804524595,
+        -30.961824859728267
+      ],
+      "rotation": 2.409870143583112,
+      "scale": [
+        0.937619221901211,
+        0.971345845773918,
+        0.92843389114699
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -47.554909106412346,
+        -31.399333849923448
+      ],
+      "rotation": 1.5427391399279469,
+      "scale": [
+        1.0596802643406322,
+        1.1321963930815,
+        1.0889600428159119
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-forest-side-trees",
+      "position": [
+        -43.520076112355554,
+        -31.602695753975972
+      ],
+      "rotation": 1.475976202929097,
+      "scale": [
+        1.1358430443029972,
+        1.1867874641047602,
+        0.9838579333995957
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-field-side-trees",
+      "position": [
+        -54.5496829438505,
+        -4.30799630384628
+      ],
+      "rotation": 3.150286408418908,
+      "scale": [
+        0.8644647344595839,
+        0.8643310331936667,
+        0.9489592437912574
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-field-side-trees",
+      "position": [
+        -53.89473574446158,
+        -10.834097717187715
+      ],
+      "rotation": 3.111871419810642,
+      "scale": [
+        0.7340821111035333,
+        0.6415573889140199,
+        0.7119652427197357
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-field-side-trees",
+      "position": [
+        -49.57897842802336,
+        -29.258071719513207
+      ],
+      "rotation": 1.6766782941347627,
+      "scale": [
+        0.7390193296847486,
+        0.7083618341969781,
+        0.685260062655948
+      ]
+    },
+    {
+      "sourceZoneId": "motorhome-road-field-side-trees",
+      "position": [
+        -43.02762422472055,
+        -29.111768495805066
+      ],
+      "rotation": 1.5776713736406154,
+      "scale": [
+        0.9570635345067886,
+        0.8437697270117336,
+        0.9194510646744385
+      ]
+    },
+    {
+      "sourceZoneId": "pavilions-14-12-courtyard-tree",
+      "position": [
+        -13.636363636363637,
+        20.214545556024095
+      ],
+      "radius": 0.3216000000000006,
+      "rootOpening": [
+        [
+          -13.314763636363637,
+          20.214545556024095
+        ],
+        [
+          -13.339243978708007,
+          20.33761654787271
+        ],
+        [
+          -13.408958095534043,
+          20.44195109685369
+        ],
+        [
+          -13.513292644515024,
+          20.511665213679727
+        ],
+        [
+          -13.636363636363637,
+          20.536145556024096
+        ],
+        [
+          -13.759434628212249,
+          20.511665213679727
+        ],
+        [
+          -13.86376917719323,
+          20.44195109685369
+        ],
+        [
+          -13.933483294019267,
+          20.33761654787271
+        ],
+        [
+          -13.957963636363637,
+          20.214545556024095
+        ],
+        [
+          -13.933483294019267,
+          20.09147456417548
+        ],
+        [
+          -13.86376917719323,
+          19.987140015194502
+        ],
+        [
+          -13.75943462821225,
+          19.917425898368464
+        ],
+        [
+          -13.636363636363637,
+          19.892945556024095
+        ],
+        [
+          -13.513292644515024,
+          19.917425898368464
+        ],
+        [
+          -13.408958095534043,
+          19.987140015194502
+        ],
+        [
+          -13.339243978708007,
+          20.09147456417548
+        ],
+        [
+          -13.314763636363637,
+          20.214545556024095
+        ]
+      ],
+      "rotation": 0.35,
+      "scale": [
+        1.85,
+        1.12,
+        1.85
+      ]
+    },
+    {
+      "sourceZoneId": "pavilion-1-sidewalk-tree",
+      "position": [
+        -14.711563634094198,
+        16.13672735373495
+      ],
+      "radius": 0.27447272865060146,
+      "rootOpening": [
+        [
+          -14.437090905443597,
+          16.13672735373495
+        ],
+        [
+          -14.457983897861382,
+          16.241763519625575
+        ],
+        [
+          -14.517482106414581,
+          16.330808881414566
+        ],
+        [
+          -14.606527468203574,
+          16.390307089967767
+        ],
+        [
+          -14.711563634094198,
+          16.41120008238555
+        ],
+        [
+          -14.816599799984822,
+          16.390307089967767
+        ],
+        [
+          -14.905645161773814,
+          16.330808881414566
+        ],
+        [
+          -14.965143370327013,
+          16.241763519625575
+        ],
+        [
+          -14.986036362744798,
+          16.13672735373495
+        ],
+        [
+          -14.965143370327013,
+          16.031691187844327
+        ],
+        [
+          -14.905645161773814,
+          15.942645826055335
+        ],
+        [
+          -14.816599799984822,
+          15.883147617502136
+        ],
+        [
+          -14.711563634094198,
+          15.86225462508435
+        ],
+        [
+          -14.606527468203574,
+          15.883147617502136
+        ],
+        [
+          -14.517482106414581,
+          15.942645826055335
+        ],
+        [
+          -14.457983897861382,
+          16.031691187844327
+        ],
+        [
+          -14.437090905443597,
+          16.13672735373495
+        ]
+      ],
+      "rotation": 0.62,
+      "scale": [
+        1.2,
+        1.05,
+        1.2
+      ]
+    }
+  ]
+}

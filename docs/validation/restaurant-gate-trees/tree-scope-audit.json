@@ -1,0 +1,175 @@
+{
+  "canonical": {
+    "count": 274,
+    "included": 274,
+    "excluded": []
+  },
+  "ambient": {
+    "count": 23,
+    "included": [
+      {
+        "zone": "benvenuto-tree-band-b5",
+        "position": [
+          -0.04359999999999997,
+          24.298
+        ]
+      },
+      {
+        "zone": "benvenuto-tree-band-b5",
+        "position": [
+          0.5673,
+          24.2692
+        ]
+      },
+      {
+        "zone": "benvenuto-tree-band-b5",
+        "position": [
+          1.1782,
+          24.298
+        ]
+      },
+      {
+        "zone": "third-age-access-dense-tree-band",
+        "position": [
+          -59.75032900967413,
+          9.08515287486646
+        ]
+      },
+      {
+        "zone": "third-age-access-dense-tree-band",
+        "position": [
+          -59.52140334620734,
+          10.267110491194313
+        ]
+      },
+      {
+        "zone": "third-age-access-dense-tree-band",
+        "position": [
+          -58.79406723406283,
+          11.145876658097025
+        ]
+      },
+      {
+        "zone": "third-age-access-sparse-tree-band",
+        "position": [
+          -58.40309266766542,
+          9.650381828712986
+        ]
+      },
+      {
+        "zone": "third-age-access-sparse-tree-band",
+        "position": [
+          -57.11271343820114,
+          11.033919806268734
+        ]
+      },
+      {
+        "zone": "motorhome-road-forest-side-trees",
+        "position": [
+          -56.10048008735371,
+          -11.846706046597436
+        ]
+      },
+      {
+        "zone": "motorhome-road-field-side-trees",
+        "position": [
+          -54.5496829438505,
+          -4.30799630384628
+        ]
+      },
+      {
+        "zone": "motorhome-road-field-side-trees",
+        "position": [
+          -53.89473574446158,
+          -10.834097717187715
+        ]
+      },
+      {
+        "zone": "pavilions-14-12-courtyard-tree",
+        "position": [
+          -13.636363636363637,
+          20.214545556024095
+        ]
+      },
+      {
+        "zone": "pavilion-1-sidewalk-tree",
+        "position": [
+          -14.711563634094198,
+          16.13672735373495
+        ]
+      }
+    ],
+    "excluded": [
+      {
+        "zone": "motorhome-road-forest-side-trees",
+        "position": [
+          -58.062704485410585,
+          4.14427951047281
+        ]
+      },
+      {
+        "zone": "motorhome-road-forest-side-trees",
+        "position": [
+          -57.25996703437623,
+          0.20434170984588887
+        ]
+      },
+      {
+        "zone": "motorhome-road-forest-side-trees",
+        "position": [
+          -56.755991277434504,
+          -3.803892197225664
+        ]
+      },
+      {
+        "zone": "motorhome-road-forest-side-trees",
+        "position": [
+          -56.630721223407974,
+          -7.841160300624741
+        ]
+      },
+      {
+        "zone": "motorhome-road-forest-side-trees",
+        "position": [
+          -53.885058699146605,
+          -27.822395150812333
+        ]
+      },
+      {
+        "zone": "motorhome-road-forest-side-trees",
+        "position": [
+          -51.44406804524595,
+          -30.961824859728267
+        ]
+      },
+      {
+        "zone": "motorhome-road-forest-side-trees",
+        "position": [
+          -47.554909106412346,
+          -31.399333849923448
+        ]
+      },
+      {
+        "zone": "motorhome-road-forest-side-trees",
+        "position": [
+          -43.520076112355554,
+          -31.602695753975972
+        ]
+      },
+      {
+        "zone": "motorhome-road-field-side-trees",
+        "position": [
+          -49.57897842802336,
+          -29.258071719513207
+        ]
+      },
+      {
+        "zone": "motorhome-road-field-side-trees",
+        "position": [
+          -43.02762422472055,
+          -29.111768495805066
+        ]
+      }
+    ]
+  }
+}
