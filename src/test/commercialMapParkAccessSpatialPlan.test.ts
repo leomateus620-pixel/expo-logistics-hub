@@ -769,7 +769,7 @@ describe('park access spatial plan', () => {
       expect(surface.adjacentOfficialIdentifiers?.length).toBeGreaterThan(0);
       nearbyFootprints.forEach(({ identifier, polygon }) => {
         expect(polygonClipping.intersection(
-          [[surface.polygon.map(p => [...p])]], [[polygon.map(p => [...p])]],
+          [[surface.polygon.map((p): [number, number] => [p[0], p[1]])]], [[polygon.map((p): [number, number] => [p[0], p[1]])]],
         ), `${surface.id}/${identifier}`).toEqual([]);
       });
       expect(pointInPolygon(PARK_ACCESS_SPATIAL_PLAN.anchors.gate2.point, surface.polygon))
@@ -803,7 +803,7 @@ describe('park access spatial plan', () => {
           .toBe(false);
       });
       PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.forEach((sidewalk) => {
-        expect(polygonClipping.intersection([[segment.polygon.map(p => [...p])]],
+        expect(polygonClipping.intersection([[segment.polygon.map((p): [number, number] => [p[0], p[1]])]],
           [[sidewalk.polygon, ...(sidewalk.holes ?? [])].map(r => r.map(p => [...p] as [number, number]))]),
         `${segment.id}/${sidewalk.id}`).toEqual([]);
       });
