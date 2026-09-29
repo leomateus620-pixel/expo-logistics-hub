@@ -667,7 +667,7 @@ export async function fetchCommercialMap(
     sourceMessage: project.isPublished ? null : 'Projeto cartográfico em rascunho. Alterações ainda não estão publicadas para toda a equipe.',
     project,
     calibration: calibrationResult.calibration,
-    layers: [...scopedLayers, ...contextLayers],
+    layers: (layersResult.data ?? []).map(mapLayer),
     entities,
     lots: lotRows.map(row => ({ ...mapLot(row), saleLogoUrl: row.status === 'SOLD' ? logoUrls[row.id] ?? null : null })),
   });
