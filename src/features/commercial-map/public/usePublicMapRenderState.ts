@@ -5,7 +5,7 @@ import {
   readLatestCommercialMapRenderHealth,
 } from '../utils/renderingHealth';
 
-export type PublicMapRenderState = 'preparing' | 'slow' | 'ready' | 'failed';
+export type PublicMapRenderState = 'preparing' | 'recovering' | 'slow' | 'ready' | 'failed';
 
 /** Tempo máximo tolerado até a primeira imagem antes de oferecer alternativa. */
 const SLOW_AFTER_MS = 12_000;
@@ -32,7 +32,9 @@ export function usePublicMapRenderState(enabled: boolean, attempt = 0): PublicMa
     }, SLOW_AFTER_MS);
 
     const read = () => {
-      const health = readLatestCommercialMapRenderHealth(publicCanvas());
+      const canvas = publicCanvas();
+      if (canvas?.dataset.commercialMapPreparationError) { setState('failed'); return; }
+      const health = readLatestCommercialMapRenderHealth(canvas);
       if (!health) return;
       if (health.status === 'failed') {
         setState('failed');
@@ -42,7 +44,9 @@ export function usePublicMapRenderState(enabled: boolean, attempt = 0): PublicMa
         if (slowTimer !== null) { window.clearTimeout(slowTimer); slowTimer = null; }
         setState('ready');
       } else if (health.status === 'context-lost' || health.status === 'recovering') {
-        setState('failed');
+        setState('recovering');
+      } else if (canvas?.dataset.commercialMapPreparing) {
+        setState(current => current === 'ready' ? 'preparing' : current);
       }
     };
 

@@ -314,7 +314,8 @@ describe('orientação visual das plantas internas comerciais', () => {
     expect(layer).toContain("const HTML_HOST_STYLE: CSSProperties = { pointerEvents: 'none' };");
     expect(layer).toContain('style={HTML_HOST_STYLE}');
     expect(layer).toContain('calculatePosition={calculateWayfindingMarkerPosition}');
-    expect(layer).toContain('THREE.MathUtils.clamp');
+    expect(layer).not.toContain('THREE.MathUtils.clamp');
+    expect(layer).toContain('dimensionRectsOverlap(box');
     expect(layer).toMatch(/event\.stopPropagation\(\);\s+lastPointerType.current = event.pointerType;/);
     expect(layer).toContain('geometry.dispose()');
     expect(layer).toContain('surface.dispose()');
@@ -336,7 +337,7 @@ describe('orientação visual das plantas internas comerciais', () => {
       'utf8',
     );
     const styles = readFileSync(
-      'src/features/commercial-map/commercial-map.css',
+      'src/features/commercial-map/components/canvas/pavilion-wayfinding.css',
       'utf8',
     );
 
@@ -350,8 +351,9 @@ describe('orientação visual das plantas internas comerciais', () => {
     expect(layer).toContain("if (pointerType === 'touch' && !active)");
     expect(layer).toContain("document.addEventListener('pointerdown', closeOnOutsidePointer, true)");
     expect(layer).toContain('}, [plan.publicIdentifier]);');
-    // Anchor and inset are untouched: the icon sits exactly where the pill sat.
-    expect(layer).toContain('position={[0, layout.interior.floorY + shortSide * 0.065, 0]}');
+    // Floor-level anchors avoid parallax; screen coordinates are never clamped.
+    expect(layer).toContain('position={[0, layout.interior.floorY + 0.05, 0]}');
+    expect(layer).toContain("import './pavilion-wayfinding.css'");
     expect(layer).toContain('const inset = Math.min(layout.interior.clearWidth, layout.interior.clearDepth) * 0.022;');
     expect(layer).not.toContain('distanceFactor');
 

@@ -5,10 +5,15 @@ import { useCommercialMapStore } from '../state/useCommercialMapStore';
 const pending = new WeakMap<THREE.WebGLRenderer, object>();
 const programPreparations = new WeakMap<THREE.WebGLRenderer, number>();
 interface PreparedProgram {
+  program?: WebGLProgram;
   isReady: () => boolean;
   getUniforms?: () => unknown;
   getAttributes?: () => unknown;
   diagnostics?: { runnable?: boolean };
+}
+
+export class RetiredSceneProgramError extends Error {
+  constructor() { super('SCENE_PROGRAM_RETIRED'); }
 }
 // Program instances change on context recovery. This cache retains no renderer,
 // material or disposed program and avoids repeating work in later layer jobs.
@@ -192,6 +197,7 @@ function prepareCompiledPrograms(
   return new Promise<void>((resolve, reject) => {
     let timer: ReturnType<typeof setTimeout> | undefined;
     let settled = false, reflecting = false, linksReady = false, synchronousMs = 0, maximumBatchMs = 0, batches = 0, initialized = 0;
+    let reportedPending = false;
     const startedAt = performance.now(), programCount = programs.size;
     const cleanup = () => {
       clearTimeout(timer);
@@ -214,10 +220,24 @@ function prepareCompiledPrograms(
       if (signal?.aborted) { abort(); return; }
       let batchPrograms = 0, batchMs = 0;
       try {
+        // Three clears .program on destroy(). Polling COMPLETION_STATUS_KHR on
+        // that deleted handle never completes on some drivers. Re-snapshot the
+        // current scene instead of qualifying an obsolete shader as prepared.
+        if ([...programs].some(program => 'program' in program && !program.program)) {
+          record('program-retired', { programCount });
+          throw new RetiredSceneProgramError();
+        }
+        if (performance.now() - startedAt > 20_000) throw new Error('SHADER_PREPARATION_TIMEOUT');
         if (!linksReady) {
           let allReady = true;
           for (const program of programs) if (!program.isReady()) allReady = false;
-          if (!allReady) { timer = setTimeout(check, 10); return; }
+          if (!allReady) {
+            if (!reportedPending && performance.now() - startedAt > 1000) {
+              reportedPending = true;
+              record('program-links-pending', { programCount, retiredPrograms: [...programs].filter(program => 'program' in program && !program.program).length });
+            }
+            timer = setTimeout(check, 10); return;
+          }
           linksReady = true;
           // A ready program's getProgramInfoLog still blocked the measured
           // driver for 5.65 s while another captured program was linking.

@@ -1,0 +1,572 @@
+{
+  "resilience": [
+    {
+      "name": "network",
+      "slug": "pavilhao-3",
+      "pass": true,
+      "assertions": [
+        "first ready without manual retry"
+      ],
+      "requests": {
+        "inventory": 2,
+        "context": 0,
+        "revision": 0
+      },
+      "errors": [],
+      "initial": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "final": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "sameCanvas": true,
+        "visibility": []
+      }
+    },
+    {
+      "name": "context-network",
+      "slug": "exporural",
+      "pass": true,
+      "assertions": [
+        "list and details usable before WebGL/context",
+        "first ready without manual retry"
+      ],
+      "requests": {
+        "inventory": 1,
+        "context": 2,
+        "revision": 0
+      },
+      "errors": [],
+      "initial": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 96,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "final": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 96,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "sameCanvas": true,
+        "visibility": []
+      }
+    },
+    {
+      "name": "unsupported",
+      "slug": "pavilhao-3",
+      "pass": true,
+      "assertions": [
+        "list and details usable before WebGL/context"
+      ],
+      "requests": {
+        "inventory": 1,
+        "context": 0,
+        "revision": 0
+      },
+      "errors": []
+    },
+    {
+      "name": "recovery",
+      "slug": "pavilhao-3",
+      "pass": true,
+      "assertions": [
+        "first ready without manual retry",
+        "real WEBGL_lose_context restored with sheet/camera preserved"
+      ],
+      "requests": {
+        "inventory": 1,
+        "context": 0,
+        "revision": 0
+      },
+      "errors": [],
+      "initial": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "final": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 52,
+          "contextLosses": 1,
+          "lastErrorCode": null
+        },
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "sameCanvas": true,
+        "visibility": []
+      }
+    },
+    {
+      "name": "loading-loss",
+      "slug": "pavilhao-3",
+      "pass": true,
+      "assertions": [
+        "first ready without manual retry"
+      ],
+      "requests": {
+        "inventory": 1,
+        "context": 0,
+        "revision": 0
+      },
+      "errors": [],
+      "initial": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1,
+          "contextLosses": 1,
+          "lastErrorCode": null
+        },
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "final": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1,
+          "contextLosses": 1,
+          "lastErrorCode": null
+        },
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "sameCanvas": true,
+        "visibility": []
+      }
+    },
+    {
+      "name": "refresh",
+      "slug": "pavilhao-3",
+      "pass": true,
+      "assertions": [
+        "first ready without manual retry",
+        "simulated hidden/visible lifecycle after browser tab activation",
+        "revision refresh keeps selection/interior, updates price/status, hides pending buyer"
+      ],
+      "requests": {
+        "inventory": 2,
+        "context": 0,
+        "revision": 1
+      },
+      "errors": [],
+      "initial": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "final": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 60,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "sameCanvas": true,
+        "visibility": [
+          "hidden",
+          "visible"
+        ]
+      }
+    },
+    {
+      "name": "external-refresh",
+      "slug": "exporural",
+      "pass": true,
+      "assertions": [
+        "first ready without manual retry",
+        "simulated hidden/visible lifecycle after browser tab activation",
+        "revision refresh keeps selection/interior, updates price/status, hides pending buyer"
+      ],
+      "requests": {
+        "inventory": 2,
+        "context": 1,
+        "revision": 1
+      },
+      "errors": [],
+      "initial": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 89,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "final": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 434,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "sameCanvas": true,
+        "visibility": [
+          "hidden",
+          "visible"
+        ]
+      }
+    },
+    {
+      "name": "delayed-frames",
+      "slug": "pavilhao-3",
+      "pass": true,
+      "assertions": [
+        "first ready without manual retry"
+      ],
+      "requests": {
+        "inventory": 1,
+        "context": 0,
+        "revision": 0
+      },
+      "errors": [],
+      "initial": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 5,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1
+      },
+      "final": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 5,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "sameCanvas": true,
+        "visibility": []
+      }
+    }
+  ],
+  "gestures": [
+    {
+      "slug": "pavilhao-1",
+      "pass": true,
+      "canvasPicking": true,
+      "errors": [],
+      "warm": {
+        "geometries": 7,
+        "textures": 4,
+        "programs": 9
+      },
+      "afterRepeated": {
+        "geometries": 7,
+        "textures": 4,
+        "programs": 9
+      },
+      "final": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 379,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "controlsEnabled": true
+      }
+    },
+    {
+      "slug": "pavilhao-3",
+      "pass": true,
+      "canvasPicking": true,
+      "errors": [],
+      "warm": {
+        "geometries": 7,
+        "textures": 3,
+        "programs": 8
+      },
+      "afterRepeated": {
+        "geometries": 7,
+        "textures": 3,
+        "programs": 8
+      },
+      "final": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 409,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "controlsEnabled": true
+      }
+    },
+    {
+      "slug": "pavilhao-5",
+      "pass": true,
+      "canvasPicking": false,
+      "errors": [],
+      "warm": {
+        "geometries": 6,
+        "textures": 4,
+        "programs": 7
+      },
+      "afterRepeated": {
+        "geometries": 6,
+        "textures": 4,
+        "programs": 7
+      },
+      "final": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 365,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "controlsEnabled": true
+      }
+    },
+    {
+      "slug": "pavilhao-8",
+      "pass": true,
+      "canvasPicking": false,
+      "errors": [],
+      "warm": {
+        "geometries": 7,
+        "textures": 4,
+        "programs": 9
+      },
+      "afterRepeated": {
+        "geometries": 7,
+        "textures": 4,
+        "programs": 9
+      },
+      "final": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 364,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "controlsEnabled": true
+      }
+    },
+    {
+      "slug": "pavilhao-12",
+      "pass": true,
+      "canvasPicking": false,
+      "errors": [],
+      "warm": {
+        "geometries": 6,
+        "textures": 4,
+        "programs": 8
+      },
+      "afterRepeated": {
+        "geometries": 6,
+        "textures": 4,
+        "programs": 8
+      },
+      "final": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 358,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "controlsEnabled": true
+      }
+    },
+    {
+      "slug": "pavilhao-13",
+      "pass": true,
+      "canvasPicking": false,
+      "errors": [],
+      "warm": {
+        "geometries": 10,
+        "textures": 4,
+        "programs": 9
+      },
+      "afterRepeated": {
+        "geometries": 10,
+        "textures": 4,
+        "programs": 9
+      },
+      "final": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 370,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "controlsEnabled": true
+      }
+    },
+    {
+      "slug": "pavilhao-14",
+      "pass": true,
+      "canvasPicking": false,
+      "errors": [],
+      "warm": {
+        "geometries": 6,
+        "textures": 3,
+        "programs": 8
+      },
+      "afterRepeated": {
+        "geometries": 6,
+        "textures": 3,
+        "programs": 8
+      },
+      "final": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 349,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "controlsEnabled": true
+      }
+    },
+    {
+      "slug": "exporural",
+      "pass": true,
+      "canvasPicking": false,
+      "errors": [],
+      "final": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 247,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "controlsEnabled": true
+      }
+    },
+    {
+      "slug": "industria-comercio-servicos-externo",
+      "pass": true,
+      "canvasPicking": false,
+      "errors": [],
+      "final": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 262,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "controlsEnabled": true
+      }
+    },
+    {
+      "slug": "espaco-automovel",
+      "pass": true,
+      "canvasPicking": false,
+      "errors": [],
+      "final": {
+        "canvas": 1,
+        "renderer": 1,
+        "controls": 1,
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 129,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "controlsEnabled": true
+      }
+    }
+  ]
+}

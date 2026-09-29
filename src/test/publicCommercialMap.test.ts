@@ -82,8 +82,10 @@ describe('registry público das onze áreas', () => {
 });
 
 describe('payload público respeita a allowlist comercial', () => {
-  it('mostra somente as quatro fases sem apresentar reserva como venda aberta ou disponível', () => {
-    expect(PUBLIC_AVAILABILITY_LABEL).toMatchObject({ AVAILABLE: 'Disponível', SALE_OPEN: 'Venda em aberto', SOLD: 'Vendido', UNAVAILABLE: 'Bloqueado', RESERVED: 'Bloqueado' });
+  it('projeta três condições públicas preservando as quatro fases internas', () => {
+    expect(PUBLIC_AVAILABILITY_LABEL).toMatchObject({ AVAILABLE: 'Disponível', SALE_OPEN: 'Vendido', SOLD: 'Vendido', UNAVAILABLE: 'Bloqueado', RESERVED: 'Bloqueado' });
+    expect(toCanvasLot({ ...lot, availability: 'SALE_OPEN', buyerName: 'Interessado privado' })).toMatchObject({ status: 'SOLD', currentBuyer: null, activeContractNumber: null });
+    expect(toCommercialPhase('SALE_OPEN')).toBe('SALE_OPEN');
     expect(toCanvasLot({ ...lot, availability: 'RESERVED' }).status).toBe('BLOCKED');
     expect(toCommercialPhase('IN_NEGOTIATION')).toBe('BLOCKED');
     expect(toCommercialPhase('RESERVED')).not.toBe('SALE_OPEN');

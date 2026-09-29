@@ -9,7 +9,8 @@ import { preloadCommercialMapCanvas } from '../utils/preloadCanvas';
 import { claimCommercialMapBootVisit, releaseCommercialMapBootVisit } from '../utils/performanceDiagnostics';
 import { formatAreaSqmLabel } from '../utils/lotPricing2028';
 import { buildPavilionModuleCommercialIndex } from '../utils/pavilionModuleCommercial';
-import { COMMERCIAL_PHASES, STATUS_CONFIG } from '../constants';
+import { PublicMapLegend } from './PublicMapLegend';
+import { COMMERCIAL_MAP_RENDER_RETRY_EVENT } from '../utils/renderingHealth';
 import { fetchSaleLogoUrls } from '../sales/saleLogo';
 import { useQuery } from '@tanstack/react-query';
 import { getPublicArea } from './publicAreaRegistry';
@@ -30,9 +31,10 @@ import './public-map.css';
 const loadPublicCanvas = () => preloadCommercialMapCanvas({ prepareHeadquarters: false });
 const EMPTY_MATCHES: ReadonlySet<string> = new Set();
 
-class PublicCanvasBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { failed: boolean }> {
+class PublicCanvasBoundary extends Component<{ children: ReactNode; fallback: ReactNode; onFailure: () => void }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { this.props.onFailure(); }
   render() { return this.state.failed ? this.props.fallback : this.props.children; }
 }
 
@@ -66,6 +68,8 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
   const [lotGoneNotice, setLotGoneNotice] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [rendererAttempt, setRendererAttempt] = useState(0);
+  const [renderRetry, setRenderRetry] = useState(0);
+  const automaticImportRecoveryUsed = useRef(false);
   // A failed lazy import may be retried explicitly without remounts on refetch.
   const CommercialMapCanvas = useMemo(() => { void rendererAttempt; return lazy(loadPublicCanvas); }, [rendererAttempt]);
   const selectedEntityId = useCommercialMapStore(state => state.selectedEntityId);
@@ -73,6 +77,7 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
   const cameraNavigating = useCommercialMapStore(state => state.cameraNavigating);
   const setSelectedEntityId = useCommercialMapStore(state => state.setSelectedEntityId);
   const setSelectedModuleId = useCommercialMapStore(state => state.setSelectedModuleId);
+  const clearLotInspection = useCommercialMapStore(state => state.clearLotInspection);
   const data = inventory.data;
   useEffect(() => {
     applyPublicShareMetadata(slug, Boolean(data && area && !inventory.error && !context.error), window.location.href);
@@ -132,7 +137,7 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
 
   const sceneReady = initialized && Boolean(data) && (!usesParkContext || Boolean(context.data));
   const showMap = viewMode === 'map' && webglAvailable;
-  const renderState = usePublicMapRenderState(sceneReady && webglAvailable, rendererAttempt);
+  const renderState = usePublicMapRenderState(sceneReady && webglAvailable, rendererAttempt + renderRetry);
   useEffect(() => {
     if (renderState === 'ready' && data) track('map_ready', { once: 'map_ready', metadata: { lots: data.scope.lotCount } });
   }, [data, renderState, track]);
@@ -158,9 +163,8 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
   const closeDetails = useCallback(() => {
     lastSelection.current = null;
     setSelectedLotId(null);
-    setSelectedEntityId(null);
-    setSelectedModuleId(null);
-  }, [setSelectedEntityId, setSelectedModuleId]);
+    clearLotInspection();
+  }, [clearLotInspection]);
   useEffect(() => {
     if (selectedLotId && data && !lots.some(lot => lot.id === selectedLotId)) {
       closeDetails();
@@ -168,6 +172,9 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
     }
   }, [closeDetails, data, lots, selectedLotId]);
   const selectFromList = (lot: PublicLot) => {
+    // The list remains usable even before the renderer/module index is ready.
+    setSelectedLotId(lot.id);
+    setLotGoneNotice(false);
     if (pavilionEntity) {
       const module = [...lotIdByModuleKey].find(([, id]) => id === lot.id)?.[0];
       if (module) setSelectedModuleId(module);
@@ -177,7 +184,20 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
     closeDetails();
     useCommercialMapStore.getState().clearSegmentFocus();
   };
-  const retry = () => { setRendererAttempt(n => n + 1); void inventory.refetch(); if (usesParkContext) void context.refetch(); };
+  const recoverImport = useCallback(() => {
+    if (automaticImportRecoveryUsed.current) return;
+    automaticImportRecoveryUsed.current = true;
+    setRendererAttempt(n => n + 1);
+  }, []);
+  const retry = () => {
+    const canvas = document.querySelector('.public-map-canvas canvas');
+    if (canvas) {
+      canvas.dispatchEvent(new Event(COMMERCIAL_MAP_RENDER_RETRY_EVENT));
+      setRenderRetry(n => n + 1);
+    } else setRendererAttempt(n => n + 1);
+    if (!data && !inventory.isFetching) void inventory.refetch();
+    if (usesParkContext && !context.data && !context.isFetching) void context.refetch();
+  };
   if (!area || !token || inventory.error instanceof PublicMapAccessError || context.error instanceof PublicMapAccessError) return <InvalidLink />;
   const fallback = <div className="public-map-stage" role="alert">
     <strong>Não foi possível preparar o mapa.</strong><p>A consulta dos lotes continua disponível na lista.</p>
@@ -192,7 +212,9 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
         {usesParkContext && showMap && <button type="button" className="public-map-refit" onClick={refitArea}><Crosshair aria-hidden="true" /><span>Reenquadrar área</span></button>}
       </div>
     </header>
+    {data && showMap && <PublicMapLegend area={area} />}
     <div className="public-map-body">
+      {!webglAvailable && <p className="public-map-notice" role="status">Este dispositivo não oferece WebGL 2. Consulte os lotes pela lista.</p>}
       {!data && !inventory.isError && <div className="public-map-state" role="status">Carregando os lotes autorizados…</div>}
       {inventory.isError && <div className="public-map-state" role="alert"><p>Não foi possível consultar os dados agora. Verifique sua conexão.</p><button onClick={() => void inventory.refetch()}>Tentar novamente</button></div>}
       {data && usesParkContext && !context.data && showMap && <div className="public-map-state" role="status">
@@ -202,19 +224,16 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
       </div>}
       {lotGoneNotice && <p className="public-map-notice" role="status">Este lote não está mais disponível para consulta nesta área.<button onClick={() => setLotGoneNotice(false)}>Entendi</button></p>}
       {sceneReady && webglAvailable && <div className={'public-map-canvas' + (!showMap ? ' is-concealed' : '')} aria-hidden={!showMap}>
-        <PublicCanvasBoundary key={rendererAttempt} fallback={fallback}>
+        <PublicCanvasBoundary key={rendererAttempt} fallback={fallback} onFailure={recoverImport}>
           <Suspense fallback={null}><CommercialMapCanvas entities={sceneEntities} lots={canvasLots} calibration={null} matchingEntityIds={EMPTY_MATCHES} filtersActive={false}
             sceneSegmentId={null} sceneInteriorEntityId={pavilionEntity?.id ?? null} isolatedArea={null}
             interactiveEntityIds={interactionScope.interactiveEntityIds} publicFocusEntityIds={usesParkContext ? publicScenePolicy?.interactiveEntityIds : null}
             publicScenePolicy={publicScenePolicy} initialPublicView={restoredNavigation} active={showMap} /></Suspense>
           {renderState !== 'ready' && <div className="public-map-stage" role="status" aria-live="polite">
-            <span className="public-map-stage__spinner" aria-hidden="true" /><strong>{renderState === 'failed' ? 'Não foi possível desenhar o mapa neste dispositivo.' : renderState === 'slow' ? 'O mapa está demorando mais que o normal.' : 'Preparando o mapa da área…'}</strong>
+            {(renderState === 'preparing' || renderState === 'recovering') && <span className="public-map-stage__spinner" aria-hidden="true" />}<strong>{renderState === 'failed' ? 'Não foi possível desenhar o mapa neste dispositivo.' : renderState === 'slow' ? 'O mapa está demorando mais que o normal.' : renderState === 'recovering' ? 'Restaurando a visualização do mapa…' : 'Preparando o mapa da área…'}</strong>
             <div className="public-map-stage__actions">{renderState !== 'preparing' && <button onClick={retry}>Tentar novamente</button>}<button onClick={() => setViewMode('list')}>Ver lista de lotes</button></div>
           </div>}
         </PublicCanvasBoundary>
-        {usesParkContext && renderState === 'ready' && <div className="public-map-legend" aria-label="Legenda de disponibilidade">
-          {COMMERCIAL_PHASES.map(status => <span key={status}><i style={{background: STATUS_CONFIG[status].color}} />{STATUS_CONFIG[status].label}</span>)}
-        </div>}
       </div>}
       {data && !showMap && <PublicLotList lots={lots} selectedLotId={selectedLotId} onSelect={selectFromList} areaName={data.scope.name} />}
       {selectedLot && <PublicLotDetails lot={selectedLot} onClose={closeDetails} compact={usesParkContext} areaName={data?.scope.name} />}

@@ -18,6 +18,10 @@ import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { ArrowRightLeft, ArrowUpDown, LogIn, LogOut, ShieldAlert } from 'lucide-react';
 import * as THREE from 'three';
+import './pavilion-wayfinding.css';
+import { COMMERCIAL_MAP_OBSTRUCTION_SELECTOR } from '../../utils/contextualViewport';
+import { dimensionRectsOverlap, type DimensionScreenRect } from '../../utils/pavilionDimensions';
+import { createCommercialPavilionModuleProjectionFrame, projectCommercialPavilionModuleRect, type CommercialPavilionLocalRect } from '../../utils/commercialPavilionModules';
 import type { MapEntity } from '../../types';
 import type { CommercialPavilionLayout } from '../../utils/commercialPavilions';
 import type { CommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
@@ -34,11 +38,7 @@ import {
 const NO_RAYCAST = () => undefined;
 const WAYFINDING_SCREEN_POINT = new THREE.Vector3();
 
-/**
- * Half of the 44px hit target. The compact marker only needs to stay
- * tappable at the viewport edge; the real access point is never moved.
- */
-const MARKER_SCREEN_MARGIN_PX = 24;
+/** Access anchors never move to accommodate screen edges. */
 const MARKER_Z_INDEX_RANGE: [number, number] = [14, 4];
 const ACTIVE_MARKER_Z_INDEX_RANGE: [number, number] = [28, 28];
 const DEFAULT_TOOLTIP_LAYOUT: CommercialPavilionAccessTooltipLayout = { placement: 'top', shift: 0 };
@@ -62,11 +62,7 @@ function calculateWayfindingMarkerPosition(
   WAYFINDING_SCREEN_POINT.setFromMatrixPosition(object.matrixWorld).project(camera);
   const x = WAYFINDING_SCREEN_POINT.x * size.width / 2 + size.width / 2;
   const y = -WAYFINDING_SCREEN_POINT.y * size.height / 2 + size.height / 2;
-  const safeMargin = Math.min(MARKER_SCREEN_MARGIN_PX, size.width * 0.24);
-  return [
-    THREE.MathUtils.clamp(x, safeMargin, size.width - safeMargin),
-    y,
-  ];
+  return [x, y]; // Never clamp: an offscreen access stays anchored to the plan.
 }
 
 const MARKER_COLORS = {
@@ -184,6 +180,7 @@ function PavilionAccessMarker({
   active,
   onActivate,
   onNavigate,
+  protectedRects,
 }: {
   marker: CommercialPavilionWayfindingMarker;
   layout: CommercialPavilionLayout;
@@ -193,6 +190,7 @@ function PavilionAccessMarker({
   active: boolean;
   onActivate: (markerId: string | null) => void;
   onNavigate: (targetEntityId: string) => void;
+  protectedRects: readonly CommercialPavilionLocalRect[];
 }) {
   const shortSide = Math.min(layout.interior.clearWidth, layout.interior.clearDepth);
   const [x, z] = markerPosition(marker, layout);
@@ -215,10 +213,36 @@ function PavilionAccessMarker({
   const [hovered, setHovered] = useState(false);
   const open = hovered || active;
 
-  useFrame(({ camera, size }) => {
-    if (!marker.orientToWall || !markerGroupRef.current || !iconRef.current) return;
+  useFrame(({ camera, size, gl }) => {
+    if (!markerGroupRef.current || !iconRef.current || !buttonRef.current) return;
+    camera.updateMatrixWorld();
     markerGroupRef.current.updateWorldMatrix(true, false);
     const [origin, normal] = arrowPoints;
+    origin.set(0, layout.interior.floorY + 0.05, 0).applyMatrix4(markerGroupRef.current.matrixWorld).project(camera);
+    const px = (origin.x + 1) * size.width / 2, py = (1 - origin.y) * size.height / 2;
+    const box = { left: px - 22, right: px + 22, top: py - 22, bottom: py + 22 };
+    let hidden = origin.z < -1 || origin.z > 1 || box.left < 0 || box.right > size.width || box.top < 0 || box.bottom > size.height;
+    // Avoid targets over module numbers/lot picking. Hidden markers have no hit
+    // box; the physical threshold meshes remain informative and noninteractive.
+    const parent = markerGroupRef.current.parent;
+    if (!hidden && parent) for (const rect of protectedRects) {
+      const bounds: DimensionScreenRect = { left:Infinity, top:Infinity, right:-Infinity, bottom:-Infinity };
+      for (const [dx, dz] of [[-1,-1],[1,-1],[1,1],[-1,1]]) {
+        normal.set(rect.centerX + dx * rect.width / 2, layout.interior.floorY + 0.05, rect.centerZ + dz * rect.depth / 2).applyMatrix4(parent.matrixWorld).project(camera);
+        const x = (normal.x+1)*size.width/2, y=(1-normal.y)*size.height/2;
+        bounds.left=Math.min(bounds.left,x); bounds.right=Math.max(bounds.right,x); bounds.top=Math.min(bounds.top,y); bounds.bottom=Math.max(bounds.bottom,y);
+      }
+      if (dimensionRectsOverlap(box,bounds,2)) { hidden=true; break; }
+    }
+    const canvasRect=gl.domElement.getBoundingClientRect();
+    const shell=gl.domElement.closest('.public-map-shell, .commercial-map-shell') ?? gl.domElement.parentElement;
+    if (!hidden) shell?.querySelectorAll<HTMLElement>(`${COMMERCIAL_MAP_OBSTRUCTION_SELECTOR}, [data-commercial-map-interior-controls]`).forEach(element => {
+      if(!element.getClientRects().length) return;
+      const rect=element.getBoundingClientRect();
+      if(dimensionRectsOverlap(box,{left:rect.left-canvasRect.left,right:rect.right-canvasRect.left,top:rect.top-canvasRect.top,bottom:rect.bottom-canvasRect.top},4)) hidden=true;
+    });
+    buttonRef.current.style.visibility = hidden ? 'hidden' : '';
+    if (!marker.orientToWall) return;
     origin.set(0, 0, 0).applyMatrix4(markerGroupRef.current.matrixWorld).project(camera);
     normal.set(frontOrRear ? 0 : 1, 0, frontOrRear ? 1 : 0)
       .applyMatrix4(markerGroupRef.current.matrixWorld).project(camera);
@@ -316,7 +340,7 @@ function PavilionAccessMarker({
       />
       <Html
         ref={htmlRef}
-        position={[0, layout.interior.floorY + shortSide * 0.065, 0]}
+        position={[0, layout.interior.floorY + 0.05, 0]}
         center
         eps={0.001}
         zIndexRange={open ? ACTIVE_MARKER_Z_INDEX_RANGE : MARKER_Z_INDEX_RANGE}
@@ -376,6 +400,10 @@ export const CommercialPavilionWayfindingLayer = memo(function CommercialPavilio
     width: layout.interior.clearWidth,
     depth: layout.interior.clearDepth,
   }), [layout.interior.clearDepth, layout.interior.clearWidth, plan]);
+  const protectedRects = useMemo(() => {
+    const frame = createCommercialPavilionModuleProjectionFrame(plan, { width:layout.interior.clearWidth, depth:layout.interior.clearDepth });
+    return plan.cells.flatMap(cell => cell.shape?.renderParts ?? [cell]).map(rect => projectCommercialPavilionModuleRect(rect,frame));
+  }, [layout.interior.clearWidth, layout.interior.clearDepth, plan]);
   const targetEntityIdByPublicIdentifier = useMemo(() => new Map(entities.map((entity) => [
     entity.publicIdentifier.trim().toLocaleUpperCase('pt-BR'),
     entity.id,
@@ -448,6 +476,7 @@ export const CommercialPavilionWayfindingLayer = memo(function CommercialPavilio
           active={activeMarkerId === marker.id}
           onActivate={setActiveMarkerId}
           onNavigate={onNavigate}
+          protectedRects={protectedRects}
         />
       ))}
     </group>

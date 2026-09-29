@@ -1,0 +1,38 @@
+name: Public Map contracts
+on:
+  pull_request:
+    paths:
+      - 'src/features/commercial-map/**'
+      - 'src/test/public*'
+      - 'src/test/commercialMap*'
+      - 'supabase/migrations/*public_map*'
+      - '.github/workflows/public-map.yml'
+permissions:
+  contents: read
+jobs:
+  public-map:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      VITE_SUPABASE_URL: https://qa.invalid
+      VITE_SUPABASE_PUBLISHABLE_KEY: qa-placeholder
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: oven-sh/setup-bun@v2
+        with: {bun-version: '1.3.0'}
+      - run: bun install --frozen-lockfile
+      - name: Scope, inspection, public statuses and renderer recovery
+        run: >-
+          npx vitest run --maxWorkers=2 --testTimeout=30000
+          src/test/publicMap src/test/publicCommercialMap
+          src/test/commercialMapPreparationRecovery.test.tsx
+          src/test/commercialMapSceneShaderWarmup.test.ts
+          src/test/commercialMapPavilionWayfinding.test.ts
+          src/test/commercialMapPavilionDimensions.test.ts
+          src/test/commercialMapInteriorView.test.tsx
+          src/test/commercialMapInteractiveBoot.test.tsx
+          src/test/commercialMapRendererHealth.test.tsx
+      - run: npm run typecheck

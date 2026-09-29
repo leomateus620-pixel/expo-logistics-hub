@@ -14,6 +14,7 @@ import { isSoldLot, soldLotSurfaceColor } from '../../utils/soldLotPresentation'
 import { resolveLotTooltipPresentation } from '../../utils/lotTooltipPresentation';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { PublicMapEnvironment } from './PublicMapEnvironment';
+import { PublicContextLabels } from './PublicContextLabels';
 import { arenaVegetationAllowed } from '../../data/arenaCanonicalLayout';
 import { createArenaParkingGeometry, isArenaParking } from '../../utils/arenaParkingGeometry';
 import { LightingPerformanceProbe } from '../../diagnostics/LightingPerformanceProbe';
@@ -186,7 +187,7 @@ import { CommercialPavilionInteriorScene } from './CommercialPavilionInteriorSce
 import { MiranteInteriorScene } from './MiranteInteriorScene';
 import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
 import { NationsDistrict } from './NationsDistrict';
-import { CommercialMapEnvironment } from './CommercialMapEnvironment';
+import { CommercialMapEnvironment, SunrisePostProcessing } from './CommercialMapEnvironment';
 import { LateralResidentialDistrict } from './LateralResidentialDistrict';
 import { applyInteriorGroundMaterial } from './interiorGroundMaterial';
 import { applyParkGroundDetail } from './terrainMaterial';
@@ -3196,7 +3197,7 @@ function CameraRig({
     }
     if (interiorEntity) queueInterior();
     else if (parkingActive) queueParking();
-    else if (selectedEntity) queueSelection(selectedEntity);
+    else if (selectedEntity && !publicPolicy) queueSelection(selectedEntity);
     else if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
     else queuePreset(preset);
   };
@@ -3781,12 +3782,15 @@ function CameraRig({
     // coalesces drag frames and retains manual pan/zoom ownership.
     const onPanelResize = () => {
       if (!initialized.current || navigation.current.active) return;
+      // Public sheets are an inspection overlay. Opening/closing them must not
+      // issue a camera command; actual viewport resizing still fits.
+      if (gl.domElement.closest('.public-map-shell')) return;
       if (preserveManualView.current) resizeRefitSuppressedUntil.current = 0;
       scheduleResizeRefit();
     };
     window.addEventListener('commercial-map-panel-resize', onPanelResize);
     return () => window.removeEventListener('commercial-map-panel-resize', onPanelResize);
-  }, [scheduleResizeRefit]);
+  }, [gl, scheduleResizeRefit]);
 
   useLayoutEffect(() => {
     if (camera instanceof THREE.PerspectiveCamera && camera.view?.enabled) {
@@ -4553,6 +4557,7 @@ const Scene = memo(function Scene({
   // React replay terrain/road/material preparation while its worker finishes.
   const publicPolicy = usePublicScenePolicy();
   const visitEnabled = useVisitStore(state => state.enabled);
+  const publicPavilion = Boolean(interactiveEntityIds && sceneInteriorEntityId);
   if (!publicPolicy && entities.some((entity) => resolveStrategicLandmarkKind(entity) === 'fenasoja-headquarters')) {
     readPreparedHeadquartersGeometry();
   }
@@ -4853,11 +4858,11 @@ const Scene = memo(function Scene({
     });
   }, [layerOpacity, selectedEntityId, structuralEntities]);
   const sceneTrees = useMemo(
-    () => publicPolicy ? [] : selectCommercialTreesForScene(entities, lots),
-    [entities, lots, publicPolicy],
+    () => publicPolicy || publicPavilion ? [] : selectCommercialTreesForScene(entities, lots),
+    [entities, lots, publicPolicy, publicPavilion],
   );
   const rearRoadCompatibleSceneTrees = useMemo(() => {
-    if (publicPolicy) return [];
+    if (publicPolicy || publicPavilion) return [];
     const baseTrees = (!isolatedArea
       || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry)
       ? selectParkAccessCompatibleTreesForPresentation(sceneTrees)
@@ -4870,7 +4875,7 @@ const Scene = memo(function Scene({
       ? selectRearRoadCompatibleTreesForPresentation(parkAccessCompatibleTrees)
       : parkAccessCompatibleTrees;
     return rearRoadCompatibleTrees.filter(tree => arenaVegetationAllowed(tree.position, tree.canopyRadius));
-  }, [entities, isolatedArea, publicPolicy, rearParkingAvailable, sceneTrees]);
+  }, [entities, isolatedArea, publicPolicy, publicPavilion, rearParkingAvailable, sceneTrees]);
   const selectedLunarTreeEntity = selectedEntity
     && resolveStrategicLandmarkKind(selectedEntity) === 'lunar-tree'
     ? selectedEntity
@@ -5083,7 +5088,7 @@ const Scene = memo(function Scene({
 
   return (
     <>
-      {publicPolicy ? <PublicMapEnvironment extent={environmentExtent} /> : <NightAwareEnvironment
+      {publicPavilion ? <SunrisePostProcessing qualityTier="reduced" enabled={false} /> : publicPolicy ? <PublicMapEnvironment extent={environmentExtent} /> : <NightAwareEnvironment
         extent={environmentExtent}
         shadowExtent={shadowExtent}
         active={!interiorEntity}
@@ -5094,7 +5099,7 @@ const Scene = memo(function Scene({
       />}
       <InteriorCameraRequestContext.Provider value={setInteriorCameraRequest}>
         {interiorContent}
-        <PublicContextGroup><group ref={exteriorGroup} visible={!interiorEntity}>
+        {!publicPavilion && <PublicContextGroup><group ref={exteriorGroup} visible={!interiorEntity}>
       {!isolatedArea && (
         <group visible={!hydrologicalModeActive}>
           <ReferenceUnderlay calibration={calibration} />
@@ -5358,7 +5363,7 @@ const Scene = memo(function Scene({
           <QuadrasABValidationOverlay />
         </Suspense>
       )}
-        </group></PublicContextGroup>
+        </group></PublicContextGroup>}
       </InteriorCameraRequestContext.Provider>
       <CameraRig
         selectedEntity={selectedEntity}
@@ -5375,7 +5380,8 @@ const Scene = memo(function Scene({
         hydrologicalModeActive={hydrologicalModeActive}
       />
       <RuntimeFrameDiagnostics />
-      {visitEnabled && !publicPolicy && <VisitFeatureBoundary><Suspense fallback={null}>
+      {publicPolicy && <PublicContextLabels entities={entities} policy={publicPolicy} />}
+      {visitEnabled && !publicPolicy && !publicPavilion && <VisitFeatureBoundary><Suspense fallback={null}>
         <VisitMode entities={entities} lots={lots} trees={presentedSceneTrees} electricalPlacements={electricalSceneLayout.placements} siteEnvironmentEntities={siteEnvironmentEntities}/>
       </Suspense></VisitFeatureBoundary>}
       {commercialMapDiagnosticsEnabled && <LightingPerformanceProbe />}
@@ -5385,14 +5391,14 @@ const Scene = memo(function Scene({
         onHover={setHoveredEntityId}
         onCursor={setCanvasCursor}
       />
-      {!publicPolicy && <><StrategicLandmarkSelectionShaderWarmup />
+      {!publicPolicy && !publicPavilion && <><StrategicLandmarkSelectionShaderWarmup />
       <DeferredSceneLayer id="interior-shaders" priority={140} waitForMilestone="interior-preparation:end">
       <CommercialMapInteriorShaderWarmup reducedGraphics={reducedGraphics} />
       </DeferredSceneLayer>
       <DeferredSceneLayer id="physics-module" priority={150} waitForMilestone="physics-preparation:end">
         <DeferredPhysicsPreload />
       </DeferredSceneLayer></>}
-      <CommercialMapSceneShaderWarmup preparePost={!publicPolicy} />
+      <CommercialMapSceneShaderWarmup preparePost={!publicPolicy && !publicPavilion} />
       <CommercialMapInteractiveBoot />
     </>
   );

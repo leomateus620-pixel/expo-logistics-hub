@@ -3,6 +3,7 @@ import { Search } from 'lucide-react';
 import { formatAreaSqmLabel, formatBrl } from '../utils/lotPricing2028';
 import { PUBLIC_AVAILABILITY_LABEL, type PublicLot } from './publicMapTypes';
 import { resolveLotIdentity } from '../utils/lotIdentity';
+import { publicAvailability } from './publicAvailability';
 
 /** Lista acessível do mesmo escopo — nunca amplia para o parque inteiro. */
 export const PublicLotList = memo(function PublicLotList({
@@ -53,7 +54,7 @@ export const PublicLotList = memo(function PublicLotList({
                   ? formatBrl(lot.pricing.renovacaoTotal) ?? 'Valor sob consulta'
                   : 'Valor sob consulta'}
               </span>
-              <small data-availability={lot.availability}>{PUBLIC_AVAILABILITY_LABEL[lot.availability]}</small>
+              <small data-availability={publicAvailability(lot.availability)}>{PUBLIC_AVAILABILITY_LABEL[lot.availability]}</small>
             </button>
           </li>
         ))}

@@ -153,6 +153,7 @@ interface CommercialMapState {
   setDockSection: (section: CommercialMapDockSection | null) => void;
   activateScope: (scopeKey: string, segmentId: CommercialMapSegmentId | null) => void;
   setSelectedEntityId: (id: string | null) => void;
+  clearLotInspection: () => void;
   enterInterior: (id: string) => void;
   switchInterior: (id: string) => void;
   exitInterior: () => void;
@@ -342,6 +343,13 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
             : state.cameraSequence,
         }
   )),
+  // Closing a lot sheet is distinct from leaving a pavilion. No camera command.
+  clearLotInspection: () => set((state) => ({
+    selectedModuleId: null,
+    hoveredModuleId: null,
+    selectedEntityId: state.interiorEntityId,
+    activePanel: null,
+  })),
   enterInterior: (selectedEntityId) => set((state) => (
     state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning
       ? state

@@ -135,7 +135,7 @@ export function CommercialMapInteractiveBoot() {
       markCommercialMapStage('commercial-map-ready');
       markCommercialMapStage('first-interactive');
       queueFor(gl.domElement).start();
-    } else invalidate();
+    } else if (!gl.domElement.dataset.commercialMapPreparationError) invalidate();
   }, -0.5);
   return null;
 }

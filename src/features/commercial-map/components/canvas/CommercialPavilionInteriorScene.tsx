@@ -371,10 +371,14 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
       modulePlan,
     );
   }, [definition, modulePlan, physicalModelBounds]);
-  const floorTexture = useMemo(() => createCommercialPavilionTexture('floor'), []);
+  // B6/B2 have irregular islands: exposed slab is circulation, not another lot.
+  // Keep the actual slab/corridors/support geometry; remove the dark multiplied
+  // texture only on these two floors, including the residual strips at row ends.
+  const clearCirculationFloor = modulePlan?.publicIdentifier === 'B6' || modulePlan?.publicIdentifier === 'B2';
+  const floorTexture = useMemo(() => clearCirculationFloor ? null : createCommercialPavilionTexture('floor'), [clearCirculationFloor]);
   const materials = useMemo(() => ({
     floor: new THREE.MeshStandardMaterial({
-      color: '#a8aaa5',
+      color: clearCirculationFloor ? '#bcc5b8' : '#a8aaa5',
       map: floorTexture,
       bumpMap: floorTexture,
       bumpScale: 0.012,
@@ -387,7 +391,7 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
       metalness: 0.25,
     }),
     threshold: new THREE.MeshStandardMaterial({ color: '#d6b347', roughness: 0.76 }),
-  }), [floorTexture]);
+  }), [clearCirculationFloor, floorTexture]);
   const unitBoxGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const floorGeometry = useMemo(() => layout
     ? new THREE.BoxGeometry(layout.width, layout.interior.floorY, layout.depth)
