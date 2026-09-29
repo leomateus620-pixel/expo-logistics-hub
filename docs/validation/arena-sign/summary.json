@@ -768,34 +768,48 @@
       "status": "passed",
       "browser": "154.0.8037.58",
       "mobileEmulation": false,
-      "capturedAt": "2026-09-29T11:43:04.324Z",
-      "fullLocalReportSha256": "ac27400d293afd66bf982844f045df3d425140cc14fdd90bc993a24ebd903b0d",
+      "capturedAt": "2026-09-29T15:48:38.460Z",
+      "fullLocalReportSha256": "ded51e97b44a015d65dc3a23473e710de3d4ec7da9c50a909ac59a7f6c2d8b62",
       "errors": [],
       "views": {
         "day-overview": {
           "camera": [
-            28.99,
+            29,
             48,
-            -3.58
+            -3.57
           ],
           "renderer": {
-            "calls": 254,
-            "triangles": 601757,
-            "geometries": 360,
+            "calls": 251,
+            "triangles": 555839,
+            "geometries": 366,
             "textures": 132
           },
           "ready": true
         },
         "day-aerial": {
           "camera": [
-            38.11,
+            38.12,
             22,
-            -3.58
+            -3.57
           ],
           "renderer": {
-            "calls": 123,
-            "triangles": 476403,
-            "geometries": 360,
+            "calls": 126,
+            "triangles": 486271,
+            "geometries": 366,
+            "textures": 133
+          },
+          "ready": true
+        },
+        "day-reference": {
+          "camera": [
+            38.12,
+            18,
+            8
+          ],
+          "renderer": {
+            "calls": 144,
+            "triangles": 533015,
+            "geometries": 366,
             "textures": 132
           },
           "ready": true
@@ -808,8 +822,8 @@
           ],
           "renderer": {
             "calls": 131,
-            "triangles": 491745,
-            "geometries": 364,
+            "triangles": 494085,
+            "geometries": 370,
             "textures": 132
           },
           "ready": true
@@ -822,8 +836,8 @@
           ],
           "renderer": {
             "calls": 671,
-            "triangles": 711076,
-            "geometries": 543,
+            "triangles": 713416,
+            "geometries": 542,
             "textures": 132
           },
           "ready": true
@@ -836,7 +850,7 @@
           ],
           "renderer": {
             "calls": 194,
-            "triangles": 502926,
+            "triangles": 505266,
             "geometries": 558,
             "textures": 132
           },
@@ -850,7 +864,7 @@
           ],
           "renderer": {
             "calls": 166,
-            "triangles": 532278,
+            "triangles": 534618,
             "geometries": 561,
             "textures": 132
           },
@@ -864,7 +878,7 @@
           ],
           "renderer": {
             "calls": 157,
-            "triangles": 502062,
+            "triangles": 504402,
             "geometries": 562,
             "textures": 132
           },
@@ -878,7 +892,7 @@
           ],
           "renderer": {
             "calls": 130,
-            "triangles": 499473,
+            "triangles": 501813,
             "geometries": 562,
             "textures": 132
           },
@@ -886,13 +900,13 @@
         },
         "night-overview": {
           "camera": [
-            28.99,
+            29,
             48,
-            -3.58
+            -3.57
           ],
           "renderer": {
-            "calls": 261,
-            "triangles": 627995,
+            "calls": 258,
+            "triangles": 582077,
             "geometries": 552,
             "textures": 132
           },
@@ -900,13 +914,27 @@
         },
         "night-aerial": {
           "camera": [
-            38.11,
+            38.12,
             22,
-            -3.58
+            -3.57
           ],
           "renderer": {
-            "calls": 128,
-            "triangles": 502593,
+            "calls": 131,
+            "triangles": 512461,
+            "geometries": 552,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-reference": {
+          "camera": [
+            38.12,
+            18,
+            8
+          ],
+          "renderer": {
+            "calls": 149,
+            "triangles": 559205,
             "geometries": 552,
             "textures": 132
           },
@@ -920,7 +948,7 @@
           ],
           "renderer": {
             "calls": 136,
-            "triangles": 517935,
+            "triangles": 520275,
             "geometries": 552,
             "textures": 132
           },
@@ -934,7 +962,7 @@
           ],
           "renderer": {
             "calls": 685,
-            "triangles": 740954,
+            "triangles": 743294,
             "geometries": 567,
             "textures": 132
           },
@@ -948,7 +976,7 @@
           ],
           "renderer": {
             "calls": 201,
-            "triangles": 529164,
+            "triangles": 531504,
             "geometries": 567,
             "textures": 132
           },
@@ -962,7 +990,7 @@
           ],
           "renderer": {
             "calls": 171,
-            "triangles": 558468,
+            "triangles": 560808,
             "geometries": 567,
             "textures": 132
           },
@@ -976,7 +1004,7 @@
           ],
           "renderer": {
             "calls": 162,
-            "triangles": 528252,
+            "triangles": 530592,
             "geometries": 567,
             "textures": 132
           },
@@ -990,7 +1018,7 @@
           ],
           "renderer": {
             "calls": 135,
-            "triangles": 525663,
+            "triangles": 528003,
             "geometries": 567,
             "textures": 132
           },
@@ -1004,8 +1032,8 @@
           ],
           "renderer": {
             "calls": 138,
-            "triangles": 502043,
-            "geometries": 312,
+            "triangles": 504383,
+            "geometries": 305,
             "textures": 106
           },
           "ready": true
@@ -1025,7 +1053,7 @@
             },
             "max": {
               "x": 42.68164777929133,
-              "y": 2.351323558807373,
+              "y": 2.385735942840576,
               "z": -0.13596019460405184
             }
           },
@@ -1049,14 +1077,14 @@
           "bounds": {
             "isBox3": true,
             "min": {
-              "x": 36.70691085035151,
-              "y": 1.1025115985870362,
-              "z": -6.6202217073604
+              "x": 34.10388088399714,
+              "y": 2.1725952167510987,
+              "z": -4.4615093202754394
             },
             "max": {
-              "x": 40.3181045072729,
-              "y": 2.351323558807373,
-              "z": -0.5339740247889888
+              "x": 42.13926840001887,
+              "y": 2.385735942840576,
+              "z": -2.69485435201372
             }
           },
           "userData": {
@@ -1064,12 +1092,15 @@
             "roofConforming": true,
             "horizontal": true,
             "layout": {
-              "wordWidth": 6.056550030404368,
-              "symbolSize": 1.7894352362558361,
-              "symbolCenterV": 1.2775397727272728,
-              "wordCenterV": -0.9581548295454545,
-              "relief": 0.0963542050291604,
-              "bevel": 0.0137648864327372,
+              "length": 8.03025,
+              "wordWidth": 5.8620825000000005,
+              "symbolSize": 1.766655,
+              "gap": 0.40151250000000005,
+              "symbolCenterU": -3.1317975000000002,
+              "wordCenterU": 1.08408375,
+              "rotation": 1.5707963267948966,
+              "relief": 0.137648864327372,
+              "bevel": 0.004473588090639589,
               "seating": 0.0206473296491058
             }
           },
@@ -1082,19 +1113,19 @@
           "bounds": {
             "isBox3": true,
             "min": {
-              "x": 36.72071135217494,
-              "y": 1.10726602268219,
-              "z": -6.606456849114551
+              "x": 36.272048236673534,
+              "y": 2.2176243801116944,
+              "z": -4.037691953913822
             },
             "max": {
-              "x": 37.60099035674876,
-              "y": 2.351323558807373,
-              "z": -0.5499068231746089
+              "x": 42.13413047963923,
+              "y": 2.383327199935913,
+              "z": -3.1186717183753383
             }
           },
           "userData": {},
-          "vertices": 4668,
-          "triangles": 1556
+          "vertices": 8292,
+          "triangles": 2764
         },
         {
           "name": "arena-brand-relief-edges",
@@ -1103,19 +1134,19 @@
           "bounds": {
             "isBox3": true,
             "min": {
-              "x": 36.70691085035151,
-              "y": 1.1025115985870362,
-              "z": -6.6202217073604
+              "x": 34.12154722387141,
+              "y": 2.1725952167510987,
+              "z": -4.443842801587238
             },
             "max": {
-              "x": 40.3181045072729,
-              "y": 2.351323558807373,
-              "z": -0.5339740247889888
+              "x": 42.13926840001887,
+              "y": 2.383327199935913,
+              "z": -2.7125208707019217
             }
           },
           "userData": {},
-          "vertices": 14502,
-          "triangles": 4834
+          "vertices": 17898,
+          "triangles": 5966
         },
         {
           "name": "arena-brand-official-symbol",
@@ -1124,14 +1155,14 @@
           "bounds": {
             "isBox3": true,
             "min": {
-              "x": 38.50182780796832,
-              "y": 2.2710654277801514,
-              "z": -4.472899469868793
+              "x": 34.10388088399714,
+              "y": 2.3142485160827637,
+              "z": -4.4615093202754394
             },
             "max": {
-              "x": 40.291263105219066,
-              "y": 2.3444413681030274,
-              "z": -2.6834642024203674
+              "x": 35.87053561384028,
+              "y": 2.385735942840576,
+              "z": -2.69485435201372
             }
           },
           "userData": {},
@@ -1141,20 +1172,47 @@
       ],
       "performance": [
         {
+          "frames": 144,
+          "meanMs": 41.829166665673256,
+          "p95Ms": 35.200000047683716,
+          "renderer": {
+            "at": 98725,
+            "calls": 145,
+            "triangles": 498661,
+            "geometries": 569,
+            "textures": 132,
+            "programs": 225,
+            "dpr": 0.9,
+            "width": 1296,
+            "height": 810,
+            "heapBytes": 180133937,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 1944,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
           "frames": 182,
-          "meanMs": 33.19615384641585,
-          "p95Ms": 37.59999990463257,
+          "meanMs": 33.042857142595146,
+          "p95Ms": 35,
           "renderer": {
-            "at": 89085,
+            "at": 105790.39999985695,
             "calls": 145,
-            "triangles": 496321,
+            "triangles": 498661,
             "geometries": 569,
             "textures": 132,
             "programs": 225,
             "dpr": 0.9,
             "width": 1296,
             "height": 810,
-            "heapBytes": 156374208,
+            "heapBytes": 194887210,
             "qualityTier": "HIGH",
             "gpuVendor": "Google Inc. (Intel)",
             "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
@@ -1162,26 +1220,26 @@
           "health": {
             "status": "ready",
             "path": "post",
-            "presentedFrames": 1891,
+            "presentedFrames": 2157,
             "contextLosses": 0,
             "lastErrorCode": null
           }
         },
         {
-          "frames": 202,
-          "meanMs": 29.83811881282542,
-          "p95Ms": 33,
+          "frames": 183,
+          "meanMs": 32.90054644782686,
+          "p95Ms": 34.799999952316284,
           "renderer": {
-            "at": 96237,
+            "at": 112841.19999980927,
             "calls": 145,
-            "triangles": 496321,
+            "triangles": 498661,
             "geometries": 569,
             "textures": 132,
             "programs": 225,
             "dpr": 0.9,
             "width": 1296,
             "height": 810,
-            "heapBytes": 177657678,
+            "heapBytes": 181004112,
             "qualityTier": "HIGH",
             "gpuVendor": "Google Inc. (Intel)",
             "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
@@ -1189,47 +1247,20 @@
           "health": {
             "status": "ready",
             "path": "post",
-            "presentedFrames": 2120,
-            "contextLosses": 0,
-            "lastErrorCode": null
-          }
-        },
-        {
-          "frames": 207,
-          "meanMs": 29.00821256061683,
-          "p95Ms": 30.799999952316284,
-          "renderer": {
-            "at": 103226.10000014305,
-            "calls": 146,
-            "triangles": 496561,
-            "geometries": 569,
-            "textures": 132,
-            "programs": 225,
-            "dpr": 0.9,
-            "width": 1296,
-            "height": 810,
-            "heapBytes": 172072362,
-            "qualityTier": "HIGH",
-            "gpuVendor": "Google Inc. (Intel)",
-            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
-          },
-          "health": {
-            "status": "ready",
-            "path": "post",
-            "presentedFrames": 2364,
+            "presentedFrames": 2371,
             "contextLosses": 0,
             "lastErrorCode": null
           }
         }
       ],
-      "medianMeanMs": 29.83811881282542,
+      "medianMeanMs": 33.042857142595146,
       "sameSceneBaseline": [
         {
-          "frames": 209,
-          "meanMs": 28.758373205741627,
-          "p95Ms": 30.299999952316284,
+          "frames": 185,
+          "meanMs": 32.51567567619117,
+          "p95Ms": 34,
           "renderer": {
-            "at": 110221.70000004768,
+            "at": 119905.29999995232,
             "calls": 143,
             "triangles": 489307,
             "geometries": 569,
@@ -1238,7 +1269,7 @@
             "dpr": 0.9,
             "width": 1296,
             "height": 810,
-            "heapBytes": 166069334,
+            "heapBytes": 162265397,
             "qualityTier": "HIGH",
             "gpuVendor": "Google Inc. (Intel)",
             "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
@@ -1246,17 +1277,44 @@
           "health": {
             "status": "ready",
             "path": "post",
-            "presentedFrames": 2609,
+            "presentedFrames": 2588,
             "contextLosses": 0,
             "lastErrorCode": null
           }
         },
         {
-          "frames": 190,
-          "meanMs": 31.803684210777284,
-          "p95Ms": 33.799999952316284,
+          "frames": 183,
+          "meanMs": 32.959562842311755,
+          "p95Ms": 35.09999990463257,
           "renderer": {
-            "at": 117221.40000009537,
+            "at": 127008,
+            "calls": 143,
+            "triangles": 489307,
+            "geometries": 569,
+            "textures": 132,
+            "programs": 225,
+            "dpr": 0.9,
+            "width": 1296,
+            "height": 810,
+            "heapBytes": 176397438,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 2804,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 183,
+          "meanMs": 32.967213114754095,
+          "p95Ms": 35.09999990463257,
+          "renderer": {
+            "at": 134065.5,
             "calls": 142,
             "triangles": 489067,
             "geometries": 569,
@@ -1265,7 +1323,7 @@
             "dpr": 0.9,
             "width": 1296,
             "height": 810,
-            "heapBytes": 183771296,
+            "heapBytes": 161782192,
             "qualityTier": "HIGH",
             "gpuVendor": "Google Inc. (Intel)",
             "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
@@ -1273,67 +1331,40 @@
           "health": {
             "status": "ready",
             "path": "post",
-            "presentedFrames": 2835,
-            "contextLosses": 0,
-            "lastErrorCode": null
-          }
-        },
-        {
-          "frames": 186,
-          "meanMs": 32.473118279569896,
-          "p95Ms": 37.299999952316284,
-          "renderer": {
-            "at": 124350.10000014305,
-            "calls": 142,
-            "triangles": 489067,
-            "geometries": 569,
-            "textures": 132,
-            "programs": 225,
-            "dpr": 0.9,
-            "width": 1296,
-            "height": 810,
-            "heapBytes": 171931515,
-            "qualityTier": "HIGH",
-            "gpuVendor": "Google Inc. (Intel)",
-            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
-          },
-          "health": {
-            "status": "ready",
-            "path": "post",
-            "presentedFrames": 3055,
+            "presentedFrames": 3017,
             "contextLosses": 0,
             "lastErrorCode": null
           }
         }
       ],
-      "baselineMedianMeanMs": 31.803684210777284,
+      "baselineMedianMeanMs": 32.959562842311755,
       "resources": [
         {
-          "at": 133978.90000009537,
+          "at": 143960.29999995232,
           "calls": 157,
-          "triangles": 502062,
+          "triangles": 504402,
           "geometries": 570,
           "textures": 132,
           "programs": 225,
           "dpr": 1,
           "width": 1440,
           "height": 900,
-          "heapBytes": 167334650,
+          "heapBytes": 157668429,
           "qualityTier": "HIGH",
           "gpuVendor": "Google Inc. (Intel)",
           "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
         },
         {
-          "at": 138524.90000009537,
+          "at": 148520.59999990463,
           "calls": 157,
-          "triangles": 502062,
+          "triangles": 504402,
           "geometries": 570,
           "textures": 132,
           "programs": 225,
           "dpr": 1,
           "width": 1440,
           "height": 900,
-          "heapBytes": 171358481,
+          "heapBytes": 157694032,
           "qualityTier": "HIGH",
           "gpuVendor": "Google Inc. (Intel)",
           "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
@@ -1346,16 +1377,16 @@
       },
       "final": {
         "renderer": {
-          "at": 129544,
+          "at": 139213.09999990463,
           "calls": 157,
-          "triangles": 502062,
+          "triangles": 504402,
           "geometries": 570,
           "textures": 132,
           "programs": 225,
           "dpr": 1,
           "width": 1440,
           "height": 900,
-          "heapBytes": 165111111,
+          "heapBytes": 171368583,
           "qualityTier": "HIGH",
           "gpuVendor": "Google Inc. (Intel)",
           "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
@@ -1369,7 +1400,7 @@
         "health": {
           "status": "ready",
           "path": "post",
-          "presentedFrames": 3185,
+          "presentedFrames": 3141,
           "contextLosses": 0,
           "lastErrorCode": null
         },
@@ -1387,34 +1418,48 @@
       "status": "passed",
       "browser": "154.0.8037.58",
       "mobileEmulation": true,
-      "capturedAt": "2026-09-29T11:45:23.169Z",
-      "fullLocalReportSha256": "87e29061a9c0c871d32ec14dbc605983dff97cc91628b2b24e0ba417b83cccbc",
+      "capturedAt": "2026-09-29T15:44:31.473Z",
+      "fullLocalReportSha256": "1d9931fb2aeabe18353d6a1cefc13ac4643d3f36654e1fa103ebddd456868c47",
       "errors": [],
       "views": {
         "day-overview": {
           "camera": [
-            28.983499999999996,
+            29,
             79.19999999999999,
-            -3.58
+            -3.5635
           ],
           "renderer": {
-            "calls": 233,
-            "triangles": 512987,
-            "geometries": 358,
+            "calls": 178,
+            "triangles": 464683,
+            "geometries": 324,
             "textures": 132
           },
           "ready": true
         },
         "day-aerial": {
           "camera": [
-            38.103500000000004,
+            38.12,
             35.584999999999994,
-            -3.58
+            -3.5635
           ],
           "renderer": {
-            "calls": 118,
-            "triangles": 456789,
-            "geometries": 358,
+            "calls": 115,
+            "triangles": 477651,
+            "geometries": 324,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "day-reference": {
+          "camera": [
+            38.12,
+            28.984999999999996,
+            15.527
+          ],
+          "renderer": {
+            "calls": 122,
+            "triangles": 488337,
+            "geometries": 324,
             "textures": 132
           },
           "ready": true
@@ -1427,8 +1472,8 @@
           ],
           "renderer": {
             "calls": 116,
-            "triangles": 469555,
-            "geometries": 366,
+            "triangles": 471895,
+            "geometries": 333,
             "textures": 132
           },
           "ready": true
@@ -1441,8 +1486,8 @@
           ],
           "renderer": {
             "calls": 454,
-            "triangles": 559740,
-            "geometries": 494,
+            "triangles": 562080,
+            "geometries": 499,
             "textures": 132
           },
           "ready": true
@@ -1455,8 +1500,8 @@
           ],
           "renderer": {
             "calls": 183,
-            "triangles": 461110,
-            "geometries": 511,
+            "triangles": 463450,
+            "geometries": 515,
             "textures": 132
           },
           "ready": true
@@ -1469,8 +1514,8 @@
           ],
           "renderer": {
             "calls": 134,
-            "triangles": 486470,
-            "geometries": 517,
+            "triangles": 488810,
+            "geometries": 521,
             "textures": 132
           },
           "ready": true
@@ -1483,8 +1528,8 @@
           ],
           "renderer": {
             "calls": 130,
-            "triangles": 488067,
-            "geometries": 518,
+            "triangles": 490407,
+            "geometries": 522,
             "textures": 132
           },
           "ready": true
@@ -1497,36 +1542,50 @@
           ],
           "renderer": {
             "calls": 107,
-            "triangles": 454245,
-            "geometries": 520,
+            "triangles": 456585,
+            "geometries": 524,
             "textures": 132
           },
           "ready": true
         },
         "night-overview": {
           "camera": [
-            28.983499999999996,
+            29,
             79.19999999999999,
-            -3.58
+            -3.5635
           ],
           "renderer": {
-            "calls": 240,
-            "triangles": 539225,
-            "geometries": 510,
+            "calls": 185,
+            "triangles": 490921,
+            "geometries": 515,
             "textures": 132
           },
           "ready": true
         },
         "night-aerial": {
           "camera": [
-            38.103500000000004,
+            38.12,
             35.584999999999994,
-            -3.58
+            -3.5635
           ],
           "renderer": {
-            "calls": 123,
-            "triangles": 482979,
-            "geometries": 510,
+            "calls": 120,
+            "triangles": 503841,
+            "geometries": 515,
+            "textures": 132
+          },
+          "ready": true
+        },
+        "night-reference": {
+          "camera": [
+            38.12,
+            28.984999999999996,
+            15.527
+          ],
+          "renderer": {
+            "calls": 127,
+            "triangles": 514527,
+            "geometries": 515,
             "textures": 132
           },
           "ready": true
@@ -1539,8 +1598,8 @@
           ],
           "renderer": {
             "calls": 121,
-            "triangles": 495745,
-            "geometries": 510,
+            "triangles": 498085,
+            "geometries": 515,
             "textures": 132
           },
           "ready": true
@@ -1553,8 +1612,8 @@
           ],
           "renderer": {
             "calls": 459,
-            "triangles": 585930,
-            "geometries": 524,
+            "triangles": 588270,
+            "geometries": 529,
             "textures": 132
           },
           "ready": true
@@ -1567,8 +1626,8 @@
           ],
           "renderer": {
             "calls": 188,
-            "triangles": 487300,
-            "geometries": 524,
+            "triangles": 489640,
+            "geometries": 529,
             "textures": 132
           },
           "ready": true
@@ -1581,8 +1640,8 @@
           ],
           "renderer": {
             "calls": 139,
-            "triangles": 512660,
-            "geometries": 524,
+            "triangles": 515000,
+            "geometries": 529,
             "textures": 132
           },
           "ready": true
@@ -1595,8 +1654,8 @@
           ],
           "renderer": {
             "calls": 135,
-            "triangles": 514257,
-            "geometries": 524,
+            "triangles": 516597,
+            "geometries": 529,
             "textures": 132
           },
           "ready": true
@@ -1609,8 +1668,8 @@
           ],
           "renderer": {
             "calls": 112,
-            "triangles": 480435,
-            "geometries": 524,
+            "triangles": 482775,
+            "geometries": 529,
             "textures": 132
           },
           "ready": true
@@ -1623,7 +1682,7 @@
           ],
           "renderer": {
             "calls": 111,
-            "triangles": 488048,
+            "triangles": 490388,
             "geometries": 299,
             "textures": 108
           },
@@ -1644,7 +1703,7 @@
             },
             "max": {
               "x": 42.68164777929133,
-              "y": 2.351323558807373,
+              "y": 2.385735942840576,
               "z": -0.13596019460405184
             }
           },
@@ -1668,14 +1727,14 @@
           "bounds": {
             "isBox3": true,
             "min": {
-              "x": 36.70691085035151,
-              "y": 1.1025115985870362,
-              "z": -6.6202217073604
+              "x": 34.10388088399714,
+              "y": 2.1725952167510987,
+              "z": -4.4615093202754394
             },
             "max": {
-              "x": 40.3181045072729,
-              "y": 2.351323558807373,
-              "z": -0.5339740247889888
+              "x": 42.13926840001887,
+              "y": 2.385735942840576,
+              "z": -2.69485435201372
             }
           },
           "userData": {
@@ -1683,12 +1742,15 @@
             "roofConforming": true,
             "horizontal": true,
             "layout": {
-              "wordWidth": 6.056550030404368,
-              "symbolSize": 1.7894352362558361,
-              "symbolCenterV": 1.2775397727272728,
-              "wordCenterV": -0.9581548295454545,
-              "relief": 0.0963542050291604,
-              "bevel": 0.0137648864327372,
+              "length": 8.03025,
+              "wordWidth": 5.8620825000000005,
+              "symbolSize": 1.766655,
+              "gap": 0.40151250000000005,
+              "symbolCenterU": -3.1317975000000002,
+              "wordCenterU": 1.08408375,
+              "rotation": 1.5707963267948966,
+              "relief": 0.137648864327372,
+              "bevel": 0.004473588090639589,
               "seating": 0.0206473296491058
             }
           },
@@ -1701,19 +1763,19 @@
           "bounds": {
             "isBox3": true,
             "min": {
-              "x": 36.72071135217494,
-              "y": 1.10726602268219,
-              "z": -6.606456849114551
+              "x": 36.272048236673534,
+              "y": 2.2176243801116944,
+              "z": -4.037691953913822
             },
             "max": {
-              "x": 37.60099035674876,
-              "y": 2.351323558807373,
-              "z": -0.5499068231746089
+              "x": 42.13413047963923,
+              "y": 2.383327199935913,
+              "z": -3.1186717183753383
             }
           },
           "userData": {},
-          "vertices": 4668,
-          "triangles": 1556
+          "vertices": 8292,
+          "triangles": 2764
         },
         {
           "name": "arena-brand-relief-edges",
@@ -1722,19 +1784,19 @@
           "bounds": {
             "isBox3": true,
             "min": {
-              "x": 36.70691085035151,
-              "y": 1.1025115985870362,
-              "z": -6.6202217073604
+              "x": 34.12154722387141,
+              "y": 2.1725952167510987,
+              "z": -4.443842801587238
             },
             "max": {
-              "x": 40.3181045072729,
-              "y": 2.351323558807373,
-              "z": -0.5339740247889888
+              "x": 42.13926840001887,
+              "y": 2.383327199935913,
+              "z": -2.7125208707019217
             }
           },
           "userData": {},
-          "vertices": 14502,
-          "triangles": 4834
+          "vertices": 17898,
+          "triangles": 5966
         },
         {
           "name": "arena-brand-official-symbol",
@@ -1743,14 +1805,14 @@
           "bounds": {
             "isBox3": true,
             "min": {
-              "x": 38.50182780796832,
-              "y": 2.2710654277801514,
-              "z": -4.472899469868793
+              "x": 34.10388088399714,
+              "y": 2.3142485160827637,
+              "z": -4.4615093202754394
             },
             "max": {
-              "x": 40.291263105219066,
-              "y": 2.3444413681030274,
-              "z": -2.6834642024203674
+              "x": 35.87053561384028,
+              "y": 2.385735942840576,
+              "z": -2.69485435201372
             }
           },
           "userData": {},
@@ -1760,47 +1822,20 @@
       ],
       "performance": [
         {
-          "frames": 360,
-          "meanMs": 16.671388889021344,
-          "p95Ms": 18.09999990463257,
-          "renderer": {
-            "at": 73031,
-            "calls": 126,
-            "triangles": 488429,
-            "geometries": 527,
-            "textures": 132,
-            "programs": 226,
-            "dpr": 0.9,
-            "width": 351,
-            "height": 759,
-            "heapBytes": 191494298,
-            "qualityTier": "HIGH",
-            "gpuVendor": "Google Inc. (Intel)",
-            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
-          },
-          "health": {
-            "status": "ready",
-            "path": "post",
-            "presentedFrames": 2722,
-            "contextLosses": 0,
-            "lastErrorCode": null
-          }
-        },
-        {
           "frames": 361,
-          "meanMs": 16.663988919799678,
-          "p95Ms": 18,
+          "meanMs": 16.66565097005744,
+          "p95Ms": 17.200000047683716,
           "renderer": {
-            "at": 79976.19999980927,
+            "at": 72892.29999995232,
             "calls": 126,
-            "triangles": 488429,
-            "geometries": 527,
+            "triangles": 490769,
+            "geometries": 532,
             "textures": 132,
             "programs": 226,
             "dpr": 0.9,
             "width": 351,
             "height": 759,
-            "heapBytes": 188463257,
+            "heapBytes": 167027054,
             "qualityTier": "HIGH",
             "gpuVendor": "Google Inc. (Intel)",
             "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
@@ -1808,64 +1843,7 @@
           "health": {
             "status": "ready",
             "path": "post",
-            "presentedFrames": 3143,
-            "contextLosses": 0,
-            "lastErrorCode": null
-          }
-        },
-        {
-          "frames": 360,
-          "meanMs": 16.666388889153797,
-          "p95Ms": 17.799999952316284,
-          "renderer": {
-            "at": 86913.29999995232,
-            "calls": 126,
-            "triangles": 488429,
-            "geometries": 527,
-            "textures": 132,
-            "programs": 226,
-            "dpr": 0.9,
-            "width": 351,
-            "height": 759,
-            "heapBytes": 185345263,
-            "qualityTier": "HIGH",
-            "gpuVendor": "Google Inc. (Intel)",
-            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
-          },
-          "health": {
-            "status": "ready",
-            "path": "post",
-            "presentedFrames": 3566,
-            "contextLosses": 0,
-            "lastErrorCode": null
-          }
-        }
-      ],
-      "medianMeanMs": 16.666388889153797,
-      "sameSceneBaseline": [
-        {
-          "frames": 361,
-          "meanMs": 16.666204986149584,
-          "p95Ms": 17.399999856948853,
-          "renderer": {
-            "at": 93857.79999995232,
-            "calls": 123,
-            "triangles": 481175,
-            "geometries": 527,
-            "textures": 132,
-            "programs": 226,
-            "dpr": 0.9,
-            "width": 351,
-            "height": 759,
-            "heapBytes": 181750196,
-            "qualityTier": "HIGH",
-            "gpuVendor": "Google Inc. (Intel)",
-            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
-          },
-          "health": {
-            "status": "ready",
-            "path": "post",
-            "presentedFrames": 3990,
+            "presentedFrames": 2704,
             "contextLosses": 0,
             "lastErrorCode": null
           }
@@ -1873,18 +1851,18 @@
         {
           "frames": 361,
           "meanMs": 16.665373961350923,
-          "p95Ms": 17.5,
+          "p95Ms": 17.199999809265137,
           "renderer": {
-            "at": 100807.59999990463,
-            "calls": 123,
-            "triangles": 481175,
-            "geometries": 527,
+            "at": 79824.90000009537,
+            "calls": 126,
+            "triangles": 490769,
+            "geometries": 532,
             "textures": 132,
             "programs": 226,
             "dpr": 0.9,
             "width": 351,
             "height": 759,
-            "heapBytes": 177509727,
+            "heapBytes": 186475047,
             "qualityTier": "HIGH",
             "gpuVendor": "Google Inc. (Intel)",
             "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
@@ -1892,26 +1870,26 @@
           "health": {
             "status": "ready",
             "path": "post",
-            "presentedFrames": 4354,
+            "presentedFrames": 3067,
             "contextLosses": 0,
             "lastErrorCode": null
           }
         },
         {
-          "frames": 357,
-          "meanMs": 16.85322128824827,
-          "p95Ms": 17.299999952316284,
+          "frames": 361,
+          "meanMs": 16.666204986149584,
+          "p95Ms": 17.100000143051147,
           "renderer": {
-            "at": 107722.5,
-            "calls": 123,
-            "triangles": 481175,
-            "geometries": 527,
+            "at": 86741.59999990463,
+            "calls": 126,
+            "triangles": 490769,
+            "geometries": 532,
             "textures": 132,
             "programs": 226,
             "dpr": 0.9,
             "width": 351,
             "height": 759,
-            "heapBytes": 199098907,
+            "heapBytes": 178576728,
             "qualityTier": "HIGH",
             "gpuVendor": "Google Inc. (Intel)",
             "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
@@ -1919,40 +1897,124 @@
           "health": {
             "status": "ready",
             "path": "post",
-            "presentedFrames": 4773,
+            "presentedFrames": 3492,
             "contextLosses": 0,
             "lastErrorCode": null
           }
         }
       ],
-      "baselineMedianMeanMs": 16.666204986149584,
+      "medianMeanMs": 16.66565097005744,
+      "sameSceneBaseline": [
+        {
+          "frames": 361,
+          "meanMs": 16.66592797810351,
+          "p95Ms": 17,
+          "renderer": {
+            "at": 93673.79999995232,
+            "calls": 123,
+            "triangles": 481175,
+            "geometries": 532,
+            "textures": 132,
+            "programs": 226,
+            "dpr": 0.9,
+            "width": 351,
+            "height": 759,
+            "heapBytes": 171188453,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 3917,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 361,
+          "meanMs": 16.665650969397,
+          "p95Ms": 17.09999990463257,
+          "renderer": {
+            "at": 100590.5,
+            "calls": 123,
+            "triangles": 481175,
+            "geometries": 532,
+            "textures": 132,
+            "programs": 226,
+            "dpr": 0.9,
+            "width": 351,
+            "height": 759,
+            "heapBytes": 163336791,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 4340,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        },
+        {
+          "frames": 361,
+          "meanMs": 16.66592797810351,
+          "p95Ms": 17.09999990463257,
+          "renderer": {
+            "at": 107507.29999995232,
+            "calls": 123,
+            "triangles": 481175,
+            "geometries": 532,
+            "textures": 132,
+            "programs": 226,
+            "dpr": 0.9,
+            "width": 351,
+            "height": 759,
+            "heapBytes": 181348161,
+            "qualityTier": "HIGH",
+            "gpuVendor": "Google Inc. (Intel)",
+            "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+          },
+          "health": {
+            "status": "ready",
+            "path": "post",
+            "presentedFrames": 4766,
+            "contextLosses": 0,
+            "lastErrorCode": null
+          }
+        }
+      ],
+      "baselineMedianMeanMs": 16.66592797810351,
       "resources": [
         {
-          "at": 117122.59999990463,
+          "at": 117207.40000009537,
           "calls": 130,
-          "triangles": 488067,
-          "geometries": 525,
+          "triangles": 490407,
+          "geometries": 530,
           "textures": 132,
           "programs": 226,
           "dpr": 1,
           "width": 390,
           "height": 844,
-          "heapBytes": 176884058,
+          "heapBytes": 186768299,
           "qualityTier": "HIGH",
           "gpuVendor": "Google Inc. (Intel)",
           "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
         },
         {
-          "at": 121822.59999990463,
+          "at": 121823.09999990463,
           "calls": 130,
-          "triangles": 488067,
-          "geometries": 525,
+          "triangles": 490407,
+          "geometries": 530,
           "textures": 132,
           "programs": 226,
           "dpr": 1,
           "width": 390,
           "height": 844,
-          "heapBytes": 173845912,
+          "heapBytes": 183432164,
           "qualityTier": "HIGH",
           "gpuVendor": "Google Inc. (Intel)",
           "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
@@ -1965,16 +2027,16 @@
       },
       "final": {
         "renderer": {
-          "at": 112656.29999995232,
+          "at": 112639.90000009537,
           "calls": 130,
-          "triangles": 488067,
-          "geometries": 525,
+          "triangles": 490407,
+          "geometries": 530,
           "textures": 132,
           "programs": 226,
           "dpr": 1,
           "width": 390,
           "height": 844,
-          "heapBytes": 172311917,
+          "heapBytes": 193002791,
           "qualityTier": "HIGH",
           "gpuVendor": "Google Inc. (Intel)",
           "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
@@ -1988,7 +2050,7 @@
         "health": {
           "status": "ready",
           "path": "post",
-          "presentedFrames": 5072,
+          "presentedFrames": 5057,
           "contextLosses": 0,
           "lastErrorCode": null
         },

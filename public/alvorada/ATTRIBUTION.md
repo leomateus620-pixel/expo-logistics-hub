@@ -64,6 +64,24 @@ sampled as density for transparency and shadow; it is not current weather.
 `scripts/prepare-alvorada-clouds.mjs` reproduces the format conversion without
 upscaling, geographic changes or generated detail.
 
+## Arena roof wordmark typography
+
+`fenasoja-wordmark.typeface.json` contains only the glyphs used by the arena
+wordmark, converted from **Inter v4.1, weight 900**. This follows the existing
+`FenasojaBrand.tsx` UI wordmark (`font-black`, tracking `-0.04em`) and the Inter
+family configured in `tailwind.config.ts`; it is not a claim that a separate
+institutional vector wordmark was supplied. The symbol remains the unchanged
+official PNG documented above. Neither attached screenshot is used as artwork.
+
+Source: [official Inter v4.1 release](https://github.com/rsms/inter/releases/tag/v4.1),
+`Inter-4.1.zip` → `extras/ttf/Inter-Black.ttf`.
+Source SHA-256: `6342d3ea6dc088b43867f615e807d898adf100c93edb978b8e52c5eb71a264da`.
+License: [SIL Open Font License 1.1](INTER-LICENSE.txt).
+Reproduce using `node scripts/build-arena-wordmark.mjs <Inter-Black.ttf>`.
+The converted subset preserves glyph outlines and bakes kerning plus the UI
+tracking into the advances for the fixed word FENASOJA. It adds no runtime font
+conversion dependency or remote font request.
+
 ## Three.js r170 texture and font sources
 
 The following assets were downloaded from the official [`mrdoob/three.js`](https://github.com/mrdoob/three.js) repository at the immutable `r170` tag. Three.js is distributed under the [MIT License](./THREE-LICENSE.txt).

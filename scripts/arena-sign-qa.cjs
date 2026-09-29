@@ -6,8 +6,9 @@ const phase = process.argv[2] || 'after';
 const mobile = process.argv.includes('--mobile');
 const output = path.resolve('docs/validation/arena-sign', `${phase}-${mobile ? 'mobile' : 'desktop'}`);
 const poses = {
-  overview: { target: [29, 0, -3.58], position: [28.99, 48, -3.58] },
-  aerial: { target: [38.12, 1.1, -3.58], position: [38.11, 22, -3.58] },
+  overview: { target: [29, 0, -3.58], position: [29, 48, -3.57] },
+  aerial: { target: [38.12, 1.1, -3.58], position: [38.12, 22, -3.57] },
+  reference: { target: [38.12, 1.1, -3.58], position: [38.12, 18, 8] },
   front: { target: [38.12, 2.2, -3.58], position: [23, 6.8, -3.58] },
   rear: { target: [38.12, 2.2, -3.58], position: [53, 6.8, -3.58] },
   left: { target: [38.12, 1.6, -3.58], position: [37, 12, -20] },

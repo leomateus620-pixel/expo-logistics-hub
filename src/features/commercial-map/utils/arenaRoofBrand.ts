@@ -5,7 +5,7 @@ import { ARENA_CANONICAL_LAYOUT } from '../data/arenaCanonicalLayout';
 
 export const ARENA_ROOF_BRAND = Object.freeze({
   symbol: '/alvorada/fenasoja-symbol-official.png',
-  font: '/alvorada/helvetiker-bold.typeface.json',
+  font: '/alvorada/fenasoja-wordmark.typeface.json',
   text: 'FENASOJA',
   maxTriangles: 18000,
   drawCalls: 3,
@@ -21,13 +21,23 @@ export function arenaRoofBrandLayout(width: number, depth: number) {
   if (!(Number.isFinite(width) && Number.isFinite(depth) && width > 0 && depth > 0)) {
     throw new Error('Arena roof branding requires finite positive dimensions');
   }
+  // One centered lockup along the ridge: symbol first, then the UI wordmark.
+  // The 90-degree artwork rotation happens BEFORE conforming to the vault.
+  const length = Math.min(depth * 0.88, width * 2.2);
+  const symbolSize = length * 0.22;
+  const gap = length * 0.05;
+  const wordWidth = length - symbolSize - gap;
   return {
-    wordWidth: width * 0.88,
-    symbolSize: Math.min(width * 0.26, depth * 0.22),
-    symbolCenterV: depth * 0.14,
-    wordCenterV: -depth * 0.105,
-    relief: width * 0.014,
-    bevel: width * 0.002,
+    length,
+    wordWidth,
+    symbolSize,
+    gap,
+    symbolCenterU: -length / 2 + symbolSize / 2,
+    wordCenterU: length / 2 - wordWidth / 2,
+    rotation: Math.PI / 2,
+    relief: width * 0.02,
+    // Inter's compact UI tracking needs narrow chamfers, especially A–S/O–J.
+    bevel: width * 0.00065,
     seating: width * 0.003,
   };
 }
@@ -106,22 +116,36 @@ export function createArenaRoofBrand(width: number, depth: number, font: Font) {
     bevelEnabled: true, bevelThickness: layout.bevel / scale,
     bevelSize: layout.bevel / scale, bevelSegments: 1,
   });
-  text.translate(-center.x, -center.y, 0).scale(scale, scale, scale);
-  text.translate(0, layout.wordCenterV, 0);
+  // Small optical height compensation for the usual inclined roof view.
+  text.translate(-center.x, -center.y, 0).scale(scale, scale * 1.1, scale);
+  text.translate(layout.wordCenterU, 0, 0).rotateZ(layout.rotation);
   const caps = extractMaterial(text, 0), edges = extractMaterial(text, 1);
   text.dispose();
   const faces = conformArenaRoofGeometry(caps, width, layout.seating);
+  // Neutral silver face finish: bright upper edge and a darker lower face.
+  // Vertex colors keep this in the existing face draw, without a texture/atlas.
+  const facePositions = faces.getAttribute('position');
+  const faceBounds = faces.boundingBox!;
+  const silver = new THREE.Color('#959b9f'), pearl = new THREE.Color('#dde1e3'), highlight = new THREE.Color('#ffffff');
+  const color = new THREE.Color(), colors: number[] = [];
+  for (let i = 0; i < facePositions.count; i++) {
+    const height = (faceBounds.max.x - facePositions.getX(i)) / (faceBounds.max.x - faceBounds.min.x);
+    if (height < 0.5) color.copy(silver).lerp(pearl, height * 2);
+    else color.copy(pearl).lerp(highlight, (height - 0.5) * 2);
+    colors.push(color.r, color.g, color.b);
+  }
+  faces.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   const returns = conformArenaRoofGeometry(edges, width, layout.seating);
   caps.dispose(); edges.dispose();
 
   // A low relief backing seats the official emblem on the same roof surface.
   // It preserves the supplied square image, including its transparent gaps.
-  const badge = new THREE.CylinderGeometry(layout.symbolSize * 0.515, layout.symbolSize * 0.515, layout.relief, 48);
-  badge.rotateX(Math.PI / 2).translate(0, layout.symbolCenterV, layout.relief / 2);
+  const badge = new THREE.CylinderGeometry(layout.symbolSize * 0.49, layout.symbolSize * 0.49, layout.relief, 48);
+  badge.rotateX(Math.PI / 2).translate(layout.symbolCenterU, 0, layout.relief / 2).rotateZ(layout.rotation);
   const badgeRelief = conformArenaRoofGeometry(badge, width, layout.seating);
   badge.dispose();
   const symbolPlane = new THREE.PlaneGeometry(layout.symbolSize, layout.symbolSize, 12, 12)
-    .translate(0, layout.symbolCenterV, layout.relief + width * 0.001);
+    .translate(layout.symbolCenterU, 0, layout.relief + width * 0.001).rotateZ(layout.rotation);
   const symbol = conformArenaRoofGeometry(symbolPlane, width, layout.seating);
   symbolPlane.dispose();
   const geometries = { faces, returns: merge([returns, badgeRelief]), symbol };
