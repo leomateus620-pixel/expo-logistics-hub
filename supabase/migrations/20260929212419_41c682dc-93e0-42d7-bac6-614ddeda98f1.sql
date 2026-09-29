@@ -1,0 +1,1 @@
+ALTER VIEW public.commercial_lot_pricing_2028 SET (security_invoker = on);
