@@ -407,11 +407,7 @@ async function fetchCommissionCommercialMap(
     || !Array.isArray(persistedDirection)
     || persistedDirection.length !== 3
     || cameraValues.length !== 6
-    // Camera direction is a vector: negative X/Z components are valid. Only
-    // padding and distance ratios must be strictly positive.
-    || cameraValues.some((value) => !Number.isFinite(value))
-    || cameraValues.slice(0, 3).every((value) => value === 0)
-    || cameraValues.slice(3).some((value) => value <= 0)
+    || !isValidCommissionCameraValues(cameraValues)
   ) {
     throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
   }
