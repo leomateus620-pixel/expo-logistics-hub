@@ -9,7 +9,8 @@ export function resolveMapPermissions(role: string | null, capabilities: Iterabl
   // Commission map portals (Exporural / Indústria, Comércio e Serviços) grant
   // read-only access to their scoped segment even without the global map.view.
   const hasCommissionPortalView = capabilitySet.has('exporural_access')
-    || capabilitySet.has('industria_comercio_servicos_access');
+    || capabilitySet.has('industria_comercio_servicos_access')
+    || capabilitySet.has('espaco_automovel_access');
   return {
     canView: elevated || role === 'operador' || explicit('map.view') || hasCommissionPortalView,
     canEdit: elevated || explicit('map.edit'),

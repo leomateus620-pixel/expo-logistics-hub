@@ -307,8 +307,8 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     return [...scopedData.entities, ...data.parkContextEntities.filter((entity) => !own.has(entity.id))];
   }, [data?.parkContextEntities, isCommissionScope, scopedData.entities, visitEnabled]);
   const commissionInteractiveEntityIds = useMemo(
-    () => (isCommissionScope ? new Set(scopedData.entities.map((entity) => entity.id)) as ReadonlySet<string> : null),
-    [isCommissionScope, scopedData.entities],
+    () => (commissionVisitEntities ? new Set(scopedData.entities.map((entity) => entity.id)) as ReadonlySet<string> : null),
+    [commissionVisitEntities, scopedData.entities],
   );
   const parkingAvailable = rearParkingVisibleInArea(areaScope) && !hydrologicalModeActive
     && rearParkingLayerPresentation(data?.entities ?? [], layerVisibility, layerOpacity).visible;
