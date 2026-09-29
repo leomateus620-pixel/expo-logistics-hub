@@ -124,7 +124,7 @@ export default function CommissionSidebar({ module, menuItems, mobileOpen, onMob
       <nav className="premium-sidebar-scrollbar flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label={`Menu ${module.name}`}>
         {items.map((item) => {
           const Icon = item.icon;
-          const target = getModuleRoute(module, item.path);
+          const target = item.path.startsWith('/') ? item.path : getModuleRoute(module, item.path);
           return (
             <NavLink
               key={item.path}

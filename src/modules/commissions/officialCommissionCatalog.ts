@@ -67,6 +67,8 @@ export interface OfficialUnitEntry {
   order: number;
   /** Módulo já existente que representa esta frente, quando houver. */
   moduleSlug?: string;
+  /** Portal do mapa comercial do segmento, exibido como menu na frente. */
+  mapPortalSlug?: string;
   aliases: string[];
   icon: LucideIcon;
   tone: CommissionTone;
@@ -156,6 +158,7 @@ export const OFFICIAL_COMMISSION_UNITS: readonly OfficialUnitEntry[] = [
     name: 'Espaço do Automóvel',
     type: 'comissao',
     order: 7,
+    mapPortalSlug: 'espaco-automovel',
     aliases: ['automovel', 'espaco automovel'],
     icon: Car,
     tone: 'cyan',
