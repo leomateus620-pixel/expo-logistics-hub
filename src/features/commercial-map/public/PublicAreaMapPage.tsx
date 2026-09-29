@@ -13,6 +13,7 @@ import { COMMERCIAL_PHASES, STATUS_CONFIG } from '../constants';
 import { fetchSaleLogoUrls } from '../sales/saleLogo';
 import { useQuery } from '@tanstack/react-query';
 import { getPublicArea } from './publicAreaRegistry';
+import { applyPublicShareMetadata } from './publicShareMetadata';
 import { findPavilionEntity, PublicMapAccessError } from './publicMapService';
 import { usePublicCanvasLots, usePublicMapContext, usePublicMapInventory, usePublicMapTelemetry } from './usePublicMapArea';
 import { buildPublicInteractionScope, canInspectLot } from './publicInteractionScope';
@@ -73,6 +74,9 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
   const setSelectedEntityId = useCommercialMapStore(state => state.setSelectedEntityId);
   const setSelectedModuleId = useCommercialMapStore(state => state.setSelectedModuleId);
   const data = inventory.data;
+  useEffect(() => {
+    applyPublicShareMetadata(slug, Boolean(data && area && !inventory.error && !context.error), window.location.href);
+  }, [slug, area, data, inventory.error, context.error]);
   const lots = useMemo(() => data?.lots ?? [], [data?.lots]);
   const logos = useQuery({
     queryKey: ['public-map', 'sale-logos', slug, token, data?.revision],
