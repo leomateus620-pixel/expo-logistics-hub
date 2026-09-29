@@ -9754,6 +9754,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      commission_map_park_context: {
+        Args: { p_segment_id: string }
+        Returns: Json
+      }
       complete_google_sync_task: {
         Args: {
           target_is_initial_backfill: boolean
@@ -10245,6 +10249,10 @@ export type Database = {
         Returns: undefined
       }
       resolve_commission_map_segment_slug: {
+        Args: { _metadata: Json; _public_identifier: string }
+        Returns: string
+      }
+      resolve_commission_map_segment_slug_v2: {
         Args: { _metadata: Json; _public_identifier: string }
         Returns: string
       }
