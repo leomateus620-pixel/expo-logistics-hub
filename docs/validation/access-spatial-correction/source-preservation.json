@@ -1,0 +1,445 @@
+{
+  "baseline": "bb82eefb04b2685890e2e999f656ececf511a992",
+  "scope": "Tracked reference, commercial inventory, prices and cadastral geometry sources; LF normalized. Tree placement and access-filter implementation excluded and validated separately. No production/database audit.",
+  "sources": [
+    {
+      "file": "src/features/commercial-map/data/accessJunctionReconstruction.ts",
+      "before": "b1cb3570525efcf4a601ca2d37089967287ab9423975582946baea645f39dc07",
+      "after": "b1cb3570525efcf4a601ca2d37089967287ab9423975582946baea645f39dc07",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/annexSpatialCorrections.ts",
+      "before": "b9b8cdabad1a0643cb3e7d7977d6d1db52fef0b6826669cea7400bb07c7a9740",
+      "after": "b9b8cdabad1a0643cb3e7d7977d6d1db52fef0b6826669cea7400bb07c7a9740",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/arenaCanonicalLayout.ts",
+      "before": "09329786a2b85c43df4be49684955985f3b6c47f7b3a9cee34aa187c85146087",
+      "after": "09329786a2b85c43df4be49684955985f3b6c47f7b3a9cee34aa187c85146087",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/arenaRoadCorrection.ts",
+      "before": "fa04600d660958020e49e381000b378b806850755c479bf716173e79f59b73fc",
+      "after": "fa04600d660958020e49e381000b378b806850755c479bf716173e79f59b73fc",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/arenaSectorZoning.ts",
+      "before": "d8771651dddd4e156a3bb122e165bbc58498c5e2f0cef10febae1a3611fd4d4c",
+      "after": "d8771651dddd4e156a3bb122e165bbc58498c5e2f0cef10febae1a3611fd4d4c",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/arenaTerrain.ts",
+      "before": "a125c45fac42ab459914a511658b2d2b80108497268dee1a92a176c4bab2307c",
+      "after": "a125c45fac42ab459914a511658b2d2b80108497268dee1a92a176c4bab2307c",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/commercialMapEnvironment.ts",
+      "before": "fc67b5332f03a2891cbfd63014c3d35e7e90e2e656b6768a28cc1cda921441d6",
+      "after": "fc67b5332f03a2891cbfd63014c3d35e7e90e2e656b6768a28cc1cda921441d6",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/commercialMapSegments.ts",
+      "before": "eb20dfa4523365a077fd3dc9addff6e2f133ea1f9f7c868e10716185575e0307",
+      "after": "eb20dfa4523365a077fd3dc9addff6e2f133ea1f9f7c868e10716185575e0307",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/commercialMapSpatialBounds.ts",
+      "before": "068eb16775862d59a67a80a743b6982ca54597c03e5c87e699bcdc2b63c4c3f1",
+      "after": "068eb16775862d59a67a80a743b6982ca54597c03e5c87e699bcdc2b63c4c3f1",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/commercialPavilionReference.ts",
+      "before": "e8d6bce38a3924a40f818bb28ebbf6ff593e4116472ca7076db2436b1f7fb095",
+      "after": "e8d6bce38a3924a40f818bb28ebbf6ff593e4116472ca7076db2436b1f7fb095",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/commercialSiteEnvironment.ts",
+      "before": "fce62620b147c5c71923003d8460189847bf34e4e6a8c816f19ab3840de18c4c",
+      "after": "fce62620b147c5c71923003d8460189847bf34e4e6a8c816f19ab3840de18c4c",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/electricalInfrastructure.ts",
+      "before": "40309c305a21e8c2c712b49c761694f5a10536aa9b1aa256931c7aa4f80a326e",
+      "after": "40309c305a21e8c2c712b49c761694f5a10536aa9b1aa256931c7aa4f80a326e",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/electricalPresentation.ts",
+      "before": "ff3adeb800f9cbbd74167c03a189a4af5aadfa4d704ec9085cf70487ad48582b",
+      "after": "ff3adeb800f9cbbd74167c03a189a4af5aadfa4d704ec9085cf70487ad48582b",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/electricalSourceLots.json",
+      "before": "45d2ada1031d646eb8d5c511ab7c7d0bbc185e6416168849c81441bcf8e9b029",
+      "after": "45d2ada1031d646eb8d5c511ab7c7d0bbc185e6416168849c81441bcf8e9b029",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/executiveCharacters.ts",
+      "before": "3cf791903093ea5499df08b8647ca916120255e1083ebbe0b862dbd97fc5e226",
+      "after": "3cf791903093ea5499df08b8647ca916120255e1083ebbe0b862dbd97fc5e226",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/exporural2028/geometria_vias.json",
+      "before": "ae7794183fa7a2727aa6ab96ab82ca708d0f706af5ed1ffdb3cebd437dbce986",
+      "after": "ae7794183fa7a2727aa6ab96ab82ca708d0f706af5ed1ffdb3cebd437dbce986",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/exporural2028/geometrias_lotes.json",
+      "before": "78d174357546a2ec07557a81313d0148e3c5a89d0dff96be89e7dd91e6b5ebc9",
+      "after": "78d174357546a2ec07557a81313d0148e3c5a89d0dff96be89e7dd91e6b5ebc9",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/exporural2028/manifesto_lotes.json",
+      "before": "d6a5fac089188908fb13af4bbd3de0cdf03ce016dbeb38e545222952a7925af8",
+      "after": "d6a5fac089188908fb13af4bbd3de0cdf03ce016dbeb38e545222952a7925af8",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/exporural2028/revisao.json",
+      "before": "469ca09bb29ce21d691935d39cc1849a0d235e9751ee331674c9c31b620a0e43",
+      "after": "469ca09bb29ce21d691935d39cc1849a0d235e9751ee331674c9c31b620a0e43",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/exporural2028/topologia.json",
+      "before": "dfa0fb43fec5ae8c2c0515efbbb8b7e390e1e107510f45c79d89357a42a3b657",
+      "after": "dfa0fb43fec5ae8c2c0515efbbb8b7e390e1e107510f45c79d89357a42a3b657",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/exporuralReference2026.ts",
+      "before": "ebf331c2786f03bd68bc38430a262dde8cef8a8331aa3667d445f2a6818dfb87",
+      "after": "ebf331c2786f03bd68bc38430a262dde8cef8a8331aa3667d445f2a6818dfb87",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/exporuralReference2028.ts",
+      "before": "30eed8fb721cecf19827a5d43dd969b2f40a6655bc17a1fcc3129725cb15b0f9",
+      "after": "30eed8fb721cecf19827a5d43dd969b2f40a6655bc17a1fcc3129725cb15b0f9",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/exteriorArchitecture.ts",
+      "before": "ff9ddc52c39703bf0b82d905b70f47cc95490603764b9a6d571ab6b6cdeea6a3",
+      "after": "ff9ddc52c39703bf0b82d905b70f47cc95490603764b9a6d571ab6b6cdeea6a3",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/externalLotOfficialAreas.ts",
+      "before": "6c2289602ba20420836dd541544c0e7169dede0c1a2bced46f4654b589eeffb4",
+      "after": "6c2289602ba20420836dd541544c0e7169dede0c1a2bced46f4654b589eeffb4",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/fenasojaComplexReconstruction.ts",
+      "before": "a80bd14f61d966aa9b119f652a214659d078e9aeabbd43bfa1c4d75c4652d062",
+      "after": "a80bd14f61d966aa9b119f652a214659d078e9aeabbd43bfa1c4d75c4652d062",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/gateFourDistrict.ts",
+      "before": "840806f9601a09c9c6475c2a62a5b32b87509526d392f4824ad59acc8955a781",
+      "after": "840806f9601a09c9c6475c2a62a5b32b87509526d392f4824ad59acc8955a781",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/hydrologicalInfrastructure.ts",
+      "before": "e558e3330743f748af4978e17707cc952dabda970e38ae88a006573d9254b56a",
+      "after": "e558e3330743f748af4978e17707cc952dabda970e38ae88a006573d9254b56a",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/hydrologicalPresentation.ts",
+      "before": "3b175002585072d0e5ea3280c6285098bbe4952336039bb194c2b09ffb5217d7",
+      "after": "3b175002585072d0e5ea3280c6285098bbe4952336039bb194c2b09ffb5217d7",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/internalGroundCoverage.ts",
+      "before": "092817357abba29b517e138b2cc311a8e3871fe79289604918f725e7dee6d4b2",
+      "after": "092817357abba29b517e138b2cc311a8e3871fe79289604918f725e7dee6d4b2",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/lateralResidentialDistrict.ts",
+      "before": "17e82fa0588207054c6a2cdc1c7f981ed3582bfeaf4ef3650a41beb327d73e00",
+      "after": "17e82fa0588207054c6a2cdc1c7f981ed3582bfeaf4ef3650a41beb327d73e00",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/miranteComplexReconstruction.ts",
+      "before": "7eebbd70eadf0284ff6529d6a6a0309ec2c0241f84ae012d26d1f7bc6fa964f0",
+      "after": "7eebbd70eadf0284ff6529d6a6a0309ec2c0241f84ae012d26d1f7bc6fa964f0",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/nationsDistrict.ts",
+      "before": "afda30923d5d3aefc792e10a81105a065b541b9574efaa5d3a80026f7135eab7",
+      "after": "afda30923d5d3aefc792e10a81105a065b541b9574efaa5d3a80026f7135eab7",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/neCloverleafBr344Br472.ts",
+      "before": "c76d3d03d666ebe7a172ae4b211a340335422b6ba4ba1b1e6dd2a57b14ca070e",
+      "after": "c76d3d03d666ebe7a172ae4b211a340335422b6ba4ba1b1e6dd2a57b14ca070e",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/officialReference2024.ts",
+      "before": "f3f540c8a5190dd860a62e718dca7d1f683b307c0cbe2db28627f0f1e8217c43",
+      "after": "f3f540c8a5190dd860a62e718dca7d1f683b307c0cbe2db28627f0f1e8217c43",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/officialReference2026.ts",
+      "before": "f7caab53baf28964afac1498cf506b00f4c990ce40a8b8fbb55f4e96f103d679",
+      "after": "f7caab53baf28964afac1498cf506b00f4c990ce40a8b8fbb55f4e96f103d679",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/parkAccessSpatialPlan.ts",
+      "before": "d0fee49bc4b07cb617b7593bf09790f7e9948d0e9920a4168f0afc82d42d4d5c",
+      "after": "d0fee49bc4b07cb617b7593bf09790f7e9948d0e9920a4168f0afc82d42d4d5c",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/parkEnvironment.ts",
+      "before": "07c8ab91fe814392451787378826fd5378cd799954fe103f0cabf4e36ddbf575",
+      "after": "07c8ab91fe814392451787378826fd5378cd799954fe103f0cabf4e36ddbf575",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/pavilion12CommercialReference.ts",
+      "before": "da8cc13160e56a4cc8c914296e04e117d82ffc1e9dad7ebcbeaa37b2fa77e065",
+      "after": "da8cc13160e56a4cc8c914296e04e117d82ffc1e9dad7ebcbeaa37b2fa77e065",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/pavilion13CommercialReference.ts",
+      "before": "f1c07b3498c10319b89a9163fb0df5060946daf853498c6f6f1163931b9352f3",
+      "after": "f1c07b3498c10319b89a9163fb0df5060946daf853498c6f6f1163931b9352f3",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/pavilion14CommercialReference.ts",
+      "before": "4c0f280fe04f38c6fb7e30320b0c261bd324c78c844da22c12d655b334f018e5",
+      "after": "4c0f280fe04f38c6fb7e30320b0c261bd324c78c844da22c12d655b334f018e5",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/pavilion1CommercialReference.ts",
+      "before": "9583224f060aa743112ac160a1fca12af987d7b2442b45fd87f0d881b216b64d",
+      "after": "9583224f060aa743112ac160a1fca12af987d7b2442b45fd87f0d881b216b64d",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/pavilion3CommercialReference.ts",
+      "before": "7e311fad4943378772d38312540ae2da4204b8de8dbc911b5299c2bb2a27ce59",
+      "after": "7e311fad4943378772d38312540ae2da4204b8de8dbc911b5299c2bb2a27ce59",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/pavilion5CommercialReference.ts",
+      "before": "22f1ab58b5b7a6ea5e0dece83cce574332990ca922048dbef228050bee474c25",
+      "after": "22f1ab58b5b7a6ea5e0dece83cce574332990ca922048dbef228050bee474c25",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/pavilion7CommercialReference.ts",
+      "before": "08bb26555df0892ddd462da0b87295deb6ff69bf7fe29cfa96b4ffdc08652575",
+      "after": "08bb26555df0892ddd462da0b87295deb6ff69bf7fe29cfa96b4ffdc08652575",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/pavilion8CommercialReference.ts",
+      "before": "aea1ab2271fb31fb7860b46bf54a7e6cbb2a21f856e7f109af2ea51cb2aa70ae",
+      "after": "aea1ab2271fb31fb7860b46bf54a7e6cbb2a21f856e7f109af2ea51cb2aa70ae",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/pavilionCourtyard.ts",
+      "before": "4044d051ff465659f087939e0b004a098650839a7d0015680bb7a98755561244",
+      "after": "4044d051ff465659f087939e0b004a098650839a7d0015680bb7a98755561244",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/pavilionDimensionAnnotations.ts",
+      "before": "09d68babcd6f5cf3a85b7813790b634dd45a57bc5391773f2760083739f5c30c",
+      "after": "09d68babcd6f5cf3a85b7813790b634dd45a57bc5391773f2760083739f5c30c",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/pavilionModuleOfficialAreas.ts",
+      "before": "520a10a27cdba7c3fc9ef1fa53ae05d7a82cd5f4f43916bc822dff3c5d7545d6",
+      "after": "520a10a27cdba7c3fc9ef1fa53ae05d7a82cd5f4f43916bc822dff3c5d7545d6",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/quadrasABEnvironment.ts",
+      "before": "cf9110a5278a117036bd4ebecba03d909fc32de9aaea958f2bffa716479b2ff8",
+      "after": "cf9110a5278a117036bd4ebecba03d909fc32de9aaea958f2bffa716479b2ff8",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/rearParkEnvironment.ts",
+      "before": "32d044132d6007b6c72db704a3c902b138c7ab4a2ec263977df8fcb35de6c066",
+      "after": "32d044132d6007b6c72db704a3c902b138c7ab4a2ec263977df8fcb35de6c066",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/rearParkRoadNetwork.ts",
+      "before": "7a30b428ea7705ded01b9125bdb7865303f14e5a3e833bc0f3f0dd8d5000de5c",
+      "after": "7a30b428ea7705ded01b9125bdb7865303f14e5a3e833bc0f3f0dd8d5000de5c",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/rearParking.ts",
+      "before": "5e198570345c9f5bfde933015b84135a2201f020fed4962323aa23c60d20b330",
+      "after": "5e198570345c9f5bfde933015b84135a2201f020fed4962323aa23c60d20b330",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/rearParkingFootprint.ts",
+      "before": "e835f9acac896ea2daca46850aff4307c11c1e338daf38efbbabefb127f8d04b",
+      "after": "e835f9acac896ea2daca46850aff4307c11c1e338daf38efbbabefb127f8d04b",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/rearParkingSource.ts",
+      "before": "903c646edfd66efffa0565f92f1bd84b9e51689282f6336e66864c27dce598f9",
+      "after": "903c646edfd66efffa0565f92f1bd84b9e51689282f6336e66864c27dce598f9",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/rearParkingVegetation.ts",
+      "before": "2b44da7f38cb67ca7bdfa18ce29860dba5a0c3af6fa595259e0a29270226585f",
+      "after": "2b44da7f38cb67ca7bdfa18ce29860dba5a0c3af6fa595259e0a29270226585f",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/rearRoadExclusions.ts",
+      "before": "b67e4cebad004fdf5e7cf617e8c9a2977f92d761f35338abe621bf0d9c68f709",
+      "after": "b67e4cebad004fdf5e7cf617e8c9a2977f92d761f35338abe621bf0d9c68f709",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/reconcileExporuralReference.ts",
+      "before": "f4c46f0ef7836886315f0bf7ffcf72b982d279245527984eb68c25e4862f27ba",
+      "after": "f4c46f0ef7836886315f0bf7ffcf72b982d279245527984eb68c25e4862f27ba",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/regional-highways/br344MainlineLayer.ts",
+      "before": "7a394d9fedee639b52940ba1e8fe9a1277d97e7d145d05430add3ef9f34d1b43",
+      "after": "7a394d9fedee639b52940ba1e8fe9a1277d97e7d145d05430add3ef9f34d1b43",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/regional-highways/br472MainlineLayer.ts",
+      "before": "2db30ce466a24bc0030dbcba50ef74047ef1ef9eead4292d1222adc378ee5523",
+      "after": "2db30ce466a24bc0030dbcba50ef74047ef1ef9eead4292d1222adc378ee5523",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/regional-highways/contract.ts",
+      "before": "9adeb252d8df6abe674e6a71875115ad8eeab7c9687dbd56cabae1762323432b",
+      "after": "9adeb252d8df6abe674e6a71875115ad8eeab7c9687dbd56cabae1762323432b",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/regional-highways/framing.ts",
+      "before": "46f881b8586db085cb250d76b330f590136b5476230b1c29388150e5c05cda5b",
+      "after": "46f881b8586db085cb250d76b330f590136b5476230b1c29388150e5c05cda5b",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/regional-highways/index.ts",
+      "before": "198bb1ae9d3ad374c654cde286607d9c2c1e5ca8cb68e6d8163c36971819f00b",
+      "after": "198bb1ae9d3ad374c654cde286607d9c2c1e5ca8cb68e6d8163c36971819f00b",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/regional-highways/layers.ts",
+      "before": "04f2608aca68f56699a020a1b7f10363e540e6258883d9b5319411954b88a1f2",
+      "after": "04f2608aca68f56699a020a1b7f10363e540e6258883d9b5319411954b88a1f2",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/regional-highways/neCloverleafLayer.ts",
+      "before": "264bfe785a002ba6d8115e7f7586b02ba0d1bc2ab5cb0392509d86008ffc9737",
+      "after": "264bfe785a002ba6d8115e7f7586b02ba0d1bc2ab5cb0392509d86008ffc9737",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/regional-highways/seCloverleafLayer.ts",
+      "before": "814966c442c0ec0cc2e4aa96cf4d279739198bcc4d747b612630422653b3f231",
+      "after": "814966c442c0ec0cc2e4aa96cf4d279739198bcc4d747b612630422653b3f231",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/ruralPavilionReconstruction.ts",
+      "before": "be1300bf505b5ef164b6d88c67769f897d729226d81f3577f16be1ac3f00be2e",
+      "after": "be1300bf505b5ef164b6d88c67769f897d729226d81f3577f16be1ac3f00be2e",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/seCloverleaf.ts",
+      "before": "a45d6f04bd247951a1da26745035ef0e6f6ba562b0875b48c470af532ff368b2",
+      "after": "a45d6f04bd247951a1da26745035ef0e6f6ba562b0875b48c470af532ff368b2",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/soyGateInfrastructure.ts",
+      "before": "436c2badab135708a609e2f98a49f03712171e553c8bd1e00152c95ed06b7d66",
+      "after": "436c2badab135708a609e2f98a49f03712171e553c8bd1e00152c95ed06b7d66",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/territorialEnvironment.ts",
+      "before": "0625a1974cfab6fe1726cd1bd8c5dc9f80bf724a5b200720addfe8c2f1f128b8",
+      "after": "0625a1974cfab6fe1726cd1bd8c5dc9f80bf724a5b200720addfe8c2f1f128b8",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/territorialRoads.ts",
+      "before": "23e605ecd4099d8befa24808f5c97f2525ff2c362289cbc4deebdfbfccafdb28",
+      "after": "23e605ecd4099d8befa24808f5c97f2525ff2c362289cbc4deebdfbfccafdb28",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/territoryContext.generated.json",
+      "before": "9c5e5b64cba001b74d9021a706b77aec6b0edb90a9d7daf76c429b2a1a2d4a84",
+      "after": "9c5e5b64cba001b74d9021a706b77aec6b0edb90a9d7daf76c429b2a1a2d4a84",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/territoryRoadSource.LICENSE.md",
+      "before": "419b3cddb274ee037d2f7800f5e1ac9a7a4450634f14050d8298c1385281233d",
+      "after": "419b3cddb274ee037d2f7800f5e1ac9a7a4450634f14050d8298c1385281233d",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/territoryRoadSource.json",
+      "before": "a4cb58ee1817f536f68d4b90ae7ca4ad70f599294e149d684085e494b67452aa",
+      "after": "a4cb58ee1817f536f68d4b90ae7ca4ad70f599294e149d684085e494b67452aa",
+      "unchanged": true
+    }
+  ],
+  "unchanged": true
+}
