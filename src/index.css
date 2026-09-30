@@ -3460,11 +3460,11 @@ input::placeholder, textarea::placeholder {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* Alvorada alone retains its authored motion, including the embedded host.
-     The rest of the application continues to honor the OS preference. */
-  *:not(.alvorada-overlay, .alvorada-overlay *, :where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"]))),
-  *:not(.alvorada-overlay, .alvorada-overlay *, :where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"])))::before,
-  *:not(.alvorada-overlay, .alvorada-overlay *, :where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"])))::after {
+  /* Authored Alvorada motion and explicitly marked Commercial Map controls
+     retain their motion. All other surfaces honor the OS preference. */
+  *:not(.alvorada-overlay, .alvorada-overlay *, :where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"]), [data-commercial-map-full-motion], [data-commercial-map-full-motion] *)),
+  *:not(.alvorada-overlay, .alvorada-overlay *, :where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"]), [data-commercial-map-full-motion], [data-commercial-map-full-motion] *))::before,
+  *:not(.alvorada-overlay, .alvorada-overlay *, :where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"]), [data-commercial-map-full-motion], [data-commercial-map-full-motion] *))::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

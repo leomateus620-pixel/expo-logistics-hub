@@ -1,0 +1,51 @@
+{
+  "ref": "6cd27b91",
+  "cwd": "C:\\Users\\Leonardo\\Desktop\\expo-logistics-hub",
+  "command": [
+    "npm",
+    "run",
+    "test",
+    "--",
+    "src/test/commercialMapMobileExperience.test.ts",
+    "src/test/commercialMapRuntimeStability.test.ts",
+    "--maxWorkers=2",
+    "-t",
+    "mantém antialias, gestos GIS completos e DPR adaptativo no canvas compartilhado|mantém os drafts comerciais restritos à entidade sem remontar o painel",
+    "--reporter=json",
+    "--outputFile=C:/Users/Leonardo/.codex/worktrees/commercial-map-liquid-glass/expo-logistics-hub/docs/validation/liquid-glass-controls/baseline-test-failures.json"
+  ],
+  "statusesCounts": {
+    "files": 2,
+    "totalTests": 18,
+    "passedTests": 0,
+    "failedTests": 2,
+    "skippedTests": 16
+  },
+  "failures": [
+    {
+      "testcase": "arquitetura mobile-first do Mapa Comercial mantém antialias, gestos GIS completos e DPR adaptativo no canvas compartilhado",
+      "status": "failed",
+      "error": "AssertionError: expected 'import { InteriorViewControls } from …' to contain 'touches={{ ONE: THREE.TOUCH.PAN, TWO:…'",
+      "expectedLiteral": "touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE }}"
+    },
+    {
+      "testcase": "contrato de estabilidade do mapa comercial mantém os drafts comerciais restritos à entidade sem remontar o painel",
+      "status": "failed",
+      "error": "AssertionError: expected 'import { useLayoutEffect, useMemo, us…' to contain 'setEditingLot(false);'",
+      "expectedLiteral": "setEditingLot(false);"
+    }
+  ],
+  "candidate": {
+    "branch": "codex/commercial-map-liquid-glass",
+    "files": 15,
+    "passedFiles": 13,
+    "failedFiles": 2,
+    "totalTests": 180,
+    "passedTests": 178,
+    "failedTests": 2,
+    "newRailTests": 12,
+    "newRailPassed": 12,
+    "durationSeconds": 16.48,
+    "verdict": "Both candidate failures reproduce with the same assertion text on the baseline; the Canvas and MapPanels product files are unchanged by this PR."
+  }
+}

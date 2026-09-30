@@ -2,7 +2,7 @@
   position: relative;
   z-index: 24;
   display: flex;
-  width: 58px;
+  width: 274px;
   min-height: 0;
   flex: 0 0 auto;
   flex-direction: column;
@@ -11,8 +11,35 @@
   color: #16372a;
 }
 .commercial-map-dock[hidden] { display: none; }
-.commercial-map-dock.is-expanded { width: 274px; }
-.commercial-map-dock.is-context-interior.is-compact { width: 168px; }
+/* A closed desktop dock is one floating action, with no reserved canvas column. */
+.commercial-map-dock.is-compact:not(.is-mobile) {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(12px, env(safe-area-inset-left));
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+}
+.commercial-map-dock.is-compact:not(.is-mobile) .commercial-map-dock__head { min-height: 44px; padding: 0; }
+.commercial-map-dock.is-compact:not(.is-mobile) .commercial-map-dock__toggle {
+  width: 44px;
+  border: 1px solid rgb(192 234 255 / .85);
+  border-radius: 15px;
+  background: linear-gradient(155deg, rgb(138 218 251 / .32), transparent 72%), #245d7d;
+  color: #f2fbff;
+  box-shadow: 0 5px 12px -5px rgb(6 39 61 / .5), inset 0 1px rgb(233 250 255 / .45);
+}
+.commercial-map-dock.is-compact:not(.is-mobile) .commercial-map-dock__toggle svg { width: 22px; height: 22px; stroke-width: 1.9; }
+.commercial-map-dock.is-compact:not(.is-mobile) .commercial-map-dock__toggle:focus-visible { outline-color: #90dfff; }
+.commercial-map-dock.is-compact:not(.is-mobile) .commercial-map-dock__toggle:active { transform: scale(.97); }
+@media (hover: hover) and (pointer: fine) {
+  .commercial-map-dock.is-compact:not(.is-mobile) .commercial-map-dock__toggle:hover { background-color: #2e7396; }
+}
+.commercial-map-dock.is-context-interior.is-compact:not(.is-mobile) { width: 96px; }
+.commercial-map-dock.is-context-interior.is-compact:not(.is-mobile) .commercial-map-dock__head { flex-direction: row; gap: 8px; }
+.commercial-map-dock.is-context-interior.is-compact:not(.is-mobile) .commercial-map-dock__back { width: 44px; flex: 0 0 44px; padding: 0; border-radius: 15px; box-shadow: 0 5px 12px -5px rgb(6 39 61 / .35); }
+.commercial-map-dock.is-context-interior.is-compact:not(.is-mobile) .commercial-map-dock__back span { display: none; }
 .commercial-map-dock__head { display: flex; flex-shrink: 0; min-height: 54px; align-items: center; gap: 4px; padding: 4px 8px; }
 .commercial-map-dock__brand { display: flex; flex: 1; min-width: 0; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; }
 .commercial-map-dock__brand svg { width: 15px; height: 15px; flex-shrink: 0; }
@@ -22,8 +49,6 @@
 .commercial-map-dock__toggle:hover { background: #e7efe8; }
 .commercial-map-dock__back { display: flex; flex: 1; min-height: 44px; gap: 6px; align-items: center; justify-content: center; padding: 5px 8px; border: 1px solid #aec7b7; border-radius: 9px; background: #e7f1e8; font-size: 12px; font-weight: 800; }
 .commercial-map-dock__back svg { width: 16px; height: 16px; flex-shrink: 0; }
-.commercial-map-dock.is-context-interior.is-compact .commercial-map-dock__head { flex-direction: column; }
-.commercial-map-dock.is-context-interior.is-compact .commercial-map-dock__back { width: 100%; }
 .commercial-map-dock__scroll { display: flex; min-height: 0; flex: 1; flex-direction: column; gap: 14px; overflow: auto; overflow-x: hidden; overscroll-behavior: contain; padding: 0 10px 14px; scrollbar-width: thin; touch-action: pan-y; }
 .commercial-map-dock__segment-heading { display: flex; justify-content: space-between; align-items: baseline; margin: 2px 2px 8px; gap: 6px; }
 .commercial-map-dock__segment-heading strong { font-size: 12px; }
@@ -69,3 +94,7 @@
 .commercial-map-shell:has(.commercial-map-dock.is-mobile) .commercial-map-cinematic-legend { bottom: calc(var(--commercial-map-context-sheet-height, 52px) + 8px); }
 .commercial-map-shell.is-lunar-launch-active .commercial-map-dock { visibility: hidden; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { .commercial-map-dock button { transition: none; } }
+@media (forced-colors: active) {
+  .commercial-map-dock.is-compact:not(.is-mobile) .commercial-map-dock__toggle { border-color: ButtonText; background: ButtonFace; color: ButtonText; box-shadow: none; }
+  .commercial-map-dock.is-compact:not(.is-mobile) .commercial-map-dock__toggle:focus-visible { outline-color: Highlight; }
+}

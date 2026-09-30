@@ -1,89 +1,251 @@
+/* Tokens are local to the controls and their portaled menu. */
+.commercial-map-glass {
+  --glass-base: rgb(36 79 104 / .64);
+  --glass-fallback: #315970;
+  --glass-menu: #31536a;
+  --glass-ink: #f2fbff;
+  --glass-border: rgb(199 238 255 / .72);
+  --glass-reflection: rgb(230 250 255 / .28);
+  --glass-inner-shadow: rgb(4 32 51 / .34);
+  --glass-shadow: 0 6px 18px -5px rgb(4 29 47 / .42);
+  --glass-button: rgb(204 239 255 / .1);
+  --glass-button-border: rgb(208 241 255 / .3);
+  --glass-button-reflection: rgb(225 248 255 / .18);
+  --glass-button-shadow: 0 3px 7px -4px rgb(4 29 47 / .65);
+  --glass-hover: rgb(206 241 255 / .2);
+  --glass-selected: rgb(51 151 196 / .66);
+  --glass-selected-reflection: rgb(134 233 255 / .5);
+  --glass-selected-border: #9ce8ff;
+  --glass-selected-shadow: 0 3px 10px -4px rgb(72 200 243 / .65);
+  --glass-focus: #d7f5ff;
+  --glass-divider: rgb(210 240 255 / .28);
+  --glass-edge: rgb(45 90 116 / .92);
+  --glass-radius: 40px;
+  --glass-button-radius: 18px;
+  --glass-menu-radius: 20px;
+  --glass-menu-item-radius: 12px;
+  --glass-edge-radius: 8px;
+  --glass-control-size: 54px;
+  --glass-gap: 14px;
+  --glass-padding: 10px;
+  --glass-icon-size: 26px;
+  --glass-blur: 10px;
+  --glass-duration: 170ms;
+  --glass-press-duration: 100ms;
+  --glass-ease: cubic-bezier(.2, .7, .2, 1);
+  color: var(--glass-ink);
+}
+.commercial-map-glass[data-glass-theme="night"] {
+  --glass-base: rgb(21 47 67 / .72);
+  --glass-fallback: #203c51;
+  --glass-menu: #263f53;
+  --glass-ink: #edf7fc;
+  --glass-border: rgb(191 229 249 / .44);
+  --glass-reflection: rgb(208 240 255 / .16);
+  --glass-inner-shadow: rgb(2 14 26 / .28);
+  --glass-shadow: 0 6px 16px -5px rgb(2 12 24 / .55);
+  --glass-button: rgb(211 235 249 / .07);
+  --glass-button-border: rgb(198 231 250 / .25);
+  --glass-button-reflection: rgb(217 245 255 / .12);
+  --glass-hover: rgb(201 232 251 / .16);
+  --glass-selected: rgb(43 126 168 / .62);
+  --glass-selected-reflection: rgb(121 218 255 / .36);
+  --glass-selected-border: #92dcf5;
+  --glass-focus: #b0e8ff;
+  --glass-divider: rgb(195 227 247 / .25);
+  --glass-edge: rgb(35 62 82 / .96);
+}
+.commercial-map-control-rail {
+  display: flex;
+  width: max-content;
+  height: calc(var(--glass-control-size) + var(--glass-padding) * 2 + 2px);
+  padding: 0;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
+  background: linear-gradient(180deg, var(--glass-reflection), transparent 48%), var(--glass-fallback);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-reflection), inset 0 -1px 2px var(--glass-inner-shadow);
+  isolation: isolate;
+}
+/* Only this small surface blurs; no blur on buttons, menu or canvas. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .commercial-map-control-rail {
+    background: linear-gradient(180deg, var(--glass-reflection), transparent 48%), var(--glass-base);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.12);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.12);
+  }
+}
 .commercial-map-topbar {
   position: absolute;
   z-index: 18;
-  top: 14px;
+  top: max(14px, env(safe-area-inset-top));
   left: 50%;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 4px;
-  border: 1px solid rgba(25, 61, 36, .13);
-  border-radius: 16px;
-  background: rgba(253, 254, 251, .9);
-  box-shadow: 0 16px 38px -22px rgba(25, 54, 33, .6);
-  backdrop-filter: blur(20px) saturate(1.25);
+  max-width: calc(100% - max(14px, env(safe-area-inset-left)) - max(14px, env(safe-area-inset-right)));
   transform: translateX(-50%);
 }
-
-.commercial-map-topbar__trigger {
+/* The collapsed dock is now a floating control over the full-width canvas. */
+.commercial-map-body:has(.commercial-map-dock.is-compact:not(.is-mobile)) .commercial-map-topbar {
+  max-width: calc(100% - max(76px, calc(env(safe-area-inset-left) + 60px)) - max(76px, calc(env(safe-area-inset-right) + 60px)));
+}
+.commercial-map-control-rail__scroll {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--glass-gap);
+  padding: var(--glass-padding);
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: inherit;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  scrollbar-width: none;
+}
+.commercial-map-control-rail__scroll::-webkit-scrollbar { display: none; }
+.commercial-map-control-rail::before,
+.commercial-map-control-rail::after {
+  position: absolute;
+  z-index: 1;
+  top: 6px;
+  bottom: 6px;
+  width: 16px;
+  border-radius: var(--glass-edge-radius);
+  content: '';
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--glass-duration) var(--glass-ease);
+}
+.commercial-map-control-rail::before {
+  left: 1px;
+  background: linear-gradient(90deg, var(--glass-edge), transparent);
+  box-shadow: inset 2px 0 0 var(--glass-border);
+}
+.commercial-map-control-rail::after {
+  right: 1px;
+  background: linear-gradient(-90deg, var(--glass-edge), transparent);
+  box-shadow: inset -2px 0 0 var(--glass-border);
+}
+.commercial-map-control-rail[data-overflow-start="true"]::before,
+.commercial-map-control-rail[data-overflow-end="true"]::after { opacity: 1; }
+.commercial-map-control-rail__scroll > button {
   position: relative;
   display: grid;
-  width: 38px;
-  height: 38px;
+  width: var(--glass-control-size);
+  height: var(--glass-control-size);
+  min-width: 44px;
+  min-height: 44px;
+  flex: 0 0 var(--glass-control-size);
   place-items: center;
-  border-radius: 12px;
-  color: #4d5f56;
-  transition: background .18s ease, color .18s ease;
+  border: 1px solid var(--glass-button-border);
+  border-radius: var(--glass-button-radius);
+  background: linear-gradient(155deg, var(--glass-button-reflection), transparent 68%), var(--glass-button);
+  color: var(--glass-ink);
+  box-shadow: var(--glass-button-shadow), inset 0 1px 0 var(--glass-reflection), inset 0 -1px 2px var(--glass-inner-shadow);
+  transition: transform var(--glass-duration) var(--glass-ease), background-color var(--glass-duration) var(--glass-ease), border-color var(--glass-duration) var(--glass-ease), color var(--glass-duration) var(--glass-ease);
 }
-.commercial-map-topbar__trigger:hover { background: rgba(24, 94, 43, .08); color: var(--map-forest-dark); }
-.commercial-map-topbar__trigger.is-open { background: rgba(24, 94, 43, .12); color: var(--map-forest-dark); }
-.commercial-map-topbar__trigger.is-hydrological { color: #2576a8; }
-.commercial-map-topbar__trigger.is-hydrological:hover {
-  background: rgba(31, 139, 195, .1);
-  color: #0c5e90;
+.commercial-map-control-rail__scroll > button svg,
+.commercial-map-toolbar-menu.commercial-map-glass [role="menuitem"] > svg {
+  width: var(--glass-icon-size);
+  height: var(--glass-icon-size);
+  flex-shrink: 0;
+  stroke-width: 1.9;
+  color: inherit;
+  transition: transform var(--glass-duration) var(--glass-ease);
 }
-.commercial-map-topbar__trigger.is-hydrological.is-open {
-  background: linear-gradient(145deg, #1776ad, #21a7cf);
-  color: #fff;
-  box-shadow: 0 8px 20px -10px rgba(13, 104, 155, .9), inset 0 1px rgba(255, 255, 255, .28);
+.commercial-map-control-rail__scroll > button:is(.is-open, .is-active, [data-state="open"]),
+.commercial-map-toolbar-menu.commercial-map-glass [data-active="true"] {
+  border-color: var(--glass-selected-border);
+  background: linear-gradient(155deg, var(--glass-selected-reflection), transparent 72%), var(--glass-selected);
+  box-shadow: var(--glass-selected-shadow), inset 0 1px 0 var(--glass-reflection), inset 0 0 0 1px var(--glass-button-border);
 }
-.commercial-map-topbar__trigger.is-rain { color: #426c82; }
-.commercial-map-topbar__trigger.is-rain:hover { background: #e8f1f5; }
-.commercial-map-topbar__trigger.is-rain.is-open {
-  color: #d5edf9;
-  border-color: #568299;
-  background: linear-gradient(145deg, #254252, #3e657a);
+@media (hover: hover) and (pointer: fine) {
+  .commercial-map-control-rail__scroll > button:hover:not(:disabled) { background-color: var(--glass-hover); transform: translateY(-1px); }
+  .commercial-map-control-rail__scroll > button:hover:not(:disabled) svg { transform: scale(1.03); }
+  .commercial-map-control-rail__scroll > button:is(.is-open, .is-active, [data-state="open"]):hover:not(:disabled) { background-color: var(--glass-selected); }
 }
-.commercial-map-topbar__trigger.is-night { color: #4a5578; }
-.commercial-map-topbar__trigger.is-night:hover {
-  background: rgba(64, 76, 140, .1);
-  color: #2c3566;
+.commercial-map-control-rail__scroll > button:active:not(:disabled) { transform: scale(.97); transition-duration: var(--glass-press-duration); }
+.commercial-map-control-rail__scroll > button:focus-visible { outline: 2px solid var(--glass-focus); outline-offset: -3px; }
+.commercial-map-control-rail__scroll > button:disabled { cursor: default; opacity: .38; }
+.commercial-map-topbar__divider { width: 1px; height: 30px; flex: 0 0 1px; margin-inline: 0; background: var(--glass-divider); }
+/* The related portal has a solid glass tint for reliable text contrast. */
+.commercial-map-toolbar-menu.commercial-map-glass {
+  --glass-icon-size: 22px;
+  min-width: 216px;
+  max-width: calc(100vw - 16px);
+  max-height: var(--radix-dropdown-menu-content-available-height);
+  padding: 5px;
+  overflow-y: auto;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-menu-radius);
+  background: linear-gradient(180deg, var(--glass-reflection), transparent 42%), var(--glass-menu);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-reflection);
+  animation-duration: var(--glass-duration);
 }
-.commercial-map-topbar__trigger.is-night.is-open {
-  background: linear-gradient(150deg, #1c2450, #3b4a9c 62%, #5d6fc9);
-  color: #f6f1e4;
-  box-shadow: 0 8px 20px -10px rgba(28, 36, 80, .95), inset 0 1px rgba(255, 255, 255, .22);
+.commercial-map-toolbar-menu.commercial-map-glass [role="menuitem"] { min-height: 44px; gap: 10px; border: 1px solid transparent; border-radius: var(--glass-menu-item-radius); color: var(--glass-ink); font-size: 13px; font-weight: 600; }
+.commercial-map-toolbar-menu.commercial-map-glass [role="menuitem"][data-highlighted] { background: var(--glass-hover); outline: 2px solid var(--glass-focus); outline-offset: -2px; }
+.commercial-map-toolbar-menu.commercial-map-glass [role="menuitem"][data-disabled] { opacity: .38; }
+.commercial-map-toolbar-menu.commercial-map-glass [role="menuitem"] > span { flex: 1; }
+.commercial-map-toolbar-menu.commercial-map-glass [role="menuitem"] > i { width: 6px; height: 6px; border-radius: 50%; background: var(--glass-ink); }
+.commercial-map-toolbar-menu.commercial-map-glass [role="separator"] { background: var(--glass-divider); }
+/* Keep compact alternatives reachable even when a portal has no container. */
+.commercial-map-toolbar-menu-focus-selection,
+.commercial-map-toolbar-menu .commercial-map-toolbar-menu-top { display: flex; }
+.commercial-map-toolbar-mobile {
+  --glass-control-size: 44px;
+  --glass-gap: 7px;
+  --glass-padding: 7px;
+  --glass-icon-size: 22px;
+  --glass-radius: 30px;
+  --glass-button-radius: 15px;
+  display: none;
 }
-.commercial-map-topbar__trigger.is-night.is-open svg {
-  filter: drop-shadow(0 0 6px rgba(255, 233, 189, .55));
-}
-.commercial-map-topbar__trigger svg { width: 18px; height: 18px; }
-.commercial-map-topbar__trigger i {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 7px;
-  height: 7px;
-  border: 1.5px solid rgba(253, 254, 251, .95);
-  border-radius: 999px;
-  background: var(--map-gold, #b28437);
-}
-.commercial-map-topbar__trigger:focus-visible { outline: 3px solid rgba(24, 94, 43, .3); outline-offset: 2px; }
-
-
-.commercial-map-topbar__trigger:disabled { cursor: default; opacity: .38; }
-.commercial-map-topbar__divider {
-  width: 1px;
-  height: 22px;
-  margin-inline: 4px;
-  background: rgba(25, 61, 36, .14);
-}
-
-/* Keep these conditions aligned with the compact MapToolbar. */
 @container commercial-map (max-width: 720px) {
   .commercial-map-topbar { display: none; }
+  .commercial-map-toolbar-mobile {
+    --rail-left: max(8px, env(safe-area-inset-left));
+    --rail-right: calc(max(8px, env(safe-area-inset-right)) + 52px);
+    position: absolute;
+    z-index: 18;
+    top: max(8px, env(safe-area-inset-top));
+    left: var(--rail-left);
+    display: flex;
+    max-width: calc(100% - var(--rail-left) - var(--rail-right));
+  }
+  .commercial-map-shell.is-commission-scope .commercial-map-toolbar-mobile { --rail-right: calc(max(8px, env(safe-area-inset-right)) + 104px); }
+  .commission-layout--map .commercial-map-shell.is-commission-scope .commercial-map-toolbar-mobile { --rail-left: calc(max(8px, env(safe-area-inset-left)) + 3.4rem); }
 }
-
 @media (max-width: 950px) and (max-height: 520px) {
   .commercial-map-topbar { display: none; }
+  .commercial-map-toolbar-mobile {
+    --rail-left: max(8px, env(safe-area-inset-left));
+    --rail-right: calc(max(8px, env(safe-area-inset-right)) + 52px);
+    position: absolute;
+    z-index: 18;
+    top: max(8px, env(safe-area-inset-top));
+    left: var(--rail-left);
+    display: flex;
+    max-width: calc(100% - var(--rail-left) - var(--rail-right));
+  }
+  .commercial-map-shell.is-commission-scope .commercial-map-toolbar-mobile { --rail-right: calc(max(8px, env(safe-area-inset-right)) + 104px); }
+  .commission-layout--map .commercial-map-shell.is-commission-scope .commercial-map-toolbar-mobile { --rail-left: calc(max(8px, env(safe-area-inset-left)) + 3.4rem); }
+}
+@container commercial-map (max-width: 384px) {
+  .commercial-map-toolbar-mobile .commercial-map-toolbar-focus-selection { display: none; }
+}
+@container commercial-map (max-width: 344px) {
+  .commercial-map-toolbar-mobile .commercial-map-toolbar-top-view { display: none; }
+}
+/* Full glass and brief interaction feedback are retained by product request,
+   independently of system reduced-motion/reduced-transparency preferences. */
+@media (prefers-contrast: more) {
+  .commercial-map-glass[data-glass-theme] { --glass-button-border: var(--glass-selected-border); }
+}
+@media (forced-colors: active) {
+  .commercial-map-glass[data-glass-theme] { --glass-ink: ButtonText; --glass-button: ButtonFace; --glass-hover: Highlight; --glass-selected: Highlight; --glass-selected-border: Highlight; --glass-button-border: ButtonText; --glass-focus: Highlight; --glass-border: ButtonText; --glass-reflection: transparent; --glass-inner-shadow: transparent; }
+  .commercial-map-control-rail,
+  .commercial-map-toolbar-menu.commercial-map-glass { background: Canvas; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
+  .commercial-map-control-rail__scroll > button:is(.is-open, .is-active, [data-state="open"]),
+  .commercial-map-toolbar-menu.commercial-map-glass [data-active="true"],
+  .commercial-map-toolbar-menu.commercial-map-glass [role="menuitem"][data-highlighted] { color: HighlightText; }
+  @media (hover: hover) and (pointer: fine) {
+    .commercial-map-control-rail__scroll > button:hover:not(:disabled) { color: HighlightText; }
+  }
 }

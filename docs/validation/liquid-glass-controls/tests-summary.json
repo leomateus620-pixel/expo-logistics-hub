@@ -1,0 +1,157 @@
+{
+  "baselineRef": "6cd27b91",
+  "candidateBranch": "codex/commercial-map-liquid-glass",
+  "runner": "Vitest 3.2.4; jsdom; Windows; maxWorkers=2",
+  "finalScope": {
+    "files": 22,
+    "totalTests": 216,
+    "passedTests": 214,
+    "failedTests": 2,
+    "attributableFailures": 0,
+    "baselineFailureEvidence": "baseline-test-failures.json"
+  },
+  "focusedHeader": {
+    "command": "npm run test -- <files below> --maxWorkers=2 --reporter=json --outputFile=docs/validation/liquid-glass-controls/header-focused-tests.json",
+    "files": [
+      {
+        "file": "src/test/commercialMapContextualControls.test.tsx",
+        "passed": 8,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapDockLayout.test.tsx",
+        "passed": 3,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapHeaderTools.test.tsx",
+        "passed": 8,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapIndependence.test.ts",
+        "passed": 5,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapShell.test.tsx",
+        "passed": 2,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapVisitUi.test.tsx",
+        "passed": 7,
+        "failed": 0
+      }
+    ]
+  },
+  "finalMap": {
+    "command": "npm run test -- <files below> --maxWorkers=2 --reporter=json --outputFile=C:/Users/Leonardo/.codex/tmp/liquid-glass-final-vitest.json",
+    "files": [
+      {
+        "file": "src/test/alvoradaAccessContract.test.ts",
+        "passed": 7,
+        "failed": 0
+      },
+      {
+        "file": "src/test/alvoradaMotionPolicy.test.ts",
+        "passed": 4,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapAdaptiveQualityRuntime.test.ts",
+        "passed": 8,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapCameraTransition.test.ts",
+        "passed": 14,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapControlRail.test.tsx",
+        "passed": 12,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapEnvironment.test.ts",
+        "passed": 11,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapHydrologicalControls.test.tsx",
+        "passed": 5,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapInteriorView.test.tsx",
+        "passed": 37,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapLunarLaunch.test.ts",
+        "passed": 8,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapMobileExperience.test.ts",
+        "passed": 11,
+        "failed": 1
+      },
+      {
+        "file": "src/test/commercialMapNightMode.test.ts",
+        "passed": 7,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapRuntimeStability.test.ts",
+        "passed": 5,
+        "failed": 1
+      },
+      {
+        "file": "src/test/commercialMapTechnicalValidation.test.ts",
+        "passed": 4,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapTreeControls.test.tsx",
+        "passed": 4,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapViewport.test.ts",
+        "passed": 36,
+        "failed": 0
+      },
+      {
+        "file": "src/test/commercialMapVisitSession.test.tsx",
+        "passed": 8,
+        "failed": 0
+      }
+    ]
+  },
+  "typecheck": {
+    "command": "npm run typecheck",
+    "exitCode": 0,
+    "source": "root final verification after header auto-focus ref adjustment"
+  },
+  "scopedEslint": {
+    "command": "npx eslint <files below>",
+    "exitCode": 0,
+    "files": [
+      "src/features/commercial-map/components/shell/CommercialMapShell.tsx",
+      "src/features/commercial-map/components/shell/CommercialMapHeaderTools.tsx",
+      "src/features/commercial-map/components/controls/CommercialMapControlRail.tsx",
+      "src/features/commercial-map/components/controls/CommercialMapTopBar.tsx",
+      "src/features/commercial-map/components/controls/MapToolbar.tsx",
+      "src/features/commercial-map/components/dock/CommercialMapDock.tsx",
+      "src/test/commercialMapHeaderTools.test.tsx",
+      "src/test/commercialMapContextualControls.test.tsx",
+      "src/test/commercialMapIndependence.test.ts",
+      "src/test/commercialMapMobileExperience.test.ts",
+      "src/test/commercialMapNightMode.test.ts",
+      "src/test/commercialMapDockLayout.test.tsx",
+      "src/test/commercialMapControlRail.test.tsx"
+    ]
+  }
+}

@@ -236,7 +236,8 @@ describe('Modo Noturno global do Mapa Comercial', () => {
     expect(topBar).toContain("nightModeActive ? 'Sair do Modo Noturno' : 'Ativar Modo Noturno'");
     expect(topBar).toContain('{ active: nightModeActive, night: true }');
     expect(topBar.indexOf("'sunrise',")).toBeLessThan(topBar.indexOf("'night-mode',"));
-    expect(topBarStyles).toContain('.commercial-map-topbar__trigger.is-night.is-open');
+    expect(topBarStyles).toContain('.commercial-map-control-rail__scroll > button:is(.is-open, .is-active, [data-state="open"])');
+    expect(topBarStyles).toContain('.commercial-map-glass[data-glass-theme="night"]');
 
     expect(toolbar).toContain('commercial-map-night-toggle');
     expect(toolbar).toContain('aria-pressed={nightModeActive}');
