@@ -5,8 +5,8 @@ import { useCommercialMapStore } from '@/features/commercial-map/state/useCommer
 import {
   createCommercialMapAdaptiveQualityState,
   resolveCommercialMapPixelRatio,
+  resolveCommercialMapQualityPixelRatio,
 } from '@/features/commercial-map/utils/viewport';
-import { resolveCommercialMapInteractionPixelRatio } from '@/features/commercial-map/utils/adaptiveQualityRuntime';
 import { commercialMapFrameActivity } from '@/features/commercial-map/utils/frameActivity';
 import { beginVisitQualitySession, readVisitQuality, setVisitQualityMotion } from '@/features/commercial-map/visit/VisitQualityManager';
 import { visitRuntime } from '@/features/commercial-map/visit/visitRuntime';
@@ -76,7 +76,7 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     vi.useRealTimers();
   });
 
-  it('não redimensiona 1→0.9→1 quando o autofit termina durante a compilação inicial', () => {
+  it('não redimensiona quando o autofit termina durante a compilação inicial', () => {
     Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 1 });
     runtime.gl.domElement.dataset.commercialMapReady = 'false';
     runtime.programsPreparing = true;
@@ -155,7 +155,27 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     expect(onQualityChange).not.toHaveBeenCalled();
   });
 
-  it('altera o drawing buffer somente nas bordas do gesto e restaura a base reduced mais recente', () => {
+  it('mantém DPR nas bordas, no movimento contínuo e durante o damping de gestos repetidos', () => {
+    render(<CommercialMapAdaptiveQualityController active initialState={initialState} capabilityHints={capabilityHints} reducedGraphics={false} />);
+    const baseDpr = runtime.gl.getPixelRatio();
+    runtime.setDpr.mockClear();
+    runtime.invalidate.mockClear();
+    for (let cycle = 0; cycle < 20; cycle++) {
+      act(() => useCommercialMapStore.setState({ cameraNavigating: true }));
+      act(() => { for (let frame = 0; frame < 20; frame++) runtime.frame?.({}, .016); });
+      // The camera's existing settling detector keeps this signal true while
+      // damping continues after release. No DPR write belongs to that tail.
+      act(() => runtime.frame?.({}, .016));
+      expect(runtime.gl.getPixelRatio()).toBe(baseDpr);
+      act(() => useCommercialMapStore.setState({ cameraNavigating: false }));
+      act(() => vi.advanceTimersByTime(650));
+      expect(runtime.gl.getPixelRatio()).toBe(baseDpr);
+    }
+    expect(runtime.setDpr).not.toHaveBeenCalled();
+    expect(runtime.invalidate).not.toHaveBeenCalled();
+  });
+
+  it('mantém o drawing buffer no gesto e aplica a base reduced mais recente somente ao parar', () => {
     const qualityChange = vi.fn();
     const props = { active: true, initialState, capabilityHints, onQualityChange: qualityChange };
     const view = render(<CommercialMapAdaptiveQualityController {...props} reducedGraphics={false} />);
@@ -163,21 +183,45 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     runtime.setDpr.mockClear();
     runtime.invalidate.mockClear();
     act(() => useCommercialMapStore.setState({ cameraNavigating: true }));
-    expect(runtime.setDpr).toHaveBeenCalledExactlyOnceWith(resolveCommercialMapInteractionPixelRatio(baseDpr));
+    expect(runtime.setDpr).not.toHaveBeenCalled();
+    expect(runtime.gl.getPixelRatio()).toBe(baseDpr);
 
     act(() => useCommercialMapStore.setState({ cameraNavigating: true }));
     view.rerender(<CommercialMapAdaptiveQualityController {...props} reducedGraphics />);
-    expect(runtime.setDpr).toHaveBeenCalledTimes(1);
+    view.rerender(<CommercialMapAdaptiveQualityController {...props} reducedGraphics={false} />);
+    view.rerender(<CommercialMapAdaptiveQualityController {...props} reducedGraphics />);
+    expect(runtime.setDpr).not.toHaveBeenCalled();
+    expect(runtime.gl.getPixelRatio()).toBe(baseDpr);
 
     const reducedDpr = resolveCommercialMapPixelRatio({
       viewportWidth: 1280, viewportHeight: 800, devicePixelRatio: 2, reducedGraphics: true,
     });
     act(() => useCommercialMapStore.setState({ cameraNavigating: false }));
-    expect(runtime.setDpr).toHaveBeenLastCalledWith(reducedDpr);
-    expect(runtime.setDpr).toHaveBeenCalledTimes(2);
-    expect(runtime.invalidate).toHaveBeenCalledTimes(2);
+    expect(runtime.setDpr).toHaveBeenCalledExactlyOnceWith(reducedDpr);
+    expect(runtime.invalidate).toHaveBeenCalledTimes(1);
     act(() => vi.advanceTimersByTime(1000));
-    expect(runtime.setDpr).toHaveBeenCalledTimes(2);
+    expect(runtime.setDpr).toHaveBeenCalledTimes(1);
+  });
+
+  it('retém a base do viewport e da orientação mais recente durante o gesto', () => {
+    const props = { active: true, initialState, capabilityHints, reducedGraphics: false };
+    const view = render(<CommercialMapAdaptiveQualityController {...props} />);
+    const baseDpr = runtime.gl.getPixelRatio();
+    runtime.setDpr.mockClear();
+    act(() => useCommercialMapStore.setState({ cameraNavigating: true }));
+    runtime.size = { width: 1920, height: 1080 };
+    view.rerender(<CommercialMapAdaptiveQualityController {...props} />);
+    runtime.size = { width: 1080, height: 1920 };
+    view.rerender(<CommercialMapAdaptiveQualityController {...props} />);
+    expect(runtime.setDpr).not.toHaveBeenCalled();
+    expect(runtime.gl.getPixelRatio()).toBe(baseDpr);
+    const nextDpr = resolveCommercialMapQualityPixelRatio({
+      viewportWidth: 1080, viewportHeight: 1920, devicePixelRatio: 2,
+      ...capabilityHints, qualityTier: initialState.tier,
+    });
+    act(() => useCommercialMapStore.setState({ cameraNavigating: false }));
+    expect(runtime.setDpr).toHaveBeenCalledExactlyOnceWith(nextDpr);
+    expect(runtime.get().viewport.dpr).toBe(nextDpr);
   });
 
   it('aguarda 650 ms para trocar o tier de cena, sem rearmar o timer em cada frame ocioso', () => {
@@ -204,7 +248,7 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     expect(runtime.setDpr).toHaveBeenCalledTimes(writesAfterGesture);
   });
 
-  it('não restaura a base entre gestos de câmera e fase lunar sobrepostos', () => {
+  it('mantém a resolução entre gestos de câmera e fase lunar sobrepostos', () => {
     render(<CommercialMapAdaptiveQualityController
       active initialState={initialState} capabilityHints={capabilityHints} reducedGraphics={false}
     />);
@@ -213,13 +257,12 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     act(() => useCommercialMapStore.setState({ cameraNavigating: true }));
     act(() => useCommercialMapStore.setState({ lunarLaunchPhase: 'ignition' }));
     act(() => useCommercialMapStore.setState({ cameraNavigating: false }));
-    expect(runtime.setDpr).toHaveBeenCalledTimes(1);
+    expect(runtime.setDpr).not.toHaveBeenCalled();
     act(() => useCommercialMapStore.setState({ lunarLaunchPhase: 'idle', lunarLaunchReturning: true }));
-    expect(runtime.setDpr).toHaveBeenCalledTimes(1);
+    expect(runtime.setDpr).not.toHaveBeenCalled();
     act(() => useCommercialMapStore.setState({ lunarLaunchReturning: false }));
-    expect(runtime.setDpr).toHaveBeenNthCalledWith(1, resolveCommercialMapInteractionPixelRatio(baseDpr));
-    expect(runtime.setDpr).toHaveBeenCalledTimes(2);
-    expect(runtime.setDpr).toHaveBeenLastCalledWith(baseDpr);
+    expect(runtime.setDpr).not.toHaveBeenCalled();
+    expect(runtime.gl.getPixelRatio()).toBe(baseDpr);
   });
 
   it('não degrada várias vezes a mesma cena durante um gesto longo antes do tier pendente ser aplicado', () => {
@@ -240,9 +283,10 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     });
     expect(qualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'MEDIUM', sceneTier: 'HIGH' });
     expect(qualityChange.mock.calls.some(([quality]) => quality.tier === 'LOW')).toBe(false);
-    expect(runtime.setDpr).toHaveBeenCalledTimes(1);
+    expect(runtime.setDpr).not.toHaveBeenCalled();
 
     act(() => useCommercialMapStore.setState({ cameraNavigating: false }));
+    expect(runtime.setDpr).toHaveBeenCalledExactlyOnceWith(1.35);
     expect(runtime.gl.getPixelRatio()).toBe(1.35);
     act(() => vi.advanceTimersByTime(650));
     expect(qualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'MEDIUM', sceneTier: 'MEDIUM' });
@@ -283,7 +327,7 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     }
   });
 
-  it('aplica DPR uma vez na caminhada e posterga o alvo de sombras até repouso sem degradar o modo tradicional', () => {
+  it('mantém DPR na caminhada e aplica a redução medida ao parar sem degradar o modo tradicional', () => {
     const onQualityChange = vi.fn();
     render(<CommercialMapAdaptiveQualityController active initialState={initialState} capabilityHints={capabilityHints} reducedGraphics={false} onQualityChange={onQualityChange} />);
     const originalDpr = runtime.gl.getPixelRatio();
@@ -293,8 +337,8 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
       runtime.setDpr.mockClear();
       visitRuntime.renderingActive = true;
       act(() => runtime.frame?.({}, .016));
-      expect(runtime.gl.getPixelRatio()).toBe(.99);
-      expect(runtime.setDpr).toHaveBeenCalledTimes(1);
+      expect(runtime.gl.getPixelRatio()).toBe(1.1);
+      expect(runtime.setDpr).not.toHaveBeenCalled();
       act(() => {
         for (let i = 0; i < 100; i++) {
           commercialMapFrameActivity(runtime.gl).requested = 8;
@@ -302,12 +346,13 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
         }
       });
       expect(onQualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'LOW', sceneTier: 'MEDIUM' });
-      expect(runtime.gl.getPixelRatio()).toBe(.99);
-      expect(runtime.setDpr).toHaveBeenCalledTimes(1);
+      expect(runtime.gl.getPixelRatio()).toBe(1.1);
+      expect(runtime.setDpr).not.toHaveBeenCalled();
       visitRuntime.renderingActive = false;
       act(() => { runtime.frame?.({}, .016); vi.advanceTimersByTime(650); });
       expect(onQualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'LOW', sceneTier: 'LOW' });
       expect(runtime.gl.getPixelRatio()).toBe(0.85);
+      expect(runtime.setDpr).toHaveBeenCalledExactlyOnceWith(0.85);
       expect(readVisitQuality().preset).toBe('PERFORMANCE');
       expect(useCommercialMapStore.getState().cameraNavigating).toBe(false);
     } finally { act(() => release()); }

@@ -56,7 +56,7 @@ export interface CommercialMapAdaptiveQualitySample
   /** Calibrated idle RAF interval, not inferred GPU capability. */
   displayCadenceMs?: number | null;
   p95FrameTimeMs?: number;
-  /** Never recover from the cheaper gesture DPR/direct workload. */
+  /** Recover conservatively after navigation and its damping have settled. */
   recoveryEligible?: boolean;
 }
 

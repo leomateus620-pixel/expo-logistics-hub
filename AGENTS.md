@@ -12,3 +12,4 @@
 - Prévia pública: imagem por área e metadados de escopo somente após validar o token; nunca incluir comprador nem token na imagem — por quê: proteger links revogados e dados comerciais.
 <!-- LOVABLE:END -->
 - Acesso de comissão a segmento do mapa (`map_can_access_segment`) depende só de segmento ativo + capability; completude é estrutural (lotes com geometria), sem contagens fixas de baseline, e a view `commercial_lot_pricing_2028` é security_invoker — por quê: reparcelamentos não podem derrubar portais nem expor preços de outros segmentos.
+- Navegação e damping, por si só, não reduzem o DPR do mapa. O controlador adaptativo existente conserva a resolução vigente durante a atividade e aplica a base mais recente após estabilização; mudanças de orçamento precisam de evidência de capacidade ou de viewport/modo — por quê: evitar perda de definição e realocação de buffers em cada gesto, preservando a adaptação sustentada e a recuperação de contexto.

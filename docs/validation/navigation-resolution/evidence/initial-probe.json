@@ -1,0 +1,272 @@
+[
+  {
+    "phase": "rest",
+    "quality": {
+      "logicalTier": "HIGH",
+      "sceneTier": "HIGH",
+      "baseDpr": 1.75,
+      "effectiveDpr": 1.75,
+      "hardwareCeiling": "HIGH",
+      "reason": "viewport-sync"
+    },
+    "renderer": {
+      "at": 207009.70000004768,
+      "calls": 814,
+      "triangles": 685560,
+      "geometries": 590,
+      "textures": 136,
+      "programs": 242,
+      "dpr": 1.75,
+      "width": 2213,
+      "height": 1036,
+      "heapBytes": 97868171,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "css": [
+      1265,
+      592
+    ],
+    "buffer": [
+      2213,
+      1036
+    ],
+    "navigating": false,
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1169,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "visibility": "visible",
+    "focus": true,
+    "camera": [
+      -87.54287829146544,
+      78.6422567005418,
+      97.47379225429503
+    ],
+    "target": [
+      -2.2546344999999945,
+      0.744,
+      -0.3831818185993967
+    ]
+  },
+  {
+    "phase": "move-5",
+    "quality": {
+      "logicalTier": "HIGH",
+      "sceneTier": "HIGH",
+      "baseDpr": 1.75,
+      "effectiveDpr": 1.35,
+      "hardwareCeiling": "HIGH",
+      "reason": "viewport-sync"
+    },
+    "renderer": {
+      "at": 212620.40000009537,
+      "calls": 814,
+      "triangles": 685560,
+      "geometries": 590,
+      "textures": 136,
+      "programs": 242,
+      "dpr": 1.35,
+      "width": 1707,
+      "height": 799,
+      "heapBytes": 98234188,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "css": [
+      1265,
+      592
+    ],
+    "buffer": [
+      1707,
+      799
+    ],
+    "navigating": true,
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1175,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "visibility": "visible",
+    "focus": true,
+    "camera": [
+      -94.69945029904387,
+      81.31438967115375,
+      88.389441443521
+    ],
+    "target": [
+      -2.2546344999999945,
+      0.744,
+      -0.3831818185993967
+    ]
+  },
+  {
+    "phase": "move-30",
+    "quality": {
+      "logicalTier": "HIGH",
+      "sceneTier": "HIGH",
+      "baseDpr": 1.75,
+      "effectiveDpr": 1.35,
+      "hardwareCeiling": "HIGH",
+      "reason": "viewport-sync"
+    },
+    "renderer": {
+      "at": 237847,
+      "calls": 821,
+      "triangles": 694010,
+      "geometries": 594,
+      "textures": 136,
+      "programs": 242,
+      "dpr": 1.35,
+      "width": 1707,
+      "height": 799,
+      "heapBytes": 98773084,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "css": [
+      1265,
+      592
+    ],
+    "buffer": [
+      1707,
+      799
+    ],
+    "navigating": true,
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1200,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "visibility": "visible",
+    "focus": true,
+    "camera": [
+      -113.80994493985429,
+      103.07753283653567,
+      -1.5960588034963195
+    ],
+    "target": [
+      -2.2546344999999945,
+      0.744,
+      -0.3831818185993967
+    ]
+  },
+  {
+    "phase": "release",
+    "quality": {
+      "logicalTier": "HIGH",
+      "sceneTier": "HIGH",
+      "baseDpr": 1.75,
+      "effectiveDpr": 1.35,
+      "hardwareCeiling": "HIGH",
+      "reason": "viewport-sync"
+    },
+    "renderer": {
+      "at": 237854,
+      "calls": 821,
+      "triangles": 694010,
+      "geometries": 594,
+      "textures": 136,
+      "programs": 242,
+      "dpr": 1.35,
+      "width": 1707,
+      "height": 799,
+      "heapBytes": 98773084,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "css": [
+      1265,
+      592
+    ],
+    "buffer": [
+      1707,
+      799
+    ],
+    "navigating": true,
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1200,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "visibility": "visible",
+    "focus": true,
+    "camera": [
+      -113.80994493985429,
+      103.07753283653567,
+      -1.5960588034963195
+    ],
+    "target": [
+      -2.2546344999999945,
+      0.744,
+      -0.3831818185993967
+    ]
+  },
+  {
+    "phase": "settled",
+    "quality": {
+      "logicalTier": "HIGH",
+      "sceneTier": "HIGH",
+      "baseDpr": 1.75,
+      "effectiveDpr": 1.35,
+      "hardwareCeiling": "HIGH",
+      "reason": "viewport-sync"
+    },
+    "renderer": {
+      "at": 241356.80000019073,
+      "calls": 822,
+      "triangles": 693950,
+      "geometries": 595,
+      "textures": 136,
+      "programs": 242,
+      "dpr": 1.35,
+      "width": 1707,
+      "height": 799,
+      "heapBytes": 102935911,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "css": [
+      1265,
+      592
+    ],
+    "buffer": [
+      1707,
+      799
+    ],
+    "navigating": true,
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1203,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "visibility": "visible",
+    "focus": true,
+    "camera": [
+      -112.92130540111545,
+      103.93117416159335,
+      -5.231412519410311
+    ],
+    "target": [
+      -2.2546344999999945,
+      0.744,
+      -0.3831818185993967
+    ]
+  }
+]
