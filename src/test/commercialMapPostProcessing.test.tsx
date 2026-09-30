@@ -290,7 +290,7 @@ describe('Commercial Map persistent post-processing with installed postprocessin
     drawFrame();
     const composer = addPass.mock.instances[0] as unknown as EffectComposer;
     const smaaPass = composer.passes[2] as EffectPass;
-    const smaa = smaaPass.effects[0] as SMAAEffect;
+    const smaa = (smaaPass as unknown as { effects: SMAAEffect[] }).effects[0];
     const expectPhysicalSize = (width: number, height: number) => {
       expect([composer.inputBuffer.width, composer.inputBuffer.height]).toEqual([width, height]);
       expect([composer.outputBuffer.width, composer.outputBuffer.height]).toEqual([width, height]);

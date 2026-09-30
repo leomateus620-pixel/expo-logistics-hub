@@ -1,0 +1,494 @@
+{
+  "file": "baseline-HIGH-dpr2-close-moving.png",
+  "before": {
+    "at": 126296.80000019073,
+    "visible": "visible",
+    "focused": true,
+    "css": {
+      "width": 1265,
+      "height": 720,
+      "clientWidth": 1265,
+      "clientHeight": 720
+    },
+    "physical": {
+      "width": 1707,
+      "height": 972
+    },
+    "dpr": 1.35,
+    "storeDpr": 1.35,
+    "quality": {
+      "logicalTier": "HIGH",
+      "sceneTier": "HIGH",
+      "baseDpr": 1.75,
+      "effectiveDpr": 1.35,
+      "hardwareCeiling": "HIGH",
+      "reason": "viewport-sync"
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1949,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "renderTiming": null,
+    "cameraId": "edefa664-f56e-4b26-ad62-ffb8ae29a30d",
+    "cameraNavigating": true,
+    "camera": [
+      -26.18370230667054,
+      14.15487209165616,
+      19.259256652242218
+    ],
+    "target": [
+      -16.800000000000004,
+      0,
+      18.000000090361446
+    ],
+    "targets": [
+      {
+        "id": "9d588e11-616b-472b-abcc-f663fc786d67",
+        "width": 1707,
+        "height": 972,
+        "samples": 0,
+        "name": "EffectComposer.Buffer"
+      },
+      {
+        "id": "8f2fff1d-ea41-462d-86f7-a7e7c60c30b5",
+        "width": 2048,
+        "height": 2048,
+        "samples": 0,
+        "name": "CommercialMapAuthoritativeSunLight.shadowMap"
+      },
+      {
+        "id": "01882f1c-5c52-4518-8bc8-deeae4a7a8c0",
+        "width": 1707,
+        "height": 972,
+        "samples": 0,
+        "name": "LuminancePass.Target"
+      },
+      {
+        "id": "b4938cf5-5547-4420-a8ff-62514f7aa9c7",
+        "width": 854,
+        "height": 486,
+        "samples": 0,
+        "name": "Downsampling.Mipmap0"
+      },
+      {
+        "id": "8e3717d9-10a9-45f1-91a8-f5507ad6f2d7",
+        "width": 427,
+        "height": 243,
+        "samples": 0,
+        "name": "Downsampling.Mipmap1"
+      },
+      {
+        "id": "6e95d659-d190-4a7b-b62e-bfdac4209205",
+        "width": 214,
+        "height": 122,
+        "samples": 0,
+        "name": "Downsampling.Mipmap2"
+      },
+      {
+        "id": "0104586f-a43d-4b38-aeed-16c641056c40",
+        "width": 107,
+        "height": 61,
+        "samples": 0,
+        "name": "Downsampling.Mipmap3"
+      },
+      {
+        "id": "592f4705-2227-45a2-9542-6ec834221714",
+        "width": 54,
+        "height": 31,
+        "samples": 0,
+        "name": "Downsampling.Mipmap4"
+      },
+      {
+        "id": "59da4424-c1d7-4be9-95c7-a6f444f8ea2f",
+        "width": 27,
+        "height": 16,
+        "samples": 0,
+        "name": "Downsampling.Mipmap5"
+      },
+      {
+        "id": "3309a0bc-3671-4a89-b687-472f32bd940a",
+        "width": 14,
+        "height": 8,
+        "samples": 0,
+        "name": "Downsampling.Mipmap6"
+      },
+      {
+        "id": "15e207b1-1d33-4c02-9b15-9d1c138d8bc7",
+        "width": 27,
+        "height": 16,
+        "samples": 0,
+        "name": "Upsampling.Mipmap5"
+      },
+      {
+        "id": "acc33109-8d42-4987-a29d-ab4771112408",
+        "width": 54,
+        "height": 31,
+        "samples": 0,
+        "name": "Upsampling.Mipmap4"
+      },
+      {
+        "id": "b2929380-9223-4467-af32-7c3c644bea89",
+        "width": 107,
+        "height": 61,
+        "samples": 0,
+        "name": "Upsampling.Mipmap3"
+      },
+      {
+        "id": "0ffd067c-8c8b-4f91-a308-e68d769e6131",
+        "width": 214,
+        "height": 122,
+        "samples": 0,
+        "name": "Upsampling.Mipmap2"
+      },
+      {
+        "id": "0bb8bd99-86e2-47c1-b187-a70d7d42d304",
+        "width": 427,
+        "height": 243,
+        "samples": 0,
+        "name": "Upsampling.Mipmap1"
+      },
+      {
+        "id": "7281e9a9-761e-44e9-a04b-e29469566267",
+        "width": 854,
+        "height": 486,
+        "samples": 0,
+        "name": "Upsampling.Mipmap0"
+      },
+      {
+        "id": "eb1a2daa-ec5c-4e87-9c0b-0a53a58f2642",
+        "width": 1707,
+        "height": 972,
+        "samples": 0,
+        "name": "EffectComposer.Buffer"
+      },
+      {
+        "id": "91e6bb66-d055-48a3-bc7b-f9f352de6887",
+        "width": 1707,
+        "height": 972,
+        "samples": 0,
+        "name": "SMAA.Edges"
+      },
+      {
+        "id": "984f86b2-9595-401f-a7bc-732167b407b5",
+        "width": 1707,
+        "height": 972,
+        "samples": 0,
+        "name": "SMAA.Weights"
+      },
+      {
+        "id": "2a600e03-3951-4614-9bcd-41367df5d286",
+        "width": 854,
+        "height": 486,
+        "samples": 0,
+        "name": "Bloom.Target"
+      },
+      {
+        "id": "66552923-0b2c-4b3b-b751-d4db0ad4f099",
+        "width": 854,
+        "height": 486,
+        "samples": 0,
+        "name": "Blur.Target.A"
+      },
+      {
+        "id": "f3f0df56-dc92-48b8-ad4a-51d7acb99391",
+        "width": 854,
+        "height": 486,
+        "samples": 0,
+        "name": "Blur.Target.B"
+      },
+      {
+        "id": "ebb63de8-f18f-42e6-954d-69447db92b6c",
+        "width": 256,
+        "height": 256,
+        "samples": 0,
+        "name": "Luminance"
+      },
+      {
+        "id": "66e89b41-557c-4d71-aa0b-a5233bf1694d",
+        "width": 1,
+        "height": 1,
+        "samples": 0,
+        "name": "Luminance.Previous"
+      },
+      {
+        "id": "fb6b04c5-6d94-4989-b9a6-42c7849a8c84",
+        "width": 1,
+        "height": 1,
+        "samples": 0,
+        "name": "Luminance.Adapted"
+      }
+    ],
+    "renderer": {
+      "calls": 223,
+      "triangles": 363471,
+      "geometries": 603,
+      "textures": 141,
+      "programs": 243
+    },
+    "identity": {
+      "canvasMounts": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeCanvases": 1,
+      "activeControls": 1
+    },
+    "selection": null,
+    "interior": null,
+    "inventory": {
+      "entities": 1577,
+      "presentedEntities": 376,
+      "lots": 1465,
+      "commercialTrees": 273,
+      "presentedCommercialTrees": 273
+    }
+  },
+  "after": {
+    "at": 128509.20000004768,
+    "visible": "visible",
+    "focused": true,
+    "css": {
+      "width": 1265,
+      "height": 720,
+      "clientWidth": 1265,
+      "clientHeight": 720
+    },
+    "physical": {
+      "width": 1707,
+      "height": 972
+    },
+    "dpr": 1.35,
+    "storeDpr": 1.35,
+    "quality": {
+      "logicalTier": "HIGH",
+      "sceneTier": "HIGH",
+      "baseDpr": 1.75,
+      "effectiveDpr": 1.35,
+      "hardwareCeiling": "HIGH",
+      "reason": "viewport-sync"
+    },
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 1969,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "renderTiming": null,
+    "cameraId": "edefa664-f56e-4b26-ad62-ffb8ae29a30d",
+    "cameraNavigating": true,
+    "camera": [
+      -28.559690040185487,
+      11.780980806653329,
+      14.405812923277875
+    ],
+    "target": [
+      -16.800000000000004,
+      0,
+      18.000000090361446
+    ],
+    "targets": [
+      {
+        "id": "9d588e11-616b-472b-abcc-f663fc786d67",
+        "width": 1707,
+        "height": 972,
+        "samples": 0,
+        "name": "EffectComposer.Buffer"
+      },
+      {
+        "id": "8f2fff1d-ea41-462d-86f7-a7e7c60c30b5",
+        "width": 2048,
+        "height": 2048,
+        "samples": 0,
+        "name": "CommercialMapAuthoritativeSunLight.shadowMap"
+      },
+      {
+        "id": "01882f1c-5c52-4518-8bc8-deeae4a7a8c0",
+        "width": 1707,
+        "height": 972,
+        "samples": 0,
+        "name": "LuminancePass.Target"
+      },
+      {
+        "id": "b4938cf5-5547-4420-a8ff-62514f7aa9c7",
+        "width": 854,
+        "height": 486,
+        "samples": 0,
+        "name": "Downsampling.Mipmap0"
+      },
+      {
+        "id": "8e3717d9-10a9-45f1-91a8-f5507ad6f2d7",
+        "width": 427,
+        "height": 243,
+        "samples": 0,
+        "name": "Downsampling.Mipmap1"
+      },
+      {
+        "id": "6e95d659-d190-4a7b-b62e-bfdac4209205",
+        "width": 214,
+        "height": 122,
+        "samples": 0,
+        "name": "Downsampling.Mipmap2"
+      },
+      {
+        "id": "0104586f-a43d-4b38-aeed-16c641056c40",
+        "width": 107,
+        "height": 61,
+        "samples": 0,
+        "name": "Downsampling.Mipmap3"
+      },
+      {
+        "id": "592f4705-2227-45a2-9542-6ec834221714",
+        "width": 54,
+        "height": 31,
+        "samples": 0,
+        "name": "Downsampling.Mipmap4"
+      },
+      {
+        "id": "59da4424-c1d7-4be9-95c7-a6f444f8ea2f",
+        "width": 27,
+        "height": 16,
+        "samples": 0,
+        "name": "Downsampling.Mipmap5"
+      },
+      {
+        "id": "3309a0bc-3671-4a89-b687-472f32bd940a",
+        "width": 14,
+        "height": 8,
+        "samples": 0,
+        "name": "Downsampling.Mipmap6"
+      },
+      {
+        "id": "15e207b1-1d33-4c02-9b15-9d1c138d8bc7",
+        "width": 27,
+        "height": 16,
+        "samples": 0,
+        "name": "Upsampling.Mipmap5"
+      },
+      {
+        "id": "acc33109-8d42-4987-a29d-ab4771112408",
+        "width": 54,
+        "height": 31,
+        "samples": 0,
+        "name": "Upsampling.Mipmap4"
+      },
+      {
+        "id": "b2929380-9223-4467-af32-7c3c644bea89",
+        "width": 107,
+        "height": 61,
+        "samples": 0,
+        "name": "Upsampling.Mipmap3"
+      },
+      {
+        "id": "0ffd067c-8c8b-4f91-a308-e68d769e6131",
+        "width": 214,
+        "height": 122,
+        "samples": 0,
+        "name": "Upsampling.Mipmap2"
+      },
+      {
+        "id": "0bb8bd99-86e2-47c1-b187-a70d7d42d304",
+        "width": 427,
+        "height": 243,
+        "samples": 0,
+        "name": "Upsampling.Mipmap1"
+      },
+      {
+        "id": "7281e9a9-761e-44e9-a04b-e29469566267",
+        "width": 854,
+        "height": 486,
+        "samples": 0,
+        "name": "Upsampling.Mipmap0"
+      },
+      {
+        "id": "eb1a2daa-ec5c-4e87-9c0b-0a53a58f2642",
+        "width": 1707,
+        "height": 972,
+        "samples": 0,
+        "name": "EffectComposer.Buffer"
+      },
+      {
+        "id": "91e6bb66-d055-48a3-bc7b-f9f352de6887",
+        "width": 1707,
+        "height": 972,
+        "samples": 0,
+        "name": "SMAA.Edges"
+      },
+      {
+        "id": "984f86b2-9595-401f-a7bc-732167b407b5",
+        "width": 1707,
+        "height": 972,
+        "samples": 0,
+        "name": "SMAA.Weights"
+      },
+      {
+        "id": "2a600e03-3951-4614-9bcd-41367df5d286",
+        "width": 854,
+        "height": 486,
+        "samples": 0,
+        "name": "Bloom.Target"
+      },
+      {
+        "id": "66552923-0b2c-4b3b-b751-d4db0ad4f099",
+        "width": 854,
+        "height": 486,
+        "samples": 0,
+        "name": "Blur.Target.A"
+      },
+      {
+        "id": "f3f0df56-dc92-48b8-ad4a-51d7acb99391",
+        "width": 854,
+        "height": 486,
+        "samples": 0,
+        "name": "Blur.Target.B"
+      },
+      {
+        "id": "ebb63de8-f18f-42e6-954d-69447db92b6c",
+        "width": 256,
+        "height": 256,
+        "samples": 0,
+        "name": "Luminance"
+      },
+      {
+        "id": "66e89b41-557c-4d71-aa0b-a5233bf1694d",
+        "width": 1,
+        "height": 1,
+        "samples": 0,
+        "name": "Luminance.Previous"
+      },
+      {
+        "id": "fb6b04c5-6d94-4989-b9a6-42c7849a8c84",
+        "width": 1,
+        "height": 1,
+        "samples": 0,
+        "name": "Luminance.Adapted"
+      }
+    ],
+    "renderer": {
+      "calls": 248,
+      "triangles": 498588,
+      "geometries": 603,
+      "textures": 141,
+      "programs": 243
+    },
+    "identity": {
+      "canvasMounts": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeCanvases": 1,
+      "activeControls": 1
+    },
+    "selection": null,
+    "interior": null,
+    "inventory": {
+      "entities": 1577,
+      "presentedEntities": 376,
+      "lots": 1465,
+      "commercialTrees": 273,
+      "presentedCommercialTrees": 273
+    }
+  },
+  "format": "Lossless PNG screenshot at device scale; no performance claim for this separate run."
+}
