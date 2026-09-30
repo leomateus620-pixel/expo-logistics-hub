@@ -24,6 +24,9 @@ import { buildQuadrasABEnvironmentPlan, quadrasABGroundVertexHeight } from '../u
 import { buildCommercialSiteEnvironmentPlan } from '../utils/commercialSiteEnvironment';
 import { buildRestaurantFrontagePlan, RESTAURANT_FRONTAGE_LAYOUT, restaurantFrontageTreePitBounds } from '../utils/restaurantFrontage';
 import { COMMERCIAL_MAP_TREES } from '../data/commercialTrees';
+import { buildUbiretamaRoadPresentation, isUbiretamaPresentationSegment, type UbiretamaRoadPresentation } from '../utils/ubiretamaRoadPresentation';
+import { buildGateNineAccessPresentation, type GateNineAccessPresentation } from '../utils/gateNineRoadPresentation';
+import { buildExporuralSouthRoadPresentation, withExporuralSouthRoadPresentation } from '../utils/exporuralSouthRoadPresentation';
 
 export function visitBoundsRing(bounds: VisitBounds): VisitRing {
   return [[bounds.minX, bounds.minZ], [bounds.maxX, bounds.minZ], [bounds.maxX, bounds.maxZ], [bounds.minX, bounds.maxZ]];
@@ -227,9 +230,14 @@ export function buildVisitSiteGroundSurfaces(entities: readonly MapEntity[]): Vi
 
 /** Ground adapters read the same owner data as the scene. No renderable terrain
  * or collider mesh remains allocated; only numeric support planes are retained. */
-export function buildVisitGroundSurfaces(entities: readonly MapEntity[], includeContext = true, siteEnvironmentEntities: readonly MapEntity[] = entities): VisitGroundSurface[] {
+export function buildVisitGroundSurfaces(
+  entities: readonly MapEntity[], includeContext = true, siteEnvironmentEntities: readonly MapEntity[] = entities,
+  ubiretamaPresentation: UbiretamaRoadPresentation | null = includeContext ? buildUbiretamaRoadPresentation(entities) : null,
+  gateNinePresentation: GateNineAccessPresentation | null = buildGateNineAccessPresentation(entities),
+): VisitGroundSurface[] {
   const surfaces: VisitGroundSurface[] = [];
-  for (const entity of entities) {
+  const presentedEntities = withExporuralSouthRoadPresentation(entities, buildExporuralSouthRoadPresentation(entities));
+  for (const entity of presentedEntities) {
     if (entity.isArchived || entity.geometry.coordinates[0]?.length < 3) continue;
     // D1 is classified FOOD_AREA, but its cadastral extrusion is a picking
     // volume. The Alameda adapter supplies the actual split floor and stairs.
@@ -271,11 +279,20 @@ export function buildVisitGroundSurfaces(entities: readonly MapEntity[], include
   }
   // Preserve the road owner's generated junctions and small curb tops too.
   // Only numerical facets survive; temporary source buffers are all disposed.
-  const roadEntities = entities.filter(entity => !entity.isArchived
+  const roadEntities = presentedEntities.filter(entity => !entity.isArchived
     && (entity.classification === 'ROAD' || entity.classification === 'PEDESTRIAN_PATH')
     && (!includeContext || !REPLACED_OFFICIAL_ROAD_IDENTIFIERS.includes(entity.publicIdentifier)));
+  if (gateNinePresentation) {
+    const access = gateNinePresentation.roadEntity;
+    roadEntities.push(access);
+    surfaces.push(visitGroundSurface(access.id, access.geometry.coordinates[0],
+      access.geometry.elevation + roadSurfaceHeight(access), access.geometry.coordinates.slice(1)));
+  }
   if (roadEntities.length) {
-    const roads = buildRoadNetworkGeometries(roadEntities, { suppressedSurfaceIdentifiers: includeContext ? ['AV-BENVENUTO-CONTI', 'AV-TUPARENDI'] : undefined });
+    const roads = buildRoadNetworkGeometries(roadEntities, {
+      suppressedSurfaceIdentifiers: includeContext ? ['AV-BENVENUTO-CONTI', 'AV-TUPARENDI'] : undefined,
+      ubiretamaPresentation: includeContext ? ubiretamaPresentation : null,
+    });
     try {
       for (const key of ['intersections', 'curbs', 'gutters'] as const) {
         const geometry = roads[key];
@@ -331,6 +348,7 @@ export function buildVisitGroundSurfaces(entities: readonly MapEntity[], include
     surfaces.push(visitGroundSurface(surface.id, surface.polygon, surface.elevation ?? 0.04, surface.holes));
   }
   buildRearRoadCorridorFootprints(GENERATED_REAR_ROAD_SEGMENTS, { includeShoulders: false, samplesPerWorldUnit: 5 }).forEach((road, index) => {
+    if (ubiretamaPresentation && isUbiretamaPresentationSegment(road.segmentId)) return;
     const count = road.centerline.length, base = GENERATED_REAR_ROAD_SEGMENTS[index].elevationOffset;
     // Spatially partition long ribbons into quads rather than scanning a full
     // highway's hundreds of vertices every time a visitor takes one step.
@@ -338,6 +356,9 @@ export function buildVisitGroundSurfaces(entities: readonly MapEntity[], include
       surfaces.push(visitGroundSurface(`${road.segmentId}:${i}`, [road.polygon[i], road.polygon[i + 1], road.polygon[2 * count - i - 2], road.polygon[2 * count - i - 1]], (x, z) => base + rearRoadTerrainElevationAt(x, z), undefined, base + .003));
     }
   });
+  for (const [index, cut] of (ubiretamaPresentation?.supportCuts ?? []).entries()) {
+    surfaces.push(visitGroundSurface(`ubiretama-presentation:${index}`, cut.polygon, TERRITORY_ROAD_Y));
+  }
   if (entities.some(entity => entity.publicIdentifier === 'F')) {
     const arena = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.terrain.sourceBounds);
     surfaces.push(visitGroundSurface('arena-terrain', visitBoundsRing(arena), visitArenaTerrainHeight, ARENA_TERRAIN_CUTS.map(cut => cut.polygon), ARENA_TERRAIN_TOP_ELEVATION + .012));

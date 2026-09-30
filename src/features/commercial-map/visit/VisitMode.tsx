@@ -27,12 +27,12 @@ import type { VisitHelicopterModelHandle } from './vehicles/VisitHelicopterModel
 const VisitCartModel = lazy(() => import('./vehicles/VisitCartModel').then(module => ({ default: module.VisitCartModel })));
 const VisitHelicopterModel = lazy(() => import('./vehicles/VisitHelicopterModel').then(module => ({ default: module.VisitHelicopterModel })));
 
-interface Props { entities: MapEntity[]; lots: CommercialLot[]; trees: readonly CommercialMapTree[]; electricalPlacements?: readonly ResolvedElectricalNodePlacement[]; siteEnvironmentEntities?: readonly MapEntity[] }
+interface Props { entities: MapEntity[]; lots: CommercialLot[]; trees: readonly CommercialMapTree[]; electricalPlacements?: readonly ResolvedElectricalNodePlacement[]; siteEnvironmentEntities?: readonly MapEntity[]; pavilion12ConcretePresent?: boolean }
 const moving = () => visitRuntime.moving;
 const quality = (qualityPreset: 'HIGH' | 'BALANCED' | 'PERFORMANCE') => useVisitStore.setState({ qualityPreset });
 
 /** Lazy visit systems share the exterior and publish poses to the original CameraRig. */
-export default function VisitMode({ entities, lots, trees, electricalPlacements, siteEnvironmentEntities }: Props) {
+export default function VisitMode({ entities, lots, trees, electricalPlacements, siteEnvironmentEntities, pavilion12ConcretePresent }: Props) {
   const gl = useThree(s => s.gl), camera = useThree(s => s.camera), invalidate = useThree(s => s.invalidate);
   const scene = useThree(s => s.scene);
   const width = useThree(s => s.size.width), height = useThree(s => s.size.height);
@@ -40,7 +40,7 @@ export default function VisitMode({ entities, lots, trees, electricalPlacements,
   const phase = useVisitStore(s => s.phase);
   const mobilityMode = useVisitStore(s => s.mobilityMode);
   const requestAt = useRef(useVisitStore.getState().requestedAtMs).current;
-  const world = useMemo(() => buildVisitWorld({ entities, trees, electricalPlacements, siteEnvironmentEntities }), [entities, trees, electricalPlacements, siteEnvironmentEntities]);
+  const world = useMemo(() => buildVisitWorld({ entities, trees, electricalPlacements, siteEnvironmentEntities, pavilion12ConcretePresent }), [entities, trees, electricalPlacements, siteEnvironmentEntities, pavilion12ConcretePresent]);
   const pois = useMemo(() => buildVisitPOIs(entities, lots, .15, world.ground.heightAt), [entities, lots, world]);
   const interactions = useMemo(() => new VisitInteractionManager(pois, .15), [pois]);
   const vehicleInteraction = useMemo(() => new VisitVehicleInteraction(pois, .15), [pois]);

@@ -16,6 +16,7 @@ import {
   UNIFIED_TERRITORY_ROADS,
 } from "../../utils/territorialRoadGeometry";
 import { resolveRearRoadOwnerAtLocalPoint } from "../../utils/rearRoadNetwork";
+import { ubiretamaPresentationDistance, type UbiretamaRoadPresentation } from '../../utils/ubiretamaRoadPresentation';
 
 import {
   openGroundTextureBundleForEntity,
@@ -30,6 +31,7 @@ interface RegionalHighwayNetworkProps {
   visible?: boolean;
   opacity?: number;
   ownerEntityIdByIdentifier: ReadonlyMap<string, string>;
+  ubiretamaPresentation?: UbiretamaRoadPresentation | null;
   hoverEnabled: boolean;
   onSelect: (entityId: string) => void;
   onHover: (entityId: string | null) => void;
@@ -124,6 +126,7 @@ export const RegionalHighwayNetwork = memo(function RegionalHighwayNetwork({
   visible = true,
   opacity = 1,
   ownerEntityIdByIdentifier,
+  ubiretamaPresentation,
   hoverEnabled,
   onSelect,
   onHover,
@@ -131,7 +134,7 @@ export const RegionalHighwayNetwork = memo(function RegionalHighwayNetwork({
   onCursor,
 }: RegionalHighwayNetworkProps) {
   const network = useMemo(() => {
-    const geometry = buildTerritoryRoadGeometry();
+    const geometry = buildTerritoryRoadGeometry(ubiretamaPresentation);
     return {
       carriageway: geometry.pavement,
       shoulders: geometry.shoulders,
@@ -175,7 +178,7 @@ export const RegionalHighwayNetwork = memo(function RegionalHighwayNetwork({
         estimatedBaseDrawCalls: 8,
       },
     };
-  }, []);
+  }, [ubiretamaPresentation]);
   const anisotropy = useThree((state) =>
     state.gl.capabilities.getMaxAnisotropy(),
   );
@@ -217,11 +220,16 @@ export const RegionalHighwayNetwork = memo(function RegionalHighwayNetwork({
   const transparent = presentedOpacity < 0.995;
   const interactive = visible && presentedOpacity > 0.015;
   const resolveEntityId = (event: ThreeEvent<PointerEvent | MouseEvent>) => {
+    if (ubiretamaPresentation && ubiretamaPresentationDistance(
+      [event.point.x, event.point.z], ubiretamaPresentation,
+    ) <= 1e-6) return ubiretamaPresentation.entityId;
     const rearOwner = resolveRearRoadOwnerAtLocalPoint(
       [event.point.x, event.point.z],
       "park",
     );
-    if (rearOwner) return ownerEntityIdByIdentifier.get(rearOwner) ?? null;
+    if (rearOwner && !(ubiretamaPresentation && rearOwner === 'RUA-UBIRETAMA')) {
+      return ownerEntityIdByIdentifier.get(rearOwner) ?? null;
+    }
     const owner = territoryHighwayOwnerAt([event.point.x, event.point.z]);
     return owner ? (ownerEntityIdByIdentifier.get(owner) ?? null) : null;
   };

@@ -1,6 +1,7 @@
 import type { CommercialLot, MapEntity } from '../types';
 import { OPEN_GROUND_PRESENTATION_HEIGHT } from '../constants';
 import { naturalParkingGroundElevationAt } from './naturalParkingGround';
+import { isPavilion12FrontTreeId, isPavilion12TreeGroundSupport, pavilion12TreeSupportContainsPoint } from '../data/pavilion12FrontTrees';
 import {
   COMMERCIAL_TREE_AREA_SCENE_ANCHORS,
   COMMERCIAL_MAP_TREES,
@@ -117,7 +118,16 @@ function commercialTreeSurfaceEntityAtPosition(
   point: readonly [number, number],
   entities: readonly MapEntity[],
 ) {
-  const candidates = entities.filter((entity) => TREE_SURFACE_CLASSIFICATIONS.has(entity.classification));
+  // Only these three relocated trunks use the generated concrete. Shadows
+  // resolve their receiving point, including holes, without a nearest fallback
+  // that would extend the sidewalk elevation across the neighboring asphalt.
+  if (isPavilion12FrontTreeId(tree.id)) {
+    const concrete = entities.find(entity => isPavilion12TreeGroundSupport(entity)
+      && pavilion12TreeSupportContainsPoint(point, entity));
+    if (concrete) return concrete;
+  }
+  const candidates = entities.filter((entity) => TREE_SURFACE_CLASSIFICATIONS.has(entity.classification)
+    && !isPavilion12TreeGroundSupport(entity));
   const containing = candidates
     .filter((entity) => pointInPolygon(point, entity.geometry.coordinates[0] ?? []))
     .sort((left, right) => surfacePriority(tree, left) - surfacePriority(tree, right));

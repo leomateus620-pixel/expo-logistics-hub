@@ -2,6 +2,7 @@ import { OFFICIAL_REFERENCE_DATA, officialPdfPointToLocal } from './officialRefe
 import { pointInPolygon } from '../utils/spatialSurface';
 import { NATIONS_DISTRICT_LAYOUT } from './nationsDistrict';
 import { GATE_FOUR_DISTRICT_LAYOUT } from './gateFourDistrict';
+import { PAVILION12_FRONT_TREE_CORRECTIONS, PAVILION12_FRONT_TREE_SURFACE_IDENTIFIER } from './pavilion12FrontTrees';
 
 export type CommercialTreeQuadra = 'D' | 'I' | 'J' | 'E';
 
@@ -187,8 +188,9 @@ function buildTrees(area: CommercialTreeArea, blueprints: readonly TreeBlueprint
     const canopyRadius = round(dimensions.canopyRadius * scale);
     const shadowRotation = blueprint.shadowRotation ?? DEFAULT_SHADOW_ROTATION + ((index % 3) - 1) * 0.035;
     const id = `tree-${TREE_AREA_ID_PREFIX[area]}-${String(index + 1).padStart(2, '0')}`;
+    const pavilion12Correction = PAVILION12_FRONT_TREE_CORRECTIONS[id as keyof typeof PAVILION12_FRONT_TREE_CORRECTIONS];
     const corrected = LOCAL_TREE_ACCESS_CORRECTIONS[`${blueprint.sourcePosition[0]},${blueprint.sourcePosition[1]}`];
-    const sourcePosition = corrected ?? blueprint.sourcePosition;
+    const sourcePosition = pavilion12Correction?.sourcePosition ?? corrected ?? blueprint.sourcePosition;
     const position = sourceToLocal(sourcePosition);
     const correctedLot = corrected && area === 'I' && sourcePosition[0] > 2782
       ? OFFICIAL_REFERENCE_DATA.entities.find(entity => entity.classification === 'SELLABLE_LOT'
@@ -202,15 +204,17 @@ function buildTrees(area: CommercialTreeArea, blueprints: readonly TreeBlueprint
       area,
       quadra: isCommercialTreeQuadra(area) ? area : null,
       relatedLotId: correctedLot?.publicIdentifier ?? blueprint.relatedLotId ?? null,
-      surfaceEntityIdentifier: corrected && area !== 'PAVILIONS_1_14_GROVE'
+      surfaceEntityIdentifier: pavilion12Correction ? PAVILION12_FRONT_TREE_SURFACE_IDENTIFIER
+        : corrected && area !== 'PAVILIONS_1_14_GROVE'
         ? (sourcePosition[0] < 2782 ? 'CALCADA-ARVOREDO' : correctedLot?.publicIdentifier ?? 'QUADRA-I')
         : blueprint.surfaceEntityIdentifier ?? null,
-      placement: correctedLot ? 'LOT_EDGE'
+      placement: pavilion12Correction ? 'SIDEWALK_EDGE' : correctedLot ? 'LOT_EDGE'
         : corrected && area !== 'PAVILIONS_1_14_GROVE' && sourcePosition[0] < 2782
           ? 'SIDEWALK_EDGE' : blueprint.placement,
       position,
       sourcePosition,
-      ...(corrected ? { previousSourcePosition: blueprint.sourcePosition } : {}),
+      ...(pavilion12Correction ? { previousSourcePosition: pavilion12Correction.previousSourcePosition }
+        : corrected ? { previousSourcePosition: blueprint.sourcePosition } : {}),
       canopyRadius,
       trunkRadius: round(dimensions.trunkRadius * scale),
       trunkHeight: round(dimensions.trunkHeight * scale),
@@ -221,8 +225,12 @@ function buildTrees(area: CommercialTreeArea, blueprints: readonly TreeBlueprint
       shadowRotation,
       shadowDirection: [round(Math.cos(shadowRotation)), round(Math.sin(shadowRotation))],
       isVisible: true,
-      sourceReference: COMMERCIAL_TREE_SOURCE_REFERENCES[area],
-      notes: blueprint.notes,
+      sourceReference: pavilion12Correction
+        ? `${COMMERCIAL_TREE_SOURCE_REFERENCES[area]} — correção de apresentação dos anexos 3 e 4 diante do Pavilhão 12`
+        : COMMERCIAL_TREE_SOURCE_REFERENCES[area],
+      notes: pavilion12Correction
+        ? 'Tronco transferido da Rua Argentina para o concreto diante de B3/Pavilhão 12, entre acessos, conforme anexos 3 e 4. Posição de apresentação estimada, não levantamento de campo.'
+        : blueprint.notes,
       verificationStatus: blueprint.verificationStatus ?? 'SATELLITE_CONFIRMED',
     };
   });

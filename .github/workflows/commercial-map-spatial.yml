@@ -47,6 +47,12 @@ jobs:
           src/test/commercialMapRearParkResourcePersistence.test.ts
           src/test/commercialMapRearRoadGround.test.ts
           src/test/commercialMapRearRoadTreeClearance.test.ts
+          src/test/commercialMapGateNineAccessPresentation.test.ts
+          src/test/commercialMapUbiretamaPresentation.test.ts
+          src/test/commercialMapUbiretamaVisitTrees.test.ts
+          src/test/commercialMapPavilion12FrontTrees.test.ts
+          src/test/commercialMapExporuralSouthRoad.test.ts
+          src/test/commercialMapGateNineCommunicationTower.test.ts
           src/test/commercialMapCameraTransition.test.ts
           src/test/commercialMapViewport.test.ts
       - run: npm run typecheck

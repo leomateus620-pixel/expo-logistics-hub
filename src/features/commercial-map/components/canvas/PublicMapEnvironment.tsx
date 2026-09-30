@@ -8,10 +8,13 @@ import { SunrisePostProcessing } from './CommercialMapEnvironment';
 import { TerritorialEnvironment } from './TerritorialEnvironment';
 import { EssentialSceneLayer } from './EssentialSceneLayer';
 import { PublicContextGroup } from './PublicContextGroup';
+import type { UbiretamaRoadPresentation } from '../../utils/ubiretamaRoadPresentation';
 
 /** Public daylight. The existing direct frame owner retains error handling,
  * invalidation and context recovery; no second render loop or post pass. */
-export function PublicMapEnvironment({ extent }: { extent: CommercialMapEnvironmentExtent }) {
+export function PublicMapEnvironment({ extent, ubiretamaPresentation }: {
+  extent: CommercialMapEnvironmentExtent; ubiretamaPresentation?: UbiretamaRoadPresentation | null;
+}) {
   const scene = useThree(state => state.scene);
   const ground = useMemo(() => new THREE.MeshStandardMaterial({ color: '#929b91', roughness: 1 }), []);
   const size = Math.max(extent.width, extent.depth) * 12;
@@ -28,7 +31,7 @@ export function PublicMapEnvironment({ extent }: { extent: CommercialMapEnvironm
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[extent.centerX, COMMERCIAL_MAP_GROUND_ELEVATION, extent.centerZ]} material={ground} raycast={() => undefined}>
         <planeGeometry args={[size, size]} />
       </mesh>
-      <EssentialSceneLayer id="territorial-context"><TerritorialEnvironment /></EssentialSceneLayer>
+      <EssentialSceneLayer id="territorial-context"><TerritorialEnvironment ubiretamaPresentation={ubiretamaPresentation} /></EssentialSceneLayer>
     </PublicContextGroup>
     <SunrisePostProcessing qualityTier="reduced" enabled={false} />
   </>;

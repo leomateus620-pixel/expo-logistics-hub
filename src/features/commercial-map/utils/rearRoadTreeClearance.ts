@@ -1,5 +1,6 @@
 import { GENERATED_REAR_ROAD_SEGMENTS } from '../data/rearParkRoadNetwork';
 import { territoryRoadClearance } from './territorialRoadGeometry';
+import { UBIRETAMA_PRESENTATION_HANDOFF, isUbiretamaPresentationSegment, type UbiretamaRoadPresentation } from './ubiretamaRoadPresentation';
 import {
   buildRearRoadCorridorFootprints,
   distanceToPath,
@@ -25,8 +26,11 @@ const GENERATED_REAR_CORRIDOR_FOOTPRINTS = Object.freeze(
 export function treeIntersectsGeneratedRearRoadCorridor(
   tree: RearRoadClearanceTree,
   footprints: readonly RearRoadCorridorFootprint[] = GENERATED_REAR_CORRIDOR_FOOTPRINTS,
+  presentation?: UbiretamaRoadPresentation | null,
 ) {
-  return territoryRoadClearance(tree.position) <= tree.canopyRadius || footprints.some((footprint) => (
+  const scopedPresentation = presentation && tree.position[1] < UBIRETAMA_PRESENTATION_HANDOFF[1] ? presentation : null;
+  return territoryRoadClearance(tree.position, scopedPresentation) <= tree.canopyRadius || footprints.some((footprint) => (
+    !(scopedPresentation && isUbiretamaPresentationSegment(footprint.segmentId)) &&
     distanceToPath(tree.position, footprint.centerline)
       <= footprint.halfWidth + tree.canopyRadius
   ));
@@ -34,6 +38,6 @@ export function treeIntersectsGeneratedRearRoadCorridor(
 
 export function selectRearRoadCompatibleTreesForPresentation<
   Tree extends RearRoadClearanceTree,
->(trees: readonly Tree[]) {
-  return trees.filter((tree) => !treeIntersectsGeneratedRearRoadCorridor(tree));
+>(trees: readonly Tree[], presentation?: UbiretamaRoadPresentation | null) {
+  return trees.filter((tree) => !treeIntersectsGeneratedRearRoadCorridor(tree, undefined, presentation));
 }

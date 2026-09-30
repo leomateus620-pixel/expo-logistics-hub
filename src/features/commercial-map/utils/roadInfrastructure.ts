@@ -3,6 +3,8 @@ import { mergeBufferGeometries } from 'three-stdlib';
 import type { Coordinate, MapEntity } from '../types';
 import { withoutClosingPoint } from './geometry';
 import { buildRearRoadCorridorFootprints, distanceToPath } from './rearRoadNetwork';
+import { ubiretamaPresentationDistance, type UbiretamaRoadPresentation } from './ubiretamaRoadPresentation';
+import { GATE_NINE_NEIGHBOR_ROAD_IDENTIFIER, isGateNineAccessPresentationEntity } from './gateNineRoadPresentation';
 
 const REAR_ENTRY_FOOTPRINTS = buildRearRoadCorridorFootprints();
 
@@ -59,6 +61,7 @@ interface NetworkBuildOptions {
   reducedGraphics?: boolean;
   /** Detailed presentation replaces only base meshes, never source entities. */
   suppressedSurfaceIdentifiers?: readonly string[];
+  ubiretamaPresentation?: UbiretamaRoadPresentation | null;
 }
 
 interface Bounds {
@@ -264,15 +267,35 @@ function bridgeBounds(first: Bounds, second: Bounds) {
   };
 }
 
+function originalPresentationRoadRing(entity: MapEntity) {
+  const original = entity.metadata.exporuralSouthRoadOriginalCoordinates;
+  return entity.metadata.presentationOnly === true
+    && entity.metadata.exporuralSouthRoadPresentation === true
+    && entity.publicIdentifier === 'RUA-EMANUEL-BRACHMANN'
+    && Array.isArray(original) && original.length > 0
+    ? entityRing({ ...entity, geometry: { ...entity.geometry, coordinates: original as Coordinate[][] } })
+    : entityRing(entity);
+}
+
 export function findRoadConnections(entities: MapEntity[], tolerance = ROAD_INFRASTRUCTURE.joinTolerance) {
   const roads = entities.filter((entity) => entity.classification === 'ROAD');
-  const rings = new Map(roads.map((entity) => [entity.id, entityRing(entity)]));
+  const rings = new Map(roads.map((entity) => {
+    // The recovered western continuation meets its owners directly. Preserve
+    // the original Emanuel junction aprons; its enlarged bounding box would
+    // otherwise generate rectangles through adjacent commercial parcels.
+    return [entity.id, originalPresentationRoadRing(entity)] as const;
+  }));
   const bounds = new Map(roads.map((entity) => [entity.id, boundsForRing(rings.get(entity.id)!)]));
   const connections: RoadConnection[] = [];
 
   roads.forEach((first, firstIndex) => {
     const firstRing = rings.get(first.id)!;
     roads.slice(firstIndex + 1).forEach((second) => {
+      // These two parallel lanes join only at their southern ends. Their AABBs
+      // overlap along the whole access; a rectangular junction would pave the
+      // green seam between them. The authored polygons already meet below it.
+      if ((isGateNineAccessPresentationEntity(first) && second.publicIdentifier === GATE_NINE_NEIGHBOR_ROAD_IDENTIFIER)
+        || (isGateNineAccessPresentationEntity(second) && first.publicIdentifier === GATE_NINE_NEIGHBOR_ROAD_IDENTIFIER)) return;
       const secondRing = rings.get(second.id)!;
       const distance = ringDistance(firstRing, secondRing);
       if (distance > tolerance) return;
@@ -298,6 +321,7 @@ function lerpCoordinate(start: Coordinate, end: Coordinate, amount: number): Coo
 export function buildRoadBoundaryRuns(
   entities: MapEntity[],
   boundaryStep: number = ROAD_INFRASTRUCTURE.detailedBoundaryStep,
+  ubiretamaPresentation?: UbiretamaRoadPresentation | null,
 ) {
   const circulation = entities.filter(isRoadInfrastructureEntity);
   const rings = new Map(circulation.map((entity) => [entity.id, entityRing(entity)]));
@@ -311,7 +335,13 @@ export function buildRoadBoundaryRuns(
       const end = ring[(index + 1) % ring.length] ?? start;
       return Math.hypot(end[0] - start[0], end[1] - start[1]);
     });
-    const longestEdge = Math.max(...edgeLengths);
+    // Extending Emanuel west must not turn its original longitudinal edge
+    // into an end cap by increasing the length used for this cutoff.
+    const originalRing = originalPresentationRoadRing(entity);
+    const longestEdge = Math.max(...originalRing.map((start, index) => {
+      const end = originalRing[(index + 1) % originalRing.length] ?? start;
+      return Math.hypot(end[0] - start[0], end[1] - start[1]);
+    }));
 
     ring.forEach((start, edgeIndex) => {
       const end = ring[(edgeIndex + 1) % ring.length] ?? start;
@@ -331,7 +361,9 @@ export function buildRoadBoundaryRuns(
         const midpoint = lerpCoordinate(from, to, 0.5);
         const blockedByRearEntry = ['AV-IMIGRANTES', 'RUA-BRASIL'].includes(entity.publicIdentifier)
           && REAR_ENTRY_FOOTPRINTS.some(r => distanceToPath(midpoint, r.centerline) <= r.halfWidth + ROAD_INFRASTRUCTURE.curbWidth);
-        const blockedByIntersection = blockedByRearEntry || circulation.some((candidate) => {
+        const blockedByUbiretama = ubiretamaPresentation && entity.publicIdentifier !== 'RUA-UBIRETAMA'
+          && ubiretamaPresentationDistance(midpoint, ubiretamaPresentation) <= ROAD_INFRASTRUCTURE.joinTolerance;
+        const blockedByIntersection = blockedByRearEntry || blockedByUbiretama || circulation.some((candidate) => {
           if (candidate.id === entity.id) return false;
           return pointNearRing(midpoint, rings.get(candidate.id)!, ROAD_INFRASTRUCTURE.joinTolerance);
         });
@@ -462,6 +494,7 @@ export function buildRoadNetworkGeometries(
     options.reducedGraphics
       ? ROAD_INFRASTRUCTURE.reducedBoundaryStep
       : ROAD_INFRASTRUCTURE.detailedBoundaryStep,
+    options.ubiretamaPresentation,
   );
   const curbTarget = createMutableGeometry();
   const gutterTarget = createMutableGeometry();

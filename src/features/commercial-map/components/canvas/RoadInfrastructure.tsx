@@ -15,6 +15,7 @@ import {
   type OpenGroundTextureBundle,
 } from './openGroundTextures';
 import { bindParkSurfaceMaterial } from './parkSurfaceMaterial';
+import type { UbiretamaRoadPresentation } from '../../utils/ubiretamaRoadPresentation';
 
 // ANALYST 2026.9-annex-road-precision.1 — this component only extrudes official
 // ROAD polygons. Keep RUA-BRASILIA rectPdf([3940, 2440, 3988, 4210]) in the
@@ -25,6 +26,7 @@ interface RoadInfrastructureProps {
   entities: MapEntity[];
   /** Detailed presentation owns these base surfaces; entity highlights remain. */
   suppressedSurfaceIdentifiers?: readonly string[];
+  ubiretamaPresentation?: UbiretamaRoadPresentation | null;
   selectedEntityId: string | null;
   matchingEntityIds: ReadonlySet<string>;
   filtersActive: boolean;
@@ -65,6 +67,7 @@ const PEDESTRIAN_NORMAL_SCALE = new THREE.Vector2(0.22, 0.22);
 const RoadLayerNetwork = memo(function RoadLayerNetwork({
   entities,
   suppressedSurfaceIdentifiers,
+  ubiretamaPresentation,
   selectedEntityId,
   matchingEntityIds,
   filtersActive,
@@ -74,8 +77,8 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
 }: RoadLayerNetworkProps) {
   const { invalidate } = useThree();
   const network = useMemo(
-    () => buildRoadNetworkGeometries(entities, { reducedGraphics, suppressedSurfaceIdentifiers }),
-    [entities, reducedGraphics, suppressedSurfaceIdentifiers],
+    () => buildRoadNetworkGeometries(entities, { reducedGraphics, suppressedSurfaceIdentifiers, ubiretamaPresentation }),
+    [entities, reducedGraphics, suppressedSurfaceIdentifiers, ubiretamaPresentation],
   );
   const selectedEntity = useMemo(
     () => entities.find((entity) => entity.id === selectedEntityId) ?? null,
@@ -252,6 +255,7 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
 export const RoadInfrastructure = memo(function RoadInfrastructure({
   entities,
   suppressedSurfaceIdentifiers,
+  ubiretamaPresentation,
   selectedEntityId,
   matchingEntityIds,
   filtersActive,
@@ -294,6 +298,7 @@ export const RoadInfrastructure = memo(function RoadInfrastructure({
           key={layerId}
           entities={layerEntities}
           suppressedSurfaceIdentifiers={suppressedSurfaceIdentifiers}
+          ubiretamaPresentation={ubiretamaPresentation}
           selectedEntityId={selectedEntityId}
           matchingEntityIds={matchingEntityIds}
           filtersActive={filtersActive}
