@@ -1,0 +1,518 @@
+{
+  "scope": "Local Windows headless Chrome, original layout versus final immersive candidate; paired candidate filter test after resource plateau",
+  "baseline": {
+    "day-moving": {
+      "meanFrameMs": [
+        24.59,
+        23.74,
+        23.62
+      ],
+      "medianMeanFrameMs": 23.74,
+      "medianP95Ms": 24.9,
+      "meanSubmissionCpuMs": [
+        12.551,
+        11.835,
+        11.839
+      ],
+      "meanGpuMs": [
+        23.231,
+        23.051,
+        23.052
+      ],
+      "canvas": [
+        [
+          1359,
+          814
+        ],
+        [
+          1359,
+          814
+        ],
+        [
+          1359,
+          814
+        ]
+      ],
+      "quality": [
+        "HIGH",
+        "HIGH",
+        "HIGH"
+      ]
+    },
+    "night-moving": {
+      "meanFrameMs": [
+        25.65,
+        24.85,
+        25.68
+      ],
+      "medianMeanFrameMs": 25.65,
+      "medianP95Ms": 30,
+      "meanSubmissionCpuMs": [
+        18.495,
+        15.578,
+        17.127
+      ],
+      "meanGpuMs": [
+        24.311,
+        24.289,
+        24.844
+      ],
+      "canvas": [
+        [
+          1359,
+          814
+        ],
+        [
+          1359,
+          814
+        ],
+        [
+          1359,
+          814
+        ]
+      ],
+      "quality": [
+        "HIGH",
+        "HIGH",
+        "HIGH"
+      ]
+    },
+    "rain-moving": {
+      "meanFrameMs": [
+        23.99,
+        23.97,
+        24.63
+      ],
+      "medianMeanFrameMs": 23.99,
+      "medianP95Ms": 26,
+      "meanSubmissionCpuMs": [
+        15.453,
+        16.767,
+        20.946
+      ],
+      "meanGpuMs": [
+        22.984,
+        23.3,
+        23.963
+      ],
+      "canvas": [
+        [
+          1359,
+          814
+        ],
+        [
+          1359,
+          814
+        ],
+        [
+          1359,
+          814
+        ]
+      ],
+      "quality": [
+        "HIGH",
+        "HIGH",
+        "HIGH"
+      ]
+    },
+    "night-rain-bar": {
+      "meanFrameMs": [
+        25.48,
+        25.23,
+        25.59
+      ],
+      "medianMeanFrameMs": 25.48,
+      "medianP95Ms": 35.2,
+      "meanSubmissionCpuMs": [
+        16.428,
+        17.567,
+        17.106
+      ],
+      "meanGpuMs": [
+        24.329,
+        24.45,
+        24.637
+      ],
+      "canvas": [
+        [
+          1359,
+          814
+        ],
+        [
+          1359,
+          814
+        ],
+        [
+          1359,
+          814
+        ]
+      ],
+      "quality": [
+        "HIGH",
+        "HIGH",
+        "HIGH"
+      ]
+    }
+  },
+  "candidate": {
+    "day-moving": {
+      "meanFrameMs": [
+        25.03,
+        24.76,
+        24.53
+      ],
+      "medianMeanFrameMs": 24.76,
+      "medianP95Ms": 25.9,
+      "meanSubmissionCpuMs": [
+        11.955,
+        12.674,
+        14.292
+      ],
+      "meanGpuMs": [
+        24.025,
+        23.931,
+        23.799
+      ],
+      "canvas": [
+        [
+          1440,
+          828
+        ],
+        [
+          1440,
+          828
+        ],
+        [
+          1440,
+          828
+        ]
+      ],
+      "quality": [
+        "HIGH",
+        "HIGH",
+        "HIGH"
+      ]
+    },
+    "night-moving": {
+      "meanFrameMs": [
+        26.42,
+        27.18,
+        26.83
+      ],
+      "medianMeanFrameMs": 26.83,
+      "medianP95Ms": 30.2,
+      "meanSubmissionCpuMs": [
+        15.404,
+        18.401,
+        15.863
+      ],
+      "meanGpuMs": [
+        25.264,
+        26.101,
+        25.978
+      ],
+      "canvas": [
+        [
+          1440,
+          828
+        ],
+        [
+          1440,
+          828
+        ],
+        [
+          1440,
+          828
+        ]
+      ],
+      "quality": [
+        "HIGH",
+        "HIGH",
+        "HIGH"
+      ]
+    },
+    "rain-moving": {
+      "meanFrameMs": [
+        25,
+        25.07,
+        25.61
+      ],
+      "medianMeanFrameMs": 25.07,
+      "medianP95Ms": 32,
+      "meanSubmissionCpuMs": [
+        14.446,
+        15.318,
+        15.84
+      ],
+      "meanGpuMs": [
+        23.883,
+        24.252,
+        24.543
+      ],
+      "canvas": [
+        [
+          1440,
+          828
+        ],
+        [
+          1440,
+          828
+        ],
+        [
+          1440,
+          828
+        ]
+      ],
+      "quality": [
+        "HIGH",
+        "HIGH",
+        "HIGH"
+      ]
+    },
+    "night-rain-bar": {
+      "meanFrameMs": [
+        26.64,
+        26.47,
+        26.88
+      ],
+      "medianMeanFrameMs": 26.64,
+      "medianP95Ms": 30.5,
+      "meanSubmissionCpuMs": [
+        14.183,
+        13.968,
+        16.912
+      ],
+      "meanGpuMs": [
+        25.265,
+        25.393,
+        25.92
+      ],
+      "canvas": [
+        [
+          1440,
+          828
+        ],
+        [
+          1440,
+          828
+        ],
+        [
+          1440,
+          828
+        ]
+      ],
+      "quality": [
+        "HIGH",
+        "HIGH",
+        "HIGH"
+      ]
+    }
+  },
+  "warmup": {
+    "maxPasses": 8,
+    "requiredStableSamples": 3,
+    "samples": [
+      {
+        "pass": 1,
+        "stableSamples": 1,
+        "geometries": 579,
+        "textures": 109,
+        "programs": 189,
+        "width": 1440,
+        "height": 828,
+        "qualityTier": "HIGH"
+      },
+      {
+        "pass": 2,
+        "stableSamples": 2,
+        "geometries": 579,
+        "textures": 109,
+        "programs": 189,
+        "width": 1440,
+        "height": 828,
+        "qualityTier": "HIGH"
+      },
+      {
+        "pass": 3,
+        "stableSamples": 3,
+        "geometries": 579,
+        "textures": 109,
+        "programs": 189,
+        "width": 1440,
+        "height": 828,
+        "qualityTier": "HIGH"
+      }
+    ],
+    "plateau": true
+  },
+  "paired": [
+    {
+      "repetition": 1,
+      "surface": "blur10",
+      "frameMeanMs": 26.54,
+      "p95Ms": 28.2,
+      "cpuMs": 13.529,
+      "gpuMs": 25.306,
+      "geometries": 579,
+      "textures": 109,
+      "programs": 189,
+      "filter": "blur(10px) saturate(1.12)",
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 3701,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "quality": "HIGH"
+    },
+    {
+      "repetition": 1,
+      "surface": "off",
+      "frameMeanMs": 26.45,
+      "p95Ms": 37.2,
+      "cpuMs": 18.144,
+      "gpuMs": 25.354,
+      "geometries": 579,
+      "textures": 109,
+      "programs": 189,
+      "filter": "none",
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 3849,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "quality": "HIGH"
+    },
+    {
+      "repetition": 2,
+      "surface": "off",
+      "frameMeanMs": 26.37,
+      "p95Ms": 28.5,
+      "cpuMs": 14.469,
+      "gpuMs": 25.329,
+      "geometries": 579,
+      "textures": 109,
+      "programs": 189,
+      "filter": "none",
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4038,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "quality": "HIGH"
+    },
+    {
+      "repetition": 2,
+      "surface": "blur10",
+      "frameMeanMs": 26.53,
+      "p95Ms": 28.4,
+      "cpuMs": 13.976,
+      "gpuMs": 25.307,
+      "geometries": 579,
+      "textures": 109,
+      "programs": 189,
+      "filter": "blur(10px) saturate(1.12)",
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4187,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "quality": "HIGH"
+    },
+    {
+      "repetition": 3,
+      "surface": "blur10",
+      "frameMeanMs": 26.49,
+      "p95Ms": 28.2,
+      "cpuMs": 13.538,
+      "gpuMs": 25.274,
+      "geometries": 579,
+      "textures": 109,
+      "programs": 189,
+      "filter": "blur(10px) saturate(1.12)",
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4374,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "quality": "HIGH"
+    },
+    {
+      "repetition": 3,
+      "surface": "off",
+      "frameMeanMs": 26.26,
+      "p95Ms": 27.5,
+      "cpuMs": 13.319,
+      "gpuMs": 25.243,
+      "geometries": 579,
+      "textures": 109,
+      "programs": 189,
+      "filter": "none",
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4524,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "quality": "HIGH"
+    }
+  ],
+  "checks": {
+    "candidate": 235,
+    "failed": [],
+    "errors": [],
+    "header": 19
+  }
+}

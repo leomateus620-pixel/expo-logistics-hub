@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ArrowLeft, CarFront, Check, ChevronDown, ChevronUp, Factory, FilterX, Layers3, PanelLeftClose, PanelLeftOpen, RotateCcw, Tractor } from 'lucide-react';
 import { STATUS_CONFIG } from '../../constants';
 import { toCommercialPhase } from '../../types';
@@ -42,6 +42,9 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
   const [interiorExpanded, setInteriorExpanded] = useState(true);
   const [moduleLegendOpen, setModuleLegendOpen] = useState(false);
   const panelRef = useRef<HTMLElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const compactModeRef = useRef(compact);
+  const restoreToggleFocus = useRef(false);
   const dragStart = useRef<number | null>(null);
   const expanded = interiorEntity ? interiorExpanded : dockExpanded;
   const inventory = useMemo(() => commercialMapSegmentInventory(entities, lots).filter(({ segment }) =>
@@ -49,12 +52,30 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
   const activeSegment = inventory.find(({ segment }) => segment.id === activeSegmentId)?.segment;
   const interiorId = interiorEntity?.id;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const query = window.matchMedia(COMPACT_QUERY);
-    const sync = () => setCompact(query.matches);
+    const panel = panelRef.current;
+    const shell = panel?.closest<HTMLElement>('.commercial-map-shell');
+    const sync = () => {
+      const width = shell?.clientWidth ?? 0;
+      const nextCompact = query.matches || (width > 0 && width <= 720);
+      if (compactModeRef.current === nextCompact) return;
+      restoreToggleFocus.current = Boolean(panel?.querySelector('.commercial-map-dock__scroll')?.contains(document.activeElement));
+      compactModeRef.current = nextCompact;
+      setCompact(nextCompact);
+    };
+    sync();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(sync);
+    if (shell) observer?.observe(shell);
     query.addEventListener('change', sync);
-    return () => query.removeEventListener('change', sync);
+    return () => { observer?.disconnect(); query.removeEventListener('change', sync); };
   }, []);
+  useLayoutEffect(() => {
+    if (!restoreToggleFocus.current) return;
+    restoreToggleFocus.current = false;
+    // Restore only when the responsive mode removed the focused content.
+    if (!panelRef.current?.contains(document.activeElement)) toggleRef.current?.focus({ preventScroll: true });
+  }, [compact]);
   useEffect(() => {
     setSheet(interiorId ? 'summary' : 'collapsed');
     setInteriorExpanded(true);
@@ -91,7 +112,7 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
   const showContent = compact ? sheet !== 'collapsed' : expanded;
   const isModule = Boolean(interiorEntity && selectedModuleId && moduleCard);
   const returnButton = interiorEntity && <button type="button" className="commercial-map-dock__back"
-    data-map-interior-back aria-keyshortcuts="Escape" onClick={exitInterior}>
+    data-map-interior-back aria-label="Voltar ao mapa" title="Voltar ao mapa" aria-keyshortcuts="Escape" onClick={exitInterior}>
     <ArrowLeft aria-hidden="true" /><span>Voltar ao mapa</span>
   </button>;
   const toggle = () => {
@@ -108,7 +129,7 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
     <div className="commercial-map-dock__head">
       {returnButton || <span className="commercial-map-dock__brand"><Layers3 aria-hidden="true" /><span>{compact && sheet === 'collapsed' ? activeSegment?.name ?? 'Segmentos e legenda' : 'Parque Fenasoja'}</span></span>}
       {compact && sheet !== 'collapsed' && <button type="button" className="commercial-map-dock__toggle" aria-label="Recolher painel do mapa" onClick={() => setSheet('collapsed')}><ChevronDown aria-hidden="true" /></button>}
-      <button type="button" className="commercial-map-dock__toggle" onClick={toggle}
+      <button ref={toggleRef} type="button" className="commercial-map-dock__toggle" onClick={toggle}
         aria-label={compact ? sheet === 'expanded' ? 'Resumir painel do mapa' : 'Expandir painel do mapa' : expanded ? 'Recolher painel do mapa' : 'Expandir painel do mapa'}
         aria-expanded={compact ? sheet === 'expanded' : expanded}>
         {compact ? sheet === 'expanded' ? <ChevronDown /> : <ChevronUp /> : expanded ? <PanelLeftClose /> : <PanelLeftOpen />}

@@ -20,6 +20,7 @@ import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CameraPreset, MapPermissions } from '../../types';
 import type { CommercialMapAreaScope } from '../../utils/areaScope';
 import { canUseTechnicalValidationOverlay } from '../../utils/technicalValidation';
+import { CommercialMapControlRail } from './CommercialMapControlRail';
 import './commercial-map-topbar.css';
 
 const PRESET_ICONS: Record<string, LucideIcon> = {
@@ -88,7 +89,7 @@ export function CommercialMapTopBar({
           aria-pressed={options.active}
           data-commercial-map-control={key}
         >
-          <Icon aria-hidden="true" />
+          <Icon strokeWidth={1.8} aria-hidden="true" />
         </button>
       </TooltipTrigger>
       <TooltipContent side="bottom">{label}</TooltipContent>
@@ -96,7 +97,11 @@ export function CommercialMapTopBar({
   );
 
   return (
-    <div className="commercial-map-topbar" aria-label="Visualização do mapa comercial">
+    <CommercialMapControlRail
+      className="commercial-map-topbar"
+      label="Visualização do mapa comercial"
+      nightModeActive={nightModeActive}
+    >
       {presets.map((preset) => renderAction(
         preset,
         PRESET_ICONS[preset] ?? Compass,
@@ -153,6 +158,8 @@ export function CommercialMapTopBar({
         { active: activePanel === 'layers' },
       )}
 
+      <span className="commercial-map-topbar__divider" aria-hidden="true" />
+
       {renderAction(
         'environment',
         Trees,
@@ -168,6 +175,6 @@ export function CommercialMapTopBar({
         () => setTechnicalValidationVisible(!technicalValidationVisible),
         { active: technicalValidationVisible },
       )}
-    </div>
+    </CommercialMapControlRail>
   );
 }

@@ -30,13 +30,13 @@ const compactControlConditions = [
 describe('arquitetura mobile-first do Mapa Comercial', () => {
   it('oculta a barra superior somente quando a barra compacta está visível', () => {
     const topbar = read('src/features/commercial-map/components/controls/commercial-map-topbar.css');
-    const mobile = read('src/features/commercial-map/commercial-map-mobile.css');
-
-    expect(declarations(topbar, '.commercial-map-topbar', 'display')).toEqual([
+    expect(declarations(topbar, '.commercial-map-control-rail', 'display')).toEqual([
       { value: 'flex', conditions: [] },
+    ]);
+    expect(declarations(topbar, '.commercial-map-topbar', 'display')).toEqual([
       ...compactControlConditions.map((conditions) => ({ value: 'none', conditions })),
     ]);
-    expect(declarations(mobile, '.commercial-map-toolbar-mobile', 'display')).toEqual([
+    expect(declarations(topbar, '.commercial-map-toolbar-mobile', 'display')).toEqual([
       { value: 'none', conditions: [] },
       ...compactControlConditions.map((conditions) => ({ value: 'flex', conditions })),
     ]);
@@ -170,14 +170,18 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
 
   it('preserva busca e ações em smartphones estreitos sem sobrepor a toolbar', () => {
     const toolbar = read('src/features/commercial-map/components/controls/MapToolbar.tsx');
-    const styles = read('src/features/commercial-map/commercial-map-mobile.css');
+    const styles = read('src/features/commercial-map/components/controls/commercial-map-topbar.css');
 
     expect(toolbar).toContain('commercial-map-toolbar-focus-selection');
     expect(toolbar).toContain('commercial-map-toolbar-menu-focus-selection');
-    // The rail carries six actions (map, top, water, night, focus, more): on
-    // the narrowest phones the focus action moves into the overflow menu.
+    // Compact alternatives remain accessible in the portal while available
+    // container width determines which direct shortcuts fit in the capsule.
     expect(toolbar).toContain('commercial-map-night-toggle');
-    expect(styles).toMatch(/@media \(max-width: 364px\)[\s\S]*?\.commercial-map-toolbar-mobile > \.commercial-map-toolbar-focus-selection \{ display: none; \}/);
-    expect(styles).toContain('.commercial-map-toolbar-menu .commercial-map-toolbar-menu-focus-selection { display: flex; }');
+    expect(declarations(styles, '.commercial-map-toolbar-mobile .commercial-map-toolbar-focus-selection', 'display'))
+      .toContainEqual({ value: 'none', conditions: ['@container commercial-map (max-width: 384px)'] });
+    expect(declarations(styles, '.commercial-map-toolbar-mobile .commercial-map-toolbar-top-view', 'display'))
+      .toContainEqual({ value: 'none', conditions: ['@container commercial-map (max-width: 344px)'] });
+    expect(declarations(styles, '.commercial-map-toolbar-menu-focus-selection', 'display'))
+      .toContainEqual({ value: 'flex', conditions: [] });
   });
 });

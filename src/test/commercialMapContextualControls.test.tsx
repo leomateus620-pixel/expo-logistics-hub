@@ -93,6 +93,7 @@ describe('integração dos controles contextuais', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Expandir painel do mapa' }));
     expect(dock).toHaveAttribute('data-sheet-state', 'expanded');
 
+    fireEvent.click(screen.getByRole('button', { name: 'Gestão' }));
     fireEvent.click(screen.getByRole('button', { name: 'Lista e tabela' }));
     expect(dock).toHaveAttribute('data-sheet-state', 'collapsed');
     expect(useCommercialMapStore.getState()).toMatchObject({
@@ -100,6 +101,7 @@ describe('integração dos controles contextuais', () => {
       activeSegmentId: COMMERCIAL_MAP_SEGMENT_IDS.industry, statusFilters: ['BLOCKED'],
     });
 
+    fireEvent.click(screen.getByRole('button', { name: 'Gestão' }));
     fireEvent.click(screen.getByRole('button', { name: 'Lista e tabela' }));
     expect(dock).toHaveAttribute('data-sheet-state', 'collapsed');
     expect(screen.getByRole('button', { name: 'Voltar ao mapa' })).toBeVisible();
@@ -177,29 +179,36 @@ describe('integração dos controles contextuais', () => {
     </CommercialMapShell></MemoryRouter>);
     const header = screen.getByRole('banner');
     const management = within(header).getByRole('button', { name: 'Gestão' });
-    const list = within(header).getByRole('button', { name: 'Lista e tabela' });
-    const edition = within(header).getByText('FENASOJA 2028');
-    expect(management.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(list.compareDocumentPosition(edition) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const edition = within(header).getByLabelText('FENASOJA 2028');
+    expect(within(header).queryByRole('button', { name: 'Lista e tabela' })).not.toBeInTheDocument();
+    expect(management.compareDocumentPosition(edition) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByRole('main').querySelector('.commercial-map-header-tools')).toBeNull();
 
     fireEvent.click(management);
     fireEvent.click(screen.getByRole('button', { name: 'Calibrar mapa' }));
     expect(manage).toHaveBeenCalledOnce();
     fireEvent.click(management);
+    fireEvent.click(management);
+    const list = screen.getByRole('button', { name: 'Lista e tabela' });
     fireEvent.click(list);
-    expect(list).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.queryByRole('button', { name: 'Lista e tabela' })).not.toBeInTheDocument();
+    expect(management).toHaveAttribute('aria-pressed', 'true');
     expect(useCommercialMapStore.getState().interiorEntityId).toBe(pavilion.id);
-    fireEvent.click(list);
-    expect(list).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(management);
+    expect(screen.getByRole('button', { name: 'Lista e tabela' })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(screen.getByRole('button', { name: 'Lista e tabela' }));
+    expect(screen.queryByRole('button', { name: 'Lista e tabela' })).not.toBeInTheDocument();
     expect(useCommercialMapStore.getState().workspaceMode).toBe('3d');
     expect(useCommercialMapStore.getState().activeSegmentId).toBe(COMMERCIAL_MAP_SEGMENT_IDS.industry);
     expect(useCommercialMapStore.getState().interiorEntityId).toBe(pavilion.id);
   });
 
-  it('oculta gestão quando o workspace não fornece ações autorizadas', () => {
+  it('mantém Gestão e Lista acessíveis sem expor ações de administração não autorizadas', () => {
     render(<CommercialMapHeaderTools />);
-    expect(screen.queryByRole('button', { name: 'Gestão' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Gestão' })).toBeEnabled();
+    expect(screen.queryByRole('button', { name: 'Lista e tabela' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Gestão' }));
     expect(screen.getByRole('button', { name: 'Lista e tabela' })).toBeEnabled();
+    expect(screen.queryByRole('button', { name: 'Calibrar mapa' })).not.toBeInTheDocument();
   });
 });

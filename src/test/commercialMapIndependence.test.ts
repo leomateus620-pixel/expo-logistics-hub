@@ -58,14 +58,15 @@ describe('arquitetura independente do Mapa Comercial', () => {
     const shell = read('src/features/commercial-map/components/shell/CommercialMapShell.tsx');
     const dock = read('src/features/commercial-map/components/dock/CommercialMapDock.tsx');
 
-    expect(page).toContain('<CommercialMapHeaderTools managementActions={managementActions} />');
+    expect(page).toMatch(/<CommercialMapHeaderTools[\s\S]*?managementActions=\{managementActions\}/);
     expect(page).toContain('const managementActions = hasManagementActions ? (');
     expect(page).toMatch(/const hasManagementActions = permissions\.isMapAdmin\s*\|\| permissions\.canManageLots\s*\|\| permissions\.canEditGeometry/);
     expect(page).toMatch(/permissions\.canEditGeometry && \([\s\S]*?Editar geometria/);
     expect(page).toMatch(/permissions\.isMapAdmin && \([\s\S]*?Calibrar/);
     expect(page).toMatch(/data\.source === 'database' && permissions\.canManageLots && \([\s\S]*?Cadastrar lote/);
     expect(page).toMatch(/data\.source === 'official-reference' && permissions\.isMapAdmin && \([\s\S]*?Implantar base 2026/);
-    expect(header).toContain('{managementActions && <Popover');
+    expect(header).toContain('<Popover open={managementOpen && !toolsUnavailable}');
+    expect(header).toContain('{managementActions && <div className="commercial-map-header-management__actions">');
     expect(header).toContain('aria-pressed={managing}');
     expect(header).toContain("aria-pressed={mode === 'list'}");
     expect(header.indexOf('aria-label="Gestão"')).toBeLessThan(header.indexOf('aria-label="Lista e tabela"'));

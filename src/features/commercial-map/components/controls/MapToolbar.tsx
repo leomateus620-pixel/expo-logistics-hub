@@ -36,6 +36,7 @@ import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CameraPreset, MapPermissions } from '../../types';
 import type { CommercialMapAreaScope } from '../../utils/areaScope';
 import { canUseTechnicalValidationOverlay } from '../../utils/technicalValidation';
+import { CommercialMapControlRail } from './CommercialMapControlRail';
 
 const presetIcons: Record<CameraPreset, typeof Map> = {
   overview: Map,
@@ -66,6 +67,7 @@ export function MapToolbar({
   showDesktopControls?: boolean;
 }) {
   const [isCompactSearchOpen, setIsCompactSearchOpen] = useState(false);
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const compactSearchInputRef = useRef<HTMLInputElement>(null);
   const compactSearchTriggerRef = useRef<HTMLButtonElement>(null);
   const search = useCommercialMapStore((state) => state.search);
@@ -269,12 +271,18 @@ export function MapToolbar({
         </Tooltip>
       </div>}
 
-      <div className="commercial-map-toolbar-mobile" aria-label="Controles principais do mapa">
+      <CommercialMapControlRail
+        className="commercial-map-toolbar-mobile"
+        label="Controles principais do mapa"
+        nightModeActive={nightModeActive}
+      >
         <button
           type="button"
           className={cameraPreset === mobileResetPreset ? 'is-active' : ''}
           onClick={() => requestCameraPreset(mobileResetPreset)}
           aria-label={CAMERA_PRESETS[mobileResetPreset].label}
+          aria-pressed={cameraPreset === mobileResetPreset}
+          data-commercial-map-control={mobileResetPreset}
         >
           <Map aria-hidden="true" />
         </button>
@@ -283,6 +291,8 @@ export function MapToolbar({
           className={`commercial-map-toolbar-top-view ${cameraPreset === 'top' ? 'is-active' : ''}`}
           onClick={() => requestCameraPreset('top')}
           aria-label={CAMERA_PRESETS.top.label}
+          aria-pressed={cameraPreset === 'top'}
+          data-commercial-map-control="top"
         >
           <SquareStack aria-hidden="true" />
         </button>
@@ -292,6 +302,7 @@ export function MapToolbar({
           onClick={toggleHydrologicalMode}
           aria-label={hydrologicalModeActive ? 'Sair do modo Rede Hidrológica' : 'Ativar modo Rede Hidrológica'}
           aria-pressed={hydrologicalModeActive}
+          data-commercial-map-control="hydrological-network"
         >
           <Droplets aria-hidden="true" />
         </button>
@@ -301,6 +312,7 @@ export function MapToolbar({
           onClick={toggleNightMode}
           aria-label={nightControlLabel}
           aria-pressed={nightModeActive}
+          data-commercial-map-control="night-mode"
         >
           <Moon aria-hidden="true" />
         </button>
@@ -310,6 +322,7 @@ export function MapToolbar({
           onClick={toggleRainMode}
           aria-label={rainModeActive ? 'Desativar chuva' : 'Ativar chuva'}
           aria-pressed={rainModeActive}
+          data-commercial-map-control="rain-mode"
         >
           <CloudRain aria-hidden="true" />
         </button>
@@ -319,20 +332,47 @@ export function MapToolbar({
           onClick={focusSelection}
           disabled={!hasSelection}
           aria-label="Centralizar seleção"
+          data-commercial-map-control="focus"
         >
           <Maximize2 aria-hidden="true" />
         </button>
-        <DropdownMenu>
+        <DropdownMenu open={isMoreMenuOpen} onOpenChange={setIsMoreMenuOpen}>
           <DropdownMenuTrigger asChild>
-            <button type="button" aria-label="Mais controles do mapa" aria-haspopup="menu">
+            <button
+              type="button"
+              aria-label="Mais controles do mapa"
+              aria-haspopup="menu"
+              data-commercial-map-control="more"
+              onPointerDown={(event) => {
+                // Radix opens on pointerdown. Defer this trigger to a clean click
+                // so native touch scrolling can start here without mounting a menu.
+                // Radix's Enter/Space/ArrowDown keyboard behavior stays intact.
+                if (event.button === 0 && !event.ctrlKey) event.preventDefault();
+              }}
+              onClick={(event) => {
+                if (event.button === 0 && !event.ctrlKey) setIsMoreMenuOpen((open) => !open);
+              }}
+            >
               <MoreHorizontal aria-hidden="true" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" sideOffset={8} className="commercial-map-toolbar-menu">
+          <DropdownMenuContent
+            align="start"
+            sideOffset={8}
+            className="commercial-map-toolbar-menu commercial-map-glass"
+            data-glass-theme={nightModeActive ? 'night' : 'day'}
+            data-commercial-map-full-motion="true"
+          >
             {mobileSecondaryPresets.map((preset) => {
               const Icon = presetIcons[preset];
               return (
-                <DropdownMenuItem className={preset === 'top' ? 'commercial-map-toolbar-menu-top' : undefined} key={`mobile:${preset}`} onSelect={() => requestCameraPreset(preset)}>
+                <DropdownMenuItem
+                  className={preset === 'top' ? 'commercial-map-toolbar-menu-top' : undefined}
+                  key={`mobile:${preset}`}
+                  data-active={cameraPreset === preset}
+                  data-commercial-map-control={preset}
+                  onSelect={() => requestCameraPreset(preset)}
+                >
                   <Icon aria-hidden="true" />
                   <span>{CAMERA_PRESETS[preset].label}</span>
                   {cameraPreset === preset && <i aria-hidden="true" />}
@@ -340,35 +380,36 @@ export function MapToolbar({
               );
             })}
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={requestSunrise}>
+            <DropdownMenuItem data-active={sunrisePhase === 'running'} data-commercial-map-control="sunrise" onSelect={requestSunrise}>
               <Sunrise aria-hidden="true" />
               <span>{sunriseControlLabel}</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="commercial-map-toolbar-menu-focus-selection"
               disabled={!hasSelection}
+              data-commercial-map-control="focus"
               onSelect={focusSelection}
             >
               <Maximize2 aria-hidden="true" />
               <span>Centralizar seleção</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setActivePanel(activePanel === 'layers' ? null : 'layers')}>
+            <DropdownMenuItem data-active={activePanel === 'layers'} data-commercial-map-control="layers" onSelect={() => setActivePanel(activePanel === 'layers' ? null : 'layers')}>
               <Layers3 aria-hidden="true" />
               <span>{activePanel === 'layers' ? 'Fechar camadas' : 'Camadas do mapa'}</span>
             </DropdownMenuItem>
             {canUseTechnicalValidation && (
-              <DropdownMenuItem onSelect={() => setTechnicalValidationVisible(!technicalValidationVisible)}>
+              <DropdownMenuItem data-active={technicalValidationVisible} data-commercial-map-control="validation" onSelect={() => setTechnicalValidationVisible(!technicalValidationVisible)}>
                 <ScanSearch aria-hidden="true" />
                 <span>{technicalValidationVisible ? 'Ocultar validação' : 'Validação técnica'}</span>
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem onSelect={() => setWorkspaceMode(workspaceMode === 'list' ? '3d' : 'list')}>
+            <DropdownMenuItem data-active={workspaceMode === 'list'} data-commercial-map-control="list" onSelect={() => setWorkspaceMode(workspaceMode === 'list' ? '3d' : 'list')}>
               <List aria-hidden="true" />
               <span>{workspaceMode === 'list' ? 'Voltar ao mapa 3D' : 'Lista acessível'}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
+      </CommercialMapControlRail>
 
       {isCommissionScope && (
         <>

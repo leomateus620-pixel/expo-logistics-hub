@@ -1,0 +1,1366 @@
+{
+  "reason": "Excluded: host requested reduced transparency, surface used backdrop-filter:none; Vite navigation interrupted timing. This did not measure the glass effect.",
+  "browserVersion": "154.0.8037.58",
+  "controlSurface": {
+    "class": "commercial-map-topbar commercial-map-control-rail commercial-map-glass",
+    "rect": {
+      "x": 504.5,
+      "y": 87.796875,
+      "width": 489,
+      "height": 54,
+      "top": 87.796875,
+      "right": 993.5,
+      "bottom": 141.796875,
+      "left": 504.5
+    },
+    "background": "rgb(213, 228, 236)",
+    "backdropFilter": "none",
+    "buttons": [
+      {
+        "label": "Visão geral",
+        "disabled": false,
+        "pressed": "true",
+        "rect": {
+          "x": 509.5,
+          "y": 92.796875,
+          "width": 44,
+          "height": 44,
+          "top": 92.796875,
+          "right": 553.5,
+          "bottom": 136.796875,
+          "left": 509.5
+        },
+        "icon": {
+          "x": 521,
+          "y": 104.296875,
+          "width": 21,
+          "height": 21,
+          "top": 104.296875,
+          "right": 542,
+          "bottom": 125.296875,
+          "left": 521
+        }
+      },
+      {
+        "label": "Vista superior",
+        "disabled": false,
+        "pressed": "false",
+        "rect": {
+          "x": 556.5,
+          "y": 92.796875,
+          "width": 44,
+          "height": 44,
+          "top": 92.796875,
+          "right": 600.5,
+          "bottom": 136.796875,
+          "left": 556.5
+        },
+        "icon": {
+          "x": 568,
+          "y": 104.296875,
+          "width": 21,
+          "height": 21,
+          "top": 104.296875,
+          "right": 589,
+          "bottom": 125.296875,
+          "left": 568
+        }
+      },
+      {
+        "label": "Isométrica",
+        "disabled": false,
+        "pressed": "false",
+        "rect": {
+          "x": 603.5,
+          "y": 92.796875,
+          "width": 44,
+          "height": 44,
+          "top": 92.796875,
+          "right": 647.5,
+          "bottom": 136.796875,
+          "left": 603.5
+        },
+        "icon": {
+          "x": 615,
+          "y": 104.296875,
+          "width": 21,
+          "height": 21,
+          "top": 104.296875,
+          "right": 636,
+          "bottom": 125.296875,
+          "left": 615
+        }
+      },
+      {
+        "label": "Centralizar seleção",
+        "disabled": true,
+        "pressed": null,
+        "rect": {
+          "x": 662.5,
+          "y": 92.796875,
+          "width": 44,
+          "height": 44,
+          "top": 92.796875,
+          "right": 706.5,
+          "bottom": 136.796875,
+          "left": 662.5
+        },
+        "icon": {
+          "x": 674,
+          "y": 104.296875,
+          "width": 21,
+          "height": 21,
+          "top": 104.296875,
+          "right": 695,
+          "bottom": 125.296875,
+          "left": 674
+        }
+      },
+      {
+        "label": "Ativar modo Rede Hidrológica",
+        "disabled": false,
+        "pressed": "false",
+        "rect": {
+          "x": 709.5,
+          "y": 92.796875,
+          "width": 44,
+          "height": 44,
+          "top": 92.796875,
+          "right": 753.5,
+          "bottom": 136.796875,
+          "left": 709.5
+        },
+        "icon": {
+          "x": 721,
+          "y": 104.296875,
+          "width": 21,
+          "height": 21,
+          "top": 104.296875,
+          "right": 742,
+          "bottom": 125.296875,
+          "left": 721
+        }
+      },
+      {
+        "label": "Amanhecer",
+        "disabled": false,
+        "pressed": "false",
+        "rect": {
+          "x": 756.5,
+          "y": 92.796875,
+          "width": 44,
+          "height": 44,
+          "top": 92.796875,
+          "right": 800.5,
+          "bottom": 136.796875,
+          "left": 756.5
+        },
+        "icon": {
+          "x": 768,
+          "y": 104.296875,
+          "width": 21,
+          "height": 21,
+          "top": 104.296875,
+          "right": 789,
+          "bottom": 125.296875,
+          "left": 768
+        }
+      },
+      {
+        "label": "Ativar Modo Noturno",
+        "disabled": false,
+        "pressed": "false",
+        "rect": {
+          "x": 803.5,
+          "y": 92.796875,
+          "width": 44,
+          "height": 44,
+          "top": 92.796875,
+          "right": 847.5,
+          "bottom": 136.796875,
+          "left": 803.5
+        },
+        "icon": {
+          "x": 815,
+          "y": 104.296875,
+          "width": 21,
+          "height": 21,
+          "top": 104.296875,
+          "right": 836,
+          "bottom": 125.296875,
+          "left": 815
+        }
+      },
+      {
+        "label": "Ativar chuva",
+        "disabled": false,
+        "pressed": "false",
+        "rect": {
+          "x": 850.5,
+          "y": 92.796875,
+          "width": 44,
+          "height": 44,
+          "top": 92.796875,
+          "right": 894.5,
+          "bottom": 136.796875,
+          "left": 850.5
+        },
+        "icon": {
+          "x": 862,
+          "y": 104.296875,
+          "width": 21,
+          "height": 21,
+          "top": 104.296875,
+          "right": 883,
+          "bottom": 125.296875,
+          "left": 862
+        }
+      },
+      {
+        "label": "Camadas do mapa",
+        "disabled": false,
+        "pressed": "false",
+        "rect": {
+          "x": 897.5,
+          "y": 92.796875,
+          "width": 44,
+          "height": 44,
+          "top": 92.796875,
+          "right": 941.5,
+          "bottom": 136.796875,
+          "left": 897.5
+        },
+        "icon": {
+          "x": 909,
+          "y": 104.296875,
+          "width": 21,
+          "height": 21,
+          "top": 104.296875,
+          "right": 930,
+          "bottom": 125.296875,
+          "left": 909
+        }
+      },
+      {
+        "label": "Ocultar árvores e rede elétrica",
+        "disabled": false,
+        "pressed": "true",
+        "rect": {
+          "x": 944.5,
+          "y": 92.796875,
+          "width": 44,
+          "height": 44,
+          "top": 92.796875,
+          "right": 988.5,
+          "bottom": 136.796875,
+          "left": 944.5
+        },
+        "icon": {
+          "x": 956,
+          "y": 104.296875,
+          "width": 21,
+          "height": 21,
+          "top": 104.296875,
+          "right": 977,
+          "bottom": 125.296875,
+          "left": 956
+        }
+      }
+    ]
+  },
+  "timing": [
+    {
+      "name": "day-moving",
+      "repetition": 1,
+      "runtime": {
+        "sampledFrames": 118,
+        "averageFrameTimeMs": 34.16,
+        "p95FrameTimeMs": 42.9,
+        "p50FrameTimeMs": 32.9,
+        "p99FrameTimeMs": 44.9,
+        "averageFps": 29.3,
+        "inverseP99FpsApproximation": 22.3,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 118,
+        "longTasks": 1,
+        "reactCommits": 4,
+        "qualityChanges": 0,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 153613.70000004768,
+          "calls": 804,
+          "triangles": 683199,
+          "geometries": 584,
+          "textures": 112,
+          "programs": 190,
+          "dpr": 1,
+          "width": 1359,
+          "height": 814,
+          "heapBytes": 221480660,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      },
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 4,
+        "droppedGpuQueries": 0,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 122,
+          "averageMs": 31.85,
+          "p95Ms": 38.5,
+          "p99Ms": 43.2
+        },
+        "gpu": {
+          "samples": 118,
+          "averageMs": 32.01,
+          "p95Ms": 33.531,
+          "p99Ms": 35.314
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 122,
+              "averageMs": 31.85,
+              "p95Ms": 38.5,
+              "p99Ms": 43.2
+            },
+            "gpu": {
+              "samples": 118,
+              "averageMs": 32.01,
+              "p95Ms": 33.531,
+              "p99Ms": 35.314
+            }
+          }
+        }
+      },
+      "raf": {
+        "frames": 118,
+        "meanMs": 34.74406779661007,
+        "p95Ms": 50
+      },
+      "renderer": {
+        "at": 153771.79999995232,
+        "calls": 804,
+        "triangles": 683199,
+        "geometries": 584,
+        "textures": 112,
+        "programs": 190,
+        "dpr": 1,
+        "width": 1359,
+        "height": 814,
+        "heapBytes": 193634512,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1114,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          3.6588,
+          121.2439,
+          114.6092
+        ],
+        "target": [
+          -2.2546,
+          0.744,
+          -0.3832
+        ],
+        "quaternion": [
+          -0.393026,
+          0.023618,
+          0.010099,
+          0.919169
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.69449,
+        "far": 1283.245,
+        "distance": 166.6687,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1359.21875,
+          "height": 814.8125,
+          "aspect": 1.66814,
+          "dpr": 0.9
+        }
+      },
+      "quality": {
+        "logicalTier": "HIGH",
+        "sceneTier": "HIGH",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "HIGH",
+        "reason": "viewport-sync"
+      },
+      "canvasCount": 1
+    },
+    {
+      "name": "day-moving",
+      "repetition": 2,
+      "runtime": {
+        "sampledFrames": 121,
+        "averageFrameTimeMs": 33.36,
+        "p95FrameTimeMs": 41.4,
+        "p50FrameTimeMs": 32.9,
+        "p99FrameTimeMs": 45.4,
+        "averageFps": 30,
+        "inverseP99FpsApproximation": 22,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 121,
+        "longTasks": 1,
+        "reactCommits": 4,
+        "qualityChanges": 0,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 157928.79999995232,
+          "calls": 804,
+          "triangles": 683199,
+          "geometries": 584,
+          "textures": 112,
+          "programs": 190,
+          "dpr": 1,
+          "width": 1359,
+          "height": 814,
+          "heapBytes": 213634974,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      },
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 4,
+        "droppedGpuQueries": 4,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 125,
+          "averageMs": 31.524,
+          "p95Ms": 39.6,
+          "p99Ms": 46.1
+        },
+        "gpu": {
+          "samples": 117,
+          "averageMs": 32.313,
+          "p95Ms": 34.99,
+          "p99Ms": 37.171
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 125,
+              "averageMs": 31.524,
+              "p95Ms": 39.6,
+              "p99Ms": 46.1
+            },
+            "gpu": {
+              "samples": 117,
+              "averageMs": 32.313,
+              "p95Ms": 34.99,
+              "p99Ms": 37.171
+            }
+          }
+        }
+      },
+      "raf": {
+        "frames": 121,
+        "meanMs": 33.47190082644633,
+        "p95Ms": 50
+      },
+      "renderer": {
+        "at": 158116.60000014305,
+        "calls": 804,
+        "triangles": 683199,
+        "geometries": 584,
+        "textures": 112,
+        "programs": 191,
+        "dpr": 1,
+        "width": 1359,
+        "height": 814,
+        "heapBytes": 219603254,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1236,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          3.6107,
+          121.2439,
+          114.6305
+        ],
+        "target": [
+          -2.2546,
+          0.744,
+          -0.3832
+        ],
+        "quaternion": [
+          -0.39299,
+          0.023423,
+          0.010014,
+          0.91919
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.69458,
+        "far": 1283.245,
+        "distance": 166.6817,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1359.21875,
+          "height": 814.8125,
+          "aspect": 1.66814,
+          "dpr": 0.9
+        }
+      },
+      "quality": {
+        "logicalTier": "HIGH",
+        "sceneTier": "HIGH",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "HIGH",
+        "reason": "viewport-sync"
+      },
+      "canvasCount": 1
+    },
+    {
+      "name": "day-moving",
+      "repetition": 3,
+      "runtime": {
+        "sampledFrames": 125,
+        "averageFrameTimeMs": 32.28,
+        "p95FrameTimeMs": 41.7,
+        "p50FrameTimeMs": 31.3,
+        "p99FrameTimeMs": 52.2,
+        "averageFps": 31,
+        "inverseP99FpsApproximation": 19.2,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 125,
+        "longTasks": 2,
+        "reactCommits": 4,
+        "qualityChanges": 0,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 162259.40000009537,
+          "calls": 804,
+          "triangles": 683199,
+          "geometries": 584,
+          "textures": 112,
+          "programs": 191,
+          "dpr": 1,
+          "width": 1359,
+          "height": 814,
+          "heapBytes": 205659818,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      },
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 4,
+        "droppedGpuQueries": 2,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 129,
+          "averageMs": 30.289,
+          "p95Ms": 38.7,
+          "p99Ms": 47.7
+        },
+        "gpu": {
+          "samples": 123,
+          "averageMs": 31.17,
+          "p95Ms": 33.872,
+          "p99Ms": 37.896
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 129,
+              "averageMs": 30.289,
+              "p95Ms": 38.7,
+              "p99Ms": 47.7
+            },
+            "gpu": {
+              "samples": 123,
+              "averageMs": 31.17,
+              "p95Ms": 33.872,
+              "p99Ms": 37.896
+            }
+          }
+        }
+      },
+      "raf": {
+        "frames": 125,
+        "meanMs": 32.26640000000014,
+        "p95Ms": 50
+      },
+      "renderer": {
+        "at": 162413.5,
+        "calls": 804,
+        "triangles": 683199,
+        "geometries": 584,
+        "textures": 112,
+        "programs": 191,
+        "dpr": 1,
+        "width": 1359,
+        "height": 814,
+        "heapBytes": 210387162,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1388,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          3.6711,
+          121.2439,
+          114.6039
+        ],
+        "target": [
+          -2.2546,
+          0.744,
+          -0.3832
+        ],
+        "quaternion": [
+          -0.393034,
+          0.023668,
+          0.010121,
+          0.919163
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.69451,
+        "far": 1283.245,
+        "distance": 166.6655,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1359.21875,
+          "height": 814.8125,
+          "aspect": 1.66814,
+          "dpr": 0.9
+        }
+      },
+      "quality": {
+        "logicalTier": "HIGH",
+        "sceneTier": "HIGH",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "HIGH",
+        "reason": "viewport-sync"
+      },
+      "canvasCount": 1
+    },
+    {
+      "name": "night-moving",
+      "repetition": 1,
+      "runtime": {
+        "sampledFrames": 113,
+        "averageFrameTimeMs": 35.56,
+        "p95FrameTimeMs": 46.5,
+        "p50FrameTimeMs": 35.2,
+        "p99FrameTimeMs": 50.5,
+        "averageFps": 28.1,
+        "inverseP99FpsApproximation": 19.8,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 113,
+        "longTasks": 2,
+        "reactCommits": 4,
+        "qualityChanges": 0,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 172316.40000009537,
+          "calls": 819,
+          "triangles": 714085,
+          "geometries": 584,
+          "textures": 112,
+          "programs": 197,
+          "dpr": 1,
+          "width": 1359,
+          "height": 814,
+          "heapBytes": 215143935,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      },
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 3,
+        "droppedGpuQueries": 8,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 117,
+          "averageMs": 30.776,
+          "p95Ms": 43.7,
+          "p99Ms": 46.3
+        },
+        "gpu": {
+          "samples": 106,
+          "averageMs": 33.733,
+          "p95Ms": 39.776,
+          "p99Ms": 43.633
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 117,
+              "averageMs": 30.776,
+              "p95Ms": 43.7,
+              "p99Ms": 46.3
+            },
+            "gpu": {
+              "samples": 106,
+              "averageMs": 33.733,
+              "p95Ms": 39.776,
+              "p99Ms": 43.633
+            }
+          }
+        }
+      },
+      "raf": {
+        "frames": 113,
+        "meanMs": 35.54424778761062,
+        "p95Ms": 50.19999999998254
+      },
+      "renderer": {
+        "at": 172505.70000004768,
+        "calls": 819,
+        "triangles": 714085,
+        "geometries": 584,
+        "textures": 112,
+        "programs": 197,
+        "dpr": 1,
+        "width": 1359,
+        "height": 814,
+        "heapBytes": 220512747,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1665,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          3.5247,
+          121.2439,
+          114.6707
+        ],
+        "target": [
+          -2.2546,
+          0.744,
+          -0.3832
+        ],
+        "quaternion": [
+          -0.392923,
+          0.023072,
+          0.009862,
+          0.919229
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.69468,
+        "far": 1283.245,
+        "distance": 166.7064,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1359.21875,
+          "height": 814.8125,
+          "aspect": 1.66814,
+          "dpr": 0.9
+        }
+      },
+      "quality": {
+        "logicalTier": "HIGH",
+        "sceneTier": "HIGH",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "HIGH",
+        "reason": "viewport-sync"
+      },
+      "canvasCount": 1
+    },
+    {
+      "name": "night-moving",
+      "repetition": 2,
+      "runtime": {
+        "sampledFrames": 116,
+        "averageFrameTimeMs": 34.64,
+        "p95FrameTimeMs": 42.7,
+        "p50FrameTimeMs": 33.9,
+        "p99FrameTimeMs": 47,
+        "averageFps": 28.9,
+        "inverseP99FpsApproximation": 21.3,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 116,
+        "longTasks": 1,
+        "reactCommits": 4,
+        "qualityChanges": 0,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 176663.40000009537,
+          "calls": 819,
+          "triangles": 714085,
+          "geometries": 584,
+          "textures": 112,
+          "programs": 197,
+          "dpr": 1,
+          "width": 1359,
+          "height": 814,
+          "heapBytes": 231684005,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      },
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 3,
+        "droppedGpuQueries": 0,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 120,
+          "averageMs": 32.637,
+          "p95Ms": 39.8,
+          "p99Ms": 43.4
+        },
+        "gpu": {
+          "samples": 117,
+          "averageMs": 32.655,
+          "p95Ms": 35.102,
+          "p99Ms": 38.174
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 120,
+              "averageMs": 32.637,
+              "p95Ms": 39.8,
+              "p99Ms": 43.4
+            },
+            "gpu": {
+              "samples": 117,
+              "averageMs": 32.655,
+              "p95Ms": 35.102,
+              "p99Ms": 38.174
+            }
+          }
+        }
+      },
+      "raf": {
+        "frames": 116,
+        "meanMs": 34.76896551724148,
+        "p95Ms": 50
+      },
+      "renderer": {
+        "at": 176822.20000004768,
+        "calls": 819,
+        "triangles": 714085,
+        "geometries": 584,
+        "textures": 112,
+        "programs": 197,
+        "dpr": 1,
+        "width": 1359,
+        "height": 814,
+        "heapBytes": 236383917,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1781,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          3.6457,
+          121.2439,
+          114.6149
+        ],
+        "target": [
+          -2.2546,
+          0.744,
+          -0.3832
+        ],
+        "quaternion": [
+          -0.393016,
+          0.023565,
+          0.010076,
+          0.919174
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.69454,
+        "far": 1283.245,
+        "distance": 166.6722,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1359.21875,
+          "height": 814.8125,
+          "aspect": 1.66814,
+          "dpr": 0.9
+        }
+      },
+      "quality": {
+        "logicalTier": "HIGH",
+        "sceneTier": "HIGH",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "HIGH",
+        "reason": "viewport-sync"
+      },
+      "canvasCount": 1
+    },
+    {
+      "name": "night-moving",
+      "repetition": 3,
+      "runtime": {
+        "sampledFrames": 116,
+        "averageFrameTimeMs": 34.82,
+        "p95FrameTimeMs": 40.8,
+        "p50FrameTimeMs": 34.5,
+        "p99FrameTimeMs": 49.1,
+        "averageFps": 28.7,
+        "inverseP99FpsApproximation": 20.4,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 116,
+        "longTasks": 1,
+        "reactCommits": 4,
+        "qualityChanges": 0,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 180980.90000009537,
+          "calls": 819,
+          "triangles": 714085,
+          "geometries": 584,
+          "textures": 112,
+          "programs": 197,
+          "dpr": 1,
+          "width": 1359,
+          "height": 814,
+          "heapBytes": 223975663,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Intel)",
+          "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        }
+      },
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 5,
+        "droppedGpuQueries": 8,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 119,
+          "averageMs": 31.043,
+          "p95Ms": 37.1,
+          "p99Ms": 40.5
+        },
+        "gpu": {
+          "samples": 106,
+          "averageMs": 33.92,
+          "p95Ms": 35.636,
+          "p99Ms": 73.752
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 119,
+              "averageMs": 31.043,
+              "p95Ms": 37.1,
+              "p99Ms": 40.5
+            },
+            "gpu": {
+              "samples": 106,
+              "averageMs": 33.92,
+              "p95Ms": 35.636,
+              "p99Ms": 73.752
+            }
+          }
+        }
+      },
+      "raf": {
+        "frames": 116,
+        "meanMs": 34.911206896551576,
+        "p95Ms": 50
+      },
+      "renderer": {
+        "at": 181061.29999995232,
+        "calls": 819,
+        "triangles": 714085,
+        "geometries": 584,
+        "textures": 112,
+        "programs": 197,
+        "dpr": 1,
+        "width": 1359,
+        "height": 814,
+        "heapBytes": 226907043,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1896,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          3.6781,
+          121.2439,
+          114.6009
+        ],
+        "target": [
+          -2.2546,
+          0.744,
+          -0.3832
+        ],
+        "quaternion": [
+          -0.393039,
+          0.023697,
+          0.010133,
+          0.91916
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.6945,
+        "far": 1283.245,
+        "distance": 166.6636,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1359.21875,
+          "height": 814.8125,
+          "aspect": 1.66814,
+          "dpr": 0.9
+        }
+      },
+      "quality": {
+        "logicalTier": "HIGH",
+        "sceneTier": "HIGH",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "HIGH",
+        "reason": "viewport-sync"
+      },
+      "canvasCount": 1
+    }
+  ],
+  "fatal": "page.evaluate: Execution context was destroyed, most likely because of a navigation.\n    at benchmark (C:\\Users\\Leonardo\\.codex\\worktrees\\commercial-map-liquid-glass\\expo-logistics-hub\\scripts\\liquid-glass-controls\\browser-qa.cjs:297:39)\n    at async C:\\Users\\Leonardo\\.codex\\worktrees\\commercial-map-liquid-glass\\expo-logistics-hub\\scripts\\liquid-glass-controls\\browser-qa.cjs:347:56"
+}

@@ -3,6 +3,7 @@ import { ChevronLeft, Loader2, LogOut, MapPinned, Search, X } from 'lucide-react
 import { Link, useNavigate } from 'react-router-dom';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/hooks/useAuth';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { CommercialMapHeaderHost } from './headerHost';
@@ -46,21 +47,20 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <CommercialMapHeaderHost.Provider value={toolsHost}><div className="commercial-map-module">
+    <CommercialMapHeaderHost.Provider value={toolsHost}><TooltipProvider delayDuration={300}><div className="commercial-map-module">
       <a className="commercial-map-module__skip-link" href="#commercial-map-main">
         Ir para o mapa comercial
       </a>
 
-      <header className={`commercial-map-module__bar ${isSearchOpen ? 'is-search-open' : ''}`}>
+      <header className={`commercial-map-module__bar ${isSearchOpen ? 'is-search-open' : ''}`} data-commercial-map-full-motion>
         <div className="commercial-map-module__leading">
-          <Link
+          <Tooltip><TooltipTrigger asChild><Link
             to="/portal"
             className="commercial-map-module__back"
             aria-label="Voltar ao portal de acesso"
           >
             <ChevronLeft aria-hidden="true" />
-            <span>Portal</span>
-          </Link>
+          </Link></TooltipTrigger><TooltipContent side="bottom">Portal</TooltipContent></Tooltip>
 
           <span className="commercial-map-module__divider" aria-hidden="true" />
 
@@ -105,6 +105,7 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
                 }}
                 placeholder="ID, nome, quadra, lote, rua ou empresa"
                 aria-label="Buscar no mapa comercial"
+                aria-keyshortcuts="Control+K Meta+K"
                 autoComplete="off"
               />
               <button type="button" onClick={() => closeSearch(true)} aria-label="Fechar e limpar busca">
@@ -112,7 +113,7 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
               </button>
             </form>
           ) : (
-            <button
+            <Tooltip><TooltipTrigger asChild><button
               ref={searchTriggerRef}
               type="button"
               className={`commercial-map-module__search-trigger ${search ? 'has-query' : ''}`}
@@ -120,18 +121,20 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
               aria-label={search ? 'Abrir busca do mapa, filtro ativo' : 'Buscar no mapa comercial'}
               aria-expanded={isSearchOpen}
               aria-controls="commercial-map-mobile-search"
+              aria-keyshortcuts="Control+K Meta+K"
               data-commercial-map-shell-search-trigger
             >
               <Search aria-hidden="true" />
-              <span>Buscar no mapa</span>
-            </button>
+            </button></TooltipTrigger><TooltipContent side="bottom">Buscar no mapa</TooltipContent></Tooltip>
           )}
         </div>
 
 
         <div className="commercial-map-module__actions">
           <div ref={setToolsHost} className="commercial-map-module__tools-host" />
-          <span className="commercial-map-module__edition">FENASOJA 2028</span>
+          <span className="commercial-map-module__edition" aria-label="FENASOJA 2028">
+            <span>FENASOJA</span><strong>2028</strong>
+          </span>
           <Button
             type="button"
             variant="ghost"
@@ -152,6 +155,6 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
       <main id="commercial-map-main" className="commercial-map-module__content" tabIndex={-1}>
         {children}
       </main>
-    </div></CommercialMapHeaderHost.Provider>
+    </div></TooltipProvider></CommercialMapHeaderHost.Provider>
   );
 }

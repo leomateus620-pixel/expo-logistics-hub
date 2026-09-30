@@ -1,0 +1,176 @@
+{
+  "scope": "Isolated real CommercialMapHeaderTools; explicit salesAvailable/visitAvailable props; no map/data/capability changes or commercial writes",
+  "base": "http://127.0.0.1:4211",
+  "checks": [
+    {
+      "name": "isolated harness has no Canvas",
+      "passed": true
+    },
+    {
+      "name": "header has one Visit, Sales and Management control",
+      "passed": true
+    },
+    {
+      "name": "List no longer occupies a header button",
+      "passed": true
+    },
+    {
+      "name": "Authorized mount entrance uses finite 820ms animations",
+      "passed": true,
+      "details": {
+        "cart": {
+          "animation": "commercial-map-cart-flight",
+          "iterations": "1",
+          "duration": "0.82s",
+          "opacity": "0.4934",
+          "transform": "matrix(0.794541, -0.333448, 0.333448, 0.794541, 27.2158, -23.8325)"
+        },
+        "flame": {
+          "animation": "commercial-map-cart-ignition",
+          "iterations": "1",
+          "duration": "0.82s",
+          "opacity": "0",
+          "transform": "matrix(0.599159, 0, 0, 0.599159, 15.2044, -9.91591)"
+        },
+        "trail": {
+          "animation": "commercial-map-cart-speed",
+          "iterations": "1",
+          "duration": "0.82s",
+          "opacity": "0",
+          "transform": "matrix(1, 0, 0, 1, 18.5303, -10.1074)"
+        }
+      }
+    },
+    {
+      "name": "Sales click uses real sales store",
+      "passed": true
+    },
+    {
+      "name": "Sales exposes active state",
+      "passed": true
+    },
+    {
+      "name": "Cart entrance starts once on OFF to ON",
+      "passed": true
+    },
+    {
+      "name": "Cart, Flame and trail use finite 820ms CSS animations",
+      "passed": true,
+      "details": {
+        "cart": {
+          "animation": "commercial-map-cart-flight",
+          "iterations": "1",
+          "duration": "0.82s",
+          "opacity": "1",
+          "transform": "matrix(1.00304, -0.0812831, 0.0762937, 0.941471, -0.772156, 0.386078)"
+        },
+        "flame": {
+          "animation": "commercial-map-cart-ignition",
+          "iterations": "1",
+          "duration": "0.82s",
+          "opacity": "0",
+          "transform": "matrix(0.5, 0, 0, 0.5, 0, 0)"
+        },
+        "trail": {
+          "animation": "commercial-map-cart-speed",
+          "iterations": "1",
+          "duration": "0.82s",
+          "opacity": "0",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)"
+        }
+      }
+    },
+    {
+      "name": "Cart returns to stable glyph after entrance",
+      "passed": true,
+      "details": {
+        "cart": {
+          "animation": "commercial-map-cart-flight",
+          "iterations": "1",
+          "duration": "0.82s",
+          "opacity": "1",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)"
+        },
+        "flame": {
+          "animation": "commercial-map-cart-ignition",
+          "iterations": "1",
+          "duration": "0.82s",
+          "opacity": "0",
+          "transform": "matrix(0.5, 0, 0, 0.5, 0, 0)"
+        },
+        "trail": {
+          "animation": "commercial-map-cart-speed",
+          "iterations": "1",
+          "duration": "0.82s",
+          "opacity": "0",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)"
+        }
+      }
+    },
+    {
+      "name": "Unrelated store update does not restart Cart entrance",
+      "passed": true
+    },
+    {
+      "name": "Sales keyboard Space toggles OFF",
+      "passed": true
+    },
+    {
+      "name": "Next OFF to ON restarts Cart once",
+      "passed": true
+    },
+    {
+      "name": "Explicit full-motion preference retains all 820ms finite animations",
+      "passed": true,
+      "details": {
+        "cart": {
+          "animation": "commercial-map-cart-flight",
+          "iterations": "1",
+          "duration": "0.82s",
+          "opacity": "1",
+          "transform": "matrix(0.96, 0, 0, 0.96, 0, 0)"
+        },
+        "flame": {
+          "animation": "commercial-map-cart-ignition",
+          "iterations": "1",
+          "duration": "0.82s",
+          "opacity": "0",
+          "transform": "matrix(0.5, 0, 0, 0.5, 0, 0)"
+        },
+        "trail": {
+          "animation": "commercial-map-cart-speed",
+          "iterations": "1",
+          "duration": "0.82s",
+          "opacity": "0",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)"
+        }
+      }
+    },
+    {
+      "name": "Management List reaches existing workspace state",
+      "passed": true
+    },
+    {
+      "name": "Management List returns to real 3D workspace state",
+      "passed": true
+    },
+    {
+      "name": "Header Visit reaches real visit state",
+      "passed": true
+    },
+    {
+      "name": "Visit hides HeaderTools",
+      "passed": true
+    },
+    {
+      "name": "Exit restores HeaderTools",
+      "passed": true
+    },
+    {
+      "name": "No uncaught page errors",
+      "passed": true,
+      "details": []
+    }
+  ],
+  "errors": []
+}

@@ -82,11 +82,7 @@
   .visit-poi__details { max-height: 82px; }
 }
 @media (prefers-reduced-motion: reduce) { .visit-poi, .visit-hud__intro { animation: none !important; transition: none !important; } }
-.commercial-map-header-tools > [data-commercial-map-visit-start] { padding: 6px 9px; }
-.commercial-map-header-tools > [data-commercial-map-visit-start] > span { display: inline; white-space: nowrap; }
 @media (max-width: 1040px) {
   .commercial-map-header-tools > [data-commercial-map-visit-lot] { display: none; }
-  .commercial-map-header-tools > [data-commercial-map-visit-start] > svg { display: none; }
-  .commercial-map-header-tools > [data-commercial-map-visit-start] > span { display: inline; font-size: 10px; }
 }
 .commercial-map-shell.is-visit-mode:not(.is-interior) .commercial-map-stage { inset: 0 !important; transform: none !important; }
