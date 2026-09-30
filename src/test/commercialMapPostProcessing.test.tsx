@@ -288,6 +288,25 @@ describe('Commercial Map persistent post-processing with installed postprocessin
     const setSize = vi.spyOn(EffectComposer.prototype, 'setSize');
     const view = render(<SunrisePostProcessing qualityTier="full" enabled />);
     drawFrame();
+    const composer = addPass.mock.instances[0] as unknown as EffectComposer;
+    const smaaPass = composer.passes[2] as EffectPass;
+    const smaa = smaaPass.effects[0] as SMAAEffect;
+    const expectPhysicalSize = (width: number, height: number) => {
+      expect([composer.inputBuffer.width, composer.inputBuffer.height]).toEqual([width, height]);
+      expect([composer.outputBuffer.width, composer.outputBuffer.height]).toEqual([width, height]);
+      expect(smaa.edgesTexture.image).toMatchObject({ width, height });
+      expect(smaa.weightsTexture.image).toMatchObject({ width, height });
+      expect(smaa.weightsMaterial.uniforms.resolution.value.toArray()).toEqual([width, height]);
+      const materials = [
+        smaa.edgeDetectionMaterial,
+        smaa.weightsMaterial,
+        ...composer.passes.slice(1).map((pass) => pass.fullscreenMaterial as THREE.ShaderMaterial),
+      ];
+      for (const material of materials) {
+        expect(material.uniforms.texelSize.value.toArray()).toEqual([1 / width, 1 / height]);
+      }
+    };
+    expectPhysicalSize(1366, 768);
     const sizeCallsAtRest = setSize.mock.calls.length;
     view.rerender(<SunrisePostProcessing qualityTier="full" enabled interactionActive />);
     state.gl.setRenderTarget((addPass.mock.instances[0] as unknown as EffectComposer).inputBuffer);
@@ -295,6 +314,7 @@ describe('Commercial Map persistent post-processing with installed postprocessin
     expectScreenBound(state.gl);
     expect(state.gl.render).not.toHaveBeenCalled();
     expect(setSize).toHaveBeenCalledTimes(sizeCallsAtRest);
+    expectPhysicalSize(1366, 768);
     view.rerender(<SunrisePostProcessing qualityTier="full" enabled />);
     drawFrame();
     expect(state.setDpr).not.toHaveBeenCalled();
@@ -303,8 +323,18 @@ describe('Commercial Map persistent post-processing with installed postprocessin
     state.gl.setPixelRatio(0.8);
     state.viewport.dpr = 0.8;
     view.rerender(<SunrisePostProcessing qualityTier="full" enabled />);
+    expectPhysicalSize(1366, 768);
     drawFrame();
     expect(setSize).toHaveBeenCalledTimes(sizeCallsAtRest + 1);
+    expectPhysicalSize(1092, 614);
+    state.gl.setPixelRatio(1.75);
+    state.viewport.dpr = 1.75;
+    view.rerender(<SunrisePostProcessing qualityTier="full" enabled />);
+    drawFrame();
+    expect(setSize).toHaveBeenCalledTimes(sizeCallsAtRest + 2);
+    expect(setSize).toHaveBeenLastCalledWith(1366, 768);
+    expectPhysicalSize(2390, 1344);
+    expect(state.gl.setSize).not.toHaveBeenCalled();
     expect(state.setDpr).not.toHaveBeenCalled();
     expect(addPass).toHaveBeenCalledTimes(4);
   });

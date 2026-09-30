@@ -7,12 +7,8 @@ import {
 } from './viewport';
 import { visitRuntime } from '../visit/visitRuntime';
 
-export const COMMERCIAL_MAP_INTERACTION_MIN_PIXEL_RATIO = 0.85;
-export const COMMERCIAL_MAP_INTERACTION_MAX_PIXEL_RATIO = 1.35;
-export const COMMERCIAL_MAP_INTERACTION_PIXEL_RATIO_SCALE = 0.9;
-// DPR changes resize the drawing buffer and every post-processing target.
-// Wait for OrbitControls damping to finish, then require a meaningful idle
-// window so those allocations never land in the tail of the same gesture.
+// Scene-tier changes may rebuild GPU resources. After OrbitControls damping
+// finishes, require an idle window before committing those heavier changes.
 export const COMMERCIAL_MAP_QUALITY_SCENE_COMMIT_IDLE_MS = 650;
 export const COMMERCIAL_MAP_QUALITY_EVENT = 'commercial-map-quality';
 
@@ -109,28 +105,8 @@ export function shouldApplyCommercialMapPixelRatioNow({
   return !gestureActive;
 }
 
-/**
- * A deterministic, bounded render scale for camera motion. It changes only at
- * gesture boundaries and never mutates the logical adaptive-quality tier.
- * The same post stack remains active. Its drawing-buffer targets resize only
- * at the motion boundary, never repeatedly during orbit, walking or zoom.
- */
-export function resolveCommercialMapInteractionPixelRatio(restingDpr: number) {
-  if (!Number.isFinite(restingDpr) || restingDpr <= 0) {
-    return COMMERCIAL_MAP_INTERACTION_MIN_PIXEL_RATIO;
-  }
-  return Number(Math.min(
-    restingDpr,
-    COMMERCIAL_MAP_INTERACTION_MAX_PIXEL_RATIO,
-    Math.max(
-      COMMERCIAL_MAP_INTERACTION_MIN_PIXEL_RATIO,
-      restingDpr * COMMERCIAL_MAP_INTERACTION_PIXEL_RATIO_SCALE,
-    ),
-  ).toFixed(3));
-}
-
 export interface CommercialMapPixelRatioState {
-  /** Latest adaptive/viewport choice, never a snapshot of the gesture scale. */
+  /** Latest adaptive/viewport choice, including any pending gesture-time update. */
   baseDpr: number;
   effectiveDpr: number;
   gestureActive: boolean;
@@ -141,9 +117,9 @@ export function createCommercialMapPixelRatioState(baseDpr: number): CommercialM
 }
 
 /**
- * The sole DPR owner's state transition. Keep allocations out of an ongoing
- * gesture, but remember every new base choice so ending it cannot restore a
- * stale DPR captured by a different render-path effect.
+ * The sole DPR owner's state transition. Motion and its damping keep the
+ * current resolution; motion alone never discounts it. Remember new adaptive
+ * or viewport choices and apply the latest one after activity settles.
  */
 export function updateCommercialMapPixelRatioState(
   state: CommercialMapPixelRatioState,
@@ -151,11 +127,7 @@ export function updateCommercialMapPixelRatioState(
   baseDpr = state.baseDpr,
 ): number | null {
   if (Number.isFinite(baseDpr) && baseDpr > 0) state.baseDpr = baseDpr;
-  const nextDpr = gestureActive
-    ? state.gestureActive
-      ? state.effectiveDpr
-      : resolveCommercialMapInteractionPixelRatio(state.baseDpr)
-    : state.baseDpr;
+  const nextDpr = gestureActive ? state.effectiveDpr : state.baseDpr;
   state.gestureActive = gestureActive;
   if (Math.abs(state.effectiveDpr - nextDpr) <= 0.005) return null;
   state.effectiveDpr = nextDpr;
