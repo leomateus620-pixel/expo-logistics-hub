@@ -13,6 +13,7 @@ import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { buildRearTerrainPatchGeometry } from '../../utils/rearTerrainGeometry';
 import { alignContinuousGroundUv, useContinuousGround } from '../../utils/continuousGroundMaterial';
 import { clipContextPolygon } from '../../data/commercialMapSpatialBounds';
+import { UBIRETAMA_PRESENTATION_HANDOFF, ubiretamaPresentationDistance, type UbiretamaRoadPresentation } from '../../utils/ubiretamaRoadPresentation';
 
 interface RearParkEnvironmentLayerProps {
   reducedGraphics: boolean;
@@ -20,6 +21,7 @@ interface RearParkEnvironmentLayerProps {
   preserveVisitTreePlacement?: boolean;
   visible?: boolean;
   vegetationVisible?: boolean;
+  ubiretamaPresentation?: UbiretamaRoadPresentation | null;
 }
 
 const NO_RAYCAST = () => undefined;
@@ -33,6 +35,7 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
   preserveVisitTreePlacement = false,
   visible = true,
   vegetationVisible = true,
+  ubiretamaPresentation,
 }: RearParkEnvironmentLayerProps) {
   const vegetationEnabled = useSceneVegetationEnabled();
   const scene = useThree((state) => state.scene);
@@ -86,8 +89,10 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
   }, [treeResources]);
 
   const trees = useMemo(
-    () => (vegetationEnabled && vegetationVisible ? buildRearTreeInstances(reducedGraphics && !preserveVisitTreePlacement) : []),
-    [reducedGraphics, preserveVisitTreePlacement, vegetationEnabled, vegetationVisible],
+    () => (vegetationEnabled && vegetationVisible ? buildRearTreeInstances(reducedGraphics && !preserveVisitTreePlacement)
+      .filter(tree => !ubiretamaPresentation || tree.z >= UBIRETAMA_PRESENTATION_HANDOFF[1]
+        || ubiretamaPresentationDistance([tree.x, tree.z], ubiretamaPresentation) > tree.scale * .5) : []),
+    [reducedGraphics, preserveVisitTreePlacement, vegetationEnabled, vegetationVisible, ubiretamaPresentation],
   );
   const poles = useMemo(() => buildRearPoleInstances(reducedGraphics), [reducedGraphics]);
 

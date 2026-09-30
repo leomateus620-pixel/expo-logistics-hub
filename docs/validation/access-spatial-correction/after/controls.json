@@ -1,0 +1,529 @@
+{
+  "phase": "after",
+  "base": "http://127.0.0.1:4221",
+  "scope": "Local Chromium desktop and touch emulation, existing interface fixture",
+  "errors": [],
+  "views": [
+    {
+      "width": 1440,
+      "height": 900,
+      "rail": {
+        "x": 505,
+        "y": 86,
+        "width": 430,
+        "height": 48
+      },
+      "buttons": [
+        {
+          "label": "Visão geral",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Vista superior",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Isométrica",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Centralizar seleção",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": true
+        },
+        {
+          "label": "Ativar modo Rede Hidrológica",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Reiniciar Amanhecer",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Ativar Modo Noturno",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Ativar chuva",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Camadas do mapa",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Ocultar árvores e rede elétrica",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        }
+      ],
+      "styling": {
+        "backdropFilter": "blur(10px) saturate(1.12)",
+        "background": "linear-gradient(rgba(230, 250, 255, 0.28), rgba(0, 0, 0, 0) 48%), none",
+        "duration": ".17s"
+      },
+      "pageOverflow": false,
+      "canvasCount": 1,
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 24,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "touch": false
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "rail": {
+        "x": 425,
+        "y": 86,
+        "width": 430,
+        "height": 48
+      },
+      "buttons": [
+        {
+          "label": "Visão geral",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Vista superior",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Isométrica",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Centralizar seleção",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": true
+        },
+        {
+          "label": "Ativar modo Rede Hidrológica",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Reiniciar Amanhecer",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Ativar Modo Noturno",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Ativar chuva",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Camadas do mapa",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        },
+        {
+          "label": "Ocultar árvores e rede elétrica",
+          "width": 38,
+          "height": 38,
+          "icon": 18,
+          "disabled": false
+        }
+      ],
+      "styling": {
+        "backdropFilter": "blur(10px) saturate(1.12)",
+        "background": "linear-gradient(rgba(230, 250, 255, 0.28), rgba(0, 0, 0, 0) 48%), none",
+        "duration": ".17s"
+      },
+      "pageOverflow": false,
+      "canvasCount": 1,
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 67,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "touch": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "rail": {
+        "x": 8,
+        "y": 116,
+        "width": 322,
+        "height": 54
+      },
+      "buttons": [
+        {
+          "label": "Visão geral",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Vista superior",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Ativar modo Rede Hidrológica",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Ativar Modo Noturno",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Ativar chuva",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Centralizar seleção",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": true
+        },
+        {
+          "label": "Mais controles do mapa",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        }
+      ],
+      "styling": {
+        "backdropFilter": "blur(10px) saturate(1.12)",
+        "background": "linear-gradient(rgba(230, 250, 255, 0.28), rgba(0, 0, 0, 0) 48%), none",
+        "duration": ".17s"
+      },
+      "pageOverflow": false,
+      "canvasCount": 1,
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 24,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "touch": true
+    },
+    {
+      "width": 360,
+      "height": 800,
+      "rail": {
+        "x": 8,
+        "y": 116,
+        "width": 284,
+        "height": 54
+      },
+      "buttons": [
+        {
+          "label": "Visão geral",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Vista superior",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Ativar modo Rede Hidrológica",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Ativar Modo Noturno",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Ativar chuva",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Mais controles do mapa",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        }
+      ],
+      "styling": {
+        "backdropFilter": "blur(10px) saturate(1.12)",
+        "background": "linear-gradient(rgba(230, 250, 255, 0.28), rgba(0, 0, 0, 0) 48%), none",
+        "duration": ".17s"
+      },
+      "pageOverflow": false,
+      "canvasCount": 1,
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 54,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "touch": true
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "rail": {
+        "x": 8,
+        "y": 116,
+        "width": 238,
+        "height": 54
+      },
+      "buttons": [
+        {
+          "label": "Visão geral",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Ativar modo Rede Hidrológica",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Ativar Modo Noturno",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Ativar chuva",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Mais controles do mapa",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        }
+      ],
+      "styling": {
+        "backdropFilter": "blur(10px) saturate(1.12)",
+        "background": "linear-gradient(rgba(230, 250, 255, 0.28), rgba(0, 0, 0, 0) 48%), none",
+        "duration": ".17s"
+      },
+      "pageOverflow": false,
+      "canvasCount": 1,
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 79,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "touch": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "rail": {
+        "x": 8,
+        "y": 65,
+        "width": 330,
+        "height": 54
+      },
+      "buttons": [
+        {
+          "label": "Visão geral",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Vista superior",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Ativar modo Rede Hidrológica",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Ativar Modo Noturno",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Ativar chuva",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        },
+        {
+          "label": "Centralizar seleção",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": true
+        },
+        {
+          "label": "Mais controles do mapa",
+          "width": 44,
+          "height": 44,
+          "icon": 22,
+          "disabled": false
+        }
+      ],
+      "styling": {
+        "backdropFilter": "blur(10px) saturate(1.12)",
+        "background": "linear-gradient(rgba(230, 250, 255, 0.28), rgba(0, 0, 0, 0) 48%), none",
+        "duration": ".17s"
+      },
+      "pageOverflow": false,
+      "canvasCount": 1,
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 133,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "touch": true
+    }
+  ],
+  "tooltipVisible": true,
+  "mobileMenuVisible": true
+}

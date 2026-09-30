@@ -1,0 +1,2033 @@
+{
+  "schemaVersion": 1,
+  "baselineCommit": "bb82eefb",
+  "candidateCommit": "8edd4c7d2b5c3ab145c312d2288b543c6de462ce",
+  "evidenceBoundary": "QA local · fixture BLOCKED em vermelho · sem dados/validação de produção",
+  "fullCapturesModified": false,
+  "resampling": "Pillow LANCZOS; fit entire image without crop except documented rail crops",
+  "maximumDimensions": [
+    2400,
+    3000
+  ],
+  "targetBytesPerSheet": 2300000,
+  "renderer": {
+    "script": "scripts/access-spatial-correction/gallery.py",
+    "sha256": "3564df99a48a79593c63477e37125d343f877c33310bc63f0768051389e2f502",
+    "python": "3.12.14",
+    "pillow": "12.3.0",
+    "font": "arial.ttf",
+    "fontSha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a"
+  },
+  "controlCropReports": [
+    {
+      "file": "before/controls.json",
+      "sha256": "d6d219a4a7a6c2a5d63d384e21830647d23edc758f03100560db22260ef012da"
+    },
+    {
+      "file": "after/controls.json",
+      "sha256": "e780f05c264269019f580cf8c3099631c749f9a90d722242c17e1c77f82c7652"
+    }
+  ],
+  "sheets": [
+    {
+      "file": "2028-gate9.png",
+      "title": "2028 · Portão 9 · duas vias e faixa verde",
+      "size": [
+        2240,
+        1684
+      ],
+      "bytes": 1260782,
+      "sha256": "848897c82c8220c6e84c9117a0285b06a63a5a68b1110b37f8eb90eae51d6122",
+      "renderScale": 1.0,
+      "columns": [
+        "Desktop · antes",
+        "Desktop · depois",
+        "Toque emulado · antes",
+        "Toque emulado · depois"
+      ],
+      "cells": [
+        {
+          "source": "before/2028-desktop-gate9-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-gate9-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-gate9-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-gate9-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "before/2028-desktop-gate9-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-gate9-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-gate9-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-gate9-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-desktop-gate9-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-gate9-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-gate9-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-gate9-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        }
+      ]
+    },
+    {
+      "file": "2028-ubiretama.png",
+      "title": "2028 · Rua Ubiretama · alinhamento lateral",
+      "size": [
+        2240,
+        1684
+      ],
+      "bytes": 1043190,
+      "sha256": "65445784fe8c698cfb8017a5087a0a3feff2eb0fe367567fb41d0b822c2287ba",
+      "renderScale": 1.0,
+      "columns": [
+        "Desktop · antes",
+        "Desktop · depois",
+        "Toque emulado · antes",
+        "Toque emulado · depois"
+      ],
+      "cells": [
+        {
+          "source": "before/2028-desktop-ubiretama-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-ubiretama-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-ubiretama-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-ubiretama-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "before/2028-desktop-ubiretama-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-ubiretama-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-ubiretama-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-ubiretama-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-desktop-ubiretama-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-ubiretama-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-ubiretama-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-ubiretama-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        }
+      ]
+    },
+    {
+      "file": "2028-south-road.png",
+      "title": "2028 · Rua sul da Expo Rural · conexão",
+      "size": [
+        2240,
+        1684
+      ],
+      "bytes": 1254967,
+      "sha256": "6dbed894f780072e7889ee14270fa7ea8ce8651a1c16acead81b2c1fcb480baf",
+      "renderScale": 1.0,
+      "columns": [
+        "Desktop · antes",
+        "Desktop · depois",
+        "Toque emulado · antes",
+        "Toque emulado · depois"
+      ],
+      "cells": [
+        {
+          "source": "before/2028-desktop-south-road-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-south-road-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-south-road-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-south-road-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "before/2028-desktop-south-road-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-south-road-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-south-road-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-south-road-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-desktop-south-road-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-south-road-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-south-road-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-south-road-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        }
+      ]
+    },
+    {
+      "file": "2028-p12.png",
+      "title": "2028 · Pavilhão 12 · árvores sobre o concreto",
+      "size": [
+        2240,
+        2188
+      ],
+      "bytes": 1911498,
+      "sha256": "aa6861b2e5c7a93b00248e4ecad2ca41477926dacc2fb2433385fb3031bf75a3",
+      "renderScale": 1.0,
+      "columns": [
+        "Desktop · antes",
+        "Desktop · depois",
+        "Toque emulado · antes",
+        "Toque emulado · depois"
+      ],
+      "cells": [
+        {
+          "source": "before/2028-desktop-p12-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-p12-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-p12-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-p12-top.png",
+          "caption": "Vista superior",
+          "crop": null
+        },
+        {
+          "source": "before/2028-desktop-p12-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-p12-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-p12-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-p12-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-desktop-p12-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-p12-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-p12-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-p12-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-desktop-p12-reduced.png",
+          "caption": "Gráficos reduzidos",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-p12-reduced.png",
+          "caption": "Gráficos reduzidos",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-p12-reduced.png",
+          "caption": "Gráficos reduzidos",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-p12-reduced.png",
+          "caption": "Gráficos reduzidos",
+          "crop": null
+        }
+      ]
+    },
+    {
+      "file": "2028-tower.png",
+      "title": "2028 · Portão 9 · construção da torre",
+      "size": [
+        2240,
+        1180
+      ],
+      "bytes": 779570,
+      "sha256": "63ade684241eaa1cf55c1479c5f347dd972e17470e4eec31d140e05714365755",
+      "renderScale": 1.0,
+      "columns": [
+        "Desktop · antes",
+        "Desktop · depois",
+        "Toque emulado · antes",
+        "Toque emulado · depois"
+      ],
+      "cells": [
+        {
+          "source": "before/2028-desktop-tower-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-tower-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-tower-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-tower-oblique.png",
+          "caption": "Vista oblíqua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-desktop-tower-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-desktop-tower-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "before/2028-mobile-emulated-tower-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        },
+        {
+          "source": "after/2028-mobile-emulated-tower-ground.png",
+          "caption": "Vista ao nível da rua",
+          "crop": null
+        }
+      ]
+    },
+    {
+      "file": "controls-rail.png",
+      "title": "Rail de controles · 1440, 390 e 320 px",
+      "size": [
+        2240,
+        1028
+      ],
+      "bytes": 459063,
+      "sha256": "6caeb24cc0119246518db3a2dc9cc5f33cdfe47d1a9999ddd26f0698089370e4",
+      "renderScale": 1.0,
+      "columns": [
+        "Antes",
+        "Depois"
+      ],
+      "cells": [
+        {
+          "source": "before/controls-1440-day.png",
+          "caption": "1440 px · dia · rail em escala nativa",
+          "crop": [
+            337,
+            62,
+            1103,
+            186
+          ]
+        },
+        {
+          "source": "after/controls-1440-day.png",
+          "caption": "1440 px · dia · rail em escala nativa",
+          "crop": [
+            481,
+            62,
+            959,
+            158
+          ]
+        },
+        {
+          "source": "before/controls-1440-night.png",
+          "caption": "1440 px · noite · rail em escala nativa",
+          "crop": [
+            337,
+            62,
+            1103,
+            186
+          ]
+        },
+        {
+          "source": "after/controls-1440-night.png",
+          "caption": "1440 px · noite · rail em escala nativa",
+          "crop": [
+            481,
+            62,
+            959,
+            158
+          ]
+        },
+        {
+          "source": "before/controls-390-day.png",
+          "caption": "390 px · dia · rail em escala nativa",
+          "crop": [
+            0,
+            92,
+            354,
+            200
+          ]
+        },
+        {
+          "source": "after/controls-390-day.png",
+          "caption": "390 px · dia · rail em escala nativa",
+          "crop": [
+            0,
+            92,
+            354,
+            194
+          ]
+        },
+        {
+          "source": "before/controls-320-day.png",
+          "caption": "320 px · dia · rail em escala nativa",
+          "crop": [
+            0,
+            92,
+            284,
+            200
+          ]
+        },
+        {
+          "source": "after/controls-320-day.png",
+          "caption": "320 px · dia · rail em escala nativa",
+          "crop": [
+            0,
+            92,
+            270,
+            194
+          ]
+        }
+      ]
+    }
+  ],
+  "featuredOriginals": [
+    {
+      "file": "tower-lightning-cloud-full.png",
+      "source": "after/tower-lightning-cloud-full.png",
+      "title": "Raio real · nuvem, contato e torre iluminada",
+      "sha256": "40d548200b4e9baff1a2195b6b57ae98f284024e79c9ee8f0f8800de5524f27a",
+      "bytes": 2421777
+    },
+    {
+      "file": "tower-lightning-reduced-graphics.png",
+      "source": "after/tower-lightning-reduced-graphics.png",
+      "title": "Raio real · gráficos reduzidos",
+      "sha256": "0ce1248621614abb16c1bbefba4e2d88de181885056d53e7f8e863d438985d37",
+      "bytes": 2441686
+    }
+  ],
+  "captures": [
+    {
+      "file": "before/2026-desktop-gate9-ground.png",
+      "sha256": "11c92e84cb5f1d625cbe797877696dc03a21cb368b685720bde40afd9ae74770",
+      "bytes": 944812,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-desktop-gate9-oblique.png",
+      "sha256": "32900124bc05edc2fc56507761d3bd3b9370fc21b5aa6a565f8b718f406cac8c",
+      "bytes": 1043668,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-desktop-gate9-top.png",
+      "sha256": "6869eced5ac0da2042f5d3e810531b03f25b463d2c286b427b41a49b930d7d78",
+      "bytes": 1482515,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-desktop-p12-ground.png",
+      "sha256": "2602f351102cb6a3914ba7e3953aebc659aaa94df1df5b46dbcc72c1175c91c5",
+      "bytes": 976282,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-desktop-p12-oblique.png",
+      "sha256": "a4687398732f0cca7e3ccebcd583e8d781a274a21179b7407697e2f19d086b36",
+      "bytes": 1778736,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-desktop-p12-reduced.png",
+      "sha256": "2602f351102cb6a3914ba7e3953aebc659aaa94df1df5b46dbcc72c1175c91c5",
+      "bytes": 976282,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-desktop-p12-top.png",
+      "sha256": "2df2be5e696732800b3dd94afeae0af43affb9c8f208ebe84056f8bea99efaa7",
+      "bytes": 1292388,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-desktop-south-road-ground.png",
+      "sha256": "440c68e7abe054a311baac6af4d2c2887964a0f902fb2774952204ffa84f3f27",
+      "bytes": 1066510,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-desktop-south-road-oblique.png",
+      "sha256": "453d86c3e0078c104b188832bc5198526054bd9e282092e627f5dfc28b7f4c86",
+      "bytes": 1561840,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-desktop-south-road-top.png",
+      "sha256": "46a5df23764ec3e8bcaf77ca2108534956f4a355ac41f11f74637305ca9f595a",
+      "bytes": 1483766,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-desktop-tower-ground.png",
+      "sha256": "ecef42811753616928566a7434574951a992d95e8f126f9ef405683e4a9233fa",
+      "bytes": 512838,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-desktop-tower-oblique.png",
+      "sha256": "a5a465d30ec281cea8326ab333a3c9a45e1ebcded7415b465658e101390bee9d",
+      "bytes": 1570045,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-desktop-ubiretama-ground.png",
+      "sha256": "db48d13d80c2ddeb1dbd2e4652058db70199767c93a454f766068415643b5b06",
+      "bytes": 548063,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-desktop-ubiretama-oblique.png",
+      "sha256": "2ac68fa62ccadddfb07b18c3b284fe68f01caaf86b50ec7ee79275125d21ffc1",
+      "bytes": 1597030,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-desktop-ubiretama-top.png",
+      "sha256": "fe6fca12ac1f5359a33be91b0ffc8794adfb14a87be86a654a44ac90fb37c9cd",
+      "bytes": 1395555,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-gate9-ground.png",
+      "sha256": "db3fae498c7bfa8eb1ab858e9519f316ba11dd565ff64067d0f058813e4718f5",
+      "bytes": 240186,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-gate9-oblique.png",
+      "sha256": "d1c8cd510671ca70209c58560eb29454f59c60f3caf52e611fc4c22074904abc",
+      "bytes": 238425,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-gate9-top.png",
+      "sha256": "67cffb1ade83600e80957115b760c3aa390289bb581b3db8682e1850ad5026d0",
+      "bytes": 303399,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-p12-ground.png",
+      "sha256": "385178e2b725eb12ec2339e13141b45ec4ed4a6ca99c8b5cfec3334f24ab4b37",
+      "bytes": 227847,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-p12-oblique.png",
+      "sha256": "24fae4617084447052356c3be818bbf5b964de34fe6d29b2ff6ea23bb7b22d22",
+      "bytes": 443562,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-p12-reduced.png",
+      "sha256": "385178e2b725eb12ec2339e13141b45ec4ed4a6ca99c8b5cfec3334f24ab4b37",
+      "bytes": 227847,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-p12-top.png",
+      "sha256": "3b9c2bad00bb02f425cc57861d847696b028d5e72805e5bef46406322b94fba3",
+      "bytes": 298372,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-south-road-ground.png",
+      "sha256": "cd55b027ab0e0745f7876fa0d06b3d4f867062b00b454bfc18dc2e0acda5ae3f",
+      "bytes": 314232,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-south-road-oblique.png",
+      "sha256": "a64a88351468bc02fac127fd1aead1170d5fbd43e691d4a22a974134fbb6d8c0",
+      "bytes": 367150,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-south-road-top.png",
+      "sha256": "0acea6b9df8fcd0fb4f6665bfd4f3d6ba9d681f1e9dee5f6361c3fa2665dbd6a",
+      "bytes": 371823,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-tower-ground.png",
+      "sha256": "e78aa4a9850103331742d83bf5b4f3d21d00f4d8eceb2967d2b2326ce078cc40",
+      "bytes": 112761,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-tower-oblique.png",
+      "sha256": "d89254daea76c78a90b6d04180fb888c0b0fd48284db0c36500fd8767f563c7a",
+      "bytes": 351537,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-ubiretama-ground.png",
+      "sha256": "703a5bda6740c5f0e5b880c50561a37263cd84e64a6d09e7f9b68dae81cbf4ef",
+      "bytes": 43134,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-ubiretama-oblique.png",
+      "sha256": "fc8f5b67e0ccf807c547db1cb09b95d9d5169913ee1e58b00c2d6f9c0a246f0a",
+      "bytes": 389623,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2026-mobile-emulated-ubiretama-top.png",
+      "sha256": "0af5b71a938bb6b08b74fd54f6f9da95d7848406fcedfbf52dc6f6e8f1ab8abf",
+      "bytes": 383624,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "before/2028-desktop-gate9-ground.png",
+      "sha256": "5a7fc10a604f84ca10efd370543205f8d2b555ecef5a24c30fbe428813bc79de",
+      "bytes": 913570,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-gate9.png"
+      ]
+    },
+    {
+      "file": "before/2028-desktop-gate9-oblique.png",
+      "sha256": "8aff9e195eaf2160535471a157722d0eee9b3674ee6a4609a9a913e89dc7b037",
+      "bytes": 1032780,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-gate9.png"
+      ]
+    },
+    {
+      "file": "before/2028-desktop-gate9-top.png",
+      "sha256": "8b3d94d4327d7d9019e252f9a31781a46a3debad03e721acb57a0201902a9b3c",
+      "bytes": 1476075,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-gate9.png"
+      ]
+    },
+    {
+      "file": "before/2028-desktop-p12-ground.png",
+      "sha256": "2602f351102cb6a3914ba7e3953aebc659aaa94df1df5b46dbcc72c1175c91c5",
+      "bytes": 976282,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "before/2028-desktop-p12-oblique.png",
+      "sha256": "a4687398732f0cca7e3ccebcd583e8d781a274a21179b7407697e2f19d086b36",
+      "bytes": 1778736,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "before/2028-desktop-p12-reduced.png",
+      "sha256": "2602f351102cb6a3914ba7e3953aebc659aaa94df1df5b46dbcc72c1175c91c5",
+      "bytes": 976282,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "before/2028-desktop-p12-top.png",
+      "sha256": "2df2be5e696732800b3dd94afeae0af43affb9c8f208ebe84056f8bea99efaa7",
+      "bytes": 1292388,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "before/2028-desktop-south-road-ground.png",
+      "sha256": "d4a457384272fad94d6cd6fdf71e6ec4366fb3695d9f057f60fe5a7b1c0847f1",
+      "bytes": 905680,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-south-road.png"
+      ]
+    },
+    {
+      "file": "before/2028-desktop-south-road-oblique.png",
+      "sha256": "4f925dc45d072a9c7771017774c44f5d2ede5ba2ab52edec650ac6aa0efd4933",
+      "bytes": 1496008,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-south-road.png"
+      ]
+    },
+    {
+      "file": "before/2028-desktop-south-road-top.png",
+      "sha256": "afa4fe86963cfc24a5aa031d098984de37257e0375a36b2279e3a6ca46651e41",
+      "bytes": 1434575,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-south-road.png"
+      ]
+    },
+    {
+      "file": "before/2028-desktop-tower-ground.png",
+      "sha256": "ecef42811753616928566a7434574951a992d95e8f126f9ef405683e4a9233fa",
+      "bytes": 512838,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-tower.png"
+      ]
+    },
+    {
+      "file": "before/2028-desktop-tower-oblique.png",
+      "sha256": "682759221922bf63bdc6e5f6d665408f585c0b58af6b6fb0e25546b2f262095e",
+      "bytes": 1572566,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-tower.png"
+      ]
+    },
+    {
+      "file": "before/2028-desktop-ubiretama-ground.png",
+      "sha256": "2477a43ea9441ee92b0ead7c26b8f8c90f6612958d521e6b6a88789b84cbef23",
+      "bytes": 528329,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-ubiretama.png"
+      ]
+    },
+    {
+      "file": "before/2028-desktop-ubiretama-oblique.png",
+      "sha256": "e502f368881cbb106553b9b71dd35232dffe2e4ca32100f53d6f38ae85a9f362",
+      "bytes": 1581779,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-ubiretama.png"
+      ]
+    },
+    {
+      "file": "before/2028-desktop-ubiretama-top.png",
+      "sha256": "5c8100619fbd82faf751fee546918472adfefabac004106848132f5018f0be76",
+      "bytes": 1412414,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-ubiretama.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-gate9-ground.png",
+      "sha256": "26bea557b19d4d2de7b05794983eb53869e301270181f21d4a17ecbca050fa0a",
+      "bytes": 229514,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-gate9.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-gate9-oblique.png",
+      "sha256": "a5f6117df0776f36d9dc40dd5b4118a8d97549597f3de2cef8ce04dcbe315c0f",
+      "bytes": 238050,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-gate9.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-gate9-top.png",
+      "sha256": "777178fb0f9e9f73c0fe67746c72ea8b7bcaaa26468fe947814e4e039507ff23",
+      "bytes": 290329,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-gate9.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-p12-ground.png",
+      "sha256": "385178e2b725eb12ec2339e13141b45ec4ed4a6ca99c8b5cfec3334f24ab4b37",
+      "bytes": 227847,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-p12-oblique.png",
+      "sha256": "24fae4617084447052356c3be818bbf5b964de34fe6d29b2ff6ea23bb7b22d22",
+      "bytes": 443562,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-p12-reduced.png",
+      "sha256": "385178e2b725eb12ec2339e13141b45ec4ed4a6ca99c8b5cfec3334f24ab4b37",
+      "bytes": 227847,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-p12-top.png",
+      "sha256": "3b9c2bad00bb02f425cc57861d847696b028d5e72805e5bef46406322b94fba3",
+      "bytes": 298372,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-south-road-ground.png",
+      "sha256": "9266d22484f7aa0697dd7efc4c35c563b3b1fb6aef52a168aace72732c394800",
+      "bytes": 213344,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-south-road.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-south-road-oblique.png",
+      "sha256": "ffabe1f99da33d3144b8599ea3118846d7f61559aacebe3888d67875a2fd96ac",
+      "bytes": 352128,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-south-road.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-south-road-top.png",
+      "sha256": "49c0f7f054782036c482cb5f8161047b17679d6fd6ec2d928bfea5cba4954661",
+      "bytes": 354720,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-south-road.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-tower-ground.png",
+      "sha256": "e78aa4a9850103331742d83bf5b4f3d21d00f4d8eceb2967d2b2326ce078cc40",
+      "bytes": 112761,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-tower.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-tower-oblique.png",
+      "sha256": "438c77aa4c5870cdb8c8f652d697dc53179dd90f5a61e61d21a5de82e410260f",
+      "bytes": 351800,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-tower.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-ubiretama-ground.png",
+      "sha256": "fe0396b5111fdbe27b6586a3c76c258601f3f716d33883fab4c4ac0ce8442b41",
+      "bytes": 44218,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-ubiretama.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-ubiretama-oblique.png",
+      "sha256": "ca4dd5809b09a6a0f46a770570940c1d468100749a5c835db080038aa119a407",
+      "bytes": 385902,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-ubiretama.png"
+      ]
+    },
+    {
+      "file": "before/2028-mobile-emulated-ubiretama-top.png",
+      "sha256": "bb4542063819ba992223bdab3b45efa743919fb2d46c066f6d92274ad75d36c0",
+      "bytes": 381945,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-ubiretama.png"
+      ]
+    },
+    {
+      "file": "before/controls-1440-day.png",
+      "sha256": "25b33aae9b9ef682227d22aa13f6d99ca8fb828689c4da5bee2d61160818965e",
+      "bytes": 1473330,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "controls-rail.png"
+      ]
+    },
+    {
+      "file": "before/controls-1440-night.png",
+      "sha256": "5558775f66e97a9053f45997bdd6e7d7831a7571eb650cec4c517e822a91c5f4",
+      "bytes": 1351392,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "controls-rail.png"
+      ]
+    },
+    {
+      "file": "before/controls-320-day.png",
+      "sha256": "ffc5c88c4f29a43320ce54849ec684a8f7321c53ac8ce35b41e28254312a43fd",
+      "bytes": 279622,
+      "size": [
+        320,
+        740
+      ],
+      "usedIn": [
+        "controls-rail.png"
+      ]
+    },
+    {
+      "file": "before/controls-390-day.png",
+      "sha256": "a2467e0b22fcdf1410d997c36d0e0a1ddae24000fc382b9afa7f6b060bf29b5e",
+      "bytes": 355830,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "controls-rail.png"
+      ]
+    },
+    {
+      "file": "after/2026-desktop-gate9-ground.png",
+      "sha256": "11c92e84cb5f1d625cbe797877696dc03a21cb368b685720bde40afd9ae74770",
+      "bytes": 944812,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-desktop-gate9-oblique.png",
+      "sha256": "654d031b62a6b5e43c9d2d0c22fa60278ed7e132abd9f6e849f7098772116732",
+      "bytes": 1081444,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-desktop-gate9-top.png",
+      "sha256": "c46f18bfa58830bdaa6b159743bfebaf9e7bb6e5bfc262f226b36dc5652690ae",
+      "bytes": 1383704,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-desktop-p12-ground.png",
+      "sha256": "51988aa5ea9984367ec557a0a548b05c691ab78b0e1076514850c7f01e63d55a",
+      "bytes": 963335,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-desktop-p12-oblique.png",
+      "sha256": "eab4befde04b0e827cf2400295fb463a02e274466d9087736d3a30be527df056",
+      "bytes": 1618029,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-desktop-p12-reduced.png",
+      "sha256": "51988aa5ea9984367ec557a0a548b05c691ab78b0e1076514850c7f01e63d55a",
+      "bytes": 963335,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-desktop-p12-top.png",
+      "sha256": "eaa7b68e86a70f3e59b76dd820f82084626a69ad2653cf5c175c0d43e2b71ba5",
+      "bytes": 1277394,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-desktop-south-road-ground.png",
+      "sha256": "440c68e7abe054a311baac6af4d2c2887964a0f902fb2774952204ffa84f3f27",
+      "bytes": 1066510,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-desktop-south-road-oblique.png",
+      "sha256": "8b8abfd172ae824ee03e7e185430177e3ee0509242c48d9ac037476aa0a6a0e8",
+      "bytes": 1561769,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-desktop-south-road-top.png",
+      "sha256": "2db35f3d5b4dedfa374e64ec86a060e00ee9ed2695896261851f0313e7c50de0",
+      "bytes": 1483966,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-desktop-tower-ground.png",
+      "sha256": "d98af16a476b6fde979a50f5bd6b107823e8ba0d29e8dbeeefe3c3f785387bcb",
+      "bytes": 656689,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-desktop-tower-oblique.png",
+      "sha256": "24817aba531c5a86762e6ca24870ee7f37f7f495f6e58d3789fe2c3ef934dc76",
+      "bytes": 1591149,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-desktop-ubiretama-ground.png",
+      "sha256": "217e3c06299e426d65d4745e79223edd33ec5e63ceb3741e7e0d3a8022e557a4",
+      "bytes": 573354,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-desktop-ubiretama-oblique.png",
+      "sha256": "10de42eb28fbf6dfb2d3371884591f8e566bf562cad196d9f588be2d2e8ac800",
+      "bytes": 1584664,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-desktop-ubiretama-top.png",
+      "sha256": "2a7a4beb3f03a5f6f58e72021dd1f6158801bd3b79aa9c7c93eb6279cb9eb64d",
+      "bytes": 1393838,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-gate9-ground.png",
+      "sha256": "db3fae498c7bfa8eb1ab858e9519f316ba11dd565ff64067d0f058813e4718f5",
+      "bytes": 240186,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-gate9-oblique.png",
+      "sha256": "6759451e427287f611a848402ab4497d648f04037093f0bbcde665d21a14c900",
+      "bytes": 242133,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-gate9-top.png",
+      "sha256": "f79273029844b088cb5f41b44a05fd84ee0c2bb5c6ae9a125fa009f67f57cfbe",
+      "bytes": 332098,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-p12-ground.png",
+      "sha256": "d3356cfbf10c41642310e9e4d5f3e2f3249ed271d87cde9b8ecc2a27356fe896",
+      "bytes": 274872,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-p12-oblique.png",
+      "sha256": "b90e4544fbb6c6f00e21d8f77cee11e7ac4442175dc191b58266af9b00ddd025",
+      "bytes": 424919,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-p12-reduced.png",
+      "sha256": "d3356cfbf10c41642310e9e4d5f3e2f3249ed271d87cde9b8ecc2a27356fe896",
+      "bytes": 274872,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-p12-top.png",
+      "sha256": "56740b73b59527e8e0e20f4fe60e3cd6e61610d27f1014eb89ce938aa1f84414",
+      "bytes": 334277,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-south-road-ground.png",
+      "sha256": "cd55b027ab0e0745f7876fa0d06b3d4f867062b00b454bfc18dc2e0acda5ae3f",
+      "bytes": 314232,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-south-road-oblique.png",
+      "sha256": "a64a88351468bc02fac127fd1aead1170d5fbd43e691d4a22a974134fbb6d8c0",
+      "bytes": 367150,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-south-road-top.png",
+      "sha256": "0acea6b9df8fcd0fb4f6665bfd4f3d6ba9d681f1e9dee5f6361c3fa2665dbd6a",
+      "bytes": 371823,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-tower-ground.png",
+      "sha256": "29b581710d3459f9cb155345f51c63762975a0c4d9b5e088d28783a2de640682",
+      "bytes": 220673,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-tower-oblique.png",
+      "sha256": "248d7542a9c2e7a66e32addb44e527cd1188b7ccc4a21135f8be9223cbfbae9a",
+      "bytes": 370307,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-ubiretama-ground.png",
+      "sha256": "703a5bda6740c5f0e5b880c50561a37263cd84e64a6d09e7f9b68dae81cbf4ef",
+      "bytes": 43134,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-ubiretama-oblique.png",
+      "sha256": "3965f29efde40276ef8230db4a317ed3fafd5dccad5465a0db60e92e93b966e6",
+      "bytes": 386432,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2026-mobile-emulated-ubiretama-top.png",
+      "sha256": "481eb1b8a05007691b126ef9e14c310e5354887d5acad23103647ac0c0a17d2b",
+      "bytes": 383121,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/2028-desktop-gate9-ground.png",
+      "sha256": "ea662be8409d93abb39ed34ec317346d4d854f6cbd4e477dfd3a70cbe5fd12e4",
+      "bytes": 1079610,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-gate9.png"
+      ]
+    },
+    {
+      "file": "after/2028-desktop-gate9-oblique.png",
+      "sha256": "12bee35e07af1090dd8cfa585e9e188d0857b1f98ca130589b7e1ecbf6cb0730",
+      "bytes": 1093695,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-gate9.png"
+      ]
+    },
+    {
+      "file": "after/2028-desktop-gate9-top.png",
+      "sha256": "c6584eb27aba6a563f56162d1a2b6692d2287d76147211e5ccb0f74523186537",
+      "bytes": 1556726,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-gate9.png"
+      ]
+    },
+    {
+      "file": "after/2028-desktop-p12-ground.png",
+      "sha256": "51988aa5ea9984367ec557a0a548b05c691ab78b0e1076514850c7f01e63d55a",
+      "bytes": 963335,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "after/2028-desktop-p12-oblique.png",
+      "sha256": "7472145bc965b399bdd08cb912b96d4c5308d756926d670a3f89a268f85429ff",
+      "bytes": 1618029,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "after/2028-desktop-p12-reduced.png",
+      "sha256": "51988aa5ea9984367ec557a0a548b05c691ab78b0e1076514850c7f01e63d55a",
+      "bytes": 963335,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "after/2028-desktop-p12-top.png",
+      "sha256": "eaa7b68e86a70f3e59b76dd820f82084626a69ad2653cf5c175c0d43e2b71ba5",
+      "bytes": 1277394,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "after/2028-desktop-south-road-ground.png",
+      "sha256": "e81e1e066b06c59df828f32103bc9d636f3e215d2c905ac5a92a7f4ea931be31",
+      "bytes": 1104415,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-south-road.png"
+      ]
+    },
+    {
+      "file": "after/2028-desktop-south-road-oblique.png",
+      "sha256": "395ef3562504a928b4afc1cf2105f2eae0cd11b6b7197dc7792da9d74f209bb5",
+      "bytes": 1604326,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-south-road.png"
+      ]
+    },
+    {
+      "file": "after/2028-desktop-south-road-top.png",
+      "sha256": "4b0ad56cde5c07edb023965dd3ed23a5e5d3a33a4c84ceb96968402cb1ad0f6f",
+      "bytes": 1459841,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-south-road.png"
+      ]
+    },
+    {
+      "file": "after/2028-desktop-tower-ground.png",
+      "sha256": "d98af16a476b6fde979a50f5bd6b107823e8ba0d29e8dbeeefe3c3f785387bcb",
+      "bytes": 656689,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-tower.png"
+      ]
+    },
+    {
+      "file": "after/2028-desktop-tower-oblique.png",
+      "sha256": "a5a979b083ea85959392619480f51ecb2fec5ba7a8a2269c84876c8b849e89b7",
+      "bytes": 1601849,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-tower.png"
+      ]
+    },
+    {
+      "file": "after/2028-desktop-ubiretama-ground.png",
+      "sha256": "708ebcdb67ce298bedd8a39e54b9946a86e332f0fb5ef98434830fe51de36a8c",
+      "bytes": 509186,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-ubiretama.png"
+      ]
+    },
+    {
+      "file": "after/2028-desktop-ubiretama-oblique.png",
+      "sha256": "62158334d1fe571dd3c32c1f18952cd8418d11fe7106964caa38ff0c544a3b9d",
+      "bytes": 1576191,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-ubiretama.png"
+      ]
+    },
+    {
+      "file": "after/2028-desktop-ubiretama-top.png",
+      "sha256": "5e19d9c26369d14311039e098f570138fa9647d1838e5b104748c83c0763e6c6",
+      "bytes": 1415885,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "2028-ubiretama.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-gate9-ground.png",
+      "sha256": "6d140cabf357583d4cc2967e8f18131871aced669a3ec869ffa4bc23fae0ada7",
+      "bytes": 295778,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-gate9.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-gate9-oblique.png",
+      "sha256": "8dcc0073234c97562e0f0a8bb48549b9a8223c4ff5d089fb56342b800d490004",
+      "bytes": 249407,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-gate9.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-gate9-top.png",
+      "sha256": "90d9727f25f24a026fe1d0de7a18c9f1e39daf2038afda15e54eb13946640ae6",
+      "bytes": 350926,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-gate9.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-p12-ground.png",
+      "sha256": "d3356cfbf10c41642310e9e4d5f3e2f3249ed271d87cde9b8ecc2a27356fe896",
+      "bytes": 274872,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-p12-oblique.png",
+      "sha256": "b90e4544fbb6c6f00e21d8f77cee11e7ac4442175dc191b58266af9b00ddd025",
+      "bytes": 424919,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-p12-reduced.png",
+      "sha256": "d3356cfbf10c41642310e9e4d5f3e2f3249ed271d87cde9b8ecc2a27356fe896",
+      "bytes": 274872,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-p12-top.png",
+      "sha256": "56740b73b59527e8e0e20f4fe60e3cd6e61610d27f1014eb89ce938aa1f84414",
+      "bytes": 334277,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-p12.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-south-road-ground.png",
+      "sha256": "121d615197d69264d16f27fe5164fc1cd10f68077178126c867013acd68e8125",
+      "bytes": 343235,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-south-road.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-south-road-oblique.png",
+      "sha256": "65b97a77106027e12129eaf71848bf6486f43a7b646715ceba85bd50855df924",
+      "bytes": 386083,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-south-road.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-south-road-top.png",
+      "sha256": "68acfb46aec77d18ea618482ed86161b61cf66f669eb9054129e1b6bdd8f0de4",
+      "bytes": 364083,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-south-road.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-tower-ground.png",
+      "sha256": "29b581710d3459f9cb155345f51c63762975a0c4d9b5e088d28783a2de640682",
+      "bytes": 220673,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-tower.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-tower-oblique.png",
+      "sha256": "eac41a0d9b0d6f6eb328480d2533e7d939c8c8109004a2e4669cc323f450cb71",
+      "bytes": 378342,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-tower.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-ubiretama-ground.png",
+      "sha256": "fe0396b5111fdbe27b6586a3c76c258601f3f716d33883fab4c4ac0ce8442b41",
+      "bytes": 44218,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-ubiretama.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-ubiretama-oblique.png",
+      "sha256": "c5e721c8110b688be3e813ad50992760f0afd15ef8ab4be9be344f93ae94c3cd",
+      "bytes": 392212,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-ubiretama.png"
+      ]
+    },
+    {
+      "file": "after/2028-mobile-emulated-ubiretama-top.png",
+      "sha256": "0a6d5e326007a99b637718ae3b702ce1d0bdea5a12eecf6b6a31d71a595fea6f",
+      "bytes": 385094,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "2028-ubiretama.png"
+      ]
+    },
+    {
+      "file": "after/controls-1440-day.png",
+      "sha256": "4501a5de9ec05bff3773c2bee6b462f2ab1876308c2bd32567dcb9858141bbe7",
+      "bytes": 1475458,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "controls-rail.png"
+      ]
+    },
+    {
+      "file": "after/controls-1440-night.png",
+      "sha256": "9783ba6e39a3950f64238afa25eb092d15b45f5c069d3875a50751b21ad28694",
+      "bytes": 1477691,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "controls-rail.png"
+      ]
+    },
+    {
+      "file": "after/controls-320-day.png",
+      "sha256": "3d9a9082d3c72e31aec31b62a41deaba1b8693d5a703f8d363bbe6a259c31f85",
+      "bytes": 274193,
+      "size": [
+        320,
+        740
+      ],
+      "usedIn": [
+        "controls-rail.png"
+      ]
+    },
+    {
+      "file": "after/controls-390-day.png",
+      "sha256": "cab86c78164e6b7b27d9a9b98833f8b2d46d4ab2e29a15417537df91d1284060",
+      "bytes": 355565,
+      "size": [
+        390,
+        844
+      ],
+      "usedIn": [
+        "controls-rail.png"
+      ]
+    },
+    {
+      "file": "after/tower-cloud-full-construction.png",
+      "sha256": "6f1bf247d6d9020e7e1ba41511c890fdb3c8f623cda4d20f77ff8f744f39ced3",
+      "bytes": 1637272,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/tower-lightning-cloud-full.png",
+      "sha256": "40d548200b4e9baff1a2195b6b57ae98f284024e79c9ee8f0f8800de5524f27a",
+      "bytes": 2421777,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "tower-lightning-cloud-full.png"
+      ]
+    },
+    {
+      "file": "after/tower-lightning-cycle-1.png",
+      "sha256": "c0f6d14213941fcab1a5c4a0531732cef2a0eab133075303c7e0007d01e501a0",
+      "bytes": 2446943,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/tower-lightning-cycle-2-reduced-motion.png",
+      "sha256": "c80b4952bbaffe7e2cb95d4d122b4de9fcb71ebab6f0e3c266115796d3159d6e",
+      "bytes": 2441279,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/tower-lightning-cycle-3-reduced-motion.png",
+      "sha256": "9898735cf2a02e4ec3095cf6f91e4bbf177a1ac076689c06be6e0163373eb228",
+      "bytes": 2442940,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    },
+    {
+      "file": "after/tower-lightning-reduced-graphics.png",
+      "sha256": "0ce1248621614abb16c1bbefba4e2d88de181885056d53e7f8e863d438985d37",
+      "bytes": 2441686,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": [
+        "tower-lightning-reduced-graphics.png"
+      ]
+    },
+    {
+      "file": "after/tower-weather-construction.png",
+      "sha256": "e0cae7f1ce8d72086cdc98af7c1429414b3653e72707722b663698a1bc8c7c1c",
+      "bytes": 1659018,
+      "size": [
+        1440,
+        900
+      ],
+      "usedIn": []
+    }
+  ]
+}

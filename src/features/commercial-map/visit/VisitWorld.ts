@@ -10,6 +10,7 @@ import { buildRearTreeInstances } from '../data/rearParkEnvironment';
 import { buildLateralResidentialRenderPlan } from '../utils/lateralResidentialGeometry';
 import { resolveStrategicLandmarkKind, strategicLandmarkVisualHeight, strategicLandmarkBounds, strategicLandmarkFacingRadians } from '../utils/landmarks';
 import { commercialTreeGroundElevation } from '../utils/treeLayer';
+import { isPavilion12FrontTreeId, PAVILION12_FRONT_TREE_GROUND_SUPPORT, withPavilion12TreeGroundSupport } from '../data/pavilion12FrontTrees';
 import { complexLocalToWorld, complexWorldPolygon, FENASOJA_COMPLEX } from '../data/fenasojaComplexReconstruction';
 import { ARENA_FRONT_LAYOUT, sourceBoundsToLocal, sourcePolygonToLocal } from '../data/parkEnvironment';
 import { MIRANTE_COMPLEX } from '../data/miranteComplexReconstruction';
@@ -30,6 +31,9 @@ import { visitPointInRing } from './VisitSpatialIndex';
 import { SOY_RESTROOM_PRESENTATION } from '../utils/soyGateArchitecture';
 import { isInternalParkVegetationPoint, INTERNAL_TREE_TRUNK_RADIUS_FACTOR } from '../utils/internalTreeVisuals';
 import { createFenasojaRestaurantLayout } from '../utils/fenasojaRestaurant';
+import { UBIRETAMA_PRESENTATION_HANDOFF, buildUbiretamaRoadPresentation, ubiretamaPresentationDistance } from '../utils/ubiretamaRoadPresentation';
+import { buildGateNineCommunicationTowerPlan } from '../utils/gateNineCommunicationTower';
+import { GATE_NINE_COMMUNICATION_TOWER } from '../data/gateNineCommunicationTower';
 
 const SOLID_CLASSIFICATIONS = new Set(['PAVILION', 'BUILDING', 'RESTAURANT', 'RESTROOM', 'CHEMICAL_RESTROOM', 'ADMINISTRATION', 'SECURITY', 'EMERGENCY', 'SERVICE', 'EVENT_VENUE']);
 
@@ -63,16 +67,24 @@ export interface VisitWorld {
  * The structure entity's ground footprint is deliberately solid: interior access
  * is an explicit navigation action, never an accidental walk through a facade.
  * Open gates and freestanding canopies instead retain individual piers/walls. */
-export function buildVisitWorld({ entities, trees, electricalPlacements = [], siteEnvironmentEntities = entities, includeContext = entities.some(entity => ['A1', 'F', 'B12', 'EXPORURAL'].includes(entity.publicIdentifier)) }: {
+export function buildVisitWorld({ entities, trees, electricalPlacements = [], siteEnvironmentEntities = entities, includeContext = entities.some(entity => ['A1', 'F', 'B12', 'EXPORURAL'].includes(entity.publicIdentifier)), pavilion12ConcretePresent = includeContext || entities.some(entity => entity.publicIdentifier === 'B3') }: {
   entities: readonly MapEntity[];
   trees: readonly CommercialMapTree[];
   electricalPlacements?: readonly ResolvedElectricalNodePlacement[];
   siteEnvironmentEntities?: readonly MapEntity[];
   includeContext?: boolean;
+  /** Actual presentation support, independent from adding the full park context. */
+  pavilion12ConcretePresent?: boolean;
 }): VisitWorld {
   const colliders: VisitCollider[] = [];
-  const surfaces = buildVisitGroundSurfaces(entities, includeContext, siteEnvironmentEntities);
+  const ubiretamaPresentation = includeContext ? buildUbiretamaRoadPresentation(entities) : null;
+  const surfaces = buildVisitGroundSurfaces(entities, includeContext, siteEnvironmentEntities, ubiretamaPresentation);
   const identifiers = new Set(entities.map(entity => entity.publicIdentifier));
+  if (!includeContext && pavilion12ConcretePresent && trees.some(tree => isPavilion12FrontTreeId(tree.id))) {
+    const support = PAVILION12_FRONT_TREE_GROUND_SUPPORT;
+    surfaces.push(visitGroundSurface(support.id, support.geometry.coordinates[0],
+      support.geometry.elevation + support.geometry.extrusionHeight, support.geometry.coordinates.slice(1)));
+  }
   const polygon = (id: string, ring: VisitRing, base: number, height: number) => {
     if (ring.length >= 3 && ring.every(p => Number.isFinite(p[0]) && Number.isFinite(p[1])) && height > 0) colliders.push(visitPolygonCollider(id, ring, base, base + height));
   };
@@ -85,6 +97,10 @@ export function buildVisitWorld({ entities, trees, electricalPlacements = [], si
   const crown = (id: string, x: number, z: number, radius: number, bottom: number, top: number) => {
     colliders.push({ ...visitCircleCollider(`${id}:crown`, x, z, radius, bottom, top), cameraOnly: true });
   };
+  const tower = includeContext ? buildGateNineCommunicationTowerPlan(entities) : null;
+  if (tower) polygon(GATE_NINE_COMMUNICATION_TOWER.presentationId, tower.footprint,
+    tower.position[1] + GATE_NINE_COMMUNICATION_TOWER.foundationPadTop - GATE_NINE_COMMUNICATION_TOWER.foundationPadHeight,
+    GATE_NINE_COMMUNICATION_TOWER.height + GATE_NINE_COMMUNICATION_TOWER.foundationPadHeight - GATE_NINE_COMMUNICATION_TOWER.foundationPadTop);
   for (const entity of entities) {
     if (entity.isArchived) continue;
     const kind = resolveStrategicLandmarkKind(entity);
@@ -244,8 +260,9 @@ export function buildVisitWorld({ entities, trees, electricalPlacements = [], si
       trunk(entity.id, bounds.centerX, bounds.centerZ, Math.min(0.16, bounds.width * 0.08), entity.geometry.elevation, 1.8);
     }
   }
+  const treeSupportEntities = withPavilion12TreeGroundSupport(entities, pavilion12ConcretePresent);
   for (const tree of trees) {
-    const base = commercialTreeGroundElevation(tree, entities);
+    const base = commercialTreeGroundElevation(tree, treeSupportEntities);
     trunk(tree.id, tree.position[0], tree.position[1], tree.trunkRadius
       * (isInternalParkVegetationPoint(tree.position) ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1), base, tree.trunkHeight);
     crown(tree.id, tree.position[0], tree.position[1], tree.canopyRadius, base + tree.trunkHeight * 0.85, base + tree.trunkHeight + tree.crownHeight);
@@ -296,6 +313,8 @@ export function buildVisitWorld({ entities, trees, electricalPlacements = [], si
       crown(`park-access-tree:${i}`, tree.position[0], tree.position[1], Math.max(tree.scale[0], tree.scale[2]), 0.015 + 1.1 * tree.scale[1], 0.015 + 3 * tree.scale[1]);
     }
     for (const tree of buildRearTreeInstances(false)) {
+      if (ubiretamaPresentation && tree.z < UBIRETAMA_PRESENTATION_HANDOFF[1]
+        && ubiretamaPresentationDistance([tree.x, tree.z], ubiretamaPresentation) <= tree.scale * .5) continue;
       const id = `rear-tree:${tree.x}:${tree.z}`;
       const leafHalfHeight = tree.scale * .5 * (.85 + tree.tint * .5);
       const leafBottom = tree.scale * .92 - leafHalfHeight, leafTop = tree.scale * .92 + leafHalfHeight;

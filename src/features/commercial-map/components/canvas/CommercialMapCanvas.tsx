@@ -70,6 +70,10 @@ import {
 import { normalizeMapEntityMetadata } from '../../utils/mapMetadata';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
 import { selectRearRoadCompatibleTreesForPresentation } from '../../utils/rearRoadTreeClearance';
+import { createUbiretamaRoadPresentationResolver } from '../../utils/ubiretamaRoadPresentation';
+import { buildGateNineAccessPresentation } from '../../utils/gateNineRoadPresentation';
+import { createExporuralSouthRoadPresentationResolver, withExporuralSouthRoadPresentation } from '../../utils/exporuralSouthRoadPresentation';
+import { withPavilion12TreeGroundSupport } from '../../data/pavilion12FrontTrees';
 import { buildElectricalSceneLayout, selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
 import { selectCommercialHydrologicalInfrastructureForScene } from '../../utils/hydrologicalInfrastructure';
 import {
@@ -205,6 +209,7 @@ import { createCommercialMapEvents } from './commercialMapEvents';
 import { ParkAccessEnvironmentLayer } from './ParkAccessEnvironmentLayer';
 
 import { RegionalHighwayNetwork } from './RegionalHighwayNetwork';
+import { GateNineCommunicationTower } from './GateNineCommunicationTower';
 import { RearParkEnvironmentLayer } from './RearParkEnvironmentLayer';
 import { CommercialSiteEnvironmentLayer } from './CommercialSiteEnvironmentLayer';
 import { QuadrasABEnvironmentLayer } from './QuadrasABEnvironmentLayer';
@@ -4696,6 +4701,12 @@ const Scene = memo(function Scene({
     ),
     [entities, entityFiltersActive, layerOpacity, layerVisibility],
   );
+  const resolveUbiretamaPresentation = useMemo(createUbiretamaRoadPresentationResolver, []);
+  const ubiretamaPresentation = useMemo(() => !isolatedArea
+    ? resolveUbiretamaPresentation(entities) : null, [entities, isolatedArea, resolveUbiretamaPresentation]);
+  const gateNineAccessPresentation = useMemo(() => buildGateNineAccessPresentation(entities), [entities]);
+  const resolveExporuralSouthRoad = useMemo(createExporuralSouthRoadPresentationResolver, []);
+  const exporuralSouthRoadPresentation = useMemo(() => resolveExporuralSouthRoad(entities), [entities, resolveExporuralSouthRoad]);
   const rearRoadDebugVisible = useMemo(() => import.meta.env.DEV
     && typeof window !== 'undefined'
     && new URLSearchParams(window.location.search).has('rearRoadDebug'), []);
@@ -4834,7 +4845,10 @@ const Scene = memo(function Scene({
     .filter(entity => ['PAVILION', 'BUILDING', 'RESTAURANT', 'RESTROOM', 'CHEMICAL_RESTROOM', 'ADMINISTRATION', 'SECURITY', 'EMERGENCY', 'SERVICE'].includes(entity.classification))
     .map(entity => entity.geometry.coordinates[0]), [nonLotEntities]);
   const circulationEntities = useMemo(() => (
-    withGateFourDistrictPresentationEntities(nonLotEntities).filter((entity) => (
+    [...withExporuralSouthRoadPresentation(withGateFourDistrictPresentationEntities(nonLotEntities), exporuralSouthRoadPresentation),
+      ...(gateNineAccessPresentation && nonLotEntities.some(entity => entity.id === gateNineAccessPresentation.ownerEntityId)
+        ? [gateNineAccessPresentation.roadEntity] : []),
+    ].filter((entity) => (
       (entity.classification === 'ROAD' || entity.classification === 'PEDESTRIAN_PATH')
       // Rua Brasília is intentionally retained here: its persisted surface is
       // the only canonical pavement from Quadra E through D1/D2/D3 to Q-R-02.
@@ -4842,7 +4856,7 @@ const Scene = memo(function Scene({
       && (isolatedArea || hydrologicalModeActive
         || !REPLACED_OFFICIAL_ROAD_IDENTIFIERS.includes(entity.publicIdentifier))
     ))
-  ), [hydrologicalModeActive, isolatedArea, nonLotEntities]);
+  ), [exporuralSouthRoadPresentation, gateNineAccessPresentation, hydrologicalModeActive, isolatedArea, nonLotEntities]);
   const structuralEntities = useMemo(() => nonLotEntities.filter((entity) => (
     entity.classification !== 'ROAD' && entity.classification !== 'PEDESTRIAN_PATH'
   )).map((entity) => rearParkingEnabled ? rearParkingEntityForPresentation(entity) : entity), [nonLotEntities, rearParkingEnabled]);
@@ -4872,10 +4886,10 @@ const Scene = memo(function Scene({
       ? [...baseTrees, ...reconcileRearParkingTrees(baseTrees, entities)]
       : baseTrees;
     const rearRoadCompatibleTrees = !isolatedArea
-      ? selectRearRoadCompatibleTreesForPresentation(parkAccessCompatibleTrees)
+      ? selectRearRoadCompatibleTreesForPresentation(parkAccessCompatibleTrees, ubiretamaPresentation)
       : parkAccessCompatibleTrees;
     return rearRoadCompatibleTrees.filter(tree => arenaVegetationAllowed(tree.position, tree.canopyRadius));
-  }, [entities, isolatedArea, publicPolicy, publicPavilion, rearParkingAvailable, sceneTrees]);
+  }, [entities, isolatedArea, publicPolicy, publicPavilion, rearParkingAvailable, sceneTrees, ubiretamaPresentation]);
   const selectedLunarTreeEntity = selectedEntity
     && resolveStrategicLandmarkKind(selectedEntity) === 'lunar-tree'
     ? selectedEntity
@@ -4891,9 +4905,6 @@ const Scene = memo(function Scene({
       treeRemainsVisibleWithSelectedApollo(tree, memorialCenter)
     ));
   }, [rearRoadCompatibleSceneTrees, selectedLunarTreeEntity]);
-  const treeSurfaceEntities = useMemo(() => rearParkingAvailable
-    ? [...exteriorRenderedEntities, ...REAR_PARKING_GROUND_SUPPORTS]
-    : exteriorRenderedEntities, [exteriorRenderedEntities, rearParkingAvailable]);
   useEffect(() => {
     if (!commercialMapDiagnosticsEnabled) return;
     gl.domElement.dataset.commercialMapInventory = JSON.stringify({
@@ -4954,6 +4965,14 @@ const Scene = memo(function Scene({
     parkAccessScope,
     presentedMatchingEntityIds,
   ]);
+  const pavilion12ConcretePresent = parkAccessScope === 'all'
+    && parkAccessPresentation.surfaces.visible && !hydrologicalModeActive;
+  const treeSurfaceEntities = useMemo(() => withPavilion12TreeGroundSupport(
+    rearParkingAvailable
+      ? [...exteriorRenderedEntities, ...REAR_PARKING_GROUND_SUPPORTS]
+      : exteriorRenderedEntities,
+    pavilion12ConcretePresent,
+  ), [exteriorRenderedEntities, pavilion12ConcretePresent, rearParkingAvailable]);
   const arenaFrontInfrastructurePresentation = useMemo(() => {
     const entityByIdentifier = new Map(entities.map((entity) => [entity.publicIdentifier, entity]));
     const resolvePresentation = (
@@ -5088,7 +5107,8 @@ const Scene = memo(function Scene({
 
   return (
     <>
-      {publicPavilion ? <SunrisePostProcessing qualityTier="reduced" enabled={false} /> : publicPolicy ? <PublicMapEnvironment extent={environmentExtent} /> : <NightAwareEnvironment
+      {publicPavilion ? <SunrisePostProcessing qualityTier="reduced" enabled={false} /> : publicPolicy ? <PublicMapEnvironment extent={environmentExtent} ubiretamaPresentation={ubiretamaPresentation} /> : <NightAwareEnvironment
+        ubiretamaPresentation={ubiretamaPresentation}
         extent={environmentExtent}
         shadowExtent={shadowExtent}
         active={!interiorEntity}
@@ -5107,6 +5127,7 @@ const Scene = memo(function Scene({
       )}
       <RoadInfrastructure
         entities={circulationEntities}
+        ubiretamaPresentation={ubiretamaPresentation}
         suppressedSurfaceIdentifiers={parkAccessScope === 'all'
           && parkAccessPresentation.surfaces.visible && !hydrologicalModeActive
           ? PARK_ACCESS_DETAILED_ROAD_SURFACE_IDENTIFIERS : undefined}
@@ -5149,6 +5170,7 @@ const Scene = memo(function Scene({
         <group visible={!hydrologicalModeActive}>
           <EssentialSceneLayer id="rear-environment">
           <RearParkEnvironmentLayer
+            ubiretamaPresentation={ubiretamaPresentation}
             reducedGraphics={reducedGraphics}
             preserveVisitTreePlacement={visitEnabled}
             vegetationVisible={treesVisible}
@@ -5165,6 +5187,7 @@ const Scene = memo(function Scene({
           )}
           {/* Rear approaches and external roads share one polygon union. */}
           <RegionalHighwayNetwork
+            ubiretamaPresentation={ubiretamaPresentation}
             reducedGraphics={reducedGraphics}
             visible={!hydrologicalModeActive && rearRoadPresentation.visible}
             opacity={rearRoadPresentation.opacity}
@@ -5228,6 +5251,7 @@ const Scene = memo(function Scene({
       />
       </group>
       {structuralEntities.map((entity) => {
+        const kind = resolveStrategicLandmarkKind(entity);
         const mesh = (
         <PublicContextGroup active={publicPolicy?.activeScope.has(entity.id) ?? false}><EntityMesh
           key={entity.id}
@@ -5250,9 +5274,15 @@ const Scene = memo(function Scene({
           onEnterInterior={handleEnterInterior}
           onCursor={setCanvasCursor}
           moduleStateById={selectedEntityId === entity.id ? selectedPavilionModuleState : undefined}
-        /></PublicContextGroup>
+        />
+        {kind === 'gate-nine-tanks' && <GateNineCommunicationTower
+          entities={entities}
+          active={!hydrologicalModeActive && (selectedEntityId === entity.id || (layerOpacity[entity.layerId] ?? 1) > 0.015)}
+          opacity={(layerOpacity[entity.layerId] ?? 1) * (entityFiltersActive && !presentedMatchingEntityIds.has(entity.id)
+            && selectedEntityId !== entity.id ? 0.42 : 1)}
+          reducedGraphics={reducedGraphics}
+        />}</PublicContextGroup>
         );
-        const kind = resolveStrategicLandmarkKind(entity);
         // These authored landmarks are essential park content; keep their
         // EntityMesh identity and picking props intact after one-time admission.
         // Lunar memorial retains its zero-intensity engine light in Stage 1:
@@ -5382,7 +5412,7 @@ const Scene = memo(function Scene({
       <RuntimeFrameDiagnostics />
       {publicPolicy && <PublicContextLabels entities={entities} policy={publicPolicy} />}
       {visitEnabled && !publicPolicy && !publicPavilion && <VisitFeatureBoundary><Suspense fallback={null}>
-        <VisitMode entities={entities} lots={lots} trees={presentedSceneTrees} electricalPlacements={electricalSceneLayout.placements} siteEnvironmentEntities={siteEnvironmentEntities}/>
+        <VisitMode entities={entities} lots={lots} trees={presentedSceneTrees} electricalPlacements={electricalSceneLayout.placements} siteEnvironmentEntities={siteEnvironmentEntities} pavilion12ConcretePresent={pavilion12ConcretePresent}/>
       </Suspense></VisitFeatureBoundary>}
       {commercialMapDiagnosticsEnabled && <LightingPerformanceProbe />}
       {LateralDistrictQaScene && (window.location.pathname === '/__dev/commercial-map-rendering' || (import.meta.env.DEV && new URLSearchParams(window.location.search).has('groundQa')))

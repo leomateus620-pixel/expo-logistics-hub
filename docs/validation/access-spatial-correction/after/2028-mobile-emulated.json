@@ -1,0 +1,5189 @@
+{
+  "phase": "after",
+  "revision": "2028",
+  "device": "mobile-emulated",
+  "base": "http://127.0.0.1:4221",
+  "browser": "154.0.8037.58",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+  "evidence": "Local reference fixture; 2028 uses the existing opt-in cadastral proposal. No authenticated production or physical-device evidence.",
+  "errors": [],
+  "views": [
+    {
+      "name": "ubiretama-top",
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 447,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 55474,
+        "calls": 74,
+        "triangles": 330103,
+        "geometries": 569,
+        "textures": 136,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 129799050,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 7344.200000047684,
+          "duration": 39.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7347.700000047684,
+          "duration": 3.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7355,
+          "duration": 7.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7371.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 7454.5,
+          "duration": 83
+        },
+        {
+          "type": "render-frame",
+          "at": 7459.700000047684,
+          "duration": 5.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7472.099999904633,
+          "duration": 12.4
+        },
+        {
+          "type": "render-frame",
+          "at": 7488.200000047684,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7504.899999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7521.599999904633,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7543.200000047684,
+          "duration": 21.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7554.899999856949,
+          "duration": 11.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7571.700000047684,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7592.799999952316,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7605.099999904633,
+          "duration": 12.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7622.099999904633,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 7638.799999952316,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7655.399999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7671.5,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7692.299999952316,
+          "duration": 20.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7704.899999856949,
+          "duration": 12.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48145.59999990463,
+          "duration": 26.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48160.39999985695,
+          "duration": 15
+        },
+        {
+          "type": "render-frame",
+          "at": 48176.700000047684,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48221.5,
+          "duration": 44.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48230.700000047684,
+          "duration": 9.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48241,
+          "duration": 10.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48254.200000047684,
+          "duration": 13.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48271.39999985695,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48288.700000047684,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48307.700000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48320.39999985695,
+          "duration": 12.8
+        },
+        {
+          "type": "render-frame",
+          "at": 48341.5,
+          "duration": 21
+        },
+        {
+          "type": "render-frame",
+          "at": 48362.700000047684,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48378.200000047684,
+          "duration": 15.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48421.89999985695,
+          "duration": 43.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48441.5,
+          "duration": 19.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48457.09999990463,
+          "duration": 15.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48470.09999990463,
+          "duration": 13.1
+        },
+        {
+          "type": "render-frame",
+          "at": 48486.700000047684,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48503.200000047684,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48522.200000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48541.59999990463,
+          "duration": 19.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48583.799999952316,
+          "duration": 42.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48696.09999990463,
+          "duration": 112.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48818.799999952316,
+          "duration": 122.8
+        },
+        {
+          "type": "render-frame",
+          "at": 49203.39999985695,
+          "duration": 384.6
+        }
+      ]
+    },
+    {
+      "name": "ubiretama-oblique",
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 450,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 57701.09999990463,
+        "calls": 160,
+        "triangles": 477189,
+        "geometries": 569,
+        "textures": 136,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 96963191,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 7344.200000047684,
+          "duration": 39.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7347.700000047684,
+          "duration": 3.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7355,
+          "duration": 7.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7371.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 7454.5,
+          "duration": 83
+        },
+        {
+          "type": "render-frame",
+          "at": 7459.700000047684,
+          "duration": 5.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7472.099999904633,
+          "duration": 12.4
+        },
+        {
+          "type": "render-frame",
+          "at": 7488.200000047684,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7504.899999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7521.599999904633,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7543.200000047684,
+          "duration": 21.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7554.899999856949,
+          "duration": 11.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7571.700000047684,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7592.799999952316,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7605.099999904633,
+          "duration": 12.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7622.099999904633,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 7638.799999952316,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7655.399999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7671.5,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7692.299999952316,
+          "duration": 20.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7704.899999856949,
+          "duration": 12.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48145.59999990463,
+          "duration": 26.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48160.39999985695,
+          "duration": 15
+        },
+        {
+          "type": "render-frame",
+          "at": 48176.700000047684,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48221.5,
+          "duration": 44.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48230.700000047684,
+          "duration": 9.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48241,
+          "duration": 10.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48254.200000047684,
+          "duration": 13.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48271.39999985695,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48288.700000047684,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48307.700000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48320.39999985695,
+          "duration": 12.8
+        },
+        {
+          "type": "render-frame",
+          "at": 48341.5,
+          "duration": 21
+        },
+        {
+          "type": "render-frame",
+          "at": 48362.700000047684,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48378.200000047684,
+          "duration": 15.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48421.89999985695,
+          "duration": 43.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48441.5,
+          "duration": 19.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48457.09999990463,
+          "duration": 15.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48470.09999990463,
+          "duration": 13.1
+        },
+        {
+          "type": "render-frame",
+          "at": 48486.700000047684,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48503.200000047684,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48522.200000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48541.59999990463,
+          "duration": 19.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48583.799999952316,
+          "duration": 42.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48696.09999990463,
+          "duration": 112.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48818.799999952316,
+          "duration": 122.8
+        },
+        {
+          "type": "render-frame",
+          "at": 49203.39999985695,
+          "duration": 384.6
+        }
+      ]
+    },
+    {
+      "name": "ubiretama-ground",
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 450,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 59171.59999990463,
+        "calls": 395,
+        "triangles": 584064,
+        "geometries": 569,
+        "textures": 136,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 98124009,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 7344.200000047684,
+          "duration": 39.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7347.700000047684,
+          "duration": 3.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7355,
+          "duration": 7.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7371.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 7454.5,
+          "duration": 83
+        },
+        {
+          "type": "render-frame",
+          "at": 7459.700000047684,
+          "duration": 5.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7472.099999904633,
+          "duration": 12.4
+        },
+        {
+          "type": "render-frame",
+          "at": 7488.200000047684,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7504.899999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7521.599999904633,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7543.200000047684,
+          "duration": 21.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7554.899999856949,
+          "duration": 11.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7571.700000047684,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7592.799999952316,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7605.099999904633,
+          "duration": 12.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7622.099999904633,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 7638.799999952316,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7655.399999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7671.5,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7692.299999952316,
+          "duration": 20.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7704.899999856949,
+          "duration": 12.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48145.59999990463,
+          "duration": 26.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48160.39999985695,
+          "duration": 15
+        },
+        {
+          "type": "render-frame",
+          "at": 48176.700000047684,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48221.5,
+          "duration": 44.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48230.700000047684,
+          "duration": 9.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48241,
+          "duration": 10.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48254.200000047684,
+          "duration": 13.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48271.39999985695,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48288.700000047684,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48307.700000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48320.39999985695,
+          "duration": 12.8
+        },
+        {
+          "type": "render-frame",
+          "at": 48341.5,
+          "duration": 21
+        },
+        {
+          "type": "render-frame",
+          "at": 48362.700000047684,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48378.200000047684,
+          "duration": 15.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48421.89999985695,
+          "duration": 43.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48441.5,
+          "duration": 19.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48457.09999990463,
+          "duration": 15.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48470.09999990463,
+          "duration": 13.1
+        },
+        {
+          "type": "render-frame",
+          "at": 48486.700000047684,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48503.200000047684,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48522.200000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48541.59999990463,
+          "duration": 19.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48583.799999952316,
+          "duration": 42.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48696.09999990463,
+          "duration": 112.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48818.799999952316,
+          "duration": 122.8
+        },
+        {
+          "type": "render-frame",
+          "at": 49203.39999985695,
+          "duration": 384.6
+        }
+      ]
+    },
+    {
+      "name": "south-road-top",
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 453,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 60852.5,
+        "calls": 98,
+        "triangles": 335772,
+        "geometries": 569,
+        "textures": 136,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 97492990,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 7344.200000047684,
+          "duration": 39.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7347.700000047684,
+          "duration": 3.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7355,
+          "duration": 7.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7371.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 7454.5,
+          "duration": 83
+        },
+        {
+          "type": "render-frame",
+          "at": 7459.700000047684,
+          "duration": 5.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7472.099999904633,
+          "duration": 12.4
+        },
+        {
+          "type": "render-frame",
+          "at": 7488.200000047684,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7504.899999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7521.599999904633,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7543.200000047684,
+          "duration": 21.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7554.899999856949,
+          "duration": 11.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7571.700000047684,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7592.799999952316,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7605.099999904633,
+          "duration": 12.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7622.099999904633,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 7638.799999952316,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7655.399999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7671.5,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7692.299999952316,
+          "duration": 20.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7704.899999856949,
+          "duration": 12.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48145.59999990463,
+          "duration": 26.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48160.39999985695,
+          "duration": 15
+        },
+        {
+          "type": "render-frame",
+          "at": 48176.700000047684,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48221.5,
+          "duration": 44.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48230.700000047684,
+          "duration": 9.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48241,
+          "duration": 10.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48254.200000047684,
+          "duration": 13.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48271.39999985695,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48288.700000047684,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48307.700000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48320.39999985695,
+          "duration": 12.8
+        },
+        {
+          "type": "render-frame",
+          "at": 48341.5,
+          "duration": 21
+        },
+        {
+          "type": "render-frame",
+          "at": 48362.700000047684,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48378.200000047684,
+          "duration": 15.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48421.89999985695,
+          "duration": 43.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48441.5,
+          "duration": 19.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48457.09999990463,
+          "duration": 15.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48470.09999990463,
+          "duration": 13.1
+        },
+        {
+          "type": "render-frame",
+          "at": 48486.700000047684,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48503.200000047684,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48522.200000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48541.59999990463,
+          "duration": 19.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48583.799999952316,
+          "duration": 42.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48696.09999990463,
+          "duration": 112.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48818.799999952316,
+          "duration": 122.8
+        },
+        {
+          "type": "render-frame",
+          "at": 49203.39999985695,
+          "duration": 384.6
+        }
+      ]
+    },
+    {
+      "name": "south-road-oblique",
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 459,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 62429.299999952316,
+        "calls": 105,
+        "triangles": 370933,
+        "geometries": 570,
+        "textures": 136,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 98900324,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 7344.200000047684,
+          "duration": 39.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7347.700000047684,
+          "duration": 3.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7355,
+          "duration": 7.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7371.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 7454.5,
+          "duration": 83
+        },
+        {
+          "type": "render-frame",
+          "at": 7459.700000047684,
+          "duration": 5.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7472.099999904633,
+          "duration": 12.4
+        },
+        {
+          "type": "render-frame",
+          "at": 7488.200000047684,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7504.899999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7521.599999904633,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7543.200000047684,
+          "duration": 21.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7554.899999856949,
+          "duration": 11.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7571.700000047684,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7592.799999952316,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7605.099999904633,
+          "duration": 12.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7622.099999904633,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 7638.799999952316,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7655.399999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7671.5,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7692.299999952316,
+          "duration": 20.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7704.899999856949,
+          "duration": 12.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48145.59999990463,
+          "duration": 26.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48160.39999985695,
+          "duration": 15
+        },
+        {
+          "type": "render-frame",
+          "at": 48176.700000047684,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48221.5,
+          "duration": 44.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48230.700000047684,
+          "duration": 9.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48241,
+          "duration": 10.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48254.200000047684,
+          "duration": 13.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48271.39999985695,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48288.700000047684,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48307.700000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48320.39999985695,
+          "duration": 12.8
+        },
+        {
+          "type": "render-frame",
+          "at": 48341.5,
+          "duration": 21
+        },
+        {
+          "type": "render-frame",
+          "at": 48362.700000047684,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48378.200000047684,
+          "duration": 15.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48421.89999985695,
+          "duration": 43.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48441.5,
+          "duration": 19.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48457.09999990463,
+          "duration": 15.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48470.09999990463,
+          "duration": 13.1
+        },
+        {
+          "type": "render-frame",
+          "at": 48486.700000047684,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48503.200000047684,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48522.200000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48541.59999990463,
+          "duration": 19.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48583.799999952316,
+          "duration": 42.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48696.09999990463,
+          "duration": 112.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48818.799999952316,
+          "duration": 122.8
+        },
+        {
+          "type": "render-frame",
+          "at": 49203.39999985695,
+          "duration": 384.6
+        }
+      ]
+    },
+    {
+      "name": "south-road-ground",
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 459,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 64011.5,
+        "calls": 479,
+        "triangles": 793678,
+        "geometries": 573,
+        "textures": 136,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 99356878,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 7344.200000047684,
+          "duration": 39.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7347.700000047684,
+          "duration": 3.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7355,
+          "duration": 7.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7371.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 7454.5,
+          "duration": 83
+        },
+        {
+          "type": "render-frame",
+          "at": 7459.700000047684,
+          "duration": 5.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7472.099999904633,
+          "duration": 12.4
+        },
+        {
+          "type": "render-frame",
+          "at": 7488.200000047684,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7504.899999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7521.599999904633,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7543.200000047684,
+          "duration": 21.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7554.899999856949,
+          "duration": 11.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7571.700000047684,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7592.799999952316,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7605.099999904633,
+          "duration": 12.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7622.099999904633,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 7638.799999952316,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7655.399999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7671.5,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7692.299999952316,
+          "duration": 20.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7704.899999856949,
+          "duration": 12.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48145.59999990463,
+          "duration": 26.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48160.39999985695,
+          "duration": 15
+        },
+        {
+          "type": "render-frame",
+          "at": 48176.700000047684,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48221.5,
+          "duration": 44.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48230.700000047684,
+          "duration": 9.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48241,
+          "duration": 10.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48254.200000047684,
+          "duration": 13.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48271.39999985695,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48288.700000047684,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48307.700000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48320.39999985695,
+          "duration": 12.8
+        },
+        {
+          "type": "render-frame",
+          "at": 48341.5,
+          "duration": 21
+        },
+        {
+          "type": "render-frame",
+          "at": 48362.700000047684,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48378.200000047684,
+          "duration": 15.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48421.89999985695,
+          "duration": 43.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48441.5,
+          "duration": 19.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48457.09999990463,
+          "duration": 15.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48470.09999990463,
+          "duration": 13.1
+        },
+        {
+          "type": "render-frame",
+          "at": 48486.700000047684,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48503.200000047684,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48522.200000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48541.59999990463,
+          "duration": 19.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48583.799999952316,
+          "duration": 42.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48696.09999990463,
+          "duration": 112.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48818.799999952316,
+          "duration": 122.8
+        },
+        {
+          "type": "render-frame",
+          "at": 49203.39999985695,
+          "duration": 384.6
+        }
+      ]
+    },
+    {
+      "name": "p12-top",
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 468,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 68703.39999985695,
+        "calls": 114,
+        "triangles": 291668,
+        "geometries": 585,
+        "textures": 137,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 100919521,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 7344.200000047684,
+          "duration": 39.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7347.700000047684,
+          "duration": 3.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7355,
+          "duration": 7.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7371.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 7454.5,
+          "duration": 83
+        },
+        {
+          "type": "render-frame",
+          "at": 7459.700000047684,
+          "duration": 5.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7472.099999904633,
+          "duration": 12.4
+        },
+        {
+          "type": "render-frame",
+          "at": 7488.200000047684,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7504.899999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7521.599999904633,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7543.200000047684,
+          "duration": 21.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7554.899999856949,
+          "duration": 11.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7571.700000047684,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7592.799999952316,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7605.099999904633,
+          "duration": 12.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7622.099999904633,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 7638.799999952316,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7655.399999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7671.5,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7692.299999952316,
+          "duration": 20.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7704.899999856949,
+          "duration": 12.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48145.59999990463,
+          "duration": 26.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48160.39999985695,
+          "duration": 15
+        },
+        {
+          "type": "render-frame",
+          "at": 48176.700000047684,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48221.5,
+          "duration": 44.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48230.700000047684,
+          "duration": 9.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48241,
+          "duration": 10.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48254.200000047684,
+          "duration": 13.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48271.39999985695,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48288.700000047684,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48307.700000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48320.39999985695,
+          "duration": 12.8
+        },
+        {
+          "type": "render-frame",
+          "at": 48341.5,
+          "duration": 21
+        },
+        {
+          "type": "render-frame",
+          "at": 48362.700000047684,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48378.200000047684,
+          "duration": 15.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48421.89999985695,
+          "duration": 43.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48441.5,
+          "duration": 19.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48457.09999990463,
+          "duration": 15.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48470.09999990463,
+          "duration": 13.1
+        },
+        {
+          "type": "render-frame",
+          "at": 48486.700000047684,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48503.200000047684,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48522.200000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48541.59999990463,
+          "duration": 19.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48583.799999952316,
+          "duration": 42.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48696.09999990463,
+          "duration": 112.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48818.799999952316,
+          "duration": 122.8
+        },
+        {
+          "type": "render-frame",
+          "at": 49203.39999985695,
+          "duration": 384.6
+        }
+      ]
+    },
+    {
+      "name": "p12-oblique",
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 475,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 70268.29999995232,
+        "calls": 176,
+        "triangles": 359553,
+        "geometries": 590,
+        "textures": 138,
+        "programs": 243,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 101105389,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 7344.200000047684,
+          "duration": 39.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7347.700000047684,
+          "duration": 3.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7355,
+          "duration": 7.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7371.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 7454.5,
+          "duration": 83
+        },
+        {
+          "type": "render-frame",
+          "at": 7459.700000047684,
+          "duration": 5.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7472.099999904633,
+          "duration": 12.4
+        },
+        {
+          "type": "render-frame",
+          "at": 7488.200000047684,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7504.899999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7521.599999904633,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7543.200000047684,
+          "duration": 21.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7554.899999856949,
+          "duration": 11.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7571.700000047684,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7592.799999952316,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7605.099999904633,
+          "duration": 12.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7622.099999904633,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 7638.799999952316,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7655.399999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7671.5,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7692.299999952316,
+          "duration": 20.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7704.899999856949,
+          "duration": 12.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48145.59999990463,
+          "duration": 26.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48160.39999985695,
+          "duration": 15
+        },
+        {
+          "type": "render-frame",
+          "at": 48176.700000047684,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48221.5,
+          "duration": 44.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48230.700000047684,
+          "duration": 9.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48241,
+          "duration": 10.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48254.200000047684,
+          "duration": 13.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48271.39999985695,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48288.700000047684,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48307.700000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48320.39999985695,
+          "duration": 12.8
+        },
+        {
+          "type": "render-frame",
+          "at": 48341.5,
+          "duration": 21
+        },
+        {
+          "type": "render-frame",
+          "at": 48362.700000047684,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48378.200000047684,
+          "duration": 15.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48421.89999985695,
+          "duration": 43.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48441.5,
+          "duration": 19.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48457.09999990463,
+          "duration": 15.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48470.09999990463,
+          "duration": 13.1
+        },
+        {
+          "type": "render-frame",
+          "at": 48486.700000047684,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48503.200000047684,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48522.200000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48541.59999990463,
+          "duration": 19.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48583.799999952316,
+          "duration": 42.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48696.09999990463,
+          "duration": 112.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48818.799999952316,
+          "duration": 122.8
+        },
+        {
+          "type": "render-frame",
+          "at": 49203.39999985695,
+          "duration": 384.6
+        }
+      ]
+    },
+    {
+      "name": "p12-ground",
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 479,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 72373.20000004768,
+        "calls": 163,
+        "triangles": 352191,
+        "geometries": 593,
+        "textures": 138,
+        "programs": 243,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 100497546,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 7344.200000047684,
+          "duration": 39.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7347.700000047684,
+          "duration": 3.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7355,
+          "duration": 7.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7371.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 7454.5,
+          "duration": 83
+        },
+        {
+          "type": "render-frame",
+          "at": 7459.700000047684,
+          "duration": 5.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7472.099999904633,
+          "duration": 12.4
+        },
+        {
+          "type": "render-frame",
+          "at": 7488.200000047684,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7504.899999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7521.599999904633,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7543.200000047684,
+          "duration": 21.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7554.899999856949,
+          "duration": 11.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7571.700000047684,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 7592.799999952316,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 7605.099999904633,
+          "duration": 12.3
+        },
+        {
+          "type": "render-frame",
+          "at": 7622.099999904633,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 7638.799999952316,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 7655.399999856949,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7671.5,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 7692.299999952316,
+          "duration": 20.7
+        },
+        {
+          "type": "render-frame",
+          "at": 7704.899999856949,
+          "duration": 12.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48145.59999990463,
+          "duration": 26.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48160.39999985695,
+          "duration": 15
+        },
+        {
+          "type": "render-frame",
+          "at": 48176.700000047684,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48221.5,
+          "duration": 44.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48230.700000047684,
+          "duration": 9.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48241,
+          "duration": 10.3
+        },
+        {
+          "type": "render-frame",
+          "at": 48254.200000047684,
+          "duration": 13.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48271.39999985695,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48288.700000047684,
+          "duration": 17.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48307.700000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48320.39999985695,
+          "duration": 12.8
+        },
+        {
+          "type": "render-frame",
+          "at": 48341.5,
+          "duration": 21
+        },
+        {
+          "type": "render-frame",
+          "at": 48362.700000047684,
+          "duration": 21.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48378.200000047684,
+          "duration": 15.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48421.89999985695,
+          "duration": 43.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48441.5,
+          "duration": 19.9
+        },
+        {
+          "type": "render-frame",
+          "at": 48457.09999990463,
+          "duration": 15.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48470.09999990463,
+          "duration": 13.1
+        },
+        {
+          "type": "render-frame",
+          "at": 48486.700000047684,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 48503.200000047684,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 48522.200000047684,
+          "duration": 19
+        },
+        {
+          "type": "render-frame",
+          "at": 48541.59999990463,
+          "duration": 19.4
+        },
+        {
+          "type": "render-frame",
+          "at": 48583.799999952316,
+          "duration": 42.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48696.09999990463,
+          "duration": 112.2
+        },
+        {
+          "type": "render-frame",
+          "at": 48818.799999952316,
+          "duration": 122.8
+        },
+        {
+          "type": "render-frame",
+          "at": 49203.39999985695,
+          "duration": 384.6
+        }
+      ]
+    },
+    {
+      "name": "gate9-top",
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 238,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 85191.60000014305,
+        "calls": 96,
+        "triangles": 344719,
+        "geometries": 567,
+        "textures": 136,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 101684447,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 83663,
+          "duration": 27.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83669.29999995232,
+          "duration": 6.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83682.70000004768,
+          "duration": 13.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83693.40000009537,
+          "duration": 10.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83709.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83726.40000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83743.29999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83759.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83777,
+          "duration": 17.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83793,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 83809.79999995232,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83826.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83843.29999995232,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83859.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83876.40000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83893.20000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 83909.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83926.5,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83943.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 83960.10000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83976.20000004768,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83993,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84009.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84026.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84043.10000014305,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84059.70000004768,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84076.60000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84092.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84109.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84126.90000009537,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84143.5,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84159.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84176.5,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84192.90000009537,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84210,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84226.20000004768,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84243.60000014305,
+          "duration": 17.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84260.10000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84276.29999995232,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 84292.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84309.70000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84326.20000004768,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84342.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84359.60000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84376.70000004768,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84392.90000009537,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84410.29999995232,
+          "duration": 17.4
+        }
+      ]
+    },
+    {
+      "name": "gate9-oblique",
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 290,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 86707.90000009537,
+        "calls": 93,
+        "triangles": 341673,
+        "geometries": 568,
+        "textures": 136,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 105224138,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 83663,
+          "duration": 27.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83669.29999995232,
+          "duration": 6.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83682.70000004768,
+          "duration": 13.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83693.40000009537,
+          "duration": 10.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83709.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83726.40000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83743.29999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83759.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83777,
+          "duration": 17.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83793,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 83809.79999995232,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83826.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83843.29999995232,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83859.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83876.40000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83893.20000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 83909.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83926.5,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83943.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 83960.10000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83976.20000004768,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83993,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84009.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84026.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84043.10000014305,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84059.70000004768,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84076.60000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84092.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84109.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84126.90000009537,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84143.5,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84159.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84176.5,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84192.90000009537,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84210,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84226.20000004768,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84243.60000014305,
+          "duration": 17.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84260.10000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84276.29999995232,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 84292.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84309.70000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84326.20000004768,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84342.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84359.60000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84376.70000004768,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84392.90000009537,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84410.29999995232,
+          "duration": 17.4
+        }
+      ]
+    },
+    {
+      "name": "gate9-ground",
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 294,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 88250.40000009537,
+        "calls": 431,
+        "triangles": 722300,
+        "geometries": 568,
+        "textures": 136,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 106472463,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 83663,
+          "duration": 27.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83669.29999995232,
+          "duration": 6.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83682.70000004768,
+          "duration": 13.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83693.40000009537,
+          "duration": 10.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83709.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83726.40000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83743.29999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83759.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83777,
+          "duration": 17.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83793,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 83809.79999995232,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83826.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83843.29999995232,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83859.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83876.40000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83893.20000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 83909.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83926.5,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83943.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 83960.10000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83976.20000004768,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83993,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84009.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84026.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84043.10000014305,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84059.70000004768,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84076.60000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84092.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84109.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84126.90000009537,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84143.5,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84159.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84176.5,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84192.90000009537,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84210,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84226.20000004768,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84243.60000014305,
+          "duration": 17.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84260.10000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84276.29999995232,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 84292.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84309.70000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84326.20000004768,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84342.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84359.60000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84376.70000004768,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84392.90000009537,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84410.29999995232,
+          "duration": 17.4
+        }
+      ]
+    },
+    {
+      "name": "tower-oblique",
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 296,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 89801.20000004768,
+        "calls": 125,
+        "triangles": 356433,
+        "geometries": 571,
+        "textures": 136,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 109012964,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 83663,
+          "duration": 27.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83669.29999995232,
+          "duration": 6.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83682.70000004768,
+          "duration": 13.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83693.40000009537,
+          "duration": 10.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83709.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83726.40000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83743.29999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83759.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83777,
+          "duration": 17.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83793,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 83809.79999995232,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83826.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83843.29999995232,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83859.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83876.40000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83893.20000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 83909.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83926.5,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83943.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 83960.10000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83976.20000004768,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83993,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84009.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84026.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84043.10000014305,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84059.70000004768,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84076.60000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84092.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84109.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84126.90000009537,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84143.5,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84159.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84176.5,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84192.90000009537,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84210,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84226.20000004768,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84243.60000014305,
+          "duration": 17.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84260.10000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84276.29999995232,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 84292.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84309.70000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84326.20000004768,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84342.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84359.60000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84376.70000004768,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84392.90000009537,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84410.29999995232,
+          "duration": 17.4
+        }
+      ]
+    },
+    {
+      "name": "tower-ground",
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 303,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 101443.70000004768,
+        "calls": 96,
+        "triangles": 341351,
+        "geometries": 572,
+        "textures": 136,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 97798944,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 83663,
+          "duration": 27.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83669.29999995232,
+          "duration": 6.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83682.70000004768,
+          "duration": 13.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83693.40000009537,
+          "duration": 10.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83709.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83726.40000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83743.29999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83759.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83777,
+          "duration": 17.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83793,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 83809.79999995232,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83826.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83843.29999995232,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83859.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83876.40000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83893.20000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 83909.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83926.5,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83943.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 83960.10000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83976.20000004768,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83993,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84009.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84026.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84043.10000014305,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84059.70000004768,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84076.60000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84092.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84109.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84126.90000009537,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84143.5,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84159.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84176.5,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84192.90000009537,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84210,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84226.20000004768,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84243.60000014305,
+          "duration": 17.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84260.10000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84276.29999995232,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 84292.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84309.70000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84326.20000004768,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84342.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84359.60000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84376.70000004768,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84392.90000009537,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84410.29999995232,
+          "duration": 17.4
+        }
+      ]
+    }
+  ],
+  "gate9Meshes": [
+    {
+      "pdf": [
+        3996,
+        1325
+      ],
+      "local": [
+        14.094545454545454,
+        -36.00000018072289
+      ],
+      "meshes": [
+        {
+          "name": "",
+          "ancestors": [
+            "",
+            ""
+          ],
+          "heights": [
+            -0.08
+          ],
+          "color": "b8c9b0",
+          "transparent": false,
+          "triangles": 2
+        },
+        {
+          "name": "",
+          "ancestors": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "heights": [
+            0,
+            0.032
+          ],
+          "color": "4b5054",
+          "transparent": false,
+          "triangles": 1532
+        }
+      ]
+    },
+    {
+      "pdf": [
+        3991,
+        1462
+      ],
+      "local": [
+        13.985454545454544,
+        -33.010909256626505
+      ],
+      "meshes": [
+        {
+          "name": "",
+          "ancestors": [
+            "",
+            ""
+          ],
+          "heights": [
+            -0.08
+          ],
+          "color": "b8c9b0",
+          "transparent": false,
+          "triangles": 2
+        },
+        {
+          "name": "",
+          "ancestors": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "heights": [
+            0,
+            0.032
+          ],
+          "color": "4b5054",
+          "transparent": false,
+          "triangles": 1532
+        },
+        {
+          "name": "",
+          "ancestors": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "heights": [
+            0.033
+          ],
+          "color": "34393d",
+          "transparent": true,
+          "triangles": 280
+        }
+      ]
+    },
+    {
+      "pdf": [
+        3987,
+        1645
+      ],
+      "local": [
+        13.898181818181826,
+        -29.018181963855422
+      ],
+      "meshes": [
+        {
+          "name": "",
+          "ancestors": [
+            "",
+            ""
+          ],
+          "heights": [
+            -0.08
+          ],
+          "color": "b8c9b0",
+          "transparent": false,
+          "triangles": 2
+        },
+        {
+          "name": "",
+          "ancestors": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "heights": [
+            0,
+            0.032
+          ],
+          "color": "4b5054",
+          "transparent": false,
+          "triangles": 1532
+        },
+        {
+          "name": "",
+          "ancestors": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "heights": [
+            0.033
+          ],
+          "color": "34393d",
+          "transparent": true,
+          "triangles": 280
+        }
+      ]
+    },
+    {
+      "pdf": [
+        3984,
+        1744
+      ],
+      "local": [
+        13.832727272727283,
+        -26.85818195301205
+      ],
+      "meshes": [
+        {
+          "name": "",
+          "ancestors": [
+            "",
+            ""
+          ],
+          "heights": [
+            -0.08
+          ],
+          "color": "b8c9b0",
+          "transparent": false,
+          "triangles": 2
+        },
+        {
+          "name": "",
+          "ancestors": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "heights": [
+            0,
+            0.032
+          ],
+          "color": "4b5054",
+          "transparent": false,
+          "triangles": 1532
+        },
+        {
+          "name": "",
+          "ancestors": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "heights": [
+            0.0345
+          ],
+          "color": "4b5054",
+          "transparent": false,
+          "triangles": 104
+        }
+      ]
+    }
+  ],
+  "reduced": {
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 303,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "renderer": {
+      "at": 103614.40000009537,
+      "calls": 526,
+      "triangles": 747206,
+      "geometries": 584,
+      "textures": 137,
+      "programs": 242,
+      "dpr": 1,
+      "width": 390,
+      "height": 844,
+      "heapBytes": 99115696,
+      "qualityTier": "HIGH",
+      "gpuVendor": "Google Inc. (Intel)",
+      "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "identity": {
+      "canvasMounts": 1,
+      "rendererCreates": 1,
+      "controlsCreates": 1,
+      "activeCanvases": 1,
+      "activeControls": 1
+    },
+    "inventory": {
+      "entities": 1585,
+      "presentedEntities": 384,
+      "lots": 1470,
+      "commercialTrees": 273,
+      "presentedCommercialTrees": 273
+    },
+    "frameTimes": [
+      {
+        "type": "render-frame",
+        "at": 83663,
+        "duration": 27.7
+      },
+      {
+        "type": "render-frame",
+        "at": 83669.29999995232,
+        "duration": 6.6
+      },
+      {
+        "type": "render-frame",
+        "at": 83682.70000004768,
+        "duration": 13.3
+      },
+      {
+        "type": "render-frame",
+        "at": 83693.40000009537,
+        "duration": 10.7
+      },
+      {
+        "type": "render-frame",
+        "at": 83709.70000004768,
+        "duration": 16.4
+      },
+      {
+        "type": "render-frame",
+        "at": 83726.40000009537,
+        "duration": 16.6
+      },
+      {
+        "type": "render-frame",
+        "at": 83743.29999995232,
+        "duration": 17
+      },
+      {
+        "type": "render-frame",
+        "at": 83759.70000004768,
+        "duration": 16.4
+      },
+      {
+        "type": "render-frame",
+        "at": 83777,
+        "duration": 17.1
+      },
+      {
+        "type": "render-frame",
+        "at": 83793,
+        "duration": 16.2
+      },
+      {
+        "type": "render-frame",
+        "at": 83809.79999995232,
+        "duration": 16.7
+      },
+      {
+        "type": "render-frame",
+        "at": 83826.79999995232,
+        "duration": 17
+      },
+      {
+        "type": "render-frame",
+        "at": 83843.29999995232,
+        "duration": 16.6
+      },
+      {
+        "type": "render-frame",
+        "at": 83859.60000014305,
+        "duration": 16.3
+      },
+      {
+        "type": "render-frame",
+        "at": 83876.40000009537,
+        "duration": 16.7
+      },
+      {
+        "type": "render-frame",
+        "at": 83893.20000004768,
+        "duration": 16.9
+      },
+      {
+        "type": "render-frame",
+        "at": 83909.90000009537,
+        "duration": 16.6
+      },
+      {
+        "type": "render-frame",
+        "at": 83926.5,
+        "duration": 16.7
+      },
+      {
+        "type": "render-frame",
+        "at": 83943.29999995232,
+        "duration": 16.8
+      },
+      {
+        "type": "render-frame",
+        "at": 83960.10000014305,
+        "duration": 16.7
+      },
+      {
+        "type": "render-frame",
+        "at": 83976.20000004768,
+        "duration": 16.1
+      },
+      {
+        "type": "render-frame",
+        "at": 83993,
+        "duration": 16.9
+      },
+      {
+        "type": "render-frame",
+        "at": 84009.5,
+        "duration": 16.5
+      },
+      {
+        "type": "render-frame",
+        "at": 84026.29999995232,
+        "duration": 16.8
+      },
+      {
+        "type": "render-frame",
+        "at": 84043.10000014305,
+        "duration": 16.8
+      },
+      {
+        "type": "render-frame",
+        "at": 84059.70000004768,
+        "duration": 16.6
+      },
+      {
+        "type": "render-frame",
+        "at": 84076.60000014305,
+        "duration": 16.4
+      },
+      {
+        "type": "render-frame",
+        "at": 84092.90000009537,
+        "duration": 16.7
+      },
+      {
+        "type": "render-frame",
+        "at": 84109.79999995232,
+        "duration": 17
+      },
+      {
+        "type": "render-frame",
+        "at": 84126.90000009537,
+        "duration": 17
+      },
+      {
+        "type": "render-frame",
+        "at": 84143.5,
+        "duration": 16.4
+      },
+      {
+        "type": "render-frame",
+        "at": 84159.60000014305,
+        "duration": 16.3
+      },
+      {
+        "type": "render-frame",
+        "at": 84176.5,
+        "duration": 16.9
+      },
+      {
+        "type": "render-frame",
+        "at": 84192.90000009537,
+        "duration": 16.5
+      },
+      {
+        "type": "render-frame",
+        "at": 84210,
+        "duration": 17
+      },
+      {
+        "type": "render-frame",
+        "at": 84226.20000004768,
+        "duration": 16.3
+      },
+      {
+        "type": "render-frame",
+        "at": 84243.60000014305,
+        "duration": 17.4
+      },
+      {
+        "type": "render-frame",
+        "at": 84260.10000014305,
+        "duration": 16.4
+      },
+      {
+        "type": "render-frame",
+        "at": 84276.29999995232,
+        "duration": 16.2
+      },
+      {
+        "type": "render-frame",
+        "at": 84292.90000009537,
+        "duration": 16.6
+      },
+      {
+        "type": "render-frame",
+        "at": 84309.70000004768,
+        "duration": 16.9
+      },
+      {
+        "type": "render-frame",
+        "at": 84326.20000004768,
+        "duration": 16.5
+      },
+      {
+        "type": "render-frame",
+        "at": 84342.90000009537,
+        "duration": 16.7
+      },
+      {
+        "type": "render-frame",
+        "at": 84359.60000014305,
+        "duration": 16.7
+      },
+      {
+        "type": "render-frame",
+        "at": 84376.70000004768,
+        "duration": 17
+      },
+      {
+        "type": "render-frame",
+        "at": 84392.90000009537,
+        "duration": 16.3
+      },
+      {
+        "type": "render-frame",
+        "at": 84410.29999995232,
+        "duration": 17.4
+      }
+    ]
+  },
+  "warmCycles": [
+    {
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 309,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 106042.90000009537,
+        "calls": 163,
+        "triangles": 352191,
+        "geometries": 584,
+        "textures": 137,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 100106862,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 83663,
+          "duration": 27.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83669.29999995232,
+          "duration": 6.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83682.70000004768,
+          "duration": 13.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83693.40000009537,
+          "duration": 10.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83709.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83726.40000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83743.29999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83759.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83777,
+          "duration": 17.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83793,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 83809.79999995232,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83826.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83843.29999995232,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83859.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83876.40000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83893.20000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 83909.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83926.5,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83943.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 83960.10000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83976.20000004768,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83993,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84009.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84026.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84043.10000014305,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84059.70000004768,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84076.60000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84092.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84109.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84126.90000009537,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84143.5,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84159.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84176.5,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84192.90000009537,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84210,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84226.20000004768,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84243.60000014305,
+          "duration": 17.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84260.10000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84276.29999995232,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 84292.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84309.70000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84326.20000004768,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84342.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84359.60000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84376.70000004768,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84392.90000009537,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84410.29999995232,
+          "duration": 17.4
+        }
+      ]
+    },
+    {
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 314,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 108475,
+        "calls": 163,
+        "triangles": 352191,
+        "geometries": 584,
+        "textures": 137,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 100794964,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 83663,
+          "duration": 27.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83669.29999995232,
+          "duration": 6.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83682.70000004768,
+          "duration": 13.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83693.40000009537,
+          "duration": 10.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83709.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83726.40000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83743.29999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83759.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83777,
+          "duration": 17.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83793,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 83809.79999995232,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83826.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83843.29999995232,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83859.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83876.40000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83893.20000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 83909.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83926.5,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83943.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 83960.10000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83976.20000004768,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83993,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84009.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84026.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84043.10000014305,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84059.70000004768,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84076.60000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84092.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84109.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84126.90000009537,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84143.5,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84159.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84176.5,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84192.90000009537,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84210,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84226.20000004768,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84243.60000014305,
+          "duration": 17.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84260.10000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84276.29999995232,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 84292.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84309.70000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84326.20000004768,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84342.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84359.60000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84376.70000004768,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84392.90000009537,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84410.29999995232,
+          "duration": 17.4
+        }
+      ]
+    },
+    {
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 319,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "renderer": {
+        "at": 110917.70000004768,
+        "calls": 163,
+        "triangles": 352191,
+        "geometries": 584,
+        "textures": 137,
+        "programs": 242,
+        "dpr": 1,
+        "width": 390,
+        "height": 844,
+        "heapBytes": 98391384,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "identity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "inventory": {
+        "entities": 1585,
+        "presentedEntities": 384,
+        "lots": 1470,
+        "commercialTrees": 273,
+        "presentedCommercialTrees": 273
+      },
+      "frameTimes": [
+        {
+          "type": "render-frame",
+          "at": 83663,
+          "duration": 27.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83669.29999995232,
+          "duration": 6.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83682.70000004768,
+          "duration": 13.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83693.40000009537,
+          "duration": 10.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83709.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83726.40000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83743.29999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83759.70000004768,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 83777,
+          "duration": 17.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83793,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 83809.79999995232,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83826.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 83843.29999995232,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83859.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 83876.40000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83893.20000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 83909.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 83926.5,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83943.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 83960.10000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 83976.20000004768,
+          "duration": 16.1
+        },
+        {
+          "type": "render-frame",
+          "at": 83993,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84009.5,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84026.29999995232,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84043.10000014305,
+          "duration": 16.8
+        },
+        {
+          "type": "render-frame",
+          "at": 84059.70000004768,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84076.60000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84092.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84109.79999995232,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84126.90000009537,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84143.5,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84159.60000014305,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84176.5,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84192.90000009537,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84210,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84226.20000004768,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84243.60000014305,
+          "duration": 17.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84260.10000014305,
+          "duration": 16.4
+        },
+        {
+          "type": "render-frame",
+          "at": 84276.29999995232,
+          "duration": 16.2
+        },
+        {
+          "type": "render-frame",
+          "at": 84292.90000009537,
+          "duration": 16.6
+        },
+        {
+          "type": "render-frame",
+          "at": 84309.70000004768,
+          "duration": 16.9
+        },
+        {
+          "type": "render-frame",
+          "at": 84326.20000004768,
+          "duration": 16.5
+        },
+        {
+          "type": "render-frame",
+          "at": 84342.90000009537,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84359.60000014305,
+          "duration": 16.7
+        },
+        {
+          "type": "render-frame",
+          "at": 84376.70000004768,
+          "duration": 17
+        },
+        {
+          "type": "render-frame",
+          "at": 84392.90000009537,
+          "duration": 16.3
+        },
+        {
+          "type": "render-frame",
+          "at": 84410.29999995232,
+          "duration": 17.4
+        }
+      ]
+    }
+  ]
+}

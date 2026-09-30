@@ -31,6 +31,7 @@ import {
 } from '@/features/commercial-map/data/rearParkingVegetation';
 import { scopeCommercialMapData } from '@/features/commercial-map/utils/areaScope';
 import { naturalParkingGroundElevationAt } from '@/features/commercial-map/utils/naturalParkingGround';
+import { withPavilion12TreeGroundSupport } from '@/features/commercial-map/data/pavilion12FrontTrees';
 import type { Coordinate, MapEntity } from '@/features/commercial-map/types';
 
 const EPSILON = 1e-6;
@@ -311,7 +312,7 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
     const lotEntities = OFFICIAL_REFERENCE_DATA.entities.filter(
       (entity) => entity.classification === 'SELLABLE_LOT',
     );
-    const pedestrianPaths = OFFICIAL_REFERENCE_DATA.entities.filter(
+    const pedestrianPaths = withPavilion12TreeGroundSupport(OFFICIAL_REFERENCE_DATA.entities, true).filter(
       (entity) => entity.classification === 'PEDESTRIAN_PATH',
     );
     const roads = OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.classification === 'ROAD');

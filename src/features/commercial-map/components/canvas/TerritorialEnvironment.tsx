@@ -30,6 +30,7 @@ import {
   finishExteriorPatch,
 } from "../../utils/exteriorSurfaceMaterials";
 import { buildExteriorFishingScene } from "../../utils/exteriorFishing";
+import { isUbiretamaPresentationSegment, type UbiretamaRoadPresentation } from '../../utils/ubiretamaRoadPresentation';
 
 const NO_RAYCAST = () => undefined;
 interface Instance {
@@ -38,7 +39,7 @@ interface Instance {
   rotation: number;
   color: string;
 }
-function buildTerritorialScene(vegetationEnabled = true) {
+function buildTerritorialScene(vegetationEnabled = true, ubiretamaPresentation?: UbiretamaRoadPresentation | null) {
   const group = new THREE.Group();
   group.name = "territorial-environment";
   const box = new THREE.BoxGeometry(1, 1, 1);
@@ -95,7 +96,7 @@ function buildTerritorialScene(vegetationEnabled = true) {
     if (b.kind === "house") {
       const planted = offset(-w * 0.53, d * 0.66, 0.1);
       if (
-        shrub && territoryRoadClearance([planted[0], planted[2]]) > 0.3 &&
+        shrub && territoryRoadClearance([planted[0], planted[2]], ubiretamaPresentation) > 0.3 &&
         !TERRITORY_TREES.some(
           (t) =>
             Math.hypot(t.center[0] - planted[0], t.center[1] - planted[2]) <
@@ -198,7 +199,7 @@ function buildTerritorialScene(vegetationEnabled = true) {
   });
   const grounds: THREE.BufferGeometry[] = [];
   const water: THREE.BufferGeometry[] = [];
-  const groundRoads = UNIFIED_TERRITORY_ROADS.map((r) => ({
+  const groundRoads = UNIFIED_TERRITORY_ROADS.filter(r => !(ubiretamaPresentation && isUbiretamaPresentationSegment(r.id))).map((r) => ({
     road: r,
     points: sampleTerritoryRoad(r),
   }));
@@ -234,7 +235,7 @@ function buildTerritorialScene(vegetationEnabled = true) {
         .map(({ road, points }) =>
           corridorPolygon(points, road.width + road.shoulder * 2),
         );
-      polygon = polygonClipping.difference(polygon, ...later, ...roads);
+      polygon = polygonClipping.difference(polygon, ...later, ...roads, ...(ubiretamaPresentation ? [ubiretamaPresentation.groundFootprint] : []));
     }
     let geometry = territoryPolygonGeometry(
       polygon,
@@ -279,9 +280,11 @@ function buildTerritorialScene(vegetationEnabled = true) {
 export const TerritorialEnvironment = memo(function TerritorialEnvironment({
   reducedGraphics = false,
   vegetationVisible = true,
+  ubiretamaPresentation,
 }: {
   reducedGraphics?: boolean;
   vegetationVisible?: boolean;
+  ubiretamaPresentation?: UbiretamaRoadPresentation | null;
 }) {
   const vegetationEnabled = useSceneVegetationEnabled();
   const treesVisible = useCommercialMapStore((s) => s.treesVisible);
@@ -298,7 +301,7 @@ export const TerritorialEnvironment = memo(function TerritorialEnvironment({
     },
     [],
   );
-  const plan = useMemo(() => buildTerritorialScene(vegetationEnabled), [vegetationEnabled]);
+  const plan = useMemo(() => buildTerritorialScene(vegetationEnabled, ubiretamaPresentation), [vegetationEnabled, ubiretamaPresentation]);
   useEffect(() => () => plan.dispose(), [plan]);
   useEffect(
     () => () => {

@@ -1,0 +1,315 @@
+{
+  "generatedAt": "2026-09-30T06:08:46.064Z",
+  "runner": "npx vitest run --maxWorkers=2 --testTimeout=60000 (26 selected files)",
+  "exitCode": 1,
+  "summary": {
+    "files": 26,
+    "passedFiles": 23,
+    "failedFiles": 3,
+    "tests": 198,
+    "passed": 195,
+    "failed": 3,
+    "skipped": 0,
+    "durationMs": 217086
+  },
+  "newSummary": {
+    "files": 6,
+    "tests": 52,
+    "passed": 52,
+    "failed": 0
+  },
+  "files": [
+    {
+      "file": "src/test/commercialMapContextualControls.test.tsx",
+      "isNew": false,
+      "status": "passed",
+      "tests": 8,
+      "passed": 8,
+      "failed": 0,
+      "durationMs": 3304.225341796875,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapContinuousGround.test.ts",
+      "isNew": false,
+      "status": "passed",
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "durationMs": 7.6669921875,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapControlRail.test.tsx",
+      "isNew": false,
+      "status": "passed",
+      "tests": 12,
+      "passed": 12,
+      "failed": 0,
+      "durationMs": 2250.362060546875,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapExporuralSouthRoad.test.ts",
+      "isNew": true,
+      "status": "passed",
+      "tests": 14,
+      "passed": 14,
+      "failed": 0,
+      "durationMs": 12386.4453125,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapGateNineAccessPresentation.test.ts",
+      "isNew": true,
+      "status": "passed",
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "durationMs": 3336.021484375,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapGateNineCommunicationTower.test.ts",
+      "isNew": true,
+      "status": "passed",
+      "tests": 8,
+      "passed": 8,
+      "failed": 0,
+      "durationMs": 4239.40380859375,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapHeaderTools.test.tsx",
+      "isNew": false,
+      "status": "passed",
+      "tests": 8,
+      "passed": 8,
+      "failed": 0,
+      "durationMs": 1592.676513671875,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapInteriorGround.test.ts",
+      "isNew": false,
+      "status": "passed",
+      "tests": 7,
+      "passed": 7,
+      "failed": 0,
+      "durationMs": 1147.813720703125,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapInternalVegetationScope.test.ts",
+      "isNew": false,
+      "status": "passed",
+      "tests": 7,
+      "passed": 7,
+      "failed": 0,
+      "durationMs": 345.34130859375,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapOpenGroundTextures.test.ts",
+      "isNew": false,
+      "status": "passed",
+      "tests": 12,
+      "passed": 12,
+      "failed": 0,
+      "durationMs": 622.834716796875,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapParkAccessEnvironment.test.ts",
+      "isNew": false,
+      "status": "passed",
+      "tests": 11,
+      "passed": 11,
+      "failed": 0,
+      "durationMs": 619.3330078125,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapPavilion12FrontTrees.test.ts",
+      "isNew": true,
+      "status": "passed",
+      "tests": 9,
+      "passed": 9,
+      "failed": 0,
+      "durationMs": 3337.040771484375,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapPavilion12PlanPresentation.test.ts",
+      "isNew": false,
+      "status": "failed",
+      "tests": 5,
+      "passed": 4,
+      "failed": 1,
+      "durationMs": 42.108642578125,
+      "failures": [
+        {
+          "name": "planta comercial fixa do Pavilhão 12 mantém lotes planos, seleção comercial e atlas numérico único",
+          "reason": "AssertionError: expected 'import { memo, useCallback, useEffect…' to contain 'const heightScale = flatModules ? 1'"
+        }
+      ]
+    },
+    {
+      "file": "src/test/commercialMapRain.test.ts",
+      "isNew": false,
+      "status": "passed",
+      "tests": 6,
+      "passed": 6,
+      "failed": 0,
+      "durationMs": 167.874267578125,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapRearRoadGround.test.ts",
+      "isNew": false,
+      "status": "passed",
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "durationMs": 187.230224609375,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapRearRoadTreeClearance.test.ts",
+      "isNew": false,
+      "status": "failed",
+      "tests": 5,
+      "passed": 4,
+      "failed": 1,
+      "durationMs": 3888.2255859375,
+      "failures": [
+        {
+          "name": "rear-road rendered vegetation clearance clears only the official poles still crossed by the corrected roads without changing records or links",
+          "reason": "AssertionError: expected [ 'pole-ref-145', …(11) ] to deeply equal [ 'pole-ref-056', …(17) ]"
+        }
+      ]
+    },
+    {
+      "file": "src/test/commercialMapRoadInfrastructure.test.ts",
+      "isNew": false,
+      "status": "passed",
+      "tests": 10,
+      "passed": 10,
+      "failed": 0,
+      "durationMs": 1152.656494140625,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapRoadPrecision.test.ts",
+      "isNew": false,
+      "status": "failed",
+      "tests": 7,
+      "passed": 6,
+      "failed": 1,
+      "durationMs": 10319.296142578125,
+      "failures": [
+        {
+          "name": "September 13 precision road correction preserves every complete official record except the explicitly shortened road",
+          "reason": "AssertionError: expected [ { …(15) }, { …(15) }, …(1576) ] to have a length of 1692 but got 1578"
+        }
+      ]
+    },
+    {
+      "file": "src/test/commercialMapRoadSurfaceOwnership.test.ts",
+      "isNew": false,
+      "status": "passed",
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "durationMs": 56.370361328125,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapTreeControls.test.tsx",
+      "isNew": false,
+      "status": "passed",
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "durationMs": 1096.23876953125,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapTrees.test.ts",
+      "isNew": false,
+      "status": "passed",
+      "tests": 13,
+      "passed": 13,
+      "failed": 0,
+      "durationMs": 1112.65380859375,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapUbiretamaPresentation.test.ts",
+      "isNew": true,
+      "status": "passed",
+      "tests": 12,
+      "passed": 12,
+      "failed": 0,
+      "durationMs": 21513.63623046875,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapUbiretamaVisitTrees.test.ts",
+      "isNew": true,
+      "status": "passed",
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "durationMs": 7084.048828125,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapVisitCollision.test.ts",
+      "isNew": false,
+      "status": "passed",
+      "tests": 11,
+      "passed": 11,
+      "failed": 0,
+      "durationMs": 2108.3642578125,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapVisitGroundContact.test.ts",
+      "isNew": false,
+      "status": "passed",
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "durationMs": 11.228759765625,
+      "failures": []
+    },
+    {
+      "file": "src/test/commercialMapVisitSiteGround.test.ts",
+      "isNew": false,
+      "status": "passed",
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "durationMs": 3372.0107421875,
+      "failures": []
+    }
+  ],
+  "knownBaselineFailures": [
+    {
+      "file": "src/test/commercialMapRoadPrecision.test.ts",
+      "reason": "Inventory count expected 1692, baseline/current count 1578",
+      "verifiedBy": "Original directed baseline run before functional changes"
+    },
+    {
+      "file": "src/test/commercialMapRearRoadTreeClearance.test.ts",
+      "reason": "Official electrical pole ID set differs from hard-coded assertion",
+      "verifiedBy": "Original directed baseline run before functional changes"
+    },
+    {
+      "file": "src/test/commercialMapPavilion12PlanPresentation.test.ts",
+      "reason": "Expected module-layer source literal is absent at baseline and current",
+      "verifiedBy": "pavilion12-plan-baseline-failure.json (same normalized source and test SHA-256)"
+    }
+  ]
+}

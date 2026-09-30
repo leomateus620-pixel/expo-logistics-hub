@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { INTERNAL_GROUND_OWNERSHIP_RINGS } from '../data/internalGroundCoverage';
 import { COMMERCIAL_MAP_TREES } from '../data/commercialTrees';
+import { isPavilion12FrontTreeId } from '../data/pavilion12FrontTrees';
 import { OFFICIAL_REFERENCE_DATA } from '../data/officialReference2026';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../data/parkAccessSpatialPlan';
 import { PAVILION_COURTYARD } from '../data/pavilionCourtyard';
@@ -33,7 +34,7 @@ const authoredInteriorEdgeAreas = new Set([
 ]);
 const pointKey = (point: readonly [number, number]) => `${point[0].toFixed(4)}:${point[1].toFixed(4)}`;
 const authoredInteriorTreePoints = new Set([...COMMERCIAL_MAP_TREES
-  .filter(tree => authoredInteriorEdgeAreas.has(tree.area))
+  .filter(tree => authoredInteriorEdgeAreas.has(tree.area) || isPavilion12FrontTreeId(tree.id))
   .map(tree => pointKey(tree.position)),
   // These five deterministic points belong to the authored B22 approach,
   // including its planted collars. The outer Costeiros road bands stay out.

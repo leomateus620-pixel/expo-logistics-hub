@@ -27,10 +27,11 @@ const localCorrectionIds = new Set([
   'tree-i-01', 'tree-i-02', 'tree-i-03', 'tree-i-04', 'tree-i-05', 'tree-i-06', 'tree-i-08',
   'tree-j-04', 'tree-j-05', 'tree-j-06', 'tree-j-07', 'tree-j-08',
   'tree-pavilions-1-14-56', 'tree-pavilions-1-14-57', 'tree-pavilions-1-14-58',
+  'tree-i-13', 'tree-i-14', 'tree-i-15',
 ]);
 
 describe('internal park vegetation scope and immutable spatial inventory', () => {
-  it('preserves all 274 canonical IDs and only relocates the 15 authorized frontage/gate trees', () => {
+  it('preserves all 274 canonical IDs and only relocates the 18 authorized frontage/gate trees', () => {
     expect(baseline.base).toBe('9ddda43f');
     expect(COMMERCIAL_MAP_TREES.map(tree => tree.id)).toEqual(baseline.canonicalTrees.map(tree => tree.id));
     expect(COMMERCIAL_MAP_TREES).toHaveLength(274);
@@ -50,7 +51,7 @@ describe('internal park vegetation scope and immutable spatial inventory', () =>
         expect(tree.previousSourcePosition, tree.id).toBeUndefined();
       }
     }
-    expect(COMMERCIAL_MAP_TREES.filter(tree => tree.previousSourcePosition)).toHaveLength(15);
+    expect(COMMERCIAL_MAP_TREES.filter(tree => tree.previousSourcePosition)).toHaveLength(18);
   });
 
   it('preserves every ambient position, identity, scale and orientation in both quality modes', () => {

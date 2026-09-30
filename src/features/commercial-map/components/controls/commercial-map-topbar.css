@@ -20,15 +20,15 @@
   --glass-focus: #d7f5ff;
   --glass-divider: rgb(210 240 255 / .28);
   --glass-edge: rgb(45 90 116 / .92);
-  --glass-radius: 40px;
-  --glass-button-radius: 18px;
+  --glass-radius: 24px;
+  --glass-button-radius: 12px;
   --glass-menu-radius: 20px;
   --glass-menu-item-radius: 12px;
   --glass-edge-radius: 8px;
-  --glass-control-size: 54px;
-  --glass-gap: 14px;
-  --glass-padding: 10px;
-  --glass-icon-size: 26px;
+  --glass-control-size: 38px;
+  --glass-gap: 2px;
+  --glass-padding: 4px;
+  --glass-icon-size: 18px;
   --glass-blur: 10px;
   --glass-duration: 170ms;
   --glass-press-duration: 100ms;
@@ -130,8 +130,8 @@
   display: grid;
   width: var(--glass-control-size);
   height: var(--glass-control-size);
-  min-width: 44px;
-  min-height: 44px;
+  min-width: var(--glass-control-size);
+  min-height: var(--glass-control-size);
   flex: 0 0 var(--glass-control-size);
   place-items: center;
   border: 1px solid var(--glass-button-border);
@@ -164,7 +164,10 @@
 .commercial-map-control-rail__scroll > button:active:not(:disabled) { transform: scale(.97); transition-duration: var(--glass-press-duration); }
 .commercial-map-control-rail__scroll > button:focus-visible { outline: 2px solid var(--glass-focus); outline-offset: -3px; }
 .commercial-map-control-rail__scroll > button:disabled { cursor: default; opacity: .38; }
-.commercial-map-topbar__divider { width: 1px; height: 30px; flex: 0 0 1px; margin-inline: 0; background: var(--glass-divider); }
+.commercial-map-topbar__divider { width: 1px; height: 22px; flex: 0 0 1px; margin-inline: 4px; background: var(--glass-divider); }
+@media (pointer: coarse) {
+  .commercial-map-control-rail { --glass-control-size: 44px; --glass-icon-size: 22px; }
+}
 /* The related portal has a solid glass tint for reliable text contrast. */
 .commercial-map-toolbar-menu.commercial-map-glass {
   --glass-icon-size: 22px;
@@ -190,11 +193,11 @@
 .commercial-map-toolbar-menu .commercial-map-toolbar-menu-top { display: flex; }
 .commercial-map-toolbar-mobile {
   --glass-control-size: 44px;
-  --glass-gap: 7px;
-  --glass-padding: 7px;
+  --glass-gap: 2px;
+  --glass-padding: 4px;
   --glass-icon-size: 22px;
-  --glass-radius: 30px;
-  --glass-button-radius: 15px;
+  --glass-radius: 27px;
+  --glass-button-radius: 12px;
   display: none;
 }
 @container commercial-map (max-width: 720px) {

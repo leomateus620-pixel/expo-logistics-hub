@@ -1,0 +1,25 @@
+{
+  "baselineCommit": "bb82eefb",
+  "source": "src/features/commercial-map/components/canvas/CommercialPavilionModuleLayer.tsx",
+  "test": "src/test/commercialMapPavilion12PlanPresentation.test.ts",
+  "assertion": "const heightScale = flatModules ? 1",
+  "baselineContains": false,
+  "currentContains": false,
+  "sourceUnchangedIgnoringLineEndings": true,
+  "testUnchangedIgnoringLineEndings": true,
+  "baselineSourceSha256": "138a0161528b2a99c812d211e6c3164e5268a895aeb1825e73655c5cd209173c",
+  "currentSourceSha256": "138a0161528b2a99c812d211e6c3164e5268a895aeb1825e73655c5cd209173c",
+  "baselineTestSha256": "5c0f9a45b2b740da5584b4a5c8f635d35b2aae772d07a009e3f398feb93c06dc",
+  "currentTestSha256": "5c0f9a45b2b740da5584b4a5c8f635d35b2aae772d07a009e3f398feb93c06dc",
+  "relatedLines": [
+    "  heightScale: number;",
+    "    heightScale: flatModules",
+    "  heightScale,",
+    "  heightScale: number;",
+    "  const cellHeight = moduleHeight * heightScale;",
+    "      const { heightScale } = visualGeometry;",
+    "      const cellHeight = moduleHeight * heightScale;",
+    "        extrusionHeight: moduleHeight * visual.heightScale,",
+    "            heightScale={visualGeometry.heightScale}"
+  ]
+}

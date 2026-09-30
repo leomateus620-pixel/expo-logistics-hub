@@ -16,6 +16,7 @@ import {
 } from '../utils/parkAccessEnvironment';
 import { distanceToPolygon, pointInPolygon } from '../utils/spatialSurface';
 import { PAVILION_COURTYARD, clipPavilionCourtyardSurface } from './pavilionCourtyard';
+import { isPavilion12FrontTreeId, pavilion12TreeSupportContainsPoint } from './pavilion12FrontTrees';
 
 export type ParkAccessEnvironmentSurfaceKind =
   | 'WOODLAND_FLOOR'
@@ -201,7 +202,7 @@ export function isParkAccessPolygonFullyContained(
  * remain untouched and can still be used by inventories and other consumers.
  */
 export function selectParkAccessCompatibleTreesForPresentation<
-  Tree extends { position: ParkAccessPoint; canopyRadius: number },
+  Tree extends { id?: string; position: ParkAccessPoint; canopyRadius: number },
 >(trees: readonly Tree[]) {
   return trees.filter((tree) => {
     const canopyRadius = Math.max(0, tree.canopyRadius);
@@ -209,7 +210,9 @@ export function selectParkAccessCompatibleTreesForPresentation<
       tree.position[0] - PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.center[0],
       tree.position[1] - PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.center[1],
     );
-    return !pavilionPavementContains(tree.position)
+    const requestedPavilion12Placement = isPavilion12FrontTreeId(tree.id)
+      && pavilion12TreeSupportContainsPoint(tree.position);
+    return (!pavilionPavementContains(tree.position) || requestedPavilion12Placement)
       && !pointInPolygon(tree.position, PARK_ACCESS_SPATIAL_PLAN.woodlandPath.clearancePolygon)
       && !pointInPolygon(tree.position, THIRD_AGE_SETTING.accessClearancePolygon)
       && gate1RoundaboutDistance

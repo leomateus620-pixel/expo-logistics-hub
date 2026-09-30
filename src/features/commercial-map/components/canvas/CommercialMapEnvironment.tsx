@@ -67,10 +67,12 @@ import {
 } from './terrainMaterial';
 import { TerritorialEnvironment } from './TerritorialEnvironment';
 import { EssentialSceneLayer } from './EssentialSceneLayer';
+import type { UbiretamaRoadPresentation } from '../../utils/ubiretamaRoadPresentation';
 
 interface CommercialMapEnvironmentProps {
   active?: boolean;
   extent: CommercialMapEnvironmentExtent;
+  ubiretamaPresentation?: UbiretamaRoadPresentation | null;
   /**
    * Park-only box (no regional highways) that the shadow camera is fitted to.
    * Defaults to `extent` for callers that have no wider scene reach.
@@ -1142,6 +1144,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   reducedGraphics,
   adaptiveQualityTier = 'HIGH',
   nightMode = false,
+  ubiretamaPresentation,
 }: CommercialMapEnvironmentProps) {
   const scene = useThree((state) => state.scene);
   const camera = useThree((state) => state.camera);
@@ -1681,7 +1684,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       </mesh>
       <group visible={mode === 'normal'}>
         <EssentialSceneLayer id="territorial-context">
-          <TerritorialEnvironment reducedGraphics={COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics} />
+          <TerritorialEnvironment reducedGraphics={COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics} ubiretamaPresentation={ubiretamaPresentation} />
         </EssentialSceneLayer>
       </group>
       </group>

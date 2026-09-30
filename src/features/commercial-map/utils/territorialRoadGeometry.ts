@@ -21,6 +21,10 @@ import { OFFICIAL_REFERENCE_DATA, officialPdfPointToLocal } from '../data/offici
 import { ACCESS_JUNCTION } from '../data/accessJunctionReconstruction';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../data/parkAccessSpatialPlan';
 import { accessCircle, accessCorridor } from './accessJunctionGeometry';
+import { corridorPolygon, sampleTerritoryRoad } from './territoryRoadSampling';
+export { corridorPolygon, sampleTerritoryRoad } from './territoryRoadSampling';
+import { UBIRETAMA_PRESENTATION_HANDOFF, UBIRETAMA_PRESENTATION_MASK, isUbiretamaPresentationSegment, ubiretamaPresentationDistance, type UbiretamaRoadPresentation } from './ubiretamaRoadPresentation';
+import { integrateUbiretamaGroundPresentation } from './ubiretamaGroundBoundary';
 
 export const TERRITORY_ROAD_Y = 0.034;
 // Transfer also clips the last millimetres of the retained through-road seam;
@@ -42,53 +46,6 @@ export const UNIFIED_TERRITORY_ROADS: readonly TerritoryRoad[] = [
     evidence: "project-continuation" as const,
   })),
 ];
-export function sampleTerritoryRoad(road: TerritoryRoad): TerritoryPoint[] {
-  if (road.evidence === "osm-aligned") {
-    if (road.kind !== "highway") return [...road.points];
-    const points: TerritoryPoint[] = [road.points[0]];
-    for (let i = 1; i < road.points.length; i++) {
-      const a = road.points[i - 1],
-        b = road.points[i],
-        n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) * 2));
-      for (let j = 1; j <= n; j++)
-        points.push([
-          a[0] + ((b[0] - a[0]) * j) / n,
-          a[1] + ((b[1] - a[1]) * j) / n,
-        ]);
-    }
-    return points;
-  }
-  // Polyline corners in local grids stay straight; road curves use centripetal interpolation.
-  if (road.kind === "local") return [...road.points];
-  const curve = new THREE.CatmullRomCurve3(
-    road.points.map((p) => new THREE.Vector3(p[0], 0, p[1])),
-    false,
-    "centripetal",
-  );
-  curve.arcLengthDivisions = Math.ceil(curve.getLength() * 12);
-  return curve
-    .getSpacedPoints(Math.ceil(curve.getLength() * 2))
-    .map((p) => [p.x, p.z]);
-}
-export function corridorPolygon(
-  points: readonly TerritoryPoint[],
-  width: number,
-): MultiPolygon {
-  const left: Ring = [],
-    right: Ring = [];
-  points.forEach((p, i) => {
-    const a = points[Math.max(0, i - 1)],
-      b = points[Math.min(points.length - 1, i + 1)];
-    const d = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
-    const nx = ((-(b[1] - a[1]) / d) * width) / 2,
-      nz = (((b[0] - a[0]) / d) * width) / 2;
-    left.push([p[0] + nx, p[1] + nz]);
-    right.push([p[0] - nx, p[1] - nz]);
-  });
-  const ring = [...left, ...right.reverse()];
-  ring.push([...ring[0]]);
-  return [[ring]];
-}
 export function territoryPolygonGeometry(polygons: MultiPolygon, y: number) {
   const pieces = polygons.map((rings) => {
     const shape = new THREE.Shape(
@@ -254,19 +211,24 @@ export function precisionSeamPolygons(shoulders = false): MultiPolygon[] {
  * Holes are retained as islands. Shoulders are the set difference of the two unions.
  * Markings are clipped against every intersecting roadway, rather than running across its mouth.
  */
-export function buildTerritoryRoadGeometry() {
+export function buildTerritoryRoadGeometry(ubiretamaPresentation?: UbiretamaRoadPresentation | null) {
   const samples = UNIFIED_TERRITORY_ROADS.map((road) =>
     sampleTerritoryRoad(road),
   );
-  const surfaces = UNIFIED_TERRITORY_ROADS.map((r, i) =>
-    corridorPolygon(samples[i], r.width),
-  );
+  const roadSurface = (road: TerritoryRoad, index: number, shoulders = false): MultiPolygon => {
+    if (ubiretamaPresentation && isUbiretamaPresentationSegment(road.id)) {
+      return road.id === 'portao5-north-approach' ? ubiretamaPresentation.footprint : [];
+    }
+    return corridorPolygon(samples[index], road.width + (shoulders ? road.shoulder * 2 : 0));
+  };
+  const surfaces = UNIFIED_TERRITORY_ROADS.map((road, index) => roadSurface(road, index));
   // The official frontage and Brasil polygon own their existing top surface.
   // Trim the generated ribbons to their exact mouths, never stack asphalt.
   const officialMouths: MultiPolygon[] = OFFICIAL_REFERENCE_DATA.entities
     .filter(e => ['AV-IMIGRANTES', 'RUA-BRASIL'].includes(e.publicIdentifier))
     .map(e => [e.geometry.coordinates.map(r => r.map(p => [p[0], p[1]]))]);
   officialMouths.push(ACCESS_OWNERSHIP_CUT);
+  officialMouths.push(...(ubiretamaPresentation?.transverseMouths ?? []));
   const brasilMouth = corridorPolygon(
     [[4510,3150], [4528,3150]].map(p => officialPdfPointToLocal(p as [number, number])),
     GENERATED_REAR_ROAD_SEGMENTS.find(r => r.id === 'portao5-street-curve')!.width,
@@ -291,16 +253,16 @@ export function buildTerritoryRoadGeometry() {
       ),
     ),
   );
-  const hitSurface = union(
+  const hitSurface = polygonClipping.difference(union(
     surfaces.filter(
       (_, i) =>
         UNIFIED_TERRITORY_ROADS[i].ref?.includes("472") ||
         UNIFIED_TERRITORY_ROADS[i].evidence === "project-continuation",
     ),
-  );
+  ), ...(ubiretamaPresentation?.transverseMouths ?? []));
   const outer = union([
     ...UNIFIED_TERRITORY_ROADS.map((r, i) =>
-      corridorPolygon(samples[i], r.width + r.shoulder * 2),
+      roadSurface(r, i, true),
     ),
     ...precisionSeamPolygons(true),
   ]);
@@ -360,7 +322,7 @@ export function buildTerritoryRoadGeometry() {
       TERRITORY_ROAD_Y,
     ),
     unpaved: territoryPolygonGeometry(unpaved, TERRITORY_ROAD_Y),
-    embankment: territorySurfaceSkirt(polygonClipping.difference(outer, ACCESS_OWNERSHIP_CUT), TERRITORY_ROAD_Y - 0.003, -0.081),
+    embankment: territorySurfaceSkirt(polygonClipping.difference(outer, ACCESS_OWNERSHIP_CUT, ...(ubiretamaPresentation?.transverseMouths ?? [])), TERRITORY_ROAD_Y - 0.003, -0.081),
     hitSurface: territoryPolygonGeometry(hitSurface, TERRITORY_ROAD_Y),
     shoulders: territoryPolygonGeometry(shoulders, TERRITORY_ROAD_Y - 0.003),
     edgeLines: territoryPolygonGeometry(
@@ -381,7 +343,7 @@ const CLEARANCE_AXES = UNIFIED_TERRITORY_ROADS.map((r) => ({
   road: r,
   points: r.evidence === "osm-aligned" ? r.points : sampleTerritoryRoad(r),
 }));
-const TERRITORY_GROUND_CUTS: PlanarSurfaceCut[] = CLEARANCE_AXES.flatMap(
+const TERRITORY_GROUND_CUTS = CLEARANCE_AXES.flatMap(
   ({ road, points }) =>
     points.slice(1).map((p, i) => {
       const polygon = corridorPolygon(
@@ -390,6 +352,7 @@ const TERRITORY_GROUND_CUTS: PlanarSurfaceCut[] = CLEARANCE_AXES.flatMap(
       )[0][0];
       return {
         polygon,
+        segmentId: road.id,
         minX: Math.min(...polygon.map((p) => p[0])),
         maxX: Math.max(...polygon.map((p) => p[0])),
         minZ: Math.min(...polygon.map((p) => p[1])),
@@ -397,21 +360,46 @@ const TERRITORY_GROUND_CUTS: PlanarSurfaceCut[] = CLEARANCE_AXES.flatMap(
       };
     }),
 );
-export function integrateGroundWithTerritory(geometry: THREE.BufferGeometry) {
-  return clipPlanarSurfaceGeometry(
-    geometry,
-    TERRITORY_GROUND_CUTS,
-    () => TERRITORY_ROAD_Y - 0.004,
-  );
+const PRESENTED_GROUND_CUTS = new WeakMap<UbiretamaRoadPresentation, PlanarSurfaceCut[]>();
+function territoryGroundCuts(presentation?: UbiretamaRoadPresentation | null) {
+  if (!presentation) return TERRITORY_GROUND_CUTS;
+  const cached = PRESENTED_GROUND_CUTS.get(presentation);
+  if (cached) return cached;
+  const cuts: PlanarSurfaceCut[] = TERRITORY_GROUND_CUTS.flatMap(cut => {
+    if (!isUbiretamaPresentationSegment(cut.segmentId) || cut.minZ >= UBIRETAMA_PRESENTATION_HANDOFF[1]) return [cut];
+    return polygonClipping.difference([[cut.polygon]], UBIRETAMA_PRESENTATION_MASK).map(rings => {
+      const polygon = rings[0];
+      return { polygon, minX: Math.min(...polygon.map(p => p[0])), maxX: Math.max(...polygon.map(p => p[0])),
+        minZ: Math.min(...polygon.map(p => p[1])), maxZ: Math.max(...polygon.map(p => p[1])) };
+    });
+  });
+  cuts.push(...presentation.groundCuts);
+  PRESENTED_GROUND_CUTS.set(presentation, cuts);
+  return cuts;
 }
-export function territoryRoadClearance(point: TerritoryPoint) {
-  let best = Infinity;
-  for (const { road, points } of CLEARANCE_AXES)
+export function integrateGroundWithTerritory(geometry: THREE.BufferGeometry, presentation?: UbiretamaRoadPresentation | null) {
+  const legacy = (target: THREE.BufferGeometry) => clipPlanarSurfaceGeometry(target, TERRITORY_GROUND_CUTS, () => TERRITORY_ROAD_Y - 0.004);
+  if (!presentation) return legacy(geometry);
+  return integrateUbiretamaGroundPresentation(geometry, legacy, target => clipPlanarSurfaceGeometry(
+    target, territoryGroundCuts(presentation), () => TERRITORY_ROAD_Y - 0.004,
+  ));
+}
+export function territoryRoadClearance(point: TerritoryPoint, presentation?: UbiretamaRoadPresentation | null) {
+  if (presentation && point[1] >= UBIRETAMA_PRESENTATION_HANDOFF[1]) return territoryRoadClearance(point);
+  let best = presentation ? ubiretamaPresentationDistance(point, presentation) : Infinity;
+  for (const { road, points } of CLEARANCE_AXES) {
     for (let i = 1; i < points.length; i++) {
-      const a = points[i - 1],
-        b = points[i],
-        dx = b[0] - a[0],
-        dz = b[1] - a[1];
+      let a = points[i - 1], b = points[i];
+      if (presentation && isUbiretamaPresentationSegment(road.id)) {
+        const boundary = UBIRETAMA_PRESENTATION_HANDOFF[1];
+        if (a[1] < boundary && b[1] < boundary) continue;
+        if (a[1] < boundary || b[1] < boundary) {
+          const t = (boundary - a[1]) / (b[1] - a[1]);
+          const crossing: TerritoryPoint = [a[0] + (b[0] - a[0]) * t, boundary];
+          if (a[1] < boundary) a = crossing; else b = crossing;
+        }
+      }
+      const dx = b[0] - a[0], dz = b[1] - a[1];
       const t = THREE.MathUtils.clamp(
         ((point[0] - a[0]) * dx + (point[1] - a[1]) * dz) /
           (dx * dx + dz * dz || 1),
@@ -425,6 +413,7 @@ export function territoryRoadClearance(point: TerritoryPoint) {
           road.shoulder,
       );
     }
+  }
   return best;
 }
 

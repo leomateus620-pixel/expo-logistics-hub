@@ -1,0 +1,159 @@
+{
+  "pose": "weather-cloud targetY17, 1440x900, FOV38",
+  "endpointPixel": [
+    720,
+    665.257
+  ],
+  "latticeTopPixel": [
+    720,
+    680.155
+  ],
+  "before": {
+    "radius": 0.012,
+    "imageHash": "66867956073d3bfaa41733735b6e5329586ab8e701beece0d91d6916fcd28a20",
+    "energy": 0.778,
+    "rows": [
+      {
+        "y": 665,
+        "luminance": 229.58
+      },
+      {
+        "y": 666,
+        "luminance": 189.58
+      },
+      {
+        "y": 667,
+        "luminance": 90.37
+      },
+      {
+        "y": 668,
+        "luminance": 91.16
+      },
+      {
+        "y": 669,
+        "luminance": 94.16
+      },
+      {
+        "y": 670,
+        "luminance": 94.16
+      },
+      {
+        "y": 671,
+        "luminance": 94.23
+      },
+      {
+        "y": 672,
+        "luminance": 95.23
+      },
+      {
+        "y": 673,
+        "luminance": 97.3
+      },
+      {
+        "y": 674,
+        "luminance": 99.3
+      },
+      {
+        "y": 675,
+        "luminance": 117.05
+      },
+      {
+        "y": 676,
+        "luminance": 129.83
+      },
+      {
+        "y": 677,
+        "luminance": 140.12
+      },
+      {
+        "y": 678,
+        "luminance": 230.07
+      },
+      {
+        "y": 679,
+        "luminance": 249.72
+      },
+      {
+        "y": 680,
+        "luminance": 252.86
+      }
+    ]
+  },
+  "after": {
+    "radius": 0.022,
+    "imageHash": "40d548200b4e9baff1a2195b6b57ae98f284024e79c9ee8f0f8800de5524f27a",
+    "energy": 0.498,
+    "rows": [
+      {
+        "y": 665,
+        "luminance": 245.72
+      },
+      {
+        "y": 666,
+        "luminance": 243.93
+      },
+      {
+        "y": 667,
+        "luminance": 238.58
+      },
+      {
+        "y": 668,
+        "luminance": 238.79
+      },
+      {
+        "y": 669,
+        "luminance": 238.79
+      },
+      {
+        "y": 670,
+        "luminance": 238.79
+      },
+      {
+        "y": 671,
+        "luminance": 238.79
+      },
+      {
+        "y": 672,
+        "luminance": 238.79
+      },
+      {
+        "y": 673,
+        "luminance": 238.79
+      },
+      {
+        "y": 674,
+        "luminance": 238.79
+      },
+      {
+        "y": 675,
+        "luminance": 238.79
+      },
+      {
+        "y": 676,
+        "luminance": 238.58
+      },
+      {
+        "y": 677,
+        "luminance": 238.58
+      },
+      {
+        "y": 678,
+        "luminance": 238.58
+      },
+      {
+        "y": 679,
+        "luminance": 244.51
+      },
+      {
+        "y": 680,
+        "luminance": 243.79
+      }
+    ]
+  },
+  "summary": {
+    "oldMinimumTerminalLuminance": 90.37,
+    "newMinimumTerminalLuminance": 238.58,
+    "oldRowsAbove150": 5,
+    "newRowsAbove150": 16
+  }
+}
