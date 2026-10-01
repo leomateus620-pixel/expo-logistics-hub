@@ -110,15 +110,16 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
       const height = item.kind === 'segment' ? 23 : item.kind === 'road' ? 13 : 20;
       const rect = { left: center.x - width / 2, right: center.x + width / 2, top: center.y - height / 2, bottom: center.y + height / 2 };
       const enough = item.kind === 'segment' ? level.current !== 'near' : item.kind === 'block' ? level.current !== 'far' : true;
-      const projectRings = (rings: readonly Coordinate[][], elevation: number) =>
-        rings.map(ring => ring.map(p => { const screen = project(p, elevation); return [screen.x, screen.y] as [number, number]; }));
-      const onRoad = item.kind !== 'road' || Boolean(item.outline && roadLabelFits(rect,
-        projectRings(item.outline, item.elevation),
-        roadObstacles.get(item.id)?.map(entity => projectRings(entity.geometry.coordinates, entity.geometry.elevation)) ?? []));
-      const visible = enough && shown < limit && center.z >= -1 && center.z <= 1
+      const candidate = enough && shown < limit && center.z >= -1 && center.z <= 1
         && (item.kind === 'road' || Math.hypot(a.x - b.x, a.y - b.y) > width * .55)
         && rect.left > 8 && rect.right < size.width - 8 && rect.top > 8 && rect.bottom < size.height - 8
-        && orientationBoxFits(rect, occupied) && onRoad;
+        && orientationBoxFits(rect, occupied);
+      // Project polygons only for candidates that survived the cheap viewport/collision checks.
+      const projectRings = (rings: readonly Coordinate[][], elevation: number) =>
+        rings.map(ring => ring.map(p => { const screen = project(p, elevation); return [screen.x, screen.y] as [number, number]; }));
+      const visible = candidate && (item.kind !== 'road' || Boolean(item.outline && roadLabelFits(rect,
+        projectRings(item.outline, item.elevation),
+        roadObstacles.get(item.id)?.map(entity => projectRings(entity.geometry.coordinates, entity.geometry.elevation)) ?? [])));
       node.style.display = visible ? '' : 'none';
       if (!visible) continue;
       node.setAttribute('transform', `translate(${center.x} ${center.y})`);
