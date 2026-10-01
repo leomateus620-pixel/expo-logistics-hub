@@ -7,6 +7,9 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const url = process.env.WORLD_LABEL_URL || 'http://127.0.0.1:4242';
 if (!/^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(url)) throw Error('Loopback fixture required');
 const out = path.resolve(process.env.WORLD_LABEL_OUTPUT || 'docs/validation/world-labels/evidence');
+const selectionOnly = process.env.WORLD_LABEL_SELECTION_ONLY === '1';
+const quality = process.env.WORLD_LABEL_QUALITY || 'HIGH';
+if (!['LOW', 'MEDIUM', 'HIGH', 'ULTRA'].includes(quality)) throw Error('Invalid WORLD_LABEL_QUALITY');
 fs.mkdirSync(out, { recursive: true });
 const save = (name, value) => fs.writeFileSync(path.join(out, name), JSON.stringify(value, null, 2));
 const hash = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
@@ -108,11 +111,11 @@ async function capture(page, name, report) {
   report.stages.push({ name, ...snapshot }); save('world-labels-report.json', report);
   return snapshot;
 }
-async function selectAvailableLot(page, core) {
+async function selectCommercialLot(page, core) {
   const candidates = await page.evaluate(core => {
     const q = window.__benvenutoQa, qa = window.__worldLabelsQa, { scene, camera, gl, raycaster, pointer } = q.root.getState();
     const rect = gl.domElement.getBoundingClientRect();
-    return q.data.lots.filter(lot => lot.status === 'AVAILABLE').flatMap(lot => {
+    return q.data.lots.flatMap(lot => {
       const entity = q.data.entities.find(row => row.id === lot.entityId && row.classification === 'SELLABLE_LOT');
       if (!entity) return [];
       const center = qa.centroid(entity), elevation = entity.geometry.elevation + Math.max(.025, entity.geometry.extrusionHeight) + .02;
@@ -121,10 +124,10 @@ async function selectAvailableLot(page, core) {
       raycaster.setFromCamera(pointer.clone().set(p.x / rect.width * 2 - 1, 1 - p.y / rect.height * 2), camera);
       const hit = raycaster.intersectObjects(scene.children, true)[0];
       if (!hit?.object.isMesh || hit.object.name === 'territorial-world-labels') return [];
-      return [{ entityId: entity.id, lotId: lot.id, identifier: entity.publicIdentifier, point: center, ...p,
+      return [{ entityId: entity.id, lotId: lot.id, status: lot.status, identifier: entity.publicIdentifier, point: center, ...p,
         distance: Math.hypot(center[0] - core[0], center[1] - core[1]),
         raycast: { object: hit.object.name, type: hit.object.type, isBatchedMesh: Boolean(hit.object.isBatchedMesh), batchId: hit.batchId ?? null } }];
-    }).sort((a, b) => a.distance - b.distance).slice(0, 6);
+    }).sort((a, b) => Number(b.status === 'AVAILABLE') - Number(a.status === 'AVAILABLE') || a.distance - b.distance).slice(0, 6);
   }, core);
   const attempts = [];
   for (const candidate of candidates) {
@@ -135,7 +138,7 @@ async function selectAvailableLot(page, core) {
     attempts.push({ ...candidate, hover, selected, passed: selected === candidate.entityId });
     if (selected === candidate.entityId) { await settled(page); return { passed: true, attempts }; }
   }
-  return { passed: false, attempts, reason: 'No available lot selected by the normal click; inspect projected/raycast evidence.' };
+  return { passed: false, attempts, reason: 'No existing commercial lot selected by the normal click; inspect projected/raycast evidence.' };
 }
 async function video(page) {
   const started = await page.evaluate(() => {
@@ -184,7 +187,7 @@ async function video(page) {
     scope: 'Local production-built QA fixture, original Canvas/stores. No authenticated public link or physical phone certification.', stages: [], errors };
   page.on('pageerror', error => errors.push(error.message));
   try {
-    await page.goto(url + '/__dev/commercial-map-rendering?persistedStage=1&benvenutoQa=1&soldLocksQa=1&qualityQa=HIGH', { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await page.goto(url + '/__dev/commercial-map-rendering?persistedStage=1&benvenutoQa=1&soldLocksQa=1&qualityQa=' + quality, { waitUntil: 'domcontentloaded', timeout: 120000 });
     await page.waitForFunction(() => window.__benvenutoQa && document.querySelector('canvas')?.dataset.commercialMapHydration === 'complete', null, { timeout: 600000 });
     await page.waitForFunction(() => JSON.parse(document.querySelector('canvas')?.dataset.commercialMapRenderHealth || '{}').status === 'ready', null, { timeout: 120000 });
     await page.addStyleTag({ content: '.commercial-map-rendering-diagnostics__toolbar,.commercial-map-rendering-diagnostics__stress,.commercial-map-rendering-diagnostics__metrics,.commercial-map-district-qa{display:none!important}.commercial-map-rendering-diagnostics__viewport{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important}' });
@@ -200,10 +203,10 @@ async function video(page) {
       { name: 'core-close', point: seed.core, offset: [7, 12, 15] },
       { name: 'diagonal-road', point: seed.diagonal?.anchor || seed.core, offset: [-12, 18, 16] },
     ];
-    for (const view of views) { await pose(page, view.point, view.offset); await capture(page, view.name, report); }
+    if (!selectionOnly) for (const view of views) { await pose(page, view.point, view.offset); await capture(page, view.name, report); }
     await pose(page, seed.core, [14, 24, 30]);
     await capture(page, 'unfiltered-core', report);
-    report.selection = await selectAvailableLot(page, seed.core);
+    report.selection = await selectCommercialLot(page, seed.core);
     await capture(page, 'normal-lot-selection', report);
     await page.evaluate(() => window.__benvenutoQa.map.getState().setSelectedEntityId(null));
     await pose(page, seed.core, [14, 24, 30]);
@@ -214,12 +217,14 @@ async function video(page) {
     report.publicFixtureBoundary = 'QA activeScope contains only SELLABLE_LOT IDs; quadra/segment labels can be absent. This records actual fixture behavior, not authenticated public-scope coverage.';
     await page.evaluate(() => window.dispatchEvent(new CustomEvent('commercial-map:qa-lot-presentation', { detail: { public: false, filters: false } })));
     await settled(page); await pose(page, seed.core, [14, 24, 30]);
-    await page.setViewportSize({ width: 390, height: 844 }); await settled(page);
-    await capture(page, 'viewport-emulation-390x844', report);
-    await page.setViewportSize({ width: 1280, height: 720 }); await settled(page);
-    await pose(page, seed.core, [14, 24, 30]);
-    report.video = await video(page); await capture(page, 'after-motion', report);
-    if (process.env.WORLD_LABEL_RECOVERY === '1') {
+    if (!selectionOnly) {
+      await page.setViewportSize({ width: 390, height: 844 }); await settled(page);
+      await capture(page, 'viewport-emulation-390x844', report);
+      await page.setViewportSize({ width: 1280, height: 720 }); await settled(page);
+      await pose(page, seed.core, [14, 24, 30]);
+      report.video = await video(page); await capture(page, 'after-motion', report);
+    }
+    if (!selectionOnly && process.env.WORLD_LABEL_RECOVERY === '1') {
       const before = await page.evaluate(() => window.__worldLabelsQa.snapshot());
       await page.getByRole('button', { name: 'Perder contexto (QA)', exact: true, includeHidden: true }).evaluate(button => button.click());
       await page.waitForFunction(() => JSON.parse(document.querySelector('canvas').dataset.commercialMapRenderHealth || '{}').status === 'context-lost', null, { timeout: 120000 });
@@ -234,7 +239,7 @@ async function video(page) {
     }
     const base = report.stages[0].orientation;
     const reference = new Map((base?.labels || []).map(label => [label.id, label.projected]));
-    report.perspective = report.stages.slice(0, views.length).map(stage => ({ name: stage.name,
+    report.perspective = (selectionOnly ? [] : report.stages.slice(0, views.length)).map(stage => ({ name: stage.name,
       worldUnchanged: stage.orientation?.worldHash === base?.worldHash,
       geometryShared: stage.orientation?.geometryId === base?.geometryId, textureShared: stage.orientation?.textureId === base?.textureId,
       projections: stage.orientation?.labels.map(label => ({ name: label.name, kind: label.kind, worldAngle: label.angle, ...label.projected,
@@ -252,9 +257,10 @@ async function video(page) {
         labels: byName('unfiltered-core').orientation?.labelCounts, inventory: byName('unfiltered-core').inventory },
       after: { visibleMeshes: byName(name).visibleMeshes, activePublicObjects: byName(name).activePublicObjects,
         labels: byName(name).orientation?.labelCounts, inventory: byName(name).inventory } }));
-    report.passed = report.perspective.every(stage => stage.worldUnchanged && stage.geometryShared && stage.textureShared)
+    report.selectionOnly = selectionOnly;
+    report.passed = (selectionOnly || report.perspective.every(stage => stage.worldUnchanged && stage.geometryShared && stage.textureShared)
       && report.stages.slice(0, views.length).every(stage => stage.orientation?.depthTest === true && stage.orientation?.labelRaycastHits === 0)
-      && report.perspectiveAssertions.reverseAngleChangeDegrees > 30 && report.perspectiveAssertions.closeWidthRatio > 1.2
+      && report.perspectiveAssertions.reverseAngleChangeDegrees > 30 && report.perspectiveAssertions.closeWidthRatio > 1.2)
       && report.selection.passed && (!report.recovery || report.recovery.cameraPreserved && report.recovery.pathPreserved) && errors.length === 0;
     save('world-labels-report.json', report);
     if (!report.passed) throw Error('Essential visual/interaction assertions failed; inspect world-labels-report.json');

@@ -226,7 +226,10 @@ export function layoutTerritorialOrientation(items: readonly OrientationItem[], 
     if (!placement || placement.height < (item.kind === 'road' ? .18 : .35)) continue;
     const surfaceEntities = nearby.filter(entity => ['SELLABLE_LOT', 'INTERNAL_STAND', 'QUADRA'].includes(entity.classification));
     const elevation = item.kind === 'road' ? item.elevation : Math.max(item.elevation,
-      ...surfaceEntities.map(entity => entitySurfaceElevation(entity) + .025));
+      // Canonical cart/selection/hover lifts are <= .09. Keep the immutable
+      // plane just above that surface so interaction cannot clip a name.
+      ...surfaceEntities.map(entity => entitySurfaceElevation(entity)
+        + (entity.classification === 'QUADRA' ? .025 : .115)));
     output.push({ ...item, ...placement, width: placement.height * ratio, elevation,
       referenceSpan: Math.hypot(item.edge[1][0] - item.edge[0][0], item.edge[1][1] - item.edge[0][1]) });
   }

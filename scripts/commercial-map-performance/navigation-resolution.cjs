@@ -293,6 +293,17 @@ async function boot(browser, label, trialName) {
     await page.screenshot({ path: path.join(out, `${trialName}-boot-failure.png`) });
     throw error;
   } finally { clearInterval(progress); }
+  let adaptiveWarmupHold = null;
+  if (process.env.NAV_ADAPTIVE_WARMUP_HOLD === '1') {
+    if (policy !== 'adaptive' || phase !== 'sustained') throw Error('Adaptive warmup hold requires NAV_PHASE=sustained and NAV_QUALITY=adaptive');
+    adaptiveWarmupHold = await page.evaluate(() => {
+      const canvas = document.querySelector('canvas');
+      const original = JSON.parse(canvas.dataset.commercialMapQuality || 'null');
+      if (!original || original.logicalTier === 'LOW') throw Error('Automatic budget already LOW; no pending downgrade can be observed');
+      canvas.dispatchEvent(new CustomEvent('commercial-map-quality-test', { detail: { tier: original.logicalTier } }));
+      return { original, frozenAt: performance.now(), purpose: 'Hold the original automatic tier for equal real warmup, then restore its saved automatic state before the measured gesture. Frame times are untouched.' };
+    });
+  }
   await page.addStyleTag({ content: '.commercial-map-rendering-diagnostics__toolbar,.commercial-map-rendering-diagnostics__stress,.commercial-map-rendering-diagnostics__metrics,.commercial-map-district-qa{display:none!important}.commercial-map-rendering-diagnostics__viewport{position:fixed!important;inset:0!important;height:100vh!important;width:100vw!important}' });
   await page.waitForTimeout(6000);
   await page.evaluate(() => {
@@ -416,7 +427,7 @@ async function boot(browser, label, trialName) {
     multiDrawExtension: window.__benvenutoQa.root.getState().gl.getContext().getExtension('WEBGL_multi_draw') ? 'WEBGL_multi_draw' : null,
     boot: window.__commercialMapPerformance?.summary,
     displayCadence: JSON.parse(document.querySelector('canvas').dataset.commercialMapExecutionPolicy || 'null') }));
-  Object.assign(environment, { executedBuildManifest, expectedRevision: expectedRevision || null, ablationApplied, shadowReceivingAblation, labelTiming, drawTiming });
+  Object.assign(environment, { executedBuildManifest, expectedRevision: expectedRevision || null, ablationApplied, shadowReceivingAblation, labelTiming, drawTiming, adaptiveWarmupHold });
   save(`${trialName}-environment.json`, environment);
   return { label, context, page, errors, environment };
 }
@@ -750,6 +761,13 @@ async function waitMeasureGate(trialName) {
           await resetRenderTiming(page);
           const profiler = await startCpuProfile(page);
           await page.evaluate(() => { window.focus(); window.__navigationResolutionQa.begin(); });
+          if (session.environment.adaptiveWarmupHold) {
+            await page.evaluate(() => {
+              const c = document.querySelector('canvas');
+              c.dispatchEvent(new CustomEvent('commercial-map-quality-test', { detail: { tier: null } }));
+              window.__navigationResolutionQa.state.events.push({ at: performance.now(), type: 'adaptive-warmup-release', quality: JSON.parse(c.dataset.commercialMapQuality) });
+            });
+          }
           await gesture(page, scenario, phase === 'sustained' ? Number(process.env.NAV_SUSTAINED_MS || 120000) : undefined);
           const raw = await page.evaluate(() => window.__navigationResolutionQa.finish());
           const summary = summarize(raw), name = `${label}-${policy}-dpr${scale}${variant}-${view}-${scenario}-${repeat}`;

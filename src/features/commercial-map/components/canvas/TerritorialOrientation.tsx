@@ -87,7 +87,10 @@ function createTerritorialOrientationResources(items: readonly OrientationItem[]
   texture.minFilter = THREE.LinearMipmapLinearFilter;
   const material = new THREE.ShaderMaterial({
     name: 'territorial-ground-text', transparent: true, depthWrite: false, depthTest: true, toneMapped: false,
-    polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1,
+    // Lots use -3/-2. A weaker slope bias lets their fill erase ground text
+    // in oblique views even with physical clearance. Match that slope and
+    // retain one extra depth unit; buildings still occlude the world plane.
+    polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3,
     uniforms: { atlas: { value: texture }, viewportSize: { value: new THREE.Vector2(1, 1) } },
     vertexShader: `
       attribute vec3 labelAnchor; attribute vec2 labelDensity;
