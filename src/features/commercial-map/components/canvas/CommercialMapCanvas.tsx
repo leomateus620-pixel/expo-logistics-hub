@@ -5413,7 +5413,11 @@ const Scene = memo(function Scene({
       <RuntimeFrameDiagnostics />
       {publicPolicy && <PublicContextLabels entities={entities} policy={publicPolicy} />}
       {!publicPolicy && !publicPavilion && labelsVisible && !interiorEntity && !visitEnabled && !hydrologicalModeActive && !lunarCinematicActive && (
-        <TerritorialOrientation entities={exteriorRenderedEntities} lots={lots} roads={circulationEntities} />
+        <TerritorialOrientation
+          entities={interactiveEntityIds ? exteriorRenderedEntities.filter(entity => interactiveEntityIds.has(entity.id)) : exteriorRenderedEntities}
+          lots={lots}
+          roads={interactiveEntityIds ? circulationEntities.filter(entity => interactiveEntityIds.has(entity.id)) : circulationEntities}
+        />
       )}
       {visitEnabled && !publicPolicy && !publicPavilion && <VisitFeatureBoundary><Suspense fallback={null}>
         <VisitMode entities={entities} lots={lots} trees={presentedSceneTrees} electricalPlacements={electricalSceneLayout.placements} siteEnvironmentEntities={siteEnvironmentEntities} pavilion12ConcretePresent={pavilion12ConcretePresent}/>
