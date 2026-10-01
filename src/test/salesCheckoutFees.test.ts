@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { splitCents, parseMoneyInputToCents } from '@/features/commercial-map/sales/salesMoney';
+import { splitCents, parseMoneyInputToCents, parseReaisInputToCents } from '@/features/commercial-map/sales/salesMoney';
 import { buildDraftSchedule, draftsSumCents, initialSalesPayment, monthlyDueDates, redistribute } from '@/features/commercial-map/sales/salesInstallments';
 import { paymentErrors } from '@/features/commercial-map/sales/components/SalesPaymentForm';
 import { feesTotalCents } from '@/features/commercial-map/sales/salesTypes';
@@ -50,9 +50,26 @@ describe('checkout: parcelas, taxas e expositores', () => {
   });
   it('máscara monetária em centavos e busca por documento com/sem máscara', () => {
     expect(parseMoneyInputToCents('1.234,56')).toBe(123456);
+    expect(parseMoneyInputToCents('45')).toBe(45);
     const item = { id: '1', name: 'BOTOLI', documentNumber: '048.675.580-01', phone: '(55) 99969-9631', email: 'a@b.com' };
     expect(matchesExhibitor(item, '04867558001')).toBe(true);
     expect(matchesExhibitor(item, '048.675')).toBe(true);
     expect(matchesExhibitor(item, 'botoli')).toBe(true);
+  });
+  it('interpreta taxas sem vírgula como reais e mantém centavos explícitos', () => {
+    expect(parseReaisInputToCents('45')).toBe(4500);
+    expect(parseReaisInputToCents('45,00')).toBe(4500);
+    expect(parseReaisInputToCents('45,5')).toBe(4550);
+    expect(parseReaisInputToCents('1.234,56')).toBe(123456);
+    expect(parseReaisInputToCents('R$ 1.234,56')).toBe(123456);
+    expect(parseReaisInputToCents('45,')).toBe(4500);
+    expect(parseReaisInputToCents('0')).toBe(0);
+    expect(parseReaisInputToCents('')).toBe(0);
+    const fees = { adminCents: parseReaisInputToCents('45'), ppciCents: parseReaisInputToCents('12,50'), cleaningCents: parseReaisInputToCents('0') };
+    const total = 1_000_000 + feesTotalCents(fees);
+    expect(total).toBe(1_005_750);
+    const installments = redistribute(total, initialSalesPayment(1_000_000).installments);
+    expect(draftsSumCents(installments)).toBe(total);
+    expect(Object.values(paymentErrors({ ...initialSalesPayment(total), installments }, total)).every((error) => error === null)).toBe(true);
   });
 });

@@ -23,6 +23,14 @@ export function parseMoneyInputToCents(input: string): number {
   return digits ? Number(digits) : 0;
 }
 
+/** Nos campos de taxas, números sem vírgula são reais; a vírgula marca os centavos. */
+export function parseReaisInputToCents(input: string): number {
+  const [whole = '', fraction = ''] = input.split(',', 2);
+  const reais = whole.replace(/\D+/g, '').slice(0, 10);
+  const cents = fraction.replace(/\D+/g, '').slice(0, 2).padEnd(2, '0');
+  return Number(reais || '0') * 100 + Number(cents);
+}
+
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
 export function formatCents(cents: number): string {
