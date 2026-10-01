@@ -28,6 +28,7 @@ async function capture(page) {
       identity: { canvasMounts: window.__commercialMapRuntimeDiagnostics?.canvasMounts,
         rendererCreates: window.__commercialMapRuntimeDiagnostics?.rendererCreates, activeCanvases: window.__commercialMapRuntimeDiagnostics?.activeCanvases },
       health: JSON.parse(canvas?.dataset.commercialMapRenderHealth || 'null'), execution: JSON.parse(canvas?.dataset.commercialMapExecution || 'null'),
+      postBudget: JSON.parse(canvas?.dataset.commercialMapPostBudget || 'null'),
       inventory: JSON.parse(canvas?.dataset.commercialMapInventory || 'null'),
       probe: window.__startupProbe, resources: performance.getEntriesByType('resource').map(e => e.toJSON()),
       documentVisible: document.visibilityState, focused: document.hasFocus(), viewport: [innerWidth, innerHeight], dpr: devicePixelRatio, userAgent: navigator.userAgent };
@@ -103,14 +104,18 @@ async function capture(page) {
       const gestureCameraChanged = presentation.camera && afterGesture.camera ?
         JSON.stringify(presentation.camera) !== JSON.stringify(afterGesture.camera) : null;
       // Keep the existing real first-interactive barrier distinct from the
-      // later fully hydrated presentation with the prepared compositor.
+      // later fully hydrated presentation with the declared execution budget.
       if (round === 1) await page.screenshot({ path: path.join(out, `${label}-${scenario}-interactive.png`) });
       let completePresentation = null;
       if (observeComplete) {
         await page.waitForFunction(() => {
           const canvas = document.querySelector('canvas');
           const health = JSON.parse(canvas?.dataset.commercialMapRenderHealth || '{}');
-          return canvas?.dataset.commercialMapHydration === 'complete' && health.status === 'ready' && health.path === 'post';
+          const budget = JSON.parse(canvas?.dataset.commercialMapPostBudget || 'null');
+          // Old standalone datasets retain POST. A requested DIRECT budget
+          // requires actual default-framebuffer MSAA; otherwise expect POST.
+          const expectedPath = budget?.requestedPath === 'direct' && budget?.directBudgetAvailable === true ? 'direct' : 'post';
+          return canvas?.dataset.commercialMapHydration === 'complete' && health.status === 'ready' && health.path === expectedPath;
         }, null, { timeout: 180000 });
         completePresentation = await capture(page);
       }
