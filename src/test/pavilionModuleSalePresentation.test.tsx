@@ -15,6 +15,9 @@ vi.mock('@/features/commercial-map/hooks/useLotPricing2028', () => ({
   useLotPriceOverride: () => ({ isPending: false, mutateAsync: vi.fn() }),
 }));
 vi.mock('@/hooks/useCurrentOrg', () => ({ useCurrentOrg: () => ({ orgId: 'org-test' }) }));
+vi.mock('@/features/commercial-map/components/commercial/LotWorkflowDialog', () => ({
+  LotWorkflowDialog: () => null,
+}));
 vi.mock('@/features/commercial-map/sales/components/SaleOpenSection', () => ({
   SaleOpenSection: ({ canManageSales }: { canManageSales: boolean }) => (
     <section aria-label="Venda em aberto" data-can-manage-sales={String(canManageSales)}>
