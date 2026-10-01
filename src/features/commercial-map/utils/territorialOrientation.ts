@@ -66,7 +66,7 @@ export function prepareTerritorialOrientation(entities: readonly MapEntity[], lo
     if (entity.isArchived || !['ROAD', 'PEDESTRIAN_PATH'].includes(entity.classification)
       || !entity.geometry.coordinates.every(finiteRing)) continue;
     const name = normalizeMapEntityMetadata(entity).street?.trim();
-    if (!name || roadNames.has(name.toLocaleLowerCase('pt-BR'))) continue;
+    if (!name) continue;
     const rings = entity.geometry.coordinates;
     const saved = entity.metadata.labelAnchor;
     const preferred: Coordinate | null = Array.isArray(saved) && saved.length === 2 && saved.every(v => typeof v === 'number' && Number.isFinite(v))
@@ -74,9 +74,13 @@ export function prepareTerritorialOrientation(entities: readonly MapEntity[], lo
     const safe = safeLotAnchor(rings);
     const anchor = preferred && lotPointClearance(preferred, rings) > 0 ? preferred : safe?.point;
     if (!anchor) continue;
-    roadNames.add(name.toLocaleLowerCase('pt-BR'));
-    items.push({ id: `road:${entity.id}`, name, kind: 'road', anchor, elevation: entity.geometry.elevation + .08,
-      edge: largestEdge(rings[0]), clearance: lotPointClearance(anchor, rings) });
+    const normalizedName = name.toLocaleLowerCase('pt-BR');
+    const roadItem: OrientationItem = { id: `road:${entity.id}`, name, kind: 'road', anchor,
+      elevation: entity.geometry.elevation + .08, edge: largestEdge(rings[0]), outline: rings,
+      clearance: lotPointClearance(anchor, rings) };
+    const existingIndex = items.findIndex(item => item.kind === 'road' && item.name.toLocaleLowerCase('pt-BR') === normalizedName);
+    if (existingIndex < 0) { roadNames.add(normalizedName); items.push(roadItem); }
+    else if (roadItem.clearance > items[existingIndex].clearance) items[existingIndex] = roadItem;
   }
   return items;
 }
