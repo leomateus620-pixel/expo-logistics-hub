@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import type { CommercialLot, Coordinate, MapEntity } from '../../types';
 import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
 import { COMMERCIAL_MAP_OBSTRUCTION_SELECTOR } from '../../utils/contextualViewport';
-import { orientationBoxFits, orientationLevel, prepareTerritorialOrientation, TERRITORY_SYMBOLS, type ScreenBox } from '../../utils/territorialOrientation';
+import { orientationBoxFits, orientationLevel, prepareTerritorialOrientation, roadLabelFits, TERRITORY_SYMBOLS, type ScreenBox } from '../../utils/territorialOrientation';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import './territorial-orientation.css';
 
@@ -32,6 +32,21 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
   const level = useRef<'far' | 'medium' | 'near'>('far');
   const point = useMemo(() => new THREE.Vector3(), []);
   const blocks = useMemo(() => items.filter(item => item.kind === 'block'), [items]);
+  const roadObstacles = useMemo(() => {
+    const roadsWithFootprints = items.filter(item => item.kind === 'road' && item.outline);
+    const forbidden = entities.filter(entity => !entity.isArchived && entity.geometry.coordinates[0]?.length >= 3
+      && !['ROAD', 'PEDESTRIAN_PATH', 'QUADRA', 'GREEN_AREA', 'PARKING', 'WATER', 'TREE'].includes(entity.classification));
+    return new Map(roadsWithFootprints.map(road => {
+      const ring = road.outline?.[0] ?? [];
+      const minX = Math.min(...ring.map(p => p[0])), maxX = Math.max(...ring.map(p => p[0]));
+      const minZ = Math.min(...ring.map(p => p[1])), maxZ = Math.max(...ring.map(p => p[1]));
+      return [road.id, forbidden.filter(entity => {
+        const points = entity.geometry.coordinates[0];
+        return Math.min(...points.map(p => p[0])) <= maxX && Math.max(...points.map(p => p[0])) >= minX
+          && Math.min(...points.map(p => p[1])) <= maxZ && Math.max(...points.map(p => p[1])) >= minZ;
+      })] as const;
+    }));
+  }, [items, entities]);
   const rankedByLevel = useMemo(() => ({
     far: [...items].sort((a, b) => ({ segment: 0, road: 1, block: 2 })[a.kind] - ({ segment: 0, road: 1, block: 2 })[b.kind]),
     medium: [...items].sort((a, b) => ({ block: 0, road: 1, segment: 2 })[a.kind] - ({ block: 0, road: 1, segment: 2 })[b.kind]),
@@ -91,21 +106,23 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
       const center = project(item.anchor, item.elevation);
       const a = project(item.edge[0], item.elevation), b = project(item.edge[1], item.elevation);
       const text = node.querySelector('text');
-      const width = Math.ceil((text?.getComputedTextLength() ?? item.name.length * 6) + 16), height = item.kind === 'segment' ? 23 : 20;
+      const width = Math.ceil((text?.getComputedTextLength() ?? item.name.length * 6) + (item.kind === 'road' ? 5 : 16));
+      const height = item.kind === 'segment' ? 23 : item.kind === 'road' ? 13 : 20;
       const rect = { left: center.x - width / 2, right: center.x + width / 2, top: center.y - height / 2, bottom: center.y + height / 2 };
       const enough = item.kind === 'segment' ? level.current !== 'near' : item.kind === 'block' ? level.current !== 'far' : true;
-      const visible = enough && shown < limit && center.z >= -1 && center.z <= 1
-        && Math.hypot(a.x - b.x, a.y - b.y) > width * (item.kind === 'road' ? .75 : .55)
+      const candidate = enough && shown < limit && center.z >= -1 && center.z <= 1
+        && (item.kind === 'road' || Math.hypot(a.x - b.x, a.y - b.y) > width * .55)
         && rect.left > 8 && rect.right < size.width - 8 && rect.top > 8 && rect.bottom < size.height - 8
         && orientationBoxFits(rect, occupied);
+      // Project polygons only for candidates that survived the cheap viewport/collision checks.
+      const projectRings = (rings: readonly Coordinate[][], elevation: number) =>
+        rings.map(ring => ring.map(p => { const screen = project(p, elevation); return [screen.x, screen.y] as [number, number]; }));
+      const visible = candidate && (item.kind !== 'road' || Boolean(item.outline && roadLabelFits(rect,
+        projectRings(item.outline, item.elevation),
+        roadObstacles.get(item.id)?.map(entity => projectRings(entity.geometry.coordinates, entity.geometry.elevation)) ?? [])));
       node.style.display = visible ? '' : 'none';
       if (!visible) continue;
       node.setAttribute('transform', `translate(${center.x} ${center.y})`);
-      if (text && item.kind === 'road') {
-        const angle = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
-        const upright = ((angle + 90 + 360) % 180) - 90;
-        text.setAttribute('transform', `rotate(${Math.abs(upright) < 28 ? upright.toFixed(1) : 0})`);
-      }
       const background = node.querySelector('rect');
       if (background) { background.setAttribute('x', String(-width / 2)); background.setAttribute('width', String(width)); }
       occupied.push(rect); shown++;

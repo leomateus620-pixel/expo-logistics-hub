@@ -9,6 +9,8 @@
 }
 .territorial-orientation__label rect { fill: var(--orientation-paper); stroke: oklch(var(--border) / .8); stroke-width: .8; }
 .territorial-orientation__label text { fill: var(--orientation-ink); font: 600 10px system-ui, sans-serif; }
+.territorial-orientation__label--road rect { display: none; }
+.territorial-orientation__label--road text { font: 500 9px system-ui, sans-serif; fill: oklch(var(--foreground)); paint-order: stroke fill; stroke: oklch(var(--card) / .78); stroke-width: 1.5px; stroke-linejoin: round; }
 .territorial-orientation__label--segment text { font-size: 11px; font-weight: 750; }
 .territorial-orientation__outline { fill: none; stroke: var(--orientation-line); stroke-width: 1.15; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .territorial-orientation__outline--industria-comercio-servicos { stroke-dasharray: 8 4; }
