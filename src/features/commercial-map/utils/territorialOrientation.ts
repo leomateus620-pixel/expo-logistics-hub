@@ -87,9 +87,9 @@ export function orientationBoxFits(box: ScreenBox, occupied: readonly ScreenBox[
 }
 /** Two thresholds prevent a label flickering at the zoom boundary. */
 export function orientationLevel(span: number, previous: 'far' | 'medium' | 'near' = 'far') {
-  if (previous === 'far') return span > 150 ? 'medium' : 'far';
-  if (previous === 'near') return span < 300 ? 'medium' : 'near';
-  if (span > 390) return 'near';
-  if (span < 115) return 'far';
+  if (previous === 'far') return span > 40 ? 'medium' : 'far';
+  if (previous === 'near') return span < 105 ? 'medium' : 'near';
+  if (span > 130) return 'near';
+  if (span < 28) return 'far';
   return 'medium';
 }

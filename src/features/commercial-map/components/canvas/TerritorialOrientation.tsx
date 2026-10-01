@@ -21,6 +21,11 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
   const prior = useRef(''), dirty = useRef(true);
   const level = useRef<'far' | 'medium' | 'near'>('far');
   const point = useMemo(() => new THREE.Vector3(), []);
+  const blocks = useMemo(() => items.filter(item => item.kind === 'block'), [items]);
+  const rankedByLevel = useMemo(() => ({
+    far: [...items].sort((a, b) => ({ segment: 0, road: 1, block: 2 })[a.kind] - ({ segment: 0, road: 1, block: 2 })[b.kind]),
+    medium: [...items].sort((a, b) => ({ block: 0, road: 1, segment: 2 })[a.kind] - ({ block: 0, road: 1, segment: 2 })[b.kind]),
+  }), [items]);
   useEffect(() => { dirty.current = true; invalidate(); }, [items, selected, invalidate]);
   useEffect(() => {
     const shell = gl.domElement.closest('.commercial-map-shell');
@@ -45,11 +50,14 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
       point.set(p[0], y, p[1]).project(camera);
       return { x: (point.x + 1) * size.width / 2, y: (1 - point.y) * size.height / 2, z: point.z };
     };
-    const blocks = items.filter(item => item.kind === 'block');
-    const xs = blocks.flatMap(item => item.outline?.[0]?.map(p => p[0]) ?? []);
-    const zs = blocks.flatMap(item => item.outline?.[0]?.map(p => p[1]) ?? []);
-    const span = xs.length ? Math.hypot(project([Math.min(...xs), Math.min(...zs)], 0).x - project([Math.max(...xs), Math.max(...zs)], 0).x,
-      project([Math.min(...xs), Math.min(...zs)], 0).y - project([Math.max(...xs), Math.max(...zs)], 0).y) : 0;
+    // A representative quadra, rather than the whole park, defines local density.
+    const spans = blocks.map(item => {
+      const points = item.outline?.[0]?.map(p => project(p, item.elevation)) ?? [];
+      if (points.length < 3) return 0;
+      return Math.hypot(Math.max(...points.map(p => p.x)) - Math.min(...points.map(p => p.x)),
+        Math.max(...points.map(p => p.y)) - Math.min(...points.map(p => p.y)));
+    }).filter(Boolean).sort((a, b) => a - b);
+    const span = spans.length ? spans[Math.floor(spans.length / 2)] : 0;
     level.current = orientationLevel(span, level.current);
     const canvas = gl.domElement.getBoundingClientRect();
     const occupied: ScreenBox[] = [];
@@ -66,10 +74,7 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
     }
     let shown = 0;
     const limit = size.width < 600 ? 7 : 19;
-    const ranked = [...items].sort((a, b) => {
-      const rank = level.current === 'far' ? { segment: 0, road: 1, block: 2 } : { block: 0, road: 1, segment: 2 };
-      return rank[a.kind] - rank[b.kind];
-    });
+    const ranked = level.current === 'far' ? rankedByLevel.far : rankedByLevel.medium;
     for (const item of ranked) {
       const node = nodes.current.get(item.id);
       if (!node) continue;
@@ -103,7 +108,7 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
   });
   return <Html calculatePosition={ORIGIN} zIndexRange={[1, 1]} style={{ width: size.width, height: size.height, pointerEvents: 'none' }}>
     <svg ref={svg} className="territorial-orientation" aria-hidden="true" width={size.width} height={size.height}>
-      {items.filter(item => item.kind === 'block').map(item => <path key={`outline:${item.id}`} className={`territorial-orientation__outline territorial-orientation__outline--${item.segmentId}`} ref={node => { if (node) lines.current.set(item.id, node); else lines.current.delete(item.id); }} />)}
+      {blocks.map(item => <path key={`outline:${item.id}`} className={`territorial-orientation__outline territorial-orientation__outline--${item.segmentId}`} ref={node => { if (node) lines.current.set(item.id, node); else lines.current.delete(item.id); }} />)}
       {items.map(item => <g key={item.id} className={`territorial-orientation__label territorial-orientation__label--${item.kind}`} ref={node => { if (node) nodes.current.set(item.id, node); else nodes.current.delete(item.id); }} style={{ display: 'none' }}>
         <rect y={item.kind === 'segment' ? -11.5 : -10} height={item.kind === 'segment' ? 23 : 20} rx="4" />
         <text textAnchor="middle" dominantBaseline="central">{item.kind === 'segment' && item.segmentId ? `${TERRITORY_SYMBOLS[item.segmentId].glyph}  ` : ''}{item.name}</text>

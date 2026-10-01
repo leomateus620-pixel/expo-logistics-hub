@@ -31,9 +31,9 @@ describe('orientação territorial cadastral', () => {
     const box = { left: 10, right: 70, top: 10, bottom: 30 };
     expect(orientationBoxFits(box, [{ left: 76, right: 120, top: 10, bottom: 30 }])).toBe(true);
     expect(orientationBoxFits(box, [{ left: 75, right: 120, top: 10, bottom: 30 }])).toBe(false);
-    expect(orientationLevel(149, 'far')).toBe('far');
-    expect(orientationLevel(149, 'medium')).toBe('medium');
-    expect(orientationLevel(389, 'near')).toBe('near');
-    expect(orientationLevel(389, 'medium')).toBe('medium');
+    expect(orientationLevel(35, 'far')).toBe('far');
+    expect(orientationLevel(35, 'medium')).toBe('medium');
+    expect(orientationLevel(115, 'near')).toBe('near');
+    expect(orientationLevel(115, 'medium')).toBe('medium');
   });
 });
