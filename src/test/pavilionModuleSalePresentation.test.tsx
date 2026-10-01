@@ -65,4 +65,15 @@ describe('ficha comercial do módulo', () => {
     fireEvent.click(within(card).getByRole('button', { name: 'Expandir detalhes do módulo' }));
     expect(within(card).getByText('Valores oficiais 2028')).toBeVisible();
   });
+
+  it('mantém a ação de assinatura na ficha para quem pode administrar vendas', () => {
+    if (!pavilion || !entity || !lot) throw new Error('Referência do módulo não encontrada');
+    render(<PavilionModuleCard embedded plan={COMMERCIAL_PAVILION_MODULE_PLANS.B6}
+      pavilion={pavilion} entities={[pavilion, entity]}
+      lots={[{ ...lot, id: 'persisted-lot', status: 'SALE_OPEN' }]}
+      permissions={{ ...permissions, canManageSales: true }} source="database" />);
+    const card = screen.getByRole('complementary');
+    expect(within(card).getByRole('button', { name: 'Confirmar contrato assinado' })).toBeEnabled();
+    expect(within(card).getByRole('button', { name: 'Confirmar contrato assinado' })).toBeVisible();
+  });
 });
