@@ -1,6 +1,8 @@
 # Roadmap
 
 ## Orientação territorial do Mapa Comercial
+- [x] Refinar nomes das ruas: fonte leve, sem caixa branca, horizontal e contida no pavimento apresentado; omitir quando não couber ou houver estrutura.
+- [x] Testar contenção em via irregular, vazios e obstáculos, mantendo escopo e estilos das quadras.
 - [x] Separar ruas, quadras e segmentos das quatro cores comerciais, usando âncoras e limites cadastrais sem etiquetar lotes externos.
 - [x] Reaproveitar a camada leve nos links públicos dentro do escopo autorizado; preservar seleção, filtros e contagem derivada do cadastro.
 - [x] Validar tipos e testes focais de segmentos, legendas, navegação, rótulos e escopo público.
