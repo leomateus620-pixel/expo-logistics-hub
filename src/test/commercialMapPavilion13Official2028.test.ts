@@ -42,7 +42,7 @@ describe('Pavilhão 13 — planta oficial Fenasoja 2028', () => {
     const probes = {
       25: { inside: [18.5, 4.5], outside: [17, 1] },
       26: { inside: [16, 1.5], outside: [18.8, 2.8] },
-      79: { inside: [1, 1.5], outside: [4, 2.8] },
+      79: { inside: [2.5, 1.5], outside: [1, 2.8] },
       80: { inside: [1.5, 4.5], outside: [2.8, 1] },
     } as const;
     for (const number of [25, 26, 79, 80] as const) {
