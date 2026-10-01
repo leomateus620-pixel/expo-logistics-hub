@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Finalizar venda — revisão e pagamento
+- [x] Permitir valores inteiros em reais nos três campos de taxas, mantendo centavos e a edição de parcelas; conferir totais e distribuição.
 - [x] Corrigir a quebra e o alinhamento dos dados da revisão para nomes e documentos longos, em telas largas e estreitas.
 - [x] Iniciar boleto parcelado em 17 parcelas calculadas automaticamente no dia 5; preservar outras formas e edição manual.
 - [x] Verificar cálculos e validações automatizadas sem registrar vendas.

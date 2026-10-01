@@ -83,15 +83,15 @@ export function SalesPaymentForm({ value, onChange, fees, onFeesChange, spacesCe
         <div className="sales-fees-grid">
           <div className="sales-field">
             <label htmlFor="sales-fee-admin">Taxa administrativa</label>
-            <MoneyInput id="sales-fee-admin" valueCents={fees.adminCents} onChange={(adminCents) => onFeesChange({ ...fees, adminCents })} />
+            <MoneyInput id="sales-fee-admin" mode="reais" valueCents={fees.adminCents} onChange={(adminCents) => onFeesChange({ ...fees, adminCents })} />
           </div>
           <div className="sales-field">
             <label htmlFor="sales-fee-ppci">PPCI</label>
-            <MoneyInput id="sales-fee-ppci" valueCents={fees.ppciCents} onChange={(ppciCents) => onFeesChange({ ...fees, ppciCents })} />
+            <MoneyInput id="sales-fee-ppci" mode="reais" valueCents={fees.ppciCents} onChange={(ppciCents) => onFeesChange({ ...fees, ppciCents })} />
           </div>
           <div className="sales-field">
             <label htmlFor="sales-fee-cleaning">Limpeza ou licença</label>
-            <MoneyInput id="sales-fee-cleaning" valueCents={fees.cleaningCents} onChange={(cleaningCents) => onFeesChange({ ...fees, cleaningCents })} />
+            <MoneyInput id="sales-fee-cleaning" mode="reais" valueCents={fees.cleaningCents} onChange={(cleaningCents) => onFeesChange({ ...fees, cleaningCents })} />
           </div>
         </div>
         <dl className="sales-totals">
