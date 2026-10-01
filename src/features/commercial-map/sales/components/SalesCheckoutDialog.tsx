@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { draftsToInstallments, monthlyDueDates, redistribute } from '../salesInstallments';
+import { buildDraftSchedule, draftsToInstallments, monthlyDueDates, redistribute } from '../salesInstallments';
 import { formatCents, toCents } from '../salesMoney';
 import type { SalesCartSummary } from '../salesPricing';
 import { useSalesCheckout } from '../useSalesCheckout';
@@ -23,7 +23,7 @@ const EMPTY_BUYER: SalesBuyerDraft = { buyerName: '', documentNumber: '', phone:
 const EMPTY_FEES: SalesFeesDraft = { adminCents: 0, ppciCents: 0, cleaningCents: 0 };
 
 function initialPayment(totalCents: number): SalesPaymentDraft {
-  return { paymentMethod: 'PIX', countInput: '3', installments: [{ dueDate: monthlyDueDates(1)[0], amountCents: totalCents }], manualAmounts: false };
+  return { paymentMethod: 'BOLETO_PARCELADO', countInput: '17', installments: buildDraftSchedule(totalCents, monthlyDueDates(17)), manualAmounts: false };
 }
 
 interface Props {
@@ -64,7 +64,9 @@ export function SalesCheckoutDialog({ summary }: Props) {
       setStep(0);
       setShowErrors(false);
       setIdempotencyKey(crypto.randomUUID());
+      setPayment(initialPayment(totalCents));
     } else if (!uploadingRef.current) { changeLogo(null, null); }
+  // Reabrir reinicia somente a forma de pagamento; mudanças no total seguem o efeito abaixo.
   }, [open]);
 
   // Total mudou (taxas/etapa): recalcula apenas se os valores ainda são automáticos; datas preservadas.
