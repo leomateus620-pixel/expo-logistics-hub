@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { SegmentLegend } from '@/features/commercial-map/components/segments/SegmentLegend';
-import { COMMERCIAL_MAP_SEGMENT_IDS } from '@/features/commercial-map/data/commercialMapSegments';
+import { COMMERCIAL_MAP_SEGMENT_IDS, commercialMapSegmentInventory } from '@/features/commercial-map/data/commercialMapSegments';
 import {
   OFFICIAL_REFERENCE_ENTITIES,
   OFFICIAL_REFERENCE_LOTS,
@@ -10,6 +10,9 @@ import {
 describe('legenda acessível dos segmentos comerciais', () => {
   it('apresenta os três segmentos, seus inventários e solicita foco', () => {
     const onSelect = vi.fn();
+    const inventory = commercialMapSegmentInventory(OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS);
+    const count = (id: (typeof COMMERCIAL_MAP_SEGMENT_IDS)[keyof typeof COMMERCIAL_MAP_SEGMENT_IDS]) =>
+      inventory.find(item => item.segment.id === id)?.lotCount;
     render(
       <SegmentLegend
         entities={OFFICIAL_REFERENCE_ENTITIES}
@@ -24,9 +27,9 @@ describe('legenda acessível dos segmentos comerciais', () => {
     expect(within(legend).getByText('Exporural')).toBeInTheDocument();
     expect(within(legend).getByText('Indústria, Comércio e Serviços')).toBeInTheDocument();
     expect(within(legend).getByText('Espaço do Automóvel')).toBeInTheDocument();
-    expect(within(legend).getByRole('button', { name: /Focar Exporural\. 95 lotes/i })).toHaveAttribute('aria-pressed', 'false');
-    expect(within(legend).getByRole('button', { name: /Focar Indústria, Comércio e Serviços\. 1166 lotes/i })).toHaveAttribute('aria-pressed', 'false');
-    expect(within(legend).getByRole('button', { name: /Focar Espaço do Automóvel\. 52 lotes/i })).toHaveAttribute('aria-pressed', 'false');
+    expect(within(legend).getByRole('button', { name: `Focar Exporural. ${count(COMMERCIAL_MAP_SEGMENT_IDS.exporural)} lotes.` })).toHaveAttribute('aria-pressed', 'false');
+    expect(within(legend).getByRole('button', { name: `Focar Indústria, Comércio e Serviços. ${count(COMMERCIAL_MAP_SEGMENT_IDS.industry)} lotes.` })).toHaveAttribute('aria-pressed', 'false');
+    expect(within(legend).getByRole('button', { name: `Focar Espaço do Automóvel. ${count(COMMERCIAL_MAP_SEGMENT_IDS.automotive)} lotes.` })).toHaveAttribute('aria-pressed', 'false');
 
     fireEvent.click(within(legend).getByRole('button', { name: /Focar Espaço do Automóvel/i }));
     expect(onSelect).toHaveBeenCalledOnce();

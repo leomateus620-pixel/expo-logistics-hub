@@ -1,5 +1,11 @@
 # Roadmap
 
+## Orientação territorial do Mapa Comercial
+- [x] Separar ruas, quadras e segmentos das quatro cores comerciais, usando âncoras e limites cadastrais sem etiquetar lotes externos.
+- [x] Reaproveitar a camada leve nos links públicos dentro do escopo autorizado; preservar seleção, filtros e contagem derivada do cadastro.
+- [x] Validar tipos e testes focais de segmentos, legendas, navegação, rótulos e escopo público.
+- [ ] Conferir visualmente navegação 3D em desktop e celular, inclinação, rotação, modo noturno e comissões; acesso autenticado automatizado indisponível (gateway de sessão falhou). Sem capturas válidas da cena.
+
 ## Prévia de compartilhamento dos mapas públicos
 - [x] Preparar onze imagens específicas por área, com correção da planta do Pavilhão 7 para 57 boxes.
 - [x] Atualizar as prévias no navegador apenas após validação do link, sem revelar escopo de links inválidos.
