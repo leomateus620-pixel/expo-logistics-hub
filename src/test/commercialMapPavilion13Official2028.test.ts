@@ -77,8 +77,8 @@ describe('Pavilhão 13 — planta oficial Fenasoja 2028', () => {
   });
 
   it('reconcilia somente B5 e protege IDs, status, preços e histórico geométrico', () => {
-    expect(sql).toContain("pavilion.public_identifier = 'b5'");
-    expect(sql).toContain("pavilion.public_identifier = 'b5'");
+    expect(sql).toContain("p.public_identifier='b5'");
+    expect(sql).toContain("p.public_identifier='b5'");
     expect(sql).not.toContain('delete from public.commercial_lots');
     expect(sql).toContain('insert into public.commercial_lots');
   });

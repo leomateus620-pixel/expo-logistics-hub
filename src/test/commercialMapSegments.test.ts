@@ -121,7 +121,7 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
       'B5-M001', 'B5-M104',
       'B6-M001', 'B6-M214',
     ]));
-    expect(identifiers).toHaveLength(1205);
+    expect(identifiers).toHaveLength(1206);
     expect(lotIdentifiers).toEqual(expect.arrayContaining([
       'Q-G-01', 'Q-G-02', 'Q-G-03', 'Q-G-04', 'Q-G-05', 'Q-G-06', 'Q-G-07', 'Q-G-08',
     ]));
