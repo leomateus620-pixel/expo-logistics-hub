@@ -86,7 +86,7 @@ describe('portais comerciais por comissão', () => {
     expect(industry.entities.some((entity) => entity.publicIdentifier === 'B3')).toBe(true);
     expect(industry.entities.some((entity) => entity.publicIdentifier === 'B1-M189')).toBe(true);
     expect(industry.entities.some((entity) => entity.publicIdentifier === 'B4-M114')).toBe(true);
-    expect(industry.entities.some((entity) => entity.publicIdentifier === 'B5-M103')).toBe(true);
+    expect(industry.entities.some((entity) => entity.publicIdentifier === 'B5-M104')).toBe(true);
     expect(industry.entities.some((entity) => /^B8-M/.test(entity.publicIdentifier))).toBe(false);
 
     const industryExplorer = buildEntityExplorerIndex(industry.entities, industry.lots);

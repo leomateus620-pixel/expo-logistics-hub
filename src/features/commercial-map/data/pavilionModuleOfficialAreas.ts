@@ -22,7 +22,7 @@ export const PAVILION_MODULE_AREA_SOURCE_DOCUMENTS = {
   B10: 'Ajuste_Pav07.pdf (setembro/2026)',
   B4: 'Planta PAVILHÃO 8 - Fenasoja 2028.pdf',
   B3: 'Pavilhao_12_Lotes_e_Metragens.pdf',
-  B5: 'Planta Pavilhão 13 — Fenasoja 2028 (desenho set/2026).pdf',
+  B5: 'Ajuste_Pav13_1.pdf (setembro/2026)',
   B2: 'Pavilhao_14_Lotes_e_Metragens.pdf',
 } as const;
 
@@ -209,20 +209,26 @@ const PAVILION_AREA_PLANS: readonly PavilionAreaPlan[] = [
   {
     pavilionId: 'B5',
     pavilionNumber: 13,
-    moduleCount: 103,
-    expectedTotalSqm: 351,
+    moduleCount: 104,
+    expectedTotalSqm: 345,
     bands: [
       {
-        ranges: [[1, 24], [27, 77], [80, 103]],
+        ranges: [[1, 24], [27, 78], [81, 104]],
         areaSqm: 3,
         evidence: 'nominal',
         method: NOMINAL(1, 3),
       },
       {
-        ranges: [[25, 26], [78, 79]],
+        ranges: [[25, 25], [80, 80]],
         areaSqm: 13.5,
         evidence: 'written',
         method: 'Área escrita na planta 2028; metade do envelope 6 × 6 dividida pela diagonal com retorno de 3 m',
+      },
+      {
+        ranges: [[26, 26], [79, 79]],
+        areaSqm: 9,
+        evidence: 'written',
+        method: 'Área escrita na planta oficial Ajuste_Pav13_1.pdf',
       },
     ],
   },
@@ -339,9 +345,9 @@ export const PAVILION_MODULE_AREA_TOTALS = PAVILION_AREA_PLANS.map((plan) => ({
 export const PAVILION_MODULE_AREA_TOTAL_COUNT = PAVILION_MODULE_OFFICIAL_AREAS.size;
 
 // Active official reference: previous 1,315 included 114 superseded P7 cells.
-if (PAVILION_MODULE_AREA_TOTAL_COUNT !== 1201) {
+if (PAVILION_MODULE_AREA_TOTAL_COUNT !== 1202) {
   throw new Error(
-    `A referência de áreas cobriu ${PAVILION_MODULE_AREA_TOTAL_COUNT} módulos; o cadastro ativo tem 1.201.`,
+    `A referência de áreas cobriu ${PAVILION_MODULE_AREA_TOTAL_COUNT} módulos; o cadastro ativo tem 1.202.`,
   );
 }
 

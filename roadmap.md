@@ -118,18 +118,20 @@
 - Não publicar (pedido do usuário)
 
 ## Pavilhão 13 / B5 — planta interativa
-- [x] Preservar orientação canônica, 103 módulos, áreas e geometrias irregulares
+- [x] Preservar orientação canônica, 104 módulos, áreas e geometrias irregulares
 - [x] Ativar perfil compartilhado de PAN, zoom, lotes planos e numeração prioritária
 - [x] Validar regressões automatizadas (53 testes + TypeScript)
 - [ ] Validar navegação visual desktop/mobile — bloqueada pelo renderer WebGL automatizado, que permaneceu carregando por mais de 7 minutos
 - Não publicar (pedido do usuário)
 
 ## Pavilhão 13 / B5 — planta oficial Fenasoja 2028
-- [ ] Reconstruir frame métrico e corredores pelas cotas 3,90 / 3,25 / 4,55
-- [ ] Tornar B5-M025/026/078/079 simétricos, diagonais e com 13,50 m²
-- [ ] Atualizar totais, fonte e revisão exclusiva do B5, preservando ordem e câmera
-- [ ] Reconciliar geometria e áreas persistidas sem alterar IDs, status, preços ou histórico
-- [ ] Validar hit-test, rota pública, desktop/mobile, soma 351 e regressões
+- [x] Preservar frame métrico, acessos e corredores laterais sem alterar a organização física
+- [x] Reorganizar as ilhas em 78→53 / 27→52 e remover 27–29 da faixa superior
+- [x] Atualizar B5-M025/080 para 13,50 m² e B5-M026/079 para 9,00 m²
+- [x] Atualizar inventário para 104 módulos, soma 345,00 m², fonte e revisão exclusiva do B5
+- [x] Reconciliar geometria e áreas persistidas preservando os 103 IDs, status, preços e histórico
+- [x] Validar hit-test, rota pública, soma 345 e regressões automatizadas
+- [ ] Inspecionar visualmente desktop/mobile; não há evidência visual automatizada nesta execução
 - Não publicar (pedido do usuário)
 
 ## Avisos no celular (push / FCM)

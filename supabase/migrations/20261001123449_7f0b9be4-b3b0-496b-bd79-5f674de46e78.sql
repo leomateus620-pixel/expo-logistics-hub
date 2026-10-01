@@ -1,0 +1,21 @@
+BEGIN;
+SELECT pg_advisory_xact_lock(hashtextextended('commercial-map:pavilion-13:2028.2-p13.4:' || project.id::text, 0)) FROM public.map_projects project WHERE project.is_archived=false ORDER BY project.id;
+CREATE TEMP TABLE _p13_center ON COMMIT DROP AS
+WITH parent AS (
+ SELECT p.id pavilion_id,p.project_id,g.elevation,g.calibration_version,min((pt->>0)::numeric) min_x,max((pt->>0)::numeric) max_x,min((pt->>1)::numeric) min_z,max((pt->>1)::numeric) max_z
+ FROM public.map_entities p JOIN public.map_entity_geometries g ON g.entity_id=p.id AND g.is_current CROSS JOIN LATERAL jsonb_array_elements(g.geometry->'coordinates'->0) pt
+ WHERE p.public_identifier='B5' AND p.classification='PAVILION' AND NOT p.is_archived GROUP BY p.id,p.project_id,g.elevation,g.calibration_version
+), frame AS (
+ SELECT *, (min_x+max_x)/2 center_x,(min_z+max_z)/2 center_z,(max_x-min_x)-2*least(max_x-min_x,max_z-min_z)*0.09 clear_w,(max_z-min_z)-2*least(max_x-min_x,max_z-min_z)*0.09 clear_d FROM parent
+), scaled AS (SELECT *,least(clear_w/19.8,clear_d/37.8) scale FROM frame), metric AS (
+ SELECT n,CASE WHEN n<=52 THEN 9.9 ELSE 6.9 END x,3+(CASE WHEN n<=52 THEN n-27 ELSE 78-n END) z FROM generate_series(27,78) n
+), staged AS (
+ SELECT s.*,m.*,19.8*scale fw,37.8*scale fd,center_z+(clear_d-37.8*scale)/2 fz,jsonb_build_array(jsonb_build_array(m.x/19.8,m.z/37.8),jsonb_build_array((m.x+3)/19.8,m.z/37.8),jsonb_build_array((m.x+3)/19.8,(m.z+1)/37.8),jsonb_build_array(m.x/19.8,(m.z+1)/37.8),jsonb_build_array(m.x/19.8,m.z/37.8)) nr FROM scaled s CROSS JOIN metric m
+) SELECT q.*,e.id entity_id,jsonb_build_object('type','Polygon','coordinates',jsonb_build_array((SELECT jsonb_agg(jsonb_build_array(center_x-(((pt->>0)::numeric-.5)*fw),fz-(((pt->>1)::numeric-.5)*fd)) ORDER BY ord) FROM jsonb_array_elements(nr) WITH ORDINALITY p(pt,ord)))) geometry FROM staged q JOIN public.map_entities e ON e.project_id=q.project_id AND e.public_identifier='B5-M'||lpad(q.n::text,3,'0') AND NOT e.is_archived;
+DO $$ BEGIN IF (SELECT count(*) FROM _p13_center)<>52 THEN RAISE EXCEPTION 'PAVILION_13_CENTER_INVENTORY_INVALID'; END IF; END $$;
+ALTER TABLE public.map_entity_geometries DISABLE TRIGGER map_geometry_layer_lock_before_write;
+UPDATE public.map_entity_geometries g SET geometry=s.geometry,version=g.version+1,change_reason='Alinhamento oficial da ilha central do Pavilhão 13 — setembro/2026',updated_at=transaction_timestamp() FROM _p13_center s WHERE g.entity_id=s.entity_id AND g.is_current AND g.geometry IS DISTINCT FROM s.geometry;
+ALTER TABLE public.map_entity_geometries ENABLE TRIGGER map_geometry_layer_lock_before_write;
+UPDATE public.map_entities e SET metadata=(coalesce(e.metadata,'{}')-ARRAY['normalizedFootprintPolygon','normalizedLabelAnchor','labelAnchor','layoutRevision'])||jsonb_build_object('normalizedFootprintPolygon',s.nr,'normalizedLabelAnchor',jsonb_build_array((s.x+1.5)/19.8,(s.z+.5)/37.8),'labelAnchor',jsonb_build_array(s.center_x-((((s.x+1.5)/19.8)-.5)*s.fw),s.fz-((((s.z+.5)/37.8)-.5)*s.fd)),'layoutRevision','2028.2-p13.4'),updated_at=transaction_timestamp() FROM _p13_center s WHERE e.id=s.entity_id;
+UPDATE public.map_entities p SET metadata=coalesce(p.metadata,'{}')||jsonb_build_object('layoutRevision','2028.2-p13.4','internalPlanRuns',jsonb_build_array(jsonb_build_object('id','east-lower-01-15','numberRange','[1,15]'::jsonb),jsonb_build_object('id','east-upper-16-24','numberRange','[16,24]'::jsonb),jsonb_build_object('id','central-east-27-52','numberRange','[27,52]'::jsonb,'normalizedFootprint',jsonb_build_object('centerX',11.4/19.8,'centerZ',16.0/37.8,'width',3.0/19.8,'depth',26.0/37.8)),jsonb_build_object('id','central-west-53-78','numberRange','[53,78]'::jsonb,'normalizedFootprint',jsonb_build_object('centerX',8.4/19.8,'centerZ',16.0/37.8,'width',3.0/19.8,'depth',26.0/37.8)),jsonb_build_object('id','west-upper-81-89','numberRange','[81,89]'::jsonb),jsonb_build_object('id','west-lower-90-104','numberRange','[90,104]'::jsonb)), 'internalOfficialPlan',(coalesce(p.metadata->'internalOfficialPlan','{}'))||jsonb_build_object('layoutRevision','2028.2-p13.4')),updated_at=transaction_timestamp() WHERE p.public_identifier='B5' AND p.classification='PAVILION' AND NOT p.is_archived;
+COMMIT;
