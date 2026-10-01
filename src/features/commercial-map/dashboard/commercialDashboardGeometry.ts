@@ -43,6 +43,23 @@ export interface CommercialMiniMapGeometry {
   scale: number;
 }
 
+/** Fits projected geometry and its presentation symbols without changing cadastral coordinates. */
+export function buildCommercialMiniMapViewBox(
+  geometry: CommercialMiniMapGeometry,
+  decorations: readonly MiniMapBounds[] = [],
+): string {
+  if (!geometry.bounds) return geometry.viewBox;
+  const [minX, minY] = geometry.project([geometry.bounds.minX, geometry.bounds.minY]);
+  const [maxX, maxY] = geometry.project([geometry.bounds.maxX, geometry.bounds.maxY]);
+  const bounds = decorations.reduce((current, decoration) => ({
+    minX: Math.min(current.minX, decoration.minX), minY: Math.min(current.minY, decoration.minY),
+    maxX: Math.max(current.maxX, decoration.maxX), maxY: Math.max(current.maxY, decoration.maxY),
+  }), { minX, minY, maxX, maxY });
+  return [bounds.minX - PADDING, bounds.minY - PADDING,
+    bounds.maxX - bounds.minX + 2 * PADDING, bounds.maxY - bounds.minY + 2 * PADDING]
+    .map(formatCoordinate).join(' ');
+}
+
 const WIDTH = 1000;
 const HEIGHT = 600;
 const PADDING = 28;

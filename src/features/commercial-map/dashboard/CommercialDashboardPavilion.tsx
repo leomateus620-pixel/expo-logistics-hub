@@ -4,11 +4,12 @@ import { buildDashboardPavilionGeometry } from './commercialDashboardPavilionGeo
 import { CommercialMiniMap } from './CommercialMiniMap';
 import type { CommercialStatus } from '../types';
 
-export default function CommercialDashboardPavilion({ snapshot, onViewLot, selection, highlightedStatus }: {
+export default function CommercialDashboardPavilion({ snapshot, onViewLot, selection, highlightedStatus, hideStatusLegend = false }: {
   snapshot: CommercialPavilionDashboardSnapshot;
   onViewLot: (id: string) => void;
   selection?: { entityId: string | null; onChange: (id: string | null) => void };
   highlightedStatus?: CommercialStatus | null;
+  hideStatusLegend?: boolean;
 }) {
   const geometry = useMemo(() => buildDashboardPavilionGeometry(snapshot), [snapshot]);
   return <div data-dashboard-pavilion={snapshot.definition.publicIdentifier}>
@@ -18,7 +19,7 @@ export default function CommercialDashboardPavilion({ snapshot, onViewLot, selec
       {geometry.referenceCount !== snapshot.totalLots && ' A diferença permanece explícita; os indicadores usam somente o cadastro ativo carregado.'}
     </p>
     <CommercialMiniMap items={geometry.records} title={snapshot.definition.officialName}
-      outlines={geometry.outlines} accesses={geometry.accesses} numbered onViewLot={onViewLot} selection={selection} highlightedStatus={highlightedStatus} />
+      outlines={geometry.outlines} accesses={geometry.accesses} numbered onViewLot={onViewLot} selection={selection} highlightedStatus={highlightedStatus} hideStatusLegend={hideStatusLegend} />
     {geometry.pending.map((message) => <p className="commercial-dashboard-pending" key={message}>{message}</p>)}
   </div>;
 }

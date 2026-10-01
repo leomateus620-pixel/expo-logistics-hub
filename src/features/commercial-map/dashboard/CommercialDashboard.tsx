@@ -1,17 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ChartNoAxesCombined, Clock3, RefreshCw, X } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { ChartNoAxesCombined, Clock3, RefreshCw, X, LayoutGrid, PenLine, BadgeCheck, MapPinned, Ruler, Banknote, Wallet } from 'lucide-react';
 import type { CommercialMapData } from '../types';
+import { STATUS_CONFIG } from '../constants';
 import { CommercialDashboardSpaces } from './CommercialDashboardSpaces';
-import { CommercialDashboardLotChart, CommercialDashboardValueChart } from './CommercialDashboardCharts';
 import { buildCommercialDashboardSnapshot } from './commercialDashboardAnalytics';
-import { useDashboardStatusHighlight } from './useDashboardStatusHighlight';
-import {
-  formatDashboardAreaWithCoverage,
-  formatDashboardCurrency,
-  formatDashboardInteger,
-  formatDashboardPercentage,
-} from './commercialDashboardFormatters';
+import { formatDashboardAreaWithCoverage, formatDashboardCurrency, formatDashboardInteger, formatDashboardPercentage } from './commercialDashboardFormatters';
 import './commercial-dashboard.css';
 
 export interface CommercialDashboardProps {
@@ -22,192 +15,70 @@ export interface CommercialDashboardProps {
   onViewLot: (entityId: string) => void;
 }
 
-function Kpi({ label, value, detail, progress }: {
-  label: string;
-  value: ReactNode;
-  detail?: ReactNode;
-  progress?: number | null;
+function Kpi({ label, value, detail, icon, color }: {
+  label: string; value: ReactNode; detail: ReactNode; icon: ReactNode; color?: string;
 }) {
-  return <article className="commercial-dashboard-kpi">
-    <span>{label}</span>
-    <strong>{value}</strong>
-    {detail && <small>{detail}</small>}
-    {progress != null && <div className="commercial-dashboard-kpi-progress" aria-hidden="true">
-      <i style={{ width: `${Math.max(0, Math.min(100, progress))}%` }} />
-    </div>}
+  return <article className="commercial-dashboard-kpi" style={color ? { borderTopColor: color } : undefined}>
+    <span>{icon}{label}</span><strong>{value}</strong><small>{detail}</small>
   </article>;
 }
 
-function displayedValue(value: number, lotCount: number, pricedLotCount: number): string {
-  if (lotCount === 0 || pricedLotCount === 0) return '—';
-  return formatDashboardCurrency(value, true);
-}
-
-function focusDashboardSection(id: string) {
-  const heading = document.getElementById(id);
-  heading?.focus({ preventScroll: true });
-  heading?.scrollIntoView({ block: 'start' });
+function PriceCoverage({ lots, priced, scope }: { lots: number; priced: number; scope: string }) {
+  return <>{lots === 0 ? 'Nenhum lote neste indicador' : priced === 0 ? 'Preço cadastral pendente' : priced < lots
+    ? `Subtotal · ${formatDashboardInteger(priced)} de ${formatDashboardInteger(lots)} com preço`
+    : `${formatDashboardInteger(priced)} lotes com preço`}<span className="commercial-dashboard-finance-note">{scope}</span><span className="commercial-dashboard-finance-note">Valor cadastral · não é receita recebida</span></>;
 }
 
 export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, onViewLot }: CommercialDashboardProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const [consolidatedOpen, setConsolidatedOpen] = useState(false);
-  const { highlightedStatus, onHoverStatus, onToggleStatus } = useDashboardStatusHighlight();
-  const snapshot = useMemo(
-    () => buildCommercialDashboardSnapshot({ entities: data.entities, lots: data.lots }),
-    [data.entities, data.lots],
-  );
+  const snapshot = useMemo(() => buildCommercialDashboardSnapshot({ entities: data.entities, lots: data.lots }), [data.entities, data.lots]);
   const { overall } = snapshot;
-  // Vendidos legados sem comprovação de assinatura: indicador interno, sem reclassificar os lotes.
-  const [legacyUnverifiedCount, setLegacyUnverifiedCount] = useState(0);
-  useEffect(() => {
-    let cancelled = false;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (supabase as any)
-      .from('lot_sale_order_items')
-      .select('id', { count: 'exact', head: true })
-      .eq('contract_state', 'LEGACY_UNVERIFIED')
-      .then(({ count, error }: { count: number | null; error: unknown }) => {
-        if (!cancelled && !error) setLegacyUnverifiedCount(count ?? 0);
-      });
-    return () => { cancelled = true; };
-  }, [dataUpdatedAt]);
-  const pendingLotCount = overall.availableLots + overall.reservedLots + overall.negotiationLots + overall.saleOpenLots;
-  const pendingPricedLotCount = overall.byStatus.AVAILABLE.pricedLotCount
-    + overall.byStatus.RESERVED.pricedLotCount
-    + overall.byStatus.IN_NEGOTIATION.pricedLotCount
-    + overall.byStatus.SALE_OPEN.pricedLotCount;
-  const pendingUnpricedLotCount = pendingLotCount - pendingPricedLotCount;
   const updatedAtLabel = dataUpdatedAt > 0 && Number.isFinite(dataUpdatedAt)
     ? `Atualizado às ${new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(dataUpdatedAt)}`
     : 'Sincronização pendente';
-
   useEffect(() => { closeButtonRef.current?.focus({ preventScroll: true }); }, []);
 
   return <div className="commercial-dashboard">
     <header className="commercial-dashboard-header">
       <div className="commercial-dashboard-header-title">
         <div className="commercial-dashboard-mark" aria-hidden="true"><ChartNoAxesCombined /></div>
-        <div>
-          <span className="commercial-dashboard-eyebrow">Gestão comercial · Fenasoja 2028</span>
-          <h1 id="commercial-dashboard-title">Dashboard Comercial</h1>
-          <p>Acompanhamento de comercialização dos espaços — Fenasoja 2028</p>
-        </div>
+        <div><h1 id="commercial-dashboard-title">Dashboard Comercial</h1><span className="commercial-dashboard-event">Fenasoja 2028</span></div>
       </div>
       <div className="commercial-dashboard-header-actions">
         <span className="commercial-dashboard-sync" role="status">
           {isFetching ? <RefreshCw className="is-spinning" aria-hidden="true" /> : <Clock3 aria-hidden="true" />}
           <span>{isFetching ? 'Atualizando · ' : ''}{updatedAtLabel}</span>
         </span>
-        <button type="button" className="commercial-dashboard-close" onClick={onClose} ref={closeButtonRef} aria-label="Fechar Dashboard Comercial">
-          <X aria-hidden="true" /><span>Fechar</span>
-        </button>
+        <button type="button" className="commercial-dashboard-close" onClick={onClose} ref={closeButtonRef} aria-label="Fechar Dashboard Comercial"><X aria-hidden="true" /><span>Fechar</span></button>
       </div>
     </header>
-
     <main className="commercial-dashboard-content">
-      <nav className="commercial-dashboard-jump" aria-label="Navegar entre visões gerenciais">
-        <button type="button" onClick={() => focusDashboardSection('dashboard-external-title')}>Áreas externas <strong>{formatDashboardInteger(snapshot.external.totalLots)}</strong></button>
-        <button type="button" onClick={() => focusDashboardSection('dashboard-internal-title')}>Pavilhões internos <strong>{formatDashboardInteger(snapshot.internal.totalLots)}</strong></button>
-      </nav>
+      <div className="commercial-dashboard-global-label"><span className="commercial-dashboard-eyebrow">Visão global · todo o inventário comercial</span></div>
+      <div className="commercial-dashboard-indicators">
       <section className="commercial-dashboard-kpis" aria-label="Indicadores comerciais principais">
-        <Kpi
-          label="Lotes comerciais"
-          value={formatDashboardInteger(overall.commercialLots)}
-          detail={overall.commercialLots === 0 ? 'Nenhum espaço comercial cadastrado' : 'Inventário comercial ativo'}
-        />
-        <Kpi
-          label="Lotes vendidos"
-          value={<>{formatDashboardInteger(overall.soldLots)} <em>/ {formatDashboardInteger(overall.commercialLots)}</em></>}
-          detail="Do inventário comercial ativo"
-          progress={overall.commercialLots > 0 ? overall.soldLotPercentage : null}
-        />
-        <Kpi
-          label="% dos lotes vendidos"
-          value={overall.commercialLots > 0 ? formatDashboardPercentage(overall.soldLotPercentage) : '—'}
-          detail={overall.commercialLots > 0
-            ? `${formatDashboardInteger(overall.soldLots)} de ${formatDashboardInteger(overall.commercialLots)} lotes`
-            : 'Percentual pendente de inventário'}
-          progress={overall.commercialLots > 0 ? overall.soldLotPercentage : null}
-        />
-        <Kpi
-          label="Vendas em aberto"
-          value={formatDashboardInteger(overall.saleOpenLots)}
-          detail={overall.saleOpenLots === 0
-            ? 'Nenhuma venda aguardando assinatura'
-            : `Carteira em aberto · ${displayedValue(overall.saleOpenValue, overall.saleOpenLots, overall.byStatus.SALE_OPEN.pricedLotCount)} · nunca receita realizada`}
-          progress={overall.commercialLots > 0 ? overall.byStatus.SALE_OPEN.lotPercentage : null}
-        />
-        <Kpi
-          label="Lotes disponíveis"
-          value={formatDashboardInteger(overall.availableLots)}
-          detail={overall.commercialLots > 0
-            ? `${formatDashboardPercentage(overall.byStatus.AVAILABLE.lotPercentage)} do inventário comercial`
-            : 'Percentual pendente de inventário'}
-          progress={overall.commercialLots > 0 ? overall.byStatus.AVAILABLE.lotPercentage : null}
-        />
-        <Kpi
-          label="Área comercial cadastrada"
-          value={formatDashboardAreaWithCoverage(overall.totalAreaSqm, overall.commercialLots, overall.lotsWithoutOfficialArea, overall.commercialLots)}
-          detail={overall.commercialLots === 0 ? 'Nenhum espaço comercial cadastrado' : 'Metragem oficial dos espaços em oferta'}
-        />
-        <Kpi
-          label="Área vendida"
-          value={formatDashboardAreaWithCoverage(overall.soldAreaSqm, overall.soldLots, overall.byStatus.SOLD.areaPendingCount, overall.commercialLots)}
-          detail={overall.totalAreaSqm > 0 ? `${formatDashboardPercentage(overall.soldAreaPercentage)} do total comercial` : 'Percentual pendente de metragem oficial'}
-          progress={overall.totalAreaSqm > 0 ? overall.soldAreaPercentage : null}
-        />
-        <Kpi
-          label="Área disponível"
-          value={formatDashboardAreaWithCoverage(overall.availableAreaSqm, overall.availableLots, overall.byStatus.AVAILABLE.areaPendingCount, overall.commercialLots)}
-          detail={overall.totalAreaSqm > 0 ? `${formatDashboardPercentage(overall.byStatus.AVAILABLE.areaPercentage)} do total comercial` : 'Percentual pendente de metragem oficial'}
-          progress={overall.totalAreaSqm > 0 ? overall.byStatus.AVAILABLE.areaPercentage : null}
-        />
-        <Kpi
-          label="Valor comercial dos lotes vendidos"
-          value={displayedValue(overall.soldValue, overall.soldLots, overall.byStatus.SOLD.pricedLotCount)}
-          detail={overall.byStatus.SOLD.pricedLotCount === 0
-            ? 'Nenhum valor vendido cadastrado'
-            : overall.byStatus.SOLD.pricePendingCount > 0
-              ? `Subtotal cadastrado · ${formatDashboardInteger(overall.byStatus.SOLD.pricePendingCount)} sem preço`
-              : 'Valor cadastrado, não receita recebida'}
-        />
-        <Kpi
-          label="Potencial comercial pendente"
-          value={displayedValue(overall.pendingValue, pendingLotCount, pendingPricedLotCount)}
-          detail={pendingPricedLotCount === 0
-            ? 'Nenhum valor pendente cadastrado'
-            : pendingUnpricedLotCount > 0
-              ? `Subtotal cadastrado · ${formatDashboardInteger(pendingUnpricedLotCount)} sem preço`
-              : 'Disponível, reservado, em negociação e venda em aberto'}
-        />
+        <Kpi label="Espaços comerciais" icon={<LayoutGrid aria-hidden="true" />} value={formatDashboardInteger(overall.commercialLots)} detail="Inventário ativo · todos os recortes" />
+        <Kpi label="Lotes com venda em andamento" icon={<PenLine aria-hidden="true" />} color={STATUS_CONFIG.SALE_OPEN.color} value={formatDashboardInteger(overall.saleOpenLots)}
+          detail={<>{overall.commercialLots ? formatDashboardPercentage(overall.byStatus.SALE_OPEN.lotPercentage) : '—'} · aguardando assinatura</>} />
+        <Kpi label="Lotes vendidos" icon={<BadgeCheck aria-hidden="true" />} color={STATUS_CONFIG.SOLD.color} value={formatDashboardInteger(overall.soldLots)}
+          detail={<>{overall.commercialLots ? formatDashboardPercentage(overall.soldLotPercentage) : '—'} · {formatDashboardAreaWithCoverage(overall.soldAreaSqm, overall.soldLots, overall.byStatus.SOLD.areaPendingCount, overall.commercialLots)}</>} />
+        <Kpi label="Lotes disponíveis" icon={<MapPinned aria-hidden="true" />} color={STATUS_CONFIG.AVAILABLE.color} value={formatDashboardInteger(overall.availableLots)}
+          detail={<>{overall.commercialLots ? formatDashboardPercentage(overall.byStatus.AVAILABLE.lotPercentage) : '—'} · {formatDashboardAreaWithCoverage(overall.availableAreaSqm, overall.availableLots, overall.byStatus.AVAILABLE.areaPendingCount, overall.commercialLots)}</>} />
+        <Kpi label="Área comercial" icon={<Ruler aria-hidden="true" />} value={formatDashboardAreaWithCoverage(overall.totalAreaSqm, overall.commercialLots, overall.lotsWithoutOfficialArea, overall.commercialLots)}
+          detail={overall.lotsWithoutOfficialArea ? `${formatDashboardInteger(overall.lotsWithoutOfficialArea)} espaços sem metragem oficial válida` : 'Metragem oficial cadastrada'} />
       </section>
-
-      {legacyUnverifiedCount > 0 && <div className="commercial-dashboard-integrity" role="note">
-        <span>{formatDashboardInteger(legacyUnverifiedCount)} vendidos legados — comprovação de assinatura pendente (mantidos como Vendido)</span>
-      </div>}
-
-      {(overall.lotsWithoutOfficialArea > 0 || overall.lotsWithoutPrice > 0 || snapshot.unclassifiedLots > 0) && <div className="commercial-dashboard-integrity" role="note">
-        {overall.lotsWithoutOfficialArea > 0 && <span>{formatDashboardInteger(overall.lotsWithoutOfficialArea)} {overall.lotsWithoutOfficialArea === 1 ? 'espaço fora do cálculo de área' : 'espaços fora do cálculo de área'}</span>}
-        {overall.lotsWithoutPrice > 0 && <span>{formatDashboardInteger(overall.lotsWithoutPrice)} {overall.lotsWithoutPrice === 1 ? 'espaço sem valor definido' : 'espaços sem valor definido'}</span>}
-        {snapshot.unclassifiedLots > 0 && <span>{formatDashboardInteger(snapshot.unclassifiedLots)} {snapshot.unclassifiedLots === 1 ? 'espaço com classificação pendente incluído' : 'espaços com classificação pendente incluídos'} na visão geral</span>}
-      </div>}
-
-      {snapshot.orphanLots > 0 && <p className="commercial-dashboard-pending">
-        {snapshot.orphanLots} lotes sem entidade cadastral carregada, fora dos indicadores conforme o contrato atual do mapa.
-      </p>}
-      <details className="commercial-dashboard-scope-analysis commercial-dashboard-consolidated" onToggle={(event) => setConsolidatedOpen(event.currentTarget.open)}>
-        <summary>Resumo consolidado · distribuição de todo o inventário</summary>
-        {consolidatedOpen && <div className="commercial-dashboard-overview-grid">
-          <CommercialDashboardLotChart aggregate={overall} highlightedStatus={highlightedStatus} onHoverStatus={onHoverStatus} onToggleStatus={onToggleStatus} />
-          <CommercialDashboardValueChart aggregate={overall} highlightedStatus={highlightedStatus} onHoverStatus={onHoverStatus} onToggleStatus={onToggleStatus} />
-        </div>}
-      </details>
+      <section className="commercial-dashboard-financial-kpis" aria-label="Valores cadastrais globais">
+        <Kpi label="Valor dos lotes em andamento" icon={<Banknote aria-hidden="true" />} color={STATUS_CONFIG.SALE_OPEN.color}
+          value={overall.byStatus.SALE_OPEN.pricedLotCount > 0 ? <span title={formatDashboardCurrency(overall.saleOpenValue)}>{formatDashboardCurrency(overall.saleOpenValue, true)}</span> : '—'}
+          detail={<PriceCoverage lots={overall.saleOpenLots} priced={overall.byStatus.SALE_OPEN.pricedLotCount} scope="Aguardando assinatura" />} />
+        <Kpi label="Valor total dos lotes comerciais" icon={<Wallet aria-hidden="true" />}
+          value={overall.knownValueLots > 0 ? <span title={formatDashboardCurrency(overall.totalKnownValue)}>{formatDashboardCurrency(overall.totalKnownValue, true)}</span> : '—'}
+          detail={<PriceCoverage lots={overall.commercialLots} priced={overall.knownValueLots} scope="Inclui bloqueados · exclui indisponíveis" />} />
+      </section></div>
       <CommercialDashboardSpaces snapshot={snapshot} data={data} onViewLot={onViewLot} />
-
-      <footer className="commercial-dashboard-footer">
-        Fonte: cadastro comercial carregado pelo Mapa Comercial. Áreas usam apenas metragem oficial válida; valores representam preços comerciais cadastrados.
-      </footer>
+      {snapshot.orphanLots > 0 && <div className="commercial-dashboard-integrity" role="note">
+        <span>{snapshot.orphanLots} lotes sem entidade cadastral carregada, fora dos indicadores conforme o contrato atual do mapa.</span>
+      </div>}
+      <footer className="commercial-dashboard-footer">Fonte: cadastro carregado pelo Mapa Comercial · áreas oficiais válidas · atualização sincronizada com o mapa.</footer>
     </main>
   </div>;
 }

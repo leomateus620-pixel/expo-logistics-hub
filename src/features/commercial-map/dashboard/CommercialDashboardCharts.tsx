@@ -37,6 +37,7 @@ interface ChartProps {
   onHoverStatus: (status: CommercialStatus | null) => void;
   onToggleStatus: (status: CommercialStatus) => void;
   compact?: boolean;
+  metric?: 'lots' | 'area';
 }
 
 interface LotChartRow {
@@ -61,6 +62,7 @@ export function CommercialDashboardLotChart({
   onHoverStatus,
   onToggleStatus,
   compact = false,
+  metric = 'lots',
 }: ChartProps) {
   // The four displayed phases group legacy operational states without rewriting them.
   const rows: LotChartRow[] = AREA_STATUSES.flatMap((status) => {
@@ -77,14 +79,14 @@ export function CommercialDashboardLotChart({
 
   return (
     <div className={`commercial-dashboard-area-chart${compact ? ' is-compact' : ''}`}>
-      {rows.length > 0 ? (
+      {rows.length > 0 && (metric === 'lots' || aggregate.totalAreaSqm > 0) ? (
         <div className="commercial-dashboard-donut-layout">
           <div className="commercial-dashboard-donut" aria-hidden="true">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={rows}
-                  dataKey="lotCount"
+                  dataKey={metric === 'area' ? 'areaSqm' : 'lotCount'}
                   nameKey="name"
                   cx="50%"
                   cy="50%"
@@ -116,7 +118,7 @@ export function CommercialDashboardLotChart({
                     if (!row) return null;
                     return <div className="commercial-dashboard-chart-tooltip">
                       <strong>{row.name}</strong>
-                      <span>{formatDashboardInteger(row.lotCount)} {row.lotCount === 1 ? 'lote' : 'lotes'} · {formatDashboardPercentage(row.percentage)}</span>
+                      <span>{formatDashboardInteger(row.lotCount)} {row.lotCount === 1 ? 'lote' : 'lotes'} · {formatDashboardPercentage(metric === 'area' ? row.areaPercentage : row.percentage)} {metric === 'area' ? 'da área' : 'dos lotes'}</span>
                       <small>{formatDashboardAreaWithCoverage(row.areaSqm, row.lotCount, phaseSummary(aggregate, row.status).areaPendingCount, aggregate.commercialLots)}</small>
                     </div>;
                   }}
@@ -124,8 +126,8 @@ export function CommercialDashboardLotChart({
               </PieChart>
             </ResponsiveContainer>
             <div className="commercial-dashboard-donut-center">
-              <strong>{formatDashboardPercentage(aggregate.soldLotPercentage)}</strong>
-              <span>lotes vendidos</span>
+              <strong>{formatDashboardPercentage(metric === 'area' ? aggregate.soldAreaPercentage : aggregate.soldLotPercentage)}</strong>
+              <span>{metric === 'area' ? 'área vendida' : 'lotes vendidos'}</span>
             </div>
           </div>
           <div className="commercial-dashboard-donut-detail">
@@ -136,10 +138,11 @@ export function CommercialDashboardLotChart({
           </div>
         </div>
       ) : (
-        <div className="commercial-dashboard-chart-empty">Ainda não há lotes comerciais cadastrados para compor o gráfico.</div>
+        <div className="commercial-dashboard-chart-empty">{metric === 'area' && aggregate.commercialLots > 0 ? 'Área oficial pendente de cadastro para compor o gráfico.' : 'Ainda não há lotes comerciais cadastrados para compor o gráfico.'}</div>
       )}
 
       <div className="commercial-dashboard-status-list" aria-label="Distribuição comercial por quantidade de lotes e área">
+        <div className="commercial-dashboard-legend-heading" aria-hidden="true"><span>Situação</span><span>Lotes</span><span>Área oficial</span><span>% {metric === 'area' ? 'área' : 'lotes'}</span></div>
         {AREA_STATUSES.map((status) => {
           const summary = phaseSummary(aggregate, status);
           return <button
@@ -152,14 +155,26 @@ export function CommercialDashboardLotChart({
             onBlur={() => onHoverStatus(null)}
             onClick={() => onToggleStatus(status)}
             aria-pressed={highlightedStatus === status}
-            aria-label={`${STATUS_CONFIG[status].label}: ${formatDashboardInteger(summary.lotCount)} lotes, ${aggregate.commercialLots > 0 ? formatDashboardPercentage(summary.lotPercentage) : 'percentual pendente'}, ${formatDashboardAreaWithCoverage(summary.areaSqm, summary.lotCount, summary.areaPendingCount, aggregate.commercialLots)}`}
+            aria-label={`${STATUS_CONFIG[status].label}: ${formatDashboardInteger(summary.lotCount)} lotes, ${aggregate.commercialLots > 0 ? formatDashboardPercentage(summary.lotPercentage) : 'percentual pendente'} dos lotes, ${formatDashboardAreaWithCoverage(summary.areaSqm, summary.lotCount, summary.areaPendingCount, aggregate.commercialLots)}, ${aggregate.totalAreaSqm > 0 ? formatDashboardPercentage(summary.areaPercentage) : 'percentual pendente'} da área${summary.areaPendingCount ? `, ${summary.areaPendingCount} sem área oficial` : ''}`}
           >
             <i style={{ backgroundColor: STATUS_CONFIG[status].color }} aria-hidden="true" />
             <span>{STATUS_CONFIG[status].label}</span>
             <strong>{formatDashboardInteger(summary.lotCount)}</strong>
-            <small>{aggregate.commercialLots > 0 ? formatDashboardPercentage(summary.lotPercentage) : '—'}</small>
+            <span className="commercial-dashboard-legend-area">{formatDashboardAreaWithCoverage(summary.areaSqm, summary.lotCount, summary.areaPendingCount, aggregate.commercialLots)}
+              {summary.areaPendingCount > 0 && <small>{summary.areaPendingCount} sem área</small>}
+            </span>
+            <small>{metric === 'area' ? (aggregate.totalAreaSqm > 0 ? formatDashboardPercentage(summary.areaPercentage) : '—') : (aggregate.commercialLots > 0 ? formatDashboardPercentage(summary.lotPercentage) : '—')}</small>
           </button>;
         })}
+        {aggregate.unavailableLots > 0 && <button type="button" className={`commercial-dashboard-legend-unavailable${highlightedStatus === 'UNAVAILABLE' ? ' is-highlighted' : ''}`}
+          aria-pressed={highlightedStatus === 'UNAVAILABLE'} onClick={() => onToggleStatus('UNAVAILABLE')}
+          onMouseEnter={() => { if (canHover()) onHoverStatus('UNAVAILABLE'); }} onMouseLeave={() => { if (canHover()) onHoverStatus(null); }}
+          onFocus={(event) => { if (event.currentTarget.matches(':focus-visible')) onHoverStatus('UNAVAILABLE'); }} onBlur={() => onHoverStatus(null)}
+          aria-label={`Indisponível: ${formatDashboardInteger(aggregate.unavailableLots)} lotes, fora dos percentuais comerciais, ${formatDashboardAreaWithCoverage(aggregate.unavailableAreaSqm, aggregate.unavailableLots, aggregate.byStatus.UNAVAILABLE.areaPendingCount, aggregate.totalLots)}`}>
+          <i style={{ backgroundColor: STATUS_CONFIG.UNAVAILABLE.color }} aria-hidden="true" /><span>Indisponível</span>
+          <strong>{formatDashboardInteger(aggregate.unavailableLots)}</strong>
+          <span className="commercial-dashboard-legend-area">{formatDashboardAreaWithCoverage(aggregate.unavailableAreaSqm, aggregate.unavailableLots, aggregate.byStatus.UNAVAILABLE.areaPendingCount, aggregate.totalLots)}</span><small>Fora do %</small>
+        </button>}
       </div>
       {aggregate.byStatus.UNAVAILABLE.lotCount > 0 && <p className="commercial-dashboard-chart-exclusion">
         {formatDashboardInteger(aggregate.byStatus.UNAVAILABLE.lotCount)} {aggregate.byStatus.UNAVAILABLE.lotCount === 1 ? 'espaço fora da área comercial ativa' : 'espaços fora da área comercial ativa'}

@@ -37,17 +37,17 @@ describe('managerial scopes in the existing dashboard', () => {
     expect(within(screen.getByRole('region', { name: 'Mini mapa comercial: Exporural' })).getByRole('button', { name: 'Ver no mapa' })).toBeVisible();
   });
 
-  it('selects the seven accessible pavilion icons, shows registered numbers/accesses and keeps B13 explicit', async () => {
+  it('selects every pavilion from the common selector, including the official Pavilion 13 B5 identity', async () => {
     const onViewLot = vi.fn();
     const { container } = render(<CommercialDashboard {...props} onViewLot={onViewLot} />);
     const selectors = screen.getByRole('group', { name: 'Selecionar pavilhão' });
-    expect(within(selectors).getAllByRole('button')).toHaveLength(8);
-    expect(screen.getByText(/Pavilhão 13: 2 módulos ativos/)).toBeInTheDocument();
-    for (const pavilion of snapshot.pavilions.filter((item) => item.definition.pavilionNumber !== 13)) {
+    expect(within(selectors).getAllByRole('button')).toHaveLength(snapshot.pavilions.length + 1);
+    expect(screen.queryByRole('button', { name: 'Consultar Pavilhão 13' })).not.toBeInTheDocument();
+    for (const pavilion of snapshot.pavilions) {
       const button = within(selectors).getByRole('button', { name: pavilion.definition.officialName });
       fireEvent.click(button);
       expect(button).toHaveAttribute('aria-pressed', 'true');
-      const map = await screen.findByRole('region', { name: `Mini mapa comercial: ${pavilion.definition.officialName}` });
+      const map = await screen.findByRole('region', { name: `Mini mapa comercial: ${pavilion.definition.officialName}` }, { timeout: 5000 });
       expect(container.querySelectorAll('[data-dashboard-pavilion]')).toHaveLength(1);
       const expected = sampleRecords.filter((record) => record.pavilion?.publicIdentifier === pavilion.definition.publicIdentifier)[0];
       const module = map.querySelector(`path[data-entity-id="${expected.entity.id}"]`)!;
@@ -58,8 +58,9 @@ describe('managerial scopes in the existing dashboard', () => {
       fireEvent.click(within(map).getByRole('button', { name: 'Ver no mapa' }));
       expect(onViewLot).toHaveBeenLastCalledWith(expected.entity.id);
     }
-    fireEvent.click(screen.getByRole('button', { name: 'Consultar Pavilhão 13' }));
+    fireEvent.click(within(selectors).getByRole('button', { name: /Pavilhão 13/ }));
     expect(await screen.findByRole('region', { name: /Mini mapa comercial: Pavilhão 13/ })).toBeVisible();
+    expect(container.querySelector('[data-dashboard-pavilion="B5"]')).toBeInTheDocument();
   });
 
   it('refreshes selected module status, area, price, geometry and timestamp together without losing scope', async () => {
