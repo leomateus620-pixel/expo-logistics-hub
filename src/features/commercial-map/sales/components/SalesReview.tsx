@@ -29,10 +29,10 @@ export function SalesReview({ summary, stage, buyer, payment, fees, spacesCents 
       <section className="sales-block">
         <h3>Expositor</h3>
         <dl className="sales-review__dl">
-          <div className={buyer.buyerName.length > 28 ? 'is-wide' : undefined}><dt>Nome / razão social</dt><dd>{buyer.buyerName}</dd></div>
+          <div className="is-wide"><dt>Nome / razão social</dt><dd>{buyer.buyerName}</dd></div>
           <div><dt>CPF/CNPJ</dt><dd>{buyer.documentNumber}</dd></div>
           <div><dt>Celular</dt><dd>{buyer.phone}</dd></div>
-          <div><dt>E-mail</dt><dd className={buyer.email.trim() ? 'sales-review__email' : 'is-muted'}>{buyer.email.trim() || 'Não informado'}</dd></div>
+          <div className="is-email"><dt>E-mail</dt><dd className={buyer.email.trim() ? 'sales-review__email' : 'is-muted'}>{buyer.email.trim() || 'Não informado'}</dd></div>
         </dl>
       </section>
 

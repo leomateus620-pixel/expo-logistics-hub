@@ -378,7 +378,9 @@
   .sales-installment-card { grid-template-columns: 1fr 1fr; }
   .sales-installment-card__num { grid-column: 1 / -1; }
   .sales-review__dl { grid-template-columns: minmax(0, 1fr); }
-  .sales-review__dl > div, .sales-review__dl > div.is-wide { grid-column: auto; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); }
+  .sales-review__dl > div { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); }
+  .sales-review__dl > div.is-wide, .sales-review__dl > div.is-email { grid-column: auto; grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .sales-review__dl > div.is-wide dd, .sales-review__dl > div.is-email dd { text-align: left; }
 }
 @media (max-width: 380px) {
   .sales-hide-xs { display: none; }
