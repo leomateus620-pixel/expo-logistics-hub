@@ -1,0 +1,635 @@
+{
+  "phase": "probe",
+  "policy": "HIGH",
+  "renderTimingRequested": true,
+  "requestedViewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "postDisableRequested": [
+    "all"
+  ],
+  "receiveShadowsRequested": "authored",
+  "labelTimingRequested": false,
+  "drawTimingRequested": false,
+  "generatedAt": "2026-10-01T17:41:55.176Z",
+  "browser": "154.0.8037.58",
+  "endpoints": {
+    "baseline": "http://127.0.0.1:4241",
+    "candidate": "http://127.0.0.1:4242"
+  },
+  "baselineRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+  "candidateRevision": null,
+  "evidence": "Visible headful Chrome, local production fixture. Viewport/DPR emulation does not certify physical devices. Renderer counts are not GPU time or byte memory estimates.",
+  "cache": "fresh context per trial; shared browser/driver cache; identical hydration wait plus 6s and unmeasured scenario warmup; no throttling",
+  "concurrency": {
+    "maxLoadedContexts": 1,
+    "rationale": "One full map resident at a time to avoid artificial RAM/GPU pressure on this host."
+  },
+  "budget": {
+    "targetMs": 33.3,
+    "p95ToleranceMs": 50,
+    "stallThresholdMsExclusive": 50,
+    "reason": "Local ANGLE adapter; 30 FPS reference for a limited device scenario; target is not a hardware certification."
+  },
+  "trajectories": {
+    "poses": {
+      "overview": {
+        "point": [
+          3000,
+          2850
+        ],
+        "offset": [
+          115,
+          120,
+          135
+        ]
+      },
+      "close": {
+        "point": [
+          2580,
+          3800
+        ],
+        "offset": [
+          -11,
+          12,
+          5
+        ]
+      }
+    },
+    "continuous": "5s temporal pointer path, +160px horizontal, ±24px vertical; endpoint remains nonzero at low cadence",
+    "short": "three 350ms drags +28px/±5px with actual damping settlement",
+    "zoomPan": "900ms with up to nine temporal wheel steps 0..8 (actual steps/deltas recorded), then 1.7s pan +45px/±20px"
+  },
+  "runs": [
+    {
+      "name": "baseline-HIGH-dpr2-without-all-overview-continuous-1",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "continuous",
+      "repeat": 1,
+      "trial": "baseline-HIGH-dpr2-without-all-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 121896.20000004768,
+          "end": 130610
+        }
+      ],
+      "frames": {
+        "samples": 156,
+        "medianMs": 54.6,
+        "p95Ms": 60.4,
+        "stallsOver50Ms": 155,
+        "maxMs": 63
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1.75
+      ],
+      "physicalSizes": [
+        "2213x1260"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [
+        {
+          "id": "cafa4852-4405-4e0f-ae0f-b156452e34f5",
+          "width": 2213,
+          "height": 1260,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "c7283f62-5aec-4675-ad54-1a6fa5ba62ab",
+          "width": 2213,
+          "height": 1260,
+          "samples": 0,
+          "name": "LuminancePass.Target"
+        },
+        {
+          "id": "ca869e36-3e7d-4754-bfef-b3be966ef84a",
+          "width": 1107,
+          "height": 630,
+          "samples": 0,
+          "name": "Downsampling.Mipmap0"
+        },
+        {
+          "id": "adc9aaf2-63b9-4398-a639-f5f0f1616206",
+          "width": 554,
+          "height": 315,
+          "samples": 0,
+          "name": "Downsampling.Mipmap1"
+        },
+        {
+          "id": "6b69f701-0530-4375-a6ed-9dd6d58e3b70",
+          "width": 277,
+          "height": 158,
+          "samples": 0,
+          "name": "Downsampling.Mipmap2"
+        },
+        {
+          "id": "36437ece-ed98-41a3-a3eb-8d71f9e0e054",
+          "width": 139,
+          "height": 79,
+          "samples": 0,
+          "name": "Downsampling.Mipmap3"
+        },
+        {
+          "id": "3a614dd9-8b99-4114-982a-77d9bdb49881",
+          "width": 70,
+          "height": 40,
+          "samples": 0,
+          "name": "Downsampling.Mipmap4"
+        },
+        {
+          "id": "b8713236-774f-4a95-959a-2278dc162d26",
+          "width": 35,
+          "height": 20,
+          "samples": 0,
+          "name": "Downsampling.Mipmap5"
+        },
+        {
+          "id": "9157deec-962c-40f1-8de5-66bd11de4208",
+          "width": 18,
+          "height": 10,
+          "samples": 0,
+          "name": "Downsampling.Mipmap6"
+        },
+        {
+          "id": "95da62f2-2c78-4caf-9d3b-9c7299740ccb",
+          "width": 35,
+          "height": 20,
+          "samples": 0,
+          "name": "Upsampling.Mipmap5"
+        },
+        {
+          "id": "18385808-8627-417e-9414-9e61aa37031f",
+          "width": 70,
+          "height": 40,
+          "samples": 0,
+          "name": "Upsampling.Mipmap4"
+        },
+        {
+          "id": "dd27888a-1fcc-4d8b-8ebb-1932d637e0b6",
+          "width": 139,
+          "height": 79,
+          "samples": 0,
+          "name": "Upsampling.Mipmap3"
+        },
+        {
+          "id": "61e56432-3afa-4f84-bd51-8bc8ead5bfa5",
+          "width": 277,
+          "height": 158,
+          "samples": 0,
+          "name": "Upsampling.Mipmap2"
+        },
+        {
+          "id": "e1330a5d-c549-4e4d-9190-ffd8dff6f3ee",
+          "width": 554,
+          "height": 315,
+          "samples": 0,
+          "name": "Upsampling.Mipmap1"
+        },
+        {
+          "id": "38c3c44f-a05e-4025-a234-fc691d3c2714",
+          "width": 1107,
+          "height": 630,
+          "samples": 0,
+          "name": "Upsampling.Mipmap0"
+        },
+        {
+          "id": "dc9654ef-c1aa-46a2-8006-0f445156fb3f",
+          "width": 2213,
+          "height": 1260,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "5c25cea5-93e9-430e-9922-b91a64bae8c1",
+          "width": 2213,
+          "height": 1260,
+          "samples": 0,
+          "name": "SMAA.Edges"
+        },
+        {
+          "id": "8b7d7ca1-267d-41a3-9043-a8bb3d801b8c",
+          "width": 2213,
+          "height": 1260,
+          "samples": 0,
+          "name": "SMAA.Weights"
+        }
+      ],
+      "qualityChanges": [],
+      "longTasks": [],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 7,
+        "droppedGpuQueries": 0,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 168,
+          "averageMs": 20.736,
+          "p95Ms": 25.8,
+          "p99Ms": 35
+        },
+        "gpu": {
+          "samples": 161,
+          "averageMs": 52.233,
+          "p95Ms": 56.45,
+          "p99Ms": 57.56
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 168,
+              "averageMs": 20.736,
+              "p95Ms": 25.8,
+              "p99Ms": 35
+            },
+            "gpu": {
+              "samples": 161,
+              "averageMs": 52.233,
+              "p95Ms": 56.45,
+              "p99Ms": 57.56
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "effectBudget": null,
+      "ablationApplied": {
+        "requested": [
+          "all"
+        ],
+        "applied": true,
+        "executedPath": "direct-scene-ACES",
+        "before": [
+          {
+            "name": "RenderPass",
+            "enabled": true,
+            "screen": false,
+            "effects": []
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "BloomEffect",
+              "ToneMappingEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "SMAAEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": true,
+            "effects": [
+              "CommercialMapSharpenEffect"
+            ]
+          }
+        ],
+        "after": [
+          {
+            "name": "RenderPass",
+            "enabled": true,
+            "screen": false,
+            "effects": []
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "BloomEffect",
+              "ToneMappingEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "SMAAEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": true,
+            "effects": [
+              "CommercialMapSharpenEffect"
+            ]
+          }
+        ],
+        "dpr": 1.75,
+        "physical": {
+          "width": 2213,
+          "height": 1260
+        },
+        "caveat": "QA mutation before equal unmeasured warmup; original resources retained; app render-health path still reports its frame owner."
+      },
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 795,
+        "triangles": 656651,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 242
+      },
+      "resourcesAfter": {
+        "calls": 797,
+        "triangles": 685693,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 242
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -120.61584651678244,
+        119.99994527105855,
+        133.96819017941272
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2050,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  ],
+  "environments": {
+    "baseline-HIGH-dpr2-without-all-trial1": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "platform": "Win32",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "devicePixelRatio": 2,
+      "visualViewportScale": 1,
+      "hardwareConcurrency": 4,
+      "memoryHintGiB": 8,
+      "attributes": {
+        "alpha": false,
+        "antialias": true,
+        "depth": true,
+        "desynchronized": false,
+        "failIfMajorPerformanceCaveat": false,
+        "powerPreference": "high-performance",
+        "premultipliedAlpha": true,
+        "preserveDrawingBuffer": false,
+        "stencil": false,
+        "xrCompatible": false
+      },
+      "renderer": {
+        "at": 107435.40000009537,
+        "calls": 824,
+        "triangles": 694050,
+        "geometries": 576,
+        "textures": 136,
+        "programs": 242,
+        "dpr": 1.75,
+        "width": 2213,
+        "height": 1260,
+        "heapBytes": 152592378,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "gpuTimerExtension": "EXT_disjoint_timer_query_webgl2",
+      "multiDrawExtension": "WEBGL_multi_draw",
+      "boot": {
+        "routeStartedAt": 342.90000009536743,
+        "documentToInteractiveMs": 15634,
+        "navigationToModuleMs": 0,
+        "moduleMs": 495,
+        "rendererModuleMs": null,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 70,
+        "headquartersWorkerMs": 1797,
+        "webglContextMs": 62,
+        "sceneMs": 4026,
+        "entityGeometryCpuMs": 16.600001335144043,
+        "environmentMaterialMs": 0,
+        "proceduralTextureCpuMs": 221.50000047683716,
+        "textureUploadMs": 854,
+        "cpuStagesMs": {
+          "textures": 222,
+          "geometry-preparation": 17,
+          "b12-unpack": 5,
+          "b12-materials": 191
+        },
+        "shaderDirectMs": 8183,
+        "shaderPostMs": null,
+        "shadowMs": 0,
+        "postprocessingMs": 9,
+        "physicsMs": 110,
+        "firstDrawMs": 8933,
+        "interactiveMs": 15291,
+        "controlsResponseMs": null,
+        "hydrationMs": 85654
+      },
+      "displayCadence": null,
+      "executedBuildManifest": {
+        "revision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+        "build": "baseline",
+        "sourceHashes": {
+          "src/features/commercial-map/utils/viewport.ts": "0a2ad7cb8d6417c56c81066529349f9771c3056368f1a718e4d924e0aedf7e05",
+          "src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx": "64dfa5269761bfed4516dd08667a809ecd9fb6e843f4e2c6d0050db85aafa8fc",
+          "src/features/commercial-map/components/canvas/CommercialMapAdaptiveQuality.tsx": "f5e205f6e863a827db9ae9c01676f720bf33ed6986ea19b773e6ea5a1ff844aa",
+          "src/features/commercial-map/components/canvas/TerritorialOrientation.tsx": "890a5e2a756c6d066e3de0fcf9b32c8aaa15d28e699c9d116f079589106f294e",
+          "src/features/commercial-map/utils/territorialOrientation.ts": "410f227afd37a832df6e5e0a7f726a9cdab912087bc47823ffd1b095456894a6"
+        },
+        "diagnostics": true,
+        "dirty": false,
+        "baseRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab"
+      },
+      "expectedRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+      "ablationApplied": {
+        "requested": [
+          "all"
+        ],
+        "applied": true,
+        "executedPath": "direct-scene-ACES",
+        "before": [
+          {
+            "name": "RenderPass",
+            "enabled": true,
+            "screen": false,
+            "effects": []
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "BloomEffect",
+              "ToneMappingEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "SMAAEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": true,
+            "effects": [
+              "CommercialMapSharpenEffect"
+            ]
+          }
+        ],
+        "after": [
+          {
+            "name": "RenderPass",
+            "enabled": true,
+            "screen": false,
+            "effects": []
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "BloomEffect",
+              "ToneMappingEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "SMAAEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": true,
+            "effects": [
+              "CommercialMapSharpenEffect"
+            ]
+          }
+        ],
+        "dpr": 1.75,
+        "physical": {
+          "width": 2213,
+          "height": 1260
+        },
+        "caveat": "QA mutation before equal unmeasured warmup; original resources retained; app render-health path still reports its frame owner."
+      },
+      "shadowReceivingAblation": {
+        "requested": "authored",
+        "applied": false
+      },
+      "labelTiming": {
+        "enabled": false
+      },
+      "drawTiming": {
+        "enabled": false
+      }
+    }
+  },
+  "errors": {
+    "baseline-HIGH-dpr2-without-all-trial1": []
+  },
+  "trials": [
+    {
+      "name": "baseline-HIGH-dpr2-without-all-trial1",
+      "label": "baseline",
+      "repeat": 1,
+      "startedAt": "2026-10-01T17:43:43.266Z",
+      "gate": null,
+      "errors": [],
+      "completedAt": "2026-10-01T17:44:07.536Z"
+    }
+  ],
+  "trialOrder": [
+    {
+      "label": "baseline",
+      "repeat": 1
+    }
+  ]
+}

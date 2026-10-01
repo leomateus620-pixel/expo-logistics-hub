@@ -1,0 +1,885 @@
+{
+  "phase": "profile",
+  "policy": "HIGH",
+  "renderTimingRequested": true,
+  "requestedViewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "postDisableRequested": [
+    "all"
+  ],
+  "labelTimingRequested": true,
+  "generatedAt": "2026-10-01T17:19:50.751Z",
+  "browser": "154.0.8037.58",
+  "endpoints": {
+    "baseline": "http://127.0.0.1:4241",
+    "candidate": "http://127.0.0.1:4242"
+  },
+  "baselineRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+  "candidateRevision": null,
+  "evidence": "Visible headful Chrome, local production fixture. Viewport/DPR emulation does not certify physical devices. Renderer counts are not GPU time or byte memory estimates.",
+  "cache": "fresh context per trial; shared browser/driver cache; identical hydration wait plus 6s and unmeasured scenario warmup; no throttling",
+  "concurrency": {
+    "maxLoadedContexts": 1,
+    "rationale": "One full map resident at a time to avoid artificial RAM/GPU pressure on this host."
+  },
+  "budget": {
+    "targetMs": 33.3,
+    "p95ToleranceMs": 50,
+    "stallThresholdMsExclusive": 50,
+    "reason": "Local ANGLE adapter; 30 FPS reference for a limited device scenario; target is not a hardware certification."
+  },
+  "trajectories": {
+    "poses": {
+      "overview": {
+        "point": [
+          3000,
+          2850
+        ],
+        "offset": [
+          115,
+          120,
+          135
+        ]
+      },
+      "close": {
+        "point": [
+          2580,
+          3800
+        ],
+        "offset": [
+          -11,
+          12,
+          5
+        ]
+      }
+    },
+    "continuous": "5s temporal pointer path, +160px horizontal, ±24px vertical; endpoint remains nonzero at low cadence",
+    "short": "three 350ms drags +28px/±5px with actual damping settlement",
+    "zoomPan": "900ms with up to nine temporal wheel steps 0..8 (actual steps/deltas recorded), then 1.7s pan +45px/±20px"
+  },
+  "runs": [
+    {
+      "name": "baseline-HIGH-dpr1-without-all-overview-continuous-1",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "continuous",
+      "repeat": 1,
+      "trial": "baseline-HIGH-dpr1-without-all-trial1",
+      "cpuProfile": {
+        "file": "baseline-HIGH-dpr1-without-all-overview-continuous-1.cpuprofile",
+        "durationMs": 9505.122,
+        "samples": 4807,
+        "caveat": "Separate CPU sampling execution; these frame times are not the clean before/after comparison.",
+        "functions": [
+          {
+            "functionName": "(program)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1,
+            "selfMs": 1186.2999999999988,
+            "inclusiveMs": 1186.2999999999988
+          },
+          {
+            "functionName": "(idle)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1,
+            "selfMs": 531.3779999999997,
+            "inclusiveMs": 531.3779999999997
+          },
+          {
+            "functionName": "renderBufferDirect",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3827,
+            "columnNumber": 24922,
+            "selfMs": 485.1370000000002,
+            "inclusiveMs": 5111.908999999989
+          },
+          {
+            "functionName": "Hd",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3827,
+            "columnNumber": 35970,
+            "selfMs": 361.158,
+            "inclusiveMs": 3666.483000000006
+          },
+          {
+            "functionName": "x",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3775,
+            "columnNumber": 2364,
+            "selfMs": 338.93200000000013,
+            "inclusiveMs": 361.86100000000016
+          },
+          {
+            "functionName": "jo",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3827,
+            "columnNumber": 33405,
+            "selfMs": 295.97800000000007,
+            "inclusiveMs": 693.1280000000008
+          },
+          {
+            "functionName": "upload",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3724,
+            "columnNumber": 15702,
+            "selfMs": 282.5270000000001,
+            "inclusiveMs": 1354.0060000000008
+          },
+          {
+            "functionName": "getComputedTextLength",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1,
+            "selfMs": 269.528,
+            "inclusiveMs": 269.528
+          },
+          {
+            "functionName": "s",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3827,
+            "columnNumber": 9625,
+            "selfMs": 192.79999999999995,
+            "inclusiveMs": 245.07099999999994
+          },
+          {
+            "functionName": "Jc",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3827,
+            "columnNumber": 32924,
+            "selfMs": 185.2199999999999,
+            "inclusiveMs": 5393.600999999991
+          },
+          {
+            "functionName": "rl",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3724,
+            "columnNumber": 7942,
+            "selfMs": 178.83099999999996,
+            "inclusiveMs": 186.92999999999995
+          },
+          {
+            "functionName": "bindVertexArray",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1,
+            "selfMs": 133.48100000000005,
+            "inclusiveMs": 133.48100000000005
+          },
+          {
+            "functionName": "setValue",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3724,
+            "columnNumber": 14888,
+            "selfMs": 121.482,
+            "inclusiveMs": 298.15099999999995
+          },
+          {
+            "functionName": "Dn",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3724,
+            "columnNumber": 8260,
+            "selfMs": 111.23100000000001,
+            "inclusiveMs": 111.23100000000001
+          },
+          {
+            "functionName": "setValue",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3724,
+            "columnNumber": 14888,
+            "selfMs": 107.43599999999999,
+            "inclusiveMs": 408.6829999999996
+          },
+          {
+            "functionName": "Ko",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3827,
+            "columnNumber": 32691,
+            "selfMs": 103.69800000000001,
+            "inclusiveMs": 5501.94799999999
+          },
+          {
+            "functionName": "",
+            "scriptId": "44",
+            "url": "http://127.0.0.1:4241/assets/CommercialMapCanvas-BYZK__U7.js",
+            "lineNumber": 529,
+            "columnNumber": 21027,
+            "selfMs": 100.27399999999999,
+            "inclusiveMs": 579.4530000000004
+          },
+          {
+            "functionName": "Qs",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3827,
+            "columnNumber": 29860,
+            "selfMs": 93.18699999999998,
+            "inclusiveMs": 265.9120000000001
+          },
+          {
+            "functionName": "n",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3827,
+            "columnNumber": 8867,
+            "selfMs": 92.79199999999997,
+            "inclusiveMs": 155.524
+          },
+          {
+            "functionName": "m",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3574,
+            "columnNumber": 14533,
+            "selfMs": 91.359,
+            "inclusiveMs": 94.494
+          },
+          {
+            "functionName": "a",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3574,
+            "columnNumber": 13778,
+            "selfMs": 90.22199999999998,
+            "inclusiveMs": 633.0620000000005
+          },
+          {
+            "functionName": "uniform1f",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1,
+            "selfMs": 87.49099999999997,
+            "inclusiveMs": 87.49099999999997
+          },
+          {
+            "functionName": "ib",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3724,
+            "columnNumber": 8716,
+            "selfMs": 86.77399999999999,
+            "inclusiveMs": 139.49999999999997
+          },
+          {
+            "functionName": "In",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3724,
+            "columnNumber": 8147,
+            "selfMs": 86.68200000000002,
+            "inclusiveMs": 86.68200000000002
+          },
+          {
+            "functionName": "uniformMatrix4fv",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1,
+            "selfMs": 82.231,
+            "inclusiveMs": 82.231
+          },
+          {
+            "functionName": "u",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3775,
+            "columnNumber": 13179,
+            "selfMs": 80.53799999999998,
+            "inclusiveMs": 121.30599999999995
+          },
+          {
+            "functionName": "uniformMatrix4fv",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1,
+            "selfMs": 79.72899999999998,
+            "inclusiveMs": 79.72899999999998
+          },
+          {
+            "functionName": "",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1,
+            "selfMs": 77.726,
+            "inclusiveMs": 77.726
+          },
+          {
+            "functionName": "i",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3827,
+            "columnNumber": 9020,
+            "selfMs": 76.96000000000001,
+            "inclusiveMs": 328.3639999999999
+          },
+          {
+            "functionName": "Ke",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3803,
+            "columnNumber": 10302,
+            "selfMs": 73.836,
+            "inclusiveMs": 147.747
+          },
+          {
+            "functionName": "d",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3574,
+            "columnNumber": 14140,
+            "selfMs": 69.322,
+            "inclusiveMs": 69.322
+          },
+          {
+            "functionName": "Ja",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 4,
+            "columnNumber": 15264,
+            "selfMs": 62.732000000000006,
+            "inclusiveMs": 62.732000000000006
+          },
+          {
+            "functionName": "ab",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3724,
+            "columnNumber": 9694,
+            "selfMs": 62.49900000000001,
+            "inclusiveMs": 342.6429999999999
+          },
+          {
+            "functionName": "multiplyMatrices",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 4,
+            "columnNumber": 56422,
+            "selfMs": 62.36600000000001,
+            "inclusiveMs": 62.36600000000001
+          },
+          {
+            "functionName": "vertexAttribPointer",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1,
+            "selfMs": 61.61499999999999,
+            "inclusiveMs": 61.61499999999999
+          },
+          {
+            "functionName": "(garbage collector)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1,
+            "selfMs": 61.526,
+            "inclusiveMs": 61.526
+          },
+          {
+            "functionName": "setValue",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3724,
+            "columnNumber": 15564,
+            "selfMs": 61.279999999999994,
+            "inclusiveMs": 592.0690000000003
+          },
+          {
+            "functionName": "getVertexPosition",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 4,
+            "columnNumber": 117469,
+            "selfMs": 55.09,
+            "inclusiveMs": 55.09
+          },
+          {
+            "functionName": "uniform3f",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1,
+            "selfMs": 52.726000000000006,
+            "inclusiveMs": 52.726000000000006
+          },
+          {
+            "functionName": "E",
+            "scriptId": "40",
+            "url": "http://127.0.0.1:4241/assets/maps-three-DQ87woB3.js",
+            "lineNumber": 3574,
+            "columnNumber": 15844,
+            "selfMs": 51.80700000000001,
+            "inclusiveMs": 174.59300000000007
+          }
+        ]
+      },
+      "activeWindows": [
+        {
+          "start": 139359,
+          "end": 146488.79999995232
+        }
+      ],
+      "frames": {
+        "samples": 220,
+        "medianMs": 32.2,
+        "p95Ms": 39.1,
+        "stallsOver50Ms": 2,
+        "maxMs": 59.4
+      },
+      "labelCallbacks": {
+        "samples": 220,
+        "medianMs": 1.9,
+        "p95Ms": 2.8,
+        "stallsOver50Ms": 0,
+        "maxMs": 5
+      },
+      "labelLayout": {
+        "getBoundingClientRect": {
+          "calls": 220,
+          "durationMs": 6.300000429153442
+        },
+        "getComputedTextLength": {
+          "calls": 9900,
+          "durationMs": 243.50000095367432
+        }
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 139739.79999995232,
+          "duration": 55,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 7,
+        "droppedGpuQueries": 19,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 223,
+          "averageMs": 25.107,
+          "p95Ms": 31.1,
+          "p99Ms": 35.7
+        },
+        "gpu": {
+          "samples": 197,
+          "averageMs": 31.47,
+          "p95Ms": 33.921,
+          "p99Ms": 35.789
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 223,
+              "averageMs": 25.107,
+              "p95Ms": 31.1,
+              "p99Ms": 35.7
+            },
+            "gpu": {
+              "samples": 197,
+              "averageMs": 31.47,
+              "p95Ms": 33.921,
+              "p99Ms": 35.789
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "effectBudget": null,
+      "ablationApplied": {
+        "requested": [
+          "all"
+        ],
+        "applied": true,
+        "executedPath": "direct-scene-ACES",
+        "before": [
+          {
+            "name": "RenderPass",
+            "enabled": true,
+            "screen": false,
+            "effects": []
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "BloomEffect",
+              "ToneMappingEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "SMAAEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": true,
+            "effects": [
+              "CommercialMapSharpenEffect"
+            ]
+          }
+        ],
+        "after": [
+          {
+            "name": "RenderPass",
+            "enabled": true,
+            "screen": false,
+            "effects": []
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "BloomEffect",
+              "ToneMappingEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "SMAAEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": true,
+            "effects": [
+              "CommercialMapSharpenEffect"
+            ]
+          }
+        ],
+        "dpr": 1,
+        "physical": {
+          "width": 1265,
+          "height": 720
+        },
+        "caveat": "QA mutation before equal unmeasured warmup; original resources retained; app render-health path still reports its frame owner."
+      },
+      "resourcesBefore": {
+        "calls": 795,
+        "triangles": 656651,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 242
+      },
+      "resourcesAfter": {
+        "calls": 797,
+        "triangles": 685693,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 242
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -120.6158626040587,
+        119.99998181890824,
+        133.96814479916543
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 3397,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  ],
+  "environments": {
+    "baseline-HIGH-dpr1-without-all-trial1": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "platform": "Win32",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "devicePixelRatio": 1,
+      "visualViewportScale": 1,
+      "hardwareConcurrency": 4,
+      "memoryHintGiB": 8,
+      "attributes": {
+        "alpha": false,
+        "antialias": true,
+        "depth": true,
+        "desynchronized": false,
+        "failIfMajorPerformanceCaveat": false,
+        "powerPreference": "high-performance",
+        "premultipliedAlpha": true,
+        "preserveDrawingBuffer": false,
+        "stencil": false,
+        "xrCompatible": false
+      },
+      "renderer": {
+        "at": 124751.79999995232,
+        "calls": 805,
+        "triangles": 694031,
+        "geometries": 576,
+        "textures": 136,
+        "programs": 242,
+        "dpr": 1,
+        "width": 1265,
+        "height": 720,
+        "heapBytes": 125708831,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "gpuTimerExtension": "EXT_disjoint_timer_query_webgl2",
+      "boot": {
+        "routeStartedAt": 782.7999999523163,
+        "documentToInteractiveMs": 23398,
+        "navigationToModuleMs": 1,
+        "moduleMs": 1404,
+        "rendererModuleMs": null,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 212,
+        "headquartersWorkerMs": 4145,
+        "webglContextMs": 180,
+        "sceneMs": 6192,
+        "entityGeometryCpuMs": 21.30000114440918,
+        "environmentMaterialMs": 0,
+        "proceduralTextureCpuMs": 370.2000000476837,
+        "textureUploadMs": 844,
+        "cpuStagesMs": {
+          "textures": 370,
+          "geometry-preparation": 21,
+          "b12-unpack": 8,
+          "b12-materials": 281
+        },
+        "shaderDirectMs": 10682,
+        "shaderPostMs": null,
+        "shadowMs": 0,
+        "postprocessingMs": 17,
+        "physicsMs": 164,
+        "firstDrawMs": 11567,
+        "interactiveMs": 22616,
+        "controlsResponseMs": null,
+        "hydrationMs": 94890
+      },
+      "displayCadence": null,
+      "executedBuildManifest": {
+        "revision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+        "build": "baseline",
+        "sourceHashes": {
+          "src/features/commercial-map/utils/viewport.ts": "0a2ad7cb8d6417c56c81066529349f9771c3056368f1a718e4d924e0aedf7e05",
+          "src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx": "64dfa5269761bfed4516dd08667a809ecd9fb6e843f4e2c6d0050db85aafa8fc",
+          "src/features/commercial-map/components/canvas/CommercialMapAdaptiveQuality.tsx": "f5e205f6e863a827db9ae9c01676f720bf33ed6986ea19b773e6ea5a1ff844aa",
+          "src/features/commercial-map/components/canvas/TerritorialOrientation.tsx": "890a5e2a756c6d066e3de0fcf9b32c8aaa15d28e699c9d116f079589106f294e",
+          "src/features/commercial-map/utils/territorialOrientation.ts": "410f227afd37a832df6e5e0a7f726a9cdab912087bc47823ffd1b095456894a6"
+        },
+        "diagnostics": true,
+        "dirty": false,
+        "baseRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab"
+      },
+      "expectedRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+      "ablationApplied": {
+        "requested": [
+          "all"
+        ],
+        "applied": true,
+        "executedPath": "direct-scene-ACES",
+        "before": [
+          {
+            "name": "RenderPass",
+            "enabled": true,
+            "screen": false,
+            "effects": []
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "BloomEffect",
+              "ToneMappingEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "SMAAEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": true,
+            "effects": [
+              "CommercialMapSharpenEffect"
+            ]
+          }
+        ],
+        "after": [
+          {
+            "name": "RenderPass",
+            "enabled": true,
+            "screen": false,
+            "effects": []
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "BloomEffect",
+              "ToneMappingEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "SMAAEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": true,
+            "effects": [
+              "CommercialMapSharpenEffect"
+            ]
+          }
+        ],
+        "dpr": 1,
+        "physical": {
+          "width": 1265,
+          "height": 720
+        },
+        "caveat": "QA mutation before equal unmeasured warmup; original resources retained; app render-health path still reports its frame owner."
+      },
+      "labelTiming": {
+        "enabled": true,
+        "callbacks": 1,
+        "caveat": "Diagnostic wrapper overhead; compare clean trials separately"
+      }
+    }
+  },
+  "errors": {
+    "baseline-HIGH-dpr1-without-all-trial1": []
+  },
+  "trials": [
+    {
+      "name": "baseline-HIGH-dpr1-without-all-trial1",
+      "label": "baseline",
+      "repeat": 1,
+      "startedAt": "2026-10-01T17:21:56.812Z",
+      "gate": null,
+      "errors": [],
+      "completedAt": "2026-10-01T17:22:19.974Z"
+    }
+  ],
+  "trialOrder": [
+    {
+      "label": "baseline",
+      "repeat": 1
+    }
+  ]
+}

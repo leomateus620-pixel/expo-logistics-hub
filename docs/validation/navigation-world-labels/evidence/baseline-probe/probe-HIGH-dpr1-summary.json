@@ -1,0 +1,1072 @@
+{
+  "phase": "probe",
+  "policy": "HIGH",
+  "renderTimingRequested": true,
+  "generatedAt": "2026-10-01T17:11:57.028Z",
+  "browser": "154.0.8037.58",
+  "endpoints": {
+    "baseline": "http://127.0.0.1:4241",
+    "candidate": "http://127.0.0.1:4242"
+  },
+  "baselineRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+  "candidateRevision": null,
+  "evidence": "Visible headful Chrome, local production fixture. Viewport/DPR emulation does not certify physical devices. Renderer counts are not GPU time or byte memory estimates.",
+  "cache": "fresh context per trial; shared browser/driver cache; identical hydration wait plus 6s and unmeasured scenario warmup; no throttling",
+  "concurrency": {
+    "maxLoadedContexts": 1,
+    "rationale": "One full map resident at a time to avoid artificial RAM/GPU pressure on this host."
+  },
+  "budget": {
+    "targetMs": 33.3,
+    "p95ToleranceMs": 50,
+    "stallThresholdMsExclusive": 50,
+    "reason": "Local ANGLE adapter; 30 FPS reference for a limited device scenario; target is not a hardware certification."
+  },
+  "trajectories": {
+    "poses": {
+      "overview": {
+        "point": [
+          3000,
+          2850
+        ],
+        "offset": [
+          115,
+          120,
+          135
+        ]
+      },
+      "close": {
+        "point": [
+          2580,
+          3800
+        ],
+        "offset": [
+          -11,
+          12,
+          5
+        ]
+      }
+    },
+    "continuous": "5s temporal pointer path, +160px horizontal, ±24px vertical; endpoint remains nonzero at low cadence",
+    "short": "three 350ms drags +28px/±5px with actual damping settlement",
+    "zoomPan": "900ms with up to nine temporal wheel steps 0..8 (actual steps/deltas recorded), then 1.7s pan +45px/±20px"
+  },
+  "runs": [
+    {
+      "name": "baseline-HIGH-dpr1-overview-continuous-1",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "continuous",
+      "repeat": 1,
+      "trial": "baseline-HIGH-dpr1-trial1",
+      "activeWindows": [
+        {
+          "start": 129214.80000019073,
+          "end": 136517.30000019073
+        }
+      ],
+      "frames": {
+        "samples": 211,
+        "medianMs": 34,
+        "p95Ms": 40.7,
+        "stallsOver50Ms": 1,
+        "maxMs": 53.8
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [
+        {
+          "id": "adaa4cc6-285e-4658-80b7-656910a667e7",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "28ba56c6-c006-470f-a910-3c4e76faad61",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "LuminancePass.Target"
+        },
+        {
+          "id": "4c47521c-32f4-44a2-8866-a61bc4dc1997",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Downsampling.Mipmap0"
+        },
+        {
+          "id": "751c1f20-4567-4471-bc70-db14d6ed3ff8",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Downsampling.Mipmap1"
+        },
+        {
+          "id": "e5866332-b3fc-41f7-b5da-d9517d7554a4",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Downsampling.Mipmap2"
+        },
+        {
+          "id": "f6b4173c-6731-442b-bce3-b26b88fef963",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Downsampling.Mipmap3"
+        },
+        {
+          "id": "664a9270-1366-4d50-a27e-ba8d37c18a53",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Downsampling.Mipmap4"
+        },
+        {
+          "id": "6a2b6245-92d3-475b-ad56-ead23c335a50",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Downsampling.Mipmap5"
+        },
+        {
+          "id": "497aa6b7-7e24-4135-a00f-935e686ce1e8",
+          "width": 10,
+          "height": 6,
+          "samples": 0,
+          "name": "Downsampling.Mipmap6"
+        },
+        {
+          "id": "c73441f2-5d0d-4d17-9204-b6c1beeafb7c",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Upsampling.Mipmap5"
+        },
+        {
+          "id": "4c0f92db-f206-4036-a8b6-a0237558c86c",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Upsampling.Mipmap4"
+        },
+        {
+          "id": "a83cfb98-b9fa-406a-94e5-b36522f67f8e",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Upsampling.Mipmap3"
+        },
+        {
+          "id": "721bc868-a3b3-498f-b2c6-e58db80dc84f",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Upsampling.Mipmap2"
+        },
+        {
+          "id": "26caaf90-fae0-437a-aee9-e2dca6744bdc",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Upsampling.Mipmap1"
+        },
+        {
+          "id": "357fc307-1d7f-49d1-b1f4-d950ef140f10",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Upsampling.Mipmap0"
+        },
+        {
+          "id": "63621986-0175-41cb-b2fe-4e77206b562d",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "6533f060-5e30-4175-a075-f14551226a20",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Edges"
+        },
+        {
+          "id": "85041508-d03e-4490-ad7d-314559850442",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Weights"
+        }
+      ],
+      "qualityChanges": [],
+      "longTasks": [],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 4,
+        "droppedGpuQueries": 0,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 236,
+          "averageMs": 29.417,
+          "p95Ms": 35.7,
+          "p99Ms": 37.7
+        },
+        "gpu": {
+          "samples": 232,
+          "averageMs": 32.711,
+          "p95Ms": 35.563,
+          "p99Ms": 37.794
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 236,
+              "averageMs": 29.417,
+              "p95Ms": 35.7,
+              "p99Ms": 37.7
+            },
+            "gpu": {
+              "samples": 232,
+              "averageMs": 32.711,
+              "p95Ms": 35.563,
+              "p99Ms": 37.794
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "resourcesBefore": {
+        "calls": 814,
+        "triangles": 656670,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 242
+      },
+      "resourcesAfter": {
+        "calls": 816,
+        "triangles": 685712,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 242
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -120.61586175603858,
+        119.99997990798069,
+        133.9681471775927
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 3568,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "baseline-HIGH-dpr1-overview-short-1",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "short",
+      "repeat": 1,
+      "trial": "baseline-HIGH-dpr1-trial1",
+      "activeWindows": [
+        {
+          "start": 154801.60000014305,
+          "end": 157449.40000009537
+        },
+        {
+          "start": 158372.70000004768,
+          "end": 161223.30000019073
+        },
+        {
+          "start": 162103.10000014305,
+          "end": 164809
+        }
+      ],
+      "frames": {
+        "samples": 236,
+        "medianMs": 33.7,
+        "p95Ms": 43.8,
+        "stallsOver50Ms": 4,
+        "maxMs": 55.4
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [
+        {
+          "id": "adaa4cc6-285e-4658-80b7-656910a667e7",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "28ba56c6-c006-470f-a910-3c4e76faad61",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "LuminancePass.Target"
+        },
+        {
+          "id": "4c47521c-32f4-44a2-8866-a61bc4dc1997",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Downsampling.Mipmap0"
+        },
+        {
+          "id": "751c1f20-4567-4471-bc70-db14d6ed3ff8",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Downsampling.Mipmap1"
+        },
+        {
+          "id": "e5866332-b3fc-41f7-b5da-d9517d7554a4",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Downsampling.Mipmap2"
+        },
+        {
+          "id": "f6b4173c-6731-442b-bce3-b26b88fef963",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Downsampling.Mipmap3"
+        },
+        {
+          "id": "664a9270-1366-4d50-a27e-ba8d37c18a53",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Downsampling.Mipmap4"
+        },
+        {
+          "id": "6a2b6245-92d3-475b-ad56-ead23c335a50",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Downsampling.Mipmap5"
+        },
+        {
+          "id": "497aa6b7-7e24-4135-a00f-935e686ce1e8",
+          "width": 10,
+          "height": 6,
+          "samples": 0,
+          "name": "Downsampling.Mipmap6"
+        },
+        {
+          "id": "c73441f2-5d0d-4d17-9204-b6c1beeafb7c",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Upsampling.Mipmap5"
+        },
+        {
+          "id": "4c0f92db-f206-4036-a8b6-a0237558c86c",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Upsampling.Mipmap4"
+        },
+        {
+          "id": "a83cfb98-b9fa-406a-94e5-b36522f67f8e",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Upsampling.Mipmap3"
+        },
+        {
+          "id": "721bc868-a3b3-498f-b2c6-e58db80dc84f",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Upsampling.Mipmap2"
+        },
+        {
+          "id": "26caaf90-fae0-437a-aee9-e2dca6744bdc",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Upsampling.Mipmap1"
+        },
+        {
+          "id": "357fc307-1d7f-49d1-b1f4-d950ef140f10",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Upsampling.Mipmap0"
+        },
+        {
+          "id": "63621986-0175-41cb-b2fe-4e77206b562d",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "6533f060-5e30-4175-a075-f14551226a20",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Edges"
+        },
+        {
+          "id": "85041508-d03e-4490-ad7d-314559850442",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Weights"
+        }
+      ],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 158045.30000019073,
+          "duration": 54,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 159938.5,
+          "duration": 51,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 160769,
+          "duration": 54,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 163061.30000019073,
+          "duration": 54,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 5,
+        "droppedGpuQueries": 1,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 240,
+          "averageMs": 30.62,
+          "p95Ms": 40.2,
+          "p99Ms": 49.8
+        },
+        "gpu": {
+          "samples": 234,
+          "averageMs": 33.516,
+          "p95Ms": 37.025,
+          "p99Ms": 42.169
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 240,
+              "averageMs": 30.62,
+              "p95Ms": 40.2,
+              "p99Ms": 49.8
+            },
+            "gpu": {
+              "samples": 234,
+              "averageMs": 33.516,
+              "p95Ms": 37.025,
+              "p99Ms": 42.169
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "resourcesBefore": {
+        "calls": 814,
+        "triangles": 656670,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 242
+      },
+      "resourcesAfter": {
+        "calls": 814,
+        "triangles": 654750,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 242
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -12.507304598602254,
+        119.99999172853555,
+        174.54730501708264
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 4380,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "baseline-HIGH-dpr1-overview-zoom-pan-1",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "zoom-pan",
+      "repeat": 1,
+      "trial": "baseline-HIGH-dpr1-trial1",
+      "activeWindows": [
+        {
+          "start": 177719.5,
+          "end": 177796.40000009537
+        },
+        {
+          "start": 177831.80000019073,
+          "end": 177903.10000014305
+        },
+        {
+          "start": 177936.80000019073,
+          "end": 178012.10000014305
+        },
+        {
+          "start": 178053.40000009537,
+          "end": 178133.70000004768
+        },
+        {
+          "start": 178172.5,
+          "end": 178254.40000009537
+        },
+        {
+          "start": 178288.10000014305,
+          "end": 178362.80000019073
+        },
+        {
+          "start": 178395.70000004768,
+          "end": 178467.20000004768
+        },
+        {
+          "start": 178496.30000019073,
+          "end": 178574.40000009537
+        },
+        {
+          "start": 178603.5,
+          "end": 178674.70000004768
+        },
+        {
+          "start": 179578.5,
+          "end": 183299.80000019073
+        }
+      ],
+      "frames": {
+        "samples": 118,
+        "medianMs": 36.5,
+        "p95Ms": 43.9,
+        "stallsOver50Ms": 0,
+        "maxMs": 46
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [
+        {
+          "id": "adaa4cc6-285e-4658-80b7-656910a667e7",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "28ba56c6-c006-470f-a910-3c4e76faad61",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "LuminancePass.Target"
+        },
+        {
+          "id": "4c47521c-32f4-44a2-8866-a61bc4dc1997",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Downsampling.Mipmap0"
+        },
+        {
+          "id": "751c1f20-4567-4471-bc70-db14d6ed3ff8",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Downsampling.Mipmap1"
+        },
+        {
+          "id": "e5866332-b3fc-41f7-b5da-d9517d7554a4",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Downsampling.Mipmap2"
+        },
+        {
+          "id": "f6b4173c-6731-442b-bce3-b26b88fef963",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Downsampling.Mipmap3"
+        },
+        {
+          "id": "664a9270-1366-4d50-a27e-ba8d37c18a53",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Downsampling.Mipmap4"
+        },
+        {
+          "id": "6a2b6245-92d3-475b-ad56-ead23c335a50",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Downsampling.Mipmap5"
+        },
+        {
+          "id": "497aa6b7-7e24-4135-a00f-935e686ce1e8",
+          "width": 10,
+          "height": 6,
+          "samples": 0,
+          "name": "Downsampling.Mipmap6"
+        },
+        {
+          "id": "c73441f2-5d0d-4d17-9204-b6c1beeafb7c",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Upsampling.Mipmap5"
+        },
+        {
+          "id": "4c0f92db-f206-4036-a8b6-a0237558c86c",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Upsampling.Mipmap4"
+        },
+        {
+          "id": "a83cfb98-b9fa-406a-94e5-b36522f67f8e",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Upsampling.Mipmap3"
+        },
+        {
+          "id": "721bc868-a3b3-498f-b2c6-e58db80dc84f",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Upsampling.Mipmap2"
+        },
+        {
+          "id": "26caaf90-fae0-437a-aee9-e2dca6744bdc",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Upsampling.Mipmap1"
+        },
+        {
+          "id": "357fc307-1d7f-49d1-b1f4-d950ef140f10",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Upsampling.Mipmap0"
+        },
+        {
+          "id": "63621986-0175-41cb-b2fe-4e77206b562d",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "6533f060-5e30-4175-a075-f14551226a20",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Edges"
+        },
+        {
+          "id": "85041508-d03e-4490-ad7d-314559850442",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Weights"
+        }
+      ],
+      "qualityChanges": [],
+      "longTasks": [],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 4,
+        "droppedGpuQueries": 0,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 168,
+          "averageMs": 31.892,
+          "p95Ms": 38.5,
+          "p99Ms": 41.8
+        },
+        "gpu": {
+          "samples": 164,
+          "averageMs": 34.897,
+          "p95Ms": 37.841,
+          "p99Ms": 40.616
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 168,
+              "averageMs": 31.892,
+              "p95Ms": 38.5,
+              "p99Ms": 41.8
+            },
+            "gpu": {
+              "samples": 164,
+              "averageMs": 34.897,
+              "p95Ms": 37.841,
+              "p99Ms": 40.616
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "resourcesBefore": {
+        "calls": 815,
+        "triangles": 656558,
+        "geometries": 580,
+        "textures": 136,
+        "programs": 242
+      },
+      "resourcesAfter": {
+        "calls": 814,
+        "triangles": 648134,
+        "geometries": 580,
+        "textures": 136,
+        "programs": 242
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        106.10818305460043,
+        127.3635186792728,
+        146.62830527254906
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -15.948522346369195,
+        -1.108112234760166e-21,
+        3.3443467583671493
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 4895,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  ],
+  "environments": {
+    "baseline-HIGH-dpr1-trial1": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "platform": "Win32",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "devicePixelRatio": 1,
+      "visualViewportScale": 1,
+      "hardwareConcurrency": 4,
+      "memoryHintGiB": 8,
+      "attributes": {
+        "alpha": false,
+        "antialias": true,
+        "depth": true,
+        "desynchronized": false,
+        "failIfMajorPerformanceCaveat": false,
+        "powerPreference": "high-performance",
+        "premultipliedAlpha": true,
+        "preserveDrawingBuffer": false,
+        "stencil": false,
+        "xrCompatible": false
+      },
+      "renderer": {
+        "at": 115487.10000014305,
+        "calls": 824,
+        "triangles": 694050,
+        "geometries": 576,
+        "textures": 136,
+        "programs": 242,
+        "dpr": 1,
+        "width": 1265,
+        "height": 720,
+        "heapBytes": 149493791,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "gpuTimerExtension": "EXT_disjoint_timer_query_webgl2",
+      "boot": {
+        "routeStartedAt": 612,
+        "documentToInteractiveMs": 16580,
+        "navigationToModuleMs": 1,
+        "moduleMs": 1101,
+        "rendererModuleMs": null,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 192,
+        "headquartersWorkerMs": 1653,
+        "webglContextMs": 182,
+        "sceneMs": 4252,
+        "entityGeometryCpuMs": 16.300001621246338,
+        "environmentMaterialMs": 0,
+        "proceduralTextureCpuMs": 216.5,
+        "textureUploadMs": 871,
+        "cpuStagesMs": {
+          "textures": 217,
+          "geometry-preparation": 16,
+          "b12-unpack": 6,
+          "b12-materials": 199
+        },
+        "shaderDirectMs": 7750,
+        "shaderPostMs": null,
+        "shadowMs": 0,
+        "postprocessingMs": 7,
+        "physicsMs": 1347,
+        "firstDrawMs": 8785,
+        "interactiveMs": 15968,
+        "controlsResponseMs": null,
+        "hydrationMs": 92681
+      },
+      "displayCadence": null
+    }
+  },
+  "errors": {
+    "baseline-HIGH-dpr1-trial1": []
+  },
+  "trials": [
+    {
+      "name": "baseline-HIGH-dpr1-trial1",
+      "label": "baseline",
+      "repeat": 1,
+      "startedAt": "2026-10-01T17:13:53.324Z",
+      "gate": null,
+      "errors": [],
+      "completedAt": "2026-10-01T17:15:02.287Z"
+    }
+  ],
+  "trialOrder": [
+    {
+      "label": "baseline",
+      "repeat": 1
+    }
+  ]
+}

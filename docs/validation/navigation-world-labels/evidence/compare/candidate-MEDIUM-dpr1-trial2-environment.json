@@ -1,0 +1,106 @@
+{
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+  "platform": "Win32",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "devicePixelRatio": 1,
+  "visualViewportScale": 1,
+  "hardwareConcurrency": 4,
+  "memoryHintGiB": 8,
+  "attributes": {
+    "alpha": false,
+    "antialias": true,
+    "depth": true,
+    "desynchronized": false,
+    "failIfMajorPerformanceCaveat": false,
+    "powerPreference": "high-performance",
+    "premultipliedAlpha": true,
+    "preserveDrawingBuffer": false,
+    "stencil": false,
+    "xrCompatible": false
+  },
+  "renderer": {
+    "at": 124698.29999995232,
+    "calls": 806,
+    "triangles": 694119,
+    "geometries": 576,
+    "textures": 110,
+    "programs": 234,
+    "dpr": 1,
+    "width": 1265,
+    "height": 720,
+    "heapBytes": 96898603,
+    "qualityTier": "MEDIUM",
+    "gpuVendor": "Google Inc. (Intel)",
+    "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+  },
+  "gpuTimerExtension": "EXT_disjoint_timer_query_webgl2",
+  "multiDrawExtension": "WEBGL_multi_draw",
+  "boot": {
+    "routeStartedAt": 423.5,
+    "documentToInteractiveMs": 21945,
+    "navigationToModuleMs": 0,
+    "moduleMs": 764,
+    "rendererModuleMs": null,
+    "dataMs": null,
+    "routeDataWaitMs": null,
+    "rendererMs": 45,
+    "headquartersWorkerMs": 2716,
+    "webglContextMs": 34,
+    "sceneMs": 6459,
+    "entityGeometryCpuMs": 25.399998664855957,
+    "environmentMaterialMs": 0,
+    "proceduralTextureCpuMs": 366,
+    "textureUploadMs": 845,
+    "cpuStagesMs": {
+      "textures": 366,
+      "geometry-preparation": 25,
+      "b12-unpack": 6,
+      "b12-materials": 292
+    },
+    "shaderDirectMs": 10952,
+    "shaderPostMs": null,
+    "shadowMs": 0,
+    "postprocessingMs": 9,
+    "physicsMs": 166,
+    "firstDrawMs": 11762,
+    "interactiveMs": 21522,
+    "controlsResponseMs": null,
+    "hydrationMs": 96639
+  },
+  "displayCadence": null,
+  "executedBuildManifest": {
+    "build": "candidate",
+    "sourceHashes": {
+      "src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx": "9e27186521f359b8ba1a6f56415daafa10ba8671dcba7bea1b7f38f56a985a0a",
+      "src/features/commercial-map/utils/adaptiveQualityRuntime.ts": "a378842b4784a6cdeafcc8417ba01115ca7a52c52571d5f76eac3b108e262a19",
+      "src/features/commercial-map/components/canvas/CommercialMapAdaptiveQuality.tsx": "771488cde9bfdbb753062698fb78fa2bdb14ca39217210b6da868e89ce51999d",
+      "src/features/commercial-map/utils/territorialOrientation.ts": "67fc770f5f1e5602acb0effcd244c96b1233babcfb1456a422dbf26022b5080f",
+      "src/features/commercial-map/components/canvas/TerritorialOrientation.tsx": "83af0858a04dc4d2ca0f6cc03f7b4be6c61716727248b41beebc25ead7b4828e",
+      "src/features/commercial-map/utils/executionPolicy.ts": "059fe8ba81a48358b2aa36cc086b31e29ba3f0f3ae8920c341d9bef66dd0de33",
+      "src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx": "8f6b95998b59833225d8d8ae3cf9771a9a507d32906f425b7fe12e0a96b17c92"
+    },
+    "diagnostics": true,
+    "revision": "e5b3300ae7438508331a8eb65a3717adb6cf370b",
+    "dirty": false,
+    "sourceBase": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+    "baseRevision": "e5b3300ae7438508331a8eb65a3717adb6cf370b"
+  },
+  "expectedRevision": "e5b3300ae7438508331a8eb65a3717adb6cf370b",
+  "ablationApplied": {
+    "requested": [],
+    "applied": false
+  },
+  "shadowReceivingAblation": {
+    "requested": "authored",
+    "applied": false
+  },
+  "labelTiming": {
+    "enabled": false
+  },
+  "drawTiming": {
+    "enabled": false
+  }
+}

@@ -466,6 +466,20 @@ async function resetRenderTiming(page) {
   await checkbox.evaluate(input => { if (input.checked) input.click(); });
   await checkbox.evaluate(input => { if (!input.checked) input.click(); });
 }
+async function assertExpectedRenderPath(page, trialName) {
+  const facts = await page.evaluate(() => {
+    const canvas = document.querySelector('canvas');
+    return { health: JSON.parse(canvas.dataset.commercialMapRenderHealth || 'null'),
+      budget: JSON.parse(canvas.dataset.commercialMapPostBudget || 'null'),
+      failedCriticalPost: window.__commercialMapPerformance?.events?.some(row => row.name === 'critical-post:end' && row.failed) || false };
+  });
+  const expectedPath = facts.budget?.requestedPath === 'direct' && facts.budget.directBudgetAvailable ? 'direct' : 'post';
+  if (facts.failedCriticalPost || facts.health?.status !== 'ready' || facts.health.path !== expectedPath) {
+    save(`${trialName}-invalid-render-path.json`, { expectedPath, ...facts,
+      reason: 'Fallback or failed shader preparation is not the requested workload; do not include this trial in a performance comparison.' });
+    throw Error(`Invalid render path for ${trialName}: expected ready/${expectedPath}`);
+  }
+}
 async function stopRenderTiming(page) {
   if (process.env.NAV_RENDER_TIMING !== '1') return;
   await page.getByLabel('Medir CPU/GPU (DEV)', { exact: true }).evaluate(input => { if (input.checked) input.click(); });
@@ -758,6 +772,7 @@ async function waitMeasureGate(trialName) {
         for (const view of viewNames) for (const scenario of trialScenarios) {
           await pose(page, view); await gesture(page, scenario); // excluded equal warmup
           await pose(page, view);
+          await assertExpectedRenderPath(page, trialName);
           await resetRenderTiming(page);
           const profiler = await startCpuProfile(page);
           await page.evaluate(() => { window.focus(); window.__navigationResolutionQa.begin(); });
