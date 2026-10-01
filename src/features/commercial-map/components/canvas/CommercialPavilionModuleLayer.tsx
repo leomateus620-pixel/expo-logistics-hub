@@ -392,8 +392,10 @@ function createModuleNumberTexture(
 
     if (fontSize < 7) return;
     context.font = `${maximumPriority ? 900 : 800} ${fontSize}px Inter, Arial, sans-serif`;
-    if (screenAlignedLabels) {
-      fontSize *= Math.min(1, usableWidth * 0.78 / Math.max(1, context.measureText(label).width));
+    // Always fit the full official number (e.g. 3-digit "104") inside the cell.
+    const fitScale = Math.min(1, usableWidth * 0.78 / Math.max(1, context.measureText(label).width));
+    if (fitScale < 1) {
+      fontSize *= fitScale;
       context.font = `${maximumPriority ? 900 : 800} ${fontSize}px Inter, Arial, sans-serif`;
     }
     context.lineWidth = Math.max(1.5, fontSize * (maximumPriority ? 0.24 : 0.18));

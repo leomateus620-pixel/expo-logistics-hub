@@ -81,7 +81,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_RUNS = [
     id: 'central-east-27-52',
     label: 'Módulos 27–52',
     role: 'island',
-    bounds: PROJECT.rect(9.9, 6, 3, 26),
+    bounds: PROJECT.rect(9.9, 8.9, 3, 26),
     numberRange: [27, 52],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
@@ -92,7 +92,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_RUNS = [
     id: 'central-west-53-78',
     label: 'Módulos 53–78',
     role: 'island',
-    bounds: PROJECT.rect(6.9, 6, 3, 26),
+    bounds: PROJECT.rect(6.9, 8.9, 3, 26),
     numberRange: [53, 78],
     orientation: 'east-west',
     sequenceOrientation: 'z-decreasing',
@@ -168,13 +168,13 @@ export const PAVILION13_COMMERCIAL_REFERENCE_CORRIDORS = [
     id: 'west-main-aisle',
     label: 'Corredor principal oeste',
     kind: 'main',
-    ...PROJECT.rect(3, 6, 3.9, 26),
+    ...PROJECT.rect(3, 8.9, 3.9, 26),
   },
   {
     id: 'east-main-aisle',
     label: 'Corredor principal leste',
     kind: 'main',
-    ...PROJECT.rect(12.9, 6, 3.9, 26),
+    ...PROJECT.rect(12.9, 8.9, 3.9, 26),
   },
   {
     id: 'west-cross-access',
@@ -192,7 +192,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE_CORRIDORS = [
     id: 'south-distribution',
     label: 'Circulação e acessos sul',
     kind: 'main',
-    ...PROJECT.rect(3, 32, 13.8, 5.8),
+    ...PROJECT.rect(3, 34.9, 13.8, 2.9),
   },
 ] as const satisfies readonly CommercialPavilionReferenceCorridor[];
 
