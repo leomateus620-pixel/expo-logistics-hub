@@ -632,6 +632,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
           interiorEntity={interiorEntity}
           matchingEntityIds={mapFilter.matchingEntityIds}
           filtersActive={mapFilter.hasActiveCriteria}
+          moduleSaleActive={Boolean(interiorEntity && selectedModuleId && data.lots.some((lot) => lot.publicIdentifier === selectedModuleId.replace(/^.*:module:/, `${interiorEntity.publicIdentifier}-M`) && (lot.status === 'SALE_OPEN' || lot.status === 'SOLD')))}
           moduleCard={interiorPavilionPlan && interiorEntity ? <PavilionModuleCard
             embedded
             plan={interiorPavilionPlan}

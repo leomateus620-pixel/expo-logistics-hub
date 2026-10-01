@@ -172,8 +172,6 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
           ) : <span>Sem cadastro comercial</span>}
           <span>{areaLabel == null ? 'Área individual não informada' : `${areaLabel} de área individual`}</span>
         </div>
-        <CompactDetailSheetControls sheet={sheet} subject="módulo" embedded={embedded} />
-        <div className="commercial-pavilion-module-details" hidden={embedded && sheet.sheetState !== 'expanded'}>
         {persisted && lot?.status === 'SALE_OPEN' && (
           <SaleOpenSection lotId={lot.id} canManageSales={permissions.canManageSales} />
         )}
@@ -193,6 +191,8 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
             </div>
           </section>
         )}
+         <CompactDetailSheetControls sheet={sheet} subject="módulo" embedded={embedded} />
+         <div className="commercial-pavilion-module-details" hidden={embedded && sheet.sheetState !== 'expanded'}>
          <dl className="commercial-pavilion-module-facts">
           <div>
             <dt>Localização</dt>

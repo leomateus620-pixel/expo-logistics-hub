@@ -21,13 +21,14 @@ interface CommercialMapDockProps {
   matchingEntityIds?: ReadonlySet<string>;
   filtersActive?: boolean;
   moduleCard?: ReactNode;
+  moduleSaleActive?: boolean;
 }
 
 const COMPACT_QUERY = '(max-width: 720px), (max-width: 950px) and (max-height: 520px)';
 
 /** One contextual panel, rendered as a rail or a nonmodal sheet. */
 export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSelect, onSegmentClear,
-  scopeTitle, isCommissionScope, interiorEntity = null, matchingEntityIds, filtersActive, moduleCard,
+  scopeTitle, isCommissionScope, interiorEntity = null, matchingEntityIds, filtersActive, moduleCard, moduleSaleActive = false,
 }: CommercialMapDockProps) {
   const dockExpanded = useCommercialMapStore((s) => s.dockExpanded);
   const setDockExpanded = useCommercialMapStore((s) => s.setDockExpanded);
@@ -82,9 +83,9 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
     setInteriorExpanded(true);
   }, [interiorId]);
   useEffect(() => {
-    if (selectedModuleId) setSheet('summary');
+    if (selectedModuleId) setSheet(moduleSaleActive ? 'expanded' : 'summary');
     setModuleLegendOpen(false);
-  }, [interiorId, selectedModuleId]);
+  }, [interiorId, selectedModuleId, moduleSaleActive]);
   useEffect(() => {
     if (compact && mode === 'list') setSheet('collapsed');
   }, [compact, mode]);
