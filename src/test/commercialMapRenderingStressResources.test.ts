@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { analyzeCommercialMapStressResources } from '@/features/commercial-map/diagnostics/renderingStressResources';
+import { analyzeCommercialMapStressResources, resolveCommercialMapStressExpectedRenderPath } from '@/features/commercial-map/diagnostics/renderingStressResources';
 import type { RendererSnapshot } from '@/features/commercial-map/utils/runtimeDiagnostics';
 
 function snapshot(cycle: number, target: boolean, overrides: Partial<RendererSnapshot> = {}) {
@@ -26,6 +26,26 @@ function cycles(transform: (cycle: number, target: boolean) => Partial<RendererS
 }
 
 describe('resource acceptance of the DEV rendering stress runner', () => {
+  it('accepts the measured DIRECT quality budget without timing out waiting for POST', () => {
+    expect(resolveCommercialMapStressExpectedRenderPath(JSON.stringify({
+      effectTier: 'LOW', requestedPath: 'direct', appliedPath: 'direct', directBudgetAvailable: true,
+    }))).toBe('direct');
+    expect(resolveCommercialMapStressExpectedRenderPath(JSON.stringify({
+      effectTier: 'MEDIUM', requestedPath: 'direct', appliedPath: 'post', directBudgetAvailable: true,
+    }))).toBe('direct');
+  });
+
+  it('waits for POST for HIGH, unavailable MSAA or an unpublished/invalid budget', () => {
+    expect(resolveCommercialMapStressExpectedRenderPath(JSON.stringify({
+      requestedPath: 'post', appliedPath: 'direct', directBudgetAvailable: true,
+    }))).toBe('post');
+    expect(resolveCommercialMapStressExpectedRenderPath(JSON.stringify({
+      requestedPath: 'direct', appliedPath: 'post', directBudgetAvailable: false,
+    }))).toBe('post');
+    expect(resolveCommercialMapStressExpectedRenderPath()).toBe('post');
+    expect(resolveCommercialMapStressExpectedRenderPath('{')).toBe('post');
+  });
+
   it('compares warmed like-for-like modes without treating different resource totals as a leak', () => {
     const result = analyzeCommercialMapStressResources(cycles(), ['quality']);
     expect(result.status).toBe('passed');

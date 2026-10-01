@@ -26,6 +26,7 @@ import {
 } from '../utils/renderingTiming';
 import {
   analyzeCommercialMapStressResources,
+  resolveCommercialMapStressExpectedRenderPath,
   type CommercialMapStressResourceAnalysis,
 } from './renderingStressResources';
 import type { CameraPreset, Coordinate } from '../types';
@@ -152,7 +153,9 @@ async function waitForStressPresentation(
     if (presented && idleSince !== null && performance.now() - idleSince >= STRESS_IDLE_MS) {
       window.__commercialMapRuntimeDiagnostics?.capture();
       const runtime = summarizeCommercialMapRuntimeDiagnostics();
-      const expectedPath = 'post'; // quality budgets preserve the authored effects
+      const expectedPath = resolveCommercialMapStressExpectedRenderPath(
+        currentDiagnosticsCanvas()?.dataset.commercialMapPostBudget,
+      );
       if (health.path === expectedPath) {
         return {
           elapsedMs: Math.round(elapsedMs),
