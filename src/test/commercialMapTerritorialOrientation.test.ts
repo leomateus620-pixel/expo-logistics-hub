@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS } from '@/features/commercial-map/data/officialReference2026';
-import { orientationBoxFits, orientationLevel, prepareTerritorialOrientation, TERRITORY_SYMBOLS } from '@/features/commercial-map/utils/territorialOrientation';
+import { orientationBoxFits, orientationLevel, prepareTerritorialOrientation, roadLabelFits, TERRITORY_SYMBOLS } from '@/features/commercial-map/utils/territorialOrientation';
 import { lotPointClearance } from '@/features/commercial-map/utils/soldLotPresentation';
 import { COMMERCIAL_MAP_SEGMENT_IDS } from '@/features/commercial-map/data/commercialMapSegments';
 
@@ -35,5 +35,20 @@ describe('orientação territorial cadastral', () => {
     expect(orientationLevel(35, 'medium')).toBe('medium');
     expect(orientationLevel(115, 'near')).toBe('near');
     expect(orientationLevel(115, 'medium')).toBe('medium');
+  });
+  it('mantém a etiqueta horizontal inteira sobre a superfície da rua, evitando recortes e edificações', () => {
+    const road: [number, number][][] = [[[0, 0], [100, 0], [100, 20], [55, 20], [55, 12], [45, 12], [45, 20], [0, 20]]];
+    expect(roadLabelFits({ left: 2, right: 38, top: 4, bottom: 11 }, road)).toBe(true);
+    expect(roadLabelFits({ left: 35, right: 65, top: 14, bottom: 19 }, road)).toBe(false);
+    expect(roadLabelFits({ left: 2, right: 38, top: 4, bottom: 11 }, road,
+      [[[[15, 3], [25, 3], [25, 13], [15, 13]]]])).toBe(false);
+    expect(roadLabelFits({ left: 2, right: 38, top: 4, bottom: 11 },
+      [[[0, 0], [100, 0], [100, 20], [0, 20]], [[20, 3], [30, 3], [30, 12], [20, 12]]])).toBe(false);
+    expect(roadLabelFits({ left: 2, right: 38, top: 4, bottom: 11 }, [[[0, 0], [100, 0], [100, 7], [0, 7]]])).toBe(false);
+  });
+  it('escolhe sempre um trecho cadastral estável para uma via repetida', () => {
+    const road = data.find(item => item.kind === 'road' && item.name === 'Rua Bolívia');
+    expect(road?.outline).toBeDefined();
+    expect(road?.anchor && road.outline && lotPointClearance(road.anchor, road.outline)).toBeGreaterThan(0);
   });
 });
