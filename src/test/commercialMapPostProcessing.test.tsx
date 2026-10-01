@@ -25,6 +25,7 @@ import { SunrisePostProcessing } from '@/features/commercial-map/components/canv
 import { COMMERCIAL_MAP_RENDER_RETRY_EVENT, readCommercialMapRenderHealth } from '@/features/commercial-map/utils/renderingHealth';
 import { prepareCommercialMapCriticalPost, prepareCommercialScene } from '@/features/commercial-map/utils/sceneShaderWarmup';
 import { visitRuntime } from '@/features/commercial-map/visit/visitRuntime';
+import { COMMERCIAL_MAP_QUALITY_EVENT } from '@/features/commercial-map/utils/adaptiveQualityRuntime';
 
 function createRenderer() {
   const size = new THREE.Vector2(1366, 768);
@@ -36,7 +37,7 @@ function createRenderer() {
   const context = {
     FRAMEBUFFER: 0x8d40,
     FRAMEBUFFER_COMPLETE: 0x8cd5,
-    getContextAttributes: () => ({ alpha: false }),
+    getContextAttributes: () => ({ alpha: false, antialias: true }),
     getExtension: vi.fn(() => null),
     isContextLost: vi.fn(() => false),
     checkFramebufferStatus: vi.fn(() => 0x8cd5),
@@ -87,6 +88,11 @@ function createRuntime() {
 
 function drawFrame() { act(() => runtime.frame?.(runtime.state, 1 / 60)); }
 
+function publishEffectBudget(gl: THREE.WebGLRenderer, effectTier: string, sceneTier = effectTier) {
+  gl.domElement.dataset.commercialMapQuality = JSON.stringify({ effectTier, sceneTier });
+  act(() => gl.domElement.dispatchEvent(new Event(COMMERCIAL_MAP_QUALITY_EVENT)));
+}
+
 function listenerCount(effect: unknown) {
   return (effect as { _listeners?: { change?: unknown[] } })._listeners?.change?.length ?? 0;
 }
@@ -123,6 +129,104 @@ afterEach(() => {
 });
 
 describe('Commercial Map persistent post-processing with installed postprocessing classes', () => {
+  it('applies measured MEDIUM/LOW execution immediately while retaining the HIGH scene, resolution, passes and targets', () => {
+    const { gl, scene, camera } = createRuntime();
+    const addPass = vi.spyOn(EffectComposer.prototype, 'addPass');
+    const dispose = vi.spyOn(EffectComposer.prototype, 'dispose');
+    const resize = vi.spyOn(EffectComposer.prototype, 'setSize');
+    const view = render(<SunrisePostProcessing qualityTier="balanced" enabled />);
+    drawFrame();
+    const composer = addPass.mock.instances[0] as unknown as EffectComposer;
+    const targets = [composer.inputBuffer, composer.outputBuffer];
+    const passes = [...composer.passes];
+    const resized = resize.mock.calls.length;
+    const postFrames = vi.mocked(composer.render).mock.calls.length;
+    publishEffectBudget(gl, 'MEDIUM', 'HIGH');
+    vi.mocked(gl.render).mockImplementation(() => {
+      expect(gl.toneMapping).toBe(THREE.ACESFilmicToneMapping);
+      expectScreenBound(gl);
+    });
+    for (let cycle = 0; cycle < 20; cycle++) {
+      view.rerender(<SunrisePostProcessing qualityTier="balanced" enabled interactionActive />);
+      drawFrame();
+      view.rerender(<SunrisePostProcessing qualityTier="balanced" enabled />);
+      drawFrame();
+    }
+    expect(composer.render).toHaveBeenCalledTimes(postFrames);
+    expect(gl.render).toHaveBeenCalledWith(scene, camera);
+    expect(readCommercialMapRenderHealth(gl.domElement)).toMatchObject({ status: 'ready', path: 'direct', lastErrorCode: null });
+    expect(JSON.parse(gl.domElement.dataset.commercialMapPostBudget!)).toMatchObject({
+      effectTier: 'MEDIUM', requestedPath: 'direct', appliedPath: 'direct', antialiasing: 'MSAA',
+      composerResident: true, bloomEnabled: false, sharpenStrength: 0,
+    });
+    publishEffectBudget(gl, 'LOW', 'HIGH');
+    drawFrame();
+    expect(composer.render).toHaveBeenCalledTimes(postFrames);
+    expect([composer.inputBuffer, composer.outputBuffer]).toEqual(targets);
+    expect(composer.passes).toEqual(passes);
+    expect(addPass).toHaveBeenCalledTimes(4);
+    expect(dispose).not.toHaveBeenCalled();
+    expect(resize).toHaveBeenCalledTimes(resized);
+    expect(gl.setPixelRatio).not.toHaveBeenCalled();
+  });
+
+  it('keeps DIRECT for a pending upgrade then reuses POST only after the effect tier is committed', () => {
+    const { gl } = createRuntime();
+    const addPass = vi.spyOn(EffectComposer.prototype, 'addPass');
+    const dispose = vi.spyOn(EffectComposer.prototype, 'dispose');
+    render(<SunrisePostProcessing qualityTier="balanced" enabled />);
+    drawFrame();
+    const composer = addPass.mock.instances[0] as unknown as EffectComposer;
+    const targets = [composer.inputBuffer, composer.outputBuffer];
+    const resize = vi.spyOn(composer, 'setSize');
+    publishEffectBudget(gl, 'MEDIUM', 'MEDIUM'); drawFrame();
+    const postFrames = vi.mocked(composer.render).mock.calls.length;
+    // Logical HIGH may still be waiting for the scene budget to reach idle.
+    publishEffectBudget(gl, 'MEDIUM', 'MEDIUM'); drawFrame();
+    expect(composer.render).toHaveBeenCalledTimes(postFrames);
+    publishEffectBudget(gl, 'HIGH', 'HIGH'); drawFrame();
+    expect(composer.render).toHaveBeenCalledTimes(postFrames + 1);
+    expect(JSON.parse(gl.domElement.dataset.commercialMapPostBudget!)).toMatchObject({
+      effectTier: 'HIGH', appliedPath: 'post', antialiasing: 'SMAA_ULTRA', composerResident: true,
+    });
+    expect([composer.inputBuffer, composer.outputBuffer]).toEqual(targets);
+    expect(resize).not.toHaveBeenCalled();
+    expect(dispose).not.toHaveBeenCalled();
+    expect(gl.setPixelRatio).not.toHaveBeenCalled();
+  });
+
+  it('retains the antialiased composer when the driver declined default-framebuffer MSAA', () => {
+    const { gl } = createRuntime();
+    vi.spyOn(gl.getContext(), 'getContextAttributes').mockReturnValue({ alpha: false, antialias: false } as WebGLContextAttributes);
+    render(<SunrisePostProcessing qualityTier="balanced" enabled />);
+    publishEffectBudget(gl, 'MEDIUM', 'HIGH');
+    drawFrame();
+    expect(EffectComposer.prototype.render).toHaveBeenCalledOnce();
+    expect(gl.render).not.toHaveBeenCalled();
+    expect(JSON.parse(gl.domElement.dataset.commercialMapPostBudget!)).toMatchObject({
+      requestedPath: 'direct', appliedPath: 'post', antialiasing: 'SMAA_ULTRA', directBudgetAvailable: false,
+    });
+  });
+
+  it('keeps the measured DIRECT budget through context restoration and removes its quality listener on unmount', () => {
+    const state = createRuntime();
+    const { gl, scene, camera } = state;
+    const view = render(<SunrisePostProcessing qualityTier="full" enabled />);
+    publishEffectBudget(gl, 'MEDIUM', 'HIGH'); drawFrame();
+    loseContext(gl); drawFrame();
+    const directFrames = vi.mocked(gl.render).mock.calls.length;
+    restoreContext(gl); drawFrame();
+    expect(gl.render).toHaveBeenCalledTimes(directFrames + 1);
+    expect(EffectComposer.prototype.render).not.toHaveBeenCalled();
+    expect(readCommercialMapRenderHealth(gl.domElement)).toMatchObject({ status: 'ready', path: 'direct', contextLosses: 1 });
+    expect(state.scene).toBe(scene); expect(state.camera).toBe(camera);
+    expect(JSON.parse(gl.domElement.dataset.commercialMapPostBudget!)).toMatchObject({ effectTier: 'MEDIUM', appliedPath: 'direct' });
+    expectScreenBound(gl);
+    view.unmount(); state.invalidate.mockClear();
+    publishEffectBudget(gl, 'HIGH', 'HIGH');
+    expect(state.invalidate).not.toHaveBeenCalled();
+  });
+
   it('preserva todos os efeitos e o mesmo compositor em movimento e repouso da visita', () => {
     const state = createRuntime();
     const addPass = vi.spyOn(EffectComposer.prototype, 'addPass');

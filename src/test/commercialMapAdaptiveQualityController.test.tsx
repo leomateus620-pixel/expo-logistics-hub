@@ -265,7 +265,7 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     expect(runtime.gl.getPixelRatio()).toBe(baseDpr);
   });
 
-  it('não degrada várias vezes a mesma cena durante um gesto longo antes do tier pendente ser aplicado', () => {
+  it('reduz efeitos na lentidão persistente e mede o novo orçamento durante o gesto, sem redimensionar buffers', () => {
     const qualityChange = vi.fn();
     render(<CommercialMapAdaptiveQualityController
       active
@@ -277,26 +277,44 @@ describe('único proprietário do DPR do Mapa Comercial', () => {
     runtime.setDpr.mockClear();
     act(() => useCommercialMapStore.setState({ cameraNavigating: true }));
     act(() => {
-      // Six slow windows used to downgrade HIGH -> MEDIUM -> LOW without
-      // ever measuring the lower tier: the actual scene stayed HIGH throughout.
-      for (let frame = 0; frame < 270; frame += 1) runtime.frame?.({}, 0.03);
+      for (let frame = 0; frame < 91; frame += 1) runtime.frame?.({}, 0.03);
     });
-    expect(qualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'MEDIUM', sceneTier: 'HIGH' });
+    expect(qualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'MEDIUM', effectTier: 'MEDIUM', sceneTier: 'HIGH' });
     expect(qualityChange.mock.calls.some(([quality]) => quality.tier === 'LOW')).toBe(false);
     expect(runtime.setDpr).not.toHaveBeenCalled();
 
-    act(() => useCommercialMapStore.setState({ cameraNavigating: false }));
-    expect(runtime.setDpr).toHaveBeenCalledExactlyOnceWith(1.35);
-    expect(runtime.gl.getPixelRatio()).toBe(1.35);
-    act(() => vi.advanceTimersByTime(650));
-    expect(qualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'MEDIUM', sceneTier: 'MEDIUM' });
+    // A transition frame is discarded. The sustained slow workload after
+    // applying the cheap budget remains measurable during long navigation.
+    act(() => { for (let frame = 0; frame < 91; frame += 1) runtime.frame?.({}, 0.03); });
+    expect(qualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'LOW', effectTier: 'LOW', sceneTier: 'HIGH' });
+    expect(runtime.setDpr).not.toHaveBeenCalled();
+    const pending = JSON.parse(runtime.gl.domElement.dataset.commercialMapQuality!);
+    expect(pending).toMatchObject({ logicalTier: 'LOW', effectTier: 'LOW', sceneTier: 'HIGH', effectiveDpr: 1.75, baseDpr: 1 });
 
-    // Further adaptation resumes only when it can measure the applied tier.
+    act(() => useCommercialMapStore.setState({ cameraNavigating: false }));
+    expect(runtime.setDpr).toHaveBeenCalledExactlyOnceWith(1);
+    expect(runtime.gl.getPixelRatio()).toBe(1);
+    act(() => vi.advanceTimersByTime(650));
+    expect(qualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'LOW', effectTier: 'LOW', sceneTier: 'LOW' });
+  });
+
+  it('mantém o orçamento reduzido aplicado entre gestos sem novas trocas de efeito ou resolução', () => {
+    const qualityChange = vi.fn();
+    render(<CommercialMapAdaptiveQualityController active initialState={{ ...initialState, tier: 'HIGH' }} capabilityHints={capabilityHints} reducedGraphics={false} onQualityChange={qualityChange} />);
     act(() => useCommercialMapStore.setState({ cameraNavigating: true }));
-    act(() => {
-      for (let frame = 0; frame < 91; frame += 1) runtime.frame?.({}, 0.03);
-    });
-    expect(qualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'LOW', sceneTier: 'MEDIUM' });
+    act(() => { for (let frame = 0; frame < 91; frame += 1) runtime.frame?.({}, 0.03); });
+    act(() => useCommercialMapStore.setState({ cameraNavigating: false }));
+    act(() => vi.advanceTimersByTime(650));
+    expect(qualityChange.mock.lastCall?.[0]).toMatchObject({ tier: 'MEDIUM', effectTier: 'MEDIUM', sceneTier: 'MEDIUM' });
+    qualityChange.mockClear(); runtime.setDpr.mockClear();
+    for (let cycle = 0; cycle < 20; cycle++) {
+      act(() => useCommercialMapStore.setState({ cameraNavigating: true }));
+      act(() => { for (let frame = 0; frame < 20; frame += 1) runtime.frame?.({}, 0.016); });
+      act(() => useCommercialMapStore.setState({ cameraNavigating: false }));
+      act(() => vi.advanceTimersByTime(650));
+    }
+    expect(qualityChange).not.toHaveBeenCalled();
+    expect(runtime.setDpr).not.toHaveBeenCalled();
   });
 
   it('não trata o intervalo ocioso inicial como stall, mas conta stalls no gesto ativo', () => {

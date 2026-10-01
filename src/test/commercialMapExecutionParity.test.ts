@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { COMMERCIAL_MAP_CANONICAL_CONTENT, readCommercialMapQaQualityTier, resolveCommercialMapContentPolicy, resolveCommercialMapExecutionPolicy } from '@/features/commercial-map/utils/executionPolicy';
+import { COMMERCIAL_MAP_CANONICAL_CONTENT, readCommercialMapQaQualityTier, resolveCommercialMapContentPolicy, resolveCommercialMapExecutionPolicy, resolveCommercialMapPostProcessingExecutionBudget } from '@/features/commercial-map/utils/executionPolicy';
 import { buildRegionalLandscapePlan } from '@/features/commercial-map/utils/regionalLandscape';
 import { buildRearTreeInstances, buildRearPoleInstances } from '@/features/commercial-map/data/rearParkEnvironment';
 import { resolveParkAccessEnvironmentPresentation } from '@/features/commercial-map/data/parkAccessEnvironment';
@@ -28,7 +28,7 @@ describe('mesmo parque em todos os perfis técnicos', () => {
     expect(readCommercialMapQaQualityTier(true, '?qualityQa=invalid')).toBeNull();
     expect(readCommercialMapQaQualityTier(true, '')).toBeNull();
   });
-  it('separa conteúdo imutável de cadência e buffers sem desligar efeitos', () => {
+  it('separa conteúdo imutável do orçamento de execução, cadência e buffers', () => {
     for (const tier of tiers) {
       expect(resolveCommercialMapContentPolicy(tier, true)).toBe(COMMERCIAL_MAP_CANONICAL_CONTENT);
       expect(COMMERCIAL_MAP_QUALITY_PRESETS[tier]).toMatchObject({ vegetationDensity: 1, distantVegetationDensity: 1, lodDistanceScale: 1 });
@@ -36,6 +36,16 @@ describe('mesmo parque em todos os perfis técnicos', () => {
       expect(resolveCommercialMapQualityPixelRatio({ qualityTier: tier, devicePixelRatio: 2, viewportWidth: 3840, viewportHeight: 2160 })).toBeGreaterThanOrEqual(.85);
     }
     expect(resolveCommercialMapExecutionPolicy('LOW').lodUpdateHz).toBeLessThan(resolveCommercialMapExecutionPolicy('HIGH').lodUpdateHz);
+  });
+
+  it('usa o framebuffer MSAA/ACES em LOW e MEDIUM sem mudar conteúdo ou a variante POST dos perfis superiores', () => {
+    for (const tier of ['LOW', 'MEDIUM'] as const) {
+      expect(resolveCommercialMapPostProcessingExecutionBudget(tier)).toEqual({ path: 'direct', antialiasing: 'MSAA', toneMapping: 'ACES_FILMIC' });
+      expect(resolveCommercialMapContentPolicy(tier)).toBe(COMMERCIAL_MAP_CANONICAL_CONTENT);
+    }
+    for (const tier of ['HIGH', 'ULTRA'] as const) {
+      expect(resolveCommercialMapPostProcessingExecutionBudget(tier)).toEqual({ path: 'post', antialiasing: 'SMAA_ULTRA', toneMapping: 'ACES_FILMIC' });
+    }
   });
 
   it('mantém IDs, posição, escala e espécie de todas as árvores regionais e de acesso', () => {
