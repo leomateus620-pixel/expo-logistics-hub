@@ -73,7 +73,7 @@ import { lunarLaunchPhaseLabel } from './utils/lunarLaunch';
 import { recordCommercialMapProfiler } from './utils/profilerDiagnostics';
 import { markCommercialMapStage } from './utils/performanceDiagnostics';
 import { canHandleCommercialMapEscape } from './utils/contextualNavigation';
-import { resolveCommercialPavilionModuleNavigationTarget } from './utils/pavilionModuleCommercial';
+import { buildPavilionModuleCommercialIndex, resolveCommercialPavilionModuleNavigationTarget } from './utils/pavilionModuleCommercial';
 import { useCommercialDashboardSync } from './dashboard/useCommercialDashboardSync';
 import type { CommercialMapData, CommercialMapQueryScope, MapPermissions } from './types';
 import './commercial-map.css';
@@ -332,6 +332,11 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const interiorPavilionPlan = interiorKind === 'commercial-pavilion' && interiorEntity
     ? resolveCommercialPavilionModulePlan(interiorEntity)
     : null;
+  const selectedModuleSaleActive = useMemo(() => {
+    if (!interiorEntity || !selectedModuleId || !data) return false;
+    const record = buildPavilionModuleCommercialIndex(interiorEntity, data.entities, data.lots).get(selectedModuleId);
+    return record?.lot.status === 'SALE_OPEN' || record?.lot.status === 'SOLD';
+  }, [interiorEntity, selectedModuleId, data]);
 
   const handleSegmentClear = () => {
     if (isCommissionScope) return;
@@ -632,7 +637,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
           interiorEntity={interiorEntity}
           matchingEntityIds={mapFilter.matchingEntityIds}
           filtersActive={mapFilter.hasActiveCriteria}
-          moduleSaleActive={Boolean(interiorEntity && selectedModuleId && data.lots.some((lot) => lot.publicIdentifier === selectedModuleId.replace(/^.*:module:/, `${interiorEntity.publicIdentifier}-M`) && (lot.status === 'SALE_OPEN' || lot.status === 'SOLD')))}
+          moduleSaleActive={selectedModuleSaleActive}
           moduleCard={interiorPavilionPlan && interiorEntity ? <PavilionModuleCard
             embedded
             plan={interiorPavilionPlan}

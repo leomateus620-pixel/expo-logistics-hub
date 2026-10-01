@@ -104,6 +104,13 @@
   flex: 0 0 16px;
 }
 
+.commercial-pavilion-module-card .commercial-map-sale-open__buyer,
+.commercial-pavilion-module-card .commercial-map-sale-confirmed__buyer {
+  font-size: 17px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
 .commercial-pavilion-module-card .commercial-sale-history {
   min-width: 0;
   margin-inline: 12px;
@@ -126,6 +133,16 @@
 
 .commercial-pavilion-module-card .commercial-sale-history dl {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.commercial-map-dock__module-legend summary {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.commercial-pavilion-module-card .commercial-pavilion-module-contracts > a b {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 720px) {
