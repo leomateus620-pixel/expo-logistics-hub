@@ -194,6 +194,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const permissions = isCommissionScope || isPreview ? COMMISSION_READ_ONLY_PERMISSIONS : resolvedPermissions;
   const { bootstrap, exporuralSync, publish } = useMapMutations();
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
+  const selectedModuleId = useCommercialMapStore((state) => state.selectedModuleId);
   const visitEnabled = useVisitStore((state) => state.enabled);
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const exitInterior = useCommercialMapStore((state) => state.exitInterior);
