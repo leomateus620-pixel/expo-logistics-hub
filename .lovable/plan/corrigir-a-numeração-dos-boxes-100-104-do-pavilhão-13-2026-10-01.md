@@ -1,14 +1,15 @@
 # Corrigir a numeração dos boxes 100–104 do Pavilhão 13
 
-## Resultado
-- Os cinco boxes devem aparecer como 100, 101, 102, 103 e 104 na planta interna, na ficha, no modo Vendas e no link público, sem alterar áreas, valores, posições, estados ou vendas.
+## Resultado esperado
+Os cinco boxes aparecem como 100, 101, 102, 103 e 104 no cadastro, no mapa comercial e nas consultas públicas, em vez de aparecerem como “10”.
 
 ## Etapas
-1. Corrigir diretamente os cinco cadastros atuais, sem abrir permissão de edição para usuários nem contornar restrições de segurança. A limitação encontrada anteriormente foi da ferramenta de escrita, não uma regra de acesso dos visitantes do mapa; seguir o fluxo autorizado da ferramenta e, se ele continuar indisponível, interromper a alteração e informar o bloqueio.
-2. Atualizar apenas o nome e número exibido de cada entidade e lote, identificando cada par pelo código oficial B5-M100–104 e conferindo também a chave e o número do módulo persistidos. Aplicar a correção apenas quando os campos ainda estiverem indevidamente como “10”, de forma segura para repetição.
-3. Confirmar no banco que existem exatamente cinco correções e que B5-M099 e os demais pavilhões não mudaram. Conferir que IDs, áreas, preços, status, vínculos e históricos permanecem iguais.
-4. Verificar os consumidores da numeração no mapa, ficha e link público; rodar os testes focados. Fazer conferência visual se o mapa 3D carregar no navegador. Não criar venda de teste nem publicar.
+1. Conferir novamente os cinco registros e seus vínculos antes da atualização, garantindo que cada código técnico corresponde ao número oficial esperado.
+2. Atualizar apenas os nomes e números exibidos desses cinco boxes, tanto no cadastro do lote como no cadastro da entidade do mapa, em uma operação transacional autorizada. Conferir a contagem antes de gravar e interromper a operação se os registros não corresponderem exatamente aos cinco esperados.
+3. Consultar os cinco registros após a atualização e verificar que nenhuma outra identidade foi modificada. Validar a exibição no mapa e no link público quando a visualização carregar.
+4. Ajustar apenas eventuais verificações automatizadas diretamente relacionadas à numeração e executar os testes focados.
 
-## Detalhes técnicos
-- O cadastro atual foi consultado: B5-M100–104 têm `moduleNumber` e chave técnica corretos, mas `map_entities.name`, `metadata.lotNumber`, `commercial_lots.lot_number` e `display_name` estão gravados como “10”. Os campos textuais não têm limite de comprimento; a migração antiga empregou `lpad(n::text, 2, '0')`, que truncou esses cinco números.
-- Trata-se de correção **de dados existentes**, portanto usar a ferramenta autorizada de atualização de dados, não migração de esquema nem mudança de RLS. A operação deve ser transacional e restrita aos cinco pares válidos, com contagem verificada antes de gravar.
+## Detalhes técnicos e limites
+- A consulta atual confirmou que `B5-M100` a `B5-M104` mantêm a identidade técnica e `moduleNumber` corretos, mas `commercial_lots.lot_number`/`display_name` e `map_entities.name`/`metadata.lotNumber` estão truncados como “10”. A migração anterior usou `lpad(n::text, 2, '0')`, que truncou números de três dígitos.
+- Por ser correção de dados existentes, usar somente a operação autorizada de atualização de dados, não uma migração de esquema nem alteração de permissões. Se a ferramenta de escrita continuar bloqueada, não contornar o bloqueio: informar que a atualização ficou pendente.
+- Preservar IDs, áreas, posições, preços, status, histórico, vendas e demais pavilhões. Não criar vendas de teste nem publicar.
