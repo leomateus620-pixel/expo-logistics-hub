@@ -2,6 +2,7 @@ import type { CommercialLot, Coordinate, MapEntity } from '../types';
 import { COMMERCIAL_MAP_SEGMENTS, buildCommercialMapSegmentIndex, type CommercialMapSegmentId } from '../data/commercialMapSegments';
 import { normalizeMapEntityMetadata } from './mapMetadata';
 import { lotPointClearance, safeLotAnchor } from './soldLotPresentation';
+import { pointInPolygon } from './spatialSurface';
 
 export type OrientationItem = {
   id: string; name: string; kind: 'segment' | 'block' | 'road';
@@ -81,6 +82,36 @@ export function prepareTerritorialOrientation(entities: readonly MapEntity[], lo
 }
 
 export type ScreenBox = { left: number; right: number; top: number; bottom: number };
+type ScreenPoint = readonly [number, number];
+
+function segmentsCross(a: ScreenPoint, b: ScreenPoint, c: ScreenPoint, d: ScreenPoint) {
+  const cross = (p: ScreenPoint, q: ScreenPoint, r: ScreenPoint) =>
+    (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]);
+  const abC = cross(a, b, c), abD = cross(a, b, d);
+  const cdA = cross(c, d, a), cdB = cross(c, d, b);
+  return abC * abD < 0 && cdA * cdB < 0;
+}
+
+/** The complete horizontal label footprint must stay inside the presented road,
+ * including concave turns and holes. Screen-space checks run only on changed frames. */
+export function roadLabelFits(box: ScreenBox, road: readonly ScreenPoint[][],
+  obstacles: readonly (readonly ScreenPoint[][])[] = []) {
+  const outer = road[0];
+  if (!outer || outer.length < 3) return false;
+  const corners: ScreenPoint[] = [
+    [box.left, box.top], [box.right, box.top], [box.right, box.bottom], [box.left, box.bottom],
+  ];
+  const insideBox = ([x, y]: ScreenPoint) => x > box.left && x < box.right && y > box.top && y < box.bottom;
+  const intersects = (ring: readonly ScreenPoint[]) => ring.some((p, i) => {
+    const next = ring[(i + 1) % ring.length];
+    return insideBox(p) || corners.some((corner, j) => segmentsCross(p, next, corner, corners[(j + 1) % corners.length]));
+  });
+  return corners.every(p => pointInPolygon(p, outer) && !road.slice(1).some(hole => pointInPolygon(p, hole)))
+    && !road.some(intersects)
+    && !obstacles.some(rings => rings.some(ring => intersects(ring))
+      || corners.some(p => pointInPolygon(p, rings[0] ?? []) && !rings.slice(1).some(hole => pointInPolygon(p, hole))));
+}
+
 export function orientationBoxFits(box: ScreenBox, occupied: readonly ScreenBox[], margin = 6) {
   return !occupied.some(other => box.left < other.right + margin && box.right > other.left - margin
     && box.top < other.bottom + margin && box.bottom > other.top - margin);
