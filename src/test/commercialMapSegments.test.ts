@@ -138,7 +138,7 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
 
     const inventory = commercialMapSegmentInventory(OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS);
     expect(inventory.find(({ segment }) => segment.id === COMMERCIAL_MAP_SEGMENT_IDS.industry))
-      .toMatchObject({ entityCount: 1205, lotCount: 1168 });
+      .toMatchObject({ entityCount: 1206, lotCount: 1169 });
   });
 
   it('não aceita sobreposição silenciosa entre segmentos', () => {

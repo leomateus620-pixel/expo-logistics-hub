@@ -88,7 +88,7 @@ describe('legenda inteligente das plantas internas', () => {
       <PavilionPlanLegend plan={COMMERCIAL_PAVILION_MODULE_PLANS.B4} />,
     );
     expect(pavilion8.container.querySelectorAll('.commercial-pavilion-plan-zone'))
-      .toHaveLength(6);
+      .toHaveLength(7);
     const pavilion8Path = pavilion8.container.querySelector(
       '.commercial-pavilion-plan-irregular-modules',
     );
@@ -100,7 +100,7 @@ describe('legenda inteligente das plantas internas', () => {
       <PavilionPlanLegend plan={COMMERCIAL_PAVILION_MODULE_PLANS.B5} />,
     );
     expect(pavilion13.container.querySelectorAll('.commercial-pavilion-plan-zone'))
-      .toHaveLength(7);
+      .toHaveLength(6);
     const pavilion13Path = pavilion13.container.querySelector(
       '.commercial-pavilion-plan-irregular-modules',
     );

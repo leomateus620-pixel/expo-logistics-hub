@@ -125,12 +125,12 @@
 - Não publicar (pedido do usuário)
 
 ## Pavilhão 13 / B5 — planta oficial Fenasoja 2028
-- [x] Preservar frame métrico e corredores pelas cotas 3,90 / 3,25 / 4,55
+- [x] Preservar frame métrico, acessos e corredores laterais sem alterar a organização física
 - [x] Reorganizar as ilhas em 78→53 / 27→52 e remover 27–29 da faixa superior
 - [x] Atualizar B5-M025/080 para 13,50 m² e B5-M026/079 para 9,00 m²
 - [x] Atualizar inventário para 104 módulos, soma 345,00 m², fonte e revisão exclusiva do B5
-- [ ] Reconciliar geometria e áreas persistidas preservando os 103 IDs, status, preços e histórico
-- [ ] Validar hit-test, rota pública, desktop/mobile, soma 345 e regressões
+- [x] Reconciliar geometria e áreas persistidas preservando os 103 IDs, status, preços e histórico
+- [ ] Validar hit-test, rota pública, soma 345 e regressões; inspeção visual desktop/mobile ainda pendente
 - Não publicar (pedido do usuário)
 
 ## Avisos no celular (push / FCM)
