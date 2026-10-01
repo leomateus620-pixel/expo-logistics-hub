@@ -25,7 +25,7 @@ function polygonArea(points: readonly (readonly [number, number])[]) {
 
 describe('Pavilhão 13 — planta oficial Fenasoja 2028', () => {
   it('fecha inventário, áreas e proveniência da edição 2028', () => {
-    expect(PAVILION13_COMMERCIAL_REFERENCE.cells).toHaveLength(103);
+    expect(PAVILION13_COMMERCIAL_REFERENCE.cells).toHaveLength(104);
     expect(PAVILION13_COMMERCIAL_REFERENCE.cells.reduce(
       (sum, cell) => sum + (cell.areaM2 ?? 0), 0,
     )).toBe(351);

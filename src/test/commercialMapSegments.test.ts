@@ -118,7 +118,7 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
       'B2-M001', 'B2-M186',
       'B3-M001', 'B3-M257',
       'B4-M001', 'B4-M114',
-      'B5-M001', 'B5-M103',
+      'B5-M001', 'B5-M104',
       'B6-M001', 'B6-M214',
     ]));
     expect(identifiers).toHaveLength(1205);

@@ -83,10 +83,10 @@ const EXPECTED_PLANS = {
   B5: {
     pavilionNumber: 13,
     category: 'Indústria e Comércio',
-    moduleCount: 103,
+    moduleCount: 104,
     totalAreaSquareMeters: 709,
-    moduleAreaSquareMeters: 351,
-    ranges: [[1, 26], [27, 29], [30, 77], [78, 103]],
+    moduleAreaSquareMeters: 345,
+    ranges: [[1, 26], [27, 78], [79, 89], [90, 104]],
   },
   B6: {
     pavilionNumber: 3,
