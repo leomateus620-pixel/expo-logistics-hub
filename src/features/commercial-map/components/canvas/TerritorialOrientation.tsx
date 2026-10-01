@@ -114,8 +114,7 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
     for (const item of blocks) {
       const path = lines.current.get(item.id);
       if (!path || !item.outline) continue;
-      path.style.display = level.current === 'far' || !blocks.length ? 'none' : '';
-      if (level.current === 'far') continue;
+      path.style.display = '';
       path.setAttribute('d', item.outline.map(ring => ring.map((p, index) => {
         const projected = project(p, item.elevation);
         return `${index ? 'L' : 'M'}${projected.x.toFixed(1)} ${projected.y.toFixed(1)}`;
