@@ -1,0 +1,161 @@
+/* The module detail lives inside a narrow dock, not a full page. */
+.commercial-map-dock.is-context-interior.is-expanded:not(.is-mobile) {
+  width: clamp(320px, 27vw, 370px);
+}
+
+.commercial-map-dock__module,
+.commercial-map-dock .commercial-pavilion-module-card.is-embedded,
+.commercial-pavilion-module-details,
+.commercial-pavilion-module-facts > div,
+.commercial-pavilion-module-pricing {
+  min-width: 0;
+}
+
+.commercial-pavilion-module-card > header strong,
+.commercial-pavilion-module-card > header small {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+}
+
+.commercial-pavilion-module-card .commercial-pavilion-module-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 14px 12px;
+}
+
+.commercial-pavilion-module-card .commercial-pavilion-module-facts dd {
+  overflow-wrap: anywhere;
+}
+
+.commercial-pavilion-module-pricing {
+  margin: 4px 12px 12px;
+}
+
+.commercial-pavilion-module-pricing .lot-pricing-2028 {
+  border-radius: 8px;
+}
+
+.commercial-pavilion-module-pricing .lot-pricing-2028-stages {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.commercial-pavilion-module-pricing .lot-pricing-2028-stage {
+  gap: 4px;
+}
+
+.commercial-pavilion-module-pricing .lot-pricing-2028-total,
+.commercial-pavilion-module-pricing .lot-pricing-2028-rule {
+  overflow-wrap: anywhere;
+}
+
+.commercial-pavilion-module-card .commercial-map-sale-open,
+.commercial-pavilion-module-card .commercial-map-sale-confirmed {
+  min-width: 0;
+  gap: 9px;
+  padding: 15px;
+}
+
+.commercial-pavilion-module-card .commercial-map-sale-open p,
+.commercial-pavilion-module-card .commercial-map-sale-confirmed p {
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.commercial-pavilion-module-card .commercial-map-sale-open > div:not(.commercial-map-sale-open__actions),
+.commercial-pavilion-module-card .commercial-map-sale-confirmed > div {
+  display: grid;
+  gap: 5px;
+  font-size: 11px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.commercial-pavilion-module-card .commercial-map-sale-open > div span + span::before,
+.commercial-pavilion-module-card .commercial-map-sale-confirmed > div span + span::before {
+  display: none;
+}
+
+.commercial-pavilion-module-card .commercial-map-sale-open__actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.commercial-pavilion-module-card .commercial-map-sale-open__actions button {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  height: auto;
+  padding: 9px 12px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.commercial-pavilion-module-card .commercial-map-sale-open__actions button svg {
+  flex: 0 0 16px;
+}
+
+.commercial-pavilion-module-card .commercial-map-sale-open__buyer,
+.commercial-pavilion-module-card .commercial-map-sale-confirmed__buyer {
+  font-size: 17px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.commercial-pavilion-module-card .commercial-sale-history {
+  min-width: 0;
+  margin-inline: 12px;
+}
+
+.commercial-pavilion-module-card .commercial-sale-history > header {
+  grid-template-columns: 20px minmax(0, 1fr);
+}
+
+.commercial-pavilion-module-card .commercial-sale-history > header b {
+  grid-column: 2;
+  overflow-wrap: anywhere;
+}
+
+.commercial-pavilion-module-card .commercial-sale-history__trace,
+.commercial-pavilion-module-card .commercial-sale-history > header span {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.commercial-pavilion-module-card .commercial-sale-history dl {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.commercial-map-dock__module-legend summary {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.commercial-pavilion-module-card .commercial-pavilion-module-contracts > a b {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.commercial-map-dock.is-mobile.is-context-interior[data-sheet-state='expanded'] {
+  height: min(86dvh, calc(100% - 64px));
+}
+
+.commercial-map-dock.is-mobile.is-context-interior .commercial-map-dock__scroll {
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+@media (max-width: 360px) {
+  .commercial-pavilion-module-card .commercial-pavilion-module-facts,
+  .commercial-pavilion-module-card .commercial-sale-history dl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

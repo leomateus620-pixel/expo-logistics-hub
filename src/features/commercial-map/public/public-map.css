@@ -168,6 +168,13 @@
 .public-map-details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .public-map-details-grid dt { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: oklch(var(--muted-foreground)); }
 .public-map-details-grid dd { font-size: 0.86rem; font-weight: 600; }
+.public-map-details header strong,
+.public-map-details header small,
+.public-map-details-grid dd,
+.public-map-details-stages strong { overflow-wrap: anywhere; white-space: normal; }
+.public-map-details header > div,
+.public-map-details-grid > div,
+.public-map-details-stages > div { min-width: 0; }
 .public-map-shell [data-availability='AVAILABLE'] { color: #167b42; }
 .public-map-shell [data-availability='SOLD'] { color: #245cbb; }
 .public-map-shell [data-availability='UNAVAILABLE'] { color: #b5222b; }
@@ -230,6 +237,10 @@
   }
   .public-map-header { padding: 12px 14px; }
   .public-map-header h1 { font-size: 1rem; }
+}
+
+@media (max-width: 360px) {
+  .public-map-details-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* Faixa discreta no rodapé: informa sem cobrir o mapa nem a ficha do lote. */
