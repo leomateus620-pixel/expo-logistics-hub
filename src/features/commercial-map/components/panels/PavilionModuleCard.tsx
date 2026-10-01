@@ -35,6 +35,7 @@ import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
 import { SaleOpenSection } from '../../sales/components/SaleOpenSection';
 import { resolveLotIdentity } from '../../utils/lotIdentity';
 import type { LotPricingStage } from '../../utils/lotPricing2028';
+import './pavilion-module-detail-layout.css';
 
 const saleDateTime = new Intl.DateTimeFormat('pt-BR', {
   dateStyle: 'short',
@@ -192,7 +193,7 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
             </div>
           </section>
         )}
-        <dl>
+         <dl className="commercial-pavilion-module-facts">
           <div>
             <dt>Localização</dt>
             <dd>{zone?.label ?? 'Setor não informado'}</dd>
@@ -221,20 +222,18 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
               ) : null}
             </dd>
           </div>
-          <div>
-            <dt>Valores oficiais 2028</dt>
-            <dd>
-              <LotPricing2028Panel
-                lotId={persisted ? lot?.id ?? null : null}
-                officialAreaSqm={individualArea}
-                compact
-                confirmedStage={lot?.status === 'SOLD' ? confirmedStage(saleHistory.data?.stage) : null}
-                canEdit={persisted && permissions.canEditPricing}
-              />
-              {!persisted ? <small className="commercial-pavilion-module-area-origin">Disponível após sincronizar o cadastro.</small> : null}
-            </dd>
-          </div>
         </dl>
+
+         <div className="commercial-pavilion-module-pricing">
+           <LotPricing2028Panel
+             lotId={persisted ? lot?.id ?? null : null}
+             officialAreaSqm={individualArea}
+             compact
+             confirmedStage={lot?.status === 'SOLD' ? confirmedStage(saleHistory.data?.stage) : null}
+             canEdit={persisted && permissions.canEditPricing}
+           />
+           {!persisted ? <small className="commercial-pavilion-module-area-origin">Disponível após sincronizar o cadastro.</small> : null}
+         </div>
 
         <LotSaleHistoryCard sale={saleHistory.data} loading={saleHistory.isLoading} currentIdentity={lot ? resolveLotIdentity(lot, record?.entity, pavilion) : null} />
 
