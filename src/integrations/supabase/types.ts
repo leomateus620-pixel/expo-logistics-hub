@@ -8871,7 +8871,6 @@ export type Database = {
           block: string | null
           corner_confirmed: boolean | null
           corner_status: string | null
-          entity_id: string | null
           lot_id: string | null
           lot_num: number | null
           official_area_sqm: number | null
@@ -8894,13 +8893,6 @@ export type Database = {
           status: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "commercial_lots_entity_id_fkey"
-            columns: ["entity_id"]
-            isOneToOne: true
-            referencedRelation: "map_entities"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "commercial_lots_project_id_fkey"
             columns: ["project_id"]
