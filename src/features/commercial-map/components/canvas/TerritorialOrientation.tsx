@@ -27,7 +27,6 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
   const selected = useCommercialMapStore(s => s.selectedEntityId);
   const svg = useRef<SVGSVGElement>(null);
   const nodes = useRef(new Map<string, SVGGElement>());
-  const lines = useRef(new Map<string, SVGPathElement>());
   const prior = useRef(''), dirty = useRef(true);
   const level = useRef<'far' | 'medium' | 'near'>('far');
   const point = useMemo(() => new THREE.Vector3(), []);
