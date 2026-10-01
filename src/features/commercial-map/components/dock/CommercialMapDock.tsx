@@ -3,6 +3,7 @@ import { ArrowLeft, CarFront, Check, ChevronDown, ChevronUp, Factory, FilterX, L
 import { STATUS_CONFIG } from '../../constants';
 import { toCommercialPhase } from '../../types';
 import { commercialMapSegmentInventory, type CommercialMapSegmentId } from '../../data/commercialMapSegments';
+import { TERRITORY_SYMBOLS } from '../../utils/territorialOrientation';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CommercialLot, MapEntity } from '../../types';
 import { ContextualMapLegend } from '../panels/ContextualMapLegend';
@@ -150,14 +151,14 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
       }}><i /></div>}
     {showContent && <div className="commercial-map-dock__scroll">
       {!interiorEntity && !isCommissionScope && <section className="commercial-map-dock__segment-section" aria-label="Segmentos comerciais do parque">
-        <div className="commercial-map-dock__segment-heading"><strong>Segmentos</strong><small>Selecione para explorar</small></div>
+          <div className="commercial-map-dock__segment-heading"><strong>Segmentos</strong><small>Limites no mapa · selecione para explorar</small></div>
         <div className="commercial-map-dock__segments" role="group" aria-label="Filtrar mapa por segmento">
-          {inventory.map(({ segment, lotCount }, index) => {
-            const Icon = index === 0 ? Tractor : index === 1 ? Factory : CarFront;
+          {inventory.map(({ segment, lotCount }) => {
+            const Icon = segment.id === 'exporural' ? Tractor : segment.id === 'industria-comercio-servicos' ? Factory : CarFront;
             return <button key={segment.id} type="button" aria-pressed={activeSegmentId === segment.id}
               className={activeSegmentId === segment.id ? 'is-active' : ''} onClick={() => onSegmentSelect(segment.id)}
               disabled={segment.behavior.interaction !== 'filter-and-focus'} aria-controls="commercial-map-viewport">
-              <Icon style={{ color: segment.palette.edge }} aria-hidden="true" />
+              <span className={`commercial-map-dock__territory-symbol commercial-map-dock__territory-symbol--${segment.id}`} aria-hidden="true"><Icon />{TERRITORY_SYMBOLS[segment.id].glyph}</span>
               <span><strong>{segment.name}</strong><small>{lotCount} lotes</small></span>
               {activeSegmentId === segment.id && <Check aria-hidden="true" />}
             </button>;

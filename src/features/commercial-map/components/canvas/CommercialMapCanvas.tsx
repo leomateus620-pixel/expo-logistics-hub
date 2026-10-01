@@ -15,6 +15,7 @@ import { resolveLotTooltipPresentation } from '../../utils/lotTooltipPresentatio
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { PublicMapEnvironment } from './PublicMapEnvironment';
 import { PublicContextLabels } from './PublicContextLabels';
+import { TerritorialOrientation } from './TerritorialOrientation';
 import { arenaVegetationAllowed } from '../../data/arenaCanonicalLayout';
 import { createArenaParkingGeometry, isArenaParking } from '../../utils/arenaParkingGeometry';
 import { LightingPerformanceProbe } from '../../diagnostics/LightingPerformanceProbe';
@@ -5411,6 +5412,9 @@ const Scene = memo(function Scene({
       />
       <RuntimeFrameDiagnostics />
       {publicPolicy && <PublicContextLabels entities={entities} policy={publicPolicy} />}
+      {!publicPolicy && !publicPavilion && labelsVisible && !interiorEntity && !visitEnabled && !hydrologicalModeActive && !lunarCinematicActive && (
+        <TerritorialOrientation entities={exteriorRenderedEntities} lots={lots} roads={circulationEntities} />
+      )}
       {visitEnabled && !publicPolicy && !publicPavilion && <VisitFeatureBoundary><Suspense fallback={null}>
         <VisitMode entities={entities} lots={lots} trees={presentedSceneTrees} electricalPlacements={electricalSceneLayout.placements} siteEnvironmentEntities={siteEnvironmentEntities} pavilion12ConcretePresent={pavilion12ConcretePresent}/>
       </Suspense></VisitFeatureBoundary>}
