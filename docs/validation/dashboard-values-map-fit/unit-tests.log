@@ -362,4 +362,3 @@ Reference-only inventory {
       Tests  158 passed (158)
    Start at  20:14:27
    Duration  190.10s (transform 6.34s, setup 15.93s, collect 83.14s, tests 69.68s, environment 139.39s, prepare 17.80s)
-

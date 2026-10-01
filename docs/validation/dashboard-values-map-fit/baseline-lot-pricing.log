@@ -26,7 +26,7 @@ Received: "Valor ainda não definido"
      99|     expect(formatBrl(stageTotal(excluded, 'RENOVACAO')) ?? UNPRICED_PA…
        |                                                                                     ^
     100|   });
-    101| 
+    101|
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
 
@@ -35,4 +35,3 @@ Received: "Valor ainda não definido"
       Tests  1 failed | 7 passed (8)
    Start at  20:07:33
    Duration  6.53s (transform 217ms, setup 0ms, collect 1.27s, tests 57ms, environment 0ms, prepare 1.27s)
-
