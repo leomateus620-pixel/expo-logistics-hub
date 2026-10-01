@@ -1,5 +1,12 @@
 # Roadmap
 
+## Finalizar venda — revisão e pagamento
+- [x] Corrigir a quebra e o alinhamento dos dados da revisão para nomes e documentos longos, em telas largas e estreitas.
+- [x] Iniciar boleto parcelado em 17 parcelas calculadas automaticamente no dia 5; preservar outras formas e edição manual.
+- [x] Verificar cálculos e validações automatizadas sem registrar vendas.
+- [ ] Conferir visualmente o fluxo autenticado desktop/celular quando o mapa carregar; nesta execução parou em “Preparando o Mapa Comercial”.
+- Não publicar (pedido do usuário).
+
 ## Pavilhão 13 — circulação e numeração 100–104
 - [x] Preencher visualmente o intervalo entre circulação norte e ilha; retirar as cotas 6,00 m sobre o box 78 e 3,25 m.
 - [x] Validar continuidade da circulação, números de referência, acessos e cotas em testes focados (46 aprovados).
