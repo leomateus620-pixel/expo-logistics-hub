@@ -62,7 +62,7 @@ export const PAVILION_DIMENSION_ANNOTATIONS: readonly PavilionDimensionAnnotatio
   lotEdge('B4', 96, 1, '1,00'), lotEdge('B4', 23, 3, '1,00'),
   lotEdge('B4', 21, 2, '4,00'), lotEdge('B4', 20, 0, '4,00'),
 
-  ...specialEdges('B5', 78, ['6,00', '3,00', '3,00', null]),
+  ...specialEdges('B5', 78, [null, '3,00', '3,00', null]),
   ...specialEdges('B5', 79, [null, '3,00', null, '6,00']),
   ...specialEdges('B5', 26, ['6,00', null, '3,00', '3,00']),
   ...specialEdges('B5', 25, ['6,00', null, '3,00', null]),
@@ -71,7 +71,6 @@ export const PAVILION_DIMENSION_ANNOTATIONS: readonly PavilionDimensionAnnotatio
   lotEdge('B5', 88, 2, '3,00'), lotEdge('B5', 16, 2, '3,00'),
   dimension('B5', 'west-aisle', '3,90', 1, { kind: 'corridor', id: 'west-main-aisle', axis: 'x', at: 0.3 }, 'Anexo 8: corredor oeste.'),
   dimension('B5', 'east-aisle', '3,90', 1, { kind: 'corridor', id: 'east-main-aisle', axis: 'x', at: 0.36 }, 'Anexo 8: corredor leste.'),
-  dimension('B5', 'north-clearance', '3,25', 2, { kind: 'corridor', id: 'north-distribution', axis: 'z' }, 'Anexo 8: distância informada acima da ilha; sem alterar o traçado existente.'),
   dimension('B1', 'north-clearance', '5,40', 1, { kind: 'corridor', id: 'north-distribution', axis: 'z', at: 0.38 }, 'Entre a ilha 103–140 e a faixa 142–189; PDF 5,40, referência histórica 5,42. Afastada das cotas de frente.'),
   dimension('B1', 'south-clearance', '5,40', 1, { kind: 'corridor', id: 'south-distribution', axis: 'z', at: 0.38 }, 'Entre a ilha 65–102 e a faixa 07–58; afastada das cotas de frente.'),
   dimension('B1', 'island-side', '4,00', 2, { kind: 'gap', axis: 'x', from: zone('central-south-65-102'), fromEdge: 1, to: zone('east-59-64'), toEdge: 0 }, 'Lateral da ilha junto aos boxes 64/65.'),

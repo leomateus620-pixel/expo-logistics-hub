@@ -18,7 +18,10 @@ describe('cotas auxiliares, sem contrato comercial', () => {
     expect(dimensions.every(d => !('areaM2' in d) && !('price' in d) && !('lotId' in d))).toBe(true);
   });
   it('inclui o Pavilhão 13 solicitado sem acrescentar cotas ao Pavilhão 7', () => {
-    expect(resolvePavilionDimensions(plans.B5, { width: 20, depth: 40 })).toHaveLength(19);
+    const dimensions = resolvePavilionDimensions(plans.B5, { width: 20, depth: 40 });
+    expect(dimensions).toHaveLength(17);
+    expect(dimensions.some(d => d.ownerNumber === 78 && d.value === '6,00')).toBe(false);
+    expect(dimensions.some(d => d.id.endsWith(':north-clearance'))).toBe(false);
     expect(resolvePavilionDimensions(plans.B10, { width: 20, depth: 40 })).toEqual([]);
   });
   it('segue os extremos do corredor e a mesma transformação de quarto de volta dos módulos', () => {
