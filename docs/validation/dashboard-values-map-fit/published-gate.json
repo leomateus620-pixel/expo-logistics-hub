@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-10-01T23:35:39.166Z",
+  "readOnly": true,
+  "rowLimit": 0,
+  "productionRowsRead": 0,
+  "ready": false,
+  "probes": [
+    {
+      "name": "pricing-entity-column",
+      "status": 400,
+      "ready": false,
+      "code": "42703",
+      "message": "column commercial_lot_pricing_2028.entity_id does not exist"
+    },
+    {
+      "name": "shared-map-relationship",
+      "status": 400,
+      "ready": false,
+      "code": "PGRST200",
+      "message": "Could not find a relationship between 'map_entities' and 'commercial_lot_pricing_2028' in the schema cache"
+    }
+  ]
+}

@@ -7,7 +7,7 @@ export interface DashboardLotRecord {
   readonly lot: CommercialLot;
   readonly entity: MapEntity;
   readonly segmentId: CommercialMapSegmentId | null;
-  /** Registered commercial total, not the negotiated or received sale amount. */
+  /** Persisted sale amount or official stage total; never received revenue. */
   readonly value: number | null;
   /** Invalid or absent official area stays pending instead of becoming zero. */
   readonly officialAreaSqm: number | null;
@@ -67,12 +67,12 @@ export interface DashboardAggregate {
   readonly reservedValue: number;
   readonly negotiationValue: number;
   readonly blockedValue: number;
-  /** Known registered values across the five commercial statuses. */
+  /** Known sale/official values across all six commercial statuses. */
   readonly totalKnownValue: number;
   readonly knownValueLots: number;
   /** SOLD share of known commercial value; null when the denominator is absent. */
   readonly soldValuePercentage: number | null;
-  /** AVAILABLE + RESERVED + IN_NEGOTIATION; excludes BLOCKED. */
+  /** AVAILABLE + RESERVED + IN_NEGOTIATION + SALE_OPEN; excludes BLOCKED. */
   readonly pendingValue: number;
   /** Counts pending fields only in commercial inventory; UNAVAILABLE is separate. */
   readonly lotsWithoutOfficialArea: number;

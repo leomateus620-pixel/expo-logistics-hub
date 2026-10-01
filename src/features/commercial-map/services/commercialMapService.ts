@@ -22,6 +22,7 @@ import {
   type CommercialMapSegmentId,
 } from '../data/commercialMapSegments';
 import { isCommissionInventoryConsistent } from '../utils/commissionInventory';
+import { normalizeLotSales, normalizeOfficialLotPricing2028, type OfficialLotPricing2028Row, type PersistedLotSaleRow } from '../utils/commercialLotFinancialData';
 
 interface ProjectRow {
   id: string; org_id: string; name: string; description: string | null; coordinate_system: MapProject['coordinateSystem'];
@@ -62,7 +63,8 @@ interface GeometryRow {
 interface PriceRow { is_active: boolean; pricing_mode: CommercialLot['pricingMode']; base_price: number | string | null; price_per_sqm: number | string | null; asking_price: number | string | null; minimum_price: number | string | null; }
 interface ReservationRow { status: string; company_name: string; expires_at: string; responsible_name: string | null; }
 interface NegotiationRow { status: string; company_name: string; contact_name: string | null; }
-interface SaleRow { status: string; buyer_name: string; sale_date: string; salesperson_name: string; contract_number: string | null; }
+interface SaleRow extends PersistedLotSaleRow { buyer_name: string; sale_date: string; salesperson_name: string; contract_number: string | null; }
+interface FinancialEntityRow { id: string; pricing: OfficialLotPricing2028Row | OfficialLotPricing2028Row[] | null; }
 interface ContractRow { is_active: boolean; contract_number: string | null; }
 interface LotRow {
   id: string; entity_id: string; public_identifier: string; block: string | null; lot_number: string | null; level_label: string | null; display_name: string;
@@ -70,17 +72,21 @@ interface LotRow {
   area_validation_status: CommercialLot['areaValidationStatus']; frontage_meters: number | string | null; depth_meters: number | string | null;
   lot_prices: PriceRow[] | PriceRow | null; lot_reservations: ReservationRow[] | null; lot_negotiations: NegotiationRow[] | null;
   lot_sales: SaleRow[] | null; lot_contracts: ContractRow[] | null;
+  financial_entity?: FinancialEntityRow | null;
   infrastructure: string[] | null; has_electricity: boolean; has_water: boolean; has_internet: boolean; is_corner: boolean; is_covered: boolean;
   accessibility_notes: string | null; commercial_notes: string | null; internal_notes: string | null; archived_at: string | null;
   created_by: string | null; updated_by: string | null; created_at: string | null; updated_at: string | null;
 }
 /** Every relation column consumed by mapLot; no history/blob payloads. */
+const OFFICIAL_PRICING_EMBED = `financial_entity:map_entities!commercial_lots_entity_id_fkey(id,
+  pricing:commercial_lot_pricing_2028!commercial_lots_entity_id_fkey(lot_id,entity_id,renovacao_total,segunda_total,renovacao_is_manual,segunda_is_manual,resolution_status))`;
 export const COMMERCIAL_LOT_SELECT = `*,
   lot_prices(is_active,pricing_mode,base_price,price_per_sqm,asking_price,minimum_price),
   lot_reservations(status,company_name,expires_at,responsible_name),
   lot_negotiations(status,company_name),
-  lot_sales(status,buyer_name,sale_date,salesperson_name,contract_number),
-  lot_contracts(is_active,contract_number)`;
+  lot_sales(id,lot_id,status,negotiated_value,buyer_name,sale_date,salesperson_name,contract_number),
+  lot_contracts(is_active,contract_number),
+  ${OFFICIAL_PRICING_EMBED}`;
 
 interface ActivityRow {
   id: string; entity_id: string | null; lot_id: string | null; action: string; reason: string | null; actor_user_id: string | null;
@@ -148,7 +154,7 @@ async function fetchCommissionRowsByEntity(
   entityIds: readonly string[], stage: string, context: MapReadContext,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   buildQuery: (ids: string[]) => any,
-): Promise<{ data: any[] | null; error: any }> {
+): ReturnType<typeof fetchAllRows> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rows: any[] = [];
   for (let offset = 0; offset < entityIds.length; offset += 100) {
@@ -349,6 +355,9 @@ function mapLot(row: LotRow): CommercialLot {
     pricePerSqm: price?.price_per_sqm === null || price?.price_per_sqm === undefined ? null : Number(price.price_per_sqm),
     askingPrice: price?.asking_price === null || price?.asking_price === undefined ? null : Number(price.asking_price),
     minimumPrice: price?.minimum_price === null || price?.minimum_price === undefined ? null : Number(price.minimum_price),
+    sales: normalizeLotSales(row.id, row.lot_sales),
+    officialPricing2028: normalizeOfficialLotPricing2028(row.id, row.entity_id,
+      row.financial_entity && row.financial_entity.id === row.entity_id ? row.financial_entity.pricing : null),
     infrastructure: row.infrastructure ?? [],
     hasElectricity: row.has_electricity,
     hasWater: row.has_water,
@@ -501,9 +510,10 @@ async function fetchCommissionCommercialMap(
       lot_prices(is_active, pricing_mode, base_price, price_per_sqm, asking_price, minimum_price),
       lot_reservations(status, company_name, expires_at, responsible_name),
       lot_negotiations(status, company_name, contact_name),
-      lot_sales(status, buyer_name, sale_date, salesperson_name, contract_number),
-      lot_contracts(is_active, contract_number)
-    `).eq('project_id', project.id).is('archived_at', null).in('entity_id', ids)),
+      lot_sales(id, lot_id, status, negotiated_value, buyer_name, sale_date, salesperson_name, contract_number),
+      lot_contracts(is_active, contract_number),
+      ${OFFICIAL_PRICING_EMBED}
+    `).limit(1, { referencedTable: 'financial_entity.pricing' }).eq('project_id', project.id).is('archived_at', null).in('entity_id', ids)),
     mapRequest(db.rpc('commission_map_park_context', { p_segment_id: segment.id }), context),
   ]);
 
@@ -629,7 +639,7 @@ export async function fetchCommercialMap(
     fetchAllRows(() => db.from('map_entities').select('*').eq('project_id', project.id).eq('is_archived', false), 'entities', context),
     fetchAllRows(() => db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true), 'geometries', context),
     calibrationPromise,
-    fetchAllRows(() => db.from('commercial_lots').select(COMMERCIAL_LOT_SELECT).eq('project_id', project.id).is('archived_at', null), 'lots', context),
+    fetchAllRows(() => db.from('commercial_lots').select(COMMERCIAL_LOT_SELECT).limit(1, { referencedTable: 'financial_entity.pricing' }).eq('project_id', project.id).is('archived_at', null), 'lots', context),
     mapRequest(db.from('commercial_lots').select('id').eq('project_id', project.id).limit(1), context),
     mapRequest(db.from('map_segments').select('id, slug').eq('project_id', project.id).eq('is_active', true), context),
   ]);

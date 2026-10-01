@@ -1,3 +1,5 @@
+import type { LotPricingResolution } from './utils/lotPricing2028';
+
 export type MapClassification =
   | 'SELLABLE_LOT'
   | 'INTERNAL_STAND'
@@ -154,6 +156,24 @@ export interface MapEntity {
   metadata: Record<string, unknown>;
 }
 
+export interface CommercialLotSale {
+  id: string;
+  lotId: string;
+  status: 'OPEN' | 'CONFIRMED' | 'REVERTED';
+  negotiatedValue: number | null;
+}
+
+/** Totals resolved by the existing official pricing view, including overrides. */
+export interface CommercialLotOfficialPricing2028 {
+  lotId: string;
+  entityId: string;
+  renovacaoTotal: number | null;
+  segundaTotal: number | null;
+  renovacaoIsManual: boolean;
+  segundaIsManual: boolean;
+  resolutionStatus: LotPricingResolution;
+}
+
 export interface CommercialLot {
   id: string;
   entityId: string;
@@ -174,6 +194,9 @@ export interface CommercialLot {
   pricePerSqm: number | null;
   askingPrice: number | null;
   minimumPrice: number | null;
+  /** Persisted per-lot sales; absence does not authorize a price estimate. */
+  sales?: readonly CommercialLotSale[];
+  officialPricing2028?: CommercialLotOfficialPricing2028 | null;
   infrastructure: string[];
   hasElectricity: boolean;
   hasWater: boolean;

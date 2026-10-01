@@ -1,6 +1,6 @@
 import { COMMERCIAL_MAP_SEGMENTS, buildCommercialMapSegmentIndex, type CommercialMapSegmentId } from '../data/commercialMapSegments';
 import type { CommercialLot, CommercialMapData, CommercialStatus } from '../types';
-import { computeLotTotal } from '../utils/lotPricing2028';
+import type { LotPricingStage } from '../utils/lotPricing2028';
 import { COMMERCIAL_PAVILION_DEFINITIONS, type CommercialPavilionPublicIdentifier } from '../utils/commercialPavilions';
 import { classifyDashboardLot } from './commercialDashboardClassification';
 import type {
@@ -44,26 +44,20 @@ function validOfficialArea(value: number | null | undefined): number | null {
 }
 
 /**
- * Resolve the lot's registered commercial total from the existing map domain.
- * The map query does not expose the negotiated sale amount, so this value must
- * never be presented as cash received or confirmed sale revenue.
+ * One amount per lot: persisted sale for open/confirmed sales, otherwise the
+ * selected official stage total (already including overrides). Never receipts.
  */
-export function resolveDashboardLotValue(lot: CommercialLot): number | null {
-  if (lot.pricingMode === 'NOT_FOR_SALE') return null;
-
-  // askingPrice is already a total, including when the mode is price per m².
-  const askingTotal = validCommercialAmount(lot.askingPrice);
-  if (askingTotal !== null) return askingTotal;
-
-  if (lot.pricingMode === 'FIXED_TOTAL') {
-    return validCommercialAmount(lot.basePrice);
+export function resolveDashboardLotValue(lot: CommercialLot, stage: LotPricingStage = 'RENOVACAO'): number | null {
+  if (lot.status === 'UNAVAILABLE') return null;
+  if (lot.status === 'SALE_OPEN' || lot.status === 'SOLD') {
+    const status = lot.status === 'SALE_OPEN' ? 'OPEN' : 'CONFIRMED';
+    const sales = lot.sales?.filter((sale) => sale.status === status && sale.lotId === lot.id) ?? [];
+    // Ambiguous or RLS-hidden records stay pending; do not substitute table prices.
+    return sales.length === 1 ? validCommercialAmount(sales[0].negotiatedValue) : null;
   }
-
-  if (lot.pricingMode === 'PRICE_PER_SQUARE_METER' && lot.areaValidationStatus === 'VALIDATED') {
-    return validCommercialAmount(computeLotTotal(validOfficialArea(lot.officialAreaSqm), lot.pricePerSqm));
-  }
-
-  return null;
+  const pricing = lot.officialPricing2028;
+  if (!pricing || pricing.lotId !== lot.id || pricing.entityId !== lot.entityId || pricing.resolutionStatus === 'EXCLUIDO') return null;
+  return validCommercialAmount(stage === 'RENOVACAO' ? pricing.renovacaoTotal : pricing.segundaTotal);
 }
 
 function makeMutableStatusSummary(): MutableStatusSummary {
@@ -168,6 +162,7 @@ function finishAccumulator(accumulator: MutableAggregate): DashboardAggregate {
  */
 export function buildCommercialDashboardSnapshot(
   data: Pick<CommercialMapData, 'entities' | 'lots'>,
+  pricingStage: LotPricingStage = 'RENOVACAO',
 ): CommercialDashboardSnapshot {
   const entityById = new Map(data.entities.map((entity) => [entity.id, entity]));
   const segmentIndex = buildCommercialMapSegmentIndex(data.entities, data.lots);
@@ -194,7 +189,7 @@ export function buildCommercialDashboardSnapshot(
       lot,
       entity,
       segmentId,
-      value: resolveDashboardLotValue(lot),
+      value: resolveDashboardLotValue(lot, pricingStage),
       officialAreaSqm: validOfficialArea(lot.officialAreaSqm),
       ...classifyDashboardLot(entity, lot, entityById, segmentId),
     });

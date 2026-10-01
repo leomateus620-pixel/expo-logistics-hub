@@ -1,0 +1,19 @@
+{
+  "postgresql": {
+    "archiveBytes": 373254386,
+    "entries": 1661,
+    "source": "https://get.enterprisedb.com/postgresql/postgresql-16.15-5-windows-x64-binaries.zip",
+    "downloadedBytes": 45875200
+  },
+  "postgrest": {
+    "source": "https://github.com/PostgREST/postgrest/releases/download/v16.4/postgrest-v16.4-windows-x86-64.zip",
+    "archiveBytes": 15073226,
+    "downloadedBytes": 15073226,
+    "entries": 1,
+    "archiveSha256": "29a5b56e5a09b7168bb552ef14aa7ade40bf0a81dd0687cffa86610187b89d78"
+  },
+  "binarySha256": {
+    "postgres.exe": "19e73deb1152b3b505f2e1fd579191427f9eb3b3f800754968e7214b24edf31d",
+    "postgrest.exe": "c4155000dfb0befb59215b65d61a621bbaea1515f36a6e758fc504c7ca0dcbee"
+  }
+}

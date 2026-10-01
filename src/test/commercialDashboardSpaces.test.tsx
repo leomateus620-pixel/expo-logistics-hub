@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { withDashboardValue } from './helpers/dashboardFinancialFixture';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CommercialDashboard } from '@/features/commercial-map/dashboard/CommercialDashboard';
@@ -73,7 +74,7 @@ describe('managerial scopes in the existing dashboard', () => {
     const next = {
       entities: data.entities.map((entity) => entity.id === module.entity.id ? { ...entity, geometry: { ...entity.geometry,
         coordinates: entity.geometry.coordinates.map((ring) => ring.map(([x, y]) => [x + 0.01, y] as [number, number])) } } : entity),
-      lots: data.lots.map((lot) => lot.id === module.lot.id ? { ...lot, status: 'SOLD' as const, pricingMode: 'FIXED_TOTAL' as const, officialAreaSqm: 72, askingPrice: 15000 } : lot),
+      lots: data.lots.map((lot) => lot.id === module.lot.id ? withDashboardValue({ ...lot, status: 'SOLD', officialAreaSqm: 72 }, 15000) : lot),
     };
     rerender(<CommercialDashboard {...props} data={next} dataUpdatedAt={2000} />);
     const path = map.querySelector(`path[data-entity-id="${module.entity.id}"]`)!;
@@ -103,8 +104,8 @@ describe('managerial scopes in the existing dashboard', () => {
         setCurrent({
           entities: data.entities.map((entity) => entity.id !== target.entity.id ? entity : { ...entity,
             geometry: { ...entity.geometry, coordinates: entity.geometry.coordinates.map((ring) => ring.map(([x, y]) => [x + calls * 0.01, y] as [number, number])) } }),
-          lots: data.lots.map((lot) => lot.id !== target.lot.id ? lot : { ...lot, status: 'SOLD' as const,
-            pricingMode: 'FIXED_TOTAL' as const, officialAreaSqm: 70 + calls, askingPrice: 1000 * calls }),
+          lots: data.lots.map((lot) => lot.id !== target.lot.id ? lot : withDashboardValue({ ...lot, status: 'SOLD',
+            officialAreaSqm: 70 + calls }, 1000 * calls)),
         });
         setUpdatedAt(Date.now());
         return {};

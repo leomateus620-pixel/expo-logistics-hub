@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const backend = vi.hoisted(() => ({
-  events: [] as { table: string; select?: string; from?: number; filters?: unknown[] }[],
+  events: [] as { table: string; select?: string; from?: number; filters?: unknown[]; limits?: unknown[] }[],
   rows: {} as Record<string, unknown>,
   wait: {} as Record<string, Promise<unknown>>,
   failPage: '',
@@ -14,17 +14,17 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: {
   } }),
   from: (table: string) => {
     let projection = ''; let start = 0; let end = Infinity; let single = false;
-    const filters: unknown[] = [];
+    const filters: unknown[] = []; const limits: unknown[] = [];
     const query = {
       select: (value: string) => { projection = value; return query; },
       eq: (...args: unknown[]) => { filters.push(args); return query; },
       is: (...args: unknown[]) => { filters.push(args); return query; },
       in: (...args: unknown[]) => { filters.push(args); return query; },
-      order: () => query, limit: () => query,
+      order: () => query, limit: (...args: unknown[]) => { limits.push(args); return query; },
       maybeSingle: () => { single = true; return query; },
       range: (a: number, b: number) => { start = a; end = b; return query; },
       then: (resolve: (value: unknown) => void, reject: (e: unknown) => void) => {
-        backend.events.push({ table, select: projection, from: start, filters });
+        backend.events.push({ table, select: projection, from: start, filters, limits });
         if (`${table}:${start}` === backend.failPage) return Promise.resolve({ data: null, error: new Error('second-page-failed') }).then(resolve);
         const rows = backend.rows[table];
         const data = single ? rows ?? null : Array.isArray(rows) ? rows.slice(start, end + 1) : [];
@@ -126,9 +126,20 @@ describe('commercial map initial data pipeline', () => {
   it('loads all 1205 entities and lots through stable 1000-row pages', async () => {
     backend.rows.map_entities = Array.from({ length: 1205 }, (_, i) => ({ id: `entity-${i}`, public_identifier: `Q-${i}` }));
     backend.rows.map_entity_geometries = Array.from({ length: 1205 }, (_, i) => ({ id: `geometry-${i}`, entity_id: `entity-${i}`, geometry: { type: 'Polygon', coordinates: [[[0, 0], [1, 0], [0, 1], [0, 0]]] } }));
-    backend.rows.commercial_lots = Array.from({ length: 1205 }, (_, i) => ({ id: `lot-${i}`, entity_id: `entity-${i}` }));
+    backend.rows.commercial_lots = Array.from({ length: 1205 }, (_, i) => ({ id: `lot-${i}`, entity_id: `entity-${i}`,
+      lot_sales: [{ id: `sale-${i}`, lot_id: `lot-${i}`, status: 'OPEN', negotiated_value: `${i}.25` }],
+      financial_entity: { id: `entity-${i}`, pricing: { lot_id: `lot-${i}`, entity_id: `entity-${i}`, renovacao_total: `${i}.50`, segunda_total: null, resolution_status: 'SEM_REGRA' } },
+    }));
     const data = await fetchCommercialMap('org');
     expect(data.entities).toHaveLength(1205); expect(data.lots).toHaveLength(1205);
+    expect(data.lots[1204]).toMatchObject({
+      sales: [{ id: 'sale-1204', lotId: 'lot-1204', status: 'OPEN', negotiatedValue: 1204.25 }],
+      officialPricing2028: { lotId: 'lot-1204', entityId: 'entity-1204', renovacaoTotal: 1204.5, segundaTotal: null },
+    });
+    const inventoryPages = backend.events.filter((event) => event.table === 'commercial_lots' && event.select === COMMERCIAL_LOT_SELECT);
+    expect(inventoryPages.map((page) => page.from)).toEqual([0, 1000]);
+    expect(inventoryPages.every((page) => page.limits?.some((limit) => JSON.stringify(limit) === '[1,{"referencedTable":"financial_entity.pricing"}]'))).toBe(true);
+    expect(backend.events.some((event) => ['lot_sales', 'lot_sale_orders', 'lot_sale_order_items', 'commercial_lot_pricing_2028'].includes(event.table))).toBe(false);
     for (const table of ['map_entities', 'map_entity_geometries', 'commercial_lots']) {
       expect(backend.events.some((e) => e.table === table && e.from === 1000)).toBe(true);
       expect(backend.events.filter((e) => e.table === table).every((e) => e.filters?.some((f) => JSON.stringify(f) === '["project_id","project"]'))).toBe(true);
@@ -155,5 +166,34 @@ describe('commercial map initial data pipeline', () => {
     expect(data.lots[2].currentBuyer).toBe('Negotiation');
     expect(COMMERCIAL_LOT_SELECT).not.toMatch(/lot_\w+\(\*\)/);
     expect(backend.events.find((e) => e.table === 'commercial_lots')?.select).toBe(COMMERCIAL_LOT_SELECT);
+  });
+
+  it('reads persisted open amounts without an item, signature, selected lot or price row', async () => {
+    const open = { id: 'open', entity_id: 'entity-open', status: 'SALE_OPEN',
+      lot_sales: [{ id: 'sale-open', lot_id: 'open', status: 'OPEN', negotiated_value: '9876.54' },
+        { id: 'old-sale', lot_id: 'open', status: 'REVERTED', negotiated_value: '20000' }],
+      financial_entity: { id: 'entity-open', pricing: { lot_id: 'open', entity_id: 'entity-open', renovacao_total: '12345', segunda_total: '15000', resolution_status: 'OK' } },
+    };
+    const sold = { id: 'sold', entity_id: 'entity-sold', status: 'SOLD',
+      lot_sales: [{ id: 'sale-sold', lot_id: 'sold', status: 'CONFIRMED', negotiated_value: 0, buyer_name: 'Buyer', salesperson_name: 'Seller', sale_date: '2026-09-01', contract_number: 'C1' }],
+    };
+    const masked = { id: 'masked', entity_id: 'entity-masked', status: 'SALE_OPEN', lot_sales: [], financial_entity: null };
+    backend.rows.commercial_lots = [open, sold, masked];
+    const original = JSON.stringify(backend.rows.commercial_lots);
+    const data = await fetchCommercialMap('org', { mode: 'full' }, { includeReferenceImage: false });
+    expect(data.lots[0]).toMatchObject({ status: 'SALE_OPEN', askingPrice: null, sales: [
+      { id: 'sale-open', lotId: 'open', status: 'OPEN', negotiatedValue: 9876.54 },
+      { id: 'old-sale', lotId: 'open', status: 'REVERTED', negotiatedValue: 20000 },
+    ], officialPricing2028: { renovacaoTotal: 12345, segundaTotal: 15000 } });
+    expect(data.lots[1]).toMatchObject({ status: 'SOLD', currentBuyer: 'Buyer', activeContractNumber: 'C1', sales: [
+      { id: 'sale-sold', lotId: 'sold', status: 'CONFIRMED', negotiatedValue: 0 },
+    ] });
+    expect(data.lots[2]).toMatchObject({ status: 'SALE_OPEN', sales: [], officialPricing2028: null });
+    expect(JSON.stringify(backend.rows.commercial_lots)).toBe(original);
+    expect(COMMERCIAL_LOT_SELECT).toContain('lot_sales(id,lot_id,status,negotiated_value,');
+    expect(COMMERCIAL_LOT_SELECT).toContain('financial_entity:map_entities!commercial_lots_entity_id_fkey');
+    expect(COMMERCIAL_LOT_SELECT).toContain('pricing:commercial_lot_pricing_2028!commercial_lots_entity_id_fkey');
+    expect(COMMERCIAL_LOT_SELECT).not.toContain('superseded_by_lot_id');
+    expect(backend.events.some((event) => ['lot_sales', 'lot_sale_order_items', 'commercial_lot_pricing_2028'].includes(event.table))).toBe(false);
   });
 });

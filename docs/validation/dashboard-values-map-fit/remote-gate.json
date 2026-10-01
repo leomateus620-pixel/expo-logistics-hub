@@ -1,0 +1,37 @@
+{
+  "evidenceRecordedAtUtc": "2026-10-01 23:08:32 UTC",
+  "source": "Read-only GET metadata probes against the Supabase project configured by the workspace public client configuration",
+  "authentication": "Public API key only; no authenticated user or privileged credentials",
+  "limit": 0,
+  "rowDataRequested": false,
+  "rowDataPrinted": false,
+  "financialEmbedReady": false,
+  "productionWritePerformed": false,
+  "checks": [
+    {
+      "check": "pricing_entity_column",
+      "resource": "commercial_lot_pricing_2028",
+      "select": "entity_id",
+      "httpStatus": 400,
+      "code": "42703",
+      "message": "column commercial_lot_pricing_2028.entity_id does not exist"
+    },
+    {
+      "check": "pricing_entity_relationship",
+      "resource": "map_entities",
+      "select": "id,pricing:commercial_lot_pricing_2028!commercial_lots_entity_id_fkey(entity_id,lot_id)",
+      "httpStatus": 400,
+      "code": "PGRST200",
+      "message": "Could not find a relationship between 'map_entities' and 'commercial_lot_pricing_2028' in the schema cache"
+    },
+    {
+      "check": "same_lot_financial_embed",
+      "resource": "commercial_lots",
+      "select": "id,financial_entity:map_entities!commercial_lots_entity_id_fkey(id,pricing:commercial_lot_pricing_2028!commercial_lots_entity_id_fkey(lot_id,entity_id))",
+      "httpStatus": 400,
+      "code": "PGRST200",
+      "message": "Could not find a relationship between 'map_entities' and 'commercial_lot_pricing_2028' in the schema cache"
+    }
+  ],
+  "requiredGate": "Apply the compatible view migration and reload the PostgREST schema cache before deploying the new embedded map read, then repeat these zero-row probes under the intended authenticated roles"
+}

@@ -5,6 +5,8 @@ const assert = require('node:assert/strict');
 
 const out = path.resolve(process.env.DASHBOARD_EVIDENCE_DIR || 'docs/validation/dashboard-integrated/evidence');
 const base = process.env.DASHBOARD_BASE_URL || 'http://127.0.0.1:5189';
+const evidenceLabel = process.env.DASHBOARD_EVIDENCE_LABEL || 'after';
+const baselineDir = process.env.DASHBOARD_BASELINE_DIR && path.resolve(process.env.DASHBOARD_BASELINE_DIR);
 const sizes = [
   { name: 'desktop', width: 1920, height: 1080 },
   { name: 'notebook', width: 1366, height: 768 },
@@ -25,8 +27,8 @@ async function mapState(page) {
       'cameraPreset', 'cameraSequence', 'interiorViewSequence'].map(key => [key, state[key]]));
   });
 }
-async function expectedScopes(page) {
-  return page.evaluate(async () => {
+async function expectedScopes(page, pricingStage = 'RENOVACAO') {
+  return page.evaluate(async stage => {
     const [{ OFFICIAL_REFERENCE_DATA }, { presentCommercialMapData }, { buildCommercialDashboardSnapshot },
       { STATUS_CONFIG, COMMERCIAL_PHASES }, { toCommercialPhase }, formatters] = await Promise.all([
       import('/src/features/commercial-map/data/officialReference2026.ts'),
@@ -36,7 +38,7 @@ async function expectedScopes(page) {
       import('/src/features/commercial-map/types.ts'),
       import('/src/features/commercial-map/dashboard/commercialDashboardFormatters.ts'),
     ]);
-    const snapshot = buildCommercialDashboardSnapshot(presentCommercialMapData(OFFICIAL_REFERENCE_DATA));
+    const snapshot = buildCommercialDashboardSnapshot(presentCommercialMapData(OFFICIAL_REFERENCE_DATA), stage);
     const summarize = aggregate => ({
       total: aggregate.totalLots, commercial: aggregate.commercialLots, saleOpen: aggregate.saleOpenLots,
       distinctSaleOpen: new Set(aggregate.records.filter(record => record.lot.status === 'SALE_OPEN').map(record => record.lot.id)).size,
@@ -61,7 +63,7 @@ async function expectedScopes(page) {
       pavilions: snapshot.pavilions.map(aggregate => ({ name: aggregate.definition.officialName,
         number: aggregate.definition.pavilionNumber, id: aggregate.definition.publicIdentifier, ...summarize(aggregate) })),
     };
-  });
+  }, pricingStage);
 }
 async function fitEvidence(map, title) {
   const viewport = map.locator('.commercial-dashboard-map-scroll');
@@ -73,10 +75,14 @@ async function fitEvidence(map, title) {
     const viewBox = svg?.viewBox.baseVal;
     const rect = element.getBoundingClientRect();
     const svgRect = svg?.getBoundingClientRect();
+    const scale = svg && viewBox ? Math.min(svg.clientWidth / viewBox.width, svg.clientHeight / viewBox.height) : 0;
     return { width: element.clientWidth, height: element.clientHeight, scrollWidth: element.scrollWidth,
       scrollHeight: element.scrollHeight, left: element.scrollLeft, top: element.scrollTop, zoom: element.dataset.mapFit,
       preserveAspectRatio: svg?.getAttribute('preserveAspectRatio'),
       content: bounds && { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height },
+      contentScreen: bounds && { width: bounds.width * scale, height: bounds.height * scale,
+        diagonal: Math.hypot(bounds.width * scale, bounds.height * scale),
+        area: bounds.width * bounds.height * scale * scale },
       viewBox: viewBox && { x: viewBox.x, y: viewBox.y, width: viewBox.width, height: viewBox.height },
       svgFitsViewport: !svgRect || (svgRect.left >= rect.left - 1 && svgRect.top >= rect.top - 1
         && svgRect.right <= rect.right + 1 && svgRect.bottom <= rect.bottom + 1),
@@ -131,7 +137,7 @@ async function screenshot(page, prefix, name, map) {
   if (map) await map.scrollIntoViewIfNeeded();
   else await page.locator('.commercial-dashboard-overlay').evaluate(element => { element.scrollTop = 0; });
   await settle(page);
-  await page.screenshot({ path: path.join(out, 'after-' + prefix + '-' + name + '.png') });
+  await page.screenshot({ path: path.join(out, evidenceLabel + '-' + prefix + '-' + name + '.png') });
 }
 async function run(browser, size) {
   console.log('Testing ' + size.name + ' ' + size.width + 'x' + size.height);
@@ -175,12 +181,13 @@ async function run(browser, size) {
     const kpis = await page.getByRole('region', { name: 'Indicadores comerciais principais', exact: true }).locator('.commercial-dashboard-kpi > strong').allTextContents();
     assert.equal(kpis.length, 5);
     assert.equal(kpis[1], expected.overall.saleOpen.toLocaleString('pt-BR'));
-    const financial = page.getByRole('region', { name: 'Valores cadastrais globais', exact: true });
+    const isBaseline = evidenceLabel === 'before';
+    const financial = page.getByRole('region', { name: isBaseline ? 'Valores cadastrais globais' : 'Valores comerciais globais', exact: true });
     const values = await financial.locator('.commercial-dashboard-kpi > strong').allTextContents();
     assert.equal(values.length, 2);
-    assert.equal(values[0], expected.overall.saleOpenValueLabel, 'global existing SALE_OPEN cadastral subtotal');
-    assert.equal(values[1], expected.overall.totalValueLabel, 'global existing cadastral sum, unavailable excluded');
-    assert.equal(await financial.getByText('Valor cadastral · não é receita recebida', { exact: true }).count(), 2);
+    assert.equal(values[0], expected.overall.saleOpenValueLabel, 'global SALE_OPEN financial subtotal from snapshot');
+    assert.equal(values[1], expected.overall.totalValueLabel, 'global commercial financial total, unavailable excluded');
+    assert.equal(await financial.getByText(isBaseline ? 'Valor cadastral · não é receita recebida' : 'Não é receita recebida', { exact: true }).count(), 2);
     assert.equal(await page.locator('.commercial-dashboard-value-chart').count(), 0);
     assert(!/Valor comercial conhecido|Valor comercial dos lotes vendidos|Distribuição do valor comercial|Potencial comercial pendente/.test(await page.getByRole('dialog').innerText()));
     assert.equal(await page.locator('.commercial-dashboard-close').evaluate(button => document.activeElement === button), true, 'initial focus on close');
@@ -193,6 +200,23 @@ async function run(browser, size) {
       return { mapTop: map.top, mapHeight: map.height, mapBottom: map.bottom,
         distributionTop: distribution.top, distributionBottom: distribution.bottom, height: innerHeight };
     });
+    if (!isBaseline) {
+      const stage = page.getByRole('group', { name: 'Etapa dos preços oficiais', exact: true });
+      const quantityBefore = await page.getByRole('region', { name: 'Indicadores comerciais principais', exact: true }).innerText();
+      const selectedBefore = await page.locator('.commercial-dashboard-scope-metrics').innerText();
+      await stage.getByRole('button', { name: '2ª Etapa', exact: true }).click();
+      assert.equal(await stage.getByRole('button', { name: '2ª Etapa', exact: true }).getAttribute('aria-pressed'), 'true');
+      const secondStage = await expectedScopes(page, 'SEGUNDA_ETAPA');
+      const secondValues = await financial.locator('.commercial-dashboard-kpi > strong').allTextContents();
+      assert.equal(secondValues[0], secondStage.overall.saleOpenValueLabel);
+      assert.equal(secondValues[1], secondStage.overall.totalValueLabel);
+      assert.equal(await page.getByRole('region', { name: 'Indicadores comerciais principais', exact: true }).innerText(), quantityBefore,
+        'pricing stage preserves global quantities and official areas');
+      assert.equal(await page.locator('.commercial-dashboard-scope-metrics').innerText(), selectedBefore,
+        'pricing stage preserves selected-scope quantities and official areas');
+      await stage.getByRole('button', { name: 'Renovação', exact: true }).click();
+      assert.equal(await financial.locator('.commercial-dashboard-kpi > strong').nth(1).textContent(), expected.overall.totalValueLabel);
+    }
     for (const segment of expected.segments) {
       const start = Date.now();
       await page.getByRole('group', { name: 'Selecionar área externa' }).getByRole('button', { name: new RegExp(segment.name) }).click();
@@ -244,7 +268,7 @@ async function run(browser, size) {
       await page.keyboard.press('Enter');
       assert.equal(await current.map.locator('path[aria-pressed="true"]').count(), 1, pavilion.name + ': keyboard selection');
       timings.push({ scope: pavilion.name, ms: Date.now() - start, ...current.evidence });
-      if ([1, 13, 14].includes(pavilion.number)) await screenshot(page, size.name, 'pavilion-' + pavilion.number, size.mobile ? current.map : undefined);
+      if ([1, 13, 14].includes(pavilion.number)) await screenshot(page, size.name, 'pavilion-' + pavilion.number, current.map);
     }
     await page.getByRole('group', { name: 'Selecionar pavilhão' }).getByRole('button', { name: 'Todos', exact: true }).click();
     current = await assertScope(page, 'Todos os pavilhões', expected.internal);
@@ -318,11 +342,31 @@ async function run(browser, size) {
     assert.equal(selection.selectedModuleId, originalCallback.module);
     assert.deepEqual(errors, []);
     const result = { viewport: size, fixture: 'OFFICIAL_REFERENCE_DATA through presentCommercialMapData, analytics enabled only in test browser response',
+      evidenceLabel,
       expected, timings, firstScreen, layout, errors, url: page.url(),
       checks: ['distinct SALE_OPEN lots', 'same-scope map/metrics/chart/legend', 'official area', 'all eight pavilions including B5',
+        ...(!isBaseline ? ['official pricing stage preserves quantity and area; financial cards match snapshot'] : []),
         'viewBox content and access symbols', 'no mandatory map scrolling', 'zoom/reset/scope-change/resize',
         'quantity/area metric', 'highlight keeps lots and totals', 'keyboard selection',
         'same Canvas', 'Escape and close restore focus', 'map camera and selection preserved', 'original Ver no mapa callback'] };
+    if (baselineDir && !size.mobile) {
+      const baseline = JSON.parse(fs.readFileSync(path.join(baselineDir, size.name + '-browser.json'), 'utf8'));
+      result.sizeComparison = timings.map(current => {
+        const previous = baseline.timings.find(item => item.scope === current.scope);
+        assert(previous?.contentScreen && current.contentScreen, current.scope + ': comparable drawn content');
+        const widthFactor = current.contentScreen.width / previous.contentScreen.width;
+        const heightFactor = current.contentScreen.height / previous.contentScreen.height;
+        return { scope: current.scope, before: previous.contentScreen, after: current.contentScreen,
+          widthFactor, heightFactor, linearFactor: Math.min(widthFactor, heightFactor),
+          areaFactor: current.contentScreen.area / previous.contentScreen.area };
+      });
+      fs.writeFileSync(path.join(out, size.name + '-size-comparison.json'), JSON.stringify(result.sizeComparison, null, 2));
+      if (process.env.DASHBOARD_ASSERT_MAP_GROWTH === 'true') {
+        for (const comparison of result.sizeComparison.slice(0, 4)) {
+          assert(comparison.linearFactor >= 1.30, comparison.scope + ': drawing at least 30% larger in both dimensions; actual ' + comparison.linearFactor.toFixed(3));
+        }
+      }
+    }
     fs.writeFileSync(path.join(out, size.name + '-browser.json'), JSON.stringify(result, null, 2));
     console.log('Passed ' + size.name + ': ' + timings.length + ' spatial scopes, fit/zoom/reset/resize/highlight/close');
   } catch (error) {

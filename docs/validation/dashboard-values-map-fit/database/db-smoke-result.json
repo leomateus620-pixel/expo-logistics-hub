@@ -1,0 +1,135 @@
+{
+  "status": "passed",
+  "fixture": "Synthetic local 1205-lot schema with real PK/FK/UNIQUE/RLS expressions; capability helper dependencies simulated with local JWT claims",
+  "postgresVersion": "PostgreSQL 16.15, compiled by Visual C++ build 1944, 64-bit",
+  "exactSelect": "*,lot_prices(is_active,pricing_mode,base_price,price_per_sqm,asking_price,minimum_price),lot_reservations(status,company_name,expires_at,responsible_name),lot_negotiations(status,company_name),lot_sales(id,lot_id,status,negotiated_value,buyer_name,sale_date,salesperson_name,contract_number),lot_contracts(is_active,contract_number),financial_entity:map_entities!commercial_lots_entity_id_fkey(id,pricing:commercial_lot_pricing_2028!commercial_lots_entity_id_fkey(lot_id,entity_id,renovacao_total,segunda_total,renovacao_is_manual,segunda_is_manual,resolution_status))",
+  "childLimit": "financial_entity.pricing.limit=1",
+  "viewOptions": [
+    "security_invoker=on"
+  ],
+  "viewColumnsBefore": [
+    "lot_id",
+    "project_id",
+    "public_identifier",
+    "pavilion",
+    "block",
+    "lot_num",
+    "status",
+    "corner_status",
+    "corner_confirmed",
+    "official_area_sqm",
+    "area_validation_status",
+    "renovacao_rule_id",
+    "renovacao_rule_label",
+    "renovacao_price_per_sqm",
+    "segunda_rule_id",
+    "segunda_rule_label",
+    "segunda_price_per_sqm",
+    "renovacao_total",
+    "segunda_total",
+    "resolution_status",
+    "renovacao_default_total",
+    "segunda_default_total",
+    "renovacao_is_manual",
+    "segunda_is_manual"
+  ],
+  "viewColumnsAfter": [
+    "lot_id",
+    "project_id",
+    "public_identifier",
+    "pavilion",
+    "block",
+    "lot_num",
+    "status",
+    "corner_status",
+    "corner_confirmed",
+    "official_area_sqm",
+    "area_validation_status",
+    "renovacao_rule_id",
+    "renovacao_rule_label",
+    "renovacao_price_per_sqm",
+    "segunda_rule_id",
+    "segunda_rule_label",
+    "segunda_price_per_sqm",
+    "renovacao_total",
+    "segunda_total",
+    "resolution_status",
+    "renovacao_default_total",
+    "segunda_default_total",
+    "renovacao_is_manual",
+    "segunda_is_manual",
+    "entity_id"
+  ],
+  "migrationAppliedTwice": true,
+  "tieMultiplicity": {
+    "FIXTURE-2": 2,
+    "FIXTURE-3": 2,
+    "FIXTURE-4": 4
+  },
+  "embeddedShapes": [
+    "object"
+  ],
+  "unboundedTieProbe": {
+    "status": 200,
+    "code": null,
+    "rootRows": 1,
+    "distinctRootRows": 1,
+    "childRows": 1
+  },
+  "pagination": {
+    "manager": [
+      1000,
+      205
+    ],
+    "viewer": [
+      1000,
+      205
+    ],
+    "commission": [
+      1000,
+      100
+    ],
+    "anonymous": [
+      0
+    ]
+  },
+  "localPageDurationMs": {
+    "manager": [
+      579,
+      495
+    ],
+    "viewer": [
+      556,
+      549
+    ],
+    "commission": [
+      434,
+      422
+    ],
+    "anonymous": [
+      10
+    ]
+  },
+  "rootRows": 1205,
+  "distinctRootRows": 1205,
+  "negotiatedSales": {
+    "manager": 7,
+    "viewer": 0,
+    "commissionConfirmed": 2
+  },
+  "checks": [
+    "Exact production select parses through real PostgREST",
+    "Root rows are unique across 1000+205 page boundary",
+    "Pricing belongs to matching persisted lot/entity",
+    "2x2 tied rules produce four raw view rows but one limited embedded child",
+    "Ambiguous rule stays REGRA_AMBIGUA",
+    "Manual overrides and numeric zero preserved",
+    "Missing official area stays SEM_AREA",
+    "Repeated OPEN sale IDs remain separate",
+    "RLS hides open/reverted sales from commission and all sales from ordinary viewer",
+    "Security invoker respects hidden project and base rows",
+    "Anonymous gets no lots",
+    "Previous view columns/order retained; migration twice succeeds"
+  ],
+  "productionEvidence": false
+}
