@@ -1,0 +1,1081 @@
+{
+  "viewport": {
+    "name": "compact-mobile",
+    "width": 320,
+    "height": 740,
+    "mobile": true
+  },
+  "fixture": "OFFICIAL_REFERENCE_DATA through presentCommercialMapData, analytics enabled only in test browser response",
+  "evidenceLabel": "before",
+  "expected": {
+    "overall": {
+      "total": 1466,
+      "commercial": 1466,
+      "saleOpen": 0,
+      "distinctSaleOpen": 0,
+      "sold": 0,
+      "unavailable": 0,
+      "knownValueLots": 0,
+      "saleOpenPricedLots": 0,
+      "saleOpenValueLabel": "—",
+      "totalValueLabel": "—",
+      "areaLabel": "81.618,64 m²",
+      "rows": [
+        {
+          "status": "AVAILABLE",
+          "label": "Disponível",
+          "count": 0
+        },
+        {
+          "status": "SALE_OPEN",
+          "label": "Venda em aberto",
+          "count": 0
+        },
+        {
+          "status": "SOLD",
+          "label": "Vendido",
+          "count": 0
+        },
+        {
+          "status": "BLOCKED",
+          "label": "Bloqueado",
+          "count": 1466
+        }
+      ]
+    },
+    "external": {
+      "total": 264,
+      "commercial": 264,
+      "saleOpen": 0,
+      "distinctSaleOpen": 0,
+      "sold": 0,
+      "unavailable": 0,
+      "knownValueLots": 0,
+      "saleOpenPricedLots": 0,
+      "saleOpenValueLabel": "—",
+      "totalValueLabel": "—",
+      "areaLabel": "81.618,64 m²",
+      "rows": [
+        {
+          "status": "AVAILABLE",
+          "label": "Disponível",
+          "count": 0
+        },
+        {
+          "status": "SALE_OPEN",
+          "label": "Venda em aberto",
+          "count": 0
+        },
+        {
+          "status": "SOLD",
+          "label": "Vendido",
+          "count": 0
+        },
+        {
+          "status": "BLOCKED",
+          "label": "Bloqueado",
+          "count": 264
+        }
+      ]
+    },
+    "internal": {
+      "total": 1202,
+      "commercial": 1202,
+      "saleOpen": 0,
+      "distinctSaleOpen": 0,
+      "sold": 0,
+      "unavailable": 0,
+      "knownValueLots": 0,
+      "saleOpenPricedLots": 0,
+      "saleOpenValueLabel": "—",
+      "totalValueLabel": "—",
+      "areaLabel": "Área pendente",
+      "rows": [
+        {
+          "status": "AVAILABLE",
+          "label": "Disponível",
+          "count": 0
+        },
+        {
+          "status": "SALE_OPEN",
+          "label": "Venda em aberto",
+          "count": 0
+        },
+        {
+          "status": "SOLD",
+          "label": "Vendido",
+          "count": 0
+        },
+        {
+          "status": "BLOCKED",
+          "label": "Bloqueado",
+          "count": 1202
+        }
+      ]
+    },
+    "pending": {
+      "total": 0,
+      "commercial": 0,
+      "saleOpen": 0,
+      "distinctSaleOpen": 0,
+      "sold": 0,
+      "unavailable": 0,
+      "knownValueLots": 0,
+      "saleOpenPricedLots": 0,
+      "saleOpenValueLabel": "—",
+      "totalValueLabel": "—",
+      "areaLabel": "—",
+      "rows": [
+        {
+          "status": "AVAILABLE",
+          "label": "Disponível",
+          "count": 0
+        },
+        {
+          "status": "SALE_OPEN",
+          "label": "Venda em aberto",
+          "count": 0
+        },
+        {
+          "status": "SOLD",
+          "label": "Vendido",
+          "count": 0
+        },
+        {
+          "status": "BLOCKED",
+          "label": "Bloqueado",
+          "count": 0
+        }
+      ]
+    },
+    "segments": [
+      {
+        "name": "Exporural",
+        "total": 95,
+        "commercial": 95,
+        "saleOpen": 0,
+        "distinctSaleOpen": 0,
+        "sold": 0,
+        "unavailable": 0,
+        "knownValueLots": 0,
+        "saleOpenPricedLots": 0,
+        "saleOpenValueLabel": "—",
+        "totalValueLabel": "—",
+        "areaLabel": "47.884,87 m²",
+        "rows": [
+          {
+            "status": "AVAILABLE",
+            "label": "Disponível",
+            "count": 0
+          },
+          {
+            "status": "SALE_OPEN",
+            "label": "Venda em aberto",
+            "count": 0
+          },
+          {
+            "status": "SOLD",
+            "label": "Vendido",
+            "count": 0
+          },
+          {
+            "status": "BLOCKED",
+            "label": "Bloqueado",
+            "count": 95
+          }
+        ]
+      },
+      {
+        "name": "Indústria, Comércio e Serviços",
+        "total": 117,
+        "commercial": 117,
+        "saleOpen": 0,
+        "distinctSaleOpen": 0,
+        "sold": 0,
+        "unavailable": 0,
+        "knownValueLots": 0,
+        "saleOpenPricedLots": 0,
+        "saleOpenValueLabel": "—",
+        "totalValueLabel": "—",
+        "areaLabel": "23.557,17 m²",
+        "rows": [
+          {
+            "status": "AVAILABLE",
+            "label": "Disponível",
+            "count": 0
+          },
+          {
+            "status": "SALE_OPEN",
+            "label": "Venda em aberto",
+            "count": 0
+          },
+          {
+            "status": "SOLD",
+            "label": "Vendido",
+            "count": 0
+          },
+          {
+            "status": "BLOCKED",
+            "label": "Bloqueado",
+            "count": 117
+          }
+        ]
+      },
+      {
+        "name": "Espaço do Automóvel",
+        "total": 52,
+        "commercial": 52,
+        "saleOpen": 0,
+        "distinctSaleOpen": 0,
+        "sold": 0,
+        "unavailable": 0,
+        "knownValueLots": 0,
+        "saleOpenPricedLots": 0,
+        "saleOpenValueLabel": "—",
+        "totalValueLabel": "—",
+        "areaLabel": "10.176,60 m²",
+        "rows": [
+          {
+            "status": "AVAILABLE",
+            "label": "Disponível",
+            "count": 0
+          },
+          {
+            "status": "SALE_OPEN",
+            "label": "Venda em aberto",
+            "count": 0
+          },
+          {
+            "status": "SOLD",
+            "label": "Vendido",
+            "count": 0
+          },
+          {
+            "status": "BLOCKED",
+            "label": "Bloqueado",
+            "count": 52
+          }
+        ]
+      }
+    ],
+    "pavilions": [
+      {
+        "name": "Pavilhão 1 — Indústria, Comércio e Serviços",
+        "number": 1,
+        "id": "B1",
+        "total": 189,
+        "commercial": 189,
+        "saleOpen": 0,
+        "distinctSaleOpen": 0,
+        "sold": 0,
+        "unavailable": 0,
+        "knownValueLots": 0,
+        "saleOpenPricedLots": 0,
+        "saleOpenValueLabel": "—",
+        "totalValueLabel": "—",
+        "areaLabel": "Área pendente",
+        "rows": [
+          {
+            "status": "AVAILABLE",
+            "label": "Disponível",
+            "count": 0
+          },
+          {
+            "status": "SALE_OPEN",
+            "label": "Venda em aberto",
+            "count": 0
+          },
+          {
+            "status": "SOLD",
+            "label": "Vendido",
+            "count": 0
+          },
+          {
+            "status": "BLOCKED",
+            "label": "Bloqueado",
+            "count": 189
+          }
+        ]
+      },
+      {
+        "name": "Pavilhão 3 — Indústria e Comércio",
+        "number": 3,
+        "id": "B6",
+        "total": 214,
+        "commercial": 214,
+        "saleOpen": 0,
+        "distinctSaleOpen": 0,
+        "sold": 0,
+        "unavailable": 0,
+        "knownValueLots": 0,
+        "saleOpenPricedLots": 0,
+        "saleOpenValueLabel": "—",
+        "totalValueLabel": "—",
+        "areaLabel": "Área pendente",
+        "rows": [
+          {
+            "status": "AVAILABLE",
+            "label": "Disponível",
+            "count": 0
+          },
+          {
+            "status": "SALE_OPEN",
+            "label": "Venda em aberto",
+            "count": 0
+          },
+          {
+            "status": "SOLD",
+            "label": "Vendido",
+            "count": 0
+          },
+          {
+            "status": "BLOCKED",
+            "label": "Bloqueado",
+            "count": 214
+          }
+        ]
+      },
+      {
+        "name": "Pavilhão 5 — Veterinária, Pequenos Animais e Rações",
+        "number": 5,
+        "id": "B8",
+        "total": 81,
+        "commercial": 81,
+        "saleOpen": 0,
+        "distinctSaleOpen": 0,
+        "sold": 0,
+        "unavailable": 0,
+        "knownValueLots": 0,
+        "saleOpenPricedLots": 0,
+        "saleOpenValueLabel": "—",
+        "totalValueLabel": "—",
+        "areaLabel": "Área pendente",
+        "rows": [
+          {
+            "status": "AVAILABLE",
+            "label": "Disponível",
+            "count": 0
+          },
+          {
+            "status": "SALE_OPEN",
+            "label": "Venda em aberto",
+            "count": 0
+          },
+          {
+            "status": "SOLD",
+            "label": "Vendido",
+            "count": 0
+          },
+          {
+            "status": "BLOCKED",
+            "label": "Bloqueado",
+            "count": 81
+          }
+        ]
+      },
+      {
+        "name": "Pavilhão 7 — Agricultura Familiar / Agroindústrias",
+        "number": 7,
+        "id": "B10",
+        "total": 57,
+        "commercial": 57,
+        "saleOpen": 0,
+        "distinctSaleOpen": 0,
+        "sold": 0,
+        "unavailable": 0,
+        "knownValueLots": 0,
+        "saleOpenPricedLots": 0,
+        "saleOpenValueLabel": "—",
+        "totalValueLabel": "—",
+        "areaLabel": "Área pendente",
+        "rows": [
+          {
+            "status": "AVAILABLE",
+            "label": "Disponível",
+            "count": 0
+          },
+          {
+            "status": "SALE_OPEN",
+            "label": "Venda em aberto",
+            "count": 0
+          },
+          {
+            "status": "SOLD",
+            "label": "Vendido",
+            "count": 0
+          },
+          {
+            "status": "BLOCKED",
+            "label": "Bloqueado",
+            "count": 57
+          }
+        ]
+      },
+      {
+        "name": "Pavilhão 8 — Indústria, Comércio e Serviços",
+        "number": 8,
+        "id": "B4",
+        "total": 114,
+        "commercial": 114,
+        "saleOpen": 0,
+        "distinctSaleOpen": 0,
+        "sold": 0,
+        "unavailable": 0,
+        "knownValueLots": 0,
+        "saleOpenPricedLots": 0,
+        "saleOpenValueLabel": "—",
+        "totalValueLabel": "—",
+        "areaLabel": "Área pendente",
+        "rows": [
+          {
+            "status": "AVAILABLE",
+            "label": "Disponível",
+            "count": 0
+          },
+          {
+            "status": "SALE_OPEN",
+            "label": "Venda em aberto",
+            "count": 0
+          },
+          {
+            "status": "SOLD",
+            "label": "Vendido",
+            "count": 0
+          },
+          {
+            "status": "BLOCKED",
+            "label": "Bloqueado",
+            "count": 114
+          }
+        ]
+      },
+      {
+        "name": "Pavilhão 12 — Indústria, Comércio e Serviços",
+        "number": 12,
+        "id": "B3",
+        "total": 257,
+        "commercial": 257,
+        "saleOpen": 0,
+        "distinctSaleOpen": 0,
+        "sold": 0,
+        "unavailable": 0,
+        "knownValueLots": 0,
+        "saleOpenPricedLots": 0,
+        "saleOpenValueLabel": "—",
+        "totalValueLabel": "—",
+        "areaLabel": "Área pendente",
+        "rows": [
+          {
+            "status": "AVAILABLE",
+            "label": "Disponível",
+            "count": 0
+          },
+          {
+            "status": "SALE_OPEN",
+            "label": "Venda em aberto",
+            "count": 0
+          },
+          {
+            "status": "SOLD",
+            "label": "Vendido",
+            "count": 0
+          },
+          {
+            "status": "BLOCKED",
+            "label": "Bloqueado",
+            "count": 257
+          }
+        ]
+      },
+      {
+        "name": "Pavilhão 13 — Indústria e Comércio",
+        "number": 13,
+        "id": "B5",
+        "total": 104,
+        "commercial": 104,
+        "saleOpen": 0,
+        "distinctSaleOpen": 0,
+        "sold": 0,
+        "unavailable": 0,
+        "knownValueLots": 0,
+        "saleOpenPricedLots": 0,
+        "saleOpenValueLabel": "—",
+        "totalValueLabel": "—",
+        "areaLabel": "Área pendente",
+        "rows": [
+          {
+            "status": "AVAILABLE",
+            "label": "Disponível",
+            "count": 0
+          },
+          {
+            "status": "SALE_OPEN",
+            "label": "Venda em aberto",
+            "count": 0
+          },
+          {
+            "status": "SOLD",
+            "label": "Vendido",
+            "count": 0
+          },
+          {
+            "status": "BLOCKED",
+            "label": "Bloqueado",
+            "count": 104
+          }
+        ]
+      },
+      {
+        "name": "Pavilhão 14 — Artesanato e Comércio",
+        "number": 14,
+        "id": "B2",
+        "total": 186,
+        "commercial": 186,
+        "saleOpen": 0,
+        "distinctSaleOpen": 0,
+        "sold": 0,
+        "unavailable": 0,
+        "knownValueLots": 0,
+        "saleOpenPricedLots": 0,
+        "saleOpenValueLabel": "—",
+        "totalValueLabel": "—",
+        "areaLabel": "Área pendente",
+        "rows": [
+          {
+            "status": "AVAILABLE",
+            "label": "Disponível",
+            "count": 0
+          },
+          {
+            "status": "SALE_OPEN",
+            "label": "Venda em aberto",
+            "count": 0
+          },
+          {
+            "status": "SOLD",
+            "label": "Vendido",
+            "count": 0
+          },
+          {
+            "status": "BLOCKED",
+            "label": "Bloqueado",
+            "count": 186
+          }
+        ]
+      }
+    ]
+  },
+  "timings": [
+    {
+      "scope": "Todas as áreas externas",
+      "width": 272,
+      "height": 353,
+      "scrollWidth": 272,
+      "scrollHeight": 353,
+      "left": 0,
+      "top": 0,
+      "zoom": "true",
+      "preserveAspectRatio": "xMidYMid meet",
+      "content": {
+        "x": 43.735198974609375,
+        "y": 1.0431416034698486,
+        "width": 912.529541015625,
+        "height": 570.9568481445312
+      },
+      "contentScreen": {
+        "width": 254.08943639267315,
+        "height": 158.98017239871137,
+        "diagonal": 299.72677041310527,
+        "area": 40395.18240239859
+      },
+      "viewBox": {
+        "x": 7.411900043487549,
+        "y": -33,
+        "width": 976.85302734375,
+        "height": 633
+      },
+      "svgFitsViewport": true,
+      "positioned": 264,
+      "accesses": 0,
+      "numbers": 0
+    },
+    {
+      "scope": "Exporural",
+      "ms": 476,
+      "width": 272,
+      "height": 353,
+      "scrollWidth": 272,
+      "scrollHeight": 353,
+      "left": 0,
+      "top": 0,
+      "zoom": "true",
+      "preserveAspectRatio": "xMidYMid meet",
+      "content": {
+        "x": 28,
+        "y": 35.598209381103516,
+        "width": 944,
+        "height": 501.42120361328125
+      },
+      "contentScreen": {
+        "width": 256.76800000000003,
+        "height": 136.3865673828125,
+        "diagonal": 290.74232850836574,
+        "area": 35019.706133750005
+      },
+      "viewBox": {
+        "x": 0,
+        "y": 1.9805999994277954,
+        "width": 1000,
+        "height": 563.0388793945312
+      },
+      "svgFitsViewport": true,
+      "positioned": 95,
+      "accesses": 0,
+      "numbers": 0
+    },
+    {
+      "scope": "Indústria, Comércio e Serviços",
+      "ms": 678,
+      "width": 272,
+      "height": 353,
+      "scrollWidth": 272,
+      "scrollHeight": 353,
+      "left": 0,
+      "top": 0,
+      "zoom": "true",
+      "preserveAspectRatio": "xMidYMid meet",
+      "content": {
+        "x": 37.04570007324219,
+        "y": 11.6543550491333,
+        "width": 925.9085693359375,
+        "height": 560.3456420898438
+      },
+      "contentScreen": {
+        "width": 256.48733809804094,
+        "height": 155.22219678508733,
+        "diagonal": 299.7994079036967,
+        "area": 39812.52806713733
+      },
+      "viewBox": {
+        "x": 9.045700073242188,
+        "y": -22.295900344848633,
+        "width": 981.9086303710938,
+        "height": 622.2958984375
+      },
+      "svgFitsViewport": true,
+      "positioned": 117,
+      "accesses": 0,
+      "numbers": 0
+    },
+    {
+      "scope": "Espaço do Automóvel",
+      "ms": 320,
+      "width": 272,
+      "height": 353,
+      "scrollWidth": 272,
+      "scrollHeight": 353,
+      "left": 0,
+      "top": 0,
+      "zoom": "true",
+      "preserveAspectRatio": "xMidYMid meet",
+      "content": {
+        "x": 28,
+        "y": 73.00531005859375,
+        "width": 944,
+        "height": 426.60699462890625
+      },
+      "contentScreen": {
+        "width": 256.76800000000003,
+        "height": 116.0371025390625,
+        "diagonal": 281.77014566781367,
+        "area": 29794.614744750004
+      },
+      "viewBox": {
+        "x": 0,
+        "y": 39.387699127197266,
+        "width": 1000,
+        "height": 488.2247009277344
+      },
+      "svgFitsViewport": true,
+      "positioned": 52,
+      "accesses": 0,
+      "numbers": 0
+    },
+    {
+      "scope": "Pavilhão 1 — Indústria, Comércio e Serviços",
+      "ms": 1360,
+      "width": 272,
+      "height": 353,
+      "scrollWidth": 272,
+      "scrollHeight": 353,
+      "left": 0,
+      "top": 0,
+      "zoom": "true",
+      "preserveAspectRatio": "xMidYMid meet",
+      "content": {
+        "x": -11,
+        "y": 89.78150177001953,
+        "width": 1022,
+        "height": 420.43701171875
+      },
+      "contentScreen": {
+        "width": 257.87012987012986,
+        "height": 106.08429238172542,
+        "diagonal": 278.838449589308,
+        "area": 27355.970253656364
+      },
+      "viewBox": {
+        "x": -39,
+        "y": 61.78150177001953,
+        "width": 1078,
+        "height": 476.43701171875
+      },
+      "svgFitsViewport": true,
+      "positioned": 189,
+      "accesses": 4,
+      "numbers": 189
+    },
+    {
+      "scope": "Pavilhão 3 — Indústria e Comércio",
+      "ms": 578,
+      "width": 272,
+      "height": 353,
+      "scrollWidth": 272,
+      "scrollHeight": 353,
+      "left": 0,
+      "top": 0,
+      "zoom": "true",
+      "preserveAspectRatio": "xMidYMid meet",
+      "content": {
+        "x": 316.923095703125,
+        "y": -11,
+        "width": 405.15380859375,
+        "height": 622
+      },
+      "contentScreen": {
+        "width": 210.94291214394357,
+        "height": 323.84365781710915,
+        "diagonal": 386.48625705467504,
+        "area": 68312.52425928778
+      },
+      "viewBox": {
+        "x": 288.923095703125,
+        "y": -39,
+        "width": 461.15380859375,
+        "height": 678
+      },
+      "svgFitsViewport": true,
+      "positioned": 214,
+      "accesses": 6,
+      "numbers": 214
+    },
+    {
+      "scope": "Pavilhão 5 — Veterinária, Pequenos Animais e Rações",
+      "ms": 444,
+      "width": 272,
+      "height": 353,
+      "scrollWidth": 272,
+      "scrollHeight": 353,
+      "left": 0,
+      "top": 0,
+      "zoom": "true",
+      "preserveAspectRatio": "xMidYMid meet",
+      "content": {
+        "x": 151.18182373046875,
+        "y": -11,
+        "width": 658.6364135742188,
+        "height": 622
+      },
+      "contentScreen": {
+        "width": 250.6856648910207,
+        "height": 236.7413649604483,
+        "diagonal": 344.8039681691458,
+        "area": 59347.66648231778
+      },
+      "viewBox": {
+        "x": 123.18180084228516,
+        "y": -39,
+        "width": 714.6364135742188,
+        "height": 678
+      },
+      "svgFitsViewport": true,
+      "positioned": 81,
+      "accesses": 3,
+      "numbers": 81
+    },
+    {
+      "scope": "Pavilhão 7 — Agricultura Familiar / Agroindústrias",
+      "ms": 632,
+      "width": 272,
+      "height": 353,
+      "scrollWidth": 272,
+      "scrollHeight": 353,
+      "left": 0,
+      "top": 0,
+      "zoom": "true",
+      "preserveAspectRatio": "xMidYMid meet",
+      "content": {
+        "x": 28,
+        "y": 82.5952377319336,
+        "width": 983,
+        "height": 434.8095397949219
+      },
+      "contentScreen": {
+        "width": 257.339749759384,
+        "height": 113.82886893572545,
+        "diagonal": 281.3907571499265,
+        "area": 29292.692647313306
+      },
+      "viewBox": {
+        "x": 0,
+        "y": 54.59519958496094,
+        "width": 1039,
+        "height": 490.80950927734375
+      },
+      "svgFitsViewport": true,
+      "positioned": 57,
+      "accesses": 4,
+      "numbers": 57
+    },
+    {
+      "scope": "Pavilhão 8 — Indústria, Comércio e Serviços",
+      "ms": 950,
+      "width": 272,
+      "height": 353,
+      "scrollWidth": 272,
+      "scrollHeight": 353,
+      "left": 0,
+      "top": 0,
+      "zoom": "true",
+      "preserveAspectRatio": "xMidYMid meet",
+      "content": {
+        "x": 352.8974304199219,
+        "y": -11,
+        "width": 294.2051086425781,
+        "height": 622
+      },
+      "contentScreen": {
+        "width": 153.1775860631712,
+        "height": 323.84365781710915,
+        "diagonal": 358.2430565698449,
+        "area": 49605.589766292396
+      },
+      "viewBox": {
+        "x": 324.89739990234375,
+        "y": -39,
+        "width": 350.2051086425781,
+        "height": 678
+      },
+      "svgFitsViewport": true,
+      "positioned": 114,
+      "accesses": 5,
+      "numbers": 114
+    },
+    {
+      "scope": "Pavilhão 12 — Indústria, Comércio e Serviços",
+      "ms": 824,
+      "width": 272,
+      "height": 353,
+      "scrollWidth": 272,
+      "scrollHeight": 353,
+      "left": 0,
+      "top": 0,
+      "zoom": "true",
+      "preserveAspectRatio": "xMidYMid meet",
+      "content": {
+        "x": 92.45038604736328,
+        "y": 28,
+        "width": 815.0992431640625,
+        "height": 583.4115600585938
+      },
+      "contentScreen": {
+        "width": 254.51406532008033,
+        "height": 182.16977766884722,
+        "diagonal": 312.99079434013925,
+        "area": 46364.7706929535
+      },
+      "viewBox": {
+        "x": 64.45040130615234,
+        "y": 0,
+        "width": 871.0991821289062,
+        "height": 639
+      },
+      "svgFitsViewport": true,
+      "positioned": 257,
+      "accesses": 3,
+      "numbers": 257
+    },
+    {
+      "scope": "Pavilhão 13 — Indústria e Comércio",
+      "ms": 801,
+      "width": 272,
+      "height": 353,
+      "scrollWidth": 272,
+      "scrollHeight": 353,
+      "left": 0,
+      "top": 0,
+      "zoom": "true",
+      "preserveAspectRatio": "xMidYMid meet",
+      "content": {
+        "x": 318.2775573730469,
+        "y": -11,
+        "width": 363.4448547363281,
+        "height": 622
+      },
+      "contentScreen": {
+        "width": 189.2271883804186,
+        "height": 323.84365781710915,
+        "diagonal": 375.0755171038537,
+        "area": 61280.024843561936
+      },
+      "viewBox": {
+        "x": 290.277587890625,
+        "y": -39,
+        "width": 419.44488525390625,
+        "height": 678
+      },
+      "svgFitsViewport": true,
+      "positioned": 104,
+      "accesses": 6,
+      "numbers": 104
+    },
+    {
+      "scope": "Pavilhão 14 — Artesanato e Comércio",
+      "ms": 667,
+      "width": 272,
+      "height": 353,
+      "scrollWidth": 272,
+      "scrollHeight": 353,
+      "left": 0,
+      "top": 0,
+      "zoom": "true",
+      "preserveAspectRatio": "xMidYMid meet",
+      "content": {
+        "x": 190.12863159179688,
+        "y": 28,
+        "width": 619.74267578125,
+        "height": 544
+      },
+      "contentScreen": {
+        "width": 249.45887518145906,
+        "height": 218.97092680868346,
+        "diagonal": 331.93071143576424,
+        "area": 54624.24109913577
+      },
+      "viewBox": {
+        "x": 162.12860107421875,
+        "y": 0,
+        "width": 675.74267578125,
+        "height": 600
+      },
+      "svgFitsViewport": true,
+      "positioned": 186,
+      "accesses": 6,
+      "numbers": 186
+    },
+    {
+      "scope": "Todos os pavilhões",
+      "width": 272,
+      "height": 353,
+      "scrollWidth": 272,
+      "scrollHeight": 353,
+      "left": 0,
+      "top": 0,
+      "zoom": "true",
+      "preserveAspectRatio": "xMidYMid meet",
+      "content": {
+        "x": 256.6769104003906,
+        "y": 28,
+        "width": 486.6462097167969,
+        "height": 544
+      },
+      "contentScreen": {
+        "width": 243.9301046248576,
+        "height": 272.67853785020935,
+        "diagonal": 365.8626531178361,
+        "area": 66514.50426675475
+      },
+      "viewBox": {
+        "x": 228.67689514160156,
+        "y": 0,
+        "width": 542.6463012695312,
+        "height": 600
+      },
+      "svgFitsViewport": true,
+      "positioned": 1202,
+      "accesses": 0,
+      "numbers": 0
+    }
+  ],
+  "firstScreen": {
+    "mapTop": 1191.78125,
+    "mapHeight": 355.1875,
+    "mapBottom": 1546.96875,
+    "distributionTop": 1619.96875,
+    "distributionBottom": 2080.96875,
+    "height": 740
+  },
+  "layout": {
+    "width": 320,
+    "scrollWidth": 320,
+    "sameCanvas": true,
+    "canvases": 1,
+    "pavilionButtons": [
+      {
+        "width": 50.71875,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      },
+      {
+        "width": 44,
+        "height": 44
+      }
+    ],
+    "health": "{\"status\":\"ready\",\"path\":\"direct\",\"presentedFrames\":172,\"contextLosses\":0,\"lastErrorCode\":null}"
+  },
+  "errors": [],
+  "url": "http://127.0.0.1:5190/__dev/commercial-map-interface",
+  "checks": [
+    "distinct SALE_OPEN lots",
+    "same-scope map/metrics/chart/legend",
+    "official area",
+    "all eight pavilions including B5",
+    "viewBox content and access symbols",
+    "no mandatory map scrolling",
+    "zoom/reset/scope-change/resize",
+    "quantity/area metric",
+    "highlight keeps lots and totals",
+    "keyboard selection",
+    "same Canvas",
+    "Escape and close restore focus",
+    "map camera and selection preserved",
+    "original Ver no mapa callback"
+  ]
+}

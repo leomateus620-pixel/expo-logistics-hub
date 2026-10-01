@@ -230,7 +230,7 @@ export function CommercialMiniMap({
     <div className="commercial-dashboard-lot-detail" role="status" aria-live="polite">
       {activeLot ? <><strong>{identity(activeLot)}</strong>
          <span>{activeLot.lot.officialAreaSqm != null && Number.isFinite(activeLot.lot.officialAreaSqm) && activeLot.lot.officialAreaSqm > 0 ? formatAreaSqmLabel(activeLot.lot.officialAreaSqm) : 'Área oficial pendente'} · {STATUS_CONFIG[displayStatus(activeLot.lot.status)].label}</span>
-        {validValue(activeLot.value) && <span>{formatBrl(activeLot.value)} · valor cadastral</span>}
+        {validValue(activeLot.value) && <span>{formatBrl(activeLot.value)} · {activeLot.lot.status === 'SALE_OPEN' || activeLot.lot.status === 'SOLD' ? 'valor negociado gravado' : 'tabela oficial selecionada'}</span>}
         {activeSelected && <button type="button" onClick={() => onViewLot(activeLot.entity.id)}>Ver no mapa <ArrowUpRight aria-hidden="true" /></button>}
       </> : <span>Selecione um espaço na planta ou na lista para consultar seus dados.</span>}
     </div>

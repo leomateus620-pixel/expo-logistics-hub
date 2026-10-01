@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ChartNoAxesCombined, Clock3, RefreshCw, X, LayoutGrid, PenLine, BadgeCheck, MapPinned, Ruler, Banknote, Wallet } from 'lucide-react';
 import type { CommercialMapData } from '../types';
 import { STATUS_CONFIG } from '../constants';
+import type { LotPricingStage } from '../utils/lotPricing2028';
 import { CommercialDashboardSpaces } from './CommercialDashboardSpaces';
 import { buildCommercialDashboardSnapshot } from './commercialDashboardAnalytics';
 import { formatDashboardAreaWithCoverage, formatDashboardCurrency, formatDashboardInteger, formatDashboardPercentage } from './commercialDashboardFormatters';
@@ -24,14 +25,16 @@ function Kpi({ label, value, detail, icon, color }: {
 }
 
 function PriceCoverage({ lots, priced, scope }: { lots: number; priced: number; scope: string }) {
-  return <>{lots === 0 ? 'Nenhum lote neste indicador' : priced === 0 ? 'Preço cadastral pendente' : priced < lots
-    ? `Subtotal · ${formatDashboardInteger(priced)} de ${formatDashboardInteger(lots)} com preço`
-    : `${formatDashboardInteger(priced)} lotes com preço`}<span className="commercial-dashboard-finance-note">{scope}</span><span className="commercial-dashboard-finance-note">Valor cadastral · não é receita recebida</span></>;
+  return <>{lots === 0 ? 'Nenhum lote neste indicador'
+    : `${priced < lots ? 'Subtotal · ' : ''}${formatDashboardInteger(priced)} de ${formatDashboardInteger(lots)} com valor`}
+    <span className="commercial-dashboard-finance-note">{scope}</span>
+    <span className="commercial-dashboard-finance-note">Não é receita recebida</span></>;
 }
 
 export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, onViewLot }: CommercialDashboardProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const snapshot = useMemo(() => buildCommercialDashboardSnapshot({ entities: data.entities, lots: data.lots }), [data.entities, data.lots]);
+  const [pricingStage, setPricingStage] = useState<LotPricingStage>('RENOVACAO');
+  const snapshot = useMemo(() => buildCommercialDashboardSnapshot({ entities: data.entities, lots: data.lots }, pricingStage), [data.entities, data.lots, pricingStage]);
   const { overall } = snapshot;
   const updatedAtLabel = dataUpdatedAt > 0 && Number.isFinite(dataUpdatedAt)
     ? `Atualizado às ${new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(dataUpdatedAt)}`
@@ -53,7 +56,16 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
       </div>
     </header>
     <main className="commercial-dashboard-content">
-      <div className="commercial-dashboard-global-label"><span className="commercial-dashboard-eyebrow">Visão global · todo o inventário comercial</span></div>
+      <div className="commercial-dashboard-global-label">
+        <span className="commercial-dashboard-eyebrow">Visão global · todo o inventário comercial</span>
+        <div className="commercial-dashboard-pricing-stage">
+          <span>Tabela dos lotes sem venda</span>
+          <div className="commercial-dashboard-metric" role="group" aria-label="Etapa dos preços oficiais">
+            <button type="button" aria-pressed={pricingStage === 'RENOVACAO'} onClick={() => setPricingStage('RENOVACAO')}>Renovação</button>
+            <button type="button" aria-pressed={pricingStage === 'SEGUNDA_ETAPA'} onClick={() => setPricingStage('SEGUNDA_ETAPA')}>2ª Etapa</button>
+          </div>
+        </div>
+      </div>
       <div className="commercial-dashboard-indicators">
       <section className="commercial-dashboard-kpis" aria-label="Indicadores comerciais principais">
         <Kpi label="Espaços comerciais" icon={<LayoutGrid aria-hidden="true" />} value={formatDashboardInteger(overall.commercialLots)} detail="Inventário ativo · todos os recortes" />
@@ -66,13 +78,13 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
         <Kpi label="Área comercial" icon={<Ruler aria-hidden="true" />} value={formatDashboardAreaWithCoverage(overall.totalAreaSqm, overall.commercialLots, overall.lotsWithoutOfficialArea, overall.commercialLots)}
           detail={overall.lotsWithoutOfficialArea ? `${formatDashboardInteger(overall.lotsWithoutOfficialArea)} espaços sem metragem oficial válida` : 'Metragem oficial cadastrada'} />
       </section>
-      <section className="commercial-dashboard-financial-kpis" aria-label="Valores cadastrais globais">
-        <Kpi label="Valor dos lotes em andamento" icon={<Banknote aria-hidden="true" />} color={STATUS_CONFIG.SALE_OPEN.color}
+      <section className="commercial-dashboard-financial-kpis" aria-label="Valores comerciais globais">
+        <Kpi label="Valor das vendas em andamento" icon={<Banknote aria-hidden="true" />} color={STATUS_CONFIG.SALE_OPEN.color}
           value={overall.byStatus.SALE_OPEN.pricedLotCount > 0 ? <span title={formatDashboardCurrency(overall.saleOpenValue)}>{formatDashboardCurrency(overall.saleOpenValue, true)}</span> : '—'}
-          detail={<PriceCoverage lots={overall.saleOpenLots} priced={overall.byStatus.SALE_OPEN.pricedLotCount} scope="Aguardando assinatura" />} />
-        <Kpi label="Valor total dos lotes comerciais" icon={<Wallet aria-hidden="true" />}
+          detail={<PriceCoverage lots={overall.saleOpenLots} priced={overall.byStatus.SALE_OPEN.pricedLotCount} scope="Valor negociado gravado · aguardando assinatura" />} />
+        <Kpi label="Valor total comercial dos lotes" icon={<Wallet aria-hidden="true" />}
           value={overall.knownValueLots > 0 ? <span title={formatDashboardCurrency(overall.totalKnownValue)}>{formatDashboardCurrency(overall.totalKnownValue, true)}</span> : '—'}
-          detail={<PriceCoverage lots={overall.commercialLots} priced={overall.knownValueLots} scope="Inclui bloqueados · exclui indisponíveis" />} />
+          detail={<PriceCoverage lots={overall.commercialLots} priced={overall.knownValueLots} scope="Vendas gravadas + tabela oficial · inclui bloqueados e vendidos; exclui indisponíveis" />} />
       </section></div>
       <CommercialDashboardSpaces snapshot={snapshot} data={data} onViewLot={onViewLot} />
       {snapshot.orphanLots > 0 && <div className="commercial-dashboard-integrity" role="note">

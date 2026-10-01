@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import { withDashboardValue } from './helpers/dashboardFinancialFixture';
 import { describe, expect, it, vi } from 'vitest';
 import { CommercialDashboard } from '@/features/commercial-map/dashboard/CommercialDashboard';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
@@ -22,11 +23,11 @@ function record(id: string, status: CommercialStatus, officialAreaSqm: number | 
       geometry: { ...baseEntity.geometry, coordinates: [[[index * 2, 0], [index * 2 + 1, 0],
         [index * 2 + 1, 1], [index * 2, 1], [index * 2, 0]]] },
     },
-    lot: {
+    lot: withDashboardValue({
       ...baseLot, id, entityId: id, displayName: id, publicIdentifier: `UNIT-${id}`,
       block: null, lotNumber: null, status, officialAreaSqm, calculatedAreaSqm: 999_999,
       pricingMode: 'FIXED_TOTAL', askingPrice: 1000, archivedAt: null,
-    },
+    }, 1000),
   };
 }
 
@@ -51,10 +52,33 @@ function distribution() {
 }
 
 function cadastralCard(label: string) {
-  return within(screen.getByRole('region', { name: 'Valores cadastrais globais' })).getByText(label).closest('article')!;
+  return within(screen.getByRole('region', { name: 'Valores comerciais globais' })).getByText(label).closest('article')!;
 }
 
 describe('integrated Commercial Dashboard presentation', () => {
+  it('changes only unsold official stage totals, retains scope/selection and rebuilds amounts on map refetch', () => {
+    const rows = [record('sale', 'SALE_OPEN', 10), record('confirmed', 'SOLD', 20), record('offer', 'AVAILABLE', 30)];
+    const source = inventory(rows);
+    source.lots = source.lots.map((lot, index) => withDashboardValue(lot, [1250, 750, 1000][index], 2000));
+    const { rerender } = render(<CommercialDashboard {...props} data={source} />);
+    const stages = screen.getByRole('group', { name: 'Etapa dos preços oficiais' });
+    expect(within(stages).getByRole('button', { name: 'Renovação' })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(within(screen.getByRole('group', { name: 'Selecionar área externa' })).getByRole('button', { name: /Exporural/ }));
+    const map = screen.getByRole('region', { name: 'Mini mapa comercial: Exporural' });
+    fireEvent.change(within(map).getByRole('combobox'), { target: { value: 'offer' } });
+    expect(cadastralCard('Valor total comercial dos lotes').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(3000, true));
+    fireEvent.click(within(stages).getByRole('button', { name: '2ª Etapa' }));
+    expect(cadastralCard('Valor total comercial dos lotes').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(4000, true));
+    expect(cadastralCard('Valor das vendas em andamento').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(1250, true));
+    expect(within(screen.getByRole('region', { name: 'Mini mapa comercial: Exporural' })).getByRole('combobox')).toHaveValue('offer');
+    const updated = { ...source, lots: source.lots.map((lot) => lot.id === 'sale' ? withDashboardValue(lot, 1450, 2000) : lot) };
+    rerender(<CommercialDashboard {...props} data={updated} dataUpdatedAt={2000} />);
+    expect(cadastralCard('Valor das vendas em andamento').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(1450, true));
+    expect(cadastralCard('Valor total comercial dos lotes').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(4200, true));
+    expect(within(screen.getByRole('group', { name: 'Etapa dos preços oficiais' })).getByRole('button', { name: '2ª Etapa' })).toHaveAttribute('aria-pressed', 'true');
+    expect(database.from).not.toHaveBeenCalled();
+    expect(source.lots[0].sales![0].negotiatedValue).toBe(1250);
+  });
   it('shows the user-confirmed Q/V lots in industry and hides the pending access when every loaded lot is classified', () => {
     const confirmedLots = OFFICIAL_REFERENCE_DATA.lots.filter(({ block }) => block === 'Q' || block === 'V');
     const entityIds = new Set(confirmedLots.map(({ entityId }) => entityId));
@@ -176,9 +200,9 @@ describe('integrated Commercial Dashboard presentation', () => {
       expect(screen.queryByText(text)).not.toBeInTheDocument();
     }
     expect(screen.queryByText(/espaços sem valor definido/)).not.toBeInTheDocument();
-    expect(within(screen.getByRole('region', { name: 'Valores cadastrais globais' })).getAllByRole('article')).toHaveLength(2);
-    expect(cadastralCard('Valor dos lotes em andamento').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(3000, true));
-    expect(cadastralCard('Valor total dos lotes comerciais').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(9000, true));
+    expect(within(screen.getByRole('region', { name: 'Valores comerciais globais' })).getAllByRole('article')).toHaveLength(2);
+    expect(cadastralCard('Valor das vendas em andamento').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(3000, true));
+    expect(cadastralCard('Valor total comercial dos lotes').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(9000, true));
     const map = screen.getByRole('region', { name: 'Mini mapa comercial: Todas as áreas externas' });
     fireEvent.change(within(map).getByRole('combobox'), { target: { value: rows[0].entity.id } });
     expect(within(map).getByRole('status')).toHaveTextContent('1.000,00');
@@ -190,24 +214,24 @@ describe('integrated Commercial Dashboard presentation', () => {
 
   it('keeps registered partial values global across scopes, including blocked prices and excluding unavailable prices', () => {
     const prices = [1000, null, 500, 0, null, 200, 300, 900_000, 700, 50];
-    const source = { entities: data.entities, lots: data.lots.map((lot, index) => ({ ...lot, askingPrice: prices[index], basePrice: null })) };
+    const source = { entities: data.entities, lots: data.lots.map((lot, index) => withDashboardValue(lot, prices[index])) };
     const inputBefore = JSON.stringify(source);
     const snapshot = buildCommercialDashboardSnapshot(source);
     expect(snapshot.overall).toMatchObject({ saleOpenValue: 1050, totalKnownValue: 2750, knownValueLots: 7, lotsWithoutPrice: 2 });
     expect(snapshot.overall.byStatus.SALE_OPEN).toMatchObject({ pricedLotCount: 2, pricePendingCount: 1 });
     render(<CommercialDashboard {...props} data={source} />);
-    const finance = screen.getByRole('region', { name: 'Valores cadastrais globais' });
-    const saleOpen = cadastralCard('Valor dos lotes em andamento');
-    const total = cadastralCard('Valor total dos lotes comerciais');
+    const finance = screen.getByRole('region', { name: 'Valores comerciais globais' });
+    const saleOpen = cadastralCard('Valor das vendas em andamento');
+    const total = cadastralCard('Valor total comercial dos lotes');
     expect(saleOpen.querySelector('strong')).toHaveTextContent(formatDashboardCurrency(1050, true));
     expect(saleOpen.querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(1050));
-    expect(saleOpen).toHaveTextContent('Subtotal · 2 de 3 com preço');
-    expect(saleOpen).toHaveTextContent('Aguardando assinatura');
+    expect(saleOpen).toHaveTextContent('Subtotal · 2 de 3 com valor');
+    expect(saleOpen).toHaveTextContent('aguardando assinatura');
     expect(total.querySelector('strong')).toHaveTextContent(formatDashboardCurrency(2750, true));
     expect(total.querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(2750));
-    expect(total).toHaveTextContent('Subtotal · 7 de 9 com preço');
-    expect(total).toHaveTextContent('Inclui bloqueados · exclui indisponíveis');
-    expect(within(finance).getAllByText(/não é receita recebida/)).toHaveLength(2);
+    expect(total).toHaveTextContent('Subtotal · 7 de 9 com valor');
+    expect(total).toHaveTextContent('inclui bloqueados e vendidos; exclui indisponíveis');
+    expect(within(finance).getAllByText(/Não é receita recebida/)).toHaveLength(2);
     const valuesBefore = [...finance.querySelectorAll('article > strong')].map((element) => element.textContent);
 
     fireEvent.click(within(screen.getByRole('group', { name: 'Selecionar área externa' })).getByRole('button', { name: /Espaço do Automóvel/ }));
@@ -224,23 +248,22 @@ describe('integrated Commercial Dashboard presentation', () => {
 
   it('distinguishes a registered zero price from absent prices in both global cadastral cards', () => {
     const zero = record('registered-zero-price', 'SALE_OPEN', 10);
-    zero.lot.askingPrice = 0;
-    zero.lot.basePrice = null;
+    zero.lot = withDashboardValue(zero.lot, 0);
     const source = inventory([zero]);
     const { rerender } = render(<CommercialDashboard {...props} data={source} />);
     expect(buildCommercialDashboardSnapshot(source).overall.knownValueLots).toBe(1);
-    for (const label of ['Valor dos lotes em andamento', 'Valor total dos lotes comerciais']) {
+    for (const label of ['Valor das vendas em andamento', 'Valor total comercial dos lotes']) {
       expect(cadastralCard(label).querySelector('strong')).toHaveTextContent(/R\$\s0,00/);
-      expect(cadastralCard(label)).toHaveTextContent(/1 lotes? com preço/);
+      expect(cadastralCard(label)).toHaveTextContent(/1 de 1 com valor/);
     }
-    const unpriced = { entities: source.entities, lots: source.lots.map((lot) => ({ ...lot, askingPrice: null })) };
+    const unpriced = { entities: source.entities, lots: source.lots.map((lot) => withDashboardValue(lot, null)) };
     rerender(<CommercialDashboard {...props} data={unpriced} dataUpdatedAt={2000} />);
-    for (const label of ['Valor dos lotes em andamento', 'Valor total dos lotes comerciais']) {
+    for (const label of ['Valor das vendas em andamento', 'Valor total comercial dos lotes']) {
       expect(cadastralCard(label).querySelector('strong')).toHaveTextContent(/^—$/);
-      expect(cadastralCard(label)).toHaveTextContent('Preço cadastral pendente');
-      expect(cadastralCard(label)).toHaveTextContent('não é receita recebida');
+      expect(cadastralCard(label)).toHaveTextContent('0 de 1 com valor');
+      expect(cadastralCard(label)).toHaveTextContent('Não é receita recebida');
     }
     expect(kpi('Lotes com venda em andamento').querySelector('strong')).toHaveTextContent(/^1$/);
-    expect(source.lots[0].askingPrice).toBe(0);
+    expect(source.lots[0].sales?.[0].negotiatedValue).toBe(0);
   });
 });

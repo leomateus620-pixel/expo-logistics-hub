@@ -1,3 +1,4 @@
+import { withDashboardValue } from './helpers/dashboardFinancialFixture';
 import { describe, expect, it } from 'vitest';
 import { buildCommercialDashboardSnapshot, resolveDashboardLotValue } from '../features/commercial-map/dashboard/commercialDashboardAnalytics';
 import {
@@ -41,7 +42,7 @@ function entity(id: string, segmentId: CommercialMapSegmentId | null = null, ove
 }
 
 function lot(id: string, entityId: string, overrides: Partial<CommercialLot> = {}): CommercialLot {
-  return {
+  const source: CommercialLot = {
     id,
     entityId,
     publicIdentifier: `UNIT-${id}`,
@@ -82,9 +83,49 @@ function lot(id: string, entityId: string, overrides: Partial<CommercialLot> = {
     updatedAt: null,
     ...overrides,
   };
+  return withDashboardValue(source, source.askingPrice);
 }
 
 describe('Commercial Dashboard analytics', () => {
+  it('reads persisted checkout/individual open amounts before signature and retains them on confirmation', () => {
+    const source = withDashboardValue(lot('workflow', 'workflow', { status: 'SALE_OPEN', askingPrice: 99_999 }), 845.75, 2000);
+    source.sales = [
+      { id: 'old-sale', lotId: source.id, status: 'REVERTED', negotiatedValue: 6000 },
+      { id: 'open-sale', lotId: source.id, status: 'OPEN', negotiatedValue: 845.75 },
+    ];
+    const entities = [entity(source.entityId, 'exporural')];
+    const snapshot = buildCommercialDashboardSnapshot({ entities, lots: [source, source] });
+    expect(snapshot.overall).toMatchObject({ saleOpenLots: 1, saleOpenValue: 845.75, totalKnownValue: 845.75, knownValueLots: 1 });
+    expect(buildCommercialDashboardSnapshot({ entities, lots: [source] }, 'SEGUNDA_ETAPA').overall.saleOpenValue).toBe(845.75);
+    const confirmed: CommercialLot = { ...source, status: 'SOLD', sales: source.sales.map((sale) => sale.status === 'OPEN' ? { ...sale, status: 'CONFIRMED' } : sale) };
+    const after = buildCommercialDashboardSnapshot({ entities, lots: [confirmed] });
+    expect(after.overall).toMatchObject({ saleOpenLots: 0, saleOpenValue: 0, soldLots: 1, soldValue: 845.75, totalKnownValue: 845.75 });
+    const cancelled: CommercialLot = { ...source, status: 'AVAILABLE', sales: source.sales.map((sale) => ({ ...sale, status: 'REVERTED' })) };
+    expect(buildCommercialDashboardSnapshot({ entities, lots: [cancelled] }, 'SEGUNDA_ETAPA').overall).toMatchObject({ saleOpenLots: 0, soldLots: 0, totalKnownValue: 2000 });
+  });
+
+  it('does not estimate missing, hidden or ambiguous sales from cadastral prices', () => {
+    const source = withDashboardValue(lot('open', 'open', { status: 'SALE_OPEN' }), 1000);
+    const sale = source.sales![0];
+    for (const sales of [undefined, [], [{ ...sale, negotiatedValue: null }], [{ ...sale, negotiatedValue: -1 }],
+      [{ ...sale, negotiatedValue: Number.NaN }], [sale, { ...sale, id: 'second-active' }], [{ ...sale, lotId: 'other' }]]) {
+      const aggregate = buildCommercialDashboardSnapshot({ entities: [entity(source.entityId)], lots: [{ ...source, sales }] }).overall;
+      expect(aggregate).toMatchObject({ saleOpenLots: 1, saleOpenValue: 0, knownValueLots: 0, lotsWithoutPrice: 1 });
+    }
+    expect(resolveDashboardLotValue({ ...source, status: 'SOLD' })).toBeNull();
+    expect(resolveDashboardLotValue({ ...source, sales: [{ ...sale, negotiatedValue: 0 }] })).toBe(0);
+  });
+
+  it('mixes recorded sales with stage totals across all commercial statuses, excluding unavailable', () => {
+    const statuses: CommercialLot['status'][] = ['SALE_OPEN', 'SOLD', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'BLOCKED', 'UNAVAILABLE'];
+    const rows = statuses.map((status, index) => withDashboardValue(lot(`money-${index}`, `money-${index}`, { status }), index + 1, (index + 1) * 10));
+    const source = { entities: rows.map((row) => entity(row.entityId)), lots: rows };
+    expect(buildCommercialDashboardSnapshot(source).overall).toMatchObject({ commercialLots: 6, totalKnownValue: 21, knownValueLots: 6, saleOpenValue: 1, soldValue: 2, blockedValue: 6 });
+    const segunda = buildCommercialDashboardSnapshot(source, 'SEGUNDA_ETAPA').overall;
+    expect(segunda).toMatchObject({ commercialLots: 6, totalKnownValue: 183, knownValueLots: 6, saleOpenValue: 1, soldValue: 2, blockedValue: 60 });
+    expect(segunda.byStatus.UNAVAILABLE.value).toBe(0);
+  });
+
   it('uses one status breakdown and official area denominator, with unavailable outside the offer', () => {
     const rows = [
       lot('sold', 'sold', { status: 'SOLD', officialAreaSqm: 60, askingPrice: 10_000 }),
@@ -142,23 +183,19 @@ describe('Commercial Dashboard analytics', () => {
     expect(snapshot.overall.records[0].value).toBeNull();
   });
 
-  it('resolves only an existing total or the correct pricing-mode fallback', () => {
-    expect(resolveDashboardLotValue(lot('fixed', 'fixed', { askingPrice: null, basePrice: 12_000 }))).toBe(12_000);
-    expect(resolveDashboardLotValue(lot('sqm', 'sqm', {
-      pricingMode: 'PRICE_PER_SQUARE_METER', askingPrice: null, basePrice: null,
-      officialAreaSqm: 5, pricePerSqm: 50,
-    }))).toBe(250);
-    expect(resolveDashboardLotValue(lot('already-total', 'already-total', {
-      pricingMode: 'PRICE_PER_SQUARE_METER', askingPrice: 250, officialAreaSqm: 5, pricePerSqm: 50,
-    }))).toBe(250);
-    expect(resolveDashboardLotValue(lot('unvalidated', 'unvalidated', {
-      pricingMode: 'PRICE_PER_SQUARE_METER', askingPrice: null, officialAreaSqm: 5,
-      pricePerSqm: 50, areaValidationStatus: 'UNVALIDATED',
-    }))).toBeNull();
-    expect(resolveDashboardLotValue(lot('not-for-sale', 'not-for-sale', {
-      pricingMode: 'NOT_FOR_SALE', askingPrice: 9_999,
-    }))).toBeNull();
-    expect(resolveDashboardLotValue(lot('free', 'free', { askingPrice: 0 }))).toBe(0);
+  it('uses official stage totals including overrides without recalculating geometry or legacy prices', () => {
+    const source = withDashboardValue(lot('official', 'official', {
+      pricingMode: 'PRICE_PER_SQUARE_METER', askingPrice: 999_999,
+      officialAreaSqm: null, calculatedAreaSqm: 100, pricePerSqm: 999,
+    }), 250, 400);
+    source.officialPricing2028 = { ...source.officialPricing2028!, renovacaoIsManual: true };
+    expect(resolveDashboardLotValue(source)).toBe(250);
+    expect(resolveDashboardLotValue(source, 'SEGUNDA_ETAPA')).toBe(400);
+    expect(resolveDashboardLotValue({ ...source, officialPricing2028: null })).toBeNull();
+    expect(resolveDashboardLotValue({ ...source, officialPricing2028: { ...source.officialPricing2028!, resolutionStatus: 'EXCLUIDO' } })).toBeNull();
+    expect(resolveDashboardLotValue({ ...source, officialPricing2028: { ...source.officialPricing2028!, resolutionStatus: 'REGRA_AMBIGUA', segundaTotal: null } })).toBe(250);
+    expect(resolveDashboardLotValue({ ...source, officialPricing2028: { ...source.officialPricing2028!, lotId: 'other' } })).toBeNull();
+    expect(resolveDashboardLotValue(withDashboardValue(source, 0))).toBe(0);
   });
 
   it('assigns each lot to at most one official segment and retains unclassified lots in the overview', () => {
@@ -244,7 +281,7 @@ describe('Commercial Dashboard analytics', () => {
     });
     const priceEdited = buildCommercialDashboardSnapshot({
       entities,
-      lots: [sold, { ...available, askingPrice: 12_000 }],
+      lots: [sold, withDashboardValue(available, 12_000)],
     });
 
     expect(baseline.overall.soldAreaPercentage).toBe(60);

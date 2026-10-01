@@ -180,7 +180,7 @@ describe('mini mapa comercial interativo', () => {
     expect(viewport.firstElementChild).toHaveStyle({ width: '100%', height: '100%' });
   });
 
-  it('ajusta após resize do painel sem confundir a abertura de scrollbars com mudança de tamanho', () => {
+  it('ajusta entre desktop, notebook, painel empilhado e celular preservando a seleção e a planta completa', () => {
     let resize: ResizeObserverCallback | undefined;
     const observe = vi.fn();
     const disconnect = vi.fn();
@@ -194,19 +194,31 @@ describe('mini mapa comercial interativo', () => {
     try {
       const rendered = render(<CommercialMiniMap items={[record('B5-M001', 'AVAILABLE', square(0, 0))]} title="Pavilhão 13" onViewLot={vi.fn()} />);
       const viewport = screen.getByLabelText('Planta de Pavilhão 13; use as setas para navegar pelos espaços');
+      const module = screen.getByRole('button', { name: /B5-M001.*Disponível/ });
+      fireEvent.click(module);
+      const svg = screen.getByRole('group');
+      const originalViewBox = svg.getAttribute('viewBox');
+      const originalPath = module.getAttribute('d');
       const notify = (width: number, height: number, contentWidth = width) => act(() => resize!([{
         target: viewport, borderBoxSize: [{ inlineSize: width, blockSize: height }], contentRect: { width: contentWidth, height },
       } as unknown as ResizeObserverEntry], {} as ResizeObserver));
-      notify(900, 480);
+      notify(1478, 720);
       fireEvent.click(screen.getByRole('button', { name: 'Ampliar planta de Pavilhão 13' }));
-      notify(900, 480, 883);
+      notify(1478, 720, 1461);
       expect(viewport.firstElementChild).toHaveStyle({ width: '150%' });
-      viewport.scrollLeft = 65;
-      viewport.scrollTop = 30;
-      notify(360, 300);
-      expect(viewport.firstElementChild).toHaveStyle({ width: '100%', height: '100%' });
-      expect(viewport.scrollLeft).toBe(0);
-      expect(viewport.scrollTop).toBe(0);
+      for (const [width, height] of [[904, 314], [1020, 314], [342, 403]]) {
+        viewport.scrollLeft = 65;
+        viewport.scrollTop = 30;
+        notify(width, height);
+        expect(viewport.firstElementChild).toHaveStyle({ width: '100%', height: '100%' });
+        expect(viewport.scrollLeft).toBe(0);
+        expect(viewport.scrollTop).toBe(0);
+        expect(module).toHaveAttribute('aria-pressed', 'true');
+        expect(module).toHaveAttribute('d', originalPath);
+        expect(svg).toHaveAttribute('viewBox', originalViewBox);
+        expect(svg).toHaveAttribute('preserveAspectRatio', 'xMidYMid meet');
+        fireEvent.click(screen.getByRole('button', { name: 'Ampliar planta de Pavilhão 13' }));
+      }
       expect(observe).toHaveBeenCalledWith(viewport, { box: 'border-box' });
       rendered.unmount();
       expect(disconnect).toHaveBeenCalledOnce();

@@ -1,3 +1,4 @@
+import { withDashboardValue } from './helpers/dashboardFinancialFixture';
 import { describe, expect, it } from 'vitest';
 import { buildCommercialDashboardSnapshot } from '../features/commercial-map/dashboard/commercialDashboardAnalytics';
 import type { CommercialMapSegmentId } from '../features/commercial-map/data/commercialMapSegments';
@@ -33,7 +34,7 @@ function entity(id: string, segmentId: CommercialMapSegmentId | null = null): Ma
 }
 
 function lot(id: string, entityId: string, overrides: Partial<CommercialLot> = {}): CommercialLot {
-  return {
+  const source: CommercialLot = {
     id,
     entityId,
     publicIdentifier: `UNIT-${id}`,
@@ -74,6 +75,7 @@ function lot(id: string, entityId: string, overrides: Partial<CommercialLot> = {
     updatedAt: null,
     ...overrides,
   };
+  return withDashboardValue(source, source.askingPrice);
 }
 
 /** Áreas propositalmente muito diferentes: o indicador principal é quantidade. */
@@ -157,7 +159,7 @@ describe('Dashboard Comercial — lotes como métrica principal', () => {
     const before = buildCommercialDashboardSnapshot({ entities, lots: base });
     const after = buildCommercialDashboardSnapshot({
       entities,
-      lots: base.map((item) => (item.id === 'd' ? item : { ...item, status: 'SOLD' as const })),
+      lots: base.map((item) => (item.id === 'd' ? item : withDashboardValue({ ...item, status: 'SOLD' }, item.askingPrice))),
     });
 
     expect(after.overall.soldLots - before.overall.soldLots).toBe(3);
@@ -222,7 +224,7 @@ describe('Dashboard Comercial — lotes como métrica principal', () => {
     const available = lot('b', 'b', { officialAreaSqm: 100, askingPrice: 10_000 });
     const baseline = buildCommercialDashboardSnapshot({ entities, lots: [sold, available] });
     const areaEdited = buildCommercialDashboardSnapshot({ entities, lots: [{ ...sold, officialAreaSqm: 110 }, available] });
-    const priceEdited = buildCommercialDashboardSnapshot({ entities, lots: [sold, { ...available, askingPrice: 20_000 }] });
+    const priceEdited = buildCommercialDashboardSnapshot({ entities, lots: [sold, withDashboardValue(available, 20_000)] });
 
     expect(areaEdited.overall.soldLots).toBe(baseline.overall.soldLots);
     expect(areaEdited.overall.soldLotPercentage).toBe(baseline.overall.soldLotPercentage);

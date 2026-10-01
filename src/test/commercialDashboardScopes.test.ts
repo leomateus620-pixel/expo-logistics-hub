@@ -1,3 +1,4 @@
+import { withDashboardValue } from './helpers/dashboardFinancialFixture';
 import { describe, expect, it } from 'vitest';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
 import { COMMERCIAL_MAP_SEGMENTS } from '@/features/commercial-map/data/commercialMapSegments';
@@ -16,10 +17,13 @@ const makeEntity = (id: string, overrides: Partial<MapEntity> = {}): MapEntity =
   ...baseEntity, id, publicIdentifier: id, classification: 'SELLABLE_LOT', metadata: {},
   parentEntityId: null, isArchived: false, segmentId: null, segmentSource: 'derived', ...overrides,
 });
-const makeLot = (id: string, overrides: Partial<CommercialLot> = {}): CommercialLot => ({
+const makeLot = (id: string, overrides: Partial<CommercialLot> = {}): CommercialLot => {
+ const source: CommercialLot = {
   ...baseLot, id, entityId: id, publicIdentifier: id, block: null, lotNumber: null,
   archivedAt: null, officialAreaSqm: 10.1256, askingPrice: 100.01, pricingMode: 'FIXED_TOTAL', status: 'AVAILABLE', ...overrides,
-});
+ };
+ return withDashboardValue(source, source.askingPrice);
+};
 const statuses: CommercialStatus[] = ['SOLD', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'BLOCKED', 'UNAVAILABLE'];
 function reconciles(parent: DashboardAggregate, children: readonly DashboardAggregate[]) {
   for (const field of ['totalLots', 'commercialLots', 'soldLots', 'availableLots', 'reservedLots', 'negotiationLots', 'blockedLots',

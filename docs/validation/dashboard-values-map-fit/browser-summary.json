@@ -1,0 +1,63 @@
+{
+  "recordedAtUtc": "2026-10-01T23:26:17.5244027Z",
+  "baselineRevision": "3c653eb8",
+  "fixture": "Existing OFFICIAL_REFERENCE_DATA through presentCommercialMapData; analytics enabled only in browser response",
+  "scopesTotal": 52.0,
+  "productionDataValidated": false,
+  "viewports": [
+    {
+      "viewport": "desktop",
+      "scopes": 13,
+      "javascriptErrors": 0,
+      "sameCanvas": true,
+      "canvases": 1,
+      "dashboardHorizontalOverflow": 0,
+      "maxMapHorizontalOverflow": 0.0,
+      "maxMapVerticalOverflow": 0.0,
+      "minPavilionButtonWidth": 44.0,
+      "minPavilionButtonHeight": 44.0
+    },
+    {
+      "viewport": "notebook",
+      "scopes": 13,
+      "javascriptErrors": 0,
+      "sameCanvas": true,
+      "canvases": 1,
+      "dashboardHorizontalOverflow": 0,
+      "maxMapHorizontalOverflow": 0.0,
+      "maxMapVerticalOverflow": 0.0,
+      "minPavilionButtonWidth": 44.0,
+      "minPavilionButtonHeight": 44.0
+    },
+    {
+      "viewport": "mobile",
+      "scopes": 13,
+      "javascriptErrors": 0,
+      "sameCanvas": true,
+      "canvases": 1,
+      "dashboardHorizontalOverflow": 0,
+      "maxMapHorizontalOverflow": 0.0,
+      "maxMapVerticalOverflow": 0.0,
+      "minPavilionButtonWidth": 44.0,
+      "minPavilionButtonHeight": 44.0
+    },
+    {
+      "viewport": "compact-mobile",
+      "scopes": 13,
+      "javascriptErrors": 0,
+      "sameCanvas": true,
+      "canvases": 1,
+      "dashboardHorizontalOverflow": 0,
+      "maxMapHorizontalOverflow": 0.0,
+      "maxMapVerticalOverflow": 0.0,
+      "minPavilionButtonWidth": 44.0,
+      "minPavilionButtonHeight": 44.0
+    }
+  ],
+  "permissions": {
+    "fixture": "existing read-only DEV permissions, no analytics interception",
+    "canViewMapAnalytics": false,
+    "dashboardButtons": 0,
+    "dashboardDialogs": 0
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "fixture": "existing read-only DEV permissions, no analytics interception",
+  "canViewMapAnalytics": false,
+  "dashboardButtons": 0,
+  "dashboardDialogs": 0
+}
