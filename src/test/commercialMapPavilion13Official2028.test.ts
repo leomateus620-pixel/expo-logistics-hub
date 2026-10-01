@@ -82,8 +82,8 @@ describe('Pavilhão 13 — planta oficial Fenasoja 2028', () => {
     const bottom = (rect: { centerZ: number; depth: number }) => (rect.centerZ + rect.depth / 2) * 37.8;
     const east = PAVILION13_COMMERCIAL_REFERENCE.runs.find(run => run.id === 'central-east-27-52');
     if (!east) throw new Error('Ilha do Pavilhão 13 ausente');
-    expect(bottom(corridor('north-distribution')!)).toBeCloseTo(top(east), 8);
-    expect(top(corridor('south-distribution')!)).toBeCloseTo(bottom(east), 8);
+    expect(bottom(corridor('north-distribution')!)).toBeCloseTo(top(east.bounds), 8);
+    expect(top(corridor('south-distribution')!)).toBeCloseTo(bottom(east.bounds), 8);
     expect(PAVILION13_COMMERCIAL_REFERENCE.cells.slice(99).map(cell => cell.label)).toEqual(['100', '101', '102', '103', '104']);
   });
 
