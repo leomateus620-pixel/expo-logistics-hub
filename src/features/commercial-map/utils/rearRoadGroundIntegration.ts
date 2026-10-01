@@ -38,7 +38,7 @@ function presentedRearCuts(presentation?: UbiretamaRoadPresentation | null) {
   if (cached) return cached;
   const cuts = ROAD_GROUND_CUTS.flatMap(cut => {
     if (!isUbiretamaPresentationSegment(cut.segmentId)) return [cut];
-    return polygonClipping.difference([[cut.polygon.map(p => [p[0], p[1]])]], UBIRETAMA_PRESENTATION_MASK)
+    return polygonClipping.difference([[cut.polygon.map((p): [number, number] => [p[0], p[1]])]], UBIRETAMA_PRESENTATION_MASK)
       .map(rings => {
         const polygon = rings[0];
         return { ...cut, polygon, minX: Math.min(...polygon.map(p => p[0])), maxX: Math.max(...polygon.map(p => p[0])),
