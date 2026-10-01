@@ -1,5 +1,16 @@
 import type { CommercialMapRuntimeSummary } from '../utils/runtimeDiagnostics';
 
+/** A requested DIRECT budget keeps POST when the driver declined framebuffer MSAA. */
+export function resolveCommercialMapStressExpectedRenderPath(serializedBudget?: string): 'post' | 'direct' {
+  if (!serializedBudget) return 'post';
+  try {
+    const budget = JSON.parse(serializedBudget) as { requestedPath?: unknown; directBudgetAvailable?: unknown } | null;
+    return budget?.requestedPath === 'direct' && budget.directBudgetAvailable === true ? 'direct' : 'post';
+  } catch {
+    return 'post';
+  }
+}
+
 export type CommercialMapStressPhase = 'hydrology' | 'quality';
 type ResourceMetric = 'geometries' | 'textures' | 'programs';
 const RESOURCE_METRICS: ResourceMetric[] = ['geometries', 'textures', 'programs'];

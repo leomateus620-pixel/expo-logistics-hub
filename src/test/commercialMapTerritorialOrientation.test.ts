@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS } from '@/features/commercial-map/data/officialReference2026';
-import { orientationBoxFits, orientationLevel, prepareTerritorialOrientation, roadLabelFits, TERRITORY_SYMBOLS } from '@/features/commercial-map/utils/territorialOrientation';
+import { layoutTerritorialOrientation, localRoadLabelAngle, orientationBoxFits, orientationFootprint, orientationFootprintFits, orientationLevel, prepareTerritorialOrientation, roadLabelFits, TERRITORY_SYMBOLS } from '@/features/commercial-map/utils/territorialOrientation';
 import { lotPointClearance } from '@/features/commercial-map/utils/soldLotPresentation';
 import { COMMERCIAL_MAP_SEGMENT_IDS } from '@/features/commercial-map/data/commercialMapSegments';
 
@@ -50,5 +50,39 @@ describe('orientação territorial cadastral', () => {
     const road = data.find(item => item.kind === 'road' && item.name === 'Rua Bolívia');
     expect(road?.outline).toBeDefined();
     expect(road?.anchor && road.outline && lotPointClearance(road.anchor, road.outline)).toBeGreaterThan(0);
+  });
+  it('alinha uma curva pelo corredor próximo da âncora, sem usar a maior borda distante', () => {
+    const bentRoad: [number, number][][] = [[[0, 0], [100, 0], [100, 10], [10, 10], [10, 60], [0, 60]]];
+    expect(localRoadLabelAngle([5, 45], bentRoad)).toBeCloseTo(-Math.PI / 2);
+    expect(localRoadLabelAngle([75, 5], bentRoad)).toBeCloseTo(0);
+  });
+  it('encaixa a extensão orientada da rua diagonal e rejeita obstáculos e buracos cobertos pelo texto', () => {
+    const road: [number, number][][] = [[[0, 0], [2, -2], [22, 18], [20, 20]]];
+    const footprint = orientationFootprint([11, 9], 12, 1.5, Math.PI / 4);
+    expect(orientationFootprintFits(footprint, road)).toBe(true);
+    expect(orientationFootprintFits(orientationFootprint([11, 9], 12, 1.5, 0), road)).toBe(false);
+    const obstacle: [number, number][][] = [[[10.8, 8.8], [11.2, 8.8], [11.2, 9.2], [10.8, 9.2]]];
+    expect(orientationFootprintFits(footprint, road, [obstacle])).toBe(false);
+    expect(orientationFootprintFits(footprint, [...road, obstacle[0]])).toBe(false);
+  });
+  it('prepara dimensões fixas no mundo, conservando as quadras oficiais e todo footprint dentro da área real', () => {
+    const ratios = new Map(data.map(item => [item.id, item.name.length * .34]));
+    const labels = layoutTerritorialOrientation(data, OFFICIAL_REFERENCE_ENTITIES, ratios);
+    expect(labels.filter(item => item.kind === 'block').map(item => item.name).sort())
+      .toEqual(data.filter(item => item.kind === 'block').map(item => item.name).sort());
+    for (const label of labels) {
+      expect(label.width / label.height).toBeCloseTo(ratios.get(label.id)!);
+      expect(orientationFootprintFits(label.footprint, label.outline!)).toBe(true);
+      expect(Number.isFinite(label.angle)).toBe(true);
+    }
+    expect(labels.filter(item => item.kind === 'road').map(item => item.name)).toContain('Avenida Tuparendi');
+  });
+  it('ignora inventário sem geometria utilizável sem interromper os rótulos válidos', () => {
+    const valid = OFFICIAL_REFERENCE_ENTITIES.find(entity => entity.publicIdentifier === 'QUADRA-D')!;
+    const empty = { ...valid, id: 'empty', geometry: { ...valid.geometry, coordinates: [] } };
+    const malformed = { ...valid, id: 'malformed', geometry: { ...valid.geometry, coordinates: [[[NaN, 0]]] as [number, number][][] } };
+    const item = data.find(item => item.name === 'Quadra D')!;
+    expect(layoutTerritorialOrientation([item], [valid, empty, malformed], new Map([[item.id, 3]]))).toHaveLength(1);
+    expect(layoutTerritorialOrientation([{ ...item, outline: [] }], [empty], new Map())).toEqual([]);
   });
 });

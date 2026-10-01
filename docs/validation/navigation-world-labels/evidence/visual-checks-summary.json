@@ -1,0 +1,1588 @@
+{
+  "generatedAt": "2026-10-01T18:50:59.866Z",
+  "revision": "82d8f12b49876144a7f7dd6f029e4b5e7254c743",
+  "passed": true,
+  "errors": [],
+  "perspectiveAssertions": {
+    "label": "Quadra M",
+    "reverseAngleChangeDegrees": 179.3474702288214,
+    "closeWidthRatio": 1.9789435380077158
+  },
+  "selection": {
+    "passed": true,
+    "attempts": [
+      {
+        "entityId": "reference:2026:q-m-09",
+        "lotId": "reference:2026:lot:m-09",
+        "status": "BLOCKED",
+        "identifier": "Q-M-09",
+        "point": [
+          -3.85909090909091,
+          -4.200000021084336
+        ],
+        "x": 639.598462987416,
+        "y": 378.2942121846788,
+        "z": 0.9916762851591668,
+        "clientX": 639.598462987416,
+        "clientY": 378.2942121846788,
+        "distance": 1.4156226956640439,
+        "raycast": {
+          "object": "",
+          "type": "Mesh",
+          "isBatchedMesh": true,
+          "batchId": 171
+        },
+        "hover": "reference:2026:q-m-09",
+        "selected": "reference:2026:q-m-09",
+        "passed": true
+      }
+    ]
+  },
+  "recovery": {
+    "beforeCamera": [
+      -28.10730971520667,
+      23.99998406925338,
+      -28.747867834129934
+    ],
+    "afterCamera": [
+      -28.10730971520667,
+      23.99998406925338,
+      -28.747867834129934
+    ],
+    "beforeTarget": [
+      -4.690909090909091,
+      0,
+      -5.345454572289153
+    ],
+    "afterTarget": [
+      -4.690909090909091,
+      0,
+      -5.345454572289153
+    ],
+    "cameraPreserved": true,
+    "pathPreserved": true,
+    "labelDepthTest": true
+  },
+  "video": {
+    "available": true,
+    "mime": "video/webm;codecs=vp9",
+    "requestedFps": 60,
+    "startedAt": 209274.20000004768,
+    "bytes": 5465357,
+    "stoppedAt": 297856.10000014305,
+    "file": "world-labels-motion.webm",
+    "caveat": "Native canvas capture in a separate visual execution. Lossy video and requested stream cadence are not FPS measurements."
+  },
+  "presentationChanges": [
+    {
+      "name": "filtered-internal",
+      "before": {
+        "visibleMeshes": 911,
+        "activePublicObjects": 1,
+        "labels": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        }
+      },
+      "after": {
+        "visibleMeshes": 911,
+        "activePublicObjects": 1,
+        "labels": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        }
+      }
+    },
+    {
+      "name": "public-fixture-scope",
+      "before": {
+        "visibleMeshes": 911,
+        "activePublicObjects": 1,
+        "labels": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        }
+      },
+      "after": {
+        "visibleMeshes": 606,
+        "activePublicObjects": 1,
+        "labels": {
+          "road": 27
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 0,
+          "presentedCommercialTrees": 0
+        }
+      }
+    }
+  ],
+  "stages": [
+    {
+      "name": "overview",
+      "viewport": {
+        "width": 1265,
+        "height": 720,
+        "devicePixelRatio": 1
+      },
+      "physical": {
+        "width": 1265,
+        "height": 720
+      },
+      "dpr": 1,
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2498,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "runtimeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1
+      },
+      "selection": null,
+      "hover": null,
+      "labels": {
+        "meshId": "200b9939-237c-469b-a0de-a0124aa80049",
+        "geometryId": "edf855e5-db37-44c3-9491-2d76334e56a0",
+        "textureId": "478b137f-03ab-48c4-b7da-a62a8564c4e7",
+        "worldHash": "fa309a934e23c975c5fac6b8b98ce9a9dfaf7216a383e5f4b76706b995054529",
+        "labelCounts": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "depthTest": true,
+        "labelRaycastHits": 0
+      },
+      "quadraM": {
+        "id": "reference:2026:quadra-m",
+        "name": "Quadra M",
+        "kind": "block",
+        "anchor": [
+          -4.690909090909091,
+          -5.345454572289153
+        ],
+        "angle": 0,
+        "width": 6.379067230224609,
+        "height": 2.04949951171875,
+        "elevation": 0.245,
+        "footprint": [
+          [
+            -7.880442706021396,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -4.320704816429778
+          ],
+          [
+            -7.880442706021396,
+            -4.320704816429778
+          ]
+        ],
+        "projected": {
+          "corners": [
+            {
+              "x": 578.7840804553729,
+              "y": 321.90660878416537,
+              "z": 0.9927051843735802,
+              "clientX": 578.7840804553729,
+              "clientY": 321.90660878416537
+            },
+            {
+              "x": 621.0828608451076,
+              "y": 346.2251608811999,
+              "z": 0.9925094292120166,
+              "clientX": 621.0828608451076,
+              "clientY": 346.2251608811999
+            },
+            {
+              "x": 609.355133599107,
+              "y": 356.061536258618,
+              "z": 0.992430250104497,
+              "clientX": 609.355133599107,
+              "clientY": 356.061536258618
+            },
+            {
+              "x": 566.9410017740674,
+              "y": 331.27962060659223,
+              "z": 0.9926297351677099,
+              "clientX": 566.9410017740674,
+              "clientY": 331.27962060659223
+            }
+          ],
+          "angleDegrees": 29.89559672862328,
+          "widthCssPx": 48.79117541682293,
+          "heightCssPx": 15.1033725794918
+        }
+      }
+    },
+    {
+      "name": "top",
+      "viewport": {
+        "width": 1265,
+        "height": 720,
+        "devicePixelRatio": 1
+      },
+      "physical": {
+        "width": 1265,
+        "height": 720
+      },
+      "dpr": 1,
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2719,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "runtimeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1
+      },
+      "selection": null,
+      "hover": null,
+      "labels": {
+        "meshId": "200b9939-237c-469b-a0de-a0124aa80049",
+        "geometryId": "edf855e5-db37-44c3-9491-2d76334e56a0",
+        "textureId": "478b137f-03ab-48c4-b7da-a62a8564c4e7",
+        "worldHash": "fa309a934e23c975c5fac6b8b98ce9a9dfaf7216a383e5f4b76706b995054529",
+        "labelCounts": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "depthTest": true,
+        "labelRaycastHits": 0
+      },
+      "quadraM": {
+        "id": "reference:2026:quadra-m",
+        "name": "Quadra M",
+        "kind": "block",
+        "anchor": [
+          -4.690909090909091,
+          -5.345454572289153
+        ],
+        "angle": 0,
+        "width": 6.379067230224609,
+        "height": 2.04949951171875,
+        "elevation": 0.245,
+        "footprint": [
+          [
+            -7.880442706021396,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -4.320704816429778
+          ],
+          [
+            -7.880442706021396,
+            -4.320704816429778
+          ]
+        ],
+        "projected": {
+          "corners": [
+            {
+              "x": 575.5126972180831,
+              "y": 292.98120927873055,
+              "z": 0.9923135213655457,
+              "clientX": 575.5126972180831,
+              "clientY": 292.98120927873055
+            },
+            {
+              "x": 621.3846492757116,
+              "y": 338.85310050324335,
+              "z": 0.9923134710532728,
+              "clientX": 621.3846492757116,
+              "clientY": 338.85310050324335
+            },
+            {
+              "x": 606.6465124548287,
+              "y": 353.59117477363804,
+              "z": 0.9923134548885586,
+              "clientX": 606.6465124548287,
+              "clientY": 353.59117477363804
+            },
+            {
+              "x": 560.7745603981651,
+              "y": 307.7191060700512,
+              "z": 0.9923135052010262,
+              "clientX": 560.7745603981651,
+              "clientY": 307.7191060700512
+            }
+          ],
+          "angleDegrees": 44.99996200855928,
+          "widthCssPx": 64.87269371693226,
+          "heightCssPx": 20.84270324968048
+        }
+      }
+    },
+    {
+      "name": "core-inclined",
+      "viewport": {
+        "width": 1265,
+        "height": 720,
+        "devicePixelRatio": 1
+      },
+      "physical": {
+        "width": 1265,
+        "height": 720
+      },
+      "dpr": 1,
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2819,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "runtimeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1
+      },
+      "selection": null,
+      "hover": null,
+      "labels": {
+        "meshId": "200b9939-237c-469b-a0de-a0124aa80049",
+        "geometryId": "edf855e5-db37-44c3-9491-2d76334e56a0",
+        "textureId": "478b137f-03ab-48c4-b7da-a62a8564c4e7",
+        "worldHash": "fa309a934e23c975c5fac6b8b98ce9a9dfaf7216a383e5f4b76706b995054529",
+        "labelCounts": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "depthTest": true,
+        "labelRaycastHits": 0
+      },
+      "quadraM": {
+        "id": "reference:2026:quadra-m",
+        "name": "Quadra M",
+        "kind": "block",
+        "anchor": [
+          -4.690909090909091,
+          -5.345454572289153
+        ],
+        "angle": 0,
+        "width": 6.379067230224609,
+        "height": 2.04949951171875,
+        "elevation": 0.245,
+        "footprint": [
+          [
+            -7.880442706021396,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -4.320704816429778
+          ],
+          [
+            -7.880442706021396,
+            -4.320704816429778
+          ]
+        ],
+        "projected": {
+          "corners": [
+            {
+              "x": 572.1860724326127,
+              "y": 322.31675562824694,
+              "z": 0.9922638189373375,
+              "clientX": 572.1860724326127,
+              "clientY": 322.31675562824694
+            },
+            {
+              "x": 718.5002114383916,
+              "y": 361.24900040345307,
+              "z": 0.9918312996709133,
+              "clientX": 718.5002114383916,
+              "clientY": 361.24900040345307
+            },
+            {
+              "x": 698.5313575723859,
+              "y": 390.5934467752851,
+              "z": 0.9915052964185541,
+              "clientX": 698.5313575723859,
+              "clientY": 390.5934467752851
+            },
+            {
+              "x": 547.9239849716802,
+              "y": 348.6764884365095,
+              "z": 0.9919709744747796,
+              "clientX": 547.9239849716802,
+              "clientY": 348.6764884365095
+            }
+          ],
+          "angleDegrees": 14.900388577750821,
+          "widthCssPx": 151.40524084799358,
+          "heightCssPx": 35.825750539031745
+        }
+      }
+    },
+    {
+      "name": "core-reverse",
+      "viewport": {
+        "width": 1265,
+        "height": 720,
+        "devicePixelRatio": 1
+      },
+      "physical": {
+        "width": 1265,
+        "height": 720
+      },
+      "dpr": 1,
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2823,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "runtimeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1
+      },
+      "selection": null,
+      "hover": null,
+      "labels": {
+        "meshId": "200b9939-237c-469b-a0de-a0124aa80049",
+        "geometryId": "edf855e5-db37-44c3-9491-2d76334e56a0",
+        "textureId": "478b137f-03ab-48c4-b7da-a62a8564c4e7",
+        "worldHash": "fa309a934e23c975c5fac6b8b98ce9a9dfaf7216a383e5f4b76706b995054529",
+        "labelCounts": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "depthTest": true,
+        "labelRaycastHits": 0
+      },
+      "quadraM": {
+        "id": "reference:2026:quadra-m",
+        "name": "Quadra M",
+        "kind": "block",
+        "anchor": [
+          -4.690909090909091,
+          -5.345454572289153
+        ],
+        "angle": 0,
+        "width": 6.379067230224609,
+        "height": 2.04949951171875,
+        "elevation": 0.245,
+        "footprint": [
+          [
+            -7.880442706021396,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -4.320704816429778
+          ],
+          [
+            -7.880442706021396,
+            -4.320704816429778
+          ]
+        ],
+        "projected": {
+          "corners": [
+            {
+              "x": 698.531357572386,
+              "y": 390.59344677528503,
+              "z": 0.9915052964185541,
+              "clientX": 698.531357572386,
+              "clientY": 390.59344677528503
+            },
+            {
+              "x": 547.9239849716803,
+              "y": 348.6764884365095,
+              "z": 0.9919709744747797,
+              "clientX": 547.9239849716803,
+              "clientY": 348.6764884365095
+            },
+            {
+              "x": 572.186072432613,
+              "y": 322.3167556282469,
+              "z": 0.9922638189373375,
+              "clientX": 572.186072432613,
+              "clientY": 322.3167556282469
+            },
+            {
+              "x": 718.5002114383917,
+              "y": 361.24900040345295,
+              "z": 0.9918312996709133,
+              "clientX": 718.5002114383917,
+              "clientY": 361.24900040345295
+            }
+          ],
+          "angleDegrees": -164.44708165107062,
+          "widthCssPx": 156.33173727065932,
+          "heightCssPx": 35.49438910012707
+        }
+      }
+    },
+    {
+      "name": "core-close",
+      "viewport": {
+        "width": 1265,
+        "height": 720,
+        "devicePixelRatio": 1
+      },
+      "physical": {
+        "width": 1265,
+        "height": 720
+      },
+      "dpr": 1,
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2827,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "runtimeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1
+      },
+      "selection": null,
+      "hover": null,
+      "labels": {
+        "meshId": "200b9939-237c-469b-a0de-a0124aa80049",
+        "geometryId": "edf855e5-db37-44c3-9491-2d76334e56a0",
+        "textureId": "478b137f-03ab-48c4-b7da-a62a8564c4e7",
+        "worldHash": "fa309a934e23c975c5fac6b8b98ce9a9dfaf7216a383e5f4b76706b995054529",
+        "labelCounts": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "depthTest": true,
+        "labelRaycastHits": 0
+      },
+      "quadraM": {
+        "id": "reference:2026:quadra-m",
+        "name": "Quadra M",
+        "kind": "block",
+        "anchor": [
+          -4.690909090909091,
+          -5.345454572289153
+        ],
+        "angle": 0,
+        "width": 6.379067230224609,
+        "height": 2.04949951171875,
+        "elevation": 0.245,
+        "footprint": [
+          [
+            -7.880442706021396,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -4.320704816429778
+          ],
+          [
+            -7.880442706021396,
+            -4.320704816429778
+          ]
+        ],
+        "projected": {
+          "corners": [
+            {
+              "x": 516.5024119665026,
+              "y": 287.52643323523546,
+              "z": 0.9924386793105534,
+              "clientX": 516.5024119665026,
+              "clientY": 287.52643323523546
+            },
+            {
+              "x": 806.5857077009404,
+              "y": 362.52828586717675,
+              "z": 0.9915968160134224,
+              "clientX": 806.5857077009404,
+              "clientY": 362.52828586717675
+            },
+            {
+              "x": 771.6736085744332,
+              "y": 424.481490960999,
+              "z": 0.9909014181308654,
+              "clientX": 771.6736085744332,
+              "clientY": 424.481490960999
+            },
+            {
+              "x": 464.15271304917707,
+              "y": 337.4607203965383,
+              "z": 0.991878188573934,
+              "clientX": 464.15271304917707,
+              "clientY": 337.4607203965383
+            }
+          ],
+          "angleDegrees": 14.496521566489847,
+          "widthCssPx": 299.62242299663876,
+          "heightCssPx": 72.34586381433347
+        }
+      }
+    },
+    {
+      "name": "diagonal-road",
+      "viewport": {
+        "width": 1265,
+        "height": 720,
+        "devicePixelRatio": 1
+      },
+      "physical": {
+        "width": 1265,
+        "height": 720
+      },
+      "dpr": 1,
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2831,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "runtimeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1
+      },
+      "selection": null,
+      "hover": null,
+      "labels": {
+        "meshId": "200b9939-237c-469b-a0de-a0124aa80049",
+        "geometryId": "edf855e5-db37-44c3-9491-2d76334e56a0",
+        "textureId": "478b137f-03ab-48c4-b7da-a62a8564c4e7",
+        "worldHash": "fa309a934e23c975c5fac6b8b98ce9a9dfaf7216a383e5f4b76706b995054529",
+        "labelCounts": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "depthTest": true,
+        "labelRaycastHits": 0
+      },
+      "quadraM": {
+        "id": "reference:2026:quadra-m",
+        "name": "Quadra M",
+        "kind": "block",
+        "anchor": [
+          -4.690909090909091,
+          -5.345454572289153
+        ],
+        "angle": 0,
+        "width": 6.379067230224609,
+        "height": 2.04949951171875,
+        "elevation": 0.245,
+        "footprint": [
+          [
+            -7.880442706021396,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -4.320704816429778
+          ],
+          [
+            -7.880442706021396,
+            -4.320704816429778
+          ]
+        ],
+        "projected": {
+          "corners": [
+            {
+              "x": 918.7393239834892,
+              "y": -193.05579842572888,
+              "z": 0.9966916596774158,
+              "clientX": 918.7393239834892,
+              "clientY": -193.05579842572888
+            },
+            {
+              "x": 985.9927228660866,
+              "y": -209.47145786403686,
+              "z": 0.9968390583942452,
+              "clientX": 985.9927228660866,
+              "clientY": -209.47145786403686
+            },
+            {
+              "x": 1011.9968541114953,
+              "y": -202.61256301348632,
+              "z": 0.9967774713283318,
+              "clientX": 1011.9968541114953,
+              "clientY": -202.61256301348632
+            },
+            {
+              "x": 944.6170751537135,
+              "y": -185.57123793704483,
+              "z": 0.9966244546640437,
+              "clientX": 944.6170751537135,
+              "clientY": -185.57123793704483
+            }
+          ],
+          "angleDegrees": -13.7169245694993,
+          "widthCssPx": 69.2278378692869,
+          "heightCssPx": 26.93838620513145
+        }
+      }
+    },
+    {
+      "name": "unfiltered-core",
+      "viewport": {
+        "width": 1265,
+        "height": 720,
+        "devicePixelRatio": 1
+      },
+      "physical": {
+        "width": 1265,
+        "height": 720
+      },
+      "dpr": 1,
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2834,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "runtimeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1
+      },
+      "selection": null,
+      "hover": null,
+      "labels": {
+        "meshId": "200b9939-237c-469b-a0de-a0124aa80049",
+        "geometryId": "edf855e5-db37-44c3-9491-2d76334e56a0",
+        "textureId": "478b137f-03ab-48c4-b7da-a62a8564c4e7",
+        "worldHash": "fa309a934e23c975c5fac6b8b98ce9a9dfaf7216a383e5f4b76706b995054529",
+        "labelCounts": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "depthTest": true,
+        "labelRaycastHits": 0
+      },
+      "quadraM": {
+        "id": "reference:2026:quadra-m",
+        "name": "Quadra M",
+        "kind": "block",
+        "anchor": [
+          -4.690909090909091,
+          -5.345454572289153
+        ],
+        "angle": 0,
+        "width": 6.379067230224609,
+        "height": 2.04949951171875,
+        "elevation": 0.245,
+        "footprint": [
+          [
+            -7.880442706021396,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -4.320704816429778
+          ],
+          [
+            -7.880442706021396,
+            -4.320704816429778
+          ]
+        ],
+        "projected": {
+          "corners": [
+            {
+              "x": 572.1860724326127,
+              "y": 322.31675562824694,
+              "z": 0.9922638189373375,
+              "clientX": 572.1860724326127,
+              "clientY": 322.31675562824694
+            },
+            {
+              "x": 718.5002114383916,
+              "y": 361.24900040345307,
+              "z": 0.9918312996709133,
+              "clientX": 718.5002114383916,
+              "clientY": 361.24900040345307
+            },
+            {
+              "x": 698.5313575723859,
+              "y": 390.5934467752851,
+              "z": 0.9915052964185541,
+              "clientX": 698.5313575723859,
+              "clientY": 390.5934467752851
+            },
+            {
+              "x": 547.9239849716802,
+              "y": 348.6764884365095,
+              "z": 0.9919709744747796,
+              "clientX": 547.9239849716802,
+              "clientY": 348.6764884365095
+            }
+          ],
+          "angleDegrees": 14.900388577750821,
+          "widthCssPx": 151.40524084799358,
+          "heightCssPx": 35.825750539031745
+        }
+      }
+    },
+    {
+      "name": "normal-lot-selection",
+      "viewport": {
+        "width": 1265,
+        "height": 720,
+        "devicePixelRatio": 1
+      },
+      "physical": {
+        "width": 1265,
+        "height": 720
+      },
+      "dpr": 1,
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2855,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "runtimeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1
+      },
+      "selection": "reference:2026:q-m-09",
+      "hover": null,
+      "labels": {
+        "meshId": "200b9939-237c-469b-a0de-a0124aa80049",
+        "geometryId": "edf855e5-db37-44c3-9491-2d76334e56a0",
+        "textureId": "478b137f-03ab-48c4-b7da-a62a8564c4e7",
+        "worldHash": "fa309a934e23c975c5fac6b8b98ce9a9dfaf7216a383e5f4b76706b995054529",
+        "labelCounts": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "depthTest": true,
+        "labelRaycastHits": 0
+      },
+      "quadraM": {
+        "id": "reference:2026:quadra-m",
+        "name": "Quadra M",
+        "kind": "block",
+        "anchor": [
+          -4.690909090909091,
+          -5.345454572289153
+        ],
+        "angle": 0,
+        "width": 6.379067230224609,
+        "height": 2.04949951171875,
+        "elevation": 0.245,
+        "footprint": [
+          [
+            -7.880442706021396,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -4.320704816429778
+          ],
+          [
+            -7.880442706021396,
+            -4.320704816429778
+          ]
+        ],
+        "projected": {
+          "corners": [
+            {
+              "x": 365.7574381874184,
+              "y": 236.06698089713532,
+              "z": 0.993053621528123,
+              "clientX": 365.7574381874184,
+              "clientY": 236.06698089713532
+            },
+            {
+              "x": 692.9453818780888,
+              "y": 319.0287930883045,
+              "z": 0.9921311011786212,
+              "clientX": 692.9453818780888,
+              "clientY": 319.0287930883045
+            },
+            {
+              "x": 639.2653083458562,
+              "y": 390.014115693838,
+              "z": 0.9913417572275914,
+              "clientX": 639.2653083458562,
+              "clientY": 390.014115693838
+            },
+            {
+              "x": 290.50527956453476,
+              "y": 290.946402516854,
+              "z": 0.99244337228361,
+              "clientX": 290.50527956453476,
+              "clientY": 290.946402516854
+            }
+          ],
+          "angleDegrees": 14.228062762732169,
+          "widthCssPx": 337.54201631585386,
+          "heightCssPx": 93.13773829505679
+        }
+      }
+    },
+    {
+      "name": "filtered-internal",
+      "viewport": {
+        "width": 1265,
+        "height": 720,
+        "devicePixelRatio": 1
+      },
+      "physical": {
+        "width": 1265,
+        "height": 720
+      },
+      "dpr": 1,
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2860,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "runtimeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1
+      },
+      "selection": null,
+      "hover": "reference:2026:q-m-07",
+      "labels": {
+        "meshId": "200b9939-237c-469b-a0de-a0124aa80049",
+        "geometryId": "edf855e5-db37-44c3-9491-2d76334e56a0",
+        "textureId": "478b137f-03ab-48c4-b7da-a62a8564c4e7",
+        "worldHash": "fa309a934e23c975c5fac6b8b98ce9a9dfaf7216a383e5f4b76706b995054529",
+        "labelCounts": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "depthTest": true,
+        "labelRaycastHits": 0
+      },
+      "quadraM": {
+        "id": "reference:2026:quadra-m",
+        "name": "Quadra M",
+        "kind": "block",
+        "anchor": [
+          -4.690909090909091,
+          -5.345454572289153
+        ],
+        "angle": 0,
+        "width": 6.379067230224609,
+        "height": 2.04949951171875,
+        "elevation": 0.245,
+        "footprint": [
+          [
+            -7.880442706021396,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -4.320704816429778
+          ],
+          [
+            -7.880442706021396,
+            -4.320704816429778
+          ]
+        ],
+        "projected": {
+          "corners": [
+            {
+              "x": 580.7419087464023,
+              "y": 336.296917573155,
+              "z": 0.9921548886313404,
+              "clientX": 580.7419087464023,
+              "clientY": 336.296917573155
+            },
+            {
+              "x": 711.4303514557567,
+              "y": 371.6346454335029,
+              "z": 0.9917627830862791,
+              "clientX": 711.4303514557567,
+              "clientY": 371.6346454335029
+            },
+            {
+              "x": 693.4830049451241,
+              "y": 398.00834186972287,
+              "z": 0.9914701419561738,
+              "clientX": 693.4830049451241,
+              "clientY": 398.00834186972287
+            },
+            {
+              "x": 559.3792096021234,
+              "y": 360.26643110884277,
+              "z": 0.9918889241865717,
+              "clientX": 559.3792096021234,
+              "clientY": 360.26643110884277
+            }
+          ],
+          "angleDegrees": 15.130759591679963,
+          "widthCssPx": 135.38177155041308,
+          "heightCssPx": 32.107670327610066
+        }
+      }
+    },
+    {
+      "name": "public-fixture-scope",
+      "viewport": {
+        "width": 1265,
+        "height": 720,
+        "devicePixelRatio": 1
+      },
+      "physical": {
+        "width": 1265,
+        "height": 720
+      },
+      "dpr": 1,
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 2869,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "runtimeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1
+      },
+      "selection": null,
+      "hover": null,
+      "labels": {
+        "meshId": "10d6c3b8-4960-4f41-ad52-6e8068fa9618",
+        "geometryId": "311bbe36-dd51-41e5-8fa3-4be7237eac10",
+        "textureId": "aba30542-702d-4c23-9502-5ed3bf768978",
+        "worldHash": "20b6aaff19486e555c697c20466e90271852da1045a901c0648efbda818201f9",
+        "labelCounts": {
+          "road": 27
+        },
+        "depthTest": true,
+        "labelRaycastHits": 0
+      }
+    },
+    {
+      "name": "viewport-emulation-390x844",
+      "viewport": {
+        "width": 375,
+        "height": 844,
+        "devicePixelRatio": 1
+      },
+      "physical": {
+        "width": 375,
+        "height": 844
+      },
+      "dpr": 1,
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "runtimeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1
+      },
+      "selection": null,
+      "hover": null,
+      "labels": {
+        "meshId": "85f73361-5c04-434e-a838-0f2e66e67a0e",
+        "geometryId": "aedcf3c8-1f10-4110-915a-3e0f95219f0e",
+        "textureId": "7ae3a218-c9eb-4550-a72a-bbfc823379d1",
+        "worldHash": "fa309a934e23c975c5fac6b8b98ce9a9dfaf7216a383e5f4b76706b995054529",
+        "labelCounts": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "depthTest": true,
+        "labelRaycastHits": 0
+      },
+      "quadraM": {
+        "id": "reference:2026:quadra-m",
+        "name": "Quadra M",
+        "kind": "block",
+        "anchor": [
+          -4.690909090909091,
+          -5.345454572289153
+        ],
+        "angle": 0,
+        "width": 6.379067230224609,
+        "height": 2.04949951171875,
+        "elevation": 0.245,
+        "footprint": [
+          [
+            -7.880442706021396,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -4.320704816429778
+          ],
+          [
+            -7.880442706021396,
+            -4.320704816429778
+          ]
+        ],
+        "projected": {
+          "corners": [
+            {
+              "x": 116.79867379600721,
+              "y": 377.8268635420006,
+              "z": 0.9921395647725361,
+              "clientX": 116.79867379600721,
+              "clientY": 377.8268635420006
+            },
+            {
+              "x": 288.31135896389236,
+              "y": 423.4641060284922,
+              "z": 0.9917070724816158,
+              "clientX": 288.31135896389236,
+              "clientY": 423.4641060284922
+            },
+            {
+              "x": 264.90342470985235,
+              "y": 457.86231816436197,
+              "z": 0.9913810895615345,
+              "clientX": 264.90342470985235,
+              "clientY": 457.86231816436197
+            },
+            {
+              "x": 88.35811571680281,
+              "y": 408.72632811168614,
+              "z": 0.9918467385741979,
+              "clientX": 88.35811571680281,
+              "clientY": 408.72632811168614
+            }
+          ],
+          "angleDegrees": 14.900388577750828,
+          "widthCssPx": 177.48058788292573,
+          "heightCssPx": 41.99574090964287
+        }
+      }
+    },
+    {
+      "name": "after-motion",
+      "viewport": {
+        "width": 1265,
+        "height": 720,
+        "devicePixelRatio": 1
+      },
+      "physical": {
+        "width": 1265,
+        "height": 720
+      },
+      "dpr": 1,
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 98,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "runtimeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1
+      },
+      "selection": null,
+      "hover": null,
+      "labels": {
+        "meshId": "85f73361-5c04-434e-a838-0f2e66e67a0e",
+        "geometryId": "aedcf3c8-1f10-4110-915a-3e0f95219f0e",
+        "textureId": "7ae3a218-c9eb-4550-a72a-bbfc823379d1",
+        "worldHash": "fa309a934e23c975c5fac6b8b98ce9a9dfaf7216a383e5f4b76706b995054529",
+        "labelCounts": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "depthTest": true,
+        "labelRaycastHits": 0
+      },
+      "quadraM": {
+        "id": "reference:2026:quadra-m",
+        "name": "Quadra M",
+        "kind": "block",
+        "anchor": [
+          -4.690909090909091,
+          -5.345454572289153
+        ],
+        "angle": 0,
+        "width": 6.379067230224609,
+        "height": 2.04949951171875,
+        "elevation": 0.245,
+        "footprint": [
+          [
+            -7.880442706021396,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -4.320704816429778
+          ],
+          [
+            -7.880442706021396,
+            -4.320704816429778
+          ]
+        ],
+        "projected": {
+          "corners": [
+            {
+              "x": 674.225053824872,
+              "y": 402.30145584644976,
+              "z": 0.9913752245160394,
+              "clientX": 674.225053824872,
+              "clientY": 402.30145584644976
+            },
+            {
+              "x": 558.3069566472022,
+              "y": 332.674827073557,
+              "z": 0.9921487461678566,
+              "clientX": 558.3069566472022,
+              "clientY": 332.674827073557
+            },
+            {
+              "x": 595.4406408784665,
+              "y": 312.8183355393848,
+              "z": 0.9923693431779589,
+              "clientX": 595.4406408784665,
+              "clientY": 312.8183355393848
+            },
+            {
+              "x": 711.3507484151543,
+              "y": 378.5415809424345,
+              "z": 0.9916391864226638,
+              "clientX": 711.3507484151543,
+              "clientY": 378.5415809424345
+            }
+          ],
+          "angleDegrees": -149.00871340624542,
+          "widthCssPx": 135.22156886965152,
+          "heightCssPx": 44.07775917926598
+        }
+      }
+    },
+    {
+      "name": "optional-context-recovery",
+      "viewport": {
+        "width": 1265,
+        "height": 720,
+        "devicePixelRatio": 1
+      },
+      "physical": {
+        "width": 1265,
+        "height": 720
+      },
+      "dpr": 1,
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 105,
+        "contextLosses": 1,
+        "lastErrorCode": null
+      },
+      "runtimeIdentity": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1
+      },
+      "selection": null,
+      "hover": null,
+      "labels": {
+        "meshId": "85f73361-5c04-434e-a838-0f2e66e67a0e",
+        "geometryId": "aedcf3c8-1f10-4110-915a-3e0f95219f0e",
+        "textureId": "7ae3a218-c9eb-4550-a72a-bbfc823379d1",
+        "worldHash": "fa309a934e23c975c5fac6b8b98ce9a9dfaf7216a383e5f4b76706b995054529",
+        "labelCounts": {
+          "block": 14,
+          "segment": 3,
+          "road": 27
+        },
+        "depthTest": true,
+        "labelRaycastHits": 0
+      },
+      "quadraM": {
+        "id": "reference:2026:quadra-m",
+        "name": "Quadra M",
+        "kind": "block",
+        "anchor": [
+          -4.690909090909091,
+          -5.345454572289153
+        ],
+        "angle": 0,
+        "width": 6.379067230224609,
+        "height": 2.04949951171875,
+        "elevation": 0.245,
+        "footprint": [
+          [
+            -7.880442706021396,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -6.370204328148528
+          ],
+          [
+            -1.5013754757967868,
+            -4.320704816429778
+          ],
+          [
+            -7.880442706021396,
+            -4.320704816429778
+          ]
+        ],
+        "projected": {
+          "corners": [
+            {
+              "x": 674.2255124642188,
+              "y": 402.3013552885367,
+              "z": 0.9913752264231679,
+              "clientX": 674.2255124642188,
+              "clientY": 402.3013552885367
+            },
+            {
+              "x": 558.3067113667153,
+              "y": 332.6750486941267,
+              "z": 0.9921487433351042,
+              "clientX": 558.3067113667153,
+              "clientY": 332.6750486941267
+            },
+            {
+              "x": 595.4402182719812,
+              "y": 312.818412430829,
+              "z": 0.9923693416220895,
+              "clientX": 595.4402182719812,
+              "clientY": 312.818412430829
+            },
+            {
+              "x": 711.3509528895445,
+              "y": 378.5413339191439,
+              "z": 0.9916391895608975,
+              "clientX": 711.3509528895445,
+              "clientY": 378.5413339191439
+            }
+          ],
+          "angleDegrees": -149.00898400841035,
+          "widthCssPx": 135.2220064111658,
+          "heightCssPx": 44.07762405403005
+        }
+      }
+    }
+  ]
+}

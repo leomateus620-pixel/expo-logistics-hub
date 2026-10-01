@@ -1,0 +1,3150 @@
+{
+  "phase": "compare",
+  "policy": "MEDIUM",
+  "renderTimingRequested": true,
+  "requestedViewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "postDisableRequested": [],
+  "receiveShadowsRequested": "authored",
+  "labelTimingRequested": false,
+  "drawTimingRequested": false,
+  "generatedAt": "2026-10-01T17:56:25.473Z",
+  "browser": "154.0.8037.58",
+  "endpoints": {
+    "baseline": "http://127.0.0.1:4241",
+    "candidate": "http://127.0.0.1:4242"
+  },
+  "baselineRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+  "candidateRevision": "e5b3300ae7438508331a8eb65a3717adb6cf370b",
+  "evidence": "Visible headful Chrome, local production fixture. Viewport/DPR emulation does not certify physical devices. Renderer counts are not GPU time or byte memory estimates.",
+  "cache": "fresh context per trial; shared browser/driver cache; identical hydration wait plus 6s and unmeasured scenario warmup; no throttling",
+  "concurrency": {
+    "maxLoadedContexts": 1,
+    "rationale": "One full map resident at a time to avoid artificial RAM/GPU pressure on this host."
+  },
+  "budget": {
+    "targetMs": 33.3,
+    "p95ToleranceMs": 50,
+    "stallThresholdMsExclusive": 50,
+    "reason": "Local ANGLE adapter; 30 FPS reference for a limited device scenario; target is not a hardware certification."
+  },
+  "trajectories": {
+    "poses": {
+      "overview": {
+        "point": [
+          3000,
+          2850
+        ],
+        "offset": [
+          115,
+          120,
+          135
+        ]
+      },
+      "close": {
+        "point": [
+          2580,
+          3800
+        ],
+        "offset": [
+          -11,
+          12,
+          5
+        ]
+      }
+    },
+    "continuous": "5s temporal pointer path, +160px horizontal, ±24px vertical; endpoint remains nonzero at low cadence",
+    "short": "three 350ms drags +28px/±5px with actual damping settlement",
+    "zoomPan": "900ms with up to nine temporal wheel steps 0..8 (actual steps/deltas recorded), then 1.7s pan +45px/±20px"
+  },
+  "runs": [
+    {
+      "name": "baseline-MEDIUM-dpr1-overview-continuous-1",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "continuous",
+      "repeat": 1,
+      "trial": "baseline-MEDIUM-dpr1-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 120489.20000004768,
+          "end": 127832.40000009537
+        }
+      ],
+      "frames": {
+        "samples": 210,
+        "medianMs": 33.7,
+        "p95Ms": 45.6,
+        "stallsOver50Ms": 5,
+        "maxMs": 73.5
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [
+        {
+          "id": "a87ef6f3-a3ef-4fec-9a81-52bdd54cad82",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "17a7f286-44a9-4f0f-a1cc-461c5c475173",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "LuminancePass.Target"
+        },
+        {
+          "id": "cded5852-cde2-41a1-998d-922cca918631",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Downsampling.Mipmap0"
+        },
+        {
+          "id": "674e1a1b-362f-4581-abd8-79357a8a4233",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Downsampling.Mipmap1"
+        },
+        {
+          "id": "e614f8f4-bf4d-4943-9cf1-57d37956c0ef",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Downsampling.Mipmap2"
+        },
+        {
+          "id": "532b0264-7de8-464b-8ecd-7d95ad402b07",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Downsampling.Mipmap3"
+        },
+        {
+          "id": "e262954b-affb-47f6-ae98-d91a70945cfc",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Downsampling.Mipmap4"
+        },
+        {
+          "id": "8e875f08-fe71-4df8-9def-f72681eac32c",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Downsampling.Mipmap5"
+        },
+        {
+          "id": "ab951db3-e35c-40ee-8b49-ad42577663c7",
+          "width": 10,
+          "height": 6,
+          "samples": 0,
+          "name": "Downsampling.Mipmap6"
+        },
+        {
+          "id": "63cdf9ac-70de-4495-8756-f3f26a696514",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Upsampling.Mipmap5"
+        },
+        {
+          "id": "41b6cc39-d705-4e3d-b0fd-0168a167b04e",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Upsampling.Mipmap4"
+        },
+        {
+          "id": "d5bfa47e-e96c-4681-9767-f91c97a7a32c",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Upsampling.Mipmap3"
+        },
+        {
+          "id": "844818d0-017f-40f7-815f-ffe576fbab71",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Upsampling.Mipmap2"
+        },
+        {
+          "id": "15a1ce84-4a3b-4d14-b9b4-6d1a35cb6e9f",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Upsampling.Mipmap1"
+        },
+        {
+          "id": "4268da41-0063-4e74-b0f7-aa1195ec281d",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Upsampling.Mipmap0"
+        },
+        {
+          "id": "c1072aae-f29d-448c-8ca8-1ffda2acdf6a",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "20df92f8-a5e2-475e-a24f-35d75350134a",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Edges"
+        },
+        {
+          "id": "f2cff7b3-2886-47e4-825c-a9463c33304f",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Weights"
+        }
+      ],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 124718.70000004768,
+          "duration": 50,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 125099.30000019073,
+          "duration": 54,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 125605.60000014305,
+          "duration": 51,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 126700,
+          "duration": 68,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 127930.40000009537,
+          "duration": 57,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 4,
+        "droppedGpuQueries": 1,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 234,
+          "averageMs": 29.539,
+          "p95Ms": 40.4,
+          "p99Ms": 49.8
+        },
+        "gpu": {
+          "samples": 229,
+          "averageMs": 33.53,
+          "p95Ms": 36.681,
+          "p99Ms": 44.72
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 234,
+              "averageMs": 29.539,
+              "p95Ms": 40.4,
+              "p99Ms": 49.8
+            },
+            "gpu": {
+              "samples": 229,
+              "averageMs": 33.53,
+              "p95Ms": 36.681,
+              "p99Ms": 44.72
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "effectBudget": null,
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 814,
+        "triangles": 656670,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 241
+      },
+      "resourcesAfter": {
+        "calls": 816,
+        "triangles": 685712,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 241
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -120.61586165610454,
+        119.9999797850014,
+        133.96814736814787
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 3449,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "baseline-MEDIUM-dpr1-overview-short-1",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "short",
+      "repeat": 1,
+      "trial": "baseline-MEDIUM-dpr1-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 145556.80000019073,
+          "end": 148333
+        },
+        {
+          "start": 149240,
+          "end": 151920.60000014305
+        },
+        {
+          "start": 152843.80000019073,
+          "end": 155672.10000014305
+        }
+      ],
+      "frames": {
+        "samples": 237,
+        "medianMs": 33.3,
+        "p95Ms": 41,
+        "stallsOver50Ms": 4,
+        "maxMs": 125.7
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [
+        {
+          "id": "a87ef6f3-a3ef-4fec-9a81-52bdd54cad82",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "17a7f286-44a9-4f0f-a1cc-461c5c475173",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "LuminancePass.Target"
+        },
+        {
+          "id": "cded5852-cde2-41a1-998d-922cca918631",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Downsampling.Mipmap0"
+        },
+        {
+          "id": "674e1a1b-362f-4581-abd8-79357a8a4233",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Downsampling.Mipmap1"
+        },
+        {
+          "id": "e614f8f4-bf4d-4943-9cf1-57d37956c0ef",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Downsampling.Mipmap2"
+        },
+        {
+          "id": "532b0264-7de8-464b-8ecd-7d95ad402b07",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Downsampling.Mipmap3"
+        },
+        {
+          "id": "e262954b-affb-47f6-ae98-d91a70945cfc",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Downsampling.Mipmap4"
+        },
+        {
+          "id": "8e875f08-fe71-4df8-9def-f72681eac32c",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Downsampling.Mipmap5"
+        },
+        {
+          "id": "ab951db3-e35c-40ee-8b49-ad42577663c7",
+          "width": 10,
+          "height": 6,
+          "samples": 0,
+          "name": "Downsampling.Mipmap6"
+        },
+        {
+          "id": "63cdf9ac-70de-4495-8756-f3f26a696514",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Upsampling.Mipmap5"
+        },
+        {
+          "id": "41b6cc39-d705-4e3d-b0fd-0168a167b04e",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Upsampling.Mipmap4"
+        },
+        {
+          "id": "d5bfa47e-e96c-4681-9767-f91c97a7a32c",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Upsampling.Mipmap3"
+        },
+        {
+          "id": "844818d0-017f-40f7-815f-ffe576fbab71",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Upsampling.Mipmap2"
+        },
+        {
+          "id": "15a1ce84-4a3b-4d14-b9b4-6d1a35cb6e9f",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Upsampling.Mipmap1"
+        },
+        {
+          "id": "4268da41-0063-4e74-b0f7-aa1195ec281d",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Upsampling.Mipmap0"
+        },
+        {
+          "id": "c1072aae-f29d-448c-8ca8-1ffda2acdf6a",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "20df92f8-a5e2-475e-a24f-35d75350134a",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Edges"
+        },
+        {
+          "id": "f2cff7b3-2886-47e4-825c-a9463c33304f",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Weights"
+        }
+      ],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 146337.40000009537,
+          "duration": 125,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 154534.80000019073,
+          "duration": 106,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 155194,
+          "duration": 106,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 6,
+        "droppedGpuQueries": 0,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 240,
+          "averageMs": 29.867,
+          "p95Ms": 36.1,
+          "p99Ms": 43
+        },
+        "gpu": {
+          "samples": 234,
+          "averageMs": 32.568,
+          "p95Ms": 36.229,
+          "p99Ms": 41.435
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 240,
+              "averageMs": 29.867,
+              "p95Ms": 36.1,
+              "p99Ms": 43
+            },
+            "gpu": {
+              "samples": 234,
+              "averageMs": 32.568,
+              "p95Ms": 36.229,
+              "p99Ms": 41.435
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "effectBudget": null,
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 814,
+        "triangles": 656670,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 241
+      },
+      "resourcesAfter": {
+        "calls": 814,
+        "triangles": 654750,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 241
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -12.507310557222972,
+        119.99999401185315,
+        174.54730330774441
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 4255,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "baseline-MEDIUM-dpr1-overview-zoom-pan-1",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "zoom-pan",
+      "repeat": 1,
+      "trial": "baseline-MEDIUM-dpr1-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 168118.40000009537,
+          "end": 168186.20000004768
+        },
+        {
+          "start": 168256.20000004768,
+          "end": 168340.70000004768
+        },
+        {
+          "start": 168369.90000009537,
+          "end": 168459.10000014305
+        },
+        {
+          "start": 168498.5,
+          "end": 168633
+        },
+        {
+          "start": 168687,
+          "end": 168765.40000009537
+        },
+        {
+          "start": 168799,
+          "end": 168874.70000004768
+        },
+        {
+          "start": 168907.30000019073,
+          "end": 168989.60000014305
+        },
+        {
+          "start": 169957.30000019073,
+          "end": 173816.60000014305
+        }
+      ],
+      "frames": {
+        "samples": 118,
+        "medianMs": 36.4,
+        "p95Ms": 47.4,
+        "stallsOver50Ms": 3,
+        "maxMs": 68.2
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [
+        {
+          "id": "a87ef6f3-a3ef-4fec-9a81-52bdd54cad82",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "17a7f286-44a9-4f0f-a1cc-461c5c475173",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "LuminancePass.Target"
+        },
+        {
+          "id": "cded5852-cde2-41a1-998d-922cca918631",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Downsampling.Mipmap0"
+        },
+        {
+          "id": "674e1a1b-362f-4581-abd8-79357a8a4233",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Downsampling.Mipmap1"
+        },
+        {
+          "id": "e614f8f4-bf4d-4943-9cf1-57d37956c0ef",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Downsampling.Mipmap2"
+        },
+        {
+          "id": "532b0264-7de8-464b-8ecd-7d95ad402b07",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Downsampling.Mipmap3"
+        },
+        {
+          "id": "e262954b-affb-47f6-ae98-d91a70945cfc",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Downsampling.Mipmap4"
+        },
+        {
+          "id": "8e875f08-fe71-4df8-9def-f72681eac32c",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Downsampling.Mipmap5"
+        },
+        {
+          "id": "ab951db3-e35c-40ee-8b49-ad42577663c7",
+          "width": 10,
+          "height": 6,
+          "samples": 0,
+          "name": "Downsampling.Mipmap6"
+        },
+        {
+          "id": "63cdf9ac-70de-4495-8756-f3f26a696514",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Upsampling.Mipmap5"
+        },
+        {
+          "id": "41b6cc39-d705-4e3d-b0fd-0168a167b04e",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Upsampling.Mipmap4"
+        },
+        {
+          "id": "d5bfa47e-e96c-4681-9767-f91c97a7a32c",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Upsampling.Mipmap3"
+        },
+        {
+          "id": "844818d0-017f-40f7-815f-ffe576fbab71",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Upsampling.Mipmap2"
+        },
+        {
+          "id": "15a1ce84-4a3b-4d14-b9b4-6d1a35cb6e9f",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Upsampling.Mipmap1"
+        },
+        {
+          "id": "4268da41-0063-4e74-b0f7-aa1195ec281d",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Upsampling.Mipmap0"
+        },
+        {
+          "id": "c1072aae-f29d-448c-8ca8-1ffda2acdf6a",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "20df92f8-a5e2-475e-a24f-35d75350134a",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Edges"
+        },
+        {
+          "id": "f2cff7b3-2886-47e4-825c-a9463c33304f",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Weights"
+        }
+      ],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 171759.30000019073,
+          "duration": 66,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 3,
+        "droppedGpuQueries": 0,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 162,
+          "averageMs": 32.606,
+          "p95Ms": 40.5,
+          "p99Ms": 45.8
+        },
+        "gpu": {
+          "samples": 159,
+          "averageMs": 35.063,
+          "p95Ms": 39.488,
+          "p99Ms": 41.398
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 162,
+              "averageMs": 32.606,
+              "p95Ms": 40.5,
+              "p99Ms": 45.8
+            },
+            "gpu": {
+              "samples": 159,
+              "averageMs": 35.063,
+              "p95Ms": 39.488,
+              "p99Ms": 41.398
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "effectBudget": null,
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 815,
+        "triangles": 656558,
+        "geometries": 580,
+        "textures": 136,
+        "programs": 241
+      },
+      "resourcesAfter": {
+        "calls": 815,
+        "triangles": 648354,
+        "geometries": 580,
+        "textures": 136,
+        "programs": 241
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        112.6920525008788,
+        135.2967341688509,
+        155.33381495113656
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -16.967317744269977,
+        0,
+        3.12498901117924
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 4765,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "candidate-MEDIUM-dpr1-overview-continuous-1",
+      "label": "candidate",
+      "view": "overview",
+      "scenario": "continuous",
+      "repeat": 1,
+      "trial": "candidate-MEDIUM-dpr1-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 141760.20000004768,
+          "end": 149576.10000014305
+        }
+      ],
+      "frames": {
+        "samples": 179,
+        "medianMs": 37.2,
+        "p95Ms": 96.7,
+        "stallsOver50Ms": 35,
+        "maxMs": 153.2
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 142301.70000004768,
+          "duration": 68,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 142370.10000014305,
+          "duration": 51,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 142639.79999995232,
+          "duration": 55,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 143579.40000009537,
+          "duration": 67,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 143865.90000009537,
+          "duration": 131,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 143997.40000009537,
+          "duration": 119,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 144118.20000004768,
+          "duration": 55,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 144176.40000009537,
+          "duration": 75,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 144531.10000014305,
+          "duration": 52,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 144583.29999995232,
+          "duration": 58,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 144643.29999995232,
+          "duration": 67,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 144785.29999995232,
+          "duration": 67,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145107.5,
+          "duration": 54,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145339,
+          "duration": 55,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145394.70000004768,
+          "duration": 84,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145572.60000014305,
+          "duration": 73,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145646.60000014305,
+          "duration": 152,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145799.90000009537,
+          "duration": 99,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145912.10000014305,
+          "duration": 76,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145988.90000009537,
+          "duration": 115,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 146107.90000009537,
+          "duration": 94,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 146205.90000009537,
+          "duration": 82,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 146288.79999995232,
+          "duration": 87,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 146413,
+          "duration": 52,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 146465.79999995232,
+          "duration": 73,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 146689.20000004768,
+          "duration": 79,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 146768.40000009537,
+          "duration": 95,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 147153.90000009537,
+          "duration": 69,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 148597.90000009537,
+          "duration": 98,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 148698.20000004768,
+          "duration": 82,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 148784.5,
+          "duration": 104,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 148889.60000014305,
+          "duration": 74,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 4,
+        "droppedGpuQueries": 5,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 191,
+          "averageMs": 38.649,
+          "p95Ms": 81.1,
+          "p99Ms": 129
+        },
+        "gpu": {
+          "samples": 182,
+          "averageMs": 40.306,
+          "p95Ms": 66.919,
+          "p99Ms": 102.569
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 191,
+              "averageMs": 38.649,
+              "p95Ms": 81.1,
+              "p99Ms": 129
+            },
+            "gpu": {
+              "samples": 182,
+              "averageMs": 40.306,
+              "p95Ms": 66.919,
+              "p99Ms": 102.569
+            }
+          }
+        }
+      },
+      "effectBudget": {
+        "effectTier": "MEDIUM",
+        "requestedPath": "direct",
+        "appliedPath": "direct",
+        "antialiasing": "MSAA",
+        "directBudgetAvailable": true,
+        "toneMapping": "ACES_FILMIC",
+        "bloomEnabled": false,
+        "sharpenStrength": 0,
+        "composerResident": true
+      },
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 796,
+        "triangles": 656739,
+        "geometries": 579,
+        "textures": 110,
+        "programs": 234
+      },
+      "resourcesAfter": {
+        "calls": 798,
+        "triangles": 685781,
+        "geometries": 579,
+        "textures": 110,
+        "programs": 234
+      },
+      "pathValues": [
+        "direct"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -120.61586159843843,
+        119.9999816643485,
+        133.96814576599812
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 3351,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "candidate-MEDIUM-dpr1-overview-short-1",
+      "label": "candidate",
+      "view": "overview",
+      "scenario": "short",
+      "repeat": 1,
+      "trial": "candidate-MEDIUM-dpr1-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 167557.5,
+          "end": 170205.60000014305
+        },
+        {
+          "start": 171071.10000014305,
+          "end": 173901.90000009537
+        },
+        {
+          "start": 175102.29999995232,
+          "end": 177932
+        }
+      ],
+      "frames": {
+        "samples": 239,
+        "medianMs": 33.1,
+        "p95Ms": 47.4,
+        "stallsOver50Ms": 6,
+        "maxMs": 53.5
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 168335.60000014305,
+          "duration": 53,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 172500,
+          "duration": 50,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 172770,
+          "duration": 52,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 174500,
+          "duration": 55,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 175305.90000009537,
+          "duration": 53,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 4,
+        "droppedGpuQueries": 4,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 240,
+          "averageMs": 32.242,
+          "p95Ms": 43.3,
+          "p99Ms": 49.3
+        },
+        "gpu": {
+          "samples": 232,
+          "averageMs": 33.372,
+          "p95Ms": 37.76,
+          "p99Ms": 45.519
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 240,
+              "averageMs": 32.242,
+              "p95Ms": 43.3,
+              "p99Ms": 49.3
+            },
+            "gpu": {
+              "samples": 232,
+              "averageMs": 33.372,
+              "p95Ms": 37.76,
+              "p99Ms": 45.519
+            }
+          }
+        }
+      },
+      "effectBudget": {
+        "effectTier": "MEDIUM",
+        "requestedPath": "direct",
+        "appliedPath": "direct",
+        "antialiasing": "MSAA",
+        "directBudgetAvailable": true,
+        "toneMapping": "ACES_FILMIC",
+        "bloomEnabled": false,
+        "sharpenStrength": 0,
+        "composerResident": true
+      },
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 796,
+        "triangles": 656739,
+        "geometries": 579,
+        "textures": 110,
+        "programs": 234
+      },
+      "resourcesAfter": {
+        "calls": 796,
+        "triangles": 654819,
+        "geometries": 579,
+        "textures": 110,
+        "programs": 234
+      },
+      "pathValues": [
+        "direct"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -12.507319309891296,
+        119.99999795052108,
+        174.54730040110138
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4178,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "candidate-MEDIUM-dpr1-overview-zoom-pan-1",
+      "label": "candidate",
+      "view": "overview",
+      "scenario": "zoom-pan",
+      "repeat": 1,
+      "trial": "candidate-MEDIUM-dpr1-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 190418.60000014305,
+          "end": 190492.20000004768
+        },
+        {
+          "start": 190525.40000009537,
+          "end": 190595.20000004768
+        },
+        {
+          "start": 190629.40000009537,
+          "end": 190700.5
+        },
+        {
+          "start": 190770.5,
+          "end": 190933.70000004768
+        },
+        {
+          "start": 190972.40000009537,
+          "end": 191060.29999995232
+        },
+        {
+          "start": 191103.90000009537,
+          "end": 191186.40000009537
+        },
+        {
+          "start": 191219.70000004768,
+          "end": 191286.70000004768
+        },
+        {
+          "start": 191320.79999995232,
+          "end": 191387
+        },
+        {
+          "start": 192294.70000004768,
+          "end": 195809
+        }
+      ],
+      "frames": {
+        "samples": 121,
+        "medianMs": 33.9,
+        "p95Ms": 42.4,
+        "stallsOver50Ms": 1,
+        "maxMs": 50.3
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 195959.79999995232,
+          "duration": 50,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 196060.60000014305,
+          "duration": 55,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 196117.29999995232,
+          "duration": 53,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 196171.79999995232,
+          "duration": 72,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 2,
+        "droppedGpuQueries": 4,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 172,
+          "averageMs": 32.687,
+          "p95Ms": 43,
+          "p99Ms": 53.3
+        },
+        "gpu": {
+          "samples": 166,
+          "averageMs": 33.557,
+          "p95Ms": 36.465,
+          "p99Ms": 39.242
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 172,
+              "averageMs": 32.687,
+              "p95Ms": 43,
+              "p99Ms": 53.3
+            },
+            "gpu": {
+              "samples": 166,
+              "averageMs": 33.557,
+              "p95Ms": 36.465,
+              "p99Ms": 39.242
+            }
+          }
+        }
+      },
+      "effectBudget": {
+        "effectTier": "MEDIUM",
+        "requestedPath": "direct",
+        "appliedPath": "direct",
+        "antialiasing": "MSAA",
+        "directBudgetAvailable": true,
+        "toneMapping": "ACES_FILMIC",
+        "bloomEnabled": false,
+        "sharpenStrength": 0,
+        "composerResident": true
+      },
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 797,
+        "triangles": 656627,
+        "geometries": 580,
+        "textures": 110,
+        "programs": 234
+      },
+      "resourcesAfter": {
+        "calls": 796,
+        "triangles": 648203,
+        "geometries": 580,
+        "textures": 110,
+        "programs": 234
+      },
+      "pathValues": [
+        "direct"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        106.10820035937562,
+        127.3635186792728,
+        146.62831391364446
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -15.948505041594021,
+        -4.037767680965362e-21,
+        3.344355399462553
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4678,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "candidate-MEDIUM-dpr1-overview-continuous-2",
+      "label": "candidate",
+      "view": "overview",
+      "scenario": "continuous",
+      "repeat": 2,
+      "trial": "candidate-MEDIUM-dpr1-trial2",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 138410.20000004768,
+          "end": 145466.20000004768
+        }
+      ],
+      "frames": {
+        "samples": 224,
+        "medianMs": 31,
+        "p95Ms": 38.2,
+        "stallsOver50Ms": 1,
+        "maxMs": 68.3
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 140116.5,
+          "duration": 68,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 8,
+        "droppedGpuQueries": 25,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 226,
+          "averageMs": 25.9,
+          "p95Ms": 34.6,
+          "p99Ms": 42.6
+        },
+        "gpu": {
+          "samples": 193,
+          "averageMs": 31.363,
+          "p95Ms": 34.507,
+          "p99Ms": 53.257
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 226,
+              "averageMs": 25.9,
+              "p95Ms": 34.6,
+              "p99Ms": 42.6
+            },
+            "gpu": {
+              "samples": 193,
+              "averageMs": 31.363,
+              "p95Ms": 34.507,
+              "p99Ms": 53.257
+            }
+          }
+        }
+      },
+      "effectBudget": {
+        "effectTier": "MEDIUM",
+        "requestedPath": "direct",
+        "appliedPath": "direct",
+        "antialiasing": "MSAA",
+        "directBudgetAvailable": true,
+        "toneMapping": "ACES_FILMIC",
+        "bloomEnabled": false,
+        "sharpenStrength": 0,
+        "composerResident": true
+      },
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 796,
+        "triangles": 656739,
+        "geometries": 579,
+        "textures": 110,
+        "programs": 234
+      },
+      "resourcesAfter": {
+        "calls": 798,
+        "triangles": 685781,
+        "geometries": 579,
+        "textures": 110,
+        "programs": 234
+      },
+      "pathValues": [
+        "direct"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -120.61586367708912,
+        119.99998455740261,
+        133.9681415082739
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 3570,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "baseline-MEDIUM-dpr1-overview-continuous-2",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "continuous",
+      "repeat": 2,
+      "trial": "baseline-MEDIUM-dpr1-trial2",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 123218.60000014305,
+          "end": 130377
+        }
+      ],
+      "frames": {
+        "samples": 206,
+        "medianMs": 34,
+        "p95Ms": 45.2,
+        "stallsOver50Ms": 1,
+        "maxMs": 55.6
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [
+        {
+          "id": "f139a343-f9b7-49ca-9bb8-0a7dd396e7b0",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "b7aaff8a-5ac8-4ee3-ae6c-e8d430d6b355",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "LuminancePass.Target"
+        },
+        {
+          "id": "b09edb99-a679-4f6f-8d06-193e216fb61e",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Downsampling.Mipmap0"
+        },
+        {
+          "id": "e2c4a49e-e6a4-4082-8896-9e77b40eaf67",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Downsampling.Mipmap1"
+        },
+        {
+          "id": "99473c4a-a6dd-47e6-a6d1-ec464643ec7c",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Downsampling.Mipmap2"
+        },
+        {
+          "id": "c15b7b7b-ecc6-482f-930d-c990c78fc5d8",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Downsampling.Mipmap3"
+        },
+        {
+          "id": "d7bc732d-357c-4db6-862a-e4f45048a45a",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Downsampling.Mipmap4"
+        },
+        {
+          "id": "d5e06210-7486-4841-9d6a-80c787b2ddc0",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Downsampling.Mipmap5"
+        },
+        {
+          "id": "692e36cf-e9f3-46c3-a83a-f53614f21d70",
+          "width": 10,
+          "height": 6,
+          "samples": 0,
+          "name": "Downsampling.Mipmap6"
+        },
+        {
+          "id": "014ca777-0309-4eeb-9c37-087be9140b09",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Upsampling.Mipmap5"
+        },
+        {
+          "id": "bd5dff69-91e8-4776-9472-4b29fbb312fc",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Upsampling.Mipmap4"
+        },
+        {
+          "id": "5d568fae-d7a3-4731-8db3-79ba893bda6c",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Upsampling.Mipmap3"
+        },
+        {
+          "id": "e6f45320-d292-4ce4-9073-7b08fe15c08a",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Upsampling.Mipmap2"
+        },
+        {
+          "id": "e89e15a9-4738-42e7-a6e0-f9d620497c4b",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Upsampling.Mipmap1"
+        },
+        {
+          "id": "1823ee45-67c5-4208-a93e-1d35bc1f5ef0",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Upsampling.Mipmap0"
+        },
+        {
+          "id": "14c1e1c5-dde8-4889-84ed-842ee85b3f52",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "665081d6-f2f1-49a8-b25b-739f26f2d5ff",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Edges"
+        },
+        {
+          "id": "16f99743-f1dd-4b33-841d-345675952a1a",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Weights"
+        }
+      ],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 122891.10000014305,
+          "duration": 52,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 123025.70000004768,
+          "duration": 52,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 129899.40000009537,
+          "duration": 53,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 130509.60000014305,
+          "duration": 89,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 5,
+        "droppedGpuQueries": 4,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 230,
+          "averageMs": 30.041,
+          "p95Ms": 39.2,
+          "p99Ms": 49.4
+        },
+        "gpu": {
+          "samples": 221,
+          "averageMs": 33.6,
+          "p95Ms": 35.691,
+          "p99Ms": 39.884
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 230,
+              "averageMs": 30.041,
+              "p95Ms": 39.2,
+              "p99Ms": 49.4
+            },
+            "gpu": {
+              "samples": 221,
+              "averageMs": 33.6,
+              "p95Ms": 35.691,
+              "p99Ms": 39.884
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "effectBudget": null,
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 814,
+        "triangles": 656670,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 241
+      },
+      "resourcesAfter": {
+        "calls": 816,
+        "triangles": 685712,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 241
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -120.6158555029168,
+        119.99996453003124,
+        133.9681658455765
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2948,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  ],
+  "environments": {
+    "baseline-MEDIUM-dpr1-trial1": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "platform": "Win32",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "devicePixelRatio": 1,
+      "visualViewportScale": 1,
+      "hardwareConcurrency": 4,
+      "memoryHintGiB": 8,
+      "attributes": {
+        "alpha": false,
+        "antialias": true,
+        "depth": true,
+        "desynchronized": false,
+        "failIfMajorPerformanceCaveat": false,
+        "powerPreference": "high-performance",
+        "premultipliedAlpha": true,
+        "preserveDrawingBuffer": false,
+        "stencil": false,
+        "xrCompatible": false
+      },
+      "renderer": {
+        "at": 106124,
+        "calls": 824,
+        "triangles": 694050,
+        "geometries": 576,
+        "textures": 136,
+        "programs": 241,
+        "dpr": 1,
+        "width": 1265,
+        "height": 720,
+        "heapBytes": 137807091,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "gpuTimerExtension": "EXT_disjoint_timer_query_webgl2",
+      "multiDrawExtension": "WEBGL_multi_draw",
+      "boot": {
+        "routeStartedAt": 481.30000019073486,
+        "documentToInteractiveMs": 15205,
+        "navigationToModuleMs": 0,
+        "moduleMs": 512,
+        "rendererModuleMs": null,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 120,
+        "headquartersWorkerMs": 1767,
+        "webglContextMs": 112,
+        "sceneMs": 3968,
+        "entityGeometryCpuMs": 13.30000114440918,
+        "environmentMaterialMs": 0,
+        "proceduralTextureCpuMs": 228.09999990463257,
+        "textureUploadMs": 842,
+        "cpuStagesMs": {
+          "textures": 228,
+          "geometry-preparation": 13,
+          "b12-unpack": 5,
+          "b12-materials": 189
+        },
+        "shaderDirectMs": 7757,
+        "shaderPostMs": null,
+        "shadowMs": 0,
+        "postprocessingMs": 8,
+        "physicsMs": 539,
+        "firstDrawMs": 8607,
+        "interactiveMs": 14724,
+        "controlsResponseMs": 36,
+        "hydrationMs": 84557
+      },
+      "displayCadence": null,
+      "executedBuildManifest": {
+        "revision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+        "build": "baseline",
+        "sourceHashes": {
+          "src/features/commercial-map/utils/viewport.ts": "0a2ad7cb8d6417c56c81066529349f9771c3056368f1a718e4d924e0aedf7e05",
+          "src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx": "64dfa5269761bfed4516dd08667a809ecd9fb6e843f4e2c6d0050db85aafa8fc",
+          "src/features/commercial-map/components/canvas/CommercialMapAdaptiveQuality.tsx": "f5e205f6e863a827db9ae9c01676f720bf33ed6986ea19b773e6ea5a1ff844aa",
+          "src/features/commercial-map/components/canvas/TerritorialOrientation.tsx": "890a5e2a756c6d066e3de0fcf9b32c8aaa15d28e699c9d116f079589106f294e",
+          "src/features/commercial-map/utils/territorialOrientation.ts": "410f227afd37a832df6e5e0a7f726a9cdab912087bc47823ffd1b095456894a6"
+        },
+        "diagnostics": true,
+        "dirty": false,
+        "baseRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab"
+      },
+      "expectedRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+      "ablationApplied": {
+        "requested": [],
+        "applied": false
+      },
+      "shadowReceivingAblation": {
+        "requested": "authored",
+        "applied": false
+      },
+      "labelTiming": {
+        "enabled": false
+      },
+      "drawTiming": {
+        "enabled": false
+      }
+    },
+    "candidate-MEDIUM-dpr1-trial1": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "platform": "Win32",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "devicePixelRatio": 1,
+      "visualViewportScale": 1,
+      "hardwareConcurrency": 4,
+      "memoryHintGiB": 8,
+      "attributes": {
+        "alpha": false,
+        "antialias": true,
+        "depth": true,
+        "desynchronized": false,
+        "failIfMajorPerformanceCaveat": false,
+        "powerPreference": "high-performance",
+        "premultipliedAlpha": true,
+        "preserveDrawingBuffer": false,
+        "stencil": false,
+        "xrCompatible": false
+      },
+      "renderer": {
+        "at": 128153.40000009537,
+        "calls": 806,
+        "triangles": 694119,
+        "geometries": 576,
+        "textures": 110,
+        "programs": 234,
+        "dpr": 1,
+        "width": 1265,
+        "height": 720,
+        "heapBytes": 99515047,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "gpuTimerExtension": "EXT_disjoint_timer_query_webgl2",
+      "multiDrawExtension": "WEBGL_multi_draw",
+      "boot": {
+        "routeStartedAt": 852.7999999523163,
+        "documentToInteractiveMs": 27274,
+        "navigationToModuleMs": 0,
+        "moduleMs": 3479,
+        "rendererModuleMs": null,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 40,
+        "headquartersWorkerMs": 5306,
+        "webglContextMs": 30,
+        "sceneMs": 6695,
+        "entityGeometryCpuMs": 23.200000524520874,
+        "environmentMaterialMs": 0,
+        "proceduralTextureCpuMs": 369.69999980926514,
+        "textureUploadMs": 841,
+        "cpuStagesMs": {
+          "textures": 370,
+          "geometry-preparation": 23,
+          "b12-unpack": 7,
+          "b12-materials": 281
+        },
+        "shaderDirectMs": 11873,
+        "shaderPostMs": null,
+        "shadowMs": 0,
+        "postprocessingMs": 12,
+        "physicsMs": 458,
+        "firstDrawMs": 12439,
+        "interactiveMs": 26422,
+        "controlsResponseMs": null,
+        "hydrationMs": 94442
+      },
+      "displayCadence": null,
+      "executedBuildManifest": {
+        "build": "candidate",
+        "sourceHashes": {
+          "src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx": "9e27186521f359b8ba1a6f56415daafa10ba8671dcba7bea1b7f38f56a985a0a",
+          "src/features/commercial-map/utils/adaptiveQualityRuntime.ts": "a378842b4784a6cdeafcc8417ba01115ca7a52c52571d5f76eac3b108e262a19",
+          "src/features/commercial-map/components/canvas/CommercialMapAdaptiveQuality.tsx": "771488cde9bfdbb753062698fb78fa2bdb14ca39217210b6da868e89ce51999d",
+          "src/features/commercial-map/utils/territorialOrientation.ts": "67fc770f5f1e5602acb0effcd244c96b1233babcfb1456a422dbf26022b5080f",
+          "src/features/commercial-map/components/canvas/TerritorialOrientation.tsx": "83af0858a04dc4d2ca0f6cc03f7b4be6c61716727248b41beebc25ead7b4828e",
+          "src/features/commercial-map/utils/executionPolicy.ts": "059fe8ba81a48358b2aa36cc086b31e29ba3f0f3ae8920c341d9bef66dd0de33",
+          "src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx": "8f6b95998b59833225d8d8ae3cf9771a9a507d32906f425b7fe12e0a96b17c92"
+        },
+        "diagnostics": true,
+        "revision": "e5b3300ae7438508331a8eb65a3717adb6cf370b",
+        "dirty": false,
+        "sourceBase": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+        "baseRevision": "e5b3300ae7438508331a8eb65a3717adb6cf370b"
+      },
+      "expectedRevision": "e5b3300ae7438508331a8eb65a3717adb6cf370b",
+      "ablationApplied": {
+        "requested": [],
+        "applied": false
+      },
+      "shadowReceivingAblation": {
+        "requested": "authored",
+        "applied": false
+      },
+      "labelTiming": {
+        "enabled": false
+      },
+      "drawTiming": {
+        "enabled": false
+      }
+    },
+    "candidate-MEDIUM-dpr1-trial2": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "platform": "Win32",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "devicePixelRatio": 1,
+      "visualViewportScale": 1,
+      "hardwareConcurrency": 4,
+      "memoryHintGiB": 8,
+      "attributes": {
+        "alpha": false,
+        "antialias": true,
+        "depth": true,
+        "desynchronized": false,
+        "failIfMajorPerformanceCaveat": false,
+        "powerPreference": "high-performance",
+        "premultipliedAlpha": true,
+        "preserveDrawingBuffer": false,
+        "stencil": false,
+        "xrCompatible": false
+      },
+      "renderer": {
+        "at": 124698.29999995232,
+        "calls": 806,
+        "triangles": 694119,
+        "geometries": 576,
+        "textures": 110,
+        "programs": 234,
+        "dpr": 1,
+        "width": 1265,
+        "height": 720,
+        "heapBytes": 96898603,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "gpuTimerExtension": "EXT_disjoint_timer_query_webgl2",
+      "multiDrawExtension": "WEBGL_multi_draw",
+      "boot": {
+        "routeStartedAt": 423.5,
+        "documentToInteractiveMs": 21945,
+        "navigationToModuleMs": 0,
+        "moduleMs": 764,
+        "rendererModuleMs": null,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 45,
+        "headquartersWorkerMs": 2716,
+        "webglContextMs": 34,
+        "sceneMs": 6459,
+        "entityGeometryCpuMs": 25.399998664855957,
+        "environmentMaterialMs": 0,
+        "proceduralTextureCpuMs": 366,
+        "textureUploadMs": 845,
+        "cpuStagesMs": {
+          "textures": 366,
+          "geometry-preparation": 25,
+          "b12-unpack": 6,
+          "b12-materials": 292
+        },
+        "shaderDirectMs": 10952,
+        "shaderPostMs": null,
+        "shadowMs": 0,
+        "postprocessingMs": 9,
+        "physicsMs": 166,
+        "firstDrawMs": 11762,
+        "interactiveMs": 21522,
+        "controlsResponseMs": null,
+        "hydrationMs": 96639
+      },
+      "displayCadence": null,
+      "executedBuildManifest": {
+        "build": "candidate",
+        "sourceHashes": {
+          "src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx": "9e27186521f359b8ba1a6f56415daafa10ba8671dcba7bea1b7f38f56a985a0a",
+          "src/features/commercial-map/utils/adaptiveQualityRuntime.ts": "a378842b4784a6cdeafcc8417ba01115ca7a52c52571d5f76eac3b108e262a19",
+          "src/features/commercial-map/components/canvas/CommercialMapAdaptiveQuality.tsx": "771488cde9bfdbb753062698fb78fa2bdb14ca39217210b6da868e89ce51999d",
+          "src/features/commercial-map/utils/territorialOrientation.ts": "67fc770f5f1e5602acb0effcd244c96b1233babcfb1456a422dbf26022b5080f",
+          "src/features/commercial-map/components/canvas/TerritorialOrientation.tsx": "83af0858a04dc4d2ca0f6cc03f7b4be6c61716727248b41beebc25ead7b4828e",
+          "src/features/commercial-map/utils/executionPolicy.ts": "059fe8ba81a48358b2aa36cc086b31e29ba3f0f3ae8920c341d9bef66dd0de33",
+          "src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx": "8f6b95998b59833225d8d8ae3cf9771a9a507d32906f425b7fe12e0a96b17c92"
+        },
+        "diagnostics": true,
+        "revision": "e5b3300ae7438508331a8eb65a3717adb6cf370b",
+        "dirty": false,
+        "sourceBase": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+        "baseRevision": "e5b3300ae7438508331a8eb65a3717adb6cf370b"
+      },
+      "expectedRevision": "e5b3300ae7438508331a8eb65a3717adb6cf370b",
+      "ablationApplied": {
+        "requested": [],
+        "applied": false
+      },
+      "shadowReceivingAblation": {
+        "requested": "authored",
+        "applied": false
+      },
+      "labelTiming": {
+        "enabled": false
+      },
+      "drawTiming": {
+        "enabled": false
+      }
+    },
+    "baseline-MEDIUM-dpr1-trial2": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "platform": "Win32",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "devicePixelRatio": 1,
+      "visualViewportScale": 1,
+      "hardwareConcurrency": 4,
+      "memoryHintGiB": 8,
+      "attributes": {
+        "alpha": false,
+        "antialias": true,
+        "depth": true,
+        "desynchronized": false,
+        "failIfMajorPerformanceCaveat": false,
+        "powerPreference": "high-performance",
+        "premultipliedAlpha": true,
+        "preserveDrawingBuffer": false,
+        "stencil": false,
+        "xrCompatible": false
+      },
+      "renderer": {
+        "at": 109424.90000009537,
+        "calls": 824,
+        "triangles": 694050,
+        "geometries": 576,
+        "textures": 136,
+        "programs": 241,
+        "dpr": 1,
+        "width": 1265,
+        "height": 720,
+        "heapBytes": 98736499,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "gpuTimerExtension": "EXT_disjoint_timer_query_webgl2",
+      "multiDrawExtension": "WEBGL_multi_draw",
+      "boot": {
+        "routeStartedAt": 1604.5,
+        "documentToInteractiveMs": 15833,
+        "navigationToModuleMs": 0,
+        "moduleMs": 667,
+        "rendererModuleMs": null,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 34,
+        "headquartersWorkerMs": 1877,
+        "webglContextMs": 23,
+        "sceneMs": 4366,
+        "entityGeometryCpuMs": 16.200000047683716,
+        "environmentMaterialMs": 0,
+        "proceduralTextureCpuMs": 248.70000052452087,
+        "textureUploadMs": 855,
+        "cpuStagesMs": {
+          "textures": 249,
+          "geometry-preparation": 16,
+          "b12-unpack": 5,
+          "b12-materials": 211
+        },
+        "shaderDirectMs": 6790,
+        "shaderPostMs": null,
+        "shadowMs": 0,
+        "postprocessingMs": 8,
+        "physicsMs": 731,
+        "firstDrawMs": 7493,
+        "interactiveMs": 14228,
+        "controlsResponseMs": null,
+        "hydrationMs": 87282
+      },
+      "displayCadence": null,
+      "executedBuildManifest": {
+        "revision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+        "build": "baseline",
+        "sourceHashes": {
+          "src/features/commercial-map/utils/viewport.ts": "0a2ad7cb8d6417c56c81066529349f9771c3056368f1a718e4d924e0aedf7e05",
+          "src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx": "64dfa5269761bfed4516dd08667a809ecd9fb6e843f4e2c6d0050db85aafa8fc",
+          "src/features/commercial-map/components/canvas/CommercialMapAdaptiveQuality.tsx": "f5e205f6e863a827db9ae9c01676f720bf33ed6986ea19b773e6ea5a1ff844aa",
+          "src/features/commercial-map/components/canvas/TerritorialOrientation.tsx": "890a5e2a756c6d066e3de0fcf9b32c8aaa15d28e699c9d116f079589106f294e",
+          "src/features/commercial-map/utils/territorialOrientation.ts": "410f227afd37a832df6e5e0a7f726a9cdab912087bc47823ffd1b095456894a6"
+        },
+        "diagnostics": true,
+        "dirty": false,
+        "baseRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab"
+      },
+      "expectedRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+      "ablationApplied": {
+        "requested": [],
+        "applied": false
+      },
+      "shadowReceivingAblation": {
+        "requested": "authored",
+        "applied": false
+      },
+      "labelTiming": {
+        "enabled": false
+      },
+      "drawTiming": {
+        "enabled": false
+      }
+    }
+  },
+  "errors": {
+    "baseline-MEDIUM-dpr1-trial1": [],
+    "candidate-MEDIUM-dpr1-trial1": [],
+    "candidate-MEDIUM-dpr1-trial2": [],
+    "baseline-MEDIUM-dpr1-trial2": []
+  },
+  "trials": [
+    {
+      "name": "baseline-MEDIUM-dpr1-trial1",
+      "label": "baseline",
+      "repeat": 1,
+      "startedAt": "2026-10-01T17:58:12.478Z",
+      "gate": null,
+      "errors": [],
+      "completedAt": "2026-10-01T17:59:21.141Z"
+    },
+    {
+      "name": "candidate-MEDIUM-dpr1-trial1",
+      "label": "candidate",
+      "repeat": 1,
+      "startedAt": "2026-10-01T18:01:29.802Z",
+      "gate": null,
+      "errors": [],
+      "completedAt": "2026-10-01T18:02:38.495Z"
+    },
+    {
+      "name": "candidate-MEDIUM-dpr1-trial2",
+      "label": "candidate",
+      "repeat": 2,
+      "startedAt": "2026-10-01T18:04:43.653Z",
+      "gate": null,
+      "errors": [],
+      "completedAt": "2026-10-01T18:05:05.450Z"
+    },
+    {
+      "name": "baseline-MEDIUM-dpr1-trial2",
+      "label": "baseline",
+      "repeat": 2,
+      "startedAt": "2026-10-01T18:06:55.578Z",
+      "gate": null,
+      "errors": [],
+      "completedAt": "2026-10-01T18:07:17.678Z"
+    }
+  ],
+  "trialOrder": [
+    {
+      "label": "baseline",
+      "repeat": 1
+    },
+    {
+      "label": "candidate",
+      "repeat": 1
+    },
+    {
+      "label": "candidate",
+      "repeat": 2
+    },
+    {
+      "label": "baseline",
+      "repeat": 2
+    }
+  ]
+}

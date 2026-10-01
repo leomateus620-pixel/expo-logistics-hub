@@ -1,5 +1,6 @@
 import {
   COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES,
+  COMMERCIAL_MAP_QUALITY_TIER_ORDER,
   commercialMapQualitySceneRebuildsOnTierChange,
   createCommercialMapAdaptiveQualityState,
   type CommercialMapAdaptiveQualityState,
@@ -11,6 +12,21 @@ import { visitRuntime } from '../visit/visitRuntime';
 // finishes, require an idle window before committing those heavier changes.
 export const COMMERCIAL_MAP_QUALITY_SCENE_COMMIT_IDLE_MS = 650;
 export const COMMERCIAL_MAP_QUALITY_EVENT = 'commercial-map-quality';
+
+/**
+ * Pass switches/uniforms can reduce work without rebuilding a scene or its
+ * drawing buffers. Apply those reductions as soon as persistent slowness is
+ * measured; upgrades wait for the heavier scene budget to be committed.
+ */
+export function resolveCommercialMapEffectQualityTier(
+  logicalTier: CommercialMapQualityTier,
+  sceneTier: CommercialMapQualityTier,
+): CommercialMapQualityTier {
+  return COMMERCIAL_MAP_QUALITY_TIER_ORDER[Math.min(
+    COMMERCIAL_MAP_QUALITY_TIER_ORDER.indexOf(logicalTier),
+    COMMERCIAL_MAP_QUALITY_TIER_ORDER.indexOf(sceneTier),
+  )];
+}
 
 export interface CommercialMapDeviceCapabilityHints {
   deviceMemoryGb?: number;

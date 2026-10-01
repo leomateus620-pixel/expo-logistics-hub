@@ -1,22 +1,135 @@
-import { memo, useEffect, useMemo, useRef } from 'react';
-import { Html } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
+import { memo, useEffect, useLayoutEffect, useMemo } from 'react';
+import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import type { CommercialLot, Coordinate, MapEntity } from '../../types';
+import type { CommercialLot, MapEntity } from '../../types';
 import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
-import { COMMERCIAL_MAP_OBSTRUCTION_SELECTOR } from '../../utils/contextualViewport';
-import { orientationBoxFits, orientationLevel, prepareTerritorialOrientation, roadLabelFits, TERRITORY_SYMBOLS, type ScreenBox } from '../../utils/territorialOrientation';
-import { useCommercialMapStore } from '../../state/useCommercialMapStore';
-import './territorial-orientation.css';
+import { layoutTerritorialOrientation, prepareTerritorialOrientation, type OrientationItem } from '../../utils/territorialOrientation';
 
-const ORIGIN = (): [number, number] => [0, 0];
+const NO_RAYCAST = () => undefined;
+const FONT_FAMILY = 'system-ui, -apple-system, "Segoe UI", sans-serif';
+const ROW_HEIGHT = 80;
+const ATLAS_WIDTH = 2048;
+const PADDING = 12;
+
+/** All permanent names share one texture, geometry and draw. Rasterization and
+ * cadastral fitting happen once per inventory change; navigation needs no DOM. */
+function createTerritorialOrientationResources(items: readonly OrientationItem[], entities: readonly MapEntity[], anisotropy: number) {
+  if (!items.length) return null;
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  if (!context) return null;
+  const metrics = items.map(item => {
+    context.font = `${item.kind === 'road' ? 650 : 750} 52px ${FONT_FAMILY}`;
+    let width = context.measureText(item.name).width;
+    if (item.kind === 'block') {
+      context.font = `600 46px ${FONT_FAMILY}`;
+      const prefix = context.measureText('Quadra ').width;
+      context.font = `850 58px ${FONT_FAMILY}`;
+      width = prefix + context.measureText(item.name.slice(7)).width;
+    }
+    return { item, width: Math.min(ATLAS_WIDTH - PADDING * 2, Math.ceil(width) + PADDING * 2) };
+  });
+  let nextX = 0, nextY = 0;
+  const cells = metrics.map(metric => {
+    if (nextX + metric.width > ATLAS_WIDTH) { nextX = 0; nextY += ROW_HEIGHT; }
+    const cell = { ...metric, x: nextX, y: nextY };
+    nextX += metric.width;
+    return cell;
+  });
+  canvas.width = ATLAS_WIDTH;
+  canvas.height = THREE.MathUtils.ceilPowerOfTwo(nextY + ROW_HEIGHT);
+  context.textBaseline = 'middle'; context.lineJoin = 'round';
+  for (const { item, width, x, y } of cells) {
+    context.textAlign = 'left';
+    // Cream road lettering, a restrained dark keyline, no white halo/card.
+    context.fillStyle = item.kind === 'road' ? '#f7f2d9' : '#173a3e';
+    context.strokeStyle = item.kind === 'road' ? '#243536' : '#f6f0d4';
+    context.lineWidth = item.kind === 'road' ? 3 : 3.5;
+    if (item.kind === 'block') {
+      context.font = `600 46px ${FONT_FAMILY}`;
+      context.strokeText('Quadra ', x + PADDING, y + ROW_HEIGHT / 2);
+      context.fillText('Quadra ', x + PADDING, y + ROW_HEIGHT / 2);
+      const prefix = context.measureText('Quadra ').width;
+      context.font = `850 58px ${FONT_FAMILY}`;
+      context.strokeText(item.name.slice(7), x + PADDING + prefix, y + ROW_HEIGHT / 2);
+      context.fillText(item.name.slice(7), x + PADDING + prefix, y + ROW_HEIGHT / 2);
+    } else {
+      context.font = `${item.kind === 'road' ? 650 : 750} 52px ${FONT_FAMILY}`;
+      context.strokeText(item.name, x + PADDING, y + ROW_HEIGHT / 2, width - PADDING * 2);
+      context.fillText(item.name, x + PADDING, y + ROW_HEIGHT / 2, width - PADDING * 2);
+    }
+  }
+  const labels = layoutTerritorialOrientation(items, entities, new Map(cells.map(cell => [cell.item.id, cell.width / ROW_HEIGHT])));
+  const cellById = new Map(cells.map(cell => [cell.item.id, cell]));
+  const positions: number[] = [], uvs: number[] = [], anchors: number[] = [], density: number[] = [], indices: number[] = [];
+  labels.forEach((label, index) => {
+    const cell = cellById.get(label.id)!;
+    const corners = [[0, 1], [1, 1], [1, 0], [0, 0]];
+    label.footprint.forEach(([x, z], corner) => {
+      positions.push(x, label.elevation, z);
+      uvs.push((cell.x + corners[corner][0] * cell.width) / canvas.width,
+        1 - (cell.y + (1 - corners[corner][1]) * ROW_HEIGHT) / canvas.height);
+      anchors.push(label.anchor[0], label.elevation, label.anchor[1]);
+      density.push(label.referenceSpan, label.kind === 'road' ? 0 : label.kind === 'block' ? 1 : 2);
+    });
+    const base = index * 4;
+    indices.push(base, base + 3, base + 2, base, base + 2, base + 1);
+  });
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setAttribute('labelAnchor', new THREE.Float32BufferAttribute(anchors, 3));
+  geometry.setAttribute('labelDensity', new THREE.Float32BufferAttribute(density, 2));
+  geometry.setIndex(indices); geometry.computeBoundingSphere();
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = Math.min(8, anisotropy);
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  const material = new THREE.ShaderMaterial({
+    name: 'territorial-ground-text', transparent: true, depthWrite: false, depthTest: true, toneMapped: false,
+    // Lots use -3/-2. A weaker slope bias lets their fill erase ground text
+    // in oblique views even with physical clearance. Match that slope and
+    // retain one extra depth unit; buildings still occlude the world plane.
+    polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3,
+    uniforms: { atlas: { value: texture }, viewportSize: { value: new THREE.Vector2(1, 1) } },
+    vertexShader: `
+      attribute vec3 labelAnchor; attribute vec2 labelDensity;
+      uniform vec2 viewportSize;
+      varying vec2 labelUv; varying float labelOpacity;
+      void main() {
+        vec4 center = modelViewMatrix * vec4(labelAnchor, 1.);
+        float span = abs(projectionMatrix[0][0] * labelDensity.x / max(.01, -center.z)) * viewportSize.x * .5;
+        labelOpacity = labelDensity.y < .5 ? 1. : labelDensity.y < 1.5
+          ? smoothstep(40., 50., span) : 1. - smoothstep(30., 40., span);
+        labelUv = uv;
+        // Vertices already contain the complete world footprint. No screen
+        // expansion, camera quaternion, billboard or camera-facing rotation.
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
+      }`,
+    fragmentShader: `
+      uniform sampler2D atlas; varying vec2 labelUv; varying float labelOpacity;
+      void main() {
+        vec4 color = texture2D(atlas, labelUv);
+        color.a *= labelOpacity;
+        if (color.a < .06) discard;
+        gl_FragColor = color;
+        #include <colorspace_fragment>
+      }`,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.name = 'territorial-world-labels'; mesh.raycast = NO_RAYCAST;
+  mesh.userData = { presentationOnly: true, projection: 'world-xz', labelCount: labels.length,
+    labels: labels.map(({ id, name, kind, anchor, angle, width, height, elevation, footprint }) =>
+      ({ id, name, kind, anchor, angle, width, height, elevation, footprint })) };
+  return { mesh, geometry, material, texture };
+}
+
 export const TerritorialOrientation = memo(function TerritorialOrientation({ entities, lots, roads, policy }: {
   entities: readonly MapEntity[]; lots: readonly CommercialLot[]; roads: readonly MapEntity[]; policy?: PublicExternalScenePolicy | null;
 }) {
-  const gl = useThree(s => s.gl), size = useThree(s => s.size), invalidate = useThree(s => s.invalidate);
+  const gl = useThree(state => state.gl), size = useThree(state => state.size), invalidate = useThree(state => state.invalidate);
   const items = useMemo(() => {
     const scoped = policy ? entities.filter(entity => policy.activeScope.has(entity.id)) : entities;
-    // Shared circulation is allowed only when present in the authorized inventory.
     const availableRoads = policy ? roads.filter(road => entities.some(entity => entity.id === road.id)) : roads;
     const prepared = prepareTerritorialOrientation(scoped, lots, availableRoads);
     if (!policy) return prepared;
@@ -24,115 +137,13 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
     return prepared.filter(item => item.anchor[0] >= focus.minX - pad && item.anchor[0] <= focus.maxX + pad
       && item.anchor[1] >= focus.minZ - pad && item.anchor[1] <= focus.maxZ + pad);
   }, [entities, lots, roads, policy]);
-  const selected = useCommercialMapStore(s => s.selectedEntityId);
-  const svg = useRef<SVGSVGElement>(null);
-  const nodes = useRef(new Map<string, SVGGElement>());
-  const prior = useRef(''), dirty = useRef(true);
-  const level = useRef<'far' | 'medium' | 'near'>('far');
-  const point = useMemo(() => new THREE.Vector3(), []);
-  const blocks = useMemo(() => items.filter(item => item.kind === 'block'), [items]);
-  const roadObstacles = useMemo(() => {
-    const roadsWithFootprints = items.filter(item => item.kind === 'road' && item.outline);
-    const forbidden = entities.filter(entity => !entity.isArchived && entity.geometry.coordinates[0]?.length >= 3
-      && !['ROAD', 'PEDESTRIAN_PATH', 'QUADRA', 'GREEN_AREA', 'PARKING', 'WATER', 'TREE'].includes(entity.classification));
-    return new Map(roadsWithFootprints.map(road => {
-      const ring = road.outline?.[0] ?? [];
-      const minX = Math.min(...ring.map(p => p[0])), maxX = Math.max(...ring.map(p => p[0]));
-      const minZ = Math.min(...ring.map(p => p[1])), maxZ = Math.max(...ring.map(p => p[1]));
-      return [road.id, forbidden.filter(entity => {
-        const points = entity.geometry.coordinates[0];
-        return Math.min(...points.map(p => p[0])) <= maxX && Math.max(...points.map(p => p[0])) >= minX
-          && Math.min(...points.map(p => p[1])) <= maxZ && Math.max(...points.map(p => p[1])) >= minZ;
-      })] as const;
-    }));
-  }, [items, entities]);
-  const rankedByLevel = useMemo(() => ({
-    far: [...items].sort((a, b) => ({ segment: 0, road: 1, block: 2 })[a.kind] - ({ segment: 0, road: 1, block: 2 })[b.kind]),
-    medium: [...items].sort((a, b) => ({ block: 0, road: 1, segment: 2 })[a.kind] - ({ block: 0, road: 1, segment: 2 })[b.kind]),
-  }), [items]);
-  useEffect(() => { dirty.current = true; invalidate(); }, [items, selected, invalidate]);
-  useEffect(() => {
-    const shell = gl.domElement.closest('.commercial-map-shell, .public-map-shell');
-    if (!shell) return;
-    const mark = () => { dirty.current = true; invalidate(); };
-    const observer = new MutationObserver(records => {
-      if (records.some(record => !svg.current?.contains(record.target))) mark();
-    });
-    observer.observe(shell, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'hidden', 'style'] });
-    const resize = new ResizeObserver(mark);
-    shell.querySelectorAll(COMMERCIAL_MAP_OBSTRUCTION_SELECTOR).forEach(el => resize.observe(el));
-    window.addEventListener('commercial-map-panel-resize', mark);
-    return () => { observer.disconnect(); resize.disconnect(); window.removeEventListener('commercial-map-panel-resize', mark); };
-  }, [gl, invalidate]);
-  useFrame(({ camera, size }) => {
-    if (!svg.current) return;
-    camera.updateMatrixWorld();
-    const key = [size.width, size.height, ...camera.matrixWorld.elements, ...camera.projectionMatrix.elements].join(',');
-    if (key === prior.current && !dirty.current) return;
-    prior.current = key; dirty.current = false;
-    const project = (p: Coordinate, y: number) => {
-      point.set(p[0], y, p[1]).project(camera);
-      return { x: (point.x + 1) * size.width / 2, y: (1 - point.y) * size.height / 2, z: point.z };
-    };
-    // A representative quadra, rather than the whole park, defines local density.
-    const spans = blocks.map(item => {
-      const points = item.outline?.[0]?.map(p => project(p, item.elevation)) ?? [];
-      if (points.length < 3) return 0;
-      return Math.hypot(Math.max(...points.map(p => p.x)) - Math.min(...points.map(p => p.x)),
-        Math.max(...points.map(p => p.y)) - Math.min(...points.map(p => p.y)));
-    }).filter(Boolean).sort((a, b) => a - b);
-    const span = spans.length ? spans[Math.floor(spans.length / 2)] : 0;
-    level.current = orientationLevel(span, level.current);
-    const canvas = gl.domElement.getBoundingClientRect();
-    const occupied: ScreenBox[] = [];
-    gl.domElement.closest('.commercial-map-shell, .public-map-shell')?.querySelectorAll<HTMLElement>(`${COMMERCIAL_MAP_OBSTRUCTION_SELECTOR}, .commercial-map-label, .commercial-map-top-bar, .commercial-map-toolbar, .commercial-map-onboarding-note, .commercial-map-dock`).forEach(el => {
-      if (!el.getClientRects().length || getComputedStyle(el).visibility === 'hidden') return;
-      const r = el.getBoundingClientRect();
-      occupied.push({ left: r.left - canvas.left, right: r.right - canvas.left, top: r.top - canvas.top, bottom: r.bottom - canvas.top });
-    });
-    const selection = entities.find(entity => entity.id === selected);
-    if (selection?.geometry.coordinates[0]?.length) {
-      const pts = selection.geometry.coordinates[0].map(p => project(p, selection.geometry.elevation));
-      occupied.push({ left: Math.min(...pts.map(p => p.x)), right: Math.max(...pts.map(p => p.x)),
-        top: Math.min(...pts.map(p => p.y)), bottom: Math.max(...pts.map(p => p.y)) });
-    }
-    let shown = 0;
-    const limit = size.width < 600 ? 7 : 19;
-    const ranked = level.current === 'far' ? rankedByLevel.far : rankedByLevel.medium;
-    for (const item of ranked) {
-      const node = nodes.current.get(item.id);
-      if (!node) continue;
-      const center = project(item.anchor, item.elevation);
-      const a = project(item.edge[0], item.elevation), b = project(item.edge[1], item.elevation);
-      const text = node.querySelector('text');
-      const width = Math.ceil((text?.getComputedTextLength() ?? item.name.length * 6) + (item.kind === 'road' ? 5 : 16));
-      const height = item.kind === 'segment' ? 23 : item.kind === 'road' ? 13 : 20;
-      const rect = { left: center.x - width / 2, right: center.x + width / 2, top: center.y - height / 2, bottom: center.y + height / 2 };
-      const enough = item.kind === 'segment' ? level.current !== 'near' : item.kind === 'block' ? level.current !== 'far' : true;
-      const candidate = enough && shown < limit && center.z >= -1 && center.z <= 1
-        && (item.kind === 'road' || Math.hypot(a.x - b.x, a.y - b.y) > width * .55)
-        && rect.left > 8 && rect.right < size.width - 8 && rect.top > 8 && rect.bottom < size.height - 8
-        && orientationBoxFits(rect, occupied);
-      // Project polygons only for candidates that survived the cheap viewport/collision checks.
-      const projectRings = (rings: readonly Coordinate[][], elevation: number) =>
-        rings.map(ring => ring.map(p => { const screen = project(p, elevation); return [screen.x, screen.y] as [number, number]; }));
-      const visible = candidate && (item.kind !== 'road' || Boolean(item.outline && roadLabelFits(rect,
-        projectRings(item.outline, item.elevation),
-        roadObstacles.get(item.id)?.map(entity => projectRings(entity.geometry.coordinates, entity.geometry.elevation)) ?? [])));
-      node.style.display = visible ? '' : 'none';
-      if (!visible) continue;
-      node.setAttribute('transform', `translate(${center.x} ${center.y})`);
-      const background = node.querySelector('rect');
-      if (background) { background.setAttribute('x', String(-width / 2)); background.setAttribute('width', String(width)); }
-      occupied.push(rect); shown++;
-    }
-  });
-  return <Html calculatePosition={ORIGIN} zIndexRange={[1, 1]} style={{ width: size.width, height: size.height, pointerEvents: 'none' }}>
-    <svg ref={svg} className="territorial-orientation" aria-hidden="true" width={size.width} height={size.height}>
-      {items.map(item => <g key={item.id} className={`territorial-orientation__label territorial-orientation__label--${item.kind}`} ref={node => { if (node) nodes.current.set(item.id, node); else nodes.current.delete(item.id); }} style={{ display: 'none' }}>
-        <rect y={item.kind === 'segment' ? -11.5 : -10} height={item.kind === 'segment' ? 23 : 20} rx="4" />
-        <text textAnchor="middle" dominantBaseline="central">{item.kind === 'segment' && item.segmentId ? `${TERRITORY_SYMBOLS[item.segmentId].glyph}  ` : ''}{item.name}</text>
-      </g>)}
-    </svg>
-  </Html>;
+  const resources = useMemo(() => createTerritorialOrientationResources(items, entities, gl.capabilities.getMaxAnisotropy()), [items, entities, gl]);
+  useLayoutEffect(() => {
+    resources?.material.uniforms.viewportSize.value.set(size.width, size.height);
+    invalidate();
+  }, [resources, size.width, size.height, invalidate]);
+  useEffect(() => () => {
+    resources?.geometry.dispose(); resources?.material.dispose(); resources?.texture.dispose();
+  }, [resources]);
+  return resources ? <primitive object={resources.mesh} dispose={null} /> : null;
 });

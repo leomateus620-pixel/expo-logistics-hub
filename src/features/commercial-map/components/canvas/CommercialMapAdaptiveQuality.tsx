@@ -28,6 +28,7 @@ import {
   isCommercialMapHeavyQualityGestureActive,
   recordCommercialMapAdaptiveFrame,
   resetCommercialMapFrameTimeWindow,
+  resolveCommercialMapEffectQualityTier,
   shouldDeferCommercialMapSceneQuality,
   updateCommercialMapPixelRatioState,
   type CommercialMapDeviceCapabilityHints,
@@ -42,6 +43,7 @@ interface CommercialMapAdaptiveQualityControllerProps {
     tier: CommercialMapQualityTier;
     dpr: number;
     sceneTier: CommercialMapQualityTier;
+    effectTier: CommercialMapQualityTier;
   }) => void;
 }
 
@@ -77,6 +79,7 @@ export function CommercialMapAdaptiveQualityController({
     pendingTier: CommercialMapQualityTier | null;
   } | null>(null);
   const committedSceneTier = useRef<CommercialMapQualityTier>(initialState.tier);
+  const committedEffectTier = useRef<CommercialMapQualityTier>(initialState.tier);
   const pendingSceneTier = useRef<CommercialMapQualityTier | null>(null);
   const pixelRatioState = useRef(createCommercialMapPixelRatioState(gl.getPixelRatio()));
   const pendingPixelRatioBase = useRef<number | undefined>();
@@ -173,25 +176,30 @@ export function CommercialMapAdaptiveQualityController({
   ) => {
     syncPixelRatio(nextDpr);
     const effectiveDpr = pixelRatioState.current.effectiveDpr;
+    const effectTier = reducedGraphics ? 'LOW' : resolveCommercialMapEffectQualityTier(logicalTier, sceneTier);
 
     committedSceneTier.current = sceneTier;
+    committedEffectTier.current = effectTier;
     publishVisitQualityTier(sceneTier);
     if (gl.domElement) {
-      gl.domElement.dataset.commercialMapQuality = JSON.stringify({ logicalTier, sceneTier, baseDpr: pixelRatioState.current.baseDpr, effectiveDpr, hardwareCeiling, reason });
+      gl.domElement.dataset.commercialMapQuality = JSON.stringify({ logicalTier, sceneTier, effectTier, baseDpr: pixelRatioState.current.baseDpr, effectiveDpr, hardwareCeiling, reason });
       gl.domElement.dispatchEvent(new Event(COMMERCIAL_MAP_QUALITY_EVENT, { bubbles: true }));
     }
-    // Publish only to the scene-tier child. Canvas itself deliberately keeps
+    // Heavy scene changes go to the child; the effect owner consumes the event
+    // without a scene rerender. Canvas itself deliberately keeps
     // its initial DPR prop stable; mirroring DPR into parent React state would
     // call root.configure() and resize the drawing buffer a second time.
     onQualityChange?.({
       tier: logicalTier,
       dpr: effectiveDpr,
       sceneTier,
+      effectTier,
     });
 
     const diagnosticSignature = [
       logicalTier,
       sceneTier,
+      effectTier,
       hardwareCeiling,
       effectiveDpr.toFixed(3),
       reducedGraphics ? 'reduced' : 'adaptive',
@@ -404,6 +412,7 @@ export function CommercialMapAdaptiveQualityController({
         initialTier: initialState.tier,
         tier: qualityState.current.tier,
         sceneTier: committedSceneTier.current,
+        effectTier: committedEffectTier.current,
         policy: resolveCommercialMapExecutionPolicy(committedSceneTier.current),
         dpr: gl.getPixelRatio(),
         shadowResolution: Number(gl.domElement.dataset.commercialMapShadowResolution) || null,
@@ -424,7 +433,7 @@ export function CommercialMapAdaptiveQualityController({
         // Retain the completed handle: retry only after a visibility/viewport boundary.
       });
     }
-    const signature = `${gestureActive ? 'gesture' : requested}:${frame.path}:${store.interiorEntityId ?? 'outside'}:${gl.getPixelRatio()}:${committedSceneTier.current}`;
+    const signature = `${gestureActive ? 'gesture' : requested}:${frame.path}:${store.interiorEntityId ?? 'outside'}:${gl.getPixelRatio()}:${committedSceneTier.current}:${committedEffectTier.current}`;
     const samplingActive = isCommercialMapAdaptiveQualitySamplingActive({
       mapActive: active && ready && !fixedQualityForComparison.current,
       reducedGraphics,
@@ -433,10 +442,7 @@ export function CommercialMapAdaptiveQualityController({
         : document.visibilityState,
       continuousRendering,
     });
-    if (!samplingActive || pendingSceneTier.current !== null || frame.frames === sampledPresentation.current) {
-      // Samples still describe the previously committed scene while its new
-      // tier is deferred. Do not repeatedly downgrade/upgrade that unchanged
-      // workload before the first decision has actually reached the renderer.
+    if (!samplingActive || frame.frames === sampledPresentation.current) {
       resetCommercialMapFrameTimeWindow(frameWindow.current);
       samplingSignature.current = '';
       if (gestureActive) cancelIdleCommit();
@@ -447,7 +453,10 @@ export function CommercialMapAdaptiveQualityController({
     if (signature !== samplingSignature.current) {
       samplingSignature.current = signature;
       resetCommercialMapFrameTimeWindow(frameWindow.current);
-      return; // First interval belongs partly to idle, loading or the previous path.
+      // Cheap effects change independently of shadow/DPR allocations. Drop
+      // the transition interval, then measure their actual active workload
+      // even while those heavier changes are still waiting for an idle window.
+      return;
     }
     if (gestureActive) cancelIdleCommit();
     const completedWindow = recordCommercialMapAdaptiveFrame(

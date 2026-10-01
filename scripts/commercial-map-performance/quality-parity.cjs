@@ -6,6 +6,7 @@ async function inspect(page) {
   const quality = await page.evaluate(() => {
     const canvas = document.querySelector('canvas');
     return { execution: JSON.parse(canvas.dataset.commercialMapExecution || 'null'),
+      postBudget: JSON.parse(canvas.dataset.commercialMapPostBudget || 'null'),
       inventory: JSON.parse(canvas.dataset.commercialMapInventory || 'null'),
       materialIds: window.__commercialMapEnvironmentSnapshot?.materialIds,
       trace: window.__commercialMapEnvironmentTrace };
@@ -27,12 +28,15 @@ async function inspect(page) {
       await page.screenshot({ path: path.join(out, `quality-${process.env.QUALITY_MOBILE === '1' ? 'mobile' : 'desktop'}-${tier}.png`) });
     }
     const row = { cycle: cycle + 1, requestedTier: tier, ...await inspect(page) }; assertPresented(row);
+    // Derive the contract from the requested budget and actual MSAA capability;
+    // comparing the applied path with itself would hide a routing regression.
+    row.expectedPath = row.postBudget?.requestedPath === 'direct' && row.postBudget?.directBudgetAvailable === true ? 'direct' : 'post';
     row.parity = {
       inventory: JSON.stringify(row.inventory) === JSON.stringify(before.inventory),
       materials: JSON.stringify(row.materialIds) === JSON.stringify(before.materialIds),
       lifecycle: JSON.stringify(row.identity) === JSON.stringify(before.identity),
       tierApplied: row.execution?.tier === tier && row.execution?.sceneTier === tier,
-      effects: row.health.path === 'post',
+      effects: row.health.path === row.expectedPath,
     };
     rows.push(row); save(`quality-parity-${process.env.QUALITY_MOBILE === '1' ? 'mobile' : 'desktop'}.json`, { before, rows, errors });
     console.log(JSON.stringify({ cycle: row.cycle, tier, parity: row.parity, renderer: row.renderer, execution: row.execution }));

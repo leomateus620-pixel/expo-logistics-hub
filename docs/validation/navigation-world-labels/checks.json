@@ -1,0 +1,22 @@
+{
+  "runtimeRevision": "82d8f12b",
+  "baselineRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+  "date": "2026-10-01",
+  "focusedVitest": { "passed": true, "files": 8, "tests": 129, "suites": [
+    "commercialMapAdaptiveQualityController.test.tsx",
+    "commercialMapAdaptiveQualityRuntime.test.ts",
+    "commercialMapPostProcessing.test.tsx",
+    "commercialMapExecutionParity.test.ts",
+    "commercialMapTerritorialOrientation.test.ts",
+    "commercialMapViewport.test.ts",
+    "publicMapScenePolicy.test.ts",
+    "commercialMapRenderingStressResources.test.ts"
+  ] },
+  "typecheck": { "command": "npm run typecheck", "exitCode": 0 },
+  "scopedEslint": { "changedSourceAndTestFiles": 15, "exitCode": 0 },
+  "productionBuild": { "command": "npm run build -- --outDir <temporary-final-build>/dist", "diagnosticsOptIn": true, "exitCode": 0 },
+  "nodeSyntax": { "scripts": ["navigation-resolution.cjs", "world-labels.cjs", "startup-matrix.cjs", "quality-parity.cjs"], "passed": true },
+  "finalVisual": { "report": "evidence/final-visual/world-labels-report.json.gz", "summary": "evidence/visual-checks-summary.json", "passed": true, "stages": 13, "path": "direct", "contextLossRecovery": true },
+  "performance": { "comparisonCandidateRevision": "e5b3300a", "finalRevisionAttempt": "INVALID: baseline critical-post preparation failed", "tailLatencyImprovement": "not established", "rawSamplesPreserved": true },
+  "limitations": ["Local reference fixture, not authenticated production payload", "No physical phone", "No deployment validation", "Remote CI must be checked on the PR"]
+}

@@ -1,0 +1,643 @@
+{
+  "phase": "probe",
+  "policy": "HIGH",
+  "renderTimingRequested": true,
+  "requestedViewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "postDisableRequested": [
+    "bloom"
+  ],
+  "labelTimingRequested": true,
+  "generatedAt": "2026-10-01T17:16:36.111Z",
+  "browser": "154.0.8037.58",
+  "endpoints": {
+    "baseline": "http://127.0.0.1:4241",
+    "candidate": "http://127.0.0.1:4242"
+  },
+  "baselineRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+  "candidateRevision": null,
+  "evidence": "Visible headful Chrome, local production fixture. Viewport/DPR emulation does not certify physical devices. Renderer counts are not GPU time or byte memory estimates.",
+  "cache": "fresh context per trial; shared browser/driver cache; identical hydration wait plus 6s and unmeasured scenario warmup; no throttling",
+  "concurrency": {
+    "maxLoadedContexts": 1,
+    "rationale": "One full map resident at a time to avoid artificial RAM/GPU pressure on this host."
+  },
+  "budget": {
+    "targetMs": 33.3,
+    "p95ToleranceMs": 50,
+    "stallThresholdMsExclusive": 50,
+    "reason": "Local ANGLE adapter; 30 FPS reference for a limited device scenario; target is not a hardware certification."
+  },
+  "trajectories": {
+    "poses": {
+      "overview": {
+        "point": [
+          3000,
+          2850
+        ],
+        "offset": [
+          115,
+          120,
+          135
+        ]
+      },
+      "close": {
+        "point": [
+          2580,
+          3800
+        ],
+        "offset": [
+          -11,
+          12,
+          5
+        ]
+      }
+    },
+    "continuous": "5s temporal pointer path, +160px horizontal, ±24px vertical; endpoint remains nonzero at low cadence",
+    "short": "three 350ms drags +28px/±5px with actual damping settlement",
+    "zoomPan": "900ms with up to nine temporal wheel steps 0..8 (actual steps/deltas recorded), then 1.7s pan +45px/±20px"
+  },
+  "runs": [
+    {
+      "name": "baseline-HIGH-dpr1-without-bloom-overview-continuous-1",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "continuous",
+      "repeat": 1,
+      "trial": "baseline-HIGH-dpr1-without-bloom-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 132753.59999990463,
+          "end": 140046.89999985695
+        }
+      ],
+      "frames": {
+        "samples": 207,
+        "medianMs": 34.6,
+        "p95Ms": 42.2,
+        "stallsOver50Ms": 2,
+        "maxMs": 55.2
+      },
+      "labelCallbacks": {
+        "samples": 207,
+        "medianMs": 1.7,
+        "p95Ms": 2.8,
+        "stallsOver50Ms": 0,
+        "maxMs": 4.3
+      },
+      "labelLayout": {
+        "getBoundingClientRect": {
+          "calls": 207,
+          "durationMs": 8.599998950958252
+        },
+        "getComputedTextLength": {
+          "calls": 9315,
+          "durationMs": 210.10000205039978
+        }
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [
+        {
+          "id": "94af3db3-bab3-4b13-a195-f84a4db07150",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "c811f7ae-441b-4f20-8765-df4bfc94f910",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "LuminancePass.Target"
+        },
+        {
+          "id": "83ce193b-e6d6-4adc-bcab-04d490827a8b",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Downsampling.Mipmap0"
+        },
+        {
+          "id": "a907fd3c-c7b0-433b-87a4-78911ceea1d1",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Downsampling.Mipmap1"
+        },
+        {
+          "id": "5aeef35e-654e-4774-8839-c4ffdc31ef58",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Downsampling.Mipmap2"
+        },
+        {
+          "id": "1d981ff0-5bea-426b-a0a4-224bf53e9a0d",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Downsampling.Mipmap3"
+        },
+        {
+          "id": "bc5b529e-3903-4a74-8db3-50f6a32119e4",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Downsampling.Mipmap4"
+        },
+        {
+          "id": "cafb04f0-abe4-45ed-95f4-1fdb0a94c55f",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Downsampling.Mipmap5"
+        },
+        {
+          "id": "a2a1bbd9-b82f-4495-bf3b-428538fe3622",
+          "width": 10,
+          "height": 6,
+          "samples": 0,
+          "name": "Downsampling.Mipmap6"
+        },
+        {
+          "id": "4061160a-ac56-42c8-b7d4-6f1d14ee25bc",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Upsampling.Mipmap5"
+        },
+        {
+          "id": "ccaf357f-6044-4cf0-989c-cdca3e8dedca",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Upsampling.Mipmap4"
+        },
+        {
+          "id": "8297f783-61ba-42bf-9142-77fb86b29a0b",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Upsampling.Mipmap3"
+        },
+        {
+          "id": "f0da4e03-d9c1-482f-aea5-dcb3681acd6f",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Upsampling.Mipmap2"
+        },
+        {
+          "id": "fe855859-cdf3-4136-a615-61e01718b702",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Upsampling.Mipmap1"
+        },
+        {
+          "id": "eaa8a307-f699-467c-b61a-d20ffa7d9897",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Upsampling.Mipmap0"
+        },
+        {
+          "id": "3ad63ed7-f1fd-4673-8b79-fa7500bfe7f9",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "4348bbfe-f711-495e-8c2a-018106ddc226",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Edges"
+        },
+        {
+          "id": "205d9277-9808-4289-a53e-6c825fbbc6b3",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Weights"
+        }
+      ],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 137268.59999990463,
+          "duration": 54,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 3,
+        "droppedGpuQueries": 0,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 232,
+          "averageMs": 30.053,
+          "p95Ms": 35.3,
+          "p99Ms": 38.9
+        },
+        "gpu": {
+          "samples": 229,
+          "averageMs": 33.295,
+          "p95Ms": 36.458,
+          "p99Ms": 39.419
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 232,
+              "averageMs": 30.053,
+              "p95Ms": 35.3,
+              "p99Ms": 38.9
+            },
+            "gpu": {
+              "samples": 229,
+              "averageMs": 33.295,
+              "p95Ms": 36.458,
+              "p99Ms": 39.419
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "effectBudget": null,
+      "ablationApplied": {
+        "requested": [
+          "bloom"
+        ],
+        "applied": true,
+        "executedPath": "composer",
+        "before": [
+          {
+            "name": "RenderPass",
+            "enabled": true,
+            "screen": false,
+            "effects": []
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "BloomEffect",
+              "ToneMappingEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "SMAAEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": true,
+            "effects": [
+              "CommercialMapSharpenEffect"
+            ]
+          }
+        ],
+        "after": [
+          {
+            "name": "RenderPass",
+            "enabled": true,
+            "screen": false,
+            "effects": []
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "ToneMappingEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "SMAAEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": true,
+            "effects": [
+              "CommercialMapSharpenEffect"
+            ]
+          }
+        ],
+        "dpr": 1,
+        "physical": {
+          "width": 1265,
+          "height": 720
+        },
+        "caveat": "QA mutation before equal unmeasured warmup; original resources retained; app render-health path still reports its frame owner."
+      },
+      "resourcesBefore": {
+        "calls": 800,
+        "triangles": 656656,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 243
+      },
+      "resourcesAfter": {
+        "calls": 802,
+        "triangles": 685698,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 243
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -120.61586150500412,
+        119.99997937278692,
+        133.96814785490142
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 3317,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  ],
+  "environments": {
+    "baseline-HIGH-dpr1-without-bloom-trial1": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "platform": "Win32",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "devicePixelRatio": 1,
+      "visualViewportScale": 1,
+      "hardwareConcurrency": 4,
+      "memoryHintGiB": 8,
+      "attributes": {
+        "alpha": false,
+        "antialias": true,
+        "depth": true,
+        "desynchronized": false,
+        "failIfMajorPerformanceCaveat": false,
+        "powerPreference": "high-performance",
+        "premultipliedAlpha": true,
+        "preserveDrawingBuffer": false,
+        "stencil": false,
+        "xrCompatible": false
+      },
+      "renderer": {
+        "at": 119051.59999990463,
+        "calls": 810,
+        "triangles": 694036,
+        "geometries": 576,
+        "textures": 136,
+        "programs": 243,
+        "dpr": 1,
+        "width": 1265,
+        "height": 720,
+        "heapBytes": 119960364,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Intel)",
+        "gpuRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "gpuTimerExtension": "EXT_disjoint_timer_query_webgl2",
+      "boot": {
+        "routeStartedAt": 420.09999990463257,
+        "documentToInteractiveMs": 16681,
+        "navigationToModuleMs": 0,
+        "moduleMs": 511,
+        "rendererModuleMs": null,
+        "dataMs": null,
+        "routeDataWaitMs": null,
+        "rendererMs": 118,
+        "headquartersWorkerMs": 2096,
+        "webglContextMs": 110,
+        "sceneMs": 4319,
+        "entityGeometryCpuMs": 16.100000619888306,
+        "environmentMaterialMs": 0,
+        "proceduralTextureCpuMs": 213.69999980926514,
+        "textureUploadMs": 852,
+        "cpuStagesMs": {
+          "textures": 214,
+          "geometry-preparation": 16,
+          "b12-unpack": 8,
+          "b12-materials": 196
+        },
+        "shaderDirectMs": 8417,
+        "shaderPostMs": null,
+        "shadowMs": 0,
+        "postprocessingMs": 9,
+        "physicsMs": 492,
+        "firstDrawMs": 9326,
+        "interactiveMs": 16261,
+        "controlsResponseMs": null,
+        "hydrationMs": 95594
+      },
+      "displayCadence": null,
+      "executedBuildManifest": {
+        "revision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+        "build": "baseline",
+        "sourceHashes": {
+          "src/features/commercial-map/utils/viewport.ts": "0a2ad7cb8d6417c56c81066529349f9771c3056368f1a718e4d924e0aedf7e05",
+          "src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx": "64dfa5269761bfed4516dd08667a809ecd9fb6e843f4e2c6d0050db85aafa8fc",
+          "src/features/commercial-map/components/canvas/CommercialMapAdaptiveQuality.tsx": "f5e205f6e863a827db9ae9c01676f720bf33ed6986ea19b773e6ea5a1ff844aa",
+          "src/features/commercial-map/components/canvas/TerritorialOrientation.tsx": "890a5e2a756c6d066e3de0fcf9b32c8aaa15d28e699c9d116f079589106f294e",
+          "src/features/commercial-map/utils/territorialOrientation.ts": "410f227afd37a832df6e5e0a7f726a9cdab912087bc47823ffd1b095456894a6"
+        },
+        "diagnostics": true,
+        "dirty": false,
+        "baseRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab"
+      },
+      "expectedRevision": "a154d470d7669bb5bf6a8ea2e52aa741ed22a5ab",
+      "ablationApplied": {
+        "requested": [
+          "bloom"
+        ],
+        "applied": true,
+        "executedPath": "composer",
+        "before": [
+          {
+            "name": "RenderPass",
+            "enabled": true,
+            "screen": false,
+            "effects": []
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "BloomEffect",
+              "ToneMappingEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "SMAAEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": true,
+            "effects": [
+              "CommercialMapSharpenEffect"
+            ]
+          }
+        ],
+        "after": [
+          {
+            "name": "RenderPass",
+            "enabled": true,
+            "screen": false,
+            "effects": []
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "ToneMappingEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": false,
+            "effects": [
+              "SMAAEffect"
+            ]
+          },
+          {
+            "name": "EffectPass",
+            "enabled": true,
+            "screen": true,
+            "effects": [
+              "CommercialMapSharpenEffect"
+            ]
+          }
+        ],
+        "dpr": 1,
+        "physical": {
+          "width": 1265,
+          "height": 720
+        },
+        "caveat": "QA mutation before equal unmeasured warmup; original resources retained; app render-health path still reports its frame owner."
+      },
+      "labelTiming": {
+        "enabled": true,
+        "callbacks": 1,
+        "caveat": "Diagnostic wrapper overhead; compare clean trials separately"
+      }
+    }
+  },
+  "errors": {
+    "baseline-HIGH-dpr1-without-bloom-trial1": []
+  },
+  "trials": [
+    {
+      "name": "baseline-HIGH-dpr1-without-bloom-trial1",
+      "label": "baseline",
+      "repeat": 1,
+      "startedAt": "2026-10-01T17:18:35.857Z",
+      "gate": null,
+      "errors": [],
+      "completedAt": "2026-10-01T17:18:59.112Z"
+    }
+  ],
+  "trialOrder": [
+    {
+      "label": "baseline",
+      "repeat": 1
+    }
+  ]
+}

@@ -31,6 +31,16 @@ export function resolveCommercialMapExecutionPolicy(tier: CommercialMapQualityTi
   return EXECUTION_POLICIES[tier];
 }
 
+const POST_EXECUTION_BUDGETS = Object.freeze({
+  direct: Object.freeze({ path: 'direct' as const, antialiasing: 'MSAA' as const, toneMapping: 'ACES_FILMIC' as const }),
+  post: Object.freeze({ path: 'post' as const, antialiasing: 'SMAA_ULTRA' as const, toneMapping: 'ACES_FILMIC' as const }),
+});
+
+/** The same complete scene, with cached shader variants and retained targets. */
+export function resolveCommercialMapPostProcessingExecutionBudget(tier: CommercialMapQualityTier) {
+  return tier === 'LOW' || tier === 'MEDIUM' ? POST_EXECUTION_BUDGETS.direct : POST_EXECUTION_BUDGETS.post;
+}
+
 /** QA builds alone may fix a profile before the first scene is mounted. */
 export function readCommercialMapQaQualityTier(enabled: boolean, search: string): CommercialMapQualityTier | null {
   if (!enabled) return null;

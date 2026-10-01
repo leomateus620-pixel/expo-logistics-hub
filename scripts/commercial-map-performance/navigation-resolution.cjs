@@ -1,12 +1,24 @@
-// Local production QA only. No application mutation, commercial writes or driver polling.
+// Local production QA only. No commercial writes or driver polling.
+// NAV_POST_DISABLE is an explicit in-memory QA ablation of one loaded renderer.
 // PLAYWRIGHT_MODULE=<installed playwright path> NAV_PHASE=probe node this-file
 // NAV_PHASE=compare uses one loaded scene, alternating A/B/B/A/A/B fresh-context trials.
+// NAV_LABEL=baseline|candidate also applies to probe/profile; NAV_VIEWPORT_WIDTH/HEIGHT
+// change only CSS viewport. NAV_LABEL_TIMING=1 and NAV_PHASE=profile are diagnostic
+// executions with extra instrumentation, kept separate from clean comparisons.
+// NAV_DRAW_TIMING=1 groups command submission by object during active navigation.
+// NAV_RECEIVE_SHADOWS=off tests shadow sampling on the same retained scene/resources.
 const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const phase = process.env.NAV_PHASE || 'probe';
 const scale = Number(process.env.NAV_DEVICE_DPR || 2);
 const policy = process.env.NAV_QUALITY || 'HIGH';
+const viewport = { width: Number(process.env.NAV_VIEWPORT_WIDTH || 1280), height: Number(process.env.NAV_VIEWPORT_HEIGHT || 720) };
+const disabledPost = (process.env.NAV_POST_DISABLE || '').split(',').filter(Boolean);
+const receiveShadows = process.env.NAV_RECEIVE_SHADOWS || 'authored';
+if (!Number.isInteger(viewport.width) || !Number.isInteger(viewport.height) || viewport.width < 1 || viewport.height < 1) throw Error('Invalid NAV_VIEWPORT_WIDTH/HEIGHT');
+if (disabledPost.some(name => !['bloom', 'smaa', 'sharpen', 'all'].includes(name))) throw Error('Invalid NAV_POST_DISABLE');
+if (!['authored', 'off'].includes(receiveShadows)) throw Error('Invalid NAV_RECEIVE_SHADOWS');
 const out = path.resolve(process.env.NAV_OUTPUT || 'docs/validation/navigation-resolution/evidence');
 const endpoints = {
   baseline: process.env.NAV_BASELINE_URL || 'http://127.0.0.1:4231',
@@ -15,13 +27,13 @@ const endpoints = {
 for (const url of Object.values(endpoints)) {
   if (!/^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(url)) throw Error('Loopback fixture URL required');
 }
-if (!['probe', 'compare', 'visual', 'sustained'].includes(phase)) throw Error('Unknown NAV_PHASE');
+if (!['probe', 'compare', 'visual', 'sustained', 'profile'].includes(phase)) throw Error('Unknown NAV_PHASE');
 const poses = {
   overview: { point: [3000, 2850], offset: [115, 120, 135] },
   close: { point: [2580, 3800], offset: [-11, 12, 5] },
 };
-const scenarios = process.env.NAV_SCENARIOS?.split(',') || (['probe', 'sustained'].includes(phase) ? ['continuous'] : ['continuous', 'short', 'zoom-pan']);
-const viewNames = process.env.NAV_VIEWS?.split(',') || (['probe', 'sustained'].includes(phase) ? ['overview'] : Object.keys(poses));
+const scenarios = process.env.NAV_SCENARIOS?.split(',') || (['probe', 'sustained', 'profile'].includes(phase) ? ['continuous'] : ['continuous', 'short', 'zoom-pan']);
+const viewNames = process.env.NAV_VIEWS?.split(',') || (['probe', 'sustained', 'profile'].includes(phase) ? ['overview'] : Object.keys(poses));
 const round = value => Number(value.toFixed(3));
 function distribution(values) {
   const sorted = values.filter(v => Number.isFinite(v) && v > 0).sort((a, b) => a - b);
@@ -32,8 +44,229 @@ function distribution(values) {
 }
 function save(name, value) { fs.writeFileSync(path.join(out, name), JSON.stringify(value, null, 2)); }
 
+async function applyPostAblation(page) {
+  if (!disabledPost.length) return { requested: [], applied: false };
+  if (policy === 'adaptive') throw Error('Post ablation requires a fixed NAV_QUALITY so adaptation cannot restore a pass');
+  return page.evaluate(disabled => {
+    const { gl, scene, camera, invalidate } = window.__benvenutoQa.root.getState();
+    const visited = new Set(), pipelines = new Set();
+    function visit(fiber) {
+      if (!fiber || visited.has(fiber)) return;
+      visited.add(fiber);
+      for (let hook = fiber.memoizedState; hook && typeof hook === 'object'; hook = hook.next) {
+        const value = hook.memoizedState?.current;
+        if (value?.composer?.getRenderer?.() === gl && Array.isArray(value.composer.passes)) pipelines.add(value);
+      }
+      visit(fiber.child); visit(fiber.sibling);
+    }
+    for (const root of window.__navigationReactRoots || []) visit(root.current);
+    if (pipelines.size !== 1) throw Error(`Post ablation needs exactly one live composer ref; found ${pipelines.size}`);
+    const pipeline = [...pipelines][0], composer = pipeline.composer;
+    const describe = () => composer.passes.map(pass => ({ name: pass.name, enabled: pass.enabled,
+      screen: pass.renderToScreen, effects: pass.effects?.map(effect => effect.name) || [] }));
+    const before = describe();
+    let executedPath = 'composer';
+    if (disabled.includes('all')) {
+      // Bypass every HDR/effect pass on the SAME scene/camera/renderer. Three's
+      // installed ACESFilmicToneMapping enum is 4, preserving the direct path.
+      composer.render = () => {
+        const previousToneMapping = gl.toneMapping;
+        gl.setRenderTarget(null); gl.toneMapping = 4;
+        try { gl.render(scene, camera); } finally { gl.toneMapping = previousToneMapping; }
+      };
+      executedPath = 'direct-scene-ACES';
+    } else {
+      for (const name of disabled) {
+        const effectName = name === 'bloom' ? 'BloomEffect' : name === 'smaa' ? 'SMAAEffect' : 'CommercialMapSharpenEffect';
+        const pass = composer.passes.find(value => value.effects?.some(effect => effect.name === effectName));
+        if (!pass) throw Error(`Post ablation could not find ${effectName}`);
+        if (name === 'bloom') {
+          // Removing this effect stops its blur/luminance update, unlike setting
+          // intensity to zero. Keep its allocated resources and the tone mapper.
+          pass.setEffects(pass.effects.filter(effect => effect.name !== effectName));
+          pass.recompile();
+        } else pass.enabled = false;
+      }
+      const enabled = composer.passes.filter(pass => pass.enabled);
+      composer.passes.forEach(pass => { pass.renderToScreen = pass === enabled.at(-1); });
+      if (!pipeline.hasScreenOutput()) throw Error('Ablation lost the composer screen output');
+    }
+    invalidate();
+    const result = { requested: disabled, applied: true, executedPath, before, after: describe(),
+      dpr: gl.getPixelRatio(), physical: { width: gl.domElement.width, height: gl.domElement.height },
+      caveat: 'QA mutation before equal unmeasured warmup; original resources retained; app render-health path still reports its frame owner.' };
+    window.__navigationResolutionQa.readAblation = () => ({ ...result, after: describe(),
+      dpr: gl.getPixelRatio(), physical: { width: gl.domElement.width, height: gl.domElement.height } });
+    return result;
+  }, disabledPost);
+}
+
+async function applyShadowReceivingAblation(page) {
+  if (receiveShadows !== 'off') return { requested: receiveShadows, applied: false };
+  if (policy === 'adaptive') throw Error('Shadow receiving ablation requires a fixed NAV_QUALITY');
+  return page.evaluate(() => {
+    const { scene, gl, invalidate } = window.__benvenutoQa.root.getState();
+    const receivers = [], geometryIds = new Set(), materialIds = new Set();
+    let meshCount = 0, vertexCount = 0, castShadowMeshCount = 0;
+    scene.traverse(object => {
+      if (!object.isMesh) return;
+      meshCount++;
+      if (object.castShadow) castShadowMeshCount++;
+      if (object.geometry && !geometryIds.has(object.geometry.uuid)) {
+        geometryIds.add(object.geometry.uuid);
+        vertexCount += object.geometry.getAttribute('position')?.count || 0;
+      }
+      for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
+        if (material) materialIds.add(material.uuid);
+      }
+      if (object.receiveShadow) { receivers.push(object); object.receiveShadow = false; }
+    });
+    const describe = () => ({ requested: 'off', applied: true, affectedMeshes: receivers.length,
+      remainingAffectedReceivers: receivers.reduce((count, mesh) => count + Number(mesh.receiveShadow), 0),
+      meshCount, castShadowMeshCount, geometryCount: geometryIds.size, vertexCount, materialCount: materialIds.size,
+      dpr: gl.getPixelRatio(), physical: { width: gl.domElement.width, height: gl.domElement.height },
+      caveat: 'QA receiveShadow boolean changes only. Authored casts, materials, geometry, targets and renderer retained; same unmeasured warmup.' });
+    const qa = window.__navigationResolutionQa, dispose = qa.dispose.bind(qa);
+    qa.readShadowAblation = describe;
+    qa.dispose = () => { for (const mesh of receivers) mesh.receiveShadow = true; dispose(); };
+    invalidate();
+    return describe();
+  });
+}
+
+async function instrumentLabels(page) {
+  return page.evaluate(() => {
+    const qa = window.__navigationResolutionQa, state = window.__benvenutoQa.root.getState();
+    // Match the live territorial callback by its browser API use, which survives
+    // minification. Do not wrap other labels, hover, selection or React frames.
+    const owners = state.internal.subscribers.filter(subscriber => String(subscriber.ref.current).includes('getComputedTextLength'));
+    if (!owners.length) return { enabled: true, callbacks: 0, reason: 'No SVG territorial callback in this revision' };
+    let active = null;
+    const restores = [];
+    for (const [prototype, method] of [[Element.prototype, 'getBoundingClientRect'], [Element.prototype, 'getClientRects'],
+      [SVGTextContentElement.prototype, 'getComputedTextLength'], [window, 'getComputedStyle']]) {
+      const original = prototype[method];
+      prototype[method] = function(...args) {
+        if (!active) return original.apply(this, args);
+        const start = performance.now();
+        try { return original.apply(this, args); }
+        finally { const row = active.layout[method] ||= { calls: 0, durationMs: 0 }; row.calls++; row.durationMs += performance.now() - start; }
+      };
+      restores.push(() => { prototype[method] = original; });
+    }
+    for (const subscriber of owners) {
+      const original = subscriber.ref.current;
+      subscriber.ref.current = function(...args) {
+        if (!qa.state.recording) return original.apply(this, args);
+        const row = { at: performance.now(), durationMs: 0, layout: {} };
+        active = row;
+        try { return original.apply(this, args); }
+        finally { row.durationMs = performance.now() - row.at; active = null; qa.state.labels.push(row); }
+      };
+      restores.push(() => { subscriber.ref.current = original; });
+    }
+    const dispose = qa.dispose;
+    qa.dispose = () => { restores.reverse().forEach(restore => restore()); dispose(); };
+    return { enabled: true, callbacks: owners.length, caveat: 'Diagnostic wrapper overhead; compare clean trials separately' };
+  });
+}
+
+async function startCpuProfile(page) {
+  if (phase !== 'profile') return null;
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Profiler.enable');
+  await cdp.send('Profiler.setSamplingInterval', { interval: Number(process.env.NAV_PROFILE_INTERVAL_US || 1000) });
+  await cdp.send('Profiler.start');
+  return cdp;
+}
+
+async function instrumentDraws(page) {
+  return page.evaluate(() => {
+    const qa = window.__navigationResolutionQa, { gl } = window.__benvenutoQa.root.getState();
+    if (typeof gl.renderBufferDirect !== 'function') throw Error('Draw timing needs WebGLRenderer.renderBufferDirect');
+    const totals = new Map();
+    const hints = object => {
+      const keys = ['presentationOnly', 'projection', 'labelCount', 'layerId', 'sourceRevision', 'renderMode',
+        'classification', 'qualityTier', 'canonicalOwner', 'surfaceOwner'];
+      const userData = Object.fromEntries(keys.filter(key => ['string', 'number', 'boolean'].includes(typeof object.userData?.[key]))
+        .map(key => [key, object.userData[key]]));
+      return { name: object.name || null, type: object.type, userData };
+    };
+    const original = gl.renderBufferDirect;
+    gl.renderBufferDirect = function(...args) {
+      if (!qa.state.recording || !window.__benvenutoQa.map.getState().cameraNavigating) return original.apply(this, args);
+      const object = args[4];
+      if (!object?.uuid) return original.apply(this, args);
+      let row = totals.get(object.uuid);
+      if (!row) {
+        const ancestors = [];
+        for (let parent = object.parent; parent && ancestors.length < 6; parent = parent.parent) ancestors.push(hints(parent));
+        row = { uuid: object.uuid, ...hints(object), isBatchedMesh: Boolean(object.isBatchedMesh),
+          isInstancedMesh: Boolean(object.isInstancedMesh), instanceCount: object.isInstancedMesh ? object.count : null,
+          ancestors, logicalCalls: 0, drawCalls: 0, commandSubmissionMs: 0 };
+        totals.set(object.uuid, row);
+      }
+      const before = gl.info.render.calls, started = performance.now();
+      try { return original.apply(this, args); }
+      finally {
+        row.commandSubmissionMs += performance.now() - started;
+        row.logicalCalls++; row.drawCalls += Math.max(0, gl.info.render.calls - before);
+      }
+    };
+    const begin = qa.begin, finish = qa.finish, dispose = qa.dispose;
+    qa.begin = () => { totals.clear(); begin(); };
+    qa.finish = () => {
+      const run = finish();
+      const rows = [...totals.values()];
+      run.drawTiming = { enabled: true, objects: rows.length,
+        logicalCalls: rows.reduce((sum, row) => sum + row.logicalCalls, 0),
+        drawCalls: rows.reduce((sum, row) => sum + row.drawCalls, 0),
+        commandSubmissionMs: rows.reduce((sum, row) => sum + row.commandSubmissionMs, 0),
+        topObjects: rows.sort((a, b) => b.commandSubmissionMs - a.commandSubmissionMs).slice(0, 20),
+        caveat: 'Active camera-navigation only. CPU command submission includes driver calls, not GPU elapsed time. Wrapper overhead excludes this trial from clean comparison.' };
+      return run;
+    };
+    qa.dispose = () => { gl.renderBufferDirect = original; dispose(); };
+    return { enabled: true, activeNavigationOnly: true, maxReportedObjects: 20 };
+  });
+}
+async function stopCpuProfile(cdp, name) {
+  if (!cdp) return null;
+  const { profile } = await cdp.send('Profiler.stop');
+  await cdp.detach();
+  save(name + '.cpuprofile', profile);
+  const nodes = new Map(profile.nodes.map(node => [node.id, node]));
+  const parents = new Map(profile.nodes.flatMap(node => (node.children || []).map(id => [id, node.id])));
+  const timing = new Map();
+  for (let index = 0; index < (profile.samples || []).length; index++) {
+    let id = profile.samples[index];
+    const ms = (profile.timeDeltas?.[index] || 0) / 1000;
+    const self = timing.get(id) || { selfMs: 0, inclusiveMs: 0 }; self.selfMs += ms; timing.set(id, self);
+    while (id !== undefined) {
+      const row = timing.get(id) || { selfMs: 0, inclusiveMs: 0 }; row.inclusiveMs += ms; timing.set(id, row); id = parents.get(id);
+    }
+  }
+  return { file: name + '.cpuprofile', durationMs: (profile.endTime - profile.startTime) / 1000,
+    samples: profile.samples?.length || 0, caveat: 'Separate CPU sampling execution; these frame times are not the clean before/after comparison.',
+    functions: [...timing].map(([id, value]) => ({ ...nodes.get(id).callFrame, ...value })).sort((a, b) => b.selfMs - a.selfMs).slice(0, 40) };
+}
+
 async function boot(browser, label, trialName) {
-  const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: scale });
+  const context = await browser.newContext({ viewport, deviceScaleFactor: scale });
+  if (disabledPost.length) await context.addInitScript(() => {
+    // QA only: retain React roots once so the persistent useRef-owned composer
+    // can be reached without adding a production API or rebuilding resources.
+    const roots = new Set();
+    window.__navigationReactRoots = roots;
+    const previous = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+    if (previous) {
+      const oldCommit = previous.onCommitFiberRoot;
+      previous.onCommitFiberRoot = function(id, root, ...args) { roots.add(root); return oldCommit?.call(this, id, root, ...args); };
+    } else {
+      window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = { supportsFiber: true, inject: () => 1,
+        onCommitFiberRoot: (_id, root) => roots.add(root), onCommitFiberUnmount() {} };
+    }
+  });
   const page = await context.newPage(), errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.bringToFront();
@@ -60,6 +293,17 @@ async function boot(browser, label, trialName) {
     await page.screenshot({ path: path.join(out, `${trialName}-boot-failure.png`) });
     throw error;
   } finally { clearInterval(progress); }
+  let adaptiveWarmupHold = null;
+  if (process.env.NAV_ADAPTIVE_WARMUP_HOLD === '1') {
+    if (policy !== 'adaptive' || phase !== 'sustained') throw Error('Adaptive warmup hold requires NAV_PHASE=sustained and NAV_QUALITY=adaptive');
+    adaptiveWarmupHold = await page.evaluate(() => {
+      const canvas = document.querySelector('canvas');
+      const original = JSON.parse(canvas.dataset.commercialMapQuality || 'null');
+      if (!original || original.logicalTier === 'LOW') throw Error('Automatic budget already LOW; no pending downgrade can be observed');
+      canvas.dispatchEvent(new CustomEvent('commercial-map-quality-test', { detail: { tier: original.logicalTier } }));
+      return { original, frozenAt: performance.now(), purpose: 'Hold the original automatic tier for equal real warmup, then restore its saved automatic state before the measured gesture. Frame times are untouched.' };
+    });
+  }
   await page.addStyleTag({ content: '.commercial-map-rendering-diagnostics__toolbar,.commercial-map-rendering-diagnostics__stress,.commercial-map-rendering-diagnostics__metrics,.commercial-map-district-qa{display:none!important}.commercial-map-rendering-diagnostics__viewport{position:fixed!important;inset:0!important;height:100vh!important;width:100vw!important}' });
   await page.waitForTimeout(6000);
   await page.evaluate(() => {
@@ -69,7 +313,7 @@ async function boot(browser, label, trialName) {
     const readJson = key => JSON.parse(c.dataset[key] || 'null');
     const serialTarget = target => target && ({ id: target.uuid || target.texture?.uuid, width: target.width,
       height: target.height, samples: target.samples, name: target.texture?.name || null });
-    const state = { recording: false, events: [], frames: [], samples: [], targets: new Map(), lastSignature: '',
+    const state = { recording: false, events: [], frames: [], samples: [], labels: [], targets: new Map(), lastSignature: '',
       setSizeCalls: 0, effectiveResizes: 0, setPixelRatioCalls: 0, pointerId: 1, pointerType: 'mouse' };
     function snapshot() {
       const { camera, controls, viewport, size } = q.root.getState();
@@ -78,7 +322,7 @@ async function boot(browser, label, trialName) {
         css: { width: size.width, height: size.height, clientWidth: c.clientWidth, clientHeight: c.clientHeight },
         physical: { width: c.width, height: c.height }, dpr: gl.getPixelRatio(), storeDpr: viewport.dpr,
         quality: readJson('commercialMapQuality'), health: readJson('commercialMapRenderHealth'),
-        renderTiming: readJson('commercialMapRenderTiming'), cameraId: camera.uuid,
+        renderTiming: readJson('commercialMapRenderTiming'), effectBudget: readJson('commercialMapPostBudget'), cameraId: camera.uuid,
         cameraNavigating: map.cameraNavigating, camera: camera.position.toArray(), target: controls.target.toArray(),
         targets: [...state.targets.values()],
         renderer: { calls: gl.info.render.calls, triangles: gl.info.render.triangles, geometries: gl.info.memory.geometries,
@@ -86,7 +330,9 @@ async function boot(browser, label, trialName) {
         identity: { canvasMounts: d.canvasMounts, rendererCreates: d.rendererCreates, controlsCreates: d.controlsCreates,
           activeCanvases: d.activeCanvases, activeControls: d.activeControls },
         selection: map.selectedEntityId, interior: map.interiorEntityId,
-        inventory: readJson('commercialMapInventoryCounts') };
+        inventory: readJson('commercialMapInventoryCounts'),
+        ablation: window.__navigationResolutionQa?.readAblation?.() || null,
+        shadowReceivingAblation: window.__navigationResolutionQa?.readShadowAblation?.() || null };
     }
     function event(type, extra = {}) {
       if (state.recording) state.events.push({ at: performance.now(), type, ...extra });
@@ -141,7 +387,7 @@ async function boot(browser, label, trialName) {
     window.__navigationResolutionQa = {
       snapshot, state,
       begin() {
-        state.events.length = state.frames.length = state.samples.length = 0;
+        state.events.length = state.frames.length = state.samples.length = state.labels.length = 0;
         state.setSizeCalls = state.effectiveResizes = state.setPixelRatioCalls = 0;
         d.resetSamples(); state.recording = true;
         state.before = snapshot(); event('run-start');
@@ -149,7 +395,7 @@ async function boot(browser, label, trialName) {
       finish() {
         const after = snapshot(); event('run-end'); state.recording = false;
         const start = state.before.at;
-        return { before: state.before, after, events: state.events, frames: state.frames, samples: state.samples,
+        return { before: state.before, after, events: state.events, frames: state.frames, samples: state.samples, labels: state.labels,
           setSizeCalls: state.setSizeCalls, effectiveResizes: state.effectiveResizes, setPixelRatioCalls: state.setPixelRatioCalls,
           longTasks: d.longTasks.filter(row => row.at >= start && row.at <= after.at), qualityChanges: d.qualityChanges,
           bootLongTasks: window.__commercialMapPerformance?.longTasks?.filter(row => row.at >= start && row.at <= after.at) || [] };
@@ -160,13 +406,29 @@ async function boot(browser, label, trialName) {
         gl.setRenderTarget = oldTarget; d.frameTimes.push = oldPush; },
     };
   });
+  const ablationApplied = await applyPostAblation(page);
+  const shadowReceivingAblation = await applyShadowReceivingAblation(page);
+  const labelTiming = process.env.NAV_LABEL_TIMING === '1' ? await instrumentLabels(page) : { enabled: false };
+  const drawTiming = process.env.NAV_DRAW_TIMING === '1' ? await instrumentDraws(page) : { enabled: false };
+  const executedBuildManifest = await page.evaluate(async () => {
+    const response = await fetch('/qa-build-manifest.json', { cache: 'no-store' });
+    if (!response.ok || !(response.headers.get('content-type') || '').includes('json')) return null;
+    return response.json();
+  });
+  const expectedRevision = process.env[label === 'baseline' ? 'NAV_BASELINE_REVISION' : 'NAV_CANDIDATE_REVISION'];
+  if (expectedRevision && (!executedBuildManifest || executedBuildManifest.baseRevision !== expectedRevision)) {
+    throw Error(`Executed build manifest does not match expected ${label} revision ${expectedRevision}`);
+  }
   const environment = await page.evaluate(() => ({ userAgent: navigator.userAgent, platform: navigator.platform,
     viewport: { width: innerWidth, height: innerHeight }, devicePixelRatio, visualViewportScale: visualViewport?.scale,
     hardwareConcurrency: navigator.hardwareConcurrency, memoryHintGiB: navigator.deviceMemory || null,
     attributes: window.__navigationResolutionQa.attributes, renderer: window.__commercialMapRuntimeDiagnostics.capture(),
     gpuTimerExtension: window.__navigationResolutionQa.gpuTimerExtension,
+    multiDrawExtension: window.__benvenutoQa.root.getState().gl.getContext().getExtension('WEBGL_multi_draw') ? 'WEBGL_multi_draw' : null,
     boot: window.__commercialMapPerformance?.summary,
     displayCadence: JSON.parse(document.querySelector('canvas').dataset.commercialMapExecutionPolicy || 'null') }));
+  Object.assign(environment, { executedBuildManifest, expectedRevision: expectedRevision || null, ablationApplied, shadowReceivingAblation, labelTiming, drawTiming, adaptiveWarmupHold });
+  save(`${trialName}-environment.json`, environment);
   return { label, context, page, errors, environment };
 }
 
@@ -203,6 +465,20 @@ async function resetRenderTiming(page) {
   const checkbox = page.getByLabel('Medir CPU/GPU (DEV)', { exact: true });
   await checkbox.evaluate(input => { if (input.checked) input.click(); });
   await checkbox.evaluate(input => { if (!input.checked) input.click(); });
+}
+async function assertExpectedRenderPath(page, trialName) {
+  const facts = await page.evaluate(() => {
+    const canvas = document.querySelector('canvas');
+    return { health: JSON.parse(canvas.dataset.commercialMapRenderHealth || 'null'),
+      budget: JSON.parse(canvas.dataset.commercialMapPostBudget || 'null'),
+      failedCriticalPost: window.__commercialMapPerformance?.events?.some(row => row.name === 'critical-post:end' && row.failed) || false };
+  });
+  const expectedPath = facts.budget?.requestedPath === 'direct' && facts.budget.directBudgetAvailable ? 'direct' : 'post';
+  if (facts.failedCriticalPost || facts.health?.status !== 'ready' || facts.health.path !== expectedPath) {
+    save(`${trialName}-invalid-render-path.json`, { expectedPath, ...facts,
+      reason: 'Fallback or failed shader preparation is not the requested workload; do not include this trial in a performance comparison.' });
+    throw Error(`Invalid render path for ${trialName}: expected ready/${expectedPath}`);
+  }
 }
 async function stopRenderTiming(page) {
   if (process.env.NAV_RENDER_TIMING !== '1') return;
@@ -397,13 +673,22 @@ function summarize(run) {
   // RuntimeFrameDiagnostics already omits the first delta after actual idle.
   // Retain every recorded interval in the active window, including real stalls.
   const frames = windows.flatMap(window => run.frames.filter(row => row.at >= window.start && row.at <= window.end));
+  const labels = windows.flatMap(window => run.labels.filter(row => row.at >= window.start && row.at <= window.end));
+  const layout = {};
+  for (const row of labels) for (const [method, timing] of Object.entries(row.layout)) {
+    const total = layout[method] ||= { calls: 0, durationMs: 0 };
+    total.calls += timing.calls; total.durationMs += timing.durationMs;
+  }
   return { activeWindows: windows, frames: distribution(frames.map(row => Number(row.duration))),
+    labelCallbacks: distribution(labels.map(row => row.durationMs)), labelLayout: layout,
+    drawTiming: run.drawTiming || { enabled: false },
     invalidFocus: run.events.some(row => row.type === 'invalid-focus'),
     dprValues: [...new Set([run.before.dpr, ...run.samples.map(row => row.dpr), run.after.dpr])],
     physicalSizes: [...new Set([run.before, ...run.samples, run.after].map(row => `${row.physical.width}x${row.physical.height}`))],
     effectiveResizes: run.effectiveResizes, setSizeCalls: run.setSizeCalls, setPixelRatioCalls: run.setPixelRatioCalls,
     targets: run.after.targets, qualityChanges: run.qualityChanges, longTasks: run.longTasks,
-    renderTiming: run.after.renderTiming,
+    renderTiming: run.after.renderTiming, effectBudget: run.after.effectBudget, ablationApplied: run.after.ablation,
+    shadowReceivingAblation: run.after.shadowReceivingAblation,
     resourcesBefore: run.before.renderer, resourcesAfter: run.after.renderer,
     pathValues: [...new Set([run.before, ...run.samples, run.after].map(row => row.health?.path))],
     identityBefore: run.before.identity, identityAfter: run.after.identity,
@@ -432,6 +717,8 @@ async function waitMeasureGate(trialName) {
     args: ['--use-angle=d3d11', '--disable-background-timer-throttling'] });
   let session;
   const report = { phase, policy, renderTimingRequested: process.env.NAV_RENDER_TIMING === '1',
+    requestedViewport: viewport, postDisableRequested: disabledPost, receiveShadowsRequested: receiveShadows, labelTimingRequested: process.env.NAV_LABEL_TIMING === '1',
+    drawTimingRequested: process.env.NAV_DRAW_TIMING === '1',
     generatedAt: new Date().toISOString(), browser: browser.version(), endpoints,
     baselineRevision: process.env.NAV_BASELINE_REVISION || null, candidateRevision: process.env.NAV_CANDIDATE_REVISION || null,
     evidence: 'Visible headful Chrome, local production fixture. Viewport/DPR emulation does not certify physical devices. Renderer counts are not GPU time or byte memory estimates.',
@@ -443,8 +730,9 @@ async function waitMeasureGate(trialName) {
       short: 'three 350ms drags +28px/±5px with actual damping settlement',
       zoomPan: '900ms with up to nine temporal wheel steps 0..8 (actual steps/deltas recorded), then 1.7s pan +45px/±20px' }, runs: [], environments: {}, errors: {}, trials: [] };
   try {
-    const labels = phase === 'probe' ? ['baseline'] : phase === 'sustained' ? ['candidate']
-      : (process.env.NAV_LABEL ? [process.env.NAV_LABEL] : ['baseline', 'candidate']);
+    const labels = process.env.NAV_LABEL ? [process.env.NAV_LABEL]
+      : ['probe', 'profile'].includes(phase) ? ['baseline'] : phase === 'sustained' ? ['candidate'] : ['baseline', 'candidate'];
+    if (labels.some(label => !['baseline', 'candidate'].includes(label))) throw Error('Invalid NAV_LABEL');
     const repeats = Number(process.env.NAV_REPEATS || (phase === 'compare' && scenarios.includes('continuous') ? 3 : 1));
     const trials = [];
     for (let repeat = 1; repeat <= repeats; repeat++) {
@@ -453,7 +741,8 @@ async function waitMeasureGate(trialName) {
     }
     report.trialOrder = trials.map(({ label, repeat }) => ({ label, repeat }));
     for (const { label, repeat } of trials) {
-      const trialName = `${label}-${policy}-dpr${scale}-trial${repeat}`;
+      const variant = disabledPost.length ? '-without-' + disabledPost.join('-') : '';
+      const trialName = `${label}-${policy}-dpr${scale}${variant}-trial${repeat}`;
       session = await boot(browser, label, trialName);
       const { page } = session;
       report.environments[trialName] = session.environment;
@@ -483,15 +772,25 @@ async function waitMeasureGate(trialName) {
         for (const view of viewNames) for (const scenario of trialScenarios) {
           await pose(page, view); await gesture(page, scenario); // excluded equal warmup
           await pose(page, view);
+          await assertExpectedRenderPath(page, trialName);
           await resetRenderTiming(page);
+          const profiler = await startCpuProfile(page);
           await page.evaluate(() => { window.focus(); window.__navigationResolutionQa.begin(); });
+          if (session.environment.adaptiveWarmupHold) {
+            await page.evaluate(() => {
+              const c = document.querySelector('canvas');
+              c.dispatchEvent(new CustomEvent('commercial-map-quality-test', { detail: { tier: null } }));
+              window.__navigationResolutionQa.state.events.push({ at: performance.now(), type: 'adaptive-warmup-release', quality: JSON.parse(c.dataset.commercialMapQuality) });
+            });
+          }
           await gesture(page, scenario, phase === 'sustained' ? Number(process.env.NAV_SUSTAINED_MS || 120000) : undefined);
           const raw = await page.evaluate(() => window.__navigationResolutionQa.finish());
-          const summary = summarize(raw), name = `${label}-${policy}-dpr${scale}-${view}-${scenario}-${repeat}`;
+          const summary = summarize(raw), name = `${label}-${policy}-dpr${scale}${variant}-${view}-${scenario}-${repeat}`;
+          const cpuProfile = await stopCpuProfile(profiler, name);
           save(name + '-raw.json', raw);
           await stopRenderTiming(page);
-          report.runs.push({ name, label, view, scenario, repeat, trial: trialName, ...summary });
-          save(`${phase}-${policy}-dpr${scale}-summary.json`, report);
+          report.runs.push({ name, label, view, scenario, repeat, trial: trialName, cpuProfile, ...summary });
+          save(`${phase}-${policy}-dpr${scale}${variant}-summary.json`, report);
           console.log(JSON.stringify({ name, dpr: summary.dprValues, sizes: summary.physicalSizes,
             resizes: summary.effectiveResizes, frames: summary.frames, invalidFocus: summary.invalidFocus }));
           if (summary.invalidFocus) throw Error('Tab hidden or unfocused: comparison invalid');
@@ -506,10 +805,11 @@ async function waitMeasureGate(trialName) {
       // Close the entire scene before booting the next revision. Reusing the
       // browser keeps driver warmup comparable without retaining two map graphs.
       await session.context.close(); session = undefined;
-      save(`${phase}-${policy}-dpr${scale}-summary.json`, report);
+      save(`${phase}-${policy}-dpr${scale}${variant}-summary.json`, report);
       if (report.errors[trialName].length) throw Error('Page errors occurred; inspect report');
     }
-    save(`${phase}-${policy}-dpr${scale}-summary.json`, report);
+    const variant = disabledPost.length ? '-without-' + disabledPost.join('-') : '';
+    save(`${phase}-${policy}-dpr${scale}${variant}-summary.json`, report);
   } finally {
     if (session) await session.context.close();
     await browser.close();

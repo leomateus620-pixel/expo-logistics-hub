@@ -1,6 +1,7 @@
 import { advanceSunrisePlayback, hasSunrisePlaybackFinished, updateSolarShadow } from '../../utils/lightingTransition';
 import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
-import { COMMERCIAL_MAP_CANONICAL_CONTENT, resolveCommercialMapExecutionPolicy } from '../../utils/executionPolicy';
+import { COMMERCIAL_MAP_CANONICAL_CONTENT, resolveCommercialMapExecutionPolicy, resolveCommercialMapPostProcessingExecutionBudget } from '../../utils/executionPolicy';
+import { COMMERCIAL_MAP_QUALITY_EVENT } from '../../utils/adaptiveQualityRuntime';
 import { isCommercialMapPostReady, isCommercialSceneCompiling } from '../../utils/sceneShaderWarmup';
 import { advanceRainBlend, commercialRainRuntime } from '../../utils/rainRuntime';
 import { markCommercialMapStage } from '../../utils/performanceDiagnostics';
@@ -772,7 +773,26 @@ export function SunrisePostProcessing({
   const contextLosses = useRef(0);
   const sizedBuffer = useRef('');
   const drawingBuffer = useRef(new THREE.Vector2());
+  const effectTier = useRef<CommercialMapQualityTier | null>(null);
+  const directBudgetAvailable = useRef(gl.getContext().getContextAttributes()?.antialias === true).current;
+  const publishedBudgetSignature = useRef('');
   const [contextEpoch, setContextEpoch] = useState(0);
+
+  useLayoutEffect(() => {
+    const syncEffectBudget = () => {
+      const serialized = gl.domElement.dataset.commercialMapQuality;
+      const tier = serialized
+        ? (JSON.parse(serialized) as { effectTier?: CommercialMapQualityTier }).effectTier
+        : undefined;
+      effectTier.current = tier === 'LOW' || tier === 'MEDIUM' || tier === 'HIGH' || tier === 'ULTRA' ? tier : null;
+      invalidate();
+    };
+    // Production quality publishes this event too. Do not infer hardware from
+    // the atmosphere's balanced viewport cap, or toggle budgets per gesture.
+    gl.domElement.addEventListener(COMMERCIAL_MAP_QUALITY_EVENT, syncEffectBudget);
+    syncEffectBudget();
+    return () => gl.domElement.removeEventListener(COMMERCIAL_MAP_QUALITY_EVENT, syncEffectBudget);
+  }, [gl, invalidate]);
 
   const observeContextLoss = useCallback(() => {
     // isContextLost() can turn true during a draw before the browser delivers
@@ -1015,8 +1035,12 @@ export function SunrisePostProcessing({
     };
     try {
       const current = pipeline.current;
+      // DIRECT uses the existing antialiased default framebuffer and ACES.
+      // Both material variants are prepared before a layer becomes visible.
+      // Keep the HDR stack resident so a stable recovery/upgrade can reuse it.
+      const budget = effectTier.current ? resolveCommercialMapPostProcessingExecutionBudget(effectTier.current) : null;
       if (enabled && isCommercialMapPostReady(gl)
-        && quality.bloomEnabled && current && !postFailed.current) {
+        && !(budget?.path === 'direct' && directBudgetAvailable) && quality.bloomEnabled && current && !postFailed.current) {
         try {
           bindCommercialMapScreen(gl, size.width, size.height);
           gl.toneMapping = THREE.NoToneMapping;
@@ -1086,6 +1110,23 @@ export function SunrisePostProcessing({
         contextLosses: contextLosses.current,
         lastErrorCode: lastErrorCode.current,
       });
+      const budget = effectTier.current ? resolveCommercialMapPostProcessingExecutionBudget(effectTier.current) : null;
+      const appliedPath = suspended || rendererFailed.current ? 'suspended' : path;
+      const budgetSignature = `${effectTier.current}:${budget?.path ?? 'post'}:${appliedPath}:${Boolean(pipeline.current)}:${quality.sharpenStrength}`;
+      if (budgetSignature !== publishedBudgetSignature.current) {
+        publishedBudgetSignature.current = budgetSignature;
+        gl.domElement.dataset.commercialMapPostBudget = JSON.stringify({
+          effectTier: effectTier.current,
+          requestedPath: budget?.path ?? 'post',
+          appliedPath,
+          antialiasing: appliedPath === 'post' ? 'SMAA_ULTRA' : appliedPath === 'direct' && directBudgetAvailable ? 'MSAA' : null,
+          directBudgetAvailable,
+          toneMapping: 'ACES_FILMIC',
+          bloomEnabled: appliedPath === 'post',
+          sharpenStrength: appliedPath === 'post' ? quality.sharpenStrength : 0,
+          composerResident: Boolean(pipeline.current),
+        });
+      }
     }
   }, 1);
 

@@ -8,6 +8,7 @@ import {
   isCommercialMapAdaptiveQualitySamplingActive,
   isCommercialMapHeavyQualityGestureActive,
   recordCommercialMapAdaptiveFrame,
+  resolveCommercialMapEffectQualityTier,
   shouldApplyCommercialMapPixelRatioNow,
   shouldDeferCommercialMapSceneQuality,
   updateCommercialMapPixelRatioState,
@@ -17,6 +18,12 @@ import { COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES } from '@/features/c
 const read = (path: string) => readFileSync(resolve(path), 'utf8');
 
 describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
+  it('aplica o orçamento barato imediatamente ao reduzir e aguarda o tier de cena ao recuperar', () => {
+    expect(resolveCommercialMapEffectQualityTier('MEDIUM', 'HIGH')).toBe('MEDIUM');
+    expect(resolveCommercialMapEffectQualityTier('LOW', 'HIGH')).toBe('LOW');
+    expect(resolveCommercialMapEffectQualityTier('HIGH', 'MEDIUM')).toBe('MEDIUM');
+    expect(resolveCommercialMapEffectQualityTier('HIGH', 'HIGH')).toBe('HIGH');
+  });
   it('fecha uma janela somente após frames suficientes e calcula a média real', () => {
     const window = createCommercialMapFrameTimeWindow();
     for (let frame = 1; frame < COMMERCIAL_MAP_ADAPTIVE_QUALITY_MIN_SAMPLED_FRAMES; frame += 1) {

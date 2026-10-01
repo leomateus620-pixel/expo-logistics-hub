@@ -4857,6 +4857,13 @@ const Scene = memo(function Scene({
         || !REPLACED_OFFICIAL_ROAD_IDENTIFIERS.includes(entity.publicIdentifier))
     ))
   ), [exporuralSouthRoadPresentation, gateNineAccessPresentation, hydrologicalModeActive, isolatedArea, nonLotEntities]);
+  // Hover/selection rerenders must not rebuild the shared text atlas and fit.
+  const territorialLabelEntities = useMemo(() => interactiveEntityIds
+    ? exteriorRenderedEntities.filter(entity => interactiveEntityIds.has(entity.id)) : exteriorRenderedEntities,
+  [exteriorRenderedEntities, interactiveEntityIds]);
+  const territorialLabelRoads = useMemo(() => interactiveEntityIds
+    ? circulationEntities.filter(entity => interactiveEntityIds.has(entity.id)) : circulationEntities,
+  [circulationEntities, interactiveEntityIds]);
   const structuralEntities = useMemo(() => nonLotEntities.filter((entity) => (
     entity.classification !== 'ROAD' && entity.classification !== 'PEDESTRIAN_PATH'
   )).map((entity) => rearParkingEnabled ? rearParkingEntityForPresentation(entity) : entity), [nonLotEntities, rearParkingEnabled]);
@@ -5413,9 +5420,9 @@ const Scene = memo(function Scene({
       {publicPolicy && labelsVisible && !interiorEntity && <TerritorialOrientation entities={entities} lots={lots} roads={circulationEntities} policy={publicPolicy} />}
       {!publicPolicy && !publicPavilion && labelsVisible && !interiorEntity && !visitEnabled && !hydrologicalModeActive && !lunarCinematicActive && (
         <TerritorialOrientation
-          entities={interactiveEntityIds ? exteriorRenderedEntities.filter(entity => interactiveEntityIds.has(entity.id)) : exteriorRenderedEntities}
+          entities={territorialLabelEntities}
           lots={lots}
-          roads={interactiveEntityIds ? circulationEntities.filter(entity => interactiveEntityIds.has(entity.id)) : circulationEntities}
+          roads={territorialLabelRoads}
         />
       )}
       {visitEnabled && !publicPolicy && !publicPavilion && <VisitFeatureBoundary><Suspense fallback={null}>

@@ -1,0 +1,3307 @@
+{
+  "revision": "e5b3300a",
+  "base": "a154d470",
+  "condition": "MEDIUM, DPR1, CSS1265x720, same trajectories/content, active gesture+damping only",
+  "runs": [
+    {
+      "folder": "compare",
+      "name": "baseline-MEDIUM-dpr1-overview-continuous-1",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "continuous",
+      "repeat": 1,
+      "trial": "baseline-MEDIUM-dpr1-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 120489.20000004768,
+          "end": 127832.40000009537
+        }
+      ],
+      "frames": {
+        "samples": 210,
+        "medianMs": 33.7,
+        "p95Ms": 45.6,
+        "stallsOver50Ms": 5,
+        "maxMs": 73.5
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [
+        {
+          "id": "a87ef6f3-a3ef-4fec-9a81-52bdd54cad82",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "17a7f286-44a9-4f0f-a1cc-461c5c475173",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "LuminancePass.Target"
+        },
+        {
+          "id": "cded5852-cde2-41a1-998d-922cca918631",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Downsampling.Mipmap0"
+        },
+        {
+          "id": "674e1a1b-362f-4581-abd8-79357a8a4233",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Downsampling.Mipmap1"
+        },
+        {
+          "id": "e614f8f4-bf4d-4943-9cf1-57d37956c0ef",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Downsampling.Mipmap2"
+        },
+        {
+          "id": "532b0264-7de8-464b-8ecd-7d95ad402b07",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Downsampling.Mipmap3"
+        },
+        {
+          "id": "e262954b-affb-47f6-ae98-d91a70945cfc",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Downsampling.Mipmap4"
+        },
+        {
+          "id": "8e875f08-fe71-4df8-9def-f72681eac32c",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Downsampling.Mipmap5"
+        },
+        {
+          "id": "ab951db3-e35c-40ee-8b49-ad42577663c7",
+          "width": 10,
+          "height": 6,
+          "samples": 0,
+          "name": "Downsampling.Mipmap6"
+        },
+        {
+          "id": "63cdf9ac-70de-4495-8756-f3f26a696514",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Upsampling.Mipmap5"
+        },
+        {
+          "id": "41b6cc39-d705-4e3d-b0fd-0168a167b04e",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Upsampling.Mipmap4"
+        },
+        {
+          "id": "d5bfa47e-e96c-4681-9767-f91c97a7a32c",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Upsampling.Mipmap3"
+        },
+        {
+          "id": "844818d0-017f-40f7-815f-ffe576fbab71",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Upsampling.Mipmap2"
+        },
+        {
+          "id": "15a1ce84-4a3b-4d14-b9b4-6d1a35cb6e9f",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Upsampling.Mipmap1"
+        },
+        {
+          "id": "4268da41-0063-4e74-b0f7-aa1195ec281d",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Upsampling.Mipmap0"
+        },
+        {
+          "id": "c1072aae-f29d-448c-8ca8-1ffda2acdf6a",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "20df92f8-a5e2-475e-a24f-35d75350134a",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Edges"
+        },
+        {
+          "id": "f2cff7b3-2886-47e4-825c-a9463c33304f",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Weights"
+        }
+      ],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 124718.70000004768,
+          "duration": 50,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 125099.30000019073,
+          "duration": 54,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 125605.60000014305,
+          "duration": 51,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 126700,
+          "duration": 68,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 127930.40000009537,
+          "duration": 57,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 4,
+        "droppedGpuQueries": 1,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 234,
+          "averageMs": 29.539,
+          "p95Ms": 40.4,
+          "p99Ms": 49.8
+        },
+        "gpu": {
+          "samples": 229,
+          "averageMs": 33.53,
+          "p95Ms": 36.681,
+          "p99Ms": 44.72
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 234,
+              "averageMs": 29.539,
+              "p95Ms": 40.4,
+              "p99Ms": 49.8
+            },
+            "gpu": {
+              "samples": 229,
+              "averageMs": 33.53,
+              "p95Ms": 36.681,
+              "p99Ms": 44.72
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "effectBudget": null,
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 814,
+        "triangles": 656670,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 241
+      },
+      "resourcesAfter": {
+        "calls": 816,
+        "triangles": 685712,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 241
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -120.61586165610454,
+        119.9999797850014,
+        133.96814736814787
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 3449,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "rawFile": "compare\\baseline-MEDIUM-dpr1-overview-continuous-1-raw.json"
+    },
+    {
+      "folder": "compare",
+      "name": "baseline-MEDIUM-dpr1-overview-short-1",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "short",
+      "repeat": 1,
+      "trial": "baseline-MEDIUM-dpr1-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 145556.80000019073,
+          "end": 148333
+        },
+        {
+          "start": 149240,
+          "end": 151920.60000014305
+        },
+        {
+          "start": 152843.80000019073,
+          "end": 155672.10000014305
+        }
+      ],
+      "frames": {
+        "samples": 237,
+        "medianMs": 33.3,
+        "p95Ms": 41,
+        "stallsOver50Ms": 4,
+        "maxMs": 125.7
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [
+        {
+          "id": "a87ef6f3-a3ef-4fec-9a81-52bdd54cad82",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "17a7f286-44a9-4f0f-a1cc-461c5c475173",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "LuminancePass.Target"
+        },
+        {
+          "id": "cded5852-cde2-41a1-998d-922cca918631",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Downsampling.Mipmap0"
+        },
+        {
+          "id": "674e1a1b-362f-4581-abd8-79357a8a4233",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Downsampling.Mipmap1"
+        },
+        {
+          "id": "e614f8f4-bf4d-4943-9cf1-57d37956c0ef",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Downsampling.Mipmap2"
+        },
+        {
+          "id": "532b0264-7de8-464b-8ecd-7d95ad402b07",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Downsampling.Mipmap3"
+        },
+        {
+          "id": "e262954b-affb-47f6-ae98-d91a70945cfc",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Downsampling.Mipmap4"
+        },
+        {
+          "id": "8e875f08-fe71-4df8-9def-f72681eac32c",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Downsampling.Mipmap5"
+        },
+        {
+          "id": "ab951db3-e35c-40ee-8b49-ad42577663c7",
+          "width": 10,
+          "height": 6,
+          "samples": 0,
+          "name": "Downsampling.Mipmap6"
+        },
+        {
+          "id": "63cdf9ac-70de-4495-8756-f3f26a696514",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Upsampling.Mipmap5"
+        },
+        {
+          "id": "41b6cc39-d705-4e3d-b0fd-0168a167b04e",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Upsampling.Mipmap4"
+        },
+        {
+          "id": "d5bfa47e-e96c-4681-9767-f91c97a7a32c",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Upsampling.Mipmap3"
+        },
+        {
+          "id": "844818d0-017f-40f7-815f-ffe576fbab71",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Upsampling.Mipmap2"
+        },
+        {
+          "id": "15a1ce84-4a3b-4d14-b9b4-6d1a35cb6e9f",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Upsampling.Mipmap1"
+        },
+        {
+          "id": "4268da41-0063-4e74-b0f7-aa1195ec281d",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Upsampling.Mipmap0"
+        },
+        {
+          "id": "c1072aae-f29d-448c-8ca8-1ffda2acdf6a",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "20df92f8-a5e2-475e-a24f-35d75350134a",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Edges"
+        },
+        {
+          "id": "f2cff7b3-2886-47e4-825c-a9463c33304f",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Weights"
+        }
+      ],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 146337.40000009537,
+          "duration": 125,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 154534.80000019073,
+          "duration": 106,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 155194,
+          "duration": 106,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 6,
+        "droppedGpuQueries": 0,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 240,
+          "averageMs": 29.867,
+          "p95Ms": 36.1,
+          "p99Ms": 43
+        },
+        "gpu": {
+          "samples": 234,
+          "averageMs": 32.568,
+          "p95Ms": 36.229,
+          "p99Ms": 41.435
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 240,
+              "averageMs": 29.867,
+              "p95Ms": 36.1,
+              "p99Ms": 43
+            },
+            "gpu": {
+              "samples": 234,
+              "averageMs": 32.568,
+              "p95Ms": 36.229,
+              "p99Ms": 41.435
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "effectBudget": null,
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 814,
+        "triangles": 656670,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 241
+      },
+      "resourcesAfter": {
+        "calls": 814,
+        "triangles": 654750,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 241
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -12.507310557222972,
+        119.99999401185315,
+        174.54730330774441
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 4255,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "rawFile": "compare\\baseline-MEDIUM-dpr1-overview-short-1-raw.json"
+    },
+    {
+      "folder": "compare",
+      "name": "baseline-MEDIUM-dpr1-overview-zoom-pan-1",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "zoom-pan",
+      "repeat": 1,
+      "trial": "baseline-MEDIUM-dpr1-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 168118.40000009537,
+          "end": 168186.20000004768
+        },
+        {
+          "start": 168256.20000004768,
+          "end": 168340.70000004768
+        },
+        {
+          "start": 168369.90000009537,
+          "end": 168459.10000014305
+        },
+        {
+          "start": 168498.5,
+          "end": 168633
+        },
+        {
+          "start": 168687,
+          "end": 168765.40000009537
+        },
+        {
+          "start": 168799,
+          "end": 168874.70000004768
+        },
+        {
+          "start": 168907.30000019073,
+          "end": 168989.60000014305
+        },
+        {
+          "start": 169957.30000019073,
+          "end": 173816.60000014305
+        }
+      ],
+      "frames": {
+        "samples": 118,
+        "medianMs": 36.4,
+        "p95Ms": 47.4,
+        "stallsOver50Ms": 3,
+        "maxMs": 68.2
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [
+        {
+          "id": "a87ef6f3-a3ef-4fec-9a81-52bdd54cad82",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "17a7f286-44a9-4f0f-a1cc-461c5c475173",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "LuminancePass.Target"
+        },
+        {
+          "id": "cded5852-cde2-41a1-998d-922cca918631",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Downsampling.Mipmap0"
+        },
+        {
+          "id": "674e1a1b-362f-4581-abd8-79357a8a4233",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Downsampling.Mipmap1"
+        },
+        {
+          "id": "e614f8f4-bf4d-4943-9cf1-57d37956c0ef",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Downsampling.Mipmap2"
+        },
+        {
+          "id": "532b0264-7de8-464b-8ecd-7d95ad402b07",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Downsampling.Mipmap3"
+        },
+        {
+          "id": "e262954b-affb-47f6-ae98-d91a70945cfc",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Downsampling.Mipmap4"
+        },
+        {
+          "id": "8e875f08-fe71-4df8-9def-f72681eac32c",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Downsampling.Mipmap5"
+        },
+        {
+          "id": "ab951db3-e35c-40ee-8b49-ad42577663c7",
+          "width": 10,
+          "height": 6,
+          "samples": 0,
+          "name": "Downsampling.Mipmap6"
+        },
+        {
+          "id": "63cdf9ac-70de-4495-8756-f3f26a696514",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Upsampling.Mipmap5"
+        },
+        {
+          "id": "41b6cc39-d705-4e3d-b0fd-0168a167b04e",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Upsampling.Mipmap4"
+        },
+        {
+          "id": "d5bfa47e-e96c-4681-9767-f91c97a7a32c",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Upsampling.Mipmap3"
+        },
+        {
+          "id": "844818d0-017f-40f7-815f-ffe576fbab71",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Upsampling.Mipmap2"
+        },
+        {
+          "id": "15a1ce84-4a3b-4d14-b9b4-6d1a35cb6e9f",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Upsampling.Mipmap1"
+        },
+        {
+          "id": "4268da41-0063-4e74-b0f7-aa1195ec281d",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Upsampling.Mipmap0"
+        },
+        {
+          "id": "c1072aae-f29d-448c-8ca8-1ffda2acdf6a",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "20df92f8-a5e2-475e-a24f-35d75350134a",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Edges"
+        },
+        {
+          "id": "f2cff7b3-2886-47e4-825c-a9463c33304f",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Weights"
+        }
+      ],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 171759.30000019073,
+          "duration": 66,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 3,
+        "droppedGpuQueries": 0,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 162,
+          "averageMs": 32.606,
+          "p95Ms": 40.5,
+          "p99Ms": 45.8
+        },
+        "gpu": {
+          "samples": 159,
+          "averageMs": 35.063,
+          "p95Ms": 39.488,
+          "p99Ms": 41.398
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 162,
+              "averageMs": 32.606,
+              "p95Ms": 40.5,
+              "p99Ms": 45.8
+            },
+            "gpu": {
+              "samples": 159,
+              "averageMs": 35.063,
+              "p95Ms": 39.488,
+              "p99Ms": 41.398
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "effectBudget": null,
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 815,
+        "triangles": 656558,
+        "geometries": 580,
+        "textures": 136,
+        "programs": 241
+      },
+      "resourcesAfter": {
+        "calls": 815,
+        "triangles": 648354,
+        "geometries": 580,
+        "textures": 136,
+        "programs": 241
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        112.6920525008788,
+        135.2967341688509,
+        155.33381495113656
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -16.967317744269977,
+        0,
+        3.12498901117924
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 4765,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "rawFile": "compare\\baseline-MEDIUM-dpr1-overview-zoom-pan-1-raw.json"
+    },
+    {
+      "folder": "compare",
+      "name": "candidate-MEDIUM-dpr1-overview-continuous-1",
+      "label": "candidate",
+      "view": "overview",
+      "scenario": "continuous",
+      "repeat": 1,
+      "trial": "candidate-MEDIUM-dpr1-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 141760.20000004768,
+          "end": 149576.10000014305
+        }
+      ],
+      "frames": {
+        "samples": 179,
+        "medianMs": 37.2,
+        "p95Ms": 96.7,
+        "stallsOver50Ms": 35,
+        "maxMs": 153.2
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 142301.70000004768,
+          "duration": 68,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 142370.10000014305,
+          "duration": 51,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 142639.79999995232,
+          "duration": 55,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 143579.40000009537,
+          "duration": 67,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 143865.90000009537,
+          "duration": 131,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 143997.40000009537,
+          "duration": 119,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 144118.20000004768,
+          "duration": 55,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 144176.40000009537,
+          "duration": 75,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 144531.10000014305,
+          "duration": 52,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 144583.29999995232,
+          "duration": 58,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 144643.29999995232,
+          "duration": 67,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 144785.29999995232,
+          "duration": 67,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145107.5,
+          "duration": 54,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145339,
+          "duration": 55,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145394.70000004768,
+          "duration": 84,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145572.60000014305,
+          "duration": 73,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145646.60000014305,
+          "duration": 152,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145799.90000009537,
+          "duration": 99,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145912.10000014305,
+          "duration": 76,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 145988.90000009537,
+          "duration": 115,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 146107.90000009537,
+          "duration": 94,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 146205.90000009537,
+          "duration": 82,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 146288.79999995232,
+          "duration": 87,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 146413,
+          "duration": 52,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 146465.79999995232,
+          "duration": 73,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 146689.20000004768,
+          "duration": 79,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 146768.40000009537,
+          "duration": 95,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 147153.90000009537,
+          "duration": 69,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 148597.90000009537,
+          "duration": 98,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 148698.20000004768,
+          "duration": 82,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 148784.5,
+          "duration": 104,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 148889.60000014305,
+          "duration": 74,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 4,
+        "droppedGpuQueries": 5,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 191,
+          "averageMs": 38.649,
+          "p95Ms": 81.1,
+          "p99Ms": 129
+        },
+        "gpu": {
+          "samples": 182,
+          "averageMs": 40.306,
+          "p95Ms": 66.919,
+          "p99Ms": 102.569
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 191,
+              "averageMs": 38.649,
+              "p95Ms": 81.1,
+              "p99Ms": 129
+            },
+            "gpu": {
+              "samples": 182,
+              "averageMs": 40.306,
+              "p95Ms": 66.919,
+              "p99Ms": 102.569
+            }
+          }
+        }
+      },
+      "effectBudget": {
+        "effectTier": "MEDIUM",
+        "requestedPath": "direct",
+        "appliedPath": "direct",
+        "antialiasing": "MSAA",
+        "directBudgetAvailable": true,
+        "toneMapping": "ACES_FILMIC",
+        "bloomEnabled": false,
+        "sharpenStrength": 0,
+        "composerResident": true
+      },
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 796,
+        "triangles": 656739,
+        "geometries": 579,
+        "textures": 110,
+        "programs": 234
+      },
+      "resourcesAfter": {
+        "calls": 798,
+        "triangles": 685781,
+        "geometries": 579,
+        "textures": 110,
+        "programs": 234
+      },
+      "pathValues": [
+        "direct"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -120.61586159843843,
+        119.9999816643485,
+        133.96814576599812
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 3351,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "rawFile": "compare\\candidate-MEDIUM-dpr1-overview-continuous-1-raw.json"
+    },
+    {
+      "folder": "compare",
+      "name": "candidate-MEDIUM-dpr1-overview-short-1",
+      "label": "candidate",
+      "view": "overview",
+      "scenario": "short",
+      "repeat": 1,
+      "trial": "candidate-MEDIUM-dpr1-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 167557.5,
+          "end": 170205.60000014305
+        },
+        {
+          "start": 171071.10000014305,
+          "end": 173901.90000009537
+        },
+        {
+          "start": 175102.29999995232,
+          "end": 177932
+        }
+      ],
+      "frames": {
+        "samples": 239,
+        "medianMs": 33.1,
+        "p95Ms": 47.4,
+        "stallsOver50Ms": 6,
+        "maxMs": 53.5
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 168335.60000014305,
+          "duration": 53,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 172500,
+          "duration": 50,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 172770,
+          "duration": 52,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 174500,
+          "duration": 55,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 175305.90000009537,
+          "duration": 53,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 4,
+        "droppedGpuQueries": 4,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 240,
+          "averageMs": 32.242,
+          "p95Ms": 43.3,
+          "p99Ms": 49.3
+        },
+        "gpu": {
+          "samples": 232,
+          "averageMs": 33.372,
+          "p95Ms": 37.76,
+          "p99Ms": 45.519
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 240,
+              "averageMs": 32.242,
+              "p95Ms": 43.3,
+              "p99Ms": 49.3
+            },
+            "gpu": {
+              "samples": 232,
+              "averageMs": 33.372,
+              "p95Ms": 37.76,
+              "p99Ms": 45.519
+            }
+          }
+        }
+      },
+      "effectBudget": {
+        "effectTier": "MEDIUM",
+        "requestedPath": "direct",
+        "appliedPath": "direct",
+        "antialiasing": "MSAA",
+        "directBudgetAvailable": true,
+        "toneMapping": "ACES_FILMIC",
+        "bloomEnabled": false,
+        "sharpenStrength": 0,
+        "composerResident": true
+      },
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 796,
+        "triangles": 656739,
+        "geometries": 579,
+        "textures": 110,
+        "programs": 234
+      },
+      "resourcesAfter": {
+        "calls": 796,
+        "triangles": 654819,
+        "geometries": 579,
+        "textures": 110,
+        "programs": 234
+      },
+      "pathValues": [
+        "direct"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -12.507319309891296,
+        119.99999795052108,
+        174.54730040110138
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4178,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "rawFile": "compare\\candidate-MEDIUM-dpr1-overview-short-1-raw.json"
+    },
+    {
+      "folder": "compare",
+      "name": "candidate-MEDIUM-dpr1-overview-zoom-pan-1",
+      "label": "candidate",
+      "view": "overview",
+      "scenario": "zoom-pan",
+      "repeat": 1,
+      "trial": "candidate-MEDIUM-dpr1-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 190418.60000014305,
+          "end": 190492.20000004768
+        },
+        {
+          "start": 190525.40000009537,
+          "end": 190595.20000004768
+        },
+        {
+          "start": 190629.40000009537,
+          "end": 190700.5
+        },
+        {
+          "start": 190770.5,
+          "end": 190933.70000004768
+        },
+        {
+          "start": 190972.40000009537,
+          "end": 191060.29999995232
+        },
+        {
+          "start": 191103.90000009537,
+          "end": 191186.40000009537
+        },
+        {
+          "start": 191219.70000004768,
+          "end": 191286.70000004768
+        },
+        {
+          "start": 191320.79999995232,
+          "end": 191387
+        },
+        {
+          "start": 192294.70000004768,
+          "end": 195809
+        }
+      ],
+      "frames": {
+        "samples": 121,
+        "medianMs": 33.9,
+        "p95Ms": 42.4,
+        "stallsOver50Ms": 1,
+        "maxMs": 50.3
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 195959.79999995232,
+          "duration": 50,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 196060.60000014305,
+          "duration": 55,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 196117.29999995232,
+          "duration": 53,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 196171.79999995232,
+          "duration": 72,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 2,
+        "droppedGpuQueries": 4,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 172,
+          "averageMs": 32.687,
+          "p95Ms": 43,
+          "p99Ms": 53.3
+        },
+        "gpu": {
+          "samples": 166,
+          "averageMs": 33.557,
+          "p95Ms": 36.465,
+          "p99Ms": 39.242
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 172,
+              "averageMs": 32.687,
+              "p95Ms": 43,
+              "p99Ms": 53.3
+            },
+            "gpu": {
+              "samples": 166,
+              "averageMs": 33.557,
+              "p95Ms": 36.465,
+              "p99Ms": 39.242
+            }
+          }
+        }
+      },
+      "effectBudget": {
+        "effectTier": "MEDIUM",
+        "requestedPath": "direct",
+        "appliedPath": "direct",
+        "antialiasing": "MSAA",
+        "directBudgetAvailable": true,
+        "toneMapping": "ACES_FILMIC",
+        "bloomEnabled": false,
+        "sharpenStrength": 0,
+        "composerResident": true
+      },
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 797,
+        "triangles": 656627,
+        "geometries": 580,
+        "textures": 110,
+        "programs": 234
+      },
+      "resourcesAfter": {
+        "calls": 796,
+        "triangles": 648203,
+        "geometries": 580,
+        "textures": 110,
+        "programs": 234
+      },
+      "pathValues": [
+        "direct"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        106.10820035937562,
+        127.3635186792728,
+        146.62831391364446
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -15.948505041594021,
+        -4.037767680965362e-21,
+        3.344355399462553
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 4678,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "rawFile": "compare\\candidate-MEDIUM-dpr1-overview-zoom-pan-1-raw.json"
+    },
+    {
+      "folder": "compare",
+      "name": "candidate-MEDIUM-dpr1-overview-continuous-2",
+      "label": "candidate",
+      "view": "overview",
+      "scenario": "continuous",
+      "repeat": 2,
+      "trial": "candidate-MEDIUM-dpr1-trial2",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 138410.20000004768,
+          "end": 145466.20000004768
+        }
+      ],
+      "frames": {
+        "samples": 224,
+        "medianMs": 31,
+        "p95Ms": 38.2,
+        "stallsOver50Ms": 1,
+        "maxMs": 68.3
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 140116.5,
+          "duration": 68,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 8,
+        "droppedGpuQueries": 25,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 226,
+          "averageMs": 25.9,
+          "p95Ms": 34.6,
+          "p99Ms": 42.6
+        },
+        "gpu": {
+          "samples": 193,
+          "averageMs": 31.363,
+          "p95Ms": 34.507,
+          "p99Ms": 53.257
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 226,
+              "averageMs": 25.9,
+              "p95Ms": 34.6,
+              "p99Ms": 42.6
+            },
+            "gpu": {
+              "samples": 193,
+              "averageMs": 31.363,
+              "p95Ms": 34.507,
+              "p99Ms": 53.257
+            }
+          }
+        }
+      },
+      "effectBudget": {
+        "effectTier": "MEDIUM",
+        "requestedPath": "direct",
+        "appliedPath": "direct",
+        "antialiasing": "MSAA",
+        "directBudgetAvailable": true,
+        "toneMapping": "ACES_FILMIC",
+        "bloomEnabled": false,
+        "sharpenStrength": 0,
+        "composerResident": true
+      },
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 796,
+        "triangles": 656739,
+        "geometries": 579,
+        "textures": 110,
+        "programs": 234
+      },
+      "resourcesAfter": {
+        "calls": 798,
+        "triangles": 685781,
+        "geometries": 579,
+        "textures": 110,
+        "programs": 234
+      },
+      "pathValues": [
+        "direct"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -120.61586367708912,
+        119.99998455740261,
+        133.9681415082739
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 3570,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "rawFile": "compare\\candidate-MEDIUM-dpr1-overview-continuous-2-raw.json"
+    },
+    {
+      "folder": "compare",
+      "name": "baseline-MEDIUM-dpr1-overview-continuous-2",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "continuous",
+      "repeat": 2,
+      "trial": "baseline-MEDIUM-dpr1-trial2",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 123218.60000014305,
+          "end": 130377
+        }
+      ],
+      "frames": {
+        "samples": 206,
+        "medianMs": 34,
+        "p95Ms": 45.2,
+        "stallsOver50Ms": 1,
+        "maxMs": 55.6
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [
+        {
+          "id": "f139a343-f9b7-49ca-9bb8-0a7dd396e7b0",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "b7aaff8a-5ac8-4ee3-ae6c-e8d430d6b355",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "LuminancePass.Target"
+        },
+        {
+          "id": "b09edb99-a679-4f6f-8d06-193e216fb61e",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Downsampling.Mipmap0"
+        },
+        {
+          "id": "e2c4a49e-e6a4-4082-8896-9e77b40eaf67",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Downsampling.Mipmap1"
+        },
+        {
+          "id": "99473c4a-a6dd-47e6-a6d1-ec464643ec7c",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Downsampling.Mipmap2"
+        },
+        {
+          "id": "c15b7b7b-ecc6-482f-930d-c990c78fc5d8",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Downsampling.Mipmap3"
+        },
+        {
+          "id": "d7bc732d-357c-4db6-862a-e4f45048a45a",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Downsampling.Mipmap4"
+        },
+        {
+          "id": "d5e06210-7486-4841-9d6a-80c787b2ddc0",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Downsampling.Mipmap5"
+        },
+        {
+          "id": "692e36cf-e9f3-46c3-a83a-f53614f21d70",
+          "width": 10,
+          "height": 6,
+          "samples": 0,
+          "name": "Downsampling.Mipmap6"
+        },
+        {
+          "id": "014ca777-0309-4eeb-9c37-087be9140b09",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Upsampling.Mipmap5"
+        },
+        {
+          "id": "bd5dff69-91e8-4776-9472-4b29fbb312fc",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Upsampling.Mipmap4"
+        },
+        {
+          "id": "5d568fae-d7a3-4731-8db3-79ba893bda6c",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Upsampling.Mipmap3"
+        },
+        {
+          "id": "e6f45320-d292-4ce4-9073-7b08fe15c08a",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Upsampling.Mipmap2"
+        },
+        {
+          "id": "e89e15a9-4738-42e7-a6e0-f9d620497c4b",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Upsampling.Mipmap1"
+        },
+        {
+          "id": "1823ee45-67c5-4208-a93e-1d35bc1f5ef0",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Upsampling.Mipmap0"
+        },
+        {
+          "id": "14c1e1c5-dde8-4889-84ed-842ee85b3f52",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "665081d6-f2f1-49a8-b25b-739f26f2d5ff",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Edges"
+        },
+        {
+          "id": "16f99743-f1dd-4b33-841d-345675952a1a",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Weights"
+        }
+      ],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 122891.10000014305,
+          "duration": 52,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 123025.70000004768,
+          "duration": 52,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 129899.40000009537,
+          "duration": 53,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 130509.60000014305,
+          "duration": 89,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 5,
+        "droppedGpuQueries": 4,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 230,
+          "averageMs": 30.041,
+          "p95Ms": 39.2,
+          "p99Ms": 49.4
+        },
+        "gpu": {
+          "samples": 221,
+          "averageMs": 33.6,
+          "p95Ms": 35.691,
+          "p99Ms": 39.884
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 230,
+              "averageMs": 30.041,
+              "p95Ms": 39.2,
+              "p99Ms": 49.4
+            },
+            "gpu": {
+              "samples": 221,
+              "averageMs": 33.6,
+              "p95Ms": 35.691,
+              "p99Ms": 39.884
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "effectBudget": null,
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 814,
+        "triangles": 656670,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 241
+      },
+      "resourcesAfter": {
+        "calls": 816,
+        "triangles": 685712,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 241
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -120.6158555029168,
+        119.99996453003124,
+        133.9681658455765
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 2948,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "rawFile": "compare\\baseline-MEDIUM-dpr1-overview-continuous-2-raw.json"
+    },
+    {
+      "folder": "confirmation",
+      "name": "baseline-MEDIUM-dpr1-overview-continuous-1",
+      "label": "baseline",
+      "view": "overview",
+      "scenario": "continuous",
+      "repeat": 1,
+      "trial": "baseline-MEDIUM-dpr1-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 137746.70000004768,
+          "end": 145278
+        }
+      ],
+      "frames": {
+        "samples": 199,
+        "medianMs": 37.4,
+        "p95Ms": 45,
+        "stallsOver50Ms": 4,
+        "maxMs": 56.8
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [
+        {
+          "id": "f8939aa9-3166-4836-a73d-2384add89345",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "68711c5d-bc1d-4b2e-ab51-f39dfb30364d",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "LuminancePass.Target"
+        },
+        {
+          "id": "a98cc30a-4657-4b82-bae2-ad25451a0938",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Downsampling.Mipmap0"
+        },
+        {
+          "id": "aff63c54-d685-4cce-97ba-618239e9f9ce",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Downsampling.Mipmap1"
+        },
+        {
+          "id": "f51df2fd-8248-4cd4-8739-e3ba452acf24",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Downsampling.Mipmap2"
+        },
+        {
+          "id": "4aad9062-c1a5-4636-83ff-8d395ed7a7a5",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Downsampling.Mipmap3"
+        },
+        {
+          "id": "f66de47d-8e03-4857-b35d-55edb5a3564d",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Downsampling.Mipmap4"
+        },
+        {
+          "id": "bfe8001f-4627-4d06-8a50-038719e182db",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Downsampling.Mipmap5"
+        },
+        {
+          "id": "70ae2195-5e2e-4bc0-b242-5574fc8946a4",
+          "width": 10,
+          "height": 6,
+          "samples": 0,
+          "name": "Downsampling.Mipmap6"
+        },
+        {
+          "id": "ab640e43-c4c7-46cf-97cf-caf1b5d6f947",
+          "width": 20,
+          "height": 12,
+          "samples": 0,
+          "name": "Upsampling.Mipmap5"
+        },
+        {
+          "id": "979ed8e5-0558-443e-b74e-ef0cf1e648d1",
+          "width": 40,
+          "height": 23,
+          "samples": 0,
+          "name": "Upsampling.Mipmap4"
+        },
+        {
+          "id": "9655f893-76d4-4dfd-af9d-a1a2193707e1",
+          "width": 80,
+          "height": 45,
+          "samples": 0,
+          "name": "Upsampling.Mipmap3"
+        },
+        {
+          "id": "d04041c8-3683-433f-8b17-c5deb2eea73a",
+          "width": 159,
+          "height": 90,
+          "samples": 0,
+          "name": "Upsampling.Mipmap2"
+        },
+        {
+          "id": "bf928eb6-42ff-4a8b-8722-98747922b24f",
+          "width": 317,
+          "height": 180,
+          "samples": 0,
+          "name": "Upsampling.Mipmap1"
+        },
+        {
+          "id": "dd7c5441-d1b3-4c1a-a1ac-d6287a8aafb3",
+          "width": 633,
+          "height": 360,
+          "samples": 0,
+          "name": "Upsampling.Mipmap0"
+        },
+        {
+          "id": "e038e8df-288c-4af9-9b14-6dabe75cb047",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "EffectComposer.Buffer"
+        },
+        {
+          "id": "96b404dd-4d0c-4c8a-be38-3ff09a89b340",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Edges"
+        },
+        {
+          "id": "a3467ac5-3528-46cc-82a7-35d51191c103",
+          "width": 1265,
+          "height": 720,
+          "samples": 0,
+          "name": "SMAA.Weights"
+        }
+      ],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 142615.79999995232,
+          "duration": 52,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 142963.79999995232,
+          "duration": 55,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 5,
+        "droppedGpuQueries": 3,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 214,
+          "averageMs": 31.666,
+          "p95Ms": 38.3,
+          "p99Ms": 42.9
+        },
+        "gpu": {
+          "samples": 206,
+          "averageMs": 36.486,
+          "p95Ms": 40.65,
+          "p99Ms": 44.029
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 214,
+              "averageMs": 31.666,
+              "p95Ms": 38.3,
+              "p99Ms": 42.9
+            },
+            "gpu": {
+              "samples": 206,
+              "averageMs": 36.486,
+              "p95Ms": 40.65,
+              "p99Ms": 44.029
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          }
+        }
+      },
+      "effectBudget": null,
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 814,
+        "triangles": 656670,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 241
+      },
+      "resourcesAfter": {
+        "calls": 816,
+        "triangles": 685712,
+        "geometries": 579,
+        "textures": 136,
+        "programs": 241
+      },
+      "pathValues": [
+        "post"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -120.61586105522916,
+        119.99997846194697,
+        133.9681490262364
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 3091,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "rawFile": "confirmation\\baseline-MEDIUM-dpr1-overview-continuous-1-raw.json"
+    },
+    {
+      "folder": "confirmation",
+      "name": "candidate-MEDIUM-dpr1-overview-continuous-1",
+      "label": "candidate",
+      "view": "overview",
+      "scenario": "continuous",
+      "repeat": 1,
+      "trial": "candidate-MEDIUM-dpr1-trial1",
+      "cpuProfile": null,
+      "activeWindows": [
+        {
+          "start": 147865.10000014305,
+          "end": 155142.29999995232
+        }
+      ],
+      "frames": {
+        "samples": 204,
+        "medianMs": 33.4,
+        "p95Ms": 54.4,
+        "stallsOver50Ms": 15,
+        "maxMs": 94.1
+      },
+      "labelCallbacks": {
+        "samples": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "stallsOver50Ms": 0,
+        "maxMs": null
+      },
+      "labelLayout": {},
+      "drawTiming": {
+        "enabled": false
+      },
+      "invalidFocus": false,
+      "dprValues": [
+        1
+      ],
+      "physicalSizes": [
+        "1265x720"
+      ],
+      "effectiveResizes": 0,
+      "setSizeCalls": 0,
+      "setPixelRatioCalls": 0,
+      "targets": [],
+      "qualityChanges": [],
+      "longTasks": [
+        {
+          "type": "long-task",
+          "at": 148204.20000004768,
+          "duration": 54,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 148259.5,
+          "duration": 61,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 148323.20000004768,
+          "duration": 56,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 148427.40000009537,
+          "duration": 67,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 150381.70000004768,
+          "duration": 93,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 152718.20000004768,
+          "duration": 64,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 152874.29999995232,
+          "duration": 50,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 153063.20000004768,
+          "duration": 64,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 153424.79999995232,
+          "duration": 67,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 154175.10000014305,
+          "duration": 50,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 154451.70000004768,
+          "duration": 92,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 154581.29999995232,
+          "duration": 58,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 154728.60000014305,
+          "duration": 51,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        },
+        {
+          "type": "long-task",
+          "at": 154940,
+          "duration": 56,
+          "attribution": [
+            {
+              "name": "unknown",
+              "containerType": "window",
+              "containerName": ""
+            }
+          ]
+        }
+      ],
+      "renderTiming": {
+        "enabled": true,
+        "gpuStatus": "supported",
+        "sampleLimit": 240,
+        "pendingQueries": 6,
+        "droppedGpuQueries": 9,
+        "disjointGpuQueries": 0,
+        "cpu": {
+          "samples": 232,
+          "averageMs": 31.107,
+          "p95Ms": 48.7,
+          "p99Ms": 66.7
+        },
+        "gpu": {
+          "samples": 217,
+          "averageMs": 34.341,
+          "p95Ms": 38.803,
+          "p99Ms": 39.754
+        },
+        "paths": {
+          "post": {
+            "cpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            },
+            "gpu": {
+              "samples": 0,
+              "averageMs": null,
+              "p95Ms": null,
+              "p99Ms": null
+            }
+          },
+          "direct": {
+            "cpu": {
+              "samples": 232,
+              "averageMs": 31.107,
+              "p95Ms": 48.7,
+              "p99Ms": 66.7
+            },
+            "gpu": {
+              "samples": 217,
+              "averageMs": 34.341,
+              "p95Ms": 38.803,
+              "p99Ms": 39.754
+            }
+          }
+        }
+      },
+      "effectBudget": {
+        "effectTier": "MEDIUM",
+        "requestedPath": "direct",
+        "appliedPath": "direct",
+        "antialiasing": "MSAA",
+        "directBudgetAvailable": true,
+        "toneMapping": "ACES_FILMIC",
+        "bloomEnabled": false,
+        "sharpenStrength": 0,
+        "composerResident": true
+      },
+      "ablationApplied": null,
+      "shadowReceivingAblation": null,
+      "resourcesBefore": {
+        "calls": 796,
+        "triangles": 656739,
+        "geometries": 579,
+        "textures": 110,
+        "programs": 234
+      },
+      "resourcesAfter": {
+        "calls": 798,
+        "triangles": 685781,
+        "geometries": 579,
+        "textures": 110,
+        "programs": 234
+      },
+      "pathValues": [
+        "direct"
+      ],
+      "identityBefore": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "identityAfter": {
+        "canvasMounts": 1,
+        "rendererCreates": 1,
+        "controlsCreates": 1,
+        "activeCanvases": 1,
+        "activeControls": 1
+      },
+      "cameraBefore": [
+        107.36363636363635,
+        120,
+        132.27272725903615
+      ],
+      "cameraAfter": [
+        -120.6158620201168,
+        119.99998064179867,
+        133.96814631513828
+      ],
+      "targetBefore": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "targetAfter": [
+        -7.63636363636364,
+        0,
+        -2.727272740963855
+      ],
+      "selectionBefore": null,
+      "selectionAfter": null,
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 3082,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "rawFile": "confirmation\\candidate-MEDIUM-dpr1-overview-continuous-1-raw.json"
+    }
+  ],
+  "aggregateContinuous": {
+    "baseline": {
+      "samples": 615,
+      "medianMs": 35.2,
+      "p95Ms": 45.2,
+      "stallsOver50Ms": 10,
+      "maxMs": 73.5
+    },
+    "candidate": {
+      "samples": 607,
+      "medianMs": 32.6,
+      "p95Ms": 64.5,
+      "stallsOver50Ms": 51,
+      "maxMs": 153.2
+    }
+  },
+  "limitation": "Preserves every active interval including outliers. Aggregate p95 did not improve consistently."
+}
