@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { draftsToInstallments, monthlyDueDates, redistribute } from '../salesInstallments';
+import { draftsToInstallments, initialSalesPayment, monthlyDueDates, redistribute } from '../salesInstallments';
 import { formatCents, toCents } from '../salesMoney';
 import type { SalesCartSummary } from '../salesPricing';
 import { useSalesCheckout } from '../useSalesCheckout';
@@ -21,10 +21,6 @@ const STEPS = ['Expositor', 'Pagamento', 'Revisão'] as const;
 
 const EMPTY_BUYER: SalesBuyerDraft = { buyerName: '', documentNumber: '', phone: '', email: '', notes: '' };
 const EMPTY_FEES: SalesFeesDraft = { adminCents: 0, ppciCents: 0, cleaningCents: 0 };
-
-function initialPayment(totalCents: number): SalesPaymentDraft {
-  return { paymentMethod: 'PIX', countInput: '3', installments: [{ dueDate: monthlyDueDates(1)[0], amountCents: totalCents }], manualAmounts: false };
-}
 
 interface Props {
   summary: SalesCartSummary;
@@ -51,7 +47,7 @@ export function SalesCheckoutDialog({ summary }: Props) {
   const [buyer, setBuyer] = useState<SalesBuyerDraft>(EMPTY_BUYER);
   const [fees, setFees] = useState<SalesFeesDraft>(EMPTY_FEES);
   const totalCents = spacesCents + feesTotalCents(fees);
-  const [payment, setPayment] = useState<SalesPaymentDraft>(() => initialPayment(totalCents));
+  const [payment, setPayment] = useState<SalesPaymentDraft>(() => initialSalesPayment(totalCents));
   const [advancing, setAdvancing] = useState(false);
   // Chave de idempotência por tentativa de checkout: reenvio não duplica a venda.
   const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID());
@@ -64,7 +60,9 @@ export function SalesCheckoutDialog({ summary }: Props) {
       setStep(0);
       setShowErrors(false);
       setIdempotencyKey(crypto.randomUUID());
+      setPayment(initialSalesPayment(totalCents));
     } else if (!uploadingRef.current) { changeLogo(null, null); }
+  // Reabrir reinicia somente a forma de pagamento; mudanças no total seguem o efeito abaixo.
   }, [open]);
 
   // Total mudou (taxas/etapa): recalcula apenas se os valores ainda são automáticos; datas preservadas.
@@ -124,7 +122,7 @@ export function SalesCheckoutDialog({ summary }: Props) {
         changeLogo(null, null);
         setBuyer(EMPTY_BUYER);
         setFees(EMPTY_FEES);
-        setPayment(initialPayment(0));
+        setPayment(initialSalesPayment(0));
         autosave.reset();
       },
     });

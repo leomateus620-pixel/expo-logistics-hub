@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { formatAreaSqmLabel } from '../../utils/lotPricing2028';
 import type { SalesCartSummary } from '../salesPricing';
 import { formatCents } from '../salesMoney';
@@ -28,10 +29,10 @@ export function SalesReview({ summary, stage, buyer, payment, fees, spacesCents 
       <section className="sales-block">
         <h3>Expositor</h3>
         <dl className="sales-review__dl">
-          <div><dt>Nome / razão social</dt><dd>{buyer.buyerName}</dd></div>
+          <div className="is-wide"><dt>Nome / razão social</dt><dd>{buyer.buyerName}</dd></div>
           <div><dt>CPF/CNPJ</dt><dd>{buyer.documentNumber}</dd></div>
           <div><dt>Celular</dt><dd>{buyer.phone}</dd></div>
-          <div><dt>E-mail</dt><dd className={buyer.email.trim() ? 'sales-review__email' : 'is-muted'}>{buyer.email.trim() || 'Não informado'}</dd></div>
+          <div className="is-email"><dt>E-mail</dt><dd className={buyer.email.trim() ? 'sales-review__email' : 'is-muted'}>{buyer.email.trim() || 'Não informado'}</dd></div>
         </dl>
       </section>
 
@@ -53,9 +54,9 @@ export function SalesReview({ summary, stage, buyer, payment, fees, spacesCents 
       <section className="sales-block">
         <div className="sales-installments-header">
           <h3>Composição do valor</h3>
-          <button type="button" className="sales-link" aria-expanded={showFees} onClick={() => setShowFees((v) => !v)}>
+          <Button type="button" variant="ghost" size="sm" className="sales-link" aria-expanded={showFees} onClick={() => setShowFees((v) => !v)}>
             Exibir detalhamento das taxas <ChevronDown className={`h-4 w-4 ${showFees ? 'rotate-180' : ''}`} />
-          </button>
+          </Button>
         </div>
         <dl className="sales-totals">
           <div><dt>Subtotal dos espaços</dt><dd>{formatCents(spacesCents)}</dd></div>

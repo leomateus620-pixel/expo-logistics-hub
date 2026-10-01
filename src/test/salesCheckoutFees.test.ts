@@ -1,11 +1,23 @@
 import { describe, expect, it } from 'vitest';
 import { splitCents, parseMoneyInputToCents } from '@/features/commercial-map/sales/salesMoney';
-import { buildDraftSchedule, draftsSumCents, monthlyDueDates, redistribute } from '@/features/commercial-map/sales/salesInstallments';
+import { buildDraftSchedule, draftsSumCents, initialSalesPayment, monthlyDueDates, redistribute } from '@/features/commercial-map/sales/salesInstallments';
 import { paymentErrors } from '@/features/commercial-map/sales/components/SalesPaymentForm';
 import { feesTotalCents } from '@/features/commercial-map/sales/salesTypes';
 import { matchesExhibitor } from '@/features/commercial-map/sales/exhibitorService';
 
 describe('checkout: parcelas, taxas e expositores', () => {
+  it('entra no pagamento com 17 boletos mensais calculados em centavos sem ação adicional', () => {
+    const total = 1_174_700;
+    const payment = initialSalesPayment(total);
+    expect(payment.paymentMethod).toBe('BOLETO_PARCELADO');
+    expect(payment.countInput).toBe('17');
+    expect(payment.installments).toHaveLength(17);
+    expect(payment.installments[0].dueDate).toBe('2026-12-05');
+    expect(payment.installments[16].dueDate).toBe('2028-04-05');
+    expect(draftsSumCents(payment.installments)).toBe(total);
+    expect(Object.values(paymentErrors(payment, total)).every((error) => error === null)).toBe(true);
+    expect(draftsSumCents(redistribute(total + 251, payment.installments))).toBe(total + 251);
+  });
   it('sequência mensal no dia 5 a partir de 05/12/2026 sem pular janeiro', () => {
     expect(monthlyDueDates(4)).toEqual(['2026-12-05', '2027-01-05', '2027-02-05', '2027-03-05']);
   });
