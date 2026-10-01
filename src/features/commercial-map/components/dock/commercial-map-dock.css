@@ -57,6 +57,11 @@
 .commercial-map-dock__segments > button { display: grid; grid-template-columns: 18px minmax(0,1fr) 14px; min-height: 52px; align-items: center; gap: 8px; border: 1px solid #d2ded6; border-radius: 10px; padding: 7px 9px; background: white; text-align: left; transition: transform 180ms ease, opacity 180ms ease; }
 .commercial-map-dock__segments > button > svg { width: 17px; height: 17px; }
 .commercial-map-dock__segments > button > span { display: grid; gap: 2px; min-width: 0; }
+.commercial-map-dock__segments > button > .commercial-map-dock__territory-symbol { display: flex; align-items: center; justify-content: center; gap: 2px; width: 29px; font-size: 11px; font-weight: 800; color: oklch(var(--foreground)); }
+.commercial-map-dock__territory-symbol svg { width: 13px; height: 13px; flex: none; }
+.commercial-map-dock__territory-symbol::after { content: ''; position: absolute; width: 23px; margin-top: 21px; border-bottom: 1px solid currentColor; }
+.commercial-map-dock__territory-symbol--industria-comercio-servicos::after { border-bottom-style: dashed; }
+.commercial-map-dock__territory-symbol--espaco-automovel::after { border-bottom-style: dotted; }
 .commercial-map-dock__segments strong { white-space: normal; overflow-wrap: break-word; font-size: 12px; line-height: 1.25; font-weight: 750; }
 .commercial-map-dock__segments small { font-size: 10px; color: #62766a; }
 .commercial-map-dock__segments > button.is-active { background: #e9f3e9; border-color: #357450; box-shadow: inset 3px 0 #357450; }
