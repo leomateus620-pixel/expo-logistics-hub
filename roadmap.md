@@ -130,7 +130,8 @@
 - [x] Atualizar B5-M025/080 para 13,50 m² e B5-M026/079 para 9,00 m²
 - [x] Atualizar inventário para 104 módulos, soma 345,00 m², fonte e revisão exclusiva do B5
 - [x] Reconciliar geometria e áreas persistidas preservando os 103 IDs, status, preços e histórico
-- [ ] Validar hit-test, rota pública, soma 345 e regressões; inspeção visual desktop/mobile ainda pendente
+- [x] Validar hit-test, rota pública, soma 345 e regressões automatizadas
+- [ ] Inspecionar visualmente desktop/mobile; não há evidência visual automatizada nesta execução
 - Não publicar (pedido do usuário)
 
 ## Avisos no celular (push / FCM)
