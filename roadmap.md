@@ -1,5 +1,13 @@
 # Roadmap
 
+## Ficha lateral dos módulos dos pavilhões
+- [x] Priorizar venda em aberto ou confirmada e suas ações mesmo com detalhes recolhidos; manter permissões existentes.
+- [x] Dimensionar valores oficiais, comprador, histórico, contrato e legenda pela largura da lateral; ampliar folha móvel quando há venda.
+- [x] Preservar consulta pública sem ações e permitir nomes e valores longos em telas pequenas.
+- [x] Validar testes focais de situações e permissões, preços e ficha pública.
+- [ ] Inspecionar visualmente a ficha do módulo em desktop/celular no mapa carregado: WebGL permaneceu em “Preparando o Mapa Comercial” nesta execução.
+- Não publicar (pedido do usuário).
+
 ## Orientação territorial do Mapa Comercial
 - [x] Refinar nomes das ruas: fonte leve, sem caixa branca, horizontal e contida no pavimento apresentado; omitir quando não couber ou houver estrutura.
 - [x] Testar contenção em via irregular, vazios e obstáculos, mantendo escopo e estilos das quadras.
