@@ -1,0 +1,38 @@
+
+ RUN  v3.2.4 C:/Users/Leonardo/.codex/tmp/dashboard-values-map-fit/baseline
+
+ ❯ src/test/lotPricing2028.test.ts (8 tests | 1 failed) 57ms
+   ✓ computeLotTotal — matemática decimal exata > multiplica área por preço sem erro de ponto flutuante 4ms
+   ✓ computeLotTotal — matemática decimal exata > nunca devolve zero ou valor inventado para dados ausentes 1ms
+   ✓ computeLotTotal — matemática decimal exata > não acumula resíduo em valores repetidos 1ms
+   ✓ formatação pt-BR > formata moeda e preço por m² 5ms
+   ✓ formatação pt-BR > formata área com duas casas 1ms
+   × Pavilhão 7 e pendências > lote excluído não recebe valor e exibe rótulo institucional 42ms
+     → expected 'Valor ainda não definido' to be 'Ainda não definido' // Object.is equality
+   ✓ Pavilhão 7 e pendências > regra ausente ou ambígua não vira preço 0ms
+   ✓ Pavilhão 7 e pendências > lote elegível mantém as duas etapas disponíveis 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/lotPricing2028.test.ts > Pavilhão 7 e pendências > lote excluído não recebe valor e exibe rótulo institucional
+AssertionError: expected 'Valor ainda não definido' to be 'Ainda não definido' // Object.is equality
+
+Expected: "Ainda não definido"
+Received: "Valor ainda não definido"
+
+ ❯ src/test/lotPricing2028.test.ts:99:85
+     97|     expect(stageTotal(excluded, 'RENOVACAO')).toBeNull();
+     98|     expect(stageTotal(excluded, 'SEGUNDA_ETAPA')).toBeNull();
+     99|     expect(formatBrl(stageTotal(excluded, 'RENOVACAO')) ?? UNPRICED_PA…
+       |                                                                                     ^
+    100|   });
+    101| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 7 passed (8)
+   Start at  20:07:33
+   Duration  6.53s (transform 217ms, setup 0ms, collect 1.27s, tests 57ms, environment 0ms, prepare 1.27s)
+
