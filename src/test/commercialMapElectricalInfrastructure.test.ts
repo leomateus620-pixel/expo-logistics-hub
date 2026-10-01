@@ -631,7 +631,8 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
   it('compartilha o mesmo dataset no parque e nos três recortes sem deixar conexões órfãs', () => {
     const expectedCounts = {
       park: { nodes: 428, connections: 325 },
-      [COMMERCIAL_MAP_SEGMENT_IDS.industry]: { nodes: 107, connections: 74 },
+      // O recorte confirmado agora inclui as quadras Q e V.
+      [COMMERCIAL_MAP_SEGMENT_IDS.industry]: { nodes: 123, connections: 87 },
       [COMMERCIAL_MAP_SEGMENT_IDS.exporural]: { nodes: 89, connections: 66 },
       [COMMERCIAL_MAP_SEGMENT_IDS.automotive]: { nodes: 37, connections: 26 },
     } as const;
@@ -641,6 +642,11 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
         scope as keyof typeof expectedCounts,
       );
       const infrastructure = selectCommercialElectricalInfrastructureForScene(scoped.entities, scoped.lots);
+      if (scope === COMMERCIAL_MAP_SEGMENT_IDS.industry) {
+        expect(scoped.entities.map(entity => entity.publicIdentifier)).toEqual(
+          expect.arrayContaining(['QUADRA-Q', 'QUADRA-V']),
+        );
+      }
       expect(infrastructure.nodes, scope).toHaveLength(expected.nodes);
       expect(infrastructure.connections, scope).toHaveLength(expected.connections);
       const ids = new Set(infrastructure.nodes.map((node) => node.id));

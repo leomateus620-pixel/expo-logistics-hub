@@ -1,0 +1,235 @@
+{
+  "revision": "28c237902d7eae2a37a003e1da6081d020824f7e",
+  "environment": "Windows local; same installed dependencies; maxWorkers=2; testTimeout=60000",
+  "passed": 228,
+  "failed": 45,
+  "total": 273,
+  "files": 33,
+  "failures": [
+    {
+      "file": "src/test/commercialMap2026Reference.test.ts",
+      "test": "referência cartográfica oficial Fenasoja 2026 inclui a rede viária e todas as instâncias repetidas da legenda",
+      "message": "AssertionError: expected [ Array(1) ] to have a length of +0 but got 1"
+    },
+    {
+      "file": "src/test/commercialMap2026Reference.test.ts",
+      "test": "referência cartográfica oficial Fenasoja 2026 mantém os 26 centros sanitários vetoriais oficiais e nenhum volume renderizado",
+      "message": "AssertionError: expected [ Array(1) ] to deeply equal []"
+    },
+    {
+      "file": "src/test/commercialMapArenaCanonical.test.ts",
+      "test": "Arena canônica: implantação, arquitetura e preservação da main 8783fea7 preserva todas as entidades exceto F, os lotes e integralmente o Mirante #151",
+      "message": "AssertionError: expected [ { …(15) }, { …(15) }, …(1577) ] to have a length of 1692 but got 1579"
+    },
+    {
+      "file": "src/test/commercialMapAtmospherePersistence.test.tsx",
+      "test": "atmosphere resource lifetime is independent of Hydrological visibility keeps hidden vegetation and electrical geometry on their normal physical inputs",
+      "message": "AssertionError: expected 'import { InteriorViewControls } from …' to contain 'visible={treesVisible && !hydrologica…'"
+    },
+    {
+      "file": "src/test/commercialMapElectricalInfrastructure.test.ts",
+      "test": "infraestrutura elétrica cartográfica do Mapa Comercial preserva as 13 âncoras conflitantes e projeta só sua apresentação à fachada livre",
+      "message": "AssertionError: transformer-ref-007: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/test/commercialMapElectricalInfrastructure.test.ts",
+      "test": "infraestrutura elétrica cartográfica do Mapa Comercial mantém todas as fases acima da folga técnica mínima em estruturas existentes",
+      "message": "AssertionError: expected [ …(996) ] to deeply equal []"
+    },
+    {
+      "file": "src/test/commercialMapExplorer.test.ts",
+      "test": "explorador compartilhado de entidades do mapa comercial filtra cada situação comercial e combina texto, tipo, local e verificação",
+      "message": "AssertionError: RESERVED: expected false to be true // Object.is equality"
+    },
+    {
+      "file": "src/test/commercialMapExplorer.test.ts",
+      "test": "explorador compartilhado de entidades do mapa comercial ordena por relevância, nome, localização e situação com desempate estável",
+      "message": "AssertionError: expected [ 'AVAILABLE', 'SOLD', …(4) ] to deeply equal [ 'AVAILABLE', 'RESERVED', …(4) ]"
+    },
+    {
+      "file": "src/test/commercialMapExplorer.test.ts",
+      "test": "explorador compartilhado de entidades do mapa comercial expõe somente facetas derivadas dos metadados existentes",
+      "message": "AssertionError: expected 264 to be 262 // Object.is equality"
+    },
+    {
+      "file": "src/test/commercialMapExporuralArchitecture.test.ts",
+      "test": "C4 / E-06 architecture and selection activity preserves the complete approved official inventory and compound placement",
+      "message": "AssertionError: expected 'f61703a5b7cb6c9b26ae022fd669ca11366ec…' to be '5abf0ed204b10d98e17d1a6f171add3a6c3b6…' // Object.is equality"
+    },
+    {
+      "file": "src/test/commercialMapExporuralCartographicFidelity.test.ts",
+      "test": "fidelidade cartográfica dourada da Exporural 2026.4 preserva os 95 lotes dentro do mesmo perímetro canônico e fora das sete ruas",
+      "message": "AssertionError: expected [ { …(38) }, { …(38) }, …(1464) ] to have a length of 1577 but got 1466"
+    },
+    {
+      "file": "src/test/commercialMapFenasojaReferenceStructures.test.ts",
+      "test": "reconstrução arquitetônica de B28 e D1 mantém D1 reta no eixo oficial e orienta sua fachada para leste, diante da Arena",
+      "message": "AssertionError: expected 0.9265810104734122 to be greater than 0.9659258262890683"
+    },
+    {
+      "file": "src/test/commercialMapMobileExperience.test.ts",
+      "test": "arquitetura mobile-first do Mapa Comercial mantém antialias, gestos GIS completos e DPR adaptativo no canvas compartilhado",
+      "message": "AssertionError: expected 'import { InteriorViewControls } from …' to contain 'touches={{ ONE: THREE.TOUCH.PAN, TWO:…'"
+    },
+    {
+      "file": "src/test/commercialMapNonPermanentCleanup.test.ts",
+      "test": "limpeza estrutural dos blocos não permanentes mantém ruas, quadras, lotes e pavilhões intocados",
+      "message": "AssertionError: expected 29 to be 30 // Object.is equality"
+    },
+    {
+      "file": "src/test/commercialMapPavilion12PlanPresentation.test.ts",
+      "test": "planta comercial fixa do Pavilhão 12 mantém lotes planos, seleção comercial e atlas numérico único",
+      "message": "AssertionError: expected 'import { memo, useCallback, useEffect…' to contain 'const heightScale = flatModules ? 1'"
+    },
+    {
+      "file": "src/test/commercialMapPavilion3PlanPresentation.test.ts",
+      "test": "planta comercial fixa do Pavilhão 3 mantém instancing, remove elevação dinâmica e prioriza números apenas no perfil plano",
+      "message": "AssertionError: expected 'import { memo, useCallback, useEffect…' to contain 'const heightScale = flatModules ? 1'"
+    },
+    {
+      "file": "src/test/commercialMapPavilion5PlanPresentation.test.ts",
+      "test": "planta comercial fixa do Pavilhão 5 preserva apoios legíveis, lotes planos, seleção, Vendas e renderização eficiente",
+      "message": "AssertionError: expected 'import { memo, useCallback, useEffect…' to contain 'const heightScale = flatModules ? 1'"
+    },
+    {
+      "file": "src/test/commercialMapPavilion8PlanPresentation.test.ts",
+      "test": "planta comercial fixa do Pavilhão 8 usa o motor compartilhado de pan, zoom, fit, números e lotes planos",
+      "message": "AssertionError: expected 'import { memo, useCallback, useEffect…' to contain 'const heightScale = flatModules ? 1'"
+    },
+    {
+      "file": "src/test/commercialMapPavilionFourSoyKitchen.test.ts",
+      "test": "Pavilhão 4 — Cozinha da Soja B7 reutiliza os postes frontais e a recepção elétrica oficiais sem duplicá-los",
+      "message": "AssertionError: expected 3.163636363636364 to be less than 3.000945454545455"
+    },
+    {
+      "file": "src/test/commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno mantém o módulo 'B1' neutro e sem área individual inventada",
+      "message": "TestingLibraryElementError: Unable to find an element with the text: Não informada. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "file": "src/test/commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno mantém o módulo 'B2' neutro e sem área individual inventada",
+      "message": "TestingLibraryElementError: Unable to find an element with the text: Não informada. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "file": "src/test/commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno mantém o módulo 'B3' neutro e sem área individual inventada",
+      "message": "TestingLibraryElementError: Unable to find an element with the text: Não informada. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "file": "src/test/commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno mantém o módulo 'B8' neutro e sem área individual inventada",
+      "message": "TestingLibraryElementError: Unable to find an element with the text: Não informada. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "file": "src/test/commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno não converte a área modular total em medida individual",
+      "message": "TestingLibraryElementError: Unable to find an element with the text: Não informada. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "file": "src/test/commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno oferece somente operações válidas para um módulo disponível e persistido",
+      "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Editar/i`"
+    },
+    {
+      "file": "src/test/commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno expõe versões privadas de contrato no próprio cartão do módulo",
+      "message": "Error: expect(element).toHaveTextContent()"
+    },
+    {
+      "file": "src/test/commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno não oferece venda direta enquanto o módulo permanece bloqueado",
+      "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Situação/i`"
+    },
+    {
+      "file": "src/test/commercialMapPavilionModuleCard.test.tsx",
+      "test": "cartão operacional do módulo interno abre no dock com resumo, expande voluntariamente e descarta formulário ao selecionar outro módulo",
+      "message": "TestingLibraryElementError: Unable to find an element with the text: Área não informada. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "file": "src/test/commercialMapPavilionRendering.test.ts",
+      "test": "renderização compartilhada dos módulos internos usa instancing e um atlas numérico único em vez de centenas de textos DOM",
+      "message": "AssertionError: expected 'import { memo, useCallback, useEffect…' to contain 'context.fillText(cell.label'"
+    },
+    {
+      "file": "src/test/commercialMapPavilions135Migration.contract.test.ts",
+      "test": "contrato persistido dos Pavilhões 1, 3 e 5 mantém o bbox e a âncora deslocada do módulo irregular P1-141 separados",
+      "message": "AssertionError: expected 0.935370018975332 to be close to 0.9371916508538899, received difference is 0.0018216318785578833, but expected 5e-13"
+    },
+    {
+      "file": "src/test/commercialMapPavilions813Migration.contract.test.ts",
+      "test": "contrato persistido dos Pavilhões 8 e 13 persiste os cinco módulos irregulares como polígonos oficiais e render parts leves",
+      "message": "AssertionError: expected [ 25, 26, 79, 80 ] to deeply equal [ 25, 26, 78, 79 ]"
+    },
+    {
+      "file": "src/test/commercialMapPresentation.test.ts",
+      "test": "modelo de apresentação do mapa comercial mantém histerese entre níveis de rótulo durante pequenos movimentos de zoom",
+      "message": "AssertionError: expected 'near' to be 'medium' // Object.is equality"
+    },
+    {
+      "file": "src/test/commercialMapPresentation.test.ts",
+      "test": "modelo de apresentação do mapa comercial mantém os limites exatos e normaliza entradas inválidas da histerese",
+      "message": "AssertionError: expected 'detail' to be 'near' // Object.is equality"
+    },
+    {
+      "file": "src/test/commercialMapRearParking.test.ts",
+      "test": "rear parking map integration resolves owner layers from the global collection while Expo Rural geometry remains scoped",
+      "message": "AssertionError: expected 'import { commercialMapDiagnosticsEnab…' to contain 'parkingOwnerEntities={data.entities}'"
+    },
+    {
+      "file": "src/test/commercialMapRearRoadNetwork.test.ts",
+      "test": "área posterior — exclusões espaciais, profundidade e ambiente não cruza nenhuma exclusão não autorizada com pista ou acostamento",
+      "message": "AssertionError: [\"ubiretama-registered-north:electrical:pole-ref-056\",\"portao5-north-approach:electrical:pole-ref-164\"]: expected [ …(2) ] to deeply equal []"
+    },
+    {
+      "file": "src/test/commercialMapRearRoadTreeClearance.test.ts",
+      "test": "rear-road rendered vegetation clearance clears only the official poles still crossed by the corrected roads without changing records or links",
+      "message": "AssertionError: expected [ 'pole-ref-145', …(11) ] to deeply equal [ 'pole-ref-056', …(17) ]"
+    },
+    {
+      "file": "src/test/commercialMapRegionalHighways.test.ts",
+      "test": "rodovias regionais — contrato compartilhado e BR-472 exterior expande zoom/pan regionais e mantém o enquadramento padrão no parque",
+      "message": "AssertionError: expected 'import { InteriorViewControls } from …' to contain 'expandFramingBoundsWithRegionalHighwa…'"
+    },
+    {
+      "file": "src/test/commercialMapRoadPrecision.test.ts",
+      "test": "September 13 precision road correction preserves every complete official record except the explicitly shortened road",
+      "message": "AssertionError: expected [ { …(15) }, { …(15) }, …(1577) ] to have a length of 1692 but got 1579"
+    },
+    {
+      "file": "src/test/commercialMapRuntimeStability.test.ts",
+      "test": "contrato de estabilidade do mapa comercial mantém os drafts comerciais restritos à entidade sem remontar o painel",
+      "message": "AssertionError: expected 'import { useLayoutEffect, useMemo, us…' to contain 'setEditingLot(false);'"
+    },
+    {
+      "file": "src/test/commercialMapSiteEnvironment.test.ts",
+      "test": "commercial site environment presentation layer composes every reusable no-environment mask family and accepts no intersecting cell",
+      "message": "AssertionError: expected 3 to be 1 // Object.is equality"
+    },
+    {
+      "file": "src/test/commercialMapSiteEnvironment.test.ts",
+      "test": "commercial site environment presentation layer reuses the full plan in the industrial route and limits it to owners present in that segment",
+      "message": "AssertionError: expected 'import { commercialMapDiagnosticsEnab…' to contain 'siteEnvironmentEntities={data.entitie…'"
+    },
+    {
+      "file": "src/test/commercialMapSoyGateInfrastructure.test.ts",
+      "test": "E07 / Montevideo / A9 reference-aligned infrastructure preserves every existing entity except the authorized E07 footprint",
+      "message": "AssertionError: QUADRA-G: expected { Object (id, projectId, ...) } to deeply equal { Object (id, projectId, ...) }"
+    },
+    {
+      "file": "src/test/commercialMapSpatialBounds.test.ts",
+      "test": "canonical Commercial Map spatial policy preserves all unrelated official entities, lot IDs and calibration against main 42e89d1b",
+      "message": "AssertionError: expected [ 'EXPORURAL', 'QUADRA-S', …(1577) ] to deeply equal [ 'EXPORURAL', 'QUADRA-S', …(1690) ]"
+    },
+    {
+      "file": "src/test/commercialMapVisitInteraction.test.tsx",
+      "test": "Visit HUD official values and independent touch controls shows the authorized canonical segment only in expanded details, ahead of divergent legacy metadata",
+      "message": "TestingLibraryElementError: Unable to find an element with the text: Segmento: Indústria, Comércio e Serviços. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "file": "src/test/commercialMapVisitWorld.test.ts",
+      "test": "Visit canonical world coverage keeps the source trunk inventory separate from camera-only crowns",
+      "message": "AssertionError: tree-d-01: expected 0.10033999999999998 to be 0.173 // Object.is equality"
+    }
+  ]
+}
