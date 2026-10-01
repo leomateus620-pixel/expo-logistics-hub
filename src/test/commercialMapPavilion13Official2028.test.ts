@@ -72,8 +72,8 @@ describe('Pavilhão 13 — planta oficial Fenasoja 2028', () => {
       (item) => item.id === id,
     );
     expect((corridor('west-main-aisle')?.width ?? 0) * 19.8).toBeCloseTo(3.9, 10);
-    expect((corridor('north-distribution')?.depth ?? 0) * 37.8).toBeCloseTo(6.25, 10);
-    expect((corridor('south-distribution')?.depth ?? 0) * 37.8).toBeCloseTo(4.55, 10);
+    expect((corridor('north-distribution')?.depth ?? 0) * 37.8).toBeCloseTo(3, 10);
+    expect((corridor('south-distribution')?.depth ?? 0) * 37.8).toBeCloseTo(5.8, 10);
   });
 
   it('reconcilia somente B5 e protege IDs, status, preços e histórico geométrico', () => {
