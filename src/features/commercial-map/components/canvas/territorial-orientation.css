@@ -4,7 +4,7 @@
   overflow: hidden;
   pointer-events: none;
   --orientation-ink: oklch(var(--foreground));
-  --orientation-paper: oklch(var(--surface-1) / .9);
+  --orientation-paper: oklch(var(--card) / .9);
   --orientation-line: oklch(var(--foreground) / .54);
 }
 .territorial-orientation__label rect { fill: var(--orientation-paper); stroke: oklch(var(--border) / .8); stroke-width: .8; }
@@ -13,4 +13,4 @@
 .territorial-orientation__outline { fill: none; stroke: var(--orientation-line); stroke-width: 1.15; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .territorial-orientation__outline--industria-comercio-servicos { stroke-dasharray: 8 4; }
 .territorial-orientation__outline--espaco-automovel { stroke-dasharray: 2 4; stroke-linecap: round; }
-.dark .territorial-orientation { --orientation-paper: oklch(var(--surface-inverse) / .92); --orientation-ink: oklch(var(--neutral-0)); --orientation-line: oklch(var(--neutral-0) / .7); }
+.dark .territorial-orientation { --orientation-paper: oklch(var(--card) / .92); --orientation-ink: oklch(var(--foreground)); --orientation-line: oklch(var(--foreground) / .7); }
