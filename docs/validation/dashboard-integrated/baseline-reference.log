@@ -1,0 +1,29 @@
+Observed validation evidence - commercialMap2026Reference.test.ts
+
+Candidate run, 2026-10-01 18:02 Sao Paulo:
+  npm run test -- src/test/commercialMapSegmentLegend.test.tsx src/test/commercialMap2026Reference.test.ts src/test/commercialMapInteraction.test.ts
+  commercialMapInteraction.test.ts: 17 passed
+  commercialMapSegmentLegend.test.tsx: 2 passed
+  commercialMap2026Reference.test.ts: 11 passed, 2 failed
+
+Observed reference failures:
+  line 227, "inclui a rede viaria e todas as instancias repetidas da legenda"
+  expected RESTROOM entities length 0, received length 1.
+  line 253, "mantem os 26 centros sanitarios vetoriais oficiais e nenhum volume renderizado"
+  expected RESTROOM entities [], received existing E-07 (Sanitarios - Cozinha da Soja).
+
+Baseline run, 2026-10-01 18:02 Sao Paulo:
+  HEAD: 28c237902d7eae2a37a003e1da6081d020824f7e
+  npx vitest run --config .codex-contracts-baseline.vitest.config.ts src/test/commercialMap2026Reference.test.ts
+  commercialMap2026Reference.test.ts: 11 passed, 2 failed at the same lines 227 and 253.
+
+Baseline method:
+  A temporary Vitest config extended the existing config with a pre-transform plugin.
+  The plugin replaced only the loaded commercialMapSegments.ts module with the source
+  returned by git show HEAD:src/features/commercial-map/data/commercialMapSegments.ts.
+  This reproduced the registry before the Q/V change without changing the shared file.
+  officialReference2026.ts and commercialMap2026Reference.test.ts had no local changes.
+  The temporary config was removed after the baseline run.
+
+This file is a concise record of observed tool results, not a raw console capture.
+No reference geometry or restroom assertions were changed to make this task pass.

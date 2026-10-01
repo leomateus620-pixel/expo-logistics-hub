@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { STATUS_CONFIG } from '@/features/commercial-map/constants';
 import { CommercialMiniMap } from '@/features/commercial-map/dashboard/CommercialMiniMap';
@@ -98,16 +98,16 @@ describe('mini mapa comercial interativo', () => {
     expect(screen.queryByRole('button', { name: 'Ver no mapa' })).not.toBeInTheDocument();
   });
 
-  it('reduz opacidade dos demais status sem perder o rótulo de área e valor pendentes', () => {
+  it('reduz opacidade dos demais status e conserva a pendência de área sem um bloco de valor vazio', () => {
     const pending = record('Q-P-01', 'RESERVED', square(0, 0), { area: null, value: null });
     const sold = record('Q-P-02', 'SOLD', square(12, 0));
     render(<CommercialMiniMap items={[pending, sold]} title="Automóvel" highlightedStatus="SOLD" onViewLot={vi.fn()} />);
-    const pendingPath = screen.getByRole('button', { name: /Q-P-01.*área oficial pendente.*valor não definido/i });
+    const pendingPath = screen.getByRole('button', { name: /Q-P-01.*área oficial pendente/i });
     expect(pendingPath).toHaveAttribute('opacity', '0.16');
     expect(screen.getByRole('button', { name: /Q-P-02.*Vendido/ })).toHaveAttribute('opacity', '0.92');
     fireEvent.mouseEnter(pendingPath);
     expect(screen.getByRole('status')).toHaveTextContent('Área oficial pendente');
-    expect(screen.getByRole('status')).toHaveTextContent('Valor não definido');
+    expect(screen.getByRole('status')).not.toHaveTextContent(/valor|R\$/i);
   });
 
   it('oferece uma única parada de Tab por SVG e navegação de teclado entre lotes', () => {
@@ -125,5 +125,108 @@ describe('mini mapa comercial interativo', () => {
     fireEvent.keyDown(secondPath, { key: 'Enter' });
     expect(secondPath).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('button', { name: 'Ver no mapa' })).toBeInTheDocument();
+  });
+
+  it('enquadra lotes, perímetro, identificações e acessos sem largura mínima ou distorção', () => {
+    const item = record('B5-M001', 'AVAILABLE', square(0, 0));
+    item.lot.lotNumber = '01';
+    const outlines = [{ id: 'B5', label: 'Pavilhão 13', kind: 'pavilion' as const, color: '#315543', coordinates: square(-2, -2, 14) },
+      { id: 'Q-U', label: 'Quadra U', kind: 'block' as const, color: '#315543', coordinates: square(0, 0) }];
+    render(<CommercialMiniMap items={[item]} outlines={outlines} title="Pavilhão 13" numbered onViewLot={vi.fn()}
+      accesses={[{ id: 'east', label: 'Acesso leste', kind: 'entrance', position: [12, 5], outward: [1, 0] },
+        { id: 'east-2', label: 'Acesso leste secundário', kind: 'exit', position: [12, 5], outward: [1, 0] }]} />);
+    const svg = screen.getByRole('group', { name: /Distribuição espacial/ });
+    const [left, top, width, height] = svg.getAttribute('viewBox')!.split(' ').map(Number);
+    const inside = (x: number, y: number) => {
+      expect(x).toBeGreaterThan(left);
+      expect(x).toBeLessThan(left + width);
+      expect(y).toBeGreaterThan(top);
+      expect(y).toBeLessThan(top + height);
+    };
+    svg.querySelectorAll('g[data-access-kind] rect').forEach((rect) => {
+      inside(Number(rect.getAttribute('x')), Number(rect.getAttribute('y')));
+      inside(Number(rect.getAttribute('x')) + 28, Number(rect.getAttribute('y')) + 28);
+    });
+    const label = screen.getByText('Quadra U');
+    inside(Number(label.getAttribute('x')), Number(label.getAttribute('y')) - 20);
+    expect(svg).toHaveAttribute('preserveAspectRatio', 'xMidYMid meet');
+    expect(svg).toHaveAttribute('width', '100%');
+    expect(svg).toHaveAttribute('height', '100%');
+    expect(svg.parentElement).toHaveStyle({ width: '100%', height: '100%' });
+    expect(svg.parentElement?.style.minWidth).toBe('');
+    expect(screen.queryByText(/Deslize a planta/)).not.toBeInTheDocument();
+  });
+
+  it('restaura o enquadramento no comando e na troca de recorte, preservando a seleção na atualização', () => {
+    const item = record('Q-R-01', 'AVAILABLE', square(0, 0));
+    const rendered = render(<CommercialMiniMap items={[item]} title="Exporural" onViewLot={vi.fn()} />);
+    fireEvent.click(screen.getByRole('button', { name: /Q-R-01.*Disponível/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Ampliar planta de Exporural' }));
+    const viewport = screen.getByLabelText('Planta de Exporural; use as setas para navegar pelos espaços');
+    viewport.scrollLeft = 80;
+    viewport.scrollTop = 45;
+    rendered.rerender(<CommercialMiniMap items={[{ ...item, lot: { ...item.lot, status: 'SALE_OPEN' } }]} title="Exporural" onViewLot={vi.fn()} />);
+    expect(screen.getByRole('button', { name: /Q-R-01.*Venda em aberto/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(viewport.firstElementChild).toHaveStyle({ width: '150%', height: '150%' });
+    fireEvent.click(screen.getByRole('button', { name: 'Ajustar ao espaço: Exporural' }));
+    expect(viewport.firstElementChild).toHaveStyle({ width: '100%', height: '100%' });
+    expect(viewport.scrollLeft).toBe(0);
+    expect(viewport.scrollTop).toBe(0);
+    fireEvent.click(screen.getByRole('button', { name: 'Ampliar planta de Exporural' }));
+    viewport.scrollLeft = 90;
+    rendered.rerender(<CommercialMiniMap items={[record('Q-P-01', 'AVAILABLE', square(20, 0))]} title="Automóvel" onViewLot={vi.fn()} />);
+    expect(viewport).toHaveAttribute('data-map-fit', 'true');
+    expect(viewport.scrollLeft).toBe(0);
+    expect(viewport.firstElementChild).toHaveStyle({ width: '100%', height: '100%' });
+  });
+
+  it('ajusta após resize do painel sem confundir a abertura de scrollbars com mudança de tamanho', () => {
+    let resize: ResizeObserverCallback | undefined;
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+    const original = globalThis.ResizeObserver;
+    globalThis.ResizeObserver = class {
+      constructor(callback: ResizeObserverCallback) { resize = callback; }
+      observe = observe;
+      disconnect = disconnect;
+      unobserve = vi.fn();
+    } as unknown as typeof ResizeObserver;
+    try {
+      const rendered = render(<CommercialMiniMap items={[record('B5-M001', 'AVAILABLE', square(0, 0))]} title="Pavilhão 13" onViewLot={vi.fn()} />);
+      const viewport = screen.getByLabelText('Planta de Pavilhão 13; use as setas para navegar pelos espaços');
+      const notify = (width: number, height: number, contentWidth = width) => act(() => resize!([{
+        target: viewport, borderBoxSize: [{ inlineSize: width, blockSize: height }], contentRect: { width: contentWidth, height },
+      } as unknown as ResizeObserverEntry], {} as ResizeObserver));
+      notify(900, 480);
+      fireEvent.click(screen.getByRole('button', { name: 'Ampliar planta de Pavilhão 13' }));
+      notify(900, 480, 883);
+      expect(viewport.firstElementChild).toHaveStyle({ width: '150%' });
+      viewport.scrollLeft = 65;
+      viewport.scrollTop = 30;
+      notify(360, 300);
+      expect(viewport.firstElementChild).toHaveStyle({ width: '100%', height: '100%' });
+      expect(viewport.scrollLeft).toBe(0);
+      expect(viewport.scrollTop).toBe(0);
+      expect(observe).toHaveBeenCalledWith(viewport, { box: 'border-box' });
+      rendered.unmount();
+      expect(disconnect).toHaveBeenCalledOnce();
+    } finally {
+      globalThis.ResizeObserver = original;
+    }
+  });
+
+  it('distingue indisponíveis do destaque comercial bloqueado e permite uma única legenda integrada', () => {
+    const blocked = record('BLOCKED', 'BLOCKED', square(0, 0));
+    const unavailable = record('UNAVAILABLE', 'UNAVAILABLE', square(12, 0));
+    const rendered = render(<CommercialMiniMap items={[blocked, unavailable]} title="Externo" highlightedStatus="BLOCKED" onViewLot={vi.fn()} hideStatusLegend />);
+    expect(screen.getByRole('button', { name: /BLOCKED.*Bloqueado/ })).toHaveAttribute('opacity', '0.92');
+    expect(screen.getByRole('button', { name: /UNAVAILABLE.*Indisponível/ })).toHaveAttribute('opacity', '0.16');
+    expect(screen.getByRole('button', { name: /UNAVAILABLE.*Indisponível/ })).toHaveAttribute('fill', STATUS_CONFIG.UNAVAILABLE.color);
+    expect(screen.queryByLabelText('Legenda das situações comerciais')).not.toBeInTheDocument();
+    expect(screen.getByRole('group').querySelectorAll('path[data-entity-id]')).toHaveLength(2);
+    rendered.rerender(<CommercialMiniMap items={[blocked, unavailable]} title="Externo" highlightedStatus="UNAVAILABLE" onViewLot={vi.fn()} />);
+    expect(screen.getByRole('button', { name: /UNAVAILABLE.*Indisponível/ })).toHaveAttribute('opacity', '0.92');
+    expect(screen.getByRole('button', { name: /BLOCKED.*Bloqueado/ })).toHaveAttribute('opacity', '0.16');
+    expect(screen.getByLabelText('Legenda das situações comerciais')).toHaveTextContent('Bloqueado 1Indisponível 1');
   });
 });

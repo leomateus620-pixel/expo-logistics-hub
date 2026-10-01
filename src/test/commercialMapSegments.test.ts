@@ -105,13 +105,16 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
     const blockIdentifiers = identifiers.filter((identifier) => identifier.startsWith('QUADRA-'));
     const lotIdentifiers = identifiers.filter((identifier) => identifier.startsWith('Q-'));
     const pavilionModuleIdentifiers = identifiers.filter((identifier) => /^B(?:1|2|3|4|5|6)-M/.test(identifier));
+    const confirmedBlocks = ['Q', 'V'];
+    const confirmedLots = OFFICIAL_REFERENCE_LOTS.filter((lot) => confirmedBlocks.includes(lot.block ?? ''));
+    const confirmedEntityCount = confirmedLots.length + confirmedBlocks.length;
 
     expect(blockIdentifiers).toEqual(expect.arrayContaining([
       'QUADRA-M', 'QUADRA-G', 'QUADRA-L', 'QUADRA-F',
-      'QUADRA-J', 'QUADRA-E', 'QUADRA-I', 'QUADRA-D',
+      'QUADRA-J', 'QUADRA-E', 'QUADRA-I', 'QUADRA-D', 'QUADRA-Q', 'QUADRA-V',
     ]));
-    expect(blockIdentifiers).toHaveLength(8);
-    expect(lotIdentifiers).toHaveLength(105);
+    expect(blockIdentifiers).toHaveLength(8 + confirmedBlocks.length);
+    expect(lotIdentifiers).toHaveLength(105 + confirmedLots.length);
     expect(pavilionModuleIdentifiers).toHaveLength(1064);
     expect(pavilionModuleIdentifiers).toEqual(expect.arrayContaining([
       'B1-M001', 'B1-M189',
@@ -121,7 +124,7 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
       'B5-M001', 'B5-M104',
       'B6-M001', 'B6-M214',
     ]));
-    expect(identifiers).toHaveLength(1206);
+    expect(identifiers).toHaveLength(1206 + confirmedEntityCount);
     expect(lotIdentifiers).toEqual(expect.arrayContaining([
       'Q-G-01', 'Q-G-02', 'Q-G-03', 'Q-G-04', 'Q-G-05', 'Q-G-06', 'Q-G-07', 'Q-G-08',
     ]));
@@ -138,7 +141,36 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
 
     const inventory = commercialMapSegmentInventory(OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS);
     expect(inventory.find(({ segment }) => segment.id === COMMERCIAL_MAP_SEGMENT_IDS.industry))
-      .toMatchObject({ entityCount: 1206, lotCount: 1169 });
+      .toMatchObject({ entityCount: 1206 + confirmedEntityCount, lotCount: 1169 + confirmedLots.length });
+  });
+
+  it('resolve Q/V no contrato compartilhado por quadra e pai cadastral sem depender de numeração ou quantidade', () => {
+    const confirmedBlocks = ['Q', 'V'];
+    const industry = getCommercialMapSegment(COMMERCIAL_MAP_SEGMENT_IDS.industry)!;
+    expect(industry.boundary.blockIdentifiers).toEqual(expect.arrayContaining(confirmedBlocks.map((block) => `QUADRA-${block}`)));
+    const confirmedLots = OFFICIAL_REFERENCE_LOTS.filter((lot) => confirmedBlocks.includes(lot.block ?? ''));
+    expect(confirmedLots.length).toBeGreaterThan(0);
+    for (const lot of confirmedLots) {
+      const source = OFFICIAL_REFERENCE_ENTITIES.find((entity) => entity.id === lot.entityId)!;
+      const persisted = { ...source, id: `database:${source.id}`, publicIdentifier: `CUSTOM-${source.id}`,
+        segmentId: null, segmentSource: undefined, metadata: {} };
+      expect(findCommercialMapSegmentsForEntity(persisted, { ...lot, entityId: persisted.id }).map(({ id }) => id))
+        .toEqual([COMMERCIAL_MAP_SEGMENT_IDS.industry]);
+    }
+    const parent = entityByPublicIdentifier.get('QUADRA-Q')!;
+    const child = { ...entityByPublicIdentifier.get('Q-Q-01')!, id: 'database:parent-linked-lot',
+      publicIdentifier: 'CUSTOM-PARENT-LINK', parentEntityId: parent.id, segmentId: null, segmentSource: undefined, metadata: {} };
+    expect(buildCommercialMapSegmentIndex([parent, child], []).get(child.id)?.id).toBe(COMMERCIAL_MAP_SEGMENT_IDS.industry);
+  });
+
+  it('não sobrepõe o segmento persistido nem resolve conflito de metadados ao incorporar Q/V', () => {
+    const source = entityByPublicIdentifier.get('Q-V-01')!;
+    const persisted = { ...source, segmentId: COMMERCIAL_MAP_SEGMENT_IDS.automotive, segmentSource: 'database' as const };
+    expect(findCommercialMapSegmentsForEntity(persisted).map(({ id }) => id)).toEqual([COMMERCIAL_MAP_SEGMENT_IDS.automotive]);
+    const conflicting = { ...source, segmentId: null, segmentSource: undefined,
+      metadata: { block: 'V', segmentId: COMMERCIAL_MAP_SEGMENT_IDS.automotive } };
+    expect(findCommercialMapSegmentsForEntity(conflicting)).toHaveLength(2);
+    expect(buildCommercialMapSegmentIndex([conflicting], []).has(conflicting.id)).toBe(false);
   });
 
   it('não aceita sobreposição silenciosa entre segmentos', () => {

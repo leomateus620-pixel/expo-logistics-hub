@@ -61,7 +61,9 @@ export interface CommercialMapSegmentDefinition {
 }
 
 const AUTOMOTIVE_BLOCKS = ['U', 'P', 'T', 'O'] as const;
-const INDUSTRY_BLOCKS = ['M', 'G', 'L', 'F', 'J', 'E', 'I', 'D'] as const;
+// Quadras Q/V pertencem a Indústria, Comércio e Serviços, conforme confirmação
+// do usuário em 01/10/2026. O mesmo registro rege mapa, enquadramento e dashboard.
+const INDUSTRY_BLOCKS = ['M', 'G', 'L', 'F', 'J', 'E', 'I', 'D', 'Q', 'V'] as const;
 const AUTOMOTIVE_EXCLUDED_ENTITIES = [
   'QUADRA-V', 'QUADRA-Q', 'QUADRA-M', 'QUADRA-L', 'QUADRA-X', 'QUADRA-N',
   'B39', 'G', 'J', 'TEST-DRIVE', 'C2', 'C3',

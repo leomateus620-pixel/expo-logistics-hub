@@ -1,0 +1,322 @@
+
+ RUN  v3.2.4 C:/Users/Leonardo/Desktop/expo-logistics-hub
+
+Browserslist: browsers data (caniuse-lite) is 16 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+stderr | src/test/commercialDashboardPresentation.test.tsx > integrated Commercial Dashboard presentation > shows the user-confirmed Q/V lots in industry and hides the pending access when every loaded lot is classified
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > focuses all three external areas, retains the selected lot, and opens its cadastral entity
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardPresentation.test.tsx > integrated Commercial Dashboard presentation > returns to all external areas when a refresh confirms the selected pending records as Q/V
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardPresentation.test.tsx > integrated Commercial Dashboard presentation > shows five global indicators and counts distinct SALE_OPEN lots separately from sales, reservations and negotiations
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > selects every pavilion from the common selector, including the official Pavilion 13 B5 identity
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > selects every pavilion from the common selector, including the official Pavilion 13 B5 identity
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > selects every pavilion from the common selector, including the official Pavilion 13 B5 identity
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > selects every pavilion from the common selector, including the official Pavilion 13 B5 identity
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardPresentation.test.tsx > integrated Commercial Dashboard presentation > updates the same map, summary and visible distribution when the selected area changes; highlights do not filter inventory
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > selects every pavilion from the common selector, including the official Pavilion 13 B5 identity
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > selects every pavilion from the common selector, including the official Pavilion 13 B5 identity
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardPresentation.test.tsx > integrated Commercial Dashboard presentation > keeps missing geometry, missing official area and unclassified lots in the snapshot without inventing spatial or area data
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > selects every pavilion from the common selector, including the official Pavilion 13 B5 identity
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > selects every pavilion from the common selector, including the official Pavilion 13 B5 identity
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardPresentation.test.tsx > integrated Commercial Dashboard presentation > omits superseded financial blocks while retaining the two requested global cadastral cards and lot inspection
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > selects every pavilion from the common selector, including the official Pavilion 13 B5 identity
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > refreshes selected module status, area, price, geometry and timestamp together without losing scope
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardPresentation.test.tsx > integrated Commercial Dashboard presentation > keeps registered partial values global across scopes, including blocked prices and excluding unavailable prices
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > refreshes selected module status, area, price, geometry and timestamp together without losing scope
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > polling and focus propagate a refreshed snapshot into metrics and the selected external polygon
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > polling and focus propagate a refreshed snapshot into metrics and the selected external polygon
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/commercialDashboardSpaces.test.tsx > managerial scopes in the existing dashboard > polling and focus propagate a refreshed snapshot into metrics and the selected external polygon
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+ ✓ src/test/commercialDashboardSpaces.test.tsx (4 tests) 2744ms
+   ✓ managerial scopes in the existing dashboard > focuses all three external areas, retains the selected lot, and opens its cadastral entity  1184ms
+   ✓ managerial scopes in the existing dashboard > selects every pavilion from the common selector, including the official Pavilion 13 B5 identity  1085ms
+stderr | src/test/commercialDashboardPresentation.test.tsx > integrated Commercial Dashboard presentation > distinguishes a registered zero price from absent prices in both global cadastral cards
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+ ✓ src/test/commercialDashboardPresentation.test.tsx (8 tests) 2779ms
+   ✓ integrated Commercial Dashboard presentation > shows the user-confirmed Q/V lots in industry and hides the pending access when every loaded lot is classified  860ms
+   ✓ integrated Commercial Dashboard presentation > returns to all external areas when a refresh confirms the selected pending records as Q/V  336ms
+   ✓ integrated Commercial Dashboard presentation > updates the same map, summary and visible distribution when the selected area changes; highlights do not filter inventory  428ms
+ ✓ src/test/commercialDashboardMiniMap.test.tsx (10 tests) 492ms
+ ✓ src/test/commercialMapSegmentLegend.test.tsx (2 tests) 226ms
+ ✓ src/test/commercialMapSegments.test.ts (12 tests) 159ms
+ ✓ src/test/commercialMapGateFourDistrict.test.ts (11 tests) 327ms
+   ✓ plano de apresentação do distrito do Portão 4 > clona apenas a Rua Buenos Aires e não muta a coleção de entrada  313ms
+stdout | src/test/commercialDashboardScopes.test.ts > dashboard managerial inventory > reconciles real reference inventory; industry modules and Pavilion 13 remain internal
+Reference-only inventory {
+  total: 1466,
+  external: 264,
+  internal: 1202,
+  unclassified: 0,
+  pavilions: [
+    [ 1, 189 ],
+    [ 3, 214 ],
+    [ 5, 81 ],
+    [ 7, 57 ],
+    [ 8, 114 ],
+    [ 12, 257 ],
+    [ 13, 104 ],
+    [ 14, 186 ]
+  ]
+}
+
+ ✓ src/test/commercialDashboardScopes.test.ts (12 tests) 198ms
+ ✓ src/test/commercialDashboardSync.test.tsx (3 tests) 48ms
+ ✓ src/test/commercialMapPavilion7OfficialLayout.test.ts (6 tests) 94ms
+ ✓ src/test/commercialMapSharedQuery.test.ts (4 tests) 114ms
+ ✓ src/test/commercialMapPavilionWayfinding.test.ts (11 tests) 31ms
+ ✓ src/test/commercialMapInteraction.test.ts (17 tests) 21ms
+ ✓ src/test/commercialDashboardAnalytics.test.ts (8 tests) 13ms
+ ✓ src/test/commercialDashboardLotMetrics.test.ts (7 tests) 12ms
+ ✓ src/test/commercialLotIdentity.test.ts (6 tests) 7ms
+ ✓ src/test/restrictedScope.test.ts (3 tests) 4ms
+
+ Test Files  16 passed (16)
+      Tests  124 passed (124)
+   Start at  19:03:19
+   Duration  21.45s (transform 1.43s, setup 2.71s, collect 9.68s, tests 7.27s, environment 14.06s, prepare 2.58s)
+

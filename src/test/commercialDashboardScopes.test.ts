@@ -48,6 +48,12 @@ describe('dashboard managerial inventory', () => {
     expect(snapshot.external.records.every((record) => !record.pavilion && record.entity.classification !== 'INTERNAL_STAND')).toBe(true);
     expect(snapshot.pavilions.find(({ definition }) => definition.publicIdentifier === 'B5')!.commercialLots).toBeGreaterThan(0);
     expect(snapshot.pavilions.find(({ definition }) => definition.publicIdentifier === 'B10')!.totalLots).toBe(57);
+    const confirmedLots = reference.lots.filter((lot) => lot.block === 'Q' || lot.block === 'V');
+    const industry = snapshot.segments.find(({ segmentId }) => segmentId === 'industria-comercio-servicos')!;
+    expect(confirmedLots.length).toBeGreaterThan(0);
+    expect(industry.records.filter(({ lot }) => lot.block === 'Q' || lot.block === 'V').map(({ lot }) => lot.id).sort())
+      .toEqual(confirmedLots.map(({ id }) => id).sort());
+    expect(snapshot.unclassified.records).toEqual([]);
     console.info('Reference-only inventory', {
       total: snapshot.overall.totalLots, external: snapshot.external.totalLots, internal: snapshot.internal.totalLots,
       unclassified: snapshot.unclassified.totalLots,

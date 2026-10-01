@@ -14,7 +14,7 @@ const COMPARISON_OPTIONS: readonly { id: ComparisonMode; label: string }[] = [
   { id: 'value', label: 'Valor comercial' },
 ];
 
-export function CommercialDashboardComparison({ segments }: { segments: readonly CommercialSegmentDashboardSnapshot[] }) {
+export function CommercialDashboardComparison({ segments, includeValue = true }: { segments: readonly CommercialSegmentDashboardSnapshot[]; includeValue?: boolean }) {
   const [mode, setMode] = useState<ComparisonMode>('lots');
 
   return <section className="commercial-dashboard-comparison" aria-labelledby="commercial-dashboard-comparison-title">
@@ -24,7 +24,7 @@ export function CommercialDashboardComparison({ segments }: { segments: readonly
         <h2 id="commercial-dashboard-comparison-title">Comparativo dos segmentos</h2>
       </div>
       <div className="commercial-dashboard-comparison-controls" role="group" aria-label="Métrica de comparação">
-        {COMPARISON_OPTIONS.map((option) => <button
+        {COMPARISON_OPTIONS.filter((option) => includeValue || option.id !== 'value').map((option) => <button
           type="button"
           key={option.id}
           className={mode === option.id ? 'is-active' : ''}

@@ -878,7 +878,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                 first.focus();
               }
             }}
-            style={{ position: 'absolute', inset: 0, zIndex: 60, overflow: 'auto', background: '#f5f7f3' }}
+            style={{ position: 'fixed', inset: 0, zIndex: 60, overflow: 'auto', background: '#f5f7f3' }}
           >
             <MapPanelBoundary resetKey="dashboard" title="Dashboard indisponível">
               <Suspense fallback={<CommercialDashboardSkeleton />}>
