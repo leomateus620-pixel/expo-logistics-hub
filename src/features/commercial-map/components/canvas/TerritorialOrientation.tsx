@@ -3,17 +3,27 @@ import { Html } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { CommercialLot, Coordinate, MapEntity } from '../../types';
+import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
 import { COMMERCIAL_MAP_OBSTRUCTION_SELECTOR } from '../../utils/contextualViewport';
 import { orientationBoxFits, orientationLevel, prepareTerritorialOrientation, TERRITORY_SYMBOLS, type ScreenBox } from '../../utils/territorialOrientation';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import './territorial-orientation.css';
 
 const ORIGIN = (): [number, number] => [0, 0];
-export const TerritorialOrientation = memo(function TerritorialOrientation({ entities, lots, roads }: {
-  entities: readonly MapEntity[]; lots: readonly CommercialLot[]; roads: readonly MapEntity[];
+export const TerritorialOrientation = memo(function TerritorialOrientation({ entities, lots, roads, policy }: {
+  entities: readonly MapEntity[]; lots: readonly CommercialLot[]; roads: readonly MapEntity[]; policy?: PublicExternalScenePolicy | null;
 }) {
   const gl = useThree(s => s.gl), size = useThree(s => s.size), invalidate = useThree(s => s.invalidate);
-  const items = useMemo(() => prepareTerritorialOrientation(entities, lots, roads), [entities, lots, roads]);
+  const items = useMemo(() => {
+    const scoped = policy ? entities.filter(entity => policy.activeScope.has(entity.id)) : entities;
+    // Shared circulation is allowed only when present in the authorized inventory.
+    const availableRoads = policy ? roads.filter(road => entities.some(entity => entity.id === road.id)) : roads;
+    const prepared = prepareTerritorialOrientation(scoped, lots, availableRoads);
+    if (!policy) return prepared;
+    const focus = policy.focusBounds, pad = focus.diagonal * .12;
+    return prepared.filter(item => item.anchor[0] >= focus.minX - pad && item.anchor[0] <= focus.maxX + pad
+      && item.anchor[1] >= focus.minZ - pad && item.anchor[1] <= focus.maxZ + pad);
+  }, [entities, lots, roads, policy]);
   const selected = useCommercialMapStore(s => s.selectedEntityId);
   const svg = useRef<SVGSVGElement>(null);
   const nodes = useRef(new Map<string, SVGGElement>());
@@ -28,7 +38,7 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
   }), [items]);
   useEffect(() => { dirty.current = true; invalidate(); }, [items, selected, invalidate]);
   useEffect(() => {
-    const shell = gl.domElement.closest('.commercial-map-shell');
+    const shell = gl.domElement.closest('.commercial-map-shell, .public-map-shell');
     if (!shell) return;
     const mark = () => { dirty.current = true; invalidate(); };
     const observer = new MutationObserver(records => {
@@ -61,7 +71,7 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
     level.current = orientationLevel(span, level.current);
     const canvas = gl.domElement.getBoundingClientRect();
     const occupied: ScreenBox[] = [];
-    gl.domElement.closest('.commercial-map-shell')?.querySelectorAll<HTMLElement>(`${COMMERCIAL_MAP_OBSTRUCTION_SELECTOR}, .commercial-map-label, .commercial-map-top-bar, .commercial-map-toolbar, .commercial-map-onboarding-note`).forEach(el => {
+    gl.domElement.closest('.commercial-map-shell, .public-map-shell')?.querySelectorAll<HTMLElement>(`${COMMERCIAL_MAP_OBSTRUCTION_SELECTOR}, .commercial-map-label, .commercial-map-top-bar, .commercial-map-toolbar, .commercial-map-onboarding-note, .commercial-map-dock`).forEach(el => {
       if (!el.getClientRects().length || getComputedStyle(el).visibility === 'hidden') return;
       const r = el.getBoundingClientRect();
       occupied.push({ left: r.left - canvas.left, right: r.right - canvas.left, top: r.top - canvas.top, bottom: r.bottom - canvas.top });
@@ -80,7 +90,8 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
       if (!node) continue;
       const center = project(item.anchor, item.elevation);
       const a = project(item.edge[0], item.elevation), b = project(item.edge[1], item.elevation);
-      const width = Math.min(160, item.name.length * (item.kind === 'road' ? 5.2 : 6.2) + 22), height = item.kind === 'segment' ? 23 : 20;
+      const text = node.querySelector('text');
+      const width = Math.ceil((text?.getComputedTextLength() ?? item.name.length * 6) + 16), height = item.kind === 'segment' ? 23 : 20;
       const rect = { left: center.x - width / 2, right: center.x + width / 2, top: center.y - height / 2, bottom: center.y + height / 2 };
       const enough = item.kind === 'segment' ? level.current !== 'near' : item.kind === 'block' ? level.current !== 'far' : true;
       const visible = enough && shown < limit && center.z >= -1 && center.z <= 1
@@ -90,6 +101,11 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
       node.style.display = visible ? '' : 'none';
       if (!visible) continue;
       node.setAttribute('transform', `translate(${center.x} ${center.y})`);
+      if (text && item.kind === 'road') {
+        const angle = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+        const upright = ((angle + 90 + 360) % 180) - 90;
+        text.setAttribute('transform', `rotate(${Math.abs(upright) < 28 ? upright.toFixed(1) : 0})`);
+      }
       const background = node.querySelector('rect');
       if (background) { background.setAttribute('x', String(-width / 2)); background.setAttribute('width', String(width)); }
       occupied.push(rect); shown++;
@@ -98,7 +114,7 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
     for (const item of blocks) {
       const path = lines.current.get(item.id);
       if (!path || !item.outline) continue;
-      path.style.display = level.current === 'far' ? 'none' : '';
+      path.style.display = level.current === 'far' || !blocks.length ? 'none' : '';
       if (level.current === 'far') continue;
       path.setAttribute('d', item.outline.map(ring => ring.map((p, index) => {
         const projected = project(p, item.elevation);

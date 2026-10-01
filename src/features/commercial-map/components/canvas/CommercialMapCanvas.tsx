@@ -14,7 +14,6 @@ import { isSoldLot, soldLotSurfaceColor } from '../../utils/soldLotPresentation'
 import { resolveLotTooltipPresentation } from '../../utils/lotTooltipPresentation';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { PublicMapEnvironment } from './PublicMapEnvironment';
-import { PublicContextLabels } from './PublicContextLabels';
 import { TerritorialOrientation } from './TerritorialOrientation';
 import { arenaVegetationAllowed } from '../../data/arenaCanonicalLayout';
 import { createArenaParkingGeometry, isArenaParking } from '../../utils/arenaParkingGeometry';
@@ -5411,7 +5410,7 @@ const Scene = memo(function Scene({
         hydrologicalModeActive={hydrologicalModeActive}
       />
       <RuntimeFrameDiagnostics />
-      {publicPolicy && <PublicContextLabels entities={entities} policy={publicPolicy} />}
+      {publicPolicy && labelsVisible && !interiorEntity && <TerritorialOrientation entities={entities} lots={lots} roads={circulationEntities} policy={publicPolicy} />}
       {!publicPolicy && !publicPavilion && labelsVisible && !interiorEntity && !visitEnabled && !hydrologicalModeActive && !lunarCinematicActive && (
         <TerritorialOrientation
           entities={interactiveEntityIds ? exteriorRenderedEntities.filter(entity => interactiveEntityIds.has(entity.id)) : exteriorRenderedEntities}
