@@ -274,9 +274,9 @@ export const PAVILION13_MODULE_METRIC_FOOTPRINTS = {
   ],
   79: [
     [0, 0],
-    [6, 0],
-    [6, 3],
-    [3, 3],
+    [4.5, 0],
+    [1.5, 3],
+    [0, 3],
   ],
   80: [
     [0, 0],
@@ -325,12 +325,12 @@ const MODULE_SHAPES = {
   26: {
     footprint: PROJECT.polygon(PAVILION13_MODULE_METRIC_FOOTPRINTS[26]),
     renderParts: diagonalPartitionParts('east-upper'),
-    labelAnchor: PROJECT.point(16.2, 1.35),
+    labelAnchor: PROJECT.point(17.25, 1.35),
   },
   79: {
     footprint: PROJECT.polygon(PAVILION13_MODULE_METRIC_FOOTPRINTS[79]),
     renderParts: diagonalPartitionParts('west-upper'),
-    labelAnchor: PROJECT.point(3.6, 1.35),
+    labelAnchor: PROJECT.point(1.8, 1.35),
   },
   80: {
     footprint: PROJECT.polygon(PAVILION13_MODULE_METRIC_FOOTPRINTS[80]),

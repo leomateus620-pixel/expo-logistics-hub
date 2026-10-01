@@ -20,13 +20,13 @@ describe('planta comercial fixa do Pavilhão 13', () => {
       metricWidthM: 19.8,
       metricDepthM: 37.8,
     });
-    expect(PAVILION13_COMMERCIAL_REFERENCE.moduleCount).toBe(103);
-    expect(PAVILION13_COMMERCIAL_REFERENCE.modularAreaM2).toBe(351);
+    expect(PAVILION13_COMMERCIAL_REFERENCE.moduleCount).toBe(104);
+    expect(PAVILION13_COMMERCIAL_REFERENCE.modularAreaM2).toBe(345);
     expect(PAVILION13_COMMERCIAL_REFERENCE.totalAreaM2).toBe(709);
-    expect(plan.cells).toHaveLength(103);
+    expect(plan.cells).toHaveLength(104);
     expect(plan.zones.map((zone) => zone.numberRange)).toEqual([
-      [1, 15], [16, 24], [25, 25], [26, 26], [27, 29],
-      [30, 53], [54, 77], [78, 78], [79, 79], [80, 88], [89, 103],
+      [1, 15], [16, 24], [25, 25], [26, 26],
+      [27, 52], [53, 78], [79, 79], [80, 80], [81, 89], [90, 104],
     ]);
     expect(plan.interiorPresentation).toMatchObject({
       fit: 'official-content',
@@ -50,9 +50,9 @@ describe('planta comercial fixa do Pavilhão 13', () => {
     const plan = COMMERCIAL_PAVILION_MODULE_PLANS.B5;
     const expectedAnchors = new Map([
       [25, [18.3 / 19.8, 4.5 / 37.8]],
-      [26, [16.2 / 19.8, 1.35 / 37.8]],
-      [78, [3.6 / 19.8, 1.35 / 37.8]],
-      [79, [1.5 / 19.8, 4.5 / 37.8]],
+      [26, [17.25 / 19.8, 1.35 / 37.8]],
+      [79, [1.8 / 19.8, 1.35 / 37.8]],
+      [80, [1.5 / 19.8, 4.5 / 37.8]],
     ] as const);
 
     expectedAnchors.forEach((anchor, number) => {

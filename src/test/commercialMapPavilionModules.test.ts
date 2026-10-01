@@ -628,37 +628,35 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
       [16, 24],
       [25, 25],
       [26, 26],
-      [27, 29],
-      [30, 53],
-      [54, 77],
-      [78, 78],
+      [27, 52],
+      [53, 78],
       [79, 79],
-      [80, 88],
-      [89, 103],
+      [80, 80],
+      [81, 89],
+      [90, 104],
     ]);
 
     const cell = (number: number) => plan.cells[number - 1];
     expectStrictlyDecreasing(Array.from({ length: 15 }, (_, index) => cell(index + 1).centerZ));
     expectStrictlyDecreasing(Array.from({ length: 9 }, (_, index) => cell(index + 16).centerZ));
-    expectStrictlyDecreasing(Array.from({ length: 3 }, (_, index) => cell(index + 27).centerX));
-    expectStrictlyIncreasing(Array.from({ length: 24 }, (_, index) => cell(index + 30).centerZ));
-    expectStrictlyDecreasing(Array.from({ length: 24 }, (_, index) => cell(index + 54).centerZ));
-    expectStrictlyIncreasing(Array.from({ length: 9 }, (_, index) => cell(index + 80).centerZ));
-    expectStrictlyIncreasing(Array.from({ length: 15 }, (_, index) => cell(index + 89).centerZ));
-    expect(cell(30).centerX).toBeGreaterThan(cell(77).centerX);
-    expect(cell(30).centerZ).toBeCloseTo(cell(77).centerZ, 12);
-    expect(cell(53).centerZ).toBeCloseTo(cell(54).centerZ, 12);
+    expectStrictlyIncreasing(Array.from({ length: 26 }, (_, index) => cell(index + 27).centerZ));
+    expectStrictlyDecreasing(Array.from({ length: 26 }, (_, index) => cell(index + 53).centerZ));
+    expectStrictlyIncreasing(Array.from({ length: 9 }, (_, index) => cell(index + 81).centerZ));
+    expectStrictlyIncreasing(Array.from({ length: 15 }, (_, index) => cell(index + 90).centerZ));
+    expect(cell(27).centerX).toBeGreaterThan(cell(78).centerX);
+    expect(cell(27).centerZ).toBeCloseTo(cell(78).centerZ, 12);
+    expect(cell(52).centerZ).toBeCloseTo(cell(53).centerZ, 12);
 
     expect(plan.cells.filter((candidate) => candidate.shape).map((candidate) => candidate.number))
-      .toEqual([25, 26, 78, 79]);
-    [25, 26, 78, 79].forEach((number) => {
+      .toEqual([25, 26, 79, 80]);
+    [25, 26, 79, 80].forEach((number) => {
       expect(cell(number).shape?.footprint).toHaveLength(4);
       expect(cell(number).shape?.renderParts.length).toBeGreaterThanOrEqual(12);
-      expect(cell(number).areaM2).toBe(13.5);
+      expect(cell(number).areaM2).toBe(number === 26 || number === 79 ? 9 : 13.5);
     });
-    expect(metricAreaForPlan(plan, 19.8, 37.8)).toBeCloseTo(351, 9);
+    expect(metricAreaForPlan(plan, 19.8, 37.8)).toBeCloseTo(345, 9);
     expect(PAVILION13_COMMERCIAL_REFERENCE.source.geometricModuleAreaM2)
-      .toBeCloseTo(351, 9);
+      .toBeCloseTo(345, 9);
     expectNoModuleRenderPartOverlaps(plan);
     expect(plan.supportSpaces).toEqual([]);
   });
