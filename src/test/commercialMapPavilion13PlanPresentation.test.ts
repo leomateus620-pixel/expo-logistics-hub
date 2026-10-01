@@ -93,7 +93,7 @@ describe('planta comercial fixa do Pavilhão 13', () => {
     expect(camera).toContain('mouseButtons={interiorFrame?.mouseButtons ??');
     expect(camera).toContain('touches={interiorFrame?.touches ??');
     expect(camera).toContain('preserveManualView.current = true');
-    expect(layer).toContain('const heightScale = flatModules ? 1');
+    expect(layer).toContain('heightScale: flatModules');
     expect(layer).toContain("plan.interiorPresentation?.numberPriority === 'maximum'");
     expect(layer).toContain('new THREE.CanvasTexture(canvas)');
     expect(layer).toContain('!reducedGraphics && !flatModules');

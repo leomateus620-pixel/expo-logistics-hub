@@ -11,7 +11,7 @@ import { pointInPolygon } from '@/features/commercial-map/utils/spatialSurface';
 import { getPublicArea } from '@/features/commercial-map/public/publicAreaRegistry';
 
 const migration = readFileSync(
-  resolve('supabase/migrations/20260921020213_106b16c4-fa53-436c-97a9-2a9d14de9a12.sql'),
+  resolve('supabase/migrations/20261001123132_f8abf992-0645-4df3-880b-b571ed03017b.sql'),
   'utf8',
 );
 const sql = migration.replace(/\s+/g, ' ').toLowerCase();
@@ -28,7 +28,7 @@ describe('Pavilhão 13 — planta oficial Fenasoja 2028', () => {
     expect(PAVILION13_COMMERCIAL_REFERENCE.cells).toHaveLength(104);
     expect(PAVILION13_COMMERCIAL_REFERENCE.cells.reduce(
       (sum, cell) => sum + (cell.areaM2 ?? 0), 0,
-    )).toBe(351);
+    )).toBe(345);
     expect(PAVILION13_COMMERCIAL_REFERENCE).toMatchObject({
       moduleCount: 104,
       modularAreaM2: 345,
@@ -52,7 +52,7 @@ describe('Pavilhão 13 — planta oficial Fenasoja 2028', () => {
       expect(pointInPolygon(probes[number].outside, footprint)).toBe(false);
       expect(PAVILION13_COMMERCIAL_REFERENCE.cells[number - 1]).toMatchObject({
         id: `B5:module:${String(number).padStart(3, '0')}`,
-        areaM2: 13.5,
+        areaM2: number === 26 || number === 79 ? 9 : 13.5,
       });
     }
   });

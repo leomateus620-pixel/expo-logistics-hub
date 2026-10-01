@@ -112,7 +112,7 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
     ]));
     expect(blockIdentifiers).toHaveLength(8);
     expect(lotIdentifiers).toHaveLength(105);
-    expect(pavilionModuleIdentifiers).toHaveLength(1063);
+    expect(pavilionModuleIdentifiers).toHaveLength(1064);
     expect(pavilionModuleIdentifiers).toEqual(expect.arrayContaining([
       'B1-M001', 'B1-M189',
       'B2-M001', 'B2-M186',
