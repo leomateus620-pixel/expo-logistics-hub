@@ -77,19 +77,19 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(lotsByBlock.get('G')).toContain(4);
   });
 
-  it('incorpora 1.201 módulos cartográficos dos oito pavilhões sem inventar comprador ou contrato', () => {
+  it('incorpora 1.202 módulos cartográficos dos oito pavilhões sem inventar comprador ou contrato', () => {
     const pavilionReferences = [
       { publicIdentifier: 'B1', block: 'P1', moduleCount: 189, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B2', block: 'P14', moduleCount: 186, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B3', block: 'P12', moduleCount: 257, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B4', block: 'P8', moduleCount: 114, segmentId: 'industria-comercio-servicos' },
-      { publicIdentifier: 'B5', block: 'P13', moduleCount: 103, segmentId: 'industria-comercio-servicos' },
+      { publicIdentifier: 'B5', block: 'P13', moduleCount: 104, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B6', block: 'P3', moduleCount: 214, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B8', block: 'P5', moduleCount: 81, segmentId: null },
       { publicIdentifier: 'B10', block: 'P7', moduleCount: 57, segmentId: null },
     ] as const;
 
-    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(1465);
+    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(1466);
     pavilionReferences.forEach((reference) => {
       const pavilion = OFFICIAL_REFERENCE_DATA.entities.find(
         (entity) => entity.publicIdentifier === reference.publicIdentifier,
@@ -300,7 +300,7 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(new Set(lotIdentifiers).size).toBe(lotIdentifiers.length);
     expect(externalLotIdentifiers).toHaveLength(264);
     expect(externalLotIdentifiers.every((identifier) => /^Q-[A-Z]-\d{2}$/.test(identifier))).toBe(true);
-    expect(pavilionModuleIdentifiers).toHaveLength(1201);
+    expect(pavilionModuleIdentifiers).toHaveLength(1202);
     expect(pavilionModuleIdentifiers.every((identifier) => /^B(?:1|2|3|4|5|6|8|10)-M\d{3}$/.test(identifier))).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.entities
       .filter((entity) => entity.classification === 'SELLABLE_LOT' || entity.classification === 'INTERNAL_STAND')

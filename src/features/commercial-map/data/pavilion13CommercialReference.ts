@@ -18,7 +18,7 @@ export type Pavilion13CommercialReferenceCell =
  * corner of the drawing and the two public entrances remain on the south edge.
  */
 const PROJECT = createCommercialPavilionMetricProjector(19.8, 37.8, 0);
-const SOURCE_DOCUMENT = 'Planta Pavilhão 13 — Fenasoja 2028 (desenho set/2026).pdf' as const;
+const SOURCE_DOCUMENT = 'Ajuste_Pav13_1.pdf (setembro/2026)' as const;
 
 /** Official cadastral divisions meet; the renderer supplies the visual joint. */
 export const PAVILION13_COMMERCIAL_MODULE_GAP = 0;
@@ -78,81 +78,70 @@ export const PAVILION13_COMMERCIAL_REFERENCE_RUNS = [
     cluster: 'east-01-26',
   },
   {
-    id: 'north-27-29',
-    label: 'Módulos 27–29',
-    role: 'perimeter',
-    bounds: PROJECT.rect(8.4, 0, 3, 3),
-    numberRange: [27, 29],
-    orientation: 'north-south',
-    sequenceOrientation: 'x-decreasing',
-    group: 'perimeter-north',
-    cluster: 'north-27-29',
-  },
-  {
-    id: 'central-east-30-53',
-    label: 'Módulos 30–53',
+    id: 'central-east-27-52',
+    label: 'Módulos 27–52',
     role: 'island',
-    bounds: PROJECT.rect(9.9, 9.25, 3, 24),
-    numberRange: [30, 53],
+    bounds: PROJECT.rect(9.9, 6, 3, 26),
+    numberRange: [27, 52],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
     group: 'central-pair',
-    cluster: 'central-30-77',
+    cluster: 'central-27-78',
   },
   {
-    id: 'central-west-54-77',
-    label: 'Módulos 54–77',
+    id: 'central-west-53-78',
+    label: 'Módulos 53–78',
     role: 'island',
-    bounds: PROJECT.rect(6.9, 9.25, 3, 24),
-    numberRange: [54, 77],
+    bounds: PROJECT.rect(6.9, 6, 3, 26),
+    numberRange: [53, 78],
     orientation: 'east-west',
     sequenceOrientation: 'z-decreasing',
     group: 'central-pair',
-    cluster: 'central-30-77',
-  },
-  {
-    id: 'northwest-irregular-78',
-    label: 'Módulo 78',
-    role: 'perimeter',
-    bounds: PROJECT.rect(0, 0, 6, 3),
-    numberRange: [78, 78],
-    orientation: 'north-south',
-    sequenceOrientation: 'x-increasing',
-    group: 'perimeter-west',
-    cluster: 'west-78-103',
+    cluster: 'central-27-78',
   },
   {
     id: 'northwest-irregular-79',
     label: 'Módulo 79',
     role: 'perimeter',
-    bounds: PROJECT.rect(0, 0, 3, 6),
+    bounds: PROJECT.rect(0, 0, 6, 3),
     numberRange: [79, 79],
+    orientation: 'north-south',
+    sequenceOrientation: 'x-increasing',
+    group: 'perimeter-west',
+    cluster: 'west-79-104',
+  },
+  {
+    id: 'northwest-irregular-80',
+    label: 'Módulo 80',
+    role: 'perimeter',
+    bounds: PROJECT.rect(0, 0, 3, 6),
+    numberRange: [80, 80],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
     group: 'perimeter-west',
-    cluster: 'west-78-103',
+    cluster: 'west-79-104',
   },
   {
-    id: 'west-upper-80-88',
-    label: 'Módulos 80–88',
+    id: 'west-upper-81-89',
+    label: 'Módulos 81–89',
     role: 'perimeter',
     bounds: PROJECT.rect(0, 6, 3, 9),
-    numberRange: [80, 88],
+    numberRange: [81, 89],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
     group: 'perimeter-west',
-    cluster: 'west-78-103',
+    cluster: 'west-79-104',
   },
   {
-    id: 'west-lower-89-103',
-    label: 'Módulos 89–103',
+    id: 'west-lower-90-104',
+    label: 'Módulos 90–104',
     role: 'perimeter',
     bounds: PROJECT.rect(0, 22.8, 3, 15),
-    numberRange: [89, 103],
+    numberRange: [90, 104],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
     group: 'perimeter-west',
-    cluster: 'west-78-103',
+    cluster: 'west-79-104',
   },
 ] as const satisfies readonly CommercialPavilionReferenceRun[];
 
@@ -278,18 +267,18 @@ export const PAVILION13_MODULE_METRIC_FOOTPRINTS = {
     [16.8, 3],
   ],
   26: [
-    [13.8, 0],
+    [15.3, 0],
     [19.8, 0],
     [16.8, 3],
-    [13.8, 3],
+    [15.3, 3],
   ],
-  78: [
+  79: [
     [0, 0],
     [6, 0],
     [6, 3],
     [3, 3],
   ],
-  79: [
+  80: [
     [0, 0],
     [3, 3],
     [3, 6],
@@ -338,17 +327,17 @@ const MODULE_SHAPES = {
     renderParts: diagonalPartitionParts('east-upper'),
     labelAnchor: PROJECT.point(16.2, 1.35),
   },
-  78: {
-    footprint: PROJECT.polygon(PAVILION13_MODULE_METRIC_FOOTPRINTS[78]),
+  79: {
+    footprint: PROJECT.polygon(PAVILION13_MODULE_METRIC_FOOTPRINTS[79]),
     renderParts: diagonalPartitionParts('west-upper'),
     labelAnchor: PROJECT.point(3.6, 1.35),
   },
-  79: {
-    footprint: PROJECT.polygon(PAVILION13_MODULE_METRIC_FOOTPRINTS[79]),
+  80: {
+    footprint: PROJECT.polygon(PAVILION13_MODULE_METRIC_FOOTPRINTS[80]),
     renderParts: diagonalPartitionParts('west-lower'),
     labelAnchor: PROJECT.point(1.5, 4.5),
   },
-} as const satisfies Record<25 | 26 | 78 | 79, CommercialPavilionReferenceCellShape>;
+} as const satisfies Record<25 | 26 | 79 | 80, CommercialPavilionReferenceCellShape>;
 
 export const PAVILION13_COMMERCIAL_REFERENCE_CELLS =
   buildCommercialPavilionReferenceCells({
@@ -358,15 +347,15 @@ export const PAVILION13_COMMERCIAL_REFERENCE_CELLS =
     sourceDocument: SOURCE_DOCUMENT,
     referenceYear: 2028,
     shapeForNumber: (number) => (
-      number === 25 || number === 26 || number === 78 || number === 79
+      number === 25 || number === 26 || number === 79 || number === 80
         ? MODULE_SHAPES[number]
         : null
     ),
   });
 
-if (PAVILION13_COMMERCIAL_REFERENCE_CELLS.length !== 103) {
+if (PAVILION13_COMMERCIAL_REFERENCE_CELLS.length !== 104) {
   throw new Error(
-    `B5: a referência geométrica gerou ${PAVILION13_COMMERCIAL_REFERENCE_CELLS.length} módulos; o total oficial é 103.`,
+    `B5: a referência geométrica gerou ${PAVILION13_COMMERCIAL_REFERENCE_CELLS.length} módulos; o total oficial é 104.`,
   );
 }
 
@@ -392,17 +381,17 @@ const IRREGULAR_MODULE_AREA_M2 = Object.values(PAVILION13_MODULE_METRIC_FOOTPRIN
 export const PAVILION13_COMMERCIAL_GEOMETRIC_AREA_M2 =
   REGULAR_MODULE_AREA_M2 + IRREGULAR_MODULE_AREA_M2;
 
-if (Math.abs(PAVILION13_COMMERCIAL_GEOMETRIC_AREA_M2 - 351) > 1e-9) {
-  throw new Error('B5: a geometria modular não fecha a área oficial de 351,00 m².');
+if (Math.abs(PAVILION13_COMMERCIAL_GEOMETRIC_AREA_M2 - 345) > 1e-9) {
+  throw new Error('B5: a geometria modular não fecha a área oficial de 345,00 m².');
 }
 
 export const PAVILION13_COMMERCIAL_REFERENCE = {
   publicIdentifier: 'B5',
   pavilionNumber: 13,
   category: 'Indústria e Comércio',
-  moduleCount: 103,
+  moduleCount: 104,
   totalAreaM2: 709,
-  modularAreaM2: 351,
+  modularAreaM2: 345,
   individualAreaM2: null,
   moduleGap: PAVILION13_COMMERCIAL_MODULE_GAP,
   boundary: { centerX: 0.5, centerZ: 0.5, width: 1, depth: 1 },
@@ -423,7 +412,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE = {
     boundedPan: true,
     boundedZoom: true,
   },
-  legendNumberRanges: [[1, 26], [27, 29], [30, 77], [78, 103]],
+  legendNumberRanges: [[1, 26], [27, 78], [79, 89], [90, 104]],
   runs: PAVILION13_COMMERCIAL_REFERENCE_RUNS,
   corridors: PAVILION13_COMMERCIAL_REFERENCE_CORRIDORS,
   supportSpaces: [],

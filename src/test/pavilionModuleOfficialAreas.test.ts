@@ -15,16 +15,16 @@ const EXPECTED_TOTALS: Record<string, number> = {
   B10: 427.5,
   B4: 438.5,
   B3: 771,
-  B5: 351,
+  B5: 345,
   B2: 616,
 };
 
 describe('metragens oficiais dos lotes internos dos pavilhões', () => {
-  it('cobre exatamente os 1.201 módulos ativos cadastrados', () => {
-    expect(PAVILION_MODULE_OFFICIAL_AREAS.size).toBe(1201);
+  it('cobre exatamente os 1.202 módulos ativos cadastrados', () => {
+    expect(PAVILION_MODULE_OFFICIAL_AREAS.size).toBe(1202);
     const total = [...PAVILION_MODULE_OFFICIAL_AREAS.values()]
       .reduce((sum, entry) => sum + entry.areaSqm, 0);
-    expect(total).toBeCloseTo(4098, 10);
+    expect(total).toBeCloseTo(4092, 10);
   });
 
   it('fecha a soma documental de cada pavilhão lote a lote', () => {
@@ -68,11 +68,16 @@ describe('metragens oficiais dos lotes internos dos pavilhões', () => {
     expect(getPavilionModuleArea('B4', 90)?.areaSqm).toBe(24.5);
     expect(getPavilionModuleArea('B4', 91)?.areaSqm).toBe(4);
 
-    [25, 26, 78, 79].forEach((number) => {
+    [25, 80].forEach((number) => {
       expect(getPavilionModuleArea('B5', number)?.areaSqm).toBe(13.5);
       expect(getPavilionModuleArea('B5', number)?.evidence).toBe('written');
       expect(getPavilionModuleArea('B5', number)?.validationStatus).toBe('VALIDATED');
       expect(getPavilionModuleArea('B5', number)?.caveat).toBeNull();
+    });
+    [26, 79].forEach((number) => {
+      expect(getPavilionModuleArea('B5', number)?.areaSqm).toBe(9);
+      expect(getPavilionModuleArea('B5', number)?.evidence).toBe('written');
+      expect(getPavilionModuleArea('B5', number)?.validationStatus).toBe('VALIDATED');
     });
 
     expect(getPavilionModuleArea('B2', 35)?.areaSqm).toBe(3);
@@ -90,9 +95,9 @@ describe('metragens oficiais dos lotes internos dos pavilhões', () => {
     expect(pavilion8.reduce((sum, entry) => sum + entry.areaSqm, 0)).toBe(438.5);
   });
 
-  it('remove a ressalva superada do B5-M078 pela planta oficial 2028', () => {
-    const validated = getPavilionModuleArea('B5', 78);
-    expect(validated?.areaSqm).toBe(13.5);
+  it('registra a área escrita do B5-M079 pela planta oficial ajustada', () => {
+    const validated = getPavilionModuleArea('B5', 79);
+    expect(validated?.areaSqm).toBe(9);
     expect(validated?.evidence).toBe('written');
     expect(validated?.validationStatus).toBe('VALIDATED');
     expect(validated?.caveat).toBeNull();

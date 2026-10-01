@@ -72,14 +72,14 @@ describe('legenda inteligente das plantas internas', () => {
       name: 'Legenda da planta interna do Pavilhão 13',
     });
     expect(within(legend).getByText('Indústria e Comércio')).toBeInTheDocument();
-    expect(within(legend).getByText('103')).toBeInTheDocument();
-    expect(within(legend).getByText('01–103')).toBeInTheDocument();
+    expect(within(legend).getByText('104')).toBeInTheDocument();
+    expect(within(legend).getByText('01–104')).toBeInTheDocument();
     expect(within(legend).getByText('709 m²')).toBeInTheDocument();
-    expect(within(legend).getByText('351 m²')).toBeInTheDocument();
+    expect(within(legend).getByText('345 m²')).toBeInTheDocument();
     expect(within(legend).getByText('01–26')).toBeInTheDocument();
-    expect(within(legend).getByText('27–29')).toBeInTheDocument();
-    expect(within(legend).getByText('30–77')).toBeInTheDocument();
-    expect(within(legend).getByText('78–103')).toBeInTheDocument();
+    expect(within(legend).getByText('27–78')).toBeInTheDocument();
+    expect(within(legend).getByText('79–89')).toBeInTheDocument();
+    expect(within(legend).getByText('90–104')).toBeInTheDocument();
     expect(within(legend).queryByText('Apoio permanente')).not.toBeInTheDocument();
   });
 
