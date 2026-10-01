@@ -162,7 +162,8 @@ export const PAVILION13_COMMERCIAL_REFERENCE_CORRIDORS = [
     id: 'north-distribution',
     label: 'Circulação norte',
     kind: 'cross',
-    ...PROJECT.rect(3, 3, 13.8, 3),
+    // Continue the walkway to the island: no exposed dark slab at z=6–8.9.
+    ...PROJECT.rect(3, 3, 13.8, 5.9),
   },
   {
     id: 'west-main-aisle',

@@ -72,12 +72,19 @@ describe('Pavilhão 13 — planta oficial Fenasoja 2028', () => {
       (item) => item.id === id,
     );
     expect((corridor('west-main-aisle')?.width ?? 0) * 19.8).toBeCloseTo(3.9, 10);
-    expect((corridor('north-distribution')?.depth ?? 0) * 37.8).toBeCloseTo(3, 10);
+    expect((corridor('north-distribution')?.depth ?? 0) * 37.8).toBeCloseTo(5.9, 10);
     expect((corridor('south-distribution')?.depth ?? 0) * 37.8).toBeCloseTo(2.9, 10);
     // Ilha 27–78 centrada no vão das fileiras laterais (z 6–37,8) e com corredores simétricos.
     const island = PAVILION13_COMMERCIAL_REFERENCE.runs.find((run) => run.id === 'central-east-27-52');
     expect(((island?.bounds.centerZ ?? 0) * 37.8)).toBeCloseTo((6 + 37.8) / 2, 6);
     expect((corridor('east-main-aisle')?.width ?? 0) * 19.8).toBeCloseTo(3.9, 10);
+    const top = (rect: { centerZ: number; depth: number }) => (rect.centerZ - rect.depth / 2) * 37.8;
+    const bottom = (rect: { centerZ: number; depth: number }) => (rect.centerZ + rect.depth / 2) * 37.8;
+    const east = PAVILION13_COMMERCIAL_REFERENCE.runs.find(run => run.id === 'central-east-27-52');
+    if (!east) throw new Error('Ilha do Pavilhão 13 ausente');
+    expect(bottom(corridor('north-distribution')!)).toBeCloseTo(top(east.bounds), 8);
+    expect(top(corridor('south-distribution')!)).toBeCloseTo(bottom(east.bounds), 8);
+    expect(PAVILION13_COMMERCIAL_REFERENCE.cells.slice(99).map(cell => cell.label)).toEqual(['100', '101', '102', '103', '104']);
   });
 
   it('reconcilia somente B5 e protege IDs, status, preços e histórico geométrico', () => {

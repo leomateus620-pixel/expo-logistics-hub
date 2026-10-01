@@ -1,5 +1,11 @@
 # Roadmap
 
+## Pavilhão 13 — circulação e numeração 100–104
+- [x] Preencher visualmente o intervalo entre circulação norte e ilha; retirar as cotas 6,00 m sobre o box 78 e 3,25 m.
+- [x] Validar continuidade da circulação, números de referência, acessos e cotas em testes focados (46 aprovados).
+- [ ] Corrigir no cadastro os cinco registros B5-M100–104, hoje salvos como “10” em número e nome: bloqueado pela restrição atual de escrita de dados do projeto.
+- [ ] Conferir visualmente o mapa interno e link público em desktop/celular quando o WebGL carregar; não publicar.
+
 ## Ficha lateral dos módulos dos pavilhões
 - [x] Priorizar venda em aberto ou confirmada e suas ações mesmo com detalhes recolhidos; manter permissões existentes.
 - [x] Dimensionar valores oficiais, comprador, histórico, contrato e legenda pela largura da lateral; ampliar folha móvel quando há venda.
