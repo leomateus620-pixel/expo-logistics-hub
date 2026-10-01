@@ -11,7 +11,13 @@ describe('orientação territorial cadastral', () => {
     expect(data.filter(item => item.kind === 'block').map(item => item.name)).toContain('Quadra R');
     expect(data.filter(item => item.kind === 'road').map(item => item.name)).toContain('Rua Bolívia');
     expect(data.some(item => item.name.includes('M001'))).toBe(false);
-    expect(data.filter(item => item.kind === 'block').length).toBe(14);
+    expect(data.filter(item => item.kind === 'block').map(item => item.name).sort()).toEqual(
+      ['D', 'E', 'F', 'G', 'I', 'J', 'L', 'M', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V'].map(block => `Quadra ${block}`),
+    );
+    for (const block of ['Q', 'V']) {
+      expect(data.find(item => item.kind === 'block' && item.name === `Quadra ${block}`))
+        .toMatchObject({ segmentId: COMMERCIAL_MAP_SEGMENT_IDS.industry });
+    }
     expect(Object.values(TERRITORY_SYMBOLS).map(value => value.pattern)).toEqual(['none', '8 4', '2 4']);
   });
   it('mantém todas as âncoras de quadra dentro da área real, inclusive com recortes', () => {

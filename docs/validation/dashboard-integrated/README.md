@@ -2,6 +2,8 @@
 
 Implementação de 01/10/2026 sobre `28c23790`. A composição ativa continua em `CommercialDashboard` e `CommercialDashboardSpaces`, no overlay existente do Mapa Comercial.
 
+A PR #178 foi incorporada em `main`. [Conferência final do CI e ajuste complementar das expectativas Q/V](CI.md): os checks dashboard, public-map e architecture passaram; os demais resultados e a reprodução na base estão registrados separadamente.
+
 ## Fontes e regras preservadas
 
 - A dashboard continua recebendo `data.entities`, `data.lots`, `dataUpdatedAt` e `isFetching` do fluxo existente. `buildCommercialDashboardSnapshot` é a única origem das agregações globais e dos recortes. Não foram criados endpoint, RPC, tabela, consulta paralela de inventário ou rota de navegação.
