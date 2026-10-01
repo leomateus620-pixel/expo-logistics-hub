@@ -151,7 +151,7 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
       }}><i /></div>}
     {showContent && <div className="commercial-map-dock__scroll">
       {!interiorEntity && !isCommissionScope && <section className="commercial-map-dock__segment-section" aria-label="Segmentos comerciais do parque">
-          <div className="commercial-map-dock__segment-heading"><strong>Segmentos</strong><small>Limites no mapa · selecione para explorar</small></div>
+          <div className="commercial-map-dock__segment-heading"><strong>Segmentos</strong><small>Selecione para explorar</small></div>
         <div className="commercial-map-dock__segments" role="group" aria-label="Filtrar mapa por segmento">
           {inventory.map(({ segment, lotCount }) => {
             const Icon = segment.id === 'exporural' ? Tractor : segment.id === 'industria-comercio-servicos' ? Factory : CarFront;

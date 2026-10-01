@@ -27,7 +27,6 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
   const selected = useCommercialMapStore(s => s.selectedEntityId);
   const svg = useRef<SVGSVGElement>(null);
   const nodes = useRef(new Map<string, SVGGElement>());
-  const lines = useRef(new Map<string, SVGPathElement>());
   const prior = useRef(''), dirty = useRef(true);
   const level = useRef<'far' | 'medium' | 'near'>('far');
   const point = useMemo(() => new THREE.Vector3(), []);
@@ -127,20 +126,9 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
       if (background) { background.setAttribute('x', String(-width / 2)); background.setAttribute('width', String(width)); }
       occupied.push(rect); shown++;
     }
-    // Draw only verified cadastral quadra rings; never a synthetic segment hull.
-    for (const item of blocks) {
-      const path = lines.current.get(item.id);
-      if (!path || !item.outline) continue;
-      path.style.display = '';
-      path.setAttribute('d', item.outline.map(ring => ring.map((p, index) => {
-        const projected = project(p, item.elevation);
-        return `${index ? 'L' : 'M'}${projected.x.toFixed(1)} ${projected.y.toFixed(1)}`;
-      }).join(' ') + ' Z').join(' '));
-    }
   });
   return <Html calculatePosition={ORIGIN} zIndexRange={[1, 1]} style={{ width: size.width, height: size.height, pointerEvents: 'none' }}>
     <svg ref={svg} className="territorial-orientation" aria-hidden="true" width={size.width} height={size.height}>
-      {blocks.map(item => <path key={`outline:${item.id}`} className={`territorial-orientation__outline territorial-orientation__outline--${item.segmentId}`} ref={node => { if (node) lines.current.set(item.id, node); else lines.current.delete(item.id); }} />)}
       {items.map(item => <g key={item.id} className={`territorial-orientation__label territorial-orientation__label--${item.kind}`} ref={node => { if (node) nodes.current.set(item.id, node); else nodes.current.delete(item.id); }} style={{ display: 'none' }}>
         <rect y={item.kind === 'segment' ? -11.5 : -10} height={item.kind === 'segment' ? 23 : 20} rx="4" />
         <text textAnchor="middle" dominantBaseline="central">{item.kind === 'segment' && item.segmentId ? `${TERRITORY_SYMBOLS[item.segmentId].glyph}  ` : ''}{item.name}</text>

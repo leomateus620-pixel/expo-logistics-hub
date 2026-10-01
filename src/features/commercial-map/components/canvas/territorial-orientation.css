@@ -12,7 +12,4 @@
 .territorial-orientation__label--road rect { display: none; }
 .territorial-orientation__label--road text { font: 500 9px system-ui, sans-serif; fill: oklch(var(--foreground)); paint-order: stroke fill; stroke: oklch(var(--card) / .78); stroke-width: 1.5px; stroke-linejoin: round; }
 .territorial-orientation__label--segment text { font-size: 11px; font-weight: 750; }
-.territorial-orientation__outline { fill: none; stroke: var(--orientation-line); stroke-width: 1.15; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
-.territorial-orientation__outline--industria-comercio-servicos { stroke-dasharray: 8 4; }
-.territorial-orientation__outline--espaco-automovel { stroke-dasharray: 2 4; stroke-linecap: round; }
-.dark .territorial-orientation { --orientation-paper: oklch(var(--card) / .92); --orientation-ink: oklch(var(--foreground)); --orientation-line: oklch(var(--foreground) / .7); }
+.dark .territorial-orientation { --orientation-paper: oklch(var(--card) / .92); --orientation-ink: oklch(var(--foreground)); }
