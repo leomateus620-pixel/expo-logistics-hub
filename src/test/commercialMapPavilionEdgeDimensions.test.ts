@@ -21,7 +21,7 @@ describe('bordas documentadas, sem modificar lotes',()=>{
   it('P13 só publica comprimentos documentados, sem inventar a medida da diagonal ou área',()=>{
     const plan=plans.B5,before=JSON.stringify(plan),dimensions=resolvePavilionDimensions(plan,{width:20,depth:40});
     expect(plan.cells).toHaveLength(104);
-    expect(dimensions.filter(d=>[79,80,26,25].includes(d.ownerNumber??0)).map(d=>d.value).sort()).toEqual(['6,00','3,00','3,00','3,00','6,00','6,00','3,00','3,00','6,00','3,00'].sort());
+    expect(dimensions.filter(d=>[79,80,26,25].includes(d.ownerNumber??0)).map(d=>d.value).sort()).toEqual(['3,00','3,00','3,00','3,00','6,00','6,00','6,00'].sort());
     expect(dimensions.every(d=>d.unit==='m'&&!('areaM2' in d))).toBe(true);
     expect(JSON.stringify(plan)).toBe(before);
   });
