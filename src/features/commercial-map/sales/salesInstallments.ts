@@ -1,8 +1,18 @@
-import type { SalesInstallment, SalesInstallmentDraft } from './salesTypes';
+import type { SalesInstallment, SalesInstallmentDraft, SalesPaymentDraft } from './salesTypes';
 import { splitCents, toCents } from './salesMoney';
 
 /** Primeiro vencimento padrão do boleto parcelado (dia 5, a partir de dezembro/2026). */
 export const DEFAULT_INSTALLMENT_START = '2026-12-05';
+export const DEFAULT_INSTALLMENT_COUNT = 17;
+
+export function initialSalesPayment(totalCents: number): SalesPaymentDraft {
+  return {
+    paymentMethod: 'BOLETO_PARCELADO',
+    countInput: String(DEFAULT_INSTALLMENT_COUNT),
+    installments: buildDraftSchedule(totalCents, monthlyDueDates(DEFAULT_INSTALLMENT_COUNT)),
+    manualAmounts: false,
+  };
+}
 
 export function addMonthsIso(isoDate: string, months: number): string {
   const [year, month, day] = isoDate.split('-').map(Number);
