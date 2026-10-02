@@ -3741,6 +3741,56 @@ export type Database = {
         }
         Relationships: []
       }
+      lot_contract_lots: {
+        Row: {
+          contract_id: string
+          created_at: string
+          created_by: string | null
+          lot_id: string
+        }
+        Insert: {
+          contract_id: string
+          created_at?: string
+          created_by?: string | null
+          lot_id: string
+        }
+        Update: {
+          contract_id?: string
+          created_at?: string
+          created_by?: string | null
+          lot_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_contract_lots_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "lot_contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_contract_lots_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lot_pricing_2028"
+            referencedColumns: ["lot_id"]
+          },
+          {
+            foreignKeyName: "lot_contract_lots_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_contract_lots_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_sale_eligibility"
+            referencedColumns: ["lot_id"]
+          },
+        ]
+      }
       lot_contract_versions: {
         Row: {
           contract_id: string
@@ -3796,7 +3846,9 @@ export type Database = {
           created_by: string
           id: string
           is_active: boolean
-          lot_id: string
+          lot_id: string | null
+          order_id: string | null
+          scope: string
           updated_at: string
         }
         Insert: {
@@ -3806,7 +3858,9 @@ export type Database = {
           created_by: string
           id?: string
           is_active?: boolean
-          lot_id: string
+          lot_id?: string | null
+          order_id?: string | null
+          scope?: string
           updated_at?: string
         }
         Update: {
@@ -3816,7 +3870,9 @@ export type Database = {
           created_by?: string
           id?: string
           is_active?: boolean
-          lot_id?: string
+          lot_id?: string | null
+          order_id?: string | null
+          scope?: string
           updated_at?: string
         }
         Relationships: [
@@ -3840,6 +3896,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "commercial_sale_eligibility"
             referencedColumns: ["lot_id"]
+          },
+          {
+            foreignKeyName: "lot_contracts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "lot_sale_orders"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -9711,6 +9774,19 @@ export type Database = {
         Args: { p_order_id: string; p_path: string }
         Returns: boolean
       }
+      attach_order_contract: {
+        Args: {
+          p_contract_id?: string
+          p_contract_number?: string
+          p_file_size: number
+          p_lot_ids: string[]
+          p_mime_type: string
+          p_order_id: string
+          p_original_name: string
+          p_storage_path: string
+        }
+        Returns: Json
+      }
       audit_check_rls_status: {
         Args: never
         Returns: {
@@ -9947,6 +10023,10 @@ export type Database = {
         Args: { p_segment_id: string }
         Returns: number
       }
+      get_commercial_sale_order_detail: {
+        Args: { p_order_id?: string; p_sale_id?: string }
+        Returns: Json
+      }
       get_commission_map_segment_inventory: {
         Args: { p_segment_id: string }
         Returns: {
@@ -9993,6 +10073,20 @@ export type Database = {
       is_org_member: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
+      }
+      list_commercial_sale_orders: {
+        Args: {
+          p_from?: string
+          p_has_document?: boolean
+          p_limit?: number
+          p_offset?: number
+          p_payment_method?: string
+          p_project_id: string
+          p_search?: string
+          p_status?: string
+          p_to?: string
+        }
+        Returns: Json
       }
       list_org_login_members: {
         Args: { _org_id: string }
