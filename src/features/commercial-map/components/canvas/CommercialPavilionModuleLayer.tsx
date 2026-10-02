@@ -23,6 +23,7 @@ import { isMapSelectionClick } from '../../utils/interaction';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { dispatchSalesModuleClick } from '../../sales/salesInteraction';
 import { useSalesSelectedLotIds } from '../../sales/useSalesSelection';
+import { useSaleInspectionStore } from '../../state/useSaleInspectionStore';
 import type { CommercialStatus } from '../../types';
 import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
 import { SoldLotLocks } from './SoldLotLocks';
@@ -524,7 +525,13 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   const selectedModuleId = useCommercialMapStore((state) => state.selectedModuleId);
   const setHoveredModuleId = useCommercialMapStore((state) => state.setHoveredModuleId);
   const setSelectedModuleId = useCommercialMapStore((state) => state.setSelectedModuleId);
-  const salesSelectedLotIds = useSalesSelectedLotIds();
+  const cartLotIds = useSalesSelectedLotIds();
+  // Inspeção de venda soma-se ao realce de seleção sem tocar no carrinho.
+  const inspectedLotIds = useSaleInspectionStore((state) => state.lotIdSet);
+  const salesSelectedLotIds = useMemo(() => {
+    if (inspectedLotIds.size === 0) return cartLotIds;
+    return new Set([...cartLotIds, ...inspectedLotIds]);
+  }, [cartLotIds, inspectedLotIds]);
   const unitBoxGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const shortSide = Math.min(layout.interior.clearWidth, layout.interior.clearDepth);
   const flatModules = mode === 'interior' && plan.interiorPresentation?.flatModules === true;

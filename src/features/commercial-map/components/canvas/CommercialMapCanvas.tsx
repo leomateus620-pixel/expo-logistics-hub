@@ -1487,6 +1487,7 @@ function BatchedLots({
   onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
 }) {
   const publicPolicy = usePublicScenePolicy();
+  const saleInspectionLotIds = useSaleInspectionStore((state) => state.lotIdSet);
   const geometryEntitiesRef = useRef<MapEntity[]>([]);
   if (geometryEntitiesRef.current.length !== entries.length || entries.some((entry, i) => entry.entity !== geometryEntitiesRef.current[i])) geometryEntitiesRef.current = entries.map(entry => entry.entity);
   const geometryEntities = geometryEntitiesRef.current;
