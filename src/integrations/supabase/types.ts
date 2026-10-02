@@ -1115,6 +1115,7 @@ export type Database = {
           name: string
           org_id: string
           phone: string | null
+          trade_name: string | null
           updated_at: string
           updated_by: string | null
         }
@@ -1128,6 +1129,7 @@ export type Database = {
           name: string
           org_id: string
           phone?: string | null
+          trade_name?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -1141,6 +1143,7 @@ export type Database = {
           name?: string
           org_id?: string
           phone?: string | null
+          trade_name?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -4235,6 +4238,7 @@ export type Database = {
       lot_sale_orders: {
         Row: {
           buyer_name: string
+          buyer_trade_name: string | null
           created_at: string
           document_number: string | null
           email: string | null
@@ -4265,6 +4269,7 @@ export type Database = {
         }
         Insert: {
           buyer_name: string
+          buyer_trade_name?: string | null
           created_at?: string
           document_number?: string | null
           email?: string | null
@@ -4295,6 +4300,7 @@ export type Database = {
         }
         Update: {
           buyer_name?: string
+          buyer_trade_name?: string | null
           created_at?: string
           document_number?: string | null
           email?: string | null
@@ -4343,6 +4349,7 @@ export type Database = {
       lot_sales: {
         Row: {
           buyer_name: string
+          buyer_trade_name: string | null
           contract_number: string | null
           created_at: string
           document_number: string | null
@@ -4360,6 +4367,7 @@ export type Database = {
         }
         Insert: {
           buyer_name: string
+          buyer_trade_name?: string | null
           contract_number?: string | null
           created_at?: string
           document_number?: string | null
@@ -4377,6 +4385,7 @@ export type Database = {
         }
         Update: {
           buyer_name?: string
+          buyer_trade_name?: string | null
           contract_number?: string | null
           created_at?: string
           document_number?: string | null
@@ -9762,6 +9771,10 @@ export type Database = {
         Args: { p_lot_id: string; p_stage: string }
         Returns: Json
       }
+      commercial_buyer_display_name: {
+        Args: { p_legal: string; p_trade: string }
+        Returns: string
+      }
       commercial_sale_logos: { Args: { p_project_id: string }; Returns: Json }
       commission_leadership_user_ids: {
         Args: { _commission_id: string }
@@ -10201,6 +10214,21 @@ export type Database = {
       register_commercial_sale: {
         Args: {
           p_buyer_name: string
+          p_buyer_trade_name?: string
+          p_contract_number: string
+          p_document_number: string
+          p_lot_id: string
+          p_negotiated_value: number
+          p_notes: string
+          p_payment_status: string
+          p_sale_date: string
+          p_salesperson_name: string
+        }
+        Returns: string
+      }
+      register_commercial_sale_core: {
+        Args: {
+          p_buyer_name: string
           p_contract_number: string
           p_document_number: string
           p_lot_id: string
@@ -10213,6 +10241,30 @@ export type Database = {
         Returns: string
       }
       register_commercial_sale_order: {
+        Args: {
+          p_buyer_name: string
+          p_buyer_trade_name?: string
+          p_document_number: string
+          p_email: string
+          p_exhibitor_id?: string
+          p_expected_total: number
+          p_fee_admin?: number
+          p_fee_cleaning_license?: number
+          p_fee_ppci?: number
+          p_first_due_date: string
+          p_idempotency_key: string
+          p_installment_count: number
+          p_installments: Json
+          p_lot_ids: string[]
+          p_notes: string
+          p_payment_method: string
+          p_payment_type: string
+          p_phone: string
+          p_stage: string
+        }
+        Returns: string
+      }
+      register_commercial_sale_order_core: {
         Args: {
           p_buyer_name: string
           p_document_number: string
@@ -10388,7 +10440,33 @@ export type Database = {
         }
         Returns: string
       }
+      update_sale_exhibitor_identity: {
+        Args: {
+          p_buyer_name: string
+          p_buyer_trade_name: string
+          p_document: string
+          p_email: string
+          p_expected_buyer_name: string
+          p_expected_status: string
+          p_lot_sale_id: string
+          p_phone: string
+          p_request_id?: string
+          p_update_exhibitor?: boolean
+        }
+        Returns: Json
+      }
       upsert_commercial_exhibitor: {
+        Args: {
+          p_document: string
+          p_email: string
+          p_name: string
+          p_phone: string
+          p_project_id: string
+          p_trade_name?: string
+        }
+        Returns: string
+      }
+      upsert_commercial_exhibitor_core: {
         Args: {
           p_document: string
           p_email: string
