@@ -49,13 +49,24 @@ export function SaleOpenSection({ lotId, canManageSales }: { lotId: string; canM
 
   const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: ['commercial-map'] });
+    void queryClient.invalidateQueries({ queryKey: ['commercial-sale-orders'] });
+    void queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail'] });
   };
 
   const confirmMutation = useMutation({
-    mutationFn: (itemIds: string[]) => confirmSaleOrderItems(openSale.data!.orderId, itemIds),
-    onSuccess: () => {
+    // Confirma todos os espaços do mesmo pedido que ainda aguardam assinatura,
+    // relendo a lista no servidor para não usar estado desatualizado.
+    mutationFn: async () => {
+      const fresh = await fetchLotOpenSaleOrder(lotId);
+      if (!fresh || fresh.orderId !== openSale.data?.orderId) throw new Error('A venda em aberto mudou. Atualize a ficha e tente novamente.');
+      const itemIds = fresh.items.filter((item) => item.orderId === fresh.orderId).map((item) => item.itemId);
+      if (!itemIds.length) throw new Error('Nenhum espaço aguardando assinatura neste pedido.');
+      await confirmSaleOrderItems(fresh.orderId, itemIds);
+      return itemIds.length;
+    },
+    onSuccess: (count: number) => {
       invalidate();
-      toast({ title: 'Contrato confirmado', description: 'O espaço passou a constar como vendido no mapa.' });
+      toast({ title: 'Contrato confirmado', description: count === 1 ? 'O espaço passou a constar como vendido no mapa.' : `${count} espaços da venda passaram a constar como vendidos no mapa.` });
     },
     onError: (error: Error) => {
       invalidate();
@@ -116,14 +127,14 @@ export function SaleOpenSection({ lotId, canManageSales }: { lotId: string; canM
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar contrato assinado</AlertDialogTitle>
             <AlertDialogDescription>
-              Confirme somente após receber o contrato assinado. Esta ação marca o espaço como vendido e fica registrada em auditoria.
-              {order.items.length > 1 && ' Os demais espaços do pedido não são alterados automaticamente.'}
+              Confirme somente após receber o contrato assinado. Todos os espaços deste pedido que aguardam assinatura serão marcados como vendidos, com registro em auditoria.
+              {` ${order.items.length} ${order.items.length === 1 ? 'espaço' : 'espaços'}: ${order.items.map((item) => item.publicIdentifier).join(', ')}.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={busy}>Voltar</AlertDialogCancel>
-            <AlertDialogAction disabled={busy} onClick={() => confirmMutation.mutate([currentItem!.itemId])}>
-              {confirmMutation.isPending ? 'Confirmando…' : 'Confirmar assinatura'}
+            <AlertDialogAction disabled={busy} onClick={() => confirmMutation.mutate()}>
+              {confirmMutation.isPending ? 'Confirmando…' : order.items.length > 1 ? `Confirmar ${order.items.length} espaços` : 'Confirmar assinatura'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
