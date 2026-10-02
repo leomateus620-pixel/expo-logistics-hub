@@ -51,12 +51,12 @@ describe('editor dos dados do expositor', () => {
   });
 
   it('salva com atualização do cadastro quando o usuário não toca no checkbox', async () => {
-    renderDialog();
+    const { onClose } = renderDialog();
     fireEvent.change(screen.getByLabelText('Nome fantasia (opcional)'), { target: { value: 'FANTASIA' } });
     fireEvent.click(screen.getByRole('button', { name: 'Salvar alterações' }));
     await waitFor(() => expect(updateSaleIdentity).toHaveBeenCalledTimes(1));
     expect(updateSaleIdentity.mock.calls[0][0]).toMatchObject({ updateExhibitor: true });
-    await waitFor(() => expect(screen.queryByRole('button', { name: 'Salvar alterações' })).toBeNull());
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
 
   it('desmarcar o checkbox sem alterar campos não habilita o envio', () => {
