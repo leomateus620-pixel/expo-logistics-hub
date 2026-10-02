@@ -36,16 +36,18 @@ export function AgendaKpiCard({ label, icon: Icon, value, detail, accent = false
 
 export interface AgendaDashboardProps {
   dashboard: AgendaDashboardViewModel;
+  /** The next commitment is already featured by the overview/header. */
+  showNextEvent?: boolean;
   onOpenNextEvent?: () => void;
   onOpenDocuments?: () => void;
   className?: string;
 }
 
-export function AgendaDashboard({ dashboard, onOpenNextEvent, onOpenDocuments, className }: AgendaDashboardProps) {
+export function AgendaDashboard({ dashboard, showNextEvent = true, onOpenNextEvent, onOpenDocuments, className }: AgendaDashboardProps) {
   const next = dashboard.nextEvent;
   return (
-    <section className={cn('ua-kpis', className)} aria-label="Resumo operacional da agenda">
-      <AgendaKpiCard
+    <section className={cn('ua-kpis ua-kpis--compact', className)} data-with-next={showNextEvent || undefined} aria-label="Resumo operacional da agenda">
+      {showNextEvent && <AgendaKpiCard
         label="Próximo evento"
         icon={Sparkles}
         accent
@@ -53,12 +55,12 @@ export function AgendaDashboard({ dashboard, onOpenNextEvent, onOpenDocuments, c
         value={next ? `${formatDayMonth(next.date)}${next.startTime ? ` · ${next.startTime}` : ''}` : 'Sem evento'}
         detail={next ? next.title : 'Nenhum compromisso futuro'}
         onClick={next ? onOpenNextEvent : undefined}
-      />
-      <AgendaKpiCard label="No mês" icon={CalendarClock} value={dashboard.inMonth} detail="eventos no mês atual" />
-      <AgendaKpiCard label="Futuros" icon={CalendarRange} value={dashboard.upcoming} detail="eventos programados" />
-      <AgendaKpiCard label="Concluídos" icon={CalendarCheck2} value={dashboard.completed} detail="já realizados" />
-      <AgendaKpiCard label="Documentos" icon={FileText} value={dashboard.documents} detail="publicados" desktopOnly onClick={onOpenDocuments} />
-      <AgendaKpiCard label="Pessoas" icon={Users} value={dashboard.peopleInvolved ?? 0} detail="envolvidas" desktopOnly />
+      />}
+      <AgendaKpiCard label="No mês" icon={CalendarClock} value={dashboard.inMonth} />
+      <AgendaKpiCard label="Futuros" icon={CalendarRange} value={dashboard.upcoming} />
+      <AgendaKpiCard label="Concluídos" icon={CalendarCheck2} value={dashboard.completed} />
+      <AgendaKpiCard label="Documentos" icon={FileText} value={dashboard.documents} onClick={onOpenDocuments} />
+      <AgendaKpiCard label="Pessoas nos eventos" icon={Users} value={dashboard.peopleInvolved ?? 0} />
     </section>
   );
 }

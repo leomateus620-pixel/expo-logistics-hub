@@ -63,10 +63,10 @@ export function EventDetail({ event, unitId, documents = [], history = [], today
       </div>
 
       <div className="ua-detail__actions">
-        <WorkspaceButton size="sm" icon={Edit3} onClick={() => onEdit?.(event)}>Editar</WorkspaceButton>
-        <WorkspaceButton size="sm" icon={FileText} onClick={() => onOpenDocuments?.(event)}>Documentos</WorkspaceButton>
+        {onEdit && <WorkspaceButton size="sm" icon={Edit3} onClick={() => onEdit(event)}>Editar</WorkspaceButton>}
+        {onOpenDocuments && <WorkspaceButton size="sm" icon={FileText} onClick={() => onOpenDocuments(event)}>Documentos</WorkspaceButton>}
         <WorkspaceButton size="sm" icon={History} onClick={() => document.getElementById(`ua-history-${event.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>Histórico</WorkspaceButton>
-        <WorkspaceButton size="sm" icon={Share2} onClick={() => onShare?.(event)}>Compartilhar</WorkspaceButton>
+        {onShare && <WorkspaceButton size="sm" icon={Share2} onClick={() => onShare(event)}>Compartilhar</WorkspaceButton>}
       </div>
 
       <section className="ua-detail__section" aria-labelledby={`ua-detail-people-${event.id}`}>
@@ -77,16 +77,29 @@ export function EventDetail({ event, unitId, documents = [], history = [], today
           <AgendaEmptyState compact icon={Users} title="Nenhum responsável definido" />
         ) : (
           <ul className="ua-detail__people">
-            {people.map((person, index) => (
+            {people.slice(0, 4).map((person, index) => (
               <li key={person.id} className="ua-detail__person">
                 <PersonAvatar person={person} size="lg" tone="light" primary={index === 0} />
                 <span className="min-w-0">
-                  <span className="ua-detail__person-name ws-meta block truncate" style={{ fontWeight: 600 }}>{person.name}</span>
-                  <span className="ua-detail__person-role ws-caption block" style={{ fontWeight: 500 }}>{person.role ?? (index === 0 ? 'Responsável' : 'Participante')}</span>
+                  <span className="ua-detail__person-name ws-meta block" style={{ fontWeight: 600 }}>{person.name}</span>
+                  <span className="ua-detail__person-role ws-caption block" style={{ fontWeight: 500 }}>{index === 0 ? `Responsável principal${person.role && !/^(principal|responsável principal)$/i.test(person.role) ? ` · ${person.role}` : ''}` : person.role ?? 'Responsável'}</span>
                 </span>
               </li>
             ))}
           </ul>
+        )}
+        {people.length > 4 && (
+          <details className="ua-detail__more">
+            <summary className="ws-focus ws-meta">Ver mais {people.length - 4} responsáveis <span>+{people.length - 4}</span></summary>
+            <ul className="ua-detail__people">
+              {people.slice(4).map((person) => (
+                <li key={person.id} className="ua-detail__person">
+                  <PersonAvatar person={person} size="sm" tone="light" />
+                  <span className="min-w-0"><span className="ua-detail__person-name ws-meta block">{person.name}</span><span className="ws-caption">{person.role ?? 'Responsável'}</span></span>
+                </li>
+              ))}
+            </ul>
+          </details>
         )}
       </section>
 
@@ -94,8 +107,14 @@ export function EventDetail({ event, unitId, documents = [], history = [], today
         <section className="ua-detail__section" aria-labelledby={`ua-detail-units-${event.id}`}>
           <h3 id={`ua-detail-units-${event.id}`} className="ua-detail__section-title ws-label" style={{ color: 'var(--text-muted)' }}>Frentes relacionadas</h3>
           <div className="ua-units">
-            {units.map((unit) => <UnitBadge key={unit.id} unit={unit} self={unit.id === unitId} />)}
+            {units.slice(0, 3).map((unit) => <UnitBadge key={unit.id} unit={unit} self={unit.id === unitId} />)}
           </div>
+          {units.length > 3 && (
+            <details className="ua-detail__more">
+              <summary className="ws-focus ws-meta">Ver todas as frentes <span>+{units.length - 3}</span></summary>
+              <ul className="ua-detail__unit-list">{units.slice(3).map((unit) => <li key={unit.id}><span className="ws-meta">{unit.name}</span><span className="ws-caption">{unit.type === 'assessoria' ? 'Assessoria' : 'Comissão'}</span></li>)}</ul>
+            </details>
+          )}
         </section>
       )}
 
@@ -109,7 +128,7 @@ export function EventDetail({ event, unitId, documents = [], history = [], today
       <section className="ua-detail__section" aria-labelledby={`ua-detail-docs-${event.id}`}>
         <h3 id={`ua-detail-docs-${event.id}`} className="ua-detail__section-title ws-label" style={{ color: 'var(--text-muted)' }}>
           Documentos do evento
-          <button type="button" className="ua-section__link ws-focus" onClick={() => onAddDocument?.(event)}>Adicionar</button>
+          {onAddDocument && <button type="button" className="ua-section__link ws-focus" onClick={() => onAddDocument(event)}>Adicionar</button>}
         </h3>
         {documents.length === 0 ? (
           <AgendaEmptyState compact icon={FileText} title="Nenhum documento vinculado" detail="Atas, pautas e anexos deste evento aparecerão aqui." />

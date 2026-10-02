@@ -181,44 +181,34 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
 
   return (
     <div className={cn('ua-page', className)}>
-      <AgendaPageHeader unit={unit} count={decoratedEvents.length} nextEvent={resolvedDashboard.nextEvent} />
-
-      <AgendaDashboard
-        dashboard={resolvedDashboard}
-        onOpenNextEvent={() => {
-          const next = decoratedEvents.find((event) => event.id === resolvedDashboard.nextEvent?.id);
-          if (next) openEvent(next);
-        }}
-        onOpenDocuments={() => openDocuments()}
-      />
+      <div className="ua-agenda-heading">
+        <AgendaPageHeader unit={unit} count={decoratedEvents.length} nextEvent={resolvedDashboard.nextEvent} view={filters.view} />
+        <details className="ua-agenda-summary">
+          <summary className="ws-focus" aria-label="Resumo da agenda"><span className="ua-agenda-summary__label">Resumo<span className="ua-agenda-summary__label-suffix"> da agenda</span></span> <span className="ua-agenda-summary__signals">{resolvedDashboard.upcoming} futuros · {resolvedDashboard.completed} concluídos</span></summary>
+          <AgendaDashboard dashboard={resolvedDashboard} showNextEvent={false} onOpenDocuments={() => openDocuments()} />
+        </details>
+      </div>
 
       {isEmptyAgenda ? (
         <AgendaNoEventsState unitLabel={unitLabel} onCreateEvent={openCreate} />
       ) : (
         <>
-          <AgendaToolbar
-            search={filters.search}
-            onSearchChange={(search) => patch({ search })}
-            activeFilters={activeSecondary}
-            onOpenFilters={() => setFiltersOpen(true)}
-            view={filters.view}
-            onViewChange={(view) => patch({ view })}
-          />
-
-          <div className="ua-temporal">
-            <div className="ua-temporal__row">
-              <AgendaYearSelector years={years} value={filters.year} currentYear={currentYear} onChange={changeYear} />
-              <span className="ws-meta-secondary hidden sm:inline">{yearEvents.length} {yearEvents.length === 1 ? 'evento' : 'eventos'} em {filters.year}</span>
-            </div>
-            <AgendaMonthSelector
-              value={filters.month}
-              onChange={changeMonth}
-              counts={monthCounts}
-              currentMonth={filters.year === currentYear ? currentMonth : null}
-              totalCount={yearEvents.length}
+          <section className="ua-command-surface" aria-label="Busca e filtros da agenda">
+            <AgendaToolbar
+              search={filters.search}
+              onSearchChange={(search) => patch({ search })}
+              activeFilters={activeSecondary}
+              onOpenFilters={() => setFiltersOpen(true)}
+              view={filters.view}
+              onViewChange={(view) => patch({ view })}
+              periodControls={<>
+                <AgendaYearSelector compact years={years} value={filters.year} currentYear={currentYear} onChange={changeYear} />
+                <AgendaMonthSelector compact value={filters.month} onChange={changeMonth} counts={monthCounts} currentMonth={filters.year === currentYear ? currentMonth : null} totalCount={yearEvents.length} />
+              </>}
+              statusControl={<AgendaStatusTabs value={filters.status} onChange={(status) => patch({ status })} counts={statusCounts} />}
             />
-            <AgendaStatusTabs value={filters.status} onChange={(status) => patch({ status })} counts={statusCounts} />
-          </div>
+            <span className="ua-result-count sr-only" aria-live="polite">{visibleEvents.length} {visibleEvents.length === 1 ? 'evento' : 'eventos'}</span>
+          </section>
 
           <div className="ua-layout">
             <div className="min-w-0">
@@ -250,7 +240,7 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
               )}
             </div>
 
-            <aside className="ua-layout__aside" aria-label="Atalhos da agenda">
+            {documents.length > 0 && <aside className="ua-layout__aside" aria-label="Atalhos da agenda">
               <DocumentsPanel
                 documents={documents}
                 title="Documentos"
@@ -261,7 +251,7 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
                 onOpenDocument={onOpenDocument}
                 onDownloadDocument={onDownloadDocument}
               />
-            </aside>
+            </aside>}
           </div>
         </>
       )}
@@ -312,17 +302,18 @@ export interface AgendaPageHeaderProps {
   unit: CommissionUnitViewModel;
   count: number;
   nextEvent?: AgendaDashboardViewModel['nextEvent'];
+  view?: AgendaFilterState['view'];
   onCreateEvent?: () => void;
 }
 
-export function AgendaPageHeader({ unit, count, nextEvent, onCreateEvent }: AgendaPageHeaderProps) {
+export function AgendaPageHeader({ unit, count, nextEvent, view = 'timeline', onCreateEvent }: AgendaPageHeaderProps) {
   return (
     <header className="ua-header">
       <div className="min-w-0">
         <p className="ua-header__eyebrow ws-label">Agenda {unitArticleLabel(unit.type)}</p>
-        <h2 className="ua-header__title ws-title">Linha do tempo</h2>
+        <h2 className="ua-header__title ws-title">{view === 'calendar' ? 'Calendário' : 'Linha do tempo'}</h2>
         <p className="ua-header__meta ws-meta-secondary">
-          {count === 0 ? 'Nenhum evento cadastrado' : `${count} ${count === 1 ? 'evento' : 'eventos'} vinculados`}
+          {count === 0 ? 'Nenhum evento cadastrado' : `${count} ${count === 1 ? 'evento vinculado' : 'eventos vinculados'}`}
           {nextEvent && <> · próximo em {nextEvent.date.slice(8, 10)}/{nextEvent.date.slice(5, 7)}</>}
         </p>
       </div>

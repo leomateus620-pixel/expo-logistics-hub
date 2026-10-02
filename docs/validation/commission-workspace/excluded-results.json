@@ -1,0 +1,137 @@
+{
+  "boundary": "Shared standard/map chrome and static official Agenda timeline board; full authenticated excluded pages were not exercised",
+  "samples": [
+    {
+      "phase": "before",
+      "excluded": "standard",
+      "style": {
+        "selector": ".commission-sidebar",
+        "box": {
+          "x": 0,
+          "y": 0,
+          "width": 288,
+          "height": 768
+        },
+        "fontFamily": "Inter, system-ui, sans-serif",
+        "fontSize": "16px",
+        "lineHeight": "24px",
+        "color": "oklch(0.9304 0.0369 80.62)",
+        "backgroundColor": "oklch(0.2107 0.062 255.67)"
+      },
+      "sha256": "eeeefc0105d85e486c1a95403a8c8426a487b2b207c7e2a700bfdf161b2a8ca7"
+    },
+    {
+      "phase": "before",
+      "excluded": "map",
+      "style": {
+        "selector": ".commission-sidebar",
+        "box": {
+          "x": 0,
+          "y": 0,
+          "width": 288,
+          "height": 768
+        },
+        "fontFamily": "Inter, system-ui, sans-serif",
+        "fontSize": "16px",
+        "lineHeight": "24px",
+        "color": "rgb(243, 239, 222)",
+        "backgroundColor": "rgba(0, 0, 0, 0)"
+      },
+      "sha256": "b93320aec6ce315e6e608d6865839400b71dbd4b7f6692b0a2af59a20e9a35d6"
+    },
+    {
+      "phase": "before",
+      "excluded": "agenda-reference",
+      "style": {
+        "selector": ".cronograma-timeline-shell",
+        "box": {
+          "x": 240,
+          "y": 16,
+          "width": 1099,
+          "height": 1773.421875
+        },
+        "fontFamily": "Inter, system-ui, sans-serif",
+        "fontSize": "16px",
+        "lineHeight": "24px",
+        "color": "oklch(0.2107 0.062 255.67)",
+        "backgroundColor": "rgba(0, 0, 0, 0)"
+      },
+      "sha256": "56418a4de3c2b9e28e93d1d780314047926b744ca80a634c469437018d910def"
+    },
+    {
+      "phase": "after",
+      "excluded": "standard",
+      "style": {
+        "selector": ".commission-sidebar",
+        "box": {
+          "x": 0,
+          "y": 0,
+          "width": 288,
+          "height": 768
+        },
+        "fontFamily": "Inter, system-ui, sans-serif",
+        "fontSize": "16px",
+        "lineHeight": "24px",
+        "color": "oklch(0.9304 0.0369 80.62)",
+        "backgroundColor": "oklch(0.2107 0.062 255.67)"
+      },
+      "sha256": "eeeefc0105d85e486c1a95403a8c8426a487b2b207c7e2a700bfdf161b2a8ca7"
+    },
+    {
+      "phase": "after",
+      "excluded": "map",
+      "style": {
+        "selector": ".commission-sidebar",
+        "box": {
+          "x": 0,
+          "y": 0,
+          "width": 288,
+          "height": 768
+        },
+        "fontFamily": "Inter, system-ui, sans-serif",
+        "fontSize": "16px",
+        "lineHeight": "24px",
+        "color": "rgb(243, 239, 222)",
+        "backgroundColor": "rgba(0, 0, 0, 0)"
+      },
+      "sha256": "b93320aec6ce315e6e608d6865839400b71dbd4b7f6692b0a2af59a20e9a35d6"
+    },
+    {
+      "phase": "after",
+      "excluded": "agenda-reference",
+      "style": {
+        "selector": ".cronograma-timeline-shell",
+        "box": {
+          "x": 240,
+          "y": 16,
+          "width": 1099,
+          "height": 1773.421875
+        },
+        "fontFamily": "Inter, system-ui, sans-serif",
+        "fontSize": "16px",
+        "lineHeight": "24px",
+        "color": "oklch(0.2107 0.062 255.67)",
+        "backgroundColor": "rgba(0, 0, 0, 0)"
+      },
+      "sha256": "56418a4de3c2b9e28e93d1d780314047926b744ca80a634c469437018d910def"
+    }
+  ],
+  "comparisons": [
+    {
+      "excluded": "standard",
+      "identicalPixels": true,
+      "identicalComputedChrome": true
+    },
+    {
+      "excluded": "map",
+      "identicalPixels": true,
+      "identicalComputedChrome": true
+    },
+    {
+      "excluded": "agenda-reference",
+      "identicalPixels": true,
+      "identicalComputedChrome": true
+    }
+  ],
+  "errors": []
+}

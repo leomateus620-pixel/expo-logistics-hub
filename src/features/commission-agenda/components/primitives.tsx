@@ -2,16 +2,19 @@ import { forwardRef, useState, type ButtonHTMLAttributes, type ReactNode } from 
 import {
   Ban,
   CheckCircle2,
+  ChevronDown,
   CircleDashed,
   Clock3,
   FileCheck2,
   MapPin,
   RefreshCw,
   Sparkles,
+  X,
   type LucideIcon,
 } from 'lucide-react';
 import { getPersonPhoto } from '@/components/cronograma-eventos/personPhotos';
 import { cn } from '@/lib/utils';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import type { EventStatus, PersonSummary, UnitSummary } from '../types';
 import {
   EVENT_STATUS_LABELS,
@@ -62,9 +65,10 @@ interface AvatarStackProps {
   size?: AvatarSize;
   tone?: 'dark' | 'light';
   className?: string;
+  showOverflow?: boolean;
 }
 
-export function AvatarStack({ people, max = 3, size = 'sm', tone = 'dark', className }: AvatarStackProps) {
+export function AvatarStack({ people, max = 3, size = 'sm', tone = 'dark', showOverflow = true, className }: AvatarStackProps) {
   if (people.length === 0) return null;
   const visible = people.slice(0, max);
   const overflow = people.length - visible.length;
@@ -73,7 +77,7 @@ export function AvatarStack({ people, max = 3, size = 'sm', tone = 'dark', class
       {visible.map((person, index) => (
         <PersonAvatar key={person.id} person={person} size={size} tone={tone} primary={index === 0 && people.length > 1} />
       ))}
-      {overflow > 0 && <span className="ws-avatar-stack__more" aria-hidden="true">+{overflow}</span>}
+      {showOverflow && overflow > 0 && <span className="ws-avatar-stack__more" aria-hidden="true">+{overflow}</span>}
     </span>
   );
 }
@@ -88,20 +92,44 @@ interface EventPeopleProps {
 
 /** Compact people strip: one name, multiple avatars with `+N` overflow. */
 export function EventPeople({ people, showName = true, size = 'sm', className }: EventPeopleProps) {
+  const [open, setOpen] = useState(false);
   if (people.length === 0) {
     return <span className={cn('ua-people ws-meta-secondary', className)}>Responsável a definir</span>;
   }
   const [first, ...rest] = people;
-  return (
-    <span className={cn('ua-people', className)}>
-      <AvatarStack people={people} max={3} size={size} tone="light" />
+  const summary = <>
+      <AvatarStack people={people} max={3} size={size} tone="light" showOverflow={false} />
       {showName && (
         <span className="ua-people__name ws-meta">
           {first.name}
           {rest.length > 0 && <span className="ua-people__extra"> +{rest.length}</span>}
         </span>
       )}
-    </span>
+    </>;
+  if (people.length === 1) return <span className={cn('ua-people', className)}>{summary}</span>;
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button type="button" className={cn('ua-people ua-people--expandable ws-focus', className)} aria-label={`Ver ${people.length} pessoas responsáveis. Principal: ${first.name}`}>
+          {summary}
+          <ChevronDown className="ua-people__chevron" aria-hidden="true" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="unit-workspace commission-workspace-agenda-popover" aria-label="Pessoas responsáveis">
+        <div className="ua-related-list__header">
+          <h4>Pessoas responsáveis <span>({people.length})</span></h4>
+          <IconButton icon={X} label="Fechar pessoas responsáveis" onClick={() => setOpen(false)} />
+        </div>
+        <ul className="ua-related-list" tabIndex={0} aria-label="Todas as pessoas responsáveis">
+          {people.map((person, index) => (
+            <li key={person.id}>
+              <PersonAvatar person={person} size="sm" tone="light" primary={index === 0} />
+              <span><strong>{person.name}</strong>{index === 0 && <small>Responsável principal</small>}{person.role && <small>{person.role}</small>}</span>
+            </li>
+          ))}
+        </ul>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -225,17 +253,31 @@ interface UnitBadgeListProps {
 }
 
 export function UnitBadgeList({ units, selfId, max = 2, className }: UnitBadgeListProps) {
+  const [open, setOpen] = useState(false);
   if (units.length === 0) return null;
   const ordered = [...units].sort((a, b) => (a.id === selfId ? -1 : b.id === selfId ? 1 : 0));
   const visible = ordered.slice(0, max);
   const overflow = ordered.length - visible.length;
   return (
-    <span className={cn('ua-units', className)} aria-label={`Frentes relacionadas: ${units.map((u) => u.name).join(', ')}`}>
+    <span className={cn('ua-units', className)} aria-label="Comissões e assessorias vinculadas">
       {visible.map((unit) => <UnitBadge key={unit.id} unit={unit} self={unit.id === selfId} />)}
       {overflow > 0 && (
-        <span className="ua-unit-badge ua-unit-badge--more" title={ordered.slice(max).map((u) => u.name).join(', ')}>
-          <span>+{overflow}</span>
-        </span>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <button type="button" className="ua-unit-badge ua-unit-badge--more ws-focus" aria-label={`Ver todas as ${ordered.length} comissões e assessorias vinculadas`}>
+              <span>+{overflow}</span>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="start" className="unit-workspace commission-workspace-agenda-popover" aria-label="Comissões e assessorias vinculadas">
+            <div className="ua-related-list__header">
+              <h4>Comissões e assessorias <span>({ordered.length})</span></h4>
+              <IconButton icon={X} label="Fechar comissões e assessorias" onClick={() => setOpen(false)} />
+            </div>
+            <ul className="ua-related-list ua-related-list--units" tabIndex={0} aria-label="Todas as comissões e assessorias vinculadas">
+              {ordered.map((unit) => <li key={unit.id}><span><strong>{unit.name}</strong><small>{unit.type === 'assessoria' ? 'Assessoria' : 'Comissão'}{unit.id === selfId ? ' · Esta frente' : ''}</small></span></li>)}
+            </ul>
+          </PopoverContent>
+        </Popover>
       )}
     </span>
   );

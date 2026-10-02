@@ -1,0 +1,549 @@
+{
+  "phase": "before",
+  "origin": "http://127.0.0.1:5190",
+  "fixtureBoundary": "Existing DEV fixtures only; no authenticated backend or production persistence",
+  "captures": [
+    {
+      "file": "desktop-overview.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "headerHeight": 210.234375,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "Visão geral",
+        "Visão geralGeral"
+      ]
+    },
+    {
+      "file": "desktop-agenda.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 210.234375,
+      "firstEventTop": 755.671875,
+      "dialog": null,
+      "activeLinks": [
+        "Agenda",
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "desktop-documents.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "headerHeight": 210.234375,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "Documentos",
+        "DocumentosDocs6"
+      ]
+    },
+    {
+      "file": "desktop-team.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "headerHeight": 210.234375,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "Equipe",
+        "EquipeEquipe14"
+      ]
+    },
+    {
+      "file": "desktop-tasks.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "headerHeight": 210.234375,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "Tarefas",
+        "TarefasTarefas"
+      ]
+    },
+    {
+      "file": "desktop-long-advisory.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 210.234375,
+      "firstEventTop": 755.671875,
+      "dialog": null,
+      "activeLinks": [
+        "Agenda",
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "desktop-create.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "headerHeight": 210.234375,
+      "firstEventTop": 755.671875,
+      "dialog": {
+        "width": 600,
+        "height": 768,
+        "x": 751,
+        "y": 0
+      },
+      "activeLinks": [
+        "Agenda",
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "desktop-create-people.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "headerHeight": 210.234375,
+      "firstEventTop": 755.671875,
+      "dialog": {
+        "width": 600,
+        "height": 768,
+        "x": 751,
+        "y": 0
+      },
+      "activeLinks": [
+        "Agenda",
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "desktop-many-responsibles-detail.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "headerHeight": 210.234375,
+      "firstEventTop": 755.671875,
+      "dialog": {
+        "width": 520,
+        "height": 768,
+        "x": 831,
+        "y": 0
+      },
+      "activeLinks": [
+        "Agenda",
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "desktop-many-responsibles-edit.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "headerHeight": 210.234375,
+      "firstEventTop": 755.671875,
+      "dialog": {
+        "width": 600,
+        "height": 768,
+        "x": 751,
+        "y": 0
+      },
+      "activeLinks": [
+        "Agenda",
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "desktop-documents-empty.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "headerHeight": 210.234375,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "Documentos",
+        "DocumentosDocs"
+      ]
+    },
+    {
+      "file": "mobile-overview.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "headerHeight": 221,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "Visão geralGeral"
+      ]
+    },
+    {
+      "file": "mobile-agenda.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 221,
+      "firstEventTop": 847.609375,
+      "dialog": null,
+      "activeLinks": [
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "mobile-documents.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "headerHeight": 221,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "DocumentosDocs6"
+      ]
+    },
+    {
+      "file": "mobile-team.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "headerHeight": 221,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "EquipeEquipe14"
+      ]
+    },
+    {
+      "file": "mobile-tasks.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "headerHeight": 221,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "TarefasTarefas"
+      ]
+    },
+    {
+      "file": "mobile-long-advisory.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 221,
+      "firstEventTop": 847.609375,
+      "dialog": null,
+      "activeLinks": [
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "mobile-create.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "headerHeight": 221,
+      "firstEventTop": 855.609375,
+      "dialog": {
+        "width": 375,
+        "height": 844,
+        "x": 0,
+        "y": 0
+      },
+      "activeLinks": [
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "mobile-create-people.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "headerHeight": 221,
+      "firstEventTop": 855.609375,
+      "dialog": {
+        "width": 375,
+        "height": 844,
+        "x": 0,
+        "y": 0
+      },
+      "activeLinks": [
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "mobile-many-responsibles-detail.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "headerHeight": 221,
+      "firstEventTop": 855.609375,
+      "dialog": {
+        "width": 375,
+        "height": 844,
+        "x": 0,
+        "y": 0
+      },
+      "activeLinks": [
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "mobile-many-responsibles-edit.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "headerHeight": 221,
+      "firstEventTop": 855.609375,
+      "dialog": {
+        "width": 375,
+        "height": 844,
+        "x": 0,
+        "y": 0
+      },
+      "activeLinks": [
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "mobile-documents-empty.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "headerHeight": 221,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "DocumentosDocs"
+      ]
+    },
+    {
+      "file": "desktop-calendar.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "headerHeight": 210.234375,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "Agenda",
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "desktop-filters.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "headerHeight": 210.234375,
+      "firstEventTop": 755.671875,
+      "dialog": {
+        "width": 520,
+        "height": 768,
+        "x": 831,
+        "y": 0
+      },
+      "activeLinks": [
+        "Agenda",
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "mobile-navigation.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "headerHeight": 221,
+      "firstEventTop": 847.609375,
+      "dialog": {
+        "width": 288,
+        "height": 844,
+        "x": 0,
+        "y": 0
+      },
+      "activeLinks": [
+        "Agenda",
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "320-long-advisory.png",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "bodyWidth": 320,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 284.921875,
+      "firstEventTop": 924.421875,
+      "dialog": null,
+      "activeLinks": [
+        "AgendaAgenda19"
+      ]
+    },
+    {
+      "file": "390-long-advisory.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 221,
+      "firstEventTop": 847.609375,
+      "dialog": null,
+      "activeLinks": [
+        "AgendaAgenda19"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "Timeline is initial Agenda view",
+      "passed": true
+    },
+    {
+      "name": "Search filters actual fixture events",
+      "passed": true,
+      "detail": {
+        "before": 17,
+        "after": 2
+      }
+    },
+    {
+      "name": "Calendar remains available",
+      "passed": true
+    },
+    {
+      "name": "Filters close with Escape",
+      "passed": true
+    },
+    {
+      "name": "Mobile navigation is expanded",
+      "passed": true
+    },
+    {
+      "name": "Mobile navigation closes and restores focus",
+      "passed": true
+    },
+    {
+      "name": "Mobile navigation preserves destination and closes",
+      "passed": true
+    },
+    {
+      "name": "No page horizontal overflow at 320px",
+      "passed": true
+    },
+    {
+      "name": "No page horizontal overflow at 390px",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

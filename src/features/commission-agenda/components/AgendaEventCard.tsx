@@ -38,7 +38,7 @@ export interface AgendaEventCardProps extends AgendaEventCardActions {
   className?: string;
 }
 
-export function AgendaEventCard({ event, unitId, todayKey, hideDate = false, index = 0, onOpen, onEdit, onOpenDocuments, onOpenHistory, className }: AgendaEventCardProps) {
+export function AgendaEventCard({ event, unitId, todayKey, hideDate = false, onOpen, onEdit, onOpenDocuments, onOpenHistory, className }: AgendaEventCardProps) {
   const isToday = todayKey ? event.date === todayKey : false;
   const duration = getEventDuration(event);
   const people = event.people ?? [];
@@ -46,11 +46,11 @@ export function AgendaEventCard({ event, unitId, todayKey, hideDate = false, ind
 
   return (
     <article
-      className={cn('ws-card ua-event-card ua-rise', className)}
+      className={cn('ws-card ua-event-card', className)}
       data-status={event.status}
       data-next={event.isNext || undefined}
       data-today={isToday || undefined}
-      style={{ animationDelay: `${Math.min(index, 8) * 30}ms` }}
+      data-no-date={hideDate || undefined}
       aria-labelledby={`ua-event-title-${event.id}`}
     >
       <button
@@ -61,6 +61,7 @@ export function AgendaEventCard({ event, unitId, todayKey, hideDate = false, ind
       />
 
       {!hideDate && <EventDateBadge date={event.date} endDate={event.endDate} emphasis={event.isNext ? 'gold' : 'default'} />}
+      {!hideDate && <span className="ua-event-card__rail" aria-hidden="true"><span /></span>}
 
       <div className="ua-event-card__body">
         <div className="ua-event-card__top">
@@ -71,7 +72,8 @@ export function AgendaEventCard({ event, unitId, todayKey, hideDate = false, ind
           </span>
         </div>
 
-        <h3 id={`ua-event-title-${event.id}`} className="ua-event-card__title ws-event-title ws-clamp-2">{event.title}</h3>
+        <h3 id={`ua-event-title-${event.id}`} className="ua-event-card__title ws-event-title">{event.title}</h3>
+        {event.endDate && event.endDate !== event.date && <p className="ua-event-card__period ws-caption">{formatLongDate(event.date)} até {formatLongDate(event.endDate)}</p>}
 
         <div className="ua-event-card__meta">
           <EventPeople people={people} />
@@ -97,7 +99,7 @@ export function AgendaEventCard({ event, unitId, todayKey, hideDate = false, ind
               <DropdownMenuTrigger asChild>
                 <IconButton icon={MoreHorizontal} label={`Mais ações para ${event.title}`} />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[200px]">
+              <DropdownMenuContent align="end" className="unit-workspace commission-workspace-menu min-w-[200px]">
                 <DropdownMenuItem onSelect={() => onOpen?.(event)}><ArrowRight className="mr-2 h-4 w-4" />Abrir</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => onEdit?.(event)}><Edit3 className="mr-2 h-4 w-4" />Editar</DropdownMenuItem>
                 <DropdownMenuSeparator />

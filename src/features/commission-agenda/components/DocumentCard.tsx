@@ -67,7 +67,7 @@ export function DocumentCard({ document, hideEvent = false, onOpen, onDownload, 
           <DropdownMenuTrigger asChild>
             <IconButton icon={MoreHorizontal} label={`Mais ações para ${document.name}`} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-[180px]">
+          <DropdownMenuContent align="end" className="unit-workspace commission-workspace-menu min-w-[180px]">
             <DropdownMenuItem onSelect={() => onOpen?.(document)}>Abrir</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => onDownload?.(document)}>Baixar</DropdownMenuItem>
             <DropdownMenuItem disabled>Substituir versão</DropdownMenuItem>
