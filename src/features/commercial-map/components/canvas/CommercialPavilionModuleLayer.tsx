@@ -652,6 +652,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
         activeSelectedId,
         activeHoveredId,
         salesSelectedLotIds,
+        inspectedLotIds,
       );
       const { isSelected, isHovered } = interaction;
       const persistedStatus = moduleState?.status ?? null;
@@ -742,6 +743,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     plan.zones.length,
     projectedModuleParts,
     salesSelectedLotIds,
+    inspectedLotIds,
     zoneIndex,
   ]);
 
@@ -968,6 +970,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
           activeSelectedId,
           activeHoveredId,
           salesSelectedLotIds,
+          inspectedLotIds,
         );
         const { isSelected, isHovered } = interaction;
         const visualGeometry = resolveModuleVisualGeometry(interaction, flatModules);
