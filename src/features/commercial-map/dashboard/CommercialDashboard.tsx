@@ -6,7 +6,11 @@ import type { LotPricingStage } from '../utils/lotPricing2028';
 import { CommercialDashboardSpaces } from './CommercialDashboardSpaces';
 import { buildCommercialDashboardSnapshot } from './commercialDashboardAnalytics';
 import { formatDashboardAreaWithCoverage, formatDashboardCurrency, formatDashboardInteger, formatDashboardPercentage } from './commercialDashboardFormatters';
+import { useSalesOrdersUiStore } from './salesOrders/useSalesOrdersUiStore';
+import { CommercialSalesOrdersSection } from './salesOrders/CommercialSalesOrdersSection';
+import type { SaleOrderSummary } from './salesOrders/salesOrdersService';
 import './commercial-dashboard.css';
+import './salesOrders/sales-orders.css';
 
 export interface CommercialDashboardProps {
   data: Pick<CommercialMapData, 'entities' | 'lots'>;
@@ -14,6 +18,12 @@ export interface CommercialDashboardProps {
   isFetching: boolean;
   onClose: () => void;
   onViewLot: (entityId: string) => void;
+  projectId?: string;
+  orgId?: string | null;
+  canManageSales?: boolean;
+  canManageContracts?: boolean;
+  scrollContainer?: () => HTMLElement | null;
+  onViewSale?: (record: SaleOrderSummary, lotIds: string[]) => void;
 }
 
 function Kpi({ label, value, detail, icon, color }: {
@@ -31,7 +41,7 @@ function PriceCoverage({ lots, priced, scope }: { lots: number; priced: number; 
     <span className="commercial-dashboard-finance-note">Não é receita recebida</span></>;
 }
 
-export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, onViewLot }: CommercialDashboardProps) {
+export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, onViewLot, projectId, orgId = null, canManageSales = false, canManageContracts = false, scrollContainer, onViewSale }: CommercialDashboardProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [pricingStage, setPricingStage] = useState<LotPricingStage>('RENOVACAO');
   const snapshot = useMemo(() => buildCommercialDashboardSnapshot({ entities: data.entities, lots: data.lots }, pricingStage), [data.entities, data.lots, pricingStage]);
@@ -39,7 +49,10 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
   const updatedAtLabel = dataUpdatedAt > 0 && Number.isFinite(dataUpdatedAt)
     ? `Atualizado às ${new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(dataUpdatedAt)}`
     : 'Sincronização pendente';
-  useEffect(() => { closeButtonRef.current?.focus({ preventScroll: true }); }, []);
+  useEffect(() => {
+    // Ao voltar do mapa, o foco é restaurado no controle de origem da venda.
+    if (!useSalesOrdersUiStore.getState().originRecordId) closeButtonRef.current?.focus({ preventScroll: true });
+  }, []);
 
   return <div className="commercial-dashboard">
     <header className="commercial-dashboard-header">
@@ -86,6 +99,9 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
           value={overall.knownValueLots > 0 ? <span title={formatDashboardCurrency(overall.totalKnownValue)}>{formatDashboardCurrency(overall.totalKnownValue, true)}</span> : '—'}
           detail={<PriceCoverage lots={overall.commercialLots} priced={overall.knownValueLots} scope="Vendas gravadas + tabela oficial · inclui bloqueados e vendidos; exclui indisponíveis" />} />
       </section></div>
+      {projectId && onViewSale && <CommercialSalesOrdersSection projectId={projectId} orgId={orgId}
+        canManageSales={canManageSales} canManageContracts={canManageContracts} data={data}
+        scrollContainer={scrollContainer ?? (() => null)} onViewSale={onViewSale} />}
       <CommercialDashboardSpaces snapshot={snapshot} data={data} onViewLot={onViewLot} />
       {snapshot.orphanLots > 0 && <div className="commercial-dashboard-integrity" role="note">
         <span>{snapshot.orphanLots} lotes sem entidade cadastral carregada, fora dos indicadores conforme o contrato atual do mapa.</span>

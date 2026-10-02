@@ -23,6 +23,7 @@ import { isMapSelectionClick } from '../../utils/interaction';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { dispatchSalesModuleClick } from '../../sales/salesInteraction';
 import { useSalesSelectedLotIds } from '../../sales/useSalesSelection';
+import { useSaleInspectionStore } from '../../state/useSaleInspectionStore';
 import type { CommercialStatus } from '../../types';
 import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
 import { SoldLotLocks } from './SoldLotLocks';
@@ -60,15 +61,19 @@ export interface ModuleVisualGeometry {
   footprintScaleZ: number;
 }
 
+const EMPTY_INSPECTED: ReadonlySet<string> = new Set();
+
 export function resolveModuleInteractionState(
   cellId: string,
   moduleState: CommercialPavilionModuleVisualState | null,
   activeSelectedId: string | null,
   activeHoveredId: string | null,
   salesSelectedLotIds: ReadonlySet<string>,
+  inspectedLotIds: ReadonlySet<string> = EMPTY_INSPECTED,
 ): ModuleInteractionState {
   const inCart = Boolean(!isSoldLot(moduleState?.status) && moduleState?.lotId && salesSelectedLotIds.has(moduleState.lotId));
-  const isSelected = inCart || cellId === activeSelectedId;
+  const inspected = Boolean(moduleState?.lotId && inspectedLotIds.has(moduleState.lotId));
+  const isSelected = inCart || inspected || cellId === activeSelectedId;
   return {
     inCart,
     isSelected,
@@ -525,6 +530,8 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   const setHoveredModuleId = useCommercialMapStore((state) => state.setHoveredModuleId);
   const setSelectedModuleId = useCommercialMapStore((state) => state.setSelectedModuleId);
   const salesSelectedLotIds = useSalesSelectedLotIds();
+  // Inspeção de venda soma-se ao realce de seleção sem tocar no carrinho.
+  const inspectedLotIds = useSaleInspectionStore((state) => state.lotIdSet);
   const unitBoxGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const shortSide = Math.min(layout.interior.clearWidth, layout.interior.clearDepth);
   const flatModules = mode === 'interior' && plan.interiorPresentation?.flatModules === true;
@@ -645,6 +652,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
         activeSelectedId,
         activeHoveredId,
         salesSelectedLotIds,
+        inspectedLotIds,
       );
       const { isSelected, isHovered } = interaction;
       const persistedStatus = moduleState?.status ?? null;
@@ -735,6 +743,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     plan.zones.length,
     projectedModuleParts,
     salesSelectedLotIds,
+    inspectedLotIds,
     zoneIndex,
   ]);
 
@@ -884,7 +893,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     const surfaces: SoldLotSurface[] = [];
     const add = (cell: OrientedModuleCell, ring: Coordinate[], preferredAnchor?: Coordinate) => {
       const state = moduleStateById.get(cell.id);
-      const interaction = resolveModuleInteractionState(cell.id, state ?? null, activeSelectedId, activeHoveredId, salesSelectedLotIds);
+      const interaction = resolveModuleInteractionState(cell.id, state ?? null, activeSelectedId, activeHoveredId, salesSelectedLotIds, inspectedLotIds);
       const visual = resolveModuleVisualGeometry(interaction, flatModules);
       surfaces.push({ id: cell.id, status: state?.status ?? null, logoUrl: state?.logoUrl, preferredAnchor, geometry: {
         coordinates: [ring], elevation: floorY + moduleBaseHeight + 0.008,
@@ -908,7 +917,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       add(cell, footprint.map(([x, z]) => [center[0] + (x - center[0]) * 0.91, center[1] + (z - center[1]) * 0.90]));
     }
     return surfaces;
-  }, [projectedModuleParts, projectedIrregularModules, moduleStateById, activeSelectedId, activeHoveredId, salesSelectedLotIds, flatModules, floorY, moduleBaseHeight, moduleHeight]);
+  }, [projectedModuleParts, projectedIrregularModules, moduleStateById, activeSelectedId, activeHoveredId, salesSelectedLotIds, inspectedLotIds, flatModules, floorY, moduleBaseHeight, moduleHeight]);
 
   return (
     <group raycast={NO_RAYCAST} dispose={null}>
@@ -961,6 +970,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
           activeSelectedId,
           activeHoveredId,
           salesSelectedLotIds,
+          inspectedLotIds,
         );
         const { isSelected, isHovered } = interaction;
         const visualGeometry = resolveModuleVisualGeometry(interaction, flatModules);

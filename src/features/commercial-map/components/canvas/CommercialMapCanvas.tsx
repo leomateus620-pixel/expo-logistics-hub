@@ -153,6 +153,7 @@ import {
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { dispatchSalesLotClick } from '../../sales/salesInteraction';
 import { useSalesSelectedLotIds, useSalesStore } from '../../sales/useSalesSelection';
+import { useSaleInspectionStore } from '../../state/useSaleInspectionStore';
 import {
   getRearParkingFocusBounds, rearParkingVisibleInArea, rearParkingLayerPresentation,
   REAR_PARKING_SCENE_SUPPORT_POINTS, REAR_PARKING_GROUND_SUPPORTS, reconcileRearParkingTrees, rearParkingEntityForPresentation,
@@ -1486,6 +1487,7 @@ function BatchedLots({
   onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
 }) {
   const publicPolicy = usePublicScenePolicy();
+  const saleInspectionLotIds = useSaleInspectionStore((state) => state.lotIdSet);
   const geometryEntitiesRef = useRef<MapEntity[]>([]);
   if (geometryEntitiesRef.current.length !== entries.length || entries.some((entry, i) => entry.entity !== geometryEntitiesRef.current[i])) geometryEntitiesRef.current = entries.map(entry => entry.entity);
   const geometryEntities = geometryEntitiesRef.current;
@@ -1613,6 +1615,7 @@ function BatchedLots({
     const hovered = currentHover === entityId;
     const scratch = visualScratch.current;
     const salesSelected = !isSoldLot(entry.lot.status) && salesSelectedLotIds.has(entry.lot.id);
+    const saleInspected = !publicPolicy && saleInspectionLotIds.has(entry.lot.id);
     const color = lotColor(
       entry,
       publicPolicy ? null : segmentByEntity.get(entityId) ?? null,
@@ -1627,11 +1630,13 @@ function BatchedLots({
     // Realce do carrinho: dourado sólido, mantendo geometria e status originais.
     if (publicPolicy && selected && !isSoldLot(entry.lot.status)) color.set('#ffed91');
     if (salesSelected) color.lerp(scratch.blend.set('#f2c94c'), 0.62);
+    // Inspeção da venda: realce próprio (ciano) sem mudar status nem carrinho.
+    if (saleInspected) color.lerp(scratch.blend.set('#22d3ee'), 0.55);
     batch.mesh.setColorAt(batchId, color);
-    const lift = salesSelected ? 0.09 : selected ? 0.055 : hovered ? 0.035 : 0;
+    const lift = saleInspected ? 0.1 : salesSelected ? 0.09 : selected ? 0.055 : hovered ? 0.035 : 0;
     scratch.matrix.makeTranslation(0, entry.entity.geometry.elevation + lift, 0);
     batch.mesh.setMatrixAt(batchId, scratch.matrix);
-  }, [batch, entryByEntity, filtersActive, infrastructureMode, matchingEntityIds, publicPolicy, salesSelectedLotIds, segmentByEntity]);
+  }, [batch, entryByEntity, filtersActive, infrastructureMode, matchingEntityIds, publicPolicy, saleInspectionLotIds, salesSelectedLotIds, segmentByEntity]);
 
   const previousPublicStatuses = useRef<{ batch: typeof batch; statuses: Map<string, CommercialLot['status']> }>({ batch: null, statuses: new Map() });
   useEffect(() => {
@@ -1650,7 +1655,7 @@ function BatchedLots({
       batch.mesh.computeBoundingSphere();
     }
     if (changed) invalidate();
-  }, [applyVisualState, batch, entries, filtersActive, invalidate, matchingEntityIds, publicPolicy, salesSelectedLotIds]);
+  }, [applyVisualState, batch, entries, filtersActive, invalidate, matchingEntityIds, publicPolicy, saleInspectionLotIds, salesSelectedLotIds]);
 
   useEffect(() => {
     if (!batch) return;
@@ -3110,6 +3115,21 @@ function CameraRig({
     size.width,
     startCameraMove,
   ]);
+
+  // Inspeção de venda: enquadra as geometrias reais (lotes externos + pavilhões)
+  // pelo mesmo voo único do CameraRig; um novo pedido substitui o anterior.
+  const saleFrameSequence = useSaleInspectionStore((state) => state.frameSequence);
+  const saleFrameEntityIds = useSaleInspectionStore((state) => state.frameEntityIds);
+  const lastSaleFrame = useRef(saleFrameSequence);
+  useLayoutEffect(() => {
+    if (saleFrameSequence === lastSaleFrame.current) return;
+    lastSaleFrame.current = saleFrameSequence;
+    if (publicPolicy || interiorEntity || saleFrameEntityIds.size === 0) return;
+    const targets = exteriorRenderedEntities.filter((entity) => saleFrameEntityIds.has(entity.id));
+    if (targets.length === 0) return;
+    pendingResizeRefit.current = false;
+    queueSegment(PUBLIC_FOCUS_FRAMING, targets);
+  }, [exteriorRenderedEntities, interiorEntity, publicPolicy, queueSegment, saleFrameEntityIds, saleFrameSequence]);
 
   const queueParking = useCallback(() => {
     const insets = resolveParkingViewportInsets(size.width, size.height);

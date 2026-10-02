@@ -75,6 +75,10 @@ import { markCommercialMapStage } from './utils/performanceDiagnostics';
 import { canHandleCommercialMapEscape } from './utils/contextualNavigation';
 import { buildPavilionModuleCommercialIndex, resolveCommercialPavilionModuleNavigationTarget } from './utils/pavilionModuleCommercial';
 import { useCommercialDashboardSync } from './dashboard/useCommercialDashboardSync';
+import { useSaleInspectionStore } from './state/useSaleInspectionStore';
+import { resolveSaleInspection, type SaleInspectionGroup, type SaleInspectionResolution, type SaleInspectionSpace } from './utils/saleInspectionGroups';
+import { SaleInspectionPanel } from './components/panels/SaleInspectionPanel';
+import type { SaleOrderSummary } from './dashboard/salesOrders/salesOrdersService';
 import type { CommercialMapData, CommercialMapQueryScope, MapPermissions } from './types';
 import './commercial-map.css';
 import './commercial-map-mobile.css';
@@ -224,6 +228,8 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const lastInteriorEntityId = useRef<string | null>(null);
   const [publishReason, setPublishReason] = useState('Publicação após revisão cartográfica e comercial');
   const [dashboardOpen, setDashboardOpen] = useState(false);
+  const [saleResolution, setSaleResolution] = useState<SaleInspectionResolution | null>(null);
+  useEffect(() => () => useSaleInspectionStore.getState().clear(), []);
   const dashboardOverlayRef = useRef<HTMLDivElement>(null);
   const dashboardDockRef = useRef<HTMLDivElement>(null);
   const dashboardViewportRef = useRef<HTMLDivElement>(null);
@@ -596,6 +602,58 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     </>
   ) : null;
 
+  const startSaleOverview = (resolution: SaleInspectionResolution) => {
+    const store = useCommercialMapStore.getState();
+    if (resolution.mode === 'single-pavilion') {
+      const pavilionId = resolution.groups[0].pavilionEntityId!;
+      if (store.interiorEntityId && store.interiorEntityId !== pavilionId) store.switchInterior(pavilionId);
+      else if (!store.interiorEntityId) store.enterInterior(pavilionId);
+      return;
+    }
+    if (store.interiorEntityId) {
+      store.exitInterior();
+      // O voo de retorno é substituído pelo enquadramento da venda no frame seguinte.
+      window.setTimeout(() => useSaleInspectionStore.getState().frame(resolution.overviewEntityIds), 60);
+      return;
+    }
+    if (store.selectedEntityId) store.setSelectedEntityId(null);
+    useSaleInspectionStore.getState().frame(resolution.overviewEntityIds);
+  };
+
+  const handleDashboardViewSale = (record: SaleOrderSummary, lotIds: string[]) => {
+    const resolution = resolveSaleInspection(lotIds, data.lots, data.entities);
+    useSaleInspectionStore.getState().start({
+      recordId: record.recordId, reference: record.reference, displayName: record.displayName, lotIds: resolution.allLotIds,
+    });
+    setSaleResolution(resolution);
+    setDashboardOpen(false);
+    if (activeSegmentId) clearSegmentFocus();
+    if (useCommercialMapStore.getState().workspaceMode !== '3d') setWorkspaceMode('3d');
+    window.requestAnimationFrame(() => startSaleOverview(resolution));
+  };
+
+  const handleSaleSpace = (group: SaleInspectionGroup, space: SaleInspectionSpace) => {
+    const store = useCommercialMapStore.getState();
+    if (group.kind === 'pavilion' && group.pavilionEntityId) {
+      if (store.interiorEntityId !== group.pavilionEntityId) {
+        if (store.interiorEntityId) store.switchInterior(group.pavilionEntityId); else store.enterInterior(group.pavilionEntityId);
+      }
+      if (space.moduleId) store.setSelectedModuleId(space.moduleId);
+      return;
+    }
+    if (store.interiorEntityId) store.exitInterior();
+    store.selectEntityFromExplorer(space.entityId);
+  };
+
+  const handleSaleEnterGroup = (group: SaleInspectionGroup) => {
+    if (!group.pavilionEntityId) return;
+    const store = useCommercialMapStore.getState();
+    if (store.interiorEntityId) store.switchInterior(group.pavilionEntityId); else store.enterInterior(group.pavilionEntityId);
+  };
+
+  const closeSaleInspection = () => { useSaleInspectionStore.getState().clear(); setSaleResolution(null); };
+  const backToDashboardFromSale = () => { closeSaleInspection(); setDashboardOpen(true); };
+
   const handleDashboardViewLot = (entityId: string) => {
     const entity = data.entities.find((candidate) => candidate.id === entityId);
     if (!entity) return;
@@ -851,6 +909,17 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
           </span></div>
         )}
         </div>
+        {saleResolution && !dashboardOpen && (
+          <SaleInspectionPanel
+            resolution={saleResolution}
+            interiorEntityId={interiorEntityId}
+            onOverview={() => startSaleOverview(saleResolution)}
+            onEnterGroup={handleSaleEnterGroup}
+            onSpace={handleSaleSpace}
+            onBack={backToDashboardFromSale}
+            onClose={closeSaleInspection}
+          />
+        )}
         {dashboardOpen && permissions.canViewMapAnalytics && !isCommissionScope && (
           <div
             ref={dashboardOverlayRef}
@@ -888,6 +957,12 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                   isFetching={mapQuery.isFetching}
                   onClose={closeDashboard}
                   onViewLot={handleDashboardViewLot}
+                  projectId={data.source === 'database' ? data.project.id : undefined}
+                  orgId={data.project.orgId}
+                  canManageSales={permissions.canManageSales}
+                  canManageContracts={permissions.canManageContracts}
+                  scrollContainer={() => dashboardOverlayRef.current}
+                  onViewSale={handleDashboardViewSale}
                 />
               </Suspense>
             </MapPanelBoundary>
