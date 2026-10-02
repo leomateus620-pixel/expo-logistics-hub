@@ -9,6 +9,7 @@ import { buildCommercialDashboardSnapshot } from './commercialDashboardAnalytics
 import { formatDashboardAreaWithCoverage, formatDashboardCurrency, formatDashboardInteger, formatDashboardPercentage } from './commercialDashboardFormatters';
 import { useSalesOrdersUiStore } from './salesOrders/useSalesOrdersUiStore';
 import { CommercialSalesOrdersSection } from './salesOrders/CommercialSalesOrdersSection';
+import { CommercialSalesProgress } from './CommercialSalesProgress';
 import type { SaleOrderSummary } from './salesOrders/salesOrdersService';
 import './commercial-dashboard.css';
 import './salesOrders/sales-orders.css';
@@ -101,6 +102,7 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
         <FinancialKpi label="Valor total comercial dos lotes" icon={<Wallet aria-hidden="true" />} tone="inventory"
           value={overall.totalKnownValue} lots={overall.commercialLots} priced={overall.knownValueLots} context="Vendas + tabela oficial" />
       </section>
+      <CommercialSalesProgress aggregate={overall} />
       <p className="commercial-dashboard-finance-disclaimer">Valores de vendas não representam receita recebida.</p>
       <section className="commercial-dashboard-kpis" aria-label="Indicadores comerciais principais">
         <Kpi label="Espaços comerciais" icon={<LayoutGrid aria-hidden="true" />} value={formatDashboardInteger(overall.commercialLots)} detail="Inventário ativo" />

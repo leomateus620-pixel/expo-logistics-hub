@@ -439,12 +439,58 @@
 .commercial-dashboard-indicators .commercial-dashboard-kpi { min-height: 100px; border: 1px solid var(--commercial-matrix-line); border-radius: 8px; background: var(--commercial-matrix-card); font-family: Manrope, sans-serif; }
 .commercial-dashboard-indicators .commercial-dashboard-kpi:last-child { grid-column: 1 / -1; min-height: 76px; background: var(--commercial-matrix-paper); }
 .commercial-dashboard-indicators .commercial-dashboard-kpi > strong { font-family: Sora, sans-serif; letter-spacing: 0; }
+
+/* One continuous commercial-value course: recorded confirmed then open sales. */
+.commercial-sales-progress { min-width: 0; margin-top: 14px; padding: 18px 21px 14px; border: 1px solid var(--commercial-matrix-line); border-radius: 8px; background: var(--commercial-matrix-card); color: var(--commercial-matrix-ink); font-family: Manrope, sans-serif; }
+.commercial-sales-progress__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.commercial-sales-progress__eyebrow { display: block; margin-bottom: 3px; color: var(--commercial-matrix-muted); font-size: 9px; font-weight: 800; letter-spacing: .11em; }
+.commercial-sales-progress h2 { margin: 0; font-size: 15px; font-weight: 700; line-height: 1.35; }
+.commercial-sales-progress__total { flex: 0 0 auto; color: var(--commercial-matrix-blue); font-family: Sora, sans-serif; font-size: 25px; line-height: 1; font-variant-numeric: tabular-nums; }
+.commercial-sales-progress__course { position: relative; height: 84px; margin-top: 4px; }
+.commercial-sales-progress__track { position: absolute; right: 0; bottom: 3px; left: 0; display: flex; height: 12px; overflow: hidden; border-radius: 999px; background: var(--commercial-progress-track); }
+.commercial-sales-progress__track > span { display: block; height: 100%; flex: 0 0 auto; transition: width 600ms var(--ease-decelerate); }
+.commercial-sales-progress__confirmed { width: var(--sales-confirmed); background: var(--commercial-progress-blue-bright); box-shadow: inset 0 2px 3px var(--commercial-matrix-card), var(--commercial-progress-blue-glow); z-index: 1; }
+.commercial-sales-progress__open { width: var(--sales-open); background: var(--commercial-matrix-gold); }
+.commercial-sales-progress__runner { position: absolute; z-index: 2; bottom: 13px; left: clamp(23px, var(--sales-position), calc(100% - 23px)); width: 46px; height: 53px; transform: translateX(-50%); transition: left 600ms var(--ease-decelerate); pointer-events: none; }
+.commercial-sales-progress__sojinha { display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 3px 2px var(--commercial-matrix-line)); }
+.commercial-sales-progress__shadow { fill: var(--commercial-matrix-line); }
+.commercial-sales-progress__skin, .commercial-sales-progress__arm { fill: none; stroke: var(--commercial-sojinha-hair); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.commercial-sales-progress__pod { fill: var(--commercial-sojinha-pod); }
+.commercial-sales-progress__shoe { fill: var(--commercial-sojinha-shoe); }
+.commercial-sales-progress__glove, .commercial-sales-progress__shirt, .commercial-sales-progress__eye { fill: var(--commercial-sojinha-shirt); }
+.commercial-sales-progress__shorts { fill: var(--commercial-sojinha-shorts); }
+.commercial-sales-progress__shirt-mark { fill: none; stroke: var(--commercial-sojinha-shoe); stroke-width: 2; }
+.commercial-sales-progress__bean { fill: var(--commercial-sojinha-bean); }
+.commercial-sales-progress__tuft { fill: var(--commercial-sojinha-hair); }
+.commercial-sales-progress__pupil, .commercial-sales-progress__smile { fill: var(--commercial-sojinha-face); }
+.commercial-sales-progress__leg { transform-box: fill-box; transform-origin: center top; animation: commercial-sojinha-stride 260ms ease-in-out infinite alternate; }
+.commercial-sales-progress__leg--rear { animation-direction: alternate-reverse; }
+.commercial-sales-progress__arm { transform-box: fill-box; transform-origin: center top; animation: commercial-sojinha-arm 260ms ease-in-out infinite alternate; }
+.commercial-sales-progress__arm--front { animation-direction: alternate-reverse; }
+@keyframes commercial-sojinha-stride { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
+@keyframes commercial-sojinha-arm { from { transform: rotate(-12deg); } to { transform: rotate(12deg); } }
+.commercial-sales-progress__legend { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 18px; margin-top: 8px; color: var(--commercial-matrix-muted); font-size: 11px; line-height: 1.5; }
+.commercial-sales-progress__legend > span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.commercial-sales-progress__legend b { color: var(--commercial-matrix-ink); font-variant-numeric: tabular-nums; }
+.commercial-sales-progress__key { display: inline-block; width: 8px; height: 8px; flex: 0 0 auto; border-radius: 50%; }
+.commercial-sales-progress__key--confirmed { background: var(--commercial-progress-blue-bright); }
+.commercial-sales-progress__key--open { background: var(--commercial-matrix-gold); }
+.commercial-sales-progress__legend .commercial-sales-progress__basis { margin-left: auto; white-space: normal; text-align: right; }
+@media (prefers-reduced-motion: reduce) {
+  .commercial-sales-progress__leg, .commercial-sales-progress__arm { animation: none; }
+  .commercial-sales-progress__runner, .commercial-sales-progress__track > span { transition: none; }
+}
 @media (max-width: 1000px) {
   .commercial-dashboard-financial-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .commercial-dashboard-finance-card--confirmed { grid-column: 1 / -1; }
   .commercial-dashboard-indicators .commercial-dashboard-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 590px) {
+  .commercial-sales-progress { margin-top: 10px; padding: 16px; }
+  .commercial-sales-progress h2 { font-size: 13px; }
+  .commercial-sales-progress__total { font-size: 22px; }
+  .commercial-sales-progress__legend { gap: 4px 12px; }
+  .commercial-sales-progress__legend .commercial-sales-progress__basis { flex-basis: 100%; margin-left: 0; text-align: left; }
   .commercial-dashboard-financial-kpis { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .commercial-dashboard-finance-card--confirmed { grid-column: auto; }
   .commercial-dashboard-finance-card { min-height: 118px; padding: 14px 16px; }

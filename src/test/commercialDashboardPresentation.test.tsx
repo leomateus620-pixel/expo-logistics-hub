@@ -69,6 +69,10 @@ describe('integrated Commercial Dashboard presentation', () => {
     expect(cadastralCard('Valor total comercial dos lotes').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(3000, true));
     fireEvent.click(within(stages).getByRole('button', { name: '2ª Etapa' }));
     expect(cadastralCard('Valor total comercial dos lotes').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(4000, true));
+    const progress = screen.getByRole('region', { name: 'Progresso das vendas por valor comercial' });
+    expect(within(progress).getByText('50,0%')).toBeInTheDocument();
+    expect(progress).toHaveStyle('--sales-confirmed: 18.75%; --sales-open: 31.25%; --sales-position: 50%');
+    expect(within(progress).getByText(/Total comercial · R\$\s4.000,00/)).toBeInTheDocument();
     expect(cadastralCard('Valor das vendas em andamento').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(1250, true));
     expect(cadastralCard('Valor das vendas confirmadas').querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(750));
     expect(within(screen.getByRole('region', { name: 'Mini mapa comercial: Exporural' })).getByRole('combobox')).toHaveValue('offer');
@@ -76,6 +80,7 @@ describe('integrated Commercial Dashboard presentation', () => {
     rerender(<CommercialDashboard {...props} data={updated} dataUpdatedAt={2000} />);
     expect(cadastralCard('Valor das vendas em andamento').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(1450, true));
     expect(cadastralCard('Valor total comercial dos lotes').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(4200, true));
+    expect(Number(progress.style.getPropertyValue('--sales-position').replace('%', ''))).toBeCloseTo(2200 / 4200 * 100);
     expect(within(screen.getByRole('group', { name: 'Etapa dos preços oficiais' })).getByRole('button', { name: '2ª Etapa' })).toHaveAttribute('aria-pressed', 'true');
     expect(database.from).not.toHaveBeenCalled();
     expect(source.lots[0].sales![0].negotiatedValue).toBe(1250);
@@ -236,6 +241,9 @@ describe('integrated Commercial Dashboard presentation', () => {
     expect(total.querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(2750));
     expect(total).toHaveTextContent('Subtotal · 7 de 9 com valor');
     expect(total).toHaveTextContent('Vendas + tabela oficial');
+    const progress = screen.getByRole('region', { name: 'Progresso das vendas por valor comercial' });
+    expect(within(progress).getByText(/Subtotal conhecido · R\$\s2.750,00/)).toBeInTheDocument();
+    expect(Number(progress.style.getPropertyValue('--sales-position').replace('%', ''))).toBeCloseTo(1550 / 2750 * 100);
     expect(screen.getByText(/não representam receita recebida/)).toBeInTheDocument();
     const valuesBefore = [...finance.querySelectorAll('article > strong')].map((element) => element.textContent);
 
@@ -269,6 +277,7 @@ describe('integrated Commercial Dashboard presentation', () => {
       expect(cadastralCard(label)).toHaveTextContent('0 de 1 com valor');
     }
     expect(cadastralCard('Valor das vendas confirmadas').querySelector('strong')).toHaveTextContent(/^—$/);
+    expect(screen.getByRole('region', { name: 'Progresso das vendas por valor comercial' })).toHaveTextContent('Sem total comercial conhecido');
     expect(cadastralCard('Valor das vendas confirmadas')).toHaveTextContent('Nenhum lote');
     expect(kpi('Lotes com venda em andamento').querySelector('strong')).toHaveTextContent(/^1$/);
     expect(source.lots[0].sales?.[0].negotiatedValue).toBe(0);
