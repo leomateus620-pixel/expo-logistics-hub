@@ -1,3 +1,4 @@
+import { matchesBuyerNames } from '../utils/buyerDisplayName';
 import { memo, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { formatAreaSqmLabel, formatBrl } from '../utils/lotPricing2028';
@@ -19,11 +20,9 @@ export const PublicLotList = memo(function PublicLotList({
 }) {
   const [term, setTerm] = useState('');
   const filtered = useMemo(() => {
-    const needle = term.trim().toLocaleUpperCase('pt-BR');
-    if (!needle) return lots;
-    return lots.filter((lot) => `${lot.displayName} ${lot.publicIdentifier} ${lot.block ?? ''}`
-      .toLocaleUpperCase('pt-BR')
-      .includes(needle));
+    if (!term.trim()) return lots;
+    // Índice público: identificadores do lote + nome de exibição autorizado (já resolvido no servidor).
+    return lots.filter((lot) => matchesBuyerNames(term, lot.displayName, lot.publicIdentifier, lot.block, lot.buyerName));
   }, [lots, term]);
 
   return (
