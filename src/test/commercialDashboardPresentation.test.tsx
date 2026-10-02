@@ -231,7 +231,7 @@ describe('integrated Commercial Dashboard presentation', () => {
     expect(saleOpen.querySelector('strong')).toHaveTextContent(formatDashboardCurrency(1050, true));
     expect(saleOpen.querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(1050));
     expect(saleOpen).toHaveTextContent('Subtotal · 2 de 3 com valor');
-    expect(saleOpen).toHaveTextContent('aguardando assinatura');
+    expect(saleOpen).toHaveTextContent('Aguardando assinatura');
     expect(total.querySelector('strong')).toHaveTextContent(formatDashboardCurrency(2750, true));
     expect(total.querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(2750));
     expect(total).toHaveTextContent('Subtotal · 7 de 9 com valor');
