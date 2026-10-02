@@ -26,7 +26,7 @@ export function ExhibitorBookDialog({ open, onOpenChange, onSelect }: Props) {
       <DialogContent className="sales-checkout-dialog sales-exhibitor-book sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Expositores cadastrados</DialogTitle>
-          <DialogDescription>Busque por nome, CPF/CNPJ, celular ou e-mail.</DialogDescription>
+          <DialogDescription>Busque por nome fantasia, razão social, CPF/CNPJ, celular ou e-mail.</DialogDescription>
         </DialogHeader>
         <div className="sales-exhibitor-book__search">
           <Search aria-hidden="true" className="h-4 w-4" />
@@ -52,7 +52,8 @@ export function ExhibitorBookDialog({ open, onOpenChange, onSelect }: Props) {
               className="sales-exhibitor-book__item"
               onClick={() => { onSelect(item); onOpenChange(false); setQuery(''); }}
             >
-              <strong>{item.name}</strong>
+              <strong>{item.tradeName || item.name}</strong>
+              {item.tradeName && <span>{item.name}</span>}
               <span>{item.documentNumber}{item.phone ? ` · ${item.phone}` : ''}</span>
               {item.email && <span>{item.email}</span>}
             </button>
