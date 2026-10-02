@@ -18,6 +18,6 @@ export function commercialSalesProgress(aggregate: DashboardAggregate): Commerci
     return { confirmed: 0, open: 0, combined: 0, available: false, partial };
   }
   const confirmed = Math.min(100, Math.max(0, confirmedCents / totalCents * 100));
-  const open = Math.min(100 - confirmed, Math.max(0, openCents / totalCents * 100));
-  return { confirmed, open, combined: confirmed + open, available: true, partial };
+  const combined = Math.min(100, Math.max(confirmed, (confirmedCents + Math.max(0, openCents)) / totalCents * 100));
+  return { confirmed, open: combined - confirmed, combined, available: true, partial };
 }

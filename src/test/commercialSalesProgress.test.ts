@@ -7,12 +7,11 @@ const summary = (soldValue: number, saleOpenValue: number, totalKnownValue: numb
 
 describe('commercial sales progress', () => {
   it('divides both sale states by the same known-value base and adds their widths', () => {
-    expect(commercialSalesProgress(summary(36450, 146850, 4_620_000))).toMatchObject({
-      confirmed: 36450 / 4_620_000 * 100,
-      open: 146850 / 4_620_000 * 100,
-      combined: (36450 + 146850) / 4_620_000 * 100,
-      available: true, partial: false,
-    });
+    const progress = commercialSalesProgress(summary(36450, 146850, 4_620_000));
+    expect(progress.confirmed).toBeCloseTo(36450 / 4_620_000 * 100);
+    expect(progress.open).toBeCloseTo(146850 / 4_620_000 * 100);
+    expect(progress.combined).toBeCloseTo((36450 + 146850) / 4_620_000 * 100);
+    expect(progress).toMatchObject({ available: true, partial: false });
   });
 
   it('reclassifies open as confirmed without increasing the combined amount', () => {
