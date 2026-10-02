@@ -3768,27 +3768,6 @@ export type Database = {
             referencedRelation: "lot_contracts"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "lot_contract_lots_lot_id_fkey"
-            columns: ["lot_id"]
-            isOneToOne: false
-            referencedRelation: "commercial_lot_pricing_2028"
-            referencedColumns: ["lot_id"]
-          },
-          {
-            foreignKeyName: "lot_contract_lots_lot_id_fkey"
-            columns: ["lot_id"]
-            isOneToOne: false
-            referencedRelation: "commercial_lots"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "lot_contract_lots_lot_id_fkey"
-            columns: ["lot_id"]
-            isOneToOne: false
-            referencedRelation: "commercial_sale_eligibility"
-            referencedColumns: ["lot_id"]
-          },
         ]
       }
       lot_contract_versions: {
