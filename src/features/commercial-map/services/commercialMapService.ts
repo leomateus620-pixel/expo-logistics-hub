@@ -336,6 +336,7 @@ function mapLot(row: LotRow): CommercialLot {
     ? row.lot_negotiations.find((candidate: NegotiationRow) => candidate.status === 'ACTIVE')
     : null;
   const sale = Array.isArray(row.lot_sales) ? row.lot_sales.find((candidate: SaleRow) => candidate.status === 'CONFIRMED') : null;
+  const editableSale = sale ?? (Array.isArray(row.lot_sales) ? row.lot_sales.find((candidate: SaleRow) => candidate.status === 'OPEN') ?? null : null);
   const activeContract = Array.isArray(row.lot_contracts)
     ? row.lot_contracts.find((candidate: ContractRow) => candidate.is_active)
     : null;
@@ -374,8 +375,8 @@ function mapLot(row: LotRow): CommercialLot {
     currentBuyer: (sale ? buyerDisplayName(sale.buyer_trade_name, sale.buyer_name) : null) ?? activeReservation?.company_name ?? activeNegotiation?.company_name ?? null,
     currentBuyerLegalName: sale?.buyer_name ?? null,
     currentBuyerTradeName: sale?.buyer_trade_name?.trim() || null,
-    currentSaleId: sale?.id ?? null,
-    currentSaleStatus: sale && (sale.status === 'OPEN' || sale.status === 'CONFIRMED') ? sale.status : null,
+    currentSaleId: editableSale?.id ?? null,
+    currentSaleStatus: editableSale ? (editableSale.status as 'OPEN' | 'CONFIRMED') : null,
     reservationExpiresAt: activeReservation?.expires_at ?? null,
     saleDate: sale?.sale_date ?? null,
     salespersonName: sale?.salesperson_name ?? activeReservation?.responsible_name ?? null,
