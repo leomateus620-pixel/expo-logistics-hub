@@ -1,5 +1,14 @@
 :root {
   color-scheme: light;
+  /* Commercial dashboard financial matrix. */
+  --commercial-matrix-paper: #f5f7f3;
+  --commercial-matrix-ink: #20302a;
+  --commercial-matrix-gold: #d9a800;
+  --commercial-matrix-blue: #2465c0;
+  --commercial-matrix-card: #ffffff;
+  --commercial-matrix-line: #d9e3da;
+  --commercial-matrix-muted: #596b61;
+  --commercial-matrix-inverse-muted: #c6d6cb;
 
   /* Fenasoja 2028 primitives — exact reference anchors in OKLCH. */
   --brand-indigo-50: 97% 0.014 268.03;
