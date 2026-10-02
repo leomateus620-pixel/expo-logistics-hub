@@ -909,6 +909,17 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
           </span></div>
         )}
         </div>
+        {saleResolution && !dashboardOpen && (
+          <SaleInspectionPanel
+            resolution={saleResolution}
+            interiorEntityId={interiorEntityId}
+            onOverview={() => startSaleOverview(saleResolution)}
+            onEnterGroup={handleSaleEnterGroup}
+            onSpace={handleSaleSpace}
+            onBack={backToDashboardFromSale}
+            onClose={closeSaleInspection}
+          />
+        )}
         {dashboardOpen && permissions.canViewMapAnalytics && !isCommissionScope && (
           <div
             ref={dashboardOverlayRef}
