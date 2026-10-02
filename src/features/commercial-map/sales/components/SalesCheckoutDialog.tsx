@@ -19,7 +19,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 const STEPS = ['Expositor', 'Pagamento', 'Revisão'] as const;
 
-const EMPTY_BUYER: SalesBuyerDraft = { buyerName: '', documentNumber: '', phone: '', email: '', notes: '' };
+const EMPTY_BUYER: SalesBuyerDraft = { buyerName: '', tradeName: '', documentNumber: '', phone: '', email: '', notes: '' };
 const EMPTY_FEES: SalesFeesDraft = { adminCents: 0, ppciCents: 0, cleaningCents: 0 };
 
 interface Props {

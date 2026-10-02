@@ -20,6 +20,16 @@ interface Props {
   onRetrySave?: () => void;
 }
 
+export function TradeNameField({ value, onChange, id = 'sales-buyer-trade-name' }: { value: string; onChange: (value: string) => void; id?: string }) {
+  return (
+    <div className="sales-field">
+      <label htmlFor={id}>Nome fantasia (opcional)</label>
+      <Input id={id} value={value} onChange={(event) => onChange(event.target.value.toUpperCase())} placeholder="NOME FANTASIA" autoComplete="off" aria-describedby={`${id}-help`} />
+      <span id={`${id}-help`} className="sales-logo-field__note">Nome apresentado no mapa e nos links públicos. Se não informado, será usado o nome / razão social.</span>
+    </div>
+  );
+}
+
 export function buyerErrors(value: SalesBuyerDraft) {
   return {
     buyerName: value.buyerName.trim().length < 3 ? 'Informe o nome ou razão social.' : null,
@@ -59,6 +69,7 @@ export function SalesBuyerForm({ value, onChange, showErrors, saveStatus = 'idle
   const set = (patch: Partial<SalesBuyerDraft>) => onChange({ ...value, ...patch });
   const pick = (item: CommercialExhibitor) => set({
     buyerName: item.name.toUpperCase(),
+    tradeName: item.tradeName ?? '',
     documentNumber: formatDocument(item.documentNumber),
     phone: item.phone ? formatPhoneBr(item.phone) : '',
     email: item.email ?? '',
@@ -88,6 +99,8 @@ export function SalesBuyerForm({ value, onChange, showErrors, saveStatus = 'idle
         />
         {showErrors && errors.buyerName && <span className="sales-field__error">{errors.buyerName}</span>}
       </div>
+
+      <TradeNameField value={value.tradeName} onChange={(tradeName) => set({ tradeName })} />
 
       <div className="sales-grid">
         <div className="sales-field">

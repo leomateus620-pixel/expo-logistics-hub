@@ -1,3 +1,4 @@
+import { buyerDisplayName } from '../utils/buyerDisplayName';
 import { supabase } from '@/integrations/supabase/client';
 import type { LotPricing2028, LotPricingResolution } from '../utils/lotPricing2028';
 import type { SalesOrderPayload } from './salesTypes';
@@ -122,6 +123,7 @@ export async function registerSaleOrder(payload: SalesOrderPayload): Promise<str
     p_stage: payload.stage,
     p_lot_ids: payload.lotIds,
     p_buyer_name: payload.buyer.buyerName,
+    p_buyer_trade_name: payload.buyer.tradeName.trim() || null,
     p_document_number: payload.buyer.documentNumber,
     p_phone: payload.buyer.phone,
     p_email: payload.buyer.email,
@@ -165,6 +167,7 @@ export interface OpenSaleItem {
 export interface OpenSaleOrder {
   orderId: string;
   buyerName: string;
+  buyerLegalName?: string;
   stage: string | null;
   createdAt: string | null;
   negotiatedTotal: number | null;
@@ -176,7 +179,7 @@ export async function fetchLotOpenSaleOrder(lotId: string): Promise<OpenSaleOrde
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from('lot_sale_order_items')
-    .select('id,order_id,lot_id,public_identifier,item_total,pricing_stage,lot_sale_orders!inner(id,buyer_name,stage,created_at,negotiated_total,status)')
+    .select('id,order_id,lot_id,public_identifier,item_total,pricing_stage,lot_sale_orders!inner(id,buyer_name,buyer_trade_name,stage,created_at,negotiated_total,status)')
     .eq('lot_id', lotId)
     .eq('contract_state', 'PENDING_SIGNATURE')
     .eq('lot_sale_orders.status', 'CONFIRMED')
@@ -195,7 +198,8 @@ export async function fetchLotOpenSaleOrder(lotId: string): Promise<OpenSaleOrde
   if (siblingsError) throw siblingsError;
   return {
     orderId: order.id,
-    buyerName: order.buyer_name,
+    buyerName: buyerDisplayName(order.buyer_trade_name, order.buyer_name) ?? order.buyer_name,
+    buyerLegalName: order.buyer_name,
     stage: order.stage,
     createdAt: order.created_at,
     negotiatedTotal: order.negotiated_total === null || order.negotiated_total === undefined ? null : Number(order.negotiated_total),

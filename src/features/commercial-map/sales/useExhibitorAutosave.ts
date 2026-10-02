@@ -13,7 +13,7 @@ function isComplete(buyer: SalesBuyerDraft): boolean {
 }
 
 function keyOf(buyer: SalesBuyerDraft): string {
-  return [buyer.buyerName.trim(), buyer.documentNumber.replace(/\D+/g, ''), buyer.phone.replace(/\D+/g, ''), buyer.email.trim().toLowerCase()].join('|');
+  return [buyer.buyerName.trim(), buyer.tradeName.trim(), buyer.documentNumber.replace(/\D+/g, ''), buyer.phone.replace(/\D+/g, ''), buyer.email.trim().toLowerCase()].join('|');
 }
 
 /** Salva o expositor só quando os campos obrigatórios estão válidos (nunca a cada tecla). */
@@ -40,6 +40,7 @@ export function useExhibitorAutosave(buyer: SalesBuyerDraft, firstLotId: string 
     const run = upsertExhibitor({
       projectId: project.data,
       name: buyer.buyerName,
+      tradeName: buyer.tradeName,
       document: buyer.documentNumber,
       phone: buyer.phone,
       email: buyer.email,
