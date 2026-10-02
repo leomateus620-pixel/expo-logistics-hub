@@ -28,11 +28,13 @@ const identity: SaleIdentity = {
 
 function renderDialog() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return render(
+  const onClose = vi.fn();
+  const utils = render(
     <QueryClientProvider client={client}>
-      <SaleExhibitorEditDialog lotId="lot-1" identity={identity} onClose={vi.fn()} />
+      <SaleExhibitorEditDialog lotId="lot-1" identity={identity} onClose={onClose} />
     </QueryClientProvider>,
   );
+  return { ...utils, onClose };
 }
 
 describe('editor dos dados do expositor', () => {
