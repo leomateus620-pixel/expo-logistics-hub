@@ -18,7 +18,7 @@ const identity: SaleIdentity = {
   status: 'OPEN',
   buyerName: 'EXPOSITOR LTDA',
   tradeName: null,
-  documentNumber: '12345678900',
+  documentNumber: '12345678909',
   phone: '(55) 99999-9999',
   email: 'compras@expositor.com.br',
   orderId: 'order-1',
