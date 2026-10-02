@@ -185,7 +185,7 @@ export function buildEntityExplorerIndex(entities: MapEntity[], lots: Commercial
       metadata.street,
       lot?.levelLabel,
     ]);
-    const companies = normalizedValues([lot?.currentBuyer]);
+    const companies = normalizedValues([lot?.currentBuyer, lot?.currentBuyerLegalName]);
     const contracts = normalizedValues([lot?.activeContractNumber]);
     const keywords = normalizedValues([
       ...metadata.searchKeywords,

@@ -206,7 +206,14 @@ export interface CommercialLot {
   accessibilityNotes: string | null;
   commercialNotes: string | null;
   internalNotes: string | null;
+  /** Nome de exibição do comprador: nome fantasia ou, na falta, razão social. */
   currentBuyer: string | null;
+  /** Identidade legal (razão social) da venda vigente, separada do nome exibido. */
+  currentBuyerLegalName?: string | null;
+  currentBuyerTradeName?: string | null;
+  /** Venda vigente (OPEN/CONFIRMED) usada pela edição dos dados do expositor. */
+  currentSaleId?: string | null;
+  currentSaleStatus?: 'OPEN' | 'CONFIRMED' | null;
   saleLogoUrl?: string | null;
   reservationExpiresAt: string | null;
   saleDate: string | null;
