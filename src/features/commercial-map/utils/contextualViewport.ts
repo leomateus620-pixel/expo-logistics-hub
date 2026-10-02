@@ -33,6 +33,16 @@ export function readContextualViewportInsets(canvas: HTMLCanvasElement): Context
     .map((panel) => panel.getBoundingClientRect());
   const viewport = canvas.getBoundingClientRect();
   const insets = resolveContextualViewportInsets(viewport, panels);
+  // A compact sale with one module may occupy less than the generic 35% side
+  // threshold. Its explicit inspection panel still needs a clear camera region.
+  const inspectionPanel = shell?.querySelector<HTMLElement>('[data-commercial-map-camera-obstruction="sale-inspection"]');
+  if (inspectionPanel?.getClientRects().length && getComputedStyle(inspectionPanel).visibility !== 'hidden') {
+    const rect = inspectionPanel.getBoundingClientRect();
+    const overlaps = rect.left < viewport.right && rect.right > viewport.left && rect.top < viewport.bottom && rect.bottom > viewport.top;
+    if (overlaps && rect.width < viewport.width * .65 && rect.right >= viewport.right - 24) {
+      insets.right = Math.max(insets.right, Math.min(viewport.width * .6, viewport.right - rect.left + 12));
+    }
+  }
   const controls = shell?.querySelector<HTMLElement>('[data-commercial-map-interior-controls]');
   if (controls?.getClientRects().length) {
     const rect = controls.getBoundingClientRect();

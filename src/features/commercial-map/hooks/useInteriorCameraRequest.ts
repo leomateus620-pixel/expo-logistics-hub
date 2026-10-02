@@ -14,7 +14,7 @@ export interface PavilionCameraGeometry {
   readingAxis: 'x' | 'z';
   width: number;
   depth: number;
-  modules: readonly { id: string; center: Vector3; width: number; depth: number }[];
+  modules: readonly { id: string; entityId?: string; lotId?: string; center: Vector3; width: number; depth: number }[];
 }
 
 /** Interior scenes describe a view; only the persistent CameraRig may move it. */

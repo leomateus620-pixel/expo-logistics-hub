@@ -1,0 +1,140 @@
+.cso-attach-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgb(14 37 26 / 48%);
+}
+
+.cso-attach-viewport {
+  position: fixed;
+  inset: 0;
+  z-index: 81;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  pointer-events: none;
+}
+
+.cso-attach-dialog {
+  --cso-attach-ink: #193c2b;
+  --cso-attach-muted: #5b685f;
+  --cso-attach-line: #dce3d9;
+  display: flex;
+  flex-direction: column;
+  width: min(39rem, 100%);
+  max-height: min(90dvh, 54rem);
+  overflow: hidden;
+  pointer-events: auto;
+  color: var(--cso-attach-ink);
+  background: #fff;
+  border: 1px solid var(--cso-attach-line);
+  border-radius: 1rem;
+  box-shadow: 0 16px 48px rgb(12 34 22 / 16%);
+  font-size: .875rem;
+  line-height: 1.5;
+}
+
+.cso-attach-dialog * { box-sizing: border-box; }
+.cso-attach-dialog button, .cso-attach-dialog input { font: inherit; }
+.cso-attach-dialog button { cursor: pointer; }
+.cso-attach-dialog button:disabled { cursor: not-allowed; opacity: .5; }
+.cso-attach-dialog :is(button, input):focus-visible { outline: 3px solid #3e805c; outline-offset: 3px; }
+.cso-attach-dialog svg { flex: none; width: 1.125rem; height: 1.125rem; }
+
+.cso-attach-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .75rem;
+  flex: none;
+  padding: 1.35rem 1.5rem 1.15rem;
+  border-bottom: 1px solid var(--cso-attach-line);
+}
+
+.cso-attach-eyebrow { display: block; font-size: .75rem; color: var(--cso-attach-muted); font-weight: 600; margin-bottom: .25rem; }
+.cso-attach-title { margin: 0; font-size: 1.65rem; letter-spacing: -.04em; line-height: 1.2; font-weight: 750; }
+.cso-attach-description { color: var(--cso-attach-muted); margin: .4rem 0 0; font-size: .875rem; }
+.cso-attach-close { display: grid; place-items: center; flex: none; width: 2.5rem; height: 2.5rem; border: 1px solid var(--cso-attach-line); border-radius: .6rem; background: #fff; color: var(--cso-attach-ink); }
+.cso-attach-close:hover { background: #f2f5ef; }
+.cso-attach-form { display: flex; flex-direction: column; min-height: 0; }
+.cso-attach-body { display: flex; flex-direction: column; gap: 1.25rem; min-height: 0; padding: 1.25rem 1.5rem; overflow-y: auto; overscroll-behavior: contain; }
+.cso-attach-section { min-width: 0; padding: 0; margin: 0; border: 0; }
+.cso-attach-section h3, .cso-attach-section legend { margin: 0 0 .7rem; padding: 0; font-size: .95rem; font-weight: 700; }
+.cso-attach-section h3 > span, .cso-attach-section legend > span { display: inline-block; font-size: .72rem; font-weight: 600; font-variant-numeric: tabular-nums; color: #657362; margin-right: .5rem; }
+.cso-attach-version { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .65rem; padding: .8rem 1rem; background: #f5f6f0; border-left: 3px solid #7b8a54; }
+.cso-attach-version > span:first-child { flex: none; }
+.cso-attach-current-file { min-width: 0; overflow-wrap: anywhere; font-size: .8125rem; }
+.cso-attach-version p { flex-basis: 100%; margin: 0; color: var(--cso-attach-muted); font-size: .8125rem; }
+
+.cso-attach-file { position: relative; display: flex; align-items: flex-start; gap: .8rem; padding: 1rem; border: 1px dashed #8d9c89; border-radius: .7rem; background: #f9faf6; cursor: pointer; }
+.cso-attach-file:hover { background: #f0f5eb; border-color: #376447; }
+.cso-attach-file:focus-within { outline: 3px solid #3e805c; outline-offset: 3px; }
+.cso-attach-file > svg { margin-top: .15rem; width: 1.4rem; height: 1.4rem; color: #356646; }
+.cso-attach-file.has-file { border-style: solid; }
+.cso-attach-file.is-disabled { opacity: .6; cursor: progress; }
+.cso-attach-file-copy { display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
+.cso-attach-file-copy strong { font-size: .9375rem; font-weight: 650; overflow-wrap: anywhere; }
+.cso-attach-file-copy > span { color: var(--cso-attach-muted); font-size: .8125rem; font-variant-numeric: tabular-nums; }
+.cso-attach-file-copy .cso-attach-file-change { margin-top: .15rem; color: #255938; font-weight: 650; text-decoration: underline; text-underline-offset: 3px; }
+.cso-attach-file input { position: absolute; inset: 0; height: 100%; width: 100%; cursor: inherit; opacity: 0; }
+.cso-attach-field { display: flex; flex-direction: column; gap: .4rem; margin-top: .85rem; font-size: .8125rem; font-weight: 650; }
+.cso-attach-optional { margin-left: .35rem; color: var(--cso-attach-muted); font-weight: 400; }
+.cso-attach-field input { width: 100%; height: 2.75rem; padding: .6rem .75rem; border: 1px solid #aebbaa; border-radius: .5rem; color: var(--cso-attach-ink); background: #fff; font-size: .875rem; font-weight: 400; }
+.cso-attach-field input::placeholder { color: #69766b; }
+.cso-attach-field input:disabled { background: #f5f6f2; }
+
+.cso-attach-scope-options { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.cso-attach-scope-options > label { display: flex; align-items: flex-start; gap: .6rem; min-width: 0; padding: .8rem; border: 1px solid var(--cso-attach-line); border-radius: .6rem; cursor: pointer; }
+.cso-attach-scope-options > label.is-selected { border-color: #41664a; background: #f3f7ed; }
+.cso-attach-scope-options input, .cso-attach-check-list input { flex: none; width: 1rem; height: 1rem; margin: .15rem 0 0; accent-color: #245b38; }
+.cso-attach-scope-options strong, .cso-attach-scope-options small { display: block; }
+.cso-attach-scope-options strong { font-size: .875rem; font-weight: 650; }
+.cso-attach-scope-options small { font-size: .75rem; color: var(--cso-attach-muted); margin-top: .2rem; }
+.cso-attach-coverage-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .65rem; font-size: .8125rem; margin: .9rem 0 .5rem; }
+.cso-attach-coverage-heading > strong { flex: none; font-variant-numeric: tabular-nums; font-weight: 650; }
+.cso-attach-check-list, .cso-attach-covered-spaces { list-style: none; padding: 0; margin: 0; }
+.cso-attach-check-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .3rem .6rem; }
+.cso-attach-check-list label { display: flex; align-items: flex-start; gap: .55rem; min-height: 2.75rem; padding: .65rem; border-radius: .4rem; cursor: pointer; font-size: .8125rem; }
+.cso-attach-check-list label:hover { background: #f5f7f1; }
+.cso-attach-check-list label.is-selected { background: #f1f5eb; }
+.cso-attach-check-list label span { overflow-wrap: anywhere; }
+.cso-attach-covered-spaces { display: flex; flex-wrap: wrap; gap: .35rem; }
+.cso-attach-covered-spaces li { max-width: 100%; padding: .3rem .55rem; border-radius: .3rem; background: #f1f4eb; color: #345139; font-size: .8125rem; overflow-wrap: anywhere; }
+.cso-attach-note { margin: 0; padding-left: .7rem; border-left: 2px solid #c8d3c0; font-size: .8125rem; color: var(--cso-attach-muted); }
+.cso-attach-state { display: flex; align-items: center; gap: .55rem; margin: 0; padding: .7rem .8rem; background: #f0f5eb; border-radius: .5rem; overflow-wrap: anywhere; }
+.cso-attach-state.is-error { background: #fff3ec; color: #8b351c; border: 1px solid #eac7b6; }
+.cso-attach-state svg, .cso-attach-submit svg { animation: cso-attach-spin 1s linear infinite; }
+
+.cso-attach-footer { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .75rem; flex: none; padding: 1rem 1.5rem; border-top: 1px solid var(--cso-attach-line); background: #fafbf7; }
+.cso-attach-footer > .cso-attach-state { grid-column: 1 / -1; }
+.cso-attach-footer > p { margin: 0; font-size: .8125rem; }
+.cso-attach-footer > p strong { display: block; font-variant-numeric: tabular-nums; }
+.cso-attach-footer > p span { color: var(--cso-attach-muted); }
+.cso-attach-actions { display: flex; gap: .5rem; }
+.cso-attach-actions button { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; min-height: 2.75rem; padding: .6rem .9rem; border-radius: .55rem; font-size: .8125rem; font-weight: 650; }
+.cso-attach-cancel { color: var(--cso-attach-ink); border: 1px solid #becbb7; background: #fff; }
+.cso-attach-cancel:hover { background: #f1f5eb; }
+.cso-attach-submit { border: 1px solid #205039; background: #205039; color: #fff; }
+.cso-attach-submit:hover { background: #153e23; }
+
+@keyframes cso-attach-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 540px) {
+  .cso-attach-viewport { padding: .5rem; }
+  .cso-attach-dialog { max-height: calc(100dvh - 1rem); border-radius: .8rem; }
+  .cso-attach-header { padding: 1rem; }
+  .cso-attach-title { font-size: 1.4rem; }
+  .cso-attach-body { padding: 1rem; }
+  .cso-attach-field input { font-size: 1rem; }
+  .cso-attach-footer { grid-template-columns: 1fr; align-items: stretch; gap: .65rem; padding: .8rem 1rem; }
+  .cso-attach-footer > p strong { display: inline; }
+  .cso-attach-actions { width: 100%; }
+  .cso-attach-actions button { flex: 1 1 auto; }
+  .cso-attach-actions .cso-attach-submit { flex-grow: 2; }
+  .cso-attach-scope-options > label { padding: .65rem .55rem; gap: .4rem; }
+  .cso-attach-check-list { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cso-attach-state svg, .cso-attach-submit svg { animation: none; }
+}

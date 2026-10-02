@@ -2,6 +2,7 @@ import { InteriorViewControls } from '../InteriorViewControls';
 import { useVisitStore } from '../../visit/useVisitStore';
 import { useVisitCameraLease } from '../../visit/useVisitCameraLease';
 import { clampInteriorPan, resolveInteriorView, interpolateInteriorOrbit } from '../../utils/interiorView';
+import { resolveSaleInspectionInteriorView } from '../../utils/saleInspectionCamera';
 import { publicLotOutlinePositions } from '../../public/publicLotOutline';
 import { PUBLIC_NAVIGATION_SAVE_EVENT, savePublicNavigation, type PublicNavigation } from '../../public/publicNavigation';
 import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
@@ -1508,6 +1509,14 @@ function BatchedLots({
   const lockSurfaces = useMemo(() => entries.map(({ entity, lot }) => ({
     id: entity.id, status: lot.status, logoUrl: lot.saleLogoUrl, geometry: entity.geometry,
   })), [entries]);
+  const inspectionOutline = useMemo(() => {
+    if (publicPolicy || !saleInspectionLotIds.size) return null;
+    const positions = entries.filter(entry => saleInspectionLotIds.has(entry.lot.id)).flatMap(({ entity }) => (
+      publicLotOutlinePositions(entity).map((coordinate, index) => index % 3 === 1 ? coordinate + entity.geometry.elevation + .1 : coordinate)
+    ));
+    return positions.length ? new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(positions, 3)) : null;
+  }, [entries, publicPolicy, saleInspectionLotIds]);
+  useEffect(() => () => inspectionOutline?.dispose(), [inspectionOutline]);
   const batch = useMemo(() => {
     if (entries.length === 0) return null;
     const sourceGeometries = entries.map(({ entity }) => {
@@ -1615,7 +1624,6 @@ function BatchedLots({
     const hovered = currentHover === entityId;
     const scratch = visualScratch.current;
     const salesSelected = !isSoldLot(entry.lot.status) && salesSelectedLotIds.has(entry.lot.id);
-    const saleInspected = !publicPolicy && saleInspectionLotIds.has(entry.lot.id);
     const color = lotColor(
       entry,
       publicPolicy ? null : segmentByEntity.get(entityId) ?? null,
@@ -1630,13 +1638,11 @@ function BatchedLots({
     // Realce do carrinho: dourado sólido, mantendo geometria e status originais.
     if (publicPolicy && selected && !isSoldLot(entry.lot.status)) color.set('#ffed91');
     if (salesSelected) color.lerp(scratch.blend.set('#f2c94c'), 0.62);
-    // Inspeção da venda: realce próprio (ciano) sem mudar status nem carrinho.
-    if (saleInspected) color.lerp(scratch.blend.set('#22d3ee'), 0.55);
     batch.mesh.setColorAt(batchId, color);
-    const lift = saleInspected ? 0.1 : salesSelected ? 0.09 : selected ? 0.055 : hovered ? 0.035 : 0;
+    const lift = salesSelected ? 0.09 : selected ? 0.055 : hovered ? 0.035 : 0;
     scratch.matrix.makeTranslation(0, entry.entity.geometry.elevation + lift, 0);
     batch.mesh.setMatrixAt(batchId, scratch.matrix);
-  }, [batch, entryByEntity, filtersActive, infrastructureMode, matchingEntityIds, publicPolicy, saleInspectionLotIds, salesSelectedLotIds, segmentByEntity]);
+  }, [batch, entryByEntity, filtersActive, infrastructureMode, matchingEntityIds, publicPolicy, salesSelectedLotIds, segmentByEntity]);
 
   const previousPublicStatuses = useRef<{ batch: typeof batch; statuses: Map<string, CommercialLot['status']> }>({ batch: null, statuses: new Map() });
   useEffect(() => {
@@ -1769,6 +1775,9 @@ function BatchedLots({
         />
       </lineSegments>
       {selectedEntity && <LotSelectionOutline entity={selectedEntity} />}
+      {inspectionOutline && <lineSegments geometry={inspectionOutline} raycast={NO_RAYCAST} renderOrder={3}>
+        <lineBasicMaterial color="#22bfd4" depthWrite={false} toneMapped={false} />
+      </lineSegments>}
     </>
   );
 }
@@ -2635,7 +2644,7 @@ function CameraRig({
         travel,
         typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches),
       );
-      if (source.startsWith('interior-view:')) transition.durationMs = Math.min(320, transition.durationMs);
+      if (source.startsWith('interior-view:') || source.startsWith('interior-sale:')) transition.durationMs = Math.min(320, transition.durationMs);
       gl.domElement.dataset.commercialMapCameraTransition = JSON.stringify({
         status: 'running',
         source,
@@ -3121,15 +3130,6 @@ function CameraRig({
   const saleFrameSequence = useSaleInspectionStore((state) => state.frameSequence);
   const saleFrameEntityIds = useSaleInspectionStore((state) => state.frameEntityIds);
   const lastSaleFrame = useRef(saleFrameSequence);
-  useLayoutEffect(() => {
-    if (saleFrameSequence === lastSaleFrame.current) return;
-    lastSaleFrame.current = saleFrameSequence;
-    if (publicPolicy || interiorEntity || saleFrameEntityIds.size === 0) return;
-    const targets = exteriorRenderedEntities.filter((entity) => saleFrameEntityIds.has(entity.id));
-    if (targets.length === 0) return;
-    pendingResizeRefit.current = false;
-    queueSegment(PUBLIC_FOCUS_FRAMING, targets);
-  }, [exteriorRenderedEntities, interiorEntity, publicPolicy, queueSegment, saleFrameEntityIds, saleFrameSequence]);
 
   const queueParking = useCallback(() => {
     const insets = resolveParkingViewportInsets(size.width, size.height);
@@ -3197,6 +3197,17 @@ function CameraRig({
       startCameraMove(interiorFrame.minDistance, interiorFrame.maxDistance, true, overview, `interior-view:${interiorFrame.entityId}:refit`);
       return;
     }
+    const inspection = useSaleInspectionStore.getState();
+    const saleView = !publicPolicy && inspection.context && resolveSaleInspectionInteriorView({
+      frame: interiorFrame, lotIds: inspection.lotIdSet, entityIds: inspection.frameEntityIds,
+      width: size.width, height: size.height, insets: readContextualViewportInsets(gl.domElement),
+    });
+    if (saleView) {
+      targetPosition.current.copy(saleView.position);
+      targetLookAt.current.copy(saleView.target);
+      startCameraMove(interiorFrame.minDistance, interiorFrame.maxDistance, true, saleView, `interior-sale:${interiorFrame.entityId}`);
+      return;
+    }
     targetPosition.current.copy(interiorFrame.position);
     targetLookAt.current.copy(interiorFrame.target);
     const contextualLens = fitCameraAboveContextualPanel(
@@ -3204,7 +3215,7 @@ function CameraRig({
       readContextualViewportInsets(gl.domElement), interiorFrame.maxDistance,
     );
     startCameraMove(interiorFrame.minDistance, interiorFrame.maxDistance, true, { ...interiorFrame, ...contextualLens }, `interior:${interiorFrame.entityId}`);
-  }, [camera, gl, interiorFrame, size.height, size.width, startCameraMove]);
+  }, [camera, gl, interiorFrame, publicPolicy, size.height, size.width, startCameraMove]);
 
   resizeRefitView.current = () => {
     // A panel can change the free screen center without changing the user's
@@ -3223,6 +3234,10 @@ function CameraRig({
     if (interiorEntity) queueInterior();
     else if (parkingActive) queueParking();
     else if (selectedEntity && !publicPolicy) queueSelection(selectedEntity);
+    else if (!publicPolicy && useSaleInspectionStore.getState().context && saleFrameEntityIds.size) {
+      const targets = exteriorRenderedEntities.filter(entity => saleFrameEntityIds.has(entity.id));
+      if (targets.length) queueSegment(PUBLIC_FOCUS_FRAMING, targets);
+    }
     else if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
     else queuePreset(preset);
   };
@@ -3758,6 +3773,28 @@ function CameraRig({
     startCameraMove,
     setCameraNavigating,
   ]);
+
+  useLayoutEffect(() => {
+    if (saleFrameSequence === lastSaleFrame.current || publicPolicy || saleFrameEntityIds.size === 0) return;
+    // Interior geometry arrives via the existing request after entering a pavilion.
+    // Consume only when it is ready, after the normal scene-entry transition.
+    if (interiorEntity) {
+      if (!interiorFrame?.pavilion) return;
+      const hasRequestedModule = interiorFrame.pavilion.modules.some(module => module.entityId && saleFrameEntityIds.has(module.entityId));
+      if (!hasRequestedModule) return;
+      interiorOverview.current = null;
+      cancelScheduledResizeRefit();
+      pendingResizeRefit.current = false;
+      queueInterior();
+    } else {
+      const targets = exteriorRenderedEntities.filter(entity => saleFrameEntityIds.has(entity.id));
+      if (!targets.length) return;
+      cancelScheduledResizeRefit();
+      pendingResizeRefit.current = false;
+      queueSegment(PUBLIC_FOCUS_FRAMING, targets);
+    }
+    lastSaleFrame.current = saleFrameSequence;
+  }, [cancelScheduledResizeRefit, exteriorRenderedEntities, interiorEntity, interiorFrame, publicPolicy, queueInterior, queueSegment, saleFrameEntityIds, saleFrameSequence]);
 
   useLayoutEffect(() => {
     if (!interiorFrame?.pavilion || !interiorCommand
@@ -4355,7 +4392,7 @@ function CameraRig({
           now - transition.startedAt,
           transition.durationMs,
         );
-        if (transition.source.startsWith(`interior-view:${interiorEntity?.id}:`)) {
+        if (transition.source.startsWith(`interior-view:${interiorEntity?.id}:`) || transition.source === `interior-sale:${interiorEntity?.id}`) {
           interpolateInteriorOrbit(transition.fromPosition, transition.fromTarget,
             transition.toPosition, transition.toTarget, progress, perspective.position,
             controls?.target ?? targetLookAt.current, interiorOrbitScratch.current);

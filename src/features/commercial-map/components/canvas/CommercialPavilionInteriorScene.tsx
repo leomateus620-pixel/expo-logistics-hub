@@ -202,12 +202,14 @@ function PavilionInteriorCameraRig({
   layout,
   plan,
   interiorViewRotation,
+  moduleStateById,
 }: {
   entity: MapEntity;
   layout: CommercialPavilionLayout;
   plan: CommercialPavilionModulePlan;
   reducedGraphics: boolean;
   interiorViewRotation: number;
+  moduleStateById: ReadonlyMap<string, CommercialPavilionModuleVisualState>;
 }) {
   const size = useThree((state) => state.size);
   const request = useMemo<InteriorCameraRequest>(() => {
@@ -226,7 +228,8 @@ function PavilionInteriorCameraRig({
     });
     const modules = plan.cells.map(cell => {
       const rect = projectCommercialPavilionModuleRect(cell, projection);
-      return { id: cell.id, center: planToWorld(rect.centerX, layout.interior.floorY, rect.centerZ), width: rect.width, depth: rect.depth };
+      const persisted = moduleStateById.get(cell.id);
+      return { id: cell.id, entityId: persisted?.entityId, lotId: persisted?.lotId ?? undefined, center: planToWorld(rect.centerX, layout.interior.floorY, rect.centerZ), width: rect.width, depth: rect.depth };
     });
     const pavilion = {
       key: JSON.stringify([entity.id, center.toArray(), facing, layout.width, layout.depth, layout.interior.floorY, interiorViewRotation, modules]),
@@ -308,7 +311,7 @@ function PavilionInteriorCameraRig({
         max: [layout.interior.clearWidth * 0.62, layout.height * 0.32, layout.interior.clearDepth * 0.62],
       },
     };
-  }, [entity, interiorViewRotation, layout, plan, size.height, size.width]);
+  }, [entity, interiorViewRotation, layout, moduleStateById, plan, size.height, size.width]);
   useInteriorCameraRequest(request);
   return null;
 }
@@ -536,6 +539,7 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
         plan={modulePlan}
         reducedGraphics={reducedGraphics}
         interiorViewRotation={interiorViewRotation}
+        moduleStateById={moduleStateById}
       />
     </>
   );

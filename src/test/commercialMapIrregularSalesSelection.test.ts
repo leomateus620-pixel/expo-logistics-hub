@@ -21,6 +21,13 @@ function resolve(cellId: string, lotId: string, selectedLotIds: ReadonlySet<stri
 }
 
 describe('seleção visual compartilhada dos módulos comerciais', () => {
+  it('mantém a inspeção independente do preenchimento e elevação do carrinho', () => {
+    const module = state('B5:module:025', 'lot-b5-025');
+    const inspected = resolveModuleInteractionState(module.displayName!, module, module.displayName, module.displayName, new Set(), new Set([module.lotId!]));
+    expect(inspected).toEqual({ inCart: false, isSelected: false, isHovered: false });
+    expect(resolveModuleVisualGeometry(inspected, false)).toEqual({ heightScale: 1, footprintScaleX: .91, footprintScaleZ: .9 });
+  });
+
   it.each([
     ['B6:module:036', 'lot-b6-036'],
     ['B4:module:090', 'lot-b4-090'],
