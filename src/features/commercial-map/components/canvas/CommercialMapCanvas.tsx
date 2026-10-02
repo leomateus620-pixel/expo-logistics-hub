@@ -3111,6 +3111,22 @@ function CameraRig({
     startCameraMove,
   ]);
 
+  // Inspeção de venda: enquadra as geometrias reais (lotes externos + pavilhões)
+  // pelo mesmo voo único do CameraRig; um novo pedido substitui o anterior.
+  const saleFrameSequence = useSaleInspectionStore((state) => state.frameSequence);
+  const saleFrameEntityIds = useSaleInspectionStore((state) => state.frameEntityIds);
+  const lastSaleFrame = useRef(saleFrameSequence);
+  useLayoutEffect(() => {
+    if (saleFrameSequence === lastSaleFrame.current) return;
+    lastSaleFrame.current = saleFrameSequence;
+    if (publicPolicy || interiorEntity || saleFrameEntityIds.size === 0) return;
+    const targets = exteriorRenderedEntities.filter((entity) => saleFrameEntityIds.has(entity.id));
+    if (targets.length === 0) return;
+    cancelScheduledResizeRefit();
+    pendingResizeRefit.current = false;
+    queueSegment(PUBLIC_FOCUS_FRAMING, targets);
+  }, [cancelScheduledResizeRefit, exteriorRenderedEntities, interiorEntity, publicPolicy, queueSegment, saleFrameEntityIds, saleFrameSequence]);
+
   const queueParking = useCallback(() => {
     const insets = resolveParkingViewportInsets(size.width, size.height);
     const canvasRect = gl.domElement.getBoundingClientRect();
