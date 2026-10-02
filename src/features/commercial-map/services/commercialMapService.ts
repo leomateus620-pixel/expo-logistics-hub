@@ -1,3 +1,4 @@
+import { buyerDisplayName } from '../utils/buyerDisplayName';
 import { captureCommercialMapStageRecorder, type CommercialMapStageRecorder } from '../utils/performanceDiagnostics';
 import { awaitCommercialMapRequest, measureCommercialMapOperation, throwIfMapRequestAborted } from '../utils/commercialMapOperation';
 import { supabase } from '@/integrations/supabase/client';
@@ -63,7 +64,7 @@ interface GeometryRow {
 interface PriceRow { is_active: boolean; pricing_mode: CommercialLot['pricingMode']; base_price: number | string | null; price_per_sqm: number | string | null; asking_price: number | string | null; minimum_price: number | string | null; }
 interface ReservationRow { status: string; company_name: string; expires_at: string; responsible_name: string | null; }
 interface NegotiationRow { status: string; company_name: string; contact_name: string | null; }
-interface SaleRow extends PersistedLotSaleRow { buyer_name: string; sale_date: string; salesperson_name: string; contract_number: string | null; }
+interface SaleRow extends PersistedLotSaleRow { buyer_name: string; buyer_trade_name?: string | null; sale_date: string; salesperson_name: string; contract_number: string | null; }
 interface FinancialEntityRow { id: string; pricing: OfficialLotPricing2028Row | OfficialLotPricing2028Row[] | null; }
 interface ContractRow { is_active: boolean; contract_number: string | null; }
 interface LotRow {
@@ -84,7 +85,7 @@ export const COMMERCIAL_LOT_SELECT = `*,
   lot_prices(is_active,pricing_mode,base_price,price_per_sqm,asking_price,minimum_price),
   lot_reservations(status,company_name,expires_at,responsible_name),
   lot_negotiations(status,company_name),
-  lot_sales(id,lot_id,status,negotiated_value,buyer_name,sale_date,salesperson_name,contract_number),
+  lot_sales(id,lot_id,status,negotiated_value,buyer_name,buyer_trade_name,sale_date,salesperson_name,contract_number),
   lot_contracts(is_active,contract_number),
   ${OFFICIAL_PRICING_EMBED}`;
 
@@ -112,7 +113,10 @@ export interface CommercialMapFetchOptions {
 export interface LotSaleHistory {
   orderId: string;
   publicIdentifierSnapshot: string;
+  /** Nome de exibição (fantasia ou razão social). */
   buyerName: string;
+  buyerLegalName: string;
+  buyerTradeName: string | null;
   stage: string;
   paymentType: string;
   paymentMethod: string;
@@ -332,6 +336,7 @@ function mapLot(row: LotRow): CommercialLot {
     ? row.lot_negotiations.find((candidate: NegotiationRow) => candidate.status === 'ACTIVE')
     : null;
   const sale = Array.isArray(row.lot_sales) ? row.lot_sales.find((candidate: SaleRow) => candidate.status === 'CONFIRMED') : null;
+  const editableSale = sale ?? (Array.isArray(row.lot_sales) ? row.lot_sales.find((candidate: SaleRow) => candidate.status === 'OPEN') ?? null : null);
   const activeContract = Array.isArray(row.lot_contracts)
     ? row.lot_contracts.find((candidate: ContractRow) => candidate.is_active)
     : null;
@@ -367,7 +372,11 @@ function mapLot(row: LotRow): CommercialLot {
     accessibilityNotes: row.accessibility_notes,
     commercialNotes: row.commercial_notes,
     internalNotes: row.internal_notes,
-    currentBuyer: sale?.buyer_name ?? activeReservation?.company_name ?? activeNegotiation?.company_name ?? null,
+    currentBuyer: (sale ? buyerDisplayName(sale.buyer_trade_name, sale.buyer_name) : null) ?? activeReservation?.company_name ?? activeNegotiation?.company_name ?? null,
+    currentBuyerLegalName: sale?.buyer_name ?? null,
+    currentBuyerTradeName: sale?.buyer_trade_name?.trim() || null,
+    currentSaleId: editableSale?.id ?? null,
+    currentSaleStatus: editableSale ? (editableSale.status as 'OPEN' | 'CONFIRMED') : null,
     reservationExpiresAt: activeReservation?.expires_at ?? null,
     saleDate: sale?.sale_date ?? null,
     salespersonName: sale?.salesperson_name ?? activeReservation?.responsible_name ?? null,
@@ -510,7 +519,7 @@ async function fetchCommissionCommercialMap(
       lot_prices(is_active, pricing_mode, base_price, price_per_sqm, asking_price, minimum_price),
       lot_reservations(status, company_name, expires_at, responsible_name),
       lot_negotiations(status, company_name, contact_name),
-      lot_sales(id, lot_id, status, negotiated_value, buyer_name, sale_date, salesperson_name, contract_number),
+      lot_sales(id, lot_id, status, negotiated_value, buyer_name, buyer_trade_name, sale_date, salesperson_name, contract_number),
       lot_contracts(is_active, contract_number),
       ${OFFICIAL_PRICING_EMBED}
     `).limit(1, { referencedTable: 'financial_entity.pricing' }).eq('project_id', project.id).is('archived_at', null).in('entity_id', ids)),
@@ -1141,6 +1150,7 @@ export async function startLotNegotiation(params: {
 export async function registerLotSale(params: {
   lotId: string;
   buyerName: string;
+  buyerTradeName?: string | null;
   documentNumber?: string;
   negotiatedValue: number;
   saleDate: string;
@@ -1159,6 +1169,7 @@ export async function registerLotSale(params: {
     p_contract_number: params.contractNumber || null,
     p_payment_status: params.paymentStatus || 'PENDING',
     p_notes: params.notes || null,
+    p_buyer_trade_name: params.buyerTradeName?.trim() || null,
   });
   if (error) throw error;
   return data;
@@ -1261,7 +1272,7 @@ export async function fetchLotSaleHistory(lotId: string): Promise<LotSaleHistory
   if (!item) return null;
 
   const [{ data: order, error: orderError }, { data: installments, error: installmentsError }] = await Promise.all([
-    db.from('lot_sale_orders').select('id,buyer_name,email,stage,payment_type,payment_method,created_at,spaces_subtotal,fees_total,fee_admin,fee_ppci,fee_cleaning_license,negotiated_total').eq('id', item.order_id).maybeSingle(),
+    db.from('lot_sale_orders').select('id,buyer_name,buyer_trade_name,email,stage,payment_type,payment_method,created_at,spaces_subtotal,fees_total,fee_admin,fee_ppci,fee_cleaning_license,negotiated_total').eq('id', item.order_id).maybeSingle(),
     db.from('lot_sale_installments').select('installment_number,due_date,amount,payment_status').eq('order_id', item.order_id).order('installment_number'),
   ]);
   if (orderError) throw orderError;
@@ -1270,7 +1281,9 @@ export async function fetchLotSaleHistory(lotId: string): Promise<LotSaleHistory
   return {
     orderId: order.id,
     publicIdentifierSnapshot: item.public_identifier,
-    buyerName: order.buyer_name,
+    buyerName: buyerDisplayName(order.buyer_trade_name, order.buyer_name) ?? order.buyer_name,
+    buyerLegalName: order.buyer_name,
+    buyerTradeName: order.buyer_trade_name?.trim() || null,
     stage: order.stage,
     paymentType: order.payment_type,
     paymentMethod: order.payment_method,

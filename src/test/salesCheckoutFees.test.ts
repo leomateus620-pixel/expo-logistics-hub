@@ -51,7 +51,7 @@ describe('checkout: parcelas, taxas e expositores', () => {
   it('máscara monetária em centavos e busca por documento com/sem máscara', () => {
     expect(parseMoneyInputToCents('1.234,56')).toBe(123456);
     expect(parseMoneyInputToCents('45')).toBe(45);
-    const item = { id: '1', name: 'BOTOLI', documentNumber: '048.675.580-01', phone: '(55) 99969-9631', email: 'a@b.com' };
+    const item = { id: '1', name: 'BOTOLI', tradeName: null, documentNumber: '048.675.580-01', phone: '(55) 99969-9631', email: 'a@b.com' };
     expect(matchesExhibitor(item, '04867558001')).toBe(true);
     expect(matchesExhibitor(item, '048.675')).toBe(true);
     expect(matchesExhibitor(item, 'botoli')).toBe(true);

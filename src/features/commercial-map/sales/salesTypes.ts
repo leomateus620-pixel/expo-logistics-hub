@@ -48,6 +48,8 @@ export interface SalesSelectionEntry {
 
 export interface SalesBuyerDraft {
   buyerName: string;
+  /** Nome fantasia opcional; nunca substitui a razão social. */
+  tradeName: string;
   documentNumber: string;
   phone: string;
   email: string;

@@ -32,6 +32,7 @@ import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
 import { LotPricing2028Panel } from './LotPricing2028Panel';
 import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
+import { SaleExhibitorIdentity } from '../../sales/components/SaleExhibitorEditDialog';
 import { SaleOpenSection } from '../../sales/components/SaleOpenSection';
 import { resolveLotIdentity } from '../../utils/lotIdentity';
 import type { LotPricingStage } from '../../utils/lotPricing2028';
@@ -179,6 +180,7 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
           <section className="commercial-map-sale-confirmed" aria-label="Venda confirmada">
             <header><CheckCircle2 aria-hidden="true" /><span>Venda confirmada</span></header>
             <strong className="commercial-map-sale-confirmed__buyer">{saleHistory.data?.buyerName || lot.currentBuyer}</strong>
+              <SaleExhibitorIdentity lotId={lot.id} canManageSales={permissions.canManageSales && !lot.id.startsWith('reference:')} />
             <p>
               {saleHistory.data?.createdAt
                 ? `Vendido em ${saleDateTime.format(new Date(saleHistory.data.createdAt))}`
