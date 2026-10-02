@@ -70,7 +70,7 @@ describe('integrated Commercial Dashboard presentation', () => {
     fireEvent.click(within(stages).getByRole('button', { name: '2ª Etapa' }));
     expect(cadastralCard('Valor total comercial dos lotes').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(4000, true));
     expect(cadastralCard('Valor das vendas em andamento').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(1250, true));
-    expect(cadastralCard('Valor das vendas confirmadas').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(750, true));
+    expect(cadastralCard('Valor das vendas confirmadas').querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(750));
     expect(within(screen.getByRole('region', { name: 'Mini mapa comercial: Exporural' })).getByRole('combobox')).toHaveValue('offer');
     const updated = { ...source, lots: source.lots.map((lot) => lot.id === 'sale' ? withDashboardValue(lot, 1450, 2000) : lot) };
     rerender(<CommercialDashboard {...props} data={updated} dataUpdatedAt={2000} />);
@@ -226,7 +226,7 @@ describe('integrated Commercial Dashboard presentation', () => {
     const saleOpen = cadastralCard('Valor das vendas em andamento');
     const confirmed = cadastralCard('Valor das vendas confirmadas');
     const total = cadastralCard('Valor total comercial dos lotes');
-    expect(confirmed.querySelector('strong')).toHaveTextContent(formatDashboardCurrency(500, true));
+    expect(confirmed.querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(500));
     expect(confirmed).toHaveTextContent('1 de 1 com valor');
     expect(saleOpen.querySelector('strong')).toHaveTextContent(formatDashboardCurrency(1050, true));
     expect(saleOpen.querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(1050));
