@@ -1,4 +1,4 @@
-import { normalizeSearchText } from './buyerSearchNormalize';
+import { normalizeSearchTerm as normalizeSearchText } from '@/lib/org-units';
 
 /** Nome de exibição: nome fantasia (sem espaços nas extremidades) ou, na falta, nome / razão social. */
 export function buyerDisplayName(tradeName: string | null | undefined, legalName: string | null | undefined): string | null {
