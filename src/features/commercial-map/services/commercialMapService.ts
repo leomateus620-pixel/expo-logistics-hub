@@ -86,7 +86,7 @@ export const COMMERCIAL_LOT_SELECT = `*,
   lot_reservations(status,company_name,expires_at,responsible_name),
   lot_negotiations(status,company_name),
   lot_sales(id,lot_id,status,negotiated_value,buyer_name,buyer_trade_name,sale_date,salesperson_name,contract_number),
-  lot_contracts(is_active,contract_number),
+  lot_contracts!lot_contracts_lot_id_fkey(is_active,contract_number),
   ${OFFICIAL_PRICING_EMBED}`;
 
 interface ActivityRow {
@@ -520,7 +520,7 @@ async function fetchCommissionCommercialMap(
       lot_reservations(status, company_name, expires_at, responsible_name),
       lot_negotiations(status, company_name, contact_name),
       lot_sales(id, lot_id, status, negotiated_value, buyer_name, buyer_trade_name, sale_date, salesperson_name, contract_number),
-      lot_contracts(is_active, contract_number),
+      lot_contracts!lot_contracts_lot_id_fkey(is_active, contract_number),
       ${OFFICIAL_PRICING_EMBED}
     `).limit(1, { referencedTable: 'financial_entity.pricing' }).eq('project_id', project.id).is('archived_at', null).in('entity_id', ids)),
     mapRequest(db.rpc('commission_map_park_context', { p_segment_id: segment.id }), context),

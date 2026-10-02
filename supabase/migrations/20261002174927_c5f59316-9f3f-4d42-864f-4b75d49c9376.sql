@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.lot_contract_lots_validate_lot() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.commercial_lots_block_delete_if_contract_linked() FROM PUBLIC, anon, authenticated;
