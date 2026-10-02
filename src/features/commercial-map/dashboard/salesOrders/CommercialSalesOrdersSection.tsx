@@ -1,6 +1,6 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronDown, FileText, Loader2, MapPinned, Paperclip, Search, ShieldAlert, X } from 'lucide-react';
+import { ChevronDown, FileText, Loader2, MapPinned, Paperclip, Search, ShieldAlert } from 'lucide-react';
 import type { CommercialMapData } from '../../types';
 import { paymentMethodLabel, SALES_PAYMENT_METHODS, SALES_PAYMENT_METHOD_LABELS } from '../../sales/salesTypes';
 import { getContractSignedUrl } from '../../services/commercialMapService';
@@ -332,4 +332,3 @@ function ContractRow({ contract, labelOf, canReplace, onReplace }: {
   </li>;
 }
 
-export { X };
