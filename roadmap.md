@@ -62,6 +62,12 @@
 - [ ] Conferir visualmente os rótulos em desktop/celular com sessão autorizada — prévia automatizada permaneceu na abertura, sem canvas.
 - Não publicar (pedido do usuário)
 
+## Progresso comercial por valor na Dashboard
+- [x] Somar valores confirmados e em andamento sobre o total conhecido, com segmentos azul/amarelo, cobertura parcial e atualização junto aos indicadores.
+- [x] Posicionar Sojinha animado sobre a extremidade da barra, preservar legendas e limitar a apresentação a 0–100%; validar os cálculos e a integração em testes focados.
+- [ ] Conferir a aparência em telas largas e estreitas após acesso à Dashboard autenticada; a sessão automatizada da prévia não está disponível nesta execução.
+- Não publicar (pedido permanente do usuário).
+
 ## Sidebar comercial por estado do lote
 - [x] Destacar venda confirmada com comprador, data/hora, etapa e responsável
 - [x] Diferenciar as composições de lotes vendidos e disponíveis
