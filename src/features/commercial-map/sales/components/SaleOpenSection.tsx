@@ -18,6 +18,7 @@ import {
   confirmSaleOrderItems,
   fetchLotOpenSaleOrder,
 } from '../salesService';
+import { SaleExhibitorIdentity } from './SaleExhibitorEditDialog';
 
 const dateTime = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo' });
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -89,6 +90,7 @@ export function SaleOpenSection({ lotId, canManageSales }: { lotId: string; canM
     <section className="commercial-map-sale-open" aria-label="Venda em aberto">
       <header><FileSignature aria-hidden="true" /><span>Venda em aberto</span></header>
       <strong className="commercial-map-sale-open__buyer">{order.buyerName}</strong>
+      <SaleExhibitorIdentity lotId={lotId} canManageSales={canManageSales} />
       <p>
         {order.createdAt ? `Registrada em ${dateTime.format(new Date(order.createdAt))}` : 'Data de registro não informada'}
         {' · aguardando confirmação da assinatura do contrato.'}

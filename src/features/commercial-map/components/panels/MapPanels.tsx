@@ -59,6 +59,7 @@ import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { getHistoryIdForEntity } from '../../history/bindings';
 import { HistoryExperience } from '../../history/HistoryExperience';
 import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
+import { SaleExhibitorIdentity } from '../../sales/components/SaleExhibitorEditDialog';
 import { SaleOpenSection } from '../../sales/components/SaleOpenSection';
 
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
@@ -430,6 +431,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
             <section className="commercial-map-sale-confirmed" aria-label="Venda confirmada">
               <header><CheckCircle2 aria-hidden="true" /><span>Venda confirmada</span></header>
               <strong className="commercial-map-sale-confirmed__buyer">{saleHistory.data?.buyerName || lot.currentBuyer}</strong>
+              <SaleExhibitorIdentity lotId={lot.id} canManageSales={permissions.canManageSales && !lot.id.startsWith('reference:')} />
               <p>
                 {saleHistory.data?.createdAt
                   ? `Vendido em ${dateTime.format(new Date(saleHistory.data.createdAt))}`
