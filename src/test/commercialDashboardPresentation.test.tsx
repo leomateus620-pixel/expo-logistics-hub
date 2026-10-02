@@ -273,4 +273,17 @@ describe('integrated Commercial Dashboard presentation', () => {
     expect(kpi('Lotes com venda em andamento').querySelector('strong')).toHaveTextContent(/^1$/);
     expect(source.lots[0].sales?.[0].negotiatedValue).toBe(0);
   });
+
+  it('does not replace missing confirmed sale values with the official price', () => {
+    const soldKnown = record('sold-known', 'SOLD', 12);
+    const soldUnknown = record('sold-unknown', 'SOLD', 14);
+    const source = inventory([soldKnown, soldUnknown]);
+    source.lots = [withDashboardValue(soldKnown.lot, 800), withDashboardValue(soldUnknown.lot, null)];
+    render(<CommercialDashboard {...props} data={source} />);
+    const confirmed = cadastralCard('Valor das vendas confirmadas');
+    expect(confirmed.querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(800));
+    expect(confirmed).toHaveTextContent('Subtotal · 1 de 2 com valor');
+    expect(cadastralCard('Valor total comercial dos lotes')).toHaveTextContent('Subtotal · 1 de 2 com valor');
+    expect(cadastralCard('Valor das vendas em andamento').querySelector('strong')).toHaveTextContent(/^—$/);
+  });
 });
