@@ -1,0 +1,29 @@
+name: Commission workspace
+
+on:
+  pull_request:
+    paths:
+      - 'src/features/commission-agenda/**'
+      - 'src/components/commissions/CommissionLayout.tsx'
+      - 'src/styles/commission-workspace-*.css'
+      - 'src/test/commissionWorkspaceData.test.ts'
+      - '.github/workflows/commission-workspace.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  workspace:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: oven-sh/setup-bun@v2
+        with: {bun-version: '1.3.0'}
+      - run: bun install --frozen-lockfile
+      - run: npx vitest run --maxWorkers=2 src/features/commission-agenda/__tests__ src/test/commissionWorkspaceData.test.ts
+      - run: npx eslint src/features/commission-agenda/components src/components/commissions/CommissionLayout.tsx
+      - run: npm run typecheck

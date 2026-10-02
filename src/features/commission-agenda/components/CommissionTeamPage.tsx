@@ -55,8 +55,7 @@ export function CommissionTeamPage({ unit, state = 'ready', onRetry, className }
     <div className={cn('ua-page', className)}>
       <header className="ua-header">
         <div className="min-w-0">
-          <p className="ua-header__eyebrow ws-label">Equipe {unitLabel}</p>
-          <h2 className="ua-header__title ws-title">Pessoas</h2>
+          <h2 className="ua-header__title ws-title">Equipe</h2>
           <p className="ua-header__meta ws-meta-secondary">
             {total === 0 ? 'Nenhum integrante vinculado' : `${total} ${total === 1 ? 'pessoa vinculada' : 'pessoas vinculadas'}`}
           </p>
@@ -97,12 +96,7 @@ export function CommissionTeamPage({ unit, state = 'ready', onRetry, className }
               <span className="ws-meta-secondary">{members.length}</span>
             </header>
             {members.length === 0 ? (
-              <AgendaEmptyState
-                compact
-                icon={Users}
-                title="Nenhum integrante além dos responsáveis"
-                detail={`Novos integrantes ${unitLabel} aparecerão nesta lista.`}
-              />
+              <p className="cw-team-empty ws-meta-secondary">Nenhum integrante além dos responsáveis.</p>
             ) : (
               <ul className="ua-team">
                 {members.map((person) => <TeamMemberCard key={person.id} person={person} />)}

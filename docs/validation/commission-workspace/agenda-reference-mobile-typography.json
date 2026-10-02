@@ -1,0 +1,41 @@
+{
+  "title": {
+    "text": "REUNIÃO CENTRAL DE INTEGRAÇÃO DAS COMISSÕES",
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "fontSize": "14.4px",
+    "fontWeight": "900",
+    "lineHeight": "18px",
+    "letterSpacing": "normal",
+    "color": "oklch(0.2107 0.062 255.67)"
+  },
+  "date": {
+    "text": "15",
+    "fontFamily": "\"JetBrains Mono\", monospace",
+    "fontSize": "18.4px",
+    "fontWeight": "700",
+    "lineHeight": "18.4px",
+    "letterSpacing": "normal",
+    "color": "oklch(0.2107 0.062 255.67)"
+  },
+  "month": {
+    "text": "set",
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "fontSize": "9.6px",
+    "fontWeight": "900",
+    "lineHeight": "14.4px",
+    "letterSpacing": "0.768px",
+    "color": "oklch(0.3152 0.1686 268.03)"
+  },
+  "time": null,
+  "meta": null,
+  "location": null,
+  "state": {
+    "text": "PlanejadoMédia",
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "fontSize": "16px",
+    "fontWeight": "400",
+    "lineHeight": "24px",
+    "letterSpacing": "normal",
+    "color": "oklch(0.2107 0.062 255.67)"
+  }
+}

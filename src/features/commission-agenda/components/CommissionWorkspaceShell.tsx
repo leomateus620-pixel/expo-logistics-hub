@@ -1,10 +1,10 @@
 import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, type LucideIcon } from 'lucide-react';
+import { type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CommissionUnitViewModel, CommissionWorkspaceNavItem, CommissionWorkspaceSection } from '../types';
-import { unitTypeLabel } from '../lib/workspace-navigation';
-import { AvatarStack, PersonAvatar } from './primitives';
+import { WORKSPACE_SECTION_PATHS, unitTypeLabel } from '../lib/workspace-navigation';
+import { PersonAvatar } from './primitives';
 
 const UNIT_STATUS_LABELS: Record<CommissionUnitViewModel['status'], string> = {
   active: 'Ativo',
@@ -32,23 +32,23 @@ export function CommissionHeader({ unit, action, children, className }: Commissi
   const Icon = unit.icon;
   const ActionIcon = action?.icon;
   const leads = unit.leads.length > 0 ? unit.leads : unit.principal ? [unit.principal] : [];
-  const showTeam = unit.members.length > 0;
 
   return (
     <header
-      className={cn('cw-header', className)}
+      className={cn('cw-header', leads.length === 0 && action && 'cw-header--without-leads', className)}
       style={{ '--cw-accent': unit.accentColor } as CSSProperties}
       aria-label={`${unitTypeLabel(unit.type)} ${unit.name}`}
     >
       <div className="cw-header__identity">
         <span className="cw-header__icon" aria-hidden="true"><Icon /></span>
         <div className="min-w-0">
-          <div className="cw-header__eyebrow">
-            <span className="ws-label">{unitTypeLabel(unit.type)}</span>
-            <span className="cw-unit-status" data-status={unit.status}>{UNIT_STATUS_LABELS[unit.status]}</span>
+          <div className="cw-header__title-row">
+            <h1 className="cw-header__name ws-display">{unit.name}</h1>
+            <div className="cw-header__eyebrow">
+              <span className="ws-label">{unitTypeLabel(unit.type)}</span>
+              <span className="cw-unit-status" data-status={unit.status}>{UNIT_STATUS_LABELS[unit.status]}</span>
+            </div>
           </div>
-          <h1 className="cw-header__name ws-display">{unit.name}</h1>
-          {unit.description && <p className="cw-header__description ws-meta-secondary" style={{ color: 'var(--text-on-inverse-muted)' }}>{unit.description}</p>}
         </div>
         {action && ActionIcon && (
           <div className="cw-header__actions">
@@ -60,26 +60,28 @@ export function CommissionHeader({ unit, action, children, className }: Commissi
         )}
       </div>
 
-      {(leads.length > 0 || showTeam) && (
+      {(leads.length > 0 || unit.description) && (
         <div className="cw-header__people">
-          {leads.slice(0, 2).map((person) => (
+          {leads.slice(0, 1).map((person) => (
             <span key={person.id} className="cw-person">
-              <PersonAvatar person={person} size="md" primary />
+              <PersonAvatar person={person} size="xs" tone="light" />
               <span className="min-w-0">
                 <span className="cw-person__name ws-meta">{person.name}</span>
                 <span className="cw-person__role ws-caption" style={{ fontWeight: 500 }}>{person.role ?? 'Principal'}</span>
               </span>
             </span>
           ))}
-          {leads.length > 2 && (
-            <span className="cw-person__role ws-caption" style={{ fontWeight: 500 }}>+{leads.length - 2} principais</span>
+          {leads.length > 1 && (
+            <Link to={`${unit.basePath}/${WORKSPACE_SECTION_PATHS.team}`} className="cw-header__more-leads ws-focus" aria-label={`Ver os ${leads.length} responsáveis na equipe`}>+{leads.length - 1}</Link>
           )}
-          {showTeam && (
-            <span className="cw-header__team" aria-label={`Equipe com ${unit.members.length} integrantes`}>
-              <Users className="h-4 w-4" aria-hidden="true" />
-              <span className="ws-caption" style={{ fontWeight: 600 }}>Equipe · {unit.members.length}</span>
-              <AvatarStack people={unit.members} max={4} size="sm" />
-            </span>
+          {unit.description && (
+            <details className="cw-header__about">
+              <summary className="ws-focus" aria-label={`Sobre ${unit.name}`}>
+                <span className="cw-header__about-full">Sobre a frente</span>
+                <span className="cw-header__about-short">Sobre</span>
+              </summary>
+              <p>{unit.description}</p>
+            </details>
           )}
         </div>
       )}
@@ -150,12 +152,10 @@ export interface CommissionWorkspaceShellProps {
   className?: string;
 }
 
-export function CommissionWorkspaceShell({ unit, navigation, section, action, children, className }: CommissionWorkspaceShellProps) {
+export function CommissionWorkspaceShell({ unit, section, action, children, className }: CommissionWorkspaceShellProps) {
   return (
     <div className={cn('unit-workspace', className)} data-unit={unit.id} data-section={section}>
-      <CommissionHeader unit={unit} action={action}>
-        <CommissionNavigation items={navigation} active={section} />
-      </CommissionHeader>
+      <CommissionHeader unit={unit} action={action} />
       <div className="unit-workspace__content">{children}</div>
     </div>
   );

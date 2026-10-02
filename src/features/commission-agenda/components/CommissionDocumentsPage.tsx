@@ -72,11 +72,10 @@ export function CommissionDocumentsPage({ unit, documents, state = 'ready', onOp
     <div className={cn('ua-page', className)}>
       <header className="ua-header">
         <div className="min-w-0">
-          <p className="ua-header__eyebrow ws-label">Documentos {unitLabel}</p>
-          <h2 className="ua-header__title ws-title">Biblioteca</h2>
-          <p className="ua-header__meta ws-meta-secondary">
-            {documents.length === 0 ? 'Nenhum documento publicado' : `${documents.length} ${documents.length === 1 ? 'documento publicado' : 'documentos publicados'}`}
-          </p>
+          <h2 className="ua-header__title ws-title">Documentos</h2>
+          {documents.length > 0 && <p className="ua-header__meta ws-meta-secondary">
+            {`${documents.length} ${documents.length === 1 ? 'documento publicado' : 'documentos publicados'}`}
+          </p>}
         </div>
         {onAddDocument && documents.length > 0 && (
           <WorkspaceButton variant="primary" icon={Plus} onClick={onAddDocument}>Adicionar documento</WorkspaceButton>

@@ -67,8 +67,6 @@ export function CommissionOverviewPage({
 
   return (
     <div className={cn('ua-page', className)}>
-      {loading ? <AgendaKpiSkeleton /> : <AgendaDashboard dashboard={dashboard} onOpenNextEvent={() => nextEvents[0] && onOpenEvent?.(nextEvents[0])} />}
-
       <div className="ua-overview">
         <section className="ws-panel ua-section ua-overview__full" aria-labelledby="overview-next-events">
           <header className="ua-section__header">
@@ -125,6 +123,10 @@ export function CommissionOverviewPage({
             </p>
           )}
         </section>
+
+        <div className="ua-overview__full">
+          {loading ? <AgendaKpiSkeleton /> : <AgendaDashboard dashboard={dashboard} showNextEvent={false} />}
+        </div>
 
         <section className="ws-panel ua-section" aria-labelledby="overview-documents">
           <header className="ua-section__header">
@@ -192,20 +194,11 @@ export function CommissionOverviewPage({
           )}
         </section>
 
-        <section className="ws-panel ua-section ua-overview__full" aria-labelledby="overview-tasks">
-          <header className="ua-section__header">
-            <h2 id="overview-tasks" className="ua-section__title ws-section-title">
-              <ListChecks aria-hidden="true" />
-              <span className="truncate">Tarefas {unitLabel}</span>
-            </h2>
-          </header>
-          <AgendaEmptyState
-            compact
-            icon={ListChecks}
-            title="Área preparada"
-            detail="O acompanhamento de tarefas específicas desta frente será habilitado após a validação do escopo operacional."
-          />
-        </section>
+        <div className="ua-overview__full cw-preparation-note">
+          <ListChecks aria-hidden="true" />
+          <p>O acompanhamento de tarefas aguarda a validação do escopo operacional.</p>
+          <Link to={`${unit.basePath}/${WORKSPACE_SECTION_PATHS.tasks}`} className="ua-section__link ws-focus">Ver tarefas</Link>
+        </div>
       </div>
     </div>
   );

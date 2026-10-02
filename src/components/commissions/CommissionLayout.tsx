@@ -1,5 +1,6 @@
 import { type CSSProperties, type ReactNode, useState } from 'react';
 import CommissionSidebar from './CommissionSidebar';
+import CommissionWorkspaceSidebar from '@/features/commission-agenda/components/CommissionWorkspaceSidebar';
 import OfflineBanner from '@/components/OfflineBanner';
 import PageTransition from '@/components/PageTransition';
 import type { CommissionMenuItem, CommissionModule } from '@/modules/commissions/commissionRegistry';
@@ -22,6 +23,7 @@ export default function CommissionLayout({ module, children, variant = 'standard
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMap = variant === 'map';
   const isWorkspace = variant === 'workspace';
+  const Sidebar = isWorkspace ? CommissionWorkspaceSidebar : CommissionSidebar;
 
   return (
     <div
@@ -38,7 +40,7 @@ export default function CommissionLayout({ module, children, variant = 'standard
         Pular para conteúdo
       </a>
       <OfflineBanner />
-      <CommissionSidebar
+      <Sidebar
         module={module}
         menuItems={menuItems}
         mobileOpen={mobileOpen}
@@ -51,7 +53,7 @@ export default function CommissionLayout({ module, children, variant = 'standard
           isMap
             ? 'commission-layout__map-main h-[100dvh] min-h-0 overflow-hidden pt-16 md:ml-[288px] md:pt-0'
             : isWorkspace
-              ? 'min-h-screen md:ml-[288px]'
+              ? 'commission-workspace-main min-h-screen'
               : 'min-h-screen px-4 pb-8 pt-20 md:ml-[288px] md:p-8',
         )}
       >

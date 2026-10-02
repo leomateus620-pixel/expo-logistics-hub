@@ -1,0 +1,654 @@
+{
+  "phase": "after",
+  "origin": "http://127.0.0.1:5191",
+  "fixtureBoundary": "Existing DEV fixtures only; no authenticated backend or production persistence",
+  "captures": [
+    {
+      "file": "desktop-overview.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 102,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "Visão geral"
+      ]
+    },
+    {
+      "file": "desktop-agenda.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 102,
+      "firstEventTop": 381.578125,
+      "dialog": null,
+      "activeLinks": [
+        "Agenda"
+      ]
+    },
+    {
+      "file": "desktop-documents.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 102,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "Documentos"
+      ]
+    },
+    {
+      "file": "desktop-team.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 102,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "Equipe"
+      ]
+    },
+    {
+      "file": "desktop-tasks.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 102,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "Tarefas"
+      ]
+    },
+    {
+      "file": "desktop-long-advisory.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 102,
+      "firstEventTop": 381.578125,
+      "dialog": null,
+      "activeLinks": [
+        "Agenda"
+      ]
+    },
+    {
+      "file": "desktop-create.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 102,
+      "firstEventTop": 381.578125,
+      "dialog": {
+        "width": 840,
+        "height": 768,
+        "x": 511,
+        "y": 0
+      },
+      "activeLinks": [
+        "Agenda"
+      ]
+    },
+    {
+      "file": "desktop-create-people.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 102,
+      "firstEventTop": 381.578125,
+      "dialog": {
+        "width": 840,
+        "height": 768,
+        "x": 511,
+        "y": 0
+      },
+      "activeLinks": [
+        "Agenda"
+      ]
+    },
+    {
+      "file": "desktop-many-responsibles-detail.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 102,
+      "firstEventTop": 381.578125,
+      "dialog": {
+        "width": 560,
+        "height": 768,
+        "x": 791,
+        "y": 0
+      },
+      "activeLinks": [
+        "Agenda"
+      ]
+    },
+    {
+      "file": "desktop-many-responsibles-edit.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 102,
+      "firstEventTop": 381.578125,
+      "dialog": {
+        "width": 840,
+        "height": 768,
+        "x": 511,
+        "y": 0
+      },
+      "activeLinks": [
+        "Agenda"
+      ]
+    },
+    {
+      "file": "desktop-documents-empty.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 102,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "Documentos"
+      ]
+    },
+    {
+      "file": "mobile-overview.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 130.390625,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": []
+    },
+    {
+      "file": "mobile-agenda.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 130.390625,
+      "firstEventTop": 491.625,
+      "dialog": null,
+      "activeLinks": []
+    },
+    {
+      "file": "mobile-documents.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 130.390625,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": []
+    },
+    {
+      "file": "mobile-team.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 130.390625,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": []
+    },
+    {
+      "file": "mobile-tasks.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 130.390625,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": []
+    },
+    {
+      "file": "mobile-long-advisory.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 155.390625,
+      "firstEventTop": 516.625,
+      "dialog": null,
+      "activeLinks": []
+    },
+    {
+      "file": "mobile-create.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 130.390625,
+      "firstEventTop": 491.625,
+      "dialog": {
+        "width": 375,
+        "height": 844,
+        "x": 0,
+        "y": 0
+      },
+      "activeLinks": []
+    },
+    {
+      "file": "mobile-create-people.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 130.390625,
+      "firstEventTop": 491.625,
+      "dialog": {
+        "width": 375,
+        "height": 844,
+        "x": 0,
+        "y": 0
+      },
+      "activeLinks": []
+    },
+    {
+      "file": "mobile-many-responsibles-detail.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 130.390625,
+      "firstEventTop": 491.625,
+      "dialog": {
+        "width": 375,
+        "height": 844,
+        "x": 0,
+        "y": 0
+      },
+      "activeLinks": []
+    },
+    {
+      "file": "mobile-many-responsibles-edit.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 130.390625,
+      "firstEventTop": 491.625,
+      "dialog": {
+        "width": 375,
+        "height": 844,
+        "x": 0,
+        "y": 0
+      },
+      "activeLinks": []
+    },
+    {
+      "file": "mobile-documents-empty.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 130.390625,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": []
+    },
+    {
+      "file": "desktop-calendar.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 102,
+      "firstEventTop": null,
+      "dialog": null,
+      "activeLinks": [
+        "Agenda"
+      ]
+    },
+    {
+      "file": "desktop-filters.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 102,
+      "firstEventTop": 381.578125,
+      "dialog": {
+        "width": 560,
+        "height": 768,
+        "x": 791,
+        "y": 0
+      },
+      "activeLinks": [
+        "Agenda"
+      ]
+    },
+    {
+      "file": "desktop-agenda-summary.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 102,
+      "firstEventTop": 477.578125,
+      "dialog": null,
+      "activeLinks": [
+        "Agenda"
+      ]
+    },
+    {
+      "file": "mobile-navigation.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 155.390625,
+      "firstEventTop": 516.625,
+      "dialog": {
+        "width": 320,
+        "height": 844,
+        "x": 0,
+        "y": 0
+      },
+      "activeLinks": [
+        "Agenda"
+      ]
+    },
+    {
+      "file": "320-long-advisory.png",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "bodyWidth": 320,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 155.390625,
+      "firstEventTop": 558.328125,
+      "dialog": null,
+      "activeLinks": []
+    },
+    {
+      "file": "390-long-advisory.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "fontsStatus": "loaded",
+      "loadedFontFamilies": [
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "horizontalOverflow": false,
+      "headerHeight": 155.390625,
+      "firstEventTop": 516.625,
+      "dialog": null,
+      "activeLinks": []
+    }
+  ],
+  "checks": [
+    {
+      "name": "Timeline is initial Agenda view",
+      "passed": true
+    },
+    {
+      "name": "Search filters actual fixture events",
+      "passed": true,
+      "detail": {
+        "before": 17,
+        "after": 2
+      }
+    },
+    {
+      "name": "Calendar remains available",
+      "passed": true
+    },
+    {
+      "name": "Filters close with Escape",
+      "passed": true
+    },
+    {
+      "name": "Native status selector preserves upcoming filter",
+      "passed": true
+    },
+    {
+      "name": "Year selector preserves2027 event filtering",
+      "passed": true
+    },
+    {
+      "name": "Month selector preserves February event filtering",
+      "passed": true
+    },
+    {
+      "name": "Changing year resets period as before",
+      "passed": true
+    },
+    {
+      "name": "Agenda metrics start collapsed",
+      "passed": true
+    },
+    {
+      "name": "Agenda metrics remain accessible on demand",
+      "passed": true
+    },
+    {
+      "name": "Mobile navigation is expanded",
+      "passed": true
+    },
+    {
+      "name": "Mobile navigation traps keyboard focus both ways",
+      "passed": true
+    },
+    {
+      "name": "Mobile navigation closes and restores focus",
+      "passed": true
+    },
+    {
+      "name": "Mobile navigation preserves destination and closes",
+      "passed": true
+    },
+    {
+      "name": "No page horizontal overflow at 320px",
+      "passed": true
+    },
+    {
+      "name": "No page horizontal overflow at 390px",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

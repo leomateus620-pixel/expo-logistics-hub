@@ -5,6 +5,9 @@
  * helpers, adapters that reshape data the app already loads, and components.
  */
 import '@/styles/commission-agenda.css';
+import '@/styles/commission-workspace-refinement.css';
+import '@/styles/commission-workspace-agenda.css';
+import '@/styles/commission-workspace-forms.css';
 
 export * from './types';
 export * from './lib/agenda-presentation';

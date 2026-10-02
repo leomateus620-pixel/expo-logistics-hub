@@ -1,0 +1,245 @@
+{
+  "checks": [
+    {
+      "name": "People +N reveals all six fixture responsible names",
+      "passed": true
+    },
+    {
+      "name": "People +N Escape returns focus to trigger",
+      "passed": true
+    },
+    {
+      "name": "Fronts +N reveals all four existing unit names",
+      "passed": true
+    },
+    {
+      "name": "Fronts +N Escape returns focus to trigger",
+      "passed": true
+    },
+    {
+      "name": "Editing starts with canonical principal first",
+      "passed": true,
+      "detail": [
+        "Eduardo Santos",
+        "Roberto Steffen",
+        "Zélia Savoldi",
+        "Raul Dário Nunez",
+        "Bruna Pacheco de Quadros",
+        "Estela Zamberlam Schwerz"
+      ]
+    },
+    {
+      "name": "Search retains focus throughout typing",
+      "passed": true
+    },
+    {
+      "name": "Opening selector retains edited title",
+      "passed": true
+    },
+    {
+      "name": "Keyboard reaches matching choice",
+      "passed": true
+    },
+    {
+      "name": "Selector Escape restores trigger without closing event",
+      "passed": true
+    },
+    {
+      "name": "Edit submits unchanged canonical event ID",
+      "passed": true,
+      "detail": "ev-06"
+    },
+    {
+      "name": "Edit preserves people ID order and principal",
+      "passed": true,
+      "detail": [
+        "p-eduardo",
+        "p-zelia",
+        "p-raul",
+        "p-bruna",
+        "p-estela",
+        "p-marina"
+      ]
+    },
+    {
+      "name": "Edit preserves existing ordered unit IDs",
+      "passed": true,
+      "detail": [
+        "central",
+        "logistica-hotelaria-e-turismo",
+        "infraestrutura-e-seguranca-do-trabalho",
+        "assessoria-de-marketing"
+      ]
+    },
+    {
+      "name": "Edit retains original date and times",
+      "passed": true
+    },
+    {
+      "name": "Many selections preserve chosen principal without alphabetic reorder",
+      "passed": true,
+      "detail": [
+        "Raul Dário Nunez",
+        "Bruna Pacheco de Quadros",
+        "Eduardo Santos",
+        "Roberto Steffen",
+        "Zélia Savoldi",
+        "Deise Anelise Froelich",
+        "Francine Maria Boijink",
+        "Felipe Carpenedo Gabriel",
+        "Estela Zamberlam Schwerz",
+        "José Mauro Barbieri",
+        "Sandra Lameira",
+        "Marina Ribeiro Wollmann Schneider",
+        "Pedro Henrique Lauxen",
+        "Ana Carolina Brum"
+      ]
+    },
+    {
+      "name": "Mobile form actions stay visible during long selections",
+      "passed": true,
+      "detail": {
+        "footer": {
+          "x": 0,
+          "y": 775,
+          "width": 375,
+          "height": 69
+        }
+      }
+    },
+    {
+      "name": "Create preserves initial principal ID and all14 people",
+      "passed": true,
+      "detail": [
+        "p-raul",
+        "p-bruna",
+        "p-eduardo",
+        "p-roberto",
+        "p-zelia",
+        "p-deise",
+        "p-francine",
+        "p-felipe",
+        "p-estela",
+        "p-jose",
+        "p-sandra",
+        "p-marina",
+        "p-pedro",
+        "p-ana"
+      ]
+    },
+    {
+      "name": "Create retains required workspace unit and participant",
+      "passed": true,
+      "detail": [
+        "acolhimento-e-bem-comum",
+        "assessoria-de-imprensa"
+      ]
+    },
+    {
+      "name": "Long-name form fits 320px and actions remain visible",
+      "passed": true,
+      "detail": {
+        "box": {
+          "x": 0,
+          "y": 0,
+          "width": 305,
+          "height": 844
+        },
+        "actions": {
+          "x": 0,
+          "y": 775,
+          "width": 305,
+          "height": 69
+        }
+      }
+    },
+    {
+      "name": "Title error adjacent and labelled at320px",
+      "passed": true
+    },
+    {
+      "name": "Cancel closes form at320px",
+      "passed": true
+    },
+    {
+      "name": "Long-name form fits 390px and actions remain visible",
+      "passed": true,
+      "detail": {
+        "box": {
+          "x": 0,
+          "y": 0,
+          "width": 375,
+          "height": 844
+        },
+        "actions": {
+          "x": 0,
+          "y": 775,
+          "width": 375,
+          "height": 69
+        }
+      }
+    },
+    {
+      "name": "Title error adjacent and labelled at390px",
+      "passed": true
+    },
+    {
+      "name": "Cancel closes form at390px",
+      "passed": true
+    },
+    {
+      "name": "Long-name form fits 1366px and actions remain visible",
+      "passed": true,
+      "detail": {
+        "box": {
+          "x": 511,
+          "y": 0,
+          "width": 840,
+          "height": 768
+        },
+        "actions": {
+          "x": 512,
+          "y": 703,
+          "width": 839,
+          "height": 65
+        }
+      }
+    },
+    {
+      "name": "Title error adjacent and labelled at1366px",
+      "passed": true
+    },
+    {
+      "name": "Cancel closes form at1366px",
+      "passed": true
+    },
+    {
+      "name": "Form actions fit shortened480px viewport (keyboard approximation)",
+      "passed": true,
+      "detail": {
+        "x": 0,
+        "y": 411,
+        "width": 375,
+        "height": 69
+      }
+    },
+    {
+      "name": "Create Cancelar returns focus to opener",
+      "passed": true
+    },
+    {
+      "name": "Create Fechar returns focus to opener",
+      "passed": true
+    },
+    {
+      "name": "Create Escape returns focus to opener",
+      "passed": true
+    },
+    {
+      "name": "Detail → edit → cancel returns focus to original event opener",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "fixtureBoundary": "Existing DEV fixture IDs, callback-only saves; no Supabase requests or writes"
+}

@@ -1,8 +1,8 @@
-import { useEffect, useRef, useId } from 'react';
+import { useEffect, useRef, useId, type ReactNode } from 'react';
 import { CalendarDays, ListTree, Search, SlidersHorizontal, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AgendaMonthFilter, AgendaStatusFilter, AgendaViewMode } from '../types';
-import { AGENDA_STATUS_FILTER_LABELS, MONTH_SHORT_LABELS } from '../lib/agenda-presentation';
+import { AGENDA_STATUS_FILTER_LABELS, MONTH_LONG_LABELS, MONTH_SHORT_LABELS } from '../lib/agenda-presentation';
 
 /* ─────────────────────────────── Busca ───────────────────────────────────── */
 
@@ -18,7 +18,7 @@ export function AgendaSearch({ value, onChange, placeholder = 'Buscar evento, pe
   return (
     <div className={cn('ua-search', className)}>
       <Search aria-hidden="true" />
-      <label htmlFor={id} className="sr-only">Buscar na agenda</label>
+      <label htmlFor={id} className="ua-search__label"><span className="ua-search__label-full">Buscar na agenda</span><span className="ua-search__label-short">Buscar</span></label>
       <input
         id={id}
         type="search"
@@ -94,13 +94,17 @@ export interface AgendaToolbarProps {
   onOpenFilters: () => void;
   view: AgendaViewMode;
   onViewChange: (value: AgendaViewMode) => void;
+  periodControls?: ReactNode;
+  statusControl?: ReactNode;
   className?: string;
 }
 
-export function AgendaToolbar({ search, onSearchChange, activeFilters, onOpenFilters, view, onViewChange, className }: AgendaToolbarProps) {
+export function AgendaToolbar({ search, onSearchChange, activeFilters, onOpenFilters, view, onViewChange, periodControls, statusControl, className }: AgendaToolbarProps) {
   return (
     <div className={cn('ua-toolbar', className)} role="search">
       <AgendaSearch value={search} onChange={onSearchChange} />
+      {periodControls && <div className="ua-toolbar__period">{periodControls}</div>}
+      {statusControl && <div className="ua-toolbar__status">{statusControl}</div>}
       <div className="ua-toolbar__controls">
         <AgendaFilterButton activeCount={activeFilters} onClick={onOpenFilters} className="flex-1 md:flex-none" />
         <AgendaViewToggle value={view} onChange={onViewChange} />
@@ -116,10 +120,22 @@ export interface AgendaYearSelectorProps {
   value: number;
   currentYear: number;
   onChange: (year: number) => void;
+  compact?: boolean;
   className?: string;
 }
 
-export function AgendaYearSelector({ years, value, currentYear, onChange, className }: AgendaYearSelectorProps) {
+export function AgendaYearSelector({ years, value, currentYear, onChange, compact = false, className }: AgendaYearSelectorProps) {
+  const selectId = useId();
+  if (compact) {
+    return (
+      <label htmlFor={selectId} className={cn('ua-period-field', className)}>
+        <span>Ano</span>
+        <select id={selectId} value={value} onChange={(event) => onChange(Number(event.target.value))}>
+          {years.map((year) => <option key={year} value={year}>{year}</option>)}
+        </select>
+      </label>
+    );
+  }
   return (
     <div className={cn('ua-years', className)} role="group" aria-label="Ano">
       {years.map((year) => (
@@ -147,11 +163,13 @@ export interface AgendaMonthSelectorProps {
   /** 1–12 month considered "current" for the selected year, if any. */
   currentMonth?: number | null;
   totalCount?: number;
+  compact?: boolean;
   className?: string;
 }
 
-export function AgendaMonthSelector({ value, onChange, counts = {}, currentMonth = null, totalCount, className }: AgendaMonthSelectorProps) {
+export function AgendaMonthSelector({ value, onChange, counts = {}, currentMonth = null, totalCount, compact = false, className }: AgendaMonthSelectorProps) {
   const railRef = useRef<HTMLDivElement>(null);
+  const selectId = useId();
 
   useEffect(() => {
     const rail = railRef.current;
@@ -163,6 +181,20 @@ export function AgendaMonthSelector({ value, onChange, counts = {}, currentMonth
       rail.scrollTo({ left: Math.max(0, left - 8), behavior: 'smooth' });
     }
   }, [value]);
+
+  if (compact) {
+    return (
+      <label htmlFor={selectId} className={cn('ua-period-field ua-period-field--month', className)}>
+        <span>Período</span>
+        <select id={selectId} value={value} onChange={(event) => onChange(event.target.value === 'all' ? 'all' : Number(event.target.value))}>
+          <option value="all">Todos os meses{typeof totalCount === 'number' ? ` (${totalCount})` : ''}</option>
+          {MONTH_LONG_LABELS.map((label, index) => (
+            <option key={label} value={index + 1}>{label}{counts[index + 1] ? ` (${counts[index + 1]})` : ''}</option>
+          ))}
+        </select>
+      </label>
+    );
+  }
 
   return (
     <div className={cn('ua-months', className)}>
@@ -207,21 +239,15 @@ export interface AgendaStatusTabsProps {
 const STATUS_ORDER: AgendaStatusFilter[] = ['all', 'upcoming', 'today', 'completed'];
 
 export function AgendaStatusTabs({ value, onChange, counts = {}, className }: AgendaStatusTabsProps) {
+  const selectId = useId();
   return (
-    <div className={cn('ua-status-tabs', className)} role="tablist" aria-label="Situação dos eventos">
-      {STATUS_ORDER.map((status) => (
-        <button
-          key={status}
-          type="button"
-          role="tab"
-          className="ua-status-tab ws-focus-inset"
-          aria-selected={value === status}
-          onClick={() => onChange(status)}
-        >
-          {AGENDA_STATUS_FILTER_LABELS[status]}
-          {typeof counts[status] === 'number' && <span className="ua-status-tab__count">{counts[status]}</span>}
-        </button>
-      ))}
+    <div className={cn('ua-status-tabs', className)} role="group" aria-label="Situação dos eventos">
+      <label htmlFor={selectId} className="ua-status-select">
+        <span>Mostrar eventos</span>
+        <select id={selectId} value={value} onChange={(event) => onChange(event.target.value as AgendaStatusFilter)}>
+          {STATUS_ORDER.map((status) => <option key={status} value={status}>{AGENDA_STATUS_FILTER_LABELS[status]}{typeof counts[status] === 'number' ? ` (${counts[status]})` : ''}</option>)}
+        </select>
+      </label>
     </div>
   );
 }

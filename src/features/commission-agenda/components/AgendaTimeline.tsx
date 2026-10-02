@@ -59,6 +59,7 @@ export function AgendaTimelineSection({ month, unitId, todayKey, startIndex = 0,
   return (
     <section className="ua-month-section" aria-labelledby={`ua-month-${month.monthKey}`} data-month={month.monthKey}>
       <header className="ua-month-section__header">
+        <span className="ua-month-section__marker" aria-hidden="true">{monthName.slice(0, 3)}</span>
         <h2 id={`ua-month-${month.monthKey}`} className="ua-month-section__title">
           <span className="ws-section-title">{monthName}</span>
           <span className="ws-label">{year}</span>
