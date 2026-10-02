@@ -2,14 +2,16 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { describe, expect, it, vi } from 'vitest';
 
-const items = ['34', '35', '36', '37', '38', '39'].map((n) => ({
+const { items, order, confirmSaleOrderItems } = vi.hoisted(() => {
+  const items = ['34', '35', '36', '37', '38', '39'].map((n) => ({
   itemId: `item-${n}`, orderId: 'order-1', lotId: `lot-${n}`, publicIdentifier: `B5-M0${n}`, itemTotal: 1, pricingStage: 'RENOVACAO',
 }));
 const order = { orderId: 'order-1', buyerName: 'ACME', buyerLegalName: 'ACME', stage: 'RENOVACAO', createdAt: null, negotiatedTotal: 6, items };
-const confirmSaleOrderItems = vi.fn().mockResolvedValue({});
+  return { items, order, confirmSaleOrderItems: vi.fn().mockResolvedValue({}) };
+});
 
 vi.mock('@/features/commercial-map/sales/salesService', () => ({
-  fetchLotOpenSaleOrder: vi.fn().mockResolvedValue(order),
+  fetchLotOpenSaleOrder: () => Promise.resolve(order),
   confirmSaleOrderItems: (...args: unknown[]) => confirmSaleOrderItems(...args),
   cancelSaleOrderItems: vi.fn(),
 }));
