@@ -9,6 +9,16 @@
   --commercial-matrix-line: #d9e3da;
   --commercial-matrix-muted: #596b61;
   --commercial-matrix-inverse-muted: #c6d6cb;
+  --commercial-progress-track: #e6ede8;
+  --commercial-progress-blue-bright: #388aff;
+  --commercial-progress-blue-glow: 0 0 10px 2px #388aff99, 0 0 22px #2465c066;
+  --commercial-sojinha-bean: #f7b43d;
+  --commercial-sojinha-pod: #cc821c;
+  --commercial-sojinha-hair: #603920;
+  --commercial-sojinha-shirt: #f7f7f3;
+  --commercial-sojinha-shorts: #075cc5;
+  --commercial-sojinha-shoe: #008e57;
+  --commercial-sojinha-face: #151b1b;
 
   /* Fenasoja 2028 primitives — exact reference anchors in OKLCH. */
   --brand-indigo-50: 97% 0.014 268.03;
