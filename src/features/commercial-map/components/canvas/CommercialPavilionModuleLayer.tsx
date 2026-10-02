@@ -73,11 +73,12 @@ export function resolveModuleInteractionState(
 ): ModuleInteractionState {
   const inCart = Boolean(!isSoldLot(moduleState?.status) && moduleState?.lotId && salesSelectedLotIds.has(moduleState.lotId));
   const inspected = Boolean(moduleState?.lotId && inspectedLotIds.has(moduleState.lotId));
-  const isSelected = inCart || inspected || cellId === activeSelectedId;
+  // Sale inspection is an outline, independent of the cart's gold fill/lift.
+  const isSelected = inCart || (!inspected && cellId === activeSelectedId);
   return {
     inCart,
     isSelected,
-    isHovered: !isSelected && cellId === activeHoveredId,
+    isHovered: !isSelected && !inspected && cellId === activeHoveredId,
   };
 }
 
@@ -646,6 +647,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     const borderColor = new THREE.Color();
     projectedModuleParts.forEach(({ cell, projected, shaped }, index) => {
       const moduleState = moduleStateById.get(cell.id) ?? null;
+      const inspected = Boolean(moduleState?.lotId && inspectedLotIds.has(moduleState.lotId));
       const interaction = resolveModuleInteractionState(
         cell.id,
         moduleState,
@@ -711,6 +713,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
 
       borderColor.copy(color).multiplyScalar(isSelected ? 0.68 : isHovered ? 0.56 : 0.43);
       if (isSelected) borderColor.lerp(SELECTED_COLOR, 0.34);
+      if (inspected) borderColor.set('#22bfd4');
       moduleBaseMesh.current?.setColorAt(index, borderColor);
     });
     moduleBaseMesh.current.instanceMatrix.needsUpdate = true;
@@ -964,6 +967,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       />
       {projectedIrregularModules.map((module) => {
         const moduleState = moduleStateById.get(module.cell.id) ?? null;
+        const inspected = Boolean(moduleState?.lotId && inspectedLotIds.has(moduleState.lotId));
         const interaction = resolveModuleInteractionState(
           module.cell.id,
           moduleState,
@@ -994,6 +998,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
           isSelected ? 0.68 : isHovered ? 0.56 : 0.43,
         );
         if (isSelected) borderColor.lerp(SELECTED_COLOR, 0.34);
+        if (inspected) borderColor.set('#22bfd4');
         return (
           <IrregularModuleMesh
             key={module.cell.id}

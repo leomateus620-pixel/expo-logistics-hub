@@ -1,13 +1,13 @@
 import { useLayoutEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronDown, FileText, Loader2, MapPinned, Paperclip, Search, ShieldAlert } from 'lucide-react';
+import { Check, ChevronDown, FileText, Loader2, MapPinned, Paperclip, Search, ShieldAlert, SlidersHorizontal, X } from 'lucide-react';
 import type { CommercialMapData } from '../../types';
 import { paymentMethodLabel, SALES_PAYMENT_METHODS, SALES_PAYMENT_METHOD_LABELS } from '../../sales/salesTypes';
 import { getContractSignedUrl } from '../../services/commercialMapService';
 import { formatDashboardCurrency } from '../commercialDashboardFormatters';
 import {
   describeSalesError, fetchSaleOrderDetail, fetchSaleOrdersPage, SALE_ORDERS_PAGE_SIZE, uniqueContracts,
-  type SaleContract, type SaleOrderDetail, type SaleOrderSummary,
+  type SaleContract, type SaleOrderDetail, type SaleOrderSummary, type SaleOrdersFilters,
 } from './salesOrdersService';
 import { useSalesOrdersUiStore } from './useSalesOrdersUiStore';
 import { AttachOrderContractDialog } from './AttachOrderContractDialog';
@@ -31,6 +31,15 @@ const ITEM_STATE_LABEL: Record<string, string> = {
   CANCELLED: 'Cancelado', LEGACY_UNVERIFIED: 'Legado sem comprovação',
 };
 
+const STATUS_FILTER_LABELS = {
+  PENDING: 'Aguardando assinatura', PARTIAL: 'Parcialmente assinada', SIGNED: 'Assinatura confirmada',
+  CANCELLED_PARTIAL: 'Com cancelamento', LEGACY: 'Legado',
+};
+const FILTER_REMOVE_LABELS: Record<keyof SaleOrdersFilters, string> = {
+  search: 'Remover busca', status: 'Remover filtro de situação', hasDocument: 'Remover filtro de documento',
+  paymentMethod: 'Remover filtro de pagamento', from: 'Remover data inicial', to: 'Remover data final',
+};
+
 export function signatureSummary(record: Pick<SaleOrderSummary, 'kind' | 'signedCount' | 'pendingCount' | 'cancelledCount' | 'legacyCount' | 'itemCount'>): string {
   if (record.kind === 'LEGACY') return 'Registro legado';
   const parts: string[] = [];
@@ -51,7 +60,7 @@ function documentSummary(record: SaleOrderSummary): string {
 
 export function CommercialSalesOrdersSection(props: CommercialSalesOrdersSectionProps) {
   const { projectId, canManageSales } = props;
-  const { filters, page, expandedRecordId, setFilters, resetFilters, setPage, setExpanded, consumeOrigin } = useSalesOrdersUiStore();
+  const { filters, page, expandedRecordId, filtersOpen, setFiltersOpen, setFilters, resetFilters, setPage, setExpanded, consumeOrigin } = useSalesOrdersUiStore();
   const [searchDraft, setSearchDraft] = useState(filters.search);
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -90,55 +99,76 @@ export function CommercialSalesOrdersSection(props: CommercialSalesOrdersSection
   const pages = Math.max(1, Math.ceil(total / SALE_ORDERS_PAGE_SIZE));
   const errorText = query.error ? describeSalesError(query.error) : null;
   const restricted = errorText?.includes('permissão');
+  const activeFilters = (Object.entries(filters) as [keyof SaleOrdersFilters, string][]).filter(([, value]) => value);
+  const filterLabel = (key: keyof SaleOrdersFilters, value: string) => {
+    if (key === 'status') return STATUS_FILTER_LABELS[value as keyof typeof STATUS_FILTER_LABELS];
+    if (key === 'hasDocument') return value === 'yes' ? 'Com arquivo anexado' : 'Sem arquivo anexado';
+    if (key === 'paymentMethod') return paymentMethodLabel(value);
+    if (key === 'from' || key === 'to') return `${key === 'from' ? 'De' : 'Até'} ${fmtDate(value)}`;
+    return `Busca: ${value}`;
+  };
 
   return <section className="cso-section" aria-labelledby="cso-title">
     <header className="cso-header">
-      <div>
-        <h2 id="cso-title" className="cso-title">Vendas e contratos</h2>
-        <p className="cso-sub">Um registro por pedido · valores negociados gravados, não receita recebida</p>
-      </div>
-      {query.isFetching && <Loader2 className="is-spinning" aria-label="Atualizando" />}
+      <h2 id="cso-title" className="cso-title">Vendas e contratos</h2>
+      <span className="cso-result-count" role="status">
+        {query.isFetching && <Loader2 className="is-spinning" aria-label="Atualizando" />}
+        {query.data && !errorText && <><strong>{total}</strong> {total === 1 ? 'registro' : 'registros'}</>}
+      </span>
     </header>
     <form className="cso-filters" onSubmit={submitSearch} role="search">
       <div className="cso-search">
         <input value={searchDraft} onChange={(e) => setSearchDraft(e.target.value)} placeholder="Expositor, referência, contrato ou espaço" aria-label="Pesquisar vendas" />
         <button type="submit" aria-label="Pesquisar"><Search aria-hidden="true" /></button>
       </div>
-      <select aria-label="Situação" value={filters.status} onChange={(e) => setFilters({ status: e.target.value as typeof filters.status })}>
+      <button type="button" className="cso-filter-toggle" aria-expanded={filtersOpen} aria-controls="cso-filter-fields" onClick={() => setFiltersOpen(!filtersOpen)}>
+        <SlidersHorizontal aria-hidden="true" />Filtros{activeFilters.length > 0 && <span>{activeFilters.length}</span>}
+      </button>
+      <div id="cso-filter-fields" className={`cso-filter-fields ${filtersOpen ? 'is-open' : ''}`}>
+      <label>Situação<select aria-label="Situação" value={filters.status} onChange={(e) => setFilters({ status: e.target.value as typeof filters.status })}>
         <option value="">Todas as situações</option>
-        <option value="PENDING">Aguardando assinatura</option>
-        <option value="PARTIAL">Parcialmente assinada</option>
-        <option value="SIGNED">Assinatura confirmada</option>
-        <option value="CANCELLED_PARTIAL">Com cancelamento</option>
-        <option value="LEGACY">Legado</option>
-      </select>
-      <select aria-label="Documento" value={filters.hasDocument} onChange={(e) => setFilters({ hasDocument: e.target.value as typeof filters.hasDocument })}>
+        {Object.entries(STATUS_FILTER_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+      </select></label>
+      <label>Documentos<select aria-label="Documento" value={filters.hasDocument} onChange={(e) => setFilters({ hasDocument: e.target.value as typeof filters.hasDocument })}>
         <option value="">Com ou sem documento</option>
         <option value="yes">Com arquivo anexado</option>
         <option value="no">Sem arquivo anexado</option>
-      </select>
-      <select aria-label="Forma de pagamento" value={filters.paymentMethod} onChange={(e) => setFilters({ paymentMethod: e.target.value })}>
+      </select></label>
+      <label>Pagamento<select aria-label="Forma de pagamento" value={filters.paymentMethod} onChange={(e) => setFilters({ paymentMethod: e.target.value })}>
         <option value="">Todas as formas</option>
         {SALES_PAYMENT_METHODS.map((m) => <option key={m} value={m}>{SALES_PAYMENT_METHOD_LABELS[m]}</option>)}
-      </select>
-      <label className="cso-date">De<input type="date" value={filters.from} onChange={(e) => setFilters({ from: e.target.value })} /></label>
-      <label className="cso-date">Até<input type="date" value={filters.to} onChange={(e) => setFilters({ to: e.target.value })} /></label>
-      <button type="button" className="cso-link" onClick={() => { setSearchDraft(''); resetFilters(); }}>Limpar</button>
+      </select></label>
+      <div className="cso-dates">
+        <label>De<input type="date" value={filters.from} onChange={(e) => setFilters({ from: e.target.value })} /></label>
+        <label>Até<input type="date" value={filters.to} onChange={(e) => setFilters({ to: e.target.value })} /></label>
+      </div>
+      </div>
     </form>
+    {activeFilters.length > 0 && <div className="cso-active-filters" aria-label="Filtros ativos">
+      {activeFilters.map(([key, value]) => <button type="button" key={key} aria-label={`${FILTER_REMOVE_LABELS[key]}: ${filterLabel(key, value)}`}
+        onClick={() => { setFilters({ [key]: '' }); if (key === 'search') setSearchDraft(''); }}>
+        {filterLabel(key, value)}<X aria-hidden="true" />
+      </button>)}
+      <button type="button" className="cso-clear-filters" onClick={() => { setSearchDraft(''); resetFilters(); }}>Limpar filtros</button>
+    </div>}
+    <div className="cso-list-caption"><span>Pedidos e registros legados</span><span>Valores negociados · não representam recebimentos</span></div>
 
-    <div ref={listRef} className="cso-list" aria-busy={query.isLoading}>
-      {query.isLoading && <p className="cso-state"><Loader2 className="is-spinning" aria-hidden="true" />Carregando vendas…</p>}
+    <div ref={listRef} className="cso-list" aria-busy={query.isFetching}>
+      {query.isLoading && <p className="cso-state" role="status"><Loader2 className="is-spinning" aria-hidden="true" />Carregando vendas…</p>}
       {errorText && <p className="cso-state is-error" role="alert"><ShieldAlert aria-hidden="true" />{restricted ? 'Acesso restrito às vendas desta organização.' : errorText}
         {!restricted && <button type="button" className="cso-link" onClick={() => query.refetch()}>Tentar novamente</button>}</p>}
-      {!query.isLoading && !errorText && query.data?.rows.length === 0 && <p className="cso-state">Nenhuma venda encontrada com esses critérios.</p>}
-      {query.data?.rows.map((record) => <SaleRow key={record.recordId} record={record} {...props}
+      {!query.isLoading && !errorText && query.data?.rows.length === 0 && <div className="cso-state cso-empty" role="status">
+        <Search aria-hidden="true" /><div><strong>Nenhuma venda encontrada</strong><p>{activeFilters.length ? 'Ajuste a busca ou remova os filtros para ver mais registros.' : 'Os pedidos registrados aparecerão aqui.'}</p></div>
+        {activeFilters.length > 0 && <button type="button" className="cso-link" onClick={() => { setSearchDraft(''); resetFilters(); }}>Limpar filtros</button>}
+      </div>}
+      {!errorText && query.data?.rows.map((record) => <SaleRow key={record.recordId} record={record} {...props}
         expanded={expandedRecordId === record.recordId}
         onToggle={() => setExpanded(expandedRecordId === record.recordId ? null : record.recordId)} />)}
     </div>
-    {total > SALE_ORDERS_PAGE_SIZE && <nav className="cso-pager" aria-label="Páginas de vendas">
-      <button type="button" disabled={page === 0} onClick={() => setPage(page - 1)}>Anterior</button>
-      <span>Página {page + 1} de {pages} · {total} registros</span>
-      <button type="button" disabled={page + 1 >= pages} onClick={() => setPage(page + 1)}>Próxima</button>
+    {!errorText && total > SALE_ORDERS_PAGE_SIZE && <nav className="cso-pager" aria-label="Páginas de vendas">
+      <span>Página <strong>{page + 1}</strong> de {pages}</span>
+      <div><button type="button" disabled={page === 0 || query.isPlaceholderData} onClick={() => setPage(page - 1)}>Anterior</button>
+      <button type="button" disabled={page + 1 >= pages || query.isPlaceholderData} onClick={() => setPage(page + 1)}>Próxima</button></div>
     </nav>}
   </section>;
 }
@@ -148,28 +178,26 @@ function SaleRow({ record, expanded, onToggle, onViewSale, scrollContainer, ...r
 }) {
   const detailId = `cso-detail-${record.recordId}`;
   const hasCancellation = record.cancelledCount > 0;
+  const name = record.buyerTradeName?.trim() || record.displayName;
   return <article className={`cso-row ${expanded ? 'is-expanded' : ''}`}>
     <div className="cso-row-main">
-      <button type="button" className="cso-toggle" aria-expanded={expanded} aria-controls={detailId} onClick={onToggle}>
+      <button type="button" className="cso-toggle" aria-label={`Detalhes de ${name} · ${record.reference}`} aria-expanded={expanded} aria-controls={detailId} onClick={onToggle}>
         <ChevronDown aria-hidden="true" />
-        <span className="cso-name">{record.displayName}
-          {record.buyerTradeName && record.buyerName && record.buyerTradeName.trim() !== record.buyerName.trim()
-            && <small>{record.buyerName}</small>}
+        <span className="cso-identity"><span className="cso-name">{name}</span>
+          <span className="cso-reference"><strong>{record.reference}</strong><span>{fmtDate(record.createdAt)}</span>{record.kind === 'LEGACY' && <span>Legado</span>}</span>
         </span>
       </button>
       <dl className="cso-facts">
-        <div><dt>Referência</dt><dd>{record.reference}{record.kind === 'LEGACY' && <em className="cso-chip">Legado</em>}</dd></div>
-        <div><dt>Data</dt><dd>{fmtDate(record.createdAt)}</dd></div>
-        <div><dt>Espaços</dt><dd>{record.activeCount}{hasCancellation ? ` (+${record.cancelledCount} canc.)` : ''}</dd></div>
-        <div><dt>Valor negociado</dt><dd title="Total gravado no pedido; não é receita recebida">{formatDashboardCurrency(record.negotiatedTotal)}</dd></div>
+        <div><dt>Espaços ativos</dt><dd>{record.activeCount}<span>{hasCancellation ? ` · ${record.cancelledCount} cancelado(s)` : ''}</span></dd></div>
         <div><dt>Pagamento</dt><dd>{record.kind === 'LEGACY' ? '—' : paymentMethodLabel(record.paymentMethod)}{record.installmentCount && record.installmentCount > 1 ? ` · ${record.installmentCount}x` : ''}</dd></div>
       </dl>
-      <div className="cso-badges">
-        <span className="cso-chip">Pedido registrado</span>
-        <span className={`cso-chip ${record.signedCount > 0 && record.pendingCount === 0 ? 'is-ok' : 'is-wait'}`}>{signatureSummary(record)}</span>
-        <span className={`cso-chip ${record.documentCount ? 'is-ok' : ''}`}><FileText aria-hidden="true" />{documentSummary(record)}</span>
-        {record.kind === 'ORDER' && <span className={`cso-chip ${record.paidInstallments > 0 ? 'is-ok' : ''}`}>
-          {record.paidInstallments > 0 ? `${record.paidInstallments} parcela(s) recebida(s)` : 'Nenhum pagamento registrado'}</span>}
+      <div className="cso-value"><span>Valor negociado</span><strong>{formatDashboardCurrency(record.negotiatedTotal)}</strong></div>
+      <div className="cso-statusline">
+        <span className="cso-registered"><Check aria-hidden="true" />{record.kind === 'LEGACY' ? 'Registro legado' : 'Pedido registrado'}</span>
+        {record.kind !== 'LEGACY' && <span className={`cso-signature ${record.pendingCount > 0 ? 'is-wait' : ''}`}>{signatureSummary(record)}</span>}
+        <span><FileText aria-hidden="true" />{documentSummary(record)}</span>
+        {record.kind === 'ORDER' && <span>{record.paidInstallments > 0
+          ? `${record.paidInstallments}${record.installmentCount ? ` de ${record.installmentCount}` : ''} parcela(s) recebida(s)` : 'Sem recebimento registrado'}</span>}
       </div>
       <button type="button" className="cso-view" data-view-sale={record.recordId}
         disabled={record.lotIds.length === 0}
@@ -210,68 +238,71 @@ function SaleDetail({ record, data, orgId, canManageContracts }: CommercialSales
   const h = d.header;
   const labelOf = (lotId: string) => {
     const item = d.items.find((i) => i.lotId === lotId);
-    return item ? (item.displayName || item.publicIdentifier) : (lotIndex.get(lotId)?.displayName ?? 'Espaço');
+    const label = item ? (item.displayName || item.publicIdentifier) : (lotIndex.get(lotId)?.displayName ?? 'Espaço');
+    return `${label} · ${locationOf(lotId)}`;
   };
   const activeItems = d.items.filter((i) => i.contractState !== 'CANCELLED');
   const activeSubtotal = activeItems.reduce((sum, i) => sum + (i.itemTotal ?? 0), 0);
   const hasCancelled = activeItems.length !== d.items.length;
   const contracts = d.contracts ? uniqueContracts(d.contracts) : null;
+  const groupedItems = new Map<string, typeof d.items>();
+  d.items.forEach((item) => {
+    const location = locationOf(item.lotId);
+    const group = groupedItems.get(location) ?? [];
+    group.push(item);
+    groupedItems.set(location, group);
+  });
 
   return <div className="cso-detail-grid">
-    <section className="cso-block">
-      <h3>Expositor</h3>
-      <p className="cso-strong">{h.buyerTradeName?.trim() || h.buyerName}</p>
-      {h.buyerTradeName?.trim() && <p>Razão social: {h.buyerName}</p>}
-      {h.documentNumber && <p>Documento: {h.documentNumber}</p>}
-      {h.email && <p>{h.email}</p>}
-      {h.phone && <p>{h.phone}</p>}
-    </section>
-
     <section className="cso-block cso-span">
-      <h3>Espaços ({d.items.length})</h3>
+      <h3>Espaços <span className="cso-count">{d.items.length}</span></h3>
+      {Array.from(groupedItems, ([location, items]) => <div className="cso-space-group" key={location}>
+      <h4>{location}<span>{items.length} {items.length === 1 ? 'espaço' : 'espaços'}</span></h4>
       <ul className="cso-items">
-        {d.items.map((item) => <li key={item.itemId ?? item.lotId} className={item.contractState === 'CANCELLED' ? 'is-cancelled' : ''}>
+        {items.map((item) => <li key={item.itemId ?? item.lotId} className={item.contractState === 'CANCELLED' ? 'is-cancelled' : ''}>
           <span className="cso-strong">{item.displayName || item.publicIdentifier}</span>
-          <span>{locationOf(item.lotId)}</span>
-          <span>{fmtArea(item.areaSnapshot)}</span>
-          <span>{formatDashboardCurrency(item.itemTotal)}</span>
-          <span className={`cso-chip ${item.contractState === 'SIGNED' ? 'is-ok' : item.contractState === 'PENDING_SIGNATURE' ? 'is-wait' : ''}`}>{ITEM_STATE_LABEL[item.contractState] ?? item.contractState}</span>
+          <span className="cso-item-area" aria-label={`Área: ${fmtArea(item.areaSnapshot)}`}>{fmtArea(item.areaSnapshot)}</span>
+          <span className="cso-item-value" aria-label={`Valor registrado: ${formatDashboardCurrency(item.itemTotal)}`}>{formatDashboardCurrency(item.itemTotal)}</span>
+          <span className={`cso-item-state ${item.contractState === 'PENDING_SIGNATURE' ? 'is-wait' : ''}`}>{ITEM_STATE_LABEL[item.contractState] ?? item.contractState}</span>
         </li>)}
       </ul>
+      </div>)}
     </section>
 
     <section className="cso-block">
-      <h3>Condições comerciais</h3>
+      <h3>Valores e taxas</h3>
       {h.kind === 'ORDER' ? <dl className="cso-kv">
-        <div><dt>Subtotal dos espaços</dt><dd>{formatDashboardCurrency(h.spacesSubtotal === null ? null : Number(h.spacesSubtotal))}</dd></div>
+        <div><dt>Subtotal original dos espaços</dt><dd>{formatDashboardCurrency(h.spacesSubtotal == null ? null : Number(h.spacesSubtotal))}</dd></div>
         <div><dt>Taxa administrativa</dt><dd>{formatDashboardCurrency(Number(h.feeAdmin ?? 0))}</dd></div>
         <div><dt>PPCI</dt><dd>{formatDashboardCurrency(Number(h.feePpci ?? 0))}</dd></div>
         <div><dt>Limpeza / licença</dt><dd>{formatDashboardCurrency(Number(h.feeCleaning ?? 0))}</dd></div>
-        <div className="is-total"><dt>Total gravado do pedido</dt><dd>{formatDashboardCurrency(Number(h.negotiatedTotal))}</dd></div>
+        <div className="is-total"><dt>Total registrado</dt><dd>{formatDashboardCurrency(h.negotiatedTotal == null ? null : Number(h.negotiatedTotal))}</dd></div>
         {hasCancelled && <div><dt>Subtotal dos espaços ativos</dt><dd>{formatDashboardCurrency(activeSubtotal)}</dd></div>}
       </dl> : <dl className="cso-kv">
-        <div className="is-total"><dt>Valor negociado (legado)</dt><dd>{formatDashboardCurrency(Number(h.negotiatedTotal))}</dd></div>
+        <div className="is-total"><dt>Valor negociado (legado)</dt><dd>{formatDashboardCurrency(h.negotiatedTotal == null ? null : Number(h.negotiatedTotal))}</dd></div>
         <div><dt>Data da venda</dt><dd>{fmtDate(h.saleDate)}</dd></div>
       </dl>}
       {hasCancelled && <p className="cso-note">Total original preservado; parcelas e taxas não são recalculadas automaticamente.</p>}
     </section>
 
     <section className="cso-block">
-      <h3>Pagamento</h3>
+      <h3>Parcelas e recebimentos</h3>
       {h.kind === 'ORDER' ? <>
-        <p>{paymentMethodLabel(h.paymentMethod)} · {d.installments.length} parcela(s)</p>
+        <p className="cso-payment-method">{paymentMethodLabel(h.paymentMethod)} · {d.installments.length} parcela(s)</p>
+        {d.installments.length > 0 && <div className="cso-installments-head" aria-hidden="true"><span>Nº</span><span>Vencimento</span><span>Valor</span><span>Situação</span></div>}
         <ol className="cso-installments">
           {d.installments.map((n) => <li key={n.number}>
             <span>{n.number}ª</span><span>{fmtDate(n.dueDate)}</span><span>{formatDashboardCurrency(n.amount)}</span>
-            <span className={`cso-chip ${n.paidAt || n.paymentStatus === 'PAID' ? 'is-ok' : ''}`}>{n.paidAt || n.paymentStatus === 'PAID' ? 'Recebida' : 'Pendente'}</span>
+            <span className={`cso-payment-state ${n.paidAt || n.paymentStatus === 'PAID' ? 'is-paid' : ''}`}>{n.paidAt || n.paymentStatus === 'PAID' ? 'Recebida' : 'Pendente'}</span>
           </li>)}
         </ol>
+        {d.installments.length === 0 && <p className="cso-note">Nenhuma parcela registrada neste pedido.</p>}
       </> : <p>Situação registrada: {h.paymentStatus ?? '—'} (venda legada sem parcelas)</p>}
     </section>
 
     <section className="cso-block cso-span">
       <div className="cso-block-head">
-        <h3>Contratos e documentos</h3>
+        <h3>Contratos {contracts && <span className="cso-count">{contracts.length}</span>}</h3>
         {canManageContracts && h.kind === 'ORDER' && orgId && <button type="button" className="cso-view" onClick={() => setAttachOpen({ contract: null })}>
           <Paperclip aria-hidden="true" />Anexar contrato</button>}
       </div>
@@ -279,8 +310,21 @@ function SaleDetail({ record, data, orgId, canManageContracts }: CommercialSales
         : contracts.length === 0 ? <p className="cso-state">Sem arquivo anexado.</p>
           : <ul className="cso-docs">{contracts.map((c) => <ContractRow key={c.contractId} contract={c} labelOf={labelOf}
             canReplace={canManageContracts && c.scope === 'ORDER_ITEMS'} onReplace={() => setAttachOpen({ contract: c })} />)}</ul>}
-      <p className="cso-note">Anexar um arquivo não confirma assinatura, pagamento nem venda.</p>
+      <p className="cso-note">Arquivo anexado não comprova assinatura ou recebimento.</p>
     </section>
+
+    <details className="cso-exhibitor cso-span">
+      <summary>Dados do expositor e da venda<ChevronDown aria-hidden="true" /></summary>
+      <dl className="cso-exhibitor-data">
+        <div><dt>Expositor</dt><dd>{h.buyerTradeName?.trim() || h.buyerName || '—'}</dd></div>
+        {h.buyerTradeName?.trim() && <div><dt>Razão social</dt><dd>{h.buyerName || '—'}</dd></div>}
+        {h.documentNumber && <div><dt>Documento</dt><dd>{h.documentNumber}</dd></div>}
+        {h.email && <div><dt>E-mail</dt><dd>{h.email}</dd></div>}
+        {h.phone && <div><dt>Telefone</dt><dd>{h.phone}</dd></div>}
+        <div><dt>Referência</dt><dd>{record.reference}</dd></div>
+        <div><dt>Data do registro</dt><dd>{fmtDate(record.createdAt)}</dd></div>
+      </dl>
+    </details>
 
     {attachOpen && orgId && h.orderId && <AttachOrderContractDialog
       orgId={orgId}
@@ -315,18 +359,25 @@ function ContractRow({ contract, labelOf, canReplace, onReplace }: {
     } catch (e) { win?.close(); setError(describeSalesError(e)); } finally { setOpening(false); }
   };
   return <li className="cso-doc">
-    <div>
-      <p className="cso-strong">{contract.contractNumber ? `Contrato ${contract.contractNumber}` : 'Contrato sem número'}
-        <em className="cso-chip">{contract.scope === 'ORDER_ITEMS' ? 'Documento da venda' : 'Documento do lote'}</em></p>
-      <p>Abrange: {contract.lotIds.map(labelOf).join(', ') || '—'}</p>
-      {active ? <p>v{active.version} · {active.originalName} · {fmtDate(active.uploadedAt)}</p> : <p>Sem arquivo anexado</p>}
+    <FileText className="cso-doc-icon" aria-hidden="true" />
+    <div className="cso-doc-body">
+      <h4>{active?.originalName || (contract.contractNumber ? `Contrato ${contract.contractNumber}` : 'Contrato sem número')}</h4>
+      <p className="cso-doc-meta">
+        <span>{contract.contractNumber ? `Contrato ${contract.contractNumber}` : 'Sem número'}</span>
+        <span>{contract.scope === 'ORDER_ITEMS' ? 'Documento da venda' : 'Documento do lote'}</span>
+        {active && <><strong>Versão {active.version}</strong><span>{fmtDate(active.uploadedAt)}</span></>}
+      </p>
+      <div className="cso-doc-coverage"><span>Abrangência · {contract.lotIds.length} {contract.lotIds.length === 1 ? 'espaço' : 'espaços'}</span>
+        {contract.lotIds.length > 0 ? <ul>{contract.lotIds.map((lotId) => <li key={lotId}>{labelOf(lotId)}</li>)}</ul> : <p>—</p>}
+      </div>
+      {!active && <p>Sem arquivo anexado</p>}
       {contract.versions.length > 1 && <details><summary>Histórico ({contract.versions.length} versões)</summary>
-        <ul>{contract.versions.map((v) => <li key={v.id}><button type="button" className="cso-link" onClick={() => open(v.storagePath)}>v{v.version} · {v.originalName}</button> · {fmtDate(v.uploadedAt)}</li>)}</ul>
+        <ul>{contract.versions.map((v) => <li key={v.id}><button type="button" className="cso-link" disabled={opening} onClick={() => open(v.storagePath)}>v{v.version} · {v.originalName}</button><span>{fmtDate(v.uploadedAt)}{v.id === active?.id ? ' · Atual' : ''}</span></li>)}</ul>
       </details>}
       {error && <p className="cso-note is-error" role="alert">{error}</p>}
     </div>
     <div className="cso-doc-actions">
-      {active && <button type="button" className="cso-link" disabled={opening} onClick={() => open(active.storagePath)}>{opening ? 'Abrindo…' : 'Abrir'}</button>}
+      {active && <button type="button" className="cso-secondary" disabled={opening} onClick={() => open(active.storagePath)}>{opening ? 'Abrindo…' : 'Abrir contrato'}</button>}
       {canReplace && <button type="button" className="cso-link" onClick={onReplace}>Nova versão</button>}
     </div>
   </li>;

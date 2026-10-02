@@ -608,6 +608,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
       const pavilionId = resolution.groups[0].pavilionEntityId!;
       if (store.interiorEntityId && store.interiorEntityId !== pavilionId) store.switchInterior(pavilionId);
       else if (!store.interiorEntityId) store.enterInterior(pavilionId);
+      useSaleInspectionStore.getState().frame(resolution.groups[0].spaces.map(space => space.entityId));
       return;
     }
     if (store.interiorEntityId) {
@@ -623,7 +624,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const handleDashboardViewSale = (record: SaleOrderSummary, lotIds: string[]) => {
     const resolution = resolveSaleInspection(lotIds, data.lots, data.entities);
     useSaleInspectionStore.getState().start({
-      recordId: record.recordId, reference: record.reference, displayName: record.displayName, lotIds: resolution.allLotIds,
+      recordId: record.recordId, reference: record.reference, displayName: record.buyerTradeName?.trim() || record.displayName, lotIds: resolution.allLotIds,
     });
     setSaleResolution(resolution);
     setDashboardOpen(false);
@@ -639,6 +640,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
         if (store.interiorEntityId) store.switchInterior(group.pavilionEntityId); else store.enterInterior(group.pavilionEntityId);
       }
       if (space.moduleId) store.setSelectedModuleId(space.moduleId);
+      useSaleInspectionStore.getState().frame([space.entityId]);
       return;
     }
     if (store.interiorEntityId) store.exitInterior();
@@ -646,9 +648,15 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   };
 
   const handleSaleEnterGroup = (group: SaleInspectionGroup) => {
-    if (!group.pavilionEntityId) return;
     const store = useCommercialMapStore.getState();
-    if (store.interiorEntityId) store.switchInterior(group.pavilionEntityId); else store.enterInterior(group.pavilionEntityId);
+    if (group.pavilionEntityId) {
+      if (store.interiorEntityId !== group.pavilionEntityId) {
+        if (store.interiorEntityId) store.switchInterior(group.pavilionEntityId); else store.enterInterior(group.pavilionEntityId);
+      }
+      useSaleInspectionStore.getState().frame(group.spaces.map(space => space.entityId));
+    } else if (saleResolution) {
+      startSaleOverview({ ...saleResolution, mode: 'external', overviewEntityIds: group.spaces.map(space => space.entityId) });
+    }
   };
 
   const closeSaleInspection = () => { useSaleInspectionStore.getState().clear(); setSaleResolution(null); };

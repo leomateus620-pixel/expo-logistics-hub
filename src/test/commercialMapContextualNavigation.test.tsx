@@ -1,12 +1,12 @@
 import { act, renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PerspectiveCamera, Vector3 } from 'three';
 import { OrbitControls } from 'three-stdlib';
 import { useCommercialMapStore } from '@/features/commercial-map/state/useCommercialMapStore';
 import { useMapEntityFilter } from '@/features/commercial-map/hooks/useCommercialMap';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
 import { canHandleCommercialMapEscape } from '@/features/commercial-map/utils/contextualNavigation';
-import { applyContextualCameraViewOffset, fitCameraAboveContextualPanel, readContextualCameraViewOffset, resolveContextualViewportInsets } from '@/features/commercial-map/utils/contextualViewport';
+import { applyContextualCameraViewOffset, fitCameraAboveContextualPanel, readContextualCameraViewOffset, readContextualViewportInsets, resolveContextualViewportInsets } from '@/features/commercial-map/utils/contextualViewport';
 import { resolveCameraTransitionDuration } from '@/features/commercial-map/utils/interaction';
 
 beforeEach(() => {
@@ -195,5 +195,19 @@ describe('enquadramento na área realmente livre do mapa', () => {
   it('reduz apenas a duração da câmera quando o usuário reduz movimento', () => {
     expect(resolveCameraTransitionDuration(500, true)).toBe(120);
     expect(resolveCameraTransitionDuration(500, false)).toBeGreaterThan(120);
+  });
+
+  it('reserva o painel compacto de venda mesmo abaixo de 35% da altura', () => {
+    document.body.innerHTML = '<div class="commercial-map-shell"><canvas></canvas><aside data-commercial-map-camera-obstruction="sale-inspection"></aside></div>';
+    const canvas = document.querySelector('canvas')!;
+    const panel = document.querySelector('aside')!;
+    const viewport = { left: 0, top: 0, right: 1440, bottom: 1080, width: 1440, height: 1080 } as DOMRect;
+    const rect = { left: 1060, top: 72, right: 1428, bottom: 382, width: 368, height: 310 } as DOMRect;
+    vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue(viewport);
+    vi.spyOn(panel, 'getBoundingClientRect').mockReturnValue(rect);
+    vi.spyOn(panel, 'getClientRects').mockReturnValue([rect] as unknown as DOMRectList);
+    expect(readContextualViewportInsets(canvas)).toEqual({ left: 0, right: 392, top: 0, bottom: 0 });
+    panel.style.visibility = 'hidden';
+    expect(readContextualViewportInsets(canvas).right).toBe(0);
   });
 });

@@ -10,6 +10,7 @@ import { OFFICIAL_REFERENCE_DATA as data } from '@/features/commercial-map/data/
 import { useCommercialMapStore as store } from '@/features/commercial-map/state/useCommercialMapStore';
 import { InteriorViewControls } from '@/features/commercial-map/components/InteriorViewControls';
 import type { InteriorCameraRequest } from '@/features/commercial-map/hooks/useInteriorCameraRequest';
+import { resolveSaleInspectionInteriorView } from '@/features/commercial-map/utils/saleInspectionCamera';
 
 const UP = new Vector3(0, 1, 0);
 const ids = Object.keys(definitions) as (keyof typeof definitions)[];
@@ -40,6 +41,34 @@ function frameFor(id: keyof typeof definitions): InteriorCameraRequest {
 afterEach(() => { cleanup(); store.getState().exitInterior(); });
 
 describe.each(ids)('comandos internos %s', id => {
+  it('enquadra todos os módulos da venda fora do painel em desktop e celular', () => {
+    const frame = frameFor(id);
+    frame.pavilion!.modules = frame.pavilion!.modules.map(module => ({ ...module, lotId: `lot:${module.id}`, entityId: `entity:${module.id}` }));
+    const modules = [frame.pavilion!.modules[0], frame.pavilion!.modules[frame.pavilion!.modules.length - 1]];
+    const lotIds = new Set(modules.map(module => module.lotId!));
+    const before = JSON.stringify(frame);
+    for (const [width, height] of [[1366, 768], [390, 844], [844, 390]]) {
+      const insets = { left: 0, top: 70, right: width >= 740 ? 380 : 0, bottom: width < 740 ? 390 : 0 };
+      const args = { frame, lotIds, entityIds: new Set<string>(), width, height, insets };
+      const result = resolveSaleInspectionInteriorView(args)!;
+      const camera = new PerspectiveCamera(result.fov, width / height, result.near, result.far);
+      camera.position.copy(result.position); camera.zoom = result.zoom; camera.lookAt(result.target);
+      camera.setViewOffset(width, height, result.viewOffset.x * width, result.viewOffset.y * height, width, height);
+      camera.updateProjectionMatrix(); camera.updateMatrixWorld();
+      for (const module of modules) for (const x of [-1, 1]) for (const z of [-1, 1]) {
+        const point = new Vector3(x * module.width / 2, 0, z * module.depth / 2)
+          .applyAxisAngle(UP, frame.pavilion!.facing).add(module.center).project(camera);
+        const px = (point.x + 1) * width / 2, py = (1 - point.y) * height / 2;
+        expect(px).toBeGreaterThanOrEqual(insets.left); expect(px).toBeLessThanOrEqual(width - insets.right);
+        expect(py).toBeGreaterThanOrEqual(insets.top); expect(py).toBeLessThanOrEqual(height - insets.bottom);
+      }
+      const single = resolveSaleInspectionInteriorView({ ...args, entityIds: new Set([modules[0].entityId!]) })!;
+      expect(single.target.distanceTo(modules[0].center)).toBeLessThan(1e-8);
+      expect(resolveSaleInspectionInteriorView({ ...args, lotIds: new Set() })).toBeNull();
+    }
+    expect(JSON.stringify(frame)).toBe(before);
+  });
+
   it.each([[1366, 768], [390, 844], [844, 390]])('orienta e enquadra sem modificar a planta em %s × %s', (width, height) => {
     const frame = frameFor(id);
     const before = JSON.stringify([frame, plans[id], data.entities]);
