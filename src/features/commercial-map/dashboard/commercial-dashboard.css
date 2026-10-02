@@ -397,3 +397,60 @@
   .commercial-dashboard-legend-heading { grid-template-columns: minmax(60px, 1fr) 26px minmax(77px, auto) 45px; padding-left: 14px; gap: 4px; }
   .commercial-dashboard-secondary { grid-template-columns: 1fr; gap: 6px; }
 }
+
+/* Financial matrix: recorded sales first, inventory as a quieter ledger below. */
+.commercial-dashboard-indicators { display: flex; flex-direction: column; gap: 0; }
+.commercial-dashboard-financial-kpis {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  font-family: Manrope, sans-serif;
+}
+.commercial-dashboard-finance-card {
+  display: flex;
+  min-width: 0;
+  min-height: 148px;
+  flex-direction: column;
+  padding: 20px;
+  border: 1px solid var(--commercial-matrix-line);
+  border-left: 4px solid var(--commercial-matrix-gold);
+  border-radius: 8px;
+  background: var(--commercial-matrix-card);
+  color: var(--commercial-matrix-ink);
+  box-shadow: var(--elevation-1);
+}
+.commercial-dashboard-finance-card--confirmed { border-left-color: var(--commercial-matrix-blue); }
+.commercial-dashboard-finance-card--inventory {
+  border-color: var(--commercial-matrix-ink);
+  background: var(--commercial-matrix-ink);
+  color: var(--commercial-matrix-paper);
+}
+.commercial-dashboard-finance-card__heading { display: flex; align-items: flex-start; gap: 9px; min-height: 36px; font-size: 12px; font-weight: 700; line-height: 1.4; }
+.commercial-dashboard-finance-card__heading svg { width: 18px; height: 18px; flex: 0 0 auto; margin-top: 1px; color: var(--commercial-matrix-blue); }
+.commercial-dashboard-finance-card--open .commercial-dashboard-finance-card__heading svg { color: var(--commercial-matrix-gold); }
+.commercial-dashboard-finance-card--inventory .commercial-dashboard-finance-card__heading svg { color: var(--commercial-matrix-inverse-muted); }
+.commercial-dashboard-finance-card__value { display: block; max-width: 100%; margin: 8px 0 12px; font-family: Sora, sans-serif; font-size: clamp(22px, 2vw, 32px); font-weight: 700; line-height: 1.18; overflow-wrap: anywhere; }
+.commercial-dashboard-finance-card--confirmed .commercial-dashboard-finance-card__value { font-size: clamp(26px, 2.35vw, 38px); }
+.commercial-dashboard-finance-card__foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; margin-top: auto; color: var(--commercial-matrix-muted); font-size: 10px; line-height: 1.4; }
+.commercial-dashboard-finance-card__foot span:last-child { text-align: right; }
+.commercial-dashboard-finance-card--inventory .commercial-dashboard-finance-card__foot { color: var(--commercial-matrix-inverse-muted); }
+.commercial-dashboard-finance-disclaimer { margin: 7px 0 18px; color: var(--commercial-matrix-muted); font-family: Manrope, sans-serif; font-size: 10px; }
+.commercial-dashboard-indicators .commercial-dashboard-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.commercial-dashboard-indicators .commercial-dashboard-kpi { min-height: 100px; border: 1px solid var(--commercial-matrix-line); border-radius: 8px; background: var(--commercial-matrix-card); font-family: Manrope, sans-serif; }
+.commercial-dashboard-indicators .commercial-dashboard-kpi:last-child { grid-column: 1 / -1; min-height: 76px; background: var(--commercial-matrix-paper); }
+.commercial-dashboard-indicators .commercial-dashboard-kpi > strong { font-family: Sora, sans-serif; letter-spacing: 0; }
+@media (max-width: 1000px) {
+  .commercial-dashboard-financial-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .commercial-dashboard-finance-card--confirmed { grid-column: 1 / -1; }
+  .commercial-dashboard-indicators .commercial-dashboard-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 590px) {
+  .commercial-dashboard-financial-kpis { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .commercial-dashboard-finance-card--confirmed { grid-column: auto; }
+  .commercial-dashboard-finance-card { min-height: 118px; padding: 14px 16px; }
+  .commercial-dashboard-finance-card__heading { min-height: 0; }
+  .commercial-dashboard-finance-card__value, .commercial-dashboard-finance-card--confirmed .commercial-dashboard-finance-card__value { font-size: 27px; margin: 7px 0; }
+  .commercial-dashboard-indicators .commercial-dashboard-kpis { gap: 8px; }
+  .commercial-dashboard-indicators .commercial-dashboard-kpi { min-height: 95px; }
+  .commercial-dashboard-indicators .commercial-dashboard-kpi:last-child { min-height: 74px; }
+}
