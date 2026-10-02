@@ -65,7 +65,7 @@ export function SaleExhibitorEditDialog({ lotId, identity, onClose }: { lotId: s
   const queryClient = useQueryClient();
   const initial = useRef(toDraft(identity));
   const [draft, setDraft] = useState<SaleIdentityDraft>(initial.current);
-  const [updateExhibitor, setUpdateExhibitor] = useState(false);
+  const [updateExhibitor, setUpdateExhibitor] = useState(true);
   const [showErrors, setShowErrors] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +73,7 @@ export function SaleExhibitorEditDialog({ lotId, identity, onClose }: { lotId: s
   const inFlight = useRef(false);
   const requestId = useRef<string>(crypto.randomUUID());
   const errors = saleIdentityErrors(draft);
-  const dirty = JSON.stringify(draft) !== JSON.stringify(initial.current) || updateExhibitor;
+  const dirty = JSON.stringify(draft) !== JSON.stringify(initial.current);
 
   useEffect(() => { requestId.current = crypto.randomUUID(); }, [draft, updateExhibitor]);
 
