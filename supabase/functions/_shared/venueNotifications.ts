@@ -1,6 +1,7 @@
 // Avisos no celular da Agenda Restaurante e Arena.
 // Reaproveita send-push-notification; a fila é venue_notification_deliveries.
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
+// deno-lint-ignore no-explicit-any
+type SupabaseClient = any;
 
 const INACTIVE = new Set(["cancelado", "recusado"]);
 const BATCH = 100;
