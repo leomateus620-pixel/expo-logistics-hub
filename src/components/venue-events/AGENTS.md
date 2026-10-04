@@ -1,0 +1,3 @@
+# Agenda Restaurante e Arena
+
+- Avisos e Google Agenda da Agenda Restaurante e Arena usam a infraestrutura existente: fila própria `venue_notification_deliveries` processada pelo cron de `event-assignment-push`, e `google_sync_outbox`/`google_calendar_event_map` com `venue_event_id` (exatamente uma origem por linha). Destinatários vêm só de `venue_notification_recipients` (inscritos por escopo restaurante/arena em `venue_notification_subscriptions` + responsáveis do evento, sempre com acesso ao módulo), revalidados no envio — por quê: sem nome fixo, sem depender de comissão e sem tocar nos lembretes do cronograma.

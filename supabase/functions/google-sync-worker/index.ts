@@ -55,6 +55,7 @@ interface SyncTask {
   user_id: string;
   org_id: string;
   event_id: string;
+  venue_event_id?: string | null;
   operation: "upsert" | "delete";
   payload_hash: string | null;
   is_initial_backfill: boolean;
@@ -189,6 +190,15 @@ async function processTask(supabase: ReturnType<typeof db>, task: SyncTask) {
   const calendarId = connection.secondary_calendar_id as string;
   const accessToken = await getValidGoogleAccessToken(task.user_id, task.org_id);
 
+  if (task.venue_event_id) {
+    try {
+      await processVenueTask(supabase, task, accessToken, calendarId);
+    } catch (error) {
+      await handleTaskFailure(supabase, task, error);
+    }
+    return;
+  }
+
   const { data: mapping, error: mappingError } = await supabase.from("google_calendar_event_map")
     .select("id, google_event_id, google_calendar_id, deleted_at")
     .eq("user_id", task.user_id).eq("event_id", task.event_id).is("subevent_id", null).maybeSingle();
@@ -283,38 +293,143 @@ async function processTask(supabase: ReturnType<typeof db>, task: SyncTask) {
     if (mappingWrite.error) throw new Error("mapping_write_failed");
     await completeTask(supabase, task);
   } catch (error) {
-    const message = String((error as Error).message ?? error);
-    const failureCode = syncFailureCode(message);
-    const authorizationError = failureCode === "authorization_revoked";
-    const rateLimited = failureCode === "provider_rate_limited";
-    const attempts = task.attempts + 1;
-    const backoffSeconds = rateLimited
-      ? Math.min(600, 30 * Math.pow(2, attempts))
-      : Math.min(900, 15 * Math.pow(2, attempts));
-    const nextAttemptAt = new Date(Date.now() + backoffSeconds * 1000).toISOString();
-
-    console.error("event_sync_failed", {
-      user: shortUserId(task.user_id), orgId: task.org_id, taskId: task.id,
-      eventId: task.event_id, errorCode: failureCode, attempts,
-    });
-
-    if (authorizationError) {
-      await supabase.from("google_sync_outbox").update({
-        status: "reconnect_required", attempts, last_error: failureCode,
-      }).eq("id", task.id).eq("status", "in_flight");
-      await supabase.from("google_calendar_connections").update({
-        status: "reconnect_required", error_code: failureCode, last_error: failureCode,
-      }).eq("user_id", task.user_id).eq("org_id", task.org_id);
-    } else if (message.startsWith("invalid_event_datetime:") || attempts >= MAX_ATTEMPTS) {
-      await supabase.from("google_sync_outbox").update({
-        status: "dead_letter", attempts, last_error: failureCode,
-      }).eq("id", task.id).eq("status", "in_flight");
-    } else {
-      await supabase.from("google_sync_outbox").update({
-        status: "failed", attempts, last_error: failureCode, next_attempt_at: nextAttemptAt,
-      }).eq("id", task.id).eq("status", "in_flight");
-    }
+    await handleTaskFailure(supabase, task, error);
   }
+}
+
+async function handleTaskFailure(supabase: ReturnType<typeof db>, task: SyncTask, error: unknown) {
+  const message = String((error as Error).message ?? error);
+  const failureCode = syncFailureCode(message);
+  const authorizationError = failureCode === "authorization_revoked";
+  const rateLimited = failureCode === "provider_rate_limited";
+  const attempts = task.attempts + 1;
+  const backoffSeconds = rateLimited
+    ? Math.min(600, 30 * Math.pow(2, attempts))
+    : Math.min(900, 15 * Math.pow(2, attempts));
+  const nextAttemptAt = new Date(Date.now() + backoffSeconds * 1000).toISOString();
+
+  console.error("event_sync_failed", {
+    user: shortUserId(task.user_id), orgId: task.org_id, taskId: task.id,
+    eventId: task.event_id ?? task.venue_event_id, errorCode: failureCode, attempts,
+  });
+
+  if (authorizationError) {
+    await supabase.from("google_sync_outbox").update({
+      status: "reconnect_required", attempts, last_error: failureCode,
+    }).eq("id", task.id).eq("status", "in_flight");
+    await supabase.from("google_calendar_connections").update({
+      status: "reconnect_required", error_code: failureCode, last_error: failureCode,
+    }).eq("user_id", task.user_id).eq("org_id", task.org_id);
+  } else if (message.startsWith("invalid_event_datetime:") || attempts >= MAX_ATTEMPTS) {
+    await supabase.from("google_sync_outbox").update({
+      status: "dead_letter", attempts, last_error: failureCode,
+    }).eq("id", task.id).eq("status", "in_flight");
+  } else {
+    await supabase.from("google_sync_outbox").update({
+      status: "failed", attempts, last_error: failureCode, next_attempt_at: nextAttemptAt,
+    }).eq("id", task.id).eq("status", "in_flight");
+  }
+}
+
+// ---------- Agenda Restaurante e Arena ----------
+interface VenueEventRow {
+  id: string;
+  org_id: string;
+  title: string;
+  status: string;
+  start_at: string | null;
+  end_at: string | null;
+  executive_description: string | null;
+}
+
+const VENUE_INACTIVE = new Set(["cancelado", "recusado"]);
+const venueRemoteKey = (id: string) => `venue:${id}`;
+
+async function processVenueTask(
+  supabase: ReturnType<typeof db>,
+  task: SyncTask,
+  accessToken: string,
+  calendarId: string,
+) {
+  const venueId = task.venue_event_id as string;
+  const remoteKey = venueRemoteKey(venueId);
+  const { data: mapping, error: mappingError } = await supabase.from("google_calendar_event_map")
+    .select("id, google_event_id, google_calendar_id, deleted_at")
+    .eq("user_id", task.user_id).eq("venue_event_id", venueId).maybeSingle();
+  if (mappingError) throw new Error("mapping_lookup_failed");
+  const existing = mapping as EventMapping | null;
+
+  const removeAll = async () => {
+    const mappedId = existing?.google_calendar_id === calendarId && !existing.deleted_at ? existing.google_event_id : null;
+    await deleteAllRemoteCopies(accessToken, calendarId, remoteKey, mappedId);
+    await markMappingDeleted(supabase, existing);
+    await completeTask(supabase, { ...task, operation: "delete" });
+  };
+
+  if (task.operation === "delete") return removeAll();
+
+  const { data: event, error: eventError } = await supabase.from("venue_events")
+    .select("id, org_id, title, status, start_at, end_at, executive_description")
+    .eq("id", venueId).eq("org_id", task.org_id).maybeSingle();
+  if (eventError) throw new Error("event_lookup_failed");
+  const row = event as VenueEventRow | null;
+  if (!row || !row.start_at || VENUE_INACTIVE.has(row.status)) return removeAll();
+
+  // Revalida a regra de destinatários no momento do envio.
+  const { data: recipients, error: recipientsError } = await supabase.rpc("venue_notification_recipients", { _event_id: venueId });
+  if (recipientsError) throw new Error("recipient_lookup_failed");
+  const allowed = ((recipients ?? []) as Array<{ user_id: string; google_enabled: boolean }>)
+    .some((r) => r.user_id === task.user_id && r.google_enabled);
+  if (!allowed) return removeAll();
+
+  const { data: spaces } = await supabase.from("venue_event_spaces")
+    .select("venue_spaces(name)").eq("event_id", venueId);
+  const location = ((spaces ?? []) as Array<{ venue_spaces: { name?: string } | null }>)
+    .map((s) => s.venue_spaces?.name).filter(Boolean).join(", ");
+
+  const start = new Date(row.start_at);
+  const end = row.end_at && new Date(row.end_at) > start ? new Date(row.end_at) : new Date(start.getTime() + 60 * 60_000);
+  const googleEvent = {
+    summary: row.title,
+    description: `${row.executive_description ?? ""}\n\nSincronizado por FENASOJA · Agenda Restaurante e Arena`.trim(),
+    location: location || undefined,
+    start: { dateTime: start.toISOString(), timeZone: "America/Sao_Paulo" },
+    end: { dateTime: end.toISOString(), timeZone: "America/Sao_Paulo" },
+    reminders: { useDefault: false, overrides: [{ method: "popup", minutes: 60 }] },
+    extendedProperties: { private: { fenasoja_event_id: remoteKey, fenasoja_source: "venue" } },
+  };
+
+  const remoteIds = await findRemoteEventIds(accessToken, calendarId, remoteKey);
+  const mappedRemoteId = existing?.google_calendar_id === calendarId && !existing.deleted_at
+    && existing.google_event_id && remoteIds.includes(existing.google_event_id) ? existing.google_event_id : null;
+  let googleEventId = mappedRemoteId ?? remoteIds[0] ?? null;
+
+  if (googleEventId) {
+    const updated = await callCalendarJson<{ id?: string }>(accessToken,
+      `/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(googleEventId)}`,
+      { method: "PATCH", body: JSON.stringify(googleEvent) });
+    googleEventId = updated.id ?? googleEventId;
+  } else {
+    const created = await callCalendarJson<{ id?: string }>(accessToken,
+      `/calendars/${encodeURIComponent(calendarId)}/events`,
+      { method: "POST", body: JSON.stringify(googleEvent) });
+    if (!created.id) throw new Error("remote_event_verification_failed");
+    googleEventId = created.id;
+  }
+  for (const duplicateId of remoteIds.filter((id) => id !== googleEventId)) {
+    await deleteGoogleEvent(accessToken, calendarId, duplicateId);
+  }
+
+  const mappingPayload = {
+    user_id: task.user_id, event_id: null, venue_event_id: venueId, subevent_id: null,
+    google_event_id: googleEventId, google_calendar_id: calendarId,
+    content_hash: null, last_synced_at: new Date().toISOString(), deleted_at: null,
+  };
+  const mappingWrite = existing?.id
+    ? await supabase.from("google_calendar_event_map").update(mappingPayload).eq("id", existing.id)
+    : await supabase.from("google_calendar_event_map").insert(mappingPayload);
+  if (mappingWrite.error) throw new Error("mapping_write_failed");
+  await completeTask(supabase, task);
 }
 
 Deno.serve(async (req) => {

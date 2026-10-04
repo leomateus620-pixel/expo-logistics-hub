@@ -216,3 +216,7 @@
 - [x] Validar apresentação do número temporário e retorno a vazio em fixture isolada; a edição administrativa aceita número vazio, sem escrever número fictício na base oficial.
 - [ ] Conferir a edição persistida ponta a ponta somente em ambiente isolado; o banco oficial permanece sem número.
 - Não publicar (pedido permanente do usuário).
+
+## Agenda Restaurante e Arena — notificações
+- [x] Push (criação/alteração/cancelamento/1h antes) e Google Agenda por inscrição
+- [ ] Roque ativar avisos no aparelho e conectar o Google (ação dele)

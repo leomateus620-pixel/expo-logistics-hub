@@ -3456,7 +3456,7 @@ export type Database = {
           content_hash: string | null
           created_at: string
           deleted_at: string | null
-          event_id: string
+          event_id: string | null
           google_calendar_id: string | null
           google_event_id: string | null
           id: string
@@ -3464,12 +3464,13 @@ export type Database = {
           subevent_id: string | null
           updated_at: string
           user_id: string
+          venue_event_id: string | null
         }
         Insert: {
           content_hash?: string | null
           created_at?: string
           deleted_at?: string | null
-          event_id: string
+          event_id?: string | null
           google_calendar_id?: string | null
           google_event_id?: string | null
           id?: string
@@ -3477,12 +3478,13 @@ export type Database = {
           subevent_id?: string | null
           updated_at?: string
           user_id: string
+          venue_event_id?: string | null
         }
         Update: {
           content_hash?: string | null
           created_at?: string
           deleted_at?: string | null
-          event_id?: string
+          event_id?: string | null
           google_calendar_id?: string | null
           google_event_id?: string | null
           id?: string
@@ -3490,6 +3492,7 @@ export type Database = {
           subevent_id?: string | null
           updated_at?: string
           user_id?: string
+          venue_event_id?: string | null
         }
         Relationships: []
       }
@@ -3617,6 +3620,7 @@ export type Database = {
           subevent_id: string | null
           updated_at: string
           user_id: string
+          venue_event_id: string | null
         }
         Insert: {
           attempts?: number
@@ -3635,6 +3639,7 @@ export type Database = {
           subevent_id?: string | null
           updated_at?: string
           user_id: string
+          venue_event_id?: string | null
         }
         Update: {
           attempts?: number
@@ -3653,6 +3658,7 @@ export type Database = {
           subevent_id?: string | null
           updated_at?: string
           user_id?: string
+          venue_event_id?: string | null
         }
         Relationships: [
           {
@@ -8463,6 +8469,106 @@ export type Database = {
           },
         ]
       }
+      venue_notification_deliveries: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          event_version: number
+          id: string
+          idempotency_key: string
+          kind: string
+          org_id: string
+          scheduled_for: string
+          sent_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          venue_event_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          event_version?: number
+          id?: string
+          idempotency_key: string
+          kind: string
+          org_id: string
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          venue_event_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          event_version?: number
+          id?: string
+          idempotency_key?: string
+          kind?: string
+          org_id?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          venue_event_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_notification_deliveries_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venue_notification_subscriptions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          google_enabled: boolean
+          id: string
+          org_id: string
+          push_enabled: boolean
+          scope: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          google_enabled?: boolean
+          id?: string
+          org_id: string
+          push_enabled?: boolean
+          scope: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          google_enabled?: boolean
+          id?: string
+          org_id?: string
+          push_enabled?: boolean
+          scope?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_notification_subscriptions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venue_occupancies: {
         Row: {
           active: boolean
@@ -9820,6 +9926,7 @@ export type Database = {
           subevent_id: string | null
           updated_at: string
           user_id: string
+          venue_event_id: string | null
         }[]
         SetofOptions: {
           from: "*"
@@ -10280,6 +10387,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      queue_google_venue_sync_for_user: {
+        Args: {
+          _operation: string
+          _org_id: string
+          _user_id: string
+          _venue_event_id: string
+        }
+        Returns: undefined
+      }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
@@ -10636,6 +10752,7 @@ export type Database = {
         Returns: Json
       }
       venue_delete_event_note: { Args: { p_note_id: string }; Returns: boolean }
+      venue_event_scopes: { Args: { _event_id: string }; Returns: string[] }
       venue_finish_mutation: {
         Args: {
           _idempotency_key: string
@@ -10685,6 +10802,34 @@ export type Database = {
         Returns: undefined
       }
       venue_normalize_name: { Args: { value: string }; Returns: string }
+      venue_notification_candidates: {
+        Args: { _org_id: string }
+        Returns: {
+          full_name: string
+          user_id: string
+        }[]
+      }
+      venue_notification_enqueue_immediate: {
+        Args: { _actor: string; _event_id: string; _kind: string }
+        Returns: undefined
+      }
+      venue_notification_recipients: {
+        Args: { _event_id: string }
+        Returns: {
+          google_enabled: boolean
+          push_enabled: boolean
+          reason: string
+          user_id: string
+        }[]
+      }
+      venue_notification_reconcile_event: {
+        Args: { _event_id: string; _org_id: string }
+        Returns: undefined
+      }
+      venue_notification_user_has_access: {
+        Args: { _full?: boolean; _org_id: string; _user_id: string }
+        Returns: boolean
+      }
       venue_recalculate_agreement_excess: {
         Args: { _agreement_id: string; _reason: string; _request_id: string }
         Returns: undefined

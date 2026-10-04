@@ -2,6 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { normalizeEventDateTime } from "../_shared/eventDateTime.ts";
 import { buildAssignmentPushMessage } from "../_shared/pushMessage.ts";
+import { processVenueDeliveries } from "../_shared/venueNotifications.ts";
 
 // Avisa no celular quem acabou de ser vinculado a um evento (pessoa ou comissão).
 // Mesma infraestrutura do lembrete de 1 hora: só muda o gatilho.
@@ -62,8 +63,14 @@ Deno.serve(async (req) => {
     return json({ error: "pending_query_failed" }, 500);
   }
 
+  // Agenda Restaurante e Arena: mesma rodada do cron, fila própria.
+  const venue = await processVenueDeliveries(supa, supabaseUrl, service).catch((error) => {
+    console.error("venue_push_failed", String(error));
+    return null;
+  });
+
   const rows = (pending ?? []) as PendingRow[];
-  if (!rows.length) return json({ processed: 0, sent: 0, skipped: 0 });
+  if (!rows.length) return json({ processed: 0, sent: 0, skipped: 0, venue });
 
   // Só envia para quem registrou aparelho ativo; os demais são marcados como ignorados.
   const userIds = [...new Set(rows.map((row) => row.user_id))];
@@ -171,5 +178,5 @@ Deno.serve(async (req) => {
     }
   }
 
-  return json({ processed: rows.length, sent, skipped, failed });
+  return json({ processed: rows.length, sent, skipped, failed, venue });
 });
