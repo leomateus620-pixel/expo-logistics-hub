@@ -50,6 +50,7 @@ export interface CronogramaEvent {
   priority: CronogramaPriority;
   kind: CronogramaKind;
   location?: string;
+  locationCode?: string | null;
   owner?: string;
   commission?: string;
   relatedCommissionIds?: string[];

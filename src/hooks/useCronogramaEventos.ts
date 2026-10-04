@@ -45,6 +45,7 @@ export type CronogramaEventDraft = Partial<CronogramaEventSeed> & {
   title: string;
   category: string;
   eventType: CronogramaEvent['eventType'];
+  locationCode?: string | null;
 };
 
 export type CronogramaSubeventDraft = Omit<
@@ -398,6 +399,7 @@ function fromDbRow(row: unknown): CronogramaEvent {
     status: (readString(record, 'status') ?? 'planejado') as CronogramaStatus,
     priority: (readString(record, 'priority') ?? 'media') as CronogramaPriority,
     location: readString(record, 'location'),
+    locationCode: readString(record, 'location_code'),
     time: normalizeTime(readString(record, 'event_time')),
     startTime: normalizeTime(readString(record, 'start_time')),
     endTime: normalizeTime(readString(record, 'end_time')),
@@ -513,6 +515,7 @@ function toDbPayload(event: CronogramaEventSeed | CronogramaEvent, orgId: string
     status: event.status,
     priority: event.priority,
     location: event.location ?? null,
+    location_code: 'locationCode' in event ? event.locationCode ?? null : null,
     event_time: event.time ?? null,
     start_time: event.startTime ?? null,
     end_time: event.endTime ?? null,
@@ -553,6 +556,7 @@ function toRpcEventPayload(event: CronogramaEventSeed | CronogramaEvent, orgId: 
     status: event.status,
     priority: event.priority,
     location: event.location ?? null,
+    location_code: 'locationCode' in event ? event.locationCode ?? null : null,
     event_time: event.time ?? event.startTime ?? null,
     start_time: event.startTime ?? event.time ?? null,
     end_time: event.endTime ?? null,
@@ -615,6 +619,7 @@ function draftToEvent(draft: CronogramaEventDraft): CronogramaEvent {
     status: draft.status ?? (hasExactDate ? 'planejado' : 'aguardando_definicao'),
     priority: draft.priority ?? 'media',
     location: draft.location ?? null,
+    locationCode: draft.locationCode ?? null,
     time: draft.time ?? null,
     startTime: draft.startTime ?? draft.time ?? null,
     endTime: draft.endTime ?? null,

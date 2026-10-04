@@ -7,6 +7,7 @@ import type {
 
 export interface CronogramaEvent extends CronogramaEventSeed {
   id: string;
+  locationCode?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
   sourceDataQuality?: {

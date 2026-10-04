@@ -15,6 +15,8 @@ import {
 } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { formatEventPeriodShort, getEventPeriod } from '@/lib/cronograma-event-period';
+import { CRONOGRAMA_LOCATION_OPTIONS, locationCodeForText } from '@/lib/cronograma-location-options';
+import { EventCenterRestaurantAlert } from './EventCenterRestaurantAlert';
 import { officialMemberLabel, resolveOfficialMembers } from '@/lib/memberIdentity';
 import { ORG_UNIT_SELECT_LABEL } from '@/lib/org-units';
 import {
@@ -334,6 +336,7 @@ export function EventForm({
       startTime: form.startTime?.trim() || undefined,
       endTime: form.endTime?.trim() || undefined,
       location: form.location?.trim() || undefined,
+      locationCode: locationCodeForText(form.location),
       owner: primaryResponsible?.name?.trim() || currentUserName || form.owner?.trim() || undefined,
       commission: form.commission?.trim() || undefined,
       pendingReason: form.pendingReason?.trim() || undefined,
@@ -576,11 +579,15 @@ export function EventForm({
             <Label htmlFor={fieldId('location')}>Local</Label>
             <Input
               id={fieldId('location')}
+              list={fieldId('location-options')}
               value={form.location || ''}
-              onChange={(event) => update('location', event.target.value)}
+              onChange={(event) => setForm((current) => ({ ...current, location: event.target.value, locationCode: locationCodeForText(event.target.value) }))}
               placeholder="Local ou área do parque"
               className="bg-white/72"
             />
+            <datalist id={fieldId('location-options')}>
+              {CRONOGRAMA_LOCATION_OPTIONS.map(({ code, label }) => <option key={code} value={label} />)}
+            </datalist>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor={fieldId('owner')}>Responsável</Label>
@@ -596,6 +603,7 @@ export function EventForm({
           </div>
 
         </div>
+        <EventCenterRestaurantAlert code={form.locationCode} start={form.date} end={multiDay ? form.endDate ?? form.date : form.date} />
       </div>
 
       {showRelational && (
