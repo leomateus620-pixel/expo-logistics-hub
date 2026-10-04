@@ -12,6 +12,9 @@ class ResizeObserverStub {
 (globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = ResizeObserverStub;
 
 vi.mock('@/hooks/useAuth', () => ({ useAuth: () => ({ user: null }) }));
+vi.mock('@/hooks/useEventCenterRestaurantConflicts', () => ({
+  useEventCenterRestaurantConflicts: () => ({ events: [], loading: false, error: false }),
+}));
 vi.mock('@/components/cronograma-eventos/useCronogramaRelationOptions', async () => {
   const actual = await vi.importActual<Record<string, unknown>>(
     '@/components/cronograma-eventos/useCronogramaRelationOptions',

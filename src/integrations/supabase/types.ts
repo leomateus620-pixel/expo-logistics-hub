@@ -2043,6 +2043,7 @@ export type Database = {
           is_official_seed: boolean
           linked_commissions: Json
           location: string | null
+          location_code: string | null
           lock_version: number
           month_label: string | null
           notify_all_commission_members: boolean
@@ -2086,6 +2087,7 @@ export type Database = {
           is_official_seed?: boolean
           linked_commissions?: Json
           location?: string | null
+          location_code?: string | null
           lock_version?: number
           month_label?: string | null
           notify_all_commission_members?: boolean
@@ -2129,6 +2131,7 @@ export type Database = {
           is_official_seed?: boolean
           linked_commissions?: Json
           location?: string | null
+          location_code?: string | null
           lock_version?: number
           month_label?: string | null
           notify_all_commission_members?: boolean
@@ -9017,6 +9020,7 @@ export type Database = {
           is_official_seed: boolean | null
           linked_commissions: Json | null
           location: string | null
+          location_code: string | null
           lock_version: number | null
           month_label: string | null
           org_id: string | null
@@ -9061,6 +9065,7 @@ export type Database = {
           is_official_seed?: boolean | null
           linked_commissions?: Json | null
           location?: string | null
+          location_code?: string | null
           lock_version?: number | null
           month_label?: string | null
           org_id?: string | null
@@ -9105,6 +9110,7 @@ export type Database = {
           is_official_seed?: boolean | null
           linked_commissions?: Json | null
           location?: string | null
+          location_code?: string | null
           lock_version?: number | null
           month_label?: string | null
           org_id?: string | null
@@ -9914,6 +9920,16 @@ export type Database = {
       cronograma_reorder_subevents: {
         Args: { event_id: string; ordered_ids: string[] }
         Returns: Json
+      }
+      cronograma_restaurant_alert: {
+        Args: { _end_date: string; _org_id: string; _start_date: string }
+        Returns: {
+          end_time: string
+          event_date: string
+          event_end_date: string
+          start_time: string
+          title: string
+        }[]
       }
       cronograma_save_event: {
         Args: { expected_lock_version?: number; payload: Json }

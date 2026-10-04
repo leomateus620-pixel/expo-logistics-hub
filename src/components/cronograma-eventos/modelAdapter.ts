@@ -161,6 +161,7 @@ export function adaptCronogramaEvent(
     priority: sourceToVisualPriority[event.priority] ?? 'medium',
     kind: centralMeeting ? 'meeting' : sourceToVisualKind[event.eventType] ?? 'event',
     location: event.location ?? undefined,
+    locationCode: event.locationCode ?? null,
     owner: primaryResponsible?.name ?? event.responsibleName ?? undefined,
     commission: primaryCommission?.commissionName ?? event.commissionName ?? event.linkedCommissions?.[0]?.name,
     relatedCommissionIds: [
@@ -300,6 +301,7 @@ export function visualEventToSourceUpdates(
     status: visualToSourceStatus[event.status],
     priority: visualToSourcePriority[event.priority],
     location: event.location ?? null,
+    locationCode: event.locationCode ?? null,
     time: event.startTime ?? null,
     responsibleName: event.owner ?? null,
     commissionName: event.commission ?? current.commissionName,
@@ -332,6 +334,7 @@ export function visualEventToDraft(event: CronogramaEvent): CronogramaEventDraft
     status: visualToSourceStatus[event.status],
     priority: visualToSourcePriority[event.priority],
     location: event.location ?? null,
+    locationCode: event.locationCode ?? null,
     time: event.startTime ?? null,
     responsibleName: event.owner ?? null,
     commissionName: event.commission ?? null,

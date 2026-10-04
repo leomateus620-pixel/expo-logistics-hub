@@ -1,0 +1,1 @@
+ALTER VIEW public.cronograma_eventos_full SET (security_invoker = on);

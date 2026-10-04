@@ -71,6 +71,7 @@ export interface CronogramaSaveEventPayload {
   status?: string;
   priority?: string;
   location?: string | null;
+  location_code?: string | null;
   event_time?: string | null;
   start_time?: string | null;
   end_time?: string | null;

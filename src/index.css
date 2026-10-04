@@ -1367,6 +1367,14 @@ input, textarea, select, [role="combobox"] {
   text-transform: uppercase;
 }
 
+/* iOS Safari enlarges the page when a focused edit control computes below 16px. */
+@media screen and (max-width: 767px) {
+  input:not([type="hidden"]), textarea, select, [role="combobox"], [contenteditable="true"] {
+    font-size: max(16px, 1em) !important;
+    scroll-margin-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+}
+
 /* Credenciais nunca em caixa alta: o usuário precisa enxergar exatamente o que digitou */
 input[type="password"],
 input[type="email"],
