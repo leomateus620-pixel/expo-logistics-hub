@@ -4,7 +4,8 @@
 - [x] Corrigir fonte de edição móvel nos controles compartilhados e limites de painéis.
 - [x] Disponibilizar quatro locais oficiais mantendo texto livre e código persistido.
 - [x] Avisar sobre eventos do Restaurante no Centro de Eventos com consulta restrita por dia civil.
-- [ ] Conferir teclado/zoom em iOS Safari real e alerta com sessão autorizada (prévia sem sessão).
+- [x] Conferir fonte móvel de 16px no navegador da prévia, códigos históricos inequívocos e testes focados de Agenda.
+- [ ] Conferir teclado/zoom em iOS Safari real e alerta com sessão autorizada (bloqueio: sem conta do solicitante na prévia nem sessão autenticada disponível).
 - Não publicar sem autorização.
 
 ## Finalizar venda — revisão e pagamento
