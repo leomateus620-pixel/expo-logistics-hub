@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { VenueHeaderSearch } from "@/components/venue-events/VenueHeaderSearch";
 import { VenueSearchProvider } from "@/components/venue-events/VenueSearchContext";
+import { VenueNotificationsButton } from "@/components/venue-events/VenueNotificationsButton";
 import "@/styles/venue-events-shell.css";
 
 interface VenueModuleShellProps {
@@ -78,6 +79,7 @@ export function VenueModuleShell({ children }: VenueModuleShellProps) {
           <VenueHeaderSearch className="venue-module-shell__search" />
 
           <div className="venue-module-shell__actions">
+            <VenueNotificationsButton />
             <Button
               type="button"
               variant="ghost"
