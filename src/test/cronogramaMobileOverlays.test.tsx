@@ -12,6 +12,9 @@ import type { CronogramaEvent } from '@/components/cronograma-eventos/types';
 vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({ user: null }),
 }));
+vi.mock('@/hooks/useEventCenterRestaurantConflicts', () => ({
+  useEventCenterRestaurantConflicts: () => ({ events: [], loading: false, error: false }),
+}));
 
 vi.mock('@/hooks/useOrgMembers', () => ({
   useOrgMembers: () => ({
