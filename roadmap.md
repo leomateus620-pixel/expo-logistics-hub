@@ -1,5 +1,12 @@
 # Roadmap
 
+## Agenda — zoom móvel, locais e alerta do Restaurante
+- [x] Corrigir fonte de edição móvel nos controles compartilhados e limites de painéis.
+- [x] Disponibilizar quatro locais oficiais mantendo texto livre e código persistido.
+- [x] Avisar sobre eventos do Restaurante no Centro de Eventos com consulta restrita por dia civil.
+- [ ] Conferir teclado/zoom em iOS Safari real e alerta com sessão autorizada (prévia sem sessão).
+- Não publicar sem autorização.
+
 ## Finalizar venda — revisão e pagamento
 - [x] Permitir valores inteiros em reais nos três campos de taxas, mantendo centavos e a edição de parcelas; conferir totais e distribuição.
 - [x] Corrigir a quebra e o alinhamento dos dados da revisão para nomes e documentos longos, em telas largas e estreitas.
