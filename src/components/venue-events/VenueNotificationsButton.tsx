@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { usePushRegistration } from '@/hooks/usePushRegistration';
 import { useGoogleCalendarConnection } from '@/hooks/useGoogleCalendarConnection';
-import { useCapabilities } from '@/contexts/CapabilitiesProvider';
+import { useCapabilitiesContext } from '@/contexts/CapabilitiesProvider';
 import {
   VENUE_SCOPES,
   useVenueNotificationSettings,
@@ -37,7 +37,7 @@ function findSub(list: VenueSubscription[], userId: string, scope: VenueScope) {
 }
 
 export function VenueNotificationsButton() {
-  const { hasCapability } = useCapabilities();
+  const { hasCapability } = useCapabilitiesContext();
   const manageAll = hasCapability('venue_events_full_access');
   const push = usePushRegistration();
   const google = useGoogleCalendarConnection();
