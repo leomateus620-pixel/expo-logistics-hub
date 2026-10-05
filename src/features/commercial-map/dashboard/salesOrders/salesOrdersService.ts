@@ -229,6 +229,7 @@ export interface ReviseSaleOrderParams {
   fees?: { admin: number; ppci: number; cleaning: number } | null;
   installmentCount?: number | null;
   reason: string;
+  expectedUpdatedAt?: string | null;
 }
 
 /** Troca/adição/retirada de lotes numa operação transacional no servidor (revalida permissão e disponibilidade). */
@@ -243,7 +244,7 @@ export async function reviseSaleOrder(params: ReviseSaleOrderParams) {
     p_fee_cleaning: params.fees?.cleaning ?? null,
     p_installment_count: params.installmentCount ?? null,
     p_reason: params.reason.trim(),
-    p_expected_updated_at: null,
+    p_expected_updated_at: params.expectedUpdatedAt ?? null,
   });
   if (error) throw error;
   return data as { orderId: string; before: Record<string, unknown>; after: Record<string, unknown> };
@@ -263,4 +264,17 @@ export function describeReviseError(error: unknown): string {
   if (message.includes('NOTHING_TO_CHANGE')) return 'Nenhuma alteração para salvar.';
   if (message.includes('REASON_REQUIRED')) return 'Informe o motivo da alteração.';
   return describeSalesError(error);
+}
+
+export interface SaleOrderRevision {
+  id: string; createdAt: string; reason: string; actorName: string | null;
+  before: { lots?: string[]; negotiated_total?: number; installment_count?: number };
+  after: { lots?: string[]; negotiated_total?: number; installment_count?: number };
+}
+
+/** Revisões da venda + versão atual (trava otimista da edição). */
+export async function fetchSaleOrderRevisions(orderId: string): Promise<{ updatedAt: string; revisions: SaleOrderRevision[] }> {
+  const { data, error } = await db.rpc('get_sale_order_revisions', { p_order_id: orderId });
+  if (error) throw error;
+  return { updatedAt: data?.updatedAt, revisions: data?.revisions ?? [] };
 }
