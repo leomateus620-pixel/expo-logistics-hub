@@ -43,10 +43,11 @@ describe('EventLocationField', () => {
 
   it('switches from an official location to custom without retaining its alert code', () => {
     const onChange = vi.fn();
-    render(<EventLocationField value="CENTRO DE EVENTOS FENASOJA" code="centro_eventos_fenasoja" onChange={onChange} />);
+    const { rerender } = render(<EventLocationField value="CENTRO DE EVENTOS FENASOJA" code="centro_eventos_fenasoja" onChange={onChange} />);
     fireEvent.click(screen.getByRole('button', { name: /Local CENTRO DE EVENTOS FENASOJA/i }));
     fireEvent.click(screen.getByRole('button', { name: 'Outro local' }));
     expect(onChange).toHaveBeenCalledWith('', null);
+    rerender(<EventLocationField value="" code={null} onChange={onChange} />);
     expect(screen.getByRole('textbox', { name: 'Outro local do evento' })).toHaveValue('');
   });
 });
