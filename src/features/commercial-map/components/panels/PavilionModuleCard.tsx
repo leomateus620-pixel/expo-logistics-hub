@@ -35,6 +35,8 @@ import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
 import { SaleExhibitorIdentity } from '../../sales/components/SaleExhibitorEditDialog';
 import { SaleOpenSection } from '../../sales/components/SaleOpenSection';
 import { resolveLotIdentity } from '../../utils/lotIdentity';
+import { useLotActivity } from '../../hooks/useCommercialMap';
+import { LotActivityList } from './LotActivityList';
 import type { LotPricingStage } from '../../utils/lotPricing2028';
 import './pavilion-module-detail-layout.css';
 
@@ -238,6 +240,7 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
          </div>
 
         <LotSaleHistoryCard sale={saleHistory.data} loading={saleHistory.isLoading} currentIdentity={lot ? resolveLotIdentity(lot, record?.entity, pavilion) : null} />
+        {persisted && lot ? <ModuleActivity lotId={lot.id} /> : null}
 
         {persisted && permissions.canManageContracts && lot && (lot.status === 'SOLD' || Boolean(contracts.data?.length)) && (
           <section
@@ -314,3 +317,13 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
     </>
   );
 });
+
+function ModuleActivity({ lotId }: { lotId: string }) {
+  const activity = useLotActivity(lotId);
+  return (
+    <details className="commercial-pavilion-module-history">
+      <summary>Histórico do módulo{activity.data?.length ? ` (${activity.data.length})` : ''}</summary>
+      <div className="commercial-map-activity"><LotActivityList items={activity.data} loading={activity.isLoading} /></div>
+    </details>
+  );
+}

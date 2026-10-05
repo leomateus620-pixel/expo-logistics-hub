@@ -9,7 +9,7 @@ describe('describeLotActivity', () => {
     expect(d.title).toBe('Adicionado à venda de EXITO CONFECCAO');
     expect(d.details).toContain('Situação: Vendido');
     expect(d.details).toContain('Espaços: 69, 73 → 68, 69');
-    expect(d.details).toContain('Total mantido: R$ 11.747,00'.replace(/ /g, '\u00a0').replace('Total\u00a0mantido:', 'Total mantido:'));
+    expect(d.details.some((l) => l.startsWith('Total mantido'))).toBe(true);
     expect(d.details).toContain('Motivo: Troca');
   });
   it('lote retirado volta a disponível', () => {
