@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Check, ChevronDown, FileText, Loader2, MapPinned, Paperclip, Search, ShieldAlert, SlidersHorizontal, X } from 'lucide-react';
+import { Check, ChevronDown, FileText, Loader2, MapPinned, Paperclip, Pencil, Search, ShieldAlert, SlidersHorizontal, X } from 'lucide-react';
 import type { CommercialMapData } from '../../types';
 import { paymentMethodLabel, SALES_PAYMENT_METHODS, SALES_PAYMENT_METHOD_LABELS } from '../../sales/salesTypes';
 import { getContractSignedUrl } from '../../services/commercialMapService';
@@ -11,6 +11,7 @@ import {
 } from './salesOrdersService';
 import { useSalesOrdersUiStore } from './useSalesOrdersUiStore';
 import { AttachOrderContractDialog } from './AttachOrderContractDialog';
+import { ReviseSaleOrderDialog } from './ReviseSaleOrderDialog';
 
 export interface CommercialSalesOrdersSectionProps {
   projectId: string;
@@ -179,6 +180,8 @@ function SaleRow({ record, expanded, onToggle, onViewSale, scrollContainer, ...r
   const detailId = `cso-detail-${record.recordId}`;
   const hasCancellation = record.cancelledCount > 0;
   const name = record.buyerTradeName?.trim() || record.displayName;
+  const [editRequested, setEditRequested] = useState(false);
+  const canEdit = rest.canManageSales && record.kind === 'ORDER' && record.activeCount > 0;
   return <article className={`cso-row ${expanded ? 'is-expanded' : ''}`}>
     <div className="cso-row-main">
       <button type="button" className="cso-toggle" aria-label={`Detalhes de ${name} · ${record.reference}`} aria-expanded={expanded} aria-controls={detailId} onClick={onToggle}>
@@ -207,13 +210,19 @@ function SaleRow({ record, expanded, onToggle, onViewSale, scrollContainer, ...r
         }}>
         <MapPinned aria-hidden="true" />Ver lotes no mapa
       </button>
+      {canEdit && <button type="button" className="cso-view cso-edit-lots" aria-label={`Editar lotes de ${name}`} title="Editar lotes da venda"
+        onClick={() => { setEditRequested(true); if (!expanded) onToggle(); }}>
+        <Pencil aria-hidden="true" />Editar lotes
+      </button>}
     </div>
-    {expanded && <div id={detailId} className="cso-detail"><SaleDetail record={record} {...rest} onViewSale={onViewSale} scrollContainer={scrollContainer} /></div>}
+    {expanded && <div id={detailId} className="cso-detail"><SaleDetail record={record} {...rest} editRequested={editRequested} onEditHandled={() => setEditRequested(false)} onViewSale={onViewSale} scrollContainer={scrollContainer} /></div>}
   </article>;
 }
 
-function SaleDetail({ record, data, orgId, canManageContracts }: CommercialSalesOrdersSectionProps & { record: SaleOrderSummary }) {
+function SaleDetail({ record, data, orgId, canManageContracts, canManageSales, editRequested, onEditHandled }: CommercialSalesOrdersSectionProps & { record: SaleOrderSummary; editRequested?: boolean; onEditHandled?: () => void }) {
   const queryClient = useQueryClient();
+  const [reviseOpen, setReviseOpen] = useState(false);
+  useLayoutEffect(() => { if (editRequested) { setReviseOpen(true); onEditHandled?.(); } }, [editRequested, onEditHandled]);
   const [attachOpen, setAttachOpen] = useState<{ contract: SaleContract | null } | null>(null);
   const detail = useQuery({
     queryKey: ['commercial-sale-order-detail', record.recordId],
@@ -255,7 +264,11 @@ function SaleDetail({ record, data, orgId, canManageContracts }: CommercialSales
 
   return <div className="cso-detail-grid">
     <section className="cso-block cso-span">
-      <h3>Espaços <span className="cso-count">{d.items.length}</span></h3>
+      <div className="cso-block-head">
+        <h3>Espaços <span className="cso-count">{d.items.length}</span></h3>
+        {canManageSales && h.kind === 'ORDER' && h.orderId && activeItems.length > 0 && <button type="button" className="cso-view cso-edit-lots" onClick={() => setReviseOpen(true)}>
+          <Pencil aria-hidden="true" />Editar lotes</button>}
+      </div>
       {Array.from(groupedItems, ([location, items]) => <div className="cso-space-group" key={location}>
       <h4>{location}<span>{items.length} {items.length === 1 ? 'espaço' : 'espaços'}</span></h4>
       <ul className="cso-items">
@@ -282,7 +295,7 @@ function SaleDetail({ record, data, orgId, canManageContracts }: CommercialSales
         <div className="is-total"><dt>Valor negociado (legado)</dt><dd>{formatDashboardCurrency(h.negotiatedTotal == null ? null : Number(h.negotiatedTotal))}</dd></div>
         <div><dt>Data da venda</dt><dd>{fmtDate(h.saleDate)}</dd></div>
       </dl>}
-      {hasCancelled && <p className="cso-note">Total original preservado; parcelas e taxas não são recalculadas automaticamente.</p>}
+      {hasCancelled && <p className="cso-note">Espaços cancelados ficam no histórico; use “Editar lotes” para trocar ou retirar espaços com recálculo.</p>}
     </section>
 
     <section className="cso-block">
@@ -326,6 +339,20 @@ function SaleDetail({ record, data, orgId, canManageContracts }: CommercialSales
       </dl>
     </details>
 
+    {reviseOpen && h.orderId && <ReviseSaleOrderDialog
+      orderId={h.orderId}
+      detail={d}
+      lots={data.lots}
+      locationOf={locationOf}
+      onClose={() => setReviseOpen(false)}
+      onSaved={async () => {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail'] }),
+          queryClient.invalidateQueries({ queryKey: ['commercial-sale-orders'] }),
+          queryClient.invalidateQueries({ queryKey: ['commercial-map'] }),
+        ]);
+      }}
+    />}
     {attachOpen && orgId && h.orderId && <AttachOrderContractDialog
       orgId={orgId}
       orderId={h.orderId}
