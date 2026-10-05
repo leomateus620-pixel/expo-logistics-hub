@@ -228,13 +228,14 @@ export interface ReviseSaleOrderParams {
   removeItemIds: string[];
   fees?: { admin: number; ppci: number; cleaning: number } | null;
   installmentCount?: number | null;
-  reason: string;
+  reason?: string;
   expectedUpdatedAt?: string | null;
 }
 
 /** Troca/adição/retirada de lotes numa operação transacional no servidor (revalida permissão e disponibilidade). */
 export async function reviseSaleOrder(params: ReviseSaleOrderParams) {
-  if (!params.reason.trim()) throw new Error('Informe o motivo da alteração.');
+  const reason = params.reason?.trim();
+  if (!reason) throw new Error('A alteração precisa de uma descrição automática para auditoria.');
   const { data, error } = await db.rpc('revise_sale_order_items', {
     p_order_id: params.orderId,
     p_add_lot_ids: params.addLotIds,
@@ -243,7 +244,7 @@ export async function reviseSaleOrder(params: ReviseSaleOrderParams) {
     p_fee_ppci: params.fees?.ppci ?? null,
     p_fee_cleaning: params.fees?.cleaning ?? null,
     p_installment_count: params.installmentCount ?? null,
-    p_reason: params.reason.trim(),
+    p_reason: reason,
     p_expected_updated_at: params.expectedUpdatedAt ?? null,
   });
   if (error) throw error;
