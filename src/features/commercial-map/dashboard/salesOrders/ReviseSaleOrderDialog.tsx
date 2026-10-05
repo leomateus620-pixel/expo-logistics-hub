@@ -3,22 +3,31 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSaleInspectionStore } from '../../state/useSaleInspectionStore';
 import { useSalesStore } from '../../sales/useSalesSelection';
 import * as Dialog from '@radix-ui/react-dialog';
-import { ArrowRight, Loader2, Minus, Plus, Search, Undo2, X } from 'lucide-react';
-import type { CommercialLot } from '../../types';
+import { ArrowRight, ChevronDown, Loader2, Plus, Search, Undo2, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import type { CommercialLot, MapEntity } from '../../types';
 import { formatDashboardCurrency } from '../commercialDashboardFormatters';
 import { parseReaisInputToCents } from '../../sales/salesMoney';
 import { describeReviseError, fetchSaleOrderRevisions, reviseSaleOrder, type SaleOrderDetail } from './salesOrdersService';
 import { previewRevision } from './saleRevision';
+import {
+  buildAutomaticRevisionReason,
+  candidateDisabledReason,
+  commercialStatusLabel,
+  matchesLotSearch,
+  scopeForLot,
+} from './saleLotRevisionSelection';
 import './attach-order-contract.css';
 import './revise-sale-order.css';
 
 const centsText = (v: number) => (v / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, focusLotId, onClose, onSaved }: {
+export function ReviseSaleOrderDialog({ orderId, detail, lots, entities, locationOf, focusLotId, onClose, onSaved }: {
   focusLotId?: string;
   orderId: string;
   detail: SaleOrderDetail;
   lots: readonly CommercialLot[];
+  entities: readonly MapEntity[];
   locationOf: (lotId: string) => string;
   onClose: () => void;
   onSaved: () => Promise<void>;
@@ -36,6 +45,7 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, focus
   });
   const [count, setCount] = useState(detail.installments.length || Number(h.installmentCount ?? 1));
   const [reason, setReason] = useState('');
+  const [showNote, setShowNote] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const submitting = useRef(false);
@@ -47,15 +57,34 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, focus
     return (stage === 'RENOVACAO' ? p?.renovacaoTotal : p?.segundaTotal) ?? null;
   };
   const lotById = useMemo(() => new Map(lots.map((l) => [l.id, l])), [lots]);
-  const activeLotIds = new Set(active.map((i) => i.lotId));
+  const activeLotIds = useMemo(() => new Set(active.map((i) => i.lotId)), [active]);
+  const scopes = useMemo(() => {
+    const unique = new Map<string, ReturnType<typeof scopeForLot>>();
+    active.forEach((item) => {
+      const lot = lotById.get(item.lotId);
+      const scope = lot ? scopeForLot(lot, entities) : null;
+      if (scope) unique.set(scope.key, scope);
+    });
+    return Array.from(unique.values()).filter(Boolean) as NonNullable<ReturnType<typeof scopeForLot>>[];
+  }, [active, entities, lotById]);
+  const [scopeKey, setScopeKey] = useState<string>(() => scopes[0]?.key ?? '');
+  const selectedScope = scopes.find((scope) => scope.key === scopeKey) ?? scopes[0] ?? null;
   const candidates = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return [];
-    return lots.filter((l) => !l.archivedAt && !activeLotIds.has(l.id) && !added.includes(l.id)
-      && [l.lotNumber, l.displayName, l.publicIdentifier, l.block, locationOf(l.id)].some((v) => v?.toLowerCase().includes(q)))
+    if (!search.trim() || !selectedScope) return [];
+    return lots
+      .filter((lot) => {
+        const scope = scopeForLot(lot, entities);
+        return !lot.archivedAt
+          && !activeLotIds.has(lot.id)
+          && !added.includes(lot.id)
+          && scope?.key === selectedScope.key
+          && scope.projectId === selectedScope.projectId
+          && matchesLotSearch(lot, locationOf(lot.id), search);
+      })
+      .sort((a, b) => Number(b.status === 'AVAILABLE') - Number(a.status === 'AVAILABLE')
+        || String(a.lotNumber ?? a.publicIdentifier).localeCompare(String(b.lotNumber ?? b.publicIdentifier), 'pt-BR', { numeric: true }))
       .slice(0, 30);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lots, search, added, detail]);
+  }, [activeLotIds, added, entities, locationOf, lots, search, selectedScope]);
 
   const addedLots = added.map((id) => lotById.get(id)).filter(Boolean) as CommercialLot[];
   const feesCents = parseReaisInputToCents(fees.admin) + parseReaisInputToCents(fees.ppci) + parseReaisInputToCents(fees.cleaning);
@@ -86,7 +115,6 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, focus
     if (submitting.current) return;
     if (!changed) { setError('Nenhuma alteração para salvar.'); return; }
     if (remaining === 0) { setError('A venda precisa manter ao menos um espaço.'); return; }
-    if (!reason.trim()) { setError('Informe o motivo da alteração.'); return; }
     if (preview.belowPaid) { setError('O novo total ficaria abaixo do valor já recebido.'); return; }
     submitting.current = true; setBusy(true); setError(null);
     try {
@@ -96,7 +124,10 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, focus
         removeItemIds: Array.from(removed),
         fees: feesCents !== originalFees ? { admin: parseReaisInputToCents(fees.admin) / 100, ppci: parseReaisInputToCents(fees.ppci) / 100, cleaning: parseReaisInputToCents(fees.cleaning) / 100 } : null,
         installmentCount: count !== detail.installments.length ? count : null,
-        reason,
+        reason: reason.trim() || buildAutomaticRevisionReason(
+          addedLots.map((lot) => lot.publicIdentifier),
+          active.filter((item) => removed.has(item.itemId ?? '')).map((item) => item.publicIdentifier),
+        ),
         expectedUpdatedAt: version.data?.updatedAt ?? null,
       });
       const removedLotIds = active.filter((i) => removed.has(i.itemId ?? '')).map((i) => i.lotId);
@@ -132,48 +163,61 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, focus
               <Dialog.Title className="cso-attach-title">Editar lotes da venda</Dialog.Title>
               <Dialog.Description className="cso-attach-description">Adicione, retire ou troque espaços. Valores e parcelas em aberto são recalculados.</Dialog.Description>
             </div>
-            <Dialog.Close asChild><button className="cso-attach-close" type="button" aria-label="Fechar edição" disabled={busy}><X aria-hidden="true" /></button></Dialog.Close>
+            <Dialog.Close asChild><Button className="cso-attach-close" type="button" variant="outline" size="icon" aria-label="Fechar edição" disabled={busy}><X aria-hidden="true" /></Button></Dialog.Close>
           </header>
           <form className="cso-attach-form" onSubmit={(e) => { e.preventDefault(); void submit(); }}>
             <div className="cso-attach-body">
               <section className="cso-attach-section">
-                <h3><span aria-hidden="true">01</span> Espaços da venda</h3>
+                <h3><span aria-hidden="true">01</span> Lotes atuais da venda</h3>
                 <ul className="rso-list">
                   {active.map((item) => {
                     const off = removed.has(item.itemId ?? '');
                     return <li key={item.itemId ?? item.lotId} className={`${off ? 'is-removed' : ''}${item.lotId === focusLotId ? ' is-focus' : ''}`}>
-                      <span className="rso-name">{label(item.lotId, item.displayName || item.publicIdentifier)}</span>
+                      <span className="rso-card-copy"><span className="rso-name">{label(item.lotId, item.displayName || item.publicIdentifier)}</span>{off && <span className="rso-change-state">Será retirado</span>}</span>
                       <span className="rso-value">{formatDashboardCurrency(item.itemTotal)}</span>
-                      <button type="button" className="rso-icon" disabled={busy || !item.itemId}
-                        aria-label={off ? `Manter ${item.publicIdentifier}` : `Retirar ${item.publicIdentifier}`}
+                      <Button type="button" variant="outline" size="sm" className="rso-action" disabled={busy || !item.itemId}
                         onClick={() => setRemoved((prev) => { const next = new Set(prev); const id = item.itemId as string; if (next.has(id)) next.delete(id); else next.add(id); return next; })}>
-                        {off ? <Undo2 aria-hidden="true" /> : <Minus aria-hidden="true" />}
-                      </button>
+                        {off && <Undo2 aria-hidden="true" />}{off ? 'Manter' : 'Retirar'}
+                      </Button>
                     </li>;
                   })}
-                  {addedLots.map((lot) => <li key={lot.id} className="is-added">
-                    <span className="rso-name">{label(lot.id)} <em>novo</em></span>
-                    <span className="rso-value">{priceOf(lot) === null ? 'Preço no servidor' : formatDashboardCurrency(priceOf(lot))}</span>
-                    <button type="button" className="rso-icon" disabled={busy} aria-label={`Desfazer ${lot.publicIdentifier}`}
-                      onClick={() => setAdded((prev) => prev.filter((id) => id !== lot.id))}><X aria-hidden="true" /></button>
-                  </li>)}
                 </ul>
+                {addedLots.length > 0 && <div className="rso-added-group">
+                  <h4>Adicionados nesta alteração</h4>
+                  <ul className="rso-list">
+                    {addedLots.map((lot) => <li key={lot.id} className="is-added">
+                      <span className="rso-card-copy"><span className="rso-name">{label(lot.id)}</span><span className="rso-change-state">Entrará na venda</span></span>
+                      <span className="rso-value">{priceOf(lot) === null ? 'Sem preço' : formatDashboardCurrency(priceOf(lot))}</span>
+                      <Button type="button" variant="outline" size="sm" className="rso-action" disabled={busy}
+                        onClick={() => setAdded((prev) => prev.filter((id) => id !== lot.id))}><Undo2 aria-hidden="true" />Desfazer</Button>
+                    </li>)}
+                  </ul>
+                </div>}
+                <div className="rso-add-area">
+                  <div className="rso-add-heading">
+                    <div><h4>Adicionar lotes</h4><p>Pesquisa restrita a <strong>{selectedScope?.label ?? 'local não identificado'}</strong>.</p></div>
+                    {scopes.length > 1 && <label><span>Local da venda</span><select value={selectedScope?.key ?? ''} onChange={(event) => { setScopeKey(event.target.value); setSearch(''); }} disabled={busy}>{scopes.map((scope) => <option key={scope.key} value={scope.key}>{scope.label}</option>)}</select></label>}
+                  </div>
                 <label className="rso-search"><Search aria-hidden="true" />
-                  <input value={search} disabled={busy} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar espaço para adicionar (número, pavilhão, quadra)" aria-label="Buscar espaço para adicionar" />
+                  <input value={search} disabled={busy || !selectedScope} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por número, código ou nome" aria-label="Buscar lote para adicionar" />
                 </label>
                 {search.trim() && <ul className="rso-candidates">
-                  {candidates.length === 0 && <li className="rso-empty">Nenhum espaço encontrado.</li>}
+                  {candidates.length === 0 && <li className="rso-empty">Nenhum lote encontrado neste local.</li>}
                   {candidates.map((lot) => {
-                    const free = lot.status === 'AVAILABLE';
-                    return <li key={lot.id}>
-                      <button type="button" disabled={busy || !free} onClick={() => { setAdded((prev) => [...prev, lot.id]); setSearch(''); }}>
-                        <span className="rso-name">{label(lot.id)}</span>
-                        <span className="rso-value">{free ? (priceOf(lot) === null ? '—' : formatDashboardCurrency(priceOf(lot))) : lot.status === 'SOLD' ? 'Vendido' : lot.status === 'SALE_OPEN' ? 'Em venda' : 'Indisponível'}</span>
-                        {free && <Plus aria-hidden="true" />}
-                      </button>
+                    const disabledReason = candidateDisabledReason(lot, priceOf(lot));
+                    const phase = lot.status === 'AVAILABLE' ? 'available' : lot.status === 'SALE_OPEN' ? 'open' : lot.status === 'SOLD' ? 'sold' : 'blocked';
+                    return <li key={lot.id} className={`is-${phase}`}>
+                      <div className="rso-candidate-copy"><span className="rso-name">{lot.displayName || lot.publicIdentifier}</span><small>{lot.publicIdentifier} · {locationOf(lot.id)}</small></div>
+                      <span className={`rso-status is-${phase}`}>{commercialStatusLabel(lot)}</span>
+                      <span className="rso-value">{priceOf(lot) === null ? 'Sem preço oficial' : formatDashboardCurrency(priceOf(lot))}</span>
+                      <Button type="button" size="sm" variant={disabledReason ? 'outline' : 'default'} disabled={busy || Boolean(disabledReason)}
+                        title={disabledReason ?? undefined} onClick={() => setAdded((prev) => [...prev, lot.id])}>
+                        {!disabledReason && <Plus aria-hidden="true" />}{disabledReason ?? 'Adicionar'}
+                      </Button>
                     </li>;
                   })}
                 </ul>}
+                </div>
               </section>
 
               <section className="cso-attach-section">
@@ -197,10 +241,12 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, focus
                 {unknownPrice && <p className="cso-note">* Algum espaço novo terá o preço oficial confirmado ao salvar.</p>}
               </section>
 
-              <section className="cso-attach-section">
-                <h3><span aria-hidden="true">03</span> Motivo</h3>
-                <label className="cso-attach-field"><span>Motivo da alteração</span>
-                  <input value={reason} disabled={busy} onChange={(e) => setReason(e.target.value)} placeholder="Ex.: troca de módulo a pedido do expositor" /></label>
+              <section className="cso-attach-section rso-note-section">
+                <Button type="button" variant="ghost" className="rso-note-trigger" aria-expanded={showNote} onClick={() => setShowNote((value) => !value)}>
+                  <ChevronDown aria-hidden="true" className={showNote ? 'is-open' : ''} /> Adicionar observação <span>(opcional)</span>
+                </Button>
+                {showNote && <label className="cso-attach-field"><span>Observação da alteração</span>
+                  <input value={reason} disabled={busy} onChange={(e) => setReason(e.target.value)} placeholder="Ex.: troca solicitada pelo expositor" /></label>}
                 <p className="cso-note">Espaços retirados voltam a Disponível. Os novos seguem a situação da venda (em aberto ou vendido). Se houver contrato da venda inteira, considere anexar nova versão.</p>
               </section>
             </div>
@@ -217,10 +263,10 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, focus
               {error && <p className="cso-attach-state is-error" role="alert">{error}</p>}
               <p><strong>{remaining} {remaining === 1 ? 'espaço' : 'espaços'}</strong><span> após a alteração</span></p>
               <div className="cso-attach-actions">
-                <button type="button" className="cso-attach-cancel" disabled={busy} onClick={onClose}>Cancelar</button>
-                <button type="submit" className="cso-attach-submit" disabled={busy || !changed || remaining === 0 || version.isLoading}>
+                <Button type="button" variant="outline" className="cso-attach-cancel" disabled={busy} onClick={onClose}>Cancelar</Button>
+                <Button type="submit" className="cso-attach-submit" disabled={busy || !changed || remaining === 0 || version.isLoading}>
                   {busy ? <><Loader2 aria-hidden="true" />Salvando…</> : 'Salvar alterações'}
-                </button>
+                </Button>
               </div>
             </footer>
           </form>

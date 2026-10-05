@@ -21,7 +21,7 @@ import { SaleOpenSection } from '@/features/commercial-map/sales/components/Sale
 
 describe('confirmação de venda em aberto', () => {
   it('confirma todos os espaços pendentes do mesmo pedido ao clicar no módulo 37', async () => {
-    render(<QueryClientProvider client={new QueryClient()}><SaleOpenSection lotId="lot-37" canManageSales /></QueryClientProvider>);
+    render(<QueryClientProvider client={new QueryClient()}><SaleOpenSection lotId="lot-37" canManageSales mapData={{ lots: [], entities: [] }} /></QueryClientProvider>);
     fireEvent.click(await screen.findByRole('button', { name: /Confirmar contrato assinado/ }));
     fireEvent.click(await screen.findByRole('button', { name: 'Confirmar 6 espaços' }));
     await waitFor(() => expect(confirmSaleOrderItems).toHaveBeenCalledWith('order-1', items.map((i) => i.itemId)));
