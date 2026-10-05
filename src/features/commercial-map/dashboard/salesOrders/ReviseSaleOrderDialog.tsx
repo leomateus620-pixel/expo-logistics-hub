@@ -11,7 +11,8 @@ import './revise-sale-order.css';
 
 const centsText = (v: number) => (v / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, onClose, onSaved }: {
+export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, focusLotId, onClose, onSaved }: {
+  focusLotId?: string;
   orderId: string;
   detail: SaleOrderDetail;
   lots: readonly CommercialLot[];
@@ -116,7 +117,7 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, onClo
                 <ul className="rso-list">
                   {active.map((item) => {
                     const off = removed.has(item.itemId ?? '');
-                    return <li key={item.itemId ?? item.lotId} className={off ? 'is-removed' : ''}>
+                    return <li key={item.itemId ?? item.lotId} className={`${off ? 'is-removed' : ''}${item.lotId === focusLotId ? ' is-focus' : ''}`}>
                       <span className="rso-name">{label(item.lotId, item.displayName || item.publicIdentifier)}</span>
                       <span className="rso-value">{formatDashboardCurrency(item.itemTotal)}</span>
                       <button type="button" className="rso-icon" disabled={busy || !item.itemId}

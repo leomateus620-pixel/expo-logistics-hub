@@ -27,3 +27,4 @@
 .rso-summary .is-new dd { color: hsl(var(--primary)); font-size: 1.125rem; }
 .rso-summary > svg { width: 1rem; height: 1rem; color: hsl(var(--muted-foreground)); }
 .cso-edit-lots svg { width: 1rem; height: 1rem; }
+.rso-list li.is-focus { box-shadow: inset 3px 0 0 hsl(var(--primary)); }
