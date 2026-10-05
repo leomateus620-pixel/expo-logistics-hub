@@ -1,4 +1,4 @@
-vi.mock('@/features/commercial-map/dashboard/salesOrders/SaleLotsEditAction', () => ({ SaleLotsEditAction: () => null }));
+vi.mock('@/features/commercial-map/sales/components/SaleExhibitorEditDialog', () => ({ SaleExhibitorIdentity: () => null }));
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EntityDetailsPanel } from '@/features/commercial-map/components/panels/MapPanels';
