@@ -4286,6 +4286,50 @@ export type Database = {
           },
         ]
       }
+      lot_sale_order_revisions: {
+        Row: {
+          actor_user_id: string | null
+          added_lot_ids: string[]
+          after_state: Json
+          before_state: Json
+          created_at: string
+          id: string
+          order_id: string
+          reason: string
+          removed_lot_ids: string[]
+        }
+        Insert: {
+          actor_user_id?: string | null
+          added_lot_ids?: string[]
+          after_state: Json
+          before_state: Json
+          created_at?: string
+          id?: string
+          order_id: string
+          reason: string
+          removed_lot_ids?: string[]
+        }
+        Update: {
+          actor_user_id?: string | null
+          added_lot_ids?: string[]
+          after_state?: Json
+          before_state?: Json
+          created_at?: string
+          id?: string
+          order_id?: string
+          reason?: string
+          removed_lot_ids?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_sale_order_revisions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "lot_sale_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lot_sale_orders: {
         Row: {
           buyer_name: string
@@ -9593,6 +9637,21 @@ export type Database = {
         Args: { _org_id: string }
         Returns: undefined
       }
+      _revise_sale_order_items_core: {
+        Args: {
+          p_actor: string
+          p_add_lot_ids: string[]
+          p_expected_updated_at: string
+          p_fee_admin: number
+          p_fee_cleaning: number
+          p_fee_ppci: number
+          p_installment_count: number
+          p_order_id: string
+          p_reason: string
+          p_remove_item_ids: string[]
+        }
+        Returns: Json
+      }
       agenda_meeting_accept_segment: {
         Args: { p_provider_request_id: string; p_receipt_id: string }
         Returns: Json
@@ -10527,6 +10586,20 @@ export type Database = {
       resolve_commission_map_segment_slug_v2: {
         Args: { _metadata: Json; _public_identifier: string }
         Returns: string
+      }
+      revise_sale_order_items: {
+        Args: {
+          p_add_lot_ids?: string[]
+          p_expected_updated_at?: string
+          p_fee_admin?: number
+          p_fee_cleaning?: number
+          p_fee_ppci?: number
+          p_installment_count?: number
+          p_order_id: string
+          p_reason?: string
+          p_remove_item_ids?: string[]
+        }
+        Returns: Json
       }
       rollback_exporural_reference_2026: {
         Args: { p_org_id: string; p_reason: string; p_snapshot_id: string }
