@@ -15,8 +15,9 @@ import {
 } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { formatEventPeriodShort, getEventPeriod } from '@/lib/cronograma-event-period';
-import { CRONOGRAMA_LOCATION_OPTIONS, locationCodeForText } from '@/lib/cronograma-location-options';
+import { locationCodeForText } from '@/lib/cronograma-location-options';
 import { EventCenterRestaurantAlert } from './EventCenterRestaurantAlert';
+import { EventLocationField } from './EventLocationField';
 import { officialMemberLabel, resolveOfficialMembers } from '@/lib/memberIdentity';
 import { ORG_UNIT_SELECT_LABEL } from '@/lib/org-units';
 import {
@@ -575,20 +576,12 @@ export function EventForm({
 
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor={fieldId('location')}>Local</Label>
-            <Input
-              id={fieldId('location')}
-              list={fieldId('location-options')}
-              value={form.location || ''}
-              onChange={(event) => setForm((current) => ({ ...current, location: event.target.value, locationCode: locationCodeForText(event.target.value) }))}
-              placeholder="Local ou área do parque"
-              className="bg-white/72"
-            />
-            <datalist id={fieldId('location-options')}>
-              {CRONOGRAMA_LOCATION_OPTIONS.map(({ code, label }) => <option key={code} value={label} />)}
-            </datalist>
-          </div>
+          <EventLocationField
+            key={formIdentity}
+            value={form.location || ''}
+            code={form.locationCode}
+            onChange={(location, locationCode) => setForm((current) => ({ ...current, location, locationCode }))}
+          />
           <div className="space-y-1.5">
             <Label htmlFor={fieldId('owner')}>Responsável</Label>
             <Input
