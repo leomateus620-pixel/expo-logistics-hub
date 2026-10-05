@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { formatDocument, formatPhoneBr, isValidDocument, isValidEmail, isValidPhoneBr } from '../salesValidation';
 import { TradeNameField } from './SalesBuyerForm';
+import { SaleLotsEditAction } from '../../dashboard/salesOrders/SaleLotsEditAction';
 import {
   fetchSaleIdentity, updateSaleIdentity, SaleIdentityError,
   type SaleIdentity, type SaleIdentityDraft,
@@ -56,6 +57,8 @@ export function SaleExhibitorIdentity({ lotId, canManageSales }: { lotId: string
           <UserPen className="h-4 w-4" aria-hidden="true" /> Editar dados do expositor
         </Button>
       )}
+      {canManageSales && data?.orderId && <SaleLotsEditAction lotId={lotId} orderId={data.orderId} />}
+      {canManageSales && data && !data.orderId && <span className="commercial-map-sale-legal-name">Venda antiga sem pedido: troca de lotes indisponível.</span>}
       {data && open && <SaleExhibitorEditDialog lotId={lotId} identity={data} onClose={() => setOpen(false)} />}
     </>
   );

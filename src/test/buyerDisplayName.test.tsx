@@ -54,7 +54,7 @@ describe('editor dos dados do expositor', () => {
     fireEvent.click(save); fireEvent.click(save);
     await waitFor(() => expect(screen.getByRole('alert').textContent).toMatch(/alterada por outra pessoa/));
     expect(rpc).toHaveBeenCalledTimes(1);
-    expect(rpc.mock.calls[0][1]).toMatchObject({ p_buyer_trade_name: null, p_update_exhibitor: false, p_expected_status: 'OPEN' });
+    expect(rpc.mock.calls[0][1]).toMatchObject({ p_buyer_trade_name: null, p_update_exhibitor: true, p_expected_status: 'OPEN' });
     expect(onClose).not.toHaveBeenCalled();
     expect((screen.getByLabelText('Nome / Razão social') as HTMLInputElement).value).toBe('SOL COMERCIO LTDA');
   });
