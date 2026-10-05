@@ -1,0 +1,29 @@
+.rso-list, .rso-candidates { list-style: none; margin: 0; padding: 0; display: grid; gap: .375rem; }
+.rso-list li, .rso-candidates button {
+  display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: .75rem;
+  min-height: 2.75rem; padding: .375rem .5rem .375rem .75rem; border-radius: .75rem;
+  border: 1px solid hsl(var(--border)); background: hsl(var(--card)); color: hsl(var(--foreground));
+  width: 100%; text-align: left; font: inherit;
+}
+.rso-list li.is-removed { opacity: .55; text-decoration: line-through; }
+.rso-list li.is-added { border-color: hsl(var(--primary) / .5); background: hsl(var(--primary) / .06); }
+.rso-list em { font-style: normal; font-size: .7rem; font-weight: 700; text-transform: uppercase; color: hsl(var(--primary)); margin-left: .25rem; }
+.rso-name { font-weight: 600; font-size: .875rem; min-width: 0; overflow-wrap: anywhere; }
+.rso-value { font-variant-numeric: tabular-nums; font-size: .8125rem; color: hsl(var(--muted-foreground)); }
+.rso-icon { display: inline-grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: .625rem; border: 1px solid hsl(var(--border)); background: transparent; color: inherit; cursor: pointer; }
+.rso-icon svg, .rso-candidates svg { width: 1rem; height: 1rem; }
+.rso-search { display: flex; align-items: center; gap: .5rem; margin-top: .75rem; padding: 0 .75rem; border: 1px solid hsl(var(--border)); border-radius: .75rem; background: hsl(var(--background)); }
+.rso-search svg { width: 1rem; height: 1rem; color: hsl(var(--muted-foreground)); }
+.rso-search input { flex: 1; min-height: 2.75rem; border: 0; background: transparent; outline: none; font-size: 1rem; color: hsl(var(--foreground)); }
+@media (min-width: 768px) { .rso-search input { font-size: .875rem; } }
+.rso-candidates { margin-top: .5rem; max-height: 14rem; overflow-y: auto; }
+.rso-candidates button { cursor: pointer; }
+.rso-candidates button:disabled { cursor: not-allowed; opacity: .55; }
+.rso-empty { font-size: .8125rem; color: hsl(var(--muted-foreground)); padding: .5rem; }
+.rso-fees { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem .75rem; }
+.rso-summary { display: flex; align-items: center; gap: 1rem; margin: .875rem 0 0; }
+.rso-summary dt { font-size: .75rem; color: hsl(var(--muted-foreground)); }
+.rso-summary dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+.rso-summary .is-new dd { color: hsl(var(--primary)); font-size: 1.125rem; }
+.rso-summary > svg { width: 1rem; height: 1rem; color: hsl(var(--muted-foreground)); }
+.cso-edit-lots svg { width: 1rem; height: 1rem; }
