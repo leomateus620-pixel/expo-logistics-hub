@@ -14,15 +14,17 @@ interface EventLocationFieldProps {
 export function EventLocationField({ value, code, onChange }: EventLocationFieldProps) {
   const id = useId();
   const [open, setOpen] = useState(false);
+  const [customMode, setCustomMode] = useState(() => Boolean(value && !code));
   const triggerRef = useRef<HTMLButtonElement>(null);
   const customInputRef = useRef<HTMLInputElement>(null);
   const selectedOption = CRONOGRAMA_LOCATION_OPTIONS.find((option) => option.code === code && option.label === value);
-  const custom = Boolean(value && !selectedOption);
+  const custom = customMode || Boolean(value && !selectedOption);
 
-  const choose = (nextValue: string, nextCode: string | null) => {
+  const choose = (nextValue: string, nextCode: string | null, isCustom = false) => {
+    setCustomMode(isCustom);
     onChange(nextValue, nextCode);
     setOpen(false);
-    if (nextCode === null && nextValue !== '') {
+    if (isCustom) {
       window.requestAnimationFrame(() => customInputRef.current?.focus());
     } else {
       window.requestAnimationFrame(() => triggerRef.current?.focus());
@@ -51,7 +53,7 @@ export function EventLocationField({ value, code, onChange }: EventLocationField
         <span className="flex min-w-0 items-center gap-2">
           <MapPin className="shrink-0 text-primary" aria-hidden="true" />
           <span id={`${id}-selection`} className={`min-w-0 break-words text-base md:text-sm ${!value ? 'text-muted-foreground' : ''}`}>
-            {selectedOption?.label ?? (custom ? value : 'Selecionar local')}
+            {selectedOption?.label ?? (custom ? value || 'Outro local' : 'Selecionar local')}
           </span>
         </span>
         <ChevronDown className={`shrink-0 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
@@ -76,7 +78,7 @@ export function EventLocationField({ value, code, onChange }: EventLocationField
             type="button"
             variant="ghost"
             aria-pressed={custom}
-            onClick={() => choose(custom ? value : ' ', null)}
+            onClick={() => choose(custom ? value : '', null, true)}
             className="h-auto min-h-11 w-full justify-start gap-2 whitespace-normal rounded-md border-t border-border px-3 py-2 text-left text-base font-medium md:text-sm"
           >
             <Pencil className="shrink-0 text-primary" aria-hidden="true" />
@@ -95,7 +97,7 @@ export function EventLocationField({ value, code, onChange }: EventLocationField
           ref={customInputRef}
           id={`${id}-custom`}
           aria-label="Outro local do evento"
-          value={value.trim() ? value : ''}
+          value={value}
           onChange={(event) => onChange(event.target.value, null)}
           placeholder="Digite o local do evento"
           className="bg-background text-base md:text-sm"
