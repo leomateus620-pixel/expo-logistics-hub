@@ -18,11 +18,14 @@ Corrigir a busca e seleção de novos lotes e refazer a janela **Editar lotes da
 - Mostrar carregamento ou falha do inventário de forma explícita, em vez de concluir incorretamente que não existem resultados.
 
 ### 2. Busca e seleção de novos lotes
-- Buscar por número, código, nome, pavilhão e quadra, com normalização de maiúsculas, acentos e espaços.
-- Exibir resultados em cartões com identificação completa, localização, valor da etapa e situação.
-- Priorizar lotes disponíveis; itens indisponíveis podem aparecer identificados, mas nunca selecionáveis.
+- Derivar o escopo da venda pela hierarquia persistida dos lotes ativos: dentro de pavilhão, usar o `parentEntityId` exato; em áreas externas, usar o `segmentId` persistido. A busca nunca será global.
+- Mostrar no cabeçalho da busca onde o novo lote será procurado, por exemplo **Pavilhão 13 — Comércio**, sem oferecer pavilhões ou áreas diferentes.
+- Se uma venda histórica reunir mais de um pavilhão/segmento, exigir primeiro a escolha entre os locais já presentes naquela venda; ainda assim, nunca misturar resultados de locais diferentes na mesma lista.
+- Buscar por número, código e nome dentro desse escopo, com normalização de maiúsculas, acentos e espaços.
+- Exibir resultados em cartões com identificação completa, localização, valor da etapa e situação comercial: **Disponível**, **Venda em aberto**, **Vendido** ou **Bloqueado**.
+- Ordenar primeiro os lotes disponíveis e depois por número. Os demais aparecem para consulta e entendimento, mas ficam desabilitados com o motivo pelo qual não podem ser adicionados.
 - Usar botão textual **Adicionar** e manter os lotes escolhidos em uma área visível de “Adicionados nesta alteração”, com ação **Desfazer**.
-- Tratar números repetidos em pavilhões diferentes mostrando sempre o contexto completo, evitando selecionar o espaço errado.
+- Excluir da lista de candidatos os lotes que já pertencem à venda, evitando seleção duplicada.
 
 ### 3. Retirada sem ambiguidade
 - Separar “Lotes atuais da venda” de “Adicionar lotes”.
@@ -61,7 +64,8 @@ Não é prevista migração de banco: a observação vazia será substituída po
 
 ## Validação
 - Abrir pela lateral do Módulo 68 e confirmar a identificação correta dos módulos 68–72.
-- Pesquisar “64”, “44”, código completo, pavilhão e quadra; conferir resultados homônimos com localização inequívoca.
+- Pesquisar “64”, “44” e código completo; confirmar que a venda Êxito mostra somente resultados do Pavilhão 13 e nunca módulos homônimos de outros pavilhões.
+- Conferir os quatro estados nos resultados e garantir que apenas **Disponível** tenha a ação **Adicionar**.
 - Adicionar, desfazer adição, retirar e manter novamente um lote.
 - Salvar sem observação manual e verificar histórico automático da venda e de cada lote.
 - Conferir recálculo, parcelas pagas preservadas, atualização imediata das cores e bloqueio de lote já ocupado.
