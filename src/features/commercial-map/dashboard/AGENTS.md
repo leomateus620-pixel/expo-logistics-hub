@@ -1,0 +1,2 @@
+- A matriz financeira da Dashboard usa os agregados existentes do snapshot (confirmadas, em aberto e total conhecido) e indica cobertura parcial sem estimar vendas sem valor — por quê: venda confirmada não é receita recebida.
+- A faixa de progresso comercial deriva seus trechos em centavos dos mesmos agregados da matriz (SOLD e SALE_OPEN sobre total conhecido), sem persistência paralela — por quê: evitar percentuais divergentes.
