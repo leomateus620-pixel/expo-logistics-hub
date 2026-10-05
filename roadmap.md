@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Agenda — zoom móvel, locais e alerta do Restaurante
+- [x] Substituir a escolha nativa de locais por quatro opções explícitas e "Outro local", preservando código e texto histórico.
 - [x] Corrigir fonte de edição móvel nos controles compartilhados e limites de painéis.
 - [x] Disponibilizar quatro locais oficiais mantendo texto livre e código persistido.
 - [x] Avisar sobre eventos do Restaurante no Centro de Eventos com consulta restrita por dia civil.
