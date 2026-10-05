@@ -13,7 +13,7 @@
 - [x] Corrigir a lateral para usar o inventário comercial já carregado.
 - [x] Restringir a busca ao pavilhão/segmento da venda e exibir os quatro estados comerciais.
 - [x] Tornar adição, retirada e desfazer inequívocos; justificativa manual opcional com auditoria automática.
-- [ ] Validar Dashboard, lateral, desktop/celular, testes e build; não publicar.
+- [x] Validar testes, tipos e build; a conferência visual autenticada segue bloqueada pelo mapa em 55%. Não publicar.
 
 ## Finalizar venda — revisão e pagamento
 - [x] Permitir valores inteiros em reais nos três campos de taxas, mantendo centavos e a edição de parcelas; conferir totais e distribuição.
