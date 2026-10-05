@@ -221,3 +221,4 @@
 ## Agenda Restaurante e Arena — notificações
 - [x] Push (criação/alteração/cancelamento/1h antes) e Google Agenda por inscrição
 - [ ] Roque ativar avisos no aparelho e conectar o Google (ação dele)
+- [x] Trocar lotes Êxito (68–72) e Boleiros (33–38) e criar edição de lotes da venda com recálculo.
