@@ -19,6 +19,7 @@ import {
   fetchLotOpenSaleOrder,
 } from '../salesService';
 import { SaleExhibitorIdentity } from './SaleExhibitorEditDialog';
+import type { CommercialMapData } from '../../types';
 
 const dateTime = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo' });
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -41,7 +42,11 @@ export function useLotOpenSaleOrder(lotId: string | null, enabled: boolean) {
  * aguardando assinatura, com confirmação explícita ou cancelamento. Nenhuma
  * mudança otimista: o mapa só atualiza após a resposta do servidor.
  */
-export function SaleOpenSection({ lotId, canManageSales }: { lotId: string; canManageSales: boolean }) {
+export function SaleOpenSection({ lotId, canManageSales, mapData }: {
+  lotId: string;
+  canManageSales: boolean;
+  mapData: Pick<CommercialMapData, 'lots' | 'entities'>;
+}) {
   const queryClient = useQueryClient();
   const openSale = useLotOpenSaleOrder(lotId, true);
   const [confirming, setConfirming] = useState(false);
@@ -101,7 +106,7 @@ export function SaleOpenSection({ lotId, canManageSales }: { lotId: string; canM
     <section className="commercial-map-sale-open" aria-label="Venda em aberto">
       <header><FileSignature aria-hidden="true" /><span>Venda em aberto</span></header>
       <strong className="commercial-map-sale-open__buyer">{order.buyerName}</strong>
-      <SaleExhibitorIdentity lotId={lotId} canManageSales={canManageSales} />
+      <SaleExhibitorIdentity lotId={lotId} canManageSales={canManageSales} mapData={mapData} />
       <p>
         {order.createdAt ? `Registrada em ${dateTime.format(new Date(order.createdAt))}` : 'Data de registro não informada'}
         {' · aguardando confirmação da assinatura do contrato.'}

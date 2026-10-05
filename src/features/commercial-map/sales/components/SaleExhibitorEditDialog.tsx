@@ -14,6 +14,7 @@ import {
 import { formatDocument, formatPhoneBr, isValidDocument, isValidEmail, isValidPhoneBr } from '../salesValidation';
 import { TradeNameField } from './SalesBuyerForm';
 import { SaleLotsEditAction } from '../../dashboard/salesOrders/SaleLotsEditAction';
+import type { CommercialMapData } from '../../types';
 import {
   fetchSaleIdentity, updateSaleIdentity, SaleIdentityError,
   type SaleIdentity, type SaleIdentityDraft,
@@ -44,7 +45,11 @@ export function saleIdentityErrors(draft: SaleIdentityDraft) {
  * Nome legal sob o nome exibido + ação "Editar dados do expositor".
  * Edição local até "Salvar alterações"; nada é persistido antes da resposta do servidor.
  */
-export function SaleExhibitorIdentity({ lotId, canManageSales }: { lotId: string; canManageSales: boolean }) {
+export function SaleExhibitorIdentity({ lotId, canManageSales, mapData }: {
+  lotId: string;
+  canManageSales: boolean;
+  mapData: Pick<CommercialMapData, 'lots' | 'entities'>;
+}) {
   const enabled = !lotId.startsWith('reference:');
   const identity = useQuery({ queryKey: saleIdentityQueryKey(lotId), queryFn: () => fetchSaleIdentity(lotId), enabled, staleTime: 15_000 });
   const [open, setOpen] = useState(false);
@@ -57,7 +62,7 @@ export function SaleExhibitorIdentity({ lotId, canManageSales }: { lotId: string
           <UserPen className="h-4 w-4" aria-hidden="true" /> Editar dados do expositor
         </Button>
       )}
-      {canManageSales && data?.orderId && <SaleLotsEditAction lotId={lotId} orderId={data.orderId} />}
+      {canManageSales && data?.orderId && <SaleLotsEditAction lotId={lotId} orderId={data.orderId} mapData={mapData} />}
       {canManageSales && data && !data.orderId && <span className="commercial-map-sale-legal-name">Venda antiga sem pedido: troca de lotes indisponível.</span>}
       {data && open && <SaleExhibitorEditDialog lotId={lotId} identity={data} onClose={() => setOpen(false)} />}
     </>

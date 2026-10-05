@@ -345,6 +345,7 @@ function SaleDetail({ record, data, orgId, canManageContracts, canManageSales, e
       orderId={h.orderId}
       detail={d}
       lots={data.lots}
+        entities={data.entities}
       locationOf={locationOf}
       onClose={() => setReviseOpen(false)}
       onSaved={async () => {

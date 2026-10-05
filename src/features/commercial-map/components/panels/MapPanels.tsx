@@ -424,14 +424,14 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
           )}
 
           {lot?.status === 'SALE_OPEN' && (
-            <SaleOpenSection lotId={lot.id} canManageSales={permissions.canManageSales} />
+            <SaleOpenSection lotId={lot.id} canManageSales={permissions.canManageSales} mapData={{ lots, entities }} />
           )}
 
           {lot?.status === 'SOLD' && (
             <section className="commercial-map-sale-confirmed" aria-label="Venda confirmada">
               <header><CheckCircle2 aria-hidden="true" /><span>Venda confirmada</span></header>
               <strong className="commercial-map-sale-confirmed__buyer">{saleHistory.data?.buyerName || lot.currentBuyer}</strong>
-              <SaleExhibitorIdentity lotId={lot.id} canManageSales={permissions.canManageSales && !lot.id.startsWith('reference:')} />
+              <SaleExhibitorIdentity lotId={lot.id} canManageSales={permissions.canManageSales && !lot.id.startsWith('reference:')} mapData={{ lots, entities }} />
               <p>
                 {saleHistory.data?.createdAt
                   ? `Vendido em ${dateTime.format(new Date(saleHistory.data.createdAt))}`

@@ -7,17 +7,6 @@ import type { CommercialMapData } from '../../types';
 import { describeSalesError, fetchSaleOrderDetail } from './salesOrdersService';
 import { ReviseSaleOrderDialog } from './ReviseSaleOrderDialog';
 
-/** Localiza no cache do mapa os dados (lotes + entidades) que contêm o lote aberto. */
-function useCachedMapData(lotId: string): Pick<CommercialMapData, 'lots' | 'entities'> {
-  const queryClient = useQueryClient();
-  return useMemo(() => {
-    const entries = queryClient.getQueriesData<CommercialMapData>({ queryKey: ['commercial-map', 'reference'] });
-    const hit = entries.map(([, d]) => d).find((d) => d?.lots?.some((l) => l.id === lotId));
-    return { lots: hit?.lots ?? [], entities: hit?.entities ?? [] };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lotId, queryClient]);
-}
-
 export function makeLocationOf(data: Pick<CommercialMapData, 'lots' | 'entities'>) {
   const lots = new Map(data.lots.map((l) => [l.id, l]));
   const entities = new Map(data.entities.map((e) => [e.id, e]));
@@ -32,10 +21,13 @@ export function makeLocationOf(data: Pick<CommercialMapData, 'lots' | 'entities'
 }
 
 /** Botão "Editar lotes da venda" na lateral do mapa — mesma janela e RPC da Dashboard. */
-export function SaleLotsEditAction({ lotId, orderId }: { lotId: string; orderId: string }) {
+export function SaleLotsEditAction({ lotId, orderId, mapData }: {
+  lotId: string;
+  orderId: string;
+  mapData: Pick<CommercialMapData, 'lots' | 'entities'>;
+}) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const mapData = useCachedMapData(lotId);
   const locationOf = useMemo(() => makeLocationOf(mapData), [mapData]);
   const detail = useQuery({
     queryKey: ['commercial-sale-order-detail', `order:${orderId}`],
@@ -58,6 +50,7 @@ export function SaleLotsEditAction({ lotId, orderId }: { lotId: string; orderId:
         orderId={orderId}
         detail={detail.data}
         lots={mapData.lots}
+        entities={mapData.entities}
         locationOf={locationOf}
         focusLotId={lotId}
         onClose={() => setOpen(false)}

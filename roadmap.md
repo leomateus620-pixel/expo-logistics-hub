@@ -9,6 +9,12 @@
 - [ ] Conferir teclado/zoom em iOS Safari real e alerta com sessão autorizada (bloqueio: sem conta do solicitante na prévia nem sessão autenticada disponível).
 - Não publicar sem autorização.
 
+## Edição de lotes da venda
+- [ ] Corrigir a lateral para usar o inventário comercial já carregado.
+- [ ] Restringir a busca ao pavilhão/segmento da venda e exibir os quatro estados comerciais.
+- [ ] Tornar adição, retirada e desfazer inequívocos; justificativa manual opcional com auditoria automática.
+- [ ] Validar Dashboard, lateral, desktop/celular, testes e build; não publicar.
+
 ## Finalizar venda — revisão e pagamento
 - [x] Permitir valores inteiros em reais nos três campos de taxas, mantendo centavos e a edição de parcelas; conferir totais e distribuição.
 - [x] Corrigir a quebra e o alinhamento dos dados da revisão para nomes e documentos longos, em telas largas e estreitas.
