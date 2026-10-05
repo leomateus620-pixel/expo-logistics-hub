@@ -221,3 +221,46 @@ export function describeSalesError(error: unknown): string {
   if (message.includes('Failed to fetch') || message.includes('NetworkError')) return 'Falha de conexão. Verifique a internet e tente novamente.';
   return message || 'Não foi possível concluir a operação.';
 }
+
+export interface ReviseSaleOrderParams {
+  orderId: string;
+  addLotIds: string[];
+  removeItemIds: string[];
+  fees?: { admin: number; ppci: number; cleaning: number } | null;
+  installmentCount?: number | null;
+  reason: string;
+}
+
+/** Troca/adição/retirada de lotes numa operação transacional no servidor (revalida permissão e disponibilidade). */
+export async function reviseSaleOrder(params: ReviseSaleOrderParams) {
+  if (!params.reason.trim()) throw new Error('Informe o motivo da alteração.');
+  const { data, error } = await db.rpc('revise_sale_order_items', {
+    p_order_id: params.orderId,
+    p_add_lot_ids: params.addLotIds,
+    p_remove_item_ids: params.removeItemIds,
+    p_fee_admin: params.fees?.admin ?? null,
+    p_fee_ppci: params.fees?.ppci ?? null,
+    p_fee_cleaning: params.fees?.cleaning ?? null,
+    p_installment_count: params.installmentCount ?? null,
+    p_reason: params.reason.trim(),
+    p_expected_updated_at: null,
+  });
+  if (error) throw error;
+  return data as { orderId: string; before: Record<string, unknown>; after: Record<string, unknown> };
+}
+
+export function describeReviseError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String((error as { message?: string })?.message ?? error);
+  const tail = (code: string) => message.split(`${code}:`)[1]?.trim();
+  if (message.includes('LOT_NOT_AVAILABLE')) return `O espaço ${tail('LOT_NOT_AVAILABLE') ?? ''} não está mais disponível. Atualize e escolha outro.`;
+  if (message.includes('LOT_PRICE_UNAVAILABLE')) return `O espaço ${tail('LOT_PRICE_UNAVAILABLE') ?? ''} não tem preço oficial definido.`;
+  if (message.includes('LOT_NOT_IN_PROJECT')) return 'Algum espaço escolhido não pertence a este mapa.';
+  if (message.includes('ORDER_WOULD_BE_EMPTY')) return 'A venda precisa manter ao menos um espaço. Para encerrar, cancele a venda.';
+  if (message.includes('TOTAL_BELOW_PAID')) return 'O novo total ficaria abaixo do valor já recebido.';
+  if (message.includes('INVALID_INSTALLMENT_COUNT')) return 'Quantidade de parcelas inválida para os valores já recebidos.';
+  if (message.includes('ORDER_CHANGED')) return 'A venda foi alterada por outra pessoa. Reabra e tente novamente.';
+  if (message.includes('ORDER_NOT_ACTIVE')) return 'Esta venda não está ativa.';
+  if (message.includes('NOTHING_TO_CHANGE')) return 'Nenhuma alteração para salvar.';
+  if (message.includes('REASON_REQUIRED')) return 'Informe o motivo da alteração.';
+  return describeSalesError(error);
+}
