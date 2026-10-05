@@ -30,8 +30,8 @@
 .rso-candidates li:not(.is-available) { background: hsl(var(--muted) / .4); }
 .rso-candidates button { min-width: 6.4rem; }
 .rso-status { display: inline-flex; align-items: center; min-height: 1.65rem; padding: .15rem .5rem; border-radius: 999px; font-size: .7rem; font-weight: 700; white-space: nowrap; background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
-.rso-status.is-available { background: hsl(var(--success, 142 65% 36%) / .12); color: hsl(var(--success, 142 65% 28%)); }
-.rso-status.is-open { background: hsl(var(--warning, 38 92% 50%) / .16); color: hsl(var(--warning-foreground, 36 90% 25%)); }
+.rso-status.is-available { background: hsl(var(--secondary) / .7); color: hsl(var(--secondary-foreground)); }
+.rso-status.is-open { background: hsl(var(--accent)); color: hsl(var(--accent-foreground)); }
 .rso-status.is-sold { background: hsl(var(--primary) / .12); color: hsl(var(--primary)); }
 .rso-status.is-blocked { background: hsl(var(--destructive) / .1); color: hsl(var(--destructive)); }
 .rso-empty { font-size: .8125rem; color: hsl(var(--muted-foreground)); padding: .5rem; }

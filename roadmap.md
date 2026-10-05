@@ -10,9 +10,9 @@
 - Não publicar sem autorização.
 
 ## Edição de lotes da venda
-- [ ] Corrigir a lateral para usar o inventário comercial já carregado.
-- [ ] Restringir a busca ao pavilhão/segmento da venda e exibir os quatro estados comerciais.
-- [ ] Tornar adição, retirada e desfazer inequívocos; justificativa manual opcional com auditoria automática.
+- [x] Corrigir a lateral para usar o inventário comercial já carregado.
+- [x] Restringir a busca ao pavilhão/segmento da venda e exibir os quatro estados comerciais.
+- [x] Tornar adição, retirada e desfazer inequívocos; justificativa manual opcional com auditoria automática.
 - [ ] Validar Dashboard, lateral, desktop/celular, testes e build; não publicar.
 
 ## Finalizar venda — revisão e pagamento
