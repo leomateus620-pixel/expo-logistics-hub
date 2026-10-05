@@ -10,6 +10,7 @@ import type { MapPermissions } from '@/features/commercial-map/types';
 vi.mock('@/features/commercial-map/hooks/useCommercialMap', () => ({
   useLotContractVersions: () => ({ data: [], isLoading: false, isError: false }),
   useLotSaleHistory: () => ({ data: null, isLoading: false }),
+  useLotActivity: () => ({ data: [], isLoading: false }),
 }));
 vi.mock('@/features/commercial-map/hooks/useLotPricing2028', () => ({
   useLotPricing2028: () => ({ data: null, isLoading: false, isError: false }),
