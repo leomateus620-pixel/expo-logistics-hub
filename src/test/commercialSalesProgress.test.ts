@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { commercialSalesProgress } from '@/features/commercial-map/dashboard/commercialSalesProgress';
+import { commercialSalesProgress } from '@/features/commercial-map/dashboard/commercialSalesProgressMetrics';
 import type { DashboardAggregate } from '@/features/commercial-map/dashboard/commercialDashboardTypes';
 
 const summary = (soldValue: number, saleOpenValue: number, totalKnownValue: number, commercialLots = 3, knownValueLots = 3) =>

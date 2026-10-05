@@ -5,7 +5,7 @@ import { OrbitControls } from 'three-stdlib';
 import { useCommercialMapStore } from '@/features/commercial-map/state/useCommercialMapStore';
 import { useMapEntityFilter } from '@/features/commercial-map/hooks/useCommercialMap';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
-import { canHandleCommercialMapEscape } from '@/features/commercial-map/utils/contextualNavigation';
+import { canHandleCommercialDashboardEscape, canHandleCommercialMapEscape, getCommercialDashboardFocusableElements } from '@/features/commercial-map/utils/contextualNavigation';
 import { applyContextualCameraViewOffset, fitCameraAboveContextualPanel, readContextualCameraViewOffset, readContextualViewportInsets, resolveContextualViewportInsets } from '@/features/commercial-map/utils/contextualViewport';
 import { resolveCameraTransitionDuration } from '@/features/commercial-map/utils/interaction';
 
@@ -120,6 +120,39 @@ describe('prioridade de Escape', () => {
     document.body.innerHTML = '';
     event.preventDefault();
     expect(canHandleCommercialMapEscape(event)).toBe(false);
+  });
+
+  it.each(['dialog', 'alertdialog', 'filters'])('preserva a Dashboard enquanto %s tem prioridade, dentro dela ou em portal', (kind) => {
+    const dashboard = document.createElement('div');
+    dashboard.setAttribute('role', 'dialog');
+    dashboard.setAttribute('aria-modal', 'true');
+    const close = document.createElement('button');
+    dashboard.append(close);
+    document.body.append(dashboard);
+    const event = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });
+    expect(canHandleCommercialDashboardEscape(event, dashboard)).toBe(true);
+
+    const nested = document.createElement('div');
+    if (kind === 'filters') nested.setAttribute('data-commercial-map-escape-priority', 'true');
+    else { nested.setAttribute('role', kind); nested.setAttribute('aria-modal', 'true'); }
+    dashboard.append(nested);
+    expect(canHandleCommercialDashboardEscape(event, dashboard)).toBe(false);
+    document.body.append(nested);
+    expect(canHandleCommercialDashboardEscape(event, dashboard)).toBe(false);
+    nested.remove();
+    expect(canHandleCommercialDashboardEscape(event, dashboard)).toBe(true);
+    event.preventDefault();
+    expect(canHandleCommercialDashboardEscape(event, dashboard)).toBe(false);
+  });
+
+  it('mantém no Tab só controles visíveis e habilitados do painel ativo', () => {
+    const dashboard = document.createElement('div');
+    dashboard.innerHTML = '<button>Voltar</button><button tabindex="-1">Aba inativa</button><div hidden><button>Grupo oculto</button></div><div aria-hidden="true"><button>Restrito</button></div><div inert><button>Mapa</button></div><fieldset disabled><button>Indisponível</button></fieldset><input style="visibility:hidden" /><a href="#">Contrato</a>';
+    document.body.append(dashboard);
+    for (const element of dashboard.querySelectorAll<HTMLElement>('button, input, a')) {
+      vi.spyOn(element, 'getClientRects').mockReturnValue([{} as DOMRect] as unknown as DOMRectList);
+    }
+    expect(getCommercialDashboardFocusableElements(dashboard).map((element) => element.textContent)).toEqual(['Voltar', 'Contrato']);
   });
 });
 

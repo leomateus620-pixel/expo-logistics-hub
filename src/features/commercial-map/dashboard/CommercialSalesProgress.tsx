@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { DashboardAggregate } from './commercialDashboardTypes';
-import { commercialSalesProgress } from './commercialSalesProgress';
+import { commercialSalesProgress } from './commercialSalesProgressMetrics';
 import { formatDashboardCurrency, formatDashboardPercentage } from './commercialDashboardFormatters';
 
 /** A light 2D portrait of the existing bean, shirt, shorts and green shoes. */

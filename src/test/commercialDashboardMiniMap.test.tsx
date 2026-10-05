@@ -4,6 +4,7 @@ import { STATUS_CONFIG } from '@/features/commercial-map/constants';
 import { CommercialMiniMap } from '@/features/commercial-map/dashboard/CommercialMiniMap';
 import {
   buildCommercialMiniMapGeometry,
+  commercialMiniMapNumberLabel,
   type CommercialMiniMapItem,
 } from '@/features/commercial-map/dashboard/commercialDashboardGeometry';
 import type { CommercialLot, CommercialStatus, Coordinate, MapEntity } from '@/features/commercial-map/types';
@@ -61,6 +62,19 @@ describe('geometria do mini mapa comercial', () => {
     expect(result.lots[0].path).not.toMatch(/NaN|Infinity/);
     expect(result.bounds).toEqual({ minX: 0, minY: 0, maxX: 10, maxY: 10 });
     expect(buildCommercialMiniMapGeometry([invalid]).lots).toEqual([]);
+  });
+
+  it('calcula números em pixels e orienta módulos estreitos sem ultrapassar seus limites', () => {
+    for (const scale of [.5, 1, 2]) {
+      const label = commercialMiniMapNumberLabel('104', 8, 38, scale);
+      expect(label.vertical).toBe(true);
+      expect(label.fontPixels).toBeLessThanOrEqual(11);
+      expect(label.fontSize * 3 * .62).toBeLessThan(38);
+      expect(label.fontSize).toBeLessThan(8);
+    }
+    expect(commercialMiniMapNumberLabel('31', 60, 20, 1).fontPixels).toBe(11);
+    expect(commercialMiniMapNumberLabel('31', 60, 20, 2).fontPixels).toBe(11);
+    expect(commercialMiniMapNumberLabel('31', 60, 20, 1, 14).fontPixels).toBe(14);
   });
 });
 
@@ -206,6 +220,8 @@ describe('mini mapa comercial interativo', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Ampliar planta de Pavilhão 13' }));
       notify(1478, 720, 1461);
       expect(viewport.firstElementChild).toHaveStyle({ width: '150%' });
+      notify(1479, 720);
+      expect(viewport.firstElementChild).toHaveStyle({ width: '150%' });
       for (const [width, height] of [[904, 314], [1020, 314], [342, 403]]) {
         viewport.scrollLeft = 65;
         viewport.scrollTop = 30;
@@ -225,6 +241,22 @@ describe('mini mapa comercial interativo', () => {
     } finally {
       globalThis.ResizeObserver = original;
     }
+  });
+
+  it('mantém líderes curtos ligados ao acesso oficial e mostra apoios como não comerciais', () => {
+    const item = record('B4-M001', 'AVAILABLE', square(0, 0));
+    render(<CommercialMiniMap items={[item]} title="Pavilhão 8" numbered onViewLot={vi.fn()}
+      outlines={[{ id: 'hall', label: 'Salão', kind: 'pavilion', color: '#315543', coordinates: square(-2, -2, 14) },
+        { id: 'support', label: 'Cozinha', kind: 'support', color: '#768572', coordinates: square(-2, -8, 6) }]}
+      accesses={[{ id: 'access', label: 'Conexão oficial', kind: 'connection', position: [0, 4], outward: [-1, 0] }]} />);
+    const svg = screen.getByRole('group', { name: /Distribuição espacial/ });
+    expect(svg.querySelectorAll('path[data-entity-id]')).toHaveLength(1);
+    expect(svg.querySelectorAll('path[data-outline="support"]')).toHaveLength(1);
+    expect(screen.getByText('Cozinha')).toBeInTheDocument();
+    expect(screen.getByText(/Apoios permanentes indicados.*não são espaços comerciais/)).toBeInTheDocument();
+    const leader = svg.querySelector('g[data-access-kind] path')!.getAttribute('d')!.split(' ');
+    const length = Math.hypot(Number(leader[4]) - Number(leader[1]), Number(leader[5]) - Number(leader[2]));
+    expect(length).toBeCloseTo(25);
   });
 
   it('distingue indisponíveis do destaque comercial bloqueado e permite uma única legenda integrada', () => {

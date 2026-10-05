@@ -13,7 +13,7 @@ export interface CommercialMiniMapItem {
 export interface MiniMapOutline {
   id: string;
   label: string;
-  kind: 'segment' | 'block' | 'pavilion';
+  kind: 'segment' | 'block' | 'pavilion' | 'support';
   color: string;
   coordinates: readonly (readonly (readonly [number, number])[])[];
 }
@@ -43,6 +43,19 @@ export interface CommercialMiniMapGeometry {
   scale: number;
 }
 
+/** Size labels against their actual on-screen cell, not the SVG's arbitrary
+ * normalized units. Rotation is chosen only when it improves the usable fit. */
+export function commercialMiniMapNumberLabel(number: string, width: number, height: number, pixelsPerUnit: number, targetPixels = 11) {
+  const inset = 1.5 / pixelsPerUnit;
+  const horizontalSize = Math.min((width - inset) / (number.length * .62), height - inset);
+  const verticalSize = Math.min((height - inset) / (number.length * .62), width - inset);
+  const vertical = verticalSize > horizontalSize * 1.08;
+  const along = vertical ? height : width;
+  const across = vertical ? width : height;
+  const fontSize = Math.max(.5, Math.min(targetPixels / pixelsPerUnit, (along - inset) / (number.length * .62), across - inset));
+  return { vertical, fontSize, fontPixels: fontSize * pixelsPerUnit };
+}
+
 /** Fits projected geometry and its presentation symbols without changing cadastral coordinates. */
 export function buildCommercialMiniMapViewBox(
   geometry: CommercialMiniMapGeometry,
@@ -55,8 +68,9 @@ export function buildCommercialMiniMapViewBox(
     minX: Math.min(current.minX, decoration.minX), minY: Math.min(current.minY, decoration.minY),
     maxX: Math.max(current.maxX, decoration.maxX), maxY: Math.max(current.maxY, decoration.maxY),
   }), { minX, minY, maxX, maxY });
-  return [bounds.minX - PADDING, bounds.minY - PADDING,
-    bounds.maxX - bounds.minX + 2 * PADDING, bounds.maxY - bounds.minY + 2 * PADDING]
+  const padding = Math.max(12, Math.min(PADDING, Math.min(bounds.maxX - bounds.minX, bounds.maxY - bounds.minY) * 0.04));
+  return [bounds.minX - padding, bounds.minY - padding,
+    bounds.maxX - bounds.minX + 2 * padding, bounds.maxY - bounds.minY + 2 * padding]
     .map(formatCoordinate).join(' ');
 }
 
@@ -103,6 +117,7 @@ function formatCoordinate(value: number): string {
 export function buildCommercialMiniMapGeometry(
   items: readonly CommercialMiniMapItem[],
   outlines: readonly MiniMapOutline[] = [],
+  contentEnvelope?: MiniMapBounds,
 ): CommercialMiniMapGeometry {
   const source: Array<{ item: CommercialMiniMapItem; rings: Point[][] }> = [];
   let minX = Infinity;
@@ -144,6 +159,13 @@ export function buildCommercialMiniMapGeometry(
 
   if (!source.length && !outlineSource.length) {
     return { viewBox: VIEW_BOX, bounds: null, lots: [], lotsByEntityId: new Map(), outlines: [], project: (point) => point, scale: 1 };
+  }
+
+  // Official circulation/support envelopes affect presentation only. Never
+  // exclude a persisted module, even if its current geometry is unmatched.
+  if (contentEnvelope) {
+    minX = Math.min(minX, contentEnvelope.minX); maxX = Math.max(maxX, contentEnvelope.maxX);
+    minY = Math.min(minY, contentEnvelope.minY); maxY = Math.max(maxY, contentEnvelope.maxY);
   }
 
   const bounds = { minX, minY, maxX, maxY };

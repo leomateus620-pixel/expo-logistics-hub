@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { ChartNoAxesCombined, Clock3, RefreshCw, X, LayoutGrid, PenLine, BadgeCheck, MapPinned, Ruler, Banknote, Wallet } from 'lucide-react';
+import { ArrowUpRight, ChartNoAxesCombined, Clock3, RefreshCw, X, LayoutGrid, PenLine, BadgeCheck, MapPinned, Ruler, Banknote, Wallet } from 'lucide-react';
 import type { CommercialMapData } from '../types';
 import { STATUS_CONFIG } from '../constants';
 import type { LotPricingStage } from '../utils/lotPricing2028';
@@ -56,6 +56,12 @@ function FinancialKpi({ label, value, lots, priced, icon, tone, context }: {
 
 export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, onViewLot, projectId, orgId = null, canManageSales = false, canManageContracts = false, scrollContainer, onViewSale }: CommercialDashboardProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const salesEntryRef = useRef<HTMLButtonElement>(null);
+  const overviewScrollRef = useRef(0);
+  const area = useSalesOrdersUiStore((state) => state.area);
+  const setArea = useSalesOrdersUiStore((state) => state.setArea);
+  const salesAvailable = Boolean(projectId && onViewSale);
+  const inSales = salesAvailable && area === 'sales';
   const [pricingStage, setPricingStage] = useState<LotPricingStage>('RENOVACAO');
   const snapshot = useMemo(() => buildCommercialDashboardSnapshot({ entities: data.entities, lots: data.lots }, pricingStage), [data.entities, data.lots, pricingStage]);
   const { overall } = snapshot;
@@ -82,7 +88,18 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
         <button type="button" className="commercial-dashboard-close" onClick={onClose} ref={closeButtonRef} aria-label="Fechar Dashboard Comercial"><X aria-hidden="true" /><span>Fechar</span></button>
       </div>
     </header>
-    <main className="commercial-dashboard-content">
+    <main className={`commercial-dashboard-content${inSales ? ' commercial-dashboard-content--sales' : ''}`}>
+      {inSales && projectId && onViewSale ? <CommercialSalesOrdersSection projectId={projectId} orgId={orgId}
+        canManageSales={canManageSales} canManageContracts={canManageContracts} data={data}
+        scrollContainer={scrollContainer ?? (() => null)} onViewSale={onViewSale}
+        onBack={() => {
+          setArea('overview');
+          requestAnimationFrame(() => {
+            const container = scrollContainer?.();
+            if (container) container.scrollTop = overviewScrollRef.current;
+            salesEntryRef.current?.focus({ preventScroll: true });
+          });
+        }} /> : <>
       <div className="commercial-dashboard-global-label">
         <span className="commercial-dashboard-eyebrow">Visão global · todo o inventário comercial</span>
         <div className="commercial-dashboard-pricing-stage">
@@ -116,14 +133,28 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
           detail={overall.lotsWithoutOfficialArea ? `${formatDashboardInteger(overall.lotsWithoutOfficialArea)} sem área oficial` : 'Área oficial cadastrada'} />
       </section>
       </div>
-      {projectId && onViewSale && <CommercialSalesOrdersSection projectId={projectId} orgId={orgId}
-        canManageSales={canManageSales} canManageContracts={canManageContracts} data={data}
-        scrollContainer={scrollContainer ?? (() => null)} onViewSale={onViewSale} />}
+      {salesAvailable && <section className="commercial-dashboard-sales-entry" aria-label="Acesso a vendas e contratos">
+        <div className="commercial-dashboard-sales-entry__icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M7 4h13l5 5v12M20 4v6h5M7 4v24h11M11 10h5M11 15h10M11 20h5" />
+            <rect x="19" y="18" width="10" height="11" rx="2" />
+            <path d="m22 23 2 2 3-4" />
+          </svg>
+        </div>
+        <div className="commercial-dashboard-sales-entry__text"><h2>Vendas e contratos</h2><p>Pedidos, espaços, documentos e histórico comercial.</p></div>
+        <button type="button" ref={salesEntryRef} onClick={() => {
+          overviewScrollRef.current = scrollContainer?.()?.scrollTop ?? 0;
+          setArea('sales');
+          const container = scrollContainer?.();
+          if (container) container.scrollTop = 0;
+        }} aria-label="Acessar vendas e contratos">Acessar<ArrowUpRight aria-hidden="true" /></button>
+      </section>}
       <CommercialDashboardSpaces snapshot={snapshot} data={data} onViewLot={onViewLot} />
       {snapshot.orphanLots > 0 && <div className="commercial-dashboard-integrity" role="note">
         <span>{snapshot.orphanLots} lotes sem entidade cadastral carregada, fora dos indicadores conforme o contrato atual do mapa.</span>
       </div>}
       <footer className="commercial-dashboard-footer">Fonte: cadastro carregado pelo Mapa Comercial · áreas oficiais válidas · atualização sincronizada com o mapa.</footer>
+      </>}
     </main>
   </div>;
 }

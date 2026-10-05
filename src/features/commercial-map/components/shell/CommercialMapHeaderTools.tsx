@@ -13,10 +13,20 @@ import './commercial-map-shell.css';
 export function CommercialMapHeaderTools({
   managementActions,
   dashboardOpen = false,
+  dashboardAvailable = false,
+  onOpenDashboard,
   salesAvailable = false,
   visitAvailable = false,
   visitEntityId,
-}: { managementActions?: ReactNode; dashboardOpen?: boolean; salesAvailable?: boolean; visitAvailable?: boolean; visitEntityId?: string }) {
+}: {
+  managementActions?: ReactNode;
+  dashboardOpen?: boolean;
+  dashboardAvailable?: boolean;
+  onOpenDashboard?: () => void;
+  salesAvailable?: boolean;
+  visitAvailable?: boolean;
+  visitEntityId?: string;
+}) {
   const host = useContext(CommercialMapHeaderHost);
   const [managementOpen, setManagementOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -90,6 +100,28 @@ export function CommercialMapHeaderTools({
           <span className="commercial-map-header-sales__label">Vendas</span>
         </button>
       </TooltipTrigger><TooltipContent side="bottom">{salesActive ? 'Sair do modo Vendas' : 'Abrir modo Vendas'}</TooltipContent></Tooltip>}
+      {dashboardAvailable && onOpenDashboard && <Tooltip><TooltipTrigger asChild>
+        <button
+          type="button"
+          className={`commercial-map-header-dashboard ${dashboardOpen ? 'is-active' : ''}`}
+          aria-label="Dashboard Comercial"
+          aria-pressed={dashboardOpen}
+          aria-haspopup="dialog"
+          aria-controls={dashboardOpen ? 'commercial-dashboard-overlay' : undefined}
+          data-commercial-dashboard-trigger
+          onClick={onOpenDashboard}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M3.5 4.5v15.75h17" />
+            <path d="m6.5 10 4-3 4 1.5 5-5" />
+            <path d="M16.5 3.5h3v3" />
+            <rect x="6.5" y="13.5" width="2.5" height="3.75" rx=".6" fill="currentColor" stroke="none" />
+            <rect x="11.5" y="11.5" width="2.5" height="5.75" rx=".6" fill="currentColor" stroke="none" />
+            <rect x="16.5" y="9.5" width="2.5" height="7.75" rx=".6" fill="currentColor" stroke="none" />
+          </svg>
+          <span className="commercial-map-header-dashboard__label">Dashboard</span>
+        </button>
+      </TooltipTrigger><TooltipContent side="bottom">Dashboard Comercial</TooltipContent></Tooltip>}
 
       <Popover open={managementOpen && !toolsUnavailable} onOpenChange={(open) => { if (!toolsUnavailable) setManagementOpen(open); }}>
         <Tooltip><TooltipTrigger asChild><PopoverTrigger asChild>

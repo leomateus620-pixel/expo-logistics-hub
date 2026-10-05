@@ -1,0 +1,96 @@
+{
+  "size": {
+    "name": "mobile",
+    "width": 390,
+    "height": 844
+  },
+  "fixture": "Isolated UI-only sales fixtures; all backend/storage requests intercepted; no writes",
+  "layout": {
+    "columns": 1,
+    "width": 336,
+    "cardWidths": [
+      336,
+      336,
+      336,
+      336,
+      336,
+      336,
+      336,
+      336,
+      336,
+      336,
+      336,
+      336,
+      336,
+      336,
+      336,
+      336,
+      336,
+      336,
+      336,
+      336
+    ]
+  },
+  "overflow": {
+    "width": 390,
+    "scrollWidth": 390
+  },
+  "calls": [
+    {
+      "name": "list_commercial_sale_orders",
+      "body": {
+        "p_project_id": "qa-local-only",
+        "p_search": null,
+        "p_status": null,
+        "p_has_document": null,
+        "p_payment_method": null,
+        "p_from": null,
+        "p_to": null,
+        "p_limit": 20,
+        "p_offset": 0
+      }
+    },
+    {
+      "name": "list_commercial_sale_orders",
+      "body": {
+        "p_project_id": "qa-local-only",
+        "p_search": "Expositor",
+        "p_status": null,
+        "p_has_document": null,
+        "p_payment_method": null,
+        "p_from": null,
+        "p_to": null,
+        "p_limit": 20,
+        "p_offset": 0
+      }
+    },
+    {
+      "name": "list_commercial_sale_orders",
+      "body": {
+        "p_project_id": "qa-local-only",
+        "p_search": "Expositor",
+        "p_status": null,
+        "p_has_document": null,
+        "p_payment_method": null,
+        "p_from": null,
+        "p_to": null,
+        "p_limit": 20,
+        "p_offset": 20
+      }
+    },
+    {
+      "name": "get_commercial_sale_order_detail",
+      "body": {
+        "p_order_id": "qa-order-1",
+        "p_sale_id": null
+      }
+    },
+    {
+      "name": "get_sale_order_revisions",
+      "body": {
+        "p_order_id": "qa-order-1"
+      }
+    }
+  ],
+  "errors": []
+}

@@ -54,6 +54,23 @@
 .commercial-dashboard-close svg { width: 16px; height: 16px; }
 
 .commercial-dashboard-content { width: min(100%, 1600px); margin: 0 auto; padding: clamp(18px, 2.6vw, 40px) clamp(18px, 3.1vw, 48px) 34px; }
+.commercial-dashboard-sales-entry { display: flex; align-items: center; gap: 14px; margin: 18px 0 0; padding: 14px 18px; border: 1px solid var(--dash-line); border-left: 3px solid var(--dash-accent); border-radius: 9px; background: var(--dash-surface); }
+.commercial-dashboard-sales-entry__icon { display: grid; width: 38px; height: 38px; flex: 0 0 auto; place-items: center; color: var(--dash-accent); }
+.commercial-dashboard-sales-entry__icon svg { width: 32px; height: 32px; }
+.commercial-dashboard-sales-entry__text { min-width: 0; }
+.commercial-dashboard-sales-entry h2 { margin: 0; font-size: 16px; font-weight: 750; letter-spacing: -.02em; line-height: 1.35; }
+.commercial-dashboard-sales-entry p { margin: 3px 0 0; color: var(--dash-muted); font-size: 12px; line-height: 1.4; }
+.commercial-dashboard-sales-entry button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; flex: 0 0 auto; margin-left: auto; padding: 8px 13px; border: 1px solid #bfcfc2; border-radius: 7px; background: #f5f8f4; color: var(--dash-accent); font-size: 12px; font-weight: 750; cursor: pointer; }
+.commercial-dashboard-sales-entry button:hover { border-color: var(--dash-accent); background: #eaf2e8; }
+.commercial-dashboard-sales-entry button svg { width: 16px; height: 16px; }
+@media (max-width: 590px) {
+  .commercial-dashboard-sales-entry { gap: 8px; padding: 10px; }
+  .commercial-dashboard-sales-entry__icon { width: 28px; }
+  .commercial-dashboard-sales-entry__icon svg { width: 27px; height: 27px; }
+  .commercial-dashboard-sales-entry h2 { font-size: 14px; }
+  .commercial-dashboard-sales-entry p { font-size: 11px; }
+  .commercial-dashboard-sales-entry button { gap: 4px; padding: 8px; }
+}
 .commercial-dashboard-kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
 .commercial-dashboard-kpi { display: flex; min-width: 0; min-height: 116px; flex-direction: column; align-items: flex-start; padding: 16px 17px 13px; border: 1px solid var(--dash-line); border-radius: 13px; background: var(--dash-surface); box-shadow: 0 5px 18px -17px rgba(29, 64, 37, .44); }
 .commercial-dashboard-kpi > span { min-height: 26px; color: #637669; font-size: 9px; font-weight: 800; letter-spacing: .075em; line-height: 1.35; text-transform: uppercase; }
@@ -499,4 +516,24 @@
   .commercial-dashboard-indicators .commercial-dashboard-kpis { gap: 8px; }
   .commercial-dashboard-indicators .commercial-dashboard-kpi { min-height: 95px; }
   .commercial-dashboard-indicators .commercial-dashboard-kpi:last-child { min-height: 74px; }
+}
+
+/* Dedicated official pavilion plans: the useful content controls the panel's
+   proportions. External area maps keep their established viewport sizing. */
+.commercial-dashboard-pavilion-plan { container-type: inline-size; }
+.commercial-dashboard-pavilion-plan .commercial-dashboard-map-scroll {
+  height: clamp(360px, calc(100cqw / var(--pavilion-content-aspect, 1)), min(760px, calc(100dvh - 126px)));
+}
+.commercial-dashboard-pavilion-plan .commercial-dashboard-map-tools button { min-height: 42px; min-width: 42px; }
+.commercial-dashboard-pavilion-plan .commercial-dashboard-map-tools select { height: 42px; }
+.commercial-dashboard-support-label { fill: #53634c; font-weight: 650; pointer-events: none; }
+.commercial-dashboard-support-note { margin-top: 5px; }
+@container (max-width: 440px) {
+  .commercial-dashboard-pavilion-plan .commercial-dashboard-map-tools { flex-wrap: wrap; }
+  .commercial-dashboard-pavilion-plan .commercial-dashboard-map-tools select { flex-basis: calc(100% - 98px); }
+  .commercial-dashboard-pavilion-plan .commercial-dashboard-map-fit { order: 1; flex-basis: 100%; }
+  .commercial-dashboard-pavilion-plan .commercial-dashboard-map-scroll {
+    height: clamp(330px, calc(100cqw / var(--pavilion-content-aspect, 1)), min(680px, calc(100dvh - 126px)));
+  }
+  .commercial-dashboard-pavilion-plan .commercial-dashboard-map-legend { gap: 6px 10px; }
 }

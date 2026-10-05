@@ -98,21 +98,63 @@ describe('cabeçalho compacto do mapa comercial', () => {
     expect(manage).toHaveBeenCalledOnce();
   });
 
+  it.each([false, true])('oferece Dashboard independente de Vendas (%s), ao lado dela e fora de Gestão', async (salesAvailable) => {
+    const openDashboard = vi.fn();
+    render(<CommercialMapHeaderTools
+      salesAvailable={salesAvailable}
+      dashboardAvailable
+      onOpenDashboard={openDashboard}
+      managementActions={<button type="button">Calibrar mapa</button>}
+    />);
+    const dashboard = screen.getByRole('button', { name: 'Dashboard Comercial' });
+    expect(dashboard).toHaveAttribute('data-commercial-dashboard-trigger');
+    expect(dashboard).toHaveAttribute('aria-haspopup', 'dialog');
+    expect(dashboard).toHaveAttribute('aria-pressed', 'false');
+    expect(dashboard.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+    if (salesAvailable) expect(dashboard.previousElementSibling).toBe(screen.getByRole('button', { name: 'Vendas' }));
+    else expect(screen.queryByRole('button', { name: 'Vendas' })).not.toBeInTheDocument();
+
+    const user = userEvent.setup();
+    act(() => dashboard.focus());
+    await user.keyboard('{Enter}');
+    expect(openDashboard).toHaveBeenCalledOnce();
+    expect(useSalesStore.getState().salesModeActive).toBe(false);
+    fireEvent.click(screen.getByRole('button', { name: 'Gestão' }));
+    const management = screen.getByText('Gestão do mapa').closest('.commercial-map-header-management') as HTMLElement;
+    expect(within(management).queryByRole('button', { name: 'Dashboard Comercial' })).not.toBeInTheDocument();
+    expect(within(management).getByRole('button', { name: 'Lista e tabela' })).toBeEnabled();
+    expect(within(management).getByRole('button', { name: 'Calibrar mapa' })).toBeEnabled();
+  });
+
+  it('retira o acesso da Dashboard ao revogar sua disponibilidade sem remover Vendas', () => {
+    const openDashboard = vi.fn();
+    const view = render(<CommercialMapHeaderTools salesAvailable dashboardAvailable onOpenDashboard={openDashboard} />);
+    expect(screen.getByRole('button', { name: 'Dashboard Comercial' })).toBeEnabled();
+    view.rerender(<CommercialMapHeaderTools salesAvailable dashboardAvailable={false} onOpenDashboard={openDashboard} />);
+    expect(screen.queryByRole('button', { name: 'Dashboard Comercial' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Vendas' })).toBeEnabled();
+    expect(openDashboard).not.toHaveBeenCalled();
+  });
+
   it.each(['dashboard', 'visit'])('fecha imediatamente Gestão e retira interações quando %s assume o mapa', (blockedBy) => {
-    const view = render(<CommercialMapHeaderTools visitAvailable salesAvailable />);
+    const openDashboard = vi.fn();
+    const view = render(<CommercialMapHeaderTools visitAvailable salesAvailable dashboardAvailable onOpenDashboard={openDashboard} />);
     fireEvent.click(screen.getByRole('button', { name: 'Gestão' }));
     expect(screen.getByRole('button', { name: 'Lista e tabela' })).toBeInTheDocument();
-    if (blockedBy === 'dashboard') view.rerender(<CommercialMapHeaderTools dashboardOpen visitAvailable salesAvailable />);
+    if (blockedBy === 'dashboard') view.rerender(<CommercialMapHeaderTools dashboardOpen visitAvailable salesAvailable dashboardAvailable onOpenDashboard={openDashboard} />);
     else act(() => useVisitStore.getState().start());
     expect(screen.queryByRole('button', { name: 'Lista e tabela' })).not.toBeInTheDocument();
     const group = view.container.querySelector('.commercial-map-header-tools') as HTMLDivElement;
     expect(group.inert).toBe(true);
     expect(screen.queryByRole('button', { name: 'Gestão' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Dashboard Comercial' })).not.toBeInTheDocument();
     if (blockedBy === 'dashboard') {
       expect(group).toHaveAttribute('aria-hidden', 'true');
-      view.rerender(<CommercialMapHeaderTools visitAvailable salesAvailable />);
+      expect(group.querySelector('[data-commercial-dashboard-trigger]')).toHaveAttribute('aria-pressed', 'true');
+      view.rerender(<CommercialMapHeaderTools visitAvailable salesAvailable dashboardAvailable onOpenDashboard={openDashboard} />);
     } else act(() => useVisitStore.getState().finishExit());
     expect(screen.getByRole('button', { name: 'Gestão' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Dashboard Comercial' })).toBeEnabled();
     expect(screen.queryByRole('button', { name: 'Lista e tabela' })).not.toBeInTheDocument();
     expect(group.inert).toBe(false);
   });

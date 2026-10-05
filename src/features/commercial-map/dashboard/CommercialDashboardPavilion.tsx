@@ -19,6 +19,8 @@ export default function CommercialDashboardPavilion({ snapshot, onViewLot, selec
       {geometry.referenceCount !== snapshot.totalLots && ' A diferença permanece explícita; os indicadores usam somente o cadastro ativo carregado.'}
     </p>
     <CommercialMiniMap items={geometry.records} title={snapshot.definition.officialName}
+      className="commercial-dashboard-pavilion-plan" contentEnvelope={geometry.contentEnvelope}
+      numberLabelPixels={snapshot.definition.pavilionNumber === 1 ? 14 : 11}
       outlines={geometry.outlines} accesses={geometry.accesses} numbered onViewLot={onViewLot} selection={selection} highlightedStatus={highlightedStatus} hideStatusLegend={hideStatusLegend} />
     {geometry.pending.map((message) => <p className="commercial-dashboard-pending" key={message}>{message}</p>)}
   </div>;

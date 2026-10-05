@@ -5,7 +5,7 @@ import { COMMERCIAL_MAP_SEGMENTS } from '@/features/commercial-map/data/commerci
 import { buildCommercialDashboardSnapshot } from '@/features/commercial-map/dashboard/commercialDashboardAnalytics';
 import { buildDashboardExternalBoundaries } from '@/features/commercial-map/dashboard/commercialDashboardBoundaries';
 import { buildDashboardPavilionGeometry } from '@/features/commercial-map/dashboard/commercialDashboardPavilionGeometry';
-import { buildCommercialMiniMapGeometry } from '@/features/commercial-map/dashboard/commercialDashboardGeometry';
+import { buildCommercialMiniMapGeometry, buildCommercialMiniMapViewBox } from '@/features/commercial-map/dashboard/commercialDashboardGeometry';
 import { COMMERCIAL_PAVILION_MODULE_PLANS } from '@/features/commercial-map/utils/commercialPavilionModules';
 import type { CommercialLot, CommercialStatus, MapEntity } from '@/features/commercial-map/types';
 import type { DashboardAggregate } from '@/features/commercial-map/dashboard/commercialDashboardTypes';
@@ -135,5 +135,40 @@ describe('dashboard reference geometry', () => {
     expect(result.accesses.every((access) => keys.some((key) => access.id === key || access.id.startsWith(key + ':')))).toBe(true);
     const geometry = buildCommercialMiniMapGeometry(result.records, result.outlines);
     expect(geometry.lots).toHaveLength(pavilion.totalLots);
+  });
+
+  it('fits Pavilion 8 to its official commercial hall and complete permanent wing without changing cadastral geometry', () => {
+    const pavilion = buildCommercialDashboardSnapshot(reference).pavilions.find(({ definition }) => definition.publicIdentifier === 'B4')!;
+    const cadastralBefore = JSON.stringify(pavilion.records.map(({ entity, lot }) => [entity.geometry, entity.id, lot.lotNumber]));
+    const exterior = buildCommercialMiniMapGeometry(pavilion.records, [{
+      id: pavilion.entity!.id, label: 'Implantação externa', kind: 'pavilion', color: '#315543', coordinates: pavilion.entity!.geometry.coordinates,
+    }]);
+    const result = buildDashboardPavilionGeometry(pavilion);
+    const supports = result.outlines.filter(({ kind }) => kind === 'support');
+    expect(supports.map(({ label }) => label)).toEqual(['Sanitários', 'Cozinha', 'Apoio de serviço']);
+    expect(result.contentEnvelope).toBeDefined();
+    const fitted = buildCommercialMiniMapGeometry(result.records, result.outlines, result.contentEnvelope);
+    const originalHeight = exterior.bounds!.maxY - exterior.bounds!.minY;
+    const fittedHeight = fitted.bounds!.maxY - fitted.bounds!.minY;
+    expect(fittedHeight).toBeLessThan(originalHeight * .65);
+    const [left, top, width, height] = buildCommercialMiniMapViewBox(fitted).split(' ').map(Number);
+    for (const support of supports) for (const point of support.coordinates[0]) {
+      const [x, y] = fitted.project(point);
+      expect(x).toBeGreaterThan(left); expect(x).toBeLessThan(left + width);
+      expect(y).toBeGreaterThan(top); expect(y).toBeLessThan(top + height);
+    }
+    expect(fitted.lots).toHaveLength(114);
+    expect(JSON.stringify(result.records.map(({ entity, lot }) => [entity.geometry, entity.id, lot.lotNumber]))).toBe(cadastralBefore);
+  });
+
+  it('preserves Pavilion 1 presentation and includes permanent supports without adding commercial spaces', () => {
+    const pavilions = buildCommercialDashboardSnapshot(reference).pavilions;
+    const first = pavilions.find(({ definition }) => definition.pavilionNumber === 1)!;
+    expect(buildDashboardPavilionGeometry(first).outlines.find(({ kind }) => kind === 'pavilion')!.coordinates).toBe(first.entity!.geometry.coordinates);
+    for (const pavilion of pavilions) {
+      const result = buildDashboardPavilionGeometry(pavilion);
+      expect(result.outlines.filter(({ kind }) => kind === 'support')).toHaveLength(COMMERCIAL_PAVILION_MODULE_PLANS[pavilion.definition.publicIdentifier].supportSpaces.length);
+      expect(result.records).toHaveLength(pavilion.records.length);
+    }
   });
 });
