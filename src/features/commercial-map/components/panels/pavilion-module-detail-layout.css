@@ -159,3 +159,5 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+.commercial-pavilion-module-history { margin-top: .75rem; border-top: 1px solid hsl(var(--border)); padding-top: .5rem; }
+.commercial-pavilion-module-history > summary { cursor: pointer; min-height: 2.75rem; display: flex; align-items: center; font-weight: 600; font-size: .875rem; }

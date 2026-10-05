@@ -10196,6 +10196,7 @@ export type Database = {
           lineage_delta: number
         }[]
       }
+      get_sale_order_revisions: { Args: { p_order_id: string }; Returns: Json }
       get_user_org_ids: { Args: { _user_id: string }; Returns: string[] }
       get_user_org_role: {
         Args: { _org_id: string; _user_id: string }

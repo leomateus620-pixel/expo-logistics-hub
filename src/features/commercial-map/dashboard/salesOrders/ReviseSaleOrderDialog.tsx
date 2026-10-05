@@ -1,10 +1,13 @@
 import { useMemo, useRef, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSaleInspectionStore } from '../../state/useSaleInspectionStore';
+import { useSalesStore } from '../../sales/useSalesSelection';
 import * as Dialog from '@radix-ui/react-dialog';
 import { ArrowRight, Loader2, Minus, Plus, Search, Undo2, X } from 'lucide-react';
 import type { CommercialLot } from '../../types';
 import { formatDashboardCurrency } from '../commercialDashboardFormatters';
 import { parseReaisInputToCents } from '../../sales/salesMoney';
-import { describeReviseError, reviseSaleOrder, type SaleOrderDetail } from './salesOrdersService';
+import { describeReviseError, fetchSaleOrderRevisions, reviseSaleOrder, type SaleOrderDetail } from './salesOrdersService';
 import { previewRevision } from './saleRevision';
 import './attach-order-contract.css';
 import './revise-sale-order.css';
@@ -36,6 +39,8 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, focus
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const submitting = useRef(false);
+  const queryClient = useQueryClient();
+  const version = useQuery({ queryKey: ['commercial-sale-order-revisions', orderId], queryFn: () => fetchSaleOrderRevisions(orderId), staleTime: 0 });
 
   const priceOf = (lot: CommercialLot) => {
     const p = lot.officialPricing2028;
@@ -66,6 +71,10 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, focus
   });
   const remaining = active.length - removed.size + added.length;
   const changed = removed.size > 0 || added.length > 0 || feesCents !== originalFees || count !== detail.installments.length;
+  const contracts = detail.contracts ?? [];
+  const hasOrderContract = contracts.some((c) => c.scope === 'ORDER_ITEMS');
+  const lotContractWarnings = active.filter((i) => removed.has(i.itemId ?? '') && contracts.some((c) => c.scope === 'LOT' && c.lotIds.includes(i.lotId)))
+    .map((i) => lotById.get(i.lotId)?.lotNumber || i.publicIdentifier);
   const paidCount = detail.installments.filter((i) => i.paidAt || i.paymentStatus === 'PAID').length;
 
   const label = (lotId: string, fallback?: string) => {
@@ -88,11 +97,26 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, focus
         fees: feesCents !== originalFees ? { admin: parseReaisInputToCents(fees.admin) / 100, ppci: parseReaisInputToCents(fees.ppci) / 100, cleaning: parseReaisInputToCents(fees.cleaning) / 100 } : null,
         installmentCount: count !== detail.installments.length ? count : null,
         reason,
+        expectedUpdatedAt: version.data?.updatedAt ?? null,
       });
+      const removedLotIds = active.filter((i) => removed.has(i.itemId ?? '')).map((i) => i.lotId);
+      const inspection = useSaleInspectionStore.getState();
+      if (inspection.context && removedLotIds.some((id) => inspection.lotIdSet.has(id))) {
+        inspection.start({ ...inspection.context, lotIds: [...inspection.context.lotIds.filter((id) => !removedLotIds.includes(id)), ...added] });
+      }
+      const sales = useSalesStore.getState();
+      added.forEach((id) => sales.removeLot(id));
+      await queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-revisions', orderId] });
       await onSaved();
       onClose();
     } catch (e) {
       setError(describeReviseError(e));
+      if (String((e as { message?: string })?.message ?? e).includes('ORDER_CHANGED')) {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-revisions', orderId] }),
+          queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail'] }),
+        ]);
+      }
     } finally { submitting.current = false; setBusy(false); }
   };
 
@@ -181,11 +205,20 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, locationOf, focus
               </section>
             </div>
             <footer className="cso-attach-footer">
+              {changed && <div className="rso-review" aria-live="polite">
+                {added.length > 0 && <span>Entram: <strong>{addedLots.map((l) => l.lotNumber || l.publicIdentifier).join(', ')}</strong></span>}
+                {removed.size > 0 && <span>Saem: <strong>{active.filter((i) => removed.has(i.itemId ?? '')).map((i) => lotById.get(i.lotId)?.lotNumber || i.publicIdentifier).join(', ')}</strong></span>}
+                <span>Total {formatDashboardCurrency(Number(h.negotiatedTotal ?? 0))} → <strong>{formatDashboardCurrency(preview.total)}</strong>
+                  {preview.schedule.length > 0 ? ` · ${preview.schedule.length} parcela(s)` : ''}</span>
+                {lotContractWarnings.length > 0 && <span className="rso-warn">Contrato individual em {lotContractWarnings.join(', ')}: o arquivo continua no histórico do lote.</span>}
+                {hasOrderContract && <span className="rso-warn">Esta venda tem contrato da venda inteira: anexe uma nova versão após salvar.</span>}
+                {paidCount > 0 && <span>Valores já recebidos ficam preservados.</span>}
+              </div>}
               {error && <p className="cso-attach-state is-error" role="alert">{error}</p>}
               <p><strong>{remaining} {remaining === 1 ? 'espaço' : 'espaços'}</strong><span> após a alteração</span></p>
               <div className="cso-attach-actions">
                 <button type="button" className="cso-attach-cancel" disabled={busy} onClick={onClose}>Cancelar</button>
-                <button type="submit" className="cso-attach-submit" disabled={busy || !changed || remaining === 0}>
+                <button type="submit" className="cso-attach-submit" disabled={busy || !changed || remaining === 0 || version.isLoading}>
                   {busy ? <><Loader2 aria-hidden="true" />Salvando…</> : 'Salvar alterações'}
                 </button>
               </div>

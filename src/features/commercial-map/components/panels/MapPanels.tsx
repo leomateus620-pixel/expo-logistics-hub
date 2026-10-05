@@ -54,7 +54,7 @@ import { LotStructureDialog, type LotStructureOperation } from '../commercial/Lo
 import { PavilionPlanLegend } from './PavilionPlanLegend';
 import { CompactDetailSheetControls } from './CompactDetailSheet';
 import { LotPricing2028Panel } from './LotPricing2028Panel';
-import { describePriceActivity } from '../../utils/priceActivity';
+import { LotActivityList } from './LotActivityList';
 import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { getHistoryIdForEntity } from '../../history/bindings';
 import { HistoryExperience } from '../../history/HistoryExperience';
@@ -532,16 +532,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
               <LotSaleHistoryCard sale={saleHistory.data} loading={saleHistory.isLoading} currentIdentity={lotIdentity} />
               <div className="commercial-map-activity">
                 {!lot && <div className="commercial-map-empty compact"><History /><strong>Histórico disponível após a importação</strong></div>}
-                {lot && activity.isLoading && <p>Carregando histórico auditável…</p>}
-                {lot && !activity.isLoading && activity.data?.length === 0 && <div className="commercial-map-empty compact"><History /><strong>Nenhuma alteração registrada</strong></div>}
-                {activity.data?.map((item) => (
-                  <div key={item.id}>
-                    <i><CheckCircle2 /></i>
-                    {(() => { const price = describePriceActivity(item); return price
-                      ? <span><strong>{price.title}</strong><small>{price.detail}</small><small>{[price.actor, dateTime.format(new Date(item.createdAt))].filter(Boolean).join(' · ')}</small></span>
-                      : <span><strong>{item.action.replace(/_/g, ' ')}</strong><small>{dateTime.format(new Date(item.createdAt))}{item.reason ? ` · ${item.reason}` : ''}</small></span>; })()}
-                  </div>
-                ))}
+                {lot && <LotActivityList items={activity.data} loading={activity.isLoading} />}
               </div>
             </TabsContent>
           </Tabs>

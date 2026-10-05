@@ -6,7 +6,7 @@ import { paymentMethodLabel, SALES_PAYMENT_METHODS, SALES_PAYMENT_METHOD_LABELS 
 import { getContractSignedUrl } from '../../services/commercialMapService';
 import { formatDashboardCurrency } from '../commercialDashboardFormatters';
 import {
-  describeSalesError, fetchSaleOrderDetail, fetchSaleOrdersPage, SALE_ORDERS_PAGE_SIZE, uniqueContracts,
+  describeSalesError, fetchSaleOrderDetail, fetchSaleOrderRevisions, fetchSaleOrdersPage, SALE_ORDERS_PAGE_SIZE, uniqueContracts,
   type SaleContract, type SaleOrderDetail, type SaleOrderSummary, type SaleOrdersFilters,
 } from './salesOrdersService';
 import { useSalesOrdersUiStore } from './useSalesOrdersUiStore';
@@ -326,6 +326,8 @@ function SaleDetail({ record, data, orgId, canManageContracts, canManageSales, e
       <p className="cso-note">Arquivo anexado não comprova assinatura ou recebimento.</p>
     </section>
 
+    {h.kind === 'ORDER' && h.orderId && canManageSales && <SaleRevisions orderId={h.orderId} />}
+
     <details className="cso-exhibitor cso-span">
       <summary>Dados do expositor e da venda<ChevronDown aria-hidden="true" /></summary>
       <dl className="cso-exhibitor-data">
@@ -410,3 +412,19 @@ function ContractRow({ contract, labelOf, canReplace, onReplace }: {
   </li>;
 }
 
+
+function SaleRevisions({ orderId }: { orderId: string }) {
+  const q = useQuery({ queryKey: ['commercial-sale-order-revisions', orderId], queryFn: () => fetchSaleOrderRevisions(orderId), staleTime: 30_000 });
+  const revisions = q.data?.revisions ?? [];
+  if (q.isLoading || revisions.length === 0) return null;
+  const lots = (v?: string[]) => (v ?? []).map((x) => x.replace(/^B5-M0*/, '')).join(', ');
+  return <section className="cso-block cso-span">
+    <h3>Alterações da venda <span className="cso-count">{revisions.length}</span></h3>
+    <ul className="cso-revisions">{revisions.map((r) => <li key={r.id}>
+      <strong>{r.reason}</strong>
+      <span>Espaços: {lots(r.before.lots)} → {lots(r.after.lots)}</span>
+      <span>Total: {formatDashboardCurrency(Number(r.before.negotiated_total ?? 0))} → {formatDashboardCurrency(Number(r.after.negotiated_total ?? 0))}</span>
+      <small>{[r.actorName, new Date(r.createdAt).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })].filter(Boolean).join(' · ')}</small>
+    </li>)}</ul>
+  </section>;
+}
