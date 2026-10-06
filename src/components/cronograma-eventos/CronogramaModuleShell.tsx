@@ -38,10 +38,10 @@ function CronogramaCommandBar() {
             <span>Portal</span>
           </Link>
 
+          <MobileSearchToggle className="lg:hidden" />
           <CronogramaAgendaModeControls />
 
           <CronogramaHeaderSearch className="cronograma-command-search hidden lg:flex" />
-          <MobileSearchToggle className="lg:hidden" />
         </div>
 
         <div className="cronograma-command-layer__right">

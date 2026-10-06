@@ -76,7 +76,7 @@ export function VenueNotificationsButton() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button type="button" variant="ghost" size="sm" aria-label="Notificações da Agenda Restaurante e Arena">
+        <Button type="button" variant="ghost" size="sm" className="venue-module-shell__notifications" aria-label="Notificações da Agenda Restaurante e Arena">
           <BellRing aria-hidden="true" />
           <span className="hidden sm:inline">Notificações</span>
         </Button>

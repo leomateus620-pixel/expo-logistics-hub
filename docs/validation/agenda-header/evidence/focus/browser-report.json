@@ -1,0 +1,3327 @@
+{
+  "phase": "focus",
+  "sourceRoot": "C:\\Users\\Leonardo\\.codex\\worktrees\\agenda-responsive-header\\expo-logistics-hub",
+  "boundary": "Real local Agenda components; synthetic read-only data; intercepted external requests; no authenticated backend or production writes",
+  "limitations": [
+    "Chromium viewport reduction emulates available keyboard space; it is not a physical virtual keyboard.",
+    "Desktop Chromium cannot reproduce iOS Safari elastic overscroll or a physical pull gesture."
+  ],
+  "checks": [
+    {
+      "name": "390: Shift+Tab from Portal focuses skip link visibly",
+      "passed": true
+    },
+    {
+      "name": "390: focused skip is legible in viewport",
+      "passed": true,
+      "detail": {
+        "x": 16,
+        "y": 16,
+        "width": 258.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "390: skip retains functional main destination",
+      "passed": true
+    },
+    {
+      "name": "390: inactive skip uses clipping after scroll/top",
+      "passed": true,
+      "detail": {
+        "clip": "rect(0px, 0px, 0px, 0px)",
+        "clipPath": "inset(50%)",
+        "width": 1,
+        "height": 1,
+        "visibleFocus": false
+      }
+    },
+    {
+      "name": "390: upward wheel at top does not reveal skip",
+      "passed": true
+    },
+    {
+      "name": "390-general: keyboard activates chosen mode",
+      "passed": true
+    },
+    {
+      "name": "390-general-closed: real control bounds do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-general-closed: controls stay inside horizontal viewport",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-general-closed: no horizontal overflow",
+      "passed": true,
+      "detail": {
+        "scrollWidth": 375,
+        "width": 390
+      }
+    },
+    {
+      "name": "390-general-closed: content follows header",
+      "passed": true,
+      "detail": {
+        "mainY": 229.15625,
+        "headerBottom": 229.15625
+      }
+    },
+    {
+      "name": "390-general-closed: mode touch targets at least 44px",
+      "passed": true
+    },
+    {
+      "name": "390-general-closed: Portal and search share the first row",
+      "passed": true,
+      "detail": {
+        "portal": {
+          "x": 12,
+          "y": 8.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 52.59375
+        },
+        "toggle": {
+          "x": 94.40625,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 138.40625,
+          "bottom": 53.59375
+        }
+      }
+    },
+    {
+      "name": "390-general-closed: modes form the second left-aligned row",
+      "passed": true,
+      "detail": {
+        "portal": {
+          "x": 12,
+          "y": 8.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 52.59375
+        },
+        "modes": {
+          "x": 12,
+          "y": 61.59375,
+          "width": 94.390625,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        }
+      }
+    },
+    {
+      "name": "390-general-closed: auxiliary actions have a separate row",
+      "passed": true,
+      "detail": {
+        "modes": {
+          "x": 12,
+          "y": 61.59375,
+          "width": 94.390625,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        },
+        "auxiliary": {
+          "x": 12,
+          "y": 115.984375,
+          "width": 351,
+          "height": 55.390625,
+          "right": 363,
+          "bottom": 171.375
+        }
+      }
+    },
+    {
+      "name": "390-general-open: real control bounds do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-general-open: controls stay inside horizontal viewport",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-general-open: no horizontal overflow",
+      "passed": true,
+      "detail": {
+        "scrollWidth": 375,
+        "width": 390
+      }
+    },
+    {
+      "name": "390-general-open: content follows header",
+      "passed": true,
+      "detail": {
+        "mainY": 229.15625,
+        "headerBottom": 229.15625
+      }
+    },
+    {
+      "name": "390-general-open: mode touch targets at least 44px",
+      "passed": true
+    },
+    {
+      "name": "390-general-open: Portal and search share the first row",
+      "passed": true,
+      "detail": {
+        "portal": {
+          "x": 12,
+          "y": 8.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 52.59375
+        },
+        "toggle": {
+          "x": 94.40625,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 138.40625,
+          "bottom": 53.59375
+        }
+      }
+    },
+    {
+      "name": "390-general-open: modes form the second left-aligned row",
+      "passed": true,
+      "detail": {
+        "portal": {
+          "x": 12,
+          "y": 8.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 52.59375
+        },
+        "modes": {
+          "x": 12,
+          "y": 61.59375,
+          "width": 94.390625,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        }
+      }
+    },
+    {
+      "name": "390-general-open: auxiliary actions have a separate row",
+      "passed": true,
+      "detail": {
+        "modes": {
+          "x": 12,
+          "y": 61.59375,
+          "width": 94.390625,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        },
+        "auxiliary": {
+          "x": 12,
+          "y": 115.984375,
+          "width": 351,
+          "height": 55.390625,
+          "right": 363,
+          "bottom": 171.375
+        }
+      }
+    },
+    {
+      "name": "390-general-open: expanded search participates in normal flow",
+      "passed": true,
+      "detail": "static"
+    },
+    {
+      "name": "390-general-open: compact search keeps header height stable",
+      "passed": true,
+      "detail": {
+        "before": 229.15625,
+        "after": 229.15625
+      }
+    },
+    {
+      "name": "390-room: keyboard activates chosen mode",
+      "passed": true
+    },
+    {
+      "name": "390-room-closed: real control bounds do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-room-closed: controls stay inside horizontal viewport",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-room-closed: no horizontal overflow",
+      "passed": true,
+      "detail": {
+        "scrollWidth": 375,
+        "width": 390
+      }
+    },
+    {
+      "name": "390-room-closed: content follows header",
+      "passed": true,
+      "detail": {
+        "mainY": 229.15625,
+        "headerBottom": 229.15625
+      }
+    },
+    {
+      "name": "390-room-closed: mode touch targets at least 44px",
+      "passed": true
+    },
+    {
+      "name": "390-room-closed: Portal and search share the first row",
+      "passed": true,
+      "detail": {
+        "portal": {
+          "x": 12,
+          "y": 9.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 53.59375
+        },
+        "toggle": {
+          "x": 94.40625,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 138.40625,
+          "bottom": 53.59375
+        }
+      }
+    },
+    {
+      "name": "390-room-closed: modes form the second left-aligned row",
+      "passed": true,
+      "detail": {
+        "portal": {
+          "x": 12,
+          "y": 9.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 53.59375
+        },
+        "modes": {
+          "x": 12,
+          "y": 61.59375,
+          "width": 94.390625,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        }
+      }
+    },
+    {
+      "name": "390-room-closed: auxiliary actions have a separate row",
+      "passed": true,
+      "detail": {
+        "modes": {
+          "x": 12,
+          "y": 61.59375,
+          "width": 94.390625,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        },
+        "auxiliary": {
+          "x": 12,
+          "y": 115.984375,
+          "width": 351,
+          "height": 55.390625,
+          "right": 363,
+          "bottom": 171.375
+        }
+      }
+    },
+    {
+      "name": "390-room-open: real control bounds do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-room-open: controls stay inside horizontal viewport",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-room-open: no horizontal overflow",
+      "passed": true,
+      "detail": {
+        "scrollWidth": 375,
+        "width": 390
+      }
+    },
+    {
+      "name": "390-room-open: content follows header",
+      "passed": true,
+      "detail": {
+        "mainY": 229.15625,
+        "headerBottom": 229.15625
+      }
+    },
+    {
+      "name": "390-room-open: mode touch targets at least 44px",
+      "passed": true
+    },
+    {
+      "name": "390-room-open: Portal and search share the first row",
+      "passed": true,
+      "detail": {
+        "portal": {
+          "x": 12,
+          "y": 9.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 53.59375
+        },
+        "toggle": {
+          "x": 94.40625,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 138.40625,
+          "bottom": 53.59375
+        }
+      }
+    },
+    {
+      "name": "390-room-open: modes form the second left-aligned row",
+      "passed": true,
+      "detail": {
+        "portal": {
+          "x": 12,
+          "y": 9.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 53.59375
+        },
+        "modes": {
+          "x": 12,
+          "y": 61.59375,
+          "width": 94.390625,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        }
+      }
+    },
+    {
+      "name": "390-room-open: auxiliary actions have a separate row",
+      "passed": true,
+      "detail": {
+        "modes": {
+          "x": 12,
+          "y": 61.59375,
+          "width": 94.390625,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        },
+        "auxiliary": {
+          "x": 12,
+          "y": 115.984375,
+          "width": 351,
+          "height": 55.390625,
+          "right": 363,
+          "bottom": 171.375
+        }
+      }
+    },
+    {
+      "name": "390-room-open: expanded search participates in normal flow",
+      "passed": true,
+      "detail": "static"
+    },
+    {
+      "name": "390-room-open: compact search keeps header height stable",
+      "passed": true,
+      "detail": {
+        "before": 229.15625,
+        "after": 229.15625
+      }
+    },
+    {
+      "name": "390: Enter opens search and focuses input",
+      "passed": true
+    },
+    {
+      "name": "390: input focus has a visible 2px underline",
+      "passed": true,
+      "detail": {
+        "focusVisible": true,
+        "backgroundSize": "100% 2px"
+      }
+    },
+    {
+      "name": "390: inactive compact field returns to a 1px underline",
+      "passed": true,
+      "detail": "100% 1px"
+    },
+    {
+      "name": "390: opening search does not scroll at top",
+      "passed": true
+    },
+    {
+      "name": "390: Escape closes search and restores trigger focus",
+      "passed": true
+    },
+    {
+      "name": "390: closing search does not scroll at top",
+      "passed": true
+    },
+    {
+      "name": "390: close and reopen preserves searched text",
+      "passed": true
+    },
+    {
+      "name": "390: Enter closes search and restores trigger focus",
+      "passed": true
+    },
+    {
+      "name": "390: switching mode preserves search text",
+      "passed": true
+    },
+    {
+      "name": "390: clear search preserves volunteer mode",
+      "passed": true
+    },
+    {
+      "name": "390: Tab reaches clear control from input",
+      "passed": true
+    },
+    {
+      "name": "390: Tab continues from clear control to agenda mode",
+      "passed": true
+    },
+    {
+      "name": "390: close trigger restores its own focus",
+      "passed": true
+    },
+    {
+      "name": "390-reduced-height-search: real control bounds do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-reduced-height-search: controls stay inside horizontal viewport",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-reduced-height-search: no horizontal overflow",
+      "passed": true,
+      "detail": {
+        "scrollWidth": 375,
+        "width": 390
+      }
+    },
+    {
+      "name": "390-reduced-height-search: content follows header",
+      "passed": true,
+      "detail": {
+        "mainY": 229.15625,
+        "headerBottom": 229.15625
+      }
+    },
+    {
+      "name": "390-reduced-height-search: mode touch targets at least 44px",
+      "passed": true
+    },
+    {
+      "name": "390-reduced-height-search: Portal and search share the first row",
+      "passed": true,
+      "detail": {
+        "portal": {
+          "x": 12,
+          "y": 9.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 53.59375
+        },
+        "toggle": {
+          "x": 94.40625,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 138.40625,
+          "bottom": 53.59375
+        }
+      }
+    },
+    {
+      "name": "390-reduced-height-search: modes form the second left-aligned row",
+      "passed": true,
+      "detail": {
+        "portal": {
+          "x": 12,
+          "y": 9.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 53.59375
+        },
+        "modes": {
+          "x": 12,
+          "y": 61.59375,
+          "width": 94.390625,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        }
+      }
+    },
+    {
+      "name": "390-reduced-height-search: auxiliary actions have a separate row",
+      "passed": true,
+      "detail": {
+        "modes": {
+          "x": 12,
+          "y": 61.59375,
+          "width": 94.390625,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        },
+        "auxiliary": {
+          "x": 12,
+          "y": 115.984375,
+          "width": 351,
+          "height": 55.390625,
+          "right": 363,
+          "bottom": 171.375
+        }
+      }
+    },
+    {
+      "name": "390-reduced-height-search: expanded search participates in normal flow",
+      "passed": true,
+      "detail": "static"
+    },
+    {
+      "name": "390-reduced-height-search: compact search keeps header height stable",
+      "passed": true,
+      "detail": {
+        "before": 229.15625,
+        "after": 229.15625
+      }
+    },
+    {
+      "name": "390: search input remains visible in reduced keyboard/landscape viewport",
+      "passed": true,
+      "detail": {
+        "x": 146.40625,
+        "y": 9.59375,
+        "width": 216.59375,
+        "height": 44,
+        "right": 363,
+        "bottom": 53.59375
+      }
+    },
+    {
+      "name": "390: period filter applies before search interactions",
+      "passed": true
+    },
+    {
+      "name": "390: search preserves the active period filter",
+      "passed": true
+    },
+    {
+      "name": "390: closing search preserves the active period filter",
+      "passed": true
+    },
+    {
+      "name": "820-landscape-open: real control bounds do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "820-landscape-open: controls stay inside horizontal viewport",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "820-landscape-open: no horizontal overflow",
+      "passed": true,
+      "detail": {
+        "scrollWidth": 805,
+        "width": 820
+      }
+    },
+    {
+      "name": "820-landscape-open: content follows header",
+      "passed": true,
+      "detail": {
+        "mainY": 181.96875,
+        "headerBottom": 181.96875
+      }
+    },
+    {
+      "name": "820-landscape-open: mode touch targets at least 44px",
+      "passed": true
+    },
+    {
+      "name": "820-landscape-open: Portal and search share the first row",
+      "passed": true,
+      "detail": {
+        "portal": {
+          "x": 18.390625,
+          "y": 9.59375,
+          "width": 82.40625,
+          "height": 44,
+          "right": 100.796875,
+          "bottom": 53.59375
+        },
+        "toggle": {
+          "x": 108.796875,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 152.796875,
+          "bottom": 53.59375
+        }
+      }
+    },
+    {
+      "name": "820-landscape-open: modes form the second left-aligned row",
+      "passed": true,
+      "detail": {
+        "portal": {
+          "x": 18.390625,
+          "y": 9.59375,
+          "width": 82.40625,
+          "height": 44,
+          "right": 100.796875,
+          "bottom": 53.59375
+        },
+        "modes": {
+          "x": 18.390625,
+          "y": 61.59375,
+          "width": 94.390625,
+          "height": 44,
+          "right": 112.78125,
+          "bottom": 105.59375
+        }
+      }
+    },
+    {
+      "name": "820-landscape-open: auxiliary actions have a separate row",
+      "passed": true,
+      "detail": {
+        "modes": {
+          "x": 18.390625,
+          "y": 61.59375,
+          "width": 94.390625,
+          "height": 44,
+          "right": 112.78125,
+          "bottom": 105.59375
+        },
+        "auxiliary": {
+          "x": 18.390625,
+          "y": 115.984375,
+          "width": 768.21875,
+          "height": 55.390625,
+          "right": 786.609375,
+          "bottom": 171.375
+        }
+      }
+    },
+    {
+      "name": "820-landscape-open: expanded search participates in normal flow",
+      "passed": true,
+      "detail": "static"
+    },
+    {
+      "name": "820x390: search stays accessible after rotation",
+      "passed": true,
+      "detail": {
+        "x": 160.796875,
+        "y": 9.59375,
+        "width": 625.8125,
+        "height": 44,
+        "right": 786.609375,
+        "bottom": 53.59375
+      }
+    },
+    {
+      "name": "820x390: rotation preserves searched text",
+      "passed": true
+    },
+    {
+      "name": "820x390: rotation preserves volunteer mode",
+      "passed": true
+    },
+    {
+      "name": "390-portrait-return-open: real control bounds do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-portrait-return-open: controls stay inside horizontal viewport",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-portrait-return-open: no horizontal overflow",
+      "passed": true,
+      "detail": {
+        "scrollWidth": 375,
+        "width": 390
+      }
+    },
+    {
+      "name": "390-portrait-return-open: content follows header",
+      "passed": true,
+      "detail": {
+        "mainY": 229.15625,
+        "headerBottom": 229.15625
+      }
+    },
+    {
+      "name": "390-portrait-return-open: mode touch targets at least 44px",
+      "passed": true
+    },
+    {
+      "name": "390-portrait-return-open: Portal and search share the first row",
+      "passed": true,
+      "detail": {
+        "portal": {
+          "x": 12,
+          "y": 9.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 53.59375
+        },
+        "toggle": {
+          "x": 94.40625,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 138.40625,
+          "bottom": 53.59375
+        }
+      }
+    },
+    {
+      "name": "390-portrait-return-open: modes form the second left-aligned row",
+      "passed": true,
+      "detail": {
+        "portal": {
+          "x": 12,
+          "y": 9.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 53.59375
+        },
+        "modes": {
+          "x": 12,
+          "y": 61.59375,
+          "width": 94.390625,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        }
+      }
+    },
+    {
+      "name": "390-portrait-return-open: auxiliary actions have a separate row",
+      "passed": true,
+      "detail": {
+        "modes": {
+          "x": 12,
+          "y": 61.59375,
+          "width": 94.390625,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        },
+        "auxiliary": {
+          "x": 12,
+          "y": 115.984375,
+          "width": 351,
+          "height": 55.390625,
+          "right": 363,
+          "bottom": 171.375
+        }
+      }
+    },
+    {
+      "name": "390-portrait-return-open: expanded search participates in normal flow",
+      "passed": true,
+      "detail": "static"
+    },
+    {
+      "name": "390: return from landscape preserves searched text",
+      "passed": true
+    },
+    {
+      "name": "390: return from landscape preserves active period filter",
+      "passed": true
+    },
+    {
+      "name": "1366: Shift+Tab from Portal focuses skip link visibly",
+      "passed": true
+    },
+    {
+      "name": "1366: focused skip is legible in viewport",
+      "passed": true,
+      "detail": {
+        "x": 16,
+        "y": 16,
+        "width": 258.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "1366: skip retains functional main destination",
+      "passed": true
+    },
+    {
+      "name": "1366: inactive skip uses clipping after scroll/top",
+      "passed": true,
+      "detail": {
+        "clip": "rect(0px, 0px, 0px, 0px)",
+        "clipPath": "inset(50%)",
+        "width": 1,
+        "height": 1,
+        "visibleFocus": false
+      }
+    },
+    {
+      "name": "1366-general: keyboard activates chosen mode",
+      "passed": true
+    },
+    {
+      "name": "1366-general-closed: desktop control geometry matches baseline",
+      "passed": true
+    },
+    {
+      "name": "1366-general-closed: real control bounds do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1366-general-closed: controls stay inside horizontal viewport",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1366-general-closed: no horizontal overflow",
+      "passed": true,
+      "detail": {
+        "scrollWidth": 1351,
+        "width": 1366
+      }
+    },
+    {
+      "name": "1366-general-closed: content follows header",
+      "passed": true,
+      "detail": {
+        "mainY": 58.359375,
+        "headerBottom": 58.359375
+      }
+    },
+    {
+      "name": "1366-general-closed: mode touch targets at least 44px",
+      "passed": true
+    },
+    {
+      "name": "1366-general-closed: desktop header matches baseline pixels",
+      "passed": true,
+      "detail": {
+        "label": "1366-general-closed",
+        "before": {
+          "width": 1351,
+          "height": 59
+        },
+        "after": {
+          "width": 1351,
+          "height": 59
+        },
+        "changedPixels": 0
+      }
+    },
+    {
+      "name": "1366-general-search-focused: desktop control geometry matches baseline",
+      "passed": true
+    },
+    {
+      "name": "1366-general-search-focused: real control bounds do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1366-general-search-focused: controls stay inside horizontal viewport",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1366-general-search-focused: no horizontal overflow",
+      "passed": true,
+      "detail": {
+        "scrollWidth": 1351,
+        "width": 1366
+      }
+    },
+    {
+      "name": "1366-general-search-focused: content follows header",
+      "passed": true,
+      "detail": {
+        "mainY": 58.359375,
+        "headerBottom": 58.359375
+      }
+    },
+    {
+      "name": "1366-general-search-focused: mode touch targets at least 44px",
+      "passed": true
+    },
+    {
+      "name": "1366-general-search-focused: desktop header matches baseline pixels",
+      "passed": true,
+      "detail": {
+        "label": "1366-general-search-focused",
+        "before": {
+          "width": 1351,
+          "height": 59
+        },
+        "after": {
+          "width": 1351,
+          "height": 59
+        },
+        "changedPixels": 0
+      }
+    },
+    {
+      "name": "1366-room: keyboard activates chosen mode",
+      "passed": true
+    },
+    {
+      "name": "1366-room-closed: desktop control geometry matches baseline",
+      "passed": true
+    },
+    {
+      "name": "1366-room-closed: real control bounds do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1366-room-closed: controls stay inside horizontal viewport",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1366-room-closed: no horizontal overflow",
+      "passed": true,
+      "detail": {
+        "scrollWidth": 1351,
+        "width": 1366
+      }
+    },
+    {
+      "name": "1366-room-closed: content follows header",
+      "passed": true,
+      "detail": {
+        "mainY": 58.359375,
+        "headerBottom": 58.359375
+      }
+    },
+    {
+      "name": "1366-room-closed: mode touch targets at least 44px",
+      "passed": true
+    },
+    {
+      "name": "1366-room-closed: desktop header matches baseline pixels",
+      "passed": true,
+      "detail": {
+        "label": "1366-room-closed",
+        "before": {
+          "width": 1351,
+          "height": 59
+        },
+        "after": {
+          "width": 1351,
+          "height": 59
+        },
+        "changedPixels": 0
+      }
+    },
+    {
+      "name": "1366-room-search-focused: desktop control geometry matches baseline",
+      "passed": true
+    },
+    {
+      "name": "1366-room-search-focused: real control bounds do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1366-room-search-focused: controls stay inside horizontal viewport",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1366-room-search-focused: no horizontal overflow",
+      "passed": true,
+      "detail": {
+        "scrollWidth": 1351,
+        "width": 1366
+      }
+    },
+    {
+      "name": "1366-room-search-focused: content follows header",
+      "passed": true,
+      "detail": {
+        "mainY": 58.359375,
+        "headerBottom": 58.359375
+      }
+    },
+    {
+      "name": "1366-room-search-focused: mode touch targets at least 44px",
+      "passed": true
+    },
+    {
+      "name": "1366-room-search-focused: desktop header matches baseline pixels",
+      "passed": true,
+      "detail": {
+        "label": "1366-room-search-focused",
+        "before": {
+          "width": 1351,
+          "height": 59
+        },
+        "after": {
+          "width": 1351,
+          "height": 59
+        },
+        "changedPixels": 0
+      }
+    },
+    {
+      "name": "No browser runtime errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "No external writes attempted",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "blockedWrites": [],
+  "layouts": [
+    {
+      "label": "390-general-closed",
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "tag": "A",
+          "className": "cronograma-module-back focus-ring",
+          "x": 12,
+          "y": 8.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 52.59375
+        },
+        {
+          "name": "Abrir busca",
+          "tag": "BUTTON",
+          "className": "cronograma-mobile-search-toggle__button focus-ring",
+          "x": 94.40625,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 138.40625,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Agenda geral",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--general focus-ring",
+          "x": 12,
+          "y": 61.59375,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 105.59375
+        },
+        {
+          "name": "Sala dos Voluntários",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--volunteers focus-ring",
+          "x": 62.390625,
+          "y": 61.59375,
+          "width": 44,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        },
+        {
+          "name": "Preparação 2026—2028: 17% concluído",
+          "tag": "BUTTON",
+          "className": "cronograma-command-preparation focus-ring",
+          "x": 12,
+          "y": 127.375,
+          "width": 48.9375,
+          "height": 44,
+          "right": 60.9375,
+          "bottom": 171.375
+        },
+        {
+          "name": "Google Agenda: Não foi possível atualizar agora",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip cronograma-command-chip--google focus-ring",
+          "x": 72.9375,
+          "y": 127.375,
+          "width": 44.390625,
+          "height": 44,
+          "right": 117.328125,
+          "bottom": 171.375
+        },
+        {
+          "name": "Avisos no celular: Avisos desativados neste aparelho",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip focus-ring",
+          "x": 125.328125,
+          "y": 127.375,
+          "width": 59.578125,
+          "height": 44,
+          "right": 184.90625,
+          "bottom": 171.375
+        },
+        {
+          "name": "Sair do sistema",
+          "tag": "BUTTON",
+          "className": "inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold ring-offset-background transition-[background-color,border-color,color,transform] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100 text-foreground hover:bg-accent hover:text-accent-foreground cronograma-module-signout h-10 min-w-10 rounded-lg px-2.5 text-xs",
+          "x": 192.90625,
+          "y": 127.375,
+          "width": 44,
+          "height": 44,
+          "right": 236.90625,
+          "bottom": 171.375
+        },
+        {
+          "name": "Resumo da semana: Semana atual · 5 eventos · 5h de agenda",
+          "tag": "BUTTON",
+          "className": "cronograma-week-pill focus-ring cronograma-week-pill--mobile",
+          "x": 12,
+          "y": 180.96875,
+          "width": 351,
+          "height": 38.390625,
+          "right": 363,
+          "bottom": 219.359375
+        }
+      ],
+      "intersections": [],
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 229.15625,
+        "right": 375,
+        "bottom": 229.15625
+      },
+      "main": {
+        "x": 0,
+        "y": 229.15625,
+        "width": 375,
+        "height": 1248.5,
+        "right": 375,
+        "bottom": 1477.65625
+      },
+      "portal": {
+        "x": 12,
+        "y": 8.59375,
+        "width": 74.40625,
+        "height": 44,
+        "right": 86.40625,
+        "bottom": 52.59375
+      },
+      "toggle": {
+        "x": 94.40625,
+        "y": 9.59375,
+        "width": 44,
+        "height": 44,
+        "right": 138.40625,
+        "bottom": 53.59375
+      },
+      "modes": {
+        "x": 12,
+        "y": 61.59375,
+        "width": 94.390625,
+        "height": 44,
+        "right": 106.390625,
+        "bottom": 105.59375
+      },
+      "auxiliary": {
+        "x": 12,
+        "y": 115.984375,
+        "width": 351,
+        "height": 55.390625,
+        "right": 363,
+        "bottom": 171.375
+      },
+      "field": null,
+      "fieldPosition": null,
+      "scrollWidth": 375,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scrollY": 0,
+      "skip": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "right": 1,
+        "bottom": 1,
+        "clip": "rect(0px, 0px, 0px, 0px)",
+        "clipPath": "inset(50%)",
+        "transform": "none",
+        "position": "absolute",
+        "focusVisible": false
+      }
+    },
+    {
+      "label": "390-general-open",
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "tag": "A",
+          "className": "cronograma-module-back focus-ring",
+          "x": 12,
+          "y": 8.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 52.59375
+        },
+        {
+          "name": "Fechar busca",
+          "tag": "BUTTON",
+          "className": "cronograma-mobile-search-toggle__button focus-ring",
+          "x": 94.40625,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 138.40625,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Buscar no cronograma",
+          "tag": "INPUT",
+          "className": "",
+          "x": 146.40625,
+          "y": 9.59375,
+          "width": 216.59375,
+          "height": 44,
+          "right": 363,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Agenda geral",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--general focus-ring",
+          "x": 12,
+          "y": 61.59375,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 105.59375
+        },
+        {
+          "name": "Sala dos Voluntários",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--volunteers focus-ring",
+          "x": 62.390625,
+          "y": 61.59375,
+          "width": 44,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        },
+        {
+          "name": "Preparação 2026—2028: 17% concluído",
+          "tag": "BUTTON",
+          "className": "cronograma-command-preparation focus-ring",
+          "x": 12,
+          "y": 127.375,
+          "width": 48.9375,
+          "height": 44,
+          "right": 60.9375,
+          "bottom": 171.375
+        },
+        {
+          "name": "Google Agenda: Não foi possível atualizar agora",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip cronograma-command-chip--google focus-ring",
+          "x": 72.9375,
+          "y": 127.375,
+          "width": 44.390625,
+          "height": 44,
+          "right": 117.328125,
+          "bottom": 171.375
+        },
+        {
+          "name": "Avisos no celular: Avisos desativados neste aparelho",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip focus-ring",
+          "x": 125.328125,
+          "y": 127.375,
+          "width": 59.578125,
+          "height": 44,
+          "right": 184.90625,
+          "bottom": 171.375
+        },
+        {
+          "name": "Sair do sistema",
+          "tag": "BUTTON",
+          "className": "inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold ring-offset-background transition-[background-color,border-color,color,transform] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100 text-foreground hover:bg-accent hover:text-accent-foreground cronograma-module-signout h-10 min-w-10 rounded-lg px-2.5 text-xs",
+          "x": 192.90625,
+          "y": 127.375,
+          "width": 44,
+          "height": 44,
+          "right": 236.90625,
+          "bottom": 171.375
+        },
+        {
+          "name": "Resumo da semana: Semana atual · 5 eventos · 5h de agenda",
+          "tag": "BUTTON",
+          "className": "cronograma-week-pill focus-ring cronograma-week-pill--mobile",
+          "x": 12,
+          "y": 180.96875,
+          "width": 351,
+          "height": 38.390625,
+          "right": 363,
+          "bottom": 219.359375
+        }
+      ],
+      "intersections": [],
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 229.15625,
+        "right": 375,
+        "bottom": 229.15625
+      },
+      "main": {
+        "x": 0,
+        "y": 229.15625,
+        "width": 375,
+        "height": 1248.5,
+        "right": 375,
+        "bottom": 1477.65625
+      },
+      "portal": {
+        "x": 12,
+        "y": 8.59375,
+        "width": 74.40625,
+        "height": 44,
+        "right": 86.40625,
+        "bottom": 52.59375
+      },
+      "toggle": {
+        "x": 94.40625,
+        "y": 9.59375,
+        "width": 44,
+        "height": 44,
+        "right": 138.40625,
+        "bottom": 53.59375
+      },
+      "modes": {
+        "x": 12,
+        "y": 61.59375,
+        "width": 94.390625,
+        "height": 44,
+        "right": 106.390625,
+        "bottom": 105.59375
+      },
+      "auxiliary": {
+        "x": 12,
+        "y": 115.984375,
+        "width": 351,
+        "height": 55.390625,
+        "right": 363,
+        "bottom": 171.375
+      },
+      "field": {
+        "x": 146.40625,
+        "y": 9.59375,
+        "width": 216.59375,
+        "height": 44,
+        "right": 363,
+        "bottom": 53.59375
+      },
+      "fieldPosition": "static",
+      "scrollWidth": 375,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scrollY": 0,
+      "skip": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "right": 1,
+        "bottom": 1,
+        "clip": "rect(0px, 0px, 0px, 0px)",
+        "clipPath": "inset(50%)",
+        "transform": "none",
+        "position": "absolute",
+        "focusVisible": false
+      }
+    },
+    {
+      "label": "390-room-closed",
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "tag": "A",
+          "className": "cronograma-module-back focus-ring",
+          "x": 12,
+          "y": 9.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Abrir busca",
+          "tag": "BUTTON",
+          "className": "cronograma-mobile-search-toggle__button focus-ring",
+          "x": 94.40625,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 138.40625,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Agenda geral",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--general focus-ring",
+          "x": 12,
+          "y": 61.59375,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 105.59375
+        },
+        {
+          "name": "Sala dos Voluntários",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--volunteers focus-ring",
+          "x": 62.390625,
+          "y": 61.59375,
+          "width": 44,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        },
+        {
+          "name": "Preparação 2026—2028: 17% concluído",
+          "tag": "BUTTON",
+          "className": "cronograma-command-preparation focus-ring",
+          "x": 12,
+          "y": 127.375,
+          "width": 48.9375,
+          "height": 44,
+          "right": 60.9375,
+          "bottom": 171.375
+        },
+        {
+          "name": "Google Agenda: Não foi possível atualizar agora",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip cronograma-command-chip--google focus-ring",
+          "x": 72.9375,
+          "y": 127.375,
+          "width": 44.390625,
+          "height": 44,
+          "right": 117.328125,
+          "bottom": 171.375
+        },
+        {
+          "name": "Avisos no celular: Avisos desativados neste aparelho",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip focus-ring",
+          "x": 125.328125,
+          "y": 127.375,
+          "width": 59.578125,
+          "height": 44,
+          "right": 184.90625,
+          "bottom": 171.375
+        },
+        {
+          "name": "Sair do sistema",
+          "tag": "BUTTON",
+          "className": "inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold ring-offset-background transition-[background-color,border-color,color,transform] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100 text-foreground hover:bg-accent hover:text-accent-foreground cronograma-module-signout h-10 min-w-10 rounded-lg px-2.5 text-xs",
+          "x": 192.90625,
+          "y": 127.375,
+          "width": 44,
+          "height": 44,
+          "right": 236.90625,
+          "bottom": 171.375
+        },
+        {
+          "name": "Resumo da semana: Semana atual · 2 eventos · 2h de agenda",
+          "tag": "BUTTON",
+          "className": "cronograma-week-pill focus-ring cronograma-week-pill--mobile",
+          "x": 12,
+          "y": 180.96875,
+          "width": 351,
+          "height": 38.390625,
+          "right": 363,
+          "bottom": 219.359375
+        }
+      ],
+      "intersections": [],
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 229.15625,
+        "right": 375,
+        "bottom": 229.15625
+      },
+      "main": {
+        "x": 0,
+        "y": 229.15625,
+        "width": 375,
+        "height": 844,
+        "right": 375,
+        "bottom": 1073.15625
+      },
+      "portal": {
+        "x": 12,
+        "y": 9.59375,
+        "width": 74.40625,
+        "height": 44,
+        "right": 86.40625,
+        "bottom": 53.59375
+      },
+      "toggle": {
+        "x": 94.40625,
+        "y": 9.59375,
+        "width": 44,
+        "height": 44,
+        "right": 138.40625,
+        "bottom": 53.59375
+      },
+      "modes": {
+        "x": 12,
+        "y": 61.59375,
+        "width": 94.390625,
+        "height": 44,
+        "right": 106.390625,
+        "bottom": 105.59375
+      },
+      "auxiliary": {
+        "x": 12,
+        "y": 115.984375,
+        "width": 351,
+        "height": 55.390625,
+        "right": 363,
+        "bottom": 171.375
+      },
+      "field": null,
+      "fieldPosition": null,
+      "scrollWidth": 375,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scrollY": 0,
+      "skip": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "right": 1,
+        "bottom": 1,
+        "clip": "rect(0px, 0px, 0px, 0px)",
+        "clipPath": "inset(50%)",
+        "transform": "none",
+        "position": "absolute",
+        "focusVisible": false
+      }
+    },
+    {
+      "label": "390-room-open",
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "tag": "A",
+          "className": "cronograma-module-back focus-ring",
+          "x": 12,
+          "y": 9.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Fechar busca",
+          "tag": "BUTTON",
+          "className": "cronograma-mobile-search-toggle__button focus-ring",
+          "x": 94.40625,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 138.40625,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Buscar no cronograma",
+          "tag": "INPUT",
+          "className": "",
+          "x": 146.40625,
+          "y": 9.59375,
+          "width": 216.59375,
+          "height": 44,
+          "right": 363,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Agenda geral",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--general focus-ring",
+          "x": 12,
+          "y": 61.59375,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 105.59375
+        },
+        {
+          "name": "Sala dos Voluntários",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--volunteers focus-ring",
+          "x": 62.390625,
+          "y": 61.59375,
+          "width": 44,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        },
+        {
+          "name": "Preparação 2026—2028: 17% concluído",
+          "tag": "BUTTON",
+          "className": "cronograma-command-preparation focus-ring",
+          "x": 12,
+          "y": 127.375,
+          "width": 48.9375,
+          "height": 44,
+          "right": 60.9375,
+          "bottom": 171.375
+        },
+        {
+          "name": "Google Agenda: Não foi possível atualizar agora",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip cronograma-command-chip--google focus-ring",
+          "x": 72.9375,
+          "y": 127.375,
+          "width": 44.390625,
+          "height": 44,
+          "right": 117.328125,
+          "bottom": 171.375
+        },
+        {
+          "name": "Avisos no celular: Avisos desativados neste aparelho",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip focus-ring",
+          "x": 125.328125,
+          "y": 127.375,
+          "width": 59.578125,
+          "height": 44,
+          "right": 184.90625,
+          "bottom": 171.375
+        },
+        {
+          "name": "Sair do sistema",
+          "tag": "BUTTON",
+          "className": "inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold ring-offset-background transition-[background-color,border-color,color,transform] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100 text-foreground hover:bg-accent hover:text-accent-foreground cronograma-module-signout h-10 min-w-10 rounded-lg px-2.5 text-xs",
+          "x": 192.90625,
+          "y": 127.375,
+          "width": 44,
+          "height": 44,
+          "right": 236.90625,
+          "bottom": 171.375
+        },
+        {
+          "name": "Resumo da semana: Semana atual · 2 eventos · 2h de agenda",
+          "tag": "BUTTON",
+          "className": "cronograma-week-pill focus-ring cronograma-week-pill--mobile",
+          "x": 12,
+          "y": 180.96875,
+          "width": 351,
+          "height": 38.390625,
+          "right": 363,
+          "bottom": 219.359375
+        }
+      ],
+      "intersections": [],
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 229.15625,
+        "right": 375,
+        "bottom": 229.15625
+      },
+      "main": {
+        "x": 0,
+        "y": 229.15625,
+        "width": 375,
+        "height": 844,
+        "right": 375,
+        "bottom": 1073.15625
+      },
+      "portal": {
+        "x": 12,
+        "y": 9.59375,
+        "width": 74.40625,
+        "height": 44,
+        "right": 86.40625,
+        "bottom": 53.59375
+      },
+      "toggle": {
+        "x": 94.40625,
+        "y": 9.59375,
+        "width": 44,
+        "height": 44,
+        "right": 138.40625,
+        "bottom": 53.59375
+      },
+      "modes": {
+        "x": 12,
+        "y": 61.59375,
+        "width": 94.390625,
+        "height": 44,
+        "right": 106.390625,
+        "bottom": 105.59375
+      },
+      "auxiliary": {
+        "x": 12,
+        "y": 115.984375,
+        "width": 351,
+        "height": 55.390625,
+        "right": 363,
+        "bottom": 171.375
+      },
+      "field": {
+        "x": 146.40625,
+        "y": 9.59375,
+        "width": 216.59375,
+        "height": 44,
+        "right": 363,
+        "bottom": 53.59375
+      },
+      "fieldPosition": "static",
+      "scrollWidth": 375,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scrollY": 0,
+      "skip": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "right": 1,
+        "bottom": 1,
+        "clip": "rect(0px, 0px, 0px, 0px)",
+        "clipPath": "inset(50%)",
+        "transform": "none",
+        "position": "absolute",
+        "focusVisible": false
+      }
+    },
+    {
+      "label": "390-reduced-height-search",
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "tag": "A",
+          "className": "cronograma-module-back focus-ring",
+          "x": 12,
+          "y": 9.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Fechar busca",
+          "tag": "BUTTON",
+          "className": "cronograma-mobile-search-toggle__button focus-ring",
+          "x": 94.40625,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 138.40625,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Buscar no cronograma",
+          "tag": "INPUT",
+          "className": "",
+          "x": 146.40625,
+          "y": 9.59375,
+          "width": 216.59375,
+          "height": 44,
+          "right": 363,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Agenda geral",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--general focus-ring",
+          "x": 12,
+          "y": 61.59375,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 105.59375
+        },
+        {
+          "name": "Sala dos Voluntários",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--volunteers focus-ring",
+          "x": 62.390625,
+          "y": 61.59375,
+          "width": 44,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        },
+        {
+          "name": "Preparação 2026—2028: 17% concluído",
+          "tag": "BUTTON",
+          "className": "cronograma-command-preparation focus-ring",
+          "x": 12,
+          "y": 127.375,
+          "width": 48.9375,
+          "height": 44,
+          "right": 60.9375,
+          "bottom": 171.375
+        },
+        {
+          "name": "Google Agenda: Não foi possível atualizar agora",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip cronograma-command-chip--google focus-ring",
+          "x": 72.9375,
+          "y": 127.375,
+          "width": 44.390625,
+          "height": 44,
+          "right": 117.328125,
+          "bottom": 171.375
+        },
+        {
+          "name": "Avisos no celular: Avisos desativados neste aparelho",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip focus-ring",
+          "x": 125.328125,
+          "y": 127.375,
+          "width": 59.578125,
+          "height": 44,
+          "right": 184.90625,
+          "bottom": 171.375
+        },
+        {
+          "name": "Sair do sistema",
+          "tag": "BUTTON",
+          "className": "inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold ring-offset-background transition-[background-color,border-color,color,transform] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100 text-foreground hover:bg-accent hover:text-accent-foreground cronograma-module-signout h-10 min-w-10 rounded-lg px-2.5 text-xs",
+          "x": 192.90625,
+          "y": 127.375,
+          "width": 44,
+          "height": 44,
+          "right": 236.90625,
+          "bottom": 171.375
+        },
+        {
+          "name": "Resumo da semana: Semana atual · 2 eventos · 2h de agenda",
+          "tag": "BUTTON",
+          "className": "cronograma-week-pill focus-ring cronograma-week-pill--mobile",
+          "x": 12,
+          "y": 180.96875,
+          "width": 351,
+          "height": 38.390625,
+          "right": 363,
+          "bottom": 219.359375
+        }
+      ],
+      "intersections": [],
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 229.15625,
+        "right": 375,
+        "bottom": 229.15625
+      },
+      "main": {
+        "x": 0,
+        "y": 229.15625,
+        "width": 375,
+        "height": 692.171875,
+        "right": 375,
+        "bottom": 921.328125
+      },
+      "portal": {
+        "x": 12,
+        "y": 9.59375,
+        "width": 74.40625,
+        "height": 44,
+        "right": 86.40625,
+        "bottom": 53.59375
+      },
+      "toggle": {
+        "x": 94.40625,
+        "y": 9.59375,
+        "width": 44,
+        "height": 44,
+        "right": 138.40625,
+        "bottom": 53.59375
+      },
+      "modes": {
+        "x": 12,
+        "y": 61.59375,
+        "width": 94.390625,
+        "height": 44,
+        "right": 106.390625,
+        "bottom": 105.59375
+      },
+      "auxiliary": {
+        "x": 12,
+        "y": 115.984375,
+        "width": 351,
+        "height": 55.390625,
+        "right": 363,
+        "bottom": 171.375
+      },
+      "field": {
+        "x": 146.40625,
+        "y": 9.59375,
+        "width": 216.59375,
+        "height": 44,
+        "right": 363,
+        "bottom": 53.59375
+      },
+      "fieldPosition": "static",
+      "scrollWidth": 375,
+      "viewport": {
+        "width": 390,
+        "height": 420
+      },
+      "scrollY": 0,
+      "skip": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "right": 1,
+        "bottom": 1,
+        "clip": "rect(0px, 0px, 0px, 0px)",
+        "clipPath": "inset(50%)",
+        "transform": "none",
+        "position": "absolute",
+        "focusVisible": false
+      }
+    },
+    {
+      "label": "820-landscape-open",
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "tag": "A",
+          "className": "cronograma-module-back focus-ring",
+          "x": 18.390625,
+          "y": 9.59375,
+          "width": 82.40625,
+          "height": 44,
+          "right": 100.796875,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Fechar busca",
+          "tag": "BUTTON",
+          "className": "cronograma-mobile-search-toggle__button focus-ring",
+          "x": 108.796875,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 152.796875,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Buscar no cronograma",
+          "tag": "INPUT",
+          "className": "",
+          "x": 160.796875,
+          "y": 9.59375,
+          "width": 575.421875,
+          "height": 44,
+          "right": 736.21875,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Limpar busca",
+          "tag": "BUTTON",
+          "className": "cronograma-mobile-search-toggle__clear focus-ring",
+          "x": 742.609375,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 786.609375,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Agenda geral",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--general focus-ring",
+          "x": 18.390625,
+          "y": 61.59375,
+          "width": 44,
+          "height": 44,
+          "right": 62.390625,
+          "bottom": 105.59375
+        },
+        {
+          "name": "Sala dos Voluntários",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--volunteers focus-ring",
+          "x": 68.78125,
+          "y": 61.59375,
+          "width": 44,
+          "height": 44,
+          "right": 112.78125,
+          "bottom": 105.59375
+        },
+        {
+          "name": "Preparação 2026—2028: 17% concluído",
+          "tag": "BUTTON",
+          "className": "cronograma-command-preparation focus-ring",
+          "x": 18.390625,
+          "y": 127.375,
+          "width": 211.828125,
+          "height": 44,
+          "right": 230.21875,
+          "bottom": 171.375
+        },
+        {
+          "name": "Google Agenda: Não foi possível atualizar agora",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip cronograma-command-chip--google focus-ring",
+          "x": 242.21875,
+          "y": 127.375,
+          "width": 44.390625,
+          "height": 44,
+          "right": 286.609375,
+          "bottom": 171.375
+        },
+        {
+          "name": "Avisos no celular: Avisos desativados neste aparelho",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip focus-ring",
+          "x": 294.609375,
+          "y": 127.375,
+          "width": 59.578125,
+          "height": 44,
+          "right": 354.1875,
+          "bottom": 171.375
+        },
+        {
+          "name": "Sair do sistema",
+          "tag": "BUTTON",
+          "className": "inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold ring-offset-background transition-[background-color,border-color,color,transform] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100 text-foreground hover:bg-accent hover:text-accent-foreground cronograma-module-signout h-10 min-w-10 rounded-lg px-2.5 text-xs",
+          "x": 362.1875,
+          "y": 127.375,
+          "width": 44,
+          "height": 44,
+          "right": 406.1875,
+          "bottom": 171.375
+        }
+      ],
+      "intersections": [],
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 805,
+        "height": 181.96875,
+        "right": 805,
+        "bottom": 181.96875
+      },
+      "main": {
+        "x": 0,
+        "y": 181.96875,
+        "width": 805,
+        "height": 641.421875,
+        "right": 805,
+        "bottom": 823.390625
+      },
+      "portal": {
+        "x": 18.390625,
+        "y": 9.59375,
+        "width": 82.40625,
+        "height": 44,
+        "right": 100.796875,
+        "bottom": 53.59375
+      },
+      "toggle": {
+        "x": 108.796875,
+        "y": 9.59375,
+        "width": 44,
+        "height": 44,
+        "right": 152.796875,
+        "bottom": 53.59375
+      },
+      "modes": {
+        "x": 18.390625,
+        "y": 61.59375,
+        "width": 94.390625,
+        "height": 44,
+        "right": 112.78125,
+        "bottom": 105.59375
+      },
+      "auxiliary": {
+        "x": 18.390625,
+        "y": 115.984375,
+        "width": 768.21875,
+        "height": 55.390625,
+        "right": 786.609375,
+        "bottom": 171.375
+      },
+      "field": {
+        "x": 160.796875,
+        "y": 9.59375,
+        "width": 625.8125,
+        "height": 44,
+        "right": 786.609375,
+        "bottom": 53.59375
+      },
+      "fieldPosition": "static",
+      "scrollWidth": 805,
+      "viewport": {
+        "width": 820,
+        "height": 390
+      },
+      "scrollY": 0,
+      "skip": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "right": 1,
+        "bottom": 1,
+        "clip": "rect(0px, 0px, 0px, 0px)",
+        "clipPath": "inset(50%)",
+        "transform": "none",
+        "position": "absolute",
+        "focusVisible": false
+      }
+    },
+    {
+      "label": "390-portrait-return-open",
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "tag": "A",
+          "className": "cronograma-module-back focus-ring",
+          "x": 12,
+          "y": 9.59375,
+          "width": 74.40625,
+          "height": 44,
+          "right": 86.40625,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Fechar busca",
+          "tag": "BUTTON",
+          "className": "cronograma-mobile-search-toggle__button focus-ring",
+          "x": 94.40625,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 138.40625,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Buscar no cronograma",
+          "tag": "INPUT",
+          "className": "",
+          "x": 146.40625,
+          "y": 9.59375,
+          "width": 166.203125,
+          "height": 44,
+          "right": 312.609375,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Limpar busca",
+          "tag": "BUTTON",
+          "className": "cronograma-mobile-search-toggle__clear focus-ring",
+          "x": 319,
+          "y": 9.59375,
+          "width": 44,
+          "height": 44,
+          "right": 363,
+          "bottom": 53.59375
+        },
+        {
+          "name": "Agenda geral",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--general focus-ring",
+          "x": 12,
+          "y": 61.59375,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 105.59375
+        },
+        {
+          "name": "Sala dos Voluntários",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--volunteers focus-ring",
+          "x": 62.390625,
+          "y": 61.59375,
+          "width": 44,
+          "height": 44,
+          "right": 106.390625,
+          "bottom": 105.59375
+        },
+        {
+          "name": "Preparação 2026—2028: 17% concluído",
+          "tag": "BUTTON",
+          "className": "cronograma-command-preparation focus-ring",
+          "x": 12,
+          "y": 127.375,
+          "width": 48.9375,
+          "height": 44,
+          "right": 60.9375,
+          "bottom": 171.375
+        },
+        {
+          "name": "Google Agenda: Não foi possível atualizar agora",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip cronograma-command-chip--google focus-ring",
+          "x": 72.9375,
+          "y": 127.375,
+          "width": 44.390625,
+          "height": 44,
+          "right": 117.328125,
+          "bottom": 171.375
+        },
+        {
+          "name": "Avisos no celular: Avisos desativados neste aparelho",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip focus-ring",
+          "x": 125.328125,
+          "y": 127.375,
+          "width": 59.578125,
+          "height": 44,
+          "right": 184.90625,
+          "bottom": 171.375
+        },
+        {
+          "name": "Sair do sistema",
+          "tag": "BUTTON",
+          "className": "inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold ring-offset-background transition-[background-color,border-color,color,transform] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100 text-foreground hover:bg-accent hover:text-accent-foreground cronograma-module-signout h-10 min-w-10 rounded-lg px-2.5 text-xs",
+          "x": 192.90625,
+          "y": 127.375,
+          "width": 44,
+          "height": 44,
+          "right": 236.90625,
+          "bottom": 171.375
+        },
+        {
+          "name": "Resumo da semana: Semana atual · 2 eventos · 2h de agenda",
+          "tag": "BUTTON",
+          "className": "cronograma-week-pill focus-ring cronograma-week-pill--mobile",
+          "x": 12,
+          "y": 180.96875,
+          "width": 351,
+          "height": 38.390625,
+          "right": 363,
+          "bottom": 219.359375
+        }
+      ],
+      "intersections": [],
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 229.15625,
+        "right": 375,
+        "bottom": 229.15625
+      },
+      "main": {
+        "x": 0,
+        "y": 229.15625,
+        "width": 375,
+        "height": 844,
+        "right": 375,
+        "bottom": 1073.15625
+      },
+      "portal": {
+        "x": 12,
+        "y": 9.59375,
+        "width": 74.40625,
+        "height": 44,
+        "right": 86.40625,
+        "bottom": 53.59375
+      },
+      "toggle": {
+        "x": 94.40625,
+        "y": 9.59375,
+        "width": 44,
+        "height": 44,
+        "right": 138.40625,
+        "bottom": 53.59375
+      },
+      "modes": {
+        "x": 12,
+        "y": 61.59375,
+        "width": 94.390625,
+        "height": 44,
+        "right": 106.390625,
+        "bottom": 105.59375
+      },
+      "auxiliary": {
+        "x": 12,
+        "y": 115.984375,
+        "width": 351,
+        "height": 55.390625,
+        "right": 363,
+        "bottom": 171.375
+      },
+      "field": {
+        "x": 146.40625,
+        "y": 9.59375,
+        "width": 216.59375,
+        "height": 44,
+        "right": 363,
+        "bottom": 53.59375
+      },
+      "fieldPosition": "static",
+      "scrollWidth": 375,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scrollY": 0,
+      "skip": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "right": 1,
+        "bottom": 1,
+        "clip": "rect(0px, 0px, 0px, 0px)",
+        "clipPath": "inset(50%)",
+        "transform": "none",
+        "position": "absolute",
+        "focusVisible": false
+      }
+    },
+    {
+      "label": "1366-general-closed",
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "tag": "A",
+          "className": "cronograma-module-back focus-ring",
+          "x": 18.390625,
+          "y": 10.671875,
+          "width": 82.40625,
+          "height": 36,
+          "right": 100.796875,
+          "bottom": 46.671875
+        },
+        {
+          "name": "Agenda geral",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--general focus-ring",
+          "x": 108.796875,
+          "y": 6.671875,
+          "width": 44,
+          "height": 44,
+          "right": 152.796875,
+          "bottom": 50.671875
+        },
+        {
+          "name": "Sala dos Voluntários",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--volunteers focus-ring",
+          "x": 159.1875,
+          "y": 6.671875,
+          "width": 44,
+          "height": 44,
+          "right": 203.1875,
+          "bottom": 50.671875
+        },
+        {
+          "name": "Buscar no cronograma",
+          "tag": "INPUT",
+          "className": "cronograma-header-search-input",
+          "x": 245.78125,
+          "y": 10.671875,
+          "width": 178.8125,
+          "height": 36,
+          "right": 424.59375,
+          "bottom": 46.671875
+        },
+        {
+          "name": "Resumo da semana: Semana atual · 5 eventos · 5h de agenda",
+          "tag": "BUTTON",
+          "className": "cronograma-week-pill focus-ring",
+          "x": 476.5,
+          "y": 6.390625,
+          "width": 339.625,
+          "height": 44.578125,
+          "right": 816.125,
+          "bottom": 50.96875
+        },
+        {
+          "name": "Preparação 2026—2028: 17% concluído",
+          "tag": "BUTTON",
+          "className": "cronograma-command-preparation focus-ring",
+          "x": 822.515625,
+          "y": 8.65625,
+          "width": 211.828125,
+          "height": 40.046875,
+          "right": 1034.34375,
+          "bottom": 48.703125
+        },
+        {
+          "name": "Google Agenda: Não foi possível atualizar agora",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip cronograma-command-chip--google focus-ring",
+          "x": 1044.734375,
+          "y": 9.484375,
+          "width": 44.390625,
+          "height": 38.390625,
+          "right": 1089.125,
+          "bottom": 47.875
+        },
+        {
+          "name": "Avisos no celular: Avisos desativados neste aparelho",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip focus-ring",
+          "x": 1095.515625,
+          "y": 9.484375,
+          "width": 59.578125,
+          "height": 38.390625,
+          "right": 1155.09375,
+          "bottom": 47.875
+        },
+        {
+          "name": "Ir para o período de hoje",
+          "tag": "BUTTON",
+          "className": "cronograma-command-temporal__today focus-ring",
+          "x": 1164.875,
+          "y": 15.078125,
+          "width": 57.203125,
+          "height": 27.1875,
+          "right": 1222.078125,
+          "bottom": 42.265625
+        },
+        {
+          "name": "Período anterior",
+          "tag": "BUTTON",
+          "className": "cronograma-command-temporal__step focus-ring",
+          "x": 1225.265625,
+          "y": 15.078125,
+          "width": 27.1875,
+          "height": 27.1875,
+          "right": 1252.453125,
+          "bottom": 42.265625
+        },
+        {
+          "name": "Próximo período",
+          "tag": "BUTTON",
+          "className": "cronograma-command-temporal__step focus-ring",
+          "x": 1255.640625,
+          "y": 15.078125,
+          "width": 27.1875,
+          "height": 27.1875,
+          "right": 1282.828125,
+          "bottom": 42.265625
+        },
+        {
+          "name": "Sair do sistema",
+          "tag": "BUTTON",
+          "className": "inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold ring-offset-background transition-[background-color,border-color,color,transform] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100 text-foreground hover:bg-accent hover:text-accent-foreground cronograma-module-signout h-10 min-w-10 rounded-lg px-2.5 text-xs",
+          "x": 1292.609375,
+          "y": 8.671875,
+          "width": 40,
+          "height": 40,
+          "right": 1332.609375,
+          "bottom": 48.671875
+        }
+      ],
+      "intersections": [],
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1351,
+        "height": 58.359375,
+        "right": 1351,
+        "bottom": 58.359375
+      },
+      "main": {
+        "x": 0,
+        "y": 58.359375,
+        "width": 1351,
+        "height": 844,
+        "right": 1351,
+        "bottom": 902.359375
+      },
+      "portal": {
+        "x": 18.390625,
+        "y": 10.671875,
+        "width": 82.40625,
+        "height": 36,
+        "right": 100.796875,
+        "bottom": 46.671875
+      },
+      "toggle": null,
+      "modes": {
+        "x": 108.796875,
+        "y": 6.671875,
+        "width": 94.390625,
+        "height": 44,
+        "right": 203.1875,
+        "bottom": 50.671875
+      },
+      "auxiliary": {
+        "x": 476.5,
+        "y": 6.390625,
+        "width": 856.109375,
+        "height": 44.578125,
+        "right": 1332.609375,
+        "bottom": 50.96875
+      },
+      "field": null,
+      "fieldPosition": null,
+      "scrollWidth": 1351,
+      "viewport": {
+        "width": 1366,
+        "height": 844
+      },
+      "scrollY": 0,
+      "skip": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "right": 1,
+        "bottom": 1,
+        "clip": "rect(0px, 0px, 0px, 0px)",
+        "clipPath": "inset(50%)",
+        "transform": "none",
+        "position": "absolute",
+        "focusVisible": false
+      }
+    },
+    {
+      "label": "1366-general-search-focused",
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "tag": "A",
+          "className": "cronograma-module-back focus-ring",
+          "x": 18.390625,
+          "y": 10.671875,
+          "width": 82.40625,
+          "height": 36,
+          "right": 100.796875,
+          "bottom": 46.671875
+        },
+        {
+          "name": "Agenda geral",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--general focus-ring",
+          "x": 108.796875,
+          "y": 6.671875,
+          "width": 44,
+          "height": 44,
+          "right": 152.796875,
+          "bottom": 50.671875
+        },
+        {
+          "name": "Sala dos Voluntários",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--volunteers focus-ring",
+          "x": 159.1875,
+          "y": 6.671875,
+          "width": 44,
+          "height": 44,
+          "right": 203.1875,
+          "bottom": 50.671875
+        },
+        {
+          "name": "Buscar no cronograma",
+          "tag": "INPUT",
+          "className": "cronograma-header-search-input",
+          "x": 245.78125,
+          "y": 10.671875,
+          "width": 178.8125,
+          "height": 36,
+          "right": 424.59375,
+          "bottom": 46.671875
+        },
+        {
+          "name": "Resumo da semana: Semana atual · 5 eventos · 5h de agenda",
+          "tag": "BUTTON",
+          "className": "cronograma-week-pill focus-ring",
+          "x": 476.5,
+          "y": 6.390625,
+          "width": 339.625,
+          "height": 44.578125,
+          "right": 816.125,
+          "bottom": 50.96875
+        },
+        {
+          "name": "Preparação 2026—2028: 17% concluído",
+          "tag": "BUTTON",
+          "className": "cronograma-command-preparation focus-ring",
+          "x": 822.515625,
+          "y": 8.65625,
+          "width": 211.828125,
+          "height": 40.046875,
+          "right": 1034.34375,
+          "bottom": 48.703125
+        },
+        {
+          "name": "Google Agenda: Não foi possível atualizar agora",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip cronograma-command-chip--google focus-ring",
+          "x": 1044.734375,
+          "y": 9.484375,
+          "width": 44.390625,
+          "height": 38.390625,
+          "right": 1089.125,
+          "bottom": 47.875
+        },
+        {
+          "name": "Avisos no celular: Avisos desativados neste aparelho",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip focus-ring",
+          "x": 1095.515625,
+          "y": 9.484375,
+          "width": 59.578125,
+          "height": 38.390625,
+          "right": 1155.09375,
+          "bottom": 47.875
+        },
+        {
+          "name": "Ir para o período de hoje",
+          "tag": "BUTTON",
+          "className": "cronograma-command-temporal__today focus-ring",
+          "x": 1164.875,
+          "y": 15.078125,
+          "width": 57.203125,
+          "height": 27.1875,
+          "right": 1222.078125,
+          "bottom": 42.265625
+        },
+        {
+          "name": "Período anterior",
+          "tag": "BUTTON",
+          "className": "cronograma-command-temporal__step focus-ring",
+          "x": 1225.265625,
+          "y": 15.078125,
+          "width": 27.1875,
+          "height": 27.1875,
+          "right": 1252.453125,
+          "bottom": 42.265625
+        },
+        {
+          "name": "Próximo período",
+          "tag": "BUTTON",
+          "className": "cronograma-command-temporal__step focus-ring",
+          "x": 1255.640625,
+          "y": 15.078125,
+          "width": 27.1875,
+          "height": 27.1875,
+          "right": 1282.828125,
+          "bottom": 42.265625
+        },
+        {
+          "name": "Sair do sistema",
+          "tag": "BUTTON",
+          "className": "inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold ring-offset-background transition-[background-color,border-color,color,transform] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100 text-foreground hover:bg-accent hover:text-accent-foreground cronograma-module-signout h-10 min-w-10 rounded-lg px-2.5 text-xs",
+          "x": 1292.609375,
+          "y": 8.671875,
+          "width": 40,
+          "height": 40,
+          "right": 1332.609375,
+          "bottom": 48.671875
+        }
+      ],
+      "intersections": [],
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1351,
+        "height": 58.359375,
+        "right": 1351,
+        "bottom": 58.359375
+      },
+      "main": {
+        "x": 0,
+        "y": 58.359375,
+        "width": 1351,
+        "height": 844,
+        "right": 1351,
+        "bottom": 902.359375
+      },
+      "portal": {
+        "x": 18.390625,
+        "y": 10.671875,
+        "width": 82.40625,
+        "height": 36,
+        "right": 100.796875,
+        "bottom": 46.671875
+      },
+      "toggle": null,
+      "modes": {
+        "x": 108.796875,
+        "y": 6.671875,
+        "width": 94.390625,
+        "height": 44,
+        "right": 203.1875,
+        "bottom": 50.671875
+      },
+      "auxiliary": {
+        "x": 476.5,
+        "y": 6.390625,
+        "width": 856.109375,
+        "height": 44.578125,
+        "right": 1332.609375,
+        "bottom": 50.96875
+      },
+      "field": null,
+      "fieldPosition": null,
+      "scrollWidth": 1351,
+      "viewport": {
+        "width": 1366,
+        "height": 844
+      },
+      "scrollY": 0,
+      "skip": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "right": 1,
+        "bottom": 1,
+        "clip": "rect(0px, 0px, 0px, 0px)",
+        "clipPath": "inset(50%)",
+        "transform": "none",
+        "position": "absolute",
+        "focusVisible": false
+      }
+    },
+    {
+      "label": "1366-room-closed",
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "tag": "A",
+          "className": "cronograma-module-back focus-ring",
+          "x": 18.390625,
+          "y": 10.671875,
+          "width": 82.40625,
+          "height": 36,
+          "right": 100.796875,
+          "bottom": 46.671875
+        },
+        {
+          "name": "Agenda geral",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--general focus-ring",
+          "x": 108.796875,
+          "y": 6.671875,
+          "width": 44,
+          "height": 44,
+          "right": 152.796875,
+          "bottom": 50.671875
+        },
+        {
+          "name": "Sala dos Voluntários",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--volunteers focus-ring",
+          "x": 159.1875,
+          "y": 6.671875,
+          "width": 44,
+          "height": 44,
+          "right": 203.1875,
+          "bottom": 50.671875
+        },
+        {
+          "name": "Buscar no cronograma",
+          "tag": "INPUT",
+          "className": "cronograma-header-search-input",
+          "x": 245.78125,
+          "y": 10.671875,
+          "width": 178.8125,
+          "height": 36,
+          "right": 424.59375,
+          "bottom": 46.671875
+        },
+        {
+          "name": "Resumo da semana: Semana atual · 2 eventos · 2h de agenda",
+          "tag": "BUTTON",
+          "className": "cronograma-week-pill focus-ring",
+          "x": 476.5,
+          "y": 6.390625,
+          "width": 339.625,
+          "height": 44.578125,
+          "right": 816.125,
+          "bottom": 50.96875
+        },
+        {
+          "name": "Preparação 2026—2028: 17% concluído",
+          "tag": "BUTTON",
+          "className": "cronograma-command-preparation focus-ring",
+          "x": 822.515625,
+          "y": 8.65625,
+          "width": 211.828125,
+          "height": 40.046875,
+          "right": 1034.34375,
+          "bottom": 48.703125
+        },
+        {
+          "name": "Google Agenda: Não foi possível atualizar agora",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip cronograma-command-chip--google focus-ring",
+          "x": 1044.734375,
+          "y": 9.484375,
+          "width": 44.390625,
+          "height": 38.390625,
+          "right": 1089.125,
+          "bottom": 47.875
+        },
+        {
+          "name": "Avisos no celular: Avisos desativados neste aparelho",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip focus-ring",
+          "x": 1095.515625,
+          "y": 9.484375,
+          "width": 59.578125,
+          "height": 38.390625,
+          "right": 1155.09375,
+          "bottom": 47.875
+        },
+        {
+          "name": "Ir para o período de hoje",
+          "tag": "BUTTON",
+          "className": "cronograma-command-temporal__today focus-ring",
+          "x": 1164.875,
+          "y": 15.078125,
+          "width": 57.203125,
+          "height": 27.1875,
+          "right": 1222.078125,
+          "bottom": 42.265625
+        },
+        {
+          "name": "Período anterior",
+          "tag": "BUTTON",
+          "className": "cronograma-command-temporal__step focus-ring",
+          "x": 1225.265625,
+          "y": 15.078125,
+          "width": 27.1875,
+          "height": 27.1875,
+          "right": 1252.453125,
+          "bottom": 42.265625
+        },
+        {
+          "name": "Próximo período",
+          "tag": "BUTTON",
+          "className": "cronograma-command-temporal__step focus-ring",
+          "x": 1255.640625,
+          "y": 15.078125,
+          "width": 27.1875,
+          "height": 27.1875,
+          "right": 1282.828125,
+          "bottom": 42.265625
+        },
+        {
+          "name": "Sair do sistema",
+          "tag": "BUTTON",
+          "className": "inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold ring-offset-background transition-[background-color,border-color,color,transform] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100 text-foreground hover:bg-accent hover:text-accent-foreground cronograma-module-signout h-10 min-w-10 rounded-lg px-2.5 text-xs",
+          "x": 1292.609375,
+          "y": 8.671875,
+          "width": 40,
+          "height": 40,
+          "right": 1332.609375,
+          "bottom": 48.671875
+        }
+      ],
+      "intersections": [],
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1351,
+        "height": 58.359375,
+        "right": 1351,
+        "bottom": 58.359375
+      },
+      "main": {
+        "x": 0,
+        "y": 58.359375,
+        "width": 1351,
+        "height": 844,
+        "right": 1351,
+        "bottom": 902.359375
+      },
+      "portal": {
+        "x": 18.390625,
+        "y": 10.671875,
+        "width": 82.40625,
+        "height": 36,
+        "right": 100.796875,
+        "bottom": 46.671875
+      },
+      "toggle": null,
+      "modes": {
+        "x": 108.796875,
+        "y": 6.671875,
+        "width": 94.390625,
+        "height": 44,
+        "right": 203.1875,
+        "bottom": 50.671875
+      },
+      "auxiliary": {
+        "x": 476.5,
+        "y": 6.390625,
+        "width": 856.109375,
+        "height": 44.578125,
+        "right": 1332.609375,
+        "bottom": 50.96875
+      },
+      "field": null,
+      "fieldPosition": null,
+      "scrollWidth": 1351,
+      "viewport": {
+        "width": 1366,
+        "height": 844
+      },
+      "scrollY": 0,
+      "skip": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "right": 1,
+        "bottom": 1,
+        "clip": "rect(0px, 0px, 0px, 0px)",
+        "clipPath": "inset(50%)",
+        "transform": "none",
+        "position": "absolute",
+        "focusVisible": false
+      }
+    },
+    {
+      "label": "1366-room-search-focused",
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "tag": "A",
+          "className": "cronograma-module-back focus-ring",
+          "x": 18.390625,
+          "y": 10.671875,
+          "width": 82.40625,
+          "height": 36,
+          "right": 100.796875,
+          "bottom": 46.671875
+        },
+        {
+          "name": "Agenda geral",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--general focus-ring",
+          "x": 108.796875,
+          "y": 6.671875,
+          "width": 44,
+          "height": 44,
+          "right": 152.796875,
+          "bottom": 50.671875
+        },
+        {
+          "name": "Sala dos Voluntários",
+          "tag": "BUTTON",
+          "className": "cronograma-agenda-mode cronograma-agenda-mode--volunteers focus-ring",
+          "x": 159.1875,
+          "y": 6.671875,
+          "width": 44,
+          "height": 44,
+          "right": 203.1875,
+          "bottom": 50.671875
+        },
+        {
+          "name": "Buscar no cronograma",
+          "tag": "INPUT",
+          "className": "cronograma-header-search-input",
+          "x": 245.78125,
+          "y": 10.671875,
+          "width": 178.8125,
+          "height": 36,
+          "right": 424.59375,
+          "bottom": 46.671875
+        },
+        {
+          "name": "Resumo da semana: Semana atual · 2 eventos · 2h de agenda",
+          "tag": "BUTTON",
+          "className": "cronograma-week-pill focus-ring",
+          "x": 476.5,
+          "y": 6.390625,
+          "width": 339.625,
+          "height": 44.578125,
+          "right": 816.125,
+          "bottom": 50.96875
+        },
+        {
+          "name": "Preparação 2026—2028: 17% concluído",
+          "tag": "BUTTON",
+          "className": "cronograma-command-preparation focus-ring",
+          "x": 822.515625,
+          "y": 8.65625,
+          "width": 211.828125,
+          "height": 40.046875,
+          "right": 1034.34375,
+          "bottom": 48.703125
+        },
+        {
+          "name": "Google Agenda: Não foi possível atualizar agora",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip cronograma-command-chip--google focus-ring",
+          "x": 1044.734375,
+          "y": 9.484375,
+          "width": 44.390625,
+          "height": 38.390625,
+          "right": 1089.125,
+          "bottom": 47.875
+        },
+        {
+          "name": "Avisos no celular: Avisos desativados neste aparelho",
+          "tag": "BUTTON",
+          "className": "cronograma-command-chip focus-ring",
+          "x": 1095.515625,
+          "y": 9.484375,
+          "width": 59.578125,
+          "height": 38.390625,
+          "right": 1155.09375,
+          "bottom": 47.875
+        },
+        {
+          "name": "Ir para o período de hoje",
+          "tag": "BUTTON",
+          "className": "cronograma-command-temporal__today focus-ring",
+          "x": 1164.875,
+          "y": 15.078125,
+          "width": 57.203125,
+          "height": 27.1875,
+          "right": 1222.078125,
+          "bottom": 42.265625
+        },
+        {
+          "name": "Período anterior",
+          "tag": "BUTTON",
+          "className": "cronograma-command-temporal__step focus-ring",
+          "x": 1225.265625,
+          "y": 15.078125,
+          "width": 27.1875,
+          "height": 27.1875,
+          "right": 1252.453125,
+          "bottom": 42.265625
+        },
+        {
+          "name": "Próximo período",
+          "tag": "BUTTON",
+          "className": "cronograma-command-temporal__step focus-ring",
+          "x": 1255.640625,
+          "y": 15.078125,
+          "width": 27.1875,
+          "height": 27.1875,
+          "right": 1282.828125,
+          "bottom": 42.265625
+        },
+        {
+          "name": "Sair do sistema",
+          "tag": "BUTTON",
+          "className": "inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold ring-offset-background transition-[background-color,border-color,color,transform] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100 text-foreground hover:bg-accent hover:text-accent-foreground cronograma-module-signout h-10 min-w-10 rounded-lg px-2.5 text-xs",
+          "x": 1292.609375,
+          "y": 8.671875,
+          "width": 40,
+          "height": 40,
+          "right": 1332.609375,
+          "bottom": 48.671875
+        }
+      ],
+      "intersections": [],
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1351,
+        "height": 58.359375,
+        "right": 1351,
+        "bottom": 58.359375
+      },
+      "main": {
+        "x": 0,
+        "y": 58.359375,
+        "width": 1351,
+        "height": 844,
+        "right": 1351,
+        "bottom": 902.359375
+      },
+      "portal": {
+        "x": 18.390625,
+        "y": 10.671875,
+        "width": 82.40625,
+        "height": 36,
+        "right": 100.796875,
+        "bottom": 46.671875
+      },
+      "toggle": null,
+      "modes": {
+        "x": 108.796875,
+        "y": 6.671875,
+        "width": 94.390625,
+        "height": 44,
+        "right": 203.1875,
+        "bottom": 50.671875
+      },
+      "auxiliary": {
+        "x": 476.5,
+        "y": 6.390625,
+        "width": 856.109375,
+        "height": 44.578125,
+        "right": 1332.609375,
+        "bottom": 50.96875
+      },
+      "field": null,
+      "fieldPosition": null,
+      "scrollWidth": 1351,
+      "viewport": {
+        "width": 1366,
+        "height": 844
+      },
+      "scrollY": 0,
+      "skip": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "right": 1,
+        "bottom": 1,
+        "clip": "rect(0px, 0px, 0px, 0px)",
+        "clipPath": "inset(50%)",
+        "transform": "none",
+        "position": "absolute",
+        "focusVisible": false
+      }
+    }
+  ],
+  "captures": [
+    "focus/390-general-closed-header.png",
+    "focus/390-general-closed.png",
+    "focus/390-general-open-header.png",
+    "focus/390-general-open.png",
+    "focus/390-room-closed-header.png",
+    "focus/390-room-closed.png",
+    "focus/390-room-open-header.png",
+    "focus/390-room-open.png",
+    "focus/390-reduced-height-search-header.png",
+    "focus/390-reduced-height-search.png",
+    "focus/820-landscape-open-header.png",
+    "focus/390-portrait-return-open-header.png",
+    "focus/390-portrait-return-open.png",
+    "focus/1366-general-closed-header.png",
+    "focus/1366-general-search-focused-header.png",
+    "focus/1366-room-closed-header.png",
+    "focus/1366-room-search-focused-header.png"
+  ],
+  "desktopComparison": [
+    {
+      "label": "1366-general-closed",
+      "before": {
+        "width": 1351,
+        "height": 59
+      },
+      "after": {
+        "width": 1351,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1366-general-search-focused",
+      "before": {
+        "width": 1351,
+        "height": 59
+      },
+      "after": {
+        "width": 1351,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1366-room-closed",
+      "before": {
+        "width": 1351,
+        "height": 59
+      },
+      "after": {
+        "width": 1351,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1366-room-search-focused",
+      "before": {
+        "width": 1351,
+        "height": 59
+      },
+      "after": {
+        "width": 1351,
+        "height": 59
+      },
+      "changedPixels": 0
+    }
+  ],
+  "knownDesktopIssues": [],
+  "summary": {
+    "total": 129,
+    "passed": 129,
+    "failed": 0
+  }
+}

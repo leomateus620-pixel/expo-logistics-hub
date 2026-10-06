@@ -1,0 +1,675 @@
+{
+  "method": "Computed foreground RGBA composited over a clear background pixel in a screenshot of the real button; WCAG sRGB relative luminance",
+  "comparison": [
+    {
+      "label": "320-light-normal",
+      "contrastBefore": 1,
+      "contrastAfter": 11.775225775921582,
+      "targetBefore": {
+        "x": 212,
+        "y": 10,
+        "width": 44,
+        "height": 36
+      },
+      "targetAfter": {
+        "x": 212,
+        "y": 6,
+        "width": 44,
+        "height": 44
+      },
+      "otherControls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "before": {
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "after": {
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "before": {
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24
+          },
+          "after": {
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Sair da plataforma",
+          "before": {
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "after": {
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "label": "320-dark-normal",
+      "contrastBefore": 16.996287116363362,
+      "contrastAfter": 11.814763498511736,
+      "targetBefore": {
+        "x": 212,
+        "y": 10,
+        "width": 44,
+        "height": 36
+      },
+      "targetAfter": {
+        "x": 212,
+        "y": 6,
+        "width": 44,
+        "height": 44
+      },
+      "otherControls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "before": {
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "after": {
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "before": {
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24
+          },
+          "after": {
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Sair da plataforma",
+          "before": {
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "after": {
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "label": "390-light-normal",
+      "contrastBefore": 1,
+      "contrastAfter": 11.775225775921582,
+      "targetBefore": {
+        "x": 265,
+        "y": 10,
+        "width": 44,
+        "height": 36
+      },
+      "targetAfter": {
+        "x": 265,
+        "y": 6,
+        "width": 44,
+        "height": 44
+      },
+      "otherControls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "before": {
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "after": {
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "before": {
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24
+          },
+          "after": {
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Sair da plataforma",
+          "before": {
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "after": {
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "label": "390-dark-normal",
+      "contrastBefore": 16.996287116363362,
+      "contrastAfter": 11.814763498511736,
+      "targetBefore": {
+        "x": 265,
+        "y": 10,
+        "width": 44,
+        "height": 36
+      },
+      "targetAfter": {
+        "x": 265,
+        "y": 6,
+        "width": 44,
+        "height": 44
+      },
+      "otherControls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "before": {
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "after": {
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "before": {
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24
+          },
+          "after": {
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Sair da plataforma",
+          "before": {
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "after": {
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "label": "768-light-normal",
+      "contrastBefore": 1,
+      "contrastAfter": 11.659520915445599,
+      "targetBefore": {
+        "x": 553.34375,
+        "y": 10,
+        "width": 133.65625,
+        "height": 36
+      },
+      "targetAfter": {
+        "x": 567.015625,
+        "y": 6,
+        "width": 119.984375,
+        "height": 44
+      },
+      "otherControls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "before": {
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "after": {
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "before": {
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21
+          },
+          "after": {
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Sair da plataforma",
+          "before": {
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "after": {
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "label": "768-dark-normal",
+      "contrastBefore": 16.970688908586578,
+      "contrastAfter": 11.659520915445599,
+      "targetBefore": {
+        "x": 553.34375,
+        "y": 10,
+        "width": 133.65625,
+        "height": 36
+      },
+      "targetAfter": {
+        "x": 567.015625,
+        "y": 6,
+        "width": 119.984375,
+        "height": 44
+      },
+      "otherControls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "before": {
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "after": {
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "before": {
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21
+          },
+          "after": {
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Sair da plataforma",
+          "before": {
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "after": {
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44
+          },
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "label": "1024-light-normal",
+      "contrastBefore": 1,
+      "contrastAfter": 11.659520915445599,
+      "targetBefore": {
+        "x": 777.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36
+      },
+      "targetAfter": {
+        "x": 791.640625,
+        "y": 14,
+        "width": 119.984375,
+        "height": 44
+      },
+      "otherControls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "before": {
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44
+          },
+          "after": {
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "before": {
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 234.484375,
+            "height": 18.71875
+          },
+          "after": {
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 248.15625,
+            "height": 18.71875
+          },
+          "unchanged": false
+        },
+        {
+          "name": "Sair da plataforma",
+          "before": {
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44
+          },
+          "after": {
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44
+          },
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "label": "1024-dark-normal",
+      "contrastBefore": 16.970688908586578,
+      "contrastAfter": 11.659520915445599,
+      "targetBefore": {
+        "x": 777.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36
+      },
+      "targetAfter": {
+        "x": 791.640625,
+        "y": 14,
+        "width": 119.984375,
+        "height": 44
+      },
+      "otherControls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "before": {
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44
+          },
+          "after": {
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "before": {
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 234.484375,
+            "height": 18.71875
+          },
+          "after": {
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 248.15625,
+            "height": 18.71875
+          },
+          "unchanged": false
+        },
+        {
+          "name": "Sair da plataforma",
+          "before": {
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44
+          },
+          "after": {
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44
+          },
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "label": "1366-light-normal",
+      "contrastBefore": 1,
+      "contrastAfter": 11.659520915445599,
+      "targetBefore": {
+        "x": 1119.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36
+      },
+      "targetAfter": {
+        "x": 1133.640625,
+        "y": 14,
+        "width": 119.984375,
+        "height": 44
+      },
+      "otherControls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "before": {
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44
+          },
+          "after": {
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "before": {
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875
+          },
+          "after": {
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Sair da plataforma",
+          "before": {
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44
+          },
+          "after": {
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44
+          },
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "label": "1366-dark-normal",
+      "contrastBefore": 16.970688908586578,
+      "contrastAfter": 11.659520915445599,
+      "targetBefore": {
+        "x": 1119.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36
+      },
+      "targetAfter": {
+        "x": 1133.640625,
+        "y": 14,
+        "width": 119.984375,
+        "height": 44
+      },
+      "otherControls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "before": {
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44
+          },
+          "after": {
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "before": {
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875
+          },
+          "after": {
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875
+          },
+          "unchanged": true
+        },
+        {
+          "name": "Sair da plataforma",
+          "before": {
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44
+          },
+          "after": {
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44
+          },
+          "unchanged": true
+        }
+      ]
+    }
+  ]
+}
