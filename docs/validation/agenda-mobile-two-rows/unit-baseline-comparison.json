@@ -1,0 +1,134 @@
+{
+  "baselineCommit": "3236f6905b53d9ebd84fcf2d80a2494fd17f2754",
+  "command": "npm test -- cronogramaAgendaMode cronogramaMobilePresentation cronogramaTimeline cronogramaWeeklySummary --reporter=json",
+  "baseline": {
+    "total": 67,
+    "passed": 52,
+    "failed": 15
+  },
+  "after": {
+    "total": 67,
+    "passed": 52,
+    "failed": 15
+  },
+  "sameTestStatuses": true,
+  "suites": [
+    {
+      "suite": "cronogramaAgendaMode.test.tsx",
+      "total": 8,
+      "passed": 8,
+      "failed": 0
+    },
+    {
+      "suite": "cronogramaMobilePresentation.test.tsx",
+      "total": 9,
+      "passed": 6,
+      "failed": 3
+    },
+    {
+      "suite": "cronogramaTimeline.test.tsx",
+      "total": 35,
+      "passed": 23,
+      "failed": 12
+    },
+    {
+      "suite": "cronogramaWeeklySummary.test.ts",
+      "total": 15,
+      "passed": 15,
+      "failed": 0
+    }
+  ],
+  "failures": [
+    {
+      "suite": "cronogramaMobilePresentation.test.tsx",
+      "test": "cadastro móvel e histórico remove a entrada duplicada do histórico ao desmontar um overlay ainda aberto",
+      "message": "Error: useAuthContext must be used within AuthProvider"
+    },
+    {
+      "suite": "cronogramaMobilePresentation.test.tsx",
+      "test": "cadastro móvel e histórico mantém o defaultYear informado ao criar um evento sem data",
+      "message": "Error: useAuthContext must be used within AuthProvider"
+    },
+    {
+      "suite": "cronogramaMobilePresentation.test.tsx",
+      "test": "cadastro móvel e histórico fecha pelo voltar quando limpo e mantém o cadastro quando voltar encontra alterações",
+      "message": "Error: useAuthContext must be used within AuthProvider"
+    },
+    {
+      "suite": "cronogramaTimeline.test.tsx",
+      "test": "navegador do ciclo na linha do tempo renderiza ano atual, etapas, totais e mantém botões semanticamente focáveis",
+      "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"list\" and name \"Anos do planejamento institucional\""
+    },
+    {
+      "suite": "cronogramaTimeline.test.tsx",
+      "test": "navegador do ciclo na linha do tempo seleciona 2027 e 2028 rapidamente, abre o mês correto e não limpa filtros",
+      "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação/i`"
+    },
+    {
+      "suite": "cronogramaTimeline.test.tsx",
+      "test": "navegador do ciclo na linha do tempo mostra contagem filtrada e recuperação explícita sem trocar o ano",
+      "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação, 1 evento, 0 correspondem/i`"
+    },
+    {
+      "suite": "cronogramaTimeline.test.tsx",
+      "test": "navegador do ciclo na linha do tempo mantém anos sem eventos visíveis, identificados e indisponíveis",
+      "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação, 0 eventos, ano indisponível/i`"
+    },
+    {
+      "suite": "cronogramaTimeline.test.tsx",
+      "test": "navegador do ciclo na linha do tempo reconcilia uma URL persistida para um ano que ficou indisponível",
+      "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/2026 selecionado/i`"
+    },
+    {
+      "suite": "cronogramaTimeline.test.tsx",
+      "test": "navegador do ciclo na linha do tempo Ir para hoje restaura julho de 2026 e atualiza o ano",
+      "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name \"Ir para o período de hoje\""
+    },
+    {
+      "suite": "cronogramaTimeline.test.tsx",
+      "test": "navegador do ciclo na linha do tempo restaura ano e mês ao navegar pelo histórico externo",
+      "message": "Error: Unable to find role=\"button\" and name `/2028 selecionado/i`"
+    },
+    {
+      "suite": "cronogramaTimeline.test.tsx",
+      "test": "navegador do ciclo na linha do tempo acompanha rolagem manual e bloqueia realimentação durante navegação programática",
+      "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/2027 selecionado/i`"
+    },
+    {
+      "suite": "cronogramaTimeline.test.tsx",
+      "test": "navegador do ciclo na linha do tempo sincroniza filtros temporais com o ano do período principal",
+      "message": "Error: Unable to find role=\"button\" and name `/2026 selecionado/i`"
+    },
+    {
+      "suite": "cronogramaTimeline.test.tsx",
+      "test": "navegador do ciclo na linha do tempo mantém o ano após refetch e abertura de detalhes",
+      "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação/i`"
+    },
+    {
+      "suite": "cronogramaTimeline.test.tsx",
+      "test": "navegador do ciclo na linha do tempo usa movimento reduzido e mantém um único seletor horizontal no mobile",
+      "message": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação/i`"
+    },
+    {
+      "suite": "cronogramaTimeline.test.tsx",
+      "test": "componentes críticos preservados separa leitura e edição e protege alterações não salvas",
+      "message": "Error: useAuthContext must be used within AuthProvider"
+    }
+  ],
+  "unchangedEntryPoints": [
+    "src/test/cronogramaAgendaMode.test.tsx",
+    "src/test/cronogramaMobilePresentation.test.tsx",
+    "src/test/cronogramaTimeline.test.tsx",
+    "src/test/cronogramaWeeklySummary.test.ts",
+    "src/components/cronograma-eventos/mobile/MobileCreateEventScreen.tsx",
+    "src/components/cronograma-eventos/mobile/MobileCronogramaFilters.tsx",
+    "src/components/cronograma-eventos/mobile/MobileCronogramaNavDrawer.tsx",
+    "src/components/cronograma-eventos/mobile/MobileCronogramaTimeline.tsx",
+    "src/components/cronograma-eventos/CronogramaTimelineBoard.tsx",
+    "src/components/cronograma-eventos/EventDrawer.tsx"
+  ],
+  "notes": [
+    "All 67 test statuses match baseline. The four suites and the failing component entry points are unchanged in this PR.",
+    "Failures include missing AuthProvider in fixture renders and outdated assertions for timeline controls. Full logs are ignored by existing *.log rule."
+  ]
+}
