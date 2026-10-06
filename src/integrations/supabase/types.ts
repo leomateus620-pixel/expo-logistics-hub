@@ -6042,6 +6042,36 @@ export type Database = {
           },
         ]
       }
+      map_rls_policy_snapshots: {
+        Row: {
+          created_at: string
+          id: number
+          migration_tag: string
+          new_qual: string
+          original_qual: string
+          policy_name: string
+          table_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          migration_tag: string
+          new_qual: string
+          original_qual: string
+          policy_name: string
+          table_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          migration_tag?: string
+          new_qual?: string
+          original_qual?: string
+          policy_name?: string
+          table_name?: string
+        }
+        Relationships: []
+      }
       map_segments: {
         Row: {
           boundary_data: Json
@@ -11240,6 +11270,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      map_accessible_segment_ids: { Args: never; Returns: string[] }
       map_can_access_segment: {
         Args: { _segment_id: string }
         Returns: boolean
@@ -11281,6 +11312,7 @@ export type Database = {
         Args: { _segment_id: string }
         Returns: number
       }
+      map_viewable_org_ids: { Args: never; Returns: string[] }
       merge_commercial_lots: {
         Args: {
           p_display_name: string
