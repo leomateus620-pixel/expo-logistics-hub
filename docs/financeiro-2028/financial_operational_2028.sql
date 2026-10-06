@@ -1,4 +1,4 @@
--- RASCUNHO NÃO APLICADO. Financeiro Operacional por edição (Fenasoja 2028).
+-- Aplicado em produção em 2026-10-06 (migration 20261006200356). Este arquivo é a referência de desenvolvimento.
 -- Só aplicar no backend com autorização explícita (o preview e a produção usam o mesmo backend).
 -- Nenhuma linha real é importada; 2026 permanece histórico e somente leitura.
 -- Escritas acontecem exclusivamente por RPCs transacionais, idempotentes e auditadas.
