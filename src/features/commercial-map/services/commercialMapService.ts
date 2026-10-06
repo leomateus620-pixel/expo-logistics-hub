@@ -1,3 +1,4 @@
+import { applyLotBuyerSummary, type LotBuyerSummaryRow } from '../utils/lotBuyerSummary';
 import { buyerDisplayName } from '../utils/buyerDisplayName';
 import { captureCommercialMapStageRecorder, type CommercialMapStageRecorder } from '../utils/performanceDiagnostics';
 import { awaitCommercialMapRequest, measureCommercialMapOperation, throwIfMapRequestAborted } from '../utils/commercialMapOperation';
@@ -327,6 +328,16 @@ function mapEntity(
   };
 }
 
+/** Situação + nome de exibição do comprador por lote, revalidado no servidor por map.view. */
+async function fetchLotBuyerSummary(projectId: string): Promise<Map<string, LotBuyerSummaryRow>> {
+  const { data, error } = await db.rpc('commercial_map_lot_buyers', { _project_id: projectId });
+  if (error) {
+    console.warn('[commercial-map] buyer summary unavailable', error.message);
+    return new Map();
+  }
+  return new Map(((data ?? []) as LotBuyerSummaryRow[]).map((row) => [row.lot_id, row]));
+}
+
 function mapLot(row: LotRow): CommercialLot {
   const price = Array.isArray(row.lot_prices) ? row.lot_prices.find((candidate: PriceRow) => candidate.is_active) : row.lot_prices;
   const activeReservation = Array.isArray(row.lot_reservations)
@@ -372,9 +383,9 @@ function mapLot(row: LotRow): CommercialLot {
     accessibilityNotes: row.accessibility_notes,
     commercialNotes: row.commercial_notes,
     internalNotes: row.internal_notes,
-    currentBuyer: (sale ? buyerDisplayName(sale.buyer_trade_name, sale.buyer_name) : null) ?? activeReservation?.company_name ?? activeNegotiation?.company_name ?? null,
-    currentBuyerLegalName: sale?.buyer_name ?? null,
-    currentBuyerTradeName: sale?.buyer_trade_name?.trim() || null,
+    currentBuyer: (editableSale ? buyerDisplayName(editableSale.buyer_trade_name, editableSale.buyer_name) : null) ?? activeReservation?.company_name ?? activeNegotiation?.company_name ?? null,
+    currentBuyerLegalName: editableSale?.buyer_name ?? null,
+    currentBuyerTradeName: editableSale?.buyer_trade_name?.trim() || null,
     currentSaleId: editableSale?.id ?? null,
     currentSaleStatus: editableSale ? (editableSale.status as 'OPEN' | 'CONFIRMED') : null,
     reservationExpiresAt: activeReservation?.expires_at ?? null,
@@ -550,7 +561,7 @@ async function fetchCommissionCommercialMap(
     throw commissionMapError('MAP_SEGMENT_INVENTORY_MISMATCH');
   }
 
-  const logoUrls = await fetchSaleLogoUrls({ projectId: project.id });
+  const [logoUrls, buyerSummary] = await Promise.all([fetchSaleLogoUrls({ projectId: project.id }), fetchLotBuyerSummary(project.id)]);
   const parkContext = (parkContextResult?.data ?? null) as { layers?: LayerRow[]; entities?: MapEntity[] } | null;
   const contextLayers = (parkContext?.layers ?? []).map(mapLayer);
   const parkContextEntities = (parkContext?.entities ?? []).map((entity) => ({
@@ -570,7 +581,7 @@ async function fetchCommissionCommercialMap(
     calibration: null,
     layers: contextLayers,
     entities,
-    lots: lotRows.map(row => ({ ...mapLot(row), saleLogoUrl: row.status === 'SOLD' ? logoUrls[row.id] ?? null : null })),
+    lots: lotRows.map(row => ({ ...applyLotBuyerSummary(mapLot(row), buyerSummary.get(row.id)), saleLogoUrl: row.status === 'SOLD' ? logoUrls[row.id] ?? null : null })),
     scope: {
       mode: 'commission',
       commissionId: scope.commissionId,
@@ -695,7 +706,7 @@ export async function fetchCommercialMap(
     };
   }
 
-  const logoUrls = await fetchSaleLogoUrls({ projectId: project.id });
+  const [logoUrls, buyerSummary] = await Promise.all([fetchSaleLogoUrls({ projectId: project.id }), fetchLotBuyerSummary(project.id)]);
   const result = reconcileExporuralReference({
     source: 'database',
     sourceMessage: project.isPublished ? null : 'Projeto cartográfico em rascunho. Alterações ainda não estão publicadas para toda a equipe.',
@@ -703,7 +714,7 @@ export async function fetchCommercialMap(
     calibration: calibrationResult.calibration,
     layers: (layersResult.data ?? []).map(mapLayer),
     entities,
-    lots: lotRows.map(row => ({ ...mapLot(row), saleLogoUrl: row.status === 'SOLD' ? logoUrls[row.id] ?? null : null })),
+    lots: lotRows.map(row => ({ ...applyLotBuyerSummary(mapLot(row), buyerSummary.get(row.id)), saleLogoUrl: row.status === 'SOLD' ? logoUrls[row.id] ?? null : null })),
   });
   throwIfMapRequestAborted(context.signal);
   context.recordStage('inventory-transformation:end', { duration: performance.now() - transformationStartedAt });

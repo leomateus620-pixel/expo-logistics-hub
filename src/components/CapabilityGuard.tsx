@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function CapabilityGuard({ capability, children, fallbackRoute, fallback }: Props) {
-  const { hasCapability, hasFullAccess, isLoading } = useCapabilities();
+  const { hasCapability, hasFullAccess, isLoading, loadError, retry } = useCapabilities();
   const location = useLocation();
 
   // While loading, never decide — show spinner. Prevents wrongful redirects/leaks.
@@ -19,6 +19,19 @@ export default function CapabilityGuard({ capability, children, fallbackRoute, f
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (loadError && !hasCapability(capability)) {
+    return (
+      <div role="alert" className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background p-6 text-center">
+        <p className="text-base font-semibold text-foreground">Não foi possível verificar seu acesso.</p>
+        <p className="text-sm text-muted-foreground">Verifique a conexão e tente novamente.</p>
+        <div className="flex gap-3">
+          <button type="button" onClick={retry} className="h-11 rounded-xl bg-primary px-5 text-primary-foreground">Tentar novamente</button>
+          <a href="/" className="h-11 inline-flex items-center rounded-xl border border-border px-5 text-foreground">Voltar ao módulo</a>
+        </div>
       </div>
     );
   }

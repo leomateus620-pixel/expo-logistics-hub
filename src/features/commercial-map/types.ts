@@ -214,6 +214,8 @@ export interface CommercialLot {
   /** Venda vigente (OPEN/CONFIRMED) usada pela edição dos dados do expositor. */
   currentSaleId?: string | null;
   currentSaleStatus?: 'OPEN' | 'CONFIRMED' | null;
+  /** Mais de uma venda ativa no mesmo lote: nenhum comprador é escolhido. */
+  buyerConflict?: boolean;
   saleLogoUrl?: string | null;
   reservationExpiresAt: string | null;
   saleDate: string | null;

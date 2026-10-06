@@ -290,6 +290,18 @@ function LogisticaModuleRoutes() {
   );
 }
 
+/**
+ * Quem tem `map.view` explícito (leitura do mapa completo da organização) entra
+ * pela comissão direto no mapa normal, sem o segmento travado. Não concede nada:
+ * só encaminha para a rota já protegida pela mesma capability.
+ */
+function FullMapViewerRedirect({ children }: { children: import('react').ReactNode }) {
+  const { hasCapability, isLoading } = useCapabilities();
+  if (isLoading) return <CommercialMapBootLoader force />;
+  if (hasCapability('map.view')) return <Navigate to="/mapa-comercial" replace />;
+  return <>{children}</>;
+}
+
 function CommissionModuleRoutes() {
   const { moduleSlug } = useParams();
   const module = resolveCommissionRouteModule(moduleSlug);
@@ -313,6 +325,7 @@ function CommissionModuleRoutes() {
     return (
       <AuthGuard>
         <OrgGuard>
+          <FullMapViewerRedirect>
           <ModuleAccessGuard module={module}>
             <CommissionLayout module={module} variant="map">
               <Suspended>
@@ -327,6 +340,7 @@ function CommissionModuleRoutes() {
               </Suspended>
             </CommissionLayout>
           </ModuleAccessGuard>
+          </FullMapViewerRedirect>
         </OrgGuard>
       </AuthGuard>
     );

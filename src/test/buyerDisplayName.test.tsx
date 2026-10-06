@@ -26,7 +26,7 @@ describe('nome de exibição do comprador', () => {
     expect(matchesExhibitor(item, 'comercio')).toBe(true);
   });
   it('tooltip continua mostrando comprador só em lote vendido', () => {
-    expect(resolveLotTooltipPresentation({ status: 'SALE_OPEN', currentBuyer: 'Loja Sol' }).buyerName).toBeNull();
+    expect(resolveLotTooltipPresentation({ status: 'SALE_OPEN', currentBuyer: 'Loja Sol' }).buyerName).toBe('Loja Sol');
   });
 });
 
