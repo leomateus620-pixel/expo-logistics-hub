@@ -11,6 +11,10 @@ CREATE TABLE public.organizations (id uuid PRIMARY KEY);
 CREATE TABLE public.org_members (org_id uuid, user_id uuid, role text, is_active boolean DEFAULT true, PRIMARY KEY(org_id,user_id));
 CREATE TABLE public.user_capabilities (org_id uuid, user_id uuid, capability text);
 CREATE TABLE public.commissions (id uuid PRIMARY KEY, org_id uuid, nome text);
+CREATE TABLE public.expenses (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), org_id uuid NOT NULL, title text NOT NULL, description text,
+  amount numeric NOT NULL DEFAULT 0, status text NOT NULL DEFAULT 'rascunho', created_by_user_id uuid NOT NULL,
+  origem_lancamento text NOT NULL DEFAULT 'manual', cycle_year integer NOT NULL DEFAULT 2028,
+  created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
 GRANT USAGE ON SCHEMA public, auth TO authenticated, anon;
 -- org A: admin, tesouraria (settle), editor, leitor, gestor sem capacidade; org B: admin
 INSERT INTO public.organizations VALUES ('a0000000-0000-0000-0000-000000000001'),('b0000000-0000-0000-0000-000000000001');
@@ -155,5 +159,48 @@ SELECT financial_save('a0000000-0000-0000-0000-000000000001','revenue',
   jsonb_build_object('edition_id',(SELECT e28 FROM ids),'description','Item '||g,'projected_cents',1),NULL,gen_random_uuid())
 FROM generate_series(1,1500) g;
 SELECT pg_temp.ok((financial_edition_summary('a0000000-0000-0000-0000-000000000001',(SELECT e28 FROM ids))#>>'{revenue,projected_cents}')::bigint = 501500,'1.500 registros somados sem limite de listagem');
+RESET ROLE;
+
+-- execução × liquidação
+SET ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000001',false);
+CREATE TEMP TABLE ln AS SELECT id FROM financial_budget_lines WHERE description='Mídia';
+GRANT SELECT ON ln TO authenticated;
+SELECT financial_save_expense('a0000000-0000-0000-0000-000000000001',
+  jsonb_build_object('edition_id',(SELECT e28 FROM ids),'title','Palco','planned_cents',50000,'budget_line_id',(SELECT id FROM ln)),NULL,gen_random_uuid());
+RESET ROLE;
+CREATE TEMP TABLE ex AS SELECT id FROM expenses WHERE title='Palco';
+GRANT SELECT ON ex TO authenticated;
+SET ROLE authenticated;
+SELECT pg_temp.ok((SELECT count(*) FROM financial_obligations WHERE source_type='despesa')=0,'despesa prevista não gera saldo a pagar');
+SELECT financial_save_expense('a0000000-0000-0000-0000-000000000001',
+  jsonb_build_object('id',(SELECT id FROM ex),'financial_status','realizada','committed_cents',48000,'committed_on','2027-03-01','due_date','2027-04-01'),1,gen_random_uuid());
+CREATE TEMP TABLE s2 AS SELECT financial_edition_summary('a0000000-0000-0000-0000-000000000001',(SELECT e28 FROM ids)) j;
+SELECT pg_temp.ok((SELECT (j#>>'{expenses,committed_cents}')::bigint=48000 AND (j#>>'{expenses,paid_cents}')::bigint=0
+  AND (j#>>'{expenses,payable_open_cents}')::bigint=48000 AND (j#>>'{expenses,planned_cents}')::bigint=50000 FROM s2),'realizada sem pagamento: saldo a pagar = realizado');
+SELECT pg_temp.ok((SELECT (j#>>'{budget,committed_cents}')::bigint=48000 FROM s2),'orçamento executado sem nenhum pagamento');
+SELECT financial_record_movement('a0000000-0000-0000-0000-000000000001',
+  jsonb_build_object('edition_id',(SELECT e28 FROM ids),'kind','pagamento','direction','saida','amount_cents',20000,'occurred_on','2027-03-10'),
+  jsonb_build_array(jsonb_build_object('obligation_id',(SELECT id FROM financial_obligations WHERE source_type='despesa'),'amount_cents',20000)),gen_random_uuid());
+CREATE TEMP TABLE s3 AS SELECT financial_edition_summary('a0000000-0000-0000-0000-000000000001',(SELECT e28 FROM ids)) j;
+SELECT pg_temp.ok((SELECT (j#>>'{expenses,committed_cents}')::bigint=48000 AND (j#>>'{expenses,paid_cents}')::bigint=20000
+  AND (j#>>'{expenses,payable_open_cents}')::bigint=28000 FROM s3),'pagamento parcial reduz saldo e preserva realizado');
+SELECT pg_temp.ok((financial_budget_execution('a0000000-0000-0000-0000-000000000001',(SELECT e28 FROM ids))#>>'{lines,0,payable_open_cents}')::bigint=28000,'execução por linha com saldo a pagar');
+SELECT pg_temp.expect_error($q$SELECT financial_save_expense('a0000000-0000-0000-0000-000000000001',
+  jsonb_build_object('id',(SELECT id FROM ex),'committed_cents',10000),2,gen_random_uuid())$q$,'BELOW_SETTLED');
+SELECT pg_temp.ok(true,'realizado abaixo do pago é recusado');
+SELECT pg_temp.expect_error($q$SELECT financial_record_movement('a0000000-0000-0000-0000-000000000001',
+  jsonb_build_object('edition_id',(SELECT e28 FROM ids),'kind','pagamento','direction','saida','amount_cents',28001,'occurred_on','2027-03-11'),
+  jsonb_build_array(jsonb_build_object('obligation_id',(SELECT id FROM financial_obligations WHERE source_type='despesa'),'amount_cents',28001)),gen_random_uuid())$q$,'OVER_SETTLEMENT');
+SELECT pg_temp.ok(true,'pagamento acima do realizado é recusado');
+SELECT financial_save_expense('a0000000-0000-0000-0000-000000000001',
+  jsonb_build_object('id',(SELECT id FROM ex),'financial_status','cancelada'),2,gen_random_uuid(),'Serviço desfeito');
+SELECT pg_temp.ok((SELECT settlement_inconsistent AND status='aberta' FROM financial_obligations WHERE source_type='despesa'),'cancelada após pagamento fica inconsistente, sem apagar o pago');
+SELECT pg_temp.ok((financial_edition_summary('a0000000-0000-0000-0000-000000000001',(SELECT e28 FROM ids))#>>'{expenses,paid_cents}')::bigint=20000,'pago preservado');
+SELECT financial_save('a0000000-0000-0000-0000-000000000001','revenue',
+  jsonb_build_object('edition_id',(SELECT e28 FROM ids),'description','Cota municipal','projected_cents',70000,'status','confirmada','confirmed_cents',70000),NULL,gen_random_uuid());
+CREATE TEMP TABLE s4 AS SELECT financial_edition_summary('a0000000-0000-0000-0000-000000000001',(SELECT e28 FROM ids)) j;
+SELECT pg_temp.ok((SELECT count(*) FROM financial_obligations WHERE source_type='receita' AND amount_cents=70000)=1,'confirmação cria saldo a receber');
+SELECT pg_temp.ok((SELECT (j#>>'{revenues,received_cents}')::bigint=60001 FROM s4),'receita confirmada não entra como recebida');
 RESET ROLE;
 SELECT 'TODOS OS TESTES PASSARAM' AS resultado;

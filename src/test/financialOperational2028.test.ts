@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { resolveFinancialEdition } from '@/features/financial-management/operational/financialEditionSelection';
-import { buildBudgetRows, sponsorshipConfirmedCents, sponsorshipMoneyCents } from '@/features/financial-management/operational/financialOperationalMath';
+import { buildBudgetRows, executionStages, sponsorshipConfirmedCents, sponsorshipMoneyCents } from '@/features/financial-management/operational/financialOperationalMath';
 import { describeFinancialError } from '@/features/financial-management/operational/financialOperationalApi';
 
 const budget = (id: string, cap: number | null) => ({ id, edition_id: 'e', commission_id: 'c' + id, responsible_name: null, budget_cap_cents: cap, period_start: null, period_end: null, notes: null, version: 1, updated_at: '' });
@@ -27,5 +27,22 @@ describe('Financeiro 2028', () => {
     expect(describeFinancialError(new Error('FINANCIAL_CONFLICT'))).toMatch(/outra pessoa/);
     expect(describeFinancialError(new Error('FINANCIAL_EDITION_READ_ONLY'))).toMatch(/histórica/);
     expect(describeFinancialError(new Error('FINANCIAL_FORBIDDEN: financial_confirm'))).toMatch(/confirmação/);
+  });
+});
+
+describe('execução separada de liquidação', () => {
+  it('despesa realizada sem pagamento fica toda em aberto', () => {
+    expect(executionStages({ plannedCents: 50000, executedCents: 48000, settledCents: 0 }))
+      .toMatchObject({ executedCents: 48000, settledCents: 0, openCents: 48000, headroomCents: 2000, inconsistent: false });
+  });
+  it('pagamento parcial reduz o saldo sem mudar o realizado', () => {
+    expect(executionStages({ plannedCents: 50000, executedCents: 48000, settledCents: 20000 }))
+      .toMatchObject({ executedCents: 48000, openCents: 28000 });
+  });
+  it('receita confirmada não é recebida', () => {
+    expect(executionStages({ plannedCents: 70000, executedCents: 70000, settledCents: null })).toMatchObject({ settledCents: 0, openCents: 70000 });
+  });
+  it('liquidado acima do executado é inconsistente e não gera saldo negativo', () => {
+    expect(executionStages({ executedCents: 0, settledCents: 20000 })).toMatchObject({ openCents: 0, inconsistent: true });
   });
 });

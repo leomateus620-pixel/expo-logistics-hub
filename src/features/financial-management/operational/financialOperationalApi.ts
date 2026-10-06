@@ -59,10 +59,13 @@ export interface FinancialSponsorship {
   in_kind_description: string | null; in_kind_value_cents: number | null; notes: string | null; version: number;
 }
 export interface FinancialEditionSummary {
-  budget: { count: number; cap_cents: number; uncapped_count: number; planned_cents: number; line_count: number };
+  budget: { count: number; cap_cents: number; uncapped_count: number; planned_cents: number; line_count: number; committed_cents?: number };
+  /** Execução (compromisso) e liquidação (caixa) separadas. Ausente antes da atualização do backend. */
+  expenses?: { count: number; planned_cents: number; committed_cents: number; paid_cents: number; payable_open_cents: number; overdue_count: number };
+  revenues?: { projected_cents: number; confirmed_cents: number; received_cents: number; receivable_open_cents: number; overdue_count: number };
   revenue: { count: number; projected_cents: number; confirmed_cents: number };
   sponsorship: { count: number; declared_cents: number; projected_cents: number; confirmed_cents: number; in_kind_cents: number };
-  obligations: { receivable_open_cents: number; received_cents: number; payable_open_cents: number; paid_cents: number; overdue_count: number };
+  obligations: { receivable_open_cents: number; received_cents: number; payable_open_cents: number; paid_cents: number; overdue_count: number; inconsistent_count?: number };
   movements: { count: number; inflow_cents: number; outflow_cents: number };
 }
 
