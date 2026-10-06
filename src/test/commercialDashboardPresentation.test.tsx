@@ -55,6 +55,17 @@ function cadastralCard(label: string) {
   return within(screen.getByRole('region', { name: 'Valores comerciais globais' })).getByText(label).closest('article')!;
 }
 
+/** Coverage and context moved from the card body to its information control. */
+function info(name: string) {
+  const trigger = screen.getByRole('button', { name });
+  if (trigger.getAttribute('aria-expanded') !== 'true') fireEvent.click(trigger);
+  return screen.getByRole('dialog', { name });
+}
+
+function progressReference(progress: HTMLElement) {
+  return within(progress).getByText(/^(Total comercial|Subtotal conhecido)$/).parentElement!;
+}
+
 describe('integrated Commercial Dashboard presentation', () => {
   it('changes only unsold official stage totals, retains scope/selection and rebuilds amounts on map refetch', () => {
     const rows = [record('sale', 'SALE_OPEN', 10), record('confirmed', 'SOLD', 20), record('offer', 'AVAILABLE', 30)];
@@ -72,7 +83,7 @@ describe('integrated Commercial Dashboard presentation', () => {
     const progress = screen.getByRole('region', { name: 'Progresso das vendas por valor comercial' });
     expect(within(progress).getByText('50,0%')).toBeInTheDocument();
     expect(progress).toHaveStyle('--sales-confirmed: 18.75%; --sales-open: 31.25%; --sales-position: 50%');
-    expect(within(progress).getByText(/Total comercial · R\$\s4.000,00/)).toBeInTheDocument();
+    expect(progressReference(progress)).toHaveTextContent(/^Total comercial\s*R\$\s4.000,00$/);
     expect(cadastralCard('Valor das vendas em andamento').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(1250, true));
     expect(cadastralCard('Valor das vendas confirmadas').querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(750));
     expect(within(screen.getByRole('region', { name: 'Mini mapa comercial: Exporural' })).getByRole('combobox')).toHaveValue('offer');
@@ -232,19 +243,22 @@ describe('integrated Commercial Dashboard presentation', () => {
     const confirmed = cadastralCard('Valor das vendas confirmadas');
     const total = cadastralCard('Valor total comercial dos lotes');
     expect(confirmed.querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(500));
-    expect(confirmed).toHaveTextContent('1 de 1 com valor');
+    expect(confirmed).not.toHaveTextContent('Parcial');
+    expect(info('Informações sobre vendas confirmadas')).toHaveTextContent('1 de 1 com valor');
     expect(saleOpen.querySelector('strong')).toHaveTextContent(formatDashboardCurrency(1050, true));
     expect(saleOpen.querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(1050));
-    expect(saleOpen).toHaveTextContent('Subtotal · 2 de 3 com valor');
-    expect(saleOpen).toHaveTextContent('Aguardando assinatura');
+    expect(saleOpen).toHaveTextContent('Parcial');
+    expect(info('Informações sobre vendas em andamento')).toHaveTextContent('Subtotal · 2 de 3 com valor');
+    expect(info('Informações sobre vendas em andamento')).toHaveTextContent('Aguardando assinatura');
     expect(total.querySelector('strong')).toHaveTextContent(formatDashboardCurrency(2750, true));
     expect(total.querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(2750));
-    expect(total).toHaveTextContent('Subtotal · 7 de 9 com valor');
-    expect(total).toHaveTextContent('Vendas + tabela oficial');
+    expect(total).toHaveTextContent('Parcial');
+    expect(info('Informações sobre o valor total comercial')).toHaveTextContent('Subtotal · 7 de 9 com valor');
+    expect(info('Informações sobre o valor total comercial')).toHaveTextContent('Vendas + tabela oficial');
     const progress = screen.getByRole('region', { name: 'Progresso das vendas por valor comercial' });
-    expect(within(progress).getByText(/Subtotal conhecido · R\$\s2.750,00/)).toBeInTheDocument();
+    expect(progressReference(progress)).toHaveTextContent(/^Subtotal conhecido\s*R\$\s2.750,00$/);
     expect(Number(progress.style.getPropertyValue('--sales-position').replace('%', ''))).toBeCloseTo(1550 / 2750 * 100);
-    expect(screen.getByText(/não representam receita recebida/)).toBeInTheDocument();
+    expect(info('Informações sobre a evolução comercial')).toHaveTextContent(/não representam receita recebida/);
     const valuesBefore = [...finance.querySelectorAll('article > strong')].map((element) => element.textContent);
 
     fireEvent.click(within(screen.getByRole('group', { name: 'Selecionar área externa' })).getByRole('button', { name: /Espaço do Automóvel/ }));
@@ -265,16 +279,21 @@ describe('integrated Commercial Dashboard presentation', () => {
     const source = inventory([zero]);
     const { rerender } = render(<CommercialDashboard {...props} data={source} />);
     expect(buildCommercialDashboardSnapshot(source).overall.knownValueLots).toBe(1);
-    for (const label of ['Valor das vendas em andamento', 'Valor total comercial dos lotes']) {
+    const infoNames = {
+      'Valor das vendas em andamento': 'Informações sobre vendas em andamento',
+      'Valor total comercial dos lotes': 'Informações sobre o valor total comercial',
+    } as const;
+    for (const label of ['Valor das vendas em andamento', 'Valor total comercial dos lotes'] as const) {
       expect(cadastralCard(label).querySelector('strong')).toHaveTextContent(/R\$\s0,00/);
-      expect(cadastralCard(label)).toHaveTextContent(/1 de 1 com valor/);
+      expect(cadastralCard(label)).not.toHaveTextContent('Sem valor');
+      expect(info(infoNames[label])).toHaveTextContent(/1 de 1 com valor/);
     }
     const unpriced = { entities: source.entities, lots: source.lots.map((lot) => withDashboardValue(lot, null)) };
     rerender(<CommercialDashboard {...props} data={unpriced} dataUpdatedAt={2000} />);
-    for (const label of ['Valor das vendas em andamento', 'Valor total comercial dos lotes']) {
+    for (const label of ['Valor das vendas em andamento', 'Valor total comercial dos lotes'] as const) {
       expect(cadastralCard(label).querySelector('strong')).toHaveTextContent(/^—$/);
-      expect(cadastralCard(label)).toHaveTextContent('0 de 1 com valor');
-      expect(cadastralCard(label)).toHaveTextContent('0 de 1 com valor');
+      expect(cadastralCard(label)).toHaveTextContent('Sem valor');
+      expect(info(infoNames[label])).toHaveTextContent('Subtotal · 0 de 1 com valor');
     }
     expect(cadastralCard('Valor das vendas confirmadas').querySelector('strong')).toHaveTextContent(/^—$/);
     expect(screen.getByRole('region', { name: 'Progresso das vendas por valor comercial' })).toHaveTextContent('Sem total comercial conhecido');
@@ -291,8 +310,9 @@ describe('integrated Commercial Dashboard presentation', () => {
     render(<CommercialDashboard {...props} data={source} />);
     const confirmed = cadastralCard('Valor das vendas confirmadas');
     expect(confirmed.querySelector('strong > span')).toHaveAttribute('title', formatDashboardCurrency(800));
-    expect(confirmed).toHaveTextContent('Subtotal · 1 de 2 com valor');
-    expect(cadastralCard('Valor total comercial dos lotes')).toHaveTextContent('Subtotal · 1 de 2 com valor');
+    expect(confirmed).toHaveTextContent('Parcial');
+    expect(info('Informações sobre vendas confirmadas')).toHaveTextContent('Subtotal · 1 de 2 com valor');
+    expect(info('Informações sobre o valor total comercial')).toHaveTextContent('Subtotal · 1 de 2 com valor');
     expect(cadastralCard('Valor das vendas em andamento').querySelector('strong')).toHaveTextContent(/^—$/);
   });
 });
