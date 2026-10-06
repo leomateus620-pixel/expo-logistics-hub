@@ -152,8 +152,14 @@ export const COMMISSION_MAP_PORTALS: readonly CommissionMapPortalConfig[] = [
 
 const PORTAL_BY_SLUG = new Map(COMMISSION_MAP_PORTALS.map((portal) => [portal.slug, portal]));
 
+/** Identificadores oficiais do catálogo que apontam para o mesmo portal. */
+const PORTAL_SLUG_ALIASES: Record<string, CommissionMapPortalId> = {
+  'industria-comercio-e-servicos': 'industria-comercio-servicos',
+};
+
 export function getCommissionMapPortal(slug?: string | null) {
-  return slug ? PORTAL_BY_SLUG.get(slug as CommissionMapPortalId) : undefined;
+  if (!slug) return undefined;
+  return PORTAL_BY_SLUG.get((PORTAL_SLUG_ALIASES[slug] ?? slug) as CommissionMapPortalId);
 }
 
 export function isCommissionMapPortalSlug(slug?: string | null): slug is CommissionMapPortalId {
