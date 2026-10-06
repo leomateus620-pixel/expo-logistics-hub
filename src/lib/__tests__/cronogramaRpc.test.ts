@@ -14,6 +14,8 @@ import {
   cronogramaDeleteSubevent,
   cronogramaReorderSubevents,
   CronogramaRpcError,
+  createCronogramaRequestRegistry,
+  cronogramaSaveSuccessMessage,
 } from '@/lib/cronograma-rpc';
 
 describe('cronograma-rpc wrappers', () => {
@@ -112,5 +114,64 @@ describe('cronograma-rpc wrappers', () => {
       code: 'CRONOGRAMA_UNKNOWN',
       details: 'random pg error',
     });
+  });
+
+  it('reuses a submission after an uncertain timeout without another source key', async () => {
+    const payload = { org_id: 'org-retry', source_key: 'manual-stable-submission', title: 'Evento' };
+    rpcMock.mockRejectedValueOnce(new Error('network timeout'));
+    await expect(cronogramaSaveEvent(payload)).rejects.toMatchObject({ code: 'CRONOGRAMA_UNKNOWN', details: 'network timeout' });
+    rpcMock.mockResolvedValueOnce({ data: { id: 'same-event' }, error: null });
+    await cronogramaSaveEvent({ ...payload });
+    expect(rpcMock.mock.calls[0][1].payload.request_id).toBe(rpcMock.mock.calls[1][1].payload.request_id);
+    expect(rpcMock.mock.calls[1][1].payload.source_key).toBe(payload.source_key);
+  });
+
+  it('coalesces duplicate clicks while a save is in flight', async () => {
+    let resolve!: (value: unknown) => void;
+    rpcMock.mockImplementationOnce(() => new Promise((done) => { resolve = done; }));
+    const payload = { org_id: 'org-click', source_key: 'manual-double-click', title: 'Evento' };
+    const first = cronogramaSaveEvent(payload);
+    const second = cronogramaSaveEvent({ ...payload });
+    expect(rpcMock).toHaveBeenCalledTimes(1);
+    resolve({ data: { id: 'single-event' }, error: null });
+    expect(await Promise.all([first, second])).toEqual([{ id: 'single-event' }, { id: 'single-event' }]);
+  });
+
+  it('rejects a different in-flight payload using an explicit submission identity', async () => {
+    let resolve!: (value: unknown) => void;
+    rpcMock.mockImplementationOnce(() => new Promise((done) => { resolve = done; }));
+    const payload = { org_id: 'org-mismatch', source_key: 'manual-mismatch', request_id: 'stable-request', title: 'Evento' };
+    const first = cronogramaSaveEvent(payload);
+    await expect(cronogramaSaveEvent({ ...payload, title: 'Outro evento' })).rejects.toMatchObject({ code: 'CRONOGRAMA_IDEMPOTENCY_KEY_REUSED' });
+    resolve({ data: { id: 'single-event' }, error: null });
+    await first;
+  });
+
+  it('changes request identity when content, version or organization changes', () => {
+    const prepare = createCronogramaRequestRegistry();
+    const payload = { org_id: 'org-a', id: 'event-a', title: 'Evento' };
+    const first = prepare(payload, 1).request_id;
+    expect(prepare({ title: 'Evento', id: 'event-a', org_id: 'org-a' }, 1).request_id).toBe(first);
+    const changed = prepare({ ...payload, title: 'Revisão' }, 1).request_id;
+    expect(changed).not.toBe(first);
+    expect(prepare({ ...payload, title: 'Revisão' }, 2).request_id).not.toBe(changed);
+    expect(prepare({ ...payload, org_id: 'org-b' }, 1).request_id).not.toBe(first);
+  });
+
+  it('explains a missing restaurant configuration without exposing raw details', async () => {
+    rpcMock.mockResolvedValue({ data: null, error: { message: 'CRONOGRAMA_RESTAURANT_CONFIGURATION_REQUIRED: ambiguous auth ids' } });
+    await expect(cronogramaSaveEvent({ org_id: 'o', title: 't' })).rejects.toMatchObject({ code: 'CRONOGRAMA_RESTAURANT_CONFIGURATION_REQUIRED' });
+    try { await cronogramaSaveEvent({ org_id: 'o', title: 't' }); } catch (error) {
+      expect((error as Error).message).toContain('campos foram preservados');
+      expect((error as Error).message).not.toContain('auth ids');
+    }
+  });
+
+  it('success copy distinguishes initial forwarding, update and preserved approval', () => {
+    const restaurantForwarding = { event_id: 'venue-id', source_revision: 1, status: 'solicitado', approval_status: 'pendente', action: 'created' as const };
+    expect(cronogramaSaveSuccessMessage({ restaurantForwarding })).toContain('encaminhado');
+    expect(cronogramaSaveSuccessMessage({ restaurantForwarding: { ...restaurantForwarding, action: 'updated' } })).toContain('pedido existente');
+    expect(cronogramaSaveSuccessMessage({ restaurantForwarding: { ...restaurantForwarding, approval_status: 'aprovado', action: 'updated' } })).not.toContain('aguardando');
+    expect(cronogramaSaveSuccessMessage({})).toBe('Evento salvo.');
   });
 });

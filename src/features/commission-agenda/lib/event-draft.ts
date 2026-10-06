@@ -6,6 +6,7 @@
  * mesmo ID, exibido nas duas agendas.
  */
 import type { CronogramaSaveEventPayload } from '@/lib/cronograma-rpc';
+import { newRequestId } from '@/lib/cronograma-rpc';
 import type { AgendaEventDraft } from '../components/EventFormShell';
 import type { AgendaEventViewModel, EventStatus, PersonSummary } from '../types';
 
@@ -78,10 +79,10 @@ export function draftToSaveEventPayload(
   const startDate = draft.date || null;
   const endDate = draft.endDate && draft.endDate !== draft.date ? draft.endDate : null;
   const year = startDate ? (Number(startDate.slice(0, 4)) as 2026 | 2027 | 2028) : 2028;
-  const suffix = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}`;
 
   return {
-    ...(editing?.id ? { id: editing.id } : { source_key: `unidade-${owner.slug}-${suffix}` }),
+    ...(editing?.id ? { id: editing.id } : { source_key: draft.sourceKey ?? `unidade-${owner.slug}-${newRequestId()}` }),
+    ...(!editing?.id ? { origin_commission_id: owner.commissionId } : {}),
     org_id: orgId,
     title: draft.title.trim(),
     description: draft.description.trim() || null,
@@ -93,6 +94,7 @@ export function draftToSaveEventPayload(
     status: STATUS_TO_DB[draft.status] ?? 'planejado',
     priority: 'media',
     location: draft.location.trim() || null,
+    location_code: draft.locationCode ?? null,
     event_time: draft.startTime || null,
     start_time: draft.startTime || null,
     end_time: draft.endTime || null,

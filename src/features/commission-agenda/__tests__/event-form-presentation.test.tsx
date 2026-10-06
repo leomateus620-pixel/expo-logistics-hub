@@ -24,6 +24,20 @@ const event: AgendaEventViewModel = {
 };
 
 describe('commission event form presentation', () => {
+  it('keeps failed creation fields and its source identity for a safe retry', async () => {
+    const onSubmit = vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    render(<EventFormShell unitId="owner" peopleOptions={people} unitOptions={units} onSubmit={onSubmit} />);
+    fireEvent.change(screen.getByLabelText(/Título/), { target: { value: 'Evento sintético local' } });
+    fireEvent.change(screen.getByLabelText(/^Data\s*\*?$/), { target: { value: '2028-04-29' } });
+    fireEvent.submit(document.querySelector('form')!);
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Seus campos foram preservados'));
+    expect(screen.getByLabelText(/Título/)).toHaveValue('Evento sintético local');
+    const sourceKey = onSubmit.mock.calls[0][0].sourceKey;
+    expect(sourceKey).toMatch(/^unidade-owner-[0-9a-f-]{36}$/);
+    fireEvent.submit(document.querySelector('form')!);
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(2));
+    expect(onSubmit.mock.calls[1][0].sourceKey).toBe(sourceKey);
+  });
   it('keeps equal names as distinct identities and preserves the first responsible through search and editing', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();

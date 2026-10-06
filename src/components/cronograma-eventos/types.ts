@@ -1,3 +1,5 @@
+import type { CronogramaRestaurantForwarding } from '@/lib/cronograma-rpc';
+
 export type CronogramaView =
   | 'overview'
   | 'timeline'
@@ -51,6 +53,7 @@ export interface CronogramaEvent {
   kind: CronogramaKind;
   location?: string;
   locationCode?: string | null;
+  restaurantForwarding?: CronogramaRestaurantForwarding | null;
   owner?: string;
   commission?: string;
   relatedCommissionIds?: string[];

@@ -59,6 +59,10 @@ describe('adapter da agenda da unidade', () => {
   it('ignora linhas sem data inicial', () => {
     expect(toUnitAgendaEvents([row({ start_date: null })])).toHaveLength(0);
   });
+  it('keeps the original row revision and explicit location identity for editing', () => {
+    const [event] = toUnitAgendaEvents([row({ lock_version: 4, source_key: 'stable-source', location_code: 'sala_voluntarios', location: 'CENTRO DE EVENTOS FENASOJA' })]);
+    expect(event).toMatchObject({ lockVersion: 4, sourceKey: 'stable-source', locationCode: 'sala_voluntarios' });
+  });
 });
 
 describe('regras centralizadas de acesso', () => {
@@ -136,6 +140,14 @@ describe('formulário da unidade → evento canônico', () => {
     ]);
     expect(payload.responsibles?.[0]).toMatchObject({ user_id: 'user-1', is_primary: true, responsible_type: 'member' });
     expect(payload.id).toBeUndefined();
+  });
+  it('keeps a new submission source identity and an explicit different location code on replay', () => {
+    const draft = { ...baseDraft, sourceKey: 'unidade-stable-submission', locationCode: 'sala_voluntarios', location: 'CENTRO DE EVENTOS FENASOJA' };
+    const first = draftToSaveEventPayload(draft, options);
+    const retry = draftToSaveEventPayload({ ...draft }, options);
+    expect(first.source_key).toBe('unidade-stable-submission');
+    expect(retry.source_key).toBe(first.source_key);
+    expect(retry.location_code).toBe('sala_voluntarios');
   });
 
   it('preserva o mesmo ID ao editar', () => {

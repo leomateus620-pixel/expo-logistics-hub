@@ -1,0 +1,24 @@
+{
+  "reference_commit": "9e3dd24513045a55c861cc2094221ba5738f2cdf",
+  "tested_at": "2026-10-06T03:34:09.4478951-03:00",
+  "test": "src/test/cronogramaDashboardIntegration.test.tsx",
+  "isolation": "Dashboard directory, selectors, timeline, period, relative local dependencies, test and setup extracted from reference commit; exact aliases in temporary Vitest config. Remaining imported UI/hooks/libraries unchanged by this work.",
+  "command": "npx vitest run --config tmp/dashboard-baseline/vitest.config.ts --maxWorkers=1 --testTimeout=15000 --reporter=json --outputFile=tmp/dashboard-baseline/results.json",
+  "exit_code": 1,
+  "total_tests": 2,
+  "passed_tests": 1,
+  "failed_tests": 1,
+  "assertions": [
+    {
+      "name": "Dashboard executivo do cronograma renderiza indicadores reais e mantém o recorte exato no drill-down",
+      "status": "failed",
+      "failure": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Eventos atrasados: 1\\./`"
+    },
+    {
+      "name": "Dashboard executivo do cronograma explicita fallback remoto e não fabrica gráficos quando não há eventos",
+      "status": "passed",
+      "failure": ""
+    }
+  ],
+  "conclusion": "The unavailable accessible button Eventos atrasados: 1. is an inherited reference test failure; no dashboard app source or test expectation was changed."
+}

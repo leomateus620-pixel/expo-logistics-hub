@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react';
-import { CalendarRange, ChevronLeft, LogOut } from 'lucide-react';
+import { ChevronLeft, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CronogramaGoogleStatusButton } from '@/components/cronograma-eventos/CronogramaGoogleStatusButton';
 import { CronogramaHeaderSearch } from '@/components/cronograma-eventos/CronogramaHeaderSearch';
 import { CronogramaPreparationPill } from '@/components/cronograma-eventos/CronogramaPreparationPill';
 import { CronogramaPushStatusButton } from '@/components/cronograma-eventos/CronogramaPushStatusButton';
 import { CronogramaSearchProvider } from '@/components/cronograma-eventos/CronogramaSearchContext';
+import { CronogramaAgendaModeProvider } from '@/components/cronograma-eventos/CronogramaAgendaModeContext';
+import { CronogramaAgendaModeControls } from '@/components/cronograma-eventos/CronogramaAgendaModeControls';
 import { CronogramaTemporalControls } from '@/components/cronograma-eventos/CronogramaTemporalControls';
 import { CronogramaShellProvider } from '@/components/cronograma-eventos/CronogramaShellContext';
 import { WeeklySummaryPill } from '@/components/cronograma-eventos/WeeklySummaryPill';
@@ -33,15 +35,13 @@ function CronogramaCommandBar() {
             aria-label="Voltar ao portal de acesso"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-            <span className="hidden xl:inline">Portal</span>
+            <span>Portal</span>
           </Link>
 
-          <span className="cronograma-module-tile-3d" aria-hidden="true">
-            <CalendarRange className="h-4 w-4" />
-          </span>
+          <CronogramaAgendaModeControls />
 
-          <CronogramaHeaderSearch className="cronograma-command-search hidden md:flex" />
-          <MobileSearchToggle className="md:hidden" />
+          <CronogramaHeaderSearch className="cronograma-command-search hidden lg:flex" />
+          <MobileSearchToggle className="lg:hidden" />
         </div>
 
         <div className="cronograma-command-layer__right">
@@ -88,6 +88,7 @@ function CronogramaCommandBar() {
 
 export function CronogramaModuleShell({ children }: { children: ReactNode }) {
   return (
+    <CronogramaAgendaModeProvider>
     <CronogramaSearchProvider>
       <CronogramaShellProvider>
         <div className="cronograma-module-shell min-h-screen">
@@ -101,5 +102,6 @@ export function CronogramaModuleShell({ children }: { children: ReactNode }) {
         </div>
       </CronogramaShellProvider>
     </CronogramaSearchProvider>
+    </CronogramaAgendaModeProvider>
   );
 }

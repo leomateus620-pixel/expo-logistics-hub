@@ -86,6 +86,7 @@ export function CronogramaTimelineBoard({
   requestedYear = null,
   requestedMonth = null,
   temporalFocusKey = 'all',
+  datasetScopeKey = 'general',
   preferredTemporalYear = null,
   onPositionChange,
   todayKey: todayKeyOverride,
@@ -102,6 +103,7 @@ export function CronogramaTimelineBoard({
   requestedYear?: CronogramaCycleYear | null;
   requestedMonth?: string | null;
   temporalFocusKey?: string;
+  datasetScopeKey?: string;
   preferredTemporalYear?: CronogramaCycleYear | null;
   onPositionChange?: (change: TimelinePositionChange) => void;
   todayKey?: string;
@@ -148,6 +150,7 @@ export function CronogramaTimelineBoard({
     requestedMonth,
     todayKey,
     temporalFocusKey,
+    datasetScopeKey,
     preferredTemporalYear,
     onPositionChange,
   });

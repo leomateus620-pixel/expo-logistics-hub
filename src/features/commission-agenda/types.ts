@@ -52,6 +52,9 @@ export type EventStatus =
 
 export interface AgendaEventViewModel {
   id: string;
+  sourceKey?: string | null;
+  lockVersion?: number | null;
+  locationCode?: string | null;
   title: string;
   /** ISO date `YYYY-MM-DD`. */
   date: string;

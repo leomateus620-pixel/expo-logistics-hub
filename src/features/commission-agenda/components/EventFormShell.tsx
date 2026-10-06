@@ -1,4 +1,6 @@
-import { useEffect, useId, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
+import { newRequestId } from '@/lib/cronograma-rpc';
+import { matchesCronogramaLocation } from '@/lib/cronograma-agenda-mode';
 import { CalendarDays, Check, FileText, Layers3, MapPin, Text, Users } from 'lucide-react';
 import type { AgendaEventViewModel, EventStatus, PersonSummary, UnitSummary } from '../types';
 import { EVENT_STATUS_LABELS } from '../lib/agenda-presentation';
@@ -8,6 +10,8 @@ import { WorkspaceRelationalSelect } from './WorkspaceRelationalSelect';
 
 /** Local draft shape emitted by the form. The backend phase maps it to storage. */
 export interface AgendaEventDraft {
+  sourceKey?: string;
+  locationCode?: string | null;
   title: string;
   description: string;
   date: string;
@@ -33,9 +37,11 @@ const EMPTY_DRAFT: AgendaEventDraft = {
   unitIds: [],
 };
 
-function draftFromEvent(event: AgendaEventViewModel | null | undefined, unitId?: string): AgendaEventDraft {
-  if (!event) return { ...EMPTY_DRAFT, unitIds: unitId ? [unitId] : [] };
+function draftFromEvent(event: AgendaEventViewModel | null | undefined, unitId?: string, sourceKey?: string): AgendaEventDraft {
+  if (!event) return { ...EMPTY_DRAFT, sourceKey, unitIds: unitId ? [unitId] : [] };
   return {
+    sourceKey: event.sourceKey ?? undefined,
+    locationCode: event.locationCode ?? null,
     title: event.title,
     description: event.description ?? '',
     date: event.date,
@@ -57,7 +63,7 @@ export interface EventFormShellProps {
   unitLabel?: string;
   peopleOptions?: PersonSummary[];
   unitOptions?: UnitSummary[];
-  onSubmit?: (draft: AgendaEventDraft) => void;
+  onSubmit?: (draft: AgendaEventDraft) => void | boolean | Promise<void | boolean>;
   onCancel?: () => void;
 }
 
@@ -65,11 +71,16 @@ const STATUS_OPTIONS: EventStatus[] = ['requested', 'confirmed', 'draft', 'resch
 
 export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], unitOptions = [], onSubmit, onCancel }: EventFormShellProps) {
   const id = useId();
-  const [draft, setDraft] = useState<AgendaEventDraft>(() => draftFromEvent(event, unitId));
+  const sourceIdentity = useRef<string>();
+  if (!event && !sourceIdentity.current) sourceIdentity.current = `unidade-${unitId ?? 'agenda'}-${newRequestId()}`;
+  const [draft, setDraft] = useState<AgendaEventDraft>(() => draftFromEvent(event, unitId, sourceIdentity.current));
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const submissionPending = useRef(false);
 
   useEffect(() => {
-    setDraft(draftFromEvent(event, unitId));
+    setDraft(draftFromEvent(event, unitId, sourceIdentity.current));
     setTouched({});
   }, [event, unitId]);
 
@@ -101,9 +112,21 @@ export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], u
     [key]: current[key].includes(value) ? current[key].filter((item) => item !== value) : [...current[key], value],
   }));
 
-  const handleSubmit = (formEvent: FormEvent) => {
+  const handleSubmit = async (formEvent: FormEvent) => {
     formEvent.preventDefault();
-    onSubmit?.(draft);
+    if (submissionPending.current) return;
+    submissionPending.current = true;
+    setSaving(true);
+    setSubmitError(null);
+    try {
+      const saved = await onSubmit?.(draft);
+      if (saved === false) setSubmitError('O evento não foi salvo. Revise a orientação exibida e tente novamente. Seus campos foram preservados.');
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Não foi possível salvar. Seus campos foram preservados; tente novamente.');
+    } finally {
+      submissionPending.current = false;
+      setSaving(false);
+    }
   };
 
   const canSubmit = draft.title.trim().length > 2 && draft.date.length > 0;
@@ -111,6 +134,7 @@ export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], u
   return (
     <form id={`${id}-form`} className="ua-form" onSubmit={handleSubmit} noValidate>
       <div className="ua-form__body">
+      {submitError && <p className="ua-field__error" role="alert">{submitError}</p>}
       <section className="ua-form__section" aria-labelledby={`${id}-info`}>
         <h3 id={`${id}-info`} className="ua-form__section-title ws-label"><Text className="h-4 w-4" aria-hidden="true" />Informações</h3>
         <div className="ua-field">
@@ -163,7 +187,8 @@ export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], u
         <h3 id={`${id}-where`} className="ua-form__section-title ws-label"><MapPin className="h-4 w-4" aria-hidden="true" />Local</h3>
         <div className="ua-field">
           <label htmlFor={`${id}-location`} className="ua-field__label ws-meta">Local do evento</label>
-          <input id={`${id}-location`} name="location" autoComplete="off" value={draft.location} onChange={(e) => update('location', e.target.value)} placeholder="Ex.: Casa Fenasoja" />
+          <input id={`${id}-location`} name="location" autoComplete="off" value={draft.location} onChange={(e) => setDraft((current) => ({ ...current, location: e.target.value, locationCode: null }))} placeholder="Ex.: Casa Fenasoja" />
+          {matchesCronogramaLocation(draft, 'centro_eventos_fenasoja') && <p className="ua-field__hint" role="note">Este evento também será encaminhado ao Restaurante para validação.</p>}
         </div>
       </section>
 
@@ -209,8 +234,8 @@ export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], u
       </div>
 
       <div className="ua-form__footer">
-        <WorkspaceButton onClick={onCancel}>Cancelar</WorkspaceButton>
-        <WorkspaceButton type="submit" variant="primary" icon={Check} disabled={!canSubmit}>
+        <WorkspaceButton onClick={onCancel} disabled={saving}>Cancelar</WorkspaceButton>
+        <WorkspaceButton type="submit" variant="primary" icon={Check} disabled={!canSubmit || saving}>
           {event ? 'Salvar alterações' : 'Criar evento'}
         </WorkspaceButton>
       </div>

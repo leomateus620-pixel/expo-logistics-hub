@@ -235,6 +235,7 @@ export function VenueEventFormDialog({
   const contentRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const initializationKeyRef = useRef("");
+  const isLinkedToCronograma = Boolean(initialDraft?.cronogramaSourceEventId);
 
   const activeSpaces = useMemo(
     () => workspace.spaces.filter((space) => space.active),
@@ -287,7 +288,7 @@ export function VenueEventFormDialog({
     if (initializationKeyRef.current === initializationKey) return;
     initializationKeyRef.current = initializationKey;
     const next: VenueEventDraft = initialDraft
-      ? { ...structuredClone(initialDraft), pendingDate: false }
+      ? { ...structuredClone(initialDraft), pendingDate: isLinkedToCronograma ? initialDraft.pendingDate : false }
       : {
           ...createEmptyVenueEventDraft(),
           requesterName: defaultRequesterName,
@@ -307,6 +308,7 @@ export function VenueEventFormDialog({
     defaultResponsibleUserId,
     defaultVenueIds,
     initialDraft,
+    isLinkedToCronograma,
     open,
   ]);
 
@@ -508,6 +510,7 @@ export function VenueEventFormDialog({
   const submit = async () => {
     if (!validate()) return;
     if (
+      !draft.pendingDate &&
       reviewedAvailabilityFingerprint !== currentAvailabilityFingerprint &&
       !(await reviewAvailability())
     ) {
@@ -580,6 +583,7 @@ export function VenueEventFormDialog({
           </nav>
 
           <div ref={bodyRef} className="venue-event-form__body is-flow">
+            {isLinkedToCronograma && <div className="venue-inline-alert" role="note"><strong>Origem: Agenda Fenasoja</strong><span>Título, descrição, local, período, solicitante e responsável são mantidos pelo evento original. Aqui você pode revisar os dados operacionais do pedido.</span></div>}
             {Object.keys(errors).length > 0 && (
               <div
                 className="venue-inline-alert is-danger"
@@ -605,6 +609,7 @@ export function VenueEventFormDialog({
                 >
                   <Input
                     id="venue-event-title"
+                    disabled={isLinkedToCronograma}
                     value={draft.title}
                     onChange={(event) =>
                       update("title", toDisplayUpper(event.target.value))
@@ -622,6 +627,7 @@ export function VenueEventFormDialog({
                 >
                   <Input
                     id="venue-event-requester"
+                    disabled={isLinkedToCronograma}
                     value={draft.requesterName}
                     list="venue-requester-options"
                     autoComplete="off"
@@ -646,6 +652,7 @@ export function VenueEventFormDialog({
                 >
                   <Input
                     id="venue-event-type"
+                    disabled={isLinkedToCronograma}
                     value={draft.eventType}
                     list="venue-event-type-options"
                     autoComplete="off"
@@ -671,6 +678,7 @@ export function VenueEventFormDialog({
                 >
                   <Textarea
                     id="venue-event-description"
+                    disabled={isLinkedToCronograma}
                     value={draft.executiveDescription}
                     onChange={(event) =>
                       update(
@@ -720,6 +728,7 @@ export function VenueEventFormDialog({
                 >
                   <Input
                     id="venue-event-start-date"
+                    disabled={isLinkedToCronograma}
                     type="date"
                     value={draft.startDate}
                     onChange={(event) =>
@@ -736,6 +745,7 @@ export function VenueEventFormDialog({
                 >
                   <Input
                     id="venue-event-start-time"
+                    disabled={isLinkedToCronograma}
                     type="time"
                     value={draft.startTime}
                     onChange={(event) =>
@@ -752,6 +762,7 @@ export function VenueEventFormDialog({
                 >
                   <Input
                     id="venue-event-end-date"
+                    disabled={isLinkedToCronograma}
                     type="date"
                     value={draft.endDate}
                     onChange={(event) => update("endDate", event.target.value)}
@@ -766,6 +777,7 @@ export function VenueEventFormDialog({
                 >
                   <Input
                     id="venue-event-end-time"
+                    disabled={isLinkedToCronograma}
                     type="time"
                     value={draft.endTime}
                     onChange={(event) => update("endTime", event.target.value)}
@@ -845,9 +857,9 @@ export function VenueEventFormDialog({
                   <strong>
                     <UserRound aria-hidden="true" />
                     {responsibleMember?.nome_exibicao ||
-                      "Roque Vanderlei Lugoch"}
+                      (isLinkedToCronograma ? "Responsável configurado" : "Roque Vanderlei Lugoch")}
                   </strong>
-                  <small>Responsável padrão desta agenda</small>
+                  <small>{isLinkedToCronograma ? "Validação pelo responsável configurado na organização" : "Responsável padrão desta agenda"}</small>
                 </div>
               </div>
               <div className="venue-form-grid">

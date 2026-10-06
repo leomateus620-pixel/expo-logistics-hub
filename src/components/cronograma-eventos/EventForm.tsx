@@ -16,6 +16,8 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { formatEventPeriodShort, getEventPeriod } from '@/lib/cronograma-event-period';
 import { locationCodeForText } from '@/lib/cronograma-location-options';
+import { matchesCronogramaLocation } from '@/lib/cronograma-agenda-mode';
+import { newRequestId } from '@/lib/cronograma-rpc';
 import { EventCenterRestaurantAlert } from './EventCenterRestaurantAlert';
 import { EventLocationField } from './EventLocationField';
 import { officialMemberLabel, resolveOfficialMembers } from '@/lib/memberIdentity';
@@ -148,18 +150,24 @@ export function EventForm({
   }, [officialMembersByUserId, user]);
   const currentUserName = useMemo(() => {
     if (!user) return '';
+    const metadata = (user.user_metadata ?? {}) as Record<string, unknown>;
+    const fullName = typeof metadata.full_name === 'string' ? metadata.full_name : '';
+    const name = typeof metadata.name === 'string' ? metadata.name : '';
     return (
       officialMemberLabel(currentMember)
-      || (user.user_metadata as any)?.full_name
-      || (user.user_metadata as any)?.name
+      || fullName
+      || name
       || user.email
       || ''
     );
   }, [currentMember, user]);
 
+  const newSourceKey = useRef<string>();
+  if (!event && !newSourceKey.current) newSourceKey.current = `manual-${newRequestId()}`;
   const initialForm = useMemo<CronogramaEvent>(() => {
     const next = {
       ...defaultForm,
+      ...(!event ? { sourceKey: newSourceKey.current } : {}),
       ...(!event && defaultYear ? { year: defaultYear } : {}),
       ...(event || {}),
     };
@@ -337,7 +345,7 @@ export function EventForm({
       startTime: form.startTime?.trim() || undefined,
       endTime: form.endTime?.trim() || undefined,
       location: form.location?.trim() || undefined,
-      locationCode: locationCodeForText(form.location),
+      locationCode: form.locationCode ?? locationCodeForText(form.location),
       owner: primaryResponsible?.name?.trim() || currentUserName || form.owner?.trim() || undefined,
       commission: form.commission?.trim() || undefined,
       pendingReason: form.pendingReason?.trim() || undefined,
@@ -596,7 +604,8 @@ export function EventForm({
           </div>
 
         </div>
-        <EventCenterRestaurantAlert code={form.locationCode} start={form.date} end={multiDay ? form.endDate ?? form.date : form.date} />
+        {matchesCronogramaLocation(form, 'centro_eventos_fenasoja') && <p className="mt-2 text-sm text-muted-foreground" role="note">Este evento também será encaminhado ao Restaurante para validação.</p>}
+        <EventCenterRestaurantAlert code={matchesCronogramaLocation(form, 'centro_eventos_fenasoja') ? 'centro_eventos_fenasoja' : form.locationCode} start={form.date} end={multiDay ? form.endDate ?? form.date : form.date} sourceEventId={event?.id} />
       </div>
 
       {showRelational && (

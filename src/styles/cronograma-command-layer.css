@@ -43,15 +43,205 @@
   padding: 0 0.75rem 0.55rem;
 }
 
+@media (min-width: 768px) {
+  .cronograma-module-bar .cronograma-command-layer__mobile {
+    display: none;
+  }
+}
+
 /* Busca reduzida e ancorada à esquerda. */
-.cronograma-command-search {
-  max-width: 19rem;
-  flex: 1 1 14rem;
+.cronograma-module-bar .cronograma-command-search {
+  display: flex;
+  max-width: 14rem;
+  flex: 1 1 11rem;
+}
+
+.cronograma-command-layer__left .cronograma-mobile-search-toggle {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .cronograma-module-bar .cronograma-command-search {
+    display: none;
+  }
+
+  .cronograma-command-layer__left .cronograma-mobile-search-toggle {
+    display: inline-flex;
+  }
+
+  .cronograma-command-layer__left .cronograma-mobile-search-toggle__button,
+  .cronograma-command-layer__left .cronograma-mobile-search-toggle__clear {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .cronograma-command-layer__left .cronograma-mobile-search-toggle__done {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  .cronograma-module-bar[data-layout='command'] .cronograma-command-layer:has(.cronograma-mobile-search-toggle[data-open]) {
+    padding-bottom: 3.65rem;
+  }
+
+  .cronograma-command-layer__left .cronograma-mobile-search-toggle__field {
+    top: auto;
+    bottom: 0.4rem;
+    transform: none;
+    animation: none;
+  }
 }
 
 .cronograma-command-search .cronograma-header-search-input {
   min-height: 2.25rem;
   font-size: 0.76rem;
+}
+
+.cronograma-agenda-modes {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cronograma-agenda-mode {
+  position: relative;
+  display: inline-flex;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1px solid rgb(255 255 255 / 0.2);
+  border-radius: 0.7rem;
+  padding: 0 0.6rem;
+  color: #122139;
+  font-size: 0.7rem;
+  font-weight: 800;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5), 0 5px 12px -8px rgb(0 0 0 / 0.7);
+  transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+
+.cronograma-agenda-mode > svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: none;
+}
+
+.cronograma-agenda-mode--general {
+  padding-inline: 0.5rem;
+  background: linear-gradient(155deg, #ffc93d, #fa9518);
+}
+
+.cronograma-agenda-mode--volunteers {
+  width: 2.75rem;
+  padding: 0;
+  background: #d8f0df;
+  border-color: #bbdec6;
+  color: #174d36;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45);
+}
+
+.cronograma-agenda-mode--volunteers > svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.cronograma-agenda-mode[aria-pressed='false'] {
+  filter: saturate(0.75);
+}
+
+.cronograma-agenda-mode[aria-pressed='true'] {
+  box-shadow: inset 0 -3px 0 currentColor, inset 0 1px 0 rgb(255 255 255 / 0.6), 0 0 0 2px rgb(255 255 255 / 0.32);
+}
+
+.cronograma-agenda-mode--volunteers[aria-pressed='true'] {
+  box-shadow: inset 0 -2px 0 #174d36;
+}
+
+.cronograma-agenda-mode:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+.cronograma-agenda-mode:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 3px;
+}
+
+.cronograma-agenda-mode__short-label {
+  display: none;
+}
+
+.cronograma-agenda-scope,
+.cronograma-agenda-mode-notice {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.65rem;
+  border: 1px solid #b8dcc6;
+  border-radius: 0.7rem;
+  padding: 0.6rem 0.75rem;
+  background: #eff9f1;
+  color: #23583e;
+  font-size: 0.76rem;
+}
+
+.cronograma-agenda-scope > span {
+  font-weight: 800;
+}
+
+.cronograma-agenda-scope > small {
+  font-size: 0.7rem;
+}
+
+.cronograma-agenda-mode-notice {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.cronograma-agenda-mode-notice > svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  margin-top: 0.1rem;
+}
+
+.cronograma-agenda-mode-notice p {
+  margin: 0;
+}
+
+@media (max-width: 767px) {
+  .cronograma-module-bar[data-layout='command'] .cronograma-command-layer {
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .cronograma-command-layer__left {
+    flex-basis: 100%;
+    justify-content: space-between;
+    gap: 0.4rem;
+  }
+
+  .cronograma-command-layer__right {
+    flex-basis: 100%;
+    justify-content: flex-end;
+  }
+
+  .cronograma-agenda-mode__label {
+    display: none;
+  }
+
+  .cronograma-agenda-mode__short-label {
+    display: inline;
+  }
+
+  .cronograma-command-layer__left .cronograma-module-back {
+    padding-inline: 0.5rem;
+  }
+
 }
 
 /* Chips de status (Google Agenda / Preparação). */
@@ -371,7 +561,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cronograma-command-chip,
-  .cronograma-command-create {
+  .cronograma-command-create,
+  .cronograma-agenda-mode {
     transition: none;
   }
 }

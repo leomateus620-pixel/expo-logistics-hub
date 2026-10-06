@@ -712,12 +712,14 @@ export function useVenueOperations() {
     mutationFn: async (draft, idempotencyKey) => {
       requireOnline(isOnline);
       const currentOrgId = requireOrgId(orgId);
+      const linkedEvent = draft.id ? workspaceQuery.data?.events.find((event) => event.id === draft.id && event.cronograma_source_event_id) : undefined;
+      const payload = toEventRpcPayload(draft, linkedEvent);
       const { data, error } = await venueDb.rpc("venue_save_event", {
         _org_id: currentOrgId,
         _event_id: draft.id ?? null,
         _expected_version: draft.version ?? null,
         _idempotency_key: idempotencyKey,
-        _payload: toEventRpcPayload(draft),
+        _payload: payload,
       });
       if (error) throw error;
       return data as {

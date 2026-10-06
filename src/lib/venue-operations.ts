@@ -232,6 +232,19 @@ export interface VenueEvent {
   source_row: number | null;
   source_fingerprint: string | null;
   import_batch_id: string | null;
+  cronograma_source_event_id?: string | null;
+  cronograma_source_revision?: number | null;
+  cronograma_source_snapshot?: {
+    title?: string | null;
+    start_date?: string | null;
+    end_date?: string | null;
+    start_time?: string | null;
+    end_time?: string | null;
+    event_time?: string | null;
+    location_code?: string | null;
+    location?: string | null;
+    has_exact_date?: boolean;
+  } | null;
 }
 
 
@@ -452,6 +465,7 @@ export interface AvailabilityConflict {
 export interface VenueEventDraft {
   id?: string;
   version?: number;
+  cronogramaSourceEventId?: string | null;
   title: string;
   executiveDescription: string;
   eventType: VenueEventType;
@@ -1387,10 +1401,10 @@ export function eventReadiness(
   };
 }
 
-export function toEventRpcPayload(draft: VenueEventDraft) {
+export function toEventRpcPayload(draft: VenueEventDraft, linkedEvent?: VenueEvent) {
   const parsed = venueEventDraftSchema.parse(draft);
   const schedule = buildDraftSchedule(parsed as VenueEventDraft);
-  return {
+  const payload = {
     title: parsed.title,
     executive_description: parsed.executiveDescription || null,
     event_type: parsed.eventType,
@@ -1430,6 +1444,21 @@ export function toEventRpcPayload(draft: VenueEventDraft) {
       notes: resource.notes || null,
     })),
   };
+  if (linkedEvent?.cronograma_source_event_id) {
+    Object.assign(payload, {
+      title: linkedEvent.title,
+      executive_description: linkedEvent.executive_description,
+      event_type: linkedEvent.event_type,
+      requested_area: linkedEvent.requested_area,
+      pending_date: linkedEvent.pending_date,
+      start_at: linkedEvent.start_at,
+      end_at: linkedEvent.end_at,
+      requester_name: linkedEvent.requester_name,
+      responsible_user_id: linkedEvent.responsible_user_id,
+      visibility: linkedEvent.visibility,
+    });
+  }
+  return payload;
 }
 
 export function createEmptyVenueEventDraft(): VenueEventDraft {
@@ -1501,24 +1530,27 @@ export function eventToDraft(
   const end = split(primary?.end_at ?? event.end_at);
   const setup = split(primary?.setup_start_at ?? event.setup_start_at);
   const teardown = split(primary?.teardown_end_at ?? event.teardown_end_at);
+  const linked = Boolean(event.cronograma_source_event_id);
+  const sourcePeriod = event.cronograma_source_snapshot;
   return {
     ...createEmptyVenueEventDraft(),
     id: event.id,
     version: event.version,
+    cronogramaSourceEventId: event.cronograma_source_event_id ?? null,
     title: event.title,
     executiveDescription: event.executive_description ?? "",
     eventType: venueEventTypeLabel(event.event_type),
     venueIds: eventAllocations.map((allocation) => allocation.space_id),
     requestedArea: event.requested_area ?? "",
     pendingDate: event.pending_date,
-    startDate: start.date,
-    startTime: start.time || "19:00",
-    endDate: end.date,
-    endTime: end.time || "22:00",
+    startDate: linked ? sourcePeriod?.start_date ?? start.date : start.date,
+    startTime: linked ? sourcePeriod?.start_time ?? sourcePeriod?.event_time ?? start.time : start.time || "19:00",
+    endDate: linked ? sourcePeriod?.end_date ?? end.date : end.date,
+    endTime: linked ? sourcePeriod?.end_time ?? end.time : end.time || "22:00",
     setupStartDate: setup.date,
-    setupStartTime: setup.time || "18:00",
+    setupStartTime: linked ? setup.time : setup.time || "18:00",
     teardownEndDate: teardown.date,
-    teardownEndTime: teardown.time || "23:00",
+    teardownEndTime: linked ? teardown.time : teardown.time || "23:00",
     requesterName: event.requester_name,
     responsibleOrganizationId: event.responsible_organization_id ?? "",
     sponsorId: event.sponsor_id ?? "",
@@ -1548,6 +1580,27 @@ export function eventToDraft(
         notes: resource.notes ?? "",
       })),
   };
+}
+
+export function canReviewCronogramaVenueEvent(
+  event: Pick<VenueEvent, 'cronograma_source_event_id' | 'responsible_user_id'>,
+  userId: string | null | undefined,
+  hasApprovalPermission: boolean,
+): boolean {
+  return hasApprovalPermission && (!event.cronograma_source_event_id || Boolean(userId && event.responsible_user_id === userId));
+}
+
+export function formatVenueEventPeriod(event: Pick<VenueEvent, 'start_at' | 'end_at' | 'cronograma_source_event_id' | 'cronograma_source_snapshot'>): string {
+  const snapshot = event.cronograma_source_event_id ? event.cronograma_source_snapshot : null;
+  if (!snapshot) return formatVenuePeriod(event.start_at, event.end_at);
+  const date = (value?: string | null) => value ? value.split('-').reverse().join('/') : '';
+  const startDate = date(snapshot.start_date);
+  const endDate = date(snapshot.end_date);
+  const startTime = snapshot.start_time ?? snapshot.event_time;
+  if (!startDate) return 'Aguardando definição de data na Agenda Fenasoja';
+  const first = `${startDate}${startTime ? `, ${startTime.slice(0, 5)}` : ''}`;
+  const last = `${endDate && endDate !== startDate ? endDate : ''}${snapshot.end_time ? `${endDate && endDate !== startDate ? ', ' : ''}${snapshot.end_time.slice(0, 5)}` : ''}`;
+  return `${first}${last ? ` — ${last}` : ''}${!startTime || !snapshot.end_time ? ' · Horários a definir' : ''}`;
 }
 
 export function formatVenueDateTime(
@@ -1635,6 +1688,16 @@ export function mapVenueError(error: unknown) {
           .join(" ")
       : String(error || "");
   const normalized = message.toUpperCase();
+  if (normalized.includes("CRONOGRAMA_RESTAURANT_PROTECTED"))
+    return "Este pedido já possui uma operação protegida. Regularize a operação no Restaurante antes de alterar seus recursos ou período.";
+  if (normalized.includes("CRONOGRAMA_RESTAURANT_CONFIGURATION_REQUIRED") || normalized.includes("CRONOGRAMA_RESTAURANT_RESPONSIBLE_INVALID"))
+    return "A configuração do responsável pela validação precisa ser revisada na organização antes de continuar.";
+  if (normalized.includes("VENUE_CRONOGRAMA_SOURCE_OWNED") || normalized.includes("VENUE_CRONOGRAMA_SOURCE_FIELDS_READ_ONLY"))
+    return "Título, local, período e solicitante deste pedido pertencem à Agenda Fenasoja. Faça essas alterações no evento original.";
+  if (normalized.includes("VENUE_CRONOGRAMA_HISTORY_REQUIRED"))
+    return "O pedido vinculado precisa preservar seu histórico. Cancele ou exclua o evento original na Agenda Fenasoja, respeitando as operações já confirmadas no Restaurante.";
+  if (normalized.includes("VENUE_CRONOGRAMA_DESIGNATED_APPROVER_REQUIRED"))
+    return "Este pedido precisa ser validado pelo responsável configurado para os encaminhamentos da Agenda Fenasoja.";
   if (normalized.includes("VENUE_OFFLINE_WRITE_BLOCKED"))
     return "Você está sem conexão. Por segurança, nenhuma alteração foi enviada; reconecte-se para continuar.";
   if (

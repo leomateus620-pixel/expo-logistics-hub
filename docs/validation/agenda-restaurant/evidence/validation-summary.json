@@ -1,0 +1,482 @@
+{
+  "reference_commit": "9e3dd24513045a55c861cc2094221ba5738f2cdf",
+  "verified_at": "2026-10-06T03:40:10.0299980-03:00",
+  "typecheck": {
+    "command": "npm run typecheck",
+    "exit_code": 0
+  },
+  "build": {
+    "command": "npm run build",
+    "exit_code": 0,
+    "duration_seconds": 53.18,
+    "warnings": [
+      "Existing large bundle chunks",
+      "Stale Browserslist metadata"
+    ]
+  },
+  "focused_tests": {
+    "files": 11,
+    "total": 104,
+    "passed": 104,
+    "failed": 0,
+    "success": true,
+    "assertions": [
+      {
+        "name": "cronograma-rpc wrappers cronogramaSaveEvent injects request_id and forwards expected_lock_version",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers cronogramaSaveSubevent forwards payload and lock_version",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers cronogramaDeleteSubevent forwards id + version",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers cronogramaReorderSubevents forwards ordered ids",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers maps CRONOGRAMA_NOT_FOUND error to typed CronogramaRpcError",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers maps CRONOGRAMA_CONFLICT (optimistic lock)",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers maps CRONOGRAMA_PERMISSION_DENIED",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers maps CRONOGRAMA_VALIDATION_ERROR",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers maps CRONOGRAMA_RELATIONSHIP_INVALID",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers falls back to CRONOGRAMA_UNKNOWN for unrecognized errors",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers reuses a submission after an uncertain timeout without another source key",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers coalesces duplicate clicks while a save is in flight",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers rejects a different in-flight payload using an explicit submission identity",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers changes request identity when content, version or organization changes",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers explains a missing restaurant configuration without exposing raw details",
+        "status": "passed"
+      },
+      {
+        "name": "cronograma-rpc wrappers success copy distinguishes initial forwarding, update and preserved approval",
+        "status": "passed"
+      },
+      {
+        "name": "adapter da agenda da unidade mantém um único evento canônico com unidades, pessoas e documentos",
+        "status": "passed"
+      },
+      {
+        "name": "adapter da agenda da unidade ignora linhas sem data inicial",
+        "status": "passed"
+      },
+      {
+        "name": "adapter da agenda da unidade keeps the original row revision and explicit location identity for editing",
+        "status": "passed"
+      },
+      {
+        "name": "regras centralizadas de acesso reconhece a unidade proprietária",
+        "status": "passed"
+      },
+      {
+        "name": "regras centralizadas de acesso permite editar a quem pertence a qualquer unidade do evento",
+        "status": "passed"
+      },
+      {
+        "name": "regras centralizadas de acesso restringe ações críticas à unidade proprietária",
+        "status": "passed"
+      },
+      {
+        "name": "regras centralizadas de acesso controla a gestão de documentos pela unidade",
+        "status": "passed"
+      },
+      {
+        "name": "regras centralizadas de acesso mantém eventos internos fora da agenda central",
+        "status": "passed"
+      },
+      {
+        "name": "regras centralizadas de acesso aplica a mesma regra na timeline da Agenda Fenasoja",
+        "status": "passed"
+      },
+      {
+        "name": "formulário da unidade → evento canônico envia a unidade dona como principal e as demais como participantes",
+        "status": "passed"
+      },
+      {
+        "name": "formulário da unidade → evento canônico keeps a new submission source identity and an explicit different location code on replay",
+        "status": "passed"
+      },
+      {
+        "name": "formulário da unidade → evento canônico preserva o mesmo ID ao editar",
+        "status": "passed"
+      },
+      {
+        "name": "formulário da unidade → evento canônico valida período e campos obrigatórios",
+        "status": "passed"
+      },
+      {
+        "name": "local canônico do modo de agenda prioriza o código e rejeita texto semelhante com outro código explícito",
+        "status": "passed"
+      },
+      {
+        "name": "local canônico do modo de agenda aceita somente o nome completo normalizado quando não há código histórico",
+        "status": "passed"
+      },
+      {
+        "name": "local canônico do modo de agenda recorta antes das partições e mantém concluídos e pendências com suas regras próprias",
+        "status": "passed"
+      },
+      {
+        "name": "local canônico do modo de agenda atualiza o recorte ao editar o local, sem inserir registros fora da base autorizada",
+        "status": "passed"
+      },
+      {
+        "name": "controles independentes de modo e busca abre no geral, expõe estado semântico e conserva debounce e limpeza na troca",
+        "status": "passed"
+      },
+      {
+        "name": "controles independentes de modo e busca mantém a edição aberta e informa que o detalhe é de outro local",
+        "status": "passed"
+      },
+      {
+        "name": "posição temporal na troca de local preserva o mês do desktop mesmo quando o novo recorte tem somente outro ano",
+        "status": "passed"
+      },
+      {
+        "name": "posição temporal na troca de local preserva o mês do mobile e suas contagens ficam limitadas ao recorte escolhido",
+        "status": "passed"
+      },
+      {
+        "name": "EventForm — classificação automática classifica Categoria e Tipo a partir do título",
+        "status": "passed"
+      },
+      {
+        "name": "EventForm — classificação automática não toca em Status e Prioridade",
+        "status": "passed"
+      },
+      {
+        "name": "EventForm — classificação automática não reclassifica silenciosamente um evento já salvo",
+        "status": "passed"
+      },
+      {
+        "name": "seletores executivos do cronograma normaliza o prazo e calcula atraso sem depender do status visual",
+        "status": "passed"
+      },
+      {
+        "name": "seletores executivos do cronograma aplica a fórmula auditável e renormaliza o componente sem timestamp",
+        "status": "passed"
+      },
+      {
+        "name": "seletores executivos do cronograma usa presença da fonte para qualidade, sem aceitar fallbacks visuais",
+        "status": "passed"
+      },
+      {
+        "name": "seletores executivos do cronograma posiciona conclusões pelo histórico real e identifica o fallback estimado",
+        "status": "passed"
+      },
+      {
+        "name": "seletores executivos do cronograma detecta mudanças reais, ignora subeventos nas métricas do evento e consolida duplicatas legadas",
+        "status": "passed"
+      },
+      {
+        "name": "seletores executivos do cronograma atribui cada evento somente à comissão primária e expõe participações adicionais",
+        "status": "passed"
+      },
+      {
+        "name": "seletores executivos do cronograma exclui subeventos cancelados do progresso dos grandes eventos",
+        "status": "passed"
+      },
+      {
+        "name": "seletores executivos do cronograma preserva as coleções de entrada durante todos os cálculos",
+        "status": "passed"
+      },
+      {
+        "name": "seletores executivos do cronograma aplica o recorte exato do drill-down antes dos demais filtros",
+        "status": "passed"
+      },
+      {
+        "name": "período canônico de eventos de vários dias calcula duração inclusiva e detecta múltiplos dias",
+        "status": "passed"
+      },
+      {
+        "name": "período canônico de eventos de vários dias normaliza data final inválida para a data inicial",
+        "status": "passed"
+      },
+      {
+        "name": "período canônico de eventos de vários dias sobrepõe intervalos nas bordas e cobre meses atravessados",
+        "status": "passed"
+      },
+      {
+        "name": "período canônico de eventos de vários dias formata o período curto com seta",
+        "status": "passed"
+      },
+      {
+        "name": "uppercase de exibição preserva acentos e ignora valores técnicos",
+        "status": "passed"
+      },
+      {
+        "name": "escopo de planejamento (planilhas anuais) reconhece as três planilhas anuais como material de planejamento",
+        "status": "passed"
+      },
+      {
+        "name": "escopo de planejamento (planilhas anuais) remove os eventos de planilha para quem não é do grupo de planejamento",
+        "status": "passed"
+      },
+      {
+        "name": "escopo de planejamento (planilhas anuais) mantém todos os eventos para Cléo e Zélia (grupo de planejamento)",
+        "status": "passed"
+      },
+      {
+        "name": "escopo de planejamento (planilhas anuais) não deixa nenhum evento de planilha ser reinserido no auto-seed",
+        "status": "passed"
+      },
+      {
+        "name": "escopo de planejamento (planilhas anuais) keeps historical Center events visible without automatically forwarding them",
+        "status": "passed"
+      },
+      {
+        "name": "escopo de planejamento (planilhas anuais) uses canonical location rules before automatic seeding, respecting an explicit different code",
+        "status": "passed"
+      },
+      {
+        "name": "submissão da Agenda para o Restaurante retains a new source identity and filled fields through retries and correction",
+        "status": "passed"
+      },
+      {
+        "name": "submissão da Agenda para o Restaurante shows forwarding guidance for the exact canonical Center and preserves an explicit different code",
+        "status": "passed"
+      },
+      {
+        "name": "submissão da Agenda para o Restaurante keeps the edited form version so a background refresh cannot mask a concurrent edit",
+        "status": "passed"
+      },
+      {
+        "name": "janela semanal vai de segunda a sexta da semana atual",
+        "status": "passed"
+      },
+      {
+        "name": "janela semanal inclui o fim de semana quando configurado",
+        "status": "passed"
+      },
+      {
+        "name": "janela semanal marca sexta-feira como fechamento da semana",
+        "status": "passed"
+      },
+      {
+        "name": "vínculo com o usuário reconhece responsável relacional por id",
+        "status": "passed"
+      },
+      {
+        "name": "vínculo com o usuário reconhece participante pelo nome, sem acento",
+        "status": "passed"
+      },
+      {
+        "name": "vínculo com o usuário reconhece responsável textual",
+        "status": "passed"
+      },
+      {
+        "name": "vínculo com o usuário ignora eventos de terceiros",
+        "status": "passed"
+      },
+      {
+        "name": "duração calcula intervalo simples",
+        "status": "passed"
+      },
+      {
+        "name": "duração trata virada de meia-noite sem valor negativo",
+        "status": "passed"
+      },
+      {
+        "name": "duração não inventa duração sem hora final",
+        "status": "passed"
+      },
+      {
+        "name": "duração formata horas e minutos",
+        "status": "passed"
+      },
+      {
+        "name": "resumo semanal agrega apenas eventos elegíveis, sem duplicar",
+        "status": "passed"
+      },
+      {
+        "name": "resumo semanal conta evento sem duração informada",
+        "status": "passed"
+      },
+      {
+        "name": "resumo semanal retorna vazio para usuário sem eventos",
+        "status": "passed"
+      },
+      {
+        "name": "resumo semanal usa rótulo de fechamento na sexta-feira",
+        "status": "passed"
+      },
+      {
+        "name": "solicitações preliminares de espaço aceita data pendente sem criar ocupação ou datas artificiais",
+        "status": "passed"
+      },
+      {
+        "name": "solicitações preliminares de espaço exige período completo em uma solicitação já agendada",
+        "status": "passed"
+      },
+      {
+        "name": "solicitações preliminares de espaço preserves partial source dates without inventing hours in a linked request",
+        "status": "passed"
+      },
+      {
+        "name": "solicitações preliminares de espaço keeps server source fields unchanged while editing linked operational data",
+        "status": "passed"
+      },
+      {
+        "name": "solicitações preliminares de espaço requires the linked responsible and approval permission without changing ordinary approvals",
+        "status": "passed"
+      },
+      {
+        "name": "erros operacionais identifica migration ausente pelos campos estruturados do PostgREST",
+        "status": "passed"
+      },
+      {
+        "name": "erros operacionais traduz invariants de compromisso, stakeholder e espaço",
+        "status": "passed"
+      },
+      {
+        "name": "conflitos e políticas de ocupação considera montagem e desmontagem, mas permite intervalos adjacentes",
+        "status": "passed"
+      },
+      {
+        "name": "conflitos e políticas de ocupação detecta bloqueios ativos e ignora eventos sem efeito de reserva",
+        "status": "passed"
+      },
+      {
+        "name": "conflitos e políticas de ocupação não trata capacidade, tipo de evento, montagem ou horário padrão como conflito",
+        "status": "passed"
+      },
+      {
+        "name": "consumo de contrapartidas calcula unidades por evento, hora, turno, dia, capacidade e valor explícito",
+        "status": "passed"
+      },
+      {
+        "name": "consumo de contrapartidas ignora no-show sem consumo de franquia e nunca debita cancelamentos",
+        "status": "passed"
+      },
+      {
+        "name": "consumo de contrapartidas consome a franquia do no-show quando a política do acordo determina",
+        "status": "passed"
+      },
+      {
+        "name": "prontidão operacional conta somente checklist pré-evento e recursos efetivamente finalizados",
+        "status": "passed"
+      },
+      {
+        "name": "relatórios e fuso horário agrega apenas o período solicitado, por espaço, status e patrocinador",
+        "status": "passed"
+      },
+      {
+        "name": "relatórios e fuso horário mantém o horário civil de São Paulo no payload e ao reeditar",
+        "status": "passed"
+      },
+      {
+        "name": "commission event form presentation keeps failed creation fields and its source identity for a safe retry",
+        "status": "passed"
+      },
+      {
+        "name": "commission event form presentation keeps equal names as distinct identities and preserves the first responsible through search and editing",
+        "status": "passed"
+      },
+      {
+        "name": "commission event form presentation removes only the chosen ID, appends a reselected person and keeps the required workspace separate",
+        "status": "passed"
+      },
+      {
+        "name": "commission event form presentation retains saved selections absent from current options and never resets fields when a selector opens",
+        "status": "passed"
+      },
+      {
+        "name": "commission event form presentation shows errors beside fields without changing existing submit eligibility or adding an upload interaction",
+        "status": "passed"
+      },
+      {
+        "name": "commission event form presentation closes a selector with Escape without dismissing the sheet and returns focus after removing selections",
+        "status": "passed"
+      },
+      {
+        "name": "commission event form presentation returns focus to the external opener when the controlled sheet closes",
+        "status": "passed"
+      },
+      {
+        "name": "commission event form presentation keeps focus in the edit form during the detail transition and returns to the original page opener",
+        "status": "passed"
+      },
+      {
+        "name": "commission event form presentation shows an existing completed status without enabling additional selectable states or changing the draft",
+        "status": "passed"
+      },
+      {
+        "name": "commission event form presentation selects with Enter from a search result without submitting the event",
+        "status": "passed"
+      }
+    ]
+  },
+  "lint": {
+    "scope": "All changed TypeScript source files and new source files",
+    "errors": 0,
+    "warnings": 4
+  },
+  "browser": {
+    "checks": 58,
+    "passed": 58,
+    "widths": [
+      1366,
+      768,
+      390,
+      320
+    ],
+    "runtime_errors": 0,
+    "external_writes_attempted": 0,
+    "harness": "Synthetic dataset; actual components and styles; intercepted external reads"
+  },
+  "database": {
+    "assertions": 65,
+    "concurrency_checks": 7,
+    "engine": "PostgreSQL 16.15",
+    "isolated": true,
+    "migration_apply_count": 2,
+    "report": "database-report.json"
+  },
+  "inherited_tests": {
+    "seed_count_failures": 2,
+    "timeline_failures": 12,
+    "dashboard_failures": 1,
+    "full_suite_claimed_green": false
+  },
+  "environment_dependencies": [
+    "Authorized migration application",
+    "Verified Roque account UUID and organization membership",
+    "Existing approval/access permissions and Restaurant booking unit",
+    "Authenticated remote RLS and notifications/Google delivery",
+    "Physical device coverage"
+  ],
+  "remote_writes": false
+}

@@ -19,6 +19,25 @@ export interface UnitMetrics {
 }
 
 const EMPTY_METRICS: UnitMetrics = { total: 0, upcoming: 0, completed: 0, inMonth: 0, documents: 0 };
+const EMPTY_AGENDA_ROWS: UnitAgendaRow[] = [];
+
+interface UnitMetricsRpcRow {
+  total?: number | null;
+  upcoming?: number | null;
+  completed?: number | null;
+  in_month?: number | null;
+  documents?: number | null;
+}
+
+interface UnitAgendaRpcResult<T> {
+  data: T | null;
+  error: { message: string; code?: string } | null;
+}
+
+const unitAgendaRpc = supabase as unknown as {
+  rpc(name: 'cronograma_unit_agenda', args: { _commission_id: string | null }): PromiseLike<UnitAgendaRpcResult<UnitAgendaRow[]>>;
+  rpc(name: 'cronograma_unit_metrics', args: { _commission_id: string | null }): PromiseLike<UnitAgendaRpcResult<UnitMetricsRpcRow | UnitMetricsRpcRow[]>>;
+};
 
 /**
  * Resolve o identificador do catálogo oficial (ex.: `mercosul`) para o
@@ -81,11 +100,11 @@ export function useUnitAgenda(entryId: string | null | undefined) {
     enabled: Boolean(orgId && commissionId),
     staleTime: 30_000,
     queryFn: async (): Promise<UnitAgendaRow[]> => {
-      const { data, error } = await (supabase as any).rpc('cronograma_unit_agenda', {
+      const { data, error } = await unitAgendaRpc.rpc('cronograma_unit_agenda', {
         _commission_id: commissionId,
       });
       if (error) throw error;
-      return (data ?? []) as UnitAgendaRow[];
+      return data ?? EMPTY_AGENDA_ROWS;
     },
   });
 
@@ -94,7 +113,7 @@ export function useUnitAgenda(entryId: string | null | undefined) {
     enabled: Boolean(orgId && commissionId),
     staleTime: 30_000,
     queryFn: async (): Promise<UnitMetrics> => {
-      const { data, error } = await (supabase as any).rpc('cronograma_unit_metrics', {
+      const { data, error } = await unitAgendaRpc.rpc('cronograma_unit_metrics', {
         _commission_id: commissionId,
       });
       if (error) throw error;
@@ -110,13 +129,15 @@ export function useUnitAgenda(entryId: string | null | undefined) {
     },
   });
 
-  const rows = agendaQuery.data ?? [];
+  const rows = agendaQuery.data ?? EMPTY_AGENDA_ROWS;
   const events = useMemo(() => toUnitAgendaEvents(rows, { resolveUnit }), [rows, resolveUnit]);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['unit-agenda', orgId, commissionId] });
     queryClient.invalidateQueries({ queryKey: ['unit-metrics', orgId, commissionId] });
     queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+    queryClient.invalidateQueries({ queryKey: ['venue-operations', orgId] });
+    queryClient.invalidateQueries({ queryKey: ['restaurant-event-alert', orgId] });
   };
 
   return {

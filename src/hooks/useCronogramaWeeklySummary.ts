@@ -4,9 +4,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { cronogramaEventsQueryKey, fetchCronogramaDatasetForOrg } from '@/hooks/useCronogramaEventos';
 import { buildWeeklySummary, type WeeklySummary } from '@/lib/cronograma-weekly-summary';
+import { filterCronogramaAgendaMode } from '@/lib/cronograma-agenda-mode';
+import { useCronogramaAgendaMode } from '@/components/cronograma-eventos/CronogramaAgendaModeContext';
 
 export function useCronogramaWeeklySummary() {
   const { user } = useAuth();
+  const agendaMode = useCronogramaAgendaMode()?.mode ?? 'general';
   const { orgId, membership } = useCurrentOrg();
 
   const query = useQuery({
@@ -24,8 +27,8 @@ export function useCronogramaWeeklySummary() {
     ?? null;
 
   const summary: WeeklySummary = useMemo(
-    () => buildWeeklySummary(query.data?.events ?? [], { userId: user?.id ?? null, displayName }),
-    [displayName, query.data, user?.id],
+    () => buildWeeklySummary(filterCronogramaAgendaMode(query.data?.events ?? [], agendaMode), { userId: user?.id ?? null, displayName }),
+    [agendaMode, displayName, query.data, user?.id],
   );
 
   return {

@@ -31,6 +31,7 @@ import { formatLongDate, formatLongDateRange } from '../dateUtils';
 import { formatEventDurationLabel, formatEventPeriod } from '@/lib/cronograma-event-period';
 import { getEventOperationalLines } from '@/lib/cronograma-event-details';
 import { EventForm } from '../EventForm';
+import { CronogramaAgendaModeNotice } from '../CronogramaAgendaModeNotice';
 import { splitEventResponsibles } from '../EventRelationFields';
 import type { CronogramaEvent, CronogramaHistoryEntry } from '../types';
 import { EventoAnexosSection } from '../EventoAnexosSection';
@@ -273,7 +274,7 @@ export function MobileEventScreen({
         open={open}
         title={event.title}
         description={editMode ? `Formulário de edição de ${event.title}.` : event.summary}
-        headerContent={headerContent}
+        headerContent={<>{headerContent}<CronogramaAgendaModeNotice event={event} /></>}
         onRequestClose={() => {
           if (!saving) overlayHistory.requestClose();
         }}

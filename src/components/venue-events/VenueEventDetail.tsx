@@ -68,6 +68,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/useAuth";
+import { useCapabilities } from "@/hooks/useCapabilities";
 import {
   createVenueDocumentUrl,
   useVenueEventDetail,
@@ -91,9 +92,11 @@ import {
   formatQuantity,
   formatVenueDateTime,
   formatVenuePeriod,
+  formatVenueEventPeriod,
   getSpaceNames,
   getStakeholderName,
   mapVenueError,
+  canReviewCronogramaVenueEvent,
   type VenueEvent,
   type VenueEventResource,
   type VenueMember,
@@ -565,6 +568,7 @@ export function VenueEventDetail({
   }) => Promise<unknown>;
 }) {
   const { user } = useAuth();
+  const { hasCapability } = useCapabilities();
   const detailQuery = useVenueEventDetail(
     event?.id ?? null,
     permissions.venue_events_audit_view,
@@ -732,22 +736,25 @@ export function VenueEventDetail({
 
   if (!event) return null;
 
+  const linkedToCronograma = Boolean(event.cronograma_source_event_id);
+  const canReview = canReviewCronogramaVenueEvent(event, user?.id, permissions.venue_events_approve);
+
   const possibleActions: TransitionName[] = [];
   if (
     ["rascunho", "pendente_informacoes", "reprogramado"].includes(
       event.status,
     ) &&
-    (isOwner || permissions.venue_events_manage)
+    !linkedToCronograma && (isOwner || permissions.venue_events_manage)
   )
     possibleActions.push("submit");
   if (
     ["solicitado", "reprogramado"].includes(event.status) &&
-    permissions.venue_events_approve
+    canReview
   )
     possibleActions.push("start_review");
   if (
     ["solicitado", "em_analise", "reprogramado"].includes(event.status) &&
-    permissions.venue_events_approve &&
+    canReview &&
     !event.pending_date
   )
     possibleActions.push("approve");
@@ -766,7 +773,7 @@ export function VenueEventDetail({
     possibleActions.push("unblock_request");
   if (
     event.status === "aprovado" &&
-    (permissions.venue_events_approve || permissions.venue_events_manage)
+    (linkedToCronograma ? canReview : (permissions.venue_events_approve || permissions.venue_events_manage))
   )
     possibleActions.push("confirm");
   if (event.status === "confirmado" && permissions.venue_operations_manage)
@@ -797,7 +804,7 @@ export function VenueEventDetail({
   const primaryAction = possibleActions[0] ?? null;
   const secondaryActions = possibleActions.slice(1);
   const canDelete = Boolean(
-    permissions.venue_events_manage && typeof onDelete === "function",
+    !linkedToCronograma && permissions.venue_events_manage && typeof onDelete === "function",
   );
 
   const executeDelete = async () => {
@@ -1051,7 +1058,7 @@ export function VenueEventDetail({
               </div>
               <SheetTitle>{event.title}</SheetTitle>
               <SheetDescription>
-                {formatVenuePeriod(event.start_at, event.end_at)} ·{" "}
+                {formatVenueEventPeriod(event)} ·{" "}
                 {getSpaceNames(
                   event.id,
                   workspace.allocations,
@@ -1064,6 +1071,11 @@ export function VenueEventDetail({
                 {event.executive_description}
               </p>
             )}
+            {linkedToCronograma && <div className="venue-inline-alert" role="note">
+              <strong>Origem: Agenda Fenasoja</strong>
+              <span>Solicitado por {event.requester_name}. {event.approval_status === 'pendente' ? 'Aguardando validação do responsável configurado.' : `Aprovação: ${event.approval_status}.`} Título, período e local são mantidos pelo evento original.</span>
+              {hasCapability('cronograma_eventos_access') && <a className="underline underline-offset-4" href={`/cronograma-eventos?event=${encodeURIComponent(event.cronograma_source_event_id!)}&mode=view`}>Abrir evento original na Agenda Fenasoja</a>}
+            </div>}
           </div>
 
 
@@ -1085,7 +1097,7 @@ export function VenueEventDetail({
                   <DetailFact
                     icon={CalendarClock}
                     label="Período"
-                    value={formatVenuePeriod(event.start_at, event.end_at)}
+                    value={formatVenueEventPeriod(event)}
                   />
                   <DetailFact
                     icon={MapPin}

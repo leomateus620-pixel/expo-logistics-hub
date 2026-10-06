@@ -10,6 +10,7 @@ import { CronogramaCycleSlotProvider, CronogramaCycleSlotTarget } from '@/compon
 import { CronogramaFiltersTrigger } from '@/components/cronograma-eventos/CronogramaFiltersTrigger';
 import { CronogramaSideNav } from '@/components/cronograma-eventos/CronogramaSideNav';
 import { useCronogramaSearch } from '@/components/cronograma-eventos/CronogramaSearchContext';
+import { useCronogramaAgendaMode } from '@/components/cronograma-eventos/CronogramaAgendaModeContext';
 import { useCronogramaShell } from '@/components/cronograma-eventos/CronogramaShellContext';
 
 import {
@@ -69,6 +70,8 @@ import {
   type CronogramaCycleYear,
 } from '@/lib/cronograma-cycle';
 import { isVisibleInCentralTimeline } from '@/lib/cronograma-eventos';
+import { filterCronogramaAgendaMode } from '@/lib/cronograma-agenda-mode';
+import { cronogramaSaveSuccessMessage } from '@/lib/cronograma-rpc';
 import type { CronogramaEvent as SourceCronogramaEvent } from '@/lib/cronograma-eventos';
 import type { DashboardDrilldown } from '@/lib/cronograma-dashboard-selectors';
 import {
@@ -146,6 +149,7 @@ export default function CronogramaEventosPage() {
   const todayKey = useCurrentCronogramaDay();
   const [filters, setFilters] = useState<CronogramaFilters>(emptyFilters);
   const headerSearch = useCronogramaSearch();
+  const agendaMode = useCronogramaAgendaMode()?.mode ?? 'general';
   const headerQuery = headerSearch?.query ?? '';
   useEffect(() => {
     setFilters((current) => (current.query === headerQuery ? current : { ...current, query: headerQuery }));
@@ -211,9 +215,13 @@ export default function CronogramaEventosPage() {
     () => cronograma.events.map((event) => adaptCronogramaEvent(event, todayKey)),
     [cronograma.events, todayKey],
   );
-  const events = useMemo(
+  const allAuthorizedEvents = useMemo(
     () => mergeHarvestCompletionSnapshots(persistedEvents, harvestCompletion.jobs),
     [harvestCompletion.jobs, persistedEvents],
+  );
+  const events = useMemo(
+    () => filterCronogramaAgendaMode(allAuthorizedEvents, agendaMode),
+    [allAuthorizedEvents, agendaMode],
   );
   const eventBuckets = useMemo(
     () => partitionCronogramaEvents(events, todayKey),
@@ -486,10 +494,11 @@ export default function CronogramaEventosPage() {
     if (cronograma.isLoading) return;
     const current = selectedEvent?.sourceKey ?? selectedEvent?.id;
     if (drawerOpen && current === deepLinkEvent) return;
-    const match = events.find((event) => event.id === deepLinkEvent || event.sourceKey === deepLinkEvent);
+    // Authorized direct links remain usable; an out-of-mode detail carries an explicit notice.
+    const match = allAuthorizedEvents.find((event) => event.id === deepLinkEvent || event.sourceKey === deepLinkEvent);
     if (!match) return;
     openEvent(match, deepLinkMode === 'edit');
-  }, [cronograma.isLoading, deepLinkEvent, deepLinkMode, drawerOpen, events, openEvent, selectedEvent]);
+  }, [allAuthorizedEvents, cronograma.isLoading, deepLinkEvent, deepLinkMode, drawerOpen, openEvent, selectedEvent]);
 
 
   const openWorkspace = useCallback((event: CronogramaEvent) => {
@@ -613,10 +622,12 @@ export default function CronogramaEventosPage() {
         updates: visualEventToSourceUpdates(nextEvent, sourceEvent),
       });
       setSelectedEvent(adaptCronogramaEvent(updated, todayKey));
+      if (updated.restaurantForwarding) toast.success(cronogramaSaveSuccessMessage(updated));
       return;
     }
     const created = await cronograma.create.mutateAsync(visualEventToDraft(nextEvent));
     setSelectedEvent(adaptCronogramaEvent(created, todayKey));
+    if (created.restaurantForwarding) toast.success(cronogramaSaveSuccessMessage(created));
   };
 
   const handleDeleteEvent = async (event: CronogramaEvent) => {
@@ -624,7 +635,10 @@ export default function CronogramaEventosPage() {
       || (event.sourceKey ? sourceById.get(event.sourceKey) : undefined);
     const targetId = sourceEvent?.id ?? event.id;
     try {
-      await cronograma.deleteEvent.mutateAsync(targetId);
+      await cronograma.deleteEvent.mutateAsync({
+        id: targetId,
+        expectedLockVersion: event.lockVersion ?? sourceEvent?.lockVersion,
+      });
       setSelectedEvent(null);
       toast.success('Evento excluído.', {
         description: `${event.title} foi removido do cronograma e da agenda dos usuários conectados.`,
@@ -852,11 +866,11 @@ export default function CronogramaEventosPage() {
   };
 
   const prepareNewEvent = (event: CronogramaEvent) => {
-    const id = `custom-${Date.now()}`;
+    const id = event.id || `custom-${crypto.randomUUID()}`;
     return {
       ...event,
       id,
-      sourceKey: `manual-${id}`,
+      sourceKey: event.sourceKey ?? `manual-${id}`,
       isOfficial: false,
       isMain: false,
     };
@@ -867,6 +881,7 @@ export default function CronogramaEventosPage() {
     cronograma.create.mutate(visualEventToDraft(nextEvent), {
       onSuccess: (sourceEvent) => {
         const createdEvent = adaptCronogramaEvent(sourceEvent, todayKey);
+        if (sourceEvent.restaurantForwarding) toast.success(cronogramaSaveSuccessMessage(sourceEvent));
         overlayOpenRef.current.create = false;
         setCreateOpen(false);
         openEvent(createdEvent);
@@ -877,6 +892,7 @@ export default function CronogramaEventosPage() {
   const handleMobileCreate = async (event: CronogramaEvent) => {
     const created = await cronograma.create.mutateAsync(visualEventToDraft(prepareNewEvent(event)));
     const createdEvent = adaptCronogramaEvent(created, todayKey);
+    if (created.restaurantForwarding) toast.success(cronogramaSaveSuccessMessage(created));
     setPendingCreatedEvent(createdEvent);
   };
 
@@ -907,6 +923,12 @@ export default function CronogramaEventosPage() {
   const preferredCalendarYear = filters.year === 'all' ? undefined : filters.year;
   const operationalContent = (
     <>
+      {agendaMode === 'volunteers' && (
+        <div className="cronograma-agenda-scope" role="status">
+          <span> Sala dos Voluntários</span>
+          <small>Eventos do local, com os filtros atuais.</small>
+        </div>
+      )}
       <p className="sr-only" aria-live="polite">
         {filteredEvents.length} de {eventsForView.length} eventos exibidos na visão atual.
       </p>
@@ -948,7 +970,7 @@ export default function CronogramaEventosPage() {
         </div>
       )}
 
-      {cronograma.isLoading && events.length === 0 ? (
+      {cronograma.isLoading && allAuthorizedEvents.length === 0 ? (
         <CronogramaTimelineSkeleton />
       ) : (
         <ViewContentTransition
@@ -984,6 +1006,7 @@ export default function CronogramaEventosPage() {
                 requestedYear={requestedTimelineYear}
                 requestedMonth={requestedTimelineMonth}
                 temporalFocusKey={mobileFocusKey}
+                datasetScopeKey={agendaMode}
                 preferredTemporalYear={preferredTemporalYear}
                 onPositionChange={handleTimelinePositionChange}
                 todayKey={todayKey}
@@ -1001,6 +1024,7 @@ export default function CronogramaEventosPage() {
                 requestedYear={requestedTimelineYear}
                 requestedMonth={requestedTimelineMonth}
                 temporalFocusKey={temporalFocusKey}
+                datasetScopeKey={agendaMode}
                 preferredTemporalYear={preferredTemporalYear}
                 onPositionChange={handleTimelinePositionChange}
                 todayKey={todayKey}
@@ -1020,6 +1044,7 @@ export default function CronogramaEventosPage() {
                 requestedYear={requestedTimelineYear}
                 requestedMonth={requestedTimelineMonth}
                 temporalFocusKey={mobileFocusKey}
+                datasetScopeKey={agendaMode}
                 preferredTemporalYear={preferredTemporalYear}
                 onPositionChange={handleTimelinePositionChange}
                 todayKey={todayKey}
@@ -1036,6 +1061,7 @@ export default function CronogramaEventosPage() {
                 requestedYear={requestedTimelineYear}
                 requestedMonth={requestedTimelineMonth}
                 temporalFocusKey={temporalFocusKey}
+                datasetScopeKey={agendaMode}
                 preferredTemporalYear={preferredTemporalYear}
                 onPositionChange={handleTimelinePositionChange}
                 todayKey={todayKey}
@@ -1071,6 +1097,7 @@ export default function CronogramaEventosPage() {
       id="cronograma-main"
       className={`cronograma-page min-h-screen ${workspaceIdentity ? '' : 'pb-10'}`}
       data-presentation={contentIsMobilePresentation ? 'mobile' : 'desktop'}
+      data-agenda-mode={agendaMode}
     >
       <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {completionAnnouncement}

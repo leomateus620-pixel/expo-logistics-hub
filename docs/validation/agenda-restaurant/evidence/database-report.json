@@ -1,0 +1,34 @@
+{
+  "engine": "PostgreSQL 16.15",
+  "boundary": "Synthetic isolated loopback database; no remote writes",
+  "fixture": "scripts/agenda-restaurant/db-fixture.sql",
+  "migration": "supabase/migrations/20261006120000_cronograma_restaurant_bridge.sql",
+  "migration_apply_count": 2,
+  "test": "supabase/tests/cronograma_restaurant_bridge.test.sql",
+  "assertions": 65,
+  "exit_code": 0,
+  "run": "agenda-restaurant-20261006-033631",
+  "concurrency_checks": 7,
+  "files": [
+    {
+      "path": "scripts/agenda-restaurant/db-fixture.sql",
+      "sha256": "08e8d3baef1e1963f12043574b8a0521d953f989d7fd8e8950a45c7f01d3b7b3"
+    },
+    {
+      "path": "scripts/agenda-restaurant/unit-fixture.sql",
+      "sha256": "db826829a8e9376d965c6eb812c633d5f823a0a35d8f5293285f95bcf0af77c8"
+    },
+    {
+      "path": "supabase/migrations/20261006120000_cronograma_restaurant_bridge.sql",
+      "sha256": "94a85ccf6175fc78ae3285220bbba5d91cec48e6534207946f00bea414ca03d3"
+    },
+    {
+      "path": "supabase/tests/cronograma_restaurant_bridge.test.sql",
+      "sha256": "960c96e88aa62819eeca3225e6d8c0a939455ae30124cb31f33f00c9261e2d41"
+    },
+    {
+      "path": "scripts/agenda-restaurant/db-concurrency.cjs",
+      "sha256": "8fcbe8913512fc4cf414686f02eb8ea7afa71ea751789c695d0cbdb9fb88b19d"
+    }
+  ]
+}
