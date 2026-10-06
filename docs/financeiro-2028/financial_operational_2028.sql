@@ -362,7 +362,7 @@ DECLARE
   before jsonb; after jsonb; cap text := 'financial_edit';
   b public.financial_budgets; l public.financial_budget_lines; r public.financial_revenues;
   s public.financial_sponsorships; c public.financial_categories; f public.financial_custom_fields;
-  o public.financial_obligations; current_version integer;
+  o public.financial_obligations; current_version integer; src jsonb; stype text; sid uuid;
 BEGIN
   IF _entity NOT IN ('budget','budget_line','revenue','sponsorship','category','custom_field','obligation') THEN
     RAISE EXCEPTION 'FINANCIAL_ENTITY_INVALID' USING ERRCODE = '22023';
@@ -578,11 +578,45 @@ BEGIN
       SELECT * INTO o FROM public.financial_obligations WHERE org_id=_org_id AND id=rec_id FOR UPDATE;
       IF NOT FOUND THEN RAISE EXCEPTION 'FINANCIAL_NOT_FOUND' USING ERRCODE='P0002'; END IF;
       edition := o.edition_id; before := to_jsonb(o);
+      -- Vínculo e sentido são imutáveis depois de criados.
+      IF (_payload ? 'source_type' AND _payload->>'source_type' IS DISTINCT FROM o.source_type)
+        OR (_payload ? 'source_id' AND nullif(_payload->>'source_id','')::uuid IS DISTINCT FROM o.source_id)
+        OR (_payload ? 'direction' AND _payload->>'direction' IS DISTINCT FROM o.direction) THEN
+        RAISE EXCEPTION 'FINANCIAL_SOURCE_IMMUTABLE' USING ERRCODE='22023';
+      END IF;
     END IF;
     PERFORM public.financial_require_operational(_org_id, edition);
+    stype := coalesce(o.source_type, _payload->>'source_type', 'manual');
+    sid := coalesce(o.source_id, nullif(_payload->>'source_id','')::uuid);
+    IF stype = 'manual' AND sid IS NOT NULL THEN RAISE EXCEPTION 'FINANCIAL_SOURCE_INVALID' USING ERRCODE='22023'; END IF;
+  END IF;
+  IF _entity = 'obligation' AND stype <> 'manual' THEN
+    -- Obrigação vinculada: origem validada e bloqueada, valor derivado, uma por fato financeiro.
+    src := public.financial_resolve_source(_org_id, edition, stype, sid);
+    IF NOT (src->>'active')::boolean THEN RAISE EXCEPTION 'FINANCIAL_SOURCE_NOT_EXECUTED' USING ERRCODE='23514'; END IF;
+    IF _payload ? 'amount_cents' AND (_payload->>'amount_cents')::bigint IS DISTINCT FROM (src->>'amount_cents')::bigint THEN
+      RAISE EXCEPTION 'FINANCIAL_AMOUNT_DERIVED' USING ERRCODE='22023';
+    END IF;
+    IF _payload ? 'direction' AND _payload->>'direction' IS DISTINCT FROM src->>'direction' THEN
+      RAISE EXCEPTION 'FINANCIAL_DIRECTION_MISMATCH' USING ERRCODE='22023';
+    END IF;
+    IF _payload->>'status' = 'cancelada' THEN RAISE EXCEPTION 'FINANCIAL_SOURCE_MANAGED' USING ERRCODE='22023'; END IF;
+    IF o.id IS NOT NULL AND _expected_version IS NOT NULL AND _expected_version IS DISTINCT FROM o.version THEN
+      RAISE EXCEPTION 'FINANCIAL_CONFLICT' USING ERRCODE='40001';
+    END IF;
+    SELECT * INTO o FROM public.financial_obligations WHERE source_type=stype AND source_id=sid FOR UPDATE;
+    IF FOUND THEN
+      PERFORM public.financial_reconcile_obligation(o.id, actor); -- abaixo do quitado: só marca inconsistência
+    ELSE
+      PERFORM public.financial_sync_source_obligation(_org_id, edition, src->>'direction', stype, sid, src->>'description',
+        (src->>'amount_cents')::bigint, (src->>'due_date')::date, true, actor);
+    END IF;
+    SELECT * INTO o FROM public.financial_obligations WHERE source_type=stype AND source_id=sid;
+    rec_id := o.id; after := to_jsonb(o);
+  ELSIF _entity = 'obligation' THEN
     IF rec_id IS NULL THEN
       INSERT INTO public.financial_obligations(org_id,edition_id,direction,source_type,source_id,description,amount_cents,due_date,created_by,updated_by)
-      VALUES(_org_id,edition,_payload->>'direction',coalesce(_payload->>'source_type','manual'),nullif(_payload->>'source_id','')::uuid,
+      VALUES(_org_id,edition,_payload->>'direction','manual',NULL,
         btrim(_payload->>'description'),(_payload->>'amount_cents')::bigint,(_payload->>'due_date')::date,actor,actor) RETURNING * INTO o;
     ELSE
       IF _expected_version IS DISTINCT FROM o.version THEN RAISE EXCEPTION 'FINANCIAL_CONFLICT' USING ERRCODE='40001'; END IF;
@@ -1031,3 +1065,212 @@ REVOKE ALL ON FUNCTION public.financial_save_expense(uuid,jsonb,integer,uuid,tex
   public.financial_edition_summary(uuid,uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.financial_save_expense(uuid,jsonb,integer,uuid,text), public.financial_budget_execution(uuid,uuid),
   public.financial_edition_summary(uuid,uuid) TO authenticated;
+
+-- ================================================================ origem validada e estornos por saldo líquido
+-- Valida e bloqueia a origem de uma obrigação; devolve estado e valor derivados.
+CREATE OR REPLACE FUNCTION public.financial_resolve_source(_org_id uuid, _edition_id uuid, _source_type text, _source_id uuid)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE r public.financial_revenues; s public.financial_sponsorships; e public.expenses; ok boolean;
+  inst record;
+BEGIN
+  IF _source_id IS NULL THEN RAISE EXCEPTION 'FINANCIAL_SOURCE_INVALID' USING ERRCODE='22023'; END IF;
+  IF _source_type = 'receita' THEN
+    SELECT * INTO r FROM public.financial_revenues WHERE id=_source_id FOR SHARE;
+    IF NOT FOUND OR r.org_id <> _org_id OR r.edition_id <> _edition_id THEN RAISE EXCEPTION 'FINANCIAL_SOURCE_INVALID' USING ERRCODE='22023'; END IF;
+    RETURN jsonb_build_object('active', r.status='confirmada' AND coalesce(r.confirmed_cents,0) > 0, 'amount_cents', r.confirmed_cents,
+      'due_date', r.due_date, 'description', r.description, 'direction', 'receber');
+  ELSIF _source_type = 'patrocinio' THEN
+    SELECT * INTO s FROM public.financial_sponsorships WHERE id=_source_id FOR SHARE;
+    IF NOT FOUND OR s.org_id <> _org_id OR s.edition_id <> _edition_id THEN RAISE EXCEPTION 'FINANCIAL_SOURCE_INVALID' USING ERRCODE='22023'; END IF;
+    RETURN jsonb_build_object('active', s.negotiation_status <> 'cancelado' AND s.confirmed_free_cents + s.confirmed_rouanet_cents > 0,
+      'amount_cents', s.confirmed_free_cents + s.confirmed_rouanet_cents, 'due_date', s.due_date, 'description', 'Patrocínio · '||s.name, 'direction', 'receber');
+  ELSIF _source_type = 'despesa' THEN
+    SELECT * INTO e FROM public.expenses WHERE id=_source_id FOR SHARE;
+    IF NOT FOUND OR e.org_id <> _org_id OR e.financial_edition_id IS DISTINCT FROM _edition_id THEN RAISE EXCEPTION 'FINANCIAL_SOURCE_INVALID' USING ERRCODE='22023'; END IF;
+    RETURN jsonb_build_object('active', e.financial_status='realizada', 'amount_cents', e.committed_cents,
+      'due_date', e.financial_due_date, 'description', e.title, 'direction', 'pagar');
+  ELSIF _source_type = 'parcela_comercial' THEN
+    -- O mapa comercial atende apenas a edição operacional 2028 da organização.
+    SELECT i.id, i.amount, i.due_date, i.payment_status, i.installment_number, so.status order_status, mp.org_id
+      INTO inst
+      FROM public.lot_sale_installments i JOIN public.lot_sale_orders so ON so.id = i.order_id
+      JOIN public.map_projects mp ON mp.id = so.project_id
+      WHERE i.id=_source_id FOR SHARE OF i;
+    SELECT EXISTS (SELECT 1 FROM public.financial_editions WHERE id=_edition_id AND org_id=_org_id AND code=2028) INTO ok;
+    IF inst.id IS NULL OR inst.org_id <> _org_id OR NOT ok THEN RAISE EXCEPTION 'FINANCIAL_SOURCE_INVALID' USING ERRCODE='22023'; END IF;
+    RETURN jsonb_build_object('active', inst.payment_status <> 'CANCELLED' AND inst.order_status NOT IN ('REVERTED','CANCELLED') AND inst.amount > 0,
+      'amount_cents', round(inst.amount*100)::bigint, 'due_date', inst.due_date,
+      'description', 'Parcela comercial '||inst.installment_number, 'direction', 'receber');
+  END IF;
+  RAISE EXCEPTION 'FINANCIAL_SOURCE_INVALID' USING ERRCODE='22023';
+END $$;
+
+-- Upsert concorrente seguro: uma obrigação por origem, mesmo com retries simultâneos.
+CREATE OR REPLACE FUNCTION public.financial_sync_source_obligation(_org_id uuid, _edition_id uuid, _direction text,
+  _source_type text, _source_id uuid, _description text, _amount_cents bigint, _due_date date, _active boolean, _actor uuid)
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE o public.financial_obligations; settled bigint := 0;
+BEGIN
+  IF _active AND coalesce(_amount_cents,0) > 0 THEN
+    INSERT INTO public.financial_obligations(org_id,edition_id,direction,source_type,source_id,description,amount_cents,due_date,created_by,updated_by)
+    VALUES(_org_id,_edition_id,_direction,_source_type,_source_id,left(btrim(_description),240),_amount_cents,_due_date,_actor,_actor)
+    ON CONFLICT (source_type, source_id) WHERE source_type <> 'manual' DO NOTHING;
+    IF FOUND THEN RETURN; END IF;
+  END IF;
+  SELECT * INTO o FROM public.financial_obligations WHERE source_type=_source_type AND source_id=_source_id FOR UPDATE;
+  IF NOT FOUND THEN RETURN; END IF;
+  IF o.org_id <> _org_id OR o.edition_id <> _edition_id OR o.direction <> _direction THEN
+    RAISE EXCEPTION 'FINANCIAL_SOURCE_INVALID' USING ERRCODE='22023';
+  END IF;
+  SELECT coalesce(sum(amount_cents),0) INTO settled FROM public.financial_movement_allocations WHERE obligation_id = o.id;
+  IF _active AND coalesce(_amount_cents,0) > 0 THEN
+    IF _amount_cents < settled THEN RAISE EXCEPTION 'FINANCIAL_OBLIGATION_BELOW_SETTLED' USING ERRCODE='23514'; END IF;
+    IF (o.amount_cents, o.due_date, o.description, o.status, o.settlement_inconsistent)
+       IS DISTINCT FROM (_amount_cents, _due_date, left(btrim(_description),240), 'aberta', false) THEN
+      UPDATE public.financial_obligations SET amount_cents=_amount_cents, due_date=_due_date, description=left(btrim(_description),240),
+        status='aberta', cancel_reason=NULL, settlement_inconsistent=false, version=version+1, updated_by=_actor, updated_at=now()
+      WHERE id=o.id;
+    END IF;
+  ELSIF o.status = 'aberta' THEN
+    IF settled = 0 THEN
+      UPDATE public.financial_obligations SET status='cancelada', cancel_reason='Origem cancelada ou não executada', settlement_inconsistent=false,
+        version=version+1, updated_by=_actor, updated_at=now() WHERE id=o.id;
+    ELSIF NOT o.settlement_inconsistent THEN
+      UPDATE public.financial_obligations SET settlement_inconsistent=true, version=version+1, updated_by=_actor, updated_at=now() WHERE id=o.id;
+    END IF;
+  END IF;
+END $$;
+
+-- Reconciliação sob bloqueio (chamada com a obrigação já travada): valor vem da
+-- origem; se ficaria abaixo do quitado, só marca a inconsistência.
+CREATE OR REPLACE FUNCTION public.financial_reconcile_obligation(_obligation_id uuid, _actor uuid)
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE o public.financial_obligations; src jsonb; settled bigint;
+BEGIN
+  SELECT * INTO o FROM public.financial_obligations WHERE id=_obligation_id FOR UPDATE;
+  IF NOT FOUND OR o.source_type = 'manual' THEN RETURN; END IF;
+  src := public.financial_resolve_source(o.org_id, o.edition_id, o.source_type, o.source_id);
+  SELECT coalesce(sum(amount_cents),0) INTO settled FROM public.financial_movement_allocations WHERE obligation_id = o.id;
+  IF (src->>'active')::boolean AND (src->>'amount_cents')::bigint < settled THEN
+    IF NOT o.settlement_inconsistent THEN
+      UPDATE public.financial_obligations SET settlement_inconsistent=true, version=version+1, updated_by=_actor, updated_at=now() WHERE id=o.id;
+    END IF;
+    RETURN;
+  END IF;
+  PERFORM public.financial_sync_source_obligation(o.org_id, o.edition_id, src->>'direction', o.source_type, o.source_id,
+    src->>'description', (src->>'amount_cents')::bigint, (src->>'due_date')::date, (src->>'active')::boolean, _actor);
+END $$;
+
+-- Movimentos: alocações agregadas por obrigação, bloqueio em ordem fixa,
+-- reconciliação com a origem e saldo validado contra tudo já gravado.
+CREATE OR REPLACE FUNCTION public.financial_record_movement(_org_id uuid, _payload jsonb, _allocations jsonb, _request_id uuid)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE actor uuid; replay jsonb; m public.financial_movements; item record; o public.financial_obligations;
+  allocated bigint := 0; settled bigint; edition uuid := (_payload->>'edition_id')::uuid; expected_direction text; sign int;
+BEGIN
+  actor := public.financial_require(_org_id, 'financial_settle');
+  replay := public.financial_begin(_org_id, 'movement', _request_id, jsonb_build_object('p',_payload,'a',_allocations));
+  IF replay IS NOT NULL THEN RETURN replay; END IF;
+  PERFORM public.financial_require_operational(_org_id, edition);
+  IF _payload->>'kind' = 'estorno' THEN RAISE EXCEPTION 'FINANCIAL_USE_REVERSAL' USING ERRCODE='22023'; END IF;
+  IF jsonb_typeof(_allocations) <> 'array' OR jsonb_array_length(_allocations) = 0 THEN
+    RAISE EXCEPTION 'FINANCIAL_ALLOCATION_REQUIRED' USING ERRCODE='22023';
+  END IF;
+  IF EXISTS (SELECT 1 FROM jsonb_array_elements(_allocations) a WHERE coalesce((a->>'amount_cents')::bigint,0) <= 0 OR a->>'obligation_id' IS NULL) THEN
+    RAISE EXCEPTION 'FINANCIAL_ALLOCATION_INVALID' USING ERRCODE='22023';
+  END IF;
+  -- Bloqueio em ordem fixa evita deadlock entre operações concorrentes.
+  PERFORM 1 FROM public.financial_obligations
+    WHERE id IN (SELECT (a->>'obligation_id')::uuid FROM jsonb_array_elements(_allocations) a) ORDER BY id FOR UPDATE;
+  INSERT INTO public.financial_movements(org_id,edition_id,kind,direction,amount_cents,occurred_on,method,reference,responsible_name,document_path,notes,created_by)
+  VALUES(_org_id,edition,_payload->>'kind',_payload->>'direction',(_payload->>'amount_cents')::bigint,(_payload->>'occurred_on')::date,
+    nullif(btrim(_payload->>'method'),''),nullif(btrim(_payload->>'reference'),''),nullif(btrim(_payload->>'responsible_name'),''),
+    nullif(btrim(_payload->>'document_path'),''),nullif(btrim(_payload->>'notes'),''),actor) RETURNING * INTO m;
+  expected_direction := CASE m.direction WHEN 'entrada' THEN 'receber' ELSE 'pagar' END;
+  IF m.kind = 'devolucao' THEN expected_direction := CASE m.direction WHEN 'saida' THEN 'receber' ELSE 'pagar' END; END IF;
+  sign := CASE WHEN m.kind = 'devolucao' THEN -1 ELSE 1 END;
+  FOR item IN SELECT (a->>'obligation_id')::uuid obligation_id, sum((a->>'amount_cents')::bigint) amount
+      FROM jsonb_array_elements(_allocations) a GROUP BY 1 ORDER BY 1 LOOP
+    SELECT * INTO o FROM public.financial_obligations WHERE org_id=_org_id AND id=item.obligation_id;
+    IF NOT FOUND OR o.edition_id <> edition THEN RAISE EXCEPTION 'FINANCIAL_OBLIGATION_INVALID' USING ERRCODE='22023'; END IF;
+    IF o.direction <> expected_direction THEN RAISE EXCEPTION 'FINANCIAL_DIRECTION_MISMATCH' USING ERRCODE='22023'; END IF;
+    IF sign > 0 THEN
+      PERFORM public.financial_reconcile_obligation(o.id, actor);
+      SELECT * INTO o FROM public.financial_obligations WHERE id=item.obligation_id;
+      IF o.status <> 'aberta' OR o.settlement_inconsistent THEN RAISE EXCEPTION 'FINANCIAL_OBLIGATION_CLOSED' USING ERRCODE='23514'; END IF;
+    END IF;
+    INSERT INTO public.financial_movement_allocations(org_id,movement_id,obligation_id,amount_cents)
+    VALUES(_org_id,m.id,o.id,sign * item.amount);
+    SELECT coalesce(sum(amount_cents),0) INTO settled FROM public.financial_movement_allocations WHERE obligation_id = o.id;
+    IF settled > o.amount_cents OR settled < 0 THEN RAISE EXCEPTION 'FINANCIAL_OVER_SETTLEMENT' USING ERRCODE='23514'; END IF;
+    IF settled = 0 AND o.settlement_inconsistent THEN
+      UPDATE public.financial_obligations SET settlement_inconsistent=false, status='cancelada',
+        cancel_reason=coalesce(cancel_reason,'Origem cancelada; liquidação devolvida'), version=version+1, updated_by=actor, updated_at=now() WHERE id=o.id;
+    END IF;
+    allocated := allocated + item.amount;
+  END LOOP;
+  IF allocated <> m.amount_cents THEN RAISE EXCEPTION 'FINANCIAL_ALLOCATION_MISMATCH' USING ERRCODE='23514'; END IF;
+  PERFORM public.financial_audit(_org_id, edition, 'movement', m.id, 'create', NULL,
+    to_jsonb(m) || jsonb_build_object('allocations', _allocations), NULL);
+  RETURN public.financial_finish(_org_id, 'movement', _request_id, to_jsonb(m));
+END $$;
+
+-- Estorno integral e vinculado, validado contra o saldo líquido de cada obrigação
+-- afetada, com bloqueio prévio em ordem fixa. Movimentos posteriores que dependam
+-- do original (ex.: devolução) precisam ser estornados antes.
+CREATE OR REPLACE FUNCTION public.financial_reverse_movement(_org_id uuid, _movement_id uuid, _reason text, _occurred_on date, _request_id uuid)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE actor uuid; replay jsonb; original public.financial_movements; m public.financial_movements; bad record; blocker uuid;
+BEGIN
+  actor := public.financial_require(_org_id, 'financial_settle');
+  replay := public.financial_begin(_org_id, 'reverse', _request_id, jsonb_build_object('m',_movement_id,'r',_reason,'d',_occurred_on));
+  IF replay IS NOT NULL THEN RETURN replay; END IF;
+  IF length(btrim(coalesce(_reason,''))) < 3 THEN RAISE EXCEPTION 'FINANCIAL_REASON_REQUIRED' USING ERRCODE='22023'; END IF;
+  SELECT * INTO original FROM public.financial_movements WHERE org_id=_org_id AND id=_movement_id FOR UPDATE;
+  IF NOT FOUND THEN RAISE EXCEPTION 'FINANCIAL_NOT_FOUND' USING ERRCODE='P0002'; END IF;
+  IF original.kind = 'estorno' THEN RAISE EXCEPTION 'FINANCIAL_REVERSAL_OF_REVERSAL' USING ERRCODE='23514'; END IF;
+  IF EXISTS (SELECT 1 FROM public.financial_movements WHERE reverses_movement_id = original.id) THEN
+    RAISE EXCEPTION 'FINANCIAL_ALREADY_REVERSED' USING ERRCODE='23505';
+  END IF;
+  PERFORM public.financial_require_operational(_org_id, original.edition_id);
+  PERFORM 1 FROM public.financial_obligations
+    WHERE id IN (SELECT obligation_id FROM public.financial_movement_allocations WHERE movement_id = original.id) ORDER BY id FOR UPDATE;
+  -- Saldo líquido após o estorno, lido com as obrigações já travadas.
+  SELECT a.obligation_id, o.amount_cents, t.settled - a.amount_cents AS after_settled INTO bad
+    FROM public.financial_movement_allocations a
+    JOIN public.financial_obligations o ON o.id = a.obligation_id
+    JOIN LATERAL (SELECT coalesce(sum(x.amount_cents),0) settled FROM public.financial_movement_allocations x WHERE x.obligation_id = a.obligation_id) t ON true
+    WHERE a.movement_id = original.id AND (t.settled - a.amount_cents < 0 OR t.settled - a.amount_cents > o.amount_cents)
+    LIMIT 1;
+  IF bad.obligation_id IS NOT NULL THEN
+    SELECT x.movement_id INTO blocker FROM public.financial_movement_allocations x
+      JOIN public.financial_movements mv ON mv.id = x.movement_id
+      WHERE x.obligation_id = bad.obligation_id AND mv.created_at >= original.created_at AND mv.id <> original.id
+        AND sign(x.amount_cents) <> sign((SELECT amount_cents FROM public.financial_movement_allocations WHERE movement_id=original.id AND obligation_id=bad.obligation_id))
+        AND NOT EXISTS (SELECT 1 FROM public.financial_movements r WHERE r.reverses_movement_id = mv.id) AND mv.kind <> 'estorno'
+      ORDER BY mv.created_at DESC LIMIT 1;
+    RAISE EXCEPTION 'FINANCIAL_REVERSAL_EXCEEDS_NET: estorne antes o movimento %', coalesce(blocker::text,'posterior') USING ERRCODE='23514';
+  END IF;
+  INSERT INTO public.financial_movements(org_id,edition_id,kind,direction,amount_cents,occurred_on,reference,reverses_movement_id,notes,created_by)
+  VALUES(_org_id,original.edition_id,'estorno',CASE original.direction WHEN 'entrada' THEN 'saida' ELSE 'entrada' END,
+    original.amount_cents,coalesce(_occurred_on,current_date),original.reference,original.id,btrim(_reason),actor) RETURNING * INTO m;
+  INSERT INTO public.financial_movement_allocations(org_id,movement_id,obligation_id,amount_cents)
+    SELECT _org_id, m.id, a.obligation_id, -a.amount_cents FROM public.financial_movement_allocations a WHERE a.movement_id = original.id;
+  -- Defesa: nenhuma obrigação afetada fora de 0..valor.
+  IF EXISTS (SELECT 1 FROM public.financial_obligations o
+      JOIN LATERAL (SELECT coalesce(sum(x.amount_cents),0) s FROM public.financial_movement_allocations x WHERE x.obligation_id=o.id) t ON true
+      WHERE o.id IN (SELECT obligation_id FROM public.financial_movement_allocations WHERE movement_id = m.id) AND (t.s < 0 OR t.s > o.amount_cents)) THEN
+    RAISE EXCEPTION 'FINANCIAL_REVERSAL_EXCEEDS_NET' USING ERRCODE='23514';
+  END IF;
+  UPDATE public.financial_obligations o SET settlement_inconsistent=false, status='cancelada',
+      cancel_reason=coalesce(cancel_reason,'Origem cancelada; liquidação estornada'), version=version+1, updated_by=actor, updated_at=now()
+    WHERE o.settlement_inconsistent AND o.id IN (SELECT obligation_id FROM public.financial_movement_allocations WHERE movement_id = m.id)
+      AND NOT EXISTS (SELECT 1 FROM public.financial_movement_allocations x WHERE x.obligation_id=o.id HAVING coalesce(sum(x.amount_cents),0) <> 0);
+  PERFORM public.financial_audit(_org_id, original.edition_id, 'movement', m.id, 'reverse', to_jsonb(original), to_jsonb(m), _reason);
+  RETURN public.financial_finish(_org_id, 'reverse', _request_id, to_jsonb(m));
+END $$;
+
+REVOKE ALL ON FUNCTION public.financial_resolve_source(uuid,uuid,text,uuid), public.financial_reconcile_obligation(uuid,uuid),
+  public.financial_sync_source_obligation(uuid,uuid,text,text,uuid,text,bigint,date,boolean,uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.financial_record_movement(uuid,jsonb,jsonb,uuid), public.financial_reverse_movement(uuid,uuid,text,date,uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.financial_record_movement(uuid,jsonb,jsonb,uuid), public.financial_reverse_movement(uuid,uuid,text,date,uuid) TO authenticated;

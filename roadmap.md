@@ -231,6 +231,7 @@
 
 ## Financeiro Operacional Fenasoja 2028
 - [x] Separar execução (previsto/realizado/confirmado) de liquidação (pago/recebido) e saldos em aberto no rascunho, painel e testes locais.
+- [x] Estorno por saldo líquido com bloqueio ordenado e obrigações vinculadas validadas (rascunho + testes locais e de concorrência).
 - [ ] Telas de cadastro de despesas 2028 usando `financial_save_expense` (aguarda ativação autorizada do banco).
 - [x] Mapa de fontes, relações e matriz de campos (plano aprovado).
 - [x] Estrutura do banco em rascunho (`docs/financeiro-2028/financial_operational_2028.sql`): edições, orçamento + linhas + histórico, receitas, patrocínios, obrigações, movimentos com estorno, cenários versionados, categorias e campos complementares, auditoria, idempotência e resumo agregado. Testada em banco local sintético (`local-test.sql`).

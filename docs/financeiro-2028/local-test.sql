@@ -15,6 +15,18 @@ CREATE TABLE public.expenses (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), org
   amount numeric NOT NULL DEFAULT 0, status text NOT NULL DEFAULT 'rascunho', created_by_user_id uuid NOT NULL,
   origem_lancamento text NOT NULL DEFAULT 'manual', cycle_year integer NOT NULL DEFAULT 2028,
   created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE public.map_projects (id uuid PRIMARY KEY, org_id uuid NOT NULL);
+CREATE TABLE public.lot_sale_orders (id uuid PRIMARY KEY, project_id uuid NOT NULL, status text NOT NULL DEFAULT 'CONFIRMED');
+CREATE TABLE public.lot_sale_installments (id uuid PRIMARY KEY, order_id uuid NOT NULL, installment_number int NOT NULL,
+  due_date date NOT NULL, amount numeric(14,2) NOT NULL, payment_status text NOT NULL DEFAULT 'PENDING');
+INSERT INTO public.map_projects VALUES ('e0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000001'),
+  ('e0000000-0000-0000-0000-000000000002','b0000000-0000-0000-0000-000000000001');
+INSERT INTO public.lot_sale_orders VALUES ('f0000000-0000-0000-0000-000000000001','e0000000-0000-0000-0000-000000000001','CONFIRMED'),
+  ('f0000000-0000-0000-0000-000000000002','e0000000-0000-0000-0000-000000000002','CONFIRMED');
+INSERT INTO public.lot_sale_installments VALUES
+  ('91000000-0000-0000-0000-000000000001','f0000000-0000-0000-0000-000000000001',1,'2027-05-05',1234.56,'PENDING'),
+  ('91000000-0000-0000-0000-000000000002','f0000000-0000-0000-0000-000000000002',1,'2027-05-05',100,'PENDING'),
+  ('91000000-0000-0000-0000-000000000003','f0000000-0000-0000-0000-000000000001',2,'2027-06-05',100,'CANCELLED');
 GRANT USAGE ON SCHEMA public, auth TO authenticated, anon;
 -- org A: admin, tesouraria (settle), editor, leitor, gestor sem capacidade; org B: admin
 INSERT INTO public.organizations VALUES ('a0000000-0000-0000-0000-000000000001'),('b0000000-0000-0000-0000-000000000001');
@@ -128,7 +140,7 @@ SELECT financial_record_movement('a0000000-0000-0000-0000-000000000001',
 SELECT financial_reverse_movement('a0000000-0000-0000-0000-000000000001',
   (SELECT id FROM financial_movements WHERE amount_cents=40000),'Recebido em duplicidade','2027-01-08',gen_random_uuid());
 SELECT pg_temp.expect_error($q$SELECT financial_reverse_movement('a0000000-0000-0000-0000-000000000001',
-  (SELECT id FROM financial_movements WHERE amount_cents=40000 AND kind='recebimento'),'Outra vez','2027-01-08',gen_random_uuid())$q$,'duplicate|unique');
+  (SELECT id FROM financial_movements WHERE amount_cents=40000 AND kind='recebimento'),'Outra vez','2027-01-08',gen_random_uuid())$q$,'ALREADY_REVERSED|duplicate|unique');
 SELECT pg_temp.ok((SELECT count(*) FROM financial_movements WHERE amount_cents=40000)=2,'estorno único e movimento original preservado');
 
 SELECT set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000004',false);
@@ -203,4 +215,72 @@ CREATE TEMP TABLE s4 AS SELECT financial_edition_summary('a0000000-0000-0000-000
 SELECT pg_temp.ok((SELECT count(*) FROM financial_obligations WHERE source_type='receita' AND amount_cents=70000)=1,'confirmação cria saldo a receber');
 SELECT pg_temp.ok((SELECT (j#>>'{revenues,received_cents}')::bigint=60001 FROM s4),'receita confirmada não entra como recebida');
 RESET ROLE;
+-- estorno por saldo líquido
+SET ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000001',false);
+CREATE TEMP TABLE nx AS SELECT (financial_save('a0000000-0000-0000-0000-000000000001','obligation',
+  jsonb_build_object('edition_id',(SELECT e28 FROM ids),'direction','receber','description','Net 100','amount_cents',10000),NULL,gen_random_uuid())->>'id')::uuid id;
+CREATE TEMP TABLE rc AS SELECT (financial_record_movement('a0000000-0000-0000-0000-000000000001',
+  jsonb_build_object('edition_id',(SELECT e28 FROM ids),'kind','recebimento','direction','entrada','amount_cents',10000,'occurred_on','2027-02-01'),
+  jsonb_build_array(jsonb_build_object('obligation_id',(SELECT id FROM nx),'amount_cents',10000)),gen_random_uuid())->>'id')::uuid id;
+CREATE TEMP TABLE dv AS SELECT (financial_record_movement('a0000000-0000-0000-0000-000000000001',
+  jsonb_build_object('edition_id',(SELECT e28 FROM ids),'kind','devolucao','direction','saida','amount_cents',4000,'occurred_on','2027-02-02'),
+  jsonb_build_array(jsonb_build_object('obligation_id',(SELECT id FROM nx),'amount_cents',4000)),gen_random_uuid())->>'id')::uuid id;
+CREATE FUNCTION pg_temp.net(_o uuid) RETURNS bigint LANGUAGE sql AS $f$ SELECT coalesce(sum(amount_cents),0)::bigint FROM financial_movement_allocations WHERE obligation_id=_o $f$;
+SELECT pg_temp.expect_error($q$SELECT financial_reverse_movement('a0000000-0000-0000-0000-000000000001',(SELECT id FROM rc),'Estorno indevido','2027-02-03',gen_random_uuid())$q$,'REVERSAL_EXCEEDS_NET');
+SELECT pg_temp.ok(pg_temp.net((SELECT id FROM nx))=6000 AND NOT EXISTS (SELECT 1 FROM financial_movements WHERE reverses_movement_id=(SELECT id FROM rc)),'receber 100, devolver 40, estornar original: recusado, quitação 60');
+SELECT financial_reverse_movement('a0000000-0000-0000-0000-000000000001',(SELECT id FROM dv),'Devolução lançada errada','2027-02-03',gen_random_uuid());
+SELECT pg_temp.ok(pg_temp.net((SELECT id FROM nx))=10000,'estorno da devolução restaura 100');
+SELECT financial_reverse_movement('a0000000-0000-0000-0000-000000000001',(SELECT id FROM rc),'Recebimento inexistente','2027-02-04',gen_random_uuid());
+SELECT pg_temp.ok(pg_temp.net((SELECT id FROM nx))=0,'em seguida estorno do original zera');
+SELECT pg_temp.expect_error($q$SELECT financial_record_movement('a0000000-0000-0000-0000-000000000001',
+  jsonb_build_object('edition_id',(SELECT e28 FROM ids),'kind','recebimento','direction','entrada','amount_cents',10001,'occurred_on','2027-02-05'),
+  jsonb_build_array(jsonb_build_object('obligation_id',(SELECT id FROM nx),'amount_cents',6000),jsonb_build_object('obligation_id',(SELECT id FROM nx),'amount_cents',4001)),gen_random_uuid())$q$,'OVER_SETTLEMENT');
+SELECT pg_temp.ok(true,'alocações repetidas são somadas antes da validação');
+
+-- obrigação com origem validada
+SELECT pg_temp.expect_error($q$SELECT financial_save('a0000000-0000-0000-0000-000000000001','obligation',jsonb_build_object('edition_id',(SELECT e28 FROM ids),'direction','receber',
+  'source_type','receita','source_id',gen_random_uuid(),'description','x','amount_cents',1),NULL,gen_random_uuid())$q$,'SOURCE_INVALID');
+SELECT pg_temp.ok(true,'origem inexistente recusada');
+SELECT pg_temp.expect_error($q$SELECT financial_save('a0000000-0000-0000-0000-000000000001','obligation',jsonb_build_object('edition_id',(SELECT e28 FROM ids),'direction','receber',
+  'source_type','parcela_comercial','source_id','91000000-0000-0000-0000-000000000002','description','x'),NULL,gen_random_uuid())$q$,'SOURCE_INVALID');
+SELECT pg_temp.ok(true,'parcela de outra organização recusada');
+SELECT pg_temp.expect_error($q$SELECT financial_save('a0000000-0000-0000-0000-000000000001','obligation',jsonb_build_object('edition_id',(SELECT e26 FROM ids),'direction','receber',
+  'source_type','parcela_comercial','source_id','91000000-0000-0000-0000-000000000001','description','x'),NULL,gen_random_uuid())$q$,'SOURCE_INVALID|READ_ONLY');
+SELECT pg_temp.ok(true,'parcela em 2026 recusada');
+SELECT pg_temp.expect_error($q$SELECT financial_save('a0000000-0000-0000-0000-000000000001','obligation',jsonb_build_object('edition_id',(SELECT e28 FROM ids),'direction','receber',
+  'source_type','parcela_comercial','source_id','91000000-0000-0000-0000-000000000003'),NULL,gen_random_uuid())$q$,'SOURCE_NOT_EXECUTED');
+SELECT pg_temp.ok(true,'parcela cancelada recusada');
+SELECT pg_temp.expect_error($q$SELECT financial_save('a0000000-0000-0000-0000-000000000001','obligation',jsonb_build_object('edition_id',(SELECT e28 FROM ids),'direction','receber',
+  'source_type','receita','source_id',(SELECT id FROM financial_revenues WHERE description='Bilheteria')),NULL,gen_random_uuid())$q$,'SOURCE_NOT_EXECUTED');
+SELECT pg_temp.ok(true,'receita projetada recusada');
+SELECT pg_temp.expect_error($q$SELECT financial_save('a0000000-0000-0000-0000-000000000001','obligation',jsonb_build_object('edition_id',(SELECT e28 FROM ids),'direction','receber',
+  'source_type','parcela_comercial','source_id','91000000-0000-0000-0000-000000000001','amount_cents',999),NULL,gen_random_uuid())$q$,'AMOUNT_DERIVED');
+SELECT pg_temp.ok(true,'valor divergente da origem recusado');
+SELECT pg_temp.expect_error($q$SELECT financial_save('a0000000-0000-0000-0000-000000000001','obligation',jsonb_build_object('edition_id',(SELECT e28 FROM ids),'direction','receber',
+  'source_id',gen_random_uuid(),'description','x','amount_cents',1),NULL,gen_random_uuid())$q$,'SOURCE_INVALID');
+SELECT pg_temp.ok(true,'manual não aceita source_id arbitrário');
+SELECT financial_save('a0000000-0000-0000-0000-000000000001','obligation',jsonb_build_object('edition_id',(SELECT e28 FROM ids),'source_type','parcela_comercial','source_id','91000000-0000-0000-0000-000000000001'),NULL,gen_random_uuid());
+SELECT financial_save('a0000000-0000-0000-0000-000000000001','obligation',jsonb_build_object('edition_id',(SELECT e28 FROM ids),'source_type','parcela_comercial','source_id','91000000-0000-0000-0000-000000000001'),NULL,gen_random_uuid());
+SELECT pg_temp.ok((SELECT count(*)=1 AND min(amount_cents)=123456 FROM financial_obligations WHERE source_type='parcela_comercial'),'retry com outra requisição: uma obrigação, valor derivado em centavos');
+SELECT financial_save('a0000000-0000-0000-0000-000000000001','obligation',jsonb_build_object('edition_id',(SELECT e28 FROM ids),'source_type','receita','source_id',(SELECT id FROM financial_revenues WHERE description='Cota municipal')),NULL,gen_random_uuid());
+SELECT pg_temp.ok((SELECT count(*) FROM financial_obligations WHERE source_type='receita')=1,'receita já sincronizada não duplica');
+SELECT financial_record_movement('a0000000-0000-0000-0000-000000000001',
+  jsonb_build_object('edition_id',(SELECT e28 FROM ids),'kind','recebimento','direction','entrada','amount_cents',100000,'occurred_on','2027-05-05'),
+  jsonb_build_array(jsonb_build_object('obligation_id',(SELECT id FROM financial_obligations WHERE source_type='parcela_comercial'),'amount_cents',100000)),gen_random_uuid());
+RESET ROLE;
+UPDATE lot_sale_installments SET amount=1100 WHERE id='91000000-0000-0000-0000-000000000001';
+SET ROLE authenticated;
+SELECT financial_save('a0000000-0000-0000-0000-000000000001','obligation',jsonb_build_object('edition_id',(SELECT e28 FROM ids),'source_type','parcela_comercial','source_id','91000000-0000-0000-0000-000000000001'),NULL,gen_random_uuid());
+SELECT pg_temp.ok((SELECT amount_cents=110000 AND NOT settlement_inconsistent FROM financial_obligations WHERE source_type='parcela_comercial'),'parcela revisada é reconciliada');
+RESET ROLE;
+UPDATE lot_sale_installments SET amount=900 WHERE id='91000000-0000-0000-0000-000000000001';
+SET ROLE authenticated;
+SELECT financial_save('a0000000-0000-0000-0000-000000000001','obligation',jsonb_build_object('edition_id',(SELECT e28 FROM ids),'source_type','parcela_comercial','source_id','91000000-0000-0000-0000-000000000001'),NULL,gen_random_uuid());
+SELECT pg_temp.expect_error($q$SELECT financial_record_movement('a0000000-0000-0000-0000-000000000001',
+  jsonb_build_object('edition_id',(SELECT e28 FROM ids),'kind','recebimento','direction','entrada','amount_cents',1,'occurred_on','2027-05-06'),
+  jsonb_build_array(jsonb_build_object('obligation_id',(SELECT id FROM financial_obligations WHERE source_type='parcela_comercial'),'amount_cents',1)),gen_random_uuid())$q$,'OBLIGATION_CLOSED');
+RESET ROLE;
+SELECT pg_temp.ok((SELECT amount_cents=110000 AND settlement_inconsistent FROM financial_obligations WHERE source_type='parcela_comercial'),'abaixo do quitado: valor mantido e marcada inconsistente');
+
 SELECT 'TODOS OS TESTES PASSARAM' AS resultado;
