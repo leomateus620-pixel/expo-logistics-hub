@@ -230,6 +230,8 @@
 - [x] Trocar lotes Êxito (68–72) e Boleiros (33–38) e criar edição de lotes da venda com recálculo.
 
 ## Financeiro Operacional Fenasoja 2028
+- [x] Separar execução (previsto/realizado/confirmado) de liquidação (pago/recebido) e saldos em aberto no rascunho, painel e testes locais.
+- [ ] Telas de cadastro de despesas 2028 usando `financial_save_expense` (aguarda ativação autorizada do banco).
 - [x] Mapa de fontes, relações e matriz de campos (plano aprovado).
 - [x] Estrutura do banco em rascunho (`docs/financeiro-2028/financial_operational_2028.sql`): edições, orçamento + linhas + histórico, receitas, patrocínios, obrigações, movimentos com estorno, cenários versionados, categorias e campos complementares, auditoria, idempotência e resumo agregado. Testada em banco local sintético (`local-test.sql`).
 - [x] Seletor "Fenasoja 2026 · Histórico" / "Fenasoja 2028"; 2026 intacto.
