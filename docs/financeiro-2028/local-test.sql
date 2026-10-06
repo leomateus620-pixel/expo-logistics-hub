@@ -168,8 +168,10 @@ CREATE TEMP TABLE ln AS SELECT id FROM financial_budget_lines WHERE description=
 GRANT SELECT ON ln TO authenticated;
 SELECT financial_save_expense('a0000000-0000-0000-0000-000000000001',
   jsonb_build_object('edition_id',(SELECT e28 FROM ids),'title','Palco','planned_cents',50000,'budget_line_id',(SELECT id FROM ln)),NULL,gen_random_uuid());
+RESET ROLE;
 CREATE TEMP TABLE ex AS SELECT id FROM expenses WHERE title='Palco';
 GRANT SELECT ON ex TO authenticated;
+SET ROLE authenticated;
 SELECT pg_temp.ok((SELECT count(*) FROM financial_obligations WHERE source_type='despesa')=0,'despesa prevista não gera saldo a pagar');
 SELECT financial_save_expense('a0000000-0000-0000-0000-000000000001',
   jsonb_build_object('id',(SELECT id FROM ex),'financial_status','realizada','committed_cents',48000,'committed_on','2027-03-01','due_date','2027-04-01'),1,gen_random_uuid());
