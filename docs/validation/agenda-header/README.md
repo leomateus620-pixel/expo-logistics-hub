@@ -29,7 +29,7 @@ Resultados detalhados: [depois](evidence/after/browser-report.json) e [referênc
 - Testes focados da Agenda: **34/34** passaram em quatro arquivos.
 - Testes adicionais do Restaurante/Arena: `venueNotifications.test.ts` passou (2/2). `venueEventsPresentation.test.ts` teve 7/10 passando; as mesmas três falhas foram reproduzidas no checkout limpo de referência. Elas verificam navegação, marcação do seletor e etapas do formulário, arquivos preservados nesta alteração. [Resumo da reprodução na referência](baseline-venue-unit.json).
 - TypeScript e ESLint dos componentes/configuração alterados passaram.
-- Build de produção da versão final passou em 1 min 23 s, com os avisos existentes de Browserslist e tamanho de chunks. [Log](build.log).
+- Build de produção da versão final passou em 1 min 23 s, com os avisos existentes de Browserslist e tamanho de chunks.
 - Foco da busca compacta: **129/129 verificações adicionais** passaram, incluindo sublinhado de 2 px com foco visível e 1 px inativo, sem mudança de altura. [Relatório](evidence/focus/browser-report.json).
 - Notificações do Restaurante/Arena: **212/212 verificações** passaram em 320, 390, 768, 1024 e 1366 px, nos temas claro e escuro. Estados normal, hover e foco, toque, Enter, abertura do painel, Escape e retorno de foco foram conferidos. O contraste normal no tema claro passou de **1,00:1 para pelo menos 11,66:1**; o alvo passou de 36 para 44 px. `elementFromPoint` confirma que o botão e o painel não estão cobertos, e as caixas dos controles não se cruzam. [Relatório](evidence/venue/after/browser-report.json) · [Comparação](evidence/venue/baseline-comparison.json).
 
