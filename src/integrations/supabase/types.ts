@@ -11279,6 +11279,7 @@ export type Database = {
         Args: { _project_id: string }
         Returns: boolean
       }
+      map_capable_org_ids: { Args: { _capability: string }; Returns: string[] }
       map_entity_inherits_segment: {
         Args: { _entity_id: string; _segment_id: string }
         Returns: boolean
