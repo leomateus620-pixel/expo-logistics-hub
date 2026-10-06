@@ -10830,6 +10830,15 @@ export type Database = {
         Args: { p_legal: string; p_trade: string }
         Returns: string
       }
+      commercial_map_lot_buyers: {
+        Args: { _project_id: string }
+        Returns: {
+          buyer_display_name: string
+          is_conflict: boolean
+          lot_id: string
+          sale_status: string
+        }[]
+      }
       commercial_sale_logos: { Args: { p_project_id: string }; Returns: Json }
       commission_leadership_user_ids: {
         Args: { _commission_id: string }
