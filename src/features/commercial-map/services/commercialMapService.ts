@@ -82,6 +82,14 @@ interface LotRow {
 /** Every relation column consumed by mapLot; no history/blob payloads. */
 const OFFICIAL_PRICING_EMBED = `financial_entity:map_entities!commercial_lots_entity_id_fkey(id,
   pricing:commercial_lot_pricing_2028!commercial_lots_entity_id_fkey(lot_id,entity_id,renovacao_total,segunda_total,renovacao_is_manual,segunda_is_manual,resolution_status))`;
+/** Carga completa: os preços 2028 vêm numa consulta única por projeto (ver fetchProjectPricing2028). */
+const COMMERCIAL_LOT_BASE_SELECT = `*,
+  lot_prices(is_active,pricing_mode,base_price,price_per_sqm,asking_price,minimum_price),
+  lot_reservations(status,company_name,expires_at,responsible_name),
+  lot_negotiations(status,company_name),
+  lot_sales(id,lot_id,status,negotiated_value,buyer_name,buyer_trade_name,sale_date,salesperson_name,contract_number),
+  lot_contracts!lot_contracts_lot_id_fkey(is_active,contract_number)`;
+const PRICING_2028_COLUMNS = 'lot_id,entity_id,renovacao_total,segunda_total,renovacao_is_manual,segunda_is_manual,resolution_status';
 export const COMMERCIAL_LOT_SELECT = `*,
   lot_prices(is_active,pricing_mode,base_price,price_per_sqm,asking_price,minimum_price),
   lot_reservations(status,company_name,expires_at,responsible_name),
@@ -652,6 +660,7 @@ export async function fetchCommercialMap(
     geometriesResult,
     calibrationResult,
     lotsResult,
+    pricingResult,
     lotPresenceResult,
     segmentsResult,
   ] = await Promise.all([
@@ -659,7 +668,8 @@ export async function fetchCommercialMap(
     fetchAllRows(() => db.from('map_entities').select('*').eq('project_id', project.id).eq('is_archived', false), 'entities', context),
     fetchAllRows(() => db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true), 'geometries', context),
     calibrationPromise,
-    fetchAllRows(() => db.from('commercial_lots').select(COMMERCIAL_LOT_SELECT).limit(1, { referencedTable: 'financial_entity.pricing' }).eq('project_id', project.id).is('archived_at', null), 'lots', context),
+    fetchAllRows(() => db.from('commercial_lots').select(COMMERCIAL_LOT_BASE_SELECT).eq('project_id', project.id).is('archived_at', null), 'lots', context),
+    fetchAllRows(() => db.from('commercial_lot_pricing_2028').select(PRICING_2028_COLUMNS).eq('project_id', project.id), 'pricing-2028', context),
     mapRequest(db.from('commercial_lots').select('id').eq('project_id', project.id).limit(1), context),
     mapRequest(db.from('map_segments').select('id, slug').eq('project_id', project.id).eq('is_active', true), context),
   ]);
@@ -674,6 +684,7 @@ export async function fetchCommercialMap(
     geometriesResult,
     calibrationResult,
     lotsResult,
+    pricingResult,
     lotPresenceResult,
   ]
     .find((result) => result.error)?.error;
@@ -697,7 +708,12 @@ export async function fetchCommercialMap(
       row.segment_id ? segmentSlugById.get(row.segment_id) : undefined,
     ));
   const entityRows = (entitiesResult.data ?? []) as EntityRow[];
-  const lotRows = (lotsResult.data ?? []) as LotRow[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pricingByEntity = new Map<string, any>(((pricingResult.data ?? []) as any[]).map((row) => [row.entity_id, row]));
+  const lotRows = ((lotsResult.data ?? []) as LotRow[]).map((row) => ({
+    ...row,
+    financial_entity: { id: row.entity_id, pricing: pricingByEntity.has(row.entity_id) ? [pricingByEntity.get(row.entity_id)] : [] },
+  }) as LotRow);
 
   if (isClearlyLegacy2024Seed(projectRow as ProjectRow, entityRows, (lotPresenceResult.data ?? []).length > 0)) {
     return {
