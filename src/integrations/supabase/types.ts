@@ -8121,6 +8121,9 @@ export type Database = {
           counterpart_requested_quantity: number | null
           created_at: string
           created_by: string
+          cronograma_source_event_id: string | null
+          cronograma_source_revision: number | null
+          cronograma_source_snapshot: Json | null
           electricity_fee: string | null
           end_at: string | null
           estimated_audience: number | null
@@ -8186,6 +8189,9 @@ export type Database = {
           counterpart_requested_quantity?: number | null
           created_at?: string
           created_by: string
+          cronograma_source_event_id?: string | null
+          cronograma_source_revision?: number | null
+          cronograma_source_snapshot?: Json | null
           electricity_fee?: string | null
           end_at?: string | null
           estimated_audience?: number | null
@@ -8251,6 +8257,9 @@ export type Database = {
           counterpart_requested_quantity?: number | null
           created_at?: string
           created_by?: string
+          cronograma_source_event_id?: string | null
+          cronograma_source_revision?: number | null
+          cronograma_source_snapshot?: Json | null
           electricity_fee?: string | null
           end_at?: string | null
           estimated_audience?: number | null
@@ -10064,6 +10073,7 @@ export type Database = {
           event_id: string
           event_org_id: string
           event_source_key: string
+          expected_lock_version?: number
         }
         Returns: Json
       }
@@ -10088,7 +10098,12 @@ export type Database = {
         Returns: Json
       }
       cronograma_restaurant_alert: {
-        Args: { _end_date: string; _org_id: string; _start_date: string }
+        Args: {
+          _end_date: string
+          _org_id: string
+          _source_event_id?: string
+          _start_date: string
+        }
         Returns: {
           end_time: string
           event_date: string
@@ -10125,10 +10140,13 @@ export type Database = {
           event_time: string
           id: string
           location: string
+          location_code: string
+          lock_version: number
           origin_commission_id: string
           origin_source: string
           people: Json
           responsible_name: string
+          source_key: string
           start_date: string
           start_time: string
           status: string
