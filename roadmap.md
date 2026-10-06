@@ -228,3 +228,18 @@
 - [x] Push (criação/alteração/cancelamento/1h antes) e Google Agenda por inscrição
 - [ ] Roque ativar avisos no aparelho e conectar o Google (ação dele)
 - [x] Trocar lotes Êxito (68–72) e Boleiros (33–38) e criar edição de lotes da venda com recálculo.
+
+## Financeiro Operacional Fenasoja 2028
+- [x] Mapa de fontes, relações e matriz de campos (plano aprovado).
+- [x] Estrutura do banco em rascunho (`docs/financeiro-2028/financial_operational_2028.sql`): edições, orçamento + linhas + histórico, receitas, patrocínios, obrigações, movimentos com estorno, cenários versionados, categorias e campos complementares, auditoria, idempotência e resumo agregado. Testada em banco local sintético (`local-test.sql`).
+- [x] Seletor "Fenasoja 2026 · Histórico" / "Fenasoja 2028"; 2026 intacto.
+- [x] 2028: painel consolidado, orçamento por comissão com linhas, receitas projetadas/confirmadas, carteira de patrocínios.
+- [ ] Aplicar a estrutura no backend (bloqueio: autorização expressa do usuário; preview e produção compartilham o backend).
+- [ ] Despesas previstas/realizadas sobre `expenses` (colunas de edição, comissão, vencimento) e quitação de ressarcimento.
+- [ ] Comercialização: extrair regra da Dashboard Comercial e consulta só de leitura para o Financeiro.
+- [ ] Telas de obrigações e movimentos (recebimentos/pagamentos/estornos) e comprovantes privados.
+- [ ] Proteger valores recebidos parcialmente em `revise_sale_order_items` antes de quitação parcial de parcelas.
+- [ ] Simulações versionadas, relatórios/exportação e rastreio de origem dos totais.
+- [ ] Mover a base 2026 do código do app para o servidor (somente leitura, com acesso financeiro).
+- [ ] Administração de categorias e campos complementares na interface.
+- Não publicar, não conceder acessos, não importar lançamentos reais.

@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FinancialEditionSwitch } from '@/features/financial-management/operational/FinancialEditionSwitch';
+import { Financial2028Workspace } from '@/features/financial-management/operational/Financial2028Workspace';
+import {
+  readStoredEdition,
+  resolveFinancialEdition,
+  storeEdition,
+  type FinancialEditionCode,
+} from '@/features/financial-management/operational/financialEditionSelection';
 import {
   AlertTriangle,
   ArrowRight,
@@ -431,7 +439,34 @@ function AboutFinancialModule({
   );
 }
 
+/** Escolhe a edição: 2026 segue intocada como histórico; 2028 abre a área operacional. */
 export default function FinancialManagementPage({ module }: FinancialManagementPageProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const edition = resolveFinancialEdition(location.search, readStoredEdition());
+  const relativePath = location.pathname.replace(module.basePath, '').replace(/^\/+/, '');
+  const view: FinancialViewPath = Object.prototype.hasOwnProperty.call(VIEW_COPY, relativePath || 'dashboard')
+    ? ((relativePath || 'dashboard') as FinancialViewPath)
+    : 'dashboard';
+  const changeEdition = (code: FinancialEditionCode) => {
+    storeEdition(code);
+    const params = new URLSearchParams(location.search);
+    params.set('edicao', code);
+    navigate({ pathname: location.pathname, search: params.toString() }, { replace: false });
+  };
+  return (
+    <>
+      <FinancialEditionSwitch value={edition} onChange={changeEdition} />
+      {edition === '2028' ? (
+        <div key="2028" className="financial-operational-2028"><Financial2028Workspace view={view} /></div>
+      ) : (
+        <Financial2026History key="2026" module={module} />
+      )}
+    </>
+  );
+}
+
+function Financial2026History({ module }: FinancialManagementPageProps) {
   const location = useLocation();
   const relativePath = location.pathname.replace(module.basePath, '').replace(/^\/+/, '');
   const requestedView = (relativePath || 'dashboard') as FinancialViewPath;
