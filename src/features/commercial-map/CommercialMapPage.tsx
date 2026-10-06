@@ -480,17 +480,28 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
           ? 'A conexão demorou a responder. Tente novamente.'
           : 'Não foi possível carregar os dados deste segmento. Tente novamente.'
       : null;
+    const failureText = (() => {
+      const failure = mapQuery.error as { code?: string; message?: string } | null;
+      return `${failure?.code ?? ''} ${failure?.message ?? String(failure ?? '')}`;
+    })();
+    if (mapQuery.error) console.error('[commercial-map] load failed', failureText);
+    const fullFailure = /MAP_PERMISSION_DENIED|42501|403|PGRST301/i.test(failureText)
+      ? 'Seu acesso ao mapa não pôde ser confirmado. Se você recebeu acesso há pouco, saia e entre novamente.'
+      : /57014|timeout|canceling statement/i.test(failureText)
+        ? 'O servidor demorou para responder. Tente novamente em instantes.'
+        : /failed to fetch|network|load failed/i.test(failureText)
+          ? 'Sem conexão com o servidor. Verifique a internet e tente novamente.'
+          : 'Não foi possível carregar os dados do mapa. Tente novamente.';
     return (
       <section className="commercial-map-shell" aria-label="Falha ao carregar o mapa comercial">
         <div className="commercial-map-page-error" role="alert">
           <AlertTriangle />
           <span>
             <strong>{isCommissionScope ? 'Segmento comercial indisponível' : 'Não foi possível sincronizar o mapa'}</strong>
-            {isCommissionScope
-              ? commissionFailure
-              : 'A base local não substituiu silenciosamente uma falha de rede ou permissão. Tente novamente após verificar sua conexão.'}
+            {isCommissionScope ? commissionFailure : fullFailure}
           </span>
           <Button onClick={() => mapQuery.refetch()} disabled={mapQuery.isFetching}><RefreshCw className={mapQuery.isFetching ? 'animate-spin' : ''} />Tentar novamente</Button>
+          {!isCommissionScope && <Button asChild variant="outline"><a href="/">Voltar</a></Button>}
         </div>
       </section>
     );
