@@ -1,10 +1,10 @@
-import { useCallback, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { ArrowUpRight, Maximize, MapPinned } from 'lucide-react';
 import { COMMERCIAL_PHASES, STATUS_CONFIG } from '../constants';
 import { toCommercialPhase, type CommercialStatus } from '../types';
 import { formatAreaSqmLabel, formatBrl } from '../utils/lotPricing2028';
 import { resolveLotIdentity } from '../utils/lotIdentity';
-import { buildCommercialMiniMapGeometry, buildCommercialMiniMapViewBox, type CommercialMiniMapItem, type MiniMapBounds, type MiniMapOutline } from './commercialDashboardGeometry';
+import { buildCommercialMiniMapGeometry, buildCommercialMiniMapViewBox, commercialMiniMapNumberLabel, type CommercialMiniMapItem, type MiniMapBounds, type MiniMapOutline } from './commercialDashboardGeometry';
 import type { CommercialPavilionWayfindingMarkerKind } from '../utils/commercialPavilionWayfinding';
 
 export type { CommercialMiniMapItem } from './commercialDashboardGeometry';
@@ -26,6 +26,8 @@ export interface CommercialMiniMapProps {
   numbered?: boolean;
   hideStatusLegend?: boolean;
   selection?: { entityId: string | null; onChange: (id: string | null) => void };
+  contentEnvelope?: MiniMapBounds;
+  numberLabelPixels?: number;
 }
 const EMPTY_OUTLINES: readonly MiniMapOutline[] = [];
 const EMPTY_ACCESSES: readonly DashboardAccessMarker[] = [];
@@ -45,16 +47,17 @@ function validValue(value: number | null): value is number {
 /** SVG only. Shapes, identifiers, status and selection use the same query snapshot. */
 export function CommercialMiniMap({
   items, title, highlightedStatus = null, onViewLot, className = '',
-  outlines = EMPTY_OUTLINES, accesses = EMPTY_ACCESSES, numbered = false, hideStatusLegend = false, selection,
+  outlines = EMPTY_OUTLINES, accesses = EMPTY_ACCESSES, numbered = false, hideStatusLegend = false, selection, contentEnvelope, numberLabelPixels = 11,
 }: CommercialMiniMapProps) {
   const selectId = useId();
-  const geometry = useMemo(() => buildCommercialMiniMapGeometry(items, outlines), [items, outlines]);
+  const geometry = useMemo(() => buildCommercialMiniMapGeometry(items, outlines, contentEnvelope), [items, outlines, contentEnvelope]);
   const [hoveredEntityId, setHoveredEntityId] = useState<string | null>(null);
   const [selections, setSelections] = useState<Record<string, string | null>>({});
   const selectedEntityId = selection ? selection.entityId : selections[title] ?? null;
   const select = selection?.onChange ?? ((id: string | null) => setSelections((current) => ({ ...current, [title]: id })));
   const [keyboardEntityId, setKeyboardEntityId] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const viewportRef = useRef<HTMLDivElement>(null);
   const fitToSpace = useCallback(() => {
     setZoom(1);
@@ -72,21 +75,29 @@ export function CommercialMiniMap({
     const viewport = viewportRef.current;
     if (!viewport) return;
     if (typeof ResizeObserver === 'undefined') {
-      window.addEventListener('resize', fitToSpace);
-      return () => window.removeEventListener('resize', fitToSpace);
+      const measure = () => {
+        const { width, height } = viewport.getBoundingClientRect();
+        setViewportSize({ width, height });
+        fitToSpace();
+      };
+      measure();
+      window.addEventListener('resize', measure);
+      return () => window.removeEventListener('resize', measure);
     }
     const initialRect = viewport.getBoundingClientRect();
     let previousWidth = initialRect.width;
     let previousHeight = initialRect.height;
+    setViewportSize({ width: previousWidth, height: previousHeight });
     const observer = new ResizeObserver(([entry]) => {
       if (!entry) return;
       // Border size stays stable when inspection zoom introduces scrollbars.
       const rect = viewport.getBoundingClientRect();
       const width = entry.borderBoxSize?.[0]?.inlineSize ?? (rect.width || entry.contentRect.width);
       const height = entry.borderBoxSize?.[0]?.blockSize ?? (rect.height || entry.contentRect.height);
-      if (width !== previousWidth || height !== previousHeight) {
+      if (Math.abs(width - previousWidth) >= 2 || Math.abs(height - previousHeight) >= 2) {
         previousWidth = width;
         previousHeight = height;
+        setViewportSize({ width, height });
         fitToSpace();
       }
     });
@@ -115,13 +126,14 @@ export function CommercialMiniMap({
       const halfWidth = outline.label.length * 8;
       decorations.push({ minX: x - halfWidth - 4, maxX: x + halfWidth + 4, minY: y - 33, maxY: y - 1 });
     }
-    const pavilion = geometry.outlines.find((outline) => outline.kind === 'pavilion');
-    const projected = (pavilion?.coordinates[0] ?? []).map(geometry.project);
     const markers = accesses.map((marker) => {
       const [x, y] = geometry.project(marker.position);
       const horizontal = Math.abs(marker.outward[0]) > Math.abs(marker.outward[1]);
-      const iconX = horizontal && projected.length ? (marker.outward[0] > 0 ? Math.max(...projected.map(([px]) => px)) + 25 : Math.min(...projected.map(([px]) => px)) - 25) : x;
-      const iconY = !horizontal && projected.length ? (marker.outward[1] > 0 ? Math.max(...projected.map(([, py]) => py)) + 25 : Math.min(...projected.map(([, py]) => py)) - 25) : y;
+      // Keep the official access anchor. Short local leaders avoid letting an
+      // unrelated far wall dictate the complete plant's fit.
+      const directionLength = Math.hypot(...marker.outward) || 1;
+      const iconX = x + marker.outward[0] / directionLength * 25;
+      const iconY = y + marker.outward[1] / directionLength * 25;
       return { ...marker, x, y, iconX, iconY, horizontal };
     });
     const placed: Array<readonly [number, number]> = [];
@@ -136,8 +148,13 @@ export function CommercialMiniMap({
     return { labels, markers, viewBox: buildCommercialMiniMapViewBox(geometry, decorations) };
   }, [geometry, accesses]);
   const blocks = geometry.outlines.filter((outline) => outline.kind === 'block');
+  const supports = geometry.outlines.filter((outline) => outline.kind === 'support');
+  const [, , viewBoxWidth, viewBoxHeight] = presentation.viewBox.split(' ').map(Number);
+  const pixelsPerUnit = viewportSize.width > 0 && viewportSize.height > 0
+    ? Math.min(viewportSize.width / viewBoxWidth, viewportSize.height / viewBoxHeight) * zoom : 1;
+  const planStyle = { '--pavilion-content-aspect': viewBoxWidth / viewBoxHeight } as CSSProperties;
 
-  return <section className={`commercial-dashboard-minimap ${className}`} aria-label={`Mini mapa comercial: ${title}`}>
+  return <section className={`commercial-dashboard-minimap ${className}`} style={planStyle} aria-label={`Mini mapa comercial: ${title}`}>
     <div className="commercial-dashboard-map-heading"><MapPinned aria-hidden="true" /><strong>{title}</strong>
       <span>{geometry.lots.length} {geometry.lots.length === 1 ? 'lote posicionado' : 'lotes posicionados'}</span></div>
     <div className="commercial-dashboard-map-tools">
@@ -155,8 +172,8 @@ export function CommercialMiniMap({
         {geometry.bounds ? <svg className="commercial-dashboard-map-svg" viewBox={presentation.viewBox} preserveAspectRatio="xMidYMid meet" width="100%" height="100%" role="group"
           aria-label={`Distribuição espacial de ${geometry.lots.length} lotes em ${title}, coloridos pela situação comercial`}>
           {geometry.outlines.filter(({ kind }) => kind !== 'block').map((outline) => <path key={outline.id} d={outline.path}
-            fill={outline.color} fillOpacity=".035" fillRule="evenodd" stroke={outline.color} strokeWidth="3" vectorEffect="non-scaling-stroke"
-            data-outline={outline.kind}><title>{outline.kind === 'segment' ? 'Contorno cadastral' : 'Pavilhão'} · {outline.label}</title></path>)}
+            fill={outline.color} fillOpacity={outline.kind === 'support' ? '.12' : '.035'} fillRule="evenodd" stroke={outline.color} strokeWidth={outline.kind === 'support' ? '1.5' : '3'} vectorEffect="non-scaling-stroke"
+            data-outline={outline.kind}><title>{outline.kind === 'segment' ? 'Contorno cadastral' : outline.kind === 'support' ? 'Apoio permanente' : 'Pavilhão'} · {outline.label}</title></path>)}
           {geometry.lots.map((item, index) => {
             const { entity, lot, value, path } = item;
             const config = STATUS_CONFIG[displayStatus(lot.status)];
@@ -193,17 +210,45 @@ export function CommercialMiniMap({
           })}
           {numbered && geometry.lots.map(({ lot, labelPoint, labelWidth, labelHeight }) => {
             if (!lot.lotNumber) return null;
-            const vertical = labelWidth < lot.lotNumber.length * 9 + 6 && labelHeight > labelWidth * 1.2;
-            const along = vertical ? labelHeight : labelWidth;
-            const across = vertical ? labelWidth : labelHeight;
-            const fontSize = Math.max(1, Math.min(14, (along - 4) / (lot.lotNumber.length * 0.67), across - 4));
+            const { fontSize, vertical, fontPixels } = commercialMiniMapNumberLabel(lot.lotNumber, labelWidth, labelHeight, pixelsPerUnit, numberLabelPixels);
             return <text key={lot.id} x={labelPoint[0]} y={labelPoint[1]} textAnchor="middle" dominantBaseline="central"
               transform={vertical ? `rotate(-90 ${labelPoint[0]} ${labelPoint[1]})` : undefined}
-              style={{ fontSize }} className="commercial-dashboard-module-number" aria-hidden="true">{lot.lotNumber}</text>;
+              data-module-number={lot.lotNumber} data-label-font-px={fontPixels.toFixed(2)}
+              style={{ fontSize, strokeWidth: Math.min(1.1, .7 / pixelsPerUnit) }} className="commercial-dashboard-module-number" aria-hidden="true">{lot.lotNumber}</text>;
+          })}
+          {supports.map((outline) => {
+            const points = outline.coordinates[0].map(geometry.project);
+            const width = Math.max(...points.map(([x]) => x)) - Math.min(...points.map(([x]) => x));
+            const height = Math.max(...points.map(([, y]) => y)) - Math.min(...points.map(([, y]) => y));
+            const x = (Math.min(...points.map(([px]) => px)) + Math.max(...points.map(([px]) => px))) / 2;
+            let labelTop = Math.min(...points.map(([, py]) => py)) + 3;
+            let labelBottom = Math.max(...points.map(([, py]) => py)) - 3;
+            const left = Math.min(...points.map(([px]) => px)), right = Math.max(...points.map(([px]) => px));
+            // Fit the support name into the free band inside its room, leaving
+            // the official access anchor and symbol exactly where they are.
+            for (const marker of presentation.markers) {
+              if (marker.iconX + 14 < left || marker.iconX - 14 > right || marker.iconY + 14 < labelTop || marker.iconY - 14 > labelBottom) continue;
+              if (labelBottom - marker.iconY - 18 > marker.iconY - 18 - labelTop) labelTop = marker.iconY + 18;
+              else labelBottom = marker.iconY - 18;
+            }
+            const y = (labelTop + labelBottom) / 2;
+            const lettersPerLine = Math.max(4, Math.floor((width * pixelsPerUnit - 6) / 5.6));
+            const lines = outline.label.split(' ').reduce<string[]>((result, word) => {
+              const last = result.length - 1;
+              if (last >= 0 && `${result[last]} ${word}`.length <= lettersPerLine) result[last] += ` ${word}`;
+              else result.push(word);
+              return result;
+            }, []);
+            const fontSize = Math.max(.5, Math.min(10 / pixelsPerUnit, (width - 6) / (Math.max(...lines.map(line => line.length)) * .56),
+              Math.min(height - 6, labelBottom - labelTop) / (lines.length * 1.25)));
+            return <text key={outline.id} x={x} y={y - (lines.length - 1) * fontSize * .6} fontSize={fontSize} textAnchor="middle" dominantBaseline="central"
+              className="commercial-dashboard-support-label" aria-hidden="true">
+              {lines.map((line, index) => <tspan key={index} x={x} dy={index === 0 ? 0 : fontSize * 1.2}>{line}</tspan>)}
+            </text>;
           })}
           {presentation.markers.map((marker) => {
             const { x, y, iconX, iconY } = marker;
-            // Leaders retain official positions; icons stay outside the pavilion.
+            // Leaders retain official positions, even beside support wings.
             return <g key={marker.id} role="img" aria-label={`${ACCESS_LABEL[marker.kind]}: ${marker.label}`} data-access-kind={marker.kind}>
               <title>{ACCESS_LABEL[marker.kind]}: {marker.label}</title>
               <path d={`M ${x} ${y} L ${iconX} ${iconY}`} stroke="#315543" strokeWidth="1.5" fill="none" />
@@ -225,6 +270,7 @@ export function CommercialMiniMap({
     {!!accesses.length && <div className="commercial-dashboard-map-legend" aria-label="Legenda dos acessos">
       {[...new Set(accesses.map(({ kind }) => kind))].map((kind) => <span key={kind}>{ACCESS_SYMBOL[kind]} {ACCESS_LABEL[kind]}</span>)}
     </div>}
+    {!!supports.length && <p className="commercial-dashboard-data-note commercial-dashboard-support-note">Apoios permanentes indicados na planta · não são espaços comerciais.</p>}
     {numbered && <p className="commercial-dashboard-data-note">Numeração do cadastro. Amplie para inspecionar ou use o seletor para consultar um módulo.</p>}
     {geometry.lots.length < items.length && <p className="commercial-dashboard-data-note">{items.length - geometry.lots.length} espaços sem geometria válida; incluídos nos indicadores e no seletor.</p>}
     <div className="commercial-dashboard-lot-detail" role="status" aria-live="polite">

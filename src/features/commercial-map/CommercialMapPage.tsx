@@ -9,7 +9,6 @@ import {
   ArrowLeft,
   BadgeCheck,
   Box,
-  ChartNoAxesCombined,
   DatabaseZap,
   MapPinPlus,
   MousePointer2,
@@ -72,7 +71,7 @@ import { canUseTechnicalValidationOverlay } from './utils/technicalValidation';
 import { lunarLaunchPhaseLabel } from './utils/lunarLaunch';
 import { recordCommercialMapProfiler } from './utils/profilerDiagnostics';
 import { markCommercialMapStage } from './utils/performanceDiagnostics';
-import { canHandleCommercialMapEscape } from './utils/contextualNavigation';
+import { canHandleCommercialDashboardEscape, canHandleCommercialMapEscape, getCommercialDashboardFocusableElements } from './utils/contextualNavigation';
 import { buildPavilionModuleCommercialIndex, resolveCommercialPavilionModuleNavigationTarget } from './utils/pavilionModuleCommercial';
 import { useCommercialDashboardSync } from './dashboard/useCommercialDashboardSync';
 import { useSaleInspectionStore } from './state/useSaleInspectionStore';
@@ -228,6 +227,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const lastInteriorEntityId = useRef<string | null>(null);
   const [publishReason, setPublishReason] = useState('Publicação após revisão cartográfica e comercial');
   const [dashboardOpen, setDashboardOpen] = useState(false);
+  const dashboardAvailable = permissions.canViewMapAnalytics && !isPreview && !isCommissionScope && !visitEnabled;
   const [saleResolution, setSaleResolution] = useState<SaleInspectionResolution | null>(null);
   useEffect(() => () => useSaleInspectionStore.getState().clear(), []);
   const dashboardOverlayRef = useRef<HTMLDivElement>(null);
@@ -236,7 +236,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const closeDashboard = useCallback(() => {
     setDashboardOpen(false);
     window.requestAnimationFrame(() => document.querySelector<HTMLButtonElement>(
-      '.commercial-map-header-tools button[aria-label="Gestão"]',
+      '[data-commercial-dashboard-trigger]',
     )?.focus());
   }, []);
   const technicalValidationAllowed = !isCommissionScope
@@ -249,8 +249,8 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const previousMapScope = useRef(mapScopeKey);
 
   useEffect(() => {
-    if (!permissions.canViewMapAnalytics || isCommissionScope || visitEnabled) setDashboardOpen(false);
-  }, [isCommissionScope, permissions.canViewMapAnalytics, visitEnabled]);
+    if (!dashboardAvailable) setDashboardOpen(false);
+  }, [dashboardAvailable]);
 
   useEffect(() => {
     if (dashboardDockRef.current) dashboardDockRef.current.inert = dashboardOpen;
@@ -387,7 +387,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
         return;
       }
       if (dashboardOpen) {
-        if (event.key === 'Escape' && !event.defaultPrevented && !event.isComposing) {
+        if (canHandleCommercialDashboardEscape(event, dashboardOverlayRef.current)) {
           event.preventDefault();
           closeDashboard();
         }
@@ -498,18 +498,6 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
 
   const managementActions = hasManagementActions ? (
     <>
-          {permissions.canViewMapAnalytics && (
-            <Button
-              size="sm"
-              variant="outline"
-              data-commercial-dashboard-trigger
-              aria-pressed={dashboardOpen}
-              onClick={() => setDashboardOpen(true)}
-            >
-              <ChartNoAxesCombined />
-              Dashboard Comercial
-            </Button>
-          )}
           {permissions.canViewMapAnalytics && <PublicInterestDialog />}
               {permissions.canEditGeometry && (
                 <Button
@@ -684,6 +672,8 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
       <CommercialMapHeaderTools
         managementActions={managementActions}
         dashboardOpen={dashboardOpen}
+        dashboardAvailable={dashboardAvailable}
+        onOpenDashboard={() => setDashboardOpen(true)}
         salesAvailable={webglAvailable && data.source === 'database' && permissions.canManageSales}
         visitAvailable={(areaScope === 'park' || isCommissionScope) && webglAvailable && !interiorEntity && !lunarCinematicUiActive}
         visitEntityId={selectedLot && selectedEntity?.classification !== 'INTERNAL_STAND' ? selectedEntity?.id : undefined}
@@ -928,19 +918,21 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
             onClose={closeSaleInspection}
           />
         )}
-        {dashboardOpen && permissions.canViewMapAnalytics && !isCommissionScope && (
+        {dashboardOpen && dashboardAvailable && (
           <div
             ref={dashboardOverlayRef}
+            id="commercial-dashboard-overlay"
             className="commercial-dashboard-overlay"
             role="dialog"
             aria-modal="true"
             aria-label="Dashboard Comercial"
             tabIndex={-1}
             onKeyDown={(event) => {
-              if (event.key !== 'Tab') return;
-              const focusable = Array.from(event.currentTarget.querySelectorAll<HTMLElement>(
-                'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-              )).filter((element) => !element.hasAttribute('disabled') && element.getClientRects().length > 0);
+              if (event.key !== 'Tab' || event.defaultPrevented) return;
+              const target = event.target instanceof Element ? event.target : document.activeElement;
+              const nestedOwner = target?.closest('[role="dialog"], [role="alertdialog"], [data-commercial-map-escape-priority="true"]');
+              if (nestedOwner && nestedOwner !== event.currentTarget) return;
+              const focusable = getCommercialDashboardFocusableElements(event.currentTarget);
               const first = focusable[0];
               const last = focusable[focusable.length - 1];
               if (!first || !last) {

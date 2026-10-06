@@ -136,6 +136,14 @@
 .commercial-map-header-tools .commercial-map-header-sales__cart { position: absolute; top: 4px; left: 3px; width: 22px; height: 22px; animation: commercial-map-cart-flight var(--header-cart-flight-duration) cubic-bezier(.2,.7,.25,1) 1 both; }
 .commercial-map-header-tools .commercial-map-header-sales__flame { position: absolute; z-index: 1; bottom: 0; left: 0; width: 13px; height: 15px; color: #ffd56b; fill: rgb(255 170 54 / .65); opacity: 0; animation: commercial-map-cart-ignition var(--header-cart-flight-duration) cubic-bezier(.2,.7,.25,1) 1 both; }
 .commercial-map-header-sales__motion::after { position: absolute; top: 17px; left: 0; width: 10px; height: 1px; border-radius: 2px; background: #ecfbff; box-shadow: 0 4px 0 rgb(221 248 255 / .55); content: ''; opacity: 0; animation: commercial-map-cart-speed var(--header-cart-flight-duration) ease-out 1 both; }
+.commercial-map-header-tools > .commercial-map-header-dashboard { border-color: #83aec7; background: #e7f3f9; color: #155b81; }
+.commercial-map-header-tools > .commercial-map-header-dashboard.is-active { border-color: #26789e; background: #c5e4f2; color: #124a68; }
+.commercial-map-header-tools .commercial-map-header-dashboard svg { width: 23px; height: 23px; stroke-width: 1.6; }
+.commercial-map-header-dashboard__label { display: none; font-size: 12px; font-weight: 800; letter-spacing: .01em; }
+@container commercial-map-module (min-width: 1101px) {
+  .commercial-map-header-tools > .commercial-map-header-dashboard { width: auto; gap: 7px; border-radius: 15px; padding-inline: 11px; }
+  .commercial-map-header-dashboard__label { display: inline; }
+}
 .commercial-map-header-management { display: grid; width: 280px; gap: 10px; max-width: calc(100vw - 20px); max-height: var(--radix-popover-content-available-height, calc(100dvh - 100px)); overflow: auto; border: 1px solid #b6ccdb; border-radius: 20px; padding: 12px; background: linear-gradient(145deg, #f4f9fc, #e6f1f8); color: #173f5b; box-shadow: inset 0 1px #fff, 0 10px 26px -12px rgb(20 49 67 / .4); z-index: 45; }
 .commercial-map-header-management > strong { padding: 2px 4px; color: #244d69; font-size: 13px; font-weight: 800; }
 .commercial-map-header-management button { justify-content: flex-start; min-height: 44px; white-space: normal; text-align: left; }
@@ -219,6 +227,6 @@
 @media (forced-colors: active) {
   .commercial-map-module__back, .commercial-map-module__search-trigger, .commercial-map-module__edition,
   .commercial-map-header-tools > button, .commercial-map-header-management__list { border-color: ButtonText; }
-  .commercial-map-header-tools > .commercial-map-header-sales { background: ButtonFace; color: ButtonText; box-shadow: none; }
+  .commercial-map-header-tools > .commercial-map-header-sales, .commercial-map-header-tools > .commercial-map-header-dashboard { background: ButtonFace; color: ButtonText; box-shadow: none; }
   .commercial-map-header-tools > button.is-active, .commercial-map-header-management__list.is-active { border: 2px solid Highlight; }
 }
