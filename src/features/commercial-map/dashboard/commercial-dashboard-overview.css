@@ -586,7 +586,6 @@
 .commercial-dashboard-overview-progress__title-row { display: flex; align-items: center; gap: 8px; }
 .commercial-dashboard-overview-progress h2 { margin: 0; color: var(--overview-ink); font-size: 15px; font-weight: 700; letter-spacing: -.01em; line-height: 1.35; }
 .commercial-dashboard-overview-progress__total {
-  flex: 0 0 auto;
   color: var(--overview-blue-800);
   font-family: var(--overview-font-data);
   font-size: 25px;
@@ -664,13 +663,12 @@
 .commercial-dashboard-overview-progress__key--confirmed path { fill: none; stroke: #fff; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
 .commercial-dashboard-overview-progress__key--open circle { fill: #fff; stroke: var(--overview-orange-600); stroke-width: 1.4; }
 .commercial-dashboard-overview-progress__key--open path { fill: var(--overview-orange-600); }
+.commercial-dashboard-overview-progress__head-end { display: flex; flex: 0 0 auto; align-items: center; gap: 12px; }
 .commercial-dashboard-overview .commercial-dashboard-overview-progress__motion {
   display: inline-grid;
   width: 28px;
   height: 28px;
-  flex: 0 0 auto;
   place-items: center;
-  margin-left: auto;
   padding: 0;
   border: 1px solid var(--overview-line);
   border-radius: 999px;
@@ -686,16 +684,16 @@
   display: inline-flex;
   align-items: baseline;
   gap: 8px;
-  margin: 0;
+  margin: 0 0 0 auto;
   padding: 5px 10px 5px 9px;
   border: 1px solid var(--overview-line);
   border-radius: 8px;
   background: rgb(255 255 255 / .72);
   box-shadow: inset 0 1px 0 #fff;
 }
-.commercial-dashboard-overview-progress__legend + .commercial-dashboard-overview-progress__reference { margin-left: auto; }
 .commercial-dashboard-overview-progress__reference-label {
   color: var(--overview-muted);
+  white-space: nowrap;
   font-size: 9.5px;
   font-weight: 750;
   letter-spacing: .08em;
@@ -796,9 +794,7 @@
   .commercial-dashboard-overview-progress h2 { font-size: 13px; }
   .commercial-dashboard-overview-progress__total { font-size: 22px; }
   .commercial-dashboard-overview-progress__legend { flex-basis: 100%; gap: 4px 14px; }
-  .commercial-dashboard-overview-progress__legend + .commercial-dashboard-overview-progress__reference { margin-left: 0; }
-  .commercial-dashboard-overview .commercial-dashboard-overview-progress__motion { order: 2; }
-  .commercial-dashboard-overview-progress__reference { min-width: 0; flex: 1 1 auto; justify-content: space-between; }
+  .commercial-dashboard-overview-progress__reference { min-width: 0; flex: 1 1 auto; flex-wrap: wrap; justify-content: space-between; margin-left: 0; }
   .commercial-dashboard-overview__kpis { gap: 8px; margin-top: 12px; }
   .commercial-dashboard-overview-kpi { min-height: 95px; }
   .commercial-dashboard-overview__kpis > :last-child { min-height: 74px; }

@@ -151,12 +151,18 @@ export function CommercialSalesProgress({ aggregate, fillMemory }: {
             note="Valores de vendas não representam receita recebida." />
         </div>
       </div>
-      <strong className="commercial-dashboard-overview-progress__total">{progress.available ? format(progress.combined) : '—'}</strong>
+      <div className="commercial-dashboard-overview-progress__head-end">
+        {progress.available && <button type="button" className="commercial-dashboard-overview-progress__motion"
+          aria-label="Pausar corrida do Sojinha" aria-pressed={paused} onClick={() => setPaused((value) => !value)}>
+          {paused ? <PlayGlyph /> : <PauseGlyph />}
+        </button>}
+        <strong className="commercial-dashboard-overview-progress__total">{progress.available ? format(progress.combined) : '—'}</strong>
+      </div>
     </div>
-    <div className="commercial-dashboard-overview-progress__course" ref={courseRef} aria-hidden="true"
+    <div className="commercial-dashboard-overview-progress__course" ref={courseRef}
       data-commercial-map-full-motion data-paused={paused ? 'true' : 'false'}>
-      {progress.available && <div className="commercial-dashboard-overview-progress__runner"><RunningSojinha /></div>}
-      <div className="commercial-dashboard-overview-progress__track">
+      {progress.available && <div className="commercial-dashboard-overview-progress__runner" aria-hidden="true"><RunningSojinha /></div>}
+      <div className="commercial-dashboard-overview-progress__track" aria-hidden="true">
         <div className="commercial-dashboard-overview-progress__fill">
           <span className="commercial-dashboard-overview-progress__segment commercial-dashboard-overview-progress__segment--confirmed" />
           <span className="commercial-dashboard-overview-progress__segment commercial-dashboard-overview-progress__segment--open" />
@@ -168,10 +174,6 @@ export function CommercialSalesProgress({ aggregate, fillMemory }: {
         <li><LegendConfirmedKey />Confirmadas <b>{progress.available ? format(progress.confirmed) : '—'}</b></li>
         <li><LegendOpenKey />Em andamento <b>{progress.available ? format(progress.open) : '—'}</b></li>
       </ul>
-      {progress.available && <button type="button" className="commercial-dashboard-overview-progress__motion"
-        aria-label="Pausar corrida do Sojinha" aria-pressed={paused} onClick={() => setPaused((value) => !value)}>
-        {paused ? <PlayGlyph /> : <PauseGlyph />}
-      </button>}
       <p className="commercial-dashboard-overview-progress__reference">
         {progress.available ? <>
           <span className="commercial-dashboard-overview-progress__reference-label">{basisLabel}</span>

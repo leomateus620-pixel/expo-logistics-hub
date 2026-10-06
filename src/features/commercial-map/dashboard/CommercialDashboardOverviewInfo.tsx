@@ -55,6 +55,11 @@ export function OverviewInfo({ label, title, lead, facts = [], note, align = 'en
           pointerFocus.current = false;
         }}
         onBlur={() => { if (!pinned.current) close(); }}
+        onKeyDown={(event) => {
+          if (event.key !== 'Escape' || !open || event.defaultPrevented) return;
+          event.preventDefault();
+          close();
+        }}
         onClick={(event) => {
           event.preventDefault();
           clear();
