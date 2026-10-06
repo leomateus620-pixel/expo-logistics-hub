@@ -147,13 +147,13 @@ interface MapReadContext { signal?: AbortSignal; recordStage: CommercialMapStage
 const mapRequest = (query: any, context: MapReadContext): Promise<any> => awaitCommercialMapRequest(query, context.signal);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function fetchAllRows(buildQuery: () => any, stage: string, context: MapReadContext): Promise<{ data: any[] | null; error: any }> {
+async function fetchAllRows(buildQuery: () => any, stage: string, context: MapReadContext, orderColumn = 'id'): Promise<{ data: any[] | null; error: any }> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const all: any[] = [];
   for (let from = 0; ; from += MAP_PAGE_SIZE) {
     throwIfMapRequestAborted(context.signal);
     const { data, error } = await measureCommercialMapOperation<Awaited<ReturnType<typeof fetchAllRows>>>(context.recordStage, `${stage}:page-${from / MAP_PAGE_SIZE}`, () => mapRequest(buildQuery()
-      .order('id')
+      .order(orderColumn)
       .range(from, from + MAP_PAGE_SIZE - 1), context));
     if (error) return { data: null, error };
     const rows = data ?? [];
@@ -669,7 +669,7 @@ export async function fetchCommercialMap(
     fetchAllRows(() => db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true), 'geometries', context),
     calibrationPromise,
     fetchAllRows(() => db.from('commercial_lots').select(COMMERCIAL_LOT_BASE_SELECT).eq('project_id', project.id).is('archived_at', null), 'lots', context),
-    fetchAllRows(() => db.from('commercial_lot_pricing_2028').select(PRICING_2028_COLUMNS).eq('project_id', project.id), 'pricing-2028', context),
+    fetchAllRows(() => db.from('commercial_lot_pricing_2028').select(PRICING_2028_COLUMNS).eq('project_id', project.id), 'pricing-2028', context, 'lot_id'),
     mapRequest(db.from('commercial_lots').select('id').eq('project_id', project.id).limit(1), context),
     mapRequest(db.from('map_segments').select('id, slug').eq('project_id', project.id).eq('is_active', true), context),
   ]);
