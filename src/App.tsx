@@ -295,7 +295,7 @@ function LogisticaModuleRoutes() {
  * pela comissão direto no mapa normal, sem o segmento travado. Não concede nada:
  * só encaminha para a rota já protegida pela mesma capability.
  */
-function FullMapViewerRedirect({ children }: { children: React.ReactNode }) {
+function FullMapViewerRedirect({ children }: { children: import('react').ReactNode }) {
   const { hasCapability, isLoading } = useCapabilities();
   if (isLoading) return <CommercialMapBootLoader force />;
   if (hasCapability('map.view')) return <Navigate to="/mapa-comercial" replace />;

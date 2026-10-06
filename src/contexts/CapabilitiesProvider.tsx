@@ -14,6 +14,9 @@ interface CapabilitiesContextValue {
   hasFullAccess: boolean;
   hasCapability: (cap: string) => boolean;
   isLoading: boolean;
+  /** Falha ao consultar permissões (não equivale a ausência de permissão). */
+  loadError: boolean;
+  retry: () => void;
   capSet: Set<string>;
 }
 
@@ -60,7 +63,7 @@ export function CapabilitiesProvider({ children }: { children: ReactNode }) {
 
   // Capabilities are always loaded for operators so a `restricted_scope`
   // marker can demote them to explicit, per-capability access.
-  const { data: capabilities = [], isLoading: capLoading } = useQuery({
+  const { data: capabilities = [], isLoading: capLoading, isError: capError, refetch } = useQuery({
     queryKey: ["user-capabilities", user?.id, orgId],
     queryFn: async () => {
       if (!user || !orgId) return [];
@@ -104,8 +107,8 @@ export function CapabilitiesProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ hasFullAccess, hasCapability, isLoading, capSet }),
-    [hasFullAccess, hasCapability, isLoading, capSet],
+    () => ({ hasFullAccess, hasCapability, isLoading, capSet, loadError: capError, retry: () => { void refetch(); } }),
+    [hasFullAccess, hasCapability, isLoading, capSet, capError, refetch],
   );
 
   return (
