@@ -1,0 +1,42 @@
+{
+  "previousRevision": "ba6d9647e3c88bf9099a820aa1e68941ddfb0369",
+  "checkedAtUtc": "2026-10-06T10:19:00.6419601Z",
+  "checks": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "command": "npx eslint src/components/cronograma-eventos/CronogramaModuleShell.tsx",
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "command": "npm test -- cronogramaAgendaMode cronogramaWeeklySummary --reporter=json",
+      "exitCode": 0,
+      "total": 23,
+      "passed": 23,
+      "failed": 0
+    }
+  ],
+  "suites": [
+    {
+      "suite": "cronogramaAgendaMode.test.tsx",
+      "total": 8,
+      "passed": 8,
+      "failed": 0
+    },
+    {
+      "suite": "cronogramaWeeklySummary.test.ts",
+      "total": 15,
+      "passed": 15,
+      "failed": 0
+    }
+  ],
+  "notes": [
+    "Existing direct tests cover mode/search preservation and weekly-summary rules. There are no direct unit suites for the shell or preparation pill.",
+    "Preparation component, countdown hook/formula, handlers and unit-test files are unchanged in this revision; geometry, portal relocation and breakpoint focus are checked by browser QA.",
+    "The 15 previously reproduced baseline failures remain documented in docs/validation/agenda-mobile-two-rows/unit-baseline-comparison.json; those unrelated broad suites were not rerun for this layout-only revision."
+  ]
+}

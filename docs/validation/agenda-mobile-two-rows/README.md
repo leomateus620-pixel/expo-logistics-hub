@@ -1,5 +1,7 @@
 # Cabeçalho da Agenda em duas linhas
 
+> Evidência histórica da primeira revisão da PR #187, em `ba6d9647`. A [revisão atual, com Sair na primeira linha e modos/preparação na segunda](../agenda-mobile-mode-row/README.md), tem relatório e capturas próprios; estas capturas originais foram preservadas.
+
 Baseline revalidado: `3236f6905b53d9ebd84fcf2d80a2494fd17f2754` (merge da PR #186), em checkout independente. A evidência anterior da PR #186 foi preservada.
 
 O harness monta os componentes reais da Agenda, com eventos sintéticos explicitamente identificados e hooks de leitura interceptados. Não cria rota da aplicação, não acessa um backend autenticado e não altera preferências de notificações, Google Agenda ou dados de produção.

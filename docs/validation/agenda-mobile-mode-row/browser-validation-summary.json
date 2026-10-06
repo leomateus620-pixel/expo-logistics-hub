@@ -1,0 +1,965 @@
+{
+  "baselineCommit": "ba6d9647e3c88bf9099a820aa1e68941ddfb0369",
+  "browser": {
+    "engine": "Chromium",
+    "version": "154.0.8037.98",
+    "mobileContextBelow": 1024,
+    "desktopContextFrom": 1024,
+    "deviceScaleFactor": 1
+  },
+  "afterChecks": {
+    "total": 1829,
+    "passed": 1829,
+    "failed": 0
+  },
+  "baselineChecks": {
+    "total": 458,
+    "passed": 454,
+    "failed": 4
+  },
+  "widths": [
+    320,
+    360,
+    390,
+    430,
+    640,
+    767,
+    768,
+    820,
+    899,
+    900,
+    1023,
+    1024,
+    1280,
+    1366
+  ],
+  "layoutMeasurements": 89,
+  "desktopPixelComparisons": [
+    {
+      "label": "1024-general-closed",
+      "before": {
+        "width": 1009,
+        "height": 59
+      },
+      "after": {
+        "width": 1009,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1024-general-search-focused",
+      "before": {
+        "width": 1009,
+        "height": 59
+      },
+      "after": {
+        "width": 1009,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1024-room-closed",
+      "before": {
+        "width": 1009,
+        "height": 59
+      },
+      "after": {
+        "width": 1009,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1024-room-search-focused",
+      "before": {
+        "width": 1009,
+        "height": 59
+      },
+      "after": {
+        "width": 1009,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1280-general-closed",
+      "before": {
+        "width": 1265,
+        "height": 59
+      },
+      "after": {
+        "width": 1265,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1280-general-search-focused",
+      "before": {
+        "width": 1265,
+        "height": 59
+      },
+      "after": {
+        "width": 1265,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1280-room-closed",
+      "before": {
+        "width": 1265,
+        "height": 59
+      },
+      "after": {
+        "width": 1265,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1280-room-search-focused",
+      "before": {
+        "width": 1265,
+        "height": 59
+      },
+      "after": {
+        "width": 1265,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1366-general-closed",
+      "before": {
+        "width": 1351,
+        "height": 59
+      },
+      "after": {
+        "width": 1351,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1366-general-search-focused",
+      "before": {
+        "width": 1351,
+        "height": 59
+      },
+      "after": {
+        "width": 1351,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1366-room-closed",
+      "before": {
+        "width": 1351,
+        "height": 59
+      },
+      "after": {
+        "width": 1351,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1366-room-search-focused",
+      "before": {
+        "width": 1351,
+        "height": 59
+      },
+      "after": {
+        "width": 1351,
+        "height": 59
+      },
+      "changedPixels": 0
+    }
+  ],
+  "desktopGeometryMatches": 12,
+  "mobileIntersections": 0,
+  "allControlsContainedInHeader": true,
+  "preparationStates": [
+    {
+      "label": "320-preparation-0-general",
+      "referenceTime": "2026-06-04T00:00:00-03:00",
+      "accessibleLabel": "Preparação 2026—2028: 0% concluído",
+      "value": {
+        "x": 117.390625,
+        "y": 74.390625,
+        "width": 20.453125,
+        "height": 18.40625,
+        "right": 137.84375,
+        "bottom": 92.796875
+      },
+      "track": {
+        "x": 141.84375,
+        "y": 80.390625,
+        "width": 47.1875,
+        "height": 6.390625,
+        "right": 189.03125,
+        "bottom": 86.78125
+      },
+      "fill": {
+        "progress": "0",
+        "transform": "none"
+      }
+    },
+    {
+      "label": "320-preparation-0-room",
+      "referenceTime": "2026-06-04T00:00:00-03:00",
+      "accessibleLabel": "Preparação 2026—2028: 0% concluído",
+      "value": {
+        "x": 117.390625,
+        "y": 74.390625,
+        "width": 20.453125,
+        "height": 18.40625,
+        "right": 137.84375,
+        "bottom": 92.796875
+      },
+      "track": {
+        "x": 141.84375,
+        "y": 80.390625,
+        "width": 47.1875,
+        "height": 6.390625,
+        "right": 189.03125,
+        "bottom": 86.78125
+      },
+      "fill": {
+        "progress": "0",
+        "transform": "none"
+      }
+    },
+    {
+      "label": "320-preparation-17-general",
+      "referenceTime": "2026-10-06T12:00:00-03:00",
+      "accessibleLabel": "Preparação 2026—2028: 17% concluído",
+      "value": {
+        "x": 117.390625,
+        "y": 74.390625,
+        "width": 29.34375,
+        "height": 18.40625,
+        "right": 146.734375,
+        "bottom": 92.796875
+      },
+      "track": {
+        "x": 150.734375,
+        "y": 80.390625,
+        "width": 38.296875,
+        "height": 6.390625,
+        "right": 189.03125,
+        "bottom": 86.78125
+      },
+      "fill": {
+        "progress": "0.17",
+        "transform": "none"
+      }
+    },
+    {
+      "label": "320-preparation-17-room",
+      "referenceTime": "2026-10-06T12:00:00-03:00",
+      "accessibleLabel": "Preparação 2026—2028: 17% concluído",
+      "value": {
+        "x": 117.390625,
+        "y": 74.390625,
+        "width": 29.34375,
+        "height": 18.40625,
+        "right": 146.734375,
+        "bottom": 92.796875
+      },
+      "track": {
+        "x": 150.734375,
+        "y": 80.390625,
+        "width": 38.296875,
+        "height": 6.390625,
+        "right": 189.03125,
+        "bottom": 86.78125
+      },
+      "fill": {
+        "progress": "0.17",
+        "transform": "none"
+      }
+    },
+    {
+      "label": "320-preparation-100-general",
+      "referenceTime": "2028-04-29T10:00:00-03:00",
+      "accessibleLabel": "Preparação 2026—2028: 100% concluído",
+      "value": {
+        "x": 117.390625,
+        "y": 74.390625,
+        "width": 40.375,
+        "height": 18.40625,
+        "right": 157.765625,
+        "bottom": 92.796875
+      },
+      "track": {
+        "x": 161.765625,
+        "y": 80.390625,
+        "width": 27.265625,
+        "height": 6.390625,
+        "right": 189.03125,
+        "bottom": 86.78125
+      },
+      "fill": {
+        "progress": "1",
+        "transform": "none"
+      }
+    },
+    {
+      "label": "320-preparation-100-room",
+      "referenceTime": "2028-04-29T10:00:00-03:00",
+      "accessibleLabel": "Preparação 2026—2028: 100% concluído",
+      "value": {
+        "x": 117.390625,
+        "y": 74.390625,
+        "width": 40.375,
+        "height": 18.40625,
+        "right": 157.765625,
+        "bottom": 92.796875
+      },
+      "track": {
+        "x": 161.765625,
+        "y": 80.390625,
+        "width": 27.265625,
+        "height": 6.390625,
+        "right": 189.03125,
+        "bottom": 86.78125
+      },
+      "fill": {
+        "progress": "1",
+        "transform": "none"
+      }
+    }
+  ],
+  "minimum320MiniTrackWidth": 27.265625,
+  "focusRelay": [
+    {
+      "expected": "Agenda geral",
+      "viewportWidth": 1024,
+      "name": "Agenda geral",
+      "activeName": "Agenda geral",
+      "retained": true,
+      "focusVisible": true,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "expected": "Agenda geral",
+      "viewportWidth": 1023,
+      "name": "Agenda geral",
+      "activeName": "Agenda geral",
+      "retained": true,
+      "focusVisible": true,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "expected": "Sala dos Voluntários",
+      "viewportWidth": 1024,
+      "name": "Sala dos Voluntários",
+      "activeName": "Sala dos Voluntários",
+      "retained": true,
+      "focusVisible": true,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "expected": "Sala dos Voluntários",
+      "viewportWidth": 1023,
+      "name": "Sala dos Voluntários",
+      "activeName": "Sala dos Voluntários",
+      "retained": true,
+      "focusVisible": true,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "expected": "Sair do sistema",
+      "viewportWidth": 1024,
+      "name": "Sair do sistema",
+      "activeName": "Sair do sistema",
+      "retained": true,
+      "focusVisible": true,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "expected": "Sair do sistema",
+      "viewportWidth": 1023,
+      "name": "Sair do sistema",
+      "activeName": "Sair do sistema",
+      "retained": true,
+      "focusVisible": true,
+      "width": 44,
+      "height": 44
+    }
+  ],
+  "tabSequences": [
+    {
+      "width": 320,
+      "expected": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "actual": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "focusVisible": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "width": 360,
+      "expected": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "actual": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "focusVisible": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "width": 390,
+      "expected": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "actual": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "focusVisible": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "width": 430,
+      "expected": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "actual": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "focusVisible": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "width": 640,
+      "expected": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "actual": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "focusVisible": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "width": 767,
+      "expected": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "actual": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "focusVisible": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "width": 768,
+      "expected": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "actual": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "focusVisible": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "width": 820,
+      "expected": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "actual": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "focusVisible": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "width": 899,
+      "expected": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "actual": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "focusVisible": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "width": 900,
+      "expected": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Ir para o período de hoje",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "actual": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Ir para o período de hoje",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "focusVisible": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "width": 1023,
+      "expected": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Ir para o período de hoje",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "actual": [
+        "Voltar ao portal de acesso",
+        "Abrir busca",
+        "Sair do sistema",
+        "Agenda geral",
+        "Sala dos Voluntários",
+        "Preparação 2026—2028: 17% concluído",
+        "Google Agenda: Não foi possível atualizar agora",
+        "Avisos no celular: Avisos desativados neste aparelho",
+        "Ir para o período de hoje",
+        "Resumo da semana: Semana atual · 5 eventos · 5h de agenda"
+      ],
+      "focusVisible": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    }
+  ],
+  "minimumPushContrast": 8.042383837340823,
+  "pushSignals": [
+    {
+      "label": "390-push-connected",
+      "signal": "connected",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(56, 178, 106)",
+      "contrast": 8.042383837340823
+    },
+    {
+      "label": "390-push-offline",
+      "signal": "offline",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(220, 70, 70)",
+      "contrast": 8.042383837340823
+    },
+    {
+      "label": "390-push-attention",
+      "signal": "attention",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(233, 168, 56)",
+      "contrast": 8.042383837340823
+    },
+    {
+      "label": "390-push-busy",
+      "signal": "busy",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(120, 170, 230)",
+      "contrast": 8.042383837340823
+    },
+    {
+      "label": "1023-push-connected",
+      "signal": "connected",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(56, 178, 106)",
+      "contrast": 8.042383837340823
+    },
+    {
+      "label": "1023-push-offline",
+      "signal": "offline",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(220, 70, 70)",
+      "contrast": 8.042383837340823
+    },
+    {
+      "label": "1023-push-attention",
+      "signal": "attention",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(233, 168, 56)",
+      "contrast": 8.042383837340823
+    },
+    {
+      "label": "1023-push-busy",
+      "signal": "busy",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(120, 170, 230)",
+      "contrast": 8.042383837340823
+    }
+  ],
+  "knownDesktopIntersections": [
+    {
+      "label": "1024-general-closed",
+      "intersections": [
+        {
+          "a": "Agenda geral",
+          "b": "Resumo da semana: Semana atual · 5 eventos · 5h de agenda",
+          "dx": 18.296875,
+          "dy": 44
+        },
+        {
+          "a": "Sala dos Voluntários",
+          "b": "Resumo da semana: Semana atual · 5 eventos · 5h de agenda",
+          "dx": 44,
+          "dy": 44
+        }
+      ],
+      "preserved": true
+    },
+    {
+      "label": "1024-general-search-focused",
+      "intersections": [
+        {
+          "a": "Agenda geral",
+          "b": "Resumo da semana: Semana atual · 5 eventos · 5h de agenda",
+          "dx": 18.296875,
+          "dy": 44
+        },
+        {
+          "a": "Sala dos Voluntários",
+          "b": "Resumo da semana: Semana atual · 5 eventos · 5h de agenda",
+          "dx": 44,
+          "dy": 44
+        }
+      ],
+      "preserved": true
+    },
+    {
+      "label": "1024-room-closed",
+      "intersections": [
+        {
+          "a": "Agenda geral",
+          "b": "Resumo da semana: Semana atual · 2 eventos · 2h de agenda",
+          "dx": 18.296875,
+          "dy": 44
+        },
+        {
+          "a": "Sala dos Voluntários",
+          "b": "Resumo da semana: Semana atual · 2 eventos · 2h de agenda",
+          "dx": 44,
+          "dy": 44
+        }
+      ],
+      "preserved": true
+    },
+    {
+      "label": "1024-room-search-focused",
+      "intersections": [
+        {
+          "a": "Agenda geral",
+          "b": "Resumo da semana: Semana atual · 2 eventos · 2h de agenda",
+          "dx": 18.296875,
+          "dy": 44
+        },
+        {
+          "a": "Sala dos Voluntários",
+          "b": "Resumo da semana: Semana atual · 2 eventos · 2h de agenda",
+          "dx": 44,
+          "dy": 44
+        }
+      ],
+      "preserved": true
+    }
+  ],
+  "knownDesktopSearchIssues": [
+    {
+      "width": 1024,
+      "before": {
+        "name": "Buscar no cronograma",
+        "tag": "INPUT",
+        "className": "cronograma-header-search-input",
+        "x": 245.78125,
+        "y": 10.671875,
+        "width": 0,
+        "height": 36,
+        "right": 245.78125,
+        "bottom": 46.671875
+      },
+      "after": {
+        "x": 245.78125,
+        "y": 0.671875,
+        "width": 0,
+        "height": 36
+      },
+      "note": "Approved desktop baseline already collapses the search input to zero width at 1024px. Query handoff is preserved and focus falls back to the visible Portal control; typing accessibility cannot be claimed for this input at this width."
+    }
+  ],
+  "runtimeErrors": [],
+  "externalWriteAttempts": [],
+  "mockPushMutations": [],
+  "limitations": [
+    "Chromium viewport reduction emulates available keyboard space; it is not a physical virtual keyboard.",
+    "Desktop Chromium cannot reproduce iOS Safari elastic overscroll or a physical pull gesture."
+  ]
+}

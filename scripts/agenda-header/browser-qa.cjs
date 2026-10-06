@@ -6,15 +6,15 @@ const path = require('node:path');
 const base = process.env.AGENDA_QA_BASE || 'http://127.0.0.1:5200';
 const sourceRoot = path.resolve(process.env.AGENDA_QA_SOURCE_ROOT || process.cwd());
 const phase = process.env.AGENDA_QA_PHASE || 'after';
-const outputRoot = path.resolve('docs/validation/agenda-mobile-two-rows/evidence');
+const outputRoot = path.resolve('docs/validation/agenda-mobile-mode-row/evidence');
 const output = path.join(outputRoot, phase);
 fs.mkdirSync(output, { recursive: true });
 const desktopAuditOnly = Boolean(process.env.AGENDA_QA_DESKTOP_AUDIT_ONLY);
 const report = {
-  phase, sourceRoot, baselineCommit: '3236f6905b53d9ebd84fcf2d80a2494fd17f2754',
+  phase, sourceRoot, baselineCommit: 'ba6d9647e3c88bf9099a820aa1e68941ddfb0369',
   boundary: 'Real local Agenda components; synthetic read-only data; intercepted external requests; no authenticated backend or production writes',
   limitations: ['Chromium viewport reduction emulates available keyboard space; it is not a physical virtual keyboard.', 'Desktop Chromium cannot reproduce iOS Safari elastic overscroll or a physical pull gesture.'],
-  checks: [], errors: [], blockedWrites: [], mockWrites: [], layouts: [], captures: [], desktopComparison: [], knownDesktopIssues: [], knownDesktopSearchIssues: [], pushStates: [],
+  checks: [], errors: [], blockedWrites: [], mockWrites: [], layouts: [], captures: [], desktopComparison: [], knownDesktopIssues: [], knownDesktopSearchIssues: [], pushStates: [], preparationStates: [], focusRelay: [], tabSequences: [],
 };
 if (desktopAuditOnly) {
   Object.assign(report, JSON.parse(fs.readFileSync(path.join(output, 'browser-report.json'), 'utf8')));
@@ -70,6 +70,7 @@ async function measure(page, label, width) {
       summaryComputed: [...header.querySelectorAll('.cronograma-command-summary-slot__summary, .cronograma-command-summary-slot__summary .cronograma-week-pill')].map(e => ({ className: e.className, visibility: getComputedStyle(e).visibility, transitionProperty: getComputedStyle(e).transitionProperty, transitionDuration: getComputedStyle(e).transitionDuration })),
       visibleTemporalGroups: [...header.querySelectorAll('.cronograma-command-temporal')].filter(visible).map(e => ({ className: e.className, ...box(e) })),
       preparation: optional('.cronograma-command-preparation'), google: optional('.cronograma-command-chip--google'),
+      preparationValue: optional('.cronograma-command-preparation__value'), preparationTrack: optional('.cronograma-command-preparation__track'), preparationFill: optional('.cronograma-command-preparation__track > span'),
       push: optional('.cronograma-command-chip--push'), signout: optional('.cronograma-module-signout'),
       field: optional('.cronograma-mobile-search-toggle__field'), fieldPosition: field ? getComputedStyle(field).position : null,
       scrollWidth: document.documentElement.scrollWidth, viewport: { width: innerWidth, height: innerHeight, clientWidth: document.documentElement.clientWidth },
@@ -89,20 +90,24 @@ async function measure(page, label, width) {
     check(label + ': existing desktop intersections match approved baseline', preserved, { before: baselineLayout.intersections, after: data.intersections });
     report.knownDesktopIssues.push({ label, intersections: data.intersections, preserved });
   } else check(label + ': real control bounds do not intersect', data.intersections.length === 0, data.intersections);
-  check(label + ': controls stay inside the visible horizontal viewport', data.controls.every(c => c.x >= -0.5 && c.right <= data.viewport.clientWidth + 0.5), data.controls.filter(c => c.x < -0.5 || c.right > data.viewport.clientWidth + 0.5));
+  const visibleRight = Math.min(data.viewport.clientWidth, data.header.right);
+  check(label + ': controls stay inside header and visible horizontal viewport', data.controls.every(c => c.x >= data.header.x - 0.5 && c.right <= visibleRight + 0.5), data.controls.filter(c => c.x < data.header.x - 0.5 || c.right > visibleRight + 0.5));
   check(label + ': no horizontal overflow', data.scrollWidth <= data.viewport.clientWidth + 1, { scrollWidth: data.scrollWidth, clientWidth: data.viewport.clientWidth, width });
   check(label + ': content follows header', data.main.y >= data.header.bottom - 0.5, { mainY: data.main.y, headerBottom: data.header.bottom });
   check(label + ': mode touch targets at least 44px', data.controls.filter(c => /cronograma-agenda-mode\b/.test(c.className)).every(c => c.width >= 43.5 && c.height >= 43.5));
   if (width < 1024 && phase !== 'baseline') {
     const { portal: p, toggle: t, modes: m, auxiliary: a } = data;
     check(label + ': Portal and search share the first row', p && t && Math.abs(p.y + p.height / 2 - t.y - t.height / 2) <= 1 && t.x >= p.right && t.x - p.right <= 12, { portal: p, toggle: t });
-    check(label + ': Portal, search and modes share the first row', p && m && t && Math.abs(p.y + p.height / 2 - m.y - m.height / 2) <= 1 && m.x >= t.right + 3, { portal: p, toggle: t, modes: m });
-    check(label + ': auxiliary actions form the second row', m && a && a.y >= m.bottom + 3, { modes: m, auxiliary: a });
-    const secondRow = [data.preparation, data.google, data.push, data.signout];
-    check(label + ': preparation, Google, notifications and signout align on row two', secondRow.every(Boolean) && secondRow.every(r => Math.abs(r.y + r.height / 2 - secondRow[0].y - secondRow[0].height / 2) <= 1), secondRow);
+    check(label + ': signout occupies the right end of the first row', p && t && data.signout && Math.abs(p.y + p.height / 2 - data.signout.y - data.signout.height / 2) <= 1 && data.signout.x >= t.right + 3 && Math.abs(data.header.right - data.signout.right - p.x + data.header.x) <= 1, { portal: p, toggle: t, signout: data.signout });
+    check(label + ': modes start the second row below Portal', p && m && a && m.y >= p.bottom + 3 && Math.abs(m.x - p.x) <= 1, { portal: p, modes: m, auxiliary: a });
+    const secondRow = [m, data.preparation, data.google, data.push];
+    check(label + ': modes, preparation, Google and notifications align on row two', secondRow.every(Boolean) && secondRow.every(r => Math.abs(r.y + r.height / 2 - secondRow[0].y - secondRow[0].height / 2) <= 1) && secondRow.slice(1).every((r, index) => r.x >= secondRow[index].right + 3), secondRow);
+    const { preparation: prep, preparationValue: value, preparationTrack: track, google } = data;
+    check(label + ': preparation retains a visible mini track of at least 24px', track && track.width >= 23.5 && track.height > 0, track);
+    check(label + ': preparation value and track stay inside their control without crossing Google', prep && value && track && google && value.x >= prep.x && value.right <= track.x + 0.5 && track.x >= prep.x && track.right <= prep.right + 0.5 && track.right < google.x && value.y >= prep.y && value.bottom <= prep.bottom && track.y >= prep.y && track.bottom <= prep.bottom, { preparation: prep, value, track, google });
     check(label + ': mobile header buttons and links have at least 44px targets', data.controls.filter(c => c.tag !== 'INPUT').every(c => c.width >= 43.5 && c.height >= 43.5), data.controls.filter(c => c.tag !== 'INPUT' && (c.width < 43.5 || c.height < 43.5)));
     check(label + ': exactly one temporal group is visible when supplied by desktop content', data.visibleTemporalGroups.length === (width >= 900 ? 1 : 0), data.visibleTemporalGroups);
-    if (width >= 900 && data.visibleTemporalGroups.length === 1) check(label + ': temporal group follows signout on row two', data.signout && data.visibleTemporalGroups[0].x >= data.signout.right + 3 && Math.abs(data.visibleTemporalGroups[0].y + data.visibleTemporalGroups[0].height / 2 - data.signout.y - data.signout.height / 2) <= 1, data.visibleTemporalGroups[0]);
+    if (width >= 900 && data.visibleTemporalGroups.length === 1) check(label + ': temporal group follows notifications at the end of row two', data.push && data.visibleTemporalGroups[0].x >= data.push.right + 3 && Math.abs(data.visibleTemporalGroups[0].y + data.visibleTemporalGroups[0].height / 2 - data.push.y - data.push.height / 2) <= 1, data.visibleTemporalGroups[0]);
     if (!data.field) check(label + ': weekly summary is visible below both control rows', data.summary && data.slot && data.summaryHidden !== 'true' && data.slot.y >= a.bottom - 0.5, { summary: data.summary, slot: data.slot });
     if (data.field) {
       check(label + ': expanded search participates in normal flow', data.fieldPosition !== 'absolute' && data.fieldPosition !== 'fixed', data.fieldPosition);
@@ -149,13 +154,13 @@ async function capture(page, label, desktop = false) {
     }
   }
 }
-async function prepare(page, signal = 'offline') {
+async function prepare(page, signal = 'offline', referenceTime = '2026-10-06T12:00:00-03:00') {
   page.on('pageerror', error => { report.errors.push(error.message); console.log('Page error: ' + error.message); });
   page.on('console', message => { if (message.type() === 'error') console.log('Browser: ' + message.text().slice(0, 400)); });
   page.on('requestfailed', request => console.log('Request failed: ' + request.url() + ' ' + request.failure()?.errorText));
   page.on('response', response => { if (response.status() >= 400 || process.env.AGENDA_QA_DEBUG) console.log(response.status() + ' ' + response.url().slice(0, 220)); });
   page.setDefaultTimeout(12000);
-  await page.clock.setFixedTime(new Date('2026-10-06T12:00:00-03:00'));
+  await page.clock.setFixedTime(new Date(referenceTime));
   await page.route('**/*', async route => {
     const url = new URL(route.request().url());
     if (url.origin === base) {
@@ -258,6 +263,28 @@ async function responsiveSearch(page, width) {
   await page.keyboard.press('Escape');
   await input.waitFor({ state: 'hidden' });
 }
+async function tabSequence(page, width) {
+  const expected = await page.evaluate(() => {
+    const header = document.querySelector('.cronograma-module-bar');
+    const visible = e => e && !e.disabled && e.tabIndex >= 0 && e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).display !== 'none';
+    const elements = ['.cronograma-module-back', '.cronograma-mobile-search-toggle__button', '.cronograma-module-signout', '.cronograma-agenda-mode--general', '.cronograma-agenda-mode--volunteers', '.cronograma-command-preparation', '.cronograma-command-chip--google', '.cronograma-command-chip--push'].map(s => header.querySelector(s));
+    elements.push(...[...header.querySelectorAll('.cronograma-command-temporal button')].filter(visible));
+    elements.push(header.querySelector('.cronograma-command-summary-slot__summary .cronograma-week-pill'));
+    return elements.map(e => e.getAttribute('aria-label') || e.textContent.trim());
+  });
+  await page.locator('.cronograma-module-back').focus();
+  const actual = [await page.evaluate(() => document.activeElement.getAttribute('aria-label'))];
+  const focusVisible = [];
+  for (let index = 1; index < expected.length; index++) {
+    await page.keyboard.press('Tab');
+    const current = await page.evaluate(() => ({ name: document.activeElement.getAttribute('aria-label') || document.activeElement.textContent.trim(), focusVisible: document.activeElement.matches(':focus-visible') }));
+    actual.push(current.name); focusVisible.push(current.focusVisible);
+  }
+  report.tabSequences.push({ width, expected, actual, focusVisible });
+  check(width + ': actual Tab order follows both visual control rows and summary', JSON.stringify(actual) === JSON.stringify(expected), { expected, actual });
+  check(width + ': keyboard focus remains visible across the Tab sequence', focusVisible.every(Boolean), focusVisible);
+  await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo(0, 0); });
+}
 async function orientationAndFilters(page) {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('button', { name: 'Abrir filtros avançados', exact: true }).click();
@@ -338,6 +365,65 @@ async function breakpointSearch(page) {
   await page.keyboard.press('Escape'); await input.waitFor({ state: 'hidden' });
 }
 const luminance = rgb => rgb.map(value => value / 255).map(value => value <= 0.04045 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4)).reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+async function breakpointControlFocus(browser) {
+  const context = await browser.newContext({ viewport: { width: 1023, height: 844 }, isMobile: true, hasTouch: true, timezoneId: 'America/Sao_Paulo', locale: 'pt-BR', reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  try {
+    await prepare(page);
+    const input = page.locator('.cronograma-mobile-search-toggle__field input');
+    await page.locator('.cronograma-mobile-search-toggle__button').click(); await input.waitFor();
+    await input.fill('histórica'); await page.waitForTimeout(300);
+    await page.keyboard.press('Escape'); await input.waitFor({ state: 'hidden' });
+    for (const name of ['Agenda geral', 'Sala dos Voluntários', 'Sair do sistema']) {
+      console.log(phase + ': breakpoint focus ' + name);
+      await page.setViewportSize({ width: 1023, height: 844 });
+      const target = page.getByRole('button', { name, exact: true });
+      await target.focus();
+      if (name !== 'Sair do sistema') await page.keyboard.press('Enter');
+      const selectedMode = await page.locator('.cronograma-agenda-mode[aria-pressed="true"]').getAttribute('aria-label');
+      for (const width of [1024, 1023]) {
+        await page.setViewportSize({ width, height: 844 });
+        await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+        const result = await target.evaluate(e => ({ name: e.getAttribute('aria-label'), activeName: document.activeElement?.getAttribute('aria-label'), retained: document.activeElement === e, focusVisible: e.matches(':focus-visible'), width: e.getBoundingClientRect().width, height: e.getBoundingClientRect().height }));
+        report.focusRelay.push({ expected: name, viewportWidth: width, ...result });
+        check(name + ': focus survives portal remount at ' + width + 'px', result.retained, result);
+        check(name + ': keyboard focus remains visible after portal remount at ' + width + 'px', result.focusVisible, result);
+        check(name + ': only one instance exists at ' + width + 'px', await target.count() === 1 && await page.locator('.cronograma-module-signout').count() === 1 && await page.locator('.cronograma-agenda-mode').count() === 2);
+        check(name + ': mode survives portal remount at ' + width + 'px', await page.locator('.cronograma-agenda-mode[aria-pressed="true"]').getAttribute('aria-label') === selectedMode);
+        check(name + ': query survives portal remount at ' + width + 'px', await page.locator('.cronograma-command-search input').inputValue() === 'histórica');
+      }
+    }
+  } catch (error) { report.errors.push('breakpoint-control-focus: ' + error.stack); }
+  await context.close();
+}
+async function preparationStates(browser) {
+  const clocks = { 0: '2026-06-04T00:00:00-03:00', 17: '2026-10-06T12:00:00-03:00', 100: '2028-04-29T10:00:00-03:00' };
+  for (const progress of [0, 17, 100]) {
+    const context = await browser.newContext({ viewport: { width: 320, height: 844 }, isMobile: true, hasTouch: true, timezoneId: 'America/Sao_Paulo', locale: 'pt-BR', reducedMotion: 'reduce' });
+    const page = await context.newPage();
+    try {
+      await prepare(page, 'offline', clocks[progress]);
+      for (const mode of ['general', 'room']) {
+        const label = `320-preparation-${progress}-${mode}`;
+        console.log(phase + ': ' + label);
+        await page.getByRole('button', { name: mode === 'general' ? 'Agenda geral' : 'Sala dos Voluntários', exact: true }).click();
+        await page.evaluate(() => document.activeElement?.blur()); await page.mouse.move(318, 800);
+        await capture(page, label + '-closed');
+        const closed = await measure(page, label + '-closed', 320);
+        const preparation = page.locator('.cronograma-command-preparation');
+        const computedProgress = await preparation.getAttribute('aria-label');
+        const fill = await preparation.locator('.cronograma-command-preparation__track > span').evaluate(e => ({ progress: getComputedStyle(e).getPropertyValue('--preparation-progress').trim(), transform: getComputedStyle(e).transform }));
+        check(label + ': original clock and cycle formula report the expected percentage', computedProgress === `Preparação 2026—2028: ${progress}% concluído`, computedProgress);
+        check(label + ': original mini-track fill preserves the percentage', Number(fill.progress) === progress / 100, fill);
+        report.preparationStates.push({ label, referenceTime: clocks[progress], accessibleLabel: computedProgress, value: closed.preparationValue, track: closed.preparationTrack, fill });
+        await page.locator('.cronograma-mobile-search-toggle__button').click(); await page.locator('.cronograma-mobile-search-toggle__field input').waitFor();
+        await page.mouse.move(318, 800); await capture(page, label + '-open'); await measure(page, label + '-open', 320);
+        await page.keyboard.press('Escape'); await page.locator('.cronograma-mobile-search-toggle__field input').waitFor({ state: 'hidden' });
+      }
+    } catch (error) { report.errors.push('preparation-' + progress + ': ' + error.stack); }
+    await context.close();
+  }
+}
 async function intermediateDesktopViewport(browser) {
   for (const width of [768, 820, 900, 1023]) {
     const context = await browser.newContext({ viewport: { width, height: 844 }, isMobile: false, hasTouch: false, timezoneId: 'America/Sao_Paulo', locale: 'pt-BR', reducedMotion: 'reduce' });
@@ -434,8 +520,12 @@ async function pushStates(browser) {
       await page.keyboard.press('Escape'); await popover.waitFor({ state: 'hidden' });
       check(label + ': Escape returns focus to original trigger', await trigger.evaluate(e => e === document.activeElement));
       await trigger.tap(); await popover.waitFor();
+      await page.waitForFunction(() => document.querySelector('.cronograma-command-popover[role="dialog"]')?.contains(document.activeElement));
+      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
       check(label + ': touch opens existing popover', await trigger.getAttribute('aria-expanded') === 'true');
+      check(label + ': touch opening places focus inside original popover', await popover.evaluate(e => e.contains(document.activeElement)));
       await page.keyboard.press('Escape'); await popover.waitFor({ state: 'hidden' });
+      check(label + ': Escape after touch returns focus to original trigger', await trigger.evaluate(e => e === document.activeElement));
       const writes = await page.evaluate(() => window.__agendaQaWrites);
       report.mockWrites.push(...writes);
       check(label + ': no push preference mutations attempted', writes.length === 0);
@@ -447,6 +537,11 @@ async function pushStates(browser) {
   const browser = await chromium.launch({ headless: true, channel: 'chrome', args: ['--disable-features=LocalNetworkAccessChecks,LocalNetworkAccessChecksWebSockets'] });
   report.browser = { engine: 'Chromium', version: browser.version(), mobileContextBelow: 1024, desktopContextFrom: 1024, deviceScaleFactor: 1 };
   try {
+    if (phase !== 'baseline' && !desktopAuditOnly) await breakpointControlFocus(browser);
+    if (process.env.AGENDA_QA_FOCUS_ONLY) {
+      check('Focus audit has no browser runtime errors', report.errors.length === 0, report.errors);
+      return;
+    }
     if (desktopAuditOnly) {
       await intermediateDesktopViewport(browser);
       check('Supplemental desktop viewport audit has no browser runtime errors', report.errors.length === 0, report.errors);
@@ -460,6 +555,7 @@ async function pushStates(browser) {
       try {
         await prepare(page);
         await verifySkip(page, width);
+        if (width < 1024 && phase !== 'baseline') await tabSequence(page, width);
         for (const mode of ['general', 'room']) {
           const modeButton = page.getByRole('button', { name: mode === 'general' ? 'Agenda geral' : 'Sala dos Voluntários', exact: true });
           await modeButton.focus(); await page.keyboard.press('Enter'); await page.waitForTimeout(100);
@@ -509,7 +605,7 @@ async function pushStates(browser) {
       }
       await context.close();
     }
-    if (phase !== 'baseline') await intermediateDesktopViewport(browser);
+    if (phase !== 'baseline') { await intermediateDesktopViewport(browser); await preparationStates(browser); }
     if (!process.env.AGENDA_QA_SKIP_PUSH) await pushStates(browser);
     check('No browser runtime errors', report.errors.length === 0, report.errors);
     check('No external writes attempted', report.blockedWrites.length === 0, report.blockedWrites);
