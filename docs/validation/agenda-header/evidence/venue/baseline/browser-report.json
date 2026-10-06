@@ -1,0 +1,6807 @@
+{
+  "phase": "baseline",
+  "boundary": "Actual VenueModuleShell and VenueNotificationsButton; mocked read-only auth/capabilities/push/Google/settings; external requests intercepted",
+  "checks": [
+    {
+      "name": "320-light-normal: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 212,
+        "y": 10,
+        "width": 44,
+        "height": 36,
+        "color": "oklch(0.2107 0.062 255.67)",
+        "colorRgba": [
+          3,
+          24,
+          52,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.2107 0.062 255.67)",
+        "iconStroke": "oklch(0.2107 0.062 255.67)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.2107 0.062 255.67)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 54,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24,
+            "right": 296.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 212,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 256,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 310,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 320,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "contrast": 1
+      }
+    },
+    {
+      "name": "320-light-normal: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 44,
+        "height": 36
+      }
+    },
+    {
+      "name": "320-light-normal: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "320-light-normal: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 54,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24,
+            "right": 296.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 212,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 256,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 310,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 320
+      }
+    },
+    {
+      "name": "320-light-hover: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 212,
+        "y": 10,
+        "width": 44,
+        "height": 36,
+        "color": "oklch(0.3152 0.1686 268.03)",
+        "colorRgba": [
+          18,
+          29,
+          133,
+          255
+        ],
+        "background": "oklch(0.93 0.03 268.03)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.3152 0.1686 268.03)",
+        "iconStroke": "oklch(0.3152 0.1686 268.03)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.3152 0.1686 268.03)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 54,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24,
+            "right": 296.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 212,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 256,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 310,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 320,
+        "sampledBackgroundRgb": [
+          220,
+          229,
+          251
+        ],
+        "effectiveForegroundRgb": [
+          18,
+          29,
+          133
+        ],
+        "contrast": 10.806602515907432
+      }
+    },
+    {
+      "name": "320-light-hover: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 44,
+        "height": 36
+      }
+    },
+    {
+      "name": "320-light-hover: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "320-light-hover: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 54,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24,
+            "right": 296.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 212,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 256,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 310,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 320
+      }
+    },
+    {
+      "name": "320-light-focus: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 212,
+        "y": 10,
+        "width": 44,
+        "height": 36,
+        "color": "oklch(0.2107 0.062 255.67)",
+        "colorRgba": [
+          3,
+          24,
+          52,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.2107 0.062 255.67)",
+        "iconStroke": "oklch(0.2107 0.062 255.67)",
+        "outline": {
+          "width": "2px",
+          "style": "solid",
+          "color": "rgba(0, 0, 0, 0)"
+        },
+        "focusVisible": true,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 54,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24,
+            "right": 296.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 212,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 256,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 310,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 320,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "contrast": 1
+      }
+    },
+    {
+      "name": "320-light-focus: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 44,
+        "height": 36
+      }
+    },
+    {
+      "name": "320-light-focus: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "320-light-focus: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 54,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24,
+            "right": 296.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 212,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 256,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 310,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 320
+      }
+    },
+    {
+      "name": "320-light: keyboard focus is visible",
+      "passed": true,
+      "detail": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "name": "320-light: Enter opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "320-light: Escape closes Sheet and restores button focus",
+      "passed": true
+    },
+    {
+      "name": "320-light: touch opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "320-light: touch close restores button focus",
+      "passed": true
+    },
+    {
+      "name": "320-light: no preference or external mutations attempted",
+      "passed": true
+    },
+    {
+      "name": "320-dark-normal: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 212,
+        "y": 10,
+        "width": 44,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.9846 0.0017 247.84)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 54,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24,
+            "right": 296.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 212,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 256,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 310,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 320,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          51
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 16.996287116363362
+      }
+    },
+    {
+      "name": "320-dark-normal: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 44,
+        "height": 36
+      }
+    },
+    {
+      "name": "320-dark-normal: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "320-dark-normal: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 54,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24,
+            "right": 296.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 212,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 256,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 310,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 320
+      }
+    },
+    {
+      "name": "320-dark-hover: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 212,
+        "y": 10,
+        "width": 44,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "oklch(0.28 0.078 263)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.9846 0.0017 247.84)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 54,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24,
+            "right": 296.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 212,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 256,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 310,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 320,
+        "sampledBackgroundRgb": [
+          19,
+          38,
+          77
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 14.230727338869638
+      }
+    },
+    {
+      "name": "320-dark-hover: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 44,
+        "height": 36
+      }
+    },
+    {
+      "name": "320-dark-hover: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "320-dark-hover: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 54,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24,
+            "right": 296.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 212,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 256,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 310,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 320
+      }
+    },
+    {
+      "name": "320-dark-focus: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 212,
+        "y": 10,
+        "width": 44,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "2px",
+          "style": "solid",
+          "color": "rgba(0, 0, 0, 0)"
+        },
+        "focusVisible": true,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 54,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24,
+            "right": 296.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 212,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 256,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 310,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 320,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          51
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 16.996287116363362
+      }
+    },
+    {
+      "name": "320-dark-focus: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 44,
+        "height": 36
+      }
+    },
+    {
+      "name": "320-dark-focus: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "320-dark-focus: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 10,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 54,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 47.78125,
+            "y": 64,
+            "width": 248.421875,
+            "height": 24,
+            "right": 296.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 212,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 256,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 266,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 310,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 320
+      }
+    },
+    {
+      "name": "320-dark: keyboard focus is visible",
+      "passed": true,
+      "detail": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "name": "320-dark: Enter opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "320-dark: Escape closes Sheet and restores button focus",
+      "passed": true
+    },
+    {
+      "name": "320-dark: touch opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "320-dark: touch close restores button focus",
+      "passed": true
+    },
+    {
+      "name": "320-dark: no preference or external mutations attempted",
+      "passed": true
+    },
+    {
+      "name": "390-light-normal: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 265,
+        "y": 10,
+        "width": 44,
+        "height": 36,
+        "color": "oklch(0.2107 0.062 255.67)",
+        "colorRgba": [
+          3,
+          24,
+          52,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.2107 0.062 255.67)",
+        "iconStroke": "oklch(0.2107 0.062 255.67)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.2107 0.062 255.67)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24,
+            "right": 349.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 265,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 309,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 363,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 375,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "contrast": 1
+      }
+    },
+    {
+      "name": "390-light-normal: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 44,
+        "height": 36
+      }
+    },
+    {
+      "name": "390-light-normal: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-light-normal: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24,
+            "right": 349.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 265,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 309,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 363,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 375
+      }
+    },
+    {
+      "name": "390-light-hover: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 265,
+        "y": 10,
+        "width": 44,
+        "height": 36,
+        "color": "oklch(0.3152 0.1686 268.03)",
+        "colorRgba": [
+          18,
+          29,
+          133,
+          255
+        ],
+        "background": "oklch(0.93 0.03 268.03)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklab(0.2107 -0.0153454 -0.0600709)",
+        "iconStroke": "oklab(0.2107 -0.0153454 -0.0600709)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.3152 0.1686 268.03)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24,
+            "right": 349.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 265,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 309,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 363,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 375,
+        "sampledBackgroundRgb": [
+          220,
+          229,
+          251
+        ],
+        "effectiveForegroundRgb": [
+          18,
+          29,
+          133
+        ],
+        "contrast": 10.806602515907432
+      }
+    },
+    {
+      "name": "390-light-hover: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 44,
+        "height": 36
+      }
+    },
+    {
+      "name": "390-light-hover: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-light-hover: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24,
+            "right": 349.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 265,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 309,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 363,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 375
+      }
+    },
+    {
+      "name": "390-light-focus: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 265,
+        "y": 10,
+        "width": 44,
+        "height": 36,
+        "color": "oklch(0.2107 0.062 255.67)",
+        "colorRgba": [
+          3,
+          24,
+          52,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.2107 0.062 255.67)",
+        "iconStroke": "oklch(0.2107 0.062 255.67)",
+        "outline": {
+          "width": "2px",
+          "style": "solid",
+          "color": "rgba(0, 0, 0, 0)"
+        },
+        "focusVisible": true,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24,
+            "right": 349.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 265,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 309,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 363,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 375,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "contrast": 1
+      }
+    },
+    {
+      "name": "390-light-focus: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 44,
+        "height": 36
+      }
+    },
+    {
+      "name": "390-light-focus: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-light-focus: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24,
+            "right": 349.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 265,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 309,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 363,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 375
+      }
+    },
+    {
+      "name": "390-light: keyboard focus is visible",
+      "passed": true,
+      "detail": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "name": "390-light: Enter opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "390-light: Escape closes Sheet and restores button focus",
+      "passed": true
+    },
+    {
+      "name": "390-light: touch opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "390-light: touch close restores button focus",
+      "passed": true
+    },
+    {
+      "name": "390-light: no preference or external mutations attempted",
+      "passed": true
+    },
+    {
+      "name": "390-dark-normal: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 265,
+        "y": 10,
+        "width": 44,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.9846 0.0017 247.84)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24,
+            "right": 349.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 265,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 309,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 363,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 375,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          51
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 16.996287116363362
+      }
+    },
+    {
+      "name": "390-dark-normal: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 44,
+        "height": 36
+      }
+    },
+    {
+      "name": "390-dark-normal: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-dark-normal: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24,
+            "right": 349.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 265,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 309,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 363,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 375
+      }
+    },
+    {
+      "name": "390-dark-hover: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 265,
+        "y": 10,
+        "width": 44,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "oklch(0.28 0.078 263)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.9846 0.0017 247.84)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24,
+            "right": 349.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 265,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 309,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 363,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 375,
+        "sampledBackgroundRgb": [
+          19,
+          38,
+          77
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 14.230727338869638
+      }
+    },
+    {
+      "name": "390-dark-hover: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 44,
+        "height": 36
+      }
+    },
+    {
+      "name": "390-dark-hover: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-dark-hover: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24,
+            "right": 349.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 265,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 309,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 363,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 375
+      }
+    },
+    {
+      "name": "390-dark-focus: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 265,
+        "y": 10,
+        "width": 44,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "2px",
+          "style": "solid",
+          "color": "rgba(0, 0, 0, 0)"
+        },
+        "focusVisible": true,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24,
+            "right": 349.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 265,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 309,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 363,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 375,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          51
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 16.996287116363362
+      }
+    },
+    {
+      "name": "390-dark-focus: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 44,
+        "height": 36
+      }
+    },
+    {
+      "name": "390-dark-focus: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390-dark-focus: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 64,
+            "width": 299.421875,
+            "height": 24,
+            "right": 349.203125,
+            "bottom": 88
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 265,
+            "y": 10,
+            "width": 44,
+            "height": 36,
+            "right": 309,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 319,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 363,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 375
+      }
+    },
+    {
+      "name": "390-dark: keyboard focus is visible",
+      "passed": true,
+      "detail": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "name": "390-dark: Enter opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "390-dark: Escape closes Sheet and restores button focus",
+      "passed": true
+    },
+    {
+      "name": "390-dark: touch opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "390-dark: touch close restores button focus",
+      "passed": true
+    },
+    {
+      "name": "390-dark: no preference or external mutations attempted",
+      "passed": true
+    },
+    {
+      "name": "768-light-normal: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 553.34375,
+        "y": 10,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.2107 0.062 255.67)",
+        "colorRgba": [
+          3,
+          24,
+          52,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.2107 0.062 255.67)",
+        "iconStroke": "oklch(0.2107 0.062 255.67)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.2107 0.062 255.67)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21,
+            "right": 727.203125,
+            "bottom": 86.5
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 553.34375,
+            "y": 10,
+            "width": 133.65625,
+            "height": 36,
+            "right": 687,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 741,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 753,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "contrast": 1
+      }
+    },
+    {
+      "name": "768-light-normal: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "768-light-normal: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "768-light-normal: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21,
+            "right": 727.203125,
+            "bottom": 86.5
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 553.34375,
+            "y": 10,
+            "width": 133.65625,
+            "height": 36,
+            "right": 687,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 741,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 753
+      }
+    },
+    {
+      "name": "768-light-hover: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 553.34375,
+        "y": 10,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.3152 0.1686 268.03)",
+        "colorRgba": [
+          18,
+          29,
+          133,
+          255
+        ],
+        "background": "oklch(0.93 0.03 268.03)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.3152 0.1686 268.03)",
+        "iconStroke": "oklch(0.3152 0.1686 268.03)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.3152 0.1686 268.03)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21,
+            "right": 727.203125,
+            "bottom": 86.5
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 553.34375,
+            "y": 10,
+            "width": 133.65625,
+            "height": 36,
+            "right": 687,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 741,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 753,
+        "sampledBackgroundRgb": [
+          223,
+          232,
+          253
+        ],
+        "effectiveForegroundRgb": [
+          18,
+          29,
+          133
+        ],
+        "contrast": 11.101864483414463
+      }
+    },
+    {
+      "name": "768-light-hover: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "768-light-hover: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "768-light-hover: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21,
+            "right": 727.203125,
+            "bottom": 86.5
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 553.34375,
+            "y": 10,
+            "width": 133.65625,
+            "height": 36,
+            "right": 687,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 741,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 753
+      }
+    },
+    {
+      "name": "768-light-focus: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 553.34375,
+        "y": 10,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.2107 0.062 255.67)",
+        "colorRgba": [
+          3,
+          24,
+          52,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.2107 0.062 255.67)",
+        "iconStroke": "oklch(0.2107 0.062 255.67)",
+        "outline": {
+          "width": "2px",
+          "style": "solid",
+          "color": "rgba(0, 0, 0, 0)"
+        },
+        "focusVisible": true,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21,
+            "right": 727.203125,
+            "bottom": 86.5
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 553.34375,
+            "y": 10,
+            "width": 133.65625,
+            "height": 36,
+            "right": 687,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 741,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 753,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "contrast": 1
+      }
+    },
+    {
+      "name": "768-light-focus: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "768-light-focus: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "768-light-focus: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21,
+            "right": 727.203125,
+            "bottom": 86.5
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 553.34375,
+            "y": 10,
+            "width": 133.65625,
+            "height": 36,
+            "right": 687,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 741,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 753
+      }
+    },
+    {
+      "name": "768-light: keyboard focus is visible",
+      "passed": true,
+      "detail": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "name": "768-light: Enter opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "768-light: Escape closes Sheet and restores button focus",
+      "passed": true
+    },
+    {
+      "name": "768-light: touch opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "768-light: touch close restores button focus",
+      "passed": true
+    },
+    {
+      "name": "768-light: no preference or external mutations attempted",
+      "passed": true
+    },
+    {
+      "name": "768-dark-normal: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 553.34375,
+        "y": 10,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.9846 0.0017 247.84)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21,
+            "right": 727.203125,
+            "bottom": 86.5
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 553.34375,
+            "y": 10,
+            "width": 133.65625,
+            "height": 36,
+            "right": 687,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 741,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 753,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 16.970688908586578
+      }
+    },
+    {
+      "name": "768-dark-normal: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "768-dark-normal: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "768-dark-normal: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21,
+            "right": 727.203125,
+            "bottom": 86.5
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 553.34375,
+            "y": 10,
+            "width": 133.65625,
+            "height": 36,
+            "right": 687,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 741,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 753
+      }
+    },
+    {
+      "name": "768-dark-hover: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 553.34375,
+        "y": 10,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "oklch(0.28 0.078 263)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.9846 0.0017 247.84)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21,
+            "right": 727.203125,
+            "bottom": 86.5
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 553.34375,
+            "y": 10,
+            "width": 133.65625,
+            "height": 36,
+            "right": 687,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 741,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 753,
+        "sampledBackgroundRgb": [
+          19,
+          39,
+          79
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 14.044731655826261
+      }
+    },
+    {
+      "name": "768-dark-hover: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "768-dark-hover: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "768-dark-hover: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21,
+            "right": 727.203125,
+            "bottom": 86.5
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 553.34375,
+            "y": 10,
+            "width": 133.65625,
+            "height": 36,
+            "right": 687,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 741,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 753
+      }
+    },
+    {
+      "name": "768-dark-focus: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 553.34375,
+        "y": 10,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "2px",
+          "style": "solid",
+          "color": "rgba(0, 0, 0, 0)"
+        },
+        "focusVisible": true,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21,
+            "right": 727.203125,
+            "bottom": 86.5
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 553.34375,
+            "y": 10,
+            "width": 133.65625,
+            "height": 36,
+            "right": 687,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 741,
+            "bottom": 50
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 753,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 16.970688908586578
+      }
+    },
+    {
+      "name": "768-dark-focus: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "768-dark-focus: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "768-dark-focus: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 12,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 56,
+            "bottom": 50
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 49.78125,
+            "y": 65.5,
+            "width": 677.421875,
+            "height": 21,
+            "right": 727.203125,
+            "bottom": 86.5
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 553.34375,
+            "y": 10,
+            "width": 133.65625,
+            "height": 36,
+            "right": 687,
+            "bottom": 46
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 697,
+            "y": 6,
+            "width": 44,
+            "height": 44,
+            "right": 741,
+            "bottom": 50
+          }
+        ],
+        "scrollWidth": 753
+      }
+    },
+    {
+      "name": "768-dark: keyboard focus is visible",
+      "passed": true,
+      "detail": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "name": "768-dark: Enter opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "768-dark: Escape closes Sheet and restores button focus",
+      "passed": true
+    },
+    {
+      "name": "768-dark: touch opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "768-dark: touch close restores button focus",
+      "passed": true
+    },
+    {
+      "name": "768-dark: no preference or external mutations attempted",
+      "passed": true
+    },
+    {
+      "name": "1024-light-normal: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 777.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.2107 0.062 255.67)",
+        "colorRgba": [
+          3,
+          24,
+          52,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.2107 0.062 255.67)",
+        "iconStroke": "oklch(0.2107 0.062 255.67)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.2107 0.062 255.67)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 234.484375,
+            "height": 18.71875,
+            "right": 749.78125,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 777.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 911.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 993,
+            "bottom": 58
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 1009,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "contrast": 1
+      }
+    },
+    {
+      "name": "1024-light-normal: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "1024-light-normal: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1024-light-normal: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 234.484375,
+            "height": 18.71875,
+            "right": 749.78125,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 777.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 911.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 993,
+            "bottom": 58
+          }
+        ],
+        "scrollWidth": 1009
+      }
+    },
+    {
+      "name": "1024-light-hover: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 777.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.3152 0.1686 268.03)",
+        "colorRgba": [
+          18,
+          29,
+          133,
+          255
+        ],
+        "background": "oklch(0.93 0.03 268.03)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.3152 0.1686 268.03)",
+        "iconStroke": "oklch(0.3152 0.1686 268.03)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.3152 0.1686 268.03)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 234.484375,
+            "height": 18.71875,
+            "right": 749.78125,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 777.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 911.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 993,
+            "bottom": 58
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 1009,
+        "sampledBackgroundRgb": [
+          223,
+          232,
+          253
+        ],
+        "effectiveForegroundRgb": [
+          18,
+          29,
+          133
+        ],
+        "contrast": 11.101864483414463
+      }
+    },
+    {
+      "name": "1024-light-hover: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "1024-light-hover: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1024-light-hover: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 234.484375,
+            "height": 18.71875,
+            "right": 749.78125,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 777.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 911.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 993,
+            "bottom": 58
+          }
+        ],
+        "scrollWidth": 1009
+      }
+    },
+    {
+      "name": "1024-light-focus: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 777.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.2107 0.062 255.67)",
+        "colorRgba": [
+          3,
+          24,
+          52,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.2107 0.062 255.67)",
+        "iconStroke": "oklch(0.2107 0.062 255.67)",
+        "outline": {
+          "width": "2px",
+          "style": "solid",
+          "color": "rgba(0, 0, 0, 0)"
+        },
+        "focusVisible": true,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 234.484375,
+            "height": 18.71875,
+            "right": 749.78125,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 777.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 911.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 993,
+            "bottom": 58
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 1009,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "contrast": 1
+      }
+    },
+    {
+      "name": "1024-light-focus: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "1024-light-focus: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1024-light-focus: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 234.484375,
+            "height": 18.71875,
+            "right": 749.78125,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 777.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 911.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 993,
+            "bottom": 58
+          }
+        ],
+        "scrollWidth": 1009
+      }
+    },
+    {
+      "name": "1024-light: keyboard focus is visible",
+      "passed": true,
+      "detail": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "name": "1024-light: Enter opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "1024-light: Escape closes Sheet and restores button focus",
+      "passed": true
+    },
+    {
+      "name": "1024-light: touch opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "1024-light: touch close restores button focus",
+      "passed": true
+    },
+    {
+      "name": "1024-light: no preference or external mutations attempted",
+      "passed": true
+    },
+    {
+      "name": "1024-dark-normal: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 777.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.9846 0.0017 247.84)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 234.484375,
+            "height": 18.71875,
+            "right": 749.78125,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 777.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 911.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 993,
+            "bottom": 58
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 1009,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 16.970688908586578
+      }
+    },
+    {
+      "name": "1024-dark-normal: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "1024-dark-normal: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1024-dark-normal: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 234.484375,
+            "height": 18.71875,
+            "right": 749.78125,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 777.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 911.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 993,
+            "bottom": 58
+          }
+        ],
+        "scrollWidth": 1009
+      }
+    },
+    {
+      "name": "1024-dark-hover: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 777.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "oklch(0.28 0.078 263)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.9846 0.0017 247.84)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 234.484375,
+            "height": 18.71875,
+            "right": 749.78125,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 777.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 911.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 993,
+            "bottom": 58
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 1009,
+        "sampledBackgroundRgb": [
+          19,
+          39,
+          79
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 14.044731655826261
+      }
+    },
+    {
+      "name": "1024-dark-hover: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "1024-dark-hover: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1024-dark-hover: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 234.484375,
+            "height": 18.71875,
+            "right": 749.78125,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 777.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 911.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 993,
+            "bottom": 58
+          }
+        ],
+        "scrollWidth": 1009
+      }
+    },
+    {
+      "name": "1024-dark-focus: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 777.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "2px",
+          "style": "solid",
+          "color": "rgba(0, 0, 0, 0)"
+        },
+        "focusVisible": true,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 234.484375,
+            "height": 18.71875,
+            "right": 749.78125,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 777.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 911.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 993,
+            "bottom": 58
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 1009,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 16.970688908586578
+      }
+    },
+    {
+      "name": "1024-dark-focus: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "1024-dark-focus: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1024-dark-focus: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 234.484375,
+            "height": 18.71875,
+            "right": 749.78125,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 777.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 911.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 921.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 993,
+            "bottom": 58
+          }
+        ],
+        "scrollWidth": 1009
+      }
+    },
+    {
+      "name": "1024-dark: keyboard focus is visible",
+      "passed": true,
+      "detail": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "name": "1024-dark: Enter opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "1024-dark: Escape closes Sheet and restores button focus",
+      "passed": true
+    },
+    {
+      "name": "1024-dark: touch opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "1024-dark: touch close restores button focus",
+      "passed": true
+    },
+    {
+      "name": "1024-dark: no preference or external mutations attempted",
+      "passed": true
+    },
+    {
+      "name": "1366-light-normal: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 1119.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.2107 0.062 255.67)",
+        "colorRgba": [
+          3,
+          24,
+          52,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.2107 0.062 255.67)",
+        "iconStroke": "oklch(0.2107 0.062 255.67)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.2107 0.062 255.67)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875,
+            "right": 788.546875,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 1119.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 1253.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 1335,
+            "bottom": 58
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 1351,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "contrast": 1
+      }
+    },
+    {
+      "name": "1366-light-normal: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "1366-light-normal: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1366-light-normal: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875,
+            "right": 788.546875,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 1119.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 1253.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 1335,
+            "bottom": 58
+          }
+        ],
+        "scrollWidth": 1351
+      }
+    },
+    {
+      "name": "1366-light-hover: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 1119.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.3152 0.1686 268.03)",
+        "colorRgba": [
+          18,
+          29,
+          133,
+          255
+        ],
+        "background": "oklch(0.93 0.03 268.03)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.3152 0.1686 268.03)",
+        "iconStroke": "oklch(0.3152 0.1686 268.03)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.3152 0.1686 268.03)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875,
+            "right": 788.546875,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 1119.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 1253.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 1335,
+            "bottom": 58
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 1351,
+        "sampledBackgroundRgb": [
+          223,
+          232,
+          253
+        ],
+        "effectiveForegroundRgb": [
+          18,
+          29,
+          133
+        ],
+        "contrast": 11.101864483414463
+      }
+    },
+    {
+      "name": "1366-light-hover: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "1366-light-hover: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1366-light-hover: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875,
+            "right": 788.546875,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 1119.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 1253.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 1335,
+            "bottom": 58
+          }
+        ],
+        "scrollWidth": 1351
+      }
+    },
+    {
+      "name": "1366-light-focus: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 1119.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.2107 0.062 255.67)",
+        "colorRgba": [
+          3,
+          24,
+          52,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.2107 0.062 255.67)",
+        "iconStroke": "oklch(0.2107 0.062 255.67)",
+        "outline": {
+          "width": "2px",
+          "style": "solid",
+          "color": "rgba(0, 0, 0, 0)"
+        },
+        "focusVisible": true,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875,
+            "right": 788.546875,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 1119.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 1253.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 1335,
+            "bottom": 58
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 1351,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "contrast": 1
+      }
+    },
+    {
+      "name": "1366-light-focus: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "1366-light-focus: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1366-light-focus: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875,
+            "right": 788.546875,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 1119.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 1253.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 1335,
+            "bottom": 58
+          }
+        ],
+        "scrollWidth": 1351
+      }
+    },
+    {
+      "name": "1366-light: keyboard focus is visible",
+      "passed": true,
+      "detail": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "name": "1366-light: Enter opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "1366-light: Escape closes Sheet and restores button focus",
+      "passed": true
+    },
+    {
+      "name": "1366-light: touch opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "1366-light: touch close restores button focus",
+      "passed": true
+    },
+    {
+      "name": "1366-light: no preference or external mutations attempted",
+      "passed": true
+    },
+    {
+      "name": "1366-dark-normal: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 1119.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.9846 0.0017 247.84)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875,
+            "right": 788.546875,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 1119.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 1253.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 1335,
+            "bottom": 58
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 1351,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 16.970688908586578
+      }
+    },
+    {
+      "name": "1366-dark-normal: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "1366-dark-normal: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1366-dark-normal: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875,
+            "right": 788.546875,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 1119.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 1253.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 1335,
+            "bottom": 58
+          }
+        ],
+        "scrollWidth": 1351
+      }
+    },
+    {
+      "name": "1366-dark-hover: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 1119.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "oklch(0.28 0.078 263)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "3px",
+          "style": "none",
+          "color": "oklch(0.9846 0.0017 247.84)"
+        },
+        "focusVisible": false,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875,
+            "right": 788.546875,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 1119.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 1253.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 1335,
+            "bottom": 58
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 1351,
+        "sampledBackgroundRgb": [
+          19,
+          39,
+          79
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 14.044731655826261
+      }
+    },
+    {
+      "name": "1366-dark-hover: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "1366-dark-hover: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1366-dark-hover: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875,
+            "right": 788.546875,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 1119.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 1253.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 1335,
+            "bottom": 58
+          }
+        ],
+        "scrollWidth": 1351
+      }
+    },
+    {
+      "name": "1366-dark-focus: notifications are not covered",
+      "passed": true,
+      "detail": {
+        "x": 1119.96875,
+        "y": 18,
+        "width": 133.65625,
+        "height": 36,
+        "color": "oklch(0.9846 0.0017 247.84)",
+        "colorRgba": [
+          249,
+          250,
+          251,
+          255
+        ],
+        "background": "rgba(0, 0, 0, 0)",
+        "opacity": "1",
+        "visibility": "visible",
+        "iconColor": "oklch(0.9846 0.0017 247.84)",
+        "iconStroke": "oklch(0.9846 0.0017 247.84)",
+        "outline": {
+          "width": "2px",
+          "style": "solid",
+          "color": "rgba(0, 0, 0, 0)"
+        },
+        "focusVisible": true,
+        "centerHitsButton": true,
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875,
+            "right": 788.546875,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 1119.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 1253.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 1335,
+            "bottom": 58
+          }
+        ],
+        "intersections": [],
+        "scrollWidth": 1351,
+        "sampledBackgroundRgb": [
+          3,
+          24,
+          52
+        ],
+        "effectiveForegroundRgb": [
+          249,
+          250,
+          251
+        ],
+        "contrast": 16.970688908586578
+      }
+    },
+    {
+      "name": "1366-dark-focus: notification target at least 44px",
+      "passed": false,
+      "detail": {
+        "width": 133.65625,
+        "height": 36
+      }
+    },
+    {
+      "name": "1366-dark-focus: real header controls do not intersect",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1366-dark-focus: controls remain inside viewport",
+      "passed": true,
+      "detail": {
+        "controls": [
+          {
+            "name": "Voltar ao portal de acesso",
+            "x": 16,
+            "y": 14,
+            "width": 83.734375,
+            "height": 44,
+            "right": 99.734375,
+            "bottom": 58
+          },
+          {
+            "name": "Buscar na agenda de Restaurante e Arena",
+            "x": 515.296875,
+            "y": 26.640625,
+            "width": 273.25,
+            "height": 18.71875,
+            "right": 788.546875,
+            "bottom": 45.359375
+          },
+          {
+            "name": "Notificações da Agenda Restaurante e Arena",
+            "x": 1119.96875,
+            "y": 18,
+            "width": 133.65625,
+            "height": 36,
+            "right": 1253.625,
+            "bottom": 54
+          },
+          {
+            "name": "Sair da plataforma",
+            "x": 1263.625,
+            "y": 14,
+            "width": 71.375,
+            "height": 44,
+            "right": 1335,
+            "bottom": 58
+          }
+        ],
+        "scrollWidth": 1351
+      }
+    },
+    {
+      "name": "1366-dark: keyboard focus is visible",
+      "passed": true,
+      "detail": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "name": "1366-dark: Enter opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "1366-dark: Escape closes Sheet and restores button focus",
+      "passed": true
+    },
+    {
+      "name": "1366-dark: touch opens existing notifications Sheet",
+      "passed": true
+    },
+    {
+      "name": "1366-dark: touch close restores button focus",
+      "passed": true
+    },
+    {
+      "name": "1366-dark: no preference or external mutations attempted",
+      "passed": true
+    },
+    {
+      "name": "No Venue runtime errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "No external writes attempted",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "states": [
+    {
+      "label": "320-light-normal",
+      "x": 212,
+      "y": 10,
+      "width": 44,
+      "height": 36,
+      "color": "oklch(0.2107 0.062 255.67)",
+      "colorRgba": [
+        3,
+        24,
+        52,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.2107 0.062 255.67)",
+      "iconStroke": "oklch(0.2107 0.062 255.67)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.2107 0.062 255.67)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 10,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 54,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 47.78125,
+          "y": 64,
+          "width": 248.421875,
+          "height": 24,
+          "right": 296.203125,
+          "bottom": 88
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 212,
+          "y": 10,
+          "width": 44,
+          "height": 36,
+          "right": 256,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 266,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 310,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 320,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "contrast": 1
+    },
+    {
+      "label": "320-light-hover",
+      "x": 212,
+      "y": 10,
+      "width": 44,
+      "height": 36,
+      "color": "oklch(0.3152 0.1686 268.03)",
+      "colorRgba": [
+        18,
+        29,
+        133,
+        255
+      ],
+      "background": "oklch(0.93 0.03 268.03)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.3152 0.1686 268.03)",
+      "iconStroke": "oklch(0.3152 0.1686 268.03)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.3152 0.1686 268.03)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 10,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 54,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 47.78125,
+          "y": 64,
+          "width": 248.421875,
+          "height": 24,
+          "right": 296.203125,
+          "bottom": 88
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 212,
+          "y": 10,
+          "width": 44,
+          "height": 36,
+          "right": 256,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 266,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 310,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 320,
+      "sampledBackgroundRgb": [
+        220,
+        229,
+        251
+      ],
+      "effectiveForegroundRgb": [
+        18,
+        29,
+        133
+      ],
+      "contrast": 10.806602515907432
+    },
+    {
+      "label": "320-light-focus",
+      "x": 212,
+      "y": 10,
+      "width": 44,
+      "height": 36,
+      "color": "oklch(0.2107 0.062 255.67)",
+      "colorRgba": [
+        3,
+        24,
+        52,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.2107 0.062 255.67)",
+      "iconStroke": "oklch(0.2107 0.062 255.67)",
+      "outline": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      },
+      "focusVisible": true,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 10,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 54,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 47.78125,
+          "y": 64,
+          "width": 248.421875,
+          "height": 24,
+          "right": 296.203125,
+          "bottom": 88
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 212,
+          "y": 10,
+          "width": 44,
+          "height": 36,
+          "right": 256,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 266,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 310,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 320,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "contrast": 1
+    },
+    {
+      "label": "320-dark-normal",
+      "x": 212,
+      "y": 10,
+      "width": 44,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.9846 0.0017 247.84)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 10,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 54,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 47.78125,
+          "y": 64,
+          "width": 248.421875,
+          "height": 24,
+          "right": 296.203125,
+          "bottom": 88
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 212,
+          "y": 10,
+          "width": 44,
+          "height": 36,
+          "right": 256,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 266,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 310,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 320,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        51
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 16.996287116363362
+    },
+    {
+      "label": "320-dark-hover",
+      "x": 212,
+      "y": 10,
+      "width": 44,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "oklch(0.28 0.078 263)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.9846 0.0017 247.84)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 10,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 54,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 47.78125,
+          "y": 64,
+          "width": 248.421875,
+          "height": 24,
+          "right": 296.203125,
+          "bottom": 88
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 212,
+          "y": 10,
+          "width": 44,
+          "height": 36,
+          "right": 256,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 266,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 310,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 320,
+      "sampledBackgroundRgb": [
+        19,
+        38,
+        77
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 14.230727338869638
+    },
+    {
+      "label": "320-dark-focus",
+      "x": 212,
+      "y": 10,
+      "width": 44,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      },
+      "focusVisible": true,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 10,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 54,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 47.78125,
+          "y": 64,
+          "width": 248.421875,
+          "height": 24,
+          "right": 296.203125,
+          "bottom": 88
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 212,
+          "y": 10,
+          "width": 44,
+          "height": 36,
+          "right": 256,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 266,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 310,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 320,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        51
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 16.996287116363362
+    },
+    {
+      "label": "390-light-normal",
+      "x": 265,
+      "y": 10,
+      "width": 44,
+      "height": 36,
+      "color": "oklch(0.2107 0.062 255.67)",
+      "colorRgba": [
+        3,
+        24,
+        52,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.2107 0.062 255.67)",
+      "iconStroke": "oklch(0.2107 0.062 255.67)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.2107 0.062 255.67)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 12,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 49.78125,
+          "y": 64,
+          "width": 299.421875,
+          "height": 24,
+          "right": 349.203125,
+          "bottom": 88
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 265,
+          "y": 10,
+          "width": 44,
+          "height": 36,
+          "right": 309,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 319,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 363,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 375,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "contrast": 1
+    },
+    {
+      "label": "390-light-hover",
+      "x": 265,
+      "y": 10,
+      "width": 44,
+      "height": 36,
+      "color": "oklch(0.3152 0.1686 268.03)",
+      "colorRgba": [
+        18,
+        29,
+        133,
+        255
+      ],
+      "background": "oklch(0.93 0.03 268.03)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklab(0.2107 -0.0153454 -0.0600709)",
+      "iconStroke": "oklab(0.2107 -0.0153454 -0.0600709)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.3152 0.1686 268.03)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 12,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 49.78125,
+          "y": 64,
+          "width": 299.421875,
+          "height": 24,
+          "right": 349.203125,
+          "bottom": 88
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 265,
+          "y": 10,
+          "width": 44,
+          "height": 36,
+          "right": 309,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 319,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 363,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 375,
+      "sampledBackgroundRgb": [
+        220,
+        229,
+        251
+      ],
+      "effectiveForegroundRgb": [
+        18,
+        29,
+        133
+      ],
+      "contrast": 10.806602515907432
+    },
+    {
+      "label": "390-light-focus",
+      "x": 265,
+      "y": 10,
+      "width": 44,
+      "height": 36,
+      "color": "oklch(0.2107 0.062 255.67)",
+      "colorRgba": [
+        3,
+        24,
+        52,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.2107 0.062 255.67)",
+      "iconStroke": "oklch(0.2107 0.062 255.67)",
+      "outline": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      },
+      "focusVisible": true,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 12,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 49.78125,
+          "y": 64,
+          "width": 299.421875,
+          "height": 24,
+          "right": 349.203125,
+          "bottom": 88
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 265,
+          "y": 10,
+          "width": 44,
+          "height": 36,
+          "right": 309,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 319,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 363,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 375,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "contrast": 1
+    },
+    {
+      "label": "390-dark-normal",
+      "x": 265,
+      "y": 10,
+      "width": 44,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.9846 0.0017 247.84)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 12,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 49.78125,
+          "y": 64,
+          "width": 299.421875,
+          "height": 24,
+          "right": 349.203125,
+          "bottom": 88
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 265,
+          "y": 10,
+          "width": 44,
+          "height": 36,
+          "right": 309,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 319,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 363,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 375,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        51
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 16.996287116363362
+    },
+    {
+      "label": "390-dark-hover",
+      "x": 265,
+      "y": 10,
+      "width": 44,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "oklch(0.28 0.078 263)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.9846 0.0017 247.84)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 12,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 49.78125,
+          "y": 64,
+          "width": 299.421875,
+          "height": 24,
+          "right": 349.203125,
+          "bottom": 88
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 265,
+          "y": 10,
+          "width": 44,
+          "height": 36,
+          "right": 309,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 319,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 363,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 375,
+      "sampledBackgroundRgb": [
+        19,
+        38,
+        77
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 14.230727338869638
+    },
+    {
+      "label": "390-dark-focus",
+      "x": 265,
+      "y": 10,
+      "width": 44,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      },
+      "focusVisible": true,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 12,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 49.78125,
+          "y": 64,
+          "width": 299.421875,
+          "height": 24,
+          "right": 349.203125,
+          "bottom": 88
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 265,
+          "y": 10,
+          "width": 44,
+          "height": 36,
+          "right": 309,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 319,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 363,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 375,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        51
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 16.996287116363362
+    },
+    {
+      "label": "768-light-normal",
+      "x": 553.34375,
+      "y": 10,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.2107 0.062 255.67)",
+      "colorRgba": [
+        3,
+        24,
+        52,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.2107 0.062 255.67)",
+      "iconStroke": "oklch(0.2107 0.062 255.67)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.2107 0.062 255.67)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 12,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 49.78125,
+          "y": 65.5,
+          "width": 677.421875,
+          "height": 21,
+          "right": 727.203125,
+          "bottom": 86.5
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 553.34375,
+          "y": 10,
+          "width": 133.65625,
+          "height": 36,
+          "right": 687,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 697,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 741,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 753,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "contrast": 1
+    },
+    {
+      "label": "768-light-hover",
+      "x": 553.34375,
+      "y": 10,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.3152 0.1686 268.03)",
+      "colorRgba": [
+        18,
+        29,
+        133,
+        255
+      ],
+      "background": "oklch(0.93 0.03 268.03)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.3152 0.1686 268.03)",
+      "iconStroke": "oklch(0.3152 0.1686 268.03)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.3152 0.1686 268.03)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 12,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 49.78125,
+          "y": 65.5,
+          "width": 677.421875,
+          "height": 21,
+          "right": 727.203125,
+          "bottom": 86.5
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 553.34375,
+          "y": 10,
+          "width": 133.65625,
+          "height": 36,
+          "right": 687,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 697,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 741,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 753,
+      "sampledBackgroundRgb": [
+        223,
+        232,
+        253
+      ],
+      "effectiveForegroundRgb": [
+        18,
+        29,
+        133
+      ],
+      "contrast": 11.101864483414463
+    },
+    {
+      "label": "768-light-focus",
+      "x": 553.34375,
+      "y": 10,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.2107 0.062 255.67)",
+      "colorRgba": [
+        3,
+        24,
+        52,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.2107 0.062 255.67)",
+      "iconStroke": "oklch(0.2107 0.062 255.67)",
+      "outline": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      },
+      "focusVisible": true,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 12,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 49.78125,
+          "y": 65.5,
+          "width": 677.421875,
+          "height": 21,
+          "right": 727.203125,
+          "bottom": 86.5
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 553.34375,
+          "y": 10,
+          "width": 133.65625,
+          "height": 36,
+          "right": 687,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 697,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 741,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 753,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "contrast": 1
+    },
+    {
+      "label": "768-dark-normal",
+      "x": 553.34375,
+      "y": 10,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.9846 0.0017 247.84)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 12,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 49.78125,
+          "y": 65.5,
+          "width": 677.421875,
+          "height": 21,
+          "right": 727.203125,
+          "bottom": 86.5
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 553.34375,
+          "y": 10,
+          "width": 133.65625,
+          "height": 36,
+          "right": 687,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 697,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 741,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 753,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 16.970688908586578
+    },
+    {
+      "label": "768-dark-hover",
+      "x": 553.34375,
+      "y": 10,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "oklch(0.28 0.078 263)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.9846 0.0017 247.84)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 12,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 49.78125,
+          "y": 65.5,
+          "width": 677.421875,
+          "height": 21,
+          "right": 727.203125,
+          "bottom": 86.5
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 553.34375,
+          "y": 10,
+          "width": 133.65625,
+          "height": 36,
+          "right": 687,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 697,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 741,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 753,
+      "sampledBackgroundRgb": [
+        19,
+        39,
+        79
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 14.044731655826261
+    },
+    {
+      "label": "768-dark-focus",
+      "x": 553.34375,
+      "y": 10,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      },
+      "focusVisible": true,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 12,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 56,
+          "bottom": 50
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 49.78125,
+          "y": 65.5,
+          "width": 677.421875,
+          "height": 21,
+          "right": 727.203125,
+          "bottom": 86.5
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 553.34375,
+          "y": 10,
+          "width": 133.65625,
+          "height": 36,
+          "right": 687,
+          "bottom": 46
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 697,
+          "y": 6,
+          "width": 44,
+          "height": 44,
+          "right": 741,
+          "bottom": 50
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 753,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 16.970688908586578
+    },
+    {
+      "label": "1024-light-normal",
+      "x": 777.96875,
+      "y": 18,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.2107 0.062 255.67)",
+      "colorRgba": [
+        3,
+        24,
+        52,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.2107 0.062 255.67)",
+      "iconStroke": "oklch(0.2107 0.062 255.67)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.2107 0.062 255.67)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 16,
+          "y": 14,
+          "width": 83.734375,
+          "height": 44,
+          "right": 99.734375,
+          "bottom": 58
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 515.296875,
+          "y": 26.640625,
+          "width": 234.484375,
+          "height": 18.71875,
+          "right": 749.78125,
+          "bottom": 45.359375
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 777.96875,
+          "y": 18,
+          "width": 133.65625,
+          "height": 36,
+          "right": 911.625,
+          "bottom": 54
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 921.625,
+          "y": 14,
+          "width": 71.375,
+          "height": 44,
+          "right": 993,
+          "bottom": 58
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 1009,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "contrast": 1
+    },
+    {
+      "label": "1024-light-hover",
+      "x": 777.96875,
+      "y": 18,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.3152 0.1686 268.03)",
+      "colorRgba": [
+        18,
+        29,
+        133,
+        255
+      ],
+      "background": "oklch(0.93 0.03 268.03)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.3152 0.1686 268.03)",
+      "iconStroke": "oklch(0.3152 0.1686 268.03)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.3152 0.1686 268.03)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 16,
+          "y": 14,
+          "width": 83.734375,
+          "height": 44,
+          "right": 99.734375,
+          "bottom": 58
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 515.296875,
+          "y": 26.640625,
+          "width": 234.484375,
+          "height": 18.71875,
+          "right": 749.78125,
+          "bottom": 45.359375
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 777.96875,
+          "y": 18,
+          "width": 133.65625,
+          "height": 36,
+          "right": 911.625,
+          "bottom": 54
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 921.625,
+          "y": 14,
+          "width": 71.375,
+          "height": 44,
+          "right": 993,
+          "bottom": 58
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 1009,
+      "sampledBackgroundRgb": [
+        223,
+        232,
+        253
+      ],
+      "effectiveForegroundRgb": [
+        18,
+        29,
+        133
+      ],
+      "contrast": 11.101864483414463
+    },
+    {
+      "label": "1024-light-focus",
+      "x": 777.96875,
+      "y": 18,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.2107 0.062 255.67)",
+      "colorRgba": [
+        3,
+        24,
+        52,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.2107 0.062 255.67)",
+      "iconStroke": "oklch(0.2107 0.062 255.67)",
+      "outline": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      },
+      "focusVisible": true,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 16,
+          "y": 14,
+          "width": 83.734375,
+          "height": 44,
+          "right": 99.734375,
+          "bottom": 58
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 515.296875,
+          "y": 26.640625,
+          "width": 234.484375,
+          "height": 18.71875,
+          "right": 749.78125,
+          "bottom": 45.359375
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 777.96875,
+          "y": 18,
+          "width": 133.65625,
+          "height": 36,
+          "right": 911.625,
+          "bottom": 54
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 921.625,
+          "y": 14,
+          "width": 71.375,
+          "height": 44,
+          "right": 993,
+          "bottom": 58
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 1009,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "contrast": 1
+    },
+    {
+      "label": "1024-dark-normal",
+      "x": 777.96875,
+      "y": 18,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.9846 0.0017 247.84)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 16,
+          "y": 14,
+          "width": 83.734375,
+          "height": 44,
+          "right": 99.734375,
+          "bottom": 58
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 515.296875,
+          "y": 26.640625,
+          "width": 234.484375,
+          "height": 18.71875,
+          "right": 749.78125,
+          "bottom": 45.359375
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 777.96875,
+          "y": 18,
+          "width": 133.65625,
+          "height": 36,
+          "right": 911.625,
+          "bottom": 54
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 921.625,
+          "y": 14,
+          "width": 71.375,
+          "height": 44,
+          "right": 993,
+          "bottom": 58
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 1009,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 16.970688908586578
+    },
+    {
+      "label": "1024-dark-hover",
+      "x": 777.96875,
+      "y": 18,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "oklch(0.28 0.078 263)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.9846 0.0017 247.84)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 16,
+          "y": 14,
+          "width": 83.734375,
+          "height": 44,
+          "right": 99.734375,
+          "bottom": 58
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 515.296875,
+          "y": 26.640625,
+          "width": 234.484375,
+          "height": 18.71875,
+          "right": 749.78125,
+          "bottom": 45.359375
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 777.96875,
+          "y": 18,
+          "width": 133.65625,
+          "height": 36,
+          "right": 911.625,
+          "bottom": 54
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 921.625,
+          "y": 14,
+          "width": 71.375,
+          "height": 44,
+          "right": 993,
+          "bottom": 58
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 1009,
+      "sampledBackgroundRgb": [
+        19,
+        39,
+        79
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 14.044731655826261
+    },
+    {
+      "label": "1024-dark-focus",
+      "x": 777.96875,
+      "y": 18,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      },
+      "focusVisible": true,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 16,
+          "y": 14,
+          "width": 83.734375,
+          "height": 44,
+          "right": 99.734375,
+          "bottom": 58
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 515.296875,
+          "y": 26.640625,
+          "width": 234.484375,
+          "height": 18.71875,
+          "right": 749.78125,
+          "bottom": 45.359375
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 777.96875,
+          "y": 18,
+          "width": 133.65625,
+          "height": 36,
+          "right": 911.625,
+          "bottom": 54
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 921.625,
+          "y": 14,
+          "width": 71.375,
+          "height": 44,
+          "right": 993,
+          "bottom": 58
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 1009,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 16.970688908586578
+    },
+    {
+      "label": "1366-light-normal",
+      "x": 1119.96875,
+      "y": 18,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.2107 0.062 255.67)",
+      "colorRgba": [
+        3,
+        24,
+        52,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.2107 0.062 255.67)",
+      "iconStroke": "oklch(0.2107 0.062 255.67)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.2107 0.062 255.67)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 16,
+          "y": 14,
+          "width": 83.734375,
+          "height": 44,
+          "right": 99.734375,
+          "bottom": 58
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 515.296875,
+          "y": 26.640625,
+          "width": 273.25,
+          "height": 18.71875,
+          "right": 788.546875,
+          "bottom": 45.359375
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 1119.96875,
+          "y": 18,
+          "width": 133.65625,
+          "height": 36,
+          "right": 1253.625,
+          "bottom": 54
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 1263.625,
+          "y": 14,
+          "width": 71.375,
+          "height": 44,
+          "right": 1335,
+          "bottom": 58
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 1351,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "contrast": 1
+    },
+    {
+      "label": "1366-light-hover",
+      "x": 1119.96875,
+      "y": 18,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.3152 0.1686 268.03)",
+      "colorRgba": [
+        18,
+        29,
+        133,
+        255
+      ],
+      "background": "oklch(0.93 0.03 268.03)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.3152 0.1686 268.03)",
+      "iconStroke": "oklch(0.3152 0.1686 268.03)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.3152 0.1686 268.03)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 16,
+          "y": 14,
+          "width": 83.734375,
+          "height": 44,
+          "right": 99.734375,
+          "bottom": 58
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 515.296875,
+          "y": 26.640625,
+          "width": 273.25,
+          "height": 18.71875,
+          "right": 788.546875,
+          "bottom": 45.359375
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 1119.96875,
+          "y": 18,
+          "width": 133.65625,
+          "height": 36,
+          "right": 1253.625,
+          "bottom": 54
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 1263.625,
+          "y": 14,
+          "width": 71.375,
+          "height": 44,
+          "right": 1335,
+          "bottom": 58
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 1351,
+      "sampledBackgroundRgb": [
+        223,
+        232,
+        253
+      ],
+      "effectiveForegroundRgb": [
+        18,
+        29,
+        133
+      ],
+      "contrast": 11.101864483414463
+    },
+    {
+      "label": "1366-light-focus",
+      "x": 1119.96875,
+      "y": 18,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.2107 0.062 255.67)",
+      "colorRgba": [
+        3,
+        24,
+        52,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.2107 0.062 255.67)",
+      "iconStroke": "oklch(0.2107 0.062 255.67)",
+      "outline": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      },
+      "focusVisible": true,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 16,
+          "y": 14,
+          "width": 83.734375,
+          "height": 44,
+          "right": 99.734375,
+          "bottom": 58
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 515.296875,
+          "y": 26.640625,
+          "width": 273.25,
+          "height": 18.71875,
+          "right": 788.546875,
+          "bottom": 45.359375
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 1119.96875,
+          "y": 18,
+          "width": 133.65625,
+          "height": 36,
+          "right": 1253.625,
+          "bottom": 54
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 1263.625,
+          "y": 14,
+          "width": 71.375,
+          "height": 44,
+          "right": 1335,
+          "bottom": 58
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 1351,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "contrast": 1
+    },
+    {
+      "label": "1366-dark-normal",
+      "x": 1119.96875,
+      "y": 18,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.9846 0.0017 247.84)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 16,
+          "y": 14,
+          "width": 83.734375,
+          "height": 44,
+          "right": 99.734375,
+          "bottom": 58
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 515.296875,
+          "y": 26.640625,
+          "width": 273.25,
+          "height": 18.71875,
+          "right": 788.546875,
+          "bottom": 45.359375
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 1119.96875,
+          "y": 18,
+          "width": 133.65625,
+          "height": 36,
+          "right": 1253.625,
+          "bottom": 54
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 1263.625,
+          "y": 14,
+          "width": 71.375,
+          "height": 44,
+          "right": 1335,
+          "bottom": 58
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 1351,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 16.970688908586578
+    },
+    {
+      "label": "1366-dark-hover",
+      "x": 1119.96875,
+      "y": 18,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "oklch(0.28 0.078 263)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "3px",
+        "style": "none",
+        "color": "oklch(0.9846 0.0017 247.84)"
+      },
+      "focusVisible": false,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 16,
+          "y": 14,
+          "width": 83.734375,
+          "height": 44,
+          "right": 99.734375,
+          "bottom": 58
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 515.296875,
+          "y": 26.640625,
+          "width": 273.25,
+          "height": 18.71875,
+          "right": 788.546875,
+          "bottom": 45.359375
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 1119.96875,
+          "y": 18,
+          "width": 133.65625,
+          "height": 36,
+          "right": 1253.625,
+          "bottom": 54
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 1263.625,
+          "y": 14,
+          "width": 71.375,
+          "height": 44,
+          "right": 1335,
+          "bottom": 58
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 1351,
+      "sampledBackgroundRgb": [
+        19,
+        39,
+        79
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 14.044731655826261
+    },
+    {
+      "label": "1366-dark-focus",
+      "x": 1119.96875,
+      "y": 18,
+      "width": 133.65625,
+      "height": 36,
+      "color": "oklch(0.9846 0.0017 247.84)",
+      "colorRgba": [
+        249,
+        250,
+        251,
+        255
+      ],
+      "background": "rgba(0, 0, 0, 0)",
+      "opacity": "1",
+      "visibility": "visible",
+      "iconColor": "oklch(0.9846 0.0017 247.84)",
+      "iconStroke": "oklch(0.9846 0.0017 247.84)",
+      "outline": {
+        "width": "2px",
+        "style": "solid",
+        "color": "rgba(0, 0, 0, 0)"
+      },
+      "focusVisible": true,
+      "centerHitsButton": true,
+      "controls": [
+        {
+          "name": "Voltar ao portal de acesso",
+          "x": 16,
+          "y": 14,
+          "width": 83.734375,
+          "height": 44,
+          "right": 99.734375,
+          "bottom": 58
+        },
+        {
+          "name": "Buscar na agenda de Restaurante e Arena",
+          "x": 515.296875,
+          "y": 26.640625,
+          "width": 273.25,
+          "height": 18.71875,
+          "right": 788.546875,
+          "bottom": 45.359375
+        },
+        {
+          "name": "Notificações da Agenda Restaurante e Arena",
+          "x": 1119.96875,
+          "y": 18,
+          "width": 133.65625,
+          "height": 36,
+          "right": 1253.625,
+          "bottom": 54
+        },
+        {
+          "name": "Sair da plataforma",
+          "x": 1263.625,
+          "y": 14,
+          "width": 71.375,
+          "height": 44,
+          "right": 1335,
+          "bottom": 58
+        }
+      ],
+      "intersections": [],
+      "scrollWidth": 1351,
+      "sampledBackgroundRgb": [
+        3,
+        24,
+        52
+      ],
+      "effectiveForegroundRgb": [
+        249,
+        250,
+        251
+      ],
+      "contrast": 16.970688908586578
+    }
+  ],
+  "captures": [
+    "baseline/320-light-normal.png",
+    "baseline/320-light-hover.png",
+    "baseline/320-light-focus.png",
+    "baseline/320-light-sheet.png",
+    "baseline/320-dark-normal.png",
+    "baseline/320-dark-hover.png",
+    "baseline/320-dark-focus.png",
+    "baseline/320-dark-sheet.png",
+    "baseline/390-light-normal.png",
+    "baseline/390-light-hover.png",
+    "baseline/390-light-focus.png",
+    "baseline/390-light-sheet.png",
+    "baseline/390-dark-normal.png",
+    "baseline/390-dark-hover.png",
+    "baseline/390-dark-focus.png",
+    "baseline/390-dark-sheet.png",
+    "baseline/768-light-normal.png",
+    "baseline/768-light-hover.png",
+    "baseline/768-light-focus.png",
+    "baseline/768-light-sheet.png",
+    "baseline/768-dark-normal.png",
+    "baseline/768-dark-hover.png",
+    "baseline/768-dark-focus.png",
+    "baseline/768-dark-sheet.png",
+    "baseline/1024-light-normal.png",
+    "baseline/1024-light-hover.png",
+    "baseline/1024-light-focus.png",
+    "baseline/1024-light-sheet.png",
+    "baseline/1024-dark-normal.png",
+    "baseline/1024-dark-hover.png",
+    "baseline/1024-dark-focus.png",
+    "baseline/1024-dark-sheet.png",
+    "baseline/1366-light-normal.png",
+    "baseline/1366-light-hover.png",
+    "baseline/1366-light-focus.png",
+    "baseline/1366-light-sheet.png",
+    "baseline/1366-dark-normal.png",
+    "baseline/1366-dark-hover.png",
+    "baseline/1366-dark-focus.png",
+    "baseline/1366-dark-sheet.png"
+  ],
+  "errors": [],
+  "blockedWrites": [],
+  "summary": {
+    "total": 182,
+    "passed": 152,
+    "failed": 30
+  }
+}

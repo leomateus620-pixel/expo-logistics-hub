@@ -40,33 +40,16 @@
 }
 
 .cronograma-mobile-search-toggle__field {
-  position: absolute;
-  z-index: 30;
-  inset-inline: 0.6rem;
-  top: 50%;
   display: flex;
   min-width: 0;
   align-items: center;
   gap: 0.4rem;
-  transform: translateY(-50%);
-  border-radius: 0.85rem;
-  border: 1px solid oklch(var(--brand-gold-500) / 0.5);
-  padding: 0.3rem 0.35rem 0.3rem 0.65rem;
-  background: oklch(var(--brand-navy-900));
-  box-shadow: 0 18px 34px -22px rgb(0 0 0 / 0.9);
-  animation: cronograma-mobile-search-in 180ms ease;
+  background: linear-gradient(oklch(var(--brand-gold-500) / 0.5), oklch(var(--brand-gold-500) / 0.5)) left bottom / 100% 1px no-repeat;
 }
 
-@keyframes cronograma-mobile-search-in {
-  from { opacity: 0; transform: translateY(-50%) scale(0.98); }
-  to { opacity: 1; transform: translateY(-50%) scale(1); }
-}
-
-.cronograma-mobile-search-toggle__field > svg {
-  width: 1rem;
-  height: 1rem;
-  flex: none;
-  color: oklch(var(--brand-gold-400));
+.cronograma-mobile-search-toggle__field:has(input:focus-visible) {
+  background-image: linear-gradient(oklch(var(--brand-gold-400)), oklch(var(--brand-gold-400)));
+  background-size: 100% 2px;
 }
 
 .cronograma-mobile-search-toggle__field input {
@@ -76,7 +59,8 @@
   border: 0;
   background: transparent;
   color: rgb(255 255 255 / 0.96);
-  font-size: 0.9rem;
+  /* Evita zoom automático do campo nos navegadores móveis. */
+  font-size: 1rem;
   font-weight: 600;
   outline: none;
   text-transform: none;
@@ -104,16 +88,6 @@
 .cronograma-mobile-search-toggle__clear svg {
   width: 0.85rem;
   height: 0.85rem;
-}
-
-.cronograma-mobile-search-toggle__done {
-  flex: none;
-  border-radius: 0.65rem;
-  padding: 0.35rem 0.6rem;
-  background: linear-gradient(150deg, oklch(var(--brand-gold-500)), oklch(var(--brand-orange-500)));
-  color: oklch(0.18 0.05 255);
-  font-size: 0.7rem;
-  font-weight: 900;
 }
 
 /* Faixa de controles: visão · ciclo · filtros */

@@ -1,17 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCronogramaSearch } from '../CronogramaSearchContext';
 import { useExclusiveMobileOverlay } from './mobileOverlayStore';
 import '@/styles/cronograma-mobile-refit.css';
 
-/** Lupa compacta no topo mobile que expande o campo de busca sobre a própria faixa. */
+/** Uma única busca compacta, expandida ao lado do Portal no cabeçalho. */
 export function MobileSearchToggle({ className }: { className?: string }) {
   const search = useCronogramaSearch();
   const [open, setOpen] = useExclusiveMobileOverlay('mobile-search');
   const [value, setValue] = useState(search?.query ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const fieldId = useId();
   const externalQuery = search?.query ?? '';
+  const closeSearch = useCallback(() => {
+    setOpen(false);
+    toggleRef.current?.focus({ preventScroll: true });
+  }, [setOpen]);
 
   useEffect(() => {
     setValue((current) => (current === externalQuery ? current : externalQuery));
@@ -27,43 +33,50 @@ export function MobileSearchToggle({ className }: { className?: string }) {
 
   useEffect(() => {
     if (!open) return;
-    const frame = window.requestAnimationFrame(() => inputRef.current?.focus());
+    const frame = window.requestAnimationFrame(() => inputRef.current?.focus({ preventScroll: true }));
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeSearch();
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => {
       window.cancelAnimationFrame(frame);
       window.removeEventListener('keydown', onKey);
     };
-  }, [open, setOpen]);
+  }, [open, closeSearch]);
 
   if (!search) return null;
 
   return (
     <div className={cn('cronograma-mobile-search-toggle', className)} data-open={open || undefined}>
       <button
+        ref={toggleRef}
         type="button"
-        onClick={() => setOpen(!open)}
+        onClick={() => open ? closeSearch() : setOpen(true)}
         className="cronograma-mobile-search-toggle__button focus-ring"
         aria-label={open ? 'Fechar busca' : 'Abrir busca'}
         aria-expanded={open}
+        aria-controls={open ? fieldId : undefined}
         data-active={value.length > 0 || undefined}
       >
-        <Search aria-hidden="true" />
+        {open ? <X aria-hidden="true" /> : <Search aria-hidden="true" />}
         {value.length > 0 && !open && <i aria-hidden="true" />}
       </button>
 
       {open && (
-        <div className="cronograma-mobile-search-toggle__field" role="search">
-          <Search aria-hidden="true" />
+        <div id={fieldId} className="cronograma-mobile-search-toggle__field" role="search">
           <input
             ref={inputRef}
             type="search"
             value={value}
             onChange={(event) => setValue(event.target.value)}
             onKeyDown={(event) => {
-              if (event.key === 'Enter') setOpen(false);
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                closeSearch();
+              }
             }}
             placeholder="Buscar evento, pessoa, comissão…"
             aria-label="Buscar no cronograma"
@@ -76,7 +89,7 @@ export function MobileSearchToggle({ className }: { className?: string }) {
               onClick={() => {
                 setValue('');
                 search.setQuery('');
-                inputRef.current?.focus();
+                inputRef.current?.focus({ preventScroll: true });
               }}
               className="cronograma-mobile-search-toggle__clear focus-ring"
               aria-label="Limpar busca"
@@ -84,13 +97,6 @@ export function MobileSearchToggle({ className }: { className?: string }) {
               <X aria-hidden="true" />
             </button>
           )}
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="cronograma-mobile-search-toggle__done focus-ring"
-          >
-            OK
-          </button>
         </div>
       )}
     </div>

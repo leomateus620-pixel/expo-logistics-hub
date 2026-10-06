@@ -1,5 +1,35 @@
 /* Camada executiva compacta da Agenda Fenasoja (topo azul + navegação secundária). */
 
+/* Clipping, em vez de deslocamento, mantém o atalho oculto também no overscroll. */
+.cronograma-module-shell > .skip-to-content {
+  width: 1px;
+  height: 1px;
+  top: 0;
+  left: 0;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  transform: none;
+  transition: none;
+}
+
+.cronograma-module-shell > .skip-to-content:focus-visible {
+  width: auto;
+  height: auto;
+  top: 1rem;
+  left: 1rem;
+  max-width: calc(100% - 2rem);
+  padding: 0.5rem 1rem;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  white-space: normal;
+  outline: 2px solid white;
+  outline-offset: 3px;
+}
+
 .cronograma-module-bar[data-layout='command'] .cronograma-command-layer {
   display: flex;
   width: 100%;
@@ -61,12 +91,59 @@
 }
 
 @media (max-width: 1023px) {
+  /* As três funções ocupam linhas próprias, inclusive na faixa de tablets. */
+  .cronograma-module-bar[data-layout='command'] .cronograma-command-layer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.65rem;
+    padding-block: 0.6rem;
+  }
+
+  .cronograma-command-layer__left {
+    display: grid;
+    grid-template-columns: max-content max-content minmax(0, 1fr);
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cronograma-command-layer__left .cronograma-module-back {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 2.75rem;
+  }
+
+  .cronograma-command-layer__left .cronograma-agenda-modes {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  .cronograma-command-layer__right {
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    border-top: 1px solid rgb(255 255 255 / 0.16);
+    padding-top: 0.65rem;
+  }
+
+  .cronograma-command-layer__right :is(.cronograma-command-chip, .cronograma-command-preparation, .cronograma-module-signout),
+  .cronograma-module-bar .cronograma-command-temporal button {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
   .cronograma-module-bar .cronograma-command-search {
     display: none;
   }
 
   .cronograma-command-layer__left .cronograma-mobile-search-toggle {
-    display: inline-flex;
+    display: contents;
+  }
+
+  .cronograma-command-layer__left .cronograma-mobile-search-toggle__button {
+    grid-column: 2;
+    grid-row: 1;
   }
 
   .cronograma-command-layer__left .cronograma-mobile-search-toggle__button,
@@ -75,20 +152,13 @@
     height: 2.75rem;
   }
 
-  .cronograma-command-layer__left .cronograma-mobile-search-toggle__done {
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-  }
-
-  .cronograma-module-bar[data-layout='command'] .cronograma-command-layer:has(.cronograma-mobile-search-toggle[data-open]) {
-    padding-bottom: 3.65rem;
-  }
-
   .cronograma-command-layer__left .cronograma-mobile-search-toggle__field {
-    top: auto;
-    bottom: 0.4rem;
-    transform: none;
-    animation: none;
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .cronograma-command-layer__left .cronograma-mobile-search-toggle__field input {
+    min-height: 2.75rem;
   }
 }
 
@@ -214,22 +284,6 @@
 }
 
 @media (max-width: 767px) {
-  .cronograma-module-bar[data-layout='command'] .cronograma-command-layer {
-    flex-wrap: wrap;
-    gap: 0.45rem;
-  }
-
-  .cronograma-command-layer__left {
-    flex-basis: 100%;
-    justify-content: space-between;
-    gap: 0.4rem;
-  }
-
-  .cronograma-command-layer__right {
-    flex-basis: 100%;
-    justify-content: flex-end;
-  }
-
   .cronograma-agenda-mode__label {
     display: none;
   }

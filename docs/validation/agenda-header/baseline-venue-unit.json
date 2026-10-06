@@ -1,0 +1,20 @@
+{
+  "sourceCommit": "88993b2475d7eab0f59860dfc5cdb05633eba84e",
+  "total": 10,
+  "passed": 7,
+  "failed": 3,
+  "failures": [
+    {
+      "title": "organiza a navegação em planejamento, gestão e controle",
+      "status": "failed"
+    },
+    {
+      "title": "exibe o seletor de workspaces em duas metades sem ações do hero",
+      "status": "failed"
+    },
+    {
+      "title": "expõe etapas, obrigatoriedade e foco de contexto para tecnologias assistivas",
+      "status": "failed"
+    }
+  ]
+}
