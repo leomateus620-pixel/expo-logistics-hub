@@ -2,8 +2,8 @@ import { AlertTriangle } from 'lucide-react';
 import { useEventCenterRestaurantConflicts } from '@/hooks/useEventCenterRestaurantConflicts';
 import { classifyRestaurantAlert } from '@/lib/event-center-restaurant-conflicts';
 
-export function EventCenterRestaurantAlert({ code, start, end }: { code?: string | null; start: string | null; end: string | null }) {
-  const { events, loading, error } = useEventCenterRestaurantConflicts(code, start, end);
+export function EventCenterRestaurantAlert({ code, start, end, sourceEventId }: { code?: string | null; start: string | null; end: string | null; sourceEventId?: string | null }) {
+  const { events, loading, error } = useEventCenterRestaurantConflicts(code, start, end, sourceEventId);
   if (!events.length && !loading && !error) return null;
   return <div className="mt-3 rounded-lg border border-gold/40 bg-gold/10 p-3 text-sm text-foreground" aria-live="polite">
     {events.length > 0 && <>

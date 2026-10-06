@@ -82,6 +82,7 @@ interface MobileCronogramaTimelineProps {
   requestedYear?: CronogramaCycleYear | null;
   requestedMonth?: string | null;
   temporalFocusKey?: string;
+  datasetScopeKey?: string;
   preferredTemporalYear?: CronogramaCycleYear | null;
   onPositionChange?: (change: TimelinePositionChange) => void;
   todayKey?: string;
@@ -162,6 +163,7 @@ export function MobileCronogramaTimeline({
   requestedYear = null,
   requestedMonth = null,
   temporalFocusKey = 'all',
+  datasetScopeKey = 'general',
   preferredTemporalYear = null,
   onPositionChange,
   todayKey: todayKeyOverride,
@@ -206,6 +208,10 @@ export function MobileCronogramaTimeline({
     todayKey,
   }));
   const requestedSignatureRef = useRef(`${requestedYear ?? ''}|${requestedMonth ?? ''}`);
+  const datasetScopeRef = useRef(datasetScopeKey);
+  const datasetScopeChanged = datasetScopeRef.current !== datasetScopeKey;
+  const preserveScopePositionRef = useRef(false);
+  if (datasetScopeChanged) preserveScopePositionRef.current = true;
   const temporalFocusRef = useRef(temporalFocusKey);
   const onPositionChangeRef = useRef(onPositionChange);
 
@@ -219,6 +225,7 @@ export function MobileCronogramaTimeline({
     reason: TimelinePositionReason,
     replace: boolean,
   ) => {
+    if (reason !== 'reconcile') preserveScopePositionRef.current = false;
     const resolvedYear = closestAvailableYear(year, availableYears);
     const resolvedMonth = yearFromMonth(month) === resolvedYear && month
       ? month
@@ -239,6 +246,7 @@ export function MobileCronogramaTimeline({
     const signature = `${requestedYear ?? ''}|${requestedMonth ?? ''}`;
     if (signature === requestedSignatureRef.current) return;
     requestedSignatureRef.current = signature;
+    preserveScopePositionRef.current = false;
     const monthYear = yearFromMonth(requestedMonth);
     const initialYear = yearFromMonth(initialMonth);
     const year = requestedYear ?? monthYear ?? initialYear;
@@ -262,6 +270,7 @@ export function MobileCronogramaTimeline({
   useEffect(() => {
     if (initialMonthRef.current === initialMonth) return;
     initialMonthRef.current = initialMonth;
+    if (preserveScopePositionRef.current) return;
     if (userNavigatedRef.current || requestedYear || requestedMonth) return;
     const year = yearFromMonth(initialMonth);
     if (!year || !initialMonth) return;
@@ -277,9 +286,13 @@ export function MobileCronogramaTimeline({
   }, [commitPosition, firstFilteredMonthByYear, firstMatchingYear, initialMonth, preferredTemporalYear, temporalFocusKey]);
 
   useEffect(() => {
-    if (!availableYears.length || availableYears.includes(position.year)) return;
+    if (preserveScopePositionRef.current || !availableYears.length || availableYears.includes(position.year)) return;
     commitPosition(position.year, null, 'reconcile', true);
   }, [availableYears, commitPosition, position.year]);
+
+  useEffect(() => {
+    datasetScopeRef.current = datasetScopeKey;
+  }, [datasetScopeKey]);
 
   const selectedSummary = summaries.find((summary) => summary.year === position.year) ?? summaries[0];
   const currentYear = getCurrentCycleYear(todayKey);

@@ -49,6 +49,7 @@ import {
   CronogramaStatusIndicator,
 } from './CronogramaBadges';
 import { EventForm } from './EventForm';
+import { CronogramaAgendaModeNotice } from './CronogramaAgendaModeNotice';
 import { formatLongDate, formatLongDateRange } from './dateUtils';
 import { formatEventDurationLabel, formatEventPeriod } from '@/lib/cronograma-event-period';
 import { getEventOperationalLines } from '@/lib/cronograma-event-details';
@@ -279,6 +280,7 @@ export function EventDrawer({
           </div>
 
           <div className="cronograma-drawer-body" data-testid="cronograma-drawer-scroll">
+            <CronogramaAgendaModeNotice event={event} />
             {saveError && !editMode && (
               <p className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-900" role="alert">
                 {saveError}

@@ -9,8 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUnitAgenda } from '@/hooks/useUnitAgenda';
 import { useUnitDocuments } from '@/hooks/useUnitDocuments';
 import { toast } from '@/hooks/use-toast';
-import { cronogramaSaveEvent } from '@/lib/cronograma-rpc';
-import { supabase } from '@/integrations/supabase/client';
+import { cronogramaSaveEvent, cronogramaSaveSuccessMessage, type CronogramaRestaurantForwarding } from '@/lib/cronograma-rpc';
 import CommissionLayout from '@/components/commissions/CommissionLayout';
 import PageTransition from '@/components/PageTransition';
 import type { CommissionMenuItem, CommissionModule } from '@/modules/commissions/commissionRegistry';
@@ -184,12 +183,12 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
     async (draft: AgendaEventDraft, editing: AgendaEventViewModel | null) => {
       if (!orgId || !commissionId || !commissionSlug) {
         toast({ title: 'Não foi possível salvar', description: 'Frente sem cadastro nesta organização.', variant: 'destructive' });
-        return;
+        return false;
       }
       const problem = validateDraft(draft);
       if (problem) {
         toast({ title: 'Revise o formulário', description: problem, variant: 'destructive' });
-        return;
+        return false;
       }
 
       setSaving(true);
@@ -202,26 +201,20 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
           resolvePerson: (personId) => peopleOptions.find((person) => person.id === personId),
         });
 
-        const saved = (await cronogramaSaveEvent(payload)) as { id?: string } | null;
-        const savedId = editing?.id ?? saved?.id ?? null;
-        if (savedId && !editing) {
-          await (supabase as any).rpc('cronograma_set_event_origin', {
-            _event_id: savedId,
-            _commission_id: commissionId,
-          });
-        }
-
+        const saved = (await cronogramaSaveEvent(payload, editing?.lockVersion)) as { id?: string; restaurant_forwarding?: CronogramaRestaurantForwarding | null } | null;
         invalidate();
         toast({
           title: editing ? 'Evento atualizado' : 'Evento criado',
-          description: 'O evento também aparece na Agenda Fenasoja quando envolve a Comissão Central.',
+          description: cronogramaSaveSuccessMessage({ restaurantForwarding: saved?.restaurant_forwarding }, 'O evento também aparece na Agenda Fenasoja quando envolve a Comissão Central.'),
         });
+        return true;
       } catch (error) {
         toast({
           title: 'Falha ao salvar o evento',
           description: error instanceof Error ? error.message : 'Tente novamente.',
           variant: 'destructive',
         });
+        return false;
       } finally {
         setSaving(false);
       }

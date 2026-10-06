@@ -10,6 +10,8 @@ import {
   createEmptyVenueEventDraft,
   eventReadiness,
   eventToDraft,
+  canReviewCronogramaVenueEvent,
+  formatVenueEventPeriod,
   findLocalAvailabilityConflicts,
   mapVenueError,
   rangesOverlap,
@@ -310,6 +312,41 @@ describe("solicitações preliminares de espaço", () => {
     expect(result.error.issues.map((issue) => issue.path[0])).toEqual(
       expect.arrayContaining(["startDate", "startTime"]),
     );
+  });
+  it('preserves partial source dates without inventing hours in a linked request', () => {
+    const event = makeEvent({
+      cronograma_source_event_id: '00000000-0000-4000-8000-000000000008',
+      cronograma_source_revision: 3,
+      cronograma_source_snapshot: { start_date: '2028-04-29', end_date: '2028-05-01', start_time: null, end_time: null },
+      pending_date: true,
+      status: 'pendente_informacoes',
+      approval_status: 'pendente',
+      start_at: null, end_at: null, setup_start_at: null, teardown_end_at: null,
+    });
+    const draft = eventToDraft(event, [makeAllocation({ start_at: null, end_at: null, setup_start_at: null, teardown_end_at: null })], [], []);
+    expect(formatVenueEventPeriod(event)).toBe('29/04/2028 — 01/05/2028 · Horários a definir');
+    expect(draft).toMatchObject({ pendingDate: true, startDate: '2028-04-29', endDate: '2028-05-01', startTime: '', endTime: '', setupStartTime: '', teardownEndTime: '' });
+    const payload = toEventRpcPayload({ ...draft, observations: 'Revisão operacional' }, event);
+    expect(payload).toMatchObject({ start_at: null, end_at: null, pending_date: true, observations: 'Revisão operacional' });
+  });
+
+  it('keeps server source fields unchanged while editing linked operational data', () => {
+    const event = makeEvent({
+      cronograma_source_event_id: '00000000-0000-4000-8000-000000000008',
+      title: 'Evento de origem', requester_name: 'Pessoa criadora', visibility: 'restrita',
+    });
+    const draft = eventToDraft(event, [makeAllocation()], [], []);
+    const payload = toEventRpcPayload({ ...draft, observations: 'Equipe preparada' }, event);
+    expect(payload).toMatchObject({ title: 'Evento de origem', requester_name: 'Pessoa criadora', event_type: event.event_type, visibility: 'restrita', start_at: event.start_at, observations: 'Equipe preparada' });
+  });
+
+  it('requires the linked responsible and approval permission without changing ordinary approvals', () => {
+    const linked = { cronograma_source_event_id: 'source', responsible_user_id: USER_ID };
+    expect(canReviewCronogramaVenueEvent(linked, USER_ID, true)).toBe(true);
+    expect(canReviewCronogramaVenueEvent(linked, USER_ID, false)).toBe(false);
+    expect(canReviewCronogramaVenueEvent(linked, 'another-user', true)).toBe(false);
+    expect(canReviewCronogramaVenueEvent({ ...linked, responsible_user_id: null }, USER_ID, true)).toBe(false);
+    expect(canReviewCronogramaVenueEvent({ cronograma_source_event_id: null, responsible_user_id: null }, USER_ID, true)).toBe(true);
   });
 });
 

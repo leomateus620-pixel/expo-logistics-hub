@@ -162,6 +162,7 @@ export function adaptCronogramaEvent(
     kind: centralMeeting ? 'meeting' : sourceToVisualKind[event.eventType] ?? 'event',
     location: event.location ?? undefined,
     locationCode: event.locationCode ?? null,
+    restaurantForwarding: event.restaurantForwarding ?? null,
     owner: primaryResponsible?.name ?? event.responsibleName ?? undefined,
     commission: primaryCommission?.commissionName ?? event.commissionName ?? event.linkedCommissions?.[0]?.name,
     relatedCommissionIds: [
@@ -288,6 +289,7 @@ export function visualEventToSourceUpdates(
   const hasExactDate = Boolean(event.date);
 
   return {
+    lockVersion: event.lockVersion ?? current.lockVersion,
     title: event.title,
     description: event.summary,
     category: categoryLabels[event.category],

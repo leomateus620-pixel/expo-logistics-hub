@@ -43,6 +43,7 @@ import {
   CronogramaStatusIndicator,
 } from '@/components/cronograma-eventos/CronogramaBadges';
 import { EventForm } from '@/components/cronograma-eventos/EventForm';
+import { CronogramaAgendaModeNotice } from '@/components/cronograma-eventos/CronogramaAgendaModeNotice';
 import {
   EventRelationList,
   getEventCommissionItems,
@@ -253,6 +254,7 @@ export function EventRelationshipWorkspace({
       </header>
 
       <div className="cronograma-workspace-canvas">
+        <CronogramaAgendaModeNotice event={event} />
         <div className="cronograma-workspace-ambient ambient-one" aria-hidden="true" />
         <div className="cronograma-workspace-ambient ambient-two" aria-hidden="true" />
         <div className="cronograma-workspace-grid" aria-hidden="true" />

@@ -1,0 +1,85 @@
+name: Agenda and Restaurant
+
+on:
+  pull_request:
+    paths:
+      - 'src/components/cronograma-eventos/**'
+      - 'src/components/venue-events/**'
+      - 'src/features/commission-agenda/**'
+      - 'src/hooks/useCronograma*.ts'
+      - 'src/hooks/useEventCenterRestaurantConflicts.ts'
+      - 'src/hooks/useTimelineCycleNavigation.ts'
+      - 'src/hooks/useUnitAgenda.ts'
+      - 'src/hooks/useVenueOperations.ts'
+      - 'src/lib/cronograma*.ts'
+      - 'src/lib/venue-operations.ts'
+      - 'src/pages/CronogramaEventosPage.tsx'
+      - 'src/pages/commissions/CommissionWorkspacePage.tsx'
+      - 'src/styles/cronograma-command-layer.css'
+      - 'src/test/cronograma*.test.*'
+      - 'src/test/venueOperations.test.ts'
+      - 'src/lib/__tests__/cronogramaRpc.test.ts'
+      - 'supabase/migrations/**'
+      - 'supabase/tests/cronograma_restaurant_bridge.test.sql'
+      - 'scripts/agenda-restaurant/**'
+      - '.github/workflows/agenda-restaurant.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  agenda-restaurant:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: local-fixture-only
+          POSTGRES_DB: agenda_restaurant_test
+        ports:
+          - 65441:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: 65441
+      PGUSER: postgres
+      PGPASSWORD: local-fixture-only
+      PGDATABASE: agenda_restaurant_test
+      PGCLIENTENCODING: UTF8
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: oven-sh/setup-bun@v2
+        with: {bun-version: '1.3.0'}
+      - run: bun install --frozen-lockfile
+      - run: npm run typecheck
+      - name: Focused source and UI contracts
+        run: >-
+          npx vitest run --maxWorkers=2
+          src/test/cronogramaAgendaMode.test.tsx
+          src/lib/__tests__/cronogramaRpc.test.ts
+          src/test/venueOperations.test.ts
+          src/test/cronogramaRestaurantSubmission.test.tsx
+          src/test/cronogramaClassificationForm.test.tsx
+          src/test/commissionWorkspaceData.test.ts
+          src/features/commission-agenda/__tests__/event-form-presentation.test.tsx
+          src/test/cronogramaWeeklySummary.test.ts
+          src/test/cronogramaEventPeriod.test.ts
+          src/test/cronogramaDashboardSelectors.test.ts
+          src/test/cronogramaPlanningScope.test.ts
+      - name: Install, replay and exercise the isolated database
+        run: |
+          psql -X -v ON_ERROR_STOP=1 -f scripts/agenda-restaurant/db-fixture.sql
+          psql -X -v ON_ERROR_STOP=1 -f supabase/migrations/20261006120000_cronograma_restaurant_bridge.sql
+          psql -X -v ON_ERROR_STOP=1 -f supabase/migrations/20261006120000_cronograma_restaurant_bridge.sql
+          psql -X -v ON_ERROR_STOP=1 -f supabase/tests/cronograma_restaurant_bridge.test.sql
+          mkdir -p /tmp/agenda-restaurant-concurrency
+          node scripts/agenda-restaurant/db-concurrency.cjs --psql /usr/bin/psql --port 65441 --database agenda_restaurant_test --output /tmp/agenda-restaurant-concurrency

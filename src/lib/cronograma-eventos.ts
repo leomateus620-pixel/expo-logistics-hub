@@ -4,10 +4,12 @@ import type {
   CronogramaPriority,
   CronogramaStatus,
 } from '@/data/fenasoja2028CronogramaSeed';
+import type { CronogramaRestaurantForwarding } from '@/lib/cronograma-rpc';
 
 export interface CronogramaEvent extends CronogramaEventSeed {
   id: string;
   locationCode?: string | null;
+  restaurantForwarding?: CronogramaRestaurantForwarding | null;
   createdAt?: string | null;
   updatedAt?: string | null;
   sourceDataQuality?: {

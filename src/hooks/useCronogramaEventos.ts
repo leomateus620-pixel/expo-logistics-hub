@@ -8,6 +8,8 @@ import {
   cronogramaDeleteEvent,
   cronogramaDeleteSubevent,
   cronogramaReorderSubevents,
+  newRequestId,
+  type CronogramaRestaurantForwarding,
   type CronogramaSaveEventPayload,
   type CronogramaSaveSubeventPayload,
   type CronogramaSubeventPlanItemInput,
@@ -15,6 +17,7 @@ import {
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useCapabilities } from '@/hooks/useCapabilities';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { matchesCronogramaLocation } from '@/lib/cronograma-agenda-mode';
 import {
   fenasoja2028CronogramaSeed,
   type CronogramaCommissionLink,
@@ -115,6 +118,10 @@ export function selectVisibleSeedEvents(
   return canViewPlanning ? seedEvents : seedEvents.filter((event) => !isPlanningSeedEvent(event));
 }
 
+/** Historical Center entries remain visible, but forwarding requires an explicit save. */
+export function selectAutomaticSeedEvents(seedEvents: CronogramaEvent[]): CronogramaEvent[] {
+  return seedEvents.filter((event) => !matchesCronogramaLocation(event, 'centro_eventos_fenasoja'));
+}
 
 
 export function mergeOfficialSeedWithDb(
@@ -400,6 +407,9 @@ function fromDbRow(row: unknown): CronogramaEvent {
     priority: (readString(record, 'priority') ?? 'media') as CronogramaPriority,
     location: readString(record, 'location'),
     locationCode: readString(record, 'location_code'),
+    restaurantForwarding: record.restaurant_forwarding && typeof record.restaurant_forwarding === 'object'
+      ? record.restaurant_forwarding as CronogramaRestaurantForwarding
+      : null,
     time: normalizeTime(readString(record, 'event_time')),
     startTime: normalizeTime(readString(record, 'start_time')),
     endTime: normalizeTime(readString(record, 'end_time')),
@@ -602,7 +612,7 @@ function toDbSubeventPayload(parentEventId: string, draft: CronogramaSubeventDra
 }
 
 function draftToEvent(draft: CronogramaEventDraft): CronogramaEvent {
-  const id = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}`;
+  const id = newRequestId();
   const hasExactDate = Boolean(draft.startDate);
   return {
     id: `local-${id}`,
@@ -806,7 +816,7 @@ export function useCronogramaEventos() {
       if (!orgId || !isWritableRole(myRole) || hasScopedCronogramaView) return [];
       const user = (await cronogramaDb.auth.getUser()).data.user;
       // Nunca reinserir eventos de planilha para quem não é do grupo de planejamento.
-      const allowed = selectVisibleSeedEvents(eventsToSeed, canViewPlanningEvents);
+      const allowed = selectAutomaticSeedEvents(selectVisibleSeedEvents(eventsToSeed, canViewPlanningEvents));
       if (allowed.length === 0) return [];
       const payload = allowed.map((event) => toDbPayload(event, orgId, user?.id));
       const { data, error } = await cronogramaDb
@@ -834,7 +844,7 @@ export function useCronogramaEventos() {
     if (!orgId || !query.data || !isWritableRole(myRole) || isSeedingOfficialData) return;
 
     const dbSourceKeys = new Set(dbEvents.map((event) => event.sourceKey).filter(Boolean));
-    const missingOfficialEvents = localSeedEvents.filter((event) => (
+    const missingOfficialEvents = selectAutomaticSeedEvents(localSeedEvents).filter((event) => (
       event.sourceKey && !dbSourceKeys.has(event.sourceKey) && !deletedSourceKeys.has(event.sourceKey)
     ));
 
@@ -873,9 +883,14 @@ export function useCronogramaEventos() {
     })();
   }, [orgId]);
 
+  const pendingCreateIdentity = useRef<{ fingerprint: string; sourceKey: string } | null>(null);
   const create = useMutation({
     mutationFn: async (draft: CronogramaEventDraft) => {
-      const event = draftToEvent(draft);
+      const fingerprint = JSON.stringify(draft);
+      if (!draft.sourceKey && pendingCreateIdentity.current?.fingerprint !== fingerprint) {
+        pendingCreateIdentity.current = { fingerprint, sourceKey: `manual-${newRequestId()}` };
+      }
+      const event = draftToEvent({ ...draft, sourceKey: draft.sourceKey ?? pendingCreateIdentity.current?.sourceKey });
       if (!orgId) throw new Error('Não foi possível identificar a organização atual. Entre novamente e tente salvar.');
       if (dbUnavailable) {
         throw new Error('A sincronização está indisponível. O evento não foi salvo para evitar perda de dados. Tente novamente quando a conexão for restabelecida.');
@@ -884,13 +899,16 @@ export function useCronogramaEventos() {
       const data = await cronogramaSaveEvent(toRpcEventPayload(event, orgId), null);
       return fromDbRow(data);
     },
-    onSuccess: (event) => {
+    onSuccess: (event, draft) => {
+      if (!draft.sourceKey && pendingCreateIdentity.current?.sourceKey === event.sourceKey) pendingCreateIdentity.current = null;
       setSessionEvents((current) => {
         const existingIndex = current.findIndex((item) => item.id === event.id || item.sourceKey === event.sourceKey);
         if (existingIndex === -1) return sortCronogramaEvents([...current, event]);
         return sortCronogramaEvents(current.map((item, index) => (index === existingIndex ? event : item)));
       });
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      queryClient.invalidateQueries({ queryKey: ['venue-operations', orgId] });
+      queryClient.invalidateQueries({ queryKey: ['restaurant-event-alert', orgId] });
       triggerSyncWorker();
     },
   });
@@ -958,7 +976,7 @@ export function useCronogramaEventos() {
 
     const target = cascadeCompletion(next);
     const payload = toRpcEventPayload(target, orgId);
-    const data = await cronogramaSaveEvent(payload, current.lockVersion ?? null);
+    const data = await cronogramaSaveEvent(payload, next.lockVersion ?? current.lockVersion ?? null);
     return cascadeCompletion(fromDbRow(data));
   };
 
@@ -994,12 +1012,15 @@ export function useCronogramaEventos() {
       replaceSessionEvent(event);
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
       queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
+      queryClient.invalidateQueries({ queryKey: ['venue-operations', orgId] });
+      queryClient.invalidateQueries({ queryKey: ['restaurant-event-alert', orgId] });
       triggerSyncWorker();
     },
   });
 
   const deleteEvent = useMutation({
-    mutationFn: async (eventId: string) => {
+    mutationFn: async (input: string | { id: string; expectedLockVersion?: number | null }) => {
+      const eventId = typeof input === 'string' ? input : input.id;
       const current = findSessionEvent(eventId);
       if (!current) throw new Error('Evento não encontrado. Atualize a página e tente novamente.');
       if (!canWriteCronograma) {
@@ -1011,7 +1032,8 @@ export function useCronogramaEventos() {
         throw new Error('A sincronização está indisponível. A exclusão não foi realizada. Tente novamente em instantes.');
       }
 
-      await cronogramaDeleteEvent(isUuid(current.id) ? current.id : null, orgId, current.sourceKey || current.id);
+      const expectedLockVersion = typeof input === 'string' ? current.lockVersion : input.expectedLockVersion ?? current.lockVersion;
+      await cronogramaDeleteEvent(isUuid(current.id) ? current.id : null, orgId, current.sourceKey || current.id, expectedLockVersion);
       return { id: current.id, sourceKey: current.sourceKey || current.id };
     },
     onSuccess: (result) => {
@@ -1021,6 +1043,8 @@ export function useCronogramaEventos() {
         deletedSourceKeys: Array.from(new Set([...current.deletedSourceKeys, result.sourceKey])),
       }) : current);
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      queryClient.invalidateQueries({ queryKey: ['venue-operations', orgId] });
+      queryClient.invalidateQueries({ queryKey: ['restaurant-event-alert', orgId] });
       triggerSyncWorker();
     },
   });

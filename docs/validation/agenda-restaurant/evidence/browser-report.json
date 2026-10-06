@@ -1,0 +1,307 @@
+{
+  "boundary": "Synthetic local read-only module mocks; external requests intercepted; no production writes",
+  "checks": [
+    {
+      "name": "1366: general is initial mode",
+      "passed": true
+    },
+    {
+      "name": "1366: Portal visible",
+      "passed": true
+    },
+    {
+      "name": "1366: room control visible",
+      "passed": true
+    },
+    {
+      "name": "1366: room activates by keyboard",
+      "passed": true
+    },
+    {
+      "name": "1366: canonical room and historical full name retained",
+      "passed": true
+    },
+    {
+      "name": "1366: exact scope excludes QA centro de eventos",
+      "passed": true
+    },
+    {
+      "name": "1366: exact scope excludes QA código divergente",
+      "passed": true
+    },
+    {
+      "name": "1366: exact scope excludes QA nome parcial",
+      "passed": true
+    },
+    {
+      "name": "1366: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "1366: comfortable mode target",
+      "passed": true,
+      "detail": {
+        "x": 159.1875,
+        "y": 6.671875,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "name": "1366: search combines with room",
+      "passed": true
+    },
+    {
+      "name": "1366: switching mode preserves search",
+      "passed": true
+    },
+    {
+      "name": "1366: clear search keeps room mode",
+      "passed": true
+    },
+    {
+      "name": "room Pendências: own partition remains scoped",
+      "passed": true
+    },
+    {
+      "name": "room Histórico concluído: own partition remains scoped",
+      "passed": true
+    },
+    {
+      "name": "room calendar excludes other locations",
+      "passed": true
+    },
+    {
+      "name": "room dashboard excludes other locations",
+      "passed": true
+    },
+    {
+      "name": "768: general is initial mode",
+      "passed": true
+    },
+    {
+      "name": "768: Portal visible",
+      "passed": true
+    },
+    {
+      "name": "768: room control visible",
+      "passed": true
+    },
+    {
+      "name": "768: room activates by keyboard",
+      "passed": true
+    },
+    {
+      "name": "768: canonical room and historical full name retained",
+      "passed": true
+    },
+    {
+      "name": "768: exact scope excludes QA centro de eventos",
+      "passed": true
+    },
+    {
+      "name": "768: exact scope excludes QA código divergente",
+      "passed": true
+    },
+    {
+      "name": "768: exact scope excludes QA nome parcial",
+      "passed": true
+    },
+    {
+      "name": "768: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "768: comfortable mode target",
+      "passed": true,
+      "detail": {
+        "x": 159.1875,
+        "y": 6.390625,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "name": "768: search combines with room",
+      "passed": true
+    },
+    {
+      "name": "768: switching mode preserves search",
+      "passed": true
+    },
+    {
+      "name": "768: clear search keeps room mode",
+      "passed": true
+    },
+    {
+      "name": "390: general is initial mode",
+      "passed": true
+    },
+    {
+      "name": "390: Portal visible",
+      "passed": true
+    },
+    {
+      "name": "390: room control visible",
+      "passed": true
+    },
+    {
+      "name": "390: room activates by keyboard",
+      "passed": true
+    },
+    {
+      "name": "390: canonical room and historical full name retained",
+      "passed": true
+    },
+    {
+      "name": "390: exact scope excludes QA centro de eventos",
+      "passed": true
+    },
+    {
+      "name": "390: exact scope excludes QA código divergente",
+      "passed": true
+    },
+    {
+      "name": "390: exact scope excludes QA nome parcial",
+      "passed": true
+    },
+    {
+      "name": "390: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390: comfortable mode target",
+      "passed": true,
+      "detail": {
+        "x": 205.90625,
+        "y": 6.390625,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "name": "390: search combines with room",
+      "passed": true
+    },
+    {
+      "name": "390: switching mode preserves search",
+      "passed": true
+    },
+    {
+      "name": "390: clear search keeps room mode",
+      "passed": true
+    },
+    {
+      "name": "320: general is initial mode",
+      "passed": true
+    },
+    {
+      "name": "320: Portal visible",
+      "passed": true
+    },
+    {
+      "name": "320: room control visible",
+      "passed": true
+    },
+    {
+      "name": "320: room activates by keyboard",
+      "passed": true
+    },
+    {
+      "name": "320: canonical room and historical full name retained",
+      "passed": true
+    },
+    {
+      "name": "320: exact scope excludes QA centro de eventos",
+      "passed": true
+    },
+    {
+      "name": "320: exact scope excludes QA código divergente",
+      "passed": true
+    },
+    {
+      "name": "320: exact scope excludes QA nome parcial",
+      "passed": true
+    },
+    {
+      "name": "320: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "320: comfortable mode target",
+      "passed": true,
+      "detail": {
+        "x": 178.40625,
+        "y": 6.390625,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "name": "320: search combines with room",
+      "passed": true
+    },
+    {
+      "name": "320: switching mode preserves search",
+      "passed": true
+    },
+    {
+      "name": "320: clear search keeps room mode",
+      "passed": true
+    },
+    {
+      "name": "No browser runtime errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "No production writes attempted",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "blockedWrites": [],
+  "captures": [
+    {
+      "width": 1366,
+      "overflow": false,
+      "touch": {
+        "x": 159.1875,
+        "y": 6.671875,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "width": 768,
+      "overflow": false,
+      "touch": {
+        "x": 159.1875,
+        "y": 6.390625,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "width": 390,
+      "overflow": false,
+      "touch": {
+        "x": 205.90625,
+        "y": 6.390625,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "width": 320,
+      "overflow": false,
+      "touch": {
+        "x": 178.40625,
+        "y": 6.390625,
+        "width": 44,
+        "height": 44
+      }
+    }
+  ]
+}

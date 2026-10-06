@@ -55,7 +55,7 @@ export interface CommissionAgendaPageProps extends AgendaCallbacks {
   /** Presentation-only resolvers for the detail panel. */
   getEventDocuments?: (eventId: string) => DocumentViewModel[];
   getEventHistory?: (eventId: string) => EventHistoryEntry[];
-  onSubmitEvent?: (draft: AgendaEventDraft, editing: AgendaEventViewModel | null) => void;
+  onSubmitEvent?: (draft: AgendaEventDraft, editing: AgendaEventViewModel | null) => void | boolean | Promise<void | boolean>;
   /** Initial filter overrides (e.g. from the URL). */
   initialFilters?: Partial<AgendaFilterState>;
   className?: string;
@@ -157,9 +157,11 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
     onEditEvent?.(event);
   };
   const openDocuments = (event?: AgendaEventViewModel) => onOpenDocuments?.(event);
-  const submitEvent = (draft: AgendaEventDraft) => {
-    onSubmitEvent?.(draft, editingEvent);
+  const submitEvent = async (draft: AgendaEventDraft) => {
+    const saved = await onSubmitEvent?.(draft, editingEvent);
+    if (saved === false) return false;
     setFormOpen(false);
+    return true;
   };
 
   useImperativeHandle(ref, () => ({ openCreate, openEvent }));

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   CRONOGRAMA_PLANNING_SHEETS,
   isPlanningSeedEvent,
+  selectAutomaticSeedEvents,
   selectVisibleSeedEvents,
 } from '@/hooks/useCronogramaEventos';
 import type { CronogramaEvent } from '@/lib/cronograma-eventos';
@@ -57,5 +58,23 @@ describe('escopo de planejamento (planilhas anuais)', () => {
   it('não deixa nenhum evento de planilha ser reinserido no auto-seed', () => {
     const seed = planningSheets.map((sheet, index) => makeEvent(`planilha-${index}`, sheet));
     expect(selectVisibleSeedEvents(seed, false)).toHaveLength(0);
+  });
+
+  it('keeps historical Center events visible without automatically forwarding them', () => {
+    const events = [
+      { ...makeEvent('canonical-center', 'Cadastro manual'), locationCode: 'centro_eventos_fenasoja', location: 'Outro texto histórico' },
+      { ...makeEvent('legacy-center', 'Cadastro manual'), location: '  centro   de eventos fenasoja  ' },
+      { ...makeEvent('volunteers', 'Cadastro manual'), locationCode: 'sala_voluntarios', location: 'SALA DOS VOLUNTÁRIOS' },
+    ];
+    expect(selectVisibleSeedEvents(events, true)).toEqual(events);
+    expect(selectAutomaticSeedEvents(events).map((event) => event.sourceKey)).toEqual(['volunteers']);
+  });
+
+  it('uses canonical location rules before automatic seeding, respecting an explicit different code', () => {
+    const events = [
+      { ...makeEvent('explicit-other', 'Cadastro manual'), locationCode: 'sala_voluntarios', location: 'CENTRO DE EVENTOS FENASOJA' },
+      { ...makeEvent('similar-label', 'Cadastro manual'), location: 'CENTRO DE EVENTOS FENASOJA - ANEXO' },
+    ];
+    expect(selectAutomaticSeedEvents(events)).toEqual(events);
   });
 });

@@ -42,6 +42,7 @@ interface TimelineNavigationOptions {
   requestedMonth: string | null;
   todayKey: string;
   temporalFocusKey: string;
+  datasetScopeKey?: string;
   preferredTemporalYear: CronogramaCycleYear | null;
   onPositionChange?: (change: TimelinePositionChange) => void;
 }
@@ -167,6 +168,7 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
     months: options.monthKeys.join('|'),
     available: options.availableYears.join('|'),
     temporal: options.temporalFocusKey,
+    scope: options.datasetScopeKey,
   });
 
 
@@ -403,10 +405,12 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
   useEffect(() => {
     const previous = contextRef.current;
     const temporalChanged = previous.temporal !== options.temporalFocusKey;
+    const scopeChanged = previous.scope !== options.datasetScopeKey;
     const monthsChanged = previous.months !== monthSignature;
     const availableChanged = previous.available !== availableSignature;
     contextRef.current = {
       temporal: options.temporalFocusKey,
+      scope: options.datasetScopeKey,
       months: monthSignature,
       available: availableSignature,
     };
@@ -415,6 +419,8 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
     // o foco acompanha o mês inicial recalculado (que prioriza o mês corrente).
     const initialMonthChanged = initialMonthRef.current !== options.initialMonth;
     initialMonthRef.current = options.initialMonth;
+    // Changing the location view preserves the user's current period, including empty months.
+    if (scopeChanged && !temporalChanged) return;
     if (initialMonthChanged && !userNavigated.current && options.initialMonth) {
       const year = resolveFocusYear(
         yearFromMonth(options.initialMonth) ?? getClosestCycleYear(options.todayKey),

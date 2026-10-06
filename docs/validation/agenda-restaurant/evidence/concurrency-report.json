@@ -1,0 +1,45 @@
+{
+  "boundary": "Synthetic loopback PostgreSQL only; separate connections, no remote writes",
+  "checks": [
+    {
+      "name": "Same submission in two connections succeeds through durable replay",
+      "passed": true
+    },
+    {
+      "name": "Same submission returns one source and destination identity",
+      "passed": true
+    },
+    {
+      "name": "Double request commits exactly one source, target and receipt",
+      "passed": true
+    },
+    {
+      "name": "Concurrent editors accept one version and reject the stale version",
+      "passed": true
+    },
+    {
+      "name": "Two tabs with distinct receipts and shared source key cannot duplicate creation",
+      "passed": true
+    },
+    {
+      "name": "Save/delete race terminates without deadlock or silent stale update",
+      "passed": true
+    },
+    {
+      "name": "Concurrent transactions leave no privileged write context",
+      "passed": true
+    }
+  ],
+  "initialReplies": [
+    {
+      "code": 0,
+      "stdout": "{\"id\": \"08b9074b-0bc5-48b5-a4db-3fb2247fb8c1\", \"title\": \"Pedido de concorrência sintético\", \"org_id\": \"10000000-0000-0000-0000-000000000001\", \"status\": \"planejado\", \"category\": \"Outros / a classificar\", \"end_date\": \"2028-11-10\", \"end_time\": \"12:00:00\", \"location\": \"CENTRO DE EVENTOS FENASOJA\", \"metadata\": {}, \"priority\": \"media\", \"subevents\": [], \"created_at\": \"2026-10-06T03:36:43.503813-03:00\", \"event_time\": null, \"event_type\": \"planejamento\", \"source_key\": \"qa-concurrency-shared\", \"source_row\": null, \"start_date\": \"2028-11-10\", \"start_time\": \"10:00:00\", \"updated_at\": \"2026-10-06T03:36:43.503813-03:00\", \"week_label\": null, \"description\": null, \"month_label\": null, \"source_cell\": null, \"source_note\": null, \"source_year\": 2028, \"category_key\": null, \"lock_version\": 1, \"source_sheet\": \"Cadastro manual\", \"commission_id\": null, \"location_code\": \"centro_eventos_fenasoja\", \"origin_source\": \"agenda_central\", \"days_remaining\": null, \"has_exact_date\": true, \"pending_reason\": null, \"commission_name\": null, \"commission_slug\": null, \"decision_needed\": null, \"is_official_seed\": false, \"responsible_name\": null, \"created_by_user_id\": \"20000000-0000-0000-0000-000000000001\", \"linked_commissions\": [], \"planning_restricted\": false, \"responsible_user_id\": null, \"origin_commission_id\": null, \"restaurant_forwarding\": {\"action\": \"created\", \"status\": \"solicitado\", \"event_id\": \"ef4f3d26-17ff-4309-8939-015a5fc81b70\", \"approval_status\": \"pendente\", \"source_revision\": 1}, \"notify_all_commission_members\": false}",
+      "stderr": ""
+    },
+    {
+      "code": 0,
+      "stdout": "{\"id\": \"08b9074b-0bc5-48b5-a4db-3fb2247fb8c1\", \"title\": \"Pedido de concorrência sintético\", \"org_id\": \"10000000-0000-0000-0000-000000000001\", \"status\": \"planejado\", \"category\": \"Outros / a classificar\", \"end_date\": \"2028-11-10\", \"end_time\": \"12:00:00\", \"location\": \"CENTRO DE EVENTOS FENASOJA\", \"metadata\": {}, \"priority\": \"media\", \"replayed\": true, \"subevents\": [], \"created_at\": \"2026-10-06T03:36:43.503813-03:00\", \"event_time\": null, \"event_type\": \"planejamento\", \"source_key\": \"qa-concurrency-shared\", \"source_row\": null, \"start_date\": \"2028-11-10\", \"start_time\": \"10:00:00\", \"updated_at\": \"2026-10-06T03:36:43.503813-03:00\", \"week_label\": null, \"description\": null, \"month_label\": null, \"source_cell\": null, \"source_note\": null, \"source_year\": 2028, \"category_key\": null, \"lock_version\": 1, \"source_sheet\": \"Cadastro manual\", \"commission_id\": null, \"location_code\": \"centro_eventos_fenasoja\", \"origin_source\": \"agenda_central\", \"days_remaining\": null, \"has_exact_date\": true, \"pending_reason\": null, \"commission_name\": null, \"commission_slug\": null, \"decision_needed\": null, \"is_official_seed\": false, \"responsible_name\": null, \"created_by_user_id\": \"20000000-0000-0000-0000-000000000001\", \"linked_commissions\": [], \"planning_restricted\": false, \"responsible_user_id\": null, \"origin_commission_id\": null, \"restaurant_forwarding\": {\"action\": \"created\", \"status\": \"solicitado\", \"event_id\": \"ef4f3d26-17ff-4309-8939-015a5fc81b70\", \"approval_status\": \"pendente\", \"source_revision\": 1}, \"notify_all_commission_members\": false}",
+      "stderr": ""
+    }
+  ]
+}

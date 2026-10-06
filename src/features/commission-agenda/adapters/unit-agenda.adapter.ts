@@ -26,6 +26,9 @@ export interface UnitAgendaPersonJson {
 
 export interface UnitAgendaRow {
   id: string;
+  source_key?: string | null;
+  lock_version?: number | null;
+  location_code?: string | null;
   title: string;
   start_date: string | null;
   end_date: string | null;
@@ -117,6 +120,9 @@ export function toUnitAgendaEvent(
   return {
     id: row.id,
     title: row.title,
+    sourceKey: row.source_key ?? null,
+    lockVersion: row.lock_version ?? null,
+    locationCode: row.location_code ?? null,
     date,
     endDate: endDate && endDate !== date ? endDate : null,
     startTime,
