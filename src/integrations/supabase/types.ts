@@ -3114,12 +3114,20 @@ export type Database = {
         Row: {
           amount: number
           category_id: string | null
+          committed_cents: number | null
+          committed_on: string | null
           created_at: string
           created_by_user_id: string
           cycle_year: number
           description: string | null
           event_id: string | null
           expense_date: string
+          financial_budget_line_id: string | null
+          financial_commission_id: string | null
+          financial_due_date: string | null
+          financial_edition_id: string | null
+          financial_status: string | null
+          financial_version: number
           id: string
           member_user_id: string | null
           org_id: string
@@ -3129,6 +3137,7 @@ export type Database = {
           payment_method: string | null
           pix_key: string | null
           pix_key_type: Database["public"]["Enums"]["pix_key_type"] | null
+          planned_cents: number | null
           status: Database["public"]["Enums"]["expense_status"]
           title: string
           transport_id: string | null
@@ -3138,12 +3147,20 @@ export type Database = {
         Insert: {
           amount?: number
           category_id?: string | null
+          committed_cents?: number | null
+          committed_on?: string | null
           created_at?: string
           created_by_user_id: string
           cycle_year?: number
           description?: string | null
           event_id?: string | null
           expense_date?: string
+          financial_budget_line_id?: string | null
+          financial_commission_id?: string | null
+          financial_due_date?: string | null
+          financial_edition_id?: string | null
+          financial_status?: string | null
+          financial_version?: number
           id?: string
           member_user_id?: string | null
           org_id: string
@@ -3153,6 +3170,7 @@ export type Database = {
           payment_method?: string | null
           pix_key?: string | null
           pix_key_type?: Database["public"]["Enums"]["pix_key_type"] | null
+          planned_cents?: number | null
           status?: Database["public"]["Enums"]["expense_status"]
           title: string
           transport_id?: string | null
@@ -3162,12 +3180,20 @@ export type Database = {
         Update: {
           amount?: number
           category_id?: string | null
+          committed_cents?: number | null
+          committed_on?: string | null
           created_at?: string
           created_by_user_id?: string
           cycle_year?: number
           description?: string | null
           event_id?: string | null
           expense_date?: string
+          financial_budget_line_id?: string | null
+          financial_commission_id?: string | null
+          financial_due_date?: string | null
+          financial_edition_id?: string | null
+          financial_status?: string | null
+          financial_version?: number
           id?: string
           member_user_id?: string | null
           org_id?: string
@@ -3177,6 +3203,7 @@ export type Database = {
           payment_method?: string | null
           pix_key?: string | null
           pix_key_type?: Database["public"]["Enums"]["pix_key_type"] | null
+          planned_cents?: number | null
           status?: Database["public"]["Enums"]["expense_status"]
           title?: string
           transport_id?: string | null
@@ -3196,6 +3223,20 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_financial_edition_fk"
+            columns: ["org_id", "financial_edition_id"]
+            isOneToOne: false
+            referencedRelation: "financial_editions"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "expenses_financial_line_fk"
+            columns: ["financial_budget_line_id"]
+            isOneToOne: false
+            referencedRelation: "financial_budget_lines"
             referencedColumns: ["id"]
           },
           {
@@ -3277,6 +3318,784 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      financial_audit_events: {
+        Row: {
+          action: string
+          actor_user_id: string
+          after_data: Json | null
+          before_data: Json | null
+          created_at: string
+          edition_id: string | null
+          entity: string
+          entity_id: string
+          id: string
+          org_id: string
+          reason: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id: string
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          edition_id?: string | null
+          entity: string
+          entity_id: string
+          id?: string
+          org_id: string
+          reason?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          edition_id?: string | null
+          entity?: string
+          entity_id?: string
+          id?: string
+          org_id?: string
+          reason?: string | null
+        }
+        Relationships: []
+      }
+      financial_budget_lines: {
+        Row: {
+          active: boolean
+          budget_id: string
+          category_id: string | null
+          created_at: string
+          created_by: string
+          description: string
+          edition_id: string
+          extra: Json
+          id: string
+          kind: string
+          notes: string | null
+          org_id: string
+          period_end: string | null
+          period_start: string | null
+          planned_cents: number
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          budget_id: string
+          category_id?: string | null
+          created_at?: string
+          created_by: string
+          description: string
+          edition_id: string
+          extra?: Json
+          id?: string
+          kind?: string
+          notes?: string | null
+          org_id: string
+          period_end?: string | null
+          period_start?: string | null
+          planned_cents: number
+          updated_at?: string
+          updated_by: string
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          budget_id?: string
+          category_id?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string
+          edition_id?: string
+          extra?: Json
+          id?: string
+          kind?: string
+          notes?: string | null
+          org_id?: string
+          period_end?: string | null
+          period_start?: string | null
+          planned_cents?: number
+          updated_at?: string
+          updated_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_budget_lines_org_id_budget_id_fkey"
+            columns: ["org_id", "budget_id"]
+            isOneToOne: false
+            referencedRelation: "financial_budgets"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "financial_budget_lines_org_id_category_id_fkey"
+            columns: ["org_id", "category_id"]
+            isOneToOne: false
+            referencedRelation: "financial_categories"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      financial_budgets: {
+        Row: {
+          budget_cap_cents: number | null
+          commission_id: string
+          created_at: string
+          created_by: string
+          edition_id: string
+          id: string
+          notes: string | null
+          org_id: string
+          period_end: string | null
+          period_start: string | null
+          responsible_name: string | null
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        Insert: {
+          budget_cap_cents?: number | null
+          commission_id: string
+          created_at?: string
+          created_by: string
+          edition_id: string
+          id?: string
+          notes?: string | null
+          org_id: string
+          period_end?: string | null
+          period_start?: string | null
+          responsible_name?: string | null
+          updated_at?: string
+          updated_by: string
+          version?: number
+        }
+        Update: {
+          budget_cap_cents?: number | null
+          commission_id?: string
+          created_at?: string
+          created_by?: string
+          edition_id?: string
+          id?: string
+          notes?: string | null
+          org_id?: string
+          period_end?: string | null
+          period_start?: string | null
+          responsible_name?: string | null
+          updated_at?: string
+          updated_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_budgets_commission_id_fkey"
+            columns: ["commission_id"]
+            isOneToOne: false
+            referencedRelation: "commissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_budgets_org_id_edition_id_fkey"
+            columns: ["org_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "financial_editions"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      financial_categories: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          domain: string
+          id: string
+          name: string
+          org_id: string
+          parent_id: string | null
+          sort_order: number
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          domain: string
+          id?: string
+          name: string
+          org_id: string
+          parent_id?: string | null
+          sort_order?: number
+          updated_at?: string
+          updated_by: string
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          domain?: string
+          id?: string
+          name?: string
+          org_id?: string
+          parent_id?: string | null
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_categories_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_categories_org_id_parent_id_fkey"
+            columns: ["org_id", "parent_id"]
+            isOneToOne: false
+            referencedRelation: "financial_categories"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      financial_custom_fields: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          entity: string
+          field_key: string
+          field_type: string
+          id: string
+          label: string
+          options: Json
+          org_id: string
+          required: boolean
+          sort_order: number
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          entity: string
+          field_key: string
+          field_type: string
+          id?: string
+          label: string
+          options?: Json
+          org_id: string
+          required?: boolean
+          sort_order?: number
+          updated_at?: string
+          updated_by: string
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          entity?: string
+          field_key?: string
+          field_type?: string
+          id?: string
+          label?: string
+          options?: Json
+          org_id?: string
+          required?: boolean
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_custom_fields_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financial_editions: {
+        Row: {
+          code: number
+          created_at: string
+          id: string
+          label: string
+          org_id: string
+          period_end: string
+          period_start: string
+          status: string
+        }
+        Insert: {
+          code: number
+          created_at?: string
+          id?: string
+          label: string
+          org_id: string
+          period_end: string
+          period_start: string
+          status: string
+        }
+        Update: {
+          code?: number
+          created_at?: string
+          id?: string
+          label?: string
+          org_id?: string
+          period_end?: string
+          period_start?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_editions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financial_movement_allocations: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          id: string
+          movement_id: string
+          obligation_id: string
+          org_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          id?: string
+          movement_id: string
+          obligation_id: string
+          org_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          id?: string
+          movement_id?: string
+          obligation_id?: string
+          org_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_movement_allocations_org_id_movement_id_fkey"
+            columns: ["org_id", "movement_id"]
+            isOneToOne: false
+            referencedRelation: "financial_movements"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "financial_movement_allocations_org_id_obligation_id_fkey"
+            columns: ["org_id", "obligation_id"]
+            isOneToOne: false
+            referencedRelation: "financial_obligations"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      financial_movements: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          created_by: string
+          direction: string
+          document_path: string | null
+          edition_id: string
+          id: string
+          kind: string
+          method: string | null
+          notes: string | null
+          occurred_on: string
+          org_id: string
+          reference: string | null
+          responsible_name: string | null
+          reverses_movement_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          created_by: string
+          direction: string
+          document_path?: string | null
+          edition_id: string
+          id?: string
+          kind: string
+          method?: string | null
+          notes?: string | null
+          occurred_on: string
+          org_id: string
+          reference?: string | null
+          responsible_name?: string | null
+          reverses_movement_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          created_by?: string
+          direction?: string
+          document_path?: string | null
+          edition_id?: string
+          id?: string
+          kind?: string
+          method?: string | null
+          notes?: string | null
+          occurred_on?: string
+          org_id?: string
+          reference?: string | null
+          responsible_name?: string | null
+          reverses_movement_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_movements_org_id_edition_id_fkey"
+            columns: ["org_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "financial_editions"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "financial_movements_org_id_reverses_movement_id_fkey"
+            columns: ["org_id", "reverses_movement_id"]
+            isOneToOne: false
+            referencedRelation: "financial_movements"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      financial_mutation_receipts: {
+        Row: {
+          actor_user_id: string
+          created_at: string
+          idempotency_key: string
+          operation: string
+          org_id: string
+          request_hash: string
+          result: Json | null
+        }
+        Insert: {
+          actor_user_id: string
+          created_at?: string
+          idempotency_key: string
+          operation: string
+          org_id: string
+          request_hash: string
+          result?: Json | null
+        }
+        Update: {
+          actor_user_id?: string
+          created_at?: string
+          idempotency_key?: string
+          operation?: string
+          org_id?: string
+          request_hash?: string
+          result?: Json | null
+        }
+        Relationships: []
+      }
+      financial_obligations: {
+        Row: {
+          amount_cents: number
+          cancel_reason: string | null
+          created_at: string
+          created_by: string
+          description: string
+          direction: string
+          due_date: string | null
+          edition_id: string
+          id: string
+          org_id: string
+          settlement_inconsistent: boolean
+          source_id: string | null
+          source_type: string
+          status: string
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        Insert: {
+          amount_cents: number
+          cancel_reason?: string | null
+          created_at?: string
+          created_by: string
+          description: string
+          direction: string
+          due_date?: string | null
+          edition_id: string
+          id?: string
+          org_id: string
+          settlement_inconsistent?: boolean
+          source_id?: string | null
+          source_type: string
+          status?: string
+          updated_at?: string
+          updated_by: string
+          version?: number
+        }
+        Update: {
+          amount_cents?: number
+          cancel_reason?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string
+          direction?: string
+          due_date?: string | null
+          edition_id?: string
+          id?: string
+          org_id?: string
+          settlement_inconsistent?: boolean
+          source_id?: string | null
+          source_type?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_obligations_org_id_edition_id_fkey"
+            columns: ["org_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "financial_editions"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      financial_revenues: {
+        Row: {
+          category_id: string | null
+          competence_date: string | null
+          confirmed_cents: number | null
+          counterparty: string | null
+          created_at: string
+          created_by: string
+          description: string
+          due_date: string | null
+          edition_id: string
+          extra: Json
+          funding_type: string
+          id: string
+          notes: string | null
+          org_id: string
+          projected_cents: number
+          responsible_name: string | null
+          status: string
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        Insert: {
+          category_id?: string | null
+          competence_date?: string | null
+          confirmed_cents?: number | null
+          counterparty?: string | null
+          created_at?: string
+          created_by: string
+          description: string
+          due_date?: string | null
+          edition_id: string
+          extra?: Json
+          funding_type?: string
+          id?: string
+          notes?: string | null
+          org_id: string
+          projected_cents: number
+          responsible_name?: string | null
+          status?: string
+          updated_at?: string
+          updated_by: string
+          version?: number
+        }
+        Update: {
+          category_id?: string | null
+          competence_date?: string | null
+          confirmed_cents?: number | null
+          counterparty?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string
+          due_date?: string | null
+          edition_id?: string
+          extra?: Json
+          funding_type?: string
+          id?: string
+          notes?: string | null
+          org_id?: string
+          projected_cents?: number
+          responsible_name?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_revenues_org_id_category_id_fkey"
+            columns: ["org_id", "category_id"]
+            isOneToOne: false
+            referencedRelation: "financial_categories"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "financial_revenues_org_id_edition_id_fkey"
+            columns: ["org_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "financial_editions"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      financial_scenarios: {
+        Row: {
+          assumptions: Json
+          created_at: string
+          created_by: string
+          edition_id: string
+          id: string
+          notes: string | null
+          org_id: string
+          scenario_key: string
+          version: number
+        }
+        Insert: {
+          assumptions: Json
+          created_at?: string
+          created_by: string
+          edition_id: string
+          id?: string
+          notes?: string | null
+          org_id: string
+          scenario_key: string
+          version: number
+        }
+        Update: {
+          assumptions?: Json
+          created_at?: string
+          created_by?: string
+          edition_id?: string
+          id?: string
+          notes?: string | null
+          org_id?: string
+          scenario_key?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_scenarios_org_id_edition_id_fkey"
+            columns: ["org_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "financial_editions"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      financial_sponsorships: {
+        Row: {
+          confirmed_free_cents: number
+          confirmed_rouanet_cents: number
+          created_at: string
+          created_by: string
+          declared_cents: number | null
+          due_date: string | null
+          edition_id: string
+          extra: Json
+          id: string
+          in_kind_description: string | null
+          in_kind_value_cents: number | null
+          name: string
+          negotiation_status: string
+          notes: string | null
+          org_id: string
+          projected_free_cents: number
+          projected_rouanet_cents: number
+          responsible_name: string | null
+          signed_on: string | null
+          summit_credentials: number
+          tier: string
+          updated_at: string
+          updated_by: string
+          vehicle_credentials: number
+          version: number
+        }
+        Insert: {
+          confirmed_free_cents?: number
+          confirmed_rouanet_cents?: number
+          created_at?: string
+          created_by: string
+          declared_cents?: number | null
+          due_date?: string | null
+          edition_id: string
+          extra?: Json
+          id?: string
+          in_kind_description?: string | null
+          in_kind_value_cents?: number | null
+          name: string
+          negotiation_status?: string
+          notes?: string | null
+          org_id: string
+          projected_free_cents?: number
+          projected_rouanet_cents?: number
+          responsible_name?: string | null
+          signed_on?: string | null
+          summit_credentials?: number
+          tier?: string
+          updated_at?: string
+          updated_by: string
+          vehicle_credentials?: number
+          version?: number
+        }
+        Update: {
+          confirmed_free_cents?: number
+          confirmed_rouanet_cents?: number
+          created_at?: string
+          created_by?: string
+          declared_cents?: number | null
+          due_date?: string | null
+          edition_id?: string
+          extra?: Json
+          id?: string
+          in_kind_description?: string | null
+          in_kind_value_cents?: number | null
+          name?: string
+          negotiation_status?: string
+          notes?: string | null
+          org_id?: string
+          projected_free_cents?: number
+          projected_rouanet_cents?: number
+          responsible_name?: string | null
+          signed_on?: string | null
+          summit_credentials?: number
+          tier?: string
+          updated_at?: string
+          updated_by?: string
+          vehicle_credentials?: number
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_sponsorships_org_id_edition_id_fkey"
+            columns: ["org_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "financial_editions"
+            referencedColumns: ["org_id", "id"]
           },
         ]
       }
@@ -10201,6 +11020,140 @@ export type Database = {
       expire_commission_segment_reservations: {
         Args: { p_segment_id: string }
         Returns: number
+      }
+      financial_audit: {
+        Args: {
+          _action: string
+          _after: Json
+          _before: Json
+          _edition: string
+          _entity: string
+          _id: string
+          _org: string
+          _reason: string
+        }
+        Returns: undefined
+      }
+      financial_begin: {
+        Args: {
+          _key: string
+          _operation: string
+          _org_id: string
+          _payload: Json
+        }
+        Returns: Json
+      }
+      financial_budget_execution: {
+        Args: { _edition_id: string; _org_id: string }
+        Returns: Json
+      }
+      financial_can: {
+        Args: { _capability: string; _org_id: string }
+        Returns: boolean
+      }
+      financial_edition_summary: {
+        Args: { _edition_id: string; _org_id: string }
+        Returns: Json
+      }
+      financial_finish: {
+        Args: {
+          _key: string
+          _operation: string
+          _org_id: string
+          _result: Json
+        }
+        Returns: Json
+      }
+      financial_reconcile_obligation: {
+        Args: { _actor: string; _obligation_id: string }
+        Returns: undefined
+      }
+      financial_record_movement: {
+        Args: {
+          _allocations: Json
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      financial_require: {
+        Args: { _capability: string; _org_id: string }
+        Returns: string
+      }
+      financial_require_operational: {
+        Args: { _edition_id: string; _org_id: string }
+        Returns: undefined
+      }
+      financial_resolve_source: {
+        Args: {
+          _edition_id: string
+          _org_id: string
+          _source_id: string
+          _source_type: string
+        }
+        Returns: Json
+      }
+      financial_reverse_movement: {
+        Args: {
+          _movement_id: string
+          _occurred_on: string
+          _org_id: string
+          _reason: string
+          _request_id: string
+        }
+        Returns: Json
+      }
+      financial_save: {
+        Args: {
+          _entity: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _reason?: string
+          _request_id: string
+        }
+        Returns: Json
+      }
+      financial_save_expense: {
+        Args: {
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _reason?: string
+          _request_id: string
+        }
+        Returns: Json
+      }
+      financial_save_scenario: {
+        Args: {
+          _assumptions: Json
+          _edition_id: string
+          _key: string
+          _notes: string
+          _org_id: string
+          _request_id: string
+        }
+        Returns: Json
+      }
+      financial_sync_source_obligation: {
+        Args: {
+          _active: boolean
+          _actor: string
+          _amount_cents: number
+          _description: string
+          _direction: string
+          _due_date: string
+          _edition_id: string
+          _org_id: string
+          _source_id: string
+          _source_type: string
+        }
+        Returns: undefined
+      }
+      financial_validate_extra: {
+        Args: { _entity: string; _extra: Json; _org: string }
+        Returns: Json
       }
       get_commercial_sale_order_detail: {
         Args: { p_order_id?: string; p_sale_id?: string }
