@@ -1,12 +1,16 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCronogramaSearch } from '../CronogramaSearchContext';
 import { useExclusiveMobileOverlay } from './mobileOverlayStore';
 import '@/styles/cronograma-mobile-refit.css';
 
-/** Uma única busca compacta, expandida ao lado do Portal no cabeçalho. */
-export function MobileSearchToggle({ className }: { className?: string }) {
+/** Lupa junto ao Portal; um único campo ocupa o espaço reservado ao resumo. */
+export function MobileSearchToggle({ className, fieldContainer }: {
+  className?: string;
+  fieldContainer: HTMLElement | null;
+}) {
   const search = useCronogramaSearch();
   const [open, setOpen] = useExclusiveMobileOverlay('mobile-search');
   const [value, setValue] = useState(search?.query ?? '');
@@ -32,7 +36,7 @@ export function MobileSearchToggle({ className }: { className?: string }) {
   }, [search, value]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !fieldContainer || window.matchMedia('(min-width: 1024px)').matches) return;
     const frame = window.requestAnimationFrame(() => inputRef.current?.focus({ preventScroll: true }));
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -45,7 +49,30 @@ export function MobileSearchToggle({ className }: { className?: string }) {
       window.cancelAnimationFrame(frame);
       window.removeEventListener('keydown', onKey);
     };
-  }, [open, closeSearch]);
+  }, [open, closeSearch, fieldContainer]);
+
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    const closeOnDesktop = () => {
+      if (!desktop.matches || !open) return;
+      const ownedFocus = toggleRef.current === document.activeElement
+        || fieldContainer?.contains(document.activeElement);
+      // Entrega a edição pendente antes de permitir digitação na busca desktop.
+      if (search && value !== search.query) search.setQuery(value);
+      setOpen(false);
+      if (ownedFocus) {
+        const header = fieldContainer?.closest('.cronograma-module-bar');
+        const desktopInput = header?.querySelector<HTMLInputElement>('.cronograma-header-search-input');
+        const focusTarget = desktopInput?.getBoundingClientRect().width
+          ? desktopInput
+          : header?.querySelector<HTMLElement>('.cronograma-module-back');
+        focusTarget?.focus({ preventScroll: true });
+      }
+    };
+    closeOnDesktop();
+    desktop.addEventListener('change', closeOnDesktop);
+    return () => desktop.removeEventListener('change', closeOnDesktop);
+  }, [open, setOpen, fieldContainer, search, value]);
 
   if (!search) return null;
 
@@ -65,7 +92,7 @@ export function MobileSearchToggle({ className }: { className?: string }) {
         {value.length > 0 && !open && <i aria-hidden="true" />}
       </button>
 
-      {open && (
+      {open && fieldContainer && createPortal(
         <div id={fieldId} className="cronograma-mobile-search-toggle__field" role="search">
           <input
             ref={inputRef}
@@ -97,7 +124,8 @@ export function MobileSearchToggle({ className }: { className?: string }) {
               <X aria-hidden="true" />
             </button>
           )}
-        </div>
+        </div>,
+        fieldContainer,
       )}
     </div>
   );

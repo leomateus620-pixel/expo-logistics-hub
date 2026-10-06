@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { ChevronLeft, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CronogramaGoogleStatusButton } from '@/components/cronograma-eventos/CronogramaGoogleStatusButton';
@@ -12,6 +12,7 @@ import { CronogramaTemporalControls } from '@/components/cronograma-eventos/Cron
 import { CronogramaShellProvider } from '@/components/cronograma-eventos/CronogramaShellContext';
 import { WeeklySummaryPill } from '@/components/cronograma-eventos/WeeklySummaryPill';
 import { MobileSearchToggle } from '@/components/cronograma-eventos/mobile/MobileSearchToggle';
+import { useExclusiveMobileOverlay } from '@/components/cronograma-eventos/mobile/mobileOverlayStore';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import '@/styles/cronograma-command-layer.css';
@@ -19,6 +20,8 @@ import '@/styles/cronograma-command-layer.css';
 function CronogramaCommandBar() {
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const [searchFieldContainer, setSearchFieldContainer] = useState<HTMLDivElement | null>(null);
+  const [searchOpen] = useExclusiveMobileOverlay('mobile-search');
 
   const handleSignOut = async () => {
     await signOut();
@@ -38,7 +41,7 @@ function CronogramaCommandBar() {
             <span>Portal</span>
           </Link>
 
-          <MobileSearchToggle className="lg:hidden" />
+          <MobileSearchToggle className="lg:hidden" fieldContainer={searchFieldContainer} />
           <CronogramaAgendaModeControls />
 
           <CronogramaHeaderSearch className="cronograma-command-search hidden lg:flex" />
@@ -55,12 +58,7 @@ function CronogramaCommandBar() {
 
           <CronogramaPushStatusButton />
 
-          <CronogramaTemporalControls className="hidden sm:inline-flex" />
-
-
-
-
-
+          <CronogramaTemporalControls className="cronograma-command-temporal--desktop hidden lg:inline-flex" />
           <Button
             type="button"
             variant="ghost"
@@ -71,15 +69,19 @@ function CronogramaCommandBar() {
           >
             <LogOut className="h-4 w-4" aria-hidden="true" />
           </Button>
+          <CronogramaTemporalControls className="cronograma-command-temporal--intermediate" />
         </div>
       </div>
 
-      <div className="cronograma-command-layer__mobile md:hidden">
-        <div className="flex items-center justify-between gap-2">
-          <div className="lg:hidden min-w-0 flex-1">
+      <div className="cronograma-command-layer__mobile lg:hidden">
+        <div
+          ref={setSearchFieldContainer}
+          className="cronograma-command-summary-slot"
+          data-search-open={searchOpen || undefined}
+        >
+          <div className="cronograma-command-summary-slot__summary" aria-hidden={searchOpen || undefined}>
             <WeeklySummaryPill presentation="mobile" />
           </div>
-          <CronogramaTemporalControls />
         </div>
       </div>
     </header>

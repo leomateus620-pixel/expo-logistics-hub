@@ -1,0 +1,357 @@
+{
+  "baselineCommit": "3236f6905b53d9ebd84fcf2d80a2494fd17f2754",
+  "browser": {
+    "engine": "Chromium",
+    "version": "154.0.8037.98",
+    "mobileContextBelow": 1024,
+    "desktopContextFrom": 1024,
+    "deviceScaleFactor": 1
+  },
+  "afterChecks": {
+    "total": 1429,
+    "passed": 1429,
+    "failed": 0
+  },
+  "baselineChecks": {
+    "total": 458,
+    "passed": 454,
+    "failed": 4
+  },
+  "widths": [
+    320,
+    360,
+    390,
+    430,
+    640,
+    767,
+    768,
+    820,
+    899,
+    900,
+    1023,
+    1024,
+    1280,
+    1366
+  ],
+  "layoutMeasurements": 77,
+  "desktopPixelComparisons": [
+    {
+      "label": "1024-general-closed",
+      "before": {
+        "width": 1009,
+        "height": 59
+      },
+      "after": {
+        "width": 1009,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1024-general-search-focused",
+      "before": {
+        "width": 1009,
+        "height": 59
+      },
+      "after": {
+        "width": 1009,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1024-room-closed",
+      "before": {
+        "width": 1009,
+        "height": 59
+      },
+      "after": {
+        "width": 1009,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1024-room-search-focused",
+      "before": {
+        "width": 1009,
+        "height": 59
+      },
+      "after": {
+        "width": 1009,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1280-general-closed",
+      "before": {
+        "width": 1265,
+        "height": 59
+      },
+      "after": {
+        "width": 1265,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1280-general-search-focused",
+      "before": {
+        "width": 1265,
+        "height": 59
+      },
+      "after": {
+        "width": 1265,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1280-room-closed",
+      "before": {
+        "width": 1265,
+        "height": 59
+      },
+      "after": {
+        "width": 1265,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1280-room-search-focused",
+      "before": {
+        "width": 1265,
+        "height": 59
+      },
+      "after": {
+        "width": 1265,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1366-general-closed",
+      "before": {
+        "width": 1351,
+        "height": 59
+      },
+      "after": {
+        "width": 1351,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1366-general-search-focused",
+      "before": {
+        "width": 1351,
+        "height": 59
+      },
+      "after": {
+        "width": 1351,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1366-room-closed",
+      "before": {
+        "width": 1351,
+        "height": 59
+      },
+      "after": {
+        "width": 1351,
+        "height": 59
+      },
+      "changedPixels": 0
+    },
+    {
+      "label": "1366-room-search-focused",
+      "before": {
+        "width": 1351,
+        "height": 59
+      },
+      "after": {
+        "width": 1351,
+        "height": 59
+      },
+      "changedPixels": 0
+    }
+  ],
+  "desktopGeometryMatches": 12,
+  "mobileIntersections": 0,
+  "allControlsContainedInHeader": true,
+  "minimumPushContrast": 8.042383837340823,
+  "pushSignals": [
+    {
+      "label": "390-push-connected",
+      "signal": "connected",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(56, 178, 106)",
+      "contrast": 8.042383837340823
+    },
+    {
+      "label": "390-push-offline",
+      "signal": "offline",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(220, 70, 70)",
+      "contrast": 8.042383837340823
+    },
+    {
+      "label": "390-push-attention",
+      "signal": "attention",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(233, 168, 56)",
+      "contrast": 8.042383837340823
+    },
+    {
+      "label": "390-push-busy",
+      "signal": "busy",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(120, 170, 230)",
+      "contrast": 8.042383837340823
+    },
+    {
+      "label": "1023-push-connected",
+      "signal": "connected",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(56, 178, 106)",
+      "contrast": 8.042383837340823
+    },
+    {
+      "label": "1023-push-offline",
+      "signal": "offline",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(220, 70, 70)",
+      "contrast": 8.042383837340823
+    },
+    {
+      "label": "1023-push-attention",
+      "signal": "attention",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(233, 168, 56)",
+      "contrast": 8.042383837340823
+    },
+    {
+      "label": "1023-push-busy",
+      "signal": "busy",
+      "color": "rgb(255, 209, 92)",
+      "background": "rgb(23, 59, 89)",
+      "signalColor": "rgb(120, 170, 230)",
+      "contrast": 8.042383837340823
+    }
+  ],
+  "knownDesktopIntersections": [
+    {
+      "label": "1024-general-closed",
+      "intersections": [
+        {
+          "a": "Agenda geral",
+          "b": "Resumo da semana: Semana atual · 5 eventos · 5h de agenda",
+          "dx": 18.296875,
+          "dy": 44
+        },
+        {
+          "a": "Sala dos Voluntários",
+          "b": "Resumo da semana: Semana atual · 5 eventos · 5h de agenda",
+          "dx": 44,
+          "dy": 44
+        }
+      ],
+      "preserved": true
+    },
+    {
+      "label": "1024-general-search-focused",
+      "intersections": [
+        {
+          "a": "Agenda geral",
+          "b": "Resumo da semana: Semana atual · 5 eventos · 5h de agenda",
+          "dx": 18.296875,
+          "dy": 44
+        },
+        {
+          "a": "Sala dos Voluntários",
+          "b": "Resumo da semana: Semana atual · 5 eventos · 5h de agenda",
+          "dx": 44,
+          "dy": 44
+        }
+      ],
+      "preserved": true
+    },
+    {
+      "label": "1024-room-closed",
+      "intersections": [
+        {
+          "a": "Agenda geral",
+          "b": "Resumo da semana: Semana atual · 2 eventos · 2h de agenda",
+          "dx": 18.296875,
+          "dy": 44
+        },
+        {
+          "a": "Sala dos Voluntários",
+          "b": "Resumo da semana: Semana atual · 2 eventos · 2h de agenda",
+          "dx": 44,
+          "dy": 44
+        }
+      ],
+      "preserved": true
+    },
+    {
+      "label": "1024-room-search-focused",
+      "intersections": [
+        {
+          "a": "Agenda geral",
+          "b": "Resumo da semana: Semana atual · 2 eventos · 2h de agenda",
+          "dx": 18.296875,
+          "dy": 44
+        },
+        {
+          "a": "Sala dos Voluntários",
+          "b": "Resumo da semana: Semana atual · 2 eventos · 2h de agenda",
+          "dx": 44,
+          "dy": 44
+        }
+      ],
+      "preserved": true
+    }
+  ],
+  "knownDesktopSearchIssues": [
+    {
+      "width": 1024,
+      "before": {
+        "name": "Buscar no cronograma",
+        "tag": "INPUT",
+        "className": "cronograma-header-search-input",
+        "x": 245.78125,
+        "y": 10.671875,
+        "width": 0,
+        "height": 36,
+        "right": 245.78125,
+        "bottom": 46.671875
+      },
+      "after": {
+        "x": 245.78125,
+        "y": 0.671875,
+        "width": 0,
+        "height": 36
+      },
+      "note": "Approved desktop baseline already collapses the search input to zero width at 1024px. Query handoff is preserved and focus falls back to the visible Portal control; typing accessibility cannot be claimed for this input at this width."
+    }
+  ],
+  "runtimeErrors": [],
+  "externalWriteAttempts": [],
+  "mockPushMutations": [],
+  "limitations": [
+    "Chromium viewport reduction emulates available keyboard space; it is not a physical virtual keyboard.",
+    "Desktop Chromium cannot reproduce iOS Safari elastic overscroll or a physical pull gesture."
+  ]
+}

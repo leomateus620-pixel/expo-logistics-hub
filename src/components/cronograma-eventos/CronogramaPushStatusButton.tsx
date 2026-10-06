@@ -44,7 +44,7 @@ export const CronogramaPushStatusButton = memo(function CronogramaPushStatusButt
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="cronograma-command-chip focus-ring"
+          className="cronograma-command-chip cronograma-command-chip--push focus-ring"
           data-signal={signal}
           aria-label={`Avisos no celular: ${stateLabel}`}
         >
