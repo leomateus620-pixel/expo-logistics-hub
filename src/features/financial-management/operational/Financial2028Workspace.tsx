@@ -427,19 +427,35 @@ function DashboardView({ edition }: { edition: FinancialEdition }) {
   if (query.isLoading) return <Loading label="Consolidando a edição…" />;
   if (query.isError || !query.data) return <StateMessage tone="error" title="Não foi possível consolidar os valores.">Nenhum total é mostrado como zero quando a consulta falha.</StateMessage>;
   const s = query.data;
+  // Antes da atualização do backend, despesas da edição ainda não existem: execução zero, nunca o pago.
+  const exp = s.expenses ?? { count: 0, planned_cents: 0, committed_cents: 0, paid_cents: s.obligations.paid_cents, payable_open_cents: s.obligations.payable_open_cents, overdue_count: 0 };
+  const rev = s.revenues ?? { projected_cents: s.revenue.projected_cents + s.sponsorship.projected_cents, confirmed_cents: s.revenue.confirmed_cents + s.sponsorship.confirmed_cents, received_cents: s.obligations.received_cents, receivable_open_cents: s.obligations.receivable_open_cents, overdue_count: 0 };
   return (
     <section className="space-y-4" aria-label="Painel financeiro 2028">
       <h2 className="text-lg font-semibold">Painel Financeiro · {edition.label}</h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Metric label="Teto orçamentário" value={formatCents(s.budget.cap_cents)} hint={`${s.budget.count} comissões${s.budget.uncapped_count ? ` · ${s.budget.uncapped_count} sem teto` : ''}`} />
         <Metric label="Planejado (linhas)" value={formatCents(s.budget.planned_cents)} hint={`${s.budget.line_count} linhas ativas`} />
-        <Metric label="Receitas projetadas" value={formatCents(s.revenue.projected_cents + s.sponsorship.projected_cents)} hint="Manuais + patrocínios em dinheiro" />
-        <Metric label="Receitas confirmadas" value={formatCents(s.revenue.confirmed_cents + s.sponsorship.confirmed_cents)} hint="Compromisso, não caixa" />
-        <Metric label="Recebido (realizado)" value={formatCents(s.obligations.received_cents)} hint="Movimentos registrados e alocados" />
-        <Metric label="A receber em aberto" value={formatCents(s.obligations.receivable_open_cents)} />
-        <Metric label="Pago (realizado)" value={formatCents(s.obligations.paid_cents)} />
-        <Metric label="A pagar em aberto" value={formatCents(s.obligations.payable_open_cents)} hint={s.obligations.overdue_count ? `${s.obligations.overdue_count} vencidas` : undefined} />
+        <Metric label="Orçamento executado" value={formatCents(exp.committed_cents)} hint="Compromisso: despesas realizadas, pagas ou não" />
+        <Metric label="Folga do orçamento" value={formatCents(s.budget.planned_cents - exp.committed_cents)} hint="Planejado − realizado (não é saldo a pagar)" />
       </div>
+      <h3 className="pt-2 text-sm font-semibold">Despesas</h3>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Metric label="Previsto" value={formatCents(exp.planned_cents)} hint="Compromisso · estimativa" />
+        <Metric label="Realizado / comprometido" value={formatCents(exp.committed_cents)} hint="Compromisso · dívida existente" />
+        <Metric label="Pago" value={formatCents(exp.paid_cents)} hint="Caixa · pagamentos registrados" />
+        <Metric label="Saldo a pagar" value={formatCents(exp.payable_open_cents)} hint={exp.overdue_count ? `Realizado − pago · ${exp.overdue_count} vencidas` : 'Realizado − pago'} />
+      </div>
+      <h3 className="pt-2 text-sm font-semibold">Receitas e patrocínios</h3>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Metric label="Projetado" value={formatCents(rev.projected_cents)} hint="Compromisso · expectativa" />
+        <Metric label="Confirmado" value={formatCents(rev.confirmed_cents)} hint="Compromisso, não caixa" />
+        <Metric label="Recebido" value={formatCents(rev.received_cents)} hint="Caixa · recebimentos registrados" />
+        <Metric label="Saldo a receber" value={formatCents(rev.receivable_open_cents)} hint={rev.overdue_count ? `Confirmado − recebido · ${rev.overdue_count} vencidas` : 'Confirmado − recebido'} />
+      </div>
+      {s.obligations.inconsistent_count ? (
+        <StateMessage tone="error" title={`${s.obligations.inconsistent_count} registro(s) cancelado(s) com valor já liquidado`}>Registre o estorno ou a devolução; o valor pago/recebido não é apagado.</StateMessage>
+      ) : null}
       <p className="text-xs text-muted-foreground">
         A comercialização de lotes aparece pela Dashboard Comercial, com as mesmas regras de cálculo. Contrapartidas em bens ou serviços ({formatCents(s.sponsorship.in_kind_cents)}) não entram no dinheiro.
       </p>
@@ -448,8 +464,8 @@ function DashboardView({ edition }: { edition: FinancialEdition }) {
 }
 
 const PENDING_VIEWS: Partial<Record<FinancialViewPath, string>> = {
-  'despesas-previstas': 'As despesas de 2028 passam a ter previsão, comissão e vencimento na próxima etapa, usando os lançamentos de despesas que já existem.',
-  'despesas-realizadas': 'A realização das despesas virá dos lançamentos atuais e dos pagamentos registrados, sem duplicar a despesa original.',
+  'despesas-previstas': 'Cada despesa de 2028 terá valor previsto, comissão, linha de orçamento e vencimento, aproveitando os lançamentos de despesas que já existem.',
+  'despesas-realizadas': 'Despesa realizada é compromisso: entra na execução do orçamento na data de realização e fica com saldo a pagar até o pagamento ser registrado.',
   simulacoes: 'Os cenários Realista, Pessimista e Otimista serão salvos em versões próprias de 2028.',
   relatorios: 'Os relatórios de 2028 usarão a mesma consolidação do painel.',
 };

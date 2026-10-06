@@ -31,3 +31,32 @@ export function sponsorshipMoneyCents(s: { projected_free_cents: number; project
 export function sponsorshipConfirmedCents(s: { confirmed_free_cents: number; confirmed_rouanet_cents: number }): number {
   return s.confirmed_free_cents + s.confirmed_rouanet_cents;
 }
+
+/**
+ * Quatro estágios independentes de um registro (centavos inteiros).
+ * Executado = realizado/comprometido (despesa) ou confirmado (receita);
+ * liquidado = pago/recebido por movimentos alocados. Nenhum é deduzido do outro.
+ */
+export interface ExecutionStages {
+  plannedCents: number;
+  executedCents: number;
+  settledCents: number;
+  /** Saldo a pagar/receber: executado − liquidado, nunca negativo. */
+  openCents: number;
+  /** Folga orçamentária: previsto − executado (pode ser negativa quando estoura). */
+  headroomCents: number;
+  /** Liquidado acima do executado: exige estorno/devolução registrado. */
+  inconsistent: boolean;
+}
+
+export function executionStages(input: { plannedCents?: number | null; executedCents?: number | null; settledCents?: number | null }): ExecutionStages {
+  const plannedCents = Math.max(0, Math.trunc(input.plannedCents ?? 0));
+  const executedCents = Math.max(0, Math.trunc(input.executedCents ?? 0));
+  const settledCents = Math.trunc(input.settledCents ?? 0);
+  return {
+    plannedCents, executedCents, settledCents,
+    openCents: Math.max(0, executedCents - settledCents),
+    headroomCents: plannedCents - executedCents,
+    inconsistent: settledCents > executedCents,
+  };
+}
