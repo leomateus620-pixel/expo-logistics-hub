@@ -8,7 +8,7 @@ export interface LotTooltipPresentation {
 export function resolveLotTooltipPresentation(
   lot: Pick<CommercialLot, 'status' | 'currentBuyer'>,
 ): LotTooltipPresentation {
-  if (lot.status !== 'SOLD') return { buyerName: null };
+  if (lot.status !== 'SOLD' && lot.status !== 'SALE_OPEN') return { buyerName: null };
   const buyerName = lot.currentBuyer?.trim() ?? '';
   return { buyerName: buyerName || null };
 }
