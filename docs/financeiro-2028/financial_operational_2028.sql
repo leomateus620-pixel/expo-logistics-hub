@@ -604,8 +604,13 @@ BEGIN
     IF o.id IS NOT NULL AND _expected_version IS NOT NULL AND _expected_version IS DISTINCT FROM o.version THEN
       RAISE EXCEPTION 'FINANCIAL_CONFLICT' USING ERRCODE='40001';
     END IF;
-    PERFORM public.financial_sync_source_obligation(_org_id, edition, src->>'direction', stype, sid, src->>'description',
-      (src->>'amount_cents')::bigint, (src->>'due_date')::date, true, actor);
+    SELECT * INTO o FROM public.financial_obligations WHERE source_type=stype AND source_id=sid FOR UPDATE;
+    IF FOUND THEN
+      PERFORM public.financial_reconcile_obligation(o.id, actor); -- abaixo do quitado: só marca inconsistência
+    ELSE
+      PERFORM public.financial_sync_source_obligation(_org_id, edition, src->>'direction', stype, sid, src->>'description',
+        (src->>'amount_cents')::bigint, (src->>'due_date')::date, true, actor);
+    END IF;
     SELECT * INTO o FROM public.financial_obligations WHERE source_type=stype AND source_id=sid;
     rec_id := o.id; after := to_jsonb(o);
   ELSIF _entity = 'obligation' THEN

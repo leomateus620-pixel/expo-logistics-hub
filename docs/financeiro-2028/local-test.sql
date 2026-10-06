@@ -276,6 +276,7 @@ SELECT pg_temp.ok((SELECT amount_cents=110000 AND NOT settlement_inconsistent FR
 RESET ROLE;
 UPDATE lot_sale_installments SET amount=900 WHERE id='91000000-0000-0000-0000-000000000001';
 SET ROLE authenticated;
+SELECT financial_save('a0000000-0000-0000-0000-000000000001','obligation',jsonb_build_object('edition_id',(SELECT e28 FROM ids),'source_type','parcela_comercial','source_id','91000000-0000-0000-0000-000000000001'),NULL,gen_random_uuid());
 SELECT pg_temp.expect_error($q$SELECT financial_record_movement('a0000000-0000-0000-0000-000000000001',
   jsonb_build_object('edition_id',(SELECT e28 FROM ids),'kind','recebimento','direction','entrada','amount_cents',1,'occurred_on','2027-05-06'),
   jsonb_build_array(jsonb_build_object('obligation_id',(SELECT id FROM financial_obligations WHERE source_type='parcela_comercial'),'amount_cents',1)),gen_random_uuid())$q$,'OBLIGATION_CLOSED');
