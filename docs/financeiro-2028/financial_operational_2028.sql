@@ -362,7 +362,7 @@ DECLARE
   before jsonb; after jsonb; cap text := 'financial_edit';
   b public.financial_budgets; l public.financial_budget_lines; r public.financial_revenues;
   s public.financial_sponsorships; c public.financial_categories; f public.financial_custom_fields;
-  o public.financial_obligations; current_version integer;
+  o public.financial_obligations; current_version integer; src jsonb; stype text; sid uuid;
 BEGIN
   IF _entity NOT IN ('budget','budget_line','revenue','sponsorship','category','custom_field','obligation') THEN
     RAISE EXCEPTION 'FINANCIAL_ENTITY_INVALID' USING ERRCODE = '22023';
@@ -578,11 +578,40 @@ BEGIN
       SELECT * INTO o FROM public.financial_obligations WHERE org_id=_org_id AND id=rec_id FOR UPDATE;
       IF NOT FOUND THEN RAISE EXCEPTION 'FINANCIAL_NOT_FOUND' USING ERRCODE='P0002'; END IF;
       edition := o.edition_id; before := to_jsonb(o);
+      -- Vínculo e sentido são imutáveis depois de criados.
+      IF (_payload ? 'source_type' AND _payload->>'source_type' IS DISTINCT FROM o.source_type)
+        OR (_payload ? 'source_id' AND nullif(_payload->>'source_id','')::uuid IS DISTINCT FROM o.source_id)
+        OR (_payload ? 'direction' AND _payload->>'direction' IS DISTINCT FROM o.direction) THEN
+        RAISE EXCEPTION 'FINANCIAL_SOURCE_IMMUTABLE' USING ERRCODE='22023';
+      END IF;
     END IF;
     PERFORM public.financial_require_operational(_org_id, edition);
+    stype := coalesce(o.source_type, _payload->>'source_type', 'manual');
+    sid := coalesce(o.source_id, nullif(_payload->>'source_id','')::uuid);
+    IF stype = 'manual' AND sid IS NOT NULL THEN RAISE EXCEPTION 'FINANCIAL_SOURCE_INVALID' USING ERRCODE='22023'; END IF;
+  END IF;
+  IF _entity = 'obligation' AND stype <> 'manual' THEN
+    -- Obrigação vinculada: origem validada e bloqueada, valor derivado, uma por fato financeiro.
+    src := public.financial_resolve_source(_org_id, edition, stype, sid);
+    IF NOT (src->>'active')::boolean THEN RAISE EXCEPTION 'FINANCIAL_SOURCE_NOT_EXECUTED' USING ERRCODE='23514'; END IF;
+    IF _payload ? 'amount_cents' AND (_payload->>'amount_cents')::bigint IS DISTINCT FROM (src->>'amount_cents')::bigint THEN
+      RAISE EXCEPTION 'FINANCIAL_AMOUNT_DERIVED' USING ERRCODE='22023';
+    END IF;
+    IF _payload ? 'direction' AND _payload->>'direction' IS DISTINCT FROM src->>'direction' THEN
+      RAISE EXCEPTION 'FINANCIAL_DIRECTION_MISMATCH' USING ERRCODE='22023';
+    END IF;
+    IF _payload->>'status' = 'cancelada' THEN RAISE EXCEPTION 'FINANCIAL_SOURCE_MANAGED' USING ERRCODE='22023'; END IF;
+    IF o.id IS NOT NULL AND _expected_version IS NOT NULL AND _expected_version IS DISTINCT FROM o.version THEN
+      RAISE EXCEPTION 'FINANCIAL_CONFLICT' USING ERRCODE='40001';
+    END IF;
+    PERFORM public.financial_sync_source_obligation(_org_id, edition, src->>'direction', stype, sid, src->>'description',
+      (src->>'amount_cents')::bigint, (src->>'due_date')::date, true, actor);
+    SELECT * INTO o FROM public.financial_obligations WHERE source_type=stype AND source_id=sid;
+    rec_id := o.id; after := to_jsonb(o);
+  ELSIF _entity = 'obligation' THEN
     IF rec_id IS NULL THEN
       INSERT INTO public.financial_obligations(org_id,edition_id,direction,source_type,source_id,description,amount_cents,due_date,created_by,updated_by)
-      VALUES(_org_id,edition,_payload->>'direction',coalesce(_payload->>'source_type','manual'),nullif(_payload->>'source_id','')::uuid,
+      VALUES(_org_id,edition,_payload->>'direction','manual',NULL,
         btrim(_payload->>'description'),(_payload->>'amount_cents')::bigint,(_payload->>'due_date')::date,actor,actor) RETURNING * INTO o;
     ELSE
       IF _expected_version IS DISTINCT FROM o.version THEN RAISE EXCEPTION 'FINANCIAL_CONFLICT' USING ERRCODE='40001'; END IF;
