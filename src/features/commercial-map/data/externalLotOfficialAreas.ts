@@ -25,13 +25,13 @@ export interface ExternalLotOfficialArea {
 }
 
 export const EXTERNAL_LOT_OFFICIAL_AREAS: readonly ExternalLotOfficialArea[] = [
-  { publicIdentifier: 'Q-D-01', block: 'D', lotNumber: 1, officialAreaSqm: 208.20 },
+  { publicIdentifier: 'Q-D-01', block: 'D', lotNumber: 1, officialAreaSqm: 194.30 } // corrigido em 2026-10-07 (antes 208.20),
   { publicIdentifier: 'Q-D-02', block: 'D', lotNumber: 2, officialAreaSqm: 207.38 },
-  { publicIdentifier: 'Q-D-03', block: 'D', lotNumber: 3, officialAreaSqm: 209.11 },
+  { publicIdentifier: 'Q-D-03', block: 'D', lotNumber: 3, officialAreaSqm: 195.25 } // corrigido em 2026-10-07 (antes 209.11),
   { publicIdentifier: 'Q-D-04', block: 'D', lotNumber: 4, officialAreaSqm: 209.11 },
-  { publicIdentifier: 'Q-D-05', block: 'D', lotNumber: 5, officialAreaSqm: 208.96 },
+  { publicIdentifier: 'Q-D-05', block: 'D', lotNumber: 5, officialAreaSqm: 193.57 } // corrigido em 2026-10-07 (antes 208.96),
   { publicIdentifier: 'Q-D-06', block: 'D', lotNumber: 6, officialAreaSqm: 208.96 },
-  { publicIdentifier: 'Q-D-07', block: 'D', lotNumber: 7, officialAreaSqm: 208.80 },
+  { publicIdentifier: 'Q-D-07', block: 'D', lotNumber: 7, officialAreaSqm: 194.98 } // corrigido em 2026-10-07 (antes 208.80),
   { publicIdentifier: 'Q-D-08', block: 'D', lotNumber: 8, officialAreaSqm: 208.80 },
   { publicIdentifier: 'Q-D-09', block: 'D', lotNumber: 9, officialAreaSqm: 208.64 },
   { publicIdentifier: 'Q-D-10', block: 'D', lotNumber: 10, officialAreaSqm: 208.64 },
@@ -48,7 +48,7 @@ export const EXTERNAL_LOT_OFFICIAL_AREAS: readonly ExternalLotOfficialArea[] = [
   { publicIdentifier: 'Q-E-09', block: 'E', lotNumber: 9, officialAreaSqm: 199.81 },
   { publicIdentifier: 'Q-E-10', block: 'E', lotNumber: 10, officialAreaSqm: 246.58 },
   { publicIdentifier: 'Q-E-11', block: 'E', lotNumber: 11, officialAreaSqm: 179.49 },
-  { publicIdentifier: 'Q-E-12', block: 'E', lotNumber: 12, officialAreaSqm: 175.72 },
+  { publicIdentifier: 'Q-E-12', block: 'E', lotNumber: 12, officialAreaSqm: 174.12 } // corrigido em 2026-10-07 (antes 175.72),
   { publicIdentifier: 'Q-E-13', block: 'E', lotNumber: 13, officialAreaSqm: 165.88 },
   { publicIdentifier: 'Q-F-01', block: 'F', lotNumber: 1, officialAreaSqm: 168.00 },
   { publicIdentifier: 'Q-F-02', block: 'F', lotNumber: 2, officialAreaSqm: 168.00 },
@@ -66,7 +66,7 @@ export const EXTERNAL_LOT_OFFICIAL_AREAS: readonly ExternalLotOfficialArea[] = [
   { publicIdentifier: 'Q-G-06', block: 'G', lotNumber: 6, officialAreaSqm: 168.00 },
   { publicIdentifier: 'Q-G-07', block: 'G', lotNumber: 7, officialAreaSqm: 168.00 },
   { publicIdentifier: 'Q-G-08', block: 'G', lotNumber: 8, officialAreaSqm: 168.00 },
-  { publicIdentifier: 'Q-I-01', block: 'I', lotNumber: 1, officialAreaSqm: 205.97 },
+  { publicIdentifier: 'Q-I-01', block: 'I', lotNumber: 1, officialAreaSqm: 204.37 } // corrigido em 2026-10-07 (antes 205.97),
   { publicIdentifier: 'Q-I-02', block: 'I', lotNumber: 2, officialAreaSqm: 208.36 },
   { publicIdentifier: 'Q-I-03', block: 'I', lotNumber: 3, officialAreaSqm: 210.03 },
   { publicIdentifier: 'Q-I-04', block: 'I', lotNumber: 4, officialAreaSqm: 210.03 },
@@ -80,7 +80,7 @@ export const EXTERNAL_LOT_OFFICIAL_AREAS: readonly ExternalLotOfficialArea[] = [
   { publicIdentifier: 'Q-I-12', block: 'I', lotNumber: 12, officialAreaSqm: 209.71 },
   { publicIdentifier: 'Q-I-13', block: 'I', lotNumber: 13, officialAreaSqm: 209.62 },
   { publicIdentifier: 'Q-I-14', block: 'I', lotNumber: 14, officialAreaSqm: 209.62 },
-  { publicIdentifier: 'Q-I-15', block: 'I', lotNumber: 15, officialAreaSqm: 209.31 },
+  { publicIdentifier: 'Q-I-15', block: 'I', lotNumber: 15, officialAreaSqm: 207.71 } // corrigido em 2026-10-07 (antes 209.31),
   { publicIdentifier: 'Q-I-16', block: 'I', lotNumber: 16, officialAreaSqm: 210.09 },
   { publicIdentifier: 'Q-J-01', block: 'J', lotNumber: 1, officialAreaSqm: 201.46 },
   { publicIdentifier: 'Q-J-02', block: 'J', lotNumber: 2, officialAreaSqm: 255.71 },
@@ -163,7 +163,7 @@ export const EXTERNAL_LOT_OFFICIAL_AREAS: readonly ExternalLotOfficialArea[] = [
   { publicIdentifier: 'Q-Q-03', block: 'Q', lotNumber: 3, officialAreaSqm: 191.00 },
   { publicIdentifier: 'Q-Q-04', block: 'Q', lotNumber: 4, officialAreaSqm: 191.00 },
   { publicIdentifier: 'Q-Q-05', block: 'Q', lotNumber: 5, officialAreaSqm: 191.00 },
-  { publicIdentifier: 'Q-Q-06', block: 'Q', lotNumber: 6, officialAreaSqm: 190.98 },
+  { publicIdentifier: 'Q-Q-06', block: 'Q', lotNumber: 6, officialAreaSqm: 189.38 } // corrigido em 2026-10-07 (antes 190.98),
   { publicIdentifier: 'Q-T-01', block: 'T', lotNumber: 1, officialAreaSqm: 192.91 },
   { publicIdentifier: 'Q-T-02', block: 'T', lotNumber: 2, officialAreaSqm: 192.91 },
   { publicIdentifier: 'Q-T-03', block: 'T', lotNumber: 3, officialAreaSqm: 191.00 },
@@ -193,7 +193,7 @@ export const EXTERNAL_LOT_OFFICIAL_AREAS: readonly ExternalLotOfficialArea[] = [
   { publicIdentifier: 'Q-V-03', block: 'V', lotNumber: 3, officialAreaSqm: 191.00 },
   { publicIdentifier: 'Q-V-04', block: 'V', lotNumber: 4, officialAreaSqm: 191.00 },
   { publicIdentifier: 'Q-V-05', block: 'V', lotNumber: 5, officialAreaSqm: 190.98 },
-  { publicIdentifier: 'Q-V-06', block: 'V', lotNumber: 6, officialAreaSqm: 240.65 },
+  { publicIdentifier: 'Q-V-06', block: 'V', lotNumber: 6, officialAreaSqm: 239.05 } // corrigido em 2026-10-07 (antes 240.65),
 ];
 
 export const EXTERNAL_LOT_AREA_BLOCKS = [
@@ -204,14 +204,14 @@ export type ExternalLotAreaBlock = (typeof EXTERNAL_LOT_AREA_BLOCKS)[number];
 
 /** Subtotais documentais por quadra (m²), conforme a página 1 do PDF oficial. */
 export const EXTERNAL_LOT_AREA_BLOCK_SUBTOTALS: Record<ExternalLotAreaBlock, number> = {
-  D: 2599.33, E: 2744.81, F: 1344.0, G: 1344.0,
-  I: 3351.67, J: 3718.89, L: 3010.44, M: 3010.44,
-  O: 2681.64, P: 2681.64, Q: 1237.98, T: 2406.66,
-  U: 2406.66, V: 1195.61,
+  D: 2542.36, E: 2743.21, F: 1344.0, G: 1344.0,
+  I: 3348.47, J: 3718.89, L: 3010.44, M: 3010.44,
+  O: 2681.64, P: 2681.64, Q: 1236.38, T: 2406.66,
+  U: 2406.66, V: 1194.01,
 };
 
 /** Total documental das 169 referências externas (m²). */
-export const EXTERNAL_LOT_AREA_TOTAL_SQM = 33733.77;
+export const EXTERNAL_LOT_AREA_TOTAL_SQM = 33668.8;
 
 const externalAreaByIdentifier = new Map<string, ExternalLotOfficialArea>(
   EXTERNAL_LOT_OFFICIAL_AREAS.map((entry) => [entry.publicIdentifier, entry]),
