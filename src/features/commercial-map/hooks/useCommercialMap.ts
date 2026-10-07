@@ -135,6 +135,7 @@ export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIA
   const query = useQuery({
     ...options,
     refetchOnWindowFocus: !fullScope,
+    refetchOnReconnect: true,
     refetchInterval: fullScope ? 30 * 60_000 : 10 * 60_000,
   });
   if (options.enabled) routeData.current?.observation.observe(query.data !== undefined, query.isError);

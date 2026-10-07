@@ -1,7 +1,7 @@
 import type { LotBuyerSummaryRow } from '../utils/lotBuyerSummary';
 import { buyerDisplayName } from '../utils/buyerDisplayName';
 import { captureCommercialMapStageRecorder, type CommercialMapStageRecorder } from '../utils/performanceDiagnostics';
-import { awaitCommercialMapRequest, measureCommercialMapOperation, throwIfMapRequestAborted } from '../utils/commercialMapOperation';
+import { awaitCommercialMapRequest, boundedSignal, measureCommercialMapOperation, throwIfMapRequestAborted } from '../utils/commercialMapOperation';
 import { supabase } from '@/integrations/supabase/client';
 import { OFFICIAL_REFERENCE_DATA, OFFICIAL_REFERENCE_REVISION } from '../data/officialReference2026';
 import { reconcileExporuralReference } from '../data/reconcileExporuralReference';
@@ -144,6 +144,36 @@ interface MapReadContext { signal?: AbortSignal; recordStage: CommercialMapStage
 // Existing migration-backed query builders are untyped; preserve their payload.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mapRequest = (query: any, context: MapReadContext): Promise<any> => awaitCommercialMapRequest(query, context.signal);
+
+/** Limites próprios: verificações secundárias nunca prendem lotes e geometria. */
+export const MAP_REVISION_OPEN_TIMEOUT_MS = 8_000;
+export const MAP_MAINTENANCE_OPEN_TIMEOUT_MS = 6_000;
+
+/** Revisão lida em paralelo: indicador de mudança, não prova de snapshot atômico.
+ * Esgotado o limite, o mapa abre com revisão "não verificada" e o monitor a busca depois. */
+async function boundedRevision(projectId: string, context: MapReadContext): Promise<{ data: unknown; error: unknown }> {
+  const bounded = boundedSignal(context.signal, MAP_REVISION_OPEN_TIMEOUT_MS);
+  try {
+    return await measureCommercialMapOperation<{ data: unknown; error: unknown }>(context.recordStage, 'revision',
+      () => awaitCommercialMapRequest(db.rpc('commercial_map_revision', { p_project_id: projectId }), bounded.signal));
+  } catch (error) {
+    throwIfMapRequestAborted(context.signal);
+    return { data: null, error };
+  } finally { bounded.dispose(); }
+}
+
+/** A expiração continua no servidor; se demorar, a leitura segue com os estados persistidos. */
+async function boundedMaintenance(orgId: string, context: MapReadContext): Promise<{ error: { code?: string; message?: string } | null }> {
+  const bounded = boundedSignal(context.signal, MAP_MAINTENANCE_OPEN_TIMEOUT_MS);
+  try {
+    return await measureCommercialMapOperation<{ error: { code?: string; message?: string } | null }>(context.recordStage, 'reservation-maintenance',
+      () => awaitCommercialMapRequest(db.rpc('expire_commercial_reservations', { p_org_id: orgId }), bounded.signal));
+  } catch (error) {
+    throwIfMapRequestAborted(context.signal);
+    context.recordStage('reservation-maintenance:skipped', { reason: (error as { name?: string })?.name === 'AbortError' ? 'timeout' : 'error' });
+    return { error: null };
+  } finally { bounded.dispose(); }
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function fetchAllRows(buildQuery: () => any, stage: string, context: MapReadContext, orderColumn = 'id'): Promise<{ data: any[] | null; error: any }> {
@@ -607,7 +637,7 @@ export async function fetchCommercialMap(
   // Both promises are observed immediately; business rows still wait for expiry.
   const [maintenance, { data: projectRow, error: projectError }] = await Promise.all([
     scope.mode === 'full'
-      ? measureCommercialMapOperation<{ error: { code?: string; message?: string } | null }>(context.recordStage, 'reservation-maintenance', () => mapRequest(db.rpc('expire_commercial_reservations', { p_org_id: orgId }), context))
+      ? boundedMaintenance(orgId, context)
       : Promise.resolve({ error: null }),
     measureCommercialMapOperation<{ data: ProjectRow | null; error: { code?: string; message?: string } | null }>(context.recordStage, 'project', () => mapRequest(db
     .from('map_projects')
@@ -672,8 +702,7 @@ export async function fetchCommercialMap(
     mapRequest(db.from('map_segments').select('id, slug').eq('project_id', project.id).eq('is_active', true), context),
     // Lida no início da carga: se algo mudar durante a leitura, a próxima verificação
     // vê uma assinatura diferente e recarrega uma vez (nunca adota revisão mais nova que os dados).
-    measureCommercialMapOperation<{ data: unknown; error: unknown }>(context.recordStage, 'revision', () => mapRequest(db.rpc('commercial_map_revision', { p_project_id: project.id }), context))
-      .catch((error) => ({ data: null, error })),
+    boundedRevision(project.id, context),
   ]);
 
   const segmentLookupError = segmentsResult.error

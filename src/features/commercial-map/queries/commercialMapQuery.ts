@@ -5,6 +5,7 @@ import { presentCommercialMapData } from '../utils/presentCommercialMapData';
 import { captureCommercialMapStageRecorder, type CommercialMapStageRecorder } from '../utils/performanceDiagnostics';
 import { measureCommercialMapOperation } from '../utils/commercialMapOperation';
 import { commercialMapQueryKey, FULL_COMMERCIAL_MAP_SCOPE } from './commercialMapQueryKey';
+import { commercialMapRetryDelay, shouldRetryCommercialMap } from './commercialMapRetryPolicy';
 export { commercialMapQueryKey, FULL_COMMERCIAL_MAP_SCOPE } from './commercialMapQueryKey';
 
 export const COMMERCIAL_MAP_GC_TIME = 10 * 60_000;
@@ -25,7 +26,10 @@ export function commercialMapQueryOptions(userId: string | null | undefined, org
     enabled: Boolean(userId && orgId),
     staleTime: 30_000,
     gcTime: COMMERCIAL_MAP_GC_TIME,
-    retry: 1,
+    // Único responsável pelas novas tentativas da abertura e das recargas.
+    retry: shouldRetryCommercialMap,
+    retryDelay: commercialMapRetryDelay,
+    networkMode: 'online',
     meta: { persist: false },
   });
 }

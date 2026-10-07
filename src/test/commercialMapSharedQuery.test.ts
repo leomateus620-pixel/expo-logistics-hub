@@ -1,4 +1,5 @@
 import { QueryClient, QueryObserver } from '@tanstack/react-query';
+import { shouldRetryCommercialMap } from '@/features/commercial-map/queries/commercialMapRetryPolicy';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({ fetch: vi.fn(), present: vi.fn((data: unknown) => ({ presented: data })), capture: vi.fn(() => vi.fn()) }));
 vi.mock('@/features/commercial-map/services/commercialMapService', () => ({ fetchCommercialMap: mocks.fetch }));
@@ -20,7 +21,7 @@ describe('canonical query shared by portal and map route', () => {
     const unsubscribe = observer.subscribe(() => {});
     expect(observer.getCurrentResult().data).toEqual({ presented: raw });
     expect(mocks.fetch).toHaveBeenCalledTimes(1);
-    expect(options).toMatchObject({ staleTime: 30_000, gcTime: 600_000, retry: 1, meta: { persist: false } });
+    expect(options).toMatchObject({ staleTime: 30_000, gcTime: 600_000, retry: shouldRetryCommercialMap, networkMode: 'online', meta: { persist: false } });
     expect(COMMERCIAL_MAP_GC_TIME).toBe(600_000); unsubscribe();
   });
 

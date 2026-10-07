@@ -4,7 +4,7 @@ import { useCommercialMapBootWait } from '../hooks/useCommercialMapBootWait';
 import './commercial-map-boot-loader.css';
 
 const milestones = [
-  { label: 'Dados comerciais', weight: 23, keys: ['essential-data:end', 'essential-data:cached', 'fixture-data-ready'] },
+  { label: 'Dados comerciais', weight: 23, keys: ['essential-data:ok', 'essential-data:cached', 'fixture-data-ready'] },
   { label: 'Estrutura do parque', weight: 32, keys: ['critical-scene:end'] },
   { label: 'Preparando visualização', weight: 30, keys: ['essential-scene:prepared'] },
   { label: 'Controles e navegação', weight: 15, keys: ['commercial-map-ready'] },
@@ -17,18 +17,18 @@ export function commercialMapBootProgress(boot: CommercialMapBootSnapshot) {
 }
 
 /** CSS/SVG only. Percentages advance exclusively when the renderer/data report completion. */
-export function CommercialMapBootLoader({ force = false, active = true, error, onRetry, onOpenList }: {
-  force?: boolean; active?: boolean; error?: string; onRetry?: () => void; onOpenList?: () => void;
+export function CommercialMapBootLoader({ force = false, active = true, error, recovering = false, onRetry, onOpenList }: {
+  force?: boolean; active?: boolean; error?: string; recovering?: boolean; onRetry?: () => void; onOpenList?: () => void;
 }) {
   const boot = useSyncExternalStore(subscribeCommercialMapBoot, getCommercialMapBootSnapshot, getCommercialMapBootSnapshot);
   const { done, progress, current } = commercialMapBootProgress(boot);
   const failed = error || (boot.failed ? 'Não foi possível preparar o mapa. Tente novamente.' : null);
   const waiting = !boot.commercialMapReady || force;
   const stalled = useCommercialMapBootWait(`${boot.startedAt}:${boot.preparationAttempt}:${current}`,
-    milestones[current].label, waiting && !failed, active);
+    milestones[current].label, waiting && !failed && !recovering, active);
   if (!waiting && !error) return null;
   return <section className="commercial-map-boot" aria-label="Carregamento do Mapa Comercial"
-    data-map-boot={failed ? 'failed' : stalled ? 'slow' : 'loading'} data-map-boot-wait={stalled ? JSON.stringify(stalled) : undefined}>
+    data-map-boot={failed ? 'failed' : recovering ? 'recovering' : stalled ? 'slow' : 'loading'} data-map-boot-wait={stalled ? JSON.stringify(stalled) : undefined}>
     <div className="commercial-map-boot__glow" aria-hidden="true" />
     <div className="commercial-map-boot__content">
       <span className="commercial-map-boot__brand">FENASOJA <b>2028</b></span>
@@ -40,7 +40,9 @@ export function CommercialMapBootLoader({ force = false, active = true, error, o
       </svg>
       <span className="commercial-map-boot__eyebrow">GESTÃO TERRITORIAL</span>
       <h1>{failed ? 'Vamos tentar novamente' : 'Preparando o Mapa Comercial'}</h1>
-      <p role="status" aria-live="polite">{failed || (stalled
+      <p role="status" aria-live="polite">{failed || (recovering
+        ? `Reconectando ao servidor… ${milestones[current].label}`
+        : stalled
         ? 'O mapa está demorando mais que o esperado neste dispositivo. Você pode tentar novamente ou consultar a lista.'
         : milestones[current].label)}</p>
       <div className="commercial-map-boot__meter" role="progressbar" aria-label="Preparação do mapa" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}>
