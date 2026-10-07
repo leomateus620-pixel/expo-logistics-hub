@@ -125,7 +125,14 @@ export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIA
       queryClient.getQueryState(options.queryKey), captureCommercialMapStageRecorder(),
     ) };
   }
-  const query = useQuery({ ...options, refetchInterval: 10 * 60_000 });
+  // Mapa completo: a verificação leve de versão (useCommercialMapRevision) decide
+  // quando recarregar; o intervalo longo é só uma rede de segurança.
+  const fullScope = scope.mode !== 'commission';
+  const query = useQuery({
+    ...options,
+    refetchOnWindowFocus: !fullScope,
+    refetchInterval: fullScope ? 30 * 60_000 : 10 * 60_000,
+  });
   if (options.enabled) routeData.current?.observation.observe(query.data !== undefined, query.isError);
 
   useEffect(() => {
