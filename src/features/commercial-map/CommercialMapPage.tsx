@@ -74,6 +74,7 @@ import { markCommercialMapStage } from './utils/performanceDiagnostics';
 import { canHandleCommercialDashboardEscape, canHandleCommercialMapEscape, getCommercialDashboardFocusableElements } from './utils/contextualNavigation';
 import { buildPavilionModuleCommercialIndex, resolveCommercialPavilionModuleNavigationTarget } from './utils/pavilionModuleCommercial';
 import { useCommercialDashboardSync } from './dashboard/useCommercialDashboardSync';
+import { useCommercialMapRevision } from './hooks/useCommercialMapRevision';
 import { useSaleInspectionStore } from './state/useSaleInspectionStore';
 import { resolveSaleInspection, type SaleInspectionGroup, type SaleInspectionResolution, type SaleInspectionSpace } from './utils/saleInspectionGroups';
 import { SaleInspectionPanel } from './components/panels/SaleInspectionPanel';
@@ -85,6 +86,14 @@ import './visit/visit.css';
 
 import { useWebGLAvailability } from './hooks/useWebGLAvailability';
 import { PublicInterestDialog } from './public/PublicInterestDialog';
+
+function syncFailureKind(error: unknown): 'timeout' | 'network' | 'other' {
+  const failure = error as { code?: string; message?: string } | null;
+  const text = `${failure?.code ?? ''} ${failure?.message ?? String(error ?? '')}`;
+  if (/57014|statement timeout|canceling statement|timeout/i.test(text)) return 'timeout';
+  if (/failed to fetch|network|load failed|ECONN/i.test(text)) return 'network';
+  return 'other';
+}
 
 function MapFeatureBoundary({ id, children }: { id: string; children: ReactNode }) {
   return <MapPanelBoundary resetKey={id} title="Ferramenta indisponível">
@@ -264,11 +273,18 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     }
   }, [dashboardOpen]);
 
+  const checkMapRevision = useCommercialMapRevision({
+    projectId: mapQuery.data?.source === 'database' ? mapQuery.data.project?.id : null,
+    enabled: !isPreview && !isCommissionScope,
+    isFetching: mapQuery.isFetching,
+    hasError: mapQuery.isError,
+    refetch: mapQuery.refetch,
+  });
   useCommercialDashboardSync({
     open: dashboardOpen,
     enabled: !isPreview && !isCommissionScope && permissions.canViewMapAnalytics,
     isFetching: mapQuery.isFetching,
-    refetch: mapQuery.refetch,
+    refetch: checkMapRevision,
   });
 
   useEffect(() => () => {
@@ -873,10 +889,15 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
         )}
 
         {!isPreview && mapQuery.isError && (
-          <div className="commercial-map-sync-warning" role="status">
+          <div className="commercial-map-sync-warning" role="status" data-sync-failure={syncFailureKind(mapQuery.error)}>
             <AlertTriangle />
-            <span><strong>Atualização temporariamente indisponível</strong>O último mapa válido permanece ativo.</span>
-            <Button size="sm" variant="outline" onClick={() => mapQuery.refetch()} disabled={mapQuery.isFetching}>
+            <span>
+              <strong>Atualização temporariamente indisponível</strong>
+              O último mapa válido permanece ativo.
+              {mapQuery.dataUpdatedAt > 0 && ` Última atualização às ${new Date(mapQuery.dataUpdatedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}`}
+              {syncFailureKind(mapQuery.error) === 'timeout' ? ' · servidor demorou a responder.' : syncFailureKind(mapQuery.error) === 'network' ? ' · sem conexão.' : ''}
+            </span>
+            <Button size="sm" variant="outline" onClick={() => mapQuery.refetch({ cancelRefetch: false })} disabled={mapQuery.isFetching}>
               <RefreshCw className={mapQuery.isFetching ? 'animate-spin' : ''} />
               Tentar novamente
             </Button>

@@ -12,6 +12,7 @@ import { SaleOrderHistory } from './SaleOrderHistory';
 import { describeSalesError, fetchSaleOrderDetail, uniqueContracts, type SaleContract, type SaleOrderSummary } from './salesOrdersService';
 import { documentSummary, fmtSaleArea, fmtSaleDate, receiptSummary, saleDetailSummary, saleName, saleStateLabel, signatureSummary } from './salesOrdersPresentation';
 import { useSalesOrdersUiStore, type SalesOrdersDetailTab, type SalesOrdersRecordIdentity } from './useSalesOrdersUiStore';
+import { scheduleCommercialMapRefresh } from '../../queries/commercialMapRefresh';
 
 const ITEM_STATE_LABEL: Record<string, string> = {
   PENDING_SIGNATURE: 'Aguardando assinatura', SIGNED: 'Assinatura confirmada',
@@ -176,7 +177,7 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail'] }),
         queryClient.invalidateQueries({ queryKey: ['commercial-sale-orders'] }),
-        queryClient.invalidateQueries({ queryKey: ['commercial-map'] }),
+        scheduleCommercialMapRefresh(queryClient),
       ]);
     }} />}
     {attachOpen && orgId && h.orderId && <AttachOrderContractDialog orgId={orgId} orderId={h.orderId} items={activeItems.map((item) => ({ lotId: item.lotId, label: `${item.displayName || item.publicIdentifier} · ${locationOf(item.lotId)}` }))} contract={attachOpen.contract} onClose={() => setAttachOpen(null)} onAttached={async () => {

@@ -16,6 +16,7 @@ import { SalesReview } from './SalesReview';
 import { uploadSaleLogo } from '../saleLogo';
 import { toast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { scheduleCommercialMapRefresh } from '../../queries/commercialMapRefresh';
 
 const STEPS = ['Expositor', 'Pagamento', 'Revisão'] as const;
 
@@ -115,7 +116,7 @@ export function SalesCheckoutDialog({ summary }: Props) {
         if (logoImage) {
           uploadingRef.current = true;
           setLogoUploading(true);
-          try { await uploadSaleLogo(orderId, idempotencyKey, logoImage); await queryClient.invalidateQueries({ queryKey: ['commercial-map'] }); }
+          try { await uploadSaleLogo(orderId, idempotencyKey, logoImage); await scheduleCommercialMapRefresh(queryClient); }
           catch (error) { toast({ title: 'Venda registrada sem imagem', description: error instanceof Error ? error.message : 'Não foi possível associar a imagem.', variant: 'destructive' }); }
           finally { uploadingRef.current = false; setLogoUploading(false); }
         }

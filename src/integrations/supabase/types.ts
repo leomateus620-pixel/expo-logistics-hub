@@ -10869,6 +10869,10 @@ export type Database = {
           sale_status: string
         }[]
       }
+      commercial_map_revision: {
+        Args: { p_project_id: string }
+        Returns: string
+      }
       commercial_sale_logos: { Args: { p_project_id: string }; Returns: Json }
       commission_leadership_user_ids: {
         Args: { _commission_id: string }

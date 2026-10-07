@@ -19,6 +19,7 @@ import {
   fetchSaleIdentity, updateSaleIdentity, SaleIdentityError,
   type SaleIdentity, type SaleIdentityDraft,
 } from '../saleIdentityService';
+import { scheduleCommercialMapRefresh } from '../../queries/commercialMapRefresh';
 
 export const saleIdentityQueryKey = (lotId: string) => ['commercial-map', 'sale-identity', lotId] as const;
 
@@ -99,7 +100,7 @@ export function SaleExhibitorEditDialog({ lotId, identity, onClose }: { lotId: s
     try {
       await updateSaleIdentity({ identity, draft, updateExhibitor, requestId: requestId.current });
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['commercial-map'] }),
+        scheduleCommercialMapRefresh(queryClient),
         queryClient.invalidateQueries({ queryKey: saleIdentityQueryKey(lotId) }),
       ]);
       toast({ title: 'Dados do expositor atualizados', description: identity.affectedSpaces.length > 1 ? `${identity.affectedSpaces.length} espaços do pedido foram atualizados.` : 'A venda foi atualizada.' });

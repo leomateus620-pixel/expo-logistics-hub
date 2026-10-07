@@ -20,6 +20,7 @@ import {
 } from '../salesService';
 import { SaleExhibitorIdentity } from './SaleExhibitorEditDialog';
 import type { CommercialMapData } from '../../types';
+import { scheduleCommercialMapRefresh } from '../../queries/commercialMapRefresh';
 
 const dateTime = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo' });
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -53,7 +54,7 @@ export function SaleOpenSection({ lotId, canManageSales, mapData }: {
   const [cancelling, setCancelling] = useState(false);
 
   const invalidate = () => {
-    void queryClient.invalidateQueries({ queryKey: ['commercial-map'] });
+    void scheduleCommercialMapRefresh(queryClient);
     void queryClient.invalidateQueries({ queryKey: ['commercial-sale-orders'] });
     void queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail'] });
   };

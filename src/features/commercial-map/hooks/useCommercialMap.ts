@@ -50,6 +50,7 @@ import {
 import { resolveMapPermissions } from '../utils/permissions';
 import { resolveContextualMapScope } from '../utils/contextualMapSummary';
 import { getCommercialMapSegment } from '../data/commercialMapSegments';
+import { scheduleCommercialMapRefresh } from '../queries/commercialMapRefresh';
 
 const MAP_ERROR_MESSAGES: Record<string, string> = {
   MAP_PERMISSION_DENIED: 'Você não possui permissão para concluir esta operação.',
@@ -125,7 +126,14 @@ export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIA
       queryClient.getQueryState(options.queryKey), captureCommercialMapStageRecorder(),
     ) };
   }
-  const query = useQuery({ ...options, refetchInterval: 10 * 60_000 });
+  // Mapa completo: a verificação leve de versão (useCommercialMapRevision) decide
+  // quando recarregar; o intervalo longo é só uma rede de segurança.
+  const fullScope = scope.mode !== 'commission';
+  const query = useQuery({
+    ...options,
+    refetchOnWindowFocus: !fullScope,
+    refetchInterval: fullScope ? 30 * 60_000 : 10 * 60_000,
+  });
   if (options.enabled) routeData.current?.observation.observe(query.data !== undefined, query.isError);
 
   useEffect(() => {
@@ -256,7 +264,7 @@ export function useFilteredMapEntities(entities: MapEntity[], lots: CommercialLo
 export function useMapMutations() {
   const queryClient = useQueryClient();
   const { orgId } = useCurrentOrg();
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['commercial-map'] });
+  const invalidate = () => scheduleCommercialMapRefresh(queryClient);
   const errorMessage = mapErrorMessage;
 
   const bootstrap = useMutation({

@@ -6,6 +6,7 @@ import { toast } from '@/hooks/use-toast';
 import type { CommercialMapData } from '../../types';
 import { describeSalesError, fetchSaleOrderDetail } from './salesOrdersService';
 import { ReviseSaleOrderDialog } from './ReviseSaleOrderDialog';
+import { scheduleCommercialMapRefresh } from '../../queries/commercialMapRefresh';
 
 export function makeLocationOf(data: Pick<CommercialMapData, 'lots' | 'entities'>) {
   const lots = new Map(data.lots.map((l) => [l.id, l]));
@@ -56,7 +57,7 @@ export function SaleLotsEditAction({ lotId, orderId, mapData }: {
         onClose={() => setOpen(false)}
         onSaved={async () => {
           await Promise.all([
-            queryClient.invalidateQueries({ queryKey: ['commercial-map'] }),
+            scheduleCommercialMapRefresh(queryClient),
             queryClient.invalidateQueries({ queryKey: ['commercial-sale-orders'] }),
             queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail'] }),
           ]);
