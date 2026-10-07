@@ -260,6 +260,8 @@ export interface CommercialMapData {
   layers: MapLayer[];
   entities: MapEntity[];
   lots: CommercialLot[];
+  /** Assinatura do estado comercial lida no início desta carga (mapa completo). */
+  revision?: string | null;
   /** Commission scope only: off-segment park geometry for normal and visit views (never commercial data). */
   parkContextEntities?: MapEntity[];
   scope?: {

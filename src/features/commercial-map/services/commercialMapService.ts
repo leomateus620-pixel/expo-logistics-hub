@@ -1,9 +1,8 @@
-import { applyLotBuyerSummary, type LotBuyerSummaryRow } from '../utils/lotBuyerSummary';
+import type { LotBuyerSummaryRow } from '../utils/lotBuyerSummary';
 import { buyerDisplayName } from '../utils/buyerDisplayName';
 import { captureCommercialMapStageRecorder, type CommercialMapStageRecorder } from '../utils/performanceDiagnostics';
 import { awaitCommercialMapRequest, measureCommercialMapOperation, throwIfMapRequestAborted } from '../utils/commercialMapOperation';
 import { supabase } from '@/integrations/supabase/client';
-import { fetchSaleLogoUrls } from '../sales/saleLogo';
 import { OFFICIAL_REFERENCE_DATA, OFFICIAL_REFERENCE_REVISION } from '../data/officialReference2026';
 import { reconcileExporuralReference } from '../data/reconcileExporuralReference';
 import type {
@@ -661,6 +660,7 @@ export async function fetchCommercialMap(
     pricingResult,
     lotPresenceResult,
     segmentsResult,
+    revisionResult,
   ] = await Promise.all([
     mapRequest(db.from('map_layers').select('*').eq('project_id', project.id).order('sort_order'), context),
     fetchAllRows(() => db.from('map_entities').select('*').eq('project_id', project.id).eq('is_archived', false), 'entities', context),
@@ -670,6 +670,10 @@ export async function fetchCommercialMap(
     fetchAllRows(() => db.from('commercial_lot_pricing_2028').select(PRICING_2028_COLUMNS).eq('project_id', project.id), 'pricing-2028', context, 'lot_id'),
     mapRequest(db.from('commercial_lots').select('id').eq('project_id', project.id).limit(1), context),
     mapRequest(db.from('map_segments').select('id, slug').eq('project_id', project.id).eq('is_active', true), context),
+    // Lida no início da carga: se algo mudar durante a leitura, a próxima verificação
+    // vê uma assinatura diferente e recarrega uma vez (nunca adota revisão mais nova que os dados).
+    measureCommercialMapOperation<{ data: unknown; error: unknown }>(context.recordStage, 'revision', () => mapRequest(db.rpc('commercial_map_revision', { p_project_id: project.id }), context))
+      .catch((error) => ({ data: null, error })),
   ]);
 
   const segmentLookupError = segmentsResult.error
@@ -729,6 +733,9 @@ export async function fetchCommercialMap(
     entities,
     lots: lotRows.map(mapLot),
   });
+  if (result.source === 'database') {
+    (result as CommercialMapData).revision = typeof revisionResult.data === 'string' && !revisionResult.error ? revisionResult.data : null;
+  }
   throwIfMapRequestAborted(context.signal);
   context.recordStage('inventory-transformation:end', { duration: performance.now() - transformationStartedAt });
   return result;
