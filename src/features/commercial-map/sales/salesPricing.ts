@@ -10,6 +10,8 @@ export interface SalesCartLine {
   total: number | null;
   /** Etapa sem preço oficial: impede somente o fechamento nesta etapa. */
   unpriced: boolean;
+  /** Valor ainda carregando (nunca tratado como "sem preço"). */
+  pending?: boolean;
   pendingReason: string | null;
 }
 
@@ -18,6 +20,7 @@ export interface SalesCartSummary {
   areaTotal: number;
   valueTotal: number;
   blockingCount: number;
+  pendingCount: number;
   ready: boolean;
 }
 
@@ -70,16 +73,21 @@ export function summarizeCart(
   entries: SalesSelectionEntry[],
   pricingByLot: Map<string, LotPricing2028>,
   stage: SalesStage,
+  pendingIds: ReadonlySet<string> = new Set(),
 ): SalesCartSummary {
-  const lines = entries.map((entry) => buildCartLine(entry, pricingByLot.get(entry.lotId) ?? null, stage));
+  const lines = entries.map((entry): SalesCartLine => pendingIds.has(entry.lotId)
+    ? { entry, pricing: null, areaSqm: null, pricePerSqm: null, total: null, unpriced: false, pending: true, pendingReason: null }
+    : buildCartLine(entry, pricingByLot.get(entry.lotId) ?? null, stage));
   const areaCents = lines.reduce((sum, line) => sum + (line.areaSqm == null ? 0 : toCents(line.areaSqm)), 0);
   const valueCents = lines.reduce((sum, line) => sum + (line.total == null ? 0 : toCents(line.total)), 0);
   const blockingCount = lines.filter((line) => line.unpriced).length;
+  const pendingCount = lines.filter((line) => line.pending).length;
   return {
     lines,
     areaTotal: areaCents / 100,
     valueTotal: valueCents / 100,
     blockingCount,
-    ready: lines.length > 0 && blockingCount === 0,
+    pendingCount,
+    ready: lines.length > 0 && blockingCount === 0 && pendingCount === 0,
   };
 }

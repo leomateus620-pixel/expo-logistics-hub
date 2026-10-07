@@ -42,6 +42,24 @@ function mapRow(row: PricingRow): LotPricing2028 {
   };
 }
 
+/** Todos os valores oficiais do projeto numa única leitura (cache do modo Vendas). */
+export async function fetchProjectSalesPricing(projectId: string): Promise<LotPricing2028[]> {
+  const rows: LotPricing2028[] = [];
+  const pageSize = 1000;
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await supabase
+      .from('commercial_lot_pricing_2028')
+      .select(PRICING_COLUMNS)
+      .eq('project_id', projectId)
+      .order('lot_id')
+      .range(from, from + pageSize - 1);
+    if (error) throw error;
+    (data ?? []).forEach((row) => rows.push(mapRow(row as PricingRow)));
+    if (!data || data.length < pageSize) break;
+  }
+  return rows;
+}
+
 /** Leitura em lote dos valores oficiais das duas etapas para o carrinho. */
 export async function fetchSalesPricing(lotIds: string[]): Promise<LotPricing2028[]> {
   if (lotIds.length === 0) return [];
