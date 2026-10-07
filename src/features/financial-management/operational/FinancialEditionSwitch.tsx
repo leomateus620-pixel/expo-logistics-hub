@@ -13,7 +13,15 @@ export function FinancialEditionSwitch({ value, onChange }: { value: FinancialEd
       {options.map(({ code, label, hint, Icon }) => {
         const active = value === code;
         return (
-          <button key={code} type="button" role="radio" aria-checked={active} onClick={() => onChange(code)}
+          <button key={code} type="button" role="radio" aria-checked={active} tabIndex={active ? 0 : -1} onClick={() => onChange(code)}
+            onKeyDown={(event) => {
+              if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
+              event.preventDefault();
+              const next = event.key === 'Home' ? '2026' : event.key === 'End' ? '2028' : code === '2026' ? '2028' : '2026';
+              onChange(next);
+              const group = event.currentTarget.parentElement;
+              (group?.querySelector(`[data-edition="${next}"]`) as HTMLButtonElement | null)?.focus();
+            }} data-edition={code}
             className={cn('flex items-center gap-3 rounded-xl border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
               active ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-foreground hover:bg-accent')}>
             <Icon className="h-5 w-5 shrink-0" aria-hidden />

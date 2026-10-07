@@ -1,0 +1,1979 @@
+{
+  "phase": "before",
+  "fixtureBoundary": "Synthetic QA API + real page/layout/dialogs; no backend access or financial writes",
+  "captures": [
+    {
+      "file": "desktop-2028-dashboard.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Painel Financeiro · Fenasoja 2028",
+      "activeMenu": [
+        "Painel Financeiro"
+      ]
+    },
+    {
+      "file": "desktop-2028-receitas-projetadas.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "desktop-2028-receitas-confirmadas.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas confirmadas",
+      "activeMenu": [
+        "Receitas Confirmadas"
+      ]
+    },
+    {
+      "file": "desktop-2028-despesas-previstas.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Despesas Previstas"
+      ]
+    },
+    {
+      "file": "desktop-2028-despesas-realizadas.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Despesas Realizadas"
+      ]
+    },
+    {
+      "file": "desktop-2028-orcamento-comissoes.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "desktop-2028-patrocinios.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Carteira de patrocínios 2028",
+      "activeMenu": [
+        "Patrocínios"
+      ]
+    },
+    {
+      "file": "desktop-2028-simulacoes.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Simulações"
+      ]
+    },
+    {
+      "file": "desktop-2028-relatorios.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Relatórios"
+      ]
+    },
+    {
+      "file": "desktop-2026-dashboard.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Painel Financeiro",
+      "activeMenu": [
+        "Painel Financeiro"
+      ]
+    },
+    {
+      "file": "desktop-2026-receitas-projetadas.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas Projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "desktop-2026-receitas-confirmadas.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas Confirmadas",
+      "activeMenu": [
+        "Receitas Confirmadas"
+      ]
+    },
+    {
+      "file": "desktop-2026-despesas-previstas.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Despesas Previstas",
+      "activeMenu": [
+        "Despesas Previstas"
+      ]
+    },
+    {
+      "file": "desktop-2026-despesas-realizadas.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Despesas Realizadas",
+      "activeMenu": [
+        "Despesas Realizadas"
+      ]
+    },
+    {
+      "file": "desktop-2026-orcamento-comissoes.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Orçamento por Comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "desktop-2026-patrocinios.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Patrocínios",
+      "activeMenu": [
+        "Patrocínios"
+      ]
+    },
+    {
+      "file": "desktop-2026-simulacoes.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Cenários Financeiros",
+      "activeMenu": [
+        "Simulações"
+      ]
+    },
+    {
+      "file": "desktop-2026-relatorios.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Relatórios Financeiros",
+      "activeMenu": [
+        "Relatórios"
+      ]
+    },
+    {
+      "file": "desktop-create-revenue.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 419.5,
+        "y": 70,
+        "width": 512,
+        "height": 628,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Receitas projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "desktop-revenue-select.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 419.5,
+        "y": 70,
+        "width": 512,
+        "height": 628,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Receitas projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "desktop-create-budget.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 419.5,
+        "y": 86,
+        "width": 512,
+        "height": 596,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "desktop-budget-select.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 419.5,
+        "y": 86,
+        "width": 512,
+        "height": 596,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "desktop-create-sponsorship.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 419.5,
+        "y": 38.40625,
+        "width": 512,
+        "height": 691.1875,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Carteira de patrocínios 2028",
+      "activeMenu": [
+        "Patrocínios"
+      ]
+    },
+    {
+      "file": "desktop-edit-revenue.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 419.5,
+        "y": 70,
+        "width": 512,
+        "height": 628,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Receitas projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "desktop-edit-budget.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 419.5,
+        "y": 129,
+        "width": 512,
+        "height": 510,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "desktop-create-budget-line.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 419.5,
+        "y": 170,
+        "width": 512,
+        "height": 428,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "desktop-edit-sponsorship.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 419.5,
+        "y": 38.40625,
+        "width": 512,
+        "height": 691.1875,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Carteira de patrocínios 2028",
+      "activeMenu": [
+        "Patrocínios"
+      ]
+    },
+    {
+      "file": "notebook-2028-dashboard.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Painel Financeiro · Fenasoja 2028",
+      "activeMenu": [
+        "Painel Financeiro"
+      ]
+    },
+    {
+      "file": "notebook-2028-receitas-projetadas.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "notebook-2028-receitas-confirmadas.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas confirmadas",
+      "activeMenu": [
+        "Receitas Confirmadas"
+      ]
+    },
+    {
+      "file": "notebook-2028-despesas-previstas.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Despesas Previstas"
+      ]
+    },
+    {
+      "file": "notebook-2028-despesas-realizadas.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Despesas Realizadas"
+      ]
+    },
+    {
+      "file": "notebook-2028-orcamento-comissoes.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "notebook-2028-patrocinios.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Carteira de patrocínios 2028",
+      "activeMenu": [
+        "Patrocínios"
+      ]
+    },
+    {
+      "file": "notebook-2028-simulacoes.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Simulações"
+      ]
+    },
+    {
+      "file": "notebook-2028-relatorios.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Relatórios"
+      ]
+    },
+    {
+      "file": "notebook-2026-dashboard.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Painel Financeiro",
+      "activeMenu": [
+        "Painel Financeiro"
+      ]
+    },
+    {
+      "file": "notebook-2026-receitas-projetadas.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas Projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "notebook-2026-receitas-confirmadas.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas Confirmadas",
+      "activeMenu": [
+        "Receitas Confirmadas"
+      ]
+    },
+    {
+      "file": "notebook-2026-despesas-previstas.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Despesas Previstas",
+      "activeMenu": [
+        "Despesas Previstas"
+      ]
+    },
+    {
+      "file": "notebook-2026-despesas-realizadas.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Despesas Realizadas",
+      "activeMenu": [
+        "Despesas Realizadas"
+      ]
+    },
+    {
+      "file": "notebook-2026-orcamento-comissoes.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Orçamento por Comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "notebook-2026-patrocinios.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Patrocínios",
+      "activeMenu": [
+        "Patrocínios"
+      ]
+    },
+    {
+      "file": "notebook-2026-simulacoes.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Cenários Financeiros",
+      "activeMenu": [
+        "Simulações"
+      ]
+    },
+    {
+      "file": "notebook-2026-relatorios.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Relatórios Financeiros",
+      "activeMenu": [
+        "Relatórios"
+      ]
+    },
+    {
+      "file": "notebook-create-revenue.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 248.5,
+        "y": 70,
+        "width": 512,
+        "height": 628,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Receitas projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "notebook-revenue-select.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 248.5,
+        "y": 70,
+        "width": 512,
+        "height": 628,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Receitas projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "notebook-create-budget.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 261.29998779296875,
+        "y": 100.9000015258789,
+        "width": 486.4000244140625,
+        "height": 566.199951171875,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "0",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "notebook-budget-select.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 248.5,
+        "y": 86,
+        "width": 512,
+        "height": 596,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "notebook-create-sponsorship.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 248.5,
+        "y": 38.40625,
+        "width": 512,
+        "height": 691.1875,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Carteira de patrocínios 2028",
+      "activeMenu": [
+        "Patrocínios"
+      ]
+    },
+    {
+      "file": "notebook-edit-revenue.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 248.5,
+        "y": 70,
+        "width": 512,
+        "height": 628,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Receitas projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "notebook-edit-budget.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 248.5,
+        "y": 129,
+        "width": 512,
+        "height": 510,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "notebook-create-budget-line.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 261.29998779296875,
+        "y": 180.6999969482422,
+        "width": 486.4000244140625,
+        "height": 406.5999755859375,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "0",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "notebook-edit-sponsorship.png",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "bodyWidth": 1009,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 261.29998779296875,
+        "y": 55.68593978881836,
+        "width": 486.4000244140625,
+        "height": 656.628173828125,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "0",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Carteira de patrocínios 2028",
+      "activeMenu": [
+        "Patrocínios"
+      ]
+    },
+    {
+      "file": "mobile-2028-dashboard.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Painel Financeiro · Fenasoja 2028",
+      "activeMenu": [
+        "Painel Financeiro"
+      ]
+    },
+    {
+      "file": "mobile-2028-receitas-projetadas.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "mobile-2028-receitas-confirmadas.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas confirmadas",
+      "activeMenu": [
+        "Receitas Confirmadas"
+      ]
+    },
+    {
+      "file": "mobile-2028-despesas-previstas.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Despesas Previstas"
+      ]
+    },
+    {
+      "file": "mobile-2028-despesas-realizadas.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Despesas Realizadas"
+      ]
+    },
+    {
+      "file": "mobile-2028-orcamento-comissoes.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "mobile-2028-patrocinios.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Carteira de patrocínios 2028",
+      "activeMenu": [
+        "Patrocínios"
+      ]
+    },
+    {
+      "file": "mobile-2028-simulacoes.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Simulações"
+      ]
+    },
+    {
+      "file": "mobile-2028-relatorios.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Relatórios"
+      ]
+    },
+    {
+      "file": "mobile-2026-dashboard.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Painel Financeiro",
+      "activeMenu": [
+        "Painel Financeiro"
+      ]
+    },
+    {
+      "file": "mobile-2026-receitas-projetadas.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas Projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "mobile-2026-receitas-confirmadas.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas Confirmadas",
+      "activeMenu": [
+        "Receitas Confirmadas"
+      ]
+    },
+    {
+      "file": "mobile-2026-despesas-previstas.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Despesas Previstas",
+      "activeMenu": [
+        "Despesas Previstas"
+      ]
+    },
+    {
+      "file": "mobile-2026-despesas-realizadas.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Despesas Realizadas",
+      "activeMenu": [
+        "Despesas Realizadas"
+      ]
+    },
+    {
+      "file": "mobile-2026-orcamento-comissoes.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Orçamento por Comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "mobile-2026-patrocinios.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Patrocínios",
+      "activeMenu": [
+        "Patrocínios"
+      ]
+    },
+    {
+      "file": "mobile-2026-simulacoes.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Cenários Financeiros",
+      "activeMenu": [
+        "Simulações"
+      ]
+    },
+    {
+      "file": "mobile-2026-relatorios.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Relatórios Financeiros",
+      "activeMenu": [
+        "Relatórios"
+      ]
+    },
+    {
+      "file": "mobile-create-revenue.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 20.775001525878906,
+        "y": 86.6500015258789,
+        "width": 333.45001220703125,
+        "height": 670.699951171875,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "0",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Receitas projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "mobile-revenue-select.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 12,
+        "y": 69,
+        "width": 351,
+        "height": 706,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Receitas projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "mobile-create-budget.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 20.775001525878906,
+        "y": 142.6999969482422,
+        "width": 333.45001220703125,
+        "height": 558.5999755859375,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "0",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "mobile-budget-select.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 12,
+        "y": 128,
+        "width": 351,
+        "height": 588,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "mobile-create-sponsorship.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 20.775001525878906,
+        "y": 61.19297409057617,
+        "width": 333.45001220703125,
+        "height": 721.614013671875,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "0",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Carteira de patrocínios 2028",
+      "activeMenu": [
+        "Patrocínios"
+      ]
+    },
+    {
+      "file": "mobile-edit-revenue.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 12,
+        "y": 42.203125,
+        "width": 351,
+        "height": 759.59375,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Receitas projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "mobile-edit-budget.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 20.775001525878906,
+        "y": 183.5500030517578,
+        "width": 333.45001220703125,
+        "height": 476.9000244140625,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "0",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "mobile-create-budget-line.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 20.775001525878906,
+        "y": 222.5,
+        "width": 333.45001220703125,
+        "height": 399,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "0",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "mobile-edit-sponsorship.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": {
+        "x": 12,
+        "y": 42.203125,
+        "width": 351,
+        "height": 759.59375,
+        "styles": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "rgba(255, 255, 255, 0.55)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "input": {
+          "background": "oklch(0.974 0.006 266)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.57 0.15 49.36)",
+          "opacity": "1",
+          "zIndex": "auto"
+        },
+        "label": {
+          "background": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.2107 0.062 255.67)",
+          "border": "oklch(0.87 0.018 266)",
+          "opacity": "1",
+          "zIndex": "auto"
+        }
+      },
+      "heading": "Carteira de patrocínios 2028",
+      "activeMenu": [
+        "Patrocínios"
+      ]
+    },
+    {
+      "file": "mobile-state-empty-dashboard.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Painel Financeiro · Fenasoja 2028",
+      "activeMenu": [
+        "Painel Financeiro"
+      ]
+    },
+    {
+      "file": "mobile-state-empty-receitas-projetadas.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "mobile-state-empty-orcamento-comissoes.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Orçamento por comissão",
+      "activeMenu": [
+        "Orçamento por Comissão"
+      ]
+    },
+    {
+      "file": "mobile-state-empty-patrocinios.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Carteira de patrocínios 2028",
+      "activeMenu": [
+        "Patrocínios"
+      ]
+    },
+    {
+      "file": "mobile-state-denied-dashboard.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Painel Financeiro"
+      ]
+    },
+    {
+      "file": "mobile-state-inactive-dashboard.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Painel Financeiro"
+      ]
+    },
+    {
+      "file": "mobile-state-error-dashboard.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "activeMenu": [
+        "Painel Financeiro"
+      ]
+    },
+    {
+      "file": "mobile-state-negative-dashboard.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Painel Financeiro · Fenasoja 2028",
+      "activeMenu": [
+        "Painel Financeiro"
+      ]
+    },
+    {
+      "file": "mobile-state-unavailable-dashboard.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Painel Financeiro · Fenasoja 2028",
+      "activeMenu": [
+        "Painel Financeiro"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "No external financial requests",
+      "passed": true,
+      "detail": [
+        "http://gc.kis.v2.scr.kaspersky-labs.com"
+      ]
+    },
+    {
+      "name": "No JavaScript errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "No 2028 page horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "No forms horizontal overflow",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "blockedRequests": [
+    "http://gc.kis.v2.scr.kaspersky-labs.com"
+  ]
+}

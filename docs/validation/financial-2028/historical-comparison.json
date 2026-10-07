@@ -1,0 +1,277 @@
+{
+  "fixtureBoundary": "Real historical page with unchanged 2026 data; fixed Chromium viewports, reduced-motion preference",
+  "compared": 27,
+  "identical": 11,
+  "comparisons": [
+    {
+      "file": "desktop-2026-dashboard.png",
+      "identical": false,
+      "width": 1366,
+      "height": 768,
+      "changedPixels": 58,
+      "changedPixelPercent": 0.005528611517813567,
+      "meanChannelDifference": 0.00002168550207418253,
+      "maximumChannelDifference": 1
+    },
+    {
+      "file": "desktop-2026-receitas-projetadas.png",
+      "identical": false,
+      "width": 1366,
+      "height": 768,
+      "changedPixels": 31,
+      "changedPixelPercent": 0.0029549475353831136,
+      "meanChannelDifference": 0.00001596624877989263,
+      "maximumChannelDifference": 4
+    },
+    {
+      "file": "desktop-2026-receitas-confirmadas.png",
+      "identical": false,
+      "width": 1366,
+      "height": 768,
+      "changedPixels": 24,
+      "changedPixelPercent": 0.002287701317715959,
+      "meanChannelDifference": 0.000008578879941434847,
+      "maximumChannelDifference": 1
+    },
+    {
+      "file": "desktop-2026-despesas-previstas.png",
+      "identical": false,
+      "width": 1366,
+      "height": 768,
+      "changedPixels": 28,
+      "changedPixelPercent": 0.002668984870668619,
+      "meanChannelDifference": 0.000010723599926793558,
+      "maximumChannelDifference": 1
+    },
+    {
+      "file": "desktop-2026-despesas-realizadas.png",
+      "identical": true,
+      "width": 1366,
+      "height": 768,
+      "changedPixels": 0,
+      "changedPixelPercent": 0,
+      "meanChannelDifference": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "file": "desktop-2026-orcamento-comissoes.png",
+      "identical": false,
+      "width": 1366,
+      "height": 768,
+      "changedPixels": 15,
+      "changedPixelPercent": 0.0014298133235724744,
+      "meanChannelDifference": 0.000006672462176671547,
+      "maximumChannelDifference": 1
+    },
+    {
+      "file": "desktop-2026-patrocinios.png",
+      "identical": true,
+      "width": 1366,
+      "height": 768,
+      "changedPixels": 0,
+      "changedPixelPercent": 0,
+      "meanChannelDifference": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "file": "desktop-2026-simulacoes.png",
+      "identical": true,
+      "width": 1366,
+      "height": 768,
+      "changedPixels": 0,
+      "changedPixelPercent": 0,
+      "meanChannelDifference": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "file": "desktop-2026-relatorios.png",
+      "identical": true,
+      "width": 1366,
+      "height": 768,
+      "changedPixels": 0,
+      "changedPixelPercent": 0,
+      "meanChannelDifference": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "file": "notebook-2026-dashboard.png",
+      "identical": false,
+      "width": 1024,
+      "height": 768,
+      "changedPixels": 38,
+      "changedPixelPercent": 0.004831949869791667,
+      "meanChannelDifference": 0.000016530354817708332,
+      "maximumChannelDifference": 1
+    },
+    {
+      "file": "notebook-2026-receitas-projetadas.png",
+      "identical": false,
+      "width": 1024,
+      "height": 768,
+      "changedPixels": 34,
+      "changedPixelPercent": 0.004323323567708333,
+      "meanChannelDifference": 0.000025113423665364582,
+      "maximumChannelDifference": 4
+    },
+    {
+      "file": "notebook-2026-receitas-confirmadas.png",
+      "identical": false,
+      "width": 1024,
+      "height": 768,
+      "changedPixels": 198,
+      "changedPixelPercent": 0.025177001953125,
+      "meanChannelDifference": 0.0002044041951497396,
+      "maximumChannelDifference": 3
+    },
+    {
+      "file": "notebook-2026-despesas-previstas.png",
+      "identical": false,
+      "width": 1024,
+      "height": 768,
+      "changedPixels": 7,
+      "changedPixelPercent": 0.0008900960286458334,
+      "meanChannelDifference": 0.000003814697265625,
+      "maximumChannelDifference": 1
+    },
+    {
+      "file": "notebook-2026-despesas-realizadas.png",
+      "identical": false,
+      "width": 1024,
+      "height": 768,
+      "changedPixels": 53,
+      "changedPixelPercent": 0.006739298502604167,
+      "meanChannelDifference": 0.000027338663736979168,
+      "maximumChannelDifference": 1
+    },
+    {
+      "file": "notebook-2026-orcamento-comissoes.png",
+      "identical": false,
+      "width": 1024,
+      "height": 768,
+      "changedPixels": 27,
+      "changedPixelPercent": 0.0034332275390625,
+      "meanChannelDifference": 0.000024159749348958332,
+      "maximumChannelDifference": 4
+    },
+    {
+      "file": "notebook-2026-patrocinios.png",
+      "identical": true,
+      "width": 1024,
+      "height": 768,
+      "changedPixels": 0,
+      "changedPixelPercent": 0,
+      "meanChannelDifference": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "file": "notebook-2026-simulacoes.png",
+      "identical": false,
+      "width": 1024,
+      "height": 768,
+      "changedPixels": 13,
+      "changedPixelPercent": 0.0016530354817708333,
+      "meanChannelDifference": 0.000010808308919270834,
+      "maximumChannelDifference": 1
+    },
+    {
+      "file": "notebook-2026-relatorios.png",
+      "identical": false,
+      "width": 1024,
+      "height": 768,
+      "changedPixels": 1,
+      "changedPixelPercent": 0.00012715657552083334,
+      "meanChannelDifference": 6.357828776041666e-7,
+      "maximumChannelDifference": 1
+    },
+    {
+      "file": "mobile-2026-dashboard.png",
+      "identical": true,
+      "width": 390,
+      "height": 844,
+      "changedPixels": 0,
+      "changedPixelPercent": 0,
+      "meanChannelDifference": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "file": "mobile-2026-receitas-projetadas.png",
+      "identical": false,
+      "width": 390,
+      "height": 844,
+      "changedPixels": 4,
+      "changedPixelPercent": 0.0012152144853566655,
+      "meanChannelDifference": 0.000007595090533479159,
+      "maximumChannelDifference": 1
+    },
+    {
+      "file": "mobile-2026-receitas-confirmadas.png",
+      "identical": false,
+      "width": 390,
+      "height": 844,
+      "changedPixels": 23,
+      "changedPixelPercent": 0.006987483290800826,
+      "meanChannelDifference": 0.000028861344027220804,
+      "maximumChannelDifference": 1
+    },
+    {
+      "file": "mobile-2026-despesas-previstas.png",
+      "identical": true,
+      "width": 390,
+      "height": 844,
+      "changedPixels": 0,
+      "changedPixelPercent": 0,
+      "meanChannelDifference": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "file": "mobile-2026-despesas-realizadas.png",
+      "identical": false,
+      "width": 390,
+      "height": 844,
+      "changedPixels": 11,
+      "changedPixelPercent": 0.00334183983473083,
+      "meanChannelDifference": 0.000015949690120306234,
+      "maximumChannelDifference": 1
+    },
+    {
+      "file": "mobile-2026-orcamento-comissoes.png",
+      "identical": true,
+      "width": 390,
+      "height": 844,
+      "changedPixels": 0,
+      "changedPixelPercent": 0,
+      "meanChannelDifference": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "file": "mobile-2026-patrocinios.png",
+      "identical": true,
+      "width": 390,
+      "height": 844,
+      "changedPixels": 0,
+      "changedPixelPercent": 0,
+      "meanChannelDifference": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "file": "mobile-2026-simulacoes.png",
+      "identical": true,
+      "width": 390,
+      "height": 844,
+      "changedPixels": 0,
+      "changedPixelPercent": 0,
+      "meanChannelDifference": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "file": "mobile-2026-relatorios.png",
+      "identical": true,
+      "width": 390,
+      "height": 844,
+      "changedPixels": 0,
+      "changedPixelPercent": 0,
+      "meanChannelDifference": 0,
+      "maximumChannelDifference": 0
+    }
+  ]
+}

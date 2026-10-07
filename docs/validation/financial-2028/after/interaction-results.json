@@ -1,0 +1,186 @@
+{
+  "fixtureBoundary": "Local synthetic API only; no backend writes",
+  "checks": [
+    {
+      "name": "Explicit deep link persists edition",
+      "passed": true
+    },
+    {
+      "name": "Sidebar navigation retains edition2028",
+      "passed": true
+    },
+    {
+      "name": "Refresh retains edition2028",
+      "passed": true
+    },
+    {
+      "name": "Browser back retains source menu and edition",
+      "passed": true
+    },
+    {
+      "name": "Browser forward retains destination and edition",
+      "passed": true
+    },
+    {
+      "name": "Edition switch opens actual historical page",
+      "passed": true
+    },
+    {
+      "name": "Edition radio keyboard selects and focuses2028",
+      "passed": true
+    },
+    {
+      "name": "Missing edition parameter uses remembered edition and canonicalizes URL",
+      "passed": true
+    },
+    {
+      "name": "Dialog has opaque light surface",
+      "passed": true
+    },
+    {
+      "name": "Dialog autofocus enters first permanent-label field",
+      "passed": true
+    },
+    {
+      "name": "Escape restores exact opener focus and filter",
+      "passed": true
+    },
+    {
+      "name": "Closing edit preserves list scroll position",
+      "passed": true
+    },
+    {
+      "name": "Recoverable error preserves typed content",
+      "passed": true
+    },
+    {
+      "name": "Edit preserves payload cents/date/version",
+      "passed": true
+    },
+    {
+      "name": "Pending submit locks cancel/fields/selects",
+      "passed": true,
+      "detail": {
+        "cancel": true,
+        "field": true,
+        "select": true
+      }
+    },
+    {
+      "name": "Pending dialog remains open through Escape",
+      "passed": true
+    },
+    {
+      "name": "Retry keeps attempt key and closes only after response",
+      "passed": true
+    },
+    {
+      "name": "Save return preserves filters",
+      "passed": true
+    },
+    {
+      "name": "Required field error remains next to field and takes focus",
+      "passed": true
+    },
+    {
+      "name": "Search without matches preserves filter and shows explicit result state",
+      "passed": true
+    },
+    {
+      "name": "Version conflict preserves sponsorship and actual version",
+      "passed": true
+    },
+    {
+      "name": "Required commission shows accessible inline error",
+      "passed": true
+    },
+    {
+      "name": "Create budget keeps empty cap as null",
+      "passed": true
+    },
+    {
+      "name": "500-record query scope explicitly disclosed",
+      "passed": true
+    },
+    {
+      "name": "Report links preserve current edition",
+      "passed": true
+    },
+    {
+      "name": "Desktop revenue contextual detail expands within the current ledger",
+      "passed": true
+    },
+    {
+      "name": "Desktop budget contextual detail expands within the current ledger",
+      "passed": true
+    },
+    {
+      "name": "Desktop sponsorship contextual detail expands within the current ledger",
+      "passed": true
+    },
+    {
+      "name": "Mobile revenue date retains native date input",
+      "passed": true
+    },
+    {
+      "name": "Mobile select is above dialog and inside viewport",
+      "passed": true,
+      "detail": {
+        "inside": true,
+        "x": 27,
+        "y": 500,
+        "bottom": 721.953125,
+        "right": 334.21875
+      }
+    },
+    {
+      "name": "Dialog keyboard focus stays within modal",
+      "passed": true
+    },
+    {
+      "name": "Mobile short viewport keeps footer/save accessible",
+      "passed": true,
+      "detail": {
+        "top": 373.1875,
+        "bottom": 468.59375
+      }
+    },
+    {
+      "name": "Mobile dialog scroll is local and page has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Reduced motion disables operational animations",
+      "passed": true
+    },
+    {
+      "name": "Loading keeps explicit status instead of financialzero",
+      "passed": true
+    },
+    {
+      "name": "No browser JavaScript errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "captures": [
+    "desktop-revenue-recoverable-error.png",
+    "desktop-revenue-required-error.png",
+    "desktop-revenue-search-empty.png",
+    "desktop-sponsorship-version-conflict.png",
+    "desktop-ledger-revenue-details.png",
+    "desktop-ledger-budget-details.png",
+    "desktop-ledger-sponsorship-details.png",
+    "mobile-revenue-select-focus.png",
+    "mobile-short-viewport-revenue.png",
+    "desktop-edit-budget.png",
+    "desktop-create-budget-line.png",
+    "notebook-edit-budget.png",
+    "notebook-create-budget-line.png",
+    "mobile-edit-budget.png",
+    "mobile-create-budget-line.png",
+    "mobile-state-loading-dashboard.png",
+    "desktop-ledger-budget-details-scrolled.png"
+  ]
+}

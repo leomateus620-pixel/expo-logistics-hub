@@ -448,7 +448,16 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
   const view: FinancialViewPath = Object.prototype.hasOwnProperty.call(VIEW_COPY, relativePath || 'dashboard')
     ? ((relativePath || 'dashboard') as FinancialViewPath)
     : 'dashboard';
+  useEffect(() => {
+    // Canonical entries retain the edition across sidebar links and browser history.
+    storeEdition(edition);
+    const params = new URLSearchParams(location.search);
+    if (params.get('edicao') === edition) return;
+    params.set('edicao', edition);
+    navigate({ pathname: location.pathname, search: params.toString() }, { replace: true });
+  }, [edition, location.pathname, location.search, navigate]);
   const changeEdition = (code: FinancialEditionCode) => {
+    if (code === edition) return;
     storeEdition(code);
     const params = new URLSearchParams(location.search);
     params.set('edicao', code);
@@ -458,7 +467,7 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
     <>
       <FinancialEditionSwitch value={edition} onChange={changeEdition} />
       {edition === '2028' ? (
-        <div key="2028" className="financial-operational-2028"><Financial2028Workspace view={view} /></div>
+        <div key="2028" className="financial-management-page financial-operational-2028"><Financial2028Workspace view={view} /></div>
       ) : (
         <Financial2026History key="2026" module={module} />
       )}
