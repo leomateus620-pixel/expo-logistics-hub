@@ -90,3 +90,6 @@ ALTER POLICY cronograma_evento_responsaveis_unit_write ON public.cronograma_even
 ALTER POLICY cronograma_evento_responsaveis_write ON public.cronograma_evento_responsaveis USING ((EXISTS ( SELECT 1
    FROM cronograma_eventos e
   WHERE ((e.id = cronograma_evento_responsaveis.event_id) AND ((get_user_org_role(auth.uid(), e.org_id) = ANY (ARRAY['admin'::org_role, 'gestor'::org_role, 'operador'::org_role])) OR has_capability(auth.uid(), e.org_id, 'cronograma_eventos_write'::text))))));
+
+-- 2026-10-07 (correção de criação): versão anterior de cronograma_eventos_select, sem a condição do criador:
+-- CREATE POLICY cronograma_eventos_select ON public.cronograma_eventos FOR SELECT USING (id IN (SELECT public.cronograma_visible_event_ids()));
