@@ -1,0 +1,9 @@
+# AGENTS.md — Mapa Comercial (frontend)
+
+- A cena externa e o corte dos pavilhões não montam atlas numéricos permanentes; a identificação contextual usa a seleção, enquanto a planta interna detalhada conserva sua numeração — por quê: manter o mapa navegável sem poluição e preservar a leitura da planta interna.
+- Navegação e damping, por si só, não reduzem o DPR do mapa. O controlador adaptativo existente conserva a resolução vigente durante a atividade e aplica a base mais recente após estabilização; mudanças de orçamento precisam de evidência de capacidade ou de viewport/modo — por quê: evitar perda de definição e realocação de buffers em cada gesto, preservando a adaptação sustentada e a recuperação de contexto.
+- A ficha interna de módulos mantém o destaque comercial fora dos detalhes recolhíveis e dimensiona seus elementos pela largura real da lateral, com estilos próprios do painel — por quê: o estado e as ações de venda não podem ficar ocultos nem cortados em telas estreitas.
+- O checkout comercial centraliza o cronograma inicial no utilitário de parcelas e recalcula apenas valores automáticos ao mudar o total — por quê: preservar edições manuais.
+- A entrada monetária de taxas interpreta inteiros como reais, enquanto a edição de parcelas conserva o modo em centavos — por quê: facilitar taxas sem alterar a interação existente das parcelas.
+- A inspeção de venda no mapa usa `useSaleInspectionStore` (realce próprio + enquadramento pelo CameraRig existente), nunca o carrinho de Vendas — por quê: lotes vendidos não podem entrar nas regras do carrinho.
+- O mapa completo não recarrega por foco nem por intervalo curto: `useCommercialMapRevision` consulta `commercial_map_revision` (assinatura leve) e só então recarrega; ações de venda usam `scheduleCommercialMapRefresh` (agrupado, sem cancelar carga em andamento) — por quê: recargas completas repetidas estouravam o limite de tempo do banco.
