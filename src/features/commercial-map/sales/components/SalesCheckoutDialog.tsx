@@ -17,6 +17,8 @@ import { uploadSaleLogo } from '../saleLogo';
 import { toast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { scheduleCommercialMapRefresh } from '../../queries/commercialMapRefresh';
+import { clearSaleAttempt, markSaleAttemptUncertain, resolveSaleAttempt, saleAttemptScope } from '../saleAttemptStore';
+import { SalesOrderError } from '../salesErrors';
 
 const STEPS = ['Expositor', 'Pagamento', 'Revisão'] as const;
 
@@ -50,8 +52,11 @@ export function SalesCheckoutDialog({ summary }: Props) {
   const totalCents = spacesCents + feesTotalCents(fees);
   const [payment, setPayment] = useState<SalesPaymentDraft>(() => initialSalesPayment(totalCents));
   const [advancing, setAdvancing] = useState(false);
-  // Chave de idempotência por tentativa de checkout: reenvio não duplica a venda.
-  const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID());
+  // Chave de idempotência por tentativa: guardada na sessão até um resultado confirmado.
+  const attemptScope = saleAttemptScope(selection.map((item) => item.lotId), stage);
+  const [attempt, setAttempt] = useState(() => resolveSaleAttempt(attemptScope));
+  const idempotencyKey = attempt.key;
+  useEffect(() => { if (attempt.scope !== attemptScope) setAttempt(resolveSaleAttempt(attemptScope)); }, [attempt.scope, attemptScope]);
 
   const checkout = useSalesCheckout();
   const autosave = useExhibitorAutosave(buyer, selection[0]?.lotId ?? null, open);
@@ -60,7 +65,7 @@ export function SalesCheckoutDialog({ summary }: Props) {
     if (open) {
       setStep(0);
       setShowErrors(false);
-      setIdempotencyKey(crypto.randomUUID());
+      setAttempt(resolveSaleAttempt(attemptScope));
       setPayment(initialSalesPayment(totalCents));
     } else if (!uploadingRef.current) { changeLogo(null, null); }
   // Reabrir reinicia somente a forma de pagamento; mudanças no total seguem o efeito abaixo.
@@ -93,7 +98,8 @@ export function SalesCheckoutDialog({ summary }: Props) {
     setShowErrors(false);
     if (step === 0) {
       setAdvancing(true);
-      await autosave.flush(); // falha no cadastro não bloqueia a venda (dados vão como cópia na venda)
+      // Cadastro complementar: espera curta; a venda leva os dados do expositor como cópia.
+      await autosave.flushWithin();
       setAdvancing(false);
     }
     setStep((current) => current + 1);
@@ -112,7 +118,15 @@ export function SalesCheckoutDialog({ summary }: Props) {
       installments: draftsToInstallments(payment.installments),
       expectedTotal: totalCents / 100,
     }, {
+      onError: (error) => {
+        if (error instanceof SalesOrderError && error.indeterminate) {
+          markSaleAttemptUncertain(idempotencyKey);
+          setAttempt((current) => ({ ...current, uncertain: true }));
+        }
+      },
       onSuccess: async (orderId) => {
+        clearSaleAttempt(idempotencyKey);
+        setAttempt(resolveSaleAttempt(`${attemptScope}|done:${orderId}`));
         if (logoImage) {
           uploadingRef.current = true;
           setLogoUploading(true);
