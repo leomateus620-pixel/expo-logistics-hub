@@ -24,7 +24,7 @@ describe('metragens oficiais dos lotes externos', () => {
     });
   });
 
-  it('confere subtotais por quadra e o total documental de 33.733,77 m²', () => {
+  it('confere subtotais por quadra e o total documental de 33.668,80 m² (após correção de 2026-10-07)', () => {
     const subtotals = new Map<string, number>();
     EXTERNAL_LOT_OFFICIAL_AREAS.forEach((lot) => {
       subtotals.set(lot.block, round2((subtotals.get(lot.block) ?? 0) + lot.officialAreaSqm));
@@ -34,12 +34,12 @@ describe('metragens oficiais dos lotes externos', () => {
     });
     expect(round2([...subtotals.values()].reduce((total, value) => total + value, 0)))
       .toBe(EXTERNAL_LOT_AREA_TOTAL_SQM);
-    expect(EXTERNAL_LOT_AREA_TOTAL_SQM).toBe(33733.77);
+    expect(EXTERNAL_LOT_AREA_TOTAL_SQM).toBe(33668.8);
   });
 
   it('resolve casos de risco pela combinação de quadra e número', () => {
     expect(getExternalLotOfficialArea('Q', 1)?.officialAreaSqm).toBe(283.00);
-    expect(getExternalLotOfficialArea('V', 6)?.officialAreaSqm).toBe(240.65);
+    expect(getExternalLotOfficialArea('V', 6)?.officialAreaSqm).toBe(239.05);
     expect(getExternalLotOfficialArea('T', 11)?.officialAreaSqm).toBe(244.51);
     expect(getExternalLotOfficialArea('U', 12)?.officialAreaSqm).toBe(244.51);
     expect(getExternalLotOfficialAreaByIdentifier('Q-D-11')?.officialAreaSqm).toBe(263.74);
@@ -91,5 +91,18 @@ describe('metragens oficiais dos lotes externos', () => {
     });
     expect(OFFICIAL_REFERENCE_DATA.entities.some((entity) => entity.publicIdentifier === 'RUA-INTERNA-QUADRA-G')).toBe(false);
     expect(OFFICIAL_REFERENCE_DATA.entities.find((entity) => entity.publicIdentifier === 'B40')).toBeUndefined();
+  });
+});
+
+describe('correção de área de 2026-10-07', () => {
+  it('aplica as nove áreas finais e preserva o Q-D-06', () => {
+    const expected: Record<string, number> = {
+      'Q-D-01': 194.30, 'Q-D-03': 195.25, 'Q-D-05': 193.57, 'Q-D-07': 194.98, 'Q-E-12': 174.12,
+      'Q-I-01': 204.37, 'Q-I-15': 207.71, 'Q-Q-06': 189.38, 'Q-V-06': 239.05,
+    };
+    Object.entries(expected).forEach(([id, area]) => expect(getExternalLotOfficialAreaByIdentifier(id)?.officialAreaSqm).toBe(area));
+    expect(getExternalLotOfficialAreaByIdentifier('Q-D-06')?.officialAreaSqm).toBe(208.96);
+    const six = ['Q-D-05', 'Q-E-12', 'Q-I-15', 'Q-I-01', 'Q-Q-06', 'Q-V-06'];
+    expect(Math.round(six.reduce((t, id) => t + expected[id], 0) * 100) / 100).toBe(1208.2);
   });
 });
