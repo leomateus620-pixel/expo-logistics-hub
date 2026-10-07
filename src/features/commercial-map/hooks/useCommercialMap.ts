@@ -50,6 +50,7 @@ import {
 import { resolveMapPermissions } from '../utils/permissions';
 import { resolveContextualMapScope } from '../utils/contextualMapSummary';
 import { getCommercialMapSegment } from '../data/commercialMapSegments';
+import { scheduleCommercialMapRefresh } from '../queries/commercialMapRefresh';
 
 const MAP_ERROR_MESSAGES: Record<string, string> = {
   MAP_PERMISSION_DENIED: 'Você não possui permissão para concluir esta operação.',
@@ -263,7 +264,7 @@ export function useFilteredMapEntities(entities: MapEntity[], lots: CommercialLo
 export function useMapMutations() {
   const queryClient = useQueryClient();
   const { orgId } = useCurrentOrg();
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['commercial-map'] });
+  const invalidate = () => scheduleCommercialMapRefresh(queryClient);
   const errorMessage = mapErrorMessage;
 
   const bootstrap = useMutation({

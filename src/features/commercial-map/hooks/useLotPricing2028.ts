@@ -5,6 +5,7 @@ import {
   setLotPriceOverride,
   type LotPriceOverrideStage,
 } from '../services/lotPricing2028Service';
+import { scheduleCommercialMapRefresh } from '../queries/commercialMapRefresh';
 
 /** Valores oficiais 2028 (Renovação e 2ª Etapa) do lote selecionado. */
 export function useLotPricing2028(lotId: string | null) {
@@ -28,7 +29,7 @@ export function useLotPriceOverride(lotId: string | null) {
     onSuccess: () => {
       // A gravação já terminou: não mantenha o formulário bloqueado enquanto
       // as demais leituras do mapa se atualizam em segundo plano.
-      void queryClient.invalidateQueries({ queryKey: ['commercial-map'] });
+      void scheduleCommercialMapRefresh(queryClient);
     },
   });
 }
