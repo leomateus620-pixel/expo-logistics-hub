@@ -933,19 +933,23 @@ export default function CronogramaEventosPage() {
         {filteredEvents.length} de {eventsForView.length} eventos exibidos na visão atual.
       </p>
 
-      {(cronograma.isSeedFallback || cronograma.pendingRelationshipCount > 0) && !cronograma.isLoading && (
+      {(cronograma.isSeedFallback || cronograma.listRefreshFailed || cronograma.pendingRelationshipCount > 0) && !cronograma.isLoading && (
         <div className="cronograma-sync-alert" role={cronograma.isSeedFallback ? 'alert' : 'status'}>
           <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold">
               {cronograma.pendingRelationshipCount > 0
                 ? `${cronograma.pendingRelationshipCount} ${cronograma.pendingRelationshipCount === 1 ? 'conexão aguarda' : 'conexões aguardam'} sincronização`
-                : 'Exibindo a base oficial consolidada'}
+                : cronograma.listRefreshFailed && !cronograma.isSeedFallback
+                  ? 'A lista não foi atualizada agora'
+                  : 'Exibindo a base oficial consolidada'}
             </p>
             <p className="mt-0.5 text-xs opacity-80">
               {cronograma.pendingRelationshipCount > 0
                 ? 'Os rascunhos estão preservados neste dispositivo e sairão da fila somente após confirmação do servidor.'
-                : 'A sincronização online não respondeu. Nenhum dado foi descartado.'}
+                : cronograma.listRefreshFailed && !cronograma.isSeedFallback
+                  ? 'Mostrando a última versão carregada. Você pode continuar cadastrando e editando eventos.'
+                  : 'A sincronização online não respondeu. Nenhum dado foi descartado.'}
             </p>
           </div>
           <Button
