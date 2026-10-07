@@ -77,3 +77,16 @@ ALTER POLICY map_geometries_manage ON public.map_entity_geometries USING ((EXIST
 ALTER POLICY map_geometries_select ON public.map_entity_geometries USING ((EXISTS ( SELECT 1
    FROM map_projects p
   WHERE ((p.id = map_entity_geometries.project_id) AND (p.org_id IN ( SELECT map_viewable_org_ids() AS map_viewable_org_ids))))));
+ALTER POLICY cronograma_subeventos_write ON public.cronograma_subeventos USING ((EXISTS ( SELECT 1
+   FROM cronograma_eventos e
+  WHERE ((e.id = cronograma_subeventos.parent_event_id) AND is_org_member(auth.uid(), e.org_id) AND ((get_user_org_role(auth.uid(), e.org_id) = ANY (ARRAY['admin'::org_role, 'gestor'::org_role, 'operador'::org_role])) OR has_capability(auth.uid(), e.org_id, 'cronograma_eventos_write'::text))))));
+ALTER POLICY cronograma_evento_comissoes_unit_write ON public.cronograma_evento_comissoes USING (((commission_id IS NOT NULL) AND cronograma_unit_can_manage(auth.uid(), commission_id)));
+ALTER POLICY cronograma_evento_comissoes_write ON public.cronograma_evento_comissoes USING ((EXISTS ( SELECT 1
+   FROM cronograma_eventos e
+  WHERE ((e.id = cronograma_evento_comissoes.event_id) AND ((get_user_org_role(auth.uid(), e.org_id) = ANY (ARRAY['admin'::org_role, 'gestor'::org_role, 'operador'::org_role])) OR has_capability(auth.uid(), e.org_id, 'cronograma_eventos_write'::text))))));
+ALTER POLICY cronograma_evento_responsaveis_unit_write ON public.cronograma_evento_responsaveis USING ((EXISTS ( SELECT 1
+   FROM cronograma_evento_comissoes l
+  WHERE ((l.event_id = cronograma_evento_responsaveis.event_id) AND (l.commission_id IS NOT NULL) AND cronograma_unit_can_manage(auth.uid(), l.commission_id)))));
+ALTER POLICY cronograma_evento_responsaveis_write ON public.cronograma_evento_responsaveis USING ((EXISTS ( SELECT 1
+   FROM cronograma_eventos e
+  WHERE ((e.id = cronograma_evento_responsaveis.event_id) AND ((get_user_org_role(auth.uid(), e.org_id) = ANY (ARRAY['admin'::org_role, 'gestor'::org_role, 'operador'::org_role])) OR has_capability(auth.uid(), e.org_id, 'cronograma_eventos_write'::text))))));
