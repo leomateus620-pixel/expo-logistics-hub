@@ -41,6 +41,7 @@ describe('classificação de falhas da abertura', () => {
     expect(commercialMapRetryDelay(3, {}, () => 0.5)).toBe(4000);
     expect(commercialMapRetryDelay(1, {}, () => 0)).toBe(800);
     expect(commercialMapRetryDelay(1, { retryAfter: '3' })).toBe(3000);
+    expect(commercialMapRetryDelay(1, { code: '57014', message: 'timeout' }, () => 0.5)).toBe(2000);
   });
 });
 
@@ -93,6 +94,9 @@ describe('primeira consulta falha e a seguinte funciona', () => {
     await vi.advanceTimersByTimeAsync(0);
     expect(observer.getCurrentResult().status).toBe('pending');
     expect(observer.getCurrentResult().failureCount).toBe(1);
+    // Servidor ocupado (tempo esgotado): espera mínima de 2 s antes da nova tentativa.
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(observer.getCurrentResult().data).toBeUndefined();
     await vi.advanceTimersByTimeAsync(1000);
     expect(observer.getCurrentResult().data).toBe('ok');
     expect(states).not.toContain('error');

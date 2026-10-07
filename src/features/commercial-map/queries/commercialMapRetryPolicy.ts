@@ -52,11 +52,14 @@ export function retryAfterMs(error: unknown): number | null {
   return Number.isFinite(date) ? Math.max(0, Math.min(date - Date.now(), COMMERCIAL_MAP_RETRY_MAX_DELAY_MS * 3)) : null;
 }
 
-/** 1 s, 2 s, 4 s, 8 s (teto 10 s) com ±20% de variação; Retry-After prevalece. */
+/** 1 s, 2 s, 4 s, 8 s (teto 10 s) com ±20% de variação; Retry-After prevalece.
+ *  Servidor ocupado (tempo esgotado/503/429) espera no mínimo 2 s para não somar carga. */
 export function commercialMapRetryDelay(failureCount: number, error: unknown, random: () => number = Math.random): number {
   const hinted = retryAfterMs(error);
   if (hinted !== null) return hinted;
-  const base = Math.min(COMMERCIAL_MAP_RETRY_BASE_MS * 2 ** Math.max(0, failureCount - 1), COMMERCIAL_MAP_RETRY_MAX_DELAY_MS);
+  const kind = classifyCommercialMapFailure(error);
+  const floor = kind === 'timeout' || kind === 'temporary' ? 2_000 : 0;
+  const base = Math.max(floor, Math.min(COMMERCIAL_MAP_RETRY_BASE_MS * 2 ** Math.max(0, failureCount - 1), COMMERCIAL_MAP_RETRY_MAX_DELAY_MS));
   return Math.round(base * (0.8 + random() * 0.4));
 }
 

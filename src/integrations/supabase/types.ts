@@ -10955,6 +10955,7 @@ export type Database = {
         Args: { _sheet: string }
         Returns: boolean
       }
+      cronograma_managed_commission_ids: { Args: never; Returns: string[] }
       cronograma_reorder_subevents: {
         Args: { event_id: string; ordered_ids: string[] }
         Returns: Json
@@ -11020,6 +11021,7 @@ export type Database = {
         Args: { _commission_id: string; _user_id: string }
         Returns: boolean
       }
+      cronograma_unit_event_ids: { Args: never; Returns: string[] }
       cronograma_unit_metrics: {
         Args: { _commission_id: string }
         Returns: {
@@ -11030,6 +11032,8 @@ export type Database = {
           upcoming: number
         }[]
       }
+      cronograma_visible_event_ids: { Args: never; Returns: string[] }
+      cronograma_writable_event_ids: { Args: never; Returns: string[] }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -11275,6 +11279,7 @@ export type Database = {
         }[]
       }
       map_accessible_segment_ids: { Args: never; Returns: string[] }
+      map_any_visible_lot_ids: { Args: never; Returns: string[] }
       map_can_access_segment: {
         Args: { _segment_id: string }
         Returns: boolean
@@ -11283,7 +11288,12 @@ export type Database = {
         Args: { _project_id: string }
         Returns: boolean
       }
+      map_capable_lot_ids: { Args: { _capability: string }; Returns: string[] }
       map_capable_org_ids: { Args: { _capability: string }; Returns: string[] }
+      map_capable_project_ids: {
+        Args: { _capability: string }
+        Returns: string[]
+      }
       map_entity_inherits_segment: {
         Args: { _entity_id: string; _segment_id: string }
         Returns: boolean
@@ -11305,6 +11315,13 @@ export type Database = {
         Args: { _boundary_data: Json; _key: string }
         Returns: number
       }
+      map_segment_entities: {
+        Args: never
+        Returns: {
+          id: string
+          project_id: string
+        }[]
+      }
       map_segment_is_complete: {
         Args: { _segment_id: string }
         Returns: boolean
@@ -11317,7 +11334,10 @@ export type Database = {
         Args: { _segment_id: string }
         Returns: number
       }
+      map_segment_lot_ids: { Args: never; Returns: string[] }
+      map_viewable_lot_ids: { Args: never; Returns: string[] }
       map_viewable_org_ids: { Args: never; Returns: string[] }
+      map_viewable_project_ids: { Args: never; Returns: string[] }
       merge_commercial_lots: {
         Args: {
           p_display_name: string
