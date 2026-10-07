@@ -197,6 +197,11 @@ export function SalesCheckoutDialog({ summary }: Props) {
           >
             {step === 0 ? 'Cancelar' : 'Voltar'}
           </Button>
+          {attempt.uncertain && step === 2 && !checkout.isPending && (
+            <p role="status" className="w-full text-sm text-muted-foreground">
+              Resultado ainda não confirmado. Verificar reenvia a mesma tentativa: se a venda já foi gravada, ela é devolvida sem duplicar.
+            </p>
+          )}
           {step < 2 ? (
              <Button type="button" className="h-11 flex-1 rounded-xl" disabled={advancing || logoUploading} onClick={() => { void advance(); }}>
               {advancing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -210,7 +215,7 @@ export function SalesCheckoutDialog({ summary }: Props) {
               onClick={confirm}
             >
               {checkout.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Registrar venda em aberto
+              {attempt.uncertain ? 'Verificar resultado da venda' : 'Registrar venda em aberto'}
             </Button>
           )}
         </div>
