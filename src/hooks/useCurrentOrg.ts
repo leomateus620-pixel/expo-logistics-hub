@@ -71,8 +71,13 @@ export function useCurrentOrg() {
     staleTime: 60000,
     // Cache restaurado de outra carga da página não libera acesso: confirma no servidor.
     refetchOnMount: (query) => (query.state.dataUpdatedAt < PAGE_SESSION_STARTED_AT ? 'always' : true),
-    retry: 2,
-    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 5000),
+    // Falhas de rede/servidor ocupado: até 6 novas tentativas (~30 s) antes de mostrar erro.
+    retry: (failureCount, error: any) => {
+      const code = String(error?.code ?? '');
+      if (code === '42501' || code === 'PGRST301' || /JWT/i.test(String(error?.message ?? ''))) return failureCount < 1;
+      return failureCount < 6;
+    },
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000) * (0.8 + Math.random() * 0.4),
   });
 
   const createOrgMutation = useMutation({
@@ -93,13 +98,16 @@ export function useCurrentOrg() {
   const myRole = membership?.role || null;
 
   // Estados separados: carregando, erro de verificação e ausência de acesso.
-  // Um vínculo só libera a rota se foi confirmado pelo servidor nesta carga da página;
-  // uma revalidação que falha depois disso é transitória e não desmonta a tela
-  // (preserva rascunhos). Cache antigo restaurado nunca libera acesso sozinho.
+  // Um vínculo é liberado quando confirmado pelo servidor nesta carga da página.
+  // Se a verificação falhar por instabilidade e já houver vínculo deste mesmo
+  // usuário em cache (a chave inclui o user id), a tela segue utilizável: o
+  // servidor continua conferindo a permissão em cada leitura (RLS), então o
+  // cache nunca amplia acesso a dados. Sem cache, a falha mostra o erro.
   const confirmedThisPage = dataUpdatedAt >= PAGE_SESSION_STARTED_AT;
-  const verificationError = !!user && isError && !confirmedThisPage;
+  const cachedFallback = !!user && isError && !confirmedThisPage && !!membership;
+  const verificationError = !!user && isError && !confirmedThisPage && !membership;
   const isResolving = authLoading || (!!user && !confirmedThisPage && !isError);
-  const hasVerifiedOrg = !!membership && confirmedThisPage;
+  const hasVerifiedOrg = !!membership && (confirmedThisPage || cachedFallback);
 
   return {
     orgId,
