@@ -70,6 +70,10 @@ function normalize(err: unknown): CronogramaRpcError {
     const code = codeMessages[candidate] ? candidate : 'CRONOGRAMA_UNKNOWN';
     return new CronogramaRpcError(code, codeMessages[code], match[2]?.trim() || (code === 'CRONOGRAMA_UNKNOWN' ? raw : undefined));
   }
+  const pgCode = String((err as { code?: string })?.code ?? '');
+  if (pgCode === '42501' || /row-level security/i.test(raw)) {
+    return new CronogramaRpcError('CRONOGRAMA_PERMISSION_DENIED', codeMessages.CRONOGRAMA_PERMISSION_DENIED, raw);
+  }
   return new CronogramaRpcError('CRONOGRAMA_UNKNOWN', codeMessages.CRONOGRAMA_UNKNOWN, raw);
 }
 
