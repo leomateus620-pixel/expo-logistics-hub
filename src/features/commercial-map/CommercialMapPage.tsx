@@ -276,7 +276,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     open: dashboardOpen,
     enabled: !isPreview && !isCommissionScope && permissions.canViewMapAnalytics,
     isFetching: mapQuery.isFetching,
-    refetch: () => checkMapRevision(),
+    refetch: checkMapRevision,
   });
 
   useEffect(() => () => {
