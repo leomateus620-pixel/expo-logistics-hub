@@ -676,6 +676,14 @@ function isWritableRole(role: string | null) {
   return role === 'admin' || role === 'gestor' || role === 'operador';
 }
 
+/** Tabela/visão/coluna ausente: indisponibilidade comprovada da Agenda persistida. */
+export function isStructuralCronogramaReadError(error: unknown): boolean {
+  const code = (error as { code?: string } | null)?.code ?? '';
+  const message = String((error as { message?: string } | null)?.message ?? error ?? '');
+  return ['42P01', '42703', 'PGRST205', 'PGRST204'].includes(code)
+    || /relation .* does not exist|schema cache/i.test(message);
+}
+
 function errorMessage(error: unknown, fallback: string) {
   if (error instanceof Error && error.message) return error.message;
   if (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string') {
@@ -804,11 +812,14 @@ export function useCronogramaEventos() {
         setRelationshipsUnavailable(false);
         return dataset;
       } catch (error) {
-        setDbUnavailable(true);
+        // Só uma indisponibilidade comprovada (estrutura ausente) bloqueia gravações.
+        // Falha transitória de leitura vira "lista não atualizada", com nova tentativa.
+        if (isStructuralCronogramaReadError(error)) setDbUnavailable(true);
         throw error;
       }
     },
-    retry: false,
+    retry: (failureCount, error) => failureCount < 1 && !isStructuralCronogramaReadError(error),
+    retryDelay: 1500,
   });
 
   const seedOfficialData = useMutation({
@@ -829,8 +840,8 @@ export function useCronogramaEventos() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
     },
-    onError: () => {
-      setDbUnavailable(true);
+    onError: (error) => {
+      if (isStructuralCronogramaReadError(error)) setDbUnavailable(true);
     },
   });
   const { isPending: isSeedingOfficialData, mutate: seedMissingOfficialData } = seedOfficialData;
@@ -1397,6 +1408,8 @@ export function useCronogramaEventos() {
     isRefreshing: query.isFetching,
     isSeedFallback,
     error: query.error,
+    /** A lista não atualizou, mas os dados já carregados e a gravação continuam válidos. */
+    listRefreshFailed: query.isError && Boolean(query.data),
     refetch: query.refetch,
     canManage: canWriteCronograma,
     canWriteEvents,

@@ -216,6 +216,8 @@ export interface CommercialLot {
   currentSaleStatus?: 'OPEN' | 'CONFIRMED' | null;
   /** Mais de uma venda ativa no mesmo lote: nenhum comprador é escolhido. */
   buyerConflict?: boolean;
+  /** A consulta autorizada de compradores falhou: não afirmar ausência de comprador. */
+  buyerIdentityUnavailable?: boolean;
   saleLogoUrl?: string | null;
   reservationExpiresAt: string | null;
   saleDate: string | null;
@@ -260,6 +262,8 @@ export interface CommercialMapData {
   layers: MapLayer[];
   entities: MapEntity[];
   lots: CommercialLot[];
+  /** Assinatura do estado comercial lida no início desta carga (mapa completo). */
+  revision?: string | null;
   /** Commission scope only: off-segment park geometry for normal and visit views (never commercial data). */
   parkContextEntities?: MapEntity[];
   scope?: {

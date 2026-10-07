@@ -8,12 +8,15 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCapabilities } from '@/hooks/useCapabilities';
 import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
+import { fetchSaleLogoUrls } from '../sales/saleLogo';
+import { applyLotBuyerSummary, markLotBuyerIdentityUnavailable } from '../utils/lotBuyerSummary';
 import { toast } from 'sonner';
 import {
   applyExporuralReference,
   bootstrapOfficialReference,
   createCommercialLot,
   signedReferenceUrl,
+  fetchLotBuyerSummary,
   fetchLotActivity,
   fetchLotSaleHistory,
   fetchLotContractVersions,
@@ -168,8 +171,43 @@ export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIA
     staleTime: 50 * 60_000,
     meta: { persist: false },
   });
-  const data = useMemo(() => query.data && reference.data?.referenceImageUrl
-    ? { ...query.data, calibration: reference.data } : query.data, [query.data, reference.data]);
+  // Complementos fora do caminho crítico: o inventário aparece sem esperar por eles.
+  const projectId = query.data?.source === 'database' ? query.data.project?.id ?? null : null;
+  const buyers = useQuery({
+    queryKey: ['commercial-map', 'lot-buyers', user?.id, orgId, projectId, query.dataUpdatedAt],
+    queryFn: ({ signal }) => measureCommercialMapStage('lot-buyers', () => fetchLotBuyerSummary(projectId!, signal)),
+    enabled: Boolean(user && orgId && projectId),
+    staleTime: 30_000,
+    placeholderData: (previous) => previous,
+    retry: 1,
+    meta: { persist: false },
+  });
+  const logos = useQuery({
+    queryKey: ['commercial-map', 'sale-logos', user?.id, orgId, projectId],
+    queryFn: () => measureCommercialMapStage('sale-logos', () => fetchSaleLogoUrls({ projectId: projectId! })),
+    enabled: Boolean(user && orgId && projectId),
+    staleTime: 10 * 60_000,
+    placeholderData: (previous) => previous,
+    meta: { persist: false },
+  });
+  const data = useMemo(() => {
+    if (!query.data) return query.data;
+    const base = reference.data?.referenceImageUrl ? { ...query.data, calibration: reference.data } : query.data;
+    if (!projectId) return base;
+    const buyerRows = buyers.data;
+    const buyerFailed = buyers.isError && !buyerRows;
+    const logoUrls = logos.data ?? {};
+    if (!buyerRows && !buyerFailed && !logos.data) return base;
+    return {
+      ...base,
+      lots: base.lots.map((lot) => {
+        let next = buyerRows ? applyLotBuyerSummary(lot, buyerRows.get(lot.id)) : buyerFailed ? markLotBuyerIdentityUnavailable(lot) : lot;
+        const logo = next.status === 'SOLD' ? logoUrls[next.id] ?? null : null;
+        if (logo !== (next.saleLogoUrl ?? null)) next = { ...next, saleLogoUrl: logo };
+        return next;
+      }),
+    };
+  }, [query.data, reference.data, projectId, buyers.data, buyers.isError, logos.data]);
   return { ...query, data };
 }
 

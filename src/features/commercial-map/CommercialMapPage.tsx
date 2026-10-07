@@ -273,8 +273,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     }
   }, [dashboardOpen]);
 
-  const checkMapRevision = useCommercialMapRevision({
+  const mapRevision = useCommercialMapRevision({
     projectId: mapQuery.data?.source === 'database' ? mapQuery.data.project?.id : null,
+    dataRevision: mapQuery.data?.revision ?? null,
     enabled: !isPreview && !isCommissionScope,
     isFetching: mapQuery.isFetching,
     hasError: mapQuery.isError,
@@ -284,7 +285,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     open: dashboardOpen,
     enabled: !isPreview && !isCommissionScope && permissions.canViewMapAnalytics,
     isFetching: mapQuery.isFetching,
-    refetch: checkMapRevision,
+    refetch: mapRevision.check,
   });
 
   useEffect(() => () => {
@@ -888,11 +889,11 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
           </>
         )}
 
-        {!isPreview && mapQuery.isError && (
+        {!isPreview && (mapQuery.isError || mapRevision.unconfirmed) && (
           <div className="commercial-map-sync-warning" role="status" data-sync-failure={syncFailureKind(mapQuery.error)}>
             <AlertTriangle />
             <span>
-              <strong>Atualização temporariamente indisponível</strong>
+              <strong>{mapQuery.isError ? 'Atualização temporariamente indisponível' : 'Atualização não confirmada'}</strong>
               O último mapa válido permanece ativo.
               {mapQuery.dataUpdatedAt > 0 && ` Última atualização às ${new Date(mapQuery.dataUpdatedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}`}
               {syncFailureKind(mapQuery.error) === 'timeout' ? ' · servidor demorou a responder.' : syncFailureKind(mapQuery.error) === 'network' ? ' · sem conexão.' : ''}

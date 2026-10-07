@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
 const ORG_KEY = 'fenasoja_org_id';
+/** Vínculos restaurados do cache persistido (antes desta carga da página) não contam como verificados. */
+const PAGE_SESSION_STARTED_AT = Date.now();
 
 function readOrgKey(): string | null {
   try {
@@ -37,6 +39,8 @@ export function useCurrentOrg() {
     isLoading,
     isError,
     isFetching,
+    dataUpdatedAt,
+    refetch,
   } = useQuery({
     queryKey: ['my-org-membership', user?.id],
     queryFn: async () => {
@@ -65,6 +69,8 @@ export function useCurrentOrg() {
     },
     enabled: !!user,
     staleTime: 60000,
+    // Cache restaurado de outra carga da página não libera acesso: confirma no servidor.
+    refetchOnMount: (query) => (query.state.dataUpdatedAt < PAGE_SESSION_STARTED_AT ? 'always' : true),
     retry: 2,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 5000),
   });
@@ -86,12 +92,14 @@ export function useCurrentOrg() {
   const orgName = (membership?.organizations as any)?.nome || '';
   const myRole = membership?.role || null;
 
-  // A chave inclui user.id: uma revalidação com vínculo já confirmado pertence
-  // à mesma sessão e não deve desmontar a rota protegida. A hidratação inicial,
-  // a ausência de vínculo e os erros continuam indeterminados/fail-closed.
-  const isResolving = authLoading
-    || (!!user && (isLoading || (isFetching && !membership)))
-    || isError;
+  // Estados separados: carregando, erro de verificação e ausência de acesso.
+  // Um vínculo só libera a rota se foi confirmado pelo servidor nesta carga da página;
+  // uma revalidação que falha depois disso é transitória e não desmonta a tela
+  // (preserva rascunhos). Cache antigo restaurado nunca libera acesso sozinho.
+  const confirmedThisPage = dataUpdatedAt >= PAGE_SESSION_STARTED_AT;
+  const verificationError = !!user && isError && !confirmedThisPage;
+  const isResolving = authLoading || (!!user && !confirmedThisPage && !isError);
+  const hasVerifiedOrg = !!membership && confirmedThisPage;
 
   return {
     orgId,
@@ -100,7 +108,9 @@ export function useCurrentOrg() {
     membership,
     isLoading: isResolving,
     isError,
-    hasOrg: !!membership,
+    verificationError,
+    retryVerification: () => refetch(),
+    hasOrg: hasVerifiedOrg,
     createOrg: createOrgMutation.mutateAsync,
     isCreating: createOrgMutation.isPending,
   };

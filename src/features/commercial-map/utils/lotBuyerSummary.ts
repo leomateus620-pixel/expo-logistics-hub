@@ -26,3 +26,9 @@ export function applyLotBuyerSummary(lot: CommercialLot, row: LotBuyerSummaryRow
   const status = row.sale_status === 'CONFIRMED' || row.sale_status === 'OPEN' ? row.sale_status : null;
   return { ...lot, currentBuyer: name ?? lot.currentBuyer, currentSaleStatus: status ?? lot.currentSaleStatus ?? null };
 }
+
+/** Consulta de compradores indisponível: lotes em venda sem nome conhecido ficam sinalizados, nunca "sem comprador". */
+export function markLotBuyerIdentityUnavailable(lot: CommercialLot): CommercialLot {
+  const isSaleState = lot.status === 'SOLD' || lot.status === 'SALE_OPEN';
+  return isSaleState && !lot.currentBuyer ? { ...lot, buyerIdentityUnavailable: true } : lot;
+}
