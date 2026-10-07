@@ -10955,6 +10955,7 @@ export type Database = {
         Args: { _sheet: string }
         Returns: boolean
       }
+      cronograma_managed_commission_ids: { Args: never; Returns: string[] }
       cronograma_reorder_subevents: {
         Args: { event_id: string; ordered_ids: string[] }
         Returns: Json
@@ -11020,6 +11021,7 @@ export type Database = {
         Args: { _commission_id: string; _user_id: string }
         Returns: boolean
       }
+      cronograma_unit_event_ids: { Args: never; Returns: string[] }
       cronograma_unit_metrics: {
         Args: { _commission_id: string }
         Returns: {
@@ -11031,6 +11033,7 @@ export type Database = {
         }[]
       }
       cronograma_visible_event_ids: { Args: never; Returns: string[] }
+      cronograma_writable_event_ids: { Args: never; Returns: string[] }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
