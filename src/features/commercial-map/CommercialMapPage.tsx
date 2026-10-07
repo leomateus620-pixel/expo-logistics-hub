@@ -33,7 +33,8 @@ import { useCommercialMapStore } from './state/useCommercialMapStore';
 import { useVisitStore } from './visit/useVisitStore';
 import { VisitOverlay } from './visit/VisitOverlay';
 import { preloadCommercialMapCanvas } from './utils/preloadCanvas';
-const CommercialMapCanvas = lazy(preloadCommercialMapCanvas);
+// Arquivo da cena desatualizado após publicação: uma única recarga protegida.
+const CommercialMapCanvas = lazyWithRetry(preloadCommercialMapCanvas as never) as unknown as ReturnType<typeof lazy<typeof import('./components/CommercialMapCanvas').default>>;
 import { CommercialMapRendererStatus } from './components/CommercialMapRendererStatus';
 import { MapToolbar } from './components/controls/MapToolbar';
 import { CommercialMapTopBar } from './components/controls/CommercialMapTopBar';
@@ -103,10 +104,10 @@ function MapFeatureBoundary({ id, children }: { id: string; children: ReactNode 
   </MapPanelBoundary>;
 }
 
-function MapPageSkeleton() {
+function MapPageSkeleton({ recovering = false }: { recovering?: boolean }) {
   return (
     <div className="commercial-map-shell is-loading">
-      <CommercialMapBootLoader force />
+      <CommercialMapBootLoader force recovering={recovering} />
     </div>
   );
 }
@@ -488,7 +489,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     || permissions.canManageLots
     || permissions.canEditGeometry
     || permissions.canViewMapAnalytics;
-  if (!isPreview && mapQuery.isLoading) return <MapPageSkeleton />;
+  // Enquanto a política de tentativas trabalha, a consulta segue pendente: mostra
+  // "Reconectando…" sem a tela terminal. A falha só aparece ao fim das tentativas.
+  if (!isPreview && mapQuery.isLoading) return <MapPageSkeleton recovering={mapQuery.failureCount > 0} />;
   if (!data) {
     const commissionFailure = isCommissionScope
       ? /MAP_PERMISSION_DENIED|42501|403/i.test(String(mapQuery.error ?? ''))

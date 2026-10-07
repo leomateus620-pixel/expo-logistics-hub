@@ -1,7 +1,7 @@
 import type { LotBuyerSummaryRow } from '../utils/lotBuyerSummary';
 import { buyerDisplayName } from '../utils/buyerDisplayName';
 import { captureCommercialMapStageRecorder, type CommercialMapStageRecorder } from '../utils/performanceDiagnostics';
-import { awaitCommercialMapRequest, measureCommercialMapOperation, throwIfMapRequestAborted } from '../utils/commercialMapOperation';
+import { awaitCommercialMapRequest, boundedSignal, measureCommercialMapOperation, throwIfMapRequestAborted } from '../utils/commercialMapOperation';
 import { supabase } from '@/integrations/supabase/client';
 import { OFFICIAL_REFERENCE_DATA, OFFICIAL_REFERENCE_REVISION } from '../data/officialReference2026';
 import { reconcileExporuralReference } from '../data/reconcileExporuralReference';

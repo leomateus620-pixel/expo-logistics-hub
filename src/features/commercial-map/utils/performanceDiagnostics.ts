@@ -163,13 +163,15 @@ export function markCommercialMapStage(name: string, duration?: number, failed?:
   if (typeof window === 'undefined' || !bootActive) return;
   const at = performance.now();
   const first = snapshot.marks[name] === undefined;
-  if (first || failed || (name === 'essential-data:end' && snapshot.failed)
+  // Falha de uma tentativa de dados não é falha terminal: quem decide é a política
+  // de tentativas da consulta. Só a preparação visual marca falha aqui.
+  if (first || (failed && name === 'essential-scene:failed')
     || (name === 'commercial-map-ready' && !snapshot.commercialMapReady)
     || (name === 'first-interactive' && !snapshot.interactive)) {
     snapshot = { ...snapshot, marks: first ? { ...snapshot.marks, [name]: at } : snapshot.marks,
       interactive: snapshot.interactive || name === 'first-interactive',
       commercialMapReady: snapshot.commercialMapReady || name === 'commercial-map-ready',
-      failed: name === 'essential-data:end' || name === 'essential-scene:failed' ? Boolean(failed) : snapshot.failed };
+      failed: name === 'essential-scene:failed' ? true : snapshot.failed };
     notifyBootListeners();
   }
   const markName = PREFIX + name;
