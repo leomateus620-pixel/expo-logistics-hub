@@ -15,6 +15,13 @@
       "when": 1791391873846,
       "tag": "0001_rls_set_based_agenda_writes",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791397580827,
+      "tag": "0002_cronograma_eventos_select_creator_row",
+      "breakpoints": true
     }
   ]
 }
