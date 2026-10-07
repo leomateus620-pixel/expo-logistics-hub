@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { recordCommercialMapSync } from '../queries/commercialMapRefresh';
+import { useSalesStore } from '../sales/useSalesSelection';
 
 export const COMMERCIAL_MAP_REVISION_INTERVAL_MS = 60_000;
 /** Falhas seguidas ou tempo sem verificação bem-sucedida que tornam a atualização "não confirmada". */
@@ -71,6 +72,8 @@ export function useCommercialMapRevision({ projectId, dataRevision, enabled, isF
   const check = useCallback(async () => {
     if (!enabled || !projectId || checking.current || latest.current.isFetching) return;
     if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return;
+    // Modo Vendas aberto: não disputa o servidor com o carrinho; retoma ao sair.
+    if (useSalesStore.getState().salesModeActive) return;
     checking.current = true;
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), REVISION_TIMEOUT_MS);
@@ -93,7 +96,8 @@ export function useCommercialMapRevision({ projectId, dataRevision, enabled, isF
       const since = lastConfirmed.current ?? null;
       const tooOld = since !== null && latest.current.now() - since >= COMMERCIAL_MAP_REVISION_STALE_MS;
       recordCommercialMapSync('revision-failed', { failures: failures.current });
-      if (failures.current >= COMMERCIAL_MAP_REVISION_MAX_FAILURES || tooOld) {
+      // Um tempo esgotado isolado nunca exibe aviso.
+      if (failures.current >= COMMERCIAL_MAP_REVISION_MAX_FAILURES || (tooOld && failures.current >= 2)) {
         setUnconfirmed(true);
         await recover('revision-failures').catch(() => undefined);
       }

@@ -41,9 +41,9 @@ export function AttachOrderContractDialog({ orgId, orderId, items, contract, onC
     try {
       await attachOrderContract({ orgId, orderId, lotIds, file, contractNumber: number, contractId: contract?.contractId ?? null,
         onProgress: (p) => { if (p !== 'done') setPhase(p); } });
-      setPhase('refresh');
-      await onAttached();
+      // Vínculo já persistido: fecha na hora e atualiza as listas em segundo plano.
       onClose();
+      void Promise.resolve(onAttached()).catch(() => undefined);
     } catch (e) {
       setError(describeSalesError(e));
     } finally { submitting.current = false; setPhase('idle'); }

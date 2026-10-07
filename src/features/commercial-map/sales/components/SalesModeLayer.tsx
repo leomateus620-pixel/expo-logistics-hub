@@ -28,7 +28,7 @@ export function SalesModeLayer({ projectId, lots, entities = [] }: { projectId: 
   const [sheetOpen, setSheetOpen] = useState(false);
   const previousVisuals = useRef<{ trees: boolean; night: boolean } | null>(null);
 
-  const { summary, loading } = useSalesCart();
+  const { summary, loading } = useSalesCart(projectId, active);
   useSalesEligibility(projectId, active);
 
   useLayoutEffect(() => {

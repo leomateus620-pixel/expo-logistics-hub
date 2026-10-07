@@ -2,33 +2,61 @@ import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 import type { LotPricing2028 } from '../utils/lotPricing2028';
-import { fetchSalesPricing, registerSaleOrder } from './salesService';
+import { fetchProjectSalesPricing, fetchSalesPricing, registerSaleOrder } from './salesService';
 import { SalesOrderError } from './salesErrors';
 import { summarizeCart, type SalesCartSummary } from './salesPricing';
 import { useSalesStore } from './useSalesSelection';
 import type { SalesOrderPayload } from './salesTypes';
 import { scheduleCommercialMapRefresh } from '../queries/commercialMapRefresh';
 
-/** Valores oficiais dos espaços no carrinho, recalculados ao trocar de etapa. */
-export function useSalesCart(): { summary: SalesCartSummary; loading: boolean; error: boolean } {
+export const salesPricingProjectKey = (projectId: string | null) => ['commercial-map', 'sales-pricing-project', projectId] as const;
+
+/**
+ * Valores oficiais dos espaços no carrinho. Os preços do projeto são lidos uma
+ * única vez ao entrar no modo Vendas; selecionar/remover lotes só consulta o
+ * índice local. Lotes ausentes do índice são buscados isoladamente.
+ */
+export function useSalesCart(projectId: string | null = null, active = true): { summary: SalesCartSummary; loading: boolean; error: boolean } {
   const selection = useSalesStore((state) => state.selection);
   const stage = useSalesStore((state) => state.stage);
-  const lotIds = useMemo(() => selection.map((item) => item.lotId).sort(), [selection]);
 
-  const query = useQuery({
-    queryKey: ['commercial-map', 'sales-pricing', lotIds],
-    queryFn: () => fetchSalesPricing(lotIds),
-    enabled: lotIds.length > 0,
+  const project = useQuery({
+    queryKey: salesPricingProjectKey(projectId),
+    queryFn: () => fetchProjectSalesPricing(projectId as string),
+    enabled: Boolean(projectId) && active,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
+
+  const index = useMemo(() => {
+    const map = new Map<string, LotPricing2028>();
+    (project.data ?? []).forEach((row) => map.set(row.lotId, row));
+    return map;
+  }, [project.data]);
+
+  const missingIds = useMemo(() => {
+    if (projectId && !project.isFetched) return [];
+    return selection.map((item) => item.lotId).filter((id) => !index.has(id)).sort();
+  }, [index, project.isFetched, projectId, selection]);
+
+  const missing = useQuery({
+    queryKey: ['commercial-map', 'sales-pricing', missingIds],
+    queryFn: () => fetchSalesPricing(missingIds),
+    enabled: missingIds.length > 0,
     staleTime: 5 * 60 * 1000,
   });
 
   const summary = useMemo(() => {
-    const index = new Map<string, LotPricing2028>();
-    (query.data ?? []).forEach((row) => index.set(row.lotId, row));
-    return summarizeCart(selection, index, stage);
-  }, [query.data, selection, stage]);
+    const merged = new Map(index);
+    (missing.data ?? []).forEach((row) => merged.set(row.lotId, row));
+    const pendingIds = new Set<string>();
+    if (projectId && !project.isFetched) selection.forEach((s) => { if (!merged.has(s.lotId)) pendingIds.add(s.lotId); });
+    if (missing.isLoading) missingIds.forEach((id) => { if (!merged.has(id)) pendingIds.add(id); });
+    return summarizeCart(selection, merged, stage, pendingIds);
+  }, [index, missing.data, missing.isLoading, missingIds, project.isFetched, projectId, selection, stage]);
 
-  return { summary, loading: query.isLoading, error: query.isError };
+  const loading = summary.pendingCount > 0;
+  return { summary, loading, error: project.isError || missing.isError };
 }
 
 export function useSalesCheckout() {

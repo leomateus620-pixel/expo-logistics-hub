@@ -12,9 +12,9 @@ export function SalesCartItem({ line, onRemove }: Props) {
   const priceLabel = formatPricePerSqm(line.pricePerSqm);
 
   return (
-    <article className={`sales-cart__item${line.unpriced ? ' is-pending' : ''}`}>
+    <article className={`sales-cart__item${line.unpriced ? ' is-pending' : ''}${line.pending ? ' is-loading' : ''}`}>
       <strong>{line.entry.title ?? line.entry.displayName}</strong>
-      <b>{line.unpriced ? line.pendingReason : formatBrl(line.total)}</b>
+      <b>{line.pending ? <span className="sales-cart__skeleton" aria-label="Carregando valor" /> : line.unpriced ? line.pendingReason : formatBrl(line.total)}</b>
       <button
         type="button"
         className="sales-cart__remove"
