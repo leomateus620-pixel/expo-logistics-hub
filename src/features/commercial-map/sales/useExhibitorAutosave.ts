@@ -7,22 +7,34 @@ import { buyerErrors } from './components/SalesBuyerForm';
 export type AutosaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 const DEBOUNCE_MS = 800;
+/** O avanço da venda espera o cadastro complementar no máximo este tempo. */
+export const EXHIBITOR_FLUSH_MAX_WAIT_MS = 4_000;
 
 function isComplete(buyer: SalesBuyerDraft): boolean {
   return Object.values(buyerErrors(buyer)).every((error) => error === null);
 }
 
-function keyOf(buyer: SalesBuyerDraft): string {
-  return [buyer.buyerName.trim(), buyer.tradeName.trim(), buyer.documentNumber.replace(/\D+/g, ''), buyer.phone.replace(/\D+/g, ''), buyer.email.trim().toLowerCase()].join('|');
+export function exhibitorDraftKey(buyer: SalesBuyerDraft, projectId: string | null | undefined): string {
+  return [projectId ?? '', buyer.buyerName.trim(), buyer.tradeName.trim(), buyer.documentNumber.replace(/\D+/g, ''), buyer.phone.replace(/\D+/g, ''), buyer.email.trim().toLowerCase()].join('|');
 }
 
-/** Salva o expositor só quando os campos obrigatórios estão válidos (nunca a cada tecla). */
+interface InflightSave { key: string; generation: number; promise: Promise<string | null> }
+
+/**
+ * Salva o expositor só quando os campos obrigatórios estão válidos (nunca a cada tecla).
+ * Mesmo conteúdo + contexto reaproveita a gravação em andamento; depois de esperar
+ * uma gravação anterior, confere se o conteúdo atual já foi salvo. Respostas de
+ * um formulário reiniciado/fechado (geração anterior) são descartadas.
+ */
 export function useExhibitorAutosave(buyer: SalesBuyerDraft, firstLotId: string | null, enabled: boolean) {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<AutosaveStatus>('idle');
   const [exhibitorId, setExhibitorId] = useState<string | null>(null);
-  const lastSavedKey = useRef<string | null>(null);
-  const inflight = useRef<Promise<string | null> | null>(null);
+  const saved = useRef<{ key: string; id: string } | null>(null);
+  const inflight = useRef<InflightSave | null>(null);
+  const generation = useRef(0);
+  const latestBuyer = useRef(buyer);
+  latestBuyer.current = buyer;
 
   const project = useQuery({
     queryKey: ['commercial-map', 'sales-project-of-lot', firstLotId],
@@ -30,47 +42,66 @@ export function useExhibitorAutosave(buyer: SalesBuyerDraft, firstLotId: string 
     enabled: Boolean(firstLotId),
     staleTime: Infinity,
   });
+  const projectId = project.data ?? null;
 
   const save = useCallback(async (): Promise<string | null> => {
-    if (!isComplete(buyer) || !project.data) return null;
-    const key = keyOf(buyer);
-    if (key === lastSavedKey.current && exhibitorId) return exhibitorId;
-    if (inflight.current) await inflight.current.catch(() => null);
+    const current = latestBuyer.current;
+    if (!isComplete(current) || !projectId) return null;
+    const key = exhibitorDraftKey(current, projectId);
+    if (saved.current?.key === key) return saved.current.id;
+    const running = inflight.current;
+    if (running && running.generation === generation.current) {
+      if (running.key === key) return running.promise;
+      await running.promise.catch(() => null);
+      // A gravação anterior pode já ter persistido exatamente este conteúdo.
+      if (saved.current?.key === key) return saved.current.id;
+    }
+    const gen = generation.current;
     setStatus('saving');
-    const run = upsertExhibitor({
-      projectId: project.data,
-      name: buyer.buyerName,
-      tradeName: buyer.tradeName,
-      document: buyer.documentNumber,
-      phone: buyer.phone,
-      email: buyer.email,
+    const promise = upsertExhibitor({
+      projectId,
+      name: current.buyerName,
+      tradeName: current.tradeName,
+      document: current.documentNumber,
+      phone: current.phone,
+      email: current.email,
     }).then((id) => {
-      lastSavedKey.current = key;
+      if (gen !== generation.current) return null; // formulário reiniciado: resposta antiga
+      saved.current = { key, id };
       setExhibitorId(id);
       setStatus('saved');
       void queryClient.invalidateQueries({ queryKey: ['commercial-map', 'exhibitors'] });
       return id;
     }).catch(() => {
-      setStatus('error');
+      if (gen === generation.current) setStatus('error');
       return null;
+    }).finally(() => {
+      if (inflight.current?.promise === promise) inflight.current = null;
     });
-    inflight.current = run;
-    const result = await run;
-    inflight.current = null;
-    return result;
-  }, [buyer, project.data, exhibitorId, queryClient]);
+    inflight.current = { key, generation: gen, promise };
+    return promise;
+  }, [projectId, queryClient]);
+
+  /** Espera a gravação por no máximo `maxWaitMs`; o pedido leva os dados como cópia. */
+  const flushWithin = useCallback(async (maxWaitMs = EXHIBITOR_FLUSH_MAX_WAIT_MS): Promise<string | null> => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<null>((resolve) => { timer = setTimeout(() => resolve(null), maxWaitMs); });
+    try { return await Promise.race([save(), timeout]); } finally { clearTimeout(timer); }
+  }, [save]);
 
   useEffect(() => {
-    if (!enabled || !isComplete(buyer) || keyOf(buyer) === lastSavedKey.current) return;
+    if (!enabled || !isComplete(buyer) || !projectId || exhibitorDraftKey(buyer, projectId) === saved.current?.key) return;
     const timer = window.setTimeout(() => { void save(); }, DEBOUNCE_MS);
     return () => window.clearTimeout(timer);
-  }, [buyer, enabled, save]);
+  }, [buyer, enabled, projectId, save]);
 
   const reset = useCallback(() => {
-    lastSavedKey.current = null;
+    generation.current += 1;
+    saved.current = null;
+    inflight.current = null;
     setExhibitorId(null);
     setStatus('idle');
   }, []);
 
-  return { status, exhibitorId, flush: save, reset, ready: Boolean(project.data) };
+  return { status, exhibitorId, flush: save, flushWithin, reset, ready: Boolean(projectId) };
 }
