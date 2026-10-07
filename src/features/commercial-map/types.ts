@@ -216,6 +216,8 @@ export interface CommercialLot {
   currentSaleStatus?: 'OPEN' | 'CONFIRMED' | null;
   /** Mais de uma venda ativa no mesmo lote: nenhum comprador é escolhido. */
   buyerConflict?: boolean;
+  /** A consulta autorizada de compradores falhou: não afirmar ausência de comprador. */
+  buyerIdentityUnavailable?: boolean;
   saleLogoUrl?: string | null;
   reservationExpiresAt: string | null;
   saleDate: string | null;
