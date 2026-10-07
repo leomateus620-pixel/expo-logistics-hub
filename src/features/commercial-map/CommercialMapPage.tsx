@@ -2,7 +2,7 @@ import { commercialMapDiagnosticsEnabled } from './utils/performanceDiagnostics'
 import { CommercialMapBootLoader } from './components/CommercialMapBootLoader';
 import { useCommercialMapBootVisit } from './hooks/useCommercialMapBootVisit';
 import { useExporuralRevisionSelection } from './hooks/useExporuralRevisionSelection';
-import { Profiler, lazy, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Profiler, lazy, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -33,8 +33,12 @@ import { useCommercialMapStore } from './state/useCommercialMapStore';
 import { useVisitStore } from './visit/useVisitStore';
 import { VisitOverlay } from './visit/VisitOverlay';
 import { preloadCommercialMapCanvas } from './utils/preloadCanvas';
+import { lazyWithRetry } from '@/lib/lazyWithRetry';
 // Arquivo da cena desatualizado após publicação: uma única recarga protegida.
-const CommercialMapCanvas = lazyWithRetry(preloadCommercialMapCanvas as never) as unknown as ReturnType<typeof lazy<typeof import('./components/CommercialMapCanvas').default>>;
+type CanvasModule = Awaited<ReturnType<typeof preloadCommercialMapCanvas>>;
+const CommercialMapCanvas = lazyWithRetry(
+  (() => preloadCommercialMapCanvas()) as unknown as () => Promise<{ default: ComponentType<unknown> }>,
+) as unknown as ReturnType<typeof lazy<CanvasModule['default']>>;
 import { CommercialMapRendererStatus } from './components/CommercialMapRendererStatus';
 import { MapToolbar } from './components/controls/MapToolbar';
 import { CommercialMapTopBar } from './components/controls/CommercialMapTopBar';
