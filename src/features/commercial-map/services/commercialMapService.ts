@@ -337,12 +337,11 @@ function mapEntity(
 }
 
 /** Situação + nome de exibição do comprador por lote, revalidado no servidor por map.view. */
-async function fetchLotBuyerSummary(projectId: string): Promise<Map<string, LotBuyerSummaryRow>> {
-  const { data, error } = await db.rpc('commercial_map_lot_buyers', { _project_id: projectId });
-  if (error) {
-    console.warn('[commercial-map] buyer summary unavailable', error.message);
-    return new Map();
-  }
+export async function fetchLotBuyerSummary(projectId: string, signal?: AbortSignal): Promise<Map<string, LotBuyerSummaryRow>> {
+  const request = db.rpc('commercial_map_lot_buyers', { _project_id: projectId });
+  const { data, error } = await (signal ? request.abortSignal(signal) : request);
+  // Falha de leitura NÃO significa "sem comprador": o chamador mantém estado próprio.
+  if (error) throw error;
   return new Map(((data ?? []) as LotBuyerSummaryRow[]).map((row) => [row.lot_id, row]));
 }
 
@@ -569,7 +568,6 @@ async function fetchCommissionCommercialMap(
     throw commissionMapError('MAP_SEGMENT_INVENTORY_MISMATCH');
   }
 
-  const [logoUrls, buyerSummary] = await Promise.all([fetchSaleLogoUrls({ projectId: project.id }), fetchLotBuyerSummary(project.id)]);
   const parkContext = (parkContextResult?.data ?? null) as { layers?: LayerRow[]; entities?: MapEntity[] } | null;
   const contextLayers = (parkContext?.layers ?? []).map(mapLayer);
   const parkContextEntities = (parkContext?.entities ?? []).map((entity) => ({
@@ -589,7 +587,7 @@ async function fetchCommissionCommercialMap(
     calibration: null,
     layers: contextLayers,
     entities,
-    lots: lotRows.map(row => ({ ...applyLotBuyerSummary(mapLot(row), buyerSummary.get(row.id)), saleLogoUrl: row.status === 'SOLD' ? logoUrls[row.id] ?? null : null })),
+    lots: lotRows.map(mapLot),
     scope: {
       mode: 'commission',
       commissionId: scope.commissionId,
@@ -722,7 +720,6 @@ export async function fetchCommercialMap(
     };
   }
 
-  const [logoUrls, buyerSummary] = await Promise.all([fetchSaleLogoUrls({ projectId: project.id }), fetchLotBuyerSummary(project.id)]);
   const result = reconcileExporuralReference({
     source: 'database',
     sourceMessage: project.isPublished ? null : 'Projeto cartográfico em rascunho. Alterações ainda não estão publicadas para toda a equipe.',
@@ -730,7 +727,7 @@ export async function fetchCommercialMap(
     calibration: calibrationResult.calibration,
     layers: (layersResult.data ?? []).map(mapLayer),
     entities,
-    lots: lotRows.map(row => ({ ...applyLotBuyerSummary(mapLot(row), buyerSummary.get(row.id)), saleLogoUrl: row.status === 'SOLD' ? logoUrls[row.id] ?? null : null })),
+    lots: lotRows.map(mapLot),
   });
   throwIfMapRequestAborted(context.signal);
   context.recordStage('inventory-transformation:end', { duration: performance.now() - transformationStartedAt });
