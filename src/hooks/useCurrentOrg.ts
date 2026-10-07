@@ -69,6 +69,8 @@ export function useCurrentOrg() {
     },
     enabled: !!user,
     staleTime: 60000,
+    // Cache restaurado de outra carga da página não libera acesso: confirma no servidor.
+    refetchOnMount: (query) => (query.state.dataUpdatedAt < PAGE_SESSION_STARTED_AT ? 'always' : true),
     retry: 2,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 5000),
   });
@@ -94,11 +96,10 @@ export function useCurrentOrg() {
   // Um vínculo só libera a rota se foi confirmado pelo servidor nesta carga da página;
   // uma revalidação que falha depois disso é transitória e não desmonta a tela
   // (preserva rascunhos). Cache antigo restaurado nunca libera acesso sozinho.
-  const verifiedThisPage = !!membership && dataUpdatedAt >= PAGE_SESSION_STARTED_AT;
-  const verificationError = !!user && isError && !verifiedThisPage;
-  const isResolving = authLoading
-    || (!!user && !verificationError && (isLoading || (isFetching && !verifiedThisPage)));
-  const hasVerifiedOrg = !!membership && (verifiedThisPage || (!isError && !isFetching));
+  const confirmedThisPage = dataUpdatedAt >= PAGE_SESSION_STARTED_AT;
+  const verificationError = !!user && isError && !confirmedThisPage;
+  const isResolving = authLoading || (!!user && !confirmedThisPage && !isError);
+  const hasVerifiedOrg = !!membership && confirmedThisPage;
 
   return {
     orgId,
