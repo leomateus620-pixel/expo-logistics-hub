@@ -126,7 +126,6 @@ export function SalesCheckoutDialog({ summary }: Props) {
       },
       onSuccess: async (orderId) => {
         clearSaleAttempt(idempotencyKey);
-        setAttempt(resolveSaleAttempt(`${attemptScope}|done:${orderId}`));
         if (logoImage) {
           uploadingRef.current = true;
           setLogoUploading(true);
