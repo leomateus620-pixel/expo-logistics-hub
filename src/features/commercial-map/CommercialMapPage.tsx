@@ -87,6 +87,14 @@ import './visit/visit.css';
 import { useWebGLAvailability } from './hooks/useWebGLAvailability';
 import { PublicInterestDialog } from './public/PublicInterestDialog';
 
+function syncFailureKind(error: unknown): 'timeout' | 'network' | 'other' {
+  const failure = error as { code?: string; message?: string } | null;
+  const text = `${failure?.code ?? ''} ${failure?.message ?? String(error ?? '')}`;
+  if (/57014|statement timeout|canceling statement|timeout/i.test(text)) return 'timeout';
+  if (/failed to fetch|network|load failed|ECONN/i.test(text)) return 'network';
+  return 'other';
+}
+
 function MapFeatureBoundary({ id, children }: { id: string; children: ReactNode }) {
   return <MapPanelBoundary resetKey={id} title="Ferramenta indisponível">
     <Suspense fallback={<aside role="status" className="commercial-map-panel commercial-map-details-skeleton">Carregando ferramenta…</aside>}>
