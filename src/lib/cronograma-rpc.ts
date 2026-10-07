@@ -66,9 +66,9 @@ function normalize(err: unknown): CronogramaRpcError {
   const raw = (err as { message?: string })?.message ?? String(err);
   const match = /(CRONOGRAMA_[A-Z_]+)(?:\s*:\s*([\s\S]*))?$/i.exec(raw.trim());
   if (match) {
-    const code = match[1].toUpperCase() as CronogramaRpcErrorCode;
-    const known = codeMessages[code] ?? codeMessages.CRONOGRAMA_UNKNOWN;
-    return new CronogramaRpcError(code, known, match[2]?.trim() || undefined);
+    const candidate = match[1].toUpperCase() as CronogramaRpcErrorCode;
+    const code = codeMessages[candidate] ? candidate : 'CRONOGRAMA_UNKNOWN';
+    return new CronogramaRpcError(code, codeMessages[code], match[2]?.trim() || (code === 'CRONOGRAMA_UNKNOWN' ? raw : undefined));
   }
   return new CronogramaRpcError('CRONOGRAMA_UNKNOWN', codeMessages.CRONOGRAMA_UNKNOWN, raw);
 }
