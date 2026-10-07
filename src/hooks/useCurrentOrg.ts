@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
 const ORG_KEY = 'fenasoja_org_id';
+/** Vínculos restaurados do cache persistido (antes desta carga da página) não contam como verificados. */
+const PAGE_SESSION_STARTED_AT = Date.now();
 
 function readOrgKey(): string | null {
   try {
@@ -37,6 +39,8 @@ export function useCurrentOrg() {
     isLoading,
     isError,
     isFetching,
+    dataUpdatedAt,
+    refetch,
   } = useQuery({
     queryKey: ['my-org-membership', user?.id],
     queryFn: async () => {
@@ -86,12 +90,15 @@ export function useCurrentOrg() {
   const orgName = (membership?.organizations as any)?.nome || '';
   const myRole = membership?.role || null;
 
-  // A chave inclui user.id: uma revalidação com vínculo já confirmado pertence
-  // à mesma sessão e não deve desmontar a rota protegida. A hidratação inicial,
-  // a ausência de vínculo e os erros continuam indeterminados/fail-closed.
+  // Estados separados: carregando, erro de verificação e ausência de acesso.
+  // Um vínculo só libera a rota se foi confirmado pelo servidor nesta carga da página;
+  // uma revalidação que falha depois disso é transitória e não desmonta a tela
+  // (preserva rascunhos). Cache antigo restaurado nunca libera acesso sozinho.
+  const verifiedThisPage = !!membership && dataUpdatedAt >= PAGE_SESSION_STARTED_AT;
+  const verificationError = !!user && isError && !verifiedThisPage;
   const isResolving = authLoading
-    || (!!user && (isLoading || (isFetching && !membership)))
-    || isError;
+    || (!!user && !verificationError && (isLoading || (isFetching && !verifiedThisPage)));
+  const hasVerifiedOrg = !!membership && (verifiedThisPage || (!isError && !isFetching));
 
   return {
     orgId,
@@ -100,7 +107,9 @@ export function useCurrentOrg() {
     membership,
     isLoading: isResolving,
     isError,
-    hasOrg: !!membership,
+    verificationError,
+    retryVerification: () => refetch(),
+    hasOrg: hasVerifiedOrg,
     createOrg: createOrgMutation.mutateAsync,
     isCreating: createOrgMutation.isPending,
   };

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,8 @@ function OrgLoading() {
 
 export default function OrgGuard({ children }: { children: ReactNode }) {
   const { user, loading: authLoading, signOut } = useAuth();
-  const { hasOrg, isLoading } = useCurrentOrg();
+  const { hasOrg, isLoading, verificationError, retryVerification } = useCurrentOrg();
+  const [retrying, setRetrying] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -28,6 +29,36 @@ export default function OrgGuard({ children }: { children: ReactNode }) {
     return <LoginPage returnTo={`${location.pathname}${location.search}`} />;
   }
 
+
+  if (verificationError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-6">
+        <div role="alert" className="w-full max-w-md rounded-2xl border border-border/60 bg-card/80 p-8 text-center shadow-lg backdrop-blur">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <ShieldAlert className="h-6 w-6" aria-hidden="true" />
+          </div>
+          <h1 className="text-xl font-bold tracking-tight">Não foi possível verificar seu acesso</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            A conexão com o servidor falhou. Seu acesso não foi alterado; tente novamente em instantes.
+          </p>
+          <div className="mt-6 flex flex-col gap-2">
+            <Button className="h-11 rounded-xl" disabled={retrying} onClick={async () => {
+              setRetrying(true);
+              try { await retryVerification(); } finally { setRetrying(false); }
+            }}>
+              {retrying ? 'Verificando…' : 'Tentar novamente'}
+            </Button>
+            <Button variant="ghost" className="h-11 rounded-xl" onClick={async () => {
+              await signOut();
+              navigate('/portal', { replace: true });
+            }}>
+              Sair
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!hasOrg) {
     return (
