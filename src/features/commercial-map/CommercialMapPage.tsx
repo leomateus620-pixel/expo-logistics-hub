@@ -74,6 +74,7 @@ import { markCommercialMapStage } from './utils/performanceDiagnostics';
 import { canHandleCommercialDashboardEscape, canHandleCommercialMapEscape, getCommercialDashboardFocusableElements } from './utils/contextualNavigation';
 import { buildPavilionModuleCommercialIndex, resolveCommercialPavilionModuleNavigationTarget } from './utils/pavilionModuleCommercial';
 import { useCommercialDashboardSync } from './dashboard/useCommercialDashboardSync';
+import { useCommercialMapRevision } from './hooks/useCommercialMapRevision';
 import { useSaleInspectionStore } from './state/useSaleInspectionStore';
 import { resolveSaleInspection, type SaleInspectionGroup, type SaleInspectionResolution, type SaleInspectionSpace } from './utils/saleInspectionGroups';
 import { SaleInspectionPanel } from './components/panels/SaleInspectionPanel';
@@ -264,11 +265,18 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     }
   }, [dashboardOpen]);
 
+  const checkMapRevision = useCommercialMapRevision({
+    projectId: mapQuery.data?.source === 'database' ? mapQuery.data.project?.id : null,
+    enabled: !isPreview && !isCommissionScope,
+    isFetching: mapQuery.isFetching,
+    hasError: mapQuery.isError,
+    refetch: mapQuery.refetch,
+  });
   useCommercialDashboardSync({
     open: dashboardOpen,
     enabled: !isPreview && !isCommissionScope && permissions.canViewMapAnalytics,
     isFetching: mapQuery.isFetching,
-    refetch: mapQuery.refetch,
+    refetch: () => checkMapRevision(),
   });
 
   useEffect(() => () => {
