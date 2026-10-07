@@ -56,7 +56,7 @@ export function classifySalesError(message: string, code: string | null): SalesE
   if (code === '42703' || code === '42P01' || code === '42883' || /undefined_column|does not exist/i.test(message)) {
     return 'SCHEMA';
   }
-  if (/Failed to fetch|NetworkError|timeout|aborted|ECONN/i.test(message)) return 'NETWORK';
+  if (/Failed to fetch|NetworkError|Load failed|timeout|aborted|ECONN|upstream|gateway|\b50[234]\b/i.test(message)) return 'NETWORK';
   return 'UNKNOWN';
 }
 
