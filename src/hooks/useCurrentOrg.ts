@@ -106,8 +106,9 @@ export function useCurrentOrg() {
   const confirmedThisPage = dataUpdatedAt >= PAGE_SESSION_STARTED_AT;
   const cachedFallback = !!user && isError && !confirmedThisPage && !!membership;
   const verificationError = !!user && isError && !confirmedThisPage && !membership;
-  const isResolving = authLoading || (!!user && !confirmedThisPage && !isError);
-  const hasVerifiedOrg = !!membership && (confirmedThisPage || cachedFallback);
+  // Com vínculo deste usuário em cache, a tela abre enquanto o servidor confirma em segundo plano.
+  const isResolving = authLoading || (!!user && !confirmedThisPage && !isError && !membership);
+  const hasVerifiedOrg = !!membership && (confirmedThisPage || cachedFallback || (!!user && !confirmedThisPage && !isError));
 
   return {
     orgId,
