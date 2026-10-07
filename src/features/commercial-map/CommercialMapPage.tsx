@@ -34,6 +34,7 @@ import { useVisitStore } from './visit/useVisitStore';
 import { VisitOverlay } from './visit/VisitOverlay';
 import { preloadCommercialMapCanvas } from './utils/preloadCanvas';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
+import { classifyCommercialMapFailure } from './queries/commercialMapRetryPolicy';
 // Arquivo da cena desatualizado após publicação: uma única recarga protegida.
 type CanvasModule = Awaited<ReturnType<typeof preloadCommercialMapCanvas>>;
 const CommercialMapCanvas = lazyWithRetry(
@@ -106,6 +107,12 @@ function MapFeatureBoundary({ id, children }: { id: string; children: ReactNode 
       {children}
     </Suspense>
   </MapPanelBoundary>;
+}
+
+/** Código curto, sem dados pessoais, para identificar a causa em relatos. */
+function failureReference(error: unknown) {
+  const e = (error ?? {}) as { code?: unknown; status?: unknown; name?: unknown };
+  return String(e.code || e.status || '') || classifyCommercialMapFailure(error);
 }
 
 function MapPageSkeleton({ recovering = false }: { recovering?: boolean }) {
@@ -523,6 +530,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
           <span>
             <strong>{isCommissionScope ? 'Segmento comercial indisponível' : 'Não foi possível sincronizar o mapa'}</strong>
             {isCommissionScope ? commissionFailure : fullFailure}
+            <small className="block opacity-70">Ref. {failureReference(mapQuery.error)} · {mapQuery.failureCount} {mapQuery.failureCount === 1 ? 'tentativa' : 'tentativas'}</small>
           </span>
           <Button onClick={() => mapQuery.refetch()} disabled={mapQuery.isFetching}><RefreshCw className={mapQuery.isFetching ? 'animate-spin' : ''} />Tentar novamente</Button>
           {!isCommissionScope && <Button asChild variant="outline"><a href="/">Voltar</a></Button>}
