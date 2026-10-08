@@ -6,11 +6,14 @@ export function useCommercialDashboardSync({
   enabled,
   isFetching,
   refetch,
+  refreshSales,
 }: {
   open: boolean;
   enabled: boolean;
   isFetching: boolean;
   refetch: (options: { cancelRefetch: false }) => Promise<unknown>;
+  /** Sales documents can change without changing the map's revision. */
+  refreshSales?: () => Promise<unknown>;
 }) {
   const pending = useRef(false);
 
@@ -20,7 +23,7 @@ export function useCommercialDashboardSync({
     const refresh = () => {
       if (document.visibilityState !== 'visible' || isFetching || pending.current) return;
       pending.current = true;
-      void refetch({ cancelRefetch: false }).then(
+      void Promise.allSettled([refetch({ cancelRefetch: false }), ...(refreshSales ? [refreshSales()] : [])]).then(
         () => { pending.current = false; },
         () => { pending.current = false; },
       );
@@ -34,5 +37,5 @@ export function useCommercialDashboardSync({
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('focus', onVisible);
     };
-  }, [enabled, isFetching, open, refetch]);
+  }, [enabled, isFetching, open, refetch, refreshSales]);
 }

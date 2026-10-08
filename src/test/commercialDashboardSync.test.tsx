@@ -14,6 +14,27 @@ afterEach(() => {
 });
 
 describe('sincronização da Dashboard Comercial', () => {
+  it('atualiza vendas no ciclo existente mesmo sem mudança de revisão e sem esperar o mapa', async () => {
+    vi.useFakeTimers();
+    visibility('visible');
+    let complete!: () => void;
+    const pending = new Promise<void>((resolve) => { complete = resolve; });
+    const refetch = vi.fn().mockReturnValue(pending);
+    const refreshSales = vi.fn().mockResolvedValue(undefined);
+    const { unmount } = renderHook(() => useCommercialDashboardSync({ open: true, enabled: true, isFetching: false, refetch, refreshSales }));
+    await act(async () => { await vi.advanceTimersByTimeAsync(30_000); });
+    expect(refetch).toHaveBeenCalledTimes(1);
+    expect(refreshSales).toHaveBeenCalledTimes(1);
+    await act(async () => { await vi.advanceTimersByTimeAsync(30_000); });
+    expect(refreshSales).toHaveBeenCalledTimes(1);
+    await act(async () => { complete(); await pending; });
+    act(() => { window.dispatchEvent(new Event('focus')); });
+    expect(refreshSales).toHaveBeenCalledTimes(2);
+    unmount();
+    await act(async () => { await vi.advanceTimersByTimeAsync(30_000); });
+    expect(refreshSales).toHaveBeenCalledTimes(2);
+  });
+
   it('consulta a mesma query a cada 30 s somente aberta e visível; foco atualiza imediatamente', async () => {
     vi.useFakeTimers();
     visibility('visible');

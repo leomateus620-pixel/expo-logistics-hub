@@ -4,6 +4,7 @@ import { useCommercialMapBootVisit } from './hooks/useCommercialMapBootVisit';
 import { useExporuralRevisionSelection } from './hooks/useExporuralRevisionSelection';
 import { Profiler, lazy, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -293,11 +294,21 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     hasError: mapQuery.isError,
     refetch: mapQuery.refetch,
   });
+  const dashboardQueryClient = useQueryClient();
+  const salesSummaryProjectId = mapQuery.data?.source === 'database' ? mapQuery.data.project?.id : null;
+  const refreshDashboardSales = useCallback(async () => {
+    if (!salesSummaryProjectId || !permissions.canManageSales) return;
+    // Reuse the dashboard's existing cycle; document changes need not alter map revision.
+    await dashboardQueryClient.invalidateQueries({
+      queryKey: ['commercial-sale-orders', salesSummaryProjectId],
+    }, { cancelRefetch: false });
+  }, [dashboardQueryClient, salesSummaryProjectId, permissions.canManageSales]);
   useCommercialDashboardSync({
     open: dashboardOpen,
     enabled: !isPreview && !isCommissionScope && permissions.canViewMapAnalytics,
     isFetching: mapQuery.isFetching,
     refetch: mapRevision.check,
+    refreshSales: refreshDashboardSales,
   });
 
   useEffect(() => () => {

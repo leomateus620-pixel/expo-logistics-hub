@@ -1,0 +1,16 @@
+{
+  "scope": "Tracked TypeScript and JavaScript files at the same HEAD, before and after",
+  "before": {
+    "errors": 982,
+    "warnings": 74
+  },
+  "after": {
+    "errors": 982,
+    "warnings": 74
+  },
+  "sameFindings": true,
+  "changedFiles": {
+    "errors": 0,
+    "warnings": 0
+  }
+}
