@@ -1,0 +1,160 @@
+{
+  "runs": [
+    {
+      "file": "tests.json",
+      "total": 196,
+      "passed": 196,
+      "failed": 0
+    },
+    {
+      "file": "analysis-tests.json",
+      "total": 27,
+      "passed": 27,
+      "failed": 0
+    }
+  ],
+  "files": [
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardAnalytics.test.ts",
+      "status": "passed",
+      "assertions": 11,
+      "passed": 11
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardAreaCard.test.tsx",
+      "status": "passed",
+      "assertions": 8,
+      "passed": 8
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardFinancialView.contract.test.ts",
+      "status": "passed",
+      "assertions": 2,
+      "passed": 2
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardLotContextCard.test.tsx",
+      "status": "passed",
+      "assertions": 10,
+      "passed": 10
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardLotMetrics.test.ts",
+      "status": "passed",
+      "assertions": 7,
+      "passed": 7
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardMiniMap.test.tsx",
+      "status": "passed",
+      "assertions": 12,
+      "passed": 12
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardOverview.test.tsx",
+      "status": "passed",
+      "assertions": 11,
+      "passed": 11
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardPavilionFrame.test.ts",
+      "status": "passed",
+      "assertions": 16,
+      "passed": 16
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardPavilionInspection.test.tsx",
+      "status": "passed",
+      "assertions": 13,
+      "passed": 13
+    },
+    {
+      "run": "analysis-tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardPresentation.test.tsx",
+      "status": "passed",
+      "assertions": 10,
+      "passed": 10
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardSalesSummary.test.tsx",
+      "status": "passed",
+      "assertions": 13,
+      "passed": 13
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardScopeCards.test.tsx",
+      "status": "passed",
+      "assertions": 6,
+      "passed": 6
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardScopes.test.ts",
+      "status": "passed",
+      "assertions": 14,
+      "passed": 14
+    },
+    {
+      "run": "analysis-tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardSpaces.test.tsx",
+      "status": "passed",
+      "assertions": 6,
+      "passed": 6
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardSync.test.tsx",
+      "status": "passed",
+      "assertions": 4,
+      "passed": 4
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardWorkspace.test.tsx",
+      "status": "passed",
+      "assertions": 4,
+      "passed": 4
+    },
+    {
+      "run": "analysis-tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialDashboardWorkspaceAnalysis.test.tsx",
+      "status": "passed",
+      "assertions": 11,
+      "passed": 11
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialSalesOrdersSection.test.tsx",
+      "status": "passed",
+      "assertions": 12,
+      "passed": 12
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialSalesOrdersService.test.ts",
+      "status": "passed",
+      "assertions": 21,
+      "passed": 21
+    },
+    {
+      "run": "tests.json",
+      "name": "C:/Users/Leonardo/.codex/worktrees/dashboard-commercial-cards/expo-logistics-hub/src/test/commercialSalesProgress.test.ts",
+      "status": "passed",
+      "assertions": 5,
+      "passed": 5
+    }
+  ],
+  "totalDistinctTests": 196,
+  "passed": 196
+}

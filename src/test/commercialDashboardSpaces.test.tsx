@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { withDashboardValue } from './helpers/dashboardFinancialFixture';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CommercialDashboard } from '@/features/commercial-map/dashboard/CommercialDashboard';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
 import { COMMERCIAL_MAP_SEGMENTS } from '@/features/commercial-map/data/commercialMapSegments';
@@ -12,14 +12,35 @@ import { CommercialDashboardSpaces, type CommercialDashboardSpacesMemory } from 
 
 const snapshot = buildCommercialDashboardSnapshot(OFFICIAL_REFERENCE_DATA);
 const sampleRecords = [...snapshot.segments.flatMap((segment) => segment.records.slice(0, 1)),
-  ...snapshot.pavilions.flatMap((pavilion) => pavilion.records.slice(-2))];
+  ...snapshot.pavilions.flatMap((pavilion) => [8, 13].includes(pavilion.definition.pavilionNumber)
+    ? pavilion.records : pavilion.records.slice(-2))];
 const ids = new Set(sampleRecords.map(({ entity }) => entity.id));
 const data: Pick<CommercialMapData, 'entities' | 'lots'> = {
   entities: OFFICIAL_REFERENCE_DATA.entities.filter((entity) => ids.has(entity.id) || !entity.isSellable),
   lots: sampleRecords.map(({ lot }) => lot),
 };
 const props = { data, dataUpdatedAt: 1000, isFetching: false, onClose: vi.fn(), onViewLot: vi.fn() };
-afterEach(() => { vi.useRealTimers(); });
+const originalScreenCTM = Object.getOwnPropertyDescriptor(SVGElement.prototype, 'getScreenCTM');
+const bounds = (left: number, top: number, width: number, height: number): DOMRect => ({
+  x: left, y: top, left, top, width, height, right: left + width, bottom: top + height, toJSON: () => ({}),
+});
+beforeEach(() => {
+  const originalBounds = Element.prototype.getBoundingClientRect;
+  vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function () {
+    if (this.classList.contains('commercial-dashboard-pavilion-context-anchor')) return bounds(0, 0, 280, 240);
+    if (this.classList.contains('commercial-dashboard-pavilion-frame')
+      || (this.classList.contains('commercial-dashboard-map-scroll') && this.closest('.commercial-dashboard-minimap--pavilion'))) return bounds(100, 50, 640, 420);
+    return originalBounds.call(this);
+  });
+  Object.defineProperty(SVGElement.prototype, 'getScreenCTM', { configurable: true,
+    value: () => ({ a: .5, b: 0, c: 0, d: .5, e: 100, f: 50 }) });
+});
+afterEach(() => {
+  vi.useRealTimers();
+  vi.restoreAllMocks();
+  if (originalScreenCTM) Object.defineProperty(SVGElement.prototype, 'getScreenCTM', originalScreenCTM);
+  else Reflect.deleteProperty(SVGElement.prototype, 'getScreenCTM');
+});
 
 describe('managerial scopes in the existing dashboard', () => {
   it('retains scope, selected lot and chart metric when the dedicated sales view temporarily unmounts the workspace', () => {
@@ -111,8 +132,8 @@ describe('managerial scopes in the existing dashboard', () => {
     expect(path).toHaveAttribute('aria-pressed', 'true');
     expect(path).toHaveAttribute('data-status', 'SOLD');
     expect(path.getAttribute('d')).not.toBe(oldPath);
-    expect(within(map).getByRole('status')).toHaveTextContent('72,00 m²');
-    expect(within(map).getByRole('status')).toHaveTextContent('15.000,00');
+    expect(within(map).getByRole('article', { name: /^Dados de/ })).toHaveTextContent('72,00 m²');
+    expect(within(map).getByRole('article', { name: /^Dados de/ })).toHaveTextContent('15.000,00');
     expect(within(screen.getByRole('group', { name: 'Selecionar pavilhão' })).getByRole('button', { name: /^Pavilhão 7(?: |$)/ })).toHaveAttribute('aria-pressed', 'true');
     const time = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(2000);
     expect(screen.getByText(`Atualizado às ${time}`)).toBeInTheDocument();

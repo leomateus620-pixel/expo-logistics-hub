@@ -1,0 +1,186 @@
+{
+  "base": "4fb76b4ceab1cabded26be99b2097496bcc8820f",
+  "production": [
+    "src/features/commercial-map/dashboard/CommercialDashboardCharts.tsx",
+    "src/features/commercial-map/dashboard/CommercialDashboardPavilion.tsx",
+    "src/features/commercial-map/dashboard/CommercialDashboardSpaces.tsx",
+    "src/features/commercial-map/dashboard/CommercialMiniMap.tsx",
+    "src/features/commercial-map/dashboard/commercialDashboardGeometry.ts",
+    "src/features/commercial-map/dashboard/commercialDashboardPavilionGeometry.ts",
+    "src/features/commercial-map/dashboard/CommercialDashboardLotContextCard.tsx",
+    "src/features/commercial-map/dashboard/commercial-dashboard-pavilion-inspection.css",
+    "src/features/commercial-map/dashboard/commercial-dashboard-workspace-analysis.css",
+    "src/features/commercial-map/dashboard/commercialDashboardPavilionFrame.ts"
+  ],
+  "forbidden": [],
+  "protectedFiles": [
+    {
+      "file": "src/features/commercial-map/dashboard/commercialDashboardAnalytics.ts",
+      "before": "7dc2278007358aa282351ca3cd98f3e0d29a51b2061bb18596c9d77909d3335c",
+      "after": "7dc2278007358aa282351ca3cd98f3e0d29a51b2061bb18596c9d77909d3335c",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/dashboard/commercialDashboardClassification.ts",
+      "before": "41805c816e13b6186a5b855061d79622e9f1f6673efae459c644cf6a1074ea24",
+      "after": "41805c816e13b6186a5b855061d79622e9f1f6673efae459c644cf6a1074ea24",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/dashboard/commercialDashboardTypes.ts",
+      "before": "88230f773cac88567045dc5aeae63b3c21464bb20b8f2fce75a9d06e4a784c9e",
+      "after": "88230f773cac88567045dc5aeae63b3c21464bb20b8f2fce75a9d06e4a784c9e",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/dashboard/commercial-dashboard.css",
+      "before": "506f9ab38a80f87e200f66ba49683e3de4ec7ae1e7bba41a0221874d8e21efad",
+      "after": "506f9ab38a80f87e200f66ba49683e3de4ec7ae1e7bba41a0221874d8e21efad",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/dashboard/commercial-dashboard-overview.css",
+      "before": "fbc977703e4cebacc2c27bb81b8ed21b296d90c524322520b85398db90c57e04",
+      "after": "fbc977703e4cebacc2c27bb81b8ed21b296d90c524322520b85398db90c57e04",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/dashboard/commercial-dashboard-scope-cards.css",
+      "before": "235960806ecdaabc9a45c1b07d0233cec6d04e8b8954f1c602b6133ca337c399",
+      "after": "235960806ecdaabc9a45c1b07d0233cec6d04e8b8954f1c602b6133ca337c399",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/dashboard/CommercialDashboard.tsx",
+      "before": "9a81a83a34d5597a75710919628dbeaf23fc71674d1f7f2c63b94cc87b552735",
+      "after": "9a81a83a34d5597a75710919628dbeaf23fc71674d1f7f2c63b94cc87b552735",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/dashboard/CommercialDashboardScopeCard.tsx",
+      "before": "46ee676cff9420461cbda7ad2bbac36e7c9e439b9e966875aa16728140efb529",
+      "after": "46ee676cff9420461cbda7ad2bbac36e7c9e439b9e966875aa16728140efb529",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/dashboard/CommercialDashboardAreaCard.tsx",
+      "before": "0974b1e0de405cb00709789f23bad47e8548d47b22d18443ce82d7f8a279c54f",
+      "after": "0974b1e0de405cb00709789f23bad47e8548d47b22d18443ce82d7f8a279c54f",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/dashboard/CommercialDashboardSalesSummary.tsx",
+      "before": "f8efe4dd562ce74d5c78606de016c5c57c38d8dac8f40f9c910bcdc836cedcec",
+      "after": "f8efe4dd562ce74d5c78606de016c5c57c38d8dac8f40f9c910bcdc836cedcec",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/dashboard/CommercialSalesProgress.tsx",
+      "before": "8ec343933e063a157337a308c4d597242d920e54a46242da395d55eedcb16653",
+      "after": "8ec343933e063a157337a308c4d597242d920e54a46242da395d55eedcb16653",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/dashboard/useCommercialDashboardSync.ts",
+      "before": "bd57ad83fd2f4f33df1d32a78d0ac2d7ade97bda9cd34a6a64d053382902c50c",
+      "after": "bd57ad83fd2f4f33df1d32a78d0ac2d7ade97bda9cd34a6a64d053382902c50c",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/CommercialMapPage.tsx",
+      "before": "7caf4c50ab442917f3089eb14479138b375c3a10ae107ec7d39c0b70500a7588",
+      "after": "7caf4c50ab442917f3089eb14479138b375c3a10ae107ec7d39c0b70500a7588",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/types.ts",
+      "before": "97125d4ceb9cc76b31b2ead6053560e6d9fa5e4e54c238b43dbb4198d6ac5ef8",
+      "after": "97125d4ceb9cc76b31b2ead6053560e6d9fa5e4e54c238b43dbb4198d6ac5ef8",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/officialReference2026.ts",
+      "before": "4e9aa37acaf2bf6cc58510312803877c3c7f631b0d9cf3fa9dfa8ed8667744b6",
+      "after": "4e9aa37acaf2bf6cc58510312803877c3c7f631b0d9cf3fa9dfa8ed8667744b6",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/commercialPavilionReference.ts",
+      "before": "7995f35827c47701d363c16e53fdafaa195ec00378feef012ce59f72b84eb50f",
+      "after": "7995f35827c47701d363c16e53fdafaa195ec00378feef012ce59f72b84eb50f",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/pavilion8CommercialReference.ts",
+      "before": "7022f7df195f52ad4d335352b94539d7af7e5ffdabea71e0268f858cf5b52308",
+      "after": "7022f7df195f52ad4d335352b94539d7af7e5ffdabea71e0268f858cf5b52308",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/data/pavilion13CommercialReference.ts",
+      "before": "a609d012115e6e7028d69dcc81ad8d67afb38745247c840b44e992cec00073f1",
+      "after": "a609d012115e6e7028d69dcc81ad8d67afb38745247c840b44e992cec00073f1",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/utils/commercialPavilions.ts",
+      "before": "7ac5337071121ab885b24bca3148afb793756a1f3e06c7a30062e9b88158c57a",
+      "after": "7ac5337071121ab885b24bca3148afb793756a1f3e06c7a30062e9b88158c57a",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/utils/commercialPavilionModules.ts",
+      "before": "16b17a24c97b4102bf34418bf988da7e668ccee764d680935798b4a7b8821792",
+      "after": "16b17a24c97b4102bf34418bf988da7e668ccee764d680935798b4a7b8821792",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/utils/lotPricing2028.ts",
+      "before": "c2339140653977c9d6588cd313829d02ff4c3d817356e36db68c04734ed6aa42",
+      "after": "c2339140653977c9d6588cd313829d02ff4c3d817356e36db68c04734ed6aa42",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/utils/lotTooltipPresentation.ts",
+      "before": "d52e84c80ad5b6785150bcc30aacea1e5904d6b836f5ea48665d55bf54861a3d",
+      "after": "d52e84c80ad5b6785150bcc30aacea1e5904d6b836f5ea48665d55bf54861a3d",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/hooks/useCommercialMap.ts",
+      "before": "1e891919d27c27514bdce9ce2fcca2e73fd4edb792417a60b9e6f9d95c41dd8a",
+      "after": "1e891919d27c27514bdce9ce2fcca2e73fd4edb792417a60b9e6f9d95c41dd8a",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/services/commercialMapService.ts",
+      "before": "55d2c16225a5ba7431e61c41551e3b58b92f9a250bdc97bfef880c075248f93c",
+      "after": "55d2c16225a5ba7431e61c41551e3b58b92f9a250bdc97bfef880c075248f93c",
+      "unchanged": true
+    }
+  ],
+  "protectedImplementations": [
+    {
+      "file": "src/features/commercial-map/dashboard/CommercialDashboardCharts.tsx",
+      "from": "export function CommercialDashboardValueChart(",
+      "sha256": "a4a8cc3f4561de748323d0a3b00de9f6adb72d7fff9f22006d4fdbf0081bb502",
+      "unchanged": true
+    },
+    {
+      "file": "src/features/commercial-map/dashboard/commercialDashboardGeometry.ts",
+      "from": "/** Size labels",
+      "sha256": "de41b944fa02f288e2f59137dfeaed97f578360200da4d3fa73118715c1f38da",
+      "unchanged": true
+    }
+  ],
+  "constraints": {
+    "databaseUnchanged": true,
+    "supabaseUnchanged": true,
+    "routesUnchanged": true,
+    "commercialRulesUnchanged": true,
+    "pricingResolutionUnchanged": true,
+    "refreshMechanismUnchanged": true,
+    "externalProjectionUnchanged": true,
+    "financialChartUnchanged": true
+  }
+}

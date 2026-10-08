@@ -153,10 +153,10 @@ describe('integrated Commercial Dashboard presentation', () => {
     const map = screen.getByRole('region', { name: 'Mini mapa comercial: Exporural' });
     const legend = distribution();
     const saleOpen = within(legend).getByRole('button', { name: /Venda em aberto: 2 lotes/ });
-    expect(saleOpen).toHaveAccessibleName(/28,6% dos lotes.*10,7% da área/);
-    expect(saleOpen).toHaveAccessibleName(/30,00 m²/);
+    expect(saleOpen).toHaveAccessibleName(/28,6% dos lotes comerciais/);
+    expect(saleOpen).not.toHaveTextContent('m²');
     expect(within(legend).getByRole('button', { name: /Vendido: 1 lote/ })).toHaveAccessibleName(/14,3%/);
-    expect(within(legend).getByRole('button', { name: /Indisponível: 1 lote/ })).toHaveAccessibleName(/fora dos percentuais comerciais.*900,00 m²/);
+    expect(within(legend).getByRole('button', { name: /Indisponível: 1 lote/ })).toHaveAccessibleName(/fora dos percentuais comerciais/);
     expect(container.querySelectorAll('path[data-entity-id]')).toHaveLength(8);
     expect(screen.queryByLabelText('Legenda das situações comerciais')).not.toBeInTheDocument();
 
@@ -170,9 +170,9 @@ describe('integrated Commercial Dashboard presentation', () => {
     expect(saleOpen).toHaveAccessibleName(/28,6%/);
 
     fireEvent.click(within(screen.getByRole('group', { name: 'Métrica de distribuição' })).getByRole('button', { name: 'Área oficial' }));
-    expect(saleOpen).toHaveAccessibleName(/28,6% dos lotes.*10,7% da área/);
+    expect(saleOpen).toHaveAccessibleName(/30,00 m².*10,7% da área oficial conhecida/);
     expect(within(saleOpen).getByText('10,7%')).toBeVisible();
-    expect(within(within(legend).getByRole('button', { name: /Vendido: 1 lote/ })).getByText('10,7%')).toBeVisible();
+    expect(within(within(legend).getByRole('button', { name: /Vendido: 30,00 m²/ })).getByText('10,7%')).toBeVisible();
     expect(container.querySelectorAll('path[data-entity-id]')).toHaveLength(8);
     fireEvent.click(within(screen.getByRole('group', { name: 'Métrica de distribuição' })).getByRole('button', { name: 'Quantidade' }));
     expect(within(saleOpen).getByText('28,6%')).toBeVisible();
@@ -181,7 +181,7 @@ describe('integrated Commercial Dashboard presentation', () => {
     expect(screen.queryByRole('region', { name: 'Mini mapa comercial: Exporural' })).not.toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Mini mapa comercial: Espaço do Automóvel' })).toBeVisible();
     expect(container.querySelectorAll('path[data-entity-id]')).toHaveLength(1);
-    expect(within(distribution()).getByRole('button', { name: /Disponível: 1 lote/ })).toHaveAccessibleName(/100,0%.*110,00 m²/);
+    expect(within(distribution()).getByRole('button', { name: /Disponível: 1 lote/ })).toHaveAccessibleName(/100,0% dos lotes comerciais/);
     expect(within(distribution()).getByRole('button', { name: /Venda em aberto: 0 lotes/ })).toHaveAttribute('aria-pressed', 'true');
     expect(kpi('Espaços comerciais').querySelector('strong')).toHaveTextContent(/^9$/);
   });
@@ -205,7 +205,7 @@ describe('integrated Commercial Dashboard presentation', () => {
     fireEvent.click(screen.getByRole('button', { name: /Classificação pendente/ }));
     expect(screen.queryByRole('region', { name: 'Mini mapa comercial: Todas as áreas externas' })).not.toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Mini mapa comercial: Classificação pendente' })).toBeVisible();
-    expect(within(distribution()).getByRole('button', { name: /Venda em aberto: 1 lote/ })).toHaveAccessibleName(/100,0%.*5,00 m²/);
+    expect(within(distribution()).getByRole('button', { name: /Venda em aberto: 1 lote/ })).toHaveAccessibleName(/100,0% dos lotes comerciais/);
     expect(kpi('Lotes com venda em andamento').querySelector('strong')).toHaveTextContent(/^4$/);
   });
 

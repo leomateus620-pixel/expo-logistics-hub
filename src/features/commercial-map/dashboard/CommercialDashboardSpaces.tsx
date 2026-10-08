@@ -10,7 +10,10 @@ import { CommercialDashboardLotChart } from './CommercialDashboardCharts';
 import { useDashboardStatusHighlight } from './useDashboardStatusHighlight';
 import { CommercialDashboardComparison } from './CommercialDashboardComparison';
 import { CommercialDashboardScopeCard } from './CommercialDashboardScopeCard';
+import { OverviewInfo } from './CommercialDashboardOverviewInfo';
+import { formatDashboardCommercialProgress } from './commercialDashboardProgress';
 import './commercial-dashboard-scope-cards.css';
+import './commercial-dashboard-workspace-analysis.css';
 
 const PavilionPlan = lazy(() => import('./CommercialDashboardPavilion'));
 
@@ -27,11 +30,10 @@ export interface CommercialDashboardSpacesMemory {
 
 function Metrics({ aggregate, title }: { aggregate: DashboardAggregate; title: string }) {
   return <div className="commercial-dashboard-scope-metrics" aria-label={`Indicadores de ${title}`}>
-    <div><span>Espaços comerciais</span><strong>{formatDashboardInteger(aggregate.commercialLots)}</strong><small>{formatDashboardInteger(aggregate.totalLots)} registros no recorte</small></div>
-    <div><span>Em andamento</span><strong>{formatDashboardInteger(aggregate.saleOpenLots)}</strong><small>Aguardando assinatura</small></div>
-    <div><span>Vendidos</span><strong>{formatDashboardInteger(aggregate.soldLots)} <small>{aggregate.commercialLots ? formatDashboardPercentage(aggregate.soldLotPercentage) : '—'}</small></strong><small>Do inventário comercial</small></div>
-    <div><span>Área comercial oficial</span><strong>{formatDashboardAreaWithCoverage(aggregate.totalAreaSqm, aggregate.commercialLots, aggregate.lotsWithoutOfficialArea, aggregate.commercialLots)}</strong>
-      <small>{aggregate.lotsWithoutOfficialArea ? `${aggregate.lotsWithoutOfficialArea} sem metragem válida` : 'Metragem cadastrada'}</small></div>
+    <div><span>Espaços comerciais</span><strong>{formatDashboardInteger(aggregate.commercialLots)}</strong></div>
+    <div><span>Em andamento</span><strong>{formatDashboardInteger(aggregate.saleOpenLots)}</strong></div>
+    <div><span>Vendidos</span><strong>{formatDashboardInteger(aggregate.soldLots)} <small>{aggregate.commercialLots ? formatDashboardCommercialProgress(aggregate.soldLotPercentage) : '—'}</small></strong></div>
+    <div><span>Área comercial oficial</span><strong>{formatDashboardAreaWithCoverage(aggregate.totalAreaSqm, aggregate.commercialLots, aggregate.lotsWithoutOfficialArea, aggregate.commercialLots)}</strong></div>
   </div>;
 }
 
@@ -90,7 +92,7 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, stateMemo
   const selection = { entityId: selections[scopeId] ?? null,
     onChange: (id: string | null) => setSelections((current) => ({ ...current, [scopeId]: id })) };
 
-  return <section className="commercial-dashboard-workspace" aria-label="Análise do recorte selecionado">
+  return <section className="commercial-dashboard-workspace commercial-dashboard-workspace-analysis" aria-label="Análise do recorte selecionado">
     <div className="commercial-dashboard-scope-selector commercial-dashboard-scope-cards">
       <div className="commercial-dashboard-scope-cards__section">
         <div className="commercial-dashboard-scope-cards__heading"><span><MapPinned aria-hidden="true" />Áreas externas</span>
@@ -121,7 +123,25 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, stateMemo
       </div>
     </div>
     <div className="commercial-dashboard-selected-summary"><div className="commercial-dashboard-scope-heading">
-      <div><span className="commercial-dashboard-eyebrow">Recorte selecionado</span><h2>{title}</h2></div>
+      <div><span className="commercial-dashboard-eyebrow">Recorte selecionado</span>
+        <div className="commercial-dashboard-workspace-analysis__scope-title"><h2>{title}</h2>
+          <OverviewInfo label={`Informações dos indicadores de ${title}`} title="Indicadores do recorte"
+            lead="Os indicadores usam o mesmo inventário ativo da planta e do gráfico. Vendas em andamento aguardam assinatura; vendidos seguem o estado comercial SOLD, preservando os registros legados."
+            facts={[
+              ['Registros ativos', formatDashboardInteger(aggregate.totalLots)],
+              ['Base comercial', formatDashboardInteger(aggregate.commercialLots)],
+              ['Indisponíveis fora da base', formatDashboardInteger(aggregate.unavailableLots)],
+              ['Área oficial conhecida', formatDashboardAreaWithCoverage(aggregate.totalAreaSqm, aggregate.commercialLots, aggregate.lotsWithoutOfficialArea, aggregate.commercialLots)],
+              ['Lotes sem área oficial', formatDashboardInteger(aggregate.lotsWithoutOfficialArea)],
+            ]}
+            note={<>{aggregate.commercialLots > 0
+              ? 'O percentual vendido divide os lotes vendidos pela base comercial, incluindo bloqueados e excluindo indisponíveis. '
+              : 'Não há base comercial para calcular o percentual vendido. '}
+              {aggregate.lotsWithoutOfficialArea > 0
+                ? 'A cobertura da área é parcial: somente metragens oficiais válidas entram no subtotal. Área ausente não é zero e não é estimada pela geometria.'
+                : 'A metragem usa somente áreas oficiais cadastradas.'}</>} />
+        </div>
+      </div>
     </div><Metrics aggregate={aggregate} title={title} /></div>
     <div className="commercial-dashboard-integrated-analysis">
       <div className="commercial-dashboard-spatial-card">
@@ -137,8 +157,7 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, stateMemo
             <button type="button" aria-pressed={metric === 'area'} onClick={() => setMetric('area')}>Área oficial</button>
           </div>
         </div>
-        <CommercialDashboardLotChart aggregate={aggregate} {...highlight} metric={metric} compact />
-        <p className="commercial-dashboard-highlight-note">Toque em uma situação para destacá-la na planta. Todos os espaços e totais são mantidos.</p>
+        <CommercialDashboardLotChart aggregate={aggregate} {...highlight} metric={metric} compact variant="workspace" />
       </aside>
     </div>
     <div className="commercial-dashboard-secondary">

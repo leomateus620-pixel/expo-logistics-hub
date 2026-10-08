@@ -5,6 +5,8 @@ export interface CommercialMiniMapItem {
   lot: CommercialLot;
   entity: MapEntity;
   value: number | null;
+  /** Validated official area supplied by the canonical dashboard snapshot. */
+  officialAreaSqm?: number | null;
   pavilion?: MapEntity | null;
   blockCode?: string | null;
   areaName?: string;
