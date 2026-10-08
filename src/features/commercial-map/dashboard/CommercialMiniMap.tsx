@@ -1,4 +1,4 @@
-import { useCallback, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { ArrowUpRight, Maximize, MapPinned } from 'lucide-react';
 import { COMMERCIAL_PHASES, STATUS_CONFIG } from '../constants';
 import { toCommercialPhase, type CommercialStatus } from '../types';
@@ -6,6 +6,8 @@ import { formatAreaSqmLabel, formatBrl } from '../utils/lotPricing2028';
 import { resolveLotIdentity } from '../utils/lotIdentity';
 import { buildCommercialMiniMapGeometry, buildCommercialMiniMapViewBox, commercialMiniMapNumberLabel, type CommercialMiniMapItem, type MiniMapBounds, type MiniMapOutline } from './commercialDashboardGeometry';
 import type { CommercialPavilionWayfindingMarkerKind } from '../utils/commercialPavilionWayfinding';
+import { CommercialDashboardLotContextCard } from './CommercialDashboardLotContextCard';
+import './commercial-dashboard-pavilion-inspection.css';
 
 export type { CommercialMiniMapItem } from './commercialDashboardGeometry';
 export interface DashboardAccessMarker {
@@ -28,6 +30,8 @@ export interface CommercialMiniMapProps {
   selection?: { entityId: string | null; onChange: (id: string | null) => void };
   contentEnvelope?: MiniMapBounds;
   numberLabelPixels?: number;
+  /** Pavilion inspection is opt-in; external maps keep their established presentation. */
+  presentation?: 'default' | 'pavilion';
 }
 const EMPTY_OUTLINES: readonly MiniMapOutline[] = [];
 const EMPTY_ACCESSES: readonly DashboardAccessMarker[] = [];
@@ -44,14 +48,25 @@ function validValue(value: number | null): value is number {
   return value != null && Number.isFinite(value) && value >= 0;
 }
 
+function InspectionFrame({ enabled, frameRef, onMouseLeave, children }: { enabled: boolean; frameRef: RefObject<HTMLDivElement>; onMouseLeave: () => void; children: ReactNode }) {
+  return enabled ? <div className="commercial-dashboard-pavilion-frame" ref={frameRef} onMouseLeave={onMouseLeave}>{children}</div> : <>{children}</>;
+}
+
+interface ContextPosition { left: number; top: number; anchorX?: number; anchorY?: number; placement: 'left' | 'right' | 'above' | 'below'; visible: boolean }
+
 /** SVG only. Shapes, identifiers, status and selection use the same query snapshot. */
 export function CommercialMiniMap({
   items, title, highlightedStatus = null, onViewLot, className = '',
   outlines = EMPTY_OUTLINES, accesses = EMPTY_ACCESSES, numbered = false, hideStatusLegend = false, selection, contentEnvelope, numberLabelPixels = 11,
+  presentation: variant = 'default',
 }: CommercialMiniMapProps) {
+  const pavilionPresentation = variant === 'pavilion';
   const selectId = useId();
+  const contextCardId = useId();
   const geometry = useMemo(() => buildCommercialMiniMapGeometry(items, outlines, contentEnvelope), [items, outlines, contentEnvelope]);
   const [hoveredEntityId, setHoveredEntityId] = useState<string | null>(null);
+  const [focusedEntityId, setFocusedEntityId] = useState<string | null>(null);
+  const [dismissedEntityId, setDismissedEntityId] = useState<string | null>(null);
   const [selections, setSelections] = useState<Record<string, string | null>>({});
   const selectedEntityId = selection ? selection.entityId : selections[title] ?? null;
   const select = selection?.onChange ?? ((id: string | null) => setSelections((current) => ({ ...current, [title]: id })));
@@ -59,6 +74,16 @@ export function CommercialMiniMap({
   const [zoom, setZoom] = useState(1);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const viewportRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const contextRef = useRef<HTMLDivElement>(null);
+  const contextOriginRef = useRef<HTMLElement | SVGElement | null>(null);
+  const suppressNextFocusRef = useRef<string | null>(null);
+  const pointerPreviewBlockedRef = useRef(false);
+  const lastPointerRef = useRef<{ x: number; y: number } | null>(null);
+  const [pointerDismissal, setPointerDismissal] = useState(0);
+  const [revealRevision, setRevealRevision] = useState(0);
+  const [contextPosition, setContextPosition] = useState<ContextPosition | null>(null);
   const fitToSpace = useCallback(() => {
     setZoom(1);
     if (viewportRef.current) {
@@ -69,7 +94,11 @@ export function CommercialMiniMap({
   useLayoutEffect(() => {
     fitToSpace();
     setHoveredEntityId(null);
+    setFocusedEntityId(null);
+    setDismissedEntityId(null);
     setKeyboardEntityId(null);
+    pointerPreviewBlockedRef.current = false;
+    lastPointerRef.current = null;
   }, [title, fitToSpace]);
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
@@ -108,6 +137,66 @@ export function CommercialMiniMap({
   const activeLot = items.find(({ entity }) => entity.id === selectedEntityId)
     ?? items.find(({ entity }) => entity.id === hoveredEntityId) ?? null;
   const activeSelected = activeLot?.entity.id === selectedEntityId;
+  const contextEntityId = pavilionPresentation ? hoveredEntityId ?? focusedEntityId
+    ?? (selectedEntityId !== dismissedEntityId ? selectedEntityId : null) : null;
+  const contextRecord = contextEntityId ? items.find(({ entity }) => entity.id === contextEntityId) ?? null : null;
+  const contextLot = contextEntityId ? geometry.lotsByEntityId.get(contextEntityId) ?? null : null;
+  const contextMode = contextEntityId === selectedEntityId && contextEntityId !== dismissedEntityId ? 'selected' : 'preview';
+  const choosePavilionLot = (id: string | null, origin: HTMLElement | SVGElement, reveal = false) => {
+    contextOriginRef.current = origin;
+    pointerPreviewBlockedRef.current = false;
+    setDismissedEntityId(null);
+    setHoveredEntityId(null);
+    setFocusedEntityId(null);
+    select(id);
+    // Choosing from the list must reveal an offscreen module without resetting
+    // the user's zoom. Later manual scrolling can still hide its anchored card.
+    const target = id && reveal ? geometry.lotsByEntityId.get(id) : null;
+    const viewport = viewportRef.current;
+    const path = target && Array.from(svgRef.current?.querySelectorAll<SVGPathElement>('path[data-entity-id]') ?? [])
+      .find((element) => element.dataset.entityId === id);
+    const matrix = path && typeof path.getScreenCTM === 'function' ? path.getScreenCTM() : null;
+    if (target && viewport && matrix) {
+      const bounds = viewport.getBoundingClientRect();
+      const width = viewport.clientWidth || bounds.width, height = viewport.clientHeight || bounds.height;
+      const left = bounds.left + viewport.clientLeft, top = bounds.top + viewport.clientTop;
+      const [x, y] = target.labelPoint;
+      const screenX = matrix.a * x + matrix.c * y + matrix.e;
+      const screenY = matrix.b * x + matrix.d * y + matrix.f;
+      if (screenX < left + 12 || screenX > left + width - 12) viewport.scrollLeft += screenX - left - width / 2;
+      if (screenY < top + 12 || screenY > top + height - 12) viewport.scrollTop += screenY - top - height / 2;
+      setRevealRevision((value) => value + 1);
+    }
+  };
+  const closeContext = useCallback((restoreOrigin = true) => {
+    // Removing the card can expose a path directly beneath the stationary
+    // pointer and synthesize mouseenter. Wait for real movement or an explicit
+    // focus/click before allowing a new preview.
+    pointerPreviewBlockedRef.current = true;
+    setPointerDismissal((value) => value + 1);
+    setDismissedEntityId(selectedEntityId ?? contextEntityId);
+    setHoveredEntityId(null);
+    setFocusedEntityId(null);
+    const origin = contextOriginRef.current;
+    if (origin?.isConnected && (restoreOrigin || contextRef.current?.contains(document.activeElement))) {
+      suppressNextFocusRef.current = document.activeElement !== origin ? origin.getAttribute('data-entity-id') : null;
+      origin.focus({ preventScroll: true });
+    }
+  }, [selectedEntityId, contextEntityId]);
+  useLayoutEffect(() => {
+    if (!pavilionPresentation || !pointerDismissal || !pointerPreviewBlockedRef.current) return;
+    const point = lastPointerRef.current;
+    const resume = (event: MouseEvent) => {
+      if (!pointerPreviewBlockedRef.current) { document.removeEventListener('mousemove', resume); return; }
+      if (point && point.x === event.clientX && point.y === event.clientY) return;
+      pointerPreviewBlockedRef.current = false;
+      document.removeEventListener('mousemove', resume);
+      const path = event.target instanceof Element ? event.target.closest<SVGPathElement>('path[data-entity-id]') : null;
+      if (path && frameRef.current?.contains(path)) setHoveredEntityId(path.dataset.entityId ?? null);
+    };
+    document.addEventListener('mousemove', resume);
+    return () => document.removeEventListener('mousemove', resume);
+  }, [pavilionPresentation, pointerDismissal]);
   const statusCounts = useMemo(() => {
     const counts = new Map<CommercialStatus, number>();
     for (const { lot } of items) {
@@ -154,22 +243,97 @@ export function CommercialMiniMap({
     ? Math.min(viewportSize.width / viewBoxWidth, viewportSize.height / viewBoxHeight) * zoom : 1;
   const planStyle = { '--pavilion-content-aspect': viewBoxWidth / viewBoxHeight } as CSSProperties;
 
-  return <section className={`commercial-dashboard-minimap ${className}`} style={planStyle} aria-label={`Mini mapa comercial: ${title}`}>
-    <div className="commercial-dashboard-map-heading"><MapPinned aria-hidden="true" /><strong>{title}</strong>
-      <span>{geometry.lots.length} {geometry.lots.length === 1 ? 'lote posicionado' : 'lotes posicionados'}</span></div>
-    <div className="commercial-dashboard-map-tools">
-      <label htmlFor={selectId}>Selecionar {numbered ? 'módulo' : 'lote'}</label>
-      <select id={selectId} value={activeSelected ? selectedEntityId ?? '' : ''} onChange={(event) => select(event.target.value || null)}>
-        <option value="">Escolha um espaço</option>
-        {items.map((item) => <option key={item.lot.id} value={item.entity.id}>{identity(item)} · {STATUS_CONFIG[displayStatus(item.lot.status)].label}</option>)}
-      </select>
-      <button type="button" className="commercial-dashboard-map-fit" aria-label={`Ajustar ao espaço: ${title}`} onClick={fitToSpace}><Maximize aria-hidden="true" />Ajustar ao espaço</button>
-      <button type="button" aria-label={`Reduzir planta de ${title}`} disabled={zoom === 1} onClick={() => setZoom((value) => Math.max(1, value - 0.5))}>−</button>
-      <button type="button" aria-label={`Ampliar planta de ${title}`} disabled={zoom === 3} onClick={() => setZoom((value) => Math.min(3, value + 0.5))}>+</button>
-    </div>
+  useLayoutEffect(() => {
+    if (!pavilionPresentation || !contextRecord) { setContextPosition(null); return; }
+    const frame = frameRef.current, viewport = viewportRef.current, card = contextRef.current, svg = svgRef.current;
+    if (!frame || !viewport || !card) return;
+    const path = Array.from(svg?.querySelectorAll<SVGPathElement>('path[data-entity-id]') ?? [])
+      .find((element) => element.dataset.entityId === contextRecord.entity.id);
+    const measure = () => {
+      const matrix = typeof path?.getScreenCTM === 'function' ? path.getScreenCTM() : svg?.getScreenCTM?.();
+      const frameRect = frame.getBoundingClientRect(), viewportRect = viewport.getBoundingClientRect();
+      const cardRect = card.getBoundingClientRect();
+      const width = frame.clientWidth || frameRect.width, height = frame.clientHeight || frameRect.height;
+      if (!contextLot && width > 0 && height > 0) {
+        // A selected record without a valid polygon remains inspectable. This
+        // corner is a UI fallback, never an inferred location for the lot.
+        setContextPosition((current) => current?.visible && current.anchorX == null && current.anchorY == null
+          ? current : { left: 8, top: 8, placement: 'below', visible: true });
+        return;
+      }
+      if (!matrix || width <= 0 || height <= 0 || cardRect.width <= 0 || cardRect.height <= 0) { setContextPosition(null); return; }
+      if (!contextLot) return;
+      const [x, y] = contextLot.labelPoint;
+      const screenX = matrix.a * x + matrix.c * y + matrix.e;
+      const screenY = matrix.b * x + matrix.d * y + matrix.f;
+      const anchorX = screenX - frameRect.left, anchorY = screenY - frameRect.top;
+      const viewportLeft = viewportRect.left + viewport.clientLeft, viewportTop = viewportRect.top + viewport.clientTop;
+      const visible = screenX >= viewportLeft && screenX <= viewportLeft + (viewport.clientWidth || viewportRect.width)
+        && screenY >= viewportTop && screenY <= viewportTop + (viewport.clientHeight || viewportRect.height);
+      const gap = 12, inset = 8;
+      const above = anchorY - gap - cardRect.height;
+      const below = anchorY + gap;
+      const right = anchorX + gap, leftSide = anchorX - gap - cardRect.width;
+      const placement = right + cardRect.width <= width - inset ? 'right' : leftSide >= inset ? 'left'
+        : above >= inset ? 'above' : below + cardRect.height <= height - inset ? 'below'
+        : anchorY > height / 2 ? 'above' : 'below';
+      const sidePlacement = placement === 'left' || placement === 'right';
+      const left = Math.max(inset, Math.min(placement === 'right' ? right : placement === 'left' ? leftSide : anchorX - cardRect.width / 2, width - cardRect.width - inset));
+      const top = Math.max(inset, Math.min(sidePlacement ? anchorY - cardRect.height / 2 : placement === 'above' ? above : below, height - cardRect.height - inset));
+      setContextPosition((current) => current && current.visible === visible && current.placement === placement
+        && Math.abs(current.left - left) < .25 && Math.abs(current.top - top) < .25
+        && current.anchorX != null && current.anchorY != null
+        && Math.abs(current.anchorX - anchorX) < .25 && Math.abs(current.anchorY - anchorY) < .25
+        ? current : { left, top, anchorX, anchorY, placement, visible });
+    };
+    measure();
+    viewport.addEventListener('scroll', measure, { passive: true });
+    window.addEventListener('resize', measure);
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
+    observer?.observe(frame);
+    observer?.observe(card);
+    return () => { viewport.removeEventListener('scroll', measure); window.removeEventListener('resize', measure); observer?.disconnect(); };
+  }, [pavilionPresentation, contextRecord, contextLot, contextMode, zoom, viewportSize.width, viewportSize.height, presentation.viewBox, revealRevision]);
+
+  useLayoutEffect(() => {
+    if (!pavilionPresentation || !contextRecord || !contextPosition?.visible) return;
+    // A pointer preview may open while focus remains outside the plan. It
+    // still owns the first Escape, without intercepting another nested popup.
+    const escape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented || event.isComposing) return;
+      const target = event.target instanceof Element ? event.target : document.activeElement;
+      const nested = target?.closest('[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"], [data-commercial-map-escape-priority="true"]');
+      if (nested && !nested.contains(frameRef.current) && !contextRef.current?.contains(target)) return;
+      event.preventDefault(); event.stopPropagation(); closeContext(false);
+    };
+    document.addEventListener('keydown', escape);
+    return () => document.removeEventListener('keydown', escape);
+  }, [pavilionPresentation, contextRecord, contextPosition?.visible, closeContext]);
+
+  const tools = <div className="commercial-dashboard-map-tools">
+    <label htmlFor={selectId}>Selecionar {numbered ? 'módulo' : 'lote'}</label>
+    <select id={selectId} value={pavilionPresentation ? selectedEntityId ?? '' : activeSelected ? selectedEntityId ?? '' : ''}
+      onChange={(event) => pavilionPresentation ? choosePavilionLot(event.target.value || null, event.currentTarget, true) : select(event.target.value || null)}>
+      <option value="">Escolha um espaço</option>
+      {items.map((item) => <option key={item.lot.id} value={item.entity.id}>{identity(item)} · {STATUS_CONFIG[displayStatus(item.lot.status)].label}</option>)}
+    </select>
+    <button type="button" className="commercial-dashboard-map-fit" aria-label={`Ajustar ao espaço: ${title}`} onClick={fitToSpace}><Maximize aria-hidden="true" />Ajustar ao espaço</button>
+    <button type="button" aria-label={`Reduzir planta de ${title}`} disabled={zoom === 1} onClick={() => setZoom((value) => Math.max(1, value - 0.5))}>−</button>
+    <button type="button" aria-label={`Ampliar planta de ${title}`} disabled={zoom === 3} onClick={() => setZoom((value) => Math.min(3, value + 0.5))}>+</button>
+  </div>;
+
+  return <section className={`commercial-dashboard-minimap${pavilionPresentation ? ' commercial-dashboard-minimap--pavilion' : ''} ${className}`}
+    style={planStyle} aria-label={`Mini mapa comercial: ${title}`} onKeyDownCapture={pavilionPresentation ? (event) => {
+      if (event.key !== 'Escape' || !contextRecord) return;
+      event.preventDefault(); event.stopPropagation(); closeContext(false);
+    } : undefined}>
+    {!pavilionPresentation && <div className="commercial-dashboard-map-heading"><MapPinned aria-hidden="true" /><strong>{title}</strong>
+      <span>{geometry.lots.length} {geometry.lots.length === 1 ? 'lote posicionado' : 'lotes posicionados'}</span></div>}
+    {!pavilionPresentation && tools}
+    <InspectionFrame enabled={pavilionPresentation} frameRef={frameRef} onMouseLeave={() => setHoveredEntityId(null)}>
     <div ref={viewportRef} className="commercial-dashboard-map-scroll" tabIndex={0} data-map-fit={zoom === 1} aria-label={`Planta de ${title}; use as setas para navegar pelos espaços`}>
       <div className="commercial-dashboard-map-surface" style={{ width: `${zoom * 100}%`, height: `${zoom * 100}%` }}>
-        {geometry.bounds ? <svg className="commercial-dashboard-map-svg" viewBox={presentation.viewBox} preserveAspectRatio="xMidYMid meet" width="100%" height="100%" role="group"
+        {geometry.bounds ? <svg ref={svgRef} className="commercial-dashboard-map-svg" viewBox={presentation.viewBox} preserveAspectRatio="xMidYMid meet" width="100%" height="100%" role="group"
           aria-label={`Distribuição espacial de ${geometry.lots.length} lotes em ${title}, coloridos pela situação comercial`}>
           {geometry.outlines.filter(({ kind }) => kind !== 'block').map((outline) => <path key={outline.id} d={outline.path}
             fill={outline.color} fillOpacity={outline.kind === 'support' ? '.12' : '.035'} fillRule="evenodd" stroke={outline.color} strokeWidth={outline.kind === 'support' ? '1.5' : '3'} vectorEffect="non-scaling-stroke"
@@ -177,21 +341,40 @@ export function CommercialMiniMap({
           {geometry.lots.map((item, index) => {
             const { entity, lot, value, path } = item;
             const config = STATUS_CONFIG[displayStatus(lot.status)];
-            const isActive = activeLot?.entity.id === entity.id;
+            const isActive = pavilionPresentation ? selectedEntityId === entity.id || contextEntityId === entity.id : activeLot?.entity.id === entity.id;
             const area = lot.officialAreaSqm != null && Number.isFinite(lot.officialAreaSqm) && lot.officialAreaSqm > 0 ? formatAreaSqmLabel(lot.officialAreaSqm) : 'área oficial pendente';
             return <path key={lot.id} d={path} fill={config.color} fillRule="evenodd" stroke={isActive ? '#172e20' : config.border}
               strokeWidth={isActive ? 3.5 : 1.3} vectorEffect="non-scaling-stroke"
               opacity={highlightedStatus && displayStatus(highlightedStatus) !== displayStatus(lot.status) && !isActive ? 0.16 : 0.92}
               role="button" tabIndex={keyboardStopId === entity.id ? 0 : -1} aria-pressed={selectedEntityId === entity.id}
+              aria-describedby={pavilionPresentation && contextLot?.entity.id === entity.id && contextPosition?.visible ? contextCardId : undefined}
               aria-label={`${identity(item)}, ${area}, ${config.label}${validValue(value) ? `, ${formatBrl(value)}, valor cadastral` : ''}`}
               data-entity-id={entity.id} data-status={lot.status}
-              onMouseEnter={() => setHoveredEntityId(entity.id)} onMouseLeave={() => setHoveredEntityId(null)}
-              onFocus={() => { setHoveredEntityId(entity.id); setKeyboardEntityId(entity.id); }}
-              onBlur={() => setHoveredEntityId(null)}
-              onClick={() => { setKeyboardEntityId(entity.id); select(selectedEntityId === entity.id ? null : entity.id); }}
+              onMouseEnter={(event) => {
+                if (pavilionPresentation && pointerPreviewBlockedRef.current) return;
+                lastPointerRef.current = { x: event.clientX, y: event.clientY };
+                setHoveredEntityId(entity.id);
+              }} onMouseLeave={() => { if (!pavilionPresentation) setHoveredEntityId(null); }}
+              onFocus={(event) => {
+                setKeyboardEntityId(entity.id);
+                if (!pavilionPresentation) { setHoveredEntityId(entity.id); return; }
+                setHoveredEntityId(null);
+                contextOriginRef.current = event.currentTarget;
+                if (suppressNextFocusRef.current === entity.id) { suppressNextFocusRef.current = null; return; }
+                pointerPreviewBlockedRef.current = false;
+                setFocusedEntityId(entity.id);
+              }}
+              onBlur={() => pavilionPresentation ? setFocusedEntityId(null) : setHoveredEntityId(null)}
+              onClick={(event) => {
+                setKeyboardEntityId(entity.id);
+                if (pavilionPresentation) choosePavilionLot(entity.id, event.currentTarget);
+                else select(selectedEntityId === entity.id ? null : entity.id);
+              }}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault(); select(selectedEntityId === entity.id ? null : entity.id);
+                  event.preventDefault();
+                  if (pavilionPresentation) choosePavilionLot(entity.id, event.currentTarget);
+                  else select(selectedEntityId === entity.id ? null : entity.id);
                 } else if (['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
                   event.preventDefault();
                   const paths = event.currentTarget.ownerSVGElement?.querySelectorAll<SVGPathElement>('path[data-entity-id]');
@@ -260,6 +443,26 @@ export function CommercialMiniMap({
         </svg> : <p className="commercial-dashboard-empty">Nenhuma geometria cadastral válida neste recorte.</p>}
       </div>
     </div>
+    {pavilionPresentation && contextRecord && <div ref={contextRef} id={contextCardId} className="commercial-dashboard-pavilion-context-anchor"
+      role={contextMode === 'preview' ? 'tooltip' : undefined}
+      data-mode={contextMode} data-lot-id={contextRecord.lot.id} data-placement={contextPosition?.placement}
+      data-anchor-kind={contextLot ? 'lot' : 'unpositioned'}
+      data-anchor-x={contextPosition?.anchorX} data-anchor-y={contextPosition?.anchorY}
+      data-commercial-map-escape-priority={contextPosition?.visible ? 'true' : undefined}
+      aria-hidden={!contextPosition?.visible} style={{ left: contextPosition?.left ?? 0, top: contextPosition?.top ?? 0, visibility: contextPosition?.visible ? 'visible' : 'hidden' }}
+      onMouseEnter={(event) => {
+        lastPointerRef.current = { x: event.clientX, y: event.clientY };
+        if (contextMode === 'preview') setHoveredEntityId(contextRecord.entity.id);
+      }}
+      onMouseLeave={() => { if (contextMode === 'preview') setHoveredEntityId(null); }}
+      onPointerDown={(event) => {
+        lastPointerRef.current = { x: event.clientX, y: event.clientY };
+        event.stopPropagation();
+      }} onClick={(event) => event.stopPropagation()}>
+      <CommercialDashboardLotContextCard item={contextRecord} mode={contextMode} positionUnavailable={!contextLot} onClose={() => closeContext()} onViewLot={onViewLot} />
+    </div>}
+    </InspectionFrame>
+    {pavilionPresentation && tools}
     {!hideStatusLegend && <div className="commercial-dashboard-map-legend" aria-label="Legenda das situações comerciais">
        {[...COMMERCIAL_PHASES, 'UNAVAILABLE' as const].filter((status) => statusCounts.has(status)).map((status) => <span key={status}>
         <i style={{ backgroundColor: STATUS_CONFIG[status].color }} />{STATUS_CONFIG[status].label} {statusCounts.get(status)}
@@ -271,14 +474,14 @@ export function CommercialMiniMap({
       {[...new Set(accesses.map(({ kind }) => kind))].map((kind) => <span key={kind}>{ACCESS_SYMBOL[kind]} {ACCESS_LABEL[kind]}</span>)}
     </div>}
     {!!supports.length && <p className="commercial-dashboard-data-note commercial-dashboard-support-note">Apoios permanentes indicados na planta · não são espaços comerciais.</p>}
-    {numbered && <p className="commercial-dashboard-data-note">Numeração do cadastro. Amplie para inspecionar ou use o seletor para consultar um módulo.</p>}
+    {numbered && !pavilionPresentation && <p className="commercial-dashboard-data-note">Numeração do cadastro. Amplie para inspecionar ou use o seletor para consultar um módulo.</p>}
     {geometry.lots.length < items.length && <p className="commercial-dashboard-data-note">{items.length - geometry.lots.length} espaços sem geometria válida; incluídos nos indicadores e no seletor.</p>}
-    <div className="commercial-dashboard-lot-detail" role="status" aria-live="polite">
+    {!pavilionPresentation && <div className="commercial-dashboard-lot-detail" role="status" aria-live="polite">
       {activeLot ? <><strong>{identity(activeLot)}</strong>
          <span>{activeLot.lot.officialAreaSqm != null && Number.isFinite(activeLot.lot.officialAreaSqm) && activeLot.lot.officialAreaSqm > 0 ? formatAreaSqmLabel(activeLot.lot.officialAreaSqm) : 'Área oficial pendente'} · {STATUS_CONFIG[displayStatus(activeLot.lot.status)].label}</span>
         {validValue(activeLot.value) && <span>{formatBrl(activeLot.value)} · {activeLot.lot.status === 'SALE_OPEN' || activeLot.lot.status === 'SOLD' ? 'valor negociado gravado' : 'tabela oficial selecionada'}</span>}
         {activeSelected && <button type="button" onClick={() => onViewLot(activeLot.entity.id)}>Ver no mapa <ArrowUpRight aria-hidden="true" /></button>}
       </> : <span>Selecione um espaço na planta ou na lista para consultar seus dados.</span>}
-    </div>
+    </div>}
   </section>;
 }

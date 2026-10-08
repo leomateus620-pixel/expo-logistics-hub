@@ -1,0 +1,177 @@
+/* Opt-in presentation for the selected-scope workspace. Shared map, segment
+   and financial chart rules retain their existing defaults. */
+.commercial-dashboard-workspace-analysis {
+  --analysis-font-text: Manrope, Inter, system-ui, sans-serif;
+  --analysis-font-data: Sora, Manrope, system-ui, sans-serif;
+  --analysis-ink: #253e30;
+  --analysis-muted: #607266;
+  --analysis-line: #dce5dc;
+}
+.commercial-dashboard-workspace-analysis .commercial-dashboard-selected-summary,
+.commercial-dashboard-workspace-analysis .commercial-dashboard-distribution {
+  font-family: var(--analysis-font-text);
+}
+.commercial-dashboard-workspace-analysis__scope-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.commercial-dashboard-workspace-analysis__scope-title h2 { min-width: 0; overflow-wrap: anywhere; }
+.commercial-dashboard-workspace-analysis__scope-title > .commercial-dashboard-overview-info-trigger,
+.commercial-dashboard-area-chart--workspace .commercial-dashboard-overview-info-trigger {
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--analysis-muted, #607266);
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+.commercial-dashboard-workspace-analysis__scope-title > .commercial-dashboard-overview-info-trigger:hover,
+.commercial-dashboard-workspace-analysis__scope-title > .commercial-dashboard-overview-info-trigger[data-state="open"],
+.commercial-dashboard-area-chart--workspace .commercial-dashboard-overview-info-trigger:hover,
+.commercial-dashboard-area-chart--workspace .commercial-dashboard-overview-info-trigger[data-state="open"] {
+  border-color: var(--analysis-line, #dce5dc);
+  background: #f2f6f0;
+}
+.commercial-dashboard-workspace-analysis__scope-title > .commercial-dashboard-overview-info-trigger:focus-visible,
+.commercial-dashboard-area-chart--workspace .commercial-dashboard-overview-info-trigger:focus-visible {
+  outline: 2px solid #327851;
+  outline-offset: 2px;
+}
+.commercial-dashboard-workspace-analysis .commercial-dashboard-scope-metrics { align-items: start; gap: 14px; }
+.commercial-dashboard-workspace-analysis .commercial-dashboard-scope-metrics > div { gap: 6px; }
+.commercial-dashboard-workspace-analysis .commercial-dashboard-scope-metrics strong {
+  color: var(--analysis-ink);
+  font-family: var(--analysis-font-data);
+  font-size: clamp(18px, 1.45vw, 22px);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: -.035em;
+  line-height: 1.3;
+}
+.commercial-dashboard-workspace-analysis .commercial-dashboard-scope-metrics strong small {
+  color: var(--analysis-muted);
+  font-family: var(--analysis-font-text);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.commercial-dashboard-workspace-analysis .commercial-dashboard-distribution { container: dashboard-distribution / inline-size; padding-top: 6px; }
+.commercial-dashboard-workspace-analysis .commercial-dashboard-distribution-heading { gap: 8px 12px; }
+.commercial-dashboard-workspace-analysis .commercial-dashboard-distribution-heading [role="group"] { flex: 0 0 auto; }
+.commercial-dashboard-workspace-analysis .commercial-dashboard-distribution-heading button { min-height: 36px; }
+.commercial-dashboard-area-chart--workspace {
+  --analysis-value-column: 3.1em;
+  --analysis-percentage-column: 4.7em;
+  font-family: var(--analysis-font-text, Manrope, Inter, system-ui, sans-serif);
+  font-size: 12px;
+  position: relative;
+}
+.commercial-dashboard-workspace-chart-info { position: absolute; inset-block-start: 8px; inset-inline-end: 0; }
+.commercial-dashboard-area-chart--workspace[data-metric="area"] {
+  --analysis-value-column: 7.7em;
+  --analysis-percentage-column: 3.6em;
+}
+.commercial-dashboard-workspace-analysis .commercial-dashboard-area-chart--workspace { gap: 2px; }
+.commercial-dashboard-area-chart--workspace .commercial-dashboard-donut-layout { justify-content: center; margin: 10px 0 4px; }
+.commercial-dashboard-workspace-analysis .commercial-dashboard-area-chart--workspace .commercial-dashboard-donut {
+  width: 144px;
+  flex: 0 0 144px;
+}
+.commercial-dashboard-workspace-analysis .commercial-dashboard-area-chart--workspace .commercial-dashboard-donut-center strong {
+  color: var(--analysis-ink);
+  font-family: var(--analysis-font-data);
+  font-size: 23px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: -.055em;
+}
+.commercial-dashboard-workspace-analysis .commercial-dashboard-area-chart--workspace .commercial-dashboard-donut-center span {
+  color: var(--analysis-muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .025em;
+  line-height: 1.4;
+}
+.commercial-dashboard-area-chart--workspace .commercial-dashboard-status-list { gap: 2px; }
+.commercial-dashboard-area-chart--workspace .commercial-dashboard-legend-heading {
+  grid-template-columns: minmax(0, 1fr) var(--analysis-value-column) var(--analysis-percentage-column);
+  align-items: center;
+  gap: 7px;
+  padding: 0 8px 2px 23px;
+  font-size: 12px;
+}
+.commercial-dashboard-area-chart--workspace .commercial-dashboard-legend-heading > span { font-size: 10px; }
+.commercial-dashboard-workspace-analysis .commercial-dashboard-area-chart--workspace .commercial-dashboard-status-list > button {
+  grid-template-columns: 8px minmax(0, 1fr) var(--analysis-value-column) var(--analysis-percentage-column);
+  gap: 7px;
+  min-height: 44px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+.commercial-dashboard-area-chart--workspace .commercial-dashboard-status-list > button > span {
+  color: #465d4d;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: normal;
+  overflow: visible;
+}
+.commercial-dashboard-area-chart--workspace .commercial-dashboard-status-list > button > strong {
+  color: var(--analysis-ink, #253e30);
+  font-family: var(--analysis-font-data, Sora, Manrope, system-ui, sans-serif);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: right;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.commercial-dashboard-area-chart--workspace .commercial-dashboard-status-list > button > small {
+  color: var(--analysis-muted, #607266);
+  font-family: var(--analysis-font-data, Sora, Manrope, system-ui, sans-serif);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.commercial-dashboard-area-chart--workspace .commercial-dashboard-status-list > button:focus-visible {
+  outline: 2px solid #327851;
+  outline-offset: 1px;
+}
+.commercial-dashboard-area-chart--workspace .commercial-dashboard-legend-unavailable > small { white-space: normal; }
+.commercial-dashboard-area-chart--workspace .commercial-dashboard-chart-empty { min-height: 144px; padding: 16px; margin: 10px 0 8px; }
+@container dashboard-distribution (min-width: 520px) {
+  .commercial-dashboard-workspace-analysis .commercial-dashboard-area-chart--workspace {
+    display: grid;
+    grid-template-columns: minmax(144px, .65fr) minmax(0, 1.35fr);
+    align-items: center;
+    gap: 18px;
+  }
+  .commercial-dashboard-area-chart--workspace .commercial-dashboard-workspace-chart-info { inset-inline-end: auto; inset-inline-start: 0; }
+  .commercial-dashboard-area-chart--workspace .commercial-dashboard-chart-empty { grid-column: auto; }
+}
+@media (max-width: 1100px) {
+  /* Normal flow keeps the chart below the container-sized map viewport
+     throughout viewport and container size changes. */
+  .commercial-dashboard-workspace-analysis .commercial-dashboard-integrated-analysis:has(.commercial-dashboard-minimap--pavilion) {
+    display: block;
+  }
+  .commercial-dashboard-workspace-analysis .commercial-dashboard-integrated-analysis:has(.commercial-dashboard-minimap--pavilion) > .commercial-dashboard-distribution { margin-top: 12px; }
+  .commercial-dashboard-workspace-analysis .commercial-dashboard-distribution { padding-top: 12px; }
+}
+@media (max-width: 760px) {
+  .commercial-dashboard-workspace-analysis .commercial-dashboard-scope-metrics { gap: 12px; }
+  .commercial-dashboard-workspace-analysis .commercial-dashboard-distribution-heading button { min-height: 44px; }
+  .commercial-dashboard-workspace-analysis .commercial-dashboard-area-chart--workspace .commercial-dashboard-donut { width: 136px; flex-basis: 136px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .commercial-dashboard-workspace-analysis__scope-title > .commercial-dashboard-overview-info-trigger,
+  .commercial-dashboard-area-chart--workspace .commercial-dashboard-overview-info-trigger,
+  .commercial-dashboard-workspace-analysis .commercial-dashboard-area-chart--workspace .commercial-dashboard-status-list > button { transition: none; }
+}
