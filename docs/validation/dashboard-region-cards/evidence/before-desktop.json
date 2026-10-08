@@ -1,0 +1,81 @@
+{
+  "size": {
+    "name": "desktop",
+    "width": 1920,
+    "height": 1080
+  },
+  "phase": "before",
+  "protectedRegions": {
+    "header": {
+      "bounds": {
+        "x": 0,
+        "y": 72,
+        "width": 1920,
+        "height": 57
+      },
+      "sha256": "e7d4a1bc0c372df5fdf079b22dc54ad53c3bbfbeb8967988e72e3e834de1485e"
+    },
+    "finance": {
+      "bounds": {
+        "x": 24,
+        "y": 187,
+        "width": 1872,
+        "height": 148
+      },
+      "sha256": "97103fcf7a239e8af73772cbdb466071058209e6c618308412645c8b30016cf8"
+    },
+    "progress": {
+      "bounds": {
+        "x": 24,
+        "y": 349,
+        "width": 1872,
+        "height": 195.75
+      },
+      "sha256": "181cf794008b15d7084535f2eb0ccbd28218e02e104bd19515e36646e3efdab9"
+    },
+    "kpis": [
+      {
+        "bounds": {
+          "x": 24,
+          "y": 560.75,
+          "width": 460.5,
+          "height": 100
+        },
+        "sha256": "8db122955692a6ef47f320706518a9df9b8d2b44f36d4c562ae23290d18ae551"
+      },
+      {
+        "bounds": {
+          "x": 494.5,
+          "y": 560.75,
+          "width": 460.5,
+          "height": 100
+        },
+        "sha256": "4e0189a3713826eb368b5b0d8b320412fbce5e6931a2d19c7fbdfcbd53f4c410"
+      },
+      {
+        "bounds": {
+          "x": 965,
+          "y": 560.75,
+          "width": 460.5,
+          "height": 100
+        },
+        "sha256": "d71ed90a3365ad61b6efe09205fc99eff03f1f2ed9cc7b6d6cbf8a66e8ebeaef"
+      },
+      {
+        "bounds": {
+          "x": 1435.5,
+          "y": 560.75,
+          "width": 460.5,
+          "height": 100
+        },
+        "sha256": "5a868c875f5e1b25f3d97911f96b855d13fdb5160ff18339acb8b6c5d4b0dff8"
+      }
+    ]
+  },
+  "overflow": {
+    "width": 1920,
+    "scrollWidth": 1920
+  },
+  "calls": [],
+  "errors": []
+}

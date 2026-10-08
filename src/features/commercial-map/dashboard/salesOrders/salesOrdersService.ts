@@ -100,9 +100,17 @@ export async function fetchSaleOrdersPage(projectId: string, filters: SaleOrders
     p_offset: page * SALE_ORDERS_PAGE_SIZE,
   });
   if (error) throw error;
+  const rawTotal: unknown = data?.total;
+  // A successful transport response without a count is not an observed zero.
+  // Validate here so the dashboard summary and the dedicated list agree.
+  const total = typeof rawTotal === 'number'
+    ? rawTotal : typeof rawTotal === 'string' && rawTotal.trim() !== '' ? Number(rawTotal) : NaN;
+  if (!Number.isSafeInteger(total) || total < 0) {
+    throw new Error('Consulta de vendas indisponível: total de registros inválido ou ausente.');
+  }
   const documentsAccessible = Boolean(data?.documentsAccessible);
   return {
-    total: Number(data?.total ?? 0),
+    total,
     rows: (data?.rows ?? []).map((row: unknown) => mapSummaryRow(row, documentsAccessible)),
     documentsAccessible,
   };

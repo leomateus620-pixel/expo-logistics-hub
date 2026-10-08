@@ -1,0 +1,81 @@
+{
+  "size": {
+    "name": "notebook",
+    "width": 1366,
+    "height": 768
+  },
+  "phase": "before",
+  "protectedRegions": {
+    "header": {
+      "bounds": {
+        "x": 0,
+        "y": 72,
+        "width": 1366,
+        "height": 57
+      },
+      "sha256": "501582cff2970336b595bf492a482587c21be2c643a4dd40ec53e347073bf79c"
+    },
+    "finance": {
+      "bounds": {
+        "x": 24,
+        "y": 187,
+        "width": 1318,
+        "height": 148
+      },
+      "sha256": "e4b5cbb557d6645b2264dab98f3f533029cc0086b2ba6af06813e4ce7427559a"
+    },
+    "progress": {
+      "bounds": {
+        "x": 24,
+        "y": 349,
+        "width": 1318,
+        "height": 195.75
+      },
+      "sha256": "de9cf736e0b9b46758ad41a12fb3861cd8b471a4e2adc7cb4ab60f5e2fefbc12"
+    },
+    "kpis": [
+      {
+        "bounds": {
+          "x": 24,
+          "y": 560.75,
+          "width": 322,
+          "height": 100
+        },
+        "sha256": "bf3e8fef7e6fc2596df99bd5dddbc7165f0c6f60d866d3872581037dfc4c5186"
+      },
+      {
+        "bounds": {
+          "x": 356,
+          "y": 560.75,
+          "width": 322,
+          "height": 100
+        },
+        "sha256": "493ed329006127e6fe5b72b744ba9fa88d715b19f77ee3db5c30799f5c758dd8"
+      },
+      {
+        "bounds": {
+          "x": 688,
+          "y": 560.75,
+          "width": 322,
+          "height": 100
+        },
+        "sha256": "7d3c695ba998cd496279a73ce97dc70cef1caec5d40c3934e4cadbf43e62ab87"
+      },
+      {
+        "bounds": {
+          "x": 1020,
+          "y": 560.75,
+          "width": 322,
+          "height": 100
+        },
+        "sha256": "6a09db7e3019dbad05a77a41fdb4824c882576e8a46cd874eb0bb41f2b29c335"
+      }
+    ]
+  },
+  "overflow": {
+    "width": 1366,
+    "scrollWidth": 1366
+  },
+  "calls": [],
+  "errors": []
+}

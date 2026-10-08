@@ -1,0 +1,46 @@
+{
+  "baseCommit": "e2acc54f044378e1c6d5129b6c4feb9837a4f78e",
+  "protectedPaths": [
+    "supabase",
+    "src/integrations/supabase"
+  ],
+  "changedProtectedFiles": [],
+  "newProtectedFiles": [],
+  "unchangedSources": [
+    {
+      "path": "src/features/commercial-map/dashboard/commercialDashboardAnalytics.ts",
+      "baseline": "178db135c29bda69b2bfad79618af60057d97f02",
+      "current": "178db135c29bda69b2bfad79618af60057d97f02"
+    },
+    {
+      "path": "src/features/commercial-map/dashboard/CommercialSalesProgress.tsx",
+      "baseline": "6d69f1bbcb10607dea155ca07c876052782c4846",
+      "current": "6d69f1bbcb10607dea155ca07c876052782c4846"
+    },
+    {
+      "path": "src/features/commercial-map/dashboard/commercialSalesProgressMetrics.ts",
+      "baseline": "c59d81b2fcf014885693b80443ef9266ab3375b1",
+      "current": "c59d81b2fcf014885693b80443ef9266ab3375b1"
+    },
+    {
+      "path": "src/features/commercial-map/dashboard/CommercialDashboardOverviewIcons.tsx",
+      "baseline": "fb7723cb7a11a9ce9a50a4c48b2bef5b15d53773",
+      "current": "fb7723cb7a11a9ce9a50a4c48b2bef5b15d53773"
+    },
+    {
+      "path": "src/features/commercial-map/dashboard/CommercialDashboardCharts.tsx",
+      "baseline": "c340da0728e9af6bf4bd4802df2368ad84f929a2",
+      "current": "c340da0728e9af6bf4bd4802df2368ad84f929a2"
+    },
+    {
+      "path": "src/features/commercial-map/dashboard/CommercialMiniMap.tsx",
+      "baseline": "72c0e544bc2cacdf47b39801cfb2cd87393e7b4c",
+      "current": "72c0e544bc2cacdf47b39801cfb2cd87393e7b4c"
+    },
+    {
+      "path": "src/features/commercial-map/dashboard/CommercialDashboardPavilion.tsx",
+      "baseline": "5cabe4cce0c034a4b23f1f816f446b4695bd7246",
+      "current": "5cabe4cce0c034a4b23f1f816f446b4695bd7246"
+    }
+  ]
+}

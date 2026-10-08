@@ -9,8 +9,21 @@ import { STATUS_CONFIG } from '../constants';
 import { CommercialDashboardLotChart } from './CommercialDashboardCharts';
 import { useDashboardStatusHighlight } from './useDashboardStatusHighlight';
 import { CommercialDashboardComparison } from './CommercialDashboardComparison';
+import { CommercialDashboardScopeCard } from './CommercialDashboardScopeCard';
+import './commercial-dashboard-scope-cards.css';
 
 const PavilionPlan = lazy(() => import('./CommercialDashboardPavilion'));
+
+export interface CommercialDashboardSpacesState {
+  requestedScopeId: string;
+  selections: Record<string, string | null>;
+  metric: 'lots' | 'area';
+}
+
+/** A project-scoped presentation memory supplied by the mounted Dashboard. */
+export interface CommercialDashboardSpacesMemory {
+  current: CommercialDashboardSpacesState | null;
+}
 
 function Metrics({ aggregate, title }: { aggregate: DashboardAggregate; title: string }) {
   return <div className="commercial-dashboard-scope-metrics" aria-label={`Indicadores de ${title}`}>
@@ -37,20 +50,27 @@ function Verification({ aggregate }: { aggregate: DashboardAggregate }) {
   </details>;
 }
 
-export function CommercialDashboardSpaces({ snapshot, data, onViewLot }: {
+export function CommercialDashboardSpaces({ snapshot, data, onViewLot, stateMemory }: {
   snapshot: CommercialDashboardSnapshot;
   data: Pick<CommercialMapData, 'entities' | 'lots'>;
   onViewLot: (id: string) => void;
+  stateMemory?: CommercialDashboardSpacesMemory;
 }) {
   // Presentation scope only; every element below shares one existing snapshot aggregate.
-  const [requestedScopeId, setScopeId] = useState('external:all');
-  const scopeId = requestedScopeId === 'pending' && snapshot.unclassified.totalLots === 0 ? 'external:all' : requestedScopeId;
+  const [requestedScopeId, setScopeId] = useState(() => stateMemory?.current?.requestedScopeId ?? 'external:all');
+  // The former internal aggregate remains in the snapshot, without a visible selector.
+  // Normalize a retained aggregate scope explicitly instead of choosing a pavilion.
+  const normalizedScopeId = requestedScopeId === 'internal:all' ? 'external:all' : requestedScopeId;
+  const scopeId = normalizedScopeId === 'pending' && snapshot.unclassified.totalLots === 0 ? 'external:all' : normalizedScopeId;
   useEffect(() => {
-    if (requestedScopeId === 'pending' && snapshot.unclassified.totalLots === 0) setScopeId('external:all');
+    if (requestedScopeId === 'internal:all' || (requestedScopeId === 'pending' && snapshot.unclassified.totalLots === 0)) setScopeId('external:all');
   }, [requestedScopeId, snapshot.unclassified.totalLots]);
-  const [selections, setSelections] = useState<Record<string, string | null>>({});
+  const [selections, setSelections] = useState<Record<string, string | null>>(() => stateMemory?.current?.selections ?? {});
   const [comparisonOpen, setComparisonOpen] = useState(false);
-  const [metric, setMetric] = useState<'lots' | 'area'>('lots');
+  const [metric, setMetric] = useState<'lots' | 'area'>(() => stateMemory?.current?.metric ?? 'lots');
+  useEffect(() => {
+    if (stateMemory) stateMemory.current = { requestedScopeId: scopeId, selections, metric };
+  }, [stateMemory, scopeId, selections, metric]);
   const highlight = useDashboardStatusHighlight();
   const area = scopeId.startsWith('external:') ? snapshot.segments.find((item) => `external:${item.segmentId}` === scopeId) : undefined;
   const pavilion = snapshot.pavilions.find((item) => `pavilion:${item.definition.publicIdentifier}` === scopeId);
@@ -71,22 +91,29 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot }: {
     onChange: (id: string | null) => setSelections((current) => ({ ...current, [scopeId]: id })) };
 
   return <section className="commercial-dashboard-workspace" aria-label="Análise do recorte selecionado">
-    <div className="commercial-dashboard-scope-selector">
-      <div className="commercial-dashboard-selector-row">
-        <span><MapPinned aria-hidden="true" />Áreas externas</span>
-        <div className="commercial-dashboard-area-selectors" role="group" aria-label="Selecionar área externa">
-          <button type="button" aria-pressed={scopeId === 'external:all'} onClick={() => setScopeId('external:all')}>Todas as áreas <small>{formatDashboardInteger(snapshot.external.totalLots)}</small></button>
-          {snapshot.segments.map((item) => <button type="button" key={item.segmentId} aria-pressed={scopeId === `external:${item.segmentId}`}
-            onClick={() => setScopeId(`external:${item.segmentId}`)}>{item.segment.name}<small>{formatDashboardInteger(item.totalLots)}</small></button>)}
+    <div className="commercial-dashboard-scope-selector commercial-dashboard-scope-cards">
+      <div className="commercial-dashboard-scope-cards__section">
+        <div className="commercial-dashboard-scope-cards__heading"><span><MapPinned aria-hidden="true" />Áreas externas</span>
+          <small>Comercialização por espaços</small></div>
+        <div className="commercial-dashboard-scope-grid commercial-dashboard-scope-grid--external" role="group" aria-label="Selecionar área externa">
+          <CommercialDashboardScopeCard scopeId="external:all" title="Todas as áreas" aggregate={snapshot.external}
+            selected={scopeId === 'external:all'} onSelect={() => setScopeId('external:all')} />
+          {snapshot.segments.map((item) => <CommercialDashboardScopeCard key={item.segmentId} scopeId={`external:${item.segmentId}`}
+            title={item.segment.name} aggregate={item} segmentId={item.segmentId}
+            selected={scopeId === `external:${item.segmentId}`} onSelect={() => setScopeId(`external:${item.segmentId}`)} />)}
         </div>
       </div>
-      <div className="commercial-dashboard-selector-row">
-        <span><Building2 aria-hidden="true" />Pavilhões</span>
-        <div className="commercial-dashboard-pavilion-selectors" role="group" aria-label="Selecionar pavilhão">
-          <button type="button" aria-pressed={isInternal} onClick={() => setScopeId('internal:all')}>Todos</button>
-          {snapshot.pavilions.map((item) => <button type="button" key={item.definition.publicIdentifier} aria-label={item.definition.officialName}
-            title={item.definition.officialName} aria-pressed={scopeId === `pavilion:${item.definition.publicIdentifier}`}
-            onClick={() => setScopeId(`pavilion:${item.definition.publicIdentifier}`)}>{item.definition.pavilionNumber}</button>)}
+      <div className="commercial-dashboard-scope-cards__section">
+        <div className="commercial-dashboard-scope-cards__heading"><span><Building2 aria-hidden="true" />Pavilhões</span>
+          <div className="commercial-dashboard-scope-cards__legend" aria-label="Legenda da comercialização">
+            <span><i data-status="SALE_OPEN" aria-hidden="true" />Em andamento</span><span><i data-status="SOLD" aria-hidden="true" />Confirmada</span>
+          </div>
+        </div>
+        <div className="commercial-dashboard-scope-grid commercial-dashboard-scope-grid--pavilions" role="group" aria-label="Selecionar pavilhão">
+          {snapshot.pavilions.map((item) => <CommercialDashboardScopeCard key={item.definition.publicIdentifier}
+            scopeId={`pavilion:${item.definition.publicIdentifier}`} title={item.definition.officialName} aggregate={item}
+            pavilionNumber={item.definition.pavilionNumber} selected={scopeId === `pavilion:${item.definition.publicIdentifier}`}
+            onSelect={() => setScopeId(`pavilion:${item.definition.publicIdentifier}`)} />)}
         </div>
         {snapshot.unclassified.totalLots > 0 && <button type="button" className="commercial-dashboard-pending-selector" aria-pressed={isPending} onClick={() => setScopeId('pending')}>
           Classificação pendente <strong>{formatDashboardInteger(snapshot.unclassified.totalLots)}</strong>

@@ -208,17 +208,17 @@ describe('overview structure', () => {
   it('keeps the approved order, a single motion exception and the specific information names', () => {
     render(<CommercialDashboard data={OFFICIAL_REFERENCE_DATA} dataUpdatedAt={1000} isFetching={false}
       onClose={vi.fn()} onViewLot={vi.fn()} />);
-    const finance = screen.getByRole('region', { name: 'Valores comerciais globais' });
+    const overview = document.querySelector<HTMLElement>('.commercial-dashboard-overview')!;
+    const finance = within(overview).getByRole('region', { name: 'Valores comerciais globais' });
     expect(within(finance).getAllByRole('article').map((card) => card.querySelector('header > span:nth-child(2)')?.textContent))
       .toEqual(['Valor das vendas confirmadas', 'Valor das vendas em andamento', 'Valor total comercial dos lotes']);
-    const indicators = screen.getByRole('region', { name: 'Indicadores comerciais principais' });
+    const indicators = within(overview).getByRole('region', { name: 'Indicadores comerciais principais' });
     expect(within(indicators).getAllByRole('article').map((card) => card.querySelector('header > span:nth-child(2)')?.textContent))
       .toEqual(['Espaços comerciais', 'Lotes com venda em andamento', 'Lotes vendidos', 'Lotes disponíveis', 'Área comercial']);
     for (const name of ['vendas confirmadas', 'vendas em andamento', 'o valor total comercial', 'a evolução comercial',
       'espaços comerciais', 'lotes com venda em andamento', 'lotes vendidos', 'lotes disponíveis', 'a área comercial']) {
-      expect(screen.getByRole('button', { name: `Informações sobre ${name}` })).toBeInTheDocument();
+      expect(within(overview).getByRole('button', { name: `Informações sobre ${name}` })).toBeInTheDocument();
     }
-    const overview = document.querySelector<HTMLElement>('.commercial-dashboard-overview')!;
     for (const text of ['Valor negociado confirmado', 'Aguardando assinatura', 'Vendas + tabela oficial', 'Inventário ativo',
       'Área oficial cadastrada', 'Valores de vendas não representam receita recebida.']) {
       expect(within(overview).queryByText(text)).not.toBeInTheDocument();

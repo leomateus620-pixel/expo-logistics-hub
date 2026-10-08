@@ -1,0 +1,81 @@
+{
+  "size": {
+    "name": "mobile",
+    "width": 390,
+    "height": 844
+  },
+  "phase": "before",
+  "protectedRegions": {
+    "header": {
+      "bounds": {
+        "x": 0,
+        "y": 108,
+        "width": 390,
+        "height": 65.6875
+      },
+      "sha256": "0c63ce22a86482646a87c0ccfbdf90d5c71a0b09f8a398029d11e7d6c2afeee9"
+    },
+    "finance": {
+      "bounds": {
+        "x": 12,
+        "y": 246.6875,
+        "width": 366,
+        "height": 370
+      },
+      "sha256": "77de167e718b5ff2123cb836e25b3f55cf0f0d12eb67a4737868fdbe0459ff2a"
+    },
+    "progress": {
+      "bounds": {
+        "x": 12,
+        "y": 626.6875,
+        "width": 366,
+        "height": 220.296875
+      },
+      "sha256": "fe38ad4e3d4a9b75762266373f18d431b0c061bd12719ebb27a593d59ddea90c"
+    },
+    "kpis": [
+      {
+        "bounds": {
+          "x": 12,
+          "y": 855.984375,
+          "width": 179,
+          "height": 95
+        },
+        "sha256": "c579642fdf93a4ba97dd5bae31e4bcf3c4ab2b017f71b0e6643e42f7a45e21d6"
+      },
+      {
+        "bounds": {
+          "x": 199,
+          "y": 374.984375,
+          "width": 179,
+          "height": 95
+        },
+        "sha256": "b09e0d5fb21344dd8b14099de0b64d92af49998c5ca898c88a1e3a41d43b18d2"
+      },
+      {
+        "bounds": {
+          "x": 12,
+          "y": 477.984375,
+          "width": 179,
+          "height": 95
+        },
+        "sha256": "2f4090462db7cd811c03f8bb393a748b3be433d9e9d48670448eba134eedb144"
+      },
+      {
+        "bounds": {
+          "x": 199,
+          "y": 477.984375,
+          "width": 179,
+          "height": 95
+        },
+        "sha256": "5d3d63a6973fc0bd3e715e2f53600f91cbcdb169f649724f8a5e097a1690b679"
+      }
+    ]
+  },
+  "overflow": {
+    "width": 390,
+    "scrollWidth": 390
+  },
+  "calls": [],
+  "errors": []
+}
