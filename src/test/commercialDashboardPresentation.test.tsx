@@ -74,7 +74,7 @@ describe('integrated Commercial Dashboard presentation', () => {
     const { rerender } = render(<CommercialDashboard {...props} data={source} />);
     const stages = screen.getByRole('group', { name: 'Etapa dos preços oficiais' });
     expect(within(stages).getByRole('button', { name: 'Renovação' })).toHaveAttribute('aria-pressed', 'true');
-    fireEvent.click(within(screen.getByRole('group', { name: 'Selecionar área externa' })).getByRole('button', { name: /Exporural/ }));
+    fireEvent.click(within(screen.getByRole('group', { name: 'Selecionar área externa' })).getByRole('button', { name: 'Exporural' }));
     const map = screen.getByRole('region', { name: 'Mini mapa comercial: Exporural' });
     fireEvent.change(within(map).getByRole('combobox'), { target: { value: 'offer' } });
     expect(cadastralCard('Valor total comercial dos lotes').querySelector('strong')).toHaveTextContent(formatDashboardCurrency(3000, true));
@@ -102,7 +102,7 @@ describe('integrated Commercial Dashboard presentation', () => {
     const source = { entities: OFFICIAL_REFERENCE_DATA.entities.filter(({ id, isSellable }) => entityIds.has(id) || !isSellable), lots: confirmedLots };
     render(<CommercialDashboard {...props} data={source} />);
     expect(screen.queryByRole('button', { name: /Classificação pendente/ })).not.toBeInTheDocument();
-    fireEvent.click(within(screen.getByRole('group', { name: 'Selecionar área externa' })).getByRole('button', { name: /Indústria, Comércio e Serviços/ }));
+    fireEvent.click(within(screen.getByRole('group', { name: 'Selecionar área externa' })).getByRole('button', { name: 'Indústria, Comércio e Serviços' }));
     const map = screen.getByRole('region', { name: 'Mini mapa comercial: Indústria, Comércio e Serviços' });
     const positionedIds = [...map.querySelectorAll('path[data-entity-id]')].map((path) => path.getAttribute('data-entity-id')).sort();
     expect(positionedIds).toEqual(confirmedLots.map(({ entityId }) => entityId).sort());
@@ -122,7 +122,7 @@ describe('integrated Commercial Dashboard presentation', () => {
     expect(screen.queryByRole('region', { name: 'Mini mapa comercial: Classificação pendente' })).not.toBeInTheDocument();
     const map = screen.getByRole('region', { name: 'Mini mapa comercial: Todas as áreas externas' });
     expect(map.querySelectorAll('path[data-entity-id]')).toHaveLength(initial.lots.length);
-    expect(within(screen.getByRole('group', { name: 'Selecionar área externa' })).getByRole('button', { name: /Todas as áreas/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(within(screen.getByRole('group', { name: 'Selecionar área externa' })).getByRole('button', { name: 'Todas as áreas' })).toHaveAttribute('aria-pressed', 'true');
     expect(kpi('Espaços comerciais').querySelector('strong')).toHaveTextContent(formatDashboardInteger(initial.lots.length));
     expect(initial.lots.every(({ block }) => block === null)).toBe(true);
     expect(buildCommercialDashboardSnapshot(updated).unclassified.records).toEqual([]);
@@ -149,14 +149,14 @@ describe('integrated Commercial Dashboard presentation', () => {
   it('updates the same map, summary and visible distribution when the selected area changes; highlights do not filter inventory', () => {
     const { container } = render(<CommercialDashboard {...props} />);
     const selectors = screen.getByRole('group', { name: 'Selecionar área externa' });
-    fireEvent.click(within(selectors).getByRole('button', { name: /Exporural/ }));
+    fireEvent.click(within(selectors).getByRole('button', { name: 'Exporural' }));
     const map = screen.getByRole('region', { name: 'Mini mapa comercial: Exporural' });
     const legend = distribution();
     const saleOpen = within(legend).getByRole('button', { name: /Venda em aberto: 2 lotes/ });
-    expect(saleOpen).toHaveAccessibleName(/28,6% dos lotes.*10,7% da área/);
-    expect(saleOpen).toHaveAccessibleName(/30,00 m²/);
+    expect(saleOpen).toHaveAccessibleName(/28,6% dos lotes comerciais/);
+    expect(saleOpen).not.toHaveTextContent('m²');
     expect(within(legend).getByRole('button', { name: /Vendido: 1 lote/ })).toHaveAccessibleName(/14,3%/);
-    expect(within(legend).getByRole('button', { name: /Indisponível: 1 lote/ })).toHaveAccessibleName(/fora dos percentuais comerciais.*900,00 m²/);
+    expect(within(legend).getByRole('button', { name: /Indisponível: 1 lote/ })).toHaveAccessibleName(/fora dos percentuais comerciais/);
     expect(container.querySelectorAll('path[data-entity-id]')).toHaveLength(8);
     expect(screen.queryByLabelText('Legenda das situações comerciais')).not.toBeInTheDocument();
 
@@ -170,18 +170,18 @@ describe('integrated Commercial Dashboard presentation', () => {
     expect(saleOpen).toHaveAccessibleName(/28,6%/);
 
     fireEvent.click(within(screen.getByRole('group', { name: 'Métrica de distribuição' })).getByRole('button', { name: 'Área oficial' }));
-    expect(saleOpen).toHaveAccessibleName(/28,6% dos lotes.*10,7% da área/);
+    expect(saleOpen).toHaveAccessibleName(/30,00 m².*10,7% da área oficial conhecida/);
     expect(within(saleOpen).getByText('10,7%')).toBeVisible();
-    expect(within(within(legend).getByRole('button', { name: /Vendido: 1 lote/ })).getByText('10,7%')).toBeVisible();
+    expect(within(within(legend).getByRole('button', { name: /Vendido: 30,00 m²/ })).getByText('10,7%')).toBeVisible();
     expect(container.querySelectorAll('path[data-entity-id]')).toHaveLength(8);
     fireEvent.click(within(screen.getByRole('group', { name: 'Métrica de distribuição' })).getByRole('button', { name: 'Quantidade' }));
     expect(within(saleOpen).getByText('28,6%')).toBeVisible();
 
-    fireEvent.click(within(selectors).getByRole('button', { name: /Espaço do Automóvel/ }));
+    fireEvent.click(within(selectors).getByRole('button', { name: 'Espaço do Automóvel' }));
     expect(screen.queryByRole('region', { name: 'Mini mapa comercial: Exporural' })).not.toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Mini mapa comercial: Espaço do Automóvel' })).toBeVisible();
     expect(container.querySelectorAll('path[data-entity-id]')).toHaveLength(1);
-    expect(within(distribution()).getByRole('button', { name: /Disponível: 1 lote/ })).toHaveAccessibleName(/100,0%.*110,00 m²/);
+    expect(within(distribution()).getByRole('button', { name: /Disponível: 1 lote/ })).toHaveAccessibleName(/100,0% dos lotes comerciais/);
     expect(within(distribution()).getByRole('button', { name: /Venda em aberto: 0 lotes/ })).toHaveAttribute('aria-pressed', 'true');
     expect(kpi('Espaços comerciais').querySelector('strong')).toHaveTextContent(/^9$/);
   });
@@ -205,7 +205,7 @@ describe('integrated Commercial Dashboard presentation', () => {
     fireEvent.click(screen.getByRole('button', { name: /Classificação pendente/ }));
     expect(screen.queryByRole('region', { name: 'Mini mapa comercial: Todas as áreas externas' })).not.toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Mini mapa comercial: Classificação pendente' })).toBeVisible();
-    expect(within(distribution()).getByRole('button', { name: /Venda em aberto: 1 lote/ })).toHaveAccessibleName(/100,0%.*5,00 m²/);
+    expect(within(distribution()).getByRole('button', { name: /Venda em aberto: 1 lote/ })).toHaveAccessibleName(/100,0% dos lotes comerciais/);
     expect(kpi('Lotes com venda em andamento').querySelector('strong')).toHaveTextContent(/^4$/);
   });
 
@@ -261,7 +261,7 @@ describe('integrated Commercial Dashboard presentation', () => {
     expect(info('Informações sobre a evolução comercial')).toHaveTextContent(/não representam receita recebida/);
     const valuesBefore = [...finance.querySelectorAll('article > strong')].map((element) => element.textContent);
 
-    fireEvent.click(within(screen.getByRole('group', { name: 'Selecionar área externa' })).getByRole('button', { name: /Espaço do Automóvel/ }));
+    fireEvent.click(within(screen.getByRole('group', { name: 'Selecionar área externa' })).getByRole('button', { name: 'Espaço do Automóvel' }));
     expect(screen.getByRole('region', { name: 'Mini mapa comercial: Espaço do Automóvel' })).toBeVisible();
     expect([...finance.querySelectorAll('article > strong')].map((element) => element.textContent)).toEqual(valuesBefore);
     fireEvent.click(screen.getByRole('button', { name: /Classificação pendente/ }));

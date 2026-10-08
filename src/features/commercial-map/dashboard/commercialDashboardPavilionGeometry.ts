@@ -4,6 +4,7 @@ import { resolveCommercialPavilionWayfindingMarkers } from '../utils/commercialP
 import type { CommercialPavilionDashboardSnapshot } from './commercialDashboardTypes';
 import { validDashboardRing, type MiniMapBounds, type MiniMapOutline } from './commercialDashboardGeometry';
 import type { DashboardAccessMarker } from './CommercialMiniMap';
+import { reconcileDashboardPavilionFrame } from './commercialDashboardPavilionFrame';
 
 export function buildDashboardPavilionGeometry(snapshot: CommercialPavilionDashboardSnapshot) {
   const plan = COMMERCIAL_PAVILION_MODULE_PLANS[snapshot.definition.publicIdentifier];
@@ -30,6 +31,16 @@ export function buildDashboardPavilionGeometry(snapshot: CommercialPavilionDashb
     width: Math.max(...xs) - Math.min(...xs), depth: Math.max(...zs) - Math.min(...zs),
   }, facing);
   const layout = createCommercialPavilionLayout(bounds, snapshot.definition, undefined, plan);
+  const footprint = { width: layout.interior.clearWidth, depth: layout.interior.clearDepth };
+  const frame = createCommercialPavilionModuleProjectionFrame(plan, footprint);
+  const alignment = snapshot.definition.publicIdentifier === 'B4' || snapshot.definition.publicIdentifier === 'B5'
+    ? reconcileDashboardPavilionFrame({ records, plan, frame, worldCenter: [centerX, centerZ], facingRadians: facing })
+    : { translation: [0, 0] as const, issue: null };
+  if (!alignment.translation) {
+    pending.push('Contorno interno, apoios e acessos pendentes: a referência não pôde ser reconciliada com a geometria carregada. Os lotes cadastrados permanecem na planta.');
+    return { records, outlines, accesses, pending, contentEnvelope: undefined, referenceCount: plan.cells.length };
+  }
+  const [offsetX, offsetZ] = alignment.translation;
   // Same clear floor/projection as the standard map. Only explicitly referenced
   // wall accesses are included; generic facade entrances are never used.
   const markers = resolveCommercialPavilionWayfindingMarkers({
@@ -45,11 +56,9 @@ export function buildDashboardPavilionGeometry(snapshot: CommercialPavilionDashb
       [rect.centerX - rect.width / 2, rect.centerZ + rect.depth / 2]];
     return corners.map((point) => {
       const [x, z] = rotate(point);
-      return [centerX + x, centerZ + z];
+      return [centerX + x + offsetX, centerZ + z + offsetZ];
     });
   };
-  const footprint = { width: layout.interior.clearWidth, depth: layout.interior.clearDepth };
-  const frame = createCommercialPavilionModuleProjectionFrame(plan, footprint);
   // This is the official internal plan's presentation boundary, not the park's
   // external building footprint. Persisted lot polygons remain untouched.
   outlines.push({ id: snapshot.entity.id, kind: 'pavilion', label: snapshot.definition.officialName,
@@ -71,7 +80,7 @@ export function buildDashboardPavilionGeometry(snapshot: CommercialPavilionDashb
     const direction: [number, number] = marker.edge === 'front' ? [0, 1]
       : marker.edge === 'rear' ? [0, -1] : marker.edge === 'left' ? [-1, 0] : [1, 0];
     accesses.push({ id: marker.id, label: marker.label, kind: marker.kind,
-      position: [centerX + x, centerZ + z], outward: rotate(direction) });
+      position: [centerX + x + offsetX, centerZ + z + offsetZ], outward: rotate(direction) });
   }
   if (!accesses.length) pending.push('Nenhuma entrada ou saída confirmada nas referências deste pavilhão.');
   return { records, outlines, accesses, pending, contentEnvelope, referenceCount: plan.cells.length };

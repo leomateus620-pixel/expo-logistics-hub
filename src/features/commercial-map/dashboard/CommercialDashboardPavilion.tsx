@@ -3,6 +3,7 @@ import type { CommercialPavilionDashboardSnapshot } from './commercialDashboardT
 import { buildDashboardPavilionGeometry } from './commercialDashboardPavilionGeometry';
 import { CommercialMiniMap, type MiniMapPresentationMemory } from './CommercialMiniMap';
 import type { CommercialStatus } from '../types';
+import { OverviewInfo } from './CommercialDashboardOverviewInfo';
 
 export default function CommercialDashboardPavilion({ snapshot, onViewLot, selection, highlightedStatus, presentationMemory, hideStatusLegend = false }: {
   snapshot: CommercialPavilionDashboardSnapshot;
@@ -13,16 +14,21 @@ export default function CommercialDashboardPavilion({ snapshot, onViewLot, selec
   presentationMemory?: MiniMapPresentationMemory;
 }) {
   const geometry = useMemo(() => buildDashboardPavilionGeometry(snapshot), [snapshot]);
+  const hasReferenceDetails = geometry.referenceCount !== snapshot.totalLots || geometry.pending.length > 0;
   return <div data-dashboard-pavilion={snapshot.definition.publicIdentifier}>
     {!snapshot.totalLots && <p className="commercial-dashboard-empty">Nenhum módulo comercial ativo carregado neste pavilhão.</p>}
-    <p className="commercial-dashboard-data-note">
-      {geometry.referenceCount} módulos na referência oficial · {snapshot.totalLots} registros ativos carregados.
-      {geometry.referenceCount !== snapshot.totalLots && ' A diferença permanece explícita; os indicadores usam somente o cadastro ativo carregado.'}
-    </p>
     <CommercialMiniMap items={geometry.records} title={snapshot.definition.officialName}
-      className="commercial-dashboard-pavilion-plan" contentEnvelope={geometry.contentEnvelope}
+      presentation="pavilion" className="commercial-dashboard-pavilion-plan" contentEnvelope={geometry.contentEnvelope}
       numberLabelPixels={snapshot.definition.pavilionNumber === 1 ? 14 : 11}
       outlines={geometry.outlines} accesses={geometry.accesses} numbered onViewLot={onViewLot} selection={selection} presentationMemory={presentationMemory} highlightedStatus={highlightedStatus} hideStatusLegend={hideStatusLegend} />
-    {geometry.pending.map((message) => <p className="commercial-dashboard-pending" key={message}>{message}</p>)}
+    {hasReferenceDetails && <div className="commercial-dashboard-pavilion-reference-note">
+      <OverviewInfo label={`Informações da referência de ${snapshot.definition.officialName}`}
+        title="Referência da planta" lead="A planta mantém os espaços do cadastro ativo carregado."
+        facts={[
+          ['Módulos na referência', geometry.referenceCount],
+          ['Registros ativos carregados', snapshot.totalLots],
+        ]}
+        note={geometry.pending.length ? geometry.pending.join(' ') : 'A referência e o cadastro carregado possuem contagens diferentes. Os indicadores usam somente o cadastro ativo.'} />
+    </div>}
   </div>;
 }

@@ -31,11 +31,11 @@ describe('Dashboard sales workspace composition', () => {
     mount();
     expect(screen.getByRole('region', { name: 'Indicadores comerciais principais' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Acessar vendas e contratos' })).toBeInTheDocument();
-    expect(fetchSaleOrdersPage).not.toHaveBeenCalled();
+    await waitFor(() => expect(fetchSaleOrdersPage).toHaveBeenCalledTimes(3));
     expect(fetchSaleOrderDetail).not.toHaveBeenCalled();
     expect(screen.queryByRole('navigation', { name: 'Páginas de vendas' })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Acessar vendas e contratos' }));
-    await waitFor(() => expect(fetchSaleOrdersPage).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(fetchSaleOrdersPage).toHaveBeenCalledTimes(4));
     expect(useSalesOrdersUiStore.getState().area).toBe('sales');
     expect(screen.queryByRole('region', { name: 'Indicadores comerciais principais' })).not.toBeInTheDocument();
     expect(screen.queryByRole('group', { name: 'Selecionar pavilhão' })).not.toBeInTheDocument();
@@ -53,6 +53,25 @@ describe('Dashboard sales workspace composition', () => {
       { ...EMPTY_SALE_FILTERS, search: 'registro', hasDocument: 'yes' }, 2));
     expect(screen.queryByRole('button', { name: 'Acessar vendas e contratos' })).not.toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Indicadores comerciais principais' })).not.toBeInTheDocument();
+  });
+
+  it('returns from dedicated sales with the selected scope, metric, focus and overview scroll intact', async () => {
+    const container = document.createElement('div');
+    mount({ scrollContainer: () => container });
+    await waitFor(() => expect(fetchSaleOrdersPage).toHaveBeenCalledTimes(3));
+    fireEvent.click(screen.getByRole('button', { name: 'Exporural' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Área oficial' }));
+    container.scrollTop = 640;
+    fireEvent.click(screen.getByRole('button', { name: 'Acessar vendas e contratos' }));
+    await waitFor(() => expect(fetchSaleOrdersPage).toHaveBeenCalledTimes(4));
+    expect(container.scrollTop).toBe(0);
+    container.scrollTop = 220;
+    fireEvent.click(screen.getByRole('button', { name: /Voltar à visão geral/ }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Acessar vendas e contratos' })).toHaveFocus());
+    expect(container.scrollTop).toBe(640);
+    expect(screen.getByRole('button', { name: 'Exporural' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Todas as áreas' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Área oficial' })).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('keeps lack of sales permission explicit without starting a list request', async () => {

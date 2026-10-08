@@ -1,0 +1,39 @@
+/* Opt-in pavilion inspection. The external maps retain their established DOM and styles. */
+.commercial-dashboard-minimap--pavilion .commercial-dashboard-pavilion-frame { position: relative; isolation: isolate; min-width: 0; }
+.commercial-dashboard-minimap--pavilion .commercial-dashboard-map-tools { margin: 10px 0 0; }
+.commercial-dashboard-minimap--pavilion .commercial-dashboard-map-tools select { min-height: 44px; }
+.commercial-dashboard-minimap--pavilion .commercial-dashboard-map-tools button { min-height: 44px; min-width: 44px; }
+.commercial-dashboard-pavilion-context-anchor { position: absolute; z-index: 2; width: min(290px, calc(100% - 16px)); max-height: calc(100% - 16px); overflow: auto; overscroll-behavior: contain; border-radius: 11px; }
+.commercial-dashboard-lot-context { --inspection-ink: #243d30; --inspection-muted: #62756a; padding: 13px 14px 11px; border: 1px solid #c6d6ca; border-radius: 11px; background: #fffffffa; color: var(--inspection-ink); box-shadow: 0 5px 18px #173c2520; font-size: 11px; line-height: 1.4; font-variant-numeric: tabular-nums; }
+.commercial-dashboard-lot-context__heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.commercial-dashboard-lot-context__heading > div { display: grid; gap: 1px; min-width: 0; }
+.commercial-dashboard-lot-context__heading strong { font-size: 15px; font-weight: 750; letter-spacing: -.02em; }
+.commercial-dashboard-lot-context__heading span { color: var(--inspection-muted); font-size: 10px; }
+.commercial-dashboard-lot-context__close { display: inline-grid; place-items: center; flex: 0 0 auto; width: 44px; height: 44px; margin: -8px -9px -8px 0; border: 0; border-radius: 7px; background: transparent; color: #62756a; cursor: pointer; }
+.commercial-dashboard-lot-context__close svg { width: 17px; height: 17px; }
+.commercial-dashboard-lot-context__close:hover { background: #edf3ee; color: #243d30; }
+.commercial-dashboard-lot-context__summary { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 9px; margin-top: 10px; }
+.commercial-dashboard-lot-context__status { display: inline-flex; align-items: center; gap: 5px; padding: 3px 7px; border-radius: 5px; font-size: 10px; font-weight: 650; }
+.commercial-dashboard-lot-context__status i { width: 5px; height: 5px; border-radius: 50%; }
+.commercial-dashboard-lot-context__area { display: inline-flex; align-items: center; gap: 5px; color: #4c6656; font-size: 11px; }
+.commercial-dashboard-lot-context__area svg { width: 13px; height: 13px; }
+.commercial-dashboard-lot-context__position-note { margin: 8px 0 0; color: var(--inspection-muted); font-size: 10px; }
+.commercial-dashboard-lot-context__sale-value { display: grid; gap: 2px; margin-top: 11px; padding-top: 10px; border-top: 1px solid #e3ebe4; }
+.commercial-dashboard-lot-context__sale-value > span, .commercial-dashboard-lot-context__buyer span, .commercial-dashboard-lot-context__prices dt { color: var(--inspection-muted); font-size: 10px; }
+.commercial-dashboard-lot-context__sale-value > strong { font-size: 18px; font-weight: 700; letter-spacing: -.025em; overflow-wrap: anywhere; }
+.commercial-dashboard-lot-context__buyer { display: flex; align-items: flex-start; gap: 7px; margin-top: 9px; }
+.commercial-dashboard-lot-context__buyer > svg { width: 14px; height: 14px; flex: 0 0 auto; margin-top: 3px; color: #708477; }
+.commercial-dashboard-lot-context__buyer > div { display: grid; gap: 1px; min-width: 0; }
+.commercial-dashboard-lot-context__buyer strong { font-size: 11px; font-weight: 650; overflow-wrap: anywhere; }
+.commercial-dashboard-lot-context__prices { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; margin: 11px 0 0; padding-top: 10px; border-top: 1px solid #e3ebe4; }
+.commercial-dashboard-lot-context__prices > div { display: grid; gap: 3px; }
+.commercial-dashboard-lot-context__prices > div + div { padding-left: 10px; border-left: 1px solid #e3ebe4; }
+.commercial-dashboard-lot-context__prices dd { margin: 0; font-size: 13px; font-weight: 700; overflow-wrap: anywhere; }
+.commercial-dashboard-lot-context footer { display: flex; justify-content: flex-end; margin-top: 10px; padding-top: 8px; border-top: 1px solid #e3ebe4; }
+.commercial-dashboard-lot-context footer button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 7px 11px; border: 1px solid #c8d9cd; border-radius: 7px; background: #edf4ed; color: #2f5b3d; font: inherit; font-weight: 700; cursor: pointer; }
+.commercial-dashboard-lot-context footer svg { width: 14px; height: 14px; }
+.commercial-dashboard-lot-context button:focus-visible { outline: 2px solid #397b50; outline-offset: 2px; }
+.commercial-dashboard-pavilion-reference-note { display: flex; align-items: center; justify-content: flex-end; gap: 5px; margin-top: 6px; color: #6a786e; font-size: 11px; }
+.commercial-dashboard-pavilion-reference-note .commercial-dashboard-overview-info-trigger { display: inline-grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; margin: 0; padding: 0; }
+.commercial-dashboard-pavilion-reference-note .commercial-dashboard-overview-info-trigger::after { inset: 0; }
+@media (prefers-reduced-motion: reduce) { .commercial-dashboard-minimap--pavilion .commercial-dashboard-map-svg path[role="button"] { transition: none; } }

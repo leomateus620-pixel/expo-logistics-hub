@@ -9,6 +9,8 @@ import {
   formatDashboardPercentage,
 } from './commercialDashboardFormatters';
 import type { DashboardAggregate } from './commercialDashboardTypes';
+import { OverviewInfo } from './CommercialDashboardOverviewInfo';
+import { formatDashboardCommercialProgress } from './commercialDashboardProgress';
 
 const AREA_STATUSES = COMMERCIAL_PHASES;
 const VALUE_STATUSES = COMMERCIAL_PHASES.filter((status) => status !== 'BLOCKED');
@@ -50,6 +52,11 @@ interface LotChartRow {
   lotCount: number;
 }
 
+interface LotChartProps extends ChartProps {
+  /** The workspace presentation is opt-in; segment and financial charts keep their layout. */
+  variant?: 'default' | 'workspace';
+}
+
 function canHover() {
   return typeof window !== 'undefined'
     && typeof window.matchMedia === 'function'
@@ -63,7 +70,23 @@ export function CommercialDashboardLotChart({
   onToggleStatus,
   compact = false,
   metric = 'lots',
-}: ChartProps) {
+  variant = 'default',
+}: LotChartProps) {
+  const workspace = variant === 'workspace';
+  const formatPercentage = workspace ? formatDashboardCommercialProgress : formatDashboardPercentage;
+  const soldAreaPending = aggregate.byStatus.SOLD.areaPendingCount;
+  const soldPercentage = metric === 'area'
+    ? (aggregate.totalAreaSqm > 0 && !(aggregate.soldLots > 0 && soldAreaPending === aggregate.soldLots) ? aggregate.soldAreaPercentage : null)
+    : (aggregate.commercialLots > 0 ? aggregate.soldLotPercentage : null);
+  const workspaceSummary = metric === 'area'
+    ? (soldPercentage === null
+      ? (aggregate.totalAreaSqm > 0
+        ? 'Percentual da área vendida pendente porque a metragem oficial dos lotes vendidos não está cadastrada.'
+        : 'Percentual da área vendida pendente porque não há base de área oficial válida.')
+      : `${formatPercentage(soldPercentage)} da área oficial conhecida foi classificada como vendida: ${formatDashboardAreaWithCoverage(aggregate.soldAreaSqm, aggregate.soldLots, soldAreaPending, aggregate.commercialLots)} de ${formatDashboardArea(aggregate.totalAreaSqm)}.${aggregate.lotsWithoutOfficialArea > 0 ? ' Cobertura de área parcial.' : ''}`)
+    : (aggregate.commercialLots > 0
+      ? `${formatPercentage(soldPercentage)} dos lotes comerciais foram vendidos: ${formatDashboardInteger(aggregate.soldLots)} de ${formatDashboardInteger(aggregate.commercialLots)}.`
+      : 'Percentual vendido pendente porque não há lotes comerciais cadastrados.');
   // The four displayed phases group legacy operational states without rewriting them.
   const rows: LotChartRow[] = AREA_STATUSES.flatMap((status) => {
     const summary = phaseSummary(aggregate, status);
@@ -78,7 +101,24 @@ export function CommercialDashboardLotChart({
   });
 
   return (
-    <div className={`commercial-dashboard-area-chart${compact ? ' is-compact' : ''}`}>
+    <div className={`commercial-dashboard-area-chart${compact ? ' is-compact' : ''}${workspace ? ' commercial-dashboard-area-chart--workspace' : ''}`} data-metric={workspace ? metric : undefined}>
+      {workspace && <div className="commercial-dashboard-workspace-chart-info">
+        <OverviewInfo label="Informações da distribuição comercial" title="Como ler a distribuição"
+          lead={metric === 'area'
+            ? 'O gráfico e a lista mostram a área oficial conhecida por situação. O centro indica somente a área classificada como vendida.'
+            : 'O gráfico e a lista mostram a quantidade de lotes por situação. O centro indica somente os lotes classificados como vendidos.'}
+          facts={[
+            ['Base de lotes comerciais', formatDashboardInteger(aggregate.commercialLots)],
+            ['Área oficial conhecida', formatDashboardAreaWithCoverage(aggregate.totalAreaSqm, aggregate.commercialLots, aggregate.lotsWithoutOfficialArea, aggregate.commercialLots)],
+            ['Lotes sem área oficial', formatDashboardInteger(aggregate.lotsWithoutOfficialArea)],
+            ['Indisponíveis fora da base', formatDashboardInteger(aggregate.unavailableLots)],
+          ]}
+          note={<>{aggregate.lotsWithoutOfficialArea > 0 && 'Cobertura parcial: percentuais de área usam somente a metragem oficial conhecida; área ausente não equivale a zero. '}
+            {aggregate.commercialLots === 0 && 'Não há base comercial para calcular percentuais. '}
+            {metric === 'area' && aggregate.totalAreaSqm <= 0 && 'Não há área oficial positiva para calcular percentuais de área. '}
+            Bloqueados participam da base comercial. Indisponíveis permanecem na planta e ficam fora dos percentuais.
+            {' '}Selecione uma situação para destacá-la na planta, preservando todos os espaços e totais.</>} />
+      </div>}
       {rows.length > 0 && (metric === 'lots' || aggregate.totalAreaSqm > 0) ? (
         <div className="commercial-dashboard-donut-layout">
           <div className="commercial-dashboard-donut" aria-hidden="true">
@@ -116,6 +156,13 @@ export function CommercialDashboardLotChart({
                   content={({ active, payload }) => {
                     const row = active ? payload?.[0]?.payload as LotChartRow | undefined : undefined;
                     if (!row) return null;
+                    const summary = phaseSummary(aggregate, row.status);
+                    const areaValue = formatDashboardAreaWithCoverage(row.areaSqm, row.lotCount, summary.areaPendingCount, aggregate.commercialLots);
+                    if (workspace) return <div className="commercial-dashboard-chart-tooltip">
+                      <strong>{row.name}</strong>
+                      <span>{metric === 'area' ? areaValue : `${formatDashboardInteger(row.lotCount)} ${row.lotCount === 1 ? 'lote' : 'lotes'}`} · {formatPercentage(metric === 'area' ? row.areaPercentage : row.percentage)}</span>
+                      {metric === 'area' && summary.areaPendingCount > 0 && <small>{formatDashboardInteger(summary.areaPendingCount)} sem área oficial · subtotal conhecido</small>}
+                    </div>;
                     return <div className="commercial-dashboard-chart-tooltip">
                       <strong>{row.name}</strong>
                       <span>{formatDashboardInteger(row.lotCount)} {row.lotCount === 1 ? 'lote' : 'lotes'} · {formatDashboardPercentage(metric === 'area' ? row.areaPercentage : row.percentage)} {metric === 'area' ? 'da área' : 'dos lotes'}</span>
@@ -126,25 +173,33 @@ export function CommercialDashboardLotChart({
               </PieChart>
             </ResponsiveContainer>
             <div className="commercial-dashboard-donut-center">
-              <strong>{formatDashboardPercentage(metric === 'area' ? aggregate.soldAreaPercentage : aggregate.soldLotPercentage)}</strong>
+              <strong>{workspace ? formatPercentage(soldPercentage) : formatDashboardPercentage(metric === 'area' ? aggregate.soldAreaPercentage : aggregate.soldLotPercentage)}</strong>
               <span>{metric === 'area' ? 'área vendida' : 'lotes vendidos'}</span>
             </div>
           </div>
-          <div className="commercial-dashboard-donut-detail">
+          {!workspace && <div className="commercial-dashboard-donut-detail">
             <strong>{formatDashboardInteger(aggregate.soldLots)} de {formatDashboardInteger(aggregate.commercialLots)} lotes</strong>
             <span>{aggregate.totalAreaSqm > 0
               ? `${formatDashboardPercentage(aggregate.soldAreaPercentage)} da área · ${formatDashboardArea(aggregate.soldAreaSqm)} de ${formatDashboardArea(aggregate.totalAreaSqm)}`
               : 'Área oficial pendente de cadastro'}</span>
-          </div>
+          </div>}
         </div>
       ) : (
         <div className="commercial-dashboard-chart-empty">{metric === 'area' && aggregate.commercialLots > 0 ? 'Área oficial pendente de cadastro para compor o gráfico.' : 'Ainda não há lotes comerciais cadastrados para compor o gráfico.'}</div>
       )}
 
       <div className="commercial-dashboard-status-list" aria-label="Distribuição comercial por quantidade de lotes e área">
-        <div className="commercial-dashboard-legend-heading" aria-hidden="true"><span>Situação</span><span>Lotes</span><span>Área oficial</span><span>% {metric === 'area' ? 'área' : 'lotes'}</span></div>
+        {workspace ? <div className="commercial-dashboard-legend-heading">
+          <span aria-hidden="true">Situação</span>
+          <span aria-hidden="true">{metric === 'area' ? 'Área oficial' : 'Lotes'}</span><span aria-hidden="true">%</span>
+        </div> : <div className="commercial-dashboard-legend-heading" aria-hidden="true"><span>Situação</span><span>Lotes</span><span>Área oficial</span><span>% {metric === 'area' ? 'área' : 'lotes'}</span></div>}
         {AREA_STATUSES.map((status) => {
           const summary = phaseSummary(aggregate, status);
+          const areaValue = formatDashboardAreaWithCoverage(summary.areaSqm, summary.lotCount, summary.areaPendingCount, aggregate.commercialLots);
+          const selectedPercentage = metric === 'area'
+            ? (aggregate.totalAreaSqm > 0 && !(summary.lotCount > 0 && summary.areaPendingCount === summary.lotCount) ? summary.areaPercentage : null)
+            : (aggregate.commercialLots > 0 ? summary.lotPercentage : null);
+          const selectedValue = metric === 'area' ? areaValue : formatDashboardInteger(summary.lotCount);
           return <button
             key={status}
             type="button"
@@ -155,33 +210,39 @@ export function CommercialDashboardLotChart({
             onBlur={() => onHoverStatus(null)}
             onClick={() => onToggleStatus(status)}
             aria-pressed={highlightedStatus === status}
-            aria-label={`${STATUS_CONFIG[status].label}: ${formatDashboardInteger(summary.lotCount)} lotes, ${aggregate.commercialLots > 0 ? formatDashboardPercentage(summary.lotPercentage) : 'percentual pendente'} dos lotes, ${formatDashboardAreaWithCoverage(summary.areaSqm, summary.lotCount, summary.areaPendingCount, aggregate.commercialLots)}, ${aggregate.totalAreaSqm > 0 ? formatDashboardPercentage(summary.areaPercentage) : 'percentual pendente'} da área${summary.areaPendingCount ? `, ${summary.areaPendingCount} sem área oficial` : ''}`}
+            aria-label={workspace
+              ? `${STATUS_CONFIG[status].label}: ${selectedValue}${metric === 'lots' ? ' lotes' : ''}, ${selectedPercentage === null ? 'sem base de cálculo' : `${formatPercentage(selectedPercentage)} ${metric === 'area' ? 'da área oficial conhecida' : 'dos lotes comerciais'}`}${summary.areaPendingCount ? `, ${summary.areaPendingCount} sem área oficial` : ''}`
+              : `${STATUS_CONFIG[status].label}: ${formatDashboardInteger(summary.lotCount)} lotes, ${aggregate.commercialLots > 0 ? formatDashboardPercentage(summary.lotPercentage) : 'percentual pendente'} dos lotes, ${formatDashboardAreaWithCoverage(summary.areaSqm, summary.lotCount, summary.areaPendingCount, aggregate.commercialLots)}, ${aggregate.totalAreaSqm > 0 ? formatDashboardPercentage(summary.areaPercentage) : 'percentual pendente'} da área${summary.areaPendingCount ? `, ${summary.areaPendingCount} sem área oficial` : ''}`}
           >
             <i style={{ backgroundColor: STATUS_CONFIG[status].color }} aria-hidden="true" />
             <span>{STATUS_CONFIG[status].label}</span>
-            <strong>{formatDashboardInteger(summary.lotCount)}</strong>
+            {workspace ? <><strong className="commercial-dashboard-workspace-legend-value">{selectedValue}</strong>
+              <small>{formatPercentage(selectedPercentage)}</small></> : <><strong>{formatDashboardInteger(summary.lotCount)}</strong>
             <span className="commercial-dashboard-legend-area">{formatDashboardAreaWithCoverage(summary.areaSqm, summary.lotCount, summary.areaPendingCount, aggregate.commercialLots)}
               {summary.areaPendingCount > 0 && <small>{summary.areaPendingCount} sem área</small>}
             </span>
-            <small>{metric === 'area' ? (aggregate.totalAreaSqm > 0 ? formatDashboardPercentage(summary.areaPercentage) : '—') : (aggregate.commercialLots > 0 ? formatDashboardPercentage(summary.lotPercentage) : '—')}</small>
+            <small>{metric === 'area' ? (aggregate.totalAreaSqm > 0 ? formatDashboardPercentage(summary.areaPercentage) : '—') : (aggregate.commercialLots > 0 ? formatDashboardPercentage(summary.lotPercentage) : '—')}</small></>}
           </button>;
         })}
         {aggregate.unavailableLots > 0 && <button type="button" className={`commercial-dashboard-legend-unavailable${highlightedStatus === 'UNAVAILABLE' ? ' is-highlighted' : ''}`}
           aria-pressed={highlightedStatus === 'UNAVAILABLE'} onClick={() => onToggleStatus('UNAVAILABLE')}
           onMouseEnter={() => { if (canHover()) onHoverStatus('UNAVAILABLE'); }} onMouseLeave={() => { if (canHover()) onHoverStatus(null); }}
           onFocus={(event) => { if (event.currentTarget.matches(':focus-visible')) onHoverStatus('UNAVAILABLE'); }} onBlur={() => onHoverStatus(null)}
-          aria-label={`Indisponível: ${formatDashboardInteger(aggregate.unavailableLots)} lotes, fora dos percentuais comerciais, ${formatDashboardAreaWithCoverage(aggregate.unavailableAreaSqm, aggregate.unavailableLots, aggregate.byStatus.UNAVAILABLE.areaPendingCount, aggregate.totalLots)}`}>
+          aria-label={workspace
+            ? `Indisponível: ${metric === 'area' ? formatDashboardAreaWithCoverage(aggregate.unavailableAreaSqm, aggregate.unavailableLots, aggregate.byStatus.UNAVAILABLE.areaPendingCount, aggregate.totalLots) : `${formatDashboardInteger(aggregate.unavailableLots)} lotes`}, fora dos percentuais comerciais`
+            : `Indisponível: ${formatDashboardInteger(aggregate.unavailableLots)} lotes, fora dos percentuais comerciais, ${formatDashboardAreaWithCoverage(aggregate.unavailableAreaSqm, aggregate.unavailableLots, aggregate.byStatus.UNAVAILABLE.areaPendingCount, aggregate.totalLots)}`}>
           <i style={{ backgroundColor: STATUS_CONFIG.UNAVAILABLE.color }} aria-hidden="true" /><span>Indisponível</span>
-          <strong>{formatDashboardInteger(aggregate.unavailableLots)}</strong>
-          <span className="commercial-dashboard-legend-area">{formatDashboardAreaWithCoverage(aggregate.unavailableAreaSqm, aggregate.unavailableLots, aggregate.byStatus.UNAVAILABLE.areaPendingCount, aggregate.totalLots)}</span><small>Fora do %</small>
+          {workspace ? <strong className="commercial-dashboard-workspace-legend-value">{metric === 'area' ? formatDashboardAreaWithCoverage(aggregate.unavailableAreaSqm, aggregate.unavailableLots, aggregate.byStatus.UNAVAILABLE.areaPendingCount, aggregate.totalLots) : formatDashboardInteger(aggregate.unavailableLots)}</strong>
+            : <><strong>{formatDashboardInteger(aggregate.unavailableLots)}</strong>
+              <span className="commercial-dashboard-legend-area">{formatDashboardAreaWithCoverage(aggregate.unavailableAreaSqm, aggregate.unavailableLots, aggregate.byStatus.UNAVAILABLE.areaPendingCount, aggregate.totalLots)}</span></>}<small>Fora do %</small>
         </button>}
       </div>
-      {aggregate.byStatus.UNAVAILABLE.lotCount > 0 && <p className="commercial-dashboard-chart-exclusion">
+      {!workspace && aggregate.byStatus.UNAVAILABLE.lotCount > 0 && <p className="commercial-dashboard-chart-exclusion">
         {formatDashboardInteger(aggregate.byStatus.UNAVAILABLE.lotCount)} {aggregate.byStatus.UNAVAILABLE.lotCount === 1 ? 'espaço fora da área comercial ativa' : 'espaços fora da área comercial ativa'}
         {aggregate.unavailableAreaSqm > 0 ? ` · ${formatDashboardArea(aggregate.unavailableAreaSqm)}` : ''}.
       </p>}
       <p className="commercial-dashboard-screen-reader-only">
-        {aggregate.commercialLots > 0
+        {workspace ? workspaceSummary : aggregate.commercialLots > 0
           ? `${formatDashboardPercentage(aggregate.soldLotPercentage)} dos lotes comerciais foram vendidos: ${formatDashboardInteger(aggregate.soldLots)} de ${formatDashboardInteger(aggregate.commercialLots)}.`
           : 'Percentual vendido pendente porque não há lotes comerciais cadastrados.'}
       </p>

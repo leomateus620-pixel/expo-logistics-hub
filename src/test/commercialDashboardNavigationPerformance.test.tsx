@@ -45,6 +45,7 @@ afterEach(() => { cleanup(); client.clear(); vi.restoreAllMocks(); });
 const dashboard = (overrides: Partial<CommercialDashboardProps> = {}) =>
   <QueryClientProvider client={client}><CommercialDashboard {...props} {...overrides} /></QueryClientProvider>;
 const areaSelectors = () => screen.getByRole('group', { name: 'Selecionar área externa' });
+const areaButton = (name: string) => within(areaSelectors()).getByRole('button', { name });
 const metricSelectors = () => screen.getByRole('group', { name: 'Métrica de distribuição' });
 const currentMap = () => screen.getByRole('region', { name: `Mini mapa comercial: ${segments[0].segment.name}` });
 const soldStatus = () => within(screen.getByRole('complementary', { name: `Distribuição de ${segments[0].segment.name}` }))
@@ -53,18 +54,22 @@ const soldStatus = () => within(screen.getByRole('complementary', { name: `Distr
 function selectPresentation() {
   // A → B → A keeps the selected identity of each external scope.
   for (const [index, segment] of segments.entries()) {
-    fireEvent.click(within(areaSelectors()).getByRole('button', { name: new RegExp(segment.segment.name) }));
+    fireEvent.click(areaButton(segment.segment.name));
     const map = screen.getByRole('region', { name: `Mini mapa comercial: ${segment.segment.name}` });
     fireEvent.change(within(map).getByRole('combobox'), { target: { value: records[index].entity.id } });
   }
-  fireEvent.click(within(areaSelectors()).getByRole('button', { name: new RegExp(segments[0].segment.name) }));
+  fireEvent.click(areaButton(segments[0].segment.name));
   expect(within(currentMap()).getByRole('combobox')).toHaveValue(records[0].entity.id);
   fireEvent.click(within(metricSelectors()).getByRole('button', { name: 'Área oficial' }));
   fireEvent.click(soldStatus());
+  fireEvent.click(within(currentMap()).getByRole('button', { name: `Ampliar planta de ${segments[0].segment.name}` }));
+  const viewport = currentMap().querySelector<HTMLDivElement>('.commercial-dashboard-map-scroll')!;
+  viewport.scrollLeft = 75;
+  viewport.scrollTop = 40;
 }
 
 describe('Dashboard presentation across discarded navigation views', () => {
-  it('restores scope, selection, metric, status, comparison, scroll and entry focus after sales', async () => {
+  it('restores scope, selection, metric, status, zoom, comparison, scroll and entry focus after sales', async () => {
     const scrollContainer = document.createElement('div');
     const view = render(dashboard({ scrollContainer: () => scrollContainer }));
     selectPresentation();
@@ -84,8 +89,12 @@ describe('Dashboard presentation across discarded navigation views', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Voltar à visão geral' }));
       await waitFor(() => expect(screen.getByRole('button', { name: 'Acessar vendas e contratos' })).toHaveFocus());
       expect(scrollContainer.scrollTop).toBe(scrollTop);
-      expect(within(areaSelectors()).getByRole('button', { name: new RegExp(segments[0].segment.name) })).toHaveAttribute('aria-pressed', 'true');
+      expect(areaButton(segments[0].segment.name)).toHaveAttribute('aria-pressed', 'true');
       expect(within(currentMap()).getByRole('combobox')).toHaveValue(records[0].entity.id);
+      expect(currentMap().querySelector('.commercial-dashboard-map-surface')).toHaveStyle({ width: '150%', height: '150%' });
+      const viewport = currentMap().querySelector<HTMLDivElement>('.commercial-dashboard-map-scroll')!;
+      expect(viewport.scrollLeft).toBe(75);
+      expect(viewport.scrollTop).toBe(40);
       expect(within(metricSelectors()).getByRole('button', { name: 'Área oficial' })).toHaveAttribute('aria-pressed', 'true');
       expect(soldStatus()).toHaveAttribute('aria-pressed', 'true');
       expect(screen.getByText('Comparar segmentos externos').closest('details')).toHaveAttribute('open');
@@ -100,10 +109,14 @@ describe('Dashboard presentation across discarded navigation views', () => {
     const view = render(dashboard());
     selectPresentation();
     view.rerender(dashboard(nextIdentity));
-    expect(within(areaSelectors()).getByRole('button', { name: /Todas as áreas/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(areaButton('Todas as áreas')).toHaveAttribute('aria-pressed', 'true');
     expect(within(metricSelectors()).getByRole('button', { name: 'Quantidade' })).toHaveAttribute('aria-pressed', 'true');
     const map = screen.getByRole('region', { name: 'Mini mapa comercial: Todas as áreas externas' });
     expect(within(map).getByRole('combobox')).toHaveValue('');
+    expect(map.querySelector('.commercial-dashboard-map-surface')).toHaveStyle({ width: '100%', height: '100%' });
+    const viewport = map.querySelector<HTMLDivElement>('.commercial-dashboard-map-scroll')!;
+    expect(viewport.scrollLeft).toBe(0);
+    expect(viewport.scrollTop).toBe(0);
     const statuses = screen.getByLabelText('Distribuição comercial por quantidade de lotes e área');
     expect(within(statuses).queryByRole('button', { pressed: true })).not.toBeInTheDocument();
   });
@@ -122,7 +135,7 @@ describe('Dashboard presentation across discarded navigation views', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Voltar à visão geral' }));
     await waitFor(() => expect(screen.getByRole('button', { name: 'Acessar vendas e contratos' })).toHaveFocus());
     expect(scrollContainer.scrollTop).toBe(0);
-    expect(within(areaSelectors()).getByRole('button', { name: /Todas as áreas/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(areaButton('Todas as áreas')).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('ignores a queued overview restoration after an immediate return to sales', async () => {

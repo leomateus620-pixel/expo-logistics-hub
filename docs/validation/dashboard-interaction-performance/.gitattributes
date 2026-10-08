@@ -1,0 +1,4 @@
+# Generated measurement data stays available without obscuring the source diff.
+*.json linguist-generated=true
+*.json.gz linguist-generated=true
+*.log.gz linguist-generated=true

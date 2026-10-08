@@ -1,0 +1,74 @@
+[
+  {
+    "screen": "desktop",
+    "pavilion": 8,
+    "outsideBefore": 91,
+    "outsideAfter": 0,
+    "labelBefore": 9.49,
+    "labelAfter": 10.97,
+    "widthBefore": 238.45,
+    "widthAfter": 345.11,
+    "heightBefore": 373.61,
+    "heightAfter": 540.72
+  },
+  {
+    "screen": "desktop",
+    "pavilion": 13,
+    "outsideBefore": 4,
+    "outsideAfter": 0,
+    "labelBefore": 10.97,
+    "labelAfter": 10.97,
+    "widthBefore": 321.23,
+    "widthAfter": 331.77,
+    "heightBefore": 613.26,
+    "heightAfter": 633.38
+  },
+  {
+    "screen": "notebook",
+    "pavilion": 8,
+    "outsideBefore": 91,
+    "outsideAfter": 0,
+    "labelBefore": 7.78,
+    "labelAfter": 10.97,
+    "widthBefore": 201.33,
+    "widthAfter": 291.38,
+    "heightBefore": 315.45,
+    "heightAfter": 456.55
+  },
+  {
+    "screen": "notebook",
+    "pavilion": 13,
+    "outsideBefore": 4,
+    "outsideAfter": 0,
+    "labelBefore": 10.97,
+    "labelAfter": 10.97,
+    "widthBefore": 271.23,
+    "widthAfter": 280.12,
+    "heightBefore": 517.8,
+    "heightAfter": 534.78
+  },
+  {
+    "screen": "mobile",
+    "pavilion": 8,
+    "outsideBefore": 91,
+    "outsideAfter": 0,
+    "labelBefore": 8.33,
+    "labelAfter": 9.91,
+    "widthBefore": 213.28,
+    "widthAfter": 247.37,
+    "heightBefore": 334.18,
+    "heightAfter": 387.58
+  },
+  {
+    "screen": "mobile",
+    "pavilion": 13,
+    "outsideBefore": 4,
+    "outsideAfter": 0,
+    "labelBefore": 10.79,
+    "labelAfter": 10.94,
+    "widthBefore": 243.26,
+    "widthAfter": 248.61,
+    "heightBefore": 464.4,
+    "heightAfter": 474.63
+  }
+]

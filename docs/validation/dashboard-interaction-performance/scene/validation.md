@@ -2,6 +2,8 @@
 
 O cenário integrado usa `CommercialMapPage` com o inventário oficial de leitura da rota `/__dev/commercial-map-interface`. O harness de medição libera a dashboard nessa rota, sem alterar a disponibilidade de produção. Requisições de autenticação e REST são interceptadas. Não foram exercitadas operações comerciais autenticadas nesse cenário.
 
+As medições deste documento foram preservadas no commit `7aff263d`, anterior à integração da `main` `9f2ee996` na PR #191. A integração dos novos layouts e inspeção é verificada separadamente no relatório principal; não houve novo benchmark integrado dessa revisão. Logs publicados usam `.log.gz` com os bytes originais.
+
 ## Condições
 
 - Windows, Chrome 154 headless, ANGLE/D3D11, Intel UHD Graphics; `hardwareConcurrency=4`, `deviceMemory=8`.
@@ -13,7 +15,7 @@ O cenário integrado usa `CommercialMapPage` com o inventário oficial de leitur
 
 ## Causa observada antes da alteração
 
-Na observação inicial, a dashboard cobria o mapa, mas a cena continuava apresentando frames completos: 244 frames em 10,76 s no estado seco e 264 em 10,77 s com chuva. A cena visível apresentou 263 em 10,29 s. O Canvas sob demanda continuava recebendo invalidações do intervalo dos personagens executivos; a chuva também varria materiais/luminárias periodicamente, inclusive seca. Esses registros demonstram trabalho ao fundo, mas não demonstram uma interrupção de três segundos.
+Na referência válida, a dashboard cobria o mapa, mas a cena continuava apresentando frames completos: 265 frames em 11,52 s no estado seco e 312 em 11,29 s com chuva. A cena visível seca apresentou 276 em 11,46 s. O Canvas sob demanda continuava recebendo invalidações do intervalo dos personagens executivos; a chuva também varria materiais/luminárias periodicamente, inclusive seca. Esses registros demonstram trabalho ao fundo, mas não demonstram uma interrupção de três segundos.
 
 A intervenção conserva o Canvas, cena, câmera, controles, recursos e listeners de recuperação. A cobertura pausa a apresentação R3F, o agendador explícito, picking, amostragem adaptativa, intervalos decorativos, varreduras de chuva e a timeline GSAP. O retorno invalida a apresentação, preserva a fase do relógio e o DPR canônico e compensa apenas o período oculto de cada transição de câmera. O snapshot e a atualização dos dados continuam ativos.
 

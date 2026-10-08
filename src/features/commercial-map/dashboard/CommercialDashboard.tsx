@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowUpRight, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import type { CommercialMapData } from '../types';
 import type { LotPricingStage } from '../utils/lotPricing2028';
-import { CommercialDashboardSpaces, type DashboardSpacesPresentationMemory } from './CommercialDashboardSpaces';
+import { CommercialDashboardSpaces, type DashboardSpacesPresentationMemory, type CommercialDashboardSpacesMemory } from './CommercialDashboardSpaces';
 import { buildCommercialDashboardSnapshot } from './commercialDashboardAnalytics';
 import type { DashboardStatusSummary } from './commercialDashboardTypes';
 import { formatDashboardAreaWithCoverage, formatDashboardCurrency, formatDashboardInteger, formatDashboardPercentage } from './commercialDashboardFormatters';
@@ -11,8 +11,10 @@ import { useSalesOrdersUiStore } from './salesOrders/useSalesOrdersUiStore';
 import { CommercialSalesOrdersSection } from './salesOrders/CommercialSalesOrdersSection';
 import { CommercialSalesProgress, type SalesProgressFill } from './CommercialSalesProgress';
 import { OverviewInfo, type OverviewInfoFact } from './CommercialDashboardOverviewInfo';
+import { CommercialDashboardAreaCard } from './CommercialDashboardAreaCard';
+import { CommercialDashboardSalesSummary } from './CommercialDashboardSalesSummary';
 import {
-  AreaMeasureGlyph, AvailableLotGlyph, ConfirmedGlyph, ConfirmedSealGlyph, DashboardMarkGlyph, InventoryBaseGlyph,
+  AvailableLotGlyph, ConfirmedGlyph, ConfirmedSealGlyph, DashboardMarkGlyph, InventoryBaseGlyph,
   ModulesGlyph, PendingSignatureGlyph, ProcessGlyph, SyncActiveGlyph, SyncDoneGlyph,
 } from './CommercialDashboardOverviewIcons';
 import type { SaleOrderSummary } from './salesOrders/salesOrdersService';
@@ -54,12 +56,6 @@ function OverviewAmount({ text }: { text: string }) {
     </span>
     {match[2] && <span className="commercial-dashboard-overview-amount__unit"> {match[2]}</span>}
   </>;
-}
-
-function OverviewArea({ text }: { text: string }) {
-  const match = /^(\S+)\s+m²$/u.exec(text);
-  if (!match) return <>{text}</>;
-  return <>{match[1]}<span className="commercial-dashboard-overview-amount__unit"> m²</span></>;
 }
 
 function financeCoverage(lots: number, priced: number): string {
@@ -128,13 +124,14 @@ function statusAreaFact(summary: DashboardStatusSummary, inventoryLots: number):
 export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, onViewLot, projectId, orgId = null, canManageSales = false, canManageContracts = false, scrollContainer, onViewSale }: CommercialDashboardProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const salesEntryRef = useRef<HTMLButtonElement>(null);
+  const presentationScopeId = projectId ?? data.entities[0]?.projectId ?? 'unscoped';
   // Keep only presentation state across sales navigation; maps remain unmounted.
   // A new project/organization receives fresh state before its first render.
   const presentation = useMemo(() => ({
-    scope: `${orgId ?? ''}:${projectId ?? ''}`,
-    spaces: {} as DashboardSpacesPresentationMemory,
+    scope: `${orgId ?? ''}:${presentationScopeId}`,
+    spaces: { current: null } as DashboardSpacesPresentationMemory & CommercialDashboardSpacesMemory,
     overview: { scrollTop: 0 },
-  }), [orgId, projectId]);
+  }), [orgId, presentationScopeId]);
   const { spaces: spacesMemory, overview: overviewMemory } = presentation;
   const currentOverviewMemory = useRef(overviewMemory);
   currentOverviewMemory.current = overviewMemory;
@@ -148,7 +145,6 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
   const snapshot = useMemo(() => buildCommercialDashboardSnapshot({ entities: data.entities, lots: data.lots }, pricingStage), [data.entities, data.lots, pricingStage]);
   const { overall } = snapshot;
   const lotShare = (value: number) => overall.commercialLots ? `${formatDashboardPercentage(value)} dos espaços comerciais` : '—';
-  const areaQualifier = overall.lotsWithoutOfficialArea > 0 && overall.lotsWithoutOfficialArea < overall.commercialLots ? 'Parcial' : null;
   const updatedAtLabel = dataUpdatedAt > 0 && Number.isFinite(dataUpdatedAt)
     ? `Atualizado às ${new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(dataUpdatedAt)}`
     : 'Sincronização pendente';
@@ -251,32 +247,21 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
             lead: 'Lotes liberados para proposta comercial.',
             facts: [['Participação', lotShare(overall.byStatus.AVAILABLE.lotPercentage)],
               ['Área oficial', statusAreaFact(overall.byStatus.AVAILABLE, overall.commercialLots)]] }} />
-        <OverviewKpi tone="area" label="Área comercial" icon={<AreaMeasureGlyph />} qualifier={areaQualifier}
-          value={<OverviewArea text={formatDashboardAreaWithCoverage(overall.totalAreaSqm, overall.commercialLots, overall.lotsWithoutOfficialArea, overall.commercialLots)} />}
-          info={{ label: 'Informações sobre a área comercial', title: 'Área comercial',
-            lead: 'Soma das áreas oficiais válidas do inventário comercial. Espaços indisponíveis ficam fora.',
-            facts: [['Cobertura', overall.lotsWithoutOfficialArea
-              ? `${formatDashboardInteger(overall.lotsWithoutOfficialArea)} sem área oficial`
-              : 'Área oficial cadastrada']] }} />
+        <div className="commercial-dashboard-region-summary" aria-label="Área comercial e vendas">
+          <CommercialDashboardAreaCard aggregate={overall} />
+          {salesAvailable && projectId && <CommercialDashboardSalesSummary projectId={projectId}
+            canManageSales={canManageSales} canManageContracts={canManageContracts} entryRef={salesEntryRef}
+            onAccess={() => {
+              overviewMemory.scrollTop = scrollContainer?.()?.scrollTop ?? 0;
+              setArea('sales');
+              const container = scrollContainer?.();
+              if (container) container.scrollTop = 0;
+            }} />}
+        </div>
       </section>
       </div>
-      {salesAvailable && <section className="commercial-dashboard-sales-entry" aria-label="Acesso a vendas e contratos">
-        <div className="commercial-dashboard-sales-entry__icon" aria-hidden="true">
-          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M7 4h13l5 5v12M20 4v6h5M7 4v24h11M11 10h5M11 15h10M11 20h5" />
-            <rect x="19" y="18" width="10" height="11" rx="2" />
-            <path d="m22 23 2 2 3-4" />
-          </svg>
-        </div>
-        <div className="commercial-dashboard-sales-entry__text"><h2>Vendas e contratos</h2><p>Pedidos, espaços, documentos e histórico comercial.</p></div>
-        <button type="button" ref={salesEntryRef} onClick={() => {
-          overviewMemory.scrollTop = scrollContainer?.()?.scrollTop ?? 0;
-          setArea('sales');
-          const container = scrollContainer?.();
-          if (container) container.scrollTop = 0;
-        }} aria-label="Acessar vendas e contratos">Acessar<ArrowUpRight aria-hidden="true" /></button>
-      </section>}
-      <CommercialDashboardSpaces key={presentation.scope} snapshot={snapshot} data={data} onViewLot={onViewLot} presentationMemory={spacesMemory} />
+      <CommercialDashboardSpaces key={presentation.scope} snapshot={snapshot} data={data} onViewLot={onViewLot}
+        presentationMemory={spacesMemory} stateMemory={spacesMemory} />
       {snapshot.orphanLots > 0 && <div className="commercial-dashboard-integrity" role="note">
         <span>{snapshot.orphanLots} lotes sem entidade cadastral carregada, fora dos indicadores conforme o contrato atual do mapa.</span>
       </div>}

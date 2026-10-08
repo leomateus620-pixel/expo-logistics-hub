@@ -10,6 +10,11 @@ import { STATUS_CONFIG } from '../constants';
 import { CommercialDashboardLotChart } from './CommercialDashboardCharts';
 import { useDashboardStatusHighlight } from './useDashboardStatusHighlight';
 import { CommercialDashboardComparison } from './CommercialDashboardComparison';
+import { CommercialDashboardScopeCard } from './CommercialDashboardScopeCard';
+import { OverviewInfo } from './CommercialDashboardOverviewInfo';
+import { formatDashboardCommercialProgress } from './commercialDashboardProgress';
+import './commercial-dashboard-scope-cards.css';
+import './commercial-dashboard-workspace-analysis.css';
 
 const PavilionPlan = lazy(() => import('./CommercialDashboardPavilion'));
 const EMPTY_BOUNDARY = { outlines: [], pending: [] };
@@ -24,13 +29,23 @@ export interface DashboardSpacesPresentationMemory {
   miniMaps?: Record<string, MiniMapPresentationMemory>;
 }
 
+export interface CommercialDashboardSpacesState {
+  requestedScopeId: string;
+  selections: Record<string, string | null>;
+  metric: 'lots' | 'area';
+}
+
+/** A project-scoped presentation memory supplied by the mounted Dashboard. */
+export interface CommercialDashboardSpacesMemory {
+  current: CommercialDashboardSpacesState | null;
+}
+
 function Metrics({ aggregate, title }: { aggregate: DashboardAggregate; title: string }) {
   return <div className="commercial-dashboard-scope-metrics" aria-label={`Indicadores de ${title}`}>
-    <div><span>Espaços comerciais</span><strong>{formatDashboardInteger(aggregate.commercialLots)}</strong><small>{formatDashboardInteger(aggregate.totalLots)} registros no recorte</small></div>
-    <div><span>Em andamento</span><strong>{formatDashboardInteger(aggregate.saleOpenLots)}</strong><small>Aguardando assinatura</small></div>
-    <div><span>Vendidos</span><strong>{formatDashboardInteger(aggregate.soldLots)} <small>{aggregate.commercialLots ? formatDashboardPercentage(aggregate.soldLotPercentage) : '—'}</small></strong><small>Do inventário comercial</small></div>
-    <div><span>Área comercial oficial</span><strong>{formatDashboardAreaWithCoverage(aggregate.totalAreaSqm, aggregate.commercialLots, aggregate.lotsWithoutOfficialArea, aggregate.commercialLots)}</strong>
-      <small>{aggregate.lotsWithoutOfficialArea ? `${aggregate.lotsWithoutOfficialArea} sem metragem válida` : 'Metragem cadastrada'}</small></div>
+    <div><span>Espaços comerciais</span><strong>{formatDashboardInteger(aggregate.commercialLots)}</strong></div>
+    <div><span>Em andamento</span><strong>{formatDashboardInteger(aggregate.saleOpenLots)}</strong></div>
+    <div><span>Vendidos</span><strong>{formatDashboardInteger(aggregate.soldLots)} <small>{aggregate.commercialLots ? formatDashboardCommercialProgress(aggregate.soldLotPercentage) : '—'}</small></strong></div>
+    <div><span>Área comercial oficial</span><strong>{formatDashboardAreaWithCoverage(aggregate.totalAreaSqm, aggregate.commercialLots, aggregate.lotsWithoutOfficialArea, aggregate.commercialLots)}</strong></div>
   </div>;
 }
 
@@ -49,26 +64,31 @@ function Verification({ aggregate }: { aggregate: DashboardAggregate }) {
   </details>;
 }
 
-export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentationMemory }: {
+export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentationMemory, stateMemory }: {
   snapshot: CommercialDashboardSnapshot;
   data: Pick<CommercialMapData, 'entities' | 'lots'>;
   onViewLot: (id: string) => void;
   presentationMemory?: DashboardSpacesPresentationMemory;
+  stateMemory?: CommercialDashboardSpacesMemory;
 }) {
   // Presentation scope only; every element below shares one existing snapshot aggregate.
-  const [requestedScopeId, setScopeId] = useState(presentationMemory?.scopeId ?? 'external:all');
-  const scopeId = requestedScopeId === 'pending' && snapshot.unclassified.totalLots === 0 ? 'external:all' : requestedScopeId;
+  const [requestedScopeId, setScopeId] = useState(() => presentationMemory?.scopeId ?? stateMemory?.current?.requestedScopeId ?? 'external:all');
+  // The former internal aggregate remains in the snapshot, without a visible selector.
+  // Normalize a retained aggregate scope explicitly instead of choosing a pavilion.
+  const normalizedScopeId = requestedScopeId === 'internal:all' ? 'external:all' : requestedScopeId;
+  const scopeId = normalizedScopeId === 'pending' && snapshot.unclassified.totalLots === 0 ? 'external:all' : normalizedScopeId;
   useEffect(() => {
-    if (requestedScopeId === 'pending' && snapshot.unclassified.totalLots === 0) setScopeId('external:all');
+    if (requestedScopeId === 'internal:all' || (requestedScopeId === 'pending' && snapshot.unclassified.totalLots === 0)) setScopeId('external:all');
   }, [requestedScopeId, snapshot.unclassified.totalLots]);
-  const [selections, setSelections] = useState<Record<string, string | null>>(presentationMemory?.selections ?? {});
+  const [selections, setSelections] = useState<Record<string, string | null>>(() => presentationMemory?.selections ?? stateMemory?.current?.selections ?? {});
   const [comparisonOpen, setComparisonOpen] = useState(presentationMemory?.comparisonOpen ?? false);
-  const [metric, setMetric] = useState<'lots' | 'area'>(presentationMemory?.metric ?? 'lots');
+  const [metric, setMetric] = useState<'lots' | 'area'>(() => presentationMemory?.metric ?? stateMemory?.current?.metric ?? 'lots');
   const highlight = useDashboardStatusHighlight(presentationMemory);
   const miniMapMemories = useRef(presentationMemory?.miniMaps ?? {});
   useLayoutEffect(() => {
     if (presentationMemory) Object.assign(presentationMemory, { scopeId, selections, comparisonOpen, metric, miniMaps: miniMapMemories.current });
-  }, [presentationMemory, scopeId, selections, comparisonOpen, metric]);
+    if (stateMemory) stateMemory.current = { requestedScopeId: scopeId, selections, metric };
+  }, [presentationMemory, stateMemory, scopeId, selections, comparisonOpen, metric]);
   const miniMapMemory = useMemo(() => {
     if (!presentationMemory) return undefined;
     return miniMapMemories.current[scopeId] ??= {};
@@ -95,23 +115,30 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentat
   const selectedEntityId = selections[scopeId] ?? null;
   const selection = useMemo(() => ({ entityId: selectedEntityId, onChange: selectLot }), [selectedEntityId, selectLot]);
 
-  return <section className="commercial-dashboard-workspace" aria-label="Análise do recorte selecionado">
-    <div className="commercial-dashboard-scope-selector">
-      <div className="commercial-dashboard-selector-row">
-        <span><MapPinned aria-hidden="true" />Áreas externas</span>
-        <div className="commercial-dashboard-area-selectors" role="group" aria-label="Selecionar área externa">
-          <button type="button" aria-pressed={scopeId === 'external:all'} onClick={() => setScopeId('external:all')}>Todas as áreas <small>{formatDashboardInteger(snapshot.external.totalLots)}</small></button>
-          {snapshot.segments.map((item) => <button type="button" key={item.segmentId} aria-pressed={scopeId === `external:${item.segmentId}`}
-            onClick={() => setScopeId(`external:${item.segmentId}`)}>{item.segment.name}<small>{formatDashboardInteger(item.totalLots)}</small></button>)}
+  return <section className="commercial-dashboard-workspace commercial-dashboard-workspace-analysis" aria-label="Análise do recorte selecionado">
+    <div className="commercial-dashboard-scope-selector commercial-dashboard-scope-cards">
+      <div className="commercial-dashboard-scope-cards__section">
+        <div className="commercial-dashboard-scope-cards__heading"><span><MapPinned aria-hidden="true" />Áreas externas</span>
+          <small>Comercialização por espaços</small></div>
+        <div className="commercial-dashboard-scope-grid commercial-dashboard-scope-grid--external" role="group" aria-label="Selecionar área externa">
+          <CommercialDashboardScopeCard scopeId="external:all" title="Todas as áreas" aggregate={snapshot.external}
+            selected={scopeId === 'external:all'} onSelect={() => setScopeId('external:all')} />
+          {snapshot.segments.map((item) => <CommercialDashboardScopeCard key={item.segmentId} scopeId={`external:${item.segmentId}`}
+            title={item.segment.name} aggregate={item} segmentId={item.segmentId}
+            selected={scopeId === `external:${item.segmentId}`} onSelect={() => setScopeId(`external:${item.segmentId}`)} />)}
         </div>
       </div>
-      <div className="commercial-dashboard-selector-row">
-        <span><Building2 aria-hidden="true" />Pavilhões</span>
-        <div className="commercial-dashboard-pavilion-selectors" role="group" aria-label="Selecionar pavilhão">
-          <button type="button" aria-pressed={isInternal} onClick={() => setScopeId('internal:all')}>Todos</button>
-          {snapshot.pavilions.map((item) => <button type="button" key={item.definition.publicIdentifier} aria-label={item.definition.officialName}
-            title={item.definition.officialName} aria-pressed={scopeId === `pavilion:${item.definition.publicIdentifier}`}
-            onClick={() => setScopeId(`pavilion:${item.definition.publicIdentifier}`)}>{item.definition.pavilionNumber}</button>)}
+      <div className="commercial-dashboard-scope-cards__section">
+        <div className="commercial-dashboard-scope-cards__heading"><span><Building2 aria-hidden="true" />Pavilhões</span>
+          <div className="commercial-dashboard-scope-cards__legend" aria-label="Legenda da comercialização">
+            <span><i data-status="SALE_OPEN" aria-hidden="true" />Em andamento</span><span><i data-status="SOLD" aria-hidden="true" />Confirmada</span>
+          </div>
+        </div>
+        <div className="commercial-dashboard-scope-grid commercial-dashboard-scope-grid--pavilions" role="group" aria-label="Selecionar pavilhão">
+          {snapshot.pavilions.map((item) => <CommercialDashboardScopeCard key={item.definition.publicIdentifier}
+            scopeId={`pavilion:${item.definition.publicIdentifier}`} title={item.definition.officialName} aggregate={item}
+            pavilionNumber={item.definition.pavilionNumber} selected={scopeId === `pavilion:${item.definition.publicIdentifier}`}
+            onSelect={() => setScopeId(`pavilion:${item.definition.publicIdentifier}`)} />)}
         </div>
         {snapshot.unclassified.totalLots > 0 && <button type="button" className="commercial-dashboard-pending-selector" aria-pressed={isPending} onClick={() => setScopeId('pending')}>
           Classificação pendente <strong>{formatDashboardInteger(snapshot.unclassified.totalLots)}</strong>
@@ -119,7 +146,25 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentat
       </div>
     </div>
     <div className="commercial-dashboard-selected-summary"><div className="commercial-dashboard-scope-heading">
-      <div><span className="commercial-dashboard-eyebrow">Recorte selecionado</span><h2>{title}</h2></div>
+      <div><span className="commercial-dashboard-eyebrow">Recorte selecionado</span>
+        <div className="commercial-dashboard-workspace-analysis__scope-title"><h2>{title}</h2>
+          <OverviewInfo label={`Informações dos indicadores de ${title}`} title="Indicadores do recorte"
+            lead="Os indicadores usam o mesmo inventário ativo da planta e do gráfico. Vendas em andamento aguardam assinatura; vendidos seguem o estado comercial SOLD, preservando os registros legados."
+            facts={[
+              ['Registros ativos', formatDashboardInteger(aggregate.totalLots)],
+              ['Base comercial', formatDashboardInteger(aggregate.commercialLots)],
+              ['Indisponíveis fora da base', formatDashboardInteger(aggregate.unavailableLots)],
+              ['Área oficial conhecida', formatDashboardAreaWithCoverage(aggregate.totalAreaSqm, aggregate.commercialLots, aggregate.lotsWithoutOfficialArea, aggregate.commercialLots)],
+              ['Lotes sem área oficial', formatDashboardInteger(aggregate.lotsWithoutOfficialArea)],
+            ]}
+            note={<>{aggregate.commercialLots > 0
+              ? 'O percentual vendido divide os lotes vendidos pela base comercial, incluindo bloqueados e excluindo indisponíveis. '
+              : 'Não há base comercial para calcular o percentual vendido. '}
+              {aggregate.lotsWithoutOfficialArea > 0
+                ? 'A cobertura da área é parcial: somente metragens oficiais válidas entram no subtotal. Área ausente não é zero e não é estimada pela geometria.'
+                : 'A metragem usa somente áreas oficiais cadastradas.'}</>} />
+        </div>
+      </div>
     </div><Metrics aggregate={aggregate} title={title} /></div>
     <div className="commercial-dashboard-integrated-analysis">
       <div className="commercial-dashboard-spatial-card">
@@ -135,8 +180,7 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentat
             <button type="button" aria-pressed={metric === 'area'} onClick={() => setMetric('area')}>Área oficial</button>
           </div>
         </div>
-        <CommercialDashboardLotChart aggregate={aggregate} {...highlight} metric={metric} compact />
-        <p className="commercial-dashboard-highlight-note">Toque em uma situação para destacá-la na planta. Todos os espaços e totais são mantidos.</p>
+        <CommercialDashboardLotChart aggregate={aggregate} {...highlight} metric={metric} compact variant="workspace" />
       </aside>
     </div>
     <div className="commercial-dashboard-secondary">
