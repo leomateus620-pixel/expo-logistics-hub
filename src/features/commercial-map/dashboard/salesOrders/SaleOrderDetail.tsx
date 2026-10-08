@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, Loader2, MapPinned, Paperclip, Pencil, ShieldAlert, Wallet } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,11 +21,19 @@ const ITEM_STATE_LABEL: Record<string, string> = {
 const INSTALLMENTS_PER_PAGE = 8;
 const moneyValue = (value: unknown) => value == null || value === '' ? null : Number(value);
 
+// A troca de aba atualiza o contexto do Radix sem reconstruir os dados e o JSX do pedido.
+function SaleOrderDetailTabs({ children, onReady, readyData }: { children: ReactNode; onReady: () => void; readyData: object }) {
+  const detailTab = useSalesOrdersUiStore((state) => state.detailTab);
+  const setDetailTab = useSalesOrdersUiStore((state) => state.setDetailTab);
+  // Só restaura a origem quando a aba e os controles do detalhe já existem no DOM.
+  useLayoutEffect(() => { onReady(); }, [detailTab, onReady, readyData]);
+  return <Tabs className="cso-detail-tabs" value={detailTab} onValueChange={(value) => setDetailTab(value as SalesOrdersDetailTab)}>{children}</Tabs>;
+}
+
 export function SaleOrderDetail({ record, data, orgId, canManageContracts, canManageSales, onViewSale, scrollContainer, onReady }: CommercialSalesOrdersSectionProps & {
   record: SaleOrderSummary | SalesOrdersRecordIdentity; onReady: () => void;
 }) {
   const queryClient = useQueryClient();
-  const { detailTab, setDetailTab } = useSalesOrdersUiStore();
   const [reviseOpen, setReviseOpen] = useState(false);
   const [attachOpen, setAttachOpen] = useState<{ contract: SaleContract | null } | null>(null);
   const [installmentPage, setInstallmentPage] = useState(0);
@@ -34,46 +42,63 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
     queryFn: () => fetchSaleOrderDetail(record),
     staleTime: 30_000,
   });
-  // Só restaura a origem quando a aba e os controles do detalhe já existem no DOM.
-  useLayoutEffect(() => { if (detail.data && !detail.error) onReady(); }, [detail.data, detail.error, detailTab, onReady]);
   const lotIndex = useMemo(() => new Map(data.lots.map((lot) => [lot.id, lot])), [data.lots]);
   const entityIndex = useMemo(() => new Map(data.entities.map((entity) => [entity.id, entity])), [data.entities]);
-  const locationOf = (lotId: string) => {
+  const locationOf = useCallback((lotId: string) => {
     const lot = lotIndex.get(lotId);
     const entity = lot ? entityIndex.get(lot.entityId) : undefined;
     if (!lot || !entity) return 'Fora do inventário carregado';
     const parent = entity.parentEntityId ? entityIndex.get(entity.parentEntityId) : null;
     if (parent) return parent.name || parent.publicIdentifier;
     return lot.block ? `Quadra ${lot.block}` : 'Área externa';
-  };
+  }, [lotIndex, entityIndex]);
+  const itemRows = detail.data?.items;
+  const itemPresentation = useMemo(() => {
+    if (!itemRows) return null;
+    const activeItems = itemRows.filter((item) => item.contractState !== 'CANCELLED');
+    const groupedItems = new Map<string, typeof itemRows>();
+    const itemIndex = new Map<string, (typeof itemRows)[number]>();
+    itemRows.forEach((item) => {
+      const location = locationOf(item.lotId);
+      const group = groupedItems.get(location) ?? [];
+      group.push(item);
+      groupedItems.set(location, group);
+      // Conserva a primeira ocorrência, como a busca por identidade usada anteriormente.
+      if (!itemIndex.has(item.lotId)) itemIndex.set(item.lotId, item);
+    });
+    return {
+      activeItems, groupedItems, itemIndex,
+      activeSubtotal: activeItems.some((item) => item.itemTotal === null) ? null : activeItems.reduce((sum, item) => sum + (item.itemTotal ?? 0), 0),
+      hasCancelled: activeItems.length !== itemRows.length,
+      attachmentItems: activeItems.map((item) => ({ lotId: item.lotId, label: `${item.displayName || item.publicIdentifier} · ${locationOf(item.lotId)}` })),
+    };
+  }, [itemRows, locationOf]);
+  const contractRows = detail.data?.contracts;
+  const contracts = useMemo(() => contractRows ? uniqueContracts(contractRows) : null, [contractRows]);
+  const installmentRows = detail.data?.installments;
+  const receipts = useMemo(() => {
+    const paid = installmentRows?.filter((item) => item.paidAt || item.paymentStatus === 'PAID') ?? [];
+    return { count: paid.length, total: paid.reduce((sum, item) => sum + item.amount, 0) };
+  }, [installmentRows]);
+  const { recordId, orderId, saleId } = record;
+  const currentRecord = useMemo(() => detail.data ? saleDetailSummary({ recordId, orderId, saleId }, detail.data) : null,
+    [detail.data, recordId, orderId, saleId]);
+  const labelOf = useCallback((lotId: string) => {
+    const item = itemPresentation?.itemIndex.get(lotId);
+    const label = item ? (item.displayName || item.publicIdentifier) : (lotIndex.get(lotId)?.displayName ?? 'Espaço');
+    return `${label} · ${locationOf(lotId)}`;
+  }, [itemPresentation, lotIndex, locationOf]);
 
   if (detail.isLoading) return <p className="cso-state" role="status"><Loader2 className="is-spinning" aria-hidden="true" />Carregando detalhes…</p>;
   if (detail.error) return <p className="cso-state is-error" role="alert">{describeSalesError(detail.error)}
     <button type="button" className="cso-link" onClick={() => detail.refetch()}>Tentar novamente</button></p>;
-  if (!detail.data) return null;
+  if (!detail.data || !itemPresentation || !currentRecord) return null;
   const d = detail.data;
   const h = d.header;
-  const labelOf = (lotId: string) => {
-    const item = d.items.find((i) => i.lotId === lotId);
-    const label = item ? (item.displayName || item.publicIdentifier) : (lotIndex.get(lotId)?.displayName ?? 'Espaço');
-    return `${label} · ${locationOf(lotId)}`;
-  };
-  const activeItems = d.items.filter((i) => i.contractState !== 'CANCELLED');
-  const activeSubtotal = activeItems.some((item) => item.itemTotal === null) ? null : activeItems.reduce((sum, i) => sum + (i.itemTotal ?? 0), 0);
-  const hasCancelled = activeItems.length !== d.items.length;
-  const contracts = d.contracts ? uniqueContracts(d.contracts) : null;
-  const groupedItems = new Map<string, typeof d.items>();
-  d.items.forEach((item) => {
-    const location = locationOf(item.lotId);
-    const group = groupedItems.get(location) ?? [];
-    group.push(item);
-    groupedItems.set(location, group);
-  });
-  const paid = d.installments.filter((item) => item.paidAt || item.paymentStatus === 'PAID');
+  const { activeItems, activeSubtotal, hasCancelled, groupedItems, attachmentItems } = itemPresentation;
   const installmentPages = Math.max(1, Math.ceil(d.installments.length / INSTALLMENTS_PER_PAGE));
   const currentInstallmentPage = Math.min(installmentPage, installmentPages - 1);
   const installments = d.installments.slice(currentInstallmentPage * INSTALLMENTS_PER_PAGE, (currentInstallmentPage + 1) * INSTALLMENTS_PER_PAGE);
-  const currentRecord = saleDetailSummary(record, d);
 
   return <div className="cso-detail" data-sale-detail={record.recordId}>
     <header className="cso-detail-summary">
@@ -82,7 +107,7 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
       </div>
       <div className="cso-detail-summary-numbers"><div><span>Espaços ativos</span><strong>{activeItems.length}</strong></div><div className="cso-value"><span>Valor negociado</span><strong>{formatDashboardCurrency(moneyValue(h.negotiatedTotal))}</strong></div></div>
     </header>
-    <Tabs className="cso-detail-tabs" value={detailTab} onValueChange={(value) => setDetailTab(value as SalesOrdersDetailTab)}>
+    <SaleOrderDetailTabs onReady={onReady} readyData={d}>
       <TabsList className="cso-tabs-list" aria-label="Assuntos da venda">
         <TabsTrigger className="cso-tab" value="overview">Visão geral</TabsTrigger>
         <TabsTrigger className="cso-tab" value="spaces">Espaços</TabsTrigger>
@@ -141,7 +166,7 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
           </section>
           <section className="cso-block"><h3>Parcelas e recebimentos</h3>
             {h.kind === 'ORDER' ? <>
-              <dl className="cso-receipts"><div><dt>Recebido em parcelas</dt><dd>{formatDashboardCurrency(paid.reduce((sum, item) => sum + item.amount, 0))}</dd></div><div><dt>Parcelas recebidas</dt><dd>{paid.length} de {d.installments.length}</dd></div></dl>
+              <dl className="cso-receipts"><div><dt>Recebido em parcelas</dt><dd>{formatDashboardCurrency(receipts.total)}</dd></div><div><dt>Parcelas recebidas</dt><dd>{receipts.count} de {d.installments.length}</dd></div></dl>
               <p className="cso-payment-method">{paymentMethodLabel(h.paymentMethod)} · {d.installments.length} parcela(s)</p>
               {d.installments.length > 0 && <div className="cso-installments-head" aria-hidden="true"><span>Nº</span><span>Vencimento</span><span>Valor</span><span>Situação</span></div>}
               <ol className="cso-installments" start={currentInstallmentPage * INSTALLMENTS_PER_PAGE + 1}>{installments.map((item) => <li key={item.number}>
@@ -172,7 +197,7 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
       <TabsContent value="history" className="cso-tab-content">
         {h.kind === 'ORDER' && h.orderId && canManageSales ? <SaleOrderHistory orderId={h.orderId} /> : <p className="cso-state">Registro legado: o histórico de revisões de pedidos não se aplica a esta venda.</p>}
       </TabsContent>
-    </Tabs>
+    </SaleOrderDetailTabs>
     {reviseOpen && h.orderId && <ReviseSaleOrderDialog orderId={h.orderId} detail={d} lots={data.lots} entities={data.entities} locationOf={locationOf} onClose={() => setReviseOpen(false)} onSaved={async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail'] }),
@@ -180,7 +205,7 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
         scheduleCommercialMapRefresh(queryClient),
       ]);
     }} />}
-    {attachOpen && orgId && h.orderId && <AttachOrderContractDialog orgId={orgId} orderId={h.orderId} items={activeItems.map((item) => ({ lotId: item.lotId, label: `${item.displayName || item.publicIdentifier} · ${locationOf(item.lotId)}` }))} contract={attachOpen.contract} onClose={() => setAttachOpen(null)} onAttached={async () => {
+    {attachOpen && orgId && h.orderId && <AttachOrderContractDialog orgId={orgId} orderId={h.orderId} items={attachmentItems} contract={attachOpen.contract} onClose={() => setAttachOpen(null)} onAttached={async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail', record.recordId] }),
         queryClient.invalidateQueries({ queryKey: ['commercial-sale-orders'] }),

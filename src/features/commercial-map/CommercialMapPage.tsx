@@ -252,6 +252,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const [saleResolution, setSaleResolution] = useState<SaleInspectionResolution | null>(null);
   useEffect(() => () => useSaleInspectionStore.getState().clear(), []);
   const dashboardOverlayRef = useRef<HTMLDivElement>(null);
+  const getDashboardScrollContainer = useCallback(() => dashboardOverlayRef.current, []);
   const dashboardDockRef = useRef<HTMLDivElement>(null);
   const dashboardViewportRef = useRef<HTMLDivElement>(null);
   const closeDashboard = useCallback(() => {
@@ -774,6 +775,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
               <Profiler id="CommercialMapCanvas" onRender={recordCommercialMapProfiler}>
                 <CommercialMapCanvas
                   active={workspaceMode === '3d'}
+                  presentationVisible={workspaceMode === '3d' && !dashboardOpen}
                   entities={commissionSceneEntities ?? scopedData.entities}
                   parkingOwnerEntities={commissionSceneEntities ?? data.entities}
                   siteEnvironmentEntities={commissionSceneEntities ?? data.entities}
@@ -1009,7 +1011,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                   orgId={data.project.orgId}
                   canManageSales={permissions.canManageSales}
                   canManageContracts={permissions.canManageContracts}
-                  scrollContainer={() => dashboardOverlayRef.current}
+                  scrollContainer={getDashboardScrollContainer}
                   onViewSale={handleDashboardViewSale}
                 />
               </Suspense>

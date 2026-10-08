@@ -83,7 +83,8 @@ describe('runtime de qualidade adaptativa do Mapa Comercial', () => {
 
     expect(page).toContain("active={workspaceMode === '3d'}");
     expect(canvas).toContain('<CommercialMapAdaptiveQualityController');
-    expect(canvas).toContain('frameloop="demand"');
+    expect(canvas).toContain("frameloop={presentationVisible ? 'demand' : 'never'}");
+    expect(canvas).toContain('dpr={canvasState.current?.().viewport.dpr ?? initialPixelRatio}');
     expect(controller).toContain('const setDpr = useThree((state) => state.setDpr)');
     expect(controller).toContain('setDpr(nextDpr)');
     expect(controller).toContain('useFrame((_frameState, deltaSeconds) =>');

@@ -43,6 +43,45 @@ export interface CommercialMiniMapGeometry {
   scale: number;
 }
 
+type ProjectedLot = Pick<MiniMapLotGeometry, 'path' | 'labelPoint' | 'labelWidth' | 'labelHeight'> & { itemIndex: number };
+type SpatialProjection = Omit<CommercialMiniMapGeometry, 'lots' | 'lotsByEntityId'> & { lots: ProjectedLot[] };
+// Keep only coordinates/projection results, never status, prices or lot records.
+// Current dashboard scopes fit here; older geometries are evicted on revision.
+const PROJECTION_CACHE_LIMIT = 16;
+const projectionCache = new Map<string, SpatialProjection>();
+
+/** Reuses exact projection work across scope remounts and price/status updates.
+ * Current commercial records are joined on every call, outside the cache. */
+export function getCommercialMiniMapGeometry(
+  items: readonly CommercialMiniMapItem[],
+  outlines: readonly MiniMapOutline[] = [],
+  contentEnvelope?: MiniMapBounds,
+): CommercialMiniMapGeometry {
+  const key = JSON.stringify([items.map(({ entity, lot }) => [
+    entity.id, lot.id, entity.isArchived, lot.archivedAt, lot.entityId,
+    entity.geometry, entity.metadata?.labelAnchor,
+  ]), outlines, contentEnvelope]);
+  let projection = projectionCache.get(key);
+  if (!projection) {
+    const built = buildCommercialMiniMapGeometry(items, outlines, contentEnvelope);
+    let itemIndex = 0;
+    const lots = built.lots.map(({ entity, lot, path, labelPoint, labelWidth, labelHeight }) => {
+      while (items[itemIndex].entity !== entity || items[itemIndex].lot !== lot) itemIndex += 1;
+      return { itemIndex: itemIndex++, path, labelPoint, labelWidth, labelHeight };
+    });
+    projection = { viewBox: built.viewBox, bounds: built.bounds,
+      outlines: built.outlines.map(({ id, label, kind, color, coordinates, path, labelPoint }) => ({ id, label, kind, color, coordinates, path, labelPoint })),
+      project: built.project, scale: built.scale, lots };
+    projectionCache.set(key, projection);
+    if (projectionCache.size > PROJECTION_CACHE_LIMIT) projectionCache.delete(projectionCache.keys().next().value!);
+  } else {
+    projectionCache.delete(key);
+    projectionCache.set(key, projection);
+  }
+  const lots = projection.lots.map(({ itemIndex, ...shape }) => ({ ...items[itemIndex], ...shape }));
+  return { ...projection, lots, lotsByEntityId: new Map(lots.map((lot) => [lot.entity.id, lot])) };
+}
+
 /** Size labels against their actual on-screen cell, not the SVG's arbitrary
  * normalized units. Rotation is chosen only when it improves the usable fit. */
 export function commercialMiniMapNumberLabel(number: string, width: number, height: number, pixelsPerUnit: number, targetPixels = 11) {
@@ -107,6 +146,12 @@ export function validDashboardRing(source: unknown): Point[] | null {
 
 function formatCoordinate(value: number): string {
   return String(Number(value.toFixed(4)));
+}
+
+function createMiniMapProjection(minX: number, minY: number, offsetX: number, offsetY: number, scale: number) {
+  // This closure contains numbers only, so cached projections cannot keep a
+  // discarded snapshot's commercial records alive through their scope.
+  return ([x, y]: Point): Point => [offsetX + (x - minX) * scale, offsetY + (y - minY) * scale];
 }
 
 /**
@@ -176,7 +221,7 @@ export function buildCommercialMiniMapGeometry(
   const offsetY = (HEIGHT - (maxY - minY) * scale) / 2;
   const lots: MiniMapLotGeometry[] = [];
   const lotsByEntityId = new Map<string, MiniMapLotGeometry>();
-  const project = ([x, y]: Point): Point => [offsetX + (x - minX) * scale, offsetY + (y - minY) * scale];
+  const project = createMiniMapProjection(minX, minY, offsetX, offsetY, scale);
   const pathFor = (rings: Point[][]) => rings.map((ring) => {
     const points = ring.map((point) => project(point).map(formatCoordinate).join(' '));
     return `M ${points[0]} L ${points.slice(1).join(' L ')} Z`;

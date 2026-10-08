@@ -1,0 +1,66 @@
+{
+  "capturedAt": "2026-10-08T04:33:49.652Z",
+  "root": "C:\\Users\\Leonardo\\AppData\\Local\\Temp\\fenasoja-dashboard-baseline-e2acc54",
+  "runtime": "v24.15.0",
+  "platform": "win32/x64",
+  "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+  "warmup": 5,
+  "repetitions": 100,
+  "measurement": "Unthrottled Node/Vite SSR pure CPU; excludes browser/React/input/paint/GPU",
+  "inventory": {
+    "entities": 1579,
+    "lots": 1466,
+    "external": 264,
+    "internal": 1202
+  },
+  "cacheAvailable": {
+    "boundaries": false,
+    "geometry": false
+  },
+  "samples": {
+    "all-boundaries-raw": {
+      "medianMs": 8.798500000000786,
+      "p95Ms": 33.08639999999832,
+      "worstMs": 55.28969999999936
+    },
+    "rural-boundary-raw": {
+      "medianMs": 5.577400000000125,
+      "p95Ms": 20.191000000000713,
+      "worstMs": 33.413799999998446
+    },
+    "external-geometry-raw": {
+      "medianMs": 3.041400000000067,
+      "p95Ms": 28.75720000000001,
+      "worstMs": 35.15990000000056
+    },
+    "internal-geometry-raw": {
+      "medianMs": 15.471799999999348,
+      "p95Ms": 34.264500000001135,
+      "worstMs": 41.13539999999921
+    },
+    "all-boundaries-repeat": {
+      "medianMs": 7.093600000000151,
+      "p95Ms": 28.738099999998667,
+      "worstMs": 41.45669999999882
+    },
+    "rural-boundary-repeat": {
+      "medianMs": 5.180299999999988,
+      "p95Ms": 41.10540000000037,
+      "worstMs": 73.24239999999918
+    },
+    "external-geometry-repeat": {
+      "medianMs": 3.0569000000032247,
+      "p95Ms": 23.4887000000017,
+      "worstMs": 35.34560000000056
+    },
+    "internal-geometry-repeat": {
+      "medianMs": 15.663399999997637,
+      "p95Ms": 47.666299999997136,
+      "worstMs": 132.45180000000255
+    }
+  },
+  "conditions": {
+    "cpuContention": true,
+    "reason": "Overlapped root build/tests; descriptive samples only, not a controlled speedup comparison."
+  }
+}

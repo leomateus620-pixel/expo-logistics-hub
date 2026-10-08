@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { ArrowUpRight, X } from 'lucide-react';
 import type { CommercialMapData } from '../types';
 import type { LotPricingStage } from '../utils/lotPricing2028';
-import { CommercialDashboardSpaces } from './CommercialDashboardSpaces';
+import { CommercialDashboardSpaces, type DashboardSpacesPresentationMemory } from './CommercialDashboardSpaces';
 import { buildCommercialDashboardSnapshot } from './commercialDashboardAnalytics';
 import type { DashboardStatusSummary } from './commercialDashboardTypes';
 import { formatDashboardAreaWithCoverage, formatDashboardCurrency, formatDashboardInteger, formatDashboardPercentage } from './commercialDashboardFormatters';
@@ -41,6 +41,7 @@ type KpiTone = 'spaces' | 'open' | 'sold' | 'available' | 'area';
 /** Stable per opening, cycling between openings; data refreshes never recompose the backgrounds. */
 const OVERVIEW_COMPOSITIONS = ['a', 'b', 'c'] as const;
 let overviewOpenings = 0;
+const emptyScrollContainer = () => null;
 
 /** Splits an existing formatter result into currency, number and compact unit without changing it. */
 function OverviewAmount({ text }: { text: string }) {
@@ -127,7 +128,16 @@ function statusAreaFact(summary: DashboardStatusSummary, inventoryLots: number):
 export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, onViewLot, projectId, orgId = null, canManageSales = false, canManageContracts = false, scrollContainer, onViewSale }: CommercialDashboardProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const salesEntryRef = useRef<HTMLButtonElement>(null);
-  const overviewScrollRef = useRef(0);
+  // Keep only presentation state across sales navigation; maps remain unmounted.
+  // A new project/organization receives fresh state before its first render.
+  const presentation = useMemo(() => ({
+    scope: `${orgId ?? ''}:${projectId ?? ''}`,
+    spaces: {} as DashboardSpacesPresentationMemory,
+    overview: { scrollTop: 0 },
+  }), [orgId, projectId]);
+  const { spaces: spacesMemory, overview: overviewMemory } = presentation;
+  const currentOverviewMemory = useRef(overviewMemory);
+  currentOverviewMemory.current = overviewMemory;
   const area = useSalesOrdersUiStore((state) => state.area);
   const setArea = useSalesOrdersUiStore((state) => state.setArea);
   const salesAvailable = Boolean(projectId && onViewSale);
@@ -174,12 +184,14 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
     <main className={`commercial-dashboard-content${inSales ? ' commercial-dashboard-content--sales' : ''}`}>
       {inSales && projectId && onViewSale ? <CommercialSalesOrdersSection projectId={projectId} orgId={orgId}
         canManageSales={canManageSales} canManageContracts={canManageContracts} data={data}
-        scrollContainer={scrollContainer ?? (() => null)} onViewSale={onViewSale}
+        scrollContainer={scrollContainer ?? emptyScrollContainer} onViewSale={onViewSale}
         onBack={() => {
           setArea('overview');
           requestAnimationFrame(() => {
+            if (currentOverviewMemory.current !== overviewMemory
+              || useSalesOrdersUiStore.getState().area !== 'overview' || !salesEntryRef.current) return;
             const container = scrollContainer?.();
-            if (container) container.scrollTop = overviewScrollRef.current;
+            if (container) container.scrollTop = overviewMemory.scrollTop;
             salesEntryRef.current?.focus({ preventScroll: true });
           });
         }} /> : <>
@@ -258,13 +270,13 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
         </div>
         <div className="commercial-dashboard-sales-entry__text"><h2>Vendas e contratos</h2><p>Pedidos, espaços, documentos e histórico comercial.</p></div>
         <button type="button" ref={salesEntryRef} onClick={() => {
-          overviewScrollRef.current = scrollContainer?.()?.scrollTop ?? 0;
+          overviewMemory.scrollTop = scrollContainer?.()?.scrollTop ?? 0;
           setArea('sales');
           const container = scrollContainer?.();
           if (container) container.scrollTop = 0;
         }} aria-label="Acessar vendas e contratos">Acessar<ArrowUpRight aria-hidden="true" /></button>
       </section>}
-      <CommercialDashboardSpaces snapshot={snapshot} data={data} onViewLot={onViewLot} />
+      <CommercialDashboardSpaces key={presentation.scope} snapshot={snapshot} data={data} onViewLot={onViewLot} presentationMemory={spacesMemory} />
       {snapshot.orphanLots > 0 && <div className="commercial-dashboard-integrity" role="note">
         <span>{snapshot.orphanLots} lotes sem entidade cadastral carregada, fora dos indicadores conforme o contrato atual do mapa.</span>
       </div>}

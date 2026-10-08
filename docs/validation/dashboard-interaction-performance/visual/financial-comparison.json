@@ -1,0 +1,402 @@
+{
+  "capturedAt": "2026-10-08T04:42:25.871Z",
+  "images": [
+    {
+      "left": "before-desktop-financial.png",
+      "right": "after-desktop-financial.png",
+      "identicalPixels": false,
+      "changedPixels": 1267,
+      "maximumChannelDifference": 2,
+      "dimensions": [
+        [
+          1920,
+          1080
+        ],
+        [
+          1920,
+          1080
+        ]
+      ],
+      "sha256": [
+        "01da35b80e8fa08541aece0ca36c3d62e61400a8750d8866adddc48f40e85e21",
+        "2b8b291c806aafe618b7b91317198802318fb07f67e4fc01e3923eb8416ec646"
+      ]
+    },
+    {
+      "left": "before-desktop-contracts.png",
+      "right": "after-desktop-contracts.png",
+      "identicalPixels": false,
+      "changedPixels": 1,
+      "maximumChannelDifference": 2,
+      "dimensions": [
+        [
+          1920,
+          1080
+        ],
+        [
+          1920,
+          1080
+        ]
+      ],
+      "sha256": [
+        "551327e3cb2adbb30d2c18093d5ec8845dd09577fda3d47342ed17048992dfb0",
+        "ca6a8af593f0296a330fbce8386812e3f83cb4e505f185373fc4c4cfe52f3835"
+      ]
+    },
+    {
+      "left": "before-notebook-financial.png",
+      "right": "after-notebook-financial.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "dimensions": [
+        [
+          1366,
+          768
+        ],
+        [
+          1366,
+          768
+        ]
+      ],
+      "sha256": [
+        "72818969be83391dba9b077bdf908981c16cff25f0e474c76d41d9191f439a1a",
+        "72818969be83391dba9b077bdf908981c16cff25f0e474c76d41d9191f439a1a"
+      ]
+    },
+    {
+      "left": "before-notebook-contracts.png",
+      "right": "after-notebook-contracts.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "dimensions": [
+        [
+          1366,
+          768
+        ],
+        [
+          1366,
+          768
+        ]
+      ],
+      "sha256": [
+        "13af63bb0ec8cfb875a1f99ac8f392086487a118f2f25ae6b5d4d384ce536fe8",
+        "13af63bb0ec8cfb875a1f99ac8f392086487a118f2f25ae6b5d4d384ce536fe8"
+      ]
+    },
+    {
+      "left": "before-mobile-financial.png",
+      "right": "after-mobile-financial.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "dimensions": [
+        [
+          390,
+          844
+        ],
+        [
+          390,
+          844
+        ]
+      ],
+      "sha256": [
+        "b79aa7bbd4ca14eb2c9d7ffed3f06e7ee69d5965c850d90a781bf90b751e3085",
+        "b79aa7bbd4ca14eb2c9d7ffed3f06e7ee69d5965c850d90a781bf90b751e3085"
+      ]
+    },
+    {
+      "left": "before-mobile-contracts.png",
+      "right": "after-mobile-contracts.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "dimensions": [
+        [
+          390,
+          844
+        ],
+        [
+          390,
+          844
+        ]
+      ],
+      "sha256": [
+        "ee77b97da222296da60cf2cdee0a213db5e37d7bf046ca74d72e3cbd648ec539",
+        "ee77b97da222296da60cf2cdee0a213db5e37d7bf046ca74d72e3cbd648ec539"
+      ]
+    },
+    {
+      "left": "before-landscape-financial.png",
+      "right": "after-landscape-financial.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "dimensions": [
+        [
+          844,
+          390
+        ],
+        [
+          844,
+          390
+        ]
+      ],
+      "sha256": [
+        "6931b3904e58da7f6431a24106e9b499f3c1a7a4bac2cc9d6a9520a56e0adc58",
+        "6931b3904e58da7f6431a24106e9b499f3c1a7a4bac2cc9d6a9520a56e0adc58"
+      ]
+    },
+    {
+      "left": "before-landscape-contracts.png",
+      "right": "after-landscape-contracts.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "dimensions": [
+        [
+          844,
+          390
+        ],
+        [
+          844,
+          390
+        ]
+      ],
+      "sha256": [
+        "b781e20972e6cfebc7f7a874801d7ab35c4e907e49a53f1e81bb9948be3f71ba",
+        "b781e20972e6cfebc7f7a874801d7ab35c4e907e49a53f1e81bb9948be3f71ba"
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "left": "before-desktop-financial.png",
+      "right": "before-desktop-financial-control.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "dimensions": [
+        [
+          1920,
+          1080
+        ],
+        [
+          1920,
+          1080
+        ]
+      ],
+      "sha256": [
+        "01da35b80e8fa08541aece0ca36c3d62e61400a8750d8866adddc48f40e85e21",
+        "01da35b80e8fa08541aece0ca36c3d62e61400a8750d8866adddc48f40e85e21"
+      ]
+    },
+    {
+      "left": "after-desktop-financial.png",
+      "right": "after-desktop-financial-control.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "dimensions": [
+        [
+          1920,
+          1080
+        ],
+        [
+          1920,
+          1080
+        ]
+      ],
+      "sha256": [
+        "2b8b291c806aafe618b7b91317198802318fb07f67e4fc01e3923eb8416ec646",
+        "2b8b291c806aafe618b7b91317198802318fb07f67e4fc01e3923eb8416ec646"
+      ]
+    },
+    {
+      "left": "before-notebook-financial.png",
+      "right": "before-notebook-financial-control.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "dimensions": [
+        [
+          1366,
+          768
+        ],
+        [
+          1366,
+          768
+        ]
+      ],
+      "sha256": [
+        "72818969be83391dba9b077bdf908981c16cff25f0e474c76d41d9191f439a1a",
+        "72818969be83391dba9b077bdf908981c16cff25f0e474c76d41d9191f439a1a"
+      ]
+    },
+    {
+      "left": "after-notebook-financial.png",
+      "right": "after-notebook-financial-control.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "dimensions": [
+        [
+          1366,
+          768
+        ],
+        [
+          1366,
+          768
+        ]
+      ],
+      "sha256": [
+        "72818969be83391dba9b077bdf908981c16cff25f0e474c76d41d9191f439a1a",
+        "72818969be83391dba9b077bdf908981c16cff25f0e474c76d41d9191f439a1a"
+      ]
+    },
+    {
+      "left": "before-mobile-financial.png",
+      "right": "before-mobile-financial-control.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "dimensions": [
+        [
+          390,
+          844
+        ],
+        [
+          390,
+          844
+        ]
+      ],
+      "sha256": [
+        "b79aa7bbd4ca14eb2c9d7ffed3f06e7ee69d5965c850d90a781bf90b751e3085",
+        "b79aa7bbd4ca14eb2c9d7ffed3f06e7ee69d5965c850d90a781bf90b751e3085"
+      ]
+    },
+    {
+      "left": "after-mobile-financial.png",
+      "right": "after-mobile-financial-control.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "dimensions": [
+        [
+          390,
+          844
+        ],
+        [
+          390,
+          844
+        ]
+      ],
+      "sha256": [
+        "b79aa7bbd4ca14eb2c9d7ffed3f06e7ee69d5965c850d90a781bf90b751e3085",
+        "b79aa7bbd4ca14eb2c9d7ffed3f06e7ee69d5965c850d90a781bf90b751e3085"
+      ]
+    },
+    {
+      "left": "before-landscape-financial.png",
+      "right": "before-landscape-financial-control.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "dimensions": [
+        [
+          844,
+          390
+        ],
+        [
+          844,
+          390
+        ]
+      ],
+      "sha256": [
+        "6931b3904e58da7f6431a24106e9b499f3c1a7a4bac2cc9d6a9520a56e0adc58",
+        "6931b3904e58da7f6431a24106e9b499f3c1a7a4bac2cc9d6a9520a56e0adc58"
+      ]
+    },
+    {
+      "left": "after-landscape-financial.png",
+      "right": "after-landscape-financial-control.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "dimensions": [
+        [
+          844,
+          390
+        ],
+        [
+          844,
+          390
+        ]
+      ],
+      "sha256": [
+        "6931b3904e58da7f6431a24106e9b499f3c1a7a4bac2cc9d6a9520a56e0adc58",
+        "6931b3904e58da7f6431a24106e9b499f3c1a7a4bac2cc9d6a9520a56e0adc58"
+      ]
+    }
+  ],
+  "data": [
+    {
+      "size": "desktop",
+      "canonical": {
+        "lots": 1466,
+        "confirmed": 518250,
+        "open": 517375,
+        "total": 2067250,
+        "area": 81553.67
+      },
+      "canonicalIdentical": true,
+      "overviewPresentationIdentical": true,
+      "beforeErrors": [],
+      "afterErrors": []
+    },
+    {
+      "size": "notebook",
+      "canonical": {
+        "lots": 1466,
+        "confirmed": 518250,
+        "open": 517375,
+        "total": 2067250,
+        "area": 81553.67
+      },
+      "canonicalIdentical": true,
+      "overviewPresentationIdentical": true,
+      "beforeErrors": [],
+      "afterErrors": []
+    },
+    {
+      "size": "mobile",
+      "canonical": {
+        "lots": 1466,
+        "confirmed": 518250,
+        "open": 517375,
+        "total": 2067250,
+        "area": 81553.67
+      },
+      "canonicalIdentical": true,
+      "overviewPresentationIdentical": true,
+      "beforeErrors": [],
+      "afterErrors": []
+    },
+    {
+      "size": "landscape",
+      "canonical": {
+        "lots": 1466,
+        "confirmed": 518250,
+        "open": 517375,
+        "total": 2067250,
+        "area": 81553.67
+      },
+      "canonicalIdentical": true,
+      "overviewPresentationIdentical": true,
+      "beforeErrors": [],
+      "afterErrors": []
+    }
+  ],
+  "note": "Sojinha is paused and its existing animation currentTime aligned to zero in QA only. Every raw pixel/channel change still fails."
+}

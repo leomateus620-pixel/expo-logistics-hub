@@ -1,15 +1,16 @@
 import { useMemo } from 'react';
 import type { CommercialPavilionDashboardSnapshot } from './commercialDashboardTypes';
 import { buildDashboardPavilionGeometry } from './commercialDashboardPavilionGeometry';
-import { CommercialMiniMap } from './CommercialMiniMap';
+import { CommercialMiniMap, type MiniMapPresentationMemory } from './CommercialMiniMap';
 import type { CommercialStatus } from '../types';
 
-export default function CommercialDashboardPavilion({ snapshot, onViewLot, selection, highlightedStatus, hideStatusLegend = false }: {
+export default function CommercialDashboardPavilion({ snapshot, onViewLot, selection, highlightedStatus, presentationMemory, hideStatusLegend = false }: {
   snapshot: CommercialPavilionDashboardSnapshot;
   onViewLot: (id: string) => void;
   selection?: { entityId: string | null; onChange: (id: string | null) => void };
   highlightedStatus?: CommercialStatus | null;
   hideStatusLegend?: boolean;
+  presentationMemory?: MiniMapPresentationMemory;
 }) {
   const geometry = useMemo(() => buildDashboardPavilionGeometry(snapshot), [snapshot]);
   return <div data-dashboard-pavilion={snapshot.definition.publicIdentifier}>
@@ -21,7 +22,7 @@ export default function CommercialDashboardPavilion({ snapshot, onViewLot, selec
     <CommercialMiniMap items={geometry.records} title={snapshot.definition.officialName}
       className="commercial-dashboard-pavilion-plan" contentEnvelope={geometry.contentEnvelope}
       numberLabelPixels={snapshot.definition.pavilionNumber === 1 ? 14 : 11}
-      outlines={geometry.outlines} accesses={geometry.accesses} numbered onViewLot={onViewLot} selection={selection} highlightedStatus={highlightedStatus} hideStatusLegend={hideStatusLegend} />
+      outlines={geometry.outlines} accesses={geometry.accesses} numbered onViewLot={onViewLot} selection={selection} presentationMemory={presentationMemory} highlightedStatus={highlightedStatus} hideStatusLegend={hideStatusLegend} />
     {geometry.pending.map((message) => <p className="commercial-dashboard-pending" key={message}>{message}</p>)}
   </div>;
 }
