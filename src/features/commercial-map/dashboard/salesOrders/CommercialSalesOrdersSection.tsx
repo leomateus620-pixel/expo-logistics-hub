@@ -1,5 +1,6 @@
 import { useCallback, useLayoutEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useShallow } from 'zustand/react/shallow';
 import { ArrowLeft, Loader2, Search, ShieldAlert } from 'lucide-react';
 import type { CommercialMapData } from '../../types';
 import { describeSalesError, EMPTY_SALE_FILTERS, fetchSaleOrdersPage, SALE_ORDERS_PAGE_SIZE, type SaleOrderSummary } from './salesOrdersService';
@@ -24,7 +25,12 @@ export interface CommercialSalesOrdersSectionProps {
 export function CommercialSalesOrdersSection(props: CommercialSalesOrdersSectionProps) {
   const { projectId, canManageSales, scrollContainer, onBack } = props;
   const { scopeProjectId, filters: storedFilters, page: storedPage, expandedRecordId: storedExpanded,
-    selectedRecordIdentity, ensureProjectScope, setSelectedRecordIdentity, setPage, setExpanded, resetFilters } = useSalesOrdersUiStore();
+    selectedRecordIdentity, ensureProjectScope, setSelectedRecordIdentity, setPage, setExpanded, resetFilters } = useSalesOrdersUiStore(useShallow((state) => ({
+      scopeProjectId: state.scopeProjectId, filters: state.filters, page: state.page,
+      expandedRecordId: state.expandedRecordId, selectedRecordIdentity: state.selectedRecordIdentity,
+      ensureProjectScope: state.ensureProjectScope, setSelectedRecordIdentity: state.setSelectedRecordIdentity,
+      setPage: state.setPage, setExpanded: state.setExpanded, resetFilters: state.resetFilters,
+    })));
   // Bloqueia a identidade anterior durante o próprio render, antes que qualquer RPC de detalhe monte.
   const sameProject = scopeProjectId === null || scopeProjectId === projectId;
   const expandedRecordId = sameProject ? storedExpanded : null;
@@ -97,12 +103,12 @@ export function CommercialSalesOrdersSection(props: CommercialSalesOrdersSection
     else state.rememberListScroll(scrollContainer()?.scrollTop ?? 0);
     onBack?.();
   };
-  const openRecord = (record: SaleOrderSummary) => {
+  const openRecord = useCallback((record: SaleOrderSummary) => {
     useSalesOrdersUiStore.getState().rememberListScroll(scrollContainer()?.scrollTop ?? 0);
     setSelectedRecordIdentity(record);
     pendingDetailFocus.current = true;
     setExpanded(record.recordId);
-  };
+  }, [scrollContainer, setSelectedRecordIdentity, setExpanded]);
   const total = query.data?.total ?? 0;
   const pages = Math.max(1, Math.ceil(total / SALE_ORDERS_PAGE_SIZE));
   const hasFilters = Object.values(filters).some(Boolean);
@@ -123,7 +129,7 @@ export function CommercialSalesOrdersSection(props: CommercialSalesOrdersSection
         {!errorText && expandedRecordId && selectedRecord && <SaleOrderDetail key={selectedRecord.recordId} record={selectedRecord} {...props} onReady={detailReady} />}
         {!query.isLoading && !errorText && expandedRecordId && !selectedRecord && <p className="cso-state">Este registro não está na página atual. Volte às vendas para atualizar a seleção.</p>}
         {!expandedRecordId && !query.isLoading && !errorText && query.data?.rows.length === 0 && <div className="cso-state cso-empty" role="status"><Search aria-hidden="true" /><div><strong>Nenhuma venda encontrada</strong><p>{hasFilters ? 'Ajuste a busca ou remova os filtros para ver mais registros.' : 'Os pedidos registrados aparecerão aqui.'}</p></div>{hasFilters && <button type="button" className="cso-link" onClick={resetFilters}>Limpar filtros</button>}</div>}
-        {!errorText && !expandedRecordId && <div className="cso-list" aria-busy={query.isFetching}>{query.data?.rows.map((record) => <SaleOrderCard key={record.recordId} record={record} onOpen={() => openRecord(record)} />)}</div>}
+        {!errorText && !expandedRecordId && <div className="cso-list" aria-busy={query.isFetching}>{query.data?.rows.map((record) => <SaleOrderCard key={record.recordId} record={record} onOpen={openRecord} />)}</div>}
         {!errorText && !expandedRecordId && total > SALE_ORDERS_PAGE_SIZE && <nav className="cso-pager" aria-label="Páginas de vendas"><span>Página <strong>{page + 1}</strong> de {pages}</span><div>
           <button type="button" disabled={page === 0 || query.isPlaceholderData} onClick={() => { setPage(page - 1); useSalesOrdersUiStore.getState().rememberListScroll(0); const container = scrollContainer(); if (container) container.scrollTop = 0; }}>Anterior</button>
           <button type="button" disabled={page + 1 >= pages || query.isPlaceholderData} onClick={() => { setPage(page + 1); useSalesOrdersUiStore.getState().rememberListScroll(0); const container = scrollContainer(); if (container) container.scrollTop = 0; }}>Próxima</button>

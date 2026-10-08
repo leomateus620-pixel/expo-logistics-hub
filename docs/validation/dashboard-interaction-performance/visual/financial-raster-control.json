@@ -1,0 +1,81 @@
+{
+  "capturedAt": "2026-10-08T05:03:41.459Z",
+  "source": "Both control runs use the immutable baseline at port 5191, separate Chromium processes/contexts, cached identical fonts, 1920x1080 viewport, paused Sojinha at animation time zero.",
+  "crossContext": [
+    {
+      "left": "raster-control-a-desktop-financial.png",
+      "right": "raster-control-b-desktop-financial.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "bounds": null
+    },
+    {
+      "left": "raster-control-a-desktop-contracts.png",
+      "right": "raster-control-b-desktop-contracts.png",
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "bounds": null
+    }
+  ],
+  "originalBaselineAgainstControl": [
+    {
+      "left": "before-desktop-financial.png",
+      "right": "raster-control-a-desktop-financial.png",
+      "identicalPixels": false,
+      "changedPixels": 1266,
+      "maxChannelDifference": 1,
+      "bounds": [
+        22,
+        79,
+        1897,
+        242
+      ]
+    },
+    {
+      "left": "before-desktop-contracts.png",
+      "right": "raster-control-a-desktop-contracts.png",
+      "identicalPixels": false,
+      "changedPixels": 578,
+      "maxChannelDifference": 1,
+      "bounds": [
+        22,
+        79,
+        1897,
+        122
+      ]
+    }
+  ],
+  "candidateAgainstControl": [
+    {
+      "left": "after-desktop-financial.png",
+      "right": "raster-control-a-desktop-financial.png",
+      "identicalPixels": false,
+      "changedPixels": 1,
+      "maxChannelDifference": 2,
+      "bounds": [
+        1457,
+        27,
+        1457,
+        27
+      ]
+    },
+    {
+      "left": "after-desktop-contracts.png",
+      "right": "raster-control-a-desktop-contracts.png",
+      "identicalPixels": false,
+      "changedPixels": 579,
+      "maxChannelDifference": 2,
+      "bounds": [
+        22,
+        27,
+        1897,
+        122
+      ]
+    }
+  ],
+  "canonicalIdentical": true,
+  "presentationIdentical": true,
+  "note": "A difference here records same-version raster variation. The original strict before/after comparator remains unchanged and can still fail."
+}

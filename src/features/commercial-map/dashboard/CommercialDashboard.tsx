@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import type { CommercialMapData } from '../types';
 import type { LotPricingStage } from '../utils/lotPricing2028';
-import { CommercialDashboardSpaces, type CommercialDashboardSpacesMemory } from './CommercialDashboardSpaces';
+import { CommercialDashboardSpaces, type DashboardSpacesPresentationMemory, type CommercialDashboardSpacesMemory } from './CommercialDashboardSpaces';
 import { buildCommercialDashboardSnapshot } from './commercialDashboardAnalytics';
 import type { DashboardStatusSummary } from './commercialDashboardTypes';
 import { formatDashboardAreaWithCoverage, formatDashboardCurrency, formatDashboardInteger, formatDashboardPercentage } from './commercialDashboardFormatters';
@@ -43,6 +43,7 @@ type KpiTone = 'spaces' | 'open' | 'sold' | 'available' | 'area';
 /** Stable per opening, cycling between openings; data refreshes never recompose the backgrounds. */
 const OVERVIEW_COMPOSITIONS = ['a', 'b', 'c'] as const;
 let overviewOpenings = 0;
+const emptyScrollContainer = () => null;
 
 /** Splits an existing formatter result into currency, number and compact unit without changing it. */
 function OverviewAmount({ text }: { text: string }) {
@@ -123,7 +124,17 @@ function statusAreaFact(summary: DashboardStatusSummary, inventoryLots: number):
 export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, onViewLot, projectId, orgId = null, canManageSales = false, canManageContracts = false, scrollContainer, onViewSale }: CommercialDashboardProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const salesEntryRef = useRef<HTMLButtonElement>(null);
-  const overviewScrollRef = useRef(0);
+  const presentationScopeId = projectId ?? data.entities[0]?.projectId ?? 'unscoped';
+  // Keep only presentation state across sales navigation; maps remain unmounted.
+  // A new project/organization receives fresh state before its first render.
+  const presentation = useMemo(() => ({
+    scope: `${orgId ?? ''}:${presentationScopeId}`,
+    spaces: { current: null } as DashboardSpacesPresentationMemory & CommercialDashboardSpacesMemory,
+    overview: { scrollTop: 0 },
+  }), [orgId, presentationScopeId]);
+  const { spaces: spacesMemory, overview: overviewMemory } = presentation;
+  const currentOverviewMemory = useRef(overviewMemory);
+  currentOverviewMemory.current = overviewMemory;
   const area = useSalesOrdersUiStore((state) => state.area);
   const setArea = useSalesOrdersUiStore((state) => state.setArea);
   const salesAvailable = Boolean(projectId && onViewSale);
@@ -131,10 +142,6 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
   const [pricingStage, setPricingStage] = useState<LotPricingStage>('RENOVACAO');
   const [composition] = useState(() => OVERVIEW_COMPOSITIONS[overviewOpenings++ % OVERVIEW_COMPOSITIONS.length]);
   const progressFillRef = useRef<SalesProgressFill | null>(null);
-  const presentationScopeId = projectId ?? data.entities[0]?.projectId ?? 'unscoped';
-  const spacesMemory = useMemo<CommercialDashboardSpacesMemory>(() => ({
-    current: null, contextKey: `${presentationScopeId}:${orgId ?? ''}`,
-  }), [presentationScopeId, orgId]);
   const snapshot = useMemo(() => buildCommercialDashboardSnapshot({ entities: data.entities, lots: data.lots }, pricingStage), [data.entities, data.lots, pricingStage]);
   const { overall } = snapshot;
   const lotShare = (value: number) => overall.commercialLots ? `${formatDashboardPercentage(value)} dos espaços comerciais` : '—';
@@ -173,12 +180,14 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
     <main className={`commercial-dashboard-content${inSales ? ' commercial-dashboard-content--sales' : ''}`}>
       {inSales && projectId && onViewSale ? <CommercialSalesOrdersSection projectId={projectId} orgId={orgId}
         canManageSales={canManageSales} canManageContracts={canManageContracts} data={data}
-        scrollContainer={scrollContainer ?? (() => null)} onViewSale={onViewSale}
+        scrollContainer={scrollContainer ?? emptyScrollContainer} onViewSale={onViewSale}
         onBack={() => {
           setArea('overview');
           requestAnimationFrame(() => {
+            if (currentOverviewMemory.current !== overviewMemory
+              || useSalesOrdersUiStore.getState().area !== 'overview' || !salesEntryRef.current) return;
             const container = scrollContainer?.();
-            if (container) container.scrollTop = overviewScrollRef.current;
+            if (container) container.scrollTop = overviewMemory.scrollTop;
             salesEntryRef.current?.focus({ preventScroll: true });
           });
         }} /> : <>
@@ -243,7 +252,7 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
           {salesAvailable && projectId && <CommercialDashboardSalesSummary projectId={projectId}
             canManageSales={canManageSales} canManageContracts={canManageContracts} entryRef={salesEntryRef}
             onAccess={() => {
-              overviewScrollRef.current = scrollContainer?.()?.scrollTop ?? 0;
+              overviewMemory.scrollTop = scrollContainer?.()?.scrollTop ?? 0;
               setArea('sales');
               const container = scrollContainer?.();
               if (container) container.scrollTop = 0;
@@ -251,7 +260,8 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
         </div>
       </section>
       </div>
-      <CommercialDashboardSpaces key={`${presentationScopeId}:${orgId ?? ''}`} snapshot={snapshot} data={data} onViewLot={onViewLot} stateMemory={spacesMemory} />
+      <CommercialDashboardSpaces key={presentation.scope} snapshot={snapshot} data={data} onViewLot={onViewLot}
+        presentationMemory={spacesMemory} stateMemory={spacesMemory} />
       {snapshot.orphanLots > 0 && <div className="commercial-dashboard-integrity" role="note">
         <span>{snapshot.orphanLots} lotes sem entidade cadastral carregada, fora dos indicadores conforme o contrato atual do mapa.</span>
       </div>}

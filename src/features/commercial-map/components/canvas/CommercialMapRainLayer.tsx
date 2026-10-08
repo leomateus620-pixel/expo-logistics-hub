@@ -9,6 +9,7 @@ import { buildRainGroundAnchors, buildRainRunoffAnchors, type RainGroundAnchor }
 import { commercialMapDiagnosticsEnabled, markCommercialMapStage } from '../../utils/performanceDiagnostics';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { RainWetSurfaceRegistry } from './rainWetSurfaces';
+import { useCommercialMapPresentationVisible } from './CommercialMapPresentationContext';
 import { resolveCommercialMapExecutionPolicy } from '../../utils/executionPolicy';
 
 const NO_RAYCAST = () => undefined;
@@ -112,6 +113,7 @@ export function CommercialMapRainLayer({entities, qualityTier, active=true}: {
   entities: readonly MapEntity[]; qualityTier: CommercialMapQualityTier; active?: boolean;
 }) {
   const gl=useThree((s)=>s.gl);
+  const presentationVisible=useCommercialMapPresentationVisible();
   const scene=useThree((s)=>s.scene);
   const invalidate=useThree((s)=>s.invalidate);
   const rain=useMemo(()=>commercialRainRuntime(scene),[scene]);
@@ -147,6 +149,7 @@ export function CommercialMapRainLayer({entities, qualityTier, active=true}: {
   },[entities,rain]);
 
   useEffect(()=>{
+    if(!presentationVisible)return;
     let cancel=false;
     let timer=0;
     const instanceMatrix=new THREE.Matrix4();
@@ -191,15 +194,16 @@ export function CommercialMapRainLayer({entities, qualityTier, active=true}: {
       chunk();
     };
     scan();
-    return()=>{cancel=true;clearTimeout(timer);registry.dispose();};
-  },[scene,registry,resources,invalidate]);
+    return()=>{cancel=true;clearTimeout(timer);};
+  },[scene,registry,resources,invalidate,presentationVisible]);
+  useEffect(()=>()=>registry.dispose(),[registry,resources]);
   useEffect(()=>()=>{
     for(const key of ['drops','splashes','runoff','puddles'] as const){resources[key].geometry.dispose();resources[key].material.dispose();}
   },[resources]);
   useEffect(()=>{invalidate();},[active,hydrology,tier,invalidate]);
   const cadence=useRef({wet:0,report:0,lamps:0,lastWet:-1});
   useFrame(({camera},delta)=>{
-    if(!group.current)return;
+    if(!presentationVisible||!group.current)return;
     const now=performance.now();
     const wet=rain.blend.value;
     const lighting=useCommercialMapStore.getState();

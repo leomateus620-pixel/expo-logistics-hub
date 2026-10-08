@@ -4,6 +4,54 @@ import type { CommercialLot, MapEntity } from '../types';
 import { resolveCommercialPavilionDefinition } from '../utils/commercialPavilions';
 import { validDashboardRing, type MiniMapOutline } from './commercialDashboardGeometry';
 
+const BOUNDARY_CACHE_LIMIT = 8;
+const boundaryCache = new Map<string, ReturnType<typeof buildDashboardExternalBoundaries>>();
+const membershipKeys = new WeakMap<readonly MapEntity[], WeakMap<readonly CommercialLot[], string>>();
+
+/** Financial and visual snapshot changes do not change segment membership. */
+function membershipKey(entities: readonly MapEntity[], lots: readonly CommercialLot[]) {
+  let byLots = membershipKeys.get(entities);
+  if (!byLots) {
+    byLots = new WeakMap();
+    membershipKeys.set(entities, byLots);
+  }
+  let key = byLots.get(lots);
+  if (key === undefined) {
+    key = JSON.stringify([entities.map((entity) => [entity.id, entity.publicIdentifier,
+      entity.parentEntityId, entity.segmentId, entity.segmentSource,
+      entity.metadata?.block, entity.metadata?.parentPublicIdentifier, entity.metadata?.segmentId,
+      entity.metadata?.segmentCode, entity.metadata?.areaCode]), lots.map((lot) => [lot.entityId, lot.block])]);
+    byLots.set(lots, key);
+  }
+  return key;
+}
+
+/** Bounded, pure spatial results survive overview/sales remounts. Exact member
+ * coordinates and association inputs invalidate the union, never prices. */
+export function getDashboardExternalBoundaries(
+  entities: readonly MapEntity[],
+  lots: readonly CommercialLot[],
+  segments: readonly CommercialMapSegmentDefinition[],
+) {
+  const declared = new Set(segments.flatMap((segment) => [...segment.boundary.blockIdentifiers, ...segment.membership.entityIdentifiers]));
+  const key = JSON.stringify([membershipKey(entities, lots),
+    segments.map((segment) => [segment.id, segment.name, segment.palette.edge,
+      segment.boundary.blockIdentifiers, segment.boundary.excludedIdentifiers, segment.membership.entityIdentifiers]),
+    entities.filter((entity) => declared.has(entity.publicIdentifier)).map((entity) => [
+      entity.id, entity.isArchived, entity.classification, entity.geometry?.coordinates,
+    ])]);
+  let result = boundaryCache.get(key);
+  if (!result) {
+    result = buildDashboardExternalBoundaries(entities, lots, segments);
+    boundaryCache.set(key, result);
+    if (boundaryCache.size > BOUNDARY_CACHE_LIMIT) boundaryCache.delete(boundaryCache.keys().next().value!);
+  } else {
+    boundaryCache.delete(key);
+    boundaryCache.set(key, result);
+  }
+  return result;
+}
+
 /** Exact union of declared, active cadastral members; never a hull or bounding box. */
 export function buildDashboardExternalBoundaries(
   entities: readonly MapEntity[],

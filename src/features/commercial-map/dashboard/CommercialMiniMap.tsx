@@ -1,10 +1,10 @@
-import { useCallback, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
+import { memo, useCallback, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent, type ReactNode, type RefObject } from 'react';
 import { ArrowUpRight, Maximize, MapPinned } from 'lucide-react';
 import { COMMERCIAL_PHASES, STATUS_CONFIG } from '../constants';
 import { toCommercialPhase, type CommercialStatus } from '../types';
 import { formatAreaSqmLabel, formatBrl } from '../utils/lotPricing2028';
 import { resolveLotIdentity } from '../utils/lotIdentity';
-import { buildCommercialMiniMapGeometry, buildCommercialMiniMapViewBox, commercialMiniMapNumberLabel, type CommercialMiniMapItem, type MiniMapBounds, type MiniMapOutline } from './commercialDashboardGeometry';
+import { getCommercialMiniMapGeometry, buildCommercialMiniMapViewBox, commercialMiniMapNumberLabel, type CommercialMiniMapItem, type MiniMapBounds, type MiniMapOutline } from './commercialDashboardGeometry';
 import type { CommercialPavilionWayfindingMarkerKind } from '../utils/commercialPavilionWayfinding';
 import { CommercialDashboardLotContextCard } from './CommercialDashboardLotContextCard';
 import './commercial-dashboard-pavilion-inspection.css';
@@ -16,6 +16,11 @@ export interface DashboardAccessMarker {
   kind: CommercialPavilionWayfindingMarkerKind;
   position: readonly [number, number];
   outward: readonly [number, number];
+}
+export interface MiniMapPresentationMemory {
+  zoom?: number;
+  scrollLeft?: number;
+  scrollTop?: number;
 }
 export interface CommercialMiniMapProps {
   items: readonly CommercialMiniMapItem[];
@@ -32,6 +37,7 @@ export interface CommercialMiniMapProps {
   numberLabelPixels?: number;
   /** Pavilion inspection is opt-in; external maps keep their established presentation. */
   presentation?: 'default' | 'pavilion';
+  presentationMemory?: MiniMapPresentationMemory;
 }
 const EMPTY_OUTLINES: readonly MiniMapOutline[] = [];
 const EMPTY_ACCESSES: readonly DashboardAccessMarker[] = [];
@@ -54,26 +60,58 @@ function InspectionFrame({ enabled, frameRef, onMouseLeave, children }: { enable
 
 interface ContextPosition { left: number; top: number; anchorX?: number; anchorY?: number; placement: 'left' | 'right' | 'above' | 'below'; visible: boolean }
 
+/** Transient interaction changes only the affected SVG paths. */
+const MiniMapLotPath = memo(function MiniMapLotPath({
+  entityId, path, status, label, active, selected, keyboardStop, dimmed, describedBy, index,
+  onEnter, onLeave, onFocusLot, onBlurLot, onActivate, onNavigate,
+}: {
+  entityId: string; path: string; status: CommercialStatus; label: string;
+  active: boolean; selected: boolean; keyboardStop: boolean; dimmed: boolean; describedBy?: string; index: number;
+  onEnter: (id: string, event: ReactMouseEvent<SVGPathElement>) => void;
+  onLeave: () => void; onFocusLot: (id: string, origin: SVGPathElement) => void; onBlurLot: () => void;
+  onActivate: (id: string, origin: SVGPathElement, selected: boolean) => void;
+  onNavigate: (event: ReactKeyboardEvent<SVGPathElement>, index: number) => void;
+}) {
+  const config = STATUS_CONFIG[displayStatus(status)];
+  return <path d={path} fill={config.color} fillRule="evenodd" stroke={active ? '#172e20' : config.border}
+    strokeWidth={active ? 3.5 : 1.3} vectorEffect="non-scaling-stroke" opacity={dimmed && !active ? 0.16 : 0.92}
+    role="button" tabIndex={keyboardStop ? 0 : -1} aria-pressed={selected} aria-label={label} aria-describedby={describedBy}
+    data-entity-id={entityId} data-status={status}
+    onMouseEnter={(event) => onEnter(entityId, event)} onMouseLeave={onLeave}
+    onFocus={(event) => onFocusLot(entityId, event.currentTarget)} onBlur={onBlurLot}
+    onClick={(event) => onActivate(entityId, event.currentTarget, selected)} onKeyDown={(event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault(); onActivate(entityId, event.currentTarget, selected);
+      } else onNavigate(event, index);
+    }} />;
+});
+
 /** SVG only. Shapes, identifiers, status and selection use the same query snapshot. */
-export function CommercialMiniMap({
+export const CommercialMiniMap = memo(function CommercialMiniMap({
   items, title, highlightedStatus = null, onViewLot, className = '',
   outlines = EMPTY_OUTLINES, accesses = EMPTY_ACCESSES, numbered = false, hideStatusLegend = false, selection, contentEnvelope, numberLabelPixels = 11,
-  presentation: variant = 'default',
+  presentation: variant = 'default', presentationMemory,
 }: CommercialMiniMapProps) {
   const pavilionPresentation = variant === 'pavilion';
   const selectId = useId();
   const contextCardId = useId();
-  const geometry = useMemo(() => buildCommercialMiniMapGeometry(items, outlines, contentEnvelope), [items, outlines, contentEnvelope]);
+  const geometry = useMemo(() => getCommercialMiniMapGeometry(items, outlines, contentEnvelope), [items, outlines, contentEnvelope]);
   const [hoveredEntityId, setHoveredEntityId] = useState<string | null>(null);
   const [focusedEntityId, setFocusedEntityId] = useState<string | null>(null);
   const [dismissedEntityId, setDismissedEntityId] = useState<string | null>(null);
   const [selections, setSelections] = useState<Record<string, string | null>>({});
   const selectedEntityId = selection ? selection.entityId : selections[title] ?? null;
-  const select = selection?.onChange ?? ((id: string | null) => setSelections((current) => ({ ...current, [title]: id })));
+  const onSelectionChange = selection?.onChange;
+  const select = useCallback((id: string | null) => {
+    if (onSelectionChange) onSelectionChange(id);
+    else setSelections((current) => ({ ...current, [title]: id }));
+  }, [onSelectionChange, title]);
+
   const [keyboardEntityId, setKeyboardEntityId] = useState<string | null>(null);
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(presentationMemory?.zoom ?? 1);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const viewportRef = useRef<HTMLDivElement>(null);
+  const pendingRestore = useRef<{ zoom: number; scrollLeft: number; scrollTop: number } | null>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const contextRef = useRef<HTMLDivElement>(null);
@@ -92,14 +130,39 @@ export function CommercialMiniMap({
     }
   }, []);
   useLayoutEffect(() => {
-    fitToSpace();
+    if (presentationMemory) {
+      pendingRestore.current = { zoom: presentationMemory.zoom ?? 1,
+        scrollLeft: presentationMemory.scrollLeft ?? 0, scrollTop: presentationMemory.scrollTop ?? 0 };
+      setZoom(pendingRestore.current.zoom);
+    } else fitToSpace();
     setHoveredEntityId(null);
     setFocusedEntityId(null);
     setDismissedEntityId(null);
     setKeyboardEntityId(null);
     pointerPreviewBlockedRef.current = false;
     lastPointerRef.current = null;
-  }, [title, fitToSpace]);
+  }, [title, fitToSpace, presentationMemory]);
+  useLayoutEffect(() => {
+    const restore = pendingRestore.current;
+    const viewport = viewportRef.current;
+    // Apply scroll only once the matching zoom has reached the DOM. A scope
+    // can reuse this component while its previous surface was still at 100%.
+    if (!restore || zoom !== restore.zoom || !viewport) return;
+    viewport.scrollLeft = restore.scrollLeft;
+    viewport.scrollTop = restore.scrollTop;
+    pendingRestore.current = null;
+  }, [zoom, title, presentationMemory]);
+  useLayoutEffect(() => {
+    if (!presentationMemory || pendingRestore.current) return;
+    presentationMemory.zoom = zoom;
+    const viewport = viewportRef.current;
+    return () => {
+      if (viewport) {
+        presentationMemory.scrollLeft = viewport.scrollLeft;
+        presentationMemory.scrollTop = viewport.scrollTop;
+      }
+    };
+  }, [presentationMemory, zoom]);
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
@@ -120,9 +183,11 @@ export function CommercialMiniMap({
     const observer = new ResizeObserver(([entry]) => {
       if (!entry) return;
       // Border size stays stable when inspection zoom introduces scrollbars.
-      const rect = viewport.getBoundingClientRect();
-      const width = entry.borderBoxSize?.[0]?.inlineSize ?? (rect.width || entry.contentRect.width);
-      const height = entry.borderBoxSize?.[0]?.blockSize ?? (rect.height || entry.contentRect.height);
+      const reportedBox = entry.borderBoxSize?.[0];
+      const box = reportedBox && Number.isFinite(reportedBox.inlineSize) && Number.isFinite(reportedBox.blockSize) ? reportedBox : null;
+      const rect = box ? null : viewport.getBoundingClientRect();
+      const width = box?.inlineSize ?? (rect!.width || entry.contentRect.width);
+      const height = box?.blockSize ?? (rect!.height || entry.contentRect.height);
       if (Math.abs(width - previousWidth) >= 2 || Math.abs(height - previousHeight) >= 2) {
         previousWidth = width;
         previousHeight = height;
@@ -134,15 +199,28 @@ export function CommercialMiniMap({
     return () => observer.disconnect();
   }, [fitToSpace]);
   const keyboardStopId = keyboardEntityId && geometry.lotsByEntityId.has(keyboardEntityId) ? keyboardEntityId : geometry.lots[0]?.entity.id;
-  const activeLot = items.find(({ entity }) => entity.id === selectedEntityId)
-    ?? items.find(({ entity }) => entity.id === hoveredEntityId) ?? null;
+  const itemsByEntityId = useMemo(() => {
+    const index = new Map<string, CommercialMiniMapItem>();
+    for (const item of items) if (!index.has(item.entity.id)) index.set(item.entity.id, item);
+    return index;
+  }, [items]);
+  const activeLot = itemsByEntityId.get(selectedEntityId ?? '') ?? itemsByEntityId.get(hoveredEntityId ?? '') ?? null;
   const activeSelected = activeLot?.entity.id === selectedEntityId;
+  const lotLabels = useMemo(() => new Map(items.map((item) => {
+    const area = item.lot.officialAreaSqm != null && Number.isFinite(item.lot.officialAreaSqm) && item.lot.officialAreaSqm > 0
+      ? formatAreaSqmLabel(item.lot.officialAreaSqm) : 'área oficial pendente';
+    const name = identity(item);
+    const statusLabel = STATUS_CONFIG[displayStatus(item.lot.status)].label;
+    return [item.lot.id, { option: `${name} · ${statusLabel}`,
+      accessible: `${name}, ${area}, ${statusLabel}${validValue(item.value) ? `, ${formatBrl(item.value)}, valor cadastral` : ''}` }];
+  })), [items]);
+  const options = useMemo(() => items.map((item) => <option key={item.lot.id} value={item.entity.id}>{lotLabels.get(item.lot.id)!.option}</option>), [items, lotLabels]);
   const contextEntityId = pavilionPresentation ? hoveredEntityId ?? focusedEntityId
     ?? (selectedEntityId !== dismissedEntityId ? selectedEntityId : null) : null;
-  const contextRecord = contextEntityId ? items.find(({ entity }) => entity.id === contextEntityId) ?? null : null;
+  const contextRecord = contextEntityId ? itemsByEntityId.get(contextEntityId) ?? null : null;
   const contextLot = contextEntityId ? geometry.lotsByEntityId.get(contextEntityId) ?? null : null;
   const contextMode = contextEntityId === selectedEntityId && contextEntityId !== dismissedEntityId ? 'selected' : 'preview';
-  const choosePavilionLot = (id: string | null, origin: HTMLElement | SVGElement, reveal = false) => {
+  const choosePavilionLot = useCallback((id: string | null, origin: HTMLElement | SVGElement, reveal = false) => {
     contextOriginRef.current = origin;
     pointerPreviewBlockedRef.current = false;
     setDismissedEntityId(null);
@@ -167,7 +245,7 @@ export function CommercialMiniMap({
       if (screenY < top + 12 || screenY > top + height - 12) viewport.scrollTop += screenY - top - height / 2;
       setRevealRevision((value) => value + 1);
     }
-  };
+  }, [select, geometry.lotsByEntityId]);
   const closeContext = useCallback((restoreOrigin = true) => {
     // Removing the card can expose a path directly beneath the stationary
     // pointer and synthesize mouseenter. Wait for real movement or an explicit
@@ -197,6 +275,39 @@ export function CommercialMiniMap({
     document.addEventListener('mousemove', resume);
     return () => document.removeEventListener('mousemove', resume);
   }, [pavilionPresentation, pointerDismissal]);
+  const enterLot = useCallback((id: string, event: ReactMouseEvent<SVGPathElement>) => {
+    if (pavilionPresentation && pointerPreviewBlockedRef.current) return;
+    lastPointerRef.current = { x: event.clientX, y: event.clientY };
+    setHoveredEntityId(id);
+  }, [pavilionPresentation]);
+  const leaveLot = useCallback(() => { if (!pavilionPresentation) setHoveredEntityId(null); }, [pavilionPresentation]);
+  const focusLot = useCallback((id: string, origin: SVGPathElement) => {
+    setKeyboardEntityId(id);
+    if (!pavilionPresentation) { setHoveredEntityId(id); return; }
+    setHoveredEntityId(null);
+    contextOriginRef.current = origin;
+    if (suppressNextFocusRef.current === id) { suppressNextFocusRef.current = null; return; }
+    pointerPreviewBlockedRef.current = false;
+    setFocusedEntityId(id);
+  }, [pavilionPresentation]);
+  const blurLot = useCallback(() => {
+    if (pavilionPresentation) setFocusedEntityId(null); else setHoveredEntityId(null);
+  }, [pavilionPresentation]);
+  const activateLot = useCallback((id: string, origin: SVGPathElement, selected: boolean) => {
+    setKeyboardEntityId(id);
+    if (pavilionPresentation) choosePavilionLot(id, origin);
+    else select(selected ? null : id);
+  }, [pavilionPresentation, choosePavilionLot, select]);
+  const lotCount = geometry.lots.length;
+  const navigateLot = useCallback((event: ReactKeyboardEvent<SVGPathElement>, index: number) => {
+    if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const paths = event.currentTarget.ownerSVGElement?.querySelectorAll<SVGPathElement>('path[data-entity-id]');
+    const last = lotCount - 1;
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? last
+      : event.key === 'ArrowRight' || event.key === 'ArrowDown' ? Math.min(last, index + 1) : Math.max(0, index - 1);
+    paths?.[next]?.focus();
+  }, [lotCount]);
   const statusCounts = useMemo(() => {
     const counts = new Map<CommercialStatus, number>();
     for (const { lot } of items) {
@@ -242,6 +353,68 @@ export function CommercialMiniMap({
   const pixelsPerUnit = viewportSize.width > 0 && viewportSize.height > 0
     ? Math.min(viewportSize.width / viewBoxWidth, viewportSize.height / viewBoxHeight) * zoom : 1;
   const planStyle = { '--pavilion-content-aspect': viewBoxWidth / viewBoxHeight } as CSSProperties;
+
+  const outlineLayer = useMemo(() => geometry.outlines.filter(({ kind }) => kind !== 'block').map((outline) => <path key={outline.id} d={outline.path}
+    fill={outline.color} fillOpacity={outline.kind === 'support' ? '.12' : '.035'} fillRule="evenodd" stroke={outline.color} strokeWidth={outline.kind === 'support' ? '1.5' : '3'} vectorEffect="non-scaling-stroke"
+    data-outline={outline.kind}><title>{outline.kind === 'segment' ? 'Contorno cadastral' : outline.kind === 'support' ? 'Apoio permanente' : 'Pavilhão'} · {outline.label}</title></path>), [geometry.outlines]);
+
+  const decorationLayer = useMemo(() => <>
+          {blocks.map((outline) => <path key={outline.id} d={outline.path} fill="none" stroke={outline.color} strokeDasharray="5 5"
+            strokeWidth="1.5" vectorEffect="non-scaling-stroke" pointerEvents="none" data-outline="block" />)}
+          {presentation.labels.map((outline) => {
+            const [x, y] = outline.labelPoint;
+            return <text key={outline.id} x={x} y={y - 9} textAnchor="middle" className="commercial-dashboard-block-label">{outline.label}</text>;
+          })}
+          {numbered && geometry.lots.map(({ lot, labelPoint, labelWidth, labelHeight }) => {
+            if (!lot.lotNumber) return null;
+            const { fontSize, vertical, fontPixels } = commercialMiniMapNumberLabel(lot.lotNumber, labelWidth, labelHeight, pixelsPerUnit, numberLabelPixels);
+            return <text key={lot.id} x={labelPoint[0]} y={labelPoint[1]} textAnchor="middle" dominantBaseline="central"
+              transform={vertical ? `rotate(-90 ${labelPoint[0]} ${labelPoint[1]})` : undefined}
+              data-module-number={lot.lotNumber} data-label-font-px={fontPixels.toFixed(2)}
+              style={{ fontSize, strokeWidth: Math.min(1.1, .7 / pixelsPerUnit) }} className="commercial-dashboard-module-number" aria-hidden="true">{lot.lotNumber}</text>;
+          })}
+          {supports.map((outline) => {
+            const points = outline.coordinates[0].map(geometry.project);
+            const width = Math.max(...points.map(([x]) => x)) - Math.min(...points.map(([x]) => x));
+            const height = Math.max(...points.map(([, y]) => y)) - Math.min(...points.map(([, y]) => y));
+            const x = (Math.min(...points.map(([px]) => px)) + Math.max(...points.map(([px]) => px))) / 2;
+            let labelTop = Math.min(...points.map(([, py]) => py)) + 3;
+            let labelBottom = Math.max(...points.map(([, py]) => py)) - 3;
+            const left = Math.min(...points.map(([px]) => px)), right = Math.max(...points.map(([px]) => px));
+            // Fit the support name into the free band inside its room, leaving
+            // the official access anchor and symbol exactly where they are.
+            for (const marker of presentation.markers) {
+              if (marker.iconX + 14 < left || marker.iconX - 14 > right || marker.iconY + 14 < labelTop || marker.iconY - 14 > labelBottom) continue;
+              if (labelBottom - marker.iconY - 18 > marker.iconY - 18 - labelTop) labelTop = marker.iconY + 18;
+              else labelBottom = marker.iconY - 18;
+            }
+            const y = (labelTop + labelBottom) / 2;
+            const lettersPerLine = Math.max(4, Math.floor((width * pixelsPerUnit - 6) / 5.6));
+            const lines = outline.label.split(' ').reduce<string[]>((result, word) => {
+              const last = result.length - 1;
+              if (last >= 0 && `${result[last]} ${word}`.length <= lettersPerLine) result[last] += ` ${word}`;
+              else result.push(word);
+              return result;
+            }, []);
+            const fontSize = Math.max(.5, Math.min(10 / pixelsPerUnit, (width - 6) / (Math.max(...lines.map(line => line.length)) * .56),
+              Math.min(height - 6, labelBottom - labelTop) / (lines.length * 1.25)));
+            return <text key={outline.id} x={x} y={y - (lines.length - 1) * fontSize * .6} fontSize={fontSize} textAnchor="middle" dominantBaseline="central"
+              className="commercial-dashboard-support-label" aria-hidden="true">
+              {lines.map((line, index) => <tspan key={index} x={x} dy={index === 0 ? 0 : fontSize * 1.2}>{line}</tspan>)}
+            </text>;
+          })}
+          {presentation.markers.map((marker) => {
+            const { x, y, iconX, iconY } = marker;
+            // Leaders retain official positions, even beside support wings.
+            return <g key={marker.id} role="img" aria-label={`${ACCESS_LABEL[marker.kind]}: ${marker.label}`} data-access-kind={marker.kind}>
+              <title>{ACCESS_LABEL[marker.kind]}: {marker.label}</title>
+              <path d={`M ${x} ${y} L ${iconX} ${iconY}`} stroke="#315543" strokeWidth="1.5" fill="none" />
+              <circle cx={x} cy={y} r="3" fill="#315543" />
+              <rect x={iconX - 14} y={iconY - 14} width="28" height="28" rx="7" fill={marker.kind === 'emergency' ? '#9f2828' : '#214d37'} />
+              <text x={iconX} y={iconY} fill="white" fontSize="22" textAnchor="middle" dominantBaseline="central">{ACCESS_SYMBOL[marker.kind]}</text>
+            </g>;
+          })}
+  </>, [geometry, blocks, supports, presentation, numbered, pixelsPerUnit, numberLabelPixels]);
 
   useLayoutEffect(() => {
     if (!pavilionPresentation || !contextRecord) { setContextPosition(null); return; }
@@ -315,7 +488,7 @@ export function CommercialMiniMap({
     <select id={selectId} value={pavilionPresentation ? selectedEntityId ?? '' : activeSelected ? selectedEntityId ?? '' : ''}
       onChange={(event) => pavilionPresentation ? choosePavilionLot(event.target.value || null, event.currentTarget, true) : select(event.target.value || null)}>
       <option value="">Escolha um espaço</option>
-      {items.map((item) => <option key={item.lot.id} value={item.entity.id}>{identity(item)} · {STATUS_CONFIG[displayStatus(item.lot.status)].label}</option>)}
+      {options}
     </select>
     <button type="button" className="commercial-dashboard-map-fit" aria-label={`Ajustar ao espaço: ${title}`} onClick={fitToSpace}><Maximize aria-hidden="true" />Ajustar ao espaço</button>
     <button type="button" aria-label={`Reduzir planta de ${title}`} disabled={zoom === 1} onClick={() => setZoom((value) => Math.max(1, value - 0.5))}>−</button>
@@ -335,111 +508,15 @@ export function CommercialMiniMap({
       <div className="commercial-dashboard-map-surface" style={{ width: `${zoom * 100}%`, height: `${zoom * 100}%` }}>
         {geometry.bounds ? <svg ref={svgRef} className="commercial-dashboard-map-svg" viewBox={presentation.viewBox} preserveAspectRatio="xMidYMid meet" width="100%" height="100%" role="group"
           aria-label={`Distribuição espacial de ${geometry.lots.length} lotes em ${title}, coloridos pela situação comercial`}>
-          {geometry.outlines.filter(({ kind }) => kind !== 'block').map((outline) => <path key={outline.id} d={outline.path}
-            fill={outline.color} fillOpacity={outline.kind === 'support' ? '.12' : '.035'} fillRule="evenodd" stroke={outline.color} strokeWidth={outline.kind === 'support' ? '1.5' : '3'} vectorEffect="non-scaling-stroke"
-            data-outline={outline.kind}><title>{outline.kind === 'segment' ? 'Contorno cadastral' : outline.kind === 'support' ? 'Apoio permanente' : 'Pavilhão'} · {outline.label}</title></path>)}
-          {geometry.lots.map((item, index) => {
-            const { entity, lot, value, path } = item;
-            const config = STATUS_CONFIG[displayStatus(lot.status)];
-            const isActive = pavilionPresentation ? selectedEntityId === entity.id || contextEntityId === entity.id : activeLot?.entity.id === entity.id;
-            const area = lot.officialAreaSqm != null && Number.isFinite(lot.officialAreaSqm) && lot.officialAreaSqm > 0 ? formatAreaSqmLabel(lot.officialAreaSqm) : 'área oficial pendente';
-            return <path key={lot.id} d={path} fill={config.color} fillRule="evenodd" stroke={isActive ? '#172e20' : config.border}
-              strokeWidth={isActive ? 3.5 : 1.3} vectorEffect="non-scaling-stroke"
-              opacity={highlightedStatus && displayStatus(highlightedStatus) !== displayStatus(lot.status) && !isActive ? 0.16 : 0.92}
-              role="button" tabIndex={keyboardStopId === entity.id ? 0 : -1} aria-pressed={selectedEntityId === entity.id}
-              aria-describedby={pavilionPresentation && contextLot?.entity.id === entity.id && contextPosition?.visible ? contextCardId : undefined}
-              aria-label={`${identity(item)}, ${area}, ${config.label}${validValue(value) ? `, ${formatBrl(value)}, valor cadastral` : ''}`}
-              data-entity-id={entity.id} data-status={lot.status}
-              onMouseEnter={(event) => {
-                if (pavilionPresentation && pointerPreviewBlockedRef.current) return;
-                lastPointerRef.current = { x: event.clientX, y: event.clientY };
-                setHoveredEntityId(entity.id);
-              }} onMouseLeave={() => { if (!pavilionPresentation) setHoveredEntityId(null); }}
-              onFocus={(event) => {
-                setKeyboardEntityId(entity.id);
-                if (!pavilionPresentation) { setHoveredEntityId(entity.id); return; }
-                setHoveredEntityId(null);
-                contextOriginRef.current = event.currentTarget;
-                if (suppressNextFocusRef.current === entity.id) { suppressNextFocusRef.current = null; return; }
-                pointerPreviewBlockedRef.current = false;
-                setFocusedEntityId(entity.id);
-              }}
-              onBlur={() => pavilionPresentation ? setFocusedEntityId(null) : setHoveredEntityId(null)}
-              onClick={(event) => {
-                setKeyboardEntityId(entity.id);
-                if (pavilionPresentation) choosePavilionLot(entity.id, event.currentTarget);
-                else select(selectedEntityId === entity.id ? null : entity.id);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault();
-                  if (pavilionPresentation) choosePavilionLot(entity.id, event.currentTarget);
-                  else select(selectedEntityId === entity.id ? null : entity.id);
-                } else if (['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
-                  event.preventDefault();
-                  const paths = event.currentTarget.ownerSVGElement?.querySelectorAll<SVGPathElement>('path[data-entity-id]');
-                  const last = geometry.lots.length - 1;
-                  const next = event.key === 'Home' ? 0 : event.key === 'End' ? last
-                    : event.key === 'ArrowRight' || event.key === 'ArrowDown' ? Math.min(last, index + 1) : Math.max(0, index - 1);
-                  paths?.[next]?.focus();
-                }
-              }} />;
-          })}
-          {blocks.map((outline) => <path key={outline.id} d={outline.path} fill="none" stroke={outline.color} strokeDasharray="5 5"
-            strokeWidth="1.5" vectorEffect="non-scaling-stroke" pointerEvents="none" data-outline="block" />)}
-          {presentation.labels.map((outline) => {
-            const [x, y] = outline.labelPoint;
-            return <text key={outline.id} x={x} y={y - 9} textAnchor="middle" className="commercial-dashboard-block-label">{outline.label}</text>;
-          })}
-          {numbered && geometry.lots.map(({ lot, labelPoint, labelWidth, labelHeight }) => {
-            if (!lot.lotNumber) return null;
-            const { fontSize, vertical, fontPixels } = commercialMiniMapNumberLabel(lot.lotNumber, labelWidth, labelHeight, pixelsPerUnit, numberLabelPixels);
-            return <text key={lot.id} x={labelPoint[0]} y={labelPoint[1]} textAnchor="middle" dominantBaseline="central"
-              transform={vertical ? `rotate(-90 ${labelPoint[0]} ${labelPoint[1]})` : undefined}
-              data-module-number={lot.lotNumber} data-label-font-px={fontPixels.toFixed(2)}
-              style={{ fontSize, strokeWidth: Math.min(1.1, .7 / pixelsPerUnit) }} className="commercial-dashboard-module-number" aria-hidden="true">{lot.lotNumber}</text>;
-          })}
-          {supports.map((outline) => {
-            const points = outline.coordinates[0].map(geometry.project);
-            const width = Math.max(...points.map(([x]) => x)) - Math.min(...points.map(([x]) => x));
-            const height = Math.max(...points.map(([, y]) => y)) - Math.min(...points.map(([, y]) => y));
-            const x = (Math.min(...points.map(([px]) => px)) + Math.max(...points.map(([px]) => px))) / 2;
-            let labelTop = Math.min(...points.map(([, py]) => py)) + 3;
-            let labelBottom = Math.max(...points.map(([, py]) => py)) - 3;
-            const left = Math.min(...points.map(([px]) => px)), right = Math.max(...points.map(([px]) => px));
-            // Fit the support name into the free band inside its room, leaving
-            // the official access anchor and symbol exactly where they are.
-            for (const marker of presentation.markers) {
-              if (marker.iconX + 14 < left || marker.iconX - 14 > right || marker.iconY + 14 < labelTop || marker.iconY - 14 > labelBottom) continue;
-              if (labelBottom - marker.iconY - 18 > marker.iconY - 18 - labelTop) labelTop = marker.iconY + 18;
-              else labelBottom = marker.iconY - 18;
-            }
-            const y = (labelTop + labelBottom) / 2;
-            const lettersPerLine = Math.max(4, Math.floor((width * pixelsPerUnit - 6) / 5.6));
-            const lines = outline.label.split(' ').reduce<string[]>((result, word) => {
-              const last = result.length - 1;
-              if (last >= 0 && `${result[last]} ${word}`.length <= lettersPerLine) result[last] += ` ${word}`;
-              else result.push(word);
-              return result;
-            }, []);
-            const fontSize = Math.max(.5, Math.min(10 / pixelsPerUnit, (width - 6) / (Math.max(...lines.map(line => line.length)) * .56),
-              Math.min(height - 6, labelBottom - labelTop) / (lines.length * 1.25)));
-            return <text key={outline.id} x={x} y={y - (lines.length - 1) * fontSize * .6} fontSize={fontSize} textAnchor="middle" dominantBaseline="central"
-              className="commercial-dashboard-support-label" aria-hidden="true">
-              {lines.map((line, index) => <tspan key={index} x={x} dy={index === 0 ? 0 : fontSize * 1.2}>{line}</tspan>)}
-            </text>;
-          })}
-          {presentation.markers.map((marker) => {
-            const { x, y, iconX, iconY } = marker;
-            // Leaders retain official positions, even beside support wings.
-            return <g key={marker.id} role="img" aria-label={`${ACCESS_LABEL[marker.kind]}: ${marker.label}`} data-access-kind={marker.kind}>
-              <title>{ACCESS_LABEL[marker.kind]}: {marker.label}</title>
-              <path d={`M ${x} ${y} L ${iconX} ${iconY}`} stroke="#315543" strokeWidth="1.5" fill="none" />
-              <circle cx={x} cy={y} r="3" fill="#315543" />
-              <rect x={iconX - 14} y={iconY - 14} width="28" height="28" rx="7" fill={marker.kind === 'emergency' ? '#9f2828' : '#214d37'} />
-              <text x={iconX} y={iconY} fill="white" fontSize="22" textAnchor="middle" dominantBaseline="central">{ACCESS_SYMBOL[marker.kind]}</text>
-            </g>;
-          })}
+          {outlineLayer}
+          {geometry.lots.map(({ entity, lot, path }, index) => <MiniMapLotPath key={lot.id}
+            entityId={entity.id} path={path} status={lot.status} label={lotLabels.get(lot.id)!.accessible}
+            active={pavilionPresentation ? selectedEntityId === entity.id || contextEntityId === entity.id : activeLot?.entity.id === entity.id}
+            selected={selectedEntityId === entity.id} keyboardStop={keyboardStopId === entity.id}
+            describedBy={pavilionPresentation && contextLot?.entity.id === entity.id && contextPosition?.visible ? contextCardId : undefined}
+            dimmed={Boolean(highlightedStatus && displayStatus(highlightedStatus) !== displayStatus(lot.status))}
+            index={index} onEnter={enterLot} onLeave={leaveLot} onFocusLot={focusLot} onBlurLot={blurLot} onActivate={activateLot} onNavigate={navigateLot} />)}
+          {decorationLayer}
         </svg> : <p className="commercial-dashboard-empty">Nenhuma geometria cadastral válida neste recorte.</p>}
       </div>
     </div>
@@ -484,4 +561,4 @@ export function CommercialMiniMap({
       </> : <span>Selecione um espaço na planta ou na lista para consultar seus dados.</span>}
     </div>}
   </section>;
-}
+});

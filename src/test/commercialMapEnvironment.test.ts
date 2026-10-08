@@ -320,7 +320,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     );
 
     expect(canvas).toContain('<CommercialMapEnvironment');
-    expect(canvas).toContain('frameloop="demand"');
+    expect(canvas).toContain("frameloop={presentationVisible ? 'demand' : 'never'}");
     expect(canvas).toContain('THREE.SRGBColorSpace');
     expect(canvas).toContain('THREE.ACESFilmicToneMapping');
     // One timeline subscriber plus the explicit persistent composer render pass.
