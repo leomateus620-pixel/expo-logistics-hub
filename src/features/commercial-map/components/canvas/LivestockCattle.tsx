@@ -1,6 +1,7 @@
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { useCommercialMapPresentationVisible } from './CommercialMapPresentationContext';
 import {
   LIVESTOCK_PAVILION_RENDER_BUDGET,
   type LivestockCattlePose,
@@ -196,6 +197,7 @@ export const LivestockCattle = memo(function LivestockCattle({
   animate?: boolean;
 }) {
   const invalidate = useThree((state) => state.invalidate);
+  const presentationVisible = useCommercialMapPresentationVisible();
   const motionAllowed = useMemo(() => animate
     && poses.some((pose) => pose.animated), [animate, poses]);
   const materials = useMemo(() => ({
@@ -232,14 +234,14 @@ export const LivestockCattle = memo(function LivestockCattle({
   }), []);
 
   useEffect(() => {
-    if (!motionAllowed || typeof window === 'undefined') return undefined;
+    if (!presentationVisible || !motionAllowed || typeof window === 'undefined') return undefined;
     const interval = window.setInterval(
       () => invalidate(),
       Math.round(1000 / LIVESTOCK_PAVILION_RENDER_BUDGET.animationFps),
     );
     invalidate();
     return () => window.clearInterval(interval);
-  }, [invalidate, motionAllowed]);
+  }, [invalidate, motionAllowed, presentationVisible]);
 
   useEffect(() => () => {
     materials.coat.dispose();

@@ -1,0 +1,15 @@
+{
+  "before": 1791435511009.2,
+  "after": 1791435511009.2,
+  "stable": true,
+  "navigation": [
+    {
+      "at": 1791435511071,
+      "url": "http://127.0.0.1:5192/scripts/dashboard/performance-qa.html"
+    }
+  ],
+  "consoleEvents": [
+    "[vite] connecting...",
+    "[vite] connected."
+  ]
+}

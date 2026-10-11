@@ -1,0 +1,428 @@
+{
+  "baseline": "origin/main 9f2ee99644706a54620e8e5ae7dc1e412df07ed3",
+  "candidate": "Integration of dashboard interaction performance with latest main; local uncommitted merge validation",
+  "conditions": {
+    "chrome": "154 headless",
+    "dpr": 1,
+    "timingClaims": false,
+    "viewportVariants": [
+      "1366x768 notebook",
+      "390x844 mobile/touch emulation"
+    ],
+    "fixture": "Existing persisted-projection pavilion inspection fixture with explicit synthetic prices and buyer; no production data",
+    "mascot": "Existing pause control + QA-only CSS animation phase alignment at currentTime=0 in both phases"
+  },
+  "views": [
+    {
+      "view": "notebook",
+      "size": {
+        "name": "notebook",
+        "width": 1366,
+        "height": 768
+      },
+      "pavilions": [
+        {
+          "number": 8,
+          "modules": 114,
+          "geometryHash": "b6e4585f5bdb79c913f63f03375e89df1da95293af0a013e25676d77eba93c91",
+          "commercialHash": "3f242a4f97281f01af274a9c576b0cfc667e0e41f0ec1a1da1d2271d4013e112"
+        },
+        {
+          "number": 13,
+          "modules": 104,
+          "geometryHash": "4868c1fa71b2f6a7ec310b8bbd7b9553b7cfb35a07f01482e95f4db472f5ca48",
+          "commercialHash": "57d2a320faed647edb805d26bf7ed819340724dd8ac5038ec034d6d35858a730"
+        }
+      ],
+      "checks": {
+        "geometryInventoryAndCommercial": true,
+        "protectedLayout": true,
+        "interactionAndSelectedCardDom": true
+      },
+      "failures": [],
+      "errorsBefore": [],
+      "errorsAfter": [],
+      "backendBefore": [],
+      "backendAfter": []
+    },
+    {
+      "view": "mobile",
+      "size": {
+        "name": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "pavilions": [
+        {
+          "number": 8,
+          "modules": 114,
+          "geometryHash": "b6e4585f5bdb79c913f63f03375e89df1da95293af0a013e25676d77eba93c91",
+          "commercialHash": "3f242a4f97281f01af274a9c576b0cfc667e0e41f0ec1a1da1d2271d4013e112"
+        },
+        {
+          "number": 13,
+          "modules": 104,
+          "geometryHash": "4868c1fa71b2f6a7ec310b8bbd7b9553b7cfb35a07f01482e95f4db472f5ca48",
+          "commercialHash": "57d2a320faed647edb805d26bf7ed819340724dd8ac5038ec034d6d35858a730"
+        }
+      ],
+      "checks": {
+        "geometryInventoryAndCommercial": true,
+        "protectedLayout": true,
+        "interactionAndSelectedCardDom": true
+      },
+      "failures": [],
+      "errorsBefore": [],
+      "errorsAfter": [],
+      "backendBefore": [],
+      "backendAfter": []
+    }
+  ],
+  "images": [
+    {
+      "name": "mobile-overview.png",
+      "beforeSize": [
+        390,
+        844
+      ],
+      "afterSize": [
+        390,
+        844
+      ],
+      "changedPixels": 9685,
+      "exactEqual": false
+    },
+    {
+      "name": "mobile-pavilion-13-analysis.png",
+      "beforeSize": [
+        344,
+        1133
+      ],
+      "afterSize": [
+        344,
+        1133
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-13-area-known.png",
+      "beforeSize": [
+        344,
+        423
+      ],
+      "afterSize": [
+        344,
+        423
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-13-area.png",
+      "beforeSize": [
+        344,
+        435
+      ],
+      "afterSize": [
+        344,
+        435
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-13-plant.png",
+      "beforeSize": [
+        344,
+        572
+      ],
+      "afterSize": [
+        344,
+        572
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-13-selected.png",
+      "beforeSize": [
+        344,
+        572
+      ],
+      "afterSize": [
+        344,
+        572
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-8-analysis.png",
+      "beforeSize": [
+        344,
+        1150
+      ],
+      "afterSize": [
+        344,
+        1150
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-8-area-known.png",
+      "beforeSize": [
+        344,
+        423
+      ],
+      "afterSize": [
+        344,
+        423
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-8-area.png",
+      "beforeSize": [
+        344,
+        435
+      ],
+      "afterSize": [
+        344,
+        435
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-8-plant.png",
+      "beforeSize": [
+        344,
+        548
+      ],
+      "afterSize": [
+        344,
+        548
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-8-selected.png",
+      "beforeSize": [
+        344,
+        548
+      ],
+      "afterSize": [
+        344,
+        548
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "notebook-overview.png",
+      "beforeSize": [
+        1366,
+        768
+      ],
+      "afterSize": [
+        1366,
+        768
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "notebook-pavilion-13-analysis.png",
+      "beforeSize": [
+        1269,
+        722
+      ],
+      "afterSize": [
+        1269,
+        722
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "notebook-pavilion-13-area-known.png",
+      "beforeSize": [
+        360,
+        418
+      ],
+      "afterSize": [
+        360,
+        418
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "notebook-pavilion-13-area.png",
+      "beforeSize": [
+        360,
+        422
+      ],
+      "afterSize": [
+        360,
+        422
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "notebook-pavilion-13-plant.png",
+      "beforeSize": [
+        891,
+        643
+      ],
+      "afterSize": [
+        891,
+        643
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "notebook-pavilion-13-selected.png",
+      "beforeSize": [
+        891,
+        643
+      ],
+      "afterSize": [
+        891,
+        643
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "notebook-pavilion-8-analysis.png",
+      "beforeSize": [
+        1269,
+        741
+      ],
+      "afterSize": [
+        1269,
+        741
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "notebook-pavilion-8-area-known.png",
+      "beforeSize": [
+        360,
+        418
+      ],
+      "afterSize": [
+        360,
+        418
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "notebook-pavilion-8-area.png",
+      "beforeSize": [
+        360,
+        422
+      ],
+      "afterSize": [
+        360,
+        422
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "notebook-pavilion-8-plant.png",
+      "beforeSize": [
+        891,
+        643
+      ],
+      "afterSize": [
+        891,
+        643
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "notebook-pavilion-8-selected.png",
+      "beforeSize": [
+        891,
+        643
+      ],
+      "afterSize": [
+        891,
+        643
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    }
+  ],
+  "allPassed": false,
+  "limitations": [
+    "Isolated React dashboard; no authentication, backend, WebGL or physical device/iOS claim.",
+    "Cold baseline optimizer changed React chunks and first load failed; successful assertion journeys use warmed optimizer. Candidate discovery was prewarmed explicitly.",
+    "Existing scoped interactions are preserved; this comparison makes no postmerge performance timing claim."
+  ],
+  "controls": [
+    {
+      "left": "mainA",
+      "right": "mainB",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "exactEqual": true
+    },
+    {
+      "left": "mainA",
+      "right": "candidateA",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "exactEqual": true
+    },
+    {
+      "left": "mainB",
+      "right": "candidateB",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "exactEqual": true
+    },
+    {
+      "left": "candidateA",
+      "right": "candidateB",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "exactEqual": true
+    },
+    {
+      "left": "originalBefore",
+      "right": "candidateA",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "exactEqual": true
+    },
+    {
+      "left": "originalAfter",
+      "right": "candidateA",
+      "changedPixels": 9685,
+      "maxChannelDelta": 1,
+      "exactEqual": false
+    },
+    {
+      "left": "originalAfter",
+      "right": "candidateB",
+      "changedPixels": 9685,
+      "maxChannelDelta": 1,
+      "exactEqual": false
+    }
+  ],
+  "controlInterpretation": "Two independent main controls and two independent candidate controls are mutually pixel-identical. The first candidate capture differs by one channel value from later captures of the same candidate source. The original strict result remains failed for this pair; no pixel tolerance was introduced.",
+  "functionalAndDomChecksPassed": true
+}

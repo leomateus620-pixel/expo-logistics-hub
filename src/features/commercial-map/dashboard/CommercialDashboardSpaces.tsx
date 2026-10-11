@@ -1,9 +1,10 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Building2, MapPinned } from 'lucide-react';
 import type { CommercialMapData, CommercialStatus } from '../types';
 import type { CommercialDashboardSnapshot, DashboardAggregate } from './commercialDashboardTypes';
-import { CommercialMiniMap } from './CommercialMiniMap';
-import { buildDashboardExternalBoundaries } from './commercialDashboardBoundaries';
+import { CommercialMiniMap, type MiniMapPresentationMemory } from './CommercialMiniMap';
+import { getDashboardExternalBoundaries } from './commercialDashboardBoundaries';
+import { COMMERCIAL_MAP_SEGMENTS } from '../data/commercialMapSegments';
 import { formatDashboardAreaWithCoverage, formatDashboardInteger, formatDashboardPercentage } from './commercialDashboardFormatters';
 import { STATUS_CONFIG } from '../constants';
 import { CommercialDashboardLotChart } from './CommercialDashboardCharts';
@@ -16,6 +17,17 @@ import './commercial-dashboard-scope-cards.css';
 import './commercial-dashboard-workspace-analysis.css';
 
 const PavilionPlan = lazy(() => import('./CommercialDashboardPavilion'));
+const EMPTY_BOUNDARY = { outlines: [], pending: [] };
+
+/** Dashboard-owned state survives the sales view without retaining mounted maps. */
+export interface DashboardSpacesPresentationMemory {
+  scopeId?: string;
+  selections?: Record<string, string | null>;
+  comparisonOpen?: boolean;
+  metric?: 'lots' | 'area';
+  selectedStatus?: CommercialStatus | null;
+  miniMaps?: Record<string, MiniMapPresentationMemory>;
+}
 
 export interface CommercialDashboardSpacesState {
   requestedScopeId: string;
@@ -52,14 +64,15 @@ function Verification({ aggregate }: { aggregate: DashboardAggregate }) {
   </details>;
 }
 
-export function CommercialDashboardSpaces({ snapshot, data, onViewLot, stateMemory }: {
+export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentationMemory, stateMemory }: {
   snapshot: CommercialDashboardSnapshot;
   data: Pick<CommercialMapData, 'entities' | 'lots'>;
   onViewLot: (id: string) => void;
+  presentationMemory?: DashboardSpacesPresentationMemory;
   stateMemory?: CommercialDashboardSpacesMemory;
 }) {
   // Presentation scope only; every element below shares one existing snapshot aggregate.
-  const [requestedScopeId, setScopeId] = useState(() => stateMemory?.current?.requestedScopeId ?? 'external:all');
+  const [requestedScopeId, setScopeId] = useState(() => presentationMemory?.scopeId ?? stateMemory?.current?.requestedScopeId ?? 'external:all');
   // The former internal aggregate remains in the snapshot, without a visible selector.
   // Normalize a retained aggregate scope explicitly instead of choosing a pavilion.
   const normalizedScopeId = requestedScopeId === 'internal:all' ? 'external:all' : requestedScopeId;
@@ -67,21 +80,30 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, stateMemo
   useEffect(() => {
     if (requestedScopeId === 'internal:all' || (requestedScopeId === 'pending' && snapshot.unclassified.totalLots === 0)) setScopeId('external:all');
   }, [requestedScopeId, snapshot.unclassified.totalLots]);
-  const [selections, setSelections] = useState<Record<string, string | null>>(() => stateMemory?.current?.selections ?? {});
-  const [comparisonOpen, setComparisonOpen] = useState(false);
-  const [metric, setMetric] = useState<'lots' | 'area'>(() => stateMemory?.current?.metric ?? 'lots');
-  useEffect(() => {
+  const [selections, setSelections] = useState<Record<string, string | null>>(() => presentationMemory?.selections ?? stateMemory?.current?.selections ?? {});
+  const [comparisonOpen, setComparisonOpen] = useState(presentationMemory?.comparisonOpen ?? false);
+  const [metric, setMetric] = useState<'lots' | 'area'>(() => presentationMemory?.metric ?? stateMemory?.current?.metric ?? 'lots');
+  const highlight = useDashboardStatusHighlight(presentationMemory);
+  const miniMapMemories = useRef(presentationMemory?.miniMaps ?? {});
+  useLayoutEffect(() => {
+    if (presentationMemory) Object.assign(presentationMemory, { scopeId, selections, comparisonOpen, metric, miniMaps: miniMapMemories.current });
     if (stateMemory) stateMemory.current = { requestedScopeId: scopeId, selections, metric };
-  }, [stateMemory, scopeId, selections, metric]);
-  const highlight = useDashboardStatusHighlight();
+  }, [presentationMemory, stateMemory, scopeId, selections, comparisonOpen, metric]);
+  const miniMapMemory = useMemo(() => {
+    if (!presentationMemory) return undefined;
+    return miniMapMemories.current[scopeId] ??= {};
+  }, [presentationMemory, scopeId]);
   const area = scopeId.startsWith('external:') ? snapshot.segments.find((item) => `external:${item.segmentId}` === scopeId) : undefined;
   const pavilion = snapshot.pavilions.find((item) => `pavilion:${item.definition.publicIdentifier}` === scopeId);
   const isInternal = scopeId === 'internal:all';
   const isPending = scopeId === 'pending';
   const aggregate = pavilion ?? (isInternal ? snapshot.internal : isPending ? snapshot.unclassified : area ?? snapshot.external);
   const title = pavilion?.definition.officialName ?? (isInternal ? 'Todos os pavilhões' : isPending ? 'Classificação pendente' : area?.segment.name ?? 'Todas as áreas externas');
-  const boundary = useMemo(() => buildDashboardExternalBoundaries(data.entities, data.lots,
-    area ? [area.segment] : snapshot.segments.map((item) => item.segment)), [data.entities, data.lots, area, snapshot.segments]);
+  const segment = area?.segment;
+  const showExternalBoundary = !pavilion && !isInternal && !isPending;
+  const boundary = useMemo(() => showExternalBoundary ? getDashboardExternalBoundaries(data.entities, data.lots,
+    segment ? [segment] : COMMERCIAL_MAP_SEGMENTS) : EMPTY_BOUNDARY,
+  [data.entities, data.lots, segment, showExternalBoundary]);
   const items = useMemo(() => aggregate.records.map((record) => ({
     ...record, areaName: snapshot.segments.find((item) => item.segmentId === record.segmentId)?.segment.name,
   })), [aggregate.records, snapshot.segments]);
@@ -89,8 +111,9 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, stateMemo
     id: item.entity.id, label: item.definition.officialName, kind: 'pavilion' as const,
     color: '#315543', coordinates: item.entity.geometry.coordinates,
   }] : []), [snapshot.pavilions]);
-  const selection = { entityId: selections[scopeId] ?? null,
-    onChange: (id: string | null) => setSelections((current) => ({ ...current, [scopeId]: id })) };
+  const selectLot = useCallback((id: string | null) => setSelections((current) => ({ ...current, [scopeId]: id })), [scopeId]);
+  const selectedEntityId = selections[scopeId] ?? null;
+  const selection = useMemo(() => ({ entityId: selectedEntityId, onChange: selectLot }), [selectedEntityId, selectLot]);
 
   return <section className="commercial-dashboard-workspace commercial-dashboard-workspace-analysis" aria-label="Análise do recorte selecionado">
     <div className="commercial-dashboard-scope-selector commercial-dashboard-scope-cards">
@@ -146,9 +169,9 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, stateMemo
     <div className="commercial-dashboard-integrated-analysis">
       <div className="commercial-dashboard-spatial-card">
         {pavilion ? <Suspense fallback={<p role="status">Preparando planta do pavilhão…</p>}>
-          <PavilionPlan key={scopeId} snapshot={pavilion} onViewLot={onViewLot} highlightedStatus={highlight.highlightedStatus} selection={selection} hideStatusLegend />
+          <PavilionPlan key={scopeId} snapshot={pavilion} onViewLot={onViewLot} highlightedStatus={highlight.highlightedStatus} selection={selection} presentationMemory={miniMapMemory} hideStatusLegend />
         </Suspense> : <CommercialMiniMap items={items} title={title} outlines={isInternal ? internalOutlines : isPending ? undefined : boundary.outlines}
-          onViewLot={onViewLot} highlightedStatus={highlight.highlightedStatus} selection={selection} hideStatusLegend />}
+          onViewLot={onViewLot} highlightedStatus={highlight.highlightedStatus} selection={selection} presentationMemory={miniMapMemory} hideStatusLegend />}
       </div>
       <aside className="commercial-dashboard-distribution" aria-label={`Distribuição de ${title}`}>
         <div className="commercial-dashboard-distribution-heading"><h3>Distribuição comercial</h3>
@@ -162,7 +185,7 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, stateMemo
     </div>
     <div className="commercial-dashboard-secondary">
       <Verification aggregate={aggregate} />
-      <details className="commercial-dashboard-scope-analysis" onToggle={(event) => setComparisonOpen(event.currentTarget.open)}>
+      <details className="commercial-dashboard-scope-analysis" open={comparisonOpen} onToggle={(event) => setComparisonOpen(event.currentTarget.open)}>
         <summary>Comparar segmentos externos</summary>
         {comparisonOpen && <CommercialDashboardComparison segments={snapshot.segments} includeValue={false} />}
       </details>

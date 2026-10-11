@@ -15,6 +15,7 @@ import {
 import { useFrame, useThree } from '@react-three/fiber';
 import { COMMERCIAL_MAP_ANIMATION, requestCommercialMapAnimationFrame } from '../../utils/frameActivity';
 import gsap from 'gsap';
+import { useCommercialMapPresentationVisible } from './CommercialMapPresentationContext';
 import * as THREE from 'three';
 import type { StrategicLandmarkBounds } from '../../utils/landmarks';
 
@@ -446,6 +447,10 @@ function Kamikaze({ parkActive }: { parkActive: boolean }) {
   const armA = useRef<THREE.Group>(null);
   const armB = useRef<THREE.Group>(null);
   const invalidate = useThree((state) => state.invalidate);
+  const presentationVisible = useCommercialMapPresentationVisible();
+  const visibleRef = useRef(presentationVisible);
+  visibleRef.current = presentationVisible;
+  const playback = useRef<gsap.core.Timeline | null>(null);
 
   useLayoutEffect(() => {
     const applyLift = (lift: number) => {
@@ -460,17 +465,22 @@ function Kamikaze({ parkActive }: { parkActive: boolean }) {
     const proxy = { lift: 0 };
     const onUpdate = () => applyLift(proxy.lift);
     const timeline = gsap.timeline({ repeat: -1, repeatDelay: 0.85 });
+    playback.current = timeline;
     timeline
       .to(proxy, { lift: 1, duration: 3.1, ease: 'power2.inOut', onUpdate })
       // Hold at the apex before the drop — the signature Kamikaze pause.
       .to({}, { duration: 0.9 })
       .to(proxy, { lift: 0, duration: 2.55, ease: 'power2.inOut', onUpdate })
       .to({}, { duration: 0.4 });
+    timeline.paused(!visibleRef.current);
     return () => {
+      playback.current = null;
       timeline.kill();
       applyLift(0);
     };
   }, [invalidate, parkActive]);
+
+  useLayoutEffect(() => { playback.current?.paused(!presentationVisible); }, [presentationVisible]);
 
   const towerLeds = useMemo(() => [
     ...ledColumn(9, [-0.24, 0.42, 0.12], [-0.24, 2.62, 0.12]),

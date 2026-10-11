@@ -1,0 +1,824 @@
+{
+  "phase": "after",
+  "size": {
+    "name": "mobile",
+    "width": 390,
+    "height": 844,
+    "touch": true
+  },
+  "fixture": "Official spatial reference + existing withDashboardValue test helper; synthetic financial values, no live-data claim",
+  "overview": {
+    "text": "Valor das vendas confirmadasR$ 518,25 milValor das vendas em andamentoR$ 517,38 milValor total comercial dos lotesR$ 2,07 miEvolução comercialVendas sobre o valor comercial50,1%Confirmadas 25,1%Em andamento 25,0%Total comercialR$ 2.067.250,00Espaços comerciais1.466Lotes com venda em andamento367Lotes vendidos367Lotes disponíveis366Área comercialParcial81.553,67 m²",
+    "elements": [
+      {
+        "tag": "SECTION",
+        "class": "commercial-dashboard-overview__finance",
+        "rect": [
+          12,
+          246.69,
+          366,
+          370
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(24, 38, 31)",
+        "background": "none"
+      },
+      {
+        "tag": "ARTICLE",
+        "class": "commercial-dashboard-overview-finance commercial-dashboard-overview-finance--confirmed",
+        "rect": [
+          12,
+          246.69,
+          366,
+          118
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(17, 48, 106)",
+        "background": "linear-gradient(155deg, rgb(248, 251, 255) 0%, rgb(243, 247, 253) 52%, rgb(237, 243, 252) 100%)"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          36,
+          268.69,
+          20,
+          20
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(47, 111, 208)",
+        "background": "none"
+      },
+      {
+        "tag": "BUTTON",
+        "class": "commercial-dashboard-overview-info-trigger",
+        "rect": [
+          342,
+          266.69,
+          24,
+          24
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(47, 111, 208)",
+        "background": "none"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          346,
+          270.69,
+          16,
+          16
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(47, 111, 208)",
+        "background": "none"
+      },
+      {
+        "tag": "ARTICLE",
+        "class": "commercial-dashboard-overview-finance commercial-dashboard-overview-finance--open",
+        "rect": [
+          12,
+          372.69,
+          366,
+          118
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(107, 49, 11)",
+        "background": "linear-gradient(155deg, rgb(255, 251, 247) 0%, rgb(254, 247, 241) 52%, rgb(253, 240, 229) 100%)"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          36,
+          394.69,
+          20,
+          20
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(219, 106, 36)",
+        "background": "none"
+      },
+      {
+        "tag": "BUTTON",
+        "class": "commercial-dashboard-overview-info-trigger",
+        "rect": [
+          342,
+          392.69,
+          24,
+          24
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(219, 106, 36)",
+        "background": "none"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          346,
+          396.69,
+          16,
+          16
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(219, 106, 36)",
+        "background": "none"
+      },
+      {
+        "tag": "ARTICLE",
+        "class": "commercial-dashboard-overview-finance commercial-dashboard-overview-finance--inventory",
+        "rect": [
+          12,
+          498.69,
+          366,
+          118
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(28, 58, 41)",
+        "background": "linear-gradient(155deg, rgb(245, 249, 244) 0%, rgb(238, 244, 237) 50%, rgb(232, 240, 231) 100%)"
+      },
+      {
+        "tag": "svg",
+        "class": "commercial-dashboard-overview-finance__contours",
+        "rect": [
+          93.09,
+          499.69,
+          283.91,
+          116
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(28, 58, 41)",
+        "background": "none"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          36,
+          520.69,
+          20,
+          20
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(51, 92, 68)",
+        "background": "none"
+      },
+      {
+        "tag": "BUTTON",
+        "class": "commercial-dashboard-overview-info-trigger",
+        "rect": [
+          342,
+          518.69,
+          24,
+          24
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(51, 92, 68)",
+        "background": "none"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          346,
+          522.69,
+          16,
+          16
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(51, 92, 68)",
+        "background": "none"
+      },
+      {
+        "tag": "SECTION",
+        "class": "commercial-dashboard-overview-progress",
+        "rect": [
+          12,
+          626.69,
+          366,
+          239.89
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(24, 38, 31)",
+        "background": "linear-gradient(rgb(252, 253, 251) 0%, rgb(247, 249, 245) 100%)"
+      },
+      {
+        "tag": "BUTTON",
+        "class": "commercial-dashboard-overview-info-trigger",
+        "rect": [
+          222.36,
+          666.48,
+          24,
+          24
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(47, 111, 208)",
+        "background": "none"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          226.36,
+          670.48,
+          16,
+          16
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(47, 111, 208)",
+        "background": "none"
+      },
+      {
+        "tag": "BUTTON",
+        "class": "commercial-dashboard-overview-progress__motion",
+        "rect": [
+          253.36,
+          668.03,
+          28,
+          28
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(54, 71, 64)",
+        "background": "none"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          261.36,
+          676.03,
+          12,
+          12
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(54, 71, 64)",
+        "background": "none"
+      },
+      {
+        "tag": "svg",
+        "class": "commercial-dashboard-overview-sojinha",
+        "rect": [
+          170.31,
+          714.03,
+          50,
+          56
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(24, 38, 31)",
+        "background": "none"
+      },
+      {
+        "tag": "svg",
+        "class": "commercial-dashboard-overview-progress__key commercial-dashboard-overview-progress__key--confirmed",
+        "rect": [
+          29,
+          796.42,
+          12,
+          12
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "11.5px",
+          "400",
+          "16.1px"
+        ],
+        "color": "rgb(91, 107, 98)",
+        "background": "none"
+      },
+      {
+        "tag": "svg",
+        "class": "commercial-dashboard-overview-progress__key commercial-dashboard-overview-progress__key--open",
+        "rect": [
+          175.42,
+          796.42,
+          12,
+          12
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "11.5px",
+          "400",
+          "16.1px"
+        ],
+        "color": "rgb(91, 107, 98)",
+        "background": "none"
+      },
+      {
+        "tag": "SECTION",
+        "class": "commercial-dashboard-overview__kpis",
+        "rect": [
+          12,
+          878.58,
+          366,
+          283.3
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(24, 38, 31)",
+        "background": "none"
+      },
+      {
+        "tag": "ARTICLE",
+        "class": "commercial-dashboard-overview-kpi commercial-dashboard-overview-kpi--spaces",
+        "rect": [
+          12,
+          878.58,
+          179,
+          95
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(24, 38, 31)",
+        "background": "linear-gradient(160deg, rgb(251, 252, 250) 0%, rgb(243, 245, 241) 100%)"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          27.5,
+          896.02,
+          15,
+          15
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(75, 90, 82)",
+        "background": "none"
+      },
+      {
+        "tag": "BUTTON",
+        "class": "commercial-dashboard-overview-info-trigger",
+        "rect": [
+          161,
+          891.52,
+          24,
+          24
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(75, 90, 82)",
+        "background": "none"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          165,
+          895.52,
+          16,
+          16
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(75, 90, 82)",
+        "background": "none"
+      },
+      {
+        "tag": "ARTICLE",
+        "class": "commercial-dashboard-overview-kpi commercial-dashboard-overview-kpi--open",
+        "rect": [
+          199,
+          878.58,
+          179,
+          95
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(24, 38, 31)",
+        "background": "linear-gradient(160deg, rgb(255, 252, 249) 0%, rgb(253, 245, 238) 100%)"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          214.5,
+          896.02,
+          15,
+          15
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(219, 106, 36)",
+        "background": "none"
+      },
+      {
+        "tag": "BUTTON",
+        "class": "commercial-dashboard-overview-info-trigger",
+        "rect": [
+          348,
+          891.52,
+          24,
+          24
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(219, 106, 36)",
+        "background": "none"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          352,
+          895.52,
+          16,
+          16
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(219, 106, 36)",
+        "background": "none"
+      },
+      {
+        "tag": "ARTICLE",
+        "class": "commercial-dashboard-overview-kpi commercial-dashboard-overview-kpi--sold",
+        "rect": [
+          12,
+          981.58,
+          179,
+          95
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(24, 38, 31)",
+        "background": "linear-gradient(160deg, rgb(250, 252, 255) 0%, rgb(242, 246, 253) 100%)"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          27.5,
+          996.08,
+          15,
+          15
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(47, 111, 208)",
+        "background": "none"
+      },
+      {
+        "tag": "BUTTON",
+        "class": "commercial-dashboard-overview-info-trigger",
+        "rect": [
+          161,
+          991.58,
+          24,
+          24
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(47, 111, 208)",
+        "background": "none"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          165,
+          995.58,
+          16,
+          16
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(47, 111, 208)",
+        "background": "none"
+      },
+      {
+        "tag": "ARTICLE",
+        "class": "commercial-dashboard-overview-kpi commercial-dashboard-overview-kpi--available",
+        "rect": [
+          199,
+          981.58,
+          179,
+          95
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(24, 38, 31)",
+        "background": "linear-gradient(160deg, rgb(250, 253, 251) 0%, rgb(240, 247, 242) 100%)"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          214.5,
+          996.08,
+          15,
+          15
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(35, 130, 90)",
+        "background": "none"
+      },
+      {
+        "tag": "BUTTON",
+        "class": "commercial-dashboard-overview-info-trigger",
+        "rect": [
+          348,
+          991.58,
+          24,
+          24
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(35, 130, 90)",
+        "background": "none"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          352,
+          995.58,
+          16,
+          16
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(35, 130, 90)",
+        "background": "none"
+      },
+      {
+        "tag": "ARTICLE",
+        "class": "commercial-dashboard-overview-kpi commercial-dashboard-overview-kpi--area",
+        "rect": [
+          12,
+          1084.58,
+          366,
+          77.3
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(24, 38, 31)",
+        "background": "linear-gradient(160deg, rgb(251, 252, 250) 0%, rgb(242, 245, 240) 100%)"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          27.5,
+          1099.08,
+          15,
+          15
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(51, 92, 68)",
+        "background": "none"
+      },
+      {
+        "tag": "BUTTON",
+        "class": "commercial-dashboard-overview-info-trigger",
+        "rect": [
+          348,
+          1094.58,
+          24,
+          24
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(51, 92, 68)",
+        "background": "none"
+      },
+      {
+        "tag": "svg",
+        "class": null,
+        "rect": [
+          352,
+          1098.58,
+          16,
+          16
+        ],
+        "font": [
+          "Manrope, Inter, system-ui, sans-serif",
+          "16px",
+          "400",
+          "24px"
+        ],
+        "color": "rgb(51, 92, 68)",
+        "background": "none"
+      }
+    ]
+  },
+  "canonical": {
+    "lots": 1466,
+    "confirmed": 518250,
+    "open": 517375,
+    "total": 2067250,
+    "area": 81553.67
+  },
+  "overflow": {
+    "width": 844,
+    "scrollWidth": 844
+  },
+  "errors": [],
+  "calls": [
+    "list_commercial_sale_orders",
+    "list_commercial_sale_orders",
+    "get_commercial_sale_order_detail"
+  ],
+  "verified": [
+    "Sojinha pause/resume",
+    "filters Escape",
+    "search submit",
+    "contracts",
+    "installments 8/8/1",
+    "sales-entry focus",
+    "Tab/ShiftTab focus-visible",
+    "SVG Home/End/Enter",
+    "touch path selection",
+    "native dropdown change",
+    "zoom/fit",
+    "viewport resize/orientation"
+  ],
+  "limits": [
+    "Chromium emulation; no physical mobile/iOS/GPU validation",
+    "setViewportSize tests resize/orientation, not browser chrome zoom"
+  ]
+}

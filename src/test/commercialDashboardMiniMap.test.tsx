@@ -4,6 +4,7 @@ import { STATUS_CONFIG } from '@/features/commercial-map/constants';
 import { CommercialMiniMap } from '@/features/commercial-map/dashboard/CommercialMiniMap';
 import {
   buildCommercialMiniMapGeometry,
+  getCommercialMiniMapGeometry,
   commercialMiniMapNumberLabel,
   type CommercialMiniMapItem,
 } from '@/features/commercial-map/dashboard/commercialDashboardGeometry';
@@ -32,6 +33,24 @@ function record(
 }
 
 describe('geometria do mini mapa comercial', () => {
+  it('reusa somente projeções e religa status, preço, identificação e seleção aos registros atuais', () => {
+    const item = record('cache-current-data', 'AVAILABLE', square(0, 0));
+    const first = getCommercialMiniMapGeometry([item]);
+    const current = { ...item, value: 0, entity: { ...item.entity, publicIdentifier: 'Novo identificador' },
+      lot: { ...item.lot, status: 'SOLD' as const, lotNumber: '104' } };
+    const refreshed = getCommercialMiniMapGeometry([current]);
+    expect(refreshed.lots[0].path).toBe(first.lots[0].path);
+    expect(refreshed.project).toBe(first.project);
+    expect(refreshed.lots[0].lot).toBe(current.lot);
+    expect(refreshed.lotsByEntityId.get(item.entity.id)?.value).toBe(0);
+    expect(refreshed.lots[0].entity.publicIdentifier).toBe('Novo identificador');
+    const moved = getCommercialMiniMapGeometry([{ ...current, entity: { ...current.entity,
+      geometry: { ...current.entity.geometry, coordinates: square(100, 40) } } }]);
+    expect(moved.bounds).toEqual({ minX: 100, minY: 40, maxX: 110, maxY: 50 });
+    expect(moved.project).not.toBe(first.project);
+    expect(getCommercialMiniMapGeometry([{ ...current, lot: { ...current.lot, archivedAt: '2026-10-08' } }]).lots).toHaveLength(0);
+    expect(getCommercialMiniMapGeometry([{ ...current, lot: { ...current.lot, entityId: 'other-project-entity' } }]).lots).toHaveLength(0);
+  });
   it('usa os polígonos cadastrais reais, preserva a posição relativa e normaliza o viewBox', () => {
     const first = record('Q-R-01', 'SOLD', square(0, 0));
     const second = record('Q-R-02', 'AVAILABLE', square(20, 5));
@@ -216,6 +235,7 @@ describe('mini mapa comercial interativo', () => {
       const notify = (width: number, height: number, contentWidth = width) => act(() => resize!([{
         target: viewport, borderBoxSize: [{ inlineSize: width, blockSize: height }], contentRect: { width: contentWidth, height },
       } as unknown as ResizeObserverEntry], {} as ResizeObserver));
+      const layoutRead = vi.spyOn(viewport, 'getBoundingClientRect');
       notify(1478, 720);
       fireEvent.click(screen.getByRole('button', { name: 'Ampliar planta de Pavilhão 13' }));
       notify(1478, 720, 1461);
@@ -236,11 +256,54 @@ describe('mini mapa comercial interativo', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Ampliar planta de Pavilhão 13' }));
       }
       expect(observe).toHaveBeenCalledWith(viewport, { box: 'border-box' });
+      expect(layoutRead).not.toHaveBeenCalled();
       rendered.unmount();
       expect(disconnect).toHaveBeenCalledOnce();
     } finally {
       globalThis.ResizeObserver = original;
     }
+  });
+
+  it('restaura zoom e rolagem ao voltar à visualização sem manter o SVG montado', () => {
+    const items = [record('memory-space', 'AVAILABLE', square(0, 0))];
+    const memory: { zoom?: number; scrollLeft?: number; scrollTop?: number } = {};
+    const first = render(<CommercialMiniMap items={items} title="Memória" onViewLot={vi.fn()} presentationMemory={memory} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Ampliar planta de Memória' }));
+    const viewport = screen.getByLabelText('Planta de Memória; use as setas para navegar pelos espaços');
+    viewport.scrollLeft = 75;
+    viewport.scrollTop = 40;
+    first.unmount();
+    const second = render(<CommercialMiniMap items={items} title="Memória" onViewLot={vi.fn()} presentationMemory={memory} />);
+    const restored = screen.getByLabelText('Planta de Memória; use as setas para navegar pelos espaços');
+    expect(restored.firstElementChild).toHaveStyle({ width: '150%', height: '150%' });
+    expect(restored.scrollLeft).toBe(75);
+    expect(restored.scrollTop).toBe(40);
+    second.unmount();
+  });
+
+  it('restaura cada recorte após aplicar seu zoom e mantém memórias distintas na troca A → B → A', () => {
+    const items = [record('scope-memory-space', 'AVAILABLE', square(0, 0))];
+    const memoryA = { zoom: 1, scrollLeft: 0, scrollTop: 0 };
+    const memoryB = { zoom: 2, scrollLeft: 95, scrollTop: 55 };
+    const rendered = render(<CommercialMiniMap items={items} title="Recorte A" onViewLot={vi.fn()} presentationMemory={memoryA} />);
+    const viewport = screen.getByLabelText('Planta de Recorte A; use as setas para navegar pelos espaços');
+    // Browser scroll offsets clamp to the surface dimensions at write time.
+    let left = 0, top = 0;
+    Object.defineProperty(viewport, 'scrollLeft', { configurable: true, get: () => left,
+      set: (value: number) => { left = viewport.firstElementChild?.getAttribute('style')?.includes('200%') ? value : 0; } });
+    Object.defineProperty(viewport, 'scrollTop', { configurable: true, get: () => top,
+      set: (value: number) => { top = viewport.firstElementChild?.getAttribute('style')?.includes('200%') ? value : 0; } });
+    rendered.rerender(<CommercialMiniMap items={items} title="Recorte B" onViewLot={vi.fn()} presentationMemory={memoryB} />);
+    expect(viewport.firstElementChild).toHaveStyle({ width: '200%' });
+    expect(viewport.scrollLeft).toBe(95);
+    expect(viewport.scrollTop).toBe(55);
+    rendered.rerender(<CommercialMiniMap items={items} title="Recorte A" onViewLot={vi.fn()} presentationMemory={memoryA} />);
+    expect(viewport.firstElementChild).toHaveStyle({ width: '100%' });
+    expect(memoryB).toEqual({ zoom: 2, scrollLeft: 95, scrollTop: 55 });
+    rendered.rerender(<CommercialMiniMap items={items} title="Recorte B" onViewLot={vi.fn()} presentationMemory={memoryB} />);
+    expect(viewport.firstElementChild).toHaveStyle({ width: '200%' });
+    expect(viewport.scrollLeft).toBe(95);
+    expect(viewport.scrollTop).toBe(55);
   });
 
   it('mantém líderes curtos ligados ao acesso oficial e mostra apoios como não comerciais', () => {

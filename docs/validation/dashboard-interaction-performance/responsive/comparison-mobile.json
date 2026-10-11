@@ -1,0 +1,366 @@
+{
+  "conditions": {
+    "browser": "Chrome 154 headless",
+    "viewport": {
+      "name": "mobile",
+      "width": 390,
+      "height": 844
+    },
+    "deviceScaleFactor": 1,
+    "isMobile": true,
+    "hasTouch": true,
+    "fixture": "Official reference inventory; isolated local React harness; no session, backend operations or WebGL",
+    "baselineScriptOrigin": "immutable baseline checkout e2acc54",
+    "runsSequential": true
+  },
+  "pavilions": [
+    {
+      "number": 1,
+      "modules": 189,
+      "exactMetricMatch": true,
+      "geometryHashEqual": true,
+      "identifiersEqual": true,
+      "labelsEqual": true,
+      "accesses": 4,
+      "supports": 0,
+      "containedBefore": true,
+      "containedAfter": true,
+      "supportLabelCollisionsAfter": []
+    },
+    {
+      "number": 3,
+      "modules": 214,
+      "exactMetricMatch": true,
+      "geometryHashEqual": true,
+      "identifiersEqual": true,
+      "labelsEqual": true,
+      "accesses": 6,
+      "supports": 0,
+      "containedBefore": true,
+      "containedAfter": true,
+      "supportLabelCollisionsAfter": []
+    },
+    {
+      "number": 5,
+      "modules": 81,
+      "exactMetricMatch": true,
+      "geometryHashEqual": true,
+      "identifiersEqual": true,
+      "labelsEqual": true,
+      "accesses": 3,
+      "supports": 4,
+      "containedBefore": true,
+      "containedAfter": true,
+      "supportLabelCollisionsAfter": []
+    },
+    {
+      "number": 7,
+      "modules": 57,
+      "exactMetricMatch": true,
+      "geometryHashEqual": true,
+      "identifiersEqual": true,
+      "labelsEqual": true,
+      "accesses": 4,
+      "supports": 2,
+      "containedBefore": true,
+      "containedAfter": true,
+      "supportLabelCollisionsAfter": []
+    },
+    {
+      "number": 8,
+      "modules": 114,
+      "exactMetricMatch": true,
+      "geometryHashEqual": true,
+      "identifiersEqual": true,
+      "labelsEqual": true,
+      "accesses": 5,
+      "supports": 3,
+      "containedBefore": true,
+      "containedAfter": true,
+      "supportLabelCollisionsAfter": []
+    },
+    {
+      "number": 12,
+      "modules": 257,
+      "exactMetricMatch": true,
+      "geometryHashEqual": true,
+      "identifiersEqual": true,
+      "labelsEqual": true,
+      "accesses": 3,
+      "supports": 0,
+      "containedBefore": true,
+      "containedAfter": true,
+      "supportLabelCollisionsAfter": []
+    },
+    {
+      "number": 13,
+      "modules": 104,
+      "exactMetricMatch": true,
+      "geometryHashEqual": true,
+      "identifiersEqual": true,
+      "labelsEqual": true,
+      "accesses": 6,
+      "supports": 0,
+      "containedBefore": true,
+      "containedAfter": true,
+      "supportLabelCollisionsAfter": []
+    },
+    {
+      "number": 14,
+      "modules": 186,
+      "exactMetricMatch": true,
+      "geometryHashEqual": true,
+      "identifiersEqual": true,
+      "labelsEqual": true,
+      "accesses": 6,
+      "supports": 0,
+      "containedBefore": true,
+      "containedAfter": true,
+      "supportLabelCollisionsAfter": []
+    }
+  ],
+  "screenshots": [
+    {
+      "name": "mobile-overview.png",
+      "beforeSize": [
+        390,
+        844
+      ],
+      "afterSize": [
+        390,
+        844
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-1-plant.png",
+      "beforeSize": [
+        344,
+        331
+      ],
+      "afterSize": [
+        344,
+        331
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-1.png",
+      "beforeSize": [
+        390,
+        844
+      ],
+      "afterSize": [
+        390,
+        844
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-12-plant.png",
+      "beforeSize": [
+        344,
+        331
+      ],
+      "afterSize": [
+        344,
+        331
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-12.png",
+      "beforeSize": [
+        390,
+        844
+      ],
+      "afterSize": [
+        390,
+        844
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-13-plant.png",
+      "beforeSize": [
+        344,
+        572
+      ],
+      "afterSize": [
+        344,
+        572
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-13.png",
+      "beforeSize": [
+        390,
+        844
+      ],
+      "afterSize": [
+        390,
+        844
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-14-plant.png",
+      "beforeSize": [
+        344,
+        331
+      ],
+      "afterSize": [
+        344,
+        331
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-14.png",
+      "beforeSize": [
+        390,
+        844
+      ],
+      "afterSize": [
+        390,
+        844
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-3-plant.png",
+      "beforeSize": [
+        344,
+        556
+      ],
+      "afterSize": [
+        344,
+        556
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-3.png",
+      "beforeSize": [
+        390,
+        844
+      ],
+      "afterSize": [
+        390,
+        844
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-5-plant.png",
+      "beforeSize": [
+        344,
+        580
+      ],
+      "afterSize": [
+        344,
+        580
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-5.png",
+      "beforeSize": [
+        390,
+        844
+      ],
+      "afterSize": [
+        390,
+        844
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-7-plant.png",
+      "beforeSize": [
+        344,
+        331
+      ],
+      "afterSize": [
+        344,
+        331
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-7.png",
+      "beforeSize": [
+        390,
+        844
+      ],
+      "afterSize": [
+        390,
+        844
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-8-plant.png",
+      "beforeSize": [
+        344,
+        548
+      ],
+      "afterSize": [
+        344,
+        548
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    },
+    {
+      "name": "mobile-pavilion-8.png",
+      "beforeSize": [
+        390,
+        844
+      ],
+      "afterSize": [
+        390,
+        844
+      ],
+      "changedPixels": 0,
+      "exactEqual": true
+    }
+  ],
+  "checksBefore": {
+    "fullFit": true,
+    "preservedAspectRatio": true
+  },
+  "checksAfter": {
+    "fullFit": true,
+    "preservedAspectRatio": true,
+    "zoom": true,
+    "commercialRefreshPreservesSelectionAndZoom": true,
+    "resizeFits": true
+  },
+  "errorsBefore": [],
+  "errorsAfter": [],
+  "backendRequestsBefore": [],
+  "backendRequestsAfter": [],
+  "limitations": [
+    "Chromium mobile/touch emulation, not a physical mobile device or Safari/iOS.",
+    "Isolated dashboard harness, not authenticated production or integrated WebGL.",
+    "Vite HMR websocket was blocked by Chrome local-network checks in both phases; application loaded, page error arrays and backend requests are empty.",
+    "Candidate mutation checks update each previously inspected pavilion, so later full-page screenshots can reflect changed fixture commercial counts outside the current plant."
+  ]
+}

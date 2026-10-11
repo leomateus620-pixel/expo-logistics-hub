@@ -11,6 +11,7 @@ import {
   type SaleContract, type SaleOrderDetail, type SaleOrderSummary,
 } from '@/features/commercial-map/dashboard/salesOrders/salesOrdersService';
 import { useSalesOrdersUiStore } from '@/features/commercial-map/dashboard/salesOrders/useSalesOrdersUiStore';
+import * as salesPresentation from '@/features/commercial-map/dashboard/salesOrders/salesOrdersPresentation';
 
 vi.mock('@/features/commercial-map/dashboard/salesOrders/salesOrdersService', async (importOriginal) => ({
   ...await importOriginal<typeof import('@/features/commercial-map/dashboard/salesOrders/salesOrdersService')>(),
@@ -107,6 +108,57 @@ afterEach(() => {
 });
 
 describe('espaço dedicado de vendas e contratos', () => {
+  it('mantém os cartões estáveis em mudanças visuais e atualiza o registro quando os dados mudam', async () => {
+    const view = mount();
+    await screen.findByText(record.reference);
+    const renderName = vi.spyOn(salesPresentation, 'saleName');
+    try {
+      act(() => {
+        useSalesOrdersUiStore.getState().setSearchOpen(true);
+        useSalesOrdersUiStore.getState().rememberListScroll(200);
+      });
+      expect(screen.getByRole('textbox', { name: 'Pesquisar vendas' })).toBeInTheDocument();
+      expect(renderName).not.toHaveBeenCalled();
+
+      act(() => {
+        view.client.setQueryData(['commercial-sale-orders', 'test-project', EMPTY_SALE_FILTERS, 0], {
+          rows: [{ ...record, buyerTradeName: 'Expositor atualizado', negotiatedTotal: 6000 }], total: 1, documentsAccessible: true,
+        });
+      });
+      await screen.findByRole('button', { name: `Detalhes de Expositor atualizado · ${record.reference}` });
+      expect(renderName).toHaveBeenCalled();
+      expect(screen.getByRole('article')).toHaveTextContent('6.000,00');
+    } finally { renderName.mockRestore(); }
+  });
+
+  it('reutiliza a apresentação do detalhe ao trocar de aba e invalida os dados reais atualizados', async () => {
+    const view = mount();
+    await screen.findByText(record.reference);
+    fireEvent.click(within(saleArticle()).getByRole('button'));
+    await screen.findByRole('tab', { name: 'Espaços' });
+    const summarize = vi.spyOn(salesPresentation, 'saleDetailSummary');
+    try {
+      act(() => {
+        useSalesOrdersUiStore.getState().rememberDetailScroll(320);
+        useSalesOrdersUiStore.getState().setSearchOpen(true);
+      });
+      await userEvent.setup().click(screen.getByRole('tab', { name: 'Espaços' }));
+      expect(screen.getByText('Módulo 2', { exact: true })).toBeInTheDocument();
+      expect(summarize).not.toHaveBeenCalled();
+
+      act(() => {
+        view.client.setQueryData(['commercial-sale-order-detail', record.recordId], {
+          ...detail, header: { ...detail.header, negotiatedTotal: 6000 },
+          items: detail.items.map((item) => item.lotId === 'lot-one' ? { ...item, contractState: 'CANCELLED' } : item),
+        });
+      });
+      await waitFor(() => expect(screen.getByText('Espaços ativos').closest('div')).toHaveTextContent('1'));
+      expect(summarize).toHaveBeenCalled();
+      expect(screen.getByText('Valor negociado').closest('div')).toHaveTextContent('6.000,00');
+      expect(screen.getByText('Módulo 1', { exact: true }).closest('li')).toHaveClass('is-cancelled');
+    } finally { summarize.mockRestore(); }
+  });
+
   it('monta controles recolhidos, consulta só a página e move foco para a área', async () => {
     mount({ onBack: vi.fn() });
     expect(screen.getByRole('heading', { name: 'Vendas e contratos' })).toHaveFocus();

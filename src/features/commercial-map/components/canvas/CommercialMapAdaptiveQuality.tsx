@@ -91,6 +91,8 @@ export function CommercialMapAdaptiveQualityController({
   const sampledPresentation = useRef(-1);
   const displayCadence = useRef<number | null>(null);
   const cadenceCancel = useRef<(() => void) | null>(null);
+  const presentationActive = useRef(active);
+  presentationActive.current = active;
   const activity = useRef(commercialMapFrameActivity(gl));
   const executionReportAt = useRef(0);
   const lastMeasuredWindow = useRef<{ averageFrameTimeMs: number; p95FrameTimeMs: number; sampledFrames: number } | null>(null);
@@ -141,7 +143,7 @@ export function CommercialMapAdaptiveQualityController({
     // in the driver. Initial camera autofit is not a reason to do that before
     // the first presentation. This gate owns adaptive DPR only; actual viewport
     // resize and camera projection remain owned by R3F.
-    if (gl.domElement.dataset.commercialMapReady !== 'true' || isCommercialMapProgramPreparationActive(gl)) {
+    if (!presentationActive.current || gl.domElement.dataset.commercialMapReady !== 'true' || isCommercialMapProgramPreparationActive(gl)) {
       pixelRatioSyncDeferred.current = true;
       return;
     }
@@ -236,7 +238,7 @@ export function CommercialMapAdaptiveQualityController({
   }, [cancelIdleCommit, publishQuality, resolveCapabilities, resolveQuality, resolveTierPixelRatio]);
 
   const scheduleIdleCommit = useCallback(() => {
-    if (pendingSceneTier.current === null || idleCommitTimer.current !== null) return;
+    if (!presentationActive.current || pendingSceneTier.current === null || idleCommitTimer.current !== null) return;
     idleCommitTimer.current = setTimeout(() => {
       idleCommitTimer.current = null;
       if (isCommercialMapHeavyQualityGestureActive(useCommercialMapStore.getState())) return;
@@ -301,6 +303,16 @@ export function CommercialMapAdaptiveQualityController({
       decision.reason === 'hardware-cap' ? decision.reason : 'viewport-sync',
     );
   }, [applyQualityDecision, resolveCapabilities, resolveQuality]);
+
+  useEffect(() => {
+    cancelIdleCommit();
+    cadenceCancel.current?.();
+    cadenceCancel.current = null;
+    displayCadence.current = null;
+    samplingSignature.current = '';
+    resetCommercialMapFrameTimeWindow(frameWindow.current);
+    if (active) scheduleIdleCommit();
+  }, [active, cancelIdleCommit, scheduleIdleCommit]);
 
   useEffect(() => {
     const syncVisitSession = () => {

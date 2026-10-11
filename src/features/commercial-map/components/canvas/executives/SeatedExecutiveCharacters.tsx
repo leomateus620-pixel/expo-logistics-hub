@@ -10,6 +10,7 @@ import {
   type ExecutiveCharacterProfile,
 } from '../../../data/executiveCharacters';
 import { SeatedExecutiveErrorBoundary } from './SeatedExecutiveErrorBoundary';
+import { useCommercialMapPresentationVisible } from '../CommercialMapPresentationContext';
 
 const NO_RAYCAST = () => undefined;
 interface SeatedExecutiveCharactersProps {
@@ -165,8 +166,10 @@ export const SeatedExecutiveCharacters = memo(function SeatedExecutiveCharacters
 }: SeatedExecutiveCharactersProps) {
   const invalidate = useThree((state) => state.invalidate);
   const reducedMotion = usePrefersReducedMotion();
+  const presentationVisible = useCommercialMapPresentationVisible();
 
   useEffect(() => {
+    if (!presentationVisible) return undefined;
     invalidate();
     if (reducedMotion || typeof window === 'undefined') return undefined;
     const interval = window.setInterval(
@@ -178,7 +181,7 @@ export const SeatedExecutiveCharacters = memo(function SeatedExecutiveCharacters
       Math.round(1000 / (reducedGraphics ? 14 : 22)),
     );
     return () => window.clearInterval(interval);
-  }, [invalidate, reducedGraphics, reducedMotion]);
+  }, [invalidate, presentationVisible, reducedGraphics, reducedMotion]);
 
   return (
     <group name="SeatedFenasojaExecutives" raycast={NO_RAYCAST}>

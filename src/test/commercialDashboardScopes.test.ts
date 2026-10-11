@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
 import { COMMERCIAL_MAP_SEGMENTS } from '@/features/commercial-map/data/commercialMapSegments';
 import { buildCommercialDashboardSnapshot } from '@/features/commercial-map/dashboard/commercialDashboardAnalytics';
-import { buildDashboardExternalBoundaries } from '@/features/commercial-map/dashboard/commercialDashboardBoundaries';
+import { buildDashboardExternalBoundaries, getDashboardExternalBoundaries } from '@/features/commercial-map/dashboard/commercialDashboardBoundaries';
 import { buildDashboardPavilionGeometry } from '@/features/commercial-map/dashboard/commercialDashboardPavilionGeometry';
 import { buildCommercialMiniMapGeometry, buildCommercialMiniMapViewBox } from '@/features/commercial-map/dashboard/commercialDashboardGeometry';
 import { COMMERCIAL_PAVILION_MODULE_PLANS } from '@/features/commercial-map/utils/commercialPavilionModules';
@@ -109,6 +109,26 @@ describe('dashboard managerial inventory', () => {
 });
 
 describe('dashboard reference geometry', () => {
+  it('invalida contornos por geometria, arquivo e associação, sem invalidar por preços ou situação', () => {
+    const rural = COMMERCIAL_MAP_SEGMENTS[0];
+    const first = getDashboardExternalBoundaries(reference.entities, reference.lots, [rural]);
+    const commercialRefresh = getDashboardExternalBoundaries(reference.entities.map((entity) => ({ ...entity })),
+      reference.lots.map((lot) => ({ ...lot, status: 'SOLD', askingPrice: 0 })), [rural]);
+    expect(commercialRefresh).toBe(first);
+    expect(commercialRefresh).toEqual(buildDashboardExternalBoundaries(reference.entities, reference.lots, [rural]));
+    const block = reference.entities.find((entity) => entity.publicIdentifier === 'QUADRA-R')!;
+    const archived = getDashboardExternalBoundaries(reference.entities.map((entity) => entity.id === block.id ? { ...entity, isArchived: true } : entity), reference.lots, [rural]);
+    expect(archived).not.toBe(first);
+    expect(archived.pending.join(' ')).toContain('R');
+    const reassigned = getDashboardExternalBoundaries(reference.entities.map((entity) => entity.id === block.id
+      ? { ...entity, segmentId: 'espaco-automovel' as const, segmentSource: 'database' as const } : entity), reference.lots, [rural]);
+    expect(reassigned).not.toBe(first);
+    expect(reassigned.outlines.filter(({ kind }) => kind === 'block').map(({ id }) => id)).not.toContain(block.id);
+    const moved = getDashboardExternalBoundaries(reference.entities.map((entity) => entity.id === block.id ? { ...entity,
+      geometry: { ...entity.geometry, coordinates: entity.geometry.coordinates.map((ring) => ring.map(([x, y]) => [x + 3, y] as [number, number])) } } : entity), reference.lots, [rural]);
+    expect(moved).not.toBe(first);
+    expect(moved.outlines.find(({ id }) => id === block.id)?.coordinates).not.toEqual(first.outlines.find(({ id }) => id === block.id)?.coordinates);
+  });
   it('projects confirmed quadras and exact nonrectangular contours without interior module bounds', () => {
     const rural = COMMERCIAL_MAP_SEGMENTS[0];
     const ruralBoundary = buildDashboardExternalBoundaries(reference.entities, reference.lots, [rural]);

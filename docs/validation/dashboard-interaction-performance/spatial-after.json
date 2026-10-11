@@ -1,0 +1,66 @@
+{
+  "capturedAt": "2026-10-08T04:34:15.922Z",
+  "root": "C:\\Users\\Leonardo\\Desktop\\expo-logistics-hub",
+  "runtime": "v24.15.0",
+  "platform": "win32/x64",
+  "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+  "warmup": 5,
+  "repetitions": 100,
+  "measurement": "Unthrottled Node/Vite SSR pure CPU; excludes browser/React/input/paint/GPU",
+  "inventory": {
+    "entities": 1579,
+    "lots": 1466,
+    "external": 264,
+    "internal": 1202
+  },
+  "cacheAvailable": {
+    "boundaries": true,
+    "geometry": true
+  },
+  "samples": {
+    "all-boundaries-raw": {
+      "medianMs": 7.800499999999374,
+      "p95Ms": 32.25810000000092,
+      "worstMs": 87.15270000000055
+    },
+    "rural-boundary-raw": {
+      "medianMs": 6.929899999999179,
+      "p95Ms": 19.8700000000008,
+      "worstMs": 36.4440999999988
+    },
+    "external-geometry-raw": {
+      "medianMs": 3.7470999999986816,
+      "p95Ms": 14.958399999999529,
+      "worstMs": 26.55069999999978
+    },
+    "internal-geometry-raw": {
+      "medianMs": 15.6257999999998,
+      "p95Ms": 49.204499999999825,
+      "worstMs": 57.73250000000007
+    },
+    "all-boundaries-repeat": {
+      "medianMs": 1.1507999999994354,
+      "p95Ms": 3.608299999999872,
+      "worstMs": 9.232200000000375
+    },
+    "rural-boundary-repeat": {
+      "medianMs": 0.9791000000004715,
+      "p95Ms": 4.3149000000012165,
+      "worstMs": 19.5645999999997
+    },
+    "external-geometry-repeat": {
+      "medianMs": 1.82090000000062,
+      "p95Ms": 6.404899999999543,
+      "worstMs": 23.002599999999802
+    },
+    "internal-geometry-repeat": {
+      "medianMs": 7.494300000000294,
+      "p95Ms": 18.612300000000687,
+      "worstMs": 78.56600000000071
+    }
+  },
+  "conditions": {
+    "cpuContention": true,
+    "reason": "Overlapped root build/tests; descriptive samples only, not a controlled speedup comparison."
+  }
+}

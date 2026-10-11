@@ -1,0 +1,3330 @@
+{
+  "capturedAt": "2026-10-08T04:40:42.038Z",
+  "images": [
+    {
+      "view": "overview",
+      "beforeSha256": "9aaf736abbfabd741cc24167cfa2c18ff1861d0c55c21f20a5f04b7c6e7a8ab9",
+      "afterSha256": "9aaf736abbfabd741cc24167cfa2c18ff1861d0c55c21f20a5f04b7c6e7a8ab9",
+      "beforeDimensions": [
+        1366,
+        768
+      ],
+      "afterDimensions": [
+        1366,
+        768
+      ],
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "view": "internal",
+      "beforeSha256": "7eb13b01bc8b36109b5f287133a0cd7bc89a4c3c78aef8c8d8872ba554bf155b",
+      "afterSha256": "7eb13b01bc8b36109b5f287133a0cd7bc89a4c3c78aef8c8d8872ba554bf155b",
+      "beforeDimensions": [
+        1366,
+        768
+      ],
+      "afterDimensions": [
+        1366,
+        768
+      ],
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "view": "pavilion-1",
+      "beforeSha256": "63f63d574250f8770cdd63c251ec9feac427dcb4f4cfb1f434c068a3c33d7a4b",
+      "afterSha256": "63f63d574250f8770cdd63c251ec9feac427dcb4f4cfb1f434c068a3c33d7a4b",
+      "beforeDimensions": [
+        906,
+        422
+      ],
+      "afterDimensions": [
+        906,
+        422
+      ],
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "view": "pavilion-3",
+      "beforeSha256": "11314004cecbcc6e7e41f92647d2616f47b232e53c2eec11d932697ec4379a5a",
+      "afterSha256": "11314004cecbcc6e7e41f92647d2616f47b232e53c2eec11d932697ec4379a5a",
+      "beforeDimensions": [
+        906,
+        643
+      ],
+      "afterDimensions": [
+        906,
+        643
+      ],
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "view": "pavilion-5",
+      "beforeSha256": "1bc4a5e483bfce52e0da6d8c92af6150bb8e993980e4bf445ac1f08055fe1f27",
+      "afterSha256": "1bc4a5e483bfce52e0da6d8c92af6150bb8e993980e4bf445ac1f08055fe1f27",
+      "beforeDimensions": [
+        906,
+        643
+      ],
+      "afterDimensions": [
+        906,
+        643
+      ],
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "view": "pavilion-7",
+      "beforeSha256": "746d2d61335ed5fbab0a0673b5379020de1937443353564d894b60b4bee181f5",
+      "afterSha256": "746d2d61335ed5fbab0a0673b5379020de1937443353564d894b60b4bee181f5",
+      "beforeDimensions": [
+        906,
+        438
+      ],
+      "afterDimensions": [
+        906,
+        438
+      ],
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "view": "pavilion-8",
+      "beforeSha256": "b463a09463e5cb03aea63afaeb339cb788642f20c74fc4ecbc4074ee87b0ed51",
+      "afterSha256": "b463a09463e5cb03aea63afaeb339cb788642f20c74fc4ecbc4074ee87b0ed51",
+      "beforeDimensions": [
+        906,
+        643
+      ],
+      "afterDimensions": [
+        906,
+        643
+      ],
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "view": "pavilion-12",
+      "beforeSha256": "61bcaecd53455ce50004712d889fbc7d5273a17c6e4dc569b316c6b3fa7a8015",
+      "afterSha256": "61bcaecd53455ce50004712d889fbc7d5273a17c6e4dc569b316c6b3fa7a8015",
+      "beforeDimensions": [
+        906,
+        621
+      ],
+      "afterDimensions": [
+        906,
+        621
+      ],
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "view": "pavilion-13",
+      "beforeSha256": "b232c86a849787bb36bf932141d7bf0c9b7669bbdea90ec6b0260b808c8a7455",
+      "afterSha256": "b232c86a849787bb36bf932141d7bf0c9b7669bbdea90ec6b0260b808c8a7455",
+      "beforeDimensions": [
+        906,
+        643
+      ],
+      "afterDimensions": [
+        906,
+        643
+      ],
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "view": "pavilion-14",
+      "beforeSha256": "8821353145eb46ce7d96395bcb3b10a311bd406b78cf06335e6e8095b7097c72",
+      "afterSha256": "8821353145eb46ce7d96395bcb3b10a311bd406b78cf06335e6e8095b7097c72",
+      "beforeDimensions": [
+        906,
+        643
+      ],
+      "afterDimensions": [
+        906,
+        643
+      ],
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "view": "sales",
+      "beforeSha256": "e3dfacac269e7ef66a847c62ab468b556defa695201da4fde25602a396d51d10",
+      "afterSha256": "e3dfacac269e7ef66a847c62ab468b556defa695201da4fde25602a396d51d10",
+      "beforeDimensions": [
+        1366,
+        768
+      ],
+      "afterDimensions": [
+        1366,
+        768
+      ],
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0
+    },
+    {
+      "view": "detail",
+      "beforeSha256": "33a6cd5f51f5e1ad10fc2d5b39b97e60ff136ae8ad61a6d0f93c07c2c8fc54b4",
+      "afterSha256": "33a6cd5f51f5e1ad10fc2d5b39b97e60ff136ae8ad61a6d0f93c07c2c8fc54b4",
+      "beforeDimensions": [
+        1366,
+        768
+      ],
+      "afterDimensions": [
+        1366,
+        768
+      ],
+      "identicalPixels": true,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0
+    }
+  ],
+  "presentation": [
+    {
+      "name": "Exporural",
+      "identical": true,
+      "beforeSha256": "bf33b39e608b248fa9401295b0135d53922a12612e3bf8d0932c979d9fdd49b1",
+      "afterSha256": "bf33b39e608b248fa9401295b0135d53922a12612e3bf8d0932c979d9fdd49b1",
+      "differentFields": [],
+      "lots": 95,
+      "outlines": 3,
+      "numbers": 0
+    },
+    {
+      "name": "Indústria, Comércio e Serviços",
+      "identical": true,
+      "beforeSha256": "31d0c48c94d7250eaf79b99df4692cf52ab6359435d2f11f1f7ad5f1ff480c7d",
+      "afterSha256": "31d0c48c94d7250eaf79b99df4692cf52ab6359435d2f11f1f7ad5f1ff480c7d",
+      "differentFields": [],
+      "lots": 117,
+      "outlines": 26,
+      "numbers": 0
+    },
+    {
+      "name": "Espaço do Automóvel",
+      "identical": true,
+      "beforeSha256": "679f367d9c492064107021516a8deef178f57f6098f2522835b6a0cc20557435",
+      "afterSha256": "679f367d9c492064107021516a8deef178f57f6098f2522835b6a0cc20557435",
+      "differentFields": [],
+      "lots": 52,
+      "outlines": 8,
+      "numbers": 0
+    },
+    {
+      "name": "internal",
+      "identical": true,
+      "beforeSha256": "488c2afc7c6e784fc07844c2cf0353861a6d9acfe2df1190695b4e2f1310dc03",
+      "afterSha256": "488c2afc7c6e784fc07844c2cf0353861a6d9acfe2df1190695b4e2f1310dc03",
+      "differentFields": [],
+      "lots": 1202,
+      "outlines": 8,
+      "numbers": 0
+    },
+    {
+      "name": "pavilion-1",
+      "identical": true,
+      "beforeSha256": "0aedcade39f734e6e1efd36a13d93640d1fadcecabae0bf8fb6df323690faadf",
+      "afterSha256": "0aedcade39f734e6e1efd36a13d93640d1fadcecabae0bf8fb6df323690faadf",
+      "differentFields": [],
+      "lots": 189,
+      "outlines": 1,
+      "numbers": 189
+    },
+    {
+      "name": "pavilion-3",
+      "identical": true,
+      "beforeSha256": "c36c9075714b9b48aa976995b1da7d4237f537bcb5b226382b3041ff689645f6",
+      "afterSha256": "c36c9075714b9b48aa976995b1da7d4237f537bcb5b226382b3041ff689645f6",
+      "differentFields": [],
+      "lots": 214,
+      "outlines": 1,
+      "numbers": 214
+    },
+    {
+      "name": "pavilion-5",
+      "identical": true,
+      "beforeSha256": "06ab38e2ce80b41dc276ec47bc521990c9f3ceb1937fcbab2c93335490c61b01",
+      "afterSha256": "06ab38e2ce80b41dc276ec47bc521990c9f3ceb1937fcbab2c93335490c61b01",
+      "differentFields": [],
+      "lots": 81,
+      "outlines": 5,
+      "numbers": 81
+    },
+    {
+      "name": "pavilion-7",
+      "identical": true,
+      "beforeSha256": "a2a185256a954f10bc8ab42178d14ab3ba77d90a97620bab8782055646befad7",
+      "afterSha256": "a2a185256a954f10bc8ab42178d14ab3ba77d90a97620bab8782055646befad7",
+      "differentFields": [],
+      "lots": 57,
+      "outlines": 3,
+      "numbers": 57
+    },
+    {
+      "name": "pavilion-8",
+      "identical": true,
+      "beforeSha256": "74aca0155e7e4f5fce2547b9fe21af44531e8c07b6cabdc6f39385dfaa6c4761",
+      "afterSha256": "74aca0155e7e4f5fce2547b9fe21af44531e8c07b6cabdc6f39385dfaa6c4761",
+      "differentFields": [],
+      "lots": 114,
+      "outlines": 4,
+      "numbers": 114
+    },
+    {
+      "name": "pavilion-12",
+      "identical": true,
+      "beforeSha256": "2c69ba30bb9c35e2ebaa30124158fee4605394d10bf24d3f4245e520f6d33af9",
+      "afterSha256": "2c69ba30bb9c35e2ebaa30124158fee4605394d10bf24d3f4245e520f6d33af9",
+      "differentFields": [],
+      "lots": 257,
+      "outlines": 1,
+      "numbers": 257
+    },
+    {
+      "name": "pavilion-13",
+      "identical": true,
+      "beforeSha256": "0c0594cd969c85917832a8b8235e4b414028026f3728cb2310c28aac92f37b17",
+      "afterSha256": "0c0594cd969c85917832a8b8235e4b414028026f3728cb2310c28aac92f37b17",
+      "differentFields": [],
+      "lots": 104,
+      "outlines": 1,
+      "numbers": 104
+    },
+    {
+      "name": "pavilion-14",
+      "identical": true,
+      "beforeSha256": "5a5b75fdb533b1fd7178c99d3f6499b3d031221fb70e0789daa4b5100c7b20c6",
+      "afterSha256": "5a5b75fdb533b1fd7178c99d3f6499b3d031221fb70e0789daa4b5100c7b20c6",
+      "differentFields": [],
+      "lots": 186,
+      "outlines": 1,
+      "numbers": 186
+    }
+  ],
+  "runs": [
+    {
+      "cpuRate": 1,
+      "before": {
+        "eventTiming": {
+          "inputDelay": {
+            "count": 4311,
+            "median": 0.5999999940395355,
+            "p95": 13.399999991059303,
+            "worst": 35.20000000298023
+          },
+          "handler": {
+            "count": 4311,
+            "median": 0,
+            "p95": 5.800000011920929,
+            "worst": 117.29999999701977
+          },
+          "duration": {
+            "count": 4311,
+            "median": 32,
+            "p95": 104,
+            "worst": 496
+          },
+          "note": "Event Timing entries have a 16ms duration threshold and may include several events per interaction."
+        },
+        "captureInputDelay": {
+          "count": 318,
+          "median": 1.7999999970197678,
+          "p95": 16.599999994039536,
+          "worst": 35.20000000298023
+        },
+        "warmedLongTasks": {
+          "count": 31,
+          "median": 61,
+          "p95": 119,
+          "worst": 392
+        },
+        "firstOpeningMs": 2876,
+        "memoryCycles": [
+          {
+            "cycle": 1,
+            "used": 30304448,
+            "nodes": 1085
+          },
+          {
+            "cycle": 2,
+            "used": 31083330,
+            "nodes": 1085
+          },
+          {
+            "cycle": 3,
+            "used": 31397821,
+            "nodes": 1085
+          },
+          {
+            "cycle": 4,
+            "used": 31669216,
+            "nodes": 1085
+          },
+          {
+            "cycle": 5,
+            "used": 31976052,
+            "nodes": 1085
+          },
+          {
+            "cycle": 6,
+            "used": 32096607,
+            "nodes": 1085
+          },
+          {
+            "cycle": 7,
+            "used": 32256979,
+            "nodes": 1085
+          },
+          {
+            "cycle": 8,
+            "used": 32309043,
+            "nodes": 1085
+          }
+        ]
+      },
+      "after": {
+        "eventTiming": {
+          "inputDelay": {
+            "count": 4430,
+            "median": 0.5999999940395355,
+            "p95": 12.899999991059303,
+            "worst": 17.899999991059303
+          },
+          "handler": {
+            "count": 4430,
+            "median": 0,
+            "p95": 3,
+            "worst": 118.90000000596046
+          },
+          "duration": {
+            "count": 4430,
+            "median": 32,
+            "p95": 80,
+            "worst": 144
+          },
+          "note": "Event Timing entries have a 16ms duration threshold and may include several events per interaction."
+        },
+        "captureInputDelay": {
+          "count": 318,
+          "median": 1.7000000029802322,
+          "p95": 13.800000011920929,
+          "worst": 17.899999991059303
+        },
+        "warmedLongTasks": {
+          "count": 11,
+          "median": 79,
+          "p95": 121,
+          "worst": 121
+        },
+        "firstOpeningMs": 2078,
+        "memoryCycles": [
+          {
+            "cycle": 1,
+            "used": 35162964,
+            "nodes": 1085
+          },
+          {
+            "cycle": 2,
+            "used": 36009218,
+            "nodes": 1085
+          },
+          {
+            "cycle": 3,
+            "used": 36345461,
+            "nodes": 1085
+          },
+          {
+            "cycle": 4,
+            "used": 36629064,
+            "nodes": 1085
+          },
+          {
+            "cycle": 5,
+            "used": 36874100,
+            "nodes": 1085
+          },
+          {
+            "cycle": 6,
+            "used": 36983991,
+            "nodes": 1085
+          },
+          {
+            "cycle": 7,
+            "used": 37142295,
+            "nodes": 1085
+          },
+          {
+            "cycle": 8,
+            "used": 37010835,
+            "nodes": 1085
+          }
+        ]
+      },
+      "interactions": [
+        {
+          "name": "external",
+          "before": {
+            "feedback": {
+              "n": 24,
+              "median": 28.5,
+              "p95": 31.799999997019768,
+              "worst": 33.900000005960464
+            },
+            "consistent": {
+              "n": 24,
+              "median": 28.5,
+              "p95": 31.799999997019768,
+              "worst": 33.900000005960464
+            },
+            "reactOperation": {
+              "n": 24,
+              "median": 11.800000011920929,
+              "p95": 17.30000002682209,
+              "worst": 17.80000001192093
+            },
+            "reactAfterEventStart": {
+              "count": 24,
+              "median": 11.800000011920929,
+              "p95": 17.30000002682209,
+              "worst": 17.80000001192093
+            },
+            "geometryOperation": {
+              "n": 24,
+              "median": 3.4000000059604645,
+              "p95": 9.099999994039536,
+              "worst": 10.600000008940697
+            },
+            "geometryAfterEventStart": {
+              "count": 24,
+              "median": 3.4000000059604645,
+              "p95": 9.099999994039536,
+              "worst": 10.600000008940697
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 24,
+              "median": 29.399999991059303,
+              "p95": 30.5,
+              "worst": 36.29999999701977
+            },
+            "consistent": {
+              "n": 24,
+              "median": 29.399999991059303,
+              "p95": 30.5,
+              "worst": 36.3999999910593
+            },
+            "reactOperation": {
+              "n": 24,
+              "median": 7.0999999940395355,
+              "p95": 17.599999979138374,
+              "worst": 22.5
+            },
+            "reactAfterEventStart": {
+              "count": 24,
+              "median": 7.0999999940395355,
+              "p95": 17.599999979138374,
+              "worst": 22.5
+            },
+            "geometryOperation": {
+              "n": 24,
+              "median": 0,
+              "p95": 3.7999999970197678,
+              "worst": 6.700000002980232
+            },
+            "geometryAfterEventStart": {
+              "count": 24,
+              "median": 0,
+              "p95": 3.7999999970197678,
+              "worst": 6.700000002980232
+            }
+          }
+        },
+        {
+          "name": "internal",
+          "before": {
+            "feedback": {
+              "n": 8,
+              "median": 102.90000000596046,
+              "p95": 123.79999999701977,
+              "worst": 123.79999999701977
+            },
+            "consistent": {
+              "n": 8,
+              "median": 102.90000000596046,
+              "p95": 123.79999999701977,
+              "worst": 123.79999999701977
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 59.29999998211861,
+              "p95": 72.59999996423721,
+              "worst": 72.59999996423721
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 59.29999998211861,
+              "p95": 72.59999996423721,
+              "worst": 72.59999996423721
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 12.600000008940697,
+              "p95": 15.099999994039536,
+              "worst": 15.099999994039536
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 12.600000008940697,
+              "p95": 15.099999994039536,
+              "worst": 15.099999994039536
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 8,
+              "median": 83.40000000596046,
+              "p95": 125.5,
+              "worst": 125.5
+            },
+            "consistent": {
+              "n": 8,
+              "median": 83.40000000596046,
+              "p95": 125.5,
+              "worst": 125.5
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 41.70000000298023,
+              "p95": 72.8999999910593,
+              "worst": 72.8999999910593
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 41.70000000298023,
+              "p95": 72.8999999910593,
+              "worst": 72.8999999910593
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 11.400000005960464,
+              "worst": 11.400000005960464
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 11.400000005960464,
+              "worst": 11.400000005960464
+            }
+          }
+        },
+        {
+          "name": "focus",
+          "before": {
+            "feedback": {
+              "n": 48,
+              "median": 33.400000005960464,
+              "p95": 49.29999999701977,
+              "worst": 62.400000005960464
+            },
+            "consistent": {
+              "n": 48,
+              "median": 33.400000005960464,
+              "p95": 49.29999999701977,
+              "worst": 62.400000005960464
+            },
+            "reactOperation": {
+              "n": 48,
+              "median": 25.899999976158142,
+              "p95": 36.09999994933605,
+              "worst": 49.700000032782555
+            },
+            "reactAfterEventStart": {
+              "count": 48,
+              "median": 25.899999976158142,
+              "p95": 36.09999994933605,
+              "worst": 49.700000032782555
+            },
+            "geometryOperation": {
+              "n": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 48,
+              "median": 26.80000001192093,
+              "p95": 27.69999998807907,
+              "worst": 61.29999999701977
+            },
+            "consistent": {
+              "n": 48,
+              "median": 26.80000001192093,
+              "p95": 27.69999998807907,
+              "worst": 61.29999999701977
+            },
+            "reactOperation": {
+              "n": 48,
+              "median": 3.1000000089406967,
+              "p95": 4.999999985098839,
+              "worst": 7.200000002980232
+            },
+            "reactAfterEventStart": {
+              "count": 48,
+              "median": 3.1000000089406967,
+              "p95": 4.999999985098839,
+              "worst": 7.200000002980232
+            },
+            "geometryOperation": {
+              "n": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "pavilion",
+          "before": {
+            "feedback": {
+              "n": 22,
+              "median": 32.400000005960464,
+              "p95": 82.90000000596046,
+              "worst": 410.3999999910593
+            },
+            "consistent": {
+              "n": 22,
+              "median": 32.400000005960464,
+              "p95": 82.90000000596046,
+              "worst": 511.70000000298023
+            },
+            "reactOperation": {
+              "n": 22,
+              "median": 24.200000002980232,
+              "p95": 45.80000002682209,
+              "worst": 62.19999997317791
+            },
+            "reactAfterEventStart": {
+              "count": 22,
+              "median": 15.399999991059303,
+              "p95": 31.199999943375587,
+              "worst": 33.400000005960464
+            },
+            "geometryOperation": {
+              "n": 22,
+              "median": 0.8999999910593033,
+              "p95": 1.5,
+              "worst": 1.7000000029802322
+            },
+            "geometryAfterEventStart": {
+              "count": 22,
+              "median": 0.8999999910593033,
+              "p95": 1.5,
+              "worst": 1.7000000029802322
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 22,
+              "median": 29.100000008940697,
+              "p95": 54.099999994039536,
+              "worst": 60.099999994039536
+            },
+            "consistent": {
+              "n": 22,
+              "median": 29.400000005960464,
+              "p95": 60.099999994039536,
+              "worst": 96.29999999701977
+            },
+            "reactOperation": {
+              "n": 22,
+              "median": 13.499999985098839,
+              "p95": 26.30000001192093,
+              "worst": 27.900000005960464
+            },
+            "reactAfterEventStart": {
+              "count": 22,
+              "median": 12.200000002980232,
+              "p95": 24.700000017881393,
+              "worst": 26.30000001192093
+            },
+            "geometryOperation": {
+              "n": 22,
+              "median": 0,
+              "p95": 1.7000000029802322,
+              "worst": 1.9000000059604645
+            },
+            "geometryAfterEventStart": {
+              "count": 22,
+              "median": 0,
+              "p95": 1.7000000029802322,
+              "worst": 1.9000000059604645
+            }
+          }
+        },
+        {
+          "name": "hover",
+          "before": {
+            "feedback": {
+              "n": 48,
+              "median": 17.099999994039536,
+              "p95": 17.599999994039536,
+              "worst": 17.900000005960464
+            },
+            "consistent": {
+              "n": 48,
+              "median": 32.900000005960464,
+              "p95": 66.1000000089407,
+              "worst": 66.1000000089407
+            },
+            "reactOperation": {
+              "n": 48,
+              "median": 4.200000002980232,
+              "p95": 10.300000011920929,
+              "worst": 12.299999952316284
+            },
+            "reactAfterEventStart": {
+              "count": 48,
+              "median": 4.200000002980232,
+              "p95": 10.300000011920929,
+              "worst": 12.299999952316284
+            },
+            "geometryOperation": {
+              "n": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 48,
+              "median": 17.099999994039536,
+              "p95": 17.5,
+              "worst": 18.200000002980232
+            },
+            "consistent": {
+              "n": 48,
+              "median": 33,
+              "p95": 66.1000000089407,
+              "worst": 66.20000000298023
+            },
+            "reactOperation": {
+              "n": 48,
+              "median": 0.8999999910593033,
+              "p95": 1.7000000029802322,
+              "worst": 1.7999999970197678
+            },
+            "reactAfterEventStart": {
+              "count": 48,
+              "median": 0.8999999910593033,
+              "p95": 1.7000000029802322,
+              "worst": 1.7999999970197678
+            },
+            "geometryOperation": {
+              "n": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "lot-selection",
+          "before": {
+            "feedback": {
+              "n": 48,
+              "median": 19.5,
+              "p95": 28.799999997019768,
+              "worst": 28.900000005960464
+            },
+            "consistent": {
+              "n": 48,
+              "median": 19.5,
+              "p95": 28.799999997019768,
+              "worst": 28.900000005960464
+            },
+            "reactOperation": {
+              "n": 48,
+              "median": 14.19999997317791,
+              "p95": 23.700000017881393,
+              "worst": 34.30000002682209
+            },
+            "reactAfterEventStart": {
+              "count": 48,
+              "median": 6.400000020861626,
+              "p95": 9.799999997019768,
+              "worst": 18.00000001490116
+            },
+            "geometryOperation": {
+              "n": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 48,
+              "median": 25.5,
+              "p95": 27.600000008940697,
+              "worst": 28.799999997019768
+            },
+            "consistent": {
+              "n": 48,
+              "median": 25.5,
+              "p95": 27.600000008940697,
+              "worst": 28.799999997019768
+            },
+            "reactOperation": {
+              "n": 48,
+              "median": 3.7999999970197678,
+              "p95": 4.499999985098839,
+              "worst": 4.599999979138374
+            },
+            "reactAfterEventStart": {
+              "count": 48,
+              "median": 2.6000000089406967,
+              "p95": 3.0999999940395355,
+              "worst": 3.3999999910593033
+            },
+            "geometryOperation": {
+              "n": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "metric",
+          "before": {
+            "feedback": {
+              "n": 16,
+              "median": 22.399999991059303,
+              "p95": 29.799999997019768,
+              "worst": 29.799999997019768
+            },
+            "consistent": {
+              "n": 16,
+              "median": 22.399999991059303,
+              "p95": 29.799999997019768,
+              "worst": 29.799999997019768
+            },
+            "reactOperation": {
+              "n": 16,
+              "median": 9.5,
+              "p95": 21.39999994635582,
+              "worst": 21.39999994635582
+            },
+            "reactAfterEventStart": {
+              "count": 16,
+              "median": 6.4000000059604645,
+              "p95": 9.5,
+              "worst": 9.5
+            },
+            "geometryOperation": {
+              "n": 16,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 16,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 16,
+              "median": 24.100000008940697,
+              "p95": 29.700000002980232,
+              "worst": 29.700000002980232
+            },
+            "consistent": {
+              "n": 16,
+              "median": 24.200000002980232,
+              "p95": 29.799999997019768,
+              "worst": 29.799999997019768
+            },
+            "reactOperation": {
+              "n": 16,
+              "median": 3.2000000029802322,
+              "p95": 8.100000008940697,
+              "worst": 8.100000008940697
+            },
+            "reactAfterEventStart": {
+              "count": 16,
+              "median": 1.0999999940395355,
+              "p95": 3.2000000029802322,
+              "worst": 3.2000000029802322
+            },
+            "geometryOperation": {
+              "n": 16,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 16,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "price-stage",
+          "before": {
+            "feedback": {
+              "n": 16,
+              "median": 28,
+              "p95": 30.100000008940697,
+              "worst": 30.100000008940697
+            },
+            "consistent": {
+              "n": 16,
+              "median": 28,
+              "p95": 30.100000008940697,
+              "worst": 30.100000008940697
+            },
+            "reactOperation": {
+              "n": 16,
+              "median": 16.50000001490116,
+              "p95": 21,
+              "worst": 21
+            },
+            "reactAfterEventStart": {
+              "count": 16,
+              "median": 16.50000001490116,
+              "p95": 21,
+              "worst": 21
+            },
+            "geometryOperation": {
+              "n": 16,
+              "median": 4,
+              "p95": 4.600000008940697,
+              "worst": 4.600000008940697
+            },
+            "geometryAfterEventStart": {
+              "count": 16,
+              "median": 4,
+              "p95": 4.600000008940697,
+              "worst": 4.600000008940697
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 16,
+              "median": 28.700000002980232,
+              "p95": 30,
+              "worst": 30
+            },
+            "consistent": {
+              "n": 16,
+              "median": 28.700000002980232,
+              "p95": 30,
+              "worst": 30
+            },
+            "reactOperation": {
+              "n": 16,
+              "median": 11.399999991059303,
+              "p95": 13.500000014901161,
+              "worst": 13.500000014901161
+            },
+            "reactAfterEventStart": {
+              "count": 16,
+              "median": 11.399999991059303,
+              "p95": 13.500000014901161,
+              "worst": 13.500000014901161
+            },
+            "geometryOperation": {
+              "n": 16,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 16,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "sales-open",
+          "before": {
+            "feedback": {
+              "n": 8,
+              "median": 29.299999997019768,
+              "p95": 31.899999991059303,
+              "worst": 31.899999991059303
+            },
+            "consistent": {
+              "n": 8,
+              "median": 29.299999997019768,
+              "p95": 80.8999999910593,
+              "worst": 80.8999999910593
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 7.899999991059303,
+              "p95": 21.200000017881393,
+              "worst": 21.200000017881393
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 7.899999991059303,
+              "p95": 21.200000017881393,
+              "worst": 21.200000017881393
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 8,
+              "median": 28.299999997019768,
+              "p95": 29.400000005960464,
+              "worst": 29.400000005960464
+            },
+            "consistent": {
+              "n": 8,
+              "median": 28.299999997019768,
+              "p95": 62.400000005960464,
+              "worst": 62.400000005960464
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 7.700000002980232,
+              "p95": 14.400000035762787,
+              "worst": 14.400000035762787
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 7.700000002980232,
+              "p95": 14.400000035762787,
+              "worst": 14.400000035762787
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "detail-open",
+          "before": {
+            "feedback": {
+              "n": 8,
+              "median": 29.700000002980232,
+              "p95": 37.900000005960464,
+              "worst": 37.900000005960464
+            },
+            "consistent": {
+              "n": 8,
+              "median": 29.700000002980232,
+              "p95": 46,
+              "worst": 46
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 3.000000014901161,
+              "p95": 8.399999976158142,
+              "worst": 8.399999976158142
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 3.000000014901161,
+              "p95": 8.399999976158142,
+              "worst": 8.399999976158142
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 8,
+              "median": 28.900000005960464,
+              "p95": 35.599999994039536,
+              "worst": 35.599999994039536
+            },
+            "consistent": {
+              "n": 8,
+              "median": 28.900000005960464,
+              "p95": 45.8999999910593,
+              "worst": 45.8999999910593
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 3.2999999970197678,
+              "p95": 7.5,
+              "worst": 7.5
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 3.2999999970197678,
+              "p95": 7.5,
+              "worst": 7.5
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "detail-tab",
+          "before": {
+            "feedback": {
+              "n": 40,
+              "median": 22.200000002980232,
+              "p95": 25,
+              "worst": 25.200000002980232
+            },
+            "consistent": {
+              "n": 40,
+              "median": 22.200000002980232,
+              "p95": 25,
+              "worst": 25.200000002980232
+            },
+            "reactOperation": {
+              "n": 40,
+              "median": 2.3999999910593033,
+              "p95": 3.7999999970197678,
+              "worst": 5.199999988079071
+            },
+            "reactAfterEventStart": {
+              "count": 40,
+              "median": 0,
+              "p95": 0,
+              "worst": 2.5
+            },
+            "geometryOperation": {
+              "n": 40,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 40,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 40,
+              "median": 23.5,
+              "p95": 24.900000005960464,
+              "worst": 26
+            },
+            "consistent": {
+              "n": 40,
+              "median": 23.5,
+              "p95": 24.900000005960464,
+              "worst": 26
+            },
+            "reactOperation": {
+              "n": 40,
+              "median": 1.2999999970197678,
+              "p95": 1.5999999940395355,
+              "worst": 2.1000000089406967
+            },
+            "reactAfterEventStart": {
+              "count": 40,
+              "median": 0,
+              "p95": 0,
+              "worst": 0.7999999970197678
+            },
+            "geometryOperation": {
+              "n": 40,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 40,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "detail-back",
+          "before": {
+            "feedback": {
+              "n": 8,
+              "median": 28.099999994039536,
+              "p95": 36.099999994039536,
+              "worst": 36.099999994039536
+            },
+            "consistent": {
+              "n": 8,
+              "median": 28.099999994039536,
+              "p95": 36.099999994039536,
+              "worst": 36.099999994039536
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 8.100000008940697,
+              "p95": 13,
+              "worst": 13
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 8.100000008940697,
+              "p95": 13,
+              "worst": 13
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 8,
+              "median": 28.099999994039536,
+              "p95": 28.899999991059303,
+              "worst": 28.899999991059303
+            },
+            "consistent": {
+              "n": 8,
+              "median": 28.099999994039536,
+              "p95": 28.899999991059303,
+              "worst": 28.899999991059303
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 7.299999982118607,
+              "p95": 11.499999985098839,
+              "worst": 11.499999985098839
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 7.299999982118607,
+              "p95": 11.499999985098839,
+              "worst": 11.499999985098839
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "overview-back",
+          "before": {
+            "feedback": {
+              "n": 8,
+              "median": 50.599999994039536,
+              "p95": 86.70000000298023,
+              "worst": 86.70000000298023
+            },
+            "consistent": {
+              "n": 8,
+              "median": 50.70000000298023,
+              "p95": 86.70000000298023,
+              "worst": 86.70000000298023
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 29.500000029802322,
+              "p95": 43.999999955296516,
+              "worst": 43.999999955296516
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 29.500000029802322,
+              "p95": 43.999999955296516,
+              "worst": 43.999999955296516
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 4.700000002980232,
+              "p95": 6.5,
+              "worst": 6.5
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 4.700000002980232,
+              "p95": 6.5,
+              "worst": 6.5
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 8,
+              "median": 34.900000005960464,
+              "p95": 53.3999999910593,
+              "worst": 53.3999999910593
+            },
+            "consistent": {
+              "n": 8,
+              "median": 34.900000005960464,
+              "p95": 53.3999999910593,
+              "worst": 53.3999999910593
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 16.30000001192093,
+              "p95": 23.400000020861626,
+              "worst": 23.400000020861626
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 16.30000001192093,
+              "p95": 23.400000020861626,
+              "worst": 23.400000020861626
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "close",
+          "before": {
+            "feedback": {
+              "n": 8,
+              "median": 28.299999997019768,
+              "p95": 29.899999991059303,
+              "worst": 29.899999991059303
+            },
+            "consistent": {
+              "n": 8,
+              "median": 28.299999997019768,
+              "p95": 29.899999991059303,
+              "worst": 29.899999991059303
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 8,
+              "median": 27.899999991059303,
+              "p95": 29.200000002980232,
+              "worst": 29.200000002980232
+            },
+            "consistent": {
+              "n": 8,
+              "median": 27.899999991059303,
+              "p95": 29.200000002980232,
+              "worst": 29.200000002980232
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "reopen",
+          "before": {
+            "feedback": {
+              "n": 8,
+              "median": 54.5,
+              "p95": 66,
+              "worst": 66
+            },
+            "consistent": {
+              "n": 8,
+              "median": 54.5,
+              "p95": 66,
+              "worst": 66
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 35.40000003576279,
+              "p95": 37.5,
+              "worst": 37.5
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 35.40000003576279,
+              "p95": 37.5,
+              "worst": 37.5
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 4.5999999940395355,
+              "p95": 4.9000000059604645,
+              "worst": 4.9000000059604645
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 4.5999999940395355,
+              "p95": 4.9000000059604645,
+              "worst": 4.9000000059604645
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 8,
+              "median": 46,
+              "p95": 53.70000000298023,
+              "worst": 53.70000000298023
+            },
+            "consistent": {
+              "n": 8,
+              "median": 46,
+              "p95": 53.70000000298023,
+              "worst": 53.70000000298023
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 24.299999982118607,
+              "p95": 28.099999979138374,
+              "worst": 28.099999979138374
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 24.299999982118607,
+              "p95": 28.099999979138374,
+              "worst": 28.099999979138374
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        }
+      ],
+      "renderWindowNote": "Operation starts before Playwright moves/focuses the target, so it can include hover/focus work before the captured click. AfterEventStart uses Profiler startTime/geometry start >= the captured event start; nested component durations are not summed.",
+      "pipeline": {
+        "before": {
+          "EventDispatch": {
+            "available": true,
+            "total": 675.074999999991,
+            "n": 2182,
+            "median": 0.001,
+            "p95": 0.18,
+            "worst": 98.492
+          },
+          "FunctionCall": {
+            "available": true,
+            "total": 975.1809999999956,
+            "n": 2037,
+            "median": 0.011,
+            "p95": 0.265,
+            "worst": 96.811
+          },
+          "UpdateLayoutTree": {
+            "available": true,
+            "total": 43.09700000000002,
+            "n": 259,
+            "median": 0.101,
+            "p95": 0.451,
+            "worst": 2.007
+          },
+          "Layout": {
+            "available": true,
+            "total": 143.318,
+            "n": 73,
+            "median": 0.411,
+            "p95": 8.942,
+            "worst": 24.755
+          },
+          "PrePaint": {
+            "available": true,
+            "total": 31.507999999999967,
+            "n": 632,
+            "median": 0.007,
+            "p95": 0.234,
+            "worst": 1.36
+          },
+          "Paint": {
+            "available": true,
+            "total": 120.80099999999999,
+            "n": 217,
+            "median": 0.3,
+            "p95": 1.615,
+            "worst": 3.163
+          },
+          "Layerize": {
+            "available": true,
+            "total": 32.430000000000035,
+            "n": 243,
+            "median": 0.002,
+            "p95": 0.526,
+            "worst": 1.657
+          },
+          "Commit": {
+            "available": false,
+            "n": 0,
+            "total": null,
+            "median": null,
+            "p95": null,
+            "worst": null,
+            "reason": "The trace contains no complete duration entries for this stage; elapsed cost is unavailable."
+          },
+          "RunTask": {
+            "available": false,
+            "n": 0,
+            "total": null,
+            "median": null,
+            "p95": null,
+            "worst": null,
+            "reason": "The trace contains no complete duration entries for this stage; elapsed cost is unavailable."
+          }
+        },
+        "after": {
+          "EventDispatch": {
+            "available": true,
+            "total": 473.03099999999677,
+            "n": 2052,
+            "median": 0.001,
+            "p95": 0.189,
+            "worst": 82.86
+          },
+          "FunctionCall": {
+            "available": true,
+            "total": 560.7139999999969,
+            "n": 2047,
+            "median": 0.01,
+            "p95": 0.277,
+            "worst": 81.277
+          },
+          "UpdateLayoutTree": {
+            "available": true,
+            "total": 44.335,
+            "n": 266,
+            "median": 0.106,
+            "p95": 0.463,
+            "worst": 2.231
+          },
+          "Layout": {
+            "available": true,
+            "total": 146.40700000000004,
+            "n": 83,
+            "median": 0.377,
+            "p95": 7.836,
+            "worst": 24.073
+          },
+          "PrePaint": {
+            "available": true,
+            "total": 31.080000000000023,
+            "n": 629,
+            "median": 0.007,
+            "p95": 0.226,
+            "worst": 1.293
+          },
+          "Paint": {
+            "available": true,
+            "total": 120.12300000000006,
+            "n": 213,
+            "median": 0.29,
+            "p95": 1.965,
+            "worst": 4.129
+          },
+          "Layerize": {
+            "available": true,
+            "total": 30.96400000000001,
+            "n": 240,
+            "median": 0.002,
+            "p95": 0.501,
+            "worst": 1.896
+          },
+          "Commit": {
+            "available": false,
+            "n": 0,
+            "total": null,
+            "median": null,
+            "p95": null,
+            "worst": null,
+            "reason": "The trace contains no complete duration entries for this stage; elapsed cost is unavailable."
+          },
+          "RunTask": {
+            "available": false,
+            "n": 0,
+            "total": null,
+            "median": null,
+            "p95": null,
+            "worst": null,
+            "reason": "The trace contains no complete duration entries for this stage; elapsed cost is unavailable."
+          }
+        },
+        "note": "Nested trace stages overlap; their totals must not be summed into end-to-end interaction time."
+      }
+    },
+    {
+      "cpuRate": 4,
+      "before": {
+        "eventTiming": {
+          "inputDelay": {
+            "count": 4023,
+            "median": 2,
+            "p95": 34.400000005960464,
+            "worst": 145.40000000596046
+          },
+          "handler": {
+            "count": 4023,
+            "median": 0,
+            "p95": 28.100000008940697,
+            "worst": 492.20000000298023
+          },
+          "duration": {
+            "count": 4023,
+            "median": 64,
+            "p95": 304,
+            "worst": 560
+          },
+          "note": "Event Timing entries have a 16ms duration threshold and may include several events per interaction."
+        },
+        "captureInputDelay": {
+          "count": 318,
+          "median": 8.099999994039536,
+          "p95": 56.099999994039536,
+          "worst": 145.5
+        },
+        "warmedLongTasks": {
+          "count": 216,
+          "median": 103,
+          "p95": 274,
+          "worst": 502
+        },
+        "firstOpeningMs": 3626,
+        "memoryCycles": [
+          {
+            "cycle": 1,
+            "used": 30280238,
+            "nodes": 1085
+          },
+          {
+            "cycle": 2,
+            "used": 31053465,
+            "nodes": 1085
+          },
+          {
+            "cycle": 3,
+            "used": 31382925,
+            "nodes": 1085
+          },
+          {
+            "cycle": 4,
+            "used": 31644060,
+            "nodes": 1085
+          },
+          {
+            "cycle": 5,
+            "used": 31875613,
+            "nodes": 1085
+          },
+          {
+            "cycle": 6,
+            "used": 32110097,
+            "nodes": 1085
+          },
+          {
+            "cycle": 7,
+            "used": 32265852,
+            "nodes": 1085
+          },
+          {
+            "cycle": 8,
+            "used": 32391968,
+            "nodes": 1085
+          }
+        ]
+      },
+      "after": {
+        "eventTiming": {
+          "inputDelay": {
+            "count": 3955,
+            "median": 1.9000000059604645,
+            "p95": 18.5,
+            "worst": 40.20000000298023
+          },
+          "handler": {
+            "count": 3955,
+            "median": 0,
+            "p95": 15.5,
+            "worst": 471.30000001192093
+          },
+          "duration": {
+            "count": 3955,
+            "median": 48,
+            "p95": 240,
+            "worst": 528
+          },
+          "note": "Event Timing entries have a 16ms duration threshold and may include several events per interaction."
+        },
+        "captureInputDelay": {
+          "count": 318,
+          "median": 6.5,
+          "p95": 30.799999997019768,
+          "worst": 40.29999999701977
+        },
+        "warmedLongTasks": {
+          "count": 110,
+          "median": 87,
+          "p95": 361,
+          "worst": 476
+        },
+        "firstOpeningMs": 2967,
+        "memoryCycles": [
+          {
+            "cycle": 1,
+            "used": 35173859,
+            "nodes": 1085
+          },
+          {
+            "cycle": 2,
+            "used": 36019302,
+            "nodes": 1085
+          },
+          {
+            "cycle": 3,
+            "used": 36348003,
+            "nodes": 1085
+          },
+          {
+            "cycle": 4,
+            "used": 36621061,
+            "nodes": 1085
+          },
+          {
+            "cycle": 5,
+            "used": 36502746,
+            "nodes": 1085
+          },
+          {
+            "cycle": 6,
+            "used": 37023469,
+            "nodes": 1085
+          },
+          {
+            "cycle": 7,
+            "used": 37174566,
+            "nodes": 1085
+          },
+          {
+            "cycle": 8,
+            "used": 37407217,
+            "nodes": 1085
+          }
+        ]
+      },
+      "interactions": [
+        {
+          "name": "external",
+          "before": {
+            "feedback": {
+              "n": 24,
+              "median": 86.5,
+              "p95": 100.40000000596046,
+              "worst": 101.59999999403954
+            },
+            "consistent": {
+              "n": 24,
+              "median": 86.5,
+              "p95": 100.40000000596046,
+              "worst": 101.70000000298023
+            },
+            "reactOperation": {
+              "n": 24,
+              "median": 50.099999994039536,
+              "p95": 58.599999994039536,
+              "worst": 63.69999998807907
+            },
+            "reactAfterEventStart": {
+              "count": 24,
+              "median": 50.099999994039536,
+              "p95": 58.599999994039536,
+              "worst": 63.69999998807907
+            },
+            "geometryOperation": {
+              "n": 24,
+              "median": 14.5,
+              "p95": 28.700000002980232,
+              "worst": 30.200000002980232
+            },
+            "geometryAfterEventStart": {
+              "count": 24,
+              "median": 14.5,
+              "p95": 28.700000002980232,
+              "worst": 30.200000002980232
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 24,
+              "median": 70.5,
+              "p95": 107.09999999403954,
+              "worst": 110.1000000089407
+            },
+            "consistent": {
+              "n": 24,
+              "median": 70.70000000298023,
+              "p95": 107.29999999701977,
+              "worst": 110.20000000298023
+            },
+            "reactOperation": {
+              "n": 24,
+              "median": 33.700000032782555,
+              "p95": 61.99999998509884,
+              "worst": 62.099999994039536
+            },
+            "reactAfterEventStart": {
+              "count": 24,
+              "median": 33.700000032782555,
+              "p95": 61.99999998509884,
+              "worst": 62.099999994039536
+            },
+            "geometryOperation": {
+              "n": 24,
+              "median": 0,
+              "p95": 14.000000014901161,
+              "worst": 20.200000002980232
+            },
+            "geometryAfterEventStart": {
+              "count": 24,
+              "median": 0,
+              "p95": 14.000000014901161,
+              "worst": 20.200000002980232
+            }
+          }
+        },
+        {
+          "name": "internal",
+          "before": {
+            "feedback": {
+              "n": 8,
+              "median": 461.29999999701977,
+              "p95": 518.9000000059605,
+              "worst": 518.9000000059605
+            },
+            "consistent": {
+              "n": 8,
+              "median": 461.29999999701977,
+              "p95": 518.9000000059605,
+              "worst": 518.9000000059605
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 269.60000002384186,
+              "p95": 323.0000000298023,
+              "worst": 323.0000000298023
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 269.60000002384186,
+              "p95": 323.0000000298023,
+              "worst": 323.0000000298023
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 47.599999994039536,
+              "p95": 64.20000000298023,
+              "worst": 64.20000000298023
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 47.599999994039536,
+              "p95": 64.20000000298023,
+              "worst": 64.20000000298023
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 8,
+              "median": 382.09999999403954,
+              "p95": 494.80000001192093,
+              "worst": 494.80000001192093
+            },
+            "consistent": {
+              "n": 8,
+              "median": 382.09999999403954,
+              "p95": 494.80000001192093,
+              "worst": 494.80000001192093
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 185.90000005066395,
+              "p95": 292.19999998807907,
+              "worst": 292.19999998807907
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 185.90000005066395,
+              "p95": 292.19999998807907,
+              "worst": 292.19999998807907
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 40.900000005960464,
+              "worst": 40.900000005960464
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 40.900000005960464,
+              "worst": 40.900000005960464
+            }
+          }
+        },
+        {
+          "name": "focus",
+          "before": {
+            "feedback": {
+              "n": 48,
+              "median": 144.20000000298023,
+              "p95": 179.79999999701977,
+              "worst": 196.5
+            },
+            "consistent": {
+              "n": 48,
+              "median": 144.29999999701977,
+              "p95": 179.79999999701977,
+              "worst": 196.5
+            },
+            "reactOperation": {
+              "n": 48,
+              "median": 113.09999999403954,
+              "p95": 140.29999995231628,
+              "worst": 163.10000005364418
+            },
+            "reactAfterEventStart": {
+              "count": 48,
+              "median": 113.09999999403954,
+              "p95": 140.29999995231628,
+              "worst": 163.10000005364418
+            },
+            "geometryOperation": {
+              "n": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 48,
+              "median": 41.900000005960464,
+              "p95": 50.599999994039536,
+              "worst": 85.20000000298023
+            },
+            "consistent": {
+              "n": 48,
+              "median": 42,
+              "p95": 50.599999994039536,
+              "worst": 85.20000000298023
+            },
+            "reactOperation": {
+              "n": 48,
+              "median": 14,
+              "p95": 17.50000001490116,
+              "worst": 51.3999999910593
+            },
+            "reactAfterEventStart": {
+              "count": 48,
+              "median": 14,
+              "p95": 17.50000001490116,
+              "worst": 51.3999999910593
+            },
+            "geometryOperation": {
+              "n": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "pavilion",
+          "before": {
+            "feedback": {
+              "n": 22,
+              "median": 145,
+              "p95": 280.70000000298023,
+              "worst": 330.70000000298023
+            },
+            "consistent": {
+              "n": 22,
+              "median": 146.70000000298023,
+              "p95": 330.70000000298023,
+              "worst": 336.79999999701977
+            },
+            "reactOperation": {
+              "n": 22,
+              "median": 79.69999997317791,
+              "p95": 194.20000000298023,
+              "worst": 258.0999999642372
+            },
+            "reactAfterEventStart": {
+              "count": 22,
+              "median": 70.2000000178814,
+              "p95": 139.1000000089407,
+              "worst": 141.5999999642372
+            },
+            "geometryOperation": {
+              "n": 22,
+              "median": 3.4000000059604645,
+              "p95": 6.5,
+              "worst": 6.799999997019768
+            },
+            "geometryAfterEventStart": {
+              "count": 22,
+              "median": 3.4000000059604645,
+              "p95": 6.5,
+              "worst": 6.799999997019768
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 22,
+              "median": 126.79999999701977,
+              "p95": 229.30000001192093,
+              "worst": 241
+            },
+            "consistent": {
+              "n": 22,
+              "median": 128.70000000298023,
+              "p95": 241,
+              "worst": 296.1000000089407
+            },
+            "reactOperation": {
+              "n": 22,
+              "median": 59.599999994039536,
+              "p95": 112.40000003576279,
+              "worst": 133.8000000268221
+            },
+            "reactAfterEventStart": {
+              "count": 22,
+              "median": 55.49999997019768,
+              "p95": 112.40000003576279,
+              "worst": 119.40000002086163
+            },
+            "geometryOperation": {
+              "n": 22,
+              "median": 0,
+              "p95": 6.5999999940395355,
+              "worst": 7
+            },
+            "geometryAfterEventStart": {
+              "count": 22,
+              "median": 0,
+              "p95": 6.5999999940395355,
+              "worst": 7
+            }
+          }
+        },
+        {
+          "name": "hover",
+          "before": {
+            "feedback": {
+              "n": 48,
+              "median": 28.299999997019768,
+              "p95": 38.19999998807907,
+              "worst": 40.900000005960464
+            },
+            "consistent": {
+              "n": 48,
+              "median": 36.29999999701977,
+              "p95": 101.90000000596046,
+              "worst": 110.1000000089407
+            },
+            "reactOperation": {
+              "n": 48,
+              "median": 18.30000002682209,
+              "p95": 37.6000000089407,
+              "worst": 43.99999998509884
+            },
+            "reactAfterEventStart": {
+              "count": 48,
+              "median": 18.30000002682209,
+              "p95": 37.6000000089407,
+              "worst": 43.99999998509884
+            },
+            "geometryOperation": {
+              "n": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 48,
+              "median": 18.599999994039536,
+              "p95": 19.799999997019768,
+              "worst": 20.200000002980232
+            },
+            "consistent": {
+              "n": 48,
+              "median": 31.799999997019768,
+              "p95": 80.70000000298023,
+              "worst": 435.20000000298023
+            },
+            "reactOperation": {
+              "n": 48,
+              "median": 3.2000000029802322,
+              "p95": 7.600000008940697,
+              "worst": 8.399999991059303
+            },
+            "reactAfterEventStart": {
+              "count": 48,
+              "median": 3.2000000029802322,
+              "p95": 7.600000008940697,
+              "worst": 8.399999991059303
+            },
+            "geometryOperation": {
+              "n": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "lot-selection",
+          "before": {
+            "feedback": {
+              "n": 48,
+              "median": 44.8999999910593,
+              "p95": 59.3999999910593,
+              "worst": 63.099999994039536
+            },
+            "consistent": {
+              "n": 48,
+              "median": 45,
+              "p95": 59.3999999910593,
+              "worst": 63.29999999701977
+            },
+            "reactOperation": {
+              "n": 48,
+              "median": 66.2999999821186,
+              "p95": 94.40000003576279,
+              "worst": 97.80000002682209
+            },
+            "reactAfterEventStart": {
+              "count": 48,
+              "median": 29.799999997019768,
+              "p95": 38.900000020861626,
+              "worst": 69.60000003874302
+            },
+            "geometryOperation": {
+              "n": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 48,
+              "median": 27.899999991059303,
+              "p95": 36.400000005960464,
+              "worst": 42.599999994039536
+            },
+            "consistent": {
+              "n": 48,
+              "median": 27.899999991059303,
+              "p95": 36.400000005960464,
+              "worst": 42.599999994039536
+            },
+            "reactOperation": {
+              "n": 48,
+              "median": 18.90000006556511,
+              "p95": 25.100000008940697,
+              "worst": 34.79999999701977
+            },
+            "reactAfterEventStart": {
+              "count": 48,
+              "median": 13.200000002980232,
+              "p95": 19.400000005960464,
+              "worst": 24.099999994039536
+            },
+            "geometryOperation": {
+              "n": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 48,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "metric",
+          "before": {
+            "feedback": {
+              "n": 16,
+              "median": 41.5,
+              "p95": 60,
+              "worst": 60
+            },
+            "consistent": {
+              "n": 16,
+              "median": 41.70000000298023,
+              "p95": 60,
+              "worst": 60
+            },
+            "reactOperation": {
+              "n": 16,
+              "median": 36.00000001490116,
+              "p95": 71.69999998807907,
+              "worst": 71.69999998807907
+            },
+            "reactAfterEventStart": {
+              "count": 16,
+              "median": 27.00000001490116,
+              "p95": 44.09999994933605,
+              "worst": 44.09999994933605
+            },
+            "geometryOperation": {
+              "n": 16,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 16,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 16,
+              "median": 22.700000002980232,
+              "p95": 37.20000000298023,
+              "worst": 37.20000000298023
+            },
+            "consistent": {
+              "n": 16,
+              "median": 22.700000002980232,
+              "p95": 37.29999999701977,
+              "worst": 37.29999999701977
+            },
+            "reactOperation": {
+              "n": 16,
+              "median": 8.200000002980232,
+              "p95": 17.19999997317791,
+              "worst": 17.19999997317791
+            },
+            "reactAfterEventStart": {
+              "count": 16,
+              "median": 5.200000002980232,
+              "p95": 17.19999997317791,
+              "worst": 17.19999997317791
+            },
+            "geometryOperation": {
+              "n": 16,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 16,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "price-stage",
+          "before": {
+            "feedback": {
+              "n": 16,
+              "median": 82.09999999403954,
+              "p95": 111.20000000298023,
+              "worst": 111.20000000298023
+            },
+            "consistent": {
+              "n": 16,
+              "median": 82.09999999403954,
+              "p95": 111.20000000298023,
+              "worst": 111.20000000298023
+            },
+            "reactOperation": {
+              "n": 16,
+              "median": 70.7000000178814,
+              "p95": 93.6000000089407,
+              "worst": 93.6000000089407
+            },
+            "reactAfterEventStart": {
+              "count": 16,
+              "median": 70.7000000178814,
+              "p95": 93.6000000089407,
+              "worst": 93.6000000089407
+            },
+            "geometryOperation": {
+              "n": 16,
+              "median": 17.600000008940697,
+              "p95": 19.900000005960464,
+              "worst": 19.900000005960464
+            },
+            "geometryAfterEventStart": {
+              "count": 16,
+              "median": 17.600000008940697,
+              "p95": 19.900000005960464,
+              "worst": 19.900000005960464
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 16,
+              "median": 58.6000000089407,
+              "p95": 79.29999999701977,
+              "worst": 79.29999999701977
+            },
+            "consistent": {
+              "n": 16,
+              "median": 58.6000000089407,
+              "p95": 79.40000000596046,
+              "worst": 79.40000000596046
+            },
+            "reactOperation": {
+              "n": 16,
+              "median": 47.20000001788139,
+              "p95": 64.3999999910593,
+              "worst": 64.3999999910593
+            },
+            "reactAfterEventStart": {
+              "count": 16,
+              "median": 47.20000001788139,
+              "p95": 64.3999999910593,
+              "worst": 64.3999999910593
+            },
+            "geometryOperation": {
+              "n": 16,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 16,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "sales-open",
+          "before": {
+            "feedback": {
+              "n": 8,
+              "median": 108.20000000298023,
+              "p95": 141.40000000596046,
+              "worst": 141.40000000596046
+            },
+            "consistent": {
+              "n": 8,
+              "median": 118.40000000596046,
+              "p95": 307.19999998807907,
+              "worst": 307.19999998807907
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 40.599999994039536,
+              "p95": 110,
+              "worst": 110
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 40.599999994039536,
+              "p95": 110,
+              "worst": 110
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 8,
+              "median": 114.20000000298023,
+              "p95": 141.40000000596046,
+              "worst": 141.40000000596046
+            },
+            "consistent": {
+              "n": 8,
+              "median": 114.8999999910593,
+              "p95": 244.8999999910593,
+              "worst": 244.8999999910593
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 38.80000001192093,
+              "p95": 76.1000000089407,
+              "worst": 76.1000000089407
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 38.80000001192093,
+              "p95": 76.1000000089407,
+              "worst": 76.1000000089407
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "detail-open",
+          "before": {
+            "feedback": {
+              "n": 8,
+              "median": 38.400000005960464,
+              "p95": 51.79999999701977,
+              "worst": 51.79999999701977
+            },
+            "consistent": {
+              "n": 8,
+              "median": 39.8999999910593,
+              "p95": 110.5,
+              "worst": 110.5
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 15.400000005960464,
+              "p95": 33.60000002384186,
+              "worst": 33.60000002384186
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 15.400000005960464,
+              "p95": 33.60000002384186,
+              "worst": 33.60000002384186
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 8,
+              "median": 41.400000005960464,
+              "p95": 45.400000005960464,
+              "worst": 45.400000005960464
+            },
+            "consistent": {
+              "n": 8,
+              "median": 41.5,
+              "p95": 115.90000000596046,
+              "worst": 115.90000000596046
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 15.299999982118607,
+              "p95": 33.80000001192093,
+              "worst": 33.80000001192093
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 15.299999982118607,
+              "p95": 33.80000001192093,
+              "worst": 33.80000001192093
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "detail-tab",
+          "before": {
+            "feedback": {
+              "n": 40,
+              "median": 5.699999988079071,
+              "p95": 8.200000002980232,
+              "worst": 15.5
+            },
+            "consistent": {
+              "n": 40,
+              "median": 5.699999988079071,
+              "p95": 8.200000002980232,
+              "worst": 15.5
+            },
+            "reactOperation": {
+              "n": 40,
+              "median": 12.199999988079071,
+              "p95": 15.299999997019768,
+              "worst": 16.100000008940697
+            },
+            "reactAfterEventStart": {
+              "count": 40,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryOperation": {
+              "n": 40,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 40,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 40,
+              "median": 6,
+              "p95": 9,
+              "worst": 18.700000002980232
+            },
+            "consistent": {
+              "n": 40,
+              "median": 6,
+              "p95": 9,
+              "worst": 18.700000002980232
+            },
+            "reactOperation": {
+              "n": 40,
+              "median": 5.9000000059604645,
+              "p95": 8.499999985098839,
+              "worst": 12
+            },
+            "reactAfterEventStart": {
+              "count": 40,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryOperation": {
+              "n": 40,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 40,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "detail-back",
+          "before": {
+            "feedback": {
+              "n": 8,
+              "median": 104.1000000089407,
+              "p95": 119.30000001192093,
+              "worst": 119.30000001192093
+            },
+            "consistent": {
+              "n": 8,
+              "median": 104.1000000089407,
+              "p95": 119.30000001192093,
+              "worst": 119.30000001192093
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 38.20000000298023,
+              "p95": 41.599999979138374,
+              "worst": 41.599999979138374
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 38.20000000298023,
+              "p95": 41.599999979138374,
+              "worst": 41.599999979138374
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 8,
+              "median": 103.29999999701977,
+              "p95": 120.1000000089407,
+              "worst": 120.1000000089407
+            },
+            "consistent": {
+              "n": 8,
+              "median": 103.29999999701977,
+              "p95": 120.1000000089407,
+              "worst": 120.1000000089407
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 36.5,
+              "p95": 42.89999997615814,
+              "worst": 42.89999997615814
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 36.5,
+              "p95": 42.89999997615814,
+              "worst": 42.89999997615814
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "overview-back",
+          "before": {
+            "feedback": {
+              "n": 8,
+              "median": 260.5,
+              "p95": 279.79999999701977,
+              "worst": 279.79999999701977
+            },
+            "consistent": {
+              "n": 8,
+              "median": 260.5,
+              "p95": 279.79999999701977,
+              "worst": 279.79999999701977
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 139.39999997615814,
+              "p95": 149.20000004768372,
+              "worst": 149.20000004768372
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 139.39999997615814,
+              "p95": 149.20000004768372,
+              "worst": 149.20000004768372
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 21,
+              "p95": 22.599999994039536,
+              "worst": 22.599999994039536
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 21,
+              "p95": 22.599999994039536,
+              "worst": 22.599999994039536
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 8,
+              "median": 192.79999999701977,
+              "p95": 264.79999999701977,
+              "worst": 264.79999999701977
+            },
+            "consistent": {
+              "n": 8,
+              "median": 192.90000000596046,
+              "p95": 264.79999999701977,
+              "worst": 264.79999999701977
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 81.20000000298023,
+              "p95": 117.70000003278255,
+              "worst": 117.70000003278255
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 81.20000000298023,
+              "p95": 117.70000003278255,
+              "worst": 117.70000003278255
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "close",
+          "before": {
+            "feedback": {
+              "n": 8,
+              "median": 52.70000000298023,
+              "p95": 62.900000005960464,
+              "worst": 62.900000005960464
+            },
+            "consistent": {
+              "n": 8,
+              "median": 52.70000000298023,
+              "p95": 62.900000005960464,
+              "worst": 62.900000005960464
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 8,
+              "median": 56.400000005960464,
+              "p95": 67.5,
+              "worst": 67.5
+            },
+            "consistent": {
+              "n": 8,
+              "median": 56.400000005960464,
+              "p95": 67.5,
+              "worst": 67.5
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        },
+        {
+          "name": "reopen",
+          "before": {
+            "feedback": {
+              "n": 8,
+              "median": 355.6000000089407,
+              "p95": 379.09999999403954,
+              "worst": 379.09999999403954
+            },
+            "consistent": {
+              "n": 8,
+              "median": 355.6000000089407,
+              "p95": 379.09999999403954,
+              "worst": 379.09999999403954
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 146.3999999910593,
+              "p95": 152.7999999821186,
+              "worst": 152.7999999821186
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 146.3999999910593,
+              "p95": 152.7999999821186,
+              "worst": 152.7999999821186
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 20.400000005960464,
+              "p95": 22.099999979138374,
+              "worst": 22.099999979138374
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 20.400000005960464,
+              "p95": 22.099999979138374,
+              "worst": 22.099999979138374
+            }
+          },
+          "after": {
+            "feedback": {
+              "n": 8,
+              "median": 321.09999999403954,
+              "p95": 335.79999999701977,
+              "worst": 335.79999999701977
+            },
+            "consistent": {
+              "n": 8,
+              "median": 321.09999999403954,
+              "p95": 336,
+              "worst": 336
+            },
+            "reactOperation": {
+              "n": 8,
+              "median": 112.49999997019768,
+              "p95": 130.19999995827675,
+              "worst": 130.19999995827675
+            },
+            "reactAfterEventStart": {
+              "count": 8,
+              "median": 112.49999997019768,
+              "p95": 130.19999995827675,
+              "worst": 130.19999995827675
+            },
+            "geometryOperation": {
+              "n": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            },
+            "geometryAfterEventStart": {
+              "count": 8,
+              "median": 0,
+              "p95": 0,
+              "worst": 0
+            }
+          }
+        }
+      ],
+      "renderWindowNote": "Operation starts before Playwright moves/focuses the target, so it can include hover/focus work before the captured click. AfterEventStart uses Profiler startTime/geometry start >= the captured event start; nested component durations are not summed.",
+      "pipeline": {
+        "before": {
+          "EventDispatch": {
+            "available": true,
+            "total": 2816.8670000000448,
+            "n": 2214,
+            "median": 0.001,
+            "p95": 0.617,
+            "worst": 459.744
+          },
+          "FunctionCall": {
+            "available": true,
+            "total": 3960.7529999999933,
+            "n": 2055,
+            "median": 0.021,
+            "p95": 1.06,
+            "worst": 451.933
+          },
+          "UpdateLayoutTree": {
+            "available": true,
+            "total": 169.61699999999982,
+            "n": 266,
+            "median": 0.387,
+            "p95": 1.809,
+            "worst": 8.691
+          },
+          "Layout": {
+            "available": true,
+            "total": 623.0380000000001,
+            "n": 73,
+            "median": 1.622,
+            "p95": 38.211,
+            "worst": 108.008
+          },
+          "PrePaint": {
+            "available": true,
+            "total": 116.91300000000004,
+            "n": 656,
+            "median": 0.009,
+            "p95": 0.873,
+            "worst": 5.845
+          },
+          "Paint": {
+            "available": true,
+            "total": 454.64899999999983,
+            "n": 240,
+            "median": 0.86,
+            "p95": 7.141,
+            "worst": 9.882
+          },
+          "Layerize": {
+            "available": true,
+            "total": 131.06700000000012,
+            "n": 267,
+            "median": 0.003,
+            "p95": 2.22,
+            "worst": 6.644
+          },
+          "Commit": {
+            "available": false,
+            "n": 0,
+            "total": null,
+            "median": null,
+            "p95": null,
+            "worst": null,
+            "reason": "The trace contains no complete duration entries for this stage; elapsed cost is unavailable."
+          },
+          "RunTask": {
+            "available": false,
+            "n": 0,
+            "total": null,
+            "median": null,
+            "p95": null,
+            "worst": null,
+            "reason": "The trace contains no complete duration entries for this stage; elapsed cost is unavailable."
+          }
+        },
+        "after": {
+          "EventDispatch": {
+            "available": true,
+            "total": 1625.6489999999703,
+            "n": 2068,
+            "median": 0.001,
+            "p95": 0.615,
+            "worst": 363.697
+          },
+          "FunctionCall": {
+            "available": true,
+            "total": 1920.9509999999948,
+            "n": 2091,
+            "median": 0.017,
+            "p95": 0.844,
+            "worst": 356.914
+          },
+          "UpdateLayoutTree": {
+            "available": true,
+            "total": 125.43100000000017,
+            "n": 284,
+            "median": 0.209,
+            "p95": 1.497,
+            "worst": 7.572
+          },
+          "Layout": {
+            "available": true,
+            "total": 483.1690000000001,
+            "n": 85,
+            "median": 1.407,
+            "p95": 25.606,
+            "worst": 106.206
+          },
+          "PrePaint": {
+            "available": true,
+            "total": 100.17000000000017,
+            "n": 690,
+            "median": 0.009,
+            "p95": 0.801,
+            "worst": 7.474
+          },
+          "Paint": {
+            "available": true,
+            "total": 409.7390000000002,
+            "n": 284,
+            "median": 0.459,
+            "p95": 4.427,
+            "worst": 10.607
+          },
+          "Layerize": {
+            "available": true,
+            "total": 121.05700000000007,
+            "n": 297,
+            "median": 0.003,
+            "p95": 1.838,
+            "worst": 9.405
+          },
+          "Commit": {
+            "available": false,
+            "n": 0,
+            "total": null,
+            "median": null,
+            "p95": null,
+            "worst": null,
+            "reason": "The trace contains no complete duration entries for this stage; elapsed cost is unavailable."
+          },
+          "RunTask": {
+            "available": false,
+            "n": 0,
+            "total": null,
+            "median": null,
+            "p95": null,
+            "worst": null,
+            "reason": "The trace contains no complete duration entries for this stage; elapsed cost is unavailable."
+          }
+        },
+        "note": "Nested trace stages overlap; their totals must not be summed into end-to-end interaction time."
+      }
+    }
+  ],
+  "limitations": [
+    "Browser runs use Chrome, official local fixture and CPU emulation; no physical integrated GPU certification.",
+    "Click feedback is a two-requestAnimationFrame presentation proxy; Event Timing and trace stages are reported separately.",
+    "First opening includes module import/evaluation in the QA Vite server and is separate from warmed navigation."
+  ]
+}

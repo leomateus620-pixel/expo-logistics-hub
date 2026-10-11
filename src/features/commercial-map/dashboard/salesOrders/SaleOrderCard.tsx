@@ -1,10 +1,11 @@
+import { memo } from 'react';
 import { ArrowUpRight, FileText, LayoutGrid, Wallet } from 'lucide-react';
 import { formatDashboardCurrency } from '../commercialDashboardFormatters';
 import { paymentMethodLabel } from '../../sales/salesTypes';
 import type { SaleOrderSummary } from './salesOrdersService';
 import { documentSummary, fmtSaleDate, receiptSummary, saleName, saleStateLabel, signatureSummary } from './salesOrdersPresentation';
 
-export function SaleOrderCard({ record, onOpen }: { record: SaleOrderSummary; onOpen: () => void }) {
+export const SaleOrderCard = memo(function SaleOrderCard({ record, onOpen }: { record: SaleOrderSummary; onOpen: (record: SaleOrderSummary) => void }) {
   const name = saleName(record);
   return <article className="cso-card" data-sale-record={record.recordId}>
     <header className="cso-card-heading">
@@ -23,7 +24,7 @@ export function SaleOrderCard({ record, onOpen }: { record: SaleOrderSummary; on
     </div>
     <footer className="cso-card-footer">
       <span>{record.kind === 'LEGACY' ? 'Registro sem pedido' : <>{paymentMethodLabel(record.paymentMethod)}{record.installmentCount && record.installmentCount > 1 ? ` · ${record.installmentCount}x` : ''}</>}</span>
-      <button type="button" className="cso-card-open" data-open-sale={record.recordId} aria-label={`Detalhes de ${name} · ${record.reference}`} onClick={onOpen}>Detalhes<ArrowUpRight aria-hidden="true" /></button>
+      <button type="button" className="cso-card-open" data-open-sale={record.recordId} aria-label={`Detalhes de ${name} · ${record.reference}`} onClick={() => onOpen(record)}>Detalhes<ArrowUpRight aria-hidden="true" /></button>
     </footer>
   </article>;
-}
+});

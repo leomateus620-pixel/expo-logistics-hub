@@ -38,9 +38,11 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Canvas, type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, type RootState, type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, useTexture } from '@react-three/drei';
 import { CommercialMapSceneShaderWarmup } from './CommercialMapSceneShaderWarmup';
+import { CommercialMapPresentation } from './CommercialMapPresentation';
+import { COMMERCIAL_MAP_PRESENTATION_EVENT, isCommercialMapPresentationVisible } from '../../utils/frameActivity';
 import { readPreparedHeadquartersGeometry } from './headquarters/headquartersPreparationResource';
 import { CommercialMapInteractiveBoot, DeferredSceneLayer } from './DeferredSceneLayer';
 import { COMMERCIAL_MAP_CANONICAL_CONTENT, readCommercialMapQaQualityTier } from '../../utils/executionPolicy';
@@ -308,6 +310,8 @@ interface CommercialMapCanvasProps {
   initialPublicView?: PublicNavigation | null;
   technicalValidationAllowed?: boolean;
   active?: boolean;
+  /** Opaque dashboard/workspace coverage; never discards spatial resources. */
+  presentationVisible?: boolean;
 }
 
 interface CommercialMapSceneProps extends CommercialMapCanvasProps {
@@ -2749,29 +2753,35 @@ function CameraRig({
     let pausedAt: number | null = null;
     const handleVisibility = () => {
       const now = performance.now();
-      if (document.hidden) {
+      if (document.hidden || !isCommercialMapPresentationVisible(gl)) {
         pausedAt ??= now;
         return;
       }
       if (pausedAt !== null) {
-        const elapsed = now - pausedAt;
-        if (cameraTransition.current.active) cameraTransition.current.startedAt += elapsed;
+        const pausedSince = pausedAt;
+        // A real geometry update can start a newer transition while covered.
+        // Pause only that transition's own hidden interval, never its future.
+        const resumeStart = (startedAt: number) => startedAt + Math.max(0, now - Math.max(pausedSince, startedAt));
+        if (cameraTransition.current.active) cameraTransition.current.startedAt = resumeStart(cameraTransition.current.startedAt);
         if (lunarPath.current.active) {
-          lunarPath.current.startedAt += elapsed;
+          lunarPath.current.startedAt = resumeStart(lunarPath.current.startedAt);
           const startedAt = useCommercialMapStore.getState().lunarLaunchStartedAt;
-          if (startedAt !== null) useCommercialMapStore.setState({ lunarLaunchStartedAt: startedAt + elapsed });
+          if (startedAt !== null) useCommercialMapStore.setState({ lunarLaunchStartedAt: resumeStart(startedAt) });
         }
-        if (lunarPath.current.returning) lunarPath.current.returnStartedAt += elapsed;
+        if (lunarPath.current.returning) lunarPath.current.returnStartedAt = resumeStart(lunarPath.current.returnStartedAt);
         pausedAt = null;
       }
       invalidate();
     };
     const restoreFrame = () => invalidate();
     document.addEventListener('visibilitychange', handleVisibility);
+    gl.domElement.addEventListener(COMMERCIAL_MAP_PRESENTATION_EVENT, handleVisibility);
     window.addEventListener('pageshow', restoreFrame);
     gl.domElement.addEventListener('webglcontextrestored', restoreFrame);
+    handleVisibility();
     return () => {
       document.removeEventListener('visibilitychange', handleVisibility);
+      gl.domElement.removeEventListener(COMMERCIAL_MAP_PRESENTATION_EVENT, handleVisibility);
       window.removeEventListener('pageshow', restoreFrame);
       gl.domElement.removeEventListener('webglcontextrestored', restoreFrame);
     };
@@ -5539,7 +5549,6 @@ function AdaptiveCommercialMapScene({
       <Profiler id="CommercialMapScene" onRender={recordCommercialMapProfiler}>
         <Scene
           {...sceneProps}
-          active={active}
           renderQualityTier={renderQualityTier}
         />
       </Profiler>
@@ -5548,6 +5557,8 @@ function AdaptiveCommercialMapScene({
 }
 
 export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: CommercialMapCanvasProps) {
+  // Keep coverage out of the memoized Scene's props: its geometry is unchanged.
+  const { presentationVisible = true, ...sceneProps } = props;
   const bootSessionInitialized = useRef(false);
   if (!bootSessionInitialized.current) {
     bootSessionInitialized.current = true;
@@ -5566,6 +5577,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
   );
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const canvasCleanup = useRef<(() => void) | null>(null);
+  const canvasState = useRef<(() => RootState) | null>(null);
   const capabilityHints = useRef(readCommercialMapDeviceCapabilityHints()).current;
   const initialViewport = useRef({
     width: typeof window === 'undefined' ? 1366 : window.innerWidth,
@@ -5677,12 +5689,13 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
     <Canvas
       className="commercial-map-canvas"
       events={createCommercialMapEvents}
-      frameloop="demand"
+      frameloop={presentationVisible ? 'demand' : 'never'}
       camera={initialRenderConfig.current.camera}
-      dpr={initialPixelRatio}
+      dpr={canvasState.current?.().viewport.dpr ?? initialPixelRatio}
       shadows={props.publicScenePolicy ? false : COMMERCIAL_MAP_SHADOW_MAP_CONFIG}
       gl={createRenderer}
-        onCreated={({ gl, scene, camera }) => {
+        onCreated={({ gl, scene, camera, get }) => {
+          canvasState.current = get;
           markCommercialMapStage('canvas-created');
           canvasCleanup.current?.();
           const disposeGestureGuard = registerMapGestureGuard(gl.domElement);
@@ -5729,16 +5742,18 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
         setSelectedEntityId(null);
       }}
     >
-      {/* Adaptive DPR stays imperative inside the R3F root. Only this child
-          owns scene-tier state, so a DPR decision cannot reconfigure Canvas
-          and resize the drawing buffer a second time through React props. */}
+      {/* Adaptive DPR stays imperative inside this child. Visibility can
+          reconfigure Canvas, so its prop echoes the current canonical R3F
+          DPR instead of restoring the obsolete initial value. */}
+      <CommercialMapPresentation visible={presentationVisible}>
       <PublicScenePolicyContext.Provider value={props.publicScenePolicy ?? null}><PublicMaterialPool><AdaptiveCommercialMapScene
-        sceneProps={props}
-        active={active}
+        sceneProps={sceneProps}
+        active={active && presentationVisible}
         reducedGraphics={reducedGraphics}
         initialQualityState={initialQualityState}
         capabilityHints={capabilityHints}
       /></PublicMaterialPool></PublicScenePolicyContext.Provider>
+      </CommercialMapPresentation>
     </Canvas>
     <InteriorViewControls entities={entities} active={active} />
     </>

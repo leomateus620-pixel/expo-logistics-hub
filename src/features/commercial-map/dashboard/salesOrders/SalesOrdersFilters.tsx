@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { paymentMethodLabel, SALES_PAYMENT_METHODS, SALES_PAYMENT_METHOD_LABELS } from '../../sales/salesTypes';
 import type { SaleOrdersFilters } from './salesOrdersService';
 import { useSalesOrdersUiStore } from './useSalesOrdersUiStore';
@@ -24,7 +25,11 @@ function saleFilterLabel(key: keyof SaleOrdersFilters, value: string) {
 }
 
 export function SalesOrdersFilters() {
-  const { filters, filtersOpen, searchOpen, setFiltersOpen, setSearchOpen, setFilters, resetFilters } = useSalesOrdersUiStore();
+  const { filters, filtersOpen, searchOpen, setFiltersOpen, setSearchOpen, setFilters, resetFilters } = useSalesOrdersUiStore(useShallow((state) => ({
+    filters: state.filters, filtersOpen: state.filtersOpen, searchOpen: state.searchOpen,
+    setFiltersOpen: state.setFiltersOpen, setSearchOpen: state.setSearchOpen,
+    setFilters: state.setFilters, resetFilters: state.resetFilters,
+  })));
   const [searchDraft, setSearchDraft] = useState(filters.search);
   const rootRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
