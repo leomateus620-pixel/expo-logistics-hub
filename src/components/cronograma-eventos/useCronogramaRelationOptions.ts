@@ -106,7 +106,13 @@ export function buildCommissionOptions(
   units: ReturnType<typeof useOrgCommissions>['units'],
   linkedUnitIds: string[] = [],
 ): RelationalOption[] {
-  return selectableOrgUnits(units, linkedUnitIds).map((unit) => ({
+  const selectable = selectableOrgUnits(units, linkedUnitIds);
+  // CCPF (conselho) is its own category and always leads the list.
+  const ordered = [
+    ...selectable.filter((unit) => unit.type === 'conselho'),
+    ...selectable.filter((unit) => unit.type !== 'conselho'),
+  ];
+  return ordered.map((unit) => ({
     id: unit.id,
     label: unit.name,
     // `hint` participates in the existing persistence fallback; preserve it byte-for-byte.

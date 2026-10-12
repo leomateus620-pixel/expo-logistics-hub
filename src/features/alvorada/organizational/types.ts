@@ -109,7 +109,7 @@ export interface OrganizationalUnitRecord {
   id: string;
   name: string;
   slug: string;
-  type: 'comissao' | 'assessoria' | 'externo';
+  type: 'conselho' | 'comissao' | 'assessoria' | 'externo';
   displayOrder: number;
   isOfficial: boolean;
   isLegacy: boolean;

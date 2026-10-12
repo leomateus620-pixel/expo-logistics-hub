@@ -5,7 +5,7 @@
  * "Eventos Restaurante e Arena". No module may keep its own hardcoded list.
  */
 
-export type OrgUnitType = 'comissao' | 'assessoria' | 'externo';
+export type OrgUnitType = 'conselho' | 'comissao' | 'assessoria' | 'externo';
 
 export type OrgUnitResponsibleRole =
   | 'principal'
@@ -45,12 +45,14 @@ export function normalizeSearchTerm(value: string | null | undefined): string {
 }
 
 export function orgUnitTypeLabel(type: OrgUnitType): string {
+  if (type === 'conselho') return 'Conselho';
   if (type === 'assessoria') return 'Assessoria';
   if (type === 'externo') return 'Organização';
   return 'Comissão';
 }
 
 export function orgUnitGroupLabel(type: OrgUnitType): string {
+  if (type === 'conselho') return 'CCPF';
   if (type === 'assessoria') return 'Assessorias';
   if (type === 'externo') return 'Outras organizações';
   return 'Comissões';
@@ -124,7 +126,7 @@ export interface OrgUnitGroup {
 }
 
 export function groupOrgUnits(units: OrgUnit[]): OrgUnitGroup[] {
-  const order: OrgUnitType[] = ['comissao', 'assessoria', 'externo'];
+  const order: OrgUnitType[] = ['conselho', 'comissao', 'assessoria', 'externo'];
   return order
     .map((type) => ({
       type,
