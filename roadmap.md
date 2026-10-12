@@ -2,7 +2,8 @@
 
 ## Retratos de Diana e Roberto
 - [x] Registrar anexos originais por identidade confirmada na resolução compartilhada, sem alterar cadastros ou vínculos.
-- [ ] Conferir testes e apresentação na Agenda/Ecossistema em computador e celular.
+- [x] Validar resolução compartilhada, integração do Ecossistema e regressões (16 testes); conferir carregamento das duas imagens originais no navegador.
+- [ ] Conferir campos autenticados da Agenda/Ecossistema em computador e celular — bloqueio: sem sessão; acesso automático do solicitante indisponível por ausência de conta correspondente.
 - Não publicar.
 
 ## Agenda — CCPF, Entrevista/Podcast e cinco fotografias
