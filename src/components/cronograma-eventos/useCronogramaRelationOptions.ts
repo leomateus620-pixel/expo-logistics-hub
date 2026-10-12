@@ -9,6 +9,7 @@ import {
   responsibleRoleLabel,
   selectableOrgUnits,
 } from '@/lib/org-units';
+import { resolveOrgUnitIdentity } from './org-unit-identity';
 import type { RelationalOption, RelationalSelection } from './RelationalMultiSelect';
 import type {
   CronogramaEventCommissionLink,
@@ -112,16 +113,21 @@ export function buildCommissionOptions(
     ...selectable.filter((unit) => unit.type === 'conselho'),
     ...selectable.filter((unit) => unit.type !== 'conselho'),
   ];
-  return ordered.map((unit) => ({
-    id: unit.id,
-    label: unit.name,
-    // `hint` participates in the existing persistence fallback; preserve it byte-for-byte.
-    hint: orgUnitHint(unit),
-    description: orgUnitHint(unit),
-    context: unit.isLegacy ? 'Registro histórico' : 'Área institucional oficial',
-    searchText: unit.responsibles.map((person) => person.displayName).join(' '),
-    group: orgUnitGroupLabel(unit.type),
-  }));
+  return ordered.map((unit) => {
+    const identity = resolveOrgUnitIdentity(unit);
+    return {
+      id: unit.id,
+      label: unit.name,
+      // `hint` participates in the existing persistence fallback; preserve it byte-for-byte.
+      hint: orgUnitHint(unit),
+      description: orgUnitHint(unit),
+      context: unit.isLegacy ? 'Registro histórico' : 'Área institucional oficial',
+      searchText: unit.responsibles.map((person) => person.displayName).join(' '),
+      group: orgUnitGroupLabel(unit.type),
+      identityId: identity?.id,
+      identityKind: identity?.kind ?? (unit.type === 'conselho' || unit.type === 'assessoria' ? unit.type : 'comissao'),
+    };
+  });
 }
 
 /**

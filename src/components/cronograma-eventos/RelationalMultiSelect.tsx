@@ -39,7 +39,13 @@ import {
 import { normalizeSearchTerm } from '@/lib/org-units';
 import { useMobileOverlayHistory } from './mobile/useMobileOverlayHistory';
 import { PersonAvatar } from './PersonAvatar';
+import {
+  OrgUnitIdentityBadge,
+  resolveOrgUnitIdentity,
+  type OrgUnitKind,
+} from './org-unit-identity';
 import '@/styles/cronograma-registration-interactions.css';
+import '@/styles/org-unit-identity.css';
 
 const MAX_VISIBLE_OPTIONS = 120;
 
@@ -58,6 +64,10 @@ export interface RelationalOption {
   context?: string;
   /** Additional normalized-search source that is never persisted. */
   searchText?: string;
+  /** Presentation-only: stable org-unit identity (slug) that selects the icon. Never persisted. */
+  identityId?: string;
+  /** Presentation-only: category shown by the identity container. */
+  identityKind?: OrgUnitKind;
 }
 
 export interface RelationalSelection {
@@ -628,9 +638,11 @@ export function RelationalMultiSelect({
                     onClick={() => addOption(option)}
                   >
                     {variant === 'organization' ? (
-                      <span className="cronograma-relation-option__identity" aria-hidden="true">
-                        <Building2 />
-                      </span>
+                      <OrgUnitIdentityBadge
+                        identityId={option.identityId}
+                        kind={option.identityKind}
+                        className="cronograma-relation-option__identity"
+                      />
                     ) : (
                       <PersonAvatar
                         name={option.label}
@@ -764,6 +776,9 @@ export function RelationalMultiSelect({
             const detail = matchingOption?.description ?? item.hint;
             const context = matchingOption?.context
               ?? ((item.id.startsWith('custom:') || item.id.startsWith('external:')) ? 'Responsável externo' : undefined);
+            const identityId = variant === 'organization'
+              ? matchingOption?.identityId ?? resolveOrgUnitIdentity({ slug: item.hint, name: item.label })?.id
+              : undefined;
             /** People: first/primary link is the "Responsável", the rest are guests. */
             const roleLabel = variant === 'organization'
               ? (item.isPrimary ? 'Área principal' : 'Área institucional')
@@ -776,9 +791,11 @@ export function RelationalMultiSelect({
                 data-role={variant === 'person' && !item.isPrimary ? 'guest' : undefined}
               >
                 {variant === 'organization' ? (
-                  <span className="cronograma-relation-selected__identity" aria-hidden="true">
-                    <Building2 />
-                  </span>
+                  <OrgUnitIdentityBadge
+                    identityId={identityId}
+                    kind={matchingOption?.identityKind}
+                    className="cronograma-relation-selected__identity"
+                  />
                 ) : (
                   <PersonAvatar
                     name={item.label}
