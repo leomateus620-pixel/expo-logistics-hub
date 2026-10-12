@@ -1,0 +1,208 @@
+/* Identidade iconográfica das comissões, assessorias e do CCPF no seletor de áreas da Agenda.
+   Somente apresentação: contêiner 2,6 rem, símbolo ~22 px, traço 1,85. */
+
+.org-unit-identity {
+  --oui-size: 2.6rem;
+  --oui-glyph: 1.4rem;
+  --oui-border: oklch(var(--brand-indigo-200) / 0.78);
+  --oui-surface-from: oklch(var(--neutral-0));
+  --oui-surface-to: oklch(var(--brand-indigo-50));
+  --oui-ink: oklch(var(--brand-indigo-500));
+
+  position: relative;
+  display: grid;
+  width: var(--oui-size);
+  height: var(--oui-size);
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--oui-border);
+  border-radius: 0.85rem;
+  background: linear-gradient(150deg, var(--oui-surface-from), var(--oui-surface-to));
+  color: var(--oui-ink);
+  box-shadow:
+    0 1px 2px oklch(var(--brand-navy-900) / 0.06),
+    inset 0 1px 0 oklch(var(--neutral-0));
+  transition:
+    border-color 150ms var(--ease-standard),
+    background-color 150ms var(--ease-standard),
+    box-shadow 170ms var(--ease-standard),
+    transform 150ms var(--ease-decelerate);
+}
+
+.org-unit-identity .org-unit-identity__glyph {
+  width: var(--oui-glyph);
+  height: var(--oui-glyph);
+  flex: none;
+}
+
+.org-unit-identity .org-unit-identity__symbol {
+  width: 1.8rem;
+  height: 1.8rem;
+  flex: none;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Conselho: superfície clara e filete dourado para receber a marca sem tintura. */
+.org-unit-identity[data-kind='conselho'] {
+  --oui-border: oklch(var(--brand-gold-500) / 0.5);
+  --oui-surface-from: oklch(var(--neutral-0));
+  --oui-surface-to: oklch(var(--brand-gold-400) / 0.14);
+}
+
+/* Estado de repouso nas linhas: aplica-se ao resultado da busca e ao item já selecionado. */
+.cronograma-relation-option .org-unit-identity.cronograma-relation-option__identity,
+.cronograma-relation-selected__item .org-unit-identity.cronograma-relation-selected__identity {
+  width: var(--oui-size);
+  height: var(--oui-size);
+  border: 1px solid var(--oui-border);
+  border-radius: 0.85rem;
+  background: linear-gradient(150deg, var(--oui-surface-from), var(--oui-surface-to));
+  color: var(--oui-ink);
+}
+
+/* Hover e item ativo por teclado: realce suave do contêiner. */
+.cronograma-relation-option[data-active='true'] .org-unit-identity {
+  --oui-border: oklch(var(--brand-indigo-300) / 0.8);
+  --oui-surface-to: oklch(var(--brand-indigo-100) / 0.85);
+  box-shadow:
+    0 4px 10px -6px oklch(var(--brand-navy-900) / 0.28),
+    inset 0 1px 0 oklch(var(--neutral-0));
+}
+
+.cronograma-relation-option[data-active='true'] .org-unit-identity[data-kind='conselho'] {
+  --oui-border: oklch(var(--brand-gold-500) / 0.72);
+  --oui-surface-to: oklch(var(--brand-gold-400) / 0.26);
+}
+
+/* Foco visível no contêiner; o anel externo da linha continua o do sistema. */
+.cronograma-relation-option:focus-visible {
+  outline: 2px solid oklch(var(--focus-ring));
+  outline-offset: -2px;
+}
+
+/* Pressionamento: resposta mínima, sem deslocar o layout. */
+.cronograma-relation-option:active .org-unit-identity {
+  transform: scale(0.94);
+}
+
+/* Seleção: mantém o símbolo individual e acrescenta superfície e borda. */
+.cronograma-relation-option[data-selected='true'] .org-unit-identity,
+.cronograma-relation-selected__item .org-unit-identity.cronograma-relation-selected__identity {
+  --oui-border: oklch(var(--brand-green) / 0.5);
+  --oui-surface-from: oklch(var(--neutral-0));
+  --oui-surface-to: oklch(var(--brand-green) / 0.13);
+}
+
+.cronograma-relation-selected__item[data-primary='true'] .org-unit-identity.cronograma-relation-selected__identity {
+  --oui-border: oklch(var(--brand-gold-500) / 0.7);
+  --oui-surface-to: oklch(var(--brand-gold-400) / 0.2);
+}
+
+/* Hierarquia tipográfica: nome em destaque moderado; categoria e responsáveis em segundo plano. */
+.cronograma-relation-option:has(.org-unit-identity) {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.72rem;
+  padding: 0.45rem 0.6rem;
+}
+
+.cronograma-relation-option:has(.org-unit-identity) .cronograma-relation-option__copy strong {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  line-height: 1.28;
+}
+
+.cronograma-relation-option:has(.org-unit-identity) .cronograma-relation-option__copy > span {
+  margin-top: 0.14rem;
+  color: oklch(var(--muted-foreground));
+  font-size: 0.68rem;
+  font-weight: 500;
+  line-height: 1.36;
+}
+
+.cronograma-relation-option:has(.org-unit-identity) .cronograma-relation-option__copy small {
+  margin-top: 0.1rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+}
+
+.cronograma-relation-selected__item:has(.org-unit-identity) {
+  gap: 0.72rem;
+  align-items: center;
+}
+
+.cronograma-relation-selected__item:has(.org-unit-identity) .cronograma-relation-selected__copy strong {
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.28;
+}
+
+.cronograma-relation-selected__item:has(.org-unit-identity) .cronograma-relation-selected__copy > span {
+  font-size: 0.68rem;
+  font-weight: 500;
+}
+
+@media (hover: hover) {
+  .cronograma-relation-option:hover .org-unit-identity {
+    --oui-border: oklch(var(--brand-indigo-300) / 0.8);
+    --oui-surface-to: oklch(var(--brand-indigo-100) / 0.85);
+  }
+
+  .cronograma-relation-option:hover .org-unit-identity[data-kind='conselho'] {
+    --oui-border: oklch(var(--brand-gold-500) / 0.72);
+    --oui-surface-to: oklch(var(--brand-gold-400) / 0.26);
+  }
+
+  .cronograma-relation-option[data-selected='true']:hover .org-unit-identity {
+    --oui-border: oklch(var(--brand-green) / 0.65);
+    --oui-surface-to: oklch(var(--brand-green) / 0.18);
+  }
+}
+
+.cronograma-relation-option[data-selected='true'][data-active='true'] .org-unit-identity {
+  --oui-border: oklch(var(--brand-green) / 0.65);
+  --oui-surface-to: oklch(var(--brand-green) / 0.18);
+}
+
+/* Telas estreitas: o contêiner mantém 2,6 rem e o texto quebra naturalmente. */
+@media (max-width: 374px) {
+  .cronograma-relation-option:has(.org-unit-identity) {
+    gap: 0.58rem;
+    padding-inline: 0.45rem;
+  }
+
+  .cronograma-relation-selected__item:has(.org-unit-identity) {
+    gap: 0.58rem;
+  }
+
+  .cronograma-relation-option .org-unit-identity.cronograma-relation-option__identity,
+  .cronograma-relation-selected__item .org-unit-identity.cronograma-relation-selected__identity {
+    width: var(--oui-size);
+    height: var(--oui-size);
+  }
+}
+
+@media (max-width: 520px) {
+  .cronograma-relation-selected__item:has(.org-unit-identity) {
+    align-items: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .org-unit-identity {
+    transition-duration: 0.01ms !important;
+  }
+
+  .cronograma-relation-option:active .org-unit-identity {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .org-unit-identity {
+    --oui-border: oklch(var(--brand-navy-900) / 0.6);
+  }
+}
