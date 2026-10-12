@@ -180,7 +180,7 @@
 }
 /* Compact header: two slim rows (identity 32 px, tools 36 px) instead of two
    44 px rows. Drawn controls are smaller, but each one keeps an invisible
-   44 px-wide target; the tools row sits above the identity row so the
+   44 px target (insets include the 1 px border); the tools row sits above the identity row so the
    overlapping band always resolves to the control the finger is on. */
 @container commercial-map-module (max-width: 720px) {
   .commercial-map-module__bar {
@@ -213,7 +213,7 @@
   .commercial-map-module__search-trigger svg { width: 16px; height: 16px; }
   .commercial-map-module__search-trigger.has-query::after { top: 4px; right: 3px; width: 6px; height: 6px; }
   .commercial-map-module__back::before, .commercial-map-module__search-trigger::before,
-  .commercial-map-module__search button::before { position: absolute; inset: -6px; content: ''; }
+  .commercial-map-module__search button::before { position: absolute; inset: -7px; content: ''; }
   .commercial-map-module__back { grid-column: 1; grid-row: 1; }
   .commercial-map-module__search-trigger { grid-column: 3; grid-row: 1; }
   .commercial-map-module__edition {
@@ -255,7 +255,7 @@
   .commercial-map-module__sign-out svg { width: 18px; height: 18px; }
   .commercial-map-header-tools { gap: clamp(4px, 1.6vw, 8px); }
   .commercial-map-header-tools > button { width: var(--bar-tool); height: var(--bar-tool); min-width: var(--bar-tool); min-height: var(--bar-tool); }
-  .commercial-map-header-tools > button::before, .commercial-map-module__sign-out::before { position: absolute; inset: -4px; content: ''; }
+  .commercial-map-header-tools > button::before, .commercial-map-module__sign-out::before { position: absolute; inset: -5px; content: ''; }
   .commercial-map-header-tools svg { width: 19px; height: 19px; }
   .commercial-map-header-visit svg { width: 20px; height: 20px; }
   .commercial-map-header-tools .commercial-map-header-dashboard svg { width: 20px; height: 20px; }
@@ -276,7 +276,7 @@
     .commercial-map-module__back, .commercial-map-module__search-trigger, .commercial-map-module__sign-out,
     .commercial-map-header-tools > button { position: relative; width: var(--bar-tool); height: var(--bar-tool); min-width: var(--bar-tool); min-height: var(--bar-tool); }
     .commercial-map-module__back::before, .commercial-map-module__search-trigger::before, .commercial-map-module__sign-out::before,
-    .commercial-map-header-tools > button::before { position: absolute; inset: -4px; content: ''; }
+    .commercial-map-header-tools > button::before { position: absolute; inset: -5px; content: ''; }
     .commercial-map-header-tools > .commercial-map-header-sales { width: auto; }
     .commercial-map-module__edition { min-height: 30px; }
     .commercial-map-module__search { width: min(240px, 28vw); height: var(--bar-tool); }

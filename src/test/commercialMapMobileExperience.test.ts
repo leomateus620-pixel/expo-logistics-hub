@@ -66,7 +66,7 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     expect(declarations(topbar, '.commercial-map-toolbar-mobile', '--rail-right')).toEqual(
       compactControlConditions.map((conditions) => ({ value: 'max(8px, env(safe-area-inset-right))', conditions })),
     );
-    expect(declarations(topbar, '.commercial-map-toolbar-mobile', '--glass-control-size')[0]).toEqual({ value: 'clamp(36px, 10.2vw, 40px)', conditions: [] });
+    expect(declarations(topbar, '.commercial-map-toolbar-mobile', '--glass-control-size')[0]).toEqual({ value: 'clamp(38px, 10.2vw, 40px)', conditions: [] });
   });
 
   it('compacta o cabeçalho mobile em duas linhas finas mantendo alvos de toque de 44 px', () => {
@@ -75,9 +75,9 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     expect(declarations(shell, '.commercial-map-module__bar', '--bar-identity')).toEqual([{ value: '32px', conditions: compact }]);
     expect(declarations(shell, '.commercial-map-module__bar', '--bar-tool')).toContainEqual({ value: '36px', conditions: compact });
     expect(declarations(shell, '.commercial-map-module__bar', 'min-height')).not.toContainEqual({ value: '108px', conditions: compact });
-    // 32 px control + 2 × 6 px and 36 px control + 2 × 4 px both reach 44 px.
-    expect(declarations(shell, '.commercial-map-module__back::before', 'inset')).toContainEqual({ value: '-6px', conditions: compact });
-    expect(declarations(shell, '.commercial-map-header-tools > button::before', 'inset')).toContainEqual({ value: '-4px', conditions: compact });
+    // Insets are measured from the padding box: 30 + 2 × 7 and 34 + 2 × 5 reach 44 px.
+    expect(declarations(shell, '.commercial-map-module__back::before', 'inset')).toContainEqual({ value: '-7px', conditions: compact });
+    expect(declarations(shell, '.commercial-map-header-tools > button::before', 'inset')).toContainEqual({ value: '-5px', conditions: compact });
     expect(declarations(shell, '.commercial-map-module__tools-host', 'z-index')).toContainEqual({ value: '1', conditions: compact });
   });
 

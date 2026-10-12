@@ -152,10 +152,10 @@
   transition: transform var(--glass-duration) var(--glass-ease), background-color var(--glass-duration) var(--glass-ease), border-color var(--glass-duration) var(--glass-ease), box-shadow var(--glass-duration) var(--glass-ease), opacity var(--glass-duration) var(--glass-ease);
 }
 /* The touch target fills the capsule height and the neighbouring gaps even
-   when the drawn control is smaller than 44 px. */
+   when the drawn control is smaller than 44 px (insets include the border). */
 .commercial-map-control-rail__scroll > button::before {
   position: absolute;
-  inset: calc(var(--glass-padding) * -1) calc(var(--glass-gap) / -2);
+  inset: calc(-1px - var(--glass-padding)) calc(-1px - var(--glass-gap) / 2);
   content: '';
 }
 .commercial-map-control-rail__scroll > button svg,
@@ -212,8 +212,8 @@
 /* Compact rail: one centred capsule sized from the available width. The drawn
    controls shrink with the viewport; touch targets keep the capsule height. */
 .commercial-map-toolbar-mobile {
-  --glass-control-size: clamp(36px, 10.2vw, 40px);
-  --glass-gap: clamp(1px, .6vw, 3px);
+  --glass-control-size: clamp(38px, 10.2vw, 40px);
+  --glass-gap: clamp(2px, 1.2vw, 5px);
   --glass-padding: 3px;
   --glass-icon-size: calc(var(--glass-control-size) * .55);
   --glass-radius: calc(var(--glass-control-size) / 2 + var(--glass-padding) + 1px);
@@ -241,7 +241,7 @@
 @media (max-width: 950px) and (max-height: 520px) {
   .commercial-map-topbar { display: none; }
   .commercial-map-toolbar-mobile {
-    --glass-control-size: 36px;
+    --glass-control-size: 38px;
     --rail-left: max(8px, env(safe-area-inset-left));
     --rail-right: max(8px, env(safe-area-inset-right));
     position: absolute;
