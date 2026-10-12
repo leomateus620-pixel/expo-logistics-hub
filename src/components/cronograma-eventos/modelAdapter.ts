@@ -83,15 +83,21 @@ const sourceToVisualKind: Record<SourceCronogramaEvent['eventType'], CronogramaK
   evento_principal: 'event',
   representacao: 'event',
   sem_data: 'decision',
+  entrevista: 'interview',
+  podcast: 'podcast',
 };
 
-const visualToSourceKind: Record<CronogramaKind, SourceCronogramaEvent['eventType']> = {
+export const visualToSourceKind: Record<CronogramaKind, SourceCronogramaEvent['eventType']> = {
   milestone: 'planejamento',
   event: 'evento_institucional',
   meeting: 'reuniao',
   deadline: 'contratacao',
   decision: 'sem_data',
+  interview: 'entrevista',
+  podcast: 'podcast',
 };
+
+export { sourceToVisualKind };
 
 function normalizeYear(year: number): 2026 | 2027 | 2028 {
   if (year === 2026 || year === 2027 || year === 2028) return year;

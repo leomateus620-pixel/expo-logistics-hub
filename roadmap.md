@@ -1,5 +1,12 @@
 # Roadmap
 
+## Agenda — CCPF, Entrevista/Podcast e cinco fotografias
+- [x] CCPF único no cadastro institucional com Marcos, Dário, Elemar e Milton; nó raiz do Ecossistema lê os vínculos, sem nó inferior nem card.
+- [x] Entrevista e Podcast no tipo, com ida e volta persistida e classificação por intenção.
+- [x] Fotos de Débora, Thaís, Sara, Milton e Vanessa por ID, sem bordas, com prioridade comum.
+- [ ] Conferência visual autenticada no computador/celular (aguarda sessão autorizada na prévia).
+- Não publicar sem pedido.
+
 ## Agenda — zoom móvel, locais e alerta do Restaurante
 - [x] Substituir a escolha nativa de locais por quatro opções explícitas e "Outro local", preservando código e texto histórico.
 - [x] Corrigir fonte de edição móvel nos controles compartilhados e limites de painéis.

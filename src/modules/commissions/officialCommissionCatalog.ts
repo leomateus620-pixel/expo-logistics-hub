@@ -483,6 +483,7 @@ export const OFFICIAL_COMMISSION_UNITS: readonly OfficialUnitEntry[] = [
 /** Frentes registradas no banco que NÃO são exibidas como card no portal. */
 export const NON_PORTAL_UNIT_SLUGS: readonly string[] = [
   'central',
+  'ccpf',
   'assessoria-projetos-e-captacoes-institucionais',
   'fotografia',
 ];

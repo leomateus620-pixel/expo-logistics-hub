@@ -23,7 +23,9 @@ export type CronogramaEventType =
   | 'lancamento'
   | 'evento_principal'
   | 'representacao'
-  | 'sem_data';
+  | 'sem_data'
+  | 'entrevista'
+  | 'podcast';
 
 export interface CronogramaCommissionLink {
   slug: string;

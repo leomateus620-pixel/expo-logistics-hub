@@ -53,6 +53,8 @@ export function normalizeText(raw: string | null | undefined): string {
 const KIND_PREFIX_RULES: Array<[CronogramaKind, RegExp]> = [
   ['milestone', /^(marco|hito)\b/],
   ['meeting', /^(reuniao|reunioes|encontro|assembleia|comite|alinhamento|meeting|mesa redonda|workshop de alinhamento)\b/],
+  ['interview', /^(entrevista|entrevistas)\b/],
+  ['podcast', /^(podcast|gravacao (do |de )?(episodio|podcast)|episodio)\b/],
   ['deadline', /^(prazo|data limite|deadline|entrega ate|vencimento|encerramento das inscricoes|ultimo dia)\b/],
   ['decision', /^(decisao|deliberacao|aprovacao|votacao|homologacao)\b/],
   ['event', /^(evento|cerimonia|solenidade|abertura|coletiva|visita|lancamento oficial de|show|apresentacao)\b/],
@@ -72,6 +74,8 @@ const KIND_SIGNALS: KindSignalRule[] = [
   { kind: 'milestone', pattern: /\b(conclusao|concluida|concluido|finalizacao de etapa|entrega oficial|abertura oficial|inicio oficial|implantacao concluida|encerramento de etapa|marco)\b/, weight: 2.2 },
   { kind: 'milestone', pattern: /\b(lancamento oficial|abertura de vendas|publicacao oficial)\b/, weight: 1.5 },
   { kind: 'event', pattern: /\b(evento|cerimonia|solenidade|coletiva|visita|show|apresentacao|treinamento|recepcao|jantar|almoco|feira|campanha|producao|inauguracao)\b/, weight: 1.6 },
+  { kind: 'interview', pattern: /\b(entrevista|entrevistas)\b/, weight: 1.9 },
+  { kind: 'podcast', pattern: /\b(podcast|podcasts)\b/, weight: 1.9 },
 ];
 
 function headOf(text: string): string {

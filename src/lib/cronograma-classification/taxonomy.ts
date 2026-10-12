@@ -33,6 +33,8 @@ export const CRONOGRAMA_KIND_LABELS: Record<CronogramaKind, string> = {
   deadline: 'Prazo',
   decision: 'Decisão',
   milestone: 'Marco',
+  interview: 'Entrevista',
+  podcast: 'Podcast',
 };
 
 export const CRONOGRAMA_KIND_HINTS: Record<CronogramaKind, string> = {
@@ -41,6 +43,8 @@ export const CRONOGRAMA_KIND_HINTS: Record<CronogramaKind, string> = {
   deadline: 'Data limite para entrega, inscrição, pagamento, contratação ou documentação.',
   decision: 'Registro de uma deliberação, aprovação ou definição formal relevante.',
   milestone: 'Momento que representa o avanço ou a conclusão de uma etapa relevante do projeto.',
+  interview: 'Participação em rádio, TV, jornal ou canal digital para responder perguntas.',
+  podcast: 'Gravação ou transmissão de episódio em áudio ou vídeo.',
 };
 
 /** Legacy labels/keys seen in the database mapped onto the canonical taxonomy. */

@@ -48,6 +48,14 @@ const EXECUTIVE_IDENTITY_REPAIRS = [
 
 const CENTRAL_COMMISSION_NAMES = new Set(['central', 'comissao central']);
 
+/** Institutional CCPF unit (Agenda selector); feeds the root node, never level 4. */
+export const CCPF_UNIT_SLUG = 'ccpf';
+
+function isCcpfUnit(unit: Pick<OrganizationalUnitRecord, 'slug' | 'name'>): boolean {
+  return normalizeOrganizationalText(unit.slug) === CCPF_UNIT_SLUG
+    || normalizeOrganizationalText(unit.name).startsWith('ccpf');
+}
+
 // Presentation-only exception: the director account is documented in
 // provision-presidentes-2028/data.ts; both real accounts have the same official
 // portrait in personPhotos.ts. Do not merge them or discard advisory assignments.
@@ -401,6 +409,9 @@ function upsertPerson(
     const value = nonEmpty(sourceId);
     if (value) person.sourceIdSet.add(value);
   });
+  // An explicitly registered institutional portrait (by user ID) wins everywhere.
+  const institutional = person.userId ? getPersonPhoto(null, person.userId) : null;
+  if (institutional) person.avatarUrl = institutional;
   if (input.avatarUrl && !person.avatarUrl) person.avatarUrl = input.avatarUrl;
   if (!person.avatarUrl) person.avatarUrl = getPersonPhoto(person.fullName, person.userId);
 
@@ -824,6 +835,7 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
   const levelFourUnits = units.filter((unit) => {
     const supportedType = unit.type === 'comissao' || unit.type === 'assessoria';
     const isCentral = isCentralCommissionUnit(unit);
+    if (isCcpfUnit(unit)) return false;
     const included =
       supportedType && unit.isOfficial && !unit.isLegacy && !isCentral;
     if (!included && !isCentral) {
@@ -870,13 +882,25 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
   });
 
   const ccpAliasKeys = new Set(CCP_AUTHORITY_ALIASES.map(normalizeOrganizationalText));
-  const ccpPersonIds = uniqueSorted(
-    members.flatMap((member) => {
+  const ccpUnitPersonIds = units.filter(isCcpfUnit).flatMap((unit) => unit.responsibles.flatMap((responsible) => {
+    if (responsible.responsibleType !== 'pessoa') return [];
+    const personId = upsertPerson(registry, {
+      fullName: responsible.displayName,
+      userId: responsible.userId,
+      roles: [CCPF_SHORT_LABEL],
+      sourceIds: [responsible.id, responsible.userId],
+      sourcePriority: 2,
+    }, anomalies);
+    return personId ? [personId] : [];
+  }));
+  const ccpPersonIds = uniqueSorted([
+    ...ccpUnitPersonIds,
+    ...members.flatMap((member) => {
       if (!ccpAliasKeys.has(normalizeOrganizationalText(member.nome_exibicao))) return [];
       const personId = personIdForMember(registry, member);
       return personId ? [personId] : [];
     }),
-  );
+  ]);
 
   CCP_AUTHORITY_ALIASES.forEach((alias) => {
     const normalized = normalizeOrganizationalText(alias);

@@ -77,6 +77,8 @@ export const typeLabels: Record<CronogramaEventType, string> = {
   evento_principal: 'Evento principal',
   representacao: 'Representação',
   sem_data: 'Sem data',
+  entrevista: 'Entrevista',
+  podcast: 'Podcast',
 };
 
 export const monthNames = [

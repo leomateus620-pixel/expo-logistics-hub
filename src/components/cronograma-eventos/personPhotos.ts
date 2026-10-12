@@ -39,6 +39,11 @@ import julioBravo from '@/assets/person-julio-bravo.png.asset.json';
 import elemarLenz from '@/assets/person-elemar-lenz.png.asset.json';
 import cristinaScheuermann from '@/assets/person-cristina-scheuermann.png.asset.json';
 import jefersonAraujo from '@/assets/person-jeferson-araujo.png.asset.json';
+import deboraBamberg from '@/assets/person-debora-bamberg.webp.asset.json';
+import thaisBroglio from '@/assets/person-thais-broglio.webp.asset.json';
+import saraKirchhof from '@/assets/person-sara-kirchhof-varela.webp.asset.json';
+import miltonRacho from '@/assets/person-milton-racho.webp.asset.json';
+import vanessaPeripolli from '@/assets/person-vanessa-peripolli.webp.asset.json';
 
 /**
  * Only these members have an official portrait. Everyone else keeps the
@@ -89,6 +94,12 @@ const PERSON_PHOTOS: Record<string, string> = {
   'cristina beatriz manjabosco scheuermann': cristinaScheuermann.url,
   'cristina scheuermann': cristinaScheuermann.url,
   'jeferson araujo': jefersonAraujo.url,
+  // Nomes oficiais completos, apenas para registros sem user_id.
+  'debora leticia bamberg': deboraBamberg.url,
+  'thais broglio': thaisBroglio.url,
+  'sara kirchhof varela': saraKirchhof.url,
+  'milton racho': miltonRacho.url,
+  'vanessa peripolli': vanessaPeripolli.url,
 };
 
 const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
@@ -140,6 +151,12 @@ const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
   '823f010b-c4b1-4d9f-a8c7-6d66d58f4670': elemarLenz.url,
   'c3e01950-00ba-497a-b2b0-e13debce41e2': cristinaScheuermann.url,
   '7e2422a6-91e8-428c-9cdd-f25eb503e9c3': jefersonAraujo.url,
+  // Identidades confirmadas por ID em 12/10/2026 (sem associação por nome parcial).
+  'd251d7d6-389f-42f3-afef-8b94db02a47b': deboraBamberg.url,
+  'eafd6b31-61d5-45a9-bba0-190fa06f30d6': thaisBroglio.url,
+  'ad37de44-c925-4add-b96a-9fdcc76411ed': saraKirchhof.url,
+  '2b76c299-e357-4597-bf22-acd307990cb7': miltonRacho.url,
+  '2e229647-0db7-451d-800c-395190471751': vanessaPeripolli.url,
 };
 
 function normalize(value: string): string {
