@@ -78,13 +78,7 @@ export function FenasojaEcosystemExperienceView({
       }
       if (event.key === 'Escape') {
         const activeElement = document.activeElement;
-        // A typed search is cleared by the field itself; an open detail panel
-        // closes itself before the dialog does.
-        if (
-          activeElement instanceof HTMLInputElement
-          && activeElement.closest('.org-search')
-          && activeElement.value
-        ) return;
+        // An open detail panel closes before the dialog.
         const openDetail = dialog.current?.querySelector<HTMLElement>(
           '.org-ecosystem__ready[data-org-detail-open="true"]',
         );

@@ -44,12 +44,23 @@ const LEVEL_RADII: Record<1 | 2 | 3 | 4, number> = {
 };
 
 const TOP_PADDING = 88;
-const LEVEL_2_Y = 176;
-const LEVEL_3_Y = 314;
-const LEVEL_4_Y = 480;
-const LEVEL_4_ROW_GAP = 184;
+// Include the entire portrait + caption, including the CCPF member count.
+const LEVEL_2_Y = 360;
+const LEVEL_3_Y = 590;
+const LEVEL_4_Y = 810;
+const LEVEL_4_ROW_GAP = 232;
 const LEVEL_4_COLUMN_GAP = 184;
 const SIDE_PADDING = 102;
+
+/** Visual rows are independent of institutional authority and filter identity. */
+export function organizationalPresentationLevel(node: OrgNode): number {
+  if (node.type === 'ccp') return 1;
+  if (node.type === 'executive') {
+    const roles = node.metadata.executiveRole;
+    return Array.isArray(roles) && roles.includes('president') ? 1 : 2;
+  }
+  return node.authorityLevel;
+}
 
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value));
@@ -102,20 +113,25 @@ function averageParentX(
 
 function createConnectionPath(source: PositionedOrgNode, target: PositionedOrgNode): string {
   const side = target.x >= source.x ? 1 : -1;
-  // Fan out along the rim, leaving the caption below each portrait unobstructed.
   const sourceX = source.x + side * source.radius * 0.9;
   const sourceY = source.y + source.radius * 0.38;
-  const targetY = target.y - target.radius - 5;
+  const captionHalfWidth = source.node.type === 'ccp' ? 143
+    : source.node.type === 'executive' ? 112 : 98;
+  const exitX = source.x + side * (captionHalfWidth + 12);
+  // Leave the rim horizontally before descending beside the source caption.
+  const departure = `M ${sourceX} ${sourceY} C ${sourceX + side * 24} ${sourceY}, ${exitX} ${sourceY}, ${exitX} ${sourceY + 24}`;
   if (target.node.authorityLevel === 4) {
-    // Later rows travel through column gutters, never through the portraits or
-    // captions in earlier rows. The final short curve approaches from above.
-    const gutterX = target.x - side * (LEVEL_4_COLUMN_GAP / 2);
-    const laneY = targetY - 30;
-    const fanY = Math.min(sourceY + 58, laneY - 32);
-    return `M ${sourceX} ${sourceY} C ${sourceX + side * 32} ${fanY}, ${gutterX} ${fanY}, ${gutterX} ${fanY + 26} L ${gutterX} ${laneY - 18} Q ${gutterX} ${laneY} ${gutterX + side * 18} ${laneY} L ${target.x - side * 16} ${laneY} Q ${target.x} ${laneY} ${target.x} ${targetY}`;
+    // Keep the established column gutters and fan-out. The approach to each
+    // upper side of the rim stays below the preceding row's long captions.
+    const gutterSide = target.x === source.x ? -1 : side;
+    const gutterX = target.x - gutterSide * (LEVEL_4_COLUMN_GAP / 2);
+    const fanY = source.y + 156;
+    const targetX = target.x - gutterSide * target.radius * 0.9;
+    const targetY = target.y - target.radius * 0.38;
+    return `${departure} L ${exitX} ${fanY - 18} Q ${exitX} ${fanY} ${exitX + side * 18} ${fanY} L ${gutterX} ${fanY} L ${gutterX} ${targetY - 18} Q ${gutterX} ${targetY} ${targetX} ${targetY}`;
   }
-  const bend = Math.max(24, Math.abs(targetY - sourceY) * 0.5);
-  return `M ${sourceX} ${sourceY} C ${sourceX + side * 22} ${sourceY + bend}, ${target.x} ${targetY - bend}, ${target.x} ${targetY}`;
+  const targetY = target.y - target.radius - 5;
+  return `${departure} L ${exitX} ${targetY - 22} Q ${exitX} ${targetY} ${target.x} ${targetY}`;
 }
 
 export interface OrganizationalLayoutOptions {
@@ -137,9 +153,10 @@ export function calculateOrganizationalLayout(
   )));
   const byLevel = new Map<number, OrgNode[]>();
   renderable.forEach((node) => {
-    const group = byLevel.get(node.authorityLevel) ?? [];
+    const level = organizationalPresentationLevel(node);
+    const group = byLevel.get(level) ?? [];
     group.push(node);
-    byLevel.set(node.authorityLevel, group);
+    byLevel.set(level, group);
   });
 
   const level4 = byLevel.get(4) ?? [];
@@ -151,13 +168,15 @@ export function calculateOrganizationalLayout(
     : clamp(Math.ceil(level4.length / 3), 1, 12);
   const level4Rows = Math.max(1, Math.ceil(level4.length / level4Columns));
   const worldWidth = Math.max(
-    compact ? 466 : 660,
+    compact ? 600 : 660,
     (level4Columns - 1) * LEVEL_4_COLUMN_GAP + SIDE_PADDING * 2,
     (Math.min(10, Math.max(1, level3.length)) - 1) * 188 + SIDE_PADDING * 2,
   );
-  const worldHeight = (compact ? 234 : 0) + (level4.length > 0
-    ? LEVEL_4_Y + (level4Rows - 1) * LEVEL_4_ROW_GAP + 132
-    : LEVEL_3_Y + 180);
+  const centralY = LEVEL_3_Y;
+  const operationalY = LEVEL_4_Y;
+  const worldHeight = level4.length > 0
+    ? operationalY + (level4Rows - 1) * LEVEL_4_ROW_GAP + 132
+    : centralY + 180;
   const centerX = worldWidth / 2;
   const maximumTopSpan = worldWidth - SIDE_PADDING * 2;
 
@@ -165,11 +184,11 @@ export function calculateOrganizationalLayout(
   let order = 0;
 
   const level1Positions = distributeAcrossSpan(
-    byLevel.get(1) ?? [],
+    [...(byLevel.get(1) ?? [])].sort((a, b) => Number(a.type !== 'ccp') - Number(b.type !== 'ccp') || a.sortOrder - b.sortOrder || a.id.localeCompare(b.id)),
     TOP_PADDING,
     centerX,
-    420,
-    maximumTopSpan * 0.48,
+    300,
+    maximumTopSpan,
     order,
   );
   positioned.push(...level1Positions);
@@ -177,9 +196,9 @@ export function calculateOrganizationalLayout(
 
   const level2Positions = distributeAcrossSpan(
     byLevel.get(2) ?? [],
-    compact ? 320 : LEVEL_2_Y,
+    LEVEL_2_Y,
     centerX,
-    compact ? 280 : 480,
+    280,
     maximumTopSpan,
     order,
   );
@@ -188,7 +207,7 @@ export function calculateOrganizationalLayout(
 
   const level3Base = distributeAcrossSpan(
     level3,
-    compact ? 522 : LEVEL_3_Y,
+    centralY,
     centerX,
     220,
     maximumTopSpan,
@@ -221,7 +240,7 @@ export function calculateOrganizationalLayout(
       row,
       column,
       x: gridStartX + columnGap * column,
-      y: (compact ? 714 : LEVEL_4_Y) + row * LEVEL_4_ROW_GAP,
+      y: operationalY + row * LEVEL_4_ROW_GAP,
     };
   });
 
@@ -287,6 +306,9 @@ export function findDirectionalNode(
   const sign = direction === 'left' || direction === 'up' ? -1 : 1;
   let best: PositionedOrgNode | null = null;
   let bestScore = Number.POSITIVE_INFINITY;
+  const sameRowPeers = axis === 'x' && layout.nodes.some((candidate) => (
+    (candidate.x - current.x) * sign > 8 && Math.abs(candidate.y - current.y) <= 8
+  ));
 
   layout.nodes.forEach((candidate) => {
     if (candidate.node.id === currentNodeId) return;
@@ -295,6 +317,7 @@ export function findDirectionalNode(
     const secondaryDelta = axis === 'x'
       ? Math.abs(candidate.y - current.y)
       : Math.abs(candidate.x - current.x);
+    if (sameRowPeers && secondaryDelta > 8) return;
     // Prefer the next visual band while still penalizing strong diagonal jumps.
     // A lighter cross-axis weight keeps a centered Level 3 node from skipping
     // over the intentionally split President/Vice band.

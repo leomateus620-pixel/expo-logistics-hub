@@ -1,0 +1,38 @@
+{
+  "baselineCommit": "8c4dd1214acae2e1dcf68ff981b846bdf23d8b1f",
+  "reports": [
+    {
+      "name": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "lowerNodesUnchanged": 33,
+      "peopleUnchanged": 41,
+      "orderPreserved": true,
+      "horizontalTranslation": 0
+    },
+    {
+      "name": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "lowerNodesUnchanged": 33,
+      "peopleUnchanged": 41,
+      "orderPreserved": true,
+      "horizontalTranslation": 67
+    },
+    {
+      "name": "landscape",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "lowerNodesUnchanged": 33,
+      "peopleUnchanged": 41,
+      "orderPreserved": true,
+      "horizontalTranslation": 14
+    }
+  ]
+}

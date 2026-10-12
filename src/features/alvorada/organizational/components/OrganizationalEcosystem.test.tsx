@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { OrganizationalGraph, OrgNode } from '../types';
 import { OrganizationalEcosystem } from './OrganizationalEcosystem';
+import { buildOrganizationalGraph } from '../resolver';
 
 function createNode(partial: Partial<OrgNode> & Pick<OrgNode, 'id' | 'type' | 'authorityLevel' | 'title'>): OrgNode {
   return {
@@ -265,6 +266,34 @@ describe('OrganizationalEcosystem', () => {
     vi.unstubAllGlobals();
   });
 
+  it('shares the corrected Central roster across captions avatars count list selection and refresh', () => {
+    const directorId = '74a71a9f-c2a6-4ae1-baed-1e2d7b8bc07f';
+    const advisoryId = '38e7e8d3-4c66-4279-92ea-961b70ee4e80';
+    const raw = { members: [
+      { user_id: directorId, nome_exibicao: 'Zélia Savoldi', cargo: 'Diretora de Marketing e Comunicação', commission_id: 'central', commission_nome: 'Comissão Central' },
+      { user_id: advisoryId, nome_exibicao: 'ZÉLIA SAVOLDI', cargo: 'Assessoria de Marketing', commission_id: 'central' },
+    ], units: [{ id: 'central', name: 'Comissão Central', slug: 'central', type: 'comissao' as const, displayOrder: 0, isOfficial: true, isLegacy: false, responsibles: [] }, {
+      id: 'marketing', name: 'Assessoria de Marketing/Comunicação', slug: 'marketing', type: 'assessoria' as const, displayOrder: 1, isOfficial: true, isLegacy: false,
+      responsibles: [{ id: 'responsible', displayName: 'Zélia Savoldi', responsibleType: 'pessoa' as const, relationshipRole: 'principal', isPrimary: true, userId: advisoryId }],
+    }] };
+    const view = render(<OrganizationalEcosystem graph={buildOrganizationalGraph(raw)} />);
+    const centralButton = within(screen.getByRole('group', { name: /Mapa interativo/i })).getByRole('button', { name: /^COMISSÃO CENTRAL/i });
+    expect(centralButton).toHaveTextContent('1 INTEGRANTES');
+    expect(centralButton.querySelectorAll('.org-node__avatar')).toHaveLength(1);
+    fireEvent.click(centralButton);
+    const panel = screen.getByLabelText('DETALHES DE COMISSÃO CENTRAL');
+    expect(within(panel).getAllByRole('button', { name: 'Selecionar ZÉLIA SAVOLDI' })).toHaveLength(1);
+    expect(within(panel).getByText('COMISSÃO CENTRAL · MARKETING E COMUNICAÇÃO')).toBeInTheDocument();
+    fireEvent.click(within(panel).getByRole('button', { name: 'Selecionar ZÉLIA SAVOLDI' }));
+    expect(view.container.querySelector('[data-selection-person]')).toHaveAttribute('data-selection-person', `person:user:${directorId}`);
+    view.rerender(<OrganizationalEcosystem graph={buildOrganizationalGraph({ ...raw, members: [...raw.members].reverse() })} />);
+    expect(within(screen.getByLabelText('DETALHES DE ZÉLIA SAVOLDI')).getAllByRole('button', { name: 'Selecionar ZÉLIA SAVOLDI' })).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Fechar detalhes' }));
+    fireEvent.click(screen.getByRole('button', { name: /ZÉLIA SAVOLDI\. ASSESSORIA/i }));
+    expect(view.container.querySelector('[data-selection-person]')).toHaveAttribute('data-selection-person', `person:user:${advisoryId}`);
+    expect(screen.getAllByText('PRINCIPAL')).toHaveLength(2);
+  });
+
   it('selects a real node, exposes context and consumes Escape to close detail', () => {
     render(<OrganizationalEcosystem graph={createGraph()} active />);
 
@@ -291,56 +320,26 @@ describe('OrganizationalEcosystem', () => {
     await waitFor(() => expect(node).toHaveFocus());
   });
 
-  it('searches registered people, focuses the result and keeps Level 5 inactive', () => {
+  it('has no search state or invisible query and selects all members through their collective', () => {
     render(<OrganizationalEcosystem graph={createGraph()} active />);
-
-    fireEvent.change(screen.getByRole('combobox', { name: /Buscar pessoa/i }), {
-      target: { value: 'Bruno' },
-    });
-    fireEvent.click(screen.getByRole('option', { name: /Bruno Souza/i }));
-
-    expect(screen.getByLabelText(/Detalhes de Bruno Souza/i)).toBeInTheDocument();
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Bruno Souza/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Selecionar Carla Ribeiro' }));
+    expect(screen.getByRole('heading', { name: 'CARLA RIBEIRO' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Voluntário futuro/i })).not.toBeInTheDocument();
-    expect(screen.queryByText('Voluntário futuro')).not.toBeInTheDocument();
   });
 
-  it('labels a result with the person actually matched, including a second responsible', () => {
-    render(<OrganizationalEcosystem graph={createGraph()} active />);
-
-    fireEvent.change(screen.getByRole('combobox', { name: /Buscar pessoa/i }), {
-      target: { value: 'Carla' },
-    });
-
-    expect(screen.getByRole('option', { name: /Carla Ribeiro/i })).toBeInTheDocument();
-    expect(screen.queryByRole('option', { name: /Bruno Souza/i })).not.toBeInTheDocument();
-  });
-
-  it('searches a collective title without selecting the first member whose role repeats that title', () => {
+  it('selects the Central collective without inheriting its member roles or outgoing links', () => {
     const graph = createGraph();
     graph.nodes.find((node) => node.id === 'central')!.personIds = ['person-carla'];
     graph.people['person-carla'].roles = ['Comissão Central'];
     const { container } = render(<OrganizationalEcosystem graph={graph} active />);
-    fireEvent.change(screen.getByRole('combobox', { name: /Buscar pessoa/i }), { target: { value: 'Comissão Central' } });
-    fireEvent.click(screen.getByRole('option', { name: /^Comissão Central/i }));
+    fireEvent.click(within(screen.getByRole('group', { name: /Mapa interativo/i })).getByRole('button', { name: /^Comissão Central/i }));
     expect(container.querySelector('[data-selection-person]')).toBeNull();
     expect(screen.getByRole('heading', { name: 'COMISSÃO CENTRAL' })).toBeInTheDocument();
     const edgeIds = Array.from(container.querySelectorAll('[data-edge-id]'), (edge) => edge.getAttribute('data-edge-id')).sort();
     expect(edgeIds).toEqual(['central-logistics', 'central-press', 'president-central']);
-  });
-
-  it('uses the executive subtitle as search context when the node title is the person name', () => {
-    const graph = createGraph();
-    const executive = graph.nodes.find((node) => node.id === 'president');
-    if (!executive) throw new Error('Executive fixture missing');
-    executive.title = 'Ana Silva';
-    executive.subtitle = 'Presidente';
-
-    render(<OrganizationalEcosystem graph={graph} active />);
-    fireEvent.change(screen.getByRole('combobox', { name: /Buscar pessoa/i }), {
-      target: { value: 'Ana' },
-    });
-
-    expect(screen.getByRole('option', { name: /Ana Silva.*Presidente/i })).toBeInTheDocument();
   });
 
   it('announces every mixed responsibility once and translates raw relationship roles', () => {
@@ -369,7 +368,7 @@ describe('OrganizationalEcosystem', () => {
       'org-ecosystem__brand',
     );
     expect(within(masthead).getByRole('heading', {
-      name: 'ECOSSISTEMA ORGANIZACIONAL',
+      name: 'Ecossistema',
     })).toBeInTheDocument();
     expect(masthead.querySelector('.org-ecosystem__title > p')).toBeNull();
     expect(screen.getByRole('button', {
@@ -418,7 +417,7 @@ describe('OrganizationalEcosystem', () => {
     });
   });
 
-  it('fits once above 53% and preserves the initial composition after the arrival cascade', () => {
+  it('fits once above 40% and preserves the initial composition after the arrival cascade', () => {
     vi.useFakeTimers();
     const view = render(<OrganizationalEcosystem graph={createDenseGraph()} active />);
     act(() => {
@@ -427,15 +426,15 @@ describe('OrganizationalEcosystem', () => {
     });
     const ready = view.container.querySelector('.org-ecosystem__ready') as HTMLElement;
     const initialScale = Number(ready.dataset.viewportScale);
-    expect(initialScale).toBeGreaterThan(0.53);
-    expect(Number(ready.dataset.layoutHeight)).toBeLessThan(990);
+    expect(initialScale).toBeGreaterThan(0.40);
+    expect(Number(ready.dataset.layoutHeight)).toBeLessThan(1440);
     act(() => vi.advanceTimersByTime(4000));
     expect(Number(ready.dataset.viewportScale)).toBe(initialScale);
     expect(ready).not.toHaveAttribute('data-camera-animating');
     view.unmount();
   });
 
-  it('preserves the fitted composition while search receives focus during the entrance', () => {
+  it('preserves the fitted composition while filters receive focus during the entrance', () => {
     vi.useFakeTimers();
     const view = render(
       <OrganizationalEcosystem graph={createDenseGraph()} active />,
@@ -452,7 +451,7 @@ describe('OrganizationalEcosystem', () => {
       if (!(ready instanceof HTMLElement)) throw new Error('Ready graph missing');
       const narrativeScale = Number(ready.dataset.viewportScale);
 
-      act(() => screen.getByRole('combobox', { name: /BUSCAR PESSOA/i }).focus());
+      act(() => screen.getByRole('button', { name: 'TODO O ECOSSISTEMA' }).focus());
       act(() => vi.advanceTimersByTime(3000));
 
       expect(Number(ready.dataset.viewportScale)).toBe(narrativeScale);
@@ -564,10 +563,7 @@ describe('OrganizationalEcosystem', () => {
       .toHaveAttribute('tabindex', '0');
     expect(onSelectedNodeChange).toHaveBeenLastCalledWith(null);
 
-    fireEvent.change(screen.getByRole('combobox', { name: /Buscar pessoa/i }), {
-      target: { value: 'Bruno' },
-    });
-    expect(screen.queryByRole('option', { name: /Bruno Souza/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });
 
   it('pans from a touch that starts over a node without converting the gesture into selection', () => {
@@ -666,7 +662,7 @@ describe('OrganizationalEcosystem', () => {
     await waitFor(() => expect(zoomOutput.textContent).toBe(zoomAfterInteraction));
   });
 
-  it('excludes allow-list omissions from search and initial selection', () => {
+  it('excludes allow-list omissions from the graph and initial selection', () => {
     const graph = createGraph();
     render(
       <OrganizationalEcosystem
@@ -677,10 +673,7 @@ describe('OrganizationalEcosystem', () => {
     );
 
     expect(screen.queryByLabelText(/Detalhes de Comissão fora da edição/i)).not.toBeInTheDocument();
-    fireEvent.change(screen.getByRole('combobox', { name: /Buscar pessoa/i }), {
-      target: { value: 'Pessoa Oculta' },
-    });
-    expect(screen.queryByRole('option', { name: /Pessoa Oculta/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Pessoa Oculta/i })).not.toBeInTheDocument();
   });
 
   it('unmounts every unrelated edge and decoration through successive selections and clear', () => {
@@ -707,15 +700,15 @@ describe('OrganizationalEcosystem', () => {
     expect(container.querySelector('[data-org-detail-panel]')).toBeNull();
   });
 
-  it('selects the actual second person through search and panel without inheriting collective outgoing edges', () => {
+  it('selects the actual second person through the panel without inheriting collective outgoing edges', () => {
     const graph = createGraph();
     const central = graph.nodes.find((node) => node.id === 'central')!;
     central.personIds = ['person-carla'];
     const { container } = render(<OrganizationalEcosystem graph={graph} active />);
     const edges = () => Array.from(container.querySelectorAll('[data-edge-id]'), (item) => item.getAttribute('data-edge-id')).sort();
 
-    fireEvent.change(screen.getByRole('combobox', { name: /Buscar pessoa/i }), { target: { value: 'Carla' } });
-    fireEvent.click(screen.getAllByRole('option', { name: /Carla Ribeiro/i })[0]);
+    fireEvent.click(screen.getByRole('button', { name: /^Bruno Souza/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^Selecionar Carla Ribeiro/i }));
     expect(screen.getByLabelText(/Detalhes de Carla Ribeiro/i)).toBeInTheDocument();
     expect(edges()).toEqual(['central-logistics', 'president-central']);
     expect(container.querySelector('[data-edge-id="central-press"]')).toBeNull();

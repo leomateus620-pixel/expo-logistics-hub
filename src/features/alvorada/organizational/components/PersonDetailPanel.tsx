@@ -46,6 +46,14 @@ function personRoleSummary(
   return [...new Set(labels)].join(' · ') || 'VÍNCULO INSTITUCIONAL';
 }
 
+function contextualPersonRole(node: OrgNode, person: OrgPerson, relationshipRole?: string): string {
+  const labels = node.metadata.memberRoleLabels;
+  const label = labels && typeof labels === 'object' && person.id in labels
+    ? (labels as Record<string, unknown>)[person.id] : null;
+  return typeof label === 'string' && node.personIds.includes(person.id)
+    ? label : personRoleSummary(relationshipRole, person.roles);
+}
+
 function DetailAvatar({ person }: { person: OrgPerson }) {
   const [failed, setFailed] = useState(false);
   return (
@@ -119,7 +127,7 @@ export function PersonDetailPanel({ graph, node, selectedPersonId, onPersonSelec
                 return (
                   <li key={membership.id}>
                     <strong>{membership.title}</strong>
-                    <span>{personRoleSummary(responsibility?.relationshipRole, selectedPerson.roles)}</span>
+                    <span>{contextualPersonRole(membership, selectedPerson, responsibility?.relationshipRole)}</span>
                   </li>
                 );
               })}
@@ -139,7 +147,7 @@ export function PersonDetailPanel({ graph, node, selectedPersonId, onPersonSelec
               const relationship = node.responsibilities.find((item) => item.personId === person.id);
               const roleSummary = node.type === 'executive'
                 ? presentationText(node.subtitle ?? 'PRESIDÊNCIA')
-                : personRoleSummary(relationship?.relationshipRole, person.roles);
+                : contextualPersonRole(node, person, relationship?.relationshipRole);
               return (
                 <button
                   key={person.id}

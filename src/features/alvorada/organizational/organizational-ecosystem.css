@@ -123,22 +123,24 @@
   visibility: visible;
 }
 
-.org-ecosystem__masthead {
+.org-ecosystem__top-controls {
   position: absolute;
   z-index: 50;
-  top: calc(env(safe-area-inset-top, 0px) + 24px);
+  top: calc(env(safe-area-inset-top, 0px) + 16px);
+  right: calc(env(safe-area-inset-right, 0px) + 76px);
   left: calc(env(safe-area-inset-left, 0px) + 24px);
-  display: flex;
-  max-width: min(940px, calc(100vw - 180px));
-  align-items: center;
-  gap: clamp(22px, 3vw, 48px);
+  display: grid;
+  justify-items: start;
+  gap: 8px;
   pointer-events: auto;
 }
 
+.org-ecosystem__masthead { min-width: 0; }
+
 .org-ecosystem__title {
-  display: grid;
-  min-width: 278px;
-  gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .org-ecosystem__brand {
@@ -147,8 +149,8 @@
 }
 
 .org-ecosystem__brand .fenasoja-brand__mark {
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   overflow: visible;
 }
 
@@ -169,144 +171,21 @@
 
 .org-ecosystem__title h1 {
   margin: 0;
-  color: rgb(224 235 247 / 74%);
-  font-size: 10px;
-  font-weight: 650;
-  letter-spacing: 0.16em;
-  line-height: 1.15;
-}
-
-.org-search {
-  position: relative;
-  width: clamp(250px, 28vw, 390px);
-}
-
-.org-search__field {
-  display: grid;
-  min-height: 46px;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 10px;
-  padding: 0 4px 0 15px;
-  border: 1px solid rgb(161 193 231 / 21%);
-  border-radius: 12px;
-  background: linear-gradient(120deg, rgb(5 24 52 / 90%), rgb(9 31 60 / 72%));
-  box-shadow:
-    0 4px 12px rgb(0 5 18 / 24%),
-    inset 0 1px 0 rgb(255 255 255 / 8%);
-  transition: border-color 180ms ease, box-shadow 180ms ease;
-}
-
-.org-search__field:focus-within {
-  border-color: rgb(249 193 33 / 66%);
-  box-shadow:
-    0 0 0 3px rgb(249 193 33 / 12%),
-    0 18px 50px rgb(0 5 18 / 38%);
-}
-
-.org-search__field > svg {
-  width: 17px;
-  height: 17px;
-  color: var(--org-gold);
-}
-
-.org-search__field input {
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--org-white);
-  font: inherit;
-  font-size: 0.76rem;
-  font-weight: 650;
-}
-
-.org-search__field input::placeholder {
-  color: rgb(203 219 237 / 72%);
-}
-
-.org-search__clear {
-  display: grid;
-  width: 44px;
-  height: 44px;
-  place-items: center;
-  border: 0;
-  border-radius: 9px;
-  background: transparent;
-  color: #b5c8dc;
-  cursor: pointer;
-}
-
-.org-search__clear:hover { background: rgb(216 184 112 / 12%); color: var(--org-white); }
-.org-search__clear:focus-visible { outline: 2px solid var(--org-gold); outline-offset: -3px; }
-.org-search__clear svg { width: 15px; height: 15px; }
-.org-search__field input::-webkit-search-cancel-button { display: none; }
-.org-search__empty { padding: 18px; color: #b9ccde; font-size: 13px; }
-
-.org-search__results {
-  position: absolute;
-  z-index: 4;
-  top: calc(100% + 8px);
-  right: 0;
-  left: 0;
-  max-height: min(50dvh, 360px);
-  overflow: auto;
-  padding: 6px;
-  border: 1px solid rgb(167 198 232 / 19%);
-  border-radius: 6px 16px 6px 16px;
-  background: rgb(4 20 44 / 96%);
-  box-shadow: 0 24px 70px rgb(0 5 18 / 52%);
-  backdrop-filter: blur(20px);
-  animation: org-results-enter 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.org-search__results button {
-  display: grid;
-  width: 100%;
-  min-height: 44px;
-  gap: 2px;
-  padding: 10px 11px;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--org-white);
-  text-align: left;
-  cursor: pointer;
-}
-
-.org-search__results button:hover,
-.org-search__results .org-search__result--active,
-.org-search__results button:focus-visible {
-  outline: 0;
-  background: rgb(43 84 135 / 40%);
-}
-
-.org-search__results button span {
-  overflow: hidden;
-  font-size: 0.75rem;
-  font-weight: 760;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.org-search__results button small {
-  overflow: hidden;
-  color: rgb(215 227 241 / 55%);
-  font-size: 0.62rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  padding-left: 20px;
+  border-left: 1px solid rgb(216 184 112 / 28%);
+  color: var(--org-cream);
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
 }
 
 .org-filters {
-  position: absolute;
-  z-index: 45;
-  top: calc(env(safe-area-inset-top, 0px) + 104px);
-  left: calc(env(safe-area-inset-left, 0px) + 24px);
   display: flex;
-  max-width: calc(100vw - 150px);
-  gap: 4px;
-  overflow-x: auto;
-  padding: 4px;
+  max-width: 100%;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 2px;
   border: 1px solid rgb(148 183 222 / 14%);
   border-radius: 12px;
   background: rgb(6 22 42 / 94%);
@@ -320,11 +199,11 @@
 
 .org-filters button {
   display: flex;
-  min-height: 40px;
+  min-height: 34px;
   flex: 0 0 auto;
   align-items: center;
-  gap: 7px;
-  padding: 0 12px;
+  gap: 5px;
+  padding: 0 9px;
   border: 0;
   border-radius: 8px;
   background: transparent;
@@ -332,15 +211,15 @@
   font: inherit;
   font-size: 10px;
   font-weight: 760;
-  letter-spacing: 0.055em;
+  letter-spacing: 0.025em;
   text-transform: uppercase;
   cursor: pointer;
   transition: background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
 }
 
 .org-filters button > svg {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   flex: 0 0 auto;
   stroke-width: 1.8;
 }
@@ -362,10 +241,6 @@
 .org-filters button:focus-visible {
   outline: 2px solid var(--org-gold);
   outline-offset: 2px;
-}
-
-.org-filters__short {
-  display: none;
 }
 
 .org-viewport {
@@ -504,8 +379,7 @@
 }
 
 .org-node[data-selected="true"],
-.org-node[data-hovered="true"],
-.org-node[data-matched="true"] {
+.org-node[data-hovered="true"] {
   z-index: 10;
   opacity: 1 !important;
   filter: none;
@@ -558,8 +432,7 @@
 }
 
 .org-node[data-selected="true"] .org-node__ring,
-.org-node[data-hovered="true"] .org-node__ring,
-.org-node[data-matched="true"] .org-node__ring {
+.org-node[data-hovered="true"] .org-node__ring .org-node__ring {
   border-color: var(--org-node-accent);
   box-shadow:
     0 6px 18px rgb(0 4 17 / 48%),
@@ -702,8 +575,7 @@
 }
 
 .org-node[data-selected="true"] .org-node__halo,
-.org-node[data-hovered="true"] .org-node__halo,
-.org-node[data-matched="true"] .org-node__halo {
+.org-node[data-hovered="true"] .org-node__halo .org-node__halo {
   opacity: 1;
 }
 
@@ -898,7 +770,7 @@
 .org-detail {
   position: absolute;
   z-index: 55;
-  top: calc(env(safe-area-inset-top, 0px) + 168px);
+  top: calc(var(--org-controls-bottom, 100px) + 12px);
   right: calc(env(safe-area-inset-right, 0px) + 20px);
   bottom: calc(env(safe-area-inset-bottom, 0px) + 82px);
   display: flex;
@@ -1225,15 +1097,6 @@
 .org-ecosystem__loading-network i:nth-child(5) { right: 46px; bottom: 0; animation-delay: 480ms; }
 
 @media (max-width: 900px) {
-  .org-ecosystem__masthead {
-    max-width: calc(100vw - 92px);
-    gap: 22px;
-  }
-
-  .org-search {
-    width: min(340px, 38vw);
-  }
-
   .org-level-legend {
     gap: 10px;
   }
@@ -1249,63 +1112,22 @@
       linear-gradient(180deg, rgb(1 8 21 / 48%), transparent 23%, transparent 74%, rgb(1 8 21 / 66%));
   }
 
-  .org-ecosystem__masthead {
-    top: calc(env(safe-area-inset-top, 0px) + 11px);
-    right: calc(env(safe-area-inset-right, 0px) + 58px);
-    left: calc(env(safe-area-inset-left, 0px) + 12px);
-    display: block;
-    max-width: none;
-  }
-
-  .org-ecosystem__title {
-    min-width: 0;
-  }
-
-  .org-ecosystem__title h1 {
-    margin-top: 3px;
-    font-size: 9px;
-    letter-spacing: 0.12em;
-  }
-
-  .org-ecosystem__brand { gap: 9px; }
-  .org-ecosystem__brand .fenasoja-brand__mark { width: 42px; height: 42px; }
-  .org-ecosystem__brand .fenasoja-brand__wordmark { font-size: 21px; }
-  .org-ecosystem__brand .fenasoja-brand__edition { font-size: 10px; padding: 3px 5px; }
-
-  .org-search {
-    width: calc(100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 24px);
-    margin-top: 13px;
-  }
-
-  .org-search__field {
-    min-height: 46px;
-    border-radius: 11px;
-  }
-
-  .org-search__field input { font-size: 16px; font-weight: 500; }
-  .org-search__field input::placeholder { font-size: 12px; font-weight: 600; }
-
-  .org-filters {
-    top: calc(env(safe-area-inset-top, 0px) + 134px);
+  .org-ecosystem__top-controls {
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
     right: calc(env(safe-area-inset-right, 0px) + 12px);
     left: calc(env(safe-area-inset-left, 0px) + 12px);
-    max-width: none;
-    border-radius: 11px;
+    gap: 8px;
   }
 
-  .org-filters button {
-    min-height: 44px;
-    min-width: 44px;
-    padding: 0 11px;
-  }
-
-  .org-filters__long {
-    display: none;
-  }
-
-  .org-filters__short {
-    display: inline;
-  }
+  .org-ecosystem__masthead { padding-right: 46px; }
+  .org-ecosystem__title { gap: 10px; }
+  .org-ecosystem__title h1 { padding-left: 10px; font-size: 15px; }
+  .org-ecosystem__brand { gap: 7px; }
+  .org-ecosystem__brand .fenasoja-brand__mark { width: 32px; height: 32px; }
+  .org-ecosystem__brand .fenasoja-brand__wordmark { font-size: 18px; }
+  .org-ecosystem__brand .fenasoja-brand__edition { font-size: 10px; padding: 3px 5px; }
+  .org-filters { border-radius: 10px; }
+  .org-filters button { min-height: 44px; min-width: 44px; padding: 0 8px; font-size: 9px; }
 
   .org-level-legend {
     display: none;
@@ -1398,24 +1220,13 @@
 }
 
 @media (max-width: 430px) {
-  .org-search__field {
-    grid-template-columns: auto 1fr auto;
-  }
-
-  .org-filters button {
-    padding: 0 11px;
-    font-size: 10px;
-  }
-
   .org-viewport-controls {
     padding: 3px;
   }
 }
 
 @media (pointer: coarse) {
-  .org-search__field,
   .org-filters button,
-  .org-search__results button,
   .org-ecosystem__state button {
     min-height: 44px;
   }
@@ -1432,44 +1243,40 @@
 }
 
 @media (max-height: 700px) and (min-width: 721px) {
-  .org-ecosystem__masthead {
-    top: calc(env(safe-area-inset-top, 0px) + 14px);
-  }
-
-  .org-filters {
-    top: calc(env(safe-area-inset-top, 0px) + 94px);
-  }
-
-  .org-detail {
-    top: calc(env(safe-area-inset-top, 0px) + 158px);
-  }
+  .org-ecosystem__top-controls { top: calc(env(safe-area-inset-top, 0px) + 10px); }
 }
 
 @media (max-height: 520px) and (min-width: 721px) {
-  .org-ecosystem__masthead {
-    top: calc(env(safe-area-inset-top, 0px) + 8px);
-    left: calc(env(safe-area-inset-left, 0px) + 16px);
-    gap: 24px;
-  }
-
-  .org-ecosystem__title { min-width: 235px; gap: 4px; }
-  .org-ecosystem__title h1 { font-size: 8px; }
+  .org-ecosystem__top-controls { top: calc(env(safe-area-inset-top, 0px) + 8px); left: calc(env(safe-area-inset-left, 0px) + 16px); gap: 4px; }
+  .org-ecosystem__title { gap: 14px; }
+  .org-ecosystem__title h1 { padding-left: 14px; font-size: 18px; }
   .org-ecosystem__brand .fenasoja-brand__mark { width: 34px; height: 34px; }
   .org-ecosystem__brand .fenasoja-brand__wordmark { font-size: 19px; }
   .org-ecosystem__brand .fenasoja-brand__edition { font-size: 10px; }
-  .org-search { width: min(320px, 35vw); }
-  .org-filters { top: calc(env(safe-area-inset-top, 0px) + 62px); left: calc(env(safe-area-inset-left, 0px) + 16px); padding: 2px; }
-  .org-filters button { min-height: 44px; padding: 0 10px; font-size: 9px; }
+  .org-filters button { padding: 0 8px; font-size: 9px; }
   .org-level-legend { display: none; }
-  .org-detail { top: calc(env(safe-area-inset-top, 0px) + 112px); right: calc(env(safe-area-inset-right, 0px) + 12px); width: 280px; padding: 14px; }
+  .org-detail { right: calc(env(safe-area-inset-right, 0px) + 12px); width: 280px; padding: 14px; }
   .org-detail__header { gap: 8px; padding-bottom: 10px; }
   .org-detail__header h2 { font-size: 16px; }
   .org-viewport-controls { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); right: calc(env(safe-area-inset-right, 0px) + 12px); }
 }
 
+@media (max-width: 360px) {
+  .org-ecosystem__title { gap: 8px; }
+  .org-ecosystem__title h1 { padding-left: 8px; font-size: 13px; }
+  .org-ecosystem__brand .fenasoja-brand__wordmark { font-size: 16px; }
+}
+
+@media (max-width: 340px) {
+  .org-ecosystem__title { gap: 6px; }
+  .org-ecosystem__title h1 { padding-left: 6px; font-size: 12px; }
+  .org-ecosystem__brand { gap: 5px; }
+  .org-ecosystem__brand .fenasoja-brand__mark { width: 28px; height: 28px; }
+  .org-ecosystem__brand .fenasoja-brand__wordmark { font-size: 14px; }
+}
+
 @media (prefers-contrast: more) {
   .org-node__ring,
-  .org-search__field,
   .org-filters,
   .org-detail,
   .org-viewport-controls {
@@ -1485,7 +1292,6 @@
 
 @media (forced-colors: active) {
   .org-ecosystem,
-  .org-search__field,
   .org-filters,
   .org-detail,
   .org-viewport-controls {
@@ -1494,7 +1300,6 @@
   }
 
   .org-node__ring,
-  .org-search__field,
   .org-filters,
   .org-detail,
   .org-viewport-controls,

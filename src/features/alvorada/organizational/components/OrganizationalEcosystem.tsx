@@ -20,12 +20,11 @@ import {
 import {
   useOrgGraphInteraction,
   type OrgGraphFilter,
-  type OrgSearchResult,
 } from '../hooks/useOrgGraphInteraction';
 import { useOrgPerformanceTelemetry } from '../hooks/useOrgPerformanceTelemetry';
 import { useOrgViewport } from '../hooks/useOrgViewport';
 import { OrganizationalNode } from './OrganizationalNode';
-import { OrgFilterBar, OrgSearch, OrgViewportControls } from './OrgControls';
+import { OrgFilterBar, OrgViewportControls } from './OrgControls';
 import { PersonDetailPanel } from './PersonDetailPanel';
 import { RelationshipLayer } from './RelationshipLayer';
 import { SoybeanAtmosphere } from './SoybeanAtmosphere';
@@ -99,9 +98,9 @@ function GraphReady({
     setFilter,
     setHoveredNodeId,
     setKeyboardNodeId,
-    setQuery,
     visualStateById,
   } = interaction;
+  const topControlsRef = useRef<HTMLDivElement>(null);
   const nodeElements = useRef(new Map<string, HTMLButtonElement>());
   const nodeRefCallbacks = useRef(new Map<string, RefCallback<HTMLButtonElement>>());
   const handleBackgroundPress = useCallback(() => {
@@ -109,6 +108,7 @@ function GraphReady({
   }, [clearSelection]);
   const viewport = useOrgViewport({
     bounds: layout.bounds,
+    topControlsRef,
     detailOpen: Boolean(interaction.selectedNode),
     resizeFocusPoint: selectedNodeId ? layout.nodeById.get(selectedNodeId) : null,
     onBackgroundPress: handleBackgroundPress,
@@ -205,18 +205,6 @@ function GraphReady({
     visualStateById,
   ]);
 
-  const handleSearchResult = useCallback((result: OrgSearchResult) => {
-    setQuery('');
-    commitSelection(result.id, result.personId ?? null);
-    setKeyboardNodeId(result.id);
-    focusNode(result.id, undefined, true);
-    window.requestAnimationFrame(() => nodeElements.current.get(result.id)?.focus({ preventScroll: true }));
-  }, [commitSelection, focusNode, setKeyboardNodeId, setQuery]);
-
-  const handleQueryChange = useCallback((value: string) => {
-    setQuery(value);
-  }, [setQuery]);
-
   const handleFilterChange = useCallback((filter: OrgGraphFilter) => {
     setFilter(filter);
   }, [setFilter]);
@@ -255,25 +243,20 @@ function GraphReady({
         closeDetails();
       }}
     >
-      <header className="org-ecosystem__masthead" data-org-interactive>
-        <div className="org-ecosystem__title">
-          <FenasojaBrand
-            className="org-ecosystem__brand"
-            compact
-            tone="dark"
-            markSrc="/alvorada/fenasoja-symbol-official.png"
-          />
-          <h1>ECOSSISTEMA ORGANIZACIONAL</h1>
-        </div>
-        <OrgSearch
-          query={interaction.query}
-          results={interaction.searchResults}
-          onQueryChange={handleQueryChange}
-          onResultSelect={handleSearchResult}
-        />
-      </header>
-
-      <OrgFilterBar filter={interaction.filter} onFilterChange={handleFilterChange} />
+      <div ref={topControlsRef} className="org-ecosystem__top-controls" data-org-interactive>
+        <header className="org-ecosystem__masthead" data-org-interactive>
+          <div className="org-ecosystem__title">
+            <FenasojaBrand
+              className="org-ecosystem__brand"
+              compact
+              tone="dark"
+              markSrc="/alvorada/fenasoja-symbol-official.png"
+            />
+            <h1>Ecossistema</h1>
+          </div>
+        </header>
+        <OrgFilterBar filter={interaction.filter} onFilterChange={handleFilterChange} />
+      </div>
 
       <div
         ref={viewport.viewportRef}
@@ -319,7 +302,6 @@ function GraphReady({
                 state={visualStateById.get(position.node.id) ?? {
                   filtered: false,
                   hovered: false,
-                  matched: false,
                   muted: false,
                   related: false,
                   selected: false,

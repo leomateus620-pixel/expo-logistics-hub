@@ -174,7 +174,6 @@ function OrganizationalNodeComponent({
       data-authority={node.authorityLevel}
       data-filtered={state.filtered || undefined}
       data-hovered={state.hovered || undefined}
-      data-matched={state.matched || undefined}
       data-muted={state.muted || undefined}
       data-node-type={node.type}
       data-related={state.related || undefined}
@@ -262,7 +261,6 @@ export const OrganizationalNode = memo(
     && previous.position === next.position
     && previous.state.filtered === next.state.filtered
     && previous.state.hovered === next.state.hovered
-    && previous.state.matched === next.state.matched
     && previous.state.muted === next.state.muted
     && previous.state.related === next.state.related
     && previous.state.selected === next.state.selected
