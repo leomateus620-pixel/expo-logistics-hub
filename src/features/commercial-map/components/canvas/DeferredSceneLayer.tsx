@@ -34,6 +34,8 @@ function queueFor(canvas: HTMLCanvasElement) {
       canRun: () => !document.hidden && readLatestCommercialMapRenderHealth(canvas)?.status !== 'context-lost'
         && !useCommercialMapStore.getState().cameraNavigating
         && !canvas.dataset.commercialMapPreparing
+        && canvas.dataset.commercialMapEssentialReady !== 'false'
+        && !canvas.dataset.commercialMapPreparationError
         && performance.now() - (lastInteraction.get(canvas) ?? 0) > 350,
       onComplete: () => {
         canvas.dataset.commercialMapHydration = 'complete';

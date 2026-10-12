@@ -1,0 +1,100 @@
+{
+  "health": {
+    "status": "ready",
+    "path": "direct",
+    "presentedFrames": 1762,
+    "contextLosses": 0,
+    "lastErrorCode": null
+  },
+  "ready": "true",
+  "essentialReady": "true",
+  "hydration": "complete",
+  "quality": {
+    "logicalTier": "HIGH",
+    "sceneTier": "HIGH",
+    "effectTier": "HIGH",
+    "baseDpr": 1,
+    "effectiveDpr": 1,
+    "hardwareCeiling": "HIGH",
+    "reason": "viewport-sync"
+  },
+  "camera": {
+    "position": [
+      0.5672727272727229,
+      9.875465345886587,
+      20.31815026566098
+    ],
+    "target": [
+      0.5672727272727229,
+      0.08736,
+      20.6072728307229
+    ],
+    "quaternion": [
+      0,
+      0.717469607917895,
+      0.6965898087929093,
+      0
+    ],
+    "fov": 36,
+    "zoom": 1
+  },
+  "selection": {
+    "entity": "reference:2026:b5",
+    "module": null,
+    "interior": "reference:2026:b5",
+    "segment": null,
+    "workspace": "3d",
+    "navigating": false,
+    "night": false,
+    "rain": false,
+    "sunrise": "complete"
+  },
+  "inventory": {
+    "entities": 1578,
+    "presentedEntities": 376,
+    "lots": 1466,
+    "commercialTrees": 273,
+    "presentedCommercialTrees": 273
+  },
+  "renderer": {
+    "calls": 27,
+    "triangles": 2894,
+    "programs": 251,
+    "textures": 139,
+    "geometries": 604,
+    "dpr": 1,
+    "width": 1366,
+    "height": 768,
+    "qualityTier": "HIGH",
+    "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+  },
+  "identity": {
+    "canvasMounts": 1,
+    "rendererCreates": 1,
+    "controlsCreates": 1,
+    "activeCanvases": 1,
+    "activeControls": 1,
+    "sceneIds": [
+      "21731ebf-afc8-4ca6-bb66-d47659b4c165"
+    ],
+    "cameraIds": [
+      "e72f64b6-4e95-4853-b63d-e050473b5074"
+    ],
+    "rendererIds": [
+      1
+    ]
+  },
+  "physicalBuffer": [
+    1366,
+    768
+  ],
+  "cssBuffer": [
+    1366,
+    768
+  ],
+  "dpr": 1,
+  "presentationVisible": "true",
+  "frameSerial": 28644,
+  "preparationError": null,
+  "failureActionAvailable": false
+}

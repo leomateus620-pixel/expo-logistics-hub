@@ -1,0 +1,274 @@
+{
+  "generatedAt": "2026-10-12T04:07:10.455Z",
+  "processVersion": "v24.19.0",
+  "platform": "darwin",
+  "baseSha": "8f3e871010ebfeab45824ba042183127da3b15e3",
+  "candidateSha": "uncommitted",
+  "fixture": "presentCommercialMapData(OFFICIAL_REFERENCE_DATA) + rear parking supports + P12 concrete; canonical visible trees",
+  "entities": 1595,
+  "trees": 274,
+  "queries": 548,
+  "equivalenceChecks": 2378,
+  "rows": [
+    {
+      "label": "baseline",
+      "round": 0,
+      "durationMs": 24.805957999999976,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 0,
+      "durationMs": 1.0732499999999732,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 1,
+      "durationMs": 1.0594580000000065,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 1,
+      "durationMs": 24.68233299999997,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 2,
+      "durationMs": 24.860375000000033,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 2,
+      "durationMs": 1.0119589999999903,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 3,
+      "durationMs": 0.9630410000000325,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 3,
+      "durationMs": 24.748874999999998,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 4,
+      "durationMs": 24.682874999999967,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 4,
+      "durationMs": 1.00733299999996,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 5,
+      "durationMs": 0.8646249999999895,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 5,
+      "durationMs": 24.688207999999975,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 6,
+      "durationMs": 24.679958000000056,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 6,
+      "durationMs": 0.8368749999999636,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 7,
+      "durationMs": 0.8185839999999871,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 7,
+      "durationMs": 24.751500000000078,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 8,
+      "durationMs": 24.687999999999988,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 8,
+      "durationMs": 0.8402079999999614,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 9,
+      "durationMs": 0.8292079999999942,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 9,
+      "durationMs": 24.778500000000008,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 10,
+      "durationMs": 24.735582999999906,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 10,
+      "durationMs": 0.895832999999925,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 11,
+      "durationMs": 0.8990830000000187,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 11,
+      "durationMs": 24.909874999999943,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 12,
+      "durationMs": 24.78637500000002,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 12,
+      "durationMs": 0.9027909999999792,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 13,
+      "durationMs": 0.8405409999999165,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 13,
+      "durationMs": 23.126708000000008,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 14,
+      "durationMs": 21.822750000000042,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 14,
+      "durationMs": 0.7740830000000187,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 15,
+      "durationMs": 0.7661669999999958,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 15,
+      "durationMs": 21.832750000000033,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 16,
+      "durationMs": 21.805375000000026,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 16,
+      "durationMs": 0.7823750000000018,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 17,
+      "durationMs": 0.783457999999996,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 17,
+      "durationMs": 21.866709000000014,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 18,
+      "durationMs": 21.804250000000025,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 18,
+      "durationMs": 0.7657080000000178,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "candidate",
+      "round": 19,
+      "durationMs": 0.7641669999999294,
+      "checksum": 14.759045716367007
+    },
+    {
+      "label": "baseline",
+      "round": 19,
+      "durationMs": 21.759874999999965,
+      "checksum": 14.759045716367007
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "n": 20,
+      "p50Ms": 24.682874999999967,
+      "p95Ms": 24.860375000000033,
+      "minMs": 21.759874999999965,
+      "maxMs": 24.909874999999943
+    },
+    "candidate": {
+      "n": 20,
+      "p50Ms": 0.8402079999999614,
+      "p95Ms": 1.0594580000000065,
+      "minMs": 0.7641669999999294,
+      "maxMs": 1.0732499999999732
+    }
+  },
+  "limits": [
+    "Node CPU microbenchmark of surface resolution only; no renderer, physical device, React mount, frame latency, production data, or end-to-end boot claim.",
+    "20 alternating measured repetitions; two warmup rounds; candidate rebuilds numeric index every measured pass."
+  ]
+}

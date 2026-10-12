@@ -1,0 +1,642 @@
+{
+  "diagnosticOnly": true,
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "deviceScaleFactor": 1,
+  "durationMs": 5000,
+  "fixedQuality": "HIGH",
+  "rows": [
+    {
+      "label": "baseline",
+      "before": {
+        "at": 23306.199999999255,
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "visible": "visible",
+        "focused": true,
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 1094,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "manifest": {
+          "sha": "8f3e871010ebfeab45824ba042183127da3b15e3",
+          "mode": "production",
+          "diagnostics": true,
+          "fixtureBackend": "qa.invalid",
+          "analytics": "preview fixture only"
+        },
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "buffer": [
+          1280,
+          592
+        ],
+        "dpr": 1,
+        "storeDpr": 1,
+        "css": [
+          1280,
+          592
+        ],
+        "camera": [
+          107.36363636363635,
+          120,
+          132.27272725903615
+        ],
+        "target": [
+          -7.63636363636364,
+          0,
+          -2.727272740963855
+        ],
+        "inventoryCounts": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "resources": {
+          "geometries": 574,
+          "textures": 137,
+          "programs": 244
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1
+        }
+      },
+      "after": {
+        "at": 30414.699999999255,
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "visible": "visible",
+        "focused": true,
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 1458,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "manifest": {
+          "sha": "8f3e871010ebfeab45824ba042183127da3b15e3",
+          "mode": "production",
+          "diagnostics": true,
+          "fixtureBackend": "qa.invalid",
+          "analytics": "preview fixture only"
+        },
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "buffer": [
+          1280,
+          592
+        ],
+        "dpr": 1,
+        "storeDpr": 1,
+        "css": [
+          1280,
+          592
+        ],
+        "camera": [
+          -156.14996892142705,
+          119.99982835886473,
+          94.19408836728638
+        ],
+        "target": [
+          -7.63636363636364,
+          0,
+          -2.727272740963855
+        ],
+        "inventoryCounts": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "resources": {
+          "geometries": 574,
+          "textures": 137,
+          "programs": 244
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1
+        }
+      },
+      "gesture": {
+        "pointerId": 1,
+        "inputSamples": 301,
+        "controlStarts": 1,
+        "controlChanges": 648,
+        "path": "+160 CSS px horizontal, ±24 vertical over recorded duration; native down/up with temporal dispatched moves"
+      },
+      "probe": {
+        "status": "supported",
+        "reason": null,
+        "recording": false,
+        "disposed": true,
+        "eligibleDraws": 362,
+        "sampledDraws": 18,
+        "sampleEvery": 20,
+        "sampleLimit": 40,
+        "pendingLimit": 8,
+        "queryTimeoutMs": 5000,
+        "pollIntervalMs": 100,
+        "pendingQueries": 0,
+        "skippedPreparing": 0,
+        "skippedPendingCapacity": 0,
+        "disjointDrops": 0,
+        "droppedQueries": 0,
+        "invalidVisibility": false,
+        "cpuSubmission": {
+          "samples": 18,
+          "medianMs": 4.199999999254942
+        },
+        "gpuMainScene": {
+          "samples": 18,
+          "medianMs": 4.098999
+        },
+        "samples": [
+          {
+            "ordinal": 20,
+            "at": 23674.89999999851,
+            "cpuMs": 4.100000001490116,
+            "gpuMs": 7.270333,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 40,
+            "at": 24008.199999999255,
+            "cpuMs": 4.199999999254942,
+            "gpuMs": 7.780874,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 60,
+            "at": 24341.699999999255,
+            "cpuMs": 3.900000000372529,
+            "gpuMs": 7.327999,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 80,
+            "at": 24674.799999998882,
+            "cpuMs": 4.300000000745058,
+            "gpuMs": 7.313875,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 100,
+            "at": 25008.099999999627,
+            "cpuMs": 4.5,
+            "gpuMs": 7.622499,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 120,
+            "at": 25341.39999999851,
+            "cpuMs": 3.700000001117587,
+            "gpuMs": 7.231416,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 140,
+            "at": 25674.799999998882,
+            "cpuMs": 4.099999999627471,
+            "gpuMs": 3.754708,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 160,
+            "at": 26008.099999999627,
+            "cpuMs": 4.199999999254942,
+            "gpuMs": 3.68275,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 180,
+            "at": 26341.39999999851,
+            "cpuMs": 4.100000001490116,
+            "gpuMs": 3.733583,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 200,
+            "at": 26674.799999998882,
+            "cpuMs": 4.200000001117587,
+            "gpuMs": 3.676374,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 220,
+            "at": 27008,
+            "cpuMs": 4.199999999254942,
+            "gpuMs": 3.968416,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 240,
+            "at": 27341.39999999851,
+            "cpuMs": 4.300000000745058,
+            "gpuMs": 4.035375,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 260,
+            "at": 27674.699999999255,
+            "cpuMs": 4,
+            "gpuMs": 3.909875,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 280,
+            "at": 28008,
+            "cpuMs": 3.899999998509884,
+            "gpuMs": 3.808166,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 300,
+            "at": 28341.299999998882,
+            "cpuMs": 4.200000001117587,
+            "gpuMs": 4.098999,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 320,
+            "at": 28674.699999999255,
+            "cpuMs": 4.300000000745058,
+            "gpuMs": 4.134333,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 340,
+            "at": 29008,
+            "cpuMs": 4.299999998882413,
+            "gpuMs": 4.2375,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 360,
+            "at": 29341.299999998882,
+            "cpuMs": 4,
+            "gpuMs": 4.099333,
+            "outcome": "complete"
+          }
+        ],
+        "scope": "One existing renderer.render(mainScene, mainCamera), including its internal shadow work; excludes subsequent composer/effect passes.",
+        "limitations": [
+          "CPU is JavaScript command submission around sampled main render only; GPU is asynchronous elapsed query, not whole frame or input-to-photon.",
+          "CPU/GPU durations overlap and must not be added. At most 40 sampled existing draws, one per 20 eligible draws, no extra draw/invalidate.",
+          "Diagnostic wrapper/query overhead; compare clean navigation separately. Another profiler must stay disabled for this isolated session.",
+          "Timer extension absence is unavailable; failed ownership/capability lookup is unknown. Disjoint and timed-out GPU samples are discarded."
+        ]
+      },
+      "errors": []
+    },
+    {
+      "label": "candidate",
+      "before": {
+        "at": 23205,
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "visible": "visible",
+        "focused": true,
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 1095,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "manifest": {
+          "sha": "38aff99abd08261e7523a1855ca074ff1c350008",
+          "mode": "production",
+          "diagnostics": true,
+          "fixtureBackend": "qa.invalid",
+          "analytics": "preview fixture only"
+        },
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "buffer": [
+          1280,
+          592
+        ],
+        "dpr": 1,
+        "storeDpr": 1,
+        "css": [
+          1280,
+          592
+        ],
+        "camera": [
+          107.36363636363635,
+          120,
+          132.27272725903615
+        ],
+        "target": [
+          -7.63636363636364,
+          0,
+          -2.727272740963855
+        ],
+        "inventoryCounts": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "resources": {
+          "geometries": 574,
+          "textures": 137,
+          "programs": 244
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1
+        }
+      },
+      "after": {
+        "at": 30320.199999999255,
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "visible": "visible",
+        "focused": true,
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 1459,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "manifest": {
+          "sha": "38aff99abd08261e7523a1855ca074ff1c350008",
+          "mode": "production",
+          "diagnostics": true,
+          "fixtureBackend": "qa.invalid",
+          "analytics": "preview fixture only"
+        },
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "buffer": [
+          1280,
+          592
+        ],
+        "dpr": 1,
+        "storeDpr": 1,
+        "css": [
+          1280,
+          592
+        ],
+        "camera": [
+          -156.14996892517485,
+          119.99982860597797,
+          94.19408805558903
+        ],
+        "target": [
+          -7.63636363636364,
+          0,
+          -2.727272740963855
+        ],
+        "inventoryCounts": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "resources": {
+          "geometries": 574,
+          "textures": 137,
+          "programs": 244
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1
+        }
+      },
+      "gesture": {
+        "pointerId": 1,
+        "inputSamples": 301,
+        "controlStarts": 1,
+        "controlChanges": 648,
+        "path": "+160 CSS px horizontal, ±24 vertical over recorded duration; native down/up with temporal dispatched moves"
+      },
+      "probe": {
+        "status": "supported",
+        "reason": null,
+        "recording": false,
+        "disposed": true,
+        "eligibleDraws": 362,
+        "sampledDraws": 18,
+        "sampleEvery": 20,
+        "sampleLimit": 40,
+        "pendingLimit": 8,
+        "queryTimeoutMs": 5000,
+        "pollIntervalMs": 100,
+        "pendingQueries": 0,
+        "skippedPreparing": 0,
+        "skippedPendingCapacity": 0,
+        "disjointDrops": 0,
+        "droppedQueries": 0,
+        "invalidVisibility": false,
+        "cpuSubmission": {
+          "samples": 18,
+          "medianMs": 4.399999998509884
+        },
+        "gpuMainScene": {
+          "samples": 18,
+          "medianMs": 3.858916
+        },
+        "samples": [
+          {
+            "ordinal": 20,
+            "at": 23576.299999998882,
+            "cpuMs": 4.5,
+            "gpuMs": 3.887,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 40,
+            "at": 23908.900000000373,
+            "cpuMs": 4.299999998882413,
+            "gpuMs": 3.858916,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 60,
+            "at": 24242.900000000373,
+            "cpuMs": 4.399999998509884,
+            "gpuMs": 3.884249,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 80,
+            "at": 24576.199999999255,
+            "cpuMs": 4.300000000745058,
+            "gpuMs": 3.981208,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 100,
+            "at": 24909.5,
+            "cpuMs": 4.099999999627471,
+            "gpuMs": 3.748166,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 120,
+            "at": 25242.199999999255,
+            "cpuMs": 4.099999999627471,
+            "gpuMs": 3.711125,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 140,
+            "at": 25576.099999999627,
+            "cpuMs": 4.400000000372529,
+            "gpuMs": 3.739541,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 160,
+            "at": 25909.5,
+            "cpuMs": 4.400000000372529,
+            "gpuMs": 4.130999,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 180,
+            "at": 26242.799999998882,
+            "cpuMs": 4.200000001117587,
+            "gpuMs": 4.726125,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 200,
+            "at": 26576.099999999627,
+            "cpuMs": 4.300000000745058,
+            "gpuMs": 4.78625,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 220,
+            "at": 26909.5,
+            "cpuMs": 4.599999999627471,
+            "gpuMs": 5.324708,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 240,
+            "at": 27242.699999999255,
+            "cpuMs": 4.5,
+            "gpuMs": 6.288541,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 260,
+            "at": 27576.099999999627,
+            "cpuMs": 4.599999999627471,
+            "gpuMs": 3.744124,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 280,
+            "at": 27909.299999998882,
+            "cpuMs": 4.600000001490116,
+            "gpuMs": 3.871749,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 300,
+            "at": 28242.699999999255,
+            "cpuMs": 4.5,
+            "gpuMs": 3.7025,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 320,
+            "at": 28576,
+            "cpuMs": 4.299999998882413,
+            "gpuMs": 3.807791,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 340,
+            "at": 28909.400000000373,
+            "cpuMs": 4.199999999254942,
+            "gpuMs": 3.74025,
+            "outcome": "complete"
+          },
+          {
+            "ordinal": 360,
+            "at": 29242.699999999255,
+            "cpuMs": 4.400000000372529,
+            "gpuMs": 3.6615,
+            "outcome": "complete"
+          }
+        ],
+        "scope": "One existing renderer.render(mainScene, mainCamera), including its internal shadow work; excludes subsequent composer/effect passes.",
+        "limitations": [
+          "CPU is JavaScript command submission around sampled main render only; GPU is asynchronous elapsed query, not whole frame or input-to-photon.",
+          "CPU/GPU durations overlap and must not be added. At most 40 sampled existing draws, one per 20 eligible draws, no extra draw/invalidate.",
+          "Diagnostic wrapper/query overhead; compare clean navigation separately. Another profiler must stay disabled for this isolated session.",
+          "Timer extension absence is unavailable; failed ownership/capability lookup is unknown. Disjoint and timed-out GPU samples are discarded."
+        ]
+      },
+      "errors": []
+    }
+  ],
+  "cache": "Fresh context per revision; same browser sequentially; equal gesture warmup. HTTP/OS/driver caches not controlled.",
+  "limitations": "One descriptive QA GPU run per revision on the reported host. Query wrapper overhead. Main scene render only, excluding post effect passes. No physical Android/old GPU, real input-to-photon, whole-frame GPU time, population percentiles, or production data.",
+  "testValidation": {
+    "runner": "Node v24.19.0 node:test",
+    "passed": 7,
+    "failed": 0,
+    "durationMs": 40.615334,
+    "syntax": "gpu-scene-probe.cjs/gpu-navigation.cjs passed"
+  },
+  "execution": {
+    "hostGPU": "ANGLE Metal Renderer Apple M5",
+    "browserHeadless": true,
+    "concurrency": "Sequential exclusive diagnostic session; no build, test or other browser benchmark running",
+    "contextCleanup": "Playwright finally closed every context and browser after both revisions",
+    "drawCounters": "Instantaneous draw/triangle counters were not captured by this probe; eligibleDraws is main renderer.render calls, not GL draw calls."
+  }
+}

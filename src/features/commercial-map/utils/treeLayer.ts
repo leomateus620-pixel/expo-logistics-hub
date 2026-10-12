@@ -160,6 +160,94 @@ function commercialTreeSurfaceEntityAtPosition(
   }, null);
 }
 
+export interface CommercialTreeSurfaceResolver {
+  groundElevation: (tree: CommercialMapTree) => number;
+  groundElevationAtPosition: (tree: CommercialMapTree, point: readonly [number, number]) => number;
+  shadowElevationAtPosition: (tree: CommercialMapTree, point: readonly [number, number]) => number;
+}
+
+/** Scene-owned numeric preparation, rebuilt when the surface snapshot changes.
+ * Bounds only reject impossible candidates; the existing polygon/distance and
+ * priority rules still choose the receiver. No commercial or GPU cache. */
+export function createCommercialTreeSurfaceResolver(entities: readonly MapEntity[]): CommercialTreeSurfaceResolver {
+  const supports = entities.filter(isPavilion12TreeGroundSupport);
+  const candidates = entities.filter((entity) => TREE_SURFACE_CLASSIFICATIONS.has(entity.classification)
+    && !isPavilion12TreeGroundSupport(entity)).map((entity) => {
+    let minX = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let minZ = Number.POSITIVE_INFINITY;
+    let maxZ = Number.NEGATIVE_INFINITY;
+    let bounded = true;
+    for (const [x, z] of entity.geometry.coordinates[0] ?? []) {
+      bounded = bounded && Number.isFinite(x) && Number.isFinite(z);
+      minX = Math.min(minX, x);
+      maxX = Math.max(maxX, x);
+      minZ = Math.min(minZ, z);
+      maxZ = Math.max(maxZ, z);
+    }
+    return { entity, minX, maxX, minZ, maxZ, bounded };
+  });
+  const anchoredSurfaces = new Map<string, MapEntity>();
+  for (const { entity } of candidates) {
+    // Match Array.find when a presentation includes duplicate identifiers.
+    if (!anchoredSurfaces.has(entity.publicIdentifier)) anchoredSurfaces.set(entity.publicIdentifier, entity);
+  }
+  const resolveSurface = (tree: CommercialMapTree, point: readonly [number, number]) => {
+    if (isPavilion12FrontTreeId(tree.id)) {
+      const support = supports.find((entity) => pavilion12TreeSupportContainsPoint(point, entity));
+      if (support) return support;
+    }
+    let containing: MapEntity | null = null;
+    let containingPriority = Number.POSITIVE_INFINITY;
+    for (const { entity, minX, maxX, minZ, maxZ, bounded } of candidates) {
+      if (bounded && (point[0] < minX - SPATIAL_EPSILON || point[0] > maxX + SPATIAL_EPSILON
+        || point[1] < minZ - SPATIAL_EPSILON || point[1] > maxZ + SPATIAL_EPSILON)) continue;
+      if (!pointInPolygon(point, entity.geometry.coordinates[0] ?? [])) continue;
+      const priority = surfacePriority(tree, entity);
+      // Strict comparison preserves the previous stable-sort tie order.
+      if (priority < containingPriority) {
+        containing = entity;
+        containingPriority = priority;
+      }
+    }
+    if (containing) return containing;
+    const anchoredSurface = tree.surfaceEntityIdentifier
+      ? anchoredSurfaces.get(tree.surfaceEntityIdentifier)
+      : null;
+    if (anchoredSurface && distanceToEntity(point, anchoredSurface) <= Math.max(0.75, tree.canopyRadius * 1.5)) {
+      return anchoredSurface;
+    }
+    if (tree.placement === 'LANDSCAPE_MASS' || tree.placement === 'BUILDING_EDGE'
+      || tree.placement === 'OUTSIDE_COMMERCIAL_LOT') return null;
+    let nearest: MapEntity | null = null;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+    let nearestPriority = Number.POSITIVE_INFINITY;
+    for (const { entity, minX, maxX, minZ, maxZ, bounded } of candidates) {
+      const lowerDistance = Math.hypot(
+        Math.max(minX - point[0], 0, point[0] - maxX),
+        Math.max(minZ - point[1], 0, point[1] - maxZ),
+      );
+      // A candidate inside the epsilon tie must still be considered for its
+      // priority, including the old reducer's deliberately stable ties.
+      if (bounded && nearest && lowerDistance > nearestDistance + SPATIAL_EPSILON) continue;
+      const distance = distanceToEntity(point, entity);
+      const priority = surfacePriority(tree, entity);
+      if (!nearest || distance < nearestDistance - SPATIAL_EPSILON
+        || (Math.abs(distance - nearestDistance) <= SPATIAL_EPSILON && priority < nearestPriority)) {
+        nearest = entity;
+        nearestDistance = distance;
+        nearestPriority = priority;
+      }
+    }
+    return nearest;
+  };
+  return {
+    groundElevation: (tree) => commercialTreeSupportElevation(tree, tree.position, resolveSurface(tree, tree.position), false),
+    groundElevationAtPosition: (tree, point) => commercialTreeSupportElevation(tree, point, resolveSurface(tree, point), false),
+    shadowElevationAtPosition: (tree, point) => commercialTreeSupportElevation(tree, point, resolveSurface(tree, point), true),
+  };
+}
+
 export function commercialTreeGroundElevation(
   tree: CommercialMapTree,
   entities: readonly MapEntity[] = [],
@@ -191,6 +279,15 @@ function commercialTreeSupportElevationAtPosition(
   shadow: boolean,
 ) {
   const surfaceEntity = commercialTreeSurfaceEntityAtPosition(tree, point, entities);
+  return commercialTreeSupportElevation(tree, point, surfaceEntity, shadow);
+}
+
+function commercialTreeSupportElevation(
+  tree: CommercialMapTree,
+  point: readonly [number, number],
+  surfaceEntity: MapEntity | null,
+  shadow: boolean,
+) {
   if (surfaceEntity?.publicIdentifier === 'EST-EXP-VIS' || surfaceEntity?.publicIdentifier === 'EST-VIS') {
     return naturalParkingGroundElevationAt(point) + (shadow ? TREE_SHADOW_CLEARANCE : TREE_SURFACE_CLEARANCE);
   }

@@ -2,12 +2,15 @@ import { act, cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as THREE from 'three';
 
-const runtime = vi.hoisted(() => ({ state: null as unknown }));
+const runtime = vi.hoisted(() => ({ state: null as unknown, frame: null as null | (() => void) }));
 vi.mock('@react-three/fiber', () => ({
   useThree: (selector: (state: unknown) => unknown) => selector(runtime.state),
+  useFrame: (callback: () => void) => { runtime.frame = callback; },
 }));
 
 import { CommercialMapInteriorShaderWarmup } from '@/features/commercial-map/components/canvas/CommercialMapInteriorShaderWarmup';
+import { CommercialMapInteractiveBoot, scheduleCommercialMapSceneTask } from '@/features/commercial-map/components/canvas/DeferredSceneLayer';
+import { COMMERCIAL_MAP_RENDER_RETRY_EVENT, publishCommercialMapRenderHealth } from '@/features/commercial-map/utils/renderingHealth';
 
 function createRuntime({ pending = false, target = null }: { pending?: boolean; target?: THREE.WebGLRenderTarget | null } = {}) {
   let currentTarget = target;
@@ -33,14 +36,32 @@ function createRuntime({ pending = false, target = null }: { pending?: boolean; 
       return materials;
     }),
   };
-  runtime.state = { gl, camera: new THREE.PerspectiveCamera(38, 1.5, 0.05, 1200) };
-  return { gl, snapshot, complete: () => complete() };
+  runtime.state = { gl, camera: new THREE.PerspectiveCamera(38, 1.5, 0.05, 1200), controls: {}, invalidate: vi.fn() };
+  return { gl, snapshot, complete: () => complete(), suspend: () => { ready = false; } };
 }
 
 afterEach(() => {
   cleanup();
+  vi.useRealTimers();
   vi.restoreAllMocks();
+  runtime.frame = null;
 });
+
+function health(canvas: HTMLCanvasElement, status: 'ready' | 'context-lost', presentedFrames: number) {
+  publishCommercialMapRenderHealth(canvas, {
+    status, path: status === 'ready' ? 'direct' : 'suspended', presentedFrames,
+    contextLosses: status === 'ready' ? 0 : 1, lastErrorCode: status === 'ready' ? null : 'context-lost',
+  });
+}
+
+function startExistingQueue(canvas: HTMLCanvasElement) {
+  render(<CommercialMapInteractiveBoot />);
+  canvas.dataset.commercialMapEssentialReady = 'true';
+  act(() => {
+    for (let frames = 0; frames <= 3; frames++) { health(canvas, 'ready', frames); runtime.frame?.(); }
+  });
+  expect(canvas.dataset.commercialMapReady).toBe('true');
+}
 
 describe('Commercial Map exact interior shader warmup', () => {
   it('prepares seven detached variants with the actual interior light/fog/texture/instance defines', async () => {
@@ -110,19 +131,128 @@ describe('Commercial Map exact interior shader warmup', () => {
   });
 
   it('aborts lost programs and recompiles retained probes on context restoration', async () => {
+    vi.useFakeTimers();
     const { gl, snapshot, complete } = createRuntime({ pending: true });
+    startExistingQueue(gl.domElement);
     const view = render(<CommercialMapInteriorShaderWarmup reducedGraphics />);
     const scene = snapshot.scene;
     await act(async () => { gl.domElement.dispatchEvent(new Event('webglcontextlost')); });
-    expect(JSON.parse(gl.domElement.dataset.commercialMapInteriorShaderWarmup!).error).toContain('Shader preparation cancelled');
+    expect(gl.domElement.dataset.commercialMapInteriorShaderWarmup).toBeUndefined();
     complete();
-    await act(async () => { gl.domElement.dispatchEvent(new Event('webglcontextrestored')); });
+    await act(async () => {
+      gl.domElement.dispatchEvent(new Event('webglcontextrestored'));
+      await vi.advanceTimersByTimeAsync(1000);
+    });
     expect(gl.compile).toHaveBeenCalledTimes(2);
     expect(snapshot.scene).toBe(scene);
     expect(JSON.parse(gl.domElement.dataset.commercialMapInteriorShaderWarmup!)).toMatchObject({ error: null });
     view.unmount();
     gl.domElement.dispatchEvent(new Event('webglcontextrestored'));
     expect(gl.compile).toHaveBeenCalledTimes(2);
+  });
+
+  it('queues restored probes behind essential preparation and the critical post job, preserving a single initial compile', async () => {
+    vi.useFakeTimers();
+    const { gl } = createRuntime();
+    startExistingQueue(gl.domElement);
+    render(<CommercialMapInteriorShaderWarmup reducedGraphics />);
+    await act(async () => {});
+    expect(gl.compile).toHaveBeenCalledTimes(1);
+    gl.domElement.dataset.commercialMapPreparing = 'true';
+    gl.domElement.dataset.commercialMapEssentialReady = 'false';
+    health(gl.domElement, 'context-lost', 3);
+    act(() => {
+      gl.domElement.dispatchEvent(new Event('webglcontextlost'));
+      gl.domElement.dispatchEvent(new Event('webglcontextrestored'));
+    });
+    const order: string[] = [];
+    const critical = vi.fn((complete: () => void) => { order.push('critical-post'); complete(); });
+    scheduleCommercialMapSceneTask(gl.domElement, { id: 'critical-post-shaders', priority: 0, run: critical });
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(gl.compile).toHaveBeenCalledTimes(1);
+    expect(critical).not.toHaveBeenCalled();
+    gl.compile.mockImplementationOnce(() => { order.push('interior'); return new Set<THREE.Material>(); });
+    gl.domElement.dataset.commercialMapEssentialReady = 'true';
+    delete gl.domElement.dataset.commercialMapPreparing;
+    health(gl.domElement, 'ready', 6);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(gl.compile).toHaveBeenCalledTimes(2);
+    expect(order).toEqual(['critical-post', 'interior']);
+  });
+
+  it('cancels queued restored probes on unmount without compiling or retaining their resources', async () => {
+    vi.useFakeTimers();
+    const { gl, snapshot } = createRuntime();
+    startExistingQueue(gl.domElement);
+    const view = render(<CommercialMapInteriorShaderWarmup reducedGraphics />);
+    await act(async () => {});
+    gl.domElement.dataset.commercialMapPreparing = 'true';
+    act(() => gl.domElement.dispatchEvent(new Event('webglcontextrestored')));
+    expect(gl.compile).toHaveBeenCalledTimes(1);
+    const dispose = vi.spyOn((snapshot.scene!.children.find(child => child instanceof THREE.Mesh) as THREE.Mesh).geometry, 'dispose');
+    view.unmount();
+    expect(dispose).toHaveBeenCalledOnce();
+    delete gl.domElement.dataset.commercialMapPreparing;
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(gl.compile).toHaveBeenCalledTimes(1);
+    expect(snapshot.scene!.children).toHaveLength(0);
+  });
+
+  it('keeps optional restoration queued after essential failure and resumes only after an explicit retry has prepared essentials', async () => {
+    vi.useFakeTimers();
+    const { gl } = createRuntime();
+    startExistingQueue(gl.domElement);
+    render(<CommercialMapInteriorShaderWarmup reducedGraphics />);
+    await act(async () => {});
+    gl.domElement.dataset.commercialMapEssentialReady = 'false';
+    gl.domElement.dataset.commercialMapPreparationError = 'SHADER_PREPARATION_TIMEOUT';
+    publishCommercialMapRenderHealth(gl.domElement, {
+      status: 'failed', path: 'suspended', presentedFrames: 3, contextLosses: 1,
+      lastErrorCode: 'SHADER_PREPARATION_TIMEOUT',
+    });
+    act(() => gl.domElement.dispatchEvent(new Event('webglcontextrestored')));
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(gl.compile).toHaveBeenCalledTimes(1);
+
+    // Retry clears its error while its existing essential gate remains closed.
+    const retry = () => { delete gl.domElement.dataset.commercialMapPreparationError; };
+    gl.domElement.addEventListener(COMMERCIAL_MAP_RENDER_RETRY_EVENT, retry, { once: true });
+    act(() => gl.domElement.dispatchEvent(new Event(COMMERCIAL_MAP_RENDER_RETRY_EVENT)));
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(gl.compile).toHaveBeenCalledTimes(1);
+
+    // A stale error independently blocks a misleading ready marker as well.
+    gl.domElement.dataset.commercialMapEssentialReady = 'true';
+    gl.domElement.dataset.commercialMapPreparationError = 'SHADER_PREPARATION_TIMEOUT';
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(gl.compile).toHaveBeenCalledTimes(1);
+    delete gl.domElement.dataset.commercialMapPreparationError;
+    health(gl.domElement, 'ready', 6);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(gl.compile).toHaveBeenCalledTimes(2);
+    expect(gl.domElement.dataset.commercialMapHydration).toBe('complete');
+  });
+
+  it('releases a cancelled in-flight restoration once and ignores its obsolete completion', async () => {
+    vi.useFakeTimers();
+    const { gl, suspend, complete } = createRuntime();
+    startExistingQueue(gl.domElement);
+    const view = render(<CommercialMapInteriorShaderWarmup reducedGraphics />);
+    await act(async () => {});
+    suspend();
+    act(() => gl.domElement.dispatchEvent(new Event('webglcontextrestored')));
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(gl.compile).toHaveBeenCalledTimes(2);
+    const successor = vi.fn((done: () => void) => done());
+    scheduleCommercialMapSceneTask(gl.domElement, { id: 'after-interior', priority: 150, run: successor });
+    view.unmount();
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(successor).toHaveBeenCalledOnce();
+    complete();
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(successor).toHaveBeenCalledOnce();
+    expect(gl.compile).toHaveBeenCalledTimes(2);
+    expect(vi.getTimerCount()).toBe(0);
   });
 
   it('restores renderer globals and leaves the map intact when optional warmup fails', async () => {

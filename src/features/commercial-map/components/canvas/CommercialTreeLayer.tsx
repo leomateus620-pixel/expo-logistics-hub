@@ -12,9 +12,10 @@ import {
   COMMERCIAL_TREE_BRANCHES,
   COMMERCIAL_TREE_CANOPY_LOBES,
   COMMERCIAL_TREE_REDUCED_CANOPY_LOBES,
-  commercialTreeGroundElevation,
-  commercialTreeShadowElevationAtPosition,
+  createCommercialTreeSurfaceResolver,
+  type CommercialTreeSurfaceResolver,
 } from '../../utils/treeLayer';
+import { measureCommercialMapSync } from '../../utils/performanceDiagnostics';
 import {
   buildVegetationLodSelectionPlan,
   createVegetationLodController,
@@ -531,7 +532,7 @@ function advanceCommercialTreeLodCounts(
 
 function CommercialTreeInstances({
   trees,
-  surfaceEntities,
+  surfaceResolver,
   visible,
   reducedGraphics,
   qualityTier,
@@ -541,6 +542,7 @@ function CommercialTreeInstances({
 }: {
   trees: readonly CommercialMapTree[];
   surfaceEntities: readonly MapEntity[];
+  surfaceResolver: CommercialTreeSurfaceResolver;
   visible: boolean;
   reducedGraphics: boolean;
   qualityTier: CommercialMapQualityTier;
@@ -647,7 +649,7 @@ function CommercialTreeInstances({
     // canonical tree and the same surface-clearance functions as before LOD.
     lodPlan.rankedItems.forEach((tree, treeIndex) => {
       const [x, z] = tree.position;
-      const groundY = commercialTreeGroundElevation(tree, surfaceEntities);
+      const groundY = surfaceResolver.groundElevation(tree);
       const trunkPalette = (referenceQuadras ? QUADRAS_AB_TRUNK_PALETTES : TRUNK_PALETTES)[tree.speciesGroup];
       const foliagePalette = (referenceQuadras ? QUADRAS_AB_FOLIAGE_PALETTES : COMMERCIAL_TREE_FOLIAGE_PALETTES)[tree.speciesGroup];
       const profile = commercialTreePresentationProfile(tree);
@@ -728,10 +730,9 @@ function CommercialTreeInstances({
         x + SUNRISE_SHADOW_DIRECTION[0] * shadowOffset,
         z + SUNRISE_SHADOW_DIRECTION[1] * shadowOffset,
       ] as const;
-      const shadowGroundY = commercialTreeShadowElevationAtPosition(
+      const shadowGroundY = surfaceResolver.shadowElevationAtPosition(
         tree,
         shadowPosition,
-        surfaceEntities,
       );
       transform.position.set(
         shadowPosition[0],
@@ -776,7 +777,7 @@ function CommercialTreeInstances({
     lodPlan,
     referenceQuadras,
     internalPark,
-    surfaceEntities,
+    surfaceResolver,
   ]);
 
   useLayoutEffect(() => {
@@ -969,12 +970,14 @@ export const CommercialTreeLayer = memo(function CommercialTreeLayer(props: {
   const lodScene = useMemo(() => resolveCommercialTreeLodSceneMetrics(props.trees), [props.trees]);
   const qualityTier = props.qualityTier ?? 'HIGH';
   const content = resolveCommercialMapContentPolicy(qualityTier, props.reducedGraphics);
+  const surfaceResolver = useMemo(() => measureCommercialMapSync('tree-surface-preparation',
+    () => createCommercialTreeSurfaceResolver(props.surfaceEntities)), [props.surfaceEntities]);
   if (props.trees.length === 0) return null;
   return (
     <>
       {treeGroups.pilot.length > 0 && <>
-        <VegetationPilotTreeLayer {...props} trees={treeGroups.pilot} reducedGraphics={content.reducedGraphics} />
-        <VegetationPilotGroundLayer entities={props.surfaceEntities} trees={treeGroups.pilot} visible={props.visible} reducedGraphics={content.reducedGraphics} />
+        <VegetationPilotTreeLayer {...props} trees={treeGroups.pilot} reducedGraphics={content.reducedGraphics} surfaceResolver={surfaceResolver} />
+        <VegetationPilotGroundLayer entities={props.surfaceEntities} trees={treeGroups.pilot} visible={props.visible} reducedGraphics={content.reducedGraphics} surfaceResolver={surfaceResolver} />
       </>}
       {treeGroups.legacy.length > 0 && (
         <CommercialTreeInstances
@@ -982,11 +985,12 @@ export const CommercialTreeLayer = memo(function CommercialTreeLayer(props: {
           trees={treeGroups.legacy}
           qualityTier={qualityTier}
           lodScene={lodScene}
+          surfaceResolver={surfaceResolver}
         />
       )}
       {treeGroups.internal.length > 0 && (
         <CommercialTreeInstances {...props} trees={treeGroups.internal}
-          qualityTier={qualityTier} lodScene={lodScene} internalPark />
+          qualityTier={qualityTier} lodScene={lodScene} surfaceResolver={surfaceResolver} internalPark />
       )}
       {treeGroups.referenceQuadras.length > 0 && (
         <CommercialTreeInstances
@@ -995,6 +999,7 @@ export const CommercialTreeLayer = memo(function CommercialTreeLayer(props: {
           qualityTier={qualityTier}
           lodScene={lodScene}
           referenceQuadras
+          surfaceResolver={surfaceResolver}
         />
       )}
     </>

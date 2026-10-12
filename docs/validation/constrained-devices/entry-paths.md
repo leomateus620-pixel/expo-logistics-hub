@@ -1,0 +1,74 @@
+# Auditoria de boot/dados — somente leitura
+
+Base examinada: `8f3e871010ebfeab45824ba042183127da3b15e3`, worktree `/Users/leonardo/.codex/worktrees/map-constrained-devices/expo-logistics-hub`.
+Regras lidas: raiz `AGENTS.md` e `src/features/commercial-map/AGENTS.md`; não existem AGENTS adicionais nos subdiretórios de boot/dados/canvas/público examinados. Nenhuma escrita no banco, ação comercial, build ou benchmark executado por esta auditoria.
+
+## Deploy observado
+
+Em consulta HTTP read-only ao HTML público de `https://fenasojagestao.com`, em 11/10/2026 no horário do cliente (resposta HTTP datada 12/10/2026 03:51 UTC), o HTML declara `data-commit-sha="8f3e871010ebfeab45824ba042183127da3b15e3"` e entry `/assets/index-D5DewM7l.js`. Isso identifica a revisão **declarada pelo artefato servido**. Não demonstra identidade criptográfica de todos os bundles ou presença dos mesmos dados, driver e sessão da reprodução local. Não foi acessada API de dados privados, sessão, token de link nem rota autenticada. Metadados irrelevantes foram omitidos desta evidência.
+
+## Caminho ativo por entrada
+
+### Autenticado integral
+
+1. `App.tsx:CommercialMapRoute` aplica AuthGuard → OrgGuard → CapabilityGuard `map.view` → Suspense. A factory lazy abre a sessão de boot, inicia o worker B12 e importa `pages/CommercialMapPage` por `loadCommercialMapRouteModule`.
+2. Wrapper monta Shell + feature. `useCommercialMapBootVisit` reivindica dono por chave de rota e preserva sessão em replay Suspense/StrictMode. `CommercialMapPage` inicia `useCommercialMap`, a sondagem descartável WebGL2 e, depois de montar, a importação Canvas durante a espera por dados.
+3. `commercialMapQueryOptions` usa chave integral com `userId/orgId`, cache raw único, apresentação comum por `select`, signal de React Query, staleTime 30s, gc 10min. `useCommercialMap` desabilita refetch por foco integral, conserva reconnect e um intervalo de segurança de 30min.
+4. `fetchCommercialMap`: expiração de reservas (limite 6s) e projeto em paralelo, depois layers/entities/geometries/calibration/lots/pricing/lotPresence/segments/revision (limite 8s) em paralelo. Paginação ordenada por id, 1.000 linhas/página e falha de qualquer página retorna null/error; erro essencial lança antes da transformação, não libera inventário parcial. Todos os awaits usam sinal e rejeitam resposta obsoleta mesmo quando adapter não aborta.
+5. Transformação raw: geometria por entidade, lotes/preços, reconciliação e revisão do início da carga. `select: presentCommercialMapData` aplica reconstruções visuais sem escrever cadastro; não há medição própria dessa transformação do select. Comprador resumido, logo privado autorizado e assinatura da referência são consultas secundárias e não prendem os dados essenciais.
+6. Canvas lazy/Profiler monta somente com dados utilizáveis e WebGL2 disponível. `Scene` suspende B12 **antes** de construir irmãos, evitando o replay já corrigido. Camadas EssentialSceneLayer autenticadas participam do commit inicial/barreira global: site, quadras, estacionamentos, acessos, residência, landmarks, nações, arena, vegetação e detalhe elétrico. A fila idle não divide esse commit nem os cálculos síncronos dos filhos.
+7. Shader warmup só libera estrutura essencial preparada. `CommercialMapInteractiveBoot` observa o único proprietário do draw em prioridade -0.5; exige preparação essencial, controles instalados, tela saudável direct/post, ausência de compilação e três apresentações novas do attempt. Não exige FPS mínimo. Context loss/preparing zera baseline local. Readiness é apresentação, não demonstra fluidez ou latência física.
+8. Após readiness inicia fila única por Canvas: rain, hydrology, interior-shaders, physics. Fila concede um commit por vez, após 80ms + idle; aguarda documento visível, contexto, ausência de navegação/preparing e 350ms sem input. Ao terminar escreve `commercialMapHydration=complete`.
+9. Revisão leve: 60s/foco/retorno, só visível, sem dados em fetch nem Vendas ativo; assinatura divergente gera uma refetch sem cancelamento. Timeout de revisão 15s, recuperação integral no mínimo a cada 3min depois de falhas persistentes. `scheduleCommercialMapRefresh` agrupa pedidos 400ms e mantém uma atualização depois de carga em andamento.
+
+### Comissão restrita
+
+1. AuthGuard/OrgGuard/ModuleAccessGuard e layout de comissão. `FullMapViewerRedirect` envia quem tem `map.view` ao integral; quem só tem capability segmentada usa workspace com scope estável `commissionId/segmentId`.
+2. Mesma política de tentativas e cache com chave contendo usuário/org/comissão/segmento. Permissões do workspace são explicitamente leitura. Refetch por foco e safety de 10min neste caminho.
+3. Projeto → segmento ativo/câmera persistida → RPC inventário → RPC expiração de reservas segmentada → entidades paginadas → geometria/lotes em grupos de 100 IDs + contexto cartográfico em paralelo. Valida geometrias vigentes completas e inventário; não reutiliza snapshot de outro scope. Geometria/contexto integral só vem da RPC autorizada de contexto.
+4. A expiração segmentada não usa `boundedSignal`, ao contrário da integral: é uma espera de rede sequencial sem limite local antes de ler entidades. **Mecanismo confirmado no código, efeito atual não medido**; não é causa gráfica comprovada nem motivo de redução visual. Não corrigir por hipótese sem medição/reprodução de timeout.
+5. Canvas, estrutura/barreira e recuperação são compartilhados; seleção/picking ficam restritos ao segmento persistido. Logo/comprador dependem da autorização já existente.
+
+### Público por link
+
+1. `/areas/:slug/:token` tem factory própria. Página keyed por slug/token reivindica sessão no layout effect e inicializa o scope público; Canvas lazy por import resource compartilhado, sem speculative B12.
+2. `usePublicMapInventory`/`usePublicMapContext`: queries distintas keyed por slug/token, RPCs que validam scope no servidor. `publicRpc` tem 20s e sinal vinculado. Uma tentativa adicional em falha não-access. Pavilhão precisa inventário; externo precisa inventário **e** contexto publicável antes de montar para não usar bounds temporários.
+3. Logos são secundários autorizados pelo token; conversão para Canvas cacheia por lote. Política externa cacheada por chave de geometria/escopo preserva variantes e câmera em revisão de preço/status.
+4. Canvas é o mesmo; public policy preserva caminho próprio com algumas camadas contextuais deferred existentes e interação restrita. Pavilhão entra no interior persistido. `usePublicMapRenderState` lê saúde/readiness, demora vira aviso em 12s, falha real tem retry. Esse timer não prova prontidão.
+5. Revisão pública leve a cada 15s, fora de background, invalida inventário apenas em assinatura diferente; revogação invalida inventário exibido. Listagem e detalhes continuam disponíveis, porém não representam paridade do fluxo autenticado de Vendas múltiplas/interiores.
+6. Lacuna diagnóstica: `publicRpc` usa `markCommercialMapStage` diretamente em finally e não registra failure/ok/ownership capturado. A factory/página inicia boot no layout após hooks de consulta; tempos iniciais de RPC podem ficar incompletos em certas ordens. Isso é confiabilidade da medição, não falha funcional demonstrada.
+
+## Hipóteses e testes que podem refutar
+
+| Hipótese | Evidência e condição | Mecanismo/impacto | Correção admissível / teste |
+|---|---|---|---|
+| 1. Adaptação tarde por gate | `CommercialMapAdaptiveQuality.tsx:438` exige hydration complete; `DeferredSceneLayer.queueFor` pausa por navegação. Confirmado no código. | Usuário navegando após apresentações essenciais pode postergar trabalho secundário e impedir início de amostragem por tempo indeterminado. Não explica pré-montagem nem rede. | Considerar amostras de apresentações essenciais válidas sem preparação, usando o mesmo controlador. Reproduzir gesto contínuo antes de hydration; exigir decisões sem consumir intervalos de compilação/pausa/resize. Se hydration sempre termina antes da interação ou não há frames válidos, refuta causalidade no cenário. |
+| 2. Pico React/CPU essencial | Camadas autenticadas montam no commit inicial; idle só atende secundárias. Histórico device-performance relata montagem ~4s e relatório systemic 5,5–7,1s, outra base/máquina. | Tasks síncronas e construção/alocação dominantes podem monopolizar main thread antes dos draws. Custo atual e componente dominante desconhecidos. | Profiler/long tasks/CPU builders atuais, depois otimização equivalente ou divisão real. Um trace sem bloqueio de montagem ou dominado por rede/GPU refuta esta causa naquele aparelho. |
+| 3. CPU/RAM não mede GPU | Sondagem `probeCommercialMapWebGL2` só cria contexto descartável. Não mede load/targets; pistas ausentes não levam downgrade por si só. | Driver/GPU lenta pode passar probe e stall em shader/draw. Driver problemático específico não confirmado. | Diagnóstico limitado por etapa/contexto real, conhecidos vs desconhecidos; correlacionar falha/alloc/context-lost com carga. Aparelho alvo que falha antes de context/dados refuta causa GPU. |
+| 4. Conteúdo permanece LOW/MEDIUM | Regras e histórico confirmam densidade/material canônico; custos residentes dependem de geometria/material/caches reais. Auditoria de ownership cabe ao agente gráfico. | Mudar tier não elimina custo CPU de objetos/recursos duplicados. Duplicação dominante atual desconhecida. | Contagem e bytes estimados por dimensões/formato/proprietário; comparação fixed HIGH equivalente. Não chamar texturas de VRAM. |
+| 5. Janelas de 45/two slow | Controlador global é único; frames extremos contados pela política atual, mas mínimo pode atrasar. | Cadência de progresso extremo precisa ser separada de janela normal. Não usar timer/gesto/tab como prova de baixa capacidade. | Reproduzir frames ativos válidos muito lentos e medir tempo de decisão; manter histerese normal e ausência de downgrade com pausas/preparação. |
+| 6. Compile/link/reflexão/primeiro draw | Warmup real/global antes da apresentação; timer não libera inválido. Compilação não é necessariamente async pela fila idle. | Driver pode bloquear compile/introspection, mas custo atual separados não medidos nesta auditoria. | Medir submissão/link/reflexão/draw, programas/geração/abort; não trocar cegamente compileAsync. Timeout/abort/context loss devem manter barreira. |
+| 7. Probe WebGL2 limitado | Somente contexto + !lost. Confirmado. | Não comprova targets/shaders da cena; sem WebGL2 consulta é útil, incompleta em paridade autenticada. | QA de falhas reais por etapa e contexto forçado, sem sondagem pesada saudável. Falha puramente de dados não é hipótese GPU. |
+| 8. Lista não é solução integral | Histórico e workspace distinguem Vendas/3D; público é consulta scoped. Confirmado. | Tirar loader ou abrir lista não dá cena navegável/ações integrais. | Preservar barreira, saída útil e ações; validar múltipla/interior na cena. |
+| 9. Rede/sessão/RLS | Política única + marca essential-data:ok, page failure details, paginação, revisão bounded. Nenhuma chamada de dados atuais foi feita. | Dados podem demorar antes de qualquer carga GPU, especialmente expiração comissão. | Replay local de timeout/aborts/403/page error/session/retry-after; separar stage timings. Sem medição não alterar backend/RLS ou gráficos. |
+
+## Instrumentação existente e lacunas
+
+- Boot snapshots e recorder capturado têm ownership de sessão para imports/requests integrais. Eventos detalhados/long-task observer são só DEV/flag QA; produção mantém marcas e snapshot limitado, sem payload comercial.
+- `essential-data` wrapper só marca :ok depois de `fetchCommercialMap` utilizável; loader usa :ok/:cached/fixture, nunca :end. Subrequests Supabase que resolvem `{error}` ainda produzem :ok na medição genérica antes da inspeção: não usar essas marcas isoladas como sucesso de página/backend. `essential-data` global rejeita corretamente.
+- Boot summary usa first timestamps por stage. Com retries, dataMs span pode refletir o fim da primeira falha, enquanto marca :ok e apresentação vêm depois. Eventos detalhados contêm duration por attempt; análise precisa distinguir tentativas e espera total de rota.
+- `route-data-wait` captura cold/prefetched/cached antes de criar QueryObserver e evita confundir a própria request com prewarm. O recorder de portal é distinto do boot; a consulta raw e pending imports/worker são compartilhados sem segundo renderer.
+- `controls-responsive` mede próximo RAF/event-loop após input, explicitamente não input-to-photon. Prontidão marca `first-interactive` mesmo com 1s/frame, conforme teste deliberado; só confirma tela/controle e não experiência utilizável. Fluidez precisa de active frame window.
+- `critical-scene:start` ocorre depois que worker B12 read resolve; worker é medido separadamente. Falha worker (8s) termina worker, fallback só admitido por consumidor montado e uma única promessa, não duplicação do fallback. Custo do fallback lento físico é desconhecido.
+- Nenhum getter GL sincronizado por frame foi introduzido por esta auditoria. Upload GPU/bytes resident/render-target peak precisam de instrumentação QA própria do dono gráfico, sem inferência a partir de counters.
+
+## Evidência histórica lida e limite
+
+- `device-performance/README.md`: Windows i5-1035G1/8GB Intel UHD/ANGLE D3D11; viewport móvel em mesmo GPU, não Android. 20 warm reloads, montagem dominante, p95 piorou; ganho de boot não declarado. Existem lacunas físicas, cold start, staging e RLS. Não reapresentar valores como atuais.
+- `progressive-rain/README.md` + `docs/commercial-map-systemic-performance.md`: base mais antiga, divisão de módulo/worker e programas; montagem ainda pesada, waits compilação não são puro GPU; timers/fixture não autenticam dados.
+- `navigation-resolution/README.md`: mesma Intel histórica, DPR estável por gesto preservado. Uma tentativa 240s sem hydration foi rejeitada; timeout harness aumentou sem antecipar gate. Comparação com dois contextos foi excluída. Isso corrobora importância do gate, não falha atual específica em telefone.
+- `dashboard-interaction-performance/scene/validation.md`: benchmark no commit 7aff263d anterior à integração da main da PR #191; covered scene passou a 0 frames/long tasks, renderer/câmera/controles/dados preservados. Deve ser conservado. Não é benchmark novo da base atual.
+
+## Testes reutilizáveis, sem execução nesta auditoria
+
+`src/test/commercialMapInteractiveBoot.test.tsx` já testa ausência de gate FPS (101/120/250/1000ms), somente draws novos, controles/essential/health, preparing e restauração. `commercialMapProgressiveBoot.test.ts`, `commercialMapBootLoader.test.tsx`, `commercialMapPreloadResources.test.ts`, operação/retry/revision/prewarm e cancelamento de controles devem complementar alterações pertinentes. Testes mock/unitário comprovam estado/ownership/cancelamento, não fluidez física. Benchmarks devem rodar sequencialmente coordenados pelo agente principal.

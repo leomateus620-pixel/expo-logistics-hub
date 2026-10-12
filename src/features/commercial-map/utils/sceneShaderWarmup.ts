@@ -1,4 +1,4 @@
-import { captureCommercialMapStageRecorder, measureCommercialMapStage, markCommercialMapStage, type CommercialMapStageRecorder } from './performanceDiagnostics';
+import { captureCommercialMapStageRecorder, commercialMapDiagnosticsEnabled, measureCommercialMapStage, markCommercialMapStage, type CommercialMapStageRecorder } from './performanceDiagnostics';
 import * as THREE from 'three';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 
@@ -182,7 +182,14 @@ function prepareCompiledPrograms(
   renderer: THREE.WebGLRenderer, objects: THREE.Object3D, camera: THREE.Camera, scene: THREE.Scene,
   signal: AbortSignal | undefined, record: CommercialMapStageRecorder,
 ) {
-  const materials = renderer.compile(objects, camera, scene);
+  const submissionStartedAt = commercialMapDiagnosticsEnabled ? performance.now() : 0;
+  let materials: Set<THREE.Material>;
+  try { materials = renderer.compile(objects, camera, scene); }
+  catch (error) {
+    if (commercialMapDiagnosticsEnabled) record('program-submission', { duration: performance.now() - submissionStartedAt, failed: true });
+    throw error;
+  }
+  const submissionMs = commercialMapDiagnosticsEnabled ? performance.now() - submissionStartedAt : 0;
   const programs = new Set<PreparedProgram>();
   materials.forEach((material) => {
     const properties = renderer.properties.get(material) as {
@@ -193,6 +200,9 @@ function prepareCompiledPrograms(
     // variants in a single call. currentProgram alone misses all but the last.
     if (properties.programs) properties.programs.forEach(program => programs.add(program));
     else if (properties.currentProgram) programs.add(properties.currentProgram);
+  });
+  if (commercialMapDiagnosticsEnabled) record('program-submission', {
+    duration: submissionMs, materialCount: materials.size, programCount: programs.size,
   });
   return new Promise<void>((resolve, reject) => {
     let timer: ReturnType<typeof setTimeout> | undefined;

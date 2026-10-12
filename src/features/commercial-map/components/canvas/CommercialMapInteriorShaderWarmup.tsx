@@ -4,6 +4,7 @@ import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { compileCommercialMapPrograms } from '../../utils/sceneShaderWarmup';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
+import { scheduleCommercialMapSceneTask } from './DeferredSceneLayer';
 
 const NO_RAYCAST = () => undefined;
 
@@ -66,10 +67,22 @@ export function CommercialMapInteriorShaderWarmup({ reducedGraphics }: { reduced
     const probes = createInteriorShaderProbes(reducedGraphics);
     let controller: AbortController | null = null;
     let disposed = false;
-    const prepare = () => {
+    let generation = 0;
+    let cancelRestoreTask: (() => void) | undefined;
+    let releaseRestoreTask: (() => void) | undefined;
+    const prepare = (complete?: () => void) => {
       controller?.abort();
       const current = new AbortController();
       controller = current;
+      const currentGeneration = ++generation;
+      let released = false;
+      const release = () => {
+        if (released) return;
+        released = true;
+        if (releaseRestoreTask === release) releaseRestoreTask = undefined;
+        complete?.();
+      };
+      if (complete) releaseRestoreTask = release;
       const previousTarget = gl.getRenderTarget();
       const previousFace = gl.getActiveCubeFace();
       const previousLevel = gl.getActiveMipmapLevel();
@@ -92,7 +105,8 @@ export function CommercialMapInteriorShaderWarmup({ reducedGraphics }: { reduced
         if (previousTarget !== null) gl.setRenderTarget(previousTarget, previousFace, previousLevel);
       }
       const finish = (error?: unknown) => {
-        if (disposed || controller !== current) return;
+        release();
+        if (disposed || controller !== current || currentGeneration !== generation) return;
         markCommercialMapStage('interior-preparation:end', performance.now() - startedAt, Boolean(error));
         if (commercialMapDiagnosticsEnabled) {
           gl.domElement.dataset.commercialMapInteriorShaderWarmup = JSON.stringify({
@@ -105,19 +119,43 @@ export function CommercialMapInteriorShaderWarmup({ reducedGraphics }: { reduced
       void compilation.then(() => finish(), finish);
     };
     const lost = () => {
+      generation += 1;
       controller?.abort();
+      releaseRestoreTask?.();
+      cancelRestoreTask?.();
+      cancelRestoreTask = undefined;
       // Release the optional queue even when the driver's old program can no
       // longer become ready. The critical renderer owns context recovery.
       markCommercialMapStage('interior-preparation:end', undefined, true);
     };
+    const restored = () => {
+      generation += 1;
+      controller?.abort();
+      releaseRestoreTask?.();
+      cancelRestoreTask?.();
+      // The first admission already runs inside DeferredSceneLayer. Retained
+      // probes must re-enter that same queue after context restoration, behind
+      // the essential barrier and critical post job, rather than submitting
+      // optional programs while the driver's essential programs are linking.
+      cancelRestoreTask = scheduleCommercialMapSceneTask(gl.domElement, {
+        id: 'restore:interior-programs', priority: 140,
+        run: (complete) => {
+          if (disposed) { complete(); return; }
+          prepare(complete);
+        },
+      });
+    };
     gl.domElement.addEventListener('webglcontextlost', lost);
-    gl.domElement.addEventListener('webglcontextrestored', prepare);
+    gl.domElement.addEventListener('webglcontextrestored', restored);
     prepare();
     return () => {
       disposed = true;
+      generation += 1;
       controller?.abort();
+      releaseRestoreTask?.();
+      cancelRestoreTask?.();
       gl.domElement.removeEventListener('webglcontextlost', lost);
-      gl.domElement.removeEventListener('webglcontextrestored', prepare);
+      gl.domElement.removeEventListener('webglcontextrestored', restored);
       // Fixed-program polling releases references on abort; GPU resources can
       // now be disposed immediately, including an abandoned pending warmup.
       probes.dispose();
