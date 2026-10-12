@@ -1,0 +1,2 @@
+# Generated measurements are retained without obscuring the implementation diff.
+*.json linguist-generated=true
