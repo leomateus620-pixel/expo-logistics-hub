@@ -53,6 +53,8 @@ export function normalizeText(raw: string | null | undefined): string {
 const KIND_PREFIX_RULES: Array<[CronogramaKind, RegExp]> = [
   ['milestone', /^(marco|hito)\b/],
   ['meeting', /^(reuniao|reunioes|encontro|assembleia|comite|alinhamento|meeting|mesa redonda|workshop de alinhamento)\b/],
+  ['interview', /^(entrevista|entrevistas)\b/],
+  ['podcast', /^(podcast|gravacao (do |de )?(episodio|podcast)|episodio)\b/],
   ['deadline', /^(prazo|data limite|deadline|entrega ate|vencimento|encerramento das inscricoes|ultimo dia)\b/],
   ['decision', /^(decisao|deliberacao|aprovacao|votacao|homologacao)\b/],
   ['event', /^(evento|cerimonia|solenidade|abertura|coletiva|visita|lancamento oficial de|show|apresentacao)\b/],

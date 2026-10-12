@@ -33,7 +33,14 @@ export type CronogramaStatus =
 
 export type CronogramaPriority = 'critical' | 'high' | 'medium' | 'low';
 
-export type CronogramaKind = 'milestone' | 'event' | 'meeting' | 'deadline' | 'decision';
+export type CronogramaKind =
+  | 'milestone'
+  | 'event'
+  | 'meeting'
+  | 'deadline'
+  | 'decision'
+  | 'interview'
+  | 'podcast';
 
 export interface CronogramaEvent {
   id: string;
