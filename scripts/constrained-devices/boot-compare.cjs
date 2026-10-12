@@ -8,6 +8,7 @@ for (const value of Object.values(urls)) if (!/^http:\/\/(127\.0\.0\.1|localhost
 const output = path.resolve(process.env.MAP_OUTPUT || 'docs/validation/constrained-devices/evidence');
 const scenario = process.env.MAP_SCENARIO || 'desktop';
 const rounds = Number(process.env.MAP_ROUNDS || 10);
+const roundOffset = Number(process.env.MAP_ROUND_OFFSET || 0);
 const profiles = {
   desktop: { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, cpu: 1 },
   cpu4: { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, cpu: 4 },
@@ -18,7 +19,7 @@ const profile = profiles[scenario];
 if (!profile) throw Error('Unknown simulation');
 const rows = [];
 const file = path.join(output, `boot-${scenario}.json`);
-const save = () => fs.writeFileSync(file, JSON.stringify({ scenario, profile, rounds, fixedQuality: 'HIGH', rows,
+const save = () => fs.writeFileSync(file, JSON.stringify({ scenario, profile, rounds, roundOffset, fixedQuality: 'HIGH', rows,
   cacheDefinition: 'cold: fresh context, HTTP browser cache explicitly cleared via CDP; no storage/SW from earlier context. warm: reload in same context, HTTP/CacheStorage/driver retained. OS/driver shader cache not controlled.',
   limitations: 'Local official read-only fixture; no session, permission, remote commercial data, physical mobile/old GPU or population p95 measured.' }, null, 2));
 async function capture(page) {
@@ -55,7 +56,8 @@ async function capture(page) {
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
   try {
     // AB/BA prevents systematic ordering bias. Never keep two WebGL scenes live.
-    for (let round = 0; round < rounds; round++) for (const label of round % 2 ? ['candidate', 'baseline'] : ['baseline', 'candidate']) {
+    for (let iteration = 0; iteration < rounds; iteration++) for (const label of (iteration + roundOffset) % 2 ? ['candidate', 'baseline'] : ['baseline', 'candidate']) {
+      const round = iteration + roundOffset;
       const context = await browser.newContext({ viewport: profile.viewport, deviceScaleFactor: profile.deviceScaleFactor, isMobile: profile.isMobile, hasTouch: profile.hasTouch });
       try {
         const blocked = [], errors = [];

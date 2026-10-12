@@ -1,0 +1,1886 @@
+{
+  "baseSha": "8f3e871010ebfeab45824ba042183127da3b15e3",
+  "candidateSourceSha": "38aff99abd08261e7523a1855ca074ff1c350008",
+  "browser": "155.0.8059.40",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+  "conditions": {
+    "viewport": [
+      1366,
+      768
+    ],
+    "DPR": 1,
+    "tier": "HIGH fixed",
+    "cache": "fresh browser contexts; OS/driver shader cache uncontrolled",
+    "network": "loopback only; CSP connect-src self plus all nonloopback/non-GET/HEAD requests blocked",
+    "concurrency": "sequential; no other build/test/benchmark while browser journeys ran"
+  },
+  "fixture": "OFFICIAL_REFERENCE_DATA / persistedStage=1, 2026 revision; not current authorized production data. Additional 2028 fixture is separate and not a substitute for timed baseline.",
+  "scenarios": [
+    {
+      "scenario": "interface-overview",
+      "method": "UI route, fixed HIGH",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-ui-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "search-filter-list-selection",
+      "method": "Actual user-visible UI controls",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-ui-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "dashboard-cover-return",
+      "method": "Actual dashboard UI; analytics enabled only by identical QA build transform",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-ui-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "sales-multiple-and-writes",
+      "method": "Read-only fixture permission inspection",
+      "baseStatus": "unavailable",
+      "candidateStatus": "unavailable",
+      "baseEvidenceSource": "base-ui-report.json",
+      "limitation": "Existing preview has canManageSales=false; multiple checkout, sale/contract writes and RBAC require the unavailable isolated local Supabase staging"
+    },
+    {
+      "scenario": "canonical-overview-content",
+      "method": "Existing rendering fixture and QA store camera preset; no persisted edit",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "segment-exporural",
+      "method": "Programmatic existing requestSegmentFocus; no commercial scope/permission claim",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "segment-industria-comercio-servicos",
+      "method": "Programmatic existing requestSegmentFocus; no commercial scope/permission claim",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "segment-espaco-automovel",
+      "method": "Programmatic existing requestSegmentFocus; no commercial scope/permission claim",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "interior-B1",
+      "method": "Programmatic existing setSelectedEntityId/enterInterior/exitInterior; IDs from same fixture",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "interior-B2",
+      "method": "Programmatic existing setSelectedEntityId/enterInterior/exitInterior; IDs from same fixture",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "interior-B3",
+      "method": "Programmatic existing setSelectedEntityId/enterInterior/exitInterior; IDs from same fixture",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "interior-B4",
+      "method": "Programmatic existing setSelectedEntityId/enterInterior/exitInterior; IDs from same fixture",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "interior-B5",
+      "method": "Programmatic existing setSelectedEntityId/enterInterior/exitInterior; IDs from same fixture",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "interior-B6",
+      "method": "Programmatic existing setSelectedEntityId/enterInterior/exitInterior; IDs from same fixture",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "interior-B8",
+      "method": "Programmatic existing setSelectedEntityId/enterInterior/exitInterior; IDs from same fixture",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "interior-B10",
+      "method": "Programmatic existing setSelectedEntityId/enterInterior/exitInterior; IDs from same fixture",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "interior-B9",
+      "method": "Programmatic existing setSelectedEntityId/enterInterior/exitInterior; IDs from same fixture",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "interior-D3",
+      "method": "Programmatic existing setSelectedEntityId/enterInterior/exitInterior; IDs from same fixture",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "interior-B12",
+      "method": "Programmatic existing setSelectedEntityId/enterInterior/exitInterior; IDs from same fixture",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "night-rain-sunrise",
+      "method": "Programmatic existing environment actions, full canonical density",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "visit-enter-move-exit",
+      "method": "Existing QA spawn event/normal Visita lifecycle, actual keyboard input",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "resize-orientation",
+      "method": "Viewport emulation on this same host/GPU, not physical orientation",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "pointercancel-and-lost-capture",
+      "method": "Actual mouse gestures; synthetic pointercancel, QA-established native pointer capture then release/lostpointercapture",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "hidden-return",
+      "method": "Synthetic DOM visibility event; no OS background/freeze or physical-device claim",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "terminal-preparation-owner",
+      "method": "QA marker injection into existing single draw owner; no actual invalid shader/driver claim",
+      "baseStatus": "failed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "context-loss-restore",
+      "method": "One intentional QA WEBGL_lose_context, existing renderer recovery, no real driver-loss claim",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    },
+    {
+      "scenario": "canonical-final-content",
+      "method": "Same overview preset, fixed HIGH; hashes taken after all functional actions",
+      "baseStatus": "passed",
+      "candidateStatus": "passed",
+      "baseEvidenceSource": "base-report.json",
+      "limitation": null
+    }
+  ],
+  "comparison": {
+    "canonical-overview": {
+      "base": {
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 431,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "essentialReady": "true",
+        "hydration": "complete",
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "camera": {
+          "position": [
+            4.115393177317758,
+            115.40449819171954,
+            109.49979561513183
+          ],
+          "target": [
+            -2.2546344999999945,
+            0.744,
+            -0.3831818185993967
+          ],
+          "quaternion": [
+            -0.3919388644454563,
+            0.02663085290082978,
+            0.011351018127214582,
+            0.9195356864192147
+          ],
+          "fov": 38,
+          "zoom": 1
+        },
+        "selection": {
+          "entity": null,
+          "module": null,
+          "interior": null,
+          "segment": null,
+          "workspace": "3d",
+          "navigating": false,
+          "night": false,
+          "rain": false,
+          "sunrise": "running"
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "renderer": {
+          "calls": 1145,
+          "triangles": 1072857,
+          "programs": 244,
+          "textures": 137,
+          "geometries": 576,
+          "dpr": 1,
+          "width": 1366,
+          "height": 768,
+          "qualityTier": "HIGH",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1,
+          "sceneIds": [
+            "21731ebf-afc8-4ca6-bb66-d47659b4c165"
+          ],
+          "cameraIds": [
+            "e72f64b6-4e95-4853-b63d-e050473b5074"
+          ],
+          "rendererIds": [
+            1
+          ]
+        },
+        "physicalBuffer": [
+          1366,
+          768
+        ],
+        "cssBuffer": [
+          1366,
+          768
+        ],
+        "dpr": 1,
+        "presentationVisible": "true",
+        "frameSerial": 6546,
+        "preparationError": null,
+        "failureActionAvailable": false,
+        "fixture": {
+          "entityCount": 1578,
+          "lotCount": 1466,
+          "inventorySha256": "9d0e02e00884c8dbca99b9d823a5c4283050999ede77f9bb0bc6abc826e465b3"
+        },
+        "resources": {
+          "sceneObjects": 1505,
+          "meshes": 958,
+          "instances": 23573,
+          "uniqueGeometries": 639,
+          "uniqueMaterials": 706,
+          "uniqueTextures": 101,
+          "cpuBackingBufferBytes": 18230978,
+          "geometryAndInstanceContentSha256": "2f28adb6fa7f602a20952efaf9472ef315f380f294c810158657703492ba855c",
+          "dimensionFormatBytesEstimate": 62930804,
+          "unknownTextureEstimates": 0,
+          "unmeasured": [
+            "Render targets",
+            "GPU uploads",
+            "driver/shader allocations",
+            "VRAM residency",
+            "textures not owned by scene materials"
+          ]
+        }
+      },
+      "candidate": {
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 433,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "essentialReady": "true",
+        "hydration": "complete",
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "camera": {
+          "position": [
+            4.115393177317758,
+            115.40449819171954,
+            109.49979561513183
+          ],
+          "target": [
+            -2.2546344999999945,
+            0.744,
+            -0.3831818185993967
+          ],
+          "quaternion": [
+            -0.3919388644454563,
+            0.02663085290082978,
+            0.011351018127214582,
+            0.9195356864192147
+          ],
+          "fov": 38,
+          "zoom": 1
+        },
+        "selection": {
+          "entity": null,
+          "module": null,
+          "interior": null,
+          "segment": null,
+          "workspace": "3d",
+          "navigating": false,
+          "night": false,
+          "rain": false,
+          "sunrise": "complete"
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "renderer": {
+          "calls": 824,
+          "triangles": 694400,
+          "programs": 244,
+          "textures": 137,
+          "geometries": 576,
+          "dpr": 1,
+          "width": 1366,
+          "height": 768,
+          "qualityTier": "HIGH",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1,
+          "sceneIds": [
+            "0452271a-7ddb-43f1-99bc-02d5b6d8a2a6"
+          ],
+          "cameraIds": [
+            "1a93415c-d247-4a27-aeae-205ec9b1b310"
+          ],
+          "rendererIds": [
+            1
+          ]
+        },
+        "physicalBuffer": [
+          1366,
+          768
+        ],
+        "cssBuffer": [
+          1366,
+          768
+        ],
+        "dpr": 1,
+        "presentationVisible": "true",
+        "frameSerial": 6609,
+        "preparationError": null,
+        "failureActionAvailable": false,
+        "fixture": {
+          "entityCount": 1578,
+          "lotCount": 1466,
+          "inventorySha256": "9d0e02e00884c8dbca99b9d823a5c4283050999ede77f9bb0bc6abc826e465b3"
+        },
+        "resources": {
+          "sceneObjects": 1505,
+          "meshes": 958,
+          "instances": 23573,
+          "uniqueGeometries": 639,
+          "uniqueMaterials": 705,
+          "uniqueTextures": 101,
+          "cpuBackingBufferBytes": 18230978,
+          "geometryAndInstanceContentSha256": "2f28adb6fa7f602a20952efaf9472ef315f380f294c810158657703492ba855c",
+          "dimensionFormatBytesEstimate": 62930804,
+          "unknownTextureEstimates": 0,
+          "unmeasured": [
+            "Render targets",
+            "GPU uploads",
+            "driver/shader allocations",
+            "VRAM residency",
+            "textures not owned by scene materials"
+          ]
+        }
+      },
+      "inventoryIdentical": true,
+      "geometryAndInstanceContentIdentical": true,
+      "poseIdentical": true,
+      "bufferIdentical": true
+    },
+    "canonical-final": {
+      "base": {
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 4086,
+          "contextLosses": 1,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "essentialReady": "true",
+        "hydration": "complete",
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "camera": {
+          "position": [
+            4.115393177317758,
+            115.40449819171954,
+            109.49979561513183
+          ],
+          "target": [
+            -2.2546344999999945,
+            0.744,
+            -0.3831818185993967
+          ],
+          "quaternion": [
+            -0.3919388644454563,
+            0.02663085290082978,
+            0.011351018127214582,
+            0.9195356864192147
+          ],
+          "fov": 38,
+          "zoom": 1
+        },
+        "selection": {
+          "entity": null,
+          "module": null,
+          "interior": null,
+          "segment": null,
+          "workspace": "3d",
+          "navigating": false,
+          "night": false,
+          "rain": false,
+          "sunrise": "complete"
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "renderer": {
+          "calls": 824,
+          "triangles": 695228,
+          "programs": 247,
+          "textures": 137,
+          "geometries": 590,
+          "dpr": 1,
+          "width": 1366,
+          "height": 768,
+          "qualityTier": "HIGH",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1,
+          "sceneIds": [
+            "21731ebf-afc8-4ca6-bb66-d47659b4c165"
+          ],
+          "cameraIds": [
+            "e72f64b6-4e95-4853-b63d-e050473b5074"
+          ],
+          "rendererIds": [
+            1
+          ]
+        },
+        "physicalBuffer": [
+          1366,
+          768
+        ],
+        "cssBuffer": [
+          1366,
+          768
+        ],
+        "dpr": 1,
+        "presentationVisible": "true",
+        "frameSerial": 1208,
+        "preparationError": null,
+        "failureActionAvailable": false,
+        "fixture": {
+          "entityCount": 1578,
+          "lotCount": 1466,
+          "inventorySha256": "9d0e02e00884c8dbca99b9d823a5c4283050999ede77f9bb0bc6abc826e465b3"
+        },
+        "resources": {
+          "sceneObjects": 1518,
+          "meshes": 958,
+          "instances": 23573,
+          "uniqueGeometries": 640,
+          "uniqueMaterials": 706,
+          "uniqueTextures": 104,
+          "cpuBackingBufferBytes": 18384770,
+          "geometryAndInstanceContentSha256": "9ae576ea088aeb4be951cacc96c1f21d34d5c93da6ea90edcedd13f016cf3f96",
+          "dimensionFormatBytesEstimate": 63979376,
+          "unknownTextureEstimates": 0,
+          "unmeasured": [
+            "Render targets",
+            "GPU uploads",
+            "driver/shader allocations",
+            "VRAM residency",
+            "textures not owned by scene materials"
+          ]
+        }
+      },
+      "candidate": {
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 4114,
+          "contextLosses": 1,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "essentialReady": "true",
+        "hydration": "complete",
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "camera": {
+          "position": [
+            4.115393177317758,
+            115.40449819171954,
+            109.49979561513183
+          ],
+          "target": [
+            -2.2546344999999945,
+            0.744,
+            -0.3831818185993967
+          ],
+          "quaternion": [
+            -0.3919388644454563,
+            0.02663085290082978,
+            0.011351018127214582,
+            0.9195356864192147
+          ],
+          "fov": 38,
+          "zoom": 1
+        },
+        "selection": {
+          "entity": null,
+          "module": null,
+          "interior": null,
+          "segment": null,
+          "workspace": "3d",
+          "navigating": false,
+          "night": false,
+          "rain": false,
+          "sunrise": "complete"
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "renderer": {
+          "calls": 824,
+          "triangles": 695228,
+          "programs": 240,
+          "textures": 137,
+          "geometries": 590,
+          "dpr": 1,
+          "width": 1366,
+          "height": 768,
+          "qualityTier": "HIGH",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1,
+          "sceneIds": [
+            "0452271a-7ddb-43f1-99bc-02d5b6d8a2a6"
+          ],
+          "cameraIds": [
+            "1a93415c-d247-4a27-aeae-205ec9b1b310"
+          ],
+          "rendererIds": [
+            1
+          ]
+        },
+        "physicalBuffer": [
+          1366,
+          768
+        ],
+        "cssBuffer": [
+          1366,
+          768
+        ],
+        "dpr": 1,
+        "presentationVisible": "true",
+        "frameSerial": 2960,
+        "preparationError": null,
+        "failureActionAvailable": false,
+        "fixture": {
+          "entityCount": 1578,
+          "lotCount": 1466,
+          "inventorySha256": "9d0e02e00884c8dbca99b9d823a5c4283050999ede77f9bb0bc6abc826e465b3"
+        },
+        "resources": {
+          "sceneObjects": 1518,
+          "meshes": 958,
+          "instances": 23573,
+          "uniqueGeometries": 640,
+          "uniqueMaterials": 706,
+          "uniqueTextures": 104,
+          "cpuBackingBufferBytes": 18384770,
+          "geometryAndInstanceContentSha256": "9ae576ea088aeb4be951cacc96c1f21d34d5c93da6ea90edcedd13f016cf3f96",
+          "dimensionFormatBytesEstimate": 63979376,
+          "unknownTextureEstimates": 0,
+          "unmeasured": [
+            "Render targets",
+            "GPU uploads",
+            "driver/shader allocations",
+            "VRAM residency",
+            "textures not owned by scene materials"
+          ]
+        }
+      },
+      "inventoryIdentical": true,
+      "geometryAndInstanceContentIdentical": true,
+      "poseIdentical": true,
+      "bufferIdentical": true
+    },
+    "exporural2028": {
+      "base": {
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 607,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "essentialReady": "true",
+        "hydration": "complete",
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "camera": {
+          "position": [
+            85.7753405215083,
+            68.17181644139964,
+            21.531259782045726
+          ],
+          "target": [
+            27.68727272727273,
+            0.7147054545454563,
+            -21.566338904000002
+          ],
+          "quaternion": [
+            -0.32740847772065584,
+            0.41824484075108864,
+            0.16476586751619302,
+            0.8310999643865806
+          ],
+          "fov": 38,
+          "zoom": 1
+        },
+        "selection": {
+          "entity": null,
+          "module": null,
+          "interior": null,
+          "segment": "exporural",
+          "workspace": "3d",
+          "navigating": false,
+          "night": false,
+          "rain": false,
+          "sunrise": "complete"
+        },
+        "inventory": {
+          "entities": 1586,
+          "presentedEntities": 384,
+          "lots": 1471,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "renderer": {
+          "calls": 722,
+          "triangles": 673133,
+          "programs": 244,
+          "textures": 137,
+          "geometries": 579,
+          "dpr": 1,
+          "width": 1366,
+          "height": 768,
+          "qualityTier": "HIGH",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1,
+          "sceneIds": [
+            "0fa5b155-a1e4-48b9-ad61-6beb55be2464"
+          ],
+          "cameraIds": [
+            "df879f12-c00f-4604-b63c-8621b91942fb"
+          ],
+          "rendererIds": [
+            1
+          ]
+        },
+        "physicalBuffer": [
+          1366,
+          768
+        ],
+        "cssBuffer": [
+          1366,
+          768
+        ],
+        "dpr": 1,
+        "presentationVisible": "true",
+        "frameSerial": 9804,
+        "preparationError": null,
+        "failureActionAvailable": false,
+        "fixture": {
+          "entityCount": 1586,
+          "lotCount": 1471,
+          "inventorySha256": "5281e1d17267db2435b02c65e9ac567122dec9bf72144e50e42d53420974be10"
+        },
+        "resources": {
+          "sceneObjects": 1505,
+          "meshes": 958,
+          "instances": 24000,
+          "uniqueGeometries": 642,
+          "uniqueMaterials": 705,
+          "uniqueTextures": 101,
+          "cpuBackingBufferBytes": 19233274,
+          "geometryAndInstanceContentSha256": "600b6ca5c4b76e751f7df870ade23c6c6205545d3556777878c1cee827e956c7",
+          "dimensionFormatBytesEstimate": 74115612,
+          "unknownTextureEstimates": 0,
+          "unmeasured": [
+            "Render targets",
+            "GPU uploads",
+            "driver/shader allocations",
+            "VRAM residency",
+            "textures not owned by scene materials"
+          ]
+        }
+      },
+      "candidate": {
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 611,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "essentialReady": "true",
+        "hydration": "complete",
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "camera": {
+          "position": [
+            85.7753405215083,
+            68.17181644139964,
+            21.531259782045726
+          ],
+          "target": [
+            27.68727272727273,
+            0.7147054545454563,
+            -21.566338904000002
+          ],
+          "quaternion": [
+            -0.32740847772065584,
+            0.41824484075108864,
+            0.16476586751619302,
+            0.8310999643865806
+          ],
+          "fov": 38,
+          "zoom": 1
+        },
+        "selection": {
+          "entity": null,
+          "module": null,
+          "interior": null,
+          "segment": "exporural",
+          "workspace": "3d",
+          "navigating": false,
+          "night": false,
+          "rain": false,
+          "sunrise": "complete"
+        },
+        "inventory": {
+          "entities": 1586,
+          "presentedEntities": 384,
+          "lots": 1471,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "renderer": {
+          "calls": 722,
+          "triangles": 673133,
+          "programs": 244,
+          "textures": 137,
+          "geometries": 579,
+          "dpr": 1,
+          "width": 1366,
+          "height": 768,
+          "qualityTier": "HIGH",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1,
+          "sceneIds": [
+            "11a44509-1cdc-47c1-bd1b-783133929603"
+          ],
+          "cameraIds": [
+            "025c3522-aa24-4736-8db0-f11dd3b70a4e"
+          ],
+          "rendererIds": [
+            1
+          ]
+        },
+        "physicalBuffer": [
+          1366,
+          768
+        ],
+        "cssBuffer": [
+          1366,
+          768
+        ],
+        "dpr": 1,
+        "presentationVisible": "true",
+        "frameSerial": 9848,
+        "preparationError": null,
+        "failureActionAvailable": false,
+        "fixture": {
+          "entityCount": 1586,
+          "lotCount": 1471,
+          "inventorySha256": "5281e1d17267db2435b02c65e9ac567122dec9bf72144e50e42d53420974be10"
+        },
+        "resources": {
+          "sceneObjects": 1505,
+          "meshes": 958,
+          "instances": 24000,
+          "uniqueGeometries": 642,
+          "uniqueMaterials": 705,
+          "uniqueTextures": 101,
+          "cpuBackingBufferBytes": 19233274,
+          "geometryAndInstanceContentSha256": "600b6ca5c4b76e751f7df870ade23c6c6205545d3556777878c1cee827e956c7",
+          "dimensionFormatBytesEstimate": 74115612,
+          "unknownTextureEstimates": 0,
+          "unmeasured": [
+            "Render targets",
+            "GPU uploads",
+            "driver/shader allocations",
+            "VRAM residency",
+            "textures not owned by scene materials"
+          ]
+        }
+      },
+      "inventoryIdentical": true,
+      "geometryAndInstanceContentIdentical": true,
+      "poseIdentical": true,
+      "bufferIdentical": true
+    }
+  },
+  "terminalPreparationOwner": {
+    "base": {
+      "checks": {
+        "failedHealth": false,
+        "suspendedPath": false,
+        "errorAvailable": false,
+        "noRenderSubmissions": false,
+        "noSuccessfulPresentations": true
+      },
+      "before": {
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 3978,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "essentialReady": "true",
+        "hydration": "complete",
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "camera": {
+          "position": [
+            -0.934222130474156,
+            21.842638261764055,
+            1.1014338002641235
+          ],
+          "target": [
+            13.829905248747865,
+            0.7439999999999998,
+            -6.463431512221679
+          ],
+          "quaternion": [
+            -0.3728461852327995,
+            -0.46910332256268455,
+            -0.22790008856325533,
+            0.7674564121504617
+          ],
+          "fov": 38,
+          "zoom": 1
+        },
+        "selection": {
+          "entity": "reference:2026:b12",
+          "module": null,
+          "interior": null,
+          "segment": null,
+          "workspace": "3d",
+          "navigating": false,
+          "night": false,
+          "rain": false,
+          "sunrise": "complete"
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "renderer": {
+          "calls": 233,
+          "triangles": 577176,
+          "programs": 364,
+          "textures": 163,
+          "geometries": 684,
+          "dpr": 1,
+          "width": 1366,
+          "height": 768,
+          "qualityTier": "HIGH",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1,
+          "sceneIds": [
+            "21731ebf-afc8-4ca6-bb66-d47659b4c165"
+          ],
+          "cameraIds": [
+            "e72f64b6-4e95-4853-b63d-e050473b5074"
+          ],
+          "rendererIds": [
+            1
+          ]
+        },
+        "physicalBuffer": [
+          1366,
+          768
+        ],
+        "cssBuffer": [
+          1366,
+          768
+        ],
+        "dpr": 1,
+        "presentationVisible": "true",
+        "frameSerial": 57807,
+        "preparationError": null,
+        "failureActionAvailable": false
+      },
+      "suspendedStart": {
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 3981,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "false",
+        "essentialReady": "false",
+        "hydration": "complete",
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "camera": {
+          "position": [
+            -0.934222130474156,
+            21.842638261764055,
+            1.1014338002641235
+          ],
+          "target": [
+            13.829905248747865,
+            0.7439999999999998,
+            -6.463431512221679
+          ],
+          "quaternion": [
+            -0.3728461852327995,
+            -0.46910332256268455,
+            -0.22790008856325533,
+            0.7674564121504617
+          ],
+          "fov": 38,
+          "zoom": 1
+        },
+        "selection": {
+          "entity": "reference:2026:b12",
+          "module": null,
+          "interior": null,
+          "segment": null,
+          "workspace": "3d",
+          "navigating": false,
+          "night": false,
+          "rain": false,
+          "sunrise": "complete"
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "renderer": {
+          "calls": 233,
+          "triangles": 577176,
+          "programs": 364,
+          "textures": 163,
+          "geometries": 684,
+          "dpr": 1,
+          "width": 1366,
+          "height": 768,
+          "qualityTier": "HIGH",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1,
+          "sceneIds": [
+            "21731ebf-afc8-4ca6-bb66-d47659b4c165"
+          ],
+          "cameraIds": [
+            "e72f64b6-4e95-4853-b63d-e050473b5074"
+          ],
+          "rendererIds": [
+            1
+          ]
+        },
+        "physicalBuffer": [
+          1366,
+          768
+        ],
+        "cssBuffer": [
+          1366,
+          768
+        ],
+        "dpr": 1,
+        "presentationVisible": "true",
+        "frameSerial": 57827,
+        "preparationError": "QA_SCENE_PREPARATION_FAILED",
+        "failureActionAvailable": false
+      },
+      "suspendedEnd": {
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 3981,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "false",
+        "essentialReady": "false",
+        "hydration": "complete",
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "camera": {
+          "position": [
+            -0.934222130474156,
+            21.842638261764055,
+            1.1014338002641235
+          ],
+          "target": [
+            13.829905248747865,
+            0.7439999999999998,
+            -6.463431512221679
+          ],
+          "quaternion": [
+            -0.3728461852327995,
+            -0.46910332256268455,
+            -0.22790008856325533,
+            0.7674564121504617
+          ],
+          "fov": 38,
+          "zoom": 1
+        },
+        "selection": {
+          "entity": "reference:2026:b12",
+          "module": null,
+          "interior": null,
+          "segment": null,
+          "workspace": "3d",
+          "navigating": false,
+          "night": false,
+          "rain": false,
+          "sunrise": "complete"
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "renderer": {
+          "calls": 233,
+          "triangles": 577176,
+          "programs": 364,
+          "textures": 163,
+          "geometries": 684,
+          "dpr": 1,
+          "width": 1366,
+          "height": 768,
+          "qualityTier": "HIGH",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1,
+          "sceneIds": [
+            "21731ebf-afc8-4ca6-bb66-d47659b4c165"
+          ],
+          "cameraIds": [
+            "e72f64b6-4e95-4853-b63d-e050473b5074"
+          ],
+          "rendererIds": [
+            1
+          ]
+        },
+        "physicalBuffer": [
+          1366,
+          768
+        ],
+        "cssBuffer": [
+          1366,
+          768
+        ],
+        "dpr": 1,
+        "presentationVisible": "true",
+        "frameSerial": 57927,
+        "preparationError": "QA_SCENE_PREPARATION_FAILED",
+        "failureActionAvailable": false
+      },
+      "after": {
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 3992,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "essentialReady": "true",
+        "hydration": "complete",
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "camera": {
+          "position": [
+            -0.934222130474156,
+            21.842638261764055,
+            1.1014338002641235
+          ],
+          "target": [
+            13.829905248747865,
+            0.7439999999999998,
+            -6.463431512221679
+          ],
+          "quaternion": [
+            -0.3728461852327995,
+            -0.46910332256268455,
+            -0.22790008856325533,
+            0.7674564121504617
+          ],
+          "fov": 38,
+          "zoom": 1
+        },
+        "selection": {
+          "entity": "reference:2026:b12",
+          "module": null,
+          "interior": null,
+          "segment": null,
+          "workspace": "3d",
+          "navigating": false,
+          "night": false,
+          "rain": false,
+          "sunrise": "complete"
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "renderer": {
+          "calls": 214,
+          "triangles": 577157,
+          "programs": 359,
+          "textures": 140,
+          "geometries": 683,
+          "dpr": 1,
+          "width": 1366,
+          "height": 768,
+          "qualityTier": "HIGH",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1,
+          "sceneIds": [
+            "21731ebf-afc8-4ca6-bb66-d47659b4c165"
+          ],
+          "cameraIds": [
+            "e72f64b6-4e95-4853-b63d-e050473b5074"
+          ],
+          "rendererIds": [
+            1
+          ]
+        },
+        "physicalBuffer": [
+          1366,
+          768
+        ],
+        "cssBuffer": [
+          1366,
+          768
+        ],
+        "dpr": 1,
+        "presentationVisible": "true",
+        "frameSerial": 57952,
+        "preparationError": null,
+        "failureActionAvailable": false
+      }
+    },
+    "candidate": {
+      "checks": {
+        "failedHealth": true,
+        "suspendedPath": true,
+        "errorAvailable": true,
+        "noRenderSubmissions": true,
+        "noSuccessfulPresentations": true
+      },
+      "before": {
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 3986,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "essentialReady": "true",
+        "hydration": "complete",
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "camera": {
+          "position": [
+            -0.934222130474156,
+            21.842638261764055,
+            1.1014338002641235
+          ],
+          "target": [
+            13.829905248747865,
+            0.7439999999999998,
+            -6.463431512221679
+          ],
+          "quaternion": [
+            -0.3728461852327995,
+            -0.46910332256268455,
+            -0.22790008856325533,
+            0.7674564121504617
+          ],
+          "fov": 38,
+          "zoom": 1
+        },
+        "selection": {
+          "entity": "reference:2026:b12",
+          "module": null,
+          "interior": null,
+          "segment": null,
+          "workspace": "3d",
+          "navigating": false,
+          "night": false,
+          "rain": false,
+          "sunrise": "complete"
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "renderer": {
+          "calls": 233,
+          "triangles": 577176,
+          "programs": 363,
+          "textures": 163,
+          "geometries": 684,
+          "dpr": 1,
+          "width": 1366,
+          "height": 768,
+          "qualityTier": "HIGH",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1,
+          "sceneIds": [
+            "0452271a-7ddb-43f1-99bc-02d5b6d8a2a6"
+          ],
+          "cameraIds": [
+            "1a93415c-d247-4a27-aeae-205ec9b1b310"
+          ],
+          "rendererIds": [
+            1
+          ]
+        },
+        "physicalBuffer": [
+          1366,
+          768
+        ],
+        "cssBuffer": [
+          1366,
+          768
+        ],
+        "dpr": 1,
+        "presentationVisible": "true",
+        "frameSerial": 57967,
+        "preparationError": null,
+        "failureActionAvailable": false
+      },
+      "suspendedStart": {
+        "health": {
+          "status": "failed",
+          "path": "suspended",
+          "presentedFrames": 3986,
+          "contextLosses": 0,
+          "lastErrorCode": "QA_SCENE_PREPARATION_FAILED"
+        },
+        "ready": "false",
+        "essentialReady": "false",
+        "hydration": "complete",
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "camera": {
+          "position": [
+            -0.934222130474156,
+            21.842638261764055,
+            1.1014338002641235
+          ],
+          "target": [
+            13.829905248747865,
+            0.7439999999999998,
+            -6.463431512221679
+          ],
+          "quaternion": [
+            -0.3728461852327995,
+            -0.46910332256268455,
+            -0.22790008856325533,
+            0.7674564121504617
+          ],
+          "fov": 38,
+          "zoom": 1
+        },
+        "selection": {
+          "entity": "reference:2026:b12",
+          "module": null,
+          "interior": null,
+          "segment": null,
+          "workspace": "3d",
+          "navigating": false,
+          "night": false,
+          "rain": false,
+          "sunrise": "complete"
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "renderer": {
+          "calls": 0,
+          "triangles": 0,
+          "programs": 363,
+          "textures": 163,
+          "geometries": 684,
+          "dpr": 1,
+          "width": 1366,
+          "height": 768,
+          "qualityTier": "HIGH",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1,
+          "sceneIds": [
+            "0452271a-7ddb-43f1-99bc-02d5b6d8a2a6"
+          ],
+          "cameraIds": [
+            "1a93415c-d247-4a27-aeae-205ec9b1b310"
+          ],
+          "rendererIds": [
+            1
+          ]
+        },
+        "physicalBuffer": [
+          1366,
+          768
+        ],
+        "cssBuffer": [
+          1366,
+          768
+        ],
+        "dpr": 1,
+        "presentationVisible": "true",
+        "frameSerial": 57967,
+        "preparationError": "QA_SCENE_PREPARATION_FAILED",
+        "failureActionAvailable": true
+      },
+      "suspendedEnd": {
+        "health": {
+          "status": "failed",
+          "path": "suspended",
+          "presentedFrames": 3986,
+          "contextLosses": 0,
+          "lastErrorCode": "QA_SCENE_PREPARATION_FAILED"
+        },
+        "ready": "false",
+        "essentialReady": "false",
+        "hydration": "complete",
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "camera": {
+          "position": [
+            -0.934222130474156,
+            21.842638261764055,
+            1.1014338002641235
+          ],
+          "target": [
+            13.829905248747865,
+            0.7439999999999998,
+            -6.463431512221679
+          ],
+          "quaternion": [
+            -0.3728461852327995,
+            -0.46910332256268455,
+            -0.22790008856325533,
+            0.7674564121504617
+          ],
+          "fov": 38,
+          "zoom": 1
+        },
+        "selection": {
+          "entity": "reference:2026:b12",
+          "module": null,
+          "interior": null,
+          "segment": null,
+          "workspace": "3d",
+          "navigating": false,
+          "night": false,
+          "rain": false,
+          "sunrise": "complete"
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "renderer": {
+          "calls": 0,
+          "triangles": 0,
+          "programs": 363,
+          "textures": 163,
+          "geometries": 684,
+          "dpr": 1,
+          "width": 1366,
+          "height": 768,
+          "qualityTier": "HIGH",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1,
+          "sceneIds": [
+            "0452271a-7ddb-43f1-99bc-02d5b6d8a2a6"
+          ],
+          "cameraIds": [
+            "1a93415c-d247-4a27-aeae-205ec9b1b310"
+          ],
+          "rendererIds": [
+            1
+          ]
+        },
+        "physicalBuffer": [
+          1366,
+          768
+        ],
+        "cssBuffer": [
+          1366,
+          768
+        ],
+        "dpr": 1,
+        "presentationVisible": "true",
+        "frameSerial": 57967,
+        "preparationError": "QA_SCENE_PREPARATION_FAILED",
+        "failureActionAvailable": true
+      },
+      "after": {
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 3991,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "ready": "true",
+        "essentialReady": "true",
+        "hydration": "complete",
+        "quality": {
+          "logicalTier": "HIGH",
+          "sceneTier": "HIGH",
+          "effectTier": "HIGH",
+          "baseDpr": 1,
+          "effectiveDpr": 1,
+          "hardwareCeiling": "HIGH",
+          "reason": "viewport-sync"
+        },
+        "camera": {
+          "position": [
+            -0.934222130474156,
+            21.842638261764055,
+            1.1014338002641235
+          ],
+          "target": [
+            13.829905248747865,
+            0.7439999999999998,
+            -6.463431512221679
+          ],
+          "quaternion": [
+            -0.3728461852327995,
+            -0.46910332256268455,
+            -0.22790008856325533,
+            0.7674564121504617
+          ],
+          "fov": 38,
+          "zoom": 1
+        },
+        "selection": {
+          "entity": "reference:2026:b12",
+          "module": null,
+          "interior": null,
+          "segment": null,
+          "workspace": "3d",
+          "navigating": false,
+          "night": false,
+          "rain": false,
+          "sunrise": "complete"
+        },
+        "inventory": {
+          "entities": 1578,
+          "presentedEntities": 376,
+          "lots": 1466,
+          "commercialTrees": 273,
+          "presentedCommercialTrees": 273
+        },
+        "renderer": {
+          "calls": 233,
+          "triangles": 577176,
+          "programs": 366,
+          "textures": 166,
+          "geometries": 684,
+          "dpr": 1,
+          "width": 1366,
+          "height": 768,
+          "qualityTier": "HIGH",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "identity": {
+          "canvasMounts": 1,
+          "rendererCreates": 1,
+          "controlsCreates": 1,
+          "activeCanvases": 1,
+          "activeControls": 1,
+          "sceneIds": [
+            "0452271a-7ddb-43f1-99bc-02d5b6d8a2a6"
+          ],
+          "cameraIds": [
+            "1a93415c-d247-4a27-aeae-205ec9b1b310"
+          ],
+          "rendererIds": [
+            1
+          ]
+        },
+        "physicalBuffer": [
+          1366,
+          768
+        ],
+        "cssBuffer": [
+          1366,
+          768
+        ],
+        "dpr": 1,
+        "presentationVisible": "true",
+        "frameSerial": 58011,
+        "preparationError": null,
+        "failureActionAvailable": false
+      }
+    }
+  },
+  "images": [
+    {
+      "file": "base-canonical-overview.png",
+      "sha256": "912eaf44de7dc245746983501e394db094cd8c40d25443d63cf9ce0f8f5b6b60",
+      "bytes": 1642370
+    },
+    {
+      "file": "candidate-canonical-overview.png",
+      "sha256": "a439b7e2df07c88b67f0458f87982fc3738bbbb582f20d6fbc5bdd5f3d78a94b",
+      "bytes": 1642366
+    },
+    {
+      "file": "base-interior-B5.png",
+      "sha256": "4f7607e735844ec391d056126b346e156230eaac6a830e3518bdde250a052376",
+      "bytes": 166264
+    },
+    {
+      "file": "candidate-interior-B5.png",
+      "sha256": "4f7607e735844ec391d056126b346e156230eaac6a830e3518bdde250a052376",
+      "bytes": 166264
+    },
+    {
+      "file": "candidate-preparation-failed.png",
+      "sha256": "9ab684fe2d598e9b049a96964dbc34061a3ba68644a57939f0e878bf8bcb6e69",
+      "bytes": 1507715
+    },
+    {
+      "file": "candidate-context-restored.png",
+      "sha256": "559e3ab46da84856cb721e00c6dc5a0328f1ee31a54ab7781c169fbf2d95f144",
+      "bytes": 1519617
+    }
+  ],
+  "imageChecks": {
+    "overview": "same exact pose/buffer/content hash; visually inspected scene preservation; PNG bytes differ in animated content",
+    "interiorB5": "Pavilhão 13 canonical labels including104; exact PNG SHA256 matches",
+    "dashboardCovered": "separate raw screenshots also match SHA256 f7a4fbc4c880e909982215e378db747a27eb810b53e936029a3275e05db52d7d; zero covered presentation count in actual UI; not account-RBAC test"
+  },
+  "harnessCorrections": [
+    {
+      "run": "excluded-harness-attempt-1/base-report.json",
+      "reasons": [
+        "wrong shell search locator",
+        "installed OrbitControls does not set pointer capture itself"
+      ]
+    },
+    {
+      "run": "base-report.json interface portion only",
+      "reasons": [
+        "fixture Available status correctly disabled; harness should select real enabled status",
+        "list-mode cascade made dashboard correctly return to list; corrected isolated base-ui journey"
+      ]
+    }
+  ],
+  "rawEvidenceLocalPath": "/tmp/fenasoja-map-functional",
+  "rawIncludedInPR": false,
+  "limits": [
+    "No authenticated session, commission capability, public token, live data, sale, reservation, contract, installment or Storage/RPC authorization is validated.",
+    "QA enables preview analytics equally on base and candidate to make the existing dashboard cover reachable; this does not grant or validate production permissions.",
+    "Resource bytes are CPU buffers and dimension/format estimates; driver allocation, render targets and VRAM residency are unknown.",
+    "Functional runs, hashing and screenshots are separate from timing benchmarks.",
+    "Hidden state is DOM event emulation; pointer capture is explicitly established by QA; no OS freeze/thaw or real cancellation certified.",
+    "No timer GPU, render target bytes or physical input-to-photon latency measured.",
+    "Terminal marker injection verifies causal admission/retry path, not a real malformed shader or driver failure.",
+    "Renderer counters/resource counts vary with warmed variants; material705/706 and programs after restoration are not claimed memory/performance savings.",
+    "Physical older integrated GPU, 4GB desktop, Android/iPhone/Safari, staging commercial transactions and current project inventory remain untested."
+  ]
+}

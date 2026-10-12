@@ -1,0 +1,124 @@
+{
+  "health": {
+    "status": "ready",
+    "path": "post",
+    "presentedFrames": 431,
+    "contextLosses": 0,
+    "lastErrorCode": null
+  },
+  "ready": "true",
+  "essentialReady": "true",
+  "hydration": "complete",
+  "quality": {
+    "logicalTier": "HIGH",
+    "sceneTier": "HIGH",
+    "effectTier": "HIGH",
+    "baseDpr": 1,
+    "effectiveDpr": 1,
+    "hardwareCeiling": "HIGH",
+    "reason": "viewport-sync"
+  },
+  "camera": {
+    "position": [
+      4.115393177317758,
+      115.40449819171954,
+      109.49979561513183
+    ],
+    "target": [
+      -2.2546344999999945,
+      0.744,
+      -0.3831818185993967
+    ],
+    "quaternion": [
+      -0.3919388644454563,
+      0.02663085290082978,
+      0.011351018127214582,
+      0.9195356864192147
+    ],
+    "fov": 38,
+    "zoom": 1
+  },
+  "selection": {
+    "entity": null,
+    "module": null,
+    "interior": null,
+    "segment": null,
+    "workspace": "3d",
+    "navigating": false,
+    "night": false,
+    "rain": false,
+    "sunrise": "running"
+  },
+  "inventory": {
+    "entities": 1578,
+    "presentedEntities": 376,
+    "lots": 1466,
+    "commercialTrees": 273,
+    "presentedCommercialTrees": 273
+  },
+  "renderer": {
+    "calls": 1145,
+    "triangles": 1072857,
+    "programs": 244,
+    "textures": 137,
+    "geometries": 576,
+    "dpr": 1,
+    "width": 1366,
+    "height": 768,
+    "qualityTier": "HIGH",
+    "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+  },
+  "identity": {
+    "canvasMounts": 1,
+    "rendererCreates": 1,
+    "controlsCreates": 1,
+    "activeCanvases": 1,
+    "activeControls": 1,
+    "sceneIds": [
+      "21731ebf-afc8-4ca6-bb66-d47659b4c165"
+    ],
+    "cameraIds": [
+      "e72f64b6-4e95-4853-b63d-e050473b5074"
+    ],
+    "rendererIds": [
+      1
+    ]
+  },
+  "physicalBuffer": [
+    1366,
+    768
+  ],
+  "cssBuffer": [
+    1366,
+    768
+  ],
+  "dpr": 1,
+  "presentationVisible": "true",
+  "frameSerial": 6546,
+  "preparationError": null,
+  "failureActionAvailable": false,
+  "fixture": {
+    "entityCount": 1578,
+    "lotCount": 1466,
+    "inventorySha256": "9d0e02e00884c8dbca99b9d823a5c4283050999ede77f9bb0bc6abc826e465b3"
+  },
+  "resources": {
+    "sceneObjects": 1505,
+    "meshes": 958,
+    "instances": 23573,
+    "uniqueGeometries": 639,
+    "uniqueMaterials": 706,
+    "uniqueTextures": 101,
+    "cpuBackingBufferBytes": 18230978,
+    "geometryAndInstanceContentSha256": "2f28adb6fa7f602a20952efaf9472ef315f380f294c810158657703492ba855c",
+    "dimensionFormatBytesEstimate": 62930804,
+    "unknownTextureEstimates": 0,
+    "unmeasured": [
+      "Render targets",
+      "GPU uploads",
+      "driver/shader allocations",
+      "VRAM residency",
+      "textures not owned by scene materials"
+    ]
+  }
+}

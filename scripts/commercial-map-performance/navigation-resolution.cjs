@@ -14,6 +14,8 @@ const phase = process.env.NAV_PHASE || 'probe';
 const scale = Number(process.env.NAV_DEVICE_DPR || 2);
 const policy = process.env.NAV_QUALITY || 'HIGH';
 const viewport = { width: Number(process.env.NAV_VIEWPORT_WIDTH || 1280), height: Number(process.env.NAV_VIEWPORT_HEIGHT || 720) };
+const cpuRate = Number(process.env.NAV_CPU_RATE || 1);
+if (!Number.isFinite(cpuRate) || cpuRate < 1 || cpuRate > 20) throw Error('Invalid NAV_CPU_RATE');
 const disabledPost = (process.env.NAV_POST_DISABLE || '').split(',').filter(Boolean);
 const receiveShadows = process.env.NAV_RECEIVE_SHADOWS || 'authored';
 if (!Number.isInteger(viewport.width) || !Number.isInteger(viewport.height) || viewport.width < 1 || viewport.height < 1) throw Error('Invalid NAV_VIEWPORT_WIDTH/HEIGHT');
@@ -268,6 +270,10 @@ async function boot(browser, label, trialName) {
     }
   });
   const page = await context.newPage(), errors = [];
+  if (cpuRate !== 1) {
+    const session = await context.newCDPSession(page);
+    await session.send('Emulation.setCPUThrottlingRate', { rate: cpuRate });
+  }
   page.on('pageerror', error => errors.push(error.message));
   await page.bringToFront();
   const qualityQuery = process.env.NAV_QUALITY === 'adaptive' ? '' : '&qualityQa=' + (process.env.NAV_QUALITY || 'HIGH');
@@ -416,7 +422,7 @@ async function boot(browser, label, trialName) {
     return response.json();
   });
   const expectedRevision = process.env[label === 'baseline' ? 'NAV_BASELINE_REVISION' : 'NAV_CANDIDATE_REVISION'];
-  if (expectedRevision && (!executedBuildManifest || executedBuildManifest.baseRevision !== expectedRevision)) {
+  if (expectedRevision && (!executedBuildManifest || (executedBuildManifest.baseRevision ?? executedBuildManifest.sha) !== expectedRevision)) {
     throw Error(`Executed build manifest does not match expected ${label} revision ${expectedRevision}`);
   }
   const environment = await page.evaluate(() => ({ userAgent: navigator.userAgent, platform: navigator.platform,
@@ -713,16 +719,17 @@ async function waitMeasureGate(trialName) {
 
 (async () => {
   fs.mkdirSync(out, { recursive: true });
-  const browser = await chromium.launch({ channel: process.env.CHROME_CHANNEL || 'chrome', headless: false,
-    args: ['--use-angle=d3d11', '--disable-background-timer-throttling'] });
+  const headless = process.env.NAV_HEADLESS === '1';
+  const browser = await chromium.launch({ channel: process.env.CHROME_CHANNEL || 'chrome', headless,
+    args: process.platform === 'win32' ? ['--use-angle=d3d11', '--disable-background-timer-throttling'] : [] });
   let session;
   const report = { phase, policy, renderTimingRequested: process.env.NAV_RENDER_TIMING === '1',
-    requestedViewport: viewport, postDisableRequested: disabledPost, receiveShadowsRequested: receiveShadows, labelTimingRequested: process.env.NAV_LABEL_TIMING === '1',
+    requestedViewport: viewport, simulatedCpuRate: cpuRate, postDisableRequested: disabledPost, receiveShadowsRequested: receiveShadows, labelTimingRequested: process.env.NAV_LABEL_TIMING === '1',
     drawTimingRequested: process.env.NAV_DRAW_TIMING === '1',
     generatedAt: new Date().toISOString(), browser: browser.version(), endpoints,
     baselineRevision: process.env.NAV_BASELINE_REVISION || null, candidateRevision: process.env.NAV_CANDIDATE_REVISION || null,
-    evidence: 'Visible headful Chrome, local production fixture. Viewport/DPR emulation does not certify physical devices. Renderer counts are not GPU time or byte memory estimates.',
-    cache: 'fresh context per trial; shared browser/driver cache; identical hydration wait plus 6s and unmeasured scenario warmup; no throttling',
+    evidence: `${headless ? 'Headless' : 'Visible headful'} Chrome, local production fixture. Viewport/DPR emulation does not certify physical devices. Renderer counts are not GPU time or byte memory estimates.`,
+    cache: `fresh context per trial; shared browser/driver cache; identical hydration wait plus 6s and unmeasured scenario warmup; ${cpuRate === 1 ? 'no throttling' : `simulated CPU ${cpuRate}x, GPU unchanged`}`,
     concurrency: { maxLoadedContexts: 1, rationale: 'One full map resident at a time to avoid artificial RAM/GPU pressure on this host.' },
     budget: { targetMs: 33.3, p95ToleranceMs: 50, stallThresholdMsExclusive: 50,
       reason: 'Local ANGLE adapter; 30 FPS reference for a limited device scenario; target is not a hardware certification.' },

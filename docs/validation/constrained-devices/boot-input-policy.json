@@ -1,0 +1,8 @@
+{
+  "cpu4": {
+    "excludedOriginalRounds": [1],
+    "replacementFile": "/tmp/fenasoja-map-benchmarks-cpu4-repeat/boot-cpu4.json",
+    "expectedReplacementRows": 4,
+    "reason": "The original CPU4 round1 overlapped a brief syntax check of the navigation harness. All four rows of that round are excluded conservatively because the requested protocol forbids concurrent tests; this is not a demonstrated runtime regression. Preserve original raw reports and replace only with the exact clean round1 after navigation finishes."
+  }
+}

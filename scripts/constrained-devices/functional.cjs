@@ -5,6 +5,8 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const label = process.env.MAP_FUNCTIONAL_LABEL || 'candidate';
+const mode = process.env.MAP_FUNCTIONAL_MODE || 'all';
+assert(['all', 'interface', 'exporural2028'].includes(mode), 'Unknown functional mode');
 assert(/^[a-z0-9-]+$/i.test(label), 'Use a simple evidence label');
 const base = new URL(process.env.MAP_FUNCTIONAL_URL || 'http://127.0.0.1:4242');
 const loopback = hostname => ['127.0.0.1', 'localhost', '[::1]', '::1'].includes(hostname);
@@ -19,6 +21,7 @@ const redact = value => typeof value === 'string'
 const save = (name, value) => fs.writeFileSync(path.join(out, `${label}-${name}.json`),
   JSON.stringify(value, (key, item) => /buyer|contract|token|credential|password|authorization|apikey|privateurl/i.test(key) ? '[redacted]' : redact(item), 2));
 const report = { label, expectedSha: process.env.MAP_FUNCTIONAL_SHA || 'unknown', observedSha: 'unknown',
+  mode,
   fixture: 'Existing official reference, production compilation with QA-only analytics transform; no backend',
   cache: 'New browser context, browser HTTP storage not reused; driver shader cache uncontrolled',
   quality: 'Fixed HIGH, DPR 1; persistedStage=1 on rendering route',
@@ -185,8 +188,9 @@ async function interfaceScenarios() {
   await scenario('search-filter-list-selection', 'Actual user-visible UI controls', async () => {
     const searchButton = page.locator('[data-commercial-map-shell-search-trigger], [data-commercial-map-commission-search-trigger]').first();
     await searchButton.click();
-    const input = page.getByRole('textbox', { name: 'Buscar entidades do parque' });
+    const input = page.locator('.commercial-map-module__search [data-commercial-map-search]');
     await input.fill('Q-R-01');
+    await input.press('Enter');
     await page.waitForTimeout(350);
     const results = page.locator('.commercial-map-result-list [role="option"]');
     await page.waitForFunction(() => document.querySelector('.commercial-map-result-list')?.textContent.includes('Q-R-01'));
@@ -203,16 +207,20 @@ async function interfaceScenarios() {
     const tableInput = page.locator('.commercial-map-list-view').getByRole('textbox', { name: 'Buscar entidades do parque' });
     await tableInput.fill('Q-R-01'); await page.waitForTimeout(350);
     const table = page.locator('.commercial-map-entity-table');
-    const available = page.locator('.commercial-map-list-view').getByRole('group', { name: 'Filtrar por situação comercial' }).getByRole('button', { name: /Dispon/ }).first();
-    if (await available.count()) { await available.click(); await page.waitForTimeout(250); await available.click(); }
+    const status = page.locator('.commercial-map-list-view [aria-label="Filtrar por situação comercial"] button:not([disabled])').first();
+    assert(await status.count(), 'Fixture has no enabled commercial status filter');
+    const testedStatus = await status.innerText();
+    await status.click(); assert.equal(await status.getAttribute('aria-pressed'), 'true');
+    await page.waitForTimeout(250); await status.click();
     await table.getByRole('button', { name: 'Ver no mapa' }).first().click();
     await page.waitForFunction(() => !document.querySelector('.commercial-map-list-view'));
     await settle();
-    return { results: count, listReturnedTo3D: true, snapshot: await screenshot('interface-list-to-3d') };
+    return { results: count, testedStatus, listReturnedTo3D: true, snapshot: await screenshot('interface-list-to-3d') };
   });
   await scenario('dashboard-cover-return', 'Actual dashboard UI; analytics enabled only by identical QA build transform', async () => {
     const trigger = page.locator('[data-commercial-dashboard-trigger]');
     if (!await trigger.count()) return { skipped: true, reason: 'Build does not expose the measurement-only analytics fixture' };
+    if (await page.locator('.commercial-map-list-view').count()) await page.getByRole('button', { name: 'Exibir mapa 3D', exact: true }).click();
     // Clear detail obstruction with Escape through the real UI before opening.
     await page.keyboard.press('Escape'); await settle();
     const before = await snapshot();
@@ -234,7 +242,7 @@ async function interfaceScenarios() {
     salesButtonCount: await page.getByRole('button', { name: 'Vendas', exact: true }).count() }));
 }
 async function renderingScenarios(context) {
-  await page.goto(base.origin + '/__dev/commercial-map-rendering?persistedStage=1&benvenutoQa=1&qualityQa=HIGH',
+  await page.goto(base.origin + '/__dev/commercial-map-rendering?persistedStage=1&benvenutoQa=1&qualityQa=HIGH' + (mode === 'exporural2028' ? '&exporural2028=1' : ''),
     { waitUntil: 'domcontentloaded', timeout: 120000 });
   await settle(true);
   await page.waitForFunction(() => document.querySelector('canvas')?.dataset.commercialMapHydration === 'complete', null, { timeout: bootTimeout });
@@ -245,6 +253,14 @@ async function renderingScenarios(context) {
   await page.evaluate(() => { const q = window.__benvenutoQa, s = q.map.getState(); s.setNightModeActive(false); s.setRainModeActive(false); s.clearSegmentFocus(); s.requestCameraPreset('overview'); });
   await settle(true);
   await scenario('canonical-overview-content', 'Existing rendering fixture and QA store camera preset; no persisted edit', () => screenshot('canonical-overview', true));
+  if (mode === 'exporural2028') {
+    report.fixture = 'Existing Exporural 2028 preview plus persistedStage; not a read of the current authorized production project';
+    await scenario('exporural2028-content', 'Existing query-param fixture and requestSegmentFocus; no cadastral or commercial write', async () => {
+      await page.evaluate(() => window.__benvenutoQa.map.getState().requestSegmentFocus('exporural')); await settle(true);
+      const value = await screenshot('exporural2028', true); assert.equal(value.selection.segment, 'exporural'); return value;
+    });
+    return;
+  }
   for (const segment of ['exporural', 'industria-comercio-servicos', 'espaco-automovel']) {
     await scenario(`segment-${segment}`, 'Programmatic existing requestSegmentFocus; no commercial scope/permission claim', async () => {
       await page.evaluate(id => window.__benvenutoQa.map.getState().requestSegmentFocus(id), segment); await settle(true);
@@ -293,12 +309,20 @@ async function renderingScenarios(context) {
     }
     return { before, rows };
   });
-  await scenario('pointercancel-and-lost-capture', 'Actual mouse gestures; synthetic pointercancel, native releasePointerCapture/lostpointercapture', async () => {
+  await scenario('pointercancel-and-lost-capture', 'Actual mouse gestures; synthetic pointercancel, QA-established native pointer capture then release/lostpointercapture', async () => {
     const canvas = page.locator('canvas'), box = await canvas.boundingBox(); assert(box, 'No canvas bounds');
     const x = box.x + box.width * .6, y = box.y + box.height * .45;
     const rows = [];
     for (const kind of ['pointercancel', 'lost-capture']) {
-      await page.mouse.move(x, y); await page.mouse.down(); await page.mouse.move(x + 24, y + 12, { steps: 4 });
+      await page.mouse.move(x, y); await page.mouse.down();
+      // The installed OrbitControls uses document listeners and does not set
+      // capture itself. Establish a real browser capture only for this QA loss
+      // event, rather than pretending the ordinary gesture acquired one.
+      if (kind === 'lost-capture') await page.evaluate(() => {
+        const c = document.querySelector('canvas');
+        if (typeof window.__functionalPointerId === 'number') c.setPointerCapture(window.__functionalPointerId);
+      });
+      await page.mouse.move(x + 24, y + 12, { steps: 4 });
       const injection = await page.evaluate(mode => {
         const c = document.querySelector('canvas'), pointerId = window.__functionalPointerId;
         const captured = typeof pointerId === 'number' && c.hasPointerCapture(pointerId);
@@ -393,8 +417,8 @@ async function renderingScenarios(context) {
     assert(response.headers()['content-security-policy']?.includes("connect-src 'self'"), 'Fixture server must provide the additional network-denying CSP');
     report.browser = await browser.version();
     report.capabilityHints = await page.evaluate(() => ({ hardwareConcurrency: navigator.hardwareConcurrency ?? 'unknown', deviceMemory: navigator.deviceMemory ?? 'unknown' }));
-    await interfaceScenarios();
-    await renderingScenarios(context);
+    if (mode !== 'exporural2028') await interfaceScenarios();
+    if (mode !== 'interface') await renderingScenarios(context);
   } catch (error) { report.fatal = redact(error.message); process.exitCode = 1; }
   finally {
     report.completed = !report.fatal;

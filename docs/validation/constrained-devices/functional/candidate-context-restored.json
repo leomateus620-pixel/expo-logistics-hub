@@ -1,0 +1,100 @@
+{
+  "health": {
+    "status": "ready",
+    "path": "post",
+    "presentedFrames": 3998,
+    "contextLosses": 1,
+    "lastErrorCode": null
+  },
+  "ready": "true",
+  "essentialReady": "true",
+  "hydration": "complete",
+  "quality": {
+    "logicalTier": "HIGH",
+    "sceneTier": "HIGH",
+    "effectTier": "HIGH",
+    "baseDpr": 1,
+    "effectiveDpr": 1,
+    "hardwareCeiling": "HIGH",
+    "reason": "viewport-sync"
+  },
+  "camera": {
+    "position": [
+      -0.934222130474156,
+      21.842638261764055,
+      1.1014338002641235
+    ],
+    "target": [
+      13.829905248747865,
+      0.7439999999999998,
+      -6.463431512221679
+    ],
+    "quaternion": [
+      -0.3728461852327995,
+      -0.46910332256268455,
+      -0.22790008856325533,
+      0.7674564121504617
+    ],
+    "fov": 38,
+    "zoom": 1
+  },
+  "selection": {
+    "entity": "reference:2026:b12",
+    "module": null,
+    "interior": null,
+    "segment": null,
+    "workspace": "3d",
+    "navigating": false,
+    "night": false,
+    "rain": false,
+    "sunrise": "complete"
+  },
+  "inventory": {
+    "entities": 1578,
+    "presentedEntities": 376,
+    "lots": 1466,
+    "commercialTrees": 273,
+    "presentedCommercialTrees": 273
+  },
+  "renderer": {
+    "calls": 233,
+    "triangles": 577176,
+    "programs": 246,
+    "textures": 143,
+    "geometries": 347,
+    "dpr": 1,
+    "width": 1366,
+    "height": 768,
+    "qualityTier": "HIGH",
+    "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+  },
+  "identity": {
+    "canvasMounts": 1,
+    "rendererCreates": 1,
+    "controlsCreates": 1,
+    "activeCanvases": 1,
+    "activeControls": 1,
+    "sceneIds": [
+      "0452271a-7ddb-43f1-99bc-02d5b6d8a2a6"
+    ],
+    "cameraIds": [
+      "1a93415c-d247-4a27-aeae-205ec9b1b310"
+    ],
+    "rendererIds": [
+      1
+    ]
+  },
+  "physicalBuffer": [
+    1366,
+    768
+  ],
+  "cssBuffer": [
+    1366,
+    768
+  ],
+  "dpr": 1,
+  "presentationVisible": "true",
+  "frameSerial": 40,
+  "preparationError": null,
+  "failureActionAvailable": false
+}
