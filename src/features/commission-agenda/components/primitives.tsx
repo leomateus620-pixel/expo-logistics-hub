@@ -37,7 +37,8 @@ interface PersonAvatarProps {
 
 export function PersonAvatar({ person, size = 'md', tone = 'dark', primary = false, className }: PersonAvatarProps) {
   const [failed, setFailed] = useState(false);
-  const photo = person.photoUrl ?? getPersonPhoto(person.name, person.userId);
+  const photo = (person.userId ? getPersonPhoto(null, person.userId) : null)
+    ?? person.photoUrl ?? getPersonPhoto(person.name, person.userId);
   const label = person.role ? `${person.name} — ${person.role}` : person.name;
 
   return (

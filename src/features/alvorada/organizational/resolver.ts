@@ -835,6 +835,7 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
   const levelFourUnits = units.filter((unit) => {
     const supportedType = unit.type === 'comissao' || unit.type === 'assessoria';
     const isCentral = isCentralCommissionUnit(unit);
+    if (isCcpfUnit(unit)) return false;
     const included =
       supportedType && unit.isOfficial && !unit.isLegacy && !isCentral;
     if (!included && !isCentral) {
@@ -881,13 +882,25 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
   });
 
   const ccpAliasKeys = new Set(CCP_AUTHORITY_ALIASES.map(normalizeOrganizationalText));
-  const ccpPersonIds = uniqueSorted(
-    members.flatMap((member) => {
+  const ccpUnitPersonIds = units.filter(isCcpfUnit).flatMap((unit) => unit.responsibles.flatMap((responsible) => {
+    if (responsible.responsibleType !== 'pessoa') return [];
+    const personId = upsertPerson(registry, {
+      fullName: responsible.displayName,
+      userId: responsible.userId,
+      roles: [CCPF_SHORT_LABEL],
+      sourceIds: [responsible.id, responsible.userId],
+      sourcePriority: 2,
+    }, anomalies);
+    return personId ? [personId] : [];
+  }));
+  const ccpPersonIds = uniqueSorted([
+    ...ccpUnitPersonIds,
+    ...members.flatMap((member) => {
       if (!ccpAliasKeys.has(normalizeOrganizationalText(member.nome_exibicao))) return [];
       const personId = personIdForMember(registry, member);
       return personId ? [personId] : [];
     }),
-  );
+  ]);
 
   CCP_AUTHORITY_ALIASES.forEach((alias) => {
     const normalized = normalizeOrganizationalText(alias);
