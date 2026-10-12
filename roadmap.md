@@ -1,5 +1,11 @@
 # Roadmap
 
+## Retratos de Diana e Roberto
+- [x] Registrar anexos originais por identidade confirmada na resolução compartilhada, sem alterar cadastros ou vínculos.
+- [x] Validar resolução compartilhada, integração do Ecossistema e regressões (16 testes); conferir carregamento das duas imagens originais no navegador.
+- [ ] Conferir campos autenticados da Agenda/Ecossistema em computador e celular — bloqueio: sem sessão; acesso automático do solicitante indisponível por ausência de conta correspondente.
+- Não publicar.
+
 ## Agenda — CCPF, Entrevista/Podcast e cinco fotografias
 - [x] CCPF único no cadastro institucional com Marcos, Dário, Elemar e Milton; nó raiz do Ecossistema lê os vínculos, sem nó inferior nem card.
 - [x] Entrevista e Podcast no tipo, com ida e volta persistida e classificação por intenção.

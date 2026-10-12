@@ -44,6 +44,8 @@ import thaisBroglio from '@/assets/person-thais-broglio.webp.asset.json';
 import saraKirchhof from '@/assets/person-sara-kirchhof-varela.webp.asset.json';
 import miltonRacho from '@/assets/person-milton-racho.webp.asset.json';
 import vanessaPeripolli from '@/assets/person-vanessa-peripolli.webp.asset.json';
+import dianaSchmidtNedel from '@/assets/person-diana-schmidt-nedel.png.asset.json';
+import robertoRacho from '@/assets/person-roberto-racho.jpeg.asset.json';
 
 /**
  * Only these members have an official portrait. Everyone else keeps the
@@ -100,6 +102,9 @@ const PERSON_PHOTOS: Record<string, string> = {
   'sara kirchhof varela': saraKirchhof.url,
   'milton racho': miltonRacho.url,
   'vanessa peripolli': vanessaPeripolli.url,
+  'diana schmidt nedel': dianaSchmidtNedel.url,
+  'roberto adriano racho': robertoRacho.url,
+  'roberto racho': robertoRacho.url,
 };
 
 const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
@@ -157,6 +162,8 @@ const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
   'ad37de44-c925-4add-b96a-9fdcc76411ed': saraKirchhof.url,
   '2b76c299-e357-4597-bf22-acd307990cb7': miltonRacho.url,
   '2e229647-0db7-451d-800c-395190471751': vanessaPeripolli.url,
+  'd2966417-dc6b-405d-813d-682a780c33c5': dianaSchmidtNedel.url,
+  'e639a24f-e68d-48ab-a76e-1763b966b3ed': robertoRacho.url,
 };
 
 function normalize(value: string): string {
