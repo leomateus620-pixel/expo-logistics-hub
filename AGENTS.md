@@ -19,3 +19,10 @@ Regras de frontend do Mapa Comercial: `src/features/commercial-map/AGENTS.md`.
 
 - Políticas RLS do Mapa Comercial e da Agenda usam conjuntos calculados uma vez por consulta (funções SECURITY DEFINER como `map_viewable_project_ids`, `map_segment_lot_ids`, `cronograma_visible_event_ids`), nunca funções por linha nem EXISTS em tabelas que também têm RLS — por quê: as checagens encadeadas estouravam o tempo do banco e derrubavam mapa e Agenda; rollback em `docs/performance/rollback_rls_set_based_2026-10-07.sql`.
 - Toda política SELECT baseada em conjunto calculado (ex.: `cronograma_visible_event_ids`) em tabela que recebe `INSERT ... RETURNING` precisa também de uma condição sobre a própria linha (ex.: `created_by_user_id = auth.uid()`) — por quê: o conjunto é calculado antes da inserção e não enxerga a linha nova, o que bloqueava a criação de eventos.
+
+## Cursor Cloud specific instructions
+
+- Dependências: `npm install` na raiz. `npm ci` falha neste checkout porque `package.json` declara `drizzle-kit`, `drizzle-orm` e `postgres` e esses pacotes estão ausentes do `package-lock.json`. A segunda execução de `npm install` termina com a árvore já atualizada.
+- Servidor: `npm run dev` escuta em `http://127.0.0.1:8080` (`host` e `port` em `vite.config.ts`).
+- Verificação: `npm run typecheck` e `npm run build`. `npm run lint` reproduz a dívida histórica já descrita no README. `npm test` executa o Vitest; trate falhas atuais da suíte como comportamento do código, separado da instalação do ambiente.
+- Entrada sem sessão: portal em `/`. O login de Mapa Comercial fica em `/login/mapa-comercial`. Abrir `/mapa-comercial` sem sessão mostra o formulário de login. As variáveis públicas do Supabase já estão no `.env` versionado.
