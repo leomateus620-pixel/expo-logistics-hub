@@ -1,0 +1,71 @@
+{
+  "candidate": {
+    "passed": 136,
+    "failed": 5,
+    "suites": 13,
+    "failures": [
+      {
+        "file": "commercialMapBootLoader.test.tsx",
+        "name": "Commercial Map real readiness loader does not advance for elapsed time, module availability, or an unfinished data request"
+      },
+      {
+        "file": "commercialMapBootLoader.test.tsx",
+        "name": "Commercial Map real readiness loader reports overlapping real spans and preserves failed then successful data retry"
+      },
+      {
+        "file": "commercialMapLoadingPipeline.test.ts",
+        "name": "commercial map initial data pipeline loads all 1205 entities and lots through stable 1000-row pages"
+      },
+      {
+        "file": "commercialMapLoadingPipeline.test.ts",
+        "name": "commercial map initial data pipeline preserves prices, reservation, negotiation, sale and active contract fields with explicit relation columns"
+      },
+      {
+        "file": "commercialMapLoadingPipeline.test.ts",
+        "name": "commercial map initial data pipeline reads persisted open amounts without an item, signature, selected lot or price row"
+      }
+    ]
+  },
+  "baseline": {
+    "passed": 24,
+    "failed": 5,
+    "suites": 2,
+    "failures": [
+      {
+        "file": "commercialMapBootLoader.test.tsx",
+        "name": "Commercial Map real readiness loader does not advance for elapsed time, module availability, or an unfinished data request"
+      },
+      {
+        "file": "commercialMapBootLoader.test.tsx",
+        "name": "Commercial Map real readiness loader reports overlapping real spans and preserves failed then successful data retry"
+      },
+      {
+        "file": "commercialMapLoadingPipeline.test.ts",
+        "name": "commercial map initial data pipeline loads all 1205 entities and lots through stable 1000-row pages"
+      },
+      {
+        "file": "commercialMapLoadingPipeline.test.ts",
+        "name": "commercial map initial data pipeline preserves prices, reservation, negotiation, sale and active contract fields with explicit relation columns"
+      },
+      {
+        "file": "commercialMapLoadingPipeline.test.ts",
+        "name": "commercial map initial data pipeline reads persisted open amounts without an item, signature, selected lot or price row"
+      }
+    ]
+  },
+  "samePreexistingFailures": true,
+  "typecheck": "passed",
+  "normalBuild": "passed",
+  "normalBuildQaRoutes": "absent",
+  "mcpGeneratedArtifact": "unchanged after build",
+  "dependencyInstall": {
+    "npmCi": "preexisting failure: missing Drizzle/Postgres dev entries in lock",
+    "graph": "temporary repaired install reused by both revisions; tracked package and locks unchanged",
+    "node": "24.19.0",
+    "npm": "11.12.1",
+    "three": "0.170.0",
+    "fiber": "8.17.10",
+    "drei": "9.122.0",
+    "postprocessing": "6.37.8"
+  }
+}

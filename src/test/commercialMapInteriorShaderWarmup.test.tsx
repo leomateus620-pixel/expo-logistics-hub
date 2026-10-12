@@ -10,7 +10,7 @@ vi.mock('@react-three/fiber', () => ({
 
 import { CommercialMapInteriorShaderWarmup } from '@/features/commercial-map/components/canvas/CommercialMapInteriorShaderWarmup';
 import { CommercialMapInteractiveBoot, scheduleCommercialMapSceneTask } from '@/features/commercial-map/components/canvas/DeferredSceneLayer';
-import { publishCommercialMapRenderHealth } from '@/features/commercial-map/utils/renderingHealth';
+import { COMMERCIAL_MAP_RENDER_RETRY_EVENT, publishCommercialMapRenderHealth } from '@/features/commercial-map/utils/renderingHealth';
 
 function createRuntime({ pending = false, target = null }: { pending?: boolean; target?: THREE.WebGLRenderTarget | null } = {}) {
   let currentTarget = target;
@@ -196,6 +196,41 @@ describe('Commercial Map exact interior shader warmup', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
     expect(gl.compile).toHaveBeenCalledTimes(1);
     expect(snapshot.scene!.children).toHaveLength(0);
+  });
+
+  it('keeps optional restoration queued after essential failure and resumes only after an explicit retry has prepared essentials', async () => {
+    vi.useFakeTimers();
+    const { gl } = createRuntime();
+    startExistingQueue(gl.domElement);
+    render(<CommercialMapInteriorShaderWarmup reducedGraphics />);
+    await act(async () => {});
+    gl.domElement.dataset.commercialMapEssentialReady = 'false';
+    gl.domElement.dataset.commercialMapPreparationError = 'SHADER_PREPARATION_TIMEOUT';
+    publishCommercialMapRenderHealth(gl.domElement, {
+      status: 'failed', path: 'suspended', presentedFrames: 3, contextLosses: 1,
+      lastErrorCode: 'SHADER_PREPARATION_TIMEOUT',
+    });
+    act(() => gl.domElement.dispatchEvent(new Event('webglcontextrestored')));
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(gl.compile).toHaveBeenCalledTimes(1);
+
+    // Retry clears its error while its existing essential gate remains closed.
+    const retry = () => { delete gl.domElement.dataset.commercialMapPreparationError; };
+    gl.domElement.addEventListener(COMMERCIAL_MAP_RENDER_RETRY_EVENT, retry, { once: true });
+    act(() => gl.domElement.dispatchEvent(new Event(COMMERCIAL_MAP_RENDER_RETRY_EVENT)));
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(gl.compile).toHaveBeenCalledTimes(1);
+
+    // A stale error independently blocks a misleading ready marker as well.
+    gl.domElement.dataset.commercialMapEssentialReady = 'true';
+    gl.domElement.dataset.commercialMapPreparationError = 'SHADER_PREPARATION_TIMEOUT';
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(gl.compile).toHaveBeenCalledTimes(1);
+    delete gl.domElement.dataset.commercialMapPreparationError;
+    health(gl.domElement, 'ready', 6);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(gl.compile).toHaveBeenCalledTimes(2);
+    expect(gl.domElement.dataset.commercialMapHydration).toBe('complete');
   });
 
   it('releases a cancelled in-flight restoration once and ignores its obsolete completion', async () => {

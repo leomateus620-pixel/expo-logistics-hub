@@ -12,6 +12,8 @@ Foram lidos os AGENTS da raiz/feature, os caminhos ativos de warmup, fila, saúd
 
 `SunrisePostProcessing` é o único dono de desenho, incluindo o caminho público e os pavilhões públicos (`PublicMapEnvironment` também o usa no perfil reduced). Sua recuperação mantém renderer/cena/câmera e faz restauração explícita de contexto para shaders inválidos em cache. A pausa sob dashboard da PR #191 continua sem alteração: `CommercialMapPresentation` preserva o clock, desliga eventos e cancela frames pendentes; `frameActivity` não invalida apresentação coberta.
 
+A fila existente também respeita agora `commercialMapEssentialReady=false` e `commercialMapPreparationError`. Antes, uma falha terminal removia `commercialMapPreparing` e publicava failed, estado que não era context-lost: a fila podia admitir restaurações opcionais mesmo com o desenho essencial bloqueado. Um teste novo mantém probes sem submissão após falha, durante retry com erro removido/barreira ainda fechada, e diante de marcador pronto com erro residual; só a preparação saudável libera a fila. O mesmo teste falha com apenas essas duas condições removidas e passa na versão final. Marcadores ausentes mantêm o uso standalone.
+
 ## Causas de comportamento reproduzidas e correções
 
 | Mecanismo | Evidência atual e reprodução | Impacto e correção | Teste que refuta o achado |
@@ -42,7 +44,7 @@ O candidato acrescenta **somente em QA/DEV** `program-submission`, em torno de `
 
 ## Verificação automatizada e física
 
-Resultado final desta janela exclusiva, sem build/benchmark simultâneo: **81/81 passaram** em sete arquivos de teste: compositor, interior, scene warmup, recuperação de preparação, recursos deferidos, renderer health e apresentação. Resultados resumidos em `shader-health-tests.json`. A primeira execução do candidato teve 80/81: um teste avançava só 100 ms, antes do slot idle do harness. Foi corrigido para avançar 1.000 ms; a política/deadline do aplicativo não foi alterada.
+Resultado inicial desta janela exclusiva, sem build/benchmark simultâneo: **81/81 passaram** em sete arquivos de teste: compositor, interior, scene warmup, recuperação de preparação, recursos deferidos, renderer health e apresentação. Após a revisão do gate da fila, o resultado final foi **92/92 em oito arquivos**, incluindo o novo caso de falha essencial e os dez casos de `CommercialMapInteractiveBoot`. Resultados resumidos em `shader-health-tests.json`. A primeira execução do candidato teve 80/81: um teste avançava só 100 ms, antes do slot idle do harness. Foi corrigido para avançar 1.000 ms; a política/deadline do aplicativo não foi alterada.
 
 Na base, os três casos novos de barreira falharam. Entre os três casos novos de fila, dois falharam e o cancelamento de polling durante desmontagem já passava. Assim, são **cinco regressões novas demonstradas na base**, com controles positivos preservados. Não se somam repetições como novos testes aprovados.
 
