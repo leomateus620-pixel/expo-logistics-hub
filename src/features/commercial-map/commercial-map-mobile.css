@@ -364,8 +364,8 @@
   .commercial-map-commission-search-trigger {
     position: absolute;
     z-index: 16;
-    top: 0.65rem;
-    right: 3.9rem;
+    top: 0.5rem;
+    right: max(0.5rem, env(safe-area-inset-right));
     display: grid;
     width: 2.75rem;
     height: 2.75rem;
@@ -430,15 +430,9 @@
     left: calc(max(0.65rem, env(safe-area-inset-left)) + 3.4rem);
     top: max(0.65rem, env(safe-area-inset-top));
   }
-  .commission-layout--map .commercial-map-shell.is-commission-scope .commercial-map-commission-search-trigger,
-  .commission-layout--map .commercial-map-shell.is-commission-scope .commercial-map-actions {
-    top: max(0.65rem, env(safe-area-inset-top));
+  .commission-layout--map .commercial-map-shell.is-commission-scope .commercial-map-commission-search-trigger {
+    top: max(0.5rem, env(safe-area-inset-top));
   }
-
-  .commercial-map-shell .commercial-map-actions { display: flex; }
-  .commercial-map-actions { top: 0.65rem; right: 0.65rem; }
-  .commercial-map-actions button { width: 2.75rem; height: 2.75rem; min-height: 2.75rem; padding: 0; border-radius: 0.78rem; font-size: 0; }
-  .commercial-map-actions button svg { width: 1.05rem; height: 1.05rem; margin: 0; }
 
   .commercial-map-summary {
     right: 0.5rem;
@@ -524,7 +518,7 @@
   .commercial-map-segment-mobile-trigger > span,
   .commercial-map-segment-mobile-trigger > svg:last-child { display: none; }
 
-  .commercial-map-commission-search-trigger { position: absolute; z-index: 16; top: 0.5rem; right: calc(max(0.5rem, env(safe-area-inset-right)) + 3.25rem); display: grid; width: 2.75rem; height: 2.75rem; place-items: center; border: 1px solid #cbd8df; border-radius: 0.78rem; background: #fff; color: #34576f; }
+  .commercial-map-commission-search-trigger { position: absolute; z-index: 16; top: 0.5rem; right: max(0.5rem, env(safe-area-inset-right)); display: grid; width: 2.75rem; height: 2.75rem; place-items: center; border: 1px solid #cbd8df; border-radius: 0.78rem; background: #fff; color: #34576f; }
   .commercial-map-commission-search-trigger svg { width: 1.05rem; height: 1.05rem; }
   .commercial-map-commission-search { position: absolute; z-index: 24; top: 0.5rem; right: max(0.5rem, env(safe-area-inset-right)); left: max(0.5rem, env(safe-area-inset-left)); display: flex; height: 2.75rem; align-items: center; gap: 0.55rem; padding: 0 0.2rem 0 0.8rem; border: 1px solid #a8c4d3; border-radius: 0.78rem; background: #fff; color: #246686; box-shadow: 0 12px 30px rgb(15 39 66 / 0.18); }
   .commercial-map-commission-search > svg { width: 1.05rem; height: 1.05rem; flex: 0 0 auto; }
@@ -532,12 +526,8 @@
   .commercial-map-commission-search > button { display: grid; width: 2.5rem; height: 2.5rem; flex: 0 0 auto; place-items: center; border-radius: 0.65rem; color: #536c7d; }
   .commercial-map-commission-search > button svg { width: 1rem; height: 1rem; }
   .commission-layout--map .commercial-map-shell.is-commission-scope .commercial-map-commission-search { top: max(0.5rem, env(safe-area-inset-top)); left: calc(max(0.5rem, env(safe-area-inset-left)) + 3.4rem); }
-  .commission-layout--map .commercial-map-shell.is-commission-scope .commercial-map-commission-search-trigger,
-  .commission-layout--map .commercial-map-shell.is-commission-scope .commercial-map-actions { top: max(0.5rem, env(safe-area-inset-top)); }
+  .commission-layout--map .commercial-map-shell.is-commission-scope .commercial-map-commission-search-trigger { top: max(0.5rem, env(safe-area-inset-top)); }
 
-  .commercial-map-shell .commercial-map-actions { display: flex; }
-  .commercial-map-actions { top: 0.5rem; right: max(0.5rem, env(safe-area-inset-right)); }
-  .commercial-map-actions button { width: 2.75rem; height: 2.75rem; padding: 0; font-size: 0; }
   .commercial-map-summary { right: max(0.5rem, env(safe-area-inset-right)); bottom: max(0.5rem, env(safe-area-inset-bottom)); left: max(0.5rem, env(safe-area-inset-left)); height: 2.75rem; max-width: none; padding: 0.15rem; }
   .commercial-map-summary > div,
   .commercial-map-summary > button { min-width: 0; flex: 1; flex-direction: row; align-items: center; justify-content: center; gap: 0.25rem; padding: 0.2rem; }

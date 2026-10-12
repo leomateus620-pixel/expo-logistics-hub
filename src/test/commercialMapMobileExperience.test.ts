@@ -52,16 +52,33 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     expect(declarations(layout, '.commercial-map-viewport', 'flex')).toContainEqual({ value: '1', conditions: [] });
   });
 
-  it('mostra Filtros flutuante exatamente quando o dock é substituído pelos controles compactos', () => {
-    const layout = read('src/features/commercial-map/commercial-map.css');
+  it('retira o botão flutuante de Filtros e centraliza a barra compacta na área do mapa', () => {
+    const toolbar = read('src/features/commercial-map/components/controls/MapToolbar.tsx');
     const mobile = read('src/features/commercial-map/commercial-map-mobile.css');
+    const topbar = read('src/features/commercial-map/components/controls/commercial-map-topbar.css');
 
-    expect(declarations(layout, '.commercial-map-actions', 'display')).toEqual([
-      { value: 'none', conditions: [] },
-    ]);
-    expect(declarations(mobile, '.commercial-map-shell .commercial-map-actions', 'display')).toEqual(
-      compactControlConditions.map((conditions) => ({ value: 'flex', conditions })),
+    expect(toolbar).not.toContain('commercial-map-actions');
+    expect(declarations(mobile, '.commercial-map-shell .commercial-map-actions', 'display')).toEqual([]);
+    for (const property of ['width', 'margin-inline']) {
+      expect(declarations(topbar, '.commercial-map-toolbar-mobile', property).map(({ value }) => value))
+        .toEqual(property === 'width' ? ['fit-content', 'fit-content'] : ['auto', 'auto']);
+    }
+    expect(declarations(topbar, '.commercial-map-toolbar-mobile', '--rail-right')).toEqual(
+      compactControlConditions.map((conditions) => ({ value: 'max(8px, env(safe-area-inset-right))', conditions })),
     );
+    expect(declarations(topbar, '.commercial-map-toolbar-mobile', '--glass-control-size')[0]).toEqual({ value: 'clamp(38px, 10.2vw, 40px)', conditions: [] });
+  });
+
+  it('compacta o cabeçalho mobile em duas linhas finas mantendo alvos de toque de 44 px', () => {
+    const shell = read('src/features/commercial-map/components/shell/commercial-map-shell.css');
+    const compact = ['@container commercial-map-module (max-width: 720px)'];
+    expect(declarations(shell, '.commercial-map-module__bar', '--bar-identity')).toEqual([{ value: '32px', conditions: compact }]);
+    expect(declarations(shell, '.commercial-map-module__bar', '--bar-tool')).toContainEqual({ value: '36px', conditions: compact });
+    expect(declarations(shell, '.commercial-map-module__bar', 'min-height')).not.toContainEqual({ value: '108px', conditions: compact });
+    // Insets are measured from the padding box: 30 + 2 × 7 and 34 + 2 × 5 reach 44 px.
+    expect(declarations(shell, '.commercial-map-module__back::before', 'inset')).toContainEqual({ value: '-7px', conditions: compact });
+    expect(declarations(shell, '.commercial-map-header-tools > button::before', 'inset')).toContainEqual({ value: '-5px', conditions: compact });
+    expect(declarations(shell, '.commercial-map-module__tools-host', 'z-index')).toContainEqual({ value: '1', conditions: compact });
   });
 
   it('mantém segmentos legíveis e a legenda sem rolagem horizontal', () => {
@@ -177,9 +194,12 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     // Compact alternatives remain accessible in the portal while available
     // container width determines which direct shortcuts fit in the capsule.
     expect(toolbar).toContain('commercial-map-night-toggle');
-    expect(declarations(styles, '.commercial-map-toolbar-mobile .commercial-map-toolbar-focus-selection', 'display'))
+    // Without the floating Filtros button every shortcut fits from 320 px; only
+    // the commission layout, with lateral offsets, still trims shortcuts.
+    expect(declarations(styles, '.commercial-map-toolbar-mobile .commercial-map-toolbar-focus-selection', 'display')).toEqual([]);
+    expect(declarations(styles, '.commercial-map-shell.is-commission-scope .commercial-map-toolbar-mobile .commercial-map-toolbar-focus-selection', 'display'))
       .toContainEqual({ value: 'none', conditions: ['@container commercial-map (max-width: 384px)'] });
-    expect(declarations(styles, '.commercial-map-toolbar-mobile .commercial-map-toolbar-top-view', 'display'))
+    expect(declarations(styles, '.commercial-map-shell.is-commission-scope .commercial-map-toolbar-mobile .commercial-map-toolbar-top-view', 'display'))
       .toContainEqual({ value: 'none', conditions: ['@container commercial-map (max-width: 344px)'] });
     expect(declarations(styles, '.commercial-map-toolbar-menu-focus-selection', 'display'))
       .toContainEqual({ value: 'flex', conditions: [] });

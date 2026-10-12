@@ -1,59 +1,62 @@
 /* Tokens are local to the controls and their portaled menu. */
 .commercial-map-glass {
-  --glass-base: rgb(36 79 104 / .64);
-  --glass-fallback: #315970;
+  --glass-base: rgb(30 72 98 / .6);
+  --glass-fallback: #2d566d;
   --glass-menu: #31536a;
   --glass-ink: #f2fbff;
-  --glass-border: rgb(199 238 255 / .72);
-  --glass-reflection: rgb(230 250 255 / .28);
-  --glass-inner-shadow: rgb(4 32 51 / .34);
-  --glass-shadow: 0 6px 18px -5px rgb(4 29 47 / .42);
-  --glass-button: rgb(204 239 255 / .1);
+  --glass-border: rgb(205 240 255 / .62);
+  --glass-reflection: rgb(232 250 255 / .26);
+  --glass-inner-shadow: rgb(4 32 51 / .3);
+  --glass-shadow: 0 8px 20px -10px rgb(4 29 47 / .55), 0 1px 2px rgb(4 29 47 / .18);
+  --glass-button: transparent;
   --glass-button-border: rgb(208 241 255 / .3);
   --glass-button-reflection: rgb(225 248 255 / .18);
-  --glass-button-shadow: 0 3px 7px -4px rgb(4 29 47 / .65);
-  --glass-hover: rgb(206 241 255 / .2);
-  --glass-selected: rgb(51 151 196 / .66);
-  --glass-selected-reflection: rgb(134 233 255 / .5);
-  --glass-selected-border: #9ce8ff;
-  --glass-selected-shadow: 0 3px 10px -4px rgb(72 200 243 / .65);
+  --glass-button-shadow: none;
+  --glass-hover: rgb(214 243 255 / .14);
+  --glass-press: rgb(214 243 255 / .22);
+  --glass-selected: #1a6ea6;
+  --glass-selected-top: #3e9ed6;
+  --glass-selected-reflection: rgb(176 236 255 / .55);
+  --glass-selected-border: rgb(165 228 252 / .9);
+  --glass-selected-shadow: 0 3px 9px -4px rgb(5 70 112 / .75);
   --glass-focus: #d7f5ff;
-  --glass-divider: rgb(210 240 255 / .28);
-  --glass-edge: rgb(45 90 116 / .92);
-  --glass-radius: 24px;
-  --glass-button-radius: 12px;
+  --glass-divider: rgb(210 240 255 / .24);
+  --glass-edge: rgb(41 84 109 / .92);
+  --glass-radius: 22px;
+  --glass-button-radius: 14px;
   --glass-menu-radius: 20px;
   --glass-menu-item-radius: 12px;
   --glass-edge-radius: 8px;
   --glass-control-size: 38px;
   --glass-gap: 2px;
   --glass-padding: 4px;
-  --glass-icon-size: 18px;
-  --glass-blur: 10px;
+  --glass-icon-size: 20px;
+  --glass-blur: 12px;
   --glass-duration: 170ms;
-  --glass-press-duration: 100ms;
+  --glass-press-duration: 90ms;
   --glass-ease: cubic-bezier(.2, .7, .2, 1);
   color: var(--glass-ink);
 }
 .commercial-map-glass[data-glass-theme="night"] {
-  --glass-base: rgb(21 47 67 / .72);
-  --glass-fallback: #203c51;
+  --glass-base: rgb(18 41 60 / .7);
+  --glass-fallback: #1e3a4e;
   --glass-menu: #263f53;
   --glass-ink: #edf7fc;
-  --glass-border: rgb(191 229 249 / .44);
-  --glass-reflection: rgb(208 240 255 / .16);
+  --glass-border: rgb(191 229 249 / .42);
+  --glass-reflection: rgb(208 240 255 / .15);
   --glass-inner-shadow: rgb(2 14 26 / .28);
-  --glass-shadow: 0 6px 16px -5px rgb(2 12 24 / .55);
-  --glass-button: rgb(211 235 249 / .07);
+  --glass-shadow: 0 8px 18px -9px rgb(2 12 24 / .65), 0 1px 2px rgb(2 12 24 / .2);
   --glass-button-border: rgb(198 231 250 / .25);
   --glass-button-reflection: rgb(217 245 255 / .12);
-  --glass-hover: rgb(201 232 251 / .16);
-  --glass-selected: rgb(43 126 168 / .62);
-  --glass-selected-reflection: rgb(121 218 255 / .36);
-  --glass-selected-border: #92dcf5;
+  --glass-hover: rgb(201 232 251 / .12);
+  --glass-press: rgb(201 232 251 / .2);
+  --glass-selected: #18557f;
+  --glass-selected-top: #2f81b4;
+  --glass-selected-reflection: rgb(150 222 255 / .42);
+  --glass-selected-border: rgb(146 220 245 / .8);
   --glass-focus: #b0e8ff;
-  --glass-divider: rgb(195 227 247 / .25);
-  --glass-edge: rgb(35 62 82 / .96);
+  --glass-divider: rgb(195 227 247 / .22);
+  --glass-edge: rgb(31 58 78 / .96);
 }
 .commercial-map-control-rail {
   display: flex;
@@ -62,16 +65,22 @@
   padding: 0;
   border: 1px solid var(--glass-border);
   border-radius: var(--glass-radius);
-  background: linear-gradient(180deg, var(--glass-reflection), transparent 48%), var(--glass-fallback);
-  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-reflection), inset 0 -1px 2px var(--glass-inner-shadow);
+  background: linear-gradient(180deg, var(--glass-reflection), transparent 52%), var(--glass-fallback);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-reflection), inset 0 -1px 1px var(--glass-inner-shadow);
   isolation: isolate;
+}
+/* Low-capability devices keep the same capsule as an opaque tint: no blur pass. */
+.commercial-map-control-rail[data-glass-capability="reduced"] {
+  background: linear-gradient(180deg, var(--glass-reflection), transparent 52%), var(--glass-fallback);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 /* Only this small surface blurs; no blur on buttons, menu or canvas. */
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .commercial-map-control-rail {
-    background: linear-gradient(180deg, var(--glass-reflection), transparent 48%), var(--glass-base);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.12);
-    backdrop-filter: blur(var(--glass-blur)) saturate(1.12);
+    background: linear-gradient(180deg, var(--glass-reflection), transparent 52%), var(--glass-base);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.15);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.15);
   }
 }
 .commercial-map-topbar {
@@ -134,12 +143,20 @@
   min-height: var(--glass-control-size);
   flex: 0 0 var(--glass-control-size);
   place-items: center;
-  border: 1px solid var(--glass-button-border);
+  padding: 0;
+  border: 1px solid transparent;
   border-radius: var(--glass-button-radius);
-  background: linear-gradient(155deg, var(--glass-button-reflection), transparent 68%), var(--glass-button);
+  background: var(--glass-button);
   color: var(--glass-ink);
-  box-shadow: var(--glass-button-shadow), inset 0 1px 0 var(--glass-reflection), inset 0 -1px 2px var(--glass-inner-shadow);
-  transition: transform var(--glass-duration) var(--glass-ease), background-color var(--glass-duration) var(--glass-ease), border-color var(--glass-duration) var(--glass-ease), color var(--glass-duration) var(--glass-ease);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--glass-duration) var(--glass-ease), background-color var(--glass-duration) var(--glass-ease), border-color var(--glass-duration) var(--glass-ease), box-shadow var(--glass-duration) var(--glass-ease), opacity var(--glass-duration) var(--glass-ease);
+}
+/* The touch target fills the capsule height and the neighbouring gaps even
+   when the drawn control is smaller than 44 px (insets include the border). */
+.commercial-map-control-rail__scroll > button::before {
+  position: absolute;
+  inset: calc(-1px - var(--glass-padding)) calc(-1px - var(--glass-gap) / 2);
+  content: '';
 }
 .commercial-map-control-rail__scroll > button svg,
 .commercial-map-toolbar-menu.commercial-map-glass [role="menuitem"] > svg {
@@ -153,18 +170,19 @@
 .commercial-map-control-rail__scroll > button:is(.is-open, .is-active, [data-state="open"]),
 .commercial-map-toolbar-menu.commercial-map-glass [data-active="true"] {
   border-color: var(--glass-selected-border);
-  background: linear-gradient(155deg, var(--glass-selected-reflection), transparent 72%), var(--glass-selected);
-  box-shadow: var(--glass-selected-shadow), inset 0 1px 0 var(--glass-reflection), inset 0 0 0 1px var(--glass-button-border);
+  background: linear-gradient(180deg, var(--glass-selected-top), var(--glass-selected));
+  box-shadow: var(--glass-selected-shadow), inset 0 1px 0 var(--glass-selected-reflection), inset 0 -1px 1px rgb(3 40 66 / .35);
 }
 @media (hover: hover) and (pointer: fine) {
-  .commercial-map-control-rail__scroll > button:hover:not(:disabled) { background-color: var(--glass-hover); transform: translateY(-1px); }
-  .commercial-map-control-rail__scroll > button:hover:not(:disabled) svg { transform: scale(1.03); }
-  .commercial-map-control-rail__scroll > button:is(.is-open, .is-active, [data-state="open"]):hover:not(:disabled) { background-color: var(--glass-selected); }
+  .commercial-map-control-rail__scroll > button:hover:not(:disabled) { background-color: var(--glass-hover); border-color: var(--glass-button-border); box-shadow: inset 0 1px 0 var(--glass-button-reflection); }
+  .commercial-map-control-rail__scroll > button:hover:not(:disabled) svg { transform: translateY(-.5px) scale(1.04); }
+  .commercial-map-control-rail__scroll > button:is(.is-open, .is-active, [data-state="open"]):hover:not(:disabled) { border-color: var(--glass-selected-border); box-shadow: var(--glass-selected-shadow), inset 0 1px 0 var(--glass-selected-reflection), inset 0 0 0 1px rgb(190 240 255 / .2); }
 }
-.commercial-map-control-rail__scroll > button:active:not(:disabled) { transform: scale(.97); transition-duration: var(--glass-press-duration); }
-.commercial-map-control-rail__scroll > button:focus-visible { outline: 2px solid var(--glass-focus); outline-offset: -3px; }
-.commercial-map-control-rail__scroll > button:disabled { cursor: default; opacity: .38; }
-.commercial-map-topbar__divider { width: 1px; height: 22px; flex: 0 0 1px; margin-inline: 4px; background: var(--glass-divider); }
+.commercial-map-control-rail__scroll > button:active:not(:disabled) { background-color: var(--glass-press); transform: scale(.94); transition-duration: var(--glass-press-duration); }
+.commercial-map-control-rail__scroll > button:is(.is-open, .is-active, [data-state="open"]):active:not(:disabled) { background: linear-gradient(180deg, var(--glass-selected), var(--glass-selected)); }
+.commercial-map-control-rail__scroll > button:focus-visible { outline: 2px solid var(--glass-focus); outline-offset: -2px; }
+.commercial-map-control-rail__scroll > button:disabled { cursor: default; opacity: .42; }
+.commercial-map-topbar__divider { width: 1px; height: 22px; flex: 0 0 1px; margin-inline: 4px; border-radius: 1px; background: var(--glass-divider); }
 @media (pointer: coarse) {
   .commercial-map-control-rail { --glass-control-size: 44px; --glass-icon-size: 22px; }
 }
@@ -191,50 +209,60 @@
 /* Keep compact alternatives reachable even when a portal has no container. */
 .commercial-map-toolbar-menu-focus-selection,
 .commercial-map-toolbar-menu .commercial-map-toolbar-menu-top { display: flex; }
+/* Compact rail: one centred capsule sized from the available width. The drawn
+   controls shrink with the viewport; touch targets keep the capsule height. */
 .commercial-map-toolbar-mobile {
-  --glass-control-size: 44px;
-  --glass-gap: 2px;
-  --glass-padding: 4px;
-  --glass-icon-size: 22px;
-  --glass-radius: 27px;
-  --glass-button-radius: 12px;
+  --glass-control-size: clamp(38px, 10.2vw, 40px);
+  --glass-gap: clamp(2px, 1.2vw, 5px);
+  --glass-padding: 3px;
+  --glass-icon-size: calc(var(--glass-control-size) * .55);
+  --glass-radius: calc(var(--glass-control-size) / 2 + var(--glass-padding) + 1px);
+  --glass-button-radius: calc(var(--glass-control-size) / 2 - 5px);
   display: none;
 }
 @container commercial-map (max-width: 720px) {
   .commercial-map-topbar { display: none; }
   .commercial-map-toolbar-mobile {
     --rail-left: max(8px, env(safe-area-inset-left));
-    --rail-right: calc(max(8px, env(safe-area-inset-right)) + 52px);
+    --rail-right: max(8px, env(safe-area-inset-right));
     position: absolute;
     z-index: 18;
     top: max(8px, env(safe-area-inset-top));
+    right: var(--rail-right);
     left: var(--rail-left);
     display: flex;
+    width: fit-content;
     max-width: calc(100% - var(--rail-left) - var(--rail-right));
+    margin-inline: auto;
   }
-  .commercial-map-shell.is-commission-scope .commercial-map-toolbar-mobile { --rail-right: calc(max(8px, env(safe-area-inset-right)) + 104px); }
+  .commercial-map-shell.is-commission-scope .commercial-map-toolbar-mobile { --rail-right: calc(max(8px, env(safe-area-inset-right)) + 52px); }
   .commission-layout--map .commercial-map-shell.is-commission-scope .commercial-map-toolbar-mobile { --rail-left: calc(max(8px, env(safe-area-inset-left)) + 3.4rem); }
 }
 @media (max-width: 950px) and (max-height: 520px) {
   .commercial-map-topbar { display: none; }
   .commercial-map-toolbar-mobile {
+    --glass-control-size: 38px;
     --rail-left: max(8px, env(safe-area-inset-left));
-    --rail-right: calc(max(8px, env(safe-area-inset-right)) + 52px);
+    --rail-right: max(8px, env(safe-area-inset-right));
     position: absolute;
     z-index: 18;
-    top: max(8px, env(safe-area-inset-top));
+    top: max(6px, env(safe-area-inset-top));
+    right: var(--rail-right);
     left: var(--rail-left);
     display: flex;
+    width: fit-content;
     max-width: calc(100% - var(--rail-left) - var(--rail-right));
+    margin-inline: auto;
   }
-  .commercial-map-shell.is-commission-scope .commercial-map-toolbar-mobile { --rail-right: calc(max(8px, env(safe-area-inset-right)) + 104px); }
+  .commercial-map-shell.is-commission-scope .commercial-map-toolbar-mobile { --rail-right: calc(max(8px, env(safe-area-inset-right)) + 52px); }
   .commission-layout--map .commercial-map-shell.is-commission-scope .commercial-map-toolbar-mobile { --rail-left: calc(max(8px, env(safe-area-inset-left)) + 3.4rem); }
 }
+/* Only the commission layout, with side offsets, still runs out of width. */
 @container commercial-map (max-width: 384px) {
-  .commercial-map-toolbar-mobile .commercial-map-toolbar-focus-selection { display: none; }
+  .commercial-map-shell.is-commission-scope .commercial-map-toolbar-mobile .commercial-map-toolbar-focus-selection { display: none; }
 }
 @container commercial-map (max-width: 344px) {
-  .commercial-map-toolbar-mobile .commercial-map-toolbar-top-view { display: none; }
+  .commercial-map-shell.is-commission-scope .commercial-map-toolbar-mobile .commercial-map-toolbar-top-view { display: none; }
 }
 /* Full glass and brief interaction feedback are retained by product request,
    independently of system reduced-motion/reduced-transparency preferences. */

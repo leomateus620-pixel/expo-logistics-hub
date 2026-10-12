@@ -1,11 +1,12 @@
 import { useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { Flame, Footprints, List, Settings2, ShoppingCart } from 'lucide-react';
+import { Flame, Footprints, List, Settings2, ShoppingCart, SlidersHorizontal } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { useSalesStore } from '../../sales/useSalesSelection';
 import { useVisitStore } from '../../visit/useVisitStore';
+import { isCommercialMapCompactLayout } from '../../utils/compactLayout';
 import { CommercialMapHeaderHost } from './headerHost';
 import './commercial-map-shell.css';
 
@@ -33,6 +34,11 @@ export function CommercialMapHeaderTools({
   const mode = useCommercialMapStore((state) => state.workspaceMode);
   const panel = useCommercialMapStore((state) => state.activePanel);
   const setMode = useCommercialMapStore((state) => state.setWorkspaceMode);
+  const setPanel = useCommercialMapStore((state) => state.setActivePanel);
+  const insideInterior = useCommercialMapStore((state) => Boolean(state.interiorEntityId));
+  const [compactSearchEntry, setSearchEntryVisible] = useState(false);
+  // Compact layouts have no dock search; the results panel itself is exterior-only.
+  const searchEntryVisible = compactSearchEntry && !insideInterior;
   const salesActive = useSalesStore((state) => state.salesModeActive);
   const toggleSalesMode = useSalesStore((state) => state.toggleSalesMode);
   const checkoutOpen = useSalesStore((state) => state.checkoutOpen);
@@ -123,7 +129,11 @@ export function CommercialMapHeaderTools({
         </button>
       </TooltipTrigger><TooltipContent side="bottom">Dashboard Comercial</TooltipContent></Tooltip>}
 
-      <Popover open={managementOpen && !toolsUnavailable} onOpenChange={(open) => { if (!toolsUnavailable) setManagementOpen(open); }}>
+      <Popover open={managementOpen && !toolsUnavailable} onOpenChange={(open) => {
+        if (toolsUnavailable) return;
+        if (open) setSearchEntryVisible(isCommercialMapCompactLayout());
+        setManagementOpen(open);
+      }}>
         <Tooltip><TooltipTrigger asChild><PopoverTrigger asChild>
           <button type="button" className={`commercial-map-header-management-trigger ${managing ? 'is-active' : ''}`} aria-label="Gestão" aria-pressed={managing}>
             <Settings2 aria-hidden="true" />
@@ -137,6 +147,27 @@ export function CommercialMapHeaderTools({
           onCloseAutoFocus={(event) => { if (toolsUnavailableRef.current) event.preventDefault(); }}
         >
           <strong>Gestão do mapa</strong>
+          {searchEntryVisible && <button
+            type="button"
+            className={`commercial-map-header-management__list commercial-map-header-management__search ${panel === 'results' ? 'is-active' : ''}`}
+            aria-pressed={panel === 'results'}
+            data-commercial-map-management-search
+            onClick={() => {
+              if (panel === 'results') {
+                setPanel(null);
+              } else {
+                if (mode !== '3d') setMode('3d');
+                setPanel('results');
+              }
+              setManagementOpen(false);
+            }}
+          >
+            <SlidersHorizontal aria-hidden="true" />
+            <span>
+              <span>{panel === 'results' ? 'Fechar busca e seleção' : 'Busca e seleção'}</span>
+              <small>Lotes, quadras, pavilhões e filtros</small>
+            </span>
+          </button>}
           <button
             type="button"
             className={`commercial-map-header-management__list ${mode === 'list' ? 'is-active' : ''}`}

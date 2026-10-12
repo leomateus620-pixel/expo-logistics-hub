@@ -2,25 +2,21 @@ import {
   Box,
   Building2,
   CarFront,
-  CloudRain,
-  Droplets,
   Layers3,
   List,
   Map,
   Maximize2,
-  Moon,
   MoreHorizontal,
   ParkingCircle,
   Search,
   ScanSearch,
-  SlidersHorizontal,
   SquareStack,
   Sunrise,
   Trees,
   Warehouse,
   X,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import type { ComponentType, SVGProps } from 'react';
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useEffect, useRef, useState } from 'react';
@@ -36,17 +32,25 @@ import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CameraPreset, MapPermissions } from '../../types';
 import type { CommercialMapAreaScope } from '../../utils/areaScope';
 import { canUseTechnicalValidationOverlay } from '../../utils/technicalValidation';
+import { COMMERCIAL_MAP_COMPACT_QUERY } from '../../utils/compactLayout';
 import { CommercialMapControlRail } from './CommercialMapControlRail';
+import {
+  FenasojaFoldedMapIcon,
+  FenasojaHydrologyIcon,
+  FenasojaLayeredViewIcon,
+  FenasojaMoonIcon,
+  FenasojaRainIcon,
+} from './FenasojaMapIcons';
 
-const presetIcons: Record<CameraPreset, typeof Map> = {
-  overview: Map,
-  top: SquareStack,
+const presetIcons: Record<CameraPreset, ComponentType<SVGProps<SVGSVGElement>>> = {
+  overview: FenasojaFoldedMapIcon,
+  top: FenasojaLayeredViewIcon,
   isometric: Box,
   commercial: Building2,
   pavilions: Warehouse,
   parking: ParkingCircle,
   gates: CarFront,
-  exporural: Map,
+  exporural: FenasojaFoldedMapIcon,
   'quadra-r': SquareStack,
   'quadra-s': SquareStack,
   semear: Map,
@@ -111,7 +115,7 @@ export function MapToolbar({
   }, [isCompactSearchOpen]);
 
   useEffect(() => {
-    const compactViewport = window.matchMedia('(max-width: 720px), (max-width: 950px) and (max-height: 520px)');
+    const compactViewport = window.matchMedia(COMMERCIAL_MAP_COMPACT_QUERY);
     const syncSearchMode = () => {
       if (!compactViewport.matches) setIsCompactSearchOpen(false);
     };
@@ -184,7 +188,7 @@ export function MapToolbar({
               aria-label={hydrologicalModeActive ? 'Sair do modo Rede Hidrológica' : 'Ativar modo Rede Hidrológica'}
               aria-pressed={hydrologicalModeActive}
             >
-              <Droplets className="h-4 w-4" aria-hidden="true" />
+              <FenasojaHydrologyIcon className="h-4 w-4" aria-hidden="true" />
             </button>
           </TooltipTrigger>
           <TooltipContent>
@@ -214,7 +218,7 @@ export function MapToolbar({
               aria-label={nightControlLabel}
               aria-pressed={nightModeActive}
             >
-              <Moon className="h-4 w-4" aria-hidden="true" />
+              <FenasojaMoonIcon className="h-4 w-4" aria-hidden="true" />
             </button>
           </TooltipTrigger>
           <TooltipContent>{nightModeActive ? 'Sair do Modo Noturno' : 'Modo Noturno'}</TooltipContent>
@@ -284,7 +288,7 @@ export function MapToolbar({
           aria-pressed={cameraPreset === mobileResetPreset}
           data-commercial-map-control={mobileResetPreset}
         >
-          <Map aria-hidden="true" />
+          <FenasojaFoldedMapIcon aria-hidden="true" />
         </button>
         <button
           type="button"
@@ -294,7 +298,7 @@ export function MapToolbar({
           aria-pressed={cameraPreset === 'top'}
           data-commercial-map-control="top"
         >
-          <SquareStack aria-hidden="true" />
+          <FenasojaLayeredViewIcon aria-hidden="true" />
         </button>
         <button
           type="button"
@@ -304,7 +308,7 @@ export function MapToolbar({
           aria-pressed={hydrologicalModeActive}
           data-commercial-map-control="hydrological-network"
         >
-          <Droplets aria-hidden="true" />
+          <FenasojaHydrologyIcon aria-hidden="true" />
         </button>
         <button
           type="button"
@@ -314,7 +318,7 @@ export function MapToolbar({
           aria-pressed={nightModeActive}
           data-commercial-map-control="night-mode"
         >
-          <Moon aria-hidden="true" />
+          <FenasojaMoonIcon aria-hidden="true" />
         </button>
         <button
           type="button"
@@ -324,7 +328,7 @@ export function MapToolbar({
           aria-pressed={rainModeActive}
           data-commercial-map-control="rain-mode"
         >
-          <CloudRain aria-hidden="true" />
+          <FenasojaRainIcon aria-hidden="true" />
         </button>
         <button
           type="button"
@@ -462,13 +466,6 @@ export function MapToolbar({
           )}
         </>
       )}
-
-      <div className="commercial-map-actions">
-        <Button variant="outline" size="sm" onClick={() => setActivePanel('results')}>
-          <SlidersHorizontal className="h-4 w-4" />
-          Filtros
-        </Button>
-      </div>
     </>
   );
 }

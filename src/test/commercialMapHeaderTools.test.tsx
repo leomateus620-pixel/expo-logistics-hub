@@ -10,6 +10,7 @@ import { CommercialMapShell } from '@/features/commercial-map/components/shell/C
 import { useCommercialMapStore } from '@/features/commercial-map/state/useCommercialMapStore';
 import { useSalesStore } from '@/features/commercial-map/sales/useSalesSelection';
 import { useVisitStore } from '@/features/commercial-map/visit/useVisitStore';
+import { COMMERCIAL_MAP_COMPACT_QUERY } from '@/features/commercial-map/utils/compactLayout';
 
 vi.mock('@/hooks/useAuth', () => ({ useAuth: () => ({ signOut: vi.fn() }) }));
 
@@ -21,6 +22,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  vi.restoreAllMocks();
   useVisitStore.getState().finishExit();
   useCommercialMapStore.setState(useCommercialMapStore.getInitialState(), true);
   useSalesStore.setState(useSalesStore.getInitialState(), true);
@@ -77,6 +79,50 @@ describe('cabeçalho compacto do mapa comercial', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Lista e tabela' }));
     expect(useCommercialMapStore.getState().workspaceMode).toBe('3d');
     expect(useCommercialMapStore.getState().interiorEntityId).toBe('pavilion-context');
+  });
+
+  it('leva Busca e seleção para Gestão somente no layout compacto, reutilizando o painel de resultados', async () => {
+    const matchMedia = vi.spyOn(window, 'matchMedia');
+    const compact = (matches: boolean) => matchMedia.mockImplementation((query: string) => ({
+      matches: matches && query === COMMERCIAL_MAP_COMPACT_QUERY,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }));
+    compact(false);
+    useCommercialMapStore.setState({ workspaceMode: 'list', search: 'Quadra R', statusFilters: ['BLOCKED'] });
+    render(<CommercialMapHeaderTools />);
+    const management = screen.getByRole('button', { name: 'Gestão' });
+    fireEvent.click(management);
+    expect(screen.getByRole('button', { name: 'Lista e tabela' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Busca e seleção/ })).not.toBeInTheDocument();
+    fireEvent.click(management);
+
+    compact(true);
+    fireEvent.click(management);
+    const entry = screen.getByRole('button', { name: /^Busca e seleção/ });
+    expect(entry).toHaveAttribute('data-commercial-map-management-search');
+    expect(entry).toHaveAttribute('aria-pressed', 'false');
+    expect(entry.compareDocumentPosition(screen.getByRole('button', { name: 'Lista e tabela' })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(entry);
+    await waitFor(() => expect(management).toHaveFocus());
+    expect(screen.queryByRole('button', { name: /Busca e seleção/ })).not.toBeInTheDocument();
+    expect(useCommercialMapStore.getState()).toMatchObject({ activePanel: 'results', workspaceMode: '3d', search: 'Quadra R', statusFilters: ['BLOCKED'] });
+
+    fireEvent.click(management);
+    const close = screen.getByRole('button', { name: /^Fechar busca e seleção/ });
+    expect(close).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(close);
+    expect(useCommercialMapStore.getState()).toMatchObject({ activePanel: null, search: 'Quadra R' });
+
+    act(() => useCommercialMapStore.setState({ interiorEntityId: 'pavilion-context' }));
+    fireEvent.click(management);
+    expect(screen.getByRole('button', { name: 'Lista e tabela' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Busca e seleção/ })).not.toBeInTheDocument();
   });
 
   it('mantém menu funcional por teclado no fallback e só renderiza as ações autorizadas pelo chamador', async () => {
