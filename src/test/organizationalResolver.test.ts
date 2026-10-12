@@ -46,6 +46,67 @@ const central = unit({
 });
 
 describe('organizationalResolver', () => {
+  it('gera raízes pares e o caminho executivo pela vice-presidência sem mudar cargos', () => {
+    const members = [
+      member({ user_id: 'president', nome_exibicao: 'Fabiano Soltis', cargo: 'Presidente', commission_id: central.id }),
+      member({ user_id: 'vice', nome_exibicao: 'Djeison Drey', cargo: 'Vice-presidente', commission_id: central.id }),
+    ];
+    const input = { members, units: [central, unit({ id: 'lower', name: 'Comissão Oficial' })] };
+    const original = structuredClone(input);
+    const graph = buildOrganizationalGraph(input);
+    const president = graph.nodes.find((node) => node.subtitle === 'PRESIDENTE')!;
+    const vice = graph.nodes.find((node) => node.subtitle === 'VICE-PRESIDENTE')!;
+    const centralNode = graph.nodes.find((node) => node.type === 'central-commission')!;
+    expect(president.parentIds).toEqual([]);
+    expect(vice.parentIds.sort()).toEqual([graph.rootNodeId, president.id].sort());
+    expect(centralNode.parentIds).toEqual([vice.id]);
+    expect(president.authorityLevel).toBe(2);
+    expect(vice.authorityLevel).toBe(2);
+    expect(input).toEqual(original);
+    const visit = (id: string, ancestors = new Set<string>()) => {
+      expect(ancestors.has(id)).toBe(false);
+      const node = graph.nodes.find((item) => item.id === id)!;
+      for (const child of node.childIds) visit(child, new Set([...ancestors, id]));
+    };
+    for (const node of graph.nodes) visit(node.id);
+    for (const edge of graph.edges) {
+      expect(graph.nodes.find((node) => node.id === edge.sourceId)!.childIds).toContain(edge.targetId);
+      expect(graph.nodes.find((node) => node.id === edge.targetId)!.parentIds).toContain(edge.sourceId);
+    }
+  });
+
+  it('omite somente a ocorrência histórica da Zélia na Central, preservando assessoria e homônimas', () => {
+    const directorId = '74a71a9f-c2a6-4ae1-baed-1e2d7b8bc07f';
+    const advisoryId = '38e7e8d3-4c66-4279-92ea-961b70ee4e80';
+    const members = [
+      member({ user_id: directorId, nome_exibicao: 'Zélia Savoldi', cargo: 'Marketing e Comunicação', commission_id: central.id, commission_nome: 'Comissão Central' }),
+      member({ user_id: advisoryId, nome_exibicao: 'ZÉLIA SAVOLDI', cargo: 'Assessoria de Marketing', commission_id: central.id }),
+      member({ user_id: 'homonym', nome_exibicao: 'Zélia Savoldi', cargo: 'Diretoria', commission_id: central.id }),
+    ];
+    const marketing = unit({ id: 'marketing', name: 'Assessoria de Marketing/Comunicação', type: 'assessoria', responsibles: [{
+      id: 'marketing-responsibility', displayName: 'Zélia Savoldi', responsibleType: 'pessoa', relationshipRole: 'principal', isPrimary: true, userId: advisoryId,
+    }] });
+    const input = { members, units: [central, marketing] };
+    const original = structuredClone(input);
+    for (const orderedMembers of [members, [...members].reverse()]) {
+      const graph = buildOrganizationalGraph({ ...input, members: orderedMembers });
+      const centralNode = graph.nodes.find((node) => node.type === 'central-commission')!;
+      expect(centralNode.personIds).toEqual([`person:user:${directorId}`, 'person:user:homonym'].sort());
+      expect(centralNode.subtitle).toBe('2 INTEGRANTES');
+      expect(graph.nodes.find((node) => node.id === 'unit:marketing')!.personIds).toEqual([`person:user:${advisoryId}`]);
+      expect(graph.people[`person:user:${advisoryId}`].sourceIds).toContain('marketing-responsibility');
+      expect(graph.people[`person:user:${advisoryId}`].highestAuthorityLevel).toBe(3);
+      expect(graph.people[`person:user:${directorId}`].roles).toEqual(['COMISSÃO CENTRAL', 'MARKETING E COMUNICAÇÃO']);
+      expect(Object.values(graph.people).filter((person) => person.fullName === 'ZÉLIA SAVOLDI')).toHaveLength(3);
+    }
+    expect(input).toEqual(original);
+    // Incomplete refresh and changed identity must fail conservatively.
+    const incomplete = buildOrganizationalGraph({ members: members.slice(1), units: input.units });
+    expect(incomplete.nodes.find((node) => node.type === 'central-commission')!.personIds).toContain(`person:user:${advisoryId}`);
+    const renamed = buildOrganizationalGraph({ members: members.map((item) => item.user_id === advisoryId ? { ...item, nome_exibicao: 'Outra Pessoa' } : item), units: [central] });
+    expect(renamed.nodes.find((node) => node.type === 'central-commission')!.personIds).toContain(`person:user:${advisoryId}`);
+  });
+
   it('resolve autoridade 1-4 a partir de aliases existentes, cargos e membership reais', () => {
     const graph = buildOrganizationalGraph({
       members: [

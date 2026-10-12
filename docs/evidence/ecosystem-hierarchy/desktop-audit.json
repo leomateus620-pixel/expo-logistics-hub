@@ -1,0 +1,42 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "mobileEmulation": false,
+  "checks": [
+    "peer roots and executive graph agree",
+    "search removed and six labeled filters retained",
+    "no card overlaps or connector crossings over captions",
+    "top portraits fit below measured controls",
+    "person has exclusively one incident edge",
+    "selected person stays visible outside panel",
+    "successive selection never restores other edges",
+    "clear restores complete graph",
+    "collective has only its immediate links",
+    "Central count list and selection share the corrected identities",
+    "member does not inherit collective outgoing links",
+    "zoom controls respond",
+    "filter excludes nodes from interaction and focus",
+    "all six filters retain their institutional scope",
+    "mouse pan",
+    "mouse wheel zoom",
+    "authored movement survives reduced-motion preference",
+    "keyboard follows visual rows and Home returns to CCPF",
+    "refresh preserves camera and corrected membership",
+    "Escape closes details returns node focus and closes fullscreen",
+    "reopen and fullscreen close button"
+  ],
+  "visualAudit": {
+    "overlaps": [],
+    "crossings": [],
+    "topYs": [
+      "88px",
+      "88px"
+    ],
+    "topVisible": true,
+    "controlsBottom": 108,
+    "scale": "0.504"
+  },
+  "errors": []
+}

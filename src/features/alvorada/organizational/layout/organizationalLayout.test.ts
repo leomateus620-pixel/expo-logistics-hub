@@ -25,7 +25,7 @@ function node(
     sortOrder: Number(id.replace(/\D/g, '')) || 0,
     isRenderable: authorityLevel <= 4,
     responsibilities: [],
-    metadata: {},
+    metadata: type === 'executive' ? { executiveRole: [id === 'president' ? 'president' : 'vice-president'] } : {},
   };
 }
 
@@ -39,19 +39,37 @@ function edge(sourceId: string, targetId: string, authorityLevel: AuthorityLevel
 }
 
 describe('calculateOrganizationalLayout', () => {
+  it.each([[1440, 900], [390, 844], [844, 390]])('preserves peer roots and centered executive descent at %ix%i', (viewportWidth, viewportHeight) => {
+    const nodes = [node('root', 'ccp', 1), node('president', 'executive', 2),
+      node('vice', 'executive', 2, ['root', 'president']), node('central', 'central-commission', 3, ['vice'])];
+    // Labels never determine the executive role or the visual row.
+    nodes[1].title = 'Nome atualizado';
+    const layout = calculateOrganizationalLayout(nodes, [], { viewportWidth, viewportHeight });
+    const [root, president, vice, central] = nodes.map((item) => layout.nodeById.get(item.id)!);
+    expect(root.y).toBe(president.y);
+    expect(root.x).toBeLessThan(president.x);
+    expect(vice.x).toBe(layout.bounds.width / 2);
+    expect(central.x).toBe(vice.x);
+    expect(vice.y - root.y).toBeGreaterThanOrEqual(230);
+    expect(central.y - vice.y).toBeGreaterThanOrEqual(200);
+    expect(findDirectionalNode(layout, 'root', 'right')?.node.id).toBe('president');
+    expect(findDirectionalNode(layout, 'president', 'down')?.node.id).toBe('vice');
+    expect(findDirectionalNode(layout, 'vice', 'down')?.node.id).toBe('central');
+  });
+
   it('keeps deterministic positions and authority progression', () => {
     const nodes = [
       node('root', 'ccp', 1),
-      node('president', 'executive', 2, ['root']),
-      node('vice', 'executive', 2, ['root']),
-      node('central', 'central-commission', 3, ['president', 'vice']),
+      node('president', 'executive', 2),
+      node('vice', 'executive', 2, ['root', 'president']),
+      node('central', 'central-commission', 3, ['vice']),
       node('commission', 'commission', 4, ['central']),
       node('future-volunteer', 'volunteer', 5, ['commission']),
     ];
     const edges = [
-      edge('root', 'president', 2),
       edge('root', 'vice', 2),
-      edge('president', 'central', 3),
+      edge('president', 'vice', 2),
+      edge('vice', 'central', 3),
       edge('central', 'commission', 4),
     ];
 
@@ -71,17 +89,20 @@ describe('calculateOrganizationalLayout', () => {
 
     expect(snapshot(first)).toEqual(snapshot(second));
     expect(first.nodeById.has('future-volunteer')).toBe(false);
-    expect(first.nodeById.get('root')?.y).toBeLessThan(first.nodeById.get('president')?.y ?? 0);
+    expect(first.nodeById.get('root')?.y).toBe(first.nodeById.get('president')?.y);
+    expect(first.nodeById.get('root')!.x).toBeLessThan(first.nodeById.get('president')!.x);
+    expect(first.nodeById.get('vice')!.x).toBe(first.bounds.width / 2);
+    expect(first.nodeById.get('vice')!.y).toBeGreaterThan(first.nodeById.get('president')!.y);
     expect(first.nodeById.get('president')?.y).toBeLessThan(first.nodeById.get('central')?.y ?? 0);
     expect(first.nodeById.get('central')?.y).toBeLessThan(first.nodeById.get('commission')?.y ?? 0);
     expect(first.nodes.filter(({ node: item }) => item.authorityLevel === 1).map(({ levelOrder }) => levelOrder)).toEqual([0]);
-    expect(first.nodes.filter(({ node: item }) => item.authorityLevel === 2).map(({ levelOrder }) => levelOrder)).toEqual([0, 1]);
+    expect(first.nodes.filter(({ node: item }) => item.authorityLevel === 2).map(({ levelOrder }) => levelOrder)).toEqual([1, 0]);
     expect(first.nodes.filter(({ node: item }) => item.authorityLevel === 3).map(({ levelOrder }) => levelOrder)).toEqual([0]);
     expect(first.nodes.filter(({ node: item }) => item.authorityLevel === 4).map(({ levelOrder }) => levelOrder)).toEqual([0]);
     expect(first.edges).toHaveLength(edges.length);
   });
 
-  it('fits 35 operational cards in a collision-free compact world at more than 53% on 1366x768', () => {
+  it('fits 35 operational cards in a collision-free compact world at more than 40% on 1366x768', () => {
     const operationalNodes = Array.from({ length: 35 }, (_, index) => node(
       `unit-${index + 1}`,
       index % 5 === 0 ? 'advisory' : 'commission',
@@ -90,7 +111,7 @@ describe('calculateOrganizationalLayout', () => {
     ));
     const nodes = [
       node('root', 'ccp', 1),
-      node('president', 'executive', 2, ['root']),
+      node('president', 'executive', 2),
       node('central', 'central-commission', 3, ['president']),
       ...operationalNodes,
     ];
@@ -104,7 +125,7 @@ describe('calculateOrganizationalLayout', () => {
       Array.from({ length: 35 }, (_, index) => index),
     );
     expect(layout.bounds.width).toBeLessThanOrEqual(2240);
-    expect(layout.bounds.height).toBeLessThanOrEqual(990);
+    expect(layout.bounds.height).toBeLessThanOrEqual(1440);
     layout.nodes.forEach(({ x, y }) => {
       expect(x).toBeGreaterThanOrEqual(0);
       expect(x).toBeLessThanOrEqual(layout.bounds.width);
@@ -125,9 +146,9 @@ describe('calculateOrganizationalLayout', () => {
 
     const desktopFitScale = Math.min(
       (1366 - 24 * 2) / layout.bounds.width,
-      (768 - 168 - 72) / layout.bounds.height,
+      (768 - 112 - 72) / layout.bounds.height,
     );
-    expect(desktopFitScale).toBeGreaterThan(0.53);
+    expect(desktopFitScale).toBeGreaterThan(0.40);
   });
 
   it.each([1, 2, 3, 4, 5, 6])(
@@ -170,9 +191,9 @@ describe('calculateOrganizationalLayout', () => {
   it('supports spatial keyboard navigation without relying on DOM order', () => {
     const layout = calculateOrganizationalLayout([
       node('root', 'ccp', 1),
-      node('president', 'executive', 2, ['root']),
-      node('vice', 'executive', 2, ['root']),
-      node('central', 'central-commission', 3, ['president', 'vice']),
+      node('president', 'executive', 2),
+      node('vice', 'executive', 2, ['root', 'president']),
+      node('central', 'central-commission', 3, ['vice']),
     ], []);
 
     const down = findDirectionalNode(layout, 'root', 'down');

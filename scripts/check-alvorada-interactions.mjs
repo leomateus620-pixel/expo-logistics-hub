@@ -18,12 +18,55 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   const graph = await page.evaluate(() => window.__alvoradaQaGraph);
   const edges = () => page.locator('[data-edge-id]').evaluateAll(elements => elements.map(e => e.dataset.edgeId).sort());
   const capture = async label => page.screenshot({ path: path.join(output, `${name}-${label}.png`) });
-  const search = page.getByRole('combobox');
-  const choose = async value => { await search.fill(value); await page.getByRole('option').first().click(); await page.waitForTimeout(750); };
+  const choose = async value => {
+    const target = page.locator('.org-node button').filter({ hasText: new RegExp(value, 'i') }).first();
+    await target.evaluate(element => element.focus({ preventScroll: true }));
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(750);
+  };
   const camera = () => page.locator('.org-viewport__world').evaluate(e => getComputedStyle(e).transform);
   const checkSelection = async (label, expected) => { assert.deepEqual(await edges(), expected.sort(), label); checks.push(label); };
   const all = await edges();
   assert.equal(all.length, graph.edges.length);
+  assert.equal(await page.getByRole('combobox').count(), 0);
+  assert.equal(await page.getByRole('searchbox').count(), 0);
+  assert.equal(await page.locator('.org-filters button').count(), 6);
+  const president = graph.nodes.find(n => n.metadata.executiveRole?.includes('president'));
+  const vice = graph.nodes.find(n => n.metadata.executiveRole?.includes('vice-president'));
+  const centralNode = graph.nodes.find(n => n.type === 'central-commission');
+  assert.deepEqual(president.parentIds, []);
+  assert.deepEqual(vice.parentIds.slice().sort(), [graph.rootNodeId, president.id].sort());
+  assert.deepEqual(centralNode.parentIds, [vice.id]);
+  const visualAudit = await page.evaluate(() => {
+    const nodes = [...document.querySelectorAll('.org-node')];
+    const rects = nodes.map(e => ({ label: e.textContent, r: e.querySelector('button').getBoundingClientRect() }));
+    const overlaps = [];
+    for (let i = 0; i < rects.length; i++) for (let j = i + 1; j < rects.length; j++) {
+      const a = rects[i].r, b = rects[j].r;
+      if (a.left < b.right - 1 && a.right > b.left + 1 && a.top < b.bottom - 1 && a.bottom > b.top + 1) overlaps.push([rects[i].label, rects[j].label]);
+    }
+    const captions = nodes.map(e => ({ label: e.textContent, r: e.querySelector('.org-node__copy').getBoundingClientRect() }));
+    const crossings = [];
+    for (const path of document.querySelectorAll('.org-relationship__path')) {
+      const m = path.getScreenCTM();
+      for (let d = 0; d <= path.getTotalLength(); d += 3) {
+        const q = path.getPointAtLength(d), x = q.x * m.a + m.e, y = q.y * m.d + m.f;
+        const hit = captions.find(c => x > c.r.left + 1 && x < c.r.right - 1 && y > c.r.top + 1 && y < c.r.bottom - 1);
+        if (hit) { crossings.push([path.parentElement.dataset.edgeId, hit.label]); break; }
+      }
+    }
+    const topNodes = nodes.filter(e => e.dataset.nodeType === 'ccp' || e.querySelector('.org-node__organization').textContent === 'PRESIDENTE');
+    const controlsBottom = document.querySelector('.org-ecosystem__top-controls').getBoundingClientRect().bottom;
+    return { overlaps, crossings, topYs: topNodes.map(e => e.style.getPropertyValue('--org-node-y')), topVisible: topNodes.every(e => {
+      const r = e.querySelector('.org-node__ring').getBoundingClientRect();
+      return r.top >= controlsBottom + 4 && r.left >= 0 && r.right <= innerWidth;
+    }), controlsBottom, scale: document.querySelector('.org-ecosystem__ready').dataset.viewportScale };
+  });
+  assert.deepEqual(visualAudit.overlaps, []);
+  assert.deepEqual(visualAudit.crossings, []);
+  assert.equal(new Set(visualAudit.topYs).size, 1);
+  assert.equal(visualAudit.topVisible, true);
+  checks.push('peer roots and executive graph agree', 'search removed and six labeled filters retained', 'no card overlaps or connector crossings over captions', 'top portraits fit below measured controls');
   await capture('overview');
   await choose('Felipe Bortoli');
   const felipe = graph.nodes.find(n => n.id === 'unit:qa-unit-3');
@@ -37,19 +80,23 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await capture('person');
   await choose('Vanessa Matraszek');
   const vanessa = graph.nodes.find(n => n.id === 'unit:qa-unit-5');
-  await checkSelection('successive search never restores other edges', graph.edges.filter(e => e.targetId === vanessa.id).map(e => e.id));
+  await checkSelection('successive selection never restores other edges', graph.edges.filter(e => e.targetId === vanessa.id).map(e => e.id));
   await page.getByRole('button', { name: 'Limpar seleção e restaurar visão geral' }).click();
   await page.waitForTimeout(750);
   assert.deepEqual(await edges(), all);
   checks.push('clear restores complete graph');
   await choose('Comissão Central');
   const central = graph.nodes.find(n => n.type === 'central-commission');
-  // Search by a collective title must keep the collective selection.
-  if (await page.locator('.org-ecosystem__ready').getAttribute('data-selection-person')) throw new Error('Collective search incorrectly selects a person');
+  // Selection of a collective title must keep the collective selection.
+  if (await page.locator('.org-ecosystem__ready').getAttribute('data-selection-person')) throw new Error('Collective selection incorrectly selects a person');
   await checkSelection('collective has only its immediate links', graph.edges.filter(e => e.targetId === central.id || e.sourceId === central.id).map(e => e.id));
   await capture('collective');
+  assert.equal(await page.getByRole('button', { name: 'Selecionar Zélia Savoldi' }).count(), 1);
+  assert.equal(await page.locator('.org-detail__person').count(), central.personIds.length);
+  assert.equal(await page.getByText('COMISSÃO CENTRAL · MARKETING E COMUNICAÇÃO', { exact: true }).count(), 1);
+  checks.push('Central count list and selection share the corrected identities');
   await page.getByRole('button', { name: 'Selecionar Zélia Savoldi' }).click();
-  const zeliaId = Object.values(graph.people).find(p => p.userId === 'qa-person-30').id;
+  const zeliaId = Object.values(graph.people).find(p => p.userId === '74a71a9f-c2a6-4ae1-baed-1e2d7b8bc07f').id;
   const zeliaMemberships = graph.nodes.filter(n => n.personIds.includes(zeliaId)).map(n => n.id);
   await checkSelection('member does not inherit collective outgoing links', graph.edges.filter(e => zeliaMemberships.includes(e.targetId)).map(e => e.id));
   await capture('member');
@@ -66,6 +113,12 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   assert.equal(await page.locator('.org-node[data-filtered] button:not([tabindex="-1"])').count(), 0);
   checks.push('filter excludes nodes from interaction and focus');
   await page.getByRole('button', { name: 'TODO O ECOSSISTEMA', exact: true }).click();
+  for (const [label, type] of [['CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA', 'ccp'], ['PRESIDÊNCIA', 'executive'], ['COMISSÃO CENTRAL', 'central-commission'], ['COMISSÕES', 'commission'], ['ASSESSORIAS', 'advisory']]) {
+    await page.getByRole('button', { name: label, exact: true }).click();
+    assert.equal(await page.locator('.org-node button:enabled').count(), graph.nodes.filter(n => n.isRenderable && n.type === type).length);
+  }
+  await page.getByRole('button', { name: 'TODO O ECOSSISTEMA', exact: true }).click();
+  checks.push('all six filters retain their institutional scope');
   if (mobile) {
     const cdp = await context.newCDPSession(page);
     const before = await camera();
@@ -96,8 +149,43 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   const duration = await page.locator('.org-soy-atmosphere__layer').first().evaluate(e => getComputedStyle(e).animationDuration);
   assert.equal(duration, '24s'); checks.push('authored movement survives reduced-motion preference');
   await capture('navigation');
+  const cameraBeforeRefresh = await camera();
+  await page.evaluate(() => window.__alvoradaQaRefresh());
+  await page.waitForTimeout(650);
+  assert.equal(await camera(), cameraBeforeRefresh);
+  await choose('Comissão Central');
+  assert.equal(await page.getByRole('button', { name: 'Selecionar Zélia Savoldi' }).count(), 1);
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('.org-detail').count(), 0);
+  assert.equal(await page.locator('.org-node[data-node-type="central-commission"] button').evaluate(e => e === document.activeElement), true);
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: 'Abrir ecossistema' }).waitFor({ state: 'visible' });
+  await page.getByRole('button', { name: 'Abrir ecossistema' }).click();
+  await page.locator('.org-node').first().waitFor();
+  await page.waitForTimeout(650);
+  if (mobile) {
+    const rotated = name === 'mobile' ? { width: 844, height: 390 } : { width: 390, height: 844 };
+    await page.setViewportSize(rotated);
+    await page.waitForTimeout(650);
+    const portrait = await page.locator('.org-node[data-node-type="ccp"] .org-node__ring').boundingBox();
+    const header = await page.locator('.org-ecosystem__top-controls').boundingBox();
+    assert.ok(portrait.y >= header.y + header.height && portrait.x >= 0 && portrait.x + portrait.width <= rotated.width);
+    checks.push('rotation retains visible peer roots below responsive controls');
+  }
+  const rootButton = page.locator('.org-node[data-node-type="ccp"] button');
+  await rootButton.evaluate(e => e.focus({ preventScroll: true }));
+  await page.keyboard.press('ArrowRight');
+  assert.ok((await page.evaluate(() => document.activeElement.getAttribute('aria-label'))).includes('FABIANO SOLTIS'));
+  await page.keyboard.press('ArrowDown');
+  assert.ok((await page.evaluate(() => document.activeElement.getAttribute('aria-label'))).includes('DJEISON DREY'));
+  await page.keyboard.press('Home');
+  assert.equal(await rootButton.evaluate(e => e === document.activeElement), true);
+  checks.push('keyboard follows visual rows and Home returns to CCPF');
+  await page.getByRole('button', { name: 'Fechar Ecossistema Fenasoja' }).click();
+  await page.getByRole('button', { name: 'Abrir ecossistema' }).waitFor({ state: 'visible' });
+  checks.push('refresh preserves camera and corrected membership', 'Escape closes details returns node focus and closes fullscreen', 'reopen and fullscreen close button');
   assert.deepEqual(errors, []);
-  await fs.writeFile(path.join(output, `${name}.json`), JSON.stringify({ viewport, mobileEmulation: mobile, checks, errors }, null, 2));
+  await fs.writeFile(path.join(output, `${name}.json`), JSON.stringify({ viewport, mobileEmulation: mobile, checks, visualAudit, errors }, null, 2));
   console.log(name, checks.length, 'checks passed');
   await context.close();
 }

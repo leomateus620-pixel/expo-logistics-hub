@@ -48,6 +48,29 @@ const EXECUTIVE_IDENTITY_REPAIRS = [
 
 const CENTRAL_COMMISSION_NAMES = new Set(['central', 'comissao central']);
 
+// Presentation-only exception: the director account is documented in
+// provision-presidentes-2028/data.ts; both real accounts have the same official
+// portrait in personPhotos.ts. Do not merge them or discard advisory assignments.
+const CENTRAL_ZELIA_PRESENTATION = {
+  directorUserId: '74a71a9f-c2a6-4ae1-baed-1e2d7b8bc07f',
+  advisoryUserId: '38e7e8d3-4c66-4279-92ea-961b70ee4e80',
+  normalizedName: 'zelia savoldi',
+} as const;
+
+function centralPresentationPeople(
+  personIds: string[],
+  registry: PersonRegistry,
+): string[] {
+  const directorId = registry.byUserId.get(CENTRAL_ZELIA_PRESENTATION.directorUserId);
+  const advisoryId = registry.byUserId.get(CENTRAL_ZELIA_PRESENTATION.advisoryUserId);
+  if (!directorId || !advisoryId || !personIds.includes(directorId)) return personIds;
+  const matches = [directorId, advisoryId].every((id) => (
+    normalizeOrganizationalText(registry.people.get(id)?.fullName)
+      === CENTRAL_ZELIA_PRESENTATION.normalizedName
+  ));
+  return matches ? personIds.filter((id) => id !== advisoryId) : personIds;
+}
+
 interface PersonAccumulator extends OrgPerson {
   normalizedNames: Set<string>;
   roleSet: Set<string>;
@@ -915,7 +938,7 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
   }
 
   const executivePersonIds = new Set(executiveRoles.keys());
-  const centralPersonIds = uniqueSorted(
+  const centralMembershipPersonIds = uniqueSorted(
     members.flatMap((member) => {
       if (!isCentralMember(member, centralUnitIds)) return [];
       const personId = personIdForMember(registry, member);
@@ -927,7 +950,10 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
       return [personId];
     }),
   );
-  centralPersonIds.forEach((personId) => addAuthority(registry.people.get(personId), 3));
+  // Institutional classification remains the same for both real records;
+  // only the Central node's displayed roster is corrected.
+  centralMembershipPersonIds.forEach((personId) => addAuthority(registry.people.get(personId), 3));
+  const centralPersonIds = centralPresentationPeople(centralMembershipPersonIds, registry);
 
   if (centralUnits.length === 0) {
     addAnomaly(anomalies, {
@@ -977,7 +1003,10 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
         title: person?.fullName ?? '',
         subtitle: executiveRole === 'president' ? 'Presidente' : 'Vice-Presidente',
         personIds: [personId],
-        parentIds: [ORGANIZATIONAL_ROOT_NODE_ID],
+        parentIds: executiveRole === 'president' ? [] : [
+          ORGANIZATIONAL_ROOT_NODE_ID,
+          ...presidentPersonIds.map((id) => `executive:${id}`),
+        ],
         commissionId: centralUnits[0]?.id ?? null,
         advisoryId: null,
         sortOrder: index,
@@ -986,6 +1015,16 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
       });
     });
   nodes.push(...executiveNodes);
+
+  const viceNodes = executiveNodes.filter((item) => (
+    (item.metadata.executiveRole as ExecutiveRole[]).includes('vice-president')
+    && !(item.metadata.executiveRole as ExecutiveRole[]).includes('president')
+  ));
+  // Missing-role fallbacks preserve a connected graph without fabricating an
+  // executive. In a complete registry only the vice leads to the Central node.
+  const centralParentIds = viceNodes.length > 0
+    ? viceNodes.map((item) => item.id)
+    : [ORGANIZATIONAL_ROOT_NODE_ID, ...executiveNodes.map((item) => item.id)];
 
   const centralNodeId = centralUnits.length > 0 || hasCentralMembership
     ? 'org:central-commission'
@@ -999,10 +1038,7 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
         title: 'Comissão Central',
         subtitle: centralPersonIds.length > 0 ? `${centralPersonIds.length} integrantes` : null,
         personIds: centralPersonIds,
-        parentIds:
-          executiveNodes.length > 0
-            ? executiveNodes.map((item) => item.id)
-            : [ORGANIZATIONAL_ROOT_NODE_ID],
+        parentIds: centralParentIds,
         commissionId: centralUnits[0]?.id ?? null,
         advisoryId: null,
         sortOrder: 0,
@@ -1010,6 +1046,14 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
         metadata: {
           sourceUnitIds: centralUnits.map((unit) => unit.id),
           resolvedFromMembership: centralUnits.length === 0,
+          // Requested caption for this real director in this collective only.
+          // The institutional cargo remains untouched in OrgPerson.roles.
+          memberRoleLabels: Object.fromEntries(centralPersonIds.flatMap((id) => {
+            const person = registry.people.get(id);
+            return person?.sourceUserIds.has(CENTRAL_ZELIA_PRESENTATION.directorUserId)
+              && normalizeOrganizationalText(person.fullName) === CENTRAL_ZELIA_PRESENTATION.normalizedName
+              ? [[id, 'COMISSÃO CENTRAL · MARKETING E COMUNICAÇÃO']] : [];
+          })),
         },
       }),
     );
@@ -1101,7 +1145,10 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
     );
   });
 
-  const usedPersonIds = new Set(nodes.flatMap((item) => item.personIds));
+  const usedPersonIds = new Set([
+    ...nodes.flatMap((item) => item.personIds),
+    ...centralMembershipPersonIds,
+  ]);
   usedPersonIds.forEach((personId) => {
     const person = registry.people.get(personId);
     if (person && !person.avatarUrl) {
