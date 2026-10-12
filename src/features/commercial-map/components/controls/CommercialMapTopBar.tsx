@@ -1,19 +1,14 @@
 import {
   Box,
-  Compass,
-  CloudRain,
-  Droplets,
-  Grid2x2,
   Layers3,
   Maximize2,
-  Moon,
   ScanSearch,
   Signpost,
   Sunrise,
   Tractor,
   Trees,
-  type LucideIcon,
 } from 'lucide-react';
+import type { ComponentType } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CAMERA_PRESETS } from '../../constants';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
@@ -21,12 +16,21 @@ import type { CameraPreset, MapPermissions } from '../../types';
 import type { CommercialMapAreaScope } from '../../utils/areaScope';
 import { canUseTechnicalValidationOverlay } from '../../utils/technicalValidation';
 import { CommercialMapControlRail } from './CommercialMapControlRail';
+import {
+  FenasojaFoldedMapIcon,
+  FenasojaHydrologyIcon,
+  FenasojaLayeredViewIcon,
+  FenasojaMoonIcon,
+  FenasojaRainIcon,
+} from './FenasojaMapIcons';
 import './commercial-map-topbar.css';
 
-const PRESET_ICONS: Record<string, LucideIcon> = {
-  overview: Compass,
+type ControlIcon = ComponentType<{ className?: string; strokeWidth?: number | string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
+
+const PRESET_ICONS: Record<string, ControlIcon> = {
+  overview: FenasojaFoldedMapIcon,
   exporural: Tractor,
-  top: Grid2x2,
+  top: FenasojaLayeredViewIcon,
   isometric: Box,
   'quadra-r': Signpost,
   'quadra-s': Signpost,
@@ -73,7 +77,7 @@ export function CommercialMapTopBar({
 
   const renderAction = (
     key: string,
-    Icon: LucideIcon,
+    Icon: ControlIcon,
     label: string,
     onClick: () => void,
     options: { active?: boolean; disabled?: boolean; hydrological?: boolean; night?: boolean; rain?: boolean } = {},
@@ -104,7 +108,7 @@ export function CommercialMapTopBar({
     >
       {presets.map((preset) => renderAction(
         preset,
-        PRESET_ICONS[preset] ?? Compass,
+        PRESET_ICONS[preset] ?? FenasojaFoldedMapIcon,
         CAMERA_PRESETS[preset].label,
         () => requestCameraPreset(preset),
         { active: cameraPreset === preset },
@@ -116,7 +120,7 @@ export function CommercialMapTopBar({
 
       {renderAction(
         'hydrological-network',
-        Droplets,
+        FenasojaHydrologyIcon,
         hydrologicalModeActive ? 'Sair do modo Rede Hidrológica' : 'Ativar modo Rede Hidrológica',
         toggleHydrologicalMode,
         { active: hydrologicalModeActive, hydrological: true },
@@ -136,7 +140,7 @@ export function CommercialMapTopBar({
 
       {renderAction(
         'night-mode',
-        Moon,
+        FenasojaMoonIcon,
         nightModeActive ? 'Sair do Modo Noturno' : 'Ativar Modo Noturno',
         toggleNightMode,
         { active: nightModeActive, night: true },
@@ -144,7 +148,7 @@ export function CommercialMapTopBar({
 
       {renderAction(
         'rain-mode',
-        CloudRain,
+        FenasojaRainIcon,
         rainModeActive ? 'Desativar chuva' : 'Ativar chuva',
         toggleRainMode,
         { active: rainModeActive, rain: true },

@@ -1,4 +1,5 @@
 import { useCallback, useLayoutEffect, useRef, type ReactNode, type SyntheticEvent } from 'react';
+import { COMMERCIAL_MAP_QUALITY_EVENT, readCommercialMapDeviceCapabilityHints } from '../../utils/adaptiveQualityRuntime';
 
 interface CommercialMapControlRailProps {
   children: ReactNode;
@@ -42,6 +43,34 @@ export function CommercialMapControlRail({
   }, []);
 
   useLayoutEffect(syncOverflow);
+
+  useLayoutEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return undefined;
+    const hints = readCommercialMapDeviceCapabilityHints();
+    const modestHardware = (Number.isFinite(hints.deviceMemoryGb) && (hints.deviceMemoryGb ?? 8) < 4)
+      || (Number.isFinite(hints.hardwareConcurrency) && (hints.hardwareConcurrency ?? 8) < 4);
+    let lowEffectBudget = false;
+    const apply = () => {
+      const capability = modestHardware || lowEffectBudget ? 'reduced' : 'full';
+      if (rail.dataset.glassCapability !== capability) rail.dataset.glassCapability = capability;
+    };
+    // The adaptive-quality owner already publishes its budget on the canvas;
+    // decorative glass follows it imperatively, without React renders.
+    const syncQuality = (event: Event) => {
+      const source = event.target instanceof HTMLElement ? event.target.dataset.commercialMapQuality : undefined;
+      if (!source) return;
+      try {
+        lowEffectBudget = (JSON.parse(source) as { effectTier?: string }).effectTier === 'LOW';
+      } catch {
+        return;
+      }
+      apply();
+    };
+    apply();
+    document.addEventListener(COMMERCIAL_MAP_QUALITY_EVENT, syncQuality);
+    return () => document.removeEventListener(COMMERCIAL_MAP_QUALITY_EVENT, syncQuality);
+  }, []);
 
   useLayoutEffect(() => {
     const scroll = scrollRef.current;

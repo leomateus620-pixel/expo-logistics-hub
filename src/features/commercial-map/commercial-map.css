@@ -704,8 +704,6 @@
   color: #f6f1e4 !important;
   box-shadow: 0 7px 16px -9px rgba(28, 36, 80, .95), inset 0 1px rgba(255, 255, 255, .22);
 }
-.commercial-map-toolbar--desktop .commercial-map-night-toggle.is-active svg { filter: drop-shadow(0 0 5px rgba(255, 233, 189, .55)); }
-
 .hydrological-network-legend {
   position: absolute;
   z-index: 14;

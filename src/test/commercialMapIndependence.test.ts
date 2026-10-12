@@ -74,7 +74,9 @@ describe('arquitetura independente do Mapa Comercial', () => {
     expect(page).toContain('Editar geometria');
     expect(page).toContain('Calibrar');
     expect(page).toContain('Implantar base 2026');
-    expect(toolbar).toContain('Filtros');
+    expect(toolbar).not.toContain('commercial-map-actions');
+    expect(header).toContain('data-commercial-map-management-search');
+    expect(header).toContain("setPanel('results')");
     expect(toolbar).not.toContain('Editar geometria');
     expect(dock).toContain('<ContextualMapLegend');
     expect(dock).not.toContain('managementActions');

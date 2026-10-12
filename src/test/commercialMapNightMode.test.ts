@@ -231,7 +231,7 @@ describe('Modo Noturno global do Mapa Comercial', () => {
     );
     const styles = read('src/features/commercial-map/commercial-map.css');
 
-    expect(topBar).toContain('Moon,');
+    expect(topBar).toContain('FenasojaMoonIcon,');
     expect(topBar).toContain("'night-mode',");
     expect(topBar).toContain("nightModeActive ? 'Sair do Modo Noturno' : 'Ativar Modo Noturno'");
     expect(topBar).toContain('{ active: nightModeActive, night: true }');

@@ -1,0 +1,35 @@
+/* Estados dos ícones próprios: só opacity/transform, sem filtros SVG. */
+.fenasoja-map-icon { overflow: hidden; }
+.fenasoja-map-icon__fill { transition: opacity var(--glass-duration, 170ms) var(--glass-ease, ease); }
+.fenasoja-map-icon--hydrology .fenasoja-map-icon__fill { opacity: .78; }
+.fenasoja-map-icon--hydrology .fenasoja-map-icon__fill--minor { opacity: .62; }
+.fenasoja-map-icon__halo { opacity: 0; transition: opacity 240ms var(--glass-ease, ease); }
+.fenasoja-map-icon__drop { transform-box: fill-box; transform-origin: center top; }
+
+:is(.is-active, .is-open, [aria-pressed="true"]) > .fenasoja-map-icon--hydrology .fenasoja-map-icon__fill { opacity: 1; }
+:is(.is-active, .is-open, [aria-pressed="true"]) > .fenasoja-map-icon--hydrology .fenasoja-map-icon__fill--minor { opacity: .9; }
+:is(.is-active, .is-open, [aria-pressed="true"]) > .fenasoja-map-icon--moon .fenasoja-map-icon__halo { opacity: 1; }
+
+/* Precipitação: três gotas defasadas num único ciclo CSS, recortadas pelo viewBox. */
+:is(.is-active, [aria-pressed="true"]) > .fenasoja-map-icon--rain .fenasoja-map-icon__drop {
+  animation: fenasoja-map-icon-rain 1.15s linear infinite both;
+}
+:is(.is-active, [aria-pressed="true"]) > .fenasoja-map-icon--rain .fenasoja-map-icon__drop:nth-child(2) { animation-delay: -.38s; }
+:is(.is-active, [aria-pressed="true"]) > .fenasoja-map-icon--rain .fenasoja-map-icon__drop:nth-child(3) { animation-delay: -.76s; }
+
+@keyframes fenasoja-map-icon-rain {
+  0% { opacity: 0; transform: translateY(-1.4px); }
+  22% { opacity: 1; }
+  72% { opacity: .55; }
+  100% { opacity: 0; transform: translateY(2.8px); }
+}
+
+/* Degradação: movimento contínuo some em hardware modesto ou por preferência
+   do sistema; o estado ativo continua legível pelas gotas estáticas e pelo botão. */
+[data-glass-capability="reduced"] .fenasoja-map-icon__drop { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .fenasoja-map-icon__drop { animation: none !important; }
+}
+@media (forced-colors: active) {
+  .fenasoja-map-icon__fill, .fenasoja-map-icon__halo, .fenasoja-map-icon__craters { display: none; }
+}
