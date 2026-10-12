@@ -5,7 +5,7 @@ import type { CommercialMapTree } from "../../data/commercialTrees";
 import type { MapEntity } from "../../types";
 import { pilotTreeProfile } from "../../utils/vegetationPilot";
 import { createPilotTreeAsset } from "../../utils/vegetationPilotAssets";
-import { commercialTreeGroundElevation } from "../../utils/treeLayer";
+import { createCommercialTreeSurfaceResolver, type CommercialTreeSurfaceResolver } from "../../utils/treeLayer";
 import { disposeInstancedMesh } from "../../utils/instancedMeshDisposal";
 import {
   createPilotBarkMaterial,
@@ -17,14 +17,14 @@ const NO_RAYCAST = () => undefined;
 function TreeFamily({
   family,
   trees,
-  surfaceEntities,
+  surfaceResolver,
   reducedGraphics,
   visible,
   materials,
 }: {
   family: number;
   trees: readonly CommercialMapTree[];
-  surfaceEntities: readonly MapEntity[];
+  surfaceResolver: CommercialTreeSurfaceResolver;
   reducedGraphics: boolean;
   visible: boolean;
   materials: {
@@ -55,7 +55,7 @@ function TreeFamily({
       const profile = pilotTreeProfile(tree);
       transform.position.set(
         tree.position[0],
-        commercialTreeGroundElevation(tree, surfaceEntities),
+        surfaceResolver.groundElevation(tree),
         tree.position[1],
       );
       transform.rotation.set(0, profile.rotation, 0);
@@ -83,7 +83,7 @@ function TreeFamily({
     });
     invalidate();
     gl.shadowMap.needsUpdate = true;
-  }, [meshes, trees, surfaceEntities, gl, invalidate]);
+  }, [meshes, trees, surfaceResolver, gl, invalidate]);
   useEffect(
     () => () => {
       Object.values(meshes).forEach(disposeInstancedMesh);
@@ -146,7 +146,10 @@ export const VegetationPilotTreeLayer = memo(
     surfaceEntities: readonly MapEntity[];
     reducedGraphics: boolean;
     visible: boolean;
+    surfaceResolver?: CommercialTreeSurfaceResolver;
   }) {
+    const surfaceResolver = useMemo(() => props.surfaceResolver
+      ?? createCommercialTreeSurfaceResolver(props.surfaceEntities), [props.surfaceResolver, props.surfaceEntities]);
     const atlas = useMemo(createPilotLeafAtlas, []);
     const materials = useMemo(
       () => ({
@@ -186,6 +189,7 @@ export const VegetationPilotTreeLayer = memo(
                 trees={trees}
                 family={family}
                 materials={materials}
+                surfaceResolver={surfaceResolver}
               />
             ),
         )}

@@ -12,7 +12,7 @@ import {
 import { createPilotGrassGeometry } from "../../utils/vegetationPilotAssets";
 import { disposeInstancedMesh } from "../../utils/instancedMeshDisposal";
 import { createPilotFoliageMaterial } from "./vegetationPilotMaterial";
-import { commercialTreeGroundElevation } from "../../utils/treeLayer";
+import { createCommercialTreeSurfaceResolver, type CommercialTreeSurfaceResolver } from "../../utils/treeLayer";
 import {
   projectedCommercialMapShadowDirection,
   projectedCommercialMapShadowRotation,
@@ -62,13 +62,17 @@ export const VegetationPilotGroundLayer = memo(
     trees,
     visible,
     reducedGraphics,
+    surfaceResolver: providedSurfaceResolver,
   }: {
     entities: readonly MapEntity[];
     trees: readonly CommercialMapTree[];
     visible: boolean;
     reducedGraphics: boolean;
+    surfaceResolver?: CommercialTreeSurfaceResolver;
   }) {
     const { invalidate } = useThree();
+    const surfaceResolver = useMemo(() => providedSurfaceResolver
+      ?? createCommercialTreeSurfaceResolver(entities), [providedSurfaceResolver, entities]);
     const anchors = useMemo(
       () => buildPilotGroundAnchors(entities, trees),
       [entities, trees],
@@ -141,7 +145,7 @@ export const VegetationPilotGroundLayer = memo(
         const reach = reducedGraphics ? tree.canopyRadius * 0.6 : 0;
         transform.position.set(
           tree.position[0] + direction[0] * reach,
-          commercialTreeGroundElevation(tree, entities) + 0.002,
+          surfaceResolver.groundElevation(tree) + 0.002,
           tree.position[1] + direction[1] * reach,
         );
         transform.rotation.set(
@@ -166,7 +170,7 @@ export const VegetationPilotGroundLayer = memo(
       contact.mesh.computeBoundingSphere();
       contact.mesh.raycast = NO_RAYCAST;
       invalidate();
-    }, [batches, trees, entities, contact, invalidate, reducedGraphics]);
+    }, [batches, trees, surfaceResolver, contact, invalidate, reducedGraphics]);
     useFrame(({ camera }) => {
       for (const { mesh, points } of batches) {
         const sphere = mesh.boundingSphere;

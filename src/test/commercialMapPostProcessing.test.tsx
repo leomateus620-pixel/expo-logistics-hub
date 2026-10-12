@@ -129,6 +129,63 @@ afterEach(() => {
 });
 
 describe('Commercial Map persistent post-processing with installed postprocessing classes', () => {
+  it.each(['balanced', 'reduced'] as const)('keeps failed essential preparation closed for the %s frame owner until an explicit retry is prepared', (qualityTier) => {
+    const { gl, scene, camera } = createRuntime();
+    gl.domElement.dataset.commercialMapEssentialReady = 'false';
+    gl.domElement.dataset.commercialMapPreparationError = 'SHADER_PREPARATION_TIMEOUT';
+    render(<SunrisePostProcessing qualityTier={qualityTier} enabled={qualityTier !== 'reduced'} />);
+    drawFrame();
+    expect(gl.render).not.toHaveBeenCalled();
+    expect(EffectComposer.prototype.render).not.toHaveBeenCalled();
+    expect(readCommercialMapRenderHealth(gl.domElement)).toMatchObject({
+      status: 'failed', path: 'suspended', presentedFrames: 0, lastErrorCode: 'SHADER_PREPARATION_TIMEOUT',
+    });
+
+    act(() => gl.domElement.dispatchEvent(new Event(COMMERCIAL_MAP_RENDER_RETRY_EVENT)));
+    delete gl.domElement.dataset.commercialMapPreparationError;
+    drawFrame();
+    expect(gl.render).not.toHaveBeenCalled();
+    expect(EffectComposer.prototype.render).not.toHaveBeenCalled();
+    gl.domElement.dataset.commercialMapEssentialReady = 'true';
+    drawFrame();
+    expect(readCommercialMapRenderHealth(gl.domElement)).toMatchObject({ status: 'ready', presentedFrames: 1, lastErrorCode: null });
+    expect((runtime.state as ReturnType<typeof createRuntime>).scene).toBe(scene);
+    expect((runtime.state as ReturnType<typeof createRuntime>).camera).toBe(camera);
+  });
+
+  it('keeps an admitted essential scene closed between program preparation and actual readiness without changing standalone rendering', () => {
+    const { gl } = createRuntime();
+    render(<SunrisePostProcessing qualityTier="reduced" enabled={false} />);
+    gl.domElement.dataset.commercialMapEssentialReady = 'false';
+    drawFrame();
+    expect(gl.render).not.toHaveBeenCalled();
+    expect(readCommercialMapRenderHealth(gl.domElement)).toBeNull();
+    gl.domElement.dataset.commercialMapEssentialReady = 'true';
+    gl.domElement.dataset.commercialMapPreparing = 'true';
+    drawFrame();
+    expect(gl.render).not.toHaveBeenCalled();
+    delete gl.domElement.dataset.commercialMapPreparing;
+    drawFrame();
+    expect(gl.render).toHaveBeenCalledOnce();
+    delete gl.domElement.dataset.commercialMapEssentialReady;
+    drawFrame();
+    expect(gl.render).toHaveBeenCalledTimes(2);
+  });
+
+  it('retains explicit context recovery for a cached shader error while the essential barrier is closed', () => {
+    const { gl } = createRuntime();
+    render(<SunrisePostProcessing qualityTier="reduced" enabled={false} />);
+    gl.domElement.dataset.commercialMapEssentialReady = 'false';
+    gl.domElement.dataset.commercialMapPreparationError = 'Shader program is not runnable';
+    act(() => gl.debug.onShaderError?.(gl.getContext(), {} as THREE.WebGLProgram, {} as WebGLShader, {} as WebGLShader));
+    drawFrame();
+    expect(gl.render).not.toHaveBeenCalled();
+    expect(readCommercialMapRenderHealth(gl.domElement)).toMatchObject({ status: 'failed', lastErrorCode: 'cached-shader-failed' });
+    act(() => gl.domElement.dispatchEvent(new Event(COMMERCIAL_MAP_RENDER_RETRY_EVENT)));
+    expect(gl.forceContextLoss).toHaveBeenCalledOnce();
+    expect(gl.resetState).not.toHaveBeenCalled();
+  });
+
   it('applies measured MEDIUM/LOW execution immediately while retaining the HIGH scene, resolution, passes and targets', () => {
     const { gl, scene, camera } = createRuntime();
     const addPass = vi.spyOn(EffectComposer.prototype, 'addPass');

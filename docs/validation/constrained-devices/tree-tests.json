@@ -1,0 +1,25 @@
+{
+  "baseSha": "8f3e871010ebfeab45824ba042183127da3b15e3",
+  "candidateShaAtMeasurement": "uncommitted",
+  "testRunner": "vitest 3.2.4",
+  "execution": "sequential, maxWorkers=1, fileParallelism=false",
+  "files": {
+    "commercialMapTrees.test.ts": 13,
+    "commercialMapPavilion12FrontTrees.test.ts": 9,
+    "commercialMapTreeSurfaceResolver.test.ts": 7,
+    "commercialMapInternalVegetationScope.test.ts": 7,
+    "commercialMapVegetationPilot.test.ts": 5,
+    "commercialMapVegetationLod.test.ts": 8,
+    "commercialMapTreeControls.test.tsx": 4
+  },
+  "passed": 53,
+  "failed": 0,
+  "durationMs": 9100,
+  "warnings": [
+    "Multiple instances of Three.js being imported (Pavilion12/InternalVegetationScope)",
+    "Browserslist data is 16 months old"
+  ],
+  "limitations": [
+    "Unit/differential tests do not certify GPU/driver, physical device navigation, real commercial permissions or complete boot latency."
+  ]
+}

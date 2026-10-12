@@ -1009,6 +1009,22 @@ export function SunrisePostProcessing({
       });
       return;
     }
+    const preparationError = gl.domElement.dataset.commercialMapPreparationError;
+    if (preparationError) {
+      // Releasing an aborted/timed-out preparation job only releases its
+      // resources. It never admits its unprepared programs to a screen draw.
+      // All map entries, including public/direct interiors, share this owner.
+      lastErrorCode.current = preparationError;
+      publishCommercialMapRenderHealth(gl.domElement, {
+        status: 'failed', path: 'suspended', presentedFrames: presentedFrames.current,
+        contextLosses: contextLosses.current, lastErrorCode: preparationError,
+      });
+      return;
+    }
+    // An absent marker belongs to a standalone renderer. An admitted map must
+    // keep its existing real barrier through preparation and context recovery.
+    if (gl.domElement.dataset.commercialMapEssentialReady === 'false'
+      || gl.domElement.dataset.commercialMapPreparing) return;
     const renderTiming = commercialMapDiagnosticsEnabled ? beginCommercialMapRenderTiming(gl) : null;
     renderingFrame.current = true;
     const previousAutoClear = gl.autoClear;

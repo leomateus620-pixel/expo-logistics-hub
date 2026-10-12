@@ -72,9 +72,23 @@ describe('non-rendering commercial scene preparation', () => {
     expect(stage.mock.calls.some(call => call[0] === 'program-links-ready')).toBe(false);
     secondReady = true; await vi.runAllTimersAsync(); await preparation;
     expect(ready.getUniforms).toHaveBeenCalledOnce(); expect(pending.getUniforms).toHaveBeenCalledOnce();
-    expect(stage.mock.calls.map(call => call[0])).toEqual(['program-links-ready', 'program-introspection']);
+    expect(stage.mock.calls.map(call => call[0])).toEqual(['program-submission', 'program-links-ready', 'program-introspection']);
     expect(isCommercialMapProgramPreparationActive(gl)).toBe(false);
     expect(vi.getTimerCount()).toBe(0); material.dispose();
+  });
+  it('separates synchronous compile submission from first-use reflection without issuing diagnostic GL queries', async () => {
+    let now = 0;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    const material = new THREE.MeshBasicMaterial();
+    const program = { isReady: () => true, getUniforms: vi.fn(() => { now += 13; }), getAttributes: vi.fn() };
+    const scene = new THREE.Scene(), stage = vi.fn();
+    const renderer = { compile: () => { now += 7; return new Set([material]); },
+      properties: { get: () => ({ currentProgram: program }) } } as unknown as THREE.WebGLRenderer;
+    await compileCommercialMapPrograms(renderer, scene, new THREE.Camera(), scene, undefined, stage);
+    expect(stage).toHaveBeenCalledWith('program-submission', { duration: 7, materialCount: 1, programCount: 1 });
+    expect(stage.mock.calls.find(call => call[0] === 'program-introspection')?.[1]).toMatchObject({ duration: 13, outcome: 'complete' });
+    expect(program.getUniforms).toHaveBeenCalledOnce();
+    material.dispose();
   });
   it('keeps the resize scheduling signal active until every overlapping program job settles without acquiring the draw gate', async () => {
     vi.useFakeTimers();

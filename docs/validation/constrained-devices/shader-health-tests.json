@@ -1,0 +1,102 @@
+{
+  "baseSha": "8f3e871010ebfeab45824ba042183127da3b15e3",
+  "scope": "Behavioral tests; DOM plus installed Three/postprocessing classes; GPU submission mocked; sequential with one worker; no physical performance claim",
+  "baseline": {
+    "owner": {
+      "executed": 3,
+      "failed": 3,
+      "passed": 0,
+      "source": "map-shader-regression-before.log",
+      "reason": "draw occurred while essential preparation marker was false or timeout error was present"
+    },
+    "interior": {
+      "executed": 3,
+      "failed": 2,
+      "passed": 1,
+      "cases": [
+        {
+          "name": "Commercial Map exact interior shader warmup prepares seven detached variants with the actual interior light/fog/texture/instance defines",
+          "status": "skipped",
+          "failure": null
+        },
+        {
+          "name": "Commercial Map exact interior shader warmup keeps programs retained across rerenders and aborts pending polling and releases resources on teardown",
+          "status": "skipped",
+          "failure": null
+        },
+        {
+          "name": "Commercial Map exact interior shader warmup aborts lost programs and recompiles retained probes on context restoration",
+          "status": "skipped",
+          "failure": null
+        },
+        {
+          "name": "Commercial Map exact interior shader warmup queues restored probes behind essential preparation and the critical post job, preserving a single initial compile",
+          "status": "failed",
+          "failure": "AssertionError: expected \"spy\" to be called 1 times, but got 2 times"
+        },
+        {
+          "name": "Commercial Map exact interior shader warmup cancels queued restored probes on unmount without compiling or retaining their resources",
+          "status": "failed",
+          "failure": "AssertionError: expected \"spy\" to be called 1 times, but got 2 times"
+        },
+        {
+          "name": "Commercial Map exact interior shader warmup releases a cancelled in-flight restoration once and ignores its obsolete completion",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "Commercial Map exact interior shader warmup restores renderer globals and leaves the map intact when optional warmup fails",
+          "status": "skipped",
+          "failure": null
+        }
+      ]
+    },
+    "note": "The cancelled in-flight restoration already passed in base. Five new regressions fail on base."
+  },
+  "candidate": {
+    "passed": 81,
+    "failed": 0,
+    "suites": [
+      {
+        "file": "commercialMapDeferredResources.test.tsx",
+        "passed": 7,
+        "failed": 0
+      },
+      {
+        "file": "commercialMapInteriorShaderWarmup.test.tsx",
+        "passed": 7,
+        "failed": 0
+      },
+      {
+        "file": "commercialMapPostProcessing.test.tsx",
+        "passed": 31,
+        "failed": 0
+      },
+      {
+        "file": "commercialMapPreparationRecovery.test.tsx",
+        "passed": 2,
+        "failed": 0
+      },
+      {
+        "file": "commercialMapPresentation.test.tsx",
+        "passed": 3,
+        "failed": 0
+      },
+      {
+        "file": "commercialMapRendererHealth.test.tsx",
+        "passed": 9,
+        "failed": 0
+      },
+      {
+        "file": "commercialMapSceneShaderWarmup.test.ts",
+        "passed": 22,
+        "failed": 0
+      }
+    ]
+  },
+  "firstCandidateRun": {
+    "passed": 80,
+    "failed": 1,
+    "reason": "Test advanced 100 ms before the existing idle slot ran; test clock corrected to 1000 ms, application deadline unchanged"
+  }
+}
