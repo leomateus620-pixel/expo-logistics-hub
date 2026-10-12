@@ -74,6 +74,8 @@ const KIND_SIGNALS: KindSignalRule[] = [
   { kind: 'milestone', pattern: /\b(conclusao|concluida|concluido|finalizacao de etapa|entrega oficial|abertura oficial|inicio oficial|implantacao concluida|encerramento de etapa|marco)\b/, weight: 2.2 },
   { kind: 'milestone', pattern: /\b(lancamento oficial|abertura de vendas|publicacao oficial)\b/, weight: 1.5 },
   { kind: 'event', pattern: /\b(evento|cerimonia|solenidade|coletiva|visita|show|apresentacao|treinamento|recepcao|jantar|almoco|feira|campanha|producao|inauguracao)\b/, weight: 1.6 },
+  { kind: 'interview', pattern: /\b(entrevista|entrevistas)\b/, weight: 1.9 },
+  { kind: 'podcast', pattern: /\b(podcast|podcasts)\b/, weight: 1.9 },
 ];
 
 function headOf(text: string): string {
