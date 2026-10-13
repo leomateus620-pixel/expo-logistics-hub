@@ -27,11 +27,17 @@ async function main() {
   const noOverflow = () => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
   const panel = side => page.locator(`[data-revenue-panel=${side}]`);
   const size = async () => Number(await page.locator('[data-side=projetado]').getAttribute('data-panel-size'));
-  const total = label => page.getByRole('heading', { name: label, exact: true, includeHidden: true }).locator('..');
+  const total = label => page.getByRole('heading', { name: label, exact: true, includeHidden: true }).locator('xpath=ancestor::article[1]');
+  const cents = label => Math.round(Number(label.match(/R\$\s?(-?[\d.]+,\d{2})/)[1].replace(/\./g, '').replace(',', '.')) * 100);
   await go();
   check('Canonical edition projection', (await total('Total projetado').textContent()).includes('5.000.000,00'));
   check('Received differs from confirmed commitment', (await total('Total realizado').textContent()).includes('3.000.000,00') && !(await total('Total realizado').textContent()).includes('4.000.000,00'));
-  check('Unsupported breakdowns remain unavailable', (await total('Comercialização projetada').textContent()).includes('Não disponível') && (await total('Rouanet realizado').textContent()).includes('Não disponível'));
+  check('Commercial projection has no financial source and no zero', (await total('Comercialização projetada').textContent()).includes('Sem fonte financeira') && !(await total('Comercialização projetada').textContent()).includes('R$'));
+  check('Realized cuts come from settled obligations', (await total('Comercialização realizada').textContent()).includes('2.769.999,99') && (await total('Rouanet realizado').textContent()).includes('30.000,00') && (await total('Rouanet realizado').textContent()).includes('Parcial'));
+  check('Projected Rouanet includes explicit sponsorship quota', (await total('Rouanet projetado').textContent()).includes('250.000,01'));
+  const realizedRows = await panel('realizado').locator('.f28-revenue-ranking .f28-revenue-exact').evaluateAll(buttons => buttons.map(button => button.getAttribute('aria-label')));
+  check('Realized ranking partitions received total without double counting', realizedRows.reduce((sum, label) => sum + cents(label), 0) === 300000000, realizedRows);
+  check('Realized ledger shows received separately from confirmed', (await panel('realizado').locator('.f28-ledger-mobile-values__received').first().textContent()).includes('30.000,00'));
   check('Only one 2028 revenue navigation item', await page.getByRole('link', { name: 'Receitas', exact: true }).count() === 1 && await page.getByRole('link', { name: 'Receitas Confirmadas', exact: true }).count() === 0);
   check('Edition selector is only in sidebar', await page.locator('main [role=radiogroup]').count() === 0 && await page.locator('.commission-sidebar [role=radiogroup]').count() === 1);
   const separator = page.getByRole('separator', { name: 'Ajustar comparação entre projetado e realizado' });
@@ -66,9 +72,11 @@ async function main() {
   check('Double click restores50/50', Math.abs(await size() - 50) < .1);
   check('Desktop no horizontal overflow', await noOverflow());
   await page.evaluate(() => document.activeElement?.blur());
-  await panel('projetado').getByRole('heading', { name: 'Ranking de receitas' }).evaluate(element => window.scrollTo(0, scrollY + element.closest('section').getBoundingClientRect().top - 32)); await shot('desktop-ranking-comparison');
-  const ranks = await panel('projetado').locator('.f28-revenue-ranking li').evaluateAll(items => items.map(item => ({ name: item.getAttribute('data-category'), width: item.querySelector('.f28-revenue-ranking__track > span').style.width, value: item.textContent })));
-  check('Zero categories have no artificial fill', ranks.filter(r => /0% do recorte/.test(r.value)).every(r => r.width === '0%'), ranks);
+  await panel('projetado').getByRole('heading', { name: 'Receitas por categoria' }).evaluate(element => window.scrollTo(0, scrollY + element.closest('section').getBoundingClientRect().top - 32)); await shot('desktop-ranking-comparison');
+  const ranks = await page.locator('.f28-revenue-ranking li').evaluateAll(items => items.map(item => ({ zero: item.hasAttribute('data-zero'), fill: Boolean(item.querySelector('.f28-revenue-ranking__track > span')), value: item.textContent })));
+  check('Zero categories have no artificial fill', ranks.some(r => r.zero) && ranks.filter(r => r.zero).every(r => !r.fill), ranks);
+  const lengths = await page.locator('.f28-revenue-ranking__track > span').evaluateAll(spans => spans.map(span => span.style.width));
+  check('Bars share one scale across sides', lengths.includes('100%') && lengths.filter(width => width === '100%').length === 1, lengths);
   await panel('projetado').getByRole('button', { name: /Lei Rouanet:.*50\.000,01/ }).click();
   check('Ranking exact value available by touch/keyboard', await page.locator('.f28-revenue-value-popover').getByText('R$ 50.000,01', { exact: true }).count() === 1);
   await page.keyboard.press('Escape');
@@ -104,12 +112,13 @@ async function main() {
   check('Old confirmed entry preserves Realizado context', await page.getByRole('tab', { name: 'Realizado', exact: true }).getAttribute('aria-selected') === 'true' && (await panel('realizado').textContent()).includes('Compromissos confirmados'));
   await panel('realizado').getByRole('button', { name: /Registrar receita/ }).click(); await shot('mobile-revenue-form'); await page.getByRole('dialog').getByRole('button', { name: 'Cancelar', exact: true }).click();
   check('Mobile no horizontal overflow', await noOverflow());
-  for (const state of ['empty', 'summary-error', 'list-error', 'revenue-negative', 'loading', 'denied']) {
+  for (const state of ['empty', 'summary-error', 'list-error', 'receivables-error', 'revenue-negative', 'loading', 'denied']) {
     await go('receitas-projetadas', '2028', state); await shot(`mobile-state-${state}`);
     check(`No page overflow in ${state}`, await noOverflow());
     if (state === 'empty') check('True empty received is zero', (await total('Total realizado').textContent()).includes('0,00'));
     if (state === 'summary-error') check('Summary error does not present zero', (await total('Total realizado').textContent()).includes('Indisponível') && !(await total('Total realizado').textContent()).includes('0,00'));
     if (state === 'list-error') check('List error retains canonical total independently', (await total('Total projetado').textContent()).includes('5.000.000,00') && (await total('Rouanet projetado').textContent()).includes('Indisponível'));
+    if (state === 'receivables-error') check('Receivable failure keeps canonical total and hides cuts', (await total('Total realizado').textContent()).includes('3.000.000,00') && (await total('Comercialização realizada').textContent()).includes('Indisponível') && !(await total('Comercialização realizada').textContent()).includes('R$'));
     if (state === 'revenue-negative') check('Negative rank retains sign and left side', await page.locator('.f28-revenue-ranking li[data-negative=true]').count() === 1 && await page.locator('.f28-revenue-ranking li[data-negative=true]').getByRole('button').getAttribute('aria-label').then(label => /-/.test(label)));
     if (state === 'loading') check('Loading has no false financial zero', await page.getByRole('status').count() > 0 && !(await page.locator('main').textContent()).includes('R$ 0,00'));
     if (state === 'denied') check('Denied remains locked without financial indicators', await page.getByRole('heading', { name: 'Edição 2028 indisponível para sua conta' }).count() === 1 && await page.locator('.f28-revenue-comparison').count() === 0);

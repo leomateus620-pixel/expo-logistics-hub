@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Financial2028Workspace } from '@/features/financial-management/operational/Financial2028Workspace';
 import type { FinancialViewPath } from '@/features/financial-management/types';
-import { fetchBudgets, fetchBudgetLines, fetchEditions, fetchEditionSummary, fetchRevenues, fetchSponsorships, saveFinancialRecord } from '@/features/financial-management/operational/financialOperationalApi';
+import { fetchBudgets, fetchBudgetLines, fetchEditions, fetchEditionSummary, fetchReceivableSettlements, fetchRevenues, fetchSponsorships, saveFinancialRecord } from '@/features/financial-management/operational/financialOperationalApi';
 
 vi.mock('@/hooks/useCurrentOrg', () => ({ useCurrentOrg: () => ({ orgId: 'qa-org' }) }));
 vi.mock('@/hooks/useOrgCommissions', () => ({ useOrgCommissions: () => ({ commissions: [
@@ -13,7 +13,7 @@ vi.mock('@/hooks/useOrgCommissions', () => ({ useOrgCommissions: () => ({ commis
 vi.mock('@/hooks/use-toast', () => ({ toast: vi.fn() }));
 vi.mock('@/features/financial-management/operational/financialOperationalApi', async (original) => ({
   ...await original<typeof import('@/features/financial-management/operational/financialOperationalApi')>(),
-  fetchEditions: vi.fn(), fetchBudgets: vi.fn(), fetchBudgetLines: vi.fn(), fetchEditionSummary: vi.fn(), fetchRevenues: vi.fn(), fetchSponsorships: vi.fn(), saveFinancialRecord: vi.fn(),
+  fetchEditions: vi.fn(), fetchBudgets: vi.fn(), fetchBudgetLines: vi.fn(), fetchEditionSummary: vi.fn(), fetchRevenues: vi.fn(), fetchSponsorships: vi.fn(), fetchReceivableSettlements: vi.fn(), saveFinancialRecord: vi.fn(),
 }));
 const edition = { id:'qa-e',org_id:'qa-org',code:2028,label:'Fenasoja 2028',status:'operacional' as const,period_start:'2027-01-01',period_end:'2028-12-31' };
 const budget = { id:'qa-b',edition_id:'qa-e',commission_id:'qa-c1',responsible_name:'Responsável de teste',budget_cap_cents:null,period_start:null,period_end:null,notes:null,version:7,updated_at:'' };
@@ -32,6 +32,7 @@ beforeEach(() => {
   vi.mocked(fetchRevenues).mockResolvedValue([revenue]);
   vi.mocked(fetchEditionSummary).mockResolvedValue({budget:{count:0,cap_cents:0,uncapped_count:0,planned_cents:0,line_count:0},revenues:{projected_cents:123456,confirmed_cents:12345,received_cents:123,receivable_open_cents:12222,overdue_count:0},revenue:{count:1,projected_cents:123456,confirmed_cents:12345},sponsorship:{count:0,declared_cents:0,projected_cents:0,confirmed_cents:0,in_kind_cents:0},obligations:{received_cents:123,paid_cents:0,receivable_open_cents:12222,payable_open_cents:0,overdue_count:0},movements:{count:1,inflow_cents:123,outflow_cents:0}});
   vi.mocked(fetchSponsorships).mockResolvedValue([sponsor]);
+  vi.mocked(fetchReceivableSettlements).mockResolvedValue([]);
   vi.mocked(saveFinancialRecord).mockResolvedValue({id:'qa-saved',version:1});
   Object.defineProperty(HTMLElement.prototype,'scrollIntoView',{configurable:true,value:vi.fn()});
   Object.defineProperty(HTMLElement.prototype,'hasPointerCapture',{configurable:true,value:()=>false});

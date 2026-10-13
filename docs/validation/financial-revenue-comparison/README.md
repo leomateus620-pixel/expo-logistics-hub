@@ -72,3 +72,16 @@ npm test -- src/test/financialRevenueComparison.test.tsx src/test/financial2028P
 O teste novo cobre consolidação versus compromisso, compatibilidade do resumo, ausência de dupla contagem, escopo das origens, canceladas, proporções do ranking, barras negativas e zero, valor exato acessível, filtros independentes, ausência de dados, carregamento, falha, zero verdadeiro e limite da lista. Os testes existentes de formulários foram adaptados à composição compartilhada preservando verificações de payload, centavos, versão, chave de tentativa, erro e bloqueio durante envio.
 
 Toque foi exercitado por eventos confiáveis do Chromium via CDP; viewport e menus móveis são emulados. Isso não certifica aparelhos físicos ou o calendário nativo do sistema. A entrega não adiciona fonte de dados inexistente para os recortes financeiros indisponíveis.
+
+## Revisão: recortes realizados e ranking por categoria
+
+O contrato existente já fornece o recebimento por registro: `financial_obligations` (direção `receber`) com as alocações de `financial_movement_allocations`, sob a mesma política `financial_read`. A comparação passa a ler essas tabelas, sem nova RPC, permissão, rota ou cálculo no servidor:
+
+- **Comercialização realizada**: alocações em obrigações `parcela_comercial` (parcelas comerciais vinculadas ao Financeiro). Vendas de lotes da Dashboard Comercial continuam fora da soma.
+- **Rouanet realizado**: receitas de origem `lei_rouanet` e patrocínios cuja confirmação é só Rouanet. Patrocínios com cota livre e Rouanet não são repartidos; o valor recebido sem origem discriminada aparece no próprio card, marcado como **Parcial**.
+- **Rouanet projetado**: receitas `lei_rouanet` + `projected_rouanet_cents` dos patrocínios não cancelados (campo explícito, sem rateio).
+- **Comercialização projetada**: continua sem fonte financeira e é exibida como “Sem fonte financeira”, nunca como R$ 0.
+- **Receitas por categoria**: as mesmas chaves nos dois lados — Patrocínios, Receitas por origem, Comercialização (parcelas vinculadas) e Recebimentos avulsos. Cada centavo recebido cai em uma única categoria, então o ranking realizado soma exatamente o recebido do resumo; “Recorte carregado” aparece quando as listas não cobrem as contagens do resumo ou a soma diverge do servidor.
+- **Listagem realizada**: cada compromisso confirmado mostra o recebido líquido do registro, separado do confirmado.
+
+Validação desta revisão: `npm run typecheck` e `npm run build` aprovados; ESLint dos arquivos alterados sem apontamentos; 30 testes financeiros pertinentes aprovados; suíte completa com as mesmas 100 falhas da base e 3 testes novos aprovados; `revenue-comparison-qa.cjs` com 67/67 verificações no navegador.

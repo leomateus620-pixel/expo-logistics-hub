@@ -1,5 +1,5 @@
 // Test-only synthetic records. No Supabase client, requests, or production writes.
-export type { FinancialEdition, FinancialBudget, FinancialBudgetLine, FinancialRevenue, FinancialSponsorship, FinancialEditionSummary, FinancialEntity, FundingTypeKey, NegotiationStatus, RevenueStatus, SponsorTierKey } from '../../src/features/financial-management/operational/financialOperationalApi';
+export type { FinancialEdition, FinancialBudget, FinancialBudgetLine, FinancialRevenue, FinancialSponsorship, FinancialEditionSummary, FinancialEntity, FinancialReceivableSettlement, FundingTypeKey, ReceivableSourceType, NegotiationStatus, RevenueStatus, SponsorTierKey } from '../../src/features/financial-management/operational/financialOperationalApi';
 import type { FinancialEditionSummary } from '../../src/features/financial-management/operational/financialOperationalApi';
 export const FUNDING_TYPE_LABELS = { recurso_livre: 'Recurso livre', lei_rouanet: 'Lei Rouanet', prefeitura_plano_trabalho: 'Prefeitura / Plano de Trabalho', misto: 'Misto', nao_identificado: 'Não identificado' };
 export const SPONSOR_TIER_LABELS = { grao_de_ouro: 'Grão de Ouro', ouro: 'Ouro', prata: 'Prata', bronze: 'Bronze', soy_summit: 'Soy Summit', outros_apoios: 'Outros Apoios', nao_classificado: 'Não classificado' };
@@ -48,6 +48,19 @@ export const fetchRevenues = () => {
   return read(mode() === 'empty' ? [] : mode() === 'partial' ? Array.from({ length: 500 }, (_, i) => ({ ...QA_REVENUES[0], id: `qa-r-${i}`, description: `Receita sintética ${i + 1}` })) : mode() === 'revenue-negative' ? [{ ...QA_REVENUES[0], projected_cents: -500000 }, { ...QA_REVENUES[1], projected_cents: 1000000 }, QA_REVENUES[2]] : QA_REVENUES);
 };
 export const fetchSponsorships = () => read(mode() === 'empty' ? [] : mode() === 'partial' ? Array.from({ length: 500 }, (_, i) => ({ ...QA_SPONSORS[0], id: `qa-s-${i}`, name: `Patrocinador sintético ${i + 1}` })) : QA_SPONSORS);
+export const RECEIVABLE_SETTLEMENTS_LIMIT = 1000;
+// Settled amounts add up to QA_SUMMARY received_cents, so the realized ranking is complete.
+export const QA_RECEIVABLES = [
+  { id: 'qa-o1', source_type: 'receita' as const, source_id: 'qa-r2', status: 'aberta' as const, amount_cents: 4500001, settled_cents: 3000000 },
+  { id: 'qa-o2', source_type: 'patrocinio' as const, source_id: 'qa-s1', status: 'aberta' as const, amount_cents: 18000001, settled_cents: 18000001 },
+  { id: 'qa-o3', source_type: 'parcela_comercial' as const, source_id: 'qa-i1', status: 'aberta' as const, amount_cents: 300000000, settled_cents: 276999999 },
+  { id: 'qa-o4', source_type: 'manual' as const, source_id: null, status: 'aberta' as const, amount_cents: 2000000, settled_cents: 2000000 },
+];
+export const fetchReceivableSettlements = () => {
+  window.__financialQaReads.receivables++;
+  if (mode() === 'receivables-error') return Promise.reject(new Error('Falha sintética dos recebimentos.'));
+  return read(mode() === 'empty' ? [] : QA_RECEIVABLES);
+};
 export const QA_SUMMARY: FinancialEditionSummary = {
   budget: { count: 3, cap_cents: 25000000, uncapped_count: 1, planned_cents: 25000201, line_count: 4, committed_cents: 20000000 },
   expenses: { count: 7, planned_cents: 25000201, committed_cents: 20000000, paid_cents: 15000000, payable_open_cents: 5000000, overdue_count: 1 },
@@ -67,9 +80,9 @@ export const fetchEditionSummary = () => {
   return read(summary);
 };
 type Save = { orgId: string; entity: string; payload: Record<string, unknown>; expectedVersion: number | null; requestId: string; reason?: string | null };
-declare global { interface Window { __financialQaSaves: Save[]; __financialQaReads: { summary: number; revenues: number }; __financialQaFailNext?: string; } }
+declare global { interface Window { __financialQaSaves: Save[]; __financialQaReads: { summary: number; revenues: number; receivables: number }; __financialQaFailNext?: string; } }
 window.__financialQaSaves = [];
-window.__financialQaReads = { summary: 0, revenues: 0 };
+window.__financialQaReads = { summary: 0, revenues: 0, receivables: 0 };
 export async function saveFinancialRecord(input: Save) {
   window.__financialQaSaves.push(structuredClone(input));
   await delay(350);
