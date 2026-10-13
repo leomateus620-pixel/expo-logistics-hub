@@ -109,7 +109,7 @@ const EXPECTED_PLANS = {
   },
   B8: {
     pavilionNumber: 5,
-    category: 'Veterinária, Pequenos Animais e Rações',
+    category: 'Floriculturas',
     moduleCount: 81,
     totalAreaSquareMeters: 841.53,
     moduleAreaSquareMeters: 244.5,

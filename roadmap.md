@@ -1,5 +1,10 @@
 # Roadmap
 
+## Pavilhão 5 — Floriculturas
+- [x] Alinhar referências, atividade e identificação pública com o nome oficial aprovado.
+- [ ] Atualizar exclusivamente o nome persistido de B8 com auditoria e validar banco, testes e título na prévia.
+- Não publicar.
+
 ## Retratos de Diana e Roberto
 - [x] Registrar anexos originais por identidade confirmada na resolução compartilhada, sem alterar cadastros ou vínculos.
 - [x] Validar resolução compartilhada, integração do Ecossistema e regressões (16 testes); conferir carregamento das duas imagens originais no navegador.
