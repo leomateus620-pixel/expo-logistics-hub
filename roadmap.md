@@ -2,7 +2,8 @@
 
 ## Pavilhão 5 — Floriculturas
 - [x] Alinhar referências, atividade e identificação pública com o nome oficial aprovado.
-- [ ] Atualizar exclusivamente o nome persistido de B8 com auditoria e validar banco, testes e título na prévia.
+- [x] Atualizar exclusivamente o nome persistido de B8 e da planta interna com auditoria; conferir preservação dos demais campos e 35 testes aprovados.
+- [ ] Conferir visualmente o título na prévia — bloqueio: navegador autenticado permaneceu na preparação do mapa, sem abrir o painel.
 - Não publicar.
 
 ## Retratos de Diana e Roberto
