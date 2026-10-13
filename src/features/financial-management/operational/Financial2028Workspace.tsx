@@ -6,6 +6,7 @@ import { FinancialNotActivatedError, fetchEditions } from './financialOperationa
 import { DashboardView } from './Financial2028Dashboard';
 import { BudgetsView, SponsorshipsView } from './Financial2028Ledgers';
 import { Financial2028RevenueComparison } from './Financial2028RevenueComparison';
+import { Financial2028Expenses } from './Financial2028Expenses';
 import { PendingView, ReportsView } from './Financial2028SecondaryViews';
 import { Financial2028Loading, Financial2028State } from './Financial2028Presentation';
 import '@/styles/financial-operational-2028.css';
@@ -36,6 +37,7 @@ export function Financial2028Workspace({ view }: { view: FinancialViewPath }) {
   else if (view === 'dashboard') content = <DashboardView edition={edition} />;
   else if (view === 'orcamento-comissoes') content = <BudgetsView edition={edition} />;
   else if (isRevenue) content = <Financial2028RevenueComparison edition={edition} focus={view === 'receitas-confirmadas' ? 'realizado' : 'projetado'} />;
+  else if (view === 'despesas-previstas' || view === 'despesas-realizadas') content = <Financial2028Expenses edition={edition} focus={view === 'despesas-realizadas' ? 'realizado' : 'projetado'} />;
   else if (view === 'patrocinios') content = <SponsorshipsView edition={edition} />;
   else if (view === 'relatorios') content = <ReportsView />;
   else content = <PendingView view={view} />;

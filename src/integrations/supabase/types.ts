@@ -3123,10 +3123,15 @@ export type Database = {
           event_id: string | null
           expense_date: string
           financial_budget_line_id: string | null
+          financial_cancel_reason: string | null
+          financial_category_id: string | null
           financial_commission_id: string | null
           financial_due_date: string | null
           financial_edition_id: string | null
+          financial_notes: string | null
           financial_status: string | null
+          financial_updated_at: string | null
+          financial_updated_by: string | null
           financial_version: number
           id: string
           member_user_id: string | null
@@ -3134,10 +3139,12 @@ export type Database = {
           origem_lancamento: string
           paid_by_name: string | null
           paid_by_user_id: string | null
+          payee_name: string | null
           payment_method: string | null
           pix_key: string | null
           pix_key_type: Database["public"]["Enums"]["pix_key_type"] | null
           planned_cents: number | null
+          planned_on: string | null
           status: Database["public"]["Enums"]["expense_status"]
           title: string
           transport_id: string | null
@@ -3156,10 +3163,15 @@ export type Database = {
           event_id?: string | null
           expense_date?: string
           financial_budget_line_id?: string | null
+          financial_cancel_reason?: string | null
+          financial_category_id?: string | null
           financial_commission_id?: string | null
           financial_due_date?: string | null
           financial_edition_id?: string | null
+          financial_notes?: string | null
           financial_status?: string | null
+          financial_updated_at?: string | null
+          financial_updated_by?: string | null
           financial_version?: number
           id?: string
           member_user_id?: string | null
@@ -3167,10 +3179,12 @@ export type Database = {
           origem_lancamento?: string
           paid_by_name?: string | null
           paid_by_user_id?: string | null
+          payee_name?: string | null
           payment_method?: string | null
           pix_key?: string | null
           pix_key_type?: Database["public"]["Enums"]["pix_key_type"] | null
           planned_cents?: number | null
+          planned_on?: string | null
           status?: Database["public"]["Enums"]["expense_status"]
           title: string
           transport_id?: string | null
@@ -3189,10 +3203,15 @@ export type Database = {
           event_id?: string | null
           expense_date?: string
           financial_budget_line_id?: string | null
+          financial_cancel_reason?: string | null
+          financial_category_id?: string | null
           financial_commission_id?: string | null
           financial_due_date?: string | null
           financial_edition_id?: string | null
+          financial_notes?: string | null
           financial_status?: string | null
+          financial_updated_at?: string | null
+          financial_updated_by?: string | null
           financial_version?: number
           id?: string
           member_user_id?: string | null
@@ -3200,10 +3219,12 @@ export type Database = {
           origem_lancamento?: string
           paid_by_name?: string | null
           paid_by_user_id?: string | null
+          payee_name?: string | null
           payment_method?: string | null
           pix_key?: string | null
           pix_key_type?: Database["public"]["Enums"]["pix_key_type"] | null
           planned_cents?: number | null
+          planned_on?: string | null
           status?: Database["public"]["Enums"]["expense_status"]
           title?: string
           transport_id?: string | null
@@ -3224,6 +3245,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "events"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_financial_category_fk"
+            columns: ["org_id", "financial_category_id"]
+            isOneToOne: false
+            referencedRelation: "financial_categories"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "expenses_financial_commission_fk"
+            columns: ["financial_commission_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "commissions"
+            referencedColumns: ["id", "org_id"]
           },
           {
             foreignKeyName: "expenses_financial_edition_fk"
@@ -3510,9 +3545,11 @@ export type Database = {
       financial_categories: {
         Row: {
           active: boolean
+          color: string | null
           created_at: string
           created_by: string
           domain: string
+          icon: string | null
           id: string
           name: string
           org_id: string
@@ -3524,9 +3561,11 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          color?: string | null
           created_at?: string
           created_by: string
           domain: string
+          icon?: string | null
           id?: string
           name: string
           org_id: string
@@ -3538,9 +3577,11 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          color?: string | null
           created_at?: string
           created_by?: string
           domain?: string
+          icon?: string | null
           id?: string
           name?: string
           org_id?: string
@@ -11068,6 +11109,7 @@ export type Database = {
         Args: { p_segment_id: string }
         Returns: number
       }
+      financial_accessible_org_ids: { Args: never; Returns: string[] }
       financial_audit: {
         Args: {
           _action: string
@@ -11098,9 +11140,76 @@ export type Database = {
         Args: { _capability: string; _org_id: string }
         Returns: boolean
       }
+      financial_cents: { Args: { _field: string; _v: Json }; Returns: number }
+      financial_date: { Args: { _field: string; _v: Json }; Returns: string }
       financial_edition_summary: {
         Args: { _edition_id: string; _org_id: string }
         Returns: Json
+      }
+      financial_expense_comparison: {
+        Args: { _edition_id: string; _filters?: Json; _org_id: string }
+        Returns: Json
+      }
+      financial_expense_detail: {
+        Args: { _expense_id: string; _org_id: string }
+        Returns: Json
+      }
+      financial_expense_filtered: {
+        Args: { _edition_id: string; _f: Json; _org_id: string }
+        Returns: {
+          amount: number
+          category_id: string | null
+          committed_cents: number | null
+          committed_on: string | null
+          created_at: string
+          created_by_user_id: string
+          cycle_year: number
+          description: string | null
+          event_id: string | null
+          expense_date: string
+          financial_budget_line_id: string | null
+          financial_cancel_reason: string | null
+          financial_category_id: string | null
+          financial_commission_id: string | null
+          financial_due_date: string | null
+          financial_edition_id: string | null
+          financial_notes: string | null
+          financial_status: string | null
+          financial_updated_at: string | null
+          financial_updated_by: string | null
+          financial_version: number
+          id: string
+          member_user_id: string | null
+          org_id: string
+          origem_lancamento: string
+          paid_by_name: string | null
+          paid_by_user_id: string | null
+          payee_name: string | null
+          payment_method: string | null
+          pix_key: string | null
+          pix_key_type: Database["public"]["Enums"]["pix_key_type"] | null
+          planned_cents: number | null
+          planned_on: string | null
+          status: Database["public"]["Enums"]["expense_status"]
+          title: string
+          transport_id: string | null
+          updated_at: string
+          vehicle_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "expenses"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      financial_expense_json: {
+        Args: { _e: Database["public"]["Tables"]["expenses"]["Row"] }
+        Returns: Json
+      }
+      financial_expense_settled: {
+        Args: { _expense_id: string }
+        Returns: number
       }
       financial_finish: {
         Args: {
@@ -11108,6 +11217,20 @@ export type Database = {
           _operation: string
           _org_id: string
           _result: Json
+        }
+        Returns: Json
+      }
+      financial_list_categories: {
+        Args: { _domain?: string; _include_archived?: boolean; _org_id: string }
+        Returns: Json
+      }
+      financial_list_expenses: {
+        Args: {
+          _edition_id: string
+          _filters?: Json
+          _limit?: number
+          _offset?: number
+          _org_id: string
         }
         Returns: Json
       }
@@ -11122,6 +11245,10 @@ export type Database = {
           _payload: Json
           _request_id: string
         }
+        Returns: Json
+      }
+      financial_reorder_categories: {
+        Args: { _ordered_ids: string[]; _org_id: string; _request_id: string }
         Returns: Json
       }
       financial_require: {
@@ -11162,6 +11289,15 @@ export type Database = {
         }
         Returns: Json
       }
+      financial_save_category: {
+        Args: {
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
       financial_save_expense: {
         Args: {
           _expected_version: number
@@ -11183,6 +11319,10 @@ export type Database = {
         }
         Returns: Json
       }
+      financial_seed_expense_categories: {
+        Args: { _org_id: string; _request_id: string }
+        Returns: Json
+      }
       financial_sync_source_obligation: {
         Args: {
           _active: boolean
@@ -11195,6 +11335,29 @@ export type Database = {
           _org_id: string
           _source_id: string
           _source_type: string
+        }
+        Returns: undefined
+      }
+      financial_transition_expense: {
+        Args: {
+          _expected_version: number
+          _expense_id: string
+          _org_id: string
+          _payload: Json
+          _reason: string
+          _request_id: string
+          _to: string
+        }
+        Returns: Json
+      }
+      financial_validate_expense_links: {
+        Args: {
+          _category: string
+          _commission: string
+          _edition: string
+          _line: string
+          _old_category: string
+          _org_id: string
         }
         Returns: undefined
       }
