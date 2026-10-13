@@ -1,0 +1,140 @@
+{
+  "phase": "after",
+  "fixtureBoundary": "Synthetic QA API + real page/layout/dialogs; no backend access or financial writes",
+  "captures": [
+    {
+      "file": "desktop-2028-receitas-projetadas.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas",
+      "activeMenu": [
+        "Receitas"
+      ]
+    },
+    {
+      "file": "desktop-2028-receitas-confirmadas.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas",
+      "activeMenu": [
+        "Receitas"
+      ]
+    },
+    {
+      "file": "desktop-2026-receitas-projetadas.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas Projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "desktop-2026-receitas-confirmadas.png",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "bodyWidth": 1351,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas Confirmadas",
+      "activeMenu": [
+        "Receitas Confirmadas"
+      ]
+    },
+    {
+      "file": "mobile-2028-receitas-projetadas.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas",
+      "activeMenu": [
+        "Receitas"
+      ]
+    },
+    {
+      "file": "mobile-2028-receitas-confirmadas.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas",
+      "activeMenu": [
+        "Receitas"
+      ]
+    },
+    {
+      "file": "mobile-2026-receitas-projetadas.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas Projetadas",
+      "activeMenu": [
+        "Receitas Projetadas"
+      ]
+    },
+    {
+      "file": "mobile-2026-receitas-confirmadas.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "bodyWidth": 375,
+      "horizontalOverflow": false,
+      "dialog": null,
+      "heading": "Receitas Confirmadas",
+      "activeMenu": [
+        "Receitas Confirmadas"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "No external financial requests",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "No JavaScript errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "No 2028 page horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "No forms horizontal overflow",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "blockedRequests": []
+}

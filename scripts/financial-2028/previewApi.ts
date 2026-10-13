@@ -42,7 +42,11 @@ export const QA_SPONSORS = [
 ].map((sponsor) => ({ ...sponsor, responsible_name: null, notes: null, version: 5 }));
 export const fetchBudgets = () => read(mode() === 'empty' ? [] : QA_BUDGETS);
 export const fetchBudgetLines = () => read(mode() === 'empty' ? [] : QA_LINES);
-export const fetchRevenues = () => read(mode() === 'empty' ? [] : mode() === 'partial' ? Array.from({ length: 500 }, (_, i) => ({ ...QA_REVENUES[0], id: `qa-r-${i}`, description: `Receita sintética ${i + 1}` })) : QA_REVENUES);
+export const fetchRevenues = () => {
+  window.__financialQaReads.revenues++;
+  if (mode() === 'list-error') return Promise.reject(new Error('Falha sintética dos registros.'));
+  return read(mode() === 'empty' ? [] : mode() === 'partial' ? Array.from({ length: 500 }, (_, i) => ({ ...QA_REVENUES[0], id: `qa-r-${i}`, description: `Receita sintética ${i + 1}` })) : mode() === 'revenue-negative' ? [{ ...QA_REVENUES[0], projected_cents: -500000 }, { ...QA_REVENUES[1], projected_cents: 1000000 }, QA_REVENUES[2]] : QA_REVENUES);
+};
 export const fetchSponsorships = () => read(mode() === 'empty' ? [] : mode() === 'partial' ? Array.from({ length: 500 }, (_, i) => ({ ...QA_SPONSORS[0], id: `qa-s-${i}`, name: `Patrocinador sintético ${i + 1}` })) : QA_SPONSORS);
 export const QA_SUMMARY: FinancialEditionSummary = {
   budget: { count: 3, cap_cents: 25000000, uncapped_count: 1, planned_cents: 25000201, line_count: 4, committed_cents: 20000000 },
@@ -54,6 +58,8 @@ export const QA_SUMMARY: FinancialEditionSummary = {
   movements: { count: 10, inflow_cents: 300000000, outflow_cents: 15000000 },
 };
 export const fetchEditionSummary = () => {
+  window.__financialQaReads.summary++;
+  if (mode() === 'summary-error') return Promise.reject(new Error('Falha sintética da consolidação.'));
   const summary = structuredClone(QA_SUMMARY);
   if (mode() === 'empty') for (const values of Object.values(summary)) for (const key in values) values[key] = 0;
   if (mode() === 'negative') summary.budget.planned_cents = 100;
@@ -61,8 +67,9 @@ export const fetchEditionSummary = () => {
   return read(summary);
 };
 type Save = { orgId: string; entity: string; payload: Record<string, unknown>; expectedVersion: number | null; requestId: string; reason?: string | null };
-declare global { interface Window { __financialQaSaves: Save[]; __financialQaFailNext?: string; } }
+declare global { interface Window { __financialQaSaves: Save[]; __financialQaReads: { summary: number; revenues: number }; __financialQaFailNext?: string; } }
 window.__financialQaSaves = [];
+window.__financialQaReads = { summary: 0, revenues: 0 };
 export async function saveFinancialRecord(input: Save) {
   window.__financialQaSaves.push(structuredClone(input));
   await delay(350);
