@@ -120,6 +120,26 @@ export const fetchRevenues = (editionId: string) =>
 export const fetchSponsorships = (editionId: string) =>
   read<FinancialSponsorship[]>(db.from('financial_sponsorships').select('*').eq('edition_id', editionId).order('name').limit(500));
 
+export type ReceivableSourceType = 'receita' | 'patrocinio' | 'parcela_comercial' | 'manual';
+/** Obrigação a receber com o valor líquido já alocado por movimentos (mesma regra do resumo da edição). */
+export interface FinancialReceivableSettlement {
+  id: string; source_type: ReceivableSourceType; source_id: string | null; status: 'aberta' | 'cancelada';
+  amount_cents: number; settled_cents: number;
+}
+export const RECEIVABLE_SETTLEMENTS_LIMIT = 1000;
+
+export async function fetchReceivableSettlements(editionId: string): Promise<FinancialReceivableSettlement[]> {
+  const rows = await read<Array<Omit<FinancialReceivableSettlement, 'settled_cents'> & { financial_movement_allocations: Array<{ amount_cents: number }> | null }>>(
+    db.from('financial_obligations')
+      .select('id,source_type,source_id,status,amount_cents,financial_movement_allocations(amount_cents)')
+      .eq('edition_id', editionId).eq('direction', 'receber')
+      .order('created_at').limit(RECEIVABLE_SETTLEMENTS_LIMIT),
+  );
+  return rows.map(({ financial_movement_allocations: allocations, ...row }) => ({
+    ...row, settled_cents: (allocations ?? []).reduce((sum, allocation) => sum + Number(allocation.amount_cents), 0),
+  }));
+}
+
 /** Totais sempre vêm da agregação no servidor, nunca das listas paginadas. */
 export async function fetchEditionSummary(orgId: string, editionId: string): Promise<FinancialEditionSummary> {
   const { data, error } = await db.rpc('financial_edition_summary', { _org_id: orgId, _edition_id: editionId });

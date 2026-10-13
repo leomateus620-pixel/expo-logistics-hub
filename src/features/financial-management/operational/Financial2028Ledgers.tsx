@@ -149,13 +149,24 @@ export function BudgetsView({ edition }: { edition: FinancialEdition }) {
   </section>;
 }
 
-function RevenueDetails({ row }: { row: FinancialRevenue }) {
-  return <div className="f28-ledger-details"><dl className="f28-ledger-detail-grid"><div><dt>Contraparte</dt><dd>{row.counterparty || 'Não informada'}</dd></div><div><dt>Responsável</dt><dd>{row.responsible_name || 'Não informado'}</dd></div><div><dt>Competência</dt><dd><DateValue value={row.competence_date} /></dd></div><div><dt>Vencimento</dt><dd><DateValue value={row.due_date} /></dd></div></dl>{row.notes ? <p className="f28-ledger-note"><strong>Observações</strong> {row.notes}</p> : null}<p className="f28-ledger-note">O valor confirmado indica compromisso comercial. Esta consulta não fornece recebimento ou saldo a receber por registro.</p></div>;
+function RevenueDetails({ row, settlement }: { row: FinancialRevenue; settlement: boolean }) {
+  return <div className="f28-ledger-details"><dl className="f28-ledger-detail-grid"><div><dt>Contraparte</dt><dd>{row.counterparty || 'Não informada'}</dd></div><div><dt>Responsável</dt><dd>{row.responsible_name || 'Não informado'}</dd></div><div><dt>Competência</dt><dd><DateValue value={row.competence_date} /></dd></div><div><dt>Vencimento</dt><dd><DateValue value={row.due_date} /></dd></div></dl>{row.notes ? <p className="f28-ledger-note"><strong>Observações</strong> {row.notes}</p> : null}<p className="f28-ledger-note">{settlement ? 'O valor confirmado indica compromisso comercial. O recebido vem dos movimentos alocados à obrigação do registro.' : 'O valor confirmado indica compromisso comercial. Esta consulta não fornece recebimento ou saldo a receber por registro.'}</p></div>;
+}
+
+/** Net settled per revenue, or the reason it cannot be shown. Never rendered as zero while unknown. */
+export type RevenueReceivedState = { byRevenue: ReadonlyMap<string, number>; complete: boolean } | 'loading' | 'error';
+
+function ReceivedValue({ id, state }: { id: string; state: RevenueReceivedState }) {
+  if (state === 'loading') return <span className="f28-ledger-unavailable">Carregando…</span>;
+  if (state === 'error') return <span className="f28-ledger-unavailable">Indisponível</span>;
+  const value = state.byRevenue.get(id);
+  if (value == null) return state.complete ? <Money value={0} /> : <span className="f28-ledger-unavailable">Fora do recorte</span>;
+  return <Money value={value} />;
 }
 
 /** Shared operational list. Queries and dialogs belong to the comparison, so resizing never reloads it. */
-export const RevenueLedger = memo(function RevenueLedger({ data, focus, onEdit }: {
-  data: readonly FinancialRevenue[]; focus: 'projetada' | 'confirmada'; onEdit: (row: FinancialRevenue) => void;
+export const RevenueLedger = memo(function RevenueLedger({ data, focus, onEdit, received }: {
+  data: readonly FinancialRevenue[]; focus: 'projetada' | 'confirmada'; onEdit: (row: FinancialRevenue) => void; received?: RevenueReceivedState;
 }) {
   const [search, setSearch] = useState('');
   const [funding, setFunding] = useState('all');
@@ -166,10 +177,10 @@ export const RevenueLedger = memo(function RevenueLedger({ data, focus, onEdit }
   const visible = useMemo(() => rows.filter((row) => (funding === 'all' || row.funding_type === funding) && (focus === 'confirmada' || status === 'all' || row.status === status) && matches(search, row.description, row.counterparty, row.responsible_name)), [rows, funding, focus, status, search]);
   const clear = () => { setSearch(''); setFunding('all'); setStatus('all'); };
   return <div className="f28-revenue-ledger">
-    <p className="f28-revenue-scope">Recorte carregado · {data.length} registros · limite de 500</p>
+    <p className="f28-revenue-scope">{data.length >= 500 ? 'Recorte carregado · primeiros 500 registros' : `${data.length} registros carregados`}</p>
       <Filters search={search} onSearch={setSearch} placeholder="Descrição, contraparte ou responsável" active={Boolean(search) || funding !== 'all' || (focus !== 'confirmada' && status !== 'all')} clear={clear} count={visible.length}><SelectFilter label="Origem do recurso" value={funding} onChange={setFunding} options={FUNDING_TYPE_LABELS} all="Todas as origens" />{focus !== 'confirmada' ? <SelectFilter label="Situação" value={status} onChange={setStatus} options={{ projetada: 'Projetada', confirmada: 'Confirmada' }} all="Todas as situações" /> : null}</Filters>
       {rows.length === 0 ? <Financial2028State tone="info" title={focus === 'confirmada' ? 'Nenhuma receita confirmada nesta visão' : 'Primeiras receitas de 2028'}>{focus === 'confirmada' ? 'Os registros aparecerão após a confirmação comercial no cadastro.' : 'Cadastre a descrição, origem e valores para iniciar o acompanhamento.'}</Financial2028State> : visible.length === 0 ? <Financial2028State tone="info" title="Nenhuma receita corresponde aos filtros">Limpe os filtros para voltar aos registros carregados.</Financial2028State> : <>
-        <div className="f28-ledger-mobile">{visible.map((row) => <article className="f28-ledger-mobile-record" key={row.id}><header><div><h3>{row.description}</h3><p>{row.counterparty || 'Contraparte não informada'}</p></div><Status tone={row.status === 'confirmada' ? 'success' : 'neutral'}>{REVENUE_STATUS_LABELS[row.status]}</Status></header><p className="f28-ledger-secondary">{FUNDING_TYPE_LABELS[row.funding_type]}</p><dl className="f28-ledger-mobile-values"><div className={focus === 'projetada' ? 'f28-ledger-mobile-values__primary' : ''}><dt>Projetado</dt><dd><Money value={row.projected_cents} /></dd></div><div className={focus === 'confirmada' ? 'f28-ledger-mobile-values__primary' : ''}><dt>Confirmado</dt><dd><Money value={row.confirmed_cents} /></dd></div><div><dt>Vencimento</dt><dd><DateValue value={row.due_date} /></dd></div></dl><footer><DetailsButton open={expanded.has(row.id)} onClick={() => toggle(row.id)} controls={`mobile-revenue-detail-${focus}-${row.id}`} label={row.description} /><Button variant="outline" size="sm" aria-label={`Editar ${row.description}`} onClick={() => onEdit(row)}><Pencil aria-hidden="true" className="h-4 w-4" />Editar</Button></footer>{expanded.has(row.id) ? <div id={`mobile-revenue-detail-${focus}-${row.id}`}><RevenueDetails row={row} /></div> : null}</article>)}</div>
+        <div className="f28-ledger-mobile">{visible.map((row) => <article className="f28-ledger-mobile-record" key={row.id}><header><div><h3>{row.description}</h3><p>{row.counterparty || 'Contraparte não informada'}</p></div><Status tone={row.status === 'confirmada' ? 'success' : 'neutral'}>{REVENUE_STATUS_LABELS[row.status]}</Status></header><p className="f28-ledger-secondary">{FUNDING_TYPE_LABELS[row.funding_type]}</p><dl className="f28-ledger-mobile-values"><div className={focus === 'projetada' ? 'f28-ledger-mobile-values__primary' : ''}><dt>Projetado</dt><dd><Money value={row.projected_cents} /></dd></div><div className={focus === 'confirmada' ? 'f28-ledger-mobile-values__primary' : ''}><dt>Confirmado</dt><dd><Money value={row.confirmed_cents} /></dd></div>{received ? <div className="f28-ledger-mobile-values__received"><dt>Recebido</dt><dd><ReceivedValue id={row.id} state={received} /></dd></div> : null}<div><dt>Vencimento</dt><dd><DateValue value={row.due_date} /></dd></div></dl><footer><DetailsButton open={expanded.has(row.id)} onClick={() => toggle(row.id)} controls={`mobile-revenue-detail-${focus}-${row.id}`} label={row.description} /><Button variant="outline" size="sm" aria-label={`Editar ${row.description}`} onClick={() => onEdit(row)}><Pencil aria-hidden="true" className="h-4 w-4" />Editar</Button></footer>{expanded.has(row.id) ? <div id={`mobile-revenue-detail-${focus}-${row.id}`}><RevenueDetails row={row} settlement={Boolean(received)} /></div> : null}</article>)}</div>
       </>}
   </div>;
 });
