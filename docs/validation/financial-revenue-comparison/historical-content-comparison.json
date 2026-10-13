@@ -1,0 +1,57 @@
+{
+  "scope": "Historical 2026 revenue content only; shared selector/sidebar changes excluded",
+  "comparisons": [
+    {
+      "screen": "desktop",
+      "view": "receitas-projetadas",
+      "contentTextEqual": true,
+      "headingsEqual": true,
+      "actionsEqual": true,
+      "dimensionsEqual": true,
+      "width": 999,
+      "height": 768,
+      "changedPixels": 0,
+      "changedPercent": 0,
+      "maxChannelDifference": 0
+    },
+    {
+      "screen": "desktop",
+      "view": "receitas-confirmadas",
+      "contentTextEqual": true,
+      "headingsEqual": true,
+      "actionsEqual": true,
+      "dimensionsEqual": true,
+      "width": 999,
+      "height": 768,
+      "changedPixels": 0,
+      "changedPercent": 0,
+      "maxChannelDifference": 0
+    },
+    {
+      "screen": "mobile",
+      "view": "receitas-projetadas",
+      "contentTextEqual": true,
+      "headingsEqual": true,
+      "actionsEqual": true,
+      "dimensionsEqual": true,
+      "width": 343,
+      "height": 780,
+      "changedPixels": 0,
+      "changedPercent": 0,
+      "maxChannelDifference": 0
+    },
+    {
+      "screen": "mobile",
+      "view": "receitas-confirmadas",
+      "contentTextEqual": true,
+      "headingsEqual": true,
+      "actionsEqual": true,
+      "dimensionsEqual": true,
+      "width": 343,
+      "height": 780,
+      "changedPixels": 46,
+      "changedPercent": 0.017193690663078416,
+      "maxChannelDifference": 1
+    }
+  ]
+}

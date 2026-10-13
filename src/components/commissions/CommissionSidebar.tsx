@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { resolveOfficialUnit } from '@/modules/commissions/officialCommissionCatalog';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { ChevronLeft, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
@@ -11,6 +11,8 @@ import {
   type CommissionModule,
 } from '@/modules/commissions/commissionRegistry';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
+import { FinancialEditionSwitch } from '@/features/financial-management/operational/FinancialEditionSwitch';
+import { useFinancialEditionSelection } from '@/features/financial-management/operational/useFinancialEditionSelection';
 
 interface CommissionSidebarProps {
   module: CommissionModule;
@@ -23,8 +25,18 @@ interface CommissionSidebarProps {
 
 export default function CommissionSidebar({ module, menuItems, mobileOpen, onMobileOpen, onMobileClose }: CommissionSidebarProps) {
   const { signOut } = useAuth();
+  const location = useLocation();
+  const isFinancial = module.slug === 'financeiro-gerencial';
+  const { edition, changeEdition } = useFinancialEditionSelection({ canonicalize: false, enabled: isFinancial });
   const ModuleIcon = module.icon;
-  const items = menuItems ?? module.menus;
+  const sourceItems = menuItems ?? module.menus;
+  const items = isFinancial && edition === '2028'
+    ? sourceItems.filter((item) => item.path !== 'receitas-confirmadas').map((item) => (
+      item.path === 'receitas-projetadas' ? { ...item, label: 'Receitas' } : item
+    ))
+    : sourceItems;
+  const isRevenueView = location.pathname === getModuleRoute(module, 'receitas-projetadas')
+    || location.pathname === getModuleRoute(module, 'receitas-confirmadas');
   const openButtonRef = useRef<HTMLButtonElement>(null);
   const mobileDrawerRef = useRef<HTMLDivElement>(null);
 
@@ -110,7 +122,12 @@ export default function CommissionSidebar({ module, menuItems, mobileOpen, onMob
       </div>
 
       <div className="border-b border-sidebar-border p-4">
-        <div className="flex items-center gap-3 rounded-lg bg-sidebar-accent p-3">
+        {isFinancial ? (
+          <div className="financial-sidebar-edition">
+            <p className="financial-sidebar-edition__label">Edição financeira</p>
+            <FinancialEditionSwitch value={edition} onChange={changeEdition} />
+          </div>
+        ) : <div className="flex items-center gap-3 rounded-lg bg-sidebar-accent p-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-action text-action-foreground">
             <ModuleIcon className="h-5 w-5" aria-hidden="true" />
           </div>
@@ -118,13 +135,23 @@ export default function CommissionSidebar({ module, menuItems, mobileOpen, onMob
             <p className="text-sm font-semibold text-sidebar-foreground">{module.name}</p>
             <p className="text-xs text-sidebar-foreground/50">{statusLabels[module.status]}</p>
           </div>
-        </div>
+        </div>}
       </div>
 
       <nav className="premium-sidebar-scrollbar flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label={`Menu ${module.name}`}>
         {items.map((item) => {
           const Icon = item.icon;
-          const target = item.path.startsWith('/') ? item.path : getModuleRoute(module, item.path);
+          let target = item.path.startsWith('/') ? item.path : getModuleRoute(module, item.path);
+          if (isFinancial) {
+            if (edition === '2028' && item.path === 'receitas-projetadas' && isRevenueView) {
+              // A entrada anterior continua a representar o contexto que o usuário abriu.
+              target = location.pathname;
+            }
+            const [pathname, search = ''] = target.split('?');
+            const params = new URLSearchParams(search);
+            params.set('edicao', edition);
+            target = `${pathname}?${params.toString()}`;
+          }
           return (
             <NavLink
               key={item.path}
@@ -172,6 +199,12 @@ export default function CommissionSidebar({ module, menuItems, mobileOpen, onMob
 
   return (
     <>
+      {isFinancial && (
+        <div className="financial-mobile-header md:hidden">
+          <span>Financeiro</span>
+          <span className="financial-mobile-header__edition">{edition}<small>{edition === '2026' ? 'Histórico' : 'Operacional'}</small></span>
+        </div>
+      )}
       <button
         ref={openButtonRef}
         type="button"

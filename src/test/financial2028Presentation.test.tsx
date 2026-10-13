@@ -19,6 +19,7 @@ const edition = { id:'qa-e',org_id:'qa-org',code:2028,label:'Fenasoja 2028',stat
 const budget = { id:'qa-b',edition_id:'qa-e',commission_id:'qa-c1',responsible_name:'Responsável de teste',budget_cap_cents:null,period_start:null,period_end:null,notes:null,version:7,updated_at:'' };
 const revenue = { id:'qa-r',description:'Receita de teste',counterparty:'Contraparte',responsible_name:null,funding_type:'recurso_livre' as const,status:'confirmada' as const,projected_cents:123456,confirmed_cents:12345,competence_date:null,due_date:'2028-05-01',notes:null,version:8 };
 const sponsor = { id:'qa-s',name:'Patrocinador de teste',tier:'ouro' as const,negotiation_status:'negociacao' as const,responsible_name:null,declared_cents:null,projected_free_cents:12345,projected_rouanet_cents:10000,confirmed_free_cents:2000,confirmed_rouanet_cents:1000,in_kind_description:'Serviço de teste',in_kind_value_cents:500000,notes:null,version:9 };
+const revenuePanel = (side: 'projetado' | 'realizado') => within(document.querySelector(`[data-revenue-panel="${side}"]`) as HTMLElement);
 function mount(view: FinancialViewPath) {
   const client = new QueryClient({ defaultOptions: { queries:{retry:false},mutations:{retry:false} } });
   return render(<QueryClientProvider client={client}><Financial2028Workspace view={view} /></QueryClientProvider>);
@@ -29,6 +30,7 @@ beforeEach(() => {
   vi.mocked(fetchBudgets).mockResolvedValue([budget]);
   vi.mocked(fetchBudgetLines).mockResolvedValue([{id:'qa-l',budget_id:budget.id,kind:'operacional',description:'Linha de teste',planned_cents:12345,active:true,version:1,notes:null}]);
   vi.mocked(fetchRevenues).mockResolvedValue([revenue]);
+  vi.mocked(fetchEditionSummary).mockResolvedValue({budget:{count:0,cap_cents:0,uncapped_count:0,planned_cents:0,line_count:0},revenues:{projected_cents:123456,confirmed_cents:12345,received_cents:123,receivable_open_cents:12222,overdue_count:0},revenue:{count:1,projected_cents:123456,confirmed_cents:12345},sponsorship:{count:0,declared_cents:0,projected_cents:0,confirmed_cents:0,in_kind_cents:0},obligations:{received_cents:123,paid_cents:0,receivable_open_cents:12222,payable_open_cents:0,overdue_count:0},movements:{count:1,inflow_cents:123,outflow_cents:0}});
   vi.mocked(fetchSponsorships).mockResolvedValue([sponsor]);
   vi.mocked(saveFinancialRecord).mockResolvedValue({id:'qa-saved',version:1});
   Object.defineProperty(HTMLElement.prototype,'scrollIntoView',{configurable:true,value:vi.fn()});
@@ -65,7 +67,7 @@ describe('apresentação operacional Financeiro 2028', () => {
   });
   it('valida descrição junto ao campo e cancelar não grava', async () => {
     const user=userEvent.setup(); mount('receitas-projetadas');
-    await user.click(await screen.findByRole('button',{name:'Nova receita'}));
+    await user.click(await screen.findByRole('button',{name:/Adicionar receita projetada/}));
     const dialog=screen.getByRole('dialog');
     await user.click(within(dialog).getByRole('button',{name:'Salvar'}));
     expect(within(dialog).getByLabelText(/^Descrição/)).toHaveAttribute('aria-invalid','true');
@@ -75,7 +77,8 @@ describe('apresentação operacional Financeiro 2028', () => {
   });
   it('mantém conteúdo, expectedVersion e chave de tentativa após falha recuperável', async () => {
     const user=userEvent.setup(); mount('receitas-confirmadas');
-    await user.click(await screen.findByRole('button',{name:'Editar Receita de teste'}));
+    await screen.findAllByText('Receita de teste');
+    await user.click(revenuePanel('realizado').getByRole('button',{name:'Editar Receita de teste'}));
     const dialog=screen.getByRole('dialog'); const description=within(dialog).getByLabelText(/^Descrição/);
     await user.clear(description); await user.type(description,'Receita revisada em teste');
     vi.mocked(saveFinancialRecord).mockRejectedValueOnce(new Error('Falha de rede recuperável de teste.'));
@@ -101,7 +104,8 @@ describe('apresentação operacional Financeiro 2028', () => {
   it('bloqueia controles e mantém envio até confirmação real', async () => {
     const user=userEvent.setup(); let confirm:(value:Record<string,unknown>)=>void=()=>undefined;
     vi.mocked(saveFinancialRecord).mockImplementation(()=>new Promise(resolve=>{confirm=resolve;}));
-    mount('receitas-projetadas'); await user.click(await screen.findByRole('button',{name:'Editar Receita de teste'}));
+    mount('receitas-projetadas'); await screen.findAllByText('Receita de teste');
+    await user.click(revenuePanel('projetado').getByRole('button',{name:'Editar Receita de teste'}));
     const dialog=screen.getByRole('dialog'); await user.click(within(dialog).getByRole('button',{name:'Salvar'}));
     expect(within(dialog).getByLabelText(/^Descrição/)).toBeDisabled();
     expect(within(dialog).getByRole('button',{name:'Cancelar'})).toBeDisabled();
@@ -156,9 +160,10 @@ describe('apresentação operacional Financeiro 2028', () => {
     vi.mocked(fetchRevenues).mockResolvedValue([revenue,{...revenue,id:'qa-p',description:'Expectativa de teste',status:'projetada'},{...revenue,id:'qa-c',description:'Cancelada de teste',status:'cancelada'}]);
     const view=mount('receitas-projetadas');
     await screen.findAllByText('Expectativa de teste'); expect(screen.getAllByText('Receita de teste').length).toBeGreaterThan(0);
-    expect(screen.queryByText('Cancelada de teste')).not.toBeInTheDocument(); view.unmount();
+    expect(revenuePanel('projetado').queryByText('Cancelada de teste')).not.toBeInTheDocument(); view.unmount();
     mount('receitas-confirmadas'); await screen.findAllByText('Receita de teste');
-    expect(screen.queryByText('Expectativa de teste')).not.toBeInTheDocument();
+    expect(revenuePanel('realizado').queryByText('Expectativa de teste')).not.toBeInTheDocument();
+    expect(revenuePanel('projetado').getAllByText('Expectativa de teste').length).toBeGreaterThan(0);
   });
   it.each(['despesas-previstas','despesas-realizadas','simulacoes'] as const)('explicita indisponibilidade operacional em %s', async view => {
     mount(view); await waitFor(()=>expect(screen.queryByText(/Abrindo Fenasoja/)).not.toBeInTheDocument());

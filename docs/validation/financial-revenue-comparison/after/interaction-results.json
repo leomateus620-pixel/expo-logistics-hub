@@ -1,0 +1,291 @@
+{
+  "boundary": "Real UI + synthetic financial API and identity; external API access blocked",
+  "checks": [
+    {
+      "name": "Canonical edition projection",
+      "passed": true
+    },
+    {
+      "name": "Received differs from confirmed commitment",
+      "passed": true
+    },
+    {
+      "name": "Unsupported breakdowns remain unavailable",
+      "passed": true
+    },
+    {
+      "name": "Only one 2028 revenue navigation item",
+      "passed": true
+    },
+    {
+      "name": "Edition selector is only in sidebar",
+      "passed": true
+    },
+    {
+      "name": "Initial split balanced",
+      "passed": true
+    },
+    {
+      "name": "Keyboard changes split",
+      "passed": true
+    },
+    {
+      "name": "Keyboard maximum clamps to65",
+      "passed": true
+    },
+    {
+      "name": "Keyboard minimum clamps to35",
+      "passed": true
+    },
+    {
+      "name": "Accessible Enter resets split",
+      "passed": true
+    },
+    {
+      "name": "Mouse drag changes split",
+      "passed": true
+    },
+    {
+      "name": "Resize preserves filters and performs no reads",
+      "passed": true
+    },
+    {
+      "name": "Split survives refresh locally",
+      "passed": true
+    },
+    {
+      "name": "Touch drag is compatible",
+      "passed": true
+    },
+    {
+      "name": "Double click restores50/50",
+      "passed": true
+    },
+    {
+      "name": "Desktop no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Zero categories have no artificial fill",
+      "passed": true,
+      "detail": [
+        {
+          "name": "recurso_livre",
+          "width": "100%",
+          "value": "01Recurso livreR$ 1,2 mi96,1% do recorte"
+        },
+        {
+          "name": "lei_rouanet",
+          "width": "4.05%",
+          "value": "02Lei RouanetR$ 50 mil3,9% do recorte"
+        },
+        {
+          "name": "misto",
+          "width": "0%",
+          "value": "03MistoR$ 00% do recorte"
+        },
+        {
+          "name": "nao_identificado",
+          "width": "0%",
+          "value": "04Não identificadoR$ 00% do recorte"
+        },
+        {
+          "name": "prefeitura_plano_trabalho",
+          "width": "0%",
+          "value": "05Prefeitura / Plano de TrabalhoR$ 00% do recorte"
+        }
+      ]
+    },
+    {
+      "name": "Ranking exact value available by touch/keyboard",
+      "passed": true
+    },
+    {
+      "name": "Existing create payload is a commitment, not receipt",
+      "passed": true
+    },
+    {
+      "name": "Existing edit error preserves draft and version",
+      "passed": true
+    },
+    {
+      "name": "Closing form preserves filter",
+      "passed": true
+    },
+    {
+      "name": "Narrow content uses compact controls with sidebar",
+      "passed": true
+    },
+    {
+      "name": "Mobile tabs preserve independently mounted filters",
+      "passed": true
+    },
+    {
+      "name": "Mobile tab keyboard switches and focuses",
+      "passed": true
+    },
+    {
+      "name": "Mobile drawer shows same edition controls",
+      "passed": true
+    },
+    {
+      "name": "Mobile header identifies active edition",
+      "passed": true
+    },
+    {
+      "name": "Old confirmed entry preserves Realizado context",
+      "passed": true
+    },
+    {
+      "name": "Mobile no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "No page overflow in empty",
+      "passed": true
+    },
+    {
+      "name": "True empty received is zero",
+      "passed": true
+    },
+    {
+      "name": "No page overflow in summary-error",
+      "passed": true
+    },
+    {
+      "name": "Summary error does not present zero",
+      "passed": true
+    },
+    {
+      "name": "No page overflow in list-error",
+      "passed": true
+    },
+    {
+      "name": "List error retains canonical total independently",
+      "passed": true
+    },
+    {
+      "name": "No page overflow in revenue-negative",
+      "passed": true
+    },
+    {
+      "name": "Negative rank retains sign and left side",
+      "passed": true
+    },
+    {
+      "name": "No page overflow in loading",
+      "passed": true
+    },
+    {
+      "name": "Loading has no false financial zero",
+      "passed": true
+    },
+    {
+      "name": "No page overflow in denied",
+      "passed": true
+    },
+    {
+      "name": "Denied remains locked without financial indicators",
+      "passed": true
+    },
+    {
+      "name": "Edition switch/refresh/history readonly in dashboard",
+      "passed": true
+    },
+    {
+      "name": "Keyboard edition returns to2028 in dashboard",
+      "passed": true
+    },
+    {
+      "name": "Edition switch/refresh/history readonly in receitas-projetadas",
+      "passed": true
+    },
+    {
+      "name": "Keyboard edition returns to2028 in receitas-projetadas",
+      "passed": true
+    },
+    {
+      "name": "Edition switch/refresh/history readonly in receitas-confirmadas",
+      "passed": true
+    },
+    {
+      "name": "Keyboard edition returns to2028 in receitas-confirmadas",
+      "passed": true
+    },
+    {
+      "name": "Edition switch/refresh/history readonly in despesas-previstas",
+      "passed": true
+    },
+    {
+      "name": "Keyboard edition returns to2028 in despesas-previstas",
+      "passed": true
+    },
+    {
+      "name": "Edition switch/refresh/history readonly in despesas-realizadas",
+      "passed": true
+    },
+    {
+      "name": "Keyboard edition returns to2028 in despesas-realizadas",
+      "passed": true
+    },
+    {
+      "name": "Edition switch/refresh/history readonly in orcamento-comissoes",
+      "passed": true
+    },
+    {
+      "name": "Keyboard edition returns to2028 in orcamento-comissoes",
+      "passed": true
+    },
+    {
+      "name": "Edition switch/refresh/history readonly in patrocinios",
+      "passed": true
+    },
+    {
+      "name": "Keyboard edition returns to2028 in patrocinios",
+      "passed": true
+    },
+    {
+      "name": "Edition switch/refresh/history readonly in simulacoes",
+      "passed": true
+    },
+    {
+      "name": "Keyboard edition returns to2028 in simulacoes",
+      "passed": true
+    },
+    {
+      "name": "Edition switch/refresh/history readonly in relatorios",
+      "passed": true
+    },
+    {
+      "name": "Keyboard edition returns to2028 in relatorios",
+      "passed": true
+    },
+    {
+      "name": "No browser JavaScript errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "No external financial access",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "captures": [
+    "desktop-resized-comparison.png",
+    "desktop-ranking-comparison.png",
+    "desktop-revenue-form.png",
+    "desktop-revenue-error.png",
+    "notebook-2028-comparison.png",
+    "mobile-sidebar-editions.png",
+    "mobile-revenue-form.png",
+    "mobile-state-empty.png",
+    "mobile-state-summary-error.png",
+    "mobile-state-list-error.png",
+    "mobile-state-revenue-negative.png",
+    "mobile-state-loading.png",
+    "mobile-state-denied.png"
+  ],
+  "errors": [],
+  "blockedRequests": []
+}

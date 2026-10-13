@@ -1,0 +1,115 @@
+.financial-sidebar-edition__label {
+  margin: 0 0 10px;
+  color: oklch(var(--sidebar-foreground) / .52);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.financial-edition-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.financial-edition-switch__option {
+  position: relative;
+  min-width: 0;
+  min-height: 68px;
+  padding: 10px 12px;
+  border: 1px solid rgb(255 255 255 / .14);
+  border-radius: 10px;
+  color: inherit;
+  background: rgb(255 255 255 / .035);
+  text-align: left;
+  transition: background-color 150ms, border-color 150ms;
+}
+
+.financial-edition-switch__option:hover {
+  background: rgb(255 255 255 / .08);
+}
+
+.financial-edition-switch__option.is-active {
+  border-color: rgb(180 193 240 / .74);
+  color: rgb(248 250 255);
+  background: rgb(91 111 176 / .28);
+  box-shadow: inset 0 0 0 1px rgb(180 193 240 / .16);
+}
+
+.financial-edition-switch__option:focus-visible {
+  outline: 2px solid rgb(204 215 255);
+  outline-offset: 3px;
+}
+
+.financial-edition-switch__year {
+  display: block;
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.035em;
+  line-height: 1.3;
+}
+
+.financial-edition-switch__hint {
+  display: block;
+  margin-top: 3px;
+  color: rgb(226 232 244 / .6);
+  font-size: 11px;
+  font-weight: 450;
+}
+
+.financial-edition-switch__option.is-active .financial-edition-switch__hint {
+  color: rgb(236 241 255 / .8);
+}
+
+.financial-edition-switch__check {
+  position: absolute;
+  top: 12px;
+  right: 9px;
+  width: 13px;
+  height: 13px;
+  color: rgb(204 215 255);
+}
+
+.financial-mobile-header {
+  position: fixed;
+  z-index: 25;
+  inset: 0 0 auto;
+  display: flex;
+  height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px 0 68px;
+  border-bottom: 1px solid rgb(218 225 234);
+  background: rgb(250 252 255 / .97);
+  color: rgb(24 42 65);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.financial-mobile-header__edition {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.financial-mobile-header__edition small {
+  padding: 3px 6px;
+  border: 1px solid rgb(218 225 234);
+  border-radius: 5px;
+  color: rgb(98 111 133);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+@media (min-width: 768px) {
+  .financial-mobile-header { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .financial-edition-switch__option { transition: none; }
+}
