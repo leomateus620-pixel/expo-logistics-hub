@@ -94,3 +94,38 @@
   .f28-expense-detail-values dd { font-size: 1rem; }
   .f28-expense-dialog-footer { gap: .5rem; }
 }
+
+/* Operational dialog polish stays local to expense forms and their portals. */
+.f28-expense-dialog {
+  --expense-border: #d7dfeb;
+  --expense-muted: #52627a;
+  border: 1px solid var(--expense-border);
+  border-radius: 12px;
+  background: #fff;
+  color: #102b44;
+  font-family: Inter, system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  color-scheme: light;
+}
+.f28-expense-dialog [role=heading] { color: #102b44; font-size: 20px; line-height: 1.35; letter-spacing: -.015em; }
+.f28-expense-dialog [id$=description] { color: var(--expense-muted); font-size: 14px; line-height: 1.5; }
+.f28-expense-fields > legend { color: #102b44; font-size: 14px; letter-spacing: 0; text-transform: none; }
+.f28-expense-dialog :is(label, button) { font-size: 14px; }
+.f28-expense-dialog :is(input, select, button) { min-height: 44px; }
+.f28-expense-dialog :is(input, textarea, select) { border-color: #b5c2d6; background: #fff; color: #102b44; }
+.f28-expense-dialog button { box-shadow: none; }
+.f28-expense-dialog :is(button[type=submit], .f28-expense-category-suggestions > button) { background: #4859a6; border-color: #4859a6; color: #fff; }
+.f28-expense-dialog[data-tone=realizado] button[type=submit] { background: #1c746a; border-color: #1c746a; }
+.f28-expense-dialog[data-tone=cancelada] button[type=submit] { background: #a13746; border-color: #a13746; }
+.f28-expense-dialog :is(button, input, textarea, select):focus-visible { outline: 2px solid #4859a6; outline-offset: 2px; box-shadow: none; }
+.f28-expense-dialog :is(.f28-expense-field-help, .f28-expense-dialog-notice, .f28-expense-dialog-error) { font-size: 14px; }
+.f28-expense-fields .f28-expense-field-error { margin: 0; color: #a13746; font-size: 12px; font-weight: 600; line-height: 1.5; }
+.f28-expense-dialog [aria-invalid=true] { border-color: #a13746; background: #fdf4f5; }
+.f28-expense-dialog .f28-expense-detail-values dd { font-size: 20px; }
+.f28-expense-dialog .f28-expense-detail-section h3 { font-size: 18px; }
+@media (max-width: 540px) {
+  .f28-expense-dialog { max-height: calc(100dvh - 24px); }
+  .f28-expense-dialog :is(input, textarea, select) { font-size: 16px; }
+  .f28-expense-dialog [role=heading] { font-size: 18px; }
+}
+.f28-expense-dialog button { min-width:44px; }

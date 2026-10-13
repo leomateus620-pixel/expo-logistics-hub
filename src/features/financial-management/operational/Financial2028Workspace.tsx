@@ -43,7 +43,7 @@ export function Financial2028Workspace({ view }: { view: FinancialViewPath }) {
   else if (view === 'relatorios') content = <ReportsView />;
   else content = <PendingView view={view} />;
   return <>
-    {isRevenue || isExpense ? <header className="f28-revenue-header"><h1>{isExpense ? 'Despesas' : 'Receitas'}</h1><span>· FENASOJA <strong>2028</strong></span></header> : <header className="f28-header">
+    {isRevenue || isExpense ? <header className="f28-revenue-header" data-menu={isExpense ? 'expenses' : 'revenue'}><div className="f28-revenue-header__identity"><span className="f28-revenue-header__mark" aria-hidden="true">{isExpense ? <ReceiptText /> : <TrendingUp />}</span><h1>{isExpense ? 'Despesas' : 'Receitas'}</h1></div><span className="f28-revenue-header__edition">FENASOJA <strong>2028</strong></span></header> : <header className="f28-header">
       <span className="f28-header__icon"><copy.Icon aria-hidden="true" /></span>
       <div className="f28-header__copy"><p>{copy.eyebrow}</p><h1>{copy.title}</h1><span className="f28-header__description">{copy.description}</span></div>
       <div className="f28-header__edition">Fenasoja 2028<span>Operação financeira</span></div>

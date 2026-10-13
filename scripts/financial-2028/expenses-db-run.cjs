@@ -66,7 +66,8 @@ process.on('exit', stop);
   // Discard the test database, then create a fresh browser fixture in the same isolated cluster.
   sql(`DROP DATABASE ${database};`, 'postgres');
   bootstrap();
-  run(process.execPath, [path.join(__dirname, 'expenses-db-seed.cjs'), '--psql', psql, '--port', port]);
+  const seedScript = option('--seed-script') ? path.resolve(option('--seed-script')) : path.join(__dirname, 'expenses-db-seed.cjs');
+  run(process.execPath, [seedScript, '--psql', psql, '--port', port, '--output', output]);
   fs.writeFileSync(path.join(output, 'runtime.json'), JSON.stringify({
     boundary: 'Fresh synthetic loopback PostgreSQL cluster; no production connection or credentials.',
     postgres: run(path.join(pgBin, 'postgres'), ['--version']), database, port,

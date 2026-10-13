@@ -18,6 +18,7 @@ import {
   type FinancialSponsorship, type FundingTypeKey, type NegotiationStatus, type RevenueStatus, type SponsorTierKey,
 } from './financialOperationalApi';
 import '@/styles/financial-operational-2028-forms.css';
+import type { FinancialExpenseCapabilities } from './useFinancialExpenseCapabilities';
 
 const KEY = ['financial-operational'] as const;
 const centsOrNull = (value: string) => (value.trim() ? parseMoneyInputToCents(value) : null);
@@ -43,27 +44,27 @@ function Field({ id, label, required, hint, children }: {
   );
 }
 
-function MoneyField({ id, label, value, onChange, hint }: {
-  id: string; label: string; value: string; onChange: (v: string) => void; hint?: string;
+function MoneyField({ id, label, value, onChange, hint, disabled }: {
+  id: string; label: string; value: string; onChange: (v: string) => void; hint?: string; disabled?: boolean;
 }) {
   return (
     <Field id={id} label={label} hint={hint}>
-      {(a11y) => <Input id={id} inputMode="numeric" className="financial-2028-dialog__money" value={value} placeholder="0,00" {...a11y}
+      {(a11y) => <Input id={id} inputMode="numeric" disabled={disabled} className="financial-2028-dialog__money" value={value} placeholder="0,00" {...a11y}
         onChange={(event) => onChange(event.target.value ? formatCentsPlain(parseMoneyInputToCents(event.target.value)) : '')} />}
     </Field>
   );
 }
 
-function SelectField({ id, label, value, onChange, options, required, placeholder, hint }: {
+function SelectField({ id, label, value, onChange, options, required, placeholder, hint, disabled }: {
   id: string; label: string; value: string; onChange: (v: string) => void; options: Record<string, string>;
-  required?: boolean; placeholder?: string; hint?: string;
+  required?: boolean; placeholder?: string; hint?: string; disabled?: boolean;
 }) {
   const clearError = useContext(ClearFieldError);
   const pending = useContext(FormPending);
   return (
     <Field id={id} label={label} required={required} hint={hint}>
       {(a11y) => (
-        <Select disabled={pending} value={value} onValueChange={(next) => { clearError(id); onChange(next); }}>
+        <Select disabled={pending || disabled} value={value} onValueChange={(next) => { clearError(id); onChange(next); }}>
           <SelectTrigger id={id} aria-label={label} aria-required={required || undefined} {...a11y}><SelectValue placeholder={placeholder} /></SelectTrigger>
           <SelectContent className="financial-2028-select" collisionPadding={12}>
             {Object.entries(options).map(([key, text]) => <SelectItem key={key} value={key}>{text}</SelectItem>)}
@@ -93,10 +94,10 @@ function useFinancialSave(onDone: () => void) {
   return { ...mutation, resetRequest: () => { requestId.current = crypto.randomUUID(); } };
 }
 
-function DialogForm({ open = true, onOpenChange, title, description, context, pending, error, onSubmit, validate, action = 'Salvar', children }: {
+function DialogForm({ open = true, onOpenChange, title, description, context, pending, error, onSubmit, validate, action = 'Salvar', children, disabled = false, className = '' }: {
   open?: boolean; onOpenChange: (v: boolean) => void; title: string; description: string; context: string;
   pending: boolean; error: Error | null; onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  validate?: () => Record<string, string>; action?: string; children: ReactNode;
+  validate?: () => Record<string, string>; action?: string; children: ReactNode; disabled?: boolean; className?: string;
 }) {
   // Forms are opened from list actions rather than DialogTrigger. Keep their exact origin and scroll position.
   const opener = useRef<HTMLElement | null>(typeof document === 'undefined' ? null : document.activeElement as HTMLElement);
@@ -104,7 +105,7 @@ function DialogForm({ open = true, onOpenChange, title, description, context, pe
   const conflict = /alterado por outra pessoa|conflito/i.test(error?.message ?? '');
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (pending) return;
+    if (pending || disabled) return;
     const nextErrors = { ...validate?.() };
     event.currentTarget.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input, textarea').forEach((field) => {
       const tooShort = field.minLength > 0 && field.value.length > 0 && field.value.length < field.minLength;
@@ -126,7 +127,7 @@ function DialogForm({ open = true, onOpenChange, title, description, context, pe
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="financial-2028-dialog-overlay" />
         <div className="financial-2028-dialog-viewport">
-          <DialogPrimitive.Content className="financial-2028-dialog" onCloseAutoFocus={(event) => {
+          <DialogPrimitive.Content className={`financial-2028-dialog ${className}`} onCloseAutoFocus={(event) => {
             event.preventDefault();
             if (opener.current?.isConnected) opener.current.focus({ preventScroll: true });
           }} onEscapeKeyDown={(event) => { if (pending) event.preventDefault(); }} onPointerDownOutside={(event) => { if (pending) event.preventDefault(); }}>
@@ -147,14 +148,14 @@ function DialogForm({ open = true, onOpenChange, title, description, context, pe
                   </div>
                 ) : null}
                 <ClearFieldError.Provider value={(id) => setErrors((current) => { const next = { ...current }; delete next[id]; return next; })}>
-                  <FormPending.Provider value={pending}><FieldErrors.Provider value={errors}><fieldset className="financial-2028-dialog__fields" disabled={pending}>{children}</fieldset></FieldErrors.Provider></FormPending.Provider>
+                  <FormPending.Provider value={pending || disabled}><FieldErrors.Provider value={errors}><fieldset className="financial-2028-dialog__fields" disabled={pending || disabled}>{children}</fieldset></FieldErrors.Provider></FormPending.Provider>
                 </ClearFieldError.Provider>
               </div>
               <footer className="financial-2028-dialog__footer">
                 <p className="financial-2028-dialog__footer-hint" role={pending ? 'status' : undefined}>{pending ? 'Aguardando confirmação do servidor…' : '* Campos obrigatórios'}</p>
                 <div className="financial-2028-dialog__actions">
                   <Button type="button" variant="outline" className="financial-2028-dialog__cancel" disabled={pending} onClick={() => onOpenChange(false)}>Cancelar</Button>
-                  <Button type="submit" className="financial-2028-dialog__save" disabled={pending}>{pending ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="h-4 w-4" aria-hidden="true" />}{pending ? 'Salvando…' : action}</Button>
+                  <Button type="submit" className="financial-2028-dialog__save" disabled={pending || disabled}>{pending ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="h-4 w-4" aria-hidden="true" />}{pending ? 'Salvando…' : action}</Button>
                 </div>
               </footer>
             </form>
@@ -222,7 +223,7 @@ export function BudgetLineDialog({ budgetId, commissionName, open, onOpenChange 
   );
 }
 
-export function RevenueDialog({ edition, revenue, onClose }: { edition: FinancialEdition; revenue: FinancialRevenue | null; onClose: () => void }) {
+export function RevenueDialog({ edition, revenue, onClose, capabilities }: { edition: FinancialEdition; revenue: FinancialRevenue | null; onClose: () => void; capabilities: FinancialExpenseCapabilities }) {
   const [description, setDescription] = useState(revenue?.description ?? '');
   const [counterparty, setCounterparty] = useState(revenue?.counterparty ?? '');
   const [funding, setFunding] = useState<FundingTypeKey>(revenue?.funding_type ?? 'nao_identificado');
@@ -232,23 +233,30 @@ export function RevenueDialog({ edition, revenue, onClose }: { edition: Financia
   const [dueDate, setDueDate] = useState(revenue?.due_date ?? '');
   const [reason, setReason] = useState('');
   const save = useFinancialSave(onClose);
+  const { canEdit, canConfirm } = capabilities;
+  const verified = !capabilities.isLoading && !capabilities.isError;
+  const allowed = edition.status === 'operacional' && capabilities.canAccess && verified && (status === 'confirmada' ? canConfirm : canEdit) && (revenue?.status !== 'confirmada' || canConfirm);
+  const statusOptions = Object.fromEntries(Object.entries(REVENUE_STATUS_LABELS).filter(([key]) => key === status || (key === 'confirmada' ? canConfirm : canEdit)));
   return (
     <DialogForm onOpenChange={(v) => !v && onClose()} context="Receitas" title={revenue ? 'Editar receita' : 'Nova receita'}
+      className="financial-2028-dialog--revenue" disabled={!allowed} action="Salvar receita"
       description="Confirmação comercial não é recebimento: o caixa vem dos movimentos registrados." pending={save.isPending} error={save.error}
-      onSubmit={() => save.mutate({ entity: 'revenue', expectedVersion: revenue?.version ?? null, reason: reason || null, payload: {
+      onSubmit={() => allowed && save.mutate({ entity: 'revenue', expectedVersion: revenue?.version ?? null, reason: reason || null, payload: {
         ...(revenue ? { id: revenue.id } : { edition_id: edition.id }),
         description, counterparty, funding_type: funding, status,
         projected_cents: parseMoneyInputToCents(projected),
         confirmed_cents: status === 'confirmada' ? parseMoneyInputToCents(confirmed) : null,
         due_date: dueDate || null,
       } })}>
+      {!verified ? <p className="financial-2028-dialog__permission" role={capabilities.isError ? 'alert' : 'status'}>{capabilities.isError ? 'Não foi possível verificar suas permissões. Reabra o formulário após atualizar a consulta.' : 'Verificando permissões…'}</p>
+        : !allowed ? <p className="financial-2028-dialog__permission" role="status">{revenue?.status === 'confirmada' && !canConfirm ? 'Editar uma receita confirmada exige confirmação financeira.' : 'Seu acesso permite apenas consultar esta operação.'}</p> : null}
       <fieldset className="financial-2028-dialog__group">
         <legend>Identificação da receita</legend>
         <Field id="rev-desc" label="Descrição" required hint="Identifique a origem ou a finalidade da receita.">{(a11y) => <Input id="rev-desc" required minLength={2} value={description} onChange={(e) => setDescription(e.target.value)} {...a11y} />}</Field>
         <Field id="rev-cp" label="Contraparte" hint="Pessoa ou organização relacionada à receita, quando houver.">{(a11y) => <Input id="rev-cp" value={counterparty} onChange={(e) => setCounterparty(e.target.value)} {...a11y} />}</Field>
         <div className="financial-2028-dialog__grid">
           <SelectField id="rev-funding" label="Origem do recurso" value={funding} onChange={(v) => setFunding(v as FundingTypeKey)} options={FUNDING_TYPE_LABELS} />
-          <SelectField id="rev-status" label="Situação" value={status} onChange={(v) => setStatus(v as RevenueStatus)} options={REVENUE_STATUS_LABELS} />
+          <SelectField id="rev-status" label="Situação" value={status} onChange={(v) => setStatus(v as RevenueStatus)} options={statusOptions} hint={!canConfirm ? 'Confirmar receita exige confirmação financeira.' : undefined} />
         </div>
       </fieldset>
       <fieldset className="financial-2028-dialog__group">

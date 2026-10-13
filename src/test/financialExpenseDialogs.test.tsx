@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CategoriesDialog, ExpenseDetailDialog, ExpenseFormDialog, TransitionDialog } from '@/features/financial-management/operational/FinancialExpenseDialogs';
 import { canTransitionExpense } from '@/features/financial-management/operational/financialExpenseActions';
@@ -46,6 +47,39 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 describe('formulários de despesas 2028', () => {
+  it('associa o erro ao campo obrigatório, move o foco e limpa o erro ao corrigir', async () => {
+    const user = userEvent.setup();
+    render(<ExpenseFormDialog org="org" edition={edition} value="new-prevista" onClose={vi.fn()} categories={[]} commissions={[]} capabilities={capabilities} />);
+    const title = screen.getByLabelText(/Descrição da despesa/);
+    const projected = screen.getByLabelText(/Valor projetado/);
+    await user.click(screen.getByRole('button', { name: 'Salvar despesa' }));
+    const titleError = await screen.findByRole('alert');
+    expect(titleError).toHaveTextContent('Informe uma descrição com pelo menos 2 caracteres.');
+    expect(title.closest('label')).toContainElement(titleError);
+    expect(title).toHaveAttribute('aria-invalid', 'true');
+    expect(title).toHaveAttribute('aria-describedby', titleError.id);
+    expect(title).toHaveFocus();
+    expect(mocked.save).not.toHaveBeenCalled();
+    await user.type(title, 'Locação planejada');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(title).not.toHaveAttribute('aria-invalid');
+    expect(title).not.toHaveAttribute('aria-describedby');
+
+    await user.click(screen.getByRole('button', { name: 'Salvar despesa' }));
+    const amountError = await screen.findByRole('alert');
+    expect(amountError).toHaveTextContent('Informe o valor projetado.');
+    expect(projected.closest('label')).toContainElement(amountError);
+    expect(projected).toHaveAttribute('aria-describedby', amountError.id);
+    expect(projected).toHaveFocus();
+    expect(mocked.save).not.toHaveBeenCalled();
+    await user.type(projected, '500,00');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(projected).not.toHaveAttribute('aria-invalid');
+    await user.click(screen.getByRole('button', { name: 'Salvar despesa' }));
+    expect(mocked.save).toHaveBeenCalledOnce();
+    expect(mocked.save.mock.calls[0][0].payload).toMatchObject({ title: 'Locação planejada', status: 'prevista', planned_cents: 50000 });
+  });
+
   it('retry de realizada direta preserva chave, centavos e ausência de previsão', async () => {
     const user = userEvent.setup();
     mocked.save.mockRejectedValueOnce(new FinancialExpenseError('network', 'Falha de conexão.'));
@@ -104,6 +138,29 @@ describe('formulários de despesas 2028', () => {
 });
 
 describe('categorias com versionamento e idempotência', () => {
+  it('devolve o foco ao botão que abriu as categorias após fechar ou usar Escape', async () => {
+    function CategoriesHarness() {
+      const [open, setOpen] = useState(false);
+      return <><button type="button" onClick={() => setOpen(true)}>Abrir categorias</button>{open && <CategoriesDialog org="org" onClose={() => setOpen(false)} capabilities={capabilities} />}</>;
+    }
+    const user = userEvent.setup();
+    render(<CategoriesHarness />);
+    const trigger = screen.getByRole('button', { name: 'Abrir categorias' });
+    await user.click(trigger);
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toContainElement(document.activeElement as HTMLElement);
+    await user.click(within(dialog.querySelector('.f28-expense-dialog-footer') as HTMLElement).getByRole('button', { name: 'Fechar' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(trigger).toHaveFocus());
+
+    await user.click(trigger);
+    await screen.findByRole('dialog');
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(trigger).toHaveFocus());
+    expect(mocked.categorySave).not.toHaveBeenCalled();
+  });
+
   it('renomeia em formulário integrado e mantém a chave após falha de rede', async () => {
     const user = userEvent.setup();
     mocked.categorySave.mockRejectedValueOnce(new FinancialExpenseError('network', 'Falha de conexão.'));

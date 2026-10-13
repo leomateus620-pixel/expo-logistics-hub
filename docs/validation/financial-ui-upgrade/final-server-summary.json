@@ -1,0 +1,64 @@
+{
+  "boundary": "Same loopback database used by frozen and current UI after HTTP checks.",
+  "manualRevenueCount": 7,
+  "summary": {
+    "budget": {
+      "count": 0,
+      "cap_cents": 0,
+      "line_count": 0,
+      "planned_cents": 0,
+      "uncapped_count": 0,
+      "committed_cents": 27575000
+    },
+    "edition": {
+      "id": "9f722828-1e02-4ec9-839e-62fb1813ab6e",
+      "code": 2028,
+      "label": "Fenasoja 2028",
+      "org_id": "a0000000-0000-0000-0000-000000000001",
+      "status": "operacional",
+      "created_at": "2026-10-13T15:06:36.234645-03:00",
+      "period_end": "2028-06-20",
+      "period_start": "2026-06-04"
+    },
+    "revenue": {
+      "count": 7,
+      "confirmed_cents": 33000000,
+      "projected_cents": 44500000
+    },
+    "expenses": {
+      "count": 31,
+      "paid_cents": 4500000,
+      "overdue_count": 2,
+      "planned_cents": 36900300,
+      "committed_cents": 27575000,
+      "payable_open_cents": 23075000
+    },
+    "revenues": {
+      "overdue_count": 2,
+      "received_cents": 23500000,
+      "confirmed_cents": 54000000,
+      "projected_cents": 77000000,
+      "receivable_open_cents": 30500000
+    },
+    "movements": {
+      "count": 11,
+      "inflow_cents": 24506002,
+      "outflow_cents": 5506002
+    },
+    "obligations": {
+      "paid_cents": 4500000,
+      "overdue_count": 4,
+      "received_cents": 23500000,
+      "inconsistent_count": 0,
+      "payable_open_cents": 23075000,
+      "receivable_open_cents": 30500000
+    },
+    "sponsorship": {
+      "count": 3,
+      "in_kind_cents": 0,
+      "declared_cents": 0,
+      "confirmed_cents": 21000000,
+      "projected_cents": 32500000
+    }
+  }
+}

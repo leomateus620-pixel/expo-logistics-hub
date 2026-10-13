@@ -269,3 +269,11 @@
   .financial-2028-select,
   .financial-2028-select * { animation: none !important; transition: none !important; }
 }
+
+/* Revenue form typography follows the comparison, without changing other workspaces. */
+.financial-2028-dialog--revenue { --financial-indigo: #4859a6; border-radius: 12px; }
+.financial-2028-dialog--revenue .financial-2028-dialog__eyebrow { font-size: 12px; letter-spacing: .025em; }
+.financial-2028-dialog--revenue .financial-2028-dialog__title { font-size: 20px; letter-spacing: -.015em; }
+.financial-2028-dialog--revenue :is(.financial-2028-dialog__description, .financial-2028-dialog__group legend, .financial-2028-dialog__field > label, .financial-2028-dialog__actions > button) { font-size: 14px; }
+.financial-2028-dialog--revenue :is(.financial-2028-dialog__hint, .financial-2028-dialog__field-error, .financial-2028-dialog__footer-hint) { font-size: 12px; }
+.financial-2028-dialog__permission { margin: 0; padding: 12px; border: 1px solid #d7dfeb; border-radius: 8px; background: #f4f6fa; color: #52627a; font-size: 14px; line-height: 1.5; }

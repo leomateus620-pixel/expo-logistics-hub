@@ -1,0 +1,11 @@
+{
+  "keyboardAndReload": "65/35 persisted after immediate reload; Enter and doubleclick returned50/50; mouse40/60; no new RPCs",
+  "drag": {
+    "counts": "{\"financial_can\":4,\"financial_edition_summary\":1}",
+    "panels": [
+      "40.4",
+      "59.6"
+    ]
+  },
+  "fix": "Flush last local layout on pagehide/unmount beforedebounce180ms"
+}

@@ -37,6 +37,17 @@ describe('gráficos operacionais de despesas', () => {
     expect(screen.getByText('Projetado · R$ 1.000,00')).toBeInTheDocument();
   });
 
+  it('mostra apenas o percentual e mantém a interpretação da escala no ícone de ajuda', async () => {
+    const result = render(<FinancialExpenseRanking model={adaptExpenseComparison(aggregate)} side="projetado" dimension="commission" />);
+    const percentage = result.container.querySelector('.f28-expense-ranking__share') as HTMLElement;
+    expect(percentage).toHaveTextContent(/^100%$/);
+    expect(percentage).toHaveAttribute('aria-label', '100% do total projetado');
+    expect(result.container).not.toHaveTextContent('As barras usam a mesma escala');
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Como ler projetado por comissão' }));
+    expect(screen.getByText(/As barras usam a mesma escala monetária nos dois painéis/)).toHaveTextContent(/até R\$\s1\.000,00/);
+    expect(screen.getByText(/O percentual indica a participação/)).toBeInTheDocument();
+  });
+
   it('compara os mesmos grupos na mesma ordem, identifica sem previsão e nunca apresenta soma', async () => {
     const result = render(<FinancialExpenseAnalyses model={adaptExpenseComparison(aggregate)} />);
     await userEvent.setup().click(screen.getByText('Análises complementares'));

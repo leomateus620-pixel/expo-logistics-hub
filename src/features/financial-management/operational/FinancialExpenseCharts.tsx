@@ -1,8 +1,9 @@
 import { memo, useId, useMemo, useState } from 'react';
-import { ChevronDown, HelpCircle } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { FinancialDistributionDonutChart, type FinancialDistributionDatum } from '../components/FinancialCharts';
 import { formatBRL, formatCompactBRL, formatPercentage } from '../utils/financialFormatters';
+import { FinancialComparisonHelp as Help } from './FinancialComparisonPrimitives';
 import {
   expenseChartShare, expenseChartValue,
   type ExpenseChartDimension, type ExpenseChartModel, type ExpenseChartRow, type ExpenseChartSide,
@@ -53,16 +54,15 @@ export const FinancialExpenseRanking = memo(function FinancialExpenseRanking({ m
   const id = useId();
   const data = model?.[dimension];
   return <section className="f28-expense-chart f28-expense-ranking" data-side={side} data-dimension={dimension} aria-labelledby={id}>
-    <header className="f28-expense-chart__header"><h3 id={id}>{dimension === 'category' ? 'Ranking por categoria' : 'Distribuição por comissão'}</h3><small>{sideLabel(side)}</small></header>
+    <header className="f28-expense-chart__header"><h3 id={id}>{dimension === 'category' ? 'Ranking por categoria' : 'Distribuição por comissão'}</h3>{data && data.rows.length > 0 && <Help label={`Como ler ${sideLabel(side).toLocaleLowerCase('pt-BR')} por ${dimensionLabel(dimension)}`}><p>As barras usam a mesma escala monetária nos dois painéis: {data.maximumCents === null ? 'indisponível' : `até ${exactValue(data.maximumCents)}`}.</p><p>O percentual indica a participação de cada grupo no total {sideLabel(side).toLocaleLowerCase('pt-BR')}. Toque no valor para consultar a quantia exata.</p></Help>}</header>
     {!data || data.rows.length === 0 ? <ChartState loading={loading} error={error} filtered={filtered} /> : <>
-      <p className="f28-expense-chart__scale">Escala comum · {data.maximumCents === null ? 'indisponível' : `até ${formatCompactBRL(data.maximumCents / 100)}`}</p>
       <ol className="f28-expense-ranking__list" aria-label={`${sideLabel(side)} por ${dimensionLabel(dimension)}`}>
         {data.rankings[side].map((row, index) => {
           const value = expenseChartValue(row, side);
           const percentage = expenseChartShare(row, side);
           return <li key={row.key} data-group={row.key} data-unclassified={row.unclassified || undefined}>
             <div className="f28-expense-ranking__heading"><span className="f28-expense-ranking__position" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><RowName row={row} /><ChartMoney row={row} side={side} /></div>
-            <span className="f28-expense-ranking__share">{percentage === null ? 'Participação indisponível' : `${formatPercentage(percentage)} do ${side === 'projetado' ? 'projetado' : 'realizado'}`}</span>
+            <span className="f28-expense-ranking__share" aria-label={percentage === null ? 'Participação indisponível' : `${formatPercentage(percentage)} do total ${sideLabel(side).toLocaleLowerCase('pt-BR')}`}>{percentage === null ? '—' : formatPercentage(percentage)}</span>
             {value === null ? <span className="f28-expense-chart__unavailable">Valor do grupo não fornecido</span> : <div className="f28-expense-chart__track" aria-hidden="true"><span style={{ width: barWidth(value, data.maximumCents) }} /></div>}
           </li>;
         })}
@@ -112,7 +112,6 @@ function deviationLabel(row: ExpenseChartRow): string {
 
 const ExpensePairedComparison = memo(function ExpensePairedComparison({ data }: { data: ExpenseDimensionChartModel }) {
   return <div className="f28-expense-paired">
-    <p className="f28-expense-chart__scale">Mesmos grupos, ordem e escala · {data.maximumCents === null ? 'escala indisponível' : `até ${formatCompactBRL(data.maximumCents / 100)}`}</p>
     <ol className="f28-expense-paired__list" aria-label={`Projetado e realizado por ${dimensionLabel(data.dimension)}`}>
       {data.rows.map(row => <li key={row.key} data-group={row.key}>
         <div className="f28-expense-paired__heading"><RowName row={row} /><span className="f28-expense-paired__deviation" data-overrun={row.deviationCents !== null && row.deviationCents > 0 || undefined}>{deviationLabel(row)}</span></div>
@@ -132,15 +131,15 @@ export const FinancialExpenseAnalyses = memo(function FinancialExpenseAnalyses({
   const [visited, setVisited] = useState(false);
   const id = useId();
   return <details className="f28-expense-analyses" onToggle={event => { if (event.currentTarget.open) setVisited(true); }}>
-    <summary><span><strong>Análises complementares</strong><small>Composição e comparação do mesmo recorte</small></span><ChevronDown aria-hidden="true" /></summary>
+    <summary><strong>Análises complementares</strong><ChevronDown aria-hidden="true" /></summary>
     {visited && <div className="f28-expense-analyses__body">
       {!model || model.category.rows.length === 0 ? <ChartState loading={loading} error={error} filtered={filtered} /> : <>
         <section className="f28-expense-analyses__comparison" aria-labelledby={`${id}-comparison`}>
-          <header className="f28-expense-chart__header"><h3 id={`${id}-comparison`}>Projetado × Realizado</h3><Popover><PopoverTrigger asChild><button className="f28-expense-chart__help" type="button" aria-label="Como interpretar o desvio"><HelpCircle aria-hidden="true" /></button></PopoverTrigger><PopoverContent className="f28-expense-chart__popover"><strong>Desvio = realizado − projetado</strong><p>Positivo: compromisso acima da previsão. Negativo: pode representar projeções ainda não realizadas.</p><p>Sem previsão: o percentual de comparação não está disponível. Realizado representa compromisso; pago representa liquidação.</p></PopoverContent></Popover></header>
+          <header className="f28-expense-chart__header"><h3 id={`${id}-comparison`}>Projetado × Realizado</h3><Help label="Como interpretar o desvio"><strong>Desvio = realizado − projetado</strong><p>Positivo: compromisso acima da previsão. Negativo: pode representar projeções ainda não realizadas.</p><p>Sem previsão: o percentual de comparação não está disponível. Realizado representa compromisso; pago representa liquidação.</p><p>Os painéis comparam os mesmos grupos na mesma ordem e escala monetária: {model[dimension].maximumCents === null ? 'indisponível' : `até ${exactValue(model[dimension].maximumCents)}`}.</p></Help></header>
           <label className="f28-expense-analyses__dimension">Comparar por<select value={dimension} onChange={event => setDimension(event.target.value as ExpenseChartDimension)}><option value="category">Categoria</option><option value="commission">Comissão</option></select></label>
           <ExpensePairedComparison data={model[dimension]} />
         </section>
-        <section className="f28-expense-analyses__composition" aria-labelledby={`${id}-composition`}><h3 id={`${id}-composition`}>Composição percentual por categoria</h3><div className="f28-expense-analyses__compositions"><ExpenseCategoryComposition data={model.category} side="projetado" /><ExpenseCategoryComposition data={model.category} side="realizado" /></div></section>
+        <section className="f28-expense-analyses__composition" aria-labelledby={`${id}-composition`}><header className="f28-expense-chart__header"><h3 id={`${id}-composition`}>Composição percentual por categoria</h3><Help label="Como ler a composição por categoria"><p>A participação considera somente o total de cada lado, sem somar projetado e realizado. Os grupos e valores pertencem ao mesmo recorte agregado.</p></Help></header><div className="f28-expense-analyses__compositions"><ExpenseCategoryComposition data={model.category} side="projetado" /><ExpenseCategoryComposition data={model.category} side="realizado" /></div></section>
       </>}
     </div>}
   </details>;

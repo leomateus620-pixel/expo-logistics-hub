@@ -1,0 +1,27 @@
+{
+  "initial": {
+    "counts": "{\"financial_can\":4,\"financial_expense_comparison\":1,\"financial_list_expenses\":1,\"financial_list_categories\":1}",
+    "handle": {
+      "bottom": 509.3984375,
+      "height": 44,
+      "left": 855.5,
+      "right": 872.5,
+      "top": 465.3984375,
+      "width": 17,
+      "x": 855.5,
+      "y": 465.3984375
+    },
+    "panels": [
+      "50",
+      "50"
+    ]
+  },
+  "drag": {
+    "counts": "{\"financial_can\":4,\"financial_expense_comparison\":1,\"financial_list_expenses\":1,\"financial_list_categories\":1}",
+    "panels": [
+      "40.4",
+      "59.6"
+    ]
+  },
+  "keyboardAndReload": "65/35 persisted; Enter and restore button returned50/50; RPC counts unchanged duringkeyboard/mouse drag"
+}

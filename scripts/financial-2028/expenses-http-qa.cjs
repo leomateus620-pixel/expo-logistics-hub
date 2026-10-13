@@ -3,6 +3,8 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const { randomUUID }=require('node:crypto');
+const args=process.argv.slice(2);
+const output=path.resolve(args.includes('--output')?args[args.indexOf('--output')+1]:'docs/validation/financial-expenses-comparison');
 const origin='http://127.0.0.1:5580';
 const report={boundary:'Signed local fixture JWTs → actual PostgREST → migrated PostgreSQL RPCs/RLS; no production access.',
   checks:[],limitation:'Local fixture session endpoint replaces Supabase Auth. Real JWT signatures, role claims and financial permissions are verified; remote Supabase login is not tested.'};
@@ -73,6 +75,6 @@ const success=async promise=>{const result=await promise;assert.equal(result.sta
   report.summary={passed:report.checks.filter(row=>row.passed).length,total:report.checks.length,initialExpenseCount:initial.total,
     testExpenseId:expense.id,testCategoryId:category.id};
 })().catch(error=>{report.error=error.message;process.exitCode=1;console.error(error.message);}).finally(()=>{
-  const output=path.resolve('docs/validation/financial-expenses-comparison');fs.mkdirSync(output,{recursive:true});
+  fs.mkdirSync(output,{recursive:true});
   fs.writeFileSync(path.join(output,'authenticated-http-report.json'),JSON.stringify(report,null,2));
 });

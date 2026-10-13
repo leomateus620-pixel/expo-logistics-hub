@@ -1,0 +1,10 @@
+{
+  "browser": "Chrome native Cmd+Plus5 from100% to200%, macOSretina baseDPR2→4",
+  "width": 600,
+  "height": 322,
+  "documentWidth": 600,
+  "horizontalOverflow": false,
+  "expenseFormFooterVisible": true,
+  "bodyScrollable": true,
+  "nativeZoomReset": "Cmd+0"
+}

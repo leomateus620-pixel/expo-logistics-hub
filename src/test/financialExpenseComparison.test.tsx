@@ -20,14 +20,16 @@ beforeEach(() => {
   vi.mocked(listExpenses).mockResolvedValue({ total: 30, limit: 25, offset: 0, items: [expense] });
   vi.mocked(listExpenseCategories).mockResolvedValue([]);
 });
-afterEach(cleanup);
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers(); });
 describe('comparação de despesas 2028', () => {
   it('preserva previsão de realizada e usa os totais do servidor em todos os painéis', async () => {
     mount(); await within(metric('Total realizado')).findByRole('button', { name: /12\.000,00/ });
     expect(within(metric('Total projetado')).getByRole('button', { name: /10\.000,00/ })).toBeInTheDocument();
     expect(within(metric('Pago líquido')).getByRole('button', { name: /4\.000,00/ })).toBeInTheDocument();
     expect(within(metric('Saldo a pagar')).getByRole('button', { name: /8\.000,00/ })).toBeInTheDocument();
-    expect(metric('Total projetado')).toHaveTextContent('Inclui previsões preservadas');
+    expect(screen.queryByText('Inclui previsões preservadas · exclui canceladas')).not.toBeInTheDocument();
+    fireEvent.click(within(metric('Total projetado')).getByRole('button', { name: 'Ajuda sobre Total projetado' }));
+    expect(await screen.findByText('Inclui previsões preservadas · exclui canceladas')).toBeInTheDocument();
     expect(fetchExpenseComparison).toHaveBeenCalledTimes(1);
   });
   it('paginação consulta somente a listagem e busca com botão atualiza o recorte inteiro', async () => {
@@ -43,7 +45,7 @@ describe('comparação de despesas 2028', () => {
     expect(screen.getByRole('searchbox')).toHaveValue('');
   });
   it('mantém painéis, filtro e consultas ao alternar abas', async () => {
-    const result = mount('realizado'); await within(metric('Total realizado')).findByRole('button');
+    const result = mount('realizado'); await within(metric('Total realizado')).findByRole('button', { name: /Ver valor exato/ });
     const panels = [...result.container.querySelectorAll('[data-expense-panel]')];
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'rascunho' } });
     fireEvent.keyDown(screen.getByRole('tab', { name: 'Realizado' }), { key: 'Home' });
@@ -51,6 +53,48 @@ describe('comparação de despesas 2028', () => {
     expect([...result.container.querySelectorAll('[data-expense-panel]')]).toEqual(panels);
     expect(screen.getByRole('searchbox')).toHaveValue('rascunho');
     expect(fetchExpenseComparison).toHaveBeenCalledTimes(1); expect(listExpenses).toHaveBeenCalledTimes(1);
+  });
+  it('recolhe todos os seletores no mobile e remove um filtro sem perder os demais', async () => {
+    vi.stubGlobal('ResizeObserver', class {
+      constructor(private callback: ResizeObserverCallback) {}
+      observe(target: Element) { this.callback([{ target, contentRect: { width: 390, height: 600 } } as ResizeObserverEntry], this as unknown as ResizeObserver); }
+      unobserve() {}
+      disconnect() {}
+    });
+    const result = mount();
+    await within(metric('Total projetado')).findByRole('button', { name: /Ver valor exato/ });
+    const filters = result.container.querySelector('.f28-expense-filters') as HTMLElement;
+    expect(result.container.querySelector('.f28-expense-comparison')).toHaveAttribute('data-compact', 'true');
+    expect(filters).not.toHaveAttribute('open');
+    expect(screen.getByRole('combobox', { name: 'Categoria' }).closest('details')).toBe(filters);
+    expect(result.container.querySelector('.f28-expense-toolbar > select')).toBeNull();
+    fireEvent.click(within(filters).getByText('Filtros'));
+    fireEvent.change(within(filters).getByRole('combobox', { name: 'Categoria' }), { target: { value: 'none' } });
+    fireEvent.change(within(filters).getByRole('combobox', { name: 'Comissão' }), { target: { value: 'c' } });
+    fireEvent.change(within(filters).getByRole('combobox', { name: 'Situação' }), { target: { value: 'realizada' } });
+    fireEvent.change(within(filters).getByLabelText('De'), { target: { value: '2028-01-01' } });
+    await waitFor(() => expect(fetchExpenseComparison).toHaveBeenLastCalledWith('qa-org', edition.id, { date_field: 'planned_on', category_id: 'none', commission_id: 'c', status: 'realizada', from: '2028-01-01' }));
+    expect(within(filters).getByLabelText('4 filtros ativos')).toBeInTheDocument();
+    expect(within(result.container.querySelector('.f28-expense-scope') as HTMLElement).getByRole('status')).toHaveTextContent('Período por data prevista');
+    fireEvent.click(screen.getByRole('button', { name: 'Remover filtro Sem categoria' }));
+    await waitFor(() => expect(fetchExpenseComparison).toHaveBeenLastCalledWith('qa-org', edition.id, { date_field: 'planned_on', category_id: '', commission_id: 'c', status: 'realizada', from: '2028-01-01' }));
+    expect(screen.getByRole('button', { name: 'Remover filtro Comissão' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Remover filtro De 01/01/2028' })).toBeInTheDocument();
+  });
+  it('explica o atalho de vencimento e mantém o recorte e as datas nas duas consultas', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-10-13T15:00:00Z'));
+    vi.mocked(fetchExpenseComparison).mockResolvedValue({ ...comparison, totals: { ...comparison.totals, overdue_count: 2, overdue_cents: 30000 } });
+    const result = mount('realizado');
+    await screen.findByRole('button', { name: 'Ver despesas por vencimento' });
+    (result.container.querySelector('.f28-expense-ledger-section') as HTMLElement).scrollIntoView = vi.fn();
+    expect(screen.queryByText('A listagem por vencimento também inclui despesas quitadas.')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Sobre a consulta por vencimento' }));
+    expect(await screen.findByText('A listagem por vencimento também inclui despesas quitadas.')).toBeInTheDocument();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    fireEvent.click(screen.getByRole('button', { name: 'Ver despesas por vencimento' }));
+    await waitFor(() => expect(fetchExpenseComparison).toHaveBeenLastCalledWith('qa-org', edition.id, { date_field: 'due_date', status: 'realizada', from: '', to: '2026-10-12' }));
+    expect(listExpenses).toHaveBeenLastCalledWith('qa-org', edition.id, { date_field: 'due_date', status: 'realizada', from: '', to: '2026-10-12' }, 25, 0);
   });
   it('volta à última página válida se uma atualização reduzir o recorte', async () => {
     vi.mocked(listExpenses).mockResolvedValueOnce({ total: 30, limit: 25, offset: 0, items: [expense] })
