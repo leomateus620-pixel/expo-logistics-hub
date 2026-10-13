@@ -29,6 +29,13 @@
       "when": 1791843308475,
       "tag": "0003_ccpf_conselho_unit_type",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791859826804,
+      "tag": "0004_financial_expenses_2028_stage1",
+      "breakpoints": true
     }
   ]
 }
