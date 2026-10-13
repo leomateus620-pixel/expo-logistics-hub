@@ -31,12 +31,15 @@ export default function CommissionSidebar({ module, menuItems, mobileOpen, onMob
   const ModuleIcon = module.icon;
   const sourceItems = menuItems ?? module.menus;
   const items = isFinancial && edition === '2028'
-    ? sourceItems.filter((item) => item.path !== 'receitas-confirmadas').map((item) => (
-      item.path === 'receitas-projetadas' ? { ...item, label: 'Receitas' } : item
+    ? sourceItems.filter((item) => item.path !== 'receitas-confirmadas' && item.path !== 'despesas-realizadas').map((item) => (
+      item.path === 'receitas-projetadas' ? { ...item, label: 'Receitas' }
+        : item.path === 'despesas-previstas' ? { ...item, label: 'Despesas' } : item
     ))
     : sourceItems;
   const isRevenueView = location.pathname === getModuleRoute(module, 'receitas-projetadas')
     || location.pathname === getModuleRoute(module, 'receitas-confirmadas');
+  const isExpenseView = location.pathname === getModuleRoute(module, 'despesas-previstas')
+    || location.pathname === getModuleRoute(module, 'despesas-realizadas');
   const openButtonRef = useRef<HTMLButtonElement>(null);
   const mobileDrawerRef = useRef<HTMLDivElement>(null);
 
@@ -143,7 +146,8 @@ export default function CommissionSidebar({ module, menuItems, mobileOpen, onMob
           const Icon = item.icon;
           let target = item.path.startsWith('/') ? item.path : getModuleRoute(module, item.path);
           if (isFinancial) {
-            if (edition === '2028' && item.path === 'receitas-projetadas' && isRevenueView) {
+            if (edition === '2028' && ((item.path === 'receitas-projetadas' && isRevenueView)
+              || (item.path === 'despesas-previstas' && isExpenseView))) {
               // A entrada anterior continua a representar o contexto que o usuário abriu.
               target = location.pathname;
             }

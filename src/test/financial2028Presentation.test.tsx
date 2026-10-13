@@ -11,6 +11,10 @@ vi.mock('@/hooks/useOrgCommissions', () => ({ useOrgCommissions: () => ({ commis
   { id: 'qa-c1', nome: 'Comissão de teste', slug: 'qa' }, { id: 'qa-c2', nome: 'Comissão disponível', slug: 'qa2' },
 ] }) }));
 vi.mock('@/hooks/use-toast', () => ({ toast: vi.fn() }));
+// Workspace routing is verified here; authenticated expense behavior has its own integration tests.
+vi.mock('@/features/financial-management/operational/Financial2028Expenses', () => ({
+  Financial2028Expenses: ({ focus }: { focus: string }) => <div aria-label={`Despesas compartilhadas ${focus}`} />,
+}));
 vi.mock('@/features/financial-management/operational/financialOperationalApi', async (original) => ({
   ...await original<typeof import('@/features/financial-management/operational/financialOperationalApi')>(),
   fetchEditions: vi.fn(), fetchBudgets: vi.fn(), fetchBudgetLines: vi.fn(), fetchEditionSummary: vi.fn(), fetchRevenues: vi.fn(), fetchSponsorships: vi.fn(), saveFinancialRecord: vi.fn(),
@@ -165,9 +169,16 @@ describe('apresentação operacional Financeiro 2028', () => {
     expect(revenuePanel('realizado').queryByText('Expectativa de teste')).not.toBeInTheDocument();
     expect(revenuePanel('projetado').getAllByText('Expectativa de teste').length).toBeGreaterThan(0);
   });
-  it.each(['despesas-previstas','despesas-realizadas','simulacoes'] as const)('explicita indisponibilidade operacional em %s', async view => {
-    mount(view); await waitFor(()=>expect(screen.queryByText(/Abrindo Fenasoja/)).not.toBeInTheDocument());
-    await screen.findByRole('heading',{name:view === 'simulacoes' ? 'Cenários operacionais ainda indisponíveis' : 'Livro de despesas ainda indisponível'});
+  it.each(['despesas-previstas','despesas-realizadas'] as const)('abre despesas compartilhadas com foco correspondente em %s', async view => {
+    mount(view);
+    await screen.findByLabelText(`Despesas compartilhadas ${view === 'despesas-previstas' ? 'projetado' : 'realizado'}`);
+    expect(screen.getByRole('heading', { name: 'Despesas', level: 1 })).toBeInTheDocument();
+    expect(document.querySelector('.f28-header')).not.toBeInTheDocument();
+    expect(saveFinancialRecord).not.toHaveBeenCalled();
+  });
+  it('explicita indisponibilidade de cenários operacionais', async () => {
+    mount('simulacoes');
+    await screen.findByRole('heading',{name:'Cenários operacionais ainda indisponíveis'});
     expect(screen.queryByRole('button',{name:'Salvar'})).not.toBeInTheDocument();
     expect(saveFinancialRecord).not.toHaveBeenCalled();
   });

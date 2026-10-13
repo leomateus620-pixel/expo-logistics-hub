@@ -55,6 +55,17 @@ describe('edição financeira na sidebar', () => {
     expect(historical).toHaveFocus();
     expect(screen.getByRole('link', { name: 'Receitas Projetadas' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Receitas Confirmadas' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Despesas Previstas' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Despesas Realizadas' })).toBeInTheDocument();
+  });
+
+  it('unifica despesas e preserva o foco da rota realizada em 2028', () => {
+    renderFinancialSidebar(`${basePath}/despesas-realizadas?edicao=2028`);
+    const expenses = screen.getByRole('link', { name: 'Despesas' });
+    expect(expenses).toHaveAttribute('aria-current', 'page');
+    expect(expenses).toHaveAttribute('href', `${basePath}/despesas-realizadas?edicao=2028`);
+    expect(screen.queryByRole('link', { name: 'Despesas Previstas' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Despesas Realizadas' })).not.toBeInTheDocument();
   });
 
   it('mantém a edição lembrada nesta aba ao reabrir outra tela sem parâmetro', () => {

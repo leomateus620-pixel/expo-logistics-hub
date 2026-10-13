@@ -29,6 +29,7 @@ export function Financial2028Workspace({ view }: { view: FinancialViewPath }) {
   const edition = editions.data?.find((e) => e.code === 2028);
   const copy = viewCopy[view];
   const isRevenue = view === 'receitas-projetadas' || view === 'receitas-confirmadas';
+  const isExpense = view === 'despesas-previstas' || view === 'despesas-realizadas';
   let content;
   if (!orgId || editions.isLoading) content = <Financial2028Loading label="Abrindo Fenasoja 2028…" />;
   else if (editions.error instanceof FinancialNotActivatedError) content = <Financial2028State tone="locked" title="Financeiro 2028 ainda não ativado">A estrutura de cadastros está pronta, mas o banco ainda não recebeu a atualização. Ela só será aplicada com autorização.</Financial2028State>;
@@ -42,7 +43,7 @@ export function Financial2028Workspace({ view }: { view: FinancialViewPath }) {
   else if (view === 'relatorios') content = <ReportsView />;
   else content = <PendingView view={view} />;
   return <>
-    {isRevenue ? <header className="f28-revenue-header"><h1>Receitas</h1><span>FENASOJA <strong>2028</strong></span></header> : <header className="f28-header">
+    {isRevenue || isExpense ? <header className="f28-revenue-header"><h1>{isExpense ? 'Despesas' : 'Receitas'}</h1><span>· FENASOJA <strong>2028</strong></span></header> : <header className="f28-header">
       <span className="f28-header__icon"><copy.Icon aria-hidden="true" /></span>
       <div className="f28-header__copy"><p>{copy.eyebrow}</p><h1>{copy.title}</h1><span className="f28-header__description">{copy.description}</span></div>
       <div className="f28-header__edition">Fenasoja 2028<span>Operação financeira</span></div>

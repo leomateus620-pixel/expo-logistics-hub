@@ -1,0 +1,132 @@
+/* Expenses only: financial sources and the historical 2026 presentation are preserved. */
+.financial-operational-2028 .f28-expense-comparison { min-width:0; container:expense-comparison / inline-size; display:grid; grid-template-columns:minmax(0,1fr); gap:1rem; }
+.financial-operational-2028 .f28-expense-toolbar { display:flex; gap:.55rem; align-items:start; flex-wrap:wrap; min-width:0; }
+.financial-operational-2028 .f28-expense-search { display:flex; align-items:center; gap:.4rem; flex:1 1 15rem; min-width:0; border:1px solid #d7dfeb; background:white; border-radius:.6rem; padding:.25rem .4rem; }
+.financial-operational-2028 .f28-expense-search > svg { width:1rem; color:#718095; flex-shrink:0; }
+.financial-operational-2028 .f28-expense-search input { width:100%; min-width:0; outline:none; background:transparent; font-size:.75rem; min-height:1.9rem; }
+.financial-operational-2028 .f28-expense-search:focus-within { outline:2px solid #697ab8; outline-offset:2px; }
+.financial-operational-2028 .f28-expense-search button { font-size:.72rem; font-weight:600; color:#3c4d94; padding:.3rem; min-height:1.9rem; border-radius:.3rem; }
+.financial-operational-2028 .f28-expense-search button svg { width:1rem; }
+.financial-operational-2028 .f28-expense-toolbar > select { flex:1 1 9.5rem; max-width:15rem; }
+.financial-operational-2028 .f28-expense-toolbar :is(select,input[type=date]) { min-width:0; min-height:2.5rem; padding:.45rem .6rem; border:1px solid #d7dfeb; border-radius:.55rem; background:white; font-size:.72rem; color:#33465c; }
+.financial-operational-2028 .f28-expense-filters { flex:1 1 100%; order:5; min-width:0; }
+.financial-operational-2028 .f28-expense-filters summary { display:flex; align-items:center; gap:.35rem; width:max-content; cursor:pointer; font-size:.72rem; font-weight:600; color:#52617c; min-height:2rem; border-radius:.35rem; }
+.financial-operational-2028 .f28-expense-filters summary svg { width:1rem; height:1rem; }
+.financial-operational-2028 .f28-expense-filters > div { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.7rem; border-top:1px solid #e2e7ef; padding:.65rem 0 .3rem; }
+.financial-operational-2028 .f28-expense-filters label { display:grid; gap:.3rem; font-size:.7rem; color:#57687f; min-width:0; }
+.financial-operational-2028 .f28-expense-scope { display:flex; gap:.5rem; justify-content:space-between; align-items:center; margin-top:-.5rem; }
+.financial-operational-2028 .f28-expense-scope p { margin:0; font-size:.66rem; line-height:1.5; color:#65748b; }
+.financial-operational-2028 .f28-expense-scope > div { display:flex; align-items:center; gap:.25rem; flex-shrink:0; }
+.financial-operational-2028 :is(.f28-expense-control,.f28-expense-help) { display:inline-flex; align-items:center; justify-content:center; gap:.3rem; font-size:.7rem; color:#52617c; min-height:2.4rem; border:1px solid transparent; border-radius:.5rem; padding:.4rem .5rem; }
+.financial-operational-2028 :is(.f28-expense-control,.f28-expense-help):hover { border-color:#d7dfeb; background:#fff; }
+.financial-operational-2028 :is(.f28-expense-control,.f28-expense-help) svg { width:1rem; height:1rem; }
+.financial-operational-2028 .f28-expense-split { height:auto; align-items:stretch; overflow:visible !important; }
+.financial-operational-2028 .f28-expense-resizable { overflow:visible !important; min-width:0; container:expense-side / inline-size; }
+.financial-operational-2028 .f28-expense-divider { flex:0 0 25px; width:25px; background:transparent; touch-action:none; }
+.financial-operational-2028 .f28-expense-divider::before { content:''; position:absolute; width:1px; top:3.4rem; bottom:0; background:#d4dce9; }
+.financial-operational-2028 .f28-expense-divider > div { position:sticky; align-self:flex-start; top:8rem; margin-top:15rem; width:17px; height:38px; border-radius:7px; background:white; border:1px solid #bcc8da; box-shadow:0 2px 6px #102a4410; }
+.financial-operational-2028 .f28-expense-divider > div svg { width:12px; height:19px; color:#64748b; }
+.financial-operational-2028 .f28-expense-divider:hover > div { border-color:#697ab8; }
+.financial-operational-2028 .f28-expense-side { --expense-accent:#4859a6; --expense-soft:#f0f2fd; display:grid; gap:.8rem; align-content:start; min-width:0; }
+.financial-operational-2028 .f28-expense-side[data-expense-panel=realizado] { --expense-accent:#1c746a; --expense-soft:#edf7f4; }
+.financial-operational-2028 .f28-expense-side__header { display:flex; justify-content:space-between; gap:.5rem; align-items:center; border-bottom:2px solid var(--expense-accent); min-height:2.7rem; padding-bottom:.6rem; }
+.financial-operational-2028 .f28-expense-side__header > span { display:flex; gap:.45rem; align-items:center; min-width:0; }
+.financial-operational-2028 .f28-expense-side__header svg { width:1rem; height:1rem; color:var(--expense-accent); flex-shrink:0; }
+.financial-operational-2028 .f28-expense-side__header h2 { font-size:.98rem; font-weight:700; letter-spacing:-.025em; margin:0; }
+.financial-operational-2028 .f28-expense-side__header small { color:var(--expense-accent); background:var(--expense-soft); border-radius:.35rem; padding:.25rem .4rem; font-size:.64rem; }
+.financial-operational-2028 .f28-expense-add { display:flex; align-items:center; gap:.7rem; min-height:4rem; width:100%; padding:.65rem .8rem; border:1px dashed #bdc8db; border-radius:.75rem; background:#ffffffa0; text-align:left; }
+.financial-operational-2028 .f28-expense-add:hover:enabled { background:var(--expense-soft); border-color:var(--expense-accent); }
+.financial-operational-2028 .f28-expense-add:disabled { opacity:.65; cursor:not-allowed; }
+.financial-operational-2028 .f28-expense-add__icon { display:grid; place-items:center; flex-shrink:0; width:1.9rem; height:1.9rem; border-radius:.5rem; color:var(--expense-accent); background:var(--expense-soft); }
+.financial-operational-2028 .f28-expense-add__icon svg { width:1rem; }
+.financial-operational-2028 .f28-expense-add strong { display:block; font-size:.8rem; font-weight:650; }
+.financial-operational-2028 .f28-expense-add small { display:block; font-size:.66rem; color:#65748b; margin-top:.2rem; }
+.financial-operational-2028 .f28-expense-metric { border:1px solid #dce3ee; border-radius:.75rem; padding:.75rem .85rem; background:#fff; min-width:0; }
+.financial-operational-2028 .f28-expense-metric[data-primary] { border-color:color-mix(in srgb,var(--expense-accent) 30%,white); background:var(--expense-soft); padding:.85rem 1rem; }
+.financial-operational-2028 .f28-expense-metric h3 { font-size:.7rem; font-weight:600; color:#4d5d76; margin:0 0 .45rem; }
+.financial-operational-2028 .f28-expense-metric__value { max-width:100%; font-size:1rem; font-weight:750; letter-spacing:-.03em; line-height:1.3; text-align:left; border-radius:.3rem; font-variant-numeric:tabular-nums; }
+.financial-operational-2028 .f28-expense-metric[data-primary] .f28-expense-metric__value { min-height:2.7rem; font-size:clamp(1.5rem,6.3cqi,2.35rem); letter-spacing:-.045em; }
+.financial-operational-2028 .f28-expense-metric[data-attention] .f28-expense-metric__value { color:#a13746; }
+.financial-operational-2028 .f28-expense-metric__hint { font-size:.63rem; color:#65748b; line-height:1.5; margin:.4rem 0 0; }
+.financial-operational-2028 .f28-expense-unavailable { font-size:.95rem; color:#718095; margin:0; min-height:1.5rem; }
+.financial-operational-2028 .f28-expense-secondary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.5rem; }
+.financial-operational-2028 .f28-expense-alerts { display:flex; gap:.5rem; flex-wrap:wrap; font-size:.68rem; color:#795930; border-left:2px solid #ba925d; padding:.25rem .6rem; }
+.financial-operational-2028 .f28-expense-alerts button { text-align:left; border-radius:.3rem; }
+.financial-operational-2028 .f28-expense-alerts strong { font-weight:650; }
+.financial-operational-2028 .f28-expense-alerts small { display:block; font-size:.6rem; color:#65748b; margin-top:.2rem; }
+.financial-operational-2028 .f28-expense-money-full { white-space:nowrap; }
+.financial-operational-2028 .f28-expense-money-compact { display:none; }
+.financial-operational-2028 .f28-expense-tabs { display:none; }
+.financial-operational-2028 .f28-expense-ledger-section { min-width:0; background:white; border:1px solid #dce3ee; border-radius:.85rem; scroll-margin-top:2rem; }
+.financial-operational-2028 .f28-expense-ledger-section > header { padding:.9rem 1rem; border-bottom:1px solid #e5e9f1; display:flex; justify-content:space-between; gap:.5rem; }
+.financial-operational-2028 .f28-expense-ledger-section > header h2 { font-size:.9rem; font-weight:700; margin:0; }
+.financial-operational-2028 .f28-expense-ledger-section > header :is(p,span) { font-size:.66rem; color:#65748b; margin:.25rem 0 0; }
+.financial-operational-2028 .f28-expense-table table { width:100%; border-collapse:collapse; }
+.financial-operational-2028 .f28-expense-table th { text-align:right; background:#f7f9fc; font-size:.65rem; font-weight:600; color:#65748b; padding:.65rem .8rem; }
+.financial-operational-2028 .f28-expense-table td { font-size:.76rem; padding:.8rem; border-top:1px solid #edf0f5; text-align:right; vertical-align:top; }
+.financial-operational-2028 .f28-expense-table :is(th,td):first-child { text-align:left; width:40%; }
+.financial-operational-2028 .f28-expense-table td:first-child strong { display:block; font-weight:650; line-height:1.5; overflow-wrap:anywhere; }
+.financial-operational-2028 .f28-expense-classification { display:block; font-size:.66rem; color:#65748b; line-height:1.5; margin:.2rem 0 .4rem; }
+.financial-operational-2028 .f28-expense-money { font-variant-numeric:tabular-nums; white-space:nowrap; }
+.financial-operational-2028 .f28-expense-table td small,.financial-operational-2028 .f28-expense-record-values dd small { display:block; font-size:.63rem; color:#65748b; margin-top:.15rem; }
+.financial-operational-2028 [data-deviation-positive] { color:#a13746; }
+.financial-operational-2028 .f28-expense-status { display:inline-flex; padding:.18rem .4rem; background:#f0f2fd; border-radius:.35rem; font-size:.6rem; color:#4859a6; }
+.financial-operational-2028 .f28-expense-status[data-status=realizada] { color:#1c746a; background:#edf7f4; }
+.financial-operational-2028 .f28-expense-status[data-status=cancelada] { color:#65748b; background:#f1f3f7; }
+.financial-operational-2028 :is(.f28-expense-muted,.f28-expense-no-plan) { color:#65748b; font-size:.66rem; }
+.financial-operational-2028 .f28-expense-records { display:none; padding:0 1rem; }
+.financial-operational-2028 .f28-expense-record { padding:.9rem 0; border-bottom:1px solid #edf0f5; }
+.financial-operational-2028 .f28-expense-record header { display:flex; align-items:start; gap:.5rem; justify-content:space-between; }
+.financial-operational-2028 .f28-expense-record h3 { font-size:.83rem; font-weight:650; margin:0; overflow-wrap:anywhere; }
+.financial-operational-2028 .f28-expense-record header .f28-expense-status { flex-shrink:0; }
+.financial-operational-2028 .f28-expense-record-values { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.5rem; padding:.3rem 0; margin:0; }
+.financial-operational-2028 .f28-expense-record-values dt { font-size:.64rem; color:#65748b; }
+.financial-operational-2028 .f28-expense-record-values dd { font-size:.73rem; font-weight:650; margin:.2rem 0 0; }
+.financial-operational-2028 .f28-expense-record summary { cursor:pointer; font-size:.68rem; min-height:2.4rem; padding:.6rem 0; color:#52617c; }
+.financial-operational-2028 .f28-expense-record-details { background:#f7f9fc; border:1px solid #e2e7ef; padding:.7rem; border-radius:.6rem; }
+.financial-operational-2028 .f28-expense-record-details dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.6rem; margin:0; }
+.financial-operational-2028 .f28-expense-record-details dt { font-size:.63rem; color:#65748b; }
+.financial-operational-2028 .f28-expense-record-details dd { font-size:.73rem; margin:.2rem 0 0; overflow-wrap:anywhere; }
+.financial-operational-2028 .f28-expense-record-details p { font-size:.68rem; margin:.7rem 0; }
+.financial-operational-2028 .f28-expense-record-actions { display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.7rem; }
+.financial-operational-2028 .f28-expense-record-actions button { display:flex; align-items:center; gap:.3rem; padding:.4rem .5rem; min-height:2.4rem; border:1px solid #dce3ee; background:#fff; border-radius:.4rem; font-size:.67rem; }
+.financial-operational-2028 .f28-expense-record-actions svg { width:.9rem; height:.9rem; }
+.financial-operational-2028 .f28-expense-pagination { display:flex; gap:.6rem; padding:.8rem 1rem; justify-content:space-between; align-items:center; font-size:.66rem; color:#65748b; }
+.financial-operational-2028 .f28-expense-pagination > div { display:flex; gap:.5rem; }
+.financial-operational-2028 .f28-expense-pagination button { padding:.4rem .6rem; min-height:2.4rem; border:1px solid #dce3ee; background:#fff; border-radius:.45rem; color:#33465c; }
+.financial-operational-2028 .f28-expense-pagination button:disabled { opacity:.5; cursor:not-allowed; }
+.financial-operational-2028 .f28-expense-comparison :is(button,select,input,summary):focus-visible { outline:2px solid #697ab8; outline-offset:3px; }
+.f28-expense-help-popover { width:23rem; max-width:calc(100vw - 2rem); color:#102b44; font-size:.75rem; line-height:1.6; background:#fff; }
+.f28-expense-help-popover p { margin:.65rem 0 0; }
+.f28-expense-value-popover { display:grid; gap:.5rem; width:auto; max-width:calc(100vw - 2rem); background:#fff; color:#102b44; }
+.f28-expense-value-popover strong { font-size:.75rem; }
+.f28-expense-value-popover span { font-size:1rem; font-weight:700; font-variant-numeric:tabular-nums; }
+@container expense-side (max-width:440px) {
+  .financial-operational-2028 .f28-expense-secondary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .financial-operational-2028 .f28-expense-secondary > :last-child:nth-child(3) { grid-column:1 / -1; }
+  .financial-operational-2028 .f28-expense-side__header small { display:none; }
+  .financial-operational-2028 .f28-expense-metric[data-primary] .f28-expense-money-full { display:none; }
+  .financial-operational-2028 .f28-expense-metric[data-primary] .f28-expense-money-compact { display:inline; }
+}
+@container expense-comparison (width < 840px) {
+  .financial-operational-2028 .f28-expense-split { display:block; }
+  .financial-operational-2028 :is(.f28-expense-divider,.f28-expense-reset) { display:none; }
+  .financial-operational-2028 .f28-expense-resizable { width:100%; }
+  .financial-operational-2028 .f28-expense-comparison[data-active-side=projetado] > .f28-expense-split > .f28-expense-resizable[data-side=realizado],
+  .financial-operational-2028 .f28-expense-comparison[data-active-side=realizado] > .f28-expense-split > .f28-expense-resizable[data-side=projetado] { display:none; }
+  .financial-operational-2028 .f28-expense-tabs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.25rem; padding:.25rem; border:1px solid #d8dfeb; border-radius:.65rem; background:#e9eef6; }
+  .financial-operational-2028 .f28-expense-tabs button { min-height:2.5rem; border-radius:.45rem; font-size:.8rem; font-weight:600; color:#596780; }
+  .financial-operational-2028 .f28-expense-tabs button[aria-selected=true] { background:#fff; color:#35499b; box-shadow:0 1px 4px #102a4410; }
+  .financial-operational-2028 .f28-expense-tabs button:last-child[aria-selected=true] { color:#1c746a; }
+  .financial-operational-2028 .f28-expense-table { display:none; }
+  .financial-operational-2028 .f28-expense-records { display:block; }
+  .financial-operational-2028 .f28-expense-scope { flex-wrap:wrap; }
+  .financial-operational-2028 .f28-expense-filters > div { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@container expense-comparison (width < 420px) {
+  .financial-operational-2028 .f28-expense-toolbar > select { max-width:none; flex:1 1 100%; }
+  .financial-operational-2028 .f28-expense-search { flex-basis:100%; }
+  .financial-operational-2028 .f28-expense-record-values { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .financial-operational-2028 .f28-expense-record-values > div:last-child { grid-column:1 / -1; }
+  .financial-operational-2028 .f28-expense-pagination { flex-wrap:wrap; }
+}

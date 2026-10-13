@@ -1,0 +1,15 @@
+{
+  "boundary": "Synthetic local runtime only; migrated project RPCs preserved.",
+  "postgres": "16.15",
+  "postgrest": "13.0.4",
+  "successfulHttpChecksBeforeConcurrency": 15,
+  "concurrentRequest": "Two signed JWT profiles update the same expense version",
+  "observation": "One update committed; the stale update repeatedly raised FINANCIAL_CONFLICT SQLSTATE 40001 inside PostgREST instead of returning HTTP.",
+  "resolution": "Stopped the local PostgREST13 process and restarted PostgREST16.4 against the same database and JWT secret; did not reset browser records or modify backend functions.",
+  "retest": "19/19 HTTP checks passed on PostgREST16.4 including distinct JWT sessions racing the same version.",
+  "remoteGatewayVersion": "Unknown; public metadata request returned HTTP 401. No remote authenticated session was available.",
+  "sources": [
+    "https://supabase.com/docs/guides/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions-77326b",
+    "https://github.com/PostgREST/postgrest/blob/v16.4/CHANGELOG.md"
+  ]
+}
