@@ -25,7 +25,7 @@ export interface PublicAreaDefinition {
 export const PUBLIC_MAP_AREAS: readonly PublicAreaDefinition[] = [
   { slug: 'pavilhao-1', name: 'Pavilhão 1', shortName: 'Pavilhão 1', kind: 'PAVILION', pavilionIdentifier: 'B1' },
   { slug: 'pavilhao-3', name: 'Pavilhão 3', shortName: 'Pavilhão 3', kind: 'PAVILION', pavilionIdentifier: 'B6' },
-  { slug: 'pavilhao-5', name: 'Pavilhão 5', shortName: 'Pavilhão 5', kind: 'PAVILION', pavilionIdentifier: 'B8' },
+  { slug: 'pavilhao-5', name: 'Pavilhão 5: Floriculturas', shortName: 'Pavilhão 5', kind: 'PAVILION', pavilionIdentifier: 'B8' },
   { slug: 'pavilhao-7', name: 'Pavilhão 7 — Agricultura Familiar / Agroindústrias', shortName: 'Pavilhão 7', kind: 'PAVILION', pavilionIdentifier: 'B10' },
   { slug: 'pavilhao-8', name: 'Pavilhão 8', shortName: 'Pavilhão 8', kind: 'PAVILION', pavilionIdentifier: 'B4' },
   { slug: 'pavilhao-12', name: 'Pavilhão 12', shortName: 'Pavilhão 12', kind: 'PAVILION', pavilionIdentifier: 'B3' },

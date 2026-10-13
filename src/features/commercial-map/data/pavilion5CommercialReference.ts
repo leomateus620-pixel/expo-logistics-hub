@@ -190,7 +190,7 @@ if (PAVILION5_COMMERCIAL_REFERENCE_CELLS.length !== 81) {
 export const PAVILION5_COMMERCIAL_REFERENCE = {
   publicIdentifier: 'B8',
   pavilionNumber: 5,
-  category: 'Veterinária, Pequenos Animais e Rações',
+  category: 'Floriculturas',
   moduleCount: 81,
   totalAreaM2: 841.53,
   exhibitionAreaM2: 508.95,

@@ -336,8 +336,8 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
   B8: {
     publicIdentifier: 'B8',
     pavilionNumber: 5,
-    officialName: 'Pavilhão 5 — Veterinária, Pequenos Animais e Rações',
-    activity: 'Veterinária, Pequenos Animais e Rações',
+    officialName: 'Pavilhão 5: Floriculturas',
+    activity: 'Floriculturas',
     variant: 'garden-gallery',
     roofProfile: 'clerestory-span',
     entrancePattern: 'paired-end-bays',

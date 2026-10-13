@@ -583,7 +583,7 @@ const bStructures: Array<[string, string, MapClassification, string, PdfBounds |
   ['B5', 'Pavilhão 13 — Indústria e Comércio', 'PAVILION', 'pavilions', [3307, 3788, 3445, 4051]],
   ['B6', 'Pavilhão 3 — Indústria e Comércio', 'PAVILION', 'pavilions', [3460, 3786, 3670, 4098]],
   ['B7', 'Pavilhão 4 — Cozinha da Soja', 'PAVILION', 'pavilions', [3495, 2497, 3666, 2568], { parent: 'N' }],
-  ['B8', 'Pavilhão 5 — Veterinária, Pequenos Animais e Rações', 'PAVILION', 'pavilions', [3198, 2203, 3411, 2390]],
+  ['B8', 'Pavilhão 5: Floriculturas', 'PAVILION', 'pavilions', [3198, 2203, 3411, 2390]],
   ['B9', 'Pavilhões 6, 10 e 11 — Pecuária', 'PAVILION', 'pavilions', [2319, 2256, 3179, 2389]],
   ['B10', 'Pavilhão 7 — Agricultura Familiar / Agroindústrias', 'PAVILION', 'pavilions', [1973, 2252, 2309, 2379], {
     metadata: {

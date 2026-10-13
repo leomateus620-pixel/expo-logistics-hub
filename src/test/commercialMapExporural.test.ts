@@ -169,7 +169,7 @@ describe('referência cadastral e vista dedicada da Exporural', () => {
     ));
     expect(protectedEntities).toMatchObject([
       { publicIdentifier: 'B7', name: 'Pavilhão 4 — Cozinha da Soja', classification: 'PAVILION' },
-      { publicIdentifier: 'B8', name: 'Pavilhão 5 — Veterinária, Pequenos Animais e Rações', classification: 'PAVILION' },
+      { publicIdentifier: 'B8', name: 'Pavilhão 5: Floriculturas', classification: 'PAVILION' },
       { publicIdentifier: 'D3', name: 'Espaço Mirante', classification: 'ATTRACTION' },
     ]);
 
