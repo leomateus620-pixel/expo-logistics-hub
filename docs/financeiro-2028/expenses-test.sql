@@ -10,7 +10,6 @@ DECLARE
   adm uuid := 'b664fc22-69d3-40f1-8370-16b8a07ec402';
   op  uuid := '87d4fa05-375e-4e8f-9b56-d1b0c5d442b2';
   log text := ''; r jsonb; r2 jsonb; exp1 uuid; exp2 uuid; cat uuid; cat2 uuid; obl uuid; mv uuid; v int; k uuid := gen_random_uuid(); n bigint;
-  PROCEDURE_ok boolean;
 BEGIN
   PERFORM set_config('role','authenticated',true);
   PERFORM set_config('request.jwt.claims', jsonb_build_object('sub',adm,'role','authenticated')::text, true);
