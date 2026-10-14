@@ -43,6 +43,13 @@
       "when": 1791859869550,
       "tag": "0005_financial_category_audit_entity_fix",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791982259116,
+      "tag": "0006_cronograma_delete_permission_align",
+      "breakpoints": true
     }
   ]
 }
