@@ -1,0 +1,1 @@
+{"durationMs":30016.5,"frames":1801,"medianFrameMs":16.69999999999891,"p95FrameMs":17.099999999998545,"maxFrameMs":18.80000000000291,"longTasksOver50Ms":0,"maximumLongTaskMs":0,"hostAttributeMutations":11,"cpuWorkMsPerFrame":8,"assetLatencyMs":1200,"assetBytesPerSecondPerRequest":30720,"width":320,"height":800,"artCount":"12","phase":"running"}

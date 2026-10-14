@@ -1,0 +1,465 @@
+{
+  "createdAt": "2026-10-14",
+  "requestedEditions": 25,
+  "recoveredEditions": 12,
+  "missingEditions": 13,
+  "complete": false,
+  "chronologySources": [
+    "https://fenasoja.com.br/edicoes-anteriores/",
+    "https://prefeitura.santarosa.rs.gov.br/?p=12085"
+  ],
+  "editions": [
+    {
+      "editionNumber": 1,
+      "year": 1966,
+      "status": "pendente",
+      "source": null,
+      "original": null,
+      "variants": []
+    },
+    {
+      "editionNumber": 2,
+      "year": 1974,
+      "status": "pendente",
+      "source": null,
+      "original": null,
+      "variants": []
+    },
+    {
+      "editionNumber": 3,
+      "year": 1976,
+      "status": "pendente",
+      "source": null,
+      "original": null,
+      "variants": []
+    },
+    {
+      "editionNumber": 4,
+      "year": 1979,
+      "status": "pendente",
+      "source": null,
+      "original": null,
+      "variants": []
+    },
+    {
+      "editionNumber": 5,
+      "year": 1981,
+      "status": "pendente",
+      "source": null,
+      "original": null,
+      "variants": []
+    },
+    {
+      "editionNumber": 6,
+      "year": 1984,
+      "status": "pendente",
+      "source": null,
+      "original": null,
+      "variants": []
+    },
+    {
+      "editionNumber": 7,
+      "year": 1987,
+      "status": "pendente",
+      "source": null,
+      "original": null,
+      "variants": []
+    },
+    {
+      "editionNumber": 8,
+      "year": 1990,
+      "status": "pendente",
+      "source": null,
+      "original": null,
+      "variants": []
+    },
+    {
+      "editionNumber": 9,
+      "year": 1992,
+      "status": "pendente",
+      "source": null,
+      "original": null,
+      "variants": []
+    },
+    {
+      "editionNumber": 10,
+      "year": 1994,
+      "status": "pendente",
+      "source": null,
+      "original": null,
+      "variants": []
+    },
+    {
+      "editionNumber": 11,
+      "year": 1996,
+      "status": "pendente",
+      "source": null,
+      "original": null,
+      "variants": []
+    },
+    {
+      "editionNumber": 12,
+      "year": 1998,
+      "status": "recuperada",
+      "source": "https://zebu.org.br/PortalUploads/Revistas/A_Granja/1998_Abril/revista.pdf",
+      "original": "originais/fenasoja-edicao-12-1998.png",
+      "variants": [
+        {
+          "path": "portal/fenasoja-edicao-12-1998-256x192.webp",
+          "width": 256,
+          "height": 192,
+          "bytes": 12890,
+          "sha256": "40330681aba4a71e43bb95e3c5fa1a4ef1ad6072d9e7eafd5355d6656d5786fc"
+        },
+        {
+          "path": "portal/fenasoja-edicao-12-1998-512x384.webp",
+          "width": 512,
+          "height": 384,
+          "bytes": 40380,
+          "sha256": "673f69ec44816e319b30adfac37dedb5a7a330162d36a20bf5f255836b84ac70"
+        }
+      ],
+      "publication": "A Granja, abril de 1998, página PDF 36",
+      "note": "Anúncio publicado; recorte do anúncio completo em página digitalizada.",
+      "theme": "Semente do futuro",
+      "width": 1665,
+      "height": 859,
+      "sha256": "5dd1892e483a3609d643d2577269bdee5d81ec364e4d1eab985e5f04e337158c"
+    },
+    {
+      "editionNumber": 13,
+      "year": 2000,
+      "status": "pendente",
+      "source": null,
+      "original": null,
+      "variants": []
+    },
+    {
+      "editionNumber": 14,
+      "year": 2002,
+      "status": "pendente",
+      "source": null,
+      "original": null,
+      "variants": []
+    },
+    {
+      "editionNumber": 15,
+      "year": 2004,
+      "status": "recuperada",
+      "source": "https://zebu.org.br/PortalUploads/Revistas/A_Granja/2004_Abril/revista.pdf",
+      "original": "originais/fenasoja-edicao-15-2004.png",
+      "variants": [
+        {
+          "path": "portal/fenasoja-edicao-15-2004-256x192.webp",
+          "width": 256,
+          "height": 192,
+          "bytes": 13836,
+          "sha256": "84f2b939c0789a3ebda714431c457d8bcafc488011b97d5af049aed59cc14158"
+        },
+        {
+          "path": "portal/fenasoja-edicao-15-2004-512x384.webp",
+          "width": 512,
+          "height": 384,
+          "bytes": 38050,
+          "sha256": "229ebd26cec8803c87cf31879f01b59db838c56fcb125a5fdb94f83166bae784"
+        }
+      ],
+      "publication": "A Granja, abril de 2004, página PDF 53",
+      "note": "Imagem do anúncio extraída diretamente do PDF.",
+      "theme": "Alimentando a economia",
+      "width": 596,
+      "height": 397,
+      "sha256": "d22f7acaf7b6712c098aad6a5d531d00ab40e9b95fc132451ed6bdf84614ff33"
+    },
+    {
+      "editionNumber": 16,
+      "year": 2006,
+      "status": "recuperada",
+      "source": "https://zebu.org.br/PortalUploads/Revistas/A_Granja/2006_Mar%C3%A7o/revista.pdf",
+      "original": "originais/fenasoja-edicao-16-2006.png",
+      "variants": [
+        {
+          "path": "portal/fenasoja-edicao-16-2006-256x192.webp",
+          "width": 256,
+          "height": 192,
+          "bytes": 17622,
+          "sha256": "aacb26d258dc073c7e6f18bad40cb1f737e997519062580954f4fa2edb52a6e6"
+        },
+        {
+          "path": "portal/fenasoja-edicao-16-2006-512x384.webp",
+          "width": 512,
+          "height": 384,
+          "bytes": 65518,
+          "sha256": "c361afe2e2d29ff7cf04d18f91ef17ba60e47725ccb8a12cd11f2fca9cbb8f5d"
+        }
+      ],
+      "publication": "A Granja, março de 2006, página PDF 75",
+      "note": "Imagem do anúncio extraída diretamente do PDF.",
+      "theme": "40 anos semeando bons negócios",
+      "width": 613,
+      "height": 434,
+      "sha256": "c0b8cfa2cc0c9f1cb2e886610b75c32d0a0f86c77f0216396c328d481ed6abc4"
+    },
+    {
+      "editionNumber": 17,
+      "year": 2008,
+      "status": "recuperada",
+      "source": "https://zebu.org.br/PortalUploads/Revistas/A_Granja/2008_Mar%C3%A7o/revista.pdf",
+      "original": "originais/fenasoja-edicao-17-2008.png",
+      "variants": [
+        {
+          "path": "portal/fenasoja-edicao-17-2008-256x192.webp",
+          "width": 256,
+          "height": 192,
+          "bytes": 10646,
+          "sha256": "5d2714befb884df7503155c3638999c11b85962adf45902c3dc3477f15cd7390"
+        },
+        {
+          "path": "portal/fenasoja-edicao-17-2008-512x384.webp",
+          "width": 512,
+          "height": 384,
+          "bytes": 30086,
+          "sha256": "fcf651264ca6dbf77a97bf3d994db81d67e7762d331d97da0927137b90081af3"
+        }
+      ],
+      "publication": "A Granja, março de 2008, página PDF 67",
+      "note": "Imagem do anúncio extraída diretamente do PDF.",
+      "theme": "Unindo forças, colhendo resultados",
+      "width": 593,
+      "height": 273,
+      "sha256": "4e2b09a41f027b1c26f4af459058107695a871b61ffc34846603fb1b66e9b071"
+    },
+    {
+      "editionNumber": 18,
+      "year": 2010,
+      "status": "recuperada",
+      "source": "https://zebu.org.br/PortalUploads/Revistas/A_Granja/2010_Fevereiro/revista.pdf",
+      "original": "originais/fenasoja-edicao-18-2010.png",
+      "variants": [
+        {
+          "path": "portal/fenasoja-edicao-18-2010-256x192.webp",
+          "width": 256,
+          "height": 192,
+          "bytes": 16242,
+          "sha256": "a161e53be223987360b963203e2cc7ee5a290e3c0839b95a84dcf4a61a2463f5"
+        },
+        {
+          "path": "portal/fenasoja-edicao-18-2010-512x384.webp",
+          "width": 512,
+          "height": 384,
+          "bytes": 62586,
+          "sha256": "e1e6cda1b33974739a108574797a29ac65fb8e14b22b6ce29876c7ceea2305f0"
+        }
+      ],
+      "publication": "A Granja, fevereiro de 2010, página PDF 29",
+      "note": "Imagem do anúncio extraída diretamente do PDF.",
+      "theme": "Somos frutos desta semente",
+      "width": 1234,
+      "height": 851,
+      "sha256": "285aa19521ea24f3227971d119d4f102a3e99cc55caf52a0778e87e4abab9875"
+    },
+    {
+      "editionNumber": 19,
+      "year": 2012,
+      "status": "recuperada",
+      "source": "https://zebu.org.br/PortalUploads/Revistas/A_Granja/2012_Mar%C3%A7o/revista.pdf",
+      "original": "originais/fenasoja-edicao-19-2012.png",
+      "variants": [
+        {
+          "path": "portal/fenasoja-edicao-19-2012-256x192.webp",
+          "width": 256,
+          "height": 192,
+          "bytes": 15206,
+          "sha256": "c513609462423d37e305675d6b43f706d21cf08bacd009954adef0af8c8b664d"
+        },
+        {
+          "path": "portal/fenasoja-edicao-19-2012-512x384.webp",
+          "width": 512,
+          "height": 384,
+          "bytes": 47570,
+          "sha256": "923a2ee3cd5f2605956e617313f3e6ba38ecd44d374521b278f550aa500de8e3"
+        }
+      ],
+      "publication": "A Granja, março de 2012, página PDF 57",
+      "note": "Imagem do anúncio extraída diretamente do PDF.",
+      "theme": "Rede de grandes negócios",
+      "width": 1200,
+      "height": 823,
+      "sha256": "87821b8eed05400302dbdae53ee079123ff27fc02a0ef1b9529e6719be2a560b"
+    },
+    {
+      "editionNumber": 20,
+      "year": 2014,
+      "status": "recuperada",
+      "source": "https://zebu.org.br/PortalUploads/Revistas/A_Granja/2014_Fevereiro/revista.pdf",
+      "original": "originais/fenasoja-edicao-20-2014.png",
+      "variants": [
+        {
+          "path": "portal/fenasoja-edicao-20-2014-256x192.webp",
+          "width": 256,
+          "height": 192,
+          "bytes": 14944,
+          "sha256": "b3448e65e5d2696fdc5a09b3f593608d32092ccc90fabc48839f70a446f11a03"
+        },
+        {
+          "path": "portal/fenasoja-edicao-20-2014-512x384.webp",
+          "width": 512,
+          "height": 384,
+          "bytes": 49088,
+          "sha256": "c967adbc379071cd3864ea14e614ebe85785258f2ec732bf1795153a4808f55c"
+        }
+      ],
+      "publication": "A Granja, fevereiro de 2014, página PDF 36",
+      "note": "Anúncio recuperado no pacote anterior, preservado nesta pesquisa.",
+      "theme": "Negócios vencedores",
+      "width": 1252,
+      "height": 866,
+      "sha256": "e25c25aed3531526e5726f9c9deaf24fd432410c9e4bb7573f1598a00f7f15ef"
+    },
+    {
+      "editionNumber": 21,
+      "year": 2016,
+      "status": "recuperada",
+      "source": "https://zebu.org.br/PortalUploads/Revistas/A_Lavoura/2016_Edi%C3%A7%C3%A3o%20713/revista.pdf",
+      "original": "originais/fenasoja-edicao-21-2016.png",
+      "variants": [
+        {
+          "path": "portal/fenasoja-edicao-21-2016-256x192.webp",
+          "width": 256,
+          "height": 192,
+          "bytes": 10780,
+          "sha256": "112b3718880960b09972cbe89fb4036cef1b159edd46527a0a8295020df4297e"
+        },
+        {
+          "path": "portal/fenasoja-edicao-21-2016-512x384.webp",
+          "width": 512,
+          "height": 384,
+          "bytes": 34294,
+          "sha256": "d078884efd4130b7566d099394949ead736ba88eecc370e36f58e47f9b934fab"
+        }
+      ],
+      "publication": "A Lavoura, edição 713/2016, página PDF 55",
+      "note": "Anúncio recuperado no pacote anterior, preservado nesta pesquisa.",
+      "theme": "50 anos: quem tem história cultiva o futuro",
+      "width": 823,
+      "height": 1094,
+      "sha256": "39f7fc3e9f5475d9f3c5dc068bf5bda473a42dfe2b4e8607988dc78e4b08261a"
+    },
+    {
+      "editionNumber": 22,
+      "year": 2018,
+      "status": "recuperada",
+      "source": "https://www.behance.net/gallery/58535353/Fenasoja",
+      "original": "originais/fenasoja-edicao-22-2018.webp",
+      "variants": [
+        {
+          "path": "portal/fenasoja-edicao-22-2018-256x192.webp",
+          "width": 256,
+          "height": 192,
+          "bytes": 8358,
+          "sha256": "af002c10f857e3b36ec1b665089804db67ac8d13ddc0899e5976d3af6bc58f2d"
+        },
+        {
+          "path": "portal/fenasoja-edicao-22-2018-512x384.webp",
+          "width": 512,
+          "height": 384,
+          "bytes": 21054,
+          "sha256": "bae25996480a1191e91f1e935d77adc84aa7a1f992fc8d052b3d715cfeb27532"
+        }
+      ],
+      "publication": "Portfólio GH Branding / Jacson Silveira e equipe",
+      "note": "Peça gráfica do projeto de identidade de 2018; não é digitalização de cartaz de rua.",
+      "theme": "Nós somos evolução",
+      "width": 1296,
+      "height": 632,
+      "sha256": "16238ed00c7d4b174ba047ec237db4c8701ab188bde40dc32697c14c5a683b33"
+    },
+    {
+      "editionNumber": 23,
+      "year": 2022,
+      "status": "recuperada",
+      "source": "https://portalbrasil.com.br/wp-content/uploads/2022/04/folder-programacao-fenasoja2022-74x215cm-Web-18.04.pdf",
+      "original": "originais/fenasoja-edicao-23-2022.png",
+      "variants": [
+        {
+          "path": "portal/fenasoja-edicao-23-2022-256x192.webp",
+          "width": 256,
+          "height": 192,
+          "bytes": 8146,
+          "sha256": "71f368a57d459aac17bdbb4e5a1b700d7aea9ec396ca92f4b267d83e904365c3"
+        },
+        {
+          "path": "portal/fenasoja-edicao-23-2022-512x384.webp",
+          "width": 512,
+          "height": 384,
+          "bytes": 19412,
+          "sha256": "e4722725a050a828b3152f99a4d20f89d9c40bd92360c4b0c3f7965200942ff8"
+        }
+      ],
+      "publication": "Folder do programa oficial 2022, página PDF 1, painel direito",
+      "note": "Capa do programa oficial: peça institucional representativa, não identificada como cartaz principal.",
+      "theme": "Programa oficial",
+      "width": 701,
+      "height": 610,
+      "sha256": "07c445ec74bfab19d3723bc1fce1be241c6cd169cfc47c38e31fa2d1005a07b2"
+    },
+    {
+      "editionNumber": 24,
+      "year": 2024,
+      "status": "recuperada",
+      "source": "https://sucessonocampo.com.br/evento/fenasoja-2024/",
+      "original": "originais/fenasoja-edicao-24-2024.jpg",
+      "variants": [
+        {
+          "path": "portal/fenasoja-edicao-24-2024-256x192.webp",
+          "width": 256,
+          "height": 192,
+          "bytes": 6246,
+          "sha256": "34ef9f1e663f4406bc64d92f05d3c5b43883183e35026c02ea445bed345bb14e"
+        },
+        {
+          "path": "portal/fenasoja-edicao-24-2024-512x384.webp",
+          "width": 512,
+          "height": 384,
+          "bytes": 14680,
+          "sha256": "2f1b22125dd990be4471e64e5113f10cedc94a9809ab15b6fd3aed22b48c8e59"
+        }
+      ],
+      "publication": "Sucesso no Campo; campanha conferida com banner do site oficial",
+      "note": "Peça publicada da campanha com data reagendada; recuperada no pacote anterior.",
+      "theme": "29 de novembro a 8 de dezembro",
+      "width": 526,
+      "height": 526,
+      "sha256": "b1836950100311ef6347d479f9b1f0446b99831fda54e9d3cdae9eedd116b62d"
+    },
+    {
+      "editionNumber": 25,
+      "year": 2026,
+      "status": "recuperada",
+      "source": "https://fenasoja.com.br/wp-content/uploads/2025/06/Banner-site-fenasoja.webp",
+      "original": "originais/fenasoja-edicao-25-2026.webp",
+      "variants": [
+        {
+          "path": "portal/fenasoja-edicao-25-2026-256x192.webp",
+          "width": 256,
+          "height": 192,
+          "bytes": 6084,
+          "sha256": "31c32903827ca5efb3d0974c29801d521fb7a4bd2b5eab7f3a47c158b36d74b6"
+        },
+        {
+          "path": "portal/fenasoja-edicao-25-2026-512x384.webp",
+          "width": 512,
+          "height": 384,
+          "bytes": 13892,
+          "sha256": "a6a29c6db066e0d15510b324045359011c290a6c5135b4b2418970acb5cf2f88"
+        }
+      ],
+      "publication": "Banner institucional hospedado no domínio oficial Fenasoja",
+      "note": "Banner oficial 2026, não identificado como cartaz impresso principal.",
+      "theme": "Nosso ouro vem do campo",
+      "width": 1200,
+      "height": 630,
+      "sha256": "726b674a994bad93a52726d2b5443d507a4a61876487532035133cf93c04b3ee"
+    }
+  ]
+}

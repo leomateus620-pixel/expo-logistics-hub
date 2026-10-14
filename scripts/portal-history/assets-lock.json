@@ -1,160 +1,519 @@
 {
-  "archiveSha256": "3ed08a1baec47758f6738d8e586b1a9c799b48ca69d7dca4494b7b079ea56d80",
+  "archiveName": "Fenasoja_Acervo_12_Artes_Catalogo_25_Edicoes.zip",
+  "archiveSha256": "9f2f6fd1568458d111ca03fb34b0dba4ac0a2456c9f364133e468457fc4fe8c9",
+  "recoveredEditions": 12,
+  "documentedEditions": 25,
+  "pendingEditions": 13,
   "files": [
     {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2014-320x240.webp",
-      "path": "public/portal/history/fenasoja-2014-320x240.webp",
-      "kind": "runtime",
+      "archivePath": "Fenasoja_Acervo_Pesquisado/LEIA-ME.md",
+      "path": "docs/portal-history/source/LEIA-ME.md",
+      "kind": "consultation",
+      "bytes": 2870,
+      "sha256": "c6a7c81635385932875cbb366b3800f8bf1887cb6a28906e9be16d8c8f23521c"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/catalogo-25-edicoes.json",
+      "path": "docs/portal-history/source/catalogo-25-edicoes.json",
+      "kind": "consultation",
+      "bytes": 15420,
+      "sha256": "2d5e5d06e2bf7f6f6be404942d84974c4cf415e523e36ce8122ca94ab51cf6c0"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/catalogo-25-edicoes.csv",
+      "path": "docs/portal-history/source/catalogo-25-edicoes.csv",
+      "kind": "consultation",
+      "bytes": 3728,
+      "sha256": "ff40817ce19b5aef0bf4355f99fddd7bf5f41af743c9c0813454fc0181c0b8fe"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/documentacao/FONTES.md",
+      "path": "docs/portal-history/source/documentacao/FONTES.md",
+      "kind": "consultation",
+      "bytes": 2694,
+      "sha256": "5164d0880fc79400ac46e8ffd7cc8a0f7a39f2d35034f0b2e4e9fe5c9db34bbe"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/documentacao/PESQUISA_E_PENDENCIAS.md",
+      "path": "docs/portal-history/source/documentacao/PESQUISA_E_PENDENCIAS.md",
+      "kind": "consultation",
+      "bytes": 3979,
+      "sha256": "0fc52a0f1341a971d792ef650786d9189cbcedfa19644a86c8828604eb3c7b03"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/originais/fenasoja-edicao-12-1998.png",
+      "path": "docs/portal-history/source/originais/fenasoja-edicao-12-1998.png",
+      "kind": "consultation",
+      "bytes": 1926521,
+      "sha256": "5dd1892e483a3609d643d2577269bdee5d81ec364e4d1eab985e5f04e337158c",
+      "editionNumber": 12,
+      "year": 1998,
+      "width": 1665,
+      "height": 859
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/originais/fenasoja-edicao-15-2004.png",
+      "path": "docs/portal-history/source/originais/fenasoja-edicao-15-2004.png",
+      "kind": "consultation",
+      "bytes": 407119,
+      "sha256": "d22f7acaf7b6712c098aad6a5d531d00ab40e9b95fc132451ed6bdf84614ff33",
+      "editionNumber": 15,
+      "year": 2004,
+      "width": 596,
+      "height": 397
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/originais/fenasoja-edicao-16-2006.png",
+      "path": "docs/portal-history/source/originais/fenasoja-edicao-16-2006.png",
+      "kind": "consultation",
+      "bytes": 589724,
+      "sha256": "c0b8cfa2cc0c9f1cb2e886610b75c32d0a0f86c77f0216396c328d481ed6abc4",
+      "editionNumber": 16,
+      "year": 2006,
+      "width": 613,
+      "height": 434
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/originais/fenasoja-edicao-17-2008.png",
+      "path": "docs/portal-history/source/originais/fenasoja-edicao-17-2008.png",
+      "kind": "consultation",
+      "bytes": 291760,
+      "sha256": "4e2b09a41f027b1c26f4af459058107695a871b61ffc34846603fb1b66e9b071",
+      "editionNumber": 17,
+      "year": 2008,
+      "width": 593,
+      "height": 273
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/originais/fenasoja-edicao-18-2010.png",
+      "path": "docs/portal-history/source/originais/fenasoja-edicao-18-2010.png",
+      "kind": "consultation",
+      "bytes": 2700661,
+      "sha256": "285aa19521ea24f3227971d119d4f102a3e99cc55caf52a0778e87e4abab9875",
+      "editionNumber": 18,
+      "year": 2010,
+      "width": 1234,
+      "height": 851
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/originais/fenasoja-edicao-19-2012.png",
+      "path": "docs/portal-history/source/originais/fenasoja-edicao-19-2012.png",
+      "kind": "consultation",
+      "bytes": 1740985,
+      "sha256": "87821b8eed05400302dbdae53ee079123ff27fc02a0ef1b9529e6719be2a560b",
+      "editionNumber": 19,
+      "year": 2012,
+      "width": 1200,
+      "height": 823
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/originais/fenasoja-edicao-20-2014.png",
+      "path": "docs/portal-history/source/originais/fenasoja-edicao-20-2014.png",
+      "kind": "consultation",
+      "bytes": 2013754,
+      "sha256": "e25c25aed3531526e5726f9c9deaf24fd432410c9e4bb7573f1598a00f7f15ef",
+      "editionNumber": 20,
       "year": 2014,
-      "width": 320,
-      "height": 240,
-      "bytes": 19028,
-      "sha256": "d000e7fe1d884288976dfe0a54fca2c4946e2d28580d6d7a7dfe5a84e5624c41"
+      "width": 1252,
+      "height": 866
     },
     {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2014-640x480.webp",
-      "path": "public/portal/history/fenasoja-2014-640x480.webp",
-      "kind": "runtime",
-      "year": 2014,
-      "width": 640,
-      "height": 480,
-      "bytes": 62444,
-      "sha256": "66f971af63f80463d40fd23af9b89daca1eafc9b421d46b466066bd6fcec3412"
-    },
-    {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2016-320x240.webp",
-      "path": "public/portal/history/fenasoja-2016-320x240.webp",
-      "kind": "runtime",
+      "archivePath": "Fenasoja_Acervo_Pesquisado/originais/fenasoja-edicao-21-2016.png",
+      "path": "docs/portal-history/source/originais/fenasoja-edicao-21-2016.png",
+      "kind": "consultation",
+      "bytes": 1934144,
+      "sha256": "39f7fc3e9f5475d9f3c5dc068bf5bda473a42dfe2b4e8607988dc78e4b08261a",
+      "editionNumber": 21,
       "year": 2016,
-      "width": 320,
-      "height": 240,
-      "bytes": 14090,
-      "sha256": "1030cee3242e6ddabf3a49f1a82b5d8416cc45456de598b5b337f1996a56cdb4"
+      "width": 823,
+      "height": 1094
     },
     {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2016-640x480.webp",
-      "path": "public/portal/history/fenasoja-2016-640x480.webp",
-      "kind": "runtime",
-      "year": 2016,
-      "width": 640,
-      "height": 480,
-      "bytes": 44278,
-      "sha256": "fe7244e78e3791a8f61baaea8fbc0ab29a2c66d7a5bcbfa46529a0236ddb7675"
-    },
-    {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2018-320x240.webp",
-      "path": "public/portal/history/fenasoja-2018-320x240.webp",
-      "kind": "runtime",
-      "year": 2018,
-      "width": 320,
-      "height": 240,
-      "bytes": 9728,
-      "sha256": "9a7573c499da0c3ac87f225fd793013c11995a7ab8b74097fab8e95130dfbe3c"
-    },
-    {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2018-640x480.webp",
-      "path": "public/portal/history/fenasoja-2018-640x480.webp",
-      "kind": "runtime",
-      "year": 2018,
-      "width": 640,
-      "height": 480,
-      "bytes": 23518,
-      "sha256": "1fac0f9148cd265af6820011aec223b55aeecd64c87484473543ca703a2f9d81"
-    },
-    {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2024-320x240.webp",
-      "path": "public/portal/history/fenasoja-2024-320x240.webp",
-      "kind": "runtime",
-      "year": 2024,
-      "width": 320,
-      "height": 240,
-      "bytes": 7272,
-      "sha256": "e6479963a0e5e682db3ceab5f596b797390a4ed07bb9fc8985bd57104de71331"
-    },
-    {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2024-640x480.webp",
-      "path": "public/portal/history/fenasoja-2024-640x480.webp",
-      "kind": "runtime",
-      "year": 2024,
-      "width": 640,
-      "height": 480,
-      "bytes": 17320,
-      "sha256": "2a20ec5d8e1d8b7e2797445709afc22e0107be1c8cb7deb37bed641e6ab4b992"
-    },
-    {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2014-320x240.svg",
-      "path": "docs/portal-history/source/artes/fenasoja-2014-320x240.svg",
-      "kind": "consultation",
-      "bytes": 343527,
-      "sha256": "0597f7d5d4fa0909cd406274c640535732a9e910f96143d776a86f5d43af63fd"
-    },
-    {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2014.jpg",
-      "path": "docs/portal-history/source/artes/fenasoja-2014.jpg",
-      "kind": "consultation",
-      "bytes": 257420,
-      "sha256": "a3a73948b04ea0b6d4635f35adf364aad03739754f642222270b3362d36b2453"
-    },
-    {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2016-320x240.svg",
-      "path": "docs/portal-history/source/artes/fenasoja-2016-320x240.svg",
-      "kind": "consultation",
-      "bytes": 285335,
-      "sha256": "db5258e8968c9eb173e6524718b0481f904f51ed7291e85eb0044bf5ef3ff6bb"
-    },
-    {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2016.jpg",
-      "path": "docs/portal-history/source/artes/fenasoja-2016.jpg",
-      "kind": "consultation",
-      "bytes": 213775,
-      "sha256": "61f197ac8f144431cffb13af2c36ac339d1f9a0c37f8a9f278fa1667ecac1900"
-    },
-    {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2018-320x240.svg",
-      "path": "docs/portal-history/source/artes/fenasoja-2018-320x240.svg",
-      "kind": "consultation",
-      "bytes": 128623,
-      "sha256": "60b9006d706c33957bbfe016091edbbbe62054a0ed3e613ead6e29ee7a3a4197"
-    },
-    {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2018.webp",
-      "path": "docs/portal-history/source/artes/fenasoja-2018.webp",
+      "archivePath": "Fenasoja_Acervo_Pesquisado/originais/fenasoja-edicao-22-2018.webp",
+      "path": "docs/portal-history/source/originais/fenasoja-edicao-22-2018.webp",
       "kind": "consultation",
       "bytes": 96242,
-      "sha256": "16238ed00c7d4b174ba047ec237db4c8701ab188bde40dc32697c14c5a683b33"
+      "sha256": "16238ed00c7d4b174ba047ec237db4c8701ab188bde40dc32697c14c5a683b33",
+      "editionNumber": 22,
+      "year": 2018,
+      "width": 1296,
+      "height": 632
     },
     {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2024-320x240.svg",
-      "path": "docs/portal-history/source/artes/fenasoja-2024-320x240.svg",
+      "archivePath": "Fenasoja_Acervo_Pesquisado/originais/fenasoja-edicao-23-2022.png",
+      "path": "docs/portal-history/source/originais/fenasoja-edicao-23-2022.png",
       "kind": "consultation",
-      "bytes": 35219,
-      "sha256": "f799104f9d97968b61121f6307290e94813c62c1fe7dc3aae3f42337de226f2f"
+      "bytes": 113301,
+      "sha256": "07c445ec74bfab19d3723bc1fce1be241c6cd169cfc47c38e31fa2d1005a07b2",
+      "editionNumber": 23,
+      "year": 2022,
+      "width": 701,
+      "height": 610
     },
     {
-      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2024.jpg",
-      "path": "docs/portal-history/source/artes/fenasoja-2024.jpg",
+      "archivePath": "Fenasoja_Acervo_Pesquisado/originais/fenasoja-edicao-24-2024.jpg",
+      "path": "docs/portal-history/source/originais/fenasoja-edicao-24-2024.jpg",
       "kind": "consultation",
       "bytes": 26190,
-      "sha256": "b1836950100311ef6347d479f9b1f0446b99831fda54e9d3cdae9eedd116b62d"
+      "sha256": "b1836950100311ef6347d479f9b1f0446b99831fda54e9d3cdae9eedd116b62d",
+      "editionNumber": 24,
+      "year": 2024,
+      "width": 526,
+      "height": 526
     },
     {
-      "archivePath": "Fenasoja_Portal_Artes/artes-manifest.json",
-      "path": "docs/portal-history/source/artes-manifest.json",
+      "archivePath": "Fenasoja_Acervo_Pesquisado/originais/fenasoja-edicao-25-2026.webp",
+      "path": "docs/portal-history/source/originais/fenasoja-edicao-25-2026.webp",
       "kind": "consultation",
+      "bytes": 101086,
+      "sha256": "726b674a994bad93a52726d2b5443d507a4a61876487532035133cf93c04b3ee",
+      "editionNumber": 25,
+      "year": 2026,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-12-1998-256x192.webp",
+      "path": "public/portal/history/fenasoja-edicao-12-1998-256x192.webp",
+      "kind": "runtime",
+      "editionNumber": 12,
+      "year": 1998,
+      "width": 256,
+      "height": 192,
+      "bytes": 12890,
+      "sha256": "40330681aba4a71e43bb95e3c5fa1a4ef1ad6072d9e7eafd5355d6656d5786fc"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-12-1998-512x384.webp",
+      "path": "public/portal/history/fenasoja-edicao-12-1998-512x384.webp",
+      "kind": "runtime",
+      "editionNumber": 12,
+      "year": 1998,
+      "width": 512,
+      "height": 384,
+      "bytes": 40380,
+      "sha256": "673f69ec44816e319b30adfac37dedb5a7a330162d36a20bf5f255836b84ac70"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-15-2004-256x192.webp",
+      "path": "public/portal/history/fenasoja-edicao-15-2004-256x192.webp",
+      "kind": "runtime",
+      "editionNumber": 15,
+      "year": 2004,
+      "width": 256,
+      "height": 192,
+      "bytes": 13836,
+      "sha256": "84f2b939c0789a3ebda714431c457d8bcafc488011b97d5af049aed59cc14158"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-15-2004-512x384.webp",
+      "path": "public/portal/history/fenasoja-edicao-15-2004-512x384.webp",
+      "kind": "runtime",
+      "editionNumber": 15,
+      "year": 2004,
+      "width": 512,
+      "height": 384,
+      "bytes": 38050,
+      "sha256": "229ebd26cec8803c87cf31879f01b59db838c56fcb125a5fdb94f83166bae784"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-16-2006-256x192.webp",
+      "path": "public/portal/history/fenasoja-edicao-16-2006-256x192.webp",
+      "kind": "runtime",
+      "editionNumber": 16,
+      "year": 2006,
+      "width": 256,
+      "height": 192,
+      "bytes": 17622,
+      "sha256": "aacb26d258dc073c7e6f18bad40cb1f737e997519062580954f4fa2edb52a6e6"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-16-2006-512x384.webp",
+      "path": "public/portal/history/fenasoja-edicao-16-2006-512x384.webp",
+      "kind": "runtime",
+      "editionNumber": 16,
+      "year": 2006,
+      "width": 512,
+      "height": 384,
+      "bytes": 65518,
+      "sha256": "c361afe2e2d29ff7cf04d18f91ef17ba60e47725ccb8a12cd11f2fca9cbb8f5d"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-17-2008-256x192.webp",
+      "path": "public/portal/history/fenasoja-edicao-17-2008-256x192.webp",
+      "kind": "runtime",
+      "editionNumber": 17,
+      "year": 2008,
+      "width": 256,
+      "height": 192,
+      "bytes": 10646,
+      "sha256": "5d2714befb884df7503155c3638999c11b85962adf45902c3dc3477f15cd7390"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-17-2008-512x384.webp",
+      "path": "public/portal/history/fenasoja-edicao-17-2008-512x384.webp",
+      "kind": "runtime",
+      "editionNumber": 17,
+      "year": 2008,
+      "width": 512,
+      "height": 384,
+      "bytes": 30086,
+      "sha256": "fcf651264ca6dbf77a97bf3d994db81d67e7762d331d97da0927137b90081af3"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-18-2010-256x192.webp",
+      "path": "public/portal/history/fenasoja-edicao-18-2010-256x192.webp",
+      "kind": "runtime",
+      "editionNumber": 18,
+      "year": 2010,
+      "width": 256,
+      "height": 192,
+      "bytes": 16242,
+      "sha256": "a161e53be223987360b963203e2cc7ee5a290e3c0839b95a84dcf4a61a2463f5"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-18-2010-512x384.webp",
+      "path": "public/portal/history/fenasoja-edicao-18-2010-512x384.webp",
+      "kind": "runtime",
+      "editionNumber": 18,
+      "year": 2010,
+      "width": 512,
+      "height": 384,
+      "bytes": 62586,
+      "sha256": "e1e6cda1b33974739a108574797a29ac65fb8e14b22b6ce29876c7ceea2305f0"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-19-2012-256x192.webp",
+      "path": "public/portal/history/fenasoja-edicao-19-2012-256x192.webp",
+      "kind": "runtime",
+      "editionNumber": 19,
+      "year": 2012,
+      "width": 256,
+      "height": 192,
+      "bytes": 15206,
+      "sha256": "c513609462423d37e305675d6b43f706d21cf08bacd009954adef0af8c8b664d"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-19-2012-512x384.webp",
+      "path": "public/portal/history/fenasoja-edicao-19-2012-512x384.webp",
+      "kind": "runtime",
+      "editionNumber": 19,
+      "year": 2012,
+      "width": 512,
+      "height": 384,
+      "bytes": 47570,
+      "sha256": "923a2ee3cd5f2605956e617313f3e6ba38ecd44d374521b278f550aa500de8e3"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-20-2014-256x192.webp",
+      "path": "public/portal/history/fenasoja-edicao-20-2014-256x192.webp",
+      "kind": "runtime",
+      "editionNumber": 20,
+      "year": 2014,
+      "width": 256,
+      "height": 192,
+      "bytes": 14944,
+      "sha256": "b3448e65e5d2696fdc5a09b3f593608d32092ccc90fabc48839f70a446f11a03"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-20-2014-512x384.webp",
+      "path": "public/portal/history/fenasoja-edicao-20-2014-512x384.webp",
+      "kind": "runtime",
+      "editionNumber": 20,
+      "year": 2014,
+      "width": 512,
+      "height": 384,
+      "bytes": 49088,
+      "sha256": "c967adbc379071cd3864ea14e614ebe85785258f2ec732bf1795153a4808f55c"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-21-2016-256x192.webp",
+      "path": "public/portal/history/fenasoja-edicao-21-2016-256x192.webp",
+      "kind": "runtime",
+      "editionNumber": 21,
+      "year": 2016,
+      "width": 256,
+      "height": 192,
+      "bytes": 10780,
+      "sha256": "112b3718880960b09972cbe89fb4036cef1b159edd46527a0a8295020df4297e"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-21-2016-512x384.webp",
+      "path": "public/portal/history/fenasoja-edicao-21-2016-512x384.webp",
+      "kind": "runtime",
+      "editionNumber": 21,
+      "year": 2016,
+      "width": 512,
+      "height": 384,
+      "bytes": 34294,
+      "sha256": "d078884efd4130b7566d099394949ead736ba88eecc370e36f58e47f9b934fab"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-22-2018-256x192.webp",
+      "path": "public/portal/history/fenasoja-edicao-22-2018-256x192.webp",
+      "kind": "runtime",
+      "editionNumber": 22,
+      "year": 2018,
+      "width": 256,
+      "height": 192,
+      "bytes": 8358,
+      "sha256": "af002c10f857e3b36ec1b665089804db67ac8d13ddc0899e5976d3af6bc58f2d"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-22-2018-512x384.webp",
+      "path": "public/portal/history/fenasoja-edicao-22-2018-512x384.webp",
+      "kind": "runtime",
+      "editionNumber": 22,
+      "year": 2018,
+      "width": 512,
+      "height": 384,
+      "bytes": 21054,
+      "sha256": "bae25996480a1191e91f1e935d77adc84aa7a1f992fc8d052b3d715cfeb27532"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-23-2022-256x192.webp",
+      "path": "public/portal/history/fenasoja-edicao-23-2022-256x192.webp",
+      "kind": "runtime",
+      "editionNumber": 23,
+      "year": 2022,
+      "width": 256,
+      "height": 192,
+      "bytes": 8146,
+      "sha256": "71f368a57d459aac17bdbb4e5a1b700d7aea9ec396ca92f4b267d83e904365c3"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-23-2022-512x384.webp",
+      "path": "public/portal/history/fenasoja-edicao-23-2022-512x384.webp",
+      "kind": "runtime",
+      "editionNumber": 23,
+      "year": 2022,
+      "width": 512,
+      "height": 384,
+      "bytes": 19412,
+      "sha256": "e4722725a050a828b3152f99a4d20f89d9c40bd92360c4b0c3f7965200942ff8"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-24-2024-256x192.webp",
+      "path": "public/portal/history/fenasoja-edicao-24-2024-256x192.webp",
+      "kind": "runtime",
+      "editionNumber": 24,
+      "year": 2024,
+      "width": 256,
+      "height": 192,
+      "bytes": 6246,
+      "sha256": "34ef9f1e663f4406bc64d92f05d3c5b43883183e35026c02ea445bed345bb14e"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-24-2024-512x384.webp",
+      "path": "public/portal/history/fenasoja-edicao-24-2024-512x384.webp",
+      "kind": "runtime",
+      "editionNumber": 24,
+      "year": 2024,
+      "width": 512,
+      "height": 384,
+      "bytes": 14680,
+      "sha256": "2f1b22125dd990be4471e64e5113f10cedc94a9809ab15b6fd3aed22b48c8e59"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-25-2026-256x192.webp",
+      "path": "public/portal/history/fenasoja-edicao-25-2026-256x192.webp",
+      "kind": "runtime",
+      "editionNumber": 25,
+      "year": 2026,
+      "width": 256,
+      "height": 192,
+      "bytes": 6084,
+      "sha256": "31c32903827ca5efb3d0974c29801d521fb7a4bd2b5eab7f3a47c158b36d74b6"
+    },
+    {
+      "archivePath": "Fenasoja_Acervo_Pesquisado/portal/fenasoja-edicao-25-2026-512x384.webp",
+      "path": "public/portal/history/fenasoja-edicao-25-2026-512x384.webp",
+      "kind": "runtime",
+      "editionNumber": 25,
+      "year": 2026,
+      "width": 512,
+      "height": 384,
+      "bytes": 13892,
+      "sha256": "a6a29c6db066e0d15510b324045359011c290a6c5135b4b2418970acb5cf2f88"
+    },
+    {
+      "archivePath": null,
+      "path": "docs/portal-history/source/artes-manifest.json",
+      "kind": "legacy-provenance",
       "bytes": 3453,
       "sha256": "8dc26d1b09ff66793fbf54094fd9b060f60e85d434d736c982474441923a5648"
     },
     {
-      "archivePath": "Fenasoja_Portal_Artes/originais/fenasoja-2014.png",
+      "archivePath": null,
+      "path": "docs/portal-history/source/artes/fenasoja-2014.jpg",
+      "kind": "legacy-provenance",
+      "bytes": 257420,
+      "sha256": "a3a73948b04ea0b6d4635f35adf364aad03739754f642222270b3362d36b2453"
+    },
+    {
+      "archivePath": null,
+      "path": "docs/portal-history/source/artes/fenasoja-2016.jpg",
+      "kind": "legacy-provenance",
+      "bytes": 213775,
+      "sha256": "61f197ac8f144431cffb13af2c36ac339d1f9a0c37f8a9f278fa1667ecac1900"
+    },
+    {
+      "archivePath": null,
+      "path": "docs/portal-history/source/artes/fenasoja-2014-320x240.svg",
+      "kind": "legacy-provenance",
+      "bytes": 343527,
+      "sha256": "0597f7d5d4fa0909cd406274c640535732a9e910f96143d776a86f5d43af63fd"
+    },
+    {
+      "archivePath": null,
+      "path": "docs/portal-history/source/artes/fenasoja-2016-320x240.svg",
+      "kind": "legacy-provenance",
+      "bytes": 285335,
+      "sha256": "db5258e8968c9eb173e6524718b0481f904f51ed7291e85eb0044bf5ef3ff6bb"
+    },
+    {
+      "archivePath": null,
+      "path": "docs/portal-history/source/artes/fenasoja-2018-320x240.svg",
+      "kind": "legacy-provenance",
+      "bytes": 128623,
+      "sha256": "60b9006d706c33957bbfe016091edbbbe62054a0ed3e613ead6e29ee7a3a4197"
+    },
+    {
+      "archivePath": null,
+      "path": "docs/portal-history/source/artes/fenasoja-2024-320x240.svg",
+      "kind": "legacy-provenance",
+      "bytes": 35219,
+      "sha256": "f799104f9d97968b61121f6307290e94813c62c1fe7dc3aae3f42337de226f2f"
+    },
+    {
+      "archivePath": null,
+      "path": "docs/portal-history/source/artes/fenasoja-2018.webp",
+      "kind": "legacy-provenance",
+      "canonicalPath": "docs/portal-history/source/originais/fenasoja-edicao-22-2018.webp",
+      "bytes": 96242,
+      "sha256": "16238ed00c7d4b174ba047ec237db4c8701ab188bde40dc32697c14c5a683b33"
+    },
+    {
+      "archivePath": null,
+      "path": "docs/portal-history/source/artes/fenasoja-2024.jpg",
+      "kind": "legacy-provenance",
+      "canonicalPath": "docs/portal-history/source/originais/fenasoja-edicao-24-2024.jpg",
+      "bytes": 26190,
+      "sha256": "b1836950100311ef6347d479f9b1f0446b99831fda54e9d3cdae9eedd116b62d"
+    },
+    {
+      "archivePath": null,
       "path": "docs/portal-history/source/originais/fenasoja-2014.png",
-      "kind": "consultation",
+      "kind": "legacy-provenance",
+      "canonicalPath": "docs/portal-history/source/originais/fenasoja-edicao-20-2014.png",
       "bytes": 2013754,
       "sha256": "e25c25aed3531526e5726f9c9deaf24fd432410c9e4bb7573f1598a00f7f15ef"
     },
     {
-      "archivePath": "Fenasoja_Portal_Artes/originais/fenasoja-2016.png",
+      "archivePath": null,
       "path": "docs/portal-history/source/originais/fenasoja-2016.png",
-      "kind": "consultation",
+      "kind": "legacy-provenance",
+      "canonicalPath": "docs/portal-history/source/originais/fenasoja-edicao-21-2016.png",
       "bytes": 1934144,
       "sha256": "39f7fc3e9f5475d9f3c5dc068bf5bda473a42dfe2b4e8607988dc78e4b08261a"
     }

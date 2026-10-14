@@ -1,2 +1,7 @@
 # Recorded browser evidence; keep code review focused on authored changes.
 docs/validation/alvorada-2028/** linguist-generated=true
+docs/portal-history/continuous/evidence/** linguist-generated=true
+
+# Preserve the supplied archive bytes (including CRLF/EOF) for SHA-256 verification.
+docs/portal-history/source/catalogo-25-edicoes.csv -text whitespace=cr-at-eol
+docs/portal-history/source/documentacao/FONTES.md -text whitespace=-blank-at-eof

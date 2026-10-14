@@ -1,0 +1,35 @@
+{
+  "actions": [
+    {
+      "contained": true,
+      "title": "Agenda Fenasoja"
+    },
+    {
+      "contained": true,
+      "title": "Agenda Restaurante e Arena"
+    },
+    {
+      "contained": true,
+      "title": "Mapa Comercial"
+    },
+    {
+      "contained": true,
+      "title": "Financeiro"
+    },
+    {
+      "contained": true,
+      "title": "Administrador"
+    },
+    {
+      "contained": true,
+      "title": "Comissões"
+    }
+  ],
+  "brandX": 0,
+  "brandY": -0.00390625,
+  "card": 121.5546875,
+  "font": "32px",
+  "height": 800,
+  "overflow": false,
+  "width": 320
+}

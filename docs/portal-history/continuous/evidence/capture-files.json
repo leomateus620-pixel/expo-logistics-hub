@@ -1,0 +1,118 @@
+[
+  {
+    "file": "comparison-desktop.jpg",
+    "bytes": 74188,
+    "width": 1200,
+    "height": 310,
+    "frames": 1
+  },
+  {
+    "file": "comparison-mobile.jpg",
+    "bytes": 28955,
+    "width": 388,
+    "height": 350,
+    "frames": 1
+  },
+  {
+    "file": "desktop-1440.jpg",
+    "bytes": 121903,
+    "width": 1440,
+    "height": 1000,
+    "frames": 1
+  },
+  {
+    "file": "limited-mobile-320.jpg",
+    "bytes": 41834,
+    "width": 320,
+    "height": 800,
+    "frames": 1
+  },
+  {
+    "file": "qa-before-shield-desktop.jpg",
+    "bytes": 76289,
+    "width": 1200,
+    "height": 298,
+    "frames": 1
+  },
+  {
+    "file": "qa-before-shield-text-zoom.jpg",
+    "bytes": 129585,
+    "width": 320,
+    "height": 2356,
+    "frames": 1
+  },
+  {
+    "file": "responsive-1366x768.jpg",
+    "bytes": 102368,
+    "width": 1366,
+    "height": 768,
+    "frames": 1
+  },
+  {
+    "file": "responsive-1920x1080.jpg",
+    "bytes": 147534,
+    "width": 1912,
+    "height": 1080,
+    "frames": 1
+  },
+  {
+    "file": "responsive-320x720.jpg",
+    "bytes": 37921,
+    "width": 320,
+    "height": 720,
+    "frames": 1
+  },
+  {
+    "file": "responsive-360x800.jpg",
+    "bytes": 46385,
+    "width": 360,
+    "height": 800,
+    "frames": 1
+  },
+  {
+    "file": "responsive-390x844.jpg",
+    "bytes": 49986,
+    "width": 390,
+    "height": 844,
+    "frames": 1
+  },
+  {
+    "file": "responsive-430x932.jpg",
+    "bytes": 57331,
+    "width": 430,
+    "height": 932,
+    "frames": 1
+  },
+  {
+    "file": "responsive-768x1024.jpg",
+    "bytes": 98217,
+    "width": 768,
+    "height": 1024,
+    "frames": 1
+  },
+  {
+    "file": "responsive-844x390.jpg",
+    "bytes": 44372,
+    "width": 844,
+    "height": 390,
+    "frames": 1
+  },
+  {
+    "file": "seam-2026-1998.gif",
+    "bytes": 2081975,
+    "width": 1180,
+    "height": 114,
+    "frames": 40
+  },
+  {
+    "file": "seam-2026-1998.mp4",
+    "bytes": 2783017
+  },
+  {
+    "file": "text-zoom-200-320.jpg",
+    "bytes": 105916,
+    "width": 320,
+    "height": 2356,
+    "frames": 1
+  }
+]

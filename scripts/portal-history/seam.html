@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>FENASOJA — gravação local da emenda</title></head>
+<body style="margin:0"><div id="root"></div><script type="module">
+// Local QA only: resume the real controller near the seam at its normal speed.
+// No animation seeking, synthetic frames, Alvorada state or production route.
+const { FENASOJA_HISTORY_ARTS } = await import('/src/components/portal/history/artCatalog.ts');
+const { GALLERY_SESSION_KEY } = await import('/src/components/portal/history/galleryTimeline.ts');
+sessionStorage.setItem(GALLERY_SESSION_KEY, JSON.stringify({version:2,artIds:FENASOJA_HISTORY_ARTS.map(a=>a.id),positionUnits:FENASOJA_HISTORY_ARTS.findIndex(a=>a.id==='fenasoja-edicao-25')+.4,anchorId:'fenasoja-edicao-25',userPaused:true}));
+history.replaceState(null,'','/portal');
+await import('/src/main.tsx');
+</script></body></html>

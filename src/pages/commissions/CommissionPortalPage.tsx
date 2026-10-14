@@ -9,9 +9,10 @@ import {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+import { Pause, Play, X } from 'lucide-react';
 import CommissionCard from '@/components/commissions/CommissionCard';
 import { FenasojaPortalHistory } from '@/components/portal/FenasojaPortalHistory';
+import { readGallerySession } from '@/components/portal/history/galleryTimeline';
 import { FenasojaPortalHero } from '@/components/portal/FenasojaPortalHero';
 import { PortalPrimaryEntry } from '@/components/portal/PortalPrimaryEntry';
 import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
@@ -119,6 +120,8 @@ export default function CommissionPortalPage() {
   const [expandedEntry, setExpandedEntry] = useState<PortalEntryId | null>(null);
   const [ecosystemOpen, setEcosystemOpen] = useState(false);
   const [historyReleased, setHistoryReleased] = useState(false);
+  const [historyUserPaused, setHistoryUserPaused] = useState(() => readGallerySession()?.userPaused ?? false);
+  const [historyMotionAvailable, setHistoryMotionAvailable] = useState(false);
   const releaseHistory = useCallback(() => setHistoryReleased(true), []);
   const portalRef = useRef<HTMLDivElement>(null);
   const ecosystemLauncherRef = useRef<HTMLButtonElement>(null);
@@ -403,8 +406,14 @@ export default function CommissionPortalPage() {
             onPointerEnter={preloadEcosystem}
             onTouchStart={preloadEcosystem}
           >
-            <FenasojaPortalHistory released={historyReleased} paused={ecosystemOpen} />
+            <FenasojaPortalHistory released={historyReleased} paused={ecosystemOpen}
+              userPaused={historyUserPaused} onMotionAvailable={setHistoryMotionAvailable} />
           </button>
+          {historyMotionAvailable && <button type="button" className="fenasoja-portal__history-toggle"
+            aria-label={historyUserPaused ? 'Retomar faixa histórica' : 'Pausar faixa histórica'}
+            aria-pressed={historyUserPaused} onClick={() => setHistoryUserPaused((value) => !value)}>
+            {historyUserPaused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
+          </button>}
         </header>
 
         <FenasojaPortalHero onIntroReleased={releaseHistory} />

@@ -51,6 +51,9 @@ describe('contrato de acesso: ecossistema direto e introdução embutida na cont
     );
     expect(portalHistory.match(/<FenasojaBrand /g)).toHaveLength(1);
     expect(portalHistory).not.toMatch(/<button|<Link/);
+    expect(portalPage).toContain('userPaused={historyUserPaused}');
+    expect(portalPage).toContain("'Retomar faixa histórica' : 'Pausar faixa histórica'");
+    expect(portalPage).toContain('aria-pressed={historyUserPaused}');
     expect(portalPage).toContain('aria-haspopup="dialog"');
     expect(portalPage).toContain('aria-expanded={ecosystemOpen}');
     expect(portalPage).toContain('onClick={openEcosystem}');

@@ -5,11 +5,10 @@ import CommissionPortalPage from '@/pages/commissions/CommissionPortalPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { markAlvoradaIntroStarted, resetAlvoradaIntroSessionForTests } from '@/features/alvorada/introSession';
 import type { FenasojaHistoryArt } from '@/components/portal/history/artCatalog';
+import { getGalleryLayout } from '@/components/portal/history/galleryLayout';
 import {
   GALLERY_SESSION_KEY,
-  GALLERY_REVEAL_MS,
-  GALLERY_HIGHLIGHT_MS,
-  GALLERY_CLOSING_MS,
+  readGallerySession,
 } from '@/components/portal/history/galleryTimeline';
 import {
   ALVORADA_FALLBACK_NARRATIVE,
@@ -27,12 +26,35 @@ const integrationMocks = vi.hoisted(() => ({
 
 let updateGalleryIntersection: ((visible: boolean) => void) | null = null;
 const originalAnimate = Object.getOwnPropertyDescriptor(Element.prototype, 'animate');
+let historyAnimations: { node: Element; animation: Animation }[] = [];
 
-vi.mock('@/components/portal/history/prepareGalleryAssets', () => ({
-  prepareGalleryAssets: (arts: readonly FenasojaHistoryArt[], signal: AbortSignal) => (
-    integrationMocks.prepareGallery(arts, signal)
-  ),
-}));
+vi.mock('@/components/portal/history/prepareGalleryAssets', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/components/portal/history/prepareGalleryAssets')>();
+  return {
+    ...actual,
+    createGalleryAssetPreparer: ({ arts, onChange }: Parameters<typeof actual.createGalleryAssetPreparer>[0]) => {
+      const ready = new Set<string>();
+      const pending = new Set<string>();
+      const failed = new Set<string>();
+      let disposed = false;
+      return {
+        request(ids: readonly string[]) {
+          const chosen = arts.filter((art) => ids.includes(art.id) && !ready.has(art.id) && !pending.has(art.id));
+          if (disposed || !chosen.length) return;
+          chosen.forEach((art) => pending.add(art.id));
+          void integrationMocks.prepareGallery(chosen).then((valid: readonly FenasojaHistoryArt[]) => {
+            if (disposed) return;
+            valid.forEach((art) => { pending.delete(art.id); ready.add(art.id); });
+            onChange({ ready: [...ready], failed: [...failed] });
+          });
+        },
+        setSizes: vi.fn(),
+        fail(id: string) { ready.delete(id); failed.add(id); onChange({ ready: [...ready], failed: [...failed] }); },
+        dispose() { disposed = true; },
+      };
+    },
+  };
+});
 
 vi.mock('@/features/alvorada/organizational', () => ({
   useOrganizationalEcosystemData: () => ({
@@ -124,12 +146,32 @@ function countdownSection() {
 
 describe('integração do portal: ecossistema direto e introdução embutida na contagem', () => {
   beforeEach(() => {
+    historyAnimations = [];
     Object.defineProperty(Element.prototype, 'animate', {
       configurable: true,
-      value: vi.fn(() => ({ currentTime: 0, pause: vi.fn(), play: vi.fn(), cancel: vi.fn() })),
+      value: vi.fn(function (this: Element) {
+        let baseTime = 0;
+        let resumedAt = 0;
+        let playing = false;
+        const currentTime = () => baseTime + (playing ? performance.now() - resumedAt : 0);
+        const animation = {
+          get currentTime() { return currentTime(); },
+          set currentTime(value: number) { baseTime = Number(value); resumedAt = performance.now(); },
+          play: vi.fn(() => { if (!playing) { resumedAt = performance.now(); playing = true; } }),
+          pause: vi.fn(() => { baseTime = currentTime(); playing = false; }),
+          cancel: vi.fn(() => { baseTime = currentTime(); playing = false; }),
+        } as unknown as Animation;
+        historyAnimations.push({ node: this, animation });
+        return animation;
+      }),
     });
-    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
-      width: 390, height: 420, x: 0, y: 0, top: 0, left: 0, right: 390, bottom: 420, toJSON: () => ({}),
+    vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(390);
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      const width = this.classList.contains('fenasoja-brand') ? 230
+        : this.classList.contains('fenasoja-history__group')
+          ? this.querySelectorAll('[data-art]').length * getGalleryLayout(390).stepPx : 390;
+      const height = this.classList.contains('fenasoja-brand') ? 34 : 420;
+      return { width, height, x: 0, y: 0, top: 0, left: 0, right: width, bottom: height, toJSON: () => ({}) };
     });
     resetAlvoradaIntroSessionForTests();
     sessionStorage.clear();
@@ -387,6 +429,7 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
       act(() => {
         document.dispatchEvent(new Event('visibilitychange'));
       });
+      await act(async () => { await Promise.resolve(); });
       expect(hero).toHaveAttribute('data-intro', 'playing');
     } finally {
       Reflect.deleteProperty(document, 'visibilityState');
@@ -418,7 +461,7 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
     expect(integrationMocks.canvasMounts).toBe(1);
   });
 
-  it('aguarda toda a saída da Alvorada, conclui a memória visual uma vez e mantém a contagem', async () => {
+  it('aguarda toda a saída da Alvorada antes de iniciar a faixa contínua e preserva a contagem', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     try {
       const first = renderPortal();
@@ -428,7 +471,6 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
       expect(hero).toHaveAttribute('data-intro', 'playing');
       expect(history).toHaveAttribute('data-running', 'false');
       expect(sessionStorage.getItem(GALLERY_SESSION_KEY)).toBeNull();
-
       act(() => vi.advanceTimersByTime(600));
       expect(history).toHaveAttribute('data-phase', 'waiting');
       fireEvent.click(screen.getByRole('button', { name: 'Pular animação e mostrar a contagem oficial' }));
@@ -437,123 +479,131 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
       expect(history).toHaveAttribute('data-phase', 'waiting');
       act(() => vi.advanceTimersByTime(1));
       expect(hero).toHaveAttribute('data-intro', 'done');
-      expect(history).toHaveAttribute('data-phase', 'reveal');
-      expect(history).toHaveAttribute('data-running', 'true');
-
-      act(() => vi.advanceTimersByTime(GALLERY_REVEAL_MS));
-      expect(history).toHaveAttribute('data-phase', 'highlight');
-      expect(history).toHaveAttribute('data-active-art', '2016');
-      act(() => vi.advanceTimersByTime(GALLERY_HIGHLIGHT_MS));
-      expect(history).toHaveAttribute('data-active-art', '2024');
-      // Both intact campaigns remain mounted after the first highlight.
-      expect(history.querySelectorAll('.fenasoja-history__art')).toHaveLength(2);
-      act(() => vi.advanceTimersByTime(GALLERY_HIGHLIGHT_MS));
-      expect(history).toHaveAttribute('data-phase', 'closing');
-      expect(history.querySelectorAll('.fenasoja-history__art')).toHaveLength(2);
-      act(() => vi.advanceTimersByTime(GALLERY_CLOSING_MS));
-      expect(history).toHaveAttribute('data-phase', 'done');
-      expect(history).toHaveAttribute('data-running', 'false');
+      await waitFor(() => expect(history).toHaveAttribute('data-phase', 'running'));
+      expect(history).toHaveAttribute('data-art-count', '12');
       expect(screen.getAllByRole('timer')).toHaveLength(1);
       expect(screen.getByRole('button', { name: 'Abrir contagem oficial da Fenasoja 2028' })).toBeEnabled();
-
-      const prepareCalls = integrationMocks.prepareGallery.mock.calls.length;
+      act(() => vi.advanceTimersByTime(10_000));
+      await act(async () => { await Promise.resolve(); });
+      expect(history).toHaveAttribute('data-running', 'true');
       first.unmount();
+      const saved = readGallerySession();
       renderPortal();
-      expect(screen.getByTestId('portal-history')).toHaveAttribute('data-phase', 'done');
-      expect(integrationMocks.prepareGallery).toHaveBeenCalledTimes(prepareCalls);
-      expect(screen.getByTestId('portal-history').querySelectorAll('.fenasoja-history__art')).toHaveLength(0);
+      await waitFor(() => expect(screen.getByTestId('portal-history')).toHaveAttribute('data-running', 'true'));
+      expect(readGallerySession()?.anchorId).toBe(saved?.anchorId);
+      expect(screen.getAllByRole('button', { name: 'Abrir Ecossistema Fenasoja' })).toHaveLength(1);
     } finally {
       vi.useRealTimers();
     }
   });
 
-  it('mantém a sequência canônica da memória visual com movimento reduzido solicitado', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    try {
-      markAlvoradaIntroStarted();
-      (window.matchMedia as unknown as ReturnType<typeof vi.fn>).mockImplementation((query: string) => ({
-        matches: query.includes('prefers-reduced-motion'), media: query,
-        addEventListener: vi.fn(), removeEventListener: vi.fn(),
-        addListener: vi.fn(), removeListener: vi.fn(),
-      }));
-      renderPortal();
-      const history = screen.getByTestId('portal-history');
-      await waitFor(() => expect(history).toHaveAttribute('data-phase', 'reveal'));
-      expect(history).toHaveAttribute('data-gallery-motion', 'canonical');
-      act(() => vi.advanceTimersByTime(GALLERY_REVEAL_MS));
-      expect(history).toHaveAttribute('data-phase', 'highlight');
-      expect(history).toHaveAttribute('data-active-art', '2016');
-      expect(screen.getByRole('link', { name: 'Entrar para acessar: Administrador' })).toBeInTheDocument();
-    } finally {
-      vi.useRealTimers();
-    }
+  it('respeita movimento reduzido na faixa histórica sem impedir os acessos ou alterar a Alvorada', async () => {
+    markAlvoradaIntroStarted();
+    (window.matchMedia as unknown as ReturnType<typeof vi.fn>).mockImplementation((query: string) => ({
+      matches: query.includes('prefers-reduced-motion'), media: query,
+      addEventListener: vi.fn(), removeEventListener: vi.fn(),
+      addListener: vi.fn(), removeListener: vi.fn(),
+    }));
+    renderPortal();
+    await act(async () => { await Promise.resolve(); });
+    const history = screen.getByTestId('portal-history');
+    expect(history).toHaveAttribute('data-mode', 'static');
+    expect(history).toHaveAttribute('data-running', 'false');
+    expect(integrationMocks.prepareGallery).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: 'Pausar faixa histórica' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Entrar para acessar: Administrador' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Abrir Ecossistema Fenasoja' })).toBeEnabled();
   });
 
-  it('preserva o destaque restante ao ocultar a aba ou retirar o cabeçalho da viewport', async () => {
+  it('conserva a posição da faixa ao ocultar a aba ou retirar o cabeçalho da viewport', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     try {
       markAlvoradaIntroStarted();
       renderPortal();
       const history = screen.getByTestId('portal-history');
-      await waitFor(() => expect(history).toHaveAttribute('data-phase', 'reveal'));
-      act(() => vi.advanceTimersByTime(GALLERY_REVEAL_MS + 350));
-      expect(history).toHaveAttribute('data-active-art', '2016');
-
+      await waitFor(() => expect(history).toHaveAttribute('data-running', 'true'));
+      act(() => vi.advanceTimersByTime(950));
       Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'hidden' });
       act(() => document.dispatchEvent(new Event('visibilitychange')));
       expect(history).toHaveAttribute('data-running', 'false');
-      const pausedElapsed = JSON.parse(sessionStorage.getItem(GALLERY_SESSION_KEY)!).elapsedMs;
+      const paused = sessionStorage.getItem(GALLERY_SESSION_KEY);
       act(() => vi.advanceTimersByTime(10_000));
-      expect(history).toHaveAttribute('data-active-art', '2016');
-      expect(JSON.parse(sessionStorage.getItem(GALLERY_SESSION_KEY)!).elapsedMs).toBe(pausedElapsed);
-
+      expect(sessionStorage.getItem(GALLERY_SESSION_KEY)).toBe(paused);
       act(() => updateGalleryIntersection?.(false));
       Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
       act(() => document.dispatchEvent(new Event('visibilitychange')));
       expect(history).toHaveAttribute('data-running', 'false');
       act(() => vi.advanceTimersByTime(10_000));
-      expect(history).toHaveAttribute('data-active-art', '2016');
+      expect(sessionStorage.getItem(GALLERY_SESSION_KEY)).toBe(paused);
       act(() => updateGalleryIntersection?.(true));
       expect(history).toHaveAttribute('data-running', 'true');
-      act(() => vi.advanceTimersByTime(GALLERY_HIGHLIGHT_MS - (pausedElapsed - GALLERY_REVEAL_MS) - 1));
-      expect(history).toHaveAttribute('data-active-art', '2016');
-      act(() => vi.advanceTimersByTime(1));
-      expect(history).toHaveAttribute('data-active-art', '2024');
+      const track = historyAnimations.find(({ node, animation }) => (
+        node.classList.contains('fenasoja-history__track') && vi.mocked(animation.cancel).mock.calls.length === 0
+      ))!;
+      const resumedTime = Number(track.animation.currentTime);
+      act(() => vi.advanceTimersByTime(250));
+      expect(Number(track.animation.currentTime)).toBeCloseTo(resumedTime + 250);
     } finally {
       Reflect.deleteProperty(document, 'visibilityState');
       vi.useRealTimers();
     }
   });
 
-  it('pausa o destaque histórico no ecossistema e retoma com foco restaurado no mesmo launcher', async () => {
+  it('pausa a faixa no ecossistema e retoma após restaurar o foco no mesmo launcher', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     try {
       renderPortal();
       const history = screen.getByTestId('portal-history');
       const launcher = screen.getByRole('button', { name: 'Abrir Ecossistema Fenasoja' });
-      await waitFor(() => expect(history).toHaveAttribute('data-phase', 'waiting'));
+      await act(async () => { await Promise.resolve(); });
       fireEvent.click(screen.getByRole('button', { name: 'Pular animação e mostrar a contagem oficial' }));
       act(() => vi.advanceTimersByTime(ALVORADA_INTRO_EXIT_DURATION_MS));
-      act(() => vi.advanceTimersByTime(GALLERY_REVEAL_MS + 350));
-      expect(history).toHaveAttribute('data-active-art', '2016');
-
+      await waitFor(() => expect(history).toHaveAttribute('data-running', 'true'));
+      act(() => vi.advanceTimersByTime(950));
       fireEvent.click(launcher);
       expect(history).toHaveAttribute('data-running', 'false');
-      const savedElapsed = JSON.parse(sessionStorage.getItem(GALLERY_SESSION_KEY)!).elapsedMs;
+      const saved = sessionStorage.getItem(GALLERY_SESSION_KEY);
       await screen.findByTestId('ecosystem-experience', {}, { timeout: 5000 });
       act(() => vi.advanceTimersByTime(10_000));
-      expect(history).toHaveAttribute('data-phase', 'highlight');
-      expect(history).toHaveAttribute('data-active-art', '2016');
-      expect(JSON.parse(sessionStorage.getItem(GALLERY_SESSION_KEY)!).elapsedMs).toBe(savedElapsed);
-
+      expect(history).toHaveAttribute('data-running', 'false');
+      expect(sessionStorage.getItem(GALLERY_SESSION_KEY)).toBe(saved);
       fireEvent.keyDown(window, { key: 'Escape' });
       await waitFor(() => expect(launcher).toHaveFocus());
       expect(history).toHaveAttribute('data-running', 'true');
       expect(launcher).toHaveAttribute('aria-expanded', 'false');
-      act(() => vi.advanceTimersByTime(GALLERY_HIGHLIGHT_MS));
-      expect(history).toHaveAttribute('data-active-art', '2024');
-      expect(screen.getAllByRole('button', { name: 'Abrir Ecossistema Fenasoja' })).toHaveLength(1);
       expect(launcher.querySelectorAll('button, a')).toHaveLength(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('mantém a pausa escolhida pelo usuário em um controle separado do launcher', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      markAlvoradaIntroStarted();
+      const first = renderPortal();
+      const history = screen.getByTestId('portal-history');
+      const launcher = screen.getByRole('button', { name: 'Abrir Ecossistema Fenasoja' });
+      const pause = await screen.findByRole('button', { name: 'Pausar faixa histórica' });
+      expect(launcher.contains(pause)).toBe(false);
+      expect(pause).toHaveAttribute('aria-pressed', 'false');
+      fireEvent.click(pause);
+      const resume = screen.getByRole('button', { name: 'Retomar faixa histórica' });
+      expect(resume).toHaveAttribute('aria-pressed', 'true');
+      expect(history).toHaveAttribute('data-running', 'false');
+      expect(readGallerySession()?.userPaused).toBe(true);
+      fireEvent.click(launcher);
+      await screen.findByTestId('ecosystem-experience', {}, { timeout: 5000 });
+      fireEvent.keyDown(window, { key: 'Escape' });
+      await waitFor(() => expect(launcher).toHaveFocus());
+      expect(history).toHaveAttribute('data-running', 'false');
+      first.unmount();
+      renderPortal();
+      await screen.findByRole('button', { name: 'Retomar faixa histórica' });
+      expect(screen.getByTestId('portal-history')).toHaveAttribute('data-running', 'false');
+      fireEvent.click(screen.getByRole('button', { name: 'Retomar faixa histórica' }));
+      expect(screen.getByRole('button', { name: 'Pausar faixa histórica' })).toHaveAttribute('aria-pressed', 'false');
+      expect(screen.getByTestId('portal-history')).toHaveAttribute('data-running', 'true');
     } finally {
       vi.useRealTimers();
     }
