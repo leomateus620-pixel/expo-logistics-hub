@@ -11,6 +11,11 @@ vi.mock('@/hooks/useOrgCommissions', () => ({ useOrgCommissions: () => ({ commis
   { id: 'qa-c1', nome: 'Comissão de teste', slug: 'qa' }, { id: 'qa-c2', nome: 'Comissão disponível', slug: 'qa2' },
 ] }) }));
 vi.mock('@/hooks/use-toast', () => ({ toast: vi.fn() }));
+vi.mock('@/features/financial-management/operational/useFinancialExpenseCapabilities', () => ({ useFinancialExpenseCapabilities: () => ({ canAccess: true, canEdit: true, canConfirm: true, canAdmin: true, isLoading: false, isError: false, refetch: vi.fn() }) }));
+// Workspace routing is verified here; authenticated expense behavior has its own integration tests.
+vi.mock('@/features/financial-management/operational/Financial2028Expenses', () => ({
+  Financial2028Expenses: ({ focus }: { focus: string }) => <div aria-label={`Despesas compartilhadas ${focus}`} />,
+}));
 vi.mock('@/features/financial-management/operational/financialOperationalApi', async (original) => ({
   ...await original<typeof import('@/features/financial-management/operational/financialOperationalApi')>(),
   fetchEditions: vi.fn(), fetchBudgets: vi.fn(), fetchBudgetLines: vi.fn(), fetchEditionSummary: vi.fn(), fetchRevenues: vi.fn(), fetchSponsorships: vi.fn(), saveFinancialRecord: vi.fn(),
@@ -19,7 +24,7 @@ const edition = { id:'qa-e',org_id:'qa-org',code:2028,label:'Fenasoja 2028',stat
 const budget = { id:'qa-b',edition_id:'qa-e',commission_id:'qa-c1',responsible_name:'Responsável de teste',budget_cap_cents:null,period_start:null,period_end:null,notes:null,version:7,updated_at:'' };
 const revenue = { id:'qa-r',description:'Receita de teste',counterparty:'Contraparte',responsible_name:null,funding_type:'recurso_livre' as const,status:'confirmada' as const,projected_cents:123456,confirmed_cents:12345,competence_date:null,due_date:'2028-05-01',notes:null,version:8 };
 const sponsor = { id:'qa-s',name:'Patrocinador de teste',tier:'ouro' as const,negotiation_status:'negociacao' as const,responsible_name:null,declared_cents:null,projected_free_cents:12345,projected_rouanet_cents:10000,confirmed_free_cents:2000,confirmed_rouanet_cents:1000,in_kind_description:'Serviço de teste',in_kind_value_cents:500000,notes:null,version:9 };
-const revenuePanel = (side: 'projetado' | 'realizado') => within(document.querySelector(`[data-revenue-panel="${side}"]`) as HTMLElement);
+const revenueRecords = () => within(document.querySelector('.f28-revenue-records') as HTMLElement);
 function mount(view: FinancialViewPath) {
   const client = new QueryClient({ defaultOptions: { queries:{retry:false},mutations:{retry:false} } });
   return render(<QueryClientProvider client={client}><Financial2028Workspace view={view} /></QueryClientProvider>);
@@ -69,7 +74,7 @@ describe('apresentação operacional Financeiro 2028', () => {
     const user=userEvent.setup(); mount('receitas-projetadas');
     await user.click(await screen.findByRole('button',{name:/Adicionar receita projetada/}));
     const dialog=screen.getByRole('dialog');
-    await user.click(within(dialog).getByRole('button',{name:'Salvar'}));
+    await user.click(within(dialog).getByRole('button',{name:'Salvar receita'}));
     expect(within(dialog).getByLabelText(/^Descrição/)).toHaveAttribute('aria-invalid','true');
     expect(saveFinancialRecord).not.toHaveBeenCalled();
     await user.click(within(dialog).getByRole('button',{name:'Cancelar'}));
@@ -78,16 +83,16 @@ describe('apresentação operacional Financeiro 2028', () => {
   it('mantém conteúdo, expectedVersion e chave de tentativa após falha recuperável', async () => {
     const user=userEvent.setup(); mount('receitas-confirmadas');
     await screen.findAllByText('Receita de teste');
-    await user.click(revenuePanel('realizado').getByRole('button',{name:'Editar Receita de teste'}));
+    await user.click(revenueRecords().getByRole('button',{name:'Editar Receita de teste'}));
     const dialog=screen.getByRole('dialog'); const description=within(dialog).getByLabelText(/^Descrição/);
     await user.clear(description); await user.type(description,'Receita revisada em teste');
     vi.mocked(saveFinancialRecord).mockRejectedValueOnce(new Error('Falha de rede recuperável de teste.'));
-    await user.click(within(dialog).getByRole('button',{name:'Salvar'}));
+    await user.click(within(dialog).getByRole('button',{name:'Salvar receita'}));
     await within(dialog).findByText('Falha de rede recuperável de teste.');
     expect(description).toHaveValue('Receita revisada em teste');
     const first=vi.mocked(saveFinancialRecord).mock.calls[0][0];
     expect(first).toMatchObject({entity:'revenue',expectedVersion:8,payload:{id:revenue.id,projected_cents:123456,confirmed_cents:12345}});
-    await user.click(within(dialog).getByRole('button',{name:'Salvar'}));
+    await user.click(within(dialog).getByRole('button',{name:'Salvar receita'}));
     await waitFor(()=>expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(vi.mocked(saveFinancialRecord).mock.calls[1][0].requestId).toBe(first.requestId);
   });
@@ -105,8 +110,8 @@ describe('apresentação operacional Financeiro 2028', () => {
     const user=userEvent.setup(); let confirm:(value:Record<string,unknown>)=>void=()=>undefined;
     vi.mocked(saveFinancialRecord).mockImplementation(()=>new Promise(resolve=>{confirm=resolve;}));
     mount('receitas-projetadas'); await screen.findAllByText('Receita de teste');
-    await user.click(revenuePanel('projetado').getByRole('button',{name:'Editar Receita de teste'}));
-    const dialog=screen.getByRole('dialog'); await user.click(within(dialog).getByRole('button',{name:'Salvar'}));
+    await user.click(revenueRecords().getByRole('button',{name:'Editar Receita de teste'}));
+    const dialog=screen.getByRole('dialog'); await user.click(within(dialog).getByRole('button',{name:'Salvar receita'}));
     expect(within(dialog).getByLabelText(/^Descrição/)).toBeDisabled();
     expect(within(dialog).getByRole('button',{name:'Cancelar'})).toBeDisabled();
     fireEvent.keyDown(dialog,{key:'Escape'}); expect(dialog).toBeInTheDocument();
@@ -160,14 +165,21 @@ describe('apresentação operacional Financeiro 2028', () => {
     vi.mocked(fetchRevenues).mockResolvedValue([revenue,{...revenue,id:'qa-p',description:'Expectativa de teste',status:'projetada'},{...revenue,id:'qa-c',description:'Cancelada de teste',status:'cancelada'}]);
     const view=mount('receitas-projetadas');
     await screen.findAllByText('Expectativa de teste'); expect(screen.getAllByText('Receita de teste').length).toBeGreaterThan(0);
-    expect(revenuePanel('projetado').queryByText('Cancelada de teste')).not.toBeInTheDocument(); view.unmount();
+    expect(revenueRecords().queryByText('Cancelada de teste')).not.toBeInTheDocument(); view.unmount();
     mount('receitas-confirmadas'); await screen.findAllByText('Receita de teste');
-    expect(revenuePanel('realizado').queryByText('Expectativa de teste')).not.toBeInTheDocument();
-    expect(revenuePanel('projetado').getAllByText('Expectativa de teste').length).toBeGreaterThan(0);
+    expect(revenueRecords().queryByText('Expectativa de teste')).not.toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Situação' })).toHaveValue('confirmada');
   });
-  it.each(['despesas-previstas','despesas-realizadas','simulacoes'] as const)('explicita indisponibilidade operacional em %s', async view => {
-    mount(view); await waitFor(()=>expect(screen.queryByText(/Abrindo Fenasoja/)).not.toBeInTheDocument());
-    await screen.findByRole('heading',{name:view === 'simulacoes' ? 'Cenários operacionais ainda indisponíveis' : 'Livro de despesas ainda indisponível'});
+  it.each(['despesas-previstas','despesas-realizadas'] as const)('abre despesas compartilhadas com foco correspondente em %s', async view => {
+    mount(view);
+    await screen.findByLabelText(`Despesas compartilhadas ${view === 'despesas-previstas' ? 'projetado' : 'realizado'}`);
+    expect(screen.getByRole('heading', { name: 'Despesas', level: 1 })).toBeInTheDocument();
+    expect(document.querySelector('.f28-header')).not.toBeInTheDocument();
+    expect(saveFinancialRecord).not.toHaveBeenCalled();
+  });
+  it('explicita indisponibilidade de cenários operacionais', async () => {
+    mount('simulacoes');
+    await screen.findByRole('heading',{name:'Cenários operacionais ainda indisponíveis'});
     expect(screen.queryByRole('button',{name:'Salvar'})).not.toBeInTheDocument();
     expect(saveFinancialRecord).not.toHaveBeenCalled();
   });

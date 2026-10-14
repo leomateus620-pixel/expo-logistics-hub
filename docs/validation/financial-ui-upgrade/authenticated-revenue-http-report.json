@@ -1,0 +1,129 @@
+{
+  "boundary": "Signed local fixture JWTs → actual PostgREST → unchanged repository financial RPCs/RLS.",
+  "checks": [
+    {
+      "name": "Reader sees consolidated projected and confirmed server revenue totals",
+      "passed": true
+    },
+    {
+      "name": "Reader sees net received and remaining receivable separately",
+      "passed": true
+    },
+    {
+      "name": "Manual and sponsorship forecasts preserve source subtotals",
+      "passed": true
+    },
+    {
+      "name": "Reader reads the same six labeled manual records through direct-table RLS",
+      "passed": true
+    },
+    {
+      "name": "Forecast subtotal excludes preserved canceled manual records",
+      "passed": true
+    },
+    {
+      "name": "Operator without financial access receives no direct-table revenue records",
+      "passed": true
+    },
+    {
+      "name": "Operator without financial access cannot aggregate financial summary",
+      "passed": true
+    },
+    {
+      "name": "Editor creates a projected manual revenue once across retry",
+      "passed": true
+    },
+    {
+      "name": "Creating a projected revenue does not manufacture receipt or obligation",
+      "passed": true
+    },
+    {
+      "name": "Reader cannot create revenue through mutation RPC",
+      "passed": true
+    },
+    {
+      "name": "Editor modifies projected revenue with version increment and integer cents",
+      "passed": true
+    },
+    {
+      "name": "Reloaded manual revenue preserves values and notes",
+      "passed": true
+    },
+    {
+      "name": "Editor cannot confirm manual revenue without confirmation capability",
+      "passed": true
+    },
+    {
+      "name": "Confirmer preserves projected value and creates one receivable obligation",
+      "passed": true
+    },
+    {
+      "name": "Confirmation increases confirmed and open values without increasing receipt",
+      "passed": true
+    },
+    {
+      "name": "Editing and confirmation capabilities do not authorize treasury receipt",
+      "passed": true
+    },
+    {
+      "name": "Admin records one partial allocated receipt across retry",
+      "passed": true
+    },
+    {
+      "name": "Partial receipt changes net cash and remaining balance, preserving confirmation",
+      "passed": true
+    },
+    {
+      "name": "Treasury cannot receive more than the open obligation balance",
+      "passed": true
+    },
+    {
+      "name": "Confirmed source cannot be reduced below its allocated receipt",
+      "passed": true
+    },
+    {
+      "name": "Editor cannot revise a confirmed revenue",
+      "passed": true
+    },
+    {
+      "name": "Two authorized JWT sessions accept one revision and reject stale revenue version",
+      "passed": true
+    },
+    {
+      "name": "Receipt reversal restores net received without changing confirmed value",
+      "passed": true
+    },
+    {
+      "name": "Cancellation preserves revenue row while restoring consolidated totals",
+      "passed": true
+    },
+    {
+      "name": "Manual revenue revisions and cancellation retain audit history",
+      "passed": true
+    },
+    {
+      "name": "2026 historical edition remains read-only to authorized admin",
+      "passed": true
+    },
+    {
+      "name": "Direct financial table insertion is rejected; mutation RPC remains mandatory",
+      "passed": true
+    }
+  ],
+  "limitation": "Supabase Auth login/refresh and remote gateway version are not tested.",
+  "summary": {
+    "passed": 27,
+    "total": 27,
+    "testRevenueId": "d7e3e70d-f0cc-4a82-8f57-57989225283e",
+    "initialRevenueCount": 6,
+    "finalRevenueCount": 7,
+    "finalTotals": {
+      "overdue_count": 2,
+      "received_cents": 23500000,
+      "confirmed_cents": 54000000,
+      "projected_cents": 77000000,
+      "receivable_open_cents": 30500000
+    }
+  },
+  "harnessCorrection": "The historical-write assertion was corrected from HTTP400 to HTTP403, matching unchanged SQLSTATE42501. The final two checks were rerun against the same seven-record fixture without repeating successful mutations."
+}

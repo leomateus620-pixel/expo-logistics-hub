@@ -1,0 +1,134 @@
+/* Operational 2028 only; the comparison keeps the expense query and layout boundaries. */
+.financial-operational-2028 .f28-expense-comparison {
+  min-width: 0;
+  container: expense-comparison / inline-size;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+}
+.financial-operational-2028 .f28-expense-comparison[data-compact] { gap:16px; }
+.financial-operational-2028 .f28-expense-toolbar { display:flex; gap:8px; align-items:start; flex-wrap:wrap; min-width:0; }
+.financial-operational-2028 .f28-expense-search { display:flex; align-items:center; gap:8px; flex:1 1 240px; min-width:0; border:1px solid #d7dfeb; background:#fff; border-radius:12px; padding:0 8px 0 12px; }
+.financial-operational-2028 .f28-expense-search > svg { width:18px; height:18px; color:#65748b; flex-shrink:0; }
+.financial-operational-2028 .f28-expense-search input { width:100%; min-width:0; outline:none; background:transparent; font-size:14px; min-height:44px; }
+.financial-operational-2028 .f28-expense-search:focus-within { outline:2px solid #4859a6; outline-offset:2px; }
+.financial-operational-2028 .f28-expense-search button { font-size:14px; font-weight:600; color:#3c4d94; padding:8px; min-height:44px; min-width:44px; border-radius:8px; }
+.financial-operational-2028 .f28-expense-search button svg { width:16px; height:16px; }
+.financial-operational-2028 .f28-expense-toolbar > select { flex:1 1 160px; max-width:220px; }
+.financial-operational-2028 .f28-expense-toolbar :is(select,input[type=date]) { min-width:0; min-height:44px; padding:8px 12px; border:1px solid #d7dfeb; border-radius:12px; background:#fff; font-size:14px; color:#33465c; }
+.financial-operational-2028 .f28-expense-filters { flex:0 0 auto; position:relative; min-width:0; }
+.financial-operational-2028 .f28-expense-filters summary { display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; list-style:none; min-height:46px; padding:8px 12px; border:1px solid #d7dfeb; border-radius:12px; background:#fff; font-size:14px; font-weight:600; color:#33465c; }
+.financial-operational-2028 .f28-expense-filters summary::-webkit-details-marker { display:none; }
+.financial-operational-2028 .f28-expense-filters summary svg { width:16px; height:16px; }
+.financial-operational-2028 .f28-expense-filters[open] summary { color:#35499b; border-color:#4859a6; background:#f0f2fd; }
+.financial-operational-2028 .f28-expense-filter-count { display:grid; place-items:center; min-width:22px; min-height:22px; border-radius:50%; background:#4859a6; color:#fff; font-size:12px; font-variant-numeric:tabular-nums; }
+.financial-operational-2028 .f28-expense-filters > div { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; position:absolute; right:0; top:calc(100% + 8px); z-index:20; width:min(560px,calc(100vw - 48px)); border:1px solid #d7dfeb; border-radius:12px; padding:16px; background:#fff; box-shadow:0 12px 32px #102b4414; }
+.financial-operational-2028 .f28-expense-filters label { display:grid; gap:8px; font-size:14px; font-weight:500; color:#52617c; min-width:0; }
+.financial-operational-2028 .f28-expense-filter-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:-8px; }
+.financial-operational-2028 .f28-expense-filter-chips button { display:inline-flex; align-items:center; gap:8px; max-width:100%; min-height:44px; padding:8px 12px; background:#eef1f8; border:1px solid #dce3ee; border-radius:12px; color:#33465c; font-size:14px; text-align:left; }
+.financial-operational-2028 .f28-expense-filter-chips button span { overflow-wrap:anywhere; }
+.financial-operational-2028 .f28-expense-filter-chips button svg { width:14px; height:14px; flex-shrink:0; }
+.financial-operational-2028 .f28-expense-scope { display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:-16px; }
+.financial-operational-2028 .f28-expense-scope p { margin:0; font-size:12px; line-height:1.6; color:#52617c; }
+.financial-operational-2028 .f28-expense-scope > div { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.financial-operational-2028 .f28-expense-control { display:inline-flex; align-items:center; justify-content:center; gap:8px; font-size:14px; color:#52617c; min-height:44px; border:1px solid #d7dfeb; border-radius:12px; padding:8px 12px; background:#fff; }
+.financial-operational-2028 .f28-expense-control:hover { border-color:#aab7cc; background:#f7f9fc; }
+.financial-operational-2028 .f28-expense-control svg { width:16px; height:16px; }
+.financial-operational-2028 .f28-expense-split { height:auto; align-items:stretch; overflow:visible !important; }
+.financial-operational-2028 .f28-expense-resizable { overflow:visible !important; min-width:0; container:expense-side / inline-size; }
+.financial-operational-2028 .f28-expense-divider { flex:0 0 44px; width:44px; background:transparent; touch-action:none; }
+.financial-operational-2028 .f28-expense-divider::before { content:''; position:absolute; width:1px; top:72px; bottom:0; background:#d4dce9; }
+.financial-operational-2028 .f28-expense-divider > div { position:sticky; align-self:flex-start; top:128px; margin-top:240px; width:17px; height:44px; border-radius:8px; background:#fff; border:1px solid #aab7cc; box-shadow:0 2px 6px #102a4410; }
+.financial-operational-2028 .f28-expense-divider > div svg { width:12px; height:20px; color:#52617c; }
+.financial-operational-2028 .f28-expense-divider:hover > div { border-color:#4859a6; }
+.financial-operational-2028 .f28-expense-side { --comparison-soft:#f0f2fd; --comparison-border:#cdd4ef; display:grid; gap:16px; align-content:start; min-width:0; }
+.financial-operational-2028 .f28-expense-side[data-expense-panel=realizado] { --comparison-soft:#edf7f4; --comparison-border:#bfddd7; }
+.financial-operational-2028 .f28-expense-secondary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.financial-operational-2028 .f28-expense-alerts { display:flex; gap:16px; flex-wrap:wrap; align-items:start; font-size:12px; color:#795930; border:1px solid #ead6b9; border-radius:12px; padding:12px 16px; background:#fffcf7; }
+.financial-operational-2028 .f28-expense-alerts p { margin:0; line-height:1.6; }
+.financial-operational-2028 .f28-expense-overdue-action { display:flex; align-items:center; gap:8px; }
+.financial-operational-2028 .f28-expense-overdue-action > button:not(.f28-comparison-help) { display:block; min-height:44px; text-align:left; padding:8px 0; border-radius:8px; font-size:14px; font-weight:600; color:#795930; text-decoration:underline; text-underline-offset:3px; }
+.financial-operational-2028 .f28-expense-alerts strong { font-weight:600; font-variant-numeric:tabular-nums; }
+.financial-operational-2028 .f28-expense-tabs { display:none; }
+.financial-operational-2028 .f28-expense-ledger-section { min-width:0; background:#fff; border:1px solid #dce3ee; border-radius:12px; scroll-margin-top:32px; overflow:hidden; box-shadow:0 3px 12px #102b4406; }
+.financial-operational-2028 .f28-expense-ledger-section > header { padding:16px 24px; border-bottom:1px solid #e5e9f1; display:flex; justify-content:space-between; align-items:center; gap:16px; }
+.financial-operational-2028 .f28-expense-ledger-section > header h2 { font-size:18px; font-weight:800; color:#172d4b; margin:0; }
+.financial-operational-2028 .f28-expense-ledger-section > header :is(p,span) { font-size:12px; color:#52617c; margin:8px 0 0; line-height:1.6; }
+.financial-operational-2028 .f28-expense-ledger-header-actions { display:flex; align-items:center; gap:8px; }
+.financial-operational-2028 .f28-expense-ledger-heading { display:flex; align-items:center; gap:8px; min-width:0; }
+.financial-operational-2028 .f28-expense-table table { width:100%; border-collapse:collapse; }
+.financial-operational-2028 .f28-expense-table th { text-align:right; background:#172d4b; font-size:14px; font-weight:600; color:#fff; padding:16px; white-space:nowrap; }
+.financial-operational-2028 .f28-expense-table td { font-size:15px; color:#172d4b; padding:20px 16px; border-top:1px solid #edf0f5; text-align:right; vertical-align:middle; }
+.financial-operational-2028 .f28-expense-table :is(th,td):first-child { text-align:left; width:36%; }
+.financial-operational-2028 .f28-expense-table :is(th,td):nth-child(2) { text-align:left; }
+.financial-operational-2028 .f28-expense-table td:first-child strong { display:block; font-size:16px; font-weight:700; line-height:1.45; overflow-wrap:anywhere; }
+.financial-operational-2028 .f28-expense-classification { display:block; font-size:12px; color:#52617c; line-height:1.6; margin:4px 0 0; }
+.financial-operational-2028 .f28-expense-money { font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:650; }
+.financial-operational-2028 .f28-expense-table td small,.financial-operational-2028 .f28-expense-record-values dd small { display:block; font-size:12px; color:#52617c; margin-top:4px; }
+.financial-operational-2028 [data-deviation-positive] { color:#a13746; }
+.financial-operational-2028 .f28-expense-status { display:inline-flex; align-items:center; min-height:28px; padding:4px 8px; background:#f0f2fd; border:1px solid #d9dff4; border-radius:8px; font-size:12px; font-weight:650; color:#4859a6; white-space:nowrap; }
+.financial-operational-2028 .f28-expense-status[data-status=realizada] { color:#1c746a; background:#edf7f4; border-color:#cde6de; }
+.financial-operational-2028 .f28-expense-status[data-status=cancelada] { color:#52617c; background:#f1f3f7; border-color:#dde2ea; }
+.financial-operational-2028 :is(.f28-expense-muted,.f28-expense-no-plan) { color:#52617c; font-size:12px; }
+.financial-operational-2028 .f28-expense-records { display:none; padding:16px; background:#f4f6fa; }
+.financial-operational-2028 .f28-expense-record { padding:16px; margin-bottom:16px; background:#fff; border:1px solid #dce3ee; border-radius:12px; box-shadow:0 2px 8px #102b4404; }
+.financial-operational-2028 .f28-expense-record header { display:flex; align-items:start; gap:8px; justify-content:space-between; }
+.financial-operational-2028 .f28-expense-record h3 { font-size:18px; font-weight:750; color:#172d4b; line-height:1.4; margin:0; overflow-wrap:anywhere; }
+.financial-operational-2028 .f28-expense-record header .f28-expense-status { flex-shrink:0; }
+.financial-operational-2028 .f28-expense-record-values { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px 8px; padding:16px 0 8px; margin:0; }
+.financial-operational-2028 .f28-expense-record-values dt { font-size:12px; color:#52617c; }
+.financial-operational-2028 .f28-expense-record-values dd { font-size:16px; font-weight:750; color:#172d4b; margin:8px 0 0; }
+.financial-operational-2028 .f28-expense-record summary { display:flex; align-items:center; justify-content:space-between; cursor:pointer; font-size:14px; font-weight:600; min-height:44px; margin-top:8px; padding:8px 0; border-top:1px solid #e5eaf2; color:#334a62; list-style:none; }
+.financial-operational-2028 .f28-expense-record summary::-webkit-details-marker { display:none; }
+.financial-operational-2028 .f28-expense-record summary svg { width:16px; height:16px; }
+.financial-operational-2028 .f28-expense-record details[open] summary svg { transform:rotate(180deg); }
+.financial-operational-2028 .f28-expense-record-details { background:#f7f9fc; border:1px solid #e2e7ef; padding:16px; border-radius:12px; }
+.financial-operational-2028 .f28-expense-record-details dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin:0; }
+.financial-operational-2028 .f28-expense-record-details dt { font-size:12px; color:#52617c; }
+.financial-operational-2028 .f28-expense-record-details dd { font-size:14px; margin:8px 0 0; overflow-wrap:anywhere; }
+.financial-operational-2028 .f28-expense-record-details p { font-size:12px; margin:16px 0; line-height:1.6; }
+.financial-operational-2028 .f28-expense-record-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.financial-operational-2028 .f28-expense-record-actions button { display:flex; align-items:center; gap:8px; padding:8px 12px; min-height:44px; border:1px solid #dce3ee; background:#fff; border-radius:12px; font-size:14px; }
+.financial-operational-2028 .f28-expense-record-actions svg { width:16px; height:16px; }
+.financial-operational-2028 .f28-expense-record-action-group { display:flex; align-items:center; gap:8px; margin-top:16px; }
+.financial-operational-2028 .f28-expense-record-action-group .f28-expense-record-actions { margin-top:0; }
+.financial-operational-2028 .f28-expense-pagination { display:flex; gap:16px; padding:16px 24px; border-top:1px solid #e5eaf2; justify-content:space-between; align-items:center; font-size:12px; color:#52617c; }
+.financial-operational-2028 .f28-expense-pagination > div { display:flex; gap:8px; }
+.financial-operational-2028 .f28-expense-pagination button { padding:8px 12px; min-height:44px; border:1px solid #dce3ee; background:#fff; border-radius:12px; font-size:14px; color:#33465c; }
+.financial-operational-2028 .f28-expense-pagination button:disabled { opacity:.5; cursor:not-allowed; }
+.financial-operational-2028 .f28-expense-comparison :is(button,select,input,summary):focus-visible { outline:2px solid #4859a6; outline-offset:3px; }
+@container expense-side (max-width:440px) {
+  .financial-operational-2028 .f28-expense-secondary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .financial-operational-2028 .f28-expense-secondary > :last-child:nth-child(3) { grid-column:1 / -1; }
+}
+@container expense-comparison (width < 840px) {
+  .financial-operational-2028 .f28-expense-split { display:block; }
+  .financial-operational-2028 :is(.f28-expense-divider,.f28-expense-reset) { display:none; }
+  .financial-operational-2028 .f28-expense-resizable { width:100%; }
+  .financial-operational-2028 .f28-expense-comparison[data-active-side=projetado] > .f28-expense-split > .f28-expense-resizable[data-side=realizado],
+  .financial-operational-2028 .f28-expense-comparison[data-active-side=realizado] > .f28-expense-split > .f28-expense-resizable[data-side=projetado] { display:none; }
+  .financial-operational-2028 .f28-expense-tabs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; padding:4px; border:1px solid #d8dfeb; border-radius:12px; background:#e9eef6; }
+  .financial-operational-2028 .f28-expense-tabs button { min-height:44px; border-radius:8px; font-size:14px; font-weight:600; color:#52617c; }
+  .financial-operational-2028 .f28-expense-tabs button[aria-selected=true] { background:#fff; color:#35499b; box-shadow:0 1px 4px #102a4410; }
+  .financial-operational-2028 .f28-expense-tabs button:last-child[aria-selected=true] { color:#1c746a; }
+  .financial-operational-2028 .f28-expense-table { display:none; }
+  .financial-operational-2028 .f28-expense-records { display:block; }
+  .financial-operational-2028 .f28-expense-search { flex:1 1 160px; gap:4px; padding-left:8px; }
+  .financial-operational-2028 .f28-expense-search button[type=submit] { padding:8px 4px; }
+  .financial-operational-2028 .f28-expense-filters[open] { flex-basis:100%; }
+  .financial-operational-2028 .f28-expense-filters summary { width:max-content; }
+  .financial-operational-2028 .f28-expense-filters > div { position:static; width:auto; margin-top:8px; box-shadow:none; }
+  .financial-operational-2028 .f28-expense-scope { align-items:start; gap:8px; margin-top:-8px; }
+  .financial-operational-2028 .f28-expense-scope > div { align-items:start; }
+  .financial-operational-2028 .f28-expense-scope .f28-expense-control { font-size:12px; padding:8px; }
+  .financial-operational-2028 .f28-expense-ledger-section > header { padding:16px; flex-wrap:wrap; }
+  .financial-operational-2028 .f28-expense-ledger-header-actions { margin-left:auto; }
+}
+@container expense-comparison (width < 420px) {
+  .financial-operational-2028 .f28-expense-record-values { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .financial-operational-2028 .f28-expense-record-values > div:last-child { grid-column:1 / -1; }
+  .financial-operational-2028 .f28-expense-pagination { flex-wrap:wrap; padding:16px; }
+}
+
+.financial-operational-2028 .f28-expense-table tbody tr:hover { background:#f7f9fc; }
+.financial-operational-2028 .f28-expense-record:last-child { margin-bottom:0; }

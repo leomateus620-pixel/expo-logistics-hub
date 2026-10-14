@@ -8,6 +8,8 @@ import { fetchEditionSummary, fetchRevenues, saveFinancialRecord, type Financial
 
 vi.mock('@/hooks/useCurrentOrg', () => ({ useCurrentOrg: () => ({ orgId: 'qa-org' }) }));
 vi.mock('@/hooks/use-toast', () => ({ toast: vi.fn() }));
+const permissions = vi.hoisted(() => ({ canAccess: true, canEdit: true, canConfirm: true, canAdmin: true, isLoading: false, isError: false }));
+vi.mock('@/features/financial-management/operational/useFinancialExpenseCapabilities', () => ({ useFinancialExpenseCapabilities: () => ({ ...permissions, refetch: vi.fn() }) }));
 vi.mock('@/features/financial-management/operational/financialOperationalApi', async original => ({
   ...await original<typeof import('@/features/financial-management/operational/financialOperationalApi')>(),
   fetchEditionSummary: vi.fn(), fetchRevenues: vi.fn(), saveFinancialRecord: vi.fn(),
@@ -24,6 +26,7 @@ function mount(focus: 'projetado' | 'realizado' = 'projetado') {
 }
 beforeEach(() => {
   vi.clearAllMocks(); localStorage.clear();
+  Object.assign(permissions, { canAccess: true, canEdit: true, canConfirm: true, canAdmin: true, isLoading: false, isError: false });
   vi.mocked(fetchEditionSummary).mockResolvedValue(structuredClone(summary));
   vi.mocked(fetchRevenues).mockResolvedValue([revenue]);
   vi.mocked(saveFinancialRecord).mockResolvedValue({ id: 'qa-save', version: 1 });
@@ -37,30 +40,38 @@ afterEach(cleanup);
 describe('comparação das receitas de 2028', () => {
   it('usa consolidação canônica e recebimento, sem somar novamente lista, patrocínio ou confirmação', async () => {
     mount();
-    await within(metric('Total realizado')).findByRole('button', { name: /123,45/ });
+    await within(metric('Recebido líquido')).findByRole('button', { name: /123,45/ });
     expect(within(metric('Total projetado')).getByRole('button', { name: /8\.000,00/ })).toBeInTheDocument();
-    expect(metric('Total realizado')).not.toHaveTextContent('5.000,00');
-    expect(metric('Comercialização projetada')).toHaveTextContent('Não disponível');
-    expect(metric('Comercialização realizada')).toHaveTextContent('Não disponível');
-    expect(metric('Rouanet realizado')).toHaveTextContent('Não disponível');
-    expect(within(panel('realizado')).getByText('Compromissos confirmados')).toBeInTheDocument();
-    expect(within(panel('realizado')).getByText(/não somar ao recebido/)).toBeInTheDocument();
+    expect(metric('Recebido líquido')).not.toHaveTextContent('5.000,00');
+    expect(within(metric('Receitas manuais')).getByRole('button', { name: /7\.000,00/ })).toBeInTheDocument();
+    expect(within(metric('Patrocínios')).getByRole('button', { name: /1\.000,00/ })).toBeInTheDocument();
+    expect(within(metric('Confirmado')).getByRole('button', { name: /5\.000,00/ })).toBeInTheDocument();
+    expect(within(metric('Saldo a receber')).getByRole('button', { name: /4\.876,55/ })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Comercialização projetada' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Rouanet realizado' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Cobertura financeira')).not.toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Ajuda sobre fontes e comparação de receitas' }));
+    expect(screen.getByText('Cobertura financeira')).toBeInTheDocument();
+    expect(document.querySelectorAll('.f28-revenue-records')).toHaveLength(1);
     expect(fetchRevenues).toHaveBeenCalledTimes(1); expect(fetchEditionSummary).toHaveBeenCalledTimes(1);
   });
   it('mantém a compatibilidade existente apenas com agregações do servidor', async () => {
     const compatibility = structuredClone(summary); delete compatibility.revenues;
     vi.mocked(fetchEditionSummary).mockResolvedValue(compatibility);
     mount('realizado');
-    await within(metric('Total realizado')).findByRole('button', { name: /123,45/ });
+    await within(metric('Recebido líquido')).findByRole('button', { name: /123,45/ });
     expect(within(metric('Total projetado')).getByRole('button', { name: /8\.000,00/ })).toBeInTheDocument();
     expect(document.querySelector('.f28-revenue-comparison')).toHaveAttribute('data-active-side', 'realizado');
-    expect(screen.getByText(/Entrada de compromissos confirmados/)).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Situação' })).toHaveValue('confirmada');
+    expect(within(metric('Saldo a receber')).getByRole('button', { name: /4\.876,55/ })).toBeInTheDocument();
   });
   it('separa recorte manual de Rouanet e ranking da edição completa e exclui canceladas', async () => {
     vi.mocked(fetchRevenues).mockResolvedValue([revenue, { ...revenue, id: 'qa-rouanet', funding_type: 'lei_rouanet', projected_cents: 30000 }, { ...revenue, id: 'qa-misto', funding_type: 'misto', projected_cents: 50000 }, { ...revenue, id: 'qa-cancel', funding_type: 'lei_rouanet', status: 'cancelada', projected_cents: 9000000 }]);
     const result = mount();
     await within(metric('Rouanet projetado')).findByRole('button', { name: /300,00/ });
-    expect(metric('Rouanet projetado')).toHaveTextContent('recorte carregado');
+    expect(screen.getByText('Registros manuais ativos')).toBeInTheDocument();
+    await userEvent.setup().click(within(metric('Rouanet projetado')).getByRole('button', { name: 'Ajuda sobre Rouanet projetado' }));
+    expect(screen.getByText(/registros ativos carregados, antes dos filtros/)).toBeInTheDocument();
     expect(within(metric('Total projetado')).getByRole('button', { name: /8\.000,00/ })).toBeInTheDocument();
     const ranking = result.container.querySelector('.f28-revenue-ranking')!;
     const rows = [...ranking.querySelectorAll('li')];
@@ -68,51 +79,108 @@ describe('comparação das receitas de 2028', () => {
     expect(rows[0]).toHaveTextContent('60%'); expect(rows[1]).toHaveTextContent('25%'); expect(rows[2]).toHaveTextContent('15%');
     expect(rows[3].querySelector('.f28-revenue-ranking__track > span')).toHaveStyle({ width: '0%' });
   });
-  it('preserva filtros independentes e os dois painéis ao alternar contexto', async () => {
+  it('mantém uma lista compartilhada e filtros locais sem alterar resumo ou composição', async () => {
     const user = userEvent.setup(); const result = mount();
-    await within(panel('projetado')).findAllByText(revenue.description);
+    await screen.findByText(revenue.description);
     const projected = panel('projetado'); const received = panel('realizado');
-    fireEvent.change(within(projected).getByRole('searchbox', { name: 'Pesquisar' }), { target: { value: 'sem correspondência' } });
-    expect(within(projected).getByRole('searchbox')).toHaveValue('sem correspondência');
-    fireEvent.change(within(received).getByRole('searchbox', { name: 'Pesquisar' }), { target: { value: 'Contraparte' } });
-    expect(within(received).getByRole('searchbox')).toHaveValue('Contraparte');
-    await user.click(screen.getByRole('tab', { name: 'Realizado' }));
+    const records = document.querySelector('.f28-revenue-records');
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Pesquisar receitas' }), { target: { value: 'sem correspondência' } });
+    expect(screen.getByRole('heading', { name: 'Nenhuma receita corresponde aos filtros' })).toBeInTheDocument();
+    expect(within(metric('Total projetado')).getByRole('button', { name: /8\.000,00/ })).toBeInTheDocument();
+    expect(result.container.querySelector('.f28-revenue-ranking')).toHaveTextContent('Recurso livre');
+    await user.click(screen.getByRole('tab', { name: 'Recebido' }));
     expect(panel('projetado')).toBe(projected); expect(panel('realizado')).toBe(received);
-    expect(within(projected).getByRole('searchbox')).toHaveValue('sem correspondência');
-    expect(within(received).getByRole('searchbox')).toHaveValue('Contraparte');
+    expect(document.querySelector('.f28-revenue-records')).toBe(records);
+    expect(screen.getByRole('searchbox')).toHaveValue('sem correspondência');
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Contraparte' } });
     result.rerender(<QueryClientProvider client={result.client}><Financial2028RevenueComparison edition={edition} focus="realizado" /></QueryClientProvider>);
-    expect(within(projected).getByRole('searchbox')).toHaveValue('sem correspondência');
+    expect(screen.getByRole('searchbox')).toHaveValue('Contraparte');
+    expect(screen.getByRole('combobox', { name: 'Situação' })).toHaveValue('confirmada');
     expect(fetchRevenues).toHaveBeenCalledTimes(1); expect(fetchEditionSummary).toHaveBeenCalledTimes(1);
-    fireEvent.keyDown(screen.getByRole('tab', { name: 'Realizado' }), { key: 'Home' });
+    fireEvent.keyDown(screen.getByRole('tab', { name: 'Recebido' }), { key: 'Home' });
     expect(document.querySelector('.f28-revenue-comparison')).toHaveAttribute('data-active-side', 'projetado');
   });
   it('mantém carregamento e falha distintos de zero verdadeiro', async () => {
     let finish!: (value: FinancialEditionSummary) => void;
     vi.mocked(fetchEditionSummary).mockImplementation(() => new Promise(resolve => { finish = resolve; }));
     mount(); await screen.findAllByText(revenue.description);
-    expect(metric('Total realizado')).toHaveTextContent('Carregando…');
-    expect(within(metric('Total realizado')).queryByRole('button')).not.toBeInTheDocument();
+    expect(metric('Recebido líquido')).toHaveTextContent('Carregando…');
+    expect(within(metric('Recebido líquido')).queryByRole('button', { name: /^Recebido líquido:/ })).not.toBeInTheDocument();
     finish({ ...summary, revenues: { ...summary.revenues!, received_cents: 0 } });
-    await within(metric('Total realizado')).findByRole('button', { name: /0,00/ });
+    await within(metric('Recebido líquido')).findByRole('button', { name: /0,00/ });
     cleanup(); vi.mocked(fetchEditionSummary).mockRejectedValue(new Error('Falha da fonte de recebimento'));
-    mount(); await waitFor(() => expect(metric('Total realizado')).toHaveTextContent('Indisponível'));
-    expect(within(metric('Total realizado')).queryByRole('button')).not.toBeInTheDocument();
+    mount(); await waitFor(() => expect(metric('Recebido líquido')).toHaveTextContent('Indisponível'));
+    expect(within(metric('Recebido líquido')).queryByRole('button', { name: /^Recebido líquido:/ })).not.toBeInTheDocument();
     expect(screen.getByRole('alert')).toHaveTextContent('Não foi possível carregar os valores');
   });
   it('declara o limite de 500 registros sem usá-lo como total integral', async () => {
     vi.mocked(fetchRevenues).mockResolvedValue(Array.from({ length: 500 }, (_, i) => ({ ...revenue, id: `qa-${i}` })));
     mount(); await within(metric('Total projetado')).findByRole('button', { name: /8\.000,00/ });
-    expect(within(panel('projetado')).getByText('Recorte carregado · 500 registros · limite de 500')).toBeInTheDocument();
+    expect(screen.getByText('Até 500 registros')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('500 de 500 receitas carregadas');
     expect(metric('Total projetado')).not.toHaveTextContent('600.000');
   });
   it('abre o cadastro existente pela ação realizada sem oferecer operação de recebimento', async () => {
     const user = userEvent.setup(); mount('realizado');
-    await user.click(screen.getByRole('button', { name: /Registrar receita/ }));
+    await user.click(screen.getByRole('button', { name: 'Ajuda sobre fontes e comparação de receitas' }));
+    expect(screen.getByText(/recebimentos são registrados separadamente em Movimentos/)).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: 'Cadastrar receita' }));
     const dialog = screen.getByRole('dialog');
     expect(within(dialog).getByLabelText(/^Descrição/)).toBeInTheDocument();
-    expect(within(panel('realizado')).getByText(/não registra recebimento/)).toBeInTheDocument();
     await user.click(within(dialog).getByRole('button', { name: 'Cancelar' }));
     expect(saveFinancialRecord).not.toHaveBeenCalled();
+  });
+  it('expande detalhes da única lista sem apresentar recebimento inventado por registro', async () => {
+    const user = userEvent.setup(); mount();
+    const details = await screen.findByRole('button', { name: `Ver detalhes de ${revenue.description}` });
+    await user.click(details);
+    expect(details).toHaveAttribute('aria-expanded', 'true');
+    expect(document.getElementById(details.getAttribute('aria-controls')!)).toHaveTextContent('Recebimento e saldo por registro não são fornecidos');
+    expect(screen.getByRole('table')).toHaveTextContent('900,00');
+    expect(fetchRevenues).toHaveBeenCalledTimes(1);
+  });
+  it('restringe cadastro e edição com financial_can, preservando a consulta', async () => {
+    permissions.canEdit = false; permissions.canConfirm = false;
+    mount(); await screen.findByText(revenue.description);
+    expect(screen.queryByRole('button', { name: 'Adicionar receita projetada' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: `Editar ${revenue.description}` })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: `Ver detalhes de ${revenue.description}` })).toBeInTheDocument();
+    cleanup(); permissions.canEdit = true;
+    mount(); await screen.findByText(revenue.description);
+    expect(screen.getByRole('button', { name: 'Adicionar receita projetada' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: `Editar ${revenue.description}` })).not.toBeInTheDocument();
+    expect(saveFinancialRecord).not.toHaveBeenCalled();
+  });
+  it('consulta negada não busca dados financeiros', async () => {
+    permissions.canAccess = false;
+    mount(); await screen.findByRole('heading', { name: 'Acesso financeiro indisponível' });
+    expect(fetchRevenues).not.toHaveBeenCalled(); expect(fetchEditionSummary).not.toHaveBeenCalled();
+  });
+  it('permite ao perfil de confirmação editar compromissos e preserva a restrição de cadastro', async () => {
+    const user = userEvent.setup(); permissions.canEdit = false;
+    vi.mocked(fetchRevenues).mockResolvedValue([revenue, { ...revenue, id: 'qa-expectation', description: 'Expectativa sem confirmação', status: 'projetada', confirmed_cents: null }]);
+    mount();
+    await user.click(await screen.findByRole('button', { name: `Editar ${revenue.description}` }));
+    expect(within(screen.getByRole('dialog')).getByLabelText(/^Descrição/)).toHaveValue(revenue.description);
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancelar' }));
+    expect(screen.queryByRole('button', { name: 'Editar Expectativa sem confirmação' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Adicionar receita projetada' })).not.toBeInTheDocument();
+    expect(saveFinancialRecord).not.toHaveBeenCalled();
+  });
+  it('mantém explicações da composição e dos filtros em ajuda acessível', async () => {
+    const user = userEvent.setup(); mount(); await screen.findByText(revenue.description);
+    expect(screen.getByText('Resumo da edição')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Receitas manuais carregadas' })).toBeInTheDocument();
+    expect(screen.queryByText(/O ranking representa os registros ativos carregados/)).not.toBeInTheDocument();
+    const composition = screen.getByRole('button', { name: 'Ajuda sobre a composição das receitas manuais' });
+    composition.focus(); await user.keyboard('{Enter}');
+    expect(screen.getByText(/antes dos filtros da lista/)).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    const filters = screen.getByRole('button', { name: 'Ajuda sobre os filtros das receitas manuais' });
+    filters.focus(); await user.keyboard('{Enter}');
+    expect(screen.getByText(/Os filtros alteram somente as receitas manuais carregadas/)).toBeInTheDocument();
+    expect(fetchRevenues).toHaveBeenCalledTimes(1); expect(fetchEditionSummary).toHaveBeenCalledTimes(1);
   });
 });
 

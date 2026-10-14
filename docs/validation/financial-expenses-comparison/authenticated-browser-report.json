@@ -1,0 +1,206 @@
+{
+  "date": "2026-10-13",
+  "boundary": "Real UI and financial service contracts; local PostgreSQL/PostgREST with signed JWT sessions. Supabase Auth login/refresh is replaced only in the QA harness.",
+  "initialFindings": [
+    {
+      "name": "split persists reload",
+      "passed": false,
+      "resolution": "Fixed: flush latest layout on pagehide, immediate-reload recheck passed."
+    },
+    {
+      "name": "editor lacks realization capability",
+      "passed": false,
+      "resolution": "Initial assertion ran before capabilities loaded; repeated after verification and passed."
+    }
+  ],
+  "checks": [
+    {
+      "name": "one shared expense menu",
+      "passed": true
+    },
+    {
+      "name": "balanced initial split",
+      "passed": true
+    },
+    {
+      "name": "keyboard resize",
+      "passed": true
+    },
+    {
+      "name": "minimum legibility 35",
+      "passed": true
+    },
+    {
+      "name": "maximum legibility 65",
+      "passed": true
+    },
+    {
+      "name": "Enter restores 50/50",
+      "passed": true
+    },
+    {
+      "name": "mouse resize",
+      "passed": true
+    },
+    {
+      "name": "double click resets",
+      "passed": true
+    },
+    {
+      "name": "resize keeps draft form mounted",
+      "passed": true
+    },
+    {
+      "name": "created projection reload and search",
+      "passed": true
+    },
+    {
+      "name": "date input accepts ISO date",
+      "passed": true
+    },
+    {
+      "name": "edited date persists via keyboard",
+      "passed": true
+    },
+    {
+      "name": "realize keeps projection and own deviation",
+      "passed": true
+    },
+    {
+      "name": "revert preserves projected amount",
+      "passed": true
+    },
+    {
+      "name": "cancel preserves record",
+      "passed": true
+    },
+    {
+      "name": "direct realization without fabricated projection",
+      "passed": true
+    },
+    {
+      "name": "integrated category rename",
+      "passed": true
+    },
+    {
+      "name": "category archive preserves identity",
+      "passed": true
+    },
+    {
+      "name": "mobile uses tabs instead of narrow panels",
+      "passed": true
+    },
+    {
+      "name": "mobile has no page overflow",
+      "passed": true
+    },
+    {
+      "name": "resize does not issue RPC requests",
+      "passed": true,
+      "detail": "{\"financial_can\":4,\"financial_expense_comparison\":1,\"financial_list_expenses\":1,\"financial_list_categories\":1}"
+    },
+    {
+      "name": "split persists even immediate reload",
+      "passed": true
+    },
+    {
+      "name": "reset button restores 50/50",
+      "passed": true
+    },
+    {
+      "name": "desktop no overflow",
+      "passed": true
+    },
+    {
+      "name": "mouse drag changes layout without queries",
+      "passed": true
+    },
+    {
+      "name": "mobile tabs preserve shared filter",
+      "passed": true
+    },
+    {
+      "name": "expanded mobile records have no overflow",
+      "passed": true
+    },
+    {
+      "name": "reader can view but cannot create/manage",
+      "passed": true
+    },
+    {
+      "name": "reader detail has payments and correct balance without mutation actions",
+      "passed": true
+    },
+    {
+      "name": "no financial permission exposes no metrics",
+      "passed": true
+    },
+    {
+      "name": "2026 remains historical and read-only",
+      "passed": true
+    },
+    {
+      "name": "editor can plan without realization permission after capability verification",
+      "passed": true
+    },
+    {
+      "name": "pagination affects only list and keeps server totals",
+      "passed": true
+    },
+    {
+      "name": "category commission status and explicit due period share same cut",
+      "passed": true
+    },
+    {
+      "name": "filtered empty is explicit and zero remains true zero",
+      "passed": true
+    },
+    {
+      "name": "clear search works without Enter",
+      "passed": true
+    },
+    {
+      "name": "bounded due-date period reaches server",
+      "passed": true
+    },
+    {
+      "name": "responsive width 360",
+      "passed": true
+    },
+    {
+      "name": "responsive width 768",
+      "passed": true
+    },
+    {
+      "name": "responsive width 1024",
+      "passed": true
+    },
+    {
+      "name": "notebook with sidebar uses tabs by container width",
+      "passed": true
+    },
+    {
+      "name": "responsive width 1440",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "passed": 42,
+    "failedFinal": 0
+  },
+  "captures": [
+    "desktop-2026-history.jpg",
+    "desktop-analyses.jpg",
+    "desktop-comparison.jpg",
+    "desktop-resized.jpg",
+    "desktop-shared-records.jpg",
+    "mobile-no-financial-permission.jpg",
+    "mobile-projected.jpg",
+    "mobile-readonly-payment-detail.jpg",
+    "mobile-realized.jpg",
+    "mobile-records.jpg",
+    "notebook-categories.jpg",
+    "notebook-comparison.jpg",
+    "notebook-expense-form.jpg"
+  ]
+}

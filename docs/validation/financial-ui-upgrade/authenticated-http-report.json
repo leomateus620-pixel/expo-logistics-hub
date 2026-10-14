@@ -1,0 +1,89 @@
+{
+  "boundary": "Signed local fixture JWTs → actual PostgREST → migrated PostgreSQL RPCs/RLS; no production access.",
+  "checks": [
+    {
+      "name": "Signed JWT reads operational edition through PostgREST RLS",
+      "passed": true
+    },
+    {
+      "name": "Reader JWT is denied financial editing",
+      "passed": true
+    },
+    {
+      "name": "Editor JWT is allowed editing",
+      "passed": true
+    },
+    {
+      "name": "Logistics operator JWT is denied finance access",
+      "passed": true
+    },
+    {
+      "name": "Tampered JWT signature is rejected by PostgREST",
+      "passed": true
+    },
+    {
+      "name": "Without-finance JWT is denied expense RPC",
+      "passed": true
+    },
+    {
+      "name": "Admin JWT creates category via real RPC",
+      "passed": true
+    },
+    {
+      "name": "Admin JWT renames category with version increment",
+      "passed": true
+    },
+    {
+      "name": "Editor JWT creates one forecast across retry",
+      "passed": true
+    },
+    {
+      "name": "Read-only JWT cannot create expenses",
+      "passed": true
+    },
+    {
+      "name": "Editor JWT cannot realize without confirmation capability",
+      "passed": true
+    },
+    {
+      "name": "Confirmer JWT realizes expense and preserves forecast",
+      "passed": true
+    },
+    {
+      "name": "Reader JWT sees committed, net paid and balance from server",
+      "passed": true
+    },
+    {
+      "name": "Authenticated cancellation rejects settled expense",
+      "passed": true
+    },
+    {
+      "name": "Authenticated reversal returns to forecast after payment reversal",
+      "passed": true
+    },
+    {
+      "name": "Two distinct authorized JWT sessions accept one version and reject stale edit",
+      "passed": true
+    },
+    {
+      "name": "Authenticated cancellation preserves record and history",
+      "passed": true
+    },
+    {
+      "name": "Archived category retains existing expense link and audit",
+      "passed": true
+    },
+    {
+      "name": "Filtered list and server aggregation agree across pagination",
+      "passed": true
+    }
+  ],
+  "limitation": "Local fixture session endpoint replaces Supabase Auth. Real JWT signatures, role claims and financial permissions are verified; remote Supabase login is not tested.",
+  "summary": {
+    "passed": 19,
+    "total": 19,
+    "initialExpenseCount": 30,
+    "testExpenseId": "e16efe97-6718-4dfc-aa53-72a49872b1f1",
+    "testCategoryId": "1e49a652-48ad-4ced-8258-efe5b1d70325"
+  }
+}

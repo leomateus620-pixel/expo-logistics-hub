@@ -1,287 +1,167 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import { CheckCircle2, Pencil, Plus, Tags, XCircle, Undo2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
+import type { ImperativePanelGroupHandle } from 'react-resizable-panels';
+import { RotateCcw, Search, SlidersHorizontal, Tags, X } from 'lucide-react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useOrgCommissions } from '@/hooks/useOrgCommissions';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { FinancialAmount } from '../components/FinancialPrimitives';
+import { formatBRL } from '../utils/financialFormatters';
 import type { FinancialEdition } from './financialOperationalApi';
-import {
-  EXPENSE_DATE_FIELD_LABELS, EXPENSE_STATUS_LABELS, FinancialExpenseError, centsToInput, deviation, parseCents,
-  type ExpenseDateField, type ExpenseFilters, type ExpenseStatus, type FinancialExpense,
-} from './financialExpensesApi';
-import {
-  EXPENSE_PAGE_SIZE, useExpenseCategories, useExpenseComparison, useExpenseList, useSaveExpense,
-  useSaveExpenseCategory, useSeedExpenseCategories, useTransitionExpense,
-} from './useFinancialExpenses';
-import { Financial2028Composition, Financial2028Loading, Financial2028Metric, Financial2028Panel, Financial2028State } from './Financial2028Presentation';
+import { EXPENSE_DATE_FIELD_LABELS, EXPENSE_STATUS_LABELS, FinancialExpenseError, type ExpenseDateField, type ExpenseFilters, type ExpenseStatus, type FinancialExpense } from './financialExpensesApi';
+import { EXPENSE_PAGE_SIZE, useExpenseCategories, useExpenseComparison, useExpenseList } from './useFinancialExpenses';
+import { useFinancialExpenseCapabilities } from './useFinancialExpenseCapabilities';
+import { CategoriesDialog, ExpenseDetailDialog, ExpenseFormDialog, TransitionDialog } from './FinancialExpenseDialogs';
+import { FinancialExpenseLedger } from './FinancialExpenseLedger';
+import { adaptExpenseComparison } from './financialExpenseChartAdapters';
+import { FinancialExpenseAnalyses, FinancialExpenseRanking } from './FinancialExpenseCharts';
+import { Financial2028Loading, Financial2028State } from './Financial2028Presentation';
+import { EXPENSE_SPLIT_KEY, readExpenseSplit } from './financialExpenseLayout';
+import { FinancialComparisonAction, FinancialComparisonHelp as Help, FinancialComparisonMetric as Metric, FinancialComparisonSideHeader } from './FinancialComparisonPrimitives';
+import { focusFinancialControl } from './financialComparisonFocus';
+import '@/styles/financial-expense-comparison.css';
 
-const newKey = () => crypto.randomUUID();
-const fmtDate = (v: string | null) => (v ? v.slice(0, 10).split('-').reverse().join('/') : '—');
-const Money = ({ v }: { v: number | null }) => (v == null ? <span className="f28-unavailable">Não informado</span> : <FinancialAmount value={v / 100} animate={false} />);
-
-function ErrorState({ error, retry }: { error: unknown; retry: () => void }) {
+type Side = 'projetado' | 'realizado';
+export function ExpenseQueryError({ error, retry }: { error: unknown; retry: () => void }) {
   const kind = error instanceof FinancialExpenseError ? error.kind : 'unknown';
   if (kind === 'not_activated') return <Financial2028State tone="locked" title="Despesas 2028 ainda não ativadas no backend" />;
   if (kind === 'forbidden') return <Financial2028State tone="locked" title="Acesso financeiro indisponível">A consulta exige acesso financeiro a esta edição.</Financial2028State>;
   return <Financial2028State tone="error" title={kind === 'network' ? 'Falha de conexão' : 'Não foi possível carregar as despesas.'} retry={retry} />;
 }
-
-export function Financial2028Expenses({ edition, focus }: { edition: FinancialEdition; focus: 'projetado' | 'realizado' }) {
+export function Financial2028Expenses({ edition, focus }: { edition: FinancialEdition; focus: Side }) {
   const { orgId } = useCurrentOrg();
   const org = orgId as string;
-  const isMobile = useIsMobile();
+  const capabilities = useFinancialExpenseCapabilities(org);
   const [filters, setFilters] = useState<ExpenseFilters>({ date_field: focus === 'projetado' ? 'planned_on' : 'committed_on' });
+  const [query, setQuery] = useState('');
   const [page, setPage] = useState(0);
   const [side, setSide] = useState(focus);
+  const [compact, setCompact] = useState(false);
+  const [split] = useState(readExpenseSplit);
   const [editing, setEditing] = useState<FinancialExpense | 'new-prevista' | 'new-realizada' | null>(null);
   const [transition, setTransition] = useState<{ expense: FinancialExpense; to: ExpenseStatus } | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const shell = useRef<HTMLDivElement>(null);
+  const group = useRef<ImperativePanelGroupHandle>(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout>>();
+  const latestLayout = useRef<number | null>(null);
+  const ids = useId();
   useEffect(() => { setSide(focus); }, [focus]);
-  useEffect(() => { setPage(0); }, [filters]);
-
+  useEffect(() => {
+    const element = shell.current;
+    if (!element || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(([entry]) => setCompact(entry.contentRect.width < 840));
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
+    const flush = () => {
+      clearTimeout(saveTimer.current);
+      if (latestLayout.current != null) {
+        try { localStorage.setItem(EXPENSE_SPLIT_KEY, String(latestLayout.current)); } catch { /* Optional preference. */ }
+      }
+    };
+    window.addEventListener('pagehide', flush);
+    return () => { window.removeEventListener('pagehide', flush); flush(); };
+  }, []);
+  // Dragging stays in the panel primitive: no query, financial calculation or form remount.
+  const persistLayout = useCallback((sizes: number[]) => {
+    latestLayout.current = sizes[0];
+    clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      try { localStorage.setItem(EXPENSE_SPLIT_KEY, String(sizes[0])); } catch { /* Optional preference. */ }
+    }, 180);
+  }, []);
+  const reset = () => group.current?.setLayout([50, 50]);
+  const updateFilters = (patch: Partial<ExpenseFilters>) => { setPage(0); setFilters(current => ({ ...current, ...patch })); };
+  const clearFilters = () => { setQuery(''); setPage(0); setFilters({ date_field: filters.date_field }); };
+  const submitSearch = (event: FormEvent) => { event.preventDefault(); updateFilters({ q: query.trim() }); };
   const comparison = useExpenseComparison(org, edition.id, filters);
   const list = useExpenseList(org, edition.id, filters, page);
-  const categories = useExpenseCategories(org);
+  useEffect(() => {
+    if (list.data && !list.isPlaceholderData && !list.isError) {
+      const lastPage = Math.max(0, Math.ceil(list.data.total / EXPENSE_PAGE_SIZE) - 1);
+      if (page > lastPage) setPage(lastPage);
+    }
+  }, [list.data, list.isPlaceholderData, list.isError, page]);
+  const categories = useExpenseCategories(org, true);
   const { commissions } = useOrgCommissions();
-
-  if (comparison.isLoading) return <Financial2028Loading label="Carregando despesas 2028…" />;
-  if (comparison.isError) return <ErrorState error={comparison.error} retry={() => void comparison.refetch()} />;
-  const t = comparison.data!.totals;
-
-  const toolbar = <div className="f28-expense-toolbar" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
-    <Input aria-label="Buscar despesa" placeholder="Buscar por título ou favorecido" style={{ maxWidth: 260 }}
-      onKeyDown={(e) => { if (e.key === 'Enter') setFilters((f) => ({ ...f, q: (e.target as HTMLInputElement).value })); }} />
-    <select aria-label="Categoria" className="f28-select" value={filters.category_id ?? ''} onChange={(e) => setFilters((f) => ({ ...f, category_id: e.target.value }))}>
-      <option value="">Todas as categorias</option><option value="none">Sem categoria</option>
-      {categories.data?.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-    </select>
-    <select aria-label="Comissão" className="f28-select" value={filters.commission_id ?? ''} onChange={(e) => setFilters((f) => ({ ...f, commission_id: e.target.value }))}>
-      <option value="">Todas as comissões</option><option value="none">Sem comissão</option>
-      {commissions.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
-    </select>
-    <select aria-label="Situação" className="f28-select" value={filters.status ?? ''} onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value as ExpenseStatus | '' }))}>
-      <option value="">Todas as situações</option>
-      {(Object.keys(EXPENSE_STATUS_LABELS) as ExpenseStatus[]).map((s) => <option key={s} value={s}>{EXPENSE_STATUS_LABELS[s]}</option>)}
-    </select>
-    <select aria-label="Data do período" className="f28-select" value={filters.date_field} onChange={(e) => setFilters((f) => ({ ...f, date_field: e.target.value as ExpenseDateField }))}>
-      {(Object.keys(EXPENSE_DATE_FIELD_LABELS) as ExpenseDateField[]).map((k) => <option key={k} value={k}>{EXPENSE_DATE_FIELD_LABELS[k]}</option>)}
-    </select>
-    <Input type="date" aria-label="De" style={{ width: 150 }} value={filters.from ?? ''} onChange={(e) => setFilters((f) => ({ ...f, from: e.target.value }))} />
-    <Input type="date" aria-label="Até" style={{ width: 150 }} value={filters.to ?? ''} onChange={(e) => setFilters((f) => ({ ...f, to: e.target.value }))} />
-    <span style={{ flex: 1 }} />
-    <Button type="button" variant="outline" onClick={() => setCategoriesOpen(true)}><Tags aria-hidden="true" />Categorias</Button>
-    <Button type="button" variant="outline" onClick={() => setEditing('new-realizada')}><Plus aria-hidden="true" />Realizada direta</Button>
-    <Button type="button" onClick={() => setEditing('new-prevista')}><Plus aria-hidden="true" />Nova prevista</Button>
+  const model = useMemo(() => adaptExpenseComparison(comparison.data, categories.data), [comparison.data, categories.data]);
+  const t = comparison.data?.totals;
+  const state = comparison.isError ? 'error' : t ? 'ready' : 'loading';
+  const filtered = Boolean(filters.q || filters.category_id || filters.commission_id || filters.status || filters.from || filters.to);
+  const activeFilterCount = [filters.category_id, filters.commission_id, filters.status, filters.from, filters.to].filter(Boolean).length;
+  const formatDate = (value: string) => value.split('-').reverse().join('/');
+  const chips: { key: string; label: string; remove: () => void }[] = [];
+  if (filters.q) chips.push({ key: 'q', label: `Busca: ${filters.q}`, remove: () => { setQuery(''); updateFilters({ q: '' }); } });
+  if (filters.category_id) chips.push({ key: 'category', label: filters.category_id === 'none' ? 'Sem categoria' : categories.data?.find(category => category.id === filters.category_id)?.name ?? 'Categoria selecionada', remove: () => updateFilters({ category_id: '' }) });
+  if (filters.commission_id) chips.push({ key: 'commission', label: filters.commission_id === 'none' ? 'Sem comissão' : commissions.find(commission => commission.id === filters.commission_id)?.nome ?? 'Comissão selecionada', remove: () => updateFilters({ commission_id: '' }) });
+  if (filters.status) chips.push({ key: 'status', label: EXPENSE_STATUS_LABELS[filters.status], remove: () => updateFilters({ status: '' }) });
+  if (filters.from) chips.push({ key: 'from', label: `De ${formatDate(filters.from)}`, remove: () => updateFilters({ from: '' }) });
+  if (filters.to) chips.push({ key: 'to', label: `Até ${formatDate(filters.to)}`, remove: () => updateFilters({ to: '' }) });
+  const noCategory = comparison.data?.by_category.find(g => g.id == null);
+  const noCommission = comparison.data?.by_commission.find(g => g.id == null);
+  const canEdit = capabilities.canEdit && edition.status === 'operacional';
+  const canConfirm = canEdit && capabilities.canConfirm;
+  // Verify this session before displaying even a retained financial query cache.
+  if (!capabilities.canAccess) return <div ref={shell} className="f28-expense-comparison">
+    {capabilities.isLoading ? <Financial2028Loading label="Verificando acesso financeiro…" />
+      : capabilities.isError ? <Financial2028State tone="error" title="Não foi possível verificar suas permissões" retry={() => void capabilities.refetch()} />
+      : <Financial2028State tone="locked" title="Acesso financeiro indisponível">A consulta exige acesso financeiro a esta edição.</Financial2028State>}
   </div>;
-
-  const pct = t.deviation_pct == null ? 'sem previsão para comparar' : `${t.deviation_pct > 0 ? '+' : ''}${t.deviation_pct.toLocaleString('pt-BR')}%`;
-  const panel = (which: 'projetado' | 'realizado') => which === 'projetado'
-    ? <div style={{ display: 'grid', gap: 12, padding: 8 }}>
-        <Financial2028Metric label="Total projetado" value={t.planned_cents} hint={`${t.by_status.prevista} previstas · exclui canceladas`} tone="indigo" priority />
-        <Financial2028Composition title="Projetado por categoria" items={comparison.data!.by_category.filter((g) => g.planned_cents > 0).map((g) => ({ label: g.name, value: g.planned_cents }))} />
-        <Financial2028Composition title="Projetado por comissão" items={comparison.data!.by_commission.filter((g) => g.planned_cents > 0).map((g) => ({ label: g.name, value: g.planned_cents }))} />
-      </div>
-    : <div style={{ display: 'grid', gap: 12, padding: 8 }}>
-        <Financial2028Metric label="Total realizado" value={t.committed_cents} hint={`Desvio ${pct} · ${t.realized_without_plan_count} sem previsão`} tone="success" priority />
-        <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))' }}>
-          <Financial2028Metric label="Pago líquido" value={t.paid_cents} hint="Movimentos alocados" />
-          <Financial2028Metric label="Saldo a pagar" value={t.open_cents} hint={`${t.overdue_count} vencidas em aberto`} tone={t.overdue_count ? 'danger' : 'gold'} />
-          <Financial2028Metric label="Desvio (realizado − projetado)" value={t.deviation_cents} hint={pct} tone={t.deviation_cents > 0 ? 'danger' : 'neutral'} />
-        </div>
-        <Financial2028Composition title="Realizado por categoria" items={comparison.data!.by_category.filter((g) => g.committed_cents > 0).map((g) => ({ label: g.name, value: g.committed_cents, tone: 'success' }))} />
-      </div>;
-
-  return <div style={{ display: 'grid', gap: 16 }} data-expense-focus={focus}>
-    {toolbar}
-    {isMobile
-      ? <><div role="tablist" style={{ display: 'flex', gap: 8 }}>
-          {(['projetado', 'realizado'] as const).map((s) => <Button key={s} role="tab" aria-selected={side === s} variant={side === s ? 'default' : 'outline'} onClick={() => setSide(s)}>{s === 'projetado' ? 'Projetado' : 'Realizado'}</Button>)}
-        </div>{panel(side)}</>
-      : <ResizablePanelGroup direction="horizontal" className="f28-revenue-split">
-          <ResizablePanel defaultSize={50} minSize={35} maxSize={65}>{panel('projetado')}</ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={50} minSize={35} maxSize={65}>{panel('realizado')}</ResizablePanel>
-        </ResizablePanelGroup>}
-
-    <Financial2028Panel title="Despesas" description={`${list.data?.total ?? 0} registros. Totais consideram todos os filtrados, não só esta página.`}>
-      {list.isError ? <ErrorState error={list.error} retry={() => void list.refetch()} />
-        : !list.data ? <Financial2028Loading label="Carregando lista…" />
-        : list.data.items.length === 0 ? <p className="f28-composition-empty">Nenhuma despesa para os filtros atuais.</p>
-        : <div style={{ overflowX: 'auto' }}><table className="f28-ledger-table" style={{ width: '100%' }}>
-            <thead><tr><th>Despesa</th><th>Situação</th><th>Projetado</th><th>Realizado</th><th>Desvio</th><th>Pago</th><th>Saldo</th><th>Vencimento</th><th /></tr></thead>
-            <tbody>{list.data.items.map((e) => {
-              const d = deviation(e.planned_cents, e.status === 'realizada' ? e.committed_cents : null);
-              return <tr key={e.id}>
-                <td><strong>{e.title}</strong><br /><small>{[e.category_name, e.commission_name, e.payee_name].filter(Boolean).join(' · ') || 'Sem classificação'}</small></td>
-                <td>{EXPENSE_STATUS_LABELS[e.status]}</td>
-                <td><Money v={e.planned_cents} /></td>
-                <td><Money v={e.committed_cents} /></td>
-                <td>{d.state === 'comparavel' ? <><Money v={d.cents} /> <small>({d.pct! > 0 ? '+' : ''}{d.pct}%)</small></> : d.state === 'sem_previsao' ? <small>Sem previsão</small> : '—'}</td>
-                <td><Money v={e.paid_cents} /></td>
-                <td><Money v={e.status === 'realizada' ? e.open_cents : null} /></td>
-                <td>{fmtDate(e.due_date)}</td>
-                <td style={{ whiteSpace: 'nowrap' }}>
-                  {e.status !== 'cancelada' && <Button size="sm" variant="ghost" aria-label={`Editar ${e.title}`} onClick={() => setEditing(e)}><Pencil aria-hidden="true" /></Button>}
-                  {e.status === 'prevista' && <Button size="sm" variant="ghost" aria-label={`Realizar ${e.title}`} onClick={() => setTransition({ expense: e, to: 'realizada' })}><CheckCircle2 aria-hidden="true" /></Button>}
-                  {e.status === 'realizada' && e.planned_cents != null && <Button size="sm" variant="ghost" aria-label={`Voltar ${e.title} para prevista`} onClick={() => setTransition({ expense: e, to: 'prevista' })}><Undo2 aria-hidden="true" /></Button>}
-                  {e.status !== 'cancelada' && <Button size="sm" variant="ghost" aria-label={`Cancelar ${e.title}`} onClick={() => setTransition({ expense: e, to: 'cancelada' })}><XCircle aria-hidden="true" /></Button>}
-                </td>
-              </tr>;
-            })}</tbody>
-          </table>
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
-            <Button size="sm" variant="outline" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>Anterior</Button>
-            <span>Página {page + 1} de {Math.max(1, Math.ceil(list.data.total / EXPENSE_PAGE_SIZE))}</span>
-            <Button size="sm" variant="outline" disabled={(page + 1) * EXPENSE_PAGE_SIZE >= list.data.total} onClick={() => setPage((p) => p + 1)}>Próxima</Button>
-          </div></div>}
-    </Financial2028Panel>
-
-    {editing && <ExpenseFormDialog org={org} edition={edition} value={editing} onClose={() => setEditing(null)}
-      categories={categories.data ?? []} commissions={commissions.map((c) => ({ id: c.id, nome: c.nome }))} />}
-    {transition && <TransitionDialog org={org} {...transition} onClose={() => setTransition(null)} />}
-    {categoriesOpen && <CategoriesDialog org={org} onClose={() => setCategoriesOpen(false)} />}
+  const openTransition = (expense: FinancialExpense, to: ExpenseStatus) => setTransition({ expense, to });
+  const filterOverdue = () => {
+    const date = new Date(); date.setDate(date.getDate() - 1);
+    const yesterday = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    updateFilters({ status: 'realizada', date_field: 'due_date', from: '', to: yesterday });
+    document.getElementById(`${ids}-ledger`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  const panel = (which: Side) => {
+    const projected = which === 'projetado';
+    return <section className="f28-expense-side" data-expense-panel={which} aria-labelledby={`${ids}-${which}-heading`}>
+      <FinancialComparisonSideHeader id={`${ids}-${which}-heading`} title={projected ? 'Despesas projetadas' : 'Despesas realizadas'} tone={which} action={<FinancialComparisonAction label={projected ? 'Adicionar despesa projetada' : 'Adicionar despesa realizada'} compactLabel="Adicionar" disabled={projected ? !canEdit : !canConfirm} tone={which} onClick={() => setEditing(projected ? 'new-prevista' : 'new-realizada')} description={projected ? 'Cadastrar uma previsão' : 'Cadastro direto · pagamento separado'} />} />
+      <Metric primary label={projected ? 'Total projetado' : 'Total realizado'} value={t ? projected ? t.planned_cents : t.committed_cents : null} state={state} hint={projected ? 'Inclui previsões preservadas · exclui canceladas' : 'Compromissos realizados · independente do pagamento'} />
+      {projected ? <>
+        {(noCategory || noCommission) && <div className="f28-expense-secondary"><>{noCategory && <Metric label="Sem categoria" value={noCategory.planned_cents} state={state} />}{noCommission && <Metric label="Sem comissão" value={noCommission.planned_cents} state={state} />}</></div>}
+      </> : <>
+        <div className="f28-expense-secondary"><Metric label="Pago líquido" value={t?.paid_cents ?? null} state={state} /><Metric label="Saldo a pagar" value={t?.open_cents ?? null} state={state} /><Metric label="Desvio" value={t?.deviation_cents ?? null} state={state} attention={Boolean(t && t.deviation_cents > 0)} hint={t ? t.deviation_pct == null ? 'Sem previsão · percentual indisponível' : `${t.deviation_pct > 0 ? '+' : ''}${t.deviation_pct.toLocaleString('pt-BR')}% sobre o projetado` : undefined} /></div>
+        {t && (t.overdue_count > 0 || t.realized_without_plan_count > 0) && <aside className="f28-expense-alerts" aria-label="Atenção às despesas realizadas">{t.overdue_count > 0 && <div><p><strong>{t.overdue_count} vencida(s) em aberto</strong> · {formatBRL(t.overdue_cents / 100)}</p><div className="f28-expense-overdue-action"><button type="button" onClick={filterOverdue}>Ver despesas por vencimento</button><Help label="Sobre a consulta por vencimento"><p>A listagem por vencimento também inclui despesas quitadas.</p></Help></div></div>}{t.realized_without_plan_count > 0 && <p><strong>{t.realized_without_plan_count} realizada(s)</strong> sem previsão</p>}</aside>}
+      </>}
+      <FinancialExpenseRanking model={state === 'error' ? null : model} side={which} dimension="category" loading={state === 'loading'} error={state === 'error'} filtered={filtered} />
+      <FinancialExpenseRanking model={state === 'error' ? null : model} side={which} dimension="commission" loading={state === 'loading'} error={state === 'error'} filtered={filtered} />
+    </section>;
+  };
+  const categoryFilter = <select aria-label="Categoria" value={filters.category_id ?? ''} onChange={e => updateFilters({ category_id: e.target.value })}><option value="">Todas as categorias</option><option value="none">Sem categoria</option>{categories.data?.map(c => <option key={c.id} value={c.id}>{c.name}{c.active ? '' : ' · arquivada'}</option>)}</select>;
+  const commissionFilter = <select aria-label="Comissão" value={filters.commission_id ?? ''} onChange={e => updateFilters({ commission_id: e.target.value })}><option value="">Todas as comissões</option><option value="none">Sem comissão</option>{commissions.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}</select>;
+  return <div ref={shell} className="f28-expense-comparison" data-expense-focus={focus} data-active-side={side} data-compact={compact || undefined} onClickCapture={focusFinancialControl}>
+    <div className="f28-expense-toolbar">
+      <form className="f28-expense-search" onSubmit={submitSearch}><Search aria-hidden="true" /><input type="search" aria-label="Buscar despesa" placeholder="Título ou favorecido" value={query} onChange={e => setQuery(e.target.value)} />{query && <button type="button" aria-label="Limpar busca" onClick={() => { setQuery(''); updateFilters({ q: '' }); }}><X aria-hidden="true" /></button>}<button type="submit">Buscar</button></form>
+      {!compact && <>{categoryFilter}{commissionFilter}</>}
+      <details className="f28-expense-filters"><summary><SlidersHorizontal aria-hidden="true" />Filtros{activeFilterCount > 0 && <span className="f28-expense-filter-count" aria-label={`${activeFilterCount} filtros ativos`}>{activeFilterCount}</span>}</summary><div>
+        {compact && <><label>Categoria{categoryFilter}</label><label>Comissão{commissionFilter}</label></>}
+        <label>Situação<select value={filters.status ?? ''} onChange={e => updateFilters({ status: e.target.value as ExpenseStatus | '' })}><option value="">Todas as situações</option>{(Object.keys(EXPENSE_STATUS_LABELS) as ExpenseStatus[]).map(s => <option key={s} value={s}>{EXPENSE_STATUS_LABELS[s]}</option>)}</select></label>
+        <label>Data do período<select value={filters.date_field} onChange={e => updateFilters({ date_field: e.target.value as ExpenseDateField })}>{(Object.keys(EXPENSE_DATE_FIELD_LABELS) as ExpenseDateField[]).map(k => <option key={k} value={k}>{EXPENSE_DATE_FIELD_LABELS[k]}</option>)}</select></label>
+        <label>De<input type="date" value={filters.from ?? ''} max={filters.to || undefined} onChange={e => updateFilters({ from: e.target.value })} /></label><label>Até<input type="date" value={filters.to ?? ''} min={filters.from || undefined} onChange={e => updateFilters({ to: e.target.value })} /></label>
+      </div></details>
+    </div>
+    {chips.length > 0 && <div className="f28-expense-filter-chips" aria-label="Filtros ativos">{chips.map(chip => <button key={chip.key} type="button" onClick={chip.remove} aria-label={`Remover filtro ${chip.label}`}><span>{chip.label}</span><X aria-hidden="true" /></button>)}</div>}
+    <div className="f28-expense-scope"><p role="status">{t && state === 'ready' ? `${t.count} despesas no recorte` : state === 'error' ? 'Consulta indisponível' : 'Consultando despesas…'} · Período por {EXPENSE_DATE_FIELD_LABELS[filters.date_field ?? 'planned_on'].toLocaleLowerCase('pt-BR')}{filters.from || filters.to ? ` · ${filters.from ? formatDate(filters.from) : 'início'} a ${filters.to ? formatDate(filters.to) : 'sem limite final'}` : ''}</p><div>{filtered && <button type="button" className="f28-expense-control" onClick={clearFilters}>Limpar filtros</button>}<button type="button" className="f28-expense-control f28-expense-reset" onClick={reset}><RotateCcw aria-hidden="true" />Restaurar 50/50</button><Help label="Como comparar despesas"><strong>Planejamento e execução</strong><p>Projetado e realizado pertencem à mesma despesa. A previsão continua no total após realizar. Realizado é compromisso; pago é liquidação.</p><p>Desvio = realizado − projetado. Valores negativos também podem representar previsões ainda não realizadas. Sem previsão não há percentual comparável.</p><p>Indicadores e gráficos consideram todo o recorte do servidor; a paginação altera apenas a lista. Pagamentos incluem os movimentos das despesas filtradas.</p><p>Arraste o divisor ou use as setas do teclado. Enter, duplo clique e o botão restauram 50/50. Em áreas estreitas, use as abas.</p></Help></div></div>
+    {comparison.isError && <ExpenseQueryError error={comparison.error} retry={() => void comparison.refetch()} />}
+    {categories.isError && <ExpenseQueryError error={categories.error} retry={() => void categories.refetch()} />}
+    <div className="f28-expense-tabs" role="tablist" aria-label="Comparar despesas">{(['projetado', 'realizado'] as const).map(s => <button key={s} type="button" role="tab" id={`${ids}-tab-${s}`} aria-selected={side === s} aria-controls={`${ids}-panel-${s}`} tabIndex={side === s ? 0 : -1} onClick={() => setSide(s)} onKeyDown={event => {
+      if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) { event.preventDefault(); const next = event.key === 'Home' ? 'projetado' : event.key === 'End' ? 'realizado' : s === 'projetado' ? 'realizado' : 'projetado'; setSide(next); document.getElementById(`${ids}-tab-${next}`)?.focus(); }
+    }}>{s === 'projetado' ? 'Projetado' : 'Realizado'}</button>)}</div>
+    <ResizablePanelGroup ref={group} direction="horizontal" className="f28-expense-split" onLayout={persistLayout}>
+      <ResizablePanel id="projected-expense" order={1} defaultSize={split} minSize={35} maxSize={65} className="f28-expense-resizable" data-side="projetado"><div id={`${ids}-panel-projetado`} role={compact ? 'tabpanel' : undefined} aria-labelledby={compact ? `${ids}-tab-projetado` : undefined}>{panel('projetado')}</div></ResizablePanel>
+      <ResizableHandle disabled={compact} tabIndex={compact ? -1 : 0} className="f28-expense-divider" aria-label="Ajustar comparação de despesas" withHandle onDoubleClick={reset} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); reset(); } }} />
+      <ResizablePanel id="committed-expense" order={2} defaultSize={100 - split} minSize={35} maxSize={65} className="f28-expense-resizable" data-side="realizado"><div id={`${ids}-panel-realizado`} role={compact ? 'tabpanel' : undefined} aria-labelledby={compact ? `${ids}-tab-realizado` : undefined}>{panel('realizado')}</div></ResizablePanel>
+    </ResizablePanelGroup>
+    <FinancialExpenseAnalyses model={state === 'error' ? null : model} loading={state === 'loading'} error={state === 'error'} filtered={filtered} />
+    <section id={`${ids}-ledger`} className="f28-expense-ledger-section" aria-labelledby={`${ids}-ledger-heading`}><header><div className="f28-expense-ledger-heading"><h2 id={`${ids}-ledger-heading`}>Registros de despesas</h2><Help label="Como ler os registros de despesas"><p>Projetado e realizado pertencem ao mesmo registro. Os totais consideram todo o recorte; a paginação altera somente os registros exibidos.</p></Help></div><div className="f28-expense-ledger-header-actions">{list.isFetching && <span role="status">Atualizando…</span>}{capabilities.canAdmin && <button type="button" className="f28-expense-control" onClick={() => setCategoriesOpen(true)}><Tags aria-hidden="true" />Categorias</button>}</div></header>
+      {list.isError ? <ExpenseQueryError error={list.error} retry={() => void list.refetch()} /> : !list.data || list.isPlaceholderData ? <Financial2028Loading label="Carregando registros do recorte…" /> : list.data.items.length === 0 ? <Financial2028State tone="info" title={filtered ? 'Nenhuma despesa para estes filtros' : 'Nenhuma despesa cadastrada'}>{filtered ? 'Ajuste ou limpe os filtros para consultar outros registros.' : 'Cadastre uma previsão ou um compromisso realizado para iniciar a comparação.'}</Financial2028State> : <FinancialExpenseLedger data={list.data} page={page} onPage={setPage} capabilities={capabilities} readOnly={edition.status !== 'operacional'} onDetail={setDetailId} onEdit={setEditing} onTransition={openTransition} />}
+    </section>
+    {editing && <ExpenseFormDialog org={org} edition={edition} value={editing} capabilities={capabilities} onClose={() => setEditing(null)} categories={categories.data ?? []} commissions={commissions.map(c => ({ id: c.id, nome: c.nome }))} />}
+    {transition && <TransitionDialog org={org} {...transition} capabilities={capabilities} onClose={() => setTransition(null)} />}
+    {categoriesOpen && <CategoriesDialog org={org} capabilities={capabilities} onClose={() => setCategoriesOpen(false)} />}
+    {detailId && <ExpenseDetailDialog org={org} expenseId={detailId} capabilities={capabilities} onClose={() => setDetailId(null)} onEdit={canEdit ? expense => { setDetailId(null); setEditing(expense); } : undefined} onTransition={canEdit ? (expense, to) => { setDetailId(null); openTransition(expense, to); } : undefined} />}
   </div>;
-}
-
-function useStableKey(deps: unknown) {
-  // Uma chave por conteúdo enviado: repetir a mesma tentativa reaproveita a chave (sem duplicar);
-  // alterar o formulário gera nova chave.
-  const ref = useRef<{ sig: string; key: string } | null>(null);
-  const sig = JSON.stringify(deps);
-  if (!ref.current || ref.current.sig !== sig) ref.current = { sig, key: newKey() };
-  return ref.current.key;
-}
-
-function ExpenseFormDialog({ org, edition, value, onClose, categories, commissions }: {
-  org: string; edition: FinancialEdition; value: FinancialExpense | 'new-prevista' | 'new-realizada'; onClose: () => void;
-  categories: Array<{ id: string; name: string }>; commissions: Array<{ id: string; nome: string }>;
-}) {
-  const existing = typeof value === 'string' ? null : value;
-  const status = existing?.status ?? (value === 'new-realizada' ? 'realizada' : 'prevista');
-  const [form, setForm] = useState({
-    title: existing?.title ?? '', description: existing?.description ?? '', category_id: existing?.category_id ?? '',
-    commission_id: existing?.commission_id ?? '', payee_name: existing?.payee_name ?? '',
-    planned: centsToInput(existing?.planned_cents ?? null), planned_on: existing?.planned_on ?? '',
-    committed: centsToInput(existing?.committed_cents ?? null), committed_on: existing?.committed_on ?? '',
-    due_date: existing?.due_date ?? '', notes: existing?.notes ?? '',
-  });
-  const [error, setError] = useState<string | null>(null);
-  const save = useSaveExpense(org);
-  const key = useStableKey(form);
-  const set = (k: keyof typeof form) => (e: { target: { value: string } }) => setForm((f) => ({ ...f, [k]: e.target.value }));
-
-  const submit = async (ev: FormEvent) => {
-    ev.preventDefault(); setError(null);
-    try {
-      const planned = parseCents(form.planned);
-      const committed = status === 'realizada' ? parseCents(form.committed) : null;
-      const payload = {
-        ...(existing ? { id: existing.id } : { edition_id: edition.id, status: status as 'prevista' | 'realizada' }),
-        title: form.title, description: form.description || null, category_id: form.category_id || null,
-        commission_id: form.commission_id || null, payee_name: form.payee_name || null,
-        planned_cents: planned, planned_on: form.planned_on || null, due_date: form.due_date || null, notes: form.notes || null,
-        ...(status === 'realizada' ? { committed_cents: committed, committed_on: form.committed_on || null } : {}),
-      };
-      await save.mutateAsync({ payload, expectedVersion: existing?.version ?? null, requestId: key });
-      onClose();
-    } catch (e) { setError(e instanceof Error ? e.message : 'Falha ao salvar.'); }
-  };
-
-  return <Dialog open onOpenChange={(o) => !o && onClose()}>
-    <DialogContent className="max-h-[90dvh] overflow-y-auto">
-      <DialogHeader><DialogTitle>{existing ? 'Editar despesa' : status === 'realizada' ? 'Nova despesa realizada' : 'Nova despesa prevista'}</DialogTitle>
-        <DialogDescription>Pago e saldo vêm só dos pagamentos registrados.{status === 'realizada' && !existing ? ' Sem previsão anterior: o projetado fica em branco se não for informado.' : ''}</DialogDescription></DialogHeader>
-      <form onSubmit={submit} style={{ display: 'grid', gap: 10 }}>
-        <label>Título<Input required minLength={2} maxLength={240} value={form.title} onChange={set('title')} /></label>
-        <label>Descrição<Input maxLength={2000} value={form.description} onChange={set('description')} /></label>
-        <label>Categoria<select className="f28-select" value={form.category_id} onChange={set('category_id')}>
-          <option value="">Sem categoria</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
-        <label>Comissão responsável<select className="f28-select" value={form.commission_id} onChange={set('commission_id')}>
-          <option value="">Sem comissão</option>{commissions.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}</select></label>
-        <label>Fornecedor / favorecido<Input maxLength={200} value={form.payee_name} onChange={set('payee_name')} /></label>
-        <label>Valor projetado (R$){status === 'prevista' ? ' *' : ''}<Input inputMode="decimal" required={status === 'prevista'} value={form.planned} onChange={set('planned')} placeholder="0,00" /></label>
-        <label>Data prevista<Input type="date" value={form.planned_on} onChange={set('planned_on')} /></label>
-        {status === 'realizada' && <>
-          <label>Valor realizado (R$) *<Input inputMode="decimal" required value={form.committed} onChange={set('committed')} placeholder="0,00" /></label>
-          <label>Competência / realização *<Input type="date" required value={form.committed_on} onChange={set('committed_on')} /></label>
-        </>}
-        <label>Vencimento<Input type="date" value={form.due_date} onChange={set('due_date')} /></label>
-        <label>Observações<Input maxLength={2000} value={form.notes} onChange={set('notes')} /></label>
-        {error && <p role="alert" className="text-destructive">{error}</p>}
-        <DialogFooter><Button type="button" variant="outline" onClick={onClose}>Fechar</Button>
-          <Button type="submit" disabled={save.isPending}>{save.isPending ? 'Salvando…' : 'Salvar'}</Button></DialogFooter>
-      </form>
-    </DialogContent>
-  </Dialog>;
-}
-
-function TransitionDialog({ org, expense, to, onClose }: { org: string; expense: FinancialExpense; to: ExpenseStatus; onClose: () => void }) {
-  const [committed, setCommitted] = useState(centsToInput(expense.planned_cents));
-  const [committedOn, setCommittedOn] = useState(new Date().toISOString().slice(0, 10));
-  const [due, setDue] = useState(expense.due_date ?? '');
-  const [reason, setReason] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const mutation = useTransitionExpense(org);
-  const key = useStableKey([committed, committedOn, due, reason]);
-  const titles = { realizada: 'Realizar despesa', prevista: 'Voltar para prevista', cancelada: 'Cancelar despesa' };
-  const submit = async (ev: FormEvent) => {
-    ev.preventDefault(); setError(null);
-    try {
-      const payload = to === 'realizada' ? { committed_cents: parseCents(committed) ?? 0, committed_on: committedOn, due_date: due || null } : {};
-      await mutation.mutateAsync({ id: expense.id, to, expectedVersion: expense.version, payload, reason: reason || null, requestId: key });
-      onClose();
-    } catch (e) { setError(e instanceof Error ? e.message : 'Falha.'); }
-  };
-  return <Dialog open onOpenChange={(o) => !o && onClose()}>
-    <DialogContent>
-      <DialogHeader><DialogTitle>{titles[to as keyof typeof titles]}</DialogTitle><DialogDescription>{expense.title}</DialogDescription></DialogHeader>
-      <form onSubmit={submit} style={{ display: 'grid', gap: 10 }}>
-        {to === 'realizada' ? <>
-          <p>Projetado: <Money v={expense.planned_cents} /> (preservado)</p>
-          <label>Valor realizado (R$) *<Input inputMode="decimal" required value={committed} onChange={(e) => setCommitted(e.target.value)} /></label>
-          <label>Competência / realização *<Input type="date" required value={committedOn} onChange={(e) => setCommittedOn(e.target.value)} /></label>
-          <label>Vencimento<Input type="date" value={due} onChange={(e) => setDue(e.target.value)} /></label>
-        </> : <label>Motivo *<Input required minLength={3} maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} /></label>}
-        {error && <p role="alert" className="text-destructive">{error}</p>}
-        <DialogFooter><Button type="button" variant="outline" onClick={onClose}>Fechar</Button>
-          <Button type="submit" disabled={mutation.isPending}>{mutation.isPending ? 'Enviando…' : 'Confirmar'}</Button></DialogFooter>
-      </form>
-    </DialogContent>
-  </Dialog>;
-}
-
-function CategoriesDialog({ org, onClose }: { org: string; onClose: () => void }) {
-  const list = useExpenseCategories(org, true);
-  const save = useSaveExpenseCategory(org);
-  const seed = useSeedExpenseCategories(org);
-  const [name, setName] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const addKey = useStableKey(name);
-  const sorted = useMemo(() => list.data ?? [], [list.data]);
-  const run = async (fn: () => Promise<unknown>) => { setError(null); try { await fn(); } catch (e) { setError(e instanceof Error ? e.message : 'Falha.'); } };
-  return <Dialog open onOpenChange={(o) => !o && onClose()}>
-    <DialogContent className="max-h-[90dvh] overflow-y-auto">
-      <DialogHeader><DialogTitle>Categorias de despesa</DialogTitle>
-        <DialogDescription>Arquivar não apaga nem desvincula despesas antigas. Cor e ícone não afetam cálculos.</DialogDescription></DialogHeader>
-      {list.isError ? <ErrorState error={list.error} retry={() => void list.refetch()} /> : <>
-        {sorted.length === 0 && <Button type="button" variant="outline" disabled={seed.isPending} onClick={() => run(() => seed.mutateAsync(newKey()))}>Usar nomes de 2026 como sugestão</Button>}
-        <ul style={{ display: 'grid', gap: 6 }}>{sorted.map((c) => <li key={c.id} style={{ display: 'flex', gap: 8, alignItems: 'center', opacity: c.active ? 1 : 0.6 }}>
-          <span style={{ flex: 1 }}>{c.name} <small>({c.usage_count} vínculos{c.active ? '' : ' · arquivada'})</small></span>
-          <Button size="sm" variant="outline" onClick={() => {
-            const next = window.prompt('Novo nome', c.name);
-            if (next && next.trim() !== c.name) void run(() => save.mutateAsync({ payload: { id: c.id, name: next.trim() }, expectedVersion: c.version, requestId: newKey() }));
-          }}>Renomear</Button>
-          <Button size="sm" variant="outline" onClick={() => run(() => save.mutateAsync({ payload: { id: c.id, active: !c.active }, expectedVersion: c.version, requestId: newKey() }))}>{c.active ? 'Arquivar' : 'Reativar'}</Button>
-        </li>)}</ul>
-        <form style={{ display: 'flex', gap: 8 }} onSubmit={(e) => { e.preventDefault(); void run(async () => { await save.mutateAsync({ payload: { name }, expectedVersion: null, requestId: addKey }); setName(''); }); }}>
-          <Input aria-label="Nova categoria" minLength={2} maxLength={80} required value={name} onChange={(e) => setName(e.target.value)} placeholder="Nova categoria" />
-          <Button type="submit" disabled={save.isPending}>Adicionar</Button>
-        </form></>}
-      {error && <p role="alert" className="text-destructive">{error}</p>}
-    </DialogContent>
-  </Dialog>;
 }

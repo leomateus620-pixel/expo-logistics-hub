@@ -1,0 +1,220 @@
+[
+  {
+    "profile": "reader",
+    "actions": [
+      {
+        "disabled": true,
+        "label": "Adicionar despesa projetada"
+      },
+      {
+        "disabled": true,
+        "label": "Adicionar despesa realizada"
+      }
+    ],
+    "headings": [
+      "Despesas projetadas",
+      "Despesas realizadas",
+      "Registros de despesas"
+    ],
+    "path": "/comissoes/financeiro-gerencial/despesas-previstas",
+    "primary": "Total projetadoR$ 369.003,00R$ 369 mil"
+  },
+  {
+    "profile": "denied",
+    "actions": [],
+    "headings": [
+      "Edição 2028 indisponível para sua conta"
+    ],
+    "path": "/comissoes/financeiro-gerencial/despesas-previstas",
+    "primary": null
+  },
+  {
+    "profile": "editor",
+    "actions": [
+      {
+        "disabled": false,
+        "label": "Adicionar despesa projetada"
+      },
+      {
+        "disabled": true,
+        "label": "Adicionar despesa realizada"
+      }
+    ],
+    "headings": [
+      "Despesas projetadas",
+      "Despesas realizadas",
+      "Registros de despesas"
+    ],
+    "path": "/comissoes/financeiro-gerencial/despesas-previstas",
+    "primary": "Total projetadoR$ 369.003,00R$ 369 mil"
+  },
+  {
+    "profile": "confirmer",
+    "actions": [
+      {
+        "disabled": false,
+        "label": "Adicionar despesa projetada"
+      },
+      {
+        "disabled": false,
+        "label": "Adicionar despesa realizada"
+      }
+    ],
+    "headings": [
+      "Despesas projetadas",
+      "Despesas realizadas",
+      "Registros de despesas"
+    ],
+    "path": "/comissoes/financeiro-gerencial/despesas-previstas",
+    "primary": "Total projetadoR$ 369.003,00R$ 369 mil"
+  },
+  {
+    "profile": "reader",
+    "actions": [
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Eventos complementares"
+      },
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Operação de gastronomia"
+      },
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Plano de Trabalho Municipal"
+      },
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Projeto cultural Lei Rouanet"
+      },
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Bilheteria e estacionamento"
+      }
+    ],
+    "headings": [
+      "Receitas projetadas",
+      "Receitas recebidas",
+      "Receitas manuais carregadas"
+    ],
+    "path": "/comissoes/financeiro-gerencial/receitas-projetadas",
+    "primary": "Total projetadoR$ 770.000,00R$ 770 mil"
+  },
+  {
+    "profile": "denied",
+    "actions": [],
+    "headings": [
+      "Edição 2028 indisponível para sua conta"
+    ],
+    "path": "/comissoes/financeiro-gerencial/receitas-projetadas",
+    "primary": null
+  },
+  {
+    "profile": "editor",
+    "actions": [
+      {
+        "disabled": false,
+        "label": "Adicionar receita projetada"
+      },
+      {
+        "disabled": false,
+        "label": "Cadastrar receita"
+      },
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Eventos complementares"
+      },
+      {
+        "disabled": false,
+        "label": "Editar QA local · Eventos complementares"
+      },
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Operação de gastronomia"
+      },
+      {
+        "disabled": false,
+        "label": "Editar QA local · Operação de gastronomia"
+      },
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Plano de Trabalho Municipal"
+      },
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Projeto cultural Lei Rouanet"
+      },
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Bilheteria e estacionamento"
+      }
+    ],
+    "headings": [
+      "Receitas projetadas",
+      "Receitas recebidas",
+      "Receitas manuais carregadas"
+    ],
+    "path": "/comissoes/financeiro-gerencial/receitas-projetadas",
+    "primary": "Total projetadoR$ 770.000,00R$ 770 mil"
+  },
+  {
+    "profile": "confirmer",
+    "actions": [
+      {
+        "disabled": false,
+        "label": "Adicionar receita projetada"
+      },
+      {
+        "disabled": false,
+        "label": "Cadastrar receita"
+      },
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Eventos complementares"
+      },
+      {
+        "disabled": false,
+        "label": "Editar QA local · Eventos complementares"
+      },
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Operação de gastronomia"
+      },
+      {
+        "disabled": false,
+        "label": "Editar QA local · Operação de gastronomia"
+      },
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Plano de Trabalho Municipal"
+      },
+      {
+        "disabled": false,
+        "label": "Editar QA local · Plano de Trabalho Municipal"
+      },
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Projeto cultural Lei Rouanet"
+      },
+      {
+        "disabled": false,
+        "label": "Editar QA local · Projeto cultural Lei Rouanet"
+      },
+      {
+        "disabled": false,
+        "label": "Ver detalhes de QA local · Bilheteria e estacionamento"
+      },
+      {
+        "disabled": false,
+        "label": "Editar QA local · Bilheteria e estacionamento"
+      }
+    ],
+    "headings": [
+      "Receitas projetadas",
+      "Receitas recebidas",
+      "Receitas manuais carregadas"
+    ],
+    "path": "/comissoes/financeiro-gerencial/receitas-projetadas",
+    "primary": "Total projetadoR$ 770.000,00R$ 770 mil"
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "boundary": "Fresh synthetic loopback PostgreSQL cluster; no production connection or credentials.",
+  "postgres": "postgres (PostgreSQL) 16.15 (Postgres.app)",
+  "database": "financial_expenses_qa",
+  "port": "5499",
+  "runtime": "/var/folders/8t/tcm8hqc9167g5yd7dsw4yqf80000gn/T/financial-expenses-qa-XRoFRM",
+  "migrations": [
+    {
+      "filename": "scripts/financial-2028/expenses-db-fixture.sql",
+      "sha256": "58ffde93daaacbf6068ab4754279d435aee6abde7e8336ebddf7058ee7a43a1b"
+    },
+    {
+      "filename": "supabase/migrations/20261006200356_8633880e-2e4d-4354-bc01-53a604dfe92d.sql",
+      "sha256": "bd210f6b07bbf48a397a3a76ae9830cbaafea736ba7c5481e10f3047f202a829"
+    },
+    {
+      "filename": "drizzle/migrations/0004_financial_expenses_2028_stage1.sql",
+      "sha256": "6f1af3af0b35b8f55eedb4c2015bb19f141aab2c6ad2658c404bc0426f4e23bb"
+    },
+    {
+      "filename": "drizzle/migrations/0005_financial_category_audit_entity_fix.sql",
+      "sha256": "7851b07d0ff19f1f33799a7e78d99fb2fb612f5a30e255c5b177523709ce113d"
+    }
+  ],
+  "postgrest": "PostgREST 16.4"
+}

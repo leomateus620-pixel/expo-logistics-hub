@@ -1,0 +1,285 @@
+{
+  "boundary": "Fresh synthetic loopback PostgreSQL; actual migrated financial RPCs/RLS; no remote writes.",
+  "checks": [
+    {
+      "name": "2028 starts empty without copying historical values",
+      "passed": true
+    },
+    {
+      "name": "Create a custom financial category",
+      "passed": true
+    },
+    {
+      "name": "Rename with version preserved",
+      "passed": true
+    },
+    {
+      "name": "Retry preserves expense identity",
+      "passed": true
+    },
+    {
+      "name": "Same idempotency key rejects different content",
+      "passed": true
+    },
+    {
+      "name": "Projected expense reloads from server",
+      "passed": true
+    },
+    {
+      "name": "Projection creates no payable obligation",
+      "passed": true
+    },
+    {
+      "name": "Edit increments version and preserves cent precision",
+      "passed": true
+    },
+    {
+      "name": "Stale expense version is rejected",
+      "passed": true
+    },
+    {
+      "name": "Realization keeps projection and creates one obligation",
+      "passed": true
+    },
+    {
+      "name": "Direct realized expense keeps projection null",
+      "passed": true
+    },
+    {
+      "name": "Payment affects liquidation while commitment is preserved",
+      "passed": true
+    },
+    {
+      "name": "Payment above balance is rejected",
+      "passed": true
+    },
+    {
+      "name": "Cancellation with payment is rejected",
+      "passed": true
+    },
+    {
+      "name": "Reversion with payment is rejected",
+      "passed": true
+    },
+    {
+      "name": "Commitment cannot be reduced below paid",
+      "passed": true
+    },
+    {
+      "name": "Comparison aggregates planned, committed, paid and balance independently",
+      "passed": true
+    },
+    {
+      "name": "Without projection and overdue records are reported by server",
+      "passed": true
+    },
+    {
+      "name": "Pagination affects list only",
+      "passed": true
+    },
+    {
+      "name": "Search/category/commission share comparison and list scope",
+      "passed": true
+    },
+    {
+      "name": "Explicit period field uses forecast date",
+      "passed": true
+    },
+    {
+      "name": "Explicit period field uses commitment date",
+      "passed": true
+    },
+    {
+      "name": "Reversal restores paid to zero with history retained",
+      "passed": true
+    },
+    {
+      "name": "Reversion restores projected stage without deleting forecast",
+      "passed": true
+    },
+    {
+      "name": "Direct realized expense cannot revert without forecast",
+      "passed": true
+    },
+    {
+      "name": "Cancel keeps stable identity and audit history",
+      "passed": true
+    },
+    {
+      "name": "Archive retains linked category identity",
+      "passed": true
+    },
+    {
+      "name": "Archived category rejects new expense link",
+      "passed": true
+    },
+    {
+      "name": "2026 remains read only",
+      "passed": true
+    },
+    {
+      "name": "Reader can consult financial data",
+      "passed": true
+    },
+    {
+      "name": "Reader cannot write expenses",
+      "passed": true
+    },
+    {
+      "name": "Editor cannot create realized expense",
+      "passed": true
+    },
+    {
+      "name": "No-finance operator cannot use expense RPC",
+      "passed": true
+    },
+    {
+      "name": "No-finance operator sees zero financial rows by RLS",
+      "passed": true
+    },
+    {
+      "name": "Direct table edits are guarded outside financial RPC",
+      "passed": true
+    },
+    {
+      "name": "Missing financial rights are never inherited from logistics role",
+      "passed": true
+    },
+    {
+      "name": "Historic category names are optional suggestions with no expense import",
+      "passed": true
+    },
+    {
+      "name": "Two sessions retry one creation idempotently",
+      "passed": true
+    },
+    {
+      "name": "Concurrent retry stores one expense and one audit create",
+      "passed": true
+    },
+    {
+      "name": "Two sessions edit one version; stale edit is rejected",
+      "passed": true
+    },
+    {
+      "name": "Two sessions realize one forecast; one obligation survives",
+      "passed": true
+    },
+    {
+      "name": "Concurrent realization keeps forecast and one source obligation",
+      "passed": true
+    },
+    {
+      "name": "Two sessions cannot overpay one expense",
+      "passed": true
+    },
+    {
+      "name": "Concurrent payments leave exact net paid/balance",
+      "passed": true
+    },
+    {
+      "name": "Payment versus cancellation protects settled expense",
+      "passed": true
+    },
+    {
+      "name": "Payment versus reversion protects settled expense",
+      "passed": true
+    },
+    {
+      "name": "Payment versus reduction keeps commitment above liquidation",
+      "passed": true
+    }
+  ],
+  "concurrency": [
+    {
+      "name": "Two sessions retry one creation idempotently",
+      "passed": true,
+      "pids": [
+        16452,
+        16454
+      ],
+      "firstExit": 0,
+      "secondExit": 0,
+      "expectedConflict": null,
+      "error": null
+    },
+    {
+      "name": "Two sessions edit one version; stale edit is rejected",
+      "passed": true,
+      "pids": [
+        16470,
+        16472
+      ],
+      "firstExit": 0,
+      "secondExit": 3,
+      "expectedConflict": "FINANCIAL_CONFLICT",
+      "error": "psql:<stdin>:2: ERROR:  FINANCIAL_CONFLICT\nCONTEXT:  PL/pgSQL function financial_save_expense(uuid,jsonb,integer,uuid,text) line 23 at RAISE"
+    },
+    {
+      "name": "Two sessions realize one forecast; one obligation survives",
+      "passed": true,
+      "pids": [
+        16476,
+        16478
+      ],
+      "firstExit": 0,
+      "secondExit": 3,
+      "expectedConflict": "FINANCIAL_CONFLICT",
+      "error": "psql:<stdin>:2: ERROR:  FINANCIAL_CONFLICT\nCONTEXT:  PL/pgSQL function financial_transition_expense(uuid,uuid,text,integer,jsonb,text,uuid) line 14 at RAISE"
+    },
+    {
+      "name": "Two sessions cannot overpay one expense",
+      "passed": true,
+      "pids": [
+        16484,
+        16486
+      ],
+      "firstExit": 0,
+      "secondExit": 3,
+      "expectedConflict": "FINANCIAL_OVER_SETTLEMENT",
+      "error": "psql:<stdin>:2: ERROR:  FINANCIAL_OVER_SETTLEMENT\nCONTEXT:  PL/pgSQL function financial_record_movement(uuid,jsonb,jsonb,uuid) line 38 at RAISE"
+    },
+    {
+      "name": "Payment versus cancellation protects settled expense",
+      "passed": true,
+      "pids": [
+        16495,
+        16497
+      ],
+      "firstExit": 0,
+      "secondExit": 3,
+      "expectedConflict": "FINANCIAL_HAS_SETTLEMENT",
+      "error": "psql:<stdin>:2: ERROR:  FINANCIAL_HAS_SETTLEMENT\nCONTEXT:  PL/pgSQL function financial_transition_expense(uuid,uuid,text,integer,jsonb,text,uuid) line 42 at RAISE"
+    },
+    {
+      "name": "Payment versus reversion protects settled expense",
+      "passed": true,
+      "pids": [
+        16501,
+        16503
+      ],
+      "firstExit": 0,
+      "secondExit": 3,
+      "expectedConflict": "FINANCIAL_HAS_SETTLEMENT",
+      "error": "psql:<stdin>:2: ERROR:  FINANCIAL_HAS_SETTLEMENT\nCONTEXT:  PL/pgSQL function financial_transition_expense(uuid,uuid,text,integer,jsonb,text,uuid) line 34 at RAISE"
+    },
+    {
+      "name": "Payment versus reduction keeps commitment above liquidation",
+      "passed": true,
+      "pids": [
+        16507,
+        16509
+      ],
+      "firstExit": 0,
+      "secondExit": 3,
+      "expectedConflict": "FINANCIAL_OBLIGATION_BELOW_SETTLED",
+      "error": "psql:<stdin>:2: ERROR:  FINANCIAL_OBLIGATION_BELOW_SETTLED\nCONTEXT:  PL/pgSQL function financial_save_expense(uuid,jsonb,integer,uuid,text) line 56 at RAISE"
+    }
+  ],
+  "limitation": "Database authenticated roles and JWT claims are exercised; Supabase Auth login is not involved.",
+  "summary": {
+    "passed": 47,
+    "total": 47,
+    "concurrentSessions": 7
+  }
+}
