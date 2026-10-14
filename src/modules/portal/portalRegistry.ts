@@ -114,6 +114,13 @@ export const portalPrimaryEntries: PortalPrimaryEntry[] = [
     icon: commercialMapDestination.icon,
   },
   {
+    id: 'comissoes',
+    kind: 'expandable',
+    title: 'Comissões',
+    description: 'Frentes responsáveis pela operação da Fenasoja.',
+    icon: UsersRound,
+  },
+  {
     id: 'financeiro',
     kind: 'direct',
     title: 'Financeiro',
@@ -126,13 +133,6 @@ export const portalPrimaryEntries: PortalPrimaryEntry[] = [
     title: 'Administrador',
     description: 'Administração do sistema conforme as permissões do perfil.',
     icon: ShieldCheck,
-  },
-  {
-    id: 'comissoes',
-    kind: 'expandable',
-    title: 'Comissões',
-    description: 'Frentes responsáveis pela operação da Fenasoja.',
-    icon: UsersRound,
   },
 ];
 
