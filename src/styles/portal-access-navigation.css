@@ -841,6 +841,7 @@
   }
 
   .portal-primary-entry__title {
+    overflow-wrap: anywhere;
     font-size: 1rem;
   }
 
@@ -851,6 +852,7 @@
   }
 
   .portal-primary-entry__action {
+    max-width: 100%;
     min-height: 42px;
     align-self: end;
     justify-content: flex-start;
@@ -859,6 +861,8 @@
   }
 
   .portal-primary-entry__action-label {
+    min-width: 0;
+    white-space: normal;
     font-size: 0.72rem;
     text-align: left;
   }

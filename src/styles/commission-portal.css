@@ -642,10 +642,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* Exempt only the Alvorada layer and its active host reveal, not menus/cards. */
-  .fenasoja-portal *:not(:where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"]))),
-  .fenasoja-portal *:not(:where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"])))::before,
-  .fenasoja-portal *:not(:where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"])))::after {
+  /* Preserve canonical Alvorada and the finite history gallery; menus/cards still reduce motion. */
+  .fenasoja-portal *:not(:where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, [data-gallery-motion="canonical"], [data-gallery-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"]))),
+  .fenasoja-portal *:not(:where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, [data-gallery-motion="canonical"], [data-gallery-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"])))::before,
+  .fenasoja-portal *:not(:where([data-alvorada-motion="canonical"], [data-alvorada-motion="canonical"] *, [data-gallery-motion="canonical"], [data-gallery-motion="canonical"] *, .fenasoja-portal__hero[data-intro]:not([data-intro="done"])))::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-delay: 0ms !important;

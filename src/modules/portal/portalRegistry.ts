@@ -3,6 +3,7 @@ import {
   Building2,
   CalendarRange,
   MapPinned,
+  ShieldCheck,
   UsersRound,
   type LucideIcon,
 } from 'lucide-react';
@@ -18,7 +19,8 @@ export type PortalEntryId =
   | 'agenda-restaurante-arena'
   | 'mapa-comercial'
   | 'comissoes'
-  | 'financeiro';
+  | 'financeiro'
+  | 'administrador';
 export type PortalEntryKind = 'expandable' | 'direct';
 
 export interface PortalDestination {
@@ -112,18 +114,25 @@ export const portalPrimaryEntries: PortalPrimaryEntry[] = [
     icon: commercialMapDestination.icon,
   },
   {
-    id: 'comissoes',
-    kind: 'expandable',
-    title: 'Comissões',
-    description: 'Frentes responsáveis pela operação da Fenasoja.',
-    icon: UsersRound,
-  },
-  {
     id: 'financeiro',
     kind: 'direct',
     title: 'Financeiro',
     description: 'Orçamento e gestão executiva conforme o perfil.',
     icon: BadgeDollarSign,
+  },
+  {
+    id: 'administrador',
+    kind: 'direct',
+    title: 'Administrador',
+    description: 'Administração do sistema conforme as permissões do perfil.',
+    icon: ShieldCheck,
+  },
+  {
+    id: 'comissoes',
+    kind: 'expandable',
+    title: 'Comissões',
+    description: 'Frentes responsáveis pela operação da Fenasoja.',
+    icon: UsersRound,
   },
 ];
 

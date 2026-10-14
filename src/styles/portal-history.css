@@ -1,0 +1,125 @@
+/* The identity gallery is confined to the first header card. */
+.fenasoja-portal__header:has(.fenasoja-history) {
+  display: block;
+  padding: 0;
+  min-height: 0;
+  border-color: transparent;
+  background:
+    linear-gradient(#03152d, #03152d) padding-box,
+    linear-gradient(115deg, #466779, #24394f 32%, #71634a 65%, #254457) border-box;
+  box-shadow: 0 16px 44px -34px #000, inset 0 1px 0 rgb(220 237 255 / 7%);
+}
+.fenasoja-portal__header .fenasoja-portal__alvorada-launcher:has(.fenasoja-history) {
+  display: block;
+  width: 100%;
+  border-radius: inherit;
+  text-align: center;
+  transition: none;
+  transform: none;
+  filter: none;
+}
+.fenasoja-history {
+  position: relative;
+  display: block;
+  height: 112px;
+  isolation: isolate;
+  container-type: inline-size;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 50%, #123146 0%, #071d35 45%, #031326 100%);
+  pointer-events: none;
+}
+.fenasoja-history[data-layout="stacked"] { height: var(--history-height, 174px); }
+.fenasoja-history::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 22%;
+  right: 22%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(224 184 91 / 38%), transparent);
+}
+.fenasoja-history__brand {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  width: max-content;
+  max-width: calc(100% - 28px);
+  transform: translate(-50%, -50%);
+}
+.fenasoja-history .fenasoja-brand { max-width: 100%; }
+.fenasoja-history .fenasoja-brand__copy > span { flex-wrap: wrap; justify-content: center; row-gap: 5px; }
+.fenasoja-portal__header .fenasoja-history .fenasoja-brand__wordmark {
+  font-size: clamp(1.25rem, 3cqi, 1.6rem);
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+.fenasoja-portal__header .fenasoja-history .fenasoja-brand__edition { flex-shrink: 0; font-size: clamp(.72rem, 1cqi, .84rem); }
+.fenasoja-history__brand-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 50%, rgb(69 116 143 / 28%), transparent 60%);
+  opacity: .35;
+}
+.fenasoja-history__gallery {
+  position: absolute;
+  inset: 0 var(--history-inset);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--history-brand-width) minmax(0, 1fr);
+  column-gap: var(--history-clearance);
+  align-items: center;
+  visibility: hidden;
+}
+.fenasoja-history[data-active="true"] .fenasoja-history__gallery { visibility: visible; }
+.fenasoja-history__side { display: flex; gap: var(--history-gap); align-items: center; }
+.fenasoja-history__side--left { grid-column: 1; justify-content: flex-start; }
+.fenasoja-history__side--right { grid-column: 3; justify-content: flex-end; }
+.fenasoja-history__art {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  flex: 0 0 var(--history-slot);
+  width: var(--history-slot);
+  height: calc(var(--history-slot) * .75);
+  padding: 5px;
+  border: 1px solid rgb(134 182 213 / 23%);
+  border-radius: 10px;
+  background: #10263b;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%);
+  opacity: 0;
+}
+.fenasoja-history__art img { display: block; width: 100%; height: 100%; min-height: 0; object-fit: contain; }
+.fenasoja-history__halo {
+  position: absolute;
+  inset: -1px;
+  border: 1px solid #edd39b;
+  border-radius: inherit;
+  box-shadow: 0 0 0 1px rgb(228 184 88 / 9%), 0 5px 14px rgb(0 0 0 / 30%), 0 0 12px rgb(245 197 100 / 12%);
+  opacity: 0;
+}
+.fenasoja-history__connection {
+  position: absolute;
+  z-index: 1;
+  bottom: 4px;
+  width: 100%;
+  height: 8px;
+  color: rgb(205 177 105 / 32%);
+}
+.fenasoja-history[data-layout="stacked"] .fenasoja-history__gallery {
+  inset: auto 16px 17px;
+  height: 72px;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 30px;
+}
+.fenasoja-history[data-layout="stacked"] .fenasoja-history__side--left { grid-column: 1; justify-content: flex-end; }
+.fenasoja-history[data-layout="stacked"] .fenasoja-history__side--right { grid-column: 2; justify-content: flex-start; }
+.fenasoja-history[data-layout="stacked"] .fenasoja-history__connection { bottom: -12px; }
+@media (forced-colors: active) {
+  .fenasoja-history { background: Canvas; }
+  .fenasoja-history__art { border-color: CanvasText; }
+  .fenasoja-portal__header .fenasoja-history .fenasoja-brand__wordmark { background: none; -webkit-text-fill-color: CanvasText; }
+}

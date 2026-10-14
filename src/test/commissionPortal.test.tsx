@@ -107,7 +107,7 @@ describe('CommissionPortalPage', () => {
     portalMocks.org.myRole = null;
   });
 
-  it('presents the five primary entries in the required order', () => {
+  it('presents Administrador fifth and preserves the Comissões expansion immediately below', () => {
     const { container } = renderPortal();
 
     expect(screen.getAllByTestId('portal-primary-title').map((title) => (
@@ -116,8 +116,9 @@ describe('CommissionPortalPage', () => {
       'Agenda Fenasoja',
       'Agenda Restaurante e Arena',
       'Mapa Comercial',
-      'Comissões',
       'Financeiro',
+      'Administrador',
+      'Comissões',
     ]);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'FENASOJA 2028',
@@ -145,7 +146,11 @@ describe('CommissionPortalPage', () => {
     expect(container.querySelector('animateMotion')).not.toBeInTheDocument();
     expect(screen.queryByText('Da terra para o mundo')).not.toBeInTheDocument();
     expect(screen.queryByText('Plantio de precisão')).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Acessar área administrativa' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Entrar para acessar: Administrador' })).toHaveAttribute(
+      'href',
+      '/login/admin',
+    );
+    expect(container.querySelector('header')).not.toHaveTextContent('Administrador');
     expect(container.querySelector('.fenasoja-brand__mark img')).toBeInTheDocument();
   });
 
@@ -266,6 +271,71 @@ describe('CommissionPortalPage', () => {
     expect(localStorage.getItem(SELECTED_COMMISSION_STORAGE_KEY)).toBe('financeiro-gerencial');
   });
 
+  it('keeps the existing anonymous Admin destination and selected module from the fifth card', () => {
+    renderPortal();
+
+    const adminLink = screen.getByRole('link', { name: 'Entrar para acessar: Administrador' });
+    expect(adminLink.querySelector('.portal-primary-entry__index')).toHaveTextContent('05');
+    expect(adminLink.querySelectorAll('a, button')).toHaveLength(0);
+    fireEvent.click(adminLink);
+    expect(screen.getByTestId('current-location')).toHaveTextContent('/login/admin');
+    expect(localStorage.getItem(SELECTED_COMMISSION_STORAGE_KEY)).toBe('admin');
+  });
+
+  it.each([
+    { role: 'admin', capability: null },
+    { role: 'gestor', capability: null },
+    { role: 'membro', capability: 'admin_access' },
+    { role: 'membro', capability: 'full_access' },
+  ])('opens Admin only through its existing guard: $role / $capability', ({ role, capability }) => {
+    portalMocks.auth.user = { id: 'admin-allowed' };
+    portalMocks.org.myRole = role;
+    portalMocks.capabilities.capSet = new Set(capability ? [capability] : []);
+    renderPortal();
+
+    const adminLink = screen.getByRole('link', { name: 'Abrir administração: Administrador' });
+    expect(adminLink).toHaveAttribute('href', '/admin');
+    expect(adminLink).not.toHaveTextContent('Abrir agenda');
+    expect(adminLink.closest('article')).toHaveAttribute('data-access-state', 'allowed');
+    fireEvent.click(adminLink);
+    expect(screen.getByTestId('current-location')).toHaveTextContent('/admin');
+    expect(localStorage.getItem(SELECTED_COMMISSION_STORAGE_KEY)).toBe('admin');
+  });
+
+  it.each(['auth', 'capabilities', 'organization'] as const)(
+    'keeps Admin unavailable while %s authorization is still loading',
+    (stage) => {
+      portalMocks.auth.user = { id: 'admin-pending' };
+      portalMocks.org.myRole = 'admin';
+      portalMocks.auth.loading = stage === 'auth';
+      portalMocks.capabilities.isLoading = stage === 'capabilities';
+      portalMocks.org.isLoading = stage === 'organization';
+      renderPortal();
+
+      const adminControl = screen.getByLabelText('Verificando acesso: Administrador');
+      expect(adminControl).toHaveAttribute('aria-disabled', 'true');
+      expect(adminControl.closest('article')).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByRole('link', { name: /Administrador/ })).not.toBeInTheDocument();
+    },
+  );
+
+  it('updates the Admin card from loading to allowed and denied without stale navigation', () => {
+    portalMocks.auth.user = { id: 'admin-changing-profile' };
+    portalMocks.capabilities.isLoading = true;
+    const { rerender } = renderPortal();
+    expect(screen.getByLabelText('Verificando acesso: Administrador')).toHaveAttribute('aria-disabled', 'true');
+
+    portalMocks.capabilities.isLoading = false;
+    portalMocks.capabilities.capSet = new Set(['admin_access']);
+    rerender(portalElement());
+    expect(screen.getByRole('link', { name: 'Abrir administração: Administrador' })).toHaveAttribute('href', '/admin');
+
+    portalMocks.capabilities.capSet = new Set();
+    rerender(portalElement());
+    expect(screen.queryByRole('link', { name: /Administrador/ })).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Perfil sem acesso: Administrador')).toHaveAttribute('aria-disabled', 'true');
+  });
+
   it('uses the existing Agenda login destinations and selected context', () => {
     const selectedModuleWrites = vi.spyOn(Storage.prototype, 'setItem');
     const { unmount } = renderPortal();
@@ -366,8 +436,8 @@ describe('CommissionPortalPage', () => {
 
     expect(screen.queryByRole('link', { name: /Financeiro/ })).not.toBeInTheDocument();
     expect(screen.getByLabelText('Restrito ao perfil: Financeiro')).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Acessar área administrativa' })).not.toBeInTheDocument();
-    expect(screen.getByLabelText(/Administrador\. Sem permissão/)).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Administrador/ })).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Perfil sem acesso: Administrador')).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('preserves the existing organization setup flow for authenticated users without an organization', () => {
@@ -389,7 +459,7 @@ describe('CommissionPortalPage', () => {
       'href',
       '/comissoes/financeiro-gerencial/dashboard',
     );
-    expect(screen.getByRole('link', { name: 'Acessar área administrativa' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Configurar organização: Administrador' })).toHaveAttribute(
       'href',
       '/admin',
     );

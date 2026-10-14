@@ -3,7 +3,14 @@ import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import CommissionPortalPage from '@/pages/commissions/CommissionPortalPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { resetAlvoradaIntroSessionForTests } from '@/features/alvorada/introSession';
+import { markAlvoradaIntroStarted, resetAlvoradaIntroSessionForTests } from '@/features/alvorada/introSession';
+import type { FenasojaHistoryArt } from '@/components/portal/history/artCatalog';
+import {
+  GALLERY_SESSION_KEY,
+  GALLERY_REVEAL_MS,
+  GALLERY_HIGHLIGHT_MS,
+  GALLERY_CLOSING_MS,
+} from '@/components/portal/history/galleryTimeline';
 import {
   ALVORADA_FALLBACK_NARRATIVE,
   ALVORADA_INTRO_BRAND_HOLD_MS,
@@ -15,6 +22,16 @@ const integrationMocks = vi.hoisted(() => ({
   orgLoading: false,
   rendererTier: 'unavailable' as 'hardware' | 'compatible' | 'unavailable',
   warmAssets: vi.fn(),
+  prepareGallery: vi.fn(),
+}));
+
+let updateGalleryIntersection: ((visible: boolean) => void) | null = null;
+const originalAnimate = Object.getOwnPropertyDescriptor(Element.prototype, 'animate');
+
+vi.mock('@/components/portal/history/prepareGalleryAssets', () => ({
+  prepareGalleryAssets: (arts: readonly FenasojaHistoryArt[], signal: AbortSignal) => (
+    integrationMocks.prepareGallery(arts, signal)
+  ),
 }));
 
 vi.mock('@/features/alvorada/organizational', () => ({
@@ -107,14 +124,22 @@ function countdownSection() {
 
 describe('integração do portal: ecossistema direto e introdução embutida na contagem', () => {
   beforeEach(() => {
+    Object.defineProperty(Element.prototype, 'animate', {
+      configurable: true,
+      value: vi.fn(() => ({ currentTime: 0, pause: vi.fn(), play: vi.fn(), cancel: vi.fn() })),
+    });
     vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
       width: 390, height: 420, x: 0, y: 0, top: 0, left: 0, right: 390, bottom: 420, toJSON: () => ({}),
     });
     resetAlvoradaIntroSessionForTests();
+    sessionStorage.clear();
     integrationMocks.canvasMounts = 0;
     integrationMocks.orgLoading = false;
     integrationMocks.rendererTier = 'unavailable';
     integrationMocks.warmAssets.mockClear();
+    integrationMocks.prepareGallery.mockReset();
+    integrationMocks.prepareGallery.mockImplementation((arts: readonly FenasojaHistoryArt[]) => Promise.resolve(arts));
+    updateGalleryIntersection = null;
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,
       value: vi.fn().mockImplementation((query: string) => ({
@@ -132,6 +157,13 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
       constructor(private readonly callback: IntersectionObserverCallback) {}
 
       observe(target: Element) {
+        if (target.getAttribute('data-testid') === 'portal-history') {
+          updateGalleryIntersection = (visible: boolean) => this.callback([{
+            isIntersecting: visible,
+            intersectionRatio: visible ? 1 : 0,
+            target,
+          } as IntersectionObserverEntry], this as unknown as IntersectionObserver);
+        }
         this.callback([{
           isIntersecting: true,
           intersectionRatio: 1,
@@ -153,6 +185,8 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
   });
 
   afterEach(() => {
+    if (originalAnimate) Object.defineProperty(Element.prototype, 'animate', originalAnimate);
+    else Reflect.deleteProperty(Element.prototype, 'animate');
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
@@ -290,10 +324,12 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
 
   it('não reinicia a introdução ao remontar o portal na mesma execução', async () => {
     const first = renderPortal();
+    await act(async () => {});
     expect(screen.getByTestId('portal-alvorada-intro')).toBeInTheDocument();
     first.unmount();
 
     renderPortal();
+    await act(async () => {});
     const hero = document.querySelector('.fenasoja-portal__hero') as HTMLElement;
     expect(hero).toHaveAttribute('data-intro', 'done');
     expect(screen.queryByTestId('portal-alvorada-intro')).not.toBeInTheDocument();
@@ -305,6 +341,7 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
     vi.useFakeTimers({ shouldAdvanceTime: true });
     try {
       renderPortal();
+      await act(async () => {});
       const hero = document.querySelector('.fenasoja-portal__hero') as HTMLElement;
 
       fireEvent.click(screen.getByRole('button', { name: 'Pular animação e mostrar a contagem oficial' }));
@@ -336,10 +373,11 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
     expect(screen.queryByTestId('alvorada-intro')).not.toBeInTheDocument();
   });
 
-  it('não inicia enquanto a página está oculta e começa ao ficar visível', () => {
+  it('não inicia enquanto a página está oculta e começa ao ficar visível', async () => {
     Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'hidden' });
     try {
       renderPortal();
+      await act(async () => {});
       const hero = document.querySelector('.fenasoja-portal__hero') as HTMLElement;
       expect(hero).toHaveAttribute('data-intro', 'waiting');
       expect(countdownSection()).toHaveAttribute('data-concealed', 'true');
@@ -378,5 +416,146 @@ describe('integração do portal: ecossistema direto e introdução embutida na 
     expect(intro).toHaveAttribute('data-stage', 'preparing');
     expect(intro.querySelector('.alvorada-narrative')).toBeNull();
     expect(integrationMocks.canvasMounts).toBe(1);
+  });
+
+  it('aguarda toda a saída da Alvorada, conclui a memória visual uma vez e mantém a contagem', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const first = renderPortal();
+      const history = screen.getByTestId('portal-history');
+      const hero = document.querySelector('.fenasoja-portal__hero') as HTMLElement;
+      await waitFor(() => expect(history).toHaveAttribute('data-phase', 'waiting'));
+      expect(hero).toHaveAttribute('data-intro', 'playing');
+      expect(history).toHaveAttribute('data-running', 'false');
+      expect(sessionStorage.getItem(GALLERY_SESSION_KEY)).toBeNull();
+
+      act(() => vi.advanceTimersByTime(600));
+      expect(history).toHaveAttribute('data-phase', 'waiting');
+      fireEvent.click(screen.getByRole('button', { name: 'Pular animação e mostrar a contagem oficial' }));
+      expect(hero).toHaveAttribute('data-intro', 'leaving');
+      act(() => vi.advanceTimersByTime(ALVORADA_INTRO_EXIT_DURATION_MS - 1));
+      expect(history).toHaveAttribute('data-phase', 'waiting');
+      act(() => vi.advanceTimersByTime(1));
+      expect(hero).toHaveAttribute('data-intro', 'done');
+      expect(history).toHaveAttribute('data-phase', 'reveal');
+      expect(history).toHaveAttribute('data-running', 'true');
+
+      act(() => vi.advanceTimersByTime(GALLERY_REVEAL_MS));
+      expect(history).toHaveAttribute('data-phase', 'highlight');
+      expect(history).toHaveAttribute('data-active-art', '2016');
+      act(() => vi.advanceTimersByTime(GALLERY_HIGHLIGHT_MS));
+      expect(history).toHaveAttribute('data-active-art', '2024');
+      // Both intact campaigns remain mounted after the first highlight.
+      expect(history.querySelectorAll('.fenasoja-history__art')).toHaveLength(2);
+      act(() => vi.advanceTimersByTime(GALLERY_HIGHLIGHT_MS));
+      expect(history).toHaveAttribute('data-phase', 'closing');
+      expect(history.querySelectorAll('.fenasoja-history__art')).toHaveLength(2);
+      act(() => vi.advanceTimersByTime(GALLERY_CLOSING_MS));
+      expect(history).toHaveAttribute('data-phase', 'done');
+      expect(history).toHaveAttribute('data-running', 'false');
+      expect(screen.getAllByRole('timer')).toHaveLength(1);
+      expect(screen.getByRole('button', { name: 'Abrir contagem oficial da Fenasoja 2028' })).toBeEnabled();
+
+      const prepareCalls = integrationMocks.prepareGallery.mock.calls.length;
+      first.unmount();
+      renderPortal();
+      expect(screen.getByTestId('portal-history')).toHaveAttribute('data-phase', 'done');
+      expect(integrationMocks.prepareGallery).toHaveBeenCalledTimes(prepareCalls);
+      expect(screen.getByTestId('portal-history').querySelectorAll('.fenasoja-history__art')).toHaveLength(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('mantém a sequência canônica da memória visual com movimento reduzido solicitado', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      markAlvoradaIntroStarted();
+      (window.matchMedia as unknown as ReturnType<typeof vi.fn>).mockImplementation((query: string) => ({
+        matches: query.includes('prefers-reduced-motion'), media: query,
+        addEventListener: vi.fn(), removeEventListener: vi.fn(),
+        addListener: vi.fn(), removeListener: vi.fn(),
+      }));
+      renderPortal();
+      const history = screen.getByTestId('portal-history');
+      await waitFor(() => expect(history).toHaveAttribute('data-phase', 'reveal'));
+      expect(history).toHaveAttribute('data-gallery-motion', 'canonical');
+      act(() => vi.advanceTimersByTime(GALLERY_REVEAL_MS));
+      expect(history).toHaveAttribute('data-phase', 'highlight');
+      expect(history).toHaveAttribute('data-active-art', '2016');
+      expect(screen.getByRole('link', { name: 'Entrar para acessar: Administrador' })).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('preserva o destaque restante ao ocultar a aba ou retirar o cabeçalho da viewport', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      markAlvoradaIntroStarted();
+      renderPortal();
+      const history = screen.getByTestId('portal-history');
+      await waitFor(() => expect(history).toHaveAttribute('data-phase', 'reveal'));
+      act(() => vi.advanceTimersByTime(GALLERY_REVEAL_MS + 350));
+      expect(history).toHaveAttribute('data-active-art', '2016');
+
+      Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'hidden' });
+      act(() => document.dispatchEvent(new Event('visibilitychange')));
+      expect(history).toHaveAttribute('data-running', 'false');
+      const pausedElapsed = JSON.parse(sessionStorage.getItem(GALLERY_SESSION_KEY)!).elapsedMs;
+      act(() => vi.advanceTimersByTime(10_000));
+      expect(history).toHaveAttribute('data-active-art', '2016');
+      expect(JSON.parse(sessionStorage.getItem(GALLERY_SESSION_KEY)!).elapsedMs).toBe(pausedElapsed);
+
+      act(() => updateGalleryIntersection?.(false));
+      Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
+      act(() => document.dispatchEvent(new Event('visibilitychange')));
+      expect(history).toHaveAttribute('data-running', 'false');
+      act(() => vi.advanceTimersByTime(10_000));
+      expect(history).toHaveAttribute('data-active-art', '2016');
+      act(() => updateGalleryIntersection?.(true));
+      expect(history).toHaveAttribute('data-running', 'true');
+      act(() => vi.advanceTimersByTime(GALLERY_HIGHLIGHT_MS - (pausedElapsed - GALLERY_REVEAL_MS) - 1));
+      expect(history).toHaveAttribute('data-active-art', '2016');
+      act(() => vi.advanceTimersByTime(1));
+      expect(history).toHaveAttribute('data-active-art', '2024');
+    } finally {
+      Reflect.deleteProperty(document, 'visibilityState');
+      vi.useRealTimers();
+    }
+  });
+
+  it('pausa o destaque histórico no ecossistema e retoma com foco restaurado no mesmo launcher', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      renderPortal();
+      const history = screen.getByTestId('portal-history');
+      const launcher = screen.getByRole('button', { name: 'Abrir Ecossistema Fenasoja' });
+      await waitFor(() => expect(history).toHaveAttribute('data-phase', 'waiting'));
+      fireEvent.click(screen.getByRole('button', { name: 'Pular animação e mostrar a contagem oficial' }));
+      act(() => vi.advanceTimersByTime(ALVORADA_INTRO_EXIT_DURATION_MS));
+      act(() => vi.advanceTimersByTime(GALLERY_REVEAL_MS + 350));
+      expect(history).toHaveAttribute('data-active-art', '2016');
+
+      fireEvent.click(launcher);
+      expect(history).toHaveAttribute('data-running', 'false');
+      const savedElapsed = JSON.parse(sessionStorage.getItem(GALLERY_SESSION_KEY)!).elapsedMs;
+      await screen.findByTestId('ecosystem-experience', {}, { timeout: 5000 });
+      act(() => vi.advanceTimersByTime(10_000));
+      expect(history).toHaveAttribute('data-phase', 'highlight');
+      expect(history).toHaveAttribute('data-active-art', '2016');
+      expect(JSON.parse(sessionStorage.getItem(GALLERY_SESSION_KEY)!).elapsedMs).toBe(savedElapsed);
+
+      fireEvent.keyDown(window, { key: 'Escape' });
+      await waitFor(() => expect(launcher).toHaveFocus());
+      expect(history).toHaveAttribute('data-running', 'true');
+      expect(launcher).toHaveAttribute('aria-expanded', 'false');
+      act(() => vi.advanceTimersByTime(GALLERY_HIGHLIGHT_MS));
+      expect(history).toHaveAttribute('data-active-art', '2024');
+      expect(screen.getAllByRole('button', { name: 'Abrir Ecossistema Fenasoja' })).toHaveLength(1);
+      expect(launcher.querySelectorAll('button, a')).toHaveLength(0);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

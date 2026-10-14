@@ -25,6 +25,7 @@ describe('contrato de acesso: ecossistema direto e introdução embutida na cont
   const logisticsLayout = source('src/components/Layout.tsx');
   const brand = source('src/components/brand/FenasojaBrand.tsx');
   const portalHero = source('src/components/portal/FenasojaPortalHero.tsx');
+  const portalHistory = source('src/components/portal/FenasojaPortalHistory.tsx');
   const countdownCompact = source('src/components/countdown/OfficialCountdownCompact.tsx');
   const capabilities = source('src/features/alvorada/capabilities.ts');
   const alvoradaCss = source('src/features/alvorada/alvorada.css');
@@ -46,8 +47,10 @@ describe('contrato de acesso: ecossistema direto e introdução embutida na cont
     expect(allImplementation).not.toContain('Abrir O Nascer da Alvorada');
     expect(portalPage.match(/className="fenasoja-portal__alvorada-launcher"/g)).toHaveLength(1);
     expect(portalPage).toMatch(
-      /<button[\s\S]*?className="fenasoja-portal__alvorada-launcher"[\s\S]*?<FenasojaBrand[\s\S]*?<FenasojaBrand[\s\S]*?<\/button>/,
+      /<button[\s\S]*?className="fenasoja-portal__alvorada-launcher"[\s\S]*?<FenasojaPortalHistory released=\{historyReleased\} paused=\{ecosystemOpen\}[\s\S]*?<\/button>/,
     );
+    expect(portalHistory.match(/<FenasojaBrand /g)).toHaveLength(1);
+    expect(portalHistory).not.toMatch(/<button|<Link/);
     expect(portalPage).toContain('aria-haspopup="dialog"');
     expect(portalPage).toContain('aria-expanded={ecosystemOpen}');
     expect(portalPage).toContain('onClick={openEcosystem}');
@@ -86,7 +89,8 @@ describe('contrato de acesso: ecossistema direto e introdução embutida na cont
 
   it('embute a introdução no card da contagem oficial sem substituir a contagem', () => {
     expect(app).toContain('path="/cronograma-eventos/contagem-oficial"');
-    expect(portalPage).toContain('<FenasojaPortalHero />');
+    expect(portalPage).toContain('<FenasojaPortalHero onIntroReleased={releaseHistory} />');
+    expect(portalHero).toMatch(/presentation !== 'done'[\s\S]*?onIntroReleased\(\)/);
     expect(portalHero).toContain('<OfficialCountdownCompact concealed={introActive} />');
     expect(portalHero).toContain("const loadAlvoradaIntro = () => import('@/features/alvorada/AlvoradaIntro')");
     expect(portalHero).toContain('const AlvoradaIntro = lazy(loadAlvoradaIntro)');

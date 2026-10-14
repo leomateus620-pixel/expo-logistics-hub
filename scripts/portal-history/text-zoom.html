@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="pt-BR" style="font-size: 200%">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FENASOJA — conferência local de texto a 200%</title>
+  </head>
+  <body style="margin: 0">
+    <div id="root"></div>
+    <script type="module">
+      // Local QA only: use the real app/providers/routes with enlarged text.
+      // This fixture is neither a production route nor a gallery replay control.
+      history.replaceState(null, '', '/portal');
+      await import('/src/main.tsx');
+    </script>
+  </body>
+</html>

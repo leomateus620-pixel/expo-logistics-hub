@@ -16,8 +16,9 @@ describe('arquitetura de acesso do portal', () => {
       'agenda-fenasoja',
       'agenda-restaurante-arena',
       'mapa-comercial',
-      'comissoes',
       'financeiro',
+      'administrador',
+      'comissoes',
     ]);
     expect([agendaFenasojaDestination.route, agendaVenueDestination.route]).toEqual([
       '/cronograma-eventos',

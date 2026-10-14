@@ -58,8 +58,9 @@ const primaryModules = [
   'Agenda Fenasoja',
   'Agenda Restaurante e Arena',
   'Mapa Comercial',
-  'Comissões',
   'Financeiro',
+  'Administrador',
+  'Comissões',
 ] as const;
 
 const descriptionColor = cssHexProperty('.fenasoja-portal', '--access-description');

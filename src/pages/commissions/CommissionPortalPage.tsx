@@ -9,10 +9,9 @@ import {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { Link } from 'react-router-dom';
-import { ArrowUpRight, LockKeyhole, ShieldCheck, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import CommissionCard from '@/components/commissions/CommissionCard';
-import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
+import { FenasojaPortalHistory } from '@/components/portal/FenasojaPortalHistory';
 import { FenasojaPortalHero } from '@/components/portal/FenasojaPortalHero';
 import { PortalPrimaryEntry } from '@/components/portal/PortalPrimaryEntry';
 import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
@@ -119,6 +118,8 @@ export default function CommissionPortalPage() {
   const { hasOrg, orgId, myRole, isLoading: orgLoading } = useCurrentOrg();
   const [expandedEntry, setExpandedEntry] = useState<PortalEntryId | null>(null);
   const [ecosystemOpen, setEcosystemOpen] = useState(false);
+  const [historyReleased, setHistoryReleased] = useState(false);
+  const releaseHistory = useCallback(() => setHistoryReleased(true), []);
   const portalRef = useRef<HTMLDivElement>(null);
   const ecosystemLauncherRef = useRef<HTMLButtonElement>(null);
   const ecosystemSuspenseCloseRef = useRef<HTMLButtonElement>(null);
@@ -338,6 +339,7 @@ export default function CommissionPortalPage() {
     }
     if (entryId === 'agenda-fenasoja') return agendaFenasojaAccess;
     if (entryId === 'agenda-restaurante-arena') return agendaVenueAccess;
+    if (entryId === 'administrador') return adminAccess;
     return entryId === 'mapa-comercial' ? mapAccess : financeAccess;
   };
 
@@ -352,6 +354,7 @@ export default function CommissionPortalPage() {
       mapPrewarm.onNavigate(); saveSelectedModule(commercialMapDestination.storageSlug);
     };
     if (entryId === 'financeiro') return () => saveSelectedModule(financePortalModule.slug);
+    if (entryId === 'administrador') return () => saveSelectedModule('admin');
     return undefined;
   };
 
@@ -400,38 +403,11 @@ export default function CommissionPortalPage() {
             onPointerEnter={preloadEcosystem}
             onTouchStart={preloadEcosystem}
           >
-            <FenasojaBrand
-              className="fenasoja-portal__brand-standard"
-              subtitle="Sistema integrado de gestão"
-              tone="dark"
-            />
-            <FenasojaBrand className="fenasoja-portal__brand-compact" compact tone="dark" />
+            <FenasojaPortalHistory released={historyReleased} paused={ecosystemOpen} />
           </button>
-
-          {adminAccess.target ? (
-            <Link
-              to={adminAccess.target}
-              onClick={() => saveSelectedModule('admin')}
-              className="fenasoja-portal__admin"
-              aria-label="Acessar área administrativa"
-            >
-              <ShieldCheck aria-hidden="true" />
-              <span>Administrador</span>
-              <ArrowUpRight aria-hidden="true" />
-            </Link>
-          ) : (
-            <div
-              className="fenasoja-portal__admin fenasoja-portal__admin--locked"
-              aria-label={`Administrador. ${adminAccess.label}. ${adminAccess.detail ?? ''}`}
-            >
-              <LockKeyhole aria-hidden="true" />
-              <span>Administrador</span>
-              <span className="fenasoja-portal__admin-status">{adminAccess.label}</span>
-            </div>
-          )}
         </header>
 
-        <FenasojaPortalHero />
+        <FenasojaPortalHero onIntroReleased={releaseHistory} />
 
         <p
           className="portal-access-sr-only"

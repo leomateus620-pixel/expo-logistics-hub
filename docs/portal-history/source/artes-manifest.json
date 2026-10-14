@@ -1,0 +1,95 @@
+{
+  "editions": [
+    {
+      "year": 2014,
+      "source": "https://zebu.org.br/PortalUploads/Revistas/A_Granja/2014_Fevereiro/revista.pdf",
+      "publisher": "A Granja / acervo Zebu",
+      "evidence": "Publicidade original da Fenasoja, página 36 do PDF; extração integral do objeto de imagem.",
+      "name": "Medalhas e negócios vencedores",
+      "asset": "artes/fenasoja-2014-320x240.webp",
+      "frame": "artes/fenasoja-2014-320x240.svg",
+      "canvas": [
+        320,
+        240
+      ],
+      "fit": "contain",
+      "highlightMs": 1400,
+      "asset2x": "artes/fenasoja-2014-640x480.webp",
+      "runtimeBytes": 19028,
+      "master": "artes/fenasoja-2014.jpg"
+    },
+    {
+      "year": 2016,
+      "source": "https://zebu.org.br/PortalUploads/Revistas/A_Lavoura/2016_Edi%C3%A7%C3%A3o%20713/revista.pdf",
+      "publisher": "A Lavoura / acervo Zebu",
+      "evidence": "Publicidade original da Fenasoja, página 55 do PDF; extração integral do objeto de imagem.",
+      "name": "50 anos — Quem tem história cultiva o futuro",
+      "asset": "artes/fenasoja-2016-320x240.webp",
+      "frame": "artes/fenasoja-2016-320x240.svg",
+      "canvas": [
+        320,
+        240
+      ],
+      "fit": "contain",
+      "highlightMs": 1400,
+      "asset2x": "artes/fenasoja-2016-640x480.webp",
+      "runtimeBytes": 14090,
+      "master": "artes/fenasoja-2016.jpg"
+    },
+    {
+      "year": 2018,
+      "source": "https://www.behance.net/gallery/58535353/Fenasoja",
+      "publisher": "GH Branding / Jacson Silveira e equipe",
+      "evidence": "Arte de identidade visual publicada no portfólio de seus autores. Arquivo CDN referenciado pelo portfólio.",
+      "name": "Nós somos evolução",
+      "asset": "artes/fenasoja-2018-320x240.webp",
+      "frame": "artes/fenasoja-2018-320x240.svg",
+      "canvas": [
+        320,
+        240
+      ],
+      "fit": "contain",
+      "highlightMs": 1400,
+      "asset2x": "artes/fenasoja-2018-640x480.webp",
+      "runtimeBytes": 9728,
+      "master": "artes/fenasoja-2018.webp"
+    },
+    {
+      "year": 2024,
+      "source": "https://sucessonocampo.com.br/evento/fenasoja-2024/",
+      "publisher": "Sucesso no Campo, reprodução de material promocional",
+      "evidence": "Peça promocional reproduzida no portal de eventos; identidade, datas e selo correspondem ao banner alojado no site oficial.",
+      "corroboration": "https://ftp.fenasoja.com.br/img/banner-fenasoja-24.jpg",
+      "name": "Marque na agenda — 100 anos da soja no Brasil",
+      "asset": "artes/fenasoja-2024-320x240.webp",
+      "frame": "artes/fenasoja-2024-320x240.svg",
+      "canvas": [
+        320,
+        240
+      ],
+      "fit": "contain",
+      "highlightMs": 1400,
+      "asset2x": "artes/fenasoja-2024-640x480.webp",
+      "runtimeBytes": 7272,
+      "master": "artes/fenasoja-2024.jpg"
+    }
+  ],
+  "typography": "Reutilizar FenasojaBrand do repositório; não rasterizar a marca central.",
+  "timing": {
+    "introMs": 600,
+    "highlightMs": 1400,
+    "finaleMs": 1600,
+    "desktopCount": 4,
+    "desktopTotalMs": 7800,
+    "mobileCount": 2,
+    "mobileTotalMs": 5000
+  },
+  "mobileSuggestedYears": [
+    2016,
+    2024
+  ],
+  "repositoryCommit": "1053c69",
+  "assetsPolicy": "As artes permanecem íntegras. Molduras SVG dimensionam por contain; não recriam lettering. Datas dentro das artes são históricas, não a data da edição 2028.",
+  "runtimeBytes1x": 50118,
+  "runtimeBytes2x": 147560
+}
