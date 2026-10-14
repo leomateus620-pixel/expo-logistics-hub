@@ -1,5 +1,6 @@
-/* The identity gallery is confined to the first header card. */
+/* One compact identity card: archive below a fixed, accessible brand lockup. */
 .fenasoja-portal__header:has(.fenasoja-history) {
+  position: relative;
   display: block;
   padding: 0;
   min-height: 0;
@@ -21,14 +22,14 @@
 .fenasoja-history {
   position: relative;
   display: block;
-  height: 112px;
+  height: var(--history-height, 112px);
+  overflow: hidden;
   isolation: isolate;
   container-type: inline-size;
   border-radius: inherit;
   background: radial-gradient(ellipse at 50% 50%, #123146 0%, #071d35 45%, #031326 100%);
   pointer-events: none;
 }
-.fenasoja-history[data-layout="stacked"] { height: var(--history-height, 174px); }
 .fenasoja-history::after {
   content: '';
   position: absolute;
@@ -36,10 +37,63 @@
   left: 22%;
   right: 22%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgb(224 184 91 / 38%), transparent);
+  background: linear-gradient(90deg, transparent, rgb(224 184 91 / 30%), transparent);
+}
+.fenasoja-history__viewport {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  mask-image: linear-gradient(90deg, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+}
+.fenasoja-history[data-revealed="true"] .fenasoja-history__viewport { opacity: 1; }
+.fenasoja-history__track {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+.fenasoja-history__group {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--history-gap);
+  padding-right: var(--history-gap);
+}
+.fenasoja-history__art {
+  display: grid;
+  place-items: center;
+  flex: 0 0 var(--history-slot);
+  width: var(--history-slot);
+  height: var(--history-art-height);
+  border-radius: 4px;
+}
+.fenasoja-history__art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.fenasoja-history__shield {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: min(100%, calc(var(--history-brand-width, 300px) + 120px));
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent,
+    #0d283b max(0px, calc(50% - var(--history-brand-width, 300px) / 2 - 6px)),
+    #102d41 50%,
+    #0d283b min(100%, calc(50% + var(--history-brand-width, 300px) / 2 + 6px)), transparent);
+  mask-image: linear-gradient(0deg, transparent, #000 16px, #000 calc(100% - 16px), transparent);
 }
 .fenasoja-history__brand {
   position: absolute;
+  display: grid;
+  place-items: center;
   z-index: 3;
   top: 50%;
   left: 50%;
@@ -56,70 +110,34 @@
   white-space: nowrap;
 }
 .fenasoja-portal__header .fenasoja-history .fenasoja-brand__edition { flex-shrink: 0; font-size: clamp(.72rem, 1cqi, .84rem); }
-.fenasoja-history__brand-glow {
+.fenasoja-portal__history-toggle {
   position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: inherit;
-  background: radial-gradient(ellipse at 50% 50%, rgb(69 116 143 / 28%), transparent 60%);
-  opacity: .35;
-}
-.fenasoja-history__gallery {
-  position: absolute;
-  inset: 0 var(--history-inset);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--history-brand-width) minmax(0, 1fr);
-  column-gap: var(--history-clearance);
-  align-items: center;
-  visibility: hidden;
-}
-.fenasoja-history[data-active="true"] .fenasoja-history__gallery { visibility: visible; }
-.fenasoja-history__side { display: flex; gap: var(--history-gap); align-items: center; }
-.fenasoja-history__side--left { grid-column: 1; justify-content: flex-start; }
-.fenasoja-history__side--right { grid-column: 3; justify-content: flex-end; }
-.fenasoja-history__art {
-  position: relative;
-  z-index: 2;
+  z-index: 4;
+  right: 8px;
+  bottom: 5px;
   display: grid;
   place-items: center;
-  flex: 0 0 var(--history-slot);
-  width: var(--history-slot);
-  height: calc(var(--history-slot) * .75);
-  padding: 5px;
-  border: 1px solid rgb(134 182 213 / 23%);
-  border-radius: 10px;
-  background: #10263b;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%);
-  opacity: 0;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgb(145 185 207 / 26%);
+  border-radius: 50%;
+  color: #c4d4df;
+  background: rgb(5 22 41 / 85%);
+  cursor: pointer;
 }
-.fenasoja-history__art img { display: block; width: 100%; height: 100%; min-height: 0; object-fit: contain; }
-.fenasoja-history__halo {
-  position: absolute;
-  inset: -1px;
-  border: 1px solid #edd39b;
-  border-radius: inherit;
-  box-shadow: 0 0 0 1px rgb(228 184 88 / 9%), 0 5px 14px rgb(0 0 0 / 30%), 0 0 12px rgb(245 197 100 / 12%);
-  opacity: 0;
+.fenasoja-portal__history-toggle:hover { border-color: #d9bd7d; color: #f2dfb8; }
+.fenasoja-portal__history-toggle:focus-visible { outline: 2px solid #f2d18a; outline-offset: 3px; }
+.fenasoja-portal__history-toggle svg { width: 14px; height: 14px; }
+@container (max-width: 600px) {
+  .fenasoja-history__viewport { mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 10px), transparent); }
+  .fenasoja-history__shield { width: min(100%, calc(var(--history-brand-width, 240px) + 64px)); }
 }
-.fenasoja-history__connection {
-  position: absolute;
-  z-index: 1;
-  bottom: 4px;
-  width: 100%;
-  height: 8px;
-  color: rgb(205 177 105 / 32%);
+@media (prefers-reduced-motion: reduce) {
+  .fenasoja-history__viewport { display: none; }
 }
-.fenasoja-history[data-layout="stacked"] .fenasoja-history__gallery {
-  inset: auto 16px 17px;
-  height: 72px;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 30px;
-}
-.fenasoja-history[data-layout="stacked"] .fenasoja-history__side--left { grid-column: 1; justify-content: flex-end; }
-.fenasoja-history[data-layout="stacked"] .fenasoja-history__side--right { grid-column: 2; justify-content: flex-start; }
-.fenasoja-history[data-layout="stacked"] .fenasoja-history__connection { bottom: -12px; }
 @media (forced-colors: active) {
   .fenasoja-history { background: Canvas; }
-  .fenasoja-history__art { border-color: CanvasText; }
+  .fenasoja-history__shield { background: Canvas; }
+  .fenasoja-portal__history-toggle { color: ButtonText; border-color: ButtonText; background: ButtonFace; }
   .fenasoja-portal__header .fenasoja-history .fenasoja-brand__wordmark { background: none; -webkit-text-fill-color: CanvasText; }
 }

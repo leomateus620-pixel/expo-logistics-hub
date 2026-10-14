@@ -1,0 +1,38 @@
+{
+  "frames": 276,
+  "elapsedMs": 27953,
+  "allFramesRunning": true,
+  "brandMaximumOffsetX": 0,
+  "brandMaximumOffsetY": 0,
+  "seamFrame": 41,
+  "seamDeltaPx": [
+    1.60107421875,
+    1.60107421875,
+    1.60107421875,
+    1.60107421875,
+    1.60107421875,
+    1.60107421875,
+    1.60107421875,
+    1.60107421875
+  ],
+  "seamIntervalMs": 102,
+  "actualLeftEdgeArrivals": [
+    {
+      "year": 1998,
+      "elapsedMs": 4266
+    },
+    {
+      "year": 2004,
+      "elapsedMs": 11482
+    },
+    {
+      "year": 2006,
+      "elapsedMs": 18780
+    },
+    {
+      "year": 2008,
+      "elapsedMs": 26056
+    }
+  ],
+  "maximumSampleIntervalMs": 181
+}

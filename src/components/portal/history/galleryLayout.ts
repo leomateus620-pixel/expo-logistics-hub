@@ -1,10 +1,15 @@
-/** Capacity is based on the measured card and full brand (including 2028). */
-export function getGalleryLayout(innerWidth: number, brandWidth: number) {
-  const slotWidth = innerWidth < 480 ? 96 : 108;
-  const gap = 16;
-  const centralClearance = 24;
-  const perSide = Math.max(0, Math.min(2, Math.floor(
-    (innerWidth - brandWidth - 2 * centralClearance + 2 * gap) / (2 * (slotWidth + gap)),
-  )));
-  return { perSide, slotWidth, gap, centralClearance, stacked: perSide === 0 };
+/** The header stays compact; artwork size follows its real measured container. */
+export function getGalleryLayout(containerWidth: number, actualHostHeight?: number, compact = containerWidth < 600) {
+  const mobile = compact;
+  const headerHeight = mobile ? 88 : 112;
+  const hostHeight = typeof actualHostHeight === 'number' && Number.isFinite(actualHostHeight)
+    ? Math.max(0, actualHostHeight) : headerHeight;
+  const artHeight = Math.min(mobile ? 32 : 72, Math.max(0, hostHeight - 16));
+  const slotWidth = artHeight * 4 / 3;
+  const gap = mobile ? 12 : 20;
+  return {
+    mobile, headerHeight, artHeight, slotWidth, gap,
+    stepPx: slotWidth + gap,
+    speedPxPerSecond: mobile ? 12 : 16,
+  };
 }
