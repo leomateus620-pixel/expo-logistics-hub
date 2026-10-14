@@ -10532,6 +10532,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      _cronograma_require_deleter: {
+        Args: { _org_id: string }
+        Returns: undefined
+      }
       _cronograma_require_writer: {
         Args: { _org_id: string }
         Returns: undefined
