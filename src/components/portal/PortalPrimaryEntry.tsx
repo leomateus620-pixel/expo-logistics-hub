@@ -43,6 +43,7 @@ function getActionLabel(
   if (access.state === 'allowed') {
     if (entry.id === 'mapa-comercial') return 'Abrir mapa';
     if (entry.id === 'financeiro') return 'Abrir financeiro';
+    if (entry.id === 'administrador') return 'Abrir administração';
     return 'Abrir agenda';
   }
   if (access.state === 'loading') return 'Verificando acesso';

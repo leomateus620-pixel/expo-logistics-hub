@@ -1,0 +1,177 @@
+{
+  "mobile-highlight-390.jpg": {
+    "pixels": [
+      390,
+      1407
+    ],
+    "bytes": 78937
+  },
+  "mobile-highlight-390-header.jpg": {
+    "pixels": [
+      368,
+      176
+    ],
+    "bytes": 8473
+  },
+  "final-768x1024.jpg": {
+    "pixels": [
+      768,
+      1041
+    ],
+    "bytes": 94892
+  },
+  "final-360x800.jpg": {
+    "pixels": [
+      360,
+      1407
+    ],
+    "bytes": 72251
+  },
+  "final-430x932.jpg": {
+    "pixels": [
+      430,
+      1413
+    ],
+    "bytes": 79101
+  },
+  "final-1366x768.jpg": {
+    "pixels": [
+      1366,
+      1018
+    ],
+    "bytes": 123054
+  },
+  "desktop-highlight-1440.jpg": {
+    "pixels": [
+      1440,
+      1198
+    ],
+    "bytes": 136007
+  },
+  "mobile-highlight-2024-header.jpg": {
+    "pixels": [
+      368,
+      176
+    ],
+    "bytes": 8284
+  },
+  "text-zoom-200-320.jpg": {
+    "pixels": [
+      320,
+      2434
+    ],
+    "bytes": 134509
+  },
+  "final-844x390.jpg": {
+    "pixels": [
+      844,
+      1054
+    ],
+    "bytes": 99631
+  },
+  "mobile-highlight-320.jpg": {
+    "pixels": [
+      320,
+      1425
+    ],
+    "bytes": 70396
+  },
+  "final-390x844.jpg": {
+    "pixels": [
+      390,
+      1407
+    ],
+    "bytes": 75843
+  },
+  "final-1440x1000.jpg": {
+    "pixels": [
+      1440,
+      1198
+    ],
+    "bytes": 132914
+  },
+  "comparison-mobile.jpg": {
+    "pixels": [
+      760,
+      202
+    ],
+    "bytes": 39921
+  },
+  "comparison-desktop.jpg": {
+    "pixels": [
+      1180,
+      268
+    ],
+    "bytes": 76396
+  },
+  "qa-before-text-zoom-200-320.jpg": {
+    "pixels": [
+      320,
+      2367
+    ],
+    "bytes": 133369
+  },
+  "qa-before-desktop-header.jpg": {
+    "pixels": [
+      1180,
+      114
+    ],
+    "bytes": 18070
+  },
+  "final-320x720.jpg": {
+    "pixels": [
+      320,
+      1425
+    ],
+    "bytes": 68257
+  },
+  "final-1920x1080.jpg": {
+    "pixels": [
+      1920,
+      1204
+    ],
+    "bytes": 151818
+  },
+  "desktop-final-1440.jpg": {
+    "pixels": [
+      1440,
+      1198
+    ],
+    "bytes": 127093
+  },
+  "desktop-highlight-2016-header.jpg": {
+    "pixels": [
+      1180,
+      114
+    ],
+    "bytes": 18160
+  },
+  "tablet-highlight-768.jpg": {
+    "pixels": [
+      768,
+      1041
+    ],
+    "bytes": 96030
+  },
+  "desktop-highlight-2024-header.jpg": {
+    "pixels": [
+      1180,
+      114
+    ],
+    "bytes": 18019
+  },
+  "mobile-final-390.jpg": {
+    "pixels": [
+      390,
+      1407
+    ],
+    "bytes": 75501
+  },
+  "gallery-desktop.gif": {
+    "pixels": [
+      1180,
+      114
+    ],
+    "bytes": 1934700
+  }
+}

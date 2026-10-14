@@ -37,7 +37,11 @@ type IntroPresentation = 'waiting' | 'playing' | 'leaving' | 'done';
 
 const INTRO_VISIBILITY_THRESHOLD = 0.35;
 
-export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
+interface FenasojaPortalHeroProps {
+  onIntroReleased?: () => void;
+}
+
+export const FenasojaPortalHero = memo(function FenasojaPortalHero({ onIntroReleased }: FenasojaPortalHeroProps) {
   const heroRef = useRef<HTMLElement>(null);
   const [presentation, setPresentation] = useState<IntroPresentation>(() => (
     shouldAutoplayAlvoradaIntro() ? 'waiting' : 'done'
@@ -45,6 +49,7 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
   const [introStage, setIntroStage] = useState<AlvoradaIntroStage>('preparing');
   const presentationRef = useRef<IntroPresentation>(presentation);
   const leaveTimer = useRef<number | null>(null);
+  const releaseNotified = useRef(false);
   const introActive = presentation === 'waiting' || presentation === 'playing';
 
   const finishIntro = useCallback(() => {
@@ -70,6 +75,12 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero() {
   useEffect(() => () => {
     if (leaveTimer.current !== null) window.clearTimeout(leaveTimer.current);
   }, []);
+
+  useEffect(() => {
+    if (presentation !== 'done' || releaseNotified.current || !onIntroReleased) return;
+    releaseNotified.current = true;
+    onIntroReleased();
+  }, [onIntroReleased, presentation]);
 
   useEffect(() => {
     if (presentation !== 'waiting') return undefined;

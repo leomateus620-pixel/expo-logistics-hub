@@ -1,0 +1,162 @@
+{
+  "archiveSha256": "3ed08a1baec47758f6738d8e586b1a9c799b48ca69d7dca4494b7b079ea56d80",
+  "files": [
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2014-320x240.webp",
+      "path": "public/portal/history/fenasoja-2014-320x240.webp",
+      "kind": "runtime",
+      "year": 2014,
+      "width": 320,
+      "height": 240,
+      "bytes": 19028,
+      "sha256": "d000e7fe1d884288976dfe0a54fca2c4946e2d28580d6d7a7dfe5a84e5624c41"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2014-640x480.webp",
+      "path": "public/portal/history/fenasoja-2014-640x480.webp",
+      "kind": "runtime",
+      "year": 2014,
+      "width": 640,
+      "height": 480,
+      "bytes": 62444,
+      "sha256": "66f971af63f80463d40fd23af9b89daca1eafc9b421d46b466066bd6fcec3412"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2016-320x240.webp",
+      "path": "public/portal/history/fenasoja-2016-320x240.webp",
+      "kind": "runtime",
+      "year": 2016,
+      "width": 320,
+      "height": 240,
+      "bytes": 14090,
+      "sha256": "1030cee3242e6ddabf3a49f1a82b5d8416cc45456de598b5b337f1996a56cdb4"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2016-640x480.webp",
+      "path": "public/portal/history/fenasoja-2016-640x480.webp",
+      "kind": "runtime",
+      "year": 2016,
+      "width": 640,
+      "height": 480,
+      "bytes": 44278,
+      "sha256": "fe7244e78e3791a8f61baaea8fbc0ab29a2c66d7a5bcbfa46529a0236ddb7675"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2018-320x240.webp",
+      "path": "public/portal/history/fenasoja-2018-320x240.webp",
+      "kind": "runtime",
+      "year": 2018,
+      "width": 320,
+      "height": 240,
+      "bytes": 9728,
+      "sha256": "9a7573c499da0c3ac87f225fd793013c11995a7ab8b74097fab8e95130dfbe3c"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2018-640x480.webp",
+      "path": "public/portal/history/fenasoja-2018-640x480.webp",
+      "kind": "runtime",
+      "year": 2018,
+      "width": 640,
+      "height": 480,
+      "bytes": 23518,
+      "sha256": "1fac0f9148cd265af6820011aec223b55aeecd64c87484473543ca703a2f9d81"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2024-320x240.webp",
+      "path": "public/portal/history/fenasoja-2024-320x240.webp",
+      "kind": "runtime",
+      "year": 2024,
+      "width": 320,
+      "height": 240,
+      "bytes": 7272,
+      "sha256": "e6479963a0e5e682db3ceab5f596b797390a4ed07bb9fc8985bd57104de71331"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2024-640x480.webp",
+      "path": "public/portal/history/fenasoja-2024-640x480.webp",
+      "kind": "runtime",
+      "year": 2024,
+      "width": 640,
+      "height": 480,
+      "bytes": 17320,
+      "sha256": "2a20ec5d8e1d8b7e2797445709afc22e0107be1c8cb7deb37bed641e6ab4b992"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2014-320x240.svg",
+      "path": "docs/portal-history/source/artes/fenasoja-2014-320x240.svg",
+      "kind": "consultation",
+      "bytes": 343527,
+      "sha256": "0597f7d5d4fa0909cd406274c640535732a9e910f96143d776a86f5d43af63fd"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2014.jpg",
+      "path": "docs/portal-history/source/artes/fenasoja-2014.jpg",
+      "kind": "consultation",
+      "bytes": 257420,
+      "sha256": "a3a73948b04ea0b6d4635f35adf364aad03739754f642222270b3362d36b2453"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2016-320x240.svg",
+      "path": "docs/portal-history/source/artes/fenasoja-2016-320x240.svg",
+      "kind": "consultation",
+      "bytes": 285335,
+      "sha256": "db5258e8968c9eb173e6524718b0481f904f51ed7291e85eb0044bf5ef3ff6bb"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2016.jpg",
+      "path": "docs/portal-history/source/artes/fenasoja-2016.jpg",
+      "kind": "consultation",
+      "bytes": 213775,
+      "sha256": "61f197ac8f144431cffb13af2c36ac339d1f9a0c37f8a9f278fa1667ecac1900"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2018-320x240.svg",
+      "path": "docs/portal-history/source/artes/fenasoja-2018-320x240.svg",
+      "kind": "consultation",
+      "bytes": 128623,
+      "sha256": "60b9006d706c33957bbfe016091edbbbe62054a0ed3e613ead6e29ee7a3a4197"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2018.webp",
+      "path": "docs/portal-history/source/artes/fenasoja-2018.webp",
+      "kind": "consultation",
+      "bytes": 96242,
+      "sha256": "16238ed00c7d4b174ba047ec237db4c8701ab188bde40dc32697c14c5a683b33"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2024-320x240.svg",
+      "path": "docs/portal-history/source/artes/fenasoja-2024-320x240.svg",
+      "kind": "consultation",
+      "bytes": 35219,
+      "sha256": "f799104f9d97968b61121f6307290e94813c62c1fe7dc3aae3f42337de226f2f"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes/fenasoja-2024.jpg",
+      "path": "docs/portal-history/source/artes/fenasoja-2024.jpg",
+      "kind": "consultation",
+      "bytes": 26190,
+      "sha256": "b1836950100311ef6347d479f9b1f0446b99831fda54e9d3cdae9eedd116b62d"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/artes-manifest.json",
+      "path": "docs/portal-history/source/artes-manifest.json",
+      "kind": "consultation",
+      "bytes": 3453,
+      "sha256": "8dc26d1b09ff66793fbf54094fd9b060f60e85d434d736c982474441923a5648"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/originais/fenasoja-2014.png",
+      "path": "docs/portal-history/source/originais/fenasoja-2014.png",
+      "kind": "consultation",
+      "bytes": 2013754,
+      "sha256": "e25c25aed3531526e5726f9c9deaf24fd432410c9e4bb7573f1598a00f7f15ef"
+    },
+    {
+      "archivePath": "Fenasoja_Portal_Artes/originais/fenasoja-2016.png",
+      "path": "docs/portal-history/source/originais/fenasoja-2016.png",
+      "kind": "consultation",
+      "bytes": 1934144,
+      "sha256": "39f7fc3e9f5475d9f3c5dc068bf5bda473a42dfe2b4e8607988dc78e4b08261a"
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "cardHeight": 114,
+    "centerX": 0,
+    "centerY": 0,
+    "height": 1080,
+    "layout": "inline",
+    "overflow": false,
+    "phase": "done",
+    "width": 1920
+  },
+  {
+    "cardHeight": 114,
+    "centerX": 0,
+    "centerY": 0,
+    "height": 1000,
+    "layout": "inline",
+    "overflow": false,
+    "phase": "done",
+    "width": 1440
+  },
+  {
+    "cardHeight": 114,
+    "centerX": 0,
+    "centerY": 0,
+    "height": 768,
+    "layout": "inline",
+    "overflow": false,
+    "phase": "done",
+    "width": 1366
+  },
+  {
+    "cardHeight": 114,
+    "centerX": 0,
+    "centerY": 0,
+    "height": 1024,
+    "layout": "inline",
+    "overflow": false,
+    "phase": "done",
+    "width": 768
+  },
+  {
+    "cardHeight": 176,
+    "centerX": 0,
+    "centerY": 0,
+    "height": 720,
+    "layout": "stacked",
+    "overflow": false,
+    "phase": "done",
+    "width": 320
+  },
+  {
+    "cardHeight": 176,
+    "centerX": 0,
+    "centerY": 0,
+    "height": 800,
+    "layout": "stacked",
+    "overflow": false,
+    "phase": "done",
+    "width": 360
+  },
+  {
+    "cardHeight": 176,
+    "centerX": 0,
+    "centerY": 0,
+    "height": 844,
+    "layout": "stacked",
+    "overflow": false,
+    "phase": "done",
+    "width": 390
+  },
+  {
+    "cardHeight": 176,
+    "centerX": 0,
+    "centerY": 0,
+    "height": 932,
+    "layout": "stacked",
+    "overflow": false,
+    "phase": "done",
+    "width": 430
+  },
+  {
+    "cardHeight": 114,
+    "centerX": 0,
+    "centerY": 0,
+    "height": 390,
+    "layout": "inline",
+    "overflow": false,
+    "phase": "done",
+    "width": 844
+  }
+]

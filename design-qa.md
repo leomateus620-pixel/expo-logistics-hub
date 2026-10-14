@@ -1,53 +1,53 @@
-# Design QA — Despesas e Receitas 2028
+# Design QA — memória visual FENASOJA
 
-**final result: passed** — 13/10/2026, revisão local autenticada da PR #199.
+Finalizado em 14/10/2026. final result: passed.
 
-O alvo é o plano aprovado, com a orientação posterior de identidade financeira sóbria mais marcante e explicações em ícones. O código anterior da PR (`392744d8`) é a referência de comparação, não um desenho a copiar. As diferenças de composição são intencionais. Creative Production orientou composição, tipografia e gráficos; Product Design orientou a revisão visual e os fluxos. O quadro interativo de Creative Production não estava exposto nesta sessão.
+O [QA financeiro anterior](docs/validation/financial-ui-upgrade/design-qa.md) foi preservado em seu diretório de validação.
 
-## Evidência comparada
+## Fontes e capturas
 
-Fonte congelada em 5194 e implementação em 5184, mesma edição 2028, perfil administrador, tema claro, banco local, registros e valores. Capturas em pixels CSS 1:1, densidade 1, desktop 1440 × 900 e mobile 390 × 844. Os recortes vieram de capturas completas do navegador; nenhum conteúdo foi redimensionado para caber.
+Verdade visual: `docs/portal-history/reference/portal-history-preview.png` (anexo fornecido, 1440 × 660 px). Implementação: app real em `http://127.0.0.1:8081/portal`, Codex In-app Browser, DPR 1.
 
-- [Despesas — desktop](docs/validation/financial-ui-upgrade/comparison/expenses-desktop.jpg) e [mobile](docs/validation/financial-ui-upgrade/comparison/expenses-mobile.jpg).
-- [Receitas — desktop](docs/validation/financial-ui-upgrade/comparison/revenue-desktop.jpg) e [mobile](docs/validation/financial-ui-upgrade/comparison/revenue-mobile.jpg).
-- [Detalhes de Receitas](docs/validation/financial-ui-upgrade/comparison/revenue-detail-desktop.jpg), [Despesas](docs/validation/financial-ui-upgrade/comparison/expenses-detail-desktop.jpg) e [dois menus no mobile](docs/validation/financial-ui-upgrade/comparison/final-mobile-menus.jpg).
+Comparação desktop no mesmo destaque 2016: `docs/portal-history/evidence/comparison-desktop.jpg`. Recorte da referência 1182 × 121 px; normalizado para o painel 1180 × 114 px do card real, viewport 1440 × 1000. A diferença de altura é intencional: card de 112 px internos + borda, dentro da faixa pedida.
 
-As montagens antes/depois foram abertas juntas para comparar hierarquia, proporções e leitura. Os recortes de detalhe permitem conferir valores, barras, filtros, tabela e estados sem depender das imagens amplas reduzidas.
+Comparação mobile no mesmo destaque 2024: `docs/portal-history/evidence/comparison-mobile.jpg`. Recorte de referência 362 × 163 px, proporcionalmente contido em 368 × 176 px; implementação 368 × 176 px, viewport 390 × 844. A altura de 174 px internos foi reservada para acomodar realce e retorno vertical sem alterar o layout.
 
-## Iterações e correções
+As imagens da referência e da implementação estão juntas no mesmo arquivo de comparação. Capturas completas mostram o contexto do portal; recortes focados verificam marca, bordas, slots, contain e realce. As demais capturas/medidas estão em `docs/portal-history/evidence/capture-files.json` e `responsive.json`.
 
-| Achado | Correção | Conferência final |
-| --- | --- | --- |
-| P2: hierarquia pouco marcante, materiais semelhantes em todos os cards | Cabeçalho navy; totais índigo/verde-petróleo profundos; secundários claros agrupados; barras e valores maiores | Montagens finais e [crítica inicial](docs/validation/financial-ui-upgrade/direction-review/visual-review.md) |
-| P2: explicações ocupavam espaço em indicadores e fontes indisponíveis | Ajuda por ícone, com toque, Enter e Escape; cobertura e semântica preservadas | Capturas finais e teste de ajuda sem nova consulta |
-| P2: título da seção manual e descrição herdavam 14,72/11,68 px | Escopo específico de 2028: seção 18 px, auxiliares ≥12 px | [Medições finais](docs/validation/financial-ui-upgrade/responsive-final.json) |
-| P2: cabeçalho dedicado perdia padding na ordem dos estilos | Seletor específico do cabeçalho desses dois menus | Nova captura: 20/24 px desktop, 16 px mobile |
-| P2: zero do ranking tinha alvo de 40 px | Largura mínima de 44 px | Nenhum controle visível abaixo de 44 px nas cinco larguras |
-| P2: recarga imediata podia perder a divisão de Receitas | Flush local em pagehide/desmontagem, mantendo a chave exclusiva | Recarga 65/35, testes de persistência; chave de Despesas intacta |
-| P2: fechar Categorias no Safari podia perder o ponto de foco | Foco explícito no controle e retorno ao abrir/fechar diálogos | CUA voltou ao botão Categorias; teste de botão e Escape |
+## Findings e histórico de correções
 
-Após as correções, novas capturas foram comparadas. Não restou achado P0/P1/P2 de apresentação ou operação dentro do ambiente validado.
+- [P2, corrigido] Distribuição inicial das laterais ficou concentrada perto da marca. Evidência anterior: `evidence/qa-before-desktop-header.jpg`. Ajuste: padding de 48 px medido na capacidade, rails alinhados às bordas internas, mantendo centro absoluto da marca. Evidência após ajuste: `evidence/comparison-desktop.jpg`, destaque 2016, com acervo distribuído como na referência e folga para a escala 1,08.
+- [P2, corrigido] Texto ampliado cortava as setas de acesso. Evidência anterior: `evidence/qa-before-text-zoom-200-320.jpg`. Ajuste: action com max-width, rótulos que quebram e títulos que podem quebrar palavras longas. Evidência final: `evidence/text-zoom-200-320.jpg`; todas as setas terminam dentro do card e não há overflow horizontal.
+- Refinamento realizado: prioridade CSS da palavra/badge da galeria, mantendo a família/metal do componente existente e mínimo de 20 px no wordmark normal. O resultado está na comparação mobile final. Não se rasterizou o texto da marca.
 
-## Superfícies obrigatórias
+Todos os caminhos de evidência acima são relativos a `docs/portal-history/`.
 
-- **Tipografia:** Inter existente, títulos 32/26 px e seções 18 px; valores principais 36/28 px, secundários 20 px; pesos distintos, números tabulares e alinhamento monetário. Nomes longos quebram linha; valores compactos oferecem o valor exato. Nenhum texto auxiliar do conteúdo operacional fica abaixo de 12 px.
-- **Layout:** ritmo de 8/16/24 px, raios de 12 px; contraste entre totais, apoio, gráficos e lista. A sidebar reduz a largura disponível em notebook, acionando abas. No mobile o primeiro indicador fica totalmente visível até 561 px em Despesas e 507 px em Receitas.
-- **Cores:** navy `#0b2039`, projeção `#253568` e execução/recebimento `#155852`; barras índigo e petróleo; âmbar/vermelho para atenção. Valores e labels dos cards escuros mantêm contraste alto; identificação das séries também usa títulos, não depende só de cor.
-- **Ativos:** logotipo existente e ícones Lucide do projeto preservados; nenhum bitmap decorativo novo nem desenho financeiro fictício. Gráficos usam os registros e escala do servidor/adapters existentes.
-- **Conteúdo:** compromisso e liquidação continuam distintos. Resumo da edição e recorte manual até 500 registros estão identificados; busca local não modifica consolidação nem ranking/Rouanet do recorte ativo. Limitações de fonte ficam disponíveis nos ícones.
+## Superfícies de fidelidade
 
-## Responsividade, acessibilidade e operação
+- **Fontes/tipografia:** FenasojaBrand e família Inter/fallbacks existentes; peso, espaçamento e acabamento metálico preservados. Tamanho/badge seguem a marca do produto, em vez de substituir pela tipografia ilustrativa da prévia. Texto 200% quebra o badge em uma linha adicional legível. Desvio intencional e aceito pelo requisito de reutilizar a marca.
+- **Espaçamento/layout:** centro horizontal e vertical final com desvio medido zero em nove viewports, 320–1920 px e landscape. Desktop em 114 px externos; mobile em 176 px, com altura maior apenas quando a marca ampliada exige. Slots 96 × 72 / 108 × 81 px e halo dentro das margens. Nenhum overlap marca/arte nos destaques ou no retorno.
+- **Cores/tokens:** azul profundo, iluminação radial contida, borda discreta e filamento dourado estáticos. Imagens mantêm cores originais; o destaque usa opacidade/transform e halo externo, sem filtro animado.
+- **Qualidade/fidelidade dos assets:** WebPs autênticos fornecidos, integrais, transparentes, com contain; datas, assinaturas e lettering preservados. Símbolo é o recorte oficial já existente/documentado, sem redesenho. Não se usou o preview como fundo nem gerou uma campanha 2028. CSS/SVG se limitam ao fundo/conexão solicitados.
+- **Conteúdo:** nenhuma descrição/slogan/ano sobreposto às artes. Identidade final FENASOJA 2028; nomes acessíveis do launcher existentes. Ordem dos acessos atende Agenda, Agenda Restaurante/Arena, Mapa, Financeiro, Administrador e Comissões preservadas.
 
-360, 390, 430, 1024 e 1440 px: largura do documento igual à do viewport, controles visíveis ≥44 px, sem microtexto abaixo de 12 px. [Registro de medição](docs/validation/financial-ui-upgrade/responsive-final.json).
+## Interações e motion
 
-Zoom nativo de 200% foi conferido no Chrome porque o in-app browser não aplicou o atalho de zoom. A janela resultou em viewport CSS de 600 × 322, DPR 4 em tela Retina (DPR 2 a 100%), sem overflow horizontal. O formulário de Despesas preservou ações e corpo rolável. Zoom restaurado a 100%. [Evidência](docs/validation/financial-ui-upgrade/zoom-200.json).
+Registro real: `docs/portal-history/evidence/gallery-desktop.gif`, 79 frames até done em 7.816 ms de amostragem. Quatro destaques acumulativos, saída conjunta no encerramento, final estático. Testes confirmam 600 + N × 1.400 + 1.600 ms, pausa exata e cleanup/StrictMode. Mobile e tablet foram capturados ao vivo com o par. O retorno à rota não repete; Administrador abre o login correto; Comissões expande/recolhe; o Ecossistema mantém nome, botão de fechamento, inert e restauração de foco. Console final sem erros da aplicação.
 
-Teclado em abas, ajudas, divisor, formulários; filtros/chips, expansão de registros, edição de receita e restauração da contraparte por duas gravações reais locais; categorias; perfis leitor, editor, confirmador e negado conferidos. Divisores chegaram a 65/35 e persistiram após recarga, retornaram a 50/50 e foram arrastados sem novas RPCs. [Despesas](docs/validation/financial-ui-upgrade/expense-resize.json), [Receitas](docs/validation/financial-ui-upgrade/revenue-resize.json), [perfis](docs/validation/financial-ui-upgrade/profiles.json).
+## Open Questions
 
-Histórico 2026 continuou fora do shell operacional, somente leitura, com 254 linhas e a mesma base histórica. Fontes/componentes históricos não foram alterados. [Captura](docs/validation/financial-ui-upgrade/after/history-2026.jpg).
+Nenhuma pendente. A prévia fornecida é direção de composição: medidas/tipografia finais respeitam os componentes do produto e a faixa dimensional pedida. Não foi realizada autenticação administrativa nem emulação de rede lenta no navegador; esses estados possuem testes pertinentes controlados, com checks de autorização intactos.
 
-## Limites
+## Implementation Checklist
 
-Esta aprovação visual usa a sessão local com JWTs assinados, PostgreSQL/RPCs/RLS reais e um endpoint de identidade do harness. Login remoto do Supabase e versão/comportamento do gateway remoto não foram validados. O conflito em PostgREST 16.4 passou; a limitação anterior de PostgREST 13 continua documentada. Nenhuma escrita em produção foi necessária nesta etapa.
+- [x] Comparar referência/implementação juntas nos mesmos destaques.
+- [x] Corrigir distribuição e clipping de texto ampliado, recapturar e comparar.
+- [x] Conferir os cinco aspectos de fidelidade e nove viewports reais.
+- [x] Testar launcher, retorno, administrador e Comissões no navegador.
+- [x] Passar typecheck, build, lint escopado, integridade e 148 testes pertinentes.
 
-Verificações e reprodução: [README da validação](docs/validation/financial-ui-upgrade/README.md).
+## Follow-up Polish
+
+Nenhum P0/P1/P2 ou ajuste de acabamento obrigatório restante.
+
+final result: passed
