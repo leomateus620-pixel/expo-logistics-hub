@@ -1,0 +1,41 @@
+focused
+
+ ✓ src/features/workers/__tests__/workerUi.test.tsx (13 tests) 1024ms
+   ✓ bots UI de leitura > apresenta os oito bots e links reais sem ações de marketplace  568ms
+
+ Test Files  6 passed (6)
+      Tests  134 passed (134)
+   Start at  03:49:49
+   Duration  2.11s (transform 403ms, setup 275ms, collect 1.05s, tests 1.38s, environment 1.47s, prepare 252ms)
+
+
+typecheck
+npm notice run vite_react_shadcn_ts@0.0.0 typecheck
+npm notice run tsc --noEmit -p tsconfig.app.json
+
+build
+dist/assets/maps-maplibre-DaDby1s_.js                              1,053.53 kB │ gzip: 284.76 kB
+dist/assets/maps-three-BTJQksVz.js                                 1,209.42 kB │ gzip: 362.02 kB
+dist/assets/maps-physics-DbHoWopk.js                               2,081.49 kB │ gzip: 768.99 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 11.20s
+
+global-lint
+  344:21   error    Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  365:15   error    Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+
+/Users/leonardo/.codex/worktrees/workers-preflight/expo-logistics-hub/tailwind.config.ts
+  193:13  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+✖ 1056 problems (982 errors, 74 warnings)
+  7 errors and 3 warnings potentially fixable with the `--fix` option.
+
+
+Scoped ESLint: exit0, no diagnostics.
+SQL/PGlite: PASS; details and hashes in rls-validation.json.
+Deno check: PASS (orchestrator deno.json).
+Browser: PASS,56captures,8/8interactions,0Axeviolations; details in visual-qa-results.json.

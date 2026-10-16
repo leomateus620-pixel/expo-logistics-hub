@@ -1,0 +1,1331 @@
+[
+  {
+    "name": "list_events",
+    "worker": "agenda",
+    "title": "Agenda Fenasoja",
+    "description": "Consulta eventos visíveis no período. Descrições privadas e contatos são omitidos.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "from_date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "to_date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "status": {
+          "type": "string",
+          "maxLength": 60
+        },
+        "search": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "member",
+      "required": [],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/cronograma-eventos",
+    "sources": [
+      "cronograma_eventos_full"
+    ]
+  },
+  {
+    "name": "get_event",
+    "worker": "agenda",
+    "title": "Detalhe do evento",
+    "description": "Consulta dados operacionais seguros de um evento visível.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "ID do evento."
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "member",
+      "required": [],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/cronograma-eventos",
+    "sources": [
+      "cronograma_eventos_full"
+    ]
+  },
+  {
+    "name": "list_subevents",
+    "worker": "agenda",
+    "title": "Subeventos",
+    "description": "Consulta subeventos visíveis do evento informado.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "member",
+      "required": [],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/cronograma-eventos",
+    "sources": [
+      "cronograma_eventos_full",
+      "cronograma_subeventos"
+    ]
+  },
+  {
+    "name": "commission_agenda",
+    "worker": "agenda",
+    "title": "Agenda por comissão",
+    "description": "Consulta agenda da comissão persistida, sob RLS.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "commission_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "commission_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "member",
+      "required": [],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/cronograma-eventos",
+    "sources": [
+      "commissions",
+      "cronograma_unit_agenda"
+    ]
+  },
+  {
+    "name": "commission_metrics",
+    "worker": "agenda",
+    "title": "Métricas por comissão",
+    "description": "Retorna métricas calculadas da comissão, sob RLS.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "commission_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "commission_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "member",
+      "required": [],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/cronograma-eventos",
+    "sources": [
+      "commissions",
+      "cronograma_unit_metrics"
+    ]
+  },
+  {
+    "name": "list_venue_events",
+    "worker": "arena",
+    "title": "Eventos da Arena e Restaurante",
+    "description": "Consulta datas, estado e público de eventos; omite notas internas, contatos e pagamentos.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "from_datetime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "to_datetime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "venue",
+      "required": [
+        "venue_events_access"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/eventos-restaurante-arena",
+    "sources": [
+      "venue_events"
+    ]
+  },
+  {
+    "name": "venue_availability",
+    "worker": "arena",
+    "title": "Disponibilidade de espaços",
+    "description": "Consulta conflitos em espaços persistidos; não reserva nem altera ocupações.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "space_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "maxItems": 10
+        },
+        "setup_start_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "teardown_end_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "space_ids",
+        "setup_start_at",
+        "teardown_end_at"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "venue",
+      "required": [
+        "venue_events_access"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/eventos-restaurante-arena",
+    "sources": [
+      "venue_spaces",
+      "venue_check_availability"
+    ]
+  },
+  {
+    "name": "venue_occupancy",
+    "worker": "arena",
+    "title": "Ocupação",
+    "description": "Consulta períodos de ocupações ativas.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "venue",
+      "required": [
+        "venue_events_access"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/eventos-restaurante-arena",
+    "sources": [
+      "venue_occupancies"
+    ]
+  },
+  {
+    "name": "venue_counterparts",
+    "worker": "arena",
+    "title": "Saldos de contrapartida",
+    "description": "Consulta somente quantidades agregadas autorizadas.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "venue_reports",
+      "required": [
+        "venue_events_access"
+      ],
+      "anyOf": [
+        "venue_reports_view",
+        "venue_counterparts_manage"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/eventos-restaurante-arena",
+    "sources": [
+      "venue_counterpart_balances"
+    ]
+  },
+  {
+    "name": "restaurant_alert",
+    "worker": "arena",
+    "title": "Conflitos Restaurante × Agenda",
+    "description": "Consulta alerta de conflito no intervalo. Não altera agenda nem reservas.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "from_date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "to_date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "from_date",
+        "to_date"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "venue",
+      "required": [
+        "venue_events_access"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/cronograma-eventos",
+    "sources": [
+      "cronograma_restaurant_alert"
+    ]
+  },
+  {
+    "name": "map_projects",
+    "worker": "mapa",
+    "title": "Projetos comerciais",
+    "description": "Lista projetos ativos visíveis.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "map",
+      "required": [
+        "map.view"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/mapa-comercial",
+    "sources": [
+      "map_projects"
+    ]
+  },
+  {
+    "name": "map_segments",
+    "worker": "mapa",
+    "title": "Segmentos do mapa",
+    "description": "Consulta segmentos ativos do projeto autorizado.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "project_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "map",
+      "required": [
+        "map.view"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/mapa-comercial",
+    "sources": [
+      "map_projects",
+      "map_segments"
+    ]
+  },
+  {
+    "name": "map_entities",
+    "worker": "mapa",
+    "title": "Identificação de pavilhões",
+    "description": "Consulta entidades persistidas para relacionar lote, pavilhão e segmento. Não retorna geometria.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        },
+        "segment_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "project_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "map",
+      "required": [
+        "map.view"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/mapa-comercial",
+    "sources": [
+      "map_projects",
+      "map_entities"
+    ]
+  },
+  {
+    "name": "map_inventory",
+    "worker": "mapa",
+    "title": "Inventário comercial",
+    "description": "Lista lotes ativos com identidade persistida; distingue SALE_OPEN de SOLD. Total refere-se ao filtro e registros podem ser parciais.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "AVAILABLE",
+            "BLOCKED",
+            "RESERVED",
+            "IN_NEGOTIATION",
+            "SALE_OPEN",
+            "SOLD"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "project_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "map",
+      "required": [
+        "map.view"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/mapa-comercial",
+    "sources": [
+      "map_projects",
+      "commercial_lots"
+    ]
+  },
+  {
+    "name": "map_prices",
+    "worker": "mapa",
+    "title": "Preços autorizados",
+    "description": "Consulta preços oficiais sob RLS; nunca altera valores.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        },
+        "pavilion": {
+          "type": "string",
+          "maxLength": 80
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "project_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "map",
+      "required": [
+        "map.view"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/mapa-comercial",
+    "sources": [
+      "map_projects",
+      "commercial_lot_pricing_2028"
+    ]
+  },
+  {
+    "name": "map_segment_inventory",
+    "worker": "mapa",
+    "title": "Completude do segmento",
+    "description": "Retorna contagens estruturais, sem inferir inventário comercial.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "segment_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "project_id",
+        "segment_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "map",
+      "required": [
+        "map.view"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/mapa-comercial",
+    "sources": [
+      "map_projects",
+      "map_segments",
+      "get_commission_map_segment_inventory"
+    ]
+  },
+  {
+    "name": "list_sale_orders",
+    "worker": "mapa",
+    "title": "Vendas em aberto e confirmadas",
+    "description": "Consulta estados e quantidade de itens; omite comprador, contatos, valores e pagamentos.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "PENDING",
+            "SIGNED",
+            "PARTIAL",
+            "CANCELLED_PARTIAL",
+            "LEGACY"
+          ]
+        },
+        "has_document": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "project_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "map_sales",
+      "required": [
+        "map.manage_sales"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/mapa-comercial",
+    "sources": [
+      "map_projects",
+      "list_commercial_sale_orders"
+    ]
+  },
+  {
+    "name": "sale_order_detail",
+    "worker": "mapa",
+    "title": "Itens de uma venda",
+    "description": "Consulta itens e estado de assinatura. Não confirma, cancela ou revisa venda; não retorna dados pessoais nem parcelas.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "order_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "project_id",
+        "order_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "map_sales",
+      "required": [
+        "map.manage_sales"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/mapa-comercial",
+    "sources": [
+      "map_projects",
+      "lot_sale_orders",
+      "get_commercial_sale_order_detail"
+    ]
+  },
+  {
+    "name": "sale_order_contract_summary",
+    "worker": "mapa",
+    "title": "Abrangência dos contratos",
+    "description": "Consulta somente quantidade e lotes abrangidos pelos contratos autorizados de uma venda; sem arquivos, contatos ou pagamentos.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "order_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "project_id",
+        "order_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "map_contracts",
+      "required": [
+        "map.manage_sales",
+        "map.manage_contracts"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/mapa-comercial",
+    "sources": [
+      "map_projects",
+      "lot_sale_orders",
+      "get_commercial_sale_order_detail"
+    ]
+  },
+  {
+    "name": "interest_summary",
+    "worker": "interesse",
+    "title": "Interesse por área",
+    "description": "Consulta estatísticas agregadas dos links da organização; sem token ou identidade dos visitantes.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "from_datetime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "to_datetime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "analytics",
+      "required": [
+        "map.analytics.view",
+        "map.manage_sales"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/mapa-comercial",
+    "sources": [
+      "workers_interest_summary"
+    ]
+  },
+  {
+    "name": "public_links_overview",
+    "worker": "interesse",
+    "title": "Links por área",
+    "description": "Consulta nomes e estado dos links da organização; nunca retorna URLs públicas ou tokens.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "analytics",
+      "required": [
+        "map.analytics.view",
+        "map.manage_sales"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/mapa-comercial",
+    "sources": [
+      "workers_public_links_overview"
+    ]
+  },
+  {
+    "name": "my_commissions",
+    "worker": "comissao",
+    "title": "Minhas comissões",
+    "description": "Consulta comissões do vínculo persistido. Somente admin consulta a visão central.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "commission",
+      "required": [],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/portal",
+    "sources": [
+      "commissions",
+      "commission_responsibles"
+    ]
+  },
+  {
+    "name": "commission_responsibles",
+    "worker": "comissao",
+    "title": "Responsáveis da comissão",
+    "description": "Consulta nomes e papéis da comissão autorizada, sem contatos.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "commission_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "commission_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "commission",
+      "required": [],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/portal",
+    "sources": [
+      "commissions",
+      "commission_responsibles"
+    ]
+  },
+  {
+    "name": "meeting_sessions",
+    "worker": "comissao",
+    "title": "Reuniões autorizadas",
+    "description": "Lista sessões visíveis com consentimento confirmado para consultar ações; sem áudio, transcrição ou anexos.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "commission_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "event_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "commission_id",
+        "event_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "commission",
+      "required": [],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/cronograma-eventos",
+    "sources": [
+      "commissions",
+      "cronograma_eventos_full",
+      "cronograma_evento_comissoes",
+      "agenda_meeting_sessions"
+    ]
+  },
+  {
+    "name": "meeting_actions",
+    "worker": "comissao",
+    "title": "Ações de reunião",
+    "description": "Consulta ações de sessão autorizada com consentimento confirmado. Não acessa transcrição nem anexos.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "commission_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "event_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "session_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "commission_id",
+        "event_id",
+        "session_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "commission",
+      "required": [],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/cronograma-eventos",
+    "sources": [
+      "commissions",
+      "cronograma_eventos_full",
+      "cronograma_evento_comissoes",
+      "agenda_meeting_sessions",
+      "agenda_meeting_action_items"
+    ]
+  },
+  {
+    "name": "list_transports",
+    "worker": "logistica",
+    "title": "Transportes",
+    "description": "Consulta estados e horários dos transportes; omite contatos, passageiros individuais e observações privadas.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "maxLength": 60
+        },
+        "from_datetime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "to_datetime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "logistics",
+      "required": [
+        "full_access"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/transports",
+    "sources": [
+      "transports"
+    ]
+  },
+  {
+    "name": "vehicle_summary",
+    "worker": "logistica",
+    "title": "Frota",
+    "description": "Consulta disponibilidade e KM; omite placas, documentos e responsáveis individuais.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "logistics",
+      "required": [
+        "full_access"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/vehicles",
+    "sources": [
+      "vehicles"
+    ]
+  },
+  {
+    "name": "cart_reservations",
+    "worker": "logistica",
+    "title": "Carrinhos",
+    "description": "Consulta períodos e estados de reservas, sem contatos.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "logistics",
+      "required": [
+        "full_access"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/electric-carts",
+    "sources": [
+      "cart_reservations"
+    ]
+  },
+  {
+    "name": "scooter_reservations",
+    "worker": "logistica",
+    "title": "Patinetes",
+    "description": "Consulta períodos e estados de reservas, sem contatos.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "logistics",
+      "required": [
+        "full_access"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/scooters",
+    "sources": [
+      "scooter_reservations"
+    ]
+  },
+  {
+    "name": "logistics_schedules",
+    "worker": "logistica",
+    "title": "Escalas",
+    "description": "Consulta períodos das escalas, sem contatos pessoais.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "logistics",
+      "required": [
+        "full_access"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/ver-escala",
+    "sources": [
+      "schedules"
+    ]
+  },
+  {
+    "name": "transport_weather",
+    "worker": "logistica",
+    "title": "Clima nos transportes",
+    "description": "Consulta snapshots existentes visíveis por JWT; informa validade, sem atualizar dados nem chamar funções com service role.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "logistics",
+      "required": [
+        "full_access"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/transports",
+    "sources": [
+      "transport_weather_snapshots"
+    ]
+  },
+  {
+    "name": "financial_editions",
+    "worker": "caixa",
+    "title": "Edições financeiras",
+    "description": "Lista edições autorizadas para selecionar o resumo. Nenhuma ação financeira disponível.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "financial",
+      "required": [
+        "financial_access"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/comissoes/financeiro-gerencial",
+    "sources": [
+      "financial_editions"
+    ]
+  },
+  {
+    "name": "financial_edition_summary",
+    "worker": "caixa",
+    "title": "Resumo financeiro agregado",
+    "description": "Consulta somente totais calculados da edição, em centavos.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "edition_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "edition_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "financial",
+      "required": [
+        "financial_access"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/comissoes/financeiro-gerencial",
+    "sources": [
+      "financial_editions",
+      "financial_edition_summary"
+    ]
+  },
+  {
+    "name": "financial_budget_execution",
+    "worker": "caixa",
+    "title": "Orçamento × execução",
+    "description": "Consulta agregados por orçamento e linha, em centavos.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "edition_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "edition_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "financial",
+      "required": [
+        "financial_access"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/comissoes/financeiro-gerencial",
+    "sources": [
+      "financial_editions",
+      "financial_budget_execution"
+    ]
+  },
+  {
+    "name": "financial_expense_comparison",
+    "worker": "caixa",
+    "title": "Comparação de despesas",
+    "description": "Consulta totais e agregados por categoria/comissão, sem despesas individuais.",
+    "inputJsonSchema": {
+      "type": "object",
+      "properties": {
+        "edition_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "edition_id"
+      ]
+    },
+    "readOnly": true,
+    "requiresConfirmation": false,
+    "capability": {
+      "policy": "financial",
+      "required": [
+        "financial_access"
+      ],
+      "membershipRequired": true,
+      "scope": "JWT do usuário + organização ativa + RLS + escopo persistido do registro"
+    },
+    "deepLink": "/comissoes/financeiro-gerencial",
+    "sources": [
+      "financial_editions",
+      "financial_expense_comparison"
+    ]
+  }
+]

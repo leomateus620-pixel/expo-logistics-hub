@@ -1,0 +1,1988 @@
+{
+  "generatedAt": "2026-10-16T06:56:14.113Z",
+  "boundary": "Local Chromium desktop. Real React components + real useWorkersChat + localhost SSE/history fixture. Synthetic identities, permissions and data. No deployed RLS, production, real AI provider or external web-search tested here. CPU throttle is desktop emulation, not a physical mobile-device benchmark.",
+  "screenshots": [
+    {
+      "label": "390x844-light-equipe",
+      "path": "docs/workers/phase-0-1/captures/390x844-light-equipe.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-light-perfil-agenda",
+      "path": "docs/workers/phase-0-1/captures/390x844-light-perfil-agenda.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-light-perfil-arena",
+      "path": "docs/workers/phase-0-1/captures/390x844-light-perfil-arena.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-light-perfil-mapa",
+      "path": "docs/workers/phase-0-1/captures/390x844-light-perfil-mapa.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-light-perfil-interesse",
+      "path": "docs/workers/phase-0-1/captures/390x844-light-perfil-interesse.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-light-perfil-comissao",
+      "path": "docs/workers/phase-0-1/captures/390x844-light-perfil-comissao.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-light-perfil-logistica",
+      "path": "docs/workers/phase-0-1/captures/390x844-light-perfil-logistica.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-light-perfil-caixa",
+      "path": "docs/workers/phase-0-1/captures/390x844-light-perfil-caixa.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-light-perfil-radar",
+      "path": "docs/workers/phase-0-1/captures/390x844-light-perfil-radar.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-light-chat-vazio",
+      "path": "docs/workers/phase-0-1/captures/390x844-light-chat-vazio.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "390x844-light-chat-resposta-fixture",
+      "path": "docs/workers/phase-0-1/captures/390x844-light-chat-resposta-fixture.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "390x844-light-design-mascotes",
+      "path": "docs/workers/phase-0-1/captures/390x844-light-design-mascotes.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "390x844-light-design-rotina-chips",
+      "path": "docs/workers/phase-0-1/captures/390x844-light-design-rotina-chips.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "390x844-light-novo-worker-previa",
+      "path": "docs/workers/phase-0-1/captures/390x844-light-novo-worker-previa.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "390x844-dark-equipe",
+      "path": "docs/workers/phase-0-1/captures/390x844-dark-equipe.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-dark-perfil-agenda",
+      "path": "docs/workers/phase-0-1/captures/390x844-dark-perfil-agenda.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-dark-perfil-arena",
+      "path": "docs/workers/phase-0-1/captures/390x844-dark-perfil-arena.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-dark-perfil-mapa",
+      "path": "docs/workers/phase-0-1/captures/390x844-dark-perfil-mapa.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-dark-perfil-interesse",
+      "path": "docs/workers/phase-0-1/captures/390x844-dark-perfil-interesse.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-dark-perfil-comissao",
+      "path": "docs/workers/phase-0-1/captures/390x844-dark-perfil-comissao.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-dark-perfil-logistica",
+      "path": "docs/workers/phase-0-1/captures/390x844-dark-perfil-logistica.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-dark-perfil-caixa",
+      "path": "docs/workers/phase-0-1/captures/390x844-dark-perfil-caixa.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-dark-perfil-radar",
+      "path": "docs/workers/phase-0-1/captures/390x844-dark-perfil-radar.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "390x844-dark-chat-vazio",
+      "path": "docs/workers/phase-0-1/captures/390x844-dark-chat-vazio.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "390x844-dark-chat-resposta-fixture",
+      "path": "docs/workers/phase-0-1/captures/390x844-dark-chat-resposta-fixture.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "390x844-dark-design-mascotes",
+      "path": "docs/workers/phase-0-1/captures/390x844-dark-design-mascotes.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "390x844-dark-design-rotina-chips",
+      "path": "docs/workers/phase-0-1/captures/390x844-dark-design-rotina-chips.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "390x844-dark-novo-worker-previa",
+      "path": "docs/workers/phase-0-1/captures/390x844-dark-novo-worker-previa.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "1280x800-light-equipe",
+      "path": "docs/workers/phase-0-1/captures/1280x800-light-equipe.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-light-perfil-agenda",
+      "path": "docs/workers/phase-0-1/captures/1280x800-light-perfil-agenda.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-light-perfil-arena",
+      "path": "docs/workers/phase-0-1/captures/1280x800-light-perfil-arena.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-light-perfil-mapa",
+      "path": "docs/workers/phase-0-1/captures/1280x800-light-perfil-mapa.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-light-perfil-interesse",
+      "path": "docs/workers/phase-0-1/captures/1280x800-light-perfil-interesse.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-light-perfil-comissao",
+      "path": "docs/workers/phase-0-1/captures/1280x800-light-perfil-comissao.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-light-perfil-logistica",
+      "path": "docs/workers/phase-0-1/captures/1280x800-light-perfil-logistica.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-light-perfil-caixa",
+      "path": "docs/workers/phase-0-1/captures/1280x800-light-perfil-caixa.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-light-perfil-radar",
+      "path": "docs/workers/phase-0-1/captures/1280x800-light-perfil-radar.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-light-chat-vazio",
+      "path": "docs/workers/phase-0-1/captures/1280x800-light-chat-vazio.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "1280x800-light-chat-resposta-fixture",
+      "path": "docs/workers/phase-0-1/captures/1280x800-light-chat-resposta-fixture.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "1280x800-light-design-mascotes",
+      "path": "docs/workers/phase-0-1/captures/1280x800-light-design-mascotes.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "1280x800-light-design-rotina-chips",
+      "path": "docs/workers/phase-0-1/captures/1280x800-light-design-rotina-chips.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "1280x800-light-novo-worker-previa",
+      "path": "docs/workers/phase-0-1/captures/1280x800-light-novo-worker-previa.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "1280x800-dark-equipe",
+      "path": "docs/workers/phase-0-1/captures/1280x800-dark-equipe.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-dark-perfil-agenda",
+      "path": "docs/workers/phase-0-1/captures/1280x800-dark-perfil-agenda.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-dark-perfil-arena",
+      "path": "docs/workers/phase-0-1/captures/1280x800-dark-perfil-arena.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-dark-perfil-mapa",
+      "path": "docs/workers/phase-0-1/captures/1280x800-dark-perfil-mapa.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-dark-perfil-interesse",
+      "path": "docs/workers/phase-0-1/captures/1280x800-dark-perfil-interesse.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-dark-perfil-comissao",
+      "path": "docs/workers/phase-0-1/captures/1280x800-dark-perfil-comissao.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-dark-perfil-logistica",
+      "path": "docs/workers/phase-0-1/captures/1280x800-dark-perfil-logistica.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-dark-perfil-caixa",
+      "path": "docs/workers/phase-0-1/captures/1280x800-dark-perfil-caixa.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-dark-perfil-radar",
+      "path": "docs/workers/phase-0-1/captures/1280x800-dark-perfil-radar.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": true
+    },
+    {
+      "label": "1280x800-dark-chat-vazio",
+      "path": "docs/workers/phase-0-1/captures/1280x800-dark-chat-vazio.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "1280x800-dark-chat-resposta-fixture",
+      "path": "docs/workers/phase-0-1/captures/1280x800-dark-chat-resposta-fixture.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "1280x800-dark-design-mascotes",
+      "path": "docs/workers/phase-0-1/captures/1280x800-dark-design-mascotes.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "1280x800-dark-design-rotina-chips",
+      "path": "docs/workers/phase-0-1/captures/1280x800-dark-design-rotina-chips.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    },
+    {
+      "label": "1280x800-dark-novo-worker-previa",
+      "path": "docs/workers/phase-0-1/captures/1280x800-dark-novo-worker-previa.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "fullPage": false
+    }
+  ],
+  "accessibility": [
+    {
+      "label": "390x844-light-equipe",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-light-perfil-agenda",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-light-perfil-arena",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-light-perfil-mapa",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-light-perfil-interesse",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-light-perfil-comissao",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-light-perfil-logistica",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-light-perfil-caixa",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-light-perfil-radar",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-light-chat-vazio",
+      "passed": true,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "390x844-light-chat-resposta-fixture",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "label": "390x844-light-design-mascotes",
+      "passed": true,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "390x844-light-design-rotina-chips",
+      "passed": true,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "390x844-light-novo-worker-previa",
+      "passed": true,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "390x844-dark-equipe",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-dark-perfil-agenda",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-dark-perfil-arena",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-dark-perfil-mapa",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-dark-perfil-interesse",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-dark-perfil-comissao",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-dark-perfil-logistica",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-dark-perfil-caixa",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-dark-perfil-radar",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "390x844-dark-chat-vazio",
+      "passed": true,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "390x844-dark-chat-resposta-fixture",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "label": "390x844-dark-design-mascotes",
+      "passed": true,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "390x844-dark-design-rotina-chips",
+      "passed": true,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "390x844-dark-novo-worker-previa",
+      "passed": true,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "1280x800-light-equipe",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-light-perfil-agenda",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-light-perfil-arena",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-light-perfil-mapa",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-light-perfil-interesse",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-light-perfil-comissao",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-light-perfil-logistica",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-light-perfil-caixa",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-light-perfil-radar",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-light-chat-vazio",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "label": "1280x800-light-chat-resposta-fixture",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "count": 1
+        },
+        {
+          "id": "color-contrast",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "label": "1280x800-light-design-mascotes",
+      "passed": true,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "1280x800-light-design-rotina-chips",
+      "passed": true,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "1280x800-light-novo-worker-previa",
+      "passed": true,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "1280x800-dark-equipe",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-dark-perfil-agenda",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-dark-perfil-arena",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-dark-perfil-mapa",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-dark-perfil-interesse",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-dark-perfil-comissao",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-dark-perfil-logistica",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-dark-perfil-caixa",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-dark-perfil-radar",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "label": "1280x800-dark-chat-vazio",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "label": "1280x800-dark-chat-resposta-fixture",
+      "passed": true,
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "count": 1
+        },
+        {
+          "id": "color-contrast",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "label": "1280x800-dark-design-mascotes",
+      "passed": true,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "1280x800-dark-design-rotina-chips",
+      "passed": true,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "label": "1280x800-dark-novo-worker-previa",
+      "passed": true,
+      "violations": [],
+      "incomplete": []
+    }
+  ],
+  "overflow": [
+    {
+      "label": "390x844-light-equipe",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-light-perfil-agenda",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-light-perfil-arena",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-light-perfil-mapa",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-light-perfil-interesse",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-light-perfil-comissao",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-light-perfil-logistica",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-light-perfil-caixa",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-light-perfil-radar",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-light-chat-vazio",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-light-chat-resposta-fixture",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-light-design-mascotes",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-light-design-rotina-chips",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-light-novo-worker-previa",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-dark-equipe",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-dark-perfil-agenda",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-dark-perfil-arena",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-dark-perfil-mapa",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-dark-perfil-interesse",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-dark-perfil-comissao",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-dark-perfil-logistica",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-dark-perfil-caixa",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-dark-perfil-radar",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-dark-chat-vazio",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-dark-chat-resposta-fixture",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-dark-design-mascotes",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-dark-design-rotina-chips",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "390x844-dark-novo-worker-previa",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-light-equipe",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-light-perfil-agenda",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-light-perfil-arena",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-light-perfil-mapa",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-light-perfil-interesse",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-light-perfil-comissao",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-light-perfil-logistica",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-light-perfil-caixa",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-light-perfil-radar",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-light-chat-vazio",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-light-chat-resposta-fixture",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-light-design-mascotes",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-light-design-rotina-chips",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-light-novo-worker-previa",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-dark-equipe",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-dark-perfil-agenda",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-dark-perfil-arena",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-dark-perfil-mapa",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-dark-perfil-interesse",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-dark-perfil-comissao",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-dark-perfil-logistica",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-dark-perfil-caixa",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-dark-perfil-radar",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-dark-chat-vazio",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-dark-chat-resposta-fixture",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-dark-design-mascotes",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-dark-design-rotina-chips",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "1280x800-dark-novo-worker-previa",
+      "passed": true,
+      "width": 1280,
+      "scrollWidth": 1280,
+      "offenders": []
+    },
+    {
+      "label": "360x800-/equipe-ia",
+      "passed": true,
+      "width": 360,
+      "scrollWidth": 360,
+      "offenders": []
+    },
+    {
+      "label": "360x800-/equipe-ia/conheca",
+      "passed": true,
+      "width": 360,
+      "scrollWidth": 360,
+      "offenders": []
+    },
+    {
+      "label": "360x800-/equipe-ia/agenda",
+      "passed": true,
+      "width": 360,
+      "scrollWidth": 360,
+      "offenders": []
+    },
+    {
+      "label": "360x800-/equipe-ia/arena",
+      "passed": true,
+      "width": 360,
+      "scrollWidth": 360,
+      "offenders": []
+    },
+    {
+      "label": "360x800-/equipe-ia/mapa",
+      "passed": true,
+      "width": 360,
+      "scrollWidth": 360,
+      "offenders": []
+    },
+    {
+      "label": "360x800-/equipe-ia/interesse",
+      "passed": true,
+      "width": 360,
+      "scrollWidth": 360,
+      "offenders": []
+    },
+    {
+      "label": "360x800-/equipe-ia/comissao",
+      "passed": true,
+      "width": 360,
+      "scrollWidth": 360,
+      "offenders": []
+    },
+    {
+      "label": "360x800-/equipe-ia/logistica",
+      "passed": true,
+      "width": 360,
+      "scrollWidth": 360,
+      "offenders": []
+    },
+    {
+      "label": "360x800-/equipe-ia/caixa",
+      "passed": true,
+      "width": 360,
+      "scrollWidth": 360,
+      "offenders": []
+    },
+    {
+      "label": "360x800-/equipe-ia/radar",
+      "passed": true,
+      "width": 360,
+      "scrollWidth": 360,
+      "offenders": []
+    }
+  ],
+  "terminology": [
+    {
+      "label": "390x844-light-equipe",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-light-perfil-agenda",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-light-perfil-arena",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-light-perfil-mapa",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-light-perfil-interesse",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-light-perfil-comissao",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-light-perfil-logistica",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-light-perfil-caixa",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-light-perfil-radar",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-light-chat-vazio",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-light-chat-resposta-fixture",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-light-design-mascotes",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-light-design-rotina-chips",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-light-novo-worker-previa",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-dark-equipe",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-dark-perfil-agenda",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-dark-perfil-arena",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-dark-perfil-mapa",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-dark-perfil-interesse",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-dark-perfil-comissao",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-dark-perfil-logistica",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-dark-perfil-caixa",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-dark-perfil-radar",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-dark-chat-vazio",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-dark-chat-resposta-fixture",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-dark-design-mascotes",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-dark-design-rotina-chips",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "390x844-dark-novo-worker-previa",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-light-equipe",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-light-perfil-agenda",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-light-perfil-arena",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-light-perfil-mapa",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-light-perfil-interesse",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-light-perfil-comissao",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-light-perfil-logistica",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-light-perfil-caixa",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-light-perfil-radar",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-light-chat-vazio",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-light-chat-resposta-fixture",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-light-design-mascotes",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-light-design-rotina-chips",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-light-novo-worker-previa",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-dark-equipe",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-dark-perfil-agenda",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-dark-perfil-arena",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-dark-perfil-mapa",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-dark-perfil-interesse",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-dark-perfil-comissao",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-dark-perfil-logistica",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-dark-perfil-caixa",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-dark-perfil-radar",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-dark-chat-vazio",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-dark-chat-resposta-fixture",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-dark-design-mascotes",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-dark-design-rotina-chips",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    },
+    {
+      "label": "1280x800-dark-novo-worker-previa",
+      "passed": true,
+      "visibleEnglishTerm": [],
+      "ariaEnglishTerm": []
+    }
+  ],
+  "interactions": [
+    {
+      "label": "menção roteia SSE e identifica bot efetivo",
+      "passed": true
+    },
+    {
+      "label": "chips e fontes levam a rotas existentes sem URL executável",
+      "passed": true
+    },
+    {
+      "label": "voz exige consentimento e não solicita áudio antes",
+      "passed": true
+    },
+    {
+      "label": "CtrlK e Tab mantêm navegação de teclado utilizável",
+      "passed": true
+    },
+    {
+      "label": "perfil permanece disponível sem capability e mostra limite",
+      "passed": true
+    },
+    {
+      "label": "leitura não entra na revisão admin",
+      "passed": true
+    },
+    {
+      "label": "CtrlK abre copiloto contextual e Escape devolve foco",
+      "passed": true
+    },
+    {
+      "label": "prévia Novo bot reage a nome, cor e forma sem persistir",
+      "passed": true
+    }
+  ],
+  "consoleErrors": [],
+  "performance": {
+    "mascots": {
+      "frames": 301,
+      "durationMs": 5007.59999999851,
+      "p95FrameMs": 16.700000000000728,
+      "fps": 60.1086348750079,
+      "activeBefore": 12,
+      "activeAfter": 12,
+      "cpuThrottle": 4,
+      "viewport": "1280x800",
+      "targetFps": 60,
+      "note": "p95 is reported without rounding or thresholding; 16.7–16.8 ms frame jitter is retained in the evidence.",
+      "passed": true
+    },
+    "streaming": {
+      "cls": 0,
+      "totalLayoutShiftIncludingRecentInput": 0.07038082427978515,
+      "target": 0.05,
+      "passed": true,
+      "boundary": "Short synthetic localhost SSE response; not a real-provider latency measurement. Raw layout shift including recent input is also reported because the short response falls within the interaction window."
+    }
+  },
+  "browser": {
+    "engine": "Chromium",
+    "version": "155.0.8059.80",
+    "executablePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "profile": "fresh isolated context; no existing browser session"
+  },
+  "passed": true
+}
