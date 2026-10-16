@@ -42,11 +42,13 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
   const [isStreaming, setIsStreaming] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [workspaceRevision, setWorkspaceRevision] = useState(0);
   const [progress, setProgress] = useState<WorkerProgressStep[]>([]);
   const stream = useRef<AbortController | null>(null);
   const history = useRef<AbortController | null>(null);
   const generation = useRef(0);
   const busy = useRef(false);
+  const workspaceRefreshPending = useRef(false);
   const currentConversation = useRef<string | null>(null);
   const previousWorker = useRef(options.workerId);
 
@@ -102,6 +104,8 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     setOwnerScope(scope);
     setMessages([]);
     setConversations([]);
+    setWorkspaceRevision(0);
+    workspaceRefreshPending.current = false;
     setConversationId(null);
     setProgress([]);
     setError(null);
@@ -135,7 +139,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     setError(null);
     try {
       const result = await workersDatabase.from('ai_messages')
-        .select('id,role,content,worker_id,citations,created_at,state')
+        .select('id,request_id,role,content,worker_id,citations,created_at,state')
         .eq('conversation_id', id).eq('org_id', orgId).eq('user_id', user.id)
         .eq('state', 'complete').order('created_at', { ascending: false }).limit(100)
         .abortSignal(controller.signal);
@@ -148,7 +152,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
       const ordered = [...result.data].reverse();
       setMessages(ordered.map(row => ({
         id: row.id, role: row.role, content: maskSensitiveText(row.content), workerId: workerId(row.worker_id),
-        createdAt: row.created_at, sources: sourcesFrom(row.citations),
+        createdAt: row.created_at, requestId: row.request_id, sources: sourcesFrom(row.citations),
       })));
       setActiveWorkerId(workerId(ordered[ordered.length - 1]?.worker_id));
     } catch {
@@ -158,6 +162,38 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
       }
     }
   }, [orgId, user?.id, scope, stop]);
+
+  // Refresh background routine results without interrupting a live human turn.
+  const refreshMessages = useCallback(async () => {
+    const id = currentConversation.current;
+    if (!id || busy.current || !user?.id || !orgId) return;
+    history.current?.abort();
+    const controller = new AbortController(); history.current = controller;
+    const requestScope = scope; const requestGeneration = generation.current;
+    try {
+      const result = await workersDatabase.from('ai_messages')
+        .select('id,request_id,role,content,worker_id,citations,created_at,state')
+        .eq('conversation_id', id).eq('org_id', orgId).eq('user_id', user.id)
+        .eq('state', 'complete').order('created_at', { ascending: false }).limit(100).abortSignal(controller.signal);
+      if (controller.signal.aborted || liveScope.current !== requestScope || generation.current !== requestGeneration || busy.current || currentConversation.current !== id) return;
+      if (result.error) return;
+      setMessages([...(result.data ?? [])].reverse().map(row => ({
+        id: row.id, requestId: row.request_id, role: row.role, content: maskSensitiveText(row.content), workerId: workerId(row.worker_id),
+        createdAt: row.created_at, sources: sourcesFrom(row.citations),
+      })));
+      void refreshConversations();
+    } catch { /* The next active-session refresh may retry; never erase visible history. */ }
+  }, [user?.id, orgId, scope, refreshConversations]);
+
+  useEffect(() => {
+    const update = (event: Event) => {
+      if ((event as CustomEvent<{ orgId?: string }>).detail?.orgId !== orgId) return;
+      setWorkspaceRevision(current => current + 1);
+      if (busy.current) workspaceRefreshPending.current = true; else void refreshMessages();
+    };
+    window.addEventListener('workers-workspace-updated', update);
+    return () => window.removeEventListener('workers-workspace-updated', update);
+  }, [orgId, refreshMessages]);
 
   useEffect(() => {
     if (options.conversationId) void selectConversation(options.conversationId);
@@ -184,9 +220,9 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     const requestId = crypto.randomUUID();
     const assistantId = `assistant-${requestId}`;
     setMessages(current => [...current, {
-      id: `user-${requestId}`, role: 'user', content: maskSensitiveText(message), createdAt: new Date().toISOString(),
+      id: `user-${requestId}`, requestId, role: 'user', content: maskSensitiveText(message), createdAt: new Date().toISOString(),
     }, {
-      id: assistantId, role: 'assistant', content: '', workerId: options.workerId ?? activeWorkerId,
+      id: assistantId, requestId, role: 'assistant', content: '', workerId: options.workerId ?? activeWorkerId,
       createdAt: new Date().toISOString(), sources: [],
     }]);
     const alive = () => !controller.signal.aborted && requestGeneration === generation.current && liveScope.current === requestScope;
@@ -199,6 +235,9 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
       } else if (event.event === 'conversation' && uuid(event.data.conversationId)) {
         currentConversation.current = event.data.conversationId;
         setConversationId(event.data.conversationId);
+      } else if (event.event === 'workspace' && uuid(event.data.id) && ['action', 'routine'].includes(event.data.kind)) {
+        setWorkspaceRevision(current => current + 1);
+        window.dispatchEvent(new CustomEvent('workers-workspace-updated', { detail: { orgId } }));
       } else if (event.event === 'progress' && typeof event.data.label === 'string' && ['running', 'complete'].includes(event.data.status)) {
         const step = { label: maskSensitiveText(event.data.label).slice(0, 160), status: event.data.status };
         setProgress(current => [...current.filter(item => item.label !== step.label), step].slice(-12));
@@ -228,9 +267,10 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
         busy.current = false;
         setIsStreaming(false);
         setMessages(current => current.filter(item => item.id !== assistantId || item.content.trim()));
+        if (workspaceRefreshPending.current) { workspaceRefreshPending.current = false; void refreshMessages(); }
       }
     }
-  }, [user?.id, orgId, scope, options.workerId, options.context, activeWorkerId, refreshConversations]);
+  }, [user?.id, orgId, scope, options.workerId, options.context, activeWorkerId, refreshConversations, refreshMessages]);
 
   const visible = ownerScope === scope;
   return {
@@ -238,6 +278,6 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     conversationId: visible ? conversationId : null, activeWorkerId,
     isStreaming: visible && isStreaming, isLoadingHistory: visible && isLoadingHistory,
     progress: visible ? progress : [], error: visible ? error : null,
-    sendMessage, stop, selectConversation, newConversation, clearError: () => setError(null),
+    workspaceRevision, refreshMessages, sendMessage, stop, selectConversation, newConversation, clearError: () => setError(null),
   };
 }

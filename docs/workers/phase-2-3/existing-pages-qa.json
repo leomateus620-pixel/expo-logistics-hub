@@ -1,0 +1,427 @@
+{
+  "boundary": "Unauthenticated login/entry screens only. Authenticated business screens were not accessed; source diff is the additional regression control.",
+  "comparisons": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "light",
+      "page": "dashboard",
+      "exactImageMatch": true,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "390x844-light-dashboard-before.png",
+          "sha256": "2e43a3bca2ae375812fd46f498dbf706d24e00a10cb734df91f750f9f286230f"
+        },
+        {
+          "version": "after",
+          "filename": "390x844-light-dashboard-after.png",
+          "sha256": "2e43a3bca2ae375812fd46f498dbf706d24e00a10cb734df91f750f9f286230f"
+        }
+      ],
+      "differingPixels": 0,
+      "maximumChannelDifference": 0,
+      "differenceBounds": null
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "light",
+      "page": "agenda",
+      "exactImageMatch": true,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "390x844-light-agenda-before.png",
+          "sha256": "2e43a3bca2ae375812fd46f498dbf706d24e00a10cb734df91f750f9f286230f"
+        },
+        {
+          "version": "after",
+          "filename": "390x844-light-agenda-after.png",
+          "sha256": "2e43a3bca2ae375812fd46f498dbf706d24e00a10cb734df91f750f9f286230f"
+        }
+      ],
+      "differingPixels": 0,
+      "maximumChannelDifference": 0,
+      "differenceBounds": null
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "light",
+      "page": "mapa",
+      "exactImageMatch": true,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "390x844-light-mapa-before.png",
+          "sha256": "2e43a3bca2ae375812fd46f498dbf706d24e00a10cb734df91f750f9f286230f"
+        },
+        {
+          "version": "after",
+          "filename": "390x844-light-mapa-after.png",
+          "sha256": "2e43a3bca2ae375812fd46f498dbf706d24e00a10cb734df91f750f9f286230f"
+        }
+      ],
+      "differingPixels": 0,
+      "maximumChannelDifference": 0,
+      "differenceBounds": null
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "light",
+      "page": "arena",
+      "exactImageMatch": true,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "390x844-light-arena-before.png",
+          "sha256": "2e43a3bca2ae375812fd46f498dbf706d24e00a10cb734df91f750f9f286230f"
+        },
+        {
+          "version": "after",
+          "filename": "390x844-light-arena-after.png",
+          "sha256": "2e43a3bca2ae375812fd46f498dbf706d24e00a10cb734df91f750f9f286230f"
+        }
+      ],
+      "differingPixels": 0,
+      "maximumChannelDifference": 0,
+      "differenceBounds": null
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "dark",
+      "page": "dashboard",
+      "exactImageMatch": true,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "390x844-dark-dashboard-before.png",
+          "sha256": "0c43218dea95f3a19b7e9166c58e1a93bd6296d2f12cb0c47d53ac1883efd2c1"
+        },
+        {
+          "version": "after",
+          "filename": "390x844-dark-dashboard-after.png",
+          "sha256": "0c43218dea95f3a19b7e9166c58e1a93bd6296d2f12cb0c47d53ac1883efd2c1"
+        }
+      ],
+      "differingPixels": 0,
+      "maximumChannelDifference": 0,
+      "differenceBounds": null
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "dark",
+      "page": "agenda",
+      "exactImageMatch": true,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "390x844-dark-agenda-before.png",
+          "sha256": "0c43218dea95f3a19b7e9166c58e1a93bd6296d2f12cb0c47d53ac1883efd2c1"
+        },
+        {
+          "version": "after",
+          "filename": "390x844-dark-agenda-after.png",
+          "sha256": "0c43218dea95f3a19b7e9166c58e1a93bd6296d2f12cb0c47d53ac1883efd2c1"
+        }
+      ],
+      "differingPixels": 0,
+      "maximumChannelDifference": 0,
+      "differenceBounds": null
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "dark",
+      "page": "mapa",
+      "exactImageMatch": true,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "390x844-dark-mapa-before.png",
+          "sha256": "0c43218dea95f3a19b7e9166c58e1a93bd6296d2f12cb0c47d53ac1883efd2c1"
+        },
+        {
+          "version": "after",
+          "filename": "390x844-dark-mapa-after.png",
+          "sha256": "0c43218dea95f3a19b7e9166c58e1a93bd6296d2f12cb0c47d53ac1883efd2c1"
+        }
+      ],
+      "differingPixels": 0,
+      "maximumChannelDifference": 0,
+      "differenceBounds": null
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "dark",
+      "page": "arena",
+      "exactImageMatch": true,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "390x844-dark-arena-before.png",
+          "sha256": "0c43218dea95f3a19b7e9166c58e1a93bd6296d2f12cb0c47d53ac1883efd2c1"
+        },
+        {
+          "version": "after",
+          "filename": "390x844-dark-arena-after.png",
+          "sha256": "0c43218dea95f3a19b7e9166c58e1a93bd6296d2f12cb0c47d53ac1883efd2c1"
+        }
+      ],
+      "differingPixels": 0,
+      "maximumChannelDifference": 0,
+      "differenceBounds": null
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "theme": "light",
+      "page": "dashboard",
+      "exactImageMatch": false,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "1280x800-light-dashboard-before.png",
+          "sha256": "45dc834b05218a2e2ca862752ca4765f9390f6891db833ca6f903234e6b9ef0a"
+        },
+        {
+          "version": "after",
+          "filename": "1280x800-light-dashboard-after.png",
+          "sha256": "1f2925478db7e654274b98bb405a608c8b6107c564bce46ef327141be58beeb6"
+        }
+      ],
+      "differingPixels": 12,
+      "maximumChannelDifference": 1,
+      "differenceBounds": [
+        587,
+        660,
+        597,
+        662
+      ]
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "theme": "light",
+      "page": "agenda",
+      "exactImageMatch": true,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "1280x800-light-agenda-before.png",
+          "sha256": "45dc834b05218a2e2ca862752ca4765f9390f6891db833ca6f903234e6b9ef0a"
+        },
+        {
+          "version": "after",
+          "filename": "1280x800-light-agenda-after.png",
+          "sha256": "45dc834b05218a2e2ca862752ca4765f9390f6891db833ca6f903234e6b9ef0a"
+        }
+      ],
+      "differingPixels": 0,
+      "maximumChannelDifference": 0,
+      "differenceBounds": null
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "theme": "light",
+      "page": "mapa",
+      "exactImageMatch": false,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "1280x800-light-mapa-before.png",
+          "sha256": "1f2925478db7e654274b98bb405a608c8b6107c564bce46ef327141be58beeb6"
+        },
+        {
+          "version": "after",
+          "filename": "1280x800-light-mapa-after.png",
+          "sha256": "45dc834b05218a2e2ca862752ca4765f9390f6891db833ca6f903234e6b9ef0a"
+        }
+      ],
+      "differingPixels": 12,
+      "maximumChannelDifference": 1,
+      "differenceBounds": [
+        587,
+        660,
+        597,
+        662
+      ]
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "theme": "light",
+      "page": "arena",
+      "exactImageMatch": false,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "1280x800-light-arena-before.png",
+          "sha256": "1f2925478db7e654274b98bb405a608c8b6107c564bce46ef327141be58beeb6"
+        },
+        {
+          "version": "after",
+          "filename": "1280x800-light-arena-after.png",
+          "sha256": "45dc834b05218a2e2ca862752ca4765f9390f6891db833ca6f903234e6b9ef0a"
+        }
+      ],
+      "differingPixels": 12,
+      "maximumChannelDifference": 1,
+      "differenceBounds": [
+        587,
+        660,
+        597,
+        662
+      ]
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "theme": "dark",
+      "page": "dashboard",
+      "exactImageMatch": false,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "1280x800-dark-dashboard-before.png",
+          "sha256": "8bcb7897c5ad00b91f13986158a6060faec311a937949b709190a27c71bca899"
+        },
+        {
+          "version": "after",
+          "filename": "1280x800-dark-dashboard-after.png",
+          "sha256": "1c1d5e5e9ec949275841e6db0c26f0d287587d98f2e5a4a8f6a53b802542b57a"
+        }
+      ],
+      "differingPixels": 12,
+      "maximumChannelDifference": 1,
+      "differenceBounds": [
+        587,
+        660,
+        597,
+        662
+      ]
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "theme": "dark",
+      "page": "agenda",
+      "exactImageMatch": true,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "1280x800-dark-agenda-before.png",
+          "sha256": "8bcb7897c5ad00b91f13986158a6060faec311a937949b709190a27c71bca899"
+        },
+        {
+          "version": "after",
+          "filename": "1280x800-dark-agenda-after.png",
+          "sha256": "8bcb7897c5ad00b91f13986158a6060faec311a937949b709190a27c71bca899"
+        }
+      ],
+      "differingPixels": 0,
+      "maximumChannelDifference": 0,
+      "differenceBounds": null
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "theme": "dark",
+      "page": "mapa",
+      "exactImageMatch": true,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "1280x800-dark-mapa-before.png",
+          "sha256": "8bcb7897c5ad00b91f13986158a6060faec311a937949b709190a27c71bca899"
+        },
+        {
+          "version": "after",
+          "filename": "1280x800-dark-mapa-after.png",
+          "sha256": "8bcb7897c5ad00b91f13986158a6060faec311a937949b709190a27c71bca899"
+        }
+      ],
+      "differingPixels": 0,
+      "maximumChannelDifference": 0,
+      "differenceBounds": null
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "theme": "dark",
+      "page": "arena",
+      "exactImageMatch": true,
+      "visibleTextMatch": true,
+      "samples": [
+        {
+          "version": "before",
+          "filename": "1280x800-dark-arena-before.png",
+          "sha256": "1c1d5e5e9ec949275841e6db0c26f0d287587d98f2e5a4a8f6a53b802542b57a"
+        },
+        {
+          "version": "after",
+          "filename": "1280x800-dark-arena-after.png",
+          "sha256": "1c1d5e5e9ec949275841e6db0c26f0d287587d98f2e5a4a8f6a53b802542b57a"
+        }
+      ],
+      "differingPixels": 0,
+      "maximumChannelDifference": 0,
+      "differenceBounds": null
+    }
+  ],
+  "baselineCommit": "7ea29660e66c165fc9786be23089a1ee564c6d07",
+  "perceptualResult": "16 identical layouts/texts. 12 byte-identical images; four images differ by 12 anti-aliased arrow-edge pixels with a maximum channel difference of 1/255. No authenticated business-screen visual claim."
+}

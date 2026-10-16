@@ -30,6 +30,7 @@ import {
   useMapMutations,
   useMapPermissions,
 } from './hooks/useCommercialMap';
+import { MapLotDeepLink } from './components/MapLotDeepLink';
 import { useCommercialMapStore } from './state/useCommercialMapStore';
 import { useVisitStore } from './visit/useVisitStore';
 import { VisitOverlay } from './visit/VisitOverlay';
@@ -720,6 +721,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   };
 
   return (
+    <>
+    <MapLotDeepLink lotId={searchParams.get('lote')} lots={scopedData.lots} onOpen={handleDashboardViewLot}
+      onConsume={() => { const next = new URLSearchParams(searchParams); next.delete('lote'); setSearchParams(next, { replace: true }); }} />
     <section
       className={`commercial-map-shell ${dashboardOpen ? 'is-dashboard-open' : ''} ${visitEnabled ? 'is-visit-mode' : ''} ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${hydrologicalModeActive ? 'is-hydrological-mode' : ''} ${parkingInspectionOpen ? 'is-parking-inspection' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''} ${lunarCinematicUiActive ? 'is-lunar-launch-active' : ''} ${lunarLaunchReturnAvailable ? 'has-lunar-launch-return' : ''}`}
       aria-label="Plataforma de gestão do mapa comercial"
@@ -1031,5 +1035,6 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
         )}
       </div>
     </section>
+    </>
   );
 }

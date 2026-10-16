@@ -1,0 +1,157 @@
+{
+  "date": "2026-10-16",
+  "boundary": "Infrastructure-only audit via existing audit RPCs and PostgreSQL catalog. No business records read.",
+  "tables": {
+    "rows": [
+      {
+        "policy_count": 1,
+        "rls_enabled": true,
+        "table_name": "agenda_meeting_action_items"
+      },
+      {
+        "policy_count": 1,
+        "rls_enabled": true,
+        "table_name": "agenda_meeting_sessions"
+      },
+      {
+        "policy_count": 4,
+        "rls_enabled": true,
+        "table_name": "cart_reservations"
+      },
+      {
+        "policy_count": 3,
+        "rls_enabled": true,
+        "table_name": "commercial_lots"
+      },
+      {
+        "policy_count": 4,
+        "rls_enabled": true,
+        "table_name": "commission_responsibles"
+      },
+      {
+        "policy_count": 4,
+        "rls_enabled": true,
+        "table_name": "commissions"
+      },
+      {
+        "policy_count": 2,
+        "rls_enabled": true,
+        "table_name": "cronograma_subeventos"
+      },
+      {
+        "policy_count": 1,
+        "rls_enabled": true,
+        "table_name": "financial_editions"
+      },
+      {
+        "policy_count": 1,
+        "rls_enabled": true,
+        "table_name": "lot_sale_orders"
+      },
+      {
+        "policy_count": 3,
+        "rls_enabled": true,
+        "table_name": "map_entities"
+      },
+      {
+        "policy_count": 4,
+        "rls_enabled": true,
+        "table_name": "map_projects"
+      },
+      {
+        "policy_count": 2,
+        "rls_enabled": true,
+        "table_name": "map_segments"
+      },
+      {
+        "policy_count": 4,
+        "rls_enabled": true,
+        "table_name": "schedules"
+      },
+      {
+        "policy_count": 4,
+        "rls_enabled": true,
+        "table_name": "scooter_reservations"
+      },
+      {
+        "policy_count": 4,
+        "rls_enabled": true,
+        "table_name": "transport_weather_snapshots"
+      },
+      {
+        "policy_count": 4,
+        "rls_enabled": true,
+        "table_name": "transports"
+      },
+      {
+        "policy_count": 4,
+        "rls_enabled": true,
+        "table_name": "vehicles"
+      },
+      {
+        "policy_count": 2,
+        "rls_enabled": true,
+        "table_name": "venue_events"
+      },
+      {
+        "policy_count": 2,
+        "rls_enabled": true,
+        "table_name": "venue_occupancies"
+      },
+      {
+        "policy_count": 1,
+        "rls_enabled": true,
+        "table_name": "venue_spaces"
+      }
+    ]
+  },
+  "views": {
+    "rows": [
+      {
+        "relkind": "v",
+        "relname": "commercial_lot_pricing_2028",
+        "reloptions": [
+          "security_invoker=on"
+        ]
+      },
+      {
+        "relkind": "v",
+        "relname": "cronograma_eventos_full",
+        "reloptions": [
+          "security_invoker=on"
+        ]
+      },
+      {
+        "relkind": "v",
+        "relname": "venue_counterpart_balances",
+        "reloptions": [
+          "security_barrier=true"
+        ]
+      }
+    ]
+  },
+  "workspace": {
+    "rows": [
+      {
+        "policy_count": 1,
+        "rls_enabled": true,
+        "table_name": "ai_audit_events"
+      },
+      {
+        "policy_count": 1,
+        "rls_enabled": true,
+        "table_name": "ai_conversations"
+      },
+      {
+        "policy_count": 1,
+        "rls_enabled": true,
+        "table_name": "ai_messages"
+      },
+      {
+        "policy_count": 1,
+        "rls_enabled": true,
+        "table_name": "ai_usage"
+      }
+    ]
+  }
+}

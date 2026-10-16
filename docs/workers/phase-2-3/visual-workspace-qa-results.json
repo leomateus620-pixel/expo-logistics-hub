@@ -1,0 +1,1708 @@
+{
+  "generatedAt": "2026-10-16T10:19:05.233Z",
+  "boundary": "Real React UI/hooks and real API client using synthetic localhost workers-actions/workers-routines/history. No production RLS, real AI provider, verified cost or physical mobile-device claim. The fixture deliberately never persists/echoes protected commercial inputs.",
+  "screenshots": [
+    {
+      "label": "390x844-light-home-attention",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-home-attention.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-light-routine-run-chips",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-routine-run-chips.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-light-action-pending",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-action-pending.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-light-action-edit-note",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-action-edit-note.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-light-action-private-form",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-action-private-form.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-light-action-expired",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-action-expired.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-light-routines",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-routines.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-light-routine-proposal",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-routine-proposal.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-light-memory",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-memory.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-light-memory-editor",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-memory-editor.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-light-needs-you",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-needs-you.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-light-own-alert",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-own-alert.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-light-usage-unknown",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-usage-unknown.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-home-attention",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-home-attention.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-routine-run-chips",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-routine-run-chips.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-action-pending",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-action-pending.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-action-edit-note",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-action-edit-note.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-action-private-form",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-action-private-form.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-action-expired",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-action-expired.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-routines",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-routines.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-routine-proposal",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-routine-proposal.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-memory",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-memory.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-memory-editor",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-memory-editor.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-needs-you",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-needs-you.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-own-alert",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-own-alert.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-usage-unknown",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-usage-unknown.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "1280x800-light-home-attention",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-home-attention.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-light-routine-run-chips",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-routine-run-chips.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-light-action-pending",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-action-pending.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-light-action-edit-note",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-action-edit-note.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-light-action-private-form",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-action-private-form.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-light-action-expired",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-action-expired.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-light-routines",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-routines.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-light-routine-proposal",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-routine-proposal.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-light-memory",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-memory.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-light-memory-editor",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-memory-editor.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-light-needs-you",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-needs-you.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-light-own-alert",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-own-alert.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-light-usage-unknown",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-usage-unknown.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-home-attention",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-home-attention.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-routine-run-chips",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-routine-run-chips.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-action-pending",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-action-pending.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-action-edit-note",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-action-edit-note.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-action-private-form",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-action-private-form.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-action-expired",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-action-expired.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-routines",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-routines.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-routine-proposal",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-routine-proposal.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-memory",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-memory.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-memory-editor",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-memory-editor.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-needs-you",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-needs-you.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-own-alert",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-own-alert.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-usage-unknown",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-usage-unknown.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-light-action-executed",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-action-executed.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "360x800-dark-action-responsive",
+      "path": "docs/workers/phase-2-3/captures/360x800-dark-action-responsive.png",
+      "viewport": {
+        "width": 360,
+        "height": 800
+      }
+    },
+    {
+      "label": "360x800-dark-memory-responsive",
+      "path": "docs/workers/phase-2-3/captures/360x800-dark-memory-responsive.png",
+      "viewport": {
+        "width": 360,
+        "height": 800
+      }
+    }
+  ],
+  "expectedTransportErrors": [
+    {
+      "label": "interactions",
+      "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+    }
+  ],
+  "accessibility": [
+    {
+      "label": "390x844-light-home-attention",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-light-routine-run-chips",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-light-action-pending",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-light-action-edit-note",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-light-action-private-form",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-light-action-expired",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-light-routines",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-light-routine-proposal",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-light-memory",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-light-memory-editor",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-light-needs-you",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-light-own-alert",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-light-usage-unknown",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-home-attention",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-routine-run-chips",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-action-pending",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-action-edit-note",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-action-private-form",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-action-expired",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-routines",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-routine-proposal",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-memory",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-memory-editor",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-needs-you",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-own-alert",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-usage-unknown",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-home-attention",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-routine-run-chips",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-action-pending",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-action-edit-note",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-action-private-form",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-action-expired",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-routines",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-routine-proposal",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-memory",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-memory-editor",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-needs-you",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-own-alert",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-usage-unknown",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-home-attention",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-routine-run-chips",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-action-pending",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-action-edit-note",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-action-private-form",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-action-expired",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-routines",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-routine-proposal",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-memory",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-memory-editor",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-needs-you",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-own-alert",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-usage-unknown",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-action-executed",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "360x800-dark-action-responsive",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "360x800-dark-memory-responsive",
+      "passed": true,
+      "violations": []
+    }
+  ],
+  "overflow": [
+    {
+      "label": "390x844-light-home-attention",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-light-routine-run-chips",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-light-action-pending",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-light-action-edit-note",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-light-action-private-form",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-light-action-expired",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-light-routines",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-light-routine-proposal",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-light-memory",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-light-memory-editor",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-light-needs-you",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-light-own-alert",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-light-usage-unknown",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-home-attention",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-routine-run-chips",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-action-pending",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-action-edit-note",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-action-private-form",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-action-expired",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-routines",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-routine-proposal",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-memory",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-memory-editor",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-needs-you",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-own-alert",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-usage-unknown",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-home-attention",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-routine-run-chips",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-action-pending",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-action-edit-note",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-action-private-form",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-action-expired",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-routines",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-routine-proposal",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-memory",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-memory-editor",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-needs-you",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-own-alert",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-usage-unknown",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-home-attention",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-routine-run-chips",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-action-pending",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-action-edit-note",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-action-private-form",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-action-expired",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-routines",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-routine-proposal",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-memory",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-memory-editor",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-needs-you",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-own-alert",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-usage-unknown",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-action-executed",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "360x800-dark-action-responsive",
+      "width": 360,
+      "scrollWidth": 360,
+      "passed": true
+    },
+    {
+      "label": "360x800-dark-memory-responsive",
+      "width": 360,
+      "scrollWidth": 360,
+      "passed": true
+    }
+  ],
+  "interactions": [
+    {
+      "label": "editar nota regenera versão e diff antes de confirmar",
+      "passed": true
+    },
+    {
+      "label": "Confirmar duplicado na interface envia uma execução e apresenta receipt",
+      "passed": true
+    },
+    {
+      "label": "dados comerciais ficam somente no formulário protegido, sem confirmação automática",
+      "passed": true
+    },
+    {
+      "label": "Escape fecha formulário protegido e restaura foco",
+      "passed": true
+    },
+    {
+      "label": "Cancelar registra estado terminal sem oferecer exclusão",
+      "passed": true
+    },
+    {
+      "label": "rotina requer confirmação, cria evento com Desfazer e desativa futuras ocorrências",
+      "passed": true
+    },
+    {
+      "label": "memória é editável, desativável e não grava ao digitar",
+      "passed": true
+    },
+    {
+      "label": "timeout depois do commit reconcilia por GET do mesmo card",
+      "passed": true
+    },
+    {
+      "label": "leitura não vê botão Confirmar nem campo privado no card",
+      "passed": true
+    },
+    {
+      "label": "layout de 360px permanece dentro da viewport",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "commands": [
+    {
+      "label": "390x844-light",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-light",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-light",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-light",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-light",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "usage",
+      "keys": [
+        "command",
+        "from",
+        "orgId",
+        "to"
+      ]
+    },
+    {
+      "label": "390x844-dark",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-dark",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-dark",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-dark",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-dark",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "usage",
+      "keys": [
+        "command",
+        "from",
+        "orgId",
+        "to"
+      ]
+    },
+    {
+      "label": "1280x800-light",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-light",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-light",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-light",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-light",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "usage",
+      "keys": [
+        "command",
+        "from",
+        "orgId",
+        "to"
+      ]
+    },
+    {
+      "label": "1280x800-dark",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-dark",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-dark",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-dark",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-dark",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "usage",
+      "keys": [
+        "command",
+        "from",
+        "orgId",
+        "to"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "edit",
+      "keys": [
+        "actionId",
+        "command",
+        "expectedVersion",
+        "input",
+        "orgId",
+        "requestId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "confirm",
+      "keys": [
+        "actionId",
+        "command",
+        "expectedVersion",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "manual",
+      "keys": [
+        "actionId",
+        "command",
+        "expectedVersion",
+        "manualInput",
+        "orgId",
+        "requestId"
+      ],
+      "manualKeys": [
+        "companyName",
+        "contactName",
+        "kind",
+        "reservationExpiresAt"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "cancel",
+      "keys": [
+        "actionId",
+        "command",
+        "expectedVersion",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "confirmRoutine",
+      "keys": [
+        "command",
+        "expectedVersion",
+        "orgId",
+        "routineId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "undoRoutine",
+      "keys": [
+        "command",
+        "expectedVersion",
+        "orgId",
+        "routineId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "saveMemory",
+      "keys": [
+        "command",
+        "content",
+        "enabled",
+        "orgId",
+        "requestId",
+        "workerId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "saveMemory",
+      "keys": [
+        "command",
+        "content",
+        "enabled",
+        "expectedVersion",
+        "memoryId",
+        "orgId",
+        "requestId",
+        "workerId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "confirm",
+      "keys": [
+        "actionId",
+        "command",
+        "expectedVersion",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "get",
+      "keys": [
+        "actionId",
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "interactions",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    }
+  ],
+  "passed": true
+}

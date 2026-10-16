@@ -19,6 +19,7 @@ export interface WorkersTurnRequest {
 export type WorkersStreamEvent =
   | { event: 'worker'; data: { workerId: string } }
   | { event: 'conversation'; data: { conversationId: string } }
+  | { event: 'workspace'; data: { kind: 'action' | 'routine'; id: string } }
   | { event: 'progress'; data: { label: string; status: 'running' | 'complete' } }
   | { event: 'delta'; data: { text: string } }
   | { event: 'citations'; data: { citations: Array<{ label: string; url: string; source: 'app' | 'web'; date?: string }> } }
@@ -26,7 +27,7 @@ export type WorkersStreamEvent =
   | { event: 'done'; data: Record<string, unknown> }
   | { event: 'error'; data: { code: string; message: string } };
 
-const EVENT_NAMES = new Set(['worker', 'conversation', 'progress', 'delta', 'citations', 'usage', 'done', 'error']);
+const EVENT_NAMES = new Set(['worker', 'conversation', 'workspace', 'progress', 'delta', 'citations', 'usage', 'done', 'error']);
 
 /** Incremental SSE parser: supports split UTF-8 chunks, CRLF and multiline data. */
 export async function consumeWorkersStream(
@@ -137,7 +138,8 @@ export function safeWorkerSourceUrl(raw: unknown, kind: 'app' | 'web'): string |
     if (parsed.origin !== 'https://workers.invalid') return null;
     const rawPath = raw.split(/[?#]/)[0];
     if (rawPath !== parsed.pathname || rawPath.includes('%')) return null;
-    if ([...parsed.searchParams.keys()].some(key => !['event', 'evento', 'subevent', 'mode', 'edicao', 'view', 'aba', 'timelineYear', 'timelineMonth'].includes(key))) return null;
+    if ([...parsed.searchParams.keys()].some(key => !['event', 'evento', 'subevent', 'mode', 'edicao', 'view', 'aba', 'timelineYear', 'timelineMonth', 'lote'].includes(key))) return null;
+    if (parsed.searchParams.has('lote') && (parsed.pathname !== '/mapa-comercial' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(parsed.searchParams.get('lote') ?? ''))) return null;
     if (parsed.hash) return null;
     return raw;
   }

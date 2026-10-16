@@ -1,0 +1,144 @@
+{
+  "date": "2026-10-16",
+  "baseMerge": "5d1d4f8b57c934d9a481e5d9bc971f12f3d73079",
+  "migrations": {
+    "status": "applied",
+    "platformVersions": [
+      "0007",
+      "0008"
+    ],
+    "files": [
+      "20261016120000_workers_readonly_workspace.sql",
+      "20261016120100_workers_interest_scoped_reads.sql"
+    ],
+    "hashes": [
+      "a5f5d890c806437c270398e8f0c84b06b33693c9dda2446c8d0c40b98c56056f",
+      "dcfa6f82ac69ef85841fa7fa127185d140e64eb01909161322a49cf9be42f86c"
+    ]
+  },
+  "grants": {
+    "rows": [
+      {
+        "anon_access": false,
+        "authenticated_select": true,
+        "authenticated_write": false,
+        "relname": "ai_audit_events",
+        "relrowsecurity": true
+      },
+      {
+        "anon_access": false,
+        "authenticated_select": true,
+        "authenticated_write": false,
+        "relname": "ai_conversations",
+        "relrowsecurity": true
+      },
+      {
+        "anon_access": false,
+        "authenticated_select": true,
+        "authenticated_write": false,
+        "relname": "ai_messages",
+        "relrowsecurity": true
+      },
+      {
+        "anon_access": false,
+        "authenticated_select": true,
+        "authenticated_write": false,
+        "relname": "ai_usage",
+        "relrowsecurity": true
+      }
+    ]
+  },
+  "policies": {
+    "rows": [
+      {
+        "cmd": "SELECT",
+        "policyname": "ai_audit_events_read_own",
+        "qual": "((user_id = ( SELECT auth.uid() AS uid)) AND (org_id IN ( SELECT ai_workers_member_org_ids() AS ai_workers_member_org_ids)))",
+        "roles": "{authenticated}",
+        "tablename": "ai_audit_events"
+      },
+      {
+        "cmd": "SELECT",
+        "policyname": "ai_conversations_read_own",
+        "qual": "((user_id = ( SELECT auth.uid() AS uid)) AND (org_id IN ( SELECT ai_workers_member_org_ids() AS ai_workers_member_org_ids)))",
+        "roles": "{authenticated}",
+        "tablename": "ai_conversations"
+      },
+      {
+        "cmd": "SELECT",
+        "policyname": "ai_messages_read_own",
+        "qual": "((user_id = ( SELECT auth.uid() AS uid)) AND (org_id IN ( SELECT ai_workers_member_org_ids() AS ai_workers_member_org_ids)))",
+        "roles": "{authenticated}",
+        "tablename": "ai_messages"
+      },
+      {
+        "cmd": "SELECT",
+        "policyname": "ai_usage_read_own",
+        "qual": "((user_id = ( SELECT auth.uid() AS uid)) AND (org_id IN ( SELECT ai_workers_member_org_ids() AS ai_workers_member_org_ids)))",
+        "roles": "{authenticated}",
+        "tablename": "ai_usage"
+      }
+    ]
+  },
+  "businessWriteTriggers": {
+    "rows": [
+      {
+        "definition": "CREATE TRIGGER commercial_lot_segment_sync AFTER INSERT OR UPDATE OF block, entity_id ON public.commercial_lots FOR EACH ROW EXECUTE FUNCTION sync_map_entity_segment_from_lot()",
+        "function_md5": "2220b78322eadb7ed79fe245399008cf",
+        "proname": "sync_map_entity_segment_from_lot",
+        "relation": "commercial_lots",
+        "tgname": "commercial_lot_segment_sync"
+      },
+      {
+        "definition": "CREATE TRIGGER commercial_lots_block_delete_contract_trg BEFORE DELETE ON public.commercial_lots FOR EACH ROW EXECUTE FUNCTION commercial_lots_block_delete_if_contract_linked()",
+        "function_md5": "fece384e747ac3de26396b43517de6c1",
+        "proname": "commercial_lots_block_delete_if_contract_linked",
+        "relation": "commercial_lots",
+        "tgname": "commercial_lots_block_delete_contract_trg"
+      },
+      {
+        "definition": "CREATE TRIGGER commercial_lots_updated BEFORE UPDATE ON public.commercial_lots FOR EACH ROW EXECUTE FUNCTION set_updated_at()",
+        "function_md5": "2dc15d21148a19ed2e2f94c65417ae55",
+        "proname": "set_updated_at",
+        "relation": "commercial_lots",
+        "tgname": "commercial_lots_updated"
+      },
+      {
+        "definition": "CREATE TRIGGER lot_negotiations_updated BEFORE UPDATE ON public.lot_negotiations FOR EACH ROW EXECUTE FUNCTION set_updated_at()",
+        "function_md5": "2dc15d21148a19ed2e2f94c65417ae55",
+        "proname": "set_updated_at",
+        "relation": "lot_negotiations",
+        "tgname": "lot_negotiations_updated"
+      },
+      {
+        "definition": "CREATE TRIGGER lot_reservations_updated BEFORE UPDATE ON public.lot_reservations FOR EACH ROW EXECUTE FUNCTION set_updated_at()",
+        "function_md5": "2dc15d21148a19ed2e2f94c65417ae55",
+        "proname": "set_updated_at",
+        "relation": "lot_reservations",
+        "tgname": "lot_reservations_updated"
+      },
+      {
+        "definition": "CREATE TRIGGER venue_event_notes_touch BEFORE UPDATE ON public.venue_event_notes FOR EACH ROW EXECUTE FUNCTION venue_event_notes_touch()",
+        "function_md5": "05696ce2ab93af5b68f1b72e469eba53",
+        "proname": "venue_event_notes_touch",
+        "relation": "venue_event_notes",
+        "tgname": "venue_event_notes_touch"
+      }
+    ]
+  },
+  "logTriggers": {
+    "rows": []
+  },
+  "edge": {
+    "status": "deployed",
+    "function": "workers-orchestrator",
+    "verifyJwt": true,
+    "deploymentSourceCommit": "88a6e67d32faa5f41578a46e105ba6143978677d",
+    "packageSha256": "7372d1552a7585485a613a9aefeafaf9d49035111ca233c2949e53eecd256033",
+    "postWithoutAuthorization": 401,
+    "options": 204,
+    "connectorMessageId": "umsg_01m51w7dpzfxytg56x7dp6a13w",
+    "numericVersion": "not reported by platform"
+  },
+  "boundary": "Only infrastructure metadata inspected. No business rows read or modified with privileged credentials."
+}
