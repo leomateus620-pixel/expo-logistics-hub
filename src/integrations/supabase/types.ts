@@ -11011,6 +11011,7 @@ export type Database = {
         }
         Returns: Json
       }
+      ai_workers_can_access: { Args: { _org_id: string }; Returns: boolean }
       ai_workers_fail_turn: {
         Args: {
           _input_tokens?: number
