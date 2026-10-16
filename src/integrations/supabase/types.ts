@@ -1155,6 +1155,102 @@ export type Database = {
           },
         ]
       }
+      ai_inbox_items: {
+        Row: {
+          created_at: string
+          expires_at: string
+          href: string
+          id: string
+          kind: string
+          org_id: string
+          routine_id: string
+          run_id: string
+          seen_at: string | null
+          title: string
+          user_id: string
+          worker_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          href: string
+          id?: string
+          kind: string
+          org_id: string
+          routine_id: string
+          run_id: string
+          seen_at?: string | null
+          title: string
+          user_id: string
+          worker_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          href?: string
+          id?: string
+          kind?: string
+          org_id?: string
+          routine_id?: string
+          run_id?: string
+          seen_at?: string | null
+          title?: string
+          user_id?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_inbox_items_routine_id_org_id_user_id_fkey"
+            columns: ["routine_id", "org_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "ai_routines"
+            referencedColumns: ["id", "org_id", "user_id"]
+          },
+          {
+            foreignKeyName: "ai_inbox_items_run_id_org_id_user_id_fkey"
+            columns: ["run_id", "org_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "ai_routine_runs"
+            referencedColumns: ["id", "org_id", "user_id"]
+          },
+        ]
+      }
+      ai_memory: {
+        Row: {
+          content: string
+          created_at: string
+          enabled: boolean
+          id: string
+          org_id: string
+          updated_at: string
+          user_id: string
+          version: number
+          worker_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          org_id: string
+          updated_at?: string
+          user_id: string
+          version?: number
+          worker_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          org_id?: string
+          updated_at?: string
+          user_id?: string
+          version?: number
+          worker_id?: string | null
+        }
+        Relationships: []
+      }
       ai_messages: {
         Row: {
           citations: Json
@@ -1198,6 +1294,181 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "ai_messages_conversation_id_org_id_user_id_fkey"
+            columns: ["conversation_id", "org_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id", "org_id", "user_id"]
+          },
+        ]
+      }
+      ai_routine_runs: {
+        Row: {
+          catch_up: boolean
+          conversation_id: string
+          failure_code: string | null
+          finished_at: string | null
+          generation: number
+          id: string
+          lease_expires_at: string | null
+          org_id: string
+          reference_date: string
+          request_id: string
+          result_trust: string
+          routine_id: string
+          routine_version: number
+          scheduled_for: string
+          started_at: string | null
+          state: string
+          user_id: string
+        }
+        Insert: {
+          catch_up?: boolean
+          conversation_id: string
+          failure_code?: string | null
+          finished_at?: string | null
+          generation?: number
+          id?: string
+          lease_expires_at?: string | null
+          org_id: string
+          reference_date: string
+          request_id?: string
+          result_trust?: string
+          routine_id: string
+          routine_version: number
+          scheduled_for: string
+          started_at?: string | null
+          state: string
+          user_id: string
+        }
+        Update: {
+          catch_up?: boolean
+          conversation_id?: string
+          failure_code?: string | null
+          finished_at?: string | null
+          generation?: number
+          id?: string
+          lease_expires_at?: string | null
+          org_id?: string
+          reference_date?: string
+          request_id?: string
+          result_trust?: string
+          routine_id?: string
+          routine_version?: number
+          scheduled_for?: string
+          started_at?: string | null
+          state?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_routine_runs_conversation_id_org_id_user_id_fkey"
+            columns: ["conversation_id", "org_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id", "org_id", "user_id"]
+          },
+          {
+            foreignKeyName: "ai_routine_runs_routine_id_org_id_user_id_fkey"
+            columns: ["routine_id", "org_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "ai_routines"
+            referencedColumns: ["id", "org_id", "user_id"]
+          },
+        ]
+      }
+      ai_routines: {
+        Row: {
+          config: Json
+          confirmed_version: number | null
+          conversation_id: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          next_scheduled_at: string | null
+          org_id: string
+          request_id: string
+          status: string
+          updated_at: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          config: Json
+          confirmed_version?: number | null
+          conversation_id: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          next_scheduled_at?: string | null
+          org_id: string
+          request_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          version?: number
+        }
+        Update: {
+          config?: Json
+          confirmed_version?: number | null
+          conversation_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          next_scheduled_at?: string | null
+          org_id?: string
+          request_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_routines_conversation_id_org_id_user_id_fkey"
+            columns: ["conversation_id", "org_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id", "org_id", "user_id"]
+          },
+        ]
+      }
+      ai_system_events: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          entity_id: string
+          id: string
+          kind: string
+          label: string
+          org_id: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          entity_id: string
+          id?: string
+          kind: string
+          label: string
+          org_id: string
+          user_id: string
+          version: number
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          entity_id?: string
+          id?: string
+          kind?: string
+          label?: string
+          org_id?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_system_events_conversation_id_org_id_user_id_fkey"
             columns: ["conversation_id", "org_id", "user_id"]
             isOneToOne: false
             referencedRelation: "ai_conversations"
@@ -1266,6 +1537,36 @@ export type Database = {
             referencedColumns: ["id", "org_id", "user_id"]
           },
         ]
+      }
+      ai_workspace_receipts: {
+        Row: {
+          created_at: string
+          entity_id: string | null
+          fingerprint: string
+          kind: string
+          org_id: string
+          request_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id?: string | null
+          fingerprint: string
+          kind: string
+          org_id: string
+          request_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string | null
+          fingerprint?: string
+          kind?: string
+          org_id?: string
+          request_id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       audit_log: {
         Row: {
@@ -11204,6 +11505,121 @@ export type Database = {
       }
       ai_workers_redact_text: { Args: { _text: string }; Returns: string }
       ai_workers_visible_action_ids: { Args: never; Returns: string[] }
+      ai_workspace_assert_member: { Args: { _org_id: string }; Returns: string }
+      ai_workspace_claim_due: {
+        Args: { _org_id: string; _request_id: string }
+        Returns: Json
+      }
+      ai_workspace_complete_run: {
+        Args: {
+          _alert_kind?: string
+          _citations: Json
+          _content: string
+          _generation: number
+          _org_id: string
+          _run_id: string
+          _tool_names: string[]
+        }
+        Returns: Json
+      }
+      ai_workspace_config_valid: { Args: { _config: Json }; Returns: boolean }
+      ai_workspace_confirm_routine: {
+        Args: {
+          _expected_version: number
+          _org_id: string
+          _routine_id: string
+        }
+        Returns: Json
+      }
+      ai_workspace_finish_run: {
+        Args: {
+          _alert_kind?: string
+          _failure_code?: string
+          _generation: number
+          _org_id: string
+          _run_id: string
+          _success: boolean
+        }
+        Returns: Json
+      }
+      ai_workspace_mark_alert_seen: {
+        Args: { _alert_id: string; _org_id: string }
+        Returns: Json
+      }
+      ai_workspace_memory_view: {
+        Args: { r: Database["public"]["Tables"]["ai_memory"]["Row"] }
+        Returns: Json
+      }
+      ai_workspace_metadata_budget: {
+        Args: { _actor: string }
+        Returns: undefined
+      }
+      ai_workspace_next_schedule: {
+        Args: { _after: string; _config: Json }
+        Returns: string
+      }
+      ai_workspace_propose_routine: {
+        Args: {
+          _config: Json
+          _conversation_id: string
+          _org_id: string
+          _request_id: string
+        }
+        Returns: Json
+      }
+      ai_workspace_recipe_allowed: {
+        Args: { _config: Json; _org_id: string }
+        Returns: boolean
+      }
+      ai_workspace_routine_view: {
+        Args: { r: Database["public"]["Tables"]["ai_routines"]["Row"] }
+        Returns: Json
+      }
+      ai_workspace_run_view: {
+        Args: { r: Database["public"]["Tables"]["ai_routine_runs"]["Row"] }
+        Returns: Json
+      }
+      ai_workspace_save_memory: {
+        Args: {
+          _content: string
+          _enabled: boolean
+          _expected_version: number
+          _memory_id: string
+          _org_id: string
+          _request_id: string
+          _worker_id: string
+        }
+        Returns: Json
+      }
+      ai_workspace_set_routine_state: {
+        Args: {
+          _expected_version: number
+          _org_id: string
+          _routine_id: string
+          _state: string
+        }
+        Returns: Json
+      }
+      ai_workspace_snapshot: {
+        Args: { _conversation_id?: string; _org_id: string }
+        Returns: Json
+      }
+      ai_workspace_undo_routine: {
+        Args: {
+          _expected_version: number
+          _org_id: string
+          _routine_id: string
+        }
+        Returns: Json
+      }
+      ai_workspace_usage: {
+        Args: { _from: string; _org_id: string; _to: string }
+        Returns: Json
+      }
+      ai_workspace_validate_run: {
+        Args: { _generation: number; _org_id: string; _run_id: string }
+        Returns: Json
+      }
       apply_exporural_reference_2026: {
         Args: {
           p_entities: Json
