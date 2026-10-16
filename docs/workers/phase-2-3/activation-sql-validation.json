@@ -1,0 +1,25 @@
+{
+  "engine": "PostgreSQL 16.14, isolated localhost synthetic fixtures",
+  "checks": [
+    {
+      "file": "scripts/workers/db-fixture.sql",
+      "sha256": "5cb6a5e0316aa3eda2422b331f8a7efa829da38d3b374a30d81f456f84167514",
+      "passed": true
+    },
+    {
+      "file": "supabase/migrations/20261016120000_workers_readonly_workspace.sql",
+      "sha256": "a5f5d890c806437c270398e8f0c84b06b33693c9dda2446c8d0c40b98c56056f",
+      "passed": true
+    },
+    {
+      "file": "supabase/migrations/20261016120100_workers_interest_scoped_reads.sql",
+      "sha256": "dcfa6f82ac69ef85841fa7fa127185d140e64eb01909161322a49cf9be42f86c",
+      "passed": true
+    },
+    {
+      "file": "scripts/workers/rls-assertions.sql",
+      "sha256": "3a2dd0638444b81cbfa3bfccee4d9d08dd7ef858f2371e02862ed3909ecbfb9c",
+      "passed": true
+    }
+  ]
+}
