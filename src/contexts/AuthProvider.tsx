@@ -92,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem(QUERY_CACHE_KEY);
       localStorage.removeItem(ORG_KEY);
       localStorage.removeItem(LAST_USER_KEY);
+      sessionStorage.removeItem('fenasoja-workers-unlock');
     } catch {}
     await supabase.auth.signOut();
   };

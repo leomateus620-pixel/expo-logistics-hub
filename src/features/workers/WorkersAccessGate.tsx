@@ -53,7 +53,7 @@ function useUnlocked() {
   return { unlocked, unlock: () => { if (user?.id) { writeUnlock(user.id); setUnlocked(true); } } };
 }
 
-function PasswordPrompt({ onUnlock, compact }: { onUnlock: () => void; compact?: boolean }) {
+export function PasswordPrompt({ onUnlock, compact }: { onUnlock: () => void; compact?: boolean }) {
   const { user } = useAuth();
   const [password, setPassword] = useState(''); const [error, setError] = useState<string | null>(null); const [busy, setBusy] = useState(false);
   const submit = async (event: FormEvent) => {

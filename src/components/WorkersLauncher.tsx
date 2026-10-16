@@ -3,6 +3,8 @@ import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { PasswordPrompt, readUnlock, useWorkersEligibility, writeUnlock } from '@/features/workers/WorkersAccessGate';
 
 const SessionRunner = lazyWithRetry(() => import('@/features/workers/WorkersSessionRunner'));
 const Copilot = lazyWithRetry(() => import('@/features/workers/WorkersCopilot'));
@@ -15,7 +17,10 @@ export default function WorkersLauncher() {
   const [open, setOpen] = useState(false);
   const isWorkers = location.pathname.startsWith('/equipe-ia') || location.pathname.startsWith('/admin/workers/');
   const isPublic = /^\/(?:areas\/|login\/|unsubscribe|\.lovable\/)/.test(location.pathname);
-  const enabled = Boolean(user && orgId && !isPublic && !isWorkers);
+  const { eligible } = useWorkersEligibility();
+  const [unlocked, setUnlocked] = useState(() => readUnlock(user?.id));
+  const enabled = Boolean(user && orgId && !isPublic && !isWorkers && eligible);
+  useEffect(() => { if (open) setUnlocked(readUnlock(user?.id)); }, [open, user?.id]);
 
   useEffect(() => {
     if (!enabled) { setOpen(false); return; }
@@ -41,7 +46,12 @@ export default function WorkersLauncher() {
         background: '#121D85', color: '#fff', boxShadow: 'var(--shadow-md)', fontSize: 13, fontWeight: 600 }}>
       <img src="/fenasoja-bots.svg" alt="" width={24} height={24} /><span>Equipe IA</span>
     </button>
-    {open && <Suspense fallback={null}><Copilot open={open} onOpenChange={setOpen} showTrigger={false}
+    {open && !unlocked && <Dialog open onOpenChange={value => { if (!value) setOpen(false); }}>
+      <DialogContent className="max-w-sm border-0 bg-transparent p-0 shadow-none">
+        <DialogTitle className="sr-only">Senha da Equipe Fenasoja</DialogTitle><DialogDescription className="sr-only">Confirme sua senha</DialogDescription>
+        <PasswordPrompt compact onUnlock={() => { if (user) { writeUnlock(user.id); setUnlocked(true); } }} />
+      </DialogContent></Dialog>}
+    {open && unlocked && <Suspense fallback={null}><Copilot open={open} onOpenChange={setOpen} showTrigger={false}
       context={{ route: location.pathname }} /></Suspense>}
   </>;
 }
