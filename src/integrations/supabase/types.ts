@@ -964,6 +964,118 @@ export type Database = {
           },
         ]
       }
+      ai_action_events: {
+        Row: {
+          action_id: string
+          code: string | null
+          created_at: string
+          event: string
+          id: string
+          org_id: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          action_id: string
+          code?: string | null
+          created_at?: string
+          event: string
+          id?: string
+          org_id: string
+          user_id: string
+          version: number
+        }
+        Update: {
+          action_id?: string
+          code?: string | null
+          created_at?: string
+          event?: string
+          id?: string
+          org_id?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_action_events_action_id_org_id_user_id_fkey"
+            columns: ["action_id", "org_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "ai_actions"
+            referencedColumns: ["id", "org_id", "user_id"]
+          },
+        ]
+      }
+      ai_actions: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          diff: Json
+          expires_at: string
+          failure: Json | null
+          id: string
+          kind: string
+          manual_input_state: string
+          org_id: string
+          receipt: Json | null
+          status: string
+          summary: string
+          target: Json
+          target_id: string
+          updated_at: string
+          user_id: string
+          version: number
+          worker_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          diff: Json
+          expires_at?: string
+          failure?: Json | null
+          id?: string
+          kind: string
+          manual_input_state: string
+          org_id: string
+          receipt?: Json | null
+          status?: string
+          summary: string
+          target: Json
+          target_id: string
+          updated_at?: string
+          user_id: string
+          version?: number
+          worker_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          diff?: Json
+          expires_at?: string
+          failure?: Json | null
+          id?: string
+          kind?: string
+          manual_input_state?: string
+          org_id?: string
+          receipt?: Json | null
+          status?: string
+          summary?: string
+          target?: Json
+          target_id?: string
+          updated_at?: string
+          user_id?: string
+          version?: number
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_actions_conversation_id_org_id_user_id_fkey"
+            columns: ["conversation_id", "org_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id", "org_id", "user_id"]
+          },
+        ]
+      }
       ai_audit_events: {
         Row: {
           conversation_id: string
@@ -11012,6 +11124,32 @@ export type Database = {
         Returns: Json
       }
       ai_workers_can_access: { Args: { _org_id: string }; Returns: boolean }
+      ai_workers_cancel_action: {
+        Args: {
+          _action_id: string
+          _expected_revision: number
+          _org_id: string
+        }
+        Returns: Json
+      }
+      ai_workers_confirm_action: {
+        Args: {
+          _action_id: string
+          _expected_revision: number
+          _org_id: string
+        }
+        Returns: Json
+      }
+      ai_workers_edit_action: {
+        Args: {
+          _action_id: string
+          _expected_revision: number
+          _input: Json
+          _org_id: string
+          _request_id: string
+        }
+        Returns: Json
+      }
       ai_workers_fail_turn: {
         Args: {
           _input_tokens?: number
@@ -11036,8 +11174,36 @@ export type Database = {
         }
         Returns: undefined
       }
+      ai_workers_get_action: {
+        Args: { _action_id: string; _org_id: string }
+        Returns: Json
+      }
+      ai_workers_list_actions: {
+        Args: { _conversation_id?: string; _org_id: string }
+        Returns: Json
+      }
+      ai_workers_manual_action: {
+        Args: {
+          _action_id: string
+          _expected_revision: number
+          _manual_input: Json
+          _org_id: string
+          _request_id: string
+        }
+        Returns: Json
+      }
       ai_workers_member_org_ids: { Args: never; Returns: string[] }
+      ai_workers_propose_action: {
+        Args: {
+          _conversation_id: string
+          _input: Json
+          _org_id: string
+          _request_id: string
+        }
+        Returns: Json
+      }
       ai_workers_redact_text: { Args: { _text: string }; Returns: string }
+      ai_workers_visible_action_ids: { Args: never; Returns: string[] }
       apply_exporural_reference_2026: {
         Args: {
           p_entities: Json
