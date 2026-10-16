@@ -54,8 +54,12 @@ export async function authenticateWorkspace(req: Request, orgId: string) {
   }
 }
 
+import { isMissingWorkspaceObject } from './workspace-errors.ts';
+export { isMissingWorkspaceObject };
+
 export function workspaceDatabaseError(error: { code?: string; message?: string }): WorkerError {
   const message = error.message ?? '';
+  if (isMissingWorkspaceObject(error)) return new WorkerError('feature_unavailable', 503);
   if (error.code === '42501' || /FORBIDDEN|PERMISSION_DENIED/.test(message)) return new WorkerError('forbidden', 403);
   if (error.code === '54000' || message.includes('RATE_LIMITED')) return new WorkerError('rate_limited', 429);
   if (message.includes('SENSITIVE_TEXT')) return new WorkerError('sensitive_text', 400);
@@ -88,6 +92,7 @@ const messages: Record<string, string> = {
   resource_busy: 'O registro está em uso. Tente novamente com a mesma proposta.', rate_limited: 'Limite de solicitações atingido. Aguarde um momento.',
   request_cancelled: 'Solicitação interrompida.', method_not_allowed: 'Método indisponível.',
   storage_unavailable: 'Não foi possível acessar o serviço.', backend_not_configured: 'O serviço ainda não está disponível.',
+  feature_unavailable: 'Ações e rotinas da Equipe ainda não estão ativas. A conversa continua funcionando.',
 };
 
 export function workspaceError(error: unknown): Response {
